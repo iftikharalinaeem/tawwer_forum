@@ -500,7 +500,10 @@ class CleanspeakPlugin extends Gdn_Plugin {
                 if ($sender->Form->ErrorCount() == 0) {
                     SaveToConfig('Plugins.Cleanspeak.ApplicationID', $FormValues['ApplicationID']);
                     SaveToConfig('Plugins.Cleanspeak.ApiUrl', $FormValues['ApiUrl']);
-                    SaveToConfig('Plugins.Cleanspeak.AccessToken', $FormValues['AccessToken']);
+                    $accessToken = val('AccessToken', $FormValues);
+                    if ($accessToken != false) {
+                        SaveToConfig('Plugins.Cleanspeak.AccessToken', $FormValues['AccessToken']);
+                    }
                     $sender->InformMessage(T('Settings updated.'));
                 } else {
                     $sender->InformMessage(T("Error saving settings to config."));
