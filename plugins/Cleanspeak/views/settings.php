@@ -78,7 +78,7 @@ echo $this->Form->Errors();
 
     <li>
         <?php
-        echo $this->Form->Label('Cleanspeak API Url', 'ApiUrl');
+        echo $this->Form->Label('Cleanspeak API URL', 'ApiUrl');
         echo $this->Form->TextBox('ApiUrl');
         ?>
     </li>
@@ -88,6 +88,16 @@ echo $this->Form->Errors();
         echo $this->Form->Label('Application ID', 'ApplicationID');
         echo $this->Form->TextBox('ApplicationID');
         ?>
+    </li>
+
+    <li>
+        <?php
+        echo $this->Form->Label('Authentication Key', 'AccessToken');
+        echo $this->Form->TextBox('AccessToken');
+        ?>
+        <span>
+            If the Cleanspeak API URL is publicly accessible, authentication key must be set.
+        </span>
     </li>
 
 </ul>
