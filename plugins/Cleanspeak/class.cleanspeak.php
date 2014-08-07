@@ -143,6 +143,10 @@ class Cleanspeak extends Gdn_Pluggable {
         }
         $headers['Content-Type'] = 'application/json';
 
+        $apiKey = C('Plugins.Cleanspeak.AccessToken', null);
+        if (!empty($apiKey)) {
+            $headers['Authentication'] = $apiKey;
+        }
         Logger::log(Logger::DEBUG, 'Cleanspeak API Request.', array($options, $queryParams, $headers));
 
         $response = $proxyRequest->Request($options, $queryParams, null, $headers);

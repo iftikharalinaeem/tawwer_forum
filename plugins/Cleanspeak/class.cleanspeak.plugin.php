@@ -1,5 +1,10 @@
 <?php
 /**
+ *
+ * * Changes:
+ *  0.0.1alpha  Initial release
+ *  1.0         Add Cleanspeak API Key
+ *
  * @copyright 2009-2014 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
@@ -7,7 +12,7 @@
 $PluginInfo['Cleanspeak'] = array(
     'Name' => 'Cleanspeak',
     'Description' => 'Cleanspeak integration for Vanilla.',
-    'Version' => '0.0.1alpha',
+    'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'SettingsUrl' => '/settings/cleanspeak',
     'SettingsPermission' => 'Garden.Settings.Manage',
@@ -478,6 +483,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $configurationModel->SetField(array(
                 'ApiUrl',
                 'ApplicationID',
+                'AccessToken'
             ));
         // Set the model on the form.
         $sender->Form->SetModel($configurationModel);
@@ -492,8 +498,11 @@ class CleanspeakPlugin extends Gdn_Plugin {
                 $sender->Form->ValidateRule('ApiUrl', 'function:ValidateRequired', 'Api Url is required');
 
                 if ($sender->Form->ErrorCount() == 0) {
-                    SaveToConfig('Plugins.Cleanspeak.ApplicationID', $FormValues['ApplicationID']);
-                    SaveToConfig('Plugins.Cleanspeak.ApiUrl', $FormValues['ApiUrl']);
+                    SaveToConfig(array(
+                            'Plugins.Cleanspeak.ApplicationID' => $FormValues['ApplicationID'],
+                            'Plugins.Cleanspeak.ApiUrl' => $FormValues['ApiUrl'],
+                            'Plugins.Cleanspeak.AccessToken' => val('AccessToken', $FormValues, null)
+                        ));
                     $sender->InformMessage(T('Settings updated.'));
                 } else {
                     $sender->InformMessage(T("Error saving settings to config."));
@@ -505,6 +514,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         $sender->Form->SetValue('ApplicationID', C('Plugins.Cleanspeak.ApplicationID'));
         $sender->Form->SetValue('ApiUrl', C('Plugins.Cleanspeak.ApiUrl'));
+        $sender->Form->SetValue('AccessToken', C('Plugins.Cleanspeak.AccessToken'));
 
         $sender->SetData('Enabled', C('Plugins.Cleanspeak.Enabled'));
         $sender->SetData('IsConfigured', $this->isConfigured());
