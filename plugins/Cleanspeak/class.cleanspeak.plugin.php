@@ -498,12 +498,11 @@ class CleanspeakPlugin extends Gdn_Plugin {
                 $sender->Form->ValidateRule('ApiUrl', 'function:ValidateRequired', 'Api Url is required');
 
                 if ($sender->Form->ErrorCount() == 0) {
-                    SaveToConfig('Plugins.Cleanspeak.ApplicationID', $FormValues['ApplicationID']);
-                    SaveToConfig('Plugins.Cleanspeak.ApiUrl', $FormValues['ApiUrl']);
-                    $accessToken = val('AccessToken', $FormValues);
-                    if ($accessToken != false) {
-                        SaveToConfig('Plugins.Cleanspeak.AccessToken', $FormValues['AccessToken']);
-                    }
+                    SaveToConfig(array(
+                            'Plugins.Cleanspeak.ApplicationID' => $FormValues['ApplicationID'],
+                            'Plugins.Cleanspeak.ApiUrl' => $FormValues['ApiUrl'],
+                            'Plugins.Cleanspeak.AccessToken' => val('AccessToken', $FormValues, null)
+                        ));
                     $sender->InformMessage(T('Settings updated.'));
                 } else {
                     $sender->InformMessage(T("Error saving settings to config."));
