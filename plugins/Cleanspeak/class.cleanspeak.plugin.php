@@ -61,7 +61,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         if (GetValue('DiscussionID', $args['Data'])) {
             $discussionModel = new DiscussionModel();
             $discussion = $discussionModel->GetID($args['Data']['DiscussionID']);
-            $content['content']['location'] = DiscussionUrl($discussion);
+            $content['content']['location'] = md5(DiscussionUrl($discussion));
         }
         $UUID = $cleanSpeak->getRandomUUID($args['Data']);
 
