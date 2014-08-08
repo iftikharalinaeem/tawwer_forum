@@ -19,7 +19,7 @@ define('CLUSTER_CONFIG', '/var/www/api/conf/cluster.json');
 
 // Load cluster config
 
-$clusterConfigData = file_get_contents(AGENT_CONFIG);
+$clusterConfigData = file_get_contents(CLUSTER_CONFIG);
 if (!$clusterConfigData) {
     throw new Exception("Cluster configuration is empty", 200);
 }
