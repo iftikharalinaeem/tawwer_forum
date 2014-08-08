@@ -113,6 +113,7 @@ $output = null;
 exec($command, $output, $return);
 
 if ($return) {
+    echo "Failed to sync:\n";
     echo implode("\n",$output);
     exit($return);
 }
