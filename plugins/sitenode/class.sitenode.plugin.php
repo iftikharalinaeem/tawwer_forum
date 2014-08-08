@@ -187,6 +187,14 @@ class SiteNodePlugin extends Gdn_Plugin {
             }
         }
 
+        if ($mobileTheme = val('MobileTheme', $config)) {
+            try {
+                Gdn::ThemeManager()->EnableTheme($mobileTheme, true);
+            } catch (Exception $ex) {
+                Logger::event('nodesync_error', Logger::ERROR, $ex->getMessage());
+            }
+        }
+
         // Synchronize some config.
         $saveConfig = (array)val('Config', $config, []);
         TouchValue('Garden.Title', $saveConfig, valr('Multisite.Name', $config));
