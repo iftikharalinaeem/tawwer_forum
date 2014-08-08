@@ -17,58 +17,72 @@
 define('AGENT_CONFIG', '/usr/local/agent/conf/agent.json');
 define('CLUSTER_CONFIG', '/var/www/api/conf/cluster.json');
 
-// Load cluster config
+try {
 
-$clusterConfigData = file_get_contents(CLUSTER_CONFIG);
-if (!$clusterConfigData) {
-    throw new Exception("Cluster configuration is empty", 200);
-}
-$clusterConfig = json_decode($clusterConfigData, true);
-if (!$clusterConfig) {
-    throw new Exception("Cluster configuration is corrupt", 500);
-}
+    // Load cluster config
 
-// Load agent config
+    $clusterConfigData = file_get_contents(CLUSTER_CONFIG);
+    if (!$clusterConfigData) {
+        throw new Exception("Cluster configuration is empty", 500);
+    }
+    $clusterConfig = json_decode($clusterConfigData, true);
+    if (!$clusterConfig) {
+        throw new Exception("Cluster configuration is corrupt", 500);
+    }
 
-$agentConfigData = file_get_contents(AGENT_CONFIG);
-if (!$agentConfigData) {
-    throw new Exception("Agent configuration is empty", 200);
-}
-$agentConfig = json_decode($agentConfigData, true);
-if (!$agentConfig) {
-    throw new Exception("Agent configuration is corrupt", 500);
-}
+    // Load agent config
 
-// Check cluster state
+    $agentConfigData = file_get_contents(AGENT_CONFIG);
+    if (!$agentConfigData) {
+        throw new Exception("Agent configuration is empty", 500);
+    }
+    $agentConfig = json_decode($agentConfigData, true);
+    if (!$agentConfig) {
+        throw new Exception("Agent configuration is corrupt", 500);
+    }
 
-$mode = valr('cluster.loader.mode', $clusterConfig, null);
-if ($mode != 'multi') {
-    echo "Not a multisite cluster\n";
-    exit;
-}
+    // Check cluster state
 
-// Get multisite auth token
+    $mode = valr('cluster.loader.mode', $clusterConfig, null);
+    if ($mode != 'multi') {
+        throw new Exception("Not a multisite cluster", 400);
+    }
 
-$multisiteToken = valr('cluster.loader.apikey', $clusterConfig, null);
-if (!$multisiteToken) {
-    echo "No multisite token found\n";
-    exit;
-}
+    // Get multisite auth token
 
-// Get agent auth token
+    $multisiteToken = valr('cluster.loader.apikey', $clusterConfig, null);
+    if (!$multisiteToken) {
+        throw new Exception("No multisite token found", 500);
+    }
 
-$dataAccessToken = valr('server.api', $agentConfig, null);
-if (!$dataAccessToken) {
-    echo "No agent apikey found\n";
-    exit;
+    // Get agent auth token
+
+    $dataAccessToken = valr('server.api', $agentConfig, null);
+    if (!$dataAccessToken) {
+        throw new Exception("No agent apikey found", 500);
+    }
+
+    // Get cluster name
+
+    $clusterName = valr('server.cluster', $agentConfig, null);
+    $clusterNetwork = valr('server.network', $agentConfig, null);
+    if (!$clusterName || !$clusterNetwork) {
+        echo "Unknown cluster name or network\n";
+        exit(1);
+    }
+
+
+} catch (Exception $ex) {
+    echo $ex->getMessage()."\n";
+    exit(1);
 }
 
 // CURL to cluster
 
-$url = "https://127.0.0.1/forum/callback";
+$url = "https://data.{$clusterName}.{$clusterNetwork}/forum/callback";
 $method = "POST";
 $headers = [
-    'Authorization' => "token {$token}",
+    'Authorization' => "token {$multisiteToken}",
     'Content-Type' => 'application/json'
 ];
 
@@ -89,6 +103,7 @@ $command[] = "-X POST";
 $command[] = "-H 'Content-Type: application/json'";
 $command[] = "-H 'X-Access-Token: {$dataAccessToken}'";
 $command[] = "--data-ascii '{$payload}'";
+$command[] = "--insecure";
 $command[] = "{$url}";
 
 $command = implode(' ', $command);
