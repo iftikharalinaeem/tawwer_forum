@@ -404,7 +404,7 @@ class SearchModel extends Gdn_Model {
       }
 
 
-      $Prefix = C('Database.Name').'_';
+      $Prefix = str_replace(array('-'), '_', C('Database.Name')).'_';
       foreach ($Indexes as &$Name) {
          $Name = $Prefix.$Name;
       }
@@ -454,7 +454,7 @@ class SearchModel extends Gdn_Model {
 //      $search = Search::cleanSearch($search);
 //      Trace($search, 'calc search');
 
-
+/*
       $Indexes = $this->Types;
       $Prefix = C('Database.Name').'_';
       foreach ($Indexes as &$Name) {
@@ -529,6 +529,7 @@ class SearchModel extends Gdn_Model {
 		}
 
       return $Result;
+ */
 	}
 
    public function setSort($sphinx, $terms, $search) {

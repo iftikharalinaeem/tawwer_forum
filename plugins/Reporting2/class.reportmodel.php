@@ -110,12 +110,17 @@ class ReportModel extends Gdn_Model {
                 $reportAttributes['CategoryID'] = $contextDiscussion['CategoryID'];
             }
 
+            // Build report name
+            $reportName = sprintf(T('[Reported] %s', "%s"),
+               $contextDiscussion['Name'],
+               $reportedRecord['InsertName'], // Author Name
+               $contextDiscussion['Category']
+            );
+
+            // Build discussion record
             $discussion = array(
-                'Name' => sprintf(T('[Reported] %s', "%s"),
-                    $contextDiscussion['Name'],
-                    $reportedRecord['InsertName'], // Author Name
-                    $contextDiscussion['Category']
-                ),
+                // Limit new name to 100 char (db column size)
+                'Name' => SliceString($reportName , 100),
                 'Body' => sprintf(T('Report Body Format', "%s\n\n%s"),
                     formatQuote($reportedRecord),
                     reportContext($reportedRecord)
