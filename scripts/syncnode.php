@@ -104,6 +104,7 @@ $command[] = "-H 'Content-Type: application/json'";
 $command[] = "-H 'X-Access-Token: {$dataAccessToken}'";
 $command[] = "--data-ascii '{$payload}'";
 $command[] = "--insecure";
+$command[] = "-s";
 $command[] = "{$url}";
 
 $command = implode(' ', $command);
