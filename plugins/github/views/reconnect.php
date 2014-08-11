@@ -5,7 +5,7 @@
 
 </script>
 <h2>
-    Github
+    GitHub
 </h2>
-<p><?php echo T('You need to login to your Github account to continue.') ?></p>
-<button id="GithubLogin" class="Button BigButton">Login</button>
+<p><?php echo T('You need to login to your GitHub account to continue.') ?></p>
+<button id="GithubLogin" class="Button BigButton"><?php echo T('Login'); ?></button>
