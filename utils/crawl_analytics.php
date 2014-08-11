@@ -14,7 +14,8 @@ $AccessToken = FALSE;
 require_once dirname(realpath(__FILE__)).'/functions.commandline.php';
 
 
-for ($Offset = 1; $Offset < 10; $Offset++) {
+for ($Page = 0; $Page < 10; $Page++) {
+   $Offset = $Page * 30;
    // Get a list of sites to crawl.
    $Data = Curl("http://$Domain/stats/browse.json?Advanced=1&Pingable=1&access_token=$AccessToken&offset=$Offset");
    $Sites = $Data['Sites'];
