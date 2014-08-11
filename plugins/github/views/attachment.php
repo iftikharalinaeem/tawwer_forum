@@ -5,7 +5,7 @@
  */
 
 /**
- * Writes attachments for Github Issues.
+ * Writes attachments for GitHub Issues.
  *
  * @param array $attachment
  */

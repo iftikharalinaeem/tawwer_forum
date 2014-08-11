@@ -175,7 +175,7 @@ figure {
 hr {
   -moz-box-sizing: content-box;
   -webkit-box-sizing: content-box;
-  box-sizing: content-box;
+          box-sizing: content-box;
   height: 0; }
 
 /**
@@ -270,8 +270,8 @@ input {
  */
 input[type="checkbox"], input[type="radio"] {
   -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
   /* 1 */
   padding: 0;
   /* 2 */ }
@@ -939,7 +939,7 @@ a {
   color: #2e9df7;
   text-decoration: none;
   -webkit-transition: color 150ms;
-  transition: color 150ms; }
+          transition: color 150ms; }
   a:hover, a:focus {
     color: #087ad1;
     text-decoration: none; }
@@ -973,6 +973,9 @@ p {
   font-size: 15px;
   line-height: 22px;
   border-radius: 4px; }
+
+.DateBox {
+  display: inline-block; }
 
 .CommentForm .FormWrapper {
   padding-left: 90px; }
@@ -1009,6 +1012,11 @@ p {
 .iradio.checked:before {
   content: "\f138"; }
 
+.PostOptions .ReactSprite {
+  margin: 5px;
+  width: 14px;
+  height: 14px; }
+
 .Flyout *, .MenuItems * {
   font-size: 15px;
   line-height: 22px; }
@@ -1035,7 +1043,7 @@ p {
   border: transparent solid 1px;
   border-radius: 3px;
   -webkit-transition: -webkit-box-shadow 50ms;
-  transition: box-shadow 50ms;
+          transition: box-shadow 50ms;
   -webkit-font-smoothing: inherit;
   color: #fff;
   background-color: #2e9df7;
@@ -1050,7 +1058,7 @@ p {
     border-top-color: #d9d9d9;
     border-top-color: rgba(0, 0, 0, 0.15);
     -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) inset;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) inset; }
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) inset; }
   .button:hover, .button:focus, .button:active, .Button:hover, .Button:focus, .Button:active {
     color: #fff;
     background-color: #249bf7;
@@ -1058,7 +1066,7 @@ p {
 
 .Button {
   -webkit-box-shadow: none;
-  box-shadow: none; }
+          box-shadow: none; }
   .Button, .Button:hover, .Button:focus, .Button:active {
     text-shadow: none;
     border-color: transparent; }
@@ -1259,7 +1267,7 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   background-color: #2e9df7;
   -webkit-box-shadow: 0 15px 15px -15px rgba(0, 0, 0, 0.25) inset, 0 -15px 15px -15px rgba(0, 0, 0, 0.25) inset;
-  box-shadow: 0 15px 15px -15px rgba(0, 0, 0, 0.25) inset, 0 -15px 15px -15px rgba(0, 0, 0, 0.25) inset; }
+          box-shadow: 0 15px 15px -15px rgba(0, 0, 0, 0.25) inset, 0 -15px 15px -15px rgba(0, 0, 0, 0.25) inset; }
   .masthead h1, .masthead h2, .masthead h3, .masthead h4, .masthead h5, .masthead h6 {
     color: #fff; }
   .masthead form {
@@ -1368,7 +1376,7 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   border: #eee solid 1px;
   border-radius: 3px;
   -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
   .MessageList .Item:nth-child(odd) {
     background-color: transparent; }
   .MessageList .Item:before, .MessageList .Item:after {
@@ -1399,7 +1407,7 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
 .PhotoWrap {
   border-radius: 4px;
   -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); }
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); }
   .PhotoWrap:before {
     position: absolute;
     top: 0;
@@ -1410,7 +1418,7 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
     display: block;
     border-radius: 4px;
     -webkit-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) inset;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) inset;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) inset;
     content: " "; }
   .PhotoWrap img {
     border-radius: 4px; }
@@ -1421,7 +1429,7 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   border-radius: 4px;
   border: solid 1px #333;
   -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); }
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); }
 
 .ProfilePhotoMedium {
   width: 64px;
@@ -1460,3 +1468,6 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
 
 .Profile > .BoxFilter {
   display: none; }
+
+.PhotoGrid .PhotoWrap {
+  display: block; }

@@ -53,8 +53,10 @@ class CleanspeakPlugin extends Gdn_Plugin {
                 'senderId' => $cleanSpeak->getUserUUID($args['Data']['InsertUserID'])
             )
         );
-        if (GetValue('DiscussionID', $args['Data']) && GetValue('Name', $args['Data'])) {
-            $content['content']['location'] = DiscussionUrl($args['Data']);
+        if (GetValue('DiscussionID', $args['Data'])) {
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->GetID($args['Data']['DiscussionID']);
+            $content['content']['location'] = DiscussionUrl($discussion);
         }
         $UUID = $cleanSpeak->getRandomUUID($args['Data']);
 
@@ -143,9 +145,20 @@ class CleanspeakPlugin extends Gdn_Plugin {
         // Minimum Permissions needed
         $sender->Permission('Garden.Moderation.Manage');
 
+        if (Gdn::Request()->RequestMethod() != 'POST') {
+            Logger::event(
+                'postback_error',
+                Logger::ERROR,
+                'Invalid request method: {method}',
+                array('method' => Gdn::Request()->RequestMethod())
+            );
+            throw new Gdn_UserException('Invalid Request Type');
+        }
+
         $post = Gdn::Request()->Post();
         if (!$post) {
-            throw new Gdn_UserException('Invalid Request Type');
+            Logger::event('postback_error', Logger::ERROR, 'Error in POST', $post);
+            throw new Gdn_UserException('Error in POST');
         }
 
         $type = $post['type'];
@@ -160,7 +173,8 @@ class CleanspeakPlugin extends Gdn_Plugin {
                 $this->userAction($sender);
                 break;
             default:
-                throw new Gdn_UserException('Unknown moderation type: ' . $type);
+                $context['Post'] = $post;
+                Logger::event('cleanspeak_error', Logger::ERROR, 'Unknown Type.', $context);
         }
 
         $sender->Render('blank', 'utility', 'dashboard');
@@ -180,11 +194,13 @@ class CleanspeakPlugin extends Gdn_Plugin {
             array(
                 "moderatorId" => $post['moderatorId'],
                 "moderatorEmail" => $post['moderatorEmail'],
-                "moderatorExternalId" => $post['moderatorExternalId']
+                "moderatorExternalId" => GetValue('moderatorExternalId', $post)
             )
         );
         if (!$moderatorUserID) {
-            throw new Gdn_UserException('Unknown Moderator');
+            // Not able to relate moderator to vanilla user id.
+            // User Cleanspeak user id instead.
+            return $this->getUserID();
         }
         $sender->SetData('ModeratorUserID', $moderatorUserID);
         $queueModel->setModerator($moderatorUserID);
@@ -492,25 +508,55 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         $sender->SetData('Enabled', C('Plugins.Cleanspeak.Enabled'));
         $sender->SetData('IsConfigured', $this->isConfigured());
+
+        $sender->SetData('PostBackURL', $this->getPostBackURL());
+        if (Gdn::PluginManager()->CheckPlugin('sitenode')) {
+
+            $sender->SetData('PostBackURL', $this->getPostBackURL(true));
+        }
         $sender->Render($this->GetView('settings.php'));
 
 
     }
 
+    public function getPostBackURL($multiSite = false) {
+        if (!Gdn::PluginManager()->CheckPlugin('SimpleAPI')) {
+            return false;
+        }
+
+        $URL = Url('/mod/cleanspeakpostback.json', true);
+
+        if ($multiSite) {
+            $URL = C('Hub.Url', Gdn::Request()->Domain().'/hub') . '/multisites/cleanspeakproxy.json';
+        }
+
+
+        if (strstr($URL, '?')) {
+            $URL .= '&';
+        } else {
+            $URL .= '?';
+        }
+        $URL .= 'access_token=' . C('Plugins.SimpleAPI.AccessToken');
+
+        return $URL;
+    }
+
     /**
      * @param SettingsController $sender Sending controller.
+     * @param array $args Sending arguments.
      */
-    public function settingsController_cleanspeakToggle_create($sender) {
-
+    public function settingsController_cleanspeakToggle_create($sender, $args) {
 
         if (C('Plugins.Cleanspeak.Enabled')) {
             SaveToConfig('Plugins.Cleanspeak.Enabled', false);
+            $buttonText = T('Enable');
         } else {
             SaveToConfig('Plugins.Cleanspeak.Enabled', true);
+            $buttonText = T('Disable');
         }
         $sender->InformMessage(T('Changes Saved'));
-        Redirect(Url('/settings/cleanspeak'));
-
+        $sender->JsonTarget("#cstoggle", $buttonText);
+        $sender->Render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
@@ -545,4 +591,11 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
     }
 
+    /**
+     * @param MultisitesController $sender
+     */
+    public function multisitesController_nodeConfig_render($sender) {
+        TouchValue('Plugins.Cleanspeak.ApplicationID', $sender->Data['Config'], C('Plugins.Cleanspeak.ApplicationID'));
+        TouchValue('Plugins.Cleanspeak.ApiUrl', $sender->Data['Config'], C('Plugins.Cleanspeak.ApiUrl'));
+    }
 }

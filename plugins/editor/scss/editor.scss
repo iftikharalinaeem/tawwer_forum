@@ -177,20 +177,14 @@
       padding: 5px 0;
       width: auto;
 
+      /*
+      max-height: 230px;
+      overflow-y: auto;
+      */
+
       .wysihtml5-command-active {
          border-radius: 0;
       }
-
-      /*
-      .editor-action-h1 {
-         font-size: 18px;
-         line-height: 28px !important;
-      }
-
-      .editor-action-h2 {
-         font-size: 16px;
-      }
-      */
    }
 }
 

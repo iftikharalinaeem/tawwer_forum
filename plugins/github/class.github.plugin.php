@@ -1,14 +1,20 @@
 <?php
 /**
+ *
+ * GitHub Plugin
+ *
+ * Changes:
+ *  1.0      Initial release
+ *
  * @copyright 2009-2014 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
 // Define the plugin:
 $PluginInfo['github'] = array(
-    'Name' => 'Github',
-    'Description' => "Allow staff users to create Issues from discussions and comments.",
-    'Version' => '0.0.1-alpha',
+    'Name' => 'GitHub',
+    'Description' => "Allow staff users to create issues from discussions and comments.",
+    'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.1.18'),
     'SettingsUrl' => '/dashboard/plugin/github',
     'SettingsPermission' => 'Garden.Settings.Manage',
@@ -56,7 +62,7 @@ class GithubPlugin extends Gdn_Plugin {
         if (!$this->accessToken) {
             $this->accessToken = C('Plugins.Github.GlobalLogin.AccessToken');
             if ($this->accessToken) {
-                Trace('Github Using Global Login');
+                Trace('GitHub Using Global Login');
             }
         }
 
@@ -72,7 +78,7 @@ class GithubPlugin extends Gdn_Plugin {
      */
     public static function authorizeUri($RedirectUri = false) {
         if (!self::isConfigured()) {
-            throw new Gdn_UserException('Github is not configured yet');
+            throw new Gdn_UserException('GitHub is not configured yet');
         }
         $AppID = C('Plugins.Github.ApplicationID');
         if (!$RedirectUri) {
@@ -115,7 +121,7 @@ class GithubPlugin extends Gdn_Plugin {
      */
     public static function getTokens($Code, $RedirectUri) {
         if (!self::isConfigured()) {
-            throw new Gdn_UserException('Github is not configured yet');
+            throw new Gdn_UserException('GitHub is not configured yet');
         }
         $Post = array(
             'client_id' => C('Plugins.Github.ApplicationID'),
@@ -137,11 +143,11 @@ class GithubPlugin extends Gdn_Plugin {
         );
 
         if ($Proxy->ResponseStatus == 404) {
-            throw new Gdn_UserException('Error Communicating with Github API');
+            throw new Gdn_UserException('Error Communicating with GitHub API');
         }
 
         if (isset($Response->error)) {
-            throw new Gdn_UserException('Error Communicating with Github API: ' . $Response->error_description);
+            throw new Gdn_UserException('Error Communicating with GitHub API: ' . $Response->error_description);
         }
 
         return json_decode($Response);
@@ -212,7 +218,7 @@ class GithubPlugin extends Gdn_Plugin {
     /**
      * OAUth Method.  Code is Exchanged for Token.
      *
-     * Token is stored for later use.  Token does not expire.  It can be revoked from Github
+     * Token is stored for later use.  Token does not expire.  It can be revoked from GitHub
      *
      * @param ProfileController $Sender Sending controller.
      * @param string $UserReference User Reference.
@@ -278,7 +284,7 @@ class GithubPlugin extends Gdn_Plugin {
     }
 
     /**
-     * OAuth Method. Handles the redirect from Github and stores AccessToken.
+     * OAuth Method. Handles the redirect from GitHub and stores AccessToken.
      *
      * @throws Gdn_UserException If Error.
      */
@@ -302,7 +308,7 @@ class GithubPlugin extends Gdn_Plugin {
                     'Plugins.Github.GlobalLogin.AccessToken' => $AccessToken
                 )
             );
-            throw new Gdn_UserException('Error Connecting to Github');
+            throw new Gdn_UserException('Error Connecting to GitHub');
         }
         Redirect(Url('/plugin/github'));
 
@@ -341,6 +347,8 @@ class GithubPlugin extends Gdn_Plugin {
      * Setup the plugin.
      */
     public function setup() {
+
+        SaveToConfig('Garden.AttachmentsEnabled', true);
         // Save the provider type.
         Gdn::SQL()->Replace(
             'UserAuthenticationProvider',
@@ -505,14 +513,14 @@ class GithubPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Creates the Virtual Github Controller and adds Link to SideMenu in the dashboard.
+     * Creates the Virtual GitHub Controller and adds Link to SideMenu in the dashboard.
      *
      * @param PluginController $Sender Sending controller.
      */
     public function pluginController_github_create($Sender) {
 
         $Sender->Permission('Garden.Settings.Manage');
-        $Sender->Title('Github');
+        $Sender->Title('GitHub');
         $Sender->AddSideMenu('plugin/github');
         $Sender->Form = new Gdn_Form();
         $this->Dispatch($Sender, $Sender->RequestArgs);
@@ -555,11 +563,7 @@ class GithubPlugin extends Gdn_Plugin {
                     $Sender->Form->AddError('Please enter a valid repo name', 'Repositories');
                 } else {
                     foreach ($repos as $repo) {
-                        try {
-                            if (!$this->isValidRepo(trim($repo))) {
-                                $Sender->Form->AddError('Repository not found: ' . $repo, 'Repositories');
-                            }
-                        } catch (Gdn_UserException $e) {
+                        if (!$this->isValidRepoName($repo)) {
                             $Sender->Form->AddError('Invalid Repository: ' . $repo, 'Repositories');
                         }
                     }
@@ -619,6 +623,18 @@ class GithubPlugin extends Gdn_Plugin {
      * @throws Exception Permission Denied.
      */
     public function discussionController_githubIssue_create($Sender, $Args) {
+
+        if ($this->accessToken === null) {
+            $this->setAccessToken();
+        }
+
+
+        if (!$this->isConnected()) {
+
+            $Sender->SetData('LoginURL', Url('/profile/connections'));
+            $Sender->Render('reconnect', '', 'plugins/github');
+            return;
+        }
 
         // Signed in users only.
         if (!(Gdn::Session()->IsValid())) {
@@ -695,9 +711,9 @@ class GithubPlugin extends Gdn_Plugin {
 
 
                     $Sender->JsonTarget('', $Url, 'Redirect');
-                    $Sender->InformMessage(T('Github Issue created'));
+                    $Sender->InformMessage(T('GitHub Issue created'));
                 } else {
-                    $Sender->InformMessage(T('Error creating Github Issue'));
+                    $Sender->InformMessage(T('Error creating GitHub Issue'));
                 }
 
             }
@@ -744,7 +760,7 @@ class GithubPlugin extends Gdn_Plugin {
 
         if (isset($Args['DiscussionOptions'])) {
             $Args['DiscussionOptions']['GithubIssue'] = array(
-                'Label' => T('Github - Create Issue'),
+                'Label' => T('GitHub - Create Issue'),
                 'Url' => "/discussion/githubissue/discussion/$DiscussionID/$UserID",
                 'Class' => 'Popup'
             );
@@ -777,7 +793,7 @@ class GithubPlugin extends Gdn_Plugin {
         }
         if (isset($Args['CommentOptions'])) {
             $Args['CommentOptions']['GithubIssue'] = array(
-                'Label' => T('Github - Create Issue'),
+                'Label' => T('GitHub - Create Issue'),
                 'Url' => "/discussion/githubissue/comment/$CommentID/$UserID",
                 'Class' => 'Popup'
             );
@@ -805,7 +821,7 @@ class GithubPlugin extends Gdn_Plugin {
      *
      * @todo add cache for GET
      *
-     * @return string JSON response from Github.
+     * @return string JSON response from GitHub.
      */
     public function apiRequest($endPoint, $post = null) {
         if ($this->accessToken === null) {
@@ -825,7 +841,7 @@ class GithubPlugin extends Gdn_Plugin {
                 'Accept' => 'application/json'
             )
         );
-        Trace('Github API Request: ' . self::API_BASE_URL . $endPoint);
+        Trace('GitHub API Request: ' . self::API_BASE_URL . $endPoint);
         $DecodedResponse = json_decode($Response, true);
 //        if ($Proxy->ResponseStatus == 500) {
 //            throw new Gdn_UserException('Invalid apiRequest', $Proxy->ResponseStatus);
@@ -867,6 +883,9 @@ class GithubPlugin extends Gdn_Plugin {
         $response = $this->apiRequest('/repos/' . $repo . '/issues', json_encode($issue));
         if (GetValue('id', $response)) {
             return $response;
+        }
+        if (GetValue('message', $response)) {
+            throw new Gdn_UserException('Error creating issue: ' . $response['message']);
         }
         return false;
     }
@@ -1007,6 +1026,17 @@ class GithubPlugin extends Gdn_Plugin {
 
     }
 
+    /**
+     * Add GitHub to Dashboard menu.
+     *
+     * @param Controller $Sender
+     * @param array $Arguments
+     */
+    public function Base_GetAppSettingsMenuItems_Handler($Sender, $Arguments) {
+        $Menu = $Arguments['SideMenu'];
+        $Menu->AddItem('Forum', T('Forum'));
+        $Menu->AddLink('Forum', 'GitHub', 'plugin/github', 'Garden.Settings.Manage');
+    }
 
 }
 

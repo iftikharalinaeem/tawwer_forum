@@ -1,4 +1,4 @@
-<h1>Github</h1>
+<h1>GitHub</h1>
 
 <script>
     $(document).ready(function () {
@@ -29,7 +29,7 @@
 </script>
 
 <div class="Info">
-    <?php echo T('This plugin allows you to submit user discussion and comments as Github issues'); ?>.
+    <?php echo T('This plugin allows you to submit user discussion and comments as GitHub issues'); ?>.
 </div>
 
 <div class="FilterMenu">
@@ -46,7 +46,7 @@
         <ol>
             <li><?php
                 echo Anchor(
-                    'Create a new application in Github',
+                    'Create a new application in GitHub',
                     'https://github.com/settings/applications/new',
                     '',
                     array('Target' => '_blank')
@@ -67,7 +67,7 @@
 </div>
 
 
-<h3><?php echo T('Github Settings'); ?></h3>
+<h3><?php echo T('GitHub Settings'); ?></h3>
 
 <?php
 // Settings
@@ -93,7 +93,7 @@ echo $this->Form->Errors();
     <li>
         <?php
         echo $this->Form->Label('Repositories', 'Repositories');
-        ?> <span>List of Repositories separted by newline.</span><?php
+        ?><span><?php echo T('List of Repositories separted by newline.  Enter the GitHub username and repo, E.g. \'username/reponame\''); ?></span><?php
         echo $this->Form->TextBox('Repositories', array('MultiLine' => true));
         ?>
     </li>
@@ -107,9 +107,9 @@ echo $this->Form->Errors();
 
 <h3 id="global-login">Global Login</h3>
 <div class="Info">
-    <p><?php echo T('This feature will allow you to have all Staff use one Github Connection.'); ?></p>
+    <p><?php echo T('This feature will allow you to have all Staff use one GitHub connection.'); ?></p>
 
-    <p><?php echo T('If a user has a connection already established we will use that instead.'); ?>'</p>
+    <p><?php echo T('If a user has a connection already established we will use that instead.'); ?></p>
 </div>
 
 <?php if (!$this->Data['GlobalLoginEnabled']) { ?>
@@ -121,7 +121,7 @@ echo $this->Form->Errors();
 <?php } else { ?>
 
     <div class="Info">
-        <?php echo T('Global Login is currently'); ?> <strong><?php echo T('Enabled'); ?></strong>
+        <?php echo T('Global login is currently'); ?> <strong><?php echo T('Enabled'); ?></strong>
 
         <?php if ($this->Data['GlobalLoginConnected']) { ?>
 
