@@ -334,7 +334,9 @@ function WriteGroupCard($Group, $WithButtons = TRUE) {
          SliceString(
             Gdn_Format::PlainText($Group['Description'], $Group['Format']), 
             C('Groups.CardDescription.ExcerptLength', 150)).'</p>';
-      echo '<div class="Group-Members">'.sprintf(Plural($Group['CountMembers'], '%d member','%d members', number_format($Group['CountMembers'])), $Group['CountMembers']).'</div>';
+      echo '<div class="Group-Members">'
+.              Plural($Group['CountMembers'], '%d member','%s members', number_format($Group['CountMembers']))
+          .'</div>';
       
       if ($WithButtons)
          WriteGroupButtons($Group);
