@@ -1016,7 +1016,7 @@
             $(this).closest('.bodybox-wrap').fileupload({
 
                // Options
-               url: '/post/editorupload',
+               url: gdn.url('/post/editorupload'),
                paramName: editorFileInputName,
                dropZone: $init,
                forceIframeTransport: false,
