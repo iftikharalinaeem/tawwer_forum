@@ -232,6 +232,13 @@ class GithubPlugin extends Gdn_Plugin {
         $Code = false
     ) {
 
+        if (Gdn::Request()->Get('error')) {
+            $Message = Gdn::Request()->Get('error_description');
+            Gdn::Dispatcher()->PassData('Exception', htmlspecialchars($Message))
+                ->Dispatch('home/error');
+            return;
+        }
+
         if (stristr(Gdn::Request()->Url(), 'globallogin') !== false) {
             Redirect(Url('/plugin/github/connect?code=' . Gdn::Request()->Get('code')));
         }
@@ -320,7 +327,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @return string
      */
     public static function globalConnectUrl() {
-        return Gdn::Request()->Url('/profile/githubconnect/globallogin/', true, true, true);
+        return Gdn::Request()->Url('/profile/githubconnect/globallogin/', true);
     }
 
     /**
@@ -1036,6 +1043,10 @@ class GithubPlugin extends Gdn_Plugin {
         $Menu = $Arguments['SideMenu'];
         $Menu->AddItem('Forum', T('Forum'));
         $Menu->AddLink('Forum', 'GitHub', 'plugin/github', 'Garden.Settings.Manage');
+    }
+
+    public function ProfileController_GetConnections_Handler($sender) {
+        //var_dump(Gdn::Request()->Post());
     }
 
 }
