@@ -6,6 +6,7 @@ PagerModule::Write(array('Sender' => $this));
     <tr>
         <th><?php echo T('Name'); ?></th>
         <th><?php echo T('Url') ?></th>
+        <th><?php echo T('Last Sync') ?></th>
         <th><?php echo T('Status') ?></th>
     </tr>
     </thead>
@@ -18,6 +19,11 @@ PagerModule::Write(array('Sender' => $this));
             <td>
                 <?php
                 echo Anchor(htmlspecialchars($Row['FullUrl']), $Row['FullUrl'], '', ['target' => '_blank']);
+                ?>
+            </td>
+            <td>
+                <?php
+                echo Gdn_Format::Date($Row['DateLastSync'], 'html');
                 ?>
             </td>
             <td><?php echo strtolower($Row['Status']); ?></td>

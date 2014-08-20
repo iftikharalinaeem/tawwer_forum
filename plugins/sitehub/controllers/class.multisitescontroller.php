@@ -175,9 +175,20 @@ class MultisitesController extends DashboardController {
     }
 
     protected function patch() {
+        $this->Permission('Garden.Settings.Manage');
+
         if (!$this->site) {
             throw NotFoundException('Site');
         }
+
+        $post = $this->Request->Post();
+
+        if (isset($post['DateLastSync'])) {
+            $this->siteModel->SetField($this->site['MultisiteID'], 'DateLastSync', $post['DateLastSync']);
+            $this->SetData('DateLastSync', true);
+        }
+
+        $this->Render('api');
     }
 
     protected function post() {
@@ -222,6 +233,10 @@ class MultisitesController extends DashboardController {
         } else {
             $result = MultisiteModel::instance()->syncNodes();
             $this->SetData('Result', $result);
+
+            if ($this->DeliveryType() !== DELIVERY_TYPE_DATA) {
+                $this->InformMessage(T('The sites are now synchronizing.'));
+            }
         }
         $this->Render('api');
     }

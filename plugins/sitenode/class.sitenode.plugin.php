@@ -144,6 +144,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         $response = $request->Request([
             'URL' => $url,
             'Cookies' => !$system,
+            'Method' => $method,
             'Timeout' => 100,
         ], $params, null, $headers);
 
@@ -169,6 +170,8 @@ class SiteNodePlugin extends Gdn_Plugin {
         if (!val('Sync', $config)) {
             return;
         }
+
+        $siteID = valr('Multisite.MultisiteID', $config);
 
         // Enable plugins.
         foreach (val('Addons', $config, []) as $addonKey => $enabled) {
@@ -206,9 +209,10 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Synchronize the categories.
         $this->syncCategories(val('Categories', $config, []), $roleMap);
 
-        // Tell the hub that we've synchronized.
-
         $this->FireEvent('AfterSync');
+
+        // Tell the hub that we've synchronized.
+        $result = $this->hubApi("/multisites/$siteID.json", 'POST', ['DateLastSync' => Gdn_Format::ToDateTime()], true);
 
         Gdn::Config()->Shutdown();
     }

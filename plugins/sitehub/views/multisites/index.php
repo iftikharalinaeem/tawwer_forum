@@ -25,3 +25,12 @@
 require $this->FetchViewLocation('table');
 ?>
 </div>
+
+<div class="Wrap">
+    <div class="Info2">
+        The sites are synchronized with the hub roughly every 20 minutes.
+        <?php
+        echo Anchor(T('Sync Now'), '/multisites/syncnode.json', 'SmallButton Hijack');
+        ?>
+    </div>
+</div>
