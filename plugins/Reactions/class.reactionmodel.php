@@ -398,6 +398,7 @@ class ReactionModel {
                $Url = DiscussionUrl($Row, '', '#latest');
                break;
             case 'Comment':
+               $Row['Name'] = sprintf(T('Re: %s'), $Row['Name']);
                $Url = CommentUrl($Row, '/');
                break;
             default:
