@@ -232,6 +232,13 @@ class GithubPlugin extends Gdn_Plugin {
         $Code = false
     ) {
 
+        if (Gdn::Request()->Get('error')) {
+            $Message = Gdn::Request()->Get('error_description');
+            Gdn::Dispatcher()->PassData('Exception', htmlspecialchars($Message))
+                ->Dispatch('home/error');
+            return;
+        }
+
         if (stristr(Gdn::Request()->Url(), 'globallogin') !== false) {
             Redirect(Url('/plugin/github/connect?code=' . Gdn::Request()->Get('code')));
         }
@@ -320,7 +327,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @return string
      */
     public static function globalConnectUrl() {
-        return Gdn::Request()->Url('/profile/githubconnect/globallogin/', true, true, true);
+        return Gdn::Request()->Url('/profile/githubconnect/globallogin/', true);
     }
 
     /**
@@ -688,7 +695,7 @@ class GithubPlugin extends Gdn_Plugin {
                     $FormValues['Repository'],
                     array(
                         'title' => $FormValues['Title'],
-                        'body' => Gdn_Format::TextEx($FormValues['Body']) . $bodyAppend,
+                        'body' => $FormValues['Body'] . $bodyAppend,
                         'labels' => array('Vanilla')
                     )
                 );
@@ -721,7 +728,7 @@ class GithubPlugin extends Gdn_Plugin {
 
         $Data = array(
             'RepositoryOptions' => $RepositoryOptions,
-            'Body' => Gdn_Format::TextEx($Content->Body),
+            'Body' => $this->convertToMDCompatible($Content->Body, $Content->Format),
             'Title' => $Title
         );
         $Sender->SetData($Data);
@@ -1037,6 +1044,22 @@ class GithubPlugin extends Gdn_Plugin {
         $Menu->AddItem('Forum', T('Forum'));
         $Menu->AddLink('Forum', 'GitHub', 'plugin/github', 'Garden.Settings.Manage');
     }
+
+    /**
+     * Used to convert text to mark down accepted by GitHub.
+     * @param string $Text Text to be converted.
+     * @param string $Format Format of text
+     */
+    public function convertToMDCompatible($Text, $Format = 'Html') {
+        switch ($Format) {
+            case 'Markdown':
+                return $Text;
+                break;
+            default:
+                return Gdn_Format::Text($Text, false);
+        }
+    }
+
 
 }
 
