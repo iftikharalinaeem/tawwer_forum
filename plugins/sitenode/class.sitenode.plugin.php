@@ -394,6 +394,7 @@ class SiteNodePlugin extends Gdn_Plugin {
                     $roleHubIDs = ConsolidateArrayValuesByKey($roles, 'HubID');
                     $roles = $roleModel->GetWhere(['HubID' => $roleHubIDs])->ResultArray();
                     $user['Roles'] = ConsolidateArrayValuesByKey($roles, 'RoleID');
+                    $user['RoleID'] = $user['Roles'];
                 }
 
                 // Fire an event so that plugins can determine access etc.
