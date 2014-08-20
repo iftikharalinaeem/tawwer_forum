@@ -39,7 +39,7 @@ if (CheckPermission('Garden.Settings.Manage')
       echo $this->Form->Errors();
    ?>
 
-   <p>Select an avatar from this pool of options:</p>
+   <p><?php echo T('Select one of the following avatars:'); ?></p>
    <ul id="stockavatar-picker">
 
       <?php foreach ($stock_avatar_payload as $avatar): ?>
