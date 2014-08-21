@@ -5720,7 +5720,11 @@ wysihtml5.quirks.cleanPastedHTML = (function() {
   // TODO: We probably need more rules here
   var defaultRules = {
     // When pasting underlined links <a> into a contentEditable, IE thinks, it has to insert <u> to keep the styling
-    "a u": wysihtml5.dom.replaceWithChildNodes
+    "a u": wysihtml5.dom.replaceWithChildNodes,
+    // Chrome google docs paste.
+    "span[id^=docs-internal-guid-]": wysihtml5.dom.replaceWithChildNodes,
+    // Firefox google docs paste.
+    "b[id^=docs-internal-guid-]": wysihtml5.dom.replaceWithChildNodes
   };
 
   function cleanPastedHTML(elementOrHtml, rules, context) {
