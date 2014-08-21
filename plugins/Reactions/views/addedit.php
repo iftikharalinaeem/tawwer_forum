@@ -11,11 +11,6 @@ echo $this->Form->Errors();
          <div><?php echo $this->Form->TextBox('Name'); ?></div>
       </li>
 
-      <li class="UrlCode">
-         <?php echo $this->Form->Label('UrlCode'); ?>
-         <div><?php echo $this->Form->TextBox('UrlCode'); ?></div>
-      </li>
-
       <li class="Description">
          <?php echo $this->Form->Label('Description'); ?>
          <div><?php echo $this->Form->TextBox('Description', array('Table' => 'Reaction', 'MultiLine' => true)); ?></div>
