@@ -430,7 +430,7 @@ class GithubPlugin extends Gdn_Plugin {
             return;
         }
 
-        if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+        if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
             return;
         }
         $Attachments = GetValue('Attachments', $Args[$Content]);
@@ -526,7 +526,7 @@ class GithubPlugin extends Gdn_Plugin {
      */
     public function pluginController_github_create($Sender) {
 
-        $Sender->Permission('Garden.Settings.Manage');
+        $Sender->Permission('Garden.Staff.Allow');
         $Sender->Title('GitHub');
         $Sender->AddSideMenu('plugin/github');
         $Sender->Form = new Gdn_Form();
@@ -1042,7 +1042,7 @@ class GithubPlugin extends Gdn_Plugin {
     public function Base_GetAppSettingsMenuItems_Handler($Sender, $Arguments) {
         $Menu = $Arguments['SideMenu'];
         $Menu->AddItem('Forum', T('Forum'));
-        $Menu->AddLink('Forum', 'GitHub', 'plugin/github', 'Garden.Settings.Manage');
+        $Menu->AddLink('Forum', 'GitHub', 'plugin/github', 'Garden.Staff.Allow');
     }
 
     /**
