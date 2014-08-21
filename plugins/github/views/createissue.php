@@ -1,4 +1,4 @@
-<h1>Github Create Issue</h1>
+<h1><?php echo T('GitHub Create Issue'); ?></h1>
 
 <?php
 echo $this->Form->Open();
