@@ -18,7 +18,7 @@ echo $this->Form->Errors();
 
       <li class="Description">
          <?php echo $this->Form->Label('Description'); ?>
-         <div><?php echo $this->Form->BodyBox('Description', array('Table' => 'Reaction')); ?></div>
+         <div><?php echo $this->Form->TextBox('Description', array('Table' => 'Reaction', 'MultiLine' => true)); ?></div>
       </li>
 
       <li class="Class">
