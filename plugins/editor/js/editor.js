@@ -511,7 +511,7 @@
             // The quotes plugin tends to add line breaks to the end of the
             // quoted string, which upsets wysihtml5 paragraphing, so replace
             // it with proper block ending to make sure paragraphs continue.
-            data = data.replace(/<br\s?\/?>$/, '<p><br></p>');
+//            data = data.replace(/<br\s?\/?>$/, '<p><br></p>');
 
             // Read nullFix function for full explanation. Essentially,
             // placeholder does not get removed, so remove it manually if
@@ -521,6 +521,16 @@
                editor.composer.setValue('');
             }
 
+//            if (window.chrome || navigator.userAgent.toLowerCase().indexOf('safari') > -1) {
+//               var initial_value = editor.composer.getValue();
+//
+//               if (!initial_value.length
+//                  || initial_value.toString() === '<p></p>') {
+//                  editor.composer.setValue('foo: ');
+//               }
+//            }
+
+            editor.focus();
             editor.composer.commands.exec("insertHTML", data);
 
             // Reported bug: Chrome does not handle wysihtml5's insertHTML
@@ -530,18 +540,18 @@
             // for that as well. Can just check for the safari or webkit
             // strings, but there's no telling when Chrome will change their
             // user agent string to reflect Blink and other changes.
-            if (window.chrome || navigator.userAgent.toLowerCase().indexOf('safari') > -1) {
-               var initial_value = editor.composer.getValue();
+//            if (window.chrome || navigator.userAgent.toLowerCase().indexOf('safari') > -1) {
+//               var initial_value = editor.composer.getValue();
+//
+//               if (!initial_value.length
+//               || initial_value.toString() === '<p></p>') {
+//                  editor.composer.setValue(initial_value + data);
+//               } else {
+//                  editor.composer.setValue(initial_value);
+//               }
+//            }
 
-               if (!initial_value.length
-               || initial_value.toString() === '<p></p>') {
-                  editor.composer.setValue(initial_value + data);
-               } else {
-                  editor.composer.setValue(initial_value);
-               }
-            }
-
-            editor.focus();
+//            editor.focus();
          });
 
       };
@@ -652,6 +662,7 @@
        * wysihtml5.INVISIBLE_SPACE = \uFEFF
        */
       var nullFix = function(editorInstance) {
+         return;
          var editor = editorInstance;
          //var text = editor.composer.getValue();
          //editor.composer.setValue(text + "<p>&zwnj;<br></p>");
@@ -675,9 +686,9 @@
                   editor.composer.setValue('');
                }
 
-               editor.composer.commands.exec("insertHTML", "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
+               editor.composer.commands.exec("insertHTML", "<span></span>");
             } else {
-               editor.composer.setValue(editor.composer.getValue() + "<p>"+wysihtml5.INVISIBLE_SPACE+"</p>");
+               editor.composer.setValue(editor.composer.getValue() + "<span></span>");
             }
             editor.fire("blur", "composer");
             editor.focus();
@@ -695,14 +706,14 @@
          // inserting null on backspace when empty. I could just interval
          // check for emptiness, but this nullFix is already too hackish.
          // OKAY no. Return to this problem in future.
-         $(editor.composer.doc).on('keyup', function(e) {
-            // Backspace
-            if (e.which == 8) {
-               if (!editor.composer.getValue().length) {
-                  insertNull();
-               }
-            }
-         });
+//         $(editor.composer.doc).on('keyup', function(e) {
+//            // Backspace
+//            if (e.which == 8) {
+//               if (!editor.composer.getValue().length) {
+//                  insertNull();
+//               }
+//            }
+//         });
       };
 
       /**
@@ -1514,7 +1525,7 @@
                          // Class name to add to the body when the wysihtml5 editor is supported
                          bodyClassName:        "editor-active",
                          // By default wysihtml5 will insert a <br> for line breaks, set this to false to use <p>
-                         useLineBreaks:        false,
+                         useLineBreaks:        true,
                          // Array (or single string) of stylesheet urls to be loaded in the editor's iframe
                          stylesheets:          stylesheetsInclude,
                          // Placeholder text to use, defaults to the placeholder attribute on the textarea element
@@ -1554,7 +1565,7 @@
 
                          // Fix problem of editor losing its default p tag
                          // when loading another instance on the same page.
-                         nullFix(editor);
+//                         nullFix(editor);
 
                         // iOS
                         iOSwysiFix(editor);
