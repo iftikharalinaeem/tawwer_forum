@@ -2,7 +2,7 @@
 require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings2');
 $IsPrivileged = $this->Data('IsPrivileged');
 ?>
-<div class="DataListWrap">
+<div class="DataListWrap DataListWrap-UserNotes">
 <h2 class="H"><?php echo T('Notes'); ?></h2>
 
 <ul class="DataList DataList-Notes">
@@ -63,4 +63,7 @@ $IsPrivileged = $this->Data('IsPrivileged');
    <?php endif; ?>
 </ul>
 
+<?php
+   PagerModule::Write(array('CurrentRecords' => $this->Data('Notes', array())));
+?>
 </div>

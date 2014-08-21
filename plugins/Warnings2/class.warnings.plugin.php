@@ -9,7 +9,7 @@
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.1.8',
+    'Version' => '2.2.0',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -29,6 +29,8 @@ $PluginInfo['Warnings2'] = array(
 class Warnings2Plugin extends Gdn_Plugin {
 
     /// Propeties ///
+
+    public $pageSize = 20;
 
     /**
      * @var bool Whether or not to restrict the viewing of warnings on posts.
@@ -547,7 +549,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         $Sender->_SetBreadcrumbs(T('Notes'), UserUrl($Sender->User, '', 'notes'));
         $Sender->SetTabView('Notes', 'Notes', '', 'plugins/Warnings2');
 
-        list($Offset, $Limit) = OffsetLimit($Page, 30);
+        list($Offset, $Limit) = OffsetLimit($Page, $this->pageSize);
 
         $UserNoteModel = new UserNoteModel();
         $Where = array('UserID' => $Sender->User->UserID);
