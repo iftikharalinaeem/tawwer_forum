@@ -64,6 +64,6 @@ $IsPrivileged = $this->Data('IsPrivileged');
 </ul>
 
 <?php
-   PagerModule::Write(array('CurrentRecords' => $this->Data('Notes', array())));
+   PagerModule::Write(array('CurrentRecords' => count($this->Data('Notes', array()))));
 ?>
 </div>

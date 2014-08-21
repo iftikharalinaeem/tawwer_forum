@@ -571,6 +571,8 @@ class Warnings2Plugin extends Gdn_Plugin {
             $value['HideWarnerIdentity'] = $HideWarnerIdentity;
         });
 
+        PagerModule::$DefaultPageSize = $this->pageSize;
+
         $Sender->SetData('Notes', $Notes);
 
         $Sender->Render();
