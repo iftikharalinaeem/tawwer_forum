@@ -8366,7 +8366,8 @@ wysihtml5.views.View = Base.extend(
         WebkitUserSelect: "none"
       }).on(element);
 
-      element.focus();
+       // Remove this element.focus() because it screws up scroll position on embedded forums.
+//      element.focus();
 
       dom.setStyles(originalStyles).on(element);
 
