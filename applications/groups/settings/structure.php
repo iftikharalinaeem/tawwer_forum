@@ -44,11 +44,6 @@ $St
    ->Column('Attributes', 'text', TRUE)
    ->Set($Explicit, $Drop);
 
-if (!$CountDiscussionsExists) {
-   $GroupModel = new GroupModel();
-   $GroupModel->Counts('CountDiscussions');
-}
-
 if ($GroupExists && !$GroupPrivacyExists) {
    $Sql->Put('Group', array('Privacy' => 'Private'));
    $Sql->Put('Group', array('Privacy' => 'Public'), array('Registration' => 'Public', 'Visibility' => 'Public'));
@@ -106,6 +101,11 @@ if ($St->TableExists('Discussion')) {
    $St->Table('Discussion')
       ->Column('GroupID', 'int', TRUE, 'key')
       ->Set();
+}
+
+if (!$CountDiscussionsExists) {
+   $GroupModel = new GroupModel();
+   $GroupModel->Counts('CountDiscussions');
 }
 
 $St->Table('Event')

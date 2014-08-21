@@ -48,6 +48,33 @@ class ReactionsPlugin extends Gdn_Plugin {
       }
    }
 
+    /**
+     * Add content from a reaction to the promoted content module.
+     *
+     * @param PromotedContentModule $sender
+     */
+   public function PromotedContentModule_SelectByReaction_Handler($sender) {
+       $model = new ReactionModel();
+       $reactionType = ReactionModel::ReactionTypes($sender->Selection);
+
+       if (!$reactionType) {
+           return;
+       }
+
+       $data = $model->GetRecordsWhere(
+           array('TagID' => $reactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'Total >=' => 1),
+           'DateInserted', 'desc',
+           $sender->Limit, 0);
+
+       // Massage the data for the promoted content module.
+       foreach ($data as &$row) {
+           $row['ItemType'] = $row['RecordType'];
+           $row['Author'] = Gdn::UserModel()->GetID($row['InsertUserID']);
+       }
+
+       $sender->SetData('Content', $data);
+   }
+
    /**
     * Add mapper methods
     *
