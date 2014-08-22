@@ -1,15 +1,14 @@
 <?php
 
 /**
- * Groups Application - Group Module
+ * Groups Application - Promoted Groups Module
  * 
- * Shows a group box with basic group info.
+ * Outputs a list of new or popular groups.
  * 
- * @author Tim Gunter <tim@vanillaforums.com>
+ * @author Becky Van Bussel <becky@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license Proprietary
  * @package groups
- * @since 1.0
  */
 
 class PromotedGroupsModule extends Gdn_Module {
