@@ -119,7 +119,7 @@ class ReactionModel {
       $Data['TagID'] = $TagID;
       
       $Row = array();
-      $Columns = array('UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom', 'Hidden');
+      $Columns = array('Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom', 'Hidden');
       foreach ($Columns as $Column) {
          if (isset($Data[$Column])) {
             $Row[$Column] = $Data[$Column];
