@@ -52,7 +52,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $content = array(
             'content' => array(
                 'applicationId' => C('Plugins.Cleanspeak.ApplicationID'),
-                'createInstant' => time(),
+                'createInstant' => Gdn_Format::ToTimestamp($args['Data']['DateInserted']) * 1000,
                 'parts' => $cleanSpeak->getParts($args['Data']),
                 'senderDisplayName' => $foreignUser['Name'],
                 'senderId' => $cleanSpeak->getUserUUID($args['Data']['InsertUserID'])
