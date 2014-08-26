@@ -44,7 +44,6 @@ class PollModule extends Gdn_Module {
                ->WhereIn('pv.PollOptionID', $PollOptionIDs)
                ->OrderBy('po.Sort', 'asc')
                ->Get();
-
             // Join the users.
             Gdn::UserModel()->JoinUsers($VoteData, array('UserID'));
          }
@@ -80,11 +79,10 @@ class PollModule extends Gdn_Module {
    }
 
 	public function ToString() {
-      $this->LoadPoll();
-      $View = $this->Data('UserHasVoted') ? 'results' : 'form';
-		$String = '';
+        $this->LoadPoll();
+        $String = '';
 		ob_start();
-      include(PATH_PLUGINS.'/Polls/views/'.$View.'.php');
+        include(PATH_PLUGINS.'/Polls/views/poll.php');
 		$String = ob_get_contents();
 		@ob_end_clean();
 		return $String;
