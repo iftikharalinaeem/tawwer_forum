@@ -8,11 +8,14 @@
         "blush": "blush.png",
         "confused": "confused.png",
         "cry": "cry.png",
+        "disappointed": "disappointed.png",
         "dizzy_face": "dizzy_face.png",
         "expressionless": "expressionless.png",
         "frowning": "frowning.png",
         "grey_question": "grey_question.png",
+        "grin": "grin.png",
         "grinning": "grinning.png",
+        "heart": "heart.png",
         "heart_eyes": "heart_eyes.png",
         "hushed": "hushed.png",
         "innocent": "innocent.png",
@@ -42,22 +45,32 @@
     "aliases": {
         ":)": "smile",
         ":D": "smiley",
+        ":(": "disappointed",
         ";)": "wink",
         ":\\": "confused",
         ":p": "stuck_out_tongue",
         ":'(": "cry",
         "B)": "sunglasses",
+        ":#": "grin",
         "o:)": "innocent",
-        ">:)": "smiling_imp"
+        "<3": "heart",
+        ">:)": "smiling_imp",
+        "D:": "anguished",
+        "@_@": "dizzy_face"
     },
     "editor": [
         "smile",
         "smiley",
+        "disappointed",
+        "dizzy_face",
         "wink",
         "confused",
         "stuck_out_tongue",
         "cry",
         "sunglasses",
+        "grin",
+        "heart",
+        "star",
         "smiling_imp"
     ]
 }
