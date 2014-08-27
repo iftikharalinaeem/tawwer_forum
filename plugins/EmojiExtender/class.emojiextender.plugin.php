@@ -119,6 +119,10 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         if (array_key_exists('aliases', $manifest)) {
             $emoji->setAliases($manifest['aliases']);
         }
+
+        if (!empty($manifest['format'])) {
+            $emoji->format = $manifest['format'];
+        }
 //
         if (array_key_exists('editor', $manifest)) {
             $emoji->setEmojiEditorList($manifest['editor']);
