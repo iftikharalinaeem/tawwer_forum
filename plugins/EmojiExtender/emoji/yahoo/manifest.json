@@ -1,6 +1,6 @@
 {
+    "format": "<img class=\"emoji\" src=\"%1$s\" title=\"%2$s\" alt=\"%2$s\"\/>",
     "icon": "icon.png",
-    "format": "<img class=\"emoji\" src=\"%1$s\" title=\"%2$s\" alt=\"%2$s\"/>",
     "emoji": {
         "angry": "angry.gif",
         "anguished": "anguished.gif",
@@ -33,6 +33,7 @@
         "how_interesting": "how_interesting.gif",
         "hug": "hug.gif",
         "hushed": "hushed.gif",
+        "i_dunno": "i_dunno.gif",
         "innocent": "innocent.gif",
         "jack_o_lantern": "jack_o_lantern.gif",
         "joker": "joker.gif",
@@ -119,18 +120,14 @@
     "editor": [
         "smile",
         "smiley",
-        "disappointed",
         "wink",
         "confused",
         "open_mouth",
         "confounded",
         "stuck_out_tongue",
-        "cry",
         "neutral_face",
         "sunglasses",
         "grin",
-        "innocent",
-        "heart",
         "star",
         "smiling_imp"
     ]
