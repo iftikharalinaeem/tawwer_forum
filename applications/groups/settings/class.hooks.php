@@ -106,6 +106,30 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
 
+   /**
+    * Delete discussion must redirect to Group instead of Category page.
+    *
+    * @param $Sender
+    * @param $Args
+    */
+   public function DiscussionController_DiscussionOptions_Handler($Sender, $Args) {
+      if ($GroupID = val('GroupID', $Args['Discussion'])) {
+         if (GetValue('DeleteDiscussion', $Args['DiscussionOptions'])) {
+            // Get the group
+            $Model = new GroupModel();
+            $Group = $Model->GetID($GroupID);
+            if (!$Group)
+               return;
+
+            // Override redirect with GroupUrl instead of CategoryUrl.
+            $Args['DiscussionOptions']['DeleteDiscussion'] = array(
+               'Label' => T('Delete Discussion'),
+               'Url' => '/discussion/delete?discussionid='.$Args['Discussion']->DiscussionID.'&target='.urlencode(GroupUrl($Group)),
+               'Class' => 'Popup');
+         }
+      }
+   }
+
    protected function OverridePermissions($Sender) {
       $Discussion = $Sender->DiscussionModel->GetID($Sender->ReflectArgs['DiscussionID']);
       $GroupID = GetValue('GroupID', $Discussion);
