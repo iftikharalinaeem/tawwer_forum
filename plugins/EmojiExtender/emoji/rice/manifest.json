@@ -42,38 +42,22 @@
     "aliases": {
         ":)": "smile",
         ":D": "smiley",
-        ":(": "disappointed",
         ";)": "wink",
         ":\\": "confused",
-        ":o": "open_mouth",
-        ":s": "confounded",
         ":p": "stuck_out_tongue",
         ":'(": "cry",
-        ":|": "neutral_face",
         "B)": "sunglasses",
-        ":#": "grin",
         "o:)": "innocent",
-        "<3": "heart",
-        "(*)": "star",
-        ">:)": "smiling_imp",
-        "D:": "anguished"
+        ">:)": "smiling_imp"
     },
     "editor": [
         "smile",
         "smiley",
-        "disappointed",
         "wink",
         "confused",
-        "open_mouth",
-        "confounded",
         "stuck_out_tongue",
         "cry",
-        "neutral_face",
         "sunglasses",
-        "grin",
-        "innocent",
-        "heart",
-        "star",
         "smiling_imp"
     ]
 }
