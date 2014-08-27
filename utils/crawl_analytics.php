@@ -14,6 +14,7 @@ $AccessToken = FALSE;
 require_once dirname(realpath(__FILE__)).'/functions.commandline.php';
 
 
+$Count = 0;
 for ($Page = 0; $Page < 10; $Page++) {
    $Offset = $Page * 30;
    // Get a list of sites to crawl.
@@ -28,8 +29,9 @@ for ($Page = 0; $Page < 10; $Page++) {
       $VanillaID = $Site['VanillaID'];
       echo "Crawling {$Site['Hostname']}...";
       try {
-      $Data = Curl("http://$Domain/crawl/site.json?vanillaid=$VanillaID&access_token=$AccessToken");
-      echo round($Data['PercentComplete'] * 100)."%\n";
+        $Data = Curl("http://$Domain/crawl/site.json?vanillaid=$VanillaID&access_token=$AccessToken");
+        echo round($Data['PercentComplete'] * 100)."%\n";
+        $Count++;
       } catch (Exception $Ex) {
          echo $Ex->getMessage()."\n";
       }
@@ -46,4 +48,4 @@ $Minutes = floor($Seconds / 60);
 
 $Time = sprintf('%0d:%0d', $Minutes, $Seconds - $Minutes * 60);
 
-echo "Crawling started ".date('r', $FinishTime).", $Time\n";
+echo "$Count sites crawled in $Time (started on ".date('r', $FinishTime).")\n";
