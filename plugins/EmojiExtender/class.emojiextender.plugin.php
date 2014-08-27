@@ -71,7 +71,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         $this->emojiSets = array(
             '' => array('name' => 'Default Set', 'icon' => "$root/default.png", 'path' => '/resources/emoji'),
             'yahoo'   => array('name' => 'Yahoo Chat', 'icon' => "$root/yahoo/icon.png", 'path' => PATH_ROOT."$root/yahoo"),
-            'rice'    => array('name' => 'Riceballs', 'icon' => "$root/rice/icon.png", 'path' => PATH_ROOT."$root/yahoo"),
+            'rice'    => array('name' => 'Riceballs', 'icon' => "$root/rice/icon.png", 'path' => PATH_ROOT."$root/rice"),
             'none'    => array('name' => T('No Emoji'), 'icon' => "$root/none/icon.png", 'path' => PATH_ROOT."$root/none"),
         );
 //        $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('EmojiExtender', Gdn_PluginManager::ACCESS_PLUGINNAME);

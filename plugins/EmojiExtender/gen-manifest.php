@@ -12,6 +12,8 @@ $emoji = array();
 
 $validExtensions = ['gif', 'png', 'jpeg', 'jpg', 'bmp', 'tif', 'tiff', 'svg'];
 
+$manifest['format'] = '<img class="emoji" src="%1$s" title="%2$s" alt="%2$s"/>';
+
 foreach ($emoji_paths as $emoji_path) {
     $fileInfo = pathinfo($emoji_path);
     if (in_array(strtolower($fileInfo['extension']), $validExtensions)) {
@@ -45,7 +47,7 @@ if (!empty($emoji)) {
                               'D:'  => 'anguished'
                              );
 
-    $manifest['editor_list'] = array( 'smile',
+    $manifest['editor'] = array( 'smile',
                                     'smiley',
                                     'disappointed',
                                     'wink',
