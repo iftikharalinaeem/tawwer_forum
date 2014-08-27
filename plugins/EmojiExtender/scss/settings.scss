@@ -1,3 +1,32 @@
+.emojiext-list {
+  li {
+    display: inline-block;
+  }
+
+  label {
+    img {
+      height: 150px;
+      width: 150px;
+    }
+    cursor: pointer;
+    margin-right: 20px;
+    border: 2px solid transparent;
+    display: inline-block !important;
+    overflow: hidden;
+    padding: 5px;
+  }
+
+  input[type=radio] {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  input[type=radio]:checked ~ label {
+    border-color: #82BDDD;
+  }
+}
+
 .Dashboard.Settings.EmojiExtender {
 
   div ~ label {
@@ -36,3 +65,5 @@
     background-image: url('images/none.png');
   }
 }
+
+
