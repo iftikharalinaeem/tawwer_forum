@@ -113,7 +113,7 @@ class GroupsHooks extends Gdn_Plugin {
     * @param $Args
     */
    public function DiscussionController_DiscussionOptions_Handler($Sender, $Args) {
-      if ($GroupID = GetValue('GroupID', $Args['Discussion'])) {
+      if ($GroupID = val('GroupID', $Args['Discussion'])) {
          if (GetValue('DeleteDiscussion', $Args['DiscussionOptions'])) {
             // Get the group
             $Model = new GroupModel();
