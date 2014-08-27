@@ -31,26 +31,26 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
     *
     * @var string
     */
-    protected $emojiSet = 'default';
+//    protected $emojiSet = '';
 
     /**
     * Indicated whether to merge chosen set with default set.
     *
     * @var boolean
     */
-    protected $merge = false;
+//    protected $merge = false;
 
     /**
     * Path to folder containing emoji set.
     *
     * @var string
     */
-    protected $emojiPath = '/resources/emoji/default';
+//    protected $emojiPath = '/resources/emoji/default';
 
     /**
      * @var string The path to vanilla repo.
      */
-    protected $rootPath = '/var/www/internal';
+//    protected $rootPath = '/var/www/internal';
 
     /**
     * List of all available emoji sets.
@@ -74,9 +74,9 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
             'rice'    => array('name' => 'Riceballs', 'icon' => "$root/rice/icon.png", 'path' => PATH_ROOT."$root/yahoo"),
             'none'    => array('name' => T('No Emoji'), 'icon' => "$root/none/icon.png", 'path' => PATH_ROOT."$root/none"),
         );
-        $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('EmojiExtender', Gdn_PluginManager::ACCESS_PLUGINNAME);
-        $this->emojiSet = C('Plugins.EmojiExtender.emojiSet', '');
-        $this->emojiPath = $this->emojiSets[$this->emojiSet]['path'];
+//        $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('EmojiExtender', Gdn_PluginManager::ACCESS_PLUGINNAME);
+//        $this->emojiSet = C('Garden.EmojiSet', '');
+//        $this->emojiPath = $this->emojiSets[$this->emojiSet]['path'];
         //If ever you want the functionality to merge the custom emoji set with the default set, uncomment below
         //$this->merge = C('Plugins.EmojiExtender.merge', false);
     }
@@ -84,14 +84,11 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
 
     /**
      * Change the emoji set used, either by merging or or overriding the default set.
+     *
      * @param Emoji $emoji The emoji object to change.
+     * @param string $emojiSetName The name of the emoji set to enable.
      */
-    public function changeEmojiSet($emoji) {
-        $emojiSetName = C('Garden.EmojiSet');
-        if (!$emojiSetName) {
-            return;
-        }
-
+    public function changeEmojiSet($emoji, $emojiSetName) {
         if (!array_key_exists($emojiSetName, $this->emojiSets)) {
             trigger_error("Emoji set not found: $emojiSetName.", E_USER_NOTICE);
             return;
@@ -104,7 +101,12 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
             trigger_error("Emoji manifest does not exist: $manifestPath.", E_USER_NOTICE);
             return;
         }
-        $manifest = json_decode(file_get_contents($manifestPath), true);
+        try {
+            $manifest = json_decode(file_get_contents($manifestPath), true);
+        } catch (Exception $ex) {
+            trigger_error($ex->getMessage(), E_USER_NOTICE);
+            return;
+        }
 
         // Set the default asset root.
         $emoji->setAssetPath(StringBeginsWith($emojiSet['path'], PATH_ROOT, true, true));
@@ -136,7 +138,11 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
     * @param Args $args
     */
     public function Emoji_Init_Handler($sender, $args) {
-        $this->changeEmojiSet($sender);
+        $emojiSetName = C('Garden.EmojiSet');
+        if (!$emojiSetName) {
+            return;
+        }
+        $this->changeEmojiSet($sender, $emojiSetName);
     }
 
     /**
@@ -146,7 +152,6 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
     * @param array $args
     */
     public function SettingsController_EmojiExtender_Create($sender, $args) {
-
         $cf = new ConfigurationModule($sender);
 
         $items = array();
