@@ -1,0 +1,10 @@
+.at-suggest-emoji {
+  position: relative;
+  background-color: #fff; }
+  .at-suggest-emoji .emoji-img {
+    position: absolute;
+    width: inherit; }
+  .at-suggest-emoji .emoji-name {
+    background-color: inherit;
+    padding: 5px;
+    margin-left: 35px; }

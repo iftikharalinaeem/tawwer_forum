@@ -390,6 +390,7 @@ class EditorPlugin extends Gdn_Plugin {
       $editorToolbar        = array();
       $editorToolbarAll     = array();
       $allowedEditorActions = $this->getAllowedEditorActions();
+      $allowedEditorActions['emoji'] = Emoji::instance()->hasEditorList();
       $fontColorList        = $this->getFontColorList();
       $fontFormatOptions = $this->getFontFormatOptions();
       $fontFamilyOptions = $this->getFontFamilyOptions();
