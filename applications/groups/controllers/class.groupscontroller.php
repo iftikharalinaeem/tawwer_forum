@@ -44,7 +44,7 @@ class GroupsController extends Gdn_Controller {
       $this->AddJsFile('group.js');
       $this->AddCssFile('style.css');
 
-      $this->AddBreadcrumb(T('Groups'), Url('/groups'));
+      $this->AddBreadcrumb(T('Groups'), '/groups');
 
       parent::Initialize();
    }
@@ -112,7 +112,7 @@ class GroupsController extends Gdn_Controller {
       $Pager->Configure($Offset, $Limit, $TotalRecords, "groups/browse/$Sort/{Page}");
 
       $this->Title($SortRow['Title']);
-      $this->AddBreadcrumb($this->Title(), Url("/groups/browse/$Sort"));
+      $this->AddBreadcrumb($this->Title(), "/groups/browse/$Sort");
 
       require_once $this->FetchViewLocation('group_functions', 'Group');
       $this->Render();
