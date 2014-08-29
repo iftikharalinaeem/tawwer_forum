@@ -12,7 +12,7 @@
 $PluginInfo['Cleanspeak'] = array(
     'Name' => 'Cleanspeak',
     'Description' => 'Cleanspeak integration for Vanilla.',
-    'Version' => '1.0',
+    'Version' => '1.1.0',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'SettingsUrl' => '/settings/cleanspeak',
     'SettingsPermission' => 'Garden.Settings.Manage',
@@ -29,12 +29,12 @@ class CleanspeakPlugin extends Gdn_Plugin {
      *
      * @param QueueModel $sender
      * @param array $args
-     *  [Premoderate]   - bool      - True if to be premoderated.
-     *  [ForeignID]     - string    - ForeignID that will be added to queue.
-     *  [InsertUserID]  - int       - InsertUserID in the queue.
+     *  [Premoderate] bool True if to be premoderated.
+     *  [Queue] array Fields to add to the queue role.
+     *  [InsertUserID] int  InsertUserID in the queue.
      * @throws Gdn_UserException
      */
-    public function queueModel_checkpremoderation_handler($sender, &$args) {
+    public function queueModel_checkpremoderation_handler($sender, $args) {
 
         $cleanSpeak = new Cleanspeak();
         $args['Premoderate'] = false;
@@ -76,7 +76,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
             // Error communicating with cleanspeak
             // Content will go into premoderation queue
             // InsertUserID will not be updated.
-            $args['ForeignID'] = $UUID;
+            $args['Queue']['CleanspeakID'] = $UUID;
             $args['Premoderate'] = true;
             return;
         }
@@ -90,7 +90,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         if (GetValue('requiresApproval', $result) == 'requiresApproval'
             || GetValue('contentAction', $result) == 'queuedForApproval') {
             $args['Premoderate'] = true;
-            $args['ForeignID'] = $UUID;
+            $args['Queue']['CleanspeakID'] = $UUID;
             $args['InsertUserID'] = $this->getUserID();
             return;
         }
@@ -99,6 +99,52 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $args['Premoderate'] = true;
         return;
 
+    }
+
+    /**
+     * Report some content to cleanspeak.
+     *
+     * @param array $row The row to report.
+     * @param string $uuid The cleanspeak ID of the content.
+     */
+    public function reportContent($row, $uuid) {
+        $cleanSpeak = Cleanspeak::instance();
+        $foreignUser = Gdn::UserModel()->GetID($row['ForeignUserID'], DATASET_TYPE_ARRAY);
+//        if (!$foreignUser) {
+//            throw new Gdn_UserException('Can not find user.');
+//        }
+
+        $content = array(
+            'content' => array(
+                'applicationId' => C('Plugins.Cleanspeak.ApplicationID'),
+                'createInstant' => Gdn_Format::ToTimestamp($row['DateInserted']) * 1000,
+                'parts' => $cleanSpeak->getParts($row),
+                'senderDisplayName' => $foreignUser['Name'],
+                'senderId' => $cleanSpeak->getUserUUID($row['InsertUserID'])
+            )
+        );
+
+        if (val('DiscussionID', $row)) {
+            $discussionID = $row['DiscussionID'];
+        } elseif (valr('Attributes.DiscussionID', $row)) {
+            $discussionID = $row['Attributes']['DiscussionID'];
+        }
+
+        if (!empty($discussionID)) {
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->GetID($row['DiscussionID']);
+            $content['content']['location'] = md5(DiscussionUrl($discussion));
+        } else {
+            //if content has the same 'empty' location its being grouped together.
+            $content['content']['location'] = mt_rand();
+        }
+        $UUID = $uuid;
+
+        // Make an api request to cleanspeak.
+        try {
+            $result = $cleanSpeak->moderation($UUID, $content, true);
+        } catch (CleanspeakException $e) {
+        }
     }
 
     /**
@@ -231,13 +277,13 @@ class CleanspeakPlugin extends Gdn_Plugin {
         foreach ($post['approvals'] as $UUID => $action) {
             switch ($action) {
                 case 'approved':
-                    $result = $queueModel->approveOrDenyWhere(array('ForeignID' => $UUID), 'approve', $sender);
+                    $result = $queueModel->approveOrDenyWhere(array('CleanspeakID' => $UUID), 'approve', $sender);
                 break;
                 case 'dismissed':
-                    $queueModel->approveOrDenyWhere(array('ForeignID' => $UUID), 'deny', $sender);
+                    $queueModel->approveOrDenyWhere(array('CleanspeakID' => $UUID), 'deny', $sender);
                     break;
                 case 'rejected':
-                    $queueModel->approveOrDenyWhere(array('ForeignID' => $UUID), 'deny', $sender);
+                    $queueModel->approveOrDenyWhere(array('CleanspeakID' => $UUID), 'deny', $sender);
                     break;
                 default:
                     throw new Gdn_UserException('Unknown action.');
@@ -247,7 +293,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
         if (!$result) {
             $sender->SetData('Errors', $queueModel->ValidationResults());
         }
-
     }
 
     /**
@@ -261,13 +306,12 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $queueModel = QueueModel::Instance();
         $this->setModerator($sender);
         $id = $post['id'];
-        $deleted = $queueModel->denyWhere(array('ForeignID' => $id));
+        $deleted = $queueModel->denyWhere(array('CleanspeakID' => $id));
         if ($deleted) {
             $sender->setData('Success', true);
         } else {
             $sender->SetData('Errors', 'Error deleting content.');
         }
-
     }
 
     /**
@@ -387,22 +431,31 @@ class CleanspeakPlugin extends Gdn_Plugin {
      * Setup the plugin.
      */
     public function setup() {
+        $this->structure();
+    }
 
+    public function structure() {
         // Get a user for operations.
         $userID = Gdn::SQL()->GetWhere('User', array('Name' => 'Cleanspeak', 'Admin' => 2))->Value('UserID');
 
         if (!$userID) {
             $userID = Gdn::SQL()->Insert('User', array(
-                    'Name' => 'Cleanspeak',
-                    'Password' => RandomString('20'),
-                    'HashMethod' => 'Random',
-                    'Email' => 'cleanspeak@domain.com',
-                    'DateInserted' => Gdn_Format::ToDateTime(),
-                    'Admin' => '2'
-                ));
+                'Name' => 'Cleanspeak',
+                'Password' => RandomString('20'),
+                'HashMethod' => 'Random',
+                'Email' => 'cleanspeak@domain.com',
+                'DateInserted' => Gdn_Format::ToDateTime(),
+                'Admin' => '2'
+            ));
         }
         SaveToConfig('Plugins.Cleanspeak.UserID', $userID);
 
+        // Add the cleanspeakID to the queue table.
+        if (Gdn::Structure()->TableExists('Queue')) {
+            Gdn::Structure()->Table('Queue')
+                ->Column('CleanspeakID', 'varchar(50)', true, 'index')
+                ->Set();
+        }
     }
 
     /**
@@ -581,28 +634,26 @@ class CleanspeakPlugin extends Gdn_Plugin {
      * @param QueueModel $sender
      * @param $args
      */
-    public function queueModel_reportRemoval_handler($sender, &$args) {
-
-
-        // send reports to cleanspeak
-        $cleanspeak = Cleanspeak::Instance();
-        $args['ForeignID'] = $cleanspeak->getRandomUUID();
-
-        $foreignUser = Gdn::UserModel()->GetID($args['QueueRow']['ForeignUserID'], DATASET_TYPE_ARRAY);
-        $content = array(
-            'content' => array(
-                'applicationId' => C('Plugins.Cleanspeak.ApplicationID'),
-                'createInstant' => time(),
-                'parts' => $cleanspeak->getParts($args['QueueRow']),
-                'senderDisplayName' => $foreignUser['Name'],
-                'senderId' => $cleanspeak->getUserUUID($args['QueueRow']['ForeignUserID'])
-            )
-        );
-        $cleanspeak->moderation($args['ForeignID'], $content, true);
-
-        $args['ReportHandled'] = true;
-
-    }
+//    public function queueModel_reportRemoval_handler($sender, &$args) {
+//        // send reports to cleanspeak
+//        $cleanspeak = Cleanspeak::Instance();
+//        $args['ForeignID'] = $cleanspeak->getRandomUUID();
+//
+//        $foreignUser = Gdn::UserModel()->GetID($args['QueueRow']['ForeignUserID'], DATASET_TYPE_ARRAY);
+//        $content = array(
+//            'content' => array(
+//                'applicationId' => C('Plugins.Cleanspeak.ApplicationID'),
+//                'createInstant' => time(),
+//                'parts' => $cleanspeak->getParts($args['QueueRow']),
+//                'senderDisplayName' => $foreignUser['Name'],
+//                'senderId' => $cleanspeak->getUserUUID($args['QueueRow']['ForeignUserID'])
+//            )
+//        );
+//        $cleanspeak->moderation($args['ForeignID'], $content, true);
+//
+//        $args['ReportHandled'] = true;
+//
+//    }
 
     /**
      * @param MultisitesController $sender
@@ -610,5 +661,13 @@ class CleanspeakPlugin extends Gdn_Plugin {
     public function multisitesController_nodeConfig_render($sender) {
         TouchValue('Plugins.Cleanspeak.ApplicationID', $sender->Data['Config'], C('Plugins.Cleanspeak.ApplicationID'));
         TouchValue('Plugins.Cleanspeak.ApiUrl', $sender->Data['Config'], C('Plugins.Cleanspeak.ApiUrl'));
+    }
+
+    public function queueModel_beforeInsert_handler($sender, $args) {
+        $queueID = $args['QueueID'];
+        $uuid = Cleanspeak::instance()->getRandomUUID();
+        $args['Fields']['CleanspeakID'] = $uuid;
+
+        $this->reportContent($args['Fields'], $uuid);
     }
 }
