@@ -34,7 +34,7 @@ if (!$Poll) {
                     echo Anchor(T('Sign in to vote!'), $AuthenticationUrl, $CssClass);
                     echo ' ';
                 }
-                if (C('Plugins.Polls.ViewResultsBeforeVote', false)) {
+                if (C('Plugins.Polls.ViewResultsBeforeVote', true)) {
                     if (!Gdn::Session()->IsValid() && C('Plugins.Polls.ViewResultsBlockGuests', false)) {
 
                     } else {
@@ -53,7 +53,6 @@ if (!$Poll) {
                 ?>
             </div>
         </div>
-
     <?php }
     $cssResultDisplay = 'none';
     if ($this->Data['UserHasVoted']) {
@@ -109,13 +108,13 @@ if (!$Poll) {
         }
         ?>
     </div>
+        <?php
+        if (C('Plugins.Polls.ViewResultsBeforeVote', true) && !$this->Data['UserHasVoted']) {
+            echo Anchor(T('Hide Results'), '#', 'js-poll-result-btn');
+        }
+        ?>
 
-    <?php
-    if (C('Plugins.Polls.ViewResultsBeforeVote', false) && !$this->Data['UserHasVoted']) {
-        echo Anchor(T('Hide Results'), '#', 'js-poll-result-btn');
-    }
-    ?>
-
+    </div>
 <?php
 }
 ?>
