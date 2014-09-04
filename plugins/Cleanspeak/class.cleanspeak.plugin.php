@@ -35,12 +35,16 @@ class CleanspeakPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function queueModel_checkpremoderation_handler($sender, $args) {
-
         $cleanSpeak = new Cleanspeak();
         $args['Premoderate'] = false;
 
         if (!$this->isConfigured()) {
             throw new Gdn_UserException('Cleanspeak is not configured.');
+            return;
+        }
+
+        // Moderators don't go through cleanspeak.
+        if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
             return;
         }
 
@@ -664,6 +668,10 @@ class CleanspeakPlugin extends Gdn_Plugin {
     }
 
     public function queueModel_beforeInsert_handler($sender, $args) {
+        if (valr('Queue.CleanspeakID', $args)) {
+            return;
+        }
+
         $queueID = $args['QueueID'];
         $uuid = Cleanspeak::instance()->getRandomUUID();
         $args['Fields']['CleanspeakID'] = $uuid;
