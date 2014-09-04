@@ -3,9 +3,9 @@ $Poll = $this->Data('Poll');
 $Anonymous = GetValue('Anonymous', $Poll) || C('Plugins.Polls.AnonymousPolls');
 $CountPollVotes = GetValue('CountVotes', $Poll);
 $PollOptions = $this->Data('PollOptions');
-$cssResultDisplay = 'none';
+$cssResultDisplay = 'style="display: none"';
 if ($this->Data['UserHasVoted']) {
-    $cssResultDisplay = 'block';
+    $cssResultDisplay = '';
 }
 
 if (!$Poll):
@@ -13,7 +13,7 @@ if (!$Poll):
 else:
     // Display the poll
     ?>
-    <div class="Poll PollResults Hero js-poll-results" style="display: <?php echo $cssResultDisplay; ?>">
+    <div class="Poll PollResults Hero js-poll-results" <?php echo $cssResultDisplay; ?>>
         <h2 class="PollQuestion"><?php
             //         echo Sprite('SpPoll');
             echo Gdn_Format::PlainText(GetValue('Name', $Poll, ''));
