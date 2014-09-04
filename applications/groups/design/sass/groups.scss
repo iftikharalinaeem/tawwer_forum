@@ -184,6 +184,12 @@
    height: 107px;
 }
 
+.Box-Cards {
+  .PagerWrap {
+    @include pie-clearfix;
+  }
+}
+
 /*.Group-MembersPage {
     .Group-Icon {
        max-width: 36px;
