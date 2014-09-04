@@ -569,7 +569,7 @@ class GroupController extends Gdn_Controller {
     * @param string $ID
     * @param string $Page
     */
-   public function Members($ID, $Page = FALSE) {
+   public function Members($ID, $Page = FALSE, $Filter = '') {
       Gdn_Theme::Section('Group');
       Gdn_Theme::Section('Members');
 
@@ -581,17 +581,26 @@ class GroupController extends Gdn_Controller {
       $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       $this->AddBreadcrumb(T('GroupMembers', 'Members'));
 
+      list($Offset, $Limit) = OffsetLimit($Page, $this->GroupModel->MemberPageSize);
+      if ($Offset === 0) {
+         $Filter = '';
+      }
+
       // Get Leaders
-      $UserModel = new UserModel();
-      $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Leader'));
-      $this->SetData('Leaders', $Users);
+      if (in_array($Filter, array('', 'leaders'))) {
+         $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Leader'), $Limit, $Offset);
+         $this->SetData('Leaders', $Users);
+      }
 
       // Get Members
-      $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Member'));
-      $this->SetData('Members', $Users);
+      if (in_array($Filter, array('', 'members'))) {
+         $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Member'), $Limit, $Offset);
+         $this->SetData('Members', $Users);
+      }
 
       $this->Data['_properties']['newdiscussionmodule'] = array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$Group['GroupID']);
 
+      $this->SetData('Filter', $Filter);
       $this->Title(T('Members').' - '.htmlspecialchars($Group['Name']));
       require_once $this->FetchViewLocation('group_functions');
       $this->CssClass .= ' NoPanel';

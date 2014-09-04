@@ -7,6 +7,11 @@ class GroupModel extends Gdn_Model {
     */
    public $MaxUserGroups = 0;
 
+   /**
+    * @var int The number of members per page.
+    */
+   public $MemberPageSize = 30;
+
 
    /**
     * Class constructor. Defines the related database table name.
