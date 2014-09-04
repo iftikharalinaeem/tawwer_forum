@@ -744,7 +744,7 @@ if (!function_exists('WriteReactions')):
 
          echo ' <span class="FlagMenu ToggleFlyout">';
          // Write the handle.
-         echo ReactionButton($Row, 'Flag', array('LinkClass' => 'FlyoutButton'));
+         echo ReactionButton($Row, 'Flag', array('LinkClass' => 'FlyoutButton', 'IsHeading' => TRUE));
 //            echo Sprite('SpFlyoutHandle', 'Arrow');
          echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
          foreach ($Flags as $Flag) {

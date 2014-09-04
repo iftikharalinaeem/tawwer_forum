@@ -60,7 +60,7 @@ if (!function_exists('ReactionButton')):
 function ReactionButton($Row, $UrlCode, $Options = array()) {
    $ReactionType = ReactionModel::ReactionTypes($UrlCode);
 
-   $IsHeading = FALSE;
+   $IsHeading = val('IsHeading', $Options, FALSE);
    if (!$ReactionType) {
       $ReactionType = array('UrlCode' => $UrlCode, 'Name' => $UrlCode);
       $IsHeading = TRUE;
