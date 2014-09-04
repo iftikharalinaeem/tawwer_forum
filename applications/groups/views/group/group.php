@@ -26,7 +26,7 @@
       <?php $EmptyMessage = T('GroupEmptyEvents', "Aw snap, no events are coming up."); ?>
       <?php WriteEventList($this->Data('Events'), $this->Data('Group'), $EmptyMessage); ?>
       <?php
-      echo '<div class="MoreWrap">'.Anchor(T('All Events'), Url(CombinePaths(array("/events/group/", GroupSlug($this->Data('Group')))))).'</div>';
+      echo '<div class="MoreWrap">'.Anchor(sprintf(T('All %s'), T('Event')), Url(CombinePaths(array("/events/group/", GroupSlug($this->Data('Group')))))).'</div>';
       ?>
    </div>
    
@@ -37,7 +37,7 @@
       <?php
       if (GroupPermission('Moderate')) {
          echo '<div class="Button-Controls">';
-         echo Anchor(T('New Announcement'), GroupUrl($this->Data('Group'), 'announcement'), 'Button');
+         echo Anchor(sprintf(T('New %s'), T('Announcement')), GroupUrl($this->Data('Group'), 'announcement'), 'Button');
          echo '</div>';
       }
       ?>
@@ -88,7 +88,7 @@
    <!-- Members -->
    <div class="Group-Box Group-MembersPreview">
       <h3><?php echo Anchor(T('Group Members', 'Members'), GroupUrl($this->Data('Group'), 'members'));?></h3>
-      <?php WriteMemberGrid($this->Data('Members'), Anchor(T('All Members'), GroupUrl($this->Data('Group'), 'members'), 'MoreWrap')); ?>
+      <?php WriteMemberGrid($this->Data('Members'), Anchor(sprintf(T('All %s'), T('Members')), GroupUrl($this->Data('Group'), 'members'), 'MoreWrap')); ?>
    </div>
 </div>
 

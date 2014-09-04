@@ -158,7 +158,7 @@ class Reporting2Plugin extends Gdn_Plugin {
       $Sender->Form->SetFormValue('RecordType', $RecordType);
       $Sender->Form->SetFormValue('Format', 'TextEx');
 
-      $Sender->SetData('Title', sprintf(T('Report %1s'), $RecordType, 'Report'));
+      $Sender->SetData('Title', sprintf(T('Report %s'), $RecordType, 'Report'));
 
       // Set up data for Reason dropdown
       $Sender->SetData('Reasons', FALSE);
