@@ -52,7 +52,7 @@ function writeTableDef($tablename, $row) {
    $result .= "drop table if exists `$tablename`;\n";
 
    // Create the table.
-   $result .= "create table `$tablename` (\n".implode(",\n", $defs).");\n";
+   $result .= "create table `$tablename` (\n".implode(",\n", $defs).") ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;;\n";
    
    echo $result;
 }
