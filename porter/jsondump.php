@@ -31,7 +31,7 @@ function writeTableDef($tablename, $row) {
       if (is_bool($value))
          $value = 'tinyint';
       elseif (is_int($value))
-         $value = 'int';
+         $value = 'bigint'; // int kills unix timestamps in 64bit
       elseif (is_float ($value))
          $value = 'float';
       elseif (is_double($value))
