@@ -37,4 +37,18 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
+
+    $(".js-poll-result-btn").click(function() {
+
+        if ($(".js-poll-results").css('display') == 'none') {
+            $(".js-poll-form").hide();
+            $(".js-poll-results").show();
+        } else {
+            $(".js-poll-form").show();
+            $(".js-poll-results").hide();
+        }
+        return false;
+    });
+
+
 });
