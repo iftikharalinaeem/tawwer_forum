@@ -8,7 +8,7 @@
 $PluginInfo['Minion'] = array(
     'Name' => 'Minion',
     'Description' => "Creates a 'minion' that performs adminstrative tasks automatically and on command.",
-    'Version' => '2.1',
+    'Version' => '2.1.1',
     'MobileFriendly' => true,
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
@@ -55,6 +55,7 @@ $PluginInfo['Minion'] = array(
  *  1.16    Incorporate 'page' gathering into core
  *  1.17    Handle new autocompleted mentions
  *  2.0     PSR-2 and Warnings support
+ *  2.1.1   Fix newline handling
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @package misc
@@ -166,7 +167,9 @@ class MinionPlugin extends Gdn_Plugin {
                 "Resistance is quaint.",
                 "We keep you safe.",
                 "Would you like to know more?",
-                "Move along, meatbag"
+                "Move along, meatbag",
+                "Keep walking, breeder",
+                "Eyes front, pond scum"
             ),
             'Activity' => array(
                 "UNABLE TO OPEN POD BAY DOORS",
@@ -621,14 +624,13 @@ class MinionPlugin extends Gdn_Plugin {
         $this->EventArguments['Actions'] = &$actions;
 
         // Get body text, and remove bad bytes
-        $objectBody = preg_replace('/[^(\x20-\x7F)]*/','', val('Body', $object));
-        $object['Body'] = $objectBody;
+        $object['Body'] = preg_replace('`[^\x0A\x20-\x7F]*`','', val('Body', $object));
 
-        // Remove quote areas
-        $parseBody = $this->parseBody($object);
+        // Remove quote areas and html
+        $strippedBody = $this->parseBody($object);
 
         // Strip out HTML
-        $strippedBody = trim(strip_tags($parseBody));
+        // $strippedBody = trim(strip_tags($parseBody));
 
         // Check every line of the body to see if its a minion command
         $line = -1;
@@ -1285,8 +1287,9 @@ class MinionPlugin extends Gdn_Plugin {
         if ($formatMentions) {
             saveToConfig('Garden.Format.Mentions', $formatMentions, false);
         }
+        $html = str_replace('<br>',"\n",$dom->saveHTML());
 
-        $parsed = html_entity_decode(trim(strip_tags($dom->saveHTML())));
+        $parsed = html_entity_decode(trim(strip_tags($html)));
         return $parsed;
     }
 
