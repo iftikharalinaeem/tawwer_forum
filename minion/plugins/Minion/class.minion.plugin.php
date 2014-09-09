@@ -1820,11 +1820,11 @@ class MinionPlugin extends Gdn_Plugin {
         $userID = val('InsertUserID', $comment);
 
         // KICK
-        // Check expiry times and remove if expires
+        // Check expiry times and remove expired kicks
         $kickedUsers = $this->monitoring($discussion, 'Kicked', array());
         $kuLen = sizeof($kickedUsers);
-        foreach ($kickedUsers as $kickedUserID => $kickedUser) {
-            if (!is_null($kickedUser['Expires']) && $kickedUser['Expires'] <= time()) {
+        foreach ($kickedUsers as $kickedUserID => $kickedOptions) {
+            if (!is_null($kickedOptions['Expires']) && $kickedOptions['Expires'] <= time()) {
                 unset($kickedUsers[$kickedUserID]);
             }
         }
@@ -1838,7 +1838,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             if (array_key_exists($userID, $kickedUsers)) {
 
-                $kickedUser = $kickedUsers[$userID];
+                $kickedOptions = $kickedUsers[$userID];
 
                 $commentID = val('CommentID', $comment);
                 $commentModel = new CommentModel();
@@ -1846,11 +1846,11 @@ class MinionPlugin extends Gdn_Plugin {
 
                 $triggerUser = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
                 $defaultForce = $this->monitoring($discussion, 'Force', self::FORCE_LOW);
-                $force = val('Force', $kickedUser, $defaultForce);
+                $force = val('Force', $kickedOptions, $defaultForce);
 
                 $context = array(
                     'Automated' => true,
-                    'Reason' => "Kicked from thread: " . val('Reason', $kickedUser),
+                    'Reason' => "Kicked from thread: " . val('Reason', $kickedOptions),
                     'Cause' => "posting while banned from thread"
                 );
 
@@ -1866,7 +1866,7 @@ class MinionPlugin extends Gdn_Plugin {
         }
 
         // PHRASE
-        // Check expiry times and remove if expires
+        // Check expiry times and remove expired phrases
         $bannedPhrases = $this->monitoring($discussion, 'Phrases', array());
         $bpLen = sizeof($bannedPhrases);
         foreach ($bannedPhrases as $bannedPhraseWord => $bannedPhrase) {
@@ -1886,15 +1886,15 @@ class MinionPlugin extends Gdn_Plugin {
 
                 // Match
                 $matchPhrase = preg_quote($phrase);
-                $matches = preg_match("`\b{$matchPhrase}\b`i", $matchBody);
+                $matched = preg_match("`\b{$matchPhrase}\b`i", $matchBody);
 
-                if ($matches) {
-                    $commentID = val('CommentID', $comment);
-                    $commentModel = new CommentModel();
-                    //$CommentModel->Delete($CommentID);
+                if ($matched) {
+                    //$commentID = val('CommentID', $comment);
+                    //$commentModel = new CommentModel();
+                    //$commentModel->delete($commentID);
 
                     $triggerUser = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
-                    $defaultForce = $this->monitoring($discussion, 'Force', 'minor');
+                    $defaultForce = $this->monitoring($discussion, 'Force', self::FORCE_LOW);
                     $force = val('Force', $phraseOptions, $defaultForce);
 
                     $context = array(
