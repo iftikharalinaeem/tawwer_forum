@@ -1688,10 +1688,11 @@ class MinionPlugin extends Gdn_Plugin {
 
             case 'force':
 
-                if (in_array($state['Force'], $this->forces)) {
+                if (!in_array($state['Force'], $this->forces)) {
                     $this->acknowledge(null, T('You must supply a valid force level.'), 'custom', $state['Sources']['User'], array(
                         'Comment' => false
                     ));
+                    break;
                 }
 
                 $force = val('Force', $state);
