@@ -8,8 +8,7 @@
 $PluginInfo['Minion'] = array(
     'Name' => 'Minion',
     'Description' => "Creates a 'minion' that performs adminstrative tasks automatically and on command.",
-    'Version' => '2.1',
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
+    'Version' => '2.1.1',
     'MobileFriendly' => true,
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
@@ -56,6 +55,7 @@ $PluginInfo['Minion'] = array(
  *  1.16    Incorporate 'page' gathering into core
  *  1.17    Handle new autocompleted mentions
  *  2.0     PSR-2 and Warnings support
+ *  2.1.1   Fix newline handling
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @package misc
@@ -167,7 +167,9 @@ class MinionPlugin extends Gdn_Plugin {
                 "Resistance is quaint.",
                 "We keep you safe.",
                 "Would you like to know more?",
-                "Move along, meatbag"
+                "Move along, meatbag",
+                "Keep walking, breeder",
+                "Eyes front, pond scum"
             ),
             'Activity' => array(
                 "UNABLE TO OPEN POD BAY DOORS",
@@ -370,9 +372,10 @@ class MinionPlugin extends Gdn_Plugin {
 
         $this->checkFingerprintBan($Sender);
         $this->checkAutoplay($Sender);
-        $Performed = $this->checkCommands($Sender);
-        if (!$Performed)
+        $performed = $this->checkCommands($Sender);
+        if (!$performed) {
             $this->checkMonitor($Sender);
+        }
     }
 
     /**
@@ -621,14 +624,13 @@ class MinionPlugin extends Gdn_Plugin {
         $this->EventArguments['Actions'] = &$actions;
 
         // Get body text, and remove bad bytes
-        $objectBody = preg_replace('/[^(\x20-\x7F)]*/','', val('Body', $object));
-        $object['Body'] = $objectBody;
+        $object['Body'] = preg_replace('`[^\x0A\x20-\x7F]*`','', val('Body', $object));
 
-        // Remove quote areas
-        $parseBody = $this->parseBody($object);
+        // Remove quote areas and html
+        $strippedBody = $this->parseBody($object);
 
         // Strip out HTML
-        $strippedBody = trim(strip_tags($parseBody));
+        // $strippedBody = trim(strip_tags($parseBody));
 
         // Check every line of the body to see if its a minion command
         $line = -1;
@@ -731,7 +733,7 @@ class MinionPlugin extends Gdn_Plugin {
                             $terminator = val('Terminator', $state['Gather'], false);
                             if (!$terminator && strlen($state['Gather']['Delta'])) {
                                 $checkUser = trim($state['Gather']['Delta']);
-                                $gatherUser = (array)Gdn::userModel()->getByUsername($checkUser);
+                                $gatherUser = Gdn::userModel()->getByUsername($checkUser);
                                 if ($gatherUser) {
                                     $state['Gather'] = false;
                                     $state['Targets'][$gatherNode] = (array)$gatherUser;
@@ -1066,7 +1068,7 @@ class MinionPlugin extends Gdn_Plugin {
 
         if (!$terminator && is_array($terminators)) {
             $testTerminator = substr($state['Token'], 0, 1);
-            if (key_exists($testTerminator, $terminators)) {
+            if (array_key_exists($testTerminator, $terminators)) {
                 $terminator = $testTerminator;
                 $state['Token'] = substr($state['Token'], 1);
                 $double = $terminators[$testTerminator];
@@ -1285,8 +1287,9 @@ class MinionPlugin extends Gdn_Plugin {
         if ($formatMentions) {
             saveToConfig('Garden.Format.Mentions', $formatMentions, false);
         }
+        $html = str_replace('<br>',"\n",$dom->saveHTML());
 
-        $parsed = html_entity_decode(trim(strip_tags($dom->saveHTML())));
+        $parsed = html_entity_decode(trim(strip_tags($html)));
         return $parsed;
     }
 
@@ -1465,14 +1468,14 @@ class MinionPlugin extends Gdn_Plugin {
 
             case 'kick':
 
-                if (!key_exists('Discussion', $state['Targets'])) {
+                if (empty($state['Targets']['User'])) {
                     $this->acknowledge(null, T('You must supply a valid target user.'), 'custom', $state['Sources']['User'], array(
                         'Comment' => false
                     ));
                     break;
                 }
-
                 $user = $state['Targets']['User'];
+
                 $reason = val('Reason', $state, 'Not welcome');
                 $expires = array_key_exists('Time', $state) ? strtotime("+" . $state['Time']) : null;
                 $microForce = val('Force', $state, null);
@@ -1507,7 +1510,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             case 'forgive':
 
-                if (!key_exists('Discussion', $state['Targets'])) {
+                if (empty($state['Targets']['User'])) {
                     $this->acknowledge(null, T('You must supply a valid target user.'), 'custom', $state['Sources']['User'], array(
                         'Comment' => false
                     ));
@@ -1537,7 +1540,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             case 'phrase':
 
-                if (!key_exists('Phrase', $state['Targets'])) {
+                if (empty($state['Targets']['Phrase'])) {
                     $this->acknowledge(null, T('You must supply a valid phrase.'), 'custom', $state['Sources']['User'], array(
                         'Comment' => false
                     ));
@@ -1573,9 +1576,9 @@ class MinionPlugin extends Gdn_Plugin {
                     $acknowledged = formatString($acknowledge, array(
                         'Phrase' => $phrase,
                         'Discussion' => $state['Targets']['Discussion'],
-                        'Time' => $state['Time'] ? " for {$state['Time']}" : '',
-                        'Reason' => $state['Reason'] ? " for {$state['Reason']}" : '',
-                        'Force' => $state['Force'] ? " Weapons are {$state['Force']}." : ''
+                        'Time' => isset($state['Time']) ? " for {$state['Time']}" : '',
+                        'Reason' => isset($state['Reason']) ? " for {$state['Reason']}" : '',
+                        'Force' => isset($state['Force']) ? " Weapons are {$state['Force']}." : ''
                     ));
 
                     $this->acknowledge($state['Sources']['Discussion'], $acknowledged);
@@ -1646,7 +1649,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             case 'access':
 
-                if (!key_exists('User', $state['Targets'])) {
+                if (empty($state['Targets']['User'])) {
                     $this->acknowledge(null, T('You must supply a valid target user.'), 'custom', $state['Sources']['User'], array(
                         'Comment' => false
                     ));
@@ -1688,10 +1691,11 @@ class MinionPlugin extends Gdn_Plugin {
 
             case 'force':
 
-                if (in_array($state['Force'], self::FORCES)) {
+                if (!in_array($state['Force'], $this->forces)) {
                     $this->acknowledge(null, T('You must supply a valid force level.'), 'custom', $state['Sources']['User'], array(
                         'Comment' => false
                     ));
+                    break;
                 }
 
                 $force = val('Force', $state);
@@ -1816,11 +1820,11 @@ class MinionPlugin extends Gdn_Plugin {
         $userID = val('InsertUserID', $comment);
 
         // KICK
-        // Check expiry times and remove if expires
+        // Check expiry times and remove expired kicks
         $kickedUsers = $this->monitoring($discussion, 'Kicked', array());
         $kuLen = sizeof($kickedUsers);
-        foreach ($kickedUsers as $kickedUserID => $kickedUser) {
-            if (!is_null($kickedUser['Expires']) && $kickedUser['Expires'] <= time()) {
+        foreach ($kickedUsers as $kickedUserID => $kickedOptions) {
+            if (!is_null($kickedOptions['Expires']) && $kickedOptions['Expires'] <= time()) {
                 unset($kickedUsers[$kickedUserID]);
             }
         }
@@ -1834,7 +1838,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             if (array_key_exists($userID, $kickedUsers)) {
 
-                $kickedUser = $kickedUsers[$userID];
+                $kickedOptions = $kickedUsers[$userID];
 
                 $commentID = val('CommentID', $comment);
                 $commentModel = new CommentModel();
@@ -1842,11 +1846,11 @@ class MinionPlugin extends Gdn_Plugin {
 
                 $triggerUser = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
                 $defaultForce = $this->monitoring($discussion, 'Force', self::FORCE_LOW);
-                $force = val('Force', $kickedUser, $defaultForce);
+                $force = val('Force', $kickedOptions, $defaultForce);
 
                 $context = array(
                     'Automated' => true,
-                    'Reason' => "Kicked from thread: " . val('Reason', $kickedUser),
+                    'Reason' => "Kicked from thread: " . val('Reason', $kickedOptions),
                     'Cause' => "posting while banned from thread"
                 );
 
@@ -1862,7 +1866,7 @@ class MinionPlugin extends Gdn_Plugin {
         }
 
         // PHRASE
-        // Check expiry times and remove if expires
+        // Check expiry times and remove expired phrases
         $bannedPhrases = $this->monitoring($discussion, 'Phrases', array());
         $bpLen = sizeof($bannedPhrases);
         foreach ($bannedPhrases as $bannedPhraseWord => $bannedPhrase) {
@@ -1882,15 +1886,15 @@ class MinionPlugin extends Gdn_Plugin {
 
                 // Match
                 $matchPhrase = preg_quote($phrase);
-                $matches = preg_match("`\b{$matchPhrase}\b`i", $matchBody);
+                $matched = preg_match("`\b{$matchPhrase}\b`i", $matchBody);
 
-                if ($matches) {
-                    $commentID = val('CommentID', $comment);
-                    $commentModel = new CommentModel();
-                    //$CommentModel->Delete($CommentID);
+                if ($matched) {
+                    //$commentID = val('CommentID', $comment);
+                    //$commentModel = new CommentModel();
+                    //$commentModel->delete($commentID);
 
                     $triggerUser = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
-                    $defaultForce = $this->monitoring($discussion, 'Force', 'minor');
+                    $defaultForce = $this->monitoring($discussion, 'Force', self::FORCE_LOW);
                     $force = val('Force', $phraseOptions, $defaultForce);
 
                     $context = array(

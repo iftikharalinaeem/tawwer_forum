@@ -11,11 +11,10 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 // Define the plugin:
 $PluginInfo['AutoRoleByEmail'] = array(
    'Name' => 'Auto-Role By Email',
-   'Description' => 'Adds new users to roles based on their email domain (in addition to default role).',
+   'Description' => 'Adds new users to roles based on their email domain (in addition to default role). Not compatible with Approval registration method.',
    'Version' => '1.0',
-   'SettingsUrl' => '/settings/registration',
-   'Author' => "Matt Lincoln Russell",
-   'AuthorEmail' => 'matt@vanillaforums.com',
+   'Author' => "Lincoln Russell",
+   'AuthorEmail' => 'lincoln@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com'
 );
 
@@ -42,6 +41,7 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
       $RoleData = $RoleModel->SQL->GetWhereLike('Role', array('Domains' => $Domain));
       foreach ($RoleData->Result() as $Result) {
          // Confirm it wasn't a sloppy match
+         print_r($Result);
          $DomainList = explode(' ', $Result->Domains);
          if (in_array($Domain, $DomainList)) {
             // Add the role to the user

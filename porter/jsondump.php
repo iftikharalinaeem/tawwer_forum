@@ -31,7 +31,7 @@ function writeTableDef($tablename, $row) {
       if (is_bool($value))
          $value = 'tinyint';
       elseif (is_int($value))
-         $value = 'int';
+         $value = 'bigint'; // int kills unix timestamps in 64bit
       elseif (is_float ($value))
          $value = 'float';
       elseif (is_double($value))
@@ -52,7 +52,7 @@ function writeTableDef($tablename, $row) {
    $result .= "drop table if exists `$tablename`;\n";
 
    // Create the table.
-   $result .= "create table `$tablename` (\n".implode(",\n", $defs).");\n";
+   $result .= "create table `$tablename` (\n".implode(",\n", $defs).") ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;;\n";
    
    echo $result;
 }
