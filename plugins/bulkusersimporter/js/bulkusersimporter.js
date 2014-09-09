@@ -216,7 +216,7 @@ jQuery(document).ready(function($) {
 
       $.post(url, {
          DeliveryMethod: 'JSON',
-         DeliveryType: 'View',
+         DeliveryType: 'VIEW',
          TransientKey: gdn.definition('TransientKey', ''),
          debug: bulk_importer_debug,
          userin: bulk_radio_userin,
