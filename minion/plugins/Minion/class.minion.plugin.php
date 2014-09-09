@@ -9,7 +9,6 @@ $PluginInfo['Minion'] = array(
     'Name' => 'Minion',
     'Description' => "Creates a 'minion' that performs adminstrative tasks automatically and on command.",
     'Version' => '2.1',
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
     'MobileFriendly' => true,
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
@@ -370,9 +369,10 @@ class MinionPlugin extends Gdn_Plugin {
 
         $this->checkFingerprintBan($Sender);
         $this->checkAutoplay($Sender);
-        $Performed = $this->checkCommands($Sender);
-        if (!$Performed)
+        $performed = $this->checkCommands($Sender);
+        if (!$performed) {
             $this->checkMonitor($Sender);
+        }
     }
 
     /**
@@ -731,7 +731,7 @@ class MinionPlugin extends Gdn_Plugin {
                             $terminator = val('Terminator', $state['Gather'], false);
                             if (!$terminator && strlen($state['Gather']['Delta'])) {
                                 $checkUser = trim($state['Gather']['Delta']);
-                                $gatherUser = (array)Gdn::userModel()->getByUsername($checkUser);
+                                $gatherUser = Gdn::userModel()->getByUsername($checkUser);
                                 if ($gatherUser) {
                                     $state['Gather'] = false;
                                     $state['Targets'][$gatherNode] = (array)$gatherUser;
@@ -1066,7 +1066,7 @@ class MinionPlugin extends Gdn_Plugin {
 
         if (!$terminator && is_array($terminators)) {
             $testTerminator = substr($state['Token'], 0, 1);
-            if (key_exists($testTerminator, $terminators)) {
+            if (array_key_exists($testTerminator, $terminators)) {
                 $terminator = $testTerminator;
                 $state['Token'] = substr($state['Token'], 1);
                 $double = $terminators[$testTerminator];
@@ -1465,14 +1465,14 @@ class MinionPlugin extends Gdn_Plugin {
 
             case 'kick':
 
-                if (!key_exists('Discussion', $state['Targets'])) {
+                if (empty($state['Targets']['User'])) {
                     $this->acknowledge(null, T('You must supply a valid target user.'), 'custom', $state['Sources']['User'], array(
                         'Comment' => false
                     ));
                     break;
                 }
-
                 $user = $state['Targets']['User'];
+                
                 $reason = val('Reason', $state, 'Not welcome');
                 $expires = array_key_exists('Time', $state) ? strtotime("+" . $state['Time']) : null;
                 $microForce = val('Force', $state, null);
@@ -1507,7 +1507,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             case 'forgive':
 
-                if (!key_exists('Discussion', $state['Targets'])) {
+                if (empty($state['Targets']['User'])) {
                     $this->acknowledge(null, T('You must supply a valid target user.'), 'custom', $state['Sources']['User'], array(
                         'Comment' => false
                     ));
@@ -1537,7 +1537,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             case 'phrase':
 
-                if (!key_exists('Phrase', $state['Targets'])) {
+                if (empty($state['Targets']['Phrase'])) {
                     $this->acknowledge(null, T('You must supply a valid phrase.'), 'custom', $state['Sources']['User'], array(
                         'Comment' => false
                     ));
@@ -1573,9 +1573,9 @@ class MinionPlugin extends Gdn_Plugin {
                     $acknowledged = formatString($acknowledge, array(
                         'Phrase' => $phrase,
                         'Discussion' => $state['Targets']['Discussion'],
-                        'Time' => $state['Time'] ? " for {$state['Time']}" : '',
-                        'Reason' => $state['Reason'] ? " for {$state['Reason']}" : '',
-                        'Force' => $state['Force'] ? " Weapons are {$state['Force']}." : ''
+                        'Time' => isset($state['Time']) ? " for {$state['Time']}" : '',
+                        'Reason' => isset($state['Reason']) ? " for {$state['Reason']}" : '',
+                        'Force' => isset($state['Force']) ? " Weapons are {$state['Force']}." : ''
                     ));
 
                     $this->acknowledge($state['Sources']['Discussion'], $acknowledged);
@@ -1646,7 +1646,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             case 'access':
 
-                if (!key_exists('User', $state['Targets'])) {
+                if (empty($state['Targets']['User'])) {
                     $this->acknowledge(null, T('You must supply a valid target user.'), 'custom', $state['Sources']['User'], array(
                         'Comment' => false
                     ));
