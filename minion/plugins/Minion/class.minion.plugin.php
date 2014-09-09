@@ -1472,7 +1472,7 @@ class MinionPlugin extends Gdn_Plugin {
                     break;
                 }
                 $user = $state['Targets']['User'];
-                
+
                 $reason = val('Reason', $state, 'Not welcome');
                 $expires = array_key_exists('Time', $state) ? strtotime("+" . $state['Time']) : null;
                 $microForce = val('Force', $state, null);
@@ -1688,7 +1688,7 @@ class MinionPlugin extends Gdn_Plugin {
 
             case 'force':
 
-                if (in_array($state['Force'], self::FORCES)) {
+                if (in_array($state['Force'], self::$forces)) {
                     $this->acknowledge(null, T('You must supply a valid force level.'), 'custom', $state['Sources']['User'], array(
                         'Comment' => false
                     ));
