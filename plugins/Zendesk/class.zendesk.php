@@ -164,7 +164,14 @@ class Zendesk {
             CURLOPT_HTTPHEADER,
             array('Content-type: application/json', 'Authorization: Bearer '. $this->AccessToken)
         );
-        $this->curl->setOption(CURLOPT_USERAGENT, "MozillaXYZ/1.0");
+
+        $userAgent = val(HTTP_USER_ARGENT, $_SERVER);
+        if (!$userAgent) {
+            $userAgent = "Curl";
+        } else {
+            $userAgent = $_SERVER['HTTP_USER_AGENT'];
+        }
+        $this->curl->setOption(CURLOPT_USERAGENT, $userAgent);
         $this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
         $this->curl->setOption(CURLOPT_TIMEOUT, 10);
 
