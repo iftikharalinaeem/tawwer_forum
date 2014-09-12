@@ -1,15 +1,8 @@
 <?php
 /**
  * ZenDesk API -> Database exporter for Users, Questions, Answers.
+ * Help Center API Support for Articles, Article Comments, Sections, Categories.
  */
-
-$Supported['zendesk'] = array('name' => 'ZenDesk API', 'prefix' => '');
-$Supported['zendesk']['CommandLine'] = array(
-    'apiuser' => array('API user (usually email).', 'Sx' => '::', 'Short' => 'au'),
-    'apipass' => array('API authentication password.', 'Sx' => '::', 'Short' => 'ap', 'Default' => ''),
-    'apisite' => array('Subdomain of the ZenDesk.com site.', 'Sx' => '::', 'Short' => 'site'),
-    'noexport' => array('Whether or not to skip the export.', 'Sx' => '::'),
-);
 
 /*
 CREATE TABLE `zendesk_users` (
@@ -122,16 +115,20 @@ CREATE TABLE `zendesk_articles` (
 
 //class ZenDesk extends ExportController {
 
+if (count($argv) != 7) {
+    echo "This script is run by the zendeskexporter.  But if you must " . PHP_EOL . PHP_EOL;
+    die('php zendesk.php <apisite> <apiuser> <apipass> <dbname> <dbuser> <dbpass>' . PHP_EOL);
+}
 // DB creds
 $DbHost = 'localhost';
-$DbName = 'kinvey';
-$DbUser = 'root';
-$DbPass = '';
+$DbName = $argv[4];
+$DbUser = $argv[5];
+$DbPass = $argv[6];
 
 // API creds
-$Site = 'kinvey';
-$User = 'some@one.com';
-$Pass = 'pass';
+$Site = $argv[1];
+$User = $argv[2];
+$Pass = $argv[3];
 
 // Setup API call
 $ch = curl_init();
@@ -142,54 +139,130 @@ curl_setopt($ch, CURLOPT_USERPWD, $User . ':' . $Pass);
 // Setup DB connect
 $c = mysqli_connect($DbHost, $DbUser, $DbPass, $DbName);
 
-// USERS: Pagination loop
-$url = "https://{$Site}.zendesk.com/api/v2/users.json";
-$resultsProcessed = 0;
-do {
-    $called_uls[] = $url;
+// Setup Mappings
+$Maps = array(
+    'Users' => array(
+        'endpoint' => '/api/v2/users.json',
+        'tablename' => 'zendesk_users',
+        'resultsnode' => 'users',
+        'dbMap' => array(
+            'id' => 'id',
+            'name' => 'name',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
+            'role' => 'role',
+            'verified' => 'verified',
+            'email' => array('column' => 'email'),
+        ),
+//        'test' => true
+    ),
+    'Articles' => array(
+        'endpoint' => '/api/v2/help_center/articles.json',
+        'tablename' => 'zendesk_articles',
+        'resultsnode' => 'articles',
+        'dbMap' => array(
+            'id' => 'id',
+            'url' => 'url',
+            'html_url' => 'html_url',
+            'author_id' => 'author_id',
+            'comments_disabled' => 'comments_disabled',
+            'label_names' => array('column' => 'label_names', 'filter' => 'serialize'),
+            'draft' => 'draft',
+            'promoted' => 'promoted',
+            'position' => 'position',
+            'vote_sum' => 'vote_sum',
+            'section_id' => 'section_id',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
+            'name' => 'name',
+            'title' => 'title',
+            'body' => 'body',
+            'source_locale' => 'source_locale',
+            'locale' => 'locale',
+            'outdated' => 'outdated'
+        ),
+    ),
 
-    // USERS: API call
-    curl_setopt($ch, CURLOPT_URL, $url);
-    $Response = curl_exec($ch);
-    $ReplyObject = json_decode($Response);
-    if (!isset($ReplyObject->users) || !is_array($ReplyObject->users)) {
-        print_r($ReplyObject);
-        echo "Bad users response." . PHP_EOL;
-        break;
-    }
 
-    // USERS: Output CSV
-    $resultsProcessed = count($called_uls) * 100;
-    $ReplyObject->count = 0;
-    if ($ReplyObject->count == 0) {
-        echo "There is no users to export." . PHP_EOL;
-        break;
-    }
+);
 
-    foreach ($ReplyObject->users as $User) {
-        $Result = mysqli_query(
-            $c,
-            "replace into zendesk_users (id, name, created_at, updated_at, role, verified, email)
-                 values (
-                     '" . mysqli_real_escape_string($c, $User->id) . "',
-                     '" . mysqli_real_escape_string($c, $User->name) . "',
-                     '" . mysqli_real_escape_string($c, $User->created_at) . "',
-                     '" . mysqli_real_escape_string($c, $User->updated_at) . "',
-                     '" . mysqli_real_escape_string($c, $User->role) . "',
-                     '" . mysqli_real_escape_string($c, $User->verified) . "',
-                     '" . mysqli_real_escape_string($c, $User->email) . "'
-                  )"
-        );
-        if (!$Result) {
-            print_r(mysqli_error_list($c));
+// Export content from the above maps.
+
+foreach ($Maps as $MapName => $Map) {
+
+    $url = "https://{$Site}.zendesk.com/" . ltrim($Map['endpoint'], '/');
+    $resultsProcessed = 0;
+    echo 'Exporting ' . $MapName . PHP_EOL;
+    // Paginated Loop with progress bar.
+    do {
+        $called_uls[] = $url;
+
+        // API call
+        curl_setopt($ch, CURLOPT_URL, $url);
+        $Response = curl_exec($ch);
+        $ReplyObject = json_decode($Response);
+        if (!isset($ReplyObject->$Map['resultsnode']) || !is_array($ReplyObject->$Map['resultsnode'])) {
+            var_dump($Response);
+            var_dump($ReplyObject);
+            echo "Bad response." . PHP_EOL;
+            break;
         }
-        $resultsProcessed++;
-        show_status($resultsProcessed, $ReplyObject->count);
+
+        // USERS: Output CSV
+        if ($ReplyObject->count == 0) {
+            echo "There is no users to export." . PHP_EOL;
+            break;
+        }
 
 
-    }
-    $url = $ReplyObject->next_page;
-} while ($url != 'null' && !in_array($url, $called_uls));
+        foreach ($ReplyObject->$Map['resultsnode'] as $Content) {
+
+            $insertSql = 'replace into ' . $Map['tablename'] . ' (';
+            foreach($Map['dbMap'] as $column => $node) {
+                if (is_array($column)) {
+                    $column = $column['column'];
+                }
+                $insertSql .= $column . ', ';
+            }
+            $insertSql = substr($insertSql, 0, -2);
+            $insertSql .= ') values (';
+
+            foreach($Map['dbMap'] as $node => $column) {
+
+                if (is_array($column)) {
+
+                    if (!empty($column['filter'])) {
+                        $value = serialize($Content->$node);
+                    } else {
+                        $value = $Content->$column['column'];
+                    }
+
+                } else {
+                    $value = $Content->$node;
+                }
+
+                $insertSql .= "'" . mysqli_real_escape_string($c, $value) . '\', ';
+            }
+            $insertSql = substr($insertSql, 0, -2);
+            $insertSql .= ')';
+
+            $Result = mysqli_query($c, $insertSql);
+            if (!$Result) {
+                print_r(mysqli_error_list($c));
+            }
+            $resultsProcessed++;
+            show_status($resultsProcessed, $ReplyObject->count);
+
+
+        }
+        if (!empty($Map['test']) && $Map['test']) {
+            echo PHP_EOL . 'Test Mode: only one page processed.' . PHP_EOL;
+            break;
+        }
+        $url = $ReplyObject->next_page;
+    } while ($url != null && !in_array($url, $called_uls));
+
+}
 
 // QUESTIONS (with Answers, Topics joined in): Pagination loop
 $url = "https://{$Site}.zendesk.com/api/v2/help_center/questions.json?include=answers,topics";
@@ -288,76 +361,12 @@ do {
 
 } while ($url != 'null' && !in_array($url, $called_uls));
 
-// ARTICLES
-echo "Exporting Articles" . PHP_EOL;
-$url = "https://{$Site}.zendesk.com/api/v2/help_center/articles.json";
-$resultsProcessed = 0;
-do {
-    break;
-    $called_uls[] = $url;
-
-    //API call
-    curl_setopt($ch, CURLOPT_URL, $url);
-    $Response = curl_exec($ch);
-    $ReplyObject = json_decode($Response);
-    if (!isset($ReplyObject->articles) || !is_array($ReplyObject->articles)) {
-        print_r($ReplyObject);
-        echo "Bad articles response.". PHP_EOL;
-        break;
-    }
-
-    if ($ReplyObject->count == 0) {
-        echo "There is no articles to export.\n";
-        break;
-    }
-
-    foreach ($ReplyObject->articles as $Article) {
-        $Result = mysqli_query(
-            $c,
-            "replace into zendesk_articles (id, url, html_url, author_id, comments_disabled, label_names,
-                       draft, promoted, position, vote_sum, vote_count, section_id, created_at, updated_at, name, title, body,
-                       source_locale, locale, outdated)
-                         values (
-                            '" . mysqli_real_escape_string($c, $Article->id) . "',
-                 '" . mysqli_real_escape_string($c, $Article->url) . "',
-                 '" . mysqli_real_escape_string($c, $Article->html_url) . "',
-                 '" . mysqli_real_escape_string($c, $Article->author_id) . "',
-                 '" . mysqli_real_escape_string($c, $Article->comments_disabled) . "',
-                 '" . mysqli_real_escape_string($c, '') . "',
-                 '" . mysqli_real_escape_string($c, $Article->draft) . "',
-                 '" . mysqli_real_escape_string($c, $Article->promoted) . "',
-                 '" . mysqli_real_escape_string($c, $Article->position) . "',
-                 '" . mysqli_real_escape_string($c, $Article->vote_sum) . "',
-                 '" . mysqli_real_escape_string($c, $Article->vote_count) . "',
-                 '" . mysqli_real_escape_string($c, $Article->section_id) . "',
-                 '" . mysqli_real_escape_string($c, $Article->created_at) . "',
-                 '" . mysqli_real_escape_string($c, $Article->updated_at) . "',
-                 '" . mysqli_real_escape_string($c, $Article->name) . "',
-                 '" . mysqli_real_escape_string($c, $Article->title) . "',
-                 '" . mysqli_real_escape_string($c, $Article->body) . "',
-                 '" . mysqli_real_escape_string($c, $Article->source_locale) . "',
-                 '" . mysqli_real_escape_string($c, $Article->locale) . "',
-                 '" . mysqli_real_escape_string($c, $Article->outdated) . "'
-              )"
-        );
-        $resultsProcessed++;
-        show_status($resultsProcessed, $ReplyObject->count);
-
-        if (!$Result) {
-            print_r(mysqli_error_list($c));
-        }
-
-    }
-
-    $url = $ReplyObject->next_page;
-} while ($url != null && !in_array($url, $called_uls));
-
 // ARTICLE COMMENTS
 
 $Result = mysqli_query($c, 'SELECT id from zendesk_articles');
-$resultsProcessed = 1;
+$resultsProcessed = 0;
 echo "Exporting Article Comments" . PHP_EOL;
-while (false && $Article = mysqli_fetch_assoc($Result)) {
+while ($Article = mysqli_fetch_assoc($Result)) {
     $url = "https://{$Site}.zendesk.com/api/v2/help_center/articles/{$Article['id']}/comments.json";
     do {
         $called_uls[] = $url;
