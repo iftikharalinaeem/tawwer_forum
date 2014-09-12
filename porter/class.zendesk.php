@@ -27,8 +27,16 @@ class Zendesk extends ExportController {
             $dbuser = $this->Param('dbuser');
             $dbpass = $this->Param('dbpass');
 
+            if (empty($apiuser) || empty($apisite) || empty($apipass)) {
+                echo "You have asked for an API export but not provided all the required args." . PHP_EOL;
+                echo "Reminder: To view help  $ php index.php --help". PHP_EOL;
+                exit;
+            }
+
             echo "Starting API export." . PHP_EOL;
             passthru("php zendesk.php $apisite $apiuser $apipass $dbname $dbuser $dbpass");
+        } else {
+            echo "Skipping API export." . PHP_EOL;
         }
 
 //        $this->Ex->TestMode = TRUE;
