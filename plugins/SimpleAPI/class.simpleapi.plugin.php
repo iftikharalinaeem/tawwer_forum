@@ -208,11 +208,11 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                      $Multi = TRUE;
                   }
                }
-            }
 
-            // Only allow the ForeignID of the discussion table.
-            if ($SingularTableName === 'Discussion' && !in_array($ColumnLookup, array('DiscussionID', 'ForeignID')))
-               $TableAllowed = FALSE;
+               // Only allow the ForeignID of the discussion table.
+               if ($SingularTableName === 'Discussion' && !in_array($ColumnLookup, array('DiscussionID', 'ForeignID')))
+                  $TableAllowed = FALSE;
+            }
 
             if (!$TableAllowed)
                return;

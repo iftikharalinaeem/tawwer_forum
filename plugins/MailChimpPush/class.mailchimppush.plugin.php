@@ -13,7 +13,7 @@
 $PluginInfo['MailChimpPush'] = array(
    'Name' => 'MailChimp Push',
    'Description' => "Updates MailChimp when users adjust their email address.",
-   'Version' => '2.0.1',
+   'Version' => '2.0.2',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Tim Gunter',
    'AuthorEmail' => 'tim@vanillaforums.com',
@@ -86,6 +86,31 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          $this->Update($ListID, $OriginalEmail, $SuppliedEmail, null, (array)$Sender->EventArguments['User']);
       }
    }
+
+    /**
+     * Add user after successfully filling a registration form.
+     *
+     * Note: The UserModel_AfterSave_Handler will NOT save users who register.
+     * It will only save users if they are created from the dashboard, or their
+     * information is changed. The former use case may have previously
+     * functioned, but this looks like an update to core invalidated that. This
+     * handler is put in place to catch users registering, then.
+     *
+     * @param UserModel $Sender The User Model.
+     * @param Event $Args The arguments.
+     */
+    public function UserModel_AfterRegister_Handler($Sender, $Args) {
+        $IsValidRegistration = $Args['Valid'];
+
+        if ($IsValidRegistration) {
+            $User = $Args['User'];
+            $ListID = GetValue('ListID', $this->Provider(), null);
+            $Email = GetValue('Email', $User, null);
+
+            // Add the email to the given MailChimp list.
+            $this->Add($ListID, $Email, null, (array)$User);
+        }
+    }
 
    /**
     * Add an address to Mail Chimp

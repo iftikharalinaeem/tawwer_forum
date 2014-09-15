@@ -1,0 +1,42 @@
+//
+// # Navigation
+//
+// Styleguide Navigation
+
+.navbar {
+  margin-bottom: 0;
+  color: $navbar-color;
+  background-color: $navbar-bg;
+  border-bottom: $navbar-border solid 1px;
+
+  .button {
+    margin: 13px 0;
+  }
+
+  .mebox {
+    margin: 18px 0;
+
+    .PhotoWrap {
+      float: left;
+    }
+  }
+}
+
+.navbar-brand {
+  float: left;
+  padding: 20px 15px;
+  margin-left: -15px;
+  font-size: $navbar-brand-font-size;
+  font-weight: 700;
+  line-height: $line-height-base;
+
+  &,
+  &:hover,
+  &:focus {
+    color: $navbar-brand-color;
+  }
+}
+
+.navbar-right {
+  float: right;
+}

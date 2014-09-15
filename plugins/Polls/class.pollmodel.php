@@ -144,6 +144,7 @@ class PollModel extends Gdn_Model {
          $this->Validation->AddValidationResult('PollOption', 'You must provide at least 2 valid poll options.');
       if ($CountValidOptions > 10)
          $this->Validation->AddValidationResult('PollOption', 'You can not specify more than 10 poll options.');
+      $DiscussionModel->EventArguments['PollOptions'] = $ValidPollOptions;
 
       // If all validation passed, create the discussion with discmodel, and then insert all of the poll data.
       if (count($this->Validation->Results()) == 0) {

@@ -1,0 +1,16 @@
+//
+// # Grid
+//
+// Styleguide Shared.Grid
+
+.container {
+  @include outer-container();
+}
+
+.column-sidebar {
+  @include span-columns(5);
+}
+
+.column-content {
+  @include span-columns(11);
+}

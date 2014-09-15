@@ -1,5 +1,14 @@
 jQuery(document).ready(function($) {
 
+    // Composing a new poll, let poll options duplicate. This used to be inline,
+    // which generated a race condition between jQuery being defined, and this
+    // code running.
+    if ($.fn.duplicate) {
+        $('.PollOption').duplicate({
+            addButton: '.AddPollOption'
+        });
+    }
+
    $(document).on('click', '.PollForm form :submit', function() {
       var btn = this,
          frm = $(this).parents('form');
@@ -28,4 +37,18 @@ jQuery(document).ready(function($) {
       });
       return false;
    });
+
+    $(".js-poll-result-btn").click(function() {
+
+        if ($(".js-poll-results").css('display') == 'none') {
+            $(".js-poll-form").hide();
+            $(".js-poll-results").show();
+        } else {
+            $(".js-poll-form").show();
+            $(".js-poll-results").hide();
+        }
+        return false;
+    });
+
+
 });

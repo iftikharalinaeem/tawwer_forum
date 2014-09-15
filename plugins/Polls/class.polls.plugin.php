@@ -8,7 +8,7 @@
 $PluginInfo['Polls'] = array(
    'Name' => 'Polls',
    'Description' => "Allow users to create and vote on polls.",
-   'Version' => '1.1.3',
+   'Version' => '1.1.6',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
@@ -113,6 +113,27 @@ class PollsPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_Render_Before($Sender) {
       $this->_LoadVotes($Sender);
+   }
+
+   /**
+    * Update the poll name after a discussion has been edited.
+    *
+    * @param DiscussionModel $sender The discussion model doing the save.
+    * @param array $args Additional event details.
+    */
+   public function DiscussionModel_AfterSaveDiscussion_Handler($sender, $args) {
+      if ($args['Insert'] || valr('Fields.Name', $args, null) === null) {
+         return;
+      }
+
+      $model = new PollModel();
+      $poll = $model->GetWhere(array('DiscussionID' => $args['DiscussionID']))->FirstRow(DATASET_TYPE_ARRAY);
+      if ($poll) {
+         $model->SetField(
+            $poll['PollID'],
+            array('Name' => valr('Fields.Name', $args))
+         );
+      }
    }
 
    /**
@@ -221,6 +242,7 @@ class PollsPlugin extends Gdn_Plugin {
 		$Sender->SetData('Breadcrumbs', $crumb);
       $Sender->SetData('_AnonymousPolls', C('Plugins.Polls.AnonymousPolls'));
       $Sender->AddJsFile('jquery.duplicate.js');
+      $Sender->AddJsFile('polls.js', 'plugins/Polls');
       $this->_AddCss($Sender);
       $Sender->Render('add', '', 'plugins/Polls');
    }

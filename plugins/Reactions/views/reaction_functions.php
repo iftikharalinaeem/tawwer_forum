@@ -60,7 +60,7 @@ if (!function_exists('ReactionButton')):
 function ReactionButton($Row, $UrlCode, $Options = array()) {
    $ReactionType = ReactionModel::ReactionTypes($UrlCode);
 
-   $IsHeading = FALSE;
+   $IsHeading = val('IsHeading', $Options, FALSE);
    if (!$ReactionType) {
       $ReactionType = array('UrlCode' => $UrlCode, 'Name' => $UrlCode);
       $IsHeading = TRUE;
@@ -111,7 +111,7 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
 
    $UrlCode2 = strtolower($UrlCode);
    if ($IsHeading) {
-      $Url = '';
+      $Url = '#';
       $DataAttr = '';
    } else {
       $Url = Url("/react/$RecordType/$UrlCode2?id=$ID");

@@ -41,6 +41,10 @@ input.CopyInput {
    padding: 4px 3px;
 }
 
+input.CopyInputLonger {
+    width: 300px;
+}
+
 .ConfigurationHelp ol {
    margin: 1em 0 1em 3em;
 }
@@ -49,6 +53,15 @@ input.CopyInput {
   margin: 10px 0;
 }
 </style>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.CopyInput').on('click', function(e) {
+            $(this).select();
+        });
+    });
+</script>
+
 <h1><?php echo $this->Data('Title'); ?></h1>
 <div class="Info">
    Linked In social sign in allows users to sign in using their LinkedIn account.
@@ -79,6 +92,9 @@ input.CopyInput {
          <li>
             Under <b>Default Scope</b> make sure you've selected at least <b>r_basicprofile</b> and <b>r_emailaddress</b>.
          </li>
+          <li>
+              Under <b>OAuth 2.0 Redirect URLs</b> enter <input type="text" class="CopyInput CopyInputLonger" value="<?php echo rtrim(Gdn::Request()->Domain(), '/') . '/entry/connect/linkedin'; ?>" />
+          </li>
          <li>
             Once your application has been set up, you must copy the <b>API Key</b> and <b>Secret Key</b> into the form on this page.
          </li>

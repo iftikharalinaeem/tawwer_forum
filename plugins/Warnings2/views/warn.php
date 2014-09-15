@@ -4,36 +4,43 @@
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
+
+if (count($this->Data('WarningTypes', array())) <= 1) {
+    foreach ($this->Data('WarningTypes', array()) as $Row) {
+        echo $this->Form->Hidden('WarningTypeID', array('value' => $Row['WarningTypeID']));
+    }
+} else {
 ?>
-   
-<div class="P">
+    <div class="P">
+    <?php
+    echo $this->Form->Label('Severity', 'WarningTypeID', array('class' => 'B'));
+
+    foreach ($this->Data('WarningTypes', array()) as $Row) {
+       $Points = Plural($Row['Points'], '%s point', '%s points');
+       if ($Row['ExpireNumber'])
+          $Expires = sprintf(T('lasts %s'), Plural($Row['ExpireNumber'], '%s '.rtrim($Row['ExpireType'], 's'), '%s '.$Row['ExpireType']));
+       else
+          $Expires = '';
+
+       echo '<div class="WarningType">'.
+          $this->Form->Radio('WarningTypeID', $Row['Name'], array('value' => $Row['WarningTypeID'])).
+
+          ' <span class="Gloss">'.
+          $Points;
+
+       if ($Expires) {
+          echo Bullet(' ').
+          $Expires;
+       }
+
+       echo '</span>'.
+          '</div>';
+    }
+    ?>
+    </div>
 <?php
-
-echo $this->Form->Label('Severity', 'WarningTypeID', array('class' => 'B'));
-
-foreach ($this->Data('WarningTypes', array()) as $Row) {
-   $Points = Plural($Row['Points'], '%s point', '%s points');
-   if ($Row['ExpireNumber'])
-      $Expires = sprintf(T('lasts %s'), Plural($Row['ExpireNumber'], '%s '.rtrim($Row['ExpireType'], 's'), '%s '.$Row['ExpireType'])); 
-   else
-      $Expires = '';
-   
-   echo '<div class="WarningType">'.
-      $this->Form->Radio('WarningTypeID', $Row['Name'], array('value' => $Row['WarningTypeID'])).
-      
-      ' <span class="Gloss">'.
-      $Points;
-   
-   if ($Expires) {
-      echo Bullet(' ').
-      $Expires;
-   }
-      
-   echo '</span>'.
-      '</div>';
 }
 ?>
-</div>
 
 <div class="P">
 <?php

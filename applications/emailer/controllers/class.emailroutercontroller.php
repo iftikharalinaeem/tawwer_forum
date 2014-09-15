@@ -153,6 +153,14 @@ class EmailRouterController extends Gdn_Controller {
             $LogModel = new Gdn_Model('EmailLog');
             $Data['Post'] = http_build_query($Data, '', '&');
             $Data['Charsets'] = GetValue('charsets', $Post, NULL);
+
+            if ($this->isOutOfOffice($Headers, $Data)) {
+               $Data['Response'] = 202;
+               $Data['ResponseText'] = 'Out of office';
+               $LogID = $LogModel->Insert($Data);
+               return;
+            }
+
             $LogID = $LogModel->Insert($Data);
             
             list($Name, $Email) = self::ParseEmailAddress($To);
@@ -234,6 +242,24 @@ class EmailRouterController extends Gdn_Controller {
          
          throw $Ex;
       }
+   }
+
+   /**
+    * Determines whether or not an email is an out of office reply.
+    *
+    * @param array $headers The array of email headers.
+    * @param array $data The email data.
+    * @return bool Returns true if the email is an out of office email, or false otherwise.
+    */
+   public function isOutOfOffice($headers, $data) {
+      if (
+         val('x-autoreply', $headers) ||
+         val('auto-submitted', $headers) == 'auto-replied' ||
+         stripos($data['Subject'], 'Out of Office') !== false
+      ) {
+         return true;
+      }
+      return false;
    }
    
    protected function CurlHeader($Handler, $HeaderString) {

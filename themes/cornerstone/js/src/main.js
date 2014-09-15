@@ -6,13 +6,11 @@
  * @license   GPLv3
  */
 
-//= require ../../bower_components/iCheck/icheck.js
-
 ;(function ($, window, document, undefined) {
 
-  $(document).on('ready ajaxSuccess', function () {
+  $(function () {
     // Initialize iCheck
-    $('input').iCheck();
+    $('input').icheck();
   });
 
 })(jQuery, window, document);

@@ -8,6 +8,7 @@
  *  1.2.4   Allow some reactions to be protected so that users can't flag moderator posts.
  *  1.2.13  Added TagModel_Types_Handler.
  *  1.3     Add class permissions; fix GetReactionTypes attributes; fix descriptions.
+ *  1.2.15  Added section 508 fixes.
  *
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary
@@ -48,8 +49,35 @@ class ReactionsPlugin extends Gdn_Plugin {
 
       $Path = $Args['Request']->Path();
       if (preg_match('`^/?reactions`i', $Path)) {
-         require_once($this->GetResource('class.reactionscontroller.php'));
+         require_once($this->GetResource('controllers/class.reactionscontroller.php'));
       }
+   }
+
+    /**
+     * Add content from a reaction to the promoted content module.
+     *
+     * @param PromotedContentModule $sender
+     */
+   public function PromotedContentModule_SelectByReaction_Handler($sender) {
+       $model = new ReactionModel();
+       $reactionType = ReactionModel::ReactionTypes($sender->Selection);
+
+       if (!$reactionType) {
+           return;
+       }
+
+       $data = $model->GetRecordsWhere(
+           array('TagID' => $reactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'Total >=' => 1),
+           'DateInserted', 'desc',
+           $sender->Limit, 0);
+
+       // Massage the data for the promoted content module.
+       foreach ($data as &$row) {
+           $row['ItemType'] = $row['RecordType'];
+           $row['Author'] = Gdn::UserModel()->GetID($row['InsertUserID']);
+       }
+
+       $sender->SetData('Content', $data);
    }
 
    /**
@@ -725,7 +753,7 @@ if (!function_exists('WriteReactions')):
 
          echo ' <span class="FlagMenu ToggleFlyout">';
          // Write the handle.
-         echo ReactionButton($Row, 'Flag', array('LinkClass' => 'FlyoutButton'));
+         echo ReactionButton($Row, 'Flag', array('LinkClass' => 'FlyoutButton', 'IsHeading' => TRUE));
 //            echo Sprite('SpFlyoutHandle', 'Arrow');
          echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
          foreach ($Flags as $Flag) {

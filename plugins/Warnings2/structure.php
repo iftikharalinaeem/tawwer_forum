@@ -51,25 +51,6 @@ if (!$WarningTypeExists) {
       array('Name' => 'Major'), TRUE);
 }
 
-Gdn::Structure()->Table('Warning')
-   ->PrimaryKey('WarningID')
-   ->Column('Type', array('Warning', 'Ban', 'Punish'))
-   ->Column('WarnUserID', 'int') // who we're warning
-   ->Column('Points', 'smallint')
-   ->Column('DateInserted', 'datetime')
-   ->Column('InsertUserID', 'int') // who did the warning.
-   ->Column('InsertIPAddress', 'varchar(15)')
-   ->Column('Body', 'text', FALSE)
-   ->Column('ModeratorNote', 'varchar(255)', TRUE)
-   ->Column('Format', 'varchar(20)', TRUE)
-   ->Column('DateExpires', 'datetime', TRUE)
-   ->Column('Expired', 'tinyint(1)')
-   ->Column('RecordType', 'varchar(10)', TRUE) // Warned for a something they posted?
-   ->Column('RecordID', 'int', TRUE)
-   ->Column('ConversationID', 'int', TRUE, 'index')
-   ->Column('Attributes', 'text', TRUE)
-   ->Set();
-
 Gdn::Structure()->Table('User')
    ->Column('Punished', 'tinyint', '0')
    ->Set();

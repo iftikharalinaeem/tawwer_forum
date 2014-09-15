@@ -249,7 +249,9 @@
             var inputFormats = {
                'bbcode': 'BBCode',
                'html': 'Html',
-               'markdown': 'Markdown'
+               'markdown': 'Markdown',
+               'textex': 'TextEx',
+               'text': 'Text'
             };
 
             // Run autobulleting functions on load, so user can just naturally
@@ -293,7 +295,6 @@
                   Button = $(Button).closest('.editor-action');
                }
 
-
                if ($(Button).data('editor')) {
                   // :\ and :'( break object and return string, while server
                   // needs to add slashes. Without addslashes :\ does not work but
@@ -334,7 +335,7 @@
             ButtonBar.BindShortcut(TextArea, 'strike', 'ctrl+S');
             ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+L');
             ButtonBar.BindShortcut(TextArea, 'code', 'ctrl+O');
-            ButtonBar.BindShortcut(TextArea, 'quote', 'ctrl+Q');
+            ButtonBar.BindShortcut(TextArea, 'blockquote', 'ctrl+Q');
             ButtonBar.BindShortcut(TextArea, 'post', 'tab');
          },
 
@@ -403,7 +404,7 @@
                   $(TextArea).insertRoundTag('code',bbcodeOpts);
                   break;
 
-               case 'quote':
+               case 'blockquote':
                   $(TextArea).insertRoundTag('quote',bbcodeOpts);
                   break;
 
@@ -547,7 +548,7 @@
                   }
                   break;
 
-               case 'quote':
+               case 'blockquote':
                   $(TextArea).insertRoundTag('blockquote',htmlOpts, {'class':'Quote'});
                   break;
 
@@ -699,7 +700,7 @@
                   }
                   break;
 
-               case 'quote':
+               case 'blockquote':
                   var thisOpts = $.extend(markdownOpts, {
                      prefix:'> ',
                      opentag:'',
@@ -833,6 +834,25 @@
                   $(TextArea).replaceSelectedText(selection, 'collapseToEnd');
                   break;
 
+               case 'emoji':
+                  Value = Value.trim() + ' ';
+                  $(TextArea).insertText(Value, $(TextArea).getSelection().start, "collapseToEnd");
+                  break;
+            }
+         },
+
+         PerformText: function(TextArea, Operation, Value) {
+            switch (Operation) {
+               case 'emoji':
+                  Value = Value.trim() + ' ';
+                  $(TextArea).insertText(Value, $(TextArea).getSelection().start, "collapseToEnd");
+                  break;
+            }
+
+         },
+
+         PerformTextEx: function(TextArea, Operation, Value) {
+            switch (Operation) {
                case 'emoji':
                   Value = Value.trim() + ' ';
                   $(TextArea).insertText(Value, $(TextArea).getSelection().start, "collapseToEnd");

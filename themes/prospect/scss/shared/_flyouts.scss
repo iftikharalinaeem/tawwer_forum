@@ -1,0 +1,26 @@
+.Flyout,
+.MenuItems {
+  * {
+    font-size: $font-size-base;
+    line-height: $line-height-base;
+  }
+
+  .Conversations,
+  .Popin {
+    a {
+      color: $link-color;
+    }
+  }
+}
+
+.MenuItems a:hover {
+  background-color: $link-color !important;
+}
+
+.PopList .ItemContent {
+  margin-left: 70px;
+}
+
+.Popup.SignInPopup {
+  margin-top: 30px;
+}

@@ -60,18 +60,31 @@ class Reporting2Plugin extends Gdn_Plugin {
          $ModeratorRoles = $RoleModel->GetByPermission('Garden.Moderation.Manage');
          $ModeratorRoleIDs = array_column($ModeratorRoles->Result(DATASET_TYPE_ARRAY), 'RoleID');
 
+         // Get RoleIDs for roles that can flag
+         $AllowedRoles = $RoleModel->GetByPermission('Garden.SignIn.Allow');
+         $AllowedRoleIDs = array_column($AllowedRoles->Result(DATASET_TYPE_ARRAY), 'RoleID');
+         // Disallow applicants & unconfirmed by default
+         if(($Key = array_search(C('Garden.Registration.ApplicantRoleID'), $AllowedRoleIDs)) !== false) {
+            unset($AllowedRoleIDs[$Key]);
+         }
+         if(($Key = array_search(C('Garden.Registration.ConfirmEmailRole'), $AllowedRoleIDs)) !== false) {
+            unset($AllowedRoleIDs[$Key]);
+         }
+
          // Build permissions for the new category
          $Permissions = array();
          $AllRoles = array_column(RoleModel::Roles(), 'RoleID');
          foreach ($AllRoles as $RoleID) {
             $IsModerator =  (in_array($RoleID, $ModeratorRoleIDs)) ? 1 : 0;
+            $IsAllowed = (in_array($RoleID, $AllowedRoleIDs)) ? 1 : 0;
             $Permissions[] = array(
                'RoleID' => $RoleID,
                'JunctionTable' => 'Category',
                'JunctionColumn' => 'PermissionCategoryID',
                'JunctionID' => $CategoryID,
                'Vanilla.Discussions.View' => $IsModerator,
-               'Vanilla.Comments.Add' => $IsModerator
+               'Vanilla.Discussions.Add' => $IsAllowed,
+               'Vanilla.Comments.Add' => $IsAllowed
             );
          }
 
@@ -145,7 +158,7 @@ class Reporting2Plugin extends Gdn_Plugin {
       $Sender->Form->SetFormValue('RecordType', $RecordType);
       $Sender->Form->SetFormValue('Format', 'TextEx');
 
-      $Sender->SetData('Title', sprintf(T('Report %1s'), $RecordType, 'Report'));
+      $Sender->SetData('Title', sprintf(T('Report %s'), $RecordType, 'Report'));
 
       // Set up data for Reason dropdown
       $Sender->SetData('Reasons', FALSE);
@@ -231,7 +244,7 @@ function FormatQuote($Body) {
       $Result = '<blockquote class="Quote Media">'.
          '<div class="Img">'.UserPhoto($User).'</div>'.
          '<div class="Media-Body">'.
-            '<div>'.UserAnchor($User).'</div>'.
+            '<div>'.UserAnchor($User).' - '.Gdn_Format::DateFull($Body['DateInserted'],'html').'</div>'.
             Gdn_Format::To($Body['Body'], $Body['Format']).
          '</div>'.
          '</blockquote>';

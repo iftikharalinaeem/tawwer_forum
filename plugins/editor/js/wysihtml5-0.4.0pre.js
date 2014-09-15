@@ -5474,7 +5474,8 @@ wysihtml5.dom.replaceWithChildNodes = function(node) {
         "width":              0,
         "height":             0,
         "marginwidth":        0,
-        "marginheight":       0
+        "marginheight":       0,
+        "title":              "WYSIWYG editor"
       }).on(iframe);
 
       // Setting the src like this prevents ssl warnings in IE6
@@ -5719,7 +5720,11 @@ wysihtml5.quirks.cleanPastedHTML = (function() {
   // TODO: We probably need more rules here
   var defaultRules = {
     // When pasting underlined links <a> into a contentEditable, IE thinks, it has to insert <u> to keep the styling
-    "a u": wysihtml5.dom.replaceWithChildNodes
+    "a u": wysihtml5.dom.replaceWithChildNodes,
+    // Chrome google docs paste.
+    "span[id^=docs-internal-guid-]": wysihtml5.dom.replaceWithChildNodes,
+    // Firefox google docs paste.
+    "b[id^=docs-internal-guid-]": wysihtml5.dom.replaceWithChildNodes
   };
 
   function cleanPastedHTML(elementOrHtml, rules, context) {
@@ -8365,7 +8370,8 @@ wysihtml5.views.View = Base.extend(
         WebkitUserSelect: "none"
       }).on(element);
 
-      element.focus();
+       // Remove this element.focus() because it screws up scroll position on embedded forums.
+//      element.focus();
 
       dom.setStyles(originalStyles).on(element);
 

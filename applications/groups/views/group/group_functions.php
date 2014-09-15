@@ -283,7 +283,7 @@ function WriteGroupButtons($Group = NULL) {
    }
    
    if (GroupPermission('Delete', $Group)) {
-      $Options['Delete'] = array('Text' => T('Delete Group'), 'Url' => GroupUrl($Group, 'delete'), 'CssClass' => 'Popup');
+      $Options['Delete'] = array('Text' => sprintf(T('Delete %s'), T('Group')), 'Url' => GroupUrl($Group, 'delete'), 'CssClass' => 'Popup');
    }
 
    if (count($Options))
@@ -334,7 +334,9 @@ function WriteGroupCard($Group, $WithButtons = TRUE) {
          SliceString(
             Gdn_Format::PlainText($Group['Description'], $Group['Format']), 
             C('Groups.CardDescription.ExcerptLength', 150)).'</p>';
-      echo '<div class="Group-Members">'.sprintf(Plural($Group['CountMembers'], '%d member','%d members', number_format($Group['CountMembers'])), $Group['CountMembers']).'</div>';
+      echo '<div class="Group-Members">'
+.              Plural($Group['CountMembers'], '%d member','%s members', number_format($Group['CountMembers']))
+          .'</div>';
       
       if ($WithButtons)
          WriteGroupButtons($Group);
@@ -496,7 +498,7 @@ function WriteMemberCard($Member) {
    echo '<div class="Card Card-Member">';
    
    echo UserPhoto($Member, array('LinkClass' => 'Card-Icon')).' '.UserAnchor($Member).' ';
-   echo Wrap(sprintf(T('GroupMemberJoined', 'Joined %s'), Gdn_Format::Date($Member['DateInserted'], 'html')), 
+   echo Wrap(sprintf(T('Joined %s', 'Joined %s'), Gdn_Format::Date($Member['DateInserted'], 'html')),
       'span', array('class' => 'MItem DateJoined')).' ';
    
    $Options = array();
@@ -504,11 +506,11 @@ function WriteMemberCard($Member) {
    if (GroupPermission('Moderate') && $Group['InsertUserID'] != $Member['UserID']) {
       if (GroupPermission('Edit')) {
          if ($Member['Role'] == 'Leader')
-            $Options['SetRole'] = array('Text' => T('Make Member', 'Member'), 'Url' => GroupUrl($Group, 'setrole')."?userid=$UserID&role=member", 'CssClass' => 'Group-MakeLeader Hijack');
+            $Options['SetRole'] = array('Text' => sprintf(T('Make %s'), T('Member')), 'Url' => GroupUrl($Group, 'setrole')."?userid=$UserID&role=member", 'CssClass' => 'Group-MakeLeader Hijack');
          else
             $Options['SetRole'] = array('Text' => T('Make Leader', 'Leader'), 'Url' => GroupUrl($Group, 'setrole')."?userid=$UserID&role=leader", 'CssClass' => 'Group-MakeLeader Hijack');
       }
-      $Options['Remove'] = array('Text' => T('Remove from Group', 'Remove'), 'Url' => GroupUrl($Group, 'removemember')."?userid=$UserID", 'CssClass' => 'Group-RemoveMember Popup');
+      $Options['Remove'] = array('Text' => T('Remove'), 'Url' => GroupUrl($Group, 'removemember')."?userid=$UserID", 'CssClass' => 'Group-RemoveMember Popup');
       
    }
    
