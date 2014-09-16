@@ -15,7 +15,7 @@ class Cleanspeak extends Gdn_Pluggable {
      */
     public $uuidSeed = array(0, 0, 0, 0);
 
-    public $UUIDs;
+    public $UUIDs = array();
     /**
      * @var Cleanspeak
      */
@@ -49,6 +49,7 @@ class Cleanspeak extends Gdn_Pluggable {
      * @return array|mixed
      */
     public function moderation($UUID, $content, $forceModeration = false) {
+
         if (in_array($UUID, $this->UUIDs)) {
             return array(
                 'contentAction' => 'skip',

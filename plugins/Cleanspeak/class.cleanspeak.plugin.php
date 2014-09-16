@@ -35,7 +35,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function queueModel_checkpremoderation_handler($sender, $args) {
-        $cleanSpeak = new Cleanspeak();
+        $cleanSpeak = Cleanspeak::instance();
         $args['Premoderate'] = false;
 
         if (!$this->isConfigured()) {
@@ -44,9 +44,9 @@ class CleanspeakPlugin extends Gdn_Plugin {
         }
 
         // Moderators don't go through cleanspeak.
-        if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-            return;
-        }
+//        if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+//            return;
+//        }
 
         // Prepare Data.
         $foreignUser = Gdn::UserModel()->GetID($args['Data']['InsertUserID'], DATASET_TYPE_ARRAY);
@@ -66,10 +66,14 @@ class CleanspeakPlugin extends Gdn_Plugin {
             $discussionModel = new DiscussionModel();
             $discussion = $discussionModel->GetID($args['Data']['DiscussionID']);
             $content['content']['location'] = md5(DiscussionUrl($discussion));
+            if (!val('Name', $args['Data'])) {
+                $content['content']['Name'] = 'Re: ' . val('Name', $discussion);
+            }
         } else {
             //if content has the same 'empty' location its being grouped together.
             $content['content']['location'] = mt_rand();
         }
+
         $UUID = $cleanSpeak->getRandomUUID($args['Data']);
 
         // Make an api request to cleanspeak.
@@ -671,6 +675,9 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         $queueID = $args['QueueID'];
         $uuid = Cleanspeak::instance()->getRandomUUID();
+        if (GetValueR('Queue.CleanspeakID', $args)) {
+            $uuid = $args['Queue']['CleanspeakID'];
+        }
         $args['Fields']['CleanspeakID'] = $uuid;
 
         $this->reportContent($args['Fields'], $uuid);
