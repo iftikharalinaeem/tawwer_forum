@@ -15,6 +15,7 @@ class Cleanspeak extends Gdn_Pluggable {
      */
     public $uuidSeed = array(0, 0, 0, 0);
 
+    public $UUIDs;
     /**
      * @var Cleanspeak
      */
