@@ -44,9 +44,9 @@ class CleanspeakPlugin extends Gdn_Plugin {
         }
 
         // Moderators don't go through cleanspeak.
-        if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-            return;
-        }
+//        if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+//            return;
+//        }
 
         // Prepare Data.
         $foreignUser = Gdn::UserModel()->GetID($args['Data']['InsertUserID'], DATASET_TYPE_ARRAY);
