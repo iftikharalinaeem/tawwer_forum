@@ -668,6 +668,9 @@ class CleanspeakPlugin extends Gdn_Plugin {
     }
 
     public function queueModel_beforeInsert_handler($sender, $args) {
+        if (valr('Queue.CleanspeakID', $args)) {
+            return;
+        }
 
         $queueID = $args['QueueID'];
         $uuid = Cleanspeak::instance()->getRandomUUID();

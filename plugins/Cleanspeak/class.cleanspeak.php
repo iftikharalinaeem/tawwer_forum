@@ -48,19 +48,12 @@ class Cleanspeak extends Gdn_Pluggable {
      * @return array|mixed
      */
     public function moderation($UUID, $content, $forceModeration = false) {
-        if (in_array($UUID, $this->UUIDs)) {
-            return array(
-                'contentAction' => 'skip',
-            );
-        }
 
         if ($forceModeration) {
             $content['moderation'] = 'requiresApproval';
         }
 
         $response = $this->apiRequest('/content/item/moderate/' . urlencode($UUID), $content);
-
-        $this->UUIDs[] = $UUID;
 
         return $response;
 
