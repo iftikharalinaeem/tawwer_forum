@@ -20,6 +20,7 @@ body#dashboard_settings_banner a span.New {
 display:none;
 }
 
+/* hide yellowboxes linking to outdated help on .org */
 body#dashboard_settings_banner div.Help.Aside,
 body#dashboard_settings_homepage div.Help.Aside,
 body#dashboard_settings_themes div.Help.Aside,
