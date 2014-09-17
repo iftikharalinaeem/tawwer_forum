@@ -131,7 +131,9 @@ class CleanspeakPlugin extends Gdn_Plugin {
                 'senderId' => $cleanSpeak->getUserUUID($row['InsertUserID'])
             )
         );
-
+        if (valr('Attributes.ForeignDateInserted', $row)) {
+            $content['content']['createInstant'] = Gdn_Format::ToTimestamp($row['Attributes']['ForeignDateInserted']) * 1000;
+        }
         if (val('DiscussionID', $row)) {
             $discussionID = $row['DiscussionID'];
         } elseif (valr('Attributes.DiscussionID', $row)) {
@@ -679,7 +681,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
             $uuid = $args['Queue']['CleanspeakID'];
         }
         $args['Fields']['CleanspeakID'] = $uuid;
-
         $this->reportContent($args['Fields'], $uuid);
     }
 }
