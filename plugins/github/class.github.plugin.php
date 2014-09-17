@@ -1040,6 +1040,9 @@ class GithubPlugin extends Gdn_Plugin {
      * @param array $Arguments
      */
     public function Base_GetAppSettingsMenuItems_Handler($Sender, $Arguments) {
+	if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+	    return false;
+	}
         $Menu = $Arguments['SideMenu'];
         $Menu->AddItem('Forum', T('Forum'));
         $Menu->AddLink('Forum', 'GitHub', 'plugin/github', 'Garden.Staff.Allow');
