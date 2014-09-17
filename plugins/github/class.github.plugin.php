@@ -336,6 +336,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @param Controller $Sender Sending controller.
      */
     public function controller_toggle($Sender) {
+	$Sender->Permission('Garden.Settings.Manage');
         // Enable/Disable
         if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
             if (C('Plugins.Github.GlobalLogin.Enabled')) {
@@ -542,6 +543,7 @@ class GithubPlugin extends Gdn_Plugin {
      */
     public function controller_index($Sender) {
 
+	$Sender->Permission('Garden.Settings.Manage');
         $Sender->AddCssFile('admin.css');
 
         $Validation = new Gdn_Validation();
@@ -965,6 +967,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @param PlugginController $Sender Sending controller.
      */
     public function controller_test($Sender) {
+	$Sender->Permission('Garden.Settings.Manage');
 
         $args = $Sender->RequestArgs;
         if (count($args) == 1) {
