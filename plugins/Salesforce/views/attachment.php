@@ -10,6 +10,16 @@
  * @param array $attachment
  */
 function WriteSalesforceLeadAttachment($attachment) {
+    // Don't display anything for guest.
+    if (!Gdn::Session()->IsValid()) {
+        return;
+    }
+
+    // Only display to Staff
+    if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+        return;
+    }
+
    $leadName = Gdn_Format::Text($attachment['FirstName'] . ' ' . $attachment['LastName']);
    ?>
    <div class="item-attachment">
@@ -62,7 +72,17 @@ function WriteSalesforceLeadAttachment($attachment) {
  * @param array $attachment
  */
 function WriteSalesforceCaseAttachment($attachment) {
-   ?>
+    // Don't display anything for guest.
+    if (!Gdn::Session()->IsValid()) {
+        return;
+    }
+
+    // Only display to Staff
+    if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+        return;
+    }
+
+    ?>
    <div class="item-attachment">
       <div class="alert">
          <div class="media item">

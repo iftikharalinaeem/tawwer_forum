@@ -72,7 +72,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @param array $Args Event Arguments.
      */
     public function discussioncontroller_afterDiscussionBody_handler($Sender, $Args) {
-        $this->writeAndUpdateAttachments($Sender, $Args);
+        $this->updateAttachments($Sender, $Args);
     }
 
     /**
@@ -82,7 +82,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @param array $Args Event Arguments.
      */
     public function discussionController_afterCommentBody_handler($Sender, $Args) {
-        $this->writeAndUpdateAttachments($Sender, $Args);
+        $this->updateAttachments($Sender, $Args);
     }
 
     /**
@@ -93,7 +93,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      *
      * @throws Gdn_UserException If Errors.
      */
-    protected function writeAndUpdateAttachments($Sender, $Args) {
+    protected function updateAttachments($Sender, $Args) {
         if ($Args['Type'] == 'Discussion') {
             $Content = 'Discussion';
         } elseif ($Args['Type'] == 'Comment') {
@@ -102,7 +102,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             throw new Gdn_UserException('Invalid Content');
         }
         // Signed in users only.
-        if (!Gdn::Session()->UserID) {
+        if (!Gdn::Session()->IsValid()) {
             return;
         }
 
