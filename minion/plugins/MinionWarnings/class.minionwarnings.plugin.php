@@ -102,7 +102,7 @@ class MinionWarnings extends Gdn_Plugin {
             case 'ban':
 
                 if (!key_exists('User', $state['Targets'])) {
-                    $this->acknowledge(null, T('You must supply a valid target user.'), 'custom', $state['Sources']['User'], array(
+                    $sender->acknowledge(null, T('You must supply a valid target user.'), 'custom', $state['Sources']['User'], array(
                         'Comment' => false
                     ));
                     break;
