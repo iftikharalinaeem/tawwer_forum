@@ -41,16 +41,4 @@ jQuery(document).ready(function($) {
        $avatarstock_form_modify.submit();
    });
 
-   // When selecting them in the edit profile pages.
-   var $avatar_picker = $('.avatar-option input');
-   $avatar_picker.on('change', function(e) {
-      $avatar_picker.each(function(i, el) {
-         if ($(el).prop('checked')) {
-            $avatar_picker.each(function(i, el2) {
-               $(el2).closest('label').removeClass('current-stock-avatar');
-            });
-            $(el).closest('label').addClass('current-stock-avatar');
-         }
-      });
-   });
 });
