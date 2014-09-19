@@ -68,7 +68,7 @@ class MinionWarnings extends Gdn_Plugin {
         $actions = &$sender->EventArguments['Actions'];
         $state = &$sender->EventArguments['State'];
 
-        // If we don't know the originating user, try to detect by a quote
+        // If we don't know the targetted user, try to detect by a quote
         if (!key_exists('User', $state['Targets'])) {
             $sender->matchQuoted($state);
         }
