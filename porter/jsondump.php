@@ -193,6 +193,22 @@ function parseMoot($moot) {
    }
 }
 
+function parseYDN($json, $path) {
+   $data = json_decode($json, true);
+   if ($data === null) {
+      echo "Invalid JSON: ";
+      writeError();
+      die();
+   }
+
+   $tablename = (strstr($path, 'messages') !== false) ? 'messages' : 'threads';
+
+   foreach ($data as $rows) {
+      //writeTableDef($tablename, $rows[0]);
+      writeRows($tablename, $rows);
+   }
+}
+
 if ($argc < 2) {
    echo 'php '.basename(__FILE__)." path\n";
    die();
@@ -210,6 +226,9 @@ if (isset($argv[2])) {
    switch ($argv[2]) {
       case 'moot':
          parseMoot($contents);
+         break;
+      case 'ydn':
+         parseYDN($contents, $path);
          break;
       default:
          parseJson($contents);
