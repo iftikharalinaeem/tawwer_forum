@@ -12,9 +12,16 @@ if (CheckPermission('Groups.Group.Add')) {
 <div class="Box-Cards">
 <h2><?php echo T('My Groups'); ?></h2>
 <?php WriteGroupCards($this->Data('MyGroups'), 
-   T("You haven't joined any groups yet.")); ?>
-</div>      
+   T("You haven't joined any groups yet."));
+    if (count($this->Data('MyGroups')) >= 9): ?>
+        <div class="MoreWrap">
+            <?php echo Anchor(sprintf(T('All %s...'), T('My Groups')), '/groups/browse/mine'); ?>
+        </div>
+    <?php endif; ?>
+</div>
 <?php endif; ?>
+
+
 
 <?php if ($this->Data('NewGroups')) : ?>
 <div class="Box-Cards">
