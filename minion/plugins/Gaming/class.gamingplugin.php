@@ -1,20 +1,8 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 
 /**
- * Gaming Plugin
- *
- * Acts a game loader / invoker, and supplies game tools to Minion games.
- *
- * Tools:
- *  Inventory
- *
- * Changes:
- *  1.0     Release
- *
- * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
  * @license Proprietary
- * @package misc
  */
 
 $PluginInfo['Gaming'] = array(
@@ -33,6 +21,20 @@ $PluginInfo['Gaming'] = array(
    'AuthorUrl' => 'http://vanillaforums.com'
 );
 
+/**
+ * Gaming Plugin
+ *
+ * Acts a game loader / invoker, and supplies game tools to Minion games.
+ *
+ * Tools:
+ *  Inventory
+ *
+ * Changes:
+ *  1.0     Release
+ *
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @package misc
+ */
 class GamingPlugin extends Gdn_Plugin {
 
    protected $games = array();
@@ -44,12 +46,12 @@ class GamingPlugin extends Gdn_Plugin {
     * @param MinionPlugin $sender
     */
    public function MinionPlugin_Token_Handler($sender) {
-      $State = &$sender->EventArguments['State'];
+      $state = &$sender->EventArguments['State'];
 
-      if (!$State['Method'] && in_array($State['CompareToken'], array('play', 'playing'))) {
-         $sender->consume($State, 'Method', 'play');
+      if (!$state['Method'] && in_array($state['CompareToken'], array('play', 'playing'))) {
+         $sender->consume($state, 'Method', 'play');
 
-         $sender->consume($State, 'Gather', array(
+         $sender->consume($state, 'Gather', array(
             'Node'   => 'Phrase',
             'Delta'  => ''
          ));
@@ -62,21 +64,23 @@ class GamingPlugin extends Gdn_Plugin {
     * @param MinionPlugin $sender
     */
    public function MinionPlugin_Command_Handler($sender) {
-      $Actions = &$sender->EventArguments['Actions'];
-      $State = &$sender->EventArguments['State'];
+      $actions = &$sender->EventArguments['Actions'];
+      $state = &$sender->EventArguments['State'];
 
-      switch ($State['Method']) {
+      switch ($state['Method']) {
          case 'play':
 
             // Games must be started in the OP
-            if (array_key_exists('Comment', $State['Sources']))
+            if (array_key_exists('Comment', $state['Sources'])) {
                return;
+            }
 
             // Games must have a name
-            if (!array_key_exists('Phrase', $State['Targets']))
+            if (!array_key_exists('Phrase', $state['Targets'])) {
                return;
+            }
 
-            $Actions[] = array('play', null, $State);
+            $actions[] = array('play', null, $state);
             break;
 
       }
@@ -98,8 +102,9 @@ class GamingPlugin extends Gdn_Plugin {
          case 'play':
 
             // Games must be started in the OP
-            if (array_key_exists('Comment', $state['Sources']))
+            if (array_key_exists('Comment', $state['Sources'])) {
                return;
+            }
 
             $gameName = strtolower(valr('Targets.Phrase', $state));
             if (!array_key_exists($gameName, $this->aliases)) {

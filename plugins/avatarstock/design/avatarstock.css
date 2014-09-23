@@ -76,6 +76,7 @@
 }
 #stockavatar-picker .avatar-option label {
   display: block;
+  position: relative;
   margin: 0;
   padding: 2px;
   cursor: pointer;
@@ -85,23 +86,26 @@
   transition: all 0.2s ease;
   overflow: hidden;
 }
-#stockavatar-picker .avatar-option label:hover, #stockavatar-picker .avatar-option label.current-stock-avatar {
+#stockavatar-picker .avatar-option label:hover {
   opacity: 1;
   -webkit-transform: scale(1);
   transform: scale(1);
   box-shadow: 0 0 5px 0 #aaa;
 }
-#stockavatar-picker .avatar-option label.current-stock-avatar {
+#stockavatar-picker .avatar-option input[type=radio] {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+}
+#stockavatar-picker .avatar-option input[type=radio]:checked ~ label {
+  opacity: 1;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  box-shadow: 0 0 5px 0 #aaa;
   pointer-events: none;
 }
 #stockavatar-picker .avatar-option img {
   display: block;
-}
-#stockavatar-picker .avatar-option input {
-  position: fixed;
-  left: 0;
-  top: 0;
+  position: relative;
   pointer-events: none;
-  opacity: 0;
-  visbility: hidden;
 }
