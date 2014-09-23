@@ -85,6 +85,22 @@
    }
 }
 
+// We needed to make some changes to this to work in ie 11, the issue being a
+// bug in ie 11 which occurs when an img is inside a label. The fix was adding
+// these rules to label img:
+//
+// display: block;
+// position: relative;
+// pointer-events: none;
+//
+// and to label:
+//
+// display: block;
+// position: relative;
+// 
+// Read here for more info on the issue:
+// http://stackoverflow.com/questions/20524815/ie-11-bug-image-inside-label-inside-form
+
 #stockavatar-picker {
    overflow: hidden;
    padding: 3px;
@@ -96,6 +112,7 @@
 
       label {
          display: block;
+         position: relative;
          margin: 0;
          padding: 2px;
          cursor: pointer;
@@ -105,30 +122,34 @@
          transition: all 0.2s ease;
          overflow: hidden;
 
-         &:hover,
-         &.current-stock-avatar {
+         &:hover {
             opacity: 1;
             -webkit-transform: scale(1);
             transform: scale(1);
             box-shadow: 0 0 5px 0 #aaa;
          }
-
-         &.current-stock-avatar {
-            pointer-events: none;
-         }
       }
+
+      input[type=radio] {
+          position: absolute;
+          top: -9999px;
+          left: -9999px;
+      }
+
+      input[type=radio]:checked ~ label {
+        opacity: 1;
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        box-shadow: 0 0 5px 0 #aaa;
+        pointer-events: none;
+      }
+
 
       img {
          display: block;
+         position: relative;
+         pointer-events: none;
       }
 
-      input {
-         position: fixed;
-         left: 0;
-         top: 0;
-         pointer-events: none;
-         opacity: 0;
-         visbility: hidden;
-      }
    }
 }
