@@ -13,7 +13,7 @@ if (CheckPermission('Groups.Group.Add')) {
 <h2><?php echo T('My Groups'); ?></h2>
 <?php WriteGroupCards($this->Data('MyGroups'), 
    T("You haven't joined any groups yet."));
-    if (count($this->Data('MyGroups')) >= 9): ?>
+    if (count($this->Data('MyGroups')) > 0): ?>
         <div class="MoreWrap">
             <?php echo Anchor(sprintf(T('All %s...'), T('My Groups')), '/groups/browse/mine'); ?>
         </div>
