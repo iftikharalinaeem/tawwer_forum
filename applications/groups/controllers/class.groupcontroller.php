@@ -516,6 +516,7 @@ class GroupController extends Gdn_Controller {
          throw NotFoundException('Group');
 
       $this->SetData('Group', $Group);
+      $this->GroupModel->OverridePermissions($Group);
 
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $DiscussionModel = new DiscussionModel();
