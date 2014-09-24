@@ -60,8 +60,24 @@
 .SpInbox:before {
   content: @icon-inbox;
 }
+.ReactFacebook:before {
+  color: @black;
+  content: @icon-facebook-alt;
+}
+.ReactTwitter:before {
+  color: @black;
+  content: @icon-twitter;
+}
 
 // -----------------------------------------------------------------------------
+
+.ReactButton.PopupWindow {
+  &:hover {
+    .Sprite:before {
+      color: @text-color;
+    }
+  }
+}
 
 .Button.Handle .Sprite,
 .NavButton.Handle .Sprite {
