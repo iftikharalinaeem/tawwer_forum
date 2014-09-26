@@ -11,9 +11,7 @@
   height: 5px;
   border: 1px solid #38ABE3;
   opacity: 0;
-  -webkit-box-shadow: 0 1px 2px -1px #fff;
   box-shadow: 0 1px 2px -1px #fff;
-  -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
 
@@ -40,7 +38,6 @@
   padding: 10px 0;
   background-color: rgba(0, 0, 0, 0.6);
   border-radius: 2px;
-  -webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
   pointer-events: none;
   z-index: 500; }
@@ -58,7 +55,6 @@
   overflow: hidden;
   padding: 5px;
   margin: 0 -10px;
-  -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   position: relative;
@@ -79,9 +75,7 @@
   /*rgba(0,0,0,0.05);*/
   border: 1px solid #fff;
   border-radius: 2px;
-  -webkit-box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
-  -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   /* This is for the transition when removing/reattaching files. Height
@@ -106,7 +100,6 @@
     .editor-file-preview .file-preview.img {
       padding: 0;
       background-position: center;
-      -webkit-background-size: 50px auto;
       background-size: 50px auto; }
     .editor-file-preview .file-preview.icon-file {
       font-size: 18px;
@@ -136,7 +129,6 @@
     height: 30px;
     cursor: pointer;
     background-color: #fff;
-    -webkit-box-shadow: inset 2px 0 2px -3px #000;
     box-shadow: inset 2px 0 2px -3px #000; }
   .editor-file-preview .editor-file-remove:after {
     display: block;
@@ -161,7 +153,7 @@
 .editor-upload-previews will the options be activated */
 .editor-upload-readonly .file-data {
   width: 178px; }
-.editor-upload-readonly .editor-file-remove, .editor-upload-readonly .editor-file-reattach {
+.editor-upload-readonly .editor-file-remove, .editor-upload-readonly .editor-file-reattach, .editor-upload-readonly .in-body {
   display: none; }
 
 .editor-file-removed {
@@ -272,7 +264,6 @@
 .editor-insert-dialog input.InputBox {
   width: 100%;
   margin: 0;
-  -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
 
@@ -296,7 +287,6 @@
   float: left;
   cursor: pointer;
   border: 1px solid #fff;
-  -webkit-box-shadow: inset 0 0 0 1px #fff;
   box-shadow: inset 0 0 0 1px #fff;
   -webkit-transition: -webkit-transform 0.2s ease;
   transition: transform 0.2s ease;
@@ -345,7 +335,6 @@
  */
 .editor-dd-emoji + .editor-insert-dialog {
   width: 132px;
-  -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
   .editor-dd-emoji + .editor-insert-dialog .emoji {
@@ -353,7 +342,6 @@
     padding: 5px;
     background-repeat: no-repeat;
     background-position: center;
-    -webkit-box-sizing: content-box;
     -moz-box-sizing: content-box;
     box-sizing: content-box; }
     .editor-dd-emoji + .editor-insert-dialog .emoji:hover {
@@ -422,7 +410,6 @@
     .editor-fullpage .TextBoxWrapper .BodyBox, .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
       width: 100% !important;
       color: #000;
-      -webkit-box-sizing: border-box !important;
       -moz-box-sizing: border-box !important;
       box-sizing: border-box !important;
       -webkit-transition: background-color 400ms ease, color 400ms ease;
@@ -447,7 +434,6 @@
     -webkit-transition: background-color 400ms ease;
     transition: background-color 400ms ease; }
     .editor-fullpage #editor-fullpage-candidate input {
-      -webkit-box-sizing: border-box !important;
       -moz-box-sizing: border-box !important;
       box-sizing: border-box !important; }
     .editor-fullpage #editor-fullpage-candidate .editor {
@@ -460,7 +446,6 @@
       margin: 0 auto;
       background-color: rgba(255, 255, 255, 0.95);
       border: 1px solid transparent;
-      -webkit-box-shadow: 0 2px 5px -5px #000;
       box-shadow: 0 2px 5px -5px #000;
       -webkit-transition: all 400ms ease;
       transition: all 400ms ease; }
@@ -493,7 +478,6 @@
   .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor {
     color: #fff;
     background-color: rgba(0, 0, 0, 0.8);
-    -webkit-box-shadow: 0 5px 5px -5px #999;
     box-shadow: 0 5px 5px -5px #999; }
   .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .editor .icon:hover, .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-command-active, .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-action-active, .editor-fullpage #editor-fullpage-candidate.editor-lights-candidate .wysihtml5-command-dialog-opened {
     background-color: rgba(255, 255, 255, 0.25); }
