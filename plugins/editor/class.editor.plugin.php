@@ -1077,9 +1077,9 @@ class EditorPlugin extends Gdn_Plugin {
     * single request against the Media table, then filter out the ones that
     * exist per discussion or comment.
     *
-    * @param multiple $Controller
-    * @param string $Type
-    * @param array|object
+    * @param multiple $Controller The controller.
+    * @param string $Type The type of row, either discussion or comment.
+    * @param array|object $row The row of data being attached to.
     */
    protected function AttachUploadsToComment($Sender, $Type = 'comment', $row = null) {
 
@@ -1108,7 +1108,7 @@ class EditorPlugin extends Gdn_Plugin {
                $src = preg_quote($src);
 
                $regex = '`src=["\'](https?:?)?'.$src.'["\']`i';
-               $inbody = preg_match($regex, $body);
+               $inbody = (bool)preg_match($regex, $body);
 
                $attachment['InBody'] = $inbody;
             }
