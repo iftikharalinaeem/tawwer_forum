@@ -10,10 +10,14 @@ $editorkey = $this->Data('_editorkey');
    <?php foreach ($attachments as $attachment): ?>
 
       <?php
+
          $isOwner = (Gdn::Session()->IsValid() && (Gdn::Session()->UserID == $attachment['InsertUserID']));
          $viewerCssClass = ($isOwner)
             ? 'file-owner'
             : 'file-readonly';
+         if (val('InBody', $attachment)) {
+            $viewerCssClass .= ' in-body';
+         }
 
          $pathParse = Gdn_Upload::Parse($attachment['Path']);
          $thumbPathParse = Gdn_Upload::Parse($attachment['ThumbPath']);

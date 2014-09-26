@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.4.1',
+   'Version' => '1.5.0-beta',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -1079,8 +1079,9 @@ class EditorPlugin extends Gdn_Plugin {
     *
     * @param multiple $Controller
     * @param string $Type
+    * @param array|object
     */
-   protected function AttachUploadsToComment($Sender, $Type = 'comment') {
+   protected function AttachUploadsToComment($Sender, $Type = 'comment', $row = null) {
 
       $param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
       $foreignId = GetValue($param, GetValue(ucfirst($Type), $Sender->EventArguments));
@@ -1099,6 +1100,19 @@ class EditorPlugin extends Gdn_Plugin {
          });
 
          if (count($attachments)) {
+            // Loop through the attachments and add a flag if they are found in the source or not.
+            $body = Gdn_Format::To(val('Body', $row), val('Format', $row));
+            foreach ($attachments as &$attachment) {
+               $src = Gdn_Upload::Url($attachment['Path']);
+               $src = preg_replace('`^https?:?`i', '', $src);
+               $src = preg_quote($src);
+
+               $regex = '`src=["\'](https?:?)?'.$src.'["\']`i';
+               $inbody = preg_match($regex, $body);
+
+               $attachment['InBody'] = $inbody;
+            }
+
             $Sender->SetData('_attachments', $attachments);
             $Sender->SetData('_editorkey', strtolower($param.$foreignId));
             echo $Sender->FetchView($this->GetView('attachments.php'));
@@ -1245,11 +1259,11 @@ class EditorPlugin extends Gdn_Plugin {
    }
 
    public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
-      $this->AttachUploadsToComment($Sender);
+      $this->AttachUploadsToComment($Sender, 'comment', val('Comment', $Args));
    }
 
    public function DiscussionController_AfterDiscussionBody_Handler($Sender, $Args) {
-      $this->AttachUploadsToComment($Sender, 'discussion');
+      $this->AttachUploadsToComment($Sender, 'discussion', val('Discussion', $Args));
    }
 
    public function PostController_AfterCommentBody_Handler($Sender, $Args) {
