@@ -335,7 +335,7 @@ function WriteGroupCard($Group, $WithButtons = TRUE) {
             Gdn_Format::PlainText($Group['Description'], $Group['Format']), 
             C('Groups.CardDescription.ExcerptLength', 150)).'</p>';
       echo '<div class="Group-Members">'
-.              Plural($Group['CountMembers'], '%d member','%s members', number_format($Group['CountMembers']))
+.              Plural($Group['CountMembers'], '%s member','%s members', number_format($Group['CountMembers']))
           .'</div>';
       
       if ($WithButtons)

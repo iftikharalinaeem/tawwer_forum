@@ -14,7 +14,7 @@
    </div>
    
    <div class="Box-Cards Group-Members">
-      <h2><?php echo T('GroupMembers', 'Members'); ?></h2>
+      <h2><?php echo T('Group Members', 'Members'); ?></h2>
       <?php WriteMemberCards($this->Data('Members')); ?>
    </div>
 </div>
