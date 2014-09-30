@@ -224,7 +224,7 @@ class GroupController extends Gdn_Controller {
          throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Join.Reason', $Group));
       }
 
-      $this->Title('Invite');
+      $this->Title(T('Invite'));
 
       $Form = new Gdn_Form();
       $this->Form = $Form;
