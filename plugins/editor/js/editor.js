@@ -1212,9 +1212,9 @@
                // the file was probably not allowed, but passed client checks.
                // That would tend to mean the client checks need to be updated.
                fail: function(e, data) {
-                  var filename = data.files[0].name;
-                  var message = '"'+ filename +'" could not be uploaded.'
+                  var message = gdn.definition('The file failed to upload.');
                   gdn.informMessage(message);
+                  return false;
                },
 
                // Called regardless of success or failure.

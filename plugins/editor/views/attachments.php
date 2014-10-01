@@ -27,11 +27,11 @@ $editorkey = $this->Data('_editorkey');
             : '<i class="file-preview icon icon-file"></i>';
       ?>
 
-      <div class="editor-file-preview <?php echo $viewerCssClass; ?>" id="media-id-<?php echo $attachment['MediaID']; ?>" title="<?php echo $attachment['Name']; ?>">
+      <div class="editor-file-preview <?php echo $viewerCssClass; ?>" id="media-id-<?php echo $attachment['MediaID']; ?>" title="<?php echo htmlspecialchars($attachment['Name']); ?>">
          <input type="hidden" name="MediaIDs[]" value="<?php echo $attachment['MediaID']; ?>" disabled="disabled" />
          <?php echo $filePreviewCss; ?>
          <div class="file-data">
-         <a class="filename" data-type="<?php echo $attachment['Type']; ?>" data-width="<?php echo $attachment['ImageWidth']; ?>" data-height="<?php echo $attachment['ImageHeight']; ?>" href="<?php echo $pathParse['Url'] ?>" target="_blank"><?php echo $attachment['Name']; ?></a>
+         <a class="filename" data-type="<?php echo $attachment['Type']; ?>" data-width="<?php echo $attachment['ImageWidth']; ?>" data-height="<?php echo $attachment['ImageHeight']; ?>" href="<?php echo $pathParse['Url'] ?>" target="_blank"><?php echo htmlspecialchars($attachment['Name']); ?></a>
          <span class="meta"><?php echo Gdn_Format::Bytes($attachment['Size'], 1); ?></span>
          </div>
          <span class="editor-file-remove" title="Remove file"></span>
