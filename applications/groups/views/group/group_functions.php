@@ -7,12 +7,13 @@ if (!function_exists('DateTile')):
  * @param string $Date
  */
 function DateTile($Date) {
-   if (is_string($Date))
+   if (is_string($Date)) {
       $Date = new DateTime($Date);
+   }
    
    return '
    <span class="DateTile">
-      <span class="Month">'.$Date->format('M').'</span>
+      <span class="Month">'.strftime('%b', $Date->getTimestamp()).'</span>
       <span class="Day">'.$Date->format('j').'</span>
    </span>';
 }
