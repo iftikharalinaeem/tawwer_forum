@@ -279,10 +279,10 @@ class GroupsHooks extends Gdn_Plugin {
     * @param type $Sender
     */
    public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
-      $Sender->Preferences['Notifications']['Email.Groups'] = T('PreferenceGroupsEmail', 'Notify me when there is Group activity.');
-      $Sender->Preferences['Notifications']['Popup.Groups'] = T('PreferenceGroupsPopup', 'Notify me when there is Group activity.');
+      $Sender->Preferences['Notifications']['Email.Groups'] = T('Notify me when there is group activity.');
+      $Sender->Preferences['Notifications']['Popup.Groups'] = T('Notify me when there is group activity.');
 
-      $Sender->Preferences['Notifications']['Email.Events'] = T('PreferenceEventsEmail', 'Notify me when there is Event activity.');
-      $Sender->Preferences['Notifications']['Popup.Events'] = T('PreferenceEventsPopup', 'Notify me when there is Event activity.');
+      $Sender->Preferences['Notifications']['Email.Events'] = T('Notify me when there is event activity.');
+      $Sender->Preferences['Notifications']['Popup.Events'] = T('Notify me when there is event activity.');
    }
 }

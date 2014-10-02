@@ -158,7 +158,7 @@ class Reporting2Plugin extends Gdn_Plugin {
       $Sender->Form->SetFormValue('RecordType', $RecordType);
       $Sender->Form->SetFormValue('Format', 'TextEx');
 
-      $Sender->SetData('Title', sprintf(T('Report %s'), $RecordType, 'Report'));
+      $Sender->SetData('Title', sprintf(T('Report %s'), T($RecordType), 'Report'));
 
       // Set up data for Reason dropdown
       $Sender->SetData('Reasons', FALSE);
@@ -210,7 +210,7 @@ class Reporting2Plugin extends Gdn_Plugin {
          $Category = ReportModel::GetReportCategory();
          $ReportCount = ReportModel::GetUnreadReportCount();
          $CReport = $ReportCount > 0 ? ' '.Wrap($ReportCount, 'span class="Alert"') : '';
-         echo Wrap(Anchor(Sprite('SpReport').' '.htmlspecialchars($Category['Name']).$CReport, CategoryUrl($Category)), 'li', array('class' => 'ReportCategory'));
+         echo Wrap(Anchor(Sprite('SpReport').' '.htmlspecialchars(T($Category['Name'])).$CReport, CategoryUrl($Category)), 'li', array('class' => 'ReportCategory'));
       }
    }
 

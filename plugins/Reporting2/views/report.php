@@ -14,14 +14,14 @@ echo $this->Form->Errors();
          <li>
             <?php
             $FirstOption = array_shift(array_keys($this->Data('Reasons')));
-            echo $this->Form->Label(T('ReportingLabelReason', 'Reason'), 'Reason');
+            echo $this->Form->Label('@'.T('Report Reason', 'Reason'), 'Reason');
             echo $this->Form->RadioList('Reason', $this->Data('Reasons'), array('Default' => $FirstOption));
             ?>
          </li>
       <?php endif; ?>
       <li>
          <?php
-         $BodyLabel = $this->Data('Reasons') ? T('ReportingLabelNotes','Notes') : T('ReportingLabelReason', 'Reason');
+         $BodyLabel = $this->Data('Reasons') ? '@'.T('Report Notes','Notes') : '@'.T('Report Reason', 'Reason');
          echo $this->Form->Label($BodyLabel, 'Body');
          echo $this->Form->TextBox('Body', array('MultiLine' => TRUE));
          ?>
