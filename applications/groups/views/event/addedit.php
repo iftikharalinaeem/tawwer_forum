@@ -44,7 +44,7 @@
                   )); ?> 
                   <?php echo $this->Form->TextBox('TimeStarts', array(
                      'class'        => 'InputBox TimePicker',
-                     'placeholder'  => 'Add a time?'
+                     'placeholder'  => T('Add a time?')
                   )); ?>
                </span>
                <span class="Timebased Timezone">
@@ -64,7 +64,7 @@
                   )); ?> 
                   <?php echo $this->Form->TextBox('TimeEnds', array(
                      'class'        => 'InputBox TimePicker',
-                     'placeholder'  => 'Add a time?'
+                     'placeholder'  => T('Add a time?')
                   )); ?>
                </span>
                <span class="Timebased NoEndTime"><?php echo Anchor('&times;', '#'); ?></span>
