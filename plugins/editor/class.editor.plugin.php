@@ -881,7 +881,7 @@ class EditorPlugin extends Gdn_Plugin {
 
          $payload = array(
             'MediaID'            => $MediaID,
-            'Filename'           => $fileName,
+            'Filename'           => htmlspecialchars($fileName),
             'Filesize'           => $fileData['size'],
             'FormatFilesize'     => Gdn_Format::Bytes($fileData['size'], 1),
             'type' => $fileData['type'],
@@ -898,7 +898,7 @@ class EditorPlugin extends Gdn_Plugin {
          $json = array(
             'error' => 0,
             'feedback' => 'Editor received file successfully.',
-            'payload' => json_encode($payload)
+            'payload' => $payload
          );
       }
 
