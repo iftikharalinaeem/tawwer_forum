@@ -898,7 +898,7 @@ class EditorPlugin extends Gdn_Plugin {
          $json = array(
             'error' => 0,
             'feedback' => 'Editor received file successfully.',
-            'payload' => $payload
+            'payload' => json_encode($payload)
          );
       }
 
