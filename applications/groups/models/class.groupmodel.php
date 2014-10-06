@@ -295,7 +295,7 @@ class GroupModel extends Gdn_Model {
             ->From('Discussion')
             ->Where('GroupID', $GroupID)
             ->Get()->Value('CountDiscussions', 0);
-         $this->SetField('CountDiscussions', $countDiscussions);
+         $this->SetField($GroupID, 'CountDiscussions', $countDiscussions);
          return;
       }
       $SQLInc = sprintf('%+d', $Inc);
