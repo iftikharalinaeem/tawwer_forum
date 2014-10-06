@@ -352,6 +352,29 @@ class GroupModel extends Gdn_Model {
          $ValidUserIDs[] = $UserID;
       }
 
+      // If Conversations are disabled; Improve notification with a link to group.
+      if (!class_exists('ConversationModel') && count($ValidUserIDs) > 0) {
+         foreach ($ValidUserIDs as $UserID) {
+            $Activity = array(
+               'ActivityType' => 'Group',
+               'ActivityUserID' => GDN::Session()->UserID,
+               'HeadlineFormat' => T('HeadlineFormat.GroupInvite', 'Please join my <a href="{Url,html}">group</a>.'),
+               'RecordType' => 'Group',
+               'RecordID' => $Group['GroupID'],
+               'Route' => GroupUrl($Group, '/', false),
+               'Story' => FormatString(T("You've been invited to join {Name}."), array('Name' => htmlspecialchars($Group['Name']))),
+               'NotifyUserID' => $UserID,
+               'Data' => array(
+                  'Name' => $Group['Name']
+               )
+            );
+            $ActivityModel = new ActivityModel();
+            $ActivityModel->Save($Activity, 'Groups');
+
+         }
+
+      }
+
       // Send a message for the invite.
       if (class_exists('ConversationModel') && count($ValidUserIDs) > 0) {
          $Model = new ConversationModel();
