@@ -374,6 +374,7 @@ class ReactionModel {
       foreach ($Data as $Index => &$Row) {
          $RecordType = $Row['RecordType'];
          $ID = $Row['RecordID'];
+
          
          if (!isset($JoinData[$RecordType][$ID])) {
             $Unset[] = $Index;
@@ -408,7 +409,7 @@ class ReactionModel {
 
          // Join the category
          $Category = CategoryModel::Categories(GetValue('CategoryID', $Row, ''));
-         $Row['Category'] = $Category;
+         $Row['CategoryCssClass'] = GetValue('CssClass', $Category);
       }
       
       foreach ($Unset as $Index) {
