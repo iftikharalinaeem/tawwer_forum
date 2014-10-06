@@ -358,7 +358,7 @@ class GroupModel extends Gdn_Model {
             $Activity = array(
                'ActivityType' => 'Group',
                'ActivityUserID' => GDN::Session()->UserID,
-               'HeadlineFormat' => T('HeadlineFormat.GroupInvite', 'Please join my group.') . ' <a href="{Url,html}">{Data.Name,text}</a>',
+               'HeadlineFormat' => T('HeadlineFormat.GroupInvite', 'Please join my <a href="{Url,html}">group</a>.'),
                'RecordType' => 'Group',
                'RecordID' => $Group['GroupID'],
                'Route' => GroupUrl($Group, '/', false),
