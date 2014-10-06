@@ -405,12 +405,16 @@ class ReactionModel {
                $Url = '';
          }
          $Row['Url'] = $Url;
+
+         // Join the category
+         $Category = CategoryModel::Categories(GetValue('CategoryID', $Row, ''));
+         $Row['Category'] = $Category;
       }
       
       foreach ($Unset as $Index) {
          unset($Data[$Index]);
       }
-      
+
       // Join the users.
       Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'));
       
