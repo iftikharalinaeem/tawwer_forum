@@ -290,10 +290,7 @@ class GroupModel extends Gdn_Model {
 
    public function IncrementDiscussionCount($GroupID, $Inc) {
       $Group = $this->GetID($GroupID);
-      $SQLInc = '+ ' . $Inc;
-      if ($Inc < 0) {
-         $SQLInc = '- ' . $Inc;
-      }
+      $SQLInc = sprintf('%+d', $Inc);
       $this->SQL
          ->Update('Group')
          ->Set('CountDiscussions', "CountDiscussions " . $SQLInc, FALSE, FALSE)
