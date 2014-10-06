@@ -14,7 +14,7 @@ $PluginInfo['vanillicon'] = array(
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'MobileFriendly' => TRUE,
+   'MobileFriendly' => true,
    'SettingsUrl' => '/settings/vanillicon',
    'SettingsPermission' => 'Garden.Settings.Manage'
 );
@@ -22,16 +22,28 @@ $PluginInfo['vanillicon'] = array(
 class VanilliconPlugin extends Gdn_Plugin {
    /// Methods ///
 
+   /**
+    * Set up the plugin.
+    */
    public function setup() {
       $this->structure();
    }
 
+   /**
+    * Perform any necessary database or configuration updates.
+    */
    public function structure() {
       TouchConfig('Plugins.Vanillicon.Type', 'v1');
    }
 
    /// Properties ///
 
+   /**
+    * Set the vanillicon on the user' profile.
+    *
+    * @param ProfileController $Sender
+    * @param array $Args
+    */
    public function ProfileController_AfterAddSideMenu_Handler($Sender, $Args) {
       if (!$Sender->User->Photo) {
          $Sender->User->Photo = UserPhotoDefaultUrl($Sender->User, array('Size' => 200));
@@ -39,6 +51,8 @@ class VanilliconPlugin extends Gdn_Plugin {
    }
 
    /**
+    * The settings page for vanillicon.
+    *
     * @param Gdn_Controller $sender
     */
    public function SettingsController_Vanillicon_Create($sender) {
@@ -68,33 +82,41 @@ class VanilliconPlugin extends Gdn_Plugin {
 }
 
 if (!function_exists('UserPhotoDefaultUrl')) {
-   function UserPhotoDefaultUrl($User, $Options = array()) {
-      static $iconSize = NULL, $type = null;
-      if ($iconSize === NULL) {
+   /**
+    * Calculate the user's default photo url.
+    *
+    * @param array|object $user The user to examine.
+    * @param array $options An array of options.
+    * - Size: The size of the photo.
+    * @return string Returns the vanillicon url for the user.
+    */
+   function UserPhotoDefaultUrl($user, $options = array()) {
+      static $iconSize = null, $type = null;
+      if ($iconSize === null) {
          $thumbSize = C('Garden.Thumbnail.Size');
          $iconSize = $thumbSize <= 50 ? 50 : 100;
       }
       if ($type === null) {
          $type = C('Plugins.Vanillicon.Type');
       }
-      $size = val('Size', $Options, $iconSize);
+      $size = val('Size', $options, $iconSize);
 
-      $email = GetValue('Email', $User);
+      $email = val('Email', $user);
       if (!$email) {
-         $email = GetValue('UserID', $User, 100);
+         $email = GetValue('UserID', $user, 100);
       }
       $hash = md5($email);
       $px = substr($hash, 0, 1);
 
       switch ($type) {
          case 'v2':
-            $photourl = "//w$px.vanillicon.com/v2/{$hash}.svg";
+            $photoUrl = "//w$px.vanillicon.com/v2/{$hash}.svg";
             break;
          default:
-            $photourl = "//w$px.vanillicon.com/{$hash}_{$size}.png";
+            $photoUrl = "//w$px.vanillicon.com/{$hash}_{$size}.png";
             break;
       }
 
-      return $photourl;
+      return $photoUrl;
    }
 }
