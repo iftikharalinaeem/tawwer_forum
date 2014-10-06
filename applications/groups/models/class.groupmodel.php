@@ -123,7 +123,7 @@ class GroupModel extends Gdn_Model {
                   $Perms['Join.Reason'] = T("You've applied to join this group.");
                   break;
                case 'denied':
-                  $Perms['Join.Reason'] = T("You're application for this group was denied.");
+                  $Perms['Join.Reason'] = T("Your application for this group was denied.");
                   break;
                case 'ban':
                   $Perms['Join.Reason'] = T("You're banned from joining this group.");
