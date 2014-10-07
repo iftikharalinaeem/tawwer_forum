@@ -369,7 +369,7 @@ class GroupModel extends Gdn_Model {
                'HeadlineFormat' => T('HeadlineFormat.GroupInvite', 'Please join my <a href="{Url,html}">group</a>.'),
                'RecordType' => 'Group',
                'RecordID' => $Group['GroupID'],
-               'Route' => GroupUrl($Group, '/', false),
+               'Route' => GroupUrl($Group, false, '/'),
                'Story' => FormatString(T("You've been invited to join {Name}."), array('Name' => htmlspecialchars($Group['Name']))),
                'NotifyUserID' => $UserID,
                'Data' => array(
