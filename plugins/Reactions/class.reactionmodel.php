@@ -408,8 +408,8 @@ class ReactionModel {
          $Row['Url'] = $Url;
 
          // Join the category
-         $Category = CategoryModel::Categories(GetValue('CategoryID', $Row, ''));
-         $Row['CategoryCssClass'] = GetValue('CssClass', $Category);
+         $Category = CategoryModel::Categories(val('CategoryID', $Row, ''));
+         $Row['CategoryCssClass'] = val('CssClass', $Category);
       }
       
       foreach ($Unset as $Index) {
