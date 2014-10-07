@@ -150,6 +150,9 @@ endif;
 
 if (!function_exists('WriteImageItem')):
    function WriteImageItem($Record, $CssClass = 'Tile ImageWrap') {
+      if (val('CategoryCssClass', $Record)) {
+         $CssClass .= " ".val('CategoryCssClass', $Record);
+      }
       $Attributes = GetValue('Attributes', $Record);
       if (!is_array($Attributes))
          $Attributes = @unserialize($Attributes);
