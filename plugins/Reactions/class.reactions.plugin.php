@@ -464,7 +464,8 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js', 'plugins/Reactions');
       $Sender->AddJsFile('tile.js', 'plugins/Reactions');
       $Sender->AddCssFile('style.css');
-      // Set the title, breadcrumbs, canonical
+      $Sender->AddCssFile('vanillicon.css', 'static');
+     // Set the title, breadcrumbs, canonical
       $Sender->Title(T('Best Of'));
       $Sender->SetData('Breadcrumbs', array(array('Name' => T('Best Of'), 'Url' => '/bestof/everything')));
       $Sender->CanonicalUrl(
@@ -570,7 +571,9 @@ class ReactionsPlugin extends Gdn_Plugin {
       }
 
       $Sender->AddCssFile('style.css');
-      // Set the title, breadcrumbs, canonical
+      $Sender->AddCssFile('vanillicon.css', 'static');
+
+     // Set the title, breadcrumbs, canonical
       $Sender->Title(T('Best Of'));
       $Sender->SetData('Breadcrumbs', array(array('Name' => T('Best Of'), 'Url' => '/bestof/everything')));
       $Sender->CanonicalUrl(
