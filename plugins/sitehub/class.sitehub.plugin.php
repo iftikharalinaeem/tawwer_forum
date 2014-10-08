@@ -42,7 +42,7 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->column('Slug', 'varchar(50)', false, 'unique.slug')
             ->column('Url', 'varchar(255)', false, 'unique.url')
             ->column('SiteID', 'int', true)
-            ->column('Status', ['pending', 'building', 'active', 'error'], 'pending')
+            ->column('Status', ['pending', 'building', 'active', 'error', 'deleting'], 'pending')
             ->column('DateStatus', 'datetime')
             ->column('DateInserted', 'datetime')
             ->column('InsertUserID', 'int')
@@ -57,6 +57,11 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->table('Role')
             ->column('HubSync', ['settings', 'membership'], true)
             ->set();
+
+        Gdn::Structure()
+            ->Table('UserAuthenticationProvider')
+            ->Column('SyncToNodes', 'tinyint(1)', '0')
+            ->Set();
 
         TouchConfig('Badges.Disabled', true);
     }

@@ -164,6 +164,10 @@ class MultisitesController extends DashboardController {
         $categories = $this->siteModel->getSyncCategories($this->site);
         $this->SetData('Categories', $categories);
 
+        // Get the authentication providers.
+        $providers = Gdn_AuthenticationProviderModel::GetWhereStatic(['SyncToNodes' => 1]);
+        $this->SetData('Authenticators', $providers);
+
         SaveToConfig('Api.Clean', FALSE, FALSE);
         $this->Render('api');
     }

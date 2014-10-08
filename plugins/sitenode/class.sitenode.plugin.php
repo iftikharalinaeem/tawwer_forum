@@ -77,6 +77,11 @@ class SiteNodePlugin extends Gdn_Plugin {
             ->table('Discussion')
             ->column('HubID', 'varchar(20)', true, 'unique.hubid')
             ->set();
+
+        Gdn::Structure()
+            ->Table('UserAuthenticationProvider')
+            ->Column('SyncWithHub', 'tinyint(1)', '0')
+            ->Set();
     }
 
     /**
@@ -209,12 +214,29 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Synchronize the categories.
         $this->syncCategories(val('Categories', $config, []), $roleMap);
 
+        // Synchronize the authenticators.
+        $this->syncAuthenticators(val('Authenticators', $config, []));
+
         $this->FireEvent('AfterSync');
 
         // Tell the hub that we've synchronized.
         $result = $this->hubApi("/multisites/$siteID.json", 'POST', ['DateLastSync' => Gdn_Format::ToDateTime()], true);
 
         Gdn::Config()->Shutdown();
+    }
+
+    public function syncAuthenticators(array $authenticators) {
+        $model = new Gdn_AuthenticationProviderModel();
+
+        foreach ($authenticators as $row) {
+            // Look for an existing authenticator.
+            $current = $model->GetWhere(['AuthenticationKey' => $row['AuthenticationKey']])->FirstRow();
+            if (!$current || val('SyncWithHub', $current)) {
+                unset($row['SyncToNodes']);
+                $row['SyncWithHub'] = true;
+                $model->Save($row);
+            }
+        }
     }
 
     public function syncCategories(array $categories, array $roleMap) {
