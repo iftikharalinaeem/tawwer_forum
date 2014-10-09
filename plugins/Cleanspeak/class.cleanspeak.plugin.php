@@ -66,9 +66,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
             $discussionModel = new DiscussionModel();
             $discussion = $discussionModel->GetID($args['Data']['DiscussionID']);
             $content['content']['location'] = md5(DiscussionUrl($discussion));
-            if (!val('Name', $args['Data'])) {
-                $content['content']['Name'] = 'Re: ' . val('Name', $discussion);
-            }
         } else {
             //if content has the same 'empty' location its being grouped together.
             $content['content']['location'] = mt_rand();
