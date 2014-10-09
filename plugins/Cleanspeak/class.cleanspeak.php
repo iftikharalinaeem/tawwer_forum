@@ -68,6 +68,12 @@ class Cleanspeak extends Gdn_Pluggable {
 
     }
 
+    public function flag($UUID, $flag) {
+        $response = $this->apiRequest('/content/item/flag/' . urlencode($UUID), $flag);
+        return $response;
+    }
+
+
     /**
      *
      * Generate UUIDs for Content.

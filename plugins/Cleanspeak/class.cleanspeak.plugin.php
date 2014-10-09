@@ -44,9 +44,9 @@ class CleanspeakPlugin extends Gdn_Plugin {
         }
 
         // Moderators don't go through cleanspeak.
-//        if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-//            return;
-//        }
+        if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+            return;
+        }
 
         // Prepare Data.
         $foreignUser = Gdn::UserModel()->GetID($args['Data']['InsertUserID'], DATASET_TYPE_ARRAY);
@@ -673,14 +673,42 @@ class CleanspeakPlugin extends Gdn_Plugin {
         TouchValue('Plugins.Cleanspeak.ApiUrl', $sender->Data['Config'], C('Plugins.Cleanspeak.ApiUrl'));
     }
 
-    public function queueModel_beforeInsert_handler($sender, $args) {
+   /**
+    * Flag content in Cleanspeak.
+    *
+    * @param $sender
+    * @param $args
+    * @return bool
+    */
+   public function logModel_afterInsert_handler($sender, $args) {
+      $log = $args['Log'];
+      if ($log['Operation'] === 'Moderate') {
 
-        $queueID = $args['QueueID'];
-        $uuid = Cleanspeak::instance()->getRandomUUID();
-        if (GetValueR('Queue.CleanspeakID', $args)) {
-            $uuid = $args['Queue']['CleanspeakID'];
-        }
-        $args['Fields']['CleanspeakID'] = $uuid;
-        $this->reportContent($args['Fields'], $uuid);
-    }
+         $queue = QueueModel::Instance();
+         $record = unserialize($log['Data']);
+
+         // Find content and; Get UID from the queue.
+         $ForeignID = $queue->generateForeignID($record);
+         $queueRow = $queue->GetWhere(array('ForeignID' => $ForeignID))->FirstRow(DATASET_TYPE_ARRAY);
+         $cleanspeakID = $queueRow['CleanspeakID'];
+         $cleanspeak = Cleanspeak::instance();
+
+         $flag = array(
+            'flag' => array(
+               'reporterId' => $cleanspeak->getUserUUID(Gdn::Session()->UserID),
+               'createInstant' => Gdn_Format::ToTimestamp($queueRow['DateInserted']) * 1000,
+   //            'reason' => 'Flagged'
+   //            'comment' => ''
+            )
+         );
+
+         // Make an api request to cleanspeak.
+         // Send to Cleanspeak user alerts.
+         $response = $cleanspeak->flag($cleanspeakID, $flag);
+
+         return true;
+
+      }
+   }
+
 }
