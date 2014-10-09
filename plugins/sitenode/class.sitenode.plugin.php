@@ -74,13 +74,8 @@ class SiteNodePlugin extends Gdn_Plugin {
             ->set();
 
         Gdn::Structure()
-            ->table('Discussion')
-            ->column('HubID', 'varchar(20)', true, 'unique.hubid')
-            ->set();
-
-        Gdn::Structure()
             ->Table('UserAuthenticationProvider')
-            ->Column('SyncWithHub', 'tinyint(1)', '0')
+            ->Column('SyncWithHub', 'tinyint(1)', '1')
             ->Set();
     }
 
