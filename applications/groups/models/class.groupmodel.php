@@ -290,10 +290,18 @@ class GroupModel extends Gdn_Model {
 
    public function IncrementDiscussionCount($GroupID, $Inc) {
       $Group = $this->GetID($GroupID);
-
+      if (val('CountDiscussions', $Group) < 100) {
+         $countDiscussions = $this->SQL->Select('DiscussionID', 'count', 'CountDiscussions')
+            ->From('Discussion')
+            ->Where('GroupID', $GroupID)
+            ->Get()->Value('CountDiscussions', 0);
+         $this->SetField($GroupID, 'CountDiscussions', $countDiscussions);
+         return;
+      }
+      $SQLInc = sprintf('%+d', $Inc);
       $this->SQL
          ->Update('Group')
-         ->Set('CountDiscussions', "CountDiscussions + $Inc", FALSE, FALSE)
+         ->Set('CountDiscussions', "CountDiscussions " . $SQLInc, FALSE, FALSE)
          ->Where('GroupID', $GroupID)
          ->Put();
    }
@@ -361,7 +369,7 @@ class GroupModel extends Gdn_Model {
                'HeadlineFormat' => T('HeadlineFormat.GroupInvite', 'Please join my <a href="{Url,html}">group</a>.'),
                'RecordType' => 'Group',
                'RecordID' => $Group['GroupID'],
-               'Route' => GroupUrl($Group, '/', false),
+               'Route' => GroupUrl($Group, false, '/'),
                'Story' => FormatString(T("You've been invited to join {Name}."), array('Name' => htmlspecialchars($Group['Name']))),
                'NotifyUserID' => $UserID,
                'Data' => array(
