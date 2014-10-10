@@ -73,11 +73,11 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         $UUID = $cleanSpeak->getRandomUUID($args['Data']);
 
-       // Set the CleanspeakID on the form so we can save it later using model_afterSave_Handlers.
-       $Form = Gdn::Controller()->Form;
-       $Form->SetFormValue('CleanspeakID', $UUID);
+        // Set the CleanspeakID on the form so we can save it later using model_*Save*_Handlers.
+        $Form = Gdn::Controller()->Form;
+        $Form->SetFormValue('CleanspeakID', $UUID);
 
-       // Make an api request to cleanspeak.
+        // Make an api request to cleanspeak.
         try {
             $result = $cleanSpeak->moderation($UUID, $content, C('Plugins.Cleanspeak.ForceModeration'));
         } catch (CleanspeakException $e) {
@@ -688,6 +688,9 @@ class CleanspeakPlugin extends Gdn_Plugin {
          $record = unserialize($log['Data']);
          $cleanspeakID = valr('Attributes.CleanspeakID', $record);
          if (!$cleanspeakID) {
+            $cleanspeakID = valr('Data.CleanspeakID', $record);
+         }
+         if (!$cleanspeakID) {
             return false;
          }
          $cleanspeak = Cleanspeak::instance();
@@ -764,13 +767,40 @@ class CleanspeakPlugin extends Gdn_Plugin {
    }
 
    /**
+    * Save the CleanspeakID to the record Data.  We will need this for reporting.
+    *
+    * @param ActivityModel $sender
+    * @param $args
+    */
+   public function ActivityModel_AfterSave_Handler($sender, $args) {
+
+      $form = Gdn::Controller()->Form;
+      $cleanspeakID = $form->GetValue('CleanspeakID');
+      if (!$cleanspeakID) {
+         return;
+      }
+      $activityModel = new ActivityModel();
+      $activity = $activityModel->GetID($args['Activity']['ActivityID']);
+      if (val('Data', $activity)) {
+         $data = unserialize($activity['Activity']['Data']);
+      }
+      $data['CleanspeakID'] = $cleanspeakID;
+      $activityModel->SetField($args['Activity']['ActivityID'], 'Data', serialize($data));
+   }
+
+   /**
     * Add CleanspeakID to the queue if present on record attributes.
     *
     * @param queueModel $sender Sending controller.
     * @param array $args sending arguments.
     */
    public function queueModel_AfterConvertToQueueRow_Handler($sender, $args) {
-      $args['QueueRow']['CleanspeakID'] = $args['Data']['Attributes']['CleanspeakID'];
+      if (valr('Data.Attributes.CleanspeakID', $args)) {
+         $args['QueueRow']['CleanspeakID'] = $args['Data']['Attributes']['CleanspeakID'];
+      } elseif (valr('Data.Data.CleanspeakID', $args)) {
+         $args['QueueRow']['CleanspeakID'] = $args['Data']['Data']['CleanspeakID'];
+      }
+
    }
 
 }
