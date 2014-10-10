@@ -15,7 +15,6 @@ class Cleanspeak extends Gdn_Pluggable {
      */
     public $uuidSeed = array(0, 0, 0, 0);
 
-    public $UUIDs = array();
     /**
      * @var Cleanspeak
      */
@@ -50,19 +49,11 @@ class Cleanspeak extends Gdn_Pluggable {
      */
     public function moderation($UUID, $content, $forceModeration = false) {
 
-        if (in_array($UUID, $this->UUIDs)) {
-            return array(
-                'contentAction' => 'skip',
-            );
-        }
-
         if ($forceModeration) {
             $content['moderation'] = 'requiresApproval';
         }
 
         $response = $this->apiRequest('/content/item/moderate/' . urlencode($UUID), $content);
-
-        $this->UUIDs[] = $UUID;
 
         return $response;
 
@@ -162,21 +153,25 @@ class Cleanspeak extends Gdn_Pluggable {
         if (!empty($apiKey)) {
             $headers['Authentication'] = $apiKey;
         }
-        Logger::log(Logger::DEBUG, 'Cleanspeak API Request.', array($options, $queryParams, $headers));
+        Logger::log(Logger::DEBUG, 'Cleanspeak API Request.', array(
+              'Options' => $options,
+              'QueryParams' => $queryParams,
+              'Header' => $headers
+           ));
 
         $response = $proxyRequest->Request($options, $queryParams, null, $headers);
 
         if ($proxyRequest->ResponseStatus == 400) {
-            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', json_decode($response, true));
+            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', array('Response' => json_decode($response, true)));
             throw new CleanspeakException('Error in cleanspeak request.');
         } elseif ($proxyRequest->ResponseStatus == 0) {
             Logger::log(Logger::ERROR, 'Cleanspeak Error in API. No Response.');
             throw new CleanspeakException('Error communicating with the cleanspeak server.', 500);
         } elseif ($proxyRequest->ResponseStatus != 200) {
-            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', json_decode($response, true));
+            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', array('Response' => json_decode($response, true)));
             throw new CleanspeakException('Error communicating with the cleanspeak server.');
         } else {
-            Logger::log(Logger::DEBUG, 'Cleanspeak API Response.', array($response));
+            Logger::log(Logger::DEBUG, 'Cleanspeak API Response.', array('Response' => $response));
         }
 
         if (stristr($proxyRequest->ResponseHeaders['Content-Type'], 'application/json') != false) {

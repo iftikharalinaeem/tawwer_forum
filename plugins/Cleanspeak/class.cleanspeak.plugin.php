@@ -73,7 +73,11 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         $UUID = $cleanSpeak->getRandomUUID($args['Data']);
 
-        // Make an api request to cleanspeak.
+       // Set the CleanspeakID on the form so we can save it later using model_afterSave_Handlers.
+       $Form = Gdn::Controller()->Form;
+       $Form->SetFormValue('CleanspeakID', $UUID);
+
+       // Make an api request to cleanspeak.
         try {
             $result = $cleanSpeak->moderation($UUID, $content, C('Plugins.Cleanspeak.ForceModeration'));
         } catch (CleanspeakException $e) {
@@ -681,31 +685,92 @@ class CleanspeakPlugin extends Gdn_Plugin {
       $log = $args['Log'];
       if ($log['Operation'] === 'Moderate') {
 
-         $queue = QueueModel::Instance();
          $record = unserialize($log['Data']);
-
-         // Find content and; Get UID from the queue.
-         $ForeignID = $queue->generateForeignID($record);
-         $queueRow = $queue->GetWhere(array('ForeignID' => $ForeignID))->FirstRow(DATASET_TYPE_ARRAY);
-         $cleanspeakID = $queueRow['CleanspeakID'];
+         $cleanspeakID = valr('Attributes.CleanspeakID', $record);
+         if (!$cleanspeakID) {
+            return false;
+         }
          $cleanspeak = Cleanspeak::instance();
 
          $flag = array(
             'flag' => array(
                'reporterId' => $cleanspeak->getUserUUID(Gdn::Session()->UserID),
-               'createInstant' => Gdn_Format::ToTimestamp($queueRow['DateInserted']) * 1000,
+               'createInstant' => Gdn_Format::ToTimestamp() * 1000,
    //            'reason' => 'Flagged'
    //            'comment' => ''
             )
          );
 
-         // Make an api request to cleanspeak.
          // Send to Cleanspeak user alerts.
-         $response = $cleanspeak->flag($cleanspeakID, $flag);
+         try {
+            $response = $cleanspeak->flag($cleanspeakID, $flag);
+         } catch (Exception $e) {
+
+         }
 
          return true;
 
       }
+   }
+
+   /**
+    * Save the CleanspeakID to the record attributes.  We will need this for reporting.
+    *
+    * @param $sender
+    * @param $args
+    */
+   public function CommentModel_AfterSaveComment_Handler($sender, $args) {
+      /**
+       * @var $Form Gdn_Form
+       */
+      $form = Gdn::Controller()->Form;
+      $cleanspeakID = $form->GetValue('CleanspeakID');
+      if (!$cleanspeakID) {
+         return;
+      }
+      $commentModel = new CommentModel();
+      $comment = $commentModel->GetID($args['CommentID'], DATASET_TYPE_ARRAY);
+      if (val('Attributes', $comment)) {
+         $attributes = unserialize($comment['Attributes']);
+      }
+      $attributes['CleanspeakID'] = $cleanspeakID;
+      $commentModel->SetField($args['CommentID'], 'Attributes', serialize($attributes));
+
+   }
+
+   /**
+    * Save the CleanspeakID to the record attributes.  We will need this for reporting.
+    *
+    * @param DiscussionModel $sender
+    * @param array $args
+    */
+   public function DiscussionModel_AfterSaveDiscussion_Handler($sender, $args) {
+      /**
+       * @var $form Gdn_Form
+       */
+      $form = Gdn::Controller()->Form;
+      $cleanspeakID = $form->GetValue('CleanspeakID');
+      if (!$cleanspeakID) {
+         return;
+      }
+      $discussionModel = new DiscussionModel();
+      $discussion = $discussionModel->GetID($args['DiscussionID']);
+      if (val('Attributes', $discussion)) {
+         $attributes = unserialize($discussion['Attributes']);
+      }
+      $attributes['CleanspeakID'] = $cleanspeakID;
+      $discussionModel->SetField($args['DiscussionID'], 'Attributes', serialize($attributes));
+
+   }
+
+   /**
+    * Add CleanspeakID to the queue if present on record attributes.
+    *
+    * @param queueModel $sender Sending controller.
+    * @param array $args sending arguments.
+    */
+   public function queueModel_AfterConvertToQueueRow_Handler($sender, $args) {
+      $args['QueueRow']['CleanspeakID'] = $args['Data']['Attributes']['CleanspeakID'];
    }
 
 }
