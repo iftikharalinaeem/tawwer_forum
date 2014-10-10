@@ -374,6 +374,7 @@ class ReactionModel {
       foreach ($Data as $Index => &$Row) {
          $RecordType = $Row['RecordType'];
          $ID = $Row['RecordID'];
+
          
          if (!isset($JoinData[$RecordType][$ID])) {
             $Unset[] = $Index;
@@ -405,12 +406,16 @@ class ReactionModel {
                $Url = '';
          }
          $Row['Url'] = $Url;
+
+         // Join the category
+         $Category = CategoryModel::Categories(val('CategoryID', $Row, ''));
+         $Row['CategoryCssClass'] = val('CssClass', $Category);
       }
       
       foreach ($Unset as $Index) {
          unset($Data[$Index]);
       }
-      
+
       // Join the users.
       Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'));
       
