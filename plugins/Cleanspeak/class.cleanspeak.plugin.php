@@ -1,7 +1,7 @@
 <?php
 /**
  *
- * * Changes:
+ *  Changes:
  *  0.0.1alpha  Initial release
  *  1.0         Add Cleanspeak API Key
  *  1.2.0       Change report to use content flagging.
@@ -24,182 +24,7 @@ $PluginInfo['Cleanspeak'] = array(
 
 class CleanspeakPlugin extends Gdn_Plugin {
 
-
-    /**
-     * Check if content requires premoderation.
-     *
-     * @param QueueModel $sender
-     * @param array $args
-     *  [Premoderate] bool True if to be premoderated.
-     *  [Queue] array Fields to add to the queue role.
-     *  [InsertUserID] int  InsertUserID in the queue.
-     * @throws Gdn_UserException
-     */
-    public function queueModel_checkpremoderation_handler($sender, $args) {
-        $cleanSpeak = Cleanspeak::instance();
-        $args['Premoderate'] = false;
-
-        if (!$this->isConfigured()) {
-            throw new Gdn_UserException('Cleanspeak is not configured.');
-            return;
-        }
-
-        // Moderators don't go through cleanspeak.
-        if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-            return;
-        }
-
-        // Prepare Data.
-        $foreignUser = Gdn::UserModel()->GetID($args['Data']['InsertUserID'], DATASET_TYPE_ARRAY);
-        if (!$foreignUser) {
-            throw new Gdn_UserException('Can not find user.');
-        }
-        $content = array(
-            'content' => array(
-                'applicationId' => C('Plugins.Cleanspeak.ApplicationID'),
-                'createInstant' => Gdn_Format::ToTimestamp($args['Data']['DateInserted']) * 1000,
-                'parts' => $cleanSpeak->getParts($args['Data']),
-                'senderDisplayName' => $foreignUser['Name'],
-                'senderId' => $cleanSpeak->getUserUUID($args['Data']['InsertUserID'])
-            )
-        );
-        if (GetValue('DiscussionID', $args['Data'])) {
-            $discussionModel = new DiscussionModel();
-            $discussion = $discussionModel->GetID($args['Data']['DiscussionID']);
-            $content['content']['location'] = md5(DiscussionUrl($discussion));
-        } else {
-            //if content has the same 'empty' location its being grouped together.
-            $content['content']['location'] = mt_rand();
-        }
-
-        $UUID = $cleanSpeak->getRandomUUID($args['Data']);
-
-        // Set the CleanspeakID on the form so we can save it later using model_*Save*_Handlers.
-        $Form = Gdn::Controller()->Form;
-        $Form->SetFormValue('CleanspeakID', $UUID);
-
-        // Make an api request to cleanspeak.
-        try {
-            $result = $cleanSpeak->moderation($UUID, $content, C('Plugins.Cleanspeak.ForceModeration'));
-        } catch (CleanspeakException $e) {
-
-            // Error communicating with cleanspeak
-            // Content will go into premoderation queue
-            // InsertUserID will not be updated.
-            $args['Queue']['CleanspeakID'] = $UUID;
-            $args['Premoderate'] = true;
-            return;
-        }
-
-        // Content is allowed
-        if (GetValue('contentAction', $result) == 'allow') {
-            return;
-        }
-
-        // Content is in Pre Moderation Queue
-        if (GetValue('requiresApproval', $result) == 'requiresApproval'
-            || GetValue('contentAction', $result) == 'queuedForApproval'
-        ) {
-            $args['Premoderate'] = true;
-            $args['Queue']['CleanspeakID'] = $UUID;
-            $args['InsertUserID'] = $this->getUserID();
-            return;
-        }
-
-        //if not handled by above; then add to queue for premoderation.
-        $args['Premoderate'] = true;
-        return;
-
-    }
-
-
-    /**
-     * Handle Postbacks from Cleanspeak or Hub.
-     *
-     * Examples:
-     *
-     * Postback URL:
-     *
-     * http://localhost/api/v1/mod.json/cleanspeakPostback/?access_token=d7db8b7f0034c13228e4761bf1bfd434
-     *
-     *    {
-     *     "type" : "contentApproval",
-     *     "approvals" : {
-     *     "8207bc26-f048-478d-8945-84f236cb5637" : "approved",
-     *     "86d9e3e1-5752-41dc-aa55-2a832728ec33" : "dismissed",
-     *     "a1fca416-5573-4662-a31a-a4ff808c34dd" : "rejected",
-     *     "af777ea8-1874-463c-a97c-a1f9e494bee1" : "approved",
-     *     "73031050-2016-44fc-b8f6-b97184793587" : "approved"
-     *     },
-     *     "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
-     *     "moderatorEmail" : "catherine@email.com",
-     *     "moderatorExternalId": "foo-bar-baz"
-     *    }
-     *
-     *    {
-     *     "type" : "contentDelete",
-     *     "applicationId" : "63d797d4-0603-48f7-8fef-5008edc670dd",
-     *     "id" : "3f8f66cb-d933-4e5e-a76d-5b3a4d9209cd",
-     *     "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
-     *     "moderatorEmail" : "catherine@email.com",
-     *     "moderatorExternalId": "foo-bar-baz"
-     *     }
-     *
-     *    {
-     *     "type" : "userAction",
-     *     "action" : "Warn",
-     *     "applicationIds" : [ "2c84ed53-6b75-4bef-ab68-eddb9ee253b4" ],
-     *     "comment" : "a comment",
-     *     "key" : "Language",
-     *     "userId" : "f9caf789-b316-4233-bd62-19f8fb649275",
-     *     "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
-     *     "moderatorEmail" : "catherine@email.com",
-     *     "moderatorExternalId": "foo-bar-baz"
-     *     }
-     *
-     * @param PluginController $sender
-     * @throws Gdn_UserException
-     */
-    public function modController_cleanspeakPostback_create($sender) {
-
-        // Minimum Permissions needed
-        $sender->Permission('Garden.Moderation.Manage');
-
-        if (Gdn::Request()->RequestMethod() != 'POST') {
-            Logger::event(
-                'postback_error',
-                Logger::ERROR,
-                'Invalid request method: {method}',
-                array('method' => Gdn::Request()->RequestMethod())
-            );
-            throw new Gdn_UserException('Invalid Request Type');
-        }
-
-        $post = Gdn::Request()->Post();
-        if (!$post) {
-            Logger::event('postback_error', Logger::ERROR, 'Error in POST', $post);
-            throw new Gdn_UserException('Error in POST');
-        }
-
-        $type = $post['type'];
-        switch ($type) {
-            case 'contentApproval':
-                $this->contentApproval($sender);
-                break;
-            case 'contentDelete':
-                $this->contentDelete($sender);
-                break;
-            case 'userAction':
-                $this->userAction($sender);
-                break;
-            default:
-                $context['Post'] = $post;
-                Logger::event('cleanspeak_error', Logger::ERROR, 'Unknown Type.', $context);
-        }
-
-        $sender->Render('blank', 'utility', 'dashboard');
-
-    }
+    // Methods.
 
     /**
      * Set Moderator information from post.
@@ -508,6 +333,210 @@ class CleanspeakPlugin extends Gdn_Plugin {
         return $userID;
     }
 
+
+    /**
+     * @param bool $multiSite default false.
+     * @return bool|string false if SimpleAPU is disabled.
+     */
+    public function getPostBackURL($multiSite = false) {
+        if (!Gdn::PluginManager()->CheckPlugin('SimpleAPI')) {
+            return false;
+        }
+
+        $URL = Url('/mod/cleanspeakpostback.json', true);
+
+        if ($multiSite) {
+            $URL = C('Hub.Url', Gdn::Request()->Domain() . '/hub') . '/multisites/cleanspeakproxy.json';
+        }
+
+        if (strstr($URL, '?')) {
+            $URL .= '&';
+        } else {
+            $URL .= '?';
+        }
+        $URL .= 'access_token=' . C('Plugins.SimpleAPI.AccessToken');
+
+        return $URL;
+    }
+
+    // Event Handlers.
+
+    /**
+     * Check if content requires premoderation.
+     *
+     * @param QueueModel $sender
+     * @param array $args
+     *  [Premoderate] bool True if to be premoderated.
+     *  [Queue] array Fields to add to the queue role.
+     *  [InsertUserID] int  InsertUserID in the queue.
+     * @throws Gdn_UserException
+     */
+    public function queueModel_checkpremoderation_handler($sender, $args) {
+        $cleanSpeak = Cleanspeak::instance();
+        $args['Premoderate'] = false;
+
+        if (!$this->isConfigured()) {
+            throw new Gdn_UserException('Cleanspeak is not configured.');
+            return;
+        }
+
+        // Moderators don't go through cleanspeak.
+        if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+            return;
+        }
+
+        // Prepare Data.
+        $foreignUser = Gdn::UserModel()->GetID($args['Data']['InsertUserID'], DATASET_TYPE_ARRAY);
+        if (!$foreignUser) {
+            throw new Gdn_UserException('Can not find user.');
+        }
+        $content = array(
+            'content' => array(
+                'applicationId' => C('Plugins.Cleanspeak.ApplicationID'),
+                'createInstant' => Gdn_Format::ToTimestamp($args['Data']['DateInserted']) * 1000,
+                'parts' => $cleanSpeak->getParts($args['Data']),
+                'senderDisplayName' => $foreignUser['Name'],
+                'senderId' => $cleanSpeak->getUserUUID($args['Data']['InsertUserID'])
+            )
+        );
+        if (GetValue('DiscussionID', $args['Data'])) {
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->GetID($args['Data']['DiscussionID']);
+            $content['content']['location'] = md5(DiscussionUrl($discussion));
+        } else {
+            //if content has the same 'empty' location its being grouped together.
+            $content['content']['location'] = mt_rand();
+        }
+
+        $UUID = $cleanSpeak->getRandomUUID($args['Data']);
+
+        // Set the CleanspeakID on the form so we can save it later using model_*Save*_Handlers.
+        $Form = Gdn::Controller()->Form;
+        $Form->SetFormValue('CleanspeakID', $UUID);
+
+        // Make an api request to cleanspeak.
+        try {
+            $result = $cleanSpeak->moderation($UUID, $content, C('Plugins.Cleanspeak.ForceModeration'));
+        } catch (CleanspeakException $e) {
+
+            // Error communicating with cleanspeak
+            // Content will go into premoderation queue
+            // InsertUserID will not be updated.
+            $args['Queue']['CleanspeakID'] = $UUID;
+            $args['Premoderate'] = true;
+            return;
+        }
+
+        // Content is allowed
+        if (GetValue('contentAction', $result) == 'allow') {
+            return;
+        }
+
+        // Content is in Pre Moderation Queue
+        if (GetValue('requiresApproval', $result) == 'requiresApproval'
+            || GetValue('contentAction', $result) == 'queuedForApproval'
+        ) {
+            $args['Premoderate'] = true;
+            $args['Queue']['CleanspeakID'] = $UUID;
+            $args['InsertUserID'] = $this->getUserID();
+            return;
+        }
+
+        //if not handled by above; then add to queue for premoderation.
+        $args['Premoderate'] = true;
+        return;
+
+    }
+
+
+    /**
+     * Handle Postbacks from Cleanspeak or Hub.
+     *
+     * Examples:
+     *
+     * Postback URL:
+     *
+     * http://localhost/api/v1/mod.json/cleanspeakPostback/?access_token=d7db8b7f0034c13228e4761bf1bfd434
+     *
+     *    {
+     *     "type" : "contentApproval",
+     *     "approvals" : {
+     *     "8207bc26-f048-478d-8945-84f236cb5637" : "approved",
+     *     "86d9e3e1-5752-41dc-aa55-2a832728ec33" : "dismissed",
+     *     "a1fca416-5573-4662-a31a-a4ff808c34dd" : "rejected",
+     *     "af777ea8-1874-463c-a97c-a1f9e494bee1" : "approved",
+     *     "73031050-2016-44fc-b8f6-b97184793587" : "approved"
+     *     },
+     *     "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
+     *     "moderatorEmail" : "catherine@email.com",
+     *     "moderatorExternalId": "foo-bar-baz"
+     *    }
+     *
+     *    {
+     *     "type" : "contentDelete",
+     *     "applicationId" : "63d797d4-0603-48f7-8fef-5008edc670dd",
+     *     "id" : "3f8f66cb-d933-4e5e-a76d-5b3a4d9209cd",
+     *     "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
+     *     "moderatorEmail" : "catherine@email.com",
+     *     "moderatorExternalId": "foo-bar-baz"
+     *     }
+     *
+     *    {
+     *     "type" : "userAction",
+     *     "action" : "Warn",
+     *     "applicationIds" : [ "2c84ed53-6b75-4bef-ab68-eddb9ee253b4" ],
+     *     "comment" : "a comment",
+     *     "key" : "Language",
+     *     "userId" : "f9caf789-b316-4233-bd62-19f8fb649275",
+     *     "moderatorId": "b00916ba-f647-4e9f-b2a6-537f69f89b87",
+     *     "moderatorEmail" : "catherine@email.com",
+     *     "moderatorExternalId": "foo-bar-baz"
+     *     }
+     *
+     * @param PluginController $sender
+     * @throws Gdn_UserException
+     */
+    public function modController_cleanspeakPostback_create($sender) {
+
+        // Minimum Permissions needed
+        $sender->Permission('Garden.Moderation.Manage');
+
+        if (Gdn::Request()->RequestMethod() != 'POST') {
+            Logger::event(
+                'postback_error',
+                Logger::ERROR,
+                'Invalid request method: {method}',
+                array('method' => Gdn::Request()->RequestMethod())
+            );
+            throw new Gdn_UserException('Invalid Request Type');
+        }
+
+        $post = Gdn::Request()->Post();
+        if (!$post) {
+            Logger::event('postback_error', Logger::ERROR, 'Error in POST', $post);
+            throw new Gdn_UserException('Error in POST');
+        }
+
+        $type = $post['type'];
+        switch ($type) {
+            case 'contentApproval':
+                $this->contentApproval($sender);
+                break;
+            case 'contentDelete':
+                $this->contentDelete($sender);
+                break;
+            case 'userAction':
+                $this->userAction($sender);
+                break;
+            default:
+                $context['Post'] = $post;
+                Logger::event('cleanspeak_error', Logger::ERROR, 'Unknown Type.', $context);
+        }
+
+        $sender->Render('blank', 'utility', 'dashboard');
+
+    }
+
     /**
      * Plugin settings page.
      *
@@ -575,26 +604,6 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
     }
 
-    public function getPostBackURL($multiSite = false) {
-        if (!Gdn::PluginManager()->CheckPlugin('SimpleAPI')) {
-            return false;
-        }
-
-        $URL = Url('/mod/cleanspeakpostback.json', true);
-
-        if ($multiSite) {
-            $URL = C('Hub.Url', Gdn::Request()->Domain() . '/hub') . '/multisites/cleanspeakproxy.json';
-        }
-
-        if (strstr($URL, '?')) {
-            $URL .= '&';
-        } else {
-            $URL .= '?';
-        }
-        $URL .= 'access_token=' . C('Plugins.SimpleAPI.AccessToken');
-
-        return $URL;
-    }
 
     /**
      * @param SettingsController $sender Sending controller.
