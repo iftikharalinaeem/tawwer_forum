@@ -1,12 +1,16 @@
 <?php
 
 class MinisiteModel extends Gdn_Model {
+    const CACHE_KEY = 'minisites';
+
     /// Properties ///
 
     /**
      * @var MinisiteModel
      */
     protected static $instance;
+
+    protected static $all;
 
     /// Methods ///
 
@@ -17,7 +21,75 @@ class MinisiteModel extends Gdn_Model {
         $this->Validation->ApplyRule('Folder', 'Folder', '%s must be a valid folder name.');
     }
 
+    /**
+     * Get an array of all multisites indexed by folder.
+     */
+    public static function all() {
+        if (!isset(self::$all)) {
+            $all = Gdn::Cache()->Get(self::CACHE_KEY);
+            if (!$all) {
+                $all = array_column(
+                    static::instance()->getWhere(false, 'Sort,Name')->ResultArray(),
+                    null,
+                    'Folder'
+                );
+
+                Gdn::Cache()->Store(self::CACHE_KEY, $all);
+            }
+            self::$all = $all;
+        }
+
+        return self::$all;
+    }
+
+    public static function getDefaultSite() {
+        foreach (self::all() as $site) {
+            if ($site['IsDefault']) {
+                return $site;
+            }
+        }
+        return null;
+    }
+
+    public static function getSite($folder) {
+        $site = val($folder, static::all(), null);
+        return $site;
+    }
+
     public function calculateRow(&$row) {
+        $locale = val('Locale', $row);
+        if ($locale === 'en_CA' || $locale === 'en-CA') {
+            $locale = 'en';
+        }
+        if (class_exists('Locale')) {
+            $row['LocaleDisplayName'] = static::mb_ucfirst(Locale::getDisplayName($locale, $locale));
+        } else {
+            $row['LocaleDisplayName'] = $row['Name'];
+        }
+        $row['LocaleShortName'] = str_replace('_', '-', $locale);
+        $row['Url'] = Gdn::Request()->UrlDomain('//').'/'.$row['Folder'];
+    }
+
+    public static function mb_ucfirst($str, $encoding = "UTF-8", $lower_str_end = false) {
+        $first_letter = mb_strtoupper(mb_substr($str, 0, 1, $encoding), $encoding);
+        if ($lower_str_end) {
+            $str_end = mb_strtolower(mb_substr($str, 1, mb_strlen($str, $encoding), $encoding), $encoding);
+        } else {
+            $str_end = mb_substr($str, 1, mb_strlen($str, $encoding), $encoding);
+        }
+        $str = $first_letter . $str_end;
+        return $str;
+    }
+
+    protected static function clearCache() {
+        Gdn::Cache()->Remove(self::CACHE_KEY);
+        self::$all = null;
+    }
+
+    public function delete($where = '', $Limit = FALSE, $ResetData = FALSE) {
+        $result = parent::Delete($where, $Limit, $ResetData);
+        static::clearCache();
+        return $result;
     }
 
     public function getID($id) {
@@ -40,6 +112,37 @@ class MinisiteModel extends Gdn_Model {
         }
         array_walk($rows->ResultArray(), [$this, 'calculateRow']);
         return $rows;
+    }
+
+    public function insert($Fields) {
+        $this->AddInsertFields($Fields);
+        if ($this->Validate($Fields, TRUE)) {
+            if (val('IsDefault', $Fields)) {
+                $this->SQL->Put('Minisite', ['IsDefault' => null]);
+            }
+
+            static::clearCache();
+
+            return parent::Insert($Fields);
+        }
+    }
+
+    public function update($row, $where) {
+        $Result = FALSE;
+
+        // primary key (always included in $Where when updating) might be "required"
+        $allFields = $row;
+        if (is_array($where)) {
+            $allFields = array_merge($row, $where);
+        }
+
+        if ($this->Validate($allFields)) {
+            if (val('IsDefault', $row)) {
+                $this->SQL->Put('Minisite', ['IsDefault' => null], ['MinisiteID <>' => $allFields['MinisiteID']]);
+            }
+            parent::Update($row, $where);
+            static::clearCache();
+        }
     }
 
     /**

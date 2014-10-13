@@ -14,6 +14,11 @@ $PluginInfo['minisites'] = array(
 class MinisitesPlugin extends Gdn_Plugin {
     /// Properties ///
 
+    /**
+     * @var array The current site.
+     */
+    protected $current;
+
     /// Methods ///
 
     /**
@@ -35,8 +40,33 @@ class MinisitesPlugin extends Gdn_Plugin {
             ->Column('DateUpdated', 'datetime', true)
             ->Column('UpdateUserID', 'int', true)
             ->Column('Attributes', 'text', true)
+            ->Column('Sort', 'smallint', '0')
             ->Column('IsDefault', 'tinyint(1)', true, 'unique.IsDefault')
             ->Set();
+    }
+
+    /**
+     * Initialize the environment on a mini site.
+     * @param array $site The site to set.
+     */
+    protected function initializeSite(array $site) {
+        // Set the locale from the site.
+        if ($site['Locale'] !== Gdn::Locale()->Current()) {
+            Gdn::Locale()->Set($site['Locale'], Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
+        }
+
+        // Set the default routes.
+        if ($site['CategoryID']) {
+            $category = CategoryModel::Categories($site['CategoryID']);
+            Gdn::Router()->SetRoute('categories$', ltrim(CategoryUrl($category, '', '/'), '/'), 'Internal', false);
+
+            $defaultRoute = Gdn::Router()->GetRoute('DefaultController');
+            if ($defaultRoute['Destination'] === 'categories') {
+                Gdn::Router()->SetRoute('DefaultController', ltrim(CategoryUrl($category, '', '/'), '/'), 'Temporary', false);
+            }
+        }
+
+        $this->current = $site;
     }
 
     /// Event Handlers ///
@@ -48,17 +78,47 @@ class MinisitesPlugin extends Gdn_Plugin {
     }
 
     public function Gdn_Dispatcher_AppStartup_Handler() {
-        $newRoot = 'en';
+        SaveToConfig(
+            [
+                'Vanilla.Categories.NavDepth' => 1
+            ],
+            '',
+            false
+        );
 
         $parts = explode('/', trim(Gdn::Request()->Path(), '/'), 2);
-        if (empty($parts[1])) {
-            $parts[1] = '';
-        }
+        $root = $parts[0];
+        $path = val(1, $parts, '');
 
-        if ($parts[0] === $newRoot) {
-            Gdn::Request()->Path($parts[1]);
+        // Look the root up in the mini sites.
+        $site = MinisiteModel::getSite($root);
+        if ($site) {
+            Gdn::Request()->Path($path);
+            Gdn::Request()->WebRoot($root);
+            Gdn::Request()->AssetRoot('/');
+
+            $this->initializeSite($site);
+        } else {
+            $defaultSite = MinisiteModel::getDefaultSite();
+            if ($defaultSite) {
+
+                $url = '/'.$defaultSite['Folder'].rtrim('/'.Gdn::Request()->Path(), '/');
+                redirectUrl($url, Debug() ? 302 : 301);
+            }
         }
-        Gdn::Request()->WebRoot($newRoot);
-        Gdn::Request()->AssetRoot('/');
+    }
+
+    /**
+     * @return array
+     */
+    public function getCurrent() {
+        return $this->current;
+    }
+
+    /**
+     * @return MinisitesPlugin
+     */
+    public static function instance() {
+        return Gdn::PluginManager()->GetPluginInstance(__CLASS__, Gdn_PluginManager::ACCESS_CLASSNAME);
     }
 }
