@@ -5,7 +5,7 @@ class MinisiteToggleModule extends Gdn_Module {
 
     public function ToString() {
         $this->SetData('Sites', MinisiteModel::all());
-        $this->SetData('Current', MinisitesPlugin::instance()->getCurrent());
+        $this->SetData('Current', MinisiteModel::getCurrent());
 
         return parent::ToString();
     }

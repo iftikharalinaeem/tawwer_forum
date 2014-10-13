@@ -14,11 +14,6 @@ $PluginInfo['minisites'] = array(
 class MinisitesPlugin extends Gdn_Plugin {
     /// Properties ///
 
-    /**
-     * @var array The current site.
-     */
-    protected $current;
-
     /// Methods ///
 
     /**
@@ -40,7 +35,7 @@ class MinisitesPlugin extends Gdn_Plugin {
             ->Column('DateUpdated', 'datetime', true)
             ->Column('UpdateUserID', 'int', true)
             ->Column('Attributes', 'text', true)
-            ->Column('Sort', 'smallint', '0')
+            ->Column('Sort', 'smallint', '1000')
             ->Column('IsDefault', 'tinyint(1)', true, 'unique.IsDefault')
             ->Set();
     }
@@ -66,10 +61,15 @@ class MinisitesPlugin extends Gdn_Plugin {
             }
         }
 
-        $this->current = $site;
+        MinisiteModel::setCurrent($site);
     }
 
     /// Event Handlers ///
+
+    public function base_render_before($sender) {
+        // Add the alternate urls to the current crop of sites.
+        MinisiteModel::addAlternativeUrls();
+    }
 
     public function base_getAppSettingsMenuItems_handler($sender) {
         /* @var SideMenuModule */
@@ -109,10 +109,10 @@ class MinisitesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @return array
+     * @param Smarty $sender
      */
-    public function getCurrent() {
-        return $this->current;
+    public function Gdn_Smarty_Init_Handler($sender) {
+        $sender->assign('Minisite', MinisiteModel::getCurrent());
     }
 
     /**

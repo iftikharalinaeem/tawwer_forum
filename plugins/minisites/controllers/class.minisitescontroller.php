@@ -139,7 +139,7 @@ class MinisitesController extends DashboardController {
         $this->form->Method = 'get';
 
         if ($search = $this->Request->Get('search')) {
-            $sites = $this->siteModel->search($search, 'Folder', 'asc', $limit + 1, $offset)->ResultArray();
+            $sites = $this->siteModel->search($search, 'Sort,Folder', 'asc', $limit + 1, $offset)->ResultArray();
 
             // Select 1 more than page size so we can know whether or not to display the next link.
             $this->setData('_CurrentRecords', count($sites));
@@ -150,11 +150,13 @@ class MinisitesController extends DashboardController {
             $this->setData('Sites', $sites);
         } else {
             $where = [];
-            $this->setData('Sites', $this->siteModel->GetWhere($where, 'Folder', 'asc', $limit, $offset)->ResultArray());
+            $this->setData('Sites', $this->siteModel->GetWhere($where, 'Sort,Folder', 'asc', $limit, $offset)->ResultArray());
             $this->setData('RecordCount', $this->siteModel->GetCount($where));
         }
 
         $this->setData('_Limit', $pageSize);
+        $this->AddJsFile('jquery.tablednd.js');
+//        $this->AddJsFile('minisites_admin.js', 'plugins/minisites');
 
         $this->Title(T('Sites'));
         $this->AddSideMenu();

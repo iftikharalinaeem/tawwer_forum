@@ -12,6 +12,8 @@ class MinisiteModel extends Gdn_Model {
 
     protected static $all;
 
+    protected static $current;
+
     /// Methods ///
 
     public function __construct($name = '') {
@@ -19,6 +21,56 @@ class MinisiteModel extends Gdn_Model {
 
         $this->Validation->AddRule('Folder', 'function:validate_folder');
         $this->Validation->ApplyRule('Folder', 'Folder', '%s must be a valid folder name.');
+    }
+
+    public static function addAlternativeUrls() {
+        static::all();
+        $sites =& static::$all;
+
+        $currentSite = static::getCurrent();
+        $currentFolder = $currentSite['Folder'];
+        $path = trim(Gdn::Request()->Path(), '/');
+
+        // Strip the current folder off of the category code.
+        if ($baseCategoryCode = Gdn::Controller()->Data('Category.UrlCode')) {
+            $baseCategoryCode = StringBeginsWith($baseCategoryCode, "$currentFolder-", true, true);
+            $baseCategoryCode = StringEndsWith($baseCategoryCode, "-$currentFolder", true, true);
+        }
+
+        foreach ($sites as &$site) {
+            $folder = $site['Folder'];
+
+            if (!$path || $folder === $currentFolder || $currentSite['CategoryID'] == $site['CategoryID']) {
+                $site['AlternatePath'] = rtrim("/$path", '/');
+                $site['AlternateUrl'] = Gdn::Request()->UrlDomain('//')."/$folder/$path";
+                continue;
+            }
+
+            // Try and find an appropriate alternative category.
+            if (!($category = CategoryModel::Categories("$folder-$baseCategoryCode"))) {
+                $category = CategoryModel::Categories("$baseCategoryCode-$folder");
+            }
+
+            $altPath = $path;
+            if (Gdn_Theme::InSection('CategoryList')) {
+                if ($category) {
+                    $altPath = ltrim(CategoryUrl($category, '', '/'), '/');
+                }
+            } elseif (Gdn_Theme::InSection('DiscussionList')) {
+                if ($category) {
+                    $altPath = ltrim(CategoryUrl($category, '', '/'), '/');
+                } elseif (StringBeginsWith($path, 'discussions')) {
+                    $altPath = "discussions";
+                } else {
+                    $altPath = '';
+                }
+            } elseif (Gdn_Theme::InSection('Discussion')) {
+                $altPath = '';
+            }
+
+            $site['AlternatePath'] = rtrim("/$altPath", '/');
+            $site['AlternateUrl'] = rtrim(Gdn::Request()->UrlDomain('//')."/$folder/$altPath", '/');
+        }
     }
 
     /**
@@ -54,6 +106,20 @@ class MinisiteModel extends Gdn_Model {
     public static function getSite($folder) {
         $site = val($folder, static::all(), null);
         return $site;
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function getCurrent() {
+        return self::$current;
+    }
+
+    /**
+     * @param mixed $current
+     */
+    public static function setCurrent($current) {
+        self::$current = $current;
     }
 
     public function calculateRow(&$row) {
