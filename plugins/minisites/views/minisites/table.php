@@ -1,7 +1,7 @@
 <?php
 PagerModule::Write(array('Sender' => $this));
 ?>
-    <table id="minisites" class="AltColumns">
+    <table id="MinisiteTable" class="Sortable AltColumns">
         <thead>
         <tr>
             <th><?php echo T('Name'); ?></th>
@@ -15,7 +15,7 @@ PagerModule::Write(array('Sender' => $this));
         foreach ($this->Data('Sites') as $Row):
             $id = $Row['MinisiteID'];
             ?>
-            <tr id="<?php echo "minisite_$id"; ?>">
+            <tr data-id="<?php echo $id; ?>" id="<?php echo "Minisite_$id"; ?>">
                 <td><?php echo htmlspecialchars($Row['Name']); ?></td>
                 <td>
                     <?php
