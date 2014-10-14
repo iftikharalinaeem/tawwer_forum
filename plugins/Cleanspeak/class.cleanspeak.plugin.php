@@ -5,6 +5,7 @@
  *  0.0.1alpha  Initial release
  *  1.0         Add Cleanspeak API Key
  *  1.2.0       Change report to use content flagging.
+ *  1.2.1       Add reject handling.
  *
  * @copyright 2009-2014 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
@@ -429,6 +430,29 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         // Content is allowed
         if (GetValue('contentAction', $result) == 'allow') {
+            return;
+        }
+
+        // Rejected content.
+        if (val('contentAction', $result) == 'reject') {
+
+            $queueRow = $sender->convertToQueueRow($args['RecordType'], $args['Data']);
+            $queueRow['Status'] = 'denied';
+            $queueRow['CleanspeakID'] = $UUID;
+            $sender->Save($queueRow);
+
+            // Allow users to edit the post and resubmit.
+            if ($args['RecordType'] == 'Activity' || $args['RecordType'] == 'ActivityComment') {
+
+                // Not able to get the errors to attached to the forms for activities.
+                // @TODO Make this work like comments and discussions.
+                throw new Gdn_UserException('This post has been rejected.  Please try again.');
+
+            } else {
+                // Comments / discussions.
+                $Form->AddError('This post has been rejected.  Please edit and try again.');
+            }
+
             return;
         }
 
