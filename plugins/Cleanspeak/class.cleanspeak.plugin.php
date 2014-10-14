@@ -446,11 +446,12 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
                 // Not able to get the errors to attached to the forms for activities.
                 // @TODO Make this work like comments and discussions.
-                throw new Gdn_UserException('This post has been rejected.  Please try again.');
-
+                throw new Gdn_UserException('Your message has been prevented from submission because of inappropriate '
+                    . 'content. Please modify your message to be appropriate before attempting to submit it again.');
             } else {
                 // Comments / discussions.
-                $Form->AddError('This post has been rejected.  Please edit and try again.');
+                $Form->AddError('Your message has been prevented from submission because of inappropriate content. '
+                    . 'Please modify your message to be appropriate before attempting to submit it again.');
             }
 
             return;
