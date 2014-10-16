@@ -38,10 +38,21 @@ class EventController extends Gdn_Controller {
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
       $this->AddJsFile('event.js');
-      
+
+      // Localization of JqueryUI date picker.
+      $currentLocale = Gdn::Locale()->Current();
+      $parts = preg_split('`(_|-)`', $currentLocale, 2);
+      if (count($parts) == 2) {
+         $currentLanguage = $parts[0];
+      } else {
+         $currentLanguage = $currentLocale;
+      }
+      // @todo move datepicker- files into locales.
+      // Other plugins could also be implementing datapicker and we don't multiple copies.
+      $this->AddJsFile('datepicker-' . $currentLanguage . '.js');
+
       $this->AddCssFile('style.css');
       Gdn_Theme::Section('Event');
-      
       parent::Initialize();
    }
    
@@ -139,7 +150,7 @@ class EventController extends Gdn_Controller {
       // Pull in group and event functions
       require_once $this->FetchViewLocation('event_functions', 'Event');
       require_once $this->FetchViewLocation('group_functions', 'Group');
-      
+
       $this->View = 'addedit';
       $this->CssClass .= ' NoPanel NarrowForm';
       return $this->Render();
