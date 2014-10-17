@@ -372,10 +372,77 @@ class CleanspeakPlugin extends Gdn_Plugin {
      *  [InsertUserID] int  InsertUserID in the queue.
      * @throws Gdn_UserException
      */
-    public function queueModel_checkpremoderation_handler($sender, $args) {
-        $cleanSpeak = Cleanspeak::instance();
-        $args['Premoderate'] = false;
+    public function queueModel_checkpremoderation_handler($sender, &$args) {
 
+        // Call to cleanspeak is done in the BeforeSave methods and results is stored in controller data.
+        $result = Gdn::Controller()->Data('Result');
+        if ($result === false) {
+            // Error communicating with cleanspeak
+            // Content will go into premoderation queue
+            // InsertUserID will not be updated.
+            $args['Premoderate'] = true;
+            return;
+        }
+
+
+        // Content is allowed
+        if (val('contentAction', $result) == 'allow') {
+            $args['Premoderate'] = false;
+            return;
+        }
+
+        // Rejected content.
+        if (val('contentAction', $result) == 'reject') {
+
+            $args['Options']['Rejected'] = true;
+            $args['Premoderate'] = false;
+
+            $queueRow = $sender->convertToQueueRow($args['RecordType'], $args['Data']);
+            $queueRow['Status'] = 'denied';
+            $queueRow['CleanspeakID'] = $result['content']['id'];
+            $sender->Save($queueRow);
+
+            return;
+        }
+
+        // Content is in Pre Moderation Queue
+        if (GetValue('requiresApproval', $result) == 'requiresApproval'
+            || GetValue('contentAction', $result) == 'queuedForApproval'
+        ) {
+            $args['Premoderate'] = true;
+            $args['Queue']['CleanspeakID'] = $result['content']['id'];
+            $args['InsertUserID'] = $this->getUserID();
+            return;
+        }
+
+        //if not handled by above; then add to queue for premoderation.
+        $args['Premoderate'] = true;
+        return;
+
+    }
+
+    public function DiscussionModel_BeforeSaveDiscussion_Handler($sender, $args) {
+        $this->BeforeSave($sender, $args);
+    }
+
+    public function CommentModel_BeforeSaveComment_Handler($sender, $args) {
+        $this->BeforeSave($sender, $args);
+    }
+
+    public function ActivityModel_BeforeSave_Handler($sender, $args) {
+        $args['FormPostValues'] = $args['Activity'];
+        $this->BeforeSave($sender, $args);
+    }
+
+    public function ActivityModel_BeforeSaveComment_Handler($sender, $args) {
+        $args['FormPostValues'] = $args['Comment'];
+        $this->BeforeSave($sender, $args);
+
+    }
+
+    protected function BeforeSave($sender, $args) {
+
+        $cleanSpeak = Cleanspeak::instance();
         if (!$this->isConfigured()) {
             throw new Gdn_UserException('Cleanspeak is not configured.');
             return;
@@ -387,29 +454,29 @@ class CleanspeakPlugin extends Gdn_Plugin {
         }
 
         // Prepare Data.
-        $foreignUser = Gdn::UserModel()->GetID($args['Data']['InsertUserID'], DATASET_TYPE_ARRAY);
+        $foreignUser = Gdn::UserModel()->GetID($args['FormPostValues']['InsertUserID'], DATASET_TYPE_ARRAY);
         if (!$foreignUser) {
             throw new Gdn_UserException('Can not find user.');
         }
         $content = array(
             'content' => array(
                 'applicationId' => C('Plugins.Cleanspeak.ApplicationID'),
-                'createInstant' => Gdn_Format::ToTimestamp($args['Data']['DateInserted']) * 1000,
-                'parts' => $cleanSpeak->getParts($args['Data']),
+                'createInstant' => Gdn_Format::ToTimestamp($args['FormPostValues']['DateInserted']) * 1000,
+                'parts' => $cleanSpeak->getParts($args['FormPostValues']),
                 'senderDisplayName' => $foreignUser['Name'],
-                'senderId' => $cleanSpeak->getUserUUID($args['Data']['InsertUserID'])
+                'senderId' => $cleanSpeak->getUserUUID($args['FormPostValues']['InsertUserID'])
             )
         );
-        if (GetValue('DiscussionID', $args['Data'])) {
+        if (GetValue('DiscussionID', $args['FormPostValues'])) {
             $discussionModel = new DiscussionModel();
-            $discussion = $discussionModel->GetID($args['Data']['DiscussionID']);
+            $discussion = $discussionModel->GetID($args['FormPostValues']['DiscussionID']);
             $content['content']['location'] = md5(DiscussionUrl($discussion));
         } else {
             //if content has the same 'empty' location its being grouped together.
             $content['content']['location'] = mt_rand();
         }
 
-        $UUID = $cleanSpeak->getRandomUUID($args['Data']);
+        $UUID = $cleanSpeak->getRandomUUID($args['FormPostValues']);
 
         // Set the CleanspeakID on the form so we can save it later using model_*Save*_Handlers.
         $Form = Gdn::Controller()->Form;
@@ -418,62 +485,41 @@ class CleanspeakPlugin extends Gdn_Plugin {
         // Make an api request to cleanspeak.
         try {
             $result = $cleanSpeak->moderation($UUID, $content, C('Plugins.Cleanspeak.ForceModeration'));
-        } catch (CleanspeakException $e) {
 
-            // Error communicating with cleanspeak
-            // Content will go into premoderation queue
-            // InsertUserID will not be updated.
-            $args['Queue']['CleanspeakID'] = $UUID;
-            $args['Premoderate'] = true;
-            return;
-        }
+            if (val('contentAction', $result) == 'reject') {
 
-        // Content is allowed
-        if (GetValue('contentAction', $result) == 'allow') {
-            return;
-        }
-
-        // Rejected content.
-        if (val('contentAction', $result) == 'reject') {
-
-            $queueRow = $sender->convertToQueueRow($args['RecordType'], $args['Data']);
-            $queueRow['Status'] = 'denied';
-            $queueRow['CleanspeakID'] = $UUID;
-            $sender->Save($queueRow);
-
-            // Allow users to edit the post and resubmit.
-            if ($args['RecordType'] == 'Activity' || $args['RecordType'] == 'ActivityComment') {
-
-                // Not able to get the errors to attached to the forms for activities.
-                // @TODO Make this work like comments and discussions.
-                throw new Gdn_UserException('Your message has been prevented from submission because of inappropriate '
-                    . 'content. Please modify your message to be appropriate before attempting to submit it again.');
-            } else {
-                // Comments / discussions.
-                $Form->AddError('Your message has been prevented from submission because of inappropriate content. '
+                /** @var $Validation Gdn_Validation */
+                $Validation = $sender->Validation;
+                $Validation->AddValidationResult('Body', 'Your message has been prevented from submission because of inappropriate content. '
                     . 'Please modify your message to be appropriate before attempting to submit it again.');
+
+
+                if (valr('FormPostValues.Post_Discussion', $args)) {
+                    $contentType = 'Discussion';
+                } elseif (valr('FormPostValues.DiscussionID', $args)) {
+                    $contentType = 'Comment';
+                } elseif (val('Activity', $args) && val('ActivityID', $args) == null) {
+                    $contentType = 'Activity';
+                } elseif (valr('FormPostValues.ActivityID', $args)) {
+                    $contentType = 'ActivityComment';
+                }
+
+                $queueModel = QueueModel::Instance();
+                $queueRow = $queueModel->convertToQueueRow($contentType, $args['FormPostValues']);
+                $queueRow['Status'] = 'denied';
+                $queueRow['CleanspeakID'] = $result['content']['id'];
+                $queueModel->Save($queueRow);
+
             }
 
-            return;
+            Gdn::Controller()->SetData('Result', $result);
+
+        } catch (CleanspeakException $e) {
+
+            Gdn::Controller()->SetData('Result', false);
+
         }
-
-        // Content is in Pre Moderation Queue
-        if (GetValue('requiresApproval', $result) == 'requiresApproval'
-            || GetValue('contentAction', $result) == 'queuedForApproval'
-        ) {
-            $args['Premoderate'] = true;
-            $args['Queue']['CleanspeakID'] = $UUID;
-            $args['InsertUserID'] = $this->getUserID();
-            return;
-        }
-
-        //if not handled by above; then add to queue for premoderation.
-        $args['Premoderate'] = true;
-        return;
-
     }
-
-
     /**
      * Handle Postbacks from Cleanspeak or Hub.
      *
