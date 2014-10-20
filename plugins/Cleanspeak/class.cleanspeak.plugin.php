@@ -374,6 +374,12 @@ class CleanspeakPlugin extends Gdn_Plugin {
      */
     public function queueModel_checkpremoderation_handler($sender, &$args) {
 
+        // Moderators don't go through cleanspeak.
+        if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+            $args['Premoderate'] = false;
+            return;
+        }
+
         // Call to cleanspeak is done in the BeforeSave methods and results is stored in controller data.
         $result = Gdn::Controller()->Data('Result');
         if ($result === false) {
@@ -440,9 +446,25 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
     }
 
+    /**
+     * Call to cleanspeak is made before save and data stored into controller data.  This allows for us to add
+     * an error to the form; Which is used for content rejection.
+     *
+     * @param ActivityModel|CommentModel|DiscussionModel $sender Sending contgroller.
+     * @param $args Sending arguments.
+     * @throws Gdn_UserException
+     */
     protected function BeforeSave($sender, $args) {
 
         $cleanSpeak = Cleanspeak::instance();
+
+        $Body = valr('FormPostValues.Body', $args);
+        $Story = valr('FormPostValues.Story', $args);
+        // No need to check if no content.
+        if (empty($Body) && empty($Story)) {
+            return;
+        }
+
         if (!$this->isConfigured()) {
             throw new Gdn_UserException('Cleanspeak is not configured.');
             return;
