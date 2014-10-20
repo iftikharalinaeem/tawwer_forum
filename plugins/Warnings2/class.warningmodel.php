@@ -197,6 +197,18 @@ class WarningModel extends UserNoteModel {
         // First, reverse the warning.
         $this->setField($warning['UserNoteID'], 'Reversed', true);
 
+        if ($warning['RecordType'] === 'discussion') {
+            $Model = new DiscussionModel();
+        } else {
+            $Model = new CommentModel();
+        }
+
+        $Record = $Model->GetID($warning['RecordID']);
+
+        if (isset($Record->Attributes['WarningID'])) {
+            $Model->saveToSerializedColumn('Attributes', $warning['RecordID'], 'WarningID', false);
+        }
+
         // Reverse the amount of time on the warning and its points.
         $expiresTimespan = val('ExpiresTimespan', $warning, '0');
         $points = val('Points', $warning, 0);

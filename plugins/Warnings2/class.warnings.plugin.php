@@ -9,7 +9,7 @@
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.2.0',
+    'Version' => '2.2.1',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -177,7 +177,12 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $Row->Attributes = Gdn_Format::Unserialize($Row->Attributes);
         if (isset($Row->Attributes['WarningID']) && $Row->Attributes['WarningID']) {
-            if (!isset($Row->Attributes['Reversed']) || !$Row->Attributes['Reversed']) {
+
+            //Check if warning has been reversed.
+            $NoteModel = new UserNoteModel();
+            $Warning = $NoteModel->GetID($Row->Attributes['WarningID']);
+
+            if (!isset($Warning['Reversed']) || !$Warning['Reversed']) {
 
                 // Make inline warning message link to specific warning text.
                 // It will only be readable by the warned user or moderators.
@@ -645,6 +650,23 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param int $UserID
      */
     public function ProfileController_Warn_Create($Sender, $UserID, $RecordType = false, $RecordID = false) {
+
+        //If the user has already been warned, let the mod know and move on.
+        if ($RecordID && $RecordType) {
+            if ($RecordType === 'discussion') {
+                $Model = new DiscussionModel();
+            } else {
+                $Model = new CommentModel();
+            }
+            $Record = $Model->GetID($RecordID);
+
+            if (isset($Record->Attributes['WarningID']) && $Record->Attributes['WarningID']) {
+                $Sender->Title(sprintf(T('Already Warned')));
+                $Sender->Render('alreadywarned', '', 'plugins/Warnings2');
+                return;
+            }
+        }
+
         $Sender->Permission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false);
 
         $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
