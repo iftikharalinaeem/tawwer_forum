@@ -47,6 +47,8 @@ class EventController extends Gdn_Controller {
       } else {
          $currentLanguage = $currentLocale;
       }
+      $currentLanguage = strtolower($currentLanguage);
+
       // @todo move datepicker- files into locales.
       // Other plugins could also be implementing datapicker and we don't multiple copies.
       $this->AddJsFile('datepicker-' . $currentLanguage . '.js');
