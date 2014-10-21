@@ -456,6 +456,13 @@ class CleanspeakPlugin extends Gdn_Plugin {
      */
     protected function BeforeSave($sender, $args) {
 
+        // When approve() is called; if content needs to go online; Save is called
+        // This then triggers this event.  If we are coming from mod controller..
+        // we dont want to call cleanspeak again; and need to pass along cleanspeak id.
+        if (valr('FormPostValues.Approved', $args)) {
+            return;
+        }
+
         $cleanSpeak = Cleanspeak::instance();
 
         $Body = valr('FormPostValues.Body', $args);
@@ -542,6 +549,28 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         }
     }
+
+    /**
+     * Add existing CleanspeakID to the SaveData so it will be saved in attributes.
+     *
+     * @param QueueModel $sender
+     * @param array $args Sending arguments.
+     */
+    public function queueModel_BeforeApproveSave_handler($sender, $args) {
+        $activityType = valr('QueueItem.ForeignType', $args);
+        if ($activityType == 'ActivityComment') {
+            // There was no attributes or data fof activity comments at time of writing.
+            // Activity comments can not be flagged; Instead would need fo flag the parent
+            // activity.
+            return;
+        }
+        if ($activityType == 'Activity') {
+            $args['SaveData']['Data']['CleanspeakID'] = $args['QueueItem']['CleanspeakID'];
+            return;
+        }
+        $args['SaveData']['CleanspeakID'] = $args['QueueItem']['CleanspeakID'];
+    }
+
     /**
      * Handle Postbacks from Cleanspeak or Hub.
      *
@@ -772,8 +801,12 @@ class CleanspeakPlugin extends Gdn_Plugin {
         /**
          * @var $Form Gdn_Form
          */
-        $form = Gdn::Controller()->Form;
-        $cleanspeakID = $form->GetValue('CleanspeakID');
+        $form = val('Form', Gdn::Controller(), false);;
+        if ($form) {
+            $cleanspeakID = $form->GetValue('CleanspeakID');
+        } else {
+            $cleanspeakID = valr('FormPostValues.CleanspeakID', $args);
+        }
         if (!$cleanspeakID) {
             return;
         }
@@ -797,8 +830,12 @@ class CleanspeakPlugin extends Gdn_Plugin {
         /**
          * @var $form Gdn_Form
          */
-        $form = Gdn::Controller()->Form;
-        $cleanspeakID = $form->GetValue('CleanspeakID');
+        $form = val('Form', Gdn::Controller(), false);;
+        if ($form) {
+            $cleanspeakID = $form->GetValue('CleanspeakID');
+        } else {
+            $cleanspeakID = valr('FormPostValues.CleanspeakID', $args);
+        }
         if (!$cleanspeakID) {
             return;
         }
@@ -820,8 +857,12 @@ class CleanspeakPlugin extends Gdn_Plugin {
      */
     public function ActivityModel_AfterSave_Handler($sender, $args) {
 
-        $form = Gdn::Controller()->Form;
-        $cleanspeakID = $form->GetValue('CleanspeakID');
+        $form = val('Form', Gdn::Controller(), false);;
+        if ($form) {
+            $cleanspeakID = $form->GetValue('CleanspeakID');
+        } else {
+            $cleanspeakID = valr('FormPostValues.CleanspeakID', $args);
+        }
         if (!$cleanspeakID) {
             return;
         }
