@@ -14,7 +14,8 @@ class PollModule extends Gdn_Module {
       $Poll = FALSE;
       $PollID = Gdn::Controller()->Data('PollID');
       $Discussion = Gdn::Controller()->Data('Discussion');
-      
+      $PollOptions = array();
+
       // Look in the controller for a PollID
       if ($PollID > 0)
          $Poll = $PollModel->GetID($PollID);
@@ -23,7 +24,6 @@ class PollModule extends Gdn_Module {
       if (!$Poll && $Discussion)
          $Poll = $PollModel->GetByDiscussionID(GetValue('DiscussionID', $Discussion));
 
-      $this->SetData('Poll', $Poll);
       if ($Poll) {
          // Load the poll options
          $PollID = GetValue('PollID', $Poll);
@@ -49,7 +49,6 @@ class PollModule extends Gdn_Module {
          }
 
          // Build the resultset to deliver to the page
-         $PollOptions = array();
          foreach ($OptionData->ResultArray() as $Option) {
             if (!$Anonymous) {
                $Votes = array();
@@ -61,8 +60,7 @@ class PollModule extends Gdn_Module {
             }
             $PollOptions[] = $Option;
          }
-         $this->SetData('PollOptions', $PollOptions);
-         
+
          // Has this user voted?
          $this->SetData('UserHasVoted', $PollModel->SQL
             ->Select()
@@ -75,7 +73,17 @@ class PollModule extends Gdn_Module {
             ->Get()
             ->NumRows() > 0
          );
+
+
       }
+      $this->EventArguments['Poll'] =& $Poll;
+      $this->EventArguments['PollOptions'] =& $PollOptions;
+      $this->FireEvent('AfterLoadPoll');
+
+      $this->SetData('Poll', $Poll);
+      $this->SetData('PollOptions', $PollOptions);
+
+
    }
 
 	public function ToString() {
