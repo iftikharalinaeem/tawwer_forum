@@ -19,7 +19,7 @@ class ModNotifyPlugin extends Gdn_Plugin {
          $Sender->Preferences['Notifications']['Popup.ModQueue'] = T('Notify me when an item is queued for moderation.');
          
          // Set preferences in UserMeta
-         if ($Sender->Form->IsPostBack()) {
+         if ($Sender->Form->AuthenticatedPostBack()) {
             $Set = array();
             $Set['Email.ModQueue'] = ($Sender->Form->GetFormValue('Email.ModQueue', NULL)) ? 1 : NULL;
             $Set['Popup.ModQueue'] = ($Sender->Form->GetFormValue('Popup.ModQueue', NULL)) ? 1 : NULL;
