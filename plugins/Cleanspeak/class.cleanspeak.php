@@ -193,25 +193,34 @@ class Cleanspeak extends Gdn_Pluggable {
     public function getParts($data) {
 
         if (GetValue('Name', $data)) {
-            $parts[] = array(
-                'content' => Gdn_Format::Text($data['Name'], false),
-                'name' => 'Name',
-                'type' => 'text'
-            );
+            $text = Gdn_Format::Text($data['Name'], false);
+            if (!empty($text) && trim($text) != '') {
+                $parts[] = array(
+                    'content' => $text,
+                    'name' => 'Name',
+                    'type' => 'text'
+                );
+            }
         }
         if (GetValue('Body', $data)) {
-            $parts[] = array(
-                'content' => Gdn_Format::Text($data['Body'], false),
-                'name' => 'Body',
-                'type' => 'text'
-            );
+            $text = Gdn_Format::Text($data['Body'], false);
+            if (!empty($text) && trim($text) != '') {
+                $parts[] = array(
+                    'content' => $text,
+                    'name' => 'Body',
+                    'type' => 'text'
+                );
+            }
         }
         if (GetValue('Story', $data)) {
-            $parts[] = array(
-                'content' => Gdn_Format::Text($data['Story'], false),
-                'name' => 'WallPost',
-                'type' => 'text'
-            );
+            $text = Gdn_Format::Text($data['Story'], false);
+            if (!empty($text) && trim($text) != '') {
+                $parts[] = array(
+                    'content' => $text,
+                    'name' => 'WallPost',
+                    'type' => 'text'
+                );
+            }
         }
 
 
