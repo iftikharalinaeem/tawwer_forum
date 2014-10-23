@@ -214,6 +214,35 @@ class Cleanspeak extends Gdn_Pluggable {
             );
         }
 
+
+        // Attachments.
+        if (val('MediaIDs', $data)) {
+            $MediaModel = new Gdn_Model('Media');
+
+            foreach ($data['MediaIDs'] as $MediaID) {
+                $Media = $MediaModel->GetID($MediaID);
+                if (!$Media) {
+                    continue;
+                }
+                $Path = val('Path', $Media);
+                $Name = 'Attachment';
+                $Type = 'hyperlink';
+
+                if (stristr(val('Type', $Media), 'image') !== false) {
+                    $Name = 'Image';
+                    $Type = 'image';
+                }
+
+                $parts[] = array(
+                    'content' => Gdn_Upload::Url($Path),
+                    'name' => $Name,
+                    'type' => $Type
+                );
+            }
+
+        }
+
+
         if (sizeof($parts) == 0) {
             throw new Gdn_UserException('Error getting parts from content');
         }

@@ -374,6 +374,8 @@ class CleanspeakPlugin extends Gdn_Plugin {
      */
     public function queueModel_checkpremoderation_handler($sender, &$args) {
 
+        $MediaIDs = valr('Options.MediaIDs', $args);
+
         // Moderators don't go through cleanspeak.
         if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
             $args['Premoderate'] = false;
@@ -417,6 +419,10 @@ class CleanspeakPlugin extends Gdn_Plugin {
         ) {
             $args['Premoderate'] = true;
             $args['Queue']['CleanspeakID'] = $result['content']['id'];
+            if ($MediaIDs) {
+                $args['Queue']['MediaIDs'] = $MediaIDs;
+            }
+
             $args['InsertUserID'] = $this->getUserID();
             return;
         }
@@ -460,6 +466,11 @@ class CleanspeakPlugin extends Gdn_Plugin {
         // This then triggers this event.  If we are coming from mod controller..
         // we dont want to call cleanspeak again; and need to pass along cleanspeak id.
         if (valr('FormPostValues.Approved', $args)) {
+            return;
+        }
+
+        // Allow for content edit.
+        if (val('DiscussionID', $args, 0) > 0) {
             return;
         }
 
@@ -569,6 +580,35 @@ class CleanspeakPlugin extends Gdn_Plugin {
             return;
         }
         $args['SaveData']['CleanspeakID'] = $args['QueueItem']['CleanspeakID'];
+    }
+
+    /**
+     * Update media ids if present on queue row.
+     *
+     * @param queueModel $sender QueueModel.
+     * @param $args Sending arguments.
+     */
+    public function queueModel_AfterApproveSave_handler($sender, $args) {
+        $MediaIDs = valr('QueueItem.MediaIDs', $args, array());
+        $ForeignTable = false;
+
+        if (valr('QueueItem.ForeignType', $args, false) == 'Discussion') {
+            $ForeignTable = 'discussion';
+        }
+        if (valr('QueueItem.ForeignType', $args, false) == 'Comment') {
+            $ForeignTable = 'comment';
+        }
+        if ($ForeignTable && is_array($MediaIDs)) {
+            $MediaModel = new Gdn_Model('Media');
+            $MediaModel->Update(
+                array(
+                    'ForeignTable' => $ForeignTable,
+                    'ForeignID' => $args['ID']
+                ),
+                array('MediaID' => $MediaIDs)
+            );
+        }
+
     }
 
     /**
@@ -881,7 +921,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
      * @param queueModel $sender Sending controller.
      * @param array $args sending arguments.
      */
-    public function queueModel_AfterConvertToQueueRow_Handler($sender, $args) {
+    public function queueModel_afterConvertToQueueRow_Handler($sender, $args) {
         if (valr('Data.Attributes.CleanspeakID', $args)) {
             $args['QueueRow']['CleanspeakID'] = $args['Data']['Attributes']['CleanspeakID'];
         } elseif (valr('Data.Data.CleanspeakID', $args)) {
@@ -889,5 +929,38 @@ class CleanspeakPlugin extends Gdn_Plugin {
         }
 
     }
+
+    /**
+     * Add MediaIDs to Premoderation Options.
+     *
+     * @param DiscussionModel $sender Sending object.
+     * @param array $args Sending arguments.
+     */
+    public function discussionModel_beforePremoderate_handler($sender, $args) {
+        $this->addMediaIDsToOptions($args);
+    }
+
+    /**
+     * Add MediaIDs to Premoderation Options.
+     *
+     * @param CommentModel $sender Sending object.
+     * @param array $args Sending arguments.
+     */
+    public function commentModel_beforePremoderate_handler($sender, $args) {
+        $this->addMediaIDsToOptions($args);
+    }
+
+    /**
+     * Add MediaIDs to Premoderation Options.
+     *
+     * @param array $args Sending arguments.
+     */
+    protected function addMediaIDsToOptions($args) {
+        $MediaIDs = valr('FormPostValues.MediaIDs', $args);
+        if ($MediaIDs) {
+            $args['Options']['MediaIDs'] = $MediaIDs;
+        }
+    }
+
 
 }
