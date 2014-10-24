@@ -569,8 +569,9 @@ class GroupController extends Gdn_Controller {
          $Group['CountDiscussions'],
          'group/discussions/'.GroupSlug($Group).'/%1$s'
       );
-      if (!$this->Data('_PagerUrl'))
+      if (!$this->Data('_PagerUrl')) {
          $this->SetData('_PagerUrl', 'group/discussions/'.GroupSlug($Group).'/{Page}');
+      }
       $this->SetData('_Page', $Page);
       $this->SetData('_Limit', $Limit);
       $this->FireEvent('AfterBuildPager');
