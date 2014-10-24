@@ -99,7 +99,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $queueModel = QueueModel::Instance();
         $this->setModerator($sender);
         $id = $post['id'];
-        $deleted = $queueModel->approveOrDenyWhere(array('CleanspeakID' => $id), 'deny');
+        $deleted = $queueModel->approveOrDenyWhere(array('CleanspeakID' => $id), 'deny', $sender);
         if ($deleted) {
             $sender->setData('Success', true);
         } else {
@@ -828,6 +828,41 @@ class CleanspeakPlugin extends Gdn_Plugin {
                 // Content will not be flagged. Error can be seen in EventLog.
             }
 
+        }
+    }
+
+    /**
+     * Send reports to cleanspeak if flagged by a another user.
+     *
+     * @param logModel $sender
+     * @param array $args Sending arguments.
+     */
+    public function logModel_afterUpdate_handler($sender, $args) {
+        $log = $args['LogRow2'];
+        if ($log['Operation'] === 'Moderate') {
+
+            // Check to see if count is inc.  If so its a new user adding a report
+            if ($args['Update']['CountGroup'] > $log['CountGroup']) {
+
+                $record = GetRecord($log['RecordType'], $log['RecordID']);
+                $cleanspeakID = valr('Attributes.CleanspeakID', $record);
+                $cleanspeak = Cleanspeak::instance();
+                $flag = array(
+                    'flag' => array(
+                        'reporterId' => $cleanspeak->getUserUUID(Gdn::Session()->UserID),
+                        'createInstant' => time() * 1000,
+                    )
+                );
+
+                // Send to Cleanspeak user alerts.
+                try {
+                    $cleanspeak->flag($cleanspeakID, $flag);
+                } catch (Exception $e) {
+                    // Error communicating with Cleanspeak.
+                    // Content will not be flagged. Error can be seen in EventLog.
+                }
+
+            }
         }
     }
 
