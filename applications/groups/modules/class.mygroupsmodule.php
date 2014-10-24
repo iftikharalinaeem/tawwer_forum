@@ -34,18 +34,21 @@ class MyGroupsModule extends Gdn_Module {
      * @return void
      */
     public function GetData() {
-        if (!isset(Gdn::Session()->UserID)) {
+        if (!Gdn::Session()->UserID > 0) {
             $this->SetData('ErrorMessage', Gdn_Theme::Link('signinout').' '.T('to see your groups.'));
         }
         else {
             //get groups
             $GroupModel = new GroupModel();
-            $this->Groups = $GroupModel->GetByUser(Gdn::Session()->UserID, $this->orderBy, false, 'desc', $this->Limit);
+            $this->Groups = $GroupModel->GetByUser(Gdn::Session()->UserID, $this->orderBy, 'desc', false, $this->Limit);
             if ($this->AttachLastDiscussion) {
                 foreach ($this->Groups as $GroupKey => $GroupValue) {
                   $DiscussionModel = new DiscussionModel();
                     $this->Groups[$GroupKey]['LastDiscussion'] = $DiscussionModel->Get(1, 2, array('GroupID' => $GroupValue['GroupID']))->ResultArray();
                 }
+            }
+            if (!is_array($this->Groups) || !count($this->Groups) > 0) {
+                $this->SetData('ErrorMessage', T("You haven't joined any groups yet.").' '.Gdn_Theme::Link('/groups/browse/popular', "Browse popular groups."));
             }
         }
     }
