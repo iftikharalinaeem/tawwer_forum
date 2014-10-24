@@ -204,11 +204,11 @@ class GroupModel extends Gdn_Model {
       return $Result;
    }
 
-   public function GetByUser($UserID, $Limit = 9, $Offset = false) {
+   public function GetByUser($UserID, $OrderFields = '', $OrderDirection = 'desc', $Limit = 9, $Offset = false) {
       $UserGroups = $this->SQL->GetWhere('UserGroup', array('UserID' => $UserID))->ResultArray();
       $IDs = ConsolidateArrayValuesByKey($UserGroups, 'GroupID');
 
-      $Result = $this->GetWhere(array('GroupID' => $IDs), 'Name', 'asc', $Limit, $Offset)->ResultArray();
+      $Result = $this->GetWhere(array('GroupID' => $IDs), $OrderFields, $OrderDirection, $Limit, $Offset)->ResultArray();
       $this->Calc($Result);
       return $Result;
    }
