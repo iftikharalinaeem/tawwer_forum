@@ -79,8 +79,8 @@ class GroupsHooks extends Gdn_Plugin {
    }
 
    public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
-      $GroupID = valr('FormPostValues.GroupID', $Args);
-      if ($GroupID) {
+       $GroupID = Gdn::Request()->Get('groupid');
+       if ($GroupID) {
          $Model = new GroupModel();
          $Group = $Model->GetID($GroupID);
 
