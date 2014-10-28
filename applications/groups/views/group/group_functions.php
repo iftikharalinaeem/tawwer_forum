@@ -442,7 +442,6 @@ function WriteGroupRow($Row) {
                         else {
                             echo UserAnchor($LastDiscussion, 'UserLink MItem', 'First');
                         }
-                        echo $User;
                         ?>
                         <span class="Bullet">•</span>
                         <?php
@@ -480,7 +479,7 @@ function WriteGroupItems($Groups, $EmptyMessage = "") {
                <div class="ItemContent Group">
                <div class="TitleWrap">';
          $Url = GroupUrl($Group);
-         echo "<a href=\"$Url\" class=\"TextColor\">";
+         echo '<a href="'.$Url.'" class=\"TextColor\">';
          WriteGroupIcon($Group, 'Group-Icon Card-Icon');
          echo '<h3 class="Group-Name">'.htmlspecialchars($Group['Name']).'</h3>';
          echo '</a>';
@@ -546,9 +545,9 @@ function WriteGroupItemsMobile ($Groups, $EmptyMessage = '') {
                      </div>
                      <div class="Group-Name TitleWrap">';
                         $Url = GroupUrl($Group);
-                        echo "<a href=\"$Url\" class=\"TextColor\">";
+                        echo '<a href="'.$Url.'" class=\"TextColor\">';
                         WriteGroupIcon($Group, 'Group-Icon Card-Icon Hidden');
-                        echo '</a><a class="Group-Name Title" href=\"$Url\">'.htmlspecialchars($Group['Name']).'</a>
+                        echo '</a><a class="Group-Name Title" href="'.$Url.'">'.htmlspecialchars($Group['Name']).'</a>
                      </div>
                   </div>
                </li>';
