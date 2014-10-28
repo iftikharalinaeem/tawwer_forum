@@ -354,8 +354,11 @@ if (!function_exists('WriteGroupTable')) :
  * @param string $EmptyMessage
  */
 function WriteGroupTable($Groups, $EmptyMessage = '') {
-    if (!$Groups)
+    if (!$Groups) {
+        echo '<div class="ErrorMessage">';
         WriteEmptyState($EmptyMessage);
+        echo '</div>';
+    }
     else {
         echo '<div class="DataTableWrap Groups">
                 <table class="DataTable GroupTable">
@@ -465,49 +468,95 @@ if (!function_exists('WriteGroupItems')) :
  * @param string $EmptyMessage
  */
 function WriteGroupItems($Groups, $EmptyMessage = "") {
-    if (!$Groups)
-        WriteEmptyState($EmptyMessage);
-    foreach ($Groups as $Group) {
-        echo '<li id="Group_'.$Group['GroupID'].'" class="Groups Item">
-                         <div class="ItemContent Group">
-                         <div class="TitleWrap">';
-        $Url = GroupUrl($Group);
-        echo "<a href=\"$Url\" class=\"TextColor\">";
-        WriteGroupIcon($Group, 'Group-Icon Card-Icon');
-        echo '<h3 class="Group-Name">'.htmlspecialchars($Group['Name']).'</h3>';
-        echo '</a>';
-        echo "</h2>";
-        echo '<div class="Group-Description">'.
-            SliceString(
-                Gdn_Format::PlainText($Group['Description'], $Group['Format']),
-                C('Groups.ListDescription.ExcerptLength', 100)).'</div>';
-        echo '</div>
-            <div class="Meta">
-                 <span class="MItem DiscussionCount">'.sprintf(Plural(number_format($Group['CountDiscussions']), '%s discussion', '%s discussions'), $Group['CountDiscussions']).'</span>
-                 <span class="MItem CommentCount">'.sprintf(Plural(number_format($Group['CountMembers']), '%s member', '%s members'), $Group['CountMembers']).'</span>';
-        if ($Group["LastDiscussion"][0]) {
+   if (!$Groups) {
+      echo '<div class="ErrorMessage">';
+      WriteEmptyState($EmptyMessage);
+      echo '</div>';
+   }
+   else {
+      echo '<ul class="DataList GroupList">';
+      foreach ($Groups as $Group) {
+         echo '<li id="Group_'.$Group['GroupID'].'" class="Groups Item">
+               <div class="ItemContent Group">
+               <div class="TitleWrap">';
+         $Url = GroupUrl($Group);
+         echo "<a href=\"$Url\" class=\"TextColor\">";
+         WriteGroupIcon($Group, 'Group-Icon Card-Icon');
+         echo '<h3 class="Group-Name">'.htmlspecialchars($Group['Name']).'</h3>';
+         echo '</a>';
+         echo "</h2>";
+         echo '<div class="Group-Description">'.
+               SliceString(
+                  Gdn_Format::PlainText($Group['Description'], $Group['Format']),
+                  C('Groups.ListDescription.ExcerptLength', 100)).'</div>';
+         echo '</div>
+               <div class="Meta">
+                  <span class="MItem DiscussionCount">'.sprintf(Plural(number_format($Group['CountDiscussions']), '%s discussion', '%s discussions'), $Group['CountDiscussions']).'</span>
+                  <span class="MItem CommentCount">'.sprintf(Plural(number_format($Group['CountMembers']), '%s member', '%s members'), $Group['CountMembers']).'</span>';
+         if ($Group["LastDiscussion"][0]) {
             $LastDiscussion = $Group['LastDiscussion'][0];
             if (isset($LastDiscussion['LastName'])) {
-                $User = UserAnchor($LastDiscussion, 'UserLink MItem', 'Last');
+               $User = UserAnchor($LastDiscussion, 'UserLink MItem', 'Last');
             }
             else {
-                $User = UserAnchor($LastDiscussion, 'UserLink MItem', 'First');
+               $User = UserAnchor($LastDiscussion, 'UserLink MItem', 'First');
             }
             echo '<span class="MItem LastDiscussionTitle">'.sprintf(
-                    T('Most recent: %1$s by %2$s'),
-                    Anchor(
-                        SliceString(Gdn_Format::Text($LastDiscussion['Name']), 100),
-                        $LastDiscussion['Url'],
-                        'BlockTitle LatestPostTitle',
-                        array('title' => html_entity_decode($LastDiscussion['LastTitle']))),
-                    $User);
+                      T('Most recent: %1$s by %2$s'),
+                      Anchor(
+                          SliceString(Gdn_Format::Text($LastDiscussion['Name']), 100),
+                          $LastDiscussion['Url'],
+                          'BlockTitle LatestPostTitle',
+                          array('title' => html_entity_decode($LastDiscussion['LastTitle']))),
+                      $User);
             echo '</span>'
-                .'<span class="MItem LastCommentDate">'.Gdn_Format::Date($LastDiscussion['DateLastComment']).'</span>';
-        }
-    }
-    echo '</div></div></li>';
+                  .'<span class="MItem LastCommentDate">'.Gdn_Format::Date($LastDiscussion['DateLastComment']).'</span>';
+         }
+      }
+      echo '</div></div></li>';
+   }
+   echo '</ul>';
 }
 endif;
+
+
+if (!function_exists('WriteGroupItemsMobile')) :
+  /**
+   * Write a group list formatted for lithe mobile theme.
+   *
+   * @param array $Groups
+   * @param string $EmptyMessage
+   */
+function WriteGroupItemsMobile ($Groups, $EmptyMessage = '') {
+   if (!$Groups) {
+      echo '<div class="ErrorMessage">';
+      WriteEmptyState($EmptyMessage);
+      echo '</div>';
+   }
+   else {
+      echo '<ul class="DataList GroupList">';
+      foreach ($Groups as $Group) {
+         echo '<li id="Group_'.$Group['GroupID'].'" class="Groups Item">
+                  <div class="ItemContent Group">
+                     <div class="Meta">
+                        <span class="MItem MItem-Count DiscussionCount">
+                             '.BigPlural($Group['CountDiscussions'], '%s discussion').'
+                           <i class="icon icon-discussion"></i>
+                        </span>
+                     </div>
+                     <div class="Group-Name TitleWrap">';
+                        $Url = GroupUrl($Group);
+                        echo "<a href=\"$Url\" class=\"TextColor\">";
+                        WriteGroupIcon($Group, 'Group-Icon Card-Icon Hidden');
+                        echo '</a><a class="Group-Name Title" href=\"$Url\">'.htmlspecialchars($Group['Name']).'</a>
+                     </div>
+                  </div>
+               </li>';
+      }
+   }
+}
+endif;
+
 
 if (!function_exists('WriteGroupIcon')) :
 /**

@@ -2,7 +2,9 @@
 
 if ($this->Data('ErrorMessage')) {
   echo '<h2 class="Groups H">'.T($this->Data('Title')).'</h2>';
+  echo '<div class="ErrorMessage">';
   echo $this->Data('ErrorMessage');
+  echo '</div>';
 }
 
 else {
@@ -16,22 +18,35 @@ else {
     $Layout = C('Vanilla.Categories.Layout');
   }
 
-  if ($Layout === 'table') {
+  if ($Layout === 'mobile') {
     ?>
-
-    <div class="GroupList">
       <h2 class="Groups H"><?php echo T($this->Data('Title')); ?></h2>
-      <?php
-      WriteGroupTable($this->Data('Groups'));
-      ?>
-      <div class="MoreWrap">
-        <?php echo Anchor(sprintf(T('All %s...'), T($this->Data('Title'))), $this->Data('Url')); ?>
+      <div class="DataTableWrap GroupWrap">
+        <?php
+          WriteGroupItemsMobile($this->Data('Groups'));
+        ?>
+        <div class="MoreWrap">
+          <?php echo Anchor(sprintf(T('All %s...'), T($this->Data('Title'))), $this->Data('Url')); ?>
+        </div>
       </div>
-    </div>
+    <?php
+  }
+
+  else if ($Layout === 'table') {
+    ?>
+      <h2 class="Groups H"><?php echo T($this->Data('Title')); ?></h2>
+      <div class="DataTableWrap GroupWrap">
+        <?php
+          WriteGroupTable($this->Data('Groups'));
+        ?>
+        <div class="MoreWrap">
+          <?php echo Anchor(sprintf(T('All %s...'), T($this->Data('Title'))), $this->Data('Url')); ?>
+        </div>
+      </div>
 
   <?php } else { ?>
 
-    <div class="GroupList">
+    <div class="DataListWrap GroupWrap">
       <h2 class="Groups H"><?php echo T($this->Data('Title')); ?></h2>
       <?php
       WriteGroupItems($this->Data('Groups'));
