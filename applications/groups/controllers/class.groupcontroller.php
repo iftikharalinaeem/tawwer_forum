@@ -556,6 +556,29 @@ class GroupController extends Gdn_Controller {
 
       $this->Title(GetValue('Name', $Group, ''));
       $this->Description(GetValue('Description', $Group), TRUE);
+
+      // Build a pager
+      $PagerFactory = new Gdn_PagerFactory();
+      $this->EventArguments['PagerType'] = 'Pager';
+      $this->FireEvent('BeforeBuildPager');
+      $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+      $this->Pager->ClientID = 'Pager';
+      $this->Pager->Configure(
+         $Offset,
+         $Limit,
+         $Group['CountDiscussions'],
+         'group/discussions/'.GroupSlug($Group).'/%1$s'
+      );
+      if (!$this->Data('_PagerUrl')) {
+         $this->SetData('_PagerUrl', 'group/discussions/'.GroupSlug($Group).'/{Page}');
+      }
+      $this->SetData('_Page', $Page);
+      $this->SetData('_Limit', $Limit);
+      $this->FireEvent('AfterBuildPager');
+
+      $this->SetData("CountDiscussions", $Group['CountDiscussions']);
+
+
       $this->Render($this->View, 'Discussions', 'Vanilla');
    }
 
