@@ -188,7 +188,7 @@ class WarningModel extends UserNoteModel {
         } elseif ($RecordType === 'comment') {
             return new CommentModel();
         }
-        return false;
+        return null;
     }
 
     /**
