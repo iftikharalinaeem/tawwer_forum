@@ -468,6 +468,7 @@ class MultisiteModel extends Gdn_Model {
                 $query = Communication::data('/forum/callback')
                     ->method('post')
                     ->parameter('method', 'POST')
+                    ->parameter('secure', (bool)C('Garden.ForceSSL'))
                     ->parameter('path', $url)
                     ->parameter('headers', [
                         'Authorization' => self::apikey(true)
