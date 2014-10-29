@@ -69,6 +69,23 @@ class MinisitesPlugin extends Gdn_Plugin {
     public function base_render_before($sender) {
         // Add the alternate urls to the current crop of sites.
         MinisiteModel::addAlternativeUrls();
+
+        // Set alternative urls.
+        $domain = Gdn::Request()->UrlDomain();
+        foreach (MinisiteModel::all() as $site) {
+            if (!$site['AlternatePath']) {
+                continue;
+            }
+            $url = "$domain/{$site['Folder']}{$site['AlternatePath']}";
+            $sender->Head->AddTag(
+                'link',
+                [
+                    'rel' => 'alternate',
+                    'href' => $url,
+                    'hreflang' => str_replace('_', '-', $site['Locale']),
+                    HeadModule::SORT_KEY => 1000
+                ]);
+        }
     }
 
     public function base_getAppSettingsMenuItems_handler($sender) {
