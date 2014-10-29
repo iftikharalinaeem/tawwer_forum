@@ -646,23 +646,6 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     /**
      *
-     * Checks record type and returns Model object representative of RecordType.
-     * Returns false if RecordType is not discussion or comment.
-     *
-     * @param string $RecordType
-     * @return Model Object
-     */
-    public function GetModel($RecordType) {
-        if ($RecordType === 'discussion') {
-            return new DiscussionModel();
-        } elseif ($RecordType === 'comment') {
-            return new CommentModel();
-        }
-        return false;
-    }
-
-    /**
-     *
      * @param ProfileController $Sender
      * @param int $UserID
      */
@@ -670,7 +653,8 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         //If the user has already been warned, let the mod know and move on.
         if ($RecordID && $RecordType) {
-            $Model = $this->GetModel($RecordType);
+            $WarningModule = new WarningModel();
+            $Model = $WarningModule->GetModel($RecordType);
             if ($Model) {
                 $Record = $Model->GetID($RecordID);
 
