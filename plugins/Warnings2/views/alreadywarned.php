@@ -6,7 +6,7 @@
 echo $this->Form->Open();
 echo $this->Form->Errors();
 
-echo '<div class="P">'.sprintf(T('User has already been warned.'), T('warning')).'</div>';
+echo '<div class="P">'.sprintf(T('The user has already been warned for this %s.'), T('post')).'</div>';
 
 echo '<div class="Buttons Buttons-Confirm">';
 echo $this->Form->Button('OK', array('class' => 'Button Primary'));

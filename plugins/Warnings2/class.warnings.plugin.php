@@ -9,7 +9,7 @@
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.2.1',
+    'Version' => '2.2.2',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -646,6 +646,23 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     /**
      *
+     * Checks record type and returns Model object representative of RecordType.
+     * Returns false if RecordType is not discussion or comment.
+     *
+     * @param string $RecordType
+     * @return Model Object
+     */
+    public function GetModel($RecordType) {
+        if ($RecordType === 'discussion') {
+            return new DiscussionModel();
+        } elseif ($RecordType === 'comment') {
+            return new CommentModel();
+        }
+        return false;
+    }
+
+    /**
+     *
      * @param ProfileController $Sender
      * @param int $UserID
      */
@@ -653,17 +670,15 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         //If the user has already been warned, let the mod know and move on.
         if ($RecordID && $RecordType) {
-            if ($RecordType === 'discussion') {
-                $Model = new DiscussionModel();
-            } else {
-                $Model = new CommentModel();
-            }
-            $Record = $Model->GetID($RecordID);
+            $Model = $this->GetModel($RecordType);
+            if ($Model) {
+                $Record = $Model->GetID($RecordID);
 
-            if (isset($Record->Attributes['WarningID']) && $Record->Attributes['WarningID']) {
-                $Sender->Title(sprintf(T('Already Warned')));
-                $Sender->Render('alreadywarned', '', 'plugins/Warnings2');
-                return;
+                if (isset($Record->Attributes['WarningID']) && $Record->Attributes['WarningID']) {
+                    $Sender->Title(sprintf(T('Already Warned')));
+                    $Sender->Render('alreadywarned', '', 'plugins/Warnings2');
+                    return;
+                }
             }
         }
 
