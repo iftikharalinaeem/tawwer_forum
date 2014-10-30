@@ -7,12 +7,13 @@ if (!function_exists('DateTile')):
  * @param string $Date
  */
 function DateTile($Date) {
-   if (is_string($Date))
+   if (is_string($Date)) {
       $Date = new DateTime($Date);
+   }
    
    return '
    <span class="DateTile">
-      <span class="Month">'.$Date->format('M').'</span>
+      <span class="Month">'.strftime('%b', $Date->getTimestamp()).'</span>
       <span class="Day">'.$Date->format('j').'</span>
    </span>';
 }
@@ -335,7 +336,7 @@ function WriteGroupCard($Group, $WithButtons = TRUE) {
             Gdn_Format::PlainText($Group['Description'], $Group['Format']), 
             C('Groups.CardDescription.ExcerptLength', 150)).'</p>';
       echo '<div class="Group-Members">'
-.              Plural($Group['CountMembers'], '%d member','%s members', number_format($Group['CountMembers']))
+.              Plural($Group['CountMembers'], '%s member','%s members', number_format($Group['CountMembers']))
           .'</div>';
       
       if ($WithButtons)

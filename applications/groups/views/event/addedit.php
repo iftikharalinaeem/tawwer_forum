@@ -67,7 +67,7 @@
                      'placeholder'  => T('Add a time?')
                   )); ?>
                </span>
-               <span class="Timebased NoEndTime"><?php echo Anchor(T('x'), '#'); ?></span>
+               <span class="Timebased NoEndTime"><?php echo Anchor('&times;', '#'); ?></span>
             </div>
          </div>
 

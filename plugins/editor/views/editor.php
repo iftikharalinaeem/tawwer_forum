@@ -52,8 +52,8 @@
                   '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink">
                      <input class="InputBox editor-input-url" data-wysihtml5-dialog-field="href" value="http://" />
                       <div class="MenuButtons">
-                      <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="OK"/>
-                      <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="Cancel"/>
+                      <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="'.T('OK').'"/>
+                      <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="'.T('Cancel').'"/>
                       </div>
                    </div>'
                 , 'div', array('class' => 'editor-dropdown editor-dropdown-link'));
@@ -73,8 +73,8 @@
                         <option value="wysiwyg-float-right">right</option>
                       </select>
                      </label>
-                     <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="OK"/>
-                     <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="Cancel"/>
+                     <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="'.T('OK').'"/>
+                     <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="'.T('Cancel').'"/>
                      </div>
                   </div>'
                 , 'div', array('class' => 'editor-dropdown editor-dropdown-image'));
@@ -88,7 +88,7 @@
                         '. T('Drop image/file') .'
                      </div>
                      <div class="drop-section file-input">
-                        <span class="file-or">or</span> <input type="file" name="'. $editor_file_input_name .'[]" multiple />
+                        <span class="file-or">'.T('or').'</span> <input type="file" name="'. $editor_file_input_name .'[]" multiple />
                      </div>
                      <div class="drop-section image-input" title="'. T('Paste the URL of an image to quickly embed it.') .'">
                         <input class="InputBox editor-input-image" placeholder="'. T('Image URL') .'" />
