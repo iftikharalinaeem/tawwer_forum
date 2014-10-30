@@ -40,11 +40,11 @@
                <span>
                   <?php echo $this->Form->TextBox('DateStarts', array(
                      'class'        => 'InputBox DatePicker',
-                     'title'        => "Date. Expects 'mm/dd/yyyy'."
+                     'title'        => T("Date. Expects 'mm/dd/yyyy'.")
                   )); ?> 
                   <?php echo $this->Form->TextBox('TimeStarts', array(
                      'class'        => 'InputBox TimePicker',
-                     'placeholder'  => 'Add a time?'
+                     'placeholder'  => T('Add a time?')
                   )); ?>
                </span>
                <span class="Timebased Timezone">
@@ -60,11 +60,11 @@
                <span>
                   <?php echo $this->Form->TextBox('DateEnds', array(
                      'class'        => 'InputBox DatePicker',
-                     'title'        => "Date. Expects 'mm/dd/yyyy'."
+                     'title'        => T("Date. Expects 'mm/dd/yyyy'.")
                   )); ?> 
                   <?php echo $this->Form->TextBox('TimeEnds', array(
                      'class'        => 'InputBox TimePicker',
-                     'placeholder'  => 'Add a time?'
+                     'placeholder'  => T('Add a time?')
                   )); ?>
                </span>
                <span class="Timebased NoEndTime"><?php echo Anchor(T('x'), '#'); ?></span>
