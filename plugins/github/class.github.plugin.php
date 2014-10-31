@@ -424,7 +424,8 @@ class GithubPlugin extends Gdn_Plugin {
         } elseif ($Args['Type'] == 'Comment') {
             $Content = 'Comment';
         } else {
-            throw new Gdn_UserException('Invalid Content');
+            // Invalid Content
+            return;
         }
         // Signed in users only.
         if (!Gdn::Session()->IsValid()) {
