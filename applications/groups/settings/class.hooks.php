@@ -310,13 +310,13 @@ class GroupsHooks extends Gdn_Plugin {
             $GroupID = val('GroupID', $Result, false);
             if ($GroupID || $Result['CategoryID'] == $GroupCategoryID) {
 
-                if (!$GroupID && $Result['RecordType'] == 'Discussion') {
+                if (!$GroupID && val('RecordType', $Result, false) == 'Discussion') {
 
                     $DiscussionModel = new DiscussionModel();
                     $Discussion = $DiscussionModel->GetID($Result['PrimaryID']);
                     $GroupID = $Discussion->GroupID;
 
-                } elseif (!$GroupID && $Result['RecordType'] == 'Comment') {
+                } elseif (!$GroupID && val('RecordType', $Result, false) == 'Comment') {
 
                     $CommentModel = new CommentModel();
                     $Comment = $CommentModel->GetID($Result['PrimaryID']);
