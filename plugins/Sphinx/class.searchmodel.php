@@ -95,14 +95,14 @@ class SearchModel extends Gdn_Model {
    }
 
    public function GetComments($IDs) {
-      $Result = Gdn::SQL()
-			->Select('c.CommentID as PrimaryID, c.CommentID, d.DiscussionID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID')
-			->Select('c.DateInserted, c.Score, d.Type')
-			->Select('c.InsertUserID as UserID')
-			->From('Comment c')
-			->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
-         ->WhereIn('c.CommentID', $IDs)
-         ->Get()->ResultArray();
+    $SQL = Gdn::SQL()
+	    ->Select('c.CommentID as PrimaryID, c.CommentID, d.DiscussionID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID')
+		->Select('c.DateInserted, c.Score, d.Type')
+		->Select('c.InsertUserID as UserID');
+	$Result = $SQL->From('Comment c')
+        ->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
+        ->WhereIn('c.CommentID', $IDs)
+        ->Get()->ResultArray();
 
       foreach ($Result as &$Row) {
          $Row['Url'] = CommentUrl($Row, '/');
@@ -112,11 +112,14 @@ class SearchModel extends Gdn_Model {
    }
 
    public function GetDiscussions($IDs) {
-      $Result = Gdn::SQL()
+      $SQL = Gdn::SQL()
 			->Select('d.DiscussionID as PrimaryID, d.DiscussionID, d.Name as Title, d.Body as Summary, d.Format, d.CategoryID')
 			->Select('d.DateInserted, d.Score, d.Type')
-			->Select('d.InsertUserID as UserID')
-			->From('Discussion d')
+			->Select('d.InsertUserID as UserID');
+      if (Gdn::ApplicationManager()->CheckApplication('Groups')) {
+         $SQL->Select('d.GroupID');
+      }
+      $Result = $SQL->From('Discussion d')
          ->WhereIn('d.DiscussionID', $IDs)
          ->Get()->ResultArray();
 
