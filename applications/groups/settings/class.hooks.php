@@ -294,19 +294,22 @@ class GroupsHooks extends Gdn_Plugin {
      */
     public function SearchController_Render_Before($Sender, $Args) {
 
-        $GroupCategoryID = Gdn::Cache()->Get('GroupCategoryID');
-        if ($GroupCategoryID === Gdn_Cache::CACHEOP_FAILURE) {
+        $GroupCategoryIDs = Gdn::Cache()->Get('GroupCategoryIDs');
+        if ($GroupCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
             $CategoryModel = new CategoryModel();
-            $GroupCategory = $CategoryModel->GetWhere(array('AllowGroups' => 1))->FirstRow(DATASET_TYPE_ARRAY);
-            $GroupCatID = val('CategoryID', $GroupCategory, false);
+            $GroupCategories = $CategoryModel->GetWhere(array('AllowGroups' => 1))->ResultArray();
+            $GroupCategoryIDs = array();
+            foreach ($GroupCategories as $GroupCategory) {
+                $GroupCategoryIDs[] = $GroupCategory['CategoryID'];
+            }
 
-            Gdn::Cache()->Store('GroupCategoryID', $GroupCatID);
+            Gdn::Cache()->Store('GroupCategoryIDs', $GroupCategoryIDs);
         }
 
         $SearchResults = $Sender->Data('SearchResults', array());
         foreach ($SearchResults as $ResultKey => &$Result) {
             $GroupID = val('GroupID', $Result, false);
-            if ($GroupID || $Result['CategoryID'] == $GroupCategoryID) {
+            if ($GroupID || in_array($Result['CategoryID'], $GroupCategoryIDs)) {
 
                 if (!$GroupID && val('RecordType', $Result, false) == 'Discussion') {
 

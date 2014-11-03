@@ -99,7 +99,10 @@ class SearchModel extends Gdn_Model {
 	    ->Select('c.CommentID as PrimaryID, c.CommentID, d.DiscussionID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID')
 		->Select('c.DateInserted, c.Score, d.Type')
 		->Select('c.InsertUserID as UserID');
-	$Result = $SQL->From('Comment c')
+      if (Gdn::ApplicationManager()->CheckApplication('Groups')) {
+         $SQL->Select('d.GroupID');
+      }
+       $Result = $SQL->From('Comment c')
         ->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
         ->WhereIn('c.CommentID', $IDs)
         ->Get()->ResultArray();
