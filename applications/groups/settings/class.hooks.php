@@ -294,8 +294,6 @@ class GroupsHooks extends Gdn_Plugin {
      */
     public function SearchController_Render_Before($Sender, $Args) {
 
-        Trace('SearchController_Render_Before');
-
         $GroupCategoryID = Gdn::Cache()->Get('GroupCategoryID');
         if ($GroupCategoryID === Gdn_Cache::CACHEOP_FAILURE) {
             $CategoryModel = new CategoryModel();
