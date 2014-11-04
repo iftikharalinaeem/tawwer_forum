@@ -313,14 +313,14 @@ class EditorPlugin extends Gdn_Plugin {
       // Stuff like 'heading1' is the editor-action.
       $fontFormatOptions = array(
          'heading1' => array(
-            'text' => 'Heading 1',
+            'text' => sprintf(T('Heading %s'), 1),
             'command' => 'formatBlock',
             'value' => 'h1',
             'class' => 'post-font-size-h1',
             'sort' => 100
          ),
          'heading2' => array(
-            'text' => 'Heading 2',
+            'text' => sprintf(T('Heading %s'), 2),
             'command' => 'formatBlock',
             'value' => 'h2',
             'class' => 'post-font-size-h2',
@@ -335,21 +335,21 @@ class EditorPlugin extends Gdn_Plugin {
             'sort' => 98
          ),
          'blockquote' => array(
-            'text' => 'Quote',
+            'text' => T('Quote'),
             'command' => 'blockquote',
             'value' => 'blockquote',
             'class' => '',
             'sort' => 10
          ),
          'code' => array(
-            'text' => 'Code',
+            'text' => T('Source Code', 'Code'),
             'command' => 'code',
             'value' => 'code',
             'class' => '',
             'sort' => 9
          ),
          'spoiler' => array(
-            'text' => 'Spoiler',
+            'text' => T('Spoiler'),
             'command' => 'spoiler',
             'value' => 'spoiler',
             'class' => '',
@@ -529,7 +529,7 @@ class EditorPlugin extends Gdn_Plugin {
 
       $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => T('Bold'), 'data-editor' => '{"action":"bold","value":""}'));
       $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => T('Italic'), 'data-editor' => '{"action":"italic","value":""}'));
-      $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'strikethrough', 'title' => T('Strike'), 'data-editor' => '{"action":"strike","value":""}'));
+      $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'strikethrough', 'title' => T('Strikethrough'), 'data-editor' => '{"action":"strike","value":""}'));
 
       $editorToolbarAll['color'] = array('edit' => 'basic', 'action'=> 'color', 'type' =>
           $toolbarColorGroups,

@@ -135,35 +135,50 @@ class ForumMergePlugin implements Gdn_IPlugin {
       if ($this->OldTableExists('Category')) {
          $CategoryColumns = $this->GetColumns('Category', $OldDatabase, $OldPrefix);
 
-         Gdn::SQL()->Query('insert into '.$NewPrefix.'Category ('.$CategoryColumns.', OldID)
-         select '.$CategoryColumns.', CategoryID
-            from `'.$OldDatabase.'`.'.$OldPrefix.'Category
-            where Name <> "Root"');
+         /*if ($this->MergeCategories) {
+            // Merge IDs of duplicate category names
+            Gdn::SQL()->Query('update '.$NewPrefix.'Category c set c.OldID =
+               (select c2.CategoryID from `'.$OldDatabase.'`.'.$OldPrefix.'Category c2 where c2.Name = c.Name)');
 
-         // Remap hierarchy in the ugliest way possible
-         $CategoryMap = array();
-         $Categories = Gdn::SQL()->Select('CategoryID')
-            ->Select('ParentCategoryID')
-            ->Select('OldID')
-            ->From('Category')
-            ->Where(array('OldID >' => 0))
-            ->Get()->Result(DATASET_TYPE_ARRAY);
-         foreach ($Categories as $Category) {
-            $CategoryMap[$Category['OldID']] = $Category['CategoryID'];
+            // Copy non-duplicate categories
+            Gdn::SQL()->Query('insert into '.$NewPrefix.'Category ('.$CategoryColumns.', OldID)
+               select '.$CategoryColumns.', CategoryID
+               from `'.$OldDatabase.'`.'.$OldPrefix.'Category
+               where Name not in (select Name from '.$NewPrefix.'Category)');
          }
-         foreach ($Categories as $Category) {
-            if ($Category['ParentCategoryID'] > 0) {
-               $ParentID = $CategoryMap[$Category['ParentCategoryID']];
-               Gdn::SQL()->Update('Category')
-                  ->Set(array('ParentCategoryID' => $ParentID))
-                  ->Where(array('CategoryID' => $Category['CategoryID']))
-                  ->Put();
+         else {*/
+            // Import categories
+            Gdn::SQL()->Query('insert into '.$NewPrefix.'Category ('.$CategoryColumns.', OldID)
+            select '.$CategoryColumns.', CategoryID
+               from `'.$OldDatabase.'`.'.$OldPrefix.'Category
+               where Name <> "Root"');
+
+            // Remap hierarchy in the ugliest way possible
+            $CategoryMap = array();
+            $Categories = Gdn::SQL()->Select('CategoryID')
+               ->Select('ParentCategoryID')
+               ->Select('OldID')
+               ->From('Category')
+               ->Where(array('OldID >' => 0))
+               ->Get()->Result(DATASET_TYPE_ARRAY);
+            foreach ($Categories as $Category) {
+               $CategoryMap[$Category['OldID']] = $Category['CategoryID'];
             }
-         }
-         $CategoryModel = new CategoryModel();
-         $CategoryModel->RebuildTree();
+            foreach ($Categories as $Category) {
+               if ($Category['ParentCategoryID'] > 0) {
+                  $ParentID = $CategoryMap[$Category['ParentCategoryID']];
+                  Gdn::SQL()->Update('Category')
+                     ->Set(array('ParentCategoryID' => $ParentID))
+                     ->Where(array('CategoryID' => $Category['CategoryID']))
+                     ->Put();
+               }
+            }
+            $CategoryModel = new CategoryModel();
+            $CategoryModel->RebuildTree();
 
-         // @todo UserCategory
+         //}
+
+         // UserCategory
 
       }
 
@@ -238,9 +253,9 @@ class ForumMergePlugin implements Gdn_IPlugin {
            where m.OldID > 0');
 
          // ForeignID / ForeignTable
-         Gdn::SQL()->Query('update '.$NewPrefix.'Media m
-           set m.ForeignID = (SELECT c.CommentID from '.$NewPrefix.'Comment c where c.OldID = m.ForeignID)
-           where m.OldID > 0 and m.ForeignTable = \'comment\'');
+         //Gdn::SQL()->Query('update '.$NewPrefix.'Media m
+         //  set m.ForeignID = (SELECT c.CommentID from '.$NewPrefix.'Comment c where c.OldID = m.ForeignID)
+         //  where m.OldID > 0 and m.ForeignTable = \'comment\'');
          Gdn::SQL()->Query('update '.$NewPrefix.'Media m
            set m.ForeignID = (SELECT d.DiscussionID from '.$NewPrefix.'Discussion d where d.OldID = m.ForeignID)
            where m.OldID > 0 and m.ForeignTable = \'discussion\'');
@@ -265,6 +280,7 @@ class ForumMergePlugin implements Gdn_IPlugin {
            where c.OldID > 0');
          // Contributors
          // a. Build userid lookup
+
          $Users = Gdn::SQL()->Query('select UserID, OldID from '.$NewPrefix.'User');
          $UserIDLookup = array();
          foreach($Users->Result() as $User) {
@@ -358,10 +374,12 @@ class ForumMergePlugin implements Gdn_IPlugin {
 
 		////
 		
-		// @todo Draft - new UserIDs
-		// @todo Activity - wallpost, activitycomment
-		// @todo Tag - new UserID, merge on name
-		// @todo TagDiscussion - new DiscussionID, TagID
+		// Draft - new UserIDs
+		// Activity - wallpost, activitycomment
+		// Tag - new UserID, merge on name
+		// TagDiscussion - new DiscussionID, TagID
+		// Update counters
+		// LastCommentID
 	}
 
    /**
