@@ -94,6 +94,22 @@ class MinisitesPlugin extends Gdn_Plugin {
         $menu->AddLink('Forum', T('Minisites'), '/minisites', 'Garden.Settings.Manage', ['After' => 'vanilla/settings/managecategories']);
     }
 
+    /**
+     * Make sure the discussions controller is filtering by minisite.
+     *
+     * @param DiscussionsController $sender
+     * @param array $args
+     */
+    public function discussionsController_index_before($sender, $args) {
+        $site = MinisiteModel::getCurrent();
+        $categoryID = val('CategoryID', $site);
+
+        // Get all of the category IDs associated with the minisite.
+        $categories = CategoryModel::GetSubtree($categoryID, true);
+        $categoryIDs = array_keys($categories);
+        $sender->setCategoryIDs($categoryIDs);
+    }
+
     public function Gdn_Dispatcher_AppStartup_Handler() {
         SaveToConfig(
             [
