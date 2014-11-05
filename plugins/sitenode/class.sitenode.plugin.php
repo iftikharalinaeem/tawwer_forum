@@ -200,7 +200,6 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         // Synchronize some config.
         $saveConfig = (array)val('Config', $config, []);
-        TouchValue('Garden.Title', $saveConfig, valr('Multisite.Name', $config));
         SaveToConfig($saveConfig);
 
         // Synchronize the roles.
