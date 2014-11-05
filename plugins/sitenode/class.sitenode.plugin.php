@@ -401,7 +401,13 @@ class SiteNodePlugin extends Gdn_Plugin {
         $this->checkSSO();
 
         if (!Gdn::Session()->IsValid() && val(self::HUB_COOKIE, $_COOKIE)) {
-            Trace('Trying hub sso');
+            // Check the cookie expiry here.
+            $hubCookie = explode('|', val(self::HUB_COOKIE, $_COOKIE));
+            $expiry = val(4, $hubCookie);
+            if($expiry < time()) {
+                return;
+            }
+
             try {
                 $user = val('User', $this->hubApi('/profile/hubsso.json', 'GET', ['from' => $this->slug()]));
 
