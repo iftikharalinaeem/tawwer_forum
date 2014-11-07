@@ -191,6 +191,13 @@ class GroupModel extends Gdn_Model {
          case 'DateLastComment':
             $this->Database->Query(DBAModel::GetCountSQL('max', 'Group', 'Discussion', $Column, 'DateLastComment'));
             break;
+         case 'LastDiscussionID':
+            $this->SQL->Update('Group g')
+               ->Join('Discussion d', 'd.DateLastComment = g.DateLastComment and g.GroupID = d.GroupID')
+               ->Set('g.LastDiscussionID', 'd.DiscussionID', FALSE, FALSE)
+               ->Set('g.LastCommentID', 'd.LastCommentID', FALSE, FALSE)
+               ->Put();
+            break;
          default:
             throw new Gdn_UserException("Unknown column $Column");
       }

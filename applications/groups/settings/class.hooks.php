@@ -48,7 +48,7 @@ class GroupsHooks extends Gdn_Plugin {
     */
    public function DbaController_CountJobs_Handler($Sender) {
       $Counts = array(
-          'Group' => array('CountDiscussions', 'CountMembers', 'DateLastComment')
+          'Group' => array('CountDiscussions', 'CountMembers', 'DateLastComment', 'LastDiscussionID')
       );
 
       foreach ($Counts as $Table => $Columns) {
