@@ -76,8 +76,8 @@ class PollModule extends Gdn_Module {
 
 
       }
-      $this->EventArguments['Poll'] =& $Poll;
-      $this->EventArguments['PollOptions'] =& $PollOptions;
+      $this->EventArguments['Poll'] = &$Poll;
+      $this->EventArguments['PollOptions'] = &$PollOptions;
       $this->FireEvent('AfterLoadPoll');
 
       $this->SetData('Poll', $Poll);

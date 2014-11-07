@@ -215,17 +215,14 @@
             // can be toggled
             $('.MessageList')
             .on('mouseup.Spoiler', '.Spoiler', function(e) {
-               $(this).removeClass('Spoiler');
-               $(this).addClass('Spoiled');
+                  $(e.target).removeClass('Spoiler').addClass('Spoiled');
+                  e.stopPropagation(); // For nesting
             })
             .on('mouseup.Spoiled', '.Spoiled', function(e) {
                // If the user selects some text, don't close the spoiler, and
                // if there is an anchor in spoiler, do not close spoiler.
-               if (!document.getSelection().toString().length
-               && e.target.nodeName.toLowerCase() != 'a'
-               && !$(e.target).parent('.Spoiled')) {
-                  $(this).removeClass('Spoiled');
-                  $(this).addClass('Spoiler');
+               if (!document.getSelection().toString().length && e.target.nodeName.toLowerCase() != 'a') {
+                  $(e.target).removeClass('Spoiled').addClass('Spoiler');
                }
             });
          }());

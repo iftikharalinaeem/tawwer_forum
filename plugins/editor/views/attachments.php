@@ -15,6 +15,9 @@ $editorkey = $this->Data('_editorkey');
          $viewerCssClass = ($isOwner)
             ? 'file-owner'
             : 'file-readonly';
+         if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+            $viewerCssClass = 'file-owner';
+         }
          if (val('InBody', $attachment)) {
             $viewerCssClass .= ' in-body';
          }
