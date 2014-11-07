@@ -295,22 +295,34 @@ class GroupModel extends Gdn_Model {
       return $Parts[0];
    }
 
-   public function IncrementDiscussionCount($GroupID, $Inc) {
+   public function IncrementDiscussionCount($GroupID, $Inc, $DiscussionID = 0) {
       $Group = $this->GetID($GroupID);
+      $Set = array();
+
+      if ($DiscussionID) {
+         $Set['LastDiscussionID'] = $DiscussionID;
+         $Set['LastCommentID'] = null;
+      }
+
       if (val('CountDiscussions', $Group) < 100) {
          $countDiscussions = $this->SQL->Select('DiscussionID', 'count', 'CountDiscussions')
             ->From('Discussion')
             ->Where('GroupID', $GroupID)
             ->Get()->Value('CountDiscussions', 0);
-         $this->SetField($GroupID, 'CountDiscussions', $countDiscussions);
+
+         $Set['CountDiscussions'] = $countDiscussions;
+         $this->SetField($GroupID, $Set);
          return;
       }
       $SQLInc = sprintf('%+d', $Inc);
       $this->SQL
          ->Update('Group')
-         ->Set('CountDiscussions', "CountDiscussions " . $SQLInc, FALSE, FALSE)
-         ->Where('GroupID', $GroupID)
-         ->Put();
+         ->Set('CountDiscussions', "CountDiscussions " . $SQLInc, false, false)
+         ->Where('GroupID', $GroupID);
+      if (!empty($Set)) {
+         $this->SQL->Set($Set);
+      }
+      $this->SQL->Put();
    }
 
    /**
