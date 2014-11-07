@@ -208,10 +208,10 @@
          }());
 
          /**
-          * Toggle spoilers in comment previews.
+          * Toggle spoilers.
           */
-         var previewLoaded = (function() {
-            $('.Preview > .Message')
+         var previewLoaded = function() {
+            $('.Preview > .Message , .Message')
                .on('mouseup.Spoiler', '.Spoiler', function(e) {
                   $(e.target).removeClass('Spoiler').addClass('Spoiled');
                   e.stopPropagation(); // For nesting
@@ -223,7 +223,9 @@
                      $(e.target).removeClass('Spoiled').addClass('Spoiler');
                   }
                });
-         });
+         };
+
+         previewLoaded();
 
          /**
           * Comment Preview.
@@ -239,27 +241,6 @@
             window.setTimeout(previewLoaded, 150);
          });
 
-         /**
-          * Toggle spoilers in posted messages.
-          */
-         var editorToggleSpoiler = (function() {
-
-            // Use event delegation, so that even new comments ajax posted
-            // can be toggled
-            $('.Message')
-               .on('mouseup.Spoiler', '.Spoiler', function(e) {
-                  $(e.target).removeClass('Spoiler').addClass('Spoiled');
-                  e.stopPropagation(); // For nesting
-               })
-               .on('mouseup.Spoiled', '.Spoiled', function(e) {
-                  // If the user selects some text, don't close the spoiler, and
-                  // if there is an anchor in spoiler, do not close spoiler.
-                  if (!document.getSelection().toString().length && e.target.nodeName.toLowerCase() != 'a') {
-                     $(e.target).removeClass('Spoiled').addClass('Spoiler');
-                  }
-               });
-
-         }());
 
          /**
           * Lights on/off in fullpage
