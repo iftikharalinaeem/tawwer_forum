@@ -15,6 +15,7 @@ class PromotedGroupsModule extends Gdn_Module {
 
    public $Limit = 3;
    public $PromoteType = 'popular';
+   public $myGroups = false;
 
    protected $PromoteTypes = array(
      'popular' => array('title'   => 'Popular Groups',
@@ -25,6 +26,9 @@ class PromotedGroupsModule extends Gdn_Module {
                         'orderBy' => 'DateInserted'),
      'updated' => array('title'   => 'Recently Updated Groups',
                         'url'     => '/groups/browse/updated',
+                        'orderBy' => 'DateLastComment'),
+     'mine'    => array('title'   => 'My Groups',
+                        'url'     => '/groups/browse/mine',
                         'orderBy' => 'DateLastComment')
    );
 
@@ -46,7 +50,7 @@ class PromotedGroupsModule extends Gdn_Module {
    public function GetData() {
 
        if (!array_key_exists($this->PromoteType, $this->PromoteTypes)) {
-           $this->SetData('ErrorMessage', 'No such groups listing');
+           $this->SetData('ErrorMessage', T('No such groups listing.'));
        }
 
        else {
@@ -57,7 +61,13 @@ class PromotedGroupsModule extends Gdn_Module {
 
            //get groups
            $GroupModel = new GroupModel();
-           $this->Groups = $GroupModel->Get($this->orderBy, 'desc', $this->Limit)->ResultArray();
+
+           if ($this->PromoteType === 'mine') {
+              $this->Groups = $GroupModel->GetByUser(Gdn::Session()->UserID, $this->orderBy, false, 'desc', $this->Limit);
+           }
+           else {
+              $this->Groups = $GroupModel->Get($this->orderBy, 'desc', $this->Limit)->ResultArray();
+           }
        }
    }
 
