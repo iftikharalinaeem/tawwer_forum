@@ -529,6 +529,72 @@ class GroupModel extends Gdn_Model {
       }
    }
 
+   /**
+    * Join the recent discussions/comments to a given set of groups.
+    *
+    * @param array $Data The groups to join to.
+    */
+   public function JoinRecentPosts(&$Data, $JoinUsers = true) {
+      $DiscussionIDs = array();
+      $CommentIDs = array();
+
+      foreach ($Data as &$Row) {
+         if (isset($Row['LastTitle']) && $Row['LastTitle'])
+            continue;
+
+         if ($Row['LastDiscussionID'])
+            $DiscussionIDs[] = $Row['LastDiscussionID'];
+
+         if ($Row['LastCommentID']) {
+            $CommentIDs[] = $Row['LastCommentID'];
+         }
+      }
+
+      // Create a fresh copy of the Sql object so as not to pollute.
+      $Sql = clone Gdn::SQL();
+      $Sql->Reset();
+
+      // Grab the discussions.
+      if (count($DiscussionIDs) > 0) {
+         $Discussions = $Sql->WhereIn('DiscussionID', $DiscussionIDs)->Get('Discussion')->ResultArray();
+         $Discussions = Gdn_DataSet::Index($Discussions, array('DiscussionID'));
+      }
+
+      if (count($CommentIDs) > 0) {
+         $Comments = $Sql->WhereIn('CommentID', $CommentIDs)->Get('Comment')->ResultArray();
+         $Comments = Gdn_DataSet::Index($Comments, array('CommentID'));
+      }
+
+      foreach ($Data as &$Row) {
+         $Discussion = GetValue($Row['LastDiscussionID'], $Discussions);
+         if ($Discussion) {
+            $Row['LastTitle'] = Gdn_Format::Text($Discussion['Name']);
+            $Row['LastUserID'] = $Discussion['InsertUserID'];
+            $Row['LastDiscussionUserID'] = $Discussion['InsertUserID'];
+            $Row['LastDateInserted'] = $Discussion['DateInserted'];
+            $Row['LastUrl'] = DiscussionUrl($Discussion, FALSE, '/').'#latest';
+         }
+         $Comment = GetValue($Row['LastCommentID'], $Comments);
+         if ($Comment) {
+            $Row['LastUserID'] = $Comment['InsertUserID'];
+            $Row['LastDateInserted'] = $Comment['DateInserted'];
+         } else {
+            $Row['NoComment'] = TRUE;
+         }
+
+         TouchValue('LastTitle', $Row, '');
+         TouchValue('LastUserID', $Row, NULL);
+         TouchValue('LastDiscussionUserID', $Row, NULL);
+         TouchValue('LastDateInserted', $Row, NULL);
+         TouchValue('LastUrl', $Row, NULL);
+      }
+
+      // Now join the users.
+      if ($JoinUsers) {
+         Gdn::UserModel()->JoinUsers($Data, array('LastUserID'));
+      }
+   }
+
    public function Leave($Data) {
       $this->SQL->Delete('UserGroup', array(
          'UserID' => GetValue('UserID', $Data),
