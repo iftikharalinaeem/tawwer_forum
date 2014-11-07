@@ -40,7 +40,7 @@
                <span>
                   <?php echo $this->Form->TextBox('DateStarts', array(
                      'class'        => 'InputBox DatePicker',
-                     'title'        => "Date. Expects 'mm/dd/yyyy'."
+                     'title'        => T("Date. Expects 'mm/dd/yyyy'.")
                   )); ?> 
                   <?php echo $this->Form->TextBox('TimeStarts', array(
                      'class'        => 'InputBox TimePicker',
@@ -60,7 +60,7 @@
                <span>
                   <?php echo $this->Form->TextBox('DateEnds', array(
                      'class'        => 'InputBox DatePicker',
-                     'title'        => "Date. Expects 'mm/dd/yyyy'."
+                     'title'        => T("Date. Expects 'mm/dd/yyyy'.")
                   )); ?> 
                   <?php echo $this->Form->TextBox('TimeEnds', array(
                      'class'        => 'InputBox TimePicker',

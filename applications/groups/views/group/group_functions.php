@@ -332,9 +332,9 @@ function WriteGroupCard($Group, $WithButtons = TRUE) {
       echo '</a>';   
       
       echo '<p class="Group-Description">'.
-         SliceString(
-            Gdn_Format::PlainText($Group['Description'], $Group['Format']), 
-            C('Groups.CardDescription.ExcerptLength', 150)).'</p>';
+          htmlspecialchars(SliceString(
+            Gdn_Format::PlainText($Group['Description'], $Group['Format']),
+            C('Groups.CardDescription.ExcerptLength', 150))).'</p>';
       echo '<div class="Group-Members">'
 .              Plural($Group['CountMembers'], '%s member','%s members', number_format($Group['CountMembers']))
           .'</div>';
