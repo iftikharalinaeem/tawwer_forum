@@ -208,23 +208,57 @@
          }());
 
          /**
+          * Toggle spoilers in comment previews.
+          */
+         var previewLoaded = (function() {
+            $('.Preview > .Message')
+               .on('mouseup.Spoiler', '.Spoiler', function(e) {
+                  $(e.target).removeClass('Spoiler').addClass('Spoiled');
+                  e.stopPropagation(); // For nesting
+               })
+               .on('mouseup.Spoiled', '.Spoiled', function(e) {
+                  // If the user selects some text, don't close the spoiler, and
+                  // if there is an anchor in spoiler, do not close spoiler.
+                  if (!document.getSelection().toString().length && e.target.nodeName.toLowerCase() != 'a') {
+                     $(e.target).removeClass('Spoiled').addClass('Spoiler');
+                  }
+               });
+         });
+
+         /**
+          * Comment Preview.
+          */
+         jQuery(document).on('PreviewLoaded', function(e) {
+            window.setTimeout(previewLoaded, 150);
+         });
+
+         /**
+          * Discussion Preview.
+          */
+         jQuery(document).on('popupReveal', function(e) {
+            window.setTimeout(previewLoaded, 150);
+         });
+
+         /**
           * Toggle spoilers in posted messages.
           */
          var editorToggleSpoiler = (function() {
+
             // Use event delegation, so that even new comments ajax posted
             // can be toggled
-            $('.MessageList')
-            .on('mouseup.Spoiler', '.Spoiler', function(e) {
+            $('.Message')
+               .on('mouseup.Spoiler', '.Spoiler', function(e) {
                   $(e.target).removeClass('Spoiler').addClass('Spoiled');
                   e.stopPropagation(); // For nesting
-            })
-            .on('mouseup.Spoiled', '.Spoiled', function(e) {
-               // If the user selects some text, don't close the spoiler, and
-               // if there is an anchor in spoiler, do not close spoiler.
-               if (!document.getSelection().toString().length && e.target.nodeName.toLowerCase() != 'a') {
-                  $(e.target).removeClass('Spoiled').addClass('Spoiler');
-               }
-            });
+               })
+               .on('mouseup.Spoiled', '.Spoiled', function(e) {
+                  // If the user selects some text, don't close the spoiler, and
+                  // if there is an anchor in spoiler, do not close spoiler.
+                  if (!document.getSelection().toString().length && e.target.nodeName.toLowerCase() != 'a') {
+                     $(e.target).removeClass('Spoiled').addClass('Spoiler');
+                  }
+               });
+
          }());
 
          /**
