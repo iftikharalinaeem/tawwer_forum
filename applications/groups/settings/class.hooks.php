@@ -89,11 +89,43 @@ class GroupsHooks extends Gdn_Plugin {
             $Args['FormPostValues']['CategoryID'] = $Group['CategoryID'];
             $Args['FormPostValues']['GroupID'] = $GroupID;
 
-            if (GetValue('Insert', $Args)) {
-               $Model->IncrementDiscussionCount($GroupID, 1);
-            }
-
             Trace($Args, 'Group set');
+         }
+      }
+   }
+
+   /**
+    * Increment the discussion aggregates on the group.
+    *
+    * @param DiscussionModel $Sender
+    * @param array $Args
+    */
+   public function DiscussionModel_AfterSaveDiscussion_Handler($Sender, $Args) {
+      $GroupID = Gdn::Request()->Get('groupid');
+      if ($GroupID && $Args['Insert']) {
+         $Model = new GroupModel();
+         $Model->IncrementDiscussionCount($GroupID, 1, val('DiscussionID', $Args));
+      }
+   }
+
+   /**
+    * Set the most recent comment on the group.
+    *
+    * @param CommentModel $Sender
+    * @param array $Args
+    */
+   public function CommentModel_AfterSaveComment_Handler($Sender, $Args) {
+      if ($Args['Insert']) {
+         $CommentID = $Args['CommentID'];
+         $DiscussionID = valr('FormPostValues.DiscussionID', $Args);
+         $GroupID = Gdn::SQL()->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->Value('GroupID');
+         if ($GroupID) {
+            $Model = new GroupModel();
+            $Model->SetField($GroupID, array(
+               'DateLastComment' => valr('FormPostValues.DateInserted', $Args),
+               'LastDiscussionID' => $DiscussionID,
+               'LastCommentID' => $CommentID
+            ));
          }
       }
    }
