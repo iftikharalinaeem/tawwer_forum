@@ -37,6 +37,8 @@ $St
    ->Column('CountMembers', 'uint', '0')
    ->Column('CountDiscussions', 'uint', '0')
    ->Column('DateLastComment', 'datetime', TRUE)
+   ->Column('LastCommentID', 'int', NULL)
+   ->Column('LastDiscussionID', 'int', NULL)
    ->Column('DateInserted', 'datetime')
    ->Column('InsertUserID', 'int')
    ->Column('DateUpdated', 'datetime', TRUE)
