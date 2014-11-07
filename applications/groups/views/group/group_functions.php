@@ -425,29 +425,23 @@ function WriteGroupRow($Row) {
         </td>
         <td class="BlockColumn LatestPost">
             <div class="Block Wrap">
-                <?php if ($Row['LastDiscussion'][0]):
-                    $LastDiscussion = $Row['LastDiscussion'][0];
-                    echo UserPhoto($LastDiscussion, array('Size' => 'Small', 'Px' => 'Last'));
+                <?php if ($Row['LastDiscussionID']):
+                    echo UserPhoto($Row, array('Size' => 'Small', 'Px' => 'Last'));
                     echo Anchor(
-                        SliceString(Gdn_Format::Text($LastDiscussion['Name']), 100),
-                        $LastDiscussion['Url'],
+                        SliceString(Gdn_Format::Text($Row['LastTitle']), 100),
+                        $Row['LastUrl'],
                         'BlockTitle LatestPostTitle',
-                        array('title' => html_entity_decode($LastDiscussion['Name'])));
+                        array('title' => html_entity_decode($Row['LastTitle'])));
                     ?>
                     <div class="Meta">
                         <?php
-                        if (isset($LastDiscussion['LastName'])) {
-                            echo  UserAnchor($LastDiscussion, 'UserLink MItem', 'Last');
-                        }
-                        else {
-                            echo UserAnchor($LastDiscussion, 'UserLink MItem', 'First');
-                        }
+                            echo UserAnchor($Row, 'UserLink MItem', 'Last');
                         ?>
                         <span class="Bullet">•</span>
                         <?php
                         echo Anchor(
-                            Gdn_Format::Date($LastDiscussion['DateLastComment'], 'html'),
-                            $LastDiscussion['Url'],
+                            Gdn_Format::Date($Row['LastDateInserted'], 'html'),
+                            $Row['LastUrl'],
                             'CommentDate MItem');
                         ?>
                     </div>
@@ -492,24 +486,18 @@ function WriteGroupItems($Groups, $EmptyMessage = "") {
                <div class="Meta">
                   <span class="MItem DiscussionCount">'.sprintf(Plural(number_format($Group['CountDiscussions']), '%s discussion', '%s discussions'), $Group['CountDiscussions']).'</span>
                   <span class="MItem CommentCount">'.sprintf(Plural(number_format($Group['CountMembers']), '%s member', '%s members'), $Group['CountMembers']).'</span>';
-         if ($Group["LastDiscussion"][0]) {
-            $LastDiscussion = $Group['LastDiscussion'][0];
-            if (isset($LastDiscussion['LastName'])) {
-               $User = UserAnchor($LastDiscussion, 'UserLink MItem', 'Last');
-            }
-            else {
-               $User = UserAnchor($LastDiscussion, 'UserLink MItem', 'First');
-            }
+         if ($Group["LastDiscussionID"]) {
+            $User = UserAnchor($Group, 'UserLink MItem', 'Last');
             echo '<span class="MItem LastDiscussionTitle">'.sprintf(
                       T('Most recent: %1$s by %2$s'),
                       Anchor(
-                          SliceString(Gdn_Format::Text($LastDiscussion['Name']), 100),
-                          $LastDiscussion['Url'],
+                          SliceString(Gdn_Format::Text($Group['LastTitle']), 100),
+                          $Group['LastUrl'],
                           'BlockTitle LatestPostTitle',
-                          array('title' => html_entity_decode($LastDiscussion['LastTitle']))),
+                          array('title' => html_entity_decode($Group['LastTitle']))),
                       $User);
             echo '</span>'
-                  .'<span class="MItem LastCommentDate">'.Gdn_Format::Date($LastDiscussion['DateLastComment']).'</span>';
+                  .'<span class="MItem LastCommentDate">'.Gdn_Format::Date($Group['LastDateInserted']).'</span>';
          }
       }
       echo '</div></div></li>';

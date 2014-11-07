@@ -40,16 +40,14 @@ class MyGroupsModule extends Gdn_Module {
         else {
             //get groups
             $GroupModel = new GroupModel();
-            $this->Groups = $GroupModel->GetByUser(Gdn::Session()->UserID, $this->orderBy, 'desc', false, $this->Limit);
-            if ($this->AttachLastDiscussion) {
-                foreach ($this->Groups as $GroupKey => $GroupValue) {
-                  $DiscussionModel = new DiscussionModel();
-                    $this->Groups[$GroupKey]['LastDiscussion'] = $DiscussionModel->Get(1, 2, array('GroupID' => $GroupValue['GroupID']))->ResultArray();
-                }
-            }
+            $this->Groups = $GroupModel->GetByUser(Gdn::Session()->UserID, $this->orderBy, 'desc', $this->Limit);
             if (!is_array($this->Groups) || !count($this->Groups) > 0) {
-                $this->SetData('ErrorMessage', T("You haven't joined any groups yet.").' '.Gdn_Theme::Link('/groups/browse/popular', "Browse popular groups."));
+               $this->SetData('ErrorMessage', T("You haven't joined any groups yet.").' '.Gdn_Theme::Link('/groups/browse/popular', "Browse popular groups."));
             }
+            else if ($this->AttachLastDiscussion) {
+               $GroupModel->JoinRecentPosts($this->Groups);
+            }
+
         }
     }
 
