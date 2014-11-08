@@ -295,13 +295,16 @@ class GroupModel extends Gdn_Model {
       return $Parts[0];
    }
 
-   public function IncrementDiscussionCount($GroupID, $Inc, $DiscussionID = 0) {
+   public function IncrementDiscussionCount($GroupID, $Inc, $DiscussionID = 0, $DateLastComment = '') {
       $Group = $this->GetID($GroupID);
       $Set = array();
 
       if ($DiscussionID) {
          $Set['LastDiscussionID'] = $DiscussionID;
          $Set['LastCommentID'] = null;
+      }
+      if ($DateLastComment) {
+         $Set['DateLastComment'] = $DateLastComment;
       }
 
       if (val('CountDiscussions', $Group) < 100) {
