@@ -103,7 +103,7 @@ class GroupsController extends Gdn_Controller {
       $PageNumber = PageNumber($Offset, $Limit);
 
       if (Gdn::Session()->UserID && $Sort == 'mine') {
-          $Groups = $this->GroupModel->GetByUser(Gdn::Session()->UserID, $Limit, $Offset);
+          $Groups = $this->GroupModel->GetByUser(Gdn::Session()->UserID, false, false, $Limit, $Offset);
       } else {
           $Groups = $this->GroupModel->Get($SortRow['OrderBy'], 'desc', $Limit, $PageNumber)->ResultArray();
           $TotalRecords = $this->GroupModel->GetCount();

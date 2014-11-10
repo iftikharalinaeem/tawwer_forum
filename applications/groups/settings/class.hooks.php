@@ -104,7 +104,7 @@ class GroupsHooks extends Gdn_Plugin {
       $GroupID = Gdn::Request()->Get('groupid');
       if ($GroupID && $Args['Insert']) {
          $Model = new GroupModel();
-         $Model->IncrementDiscussionCount($GroupID, 1, val('DiscussionID', $Args));
+         $Model->IncrementDiscussionCount($GroupID, 1, val('DiscussionID', $Args), valr('Fields.DateInserted', $Args));
       }
    }
 
