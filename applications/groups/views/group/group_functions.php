@@ -364,10 +364,10 @@ function WriteGroupTable($Groups, $EmptyMessage = '') {
                 <table class="DataTable GroupTable">
                     <thead>
                         <tr>
-                            <td class="CategoryName"><div class="Wrap">Group</div></td>
-                            <td class="BigCount CountDiscussions"><div class="Wrap">Discussions</div></td>
-                            <td class="BigCount CountComments"><div class="Wrap">Members</div></td>
-                            <td class="BlockColumn LatestPost"><div class="Wrap">Latest Post</div></td>
+                            <td class="CategoryName"><div class="Wrap">'.T('Group').'</div></td>
+                            <td class="BigCount CountComments"><div class="Wrap">'.T('Members').'</div></td>
+                            <td class="BigCount CountDiscussions"><div class="Wrap">'.T('Discussions').'</div></td>
+                            <td class="BlockColumn LatestPost"><div class="Wrap">'.T('Latest Post').'</div></td>
                         </tr>
                     </thead>';
         foreach ($Groups as $Group) {
@@ -402,10 +402,18 @@ function WriteGroupRow($Row) {
                 echo '<div class="Group-Description">'.
                     SliceString(
                         Gdn_Format::PlainText($Row['Description'], $Row['Format']),
-                        C('Groups.ListDescription.ExcerptLength', 100)).'</div>';
-                echo '<div class="Group-Members">'
-                    .Plural($Row['CountMembers'], '%s member','%s members', number_format($Row['CountMembers']))
-                    .'</div>';
+                        C('Groups.ListDescription.ExcerptLength', 100)).'</div>'
+                     .'</div>';
+//                echo '<div class="Group-Members">'
+//                    .Plural($Row['CountMembers'], '%s member','%s members', number_format($Row['CountMembers']))
+//                    .'</div>';
+                ?>
+            </div>
+        </td>
+        <td class="BigCount CountMembers">
+            <div class="Wrap">
+                <?php
+                echo BigPlural($Row['CountMembers'], '%s member', '%s members');
                 ?>
             </div>
         </td>
@@ -413,13 +421,6 @@ function WriteGroupRow($Row) {
             <div class="Wrap">
                 <?php
                 echo BigPlural($Row['CountDiscussions'], '%s discussion');
-                ?>
-            </div>
-        </td>
-        <td class="BigCount CountMembers">
-            <div class="Wrap">
-                <?php
-                echo BigPlural($Row['CountMembers'], '%s members');
                 ?>
             </div>
         </td>
