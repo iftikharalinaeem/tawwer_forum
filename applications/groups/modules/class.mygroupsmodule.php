@@ -42,7 +42,7 @@ class MyGroupsModule extends Gdn_Module {
             $GroupModel = new GroupModel();
             $this->Groups = $GroupModel->GetByUser(Gdn::Session()->UserID, $this->orderBy, 'desc', $this->Limit);
             if (!is_array($this->Groups) || !count($this->Groups) > 0) {
-               $this->SetData('ErrorMessage', T("You haven't joined any groups yet.").' '.Gdn_Theme::Link('/groups/browse/popular', "Browse popular groups."));
+               $this->SetData('ErrorMessage', T("You haven't joined any groups yet.").' '.Anchor(T('Browse popular groups.'), '/groups/browse/popular'));
             }
             else if ($this->AttachLastDiscussion) {
                $GroupModel->JoinRecentPosts($this->Groups);
