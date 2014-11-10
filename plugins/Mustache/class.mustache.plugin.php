@@ -31,10 +31,25 @@ $PluginInfo['Mustache'] = array(
  */
 class MustachePlugin extends Gdn_Plugin {
 
+    /**
+     * Add mustache view handler
+     *
+     * @param Gdn_Dispatcher $sender
+     */
     public function gdn_dispatcher_appStartup_handler($sender) {
         // Mustache Templating Engine and Handler
         Gdn::factoryInstall('Mustache_Engine', $this->getResource('vendors/mustache/class.mustache_engine.php'));
         Gdn::factoryInstall('ViewHandler.mustache', 'MustacheHandler');
+    }
+
+    /**
+     * Allow queue of mustache templates for client side
+     *
+     * @param Gdn_Controller $sender
+     * @param array $args
+     */
+    public function gdn_controller_addMustache_create($sender, $args) {
+
     }
 
 }

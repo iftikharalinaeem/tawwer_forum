@@ -3,7 +3,7 @@
 /**
  * Mustache abstraction layer
  *
- * Vanilla wrapper for Mustache templating engine.
+ * Vanilla PHP wrapper for Mustache templating engine.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2010-2014 Vanilla Forums Inc
