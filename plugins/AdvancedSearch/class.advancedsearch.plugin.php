@@ -283,6 +283,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          $Row['Media'] = $media;
 
          $Row['Summary'] = SearchExcerpt(htmlspecialchars(Gdn_Format::PlainText($Summary, 'Raw')), $SearchTerms, $Length);
+         $Row['Summary'] = Emoji::instance()->translateToHtml($Row['Summary']);
+
          $Row['Format'] = 'Html';
          $Row['DateHtml'] = Gdn_Format::Date($Row['DateInserted'], 'html');
          $Row['Notes'] = $calc($Row, $SearchTerms);

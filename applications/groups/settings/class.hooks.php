@@ -279,10 +279,71 @@ class GroupsHooks extends Gdn_Plugin {
     * @param type $Sender
     */
    public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
-      $Sender->Preferences['Notifications']['Email.Groups'] = T('PreferenceGroupsEmail', 'Notify me when there is Group activity.');
-      $Sender->Preferences['Notifications']['Popup.Groups'] = T('PreferenceGroupsPopup', 'Notify me when there is Group activity.');
+      $Sender->Preferences['Notifications']['Email.Groups'] = T('Notify me when there is group activity.');
+      $Sender->Preferences['Notifications']['Popup.Groups'] = T('Notify me when there is group activity.');
 
-      $Sender->Preferences['Notifications']['Email.Events'] = T('PreferenceEventsEmail', 'Notify me when there is Event activity.');
-      $Sender->Preferences['Notifications']['Popup.Events'] = T('PreferenceEventsPopup', 'Notify me when there is Event activity.');
+      $Sender->Preferences['Notifications']['Email.Events'] = T('Notify me when there is event activity.');
+      $Sender->Preferences['Notifications']['Popup.Events'] = T('Notify me when there is event activity.');
    }
+
+    /**
+     * Hide Private content.
+     *
+     * @param SearchController $Sender Sending controller.
+     * @param array $Args Sending arguments.
+     */
+    public function SearchController_Render_Before($Sender, $Args) {
+
+        $GroupCategoryIDs = Gdn::Cache()->Get('GroupCategoryIDs');
+        if ($GroupCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
+            $CategoryModel = new CategoryModel();
+            $GroupCategories = $CategoryModel->GetWhere(array('AllowGroups' => 1))->ResultArray();
+            $GroupCategoryIDs = array();
+            foreach ($GroupCategories as $GroupCategory) {
+                $GroupCategoryIDs[] = $GroupCategory['CategoryID'];
+            }
+
+            Gdn::Cache()->Store('GroupCategoryIDs', $GroupCategoryIDs);
+        }
+
+        $SearchResults = $Sender->Data('SearchResults', array());
+        foreach ($SearchResults as $ResultKey => &$Result) {
+            $GroupID = val('GroupID', $Result, false);
+            if ($GroupID || in_array($Result['CategoryID'], $GroupCategoryIDs)) {
+
+                if (!$GroupID && val('RecordType', $Result, false) == 'Discussion') {
+
+                    $DiscussionModel = new DiscussionModel();
+                    $Discussion = $DiscussionModel->GetID($Result['PrimaryID']);
+                    $GroupID = $Discussion->GroupID;
+
+                } elseif (!$GroupID && val('RecordType', $Result, false) == 'Comment') {
+
+                    $CommentModel = new CommentModel();
+                    $Comment = $CommentModel->GetID($Result['PrimaryID']);
+                    $DiscussionModel = new DiscussionModel();
+                    $Discussion = $DiscussionModel->GetID($Comment->DiscussionID);
+
+                    $GroupID = $Discussion->GroupID;
+
+                }
+
+                $GroupModel = new GroupModel();
+                $Group = Gdn::Cache()->Get(sprintf('Group.%s', $GroupID));
+                if ($Group === Gdn_Cache::CACHEOP_FAILURE) {
+                    $Group = $GroupModel->GetID($GroupID);
+                    Gdn::Cache()->Store(sprintf('Group.%s', $GroupID), $Group, array(Gdn_Cache::FEATURE_EXPIRY => 15 * 60));
+                }
+
+                if ($Group['Privacy'] == 'Private' && !$GroupModel->CheckPermission('View', $Group['GroupID'])) {
+                    unset($SearchResults[$ResultKey]);
+                    $Result['Title'] = '** Private **';
+                    $Result['Summary'] = '** Private **';
+                }
+
+            }
+            $Sender->SetData('SearchResults', $SearchResults);
+        }
+
+    }
 }

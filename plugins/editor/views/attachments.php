@@ -15,6 +15,9 @@ $editorkey = $this->Data('_editorkey');
          $viewerCssClass = ($isOwner)
             ? 'file-owner'
             : 'file-readonly';
+         if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+            $viewerCssClass = 'file-owner';
+         }
          if (val('InBody', $attachment)) {
             $viewerCssClass .= ' in-body';
          }
@@ -34,8 +37,8 @@ $editorkey = $this->Data('_editorkey');
          <a class="filename" data-type="<?php echo $attachment['Type']; ?>" data-width="<?php echo $attachment['ImageWidth']; ?>" data-height="<?php echo $attachment['ImageHeight']; ?>" href="<?php echo $pathParse['Url'] ?>" target="_blank"><?php echo htmlspecialchars($attachment['Name']); ?></a>
          <span class="meta"><?php echo Gdn_Format::Bytes($attachment['Size'], 1); ?></span>
          </div>
-         <span class="editor-file-remove" title="Remove file"></span>
-         <span class="editor-file-reattach" title="Click to re-attach '<?php echo $attachment['Name']; ?>'"></span>
+         <span class="editor-file-remove" title="<?php echo T('Remove'); ?>"></span>
+         <span class="editor-file-reattach" title="<?php echo T('Click to re-attach'); ?>"></span>
       </div>
 
    <?php endforeach; ?>
