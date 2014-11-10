@@ -1,10 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 
 if ($this->Data('ErrorMessage')) {
-  echo '<h2 class="Groups H">'.T($this->Data('Title')).'</h2>';
-  echo '<div class="ErrorMessage">';
-  echo $this->Data('ErrorMessage');
-  echo '</div>';
+  //Display nothing if user is not signed in.
+   if ($this->Data('ErrorMessage') !== T('Sign In')) {
+      echo '<h2 class="Groups H">'.T($this->Data('Title')).'</h2>';
+      echo '<div class="ErrorMessage">';
+      echo $this->Data('ErrorMessage');
+      echo '</div>';
+   }
 }
 
 else {

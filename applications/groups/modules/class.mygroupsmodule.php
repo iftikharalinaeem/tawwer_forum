@@ -35,7 +35,7 @@ class MyGroupsModule extends Gdn_Module {
      */
     public function GetData() {
         if (!Gdn::Session()->UserID > 0) {
-            $this->SetData('ErrorMessage', Gdn_Theme::Link('signinout').' '.T('to see your groups.'));
+            $this->SetData('ErrorMessage', T('Sign In'));
         }
         else {
             //get groups
