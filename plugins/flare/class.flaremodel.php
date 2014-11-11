@@ -112,7 +112,7 @@ class FlareModel extends Gdn_Pluggable {
       $badge_groups = array();
       foreach ($flare_array as $badge_slug => $badge_info) {
          // Not all badges have classes, so just use slug, as that is unique
-         if (!isset($badge_info['class'])) {
+         if (empty($badge_info['class'])) {
             $badge_info['class'] = $badge_slug;
          }
          
