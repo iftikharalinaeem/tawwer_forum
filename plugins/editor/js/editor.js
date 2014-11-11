@@ -211,7 +211,7 @@
           * Toggle spoilers.
           */
          $(document).on('mouseup', '.Spoiled', function(e) {
-            // Do not close if its a link; or user selects some text.
+            // Do not close if its a link or user selects some text.
             if (!document.getSelection().toString().length && e.target.nodeName.toLowerCase() != 'a') {
                $(e.target).removeClass('Spoiled').addClass('Spoiler');
             }
