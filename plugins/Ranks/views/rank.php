@@ -177,6 +177,13 @@ echo $this->Form->Open(), $this->Form->Errors();
    </li>
    <li>
      <?php
+     echo $this->Form->Label('Avatars', 'Abilities_Avatars'),
+     '<div class="Info2">'."You can give or take away the ability to have avatars. (Requires permission to edit profile)".'</div>',
+      $this->Form->RadioList('Abilities_Avatars', array('no' => 'take away', '' => 'default'));
+     ?>
+   </li>
+   <li>
+     <?php
      echo $this->Form->Label('Signatures', 'Abilities_Signatures'),
      '<div class="Info2">'."You can give or take away the ability to have signatures. (Requires the signatures addon)".'</div>',
       $this->Form->RadioList('Abilities_Signatures', array('yes' => 'give', 'no' => 'take away', '' => 'default'));
