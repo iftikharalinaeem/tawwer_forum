@@ -205,6 +205,14 @@ class RankModel extends Gdn_Model {
          $Session->SetPermission('Plugins.Signatures.Edit', $V == 'yes' ? TRUE : FALSE);
       }
 
+      if ($V = GetValue('SignatureMaxLength', $Abilities)) {
+         SaveToConfig('Plugins.Signatures.MaxLength', $V, FALSE);
+      }
+
+      if ($V = GetValue('SignatureMaxNumberImages', $Abilities)) {
+         SaveToConfig('Plugins.Signatures.MaxNumberImages', $V, FALSE);
+      }
+
       // Polls.
       if ($V = GetValue('Polls', $Abilities)) {
          $Session->SetPermission('Plugins.Polls.Add', $V == 'yes' ? TRUE : FALSE);
