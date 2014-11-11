@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.5.0',
+   'Version' => '1.5.1',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -822,7 +822,7 @@ class EditorPlugin extends Gdn_Plugin {
          // Save original file to uploads, then manipulate from this location if
          // it's a photo. This will also call events in Vanilla so other
          // plugins can tie into this.
-         $filePathParsed = $Upload->SaveAs($tmpFilePath, $absoluteFileDestination);
+         $filePathParsed = $Upload->SaveAs($tmpFilePath, $absoluteFileDestination, array('source' => 'content'));
 
          // Determine if image, and thus requires thumbnail generation, or
          // simply saving the file.
@@ -1490,7 +1490,7 @@ class EditorPlugin extends Gdn_Plugin {
          $parsed = Gdn_Upload::Parse($thumb_destination_path);
          $target = $thumb_destination_path; // $parsed['Name'];
          $Upload = new Gdn_Upload();
-         $filepath_parsed = $Upload->SaveAs($thumb_destination_path, $target);
+         $filepath_parsed = $Upload->SaveAs($thumb_destination_path, $target, array('source' => 'content'));
 
          // Save thumbnail information to DB.
          $model->Save(array(
