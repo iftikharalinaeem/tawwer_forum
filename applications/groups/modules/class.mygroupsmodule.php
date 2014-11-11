@@ -29,7 +29,7 @@ class MyGroupsModule extends Gdn_Module {
     }
 
     /**
-     * Retrieve the groups for this module.
+     * Retrieve a user's groups and join the recent posts.
      *
      * @return void
      */
@@ -52,7 +52,7 @@ class MyGroupsModule extends Gdn_Module {
     }
 
     /**
-     * Render promoted groups
+     * Render my groups
      *
      * @return type
      */
