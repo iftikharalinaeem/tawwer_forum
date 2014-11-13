@@ -8,7 +8,7 @@
 $PluginInfo['ElasticLogSearch'] = array(
     'Name' => 'Elastic Log Search',
     'Description' => 'Use elastic search to display log data.',
-    'Version' => '1.0a',
+    'Version' => '1.0alpha',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => FALSE,
     'Author' => 'John Ashton',
@@ -24,62 +24,6 @@ class ElasticLogSearch extends Gdn_Plugin {
         'warning' => true,
         'error' => true,
     );
-
-
-//    public function VanillaController_TestElastic_Create() {
-//
-//        $es = Elastic::connection('log');
-//
-//        $indices = $es->indices()->getAliases();
-//        $params['index'] = 'log_vanilla*';
-//        //$params['type']  = 'apache_access';
-//
-//        // Pagination params.
-//        $params['from'] = 0;
-//        $params['size'] = 30;
-//
-//
-//        // Search Query.
-//        $params['body']['query']['match']['message'] = 'GET';
-//        $params['body']['query']['wildcard']['message.msg'] = 'method';
-//        $params['body']['query']['wildcard']['message.url'] = 'cleanspeak*';
-//        $params['body']['query']['wildcard']['host'] = 'app1';
-//
-//        $params['body']['query']['range']['@timestamp']['gte'] = '2010-10-20T21:00:08+00:00';
-//        $params['body']['query']['range']['message.timestamp']['gte'] = 1677972800;
-//        $params['body']['query']['nested'] = 'msg';
-//        $params['sort']['@timestamp'] = array('order' => 'desc');
-//        $results = $es->search($params);
-//        echo '<pre>';
-//        var_export($params);
-//        var_export($results);
-//
-//        $events = $this->convertHitsToRows($results['hits']['hits']);
-//        var_export($events);
-//
-//
-//    }
-
-
-    public function convertHitsToRows($hits) {
-        $rows = array();
-        foreach ($hits as $hit) {
-            $message = FormatString(valr('_source.message.msg', $hit), valr('_source.message', $hit));
-            $rows[] = array(
-                'ID' => $hit['_id'],
-                'Timestamp' => valr('_source.message.timestamp', $hit),
-                'Event' => valr('_source.message.event', $hit),
-                'Level' => valr('_source.message.level', $hit, 'unknown'),
-                'Message' => $message,
-                'Domain' => valr('_source.message.domain', $hit),
-                'Path' => valr('_source.message.path', $hit),
-                'UserID' => valr('_source.message.userid', $hit),
-                'Username' => valr('_source.message.username', $hit),
-                'IP' => valr('_source.message.ip', $hit),
-            );
-        }
-        return $rows;
-    }
 
     /**
      * @param SettingsController $Sender
@@ -163,8 +107,6 @@ class ElasticLogSearch extends Gdn_Plugin {
             $events = array();
         }
 
-
-
         // Application calculation.
         foreach ($events as &$event) {
             $event['Url'] = $event['Domain'] . ltrim($event['Path'], '/');
@@ -197,6 +139,28 @@ class ElasticLogSearch extends Gdn_Plugin {
         $Sender->Render('eventlog', '', 'plugins/ElasticLogSearch');
     }
 
+
+
+    public function convertHitsToRows($hits) {
+        $rows = array();
+        foreach ($hits as $hit) {
+            $message = FormatString(valr('_source.message.msg', $hit), valr('_source.message', $hit));
+            $rows[] = array(
+                'ID' => $hit['_id'],
+                'Timestamp' => valr('_source.message.timestamp', $hit),
+                'Event' => valr('_source.message.event', $hit),
+                'Level' => valr('_source.message.level', $hit, 'unknown'),
+                'Message' => $message,
+                'Domain' => valr('_source.message.domain', $hit),
+                'Path' => valr('_source.message.path', $hit),
+                'UserID' => valr('_source.message.userid', $hit),
+                'Username' => valr('_source.message.username', $hit),
+                'IP' => valr('_source.message.ip', $hit),
+            );
+        }
+        return $rows;
+    }
+
     /**
      * Takes all of the vales and sets them to that of the key.
      *
@@ -209,35 +173,67 @@ class ElasticLogSearch extends Gdn_Plugin {
         return array_combine($keys, $keys);
     }
 
+    /**
+     * Used for localhost testing.
+     */
+    public function VanillaController_TestElastic_Create() {
+
+        // Remove for localhost testing.
+        return;
+
+        $es = Elastic::connection('log');
+
+        $indices = $es->indices()->getAliases();
+        $params['index'] = 'log_vanilla*';
+        //$params['type']  = 'apache_access';
+
+        // Pagination params.
+        $params['from'] = 0;
+        $params['size'] = 30;
+
+
+        // Search Query.
+        $params['body']['query']['match']['message'] = 'GET';
+        $params['body']['query']['wildcard']['message.msg'] = 'method';
+        $params['body']['query']['wildcard']['message.url'] = 'cleanspeak*';
+        $params['body']['query']['wildcard']['host'] = 'app1';
+
+        $params['body']['query']['range']['@timestamp']['gte'] = '2010-10-20T21:00:08+00:00';
+        $params['body']['query']['range']['message.timestamp']['gte'] = 1677972800;
+        $params['body']['query']['nested'] = 'msg';
+        $params['sort']['@timestamp'] = array('order' => 'desc');
+        $results = $es->search($params);
+        echo '<pre>';
+        var_export($params);
+        var_export($results);
+
+        $events = $this->convertHitsToRows($results['hits']['hits']);
+        var_export($events);
+
+
+    }
 
     /**
-     * Provide elasticsearch configuration
+     *
+     *  This is used for localhost testing.
+     *
+     * Provide elasticsearch configuration.
      *
      * @param Elastic $sender
+     * @param array $args Sending arguments.
      */
     public function Elastic_GetIdentity_Handler($sender, $args) {
+
+        //Remove this for localhost testing.
+        return;
+
         $key = $args['key'];
 
         // Hosts
         $hosts = [];
         switch ($key) {
             case 'log':
-//                $servers = val('list', Infrastructure::agentConfig('servers', []), []);
-//                if (is_array($servers)) {
-//                    foreach ($servers as $server) {
-//                        if ($server['type'] != 'log') {
-//                            continue;
-//                        }
-//
-//                        $serverAddress = valr('addresses.private', $server, null);
-//                        if (!$serverAddress) {
-//                            continue;
-//                        }
-//
-//                        // 9200 = nginx ACL secured endpoint
-//                        $hosts[] = "{$serverAddress}:9200";
-//                    }
-//                }
+
                 $hosts[] = 'localhost:9200';
 
                 // Only populate identity if hosts can be found
@@ -254,14 +250,12 @@ class ElasticLogSearch extends Gdn_Plugin {
         $identity = &$args['identity'];
         $identity['params'] = [];
 
-
-
         // Connection management
         $identity['params']['connectionPoolClass'] = '\Elasticsearch\ConnectionPool\StaticConnectionPool';
         $identity['params']['selectorClass'] = '\Elasticsearch\ConnectionPool\Selectors\StickyRoundRobinSelector';
 
         $identity['params']['hosts'] = $hosts;
-        return;
+
     }
 
 }
