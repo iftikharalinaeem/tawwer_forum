@@ -150,7 +150,7 @@ class MustacheHandler {
         $virtualData['Assets'] = (array)$controller->Assets;
         $virtualData['Path'] = Gdn::request()->path();
 
-        $controller->Data = array_replace($controller->Data, $virtualData);
+        $controller->Data = array_change_key_case(array_merge($controller->Data, $virtualData), CASE_LOWER);
     }
 
     /**
