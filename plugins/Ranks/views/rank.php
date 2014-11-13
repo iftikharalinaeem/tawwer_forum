@@ -184,7 +184,7 @@ echo $this->Form->Open(), $this->Form->Errors();
    </li>
    <li>
      <?php
-     $Options = array('Unlimited', '0', '1', '2', '3', '4', '5');
+     $Options = array('' => T('Default'), 'Unlimited' => T('Unlimited'), 'None' => T('None'), '1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5');
      echo $this->Form->Label('Max number of images in signature', 'Abilities_SignatureMaxNumberImages');
      echo $this->Form->DropDown('Abilities_SignatureMaxNumberImages', $Options);
      ?>
