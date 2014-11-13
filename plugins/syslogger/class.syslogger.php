@@ -57,6 +57,7 @@ class Syslogger extends BaseLogger {
         // Add the standard fields to the row.
         $row = array_merge([
             'msg' => $message,
+            'priority' => $level
         ], $context);
 
         $tags = array_merge((array)val('tags', $context, []), explode('_', $row['event']));
