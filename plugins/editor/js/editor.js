@@ -732,6 +732,10 @@
             case 'markdown':
                imgTag = '![](' + href + ' "")';
                break;
+            case 'text':
+            case 'textex':
+               imgTag = '';
+               break;
          }
 
          return imgTag;
@@ -1197,7 +1201,9 @@
                            try {
                               // i don't know why adding [0] to this when iframe
                               // matters, and clear up part of t problem.
-                           $(editor).replaceSelectedText(imgTag + '\n');
+                              if (imgTag) {
+                                 $(editor).replaceSelectedText(imgTag + '\n');
+                              }
                            } catch(ex){}
                         }
                      }
