@@ -131,6 +131,15 @@ class RankModel extends Gdn_Model {
       self::AbilityString($Abilities, 'Locations', 'Locations', $Result);
       self::AbilityString($Abilities, 'Avatars', 'Avatars', $Result);
       self::AbilityString($Abilities, 'Signatures', 'Signatures', $Result);
+
+      if ($V = GetValue('SignatureMaxNumberImages', $Abilities)) {
+         $Result[] = '<b>Max number of images in signature</b>: '.$V;
+      }
+
+      if ($V = GetValue('SignatureMaxLength', $Abilities)) {
+         $Result[] = '<b>Max number of characters in signature</b>: '.$V;
+      }
+
       self::AbilityString($Abilities, 'Polls', 'Polls', $Result);
       self::AbilityString($Abilities, 'MeAction', 'Me Actions', $Result);
       self::AbilityString($Abilities, 'Curation', 'Content Curation', $Result);
@@ -244,6 +253,14 @@ class RankModel extends Gdn_Model {
       // Signatures.
       if ($V = GetValue('Signatures', $Abilities)) {
          $Session->SetPermission('Plugins.Signatures.Edit', $V == 'yes' ? TRUE : FALSE);
+      }
+
+      if ($V = GetValue('SignatureMaxNumberImages', $Abilities)) {
+         SaveToConfig('Plugins.Signatures.MaxNumberImages', $V, FALSE);
+      }
+
+      if ($V = GetValue('SignatureMaxLength', $Abilities)) {
+         SaveToConfig('Plugins.Signatures.MaxLength', $V, FALSE);
       }
 
       // Polls.
