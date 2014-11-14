@@ -5,7 +5,7 @@
  * @license Proprietary
  */
 
-class MinisitesController extends DashboardController {
+class SubcommunitiesController extends DashboardController {
 
     /// Properties ///
 
@@ -15,7 +15,7 @@ class MinisitesController extends DashboardController {
     protected $form;
 
     /**
-     * @var MinisiteModel
+     * @var SubcommunityModel
      */
     protected $siteModel;
 
@@ -41,8 +41,8 @@ class MinisitesController extends DashboardController {
 
         if ($this->Request->IsAuthenticatedPostBack()) {
             if ($this->site) {
-                $siteID = $this->site['MinisiteID'];
-                $this->siteModel->update($this->Request->Post(), ['MinisiteID' => $siteID]);
+                $siteID = $this->site['SubcommunityID'];
+                $this->siteModel->update($this->Request->Post(), ['SubcommunityID' => $siteID]);
             } else {
                 $siteID = $this->siteModel->insert($this->Request->Post());
             }
@@ -57,7 +57,7 @@ class MinisitesController extends DashboardController {
                 if ($this->DeliveryType() === DELIVERY_TYPE_VIEW) {
                     $this->JsonTarget('', '', 'Refresh');
                 } elseif ($this->DeliveryType() === DELIVERY_TYPE_ALL) {
-                    Redirect('/minisites');
+                    Redirect('/subcommunities');
                 }
             }
         } elseif ($this->site) {
@@ -93,13 +93,13 @@ class MinisitesController extends DashboardController {
         }
 
         if ($this->form->AuthenticatedPostBack()) {
-            $this->siteModel->Delete(['MinisiteID' => $this->site['MinisiteID']]);
+            $this->siteModel->Delete(['SubcommunityID' => $this->site['SubcommunityID']]);
 
             if ($this->form->ErrorCount() == 0) {
                 if ($this->DeliveryType() === DELIVERY_TYPE_VIEW) {
                     $this->JsonTarget('', '', 'Refresh');
                 } elseif ($this->DeliveryType() === DELIVERY_TYPE_ALL) {
-                    Redirect('/minisites');
+                    Redirect('/subcommunities');
                 }
             }
         }
@@ -156,7 +156,7 @@ class MinisitesController extends DashboardController {
 
         $this->setData('_Limit', $pageSize);
         $this->AddJsFile('jquery.tablednd.js');
-//        $this->AddJsFile('minisites_admin.js', 'plugins/minisites');
+//        $this->AddJsFile('subcommunities_admin.js', 'plugins/subcommunities');
 
         $this->Title(T('Sites'));
         $this->AddSideMenu();
@@ -166,7 +166,7 @@ class MinisitesController extends DashboardController {
     public function initialize() {
         parent::Initialize();
 
-        $this->siteModel = MinisiteModel::instance();
+        $this->siteModel = SubcommunityModel::instance();
         $this->form = new Gdn_Form;
 
         // Check for a site.
@@ -216,7 +216,7 @@ class MinisitesController extends DashboardController {
             if ($this->DeliveryType() === DELIVERY_TYPE_VIEW) {
                 $this->JsonTarget('', '', 'Refresh');
             } elseif ($this->DeliveryType() === DELIVERY_TYPE_ALL) {
-                Redirect('/minisites');
+                Redirect('/subcommunities');
             }
         }
 

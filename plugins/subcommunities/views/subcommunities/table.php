@@ -13,9 +13,9 @@ PagerModule::Write(array('Sender' => $this));
         <tbody>
         <?php
         foreach ($this->Data('Sites') as $Row):
-            $id = $Row['MinisiteID'];
+            $id = $Row['SubcommunityID'];
             ?>
-            <tr data-id="<?php echo $id; ?>" id="<?php echo "Minisite_$id"; ?>">
+            <tr data-id="<?php echo $id; ?>" id="<?php echo "Subcommunity_$id"; ?>">
                 <td><?php echo htmlspecialchars($Row['Name']); ?></td>
                 <td>
                     <?php
@@ -27,8 +27,8 @@ PagerModule::Write(array('Sender' => $this));
                 <td>
                     <?php
 
-                    echo Anchor(T('Edit'), "/minisites/$id/edit", 'Popup SmallButton'),
-                        Anchor(T('Delete'), "/minisites/$id/delete", 'Popup SmallButton');
+                    echo Anchor(T('Edit'), "/subcommunities/$id/edit", 'Popup SmallButton'),
+                        Anchor(T('Delete'), "/subcommunities/$id/delete", 'Popup SmallButton');
                     ?>
                 </td>
             </tr>

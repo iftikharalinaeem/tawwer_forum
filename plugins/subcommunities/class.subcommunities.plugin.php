@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit;
 
-$PluginInfo['minisites'] = array(
-    'Name'        => "Minisites",
+$PluginInfo['subcommunities'] = array(
+    'Name'        => "Subcommunities",
     'Description' => "Allows you to use categories as virtual mini forums for multilingual or multi-product communities.",
     'Version'     => '1.0.0-alhpa',
     'Author'      => "Todd Burry",
@@ -11,7 +11,7 @@ $PluginInfo['minisites'] = array(
 );
 
 
-class MinisitesPlugin extends Gdn_Plugin {
+class SubcommunitiesPlugin extends Gdn_Plugin {
     /// Properties ///
 
     /// Methods ///
@@ -24,8 +24,8 @@ class MinisitesPlugin extends Gdn_Plugin {
 
     public function structure() {
         Gdn::Structure()
-            ->Table('Minisite')
-            ->PrimaryKey('MinisiteID')
+            ->Table('Subcommunity')
+            ->PrimaryKey('SubcommunityID')
             ->Column('Name', 'varchar(255)')
             ->Column('Folder', 'varchar(255)', false, 'unique.Folder')
             ->Column('CategoryID', 'int', true)
@@ -61,18 +61,18 @@ class MinisitesPlugin extends Gdn_Plugin {
             }
         }
 
-        MinisiteModel::setCurrent($site);
+        SubcommunityModel::setCurrent($site);
     }
 
     /// Event Handlers ///
 
     public function base_render_before($sender) {
         // Add the alternate urls to the current crop of sites.
-        MinisiteModel::addAlternativeUrls();
+        SubcommunityModel::addAlternativeUrls();
 
         // Set alternative urls.
         $domain = Gdn::Request()->UrlDomain();
-        foreach (MinisiteModel::all() as $site) {
+        foreach (SubcommunityModel::all() as $site) {
             if (!$site['AlternatePath']) {
                 continue;
             }
@@ -91,20 +91,20 @@ class MinisitesPlugin extends Gdn_Plugin {
     public function base_getAppSettingsMenuItems_handler($sender) {
         /* @var SideMenuModule */
         $menu = $sender->EventArguments['SideMenu'];
-        $menu->AddLink('Forum', T('Minisites'), '/minisites', 'Garden.Settings.Manage', ['After' => 'vanilla/settings/managecategories']);
+        $menu->AddLink('Forum', T('Subcommunities'), '/subcommunities', 'Garden.Settings.Manage', ['After' => 'vanilla/settings/managecategories']);
     }
 
     /**
-     * Make sure the discussions controller is filtering by minisite.
+     * Make sure the discussions controller is filtering by subcommunity.
      *
      * @param DiscussionsController $sender
      * @param array $args
      */
     public function discussionsController_index_before($sender, $args) {
-        $site = MinisiteModel::getCurrent();
+        $site = SubcommunityModel::getCurrent();
         $categoryID = val('CategoryID', $site);
 
-        // Get all of the category IDs associated with the minisite.
+        // Get all of the category IDs associated with the subcommunity.
         $categories = CategoryModel::GetSubtree($categoryID, true);
         $categoryIDs = array_keys($categories);
         $sender->setCategoryIDs($categoryIDs);
@@ -124,7 +124,7 @@ class MinisitesPlugin extends Gdn_Plugin {
         $path = val(1, $parts, '');
 
         // Look the root up in the mini sites.
-        $site = MinisiteModel::getSite($root);
+        $site = SubcommunityModel::getSite($root);
         if ($site) {
             Gdn::Request()->Path($path);
             Gdn::Request()->WebRoot($root);
@@ -132,7 +132,7 @@ class MinisitesPlugin extends Gdn_Plugin {
 
             $this->initializeSite($site);
         } else {
-            $defaultSite = MinisiteModel::getDefaultSite();
+            $defaultSite = SubcommunityModel::getDefaultSite();
             if ($defaultSite) {
 
                 $url = '/'.$defaultSite['Folder'].rtrim('/'.Gdn::Request()->Path(), '/');
@@ -145,11 +145,11 @@ class MinisitesPlugin extends Gdn_Plugin {
      * @param Smarty $sender
      */
     public function Gdn_Smarty_Init_Handler($sender) {
-        $sender->assign('Minisite', MinisiteModel::getCurrent());
+        $sender->assign('Subcommunity', SubcommunityModel::getCurrent());
     }
 
     /**
-     * @return MinisitesPlugin
+     * @return SubcommunitiesPlugin
      */
     public static function instance() {
         return Gdn::PluginManager()->GetPluginInstance(__CLASS__, Gdn_PluginManager::ACCESS_CLASSNAME);

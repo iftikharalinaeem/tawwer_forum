@@ -1,12 +1,12 @@
 <?php
 
-class MinisiteModel extends Gdn_Model {
-    const CACHE_KEY = 'minisites';
+class SubcommunityModel extends Gdn_Model {
+    const CACHE_KEY = 'subcommunities';
 
     /// Properties ///
 
     /**
-     * @var MinisiteModel
+     * @var SubcommunityModel
      */
     protected static $instance;
 
@@ -17,7 +17,7 @@ class MinisiteModel extends Gdn_Model {
     /// Methods ///
 
     public function __construct($name = '') {
-        parent::__construct('Minisite');
+        parent::__construct('Subcommunity');
 
         $this->Validation->AddRule('Folder', 'function:validate_folder');
         $this->Validation->ApplyRule('Folder', 'Folder', '%s must be a valid folder name.');
@@ -184,7 +184,7 @@ class MinisiteModel extends Gdn_Model {
         $this->AddInsertFields($Fields);
         if ($this->Validate($Fields, TRUE)) {
             if (val('IsDefault', $Fields)) {
-                $this->SQL->Put('Minisite', ['IsDefault' => null]);
+                $this->SQL->Put('Subcommunity', ['IsDefault' => null]);
             }
 
             static::clearCache();
@@ -204,7 +204,7 @@ class MinisiteModel extends Gdn_Model {
 
         if ($this->Validate($allFields)) {
             if (val('IsDefault', $row)) {
-                $this->SQL->Put('Minisite', ['IsDefault' => null], ['MinisiteID <>' => $allFields['MinisiteID']]);
+                $this->SQL->Put('Subcommunity', ['IsDefault' => null], ['SubcommunityID <>' => $allFields['SubcommunityID']]);
             }
             parent::Update($row, $where);
             static::clearCache();
@@ -214,11 +214,11 @@ class MinisiteModel extends Gdn_Model {
     /**
      * Gets the singleton instance of this class.
      *
-     * @return MinisiteModel Returns the singleton instance of this class.
+     * @return SubcommunityModel Returns the singleton instance of this class.
      */
     public static function instance() {
         if (!isset(self::$instance)) {
-            self::$instance = new MinisiteModel();
+            self::$instance = new SubcommunityModel();
         }
         return self::$instance;
     }
