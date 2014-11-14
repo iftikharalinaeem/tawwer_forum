@@ -63,14 +63,28 @@ class MustacheHandler {
         ]);
         $this->engine()->setLoader($viewLoader);
 
-        // Prepare for partials
+        $partialsLoader = new Mustache_Loader_CascadingLoader();
+
+        // Prepare for method partials
         $partialsDir = paths(dirname($path), '_partials');
         if (is_dir($partialsDir)) {
-            $partialsLoader = new Mustache_Loader_FilesystemLoader($partialsDir, [
+            $localPartialsLoader = new Mustache_Loader_FilesystemLoader($partialsDir, [
                 'extension' => 'mustache'
             ]);
-            $this->engine()->setPartialsLoader($partialsLoader);
+            $partialsLoader->addLoader($localPartialsLoader);
         }
+
+        // Prepare for global partials
+        $viewsDir = dirname($viewDir);
+        $globalPartialsDir = paths($viewsDir, '_partials');
+        if (is_dir($globalPartialsDir)) {
+            $globalPartialsLoader = new Mustache_Loader_FilesystemLoader($globalPartialsDir, [
+                'extension' => 'mustache'
+            ]);
+            $partialsLoader->addLoader($globalPartialsLoader);
+        }
+
+        $this->engine()->setPartialsLoader($partialsLoader);
 
         $virtualData = [];
 
@@ -134,10 +148,10 @@ class MustacheHandler {
         if ($locale === 'en-CA') {
             $locale = 'en';
         }
-        $currentLocale = array(
+        $currentLocale = [
             'Key' => $locale,
             'Lang' => str_replace('_', '-', $locale) // mirrors html5 lang attribute
-        );
+        ];
         if (class_exists('Locale')) {
             $currentLocale['Language'] = Locale::getPrimaryLanguage($locale);
             $currentLocale['Region'] = Locale::getRegion($locale);
@@ -149,6 +163,17 @@ class MustacheHandler {
 
         $virtualData['Assets'] = (array)$controller->Assets;
         $virtualData['Path'] = Gdn::request()->path();
+
+        // Prepare breadcrumbs
+        $controller->Data['crumbs'] = function() use (&$controller) {
+            $breadcrumbs = $controller->Data['breadcrumbs'];
+            if (!is_array($breadcrumbs)) {
+                $breadcrumbs = [];
+            }
+
+            $options = ['homeurl' => 'HomeUrl', 'hidelast' => 'HideLast'];
+            return Gdn_Theme::breadcrumbs($breadcrumbs, true, $options);
+        };
 
         $controller->Data = array_change_key_case(array_merge($controller->Data, $virtualData), CASE_LOWER);
     }
