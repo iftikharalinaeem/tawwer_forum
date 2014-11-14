@@ -111,6 +111,15 @@ class RankModel extends Gdn_Model {
       self::AbilityString($Abilities, 'Titles', 'Titles', $Result);
       self::AbilityString($Abilities, 'Locations', 'Locations', $Result);
       self::AbilityString($Abilities, 'Signatures', 'Signatures', $Result);
+
+      if ($V = GetValue('SignatureMaxNumberImages', $Abilities)) {
+         $Result[] = '<b>Max number of images in signature</b>: '.$V;
+      }
+
+      if ($V = GetValue('SignatureMaxLength', $Abilities)) {
+         $Result[] = '<b>Max number of characters in signature</b>: '.$V;
+      }
+
       self::AbilityString($Abilities, 'Polls', 'Polls', $Result);
       self::AbilityString($Abilities, 'MeAction', 'Me Actions', $Result);
       self::AbilityString($Abilities, 'Curation', 'Content Curation', $Result);
