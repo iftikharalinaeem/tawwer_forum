@@ -50,16 +50,16 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             Gdn::Locale()->Set($site['Locale'], Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
         }
 
-        // Set the default routes.
-        if ($site['CategoryID']) {
-            $category = CategoryModel::Categories($site['CategoryID']);
-            Gdn::Router()->SetRoute('categories$', ltrim(CategoryUrl($category, '', '/'), '/'), 'Internal', false);
-
-            $defaultRoute = Gdn::Router()->GetRoute('DefaultController');
-            if ($defaultRoute['Destination'] === 'categories') {
-                Gdn::Router()->SetRoute('DefaultController', ltrim(CategoryUrl($category, '', '/'), '/'), 'Temporary', false);
-            }
-        }
+//        // Set the default routes.
+//        if ($site['CategoryID']) {
+//            $category = CategoryModel::Categories($site['CategoryID']);
+//            Gdn::Router()->SetRoute('categories$', ltrim(CategoryUrl($category, '', '/'), '/'), 'Internal', false);
+//
+//            $defaultRoute = Gdn::Router()->GetRoute('DefaultController');
+//            if ($defaultRoute['Destination'] === 'categories') {
+//                Gdn::Router()->SetRoute('DefaultController', ltrim(CategoryUrl($category, '', '/'), '/'), 'Temporary', false);
+//            }
+//        }
 
         SubcommunityModel::setCurrent($site);
     }
@@ -138,6 +138,50 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
                 $url = '/'.$defaultSite['Folder'].rtrim('/'.Gdn::Request()->Path(), '/');
                 redirectUrl($url, Debug() ? 302 : 301);
             }
+        }
+    }
+
+    /**
+     * Default Routing
+     *
+     * This forces the default controller to be /account, since the vanilla
+     * application is not loaded and we don't have any discussions.
+     *
+     * @param Gdn_Router $sender
+     */
+    public function Gdn_Router_beforeLoadRoutes_Handler($sender, $args) {
+        $routes =& $args['Routes'];
+        $site = SubcommunityModel::getCurrent();
+
+        // Set the default routes.
+        if (val('CategoryID', $site)) {
+            $category = CategoryModel::Categories($site['CategoryID']);
+
+            // Set the default category root.
+            $routes[base64_encode('categories$')] = ltrim(CategoryUrl($category, '', '/'), '/');
+
+            $defaultRoute = val('DefaultController', $routes);
+            if (is_array($defaultRoute)) {
+                $defaultRoute = array_shift($defaultRoute);
+            }
+            switch ($defaultRoute) {
+                case 'categories':
+                    $defaultRoute = ltrim(CategoryUrl($category, '', '/'), '/');
+                    break;
+            }
+            if ($defaultRoute) {
+                $routes['DefaultController'] = $defaultRoute;
+            }
+
+//            Gdn::Router()->SetRoute('categories$', ltrim(CategoryUrl($category, '', '/'), '/'), 'Internal', false);
+//
+//            $defaultRoute = Gdn::Router()->GetRoute('DefaultController');
+//            if ($defaultRoute['Destination'] === 'categories') {
+//                Gdn::Router()->SetRoute('DefaultController', ltrim(CategoryUrl($category, '', '/'), '/'), 'Temporary', false);
+//            }
+//
+//            $sender->EventArguments['Routes']['DefaultForumRoot'] = 'account';
+//            $sender->EventArguments['Routes']['DefaultController'] = 'account';
         }
     }
 
