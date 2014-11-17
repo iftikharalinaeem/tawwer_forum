@@ -9,7 +9,7 @@ class SubcommunityToggleModule extends Gdn_Module {
     }
 
     public function ToString() {
-        $this->SetData('Sites', SubcommunityModel::all());
+        $this->SetData('Subcommunities', SubcommunityModel::all());
         $this->SetData('Current', SubcommunityModel::getCurrent());
 
         return parent::ToString();
