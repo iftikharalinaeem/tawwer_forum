@@ -14,6 +14,9 @@ $PluginInfo['subcommunities'] = array(
 class SubcommunitiesPlugin extends Gdn_Plugin {
     /// Properties ///
 
+    protected $savedDefaultRoute = '';
+    protected $savedDoHeadings = '';
+
     /// Methods ///
 
     /**
@@ -139,6 +142,12 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
                 redirectUrl($url, Debug() ? 302 : 301);
             }
         }
+
+        $this->savedDoHeadings = C('Vanilla.Categories.DoHeadings');
+        $navDepth = C('Vanilla.Categories.NavDepth', 0);
+        if ($navDepth == 0) {
+            SaveToConfig('Vanilla.Categories.NavDepth', 1);
+        }
     }
 
     /**
@@ -164,6 +173,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             if (is_array($defaultRoute)) {
                 $defaultRoute = array_shift($defaultRoute);
             }
+            $this->savedDefaultRoute = $defaultRoute;
             switch ($defaultRoute) {
                 case 'categories':
                     $defaultRoute = ltrim(CategoryUrl($category, '', '/'), '/');
@@ -182,6 +192,12 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 //
 //            $sender->EventArguments['Routes']['DefaultForumRoot'] = 'account';
 //            $sender->EventArguments['Routes']['DefaultController'] = 'account';
+        }
+    }
+
+    public function settingsController_homepage_render($sender) {
+        if ($this->savedDefaultRoute) {
+            $sender->setData('CurrentTarget', $this->savedDefaultRoute);
         }
     }
 
