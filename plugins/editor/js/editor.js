@@ -213,14 +213,14 @@
          $(document).on('mouseup', '.Spoiled', function(e) {
             // Do not close if its a link or user selects some text.
             if (!document.getSelection().toString().length && e.target.nodeName.toLowerCase() != 'a') {
-               $(e.target).removeClass('Spoiled').addClass('Spoiler');
+               $(this).removeClass('Spoiled').addClass('Spoiler');
             }
-            e.stopPropagation(); // For nesting
+            e.stopPropagation(); // for nesting
          });
 
          $(document).on('mouseup', '.Spoiler', function(e) {
-            $(e.target).removeClass('Spoiler').addClass('Spoiled');
-            e.stopPropagation(); // For nesting
+            $(this).removeClass('Spoiler').addClass('Spoiled');
+            e.stopPropagation(); // for nesting
          });
 
 
