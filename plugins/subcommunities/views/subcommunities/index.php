@@ -17,7 +17,7 @@
     ?>
 </div>
 <div class="Wrap">
-    <?php echo Anchor(sprintf(T('Add %s'), T('Site')), '/subcommunities/add', 'Popup SmallButton'); ?>
+    <?php echo Anchor(sprintf(T('Add %s'), T('Subcommunity')), '/subcommunities/add', 'Popup SmallButton'); ?>
 </div>
 
 <div id="sites-wrap">
