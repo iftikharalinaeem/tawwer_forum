@@ -8,7 +8,7 @@
 $PluginInfo['ElasticLogSearch'] = array(
     'Name' => 'Elastic Log Search',
     'Description' => 'Use elastic search to display log data.',
-    'Version' => '1.0alpha',
+    'Version' => '1.1alpha',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => FALSE,
     'Author' => 'John Ashton',
@@ -17,6 +17,12 @@ $PluginInfo['ElasticLogSearch'] = array(
 );
 
 class ElasticLogSearch extends Gdn_Plugin {
+
+    /**
+     * Development mode.
+     * @var bool
+     */
+    public $localHostDev = false;
 
     public $severityOptions = array(
         'info' => true,
@@ -31,6 +37,9 @@ class ElasticLogSearch extends Gdn_Plugin {
      */
     public function SettingsController_EventLog2_Create($Sender, $Page = '') {
         $Sender->Permission('Garden.Settings.Manage');
+
+        $Sender->AddJsFile('eventlog.js', 'plugins/ElasticLogSearch');
+        $Sender->AddCssFile('eventlog.css', 'plugins/ElasticLogSearch');
 
         $elasticSearch = Elastic::connection('log');
 
@@ -48,7 +57,7 @@ class ElasticLogSearch extends Gdn_Plugin {
             if (!$v) {
                 $Sender->Form->AddError('Invalid Date format for From Date.');
             }
-            $params['body']['query']['range']['@timestamp']['gte'] = $v;
+            $params['body']['query']['range']['message.timestamp']['gte'] = strtotime($v);
             $Sender->Form->SetFormValue('datefrom', $get['datefrom']);
         }
 
@@ -57,7 +66,7 @@ class ElasticLogSearch extends Gdn_Plugin {
             if (!$v) {
                 $Sender->Form->AddError('Invalid Date format for To Date.');
             }
-            $params['body']['query']['range']['@timestamp']['lte'] = $v;
+            $params['body']['query']['range']['message.timestamp']['lte'] = strtotime($v);
             $Sender->Form->SetFormValue('dateto', $get['dateto']);
         }
 
@@ -88,7 +97,7 @@ class ElasticLogSearch extends Gdn_Plugin {
             }
         }
 
-        //$params['sort']['message.timestamp'] = array('order' => $sortOrder);
+        $params['sort'] = array('@timestamp:' . $sortOrder);
         $Sender->Form->SetFormValue('sortorder', $sortOrder);
 
         $params['from'] = $offset;
@@ -105,6 +114,7 @@ class ElasticLogSearch extends Gdn_Plugin {
             $searchMessage = json_decode($e->getMessage());
             Trace($searchMessage, TRACE_ERROR);
             $events = array();
+            $results = array();
         }
 
         // Application calculation.
@@ -115,7 +125,7 @@ class ElasticLogSearch extends Gdn_Plugin {
             unset($event['Domain'], $event['Path']);
         }
 
-        $Sender->SetData('_CurrentRecords', count($events));
+        $Sender->SetData('_CurrentRecords', count(valr('hits.hits', $results, 0)));
 
         $Sender->AddSideMenu();
         $SeverityOptions = self::getArrayWithKeysAsValues($this->severityOptions);
@@ -144,7 +154,11 @@ class ElasticLogSearch extends Gdn_Plugin {
     public function convertHitsToRows($hits) {
         $rows = array();
         foreach ($hits as $hit) {
+
             $message = FormatString(valr('_source.message.msg', $hit), valr('_source.message', $hit));
+            if ($message == '') {
+                continue;
+            }
             $rows[] = array(
                 'ID' => $hit['_id'],
                 'Timestamp' => valr('_source.message.timestamp', $hit),
@@ -156,6 +170,7 @@ class ElasticLogSearch extends Gdn_Plugin {
                 'UserID' => valr('_source.message.userid', $hit),
                 'Username' => valr('_source.message.username', $hit),
                 'IP' => valr('_source.message.ip', $hit),
+                'Source' => $hit
             );
         }
         return $rows;
@@ -178,8 +193,9 @@ class ElasticLogSearch extends Gdn_Plugin {
      */
     public function VanillaController_TestElastic_Create() {
 
-        // Remove for localhost testing.
-        return;
+        if (!$this->localHostDev) {
+            return;
+        }
 
         $es = Elastic::connection('log');
 
@@ -193,22 +209,29 @@ class ElasticLogSearch extends Gdn_Plugin {
 
 
         // Search Query.
-        $params['body']['query']['match']['message'] = 'GET';
-        $params['body']['query']['wildcard']['message.msg'] = 'method';
-        $params['body']['query']['wildcard']['message.url'] = 'cleanspeak*';
-        $params['body']['query']['wildcard']['host'] = 'app1';
+//        $params['body']['query']['match']['message'] = 'GET';
+//        $params['body']['query']['wildcard']['message.msg'] = 'method';
+//        $params['body']['query']['wildcard']['message.url'] = 'cleanspeak*';
+//        $params['body']['query']['wildcard']['host'] = 'app1';
+//
+//        $params['body']['query']['range']['@timestamp']['gte'] = '2010-10-20T21:00:08+00:00';
+//        $params['body']['query']['range']['message.timestamp']['gte'] = 1677972800;
+//        $params['body']['query']['nested'] = 'msg';
 
-        $params['body']['query']['range']['@timestamp']['gte'] = '2010-10-20T21:00:08+00:00';
-        $params['body']['query']['range']['message.timestamp']['gte'] = 1677972800;
-        $params['body']['query']['nested'] = 'msg';
-        $params['sort']['@timestamp'] = array('order' => 'desc');
+        $params['sort'] = array('@timestamp:desc');
+        //$params['sort'] = array('@timestamp:asc');
         $results = $es->search($params);
+
+        $query = array();
+        $query['wildcard']['message.msg'] = 'cleanspeak';
+
+        $params['body']['query'] = $query;
+
         echo '<pre>';
-        var_export($params);
-        var_export($results);
 
         $events = $this->convertHitsToRows($results['hits']['hits']);
-        var_export($events);
+        echo json_encode(array('params' => $params, 'results' => $results), JSON_PRETTY_PRINT);
+        echo '</pre>';
 
 
     }
@@ -224,9 +247,9 @@ class ElasticLogSearch extends Gdn_Plugin {
      */
     public function Elastic_GetIdentity_Handler($sender, $args) {
 
-        //Remove this for localhost testing.
-        return;
-
+        if (!$this->localHostDev) {
+            return;
+        }
         $key = $args['key'];
 
         // Hosts

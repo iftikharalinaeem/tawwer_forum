@@ -7,80 +7,13 @@
 ?>
 <script>
     $( document ).ready(function() {
-        $( "#filter-reset" ).click(function() {
+        $( "#filter-reset" ).click(function(e) {
             $("#filter-form")[0].reset();
             window.location.href = '<?php echo Url('/settings/eventlog2'); ?>';
         });
     });
 </script>
 
-<style>
-    .cf:before,
-    .cf:after {
-        content: " "; /* 1 */
-        display: table; /* 2 */
-    }
-
-    .cf:after {
-        clear: both;
-    }
-
-    .odd {background-color: #f4f4f4;}
-    tr:hover {
-        background-color: lightyellow;
-    }
-    .float-left {
-        float: left;
-    }
-    .floatfix {
-        float: left;
-        width: 100%
-    }
-    .blockgrid {
-        margin-left: -20px;
-    }
-    .blockgrid li.float-left {
-        padding: 0 20px;
-    }
-    input.Short {
-        width: 165px;
-    }
-    .buttons {
-        margin-top: 15px;
-    }
-    .table-el {
-        table-layout: fixed;
-    }
-
-    .table-el th,
-    .table-el td {
-        padding: 5px 8px;
-        word-wrap: break-word;
-    }
-
-    .el-date {
-        width: 100px;
-    }
-    .el-user {
-        width: 100px;
-    }
-    .el-severity {
-        width: 75px;
-    }
-    .el-event {
-        width: 150px;
-    }
-    .el-ip {
-        width: 100px;
-    }
-
-/*<th class="el-date">Date</th>*/
-/*<th class="el-message">Message</th>*/
-/*<th class="el-user">User</th>*/
-/*<th class="el-severity">Severity</th>*/
-/*<th class="el-event">Event</th>*/
-/*<th class="el-ip">IP Address</th>*/
-</style>
 
 <h1>Event Logs</h1>
 <?php
@@ -135,11 +68,13 @@ echo $this->Form->Errors();
     <tbody>
         <?php
         $i = 0;
-        foreach ($this->Data['Events'] as $event) {
+        foreach ($this->Data['Events'] as $ID => $event) {
             $i++;
-
+            $class = 'severity-' . Logger::priorityLabel($event['Level']);
+            $class .= $i%2 == 0 ? ' odd' : ' even';
+            $class .= ' LogRow';
             ?>
-            <tr class="severity-<?php echo Logger::priorityLabel($event['Level']); echo $i%2 == 0 ? ' odd' : ' even' ;?>">
+            <tr class="<?php echo $class; ?>" id="Event_<?php echo $ID; ?>">
                 <td><?php echo Gdn_Format::DateFull($event['Timestamp'], 'html'); ?></td>
                 <td><?php echo htmlspecialchars($event['Message']); ?></td>
                 <td class="UsernameCell">
@@ -157,6 +92,14 @@ echo $this->Form->Errors();
                 <td><?php echo Anchor($event['IP'], Url('/user/browse?Keywords='.urlencode($event['IP']))); ?></td>
 
             </tr>
+
+            <tr id="Source_Event_<?php echo $ID; ?>" style="display:none;">
+                <td colspan="6">
+                    <pre><?php echo json_encode($event['Source'], JSON_PRETTY_PRINT); ?>
+                    </pre>
+                </td>
+            </tr>
+
             <?php
         }
         ?>
