@@ -208,24 +208,21 @@
          }());
 
          /**
-          * Toggle spoilers in posted messages.
+          * Toggle spoilers.
           */
-         var editorToggleSpoiler = (function() {
-            // Use event delegation, so that even new comments ajax posted
-            // can be toggled
-            $('.MessageList')
-            .on('mouseup.Spoiler', '.Spoiler', function(e) {
-                  $(e.target).removeClass('Spoiler').addClass('Spoiled');
-                  e.stopPropagation(); // For nesting
-            })
-            .on('mouseup.Spoiled', '.Spoiled', function(e) {
-               // If the user selects some text, don't close the spoiler, and
-               // if there is an anchor in spoiler, do not close spoiler.
-               if (!document.getSelection().toString().length && e.target.nodeName.toLowerCase() != 'a') {
-                  $(e.target).removeClass('Spoiled').addClass('Spoiler');
-               }
-            });
-         }());
+         $(document).on('mouseup', '.Spoiled', function(e) {
+            // Do not close if its a link or user selects some text.
+            if (!document.getSelection().toString().length && e.target.nodeName.toLowerCase() != 'a') {
+               $(this).removeClass('Spoiled').addClass('Spoiler');
+            }
+            e.stopPropagation(); // for nesting
+         });
+
+         $(document).on('mouseup', '.Spoiler', function(e) {
+            $(this).removeClass('Spoiler').addClass('Spoiled');
+            e.stopPropagation(); // for nesting
+         });
+
 
          /**
           * Lights on/off in fullpage
@@ -732,6 +729,10 @@
             case 'markdown':
                imgTag = '![](' + href + ' "")';
                break;
+            case 'text':
+            case 'textex':
+               imgTag = '';
+               break;
          }
 
          return imgTag;
@@ -1197,7 +1198,9 @@
                            try {
                               // i don't know why adding [0] to this when iframe
                               // matters, and clear up part of t problem.
-                           $(editor).replaceSelectedText(imgTag + '\n');
+                              if (imgTag) {
+                                 $(editor).replaceSelectedText(imgTag + '\n');
+                              }
                            } catch(ex){}
                         }
                      }
