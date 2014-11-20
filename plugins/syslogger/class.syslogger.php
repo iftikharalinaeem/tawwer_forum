@@ -53,9 +53,12 @@ class Syslogger extends BaseLogger {
     }
 
     protected function logJson($priority, $message, array $context = array()) {
+        $fullmsg = FormatString($message, $context);
+
         // Add the standard fields to the row.
         $row = array_merge([
             'msg' => $message,
+            'fullmsg' => $fullmsg,
             'priority' => Logger::levelPriority($priority)
         ], $context);
 
