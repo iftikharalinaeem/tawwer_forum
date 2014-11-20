@@ -31,7 +31,7 @@
             <div><?php echo $this->Form->TextBox('Location'); ?></div>
          </div>
          
-         <?php $Both = $this->Data('Event.DateEnds') ? ' Both' : ''; ?>
+         <?php $Both = HasEndDate($this->Data['Event']) ? ' Both' : ''; ?>
          <div class="EventTime Times <?php echo $Both; ?>">
             
             <div class="P From">

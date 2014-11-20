@@ -66,6 +66,20 @@ function WriteEventCard($Event) {
 }
 endif;
 
+if (!function_exists('HasEndDate')) :
+
+/**
+ * Check whether event ends.
+ *
+ * @param $Event
+ * @return bool
+ */
+function HasEndDate($Event) {
+   // Event has no end date if start date equals end date.
+   return !($Event['DateEnds'] === $Event['DateStarts']);
+}
+
+endif;
 
 if (!function_exists('WriteEventCards')) :
 /**
