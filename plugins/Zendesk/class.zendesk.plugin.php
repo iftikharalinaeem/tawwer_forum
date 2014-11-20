@@ -689,6 +689,11 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (!$this->isConfigured()) {
             return;
         }
+        //Staff Only
+        $Session = Gdn::Session();
+        if (!$Session->CheckPermission('Garden.Staff.Allow')) {
+            return;
+        }
         $Sf = GetValueR('User.Attributes.' . self::PROVIDER_KEY, $Args);
         Trace($Sf);
         $Profile = GetValueR('User.Attributes.' . self::PROVIDER_KEY . '.Profile', $Args);
