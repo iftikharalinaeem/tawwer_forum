@@ -201,8 +201,7 @@ class GithubPlugin extends Gdn_Plugin {
             return;
         }
         //Staff Only
-        $Session = Gdn::Session();
-        if (!$Session->CheckPermission('Garden.Staff.Allow')) {
+        if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
             return;
         }
         $Sf = GetValueR('User.Attributes.' . self::PROVIDER_KEY, $Args);

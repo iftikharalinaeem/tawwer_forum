@@ -87,8 +87,7 @@ class SalesforcePlugin extends Gdn_Plugin {
          return;
       }
       //Staff Only
-      $Session = Gdn::Session();
-      if (!$Session->CheckPermission('Garden.Staff.Allow')) {
+      if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
           return;
       }
       $Sf = GetValueR('User.Attributes.' . Salesforce::ProviderKey, $Args);
