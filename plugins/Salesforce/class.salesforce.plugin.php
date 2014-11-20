@@ -86,6 +86,10 @@ class SalesforcePlugin extends Gdn_Plugin {
       if (!Salesforce::IsConfigured()) {
          return;
       }
+      //Staff Only
+      if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+          return;
+      }
       $Sf = GetValueR('User.Attributes.' . Salesforce::ProviderKey, $Args);
       Trace($Sf);
       $Profile = GetValueR('User.Attributes.' . Salesforce::ProviderKey . '.Profile', $Args);

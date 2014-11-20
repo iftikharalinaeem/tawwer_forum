@@ -26,7 +26,7 @@
       <?php $EmptyMessage = T('GroupEmptyEvents', "Aw snap, no events are coming up."); ?>
       <?php WriteEventList($this->Data('Events'), $this->Data('Group'), $EmptyMessage); ?>
       <?php
-      echo '<div class="MoreWrap">'.Anchor(sprintf(T('All %s'), T('Event')), Url(CombinePaths(array("/events/group/", GroupSlug($this->Data('Group')))))).'</div>';
+      echo '<div class="MoreWrap">'.Anchor(sprintf(T('All %s'), T('Events')), Url(CombinePaths(array("/events/group/", GroupSlug($this->Data('Group')))))).'</div>';
       ?>
    </div>
    
