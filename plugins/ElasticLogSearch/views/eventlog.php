@@ -9,15 +9,15 @@
     $( document ).ready(function() {
         $( "#filter-reset" ).click(function(e) {
             $("#filter-form")[0].reset();
-            window.location.href = '<?php echo Url('/settings/eventlog2'); ?>';
+            window.location.href = '<?php echo Url('/settings/applog'); ?>';
         });
     });
 </script>
 
 
-<h1>Event Logs</h1>
+<h1>Application Log</h1>
 <?php
-echo $this->Form->Open(array('action' => URL('/settings/eventlog2'), 'Method' => 'GET', 'id' => 'filter-form'));
+echo $this->Form->Open(array('action' => URL('/settings/applog'), 'Method' => 'GET', 'id' => 'filter-form'));
 echo $this->Form->Errors();
 ?>
 <div class="floatfix">
@@ -94,7 +94,7 @@ echo $this->Form->Errors();
                 </td>
                 <td><?php echo htmlspecialchars(Logger::priorityLabel($event['Priority'])); ?></td>
                 <td><?php echo htmlspecialchars($event['Event']); ?></td>
-                <td><?php echo Anchor($event['IP'], Url('/user/browse?Keywords='.urlencode($event['IP']))); ?></td>
+                <td><?php echo Anchor($event['IP'], '/settings/applog/?ipaddress='.urlencode($event['IP'])); ?></td>
                 <td><?php echo $event['SiteName']; ?></td>
             </tr>
 
@@ -119,8 +119,8 @@ echo $this->Form->Errors();
 
 <p>This report is also available in JSON or XML</p>
 <ul>
-    <li><?php echo Anchor('JSON', '/settings/eventlog2.json?'.$this->Data['CurrentFilter']); ?></li>
-    <li><?php echo Anchor('XML', '/settings/eventlog2.xml?'.$this->Data['CurrentFilter']); ?></li>
+    <li><?php echo Anchor('JSON', '/settings/applog.json?'.$this->Data['CurrentFilter']); ?></li>
+    <li><?php echo Anchor('XML', '/settings/applog.xml?'.$this->Data['CurrentFilter']); ?></li>
 </ul>
 
 </div>

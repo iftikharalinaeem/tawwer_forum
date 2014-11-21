@@ -24,11 +24,16 @@ class ElasticLogSearch extends Gdn_Plugin {
      */
     public $localHostDev = false;
 
+    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+        $Menu = &$Sender->EventArguments['SideMenu'];
+        $Menu->AddLink('Dashboard', T('Application Log'), '/settings/applog', 'Garden.Settings.Manage');
+    }
+
     /**
      * @param SettingsController $Sender
      * @param string $Page
      */
-    public function SettingsController_EventLog2_Create($Sender, $Page = '') {
+    public function SettingsController_Applog_Create($Sender, $Page = '') {
         $Sender->Permission('Garden.Settings.Manage');
 
         $Sender->AddJsFile('eventlog.js', 'plugins/ElasticLogSearch');
@@ -145,8 +150,6 @@ class ElasticLogSearch extends Gdn_Plugin {
             unset($event['Domain'], $event['Path']);
         }
 
-        $Sender->SetData('_CurrentRecords', count(valr('hits.hits', $results, 0)));
-
         $Sender->AddSideMenu();
         $PriorityOptions = array(
             Logger::DEBUG => LOG_DEBUG,
@@ -175,6 +178,13 @@ class ElasticLogSearch extends Gdn_Plugin {
                 'CurrentFilter' => $CurrentFilter
             )
         );
+
+        $Pager = PagerModule::Current();
+        $totalRecords = valr('hits.total', $results, 0);
+        unset($filter['Page']);
+        $CurrentFilter = http_build_query($filter);
+        $Pager->Configure($offset, $limit, $totalRecords, '/settings/applog?' . $CurrentFilter . '&Page={Page}');
+
 
         $Sender->Render('eventlog', '', 'plugins/ElasticLogSearch');
     }
