@@ -1,7 +1,7 @@
 <?php
 PagerModule::Write(array('Sender' => $this));
 ?>
-    <table id="MinisiteTable" class="Sortable AltColumns">
+    <table id="SubcommunityTable" class="Sortable AltColumns">
         <thead>
         <tr>
             <th><?php echo T('Name'); ?></th>

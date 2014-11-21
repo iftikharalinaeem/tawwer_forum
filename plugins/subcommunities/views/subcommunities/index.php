@@ -2,12 +2,12 @@
 
 <h1><?php echo $this->Data('Title'); ?></h1>
 
-<?php echo $this->form->Open(array('action' => Url('/minisites'))); ?>
+<?php echo $this->form->Open(array('action' => Url('/subcommunities'))); ?>
 <div class="Wrap">
     <?php
     echo $this->form->Errors();
 
-    echo '<div>', T('Search minisites.', 'Search for sites by the name or slug.'), '</div>';
+    echo '<div>', T('Search subcommunities.', 'Search for subcommunities by the name or slug.'), '</div>';
 
     echo '<div>';
     echo $this->form->TextBox('search');
