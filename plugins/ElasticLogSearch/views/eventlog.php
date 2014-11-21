@@ -35,8 +35,8 @@ echo $this->Form->Errors();
             <?php echo $this->Form->TextBox('event', array('class' => 'InputBox Short')); ?>
         </li>
         <li class="float-left">
-            <?php echo $this->Form->Label('Site ID', 'siteid');  ?>
-            <?php echo $this->Form->TextBox('siteid', array('class' => 'InputBox Shorter')); ?>
+            <?php echo $this->Form->Label('IP', 'ipaddress');  ?>
+            <?php echo $this->Form->TextBox('ipaddress', array('class' => 'InputBox Short')); ?>
         </li>
         <li class="float-left">
             <?php echo $this->Form->Label('Priority', 'priority');  ?>
@@ -65,7 +65,7 @@ echo $this->Form->Errors();
             <th class="el-priority">Priority</th>
             <th class="el-event">Event</th>
             <th class="el-ip">IP Address</th>
-            <th class="el-site">Site ID</th>
+            <th class="el-site">Site Name</th>
         </tr>
     </thead>
 
@@ -95,7 +95,7 @@ echo $this->Form->Errors();
                 <td><?php echo htmlspecialchars(Logger::priorityLabel($event['Priority'])); ?></td>
                 <td><?php echo htmlspecialchars($event['Event']); ?></td>
                 <td><?php echo Anchor($event['IP'], Url('/user/browse?Keywords='.urlencode($event['IP']))); ?></td>
-                <td><?php echo (int)$event['SiteID']; ?></td>
+                <td><?php echo $event['SiteName']; ?></td>
             </tr>
 
             <?php

@@ -44,7 +44,7 @@ class ElasticLogSearch extends Gdn_Plugin {
         $params = array(
             'index' => 'log_vanilla*'
         );
-        $params['body']['query']['filtered']['query'] = array('match_all' => array());
+        //$params['body']['query']['filtered']['query'] = array('match_all' => array());
 
         // Look for query parameters to filter the data.
         if ($v = val('datefrom', $get)) {
@@ -62,7 +62,7 @@ class ElasticLogSearch extends Gdn_Plugin {
             if (!$v) {
                 $Sender->Form->AddError('Invalid Date format for To Date.');
             } else {
-                $to = strtotime($v);
+                $to = $v;
             }
             $Sender->Form->SetFormValue('dateto', $get['dateto']);
         }
@@ -101,6 +101,11 @@ class ElasticLogSearch extends Gdn_Plugin {
         if ($v = val('siteid', $get)) {
             $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.siteid'] = $v;
             $Sender->Form->SetFormValue('siteid ', $v);
+        }
+
+        if ($v = val('ipaddress', $get)) {
+            $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.ip'] = $v;
+            $Sender->Form->SetFormValue('ipaddress', $v);
         }
 
         $sortOrder = 'desc';
@@ -178,6 +183,16 @@ class ElasticLogSearch extends Gdn_Plugin {
 
     public function convertHitsToRows($hits) {
         $rows = array();
+        $siteIDs = array();
+        foreach ($hits as $hit) {
+            $siteID = valr('_source.message.siteid', $hit, 0);
+            if ($siteID > 0) {
+                $siteIDs[$siteID] = true;
+            }
+        }
+        $SQL = GDN::SQL();
+        $Sites = $SQL->Select('SiteID, Name')->From('Multisite')->WhereIn('SiteID', array_keys($siteIDs))->Get()->ResultArray();
+        $Sites = array_column($Sites, 'Name', 'SiteID');
         $i = 0;
         foreach ($hits as $hit) {
 
@@ -197,6 +212,7 @@ class ElasticLogSearch extends Gdn_Plugin {
                 'Username' => valr('_source.message.username', $hit),
                 'IP' => valr('_source.message.ip', $hit),
                 'SiteID' => valr('_source.message.siteid', $hit),
+                'SiteName' => val(valr('_source.message.siteid', $hit), $Sites, 'unknown'),
                 'Source' => ''
             );
             if (C('Debug')) {

@@ -23,7 +23,7 @@ tr:hover {
     margin-left: -20px;
 }
 .blockgrid li.float-left {
-    padding: 0 20px;
+    padding: 0 10px;
 }
 input.Short {
     width: 165px;
@@ -66,5 +66,5 @@ input.Shorter {
 }
 
 .el-site {
-    width: 70px;
+    width: 140px;
 }
