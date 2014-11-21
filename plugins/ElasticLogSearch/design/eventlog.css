@@ -28,6 +28,10 @@ tr:hover {
 input.Short {
     width: 165px;
 }
+input.Shorter {
+    width: 75px;
+}
+
 .buttons {
     margin-top: 15px;
 }
@@ -47,7 +51,7 @@ input.Short {
 .el-user {
     width: 100px;
 }
-.el-severity {
+.el-priority {
     width: 75px;
 }
 .el-event {
@@ -58,5 +62,9 @@ input.Short {
 }
 
 .el-date {
-    width: 180px;
+    width: 145px;
+}
+
+.el-site {
+    width: 70px;
 }

@@ -8,7 +8,7 @@
 $PluginInfo['ElasticLogSearch'] = array(
     'Name' => 'Elastic Log Search',
     'Description' => 'Use elastic search to display log data.',
-    'Version' => '1.1alpha',
+    'Version' => '1.2alpha',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => FALSE,
     'Author' => 'John Ashton',
@@ -23,13 +23,6 @@ class ElasticLogSearch extends Gdn_Plugin {
      * @var bool
      */
     public $localHostDev = false;
-
-    public $severityOptions = array(
-        'info' => true,
-        'notice' => true,
-        'warning' => true,
-        'error' => true,
-    );
 
     /**
      * @param SettingsController $Sender
@@ -51,41 +44,63 @@ class ElasticLogSearch extends Gdn_Plugin {
         $params = array(
             'index' => 'log_vanilla*'
         );
+        $params['body']['query']['filtered']['query'] = array('match_all' => array());
+
         // Look for query parameters to filter the data.
         if ($v = val('datefrom', $get)) {
-            $v = date('c', strtotime($v));
+            $v = strtotime($v);
             if (!$v) {
                 $Sender->Form->AddError('Invalid Date format for From Date.');
+            } else {
+                $from = $v;
             }
-            $params['body']['query']['range']['message.timestamp']['gte'] = strtotime($v);
             $Sender->Form->SetFormValue('datefrom', $get['datefrom']);
         }
 
         if ($v = val('dateto', $get)) {
-            $v = date('c', strtotime($v));
+            $v = strtotime($v);
             if (!$v) {
                 $Sender->Form->AddError('Invalid Date format for To Date.');
+            } else {
+                $to = strtotime($v);
             }
-            $params['body']['query']['range']['message.timestamp']['lte'] = strtotime($v);
             $Sender->Form->SetFormValue('dateto', $get['dateto']);
         }
 
-        $Sender->Form->SetFormValue('severity', 'all');
-        if (($v = val('severity', $get)) && $v != 'all') {
-            $validLevelString = implode(', ', array_keys(array_slice($this->severityOptions, 0, -1)));
-            $validLevelString .= ' and ' . end(array_keys($this->severityOptions));
+        if (isset($from) && isset($to)) {
+            $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.timestamp'] = array(
+                'from' => $from,
+                'to' => $to,
+            );
+        } elseif (isset($to)) {
+            $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.timestamp'] = array(
+                'to' => $to,
+            );
+        } elseif (isset($from)) {
+            $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.timestamp'] = array(
+                'from' => $from,
+            );
+        }
 
-            if (!isset($this->severityOptions[$v])) {
-                $Sender->Form->AddError('Invalid severity.  Valid options are: ' . $validLevelString);
-            }
-            $params['body']['query']['match']['message.priority'] = $v;
-            $Sender->Form->SetFormValue('severity', $v);
+        $Sender->Form->SetFormValue('priority', 'All');
+        if (($v = val('priority', $get)) && $v != 'All') {
+
+            $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.priority'] = array(
+                'to' => $v,
+            );
+
+            $Sender->Form->SetFormValue('priority', $v);
 
         }
 
         if ($v = val('event', $get)) {
-            $params['body']['query']['match']['message.event'] = $v;
+            $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.event'] = $v;
             $Sender->Form->SetFormValue('event', $v);
+        }
+
+        if ($v = val('siteid', $get)) {
+            $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.siteid'] = $v;
+            $Sender->Form->SetFormValue('siteid ', $v);
         }
 
         $sortOrder = 'desc';
@@ -128,8 +143,18 @@ class ElasticLogSearch extends Gdn_Plugin {
         $Sender->SetData('_CurrentRecords', count(valr('hits.hits', $results, 0)));
 
         $Sender->AddSideMenu();
-        $SeverityOptions = self::getArrayWithKeysAsValues($this->severityOptions);
-        $SeverityOptions['all'] = 'All';
+        $PriorityOptions = array(
+            Logger::DEBUG => LOG_DEBUG,
+            Logger::INFO => LOG_INFO,
+            Logger::NOTICE => LOG_NOTICE,
+            Logger::WARNING => LOG_WARNING,
+            Logger::ERROR => LOG_ERR,
+            Logger::CRITICAL => LOG_CRIT,
+            Logger::ALERT => LOG_ALERT,
+            Logger::EMERGENCY => LOG_EMERG
+        );
+        $PriorityOptions = array_flip($PriorityOptions);
+        $PriorityOptions['All'] = 'All';
 
         $filter = Gdn::Request()->Get();
         unset($filter['TransientKey']);
@@ -140,7 +165,7 @@ class ElasticLogSearch extends Gdn_Plugin {
         $Sender->SetData(
             array(
                 'Events' => $events,
-                'SeverityOptions' => $SeverityOptions,
+                'PriorityOptions' => $PriorityOptions,
                 'SortOrder' => $sortOrder,
                 'CurrentFilter' => $CurrentFilter
             )
@@ -153,25 +178,31 @@ class ElasticLogSearch extends Gdn_Plugin {
 
     public function convertHitsToRows($hits) {
         $rows = array();
+        $i = 0;
         foreach ($hits as $hit) {
 
             $message = FormatString(valr('_source.message.msg', $hit), valr('_source.message', $hit));
             if ($message == '') {
                 continue;
             }
-            $rows[] = array(
+            $rows[$i] = array(
                 'ID' => $hit['_id'],
                 'Timestamp' => valr('_source.message.timestamp', $hit),
                 'Event' => valr('_source.message.event', $hit),
-                'Level' => valr('_source.message.level', $hit, 'unknown'),
+                'Priority' => valr('_source.message.priority', $hit, 'unknown'),
                 'Message' => $message,
                 'Domain' => valr('_source.message.domain', $hit),
                 'Path' => valr('_source.message.path', $hit),
                 'UserID' => valr('_source.message.userid', $hit),
                 'Username' => valr('_source.message.username', $hit),
                 'IP' => valr('_source.message.ip', $hit),
-                'Source' => $hit
+                'SiteID' => valr('_source.message.siteid', $hit),
+                'Source' => ''
             );
+            if (C('Debug')) {
+                $rows[$i]['Source'] = $hit;
+            }
+            $i++;
         }
         return $rows;
     }
@@ -199,38 +230,63 @@ class ElasticLogSearch extends Gdn_Plugin {
 
         $es = Elastic::connection('log');
 
-        $indices = $es->indices()->getAliases();
+        $params = array();
+
+        $params['body']['query']['filtered']['query'] = array('match_all' => array());
+
+        $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.event'] = 'security_access';
+        $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.siteid'] = 6021894;
+
+        $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.timestamp'] = array(
+            'from' => 1413931530,
+            'to' => 1413931550,
+        );
+
+//        $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.priority'] = array(
+//            'to' => 7,
+//        );
+
+        //array('term' => array('message.event' => 'security_access'));
+        //$params['body']['query']['filtered']['filter']['bool']['must'][] = array('term' => array('message.siteid' => 6021894));
+//        $params['body']['query']['filtered']['filter'] = array(
+//            'bool' => array(
+//                'must' => array(
+//                    array('term' => array('message.event' => 'security_access')),
+//                    array('term' => array('message.siteid' => 6021894)),
+//                    array('term' => array('message.userid' => 1)),
+//                    array('range' =>
+//                        array(
+//                            'message.timestamp' => array('from' => 1413931530, 'to' => 1413931550),
+////                            'message.priority' => array('from' => 0)
+//                        )
+//                    )
+//                ),
+//            ),
+//        );
+
+
         $params['index'] = 'log_vanilla*';
         //$params['type']  = 'apache_access';
 
         // Pagination params.
         $params['from'] = 0;
         $params['size'] = 30;
-
-
-        // Search Query.
-//        $params['body']['query']['match']['message'] = 'GET';
-//        $params['body']['query']['wildcard']['message.msg'] = 'method';
-//        $params['body']['query']['wildcard']['message.url'] = 'cleanspeak*';
-//        $params['body']['query']['wildcard']['host'] = 'app1';
-//
-//        $params['body']['query']['range']['@timestamp']['gte'] = '2010-10-20T21:00:08+00:00';
-//        $params['body']['query']['range']['message.timestamp']['gte'] = 1677972800;
-//        $params['body']['query']['nested'] = 'msg';
-
         $params['sort'] = array('@timestamp:desc');
-        //$params['sort'] = array('@timestamp:asc');
+
         $results = $es->search($params);
 
-        $query = array();
-        $query['wildcard']['message.msg'] = 'cleanspeak';
-
-        $params['body']['query'] = $query;
 
         echo '<pre>';
 
         $events = $this->convertHitsToRows($results['hits']['hits']);
-        echo json_encode(array('params' => $params, 'results' => $results), JSON_PRETTY_PRINT);
+        echo json_encode(
+            array(
+                'params' => $params,
+                'results' => $results,
+                'events' => $events
+            ),
+            JSON_PRETTY_PRINT
+        );
         echo '</pre>';
 
 

@@ -35,13 +35,16 @@ echo $this->Form->Errors();
             <?php echo $this->Form->TextBox('event', array('class' => 'InputBox Short')); ?>
         </li>
         <li class="float-left">
-            <?php echo $this->Form->Label('Severity', 'severity');  ?>
-            <?php echo $this->Form->DropDown('severity', $this->Data['SeverityOptions']); ?>
+            <?php echo $this->Form->Label('Site ID', 'siteid');  ?>
+            <?php echo $this->Form->TextBox('siteid', array('class' => 'InputBox Shorter')); ?>
+        </li>
+        <li class="float-left">
+            <?php echo $this->Form->Label('Priority', 'priority');  ?>
+            <?php echo $this->Form->DropDown('priority', $this->Data['PriorityOptions']); ?>
         </li>
         <li class="float-left">
             <?php echo $this->Form->Label('Sort Order', 'sortorder');  ?>
             <?php echo $this->Form->DropDown('sortorder', array('desc' => 'DESC', 'asc' => 'ASC')); ?>
-
         </li>
         <li class="float-left buttons">
             <?php echo $this->Form->Button("Filter"); ?>
@@ -59,9 +62,10 @@ echo $this->Form->Errors();
             <th class="el-date">Date</th>
             <th class="el-message">Message</th>
             <th class="el-user">User</th>
-            <th class="el-severity">Severity</th>
+            <th class="el-priority">Priority</th>
             <th class="el-event">Event</th>
             <th class="el-ip">IP Address</th>
+            <th class="el-site">Site ID</th>
         </tr>
     </thead>
 
@@ -70,12 +74,13 @@ echo $this->Form->Errors();
         $i = 0;
         foreach ($this->Data['Events'] as $ID => $event) {
             $i++;
-            $class = 'severity-' . Logger::priorityLabel($event['Level']);
+            $class = 'severity-' . Logger::priorityLabel($event['Priority']);
             $class .= $i%2 == 0 ? ' odd' : ' even';
             $class .= ' LogRow';
             ?>
             <tr class="<?php echo $class; ?>" id="Event_<?php echo $ID; ?>">
-                <td><?php echo Gdn_Format::DateFull($event['Timestamp'], 'html'); ?></td>
+                <td title="<?php echo Gdn_Format::DateFull($event['Timestamp']); ?>">
+                    <?php echo Gdn_Format::ToDateTime($event['Timestamp']); ?></td>
                 <td><?php echo htmlspecialchars($event['Message']); ?></td>
                 <td class="UsernameCell">
                     <?php
@@ -87,20 +92,22 @@ echo $this->Form->Errors();
                     }
                     ?>
                 </td>
-                <td><?php echo htmlspecialchars(Logger::priorityLabel($event['Level'])); ?></td>
+                <td><?php echo htmlspecialchars(Logger::priorityLabel($event['Priority'])); ?></td>
                 <td><?php echo htmlspecialchars($event['Event']); ?></td>
                 <td><?php echo Anchor($event['IP'], Url('/user/browse?Keywords='.urlencode($event['IP']))); ?></td>
-
+                <td><?php echo (int)$event['SiteID']; ?></td>
             </tr>
 
+            <?php
+            if (count($event['Source']) > 1) { ?>
             <tr id="Source_Event_<?php echo $ID; ?>" style="display:none;">
-                <td colspan="6">
+                <td colspan="7  ">
                     <pre><?php echo json_encode($event['Source'], JSON_PRETTY_PRINT); ?>
                     </pre>
                 </td>
             </tr>
-
             <?php
+            }
         }
         ?>
     </tbody>
