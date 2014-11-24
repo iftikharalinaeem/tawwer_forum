@@ -35,7 +35,7 @@
          $ToDate->modify("{$HourOffset} hours");
       }
       $ToDateSlot = $ToDate->format('Ymd');
-      
+
       // If we're 'all day' and only on one day
       if ($AllDay && $FromDateSlot == $ToDateSlot) {
          $DateFormatString = '{Date}';
@@ -56,7 +56,7 @@
       
       // Output format
       $WhenFormat = "{ShowDates.From}{AllDay}";
-      if (sizeof($ShowDates) > 1) {
+      if (sizeof($ShowDates) > 1 && HasEndDate($this->Data['Event'])) {
          $WhenFormat = "{ShowDates.From} <b>until</b> {ShowDates.To}{AllDay}";
       }
       
