@@ -253,7 +253,8 @@ th {
   .Note.Closed,
   .HasNew,
   .Item .Meta .MItem.Category a,
-  .token-input-token {
+  .token-input-token,
+  .TagCloud li a {
     border: 1px solid #000;
   }
   .table,
@@ -2883,7 +2884,8 @@ select[multiple].input-lg {
 .NavButton,
 .SocialIcon,
 .PhotoWrapLarge .ChangePicture,
-.ActionBlock .React {
+.ActionBlock .React,
+.AdvancedSearch .Handle {
   display: inline-block;
   margin-bottom: 0;
   font-weight: normal;
@@ -2963,7 +2965,8 @@ fieldset[disabled] .SocialIcon:active {
 }
 .btn-default,
 .Button,
-.ActionBlock .React {
+.ActionBlock .React,
+.AdvancedSearch .Handle {
   color: #ffffff;
   background-color: #424242;
   border-color: #424242;
@@ -4799,7 +4802,8 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 .Note.Closed,
 .HasNew,
 .Item .Meta .MItem.Category a,
-.token-input-token {
+.token-input-token,
+.TagCloud li a {
   display: inline;
   padding: .2em .6em .3em;
   font-size: 75%;
@@ -4812,7 +4816,8 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
   border-radius: .25em;
 }
 a.label:hover,
-a.label:focus {
+a.label:focus,
+.TagCloud li a:hover {
   color: #ffffff;
   text-decoration: none;
   cursor: pointer;
@@ -4826,7 +4831,8 @@ a.label:focus {
 }
 .label-default,
 .Tag,
-.Item .Meta .MItem.Category a {
+.Item .Meta .MItem.Category a,
+.TagCloud li a {
   background-color: #424242;
 }
 .label-default[href]:hover,
@@ -5428,7 +5434,9 @@ a.list-group-item-danger.active:focus {
 .MessageList .Item,
 .CategoryBox,
 .CategoryGroup,
-.BoxPromoted .DataList .Item {
+.BoxPromoted .DataList .Item,
+.Tiles .Tile,
+.CardWrap .Card {
   margin-bottom: 20px;
   background-color: #222222;
   border: 1px solid transparent;
@@ -5473,7 +5481,9 @@ a.list-group-item-danger.active:focus {
 .panel-footer,
 .MessageForm .Buttons,
 .CategoryBox .MorePager,
-.BoxPromoted .DataList .AuthorWrap {
+.BoxPromoted .DataList .AuthorWrap,
+.Tiles .Tile .AuthorWrap,
+.Cards-Groups .Card .Group-Buttons {
   padding: 10px 15px;
   background-color: #3c3c3c;
   border-top: 1px solid #282828;
@@ -5698,7 +5708,9 @@ a.list-group-item-danger.active:focus {
 .DataTableWrap,
 .MessageList .Item,
 .CategoryBox,
-.CategoryGroup {
+.CategoryGroup,
+.Tiles .Tile,
+.CardWrap .Card {
   border-color: #282828;
 }
 .panel-default > .panel-heading,
@@ -9750,7 +9762,8 @@ form ol {
 .SpFlyoutHandle,
 .ReactSprite,
 .InformSprite,
-a.Bookmark:before {
+a.Bookmark:before,
+.AdvancedSearch .Handle .Arrow:before {
   display: inline-block;
   min-width: 1em;
   font-family: FontAwesome;
@@ -11368,4 +11381,91 @@ h1.H,
 .swiper-active-switch {
   margin-right: 2px;
   margin-left: 2px;
+}
+.token-input-dropdown,
+.ac_results {
+  z-index: 1060 !important;
+}
+.Section-BestOf .page-content,
+.Section-Group .page-content,
+.Section-GroupList .page-content {
+  width: 100%;
+}
+.Section-BestOf .page-sidebar,
+.Section-Group .page-sidebar,
+.Section-GroupList .page-sidebar {
+  display: none;
+}
+.Tiles {
+  margin: -1%;
+}
+.Tiles .Tile {
+  width: 31.33333333% !important;
+  margin: 1% !important;
+}
+.Tiles .Tile .Author {
+  display: block;
+}
+.Tiles .Tile .Author .ProfilePhoto {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+}
+.Tiles .Tile .Reactions {
+  margin-top: 5px;
+}
+.Group-Content {
+  -webkit-column-count: 1 !important;
+  -moz-column-count: 1 !important;
+  column-count: 1 !important;
+}
+.Cards-Groups .Card {
+  padding-bottom: 70px;
+}
+.Cards-Groups .Card .Group-Name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.Cards-Groups .Card .Group-Description {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.Cards-Groups .Card .Group-Buttons {
+  right: 0;
+  left: 0;
+  float: none;
+}
+.AdvancedSearch .Handle .Arrow:before {
+  content: "\f0d7";
+}
+.AdvancedSearch .InputAndButton {
+  position: relative;
+  padding-right: 100px;
+  margin-bottom: 20px;
+}
+.AdvancedSearch .InputAndButton .Handle,
+.AdvancedSearch .InputAndButton .Button {
+  position: absolute;
+  top: 0;
+  width: 40px;
+}
+.AdvancedSearch .InputAndButton .Handle {
+  right: 50px;
+}
+.AdvancedSearch .InputAndButton .Button {
+  right: 0;
+}
+.DataList-Search .MItem-Location {
+  display: none;
+}
+.SpSearch:before {
+  content: "\f002";
+}
+.TagCloud li {
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
 }

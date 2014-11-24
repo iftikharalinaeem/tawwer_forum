@@ -100,8 +100,7 @@
       <div class="container">
         <div class="clearfix">
           <p class="pull-left">{t c="Copyright"} &copy; {$smarty.now|date_format:"%Y"} <a href="{link path="home"}">{logo}</a></p>
-          <p class="pull-right hidden-xs">{t c="Built with"} <i class="InformSprite Heart"></i> {t c="and"} <a href="http://getbootstrap.com">Bootstrap</a>. Powered by <a href="{vanillaurl}">Vanilla Forums</a>.
-          </p>
+          <p class="pull-right hidden-xs">Powered by <a href="{vanillaurl}">Vanilla Forums</a></p>
         </div>
         {asset name="Foot"}
       </div>
