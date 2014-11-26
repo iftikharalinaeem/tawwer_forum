@@ -34,10 +34,12 @@ function PageFooter() {
  * @return bool|mysqli_result
  */
 function Query($Query = '') {
-   global $DB;
+   global $DB, $C;
    $Result = mysqli_query($DB, $Query);
-   echo "<p><pre>".$Query."</pre></p>";
-   echo "<p><pre>".mysqli_error($DB)."</pre></p>";
+   if (isset($C['Debug']) && $C['Debug']) {
+      echo "<p><pre>".$Query."</pre></p>";
+      echo "<p><pre>".mysqli_error($DB)."</pre></p>";
+   }
    return $Result;
 }
 
