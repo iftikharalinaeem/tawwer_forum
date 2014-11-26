@@ -13,4 +13,6 @@ _notes
 .idea
 sso/config.php
 sso/embed.html
+sso/functions.jsconnect.php
+sso/sso.php
 *.log
