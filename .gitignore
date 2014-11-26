@@ -11,3 +11,5 @@ _notes
 .settings
 .buildpath
 .idea
+sso/config.php
+sso/embed.html
