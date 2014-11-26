@@ -25,12 +25,15 @@ Using this mess
 
 ### // YOUR CODE HERE.
 
-In the jsConnectPHP library index.php, you could then use something like this:
+Copy the jsConnectPHP `index.php` file as `sso.php` into this folder (that name is gitignore'd). Copy over its functions file as-is. Then in your new `sso.php`, you could then use something like this:
 
 	<?php
+	include_once('config.php');
+	include_once('functions.php');
+	
 	$Name = GetLogin();
 	if ($Name) {
-	   $User = GetUser($Name); // array to feed jsConnect
+	   $StoredUser = GetUser($Name); // array to map to jsConnect $user array below
 	}
 	// the rest is up to you, grasshopper.
 
