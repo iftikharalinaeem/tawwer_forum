@@ -78,6 +78,10 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
 
+   public function DiscussionController_Comment_Render($Sender, $Args) {
+      $this->DiscussionController_Index_Render($Sender, $Args);
+   }
+
    public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
        $GroupID = Gdn::Request()->Get('groupid');
        if ($GroupID) {
@@ -163,16 +167,22 @@ class GroupsHooks extends Gdn_Plugin {
    }
 
    protected function OverridePermissions($Sender) {
-      $Discussion = $Sender->DiscussionModel->GetID($Sender->ReflectArgs['DiscussionID']);
+      $DiscussionID = valr('ReflectedArgs.DiscussionID', $Sender);
+      if (!$DiscussionID) {
+         $CommentID = valr('ReflectArgs.CommentID', $Sender);
+         $CommentModel = new CommentModel();
+         $Comment = $CommentModel->GetID($CommentID, DATASET_TYPE_ARRAY);
+         $DiscussionID = $Comment['DiscussionID'];
+      }
+      $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
+
       $GroupID = GetValue('GroupID', $Discussion);
       if (!$GroupID)
          return;
-
       $Model = new GroupModel();
       $Group = $Model->GetID($GroupID);
       if (!$Group)
          return;
-
       $Model->OverridePermissions($Group);
    }
 
@@ -196,6 +206,11 @@ class GroupsHooks extends Gdn_Plugin {
    public function DiscussionController_Delete_Before($Sender) {
       $this->OverridePermissions($Sender);
    }
+
+   public function DiscussionController_Comment_Before($Sender) {
+       $this->OverridePermissions($Sender);
+   }
+
 
    /**
     *
