@@ -126,7 +126,8 @@ class AvatarStockPlugin extends Gdn_Plugin {
             'Users',
             T('Avatar Pool'),
             '/settings/avatarstock',
-            'Garden.Settings.Manage'
+            'Garden.Settings.Manage',
+            array('class' => 'nav-avatars')
         );
     }
 

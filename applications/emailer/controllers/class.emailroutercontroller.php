@@ -135,6 +135,7 @@ class EmailRouterController extends Gdn_Controller {
                $Data['Body'] = self::StripEmail($Post['text']);
                $Data['Format'] = 'Html';
             }
+            $Data['Subject'] = substr($Data['Subject'], 0, 100);
             
 //            self::Log("Saving data...");
             $this->Data['_Status'][] = 'Saving data.';
