@@ -587,27 +587,6 @@ class EditorPlugin extends Gdn_Plugin {
       $Sender->AddCssFile('editor.css', 'plugins/editor');
    }
 
-   /**
-   * Replace emoticons in comment preview.
-   */
-  public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
-    if (Emoji::instance()->enabled) {
-         $Sender->Comment->Body = Emoji::instance()->translateToHtml($Sender->Comment->Body);
-      }
-  }
-
-   /**
-   * Replace emoticons in comments.
-   */
-  public function Base_AfterCommentFormat_Handler($Sender) {
-     // Spoilers plugin compatibility.
-     //$this->RenderSpoilers($Sender);
-     if (Emoji::instance()->enabled) {
-        $Object = $Sender->EventArguments['Object'];
-        $Object->FormatBody = Emoji::instance()->translateToHtml($Object->FormatBody);
-        $Sender->EventArguments['Object'] = $Object;
-     }
-  }
 
    /**
     * Check if comments are embedded.
