@@ -317,6 +317,10 @@ class RankModel extends Gdn_Model {
          $Result[] = Plural($V, '%s post', '%s posts');
       }
 
+      if ($V = GetValue('Role', $Criteria)) {
+         $Result[] = sprintf(T('Must have role of %s'), $V);
+      }
+
       if (isset($Criteria['Permission'])) {
          $Permissions = (array)$Criteria['Permission'];
          foreach ($Permissions as $Permission) {
@@ -481,6 +485,25 @@ class RankModel extends Gdn_Model {
          $CountPosts = GetValue('CountDiscussions', $User, 0) + GetValue('CountComments', $User, 0);
          if ($CountPosts < $Criteria['CountPosts'])
             return FALSE;
+      }
+
+      if ($Role = GetValue('Role', $Criteria)) {
+         $RoleList = RoleModel::GetByName($Role);
+         $RankRoleID = array_keys($RoleList)[0];
+
+         $UserModel = new UserModel();
+         $RoleData = $UserModel->GetRoles(GetValue('UserID', $User));
+         $UserRoles = $RoleData->Result(DATASET_TYPE_ARRAY);
+
+         $RoleMatch = FALSE;
+         foreach ($UserRoles as $UserRole) {
+            if (GetValue('RoleID', $UserRole) == $RankRoleID) {
+               $RoleMatch = TRUE;
+            }
+         }
+         if(!$RoleMatch) {
+            return FALSE;
+         }
       }
 
       if (isset($Criteria['Permission'])) {
