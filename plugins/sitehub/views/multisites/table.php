@@ -5,9 +5,10 @@ PagerModule::Write(array('Sender' => $this));
     <thead>
     <tr>
         <th><?php echo T('Name'); ?></th>
-        <th><?php echo T('Url') ?></th>
-        <th><?php echo T('Last Sync') ?></th>
-        <th><?php echo T('Status') ?></th>
+        <th><?php echo T('Url'); ?></th>
+        <th><?php echo T('Last Sync'); ?></th>
+        <th><?php echo T('Status'); ?></th>
+        <th><?php echo T('Options'); ?></th>
     </tr>
     </thead>
     <tbody>
@@ -27,6 +28,11 @@ PagerModule::Write(array('Sender' => $this));
                 ?>
             </td>
             <td><?php echo strtolower($Row['Status']); ?></td>
+            <td>
+                <?php
+                echo Anchor(T('Delete'), "/multisites/{$Row['MultisiteID']}/delete", 'SmallButton Popup');
+                ?>
+            </td>
         </tr>
     <?php
     endforeach;

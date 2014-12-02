@@ -102,7 +102,7 @@ class MultisitesController extends DashboardController {
         $id = $this->site['MultisiteID'];
         $data = array_change_key_case(Gdn::Request()->Post());
 
-        if (val('build', $data) === 'success') {
+        if (val('operation', $data) === 'success') {
             MultisiteModel::instance()->status($id, 'active');
             MultisiteModel::instance()->Update(['SiteID' => valr('site.SiteID', $data)]);
             Trace("Status of site $id set to active.");
@@ -196,6 +196,8 @@ class MultisitesController extends DashboardController {
     }
 
     protected function post() {
+        $this->Permission('Garden.Settings.Manage');
+
         if ($this->site) {
             throw new Gdn_UserException('Site invalid when creating a site.');
         }
@@ -217,8 +219,51 @@ class MultisitesController extends DashboardController {
         $this->Render('api');
     }
 
-    protected function delete() {
-        throw ForbiddenException('DELETE');
+    public function delete() {
+        $this->Permission('Garden.Settings.Manage');
+
+        if (!$this->site) {
+            throw NotFoundException('Site');
+        }
+
+        $this->Form = new Gdn_Form();
+
+        if ($this->Form->AuthenticatedPostBack()) {
+            if (!$this->siteModel->queueDelete($this->site['MultisiteID'])) {
+
+            }
+        }
+
+        $this->Title(sprintf(T('Delete %s'), T('Site')));
+        $this->Render('Delete');
+    }
+
+    /**
+     * The callback for when a site has been built.
+     * @throws Gdn_UserException Thrown when the site was not found.
+     */
+    public function deletecallback() {
+        $this->Permission('Garden.Settings.Manage');
+
+        if (Gdn::Request()->RequestMethod() !== 'POST') {
+            throw new Gdn_UserException("This resource only accepts POST.", 405);
+        }
+
+        if (!$this->site) {
+            throw NotFoundException('Site');
+        }
+        $id = $this->site['MultisiteID'];
+        $data = array_change_key_case(Gdn::Request()->Post());
+
+        if (val('result', $data) === 'success') {
+            MultisiteModel::instance()->delete(['MultisiteID' => $id]);
+        } else {
+            MultisiteModel::instance()->status($id, 'error', val('status', $data));
+            MultisiteModel::instance()->SaveAttribute($id, 'callback', $data);
+            Trace("Status of site $id set to error.");
+        }
+
+        $this->Render('API');
     }
 
     /**

@@ -61,6 +61,62 @@ class MultisiteModel extends Gdn_Model {
         return $key;
     }
 
+    /**
+     * Queue a site for deletion.
+     *
+     * @param string $id The MultisiteID of the site.
+     * @return bool Returns true if the site was successfully queued for delete.
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    public function queueDelete($id) {
+        if (!class_exists('Communication')) {
+            throw new Gdn_UserException('Communication with the orchestration server is not enabled.', 500);
+        }
+
+        $site = $this->getID($id);
+        if (!$site) {
+            throw NotFoundException('Site');
+        }
+
+        $valid = true;
+
+        if (!in_array($site['Status'], ['active', 'error'])) {
+            $this->Validation->AddValidationResult('Status', 'Cannot delete a site that isn\'t active.');
+            $valid = false;
+        }
+
+        if (!$valid) {
+            return false;
+        }
+
+        $deleteQuery = Communication::orchestration('/site/delete')
+            ->method('post')
+            ->parameter('siteid', val('SiteID', $site))
+            ->parameter('callback', [
+                'url' => Gdn::Request()->Domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/deletecallback.json",
+                'headers' => [
+                    'Authorization' => self::apikey(true)
+                ]
+            ]);
+        $deleteResponse = $deleteQuery->send();
+
+        if ($deleteQuery->responseClass('2xx')) {
+            // The site built.
+            $this->SetField($id, [
+                'Status' => 'deleting',
+                'DateStatus' => Gdn_Format::ToDateTime(),
+                'SiteID' => valr('site.SiteID', $deleteResponse)
+            ]);
+            return true;
+        } else {
+            // The site has an error.
+            $error = $deleteQuery->errorMsg();
+            $this->Validation->AddValidationResult('MultisiteID', '@'.$error);
+            return false;
+        }
+    }
+
     public function build($id) {
         if (!class_exists('Communication')) {
             $this->status($id, 'error', 'Communication with the orchestration server is not enabled.');
