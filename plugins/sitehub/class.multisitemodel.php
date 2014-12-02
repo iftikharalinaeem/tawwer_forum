@@ -145,7 +145,7 @@ class MultisiteModel extends Gdn_Model {
             ->method('post')
             ->parameter('name', $name)
             ->parameter('accountid', Infrastructure::site('accountid'))
-//            ->parameter('domain', Gdn::Request()->Host())
+            ->parameter('domain', Gdn::Request()->Host()) // TODO: make work for non-dirs
             ->parameter('flavor', 'node')
             ->parameter('callback', [
                 'url' => Gdn::Request()->Domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/buildcallback.json",
