@@ -102,7 +102,7 @@ class MultisitesController extends DashboardController {
         $id = $this->site['MultisiteID'];
         $data = array_change_key_case(Gdn::Request()->Post());
 
-        if (val('operation', $data) === 'success') {
+        if (val('result', $data) === 'success') {
             MultisiteModel::instance()->status($id, 'active');
             MultisiteModel::instance()->Update(['SiteID' => valr('site.SiteID', $data)]);
             Trace("Status of site $id set to active.");
