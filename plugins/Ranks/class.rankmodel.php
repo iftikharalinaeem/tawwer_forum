@@ -487,21 +487,17 @@ class RankModel extends Gdn_Model {
             return FALSE;
       }
 
-      if ($Role = GetValue('Role', $Criteria)) {
-         $RoleList = RoleModel::GetByName($Role);
-         $RankRoleID = array_keys($RoleList)[0];
+      if ($Role = val('Role', $Criteria)) {
+         $Roles = RoleModel::GetByName($Role);
+         $RankRoleID = key($Roles);
 
-         $UserModel = new UserModel();
+         $UserModel = Gdn::UserModel();
+         // TODO: Refactor: Make method GetRoleIDs in UserModel.
          $RoleData = $UserModel->GetRoles(GetValue('UserID', $User));
          $UserRoles = $RoleData->Result(DATASET_TYPE_ARRAY);
+         $UserRoles = array_column($UserRoles, 'RoleID');
 
-         $RoleMatch = FALSE;
-         foreach ($UserRoles as $UserRole) {
-            if (GetValue('RoleID', $UserRole) == $RankRoleID) {
-               $RoleMatch = TRUE;
-            }
-         }
-         if(!$RoleMatch) {
+         if (!in_array($RankRoleID, $UserRoles)) {
             return FALSE;
          }
       }
