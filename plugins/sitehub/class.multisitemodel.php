@@ -13,6 +13,8 @@ class MultisiteModel extends Gdn_Model {
      */
     protected static $instance;
 
+    protected $reservedSlugs = ['hub'];
+
     /**
      * @var string
      */
@@ -115,6 +117,24 @@ class MultisiteModel extends Gdn_Model {
             $this->Validation->AddValidationResult('MultisiteID', '@'.$error);
             return false;
         }
+    }
+
+    /**
+     * Make sure a slug is unique.
+     *
+     * @param string $slug The slug to validate
+     * @return bool Returns true if the slug is unique or false otherwise.
+     */
+    public function validateSlugUnique($slug) {
+        if (in_array(strtolower($slug), $this->reservedSlugs)) {
+            $this->Validation->AddValidationResult('Slug', 'The slug you entered is already in use by another site.');
+            return false;
+        }
+        if ($this->getWhere(['Slug' => $slug])->NumRows()) {
+            $this->Validation->AddValidationResult('Slug', 'The slug you entered is already in use by another site.');
+            return false;
+        }
+        return true;
     }
 
     public function build($id) {
@@ -224,6 +244,8 @@ class MultisiteModel extends Gdn_Model {
     }
 
     public function insert($fields) {
+        $result = true;
+
         // Sites can only be inserted in the pending status.
         $fields['Status'] = 'pending';
         $fields['DateStatus'] = Gdn_Format::ToDateTime();
@@ -233,10 +255,14 @@ class MultisiteModel extends Gdn_Model {
         if ($slug) {
             TouchValue('Name', $fields, sprintf($this->siteNameFormat, $slug));
             TouchValue('Url', $fields, $this->siteUrl($slug, false));
+
+            // Check to see if the slug already exists.
+            $result = $this->validateSlugUnique($slug);
         }
 
-
-        $result = parent::Insert($fields);
+        if ($result) {
+            $result = parent::Insert($fields);
+        }
 
         if ($result) {
             // Now we need to queue the site to build.
