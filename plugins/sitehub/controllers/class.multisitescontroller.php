@@ -231,7 +231,7 @@ class MultisitesController extends DashboardController {
         if ($this->Form->AuthenticatedPostBack()) {
             if (!$this->site['SiteID']) {
                 // There is no site associated with this role so just delete the row.
-                $this->siteModel->Delete(['MultisitID' => $this->site['MultisiteID']]);
+                $this->siteModel->Delete(['MultisiteID' => $this->site['MultisiteID']]);
             } elseif (!$this->siteModel->queueDelete($this->site['MultisiteID'])) {
                 $this->Form->SetValidationResults($this->siteModel->ValidationResults());
             }
