@@ -90,6 +90,18 @@ echo $this->Form->Open(), $this->Form->Errors();
      ?>
    </li>
    <li>
+      <?php
+         echo $this->Form->Label('Role', 'Criteria_Points'),
+            '<div class="Info2">'."Users with the following roles will gain this rank.".'</div>';
+         $Roles = RoleModel::Roles();
+         $RoleNames[] = '';
+         foreach($Roles as $Role) {
+            $RoleNames[GetValue('Name', $Role)] = GetValue('Name', $Role);
+         }
+         echo $this->Form->DropDown('Criteria_Role', $RoleNames);
+      ?>
+   </li>
+   <li>
      <?php
      echo $this->Form->Label('Permission', 'Criteria_Permission'),
      '<div class="Info2">'."Users will need this permission to gain this rank.".'</div>',
@@ -99,7 +111,7 @@ echo $this->Form->Open(), $this->Form->Errors();
    <li>
      <?php
      echo
-     '<div class="Info2">'."You can have administrators manually apply ranks. This is usefull if only a few people will have the rank and its criteria is subjective.".'</div>',
+     '<div class="Info2">'."You can have administrators manually apply ranks. This is useful if only a few people will have the rank and its criteria is subjective.".'</div>',
       $this->Form->CheckBox('Criteria_Manual', 'Applied Manually');
      ?>
    </li>
