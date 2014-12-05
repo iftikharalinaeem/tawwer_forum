@@ -504,9 +504,6 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     public function AssetModel_StyleCss_Handler($Sender, $Args) {
         $Sender->AddCssFile('warnings.css', 'plugins/Warnings2');
-        if (IsMobile()) {
-            $Sender->AddCssFile('warnings-mobile.css', 'plugins/Warnings2');
-        }
     }
 
     public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
