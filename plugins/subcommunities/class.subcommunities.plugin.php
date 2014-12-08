@@ -16,6 +16,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
     protected $savedDefaultRoute = '';
     protected $savedDoHeadings = '';
+    protected $categoryIDs = null;
 
     /// Methods ///
 
@@ -41,6 +42,23 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->Column('Sort', 'smallint', '1000')
             ->Column('IsDefault', 'tinyint(1)', true, 'unique.IsDefault')
             ->Set();
+    }
+
+    /**
+     * Get the category IDs for the current subcommunity.
+     *
+     * @return array Returns an array of category IDs
+     */
+    public function getCategoryIDs() {
+        if (!isset($this->categoryIDs)) {
+            $site = SubcommunityModel::getCurrent();
+            $categoryID = val('CategoryID', $site);
+
+            // Get all of the category IDs associated with the subcommunity.
+            $categories = CategoryModel::GetSubtree($categoryID, true);
+            $this->categoryIDs = array_keys($categories);
+        }
+        return $this->categoryIDs;
     }
 
     /**
@@ -98,19 +116,48 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Override the categories that are displayed in the categories module to match the current subcommunity.
+     *
+     * @param CategoriesModule $sender
+     */
+    public function categoriesModule_getData_handler($sender) {
+        $site = SubcommunityModel::getCurrent();
+        $categoryID = val('CategoryID', $site);
+
+        // Get the child categories
+        $categories = CategoryModel::GetSubtree($categoryID, false, true);
+
+        // Remove categories I can't view.
+        $categories = array_filter($categories, function($category) {
+           return (bool)val('PermsDiscussionsView', $category);
+        });
+
+        $data = new Gdn_DataSet($categories);
+        $data->DatasetType(DATASET_TYPE_ARRAY);
+        $data->DatasetType(DATASET_TYPE_OBJECT);
+        $sender->Data = $data;
+    }
+
+    /**
      * Make sure the discussions controller is filtering by subcommunity.
      *
      * @param DiscussionsController $sender
      * @param array $args
      */
     public function discussionsController_index_before($sender, $args) {
-        $site = SubcommunityModel::getCurrent();
-        $categoryID = val('CategoryID', $site);
-
         // Get all of the category IDs associated with the subcommunity.
-        $categories = CategoryModel::GetSubtree($categoryID, true);
-        $categoryIDs = array_keys($categories);
+        $categoryIDs = $this->getCategoryIDs();
         $sender->setCategoryIDs($categoryIDs);
+    }
+
+    /**
+     * Make sure the discussions module is filtering by subcommunity.
+     *
+     * @param DiscussionsModule $sender
+     * @param array $args
+     */
+    public function discussionsModule_init_handler($sender, $args) {
+        $sender->setCategoryIDs($this->getCategoryIDs());
     }
 
     public function Gdn_Dispatcher_AppStartup_Handler() {
