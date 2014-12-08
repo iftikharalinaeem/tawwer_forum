@@ -13,6 +13,7 @@ $PluginInfo['Warnings2'] = array(
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
+    'MobileFriendly' => true,
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
 );
 
@@ -529,6 +530,17 @@ class Warnings2Plugin extends Gdn_Plugin {
             return;
         }
         $Sender->AddProfileTab(T('Moderation'), UserUrl($Sender->User, '', 'notes'), 'UserNotes');
+    }
+
+    public function SiteNavModule_profile_handler($sender) {
+        $IsPrivileged = Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false);
+        // We can choose to allow regular users to see warnings or not. Default not.
+        if (!$IsPrivileged && Gdn::Session()->UserID != valr('User.UserID', $sender)) {
+            return;
+        }
+        $user = Gdn::Controller()->Data('Profile');
+        $user_id = val('UserID', $user);
+        $sender->addLink('moderation.notes', array('text' => t('Notes'), 'url' => UserUrl($user, '', 'notes'), 'icon' => icon('edit')));
     }
 
     /**
