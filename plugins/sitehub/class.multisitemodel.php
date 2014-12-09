@@ -382,7 +382,7 @@ class MultisiteModel extends Gdn_Model {
             ->Select('CategoryID', '', 'HubID')
             ->Select('UrlCode,Name,Description')
             ->OrderBy('TreeLeft')
-            ->GetWhere('Category', ['CategoryID >' => 0])
+            ->GetWhere('Category', ['CategoryID >' => 0, 'HubSync' => 'Settings'])
             ->ResultArray();
         $categories = array_column($categories, null, 'HubID');
 
@@ -430,6 +430,21 @@ class MultisiteModel extends Gdn_Model {
         $this->EventArguments['Categories'] =& $categories;
         $this->FireEvent('getSyncCategories');
 
+        return $categories;
+    }
+
+    /**
+     * Get a list of categories that are not supposed to sync with nodes.
+     *
+     * @param int|array $site The site we are looking at.
+     * @return array|null
+     */
+    public function getDontSyncCategories($site) {
+        $categories = $this->SQL
+            ->Select('CategoryID', '', 'HubID')
+            ->GetWhere('Category', ['CategoryID >' => 0, 'HubSync' => ''])
+            ->ResultArray();
+        $categories = array_column($categories, 'HubID');
         return $categories;
     }
 

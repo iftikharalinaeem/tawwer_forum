@@ -242,7 +242,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         $roleMap = $this->syncRoles(val('Roles', $config, []));
 
         // Synchronize the categories.
-        $this->syncCategories(val('Categories', $config, []), $roleMap);
+        $this->syncCategories(val('Categories', $config, []), val('OtherCategories', $config, []), $roleMap);
 
         // Synchronize the authenticators.
         $this->syncAuthenticators(val('Authenticators', $config, []));
@@ -269,7 +269,14 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
     }
 
-    public function syncCategories(array $categories, array $roleMap) {
+    /**
+     * Synchronize the categories with an array from the hub.
+     *
+     * @param array $categories The categories to sync.
+     * @param array $otherCategories Other categories that should not by synchronized.
+     * @param array $roleMap A mapping of hub roles to roles on this site.
+     */
+    public function syncCategories(array $categories, array $otherCategories, array $roleMap) {
         $categoryModel = new CategoryModel();
         $categoryMap = [];
 
@@ -288,6 +295,10 @@ class SiteNodePlugin extends Gdn_Plugin {
             if (!empty($permissions)) {
                 $category['CustomPermissions'] = true;
                 foreach ($permissions as $i => $permissionRow) {
+                    if (empty($roleMap[$permissionRow['RoleID']])) {
+                        continue; // role disconnected
+                    }
+
                     $permissions[$i]['JunctionTable'] = 'Category';
                     $permissions[$i]['JunctionColumn'] = 'PermissionCategoryID';
                     $permissions[$i]['RoleID'] = $roleMap[$permissionRow['RoleID']];
@@ -325,6 +336,11 @@ class SiteNodePlugin extends Gdn_Plugin {
                     Gdn::PermissionModel()->Save($permissionRow);
                 }
             }
+        }
+
+        // Remove the synchronization from other categories.
+        foreach ($otherCategories as $categoryID) {
+            $categoryModel->SetField($categoryID, 'HubID', null);
         }
     }
 

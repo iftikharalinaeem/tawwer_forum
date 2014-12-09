@@ -59,6 +59,11 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->set();
 
         Gdn::Structure()
+            ->table('Category')
+            ->column('HubSync', ['', 'settings'], 'settings')
+            ->set();
+
+        Gdn::Structure()
             ->Table('UserAuthenticationProvider')
             ->Column('SyncToNodes', 'tinyint(1)', '0')
             ->Set();
@@ -99,6 +104,18 @@ class SiteHubPlugin extends Gdn_Plugin {
 
         $menu->AddItem('sitehub', T('Site Hub'), FALSE, ['After' => 'Forum']);
         $menu->AddLink('sitehub', T('Sites'), '/multisites', 'Garden.Settings.Manage');
+    }
+
+    /*
+    *
+    * @param Gdn_Controller $Sender
+    */
+    public function settingsController_addEditCategory_handler($sender) {
+        $sender->Data['_ExtendedFields']['HubSync'] = [
+            'Control' => 'RadioList',
+            'Description' => 'Specify how this category synchronizes to the node sites.',
+            'Items' => ['' => 'None', 'settings' => 'Settings']
+        ];
     }
 
     /**
