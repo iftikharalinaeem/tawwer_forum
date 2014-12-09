@@ -80,6 +80,36 @@ class SiteNodePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Check to see if a category can be modified by the node.
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     * @throws Gdn_UserException Throws an exception when trying to save a hub managed category.
+     */
+    protected function checkCategoryOverride($sender, $args) {
+        $categoryID = val('categoryid', array_change_key_case($sender->ReflectArgs));
+        if (!$categoryID) {
+            return;
+        }
+
+        $category = CategoryModel::Categories($categoryID);
+        if (!val('HubID', $category)) {
+            return;
+        }
+
+        if ($sender->Request->IsAuthenticatedPostBack()) {
+            // Roles from the hub cannot be edited/deleted under any circumstance.
+            throw new Gdn_UserException('This category is administered in the hub.', 400);
+        } elseif ($sender->DeliveryType() === DELIVERY_TYPE_DATA) {
+            return;
+        } else {
+            $sender->AddSideMenu('');
+            $sender->Render('hubcategory', 'settings', 'plugins/sitenode');
+            die();
+        }
+    }
+
+    /**
      * Check to see if a role can be modified by the node.
      *
      * @param RoleController $sender
@@ -108,7 +138,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         } elseif ($sender->DeliveryType() === DELIVERY_TYPE_DATA) {
             return;
         } else {
-            $sender->AddSideMenu();
+            $sender->AddSideMenu('');
             $sender->SetData('RoleID', $roleID);
             $sender->Render('hubrole', 'role', 'plugins/sitenode');
             die();
@@ -608,6 +638,28 @@ class SiteNodePlugin extends Gdn_Plugin {
                 'LabelCode' => 'This role can can override settings synchronized with the hub.'
             ];
         }
+    }
+
+    /**
+     * Make sure that hub managed categories can't be changed.
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     * @throws Gdn_UserException
+     */
+    public function settingsController_editCategory_before($sender, $args) {
+        $this->checkCategoryOverride($sender, $args);
+    }
+
+    /**
+     * Make sure that hub managed categories can't be changed.
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     * @throws Gdn_UserException
+     */
+    public function settingsController_deleteCategory_before($sender, $args) {
+        $this->checkCategoryOverride($sender, $args);
     }
 
     public function setupController_installed_handler($sender) {
