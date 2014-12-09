@@ -80,6 +80,42 @@ class SiteNodePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Check to see if a role can be modified by the node.
+     *
+     * @param RoleController $sender
+     * @param array $args
+     * @throws Gdn_UserException Throws an exception when trying to save to a non-overridden hub.
+     */
+    protected function checkRoleOverride($sender, $args) {
+        $roleID = val('roleid', array_change_key_case($sender->ReflectArgs));
+        if (!$roleID) {
+            return;
+        }
+
+        $role = $sender->RoleModel->GetByRoleID($roleID);
+        if (!val('HubID', $role)) {
+            return;
+        }
+
+        $sender->Form->AddHidden('HubID', val('HubID', $role));
+        if (!$role || val('OverrideHub', $role)) {
+            return;
+        }
+
+        if ($sender->Request->IsAuthenticatedPostBack()) {
+            // Roles from the hub cannot be edited/deleted under any circumstance.
+            throw new Gdn_UserException('This role is administered in the hub.', 400);
+        } elseif ($sender->DeliveryType() === DELIVERY_TYPE_DATA) {
+            return;
+        } else {
+            $sender->AddSideMenu();
+            $sender->SetData('RoleID', $roleID);
+            $sender->Render('hubrole', 'role', 'plugins/sitenode');
+            die();
+        }
+    }
+
+    /**
      * Check to see if a valid sso token was passed through the header.
      */
     public function checkSSO() {
@@ -315,6 +351,10 @@ class SiteNodePlugin extends Gdn_Plugin {
                     $currentRole = false;
                 }
             }
+            if (!val('OverrideHub', $currentRole)) {
+                continue;
+            }
+
             if ($currentRole) {
                 $roleID = $currentRole['RoleID'];
                 $fields = array_diff_assoc($role, $currentRole);
@@ -483,6 +523,74 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Delete the hub cookie when signing out too.
         if (val(self::HUB_COOKIE, $_COOKIE)) {
             Gdn_CookieIdentity::DeleteCookie(SiteNodePlugin::HUB_COOKIE, '/');
+        }
+    }
+
+    /**
+     * Check to see if the role can be edited or not.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function roleController_delete_before($sender, $args) {
+        $this->checkRoleOverride($sender, $args);
+    }
+
+    /**
+     * Check to see if the role can be edited or not.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function roleController_edit_before($sender, $args) {
+        $this->checkRoleOverride($sender, $args);
+    }
+
+    /**
+     * Allow the override flag to be changed on a role.
+     *
+     * @param RoleController $sender
+     * @param string $roleID
+     */
+    public function roleController_overrideHub_create($sender, $roleID) {
+        $sender->Permission('Garden.Settings.Manage');
+
+        $role = $sender->RoleModel->getByRoleID($roleID);
+        if (!$role) {
+            throw NotFoundException('Role');
+        }
+
+        /* @var Gdn_Form $form */
+        $form = $sender->Form;
+
+        if ($sender->Request->IsAuthenticatedPostBack()) {
+            $overrideHub = (bool)$form->GetFormValue('OverrideHub');
+            $sender->RoleModel->SetField($roleID, 'OverrideHub', (int)$overrideHub);
+
+            $sender->SetData([
+                'RoleID' => $roleID,
+                'OverrideHub' => $overrideHub
+            ]);
+            $sender->RedirectUrl = Url('/role');
+        } else {
+            $form->SetData($role);
+        }
+
+        $sender->Render('hubrole', 'Role', 'plugins/sitenode');
+    }
+
+    /**
+     * Add hub specific control options to the roles.
+     *
+     * @param RoleController $sender
+     * @param array $args
+     */
+    public function roleController_beforeRolePermissions_handler($sender, $args) {
+        if ($sender->Form->GetValue('HubID')) {
+            $sender->Data['_ExtendedFields']['OverrideHub'] = [
+                'Control' => 'Checkbox',
+                'LabelCode' => 'This role can can override settings synchronized with the hub.'
+            ];
         }
     }
 
