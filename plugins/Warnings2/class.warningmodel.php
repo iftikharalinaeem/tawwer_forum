@@ -245,7 +245,7 @@ class WarningModel extends UserNoteModel {
             $alert['TimeWarningExpires'] = $newTimeWarningExpires;
             $alertModel->setTimeExpires($alert);
             if (!$alertModel->save($alert)) {
-                $this->Validation->addValidationResult($alertModel->balidationResults());
+                $this->Validation->addValidationResult($alertModel->validationResults());
             } else {
                 $this->processWarnings($alert);
             }
