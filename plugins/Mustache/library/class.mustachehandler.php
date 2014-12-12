@@ -192,6 +192,20 @@ class MustacheHandler {
     }
 
     /**
+     * Render and return the given view.
+     *
+     * @param string $path The path to the view's file.
+     * @param Gdn_Controller $controller The controller that is rendering the view.
+     * @return string
+     */
+    public function get($path, $controller) {
+        $this->init($path, $controller);
+
+        $templateName = basename($path);
+        return $this->engine()->render($templateName, $controller->Data);
+    }
+
+    /**
      * Test provided template
      *
      * @param type $path Path of template file to test.
