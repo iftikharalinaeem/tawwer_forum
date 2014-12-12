@@ -25,12 +25,15 @@ class SearchModel extends Gdn_Model {
 
    public static $RankingMode = SPH_RANK_SPH04; //SPH_RANK_PROXIMITY_BM25;
 
+   public $SearchGroups = FALSE;
+
    public static $TypeMap = array(
       'd' => 0,
       'c' => 100,
       'question' => 1,
       'poll' => 2,
-      'answer' => 101
+      'answer' => 101,
+      'group' => 400
    );
 
    protected $_fp = NULL;
@@ -39,6 +42,7 @@ class SearchModel extends Gdn_Model {
 
    public function __construct() {
       $this->UseDeltas = C('Plugins.Sphinx.UseDeltas');
+      $this->SearchGroups = C('Plugins.Sphinx.SearchGroups');
 
       if (array_key_exists("Vanilla", Gdn::ApplicationManager()->EnabledApplications())) {
          $this->Types[1] = 'Discussion';
@@ -51,6 +55,11 @@ class SearchModel extends Gdn_Model {
       if (array_key_exists("Pages", Gdn::ApplicationManager()->EnabledApplications())) {
          $this->Types[3] = 'Page';
          $this->AddTypeInfo('Page', array($this, 'GetPages'), array($this, 'IndexPages'));
+      }
+
+      if ($this->SearchGroups && array_key_exists("Groups", Gdn::ApplicationManager()->EnabledApplications())) {
+         $this->Types[4] = 'Group';
+         $this->AddTypeInfo('Group', array($this, 'GetGroups'));
       }
 
       self::$Ranker['score'] = array(
@@ -133,6 +142,30 @@ class SearchModel extends Gdn_Model {
       }
 
       return $Result;
+   }
+
+   /**
+    * Fetch the groups from this search.
+    *
+    * @param $ids
+    * @return array
+    */
+   public function GetGroups($ids) {
+      $sql = Gdn::SQL()
+         ->Select('g.GroupID as PrimaryID, g.GroupID, g.Name as Title, g.Description as Summary, g.Format, 0')
+         ->Select('g.DateInserted, 1000 as Scrore, \'group\' as Type')
+         ->Select('g.InsertUserID as UserID');
+      $result = $sql->From('Group g')
+         ->WhereIn('g.GroupID', $ids)
+         ->Get()->ResultArray();
+
+      foreach ($result as &$row) {
+         $row['Name'] = $row['Title'];
+         $row['Url'] = GroupUrl($row, '', '/');
+         unset($row['Name']);
+      }
+
+      return $result;
    }
 
    public function GetPages($IDs) {
@@ -722,6 +755,6 @@ class SearchModel extends Gdn_Model {
 
 
 //      return array($search, array_unique($terms));
-      return array($finalquery, array_unique($terms));
+      return array(trim($finalquery), array_unique($terms));
    }
 }
