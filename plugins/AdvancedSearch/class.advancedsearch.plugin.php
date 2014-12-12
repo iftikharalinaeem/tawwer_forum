@@ -43,7 +43,13 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          if (Gdn::ApplicationManager()->CheckApplication('Pages')) {
             self::$Types['page']['p'] = 'docs';
          }
+
+         if (Gdn::ApplicationManager()->CheckApplication('Groups')) {
+            self::$Types['group']['g'] = 'groups';
+         }
       }
+
+      $this->FireEvent('Init');
    }
 
    public function quickSearch($title, $get = array()) {
