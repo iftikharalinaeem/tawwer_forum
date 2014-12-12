@@ -15,6 +15,11 @@ $PluginInfo['Sphinx'] = array(
    'SettingsUrl' => '/settings/sphinx',
 );
 
+// Force require our sphinx so that an incomplete autoloader doesn't miss it.
+if (!class_exists('SearchModel', false)) {
+   require_once __DIR__.'/class.searchmodel.php';
+}
+
 class SphinxPlugin extends Gdn_Plugin {
    public function  __construct() {
       parent::__construct();
@@ -29,7 +34,7 @@ class SphinxPlugin extends Gdn_Plugin {
       if (!class_exists('SphinxClient')) {
          throw new Exception('Sphinx requires the sphinx client to be installed. See http://www.php.net/manual/en/book.sphinx.php');
       }
-      
+
       // Remove the current library map so that the core file won't be grabbed.
       @unlink(PATH_CACHE.'/library_map.ini');
       $this->Structure();
