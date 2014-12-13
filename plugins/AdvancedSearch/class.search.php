@@ -291,6 +291,10 @@ EOT;
             $types['page']['p'] = 'docs';
          }
 
+         if (Gdn::ApplicationManager()->CheckApplication('Groups')) {
+            $types['group']['group'] = 'group';
+         }
+
          self::$types = $types;
       }
 

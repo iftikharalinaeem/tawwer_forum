@@ -45,7 +45,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          }
 
          if (Gdn::ApplicationManager()->CheckApplication('Groups')) {
-            self::$Types['group']['g'] = 'groups';
+            self::$Types['group']['group'] = 'groups';
          }
       }
 
