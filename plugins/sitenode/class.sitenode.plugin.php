@@ -397,7 +397,7 @@ class SiteNodePlugin extends Gdn_Plugin {
                     $currentRole = false;
                 }
             }
-            if (!val('OverrideHub', $currentRole)) {
+            if (val('OverrideHub', $currentRole)) {
                 continue;
             }
 
