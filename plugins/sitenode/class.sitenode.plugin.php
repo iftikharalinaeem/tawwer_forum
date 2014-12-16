@@ -405,7 +405,7 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $roleID = $currentRole['RoleID'];
                 $fields = array_diff_assoc($role, $currentRole);
                 if (!empty($fields)) {
-                    $roleModel->Update($fields, ['RoleID' => $roleID]);
+                    $roleModel->Put($fields, ['RoleID' => $roleID]);
                 }
             } else {
                 // Insert the role.
