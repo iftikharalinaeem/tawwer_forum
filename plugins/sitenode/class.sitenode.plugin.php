@@ -513,6 +513,8 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $this->EventArguments['User'] =& $user;
                 $this->FireEvent('hubSSO');
 
+                Trace($user, 'hubSSO');
+
                 $user_id = Gdn::UserModel()->Connect($user['UniqueID'], self::PROVIDER_KEY, $user);
                 Trace($user_id, 'user ID');
                 if ($user_id) {
