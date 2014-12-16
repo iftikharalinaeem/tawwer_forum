@@ -486,7 +486,7 @@ class MultisiteModel extends Gdn_Model {
             'Timeout' => 100,
         ], $params, null, $headers);
 
-        if ($request->ContentType === 'application/json') {
+        if (strpos($request->ContentType, 'application/json') !== false) {
             $response = json_decode($response, true);
         }
 
