@@ -167,7 +167,7 @@ class GroupsHooks extends Gdn_Plugin {
    }
 
    protected function OverridePermissions($Sender) {
-      $DiscussionID = valr('ReflectedArgs.DiscussionID', $Sender);
+      $DiscussionID = valr('ReflectArgs.DiscussionID', $Sender);
       if (!$DiscussionID) {
          $CommentID = valr('ReflectArgs.CommentID', $Sender);
          $CommentModel = new CommentModel();
