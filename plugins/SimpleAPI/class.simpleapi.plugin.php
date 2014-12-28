@@ -541,7 +541,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
    public function SettingsController_API_Create($Sender, $Args) {
       $Sender->Permission('Garden.Settings.Manage');
 
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          $Save = array(
             'Plugins.SimpleAPI.AccessToken' => $Sender->Form->GetFormValue('AccessToken'),
             'Plugins.SimpleAPI.UserID' => NULL,
