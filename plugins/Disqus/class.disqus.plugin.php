@@ -169,7 +169,7 @@ class DisqusPlugin extends Gdn_Plugin {
     public function SettingsController_Disqus_Create($Sender, $Args) {
         $Sender->Permission('Garden.Settings.Manage');
 
-        if ($Sender->Form->IsPostBack()) {
+        if ($Sender->Form->AuthenticatedPostBack()) {
             $Model = new Gdn_AuthenticationProviderModel();
             $Sender->Form->SetFormValue(Gdn_AuthenticationProviderModel::COLUMN_ALIAS, 'disqus');
             $Sender->Form->SetFormValue(Gdn_AuthenticationProviderModel::COLUMN_NAME, 'Disqus');

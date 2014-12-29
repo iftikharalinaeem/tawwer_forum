@@ -908,8 +908,8 @@ class OnlinePlugin extends Gdn_Plugin {
       $privateMode = valr('Attributes.Online/PrivateMode', Gdn::session()->User, false);
       $sender->Form->setValue('PrivateMode', $privateMode);
 
-      // If seeing the form for the first time...
-      if ($sender->Form->isPostBack()) {
+      // Form submission handling.
+      if ($sender->Form->authenticatedPostBack()) {
          $newPrivateMode = $sender->Form->getValue('PrivateMode', false);
          if ($newPrivateMode != $privateMode) {
             Gdn::userModel()->saveAttribute($userID, 'Online/PrivateMode', $newPrivateMode);
@@ -925,7 +925,7 @@ class OnlinePlugin extends Gdn_Plugin {
       $sender->deliveryMethod(DELIVERY_METHOD_JSON);
       $sender->deliveryType(DELIVERY_TYPE_DATA);
 
-      if (!$sender->Form->isPostBack())
+      if (!$sender->Form->authenticatedPostBack())
          throw new Exception('Post required.', 405);
 
       $userID = Gdn::request()->get('UserID');
@@ -1008,7 +1008,7 @@ class OnlinePlugin extends Gdn_Plugin {
          $currentValue = C($field, $defaultValue);
          $sender->Form->setValue($field, $currentValue);
 
-         if ($sender->Form->isPostBack()) {
+         if ($sender->Form->authenticatedPostBack()) {
             $newValue = $sender->Form->getValue($field);
             if ($newValue != $currentValue) {
                saveToConfig ($field, $newValue);

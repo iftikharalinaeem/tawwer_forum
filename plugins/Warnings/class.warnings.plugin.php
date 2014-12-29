@@ -179,7 +179,7 @@ class WarningsPlugin extends Gdn_Plugin {
       $Form->InputPrefix = '';
       $Sender->Form = $Form;
       
-      if ($Form->IsPostBack()) {
+      if ($Form->AuthenticatedPostBack()) {
 //         die($Form->GetFormValue('RemoveType'));
 //         decho($WarningModel->ValidationResults());
          switch ($Form->GetFormValue('RemoveType')) {
@@ -233,7 +233,7 @@ class WarningsPlugin extends Gdn_Plugin {
       if (!$UserID)
          throw NotFoundException('User');
       
-      if ($Form->IsPostBack()) {
+      if ($Form->AuthenticatedPostBack()) {
          $Model = new WarningModel();
          $Form->SetModel($Model);
          $Form->InputPrefix = '';
