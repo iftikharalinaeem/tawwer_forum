@@ -13,7 +13,8 @@ $PluginInfo['Reporting2'] = array(
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'MobileFriendly' => true
 );
 
 class Reporting2Plugin extends Gdn_Plugin {
