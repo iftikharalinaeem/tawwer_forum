@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 
-class FlareModel extends Gdn_Pluggable {
+class FlairModel extends Gdn_Pluggable {
    /// Properties ///
 
-   protected $currentFlare = array();
+   protected $currentFlair = array();
 
    /// Methods ///
 
@@ -12,7 +12,7 @@ class FlareModel extends Gdn_Pluggable {
     * Grab badge information for a given user id, direct from the database.
     * @param type $user_id
     */
-   public function addBadgeFlare($user_id) {
+   public function addBadgeFlair($user_id) {
       $UserBadgeModel = new UserBadgeModel();
       $user_badges = $UserBadgeModel->GetBadges($user_id)->ResultArray();
 
@@ -22,7 +22,7 @@ class FlareModel extends Gdn_Pluggable {
             $badge['Level'] = 1;
          }
 
-         $this->addFlare($badge['Slug'], array(
+         $this->addFlair($badge['Slug'], array(
             'title' => $badge['Name'],
             'url' => Gdn_Upload::Url($badge['Photo']),
             'class' => strtolower($badge['Class']),
@@ -32,8 +32,8 @@ class FlareModel extends Gdn_Pluggable {
       }
    }
 
-   public function addFlare($key, $flare_row) {
-      $this->currentFlare[$key] = $flare_row;
+   public function addFlair($key, $flair_row) {
+      $this->currentFlair[$key] = $flair_row;
    }
 
    /**
@@ -70,34 +70,34 @@ class FlareModel extends Gdn_Pluggable {
       $cache_key = self::cacheKey($user_id);
       $cache_expire = 60 * 60;
 
-      // Check the cache for the flare.
-      $flare = Gdn::Cache()->Get($cache_key);
+      // Check the cache for the flair.
+      $flair = Gdn::Cache()->Get($cache_key);
       $this->EventArguments['src'] = 'cache';
 
-      if ($flare === Gdn_Cache::CACHEOP_FAILURE) {
+      if ($flair === Gdn_Cache::CACHEOP_FAILURE) {
          // Make sure to clear on every call, as singleton instance will carry
          // old values.
-         $this->currentFlare = array();
+         $this->currentFlair = array();
 
          // Fire event
          $this->EventArguments['user_id'] = $user_id;
          $this->EventArguments['src'] = 'db';
          $this->FireEvent('get');
 
-         // Add flare from DB
-         $this->addBadgeFlare($user_id);
+         // Add flair from DB
+         $this->addBadgeFlair($user_id);
 
-         // Append any flare that was added by plugin, then sort and filter below.
-         $flare = $this->currentFlare;
-         $this->currentFlare = array();
+         // Append any flair that was added by plugin, then sort and filter below.
+         $flair = $this->currentFlair;
+         $this->currentFlair = array();
 
          // Sort and filter up only highest achievements for each badge class
-         $flare = $this->filterRedundantBadgeClasses($flare);
+         $flair = $this->filterRedundantBadgeClasses($flair);
 
-         Gdn::Cache()->Store($cache_key, $flare, array(Gdn_Cache::FEATURE_EXPIRY => $cache_expire));
+         Gdn::Cache()->Store($cache_key, $flair, array(Gdn_Cache::FEATURE_EXPIRY => $cache_expire));
       }
 
-      return $flare;
+      return $flair;
    }
 
    /**
@@ -105,13 +105,13 @@ class FlareModel extends Gdn_Pluggable {
     * and if there are multiple in each class, only return the highest
     * badge achieved in that class.
     *
-    * @param type $flare_array
+    * @param type $flair_array
     * @return type
     */
-   public function filterRedundantBadgeClasses($flare_array) {
+   public function filterRedundantBadgeClasses($flair_array) {
 
       $badge_groups = array();
-      foreach ($flare_array as $badge_slug => $badge_info) {
+      foreach ($flair_array as $badge_slug => $badge_info) {
          // Not all badges have classes, so just use slug, as that is unique
          if (empty($badge_info['class'])) {
             $badge_info['class'] = $badge_slug;
@@ -148,26 +148,26 @@ class FlareModel extends Gdn_Pluggable {
     * individual badges.
     */
    public function getIds($user_ids = array()) {
-      $keys = array_map('FlareModel::cacheKey', $user_ids);
-      $cache_flare = Gdn::Cache()->Get($keys);
+      $keys = array_map('FlairModel::cacheKey', $user_ids);
+      $cache_flair = Gdn::Cache()->Get($keys);
       $result = array();
 
-      $db_keys = array_diff(array_keys($cache_flare), $keys);
+      $db_keys = array_diff(array_keys($cache_flair), $keys);
       foreach ($db_keys as $key) {
          // Strip cache key.
          $user_id = self::stripCacheKey($key);
          $result[$user_id] = $this->getId($user_id);
       }
 
-      foreach ($cache_flare as $key => $flare) {
-         $result[self::stripCacheKey($key)] = $flare;
+      foreach ($cache_flair as $key => $flair) {
+         $result[self::stripCacheKey($key)] = $flair;
       }
 
       return $result;
    }
 
    public static function cacheKey($user_id) {
-      return "flare.$user_id";
+      return "flair.$user_id";
    }
 
    public static function stripCacheKey($key) {
@@ -185,11 +185,11 @@ class FlareModel extends Gdn_Pluggable {
    /**
     * Return the singleton instance of this class.
     *
-    * @return FlareModel
+    * @return FlairModel
     */
    public static function instance() {
       if (!isset(self::$instance)) {
-         self::$instance = new FlareModel();
+         self::$instance = new FlairModel();
       }
 
       return self::$instance;

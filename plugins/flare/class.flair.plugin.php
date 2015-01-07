@@ -1,21 +1,21 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PluginInfo['flare'] = array(
-   'Name' => 'Flare',
+$PluginInfo['flair'] = array(
+   'Name' => 'Flair',
    'Description' => 'Tie into Badges application.',
    'Version' => '1.1.0',
-   'SettingsUrl' => '/dashboard/settings/flare',
+   'SettingsUrl' => '/dashboard/settings/flair',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane'
 );
 
-class FlarePlugin extends Gdn_Plugin {
+class FlairPlugin extends Gdn_Plugin {
 
    function __construct(){
       if (!class_exists('UserBadgeModel')){
-         trigger_error('Flare plugin depends on the badges application to work. Please enable badges plugin.');
+         trigger_error('Flair plugin depends on the badges application to work. Please enable badges plugin.');
       }
    }
 
@@ -24,7 +24,7 @@ class FlarePlugin extends Gdn_Plugin {
     * @param AssetModel $Sender
     */
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
-      $Sender->AddCssFile('flare.css', 'plugins/flare');
+      $Sender->AddCssFile('flair.css', 'plugins/flare');
    }
 
    /**
@@ -36,7 +36,7 @@ class FlarePlugin extends Gdn_Plugin {
       $UserID = GetValue('UserID', $Args['Author']);
 
       if ($UserID) {
-         $this->writeFlare($UserID);
+         $this->writeFlair($UserID);
       }
    }
 
@@ -44,20 +44,20 @@ class FlarePlugin extends Gdn_Plugin {
     * @param $user_id
     * @param int $limit
     */
-   public function writeFlare($user_id, $limit = 4) {
-      $flare_array = FlareModel::instance()->getId($user_id);
+   public function writeFlair($user_id, $limit = 4) {
+      $flair_array = FlairModel::instance()->getId($user_id);
 
-      if (empty($flare_array)) {
+      if (empty($flair_array)) {
          return;
       }
 
-      $html_flare = '<div class="flare">';
+      $html_flair = '<div class="flair">';
 
       $count = 0;
-      foreach ($flare_array as $flare) {
-         $html_flare .= '
-         <span class="flare-item flare-'. $flare['slug'] .'" title="'. $flare['title'] .'">
-            <img src="'. $flare['url'] .'" alt="'. $flare['title'] .'" />
+      foreach ($flair_array as $flair) {
+         $html_flair .= '
+         <span class="flair-item flair-'. $flair['slug'] .'" title="'. $flair['title'] .'">
+            <img src="'. $flair['url'] .'" alt="'. $flair['title'] .'" />
          </span>';
 
          $count++;
@@ -66,8 +66,8 @@ class FlarePlugin extends Gdn_Plugin {
          }
       }
 
-      $html_flare .= '</div>';
+      $html_flair .= '</div>';
 
-      echo $html_flare;
+      echo $html_flair;
    }
 }
