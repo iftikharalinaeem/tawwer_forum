@@ -3,7 +3,7 @@
 $PluginInfo['flare'] = array(
    'Name' => 'Flare',
    'Description' => 'Tie into Badges application.',
-   'Version' => '1.0.1',
+   'Version' => '1.1.0',
    'SettingsUrl' => '/dashboard/settings/flare',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Dane MacMillan",
@@ -12,13 +12,39 @@ $PluginInfo['flare'] = array(
 );
 
 class FlarePlugin extends Gdn_Plugin {
-}
 
-if (!function_exists('writeFlare')) {
+   function __construct(){
+      if (!class_exists('UserBadgeModel')){
+         trigger_error('Flare plugin depends on the badges application to work. Please enable badges plugin.');
+      }
+   }
+
+
    /**
-    * Write out the flare HTML.
+    * @param AssetModel $Sender
     */
-   function writeFlare($user_id, $limit = 4) {
+   public function AssetModel_StyleCss_Handler($Sender, $Args) {
+      $Sender->AddCssFile('flare.css', 'plugins/flare');
+   }
+
+   /**
+    *
+    * @param DiscussionController $Sender
+    * @param type $Args
+    */
+   public function Base_AuthorInfo_Handler($Sender, $Args) {
+      $UserID = GetValue('UserID', $Args['Author']);
+
+      if ($UserID) {
+         $this->writeFlare($UserID);
+      }
+   }
+
+   /**
+    * @param $user_id
+    * @param int $limit
+    */
+   public function writeFlare($user_id, $limit = 4) {
       $flare_array = FlareModel::instance()->getId($user_id);
 
       if (empty($flare_array)) {

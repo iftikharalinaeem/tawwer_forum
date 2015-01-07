@@ -7,6 +7,7 @@ class FlareModel extends Gdn_Pluggable {
 
    /// Methods ///
 
+
    /**
     * Grab badge information for a given user id, direct from the database.
     * @param type $user_id
