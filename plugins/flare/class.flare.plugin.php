@@ -20,11 +20,11 @@ if (!function_exists('writeFlare')) {
     */
    function writeFlare($user_id, $limit = 4) {
       $flare_array = FlareModel::instance()->getId($user_id);
-      
+
       if (empty($flare_array)) {
          return;
       }
-      
+
       $html_flare = '<div class="flare">';
 
       $count = 0;
@@ -33,7 +33,7 @@ if (!function_exists('writeFlare')) {
          <span class="flare-item flare-'. $flare['slug'] .'" title="'. $flare['title'] .'">
             <img src="'. $flare['url'] .'" alt="'. $flare['title'] .'" />
          </span>';
-         
+
          $count++;
          if ($count >= $limit) {
             break;
@@ -41,7 +41,7 @@ if (!function_exists('writeFlare')) {
       }
 
       $html_flare .= '</div>';
-      
+
       echo $html_flare;
    }
 }
