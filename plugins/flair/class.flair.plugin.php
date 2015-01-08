@@ -24,7 +24,7 @@ class FlairPlugin extends Gdn_Plugin {
     * @param AssetModel $Sender
     */
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
-      $Sender->AddCssFile('flair.css', 'plugins/flare');
+      $Sender->AddCssFile('flair.css', 'plugins/flair');
    }
 
    /**
