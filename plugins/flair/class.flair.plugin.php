@@ -76,20 +76,20 @@ class FlairPlugin extends Gdn_Plugin {
    public function UserBadgeModel_AfterGive_Handler($Sender, $Args) {
      // I'm not sure how to test if the event is getting fired.
      $user_id = GetValueR('UserBagde.UserID', $Args);
-     FlareModel::instance()->clearCache($user_id);
+     FlairModel::instance()->clearCache($user_id);
    }
 
    public function DiscussionController_Render_Before($Sender, $Args) {
-     if (class_exists('FlareModel')) {
-       // Pre-fetch the flare for the comments.
-       FlareModel::instance()->fetchUsers($Sender->Data('Comments'), 'InsertUserID');
+     if (class_exists('FlairModel')) {
+       // Pre-fetch the flair for the comments.
+       FlairModel::instance()->fetchUsers($Sender->Data('Comments'), 'InsertUserID');
      }
    }
 
    public function PostController_EditComment_Render($Sender, $Args) {
-     if (class_exists('FlareModel')) {
-       // Pre-fetch the flare for the comments.
-       FlareModel::instance()->fetchUsers($Sender->Data('Comments'), 'InsertUserID');
+     if (class_exists('FlairModel')) {
+       // Pre-fetch the flair for the comments.
+       FlairModel::instance()->fetchUsers($Sender->Data('Comments'), 'InsertUserID');
      }
    }
  }
