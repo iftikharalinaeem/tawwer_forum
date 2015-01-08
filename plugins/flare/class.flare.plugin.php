@@ -3,22 +3,16 @@
 $PluginInfo['flare'] = array(
    'Name' => 'Flare',
    'Description' => 'Tie into Badges application.',
-   'Version' => '1.1.0',
+   'Version' => '1.1.1',
    'SettingsUrl' => '/dashboard/settings/flare',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.org/profile/dane'
+   'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
+   'RequiredApplications' => array('Reputation' => '>=1.3.1')
 );
 
 class FlarePlugin extends Gdn_Plugin {
-
-   function __construct(){
-      if (!class_exists('UserBadgeModel')){
-         trigger_error('Flare plugin depends on the badges application to work. Please enable badges plugin.');
-      }
-   }
-
 
    /**
     * @param AssetModel $Sender
@@ -33,11 +27,14 @@ class FlarePlugin extends Gdn_Plugin {
     * @param type $Args
     */
    public function Base_AuthorInfo_Handler($Sender, $Args) {
-      $UserID = GetValue('UserID', $Args['Author']);
+     if (!class_exists('UserBadgeModel')) {
+       return;
+     }
 
-      if ($UserID) {
-         $this->writeFlare($UserID);
-      }
+     $UserID = GetValue('UserID', $Args['Author']);
+     if ($UserID) {
+       $this->writeFlare($UserID);
+     }
    }
 
    /**
@@ -70,4 +67,29 @@ class FlarePlugin extends Gdn_Plugin {
 
       echo $html_flare;
    }
-}
+
+   /**
+   *
+   * @param UserBadgeModel $Sender
+   * @param type $Args
+   */
+   public function UserBadgeModel_AfterGive_Handler($Sender, $Args) {
+     // I'm not sure how to test if the event is getting fired.
+     $user_id = GetValueR('UserBagde.UserID', $Args);
+     FlareModel::instance()->clearCache($user_id);
+   }
+
+   public function DiscussionController_Render_Before($Sender, $Args) {
+     if (class_exists('FlareModel')) {
+       // Pre-fetch the flare for the comments.
+       FlareModel::instance()->fetchUsers($Sender->Data('Comments'), 'InsertUserID');
+     }
+   }
+
+   public function PostController_EditComment_Render($Sender, $Args) {
+     if (class_exists('FlareModel')) {
+       // Pre-fetch the flare for the comments.
+       FlareModel::instance()->fetchUsers($Sender->Data('Comments'), 'InsertUserID');
+     }
+   }
+ }
