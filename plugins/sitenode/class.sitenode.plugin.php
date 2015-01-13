@@ -280,7 +280,9 @@ class SiteNodePlugin extends Gdn_Plugin {
         $this->FireEvent('AfterSync');
 
         // Tell the hub that we've synchronized.
-        $result = $this->hubApi("/multisites/$siteID.json", 'POST', ['DateLastSync' => Gdn_Format::ToDateTime()], true);
+        $now = Gdn_Format::ToDateTime();
+        Gdn::UserMetaModel()->SetUserMeta(0, 'siteNode.dateLastSync', $now);
+        $result = $this->hubApi("/multisites/$siteID.json", 'POST', ['DateLastSync' => $now], true);
 
         Gdn::Config()->Shutdown();
     }
@@ -683,6 +685,18 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         $this->syncNode();
+        $sender->Render('blank');
+    }
+
+    public function utilityController_syncNodeInfo_create($sender) {
+        $sender->Permission('Garden.Settings.Manage');
+
+        $info = Gdn::UserMetaModel()->GetUserMeta(0, 'siteNode.dateLastSync', []);
+        $date = array_pop($info);
+
+        $sender->SetData('Ready', (bool)$date);
+        $sender->SetData('DateLastSync', $date);
+
         $sender->Render('blank');
     }
 
