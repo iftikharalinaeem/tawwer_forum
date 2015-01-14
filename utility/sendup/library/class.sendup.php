@@ -205,6 +205,19 @@ class SendUp extends Worker {
             "url" => "https://identity.api.rackspacecloud.com/v1.1/"
         ]);
         $this->CloudFiles->CacheCredentials(FALSE);
+
+        $containerName = self::$Container;
+        Workers::Log(Workers::LOG_L_WARN, " Checking container: {$containerName}");
+        $container = $this->CloudFiles->ContainerInfo($containerName);
+        if ($container) {
+            foreach ($container as $cKey => $cVal) {
+                if (is_scalar($cVal)) {
+                    Workers::Log(Workers::LOG_L_WARN, "  {$cKey}: {$cVal}");
+                }
+            }
+        } else {
+            Workers::Log(Workers::LOG_L_WARN, "  not found");
+        }
     }
 
     /**

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Rackspace API Cloud Files Functions
+ * Rackspace API Cloud Files CDN Functions
  *
- * Rackspace API functionality for Cloud Files API.
+ * Rackspace API functionality for Cloud Files CDN API.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @version 1.1
@@ -12,36 +12,12 @@
  * @package infrastructure
  * @since 1.0
  */
-class CloudFiles extends Rackspace {
+class CloudFilesCDN extends Rackspace {
 
     public function __construct($AuthURL, $Identity) {
         parent::__construct($AuthURL, $Identity);
 
-        $this->Service('CloudFiles');
-    }
-
-    /* ACCOUNT SERVICES */
-
-    /**
-     * Get account information
-     *
-     * 'containers' - total number of containers
-     * 'objects'    - total number of objects
-     * 'bytes'      - total number of stored bytes
-     * 'meta'       - account meta data array
-     *
-     * @return array
-     */
-    public function AccountInfo() {
-        $Response = $this->Request('HEAD', '/');
-
-        $Info = array();
-        $Info['containers'] = val('X-Account-Container-Count', $this->Rackspace->Headers());
-        $Info['objects'] = val('X-Account-Object-Count', $this->Rackspace->Headers());
-        $Info['bytes'] = val('X-Account-Bytes-Used', $this->Rackspace->Headers());
-        $Info['meta'] = $this->ParseMeta('Account', $this->Rackspace->Headers());
-
-        return $Info;
+        $this->Service('CloudFilesCDN');
     }
 
     /**
@@ -98,7 +74,6 @@ class CloudFiles extends Rackspace {
         $Info['objects'] = val('X-Container-Object-Count', $this->Rackspace->Headers());
         $Info['bytes'] = val('X-Container-Bytes-Used', $this->Rackspace->Headers());
         $Info['meta'] = $this->ParseMeta('Container', $this->Rackspace->Headers());
-        $Info['raw'] = $this->Rackspace->Headers();
 
         return $Info;
     }
@@ -235,66 +210,6 @@ class CloudFiles extends Rackspace {
         }
 
         return $ObjectData;
-    }
-
-    /**
-     * Stream an object to the client
-     *
-     * Some parameters can cause additional queries.
-     *
-     *  $objectSize allows caller to pre-populate Content-Length
-     *    null means Content-Length is not sent
-     *    'auto' means an objectInfo() call will be made to retrieve the info
-     *    <int> values are used verbatim as the Content-Length header value
-     *
-     *  $contentType allows caller to pre-populate Content-Type
-     *    null means Content-Type is not sent
-     *    'auto' means an objectInfo() call will be made to retrieve the info
-     *    <string> values are used verbatim as the Content-Type header value
-     *
-     * @param string $container
-     * @param string $path
-     * @param string $disposition download disposition.
-     * @param integer $objectSize optional.
-     * @param string $contentType optional.
-     */
-    public function streamObject($container, $path, $disposition = 'attachment', $objectSize = 'auto', $contentType = 'auto') {
-
-        // Do automatic lookups if needed
-        if ($objectSize == 'auto' || $contentType == 'auto') {
-            $objectInfo = $this->objectInfo($container, $path);
-            if ($objectSize == 'auto') {
-                $objectSize = $objectInfo['bytes'];
-            }
-            if ($contentType == 'auto') {
-                $contentType = $objectInfo['type'];
-            }
-        }
-
-        $file = basename($path);
-
-        // Send download headers
-        safeHeader("Content-Description: File Transfer");
-        if (is_string($contentType)) {
-            safeHeader("Content-Type: {$contentType}");
-        }
-        safeHeader("Content-Disposition: {$disposition}; filename=\"{$file}\"");
-        safeHeader("Content-Transfer-Encoding: binary");
-        safeHeader("Connection: Keep-Alive");
-        safeHeader("Expires: 0");
-        safeHeader("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-        safeHeader("Pragma: public");
-        if (is_integer($objectSize)) {
-            safeHeader("Content-Length: {$objectSize}");
-        }
-        ob_end_flush();
-        flush();
-
-        $this->retrieveObject($container, $path, [
-            'Stream' => fopen('php://output', 'w')
-        ]);
-
-        exit;
     }
 
     /**

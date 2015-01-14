@@ -65,6 +65,7 @@ require_once('library/class.sendup.php');
 require_once('library/class.cloudproxyrequest.php');
 require_once('library/class.rackspace.php');
 require_once('library/class.cloudfiles.php');
+require_once('library/class.cloudfilescdn.php');
 
 $Locked = Lock(LOCKFILE);
 if (!$Locked) {
