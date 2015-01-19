@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.5.2',
+   'Version' => '1.5.3',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -11,6 +11,7 @@ $PluginInfo['editor'] = array(
    'RequiredTheme' => false,
    'RequiredPlugins' => false,
    'HasLocale' => false,
+   'MobileFriendly' => true,
    'RegisterPermissions' => array(
       'Plugins.Attachments.Upload.Allow' => 'Garden.Profiles.Edit'
    ),
