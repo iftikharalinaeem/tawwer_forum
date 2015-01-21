@@ -11,27 +11,11 @@ body#dashboard_settings_themes .FilterMenu a.SmallButton {
 }
 
 /* hide import */
-body#dashboard_settings_banner div.Box.Group.Import {
-    display:none;
+div.Box.Group.Import {
+display:none;
 }
 
-/* hide new tag on browse add ons */
-body#dashboard_settings_banner a span.New {
-    display:none;
-}
-
-/* hide yellowboxes linking to outdated help on .org */
-body#dashboard_settings_banner div.Help.Aside,
-body#dashboard_settings_homepage div.Help.Aside,
-body#dashboard_settings_themes div.Help.Aside,
-body#dashboard_message_index div.Help.Aside,
-body#dashboard_user_index div.Help.Aside,
-body#dashboard_role_index div.Help.Aside,
-body#dashboard_user_applicants div.Help.Aside,
-body#dashboard_settings_jsconnect div.Help.Aside,
-body#vanilla_settings_managecategories div.Help.Aside,
-body#vanilla_settings_advanced div.Help.Aside,
-body#dashboard_embed_comments div.Help.Aside,
-body#dashboard_embed_forum div.Help.Aside {
-    display:none;
+/*hide "new" tag on browse-addons*/
+div.Box.Group.Addons a span.New {
+  display:none;
 }
