@@ -7,8 +7,8 @@
  *  1.2.3   Allow ReactionModel() to react from any source user.
  *  1.2.4   Allow some reactions to be protected so that users can't flag moderator posts.
  *  1.2.13  Added TagModel_Types_Handler.
+ *  1.3     Add class permissions; fix GetReactionTypes attributes; fix descriptions.
  *  1.2.15  Added section 508 fixes.
- *
  *
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary
@@ -18,8 +18,13 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.2.15',
+   'Version' => '1.3',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RegisterPermissions' => array(
+      'Reactions.Positive.Add' => 'Garden.SignIn.Allow',
+      'Reactions.Negative.Add' => 'Garden.SignIn.Allow',
+      'Reactions.Flag.Add' => 'Garden.SignIn.Allow'
+   ),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
@@ -376,9 +381,13 @@ class ReactionsPlugin extends Gdn_Plugin {
          throw ForbiddenException("@You may not use that Reaction.");
       }
 
-      // Check reaction's permission if one is applied
+      // Permission
       if ($Permission = GetValue('Permission', $ReactionType)) {
+         // Check reaction's permission if a custom/specific one is applied
          $Sender->Permission($Permission);
+      } elseif ($PermissionClass = val('Class', $ReactionType)) {
+         // Check reaction's permission based on class
+         $Sender->Permission('Reactions.'.$PermissionClass.'.Add');
       }
 
       $ReactionModel = new ReactionModel();
@@ -410,7 +419,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       // Load all of the reaction types.
       try {
          $ReactionModel = new ReactionModel();
-         $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Good', 'Active' => 1));
+         $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Positive', 'Active' => 1));
 
          $Sender->SetData('ReactionTypes', $ReactionTypes);
 //         $ReactionTypes = array_merge($ReactionTypes, ConsolidateArrayValuesByKey($ReactionTypeData, 'UrlCode'));
@@ -505,7 +514,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       // Load all of the reaction types.
       try {
          $ReactionModel = new ReactionModel();
-         $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Good', 'Active' => 1));
+         $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Positive', 'Active' => 1));
 
          $Sender->SetData('ReactionTypes', $ReactionTypes);
 //         $ReactionTypes = array_merge($ReactionTypes, ConsolidateArrayValuesByKey($ReactionTypeData, 'UrlCode'));
@@ -705,7 +714,7 @@ if (!function_exists('WriteReactions')):
 
       static $Types = NULL;
       if ($Types === NULL)
-         $Types = ReactionModel::GetReactionTypes(array('Class' => array('Good', 'Bad'), 'Active' => 1));
+         $Types = ReactionModel::GetReactionTypes(array('Class' => array('Positive', 'Negative'), 'Active' => 1));
       Gdn::Controller()->EventArguments['ReactionTypes'] = $Types;
 
       if ($ID = GetValue('CommentID', $Row)) {
@@ -727,8 +736,8 @@ if (!function_exists('WriteReactions')):
       Gdn_Theme::BulletRow();
 
       // Write the flags.
-      static $Flags = NULL, $FlagCodes = NULL;
-      if ($Flags === NULL) {
+      static $Flags = NULL;
+      if ($Flags === NULL && CheckPermission('Reactions.Flag.Add')) {
          $Flags = ReactionModel::GetReactionTypes(array('Class' => 'Flag', 'Active' => 1));
          $FlagCodes = array();
          foreach ($Flags as $Flag) {

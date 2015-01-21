@@ -240,7 +240,9 @@ class ReactionsController extends DashboardController {
           'Plugins.Reactions.DefaultOrderBy' => array('LabelCode' => 'Order Comments By', 'Control' => 'RadioList', 'Items' => array('DateInserted' => 'Date', 'Score' => 'Score'), 'Default' => 'DateInserted',
               'Description' => 'You can order your comments based on reactions. We recommend ordering the comments by date.'),
           'Plugins.Reactions.DefaultEmbedOrderBy' => array('LabelCode' => 'Order Embedded Comments By', 'Control' => 'RadioList', 'Items' => array('DateInserted' => 'Date', 'Score' => 'Score'), 'Default' => 'Score',
-              'Description' => 'Ordering your embedded comments by reaction will show just the best comments. Then users can head into the community to see the full discussion.')
+              'Description' => 'Ordering your embedded comments by reaction will show just the best comments. Then users can head into the community to see the full discussion.'),
+          'Reactions.PromoteValue' => array('Type' => 'int', 'LabelCode' => 'Promote Threshold', 'Description' => 'Points required for a post to be promoted to Best Of. Changes are not retroactive.', 'Control' => 'DropDown', 'Items' => array(3=>3,5=>5,10=>10,20=>20), 'Default' => C('Reactions.PromoteValue', 5)),
+          'Reactions.BuryValue' => array('Type' => 'int', 'LabelCode' => 'Bury Threshold', 'Description' => 'Points required for a post to be buried. Changes are not retroactive.', 'Control' => 'DropDown', 'Items' => array(-3=>-3,-5=>-5,-10=>-10,-20=>-20), 'Default' => C('Reactions.BuryValue', -5)),
       ));
       
       $this->Title(sprintf(T('%s Settings'), 'Reaction'));
