@@ -385,7 +385,7 @@ class ReactionsPlugin extends Gdn_Plugin {
       if ($Permission = GetValue('Permission', $ReactionType)) {
          // Check reaction's permission if a custom/specific one is applied
          $Sender->Permission($Permission);
-      } elseif ($PermissionClass = GetValue('Class', $ReactionType)) {
+      } elseif ($PermissionClass = val('Class', $ReactionType)) {
          // Check reaction's permission based on class
          $Sender->Permission('Reactions.'.$PermissionClass.'.Add');
       }
