@@ -110,6 +110,7 @@
 @media screen and (max-width: 768px) {
   .DataList-Notes .Item-Col {
     width: 100%;
+
     &.Item-Col3 {
       margin-top: 15px;
     }
@@ -121,6 +122,18 @@
 
   .Profile .PhotoWrap {
     display: block;
+  }
+
+  .PhotoWrap.IndexPhoto {
+    display: none;
+  }
+
+  .WarningType {
+    margin-top: 7px;
+
+    label {
+      margin-top: 0;
+    }
   }
 }
 
