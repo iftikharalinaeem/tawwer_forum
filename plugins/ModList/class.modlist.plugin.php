@@ -121,7 +121,7 @@ class ModListPlugin extends Gdn_Plugin {
       
       // Walk category ancestors
       if ($Cascade) {
-         $Ancestors = CategoryModel::GetAncestors($CategoryID);
+         $Ancestors = CategoryModel::GetAncestors($CategoryID, true, true);
          $CategoryIDs = array_keys($Ancestors);
 //         if (!in_array(-1, $CategoryIDs))
 //            $CategoryIDs[] = -1;
