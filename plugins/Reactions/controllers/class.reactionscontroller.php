@@ -220,7 +220,7 @@ class ReactionsController extends DashboardController {
       if ($this->DeliveryType() != DELIVERY_TYPE_DATA) {
          // Send back the new button.
          include_once $this->FetchViewLocation('settings_functions', '', 'plugins/Reactions');
-         $this->DeliveryType(DELIVERY_METHOD_JSON);
+         $this->DeliveryMethod(DELIVERY_METHOD_JSON);
 
          $this->JsonTarget("#ReactionType_{$ReactionType['UrlCode']} .ActivateSlider", ActivateButton($ReactionType), 'ReplaceWith');
 

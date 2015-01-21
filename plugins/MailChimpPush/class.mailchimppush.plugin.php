@@ -218,7 +218,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       ));
 
       // Validate form
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          $Modified = false;
 
          // Update API Key?

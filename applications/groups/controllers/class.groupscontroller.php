@@ -89,7 +89,9 @@ class GroupsController extends Gdn_Controller {
       $Sorts = array(
          'newest' => array('Title' => T('Newest Groups'), 'OrderBy' => 'DateInserted'),
          'popular' => array('Title' => T('Popular Groups'), 'OrderBy' => 'CountMembers'),
-         'updated' => array('Title' => T('Recently Updated Groups'), 'OrderBy' => 'DateLastComment'));
+         'updated' => array('Title' => T('Recently Updated Groups'), 'OrderBy' => 'DateLastComment'),
+         'mine' => array('Title' => T('My Groups'), 'OrderBy' => 'DateInserted')
+      );
 
       if (!array_key_exists($Sort, $Sorts)) {
          $Sort = array_pop(array_keys($Sorts));
@@ -100,16 +102,23 @@ class GroupsController extends Gdn_Controller {
       list($Offset, $Limit) = OffsetLimit($Page, $PageSize);
       $PageNumber = PageNumber($Offset, $Limit);
 
-      $Groups = $this->GroupModel->Get($SortRow['OrderBy'], 'desc', $Limit, $PageNumber)->ResultArray();
+      if (Gdn::Session()->UserID && $Sort == 'mine') {
+          $Groups = $this->GroupModel->GetByUser(Gdn::Session()->UserID, '', 'desc', $Limit, $Offset);
+      } else {
+          $Groups = $this->GroupModel->Get($SortRow['OrderBy'], 'desc', $Limit, $PageNumber)->ResultArray();
+          $TotalRecords = $this->GroupModel->GetCount();
+      }
       $this->SetData('Groups', $Groups);
 
       // Set the pager data.
       $this->SetData('_Limit', $Limit);
       $this->SetData('_CurrentRecords', count($Groups));
-      $TotalRecords = $this->GroupModel->GetCount();
 
       $Pager = PagerModule::Current();
-      $Pager->Configure($Offset, $Limit, $TotalRecords, "groups/browse/$Sort/{Page}");
+      // Use simple pager for 'mine'
+      if (Gdn::Session()->UserID && $Sort != 'mine') {
+         $Pager->Configure($Offset, $Limit, $TotalRecords, "groups/browse/$Sort/{Page}");
+      }
 
       $this->Title($SortRow['Title']);
       $this->AddBreadcrumb($this->Title(), "/groups/browse/$Sort");

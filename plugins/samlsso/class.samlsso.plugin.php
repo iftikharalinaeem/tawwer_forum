@@ -9,7 +9,8 @@ $PluginInfo['samlsso'] = array(
     'RequiredPlugins' => false,
     'HasLocale' => false,
     'SettingsUrl' => '/settings/samlsso',
-    'SettingsPermission' => 'Garden.Settings.Manage'
+    'SettingsPermission' => 'Garden.Settings.Manage',
+    'MobileFriendly' => TRUE
 );
 
 class SamlSSOPlugin extends Gdn_Plugin {

@@ -62,13 +62,15 @@ require_once('library/class.workers.php');
 require_once('library/class.sendup.php');
 
 // Include Rackspace API
-require_once('library/class.proxyrequest.php');
-require_once('library/class.rackspaceapi.php');
-require_once('library/class.rackspacecloudfiles.php');
+require_once('library/class.cloudproxyrequest.php');
+require_once('library/class.rackspace.php');
+require_once('library/class.cloudfiles.php');
+require_once('library/class.cloudfilescdn.php');
 
 $Locked = Lock(LOCKFILE);
-if (!$Locked)
+if (!$Locked) {
     exit(0);
+}
 
 $ExitCode = 0;
 $Workers = NULL;

@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.4.1',
+   'Version' => '1.5.3',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -11,6 +11,7 @@ $PluginInfo['editor'] = array(
    'RequiredTheme' => false,
    'RequiredPlugins' => false,
    'HasLocale' => false,
+   'MobileFriendly' => true,
    'RegisterPermissions' => array(
       'Plugins.Attachments.Upload.Allow' => 'Garden.Profiles.Edit'
    ),
@@ -313,14 +314,14 @@ class EditorPlugin extends Gdn_Plugin {
       // Stuff like 'heading1' is the editor-action.
       $fontFormatOptions = array(
          'heading1' => array(
-            'text' => 'Heading 1',
+            'text' => sprintf(T('Heading %s'), 1),
             'command' => 'formatBlock',
             'value' => 'h1',
             'class' => 'post-font-size-h1',
             'sort' => 100
          ),
          'heading2' => array(
-            'text' => 'Heading 2',
+            'text' => sprintf(T('Heading %s'), 2),
             'command' => 'formatBlock',
             'value' => 'h2',
             'class' => 'post-font-size-h2',
@@ -335,21 +336,21 @@ class EditorPlugin extends Gdn_Plugin {
             'sort' => 98
          ),
          'blockquote' => array(
-            'text' => 'Quote',
+            'text' => T('Quote'),
             'command' => 'blockquote',
             'value' => 'blockquote',
             'class' => '',
             'sort' => 10
          ),
          'code' => array(
-            'text' => 'Code',
+            'text' => T('Source Code', 'Code'),
             'command' => 'code',
             'value' => 'code',
             'class' => '',
             'sort' => 9
          ),
          'spoiler' => array(
-            'text' => 'Spoiler',
+            'text' => T('Spoiler'),
             'command' => 'spoiler',
             'value' => 'spoiler',
             'class' => '',
@@ -529,7 +530,7 @@ class EditorPlugin extends Gdn_Plugin {
 
       $editorToolbarAll['bold'] = array('edit' => 'basic', 'action'=> 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => T('Bold'), 'data-editor' => '{"action":"bold","value":""}'));
       $editorToolbarAll['italic'] = array('edit' => 'basic', 'action'=> 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => T('Italic'), 'data-editor' => '{"action":"italic","value":""}'));
-      $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'strikethrough', 'title' => T('Strike'), 'data-editor' => '{"action":"strike","value":""}'));
+      $editorToolbarAll['strike'] = array('edit' => 'basic', 'action'=> 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'strikethrough', 'title' => T('Strikethrough'), 'data-editor' => '{"action":"strike","value":""}'));
 
       $editorToolbarAll['color'] = array('edit' => 'basic', 'action'=> 'color', 'type' =>
           $toolbarColorGroups,
@@ -537,8 +538,8 @@ class EditorPlugin extends Gdn_Plugin {
 
       $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action'=> 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => T('Ordered list'), 'data-editor' => '{"action":"orderedlist","value":""}'));
       $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action'=> 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => T('Unordered list'), 'data-editor' => '{"action":"unorderedlist","value":""}'));
-      $editorToolbarAll['indent'] = array('edit' => 'format', 'action'=> 'indent', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-indent-right editor-dialog-fire-close', 'data-wysihtml5-command' => 'indent', 'title' => T('Indent'), 'data-editor' => '{"action":"indent","value":""}'));
-      $editorToolbarAll['outdent'] = array('edit' => 'format', 'action'=> 'outdent', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-indent-left editor-dialog-fire-close', 'data-wysihtml5-command' => 'outdent', 'title' => T('Outdent'), 'data-editor' => '{"action":"outdent","value":""}'));
+      $editorToolbarAll['indent'] = array('edit' => 'format', 'action'=> 'indent', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-indent-right editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'indent', 'title' => T('Indent'), 'data-editor' => '{"action":"indent","value":""}'));
+      $editorToolbarAll['outdent'] = array('edit' => 'format', 'action'=> 'outdent', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-indent-left editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'outdent', 'title' => T('Outdent'), 'data-editor' => '{"action":"outdent","value":""}'));
 
       $editorToolbarAll['sep-format'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-headers editor-optional-button'));
       $editorToolbarAll['format'] = array('edit' => 'format', 'action'=> 'headers', 'type' =>
@@ -587,27 +588,6 @@ class EditorPlugin extends Gdn_Plugin {
       $Sender->AddCssFile('editor.css', 'plugins/editor');
    }
 
-   /**
-   * Replace emoticons in comment preview.
-   */
-  public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
-    if (Emoji::instance()->enabled) {
-         $Sender->Comment->Body = Emoji::instance()->translateToHtml($Sender->Comment->Body);
-      }
-  }
-
-   /**
-   * Replace emoticons in comments.
-   */
-  public function Base_AfterCommentFormat_Handler($Sender) {
-     // Spoilers plugin compatibility.
-     //$this->RenderSpoilers($Sender);
-     if (Emoji::instance()->enabled) {
-        $Object = $Sender->EventArguments['Object'];
-        $Object->FormatBody = Emoji::instance()->translateToHtml($Object->FormatBody);
-        $Sender->EventArguments['Object'] = $Object;
-     }
-  }
 
    /**
     * Check if comments are embedded.
@@ -822,7 +802,7 @@ class EditorPlugin extends Gdn_Plugin {
          // Save original file to uploads, then manipulate from this location if
          // it's a photo. This will also call events in Vanilla so other
          // plugins can tie into this.
-         $filePathParsed = $Upload->SaveAs($tmpFilePath, $absoluteFileDestination);
+         $filePathParsed = $Upload->SaveAs($tmpFilePath, $absoluteFileDestination, array('source' => 'content'));
 
          // Determine if image, and thus requires thumbnail generation, or
          // simply saving the file.
@@ -881,7 +861,7 @@ class EditorPlugin extends Gdn_Plugin {
 
          $payload = array(
             'MediaID'            => $MediaID,
-            'Filename'           => $fileName,
+            'Filename'           => htmlspecialchars($fileName),
             'Filesize'           => $fileData['size'],
             'FormatFilesize'     => Gdn_Format::Bytes($fileData['size'], 1),
             'type' => $fileData['type'],
@@ -1077,10 +1057,11 @@ class EditorPlugin extends Gdn_Plugin {
     * single request against the Media table, then filter out the ones that
     * exist per discussion or comment.
     *
-    * @param multiple $Controller
-    * @param string $Type
+    * @param multiple $Controller The controller.
+    * @param string $Type The type of row, either discussion or comment.
+    * @param array|object $row The row of data being attached to.
     */
-   protected function AttachUploadsToComment($Sender, $Type = 'comment') {
+   protected function AttachUploadsToComment($Sender, $Type = 'comment', $row = null) {
 
       $param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
       $foreignId = GetValue($param, GetValue(ucfirst($Type), $Sender->EventArguments));
@@ -1099,6 +1080,19 @@ class EditorPlugin extends Gdn_Plugin {
          });
 
          if (count($attachments)) {
+            // Loop through the attachments and add a flag if they are found in the source or not.
+            $body = Gdn_Format::To(val('Body', $row), val('Format', $row));
+            foreach ($attachments as &$attachment) {
+               $src = Gdn_Upload::Url($attachment['Path']);
+               $src = preg_replace('`^https?:?`i', '', $src);
+               $src = preg_quote($src);
+
+               $regex = '`src=["\'](https?:?)?'.$src.'["\']`i';
+               $inbody = (bool)preg_match($regex, $body);
+
+               $attachment['InBody'] = $inbody;
+            }
+
             $Sender->SetData('_attachments', $attachments);
             $Sender->SetData('_editorkey', strtolower($param.$foreignId));
             echo $Sender->FetchView($this->GetView('attachments.php'));
@@ -1245,11 +1239,11 @@ class EditorPlugin extends Gdn_Plugin {
    }
 
    public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
-      $this->AttachUploadsToComment($Sender);
+      $this->AttachUploadsToComment($Sender, 'comment', val('Comment', $Args));
    }
 
    public function DiscussionController_AfterDiscussionBody_Handler($Sender, $Args) {
-      $this->AttachUploadsToComment($Sender, 'discussion');
+      $this->AttachUploadsToComment($Sender, 'discussion', val('Discussion', $Args));
    }
 
    public function PostController_AfterCommentBody_Handler($Sender, $Args) {
@@ -1476,7 +1470,7 @@ class EditorPlugin extends Gdn_Plugin {
          $parsed = Gdn_Upload::Parse($thumb_destination_path);
          $target = $thumb_destination_path; // $parsed['Name'];
          $Upload = new Gdn_Upload();
-         $filepath_parsed = $Upload->SaveAs($thumb_destination_path, $target);
+         $filepath_parsed = $Upload->SaveAs($thumb_destination_path, $target, array('source' => 'content'));
 
          // Save thumbnail information to DB.
          $model->Save(array(

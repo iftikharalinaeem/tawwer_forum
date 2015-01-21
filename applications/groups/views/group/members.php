@@ -20,7 +20,7 @@
 
    <?php if (in_array($this->Data('Filter'), array('', 'members'))): ?>
    <div class="Box-Cards Group-Members">
-      <h2><?php echo T('GroupMembers', 'Members'); ?></h2>
+      <h2><?php echo T('Group Members', 'Members'); ?></h2>
       <?php
       WriteMemberCards($this->Data('Members'));
       PagerModule::Write(array('Url' => GroupUrl($this->Data('Group'), 'members', '/').'/{Page}?filter=members', 'CurrentRecords' => count($this->Data('Members'))));

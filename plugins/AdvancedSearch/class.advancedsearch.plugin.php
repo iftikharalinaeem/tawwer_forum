@@ -43,7 +43,13 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          if (Gdn::ApplicationManager()->CheckApplication('Pages')) {
             self::$Types['page']['p'] = 'docs';
          }
+
+         if (Gdn::ApplicationManager()->CheckApplication('Groups')) {
+            self::$Types['group']['group'] = 'groups';
+         }
       }
+
+      $this->FireEvent('Init');
    }
 
    public function quickSearch($title, $get = array()) {
@@ -283,6 +289,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          $Row['Media'] = $media;
 
          $Row['Summary'] = SearchExcerpt(htmlspecialchars(Gdn_Format::PlainText($Summary, 'Raw')), $SearchTerms, $Length);
+         $Row['Summary'] = Emoji::instance()->translateToHtml($Row['Summary']);
+
          $Row['Format'] = 'Html';
          $Row['DateHtml'] = Gdn_Format::Date($Row['DateInserted'], 'html');
          $Row['Notes'] = $calc($Row, $SearchTerms);

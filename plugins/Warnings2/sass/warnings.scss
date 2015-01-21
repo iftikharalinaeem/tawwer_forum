@@ -107,6 +107,36 @@
    }
 }
 
+@media screen and (max-width: 768px) {
+  .DataList-Notes .Item-Col {
+    width: 100%;
+
+    &.Item-Col3 {
+      margin-top: 15px;
+    }
+  }
+
+  .Wrap.ReportForm {
+    min-width: 0;
+  }
+
+  .Profile .PhotoWrap {
+    display: block;
+  }
+
+  .PhotoWrap.IndexPhoto {
+    display: none;
+  }
+
+  .WarningType {
+    margin-top: 7px;
+
+    label {
+      margin-top: 0;
+    }
+  }
+}
+
 .SpEdit {
    background-image: url("//vanillicon.com/sprites/sprites-14-000000.png");
    background-position: -180px -20px;

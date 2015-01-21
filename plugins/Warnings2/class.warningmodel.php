@@ -175,6 +175,23 @@ class WarningModel extends UserNoteModel {
     }
 
     /**
+     *
+     * Checks record type and returns Model object representative of RecordType.
+     * Returns false if RecordType is not discussion or comment.
+     *
+     * @param string $RecordType
+     * @return Model Object
+     */
+    public function GetModel($RecordType) {
+        if ($RecordType === 'discussion') {
+            return new DiscussionModel();
+        } elseif ($RecordType === 'comment') {
+            return new CommentModel();
+        }
+        return null;
+    }
+
+    /**
      * Reverse a warning.
      *
      * @param array|int $warning The warning to reverse.
@@ -197,6 +214,17 @@ class WarningModel extends UserNoteModel {
         // First, reverse the warning.
         $this->setField($warning['UserNoteID'], 'Reversed', true);
 
+        $Model = $this->GetModel($warning['RecordType']);
+        if (!$Model) {
+            return false;
+        }
+
+        $Record = $Model->GetID($warning['RecordID']);
+
+        if (isset($Record->Attributes['WarningID'])) {
+            $Model->saveToSerializedColumn('Attributes', $warning['RecordID'], 'WarningID', false);
+        }
+
         // Reverse the amount of time on the warning and its points.
         $expiresTimespan = val('ExpiresTimespan', $warning, '0');
         $points = val('Points', $warning, 0);
@@ -217,7 +245,7 @@ class WarningModel extends UserNoteModel {
             $alert['TimeWarningExpires'] = $newTimeWarningExpires;
             $alertModel->setTimeExpires($alert);
             if (!$alertModel->save($alert)) {
-                $this->Validation->addValidationResult($alertModel->balidationResults());
+                $this->Validation->addValidationResult($alertModel->validationResults());
             } else {
                 $this->processWarnings($alert);
             }

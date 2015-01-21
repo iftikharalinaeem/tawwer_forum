@@ -59,7 +59,7 @@ echo $this->Form->TextBox('ModeratorNote', array('Wrap' => TRUE));
 <?php if ($this->Data('Record')): ?>
 <div class="P">
 <?php
-echo $this->Form->CheckBox('AttachRecord', '@'.sprintf('Attach this warning to the %s.', T(strtolower($this->Data('RecordType')))));
+echo $this->Form->CheckBox('AttachRecord', '@'.sprintf(T('Attach this warning to the %s.'), T(strtolower($this->Data('RecordType')))));
 ?>
 <?php endif; ?>
    

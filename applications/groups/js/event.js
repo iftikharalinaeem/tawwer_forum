@@ -73,10 +73,10 @@ jQuery(document).ready(function($) {
          method: 'GET',
          success: function(data, str, xhr) {
             if (data.Abbr != 'unknown') {
-               if (TimezoneRequestData.Auto)
-                  var TimezoneLabel = "("+data.Offset+") Automatically detected "+data.Abbr;
-               else
-                  var TimezoneLabel = "("+data.Offset+") "+data.Abbr;
+               //if (TimezoneRequestData.Auto)
+               //   var TimezoneLabel = "("+data.Offset+") Automatically detected "+data.Abbr;
+               //else
+               var TimezoneLabel = "("+data.Offset+") "+data.Abbr;
                
                UpdateTimezoneDisplay(data.TimezoneID, TimezoneLabel);
             }

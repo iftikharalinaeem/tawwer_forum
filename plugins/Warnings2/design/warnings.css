@@ -20,7 +20,7 @@
 
 .Popup .DataList .Item { border: 0; }
 
-.Item-Col { float: left; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; padding-left: 4px; padding-right: 4px; }
+.Item-Col { float: left; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box; padding-left: 4px; padding-right: 4px; }
 .Item-Col .Media { margin: 0 0 10px 0; }
 .Item-Col .Options { visibility: hidden; margin-right: 8px; }
 .Item-Col .Options .Sprite { display: inline-block; height: 16px; width: 16px; }
@@ -30,6 +30,13 @@
 .User-Col .ProfilePhoto { width: 32px; height: 32px; }
 .User-Col .Media-Body, .User-Col .Meta { line-height: 16px; font-size: 11px; }
 
+@media screen and (max-width: 768px) { .DataList-Notes .Item-Col { width: 100%; }
+  .DataList-Notes .Item-Col.Item-Col3 { margin-top: 15px; }
+  .Wrap.ReportForm { min-width: 0; }
+  .Profile .PhotoWrap { display: block; }
+  .PhotoWrap.IndexPhoto { display: none; }
+  .WarningType { margin-top: 7px; }
+  .WarningType label { margin-top: 0; } }
 .SpEdit { background-image: url("//vanillicon.com/sprites/sprites-14-000000.png"); background-position: -180px -20px; }
 
 .SpDelete { background-image: url("//vanillicon.com/sprites/sprites-14-000000.png"); background-position: -300px -140px; }

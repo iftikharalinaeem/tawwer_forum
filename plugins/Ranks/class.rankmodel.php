@@ -9,6 +9,12 @@ class RankModel extends Gdn_Model {
       parent::__construct('Rank');
    }
 
+   /**
+    * Check a user & apply their appropriate rank.
+    *
+    * @param $User
+    * @return array Key 'CurrentRank' with value of set RankID.
+    */
    public function ApplyRank($User) {
       if (is_numeric($User)) {
          $User = Gdn::UserModel()->GetID($User, DATASET_TYPE_ARRAY);
@@ -51,6 +57,13 @@ class RankModel extends Gdn_Model {
       return $Result;
    }
 
+   /**
+    * Tell a user about their new rank.
+    *
+    * @param $User
+    * @param $Rank
+    * @throws Exception
+    */
    public function Notify($User, $Rank) {
       $UserID = GetValue('UserID', $User);
       $RankID = $Rank['RankID'];
@@ -86,6 +99,12 @@ class RankModel extends Gdn_Model {
       $ActivityModel->SaveQueue();
    }
 
+   /**
+    * Return an HTML summary of a rank's abilities.
+    *
+    * @param $Rank
+    * @return mixed|string
+    */
    public static function AbilitiesString($Rank) {
       $Abilities = GetValue('Abilities', $Rank);
       $Result = array();
@@ -110,7 +129,17 @@ class RankModel extends Gdn_Model {
 
       self::AbilityString($Abilities, 'Titles', 'Titles', $Result);
       self::AbilityString($Abilities, 'Locations', 'Locations', $Result);
+      self::AbilityString($Abilities, 'Avatars', 'Avatars', $Result);
       self::AbilityString($Abilities, 'Signatures', 'Signatures', $Result);
+
+      if ($V = GetValue('SignatureMaxNumberImages', $Abilities)) {
+         $Result[] = '<b>Max number of images in signature</b>: '.$V;
+      }
+
+      if ($V = GetValue('SignatureMaxLength', $Abilities)) {
+         $Result[] = '<b>Max number of characters in signature</b>: '.$V;
+      }
+
       self::AbilityString($Abilities, 'Polls', 'Polls', $Result);
       self::AbilityString($Abilities, 'MeAction', 'Me Actions', $Result);
       self::AbilityString($Abilities, 'Curation', 'Content Curation', $Result);
@@ -130,6 +159,14 @@ class RankModel extends Gdn_Model {
       }
    }
 
+   /**
+    * Add the status of non-default abilities to $Result.
+    *
+    * @param array $Abilities Key is ability name, value is yes, no, or empty (default).
+    * @param string $Value Name of the ability.
+    * @param string $String What we're call in the ability in the UI.
+    * @param array $Result Store the HTML output for this line.
+    */
    public static function AbilityString($Abilities, $Value, $String, &$Result) {
       $V = GetValue($Value, $Abilities);
 
@@ -140,6 +177,14 @@ class RankModel extends Gdn_Model {
       }
    }
 
+   /**
+    * Set permissions, configs, or properties depending on each rank abilities.
+    *
+    * The default (empty string) option will fail each initial if(GetValue) check and skip it entirely.
+    * All config changes are set in memory only.
+    *
+    * @throws Exception
+    */
    public static function ApplyAbilities() {
       $Session = Gdn::Session();
       if (!$Session->User)
@@ -200,9 +245,22 @@ class RankModel extends Gdn_Model {
          SaveToConfig('Garden.Profile.Locations', $V == 'yes' ? TRUE : FALSE, FALSE);
       }
 
+      // Avatars.
+      if ($V = GetValue('Avatars', $Abilities)) {
+         SaveToConfig('Garden.Profile.EditPhotos', $V == 'yes' ? TRUE : FALSE, FALSE);
+      }
+
       // Signatures.
       if ($V = GetValue('Signatures', $Abilities)) {
          $Session->SetPermission('Plugins.Signatures.Edit', $V == 'yes' ? TRUE : FALSE);
+      }
+
+      if ($V = GetValue('SignatureMaxNumberImages', $Abilities)) {
+         SaveToConfig('Plugins.Signatures.MaxNumberImages', $V, FALSE);
+      }
+
+      if ($V = GetValue('SignatureMaxLength', $Abilities)) {
+         SaveToConfig('Plugins.Signatures.MaxLength', $V, FALSE);
       }
 
       // Polls.
@@ -257,6 +315,10 @@ class RankModel extends Gdn_Model {
 
       if ($V = GetValue('CountPosts', $Criteria)) {
          $Result[] = Plural($V, '%s post', '%s posts');
+      }
+
+      if ($V = GetValue('Role', $Criteria)) {
+         $Result[] = sprintf(T('Must have role of %s'), $V);
       }
 
       if (isset($Criteria['Permission'])) {
@@ -423,6 +485,21 @@ class RankModel extends Gdn_Model {
          $CountPosts = GetValue('CountDiscussions', $User, 0) + GetValue('CountComments', $User, 0);
          if ($CountPosts < $Criteria['CountPosts'])
             return FALSE;
+      }
+
+      if ($Role = val('Role', $Criteria)) {
+         $Roles = RoleModel::GetByName($Role);
+         $RankRoleID = key($Roles);
+
+         $UserModel = Gdn::UserModel();
+         // TODO: Refactor: Make method GetRoleIDs in UserModel.
+         $RoleData = $UserModel->GetRoles(GetValue('UserID', $User));
+         $UserRoles = $RoleData->Result(DATASET_TYPE_ARRAY);
+         $UserRoles = array_column($UserRoles, 'RoleID');
+
+         if (!in_array($RankRoleID, $UserRoles)) {
+            return FALSE;
+         }
       }
 
       if (isset($Criteria['Permission'])) {
