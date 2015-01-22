@@ -309,7 +309,10 @@ class GroupsHooks extends Gdn_Plugin {
         $SearchResults = $Sender->Data('SearchResults', array());
         foreach ($SearchResults as $ResultKey => &$Result) {
             $GroupID = val('GroupID', $Result, false);
-            if ($GroupID || in_array($Result['CategoryID'], $GroupCategoryIDs)) {
+
+            if (val('RecordType', $Result) === 'Group') {
+               continue;
+            } elseif ($GroupID || in_array($Result['CategoryID'], $GroupCategoryIDs)) {
 
                 if (!$GroupID && val('RecordType', $Result, false) == 'Discussion') {
 

@@ -150,13 +150,14 @@ class SearchModel extends Gdn_Model {
    public function GetGroups($ids) {
       $sql = Gdn::SQL()
          ->Select('g.GroupID as PrimaryID, g.GroupID, g.Name as Title, g.Description as Summary, g.Format, 0')
-         ->Select('g.DateInserted, 1000 as Scrore, \'group\' as Type')
+         ->Select('g.DateInserted, 1000 as Score, \'group\' as Type')
          ->Select('g.InsertUserID as UserID');
       $result = $sql->From('Group g')
          ->WhereIn('g.GroupID', $ids)
          ->Get()->ResultArray();
 
       foreach ($result as &$row) {
+         $row['RecordType'] = 'Group';
          $row['Name'] = $row['Title'];
          $row['Url'] = GroupUrl($row, '', '/');
          unset($row['Name']);
