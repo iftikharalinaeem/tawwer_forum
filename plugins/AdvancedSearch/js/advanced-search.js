@@ -21,6 +21,7 @@ $(document).on('click', '.AdvancedSearch .Handle', function(e) {
         
         if (gdn.definition('searchAutocomplete', true) != '0') {
            $('#Form_search', $container).autocomplete(method);
+           $('.js-search-groups').autocomplete(method);
         }
     }
     
@@ -100,6 +101,7 @@ jQuery(document).ready(function($) {
     /// Search box autocomplete.
     if ($.fn.searchAutocomplete && gdn.definition('searchAutocomplete', true) != '0') {
         $('.AdvancedSearch #Form_search,.SiteSearch #Form_Search,.js-search').searchAutocomplete();
+        $('.js-search-groups').searchAutocomplete();
         
         $('.QuickSearch #Form_search').each(function() {
             var $this = $(this);
