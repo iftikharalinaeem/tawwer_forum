@@ -173,6 +173,17 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
       die(json_encode($results['SearchResults']));
    }
 
+   public function searchController_groupAutoComplete_Create($sender, $term, $limit = 5) {
+      $searchModel = new SearchModel();
+      $get = $sender->Request->Get();
+      $get['search'] = $term;
+      $results = $searchModel->groupAutoComplete($get, $limit);
+      $this->CalculateResults($results['SearchResults'], $results['SearchTerms'], !$sender->Request->Get('nomark'), 100);
+
+      header('Content-Type: application/json; charset=utf8');
+      die(json_encode($results['SearchResults']));
+   }
+
    /**
     *
     * @param SearchController $Sender

@@ -101,12 +101,24 @@ jQuery(document).ready(function($) {
     /// Search box autocomplete.
     if ($.fn.searchAutocomplete && gdn.definition('searchAutocomplete', true) != '0') {
         $('.AdvancedSearch #Form_search,.SiteSearch #Form_Search,.js-search').searchAutocomplete();
-        $('.js-search-groups').searchAutocomplete();
-        
+
         $('.QuickSearch #Form_search').each(function() {
             var $this = $(this);
             
             $this.searchAutocomplete({ 
+                addForm: true,
+                position: {
+                    collision: "flip",
+                    of: $this.closest('form')
+                }
+            });
+        });
+
+        $('.js-search-groups').each(function() {
+            var $this = $(this);
+
+            $this.searchAutocomplete({
+                source: '/search/groupautocomplete.json',
                 addForm: true,
                 position: {
                     collision: "flip",
