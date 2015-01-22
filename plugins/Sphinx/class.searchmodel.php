@@ -25,8 +25,6 @@ class SearchModel extends Gdn_Model {
 
    public static $RankingMode = SPH_RANK_SPH04; //SPH_RANK_PROXIMITY_BM25;
 
-   public $SearchGroups = FALSE;
-
    public static $TypeMap = array(
       'd' => 0,
       'c' => 100,
@@ -42,7 +40,6 @@ class SearchModel extends Gdn_Model {
 
    public function __construct() {
       $this->UseDeltas = C('Plugins.Sphinx.UseDeltas');
-      $this->SearchGroups = C('Plugins.Sphinx.SearchGroups');
 
       if (array_key_exists("Vanilla", Gdn::ApplicationManager()->EnabledApplications())) {
          $this->Types[1] = 'Discussion';
@@ -57,7 +54,7 @@ class SearchModel extends Gdn_Model {
          $this->AddTypeInfo('Page', array($this, 'GetPages'), array($this, 'IndexPages'));
       }
 
-      if ($this->SearchGroups && array_key_exists("Groups", Gdn::ApplicationManager()->EnabledApplications())) {
+      if (static::SearchGroups()) {
          $this->Types[4] = 'Group';
          $this->AddTypeInfo('Group', array($this, 'GetGroups'));
       }
@@ -153,13 +150,14 @@ class SearchModel extends Gdn_Model {
    public function GetGroups($ids) {
       $sql = Gdn::SQL()
          ->Select('g.GroupID as PrimaryID, g.GroupID, g.Name as Title, g.Description as Summary, g.Format, 0')
-         ->Select('g.DateInserted, 1000 as Scrore, \'group\' as Type')
+         ->Select('g.DateInserted, 1000 as Score, \'group\' as Type')
          ->Select('g.InsertUserID as UserID');
       $result = $sql->From('Group g')
          ->WhereIn('g.GroupID', $ids)
          ->Get()->ResultArray();
 
       foreach ($result as &$row) {
+         $row['RecordType'] = 'Group';
          $row['Name'] = $row['Title'];
          $row['Url'] = GroupUrl($row, '', '/');
          unset($row['Name']);
@@ -394,6 +392,31 @@ class SearchModel extends Gdn_Model {
       return $results;
    }
 
+   /**
+    * Do a search on group names for auto-complete look ups.
+    *
+    * @param string $search The search term.
+    * @param int $limit The number of results to return.
+    * @return array Returns the search results.
+    */
+   public function groupAutoComplete($search, $limit = 10) {
+      $sphinx = $this->SphinxClient();
+      $sphinx->setLimits(0, $limit, 100);
+      $indexes = $this->Indexes('Group');
+
+      $search = Search::cleanSearch($search);
+
+      $str = $search['search'];
+      list ($query, $terms) = $this->splitTags($str);
+
+      $this->setSort($sphinx, $terms, $search);
+      $results = $this->DoSearch($sphinx, $query, $indexes);
+      $results['SearchTerms'] = $terms;
+
+      return $results;
+
+   }
+
    protected function DoSearch($Sphinx, $Query, $Indexes) {
       $this->EventArguments['SphinxClient'] = $Sphinx;
       $this->FireEvent('BeforeSphinxSearch');
@@ -455,6 +478,16 @@ class SearchModel extends Gdn_Model {
          }
       }
       return $Indexes;
+   }
+
+   /**
+    * Whether or not groups can be searched.
+    *
+    * @return bool Returns true if groups can be searched or false otherwise.
+    */
+   public static function SearchGroups() {
+      $result = in_array('groups', C('Plugins.Sphinx.Templates', [])) && Gdn::ApplicationManager()->IsEnabled('Groups');
+      return $result;
    }
 
    protected $_SphinxClient = null;

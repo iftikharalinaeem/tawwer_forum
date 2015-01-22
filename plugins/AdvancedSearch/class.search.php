@@ -269,6 +269,15 @@ EOT;
    }
 
    /**
+    * Whether or not groups can be searched.
+    *
+    * @return bool Returns true if groups can be searched or false otherwise.
+    */
+   public static function searchGroups() {
+      return method_exists('SearchModel', 'searchGroups') && SearchModel::searchGroups();
+   }
+
+   /**
     * Return an array of all of the valid search types.
     */
    public static function types() {
