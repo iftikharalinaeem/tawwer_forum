@@ -1,5 +1,6 @@
 <?php return array (
   'name' => 'Twitter Emoji',
+  'author' => 'Twitter, Inc.',
   'description' => 'The emoji used on Twitter\'s web app. Twitter emoji for everyone.',
   'format' => '<img class="emoji" src="{src}" title="{name}" alt="{name}" height="18" />',
   'emoji' => 
@@ -34,8 +35,6 @@
     'joy' => 'joy.png',
     'kiss' => 'kiss.png',
     'kissing_blush' => 'kissing_blush.png',
-    'kissing_closed_eyes copy' => 'kissing_closed_eyes copy.png',
-    'kissing_smiling_eyes' => 'kissing_smiling_eyes.png',
     'kissing_wink' => 'kissing_wink.png',
     'lol' => 'lol.png',
     'love' => 'love.png',
@@ -51,14 +50,13 @@
     'relaxed' => 'relaxed.png',
     'relieved' => 'relieved.png',
     'scream' => 'scream.png',
+    'skull' => 'skull.png',
     'sleeping' => 'sleeping.png',
     'sleepy' => 'sleepy.png',
     'smile' => 'smile.png',
     'smiley' => 'smiley.png',
     'smirk' => 'smirk.png',
     'star' => 'star.png',
-    'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.png',
-    'stuck_out_tongue_winking_eye' => 'stuck_out_tongue_winking_eye.png',
     'sunglasses' => 'sunglasses.png',
     'sweat' => 'sweat.png',
     'sweat_smile' => 'sweat_smile.png',
@@ -110,6 +108,21 @@
     'o:)' => 'innocent',
     '<3' => 'heart',
   ),
+  'archive' => 
+  array (
+    'broken_heart' => 'heartbreak.png',
+    'dizzy_face' => 'dizzy.png',
+    'grinning' => 'grin.png',
+    'heart_eyes' => 'love.png',
+    'kissing_closed_eyes' => 'kissing_closed_eyes.png',
+    'kissing_smiling_eyes' => 'kissing_smiling_eyes.png',
+    'neutral_face' => 'neutral.png',
+    'smiling_imp' => 'naughty.png',
+    'sob' => 'bawling.png',
+    'stuck_out_tongue' => 'tongue.png',
+    'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.png',
+    'stuck_out_tongue_winking_eye' => 'stuck_out_tongue_winking_eye.png',
+  ),
   'minSize' => 
   array (
     'w' => 34,
@@ -124,5 +137,4 @@
   array (
     0 => 1,
   ),
-  'author' => 'Twitter, Inc.',
 );
