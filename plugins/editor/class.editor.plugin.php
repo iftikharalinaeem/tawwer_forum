@@ -738,7 +738,7 @@ class EditorPlugin extends Gdn_Plugin {
          // to know this information to modify it accordingly.
          $View = $c->FetchView('editor', '', 'plugins/editor');
 
-         $Args['BodyBox'] .= $View;
+         $Args['BodyBox'] = $View.$Args['BodyBox'];
       }
    }
 
