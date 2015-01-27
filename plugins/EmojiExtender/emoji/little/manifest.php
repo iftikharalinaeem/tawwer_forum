@@ -1,9 +1,9 @@
 <?php return array (
   'name' => 'Little Emoji',
   'author' => 'Todd Burry',
-  'description' => 'Inspired by the the original 15px smileys seen on forums everywhere, but updated with a modern twist.',
+  'description' => 'Inspired by the the original 15px smileys seen on forums and still favored by emoticon enthusiasts everywhere.',
   'format' => '<img class="emoji" src="{src}" title="{name}" alt="{name}" srcset="{dir}/{basename}@2x{ext} 2x" />',
-  'emoji' => 
+  'emoji' =>
   array (
     -1 => '-1.png',
     '+1' => '+1.png',
@@ -53,7 +53,7 @@
     'wink' => 'wink.png',
     'winky' => 'winky.png',
   ),
-  'aliases' => 
+  'aliases' =>
   array (
     ':)' => 'smile',
     ':D' => 'grin',
@@ -77,7 +77,7 @@
     '=)' => 'smiley',
     '>_<' => 'rage',
   ),
-  'editor' => 
+  'editor' =>
   array (
     ':)' => 'smile',
     ':D' => 'smiley',
@@ -92,7 +92,7 @@
     '(*)' => 'star',
     '>:)' => 'naughty',
   ),
-  'archive' => 
+  'archive' =>
   array (
     'broken_heart' => 'heartbreak.png',
     'dizzy_face' => 'dizzy.png',
@@ -103,17 +103,17 @@
     'sob' => 'bawling.png',
     'stuck_out_tongue' => 'tongue.png',
   ),
-  'minSize' => 
+  'minSize' =>
   array (
     'w' => 15,
     'h' => 18,
   ),
-  'maxSize' => 
+  'maxSize' =>
   array (
     'w' => 22,
     'h' => 18,
   ),
-  'sizes' => 
+  'sizes' =>
   array (
     0 => 1,
     1 => 2,
