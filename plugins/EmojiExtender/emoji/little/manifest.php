@@ -1,6 +1,7 @@
 <?php return array (
   'name' => 'Little Emoji',
-  'description' => '',
+  'author' => 'Todd Burry',
+  'description' => 'Inspired by the the original 15px smileys seen on forums everywhere, but updated with a modern twist.',
   'format' => '<img class="emoji" src="{src}" title="{name}" alt="{name}" srcset="{dir}/{basename}@2x{ext} 2x" />',
   'emoji' =>
   array (

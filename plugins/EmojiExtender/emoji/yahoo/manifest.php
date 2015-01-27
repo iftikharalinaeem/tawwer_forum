@@ -1,6 +1,7 @@
 <?php return array (
-  'name' => '',
-  'description' => '',
+  'name' => 'Yahoo Emoticons',
+  'author' => 'Yahoo Inc.',
+  'description' => 'A set of emoticons originally released Yahoo Messenger during the IM boom of the 90s.',
   'format' => '<img class="emoji" src="{src}" title="{name}" alt="{name}" />',
   'emoji' =>
   array (

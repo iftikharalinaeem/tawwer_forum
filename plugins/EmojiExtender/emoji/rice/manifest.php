@@ -1,6 +1,7 @@
 <?php return array (
-  'name' => 'Riceballs',
-  'description' => 'A uniquely cute set of emoticons by David Lanham. Check out <a href="http://dlanham.com">dlanham.com</a> for more of his stuff.',
+  'name' => 'Riceball Emoticons',
+  'author' => 'David Lanham',
+  'description' => 'A uniquely cute set of emoticons modelled to look like little balls of rice. Check out <a href="http://dlanham.com" target="_blank">dlanham.com</a> for more of the author\'s stuff.',
   'format' => '<img class="emoji" src="{src}" title="{name}" alt="{name}" srcset="{dir}/{basename}@2x{ext} 2x" />',
   'emoji' =>
   array (

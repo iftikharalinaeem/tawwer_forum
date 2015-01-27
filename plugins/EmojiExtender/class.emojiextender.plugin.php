@@ -144,14 +144,32 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         $items = array();
 
         foreach ($this->emojiSets as $key => $emoji) {
-            $items[$key] = '@'.Img($emoji['icon'], array('alt' => $emoji['name']));
+            $manifestPath = $emoji['path'].'/manifest.php';
+            if (file_exists($manifestPath)) {
+                $manifest = require $manifestPath;
+            } else {
+                $manifest = array(
+                    'name' => 'Apple Emoji',
+                    'author' => 'Apple Inc.',
+                    'description' => 'A modern set of emoji you might recognize from any of your ubiquitous iDevices.'
+                );
+            }
+
+            $items[$key] = '@'.Img($emoji['icon'], array('alt' => $emoji['name'])).
+            '<div emojiset-body>'.
+                '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.
+                (empty($manifest['author']) ? '' : '<div class="emojiset-author">'.sprintf(T('by %s'), $manifest['author']).'</div>').
+                (empty($manifest['description']) ? '' : '<p class="emojiset-description">'.Gdn_Format::Wysiwyg($manifest['description']).'</p>').
+            '</div>';
         }
         $cf->Initialize(array(
-            'Garden.EmojiSet' => array(  'LabelCode' => 'Emoji Set',
-                                                        'Control' => 'radiolist',
-                                                        'Description' => '<p>Which emoji set would you like to use?</p>',
-                                                        'Items' => $items,
-                                                        'Options' => array('list' => true, 'listclass' => 'emojiext-list', 'display' => 'after')),
+            'Garden.EmojiSet' => array(
+                'LabelCode' => 'Emoji Set',
+                'Control' => 'radiolist',
+                'Description' => '<p>Which emoji set would you like to use?</p>',
+                'Items' => $items,
+                'Options' => array('list' => true, 'listclass' => 'emojiext-list', 'display' => 'after')
+            ),
             //If ever you want the functionality to merge the custom emoji set with the default set, uncomment below
             //'Plugins.EmojiExtender.merge' => array('LabelCode' => 'Merge set', 'Control' => 'Checkbox', 'Description' => '<p>Would you like to merge the selected emoji set with the default set?</p> <p><small><strong>Note:</strong> Some emojis in the default set may not be represented in the selected set and vice-versa.</small></p>'),
         ));
