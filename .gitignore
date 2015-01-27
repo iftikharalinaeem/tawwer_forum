@@ -16,3 +16,4 @@ sso/embed.html
 sso/functions.jsconnect.php
 sso/sso.php
 *.log
+utils/mustacher/vendor/*
