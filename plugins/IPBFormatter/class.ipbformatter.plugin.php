@@ -25,20 +25,35 @@ class IPBFormatterPlugin extends Gdn_Plugin {
       $String = str_replace(array('&quot;', '&#39;', '&#58;', 'Â'), array('"', "'", ':', ''), $String);
       $String = str_replace('<#EMO_DIR#>', 'default', $String);
       $String = str_replace('<{POST_SNAPBACK}>', '<span class="SnapBack">»</span>', $String);
-      
+
+      // There is an issue with using uppercase code blocks, so they're forced to lowercase here
+      $String = str_replace(array('[CODE]', '[/CODE]'), array('[code]', '[/code]'), $String);
+
+      /**
+       * IPB inserts line break markup tags at line breaks.  They need to be removed in code blocks.
+       * The original newline/line break should be left intact, so whitespace will be preserved in the pre tag.
+       */
+      $String = preg_replace_callback(
+         '/\[code\].*?\[\/code\]/is',
+         function($CodeBlocks) {
+            return str_replace(array('<br />'), array(''), $CodeBlocks[0]);
+         },
+         $String
+      );
+
       // If there is a really long string, it could cause a stack overflow in the bbcode parser.
       // Not much we can do except try and chop the data down a touch.
-      
+
       // 1. Remove html comments.
       $String = preg_replace('/<!--(.*)-->/Uis', '', $String);
-      
+
       // 2. Split the string up into chunks.
       $Strings = (array)$String;
       $Result = '';
       foreach ($Strings as $String) {
          $Result .= $this->NBBC()->Parse($String);
       }
-      
+
       // Make sure to clean filter the html in the end.
       $Config = array(
        'anti_link_spam' => array('`.`', ''),
@@ -54,16 +69,16 @@ class IPBFormatterPlugin extends Gdn_Plugin {
 
       $Spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash)';
       $Result = htmLawed($Result, $Config, $Spec);
-      
+
       return $Result;
    }
-   
+
    /**
     *
     * @var BBCode
     */
    protected $_NBBC;
-   
+
    /**
     * @return BBCode;
     */
