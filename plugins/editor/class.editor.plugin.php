@@ -462,30 +462,22 @@ class EditorPlugin extends Gdn_Plugin {
        */
       $toolbarDropdownEmoji = array();
       $emoji = Emoji::instance();
-      $emojiAliasList       = $emoji->getEmojiEditorList();
+      $emojiAliasList = $emoji->getEditorList();
       foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
-         $emojiFilePath          = $emoji->getEmoji($emojiCanonical);
-         //$editorDataAttr         = '{"action":"emoji","value":"'. htmlentities($emojiAlias) .'"}';
-         $editorDataAttr         = '{"action":"emoji","value":"'. addslashes($emojiAlias) .'"}';
-         //$emojiStyle           = 'background-image: url('. $emojiFilePath .'); background-size: '. $emojiDimension .'px; width: '.$emojiDimension .'px; height:'. $emojiDimension .'px;';
-
-         // In case user creates an alias that does not match a canonical
-         // emoji, let them know.
-         $emojiTitle             = (strpos($emojiFilePath, 'grey_question') === false)
-                                      ? $emojiAlias
-                                      : "Alias '$emojiCanonical' not found in canonical list.";
+         $emojiFilePath = $emoji->getEmojiPath($emojiCanonical);
+         $editorDataAttr = '{"action":"emoji","value":'.json_encode($emojiAlias).'}';
 
          $toolbarDropdownEmoji[] = array(
             'edit' => 'media',
             'action'=> 'emoji',
             'type' => 'button',
             'html_tag' => 'span',
-            'text' => $emoji->img($emojiFilePath, $emojiAlias, $editorDataAttr),
+            'text' => $emoji->img($emojiFilePath, $emojiAlias),
             'attr' => array(
-               'class' => 'editor-action emoji-'. $emojiCanonical. ' editor-dialog-fire-close',
+               'class' => 'editor-action emoji-'. $emojiCanonical. ' editor-dialog-fire-close emoji-wrap',
                'data-wysihtml5-command' => 'insertHTML',
                'data-wysihtml5-command-value' => ' '.$emojiAlias .' ',
-               'title' => T($emojiTitle),
+               'title' => $emojiAlias,
                'data-editor' => $editorDataAttr));
       }
 
