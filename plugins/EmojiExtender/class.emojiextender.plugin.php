@@ -69,10 +69,10 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         $root = '/plugins/EmojiExtender/emoji';
 
         $this->emojiSets = array(
-            '' => array('name' => 'Default Set', 'icon' => "$root/default.png", 'path' => '/resources/emoji'),
-            'yahoo'   => array('name' => 'Yahoo Chat', 'icon' => "$root/yahoo/icon.png", 'path' => PATH_ROOT."$root/yahoo"),
-            'rice'    => array('name' => 'Riceballs', 'icon' => "$root/rice/icon.png", 'path' => PATH_ROOT."$root/rice"),
-            'none'    => array('name' => T('No Emoji'), 'icon' => "$root/none/icon.png", 'path' => PATH_ROOT."$root/none"),
+            '' => array('name' => 'Apple Emoji', 'icon' => "$root/default.png", 'path' => '/resources/emoji'),
+            'yahoo'   => array('name' => 'Yahoo Chat', 'icon' => "$root/yahoo/yahoo-icon.png", 'path' => PATH_ROOT."$root/yahoo"),
+            'rice'    => array('name' => 'Riceball Emoticons', 'icon' => "$root/rice/rice-icon.png", 'path' => PATH_ROOT."$root/rice"),
+            'none'    => array('name' => T('No Emoji'), 'icon' => "$root/none/none-icon.png", 'path' => PATH_ROOT."$root/none"),
         );
 //        $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('EmojiExtender', Gdn_PluginManager::ACCESS_PLUGINNAME);
 //        $this->emojiSet = C('Garden.EmojiSet', '');
@@ -96,37 +96,19 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
 
         // First grab the manifest to the emoji.
         $emojiSet = $this->emojiSets[$emojiSetName];
-        $manifestPath = $emojiSet['path'].'/manifest.json';
+        $manifestPath = $emojiSet['path'].'/manifest.php';
         if (!file_exists($manifestPath)) {
             trigger_error("Emoji manifest does not exist: $manifestPath.", E_USER_NOTICE);
             return;
         }
         try {
-            $manifest = json_decode(file_get_contents($manifestPath), true);
+            $manifest = require $manifestPath;
         } catch (Exception $ex) {
             trigger_error($ex->getMessage(), E_USER_NOTICE);
             return;
         }
 
-        // Set the default asset root.
-        $emoji->setAssetPath(StringBeginsWith($emojiSet['path'], PATH_ROOT, true, true));
-
-        // Set the emoji settings from the manifest.
-        if (array_key_exists('emoji', $manifest)) {
-            $emoji->setEmoji($manifest['emoji']);
-        }
-//
-        if (array_key_exists('aliases', $manifest)) {
-            $emoji->setAliases($manifest['aliases']);
-        }
-
-        if (!empty($manifest['format'])) {
-            $emoji->format = $manifest['format'];
-        }
-//
-        if (array_key_exists('editor', $manifest)) {
-            $emoji->setEmojiEditorList($manifest['editor']);
-        }
+        $emoji->setFromManifest($manifest, StringBeginsWith($emojiSet['path'], PATH_ROOT, true, true));
     }
 
     /**
@@ -202,11 +184,4 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
 //             $Sender->EventArguments['Object'] = $Object;
 //        }
 //    }
-
-    /**
-    * Load CSS into head for suggester flyout in editor
-    */
-    public function AssetModel_StyleCss_Handler($Sender) {
-        $Sender->AddCssFile('suggester.css', 'plugins/EmojiExtender');
-    }
 }

@@ -8,8 +8,8 @@
   overflow: hidden;
   padding: 5px; }
   .emojiext-list label img {
-    height: 150px;
-    width: 150px; }
+    height: 128px;
+    width: 128px; }
 .emojiext-list input[type=radio] {
   position: absolute;
   top: -9999px;
@@ -26,11 +26,3 @@
   background-repeat: no-repeat;
   background-position: 0 30px;
   cursor: pointer; }
-.Dashboard.Settings.EmojiExtender div ~ label[for="Form_Plugins-dot-EmojiExtender-dot-emojiSet"] {
-  background-image: url('images/default.png'); }
-.Dashboard.Settings.EmojiExtender label[for="Form_Plugins-dot-EmojiExtender-dot-emojiSet1"] {
-  background-image: url('images/yahoo.png'); }
-.Dashboard.Settings.EmojiExtender label[for="Form_Plugins-dot-EmojiExtender-dot-emojiSet2"] {
-  background-image: url('images/rice.png'); }
-.Dashboard.Settings.EmojiExtender label[for="Form_Plugins-dot-EmojiExtender-dot-emojiSet3"] {
-  background-image: url('images/none.png'); }
