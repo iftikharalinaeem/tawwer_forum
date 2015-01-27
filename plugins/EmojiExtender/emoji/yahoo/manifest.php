@@ -1,9 +1,9 @@
 <?php return array (
   'name' => 'Yahoo Emoticons',
   'author' => 'Yahoo Inc.',
-  'description' => 'A set of emoticons originally released Yahoo Messenger during the IM boom of the 90s.',
+  'description' => 'A set of emoticons originally released with Yahoo Messenger during the IM boom of the 90s.',
   'format' => '<img class="emoji" src="{src}" title="{name}" alt="{name}" />',
-  'emoji' => 
+  'emoji' =>
   array (
     'angry' => 'angry.gif',
     'anguished' => 'anguished.gif',
@@ -99,7 +99,7 @@
     'worried' => 'worried.gif',
     'yin_yang' => 'yin_yang.gif',
   ),
-  'aliases' => 
+  'aliases' =>
   array (
     ':)' => 'smile',
     ':D' => 'grin',
@@ -120,7 +120,7 @@
     '=)' => 'smiley',
     '>_<' => 'rage',
   ),
-  'editor' => 
+  'editor' =>
   array (
     ':)' => 'smile',
     ':D' => 'smiley',
@@ -131,7 +131,7 @@
     'B)' => 'sunglasses',
     ':#' => 'grin',
   ),
-  'archive' => 
+  'archive' =>
   array (
     'broken_heart' => 'heartbreak.gif',
     'dizzy_face' => 'dizzy.gif',
@@ -142,17 +142,17 @@
     'stuck_out_tongue' => 'tongue.gif',
     'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.gif',
   ),
-  'minSize' => 
+  'minSize' =>
   array (
     'w' => 17,
     'h' => 18,
   ),
-  'maxSize' => 
+  'maxSize' =>
   array (
     'w' => 300,
     'h' => 300,
   ),
-  'sizes' => 
+  'sizes' =>
   array (
     0 => 1,
   ),
