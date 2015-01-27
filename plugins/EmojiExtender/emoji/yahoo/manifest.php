@@ -3,10 +3,11 @@
   'author' => 'Yahoo Inc.',
   'description' => 'A set of emoticons originally released Yahoo Messenger during the IM boom of the 90s.',
   'format' => '<img class="emoji" src="{src}" title="{name}" alt="{name}" />',
-  'emoji' =>
+  'emoji' => 
   array (
     'angry' => 'angry.gif',
     'anguished' => 'anguished.gif',
+    'bawling' => 'bawling.gif',
     'bee' => 'bee.gif',
     'blush' => 'blush.gif',
     'bow' => 'bow.gif',
@@ -27,9 +28,9 @@
     'frowning' => 'frowning.gif',
     'get_outta_here' => 'get_outta_here.gif',
     'giggle' => 'giggle.gif',
+    'glasses' => 'glasses.gif',
     'grimacing' => 'grimacing.gif',
     'grin' => 'grin.gif',
-    'grinning' => 'grinning.gif',
     'hang_loose' => 'hang_loose.gif',
     'heart' => 'heart.gif',
     'heartbreak' => 'heartbreak.gif',
@@ -53,7 +54,7 @@
     'monkey' => 'monkey.gif',
     'mrgreen' => 'mrgreen.gif',
     'murica' => 'murica.gif',
-    'nerd' => 'nerd.gif',
+    'naughty' => 'naughty.gif',
     'neutral' => 'neutral.gif',
     'no_mouth' => 'no_mouth.gif',
     'not_listening' => 'not_listening.gif',
@@ -82,11 +83,8 @@
     'sleepy' => 'sleepy.gif',
     'smile' => 'smile.gif',
     'smiley' => 'smiley.gif',
-    'smiling_imp' => 'smiling_imp.gif',
     'smirk' => 'smirk.gif',
-    'sob' => 'sob.gif',
     'star' => 'star.gif',
-    'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.gif',
     'sunglasses' => 'sunglasses.gif',
     'time_out' => 'time_out.gif',
     'tired_face' => 'tired_face.gif',
@@ -101,7 +99,7 @@
     'worried' => 'worried.gif',
     'yin_yang' => 'yin_yang.gif',
   ),
-  'aliases' =>
+  'aliases' => 
   array (
     ':)' => 'smile',
     ':D' => 'grin',
@@ -118,11 +116,11 @@
     'o:)' => 'innocent',
     '<3' => 'heart',
     '(*)' => 'star',
-    '>:)' => 'smiling_imp',
+    '8-)' => 'glasses',
     '=)' => 'smiley',
     '>_<' => 'rage',
   ),
-  'editor' =>
+  'editor' => 
   array (
     ':)' => 'smile',
     ':D' => 'smiley',
@@ -133,17 +131,28 @@
     'B)' => 'sunglasses',
     ':#' => 'grin',
   ),
-  'minSize' =>
+  'archive' => 
+  array (
+    'broken_heart' => 'heartbreak.gif',
+    'dizzy_face' => 'dizzy.gif',
+    'grinning' => 'grin.gif',
+    'neutral_face' => 'neutral.gif',
+    'smiling_imp' => 'naughty.gif',
+    'sob' => 'bawling.gif',
+    'stuck_out_tongue' => 'tongue.gif',
+    'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.gif',
+  ),
+  'minSize' => 
   array (
     'w' => 17,
     'h' => 18,
   ),
-  'maxSize' =>
+  'maxSize' => 
   array (
     'w' => 300,
     'h' => 300,
   ),
-  'sizes' =>
+  'sizes' => 
   array (
     0 => 1,
   ),
