@@ -3,7 +3,7 @@
 $PluginInfo['EmojiExtender'] = array(
     'Name'        => "Emoji Sets",
     'Description' => "Change your emoji set!",
-    'Version'     => '1.0.0',
+    'Version'     => '1.1.0',
     'Author'      => "Becky Van Bussel",
     'AuthorEmail' => 'rvanbussel@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
