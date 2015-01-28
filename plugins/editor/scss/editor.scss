@@ -189,30 +189,38 @@
 }
 
 /**
- * Emoji dropdown
+ * Emoji drop down
  */
+$emoji-width: 34px;
 
 .editor-dd-emoji {
    + .editor-insert-dialog {
-      width: 132px;
-      box-sizing: border-box;
+      width: $emoji-width * 4;
+//      box-sizing: border-box;
+//      overflow: hidden;
 
       // Since making emoji pluggable, the .emoji tag is wrapped in a span,
       // with its .emoji class name removed and just added to the child, being
       // the img tag. The parent span tag has the .emoji-$name and
       // .editor-action
-      .emoji {
-         display: inline-block;
-         padding: 5px;
-         background-repeat: no-repeat;
-         background-position: center;
-         box-sizing: content-box;
+      .emoji-wrap {
+         line-height: $emoji-width;
+         width: $emoji-width;
+         overflow: hidden;
+         text-align: center;
+         float: left;
 
          &:hover {
             cursor: pointer;
             background-color: rgba($black,.10);
             border-radius: 2px;
          }
+      }
+
+      .emoji {
+         line-height: $emoji-width;
+         display: inline-block;
+         vertical-align: middle;
       }
    }
 }

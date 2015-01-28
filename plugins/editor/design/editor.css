@@ -331,23 +331,24 @@
     border-radius: 0; }
 
 /**
- * Emoji dropdown
+ * Emoji drop down
  */
 .editor-dd-emoji + .editor-insert-dialog {
-  width: 132px;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box; }
-  .editor-dd-emoji + .editor-insert-dialog .emoji {
-    display: inline-block;
-    padding: 5px;
-    background-repeat: no-repeat;
-    background-position: center;
-    -moz-box-sizing: content-box;
-    box-sizing: content-box; }
-    .editor-dd-emoji + .editor-insert-dialog .emoji:hover {
+  width: 136px; }
+  .editor-dd-emoji + .editor-insert-dialog .emoji-wrap {
+    line-height: 34px;
+    width: 34px;
+    overflow: hidden;
+    text-align: center;
+    float: left; }
+    .editor-dd-emoji + .editor-insert-dialog .emoji-wrap:hover {
       cursor: pointer;
       background-color: rgba(0, 0, 0, 0.1);
       border-radius: 2px; }
+  .editor-dd-emoji + .editor-insert-dialog .emoji {
+    line-height: 34px;
+    display: inline-block;
+    vertical-align: middle; }
 
 /**
  * File and image dropdown

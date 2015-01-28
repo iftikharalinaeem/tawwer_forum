@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit;
 
 $PluginInfo['EmojiExtender'] = array(
-    'Name'        => "Emoji Extender",
+    'Name'        => "Emoji Sets",
     'Description' => "Change your emoji set!",
-    'Version'     => '1.0.0',
+    'Version'     => '1.1.0',
     'Author'      => "Becky Van Bussel",
     'AuthorEmail' => 'rvanbussel@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
@@ -69,10 +69,12 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         $root = '/plugins/EmojiExtender/emoji';
 
         $this->emojiSets = array(
-            '' => array('name' => 'Default Set', 'icon' => "$root/default.png", 'path' => '/resources/emoji'),
-            'yahoo'   => array('name' => 'Yahoo Chat', 'icon' => "$root/yahoo/icon.png", 'path' => PATH_ROOT."$root/yahoo"),
-            'rice'    => array('name' => 'Riceballs', 'icon' => "$root/rice/icon.png", 'path' => PATH_ROOT."$root/rice"),
-            'none'    => array('name' => T('No Emoji'), 'icon' => "$root/none/icon.png", 'path' => PATH_ROOT."$root/none"),
+            ''        => array('name' => 'Apple Emoji', 'icon' => "$root/default.png", 'path' => '/resources/emoji'),
+            'twitter' => array('name' => 'Twitter Emoji', 'icon' => "$root/twitter/twitter-icon.png", 'path' => PATH_ROOT."$root/twitter"),
+            'little'  => array('name' => 'Little Emoji', 'icon' => "$root/little/little-icon.png", 'path' => PATH_ROOT."$root/little"),
+            'rice'    => array('name' => 'Riceball Emoticons', 'icon' => "$root/rice/rice-icon.png", 'path' => PATH_ROOT."$root/rice"),
+            'yahoo'   => array('name' => 'Yahoo Chat', 'icon' => "$root/yahoo/yahoo-icon.png", 'path' => PATH_ROOT."$root/yahoo"),
+            'none'    => array('name' => T('No Emoji'), 'icon' => "$root/none/none-icon.png", 'path' => PATH_ROOT."$root/none"),
         );
 //        $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('EmojiExtender', Gdn_PluginManager::ACCESS_PLUGINNAME);
 //        $this->emojiSet = C('Garden.EmojiSet', '');
@@ -96,37 +98,19 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
 
         // First grab the manifest to the emoji.
         $emojiSet = $this->emojiSets[$emojiSetName];
-        $manifestPath = $emojiSet['path'].'/manifest.json';
+        $manifestPath = $emojiSet['path'].'/manifest.php';
         if (!file_exists($manifestPath)) {
             trigger_error("Emoji manifest does not exist: $manifestPath.", E_USER_NOTICE);
             return;
         }
         try {
-            $manifest = json_decode(file_get_contents($manifestPath), true);
+            $manifest = require $manifestPath;
         } catch (Exception $ex) {
             trigger_error($ex->getMessage(), E_USER_NOTICE);
             return;
         }
 
-        // Set the default asset root.
-        $emoji->setAssetPath(StringBeginsWith($emojiSet['path'], PATH_ROOT, true, true));
-
-        // Set the emoji settings from the manifest.
-        if (array_key_exists('emoji', $manifest)) {
-            $emoji->setEmoji($manifest['emoji']);
-        }
-//
-        if (array_key_exists('aliases', $manifest)) {
-            $emoji->setAliases($manifest['aliases']);
-        }
-
-        if (!empty($manifest['format'])) {
-            $emoji->format = $manifest['format'];
-        }
-//
-        if (array_key_exists('editor', $manifest)) {
-            $emoji->setEmojiEditorList($manifest['editor']);
-        }
+        $emoji->setFromManifest($manifest, StringBeginsWith($emojiSet['path'], PATH_ROOT, true, true));
     }
 
     /**
@@ -161,14 +145,32 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         $items = array();
 
         foreach ($this->emojiSets as $key => $emoji) {
-            $items[$key] = '@'.Img($emoji['icon'], array('alt' => $emoji['name']));
+            $manifestPath = $emoji['path'].'/manifest.php';
+            if (file_exists($manifestPath)) {
+                $manifest = require $manifestPath;
+            } else {
+                $manifest = array(
+                    'name' => 'Apple Emoji',
+                    'author' => 'Apple Inc.',
+                    'description' => 'A modern set of emoji you might recognize from any of your ubiquitous iDevices.'
+                );
+            }
+
+            $items[$key] = '@'.Img($emoji['icon'], array('alt' => $emoji['name'])).
+            '<div emojiset-body>'.
+                '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.
+                (empty($manifest['author']) ? '' : '<div class="emojiset-author">'.sprintf(T('by %s'), $manifest['author']).'</div>').
+                (empty($manifest['description']) ? '' : '<p class="emojiset-description">'.Gdn_Format::Wysiwyg($manifest['description']).'</p>').
+            '</div>';
         }
         $cf->Initialize(array(
-            'Garden.EmojiSet' => array(  'LabelCode' => 'Emoji Set',
-                                                        'Control' => 'radiolist',
-                                                        'Description' => '<p>Which emoji set would you like to use?</p>',
-                                                        'Items' => $items,
-                                                        'Options' => array('list' => true, 'listclass' => 'emojiext-list', 'display' => 'after')),
+            'Garden.EmojiSet' => array(
+                'LabelCode' => 'Emoji Set',
+                'Control' => 'radiolist',
+                'Description' => '<p>Which emoji set would you like to use?</p>',
+                'Items' => $items,
+                'Options' => array('list' => true, 'listclass' => 'emojiext-list', 'display' => 'after')
+            ),
             //If ever you want the functionality to merge the custom emoji set with the default set, uncomment below
             //'Plugins.EmojiExtender.merge' => array('LabelCode' => 'Merge set', 'Control' => 'Checkbox', 'Description' => '<p>Would you like to merge the selected emoji set with the default set?</p> <p><small><strong>Note:</strong> Some emojis in the default set may not be represented in the selected set and vice-versa.</small></p>'),
         ));
@@ -202,11 +204,4 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
 //             $Sender->EventArguments['Object'] = $Object;
 //        }
 //    }
-
-    /**
-    * Load CSS into head for suggester flyout in editor
-    */
-    public function AssetModel_StyleCss_Handler($Sender) {
-        $Sender->AddCssFile('suggester.css', 'plugins/EmojiExtender');
-    }
 }
