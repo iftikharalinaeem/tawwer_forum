@@ -115,7 +115,6 @@
     'B)' => 'sunglasses',
     'o:)' => 'innocent',
     '<3' => 'heart',
-    '(*)' => 'star',
     '8-)' => 'glasses',
     '=)' => 'smiley',
     '>_<' => 'rage',
