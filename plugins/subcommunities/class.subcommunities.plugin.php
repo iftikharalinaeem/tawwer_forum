@@ -139,6 +139,22 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Adjust the depth of the categories so that they start at 1.
+     *
+     * @param CategoriesController $sender
+     */
+    public function categoriesController_render_before($sender) {
+        if (empty($sender->Data['Category']) || empty($sender->Data['Categories'])) {
+            return;
+        }
+
+        $adjust = -$sender->Data('Category.Depth');
+        foreach ($sender->Data['Categories'] as &$category) {
+            SetValue('Depth', $category, val('Depth', $category) + $adjust);
+        }
+    }
+
+    /**
      * Make sure the discussions controller is filtering by subcommunity.
      *
      * @param DiscussionsController $sender
@@ -214,7 +230,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $category = CategoryModel::Categories($site['CategoryID']);
 
             // Set the default category root.
-            $routes[base64_encode('categories$')] = ltrim(CategoryUrl($category, '', '/'), '/');
+            $routes[base64_encode('categories(.json)?$')] = ltrim(CategoryUrl($category, '', '/'), '/').'$1';
 
             $defaultRoute = val('DefaultController', $routes);
             if (is_array($defaultRoute)) {
