@@ -8,7 +8,8 @@ $PluginInfo['EmojiExtender'] = array(
     'AuthorEmail' => 'rvanbussel@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
     'License'     => 'Proprietary',
-    'SettingsUrl' => '/settings/EmojiExtender'
+    'SettingsUrl' => '/settings/EmojiExtender',
+    'MobileFriendly' => true
 );
 
 /**
