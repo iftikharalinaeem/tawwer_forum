@@ -3,7 +3,7 @@
   'author' => 'Twitter, Inc.',
   'description' => 'The emoji used on Twitter\'s web app. Twitter emoji for everyone.',
   'format' => '<img class="emoji" src="{src}" title="{name}" alt="{name}" height="18" />',
-  'emoji' => 
+  'emoji' =>
   array (
     -1 => '-1.png',
     '+1' => '+1.png',
@@ -71,7 +71,7 @@
     'worried' => 'worried.png',
     'yum' => 'yum.png',
   ),
-  'aliases' => 
+  'aliases' =>
   array (
     ':)' => 'smile',
     ':D' => 'grin',
@@ -89,11 +89,11 @@
     ':#' => 'grimace',
     'o:)' => 'innocent',
     '<3' => 'heart',
-    '(*)' => 'star',
     '=)' => 'smiley',
     '>_<' => 'rage',
+    ':3' => 'blush',
   ),
-  'editor' => 
+  'editor' =>
   array (
     ':)' => 'smile',
     ':D' => 'smiley',
@@ -104,11 +104,11 @@
     ':p' => 'tongue',
     ':\'(' => 'cry',
     'B)' => 'sunglasses',
-    ':#' => 'grin',
-    'o:)' => 'innocent',
+    ':#' => 'grimace',
+    ':3' => 'blush',
     '<3' => 'heart',
   ),
-  'archive' => 
+  'archive' =>
   array (
     'broken_heart' => 'heartbreak.png',
     'dizzy_face' => 'dizzy.png',
@@ -123,17 +123,17 @@
     'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.png',
     'stuck_out_tongue_winking_eye' => 'stuck_out_tongue_winking_eye.png',
   ),
-  'minSize' => 
+  'minSize' =>
   array (
     'w' => 34,
     'h' => 34,
   ),
-  'maxSize' => 
+  'maxSize' =>
   array (
     'w' => 40,
     'h' => 40,
   ),
-  'sizes' => 
+  'sizes' =>
   array (
     0 => 1,
   ),
