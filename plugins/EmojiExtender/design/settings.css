@@ -1,19 +1,27 @@
 .emojiext-list li {
-  display: inline-block; }
+  display: inline-block;
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
+  width: 50%; }
+  @media screen and (max-width: 1100px) {
+    .emojiext-list li {
+      width: 100%; } }
 .emojiext-list label {
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
   cursor: pointer;
-  margin-right: 20px;
   border: 2px solid transparent;
-  display: inline-block !important;
+  display: block !important;
   overflow: hidden;
-  padding: 5px; }
+  padding: 15px; }
   .emojiext-list label img {
-    height: 150px;
-    width: 150px; }
+    height: 128px;
+    width: 128px;
+    float: left;
+    margin-right: 15px; }
 .emojiext-list input[type=radio] {
   position: absolute;
-  top: -9999px;
-  left: -9999px; }
+  opacity: 0; }
 .emojiext-list input[type=radio]:checked ~ label {
   border-color: #82BDDD; }
 
@@ -26,11 +34,3 @@
   background-repeat: no-repeat;
   background-position: 0 30px;
   cursor: pointer; }
-.Dashboard.Settings.EmojiExtender div ~ label[for="Form_Plugins-dot-EmojiExtender-dot-emojiSet"] {
-  background-image: url('images/default.png'); }
-.Dashboard.Settings.EmojiExtender label[for="Form_Plugins-dot-EmojiExtender-dot-emojiSet1"] {
-  background-image: url('images/yahoo.png'); }
-.Dashboard.Settings.EmojiExtender label[for="Form_Plugins-dot-EmojiExtender-dot-emojiSet2"] {
-  background-image: url('images/rice.png'); }
-.Dashboard.Settings.EmojiExtender label[for="Form_Plugins-dot-EmojiExtender-dot-emojiSet3"] {
-  background-image: url('images/none.png'); }
