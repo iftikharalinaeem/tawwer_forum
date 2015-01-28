@@ -3,13 +3,12 @@
 $PluginInfo['featured'] = array(
    'Name' => 'Featured Discussions',
    'Description' => 'Feature discussions.',
-   'Version' => '1.0b',
+   'Version' => '1.0',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
    'RequiredApplications' => array(
        'Vanilla' => '2.2'
-       //'Reactions' => '>=1.0'
    ),
    'RequiredTheme' => false,
    'RequiredPlugins' => array(

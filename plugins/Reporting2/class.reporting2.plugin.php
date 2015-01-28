@@ -7,7 +7,7 @@
 $PluginInfo['Reporting2'] = array(
    'Name' => 'Reporting',
    'Description' => 'Allows users to report posts to moderators for abuse, terms of service violations etc.',
-   'Version' => '2.0b',
+   'Version' => '2.0',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'SettingsUrl' => '/settings/reporting',
    'SettingsPermission' => 'Garden.Settings.Manage',

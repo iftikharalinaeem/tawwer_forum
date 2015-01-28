@@ -8,7 +8,7 @@
 $PluginInfo['CASAuthentication'] = array(
    'Name' => 'CAS Authentication for CRN',
    'Description' => 'Allows Vanilla to authenticate against a <a href="http://en.wikipedia.org/wiki/Central_Authentication_Service">CAS</a> authentication server.',
-   'Version' => '1.0b',
+   'Version' => '1.0',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',

@@ -19,7 +19,7 @@ $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
    'Version' => '1.3',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'RegisterPermissions' => array(
       'Reactions.Positive.Add' => 'Garden.SignIn.Allow',
       'Reactions.Negative.Add' => 'Garden.SignIn.Allow',

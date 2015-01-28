@@ -7,8 +7,8 @@
 $PluginInfo['IPBFormatter'] = array(
     'Name' => 'IPB Formatter',
     'Description' => 'Formats posts imported from Invision Power Board.',
-    'Version' => '1.0b',
-    'RequiredApplications' => array('Vanilla' => '2.0.2a'),
+    'Version' => '1.0',
+    'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'RequiredPlugins' => FALSE,
     'HasLocale' => FALSE,
     'Author' => "Todd Burry",

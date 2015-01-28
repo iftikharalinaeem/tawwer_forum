@@ -8,7 +8,7 @@
 $PluginInfo['CollapseCategories'] = array(
    'Name' => 'Collapse Categories',
    'Description' => 'Adds +/- icons beside category names so that they can be collapsed/expanded.',
-   'Version' => '1.0.1b',
+   'Version' => '1.0.1',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => FALSE,
    'Author' => 'Todd Burry',
