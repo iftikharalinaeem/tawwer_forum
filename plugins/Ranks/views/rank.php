@@ -90,6 +90,18 @@ echo $this->Form->Open(), $this->Form->Errors();
      ?>
    </li>
    <li>
+      <?php
+         echo $this->Form->Label('Role', 'Criteria_Points'),
+            '<div class="Info2">'."Users with the following roles will gain this rank.".'</div>';
+         $Roles = RoleModel::Roles();
+         $RoleNames[] = '';
+         foreach($Roles as $Role) {
+            $RoleNames[GetValue('Name', $Role)] = GetValue('Name', $Role);
+         }
+         echo $this->Form->DropDown('Criteria_Role', $RoleNames);
+      ?>
+   </li>
+   <li>
      <?php
      echo $this->Form->Label('Permission', 'Criteria_Permission'),
      '<div class="Info2">'."Users will need this permission to gain this rank.".'</div>',
@@ -99,7 +111,7 @@ echo $this->Form->Open(), $this->Form->Errors();
    <li>
      <?php
      echo
-     '<div class="Info2">'."You can have administrators manually apply ranks. This is usefull if only a few people will have the rank and its criteria is subjective.".'</div>',
+     '<div class="Info2">'."You can have administrators manually apply ranks. This is useful if only a few people will have the rank and its criteria is subjective.".'</div>',
       $this->Form->CheckBox('Criteria_Manual', 'Applied Manually');
      ?>
    </li>
@@ -177,9 +189,30 @@ echo $this->Form->Open(), $this->Form->Errors();
    </li>
    <li>
      <?php
+     echo $this->Form->Label('Avatars', 'Abilities_Avatars'),
+     '<div class="Info2">'."You can give or take away the ability to have avatars. (Requires permission to edit profile)".'</div>',
+      $this->Form->RadioList('Abilities_Avatars', array('no' => 'take away', '' => 'default'));
+     ?>
+   </li>
+   <li>
+     <?php
      echo $this->Form->Label('Signatures', 'Abilities_Signatures'),
      '<div class="Info2">'."You can give or take away the ability to have signatures. (Requires the signatures addon)".'</div>',
       $this->Form->RadioList('Abilities_Signatures', array('yes' => 'give', 'no' => 'take away', '' => 'default'));
+     ?>
+   </li>
+   <li>
+     <?php
+     $Options = array('' => T('Default'), 'Unlimited' => T('Unlimited'), 'None' => T('None'), '1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5');
+     echo $this->Form->Label('Max number of images in signature', 'Abilities_SignatureMaxNumberImages');
+     echo $this->Form->DropDown('Abilities_SignatureMaxNumberImages', $Options);
+     ?>
+   </li>
+   <li>
+     <?php
+     $Attributes = array('class' => 'SmallInput');
+     echo $this->Form->Label('Max signature length', 'Abilities_SignatureMaxLength');
+     echo $this->Form->TextBox('Abilities_SignatureMaxLength', $Attributes);
      ?>
    </li>
    <li>

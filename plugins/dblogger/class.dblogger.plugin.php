@@ -51,7 +51,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
 
     public function Base_GetAppSettingsMenuItems_Handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
-        $Menu->AddLink('Dashboard', T('Event Log'), '/settings/eventlog', 'Garden.Settings.Manage');
+        $Menu->AddLink('Dashboard', T('Event Log'), '/settings/eventlog', 'Garden.Settings.Manage', array('class' => 'nav-event-log'));
     }
 
     /**

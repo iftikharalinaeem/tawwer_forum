@@ -13,14 +13,20 @@ Logs events from the Logger object to the syslog. This plugin can really help wi
     * file /var/log/vanilla.log mode=0640 compress format=std rotate=seq file_max=5M all_max=20M
     ? [<= Level debug] store
     ```
+    
+3. Make sure the log file exists.
 
-3. In order for your changes to take effect you'll have to send an `HUP` signal to syslogd.
+    ```
+    sudo touch /var/log/vanilla.log
+    ```
+
+4. In order for your changes to take effect you'll have to send an `HUP` signal to syslogd.
 
     ```
     sudo killall -HUP syslogd
     ```
 
-4. To see the events logged in vanilla you just need to tail the `vanilla.log` file.
+5. To see the events logged in vanilla you just need to tail the `vanilla.log` file.
 
     ```
     tail -f /var/log/vanilla.log

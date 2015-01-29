@@ -1,6 +1,6 @@
 <div class="AttendeeList YesAttending"><?php
    $Yes = sizeof($this->Data('Invited.Yes', array()));
-   echo Wrap(sprintf(T('Attending (%d)'), $Yes),'h3');
+   echo Wrap(sprintf(T('Attending (%s)'), $Yes),'h3');
 
    if (!$Yes)
       echo T("Nobody has confirmed their attendance yet.");
@@ -12,7 +12,7 @@
 <div class="Negatives">
    <div class="AttendeeList NotAttending"><?php
       $No = sizeof($this->Data('Invited.No', array()));
-      echo Wrap(sprintf(T('Not Attending (%d)'), $No),'h3');
+      echo Wrap(sprintf(T('Not Attending (%s)'), $No),'h3');
 
       if (!$No)
          echo T("Nobody has declined the invitation so far.");
@@ -24,7 +24,7 @@
    <div class="AttendeeList MaybeAttending">
       <?php
          $Maybe = sizeof($this->Data('Invited.Maybe', array()));
-         echo Wrap(sprintf(T('Maybe (%d)'), $Maybe),'h3');
+         echo Wrap(sprintf(T('Maybe (%s)'), $Maybe),'h3');
 
          if (!$Maybe)
             echo T("Nobody is on the fence right now.");

@@ -336,7 +336,6 @@
             ButtonBar.BindShortcut(TextArea, 'url', 'ctrl+L');
             ButtonBar.BindShortcut(TextArea, 'code', 'ctrl+O');
             ButtonBar.BindShortcut(TextArea, 'blockquote', 'ctrl+Q');
-            ButtonBar.BindShortcut(TextArea, 'post', 'tab');
          },
 
          BindShortcut: function(TextArea, Operation, Shortcut, ShortcutMode, OpFunction) {
@@ -356,16 +355,18 @@
          Perform: function(TextArea, Operation, Event, Value) {
             Event.preventDefault();
 
-            var InputFormat = $(TextArea).data('InputFormat');
+            if (Operation === 'emoji' && Value === '') {
+               return;
+            }
 
+            var InputFormat = $(TextArea).data('InputFormat');
 
             var PerformMethod = 'Perform'+InputFormat;
             if (ButtonBar[PerformMethod] == undefined)
                return;
 
-            // add space on either side, in case user clicks emoji right after
-            // bit of text
-            var Value = ' '+Value+' '; // for now just used for emoji to reduce redundancy
+            // Add space on either side, in case user clicks emoji right after bit of text.
+            Value = ' '+Value+' '; // for now just used for emoji to reduce redundancy
 
             // Call performer
             ButtonBar[PerformMethod](TextArea, Operation, Value);
@@ -501,7 +502,6 @@
                   break;
 
                case 'emoji':
-                  Value = Value.trim() + ' ';
                   $(TextArea).insertText(Value, $(TextArea).getSelection().start, "collapseToEnd");
                   break;
             }
@@ -658,7 +658,6 @@
                   break;
 
                case 'emoji':
-                  Value = Value.trim() + ' ';
                   $(TextArea).insertText(Value, $(TextArea).getSelection().start, "collapseToEnd");
                   break;
             }
@@ -835,7 +834,6 @@
                   break;
 
                case 'emoji':
-                  Value = Value.trim() + ' ';
                   $(TextArea).insertText(Value, $(TextArea).getSelection().start, "collapseToEnd");
                   break;
             }
@@ -844,7 +842,6 @@
          PerformText: function(TextArea, Operation, Value) {
             switch (Operation) {
                case 'emoji':
-                  Value = Value.trim() + ' ';
                   $(TextArea).insertText(Value, $(TextArea).getSelection().start, "collapseToEnd");
                   break;
             }
@@ -854,7 +851,6 @@
          PerformTextEx: function(TextArea, Operation, Value) {
             switch (Operation) {
                case 'emoji':
-                  Value = Value.trim() + ' ';
                   $(TextArea).insertText(Value, $(TextArea).getSelection().start, "collapseToEnd");
                   break;
             }

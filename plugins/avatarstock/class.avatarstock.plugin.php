@@ -5,7 +5,7 @@
 $PluginInfo['avatarstock'] = array(
     'Name' => 'Avatar Pool',
     'Description' => 'Create a limited stock of default avatars that members can choose between.',
-    'Version' => '1.1.4',
+    'Version' => '1.2',
     'Author' => 'Dane MacMillan',
     'AuthorEmail' => 'dane@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -126,7 +126,8 @@ class AvatarStockPlugin extends Gdn_Plugin {
             'Users',
             T('Avatar Pool'),
             '/settings/avatarstock',
-            'Garden.Settings.Manage'
+            'Garden.Settings.Manage',
+            array('class' => 'nav-avatars')
         );
     }
 

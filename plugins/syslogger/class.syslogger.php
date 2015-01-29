@@ -28,16 +28,17 @@ class Syslogger extends BaseLogger {
      * @return null|void
      */
     public function log($level, $message, array $context = array()) {
+        $priority = Logger::levelPriority($level);
+
         if ($this->format === 'json') {
-            $this->logJson($level, $message, $context);
+            $this->logJson($priority, $message, $context);
         } else {
-            $this->logMessage($level, $message, $context);
+            $this->logMessage($priority, $message, $context);
         }
     }
 
-    protected function logMessage($level, $message, array $context = array()) {
+    protected function logMessage($priority, $message, array $context = array()) {
         $realMessage = FormatString($message, $context);
-        $priority = Logger::levelPriority($level);
 
         if ($event = val('event', $context, '!')) {
             $realMessage = "<$event> $realMessage";
@@ -51,12 +52,14 @@ class Syslogger extends BaseLogger {
         syslog($priority, $realMessage);
     }
 
-    protected function logJson($level, $message, array $context = array()) {
-        $msg = FormatString($message, $context);
+    protected function logJson($priority, $message, array $context = array()) {
+        $fullmsg = FormatString($message, $context);
 
         // Add the standard fields to the row.
         $row = array_merge([
             'msg' => $message,
+            'fullmsg' => $fullmsg,
+            'priority' => Logger::levelPriority($priority)
         ], $context);
 
         $tags = array_merge((array)val('tags', $context, []), explode('_', $row['event']));
@@ -67,6 +70,6 @@ class Syslogger extends BaseLogger {
         }
 
         $json = json_encode($row, JSON_UNESCAPED_SLASHES);
-        syslog(Logger::levelPriority($level), $json);
+        syslog($priority, $json);
     }
 }

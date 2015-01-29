@@ -1,8 +1,5 @@
 <?php
 
-if (!defined('APPLICATION'))
-    exit();
-
 /**
  * SendUp
  *
@@ -50,8 +47,9 @@ class SendUp extends Worker {
 
         $ParentPid = Workers::$ParentPid;
         $JobsFile = "/tmp/" . APPLICATION . ".{$ParentPid}.jobs";
-        if (file_exists($JobsFile))
+        if (file_exists($JobsFile)) {
             unlink($JobsFile);
+        }
         self::$JobsFile = $JobsFile;
 
         switch (self::$Mode) {
@@ -59,37 +57,34 @@ class SendUp extends Worker {
             // Local to remote
             case 'local':
 
-                if (!file_exists($Folder))
+                if (!file_exists($Folder)) {
                     throw new Exception("No such file or folder");
+                }
                 Workers::Log(Workers::LOG_L_NOTICE, " Scanning local target", Workers::LOG_O_SHOWPID);
                 Workers::Log(Workers::LOG_L_NOTICE, " Filesysten - {$Folder}", Workers::LOG_O_SHOWPID);
                 self::$Folder = $Folder;
 
-                if (is_dir(self::$Folder))
+                if (is_dir(self::$Folder)) {
                     shell_exec("tree -if --noreport {$Folder} > {$JobsFile}");
-                else
+                } else {
                     file_put_contents(self::$JobsFile, $Folder);
+                }
                 break;
 
             // Remote to remote
             case 'xcopy':
 
                 // Prepare CloudFiles
-                $cloudFiles = new RackspaceCloudFiles();
+                $cloudFiles = new CloudFiles("https://identity.api.rackspacecloud.com/v1.1/", [
+                    "username" => self::$RackspaceUser,
+                    "apiKey" => self::$RackspaceApiKey,
+                    "region" => strtolower(self::$RackspaceRegion),
+                    "context" => self::$RackspaceFacing,
+                    "flavor" => "cloudservers",
+                    "provider" => "rackspace",
+                    "url" => "https://identity.api.rackspacecloud.com/v1.1/"
+                ]);
                 $cloudFiles->CacheCredentials(FALSE);
-
-                // Create rackspace account
-                RackspaceAPI::AddAccount('Vanilla', array(
-                    'Name' => 'Vanilla',
-                    'APIUser' => self::$RackspaceUser,
-                    'APIKey' => self::$RackspaceApiKey,
-                    'Gateway' => 'US'
-                ));
-
-                $cloudFiles->Account('Vanilla');
-                $cloudFiles->Service('CloudFiles');
-                $cloudFiles->PreferredRegion(self::$RackspaceRegion);
-                $cloudFiles->Context(self::$RackspaceFacing);
 
                 // Get complete remote listing
                 Workers::Log(Workers::LOG_L_NOTICE, " Scanning remote target", Workers::LOG_O_SHOWPID);
@@ -116,18 +111,25 @@ class SendUp extends Worker {
 
         $Args = getopt('', array('folder:', 'container:', 'prefix:', 'move', 'lower'));
 
-        $Folder = GetValue('folder', $Args, FALSE);
-        if (!$Folder)
+        $Folder = val('folder', $Args, FALSE);
+        if (!$Folder) {
             throw new Exception("Required argument --folder not provided");
+        }
 
-        $Container = GetValue('container', $Args, FALSE);
-        if (!$Container)
+        $Container = val('container', $Args, FALSE);
+        if (!$Container) {
             throw new Exception("Required argument --container not provided");
+        }
+
+        if (!`which tree`) {
+            echo "Shell command 'tree' not found, please install before using sendup.\n";
+            exit(1);
+        }
 
         $Move = array_key_exists('move', $Args);
         $Lower = array_key_exists('lower', $Args);
 
-        $EntryPrefix = GetValue('prefix', $Args, '');
+        $EntryPrefix = val('prefix', $Args, '');
 
         // Prepare the cloudfiles container
         self::$Container = $Container;
@@ -135,13 +137,15 @@ class SendUp extends Worker {
         self::$Lower = $Lower;
         self::$Move = FALSE;
 
-        if ($Lower)
+        if ($Lower) {
             Workers::Log(Workers::LOG_L_NOTICE, " Lowercasing target paths", Workers::LOG_O_SHOWPID);
+        }
 
         if ($Move) {
             $MoveTarget = rtrim($Folder, ' /') . '-completed';
-            if (!is_dir($MoveTarget))
+            if (!is_dir($MoveTarget)) {
                 mkdir($MoveTarget);
+            }
 
             Workers::Log(Workers::LOG_L_NOTICE, " Moving completed files to: {$MoveTarget}", Workers::LOG_O_SHOWPID);
             self::$Move = $MoveTarget;
@@ -149,18 +153,23 @@ class SendUp extends Worker {
 
         // Prepare cloudfiles
         self::$RackspaceUser = getenv('RACKSPACE_USERNAME');
-        if (!self::$RackspaceUser)
+        if (!self::$RackspaceUser) {
             throw new Exception("Could not import RACKSPACE_USERNAME");
+        }
         self::$RackspaceApiKey = getenv('RACKSPACE_APIKEY');
-        if (!self::$RackspaceApiKey)
+        if (!self::$RackspaceApiKey) {
             throw new Exception("Could not import RACKSPACE_APIKEY");
+        }
 
         self::$RackspaceFacing = getenv('RACKSPACE_FACING');
-        if (!self::$RackspaceFacing)
+        if (!self::$RackspaceFacing) {
             self::$RackspaceFacing = 'public';
+        }
         self::$RackspaceRegion = getenv('RACKSPACE_REGION');
-        if (!self::$RackspaceRegion)
-            self::$RackspaceRegion = 'DFW';
+        if (!self::$RackspaceRegion) {
+            self::$RackspaceRegion = 'dfw';
+        }
+        self::$RackspaceRegion = strtolower(self::$RackspaceRegion);
 
         // Prepare the job source
         self::Folder($Folder);
@@ -181,25 +190,34 @@ class SendUp extends Worker {
      */
     public function Prepare($Workers = NULL) {
 
-        if ($Workers)
+        if ($Workers) {
             parent::Prepare($Workers);
+        }
 
         // Prepare CloudFiles
-        $this->CloudFiles = new RackspaceCloudFiles();
+        $this->CloudFiles = new CloudFiles("https://identity.api.rackspacecloud.com/v1.1/", [
+            "username" => self::$RackspaceUser,
+            "apiKey" => self::$RackspaceApiKey,
+            "region" => strtolower(self::$RackspaceRegion),
+            "context" => self::$RackspaceFacing,
+            "flavor" => "cloudservers",
+            "provider" => "rackspace",
+            "url" => "https://identity.api.rackspacecloud.com/v1.1/"
+        ]);
         $this->CloudFiles->CacheCredentials(FALSE);
 
-        // Create rackspace account
-        RackspaceAPI::AddAccount('Vanilla', array(
-            'Name' => 'Vanilla',
-            'APIUser' => self::$RackspaceUser,
-            'APIKey' => self::$RackspaceApiKey,
-            'Gateway' => 'US'
-        ));
-
-        $this->CloudFiles->Account('Vanilla');
-        $this->CloudFiles->Service('CloudFiles');
-        $this->CloudFiles->PreferredRegion(self::$RackspaceRegion);
-        $this->CloudFiles->Context(self::$RackspaceFacing);
+        $containerName = self::$Container;
+        Workers::Log(Workers::LOG_L_WARN, " Checking container: {$containerName}");
+        $container = $this->CloudFiles->ContainerInfo($containerName);
+        if ($container) {
+            foreach ($container as $cKey => $cVal) {
+                if (is_scalar($cVal)) {
+                    Workers::Log(Workers::LOG_L_WARN, "  {$cKey}: {$cVal}");
+                }
+            }
+        } else {
+            Workers::Log(Workers::LOG_L_WARN, "  not found");
+        }
     }
 
     /**
@@ -213,10 +231,12 @@ class SendUp extends Worker {
         $EndJobs = $StartJobs + $this->JobsPerWorker;
 
         // Sed foibles
-        if (!$StartJobs || $Chunk == 1)
+        if (!$StartJobs || $Chunk == 1) {
             $StartJobs = 1;
-        if ($EndJobs > 1)
+        }
+        if ($EndJobs > 1) {
             $EndJobs -= 1;
+        }
 
         $Alloc = "sed -n '{$StartJobs},{$EndJobs}p' {$JobsFile}";
         $Jobs = trim(shell_exec($Alloc));
@@ -241,8 +261,9 @@ class SendUp extends Worker {
         $Job = stripslashes($Job);
 
         $file = ltrim($Job, '.');
-        if (!$file)
+        if (!$file) {
             return;
+        }
 
         $mode = "local";
 
@@ -259,8 +280,9 @@ class SendUp extends Worker {
         $replace = preg_quote(self::$Folder);
         $destFile = preg_replace("`^{$replace}`", '', $file);
         $destPaths = array();
-        if (self::$Prefix)
+        if (self::$Prefix) {
             $destPaths[] = self::$Prefix;
+        }
         $destPaths[] = $destFile;
 
         $destFilePath = CombinePaths($destPaths);
@@ -280,8 +302,9 @@ class SendUp extends Worker {
                     // Local to remote
                     case 'local':
 
-                        if (is_dir($Job))
+                        if (is_dir($Job)) {
                             return;
+                        }
 
                         if (self::$Lower) {
                             $destFilePath = strtolower($destFilePath);
@@ -301,8 +324,9 @@ class SendUp extends Worker {
                         break;
                 }
             } catch (Exception $Ex) {
-                if ($tries == 1)
+                if ($tries == 1) {
                     Workers::Log(Workers::LOG_L_WARN, "   {$file} upload error...", Workers::LOG_O_SHOWPID);
+                }
 
                 Workers::Log(Workers::LOG_L_WARN, "   {$file} - retry {$tries}", Workers::LOG_O_SHOWPID);
                 sleep(1);

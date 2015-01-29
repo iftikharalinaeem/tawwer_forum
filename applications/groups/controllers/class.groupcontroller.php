@@ -224,7 +224,7 @@ class GroupController extends Gdn_Controller {
          throw ForbiddenException('@'.$this->GroupModel->CheckPermission('Join.Reason', $Group));
       }
 
-      $this->Title('Invite');
+      $this->Title(T('Invite'));
 
       $Form = new Gdn_Form();
       $this->Form = $Form;
@@ -556,6 +556,29 @@ class GroupController extends Gdn_Controller {
 
       $this->Title(GetValue('Name', $Group, ''));
       $this->Description(GetValue('Description', $Group), TRUE);
+
+      // Build a pager
+      $PagerFactory = new Gdn_PagerFactory();
+      $this->EventArguments['PagerType'] = 'Pager';
+      $this->FireEvent('BeforeBuildPager');
+      $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+      $this->Pager->ClientID = 'Pager';
+      $this->Pager->Configure(
+         $Offset,
+         $Limit,
+         $Group['CountDiscussions'],
+         'group/discussions/'.GroupSlug($Group).'/%1$s'
+      );
+      if (!$this->Data('_PagerUrl')) {
+         $this->SetData('_PagerUrl', 'group/discussions/'.GroupSlug($Group).'/{Page}');
+      }
+      $this->SetData('_Page', $Page);
+      $this->SetData('_Limit', $Limit);
+      $this->FireEvent('AfterBuildPager');
+
+      $this->SetData("CountDiscussions", $Group['CountDiscussions']);
+
+
       $this->Render($this->View, 'Discussions', 'Vanilla');
    }
 
@@ -570,7 +593,7 @@ class GroupController extends Gdn_Controller {
     * @param string $ID
     * @param string $Page
     */
-   public function Members($ID, $Page = FALSE) {
+   public function Members($ID, $Page = FALSE, $Filter = '') {
       Gdn_Theme::Section('Group');
       Gdn_Theme::Section('Members');
 
@@ -582,17 +605,26 @@ class GroupController extends Gdn_Controller {
       $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
       $this->AddBreadcrumb(T('GroupMembers', 'Members'));
 
+      list($Offset, $Limit) = OffsetLimit($Page, $this->GroupModel->MemberPageSize);
+      if ($Offset === 0) {
+         $Filter = '';
+      }
+
       // Get Leaders
-      $UserModel = new UserModel();
-      $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Leader'));
-      $this->SetData('Leaders', $Users);
+      if (in_array($Filter, array('', 'leaders'))) {
+         $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Leader'), $Limit, $Offset);
+         $this->SetData('Leaders', $Users);
+      }
 
       // Get Members
-      $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Member'));
-      $this->SetData('Members', $Users);
+      if (in_array($Filter, array('', 'members'))) {
+         $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Member'), $Limit, $Offset);
+         $this->SetData('Members', $Users);
+      }
 
       $this->Data['_properties']['newdiscussionmodule'] = array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$Group['GroupID']);
 
+      $this->SetData('Filter', $Filter);
       $this->Title(T('Members').' - '.htmlspecialchars($Group['Name']));
       require_once $this->FetchViewLocation('group_functions');
       $this->CssClass .= ' NoPanel';

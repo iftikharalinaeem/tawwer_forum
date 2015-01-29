@@ -48,7 +48,7 @@ class GroupsHooks extends Gdn_Plugin {
     */
    public function DbaController_CountJobs_Handler($Sender) {
       $Counts = array(
-          'Group' => array('CountDiscussions', 'CountMembers', 'DateLastComment')
+          'Group' => array('CountDiscussions', 'CountMembers', 'DateLastComment', 'LastDiscussionID')
       );
 
       foreach ($Counts as $Table => $Columns) {
@@ -78,9 +78,13 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
 
+   public function DiscussionController_Comment_Render($Sender, $Args) {
+      $this->DiscussionController_Index_Render($Sender, $Args);
+   }
+
    public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
-      $GroupID = Gdn::Request()->Get('groupid');
-      if ($GroupID) {
+       $GroupID = Gdn::Request()->Get('groupid');
+       if ($GroupID) {
          $Model = new GroupModel();
          $Group = $Model->GetID($GroupID);
 
@@ -89,11 +93,43 @@ class GroupsHooks extends Gdn_Plugin {
             $Args['FormPostValues']['CategoryID'] = $Group['CategoryID'];
             $Args['FormPostValues']['GroupID'] = $GroupID;
 
-            if (GetValue('Insert', $Args)) {
-               $Model->IncrementDiscussionCount($GroupID, 1);
-            }
-
             Trace($Args, 'Group set');
+         }
+      }
+   }
+
+   /**
+    * Increment the discussion aggregates on the group.
+    *
+    * @param DiscussionModel $Sender
+    * @param array $Args
+    */
+   public function DiscussionModel_AfterSaveDiscussion_Handler($Sender, $Args) {
+      $GroupID = Gdn::Request()->Get('groupid');
+      if ($GroupID && $Args['Insert']) {
+         $Model = new GroupModel();
+         $Model->IncrementDiscussionCount($GroupID, 1, val('DiscussionID', $Args), valr('Fields.DateInserted', $Args));
+      }
+   }
+
+   /**
+    * Set the most recent comment on the group.
+    *
+    * @param CommentModel $Sender
+    * @param array $Args
+    */
+   public function CommentModel_AfterSaveComment_Handler($Sender, $Args) {
+      if ($Args['Insert']) {
+         $CommentID = $Args['CommentID'];
+         $DiscussionID = valr('FormPostValues.DiscussionID', $Args);
+         $GroupID = Gdn::SQL()->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->Value('GroupID');
+         if ($GroupID) {
+            $Model = new GroupModel();
+            $Model->SetField($GroupID, array(
+               'DateLastComment' => valr('FormPostValues.DateInserted', $Args),
+               'LastDiscussionID' => $DiscussionID,
+               'LastCommentID' => $CommentID
+            ));
          }
       }
    }
@@ -131,16 +167,22 @@ class GroupsHooks extends Gdn_Plugin {
    }
 
    protected function OverridePermissions($Sender) {
-      $Discussion = $Sender->DiscussionModel->GetID($Sender->ReflectArgs['DiscussionID']);
+      $DiscussionID = valr('ReflectArgs.DiscussionID', $Sender);
+      if (!$DiscussionID) {
+         $CommentID = valr('ReflectArgs.CommentID', $Sender);
+         $CommentModel = new CommentModel();
+         $Comment = $CommentModel->GetID($CommentID, DATASET_TYPE_ARRAY);
+         $DiscussionID = $Comment['DiscussionID'];
+      }
+      $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
+
       $GroupID = GetValue('GroupID', $Discussion);
       if (!$GroupID)
          return;
-
       $Model = new GroupModel();
       $Group = $Model->GetID($GroupID);
       if (!$Group)
          return;
-
       $Model->OverridePermissions($Group);
    }
 
@@ -164,6 +206,11 @@ class GroupsHooks extends Gdn_Plugin {
    public function DiscussionController_Delete_Before($Sender) {
       $this->OverridePermissions($Sender);
    }
+
+   public function DiscussionController_Comment_Before($Sender) {
+       $this->OverridePermissions($Sender);
+   }
+
 
    /**
     *
@@ -279,10 +326,74 @@ class GroupsHooks extends Gdn_Plugin {
     * @param type $Sender
     */
    public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
-      $Sender->Preferences['Notifications']['Email.Groups'] = T('PreferenceGroupsEmail', 'Notify me when there is Group activity.');
-      $Sender->Preferences['Notifications']['Popup.Groups'] = T('PreferenceGroupsPopup', 'Notify me when there is Group activity.');
+      $Sender->Preferences['Notifications']['Email.Groups'] = T('Notify me when there is group activity.');
+      $Sender->Preferences['Notifications']['Popup.Groups'] = T('Notify me when there is group activity.');
 
-      $Sender->Preferences['Notifications']['Email.Events'] = T('PreferenceEventsEmail', 'Notify me when there is Event activity.');
-      $Sender->Preferences['Notifications']['Popup.Events'] = T('PreferenceEventsPopup', 'Notify me when there is Event activity.');
+      $Sender->Preferences['Notifications']['Email.Events'] = T('Notify me when there is event activity.');
+      $Sender->Preferences['Notifications']['Popup.Events'] = T('Notify me when there is event activity.');
    }
+
+    /**
+     * Hide Private content.
+     *
+     * @param SearchController $Sender Sending controller.
+     * @param array $Args Sending arguments.
+     */
+    public function SearchController_Render_Before($Sender, $Args) {
+
+        $GroupCategoryIDs = Gdn::Cache()->Get('GroupCategoryIDs');
+        if ($GroupCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
+            $CategoryModel = new CategoryModel();
+            $GroupCategories = $CategoryModel->GetWhere(array('AllowGroups' => 1))->ResultArray();
+            $GroupCategoryIDs = array();
+            foreach ($GroupCategories as $GroupCategory) {
+                $GroupCategoryIDs[] = $GroupCategory['CategoryID'];
+            }
+
+            Gdn::Cache()->Store('GroupCategoryIDs', $GroupCategoryIDs);
+        }
+
+        $SearchResults = $Sender->Data('SearchResults', array());
+        foreach ($SearchResults as $ResultKey => &$Result) {
+            $GroupID = val('GroupID', $Result, false);
+
+            if (val('RecordType', $Result) === 'Group') {
+               continue;
+            } elseif ($GroupID || in_array($Result['CategoryID'], $GroupCategoryIDs)) {
+
+                if (!$GroupID && val('RecordType', $Result, false) == 'Discussion') {
+
+                    $DiscussionModel = new DiscussionModel();
+                    $Discussion = $DiscussionModel->GetID($Result['PrimaryID']);
+                    $GroupID = $Discussion->GroupID;
+
+                } elseif (!$GroupID && val('RecordType', $Result, false) == 'Comment') {
+
+                    $CommentModel = new CommentModel();
+                    $Comment = $CommentModel->GetID($Result['PrimaryID']);
+                    $DiscussionModel = new DiscussionModel();
+                    $Discussion = $DiscussionModel->GetID($Comment->DiscussionID);
+
+                    $GroupID = $Discussion->GroupID;
+
+                }
+
+                $GroupModel = new GroupModel();
+                $Group = Gdn::Cache()->Get(sprintf('Group.%s', $GroupID));
+                if ($Group === Gdn_Cache::CACHEOP_FAILURE) {
+                    $Group = $GroupModel->GetID($GroupID);
+                    Gdn::Cache()->Store(sprintf('Group.%s', $GroupID), $Group, array(Gdn_Cache::FEATURE_EXPIRY => 15 * 60));
+                }
+
+                if ($Group['Privacy'] == 'Private' && !$GroupModel->CheckPermission('View', $Group['GroupID'])) {
+                    unset($SearchResults[$ResultKey]);
+                    $Result['Title'] = '** Private **';
+                    $Result['Summary'] = '** Private **';
+                }
+
+            }
+            $Sender->SetData('SearchResults', $SearchResults);
+        }
+
+    }
 }

@@ -269,6 +269,15 @@ EOT;
    }
 
    /**
+    * Whether or not groups can be searched.
+    *
+    * @return bool Returns true if groups can be searched or false otherwise.
+    */
+   public static function searchGroups() {
+      return method_exists('SearchModel', 'searchGroups') && SearchModel::searchGroups();
+   }
+
+   /**
     * Return an array of all of the valid search types.
     */
    public static function types() {
@@ -289,6 +298,10 @@ EOT;
 
          if (Gdn::ApplicationManager()->CheckApplication('Pages')) {
             $types['page']['p'] = 'docs';
+         }
+
+         if (Gdn::ApplicationManager()->CheckApplication('Groups')) {
+            $types['group']['group'] = 'group';
          }
 
          self::$types = $types;

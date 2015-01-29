@@ -7,13 +7,14 @@
 $PluginInfo['Reporting2'] = array(
    'Name' => 'Reporting',
    'Description' => 'Allows users to report posts to moderators for abuse, terms of service violations etc.',
-   'Version' => '2.0b',
+   'Version' => '2.0',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'SettingsUrl' => '/settings/reporting',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
+   'AuthorUrl' => 'http://www.vanillaforums.com',
+   'MobileFriendly' => true
 );
 
 class Reporting2Plugin extends Gdn_Plugin {
@@ -158,7 +159,7 @@ class Reporting2Plugin extends Gdn_Plugin {
       $Sender->Form->SetFormValue('RecordType', $RecordType);
       $Sender->Form->SetFormValue('Format', 'TextEx');
 
-      $Sender->SetData('Title', sprintf(T('Report %1s'), $RecordType, 'Report'));
+      $Sender->SetData('Title', sprintf(T('Report %s'), T($RecordType), 'Report'));
 
       // Set up data for Reason dropdown
       $Sender->SetData('Reasons', FALSE);
@@ -210,7 +211,7 @@ class Reporting2Plugin extends Gdn_Plugin {
          $Category = ReportModel::GetReportCategory();
          $ReportCount = ReportModel::GetUnreadReportCount();
          $CReport = $ReportCount > 0 ? ' '.Wrap($ReportCount, 'span class="Alert"') : '';
-         echo Wrap(Anchor(Sprite('SpReport').' '.htmlspecialchars($Category['Name']).$CReport, CategoryUrl($Category)), 'li', array('class' => 'ReportCategory'));
+         echo Wrap(Anchor(Sprite('SpReport').' '.htmlspecialchars(T($Category['Name'])).$CReport, CategoryUrl($Category)), 'li', array('class' => 'ReportCategory'));
       }
    }
 

@@ -60,12 +60,17 @@ if (!function_exists('ReactionButton')):
 function ReactionButton($Row, $UrlCode, $Options = array()) {
    $ReactionType = ReactionModel::ReactionTypes($UrlCode);
 
-   $IsHeading = FALSE;
+   $IsHeading = val('IsHeading', $Options, FALSE);
    if (!$ReactionType) {
       $ReactionType = array('UrlCode' => $UrlCode, 'Name' => $UrlCode);
       $IsHeading = TRUE;
    }
 
+   // Check reaction's permissions
+   if ($PermissionClass = GetValue('Class', $ReactionType)) {
+      if (!Gdn::Session()->CheckPermission('Reactions.'.$PermissionClass.'.Add'))
+         return '';
+   }
    if ($Permission = GetValue('Permission', $ReactionType)) {
       if (!Gdn::Session()->CheckPermission($Permission))
          return '';
@@ -150,6 +155,9 @@ endif;
 
 if (!function_exists('WriteImageItem')):
    function WriteImageItem($Record, $CssClass = 'Tile ImageWrap') {
+      if (val('CategoryCssClass', $Record)) {
+         $CssClass .= " ".val('CategoryCssClass', $Record);
+      }
       $Attributes = GetValue('Attributes', $Record);
       if (!is_array($Attributes))
          $Attributes = @unserialize($Attributes);

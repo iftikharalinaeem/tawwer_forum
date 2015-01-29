@@ -41,7 +41,7 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
       $RoleData = $RoleModel->SQL->GetWhereLike('Role', array('Domains' => $Domain));
       foreach ($RoleData->Result() as $Result) {
          // Confirm it wasn't a sloppy match
-         print_r($Result);
+         //print_r($Result);
          $DomainList = explode(' ', $Result->Domains);
          if (in_array($Domain, $DomainList)) {
             // Add the role to the user

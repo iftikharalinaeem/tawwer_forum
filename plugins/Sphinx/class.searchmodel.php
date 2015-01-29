@@ -10,7 +10,7 @@ if (!defined('SPH_RANK_SPH04'))
 require_once PATH_PLUGINS.'/AdvancedSearch/class.search.php';
 
 class SearchModel extends Gdn_Model {
-	/// PROPERTIES ///
+   /// PROPERTIES ///
 
    public $Types = array();
    public $TypeInfo = array();
@@ -30,12 +30,13 @@ class SearchModel extends Gdn_Model {
       'c' => 100,
       'question' => 1,
       'poll' => 2,
-      'answer' => 101
-      );
+      'answer' => 101,
+      'group' => 400
+   );
 
    protected $_fp = NULL;
 
-	/// METHODS ///
+   /// METHODS ///
 
    public function __construct() {
       $this->UseDeltas = C('Plugins.Sphinx.UseDeltas');
@@ -51,6 +52,11 @@ class SearchModel extends Gdn_Model {
       if (array_key_exists("Pages", Gdn::ApplicationManager()->EnabledApplications())) {
          $this->Types[3] = 'Page';
          $this->AddTypeInfo('Page', array($this, 'GetPages'), array($this, 'IndexPages'));
+      }
+
+      if (static::SearchGroups()) {
+         $this->Types[4] = 'Group';
+         $this->AddTypeInfo('Group', array($this, 'GetGroups'));
       }
 
       self::$Ranker['score'] = array(
@@ -69,7 +75,7 @@ class SearchModel extends Gdn_Model {
             strtotime('-1 day')),
          'add' => -4,
          'weight' => 1
-            );
+      );
 
       parent::__construct();
    }
@@ -95,12 +101,15 @@ class SearchModel extends Gdn_Model {
    }
 
    public function GetComments($IDs) {
-      $Result = Gdn::SQL()
-			->Select('c.CommentID as PrimaryID, c.CommentID, d.DiscussionID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID')
-			->Select('c.DateInserted, c.Score, d.Type')
-			->Select('c.InsertUserID as UserID')
-			->From('Comment c')
-			->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
+      $SQL = Gdn::SQL()
+         ->Select('c.CommentID as PrimaryID, c.CommentID, d.DiscussionID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID')
+         ->Select('c.DateInserted, c.Score, d.Type')
+         ->Select('c.InsertUserID as UserID');
+      if (Gdn::ApplicationManager()->CheckApplication('Groups')) {
+         $SQL->Select('d.GroupID');
+      }
+      $Result = $SQL->From('Comment c')
+         ->Join('Discussion d', 'd.DiscussionID = c.DiscussionID')
          ->WhereIn('c.CommentID', $IDs)
          ->Get()->ResultArray();
 
@@ -112,11 +121,14 @@ class SearchModel extends Gdn_Model {
    }
 
    public function GetDiscussions($IDs) {
-      $Result = Gdn::SQL()
-			->Select('d.DiscussionID as PrimaryID, d.DiscussionID, d.Name as Title, d.Body as Summary, d.Format, d.CategoryID')
-			->Select('d.DateInserted, d.Score, d.Type')
-			->Select('d.InsertUserID as UserID')
-			->From('Discussion d')
+      $SQL = Gdn::SQL()
+         ->Select('d.DiscussionID as PrimaryID, d.DiscussionID, d.Name as Title, d.Body as Summary, d.Format, d.CategoryID')
+         ->Select('d.DateInserted, d.Score, d.Type')
+         ->Select('d.InsertUserID as UserID');
+      if (Gdn::ApplicationManager()->CheckApplication('Groups')) {
+         $SQL->Select('d.GroupID');
+      }
+      $Result = $SQL->From('Discussion d')
          ->WhereIn('d.DiscussionID', $IDs)
          ->Get()->ResultArray();
 
@@ -129,12 +141,37 @@ class SearchModel extends Gdn_Model {
       return $Result;
    }
 
+   /**
+    * Fetch the groups from this search.
+    *
+    * @param $ids
+    * @return array
+    */
+   public function GetGroups($ids) {
+      $sql = Gdn::SQL()
+         ->Select('g.GroupID as PrimaryID, g.GroupID, g.Name as Title, g.Description as Summary, g.Format, 0')
+         ->Select('g.DateInserted, 1000 as Score, \'group\' as Type')
+         ->Select('g.InsertUserID as UserID');
+      $result = $sql->From('Group g')
+         ->WhereIn('g.GroupID', $ids)
+         ->Get()->ResultArray();
+
+      foreach ($result as &$row) {
+         $row['RecordType'] = 'Group';
+         $row['Name'] = $row['Title'];
+         $row['Url'] = GroupUrl($row, '', '/');
+         unset($row['Name']);
+      }
+
+      return $result;
+   }
+
    public function GetPages($IDs) {
       $Result = Gdn::SQL()
-			->Select('p.*')
-			->Select('u.UserID, u.Name as Username, u.Photo')
-			->From('Page p')
-			->Join('User u', 'p.InsertUserID = u.UserID', 'left')
+         ->Select('p.*')
+         ->Select('u.UserID, u.Name as Username, u.Photo')
+         ->From('Page p')
+         ->Join('User u', 'p.InsertUserID = u.UserID', 'left')
          ->WhereIn('p.PageID', $IDs)
          ->Get()->ResultArray();
 
@@ -355,6 +392,31 @@ class SearchModel extends Gdn_Model {
       return $results;
    }
 
+   /**
+    * Do a search on group names for auto-complete look ups.
+    *
+    * @param string $search The search term.
+    * @param int $limit The number of results to return.
+    * @return array Returns the search results.
+    */
+   public function groupAutoComplete($search, $limit = 10) {
+      $sphinx = $this->SphinxClient();
+      $sphinx->setLimits(0, $limit, 100);
+      $indexes = $this->Indexes('Group');
+
+      $search = Search::cleanSearch($search);
+
+      $str = $search['search'];
+      list ($query, $terms) = $this->splitTags($str);
+
+      $this->setSort($sphinx, $terms, $search);
+      $results = $this->DoSearch($sphinx, $query, $indexes);
+      $results['SearchTerms'] = $terms;
+
+      return $results;
+
+   }
+
    protected function DoSearch($Sphinx, $Query, $Indexes) {
       $this->EventArguments['SphinxClient'] = $Sphinx;
       $this->FireEvent('BeforeSphinxSearch');
@@ -418,6 +480,16 @@ class SearchModel extends Gdn_Model {
       return $Indexes;
    }
 
+   /**
+    * Whether or not groups can be searched.
+    *
+    * @return bool Returns true if groups can be searched or false otherwise.
+    */
+   public static function SearchGroups() {
+      $result = in_array('groups', C('Plugins.Sphinx.Templates', array())) && Gdn::ApplicationManager()->IsEnabled('Groups');
+      return $result;
+   }
+
    protected $_SphinxClient = null;
    /**
     * @return SphinxClient
@@ -443,7 +515,7 @@ class SearchModel extends Gdn_Model {
       return $Sphinx;
    }
 
-	public function Search($terms, $Offset = 0, $Limit = 20) {
+   public function Search($terms, $Offset = 0, $Limit = 20) {
       $search = array('search' => $terms, 'group' => false);
       if ($CategoryID = Gdn::Controller()->Request->Get('CategoryID'))
          $search['cat'] = $CategoryID;
@@ -454,83 +526,83 @@ class SearchModel extends Gdn_Model {
 //      $search = Search::cleanSearch($search);
 //      Trace($search, 'calc search');
 
-/*
-      $Indexes = $this->Types;
-      $Prefix = C('Database.Name').'_';
-      foreach ($Indexes as &$Name) {
-         $Name = $Prefix.$Name;
-      }
-      unset($Name);
+      /*
+            $Indexes = $this->Types;
+            $Prefix = C('Database.Name').'_';
+            foreach ($Indexes as &$Name) {
+               $Name = $Prefix.$Name;
+            }
+            unset($Name);
 
-      if ($this->UseDeltas) {
-         foreach ($Indexes as $Name) {
-            $Indexes[] = $Name.'_Delta';
-         }
-      }
+            if ($this->UseDeltas) {
+               foreach ($Indexes as $Name) {
+                  $Indexes[] = $Name.'_Delta';
+               }
+            }
 
-      $SphinxHost = C('Plugins.Sphinx.Server', C('Database.Host', 'localhost'));
-      $SphinxPort = C('Plugins.Sphinx.Port', 9312);
+            $SphinxHost = C('Plugins.Sphinx.Server', C('Database.Host', 'localhost'));
+            $SphinxPort = C('Plugins.Sphinx.Port', 9312);
 
-      // Get the raw results from sphinx.
-      $Sphinx = new SphinxClient();
-      $Sphinx->setServer($SphinxHost, $SphinxPort);
-      $Sphinx->setMatchMode(SPH_MATCH_EXTENDED2);
-//      $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
-      $Sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'DateInserted');
-      $Sphinx->setLimits($Offset, $Limit, self::$MaxResults);
-      $Sphinx->setMaxQueryTime(5000);
+            // Get the raw results from sphinx.
+            $Sphinx = new SphinxClient();
+            $Sphinx->setServer($SphinxHost, $SphinxPort);
+            $Sphinx->setMatchMode(SPH_MATCH_EXTENDED2);
+      //      $Sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
+            $Sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'DateInserted');
+            $Sphinx->setLimits($Offset, $Limit, self::$MaxResults);
+            $Sphinx->setMaxQueryTime(5000);
 
-      // Allow the client to be overridden.
-      $this->EventArguments['SphinxClient'] = $Sphinx;
-      $this->FireEvent('BeforeSphinxSearch');
+            // Allow the client to be overridden.
+            $this->EventArguments['SphinxClient'] = $Sphinx;
+            $this->FireEvent('BeforeSphinxSearch');
 
-      $Cats = DiscussionModel::CategoryPermissions();
-      if ($CategoryID = Gdn::Controller()->Request->Get('CategoryID')) {
-         $Cats2 = CategoryModel::GetSubtree($CategoryID);
-         Gdn::Controller()->SetData('Categories', $Cats2);
-         $Cats2 = ConsolidateArrayValuesByKey($Cats2, 'CategoryID');
-         if (is_array($Cats))
-            $Cats = array_intersect($Cats, $Cats2);
-         elseif ($Cats)
-            $Cats = $Cats2;
-      }
-//      $Cats = CategoryModel::CategoryWatch();
-//      var_dump($Cats);
-      if ($Cats !== TRUE)
-         $Sphinx->setFilter('CategoryID', (array)$Cats);
-      $terms = $Sphinx->query($terms, implode(' ', $Indexes));
-      if (!$terms) {
-         Trace($Sphinx->getLastError(), TRACE_ERROR);
-         Trace($Sphinx->getLastWarning(), TRACE_WARNING);
-         $Warning = $Sphinx->getLastWarning();
-         if (isset($Sphinx->error)) {
-            LogMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Error: '.$Sphinx->error);
-         } elseif (GetValue('warning', $Sphinx)) {
-            LogMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Warning: '.$Sphinx->warning);
-         } else {
-            Trace($Sphinx);
-            Trace('Sphinx returned an error', TRACE_ERROR);
-         }
-      }
+            $Cats = DiscussionModel::CategoryPermissions();
+            if ($CategoryID = Gdn::Controller()->Request->Get('CategoryID')) {
+               $Cats2 = CategoryModel::GetSubtree($CategoryID);
+               Gdn::Controller()->SetData('Categories', $Cats2);
+               $Cats2 = ConsolidateArrayValuesByKey($Cats2, 'CategoryID');
+               if (is_array($Cats))
+                  $Cats = array_intersect($Cats, $Cats2);
+               elseif ($Cats)
+                  $Cats = $Cats2;
+            }
+      //      $Cats = CategoryModel::CategoryWatch();
+      //      var_dump($Cats);
+            if ($Cats !== TRUE)
+               $Sphinx->setFilter('CategoryID', (array)$Cats);
+            $terms = $Sphinx->query($terms, implode(' ', $Indexes));
+            if (!$terms) {
+               Trace($Sphinx->getLastError(), TRACE_ERROR);
+               Trace($Sphinx->getLastWarning(), TRACE_WARNING);
+               $Warning = $Sphinx->getLastWarning();
+               if (isset($Sphinx->error)) {
+                  LogMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Error: '.$Sphinx->error);
+               } elseif (GetValue('warning', $Sphinx)) {
+                  LogMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Warning: '.$Sphinx->warning);
+               } else {
+                  Trace($Sphinx);
+                  Trace('Sphinx returned an error', TRACE_ERROR);
+               }
+            }
 
-      $Result = $this->GetDocuments($terms);
+            $Result = $this->GetDocuments($terms);
 
-      $Total = GetValue('total', $terms);
-      Gdn::Controller()->SetData('RecordCount', $Total);
+            $Total = GetValue('total', $terms);
+            Gdn::Controller()->SetData('RecordCount', $Total);
 
-      if (!is_array($Result))
-         $Result = array();
+            if (!is_array($Result))
+               $Result = array();
 
-      foreach ($Result as $Key => $Value) {
-			if (isset($Value['Summary'])) {
-            $Value['Summary'] = Condense(Gdn_Format::To($Value['Summary'], GetValue('Format', $Value, 'Html')));
-				$Result[$Key] = $Value;
-			}
-		}
+            foreach ($Result as $Key => $Value) {
+               if (isset($Value['Summary'])) {
+                  $Value['Summary'] = Condense(Gdn_Format::To($Value['Summary'], GetValue('Format', $Value, 'Html')));
+                  $Result[$Key] = $Value;
+               }
+            }
 
-      return $Result;
- */
-	}
+            return $Result;
+       */
+   }
 
    public function setSort($sphinx, $terms, $search) {
       // If there is just one search term then we really want to just sort by date.
@@ -716,6 +788,6 @@ class SearchModel extends Gdn_Model {
 
 
 //      return array($search, array_unique($terms));
-      return array($finalquery, array_unique($terms));
+      return array(trim($finalquery), array_unique($terms));
    }
 }

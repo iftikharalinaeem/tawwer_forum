@@ -13,8 +13,8 @@
 $PluginInfo['SMFCompatibility'] = array(
    'Name' => 'SMF Compatibility',
    'Description' => 'Adds some compatibility functionality for forums imported from SMF.',
-   'Version' => '1.1b',
-   'RequiredApplications' => array('Vanilla' => '2.0.2a'),
+   'Version' => '1.1',
+   'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,

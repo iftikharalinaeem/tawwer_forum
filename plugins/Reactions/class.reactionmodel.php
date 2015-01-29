@@ -119,7 +119,7 @@ class ReactionModel {
       $Data['TagID'] = $TagID;
       
       $Row = array();
-      $Columns = array('Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom', 'Hidden');
+      $Columns = array('UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom', 'Hidden');
       foreach ($Columns as $Column) {
          if (isset($Data[$Column])) {
             $Row[$Column] = $Data[$Column];
@@ -160,8 +160,17 @@ class ReactionModel {
       $Types = self::ReactionTypes();
       $Result = array();
       foreach ($Types as $Index => $Type) {
-         if (self::Filter($Type, $Where))
+         if (self::Filter($Type, $Where)) {
+            // Set Attributes as fields
+            $Attributes = val('Attributes', $Type);
+            if (is_string($Attributes)) {
+               $Attributes = @unserialize($Attributes);
+               $Attributes = (is_array($Attributes)) ? $Attributes : array();
+               SetValue('Attributes', $Type, $Attributes);
+            }
+            // Add the result
             $Result[$Index] = $Type;
+         }
       }
       return $Result;
    }
@@ -374,6 +383,7 @@ class ReactionModel {
       foreach ($Data as $Index => &$Row) {
          $RecordType = $Row['RecordType'];
          $ID = $Row['RecordID'];
+
          
          if (!isset($JoinData[$RecordType][$ID])) {
             $Unset[] = $Index;
@@ -405,12 +415,16 @@ class ReactionModel {
                $Url = '';
          }
          $Row['Url'] = $Url;
+
+         // Join the category
+         $Category = CategoryModel::Categories(val('CategoryID', $Row, ''));
+         $Row['CategoryCssClass'] = val('CssClass', $Category);
       }
       
       foreach ($Unset as $Index) {
          unset($Data[$Index]);
       }
-      
+
       // Join the users.
       Gdn::UserModel()->JoinUsers($Data, array('InsertUserID'));
       

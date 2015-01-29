@@ -1,6 +1,21 @@
 #Head div.User a.MyAccountLink {
-	background: url('bg-button.png') top left repeat-x;
+    background: url('bg-button.png') top left repeat-x;
 }
 #Head div.User a.MyAccountLink:focus {
-	background: #138b01;
+    background: #138b01;
+}
+
+/* hide get more themes, linking to .org */
+body#dashboard_settings_themes .FilterMenu a.SmallButton {
+    display:none;
+}
+
+/* hide import */
+div.Box.Group.Import {
+display:none;
+}
+
+/*hide "new" tag on browse-addons*/
+div.Box.Group.Addons a span.New {
+  display:none;
 }

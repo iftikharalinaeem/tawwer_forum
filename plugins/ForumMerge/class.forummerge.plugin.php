@@ -372,6 +372,39 @@ class ForumMergePlugin implements Gdn_IPlugin {
            where o.OldID > 0');
       }
 
+      // TAGS //
+      if ($this->OldTableExists('Tag')) {
+         $TagColumns = $this->GetColumns('Tag', $OldDatabase, $OldPrefix);
+         $TagDiscussionColumns = $this->GetColumns('TagDiscussion', $OldDatabase, $OldPrefix);
+
+         // Record reference of source forum tag ID
+         Gdn::SQL()->Query('update '.$NewPrefix.'Tag t set t.OldID =
+            (select t2.TagID from `'.$OldDatabase.'`.'.$OldPrefix.'Tag t2 where t2.Name = t.Name limit 1)');
+
+         // Import tags not present in destination forum
+         Gdn::SQL()->Query('insert into '.$NewPrefix.'Tag ('.$TagColumns.', OldID)
+            select '.$TagColumns.', TagID
+            from `'.$OldDatabase.'`.'.$OldPrefix.'Tag
+            where Name not in (select Name from '.$NewPrefix.'Tag)');
+
+         // TagDiscussion
+         if ($this->OldTableExists('TagDiscussion')) {
+            // Insert source tag:discussion mapping
+            Gdn::SQL()->Query('insert ignore into '.$NewPrefix.'TagDiscussion (TagID, DiscussionID, OldCategoryID)
+               select t.TagID, d.DiscussionID, td.CategoryID
+               from '.$NewPrefix.'Tag t, '.$NewPrefix.'Discussion d, `'.$OldDatabase.'`.'.$OldPrefix.'TagDiscussion td
+               where t.OldID = (td.TagID) and d.OldID = (td.DiscussionID)');
+
+            /**
+             * Incoming tags may or may not have CategoryIDs associated with them, so we'll need to update them with a
+             * current CategoryID, if applicable, based on the original category ID (OldCategoryID) from the source
+             */
+            Gdn::SQL()->Query('update '.$NewPrefix.'TagDiscussion td set CategoryID =
+               (select c.CategoryID from '.$NewPrefix.'Category c where c.OldID = td.OldCategoryID limit 1)
+               where OldCategoryID > 0');
+         }
+      }
+
 		////
 		
 		// Draft - new UserIDs
@@ -394,6 +427,8 @@ class ForumMergePlugin implements Gdn_IPlugin {
       Gdn::SQL()->Update('Discussion')->Set('OldID', NULL)->Put();
       Gdn::SQL()->Update('Media')->Set('OldID', NULL)->Put();
       Gdn::SQL()->Update('Role')->Set('OldID', NULL)->Put();
+      Gdn::SQL()->Update('Tag')->Set('OldID', NULL)->Put();
+      Gdn::SQL()->Update('TagDiscussion')->Set('OldCategoryID', NULL)->Put();
       Gdn::SQL()->Update('User')->Set('OldID', NULL)->Put();
 
       $Construct = Gdn::Database()->Structure();
@@ -415,6 +450,8 @@ class ForumMergePlugin implements Gdn_IPlugin {
       Gdn::Structure()->Table('Discussion')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('Media')->Column('OldID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('Role')->Column('OldID', 'int', TRUE, 'key')->Set();
+      Gdn::Structure()->Table('Tag')->Column('OldID', 'int', TRUE, 'key')->Set();
+      Gdn::Structure()->Table('TagDiscussion')->Column('OldCategoryID', 'int', TRUE, 'key')->Set();
       Gdn::Structure()->Table('User')->Column('OldID', 'int', TRUE, 'key')->Set();
 
       $Construct = Gdn::Database()->Structure();

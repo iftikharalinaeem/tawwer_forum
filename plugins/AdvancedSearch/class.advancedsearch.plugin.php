@@ -8,7 +8,7 @@
 $PluginInfo['AdvancedSearch'] = array(
    'Name' => 'Advanced Search',
    'Description' => "Enables advanced search on sites.",
-   'Version' => '1.0.4',
+   'Version' => '1.0.5',
    'MobileFriendly' => TRUE,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -43,7 +43,13 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          if (Gdn::ApplicationManager()->CheckApplication('Pages')) {
             self::$Types['page']['p'] = 'docs';
          }
+
+         if (Gdn::ApplicationManager()->CheckApplication('Groups')) {
+            self::$Types['group']['group'] = 'groups';
+         }
       }
+
+      $this->FireEvent('Init');
    }
 
    public function quickSearch($title, $get = array()) {
@@ -167,6 +173,17 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
       die(json_encode($results['SearchResults']));
    }
 
+   public function searchController_groupAutoComplete_Create($sender, $term, $limit = 5) {
+      $searchModel = new SearchModel();
+      $get = $sender->Request->Get();
+      $get['search'] = $term;
+      $results = $searchModel->groupAutoComplete($get, $limit);
+      $this->CalculateResults($results['SearchResults'], $results['SearchTerms'], !$sender->Request->Get('nomark'), 100);
+
+      header('Content-Type: application/json; charset=utf8');
+      die(json_encode($results['SearchResults']));
+   }
+
    /**
     *
     * @param SearchController $Sender
@@ -283,6 +300,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
          $Row['Media'] = $media;
 
          $Row['Summary'] = SearchExcerpt(htmlspecialchars(Gdn_Format::PlainText($Summary, 'Raw')), $SearchTerms, $Length);
+         $Row['Summary'] = Emoji::instance()->translateToHtml($Row['Summary']);
+
          $Row['Format'] = 'Html';
          $Row['DateHtml'] = Gdn_Format::Date($Row['DateInserted'], 'html');
          $Row['Notes'] = $calc($Row, $SearchTerms);

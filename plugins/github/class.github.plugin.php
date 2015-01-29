@@ -200,6 +200,10 @@ class GithubPlugin extends Gdn_Plugin {
         if (!$this->isConfigured()) {
             return;
         }
+        //Staff Only
+        if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+            return;
+        }
         $Sf = GetValueR('User.Attributes.' . self::PROVIDER_KEY, $Args);
         Trace($Sf);
         $Profile = GetValueR('User.Attributes.' . self::PROVIDER_KEY . '.Profile', $Args);
@@ -336,6 +340,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @param Controller $Sender Sending controller.
      */
     public function controller_toggle($Sender) {
+	$Sender->Permission('Garden.Settings.Manage');
         // Enable/Disable
         if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
             if (C('Plugins.Github.GlobalLogin.Enabled')) {
@@ -396,7 +401,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @param array $Args Event Arguments.
      */
     public function discussionController_afterDiscussionBody_handler($Sender, $Args) {
-        $this->writeAndUpdateAttachments($Sender, $Args);
+        $this->updateAttachments($Sender, $Args);
     }
 
     /**
@@ -406,7 +411,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @param array $Args Event Arguments.
      */
     public function discussionController_afterCommentBody_handler($Sender, $Args) {
-        $this->writeAndUpdateAttachments($Sender, $Args);
+        $this->updateAttachments($Sender, $Args);
     }
 
     /**
@@ -417,16 +422,17 @@ class GithubPlugin extends Gdn_Plugin {
      *
      * @throws Gdn_UserException If Errors.
      */
-    protected function writeAndUpdateAttachments($Sender, $Args) {
+    protected function updateAttachments($Sender, $Args) {
         if ($Args['Type'] == 'Discussion') {
             $Content = 'Discussion';
         } elseif ($Args['Type'] == 'Comment') {
             $Content = 'Comment';
         } else {
-            throw new Gdn_UserException('Invalid Content');
+            // Invalid Content
+            return;
         }
         // Signed in users only.
-        if (!Gdn::Session()->UserID) {
+        if (!Gdn::Session()->IsValid()) {
             return;
         }
 
@@ -542,6 +548,7 @@ class GithubPlugin extends Gdn_Plugin {
      */
     public function controller_index($Sender) {
 
+	    $Sender->Permission('Garden.Settings.Manage');
         $Sender->AddCssFile('admin.css');
 
         $Validation = new Gdn_Validation();
@@ -850,9 +857,6 @@ class GithubPlugin extends Gdn_Plugin {
         );
         Trace('GitHub API Request: ' . self::API_BASE_URL . $endPoint);
         $DecodedResponse = json_decode($Response, true);
-//        if ($Proxy->ResponseStatus == 500) {
-//            throw new Gdn_UserException('Invalid apiRequest', $Proxy->ResponseStatus);
-//        }
 
         return $DecodedResponse;
     }
@@ -881,9 +885,10 @@ class GithubPlugin extends Gdn_Plugin {
      *      [labels]    - array
      * Keys prefixed with a * are required.
      *
+     * @throws Gdn_UserException
      * @link https://developer.github.com/v3/repos/#create
      *
-     * @return array
+     * @return array|bool
      */
     protected function createIssue($repo, $issue) {
 
@@ -965,6 +970,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @param PlugginController $Sender Sending controller.
      */
     public function controller_test($Sender) {
+	$Sender->Permission('Garden.Settings.Manage');
 
         $args = $Sender->RequestArgs;
         if (count($args) == 1) {
@@ -1040,6 +1046,9 @@ class GithubPlugin extends Gdn_Plugin {
      * @param array $Arguments
      */
     public function Base_GetAppSettingsMenuItems_Handler($Sender, $Arguments) {
+        if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+            return;
+        }
         $Menu = $Arguments['SideMenu'];
         $Menu->AddItem('Forum', T('Forum'));
         $Menu->AddLink('Forum', 'GitHub', 'plugin/github', 'Garden.Staff.Allow');
@@ -1048,7 +1057,8 @@ class GithubPlugin extends Gdn_Plugin {
     /**
      * Used to convert text to mark down accepted by GitHub.
      * @param string $Text Text to be converted.
-     * @param string $Format Format of text
+     * @param string $Format Format of text.
+     * @return string MD Compatible text.
      */
     public function convertToMDCompatible($Text, $Format = 'Html') {
         switch ($Format) {

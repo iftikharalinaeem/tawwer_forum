@@ -3,13 +3,14 @@
 $PluginInfo['samlsso'] = array(
     'Name' => 'SAML SSO',
     'Description' => 'Allows Vanilla to SSO to a SAML 2.0 compliant identity provider.',
-    'Version' => '1.1b',
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
+    'Version' => '1.1',
+    'RequiredApplications' => array('Vanilla' => '2.1'),
     'RequiredTheme' => false,
     'RequiredPlugins' => false,
     'HasLocale' => false,
     'SettingsUrl' => '/settings/samlsso',
-    'SettingsPermission' => 'Garden.Settings.Manage'
+    'SettingsPermission' => 'Garden.Settings.Manage',
+    'MobileFriendly' => TRUE
 );
 
 class SamlSSOPlugin extends Gdn_Plugin {

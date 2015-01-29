@@ -59,6 +59,12 @@ class Cleanspeak extends Gdn_Pluggable {
 
     }
 
+    public function flag($UUID, $flag) {
+        $response = $this->apiRequest('/content/item/flag/' . urlencode($UUID), $flag);
+        return $response;
+    }
+
+
     /**
      *
      * Generate UUIDs for Content.
@@ -147,21 +153,25 @@ class Cleanspeak extends Gdn_Pluggable {
         if (!empty($apiKey)) {
             $headers['Authentication'] = $apiKey;
         }
-        Logger::log(Logger::DEBUG, 'Cleanspeak API Request.', array($options, $queryParams, $headers));
+        Logger::log(Logger::DEBUG, 'Cleanspeak API Request.', array(
+              'Options' => $options,
+              'QueryParams' => $queryParams,
+              'Header' => $headers
+           ));
 
         $response = $proxyRequest->Request($options, $queryParams, null, $headers);
 
         if ($proxyRequest->ResponseStatus == 400) {
-            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', json_decode($response, true));
+            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', array('Response' => json_decode($response, true)));
             throw new CleanspeakException('Error in cleanspeak request.');
         } elseif ($proxyRequest->ResponseStatus == 0) {
             Logger::log(Logger::ERROR, 'Cleanspeak Error in API. No Response.');
             throw new CleanspeakException('Error communicating with the cleanspeak server.', 500);
         } elseif ($proxyRequest->ResponseStatus != 200) {
-            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', json_decode($response, true));
+            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', array('Response' => json_decode($response, true)));
             throw new CleanspeakException('Error communicating with the cleanspeak server.');
         } else {
-            Logger::log(Logger::DEBUG, 'Cleanspeak API Response.', array($response));
+            Logger::log(Logger::DEBUG, 'Cleanspeak API Response.', array('Response' => $response));
         }
 
         if (stristr($proxyRequest->ResponseHeaders['Content-Type'], 'application/json') != false) {
@@ -183,26 +193,64 @@ class Cleanspeak extends Gdn_Pluggable {
     public function getParts($data) {
 
         if (GetValue('Name', $data)) {
-            $parts[] = array(
-                'content' => Gdn_Format::Text($data['Name'], false),
-                'name' => 'Name',
-                'type' => 'text'
-            );
+            $text = Gdn_Format::Text($data['Name'], false);
+            if (!empty($text) && trim($text) != '') {
+                $parts[] = array(
+                    'content' => $text,
+                    'name' => 'Name',
+                    'type' => 'text'
+                );
+            }
         }
         if (GetValue('Body', $data)) {
-            $parts[] = array(
-                'content' => Gdn_Format::Text($data['Body'], false),
-                'name' => 'Body',
-                'type' => 'text'
-            );
+            $text = Gdn_Format::Text($data['Body'], false);
+            if (!empty($text) && trim($text) != '') {
+                $parts[] = array(
+                    'content' => $text,
+                    'name' => 'Body',
+                    'type' => 'text'
+                );
+            }
         }
         if (GetValue('Story', $data)) {
-            $parts[] = array(
-                'content' => Gdn_Format::Text($data['Story'], false),
-                'name' => 'WallPost',
-                'type' => 'text'
-            );
+            $text = Gdn_Format::Text($data['Story'], false);
+            if (!empty($text) && trim($text) != '') {
+                $parts[] = array(
+                    'content' => $text,
+                    'name' => 'WallPost',
+                    'type' => 'text'
+                );
+            }
         }
+
+
+        // Attachments.
+        if (val('MediaIDs', $data)) {
+            $MediaModel = new Gdn_Model('Media');
+
+            foreach ($data['MediaIDs'] as $MediaID) {
+                $Media = $MediaModel->GetID($MediaID);
+                if (!$Media) {
+                    continue;
+                }
+                $Path = val('Path', $Media);
+                $Name = 'Attachment';
+                $Type = 'hyperlink';
+
+                if (stristr(val('Type', $Media), 'image') !== false) {
+                    $Name = 'Image';
+                    $Type = 'image';
+                }
+
+                $parts[] = array(
+                    'content' => Gdn_Upload::Url($Path),
+                    'name' => $Name,
+                    'type' => $Type
+                );
+            }
+
+        }
+
 
         if (sizeof($parts) == 0) {
             throw new Gdn_UserException('Error getting parts from content');

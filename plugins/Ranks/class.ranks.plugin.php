@@ -8,8 +8,8 @@
 $PluginInfo['Ranks'] = array(
    'Name' => 'Ranks',
    'Description' => "Adds user ranks to the application.",
-   'Version' => '1.2',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
+   'Version' => '1.3',
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
@@ -93,7 +93,7 @@ class RanksPlugin extends Gdn_Plugin {
 
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Reputation', T('Ranks'), 'settings/ranks', 'Garden.Settings.Manage');
+      $Menu->AddLink('Reputation', T('Ranks'), 'settings/ranks', 'Garden.Settings.Manage', array('class' => 'nav-ranks'));
    }
 
    public function Base_Render_Before($Sender) {
@@ -260,7 +260,7 @@ class RanksPlugin extends Gdn_Plugin {
    public function SettingsController_DeleteRank_Create($Sender, $RankID) {
       $Sender->Permission('Garden.Settings.Manage');
 
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          if ($Sender->Form->GetFormValue('Yes')) {
             $RankModel = new RankModel();
             $RankModel->Delete(array('RankID' => $RankID));
@@ -296,7 +296,7 @@ class RanksPlugin extends Gdn_Plugin {
       $Formats = array('Text' => 'text', 'TextEx' => 'text, links, and youtube', '' => sprintf('default (%s)', $DefaultFormat));
       $Sender->SetData('_Formats', $Formats);
 
-      if ($Sender->Form->IsPostBack()) {
+      if ($Sender->Form->AuthenticatedPostBack()) {
          $Data = $Sender->Form->FormValues();
          unset($Data['hpt'], $Data['Checkboxes'], $Data['Save']);
 

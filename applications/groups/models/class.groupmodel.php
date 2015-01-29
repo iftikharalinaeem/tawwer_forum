@@ -7,6 +7,11 @@ class GroupModel extends Gdn_Model {
     */
    public $MaxUserGroups = 0;
 
+   /**
+    * @var int The number of members per page.
+    */
+   public $MemberPageSize = 30;
+
 
    /**
     * Class constructor. Defines the related database table name.
@@ -186,6 +191,13 @@ class GroupModel extends Gdn_Model {
          case 'DateLastComment':
             $this->Database->Query(DBAModel::GetCountSQL('max', 'Group', 'Discussion', $Column, 'DateLastComment'));
             break;
+         case 'LastDiscussionID':
+            $this->SQL->Update('Group g')
+               ->Join('Discussion d', 'd.DateLastComment = g.DateLastComment and g.GroupID = d.GroupID')
+               ->Set('g.LastDiscussionID', 'd.DiscussionID', FALSE, FALSE)
+               ->Set('g.LastCommentID', 'd.LastCommentID', FALSE, FALSE)
+               ->Put();
+            break;
          default:
             throw new Gdn_UserException("Unknown column $Column");
       }
@@ -199,11 +211,11 @@ class GroupModel extends Gdn_Model {
       return $Result;
    }
 
-   public function GetByUser($UserID, $Limit = 9, $Offset = false) {
+   public function GetByUser($UserID, $OrderFields = '', $OrderDirection = 'desc', $Limit = 9, $Offset = false) {
       $UserGroups = $this->SQL->GetWhere('UserGroup', array('UserID' => $UserID))->ResultArray();
       $IDs = ConsolidateArrayValuesByKey($UserGroups, 'GroupID');
 
-      $Result = $this->GetWhere(array('GroupID' => $IDs), 'Name', 'asc', $Limit, $Offset)->ResultArray();
+      $Result = $this->GetWhere(array('GroupID' => $IDs), $OrderFields, $OrderDirection, $Limit, $Offset)->ResultArray();
       $this->Calc($Result);
       return $Result;
    }
@@ -283,14 +295,37 @@ class GroupModel extends Gdn_Model {
       return $Parts[0];
    }
 
-   public function IncrementDiscussionCount($GroupID, $Inc) {
+   public function IncrementDiscussionCount($GroupID, $Inc, $DiscussionID = 0, $DateLastComment = '') {
       $Group = $this->GetID($GroupID);
+      $Set = array();
 
+      if ($DiscussionID) {
+         $Set['LastDiscussionID'] = $DiscussionID;
+         $Set['LastCommentID'] = null;
+      }
+      if ($DateLastComment) {
+         $Set['DateLastComment'] = $DateLastComment;
+      }
+
+      if (val('CountDiscussions', $Group) < 100) {
+         $countDiscussions = $this->SQL->Select('DiscussionID', 'count', 'CountDiscussions')
+            ->From('Discussion')
+            ->Where('GroupID', $GroupID)
+            ->Get()->Value('CountDiscussions', 0);
+
+         $Set['CountDiscussions'] = $countDiscussions;
+         $this->SetField($GroupID, $Set);
+         return;
+      }
+      $SQLInc = sprintf('%+d', $Inc);
       $this->SQL
          ->Update('Group')
-         ->Set('CountDiscussions', "CountDiscussions + $Inc", FALSE, FALSE)
-         ->Where('GroupID', $GroupID)
-         ->Put();
+         ->Set('CountDiscussions', "CountDiscussions " . $SQLInc, false, false)
+         ->Where('GroupID', $GroupID);
+      if (!empty($Set)) {
+         $this->SQL->Set($Set);
+      }
+      $this->SQL->Put();
    }
 
    /**
@@ -345,6 +380,29 @@ class GroupModel extends Gdn_Model {
             $this->Validation = $Model->Validation;
          }
          $ValidUserIDs[] = $UserID;
+      }
+
+      // If Conversations are disabled; Improve notification with a link to group.
+      if (!class_exists('ConversationModel') && count($ValidUserIDs) > 0) {
+         foreach ($ValidUserIDs as $UserID) {
+            $Activity = array(
+               'ActivityType' => 'Group',
+               'ActivityUserID' => GDN::Session()->UserID,
+               'HeadlineFormat' => T('HeadlineFormat.GroupInvite', 'Please join my <a href="{Url,html}">group</a>.'),
+               'RecordType' => 'Group',
+               'RecordID' => $Group['GroupID'],
+               'Route' => GroupUrl($Group, false, '/'),
+               'Story' => FormatString(T("You've been invited to join {Name}."), array('Name' => htmlspecialchars($Group['Name']))),
+               'NotifyUserID' => $UserID,
+               'Data' => array(
+                  'Name' => $Group['Name']
+               )
+            );
+            $ActivityModel = new ActivityModel();
+            $ActivityModel->Save($Activity, 'Groups');
+
+         }
+
       }
 
       // Send a message for the invite.
@@ -471,6 +529,72 @@ class GroupModel extends Gdn_Model {
          }
 
          return $Saved;
+      }
+   }
+
+   /**
+    * Join the recent discussions/comments to a given set of groups.
+    *
+    * @param array $Data The groups to join to.
+    */
+   public function JoinRecentPosts(&$Data, $JoinUsers = true) {
+      $DiscussionIDs = array();
+      $CommentIDs = array();
+
+      foreach ($Data as &$Row) {
+         if (isset($Row['LastTitle']) && $Row['LastTitle'])
+            continue;
+
+         if ($Row['LastDiscussionID'])
+            $DiscussionIDs[] = $Row['LastDiscussionID'];
+
+         if ($Row['LastCommentID']) {
+            $CommentIDs[] = $Row['LastCommentID'];
+         }
+      }
+
+      // Create a fresh copy of the Sql object so as not to pollute.
+      $Sql = clone Gdn::SQL();
+      $Sql->Reset();
+
+      // Grab the discussions.
+      if (count($DiscussionIDs) > 0) {
+         $Discussions = $Sql->WhereIn('DiscussionID', $DiscussionIDs)->Get('Discussion')->ResultArray();
+         $Discussions = Gdn_DataSet::Index($Discussions, array('DiscussionID'));
+      }
+
+      if (count($CommentIDs) > 0) {
+         $Comments = $Sql->WhereIn('CommentID', $CommentIDs)->Get('Comment')->ResultArray();
+         $Comments = Gdn_DataSet::Index($Comments, array('CommentID'));
+      }
+
+      foreach ($Data as &$Row) {
+         $Discussion = GetValue($Row['LastDiscussionID'], $Discussions);
+         if ($Discussion) {
+            $Row['LastTitle'] = Gdn_Format::Text($Discussion['Name']);
+            $Row['LastUserID'] = $Discussion['InsertUserID'];
+            $Row['LastDiscussionUserID'] = $Discussion['InsertUserID'];
+            $Row['LastDateInserted'] = $Discussion['DateInserted'];
+            $Row['LastUrl'] = DiscussionUrl($Discussion, FALSE, '/').'#latest';
+         }
+         $Comment = GetValue($Row['LastCommentID'], $Comments);
+         if ($Comment) {
+            $Row['LastUserID'] = $Comment['InsertUserID'];
+            $Row['LastDateInserted'] = $Comment['DateInserted'];
+         } else {
+            $Row['NoComment'] = TRUE;
+         }
+
+         TouchValue('LastTitle', $Row, '');
+         TouchValue('LastUserID', $Row, NULL);
+         TouchValue('LastDiscussionUserID', $Row, NULL);
+         TouchValue('LastDateInserted', $Row, NULL);
+         TouchValue('LastUrl', $Row, NULL);
+      }
+
+      // Now join the users.
+      if ($JoinUsers) {
+         Gdn::UserModel()->JoinUsers($Data, array('LastUserID'));
       }
    }
 

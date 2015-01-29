@@ -10,6 +10,17 @@
  * @param array $attachment
  */
 function WriteZendeskTicketAttachment($attachment) {
+
+    // Don't display anything for guest.
+    if (!Gdn::Session()->IsValid()) {
+        return;
+    }
+
+    // Only display to Staff
+    if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+        return;
+    }
+
     ?>
     <div class="item-attachment">
         <div class="alert">
