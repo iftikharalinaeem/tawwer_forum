@@ -521,6 +521,7 @@ textarea.TextBox:focus {
 }
 .Sprite,
 .Sprite16,
+.ReactSprite,
 .SpFlyoutHandle {
   width: auto;
   height: auto;
@@ -528,6 +529,7 @@ textarea.TextBox:focus {
 }
 .Sprite:before,
 .Sprite16:before,
+.ReactSprite:before,
 .SpFlyoutHandle:before {
   display: inline-block;
   font-family: "vanillicon";
@@ -540,6 +542,9 @@ textarea.TextBox:focus {
   -webkit-font-smoothing: antialiased;
   min-width: 1em;
   text-align: center;
+}
+.ReactSprite:before {
+  font-size: 14px;
 }
 .SpFlyoutHandle {
   cursor: pointer;
@@ -583,13 +588,71 @@ textarea.TextBox:focus {
 .SpInbox:before {
   content: "\f159";
 }
+.ReactPromote:before {
+  content: "\f156";
+}
+.ReactOffTopic:before {
+  content: "\f16b";
+}
+.ReactInsightful:before {
+  content: "\f160";
+}
+.ReactDisagree:before {
+  content: "\f14c";
+}
+.ReactAgree:before {
+  content: "\f196";
+}
+.ReactDislike:before {
+  content: "\f1a6";
+}
+.ReactLike:before {
+  content: "\f1a7";
+}
+.ReactDown:before {
+  content: "\f108";
+}
+.ReactUp:before {
+  content: "\f10b";
+}
+.ReactWTF:before {
+  content: "\f1b8";
+}
+.ReactAwesome:before {
+  content: "\f157";
+}
+.ReactLOL:before {
+  content: "\f167";
+}
+.ReactFlag:before {
+  content: "\f147";
+}
+.ReactAbuse:before {
+  content: "\f13d";
+}
+.ReactSpam:before {
+  content: "\f198";
+}
+.ReactWarn:before {
+  content: "\f1b6";
+}
 .ReactFacebook:before {
-  color: #111111;
   content: "\f143";
 }
+.ReactFacebook:hover:before {
+  color: #3a5795;
+}
 .ReactTwitter:before {
-  color: #111111;
   content: "\f1ad";
+}
+.ReactTwitter:hover:before {
+  color: #55acee;
+}
+.ReactGooglePlus:before {
+  content: "\f151";
+}
+.ReactGooglePlus:hover:before {
+  color: #dd4b39;
 }
 .ReactButton.PopupWindow:hover .Sprite:before {
   color: #808080;
