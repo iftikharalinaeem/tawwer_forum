@@ -548,6 +548,7 @@ class MultisiteModel extends Gdn_Model {
             $result = $this->nodeApi($nodeSlug, $url, 'POST');
         } catch (Exception $ex) {
             $result = ['Code' => $ex->getCode(), 'Exception' => $ex->getMessage()];
+            LogException($ex);
         }
         return $result;
     }
