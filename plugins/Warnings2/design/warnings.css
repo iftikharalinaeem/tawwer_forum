@@ -8,7 +8,7 @@
 
 .Jailed .ProfilePhotoLarge { height: 200px; }
 
-.PhotoWrap { display: inline-block; }
+.PhotoWrap { position: relative; display: inline-block; }
 
 .PhotoWrap * { line-height: 1; }
 
