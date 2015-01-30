@@ -334,7 +334,9 @@
  * Emoji drop down
  */
 .editor-dd-emoji + .editor-insert-dialog {
-  width: 136px; }
+  width: 136px;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box; }
   .editor-dd-emoji + .editor-insert-dialog .emoji-wrap {
     line-height: 34px;
     width: 34px;
