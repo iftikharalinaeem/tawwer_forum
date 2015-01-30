@@ -125,8 +125,8 @@
   ),
   'minSize' =>
   array (
-    'w' => 34,
-    'h' => 34,
+    'w' => 36,
+    'h' => 36,
   ),
   'maxSize' =>
   array (

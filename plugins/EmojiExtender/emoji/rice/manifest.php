@@ -3,7 +3,7 @@
   'author' => 'David Lanham',
   'description' => 'A uniquely cute set of emoticons modelled to look like little balls of rice. Check out <a href="http://dlanham.com" target="_blank">dlanham.com</a> for more of the author\'s stuff.',
   'format' => '<img class="emoji" src="{src}" title="{name}" alt="{name}" srcset="{dir}/{basename}@2x{ext} 2x" />',
-  'emoji' => 
+  'emoji' =>
   array (
     -1 => '-1.png',
     '+1' => '+1.png',
@@ -39,7 +39,7 @@
     'wink' => 'wink.png',
     'yum' => 'yum.png',
   ),
-  'aliases' => 
+  'aliases' =>
   array (
     ':)' => 'smile',
     ':(' => 'frown',
@@ -52,8 +52,9 @@
     'o.O' => 'eh',
     '8-)' => 'glasses',
     '>_<' => 'rage',
+    ':3' => 'blush',
   ),
-  'editor' => 
+  'editor' =>
   array (
     ':)' => 'smile',
     ':(' => 'frown',
@@ -64,7 +65,7 @@
     '8-)' => 'glasses',
     '>_<' => 'rage',
   ),
-  'archive' => 
+  'archive' =>
   array (
     'dizzy_face' => 'dizzy.png',
     'heart_eyes' => 'love.png',
@@ -72,17 +73,17 @@
     'smiling_imp' => 'naughty.png',
     'stuck_out_tongue' => 'tongue.png',
   ),
-  'minSize' => 
+  'minSize' =>
   array (
     'w' => 18,
     'h' => 18,
   ),
-  'maxSize' => 
+  'maxSize' =>
   array (
     'w' => 30,
     'h' => 19,
   ),
-  'sizes' => 
+  'sizes' =>
   array (
     0 => 1,
     1 => 2,
