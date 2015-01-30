@@ -118,6 +118,7 @@
     '8-)' => 'glasses',
     '=)' => 'smiley',
     '>_<' => 'rage',
+    ':3' => 'blush',
   ),
   'editor' =>
   array (
@@ -148,8 +149,8 @@
   ),
   'maxSize' =>
   array (
-    'w' => 300,
-    'h' => 300,
+    'w' => 52,
+    'h' => 22,
   ),
   'sizes' =>
   array (
