@@ -189,8 +189,16 @@ class MultisitesController extends DashboardController {
 
         $post = $this->Request->Post();
 
+        $allowed = ['DateLastSync', 'Status'];
+        $post = ArrayTranslate($post, $allowed);
+        if (val('Status', $post) === 'active' && $this->site['Status'] !== 'active') {
+            $post['DateStatus'] = Gdn_Format::ToDateTime();
+        } else {
+            unset($post['Status']);
+        }
+
         if (isset($post['DateLastSync'])) {
-            $this->siteModel->SetField($this->site['MultisiteID'], 'DateLastSync', $post['DateLastSync']);
+            $this->siteModel->SetField($this->site['MultisiteID'], $post);
             $this->SetData('DateLastSync', true);
         }
 

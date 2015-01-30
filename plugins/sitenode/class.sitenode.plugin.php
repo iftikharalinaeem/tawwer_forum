@@ -282,7 +282,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Tell the hub that we've synchronized.
         $now = Gdn_Format::ToDateTime();
         Gdn::UserMetaModel()->SetUserMeta(0, 'siteNode.dateLastSync', $now);
-        $result = $this->hubApi("/multisites/$siteID.json", 'POST', ['DateLastSync' => $now], true);
+        $result = $this->hubApi("/multisites/$siteID.json", 'POST', ['DateLastSync' => $now, 'Status' => 'active'], true);
 
         Gdn::Config()->Shutdown();
     }
