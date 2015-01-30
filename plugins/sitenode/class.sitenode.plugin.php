@@ -311,8 +311,10 @@ class SiteNodePlugin extends Gdn_Plugin {
     public function syncCategories(array $categories, array $otherCategories, array $roleMap) {
         $categoryModel = new CategoryModel();
         $categoryMap = [];
+        $sort = 0;
 
         foreach ($categories as $category) {
+            $sort++;
             $hubID = $category['HubID'];
             $parentID = val('ParentHubID', $category);
             if (!$parentID || !isset($categoryMap[$parentID])) {
@@ -358,6 +360,7 @@ class SiteNodePlugin extends Gdn_Plugin {
                     $category['CategoryID'] = $existingCategory['CategoryID'];
                     $categoryMap[$hubID] = $existingCategory['CategoryID'];
                 }
+                $category['Sort'] = $sort;
 
                 $categoryID = $categoryModel->Save($category);
                 if ($categoryID) {
@@ -374,6 +377,34 @@ class SiteNodePlugin extends Gdn_Plugin {
         foreach ($otherCategories as $categoryID) {
             $categoryModel->SetField($categoryID, 'HubID', null);
         }
+
+        // Find categories that have been removed from the hub.
+        $toDelete = Gdn::SQL()
+            ->Select('CategoryID')
+            ->From('Category')
+            ->WhereNotIn('CategoryID', $categoryMap)
+            ->Where('HubID is not null')
+            ->Where('OverrideHub', 0)
+            ->Get()->ResultArray();
+        $deleteIDs = array_column($toDelete, 'CategoryID');
+
+        foreach ($deleteIDs as $categoryID) {
+            if ($categoryID <= 0) {
+                cotinue;
+            }
+            $category = (object)CategoryModel::Categories($categoryID);
+            $categoryModel->Delete($category, -1);
+        }
+
+        // Update the sort order of categories that aren't from the hub.
+        Gdn::SQL()->Update('Category')
+            ->Set('Sort', "Sort + $sort", false, false)
+            ->Where('CategoryID >', 0)
+            ->WhereNotIn('CategoryID', $categoryMap)
+            ->Put();
+
+        // Rebuild the tree with from the new sort.
+        $categoryModel->RebuildTree(true);
     }
 
     public function syncRoles(array $roles) {

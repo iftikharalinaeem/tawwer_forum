@@ -381,6 +381,7 @@ class MultisiteModel extends Gdn_Model {
         $categories = $this->SQL
             ->Select('CategoryID', '', 'HubID')
             ->Select('UrlCode,Name,Description')
+            ->Select('ParentCategoryID', '', 'ParentHubID')
             ->OrderBy('TreeLeft')
             ->GetWhere('Category', ['CategoryID >' => 0, 'HubSync' => 'Settings'])
             ->ResultArray();
