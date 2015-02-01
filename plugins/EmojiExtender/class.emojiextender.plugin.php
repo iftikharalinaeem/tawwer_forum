@@ -115,6 +115,19 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add an emoji set.
+     *
+     * @param string $setKey
+     * @param array $setData
+     */
+    public function addEmojiSet($setKey, $setData) {
+        $setKey = Gdn_Format::AlphaNumeric($setKey);
+        if (!array_key_exists($setKey, $this->emojiSets) && is_array($setData)) {
+            $this->emojiSets[$setKey] = $setData;
+        }
+    }
+
+    /**
     *
     * EVENT HANDLERS
     *
@@ -127,6 +140,11 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
     * @param Args $args
     */
     public function Emoji_Init_Handler($sender, $args) {
+        // Add your own emoji sets!
+        // Hook EmojiExtenderPlugin_beforeSetEmoji_handler & use $sender->addEmojiSet().
+        $this->fireEvent('beforeSetEmoji');
+
+        // Get the currently selected emoji set & switch to it.
         $emojiSetName = C('Garden.EmojiSet');
         if (!$emojiSetName) {
             return;
