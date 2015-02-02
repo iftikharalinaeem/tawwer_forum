@@ -2299,7 +2299,7 @@ if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript re
         left: o.left,
         top: o.top
       })
-        
+
       if (target) {
         target.insertBefore(el, target.firstChild||null)
       }
@@ -3596,7 +3596,7 @@ $('#el').spin('flower', 'red');
     // Programmatically hide buttons that are supposed to be hidden. This
     // ensures that the initial display state is correctly stored and applied
     // if the button is later shown.
-    $('.Button.Hidden').removeClass('Hidden').hide();
+    // $('.Button.Hidden').removeClass('Hidden').hide();
 
     // Attach spinner to the .InProgress element in flyouts
     $(document).on('click', '.ToggleFlyout', function (e) {
@@ -3735,7 +3735,7 @@ $('#el').spin('flower', 'red');
     , 'a.DeleteFile'
     , 'a.PopConfirm'
     , 'a.ClearConversation'
-    , 'ul#DP_Remove a'  
+    , 'ul#DP_Remove a'
     ];
 
     // When only a confirmation modal is shown, the "popupLoading" and
