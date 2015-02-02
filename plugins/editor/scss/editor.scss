@@ -196,6 +196,7 @@ $emoji-width: 34px;
 .editor-dd-emoji {
    + .editor-insert-dialog {
       width: $emoji-width * 4;
+      box-sizing: content-box;
 //      box-sizing: border-box;
 //      overflow: hidden;
 

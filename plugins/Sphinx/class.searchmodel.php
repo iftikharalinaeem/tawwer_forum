@@ -486,7 +486,7 @@ class SearchModel extends Gdn_Model {
     * @return bool Returns true if groups can be searched or false otherwise.
     */
    public static function SearchGroups() {
-      $result = in_array('groups', C('Plugins.Sphinx.Templates', [])) && Gdn::ApplicationManager()->IsEnabled('Groups');
+      $result = in_array('groups', C('Plugins.Sphinx.Templates', array())) && Gdn::ApplicationManager()->IsEnabled('Groups');
       return $result;
    }
 
