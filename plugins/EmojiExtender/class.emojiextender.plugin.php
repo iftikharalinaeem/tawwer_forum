@@ -177,7 +177,8 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
                 );
             }
 
-            $items[$key] = '@'.Img($emoji['icon'], array('alt' => $emoji['name'])).
+            $icon = (isset($emoji['icon'])) ? Img($emoji['icon'], array('alt' => $emoji['name'])) : '';
+            $items[$key] = '@'.$icon.
             '<div emojiset-body>'.
                 '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.
                 (empty($manifest['author']) ? '' : '<div class="emojiset-author">'.sprintf(T('by %s'), $manifest['author']).'</div>').
