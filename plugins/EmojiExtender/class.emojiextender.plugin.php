@@ -159,6 +159,8 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
     * @param array $args
     */
     public function SettingsController_EmojiExtender_Create($sender, $args) {
+        $this->fireEvent('beforeSetEmoji');
+
         $cf = new ConfigurationModule($sender);
 
         $items = array();
