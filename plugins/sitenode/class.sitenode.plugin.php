@@ -309,11 +309,12 @@ class SiteNodePlugin extends Gdn_Plugin {
      * @param array $roleMap A mapping of hub roles to roles on this site.
      */
     public function syncCategories(array $categories, array $otherCategories, array $roleMap) {
-        $categoryModel = new CategoryModel();
         $categoryMap = [];
         $sort = 0;
 
         foreach ($categories as $category) {
+            $categoryModel = new CategoryModel(); // have to recreate each time
+
             $sort++;
             $hubID = $category['HubID'];
             $parentID = val('ParentHubID', $category);
@@ -366,6 +367,7 @@ class SiteNodePlugin extends Gdn_Plugin {
                 if ($categoryID) {
                     $categoryMap[$hubID] = $categoryID;
                 }
+                $categoryModel->Validation->Results(true);
             } else {
                 foreach ($permissions as $permissionRow) {
                     Gdn::PermissionModel()->Save($permissionRow);
