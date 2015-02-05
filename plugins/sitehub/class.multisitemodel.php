@@ -562,6 +562,9 @@ class MultisiteModel extends Gdn_Model {
         $this->EventArguments['urls'] =& $urls;
         $this->FireEvent('SyncNodes');
 
+        list($match) = explode('.', $this->siteNameFormat, 2);
+        $match = sprintf($match, '*');
+
         if (class_exists('Communication') && class_exists('Infrastructure')) {
             foreach ($urls as $url) {
                 $query = Communication::data('/forum/callback')
@@ -569,6 +572,7 @@ class MultisiteModel extends Gdn_Model {
                     ->parameter('method', 'POST')
                     ->parameter('secure', (bool)C('Garden.ForceSSL'))
                     ->parameter('path', $url)
+                    ->parameter('match', $match)
                     ->parameter('headers', [
                         'Authorization' => self::apikey(true)
                     ])
