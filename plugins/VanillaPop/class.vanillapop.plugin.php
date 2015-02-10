@@ -409,7 +409,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                return TRUE;
             } elseif (val('Closed', $Discussion)) {
                $this->SendEmail($FromEmail, '',
-                  T("Sorry! This discussions has been closed."), $Data);
+                  T("Sorry! This discussion has been closed."), $Data);
                return TRUE;
             }
             
