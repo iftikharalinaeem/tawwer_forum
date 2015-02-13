@@ -407,6 +407,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
                $this->SendEmail($FromEmail, '',
                   T("Sorry! You don't have permission to post right now."), $Data);
                return TRUE;
+            } elseif (val('Closed', $Discussion)) {
+               $this->SendEmail($FromEmail, '',
+                  T("Sorry! This discussion has been closed."), $Data);
+               return TRUE;
             }
             
             $CommentModel = new CommentModel();

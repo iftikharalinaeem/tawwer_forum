@@ -134,7 +134,7 @@ class VFOptionsPlugin implements Gdn_IPlugin {
             .Anchor('Refund Policy', 'http://'.$Url.'.com/info/refund', '', array('target' => '_New', 'style' => $Style))
             .' | '
             .Anchor('Contact', 'http://'.$Url.'.com/info/contact', '', array('target' => '_New', 'style' => $Style));
-         $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'position: absolute; bottom: 15px; right: 140px;')));
+         $Sender->AddAsset('Foot', Wrap($Footer, 'div', array('style' => 'position: absolute; bottom: 15px; right: 30px;')));
          $Sender->AddCssFile('vfoptions.css', 'plugins/vfoptions');
 //      } else {
 //         $AnalyticsServer = C('Garden.Analytics.Remote','http://analytics.vanillaforums.com');
