@@ -279,7 +279,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @param array $Args Event arguments.
      */
     public function discussionController_discussionOptions_handler($Sender, $Args) {
-        $this->addOptions($Sender, $Args, 'Comment');
+        $this->addOptions($Sender, $Args, 'Discussion');
     }
 
     /**
@@ -291,7 +291,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @param array $Args Event arguments.
      */
     public function discussionController_commentOptions_handler($Sender, $Args) {
-        $this->addOptions($Sender, $Args, 'Discussion');
+        $this->addOptions($Sender, $Args, 'Comment');
     }
 
     /**
