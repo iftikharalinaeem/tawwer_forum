@@ -72,7 +72,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @param array $Args Event Arguments.
      */
     public function discussioncontroller_afterDiscussionBody_handler($Sender, $Args) {
-        $this->updateAttachments($Sender, $Args);
+        $this->updateAttachments($Sender, $Args, 'Discussion');
     }
 
     /**
@@ -82,7 +82,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @param array $Args Event Arguments.
      */
     public function discussionController_afterCommentBody_handler($Sender, $Args) {
-        $this->updateAttachments($Sender, $Args);
+        $this->updateAttachments($Sender, $Args, 'Comment');
     }
 
     /**
@@ -90,13 +90,14 @@ class ZendeskPlugin extends Gdn_Plugin {
      *
      * @param DiscussionController|Commentocntroller $Sender Sending controller.
      * @param array $Args Event arguments.
+     * @param string $Type Record type.
      *
      * @throws Gdn_UserException If Errors.
      */
-    protected function updateAttachments($Sender, $Args) {
-        if ($Args['Type'] == 'Discussion') {
+    protected function updateAttachments($Sender, $Args, $Type) {
+        if ($Type == 'Discussion') {
             $Content = 'Discussion';
-        } elseif ($Args['Type'] == 'Comment') {
+        } elseif ($Type == 'Comment') {
             $Content = 'Comment';
         } else {
             throw new Gdn_UserException('Invalid Content');
@@ -278,7 +279,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @param array $Args Event arguments.
      */
     public function discussionController_discussionOptions_handler($Sender, $Args) {
-        $this->addOptions($Sender, $Args);
+        $this->addOptions($Sender, $Args, 'Discussion');
     }
 
     /**
@@ -290,7 +291,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @param array $Args Event arguments.
      */
     public function discussionController_commentOptions_handler($Sender, $Args) {
-        $this->addOptions($Sender, $Args);
+        $this->addOptions($Sender, $Args, 'Comment');
     }
 
     /**
@@ -298,10 +299,11 @@ class ZendeskPlugin extends Gdn_Plugin {
      *
      * @param DiscussionConoller|CommentContrller $Sender Sending controller.
      * @param array $Args Event arguments.
+     * @param string $Type Record type.
      *
      * @throws Gdn_UserException If Error.
      */
-    protected function addOptions($Sender, $Args) {
+    protected function addOptions($Sender, $Args, $Type) {
 
         if (!$this->isConfigured()) {
             return;
@@ -316,10 +318,10 @@ class ZendeskPlugin extends Gdn_Plugin {
             return;
         }
 
-        if ($Args['Type'] == 'Discussion') {
+        if ($Type == 'Discussion') {
             $Content = 'Discussion';
             $ContentID = $Args[$Content]->DiscussionID;
-        } elseif ($Args['Type'] == 'Comment') {
+        } elseif ($Type == 'Comment') {
             $Content = 'Comment';
             $ContentID = $Args[$Content]->CommentID;
         } else {
@@ -352,7 +354,7 @@ class ZendeskPlugin extends Gdn_Plugin {
 
     /**
      * Handle Zendesk popup to create ticket in discussions.
-     * 
+     *
      * @param DiscussionController $Sender Sending controller.
      *
      * @throws Exception If Errors.
@@ -473,7 +475,7 @@ class ZendeskPlugin extends Gdn_Plugin {
 
     /**
      * Enable/Disable Global Login.
-     * 
+     *
      * @param Controller $Sender Sending controller.
      */
     public function controller_toggle($Sender) {
@@ -498,7 +500,7 @@ class ZendeskPlugin extends Gdn_Plugin {
 
     /**
      * Add Zendesk to Dashboard menu.
-     * 
+     *
      * @param Controller $Sender Sending controller.
      * @param array $Arguments Event arguments.
      */
