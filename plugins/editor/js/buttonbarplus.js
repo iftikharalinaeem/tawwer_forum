@@ -891,7 +891,7 @@
          };
 
          var end      = $(this).getSelection().end;
-         var result   = (new RegExp("\\n?("+ RegExp.escape(bullet) +"|\\d+\\.|[\\*\\+\\-])([\\s\\w\\W]+)\\n?$")).exec(this.value.slice(0, end));
+         var result   = (new RegExp("(\\n|^)("+ RegExp.escape(bullet) +"|\\d+\\.|[\\*\\+\\-])([\\s\\w\\W]+)\\n?$")).exec(this.value.slice(0, end));
          var lastWord = (result) ? result[0] : null;
 
          if (lastWord
