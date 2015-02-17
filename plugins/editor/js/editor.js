@@ -825,15 +825,18 @@
          if (editorForm) {
             var formCommentId = $(editorForm).find('#Form_CommentID');
             var formDiscussionId = $(editorForm).find('#Form_DiscussionID');
+            var formConversationId = $(editorForm).find('#Form_ConversationID');
 
             // Determine if bodybox loaded is the main comment one. This one
             // will never have any saved uploads, so make sure it never grabs
             // saved ones when switching.
             var mainCommentBox = false;
-            if (formCommentId.length
+            if ((formCommentId.length
             && formCommentId[0].value == ''
             && formDiscussionId.length
-            && parseInt(formDiscussionId[0].value) > 0) {
+            && parseInt(formDiscussionId[0].value) > 0)
+            || (formConversationId.length
+            && parseInt(formConversationId[0].value) > 0)) {
                mainCommentBox = true;
                mainCommentForm = editorForm;
                mainCommentPreviews = $editorUploadPreviews;
@@ -846,6 +849,9 @@
             } else if (formDiscussionId.length
             && parseInt(formDiscussionId[0].value) > 0) {
                editorKey += 'discussionid' + formDiscussionId[0].value;
+            } else if (formConversationId.length
+            && parseInt(formConversationId[0].value) > 0) {
+               editorKey += 'conversationid' + formConversationId[0].value;
             }
 
             // Make saved files editable
@@ -943,6 +949,10 @@
                $(savedUploadsContainer).addClass('editor-upload-readonly');
             });
 
+            $(editorForm).on('clearMessageForm', function(e) {
+               $(savedUploadsContainer).addClass('editor-upload-readonly');
+            });
+
             $(savedUploadsContainer)
             // Turn read-only mode off.
             .removeClass('editor-upload-readonly')
@@ -980,6 +990,11 @@
             // When closing editor with new uploads in session, typically
             // commentbox at bottom of discussion, remove the uploads
             $(editorForm).on('clearCommentForm', function(e) {
+               // Empty out the session previews.
+               $(mainCommentPreviews).empty();
+            });
+
+            $(editorForm).on('clearMessageForm', function(e) {
                // Empty out the session previews.
                $(mainCommentPreviews).empty();
             });

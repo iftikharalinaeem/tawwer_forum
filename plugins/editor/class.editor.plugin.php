@@ -3,7 +3,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.6.1',
+   'Version' => '1.7.0',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -978,25 +978,14 @@ class EditorPlugin extends Gdn_Plugin {
       return FALSE;
    }
 
-      /**
-    * Attach files to a comment during save.
-    *
-    * @access public
-    * @param object $Sender
-    * @param array $Args
-    */
-   public function PostController_AfterCommentSave_Handler($Sender, $Args) {
-      if (!$Args['Comment']) return;
-
-      $CommentID = $Args['Comment']->CommentID;
-      if (!$CommentID) return;
+   public function saveUploads($id, $type) {
 
       // Array of Media IDs, as input is MediaIDs[]
       $mediaIds = (array) Gdn::Request()->GetValue('MediaIDs');
 
       if (count($mediaIds)) {
          foreach ($mediaIds as $mediaId) {
-            $this->attachEditorUploads($mediaId, $CommentID, 'comment');
+            $this->attachEditorUploads($mediaId, $id, $type);
          }
       }
 
@@ -1007,9 +996,29 @@ class EditorPlugin extends Gdn_Plugin {
 
       if (count($removeMediaIds)) {
          foreach ($removeMediaIds as $mediaId) {
-            $this->deleteEditorUploads($mediaId, $CommentID, 'comment');
+            $this->deleteEditorUploads($mediaId, $id, $type);
          }
       }
+   }
+
+   /**
+    * Attach files to a comment during save.
+    *
+    * @access public
+    * @param object $Sender
+    * @param array $Args
+    */
+   public function PostController_AfterCommentSave_Handler($Sender, $Args) {
+      if (!$Args['Comment']) {
+         return;
+      }
+
+      $CommentID = $Args['Comment']->CommentID;
+      if (!$CommentID) {
+         return;
+      }
+
+      $this->saveUploads($CommentID, 'comment');
    }
 
    /**
@@ -1020,28 +1029,56 @@ class EditorPlugin extends Gdn_Plugin {
     * @param array $Args
     */
    public function PostController_AfterDiscussionSave_Handler($Sender, $Args) {
-      if (!$Args['Discussion']) return;
+      if (!$Args['Discussion']) {
+         return;
+      }
 
       $DiscussionID = $Args['Discussion']->DiscussionID;
-      if (!$DiscussionID) return;
-
-      // Array of Media IDs, as input is MediaIDs[]
-      $mediaIds = (array) Gdn::Request()->GetValue('MediaIDs');
-
-      if (count($mediaIds)) {
-         foreach ($mediaIds as $mediaId) {
-            $this->attachEditorUploads($mediaId, $DiscussionID, 'discussion');
-         }
+      if (!$DiscussionID) {
+         return;
       }
 
-      // Array of Media IDs to remove, if any.
-      $removeMediaIds = (array) Gdn::Request()->GetValue('RemoveMediaIDs');
+      $this->saveUploads($DiscussionID, 'discussion');
+   }
 
-      if (count($removeMediaIds)) {
-         foreach ($removeMediaIds as $mediaId) {
-            $this->deleteEditorUploads($mediaId, $DiscussionID, 'discussion');
-         }
+   /**
+    * Attach files to a message during save.
+    *
+    * @access public
+    * @param object $Sender
+    * @param array $Args
+    */
+   public function MessagesController_AfterMessageSave_Handler($Sender, $Args) {
+      if (!$Args['MessageID']) {
+         return;
       }
+
+      $MessageID = $Args['MessageID'];
+      if (!$MessageID) {
+         return;
+      }
+
+      $this->saveUploads($MessageID, 'message');
+   }
+
+   /**
+    * Attach files to a message during conversation save.
+    *
+    * @access public
+    * @param object $Sender
+    * @param array $Args
+    */
+   public function MessagesController_AfterConversationSave_Handler($Sender, $Args) {
+      if (!$Args['MessageID']) {
+         return;
+      }
+
+      $MessageID = $Args['MessageID'];
+      if (!$MessageID) {
+         return;
+      }
+
+      $this->saveUploads($MessageID, 'message');
    }
 
    /**
@@ -1055,7 +1092,7 @@ class EditorPlugin extends Gdn_Plugin {
     */
    protected function AttachUploadsToComment($Sender, $Type = 'comment', $row = null) {
 
-      $param = (($Type == 'comment') ? 'CommentID' : 'DiscussionID');
+      $param = ucfirst($Type).'ID';
       $foreignId = GetValue($param, GetValue(ucfirst($Type), $Sender->EventArguments));
 
       // Get all media for the page.
@@ -1092,6 +1129,30 @@ class EditorPlugin extends Gdn_Plugin {
       }
    }
 
+
+   protected function getConversationMessageIDList($id) {
+
+      $Conversations = array();
+      $ConversationMessageModel = new Gdn_Model('ConversationMessage');
+
+      // Query the Media table for discussion media.
+      if (is_numeric($id)) {
+         $sqlWhere = array(
+            'ConversationID' => $id
+         );
+
+         $Conversations = $ConversationMessageModel->GetWhere(
+         $sqlWhere
+         )->ResultArray();
+      }
+
+      $MessageIDList = array();
+      foreach ($Conversations as $Conversation) {
+         $MessageIDList[] = val('MessageID', $Conversation);
+      }
+      return $MessageIDList;
+   }
+
    /**
     * Called to prepare data grab, and then cache the results on the software
     * level for the request. This will call PreloadDiscussionMedia, which
@@ -1100,6 +1161,27 @@ class EditorPlugin extends Gdn_Plugin {
     * @param mixed $Sender
     */
    protected function CacheAttachedMedia($Sender) {
+
+      if ($Sender->Data('Conversation')) {
+         $ConversationMessageIDList = $this->getConversationMessageIDList(val('ConversationID', $Sender->Data('Conversation')));
+         if (count($ConversationMessageIDList)) {
+            $MediaData = $this->PreloadDiscussionMedia(val('ConversationID', $Sender->Data('Conversation')), $ConversationMessageIDList, 'conversation');
+         }
+         $this->mediaCache = $MediaData;
+         return;
+      }
+
+      if ($Sender->Data('Messages')) {
+         $Message = $Sender->Data('Messages')->Result();
+         $MessageID = val(0, $Message)->MessageID;
+         $MessageIDList = array($MessageID);
+         if (count($MessageIDList)) {
+            $MediaData = $this->PreloadDiscussionMedia(val('ConversationID', $Sender->Data('Messages')), $MessageIDList, 'conversation');
+         }
+         $this->mediaCache = $MediaData;
+         return;
+      }
+
       $DiscussionID = null;
       $Comments = $Sender->Data('Comments');
       $CommentIDList = array();
@@ -1168,7 +1250,7 @@ class EditorPlugin extends Gdn_Plugin {
     * @param array $commentIDList
     * @return array
     */
-   public function PreloadDiscussionMedia($discussionID, $commentIDList) {
+   public function PreloadDiscussionMedia($discussionID, $commentIDList, $type = 'discussion') {
       $mediaData = array();
       $mediaDataDiscussion = array();
       $mediaDataComment = array();
@@ -1179,16 +1261,18 @@ class EditorPlugin extends Gdn_Plugin {
          $mediaModel = new Gdn_Model('Media');
 
          // Query the Media table for discussion media.
+         if ($type === 'discussion') {
 
-         if (is_numeric($discussionID)) {
-            $sqlWhere = array(
-                'ForeignTable' => 'discussion',
-                'ForeignID' => $discussionID
-            );
+            if (is_numeric($discussionID)) {
+               $sqlWhere = array(
+                   'ForeignTable' => 'discussion',
+                   'ForeignID' => $discussionID
+               );
 
-            $mediaDataDiscussion = $mediaModel->GetWhere(
-                $sqlWhere
-            )->ResultArray();
+               $mediaDataDiscussion = $mediaModel->GetWhere(
+                   $sqlWhere
+               )->ResultArray();
+            }
          }
 
          // Query the Media table for comment media.
@@ -1201,7 +1285,7 @@ class EditorPlugin extends Gdn_Plugin {
             $commentIDList = array_filter($commentIDList);
 
             $sqlWhere = array(
-                'ForeignTable' => 'comment',
+                'ForeignTable' => ($type == 'discussion') ? 'comment' : 'message',
                 'ForeignID' => $commentIDList
             );
 
@@ -1242,10 +1326,9 @@ class EditorPlugin extends Gdn_Plugin {
       $this->AttachUploadsToComment($Sender);
    }
 
-
-
-
-
+   public function MessagesController_AfterConversationMessageBody_Handler($Sender, $Args) {
+      $this->AttachUploadsToComment($Sender, 'message', val('Message', $Args));
+   }
 
    /**
     * Specific to editor upload paths
