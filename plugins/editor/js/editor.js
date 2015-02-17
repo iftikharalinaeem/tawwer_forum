@@ -346,7 +346,7 @@
           // Check if can access selection, as programmatically triggering the
           // dd close event throws an error here.
           obj.focus();
-          if (obj.selectionEnd) {
+          if (obj.value.length) {
             // selectionStart is implied 0
             obj.selectionEnd = obj.value.length;
             obj.focus();
