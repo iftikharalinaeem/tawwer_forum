@@ -50,7 +50,11 @@ class MultisitesController extends DashboardController {
                 break;
         }
 
-        $this->Permission('Garden.Settings.Manage');
+        if ($this->site) {
+            $this->permissionNoLog('Garden.Settings.Manage');
+        } else {
+            $this->Permission('Garden.Settings.Manage');
+        }
         $pageSize = 20;
         list($offset, $limit) = OffsetLimit($page, $pageSize);
         $this->form = new Gdn_Form();
@@ -80,7 +84,7 @@ class MultisitesController extends DashboardController {
     }
 
     public function add() {
-        $this->Permission('Garden.Settings.Manage');
+        $this->permissionNoLog('Garden.Settings.Manage');
         $this->Title(T('Add Site'));
         $this->Render();
     }
@@ -90,7 +94,7 @@ class MultisitesController extends DashboardController {
      * @throws Gdn_UserException Thrown when the site was not found.
      */
     public function buildcallback() {
-        $this->Permission('Garden.Settings.Manage');
+        $this->permissionNoLog('Garden.Settings.Manage');
 
         if (Gdn::Request()->RequestMethod() !== 'POST') {
             throw new Gdn_UserException("This resource only accepts POST.", 405);
@@ -126,7 +130,7 @@ class MultisitesController extends DashboardController {
     }
 
     public function nodeConfig($from) {
-        //        $this->Permission('Garden.Settings.Manage');
+        $this->permissionNoLog('Garden.Settings.Manage');
         if (!$from) {
             throw NotFoundException('Site');
         }
@@ -181,7 +185,7 @@ class MultisitesController extends DashboardController {
     }
 
     protected function patch() {
-        $this->Permission('Garden.Settings.Manage');
+        $this->permissionNoLog('Garden.Settings.Manage');
 
         if (!$this->site) {
             throw NotFoundException('Site');
@@ -206,7 +210,7 @@ class MultisitesController extends DashboardController {
     }
 
     protected function post() {
-        $this->Permission('Garden.Settings.Manage');
+        $this->permissionNoLog('Garden.Settings.Manage');
 
         if ($this->site) {
             throw new Gdn_UserException('Site invalid when creating a site.');
@@ -256,7 +260,7 @@ class MultisitesController extends DashboardController {
      * @throws Gdn_UserException Thrown when the site was not found.
      */
     public function deletecallback() {
-        $this->Permission('Garden.Settings.Manage');
+        $this->permissionNoLog('Garden.Settings.Manage');
 
         if (Gdn::Request()->RequestMethod() !== 'POST') {
             throw new Gdn_UserException("This resource only accepts POST.", 405);
@@ -283,7 +287,7 @@ class MultisitesController extends DashboardController {
      * Synchronize a node or nodes with the hub.
      */
     public function syncNode() {
-        $this->Permission('Garden.Settings.Manage');
+        $this->permissionNoLog('Garden.Settings.Manage');
 
         if (Gdn::Request()->RequestMethod() !== 'POST') {
             throw new Gdn_UserException("This resource only accepts POST.", 405);
@@ -348,8 +352,7 @@ class MultisitesController extends DashboardController {
      * @throws Gdn_UserException
      */
     public function cleanspeakProxy() {
-
-        $this->Permission('Garden.Settings.Manage');
+        $this->permissionNoLog('Garden.Settings.Manage');
 
         $post = Gdn::Request()->Post();
         if (!$post) {
@@ -524,6 +527,19 @@ class MultisitesController extends DashboardController {
         $parts = str_split(str_replace('-', '', $UUID), 8);
         $parts = array_map('hexdec', $parts);
         return $parts;
+    }
+
+    /**
+     * Check a permission, but don't log the access.
+     *
+     * @param string $permission The name of the permission to check.
+     * @throws \Exception Throws an exception if the user does not have permission.
+     */
+    protected function permissionNoLog($permission) {
+        if (Gdn::Session()->CheckPermission($permission)) {
+            return;
+        }
+        throw PermissionException($permission);
     }
 
 
