@@ -927,18 +927,13 @@ class EditorPlugin extends Gdn_Plugin {
 
       // Save data to database using model with media table
       $Model = new Gdn_Model('Media');
-
       $Media = (array) $Model->GetID($MediaID);
 
-      if ($Media
-      && !empty($Media['InsertUserID'])
-      && Gdn::Session()->UserID == $Media['InsertUserID']
-      // These two are only available when a comment/discussion has already
-      // been saved. If removing them from a live session (ie, deciding not
-      // to use them), then they will not be filled, so remove checks.
-      //&& $Media['ForeignID'] == $ForeignID
-      //&& $Media['ForeignTable'] == $ForeignType
-      ) {
+      $IsOwner = (!empty($Media['InsertUserID']) && Gdn::Session()->UserID == $Media['InsertUserID']);
+      // @todo Per-category edit permission would be better, but this global is far simpler to check here.
+      // However, this currently matches the permission check in views/attachments.php so keep that in sync.
+      $CanDelete = ($IsOwner || Gdn::Session()->CheckPermission('Garden.Moderation.Manage'));
+      if ($Media && $CanDelete) {
          try {
             if ($Model->Delete($MediaID)) {
                // unlink the images.
@@ -978,6 +973,12 @@ class EditorPlugin extends Gdn_Plugin {
       return FALSE;
    }
 
+   /**
+    * Save uploads.
+    *
+    * @param $id
+    * @param $type
+    */
    public function saveUploads($id, $type) {
 
       // Array of Media IDs, as input is MediaIDs[]
