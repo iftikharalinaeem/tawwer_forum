@@ -1089,10 +1089,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
           'Plugins.VanillaPop.DefaultCategoryID' => array('Control' => 'CategoryDropDown', 'Description' => 'Place discussions started through email in the following category.'),
           'Plugins.VanillaPop.AllowUserRegistration' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow new users to be registered through email.'),
           'Plugins.VanillaPop.AugmentFrom' => array('Control' => 'CheckBox', 'LabelCode' => 'Add information into the from field in email addresses to help with replies (recommended).', 'Default' => TRUE),
-          'Garden.Email.SupportAddress' => array('Control' => 'TextBox', 'LabelCode' => 'Outgoing Email Address', 'Description' => 'This is the address that will show up in the from field of emails sent from the application.'),
-          'EmailFormat.DiscussionSubject' => array(),
+          'Garden.Email.SupportAddress' => array('Control' => 'TextBox', 'LabelCode' => 'Outgoing Email Address', 'Description' => 'This is the address that will show up in the from field of emails sent from the application.', 'Options' => array('class' => 'InputBox BigInput')),
+          'EmailFormat.DiscussionSubject' => array('Control' => 'TextBox', 'Options' => array('class' => 'InputBox BigInput')),
           'EmailFormat.DiscussionBody' => array(),
-          'EmailFormat.CommentSubject' => array(),
+          'EmailFormat.CommentSubject' => array('Options' => array('class' => 'InputBox BigInput')),
           'EmailFormat.CommentBody' => array(),
           'Plugins.VanillaPop.SendConfirmationEmail' => array('Control' => 'CheckBox', 'LabelCode' => 'Send a confirmation email when people ask a question or start a discussion over email.'),
           'EmailFormat.ConfirmationBody' => array(),
@@ -1101,7 +1101,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       );
       
       foreach (self::$FormatDefaults as $Name => $Default) {
-         $Options = array();
+         $Options = val('Options', $ConfSettings['EmailFormat.'.$Name], array());
          if (StringEndsWith($Name, 'Body'))
             $Options['Multiline'] = TRUE;
          $ConfSettings['EmailFormat.'.$Name] = array('Control' => 'TextBox', 'Default' => $Default, 'Options' => $Options);   
