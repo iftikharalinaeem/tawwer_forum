@@ -377,16 +377,11 @@ class MultisitesController extends DashboardController {
                 return;
 
         }
-        if (sizeof($errors) > 0) {
+        if (is_array($errors) && !empty($errors)) {
             $this->SetData('Errors', $errors);
-            if (sizeof($errors) > 0) {
-                $errorMessage = '';
-                foreach ($errors as $error) {
-                    $errorMessage .= $error . PHP_EOL;
-                }
-                $context['Errors'] = $errors;
-                Logger::event('cleanspeak_error', Logger::ERROR, 'Error(s) approving content: ' . $errorMessage, $context);
-            }
+            $errorMessage = implode(PHP_EOL, $errors);
+            $context['Errors'] = $errors;
+            Logger::event('cleanspeak_error', Logger::ERROR, 'Error(s) approving content: ' . $errorMessage, $context);
 
         } else {
             $this->SetData('Success', true);
@@ -425,7 +420,8 @@ class MultisitesController extends DashboardController {
         $multiSiteModel = new MultisiteModel();
         $site = $multiSiteModel->getWhere(array('SiteID' => $siteID))->FirstRow(DATASET_TYPE_ARRAY);
         if (!$site) {
-            throw new Gdn_UserException("Site not found. UUID: {$post['id']} SiteID: $siteID", 500);
+            Logger::event('cleanspeak_error', Logger::ERROR, "Site not found. UUID: {$post['id']} SiteID: $siteID");
+            return array();
         }
 
         try {
@@ -491,7 +487,6 @@ class MultisitesController extends DashboardController {
      *
      * @param array $post Post data.
      * @return array Errors. Empty if none.
-     * @throws Gdn_UserException
      */
     protected function cleanspeakUserAction($post) {
 
@@ -501,6 +496,7 @@ class MultisitesController extends DashboardController {
         $multiSiteModel = new MultisiteModel();
         $site = $multiSiteModel->getWhere(array('SiteID' => $siteID))->FirstRow(DATASET_TYPE_ARRAY);
         if (!$site) {
+            Logger::event('cleanspeak_error', Logger::ERROR, "Site not found. SiteID: $siteID");
             return;
         }
 
