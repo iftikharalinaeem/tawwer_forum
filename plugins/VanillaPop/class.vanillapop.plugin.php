@@ -992,6 +992,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
          Trace('Saving data.');
          if ($this->Save($Data, $Sender)) {
             $Sender->StatusMessage = T('Saved');
+            $Sender->SetData('Saved', true);
+            $Sender->SetData('Trace', Trace());
          }
       }
       
