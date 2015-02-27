@@ -116,7 +116,7 @@
    <h3>Upload CSV file or link to CSV file:</h3>
 
    <?php
-      echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => '/settings/bulkusersimporter/upload', 'id' => 'bulk-importer-form'));
+      echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => Url('/settings/bulkusersimporter/upload'), 'id' => 'bulk-importer-form'));
       echo $this->Form->Errors();
    ?>
 

@@ -18,7 +18,7 @@ class ReactionsController extends DashboardController {
     * List reactions
     */
    public function Index() {
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
       $this->Title(T('Reaction Types'));
       $this->AddSideMenu();
       
@@ -39,7 +39,7 @@ class ReactionsController extends DashboardController {
     * @throws
     */
    public function Get($UrlCode) {
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
       
       $Reaction = ReactionModel::ReactionTypes($UrlCode);
       if (!$Reaction)
@@ -62,7 +62,7 @@ class ReactionsController extends DashboardController {
     * 
     */
    public function Add() {
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
       $this->Title('Add Reaction');
       $this->AddSideMenu('reactions');
       
@@ -124,7 +124,7 @@ class ReactionsController extends DashboardController {
     * @throws type
     */
    public function Edit($UrlCode) {
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
       $this->Title('Edit Reaction');
       $this->AddSideMenu('reactions');
       
@@ -197,7 +197,7 @@ class ReactionsController extends DashboardController {
     * @param boolean $Active 
     */
    public function Toggle($UrlCode, $Active) {
-      $this->Permission('Garden.Settings.Manage');
+      $this->Permission('Garden.Community.Manage');
       
       $this->Form->InputPrefix = '';
       if (!$this->Form->AuthenticatedPostBack()) {
