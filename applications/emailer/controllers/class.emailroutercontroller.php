@@ -15,8 +15,8 @@ class EmailRouterController extends Gdn_Controller {
     * @var array
     */
    public $Aliases = array(
-      'adobeprerelease' => 'https://forums.adobeprereleasestaging.com/',
-      'adobeprereleasestage' => 'forums.stage.adobeprerelease.com'
+      'adobeprerelease' => 'https://forums.adobeprereleasestaging.com',
+      'adobeprereleasestage' => 'https://forums.stage.adobeprerelease.com'
    );
    
    /// Methods ///
