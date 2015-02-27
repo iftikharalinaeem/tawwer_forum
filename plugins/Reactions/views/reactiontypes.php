@@ -78,11 +78,13 @@
       </li>
    </ol>
 </div>
+<?php if (CheckPermission('Garden.Settings.Manage')) { ?>
 <div class="Wrap">
    <?php
    echo Anchor(T('Advanced Settings'), '/reactions/advanced', 'Button');
    ?>
 </div>
+<?php } ?>
 <table id="Badges" class="AltColumns ManageBadges">
    <thead>
       <tr>
