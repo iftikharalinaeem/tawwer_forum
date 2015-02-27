@@ -392,8 +392,7 @@ class MultisitesController extends DashboardController {
             $this->SetData('Success', true);
         }
 
-        $this->Render();
-
+        $this->Render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
