@@ -8,6 +8,16 @@ class EmailRouterController extends Gdn_Controller {
     * @var Gdn_Form 
     */
    public $Form;
+
+   /**
+    * Aliases for site hub/nodes.
+    *
+    * @var array
+    */
+   public $Aliases = array(
+      'adobeprerelease' => 'https://forums.adobeprereleasestaging.com/',
+      'adobeprereleasestage' => 'forums.stage.adobeprerelease.com'
+   );
    
    /// Methods ///
    
@@ -178,11 +188,18 @@ class EmailRouterController extends Gdn_Controller {
                   else
                      array_unshift($ToParts, $Part);
                }
-               
+
+               $Folder = '';
                if (count($ToParts) > 1) {
                   // Check for a full domain. We are just going to support a few tlds because this is a legacy format.
                   $Part = array_pop($ToParts);
-                  if (count($ToParts) > 1 || in_array($Part, array('com', 'org', 'net'))) {
+                  if (isset($this->Aliases[$Part])) {
+                     // This is a site node alias in the form: folder.alias+args@email.vanillaforums.com.
+                     $UrlParts = parse_url($this->Aliases[$Part]);
+                     $Scheme = val('scheme', $UrlParts, 'http');
+                     $Domain = val('host', $UrlParts, 'email.vanillaforums.com');
+                     $Folder = '/'.array_pop($ToParts);
+                  } elseif (count($ToParts) > 1 || in_array($Part, array('com', 'org', 'net'))) {
                      $Domain = implode($ToParts).'.'.$Part;
                   } else {
                      // This is a to in the form of category.site.
@@ -195,7 +212,7 @@ class EmailRouterController extends Gdn_Controller {
                   $Domain = $ToParts[0].'.vanillaforums.com';
                }
                
-               $Url = "$Scheme://$Domain/utility/email.json";
+               $Url = "$Scheme://{$Domain}{$Folder}/utility/email.json";
                $LogModel->SetField($LogID, array('Url' => $Url));
             } else {
                $LogModel->SetField($LogID, array('Response' => 400, 'ResponseText' => "Invalid to: $To, $Email."));
