@@ -3,11 +3,11 @@
 $PluginInfo['EmojiExtender'] = array(
     'Name'        => "Emoji Sets",
     'Description' => "Change your emoji set!",
-    'Version'     => '1.1.0',
+    'Version'     => '1.1',
     'Author'      => "Becky Van Bussel",
     'AuthorEmail' => 'rvanbussel@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
-    'License'     => 'Proprietary',
+    'License'     => 'GNU GPL2',
     'SettingsUrl' => '/settings/EmojiExtender',
     'MobileFriendly' => true
 );
@@ -16,148 +16,160 @@ $PluginInfo['EmojiExtender'] = array(
  * Emoji Extender Plugin
  *
  * @author    Becky Van Bussel <rvanbussel@vanillaforums.com>
- * @copyright 2014 (c) Becky Van Bussel
- * @license   Proprietary
+ * @copyright 2015 Vanilla Forums Inc.
+ * @license   GNU GPL2
  * @package   EmojiExtender
  * @since     1.0.0
  *
  * Users can change or delete emoji sets for their forums.
- *
  */
-
 class EmojiExtenderPlugin extends Gdn_Plugin {
 
     /**
-    * Name of emoji set.
-    *
-    * @var string
-    */
-//    protected $emojiSet = '';
-
-    /**
-    * Indicated whether to merge chosen set with default set.
-    *
-    * @var boolean
-    */
-//    protected $merge = false;
-
-    /**
-    * Path to folder containing emoji set.
-    *
-    * @var string
-    */
-//    protected $emojiPath = '/resources/emoji/default';
-
-    /**
-     * @var string The path to vanilla repo.
+     * @var array List of all available emoji sets.
      */
-//    protected $rootPath = '/var/www/internal';
-
-    /**
-    * List of all available emoji sets.
-    *
-    * @var array
-    */
     protected $emojiSets;
 
-
     /**
-    * Setup some variables and change emoji set.
-    */
+     * Setup some variables and change emoji set.
+     */
     public function __construct() {
         parent::__construct();
-
-        $root = '/plugins/EmojiExtender/emoji';
-
-        $this->emojiSets = array(
-            ''        => array('name' => 'Apple Emoji', 'icon' => "$root/default.png", 'path' => '/resources/emoji'),
-            'twitter' => array('name' => 'Twitter Emoji', 'icon' => "$root/twitter/twitter-icon.png", 'path' => PATH_ROOT."$root/twitter"),
-            'little'  => array('name' => 'Little Emoji', 'icon' => "$root/little/little-icon.png", 'path' => PATH_ROOT."$root/little"),
-            'rice'    => array('name' => 'Riceball Emoticons', 'icon' => "$root/rice/rice-icon.png", 'path' => PATH_ROOT."$root/rice"),
-            'yahoo'   => array('name' => 'Yahoo Chat', 'icon' => "$root/yahoo/yahoo-icon.png", 'path' => PATH_ROOT."$root/yahoo"),
-            'none'    => array('name' => T('No Emoji'), 'icon' => "$root/none/none-icon.png", 'path' => PATH_ROOT."$root/none"),
-        );
-//        $this->pluginInfo = Gdn::PluginManager()->GetPluginInfo('EmojiExtender', Gdn_PluginManager::ACCESS_PLUGINNAME);
-//        $this->emojiSet = C('Garden.EmojiSet', '');
-//        $this->emojiPath = $this->emojiSets[$this->emojiSet]['path'];
-        //If ever you want the functionality to merge the custom emoji set with the default set, uncomment below
-        //$this->merge = C('Plugins.EmojiExtender.merge', false);
     }
-
 
     /**
      * Change the emoji set used, either by merging or or overriding the default set.
      *
      * @param Emoji $emoji The emoji object to change.
-     * @param string $emojiSetName The name of the emoji set to enable.
+     * @param string $emojiSetKey The name of the emoji set to enable.
      */
-    public function changeEmojiSet($emoji, $emojiSetName) {
-        if (!array_key_exists($emojiSetName, $this->emojiSets)) {
-            trigger_error("Emoji set not found: $emojiSetName.", E_USER_NOTICE);
+    public function changeEmojiSet($emoji, $emojiSetKey) {
+        if (!array_key_exists($emojiSetKey, $this->getEmojiSets())) {
+            trigger_error("Emoji set not found: $emojiSetKey.", E_USER_NOTICE);
             return;
         }
 
         // First grab the manifest to the emoji.
-        $emojiSet = $this->emojiSets[$emojiSetName];
-        $manifestPath = $emojiSet['path'].'/manifest.php';
-        if (!file_exists($manifestPath)) {
-            trigger_error("Emoji manifest does not exist: $manifestPath.", E_USER_NOTICE);
-            return;
-        }
-        try {
-            $manifest = require $manifestPath;
-        } catch (Exception $ex) {
-            trigger_error($ex->getMessage(), E_USER_NOTICE);
-            return;
-        }
+        $emojiSet = $this->emojiSets[$emojiSetKey];
+        $manifest = $this->getManifest($emojiSet);
 
-        $emoji->setFromManifest($manifest, StringBeginsWith($emojiSet['path'], PATH_ROOT, true, true));
+        if ($manifest) {
+            $emoji->setFromManifest($manifest, $emojiSet['basePath']);
+        }
     }
 
     /**
-    *
-    * EVENT HANDLERS
-    *
-    */
+     * Get the manifest for am emoji set.
+     *
+     * @param array $emojiSet The emoji set to look up.
+     * @return array|null Returns the manifest on success,
+     * `false` if the emoji should be disabled, or `null` otherwise.
+     */
+    protected function getManifest($emojiSet) {
+        $manifest = val('manifest', $emojiSet);
+
+        if (!$manifest) {
+            return null; // this is the default emoji set.
+        } elseif (is_string($manifest)) {
+            if (!file_exists($manifest)) {
+                trigger_error("Emoji manifest does not exist: $manifest.", E_USER_NOTICE);
+                return null;
+            }
+
+            try {
+                $manifest = require $manifest;
+            } catch (Exception $ex) {
+                trigger_error($ex->getMessage(), E_USER_NOTICE);
+                return null;
+            }
+        }
+
+        if (!is_array($manifest)) {
+            trigger_error("Invalid emoji manifest. The manifest is not an array.", E_USER_NOTICE);
+            return null;
+        }
+        return $manifest;
+    }
 
     /**
-    * Subscribe to event in Emoji class instance method.
-    *
-    * @param Emoji $sender
-    * @param Args $args
-    */
+     * Add an emoji set.
+     *
+     * @param string $key The key that defines the emoji set.
+     * @param string|array $manifest The path to the manifest or the manifest itself.
+     * @param string $basePath The url path to the emoji.
+     * @param string $iconPath The url path to the icon.
+     */
+    public function addEmojiSet($key, $manifest, $basePath) {
+        $this->emojiSets[$key] = array(
+            'manifest' => $manifest,
+            'basePath' => $basePath
+        );
+    }
+
+    /**
+     * Get all of the registered emoji sets.
+     *
+     * @return array Returns an array of all of the emoji sets.
+     */
+    public function getEmojiSets() {
+        if (!isset($this->emojiSets)) {
+            $root = '/plugins/EmojiExtender/emoji';
+
+            $this->addEmojiSet(
+                '',
+                array(
+                    'name' => 'Apple Emoji',
+                    'author' => 'Apple Inc.',
+                    'description' => 'A modern set of emoji you might recognize from any of your ubiquitous iDevices.',
+                    'icon' => 'icon.png'
+
+                ),
+                '/resources/emoji');
+
+            $this->addEmojiSet('twitter', PATH_ROOT."$root/twitter/manifest.php", "$root/twitter");
+            $this->addEmojiSet('little', PATH_ROOT."$root/little/manifest.php", "$root/little");
+            $this->addEmojiSet('rice', PATH_ROOT."$root/rice/manifest.php", "$root/rice");
+            $this->addEmojiSet('yahoo', PATH_ROOT."$root/yahoo/manifest.php", "$root/yahoo");
+
+            $this->fireEvent('Init');
+
+            $this->addEmojiSet('none', PATH_ROOT."$root/none/manifest.php", "$root/none");
+        }
+
+        return $this->emojiSets;
+    }
+
+    /**
+     * Subscribe to event in Emoji class instance method.
+     *
+     * @param Emoji $sender
+     * @param array $args
+     */
     public function Emoji_Init_Handler($sender, $args) {
-        $emojiSetName = C('Garden.EmojiSet');
-        if (!$emojiSetName) {
+        // Get the currently selected emoji set & switch to it.
+        $emojiSetKey = C('Garden.EmojiSet');
+        if (!$emojiSetKey || !array_key_exists($emojiSetKey, $this->getEmojiSets())) {
             return;
         }
-        $this->changeEmojiSet($sender, $emojiSetName);
+        $this->changeEmojiSet($sender, $emojiSetKey);
     }
 
     /**
-    * Configure settings page in dashboard.
-    *
-    * @param SettingsController $sender
-    * @param array $args
-    */
+     * Configure settings page in dashboard.
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
     public function SettingsController_EmojiExtender_Create($sender, $args) {
         $cf = new ConfigurationModule($sender);
 
         $items = array();
 
-        foreach ($this->emojiSets as $key => $emoji) {
-            $manifestPath = $emoji['path'].'/manifest.php';
-            if (file_exists($manifestPath)) {
-                $manifest = require $manifestPath;
-            } else {
-                $manifest = array(
-                    'name' => 'Apple Emoji',
-                    'author' => 'Apple Inc.',
-                    'description' => 'A modern set of emoji you might recognize from any of your ubiquitous iDevices.'
-                );
-            }
+        foreach ($this->getEmojiSets() as $key => $emojiSet) {
+            $manifest = $this->getManifest($emojiSet);
 
-            $items[$key] = '@'.Img($emoji['icon'], array('alt' => $emoji['name'])).
+            $icon = (isset($manifest['icon'])) ? Img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'])) : '';
+            $items[$key] = '@'.$icon.
             '<div emojiset-body>'.
                 '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.
                 (empty($manifest['author']) ? '' : '<div class="emojiset-author">'.sprintf(T('by %s'), $manifest['author']).'</div>').
@@ -182,27 +194,4 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         $cf->RenderAll();
    }
 
-    /**
-    * Replace emoticons in comment preview.
-    *
-    * @param PostController $Sender
-    */
-//    public function PostController_AfterCommentPreviewFormat_Handler($Sender) {
-//        if (Emoji::instance()->enabled) {
-//            $Sender->Comment->Body = Emoji::instance()->translateToHtml($Sender->Comment->Body);
-//        }
-//    }
-
-    /**
-    * Replace emoticons in comments.
-    *
-    * @param Base $Sender
-    */
-//    public function Base_AfterCommentFormat_Handler($Sender) {
-//        if (Emoji::instance()->enabled) {
-//             $Object = $Sender->EventArguments['Object'];
-//             $Object->FormatBody = Emoji::instance()->translateToHtml($Object->FormatBody);
-//             $Sender->EventArguments['Object'] = $Object;
-//        }
-//    }
 }

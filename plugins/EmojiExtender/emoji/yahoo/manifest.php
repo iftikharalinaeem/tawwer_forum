@@ -3,6 +3,7 @@
   'author' => 'Yahoo Inc.',
   'description' => 'A set of emoticons originally released with Yahoo Messenger during the IM boom of the 90s.',
   'format' => '<img class="emoji" src="{src}" title="{name}" alt="{name}" />',
+  'icon' => 'yahoo-icon.png',
   'emoji' =>
   array (
     'angry' => 'angry.gif',

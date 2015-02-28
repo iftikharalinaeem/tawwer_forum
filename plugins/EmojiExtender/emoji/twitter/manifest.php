@@ -3,6 +3,7 @@
   'author' => 'Twitter, Inc.',
   'description' => 'The emoji used on Twitter\'s web app. Twitter emoji for everyone.',
   'format' => '<img class="emoji" src="{src}" title="{name}" alt="{name}" height="18" />',
+  'icon' => 'twitter-icon.png',
   'emoji' =>
   array (
     -1 => '-1.png',
