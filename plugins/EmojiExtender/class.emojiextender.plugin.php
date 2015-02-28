@@ -120,10 +120,14 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      * @param string $setKey
      * @param array $setData
      */
-    public function addEmojiSet($setKey, $setData) {
-        $setKey = Gdn_Format::AlphaNumeric($setKey);
+    public function addEmojiSet($key, $name, $path, $iconPath) {
+        $setKey = Gdn_Format::AlphaNumeric($key);
         if (!array_key_exists($setKey, $this->emojiSets) && is_array($setData)) {
-            $this->emojiSets[$setKey] = $setData;
+            $this->emojiSets[$key] = array(
+                'name' => $name,
+                'icon' => $path,
+                'path' => $iconPath
+            );
         }
     }
 
@@ -141,8 +145,8 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
     */
     public function Emoji_Init_Handler($sender, $args) {
         // Add your own emoji sets!
-        // Hook EmojiExtenderPlugin_beforeSetEmoji_handler & use $sender->addEmojiSet().
-        $this->fireEvent('beforeSetEmoji');
+        // Hook EmojiExtenderPlugin_Init_Handler & use $sender->addEmojiSet().
+        $this->fireEvent('Init');
 
         // Get the currently selected emoji set & switch to it.
         $emojiSetName = C('Garden.EmojiSet');
