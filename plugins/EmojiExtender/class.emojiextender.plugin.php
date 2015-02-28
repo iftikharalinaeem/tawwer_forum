@@ -99,11 +99,10 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      * @param string $basePath The url path to the emoji.
      * @param string $iconPath The url path to the icon.
      */
-    public function addEmojiSet($key, $manifest, $basePath, $iconPath) {
+    public function addEmojiSet($key, $manifest, $basePath) {
         $this->emojiSets[$key] = array(
             'manifest' => $manifest,
-            'basePath' => $basePath,
-            'icon' => $iconPath
+            'basePath' => $basePath
         );
     }
 
@@ -121,16 +120,17 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
                 array(
                     'name' => 'Apple Emoji',
                     'author' => 'Apple Inc.',
-                    'description' => 'A modern set of emoji you might recognize from any of your ubiquitous iDevices.'
-                ),
-                '/resources/emoji',
-                "$root/default.png");
+                    'description' => 'A modern set of emoji you might recognize from any of your ubiquitous iDevices.',
+                    'icon' => 'icon.png'
 
-            $this->addEmojiSet('twitter', PATH_ROOT."$root/twitter/manifest.php", "$root/twitter", "$root/twitter/twitter-icon.png");
-            $this->addEmojiSet('little', PATH_ROOT."$root/little/manifest.php", "$root/little", "$root/little/little-icon.png");
-            $this->addEmojiSet('rice', PATH_ROOT."$root/rice/manifest.php", "$root/rice", "$root/rice/rice-icon.png");
-            $this->addEmojiSet('yahoo', PATH_ROOT."$root/yahoo/manifest.php", "$root/yahoo", "$root/yahoo/yahoo-icon.png");
-            $this->addEmojiSet('none', PATH_ROOT."$root/none/manifest.php", "$root/none", "$root/none/none-icon.png");
+                ),
+                '/resources/emoji');
+
+            $this->addEmojiSet('twitter', PATH_ROOT."$root/twitter/manifest.php", "$root/twitter");
+            $this->addEmojiSet('little', PATH_ROOT."$root/little/manifest.php", "$root/little");
+            $this->addEmojiSet('rice', PATH_ROOT."$root/rice/manifest.php", "$root/rice");
+            $this->addEmojiSet('yahoo', PATH_ROOT."$root/yahoo/manifest.php", "$root/yahoo");
+            $this->addEmojiSet('none', PATH_ROOT."$root/none/manifest.php", "$root/none");
 
             $this->fireEvent('Init');
         }
@@ -167,7 +167,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         foreach ($this->getEmojiSets() as $key => $emojiSet) {
             $manifest = $this->getManifest($emojiSet);
 
-            $icon = (isset($emojiSet['icon'])) ? Img($emojiSet['icon'], array('alt' => $manifest['name'])) : '';
+            $icon = (isset($manifest['icon'])) ? Img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'])) : '';
             $items[$key] = '@'.$icon.
             '<div emojiset-body>'.
                 '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.
