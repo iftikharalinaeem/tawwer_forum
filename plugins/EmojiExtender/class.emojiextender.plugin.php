@@ -130,9 +130,10 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
             $this->addEmojiSet('little', PATH_ROOT."$root/little/manifest.php", "$root/little");
             $this->addEmojiSet('rice', PATH_ROOT."$root/rice/manifest.php", "$root/rice");
             $this->addEmojiSet('yahoo', PATH_ROOT."$root/yahoo/manifest.php", "$root/yahoo");
-            $this->addEmojiSet('none', PATH_ROOT."$root/none/manifest.php", "$root/none");
 
             $this->fireEvent('Init');
+
+            $this->addEmojiSet('none', PATH_ROOT."$root/none/manifest.php", "$root/none");
         }
 
         return $this->emojiSets;
