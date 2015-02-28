@@ -117,8 +117,10 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
     /**
      * Add an emoji set.
      *
-     * @param string $setKey
-     * @param array $setData
+     * @param string $key
+     * @param string $name
+     * @param string $path
+     * @param string $iconPath
      */
     public function addEmojiSet($key, $name, $path, $iconPath) {
         $setKey = Gdn_Format::AlphaNumeric($key);
