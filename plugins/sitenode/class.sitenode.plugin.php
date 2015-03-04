@@ -373,7 +373,9 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $categoryModel->Validation->Results(true);
             } else {
                 foreach ($permissions as $permissionRow) {
-                    Gdn::PermissionModel()->Save($permissionRow);
+                    Gdn::PermissionModel()->Validation->Results(true);
+                    $result = Gdn::PermissionModel()->Save($permissionRow);
+                    Trace(Gdn::PermissionModel()->Validation->ResultsText());
                 }
             }
         }
@@ -453,6 +455,7 @@ class SiteNodePlugin extends Gdn_Plugin {
             if ($roleID) {
                 $permissions['RoleID'] = $roleID;
                 $globalPermissions = Gdn::PermissionModel()->Save($permissions, true);
+                Trace(Gdn::PermissionModel()->Validation->Results(true));
                 $roleMap[$hubID] = $roleID;
             }
         }
