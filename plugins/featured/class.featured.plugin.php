@@ -16,6 +16,7 @@ $PluginInfo['featured'] = array(
    ),
    'HasLocale' => false,
    'RegisterPermissions' => false,
+   'MobileFriendly' => true,
 //   'SettingsUrl' => '/settings/featured',
    'SettingsPermission' => 'Garden.Setttings.Manage'
 );
