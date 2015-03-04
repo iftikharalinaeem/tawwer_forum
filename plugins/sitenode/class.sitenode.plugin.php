@@ -371,12 +371,13 @@ class SiteNodePlugin extends Gdn_Plugin {
                     $categoryMap[$hubID] = $categoryID;
                 }
                 $categoryModel->Validation->Results(true);
-            } else {
-                foreach ($permissions as $permissionRow) {
-                    Gdn::PermissionModel()->Validation->Results(true);
-                    $result = Gdn::PermissionModel()->Save($permissionRow);
-                    Trace(Gdn::PermissionModel()->Validation->ResultsText());
-                }
+            }
+
+            foreach ($permissions as $permissionRow) {
+                TouchValue('JunctionID', $permissionRow, $categoryID);
+                Gdn::PermissionModel()->Validation->Results(true);
+                $result = Gdn::PermissionModel()->Save($permissionRow);
+                Trace(Gdn::PermissionModel()->Validation->ResultsText());
             }
         }
 
