@@ -269,12 +269,15 @@ class SiteNodePlugin extends Gdn_Plugin {
         SaveToConfig($saveConfig);
 
         // Synchronize the roles.
+        Trace('Synchronizing roles.');
         $roleMap = $this->syncRoles(val('Roles', $config, []));
 
         // Synchronize the categories.
+        Trace('Synchronizing categories.');
         $this->syncCategories(val('Categories', $config, []), val('OtherCategories', $config, []), $roleMap);
 
         // Synchronize the authenticators.
+        Trace('Synchronizing authenticators.');
         $this->syncAuthenticators(val('Authenticators', $config, []));
 
         $this->FireEvent('AfterSync');
