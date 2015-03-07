@@ -77,6 +77,11 @@ class BadgeModel extends ReputationModel {
     */
    public static function FilterByClass($BadgeData) {
       $FilteredBadges = array();
+
+      if (!$BadgeData instanceof Gdn_DataSet) {
+         return $FilteredBadges;
+      }
+
       foreach ($BadgeData->Result() as $Badge) {
          $Class = GetValue('Class', $Badge);
          
