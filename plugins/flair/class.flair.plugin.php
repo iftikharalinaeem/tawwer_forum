@@ -9,6 +9,7 @@ $PluginInfo['flair'] = array(
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
+   'MobileFriendly' => true,
    'RequiredApplications' => array('Reputation' => '>=1.3.1')
 );
 
