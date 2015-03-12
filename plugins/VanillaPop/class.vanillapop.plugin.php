@@ -174,7 +174,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       } elseif (preg_match('`/?(?:vanilla/)?discussion/comment/(\d+)`i', $Route, $Matches)) {
          $Type = 'Comment';
          $ID = $Matches[1];
-      } elseif (preg_match('`/?(?:conversations/)?messages/\d+#(\d+)`i', $Route, $Matches)) {
+      } elseif (preg_match('`/?(?:conversations/)?messages/\d+#(?:Message_)?(\d+)`i', $Route, $Matches)) {
          $Type = 'Message';
          $ID = $Matches[1];
       } else {
