@@ -142,7 +142,7 @@ class EmailRouterController extends Gdn_Controller {
                $Data['Body'] = $Post['html'];
                $Data['Format'] = 'Html';
             } else {
-               $Data['Body'] = self::StripEmail($Post['text']);
+               $Data['Body'] = $Post['text'];
                $Data['Format'] = 'Html';
             }
             $Data['Subject'] = substr($Data['Subject'], 0, 100);
