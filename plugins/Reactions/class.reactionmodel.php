@@ -10,6 +10,12 @@ class ReactionModel {
    public static $ReactionTypes = NULL;
    public static $TagIDs = NULL;
    
+
+   /**
+    * @var int Contains the last count from {@link GetRecordsWhere()}.
+    */
+   public $LastCount;
+
    /**
     * @var Gdn_SQL 
     */
@@ -208,6 +214,8 @@ class ReactionModel {
       $UserTags = $this->SQL
          ->Limit($Limit, $Offset)
          ->GetWhere('UserTag', $Where, $OrderFields, $OrderDirection)->ResultArray();
+
+      $this->LastCount = count($UserTags);
       self::JoinRecords($UserTags);
       
       return $UserTags;
