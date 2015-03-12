@@ -389,6 +389,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
       // Set the source of the post.
       $Data['Source'] = 'Email';
       $Data['SourceID'] = GetValue('MessageID', $Data, NULL);
+      unset($Data['MessageID']);
       
       $Category = CategoryModel::Categories(GetValue('CategoryID', $Data));
       if ($Category) {
