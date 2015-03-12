@@ -1,0 +1,19 @@
+<?php if (!defined('APPLICATION')) exit();
+
+/**
+ * Renders the "Request This Badge" button.
+ */
+class RequestBadgeModule extends Gdn_Module {
+
+   public function AssetTarget() {
+      return 'Panel';
+   }
+   
+   public function ToString() {
+      $HasPermission = Gdn::Session()->CheckPermission('Reputation.Badges.Request');
+      if ($HasPermission)
+         return parent::ToString();
+
+      return '';
+   }
+}
