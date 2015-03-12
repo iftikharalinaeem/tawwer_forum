@@ -709,6 +709,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
       $SigFound = FALSE; 
       $InQuotes = 0;
 
+      $Body = str_replace("\r\n", "\n", $Body);
+
       $Lines = explode("\n", trim($Body));
       $LastLine = count($Lines);
 
@@ -731,6 +733,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
                // This is the quote line...
                $LastLine = $i;
                $InQuotes = FALSE;
+
+               $PrevLine = val($i - 1, $Lines);
+               $OnRegex = '`^On\s+`i';
+               if (!preg_match($OnRegex, $Line) && preg_match($OnRegex, $PrevLine)) {
+                  $i--;
+                  $LastLine = $i;
+               }
             } elseif (preg_match('`^\s*$`', $Line)) {
                $LastLine = $i;
             } else {
