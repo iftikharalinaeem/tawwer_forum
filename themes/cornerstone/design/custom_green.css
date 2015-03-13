@@ -633,6 +633,9 @@ textarea.TextBox:focus {
 .ReactSpam:before {
   content: "\f198";
 }
+.ReactQuote:before {
+  content: "\f182";
+}
 .ReactWarn:before {
   content: "\f1b6";
 }

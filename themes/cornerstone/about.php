@@ -3,7 +3,7 @@
 $ThemeInfo['cornerstone'] = array(
     'Name'        => "Cornerstone",
     'Description' => "A fresh theme for Vanilla centered around a simple and soft color scheme.",
-    'Version'     => '1.0.0-beta',
+    'Version'     => '1.0.0-beta1',
     'Url'         => 'https://vanillaforums.com',
     'Author'      => "Kasper Kronborg Isager",
     'AuthorEmail' => 'kasper@vanillaforums.com',
