@@ -464,9 +464,11 @@ class Warnings2Plugin extends Gdn_Plugin {
             $Form->InputPrefix = '';
 
             $Form->SetFormValue('Type', 'note');
-            $Form->SetFormValue('UserNoteID', $NoteID);
+
             if (!$NoteID) {
                 $Form->SetFormValue('UserID', $UserID);
+            } else {
+                $Form->SetFormValue('UserNoteID', $NoteID);
             }
 
             if ($Form->Save()) {
