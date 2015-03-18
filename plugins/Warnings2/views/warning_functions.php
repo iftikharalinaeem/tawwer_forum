@@ -88,9 +88,6 @@ function WriteUserNoteWarning($Row) {
                 '<b>'.T('Warned for').'</b>: '.
                 Anchor(htmlspecialchars($Record['Name']), $Record['Url']).
                 '</div>';
-        } else {
-            echo '<div class="P">'.
-                '<b>'.T('Warned for your post') . '</b>: ' . '</div>';
         }
 
         if (GetValue('RecordBody', $Row)) {
