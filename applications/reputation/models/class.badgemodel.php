@@ -72,12 +72,13 @@ class BadgeModel extends ReputationModel {
     * @since 1.0.0
     * @access public
     * 
-    * @param Dataset $BadgeData SQL results.
+    * @param array $Badges
     * @return array Filtered badge list.
     */
-   public static function FilterByClass($BadgeData) {
+   public static function FilterByClass($Badges) {
       $FilteredBadges = array();
-      foreach ($BadgeData->Result() as $Badge) {
+
+      foreach ($Badges as $Badge) {
          $Class = GetValue('Class', $Badge);
          
          // Keep highest level badge of each class and all classless badges

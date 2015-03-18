@@ -1,7 +1,7 @@
 <?php
 
-$ThemeInfo['prospect'] = array(
-    'Name'        => "Prospect",
+$ThemeInfo['deflector'] = array(
+    'Name'        => "Deflector",
     'Description' => "A clean Vanilla theme focused on customer support communities",
     'Version'     => '1.0.0-beta',
     'Url'         => 'http://vanillaforums.com',

@@ -146,15 +146,16 @@ class WarningModel extends UserNoteModel {
         $warningLevel = $alert['WarningLevel'];
 
         // See if there's something special to do.
-        $punished = 0;
-        if ($warningLevel >= 3) {
-            // The user is punished (jailed).
-            $punished = 1;
-        }
         $banned = 0;
         if ($warningLevel >= 5) {
             // The user is banned.
             $banned = 1;
+        }
+
+        $punished = 0;
+        if (!$banned && $warningLevel >= 3) {
+          // The user is punished (jailed).
+          $punished = 1;
         }
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
@@ -214,15 +215,13 @@ class WarningModel extends UserNoteModel {
         // First, reverse the warning.
         $this->setField($warning['UserNoteID'], 'Reversed', true);
 
-        $Model = $this->GetModel($warning['RecordType']);
-        if (!$Model) {
-            return false;
-        }
+        $model = $this->GetModel($warning['RecordType']);
+        if ($model instanceof Gdn_Model) {
+           $Record = $model->GetID($warning['RecordID']);
 
-        $Record = $Model->GetID($warning['RecordID']);
-
-        if (isset($Record->Attributes['WarningID'])) {
-            $Model->saveToSerializedColumn('Attributes', $warning['RecordID'], 'WarningID', false);
+           if (isset($Record->Attributes['WarningID'])) {
+              $model->saveToSerializedColumn('Attributes', $warning['RecordID'], 'WarningID', false);
+           }
         }
 
         // Reverse the amount of time on the warning and its points.
