@@ -197,7 +197,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             Gdn::Request()->AssetRoot('/');
 
             $this->initializeSite($site);
-        } else {
+        } elseif (!in_array($root, ['utility'])) {
             $defaultSite = SubcommunityModel::getDefaultSite();
             if ($defaultSite) {
 
