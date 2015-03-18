@@ -214,15 +214,13 @@ class WarningModel extends UserNoteModel {
         // First, reverse the warning.
         $this->setField($warning['UserNoteID'], 'Reversed', true);
 
-        $Model = $this->GetModel($warning['RecordType']);
-        if (!$Model) {
-            return false;
-        }
+        $model = $this->GetModel($warning['RecordType']);
+        if ($model instanceof Gdn_Model) {
+           $record = $model->GetID($warning['RecordID']);
 
-        $Record = $Model->GetID($warning['RecordID']);
-
-        if (isset($Record->Attributes['WarningID'])) {
-            $Model->saveToSerializedColumn('Attributes', $warning['RecordID'], 'WarningID', false);
+           if (isset($record->Attributes['WarningID'])) {
+              $model->saveToSerializedColumn('Attributes', $warning['RecordID'], 'WarningID', false);
+           }
         }
 
         // Reverse the amount of time on the warning and its points.
