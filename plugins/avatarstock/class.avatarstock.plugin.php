@@ -5,7 +5,7 @@
 $PluginInfo['avatarstock'] = array(
     'Name' => 'Avatar Pool',
     'Description' => 'Create a limited stock of default avatars that members can choose between.',
-    'Version' => '1.2',
+    'Version' => '1.2.1',
     'Author' => 'Dane MacMillan',
     'AuthorEmail' => 'dane@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -90,7 +90,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
                 if ($results) {
                     // This might interfere with API endpoint. Keep for now, adjust
                     // when becomes a real concern.
-                    Redirect(Url('/settings/avatarstock'));
+                    Redirect('/settings/avatarstock');
                 } else {
                     $sender->Render('upload', '', 'plugins/avatarstock');
                 }
@@ -99,7 +99,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
             case in_array('modify', $args):
                 $results = $this->deleteSelectedAvatars($sender);
                 if ($results) {
-                    Redirect(Url('/settings/avatarstock'));
+                    Redirect('/settings/avatarstock');
                 } else {
                     $sender->Render('upload', '', 'plugins/avatarstock');
                 }
