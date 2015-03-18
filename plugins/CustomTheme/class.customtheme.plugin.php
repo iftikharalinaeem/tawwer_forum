@@ -123,6 +123,26 @@ class CustomThemePlugin implements Gdn_IPlugin {
       $ThemeRoot = PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '');
 		return $ThemeInfo['Index'] == 'default' || !file_exists($ThemeRoot.'/views/default.master.php');
 	}
+
+   /**
+    * Get the root of the theme.
+    *
+    * @param string $folder The name of the subfolder, if any. (ex. views)
+    * @return string Returns the theme root.
+    */
+   public static function getThemeRoot($folder = '') {
+      $ThemeInfo = Gdn::ThemeManager()->EnabledThemeInfo();
+      $result = val('ThemeRoot', $ThemeInfo, '');
+
+      if (!$result) {
+         return '';
+      }
+
+      if ($folder) {
+         $result .= '/'.ltrim($folder, '/');
+      }
+      return $result;
+   }
 	
 	/**
 	 * Add the theme CSS customizations.
@@ -686,17 +706,30 @@ Here are some things you should know before you begin:
    }
 }
 
-/* Smarty functions to allow reading the template from the db as a resource */
 
-function customtheme_smarty_get_template($tpl_name, &$tpl_source, $smarty_obj) {
+/**
+ * Smarty functions to allow reading the template from the db as a resource.
+ *
+ * @param string $tpl_name The name of the template.
+ * @param string $tpl_source Return the template source to this variable.
+ * @param Smarty $smarty The smarty object rendering the template.
+ * @return bool Returns true if the template was fetched or false otherwise.
+ */
+function customtheme_smarty_get_template($tpl_name, &$tpl_source, $smarty) {
 	// do database call here to fetch your template,
 	// populating $tpl_source with actual template contents
 	$RevisionID = CustomThemePlugin::GetRevisionFromFileName($tpl_name);
 	$Data = Gdn::SQL()->Select('Html')->From('CustomThemeRevision')->Where('RevisionID', $RevisionID)->Get()->FirstRow();
-   if ($Data)
-		$tpl_source = $Data->Html;
-	else
-		return FALSE;
+   if ($Data) {
+      $dir = CustomThemePlugin::getThemeRoot('/views');
+      if ($dir) {
+         $smarty->template_dir = $dir;
+      }
+
+      $tpl_source = $Data->Html;
+   } else {
+      return FALSE;
+   }
 	
    // return true on success, false to generate failure notification
 	return TRUE;
