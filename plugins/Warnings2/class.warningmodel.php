@@ -146,15 +146,16 @@ class WarningModel extends UserNoteModel {
         $warningLevel = $alert['WarningLevel'];
 
         // See if there's something special to do.
-        $punished = 0;
-        if ($warningLevel >= 3) {
-            // The user is punished (jailed).
-            $punished = 1;
-        }
         $banned = 0;
         if ($warningLevel >= 5) {
             // The user is banned.
             $banned = 1;
+        }
+
+        $punished = 0;
+        if (!$banned && $warningLevel >= 3) {
+          // The user is punished (jailed).
+          $punished = 1;
         }
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
@@ -216,9 +217,9 @@ class WarningModel extends UserNoteModel {
 
         $model = $this->GetModel($warning['RecordType']);
         if ($model instanceof Gdn_Model) {
-           $record = $model->GetID($warning['RecordID']);
+           $Record = $model->GetID($warning['RecordID']);
 
-           if (isset($record->Attributes['WarningID'])) {
+           if (isset($Record->Attributes['WarningID'])) {
               $model->saveToSerializedColumn('Attributes', $warning['RecordID'], 'WarningID', false);
            }
         }
