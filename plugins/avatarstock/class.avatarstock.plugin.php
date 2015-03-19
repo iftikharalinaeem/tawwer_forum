@@ -5,7 +5,7 @@
 $PluginInfo['avatarstock'] = array(
     'Name' => 'Avatar Pool',
     'Description' => 'Create a limited stock of default avatars that members can choose between.',
-    'Version' => '1.2',
+    'Version' => '1.2.2',
     'Author' => 'Dane MacMillan',
     'AuthorEmail' => 'dane@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -90,7 +90,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
                 if ($results) {
                     // This might interfere with API endpoint. Keep for now, adjust
                     // when becomes a real concern.
-                    Redirect(Url('/settings/avatarstock'));
+                    Redirect('/settings/avatarstock');
                 } else {
                     $sender->Render('upload', '', 'plugins/avatarstock');
                 }
@@ -99,7 +99,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
             case in_array('modify', $args):
                 $results = $this->deleteSelectedAvatars($sender);
                 if ($results) {
-                    Redirect(Url('/settings/avatarstock'));
+                    Redirect('/settings/avatarstock');
                 } else {
                     $sender->Render('upload', '', 'plugins/avatarstock');
                 }
@@ -136,7 +136,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
      *
      * @param settingsController $sender The settings controller.
      *
-     * @return array|null
+     * @return int
      * @throws Exception No authenticated postback.
      */
     public function deleteSelectedAvatars($sender) {
@@ -147,21 +147,22 @@ class AvatarStockPlugin extends Gdn_Plugin {
         }
 
         $post = Gdn::Request()->Post();
-        $avatar_ids = $post['avatar_delete'];
+        $avatar_ids = array_values($post['avatar_delete']);
+        if (empty($avatar_ids)) {
+           return 0;
+        }
 
-        $avatarstock_model = new Gdn_Model('AvatarStock');
-
-        $update_delete = $avatarstock_model->Update(
+        Gdn::SQL()->Put(
+            'AvatarStock',
             array(
                 'Deleted' => 1
             ),
             array(
-                'AvatarID' => $avatar_ids,
-                'Deleted' => 0
+                'AvatarID' => $avatar_ids
             )
-        )->ResultArray();
+        );
 
-        return $update_delete;
+        return count($avatar_ids);
     }
 
     /**

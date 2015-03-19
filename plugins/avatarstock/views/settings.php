@@ -25,7 +25,7 @@
    <div class="display-avatars">
 
       <?php
-         echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => '/settings/avatarstock/modify', 'id' => 'avatarstock-form-modify'));
+         echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => Url('/settings/avatarstock/modify'), 'id' => 'avatarstock-form-modify'));
          echo $this->Form->Errors();
       ?>
 
@@ -52,7 +52,7 @@
       <?php echo $this->Form->Close(); ?>
 
       <?php
-         echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => '/settings/avatarstock/upload', 'id' => 'avatarstock-form'));
+         echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => Url('/settings/avatarstock/upload'), 'id' => 'avatarstock-form'));
          echo $this->Form->Errors();
       ?>
 
