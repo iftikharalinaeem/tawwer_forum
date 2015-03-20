@@ -65,8 +65,9 @@ class SubcommunitiesController extends DashboardController {
         }
 
         $locales = $localeModel->EnabledLocalePacks(true);
+        $locales = array_column($locales, 'Locale', 'Locale');
         $locales = array_combine($locales, $locales);
-        $locales = array_replace(['en-CA' => 'en-CA'], $locales);
+        $locales = array_replace(['en' => 'en'], $locales);
         $this->SetData('Locales', $locales);
 
         $categories = CategoryModel::MakeTree(CategoryModel::Categories());

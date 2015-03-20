@@ -124,15 +124,14 @@ class SubcommunityModel extends Gdn_Model {
 
     public function calculateRow(&$row) {
         $locale = val('Locale', $row);
-        if ($locale === 'en_CA' || $locale === 'en-CA') {
-            $locale = 'en';
-        }
+        $canonicalLocale = Gdn_Locale::Canonicalize($locale);
         if (class_exists('Locale')) {
             $row['LocaleDisplayName'] = static::mb_ucfirst(Locale::getDisplayName($locale, $locale));
         } else {
             $row['LocaleDisplayName'] = $row['Name'];
         }
-        $row['LocaleShortName'] = str_replace('_', '-', $locale);
+        $row['Locale'] = $canonicalLocale;
+        $row['LocaleShortName'] = str_replace('_', '-', $canonicalLocale);
         $row['Url'] = Gdn::Request()->UrlDomain('//').'/'.$row['Folder'];
     }
 
