@@ -9,6 +9,7 @@
 
 // ## Globals
 @import "globals/variables";
+@import "globals/icons";
 
 // ## Vendors
 //
@@ -19,12 +20,12 @@
 @import "../bower_components/bourbon/dist/_bourbon.scss";
 @import "../bower_components/neat/app/assets/stylesheets/_neat.scss";
 @import "../bower_components/normalize-scss/_normalize.scss";
-@import "../bower_components/font-vanillicon/scss/_vanillicon.scss";
 // endbower
 // bower:sass
 // endbower
 
 // ## Shared
+@import "shared/utilities";
 @import "shared/scaffolding";
 @import "shared/typography";
 @import "shared/forms";
