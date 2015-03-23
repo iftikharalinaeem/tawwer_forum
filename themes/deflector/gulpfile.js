@@ -19,7 +19,7 @@ gulp.task('styles', function () {
 
 gulp.task('scripts', function () {
   var dependencies = require('wiredep')({
-        exclude: [/jquery/]
+        exclude: ["dist/jquery.js"]
       })
     , source = $.filter('js/src/**/*.js');
 
