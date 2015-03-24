@@ -31,13 +31,13 @@ for ($Page = 0; $Page < 10; $Page++) {
       try {
         $Data = Curl("http://$Domain/crawl/site.json?vanillaid=$VanillaID&access_token=$AccessToken");
         echo round($Data['PercentComplete'] * 100)."%\n";
-        $Count++;
       } catch (Exception $Ex) {
          echo $Ex->getMessage()."\n";
       }
+      $Count++;
    }
-   
-   
+
+
    if (count($Sites) < 30)
       break;
 }
