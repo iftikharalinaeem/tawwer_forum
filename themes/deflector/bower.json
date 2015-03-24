@@ -5,7 +5,6 @@
     "bourbon": "~3.2.1",
     "neat": "1.5.x",
     "normalize-scss": "3.0.x",
-    "font-vanillicon": "*",
     "geopattern": "btmills/geopattern",
     "noisy": "danielrapp/noisy",
     "iCheck": "2.x-beta",
