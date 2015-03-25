@@ -356,6 +356,7 @@ class MultisiteModel extends Gdn_Model {
         $roles = $this->SQL
             ->Select('RoleID', '', 'HubID')
             ->Select('Name')
+            ->Select('Description')
             ->GetWhere('Role', ['HubSync' => ['settings', 'membership']])
             ->ResultArray();
 
