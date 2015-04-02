@@ -107,7 +107,7 @@ class PollModule extends Gdn_Module {
          $otherVoteData = Gdn::SQL()->GetWhere('PollVote',
             array('PollOptionID' => $optionIDs),
             '', '',
-            $this->MaxVoteUsers)->ResultArray();
+            self::LIMIT_THRESHOLD)->ResultArray();
          // Join the users.
          Gdn::UserModel()->JoinUsers($otherVoteData, array('UserID'));
 
