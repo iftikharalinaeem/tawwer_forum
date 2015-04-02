@@ -45,6 +45,10 @@ class PollModel extends Gdn_Model {
     * @return array array of UserID => PollVote/PollOptions.
     */
    public function GetVotesByUserID($PollID, $UserIDs) {
+      if (empty($UserIDs)) {
+         return array();
+      }
+
       $Data = $this->SQL
          ->Select('pv.UserID, po.*')
          ->From('PollVote pv')
