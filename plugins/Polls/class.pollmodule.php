@@ -1,7 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
 class PollModule extends Gdn_Module {
+   /**
+    * The maximum limit for all user vote queries.
+    * This prevents scaling issues when polls have a lot of votes.
+    */
    const LIMIT_THRESHOLD = 100;
 
+   /**
+    * @var int The maximum number of users that will displayed below each vote option.
+    */
    public $MaxVoteUsers = 20;
 
 	public function __construct(&$Sender = '') {
@@ -90,6 +97,7 @@ class PollModule extends Gdn_Module {
          if (val('CountVotes', $option, 0) < $voteThreshold) {
             $optionIDs[] = $option['PollOptionID'];
          } else {
+            // The option has too many votes so get the users for it separately.
             $ID = $option['PollOptionID'];
             $optionVotes = Gdn::SQL()->GetWhere(
                'PollVote',
