@@ -8,7 +8,7 @@
 $PluginInfo['Polls'] = array(
    'Name' => 'Polls',
    'Description' => "Allow users to create and vote on polls.",
-   'Version' => '1.2',
+   'Version' => '1.2.1',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',

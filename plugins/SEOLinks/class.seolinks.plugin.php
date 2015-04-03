@@ -10,8 +10,8 @@ if (!defined('APPLICATION'))
 $PluginInfo['SEOLinks'] = array(
     'Name' => 'SEO Links',
     'Description' => "Changes the links to discussions and categories for forums that were using the vbSEO plugin on an old forum.",
-    'Version' => '1.0.11',
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
+    'Version' => '1.1',
+    'RequiredApplications' => array('Vanilla' => '2.1'),
     'MobileFriendly' => TRUE,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -34,13 +34,12 @@ class SEOLinksPlugin extends Gdn_Plugin {
     * @param Gdn_Router $Sender
     * @param type $Args
     */
-   public function Gdn_Router_AfterLoadRoutes_Handler($Sender, $Args) {
+   public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender, $Args) {
       $Px = self::Prefix();
       $PxEsc = preg_quote($Px);
 
-      $Routes = & $Args['Routes'];
       $Route = '/?'.$PxEsc.'[^/]+/(\d+)-(.*?)(?:-(p\d+))?.html';
-      $Sender->Routes[$Route] = array(
+      Gdn::Router()->Routes[$Route] = array(
           'Route' => $Route,
           'Key' => base64_encode($Route),
           'Destination' => '/discussion/$1/$2/$3',
@@ -57,7 +56,7 @@ class SEOLinksPlugin extends Gdn_Plugin {
          $Category = CategoryModel::Categories($UrlCode);
          if ($Category) {
             $Route = '/?'.$PxEsc.'(' . preg_quote($Category['UrlCode']) . ')(?:/(p\d+))?/?(\?.*)?$';
-            $Sender->Routes[$Route] = array(
+            Gdn::Router()->Routes[$Route] = array(
                 'Route' => $Route,
                 'Key' => base64_encode($Route),
                 'Destination' => '/categories/$1/$2',

@@ -1,5 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
 class PollModule extends Gdn_Module {
+   /**
+    * The maximum limit for all user vote queries.
+    * This prevents scaling issues when polls have a lot of votes.
+    */
+   const LIMIT_THRESHOLD = 100;
+
+   /**
+    * @var int The maximum number of users that will displayed below each vote option.
+    */
+   public $MaxVoteUsers = 20;
 
 	public function __construct(&$Sender = '') {
 		parent::__construct($Sender);
@@ -28,35 +38,19 @@ class PollModule extends Gdn_Module {
          // Load the poll options
          $PollID = GetValue('PollID', $Poll);
          $PollOptionModel = new Gdn_Model('PollOption');
-         $OptionData = $PollOptionModel->GetWhere(array('PollID' => $PollID), 'Sort', 'asc');
+         $OptionData = $PollOptionModel->GetWhere(array('PollID' => $PollID), 'Sort', 'asc')->ResultArray();
          
          // Load the poll votes
-         $Anonymous = GetValue('Anonymous', $Poll);
+         $Anonymous = val('Anonymous', $Poll) || C('Plugins.Polls.AnonymousPolls');
          if (!$Anonymous) {
-            $PollOptionIDs = array();
-            foreach ($OptionData->ResultArray() as $PollOption) {
-               $PollOptionIDs[] = $PollOption['PollOptionID'];
-            }
-            $VoteData = $PollModel->SQL
-               ->Select('pv.*')
-               ->From('PollVote pv')
-               ->Join('PollOption po', 'pv.PollOptionID = po.PollOptionID')
-               ->WhereIn('pv.PollOptionID', $PollOptionIDs)
-               ->OrderBy('po.Sort', 'asc')
-               ->Get();
-            // Join the users.
-            Gdn::UserModel()->JoinUsers($VoteData, array('UserID'));
+            $VoteData = $this->GetPollVotes($OptionData, $PollModel);
          }
 
-         // Build the resultset to deliver to the page
+         // Build the result set to deliver to the page
          $PollOptions = array();
-         foreach ($OptionData->ResultArray() as $Option) {
+         foreach ($OptionData as $Option) {
             if (!$Anonymous) {
-               $Votes = array();
-               foreach ($VoteData->ResultArray() as $Vote) {
-                  if ($Vote['PollOptionID'] == $Option['PollOptionID'])
-                     $Votes[] = $Vote;
-               }
+               $Votes = val($Option['PollOptionID'], $VoteData, array());
                $Option['Votes'] = $Votes;
             }
             $PollOptions[] = $Option;
@@ -67,10 +61,9 @@ class PollModule extends Gdn_Module {
          $this->SetData('UserHasVoted', $PollModel->SQL
             ->Select()
             ->From('PollVote pv')
-            ->Join('PollOption po', 'pv.PollOptionID = po.PollOptionID')
             ->Where(array(
                'pv.UserID' => Gdn::Session()->UserID, 
-               'po.PollID' => $PollID
+               'pv.PollOptionID' => array_column($OptionData, 'PollOptionID')
             ))
             ->Get()
             ->NumRows() > 0
@@ -87,4 +80,51 @@ class PollModule extends Gdn_Module {
 		@ob_end_clean();
 		return $String;
 	}
+
+   /**
+    * Gets the users that voted for poll options.
+    *
+    * @param array $pollOptions The poll option data to query.
+    * @return array Returns an array of arrays of users indexed by poll option ID.
+    */
+   private function GetPollVotes($pollOptions) {
+      $optionIDs = array();
+      $votes = array();
+      $voteThreshold = self::LIMIT_THRESHOLD / count($pollOptions);
+
+      // Go through the options to see which ones have too many votes to get as a group.
+      foreach ($pollOptions as $option) {
+         if (val('CountVotes', $option, 0) < $voteThreshold) {
+            $optionIDs[] = $option['PollOptionID'];
+         } else {
+            // The option has too many votes so get the users for it separately.
+            $ID = $option['PollOptionID'];
+            $optionVotes = Gdn::SQL()->GetWhere(
+               'PollVote',
+               array('PollOptionID' => $ID),
+               '', '',
+               $this->MaxVoteUsers)->ResultArray();
+            // Join the users.
+            Gdn::UserModel()->JoinUsers($optionVotes, array('UserID'));
+            $votes[$ID] = $optionVotes;
+         }
+      }
+
+      // Join the rest of the poll option IDs.
+      if (!empty($optionIDs)) {
+         $otherVoteData = Gdn::SQL()->GetWhere('PollVote',
+            array('PollOptionID' => $optionIDs),
+            '', '',
+            self::LIMIT_THRESHOLD)->ResultArray();
+         // Join the users.
+         Gdn::UserModel()->JoinUsers($otherVoteData, array('UserID'));
+
+         $otherVoteData = Gdn_DataSet::Index($otherVoteData, 'PollOptionID', array('Unique' => false));
+         foreach ($otherVoteData as $ID => $Users) {
+            $votes[$ID] = array_slice($Users, 0, $this->MaxVoteUsers);
+         }
+      }
+
+      return $votes;
+   }
 }
