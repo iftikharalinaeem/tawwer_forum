@@ -33,6 +33,7 @@ $St->Table('PollOption')
 $St->Table('PollVote')
    ->Column('UserID', 'int', FALSE, 'primary')
    ->Column('PollOptionID', 'int', FALSE, array('primary', 'key'))
+   ->Column('DateInserted', 'datetime', TRUE)
    ->Set();
 
 // Define permissions
