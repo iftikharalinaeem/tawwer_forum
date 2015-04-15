@@ -10,7 +10,8 @@ class BuzzModel {
       $RoleModel = new RoleModel();
       $ModRoleIDs = $RoleModel->GetByPermission('Garden.Moderation.Manage')->ResultArray();
       $ModRoleIDs = ConsolidateArrayValuesByKey($ModRoleIDs, 'RoleID');
-      
+      $SlotString = Gdn_Statistics::TimeSlot($Slot, Gdn_Format::ToTimestamp($Date));
+
       $ModUserIDs = Gdn::SQL()
          ->Select('UserID')
          ->From('UserRole')
@@ -28,6 +29,7 @@ class BuzzModel {
           'SlotType' => $Slot,
           'DateFrom' => $SlotRange[0],
           'DateTo' => $SlotRange[1],
+          'Slot' => $SlotString
       );
       
       // New Users.
