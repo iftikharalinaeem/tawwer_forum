@@ -715,7 +715,7 @@ if (!function_exists('WriteReactions')):
       static $Types = NULL;
       if ($Types === NULL)
          $Types = ReactionModel::GetReactionTypes(array('Class' => array('Positive', 'Negative'), 'Active' => 1));
-      Gdn::Controller()->EventArguments['ReactionTypes'] = $Types;
+      Gdn::Controller()->EventArguments['ReactionTypes'] = &$Types;
 
       if ($ID = GetValue('CommentID', $Row)) {
          $RecordType = 'comment';
