@@ -317,7 +317,7 @@ class RanksPlugin extends Gdn_Plugin {
          $Sender->Form->SetValidationResults($RankModel->ValidationResults());
          if ($Result) {
             $Sender->InformMessage(T('Your changes have been saved.'));
-            $Sender->RedirectUrl = '/settings/ranks';
+            $Sender->RedirectUrl = Url('/settings/ranks');
 
             $Sender->SetData('Rank', RankModel::Ranks($Result));
          }
