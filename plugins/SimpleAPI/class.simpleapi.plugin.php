@@ -266,8 +266,10 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                      $MatchRecords = Gdn::SQL()->GetWhere($TableName, array(
                         $ColumnLookup => $MultiValue
                      ));
-                     if (!$MatchRecords->NumRows())
-                        throw new Exception(self::NotFoundString($FieldPrefix, $MultiValue), 404);
+                     if (!$MatchRecords->NumRows()) {
+                        $Code = (Gdn::Request()->Get('callback', FALSE) && C('Garden.AllowJSONP')) ? 200 : 404;
+                        throw new Exception(self::NotFoundString($FieldPrefix, $MultiValue), $Code);
+                     }
 
                      if ($MatchRecords->NumRows() > 1)
                         throw new Exception(sprintf('Multiple %ss found by %s for "%s".', T('User'), $ColumnLookup, $MultiValue), 409);
