@@ -3,7 +3,7 @@
 $PluginInfo['samlsso'] = array(
     'Name' => 'SAML SSO',
     'Description' => 'Allows Vanilla to SSO to a SAML 2.0 compliant identity provider.',
-    'Version' => '1.1',
+    'Version' => '1.2.0',
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'RequiredTheme' => false,
     'RequiredPlugins' => false,
@@ -283,6 +283,11 @@ class SamlSSOPlugin extends Gdn_Plugin {
       $Form->SetFormValue('FullName', $this->rval('cn', $profile));
       $Form->SetFormValue('Email', $this->rval('mail', $profile));
       $Form->SetFormValue('Photo', $this->rval('photo', $profile));
+
+      $roles = $this->rval('roles', $profile);
+      if ($roles) {
+          $Form->SetFormValue('Roles', $roles);
+      }
 
       // Set the target from common items.
       if ($relay_state = $Sender->Request->Post('RelayState')) {
