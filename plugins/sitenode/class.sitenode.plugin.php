@@ -539,7 +539,8 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $user = val('User', $this->hubApi('/profile/hubsso.json', 'GET', ['from' => $this->slug()]));
 
                 // Hub SSO always synchronizes roles.
-                SaveToConfig('Garden.SSO.SynchRoles', true, false);
+                SaveToConfig('Garden.SSO.SyncRoles', true, false);
+                SaveToConfig('Garden.SSO.SynchRoles', true, false); // backwards compat
 
                 // Translate the roles.
                 $roles = val('Roles', $user);
