@@ -146,10 +146,10 @@ class WarningModel extends UserNoteModel {
         $warningLevel = $alert['WarningLevel'];
 
         // See if there's something special to do.
-        $banned = 0;
+        $banned = false;
         if ($warningLevel >= 5) {
             // The user is banned.
-            $banned = 1;
+            $banned = true;
         }
 
         $punished = 0;
@@ -161,8 +161,8 @@ class WarningModel extends UserNoteModel {
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
 
         $set = array();
-        if ($user['Banned'] != $banned) {
-            $set['Banned'] = $banned;
+        if (BanModel::isBanned($user['Banned'], BanModel::BAN_WARNING) !== $banned) {
+            $set['Banned'] = BanModel::setBanned($user['Banned'], $banned, BanModel::BAN_WARNING);
         }
         if ($user['Punished'] != $punished) {
             $set['Punished'] = $punished;
@@ -380,7 +380,7 @@ class WarningModel extends UserNoteModel {
         // Process this user's warnings.
         $processed = $this->ProcessWarnings($userID);
 
-        if (valr('Set.Banned', $processed)) {
+        if (BanModel::isBanned(valr('Set.Banned', $processed), BanModel::BAN_WARNING)) {
             // Update the user note to indicate the ban.
             $this->saveToSerializedColumn('Attributes', $ID, 'Banned', true);
             $event['Banned'] = true;
