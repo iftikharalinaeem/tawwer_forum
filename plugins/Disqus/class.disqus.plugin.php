@@ -21,7 +21,8 @@ $PluginInfo['Disqus'] = array(
 class DisqusPlugin extends Gdn_Plugin {
     /* Properties */
 
-    const ProviderKey = 'Disqus';
+    const ProviderName = 'Disqus';
+    const ProviderAlias = 'disqus';
 
     protected $_Provider = NULL;
     protected $_RedirectUri = NULL;
@@ -40,7 +41,7 @@ class DisqusPlugin extends Gdn_Plugin {
 
     public function Provider() {
         if ($this->_Provider === NULL) {
-            $this->_Provider = Gdn_AuthenticationProviderModel::GetProviderByScheme('disqus');
+            $this->_Provider = Gdn_AuthenticationProviderModel::GetProviderByScheme(self::ProviderAlias);
         }
 
         return $this->_Provider;
@@ -108,12 +109,12 @@ class DisqusPlugin extends Gdn_Plugin {
     }
 
     public function Structure() {
-        Gdn::SQL()->Put('UserAuthenticationProvider', array('AuthenticationSchemeAlias' => self::ProviderKey), array('AuthenticationSchemeAlias' => 'Disqus'));
+        Gdn::SQL()->Put('UserAuthenticationProvider', array('AuthenticationSchemeAlias' => self::ProviderAlias), array('AuthenticationSchemeAlias' => 'disqus'));
 
         // Save the Disqus provider type.
         Gdn::SQL()->Replace('UserAuthenticationProvider',
-            array('AuthenticationSchemeAlias' => self::ProviderKey, 'URL' => '', 'AssociationSecret' => '', 'AssociationHashMethod' => '...'),
-            array('AuthenticationKey' => self::ProviderKey), TRUE);
+            array('AuthenticationSchemeAlias' => self::ProviderAlias, 'URL' => '', 'AssociationSecret' => '', 'AssociationHashMethod' => '...'),
+            array('AuthenticationKey' => self::ProviderName), TRUE);
     }
 
     private function _GetButton() {
@@ -182,8 +183,8 @@ class DisqusPlugin extends Gdn_Plugin {
 
         if ($Sender->Form->AuthenticatedPostBack()) {
             $Model = new Gdn_AuthenticationProviderModel();
-            $Sender->Form->SetFormValue(Gdn_AuthenticationProviderModel::COLUMN_ALIAS, 'disqus');
-            $Sender->Form->SetFormValue(Gdn_AuthenticationProviderModel::COLUMN_NAME, 'Disqus');
+            $Sender->Form->SetFormValue(Gdn_AuthenticationProviderModel::COLUMN_ALIAS, self::ProviderAlias);
+            $Sender->Form->SetFormValue(Gdn_AuthenticationProviderModel::COLUMN_NAME, self::ProviderName);
             $Sender->Form->SetModel($Model);
 
             if ($Sender->Form->Save(array('PK' => Gdn_AuthenticationProviderModel::COLUMN_ALIAS))) {
@@ -204,7 +205,7 @@ class DisqusPlugin extends Gdn_Plugin {
      * @param array $Args
      */
     public function Base_ConnectData_Handler($Sender, $Args) {
-        if (GetValue(0, $Args) != 'disqus') {
+        if (GetValue(0, $Args) != self::ProviderAlias) {
             return;
         }
 
@@ -294,8 +295,8 @@ class DisqusPlugin extends Gdn_Plugin {
         }
 
         $Form->SetFormValue('UniqueID', GetValue('id', $Profile));
-        $Form->SetFormValue('Provider', 'disqus');
-        $Form->SetFormValue('ProviderName', 'Disqus');
+        $Form->SetFormValue('Provider', self::ProviderAlias);
+        $Form->SetFormValue('ProviderName', self::ProviderName);
         $Form->SetFormValue('FullName', GetValue('name', $Profile));
         $Form->SetFormValue('Name', GetValue('username', $Profile));
         $Form->SetFormValue('Photo', GetValueR('avatar.permalink', $Profile));
