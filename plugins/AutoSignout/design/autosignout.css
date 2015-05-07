@@ -12,3 +12,7 @@
 .Entry .Buttons .CheckBoxLabel {
    display: none;
 }
+
+label[for="Form_RememberMe"] {
+   display: none !important;
+}
