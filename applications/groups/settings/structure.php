@@ -25,7 +25,7 @@ $GroupPrivacyExists = $St->ColumnExists('Privacy');
 
 $St
    ->PrimaryKey('GroupID')
-   ->Column('Name', 'varchar(255)', FALSE, 'unique')
+   ->Column('Name', 'varchar(150)', FALSE, 'unique')
    ->Column('Description', 'text')
    ->Column('Format', 'varchar(10)', TRUE)
    ->Column('CategoryID', 'int', FALSE, 'key')
