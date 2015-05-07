@@ -21,6 +21,8 @@ $PluginInfo['Disqus'] = array(
 class DisqusPlugin extends Gdn_Plugin {
     /* Properties */
 
+    const ProviderKey = 'Disqus';
+
     protected $_Provider = NULL;
     protected $_RedirectUri = NULL;
 
@@ -101,6 +103,17 @@ class DisqusPlugin extends Gdn_Plugin {
         if ($Error) {
             throw new Gdn_UserException($Error, 400);
         }
+
+        $this->Structure();
+    }
+
+    public function Structure() {
+        Gdn::SQL()->Put('UserAuthenticationProvider', array('AuthenticationSchemeAlias' => self::ProviderKey), array('AuthenticationSchemeAlias' => 'Disqus'));
+
+        // Save the Disqus provider type.
+        Gdn::SQL()->Replace('UserAuthenticationProvider',
+            array('AuthenticationSchemeAlias' => self::ProviderKey, 'URL' => '', 'AssociationSecret' => '', 'AssociationHashMethod' => '...'),
+            array('AuthenticationKey' => self::ProviderKey), TRUE);
     }
 
     private function _GetButton() {
