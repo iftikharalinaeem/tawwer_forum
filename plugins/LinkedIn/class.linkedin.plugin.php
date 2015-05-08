@@ -8,7 +8,7 @@
 $PluginInfo['LinkedIn'] = array(
    'Name' => 'Linked In Social Connect',
    'Description' => "Allow users to sign in via linked in.",
-   'Version' => '1.1',
+   'Version' => '1.1.1',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -215,13 +215,6 @@ class LinkedInPlugin extends Gdn_Plugin {
    }
    
    /// Event Handlers ///
-   
-   /**
-    * @param AssetModel $Sender
-    */
-   public function AssetModel_StyleCss_Handler($Sender, $Args) {
-      $Sender->AddCssFile('linkedin.css', 'plugins/LinkedIn');
-   }
    
    public function Base_SignInIcons_Handler($Sender, $Args) {
 		echo ' '.$this->SignInButton('icon').' ';
