@@ -8,7 +8,7 @@ WriteTables();
 // Create default users.
 $UserPass = array(
    'venkman' => 'cats&dogs',
-   'ray' => 'staypuff',
+   'ray' => 'staypuft',
    'egon' => 'crossthestreams',
    'winston' => 'yousayYES!',
    'janine' => 'wegotalive1'

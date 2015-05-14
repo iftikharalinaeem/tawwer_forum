@@ -18,7 +18,7 @@ Using this mess
 ### Default Users / Passwords
 
 * `venkman` / `cats&dogs`
-* `ray` / `staypuff`
+* `ray` / `staypuft`
 * `egon` / `crossthestreams`
 * `winston` / `yousayYES!`
 * `janine` / `wegotalive1`
