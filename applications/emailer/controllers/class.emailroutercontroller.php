@@ -170,6 +170,11 @@ class EmailRouterController extends Gdn_Controller {
                $Data['ResponseText'] = 'Out of office';
                $LogID = $LogModel->Insert($Data);
                return;
+            } elseif ($this->isServerStatus($Headers, $Data)) {
+               $Data['Response'] = 202;
+               $Data['ResponseText'] = 'Server status';
+               $LogID = $LogModel->Insert($Data);
+               return;
             }
 
             $LogID = $LogModel->Insert($Data);
@@ -275,6 +280,21 @@ class EmailRouterController extends Gdn_Controller {
          val('auto-submitted', $headers) == 'auto-replied' ||
          stripos($data['Subject'], 'Out of Office') !== false
       ) {
+         return true;
+      }
+      return false;
+   }
+
+   /**
+    * Determines whether or not an email is a system administrative status.
+    *
+    * @param array $headers The array of email headers.
+    * @return bool Returns true if the headers indicate a system administrative status, or false otherwise.
+    */
+   public function isServerStatus($headers) {
+      $contentType = val('content-type', $headers);
+
+      if (stripos($contentType, 'multipart/report') !== false) {
          return true;
       }
       return false;
