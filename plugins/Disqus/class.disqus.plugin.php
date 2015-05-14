@@ -101,8 +101,6 @@ class DisqusPlugin extends Gdn_Plugin {
         if ($Error) {
             throw new Gdn_UserException($Error, 400);
         }
-
-        $this->Structure();
     }
 
     private function _GetButton() {
