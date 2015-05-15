@@ -8,7 +8,7 @@
 $PluginInfo['VanillaPop'] = array(
    'Name' => 'Vanilla Pop',
    'Description' => "Users may start discussions, make comments, and even automatically register for your site via email.",
-   'Version' => '1.1.1',
+   'Version' => '1.2.0',
    'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -32,7 +32,17 @@ class VanillaPopPlugin extends Gdn_Plugin {
           'CommentSubject' => 'Re: [{Title}] {Discussion.Name}',
           'CommentBody' => "{Body}\n\n-- \n{Signature}",
           'ConfirmationBody' => "Your request has been received (ticket #{ID}).\n\nThis is just a confirmation email, but you can reply directly to follow up.\n\nYou wrote:\n{Quote}\n\n-- \n{Signature}");
-   
+
+   /**
+    * @var array A list of email domains for receiving email.
+    */
+   protected $emailDomains = [
+      'vanillaforums.com' => 'vanillaforums.email',
+      'vanillacommunity.com' => 'vanillacommunity.email',
+      'vanillacommunities.com' => 'vanillacommunities.email'
+   ];
+
+
    /// Methods ///
    
    public static function AddIDToEmail($Email, $ID) {
@@ -704,6 +714,48 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
       return $Body;
    }
+
+   /**
+    * Get the current email domain.
+    *
+    * @return string Returns the email domain to use.
+    */
+   public function getEmailDomain() {
+      $hostname = $this->getSiteHostname();
+      list($slug, $tld) = $this->splitHostname($hostname);
+
+      return val($tld, $this->emailDomains, 'noreply.email');
+   }
+
+   /**
+    * Get the current site hostname.
+    * @return string Returns the current site hostname.
+    */
+   public function getSiteHostname() {
+      if (class_exists('Infrastructure')) {
+         return (string)Infrastructure::site('name');
+      } else {
+         return '';
+      }
+   }
+
+   /**
+    * Split a vanilla hostname into its tld and subdomain.
+    *
+    * @param string $hostname The hostname to split.
+    * @return array Returns an array in the form `[$subdomain, $tld]`.
+    */
+   protected function splitHostname($hostname) {
+      $parts = explode('.', $hostname);
+      if (count($parts) <= 2) {
+         return ['', $hostname];
+      } else {
+         return [
+            implode('.', array_slice($parts, 0, -2)),
+            implode('.', array_slice($parts, -2))
+         ];
+      }
+   }
    
    public static function StripEmail($Body) {
       $SigFound = FALSE; 
@@ -1079,24 +1131,12 @@ class VanillaPopPlugin extends Gdn_Plugin {
    
    /**
     *
-    * @param SettingsController $Sender
-    * @param array $Args
+    * @param SettingsController $sender
+    * @param array $args
     */
-   public function SettingsController_VanillaPop_Create($Sender, $Args = array()) {
-      $Sender->Permission('Garden.Settings.Manage');
-      
-      if (defined('CLIENT_NAME')) {
-         if (StringEndsWith(CLIENT_NAME, '.vanillaforums.com'))
-            $IncomingTo = StringEndsWith(CLIENT_NAME, '.vanillaforums.com', TRUE, TRUE);
-         else
-            $IncomingTo = CLIENT_NAME;
-         $Sender->SetData('IncomingAddress', $IncomingTo.'@email.vanillaforums.com');
-         if (strpos($IncomingTo, '.') === FALSE)
-            $Sender->SetData('CategoryAddress', "categorycode.$IncomingTo@email.vanillaforums.com");
-         else
-            $Sender->SetData('CategoryAddress', "$IncomingTo+categorycode@email.vanillaforums.com");
-      }
-      
+   public function SettingsController_VanillaPop_Create($sender, $args = array()) {
+      $sender->Permission('Garden.Settings.Manage');
+
       $ConfSettings = array(
           'Plugins.VanillaPop.DefaultCategoryID' => array('Control' => 'CategoryDropDown', 'Description' => 'Place discussions started through email in the following category.'),
           'Plugins.VanillaPop.AllowUserRegistration' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow new users to be registered through email.'),
@@ -1119,14 +1159,25 @@ class VanillaPopPlugin extends Gdn_Plugin {
          $ConfSettings['EmailFormat.'.$Name] = array('Control' => 'TextBox', 'Default' => $Default, 'Options' => $Options);   
       }
 
-      $Conf = new ConfigurationModule($Sender);
+      $Conf = new ConfigurationModule($sender);
       $Conf->Initialize($ConfSettings);
 
-      $Sender->AddSideMenu();
-      $Sender->SetData('Title', T('Incoming Email'));
-      $Sender->ConfigurationModule = $Conf;
+      $emailDomain = $this->getEmailDomain();
+      list($slug, $tld) = $this->splitHostname($this->getSiteHostname());
+      if ($emailDomain && $slug) {
+         $sender->SetData('IncomingAddress', "$slug@$emailDomain");
+         if (strpos($slug, '.') === false) {
+            $sender->SetData('CategoryAddress', "categorycode.$slug@$emailDomain");
+         } else {
+            $sender->SetData('CategoryAddress', "$slug+categorycode@$emailDomain");
+         }
+      }
+
+      $sender->AddSideMenu();
+      $sender->SetData('Title', T('Incoming Email'));
+      $sender->ConfigurationModule = $Conf;
 //      $Conf->RenderAll();
-      $Sender->Render('Settings', '', 'plugins/VanillaPop');
+      $sender->Render('Settings', '', 'plugins/VanillaPop');
    }
 
    /**
