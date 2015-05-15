@@ -541,31 +541,30 @@ class Salesforce {
     * @see Refresh()
     */
    public function Reconnect() {
-      $Salesforce = Salesforce::Instance();
-      if ($Salesforce->DashboardConnection) {
-         $Response = $Salesforce->Refresh($Salesforce->RefreshToken);
+      if ($this->DashboardConnection) {
+         $Response = $this->Refresh($this->RefreshToken);
          $InstanceUrl = $Response['instance_url'];
          $AccessToken = $Response['access_token'];
          SaveToConfig(array(
             'Plugins.Salesforce.DashboardConnection.InstanceUrl' => $InstanceUrl,
             'Plugins.Salesforce.DashboardConnection.Token' => $AccessToken,
          ));
-         $Salesforce->SetAccessToken($AccessToken);
-         $Salesforce->SetInstanceUrl($InstanceUrl);
+         $this->SetAccessToken($AccessToken);
+         $this->SetInstanceUrl($InstanceUrl);
       } else {
-         $Response = $Salesforce->Refresh($Salesforce->RefreshToken);
+         $Response = $this->Refresh($this->RefreshToken);
          if ($Response != FALSE) {
-            $Profile = GetValueR('Attributes.' . Salesforce::ProviderKey . '.Profile', Gdn::Session()->User);
+            $Profile = GetValueR('Attributes.' . self::ProviderKey . '.Profile', Gdn::Session()->User);
             $Attributes = array(
-               'RefreshToken' => $Salesforce->RefreshToken,
+               'RefreshToken' => $this->RefreshToken,
                'AccessToken' => $Response['access_token'],
                'InstanceUrl' => $Response['instance_url'],
                'Profile' => $Profile,
             );
 
-            Gdn::UserModel()->SaveAttribute(Gdn::Session()->UserID, Salesforce::ProviderKey, $Attributes);
-            $Salesforce->SetAccessToken($Response['access_token']);
-            $Salesforce->SetInstanceUrl($Response['instance_url']);
+            Gdn::UserModel()->SaveAttribute(Gdn::Session()->UserID, self::ProviderKey, $Attributes);
+            $this->SetAccessToken($Response['access_token']);
+            $this->SetInstanceUrl($Response['instance_url']);
          }
       }
    }
