@@ -251,7 +251,10 @@ class EmailRouterController extends Gdn_Controller {
             } else {
                $Error = curl_error($C)."\n\n$Result";
                $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Error));
-               throw new Exception($Error, $Code);
+
+               if ($Code != 404) {
+                  throw new Exception($Error, $Code);
+               }
             }
          }
 
