@@ -7,8 +7,8 @@
 $PluginInfo['Salesforce'] = array(
    'Name' => 'Salesforce',
    'Description' => "Allow staff users to create leads and cases from discussions and comments.",
-   'Version' => '0.0.5-beta',
-   'RequiredApplications' => array('Vanilla' => '2.1.18'),
+   'Version' => '0.1',
+   'RequiredApplications' => array('Vanilla' => '2.1'),
    'SettingsUrl' => '/dashboard/plugin/Salesforce',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'RegisterPermissions' => array('Garden.Staff.Allow' => 'Garden.Moderation.Manage'),
