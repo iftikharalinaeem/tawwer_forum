@@ -224,7 +224,7 @@ class EmailRouterController extends Gdn_Controller {
 //               $Args = $Matches[2];
 
                // Check for http or https.
-               $Scheme = '';
+               $Scheme = 'http';
                if (in_array(reset($ToParts), ['http', 'https'])) {
                   $Scheme = array_shift($ToParts);
                }
@@ -249,12 +249,9 @@ class EmailRouterController extends Gdn_Controller {
                      $Data[$To] = $To;
                   }
                } else {
-                  $Scheme = 'https';
                   $Domain = $ToParts[0].'.'.$this->emailDomains[$emailDomain];
                }
 
-               $Scheme = $Scheme ?: 'https';
-               
                $Url = "$Scheme://{$Domain}{$Folder}/utility/email.json";
                $LogModel->SetField($LogID, array('Url' => $Url));
             } else {
