@@ -449,7 +449,7 @@ class SalesforcePlugin extends Gdn_Plugin {
       if (!C('Plugins.Salesforce.AllowDuplicateLeads', FALSE)) {
          $ExistingLeadResponse = $Salesforce->FindLead($User->Email);
          if ($ExistingLeadResponse['HttpCode'] == 401) {
-            $this->Reconnect($Sender, $Args);
+            $Salesforce->Reconnect();
             $ExistingLeadResponse = $Salesforce->FindLead($User->Email);
          }
          $ExistingLead = $ExistingLeadResponse['Response'];
@@ -522,7 +522,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             'Options' => $Salesforce->GetLeadStatusOptions(),
          );
       } catch (Gdn_UserException $e) {
-         $this->Reconnect($Sender, $Args);
+         $Salesforce->Reconnect();
       }
       $Sender->Form->SetData($Data);
       $Sender->SetData('Data', $Data);
@@ -650,7 +650,7 @@ class SalesforcePlugin extends Gdn_Plugin {
                'Body' => Gdn_Format::TextEx($Content->Body)
             );
       } catch (Gdn_UserException $e) {
-         $this->Reconnect($Sender, $Args);
+         $Salesforce->Reconnect();
       }
 
       $Sender->Form->SetData($Data);
@@ -747,7 +747,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             $CaseResponse = $Salesforce->GetCase($Attachment['SourceID']);
             $UpdatedAttachment = (array) $AttachmentModel->GetID($Attachment['AttachmentID']);
             if ($CaseResponse['HttpCode'] == 401) {
-               $this->Reconnect($Sender, $Args);
+               $Salesforce->Reconnect();
                continue;
             } elseif ($CaseResponse['HttpCode'] == 404) {
                $UpdatedAttachment['DateUpdated'] = Gdn_Format::ToDateTime();
@@ -774,7 +774,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             $UpdatedAttachment = (array) $AttachmentModel->GetID($Attachment['AttachmentID']);
 
             if ($LeadResponse['HttpCode'] == 401) {
-               $this->Reconnect($Sender, $Args);
+               $Salesforce->Reconnect();
                continue;
             } elseif($LeadResponse['HttpCode'] == 404) {
                $UpdatedAttachment['Error'] = T('Lead has been deleted from Salesforce');
@@ -798,37 +798,6 @@ class SalesforcePlugin extends Gdn_Plugin {
 
          }
       }
-   }
-
-   public function Reconnect($Sender, $Args) {
-      $Salesforce = Salesforce::Instance();
-      if ($Salesforce->DashboardConnection) {
-         $Response = $Salesforce->Refresh($Salesforce->RefreshToken);
-         $InstanceUrl = $Response['instance_url'];
-         $AccessToken = $Response['access_token'];
-         SaveToConfig(array(
-            'Plugins.Salesforce.DashboardConnection.InstanceUrl' => $InstanceUrl,
-            'Plugins.Salesforce.DashboardConnection.Token' => $AccessToken,
-         ));
-         $Salesforce->SetAccessToken($AccessToken);
-         $Salesforce->SetInstanceUrl($InstanceUrl);
-      } else {
-         $Response = $Salesforce->Refresh($Salesforce->RefreshToken);
-         if ($Response != FALSE) {
-            $Profile = GetValueR('Attributes.' . Salesforce::ProviderKey . '.Profile', Gdn::Session()->User);
-            $Attributes = array(
-               'RefreshToken' => $Salesforce->RefreshToken,
-               'AccessToken' => $Response['access_token'],
-               'InstanceUrl' => $Response['instance_url'],
-               'Profile' => $Profile,
-            );
-
-            Gdn::UserModel()->SaveAttribute(Gdn::Session()->UserID, Salesforce::ProviderKey, $Attributes);
-            $Salesforce->SetAccessToken($Response['access_token']);
-            $Salesforce->SetInstanceUrl($Response['instance_url']);
-         }
-      }
-      $Sender->InformMessage('Reconnecting to Salesforce');
    }
 
    /**
