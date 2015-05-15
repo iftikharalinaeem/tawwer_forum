@@ -41,7 +41,7 @@ class SalesforcePlugin extends Gdn_Plugin {
    protected $MinimumTimeForUpdate = 600;
 
    /**
-    * Used in setup for Oauth.
+    * Used in setup for OAuth.
     */
    const ProviderKey = 'Salesforce';
 

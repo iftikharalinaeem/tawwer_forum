@@ -329,7 +329,7 @@ class Salesforce {
    /**
     * Get User Profile fields.
     *
-    * @param string $LoginID - id from the Access Tokens after successful Oauth
+    * @param string $LoginID - id from the Access Tokens after successful OAuth
     * @return array $Profile
     * @throws Exception
     */
@@ -616,7 +616,7 @@ class Salesforce {
    }
 
    /**
-    * Used in the Oauth process.
+    * Used in the OAuth process.
     *
     * @param bool|string $RedirectUri
     * @param bool|string $State
@@ -700,7 +700,7 @@ class Salesforce {
    }
 
    /**
-    * Used in the Oath process.
+    * Used in the OAuth process.
     *
     * @return string $Url
     */
@@ -709,7 +709,7 @@ class Salesforce {
    }
 
    /**
-    * Used in the Oath process.
+    * Used in the OAuth process.
     *
     * @return bool
     */
