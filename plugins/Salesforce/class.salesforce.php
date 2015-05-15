@@ -329,7 +329,7 @@ class Salesforce {
    /**
     * Get User Profile fields.
     *
-    * @param string $LoginID - id from the Access Tokens after successful Oauth
+    * @param string $LoginID - id from the Access Tokens after successful OAuth
     * @return array $Profile
     * @throws Exception
     */
@@ -425,8 +425,7 @@ class Salesforce {
    }
 
    /**
-    *
-    * Sends Request to the Salesforces REST API
+    * Sends Request to the Salesforces REST API.
     *
     * @param $Path
     * @param bool|array $Post false or array of values to be sent as json POST
@@ -475,6 +474,8 @@ class Salesforce {
    }
 
    /**
+    * Send an HTTP request to Salesforce with Authorize header.
+    *
     * @param string $Url -
     * @param bool|array $Post
     * @param string|bull AccessToken
@@ -533,6 +534,48 @@ class Salesforce {
       return TRUE;
    }
 
+   /**
+    * Reestablishes a valid token session with Salesforce using refresh_token.
+    *
+    * @throws Gdn_UserException
+    * @see Refresh()
+    */
+   public function Reconnect() {
+      if ($this->DashboardConnection) {
+         $Response = $this->Refresh($this->RefreshToken);
+         $InstanceUrl = $Response['instance_url'];
+         $AccessToken = $Response['access_token'];
+         SaveToConfig(array(
+            'Plugins.Salesforce.DashboardConnection.InstanceUrl' => $InstanceUrl,
+            'Plugins.Salesforce.DashboardConnection.Token' => $AccessToken,
+         ));
+         $this->SetAccessToken($AccessToken);
+         $this->SetInstanceUrl($InstanceUrl);
+      } else {
+         $Response = $this->Refresh($this->RefreshToken);
+         if ($Response != FALSE) {
+            $Profile = GetValueR('Attributes.' . self::ProviderKey . '.Profile', Gdn::Session()->User);
+            $Attributes = array(
+               'RefreshToken' => $this->RefreshToken,
+               'AccessToken' => $Response['access_token'],
+               'InstanceUrl' => $Response['instance_url'],
+               'Profile' => $Profile,
+            );
+
+            Gdn::UserModel()->SaveAttribute(Gdn::Session()->UserID, self::ProviderKey, $Attributes);
+            $this->SetAccessToken($Response['access_token']);
+            $this->SetInstanceUrl($Response['instance_url']);
+         }
+      }
+   }
+
+   /**
+    * Revoke an access token.
+    *
+    * @param $Token
+    * @return bool
+    * @throws Gdn_UserException
+    */
    public function Revoke($Token) {
       $Response = $this->HttpRequest(C('Plugins.Salesforce.AuthenticationUrl') . '/services/oauth2/revoke?token=' . $Token);
       if ($Response['HttpCode'] == 200) {
@@ -541,6 +584,14 @@ class Salesforce {
       return FALSE;
    }
 
+   /**
+    * Sends refresh_token to Salesforce API and simply returns the response.
+    *
+    * @param $Token
+    * @return bool|mixed On success, returns entire API response.
+    * @throws Gdn_UserException
+    * @see Reconnect() is probably what you want.
+    */
    public function Refresh($Token) {
       $Response = $this->HttpRequest(
          C('Plugins.Salesforce.AuthenticationUrl') . '/services/oauth2/token',
@@ -565,7 +616,7 @@ class Salesforce {
    }
 
    /**
-    * Used in the Oauth Process
+    * Used in the OAuth process.
     *
     * @param bool|string $RedirectUri
     * @param bool|string $State
@@ -591,7 +642,8 @@ class Salesforce {
    }
 
    /**
-    * Used in the OAuth Process
+    * Used in the OAuth process.
+    *
     * @param null $NewValue a different redirect url
     * @return null|string
     */
@@ -611,7 +663,7 @@ class Salesforce {
    }
 
    /**
-    * Used in the Oath Process
+    * Used in the Oath process.
     *
     * @param $Code - OAuth Code
     * @param $RedirectUri - Redirect Uri
@@ -648,7 +700,7 @@ class Salesforce {
    }
 
    /**
-    * Used in the Oauth Process
+    * Used in the OAuth process.
     *
     * @return string $Url
     */
@@ -657,7 +709,7 @@ class Salesforce {
    }
 
    /**
-    * Used in the Oauth Process
+    * Used in the OAuth process.
     *
     * @return bool
     */
@@ -670,10 +722,20 @@ class Salesforce {
       return TRUE;
    }
 
+   /**
+    * Setter for AccessToken.
+    *
+    * @param $AccessToken
+    */
    public function SetAccessToken($AccessToken) {
       $this->AccessToken = $AccessToken;
    }
 
+   /**
+    * Setter for InstanceUrl.
+    *
+    * @param $InstanceUrl
+    */
    public function SetInstanceUrl($InstanceUrl) {
       $this->InstanceUrl = $InstanceUrl;
    }
