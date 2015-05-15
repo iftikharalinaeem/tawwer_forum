@@ -8,8 +8,8 @@ if (!defined('APPLICATION'))
  */
 // Define the plugin:
 $PluginInfo['SEOLinks'] = array(
-    'Name' => 'SEO Links',
-    'Description' => "Changes the links to discussions and categories for forums that were using the vbSEO plugin on an old forum.",
+    'Name' => 'HTML Links',
+    'Description' => "Changes the links to discussions and categories for backwards compatibility purposes.",
     'Version' => '1.1',
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'MobileFriendly' => TRUE,
