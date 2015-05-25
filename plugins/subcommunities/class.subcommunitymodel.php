@@ -14,6 +14,10 @@ class SubcommunityModel extends Gdn_Model {
 
     protected static $current;
 
+    protected $localeNameTranslations = [
+        'ru__PETR1708' => 'ru'
+    ];
+
     /// Methods ///
 
     public function __construct($name = '') {
@@ -126,7 +130,8 @@ class SubcommunityModel extends Gdn_Model {
         $locale = val('Locale', $row);
         $canonicalLocale = Gdn_Locale::Canonicalize($locale);
         if (class_exists('Locale')) {
-            $row['LocaleDisplayName'] = static::mb_ucfirst(Locale::getDisplayName($locale, $locale));
+            $displayLocale = val($canonicalLocale, $this->localeNameTranslations, $canonicalLocale);
+            $row['LocaleDisplayName'] = static::mb_ucfirst(Locale::getDisplayName($displayLocale, $canonicalLocale));
         } else {
             $row['LocaleDisplayName'] = $row['Name'];
         }
