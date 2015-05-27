@@ -38,20 +38,30 @@ class Salesforce {
 
    public $DashboardConnection = FALSE;
 
+   /**
+    * Set up Salesforce access properties.
+    *
+    * @param bool $AccessToken
+    * @param bool $InstanceUrl
+    */
    public function __construct($AccessToken = FALSE, $InstanceUrl = FALSE) {
-      if ($AccessToken != FALSE && $InstanceUrl != FALSE) {
+      if ($AccessToken && $InstanceUrl) {
+         // We passed in a connection
          $this->AccessToken = $AccessToken;
          $this->InstanceUrl = $InstanceUrl;
       } elseif (Gdn::Session()->IsValid()) {
-         $this->AccessToken = GetValue('AccessToken', Gdn::Session()->User->Attributes['Salesforce']);
-         $this->InstanceUrl = GetValue('InstanceUrl', Gdn::Session()->User->Attributes['Salesforce']);
-         $this->RefreshToken = GetValue('RefreshToken', Gdn::Session()->User->Attributes['Salesforce']);
+         // See if user has their own connection established.
+         if ($UserConnection = val('Salesforce', Gdn::Session()->User->Attributes)) {
+            $this->AccessToken = val('AccessToken', $UserConnection);
+            $this->InstanceUrl = val('InstanceUrl', $UserConnection);
+            $this->RefreshToken = val('RefreshToken', $UserConnection);
+         }
       }
-      if (C('Plugins.Salesforce.DashboardConnection.Enabled', FALSE)
-         && $this->AccessToken == FALSE && $this->InstanceUrl == FALSE)
-      {
+
+      // Fallback to global dashboard connection.
+      if (C('Plugins.Salesforce.DashboardConnection.Enabled') && !$this->AccessToken) {
          $this->UseDashboardConnection();
-         $this->DashboardConnection = TRUE;
+         $this->DashboardConnection = true;
       }
    }
 
@@ -543,6 +553,11 @@ class Salesforce {
    public function Reconnect() {
       if ($this->DashboardConnection) {
          $Response = $this->Refresh($this->RefreshToken);
+         if (!$Response) {
+            return false;
+         }
+
+         // Update global connection.
          $InstanceUrl = $Response['instance_url'];
          $AccessToken = $Response['access_token'];
          SaveToConfig(array(
@@ -553,19 +568,22 @@ class Salesforce {
          $this->SetInstanceUrl($InstanceUrl);
       } else {
          $Response = $this->Refresh($this->RefreshToken);
-         if ($Response != FALSE) {
-            $Profile = GetValueR('Attributes.' . self::ProviderKey . '.Profile', Gdn::Session()->User);
-            $Attributes = array(
-               'RefreshToken' => $this->RefreshToken,
-               'AccessToken' => $Response['access_token'],
-               'InstanceUrl' => $Response['instance_url'],
-               'Profile' => $Profile,
-            );
-
-            Gdn::UserModel()->SaveAttribute(Gdn::Session()->UserID, self::ProviderKey, $Attributes);
-            $this->SetAccessToken($Response['access_token']);
-            $this->SetInstanceUrl($Response['instance_url']);
+         if (!$Response) {
+            return false;
          }
+
+         // Update user connection.
+         $Profile = valr('Attributes.' . self::ProviderKey . '.Profile', Gdn::Session()->User);
+         $Attributes = array(
+            'RefreshToken' => $this->RefreshToken,
+            'AccessToken' => $Response['access_token'],
+            'InstanceUrl' => $Response['instance_url'],
+            'Profile' => $Profile,
+         );
+
+         Gdn::UserModel()->SaveAttribute(Gdn::Session()->UserID, self::ProviderKey, $Attributes);
+         $this->SetAccessToken($Response['access_token']);
+         $this->SetInstanceUrl($Response['instance_url']);
       }
    }
 
