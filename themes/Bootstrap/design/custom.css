@@ -1,11 +1,24 @@
+@charset "UTF-8";
 /** Scaffolding **/
 /** Grid **/
 #Panel {
   width: 300px;
+  *zoom: 1;
+}
+#Panel:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 #Body .ContentColumn {
   margin-left: 340px;
+  *zoom: 1;
+}
+#Body .ContentColumn:after {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .Row {
@@ -50,17 +63,17 @@
   }
 
   .NavBar .MeWrap {
-    right: 40px !important;
+    right: 40px !Important;
   }
 }
 @media (min-width: 1101px) {
   .PhotoWrapLarge {
-    border: solid 1px #dddddd;
+    border: solid 1px #ddd;
     padding: 24px;
     border-radius: .5ex;
     background: #EFEFEF;
     margin-bottom: 20px;
-    box-shadow: 0 1px 1px white inset;
+    box-shadow: 0 1px 1px #fff inset;
     box-sizing: content-box;
   }
 
@@ -165,7 +178,7 @@ body > #Frame > .Head {
 .NavBar .Username:hover,
 .NavBar .MeBox-SignIn a:hover {
   text-decoration: none;
-  color: white !important;
+  color: #fff !Important;
 }
 
 .NavBar .Bullet {
@@ -209,14 +222,17 @@ body > #Frame > .Head {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f5f5f5', endColorstr='#eeeeee',GradientType=0 );
   background-image: linear-gradient(top, #f5f5f5 0%, #eeeeee 100%);
   margin-bottom: 25px;
-  border-bottom: solid 1px #dddddd;
+  border-bottom: solid 1px #ddd;
   font-weight: 300;
+}
+.BreadcrumbsWrapper .SiteSearch {
+  float: right;
 }
 
 .SiteSearch .InputBox {
   float: right;
   padding: 4px 25px 4px 5px;
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
 }
 
 /*** Forms ***/
@@ -225,7 +241,7 @@ body > #Frame > .Head {
   padding: 19px;
   margin-bottom: 20px;
   background-color: #f5f5f5;
-  border: 1px solid #eeeeee;
+  border: 1px solid #eee;
   border: 1px solid rgba(0, 0, 0, 0.05);
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -297,6 +313,10 @@ body > #Frame > .Head {
   border-radius: 5px;
 }
 
+.SmallButton {
+  padding: 4px 6px;
+}
+
 .ButtonGroup.Big .Button {
   line-height: 1;
   padding-top: 10px;
@@ -328,7 +348,10 @@ body > #Frame > .Head {
 }
 
 .Handle.Primary .Sprite {
-  border-color: white transparent transparent transparent;
+  border-color: #fff transparent transparent transparent;
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
 }
 
 .Open .Handle .Sprite {
@@ -336,7 +359,7 @@ body > #Frame > .Head {
 }
 
 .Open .Handle.Primary .Sprite {
-  border-color: black transparent transparent transparent;
+  border-color: #000 transparent transparent transparent;
 }
 
 /*** Navigation ***/
@@ -355,7 +378,7 @@ body > #Frame > .Head {
 }
 
 #Panel .FilterMenu li {
-  border: none !important;
+  border: none !Important;
   padding: 0;
 }
 
@@ -431,7 +454,7 @@ body > #Frame > .Head {
 }
 
 .Pager a, .Pager span {
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
   border-left-width: 0;
   padding: 0 11px;
   line-height: 28px;
@@ -479,7 +502,7 @@ body > #Frame > .Head {
 }
 
 .MenuItems a {
-  text-shadow: none !important;
+  text-shadow: none !Important;
 }
 
 .PageControls {
@@ -585,8 +608,8 @@ body > #Frame > .Head {
 }
 
 .Item.Read .Tag, .Item.Read .Tag a {
-  background: #bbbbbb !important;
-  color: #f7f7f7 !important;
+  background: #bbb !Important;
+  color: #f7f7f7 !Important;
 }
 
 .DataList.Discussions .Item.Read .MCount, .DataList.Discussions .Item.Read .HasNew {
@@ -629,7 +652,7 @@ body > #Frame > .Head {
 }
 
 .DataTable tbody td {
-  border: solid 0px #dddddd;
+  border: solid 0px #ddd;
   border-bottom-width: 1px;
 }
 
@@ -672,6 +695,9 @@ body > #Frame > .Head {
   border: none;
   border-radius: 0;
 }
+.Activities .Item {
+  min-height: 40px;
+}
 .Activities .DataList .Item:first-child {
   border-radius: 0;
 }
@@ -680,7 +706,7 @@ body > #Frame > .Head {
 .Box {
   background: rgba(0, 0, 0, 0.02);
   padding: 10px;
-  border: solid 1px #dddddd;
+  border: solid 1px #ddd;
   border-radius: .5ex;
   margin: 20px 0;
 }
@@ -690,9 +716,9 @@ body > #Frame > .Head {
   margin: -10px -10px 10px;
   padding: 15px 10px;
   line-height: 1;
-  border-radius: 0.5ex 0.5ex 0 0;
-  border-bottom: solid 1px #dddddd;
-  box-shadow: 0 1px 1px white inset;
+  border-radius: .5ex .5ex 0 0;
+  border-bottom: solid 1px #ddd;
+  box-shadow: 0 1px 1px #fff inset;
 }
 
 .Box h4 + .PanelInfo {
@@ -780,7 +806,7 @@ div.Popup .Border {
 div.Popup h1 {
   margin: -15px -15px 15px;
   padding: 9px 15px;
-  border-bottom: solid 1px #eeeeee;
+  border-bottom: solid 1px #eee;
   font-size: 18px;
   line-height: 27px;
 }
@@ -789,8 +815,8 @@ div.Popup .Buttons {
   margin: 15px -15px -15px;
   padding: 15px;
   background: #f5f5f5;
-  border-top: 1px solid #dddddd;
-  box-shadow: inset 0 1px 0 white;
+  border-top: 1px solid #ddd;
+  box-shadow: inset 0 1px 0 #ffffff;
   border-radius: 0 0 6px 6px;
 }
 
@@ -998,6 +1024,10 @@ a.Close:hover {
   background-position: -200px -80px;
 }
 
+.SpGroups {
+  background-position: -240px -40px;
+}
+
 .SpImage {
   background-position: -120px -140px;
 }
@@ -1036,6 +1066,10 @@ a.Close:hover {
 
 .SpQuote {
   background-position: -280px -20px;
+}
+
+.SpReply {
+  background-position: -140px -40px;
 }
 
 .SpSignOut {

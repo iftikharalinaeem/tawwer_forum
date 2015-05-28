@@ -24,28 +24,28 @@
    #Panel {
       width: 220px;
    }
-   
+
    .ProfilePhotoLarge {
       width: 220px;
    }
-   
+
    .PhotoWrap.Jailed .ProfilePhotoLarge,
    .PhotoWrapLarge.Jailed:before {
       width: 220px;
       height: 220px;
    }
-   
+
    #Body .ContentColumn {
       margin-left: 240px;
   }
 }
 
-@media only screen 
-   and (min-device-width : 768px) 
-   and (max-device-width : 1024px) 
+@media only screen
+   and (min-device-width : 768px)
+   and (max-device-width : 1024px)
    and (orientation : portrait),
    (max-width: 960px) {
-      
+
    #Panel {
       display: none;
    }
@@ -59,7 +59,7 @@
       margin: 0 20px;
       min-width: inherit;
    }
-   
+
    .NavBar .MeWrap {
       right: 40px !Important;
    }
@@ -75,12 +75,12 @@
       box-shadow: 0 1px 1px #fff inset;
       box-sizing: content-box;
    }
-   
+
    .ProfilePhotoLarge,
    .PhotoWrap a.ChangePicture {
       width: 250px;
    }
-   
+
    .PhotoWrap.Jailed .ProfilePhotoLarge,
    .PhotoWrapLarge.Jailed:before {
       width: 250px;
@@ -155,7 +155,7 @@ h1, h2, h3, h4, h5 {
    top: 0;
 }
 
-.NavBar .SiteMenu a 
+.NavBar .SiteMenu a
 .NavBar .Username {
     font-weight: normal;
     color: #999999;
@@ -228,7 +228,7 @@ body > #Frame > .Head {
    margin-bottom: 25px;
    border-bottom: solid 1px #ddd;
    font-weight: 300;
-   
+
    .SiteSearch {
       float: right;
    }
@@ -358,6 +358,9 @@ body > #Frame > .Head {
 
 .Handle.Primary .Sprite {
    border-color: #fff transparent transparent transparent;
+   width: 8px;
+   height: 8px;
+   box-sizing: border-box;
 }
 
 .Open .Handle .Sprite {
@@ -420,12 +423,12 @@ body > #Frame > .Head {
 
 #Panel .SideMenu .PanelInfo li {
    padding: 0;
-   
+
    a {
       padding: 5px 10px;
       display: block;
       text-shadow: none;
-      
+
       &:hover {
          color: $linkColorHover;
       }
@@ -702,11 +705,11 @@ body > #Frame > .Head {
       border: none;
       border-radius: 0;
    }
-   
+
    .Item {
       min-height: 40px;
    }
-   
+
    .DataList .Item:first-child {
       border-radius: 0;
    }
