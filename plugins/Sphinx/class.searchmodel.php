@@ -148,10 +148,12 @@ class SearchModel extends Gdn_Model {
     * @return array
     */
    public function GetGroups($ids) {
+      $sql = Gdn::SQL();
+
+      $this->EventArguments['sql'] = $sql;
       $this->FireEvent("GetGroups");
 
-      $sql = Gdn::SQL();
-      $sql->Select('g.GroupID as PrimaryID, g.GroupID, g.Name as Title, g.Description as Summary, g.Format, 0')
+     $sql->Select('g.GroupID as PrimaryID, g.GroupID, g.Name as Title, g.Description as Summary, g.Format, 0')
          ->Select('g.DateInserted, 1000 as Score, \'group\' as Type')
          ->Select('g.InsertUserID as UserID');
       $result = $sql->From('Group g')

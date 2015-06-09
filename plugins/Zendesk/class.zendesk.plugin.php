@@ -687,7 +687,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @param Controller $Sender Sending controller.
      * @param array $Args Event arguments.
      */
-    public function Base_GetConnections_Handler($Sender, $Args) {
+    public function base_getConnections_handler($Sender, $Args) {
         if (!$this->isConfigured()) {
             return;
         }
