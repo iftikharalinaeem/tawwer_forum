@@ -12,6 +12,8 @@
             <th></th>
          <?php endif; ?>
          <th class="Alt"><?php echo T('Description'); ?></th>
+         <th><?php echo T('Class'); ?></th>
+         <th><?php echo T('Level'); ?></th>
          <th><?php echo T('Given'); ?></th>
          <th class="Alt"><?php echo T('Active'); ?></th>
          <!--<th><?php echo T('Visible'); ?></th>-->
@@ -20,11 +22,11 @@
    </thead>
    <tbody>
       <?php
-      if (count($this->Data('Badges'))) : 
+      if (count($this->Data('Badges'))) :
          include($this->FetchViewLocation('badges'));
       else :
          echo '<tr><td colspan="' . (CheckPermission('Reputation.Badges.Give') ? '7' : '6') . '">' . T('No badges yet.') . '</td></tr>';
-      endif; 
+      endif;
       ?>
    </tbody>
 </table>
