@@ -9,7 +9,7 @@
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.4.0',
+    'Version' => '2.4.1',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
