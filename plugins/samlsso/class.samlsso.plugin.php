@@ -187,20 +187,17 @@ class SamlSSOPlugin extends Gdn_Plugin {
       Redirect($url);
    }
 
-   public function EntryController_OverrideSignOut_Handler($Sender, $Args) {
-      $Provider = $Args['DefaultProvider'];
-      if ($Provider['AuthenticationSchemeAlias'] != 'saml' || !$Provider['SignOutUrl']) {
+   public function EntryController_OverrideSignOut_Handler($sender, $args) {
+      $provider = $args['DefaultProvider'];
+      if ($provider['AuthenticationSchemeAlias'] != 'saml' || !$provider['SignOutUrl']) {
          return;
       }
 
-      // Prevent the default signout because we are waiting for a valid command from SAML.
-      if (val('SignoutWithSAML', $Provider)) {
-          SaveToConfig('Garden.SSO.Signout', 'none', FALSE);
-      }
+      SaveToConfig('Garden.SSO.Signout', 'none', FALSE);
 
-      $get = $Sender->Request->Get();
-      $samlRequest = $Sender->Request->Get('SAMLRequest');
-      $samlResponse = $Sender->Request->Get('SAMLResponse');
+      $get = $sender->Request->Get();
+      $samlRequest = $sender->Request->Get('SAMLRequest');
+      $samlResponse = $sender->Request->Get('SAMLResponse');
       $settings = $this->GetSettings();
 
       if ($samlRequest) {
@@ -225,10 +222,18 @@ class SamlSSOPlugin extends Gdn_Plugin {
             Redirect('/');
          }
       } else {
+         if (!val('SignoutWithSAML', $provider)
+             && (Gdn::session()->validateTransientKey($args['TransientKey']) || Gdn::request()->isPostBack())) {
+
+             Gdn::session()->end();
+         }
+
          // The user is signing out from Vanilla and must make a request.
-         $request = new OneLogin_Saml_LogoutRequest($settings);
-         $url = $request->getRedirectUrl();
-         Redirect($url);
+         if (val('idpSingleSignOutUrl', $settings)) {
+             $request = new OneLogin_Saml_LogoutRequest($settings);
+             $url = $request->getRedirectUrl();
+             redirect($url);
+         }
       }
    }
 
