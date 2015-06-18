@@ -14,10 +14,20 @@ class EmailRouterController extends Gdn_Controller {
     *
     * @var array
     */
-   public $Aliases = array(
-      'adobeprerelease' => 'https://forums.adobeprereleasestaging.com',
+   public $Aliases = [
+      'adobeprerelease' => 'https://forums.adobeprerelease.com',
       'adobeprereleasestage' => 'https://forums.stage.adobeprerelease.com'
-   );
+   ];
+
+   /**
+    * @var array A map of email domain names to forum domain names.
+    */
+   protected $emailDomains = [
+      'email.vanillaforums.com' => 'vanillaforums.com',
+      'vanillaforums.email' => 'vanillaforums.com',
+      'vanillacommunity.email' => 'vanillacommunity.com',
+      'vanillacommunities.email' => 'vanillacommunities.com'
+   ];
    
    /// Methods ///
    
@@ -39,7 +49,13 @@ class EmailRouterController extends Gdn_Controller {
 //      $this->MasterView = 'default';
       parent::Initialize();
    }
-   
+
+   /**
+    * Parse a free-form email address into the name and email address.
+    *
+    * @param string $Email The email address to parse.
+    * @return array Returns an array in the form `[$name, $email]`.
+    */
    public static function ParseEmailAddress($Email) {
       $Name = '';
       if (preg_match('`([^<]*)<([^>]+)>`', $Email, $Matches)) {
@@ -58,6 +74,24 @@ class EmailRouterController extends Gdn_Controller {
       $Result = array($Name, $Email);
       return $Result;
    }
+
+   /**
+    * Parse the email domain out of a raw email field.
+    *
+    * @param string $email The email to parse.
+    * @param bool $onlyExisting Whether or not to check the domain against {@link $this->emailDomains}.
+    * @return array Returns an array in the form `[$to, $domain]` or `['', '']` if the email domain isn't in our list.
+    */
+   public function parseEmailDomain($email, $onlyExisting) {
+      list($_, $email) = static::ParseEmailAddress($email);
+      list($to, $domain) = explode('@', $email, 2);
+
+      if ($onlyExisting && !array_key_exists($domain, $this->emailDomains)) {
+         return ['', ''];
+      } else {
+         return [$to, $domain];
+      }
+   }
    
    public static function ParseEmailHeader($Header) {
       $Result = array();
@@ -65,6 +99,7 @@ class EmailRouterController extends Gdn_Controller {
 
       $i = NULL;
       foreach ($Parts as $Part) {
+         $Part = trim($Part);
          if (!$Part)
             continue;
          if (preg_match('`^\s`', $Part)) {
@@ -152,9 +187,12 @@ class EmailRouterController extends Gdn_Controller {
             
             // Figure out the url from the email's address.
             $To = GetValue('x-forwarded-to', $Headers);
+            $quotedDomains = array_map('preg_quote', array_keys($this->emailDomains));
+            $pregDomains = implode('|', $quotedDomains);
+
             if (!$To) {
-               // Check received header.
-               if (preg_match('`<([^<>@]+@email.vanillaforums.com)>`', $Headers['received'], $Matches)) {
+               // Check the received header.
+               if (preg_match("`<([^<>@]+@(?:$pregDomains))>`", $Headers['received'], $Matches)) {
                   $To = $Matches[1];
                } else {
                   $To = $Data['To'];
@@ -170,23 +208,25 @@ class EmailRouterController extends Gdn_Controller {
                $Data['ResponseText'] = 'Out of office';
                $LogID = $LogModel->Insert($Data);
                return;
+            } elseif ($this->isServerStatus($Headers, $Data)) {
+               $Data['Response'] = 202;
+               $Data['ResponseText'] = 'Server status';
+               $LogID = $LogModel->Insert($Data);
+               return;
             }
 
             $LogID = $LogModel->Insert($Data);
             
             list($Name, $Email) = self::ParseEmailAddress($To);
-            if (preg_match('`([^+@]+)([^@]*)@email[a-z]*.vanillaforums.com`', $Email, $Matches)) {
+            list($slug, $emailDomain) = $this->parseEmailDomain($Email, true);
+            if ($emailDomain && preg_match('`([^+@]+)([^@]*)$`', $slug, $Matches)) {
                $ToParts = explode('.', strtolower($Matches[1]));
-               $Args = $Matches[0];
+//               $Args = $Matches[2];
+
+               // Check for http or https.
                $Scheme = 'http';
-               
-               if (count($ToParts) > 1) {
-                  // Check for http or https.
-                  $Part = array_shift($ToParts);
-                  if (in_array($Part, array('http', 'https')))
-                     $Scheme = $Part;
-                  else
-                     array_unshift($ToParts, $Part);
+               if (in_array(reset($ToParts), ['http', 'https'])) {
+                  $Scheme = array_shift($ToParts);
                }
 
                $Folder = '';
@@ -209,9 +249,9 @@ class EmailRouterController extends Gdn_Controller {
                      $Data[$To] = $To;
                   }
                } else {
-                  $Domain = $ToParts[0].'.vanillaforums.com';
+                  $Domain = $ToParts[0].'.'.$this->emailDomains[$emailDomain];
                }
-               
+
                $Url = "$Scheme://{$Domain}{$Folder}/utility/email.json";
                $LogModel->SetField($LogID, array('Url' => $Url));
             } else {
@@ -246,7 +286,10 @@ class EmailRouterController extends Gdn_Controller {
             } else {
                $Error = curl_error($C)."\n\n$Result";
                $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Error));
-               throw new Exception($Error, $Code);
+
+               if ($Code != 404) {
+                  throw new Exception($Error, $Code);
+               }
             }
          }
 
@@ -275,6 +318,21 @@ class EmailRouterController extends Gdn_Controller {
          val('auto-submitted', $headers) == 'auto-replied' ||
          stripos($data['Subject'], 'Out of Office') !== false
       ) {
+         return true;
+      }
+      return false;
+   }
+
+   /**
+    * Determines whether or not an email is a system administrative status.
+    *
+    * @param array $headers The array of email headers.
+    * @return bool Returns true if the headers indicate a system administrative status, or false otherwise.
+    */
+   public function isServerStatus($headers) {
+      $contentType = val('content-type', $headers);
+
+      if (stripos($contentType, 'multipart/report') !== false) {
          return true;
       }
       return false;
