@@ -3,7 +3,7 @@
 $PluginInfo['samlsso'] = array(
     'Name' => 'SAML SSO',
     'Description' => 'Allows Vanilla to SSO to a SAML 2.0 compliant identity provider.',
-    'Version' => '1.2.1',
+    'Version' => '1.3.0',
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'RequiredTheme' => false,
     'RequiredPlugins' => false,
@@ -193,8 +193,10 @@ class SamlSSOPlugin extends Gdn_Plugin {
          return;
       }
 
-      // Prevent
-      SaveToConfig('Garden.SSO.Signout', 'none', FALSE);
+      // Prevent the default signout because we are waiting for a valid command from SAML.
+      if (val('SignoutWithSAML', $Provider)) {
+          SaveToConfig('Garden.SSO.Signout', 'none', FALSE);
+      }
 
       $get = $Sender->Request->Get();
       $samlRequest = $Sender->Request->Get('SAMLRequest');
@@ -372,6 +374,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
          'IsDefault' => array('Control' => 'CheckBox', 'LabelCode' => 'Make this connection your default signin method.'),
          'SpPrivateKey' => array('LabelCode' => 'SP Private Key', 'Description' => 'If you want to sign your requests then you need this key.', 'Options' => array('Multiline' => TRUE, 'Class' => 'TextBox BigInput')),
          'SpCertificate' => array('LabelCode' => 'SP Certificate', 'Description' => 'This is the certificate that you will give to your IDP.', 'Options' => array('Multiline' => TRUE, 'Class' => 'TextBox BigInput')),
+         'SignoutWithSAML' => array('Control' => 'CheckBox', 'LabelCode' => 'Only sign out with valid SAML logout requests.'),
          'Metadata' => array('Control' => 'Callback', 'Callback' => function($form) {
                return $form->Label('Metadata').
                   '<div class="Info">'.
