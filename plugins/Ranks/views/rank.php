@@ -89,18 +89,18 @@ echo $this->Form->Open(), $this->Form->Errors();
       $this->Form->TextBox('Criteria_CountPosts', array('class' => 'Input SmallInput'));
      ?>
    </li>
-   <li>
-      <?php
+    <li>
+        <?php
          echo $this->Form->Label('Role', 'Criteria_Points'),
             '<div class="Info2">'."Users with the following roles will gain this rank.".'</div>';
-         $Roles = RoleModel::Roles();
-         $RoleNames[] = '';
-         foreach($Roles as $Role) {
+        $Roles = RoleModel::Roles();
+        $RoleNames[] = '';
+        foreach($Roles as $Role) {
             $RoleNames[GetValue('Name', $Role)] = GetValue('Name', $Role);
-         }
-         echo $this->Form->DropDown('Criteria_Role', $RoleNames);
-      ?>
-   </li>
+        }
+        echo $this->Form->DropDown('Criteria_Role', $RoleNames);
+        ?>
+    </li>
    <li>
      <?php
      echo $this->Form->Label('Permission', 'Criteria_Permission'),
