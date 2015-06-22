@@ -14,13 +14,26 @@
    ?>
 </div>
 
+<div class="Group-Info ClearFix clearfix">
+  <?php
+   echo Gdn_Theme::Module('GroupInfoModule');
+   echo Gdn_Theme::Module('GroupLeadersModule');
+   echo Gdn_Theme::Module('GroupMembersModule');
+   ?>
+</div>
+
+
 <?php if (GroupPermission('View')): ?>
 
 <div class="Group-Content">
    <?php
    WriteGroupApplicants($this->Data('Applicants'));
+   if ($this->Data('Applicants')) {
+     $applicantList = new ApplicantListModule($this->Data('Applicants'), $this->Data('Group'), t('Applicants & Invitations'));
+     echo $applicantList;
+   }
    ?>
-   
+
    <div class="Group-Box Box-Events Group-Events">
       <h2><?php echo T('Upcoming Events'); ?></h2>
       <?php $EmptyMessage = T('GroupEmptyEvents', "Aw snap, no events are coming up."); ?>
@@ -29,11 +42,17 @@
       echo '<div class="MoreWrap">'.Anchor(sprintf(T('All %s'), T('Events')), Url(CombinePaths(array("/events/group/", GroupSlug($this->Data('Group')))))).'</div>';
       ?>
    </div>
-   
+  <?php
+  $eventList = new EventListModule($this->Data('Events'), $this->Data('Group'), t('Upcoming Events'), t('GroupEmptyEvents', "Aw snap, no events are coming up."));
+  echo $eventList;
+
+
+  ?>
+
    <div class="Group-Box Group-Announcements Section-DiscussionList">
       <h2><?php echo T('Announcements'); ?></h2>
       <?php $EmptyMessage = T('GroupEmptyAnnouncements', "Important stuff will go here one day."); ?>
-      
+
       <?php
       if (GroupPermission('Moderate')) {
          echo '<div class="Button-Controls">';
@@ -41,13 +60,13 @@
          echo '</div>';
       }
       ?>
-      
+
       <?php WriteDiscussionBlogList($this->Data('Announcements'), $EmptyMessage); ?>
    </div>
-   
+
    <div class="Group-Box Group-Discussions Section-DiscussionList">
       <h2><?php echo T('Discussions'); ?></h2>
-      
+
       <?php
       if (GroupPermission('Member')) {
          echo '<div class="Button-Controls">';
@@ -55,7 +74,7 @@
          echo '</div>';
       }
       ?>
-      
+
       <?php $EmptyMessage = T('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"); ?>
       <?php WriteDiscussionList($this->Data('Discussions'), $EmptyMessage); ?>
       <?php
@@ -70,13 +89,13 @@
 
 <div class="Group-Footer Box">
    <h2><?php echo sprintf(T('More About %s'), htmlspecialchars($this->Data('Group.Name'))); ?></h2>
-   
+
    <!-- Leaders -->
    <div class="Group-Box Group-Leaders">
       <h3><?php echo Anchor(T('Group Leaders', 'Leaders'), GroupUrl($this->Data('Group'), 'members')); ?></h3>
       <?php WriteMemberSimpleList($this->Data('Leaders')); ?>
    </div>
-   
+
    <!-- Info -->
    <div class="Group-Box Group-Info">
       <h3><?php echo T('Group Info'); ?></h3>
@@ -84,7 +103,7 @@
       WriteGroupInfo();
       ?>
    </div>
-    
+
    <!-- Members -->
    <div class="Group-Box Group-MembersPreview">
       <h3><?php echo Anchor(T('Group Members', 'Members'), GroupUrl($this->Data('Group'), 'members'));?></h3>
