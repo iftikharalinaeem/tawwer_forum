@@ -288,7 +288,7 @@ class RankModel extends Gdn_Model {
          SaveToConfig('Garden.EditContentTimeout', $V, FALSE);
       }
 
-       $permissionRole = val('PermissionRole', $Rank);
+       $permissionRole = val('Abilities_PermissionRole', $Rank);
        if($permissionRole) {
            $rankPermissions = Gdn::permissionModel()->getPermissionsByRole($permissionRole);
            Gdn::session()->addPermissions($rankPermissions);

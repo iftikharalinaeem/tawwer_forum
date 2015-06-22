@@ -89,18 +89,18 @@ echo $this->Form->Open(), $this->Form->Errors();
       $this->Form->TextBox('Criteria_CountPosts', array('class' => 'Input SmallInput'));
      ?>
    </li>
-    <li>
-        <?php
-        echo $this->Form->Label('Minimum Role Requirement', 'Criteria_Points'),
+   <li>
+      <?php
+         echo $this->Form->Label('Role', 'Criteria_Points'),
             '<div class="Info2">'."Users with the following roles will gain this rank.".'</div>';
-        $Roles = RoleModel::Roles();
-        $RoleNames[] = '';
-        foreach($Roles as $Role) {
+         $Roles = RoleModel::Roles();
+         $RoleNames[] = '';
+         foreach($Roles as $Role) {
             $RoleNames[GetValue('Name', $Role)] = GetValue('Name', $Role);
-        }
-        echo $this->Form->DropDown('Criteria_Role', $RoleNames);
-        ?>
-    </li>
+         }
+         echo $this->Form->DropDown('Criteria_Role', $RoleNames);
+      ?>
+   </li>
    <li>
      <?php
      echo $this->Form->Label('Permission', 'Criteria_Permission'),
@@ -247,9 +247,9 @@ echo $this->Form->Open(), $this->Form->Errors();
    </li>
     <li>
         <?php
-        echo $this->Form->Label('Role Earned', 'Criteria_Points'),
+        echo $this->Form->Label('Role Earned', 'Abilities_PermissionRole'),
             '<div class="Info2">'.t('Grant the permissions of this role.', "Users with this rank will gain the permissions of this role.").'</div>';
-        echo $this->Form->DropDown('PermissionRole', $this->data('_Roles'), array('IncludeNull' => true));
+        echo $this->Form->DropDown('Abilities_PermissionRole', $this->data('_Roles'), array('IncludeNull' => true));
         ?>
     </li>
 </ul>
