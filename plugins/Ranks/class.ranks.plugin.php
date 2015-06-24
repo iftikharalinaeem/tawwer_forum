@@ -283,6 +283,11 @@ class RanksPlugin extends Gdn_Plugin {
       $this->_AddEdit($Sender, $RankID);
    }
 
+    /**
+     * @param Gdn_Controller $Sender
+     * @param int|bool $RankID
+     * @throws Exception
+     */
    protected function _AddEdit($Sender, $RankID = FALSE) {
       $Sender->Permission('Garden.Settings.Manage');
 
@@ -296,11 +301,16 @@ class RanksPlugin extends Gdn_Plugin {
       $Formats = array('Text' => 'text', 'TextEx' => 'text, links, and youtube', '' => sprintf('default (%s)', $DefaultFormat));
       $Sender->SetData('_Formats', $Formats);
 
+      $roles = RoleModel::roles();
+      $roles = array_column($roles, 'Name', 'RoleID');
+      $Sender->setData('_Roles', $roles);
+
       if ($Sender->Form->AuthenticatedPostBack()) {
          $Data = $Sender->Form->FormValues();
          unset($Data['hpt'], $Data['Checkboxes'], $Data['Save']);
 
          $SaveData = array();
+
          foreach ($Data as $Key => $Value) {
             if (strpos($Key, '_') !== FALSE) {
                if ($Value === '')
