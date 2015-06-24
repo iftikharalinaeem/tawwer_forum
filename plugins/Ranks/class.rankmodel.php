@@ -150,6 +150,13 @@ class RankModel extends Gdn_Model {
          $Result[] = '<b>'.T('Editing').'</b>: '.GetValue($V, $Options);
       }
 
+      if ($v = val('PermissionRole', $Abilities)) {
+          $role = RoleModel::roles($v);
+          if ($role) {
+              $Result[] = '<b>Role Permissions</b>: '.htmlspecialchars($role['Name']);
+          }
+      }
+
       if (count($Result) == 0) {
          return '';
       } elseif (count($Result) == 1) {

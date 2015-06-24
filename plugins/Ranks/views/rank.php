@@ -247,7 +247,7 @@ echo $this->Form->Open(), $this->Form->Errors();
    </li>
     <li>
         <?php
-        echo $this->Form->Label('Role Earned', 'Abilities_PermissionRole'),
+        echo $this->Form->Label('Role Permissions', 'Abilities_PermissionRole'),
             '<div class="Info2">'.t('Grant the permissions of this role.', "Users with this rank will gain the permissions of this role.").'</div>';
         echo $this->Form->DropDown('Abilities_PermissionRole', $this->data('_Roles'), array('IncludeNull' => true));
         ?>
