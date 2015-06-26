@@ -5,15 +5,17 @@ $list = $this->data('list');
 // Table view
 if (val('view', $list) == 'table') {
   ?>
-  <div class="DataTableContainer">
+  <div class="DataTableContainer Group-Box Group-Events">
     <?php
     if (val('title', $list)) { ?><h2 class="Groups H"><?php echo val('title', $list); ?></h2><?php }
     if (val('buttons', $list)) {
+      echo '<div class="BoxButtons BoxNewDiscussion">';
       foreach (val('buttons', $list) as $button) { ?>
-        <div class="Buttons <?php echo val('buttonsCssClass', $list); ?>">
-          <a class="Button <?php echo val('cssClass', $button); ?>" href="<?php echo val('url', $button) ?>" role="button"><?php echo val('text', $button); ?></a>
+        <div class="Button-Controls NewDiscussion<?php echo val('buttonsCssClass', $list); ?>">
+          <a class="Button Primary <?php echo val('cssClass', $button); ?>" href="<?php echo val('url', $button) ?>" role="button"><?php echo val('text', $button); ?></a>
         </div>
       <?php } ?>
+      </div>
     <?php } ?>
     <div class="DataTableWrap">
       <table class="DataTable">
@@ -49,8 +51,14 @@ if (val('view', $list) == 'table') {
                         </a>
                       <?php } ?>
                     <?php } ?>
-                    <?php if (val('heading', $item)) { ?>
-                      <h3>
+                    <?php if (val('dateTile', $item)) { ?>
+                    <span class="DateTile">
+                       <span class="Month"><?php echo val('monthTile', $item); ?></span>
+                       <span class="Day"><?php echo val('dayTile', $item); ?></span>
+                    </span>
+                    <?php } ?>
+                      <?php if (val('heading', $item)) { ?>
+                      <h3 class="Title-Wrapper">
                         <?php if (val('url', $item)) { ?>
                         <a class="Title <?php echo val('headingCssClass', $item); ?>" href="<?php echo val('url', $item); ?>">
                           <?php } ?>
@@ -60,15 +68,15 @@ if (val('view', $list) == 'table') {
                       <?php } ?>
                       </h3>
                     <?php } ?>
-                    <div class="Description <?php echo val('textCssClass', $item); ?>"><?php echo val('text', $item); ?></div>
-                    <ul class="<?php echo val('metaCssClass', $item); ?>">
+                    <div class="Description Excerpt <?php echo val('textCssClass', $item); ?>"><?php echo val('text', $item); ?></div>
+                    <div class="Meta <?php echo val('metaCssClass', $item); ?>">
                       <?php foreach(val('meta', $item) as $metaItem) { ?>
-                        <li role="presentation" class="<?php echo val('cssClass', $metaItem); ?>">
+                        <span class="MItem <?php echo val('cssClass', $metaItem); ?>">
                           <?php echo val('text', $metaItem);
                           if (val('linkText', $metaItem)) { ?>
                             <a href="<?php echo val('url', $metaItem); ?>"><?php echo val('linkText', $metaItem); ?></a>
                           <?php } ?>
-                        </li>
+                        </span>
                       <?php } ?>
                     </ul>
                   </div>
@@ -100,6 +108,15 @@ if (val('view', $list) == 'table') {
                     <div class="Meta">
                       <a class="CommentDate MItem" href="<?php echo val('userPostUrl', $row); ?>"><?php echo val('userPostTime', $row); ?></a>
                     </div>
+                  </div>
+                </td>
+              <?php } ?>
+              <?php if (val('type', $row) == 'buttons') { ?>
+                <td class="BlockColumn BlockColumn-Buttons User">
+                  <div class="Buttons <?php echo val('cssClass', $row); ?>">
+                    <?php foreach (val('buttons', $row) as $button) { ?>
+                      <a class="Button <?php echo val('cssClass', $button); ?>" href="<?php echo val('url', $button) ?>" role="button"><?php echo val('text', $button); ?></a>
+                    <?php } ?>
                   </div>
                 </td>
               <?php } ?>
@@ -141,14 +158,29 @@ if (val('view', $list) == 'table') {
 
 // Modern view
 else if (val('view', $list) == 'modern') { ?>
-  <div class="media-list-container">
-    <h2 class="media-list-heading"><?php echo val('title', $list); ?></h2>
+  <div class="media-list-container Group-Box Group-Events">
+    <h2 class="media-list-heading"><?php echo val('title', $list); ?></h2> <?php
+    if (val('buttons', $list)) {
+      foreach (val('buttons', $list) as $button) { ?>
+        <div class="Button-Controls <?php echo val('buttonsCssClass', $list); ?>">
+          <a class="Button <?php echo val('cssClass', $button); ?>" href="<?php echo val('url', $button) ?>" role="button"><?php echo val('text', $button); ?></a>
+        </div>
+      <?php } ?>
+    <?php } ?>
     <ul class="media-list DataList">
       <?php foreach(val('items', $list) as $item) { ?>
         <li id="<?php echo val('id', $item); ?>" class="Item <?php echo val('cssClass', $item); ?>">
-          <a href="<?php echo val('url', $item); ?>" class="IndexPhoto PhotoWrap">
-            <img class="ProfilePhoto ProfilePhotoMedium <?php echo val('imageCssClass', $item); ?>" src="<?php echo val('imageSource', $item); ?>">
-          </a>
+          <?php if (val('imageSource', $item)) { ?>
+            <a href="<?php echo val('url', $item); ?>" class="IndexPhoto PhotoWrap">
+              <img class="ProfilePhoto ProfilePhotoMedium <?php echo val('imageCssClass', $item); ?>" src="<?php echo val('imageSource', $item); ?>">
+            </a>
+          <?php } ?>
+          <?php if (val('dateTile', $item)) { ?>
+             <span class="DateTile">
+               <span class="Month"><?php echo val('monthTile', $item); ?></span>
+               <span class="Day"><?php echo val('dayTile', $item); ?></span>
+             </span>
+          <?php } ?>
           <span class="Options">
             <?php if (val('buttons', $item)) { ?>
               <div class="Buttons <?php echo val('buttonsCssClass', $item); ?>">

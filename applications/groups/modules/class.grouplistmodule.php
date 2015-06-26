@@ -14,37 +14,12 @@ class GroupListModule extends Gdn_Module {
   public $view;
 
   public function __construct($groups, $id, $title = '', $emptyMessage = '', $view = '') {
-    parent::__construct();
     $this->groups = $groups;
     $this->id = $id;
     $this->title = $title;
     $this->emptyMessage = $emptyMessage;
-    $this->view = $view ?: c('Vanilla.Discussions.Layout');
+    $this->view = $view ?: c('Vanilla.Discussions.Layout', 'modern');
     $this->_ApplicationFolder = 'groups';
-  }
-
-  public function getGroupOptions($group, $sectionId = 'home') {
-    $groupId = val('GroupID', $group);
-    $options = new DropdownModule($sectionId.'-group-'.$groupId.'-options');
-    $options->setTrigger('', 'button', 'btn-link', 'icon-cog')
-      ->addLink(T('Edit'), GroupUrl($group, 'edit'), GroupPermission('Edit', $group), 'edit')
-      ->addLink(T('Leave Group'), GroupUrl($group, 'leave'), GroupPermission('Leave', $group), 'leave')
-      ->addLink(sprintf(T('Delete %s'), T('Group')), GroupUrl($group, 'delete'), GroupPermission('Delete', $group), 'delete')
-      ->addLink(T('Invite'), GroupUrl($group, 'invite'), GroupPermission('Leader', $group));
-
-    $options->setView('dropdown-legacy');
-    return $options;
-  }
-
-  public function getGroupButtons($group) {
-    $buttons = array();
-    if (Gdn::Session()->IsValid() && !GroupPermission('Member', $group) && GroupPermission('Join', $group)) {
-      $joinButton['text'] = T('Join this Group');
-      $joinButton['url'] = GroupUrl($group, 'join');
-      $joinButton['cssClass'] = 'Popup';
-      $buttons[] = $joinButton;
-    }
-    return $buttons;
   }
 
   public function getGroupsInfo($view, $groups, $heading, $emptyMessage = '', $sectionId = '') {
@@ -106,8 +81,8 @@ class GroupListModule extends Gdn_Module {
     }
 
     if ($withButtons) {
-      $item['options'] = $this->getGroupOptions($group, $sectionId);
-      $item['buttons'] = $this->getGroupButtons($group);
+      $item['options'] = getGroupOptions($group, $sectionId);
+      $item['buttons'] = getGroupButtons($group);
     }
 
     if ($view == 'table') {

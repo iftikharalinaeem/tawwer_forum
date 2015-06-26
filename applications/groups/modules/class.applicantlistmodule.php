@@ -14,12 +14,11 @@ class ApplicantListModule extends Gdn_Module {
   public $view;
 
   public function __construct($applicants, $group, $title = '', $emptyMessage = '', $view = '') {
-    parent::__construct();
     $this->applicants = $applicants;
     $this->group = $group;
     $this->title = $title;
     $this->emptyMessage = $emptyMessage;
-    $this->view = $view ?: c('Vanilla.Discussions.Layout');
+    $this->view = $view ?: c('Vanilla.Discussions.Layout', 'modern');
     $this->_ApplicationFolder = 'groups';
   }
 
@@ -61,6 +60,8 @@ class ApplicantListModule extends Gdn_Module {
       $applicantList['columns'][0]['columnCssClass'] = 'UserName';
       $applicantList['columns'][1]['columnLabel'] = t('Reason');
       $applicantList['columns'][1]['columnCssClass'] = 'ApplicantReason';
+      $applicantList['columns'][2]['columnLabel'] = '';
+      $applicantList['columns'][2]['columnCssClass'] = 'Buttons';
     }
 
     foreach ($applicants as $applicant) {
@@ -72,11 +73,18 @@ class ApplicantListModule extends Gdn_Module {
 
   public function getApplicantInfo($applicant, $group, $view, $withButtons = true, $sectionId = false) {
 
+    if ($view == 'table') {
+      $withButtons = false;
+    }
+
     $item['heading'] = Gdn_Format::text(val('Name', $applicant));
     $item['url'] = userUrl($applicant);
     $item['imageSource'] = userPhotoUrl($applicant);
     $item['imageUrl'] = userUrl($applicant);
     $item['metaCssClass'] = '';
+
+    $type = (val('Type', $applicant) == 'Application') ? t('Applicant') : t('Invitee');
+    $item['meta']['type']['text'] = $type;
 
     if ($view != 'table') {
       $item['text'] = htmlspecialchars($applicant['Reason']);
@@ -102,6 +110,10 @@ class ApplicantListModule extends Gdn_Module {
     $item['rows']['reason']['type'] = 'default';
     $item['rows']['reason']['text'] = htmlspecialchars($applicant['Reason']);
     $item['rows']['reason']['cssClass'] = 'ApplicantReason';
+
+    $item['rows']['buttons']['type'] = 'buttons';
+    $item['rows']['buttons']['buttons'] = $this->getApplicantButtons($applicant, $item);
+    $item['rows']['buttons']['cssClass'] = 'pull-right';
   }
 
   /**
@@ -114,7 +126,7 @@ class ApplicantListModule extends Gdn_Module {
     $controller = new Gdn_Controller();
     $controller->setData('list', $this->applicants);
     if (GroupPermission('Leader', $this->group)) {
-      return $controller->fetchView('eventlist', 'modules', 'groups');
+      return $controller->fetchView('applicantlist', 'modules', 'groups');
     }
     return '';
   }

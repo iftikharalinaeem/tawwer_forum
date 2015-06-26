@@ -14,12 +14,11 @@ class EventListModule extends Gdn_Module {
   public $view;
 
   public function __construct($events, $group, $title = '', $emptyMessage = '', $view = '') {
-    parent::__construct();
     $this->events = $events;
     $this->group = $group;
     $this->title = $title;
     $this->emptyMessage = $emptyMessage;
-    $this->view = $view ?: c('Vanilla.Discussions.Layout');
+    $this->view = $view ?: c('Vanilla.Discussions.Layout', 'modern');
     $this->_ApplicationFolder = 'groups';
   }
 
@@ -94,6 +93,9 @@ class EventListModule extends Gdn_Module {
       $dateStarts->modify("{$hourOffset} hours");
     }
 
+    $item['dateTile'] = true;
+    $item['monthTile'] = strftime('%b', $dateStarts->getTimestamp());
+    $item['dayTile'] = $dateStarts->format('j');
     $item['text'] = SliceParagraph(Gdn_Format::Text($event['Body']), 100);
     $item['textCssClass'] = 'EventDescription';
     $item['heading'] = Gdn_Format::text(val('Name', $event));
@@ -103,16 +105,16 @@ class EventListModule extends Gdn_Module {
     if ($view != 'table') {
       $startTime = $dateStarts->format('g:ia') == '12:00am' ? '' : ' '.$dateStarts->format('g:ia');
       $item['meta']['location']['text'] = Gdn_Format::text($event['Location']);
-      $item['meta']['date']['text'] = $dateStarts->format('Y-m-d').$startTime;
+      $item['meta']['date']['text'] = $dateStarts->format("F j, Y").$startTime;
     }
 
     if ($withButtons) {
 //      $item['options'] = $this->getEventOptions($event, $sectionId);
-//      $item['buttons'] = $this->getEventButtons($event);
+//      $item['buttons'] = $this->getEventListButtons($event);
     }
 
     if ($view == 'table') {
-      $this->getEventTableItem($item, $group, $dateStarts);
+      $this->getEventTableItem($item, $event, $dateStarts);
     }
 
     return $item;
@@ -124,11 +126,12 @@ class EventListModule extends Gdn_Module {
     $item['rows']['main']['cssClass'] = 'EventTitle';
 
     $item['rows']['location']['type'] = 'default';
-    $item['rows']['location']['text'] = Gdn_Format::Text(val('Location', $event));
+    $item['rows']['location']['text'] = Gdn_Format::text($event['Location']);
     $item['rows']['location']['cssClass'] = 'EventLocation';
 
+    $startTime = $dateStarts->format('g:ia') == '12:00am' ? '' : ' '.$dateStarts->format('g:ia');
     $item['rows']['date']['type'] = 'default';
-    $item['rows']['date']['text'] = $dateStarts->format('Y-m-d').' '.$dateStarts->format('g:ia');
+    $item['rows']['date']['text'] = $dateStarts->format("F j, Y").' '.$startTime;
     $item['rows']['date']['cssClass'] = 'EventDate';
   }
 

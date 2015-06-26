@@ -1,29 +1,28 @@
-.Group-Content {
-  -webkit-column-count: 3;
-  -moz-column-count: 3;
-  column-count: 3;
-  -webkit-column-gap: 30px;
-  -moz-column-gap: 30px;
-  column-gap: 30px;
+.Groups .ItemContent {
+  padding-left: 48px;
 }
-
-.Group-Content .Group-Box {
-  -webkit-column-break-inside: avoid;
-  break-inside: avoid;
-  *zoom: 1;
-}
-.Group-Content .Group-Box:after {
+.Group-Box:after {
   content: "";
   display: table;
   clear: both;
 }
-
-.Group-Events,
-.Group-Announcements {
-  -webkit-column-break-after: always;
-  break-after: always;
+.Group-Box {
+  margin-bottom: 20px;
+}
+.Groups .OptionsMenu {
+  float: right;
+}
+.Groups .DataTableWrap {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.Groups .DataTableWrap .Excerpt {
+  font-size: 12px;
 }
 
+.Groups .DataTableWrap .Title-Wrapper {
+  margin: 0;
+}
 .DateTile {
   display: block;
   float: left;
@@ -35,18 +34,15 @@
   background-color: #333333;
   color: white;
 }
-
 .DateTile .Month {
   display: block;
   font-size: 10px;
   text-transform: uppercase;
 }
-
 .DateTile .Day {
   font-size: 18px;
   display: block;
 }
-
 .Event.add .DatePicker, .Event.edit .DatePicker {
   width: 120px;
 }
@@ -283,26 +279,48 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   height: 200px;
   /* Fluid width centering */
   width: 100%;
+  background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
-  margin: 15px 0;
+  margin-bottom: 10px;
 }
 
 .Group-Icon {
+  float: left;
   max-width: 100px;
   max-height: 100px;
-  margin: 0 15px 15px 0;
-  float: left;
+}
+
+.Group-Icon-Big {
+  width: 140px;
+  height: 140px;
+  max-width: 140px;
+  max-height: 140px;
+  border: 3px solid #fff;
+  margin: -40px 15px 15px 10px;
 }
 
 .Group-Title {
-  margin: 10px 0 10px;
+  margin-bottom: 10px;
   font-size: 36px;
   line-height: 1;
 }
 
 .Group-Description {
   line-height: 1.4;
+  padding: 5px 0;
+}
+
+.Group-Header-Info {
+
+}
+
+.Group-Header .Meta {
+  font-size: 12px;
+}
+
+.Group-Header .MItem {
+  display: inline-block;
 }
 
 .Group-Buttons {
@@ -369,6 +387,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 
 .Group-Header {
   *zoom: 1;
+  margin-bottom: 20px;
 }
 .Group-Header:after {
   content: "";
@@ -482,7 +501,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
     .Group-Icon {
        max-width: 36px;
        max-height: 36px;
-       padding-top: 0;  
+       padding-top: 0;
     }
     h2 {
        clear: both;
@@ -495,14 +514,14 @@ li.ui-timepicker-selected .ui-timepicker-duration,
        padding: 5px 10px;
        float: left;
        vertical-align: top;
-       @include pie-clearfix;      
-       
+       @include pie-clearfix;
+
        .PhotoWrap {
           float: left;
           margin: 5px 5px 0 0;
        }
        a {
-          font-weight: bold;  
+          font-weight: bold;
        }
        .DateJoined {
           display: block;
@@ -511,14 +530,14 @@ li.ui-timepicker-selected .ui-timepicker-duration,
        .Group-MemberOptions {
           padding-top: 5px;
           margin-left: 45px;
-          display: none;  
+          display: none;
        }
     }
     .Card:hover {
        background-color: $shaded;
-       
+
        .Group-MemberOptions {
-          display: block;  
+          display: block;
        }
     }
 }

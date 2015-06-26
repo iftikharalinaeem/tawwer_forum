@@ -82,10 +82,10 @@ class GroupController extends Gdn_Controller {
 
       // Get Discussions
       $DiscussionModel = new DiscussionModel();
-      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, $this->HomepageDiscussionCount)->ResultArray();
+      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, $this->HomepageDiscussionCount);
       $this->SetData('Discussions', $Discussions);
 
-      $Discussions = $DiscussionModel->GetAnnouncements(array('d.GroupID' => $GroupID), 0, 10)->ResultArray();
+      $Discussions = $DiscussionModel->GetAnnouncements(array('d.GroupID' => $GroupID), 0, 10);
       $this->SetData('Announcements', $Discussions);
 
       // Get Events
