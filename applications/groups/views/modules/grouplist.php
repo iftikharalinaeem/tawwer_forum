@@ -5,7 +5,8 @@ $list = $this->data('list');
 // Table view
 if (val('view', $list) == 'table') {
   ?>
-  <div class="DataTableContainer Group-Box Group-Events">
+  <div class="DataTableContainer Group-Box">
+    <div class="PageControls">
     <?php
     if (val('title', $list)) { ?><h2 class="Groups H"><?php echo val('title', $list); ?></h2><?php }
     if (val('buttons', $list)) {
@@ -17,6 +18,10 @@ if (val('view', $list) == 'table') {
       <?php } ?>
       </div>
     <?php } ?>
+  </div>
+  <?php
+    if (val('items', $list)) {
+    ?>
     <div class="DataTableWrap">
       <table class="DataTable">
         <thead>
@@ -27,7 +32,7 @@ if (val('view', $list) == 'table') {
         </tr>
         </thead>
         <?php foreach(val('items', $list) as $item) { ?>
-          <tr id="<?php echo val('id', $item); ?>" class="<?php echo val('cssClass', $item); ?>">
+          <tr id="<?php echo val('id', $item); ?>" class="Item <?php echo val('cssClass', $item); ?>">
             <?php foreach (val('rows', $item) as $row) { ?>
               <?php if (val('type', $row) == 'main') { ?>
                 <td class="Name <?php echo val('cssClass', $row); ?>">
@@ -145,7 +150,8 @@ if (val('view', $list) == 'table') {
         <?php } ?>
       </table>
     </div>
-    <?php if (val('emptyMessage', $list) && !val('items', $list)) { ?>
+    <?php }
+    if (val('emptyMessage', $list) && !val('items', $list)) { ?>
       <div class="ErrorMessage <?php echo val('emptyMessageCssClass', $list); ?>"><?php echo val('emptyMessage', $list); ?></div>
     <?php } ?>
     <?php if (val('moreLink', $list)) { ?>
@@ -158,8 +164,9 @@ if (val('view', $list) == 'table') {
 
 // Modern view
 else if (val('view', $list) == 'modern') { ?>
-  <div class="media-list-container Group-Box Group-Events">
-    <h2 class="media-list-heading"><?php echo val('title', $list); ?></h2> <?php
+  <div class="media-list-container Group-Box">
+  <div class="PageControls">
+  <h2 class="H media-list-heading"><?php echo val('title', $list); ?></h2> <?php
     if (val('buttons', $list)) {
       foreach (val('buttons', $list) as $button) { ?>
         <div class="Button-Controls <?php echo val('buttonsCssClass', $list); ?>">
@@ -167,6 +174,7 @@ else if (val('view', $list) == 'modern') { ?>
         </div>
       <?php } ?>
     <?php } ?>
+    </div>
     <ul class="media-list DataList">
       <?php foreach(val('items', $list) as $item) { ?>
         <li id="<?php echo val('id', $item); ?>" class="Item <?php echo val('cssClass', $item); ?>">
