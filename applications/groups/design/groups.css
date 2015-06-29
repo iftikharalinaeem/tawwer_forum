@@ -12,6 +12,9 @@
 .Groups .OptionsMenu {
   float: right;
 }
+.Group-Header .OptionsMenu {
+  float: right;
+}
 .Groups .DataTableWrap {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -19,7 +22,9 @@
 .Groups .DataTableWrap .Excerpt {
   font-size: 12px;
 }
-
+.Groups .Item .Buttons {
+  margin-top: 0;
+}
 .Groups .DataTableWrap .Title-Wrapper {
   margin: 0;
 }
@@ -341,10 +346,10 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   position: relative;
 }
 .Group-Box .Button-Controls {
-  position: absolute;
-  top: 0;
-  right: 0;
-  margin: 0;
+  float: right;
+}
+.Group-Box .H {
+  float: left;
 }
 .Group-Box .Button-Controls .Dropdown {
   text-align: left;
@@ -365,6 +370,10 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 .Group-Discussions .MItem {
   margin-left: 0;
+}
+.Group-Discussions .MItem.Category,
+.Group-Announcements .MItem.Category {
+  display: none;
 }
 .Group-Discussions .MItem time {
   padding-right: 8px;
