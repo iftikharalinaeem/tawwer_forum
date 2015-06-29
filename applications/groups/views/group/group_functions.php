@@ -23,10 +23,10 @@ function getGroupOptions($group, $sectionId = 'home') {
   $groupId = val('GroupID', $group);
   $options = new DropdownModule($sectionId.'-group-'.$groupId.'-options');
   $options->setTrigger('', 'button', 'btn-link', 'icon-cog')
-    ->addLink(T('Edit'), GroupUrl($group, 'edit'), GroupPermission('Edit', $group), 'edit')
-    ->addLink(T('Leave Group'), GroupUrl($group, 'leave'), GroupPermission('Leave', $group), 'leave')
-    ->addLink(sprintf(T('Delete %s'), T('Group')), GroupUrl($group, 'delete'), GroupPermission('Delete', $group), 'delete')
-    ->addLink(T('Invite'), GroupUrl($group, 'invite'), GroupPermission('Leader', $group));
+    ->addLink(T('Edit Group'), GroupUrl($group, 'edit'), GroupPermission('Edit', $group))
+    ->addLink(T('Leave Group'), GroupUrl($group, 'leave'), GroupPermission('Leave', $group), 'leave', array(), '', '', '', false, 'Popup')
+    ->addLink(sprintf(T('Delete %s'), T('Group')), GroupUrl($group, 'delete'), GroupPermission('Delete', $group), 'delete', array(), '', '', '', false, 'Popup')
+    ->addLink(T('Invite Members'), GroupUrl($group, 'invite'), GroupPermission('Leader', $group), 'invite', array(), '', '', '', false, 'Popup');
 
   $options->setView('dropdown-legacy');
   return $options;
@@ -112,7 +112,8 @@ function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussi
   } ?>
 
   <div class="Group-Box Group-<?php echo $title; ?> Section-DiscussionList">
-      <h2><?php echo $title; ?></h2>
+      <div class="PageControls">
+      <h2 class="H"><?php echo $title; ?></h2>
       <?php
       if ($title == 'Announcements' && GroupPermission('Moderate')) {
         echo '<div class="Button-Controls">';
@@ -123,6 +124,7 @@ function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussi
         echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$sender->Data('Group.GroupID')));
         echo '</div>';
       }
+      echo '</div>';
       if (!$sender->data('Discussions')->result()) {
         echo $emptyMessage;
       } else {
@@ -275,13 +277,15 @@ if (!function_exists('WriteGroupBanner')) :
 /**
  * Output optional group banner as a div background image to allow dynamic page resizing.
  */
-function WriteGroupBanner() {
-   $Group = Gdn::Controller()->Data('Group');
+function WriteGroupBanner($group) {
+   if (!$group) {
+     $group = Gdn::Controller()->Data('Group');
+   }
 
-   if ($Group['Banner']) {
+   if (val('Banner', $group)) {
       echo Wrap('', 'div', array(
          'class' => 'Group-Banner',
-         'style' => 'background-image: url("'.Gdn_Upload::Url($Group['Banner']).'");')
+         'style' => 'background-image: url("'.Gdn_Upload::Url(val('Banner', $group)).'");')
       );
    }
 }
@@ -639,18 +643,18 @@ if (!function_exists('WriteGroupIcon')) :
  *
  * @param array $Group Optional. Uses data array's Group if none is provided.
  */
-function WriteGroupIcon($Group = FALSE, $Class = 'Group-Icon') {
-   if (!$Group)
-      $Group = Gdn::Controller()->Data('Group');
+function WriteGroupIcon($group = FALSE, $class = 'Group-Icon') {
+   if (!$group)
+      $group = Gdn::Controller()->Data('Group');
 
-   $Icon = '';
-   if ($Group['Icon'])
-      $Icon = $Group['Icon'];
+   $icon = '';
+   if ($group['Icon'])
+      $icon = $group['Icon'];
    else
-      $Icon = C('Groups.DefaultIcon', '');
+      $icon = C('Groups.DefaultIcon', '');
 
-   if ($Icon)
-      echo Img(Gdn_Upload::Url($Icon), array('class' => $Class));
+   if ($icon)
+      echo Img(Gdn_Upload::Url($icon), array('class' => $class));
 
 }
 endif;
@@ -701,12 +705,6 @@ function WriteGroupList($Groups) {
       }
       echo '</ul>';
    }
-}
-endif;
-
-if (!function_exists('WriteGroupUserHeader')):
-function WriteGroupUserHeader($Group) {
-
 }
 endif;
 

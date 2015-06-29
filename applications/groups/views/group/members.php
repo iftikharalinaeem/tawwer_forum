@@ -1,30 +1,13 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
 
-<div class="Group-MembersPage">
-   <div class="Group-SmallHeader">
-      <?php WriteGroupIcon(); ?>
-      <h1 class="Group-Title"><?php 
-         echo htmlspecialchars($this->Data('Group.Name'));
-      ?></h1>
-   </div>
+if (in_array($this->Data('Filter'), array('', 'leaders'))) {
+  $eventList = new MemberListModule($this->Data('Leaders'), $this->Data('Group'), t('Leaders'), t('GroupEmptyLeaders', "There are no group leaders."));
+  echo $eventList;
+}
 
-   <?php if (in_array($this->Data('Filter'), array('', 'leaders'))): ?>
-   <div class="Box-Cards Group-Leaders">
-      <h2><?php echo T('GroupLeaders', 'Leaders'); ?></h2>
-      <?php
-      WriteMemberCards($this->Data('Leaders'));
-//      PagerModule::Write(array('Url' => GroupUrl($this->Data('Group'), 'members', '/').'/{Page}?filter=leaders', 'CurrentRecords' => count($this->Data('Leaders'))));
-      ?>
-   </div>
-   <?php endif ?>
+if (in_array($this->Data('Filter'), array('', 'members'))) {
+  $eventList = new MemberListModule($this->Data('Members'), $this->Data('Group'), t('Members'), t('GroupEmptyMembers', "There are no group members yet."));
+  echo $eventList;
+}
 
-   <?php if (in_array($this->Data('Filter'), array('', 'members'))): ?>
-   <div class="Box-Cards Group-Members">
-      <h2><?php echo T('Group Members', 'Members'); ?></h2>
-      <?php
-      WriteMemberCards($this->Data('Members'));
-      PagerModule::Write(array('Url' => GroupUrl($this->Data('Group'), 'members', '/').'/{Page}?filter=members', 'CurrentRecords' => count($this->Data('Members'))));
-      ?>
-   </div>
-   <?php endif; ?>
-</div>
+PagerModule::Write(array('Url' => GroupUrl($this->Data('Group'), 'members', '/').'/{Page}?filter=members', 'CurrentRecords' => count($this->Data('Members'))));
