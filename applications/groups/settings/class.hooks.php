@@ -78,6 +78,37 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
 
+   /**
+    * Renders the group header on all the group pages.
+    *
+    * @param $sender
+    * @param $args
+    * @return bool
+    */
+   public function Base_BeforeRenderAsset_Handler($sender, $args) {
+      if (val('AssetName', $args) == 'Content') {
+         $group = $sender->Data('Group');
+         if (!$group) {
+            $groupId = $sender->Data('Discussion.GroupID') ?: Gdn::Request()->Get('groupid');
+            if (!$groupId) {
+               return false;
+            }
+            $model = new GroupModel();
+            $group = $model->GetID($groupId);
+         }
+
+         $params = array('group' => $group,
+            'showButtons' => true,
+            'showOptions' => true,
+         );
+         if (is_a($sender, 'GroupController') && val('RequestMethod', $sender) == 'Index') {
+            $params['showMeta'] = true;
+            $params['showDescription'] = true;
+         }
+         echo Gdn_Theme::module('GroupHeaderModule', $params);
+      }
+   }
+
    public function DiscussionController_Comment_Render($Sender, $Args) {
       $this->DiscussionController_Index_Render($Sender, $Args);
    }
