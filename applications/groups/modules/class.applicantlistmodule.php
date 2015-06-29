@@ -51,9 +51,6 @@ class ApplicantListModule extends Gdn_Module {
     $applicantList['view'] = $view;
     $applicantList['emptyMessage'] = $emptyMessage;
     $applicantList['title'] = $heading;
-    $applicantList['moreLink'] = sprintf(T('All %s...'), $heading);
-    $applicantList['moreUrl'] = Url(CombinePaths(array("/events/group/", GroupSlug($group))));
-    $applicantList['moreCssClass'] = 'More';
 
     if ($view == 'table') {
       $applicantList['columns'][0]['columnLabel'] = t('User');
@@ -73,8 +70,8 @@ class ApplicantListModule extends Gdn_Module {
 
   public function getApplicantInfo($applicant, $group, $view, $withButtons = true, $sectionId = false) {
 
-    if ($view == 'table') {
-      $withButtons = false;
+    if ($view != 'table') {
+      $item['buttons'] = $this->getApplicantButtons($applicant, $group);
     }
 
     $item['heading'] = Gdn_Format::text(val('Name', $applicant));
@@ -89,10 +86,6 @@ class ApplicantListModule extends Gdn_Module {
     if ($view != 'table') {
       $item['text'] = htmlspecialchars($applicant['Reason']);
       $item['textCssClass'] = 'ApplicantReason';
-    }
-
-    if ($withButtons) {
-      $item['buttons'] = $this->getApplicantButtons($applicant, $group);
     }
 
     if ($view == 'table') {

@@ -12,38 +12,26 @@ class EventListModule extends Gdn_Module {
   public $title;
   public $emptyMessage;
   public $view;
+  public $showMore;
 
-  public function __construct($events, $group, $title = '', $emptyMessage = '', $view = '') {
+  public function __construct($events, $group, $title = '', $emptyMessage = '', $showMore = true, $view = '') {
     $this->events = $events;
     $this->group = $group;
     $this->title = $title;
     $this->emptyMessage = $emptyMessage;
+    $this->showMore = $showMore;
     $this->view = $view ?: c('Vanilla.Discussions.Layout', 'modern');
     $this->_ApplicationFolder = 'groups';
   }
 
-  public function getEventOptions($event, $sectionId = 'home') {
-    $groupId = val('GroupID', $event);
-    $options = new DropdownModule($sectionId.'-group-'.$groupId.'-options');
+  public function getEventOptions($event) {
+    $eventId = val('EventID', $event);
+    $options = new DropdownModule('event-'.$eventId.'-options');
     $options->setTrigger('', 'button', 'btn-link', 'icon-cog')
-      ->addLink(T('Edit'), GroupUrl($event, 'edit'), GroupPermission('Edit', $event), 'edit')
-      ->addLink(T('Leave Group'), GroupUrl($event, 'leave'), GroupPermission('Leave', $event), 'leave')
-      ->addLink(sprintf(T('Delete %s'), T('Group')), GroupUrl($event, 'delete'), GroupPermission('Delete', $event), 'delete')
-      ->addLink(T('Invite'), GroupUrl($event, 'invite'), GroupPermission('Leader', $event));
-
+      ->addLink(T('Edit'), EventUrl($event, 'edit'), EventPermission('Edit', $event), 'edit')
+      ->addLink(T('Delete'), EventUrl($event, 'delete'), GroupPermission('Delete', $event), 'delete', '', '', '', '', false, 'Popup');
     $options->setView('dropdown-legacy');
     return $options;
-  }
-
-  public function getEventButtons($event) {
-    $buttons = array();
-    if (Gdn::Session()->IsValid() && !GroupPermission('Member', $event) && GroupPermission('Join', $event)) {
-      $joinButton['text'] = T('Join this Group');
-      $joinButton['url'] = GroupUrl($event, 'join');
-      $joinButton['cssClass'] = 'Popup';
-      $buttons[] = $joinButton;
-    }
-    return $buttons;
   }
 
   public function getEventListButtons($group) {
@@ -63,9 +51,11 @@ class EventListModule extends Gdn_Module {
     $eventList['view'] = $view;
     $eventList['emptyMessage'] = $emptyMessage;
     $eventList['title'] = $heading;
-    $eventList['moreLink'] = sprintf(T('All %s...'), $heading);
-    $eventList['moreUrl'] = Url(CombinePaths(array("/events/group/", GroupSlug($group))));
-    $eventList['moreCssClass'] = 'More';
+    if ($this->showMore) {
+      $eventList['moreLink'] = sprintf(T('All %s...'), T('Events'));
+      $eventList['moreUrl'] = Url(CombinePaths(array("/events/group/", GroupSlug($group))));
+      $eventList['moreCssClass'] = 'More';
+    }
     $eventList['buttons'] = $this->getEventListButtons($group);
 
     if ($view == 'table') {
@@ -109,7 +99,7 @@ class EventListModule extends Gdn_Module {
     }
 
     if ($withButtons) {
-//      $item['options'] = $this->getEventOptions($event, $sectionId);
+      $item['options'] = $this->getEventOptions($event);
 //      $item['buttons'] = $this->getEventListButtons($event);
     }
 

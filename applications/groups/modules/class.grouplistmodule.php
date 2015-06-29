@@ -11,13 +11,15 @@ class GroupListModule extends Gdn_Module {
   public $id;
   public $title;
   public $emptyMessage;
+  public $showMore;
   public $view;
 
-  public function __construct($groups, $id, $title = '', $emptyMessage = '', $view = '') {
+  public function __construct($groups, $id, $title = '', $emptyMessage = '', $showMore = true, $view = '') {
     $this->groups = $groups;
     $this->id = $id;
     $this->title = $title;
     $this->emptyMessage = $emptyMessage;
+    $this->showMore = $showMore;
     $this->view = $view ?: c('Vanilla.Discussions.Layout', 'modern');
     $this->_ApplicationFolder = 'groups';
   }
@@ -27,9 +29,11 @@ class GroupListModule extends Gdn_Module {
     $groupList['view'] = $view;
     $groupList['emptyMessage'] = $emptyMessage;
     $groupList['title'] = $heading;
-    $groupList['moreLink'] = sprintf(T('All %s...'), $heading);
-    $groupList['moreUrl'] = '/groups/browse/'.$sectionId;
-    $groupList['moreCssClass'] = 'More';
+    if ($this->showMore) {
+      $groupList['moreLink'] = sprintf(T('All %s...'), $heading);
+      $groupList['moreUrl'] = '/groups/browse/' . $sectionId;
+      $groupList['moreCssClass'] = 'More';
+    }
 
     if ($view == 'table') {
       $groupList['columns'][0]['columnLabel'] = T('Group');
