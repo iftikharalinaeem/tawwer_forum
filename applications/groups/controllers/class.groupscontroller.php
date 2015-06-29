@@ -87,7 +87,7 @@ class GroupsController extends Gdn_Controller {
       $Sort = strtolower($Sort);
 
       $Sorts = array(
-         'newest' => array('Title' => T('Newest Groups'), 'OrderBy' => 'DateInserted'),
+         'new' => array('Title' => T('New Groups'), 'OrderBy' => 'DateInserted'),
          'popular' => array('Title' => T('Popular Groups'), 'OrderBy' => 'CountMembers'),
          'updated' => array('Title' => T('Recently Updated Groups'), 'OrderBy' => 'DateLastComment'),
          'mine' => array('Title' => T('My Groups'), 'OrderBy' => 'DateInserted')
