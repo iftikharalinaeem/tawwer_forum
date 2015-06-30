@@ -21,7 +21,9 @@ class GroupMembersModule extends Gdn_Module {
     ?>
 
     <div class="Group-Box Group-MembersPreview">
-      <h3><?php echo T('Group Members', 'Members');?></h3>
+      <div class="PageControls">
+        <h2 class="Groups H"><?php echo T('Group Members', 'Members');?></h2>
+      </div>
       <?php WriteMemberGrid($Members, Anchor(sprintf(T('All %s...'), T('Members')), GroupUrl($Group, 'members'), 'MoreWrap')); ?>
     </div>
 
