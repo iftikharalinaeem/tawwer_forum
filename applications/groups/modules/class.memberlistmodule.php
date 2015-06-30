@@ -23,14 +23,7 @@ class MemberListModule extends Gdn_Module {
   }
 
   public function getMemberOptions($member, $group) {
-    $userId = val('UserID', $member);
-    $options = new DropdownModule('user-'.$userId.'-options');
-    $options->setTrigger('', 'button', 'btn-link', 'icon-cog')
-      ->addLink(sprintf(T('Make %s'), T('Member')), GroupUrl($group, 'setrole')."?userid=$userId&role=member", GroupPermission('Moderate') && val('Role', $member) == 'Leader', 'make-member', '', '', '', '', false, 'Group-MakeMember Hijack')
-      ->addLink(T('Make Leader', 'Leader'), GroupUrl($group, 'setrole')."?userid=$userId&role=leader", GroupPermission('Moderate') && (val('InsertUserID', $group) != $userId) && GroupPermission('Edit') && val('Role', $member) != 'Leader', 'make-leader', '', '', '', '', false, 'Group-MakeLeader Hijack')
-      ->addLink(T('Remove'), GroupUrl($group, 'removemember')."?userid=$userId", GroupPermission('Moderate') && (val('InsertUserID', $group) != $userId), 'remove', '', '', '', '', false, 'Group-RemoveMember Popup');
-    $options->setView('dropdown-legacy');
-    return $options;
+
   }
 
 
@@ -67,9 +60,6 @@ class MemberListModule extends Gdn_Module {
     $memberList['view'] = $view;
     $memberList['emptyMessage'] = $emptyMessage;
     $memberList['title'] = $heading;
-//    $memberList['moreLink'] = sprintf(T('All %s...'), $heading);
-//    $memberList['moreUrl'] = Url(CombinePaths(array("/events/group/", GroupSlug($group))));
-    $memberList['moreCssClass'] = 'More';
 
     if ($view == 'table') {
       $memberList['columns'][0]['columnLabel'] = t('User');
@@ -128,7 +118,7 @@ class MemberListModule extends Gdn_Module {
   }
 
   /**
-   * Render groups
+   * Render members
    *
    * @return type
    */
@@ -136,9 +126,7 @@ class MemberListModule extends Gdn_Module {
     $this->members = $this->getMembersInfo($this->view, $this->members, $this->group, $this->title, $this->emptyMessage);
     $controller = new Gdn_Controller();
     $controller->setData('list', $this->members);
-    if (GroupPermission('Leader', $this->group)) {
-      return $controller->fetchView('memberlist', 'modules', 'groups');
-    }
+    return $controller->fetchView('memberlist', 'modules', 'groups');
     return '';
   }
 }

@@ -20,15 +20,19 @@ function DateTile($Date) {
 endif;
 
 function getGroupOptions($group, $sectionId = 'home') {
-  $groupId = val('GroupID', $group);
-  $options = new DropdownModule($sectionId.'-group-'.$groupId.'-options');
-  $options->setTrigger('', 'button', 'btn-link', 'icon-cog')
-    ->addLink(T('Edit Group'), GroupUrl($group, 'edit'), GroupPermission('Edit', $group))
-    ->addLink(T('Leave Group'), GroupUrl($group, 'leave'), GroupPermission('Leave', $group), 'leave', array(), '', '', '', false, 'Popup')
-    ->addLink(sprintf(T('Delete %s'), T('Group')), GroupUrl($group, 'delete'), GroupPermission('Delete', $group), 'delete', array(), '', '', '', false, 'Popup')
-    ->addLink(T('Invite Members'), GroupUrl($group, 'invite'), GroupPermission('Leader', $group), 'invite', array(), '', '', '', false, 'Popup');
-
-  $options->setView('dropdown-legacy');
+  $options = array();
+  if (GroupPermission('Edit', $group)) {
+    $options['Edit'] = array('Text' => T('Edit Group'), 'Url' => GroupUrl($group, 'edit'));
+  }
+  if (GroupPermission('Leave', $group)) {
+    $options['Leave'] = array('Text' => T('Leave Group'), 'Url' => GroupUrl($group, 'leave'), 'CssClass' => 'Popup');
+  }
+  if (GroupPermission('Delete', $group)) {
+    $options['Delete'] = array('Text' => sprintf(T('Delete %s'), T('Group')), 'Url' => GroupUrl($group, 'delete'), 'CssClass' => 'Popup');
+  }
+  if (GroupPermission('Leader', $group)) {
+    $options['Invite'] = array('Text' => T('Invite Members'), 'Url' => GroupUrl($group, 'invite'), 'CssClass' => 'Popup');
+  }
   return $options;
 }
 
@@ -383,6 +387,29 @@ function WriteGroupButtons($Group = NULL) {
 
    echo '</div>';
 }
+endif;
+
+/**
+ * Output discussion options.
+ *
+ * @since 2.1
+ */
+if (!function_exists('writeGroupOptions')):
+  function writeGroupOptions($options = array()) {
+    if (empty($options)) {
+      return;
+    }
+
+    echo ' <span class="ToggleFlyout OptionsMenu">';
+    echo '<span class="OptionsTitle" title="'.t('Options').'">'.t('Options').'</span>';
+    echo sprite('SpFlyoutHandle', 'Arrow');
+    echo '<ul class="Flyout MenuItems" style="display: none;">';
+    foreach ($options as $code => $option):
+      echo wrap(Anchor($option['Text'], $option['Url'], val('CssClass', $option, $code)), 'li');
+    endforeach;
+    echo '</ul>';
+    echo '</span>';
+  }
 endif;
 
 

@@ -38,7 +38,7 @@ if (val('view', $list) == 'table') {
                 <td class="Name <?php echo val('cssClass', $row); ?>">
                   <div class="Wrap">
                     <span class="Options">
-                      <?php if (val('options', $item)) { echo val('options', $item)->toString(); } ?>
+                      <?php if (val('options', $item)) { writeGroupOptions(val('options', $item)); } ?>
                       <?php if (val('buttons', $item)) { ?>
                         <div class="Buttons <?php echo val('buttonsCssClass', $item); ?>">
                           <?php foreach (val('buttons', $item) as $button) { ?>
@@ -197,7 +197,7 @@ else if (val('view', $list) == 'modern') { ?>
                 <?php } ?>
               </div>
             <?php } ?>
-            <?php if (val('options', $item)) { echo val('options', $item)->toString(); } ?>
+            <?php if (val('options', $item)) { writeGroupOptions(val('options', $item)); } ?>
           </span>
           <div class="ItemContent">
             <div class="Title">

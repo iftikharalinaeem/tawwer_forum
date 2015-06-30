@@ -4,7 +4,7 @@
   WriteGroupBanner($this->group);
   WriteGroupIcon($this->group, 'Group-Icon Group-Icon-Big');
   if ($this->showOptions && $options = getGroupOptions($this->group)) {
-    echo $options->toString();
+    writeGroupOptions($options);
   }
   if ($this->showButtons) {
   $buttons = getGroupButtons($this->group);
@@ -26,7 +26,8 @@
       </div>
     <?php }
     if ($this->showMeta) {
-      echo Gdn_Theme::Module('GroupMetaModule');
+      $meta = new GroupMetaModule($this->group);
+      echo $meta;
     } ?>
   </div>
 </div>

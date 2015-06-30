@@ -36,12 +36,16 @@ function WriteEventOptions($event = null) {
    if (!$event) {
       return;
    }
-   $options = new DropdownModule('event-'.val('EventID', $event).'-options');
-   $options->setTrigger('', 'button', 'btn-link', 'icon-cog')
-      ->addLink(T('Edit'), EventUrl($event, 'edit'), EventPermission('Edit', $event), 'edit')
-      ->addLink(T('Delete'), EventUrl($event, 'delete'), EventPermission('Edit', $event), 'delete', array(), '', '', '', false, 'Popup');
-   $options->setView('dropdown-legacy');
-   return $options->toString();
+   $options = array();
+
+   if (EventPermission('Edit', $Event)) {
+      $options['Edit'] = array('Text' => T('Edit'), 'Url' => EventUrl($Event, 'edit'));
+      $options['Delete'] = array('Text' => T('Delete'), 'Url' => EventUrl($Event, 'delete'), 'CssClass' => 'Popup');
+   }
+
+   if (count($options)) {
+     writeGroupOptions($options);
+   }
 }
 
 

@@ -25,12 +25,11 @@ class EventListModule extends Gdn_Module {
   }
 
   public function getEventOptions($event) {
-    $eventId = val('EventID', $event);
-    $options = new DropdownModule('event-'.$eventId.'-options');
-    $options->setTrigger('', 'button', 'btn-link', 'icon-cog')
-      ->addLink(T('Edit'), EventUrl($event, 'edit'), EventPermission('Edit', $event), 'edit')
-      ->addLink(T('Delete'), EventUrl($event, 'delete'), GroupPermission('Delete', $event), 'delete', '', '', '', '', false, 'Popup');
-    $options->setView('dropdown-legacy');
+    $options = array();
+    if (EventPermission('Edit', $event)) {
+      $options[] = array('Text' => T('Edit'), 'Url' => EventUrl($event, 'edit'));
+      $options[] = array('Text' => T('Delete'), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup');
+    }
     return $options;
   }
 
@@ -68,16 +67,15 @@ class EventListModule extends Gdn_Module {
     }
 
     foreach ($events as $event) {
-      $eventList['items'][] = $this->getEventInfo($event, $group, $view, true, $sectionId);
+      $eventList['items'][] = $this->getEventInfo($event, $view, true);
     }
 
     return $eventList;
   }
 
-  public function getEventInfo($event, $group, $view, $withButtons = true, $sectionId = false) {
+  public function getEventInfo($event, $view, $withButtons = true) {
 
     $utc = new DateTimeZone('UTC');
-    $timeZone = new DateTimeZone($event['Timezone']);
     $dateStarts = new DateTime($event['DateStarts'], $utc);
     if (Gdn::Session()->IsValid() && $hourOffset = Gdn::Session()->User->HourOffset) {
       $dateStarts->modify("{$hourOffset} hours");
@@ -100,7 +98,6 @@ class EventListModule extends Gdn_Module {
 
     if ($withButtons) {
       $item['options'] = $this->getEventOptions($event);
-//      $item['buttons'] = $this->getEventListButtons($event);
     }
 
     if ($view == 'table') {
