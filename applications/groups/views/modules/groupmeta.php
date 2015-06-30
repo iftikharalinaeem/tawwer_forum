@@ -15,6 +15,7 @@ foreach(val('metaItems', $meta) as $metaItem) {
   if (val('url', $metaItem)) {
     echo '</a>';
   }
+  echo '</span>';
 }
 echo '</div>';
 
