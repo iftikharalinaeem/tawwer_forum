@@ -51,12 +51,11 @@ class ApplicantListModule extends Gdn_Module {
     $applicantList['view'] = $view;
     $applicantList['emptyMessage'] = $emptyMessage;
     $applicantList['title'] = $heading;
+    $applicantList['cssClass'] = 'ApplicantList';
 
     if ($view == 'table') {
       $applicantList['columns'][0]['columnLabel'] = t('User');
       $applicantList['columns'][0]['columnCssClass'] = 'UserName';
-      $applicantList['columns'][1]['columnLabel'] = t('Reason');
-      $applicantList['columns'][1]['columnCssClass'] = 'ApplicantReason';
       $applicantList['columns'][2]['columnLabel'] = '';
       $applicantList['columns'][2]['columnCssClass'] = 'Buttons';
     }
@@ -68,7 +67,7 @@ class ApplicantListModule extends Gdn_Module {
     return $applicantList;
   }
 
-  public function getApplicantInfo($applicant, $group, $view, $withButtons = true, $sectionId = false) {
+  public function getApplicantInfo($applicant, $group, $view) {
 
     if ($view != 'table') {
       $item['buttons'] = $this->getApplicantButtons($applicant, $group);
@@ -78,15 +77,20 @@ class ApplicantListModule extends Gdn_Module {
     $item['url'] = userUrl($applicant);
     $item['imageSource'] = userPhotoUrl($applicant);
     $item['imageUrl'] = userUrl($applicant);
-    $item['metaCssClass'] = '';
+    $item['cssClass'] = val('Type', $applicant);
 
-    $type = (val('Type', $applicant) == 'Application') ? t('Applicant') : t('Invitee');
-    $item['meta']['type']['text'] = $type;
+    $userModel = new UserModel();
+    $applicantRankId = val('RankID', $userModel->getID(val('UserID', $applicant)));
+    $rank = RankModel::Ranks($applicantRankId);
+    $rankLabel = val('Label', $rank);
+    $item['meta']['rank']['text'] = t('Rank').': '.$rankLabel;
 
-    if ($view != 'table') {
-      $item['text'] = htmlspecialchars($applicant['Reason']);
-      $item['textCssClass'] = 'ApplicantReason';
-    }
+    $type = (val('Type', $applicant) == 'Application') ? t('Applied on %s') : t('Invited on %s');
+    $dateString = Gdn_Format::date(val('DateInserted', $applicant));
+    $item['meta']['applyDate']['text'] = sprintf($type, $dateString);
+
+    $item['text'] = htmlspecialchars($applicant['Reason']);
+    $item['textCssClass'] = 'ApplicantReason';
 
     if ($view == 'table') {
       $this->getApplicantTableItem($item, $applicant);
@@ -99,10 +103,6 @@ class ApplicantListModule extends Gdn_Module {
   public function getApplicantTableItem(&$item, $applicant) {
     $item['rows']['main']['type'] = 'main';
     $item['rows']['main']['cssClass'] = 'UserName';
-
-    $item['rows']['reason']['type'] = 'default';
-    $item['rows']['reason']['text'] = htmlspecialchars($applicant['Reason']);
-    $item['rows']['reason']['cssClass'] = 'ApplicantReason';
 
     $item['rows']['buttons']['type'] = 'buttons';
     $item['rows']['buttons']['buttons'] = $this->getApplicantButtons($applicant, $item);

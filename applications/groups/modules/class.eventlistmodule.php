@@ -50,6 +50,8 @@ class EventListModule extends Gdn_Module {
     $eventList['view'] = $view;
     $eventList['emptyMessage'] = $emptyMessage;
     $eventList['title'] = $heading;
+    $eventList['cssClass'] = 'EventList';
+
     if ($this->showMore) {
       $eventList['moreLink'] = sprintf(T('All %s...'), T('Events'));
       $eventList['moreUrl'] = Url(CombinePaths(array("/events/group/", GroupSlug($group))));

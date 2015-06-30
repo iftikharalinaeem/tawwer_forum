@@ -5,7 +5,7 @@ $list = $this->data('list');
 // Table view
 if (val('view', $list) == 'table') {
   ?>
-  <div class="DataTableContainer Group-Box">
+  <div class="DataTableContainer Group-Box <?php echo val('cssClass', $list); ?>">
     <div class="PageControls">
     <?php
     if (val('title', $list)) { ?><h2 class="Groups H"><?php echo val('title', $list); ?></h2><?php }
@@ -164,7 +164,7 @@ if (val('view', $list) == 'table') {
 
 // Modern view
 else if (val('view', $list) == 'modern') { ?>
-  <div class="media-list-container Group-Box">
+  <div class="media-list-container Group-Box <?php echo val('cssClass', $list); ?>">
   <div class="PageControls">
   <h2 class="H media-list-heading"><?php echo val('title', $list); ?></h2> <?php
     if (val('buttons', $list)) {
@@ -208,7 +208,7 @@ else if (val('view', $list) == 'modern') { ?>
             <div class="Excerpt <?php echo val('textCssClass', $item); ?>"><?php echo val('text', $item); ?></div>
             <div class="Meta">
               <?php foreach(val('meta', $item) as $metaItem) { ?>
-                <span role="presentation" class="<?php echo val('cssClass', $metaItem); ?>">
+                <span role="presentation" class="MItem <?php echo val('cssClass', $metaItem); ?>">
             <?php echo val('text', $metaItem);
             if (val('linkText', $metaItem)) { ?>
               <a href="<?php echo val('url', $metaItem); ?>"><?php echo val('linkText', $metaItem); ?></a>
