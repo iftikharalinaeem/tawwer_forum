@@ -6,3 +6,9 @@
 .Profile > .BoxFilter {
   display: none;
 }
+
+.Profile {
+	a.ChangePicture {
+		z-index: 100;
+	}
+}
