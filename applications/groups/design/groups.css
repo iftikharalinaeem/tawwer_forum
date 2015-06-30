@@ -288,13 +288,21 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   max-width: 140px;
   max-height: 140px;
   border: 3px solid #fff;
-  margin: -40px 15px 15px 10px;
+  margin: 0 15px 15px 10px;
+}
+
+.HasBanner .Group-Icon-Big {
+  margin-top: -40px;
 }
 
 .Group-Title {
   margin-bottom: 10px;
   font-size: 36px;
   line-height: 1;
+}
+
+.NoBanner .Group-Title {
+  padding-top: 5px;
 }
 
 .Group-Description {

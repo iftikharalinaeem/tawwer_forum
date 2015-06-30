@@ -1,5 +1,7 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<div class="Group-Header">
+<?php if (!defined('APPLICATION')) exit();
+$hasBanner = val('Banner', $this->group);
+?>
+<div class="Group-Header<?php echo $hasBanner ? ' HasBanner' : ' NoBanner'; ?>">
   <?php
   WriteGroupBanner($this->group);
   WriteGroupIcon($this->group, 'Group-Icon Group-Icon-Big');
