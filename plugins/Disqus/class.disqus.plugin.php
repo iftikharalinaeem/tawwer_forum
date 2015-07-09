@@ -7,7 +7,7 @@
 // Define the plugin:
 $PluginInfo['Disqus'] = array(
     'Name' => 'Disqus Sign In',
-    'Description' => 'Users may sign into your site using their Disqus account. <b>You must register your application with Disqus for this plugin to work.</b>',
+    'Description' => 'Users may sign into your site using their Disqus account. <b>You must <a href="https://disqus.com/api/applications/register/">register your application with Disqus</a> for this plugin to work.</b>',
     'Version' => '1.1',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'MobileFriendly' => TRUE,
