@@ -75,14 +75,17 @@ if (val('view', $list) == 'table') {
                     <?php } ?>
                     <div class="Description Excerpt <?php echo val('textCssClass', $item); ?>"><?php echo val('text', $item); ?></div>
                     <div class="Meta <?php echo val('metaCssClass', $item); ?>">
-                      <?php foreach(val('meta', $item) as $metaItem) { ?>
+                      <?php
+                      if (val('meta', $item)) {
+                      foreach (val('meta', $item) as $metaItem) { ?>
                         <span class="MItem <?php echo val('cssClass', $metaItem); ?>">
                           <?php echo val('text', $metaItem);
                           if (val('linkText', $metaItem)) { ?>
                             <a href="<?php echo val('url', $metaItem); ?>"><?php echo val('linkText', $metaItem); ?></a>
                           <?php } ?>
                         </span>
-                      <?php } ?>
+                      <?php }
+                      } ?>
                     </ul>
                   </div>
                 </td>

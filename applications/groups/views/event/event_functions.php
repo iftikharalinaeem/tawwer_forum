@@ -38,9 +38,9 @@ function WriteEventOptions($event = null) {
    }
    $options = array();
 
-   if (EventPermission('Edit', $Event)) {
-      $options['Edit'] = array('Text' => T('Edit'), 'Url' => EventUrl($Event, 'edit'));
-      $options['Delete'] = array('Text' => T('Delete'), 'Url' => EventUrl($Event, 'delete'), 'CssClass' => 'Popup');
+   if (EventPermission('Edit', $event)) {
+      $options['Edit'] = array('Text' => T('Edit'), 'Url' => EventUrl($event, 'edit'));
+      $options['Delete'] = array('Text' => T('Delete'), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup');
    }
 
    if (count($options)) {

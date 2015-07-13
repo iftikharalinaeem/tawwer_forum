@@ -25,13 +25,13 @@ class ApplicantListModule extends Gdn_Module {
   public function getApplicantButtons($applicant, $group) {
     $buttons = array();
     if (strtolower(val('Type', $applicant)) == 'application') {
-      $approve['text'] = t('Approve Applicant', 'Approve');
+      $approve['text'] = t('Approve');
       $approve['url'] = GroupUrl($group, 'approve')."?id={$applicant['GroupApplicantID']}";
       $approve['cssClass'] = 'Button SmallButton Hijack Button-Approve';
 
       $buttons[] = $approve;
 
-      $deny['text'] = t('Deny Applicant', 'Deny');
+      $deny['text'] = t('Deny');
       $deny['url'] = GroupUrl($group, 'approve')."?id={$applicant['GroupApplicantID']}&value=denied";
       $deny['cssClass'] = 'Button SmallButton Hijack Button-Deny';
 
@@ -79,11 +79,13 @@ class ApplicantListModule extends Gdn_Module {
     $item['imageUrl'] = userUrl($applicant);
     $item['cssClass'] = val('Type', $applicant);
 
-    $userModel = new UserModel();
-    $applicantRankId = val('RankID', $userModel->getID(val('UserID', $applicant)));
-    $rank = RankModel::Ranks($applicantRankId);
-    $rankLabel = val('Label', $rank);
-    $item['meta']['rank']['text'] = t('Rank').': '.$rankLabel;
+    if (class_exists('RankModel')) {
+      $userModel = new UserModel();
+      $applicantRankId = val('RankID', $userModel->getID(val('UserID', $applicant)));
+      $rank = RankModel::Ranks($applicantRankId);
+      $rankLabel = val('Label', $rank);
+      $item['meta']['rank']['text'] = t('Rank') . ': ' . $rankLabel;
+    }
 
     $type = (val('Type', $applicant) == 'Application') ? t('Applied on %s') : t('Invited on %s');
     $dateString = Gdn_Format::date(val('DateInserted', $applicant));

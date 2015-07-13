@@ -24,6 +24,7 @@
 }
 .Groups .Item .Buttons {
   margin-top: 0;
+  float: right;
 }
 .Groups .DataTableWrap .Title-Wrapper {
   margin: 0;

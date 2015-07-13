@@ -59,6 +59,10 @@ function WriteDiscussionBlogList($Discussions, $EmptyMessage = '') {
    if (!$Discussions)
       WriteEmptyState($EmptyMessage);
 
+   if (!is_array($Discussions)) {
+     $Discussions = $Discussions->resultArray();
+   }
+
    if (is_array($Discussions)) {
       include_once(PATH_APPLICATIONS .'/vanilla/views/discussions/helper_functions.php');
       //include_once(PATH_APPLICATIONS .'/vanilla/views/modules/helper_functions.php');
@@ -113,8 +117,8 @@ if (!function_exists('writeFullDiscussionList')):
 function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussions', $view = '') {
   if (!$view) {
     $view = c('Vanilla.Discussions.Layout', 'modern');
-  } ?>
-
+  }
+  ?>
   <div class="Group-Box Group-<?php echo $title; ?> Section-DiscussionList">
       <div class="PageControls">
       <h2 class="H"><?php echo $title; ?></h2>
@@ -129,12 +133,15 @@ function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussi
         echo '</div>';
       }
       echo '</div>';
+      $sender->EventArguments['view'] = &$view;
+      $sender->EventArguments['title'] = &$title;
+      $sender->fireEvent('beforeDiscussionList');
       if (!$sender->data('Discussions')->result()) {
         echo $emptyMessage;
       } else {
         if ($view == 'table') {
-          include_once(PATH_APPLICATIONS .'/vanilla/views/discussions/table_functions.php');
-          include_once(PATH_APPLICATIONS .'/vanilla/views/discussions/helper_functions.php');
+          include_once($sender->fetchViewLocation('table_functions', 'discussions', 'vanilla'));
+          include_once($sender->fetchViewLocation('helper_functions', 'discussions', 'vanilla'));
           writeDiscussionTable();
         } else if ($view == 'modern') {
           include_once($sender->fetchViewLocation('helper_functions', 'discussions', 'vanilla')); ?>
@@ -180,6 +187,10 @@ if (!function_exists('WriteDiscussionList')):
 function WriteDiscussionList($Discussions, $EmptyMessage = '') {
    if (!$Discussions)
       WriteEmptyState($EmptyMessage);
+
+   if (!is_array($Discussions)) {
+     $Discussions = $Discussions->resultArray();
+   }
 
    //if (C('Vanilla.Discussions.Layout') == 'table')
    //WriteDiscussionRow($Discussion, $this, $Session, $Alt);

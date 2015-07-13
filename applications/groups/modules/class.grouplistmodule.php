@@ -7,28 +7,46 @@
 
 class GroupListModule extends Gdn_Module {
 
+  public $sender;
   public $groups;
   public $id;
   public $title;
   public $emptyMessage;
+  public $cssClass;
   public $showMore;
   public $view;
 
-  public function __construct($groups, $id, $title = '', $emptyMessage = '', $showMore = true, $view = '') {
+  public function __construct($sender, $groups, $id, $title = '', $emptyMessage = '', $cssClass = '', $showMore = true, $view = '') {
+    $this->sender = $sender;
     $this->groups = $groups;
     $this->id = $id;
     $this->title = $title;
     $this->emptyMessage = $emptyMessage;
+    $this->cssClass = $cssClass;
     $this->showMore = $showMore;
     $this->view = $view ?: c('Vanilla.Discussions.Layout', 'modern');
     $this->_ApplicationFolder = 'groups';
   }
 
-  public function getGroupsInfo($view, $groups, $heading, $emptyMessage = '', $sectionId = '') {
+  public function __get($name) {
+    $name = lcfirst($name);
+
+    if (property_exists($this, $name)) {
+      return $this->$name;
+    }
+  }
+
+  public function __set($name, $value) {
+
+  }
+
+  public function getGroupsInfo($view, $groups, $heading, $emptyMessage = '', $cssClass = '', $sectionId = '') {
 
     $groupList['view'] = $view;
     $groupList['emptyMessage'] = $emptyMessage;
     $groupList['title'] = $heading;
+    $groupList['cssClass'] = $cssClass;
+
     if ($this->showMore) {
       $groupList['moreLink'] = sprintf(T('All %s...'), $heading);
       $groupList['moreUrl'] = '/groups/browse/' . $sectionId;
@@ -125,10 +143,17 @@ class GroupListModule extends Gdn_Module {
    * @return type
    */
   public function toString() {
-    $this->groups = $this->getGroupsInfo($this->view, $this->groups, $this->title, $this->emptyMessage, $this->id);
-    $controller = new Gdn_Controller();
-    $controller->setData('list', $this->groups);
-    return $controller->fetchView('grouplist', 'modules', 'groups');
+    $this->sender->EventArguments['view'] = &$this->view;
+    $this->sender->fireEvent('beforeGenerateGroupList');
+
+    $this->groups = $this->getGroupsInfo($this->view, $this->groups, $this->title, $this->emptyMessage, $this->cssClass, $this->id);
+    $this->sender->setData('list', $this->groups);
+//    if (!in_array($this->view, array('table', 'list'))) {
+//      $this->view = 'list';
+//    }
+//    $view = 'groups_'.$this->view;
+
+    return $this->sender->fetchView('grouplist', 'modules', 'groups');
   }
 
 }

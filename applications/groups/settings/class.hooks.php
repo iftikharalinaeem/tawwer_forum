@@ -22,6 +22,16 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
 
+   /**
+    * Add a discussion excerpt in each discussion list item.
+    */
+   public function groupController_afterDiscussionTitle_handler($sender) {
+     $discussion = GetValue('Discussion', $sender->EventArguments);
+     if (is_object($discussion) && val('Announce', $discussion)) {
+       echo '<div class="Excerpt">' . SliceString(Gdn_Format::PlainText($discussion->Body, $discussion->Format), C('Vanilla.DiscussionExcerpt.Length', 100)) . '</div>';
+     }
+   }
+
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
       $Sender->AddCssFile('groups.css', 'groups');
    }
