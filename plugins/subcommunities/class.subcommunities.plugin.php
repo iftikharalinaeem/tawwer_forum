@@ -3,7 +3,7 @@
 $PluginInfo['subcommunities'] = array(
     'Name'        => "Subcommunities",
     'Description' => "Allows you to use categories as virtual mini forums for multilingual or multi-product communities.",
-    'Version'     => '1.0.0-alhpa',
+    'Version'     => '1.0.1',
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl'   => 'https://vanillaforums.com',
@@ -177,7 +177,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     public function Gdn_Dispatcher_AppStartup_Handler() {
-        SaveToConfig(
+        saveToConfig(
             [
                 'Vanilla.Categories.NavDepth' => 1
             ],
@@ -185,31 +185,32 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             false
         );
 
-        $parts = explode('/', trim(Gdn::Request()->Path(), '/'), 2);
+        $parts = explode('/', trim(Gdn::request()->path(), '/'), 2);
         $root = $parts[0];
         $path = val(1, $parts, '');
 
         // Look the root up in the mini sites.
         $site = SubcommunityModel::getSite($root);
         if ($site) {
-            Gdn::Request()->Path($path);
-            Gdn::Request()->WebRoot($root);
-            Gdn::Request()->AssetRoot('/');
+            Gdn::Request()->path($path);
+            Gdn::Request()->assetRoot(Gdn::request()->webRoot());
+            Gdn::Request()->webRoot($root);
+
 
             $this->initializeSite($site);
         } elseif (!in_array($root, ['utility'])) {
             $defaultSite = SubcommunityModel::getDefaultSite();
             if ($defaultSite) {
 
-                $url = '/'.$defaultSite['Folder'].rtrim('/'.Gdn::Request()->Path(), '/');
-                redirectUrl($url, Debug() ? 302 : 301);
+                $url = Gdn::Request()->assetRoot().'/'.$defaultSite['Folder'].rtrim('/'.Gdn::Request()->Path(), '/');
+                redirectUrl($url, debug() ? 302 : 301);
             }
         }
 
         $this->savedDoHeadings = C('Vanilla.Categories.DoHeadings');
         $navDepth = C('Vanilla.Categories.NavDepth', 0);
         if ($navDepth == 0) {
-            SaveToConfig('Vanilla.Categories.NavDepth', 1);
+            saveToConfig('Vanilla.Categories.NavDepth', 1);
         }
     }
 
