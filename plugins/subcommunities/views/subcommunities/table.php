@@ -19,7 +19,7 @@ PagerModule::Write(array('Sender' => $this));
                 <td><?php echo htmlspecialchars($Row['Name']); ?></td>
                 <td>
                     <?php
-                    $url = Gdn::Request()->UrlDomain('//').'/'.htmlspecialchars($Row['Folder']);
+                    $url = Gdn::request()->urlDomain('//').Gdn::request()->assetRoot().'/'.htmlspecialchars($Row['Folder']);
                     echo Anchor('/'.htmlspecialchars($Row['Folder']), $url);
                     ?>
                 </td>
