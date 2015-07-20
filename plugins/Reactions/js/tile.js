@@ -33,7 +33,7 @@ jQuery(document).ready(function($) {
             selector: '.LoadingMore',
              finishedMsg: '&nbsp;',
              msgText: '&nbsp;',
-             img: 'http://cdn.vanillaforums.com/images/progress.gif'
+             img: '//cdn.vanillaforums.com/images/progress.gif'
            },
          pixelsFromNavToBottom: 800
       }, function(newElements) {

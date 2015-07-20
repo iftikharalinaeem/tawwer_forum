@@ -284,16 +284,23 @@ class ReactionsPlugin extends Gdn_Plugin {
    }
 
    /**
+    * Show user's reacted-to content by reaction type.
     *
-    * @param ProfileController $Sender
-    * @param type $Args
+    * @param ProfileController $Sender Duh.
+    * @param string|int $UserReference A username or userid.
+    * @param string $Reaction Which reaction is selected.
+    * @param int $Page What page to show. Defaults to 1.
     */
-   public function ProfileController_Reactions_Create($Sender, $UserID, $Username = '', $Reaction = '', $Page = '') {
+   public function ProfileController_Reactions_Create($Sender, $UserReference, $Reaction = '', $Page = '') {
       $Sender->Permission('Garden.Profiles.View');
 
       $ReactionType = ReactionModel::ReactionTypes($Reaction);
-      if (!$ReactionType)
+      if (!$ReactionType) {
          throw NotFoundException();
+      }
+
+      $Sender->getUserInfo($UserReference);
+      $UserID = val('UserID', $Sender->User);
 
       list($Offset, $Limit) = OffsetLimit($Page, 5);
 
@@ -308,11 +315,13 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
-      if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) === 'avatars')
+      if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) === 'avatars') {
          $ReactionModel->JoinUserTags($Data);
+      }
+
       $Sender->SetData('Data', $Data);
-      $Sender->SetData('EditMode', FALSE, TRUE);
-      $Sender->GetUserInfo($UserID, $Username);
+      $Sender->SetData('EditMode', false, true);
+
       $Sender->_SetBreadcrumbs($ReactionType['Name'], $Sender->CanonicalUrl());
       $Sender->SetTabView('Reactions', 'DataList', '', 'plugins/Reactions');
       $this->AddJs($Sender);
