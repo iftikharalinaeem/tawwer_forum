@@ -6,6 +6,12 @@ $(document).ready(function() {
 
   var intercomIOMeta = gdn.getMeta('intercomIO');
 
+  if(!intercomIOMeta['app_id']) {
+    console.log('No AppID, no action taken for Intercom');
+    return;
+  }
+
+  console.log('App ID : ' + intercomIOMeta['app_id']);
   window.intercomSettings = {
     name: intercomIOMeta['name'],
     email: intercomIOMeta['email'],

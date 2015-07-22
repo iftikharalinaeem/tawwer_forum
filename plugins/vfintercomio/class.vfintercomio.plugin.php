@@ -1,12 +1,13 @@
 <?php if (!defined('APPLICATION')) exit;
 
 $PluginInfo['vfintercomio'] = array(
-    'Name'        => "Intercomio",
+    'Name'        => "Intercom.io",
     'Description' => "Integrate with the Intercom.io API to track visitor and user behavior",
     'Version'     => '1.0.0',
     'Author'      => "Patrick Kelly",
     'AuthorEmail' => 'patrick.k@vanillaforums.com',
-    'License'     => 'GPLv3'
+    'License'     => 'GPLv3',
+    'SettingsUrl' => '/settings/vfintercomio'
 );
 
 /**
@@ -37,14 +38,14 @@ class vfIntercomioPlugin extends Gdn_Plugin {
         }
     }
 
-//    public function trackEvent($eventName, $metadata = null) {
-//        $this->api()->track($eventName, $metadata);
-//    }
-//
-//
-//    public function createEvent($eventName, $metadata = null) {
-//        $this->api()->track($eventName, $metadata);
-//    }
+    public function trackEvent($eventName, $metadata = null) {
+        $this->api()->track($eventName, $metadata);
+    }
+
+
+    public function createEvent($eventName, $metadata = null) {
+        $this->api()->track($eventName, $metadata);
+    }
 
 
     public function gdn_dispatcher_beforeControllerMethod_handler($sender, $args) {
@@ -52,7 +53,6 @@ class vfIntercomioPlugin extends Gdn_Plugin {
         if (!gdn::session()->checkPermission('Garden.Settings.Manage')) {
             return;
         }
-
         trace(array_keys($args), "Arguments available");
         trace($args['ControllerMethod'], "Controller Method");
 
@@ -80,10 +80,26 @@ class vfIntercomioPlugin extends Gdn_Plugin {
             'email' => gdn::session()->User->Email,
             'userID' => gdn::session()->User->UserID,
             'trackingPages' => 'Banner,Themes,Users,Roles & Permissions,Social,Categories,Plugins',
-            'app_id' => 'kbok1iui'
+            'app_id' => C('Plugins.Intercomio.App_id', 0)
         );
 
         $sender->AddJsFile('intercomio.js', 'plugins/vfintercomio/js');
         $sender->addDefinition('intercomIO', $intercomio);
+    }
+
+    public function settingsController_vfintercomio_create($sender, $Args) {
+        $sender->Permission('Garden.Settings.Manage');
+
+        $cf = new ConfigurationModule($sender);
+
+        $cf->Initialize(
+            array(
+                'Plugins.Intercomio.App_id' => []
+            )
+        );
+
+        $sender->AddSideMenu();
+        $sender->SetData('Title', T('Intercom.io Settings'));
+        $cf->RenderAll();
     }
 }
