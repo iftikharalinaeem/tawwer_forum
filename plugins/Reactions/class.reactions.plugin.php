@@ -609,6 +609,8 @@ class ReactionsPlugin extends Gdn_Plugin {
     * Recalculate all reaction data, including totals
     */
    public function utilityController_RecalculateReactions_Create($sender) {
+      $sender->permission('Garden.Settings.Manage');
+
       $this->form = new Gdn_Form();
 
       if ($this->form->authenticatedPostback()) {

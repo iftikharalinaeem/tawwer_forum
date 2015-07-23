@@ -14,7 +14,7 @@
     <div>
         <?php
         echo $this->Form->open();
-        echo $this->Form->Close('Recalculate Now');
+        echo $this->Form->close('Recalculate Now');
         ?>
     </div>
 </div>
