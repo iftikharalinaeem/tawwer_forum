@@ -619,7 +619,7 @@ class ReactionsPlugin extends Gdn_Plugin {
          $sender->setData('Recalculated', true);
       }
 
-      $sender->addSideMenu('dashboard/settings/configure');
+      $sender->addSideMenu();
       $sender->setData('Title', t('Recalculate Reactions'));
       $sender->render('Recalculate', '', 'plugins/Reactions');
    }
