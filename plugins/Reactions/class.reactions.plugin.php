@@ -606,6 +606,25 @@ class ReactionsPlugin extends Gdn_Plugin {
    }
 
    /**
+    * Recalculate all reaction data, including totals
+    */
+   public function utilityController_RecalculateReactions_Create($sender) {
+      $sender->permission('Garden.Settings.Manage');
+
+      $this->form = new Gdn_Form();
+
+      if ($this->form->authenticatedPostback()) {
+         $reactionModel = new ReactionModel();
+         $reactionModel->recalculateTotals();
+         $sender->setData('Recalculated', true);
+      }
+
+      $sender->addSideMenu();
+      $sender->setData('Title', t('Recalculate Reactions'));
+      $sender->render('Recalculate', '', 'plugins/Reactions');
+   }
+
+   /**
 	 * Sort the comments by score if necessary
     * @param CommentModel $CommentModel
 	 */
