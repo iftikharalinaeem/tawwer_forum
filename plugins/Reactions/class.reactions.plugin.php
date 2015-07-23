@@ -614,12 +614,12 @@ class ReactionsPlugin extends Gdn_Plugin {
       if ($this->form->authenticatedPostback()) {
          $reactionModel = new ReactionModel();
          $reactionModel->recalculateTotals();
-         $sender->SetData('Recalculated', true);
+         $sender->setData('Recalculated', true);
       }
 
       $sender->addSideMenu('dashboard/settings/configure');
-      $sender->SetData('Title', t('Recalculate Reactions'));
-      $sender->Render('Recalculate', '', 'plugins/Reactions');
+      $sender->setData('Title', t('Recalculate Reactions'));
+      $sender->render('Recalculate', '', 'plugins/Reactions');
    }
 
    /**
