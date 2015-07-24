@@ -291,7 +291,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     * @param string $Reaction Which reaction is selected.
     * @param int $Page What page to show. Defaults to 1.
     */
-   public function ProfileController_Reactions_Create($Sender, $UserReference, $Reaction = '', $Page = '') {
+   public function ProfileController_Reactions_Create($Sender, $UserReference, $Username = '', $Reaction = '', $Page = '') {
       $Sender->Permission('Garden.Profiles.View');
 
       $ReactionType = ReactionModel::ReactionTypes($Reaction);
@@ -299,7 +299,7 @@ class ReactionsPlugin extends Gdn_Plugin {
          throw NotFoundException();
       }
 
-      $Sender->getUserInfo($UserReference);
+      $Sender->getUserInfo($UserReference, $Username);
       $UserID = val('UserID', $Sender->User);
 
       list($Offset, $Limit) = OffsetLimit($Page, 5);
