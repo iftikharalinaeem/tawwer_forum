@@ -39,6 +39,8 @@ class Infrastructure {
                 return 8080;
             case 'siteid':
                 return 123;
+            case 'name':
+                return 'localhost.vanillaforums.com';
         }
         return null;
     }
