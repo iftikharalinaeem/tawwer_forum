@@ -41,7 +41,7 @@ class NoadminPlugin extends Gdn_Plugin {
         }
 
         $session = Gdn::session();
-        setValue('Admin', $session->user, 0);
+        setValue('Admin', $session->User, 0);
         $session->setPermission('Garden.Settings.Manage', false);
         $session->setPermission('Garden.Community.Manage', false);
         $session->setPermission('Garden.Moderation.Manage', false);
