@@ -102,12 +102,12 @@ class EventsController extends Gdn_Controller {
       $this->AddBreadcrumb($this->Title());
 
       // Upcoming events
-      $UpcomingRange = C('Groups.Events.UpcomingRange', '+30 days');
+      $UpcomingRange = C('Groups.Events.UpcomingRange', '+365 days');
       $Events = $EventModel->GetUpcoming($UpcomingRange, $EventCriteria, FALSE);
       $this->SetData('UpcomingEvents', $Events);
 
       // Recent events
-      $RecentRange = C('Groups.Events.RecentRange', '-10 days');
+      $RecentRange = C('Groups.Events.RecentRange', '-365 days');
       $Events = $EventModel->GetUpcoming($RecentRange, $EventCriteria, TRUE);
       $this->SetData('RecentEvents', $Events);
 
