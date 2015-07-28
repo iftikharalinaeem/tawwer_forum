@@ -13,14 +13,16 @@ class EventListModule extends Gdn_Module {
   public $emptyMessage;
   public $view;
   public $showMore;
+  public $withButtons;
 
-  public function __construct($events, $group, $title = '', $emptyMessage = '', $showMore = true, $view = '') {
+  public function __construct($events, $group, $title = '', $emptyMessage = '', $showMore = true, $view = '', $withButtons = true) {
     $this->events = $events;
     $this->group = $group;
     $this->title = $title;
     $this->emptyMessage = $emptyMessage;
     $this->showMore = $showMore;
     $this->view = $view ?: c('Vanilla.Discussions.Layout', 'modern');
+    $this->withButtons = $withButtons;
     $this->_ApplicationFolder = 'groups';
   }
 
@@ -45,7 +47,7 @@ class EventListModule extends Gdn_Module {
     return $buttons;
   }
 
-  public function getEventsInfo($view, $events, $group, $heading, $emptyMessage = '', $sectionId = '') {
+  public function getEventsInfo($view, $events, $group, $heading, $emptyMessage = '', $withButtons = true) {
 
     $eventList['view'] = $view;
     $eventList['emptyMessage'] = $emptyMessage;
@@ -57,15 +59,18 @@ class EventListModule extends Gdn_Module {
       $eventList['moreUrl'] = Url(CombinePaths(array("/events/group/", GroupSlug($group))));
       $eventList['moreCssClass'] = 'More';
     }
-    $eventList['buttons'] = $this->getEventListButtons($group);
+
+    if ($withButtons) {
+      $eventList['buttons'] = $this->getEventListButtons($group);
+    }
 
     if ($view == 'table') {
       $eventList['columns'][0]['columnLabel'] = t('Event');
       $eventList['columns'][0]['columnCssClass'] = 'EventTitle';
       $eventList['columns'][1]['columnLabel'] = t('Location');
-      $eventList['columns'][1]['columnCssClass'] = 'BigCount CountDiscussions';
+      $eventList['columns'][1]['columnCssClass'] = 'EventLocation';
       $eventList['columns'][2]['columnLabel'] = t('Date');
-      $eventList['columns'][2]['columnCssClass'] = 'BlockColumn LatestPost';
+      $eventList['columns'][2]['columnCssClass'] = 'EventDate';
     }
 
     foreach ($events as $event) {
@@ -75,7 +80,7 @@ class EventListModule extends Gdn_Module {
     return $eventList;
   }
 
-  public function getEventInfo($event, $view, $withButtons = true) {
+  public function getEventInfo($event, $view, $withOptions) {
 
     $utc = new DateTimeZone('UTC');
     $dateStarts = new DateTime($event['DateStarts'], $utc);
@@ -86,7 +91,7 @@ class EventListModule extends Gdn_Module {
     $item['dateTile'] = true;
     $item['monthTile'] = strftime('%b', $dateStarts->getTimestamp());
     $item['dayTile'] = $dateStarts->format('j');
-    $item['text'] = SliceParagraph(Gdn_Format::Text($event['Body']), 100);
+    $item['text'] = SliceParagraph(Gdn_Format::plainText(val('Body', $event), val('Format', $event)), 100);
     $item['textCssClass'] = 'EventDescription';
     $item['heading'] = Gdn_Format::text(val('Name', $event));
     $item['url'] = EventUrl($event);
@@ -98,7 +103,7 @@ class EventListModule extends Gdn_Module {
       $item['meta']['date']['text'] = $dateStarts->format("F j, Y").$startTime;
     }
 
-    if ($withButtons) {
+    if ($withOptions) {
       $item['options'] = $this->getEventOptions($event);
     }
 
@@ -130,7 +135,7 @@ class EventListModule extends Gdn_Module {
    * @return type
    */
   public function toString() {
-    $this->events = $this->getEventsInfo($this->view, $this->events, $this->group, $this->title, $this->emptyMessage);
+    $this->events = $this->getEventsInfo($this->view, $this->events, $this->group, $this->title, $this->emptyMessage, $this->withButtons);
     $controller = new Gdn_Controller();
     $controller->setData('list', $this->events);
     return $controller->fetchView('eventlist', 'modules', 'groups');
