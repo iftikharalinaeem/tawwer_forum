@@ -1,3 +1,8 @@
+.Groups .PageControls:after {
+  content: "";
+  display: table;
+  clear: both;
+}
 .Groups .ItemContent {
   padding-left: 48px;
 }
@@ -10,9 +15,11 @@
   margin-bottom: 20px;
 }
 .Groups .OptionsMenu {
-  float: right;
+  display: inline-block;
+  vertical-align: top;
 }
 .Group-Header .OptionsMenu {
+  display: block;
   float: right;
 }
 .Groups .DataTableWrap {
@@ -24,7 +31,7 @@
 }
 .Groups .Item .Buttons {
   margin-top: 0;
-  float: right;
+  display: inline-block;
 }
 .Groups .DataTableWrap .Title-Wrapper {
   margin: 0;
