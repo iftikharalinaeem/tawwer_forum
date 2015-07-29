@@ -39,7 +39,7 @@ function getGroupOptions($group, $sectionId = 'home') {
 function getGroupButtons($group) {
   $buttons = array();
   if (Gdn::Session()->IsValid() && !GroupPermission('Member', $group) && GroupPermission('Join', $group)) {
-    $joinButton['text'] = T('Join this Group');
+    $joinButton['text'] = T('Join');
     $joinButton['url'] = GroupUrl($group, 'join');
     $joinButton['cssClass'] = 'Popup';
     $buttons[] = $joinButton;
