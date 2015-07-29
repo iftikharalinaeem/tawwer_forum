@@ -433,7 +433,7 @@ if (!function_exists('writeGroupBannerOptions')):
       echo wrap(Anchor($option['Text'], $option['Url'], val('CssClass', $option, $code)), 'li');
     }
     echo '</ul>';
-    echo '<a class="NavButton Handle GroupOptionsTitle" title="'.t('Group Options').'">'.t('Group Options').' '.
+    echo '<a class="NavButton Handle Button GroupOptionsTitle" title="'.t('Group Options').'">'.t('Group Options').' '.
       sprite('Sprite', 'SpDropdownHandle').'</a>';
     echo '</div>';
   }
