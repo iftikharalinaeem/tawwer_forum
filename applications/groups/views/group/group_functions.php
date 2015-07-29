@@ -410,16 +410,32 @@ if (!function_exists('writeGroupOptions')):
     if (empty($options)) {
       return;
     }
-
     echo ' <span class="ToggleFlyout OptionsMenu">';
     echo '<span class="OptionsTitle" title="'.t('Options').'">'.t('Options').'</span>';
     echo sprite('SpFlyoutHandle', 'Arrow');
     echo '<ul class="Flyout MenuItems" style="display: none;">';
-    foreach ($options as $code => $option):
+    foreach ($options as $code => $option) {
       echo wrap(Anchor($option['Text'], $option['Url'], val('CssClass', $option, $code)), 'li');
-    endforeach;
+    }
     echo '</ul>';
     echo '</span>';
+  }
+endif;
+
+if (!function_exists('writeGroupBannerOptions')):
+  function writeGroupBannerOptions($options = array()) {
+    if (empty($options)) {
+      return;
+    }
+    echo ' <div class="GroupOptions OptionsMenu ButtonGroup">';
+    echo '<ul class="Dropdown MenuItems">';
+    foreach ($options as $code => $option) {
+      echo wrap(Anchor($option['Text'], $option['Url'], val('CssClass', $option, $code)), 'li');
+    }
+    echo '</ul>';
+    echo '<a class="NavButton Handle GroupOptionsTitle" title="'.t('Group Options').'">'.t('Group Options').' '.
+      sprite('Sprite', 'SpDropdownHandle').'</a>';
+    echo '</div>';
   }
 endif;
 
