@@ -10,9 +10,9 @@ if (val('view', $list) == 'table') {
     <?php
     if (val('title', $list)) { ?><h2 class="Groups H"><?php echo val('title', $list); ?></h2><?php }
     if (val('buttons', $list)) {
-      echo '<div class="BoxButtons BoxNewDiscussion">';
+      echo '<div class="BoxButtons">';
       foreach (val('buttons', $list) as $button) { ?>
-        <div class="Button-Controls NewDiscussion<?php echo val('buttonsCssClass', $list); ?>">
+        <div class="Button-Controls <?php echo val('buttonsCssClass', $list); ?>">
           <a class="Button Primary <?php echo val('cssClass', $button); ?>" href="<?php echo val('url', $button) ?>" role="button"><?php echo val('text', $button); ?></a>
         </div>
       <?php } ?>
@@ -38,7 +38,6 @@ if (val('view', $list) == 'table') {
                 <td class="Name <?php echo val('cssClass', $row); ?>">
                   <div class="Wrap">
                     <span class="Options">
-                      <?php if (val('options', $item)) { writeGroupOptions(val('options', $item)); } ?>
                       <?php if (val('buttons', $item)) { ?>
                         <div class="Buttons <?php echo val('buttonsCssClass', $item); ?>">
                           <?php foreach (val('buttons', $item) as $button) { ?>
@@ -46,6 +45,7 @@ if (val('view', $list) == 'table') {
                           <?php } ?>
                         </div>
                       <?php } ?>
+                      <?php if (val('options', $item)) { writeGroupOptions(val('options', $item)); } ?>
                     </span>
                     <?php if (val('imageSource', $item)) { ?>
                       <?php if (val('url', $item)) { ?>
@@ -182,7 +182,7 @@ else if (val('view', $list) == 'modern') { ?>
       <?php foreach(val('items', $list) as $item) { ?>
         <li id="<?php echo val('id', $item); ?>" class="Item <?php echo val('cssClass', $item); ?>">
           <?php if (val('imageSource', $item)) { ?>
-            <a href="<?php echo val('url', $item); ?>" class="IndexPhoto PhotoWrap">
+            <a href="<?php echo val('url', $item); ?>" class="PhotoWrap">
               <img class="ProfilePhoto ProfilePhotoMedium <?php echo val('imageCssClass', $item); ?>" src="<?php echo val('imageSource', $item); ?>">
             </a>
           <?php } ?>
