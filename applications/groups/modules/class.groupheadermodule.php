@@ -14,31 +14,31 @@
 
 class GroupHeaderModule extends Gdn_Module {
 
-  public $group;
-  public $showOptions;
-  public $showButtons;
-  public $showMeta;
-  public $showDescription;
+    public $group;
+    public $showOptions;
+    public $showButtons;
+    public $showMeta;
+    public $showDescription;
 
-  function __construct($group, $showOptions = true, $showButtons = true, $showMeta = false, $showDescription = false) {
-    $this->group = $group;
-    $this->showOptions = $showOptions;
-    $this->showButtons = $showButtons;
-    $this->showMeta = $showMeta;
-    $this->showDescription = $showDescription;
-  }
+    function __construct($group, $showOptions = true, $showButtons = true, $showMeta = false, $showDescription = false) {
+        $this->group = $group;
+        $this->showOptions = $showOptions;
+        $this->showButtons = $showButtons;
+        $this->showMeta = $showMeta;
+        $this->showDescription = $showDescription;
+    }
 
-  public function assetTarget() {
-    return 'Content';
-  }
+    public function assetTarget() {
+        return 'Content';
+    }
 
-  /**
-   * Render header
-   *
-   * @return type
-   */
-  public function toString() {
-    include_once(PATH_APPLICATIONS .'/groups/views/group/group_functions.php');
-    return $this->fetchView();
-  }
+    /**
+     * Render header
+     *
+     * @return type
+     */
+    public function toString() {
+        include_once(PATH_APPLICATIONS .'/groups/views/group/group_functions.php');
+        return $this->fetchView();
+    }
 }
