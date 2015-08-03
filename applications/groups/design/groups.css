@@ -228,6 +228,10 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
   .Group-Header .OptionsMenu {
     display: block;
     float: right; }
+  .Group-Header .Buttons {
+    float: right;
+    margin-top: 0;
+    margin-right: 5px; }
   .Group-Header .Dropdown {
     right: 0;
     left: auto; }
