@@ -10,7 +10,7 @@ class GroupMetaModule extends Gdn_Module {
         $this->group = $group;
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Content';
     }
 
@@ -38,7 +38,7 @@ class GroupMetaModule extends Gdn_Module {
         return $metaItems;
     }
 
-    public function ToString() {
+    public function toString() {
         $this->meta['metaItems'] = $this->getMetaInfo($this->group);
         $controller = new Gdn_Controller();
         $controller->setData('meta', $this->meta);

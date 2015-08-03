@@ -6,11 +6,11 @@ class GroupMembersModule extends Gdn_Module {
         parent::__construct($Sender, 'Vanilla');
     }
 
-    public function AssetTarget() {
+    public function assetTarget() {
         return 'Content';
     }
 
-    public function ToString() {
+    public function toString() {
         require_once Gdn::Controller()->FetchViewLocation('group_functions', 'Group', 'groups');
         $GroupID = Gdn::Controller()->Data('Group.GroupID');
         $GroupModel = new GroupModel();

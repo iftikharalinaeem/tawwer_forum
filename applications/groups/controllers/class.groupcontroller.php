@@ -603,8 +603,9 @@ class GroupController extends Gdn_Controller {
 
       // Check if this person is a member of the group or a moderator
       $ViewGroupEvents = GroupPermission('View', $Group);
-      if (!$ViewGroupEvents)
+      if (!$ViewGroupEvents) {
          throw PermissionException();
+      }
 
       $this->SetData('Group', $Group);
       $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));

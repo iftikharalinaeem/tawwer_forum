@@ -36,7 +36,7 @@ class EventListModule extends Gdn_Module {
     }
 
     public function getEventListButtons($group) {
-        $groupID = GetValue('GroupID', $group, '');
+        $groupID = val('GroupID', $group, '');
         $buttons = array();
         if (GroupPermission('Member')) {
             $newEventButton['text'] = t('New Event');

@@ -26,10 +26,10 @@ class GroupsHooks extends Gdn_Plugin {
     * Add a discussion excerpt in each discussion list item.
     */
    public function groupController_afterDiscussionTitle_handler($sender) {
-     $discussion = GetValue('Discussion', $sender->EventArguments);
-     if (is_object($discussion) && val('Announce', $discussion)) {
-       echo '<div class="Excerpt">' . SliceString(Gdn_Format::PlainText($discussion->Body, $discussion->Format), C('Vanilla.DiscussionExcerpt.Length', 100)) . '</div>';
-     }
+      $discussion = val('Discussion', $sender->EventArguments);
+      if (is_object($discussion) && val('Announce', $discussion)) {
+         echo '<div class="Excerpt">'.sliceString(Gdn_Format::plainText($discussion->Body, $discussion->Format), C('Vanilla.DiscussionExcerpt.Length', 100)).'</div>';
+      }
    }
 
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
@@ -95,14 +95,14 @@ class GroupsHooks extends Gdn_Plugin {
     * @param $args
     * @return bool
     */
-   public function Base_BeforeRenderAsset_Handler($sender, $args) {
+   public function base_beforeRenderAsset_handler($sender, $args) {
       if (val('AssetName', $args) == 'Content' && is_a($sender, 'DiscussionController')) {
          $groupId = $sender->Data('Discussion.GroupID');
          if (!$groupId) {
             return false;
          }
          $model = new GroupModel();
-         $group = $model->GetID($groupId);
+         $group = $model->getID($groupId);
 
          $params = array('group' => $group,
             'showButtons' => true,
