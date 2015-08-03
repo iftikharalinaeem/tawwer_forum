@@ -28,7 +28,7 @@ class GroupsHooks extends Gdn_Plugin {
    public function groupController_afterDiscussionTitle_handler($sender) {
       $discussion = val('Discussion', $sender->EventArguments);
       if (is_object($discussion) && val('Announce', $discussion)) {
-         echo '<div class="Excerpt">'.sliceString(Gdn_Format::plainText($discussion->Body, $discussion->Format), C('Vanilla.DiscussionExcerpt.Length', 100)).'</div>';
+         echo '<div class="Excerpt">'.sliceString(Gdn_Format::plainText($discussion->Body, $discussion->Format), c('Vanilla.DiscussionExcerpt.Length', 100)).'</div>';
       }
    }
 
