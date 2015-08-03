@@ -20,31 +20,31 @@ function DateTile($Date) {
 endif;
 
 function getGroupOptions($group, $sectionId = 'home') {
-  $options = array();
-  if (GroupPermission('Edit', $group)) {
-    $options['Edit'] = array('Text' => T('Edit Group'), 'Url' => GroupUrl($group, 'edit'));
-  }
-  if (GroupPermission('Leave', $group)) {
-    $options['Leave'] = array('Text' => T('Leave Group'), 'Url' => GroupUrl($group, 'leave'), 'CssClass' => 'Popup');
-  }
-  if (GroupPermission('Delete', $group)) {
-    $options['Delete'] = array('Text' => sprintf(T('Delete %s'), T('Group')), 'Url' => GroupUrl($group, 'delete'), 'CssClass' => 'Popup');
-  }
-  if (GroupPermission('Leader', $group)) {
-    $options['Invite'] = array('Text' => T('Invite Members'), 'Url' => GroupUrl($group, 'invite'), 'CssClass' => 'Popup');
-  }
-  return $options;
+    $options = array();
+    if (GroupPermission('Edit', $group)) {
+        $options['Edit'] = array('Text' => T('Edit Group'), 'Url' => GroupUrl($group, 'edit'));
+    }
+    if (GroupPermission('Leave', $group)) {
+        $options['Leave'] = array('Text' => T('Leave Group'), 'Url' => GroupUrl($group, 'leave'), 'CssClass' => 'Popup');
+    }
+    if (GroupPermission('Delete', $group)) {
+        $options['Delete'] = array('Text' => sprintf(T('Delete %s'), T('Group')), 'Url' => GroupUrl($group, 'delete'), 'CssClass' => 'Popup');
+    }
+    if (GroupPermission('Leader', $group)) {
+        $options['Invite'] = array('Text' => T('Invite Members'), 'Url' => GroupUrl($group, 'invite'), 'CssClass' => 'Popup');
+    }
+    return $options;
 }
 
 function getGroupButtons($group) {
-  $buttons = array();
-  if (Gdn::Session()->IsValid() && !GroupPermission('Member', $group) && GroupPermission('Join', $group)) {
-    $joinButton['text'] = T('Join');
-    $joinButton['url'] = GroupUrl($group, 'join');
-    $joinButton['cssClass'] = 'Popup';
-    $buttons[] = $joinButton;
-  }
-  return $buttons;
+    $buttons = array();
+    if (Gdn::session()->isValid() && !GroupPermission('Member', $group) && GroupPermission('Join', $group)) {
+        $joinButton['text'] = T('Join');
+        $joinButton['url'] = GroupUrl($group, 'join');
+        $joinButton['cssClass'] = 'Popup';
+        $buttons[] = $joinButton;
+    }
+    return $buttons;
 }
 
 
@@ -115,51 +115,50 @@ endif;
 if (!function_exists('writeFullDiscussionList')):
 
 function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussions', $view = '') {
-  if (!$view) {
-    $view = c('Vanilla.Discussions.Layout', 'modern');
-  }
-  ?>
-  <div class="Group-Box Group-<?php echo $title; ?> Section-DiscussionList">
-      <div class="PageControls">
-      <h2 class="H"><?php echo $title; ?></h2>
-      <?php
-      if ($title == 'Announcements' && GroupPermission('Moderate')) {
-        echo '<div class="Button-Controls">';
-        echo Anchor(sprintf(T('New %s'), T('Announcement')), GroupUrl($sender->Data('Group'), 'announcement'), 'Button');
-        echo '</div>';
-      } else if ($title == 'Discussions' && GroupPermission('Member')) {
-        echo '<div class="Button-Controls">';
-        echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$sender->Data('Group.GroupID')));
-        echo '</div>';
-      }
-      echo '</div>';
-      $sender->EventArguments['view'] = &$view;
-      $sender->EventArguments['title'] = &$title;
-      $sender->fireEvent('beforeDiscussionList');
-      if (!$sender->data('Discussions')->result()) {
-        echo $emptyMessage;
-      } else {
-        if ($view == 'table') {
-          include_once($sender->fetchViewLocation('table_functions', 'discussions', 'vanilla'));
-          include_once($sender->fetchViewLocation('helper_functions', 'discussions', 'vanilla'));
-          writeDiscussionTable();
-        } else if ($view == 'modern') {
-          include_once($sender->fetchViewLocation('helper_functions', 'discussions', 'vanilla')); ?>
-          <ul class="DataList <?php echo $title; ?>">
-            <?php foreach($sender->Data('Discussions') as $discussion) {
-              WriteDiscussion($discussion, $sender, Gdn::Session());
-            }?>
-          </ul> <?php
-        }
-      }
-      if ($title == 'Discussions' && $sender->Data('Discussions')->result()) {
-        echo '<div class="MoreWrap">'.
-          Anchor(T('All Discussions'), GroupUrl($sender->Data('Group'), 'discussions')).
-          '</div>';
-      }
-      ?>
-
-   </div>
+    if (!$view) {
+        $view = c('Vanilla.Discussions.Layout', 'modern');
+    }
+    ?>
+    <div class="Group-Box Group-<?php echo $title; ?> Section-DiscussionList">
+        <div class="PageControls">
+            <h2 class="H"><?php echo $title; ?></h2>
+            <?php
+            if ($title == 'Announcements' && GroupPermission('Moderate')) {
+                echo '<div class="Button-Controls">';
+                echo anchor(sprintf(T('New %s'), T('Announcement')), GroupUrl($sender->Data('Group'), 'announcement'), 'Button');
+                echo '</div>';
+            } else if ($title == 'Discussions' && GroupPermission('Member')) {
+                echo '<div class="Button-Controls">';
+                echo Gdn_Theme::module('NewDiscussionModule', array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$sender->Data('Group.GroupID')));
+                echo '</div>';
+            }
+            echo '</div>';
+            $sender->EventArguments['view'] = &$view;
+            $sender->EventArguments['title'] = &$title;
+            $sender->fireEvent('beforeDiscussionList');
+            if (!$sender->data('Discussions')->result()) {
+                echo $emptyMessage;
+            } else {
+                if ($view == 'table') {
+                    include_once($sender->fetchViewLocation('table_functions', 'discussions', 'vanilla'));
+                    include_once($sender->fetchViewLocation('helper_functions', 'discussions', 'vanilla'));
+                    writeDiscussionTable();
+                } else if ($view == 'modern') {
+                    include_once($sender->fetchViewLocation('helper_functions', 'discussions', 'vanilla')); ?>
+                    <ul class="DataList <?php echo $title; ?>">
+                        <?php foreach($sender->Data('Discussions') as $discussion) {
+                            writeDiscussion($discussion, $sender, Gdn::session());
+                        }?>
+                    </ul> <?php
+                }
+            }
+            if ($title == 'Discussions' && $sender->Data('Discussions')->result()) {
+                echo '<div class="MoreWrap">'.
+                        anchor(T('All Discussions'), GroupUrl($sender->Data('Group'), 'discussions')).
+                    '</div>';
+            }
+            ?>
+     </div>
 <?php
 }
 endif;
@@ -406,37 +405,37 @@ endif;
  * @since 2.1
  */
 if (!function_exists('writeGroupOptions')):
-  function writeGroupOptions($options = array()) {
+function writeGroupOptions($options = array()) {
     if (empty($options)) {
-      return;
+        return;
     }
     echo ' <span class="ToggleFlyout OptionsMenu">';
     echo '<span class="OptionsTitle" title="'.t('Options').'">'.t('Options').'</span>';
     echo sprite('SpFlyoutHandle', 'Arrow');
     echo '<ul class="Flyout MenuItems" style="display: none;">';
     foreach ($options as $code => $option) {
-      echo wrap(Anchor($option['Text'], $option['Url'], val('CssClass', $option, $code)), 'li');
+        echo wrap(anchor($option['Text'], $option['Url'], val('CssClass', $option, $code)), 'li');
     }
     echo '</ul>';
     echo '</span>';
-  }
+}
 endif;
 
 if (!function_exists('writeGroupBannerOptions')):
-  function writeGroupBannerOptions($options = array()) {
+function writeGroupBannerOptions($options = array()) {
     if (empty($options)) {
-      return;
+        return;
     }
     echo ' <div class="GroupOptions OptionsMenu ButtonGroup">';
     echo '<ul class="Dropdown MenuItems">';
     foreach ($options as $code => $option) {
-      echo wrap(Anchor($option['Text'], $option['Url'], val('CssClass', $option, $code)), 'li');
+        echo wrap(anchor($option['Text'], $option['Url'], val('CssClass', $option, $code)), 'li');
     }
     echo '</ul>';
     echo '<a class="NavButton Handle Button GroupOptionsTitle" title="'.t('Group Options').'">'.t('Group Options').' '.
-      sprite('Sprite', 'SpDropdownHandle').'</a>';
+        sprite('Sprite', 'SpDropdownHandle').'</a>';
     echo '</div>';
-  }
+}
 endif;
 
 

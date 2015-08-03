@@ -1,6 +1,6 @@
 <div class="Event-Header">
    <!-- Edit/Delete Buttons -->
-   <?php WriteEventOptions(); ?>
+   <?php writeEventOptions(); ?>
    <h1 class="Event-Title"><?php echo htmlspecialchars($this->Data('Event.Name')); ?></h1>
 </div>
 

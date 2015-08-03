@@ -1,6 +1,6 @@
 <div class="PageControls Top">
   <?php
-  echo PagerModule::Write();
+  echo PagerModule::write();
   ?>
 </div>
 
@@ -14,6 +14,6 @@ echo $list;
 
 <div class="PageControls Bottom">
   <?php
-  echo PagerModule::Write();
+  echo PagerModule::write();
   ?>
 </div>

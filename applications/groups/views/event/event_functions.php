@@ -29,7 +29,7 @@ function WriteEventButtons($Event = NULL) {
 }
 endif;
 
-function WriteEventOptions($event = null) {
+function writeEventOptions($event = null) {
    if (!$event) {
       $event = Gdn::Controller()->Data('Event');
    }
