@@ -473,7 +473,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
                 // their own avatars.
                 $sender->Permission(array(
                     'Garden.Settings.Manage',
-                    'AvatarStock.CustomUpload.Allow'
+                    'AvatarPool.CustomUpload.Allow'
                 ), false);
 
                 // Generate the target image name.
