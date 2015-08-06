@@ -5,7 +5,9 @@ var gulp = require('gulp')
   , $ = require('gulp-load-plugins')()
 
 gulp.task('styles', function () {
-  var themes = $.filter('themes/*.css');
+  var themes = $.filter('themes/*.css', {
+    restore: true
+  });
 
   return gulp.src([
     'less/style.less'
@@ -20,7 +22,7 @@ gulp.task('styles', function () {
       dirname: '/'
     , prefix: 'custom_'
     }))
-    .pipe(themes.restore())
+    .pipe(themes.restore)
     .pipe(gulp.dest('design'))
     .pipe($.size({showFiles: true}));
 });
@@ -30,7 +32,9 @@ gulp.task('scripts', function () {
     , source = $.filter('js/src/**/*.js');
 
   return gulp.src((dependencies.js || []).concat([
-    'js/src/main.js'
+    'js/src/main.js',
+    'bower_components/bootstrap/js/transition.js',
+    'bower_components/bootstrap/js/collapse.js'
   ]))
     .pipe($.plumber())
     .pipe($.concat('custom.js'))
@@ -50,14 +54,14 @@ gulp.task('wiredep', function () {
 gulp.task('default', ['styles', 'scripts']);
 
 gulp.task('watch',  function () {
-  var server = $.livereload();
+  $.livereload.listen();
 
   gulp.watch([
     'design/*.css'
   , 'js/*.js'
   , 'views/**/*.tpl'
   ], function (file) {
-    return server.changed(file.path);
+    return $.livereload.changed(file.path);
   });
 
   gulp.watch('less/**/*.less', ['styles']);
