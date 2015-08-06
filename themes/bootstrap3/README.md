@@ -3,14 +3,8 @@
 This theme's source is located in vanilla/vanilla-bootstrap (forked from kasperisager/vanilla-bootstrap). In order to update this theme to be up to date with vanilla/vanilla-bootstrap:
 
 1. update the vanilla-bootstrap release number in the bower.json file.
-2. update the dependencies:
-```sh
-$ bower update
-```
-3. compile the theme assets (you must have node and the local dependencies installed first):
-```sh
-$ npm run build
-```
+2. update the dependencies: `bower update`
+3. compile the theme assets (you must have node and the local dependencies installed first): `npm run build`
 
 ## Compiling assets
 
@@ -35,5 +29,6 @@ Compiles all theme assets using Gulp. LESS stylesheets will be compiled to [`des
 
 #### Watch - `npm run watch`
 Watches the assets for changes and runs the appropriate Gulp tasks. Also starts a Livereload server that will push the changes to your Vanilla installation automatically.
+
 ---
 Copyright &copy; 2015 [Kasper Kronborg Isager](https://github.com/kasperisager). Licensed under the terms of the [MIT License](LICENSE.md)
