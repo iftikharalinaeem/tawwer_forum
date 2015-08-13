@@ -4,38 +4,57 @@
 if (!function_exists('WriteEventButtons')) :
 /**
  * Output action buttons to edit/delete an Event.
- * 
- * @param array $Event Optional. Uses data array's Event if none is provided. 
+ *
+ * @param array $Event Optional. Uses data array's Event if none is provided.
  */
 function WriteEventButtons($Event = NULL) {
    if (!$Event)
       $Event = Gdn::Controller()->Data('Event');
-   if (!$Event) 
+   if (!$Event)
       return;
-   
+
    echo '<div class="Event-Buttons">';
-   
+
    $Options = array();
-   
+
    if (EventPermission('Edit', $Event)) {
       $Options['Edit'] = array('Text' => T('Edit'), 'Url' => EventUrl($Event, 'edit'));
       $Options['Delete'] = array('Text' => T('Delete'), 'Url' => EventUrl($Event, 'delete'), 'CssClass' => 'Popup');
    }
-   
+
    if (count($Options))
       echo ButtonDropDown($Options, 'Button DropRight Event-OptionsButton', Sprite('SpOptions', 'Sprite16'));
-   
+
    echo '</div>';
 }
 endif;
+
+function writeEventOptions($event = null) {
+   if (!$event) {
+      $event = Gdn::Controller()->Data('Event');
+   }
+   if (!$event) {
+      return;
+   }
+   $options = array();
+
+   if (EventPermission('Edit', $event)) {
+      $options['Edit'] = array('Text' => T('Edit'), 'Url' => EventUrl($event, 'edit'));
+      $options['Delete'] = array('Text' => T('Delete'), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup');
+   }
+
+   if (count($options)) {
+     writeGroupOptions($options);
+   }
+}
 
 
 if (!function_exists('WriteEventCard')) :
 /**
  * Write an event card
- * 
+ *
  * Optionally write rich listing
- * 
+ *
  * @param array $Event
  */
 function WriteEventCard($Event) {
@@ -44,14 +63,14 @@ function WriteEventCard($Event) {
    $DateStarts = new DateTime($Event['DateStarts'], $UTC);
    if (Gdn::Session()->IsValid() && $HourOffset = Gdn::Session()->User->HourOffset)
       $DateStarts->modify("{$HourOffset} hours");
-   
+
    echo '<div class="Event">';
    if (GetValue('Rich', $Event)) {
-      
-      
-      
+
+
+
    } else {
-      
+
       echo DateTile($DateStarts->format('Y-m-d'));
       echo '<h3 class="Event-Title">'.Anchor(Gdn_Format::Text($Event['Name']), EventUrl($Event));
       if ($DateStarts->format('g:ia') != '12:00am')
@@ -60,7 +79,7 @@ function WriteEventCard($Event) {
 
       echo '<div class="Event-Location">'.Gdn_Format::Text($Event['Location']).'</div>';
       echo '<p class="Event-Description">'.SliceParagraph(Gdn_Format::Text($Event['Body']), 100).'</p>';
-      
+
    }
    echo '</div>';
 }
@@ -84,7 +103,7 @@ endif;
 if (!function_exists('WriteEventCards')) :
 /**
  * Write a list of events out as cards.
- * 
+ *
  * @param array $Events
  * @param string $EmptyMessage
  */

@@ -1,17 +1,19 @@
-<h1><?php echo $this->Title(); ?></h1>
-
 <div class="PageControls Top">
-<?php
-echo PagerModule::Write();
-?>
+  <?php
+  echo PagerModule::write();
+  ?>
 </div>
 
 <?php
-WriteGroupCards($this->Data('Groups'));
+$groups = $this->Data('Groups');
+$groupModel = new GroupModel();
+$groupModel->JoinRecentPosts($groups);
+$list = new GroupListModule($this, $groups, 'groups', $this->Title(), t("No groups to display yet."), '', false);
+echo $list;
 ?>
 
 <div class="PageControls Bottom">
-<?php
-echo PagerModule::Write();
-?>
+  <?php
+  echo PagerModule::write();
+  ?>
 </div>

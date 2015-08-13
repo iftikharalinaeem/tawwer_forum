@@ -22,6 +22,16 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
 
+   /**
+    * Add a discussion excerpt in each discussion list item.
+    */
+   public function groupController_afterDiscussionTitle_handler($sender) {
+      $discussion = val('Discussion', $sender->EventArguments);
+      if (is_object($discussion) && val('Announce', $discussion)) {
+         echo '<div class="Excerpt">'.sliceString(Gdn_Format::plainText($discussion->Body, $discussion->Format), c('Vanilla.DiscussionExcerpt.Length', 100)).'</div>';
+      }
+   }
+
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
       $Sender->AddCssFile('groups.css', 'groups');
    }
@@ -75,6 +85,31 @@ class GroupsHooks extends Gdn_Plugin {
       $ViewPermission = GroupPermission('View', $GroupID);
       if (!$ViewPermission) {
          throw ForbiddenException('@'.GroupPermission('View.Reason', $GroupID));
+      }
+   }
+
+   /**
+    * Renders the group header on the discussion/announcement pages.
+    *
+    * @param $sender
+    * @param $args
+    * @return bool
+    */
+   public function base_beforeRenderAsset_handler($sender, $args) {
+      if (val('AssetName', $args) == 'Content' && is_a($sender, 'DiscussionController')) {
+         $groupId = $sender->Data('Discussion.GroupID');
+         if (!$groupId) {
+            return false;
+         }
+         $model = new GroupModel();
+         $group = $model->getID($groupId);
+
+         $params = array('group' => $group,
+            'showButtons' => true,
+            'showOptions' => true,
+         );
+
+         echo Gdn_Theme::module('GroupHeaderModule', $params);
       }
    }
 

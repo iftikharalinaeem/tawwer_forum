@@ -1,13 +1,10 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
 
-<h1><?php echo $this->Data('Title')?></h1>
+echo '<h1>'.$this->Data('Title').'</h1>';
 
-<div class="UpcomingEvents">
-   <h2><?php echo T('Upcoming Events'); ?></h2>
-   <?php WriteEventCards($this->Data('UpcomingEvents')); ?>
-</div>
+$eventList = new EventListModule($this->Data('UpcomingEvents'), $this->Data('Group'), t('Upcoming Events'), t('GroupEmptyUpcomingEvents', "Aw snap, no events are coming up."), false);
+echo $eventList;
 
-<div class="RecentEvents">
-   <h2><?php echo T('Recent Events'); ?></h2>
-   <?php WriteEventCards($this->Data('RecentEvents')); ?>
-</div>
+$eventList = new EventListModule($this->Data('RecentEvents'), $this->Data('Group'), t('Recent Events'), t('GroupEmptyRecentEvents', "There aren't any recent events to show."), false, '', false);
+echo $eventList;
+
