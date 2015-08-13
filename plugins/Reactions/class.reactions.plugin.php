@@ -284,16 +284,23 @@ class ReactionsPlugin extends Gdn_Plugin {
    }
 
    /**
+    * Show user's reacted-to content by reaction type.
     *
-    * @param ProfileController $Sender
-    * @param type $Args
+    * @param ProfileController $Sender Duh.
+    * @param string|int $UserReference A username or userid.
+    * @param string $Reaction Which reaction is selected.
+    * @param int $Page What page to show. Defaults to 1.
     */
-   public function ProfileController_Reactions_Create($Sender, $UserID, $Username = '', $Reaction = '', $Page = '') {
+   public function ProfileController_Reactions_Create($Sender, $UserReference, $Username = '', $Reaction = '', $Page = '') {
       $Sender->Permission('Garden.Profiles.View');
 
       $ReactionType = ReactionModel::ReactionTypes($Reaction);
-      if (!$ReactionType)
+      if (!$ReactionType) {
          throw NotFoundException();
+      }
+
+      $Sender->getUserInfo($UserReference, $Username);
+      $UserID = val('UserID', $Sender->User);
 
       list($Offset, $Limit) = OffsetLimit($Page, 5);
 
@@ -308,11 +315,13 @@ class ReactionsPlugin extends Gdn_Plugin {
       if (count($Data) > $Limit) {
          array_pop($Data);
       }
-      if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) === 'avatars')
+      if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) === 'avatars') {
          $ReactionModel->JoinUserTags($Data);
+      }
+
       $Sender->SetData('Data', $Data);
-      $Sender->SetData('EditMode', FALSE, TRUE);
-      $Sender->GetUserInfo($UserID, $Username);
+      $Sender->SetData('EditMode', false, true);
+
       $Sender->_SetBreadcrumbs($ReactionType['Name'], $Sender->CanonicalUrl());
       $Sender->SetTabView('Reactions', 'DataList', '', 'plugins/Reactions');
       $this->AddJs($Sender);
@@ -566,9 +575,9 @@ class ReactionsPlugin extends Gdn_Plugin {
       $Sender->AddJsFile('global.js');
 
       if (C('Plugins.Reactions.BestOfStyle', 'Tiles') == 'Tiles') {
-         $Sender->AddJsFile('plugins/Reactions/library/jQuery-Masonry/jquery.masonry.js'); // I customized this to get proper callbacks.
-         $Sender->AddJsFile('plugins/Reactions/library/jQuery-Wookmark/jquery.imagesloaded.js');
-         $Sender->AddJsFile('plugins/Reactions/library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js');
+         $Sender->AddJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions'); // I customized this to get proper callbacks.
+         $Sender->AddJsFile('library/jQuery-Wookmark/jquery.imagesloaded.js', 'plugins/Reactions');
+         $Sender->AddJsFile('library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js', 'plugins/Reactions');
          $Sender->AddJsFile('tile.js', 'plugins/Reactions');
          $Sender->CssClass .= ' NoPanel';
          $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'tile_items' : 'tiles';
@@ -594,6 +603,25 @@ class ReactionsPlugin extends Gdn_Plugin {
 
       // Render the page (or deliver the view)
       $Sender->Render($View, '', 'plugins/Reactions');
+   }
+
+   /**
+    * Recalculate all reaction data, including totals
+    */
+   public function utilityController_RecalculateReactions_Create($sender) {
+      $sender->permission('Garden.Settings.Manage');
+
+      $this->form = new Gdn_Form();
+
+      if ($this->form->authenticatedPostback()) {
+         $reactionModel = new ReactionModel();
+         $reactionModel->recalculateTotals();
+         $sender->setData('Recalculated', true);
+      }
+
+      $sender->addSideMenu();
+      $sender->setData('Title', t('Recalculate Reactions'));
+      $sender->render('Recalculate', '', 'plugins/Reactions');
    }
 
    /**

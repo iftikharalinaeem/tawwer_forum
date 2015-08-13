@@ -81,7 +81,7 @@ class RankModel extends Gdn_Model {
             'Route' => "/profile",
             'Emailed' => ActivityModel::SENT_PENDING,
             'Notified' => ActivityModel::SENT_PENDING,
-            'Photo' => 'http://cdn.vanillaforums.com/images/ranks_100.png',
+            'Photo' => 'https://c3409409.ssl.cf0.rackcdn.com/images/ranks_100.png',
             'Data' => array('Name' => $Rank['Name'], 'Label' => $Rank['Label'])
       );
 
@@ -148,6 +148,13 @@ class RankModel extends Gdn_Model {
       if ($V !== '') {
          $Options = self::ContentEditingOptions();
          $Result[] = '<b>'.T('Editing').'</b>: '.GetValue($V, $Options);
+      }
+
+      if ($v = val('PermissionRole', $Abilities)) {
+          $role = RoleModel::roles($v);
+          if ($role) {
+              $Result[] = '<b>Role Permissions</b>: '.htmlspecialchars($role['Name']);
+          }
       }
 
       if (count($Result) == 0) {
@@ -287,6 +294,12 @@ class RankModel extends Gdn_Model {
       if ($V = GetValue('EditContentTimeout', $Abilities)) {
          SaveToConfig('Garden.EditContentTimeout', $V, FALSE);
       }
+
+       $permissionRole = val('PermissionRole', $Abilities);
+       if($permissionRole) {
+           $rankPermissions = Gdn::permissionModel()->getPermissionsByRole($permissionRole);
+           Gdn::session()->addPermissions($rankPermissions);
+       }
    }
 
    public function Calculate(&$Data) {
