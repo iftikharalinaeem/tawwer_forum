@@ -35,6 +35,28 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
 
+   /**
+    * Interrupt category management to disallow deletion of the Social Groups category.
+    *
+    * @param $sender
+    */
+   public function SettingsController_Render_Before($sender) {
+      if ($sender->RequestMethod == 'managecategories') {
+         $categorydata = $sender->data('CategoryData');
+         foreach ($categorydata->result() as $category) {
+            if (val('AllowGroups', $category)) {
+                setValue('CanDelete', $category, 0);
+            }
+         }
+      }
+   }
+
+   /**
+    *
+    *
+    * @param $Sender
+    * @param $Args
+    */
    public function Base_ConversationGInvite_Handler($Sender, $Args) {
       $GroupID = $Sender->Data('Conversation.RegardingID');
       if ($GroupID) {
