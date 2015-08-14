@@ -125,6 +125,68 @@ class GroupsHooks extends Gdn_Plugin {
 
    }
 
+
+
+   /**
+    * Remove category permissions restrictions temporarily when getting bookmarks
+    * @param DiscussionsController $sender
+    * @param $args
+    */
+   public function discussionsController_bookmarkedPopin_before($sender, $args) {
+      $cm = new CategoryModel();
+      $a = $cm->categories();
+      $categories = $cm->getWhereCache(['AllowGroups' => 1]);
+      $this->categoryPermissions = [];
+      foreach ($categories as $id => $cat) {
+         $this->categoryPermissions[$id] = $cat['PermsDiscussionsView'];
+         CategoryModel::$Categories[$id]['PermsDiscussionsView'] = true;
+      }
+   }
+
+   /**
+    * Restore category permissions that have been changed in discussionsController_bookmarked_before in order
+    * to allow bookmarks to appear that are in groups within categories.
+    *
+    * @param $sender
+    * @param $args
+    */
+   public function discussionsController_bookmarkedPopin_render($sender, $args) {
+
+      /* Ensure that there are discussions */
+
+      if (!isset($sender->Data['Discussions']) && !($sender->Data['Discussions'] instanceof Gdn_DataSet)) {
+         trigger_error("No discussions found in the data array.", E_USER_NOTICE);
+         return;
+      }
+
+      $discussionResult = $sender->Data['Discussions'];
+      $groupModel = new GroupModel();
+
+      /* Create a discussionsArray by filtering out groups forwhich the $User does not have permissions to view. s*/
+      $discussionsArray = array_filter(
+          $discussionResult,
+          function ($discussion) use ($groupModel) {
+             $groupID = val('GroupID', $discussion);
+             if (empty($groupID)) {
+                return true;
+             }
+             $viewPermission = $groupModel->checkPermission('View', $groupID);
+             return (bool)$viewPermission;
+          }
+      );
+
+      $sender->setData('Discussions', $discussionsArray);
+
+      /* Re-instate category permissions temporarily modified in discussionsController_bookmarked_before */
+      $cm = new CategoryModel();
+      $categories = $cm->getWhereCache(['AllowGroups' => 1]);
+
+      foreach ($categories as $id => $cat) {
+         CategoryModel::$Categories[$id]['PermsDiscussionsView'] = $this->categoryPermissions[$id];
+      }
+
+   }
+
    /**
     * Make sure the user has permission to view the group
     * @param DiscussionController $Sender
