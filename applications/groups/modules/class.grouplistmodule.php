@@ -72,6 +72,7 @@ class GroupListModule extends Gdn_Module {
     }
 
     public function getGroupInfo($group, $view, $withButtons = true, $sectionId = false) {
+
         $item['text'] = htmlspecialchars(SliceString(Gdn_Format::PlainText(val('Description', $group), val('Format', $group)), C('Groups.CardDescription.ExcerptLength', 150)));
         $item['textCssClass'] = 'GroupDescription';
         $item['imageSource'] = val('Icon', $group) ? Gdn_Upload::Url(val('Icon', $group)) : C('Groups.DefaultIcon', false);
@@ -89,12 +90,9 @@ class GroupListModule extends Gdn_Module {
             $item['meta']['countMembers']['text'] = Plural(val('CountMembers', $group), '%s member', '%s members', number_format(val('CountMembers', $group)));
 
             if ($attachDiscussionData) {
-                $groupModel = new GroupModel();
-                if ($groupModel->CheckPermission('View', val('GroupID', $group))) {
-                    $item['meta']['lastDiscussion']['text'] = T('Most recent discussion:') . ' ';
-                    $item['meta']['lastDiscussion']['linkText'] = htmlspecialchars(SliceString(Gdn_Format::Text(val('LastTitle', $group)), 100));
-                    $item['meta']['lastDiscussion']['url'] = Url(val('LastUrl', $group));
-                }
+                $item['meta']['lastDiscussion']['text'] = T('Most recent discussion:') . ' ';
+                $item['meta']['lastDiscussion']['linkText'] = htmlspecialchars(SliceString(Gdn_Format::Text(val('LastTitle', $group)), 100));
+                $item['meta']['lastDiscussion']['url'] = val('LastUrl', $group);
 
                 $item['meta']['lastUser']['text'] = T('by') . ' ';
                 $item['meta']['lastUser']['linkText'] = val('LastName', $group);
