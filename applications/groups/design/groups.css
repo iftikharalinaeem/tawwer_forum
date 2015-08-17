@@ -214,6 +214,10 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
   float: right; }
 .Group-Box .H {
   float: left; }
+.Group-Box .PhotoWrap {
+  display: block; }
+.Group-Box .PhotoGrid .PhotoWrap {
+  display: inline; }
 
 .Group-Header {
   margin-bottom: 20px; }
