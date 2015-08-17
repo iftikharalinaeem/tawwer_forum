@@ -57,12 +57,13 @@
     float: left;
   }
 
-  // Warnings2 fix, 
+  // Warnings2 fix,
   .PhotoWrap {
     display: block;
   }
 
-  .PhotoGrid .PhotoWrap {
+  .PhotoGrid .PhotoWrap,
+  .Group-Member.UserTile .PhotoWrap {
     display: inline;
   }
 }

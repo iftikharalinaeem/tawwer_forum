@@ -216,7 +216,7 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
   float: left; }
 .Group-Box .PhotoWrap {
   display: block; }
-.Group-Box .PhotoGrid .PhotoWrap {
+.Group-Box .PhotoGrid .PhotoWrap, .Group-Box .Group-Member.UserTile .PhotoWrap {
   display: inline; }
 
 .Group-Header {
