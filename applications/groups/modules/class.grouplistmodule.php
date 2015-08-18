@@ -49,7 +49,7 @@ class GroupListModule extends Gdn_Module {
 
         if ($this->showMore) {
             $groupList['moreLink'] = sprintf(T('All %s...'), $heading);
-            $groupList['moreUrl'] = '/groups/browse/' . $sectionId;
+            $groupList['moreUrl'] = url('/groups/browse/'.$sectionId);
             $groupList['moreCssClass'] = 'More';
         }
 
@@ -72,9 +72,9 @@ class GroupListModule extends Gdn_Module {
     }
 
     public function getGroupInfo($group, $view, $withButtons = true, $sectionId = false) {
-        $item['text'] = htmlspecialchars(SliceString(Gdn_Format::PlainText(val('Description', $group), val('Format', $group)), C('Groups.CardDescription.ExcerptLength', 150)));
+        $item['text'] = htmlspecialchars(sliceString(Gdn_Format::plainText(val('Description', $group), val('Format', $group)), C('Groups.CardDescription.ExcerptLength', 150)));
         $item['textCssClass'] = 'GroupDescription';
-        $item['imageSource'] = val('Icon', $group) ? Gdn_Upload::Url(val('Icon', $group)) : C('Groups.DefaultIcon', false);
+        $item['imageSource'] = val('Icon', $group) ? Gdn_Upload::url(val('Icon', $group)) : C('Groups.DefaultIcon', false);
         $item['imageCssClass'] = 'Group-Icon';
         $item['heading'] = val('Name', $group);
         $item['url'] = GroupUrl($group);
@@ -91,16 +91,16 @@ class GroupListModule extends Gdn_Module {
             if ($attachDiscussionData) {
                 $groupModel = new GroupModel();
                 if ($groupModel->CheckPermission('View', val('GroupID', $group))) {
-                    $item['meta']['lastDiscussion']['text'] = T('Most recent discussion:') . ' ';
-                    $item['meta']['lastDiscussion']['linkText'] = htmlspecialchars(SliceString(Gdn_Format::Text(val('LastTitle', $group)), 100));
-                    $item['meta']['lastDiscussion']['url'] = Url(val('LastUrl', $group));
+                    $item['meta']['lastDiscussion']['text'] = t('Most recent discussion:') . ' ';
+                    $item['meta']['lastDiscussion']['linkText'] = htmlspecialchars(sliceString(Gdn_Format::text(val('LastTitle', $group)), 100));
+                    $item['meta']['lastDiscussion']['url'] = url(val('LastUrl', $group));
                 }
 
-                $item['meta']['lastUser']['text'] = T('by') . ' ';
+                $item['meta']['lastUser']['text'] = t('by') . ' ';
                 $item['meta']['lastUser']['linkText'] = val('LastName', $group);
-                $item['meta']['lastUser']['url'] = UserUrl($group, 'Last');
+                $item['meta']['lastUser']['url'] = userUrl($group, 'Last');
 
-                $item['meta']['lastDate']['text'] = Gdn_Format::Date(val('LastDateInserted', $group));
+                $item['meta']['lastDate']['text'] = Gdn_Format::date(val('LastDateInserted', $group));
             }
         }
 
