@@ -55,7 +55,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
     public function getSettings() {
         self::requireFiles();
         $settings = new OneLogin_Saml_Settings();
-        $provider = $this->Provider();
+        $provider = $this->provider();
         $settings->idpSingleSignOnUrl = $provider['SignInUrl'];
         $settings->idpSingleSignOutUrl = $provider['SignOutUrl'];
         $settings->idpPublicCertificate = $provider['AssociationSecret'];
@@ -150,7 +150,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         }
     }
 
-    /**
+   /**
 	 * Validate the signature on a HTTP-Redirect message.
 	 *
 	 * Throws an exception if we are unable to validate the signature.
@@ -200,7 +200,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         if ($Provider['AuthenticationSchemeAlias'] != 'saml')
             return;
 
-        $this->entryController_Saml_Create($Sender);
+        $this->entryController_saml_create($Sender);
     }
 
     /**
@@ -399,13 +399,13 @@ class SamlSSOPlugin extends Gdn_Plugin {
             $Form->setFormValue('AuthenticationKey', 'saml');
 
             // Make sure the key is in the correct form.
-            $secret = $Form->GetFormValue('AssociationSecret');
-            $Form->SetFormValue('AssociationSecret', self::untrimCert($secret));
+            $secret = $Form->getFormValue('AssociationSecret');
+            $Form->setFormValue('AssociationSecret', self::untrimCert($secret));
 
-            $key = $Form->GetFormValue('PrivateKey');
+            $key = $Form->getFormValue('PrivateKey');
             $Form->SetFormValue('PrivateKey', self::untrimCert($key, 'RSA PRIVATE KEY'));
 
-            $key = $Form->GetFormValue('PublicKey');
+            $key = $Form->getFormValue('PublicKey');
             $Form->setFormValue('PublicKey', self::untrimCert($key, 'RSA PUBLIC KEY'));
 
             if ($Form->save()) {
