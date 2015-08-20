@@ -2,7 +2,7 @@
 
 $PluginInfo['sitenode'] = array(
     'Name'        => "Multisite Node",
-    'Version'     => '1.0.0-alpha',
+    'Version'     => '1.1.0',
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
@@ -596,6 +596,18 @@ class SiteNodePlugin extends Gdn_Plugin {
             $supportEmail = $this->slug().".$alias@email.vanillaforums.com";
             SaveToConfig('Garden.Email.SupportAddress', $supportEmail, false);
         }
+    }
+
+    /**
+     * Add a checkbox that tells this connection whether or not to synchronize to nodes.
+     *
+     * @param JsConnectPlugin $sender
+     */
+    public function jsconnectPlugin_addEdit_render($sender) {
+        $sender->addControl(
+            'SyncWithHub',
+            ['LabelCode' => 'Get the client information from the hub.', 'Control' => 'Checkbox']
+        );
     }
 
     /**

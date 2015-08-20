@@ -3,7 +3,7 @@
 $PluginInfo['sitehub'] = array(
     'Name'        => "Multisite Hub",
     'Description' => 'The Multi-site Hub plugin provides functionality to manage a multi-site cluster.',
-    'Version'     => '1.0.0',
+    'Version'     => '1.1.0',
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
@@ -187,6 +187,18 @@ class SiteHubPlugin extends Gdn_Plugin {
         $sender->Data = array('User' => $ssoUser);
         SaveToConfig('Api.Clean', false, false);
         $sender->Render('Blank', 'Utility', 'Dashboard');
+    }
+
+    /**
+     * Add a checkbox that tells this connection whether or not to synchronize to nodes.
+     *
+     * @param JsConnectPlugin $sender
+     */
+    public function jsconnectPlugin_addEdit_render($sender) {
+        $sender->addControl(
+            'SyncToNodes',
+            ['LabelCode' => 'Synchronize the client information to the nodes.', 'Control' => 'Checkbox']
+        );
     }
 
     /**
