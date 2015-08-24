@@ -8,7 +8,7 @@ if (GroupPermission('View')) {
         echo $applicantList;
     }
     writeFullAnnouncementList($this, T('GroupEmptyAnnouncements', "Important stuff will go here one day."));
-    writeFullDiscussionList($this, T('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"));
+    writeFullDiscussionList($this, T('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"), t('Discussions'));
     $eventList = new EventListModule($this->Data('Events'), $this->Data('Group'), t('Upcoming Events'), t('GroupEmptyEvents', "Aw snap, no events are coming up."));
     echo $eventList;
     echo '<div class="Group-Info ClearFix clearfix">';

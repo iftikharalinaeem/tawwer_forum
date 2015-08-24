@@ -21,7 +21,7 @@ class GroupLeadersModule extends Gdn_Module {
         ?>
 
         <div class="Group-Box Group-Leaders">
-            <h3><?php echo Anchor(T('Group Leaders', 'Leaders'), GroupUrl($Group)); ?></h3>
+            <h3><?php echo Anchor(T('Group Leaders', 'Leaders'), GroupUrl($Group, 'members')); ?></h3>
             <?php WriteMemberSimpleList($Leaders); ?>
         </div>
 

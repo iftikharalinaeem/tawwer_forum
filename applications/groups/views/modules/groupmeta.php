@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $meta = $this->data('meta');
 
-echo '<div class="Meta'.val('cssClass', $meta).'">';
+echo '<div class="Meta '.val('cssClass', $meta).'">';
 foreach(val('metaItems', $meta) as $metaItem) {
 
   echo '<span class="MItem '.val('cssClass', $metaItem).'">';
