@@ -137,7 +137,7 @@ function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussi
             $sender->EventArguments['title'] = &$title;
             $sender->fireEvent('beforeDiscussionList');
             if (!$sender->data('Discussions')->result()) {
-                echo $emptyMessage;
+                echo '<div class="EmptyMessage">'.$emptyMessage.'</div>';
             } else {
                 if ($view == 'table') {
                     include_once($sender->fetchViewLocation('table_functions', 'discussions', 'vanilla'));
@@ -170,7 +170,7 @@ function writeFullAnnouncementList($sender, $emptyMessage) {
   $bak = $sender->data('Discussions');
   $sender->setData('Discussions', $sender->Data('Announcements'));
   $sender->setData('Announcements', false);
-  writeFullDiscussionList($sender, $emptyMessage, 'Announcements');
+  writeFullDiscussionList($sender, $emptyMessage, t('Announcements'));
   $sender->setData('Discussions', $bak);
 }
 endif;

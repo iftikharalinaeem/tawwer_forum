@@ -155,7 +155,7 @@ if (val('view', $list) == 'table') {
     </div>
     <?php }
     if (val('emptyMessage', $list) && !val('items', $list)) { ?>
-      <div class="ErrorMessage <?php echo val('emptyMessageCssClass', $list); ?>"><?php echo val('emptyMessage', $list); ?></div>
+      <div class="EmptyMessage <?php echo val('emptyMessageCssClass', $list); ?>"><?php echo val('emptyMessage', $list); ?></div>
     <?php } ?>
     <?php if (val('moreLink', $list)) { ?>
       <div class="MoreWrap">
@@ -224,7 +224,7 @@ else if (val('view', $list) == 'modern') { ?>
       <?php } ?>
     </ul>
     <?php if (val('emptyMessage', $list) && !val('items', $list)) { ?>
-      <div class="ErrorMessage <?php echo val('emptyMessageCssClass', $list); ?>"><?php echo val('emptyMessage', $list); ?></div>
+      <div class="EmptyMessage <?php echo val('emptyMessageCssClass', $list); ?>"><?php echo val('emptyMessage', $list); ?></div>
     <?php } ?>
     <?php if (val('moreLink', $list)) { ?>
       <div class="MoreWrap">
