@@ -33,7 +33,7 @@ class MemberListModule extends Gdn_Module {
         if (GroupPermission('Moderate') && (val('InsertUserID', $group) != $userId)) {
             if (GroupPermission('Edit')) {
                 if (val('Role', $member) == 'Leader') {
-                    $makeMember['text'] = sprintf(T('Make %s'), T('Member'));
+                    $makeMember['text'] = sprintf(t('Make %s'), t('Member'));
                     $makeMember['url'] = GroupUrl($group, 'setrole')."?userid=$userId&role=member";
                     $makeMember['cssClass'] = 'Group-MakeMember Hijack';
 
@@ -109,7 +109,7 @@ class MemberListModule extends Gdn_Module {
         $item['rows']['main']['cssClass'] = 'UserName';
 
         $item['rows']['joinDate']['type'] = 'default';
-        $item['rows']['joinDate']['text'] = Gdn_Format::Date(val('DateInserted', $member), 'html');
+        $item['rows']['joinDate']['text'] = Gdn_Format::date(val('DateInserted', $member), 'html');
         $item['rows']['joinDate']['cssClass'] = 'JoinDate';
 
         $item['rows']['buttons']['type'] = 'buttons';

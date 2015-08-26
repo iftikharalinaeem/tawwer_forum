@@ -29,8 +29,8 @@ class EventListModule extends Gdn_Module {
     public function getEventOptions($event) {
         $options = array();
         if (EventPermission('Edit', $event)) {
-            $options[] = array('Text' => T('Edit'), 'Url' => EventUrl($event, 'edit'));
-            $options[] = array('Text' => T('Delete'), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup');
+            $options[] = array('Text' => t('Edit'), 'Url' => EventUrl($event, 'edit'));
+            $options[] = array('Text' => t('Delete'), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup');
         }
         return $options;
     }
@@ -40,7 +40,7 @@ class EventListModule extends Gdn_Module {
         $buttons = array();
         if (GroupPermission('Member')) {
             $newEventButton['text'] = t('New Event');
-            $newEventButton['url'] = Url("/event/add/{$groupID}");
+            $newEventButton['url'] = url("/event/add/{$groupID}");
             $newEventButton['cssClass'] = 'Button Primary Group-NewEventButton';
             $buttons[] = $newEventButton;
         }
@@ -56,7 +56,7 @@ class EventListModule extends Gdn_Module {
 
         if ($this->showMore) {
             $eventList['moreLink'] = sprintf(T('All %s...'), T('Events'));
-            $eventList['moreUrl'] = Url(CombinePaths(array("/events/group/", GroupSlug($group))));
+            $eventList['moreUrl'] = url(combinePaths(array("/events/group/", GroupSlug($group))));
             $eventList['moreCssClass'] = 'More';
         }
 
@@ -84,14 +84,14 @@ class EventListModule extends Gdn_Module {
 
         $utc = new DateTimeZone('UTC');
         $dateStarts = new DateTime($event['DateStarts'], $utc);
-        if (Gdn::Session()->IsValid() && $hourOffset = Gdn::Session()->User->HourOffset) {
+        if (Gdn::session()->isValid() && $hourOffset = Gdn::session()->User->HourOffset) {
             $dateStarts->modify("{$hourOffset} hours");
         }
 
         $item['dateTile'] = true;
         $item['monthTile'] = strftime('%b', $dateStarts->getTimestamp());
         $item['dayTile'] = $dateStarts->format('j');
-        $item['text'] = SliceParagraph(Gdn_Format::plainText(val('Body', $event), val('Format', $event)), 100);
+        $item['text'] = sliceParagraph(Gdn_Format::plainText(val('Body', $event), val('Format', $event)), 100);
         $item['textCssClass'] = 'EventDescription';
         $item['heading'] = Gdn_Format::text(val('Name', $event));
         $item['url'] = EventUrl($event);

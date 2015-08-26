@@ -5,7 +5,7 @@ class GroupMetaModule extends Gdn_Module {
     public $meta;
     public $group;
 
-    public function __construct($group, $cssClass = 'Group-Meta Group-Info') {
+    public function __construct($group, $cssClass = '') {
         $this->meta['cssClass'] = $cssClass;
         $this->group = $group;
     }
@@ -16,7 +16,7 @@ class GroupMetaModule extends Gdn_Module {
 
     public function getMetaInfo($group) {
         $owner = Gdn::UserModel()->getID(val('InsertUserID', $group));
-        $metaItems['owner']['text'] = T('Owner').': ';
+        $metaItems['owner']['text'] = t('Owner').': ';
         $metaItems['owner']['value'] = userAnchor($owner);
 
         $groupModel = new GroupModel();
@@ -26,13 +26,13 @@ class GroupMetaModule extends Gdn_Module {
             $leaderString[] = userAnchor($leader);
         }
         $leaderString = implode(', ', $leaderString);
-        $metaItems['leaders']['text'] = T('Leaders').': ';
+        $metaItems['leaders']['text'] = t('Leaders').': ';
         $metaItems['leaders']['value'] = $leaderString;
 
         $date = new DateTime(val('DateInserted', $group));
-        $metaItems['date']['text'] = sprintf(T('Created on %s'), $date->format('F j, Y'));
+        $metaItems['date']['text'] = sprintf(t('Created on %s'), $date->format('F j, Y'));
 
-        $metaItems['count']['text'] = sprintf(T('%s members'), val('CountMembers', $group));
+        $metaItems['count']['text'] = sprintf(t('%s members'), val('CountMembers', $group));
         $metaItems['count']['url'] = GroupUrl($group, 'members');
 
         return $metaItems;

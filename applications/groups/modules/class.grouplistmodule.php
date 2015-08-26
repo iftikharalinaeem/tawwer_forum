@@ -48,19 +48,19 @@ class GroupListModule extends Gdn_Module {
         $groupList['cssClass'] = $cssClass;
 
         if ($this->showMore) {
-            $groupList['moreLink'] = sprintf(T('All %s...'), $heading);
+            $groupList['moreLink'] = sprintf(t('All %s...'), $heading);
             $groupList['moreUrl'] = url('/groups/browse/'.$sectionId);
             $groupList['moreCssClass'] = 'More';
         }
 
         if ($view == 'table') {
-            $groupList['columns'][0]['columnLabel'] = T('Group');
+            $groupList['columns'][0]['columnLabel'] = t('Group');
             $groupList['columns'][0]['columnCssClass'] = 'GroupName';
-            $groupList['columns'][1]['columnLabel'] = T('Members');
+            $groupList['columns'][1]['columnLabel'] = t('Members');
             $groupList['columns'][1]['columnCssClass'] = 'BigCount CountMembers';
-            $groupList['columns'][2]['columnLabel'] = T('Discussions');
+            $groupList['columns'][2]['columnLabel'] = t('Discussions');
             $groupList['columns'][2]['columnCssClass'] = 'BigCount CountDiscussions';
-            $groupList['columns'][3]['columnLabel'] = T('Latest Post');
+            $groupList['columns'][3]['columnLabel'] = t('Latest Post');
             $groupList['columns'][3]['columnCssClass'] = 'BlockColumn LatestPost';
         }
 
@@ -72,7 +72,7 @@ class GroupListModule extends Gdn_Module {
     }
 
     public function getGroupInfo($group, $view, $withButtons = true, $sectionId = false) {
-        $item['text'] = htmlspecialchars(sliceString(Gdn_Format::plainText(val('Description', $group), val('Format', $group)), C('Groups.CardDescription.ExcerptLength', 150)));
+        $item['text'] = htmlspecialchars(sliceString(Gdn_Format::plainText(val('Description', $group), val('Format', $group)), c('Groups.CardDescription.ExcerptLength', 150)));
         $item['textCssClass'] = 'GroupDescription';
         $item['imageSource'] = val('Icon', $group) ? Gdn_Upload::url(val('Icon', $group)) : C('Groups.DefaultIcon', false);
         $item['imageCssClass'] = 'Group-Icon';
@@ -133,10 +133,10 @@ class GroupListModule extends Gdn_Module {
         $item['rows']['lastPost']['title'] = val('LastTitle', $group);
         $item['rows']['lastPost']['url'] = val('LastUrl', $group);
         $item['rows']['lastPost']['username'] = val('LastName', $group);
-        $item['rows']['lastPost']['userUrl'] = UserUrl($group, 'Last');
+        $item['rows']['lastPost']['userUrl'] = userUrl($group, 'Last');
         $item['rows']['lastPost']['date'] = val('LastDateInserted', $group);
         $item['rows']['lastPost']['imageSource'] = val('LastPhoto', $group);
-        $item['rows']['lastPost']['imageUrl'] = UserUrl($group, 'Last');
+        $item['rows']['lastPost']['imageUrl'] = userUrl($group, 'Last');
     }
 
     /**
