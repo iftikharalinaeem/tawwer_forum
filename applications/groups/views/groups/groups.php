@@ -7,7 +7,7 @@ if (CheckPermission('Groups.Group.Add')) {
    echo Anchor(T('New Group'), '/group/add', 'Button Primary');
 }
 
-if ($groups = $this->Data('MyGroups')) {
+if ($groups = $this->data('MyGroups')) {
   $groupModel = new GroupModel();
   $groupModel->JoinRecentPosts($groups);
   $list = new GroupListModule($this, $groups, 'mine', t('My Groups'), t("You haven't joined any groups yet."), 'my-groups');
@@ -15,14 +15,14 @@ if ($groups = $this->Data('MyGroups')) {
 }
 
 
-if ($groups = $this->Data('NewGroups')) {
+if ($groups = $this->data('NewGroups')) {
   $groupModel = new GroupModel();
   $groupModel->JoinRecentPosts($groups);
   $list = new GroupListModule($this, $groups, 'new', t('New Groups'), t("There aren't any groups yet."), 'new-groups');
   echo $list;
 }
 
-if ($groups = $this->Data('Groups')) {
+if ($groups = $this->data('Groups')) {
   $groupModel = new GroupModel();
   $groupModel->JoinRecentPosts($groups);
   $list = new GroupListModule($this, $groups, 'popular', t('Popular Groups'), t("There aren't any groups yet."), 'popular-groups');

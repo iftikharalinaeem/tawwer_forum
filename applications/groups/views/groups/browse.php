@@ -5,7 +5,7 @@
 </div>
 
 <?php
-$groups = $this->Data('Groups');
+$groups = $this->data('Groups');
 $groupModel = new GroupModel();
 $groupModel->JoinRecentPosts($groups);
 $list = new GroupListModule($this, $groups, 'groups', $this->Title(), t("No groups to display yet."), '', false);

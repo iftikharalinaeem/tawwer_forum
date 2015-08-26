@@ -3,7 +3,7 @@ $hasBanner = val('Banner', $this->group);
 ?>
 <div class="Group-Header<?php echo $hasBanner ? ' HasBanner' : ' NoBanner'; ?>">
   <?php
-  WriteGroupBanner($this->group);
+  writeGroupBanner($this->group);
   WriteGroupIcon($this->group, 'Group-Icon Group-Icon-Big');
   if ($this->showOptions && $options = getGroupOptions($this->group)) {
     writeGroupBannerOptions($options);
@@ -24,7 +24,7 @@ $hasBanner = val('Banner', $this->group);
     <?php
     if ($this->showDescription) { ?>
       <div class="Group-Description">
-        <?php echo Gdn_Format::To(val('Description', $this->group), val('Format', $this->group)); ?>
+        <?php echo Gdn_Format::to(val('Description', $this->group), val('Format', $this->group)); ?>
       </div>
     <?php }
     if ($this->showMeta) {
