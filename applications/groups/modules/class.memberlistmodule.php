@@ -11,14 +11,14 @@ class MemberListModule extends Gdn_Module {
     public $group;
     public $title;
     public $emptyMessage;
-    public $view;
+    public $layout;
 
-    public function __construct($members, $group, $title = '', $emptyMessage = '', $view = '') {
+    public function __construct($members, $group, $title = '', $emptyMessage = '', $layout = '') {
         $this->members = $members;
         $this->group = $group;
         $this->title = $title;
         $this->emptyMessage = $emptyMessage;
-        $this->view = $view ?: c('Vanilla.Discussions.Layout', 'modern');
+        $this->layout = $layout ?: c('Vanilla.Discussions.Layout', 'modern');
         $this->_ApplicationFolder = 'groups';
     }
 
@@ -55,13 +55,13 @@ class MemberListModule extends Gdn_Module {
         return $buttons;
     }
 
-    public function getMembersInfo($view, $members, $group, $heading, $emptyMessage = '', $sectionId = '') {
+    public function getMembersInfo($layout, $members, $group, $heading, $emptyMessage = '', $sectionId = '') {
 
-        $memberList['view'] = $view;
+        $memberList['layout'] = $layout;
         $memberList['emptyMessage'] = $emptyMessage;
         $memberList['title'] = $heading;
 
-        if ($view == 'table') {
+        if ($layout == 'table') {
             $memberList['columns'][0]['columnLabel'] = t('User');
             $memberList['columns'][0]['columnCssClass'] = 'UserName';
             $memberList['columns'][1]['columnLabel'] = t('Join Date');
@@ -71,15 +71,15 @@ class MemberListModule extends Gdn_Module {
         }
 
         foreach ($members as $member) {
-            $memberList['items'][] = $this->getMemberInfo($member, $group, $view, true, $sectionId);
+            $memberList['items'][] = $this->getMemberInfo($member, $group, $layout, true, $sectionId);
         }
 
         return $memberList;
     }
 
-    public function getMemberInfo($member, $group, $view, $withButtons = true, $sectionId = false) {
+    public function getMemberInfo($member, $group, $layout, $withButtons = true, $sectionId = false) {
 
-        if ($view != 'table') {
+        if ($layout != 'table') {
             $item['buttons'] = $this->getMemberButtons($member, $group);
         }
 
@@ -89,14 +89,14 @@ class MemberListModule extends Gdn_Module {
         $item['imageUrl'] = userUrl($member);
         $item['metaCssClass'] = '';
 
-        if ($view != 'table') {
+        if ($layout != 'table') {
             $item['meta']['joinDate']['text'] = sprintf(T('Joined %s', 'Joined %s'), Gdn_Format::date(val('DateInserted', $member), 'html'));
             $item['meta']['joinDate']['cssClass'] = 'JoinDate';
         }
 
 //        $item['options'] = $this->getMemberOptions($member, $group);
 
-        if ($view == 'table') {
+        if ($layout == 'table') {
             $this->getMemberTableItem($item, $member, $group);
         }
 
@@ -123,7 +123,7 @@ class MemberListModule extends Gdn_Module {
      * @return type
      */
     public function toString() {
-        $this->members = $this->getMembersInfo($this->view, $this->members, $this->group, $this->title, $this->emptyMessage);
+        $this->members = $this->getMembersInfo($this->layout, $this->members, $this->group, $this->title, $this->emptyMessage);
         $controller = new Gdn_Controller();
         $controller->setData('list', $this->members);
         return $controller->fetchView('memberlist', 'modules', 'groups');
