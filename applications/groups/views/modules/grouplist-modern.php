@@ -27,6 +27,7 @@ $list = $this->data('list');
              </span>
         <?php } ?>
         <span class="Options">
+            <?php if (val('options', $item)) { writeGroupOptions(val('options', $item)); } ?>
             <?php if (val('buttons', $item)) { ?>
               <div class="Buttons <?php echo val('buttonsCssClass', $item); ?>">
                 <?php foreach (val('buttons', $item) as $button) { ?>
@@ -34,7 +35,6 @@ $list = $this->data('list');
                 <?php } ?>
               </div>
             <?php } ?>
-          <?php if (val('options', $item)) { writeGroupOptions(val('options', $item)); } ?>
           </span>
         <div class="ItemContent">
           <div class="Title">

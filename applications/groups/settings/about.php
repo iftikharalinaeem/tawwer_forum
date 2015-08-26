@@ -4,7 +4,7 @@
  */
 $ApplicationInfo['Groups'] = array(
    'Description' => "Adds social groups to your application.",
-   'Version' => '1.0.4-beta3',
+   'Version' => '1.0.4-beta4',
    'Url' => 'http://vanillaforums.com',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
