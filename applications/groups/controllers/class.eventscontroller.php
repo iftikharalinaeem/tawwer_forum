@@ -29,7 +29,7 @@ class EventsController extends Gdn_Controller {
       $this->AddJsFile('jquery.popup.js');
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
-
+      $this->addCssFile('vanillicon.css', 'static');
       $this->AddCssFile('style.css');
       Gdn_Theme::Section('Events');
 
