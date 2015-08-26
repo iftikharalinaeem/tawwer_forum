@@ -206,9 +206,6 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
     margin: 0; }
 .Groups .Group-Discussions .MItem.Category, .Groups .Group-Announcements .MItem.Category {
   display: none; }
-.Groups .OptionsMenu {
-  display: block;
-  float: right; }
 
 .Group-Box .Button-Controls {
   float: right; }
