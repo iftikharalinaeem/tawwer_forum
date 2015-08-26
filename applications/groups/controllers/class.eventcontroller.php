@@ -53,6 +53,7 @@ class EventController extends Gdn_Controller {
       // Other plugins could also be implementing datapicker and we don't multiple copies.
       $this->AddJsFile('datepicker-' . $currentLanguage . '.js');
 
+      $this->addCssFile('vanillicon.css', 'static');
       $this->AddCssFile('style.css');
       Gdn_Theme::Section('Event');
       parent::Initialize();
