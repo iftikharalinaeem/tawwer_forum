@@ -22,16 +22,16 @@ endif;
 function getGroupOptions($group, $sectionId = 'home') {
     $options = array();
     if (GroupPermission('Edit', $group)) {
-        $options['Edit'] = array('Text' => T('Edit Group'), 'Url' => GroupUrl($group, 'edit'));
+        $options['Edit'] = array('Text' => t('Edit Group'), 'Url' => GroupUrl($group, 'edit'));
     }
     if (GroupPermission('Leave', $group)) {
-        $options['Leave'] = array('Text' => T('Leave Group'), 'Url' => GroupUrl($group, 'leave'), 'CssClass' => 'Popup');
+        $options['Leave'] = array('Text' => t('Leave Group'), 'Url' => GroupUrl($group, 'leave'), 'CssClass' => 'Popup');
     }
     if (GroupPermission('Delete', $group)) {
-        $options['Delete'] = array('Text' => sprintf(T('Delete %s'), T('Group')), 'Url' => GroupUrl($group, 'delete'), 'CssClass' => 'Popup');
+        $options['Delete'] = array('Text' => sprintf(t('Delete %s'), t('Group')), 'Url' => GroupUrl($group, 'delete'), 'CssClass' => 'Popup');
     }
     if (GroupPermission('Leader', $group)) {
-        $options['Invite'] = array('Text' => T('Invite Members'), 'Url' => GroupUrl($group, 'invite'), 'CssClass' => 'Popup');
+        $options['Invite'] = array('Text' => t('Invite Members'), 'Url' => GroupUrl($group, 'invite'), 'CssClass' => 'Popup');
     }
     return $options;
 }
@@ -39,7 +39,7 @@ function getGroupOptions($group, $sectionId = 'home') {
 function getGroupButtons($group) {
     $buttons = array();
     if (Gdn::session()->isValid() && !GroupPermission('Member', $group) && GroupPermission('Join', $group)) {
-        $joinButton['text'] = T('Join');
+        $joinButton['text'] = t('Join');
         $joinButton['url'] = GroupUrl($group, 'join');
         $joinButton['cssClass'] = 'Popup';
         $buttons[] = $joinButton;
@@ -125,11 +125,11 @@ function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussi
             <?php
             if ($title == 'Announcements' && GroupPermission('Moderate')) {
                 echo '<div class="Button-Controls">';
-                echo anchor(sprintf(T('New %s'), T('Announcement')), GroupUrl($sender->Data('Group'), 'announcement'), 'Button');
+                echo anchor(sprintf(t('New %s'), t('Announcement')), GroupUrl($sender->data('Group'), 'announcement'), 'Button');
                 echo '</div>';
             } else if ($title == 'Discussions' && GroupPermission('Member')) {
                 echo '<div class="Button-Controls">';
-                echo Gdn_Theme::module('NewDiscussionModule', array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$sender->Data('Group.GroupID')));
+                echo Gdn_Theme::module('NewDiscussionModule', array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$sender->data('Group.GroupID')));
                 echo '</div>';
             }
             echo '</div>';
@@ -152,9 +152,9 @@ function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussi
                     </ul> <?php
                 }
             }
-            if ($title == 'Discussions' && $sender->Data('Discussions')->result()) {
+            if ($title == 'Discussions' && $sender->data('Discussions')->result()) {
                 echo '<div class="MoreWrap">'.
-                        anchor(T('All Discussions'), GroupUrl($sender->Data('Group'), 'discussions')).
+                        anchor(t('All Discussions'), GroupUrl($sender->Data('Group'), 'discussions')).
                     '</div>';
             }
             ?>
@@ -168,7 +168,7 @@ if (!function_exists('writeFullAnnouncementList')):
 
 function writeFullAnnouncementList($sender, $emptyMessage) {
   $bak = $sender->data('Discussions');
-  $sender->setData('Discussions', $sender->Data('Announcements'));
+  $sender->setData('Discussions', $sender->data('Announcements'));
   $sender->setData('Announcements', false);
   writeFullDiscussionList($sender, $emptyMessage, t('Announcements'));
   $sender->setData('Discussions', $bak);
@@ -287,19 +287,19 @@ function WriteEventCard($Event) {
 endif;
 
 
-if (!function_exists('WriteGroupBanner')) :
+if (!function_exists('writeGroupBanner')) :
 /**
  * Output optional group banner as a div background image to allow dynamic page resizing.
  */
-function WriteGroupBanner($group) {
+function WriteGroupBanner($group = array()) {
    if (!$group) {
-     $group = Gdn::Controller()->Data('Group');
+     $group = Gdn::controller()->data('Group');
    }
 
    if (val('Banner', $group)) {
-      echo Wrap('', 'div', array(
+      echo wrap('', 'div', array(
          'class' => 'Group-Banner',
-         'style' => 'background-image: url("'.Gdn_Upload::Url(val('Banner', $group)).'");')
+         'style' => 'background-image: url("'.Gdn_Upload::url(val('Banner', $group)).'");')
       );
    }
 }

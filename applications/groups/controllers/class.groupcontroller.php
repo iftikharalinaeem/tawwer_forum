@@ -82,12 +82,12 @@ class GroupController extends Gdn_Controller {
       $this->GroupModel->OverridePermissions($Group);
 
       // Get Discussions
-      $DiscussionModel = new DiscussionModel();
-      $Discussions = $DiscussionModel->GetWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, $this->HomepageDiscussionCount);
-      $this->SetData('Discussions', $Discussions);
+      $discussionModel = new DiscussionModel();
+      $discussions = $discussionModel->getWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, $this->HomepageDiscussionCount);
+      $this->setData('Discussions', $discussions);
 
-      $Discussions = $DiscussionModel->GetAnnouncements(array('d.GroupID' => $GroupID), 0, 10);
-      $this->SetData('Announcements', $Discussions);
+      $discussions = $discussionModel->getAnnouncements(array('d.GroupID' => $GroupID), 0, 10);
+      $this->setData('Announcements', $discussions);
 
       // Get Events
       $MaxEvents = C('Groups.Events.MaxList', 5);
@@ -603,8 +603,8 @@ class GroupController extends Gdn_Controller {
          throw NotFoundException('Group');
 
       // Check if this person is a member of the group or a moderator
-      $ViewGroupEvents = GroupPermission('View', $Group);
-      if (!$ViewGroupEvents) {
+      $viewGroupEvents = GroupPermission('View', $Group);
+      if (!$viewGroupEvents) {
          throw PermissionException();
       }
 
