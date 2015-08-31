@@ -594,7 +594,7 @@ class GroupModel extends Gdn_Model {
 
       // Now join the users.
       if ($JoinUsers) {
-         Gdn::UserModel()->JoinUsers($Data, array('LastUserID'));
+         Gdn::UserModel()->JoinUsers($Data, array('LastCommentUserID'));
       }
    }
 
