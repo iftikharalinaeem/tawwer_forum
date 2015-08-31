@@ -1,27 +1,10 @@
-[![Bootstrap for Vanilla](screenshot.png)](https://github.com/kasperisager/vanilla-bootstrap)
+[![Bootstrap 3](screenshot.png)](https://github.com/vanilla/vanilla-bootstrap)
 
-[![Release](http://img.shields.io/github/release/kasperisager/vanilla-bootstrap.svg?style=flat)](https://github.com/kasperisager/vanilla-bootstrap/releases) [![Depencency Status](http://img.shields.io/gemnasium/kasperisager/vanilla-bootstrap.svg?style=flat)](https://gemnasium.com/kasperisager/vanilla-bootstrap)
+This theme's source is located in vanilla/vanilla-bootstrap (forked from kasperisager/vanilla-bootstrap). In order to update this theme to be up to date with vanilla/vanilla-bootstrap:
 
-Bootstrap for Vanilla has been rewritten from scratch on top of [Bootstrap 3](http://getbootstrap.com) in this second installation of the most popular theme for Vanilla Forums. Kickstart your Vanilla-powered community forums with a fresh and solid theme that is ready to be customized to your heart's desires.
-
-## Getting started
-
-To get started using Bootstrap for Vanilla, either:
-
-- [__Download the latest release__](https://github.com/kasperisager/vanilla-bootstrap/releases/latest)
-- Clone the repository directly into your Vanilla `themes` directory:
-
-```sh
-$ git clone kasperisager/vanilla-bootstrap bootstrap
-```
-
-## Included themes
-
-![Default](design/screenshot_default.png) | ![Bootstrap](design/screenshot_bootstrap.png) | ![Cerulean](design/screenshot_cerulean.png) | ![Cosmo](design/screenshot_cosmo.png)
----|---|---|---
-![Cyborg](design/screenshot_cyborg.png) | ![Darkly](design/screenshot_darkly.png) | ![Flatly](design/screenshot_flatly.png) | ![Journal](design/screenshot_journal.png)
-![Lumen](design/screenshot_lumen.png) | ![Readable](design/screenshot_readable.png) | ![Simplex](design/screenshot_simplex.png) | ![Slate](design/screenshot_slate.png)
-![Spacelab](design/screenshot_spacelab.png) | ![Superhero](design/screenshot_superhero.png) | ![United](design/screenshot_united.png) | ![Yeti](design/screenshot_yeti.png)
+1. update the vanilla-bootstrap release number in the bower.json file.
+2. update the dependencies: `bower update`
+3. compile the theme assets (you must have node and the local dependencies installed first): `npm run build`
 
 ## Compiling assets
 
@@ -47,12 +30,5 @@ Compiles all theme assets using Gulp. LESS stylesheets will be compiled to [`des
 #### Watch - `npm run watch`
 Watches the assets for changes and runs the appropriate Gulp tasks. Also starts a Livereload server that will push the changes to your Vanilla installation automatically.
 
-## [Issue tracking](https://github.com/kasperisager/vanilla-bootstrap/issues)
-
-If you come across any bugs or if you have a feature request, please file an issue using the GitHub Issue tracker. Bootstrap for Vanilla won't be supported through http://vanillaforums.org so please stick to using GitHub for inquiries about bugs and feature requests. Thanks!
-
-[__File a new issue or feature request__](https://github.com/kasperisager/vanilla-bootstrap/issues/new)
-
 ---
-
-Copyright &copy; 2014 [Kasper Kronborg Isager](https://github.com/kasperisager). Licensed under the terms of the [MIT License](LICENSE.md)
+Copyright &copy; 2015 [Kasper Kronborg Isager](https://github.com/kasperisager). Licensed under the terms of the [MIT License](LICENSE.md)
