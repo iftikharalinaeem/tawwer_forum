@@ -90,12 +90,12 @@ class GroupsHooks extends Gdn_Plugin {
 
       /* Ensure that there are discussions */
 
-      if (!isset($sender->Data['Discussions']) && !($sender->Data['Discussions'] instanceof Gdn_DataSet)) {
+      if (!$sender->data('Discussions') && !($sender->data('Discussions') instanceof Gdn_DataSet)) {
          trigger_error("No discussions found in the data array.", E_USER_NOTICE);
          return;
       }
 
-      $discussions = $sender->Data['Discussions'];
+      $discussions = $sender->data('Discussions');
       $discussionResult = (array)$discussions->result();
 
       $groupModel = new GroupModel();
