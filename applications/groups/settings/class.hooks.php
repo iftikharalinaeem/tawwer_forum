@@ -62,24 +62,26 @@ class GroupsHooks extends Gdn_Plugin {
    }
 
    /**
-    * Remove category permissions restrictions temporarily when getting bookmarks
+    * Remove category permissions restrictions temporarily when getting bookmarks.
+    *
     * @param DiscussionsController $sender
     * @param $args
     */
    public function discussionsController_bookmarked_before($sender, $args) {
-      $cm = new CategoryModel();
-      $a = $cm->categories();
-      $categories = $cm->getWhereCache(['AllowGroups' => 1]);
+      $categoryModel = new CategoryModel();
+      $categories = $categoryModel->getWhereCache(['AllowGroups' => 1]);
       $this->categoryPermissions = [];
       foreach ($categories as $id => $cat) {
          $this->categoryPermissions[$id] = $cat['PermsDiscussionsView'];
-         CategoryModel::$Categories[$id]['PermsDiscussionsView'] = true;
+         CategoryModel::setLocalField($id, 'PermsDiscussionsView', true);
       }
    }
 
    /**
-    * Restore category permissions that have been changed in discussionsController_bookmarked_before in order
-    * to allow bookmarks to appear that are in groups within categories.
+    * Restore category permissions that have been changed.
+    *
+    * Permissions are changed in discussionsController_bookmarked_before in order to allow bookmarks
+    * to appear that are in groups within categories, in this method they are restored.
     *
     * @param $sender
     * @param $args
@@ -93,14 +95,13 @@ class GroupsHooks extends Gdn_Plugin {
          return;
       }
 
-      /* @var Gdn_DataSet $discussionsArray */
       $discussions = $sender->Data['Discussions'];
       $discussionResult = (array)$discussions->result();
 
       $groupModel = new GroupModel();
 
-      /* Create a discussionsArray by filtering out groups forwhich the $User does not have permissions to view. s*/
-      $discussionsArray = array_filter(
+      // Create a discussions array by filtering out groups for which the $User does not have permissions to view.
+      $discussionsDenied = array_filter(
           $discussionResult,
           function ($discussion) use ($groupModel) {
              $groupID = val('GroupID', $discussion);
@@ -112,15 +113,15 @@ class GroupsHooks extends Gdn_Plugin {
           }
       );
 
-      /* Re-import $disussionsArray into dataset */
-      $discussions->importDataset($discussionsArray);
+      // Re-import $disussions into dataset.
+      $discussions->importDataset($discussionsDenied);
 
-      /* Re-instate category permissions temporarily modified in discussionsController_bookmarked_before */
-      $cm = new CategoryModel();
-      $categories = $cm->getWhereCache(['AllowGroups' => 1]);
+      // Re-instate category permissions temporarily modified in discussionsController_bookmarked_before.
+      $categoryModel = new CategoryModel();
+      $categories = $categoryModel->getWhereCache(['AllowGroups' => 1]);
 
       foreach ($categories as $id => $cat) {
-         CategoryModel::$Categories[$id]['PermsDiscussionsView'] = $this->categoryPermissions[$id];
+         CategoryModel::setLocalField($id, 'PermsDiscussionsView', $this->categoryPermissions[$id]);
       }
 
    }
@@ -128,18 +129,18 @@ class GroupsHooks extends Gdn_Plugin {
 
 
    /**
-    * Remove category permissions restrictions temporarily when getting bookmarks
+    * Remove category permissions restrictions temporarily when getting bookmarks.
+    *
     * @param DiscussionsController $sender
     * @param $args
     */
    public function discussionsController_bookmarkedPopin_before($sender, $args) {
-      $cm = new CategoryModel();
-      $a = $cm->categories();
-      $categories = $cm->getWhereCache(['AllowGroups' => 1]);
+      $categoryModel = new CategoryModel();
+      $categories = $categoryModel->getWhereCache(['AllowGroups' => 1]);
       $this->categoryPermissions = [];
       foreach ($categories as $id => $cat) {
          $this->categoryPermissions[$id] = $cat['PermsDiscussionsView'];
-         CategoryModel::$Categories[$id]['PermsDiscussionsView'] = true;
+         CategoryModel::setLocalField($id, 'PermsDiscussionsView', true);
       }
    }
 
@@ -150,20 +151,20 @@ class GroupsHooks extends Gdn_Plugin {
     * @param $sender
     * @param $args
     */
-   public function discussionsController_bookmarkedPopin_render($sender, $args) {
+   public function discussionsController_bookmarkedPopin_render($sender, $args, $discussions) {
 
-      /* Ensure that there are discussions */
+      // Ensure that there are discussions.
 
-      if (!isset($sender->Data['Discussions']) && !($sender->Data['Discussions'] instanceof Gdn_DataSet)) {
+      if (!$sender->data('Discussions') && !($sender->data('Discussions') instanceof Gdn_DataSet)) {
          trigger_error("No discussions found in the data array.", E_USER_NOTICE);
          return;
       }
 
-      $discussionResult = $sender->Data['Discussions'];
+      $discussionResult = $sender->data('Discussions');
       $groupModel = new GroupModel();
 
-      /* Create a discussionsArray by filtering out groups forwhich the $User does not have permissions to view. s*/
-      $discussionsArray = array_filter(
+      // Create a discussions Array by filtering out groups forwhich the $User does not have permissions to view.
+      $discussions = array_filter(
           $discussionResult,
           function ($discussion) use ($groupModel) {
              $groupID = val('GroupID', $discussion);
@@ -175,14 +176,14 @@ class GroupsHooks extends Gdn_Plugin {
           }
       );
 
-      $sender->setData('Discussions', $discussionsArray);
+      $sender->setData('Discussions', $discussions);
 
-      /* Re-instate category permissions temporarily modified in discussionsController_bookmarked_before */
-      $cm = new CategoryModel();
-      $categories = $cm->getWhereCache(['AllowGroups' => 1]);
+      // Re-instate category permissions temporarily modified in discussionsController_bookmarked_before.
+      $categoryModel = new CategoryModel();
+      $categories = $categoryModel->getWhereCache(['AllowGroups' => 1]);
 
       foreach ($categories as $id => $cat) {
-         CategoryModel::$Categories[$id]['PermsDiscussionsView'] = $this->categoryPermissions[$id];
+         CategoryModel::setLocalField($id, 'PermsDiscussionsView', $this->categoryPermissions[$id]);
       }
 
    }
