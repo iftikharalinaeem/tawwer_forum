@@ -385,6 +385,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         foreach ($otherCategories as $hubID) {
             if ($categoryID = val($hubID, $categoryMap)) {
                 $categoryModel->setField($categoryID, 'HubID', null);
+                Trace("Removing hub ID for category $categoryID.");
             }
         }
 
