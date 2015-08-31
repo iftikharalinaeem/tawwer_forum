@@ -385,10 +385,9 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         // Remove the synchronization from other categories.
         foreach ($otherCategories as $hubID) {
-            $category = $categoryModel->getWhereCache(['HubID' => $hubID]);
+            $categories = $categoryModel->getWhereCache(['HubID' => $hubID]);
 
-            if ($category) {
-                $categoryID = val('CategoryID', $category);
+            foreach ($categories as $categoryID => $category) {
                 $categoryModel->setField($categoryID, 'HubID', null);
                 trace("Removing hub ID for category $categoryID.");
             }
