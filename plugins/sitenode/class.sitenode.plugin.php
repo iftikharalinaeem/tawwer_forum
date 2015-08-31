@@ -381,11 +381,16 @@ class SiteNodePlugin extends Gdn_Plugin {
             }
         }
 
+        trace($categoryMap, 'categoryMap');
+
         // Remove the synchronization from other categories.
         foreach ($otherCategories as $hubID) {
-            if ($categoryID = val($hubID, $categoryMap)) {
+            $category = $categoryModel->getWhereCache(['HubID' => $hubID]);
+
+            if ($category) {
+                $categoryID = val('CategoryID', $category);
                 $categoryModel->setField($categoryID, 'HubID', null);
-                Trace("Removing hub ID for category $categoryID.");
+                trace("Removing hub ID for category $categoryID.");
             }
         }
 
