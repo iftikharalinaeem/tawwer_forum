@@ -2,7 +2,7 @@
 
 $PluginInfo['sitenode'] = array(
     'Name'        => "Multisite Node",
-    'Version'     => '1.1.0',
+    'Version'     => '1.1.1',
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
@@ -382,8 +382,10 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         // Remove the synchronization from other categories.
-        foreach ($otherCategories as $categoryID) {
-            $categoryModel->SetField($categoryID, 'HubID', null);
+        foreach ($otherCategories as $hubID) {
+            if ($categoryID = val($hubID, $categoryMap)) {
+                $categoryModel->setField($categoryID, 'HubID', null);
+            }
         }
 
         // Find categories that have been removed from the hub.
