@@ -3,7 +3,7 @@
 $PluginInfo['subcommunities'] = array(
     'Name'        => "Subcommunities",
     'Description' => "Allows you to use categories as virtual mini forums for multilingual or multi-product communities.",
-    'Version'     => '1.0.1',
+    'Version'     => '1.0.2',
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl'   => 'https://vanillaforums.com',
@@ -199,11 +199,15 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
 
             $this->initializeSite($site);
-        } elseif (!in_array($root, ['utility'])) {
+        } elseif (!in_array($root, ['utility', 'sso', 'entry'])) {
             $defaultSite = SubcommunityModel::getDefaultSite();
             if ($defaultSite) {
-
                 $url = Gdn::Request()->assetRoot().'/'.$defaultSite['Folder'].rtrim('/'.Gdn::Request()->Path(), '/');
+                $get = Gdn::Request()->get();
+                if (!empty($get)) {
+                    $url .= '?'.http_build_query($get);
+                }
+
                 redirectUrl($url, debug() ? 302 : 301);
             }
         }
