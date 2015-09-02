@@ -282,4 +282,7 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
   background-position: center top;
   background-repeat: no-repeat;
   margin-bottom: 10px; }
+
+.Section-Members .DataList .Item .PhotoWrap {
+  float: left; }
 /*# sourceMappingURL=groups.css.map */
