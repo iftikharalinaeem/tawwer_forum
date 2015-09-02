@@ -5,18 +5,59 @@
  *
  */
 
+/**
+ * Class GroupListModule
+ *
+ * Consolidates the data and renders the view for a group list. Group lists populate the /groups and /groups/browse views.
+ */
 class GroupListModule extends Gdn_Module {
 
+    /**
+     * @var object The sending controller object.
+     */
     public $sender;
+    /**
+     * @var array The groups to render. (An array of group arrays.)
+     */
     public $groups;
+    /**
+     * @var string The group list's unique endpoint slug ('mine', 'popular', 'new', etc.).
+     */
     public $id;
+    /**
+     * @var string The group list's title (i.e., 'My Groups').
+     */
     public $title;
+    /**
+     * @var string The message to display if there are no groups.
+     */
     public $emptyMessage;
+    /**
+     * @var string A css class to add to the group list container.
+     */
     public $cssClass;
+    /**
+     * @var bool Whether to provide a link to see all of the group list's contents.
+     */
     public $showMore;
-    public $view;
+    /**
+     * @var string The layout type, either 'modern' or 'table'.
+     */
+    public $layout;
 
-    public function __construct($sender, $groups, $id, $title = '', $emptyMessage = '', $cssClass = '', $showMore = true, $view = '') {
+    /**
+     * Construct the GroupListModule object.
+     *
+     * @param object $sender The sending controller object.
+     * @param array $groups The groups to render. (An array of group arrays.)
+     * @param string $id The group list's unique endpoint slug ('mine', 'popular', 'new', etc.).
+     * @param string $title The group list's title (i.e., 'My Groups').
+     * @param string $emptyMessage The message to display if there are no groups.
+     * @param string $cssClass A css class to add to the group list container.
+     * @param bool $showMore Whether to provide a link to see all of the group list's contents.
+     * @param string $layout The layout type, either 'modern' or 'table'.
+     */
+    public function __construct($sender, $groups, $id, $title = '', $emptyMessage = '', $cssClass = '', $showMore = true, $layout = '') {
         $this->sender = $sender;
         $this->groups = $groups;
         $this->id = $id;
@@ -24,55 +65,63 @@ class GroupListModule extends Gdn_Module {
         $this->emptyMessage = $emptyMessage;
         $this->cssClass = $cssClass;
         $this->showMore = $showMore;
-        $this->view = $view ?: c('Vanilla.Discussions.Layout', 'modern');
+        $this->layout = $layout ?: c('Vanilla.Discussions.Layout', 'modern');
         $this->_ApplicationFolder = 'groups';
     }
 
-    public function __get($name) {
-        $name = lcfirst($name);
+    /**
+     * Collect and organize the data for the group list.
+     *
+     * @param string $layout The layout type, either 'modern' or 'table'.
+     * @param array $groups The groups to render. (An array of group arrays.)
+     * @param string $heading The group list's title (i.e., 'My Groups').
+     * @param string $emptyMessage The message to display if there are no groups.
+     * @param string $cssClass A css class to add to the group list container.
+     * @param string $sectionId The group list's unique endpoint slug ('mine', 'popular', 'new', etc.).
+     * @return array A group list data array.
+     */
+    public function getGroupsInfo($layout, $groups, $heading, $emptyMessage = '', $cssClass = '', $sectionId = '') {
 
-        if (property_exists($this, $name)) {
-            return $this->$name;
-        }
-    }
-
-    public function __set($name, $value) {
-
-    }
-
-    public function getGroupsInfo($view, $groups, $heading, $emptyMessage = '', $cssClass = '', $sectionId = '') {
-
-        $groupList['view'] = $view;
+        $groupList['layout'] = $layout;
         $groupList['emptyMessage'] = $emptyMessage;
         $groupList['title'] = $heading;
         $groupList['cssClass'] = $cssClass;
 
         if ($this->showMore) {
-            $groupList['moreLink'] = sprintf(T('All %s...'), $heading);
+            $groupList['moreLink'] = sprintf(t('All %s...'), $heading);
             $groupList['moreUrl'] = url('/groups/browse/'.$sectionId);
             $groupList['moreCssClass'] = 'More';
         }
 
-        if ($view == 'table') {
-            $groupList['columns'][0]['columnLabel'] = T('Group');
+        if ($layout == 'table') {
+            $groupList['columns'][0]['columnLabel'] = t('Group');
             $groupList['columns'][0]['columnCssClass'] = 'GroupName';
-            $groupList['columns'][1]['columnLabel'] = T('Members');
+            $groupList['columns'][1]['columnLabel'] = t('Members');
             $groupList['columns'][1]['columnCssClass'] = 'BigCount CountMembers';
-            $groupList['columns'][2]['columnLabel'] = T('Discussions');
+            $groupList['columns'][2]['columnLabel'] = t('Discussions');
             $groupList['columns'][2]['columnCssClass'] = 'BigCount CountDiscussions';
-            $groupList['columns'][3]['columnLabel'] = T('Latest Post');
+            $groupList['columns'][3]['columnLabel'] = t('Latest Post');
             $groupList['columns'][3]['columnCssClass'] = 'BlockColumn LatestPost';
         }
 
         foreach ($groups as $group) {
-            $groupList['items'][] = $this->getGroupInfo($group, $view, true, $sectionId);
+            $groupList['items'][] = $this->getGroupInfo($group, $layout, true, $sectionId);
         }
 
         return $groupList;
     }
 
-    public function getGroupInfo($group, $view, $withButtons = true, $sectionId = false) {
-        $item['text'] = htmlspecialchars(sliceString(Gdn_Format::plainText(val('Description', $group), val('Format', $group)), C('Groups.CardDescription.ExcerptLength', 150)));
+    /**
+     * Collect and organize the data for a group item in the group list.
+     *
+     * @param array $group The group item.
+     * @param string $layout The layout type, either 'modern' or 'table'.
+     * @param bool $withOptions Whether to add a the group options to the group item.
+     * @param string $sectionId The group list's unique endpoint slug.
+     * @return array A data array representing a group item in a group list.
+     */
+    public function getGroupInfo($group, $layout, $withOptions = true, $sectionId = '') {
+        $item['text'] = htmlspecialchars(sliceString(Gdn_Format::plainText(val('Description', $group), val('Format', $group)), c('Groups.CardDescription.ExcerptLength', 150)));
         $item['textCssClass'] = 'GroupDescription';
         $item['imageSource'] = val('Icon', $group) ? Gdn_Upload::url(val('Icon', $group)) : C('Groups.DefaultIcon', false);
         $item['imageCssClass'] = 'Group-Icon';
@@ -81,7 +130,7 @@ class GroupListModule extends Gdn_Module {
         $item['id'] = 'Group_'.val('GroupID', $group);
         $item['metaCssClass'] = '';
 
-        if ($view != 'table') {
+        if ($layout != 'table') {
             // 'LastTitle' is only added if JoinRecentPosts function is called on groups
             $attachDiscussionData = val('LastTitle', $group);
 
@@ -104,20 +153,26 @@ class GroupListModule extends Gdn_Module {
             }
         }
 
-        if ($withButtons) {
+        if ($withOptions) {
             $item['options'] = getGroupOptions($group, $sectionId);
             $item['buttons'] = getGroupButtons($group);
         }
 
-        if ($view == 'table') {
-            $this->getGroupTableItem($item, $group);
+        if ($layout == 'table') {
+            $this->getGroupItemTableData($item, $group);
         }
 
         return $item;
     }
 
 
-    public function getGroupTableItem(&$item, $group) {
+    /**
+     * Adds the row data for a group item in a table layout group list.
+     *
+     * @param array $item The working group item for a group list.
+     * @param array $group The group array we're parsing.
+     */
+    public function getGroupItemTableData(&$item, $group) {
         $item['rows']['main']['type'] = 'main';
         $item['rows']['main']['cssClass'] = 'Group-Name';
 
@@ -133,27 +188,25 @@ class GroupListModule extends Gdn_Module {
         $item['rows']['lastPost']['title'] = val('LastTitle', $group);
         $item['rows']['lastPost']['url'] = val('LastUrl', $group);
         $item['rows']['lastPost']['username'] = val('LastName', $group);
-        $item['rows']['lastPost']['userUrl'] = UserUrl($group, 'Last');
+        $item['rows']['lastPost']['userUrl'] = userUrl($group, 'Last');
         $item['rows']['lastPost']['date'] = val('LastDateInserted', $group);
         $item['rows']['lastPost']['imageSource'] = val('LastPhoto', $group);
-        $item['rows']['lastPost']['imageUrl'] = UserUrl($group, 'Last');
+        $item['rows']['lastPost']['imageUrl'] = userUrl($group, 'Last');
     }
 
     /**
-     * Render groups
+     * Renders the group list.
      *
-     * @return type
+     * @return string HTML view
      */
     public function toString() {
-        $this->sender->EventArguments['view'] = &$this->view;
+
+        // Let plugins and themes set the layout of a group list before compiling the data.
+        $this->sender->EventArguments['layout'] = &$this->layout;
         $this->sender->fireEvent('beforeGenerateGroupList');
 
-        $this->groups = $this->getGroupsInfo($this->view, $this->groups, $this->title, $this->emptyMessage, $this->cssClass, $this->id);
+        $this->groups = $this->getGroupsInfo($this->layout, $this->groups, $this->title, $this->emptyMessage, $this->cssClass, $this->id);
         $this->sender->setData('list', $this->groups);
-//        if (!in_array($this->view, array('table', 'list'))) {
-//            $this->view = 'list';
-//        }
-//        $view = 'groups_'.$this->view;
 
         return $this->sender->fetchView('grouplist', 'modules', 'groups');
     }

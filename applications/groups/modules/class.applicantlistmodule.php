@@ -11,14 +11,14 @@ class ApplicantListModule extends Gdn_Module {
     public $group;
     public $title;
     public $emptyMessage;
-    public $view;
+    public $layout;
 
-    public function __construct($applicants, $group, $title = '', $emptyMessage = '', $view = '') {
+    public function __construct($applicants, $group, $title = '', $emptyMessage = '', $layout = '') {
         $this->applicants = $applicants;
         $this->group = $group;
         $this->title = $title;
         $this->emptyMessage = $emptyMessage;
-        $this->view = $view ?: c('Vanilla.Discussions.Layout', 'modern');
+        $this->layout = $layout ?: c('Vanilla.Discussions.Layout', 'modern');
         $this->_ApplicationFolder = 'groups';
     }
 
@@ -46,14 +46,14 @@ class ApplicantListModule extends Gdn_Module {
         return $buttons;
     }
 
-    public function getApplicantsInfo($view, $applicants, $group, $heading, $emptyMessage = '', $sectionId = '') {
+    public function getApplicantsInfo($layout, $applicants, $group, $heading, $emptyMessage = '', $sectionId = '') {
 
-        $applicantList['view'] = $view;
+        $applicantList['layout'] = $layout;
         $applicantList['emptyMessage'] = $emptyMessage;
         $applicantList['title'] = $heading;
         $applicantList['cssClass'] = 'ApplicantList';
 
-        if ($view == 'table') {
+        if ($layout == 'table') {
             $applicantList['columns'][0]['columnLabel'] = t('User');
             $applicantList['columns'][0]['columnCssClass'] = 'UserName';
             $applicantList['columns'][2]['columnLabel'] = '';
@@ -61,15 +61,15 @@ class ApplicantListModule extends Gdn_Module {
         }
 
         foreach ($applicants as $applicant) {
-            $applicantList['items'][] = $this->getApplicantInfo($applicant, $group, $view, true, $sectionId);
+            $applicantList['items'][] = $this->getApplicantInfo($applicant, $group, $layout, true, $sectionId);
         }
 
         return $applicantList;
     }
 
-    public function getApplicantInfo($applicant, $group, $view) {
+    public function getApplicantInfo($applicant, $group, $layout) {
 
-        if ($view != 'table') {
+        if ($layout != 'table') {
             $item['buttons'] = $this->getApplicantButtons($applicant, $group);
         }
 
@@ -94,7 +94,7 @@ class ApplicantListModule extends Gdn_Module {
         $item['text'] = htmlspecialchars($applicant['Reason']);
         $item['textCssClass'] = 'ApplicantReason';
 
-        if ($view == 'table') {
+        if ($layout == 'table') {
             $this->getApplicantTableItem($item, $applicant);
         }
 
@@ -117,7 +117,7 @@ class ApplicantListModule extends Gdn_Module {
      * @return type
      */
     public function toString() {
-        $this->applicants = $this->getApplicantsInfo($this->view, $this->applicants, $this->group, $this->title, $this->emptyMessage);
+        $this->applicants = $this->getApplicantsInfo($this->layout, $this->applicants, $this->group, $this->title, $this->emptyMessage);
         $controller = new Gdn_Controller();
         $controller->setData('list', $this->applicants);
         if (GroupPermission('Leader', $this->group)) {

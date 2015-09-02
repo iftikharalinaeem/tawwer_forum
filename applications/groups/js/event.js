@@ -1,33 +1,33 @@
 /**
  * Groups Application - Event JS
- * 
- * 
+ *
+ *
  */
 
 jQuery(document).ready(function($) {
-   
+
    if ($('.Event.add').length)
       EventAddEdit($);
-   
+
    if ($('.Event.edit').length)
       EventAddEdit($);
-   
+
    if ($('.Event.event').length)
       EventShow($);
-   
+
    function UpdateTimezoneDisplay(TimezoneID, TimezoneLabel) {
       var TimezoneAbbr = TimezoneLabel.match(/[A-Z]+$/).pop();
       var EventTimezone = $('.Timezone input');
       EventTimezone.val(TimezoneID);
-      
+
       var TimezoneDisplay = $('.Timezone .EventTimezoneDisplay');
       TimezoneDisplay.text(TimezoneAbbr);
       TimezoneDisplay.attr('title', TimezoneLabel);
    }
-   
+
    /**
     * Handle event/add
-    * 
+    *
     */
    function EventAddEdit($) {
       $('.TimePicker').timepicker({
@@ -38,7 +38,7 @@ jQuery(document).ready(function($) {
       var DateNow = new Date();
       var DateNowStr = (DateNow.getMonth()+1)+'/'+DateNow.getDate()+'/'+DateNow.getFullYear();
       $('.DatePicker').val(DateNowStr);
-      
+
       $('.Event .CancelButton').on('click', function(e){
          var Event = $(e.target).closest('.Event');
          var GroupID = Event.data('groupid');
@@ -53,19 +53,19 @@ jQuery(document).ready(function($) {
 
       var Timezone = $('.Event .EventTimezone');
       var TimezoneAbbr = $('.Event .EventTimezoneAbbr');
-      
+
       // Lookup timezone automatically
       var TimezoneRequestData = {
          'TimezoneID': DefaultTimezone,
          'Auto': true
       }
-      
+
       // If TZ was supplied in form, use that
       if (Timezone.val()) {
          TimezoneRequestData.TimezoneID = Timezone.val();
          TimezoneRequestData.Auto = false;
       }
-      
+
       $.ajax({
          url: gdn.url('/event/gettimezoneabbr'),
          data: TimezoneRequestData,
@@ -77,7 +77,7 @@ jQuery(document).ready(function($) {
                //   var TimezoneLabel = "("+data.Offset+") Automatically detected "+data.Abbr;
                //else
                var TimezoneLabel = "("+data.Offset+") "+data.Abbr;
-               
+
                UpdateTimezoneDisplay(data.TimezoneID, TimezoneLabel);
             }
          }
@@ -163,38 +163,83 @@ jQuery(document).ready(function($) {
          return false;
       });
    }
-   
+
+
+   /**
+    * Handles the rsvp dropdowns in the event lists and the select box on the event page
+    * and the updating of the user's event status.
+    */
    function EventShow($) {
-      
-      var EventID = $('.EventInfo').data('eventid');
-      
-      $('input.EventAttending').on('change', function(e){
-         var EventAttending = $(e.target);
-         if (!EventAttending.val()) return;
-         
+
+      // On event list
+      $('.js-event .EventAttending').on('click', function(e) {
+         e.preventDefault();
+         var selection = $(e.target);
+         var eventId = $(selection.closest('.js-event')).attr('id');
+
+         var optionList = selection.closest('ul');
+         var option = selection.closest('li');
+
+         var newStatus = selection.html();
+         var newStatusCode = selection.attr('data-name');
+
+         var oldStatus = $('#'+eventId+' .js-status').html();
+         var oldStatusCode = $('#'+eventId+' .js-status').attr('data-name');
+
+         // set trigger data
+         $('#'+eventId+' .js-status').html(newStatus);
+         $('#'+eventId+' .js-status').attr('data-name', newStatusCode);
+
+         // reset dropdown options
+         option.detach();
+         if (oldStatusCode !== 'rsvp') {
+            optionList.append('<li><a class="EventAttending" data-name="' + oldStatusCode + '">' + oldStatus + '</a></li>');
+         }
+
+         EventShow($);
+         processStatus(eventId, newStatusCode);
+      });
+
+      // On event page
+      $('.EventAttending').on('change', function(e) {
+         var eventId = $('.EventInfo').data('eventid');
+         var eventAttending = $(e.target);
+         var result = false;
+         if (eventAttending.val()) {
+            result = eventAttending.val();
+         }
+         if (!result) {
+            return;
+         }
+         processStatus(eventId, result);
+      });
+
+
+      /**
+       * Handles the ajax-y updating of the user's attendance status for an event.
+       */
+      function processStatus(eventId, result) {
          $.ajax({
             url: gdn.url('/event/attending'),
-            data: {'EventID':EventID, 'Attending':EventAttending.val()},
+            data: {'EventID':eventId, 'Attending':result},
             dataType: 'json',
             success: function(json) {
                json = $.postParseJson(json);
-               
+
                // Process targets
                if (json.Targets && json.Targets.length > 0)
                   gdn.processTargets(json.Targets);
-               
+
                // If there is a redirect url, go to it
                if (json.RedirectUrl != null && jQuery.trim(json.RedirectUrl) != '') {
                   window.location.replace(json.RedirectUrl);
                   return false;
                }
-               
+
                // Inform
                gdn.inform(json);
             }
          });
-      });
-      
+      }
    }
-   
 });

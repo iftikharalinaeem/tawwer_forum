@@ -35,6 +35,17 @@ $list = $this->data('list');
                 <?php } ?>
               </div>
             <?php } ?>
+            <?php if ($dropdown = val('buttonDropdown', $item)) { ?>
+              <div class="ButtonGroup <?php echo val('cssClass', $dropdown); ?>">
+                <ul class="Dropdown MenuItems">
+                <?php foreach (val('options', $dropdown) as $option) { ?>
+                  <li><a href="<?php echo val('url', $option) ?>" class="<?php echo val('cssClass', $option) ?>" data-name="<?php echo val('dataName', $option) ?>"><?php echo val('text', $option) ?></a></li>
+                <?php } ?>
+                </ul>
+                <?php $trigger = val('trigger', $dropdown); ?>
+                <a class="NavButton Handle Button <?php echo val('cssClass', $trigger); ?>" role="button"><?php echo val('text', $trigger); ?> <span class="Sprite SpDropdownHandle"></span></a>
+              </div>
+            <?php } ?>
           </span>
         <div class="ItemContent">
           <div class="Title">

@@ -187,9 +187,9 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
   content: "";
   display: table;
   clear: both; }
-.Groups .ItemContent {
+.Groups .DataList .ItemContent {
   padding-left: 48px; }
-.Groups .Item .OptionsMenu {
+.Groups .Item .OptionsMenu, .Groups .Item .ButtonGroup {
   display: inline-block;
   vertical-align: top; }
 .Groups .Item .Buttons {
@@ -204,6 +204,8 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
     font-size: 12px; }
   .Groups .DataTableWrap .Title-Wrapper {
     margin: 0; }
+  .Groups .DataTableWrap .EventLocation, .Groups .DataTableWrap .EventDate {
+    width: 25%; }
 .Groups .Group-Discussions .MItem.Category, .Groups .Group-Announcements .MItem.Category {
   display: none; }
 
@@ -280,4 +282,7 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
   background-position: center top;
   background-repeat: no-repeat;
   margin-bottom: 10px; }
+
+.Section-Members .DataList .Item .PhotoWrap {
+  float: left; }
 /*# sourceMappingURL=groups.css.map */

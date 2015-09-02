@@ -1,6 +1,8 @@
-<div class="Event-Header">
+<div class="Event-Header PageTitle">
    <!-- Edit/Delete Buttons -->
-   <?php writeEventOptions(); ?>
+   <div class="Options">
+       <?php writeEventOptions(); ?>
+   </div>
    <h1 class="Event-Title"><?php echo htmlspecialchars($this->Data('Event.Name')); ?></h1>
 </div>
 
@@ -105,22 +107,22 @@
 
    <div class="Body"><?php echo Gdn_Format::To($this->Data('Event.Body'), $this->Data('Event.Format')); ?></div>
 </div>
-
+<?php if (!EventModel::isEnded($this->Data('Event')))  { ?>
+<div class="FormWrapper StructuredForm Attending">
+  <div class="P Attending">
+    <?php echo $this->Form->Label('Are you attending this event?'); ?>
+    <div><?php echo $this->Form->RadioList('Attending', array(
+        'Yes'       => 'Yes',
+        'No'        => 'No',
+        'Maybe'     => 'Maybe'
+      ), array('class' => 'EventAttending')); ?></div>
+  </div>
+</div>
 <div class="FormTitleWrapper">
    <h2><?php echo T("Who's going?"); ?></h2>
-   <div class="FormWrapper StructuredForm Attending">
-
-      <div class="P Attending">
-         <?php echo $this->Form->Label('Are you attending this event?'); ?>
-         <div><?php echo $this->Form->RadioList('Attending', array(
-            'Yes'       => 'Yes',
-            'No'        => 'No',
-            'Maybe'     => 'Maybe'
-         ), array('class' => 'EventAttending')); ?></div>
-      </div>
-
-   </div>
-
+<?php } else  { ?>
+  <h2><?php echo T("Who went?"); ?></h2>
+<?php } ?>
    <div class="Attendees" id="EventAttendees">
       <?php echo $this->FetchView('attendees'); ?>
    </div>
