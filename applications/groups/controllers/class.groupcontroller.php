@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary

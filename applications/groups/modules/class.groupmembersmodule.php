@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 
 class GroupMembersModule extends Gdn_Module {
 
