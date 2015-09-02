@@ -389,9 +389,9 @@ class EventController extends Gdn_Controller {
       // No permission
       if (!$AttendEvent)
          throw ForbiddenException('attend this event');
-
+      $eventName = val('Name', $Event, t('this event'));
       $EventModel->Attend(Gdn::Session()->UserID, $EventID, $Attending);
-      $this->InformMessage(sprintf(T('Your status for this event is now: <b>%s</b>'), T($Attending)));
+      $this->InformMessage(sprintf(t('Your status for %s is now: <b>%s</b>'), $eventName, t($Attending)));
       $this->JsonTarget('#EventAttendees', $this->Attendees($EventID));
 
       $this->Render('blank', 'utility', 'dashboard');

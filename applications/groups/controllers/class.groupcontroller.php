@@ -46,6 +46,7 @@ class GroupController extends Gdn_Controller {
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
       $this->AddJsFile('group.js');
+      $this->AddJsFile('event.js');
       $this->addCssFile('vanillicon.css', 'static');
       $this->AddCssFile('style.css');
 

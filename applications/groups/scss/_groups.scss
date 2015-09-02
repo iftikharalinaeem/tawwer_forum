@@ -6,12 +6,14 @@
     @include clearfix;
   }
 
-  .ItemContent {
+
+  .DataList .ItemContent {
     padding-left: 48px;
   }
 
   .Item {
-    .OptionsMenu {
+    .OptionsMenu,
+    .ButtonGroup {
       display: inline-block;
       vertical-align: top;
     }
@@ -34,6 +36,11 @@
 
     .Title-Wrapper {
       margin: 0;
+    }
+
+    .EventLocation,
+    .EventDate {
+      width: 25%;
     }
   }
 
