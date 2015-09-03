@@ -67,6 +67,7 @@ class EventsController extends Gdn_Controller {
             if (!$Group)
                throw NotFoundException('Group');
             $this->SetData('Group', $Group);
+            $this->SetData('NewButtonId', val('GroupID', $Group));
 
             // Check if this person is a member of the group or a moderator
             $ViewGroupEvents = GroupPermission('View', $Group);

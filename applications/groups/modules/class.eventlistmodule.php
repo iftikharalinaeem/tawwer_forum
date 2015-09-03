@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Groups Application - Group List Module
+ * Groups Application - Event List Module
  *
  */
 
@@ -17,10 +17,6 @@ class EventListModule extends Gdn_Module {
      */
     public $events;
     /**
-     * @var array The group the events belong to.
-     */
-    public $group;
-    /**
      * @var string The event section title (i.e., 'Upcoming Events').
      */
     public $title;
@@ -33,19 +29,27 @@ class EventListModule extends Gdn_Module {
      */
     public $layout;
     /**
-     * @var bool Whether to provide a link to see all of the events (a link to events/group).
+     * @var bool Whether to provide a link to see all of the events.
      */
     public $showMore;
     /**
+     * @var string The url for the 'show more' link.
+     */
+    public $showMoreUrl;
+    /**
      * @var bool Whether to show the 'New Event' button.
      */
-    public $withNewButton;
+    public $addNewEventButton;
+    /**
+     * @var string The url for the 'New Event' button.
+     */
+    public $newEventUrl;
     /**
      * @var bool Whether to show the event's 'RSVP' dropdown.
      */
     public $withJoinButtons;
     /**
-     * @var bool Whether to show the event options.
+     * @var bool Whether to show the event edit options.
      */
     public $withOptions;
 
@@ -53,21 +57,19 @@ class EventListModule extends Gdn_Module {
      * Construct the EventListModule object.
      *
      * @param array $events The events to render. (An array of event arrays.)
-     * @param array $group The group the events belong to.
      * @param string $title The event section title (i.e., 'Upcoming Events').
      * @param string $emptyMessage The message to display if there are no events.
-     * @param bool $showMore Whether to provide a link to see all of the events (a link to events/group).
      * @param string $layout The layout type, either 'modern' or 'table'.
-     * @param bool $withNewButton Whether to show the 'New Event' button.
+     * @param bool $withJoinButtons Whether to show the event's 'RSVP' dropdown.
+     * @param bool $withOptions Whether to show the event edit options.
+     * @internal param bool $showMore Whether to provide a link to see all of the events.
+     * @internal param bool $withNewButton Whether to show the 'New Event' button.
      */
-    public function __construct($events, $group, $title = '', $emptyMessage = '', $showMore = true, $layout = '', $withNewButton = true, $withJoinButtons = true, $withOptions = true) {
+    public function __construct($events, $title = '', $emptyMessage = '', $layout = '', $withJoinButtons = true, $withOptions = true) {
         $this->events = $events;
-        $this->group = $group;
         $this->title = $title;
         $this->emptyMessage = $emptyMessage;
-        $this->showMore = $showMore;
         $this->layout = $layout ?: c('Vanilla.Discussions.Layout', 'modern');
-        $this->withNewButton = $withNewButton;
         $this->withJoinButtons = $withJoinButtons;
         $this->withOptions = $withOptions;
         $this->_ApplicationFolder = 'groups';
@@ -76,7 +78,7 @@ class EventListModule extends Gdn_Module {
     /**
      * Returns an array of event options that the user has permissions for.
      *
-     * @param $event The event to get options for.
+     * @param array $event The event to get options for.
      * @return array The event options.
      */
     public function getEventOptions($event) {
@@ -89,10 +91,10 @@ class EventListModule extends Gdn_Module {
     }
 
     /**
-     * Returns the event button dropdown.
+     * Compiles data for the event button RSVP dropdown.
      *
-     * @param $event The event to get buttons for.
-     * @return array The event buttons.
+     * @param array $event The event to get the dropdown menu for.
+     * @return array The event's RSVP dropdown.
      */
     public function getEventDropdown($event) {
         if (EventPermission('Member', $event) && !EventModel::isEnded($event)) {
@@ -117,48 +119,70 @@ class EventListModule extends Gdn_Module {
             }
             return $dropdown;
         }
+        return array();
     }
 
     /**
-     * @param $group
-     * @return array
+     * Compiles the data for the buttons for an event list.
+     *
+     * @param string $url The url for the new event button.
+     * @return array The buttons' data.
      */
-    public function getEventListButtons($group) {
-        $groupID = val('GroupID', $group, '');
+    public function getEventListButtons($url) {
         $buttons = array();
-        if (GroupPermission('Member')) {
-            $newEventButton['text'] = t('New Event');
-            $newEventButton['url'] = url("/event/add/{$groupID}");
-            $newEventButton['cssClass'] = 'Button Primary Group-NewEventButton';
-            $buttons[] = $newEventButton;
-        }
+        $newEventButton['text'] = t('New Event');
+        $newEventButton['url'] = $url;
+        $newEventButton['cssClass'] = 'Button Primary NewEventButton';
+        $buttons['newEvent'] = $newEventButton;
         return $buttons;
     }
 
     /**
-     * @param $layout
-     * @param $events
-     * @param $group
-     * @param $heading
-     * @param string $emptyMessage
-     * @param bool $withButtons
-     * @return mixed
+     * Enables the 'show more' link after the event list.
+     *
+     * @param string $url The url for the 'show more' link.
      */
-    public function getEventsInfo($layout, $events, $group, $heading, $emptyMessage = '', $withButtons = true) {
+    public function showMore($url) {
+        $this->showMore = true;
+        $this->showMoreUrl = $url;
+    }
+
+    /**
+     * Enables the 'New Event' button before the event list.
+     *
+     * @param $id The group id to add the event to, if one exists.
+     */
+    public function addNewEventButton($id = '') {
+        $this->addNewEventButton = true;
+        $this->newEventUrl = url("/event/add/{$id}");
+    }
+
+    /**
+     * Collect and organize the data for the event list.
+     *
+     * @param string $layout The layout type, either 'modern' or 'table'.
+     * @param array $events The events to render. (An array of event arrays.)
+     * @param string $heading
+     * @param string $emptyMessage The message to display if there are no events.
+     * @param string $showMoreUrl The url for the show more link, if one exists.
+     * @param string $newEventUrl The url for the new event button, if one exists.
+     * @return array An event list data array.
+     */
+    public function getEventsInfo($layout, $events, $heading, $emptyMessage = '', $showMoreUrl = '', $newEventUrl = '') {
 
         $eventList['layout'] = $layout;
         $eventList['emptyMessage'] = $emptyMessage;
         $eventList['title'] = $heading;
         $eventList['cssClass'] = 'EventList';
 
-        if ($this->showMore) {
+        if ($showMoreUrl) {
             $eventList['moreLink'] = sprintf(T('All %s...'), T('Events'));
-            $eventList['moreUrl'] = url(combinePaths(array("/events/group/", GroupSlug($group))));
             $eventList['moreCssClass'] = 'More';
+            $eventList['moreUrl'] =  $showMoreUrl;
         }
 
-        if ($withButtons) {
-            $eventList['buttons'] = $this->getEventListButtons($group);
+        if ($newEventUrl) {
+            $eventList['buttons'] = $this->getEventListButtons($newEventUrl);
         }
 
         if ($layout == 'table') {
@@ -178,10 +202,13 @@ class EventListModule extends Gdn_Module {
     }
 
     /**
-     * @param $event
-     * @param $layout
-     * @param $withOptions
-     * @return mixed
+     * Collect and organize the data for an event item in the event list.
+     *
+     * @param array $event The event item.
+     * @param string $layout The layout type, either 'modern' or 'table'.
+     * @param bool $withJoinButtons Whether to show the event's 'RSVP' dropdown.
+     * @param bool $withOptions Whether to show the event edit options.
+     * @return array A data array representing an event item in an event list.
      */
     public function getEventInfo($event, $layout, $withJoinButtons = true, $withOptions = true) {
 
@@ -220,9 +247,11 @@ class EventListModule extends Gdn_Module {
 
 
     /**
-     * @param $item
-     * @param $event
-     * @param $dateStarts
+     * Adds the row data for an event item in an event layout group list.
+     *
+     * @param array $item The working event item for an event list.
+     * @param array $event The event array we're parsing.
+     * @param DateTime $dateStarts The starting date of the event.
      */
     public function getEventTableItem(&$item, $event, $dateStarts) {
         $item['rows']['main']['type'] = 'main';
@@ -239,12 +268,12 @@ class EventListModule extends Gdn_Module {
     }
 
     /**
-     * Render events.
+     * Renders the event list.
      *
-     * @return string
+     * @return string HTML view
      */
     public function toString() {
-        $this->events = $this->getEventsInfo($this->layout, $this->events, $this->group, $this->title, $this->emptyMessage, $this->withNewButton);
+        $this->events = $this->getEventsInfo($this->layout, $this->events, $this->title, $this->emptyMessage, $this->showMoreUrl, $this->newEventUrl);
         $controller = new Gdn_Controller();
         $controller->setData('list', $this->events);
         return $controller->fetchView('eventlist', 'modules', 'groups');

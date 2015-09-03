@@ -9,7 +9,11 @@ if (GroupPermission('View')) {
     }
     writeFullAnnouncementList($this, t('GroupEmptyAnnouncements', "Important stuff will go here one day."));
     writeFullDiscussionList($this, t('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"), t('Discussions'));
-    $eventList = new EventListModule($this->data('Events'), $this->data('Group'), t('Upcoming Events'), t('GroupEmptyEvents', "Aw snap, no events are coming up."));
+    $eventList = new EventListModule($this->data('Events'), t('Upcoming Events'), t('GroupEmptyEvents', "Aw snap, no events are coming up."));
+    if (GroupPermission('Member', $this->data('Group'))) {
+        $eventList->addNewEventButton(val('GroupID', $this->data('Group')));
+        $eventList->showMore(url(combinePaths(array("/events/group/", GroupSlug($this->data('Group'))))));
+    }
     echo $eventList;
     echo '<div class="Group-Info ClearFix clearfix">';
     echo Gdn_Theme::module('GroupMembersModule');
