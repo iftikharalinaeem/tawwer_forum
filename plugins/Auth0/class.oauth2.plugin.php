@@ -36,7 +36,7 @@ class OAuth2Plugin {
         $this->provider = provider();
         if ($accessToken) {
             // We passed in a connection
-            $this->AccessToken = $accessToken;
+            $this->accessToken = $accessToken;
         }
     }
 
@@ -310,7 +310,7 @@ class OAuth2Plugin {
         return $this;
     }
 
-    public function settingsController_oAuth2_Create($sender, $args) {
+    public function settingsController_oAuth2_create($sender, $args) {
         $sender->permission('Garden.Settings.Manage');
 
         $model = new Gdn_AuthenticationProviderModel();
@@ -325,7 +325,6 @@ class OAuth2Plugin {
         } else {
             $form->SetFormValue('AuthenticationKey', $this->getProviderKey());
             $form->setFormValue('SignInUrl', '...'); // kludge for default provider
-//            $form->setFormValue('RegisterUrl', '...'); // kludge for default provider
 
             if ($form->Save()) {
                 $sender->informMessage(T('Saved'));
@@ -368,7 +367,7 @@ class OAuth2Plugin {
         if (val(0, $args) != $this->getProviderKey()) {
             return;
         }
-        $savedProfile = Gdn::Session()->Stash($this->getProviderKey(), '', false);
+        $savedProfile = Gdn::Session()->stash($this->getProviderKey(), '', false);
 
         $profile = val('Profile', $savedProfile);
         $accessToken = val('AccessToken', $savedProfile);
@@ -380,12 +379,12 @@ class OAuth2Plugin {
         $formValues = array_replace($formValues, $profile);
         $form->formValues($formValues);
         // Save some original data in the attributes of the connection for later API calls.
-        $Attributes = array();
-        $Attributes[$this->getProviderKey()] = array(
+        $attributes = array();
+        $attributes[$this->getProviderKey()] = array(
             'AccessToken' => $accessToken,
             'Profile' => $profile
         );
-        $form->setFormValue('Attributes', $Attributes);
+        $form->setFormValue('Attributes', $attributes);
 
         $this->EventArguments['Profile'] = $profile;
         $this->EventArguments['Form'] = $form;
@@ -432,12 +431,12 @@ class OAuth2Plugin {
         if (isset($sender->Data['Methods'])) {
 
             // Add the sign in button method to the controller.
-            $Method = array(
+            $method = array(
                 'Name' => $this->getProviderKey(),
                 'SignInHtml' => $this->signInButton()
             );
 
-            $sender->Data['Methods'][] = $Method;
+            $sender->Data['Methods'][] = $method;
         }
     }
 
@@ -465,7 +464,7 @@ class OAuth2Plugin {
      * @param $sender
      * @param $args
      */
-    public function EntryController_OverrideRegister_Handler($sender, $args) {
+    public function entryController_overrideRegister_handler($sender, $args) {
         $provider = $args['DefaultProvider'];
         if ($provider['AuthenticationSchemeAlias'] != $this->getProviderKey() || !$this->isConfigured()) {
             return;
@@ -486,7 +485,7 @@ class OAuth2Plugin {
      */
     public function entryController_oAuth2_create($sender, $code, $state) {
 
-        if ($Error = $sender->Request->get('error')) {
+        if ($Error = $sender->request->get('error')) {
             throw new Gdn_UserException($Error);
         }
 
@@ -528,7 +527,7 @@ class OAuth2Plugin {
 
                 // Save the information as attributes.
                 $attributes = array(
-                    'AccessToken' => $response->access_token,
+                    'AccessToken' => $response['access_token'],
                     'Profile' => $profile
                 );
 

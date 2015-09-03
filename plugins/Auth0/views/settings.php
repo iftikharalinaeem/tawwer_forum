@@ -3,12 +3,12 @@
       <?php
       echo '<h2>', t('Need More Help?'), '</h2>';
       echo '<ul>';
-      echo wrap(Anchor(t("Identity Protocols supported by Auth0"), 'https://auth0.com/docs/protocols'), 'li');
+      echo wrap(anchor(t("Identity Protocols supported by Auth0"), 'https://auth0.com/docs/protocols'), 'li');
       echo '</ul>';
       ?>
    </div>
 
-   <h1><?php echo $this->Data('Title'); ?></h1>
+   <h1><?php echo $this->data('Title'); ?></h1>
 
     <div class="PageInfo">
         <h2><?php echo t('Create Single Sign On integration with Auth0!'); ?></h2>
@@ -22,14 +22,14 @@
     </div>
 <?php
 
-echo $this->Form->Open(),
-   $this->Form->Errors();
+echo $this->Form->open(),
+   $this->Form->errors();
 
-echo $this->Form->Simple($this->Data('_Form'));
+echo $this->Form->simple($this->data('_Form'));
 
 echo '<div class="Buttons">';
-echo $this->Form->Button('Save');
-//echo '<input type="hidden" id="Form_AuthenticationSchemeAlias" name="AuthenticationSchemeAlias" value="OAuth2">';
+echo $this->Form->button('Save');
+
 ?>
 
     <div>
@@ -37,13 +37,13 @@ echo $this->Form->Button('Save');
             <li>
                 <label>Important</label>
                 <div class="Info">Auth0 requires that you provide allowed callback URLs, in part, to validate requests. Copy and past the URLs below into your Auth0 application settings.</div>
-                <textarea class="TextBox textarea-autosize"><?php echo $this->Data('redirectUrls'); ?></textarea>
+                <textarea class="TextBox textarea-autosize"><?php echo $this->data('redirectUrls'); ?></textarea>
             </li>
         </ul>
     </div>
 
 <?php
-echo $this->Form->Close();
+echo $this->Form->close();
 
 echo '</div>';
 

@@ -26,6 +26,12 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
             ->setScope('profile');
     }
 
+    /**
+     * Override parent provider with the url endpoints specific to this provider
+     *
+     * @return array|bool|stdClass
+     */
+
     public function provider() {
         $provider = parent::provider();
 
@@ -41,25 +47,25 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
     /**
      * Setup
      */
-    public function Setup() {
-        $this->Structure();
+    public function setUp() {
+        $this->structure();
     }
 
     /**
      * Create the structure in the database
      */
-    public function Structure() {
+    public function structure() {
         // Make sure we have the Auth0 provider.
         $provider = $this->provider();
         if (!$provider) {
-            $Model = new Gdn_AuthenticationProviderModel();
+            $model = new Gdn_AuthenticationProviderModel();
             $provider = array(
                 'AuthenticationKey' => $this->providerKey,
                 'AuthenticationSchemeAlias' => $this->providerKey,
                 'Name' => $this->providerKey
             );
 
-            $Model->Save($provider);
+            $model->save($provider);
         }
     }
 
@@ -81,15 +87,16 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
      *
      * @param SettingsController $Sender
      */
-    public function settingsController_auth0_Create($sender, $args) {
+    public function settingsController_auth0_create($sender, $args) {
 
         $sender->setData('Title', sprintf(T('%s Settings'), 'Auth0 SSO'));
 
-        //Create send the possible redirect URLs that will be required by Auth0
-        $redirectUrls = Gdn::Request()->Url('/entry/'. $this->getProviderKey(), true, false).','.Gdn::Request()->Url('/entry/'. $this->getProviderKey(), true, true);
+        // Create send the possible redirect URLs that will be required by Auth0.
+        // Use Gdn::Request instead of convience function so that we can return http and https.
+        $redirectUrls = Gdn::request()->Url('/entry/'. $this->getProviderKey(), true, false).','.Gdn::Request()->Url('/entry/'. $this->getProviderKey(), true, true);
         $sender->setData('redirectUrls', $redirectUrls);
 
-        $this->settingsController_oAuth2_Create($sender, $args);
+        $this->settingsController_oAuth2_create($sender, $args);
 
     }
 
@@ -101,9 +108,9 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
      * @param string $State
      * @throws Gdn_UserException
      */
-    public function entryController_auth0_Create($sender, $code = false, $state = false) {
+    public function entryController_auth0_create($sender, $code = false, $state = false) {
 
-        $this->entryController_OAuth2_Create($sender, $code, $state);
+        $this->entryController_OAuth2_create($sender, $code, $state);
 
     }
 
@@ -135,8 +142,8 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
      * @return string
      */
     public function signInButton($type = 'button') {
-        $Target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
-        $url = $this->authorizeUri(array('target' => $Target));
+        $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
+        $url = $this->authorizeUri(array('target' => $target));
         $result = socialSignInButton('Auth0', $url, $type, array('rel' => 'nofollow', 'class' => 'default', 'title' => 'Sign in with Auth0'));
         return $result;
     }
