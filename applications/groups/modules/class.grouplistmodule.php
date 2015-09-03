@@ -13,10 +13,6 @@
 class GroupListModule extends Gdn_Module {
 
     /**
-     * @var object The sending controller object.
-     */
-    public $sender;
-    /**
      * @var array The groups to render. (An array of group arrays.)
      */
     public $groups;
@@ -48,7 +44,6 @@ class GroupListModule extends Gdn_Module {
     /**
      * Construct the GroupListModule object.
      *
-     * @param object $sender The sending controller object.
      * @param array $groups The groups to render. (An array of group arrays.)
      * @param string $id The group list's unique endpoint slug ('mine', 'popular', 'new', etc.).
      * @param string $title The group list's title (i.e., 'My Groups').
@@ -57,8 +52,7 @@ class GroupListModule extends Gdn_Module {
      * @param bool $showMore Whether to provide a link to see all of the group list's contents.
      * @param string $layout The layout type, either 'modern' or 'table'.
      */
-    public function __construct($sender, $groups, $id, $title = '', $emptyMessage = '', $cssClass = '', $showMore = true, $layout = '') {
-        $this->sender = $sender;
+    public function __construct($groups, $id, $title = '', $emptyMessage = '', $cssClass = '', $showMore = true, $layout = '') {
         $this->groups = $groups;
         $this->id = $id;
         $this->title = $title;
@@ -200,15 +194,10 @@ class GroupListModule extends Gdn_Module {
      * @return string HTML view
      */
     public function toString() {
-
-        // Let plugins and themes set the layout of a group list before compiling the data.
-        $this->sender->EventArguments['layout'] = &$this->layout;
-        $this->sender->fireEvent('beforeGenerateGroupList');
-
         $this->groups = $this->getGroupsInfo($this->layout, $this->groups, $this->title, $this->emptyMessage, $this->cssClass, $this->id);
-        $this->sender->setData('list', $this->groups);
-
-        return $this->sender->fetchView('grouplist', 'modules', 'groups');
+        $controller = new Gdn_Controller();
+        $controller->setData('list', $this->groups);
+        return $controller->fetchView('grouplist', 'modules', 'groups');
     }
 
 }

@@ -41,11 +41,11 @@ class EventListModule extends Gdn_Module {
      */
     public $withNewButton;
     /**
-     * @var bool Whether to show the 'New Event' button.
+     * @var bool Whether to show the event's 'RSVP' dropdown.
      */
     public $withJoinButtons;
     /**
-     * @var bool Whether to show the 'New Event' button.
+     * @var bool Whether to show the event options.
      */
     public $withOptions;
 
