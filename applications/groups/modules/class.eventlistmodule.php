@@ -8,7 +8,7 @@
 /**
  * Class EventListModule
  *
- * Consolidates the data and renders the view for a event list. Event lists appear on the group and events/group pages.
+ * Consolidates the data and renders the view for a event list. Currently, event lists appear on the group and events/group pages.
  */
 class EventListModule extends Gdn_Module {
 

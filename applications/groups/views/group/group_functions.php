@@ -19,6 +19,13 @@ function DateTile($Date) {
 }
 endif;
 
+if (!function_exists('getGroupOptions')):
+/**
+ * Compiles the options for a group given a user's permissions.
+ *
+ * @param array $group The group to get options for.
+ * @return array The options for the group that the user can access.
+ */
 function getGroupOptions($group, $sectionId = 'home') {
     $options = array();
     if (GroupPermission('Edit', $group)) {
@@ -35,7 +42,15 @@ function getGroupOptions($group, $sectionId = 'home') {
     }
     return $options;
 }
+endif;
 
+if (!function_exists('getGroupButtons')):
+/**
+ * Compiles the buttons for a group given the user's membership and permissions.
+ *
+ * @param array $group The group to get buttons for.
+ * @return array The buttons for the group.
+ */
 function getGroupButtons($group) {
     $buttons = array();
     if (Gdn::session()->isValid() && !GroupPermission('Member', $group) && GroupPermission('Join', $group)) {
@@ -46,6 +61,7 @@ function getGroupButtons($group) {
     }
     return $buttons;
 }
+endif;
 
 
 if (!function_exists('WriteDiscussionBlogList')):
@@ -113,10 +129,17 @@ function WriteDiscussionBlog($Discussion, $Px = 'Discussion') {
 endif;
 
 if (!function_exists('writeFullDiscussionList')):
-
-function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussions', $view = '') {
-    if (!$view) {
-        $view = c('Vanilla.Discussions.Layout', 'modern');
+/**
+ * Renders a list of discussions in the same format as in the vanilla application.
+ *
+ * @param Controller $sender The sending object.
+ * @param string $emptyMessage The message to render if no discussions exist.
+ * @param string $title The title of the discussion list.
+ * @param string $layout The layout type, either 'modern' or 'table'.
+ */
+function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussions', $layout = '') {
+    if (!$layout) {
+        $layout = c('Vanilla.Discussions.Layout', 'modern');
     }
     ?>
     <div class="Group-Box Group-<?php echo $title; ?> Section-DiscussionList">
@@ -133,17 +156,17 @@ function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussi
                 echo '</div>';
             }
             echo '</div>';
-            $sender->EventArguments['view'] = &$view;
+            $sender->EventArguments['layout'] = &$layout;
             $sender->EventArguments['title'] = &$title;
             $sender->fireEvent('beforeDiscussionList');
             if (!$sender->data('Discussions')->result()) {
                 echo '<div class="EmptyMessage">'.$emptyMessage.'</div>';
             } else {
-                if ($view == 'table') {
+                if ($layout == 'table') {
                     include_once($sender->fetchViewLocation('table_functions', 'discussions', 'vanilla'));
                     include_once($sender->fetchViewLocation('helper_functions', 'discussions', 'vanilla'));
                     writeDiscussionTable();
-                } else if ($view == 'modern') {
+                } else if ($layout == 'modern') {
                     include_once($sender->fetchViewLocation('helper_functions', 'discussions', 'vanilla')); ?>
                     <ul class="DataList <?php echo $title; ?>">
                         <?php foreach($sender->Data('Discussions') as $discussion) {
@@ -165,7 +188,12 @@ endif;
 
 
 if (!function_exists('writeFullAnnouncementList')):
-
+/**
+ * Renders a list of announcements.
+ *
+ * @param Controller $sender The sending object.
+ * @param $emptyMessage The message to render if not announcements exist.
+ */
 function writeFullAnnouncementList($sender, $emptyMessage) {
   $bak = $sender->data('Discussions');
   $sender->setData('Discussions', $sender->data('Announcements'));
@@ -287,7 +315,7 @@ function WriteEventCard($Event) {
 endif;
 
 
-if (!function_exists('writeGroupBanner')) :
+if (!function_exists('WriteGroupBanner')) :
 /**
  * Output optional group banner as a div background image to allow dynamic page resizing.
  */
@@ -399,12 +427,12 @@ function WriteGroupButtons($Group = NULL) {
 }
 endif;
 
-/**
- * Output discussion options.
- *
- * @since 2.1
- */
 if (!function_exists('writeGroupOptions')):
+/**
+ * Renders the options menu for a group in a cog (typically for group in a group list).
+ *
+ * @param array $options The options to render.
+ */
 function writeGroupOptions($options = array()) {
     if (empty($options)) {
         return;
@@ -422,6 +450,11 @@ function writeGroupOptions($options = array()) {
 endif;
 
 if (!function_exists('writeGroupBannerOptions')):
+/**
+ * Renders the options menu for a group in a button dropdown format (typically for a banner).
+ *
+ * @param array $options The options to render.
+ */
 function writeGroupBannerOptions($options = array()) {
     if (empty($options)) {
         return;

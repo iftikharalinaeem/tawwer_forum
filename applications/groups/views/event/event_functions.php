@@ -29,9 +29,15 @@ function WriteEventButtons($Event = NULL) {
 }
 endif;
 
+if (!function_exists('writeEventOptions')) :
+  /**
+   * Writes event edit options.
+   *
+   * @param array $event The event to write options for.
+   */
 function writeEventOptions($event = null) {
    if (!$event) {
-      $event = Gdn::Controller()->Data('Event');
+      $event = Gdn::Controller()->data('Event');
    }
    if (!$event) {
       return;
@@ -44,10 +50,10 @@ function writeEventOptions($event = null) {
    }
 
    if (count($options)) {
-     writeGroupOptions($options);
+      writeGroupOptions($options);
    }
 }
-
+endif;
 
 if (!function_exists('WriteEventCard')) :
 /**

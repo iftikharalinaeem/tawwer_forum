@@ -76,6 +76,8 @@ class EventsController extends Gdn_Controller {
 
             $this->AddBreadcrumb('Groups', Url('/groups'));
             $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+            $header = new GroupHeaderModule($Group);
+            $this->addModule($header);
 
             // Register GroupID as criteria
             $EventCriteria['GroupID'] = $Group['GroupID'];
@@ -96,11 +98,6 @@ class EventsController extends Gdn_Controller {
             $RecentEventsModule->UserID = Gdn::Session()->UserID;
 
             break;
-      }
-
-      if (isset($Group)) {
-         $header = new GroupHeaderModule($Group);
-         $this->addModule($header);
       }
       $this->Title(T('Events'));
       $this->AddBreadcrumb($this->Title());
