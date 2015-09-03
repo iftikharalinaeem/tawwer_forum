@@ -35,7 +35,7 @@ class EventListModule extends Gdn_Module {
     /**
      * @var string The url for the 'show more' link.
      */
-    public $showMoreUrl;
+    public $showMoreUrl = '';
     /**
      * @var bool Whether to show the 'New Event' button.
      */
@@ -43,7 +43,7 @@ class EventListModule extends Gdn_Module {
     /**
      * @var string The url for the 'New Event' button.
      */
-    public $newEventUrl;
+    public $newEventUrl = '';
     /**
      * @var bool Whether to show the event's 'RSVP' dropdown.
      */
@@ -168,7 +168,7 @@ class EventListModule extends Gdn_Module {
      * @param string $newEventUrl The url for the new event button, if one exists.
      * @return array An event list data array.
      */
-    public function getEventsInfo($layout, $events, $heading, $emptyMessage = '', $showMoreUrl = '', $newEventUrl = '') {
+    public function getEventsInfo($layout, $events, $heading, $emptyMessage, $showMoreUrl, $newEventUrl) {
 
         $eventList['layout'] = $layout;
         $eventList['emptyMessage'] = $emptyMessage;
@@ -247,7 +247,7 @@ class EventListModule extends Gdn_Module {
 
 
     /**
-     * Adds the row data for an event item in an event layout group list.
+     * Adds the row data for an event item in a table layout group list.
      *
      * @param array $item The working event item for an event list.
      * @param array $event The event array we're parsing.

@@ -74,7 +74,7 @@ class GroupListModule extends Gdn_Module {
      * @param string $sectionId The group list's unique endpoint slug ('mine', 'popular', 'new', etc.).
      * @return array A group list data array.
      */
-    public function getGroupsInfo($layout, $groups, $heading, $emptyMessage = '', $cssClass = '', $sectionId = '') {
+    public function getGroupsInfo($layout, $groups, $heading, $emptyMessage, $cssClass, $sectionId) {
 
         $groupList['layout'] = $layout;
         $groupList['emptyMessage'] = $emptyMessage;
@@ -114,7 +114,7 @@ class GroupListModule extends Gdn_Module {
      * @param string $sectionId The group list's unique endpoint slug.
      * @return array A data array representing a group item in a group list.
      */
-    public function getGroupInfo($group, $layout, $withOptions = true, $sectionId = '') {
+    public function getGroupInfo($group, $layout, $withOptions, $sectionId) {
         $item['text'] = htmlspecialchars(sliceString(Gdn_Format::plainText(val('Description', $group), val('Format', $group)), c('Groups.CardDescription.ExcerptLength', 150)));
         $item['textCssClass'] = 'GroupDescription';
         $item['imageSource'] = val('Icon', $group) ? Gdn_Upload::url(val('Icon', $group)) : C('Groups.DefaultIcon', false);
