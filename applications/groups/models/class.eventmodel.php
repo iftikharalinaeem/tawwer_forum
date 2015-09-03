@@ -271,7 +271,7 @@ class EventModel extends Gdn_Model {
    /**
     * Checks whether an event has ended.
     *
-    * @param $event The event to check.
+    * @param array $event The event to check.
     * @return bool Whether the event has ended.
     */
    public static function isEnded($event) {
