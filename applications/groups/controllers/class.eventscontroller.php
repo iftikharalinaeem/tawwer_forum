@@ -83,11 +83,6 @@ class EventsController extends Gdn_Controller {
             $EventCriteria['GroupID'] = $Group['GroupID'];
 
             $RecentEventsModule->GroupID = $Group['GroupID'];
-
-            $GroupModule = new GroupModule();
-            $GroupModule->GroupID = $Group['GroupID'];
-            $this->AddModule($GroupModule, 'Panel');
-
             break;
 
          // Events this user is invited to
@@ -101,8 +96,9 @@ class EventsController extends Gdn_Controller {
       }
       $this->Title(T('Events'));
       $this->AddBreadcrumb($this->Title());
+      $this->CssClass .= ' NoPanel';
 
-      // Upcoming events
+     // Upcoming events
       $UpcomingRange = c('Groups.Events.UpcomingRange', '+365 days');
       $Events = $EventModel->GetUpcoming($UpcomingRange, $EventCriteria, FALSE);
       $this->SetData('UpcomingEvents', $Events);

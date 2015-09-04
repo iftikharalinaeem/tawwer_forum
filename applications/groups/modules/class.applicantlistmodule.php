@@ -1,36 +1,40 @@
 <?php
-
 /**
  * Groups Application - Applicant List Module
  *
  */
 
+/**
+ * Class ApplicantListModule
+ *
+ * Consolidates the data and renders the view for an applicant list.
+ */
 class ApplicantListModule extends Gdn_Module {
 
     /**
      * @var array The applicants to render.
      */
-    public $applicants;
+    private $applicants;
     /**
      * @var array The group that the applicants are associated with.
      */
-    public $group;
+    private $group;
     /**
      * @var string The applicant section title.
      */
-    public $title;
+    private $title;
     /**
      * @var string The message to display if there are no applicants.
      */
-    public $emptyMessage;
+    private $emptyMessage;
     /**
      * @var string The layout type, either 'modern' or 'table'.
      */
-    public $layout;
+    private $layout;
     /**
      * @var bool Whether to add the 'approve', 'deny' and 'remove' buttons to applicant items.
      */
-    public $withButtons;
+    private $withButtons;
 
     /**
      * Construct the ApplicantListModule object.
@@ -48,6 +52,7 @@ class ApplicantListModule extends Gdn_Module {
         $this->title = $title;
         $this->emptyMessage = $emptyMessage;
         $this->layout = $layout ?: c('Vanilla.Discussions.Layout', 'modern');
+        $this->setView('applicantlist');
         $this->_ApplicationFolder = 'groups';
     }
 
@@ -58,7 +63,7 @@ class ApplicantListModule extends Gdn_Module {
      * @param array $group The group that the applicant is associated with.
      * @return array The applicant buttons.
      */
-    public function getApplicantButtons($applicant, $group) {
+    private function getApplicantButtons($applicant, $group) {
         $buttons = array();
         if (strtolower(val('Type', $applicant)) == 'application') {
             $approve['text'] = t('Approve');
@@ -93,7 +98,7 @@ class ApplicantListModule extends Gdn_Module {
      * @param bool $withButtons Whether to add the 'approve', 'deny' and 'remove' buttons to applicant items.
      * @return array An applicant list data array.
      */
-    public function getApplicantsInfo($layout, $applicants, $group, $title, $emptyMessage, $withButtons) {
+    private function getApplicantsInfo($layout, $applicants, $group, $title, $emptyMessage, $withButtons) {
 
         $applicantList['layout'] = $layout;
         $applicantList['emptyMessage'] = $emptyMessage;
@@ -123,7 +128,7 @@ class ApplicantListModule extends Gdn_Module {
      * @param bool $withButtons Whether to add the 'approve', 'deny' and 'remove' buttons to applicant items.
      * @return array A data array representing an applicant item in an applicant list.
      */
-    public function getApplicantInfo($applicant, $group, $layout, $withButtons) {
+    private function getApplicantInfo($applicant, $group, $layout, $withButtons) {
         $item['heading'] = Gdn_Format::text(val('Name', $applicant));
         $item['url'] = userUrl($applicant);
         $item['imageSource'] = userPhotoUrl($applicant);
@@ -162,7 +167,7 @@ class ApplicantListModule extends Gdn_Module {
      * @param array $applicant The applicant array we're parsing.
      * @param bool $withButtons Whether to add the 'approve', 'deny' and 'remove' buttons to applicant items.
      */
-    public function getApplicantTableItem(&$item, $applicant, $withButtons) {
+    private function getApplicantTableItem(&$item, $applicant, $withButtons) {
         $item['rows']['main']['type'] = 'main';
         $item['rows']['main']['cssClass'] = 'UserName';
 
@@ -183,7 +188,7 @@ class ApplicantListModule extends Gdn_Module {
         $controller = new Gdn_Controller();
         $controller->setData('list', $this->applicants);
         if (GroupPermission('Leader', $this->group)) {
-            return $controller->fetchView('applicantlist', 'modules', 'groups');
+            return $controller->fetchView($this->getView(), 'modules', 'groups');
         }
         return '';
     }

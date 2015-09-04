@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Groups Application - Group List Module
  *
@@ -15,31 +14,35 @@ class GroupListModule extends Gdn_Module {
     /**
      * @var array The groups to render. (An array of group arrays.)
      */
-    public $groups;
+    private $groups;
     /**
      * @var string The group list's unique endpoint slug ('mine', 'popular', 'new', etc.).
      */
-    public $id;
+    private $id;
     /**
      * @var string The group list's title (i.e., 'My Groups').
      */
-    public $title;
+    private $title;
     /**
      * @var string The message to display if there are no groups.
      */
-    public $emptyMessage;
+    private $emptyMessage;
     /**
      * @var string A css class to add to the group list container.
      */
-    public $cssClass;
+    private $cssClass;
     /**
      * @var bool Whether to provide a link to see all of the group list's contents.
      */
-    public $showMore;
+    private $showMore;
     /**
      * @var string The layout type, either 'modern' or 'table'.
      */
-    public $layout;
+    private $layout;
+    /**
+     * @var bool Whether the latest post is attached to a group item.
+     */
+    private $attachDiscussions;
 
     /**
      * Construct the GroupListModule object.
@@ -60,6 +63,7 @@ class GroupListModule extends Gdn_Module {
         $this->cssClass = $cssClass;
         $this->showMore = $showMore;
         $this->layout = $layout ?: c('Vanilla.Discussions.Layout', 'modern');
+        $this->setView('grouplist');
         $this->_ApplicationFolder = 'groups';
     }
 
@@ -74,7 +78,7 @@ class GroupListModule extends Gdn_Module {
      * @param string $sectionId The group list's unique endpoint slug ('mine', 'popular', 'new', etc.).
      * @return array A group list data array.
      */
-    public function getGroupsInfo($layout, $groups, $heading, $emptyMessage, $cssClass, $sectionId) {
+    private function getGroupsInfo($layout, $groups, $heading, $emptyMessage, $cssClass, $sectionId) {
 
         $groupList['layout'] = $layout;
         $groupList['emptyMessage'] = $emptyMessage;
@@ -94,12 +98,15 @@ class GroupListModule extends Gdn_Module {
             $groupList['columns'][1]['columnCssClass'] = 'BigCount CountMembers';
             $groupList['columns'][2]['columnLabel'] = t('Discussions');
             $groupList['columns'][2]['columnCssClass'] = 'BigCount CountDiscussions';
-            $groupList['columns'][3]['columnLabel'] = t('Latest Post');
-            $groupList['columns'][3]['columnCssClass'] = 'BlockColumn LatestPost';
         }
 
         foreach ($groups as $group) {
             $groupList['items'][] = $this->getGroupInfo($group, $layout, true, $sectionId);
+        }
+
+        if ($this->attachDiscussions && $layout == 'table') {
+            $groupList['columns'][3]['columnLabel'] = t('Latest Post');
+            $groupList['columns'][3]['columnCssClass'] = 'BlockColumn LatestPost';
         }
 
         return $groupList;
@@ -114,7 +121,7 @@ class GroupListModule extends Gdn_Module {
      * @param string $sectionId The group list's unique endpoint slug.
      * @return array A data array representing a group item in a group list.
      */
-    public function getGroupInfo($group, $layout, $withOptions, $sectionId) {
+    private function getGroupInfo($group, $layout, $withOptions, $sectionId) {
         $item['text'] = htmlspecialchars(sliceString(Gdn_Format::plainText(val('Description', $group), val('Format', $group)), c('Groups.CardDescription.ExcerptLength', 150)));
         $item['textCssClass'] = 'GroupDescription';
         $item['imageSource'] = val('Icon', $group) ? Gdn_Upload::url(val('Icon', $group)) : C('Groups.DefaultIcon', false);
@@ -124,27 +131,28 @@ class GroupListModule extends Gdn_Module {
         $item['id'] = 'Group_'.val('GroupID', $group);
         $item['metaCssClass'] = '';
 
-        if ($layout != 'table') {
-            // 'LastTitle' is only added if JoinRecentPosts function is called on groups
-            $attachDiscussionData = val('LastTitle', $group);
+        // 'LastTitle' is only added if JoinRecentPosts function is called on groups
+        $attachDiscussionData = val('LastTitle', $group);
 
-            $item['meta']['countDiscussions']['text'] = Plural(val('CountDiscussions', $group), '%s discussion', '%s discussions', number_format(val('CountDiscussions', $group)));
-            $item['meta']['countMembers']['text'] = Plural(val('CountMembers', $group), '%s member', '%s members', number_format(val('CountMembers', $group)));
+        $item['meta']['countDiscussions']['text'] = Plural(val('CountDiscussions', $group), '%s discussion', '%s discussions', number_format(val('CountDiscussions', $group)));
+        $item['meta']['countDiscussions']['count'] = val('CountDiscussions', $group);
+        $item['meta']['countMembers']['text'] = Plural(val('CountMembers', $group), '%s member', '%s members', number_format(val('CountMembers', $group)));
+        $item['meta']['countMembers']['count'] = val('CountMembers', $group);
 
-            if ($attachDiscussionData) {
-                $groupModel = new GroupModel();
-                if ($groupModel->CheckPermission('View', val('GroupID', $group))) {
-                    $item['meta']['lastDiscussion']['text'] = t('Most recent discussion:') . ' ';
-                    $item['meta']['lastDiscussion']['linkText'] = htmlspecialchars(sliceString(Gdn_Format::text(val('LastTitle', $group)), 100));
-                    $item['meta']['lastDiscussion']['url'] = url(val('LastUrl', $group));
-                }
-
-                $item['meta']['lastUser']['text'] = t('by') . ' ';
-                $item['meta']['lastUser']['linkText'] = val('LastName', $group);
-                $item['meta']['lastUser']['url'] = userUrl($group, 'Last');
-
-                $item['meta']['lastDate']['text'] = Gdn_Format::date(val('LastDateInserted', $group));
+        if ($attachDiscussionData) {
+            $this->attachDiscussions = true;
+            $groupModel = new GroupModel();
+            if ($groupModel->CheckPermission('View', val('GroupID', $group))) {
+                $item['meta']['lastDiscussion']['text'] = t('Most recent discussion:') . ' ';
+                $item['meta']['lastDiscussion']['linkText'] = htmlspecialchars(sliceString(Gdn_Format::text(val('LastTitle', $group)), 100));
+                $item['meta']['lastDiscussion']['url'] = url(val('LastUrl', $group));
             }
+
+            $item['meta']['lastUser']['text'] = t('by') . ' ';
+            $item['meta']['lastUser']['linkText'] = val('LastName', $group);
+            $item['meta']['lastUser']['url'] = userUrl($group, 'Last');
+
+            $item['meta']['lastDate']['text'] = Gdn_Format::date(val('LastDateInserted', $group));
         }
 
         if ($withOptions) {
@@ -166,7 +174,7 @@ class GroupListModule extends Gdn_Module {
      * @param array $item The working group item for a group list.
      * @param array $group The group array we're parsing.
      */
-    public function getGroupItemTableData(&$item, $group) {
+    private function getGroupItemTableData(&$item, $group) {
         $item['rows']['main']['type'] = 'main';
         $item['rows']['main']['cssClass'] = 'Group-Name';
 
@@ -178,14 +186,17 @@ class GroupListModule extends Gdn_Module {
         $item['rows']['countDiscussions']['number'] = val('CountDiscussions', $group);
         $item['rows']['countDiscussions']['cssClass'] = 'CountDiscussions';
 
-        $item['rows']['lastPost']['type'] = 'lastPost';
-        $item['rows']['lastPost']['title'] = val('LastTitle', $group);
-        $item['rows']['lastPost']['url'] = val('LastUrl', $group);
-        $item['rows']['lastPost']['username'] = val('LastName', $group);
-        $item['rows']['lastPost']['userUrl'] = userUrl($group, 'Last');
-        $item['rows']['lastPost']['date'] = val('LastDateInserted', $group);
-        $item['rows']['lastPost']['imageSource'] = val('LastPhoto', $group);
-        $item['rows']['lastPost']['imageUrl'] = userUrl($group, 'Last');
+        $attachDiscussionData = val('LastTitle', $group);
+        if ($attachDiscussionData) {
+            $item['rows']['lastPost']['type'] = 'lastPost';
+            $item['rows']['lastPost']['title'] = val('LastTitle', $group);
+            $item['rows']['lastPost']['url'] = val('LastUrl', $group);
+            $item['rows']['lastPost']['username'] = val('LastName', $group);
+            $item['rows']['lastPost']['userUrl'] = userUrl($group, 'Last');
+            $item['rows']['lastPost']['date'] = val('LastDateInserted', $group);
+            $item['rows']['lastPost']['imageSource'] = val('LastPhoto', $group);
+            $item['rows']['lastPost']['imageUrl'] = userUrl($group, 'Last');
+        }
     }
 
     /**
@@ -194,10 +205,11 @@ class GroupListModule extends Gdn_Module {
      * @return string HTML view
      */
     public function toString() {
+        require_once Gdn::Controller()->fetchViewLocation('group_functions', 'Group', 'groups');
         $this->groups = $this->getGroupsInfo($this->layout, $this->groups, $this->title, $this->emptyMessage, $this->cssClass, $this->id);
         $controller = new Gdn_Controller();
         $controller->setData('list', $this->groups);
-        return $controller->fetchView('grouplist', 'modules', 'groups');
+        return $controller->fetchView($this->getView(), 'modules', 'groups');
     }
 
 }
