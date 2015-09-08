@@ -237,8 +237,9 @@ class OnlineModule extends Gdn_Module {
                      echo userPhoto($user);
 
                      $userName = val('Name', $user, FALSE);
-                     if ($userName)
-                        echo wrap($userName, 'div', array('class' => 'OnlineUserName'));
+                     if ($userName) {
+                        echo wrap(htmlspecialchars($userName), 'div', array('class' => 'OnlineUserName'));
+                     }
                      echo '</div>';
                   }
                }

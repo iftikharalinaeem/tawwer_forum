@@ -21,7 +21,7 @@
                     Wrap(Wrap(Plural($Leader['Points'], '%s Point', '%s Points'), 'span', array('class' => 'Count')), 'span', array('class' => 'Aside')).' '.
                     Wrap(
                         Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')).' '.
-                        Wrap($Username, 'span', array('class' => 'Username'))
+                        Wrap(htmlspecialchars($Username), 'span', array('class' => 'Username'))
                     , 'span', array('class' => 'Leaderboard-User')),
                     UserUrl($Leader)
                 )
