@@ -7,31 +7,28 @@
 
 class OAuth2Plugin {
 
-    /**
-     * @var string OAuth Access Token
-     */
+    /** @var string token provider by authenticator  */
     protected $accessToken;
 
+    /** @var string key for GDN_UserAuthenticationProvider table  */
     protected $providerKey = null;
 
+    /** @var  string passing scope to authenticator */
     protected $scope;
 
-    protected $configurationModule;
-
+    /** @var string content type for API calls */
     protected $defaultContentType = 'application/x-www-form-urlencoded';
 
-    /**
-     * @var array
-     */
+    /** @var array stored information to connect with provider (secret, etc.) */
     protected $provider = [];
 
     /**
      * Set up OAuth2 access properties.
      *
-     * @param bool $accessToken
-     * @param bool $InstanceUrl
+     * @param string $providerKey
+     * @param string $accessToken
      */
-    public function __construct($providerKey, $accessToken = FALSE, $InstanceUrl = FALSE) {
+    public function __construct($providerKey, $accessToken = false) {
         $this->providerKey = $providerKey;
         $this->provider = provider();
         if ($accessToken) {
@@ -45,7 +42,9 @@ class OAuth2Plugin {
     }
 
     /**
-     *  Return all the information saved in provider table
+     *  Return all the information saved in provider table.
+     *
+     * return array
      */
     public function provider() {
         if (!$this->provider) {
@@ -55,6 +54,8 @@ class OAuth2Plugin {
     }
 
     /**
+     * Check if there is enough data to connect to an authentication provider.
+     *
      * @return bool
      */
     public function isConfigured() {
@@ -63,9 +64,8 @@ class OAuth2Plugin {
     }
 
     /**
-     * Create the URI that can return an authorization
+     * Create the URI that can return an authorization.
      *
-     * @param $class_name
      * @param array $state
      * @return string
      */
@@ -93,7 +93,8 @@ class OAuth2Plugin {
     }
 
     /**
-     * Generic API call used to authenticate
+     * Generic API uses Proxy->Request.
+     *
      * @param $uri
      * @param string $method
      * @param array $params
@@ -105,19 +106,23 @@ class OAuth2Plugin {
     protected function api($uri, $method = 'GET', $params = [], $options = []) {
         $Proxy = new ProxyRequest();
 
+        // Create default values of options to be passed to ProxyRequest.
         $defaultOptions['ConnectTimeout'] = 10;
         $defaultOptions['Timeout'] = 10;
 
         $headers = [];
 
+        // Optionally over-write the content type
         if ($contentType = val('Content-Type', $options, $this->defaultContentType)) {
             $headers['Content-Type'] = $contentType;
         }
 
+        // Obtionally add proprietary required Authorization headers
         if ($headerAuthorization = val('Authorization-Header-Message', $options, null)) {
             $headers['Authorization'] = $headerAuthorization;
         }
 
+        // Merge the default options with the passed options over-writing default options with passed options.
         $proxyOptions = array_merge($defaultOptions, $options);
 
         $proxyOptions['URL'] = $uri;
@@ -130,10 +135,12 @@ class OAuth2Plugin {
             $headers
         );
 
+        // Extract response only if it arrives as JSON
         if (stripos($Proxy->ContentType, 'application/json') !== false) {
             $response = json_decode($Proxy->ResponseBody, true);
         }
 
+        // Return any errors
         if (!$Proxy->responseClass('2xx')) {
             if (isset($response['error'])) {
                 $message = "Request server says: ".$response['error_description']." (code: ".$response['error'].")";
@@ -148,17 +155,19 @@ class OAuth2Plugin {
     }
 
     /**
+     * Check if an access token has been returned from the provider server.
+     *
      * @return bool
      */
     public function isConnected() {
-        if (!$this->accessToken || !$this->instanceUrl) {
-            return FALSE;
+        if (!$this->accessToken) {
+            return false;
         }
         return TRUE;
     }
 
     /**
-     * Renew or return access token
+     * Renew or return access token.
      *
      * @param bool $NewValue
      * @return bool|mixed|null
@@ -217,7 +226,7 @@ class OAuth2Plugin {
 //        if ($Response['HttpCode'] == 200) {
 //            return TRUE;
 //        }
-//        return FALSE;
+//        return false;
 //    }
 
     /**
@@ -258,13 +267,12 @@ class OAuth2Plugin {
 //    }
 
     /**
-     * Request access token from provider
-     * @param $code
+     * Request access token from provider.
+     *
+     * @param string $code code returned from initial handshake with provider
      * @return mixed
-     * @throws Gdn_UserException
      */
     public function requestAccessToken($code) {
-
         $provider = $this->provider();
 
         $uri = $provider['TokenUrl'];
@@ -281,8 +289,9 @@ class OAuth2Plugin {
     }
 
     /**
-     * Set Access Token
-     * @param $accessToken
+     * Set access token received from provider.
+     *
+     * @param string $accessToken
      * @return $this
      */
     public function setAccessToken($accessToken) {
@@ -291,8 +300,9 @@ class OAuth2Plugin {
     }
 
     /**
-     * Set Provider Key
-     * @param $providerKey
+     * Set provider key used to access settings stored in GDN_UserAuthenticationProvider.
+     *
+     * @param string $providerKey
      * @return $this
      */
     public function setProviderKey($providerKey) {
@@ -301,8 +311,9 @@ class OAuth2Plugin {
     }
 
     /**
-     * Set Scope
-     * @param $scope
+     * Set scope to be passed to provider.
+     *
+     * @param string $scope
      * @return $this
      */
     public function setScope($scope) {
@@ -310,6 +321,12 @@ class OAuth2Plugin {
         return $this;
     }
 
+    /**
+     * Create a controller to deal with plugin settings in dashboard.
+     *
+     * @param Gdn_Controller $sender
+     * @param array $args arguments passed from sender
+     */
     public function settingsController_oAuth2_create($sender, $args) {
         $sender->permission('Garden.Settings.Manage');
 
@@ -347,7 +364,8 @@ class OAuth2Plugin {
     }
 
     /**
-     * Allow child plugins to over-ride or add form fields to settings
+     * Allow child plugins to over-ride or add form fields to settings.
+     *
      * @return array
      */
     protected function getSettingsFormFields() {
@@ -359,14 +377,17 @@ class OAuth2Plugin {
     }
 
     /**
-     * Inject into the process of the base connection
+     * Inject into the process of the base connection.
+     *
      * @param Gdn_Controller $sender
-     * @param array $args
+     * @param array $args arguments passed from sender
      */
     public function base_connectData_handler($sender, $args) {
         if (val(0, $args) != $this->getProviderKey()) {
             return;
         }
+
+        // Retrieve the profile that was saved to the session in the entry controller.
         $savedProfile = Gdn::Session()->stash($this->getProviderKey(), '', false);
 
         $profile = val('Profile', $savedProfile);
@@ -375,9 +396,11 @@ class OAuth2Plugin {
         /* @var Gdn_Form $form */
         $form = $sender->Form; //new Gdn_Form();
 
-        $formValues = $form->formValues();
-        $formValues = array_replace($formValues, $profile);
+        // Create a form and populate it with values from the profile.
+        $originaFormValues = $form->formValues();
+        $formValues = array_replace($originaFormValues, $profile);
         $form->formValues($formValues);
+
         // Save some original data in the attributes of the connection for later API calls.
         $attributes = array();
         $attributes[$this->getProviderKey()] = array(
@@ -398,10 +421,10 @@ class OAuth2Plugin {
     }
 
     /**
+     * Inject a sign-in icon into the ME menu
      *
-     *
-     * @param $sender
-     * @param $args
+     * @param Gdn_Controller $sender
+     * @param array $args arguments passed from sender
      */
     public function base_beforeSignInButton_handler($sender, $args) {
         if(!$this->isConfigured() || $this->isDefault()) {
@@ -412,6 +435,11 @@ class OAuth2Plugin {
 
     }
 
+    /**
+     * Check authentication provider table to see if this is the default method for logging in.
+     *
+     * @return bool
+     */
     public function isDefault() {
         $provider = $this->provider();
         return $provider['IsDefault'];
@@ -419,9 +447,10 @@ class OAuth2Plugin {
     }
 
     /**
-     * Inject signin button into the sign in page
+     * Inject sign-in button into the sign in page.
      *
      * @param Gdn_Controller $sender
+     * @param array $args arguments passed from sender
      */
     public function entryController_signIn_handler($sender, $args) {
         if(!$this->isConfigured()) {
@@ -429,7 +458,6 @@ class OAuth2Plugin {
         }
 
         if (isset($sender->Data['Methods'])) {
-
             // Add the sign in button method to the controller.
             $method = array(
                 'Name' => $this->getProviderKey(),
@@ -441,10 +469,10 @@ class OAuth2Plugin {
     }
 
     /**
-     * Redirect to provider's signin page if this is the default behaviour
+     * Redirect to provider's signin page if this is the default behaviour.
      *
-     * @param $Sender
-     * @param $Args
+     * @param Gdn_Controller $sender
+     * @param array $args arguments passed from sender
      */
     public function entryController_overrideSignIn_handler($sender, $args) {
         $provider = $args['DefaultProvider'];
@@ -459,10 +487,10 @@ class OAuth2Plugin {
 
 
     /**
-     * Redirect to provider's register page if this is the default behaviour
+     * Redirect to provider's register page if this is the default behaviour.
      *
-     * @param $sender
-     * @param $args
+     * @param Gdn_Controller $sender
+     * @param array $args arguments passed from sender
      */
     public function entryController_overrideRegister_handler($sender, $args) {
         $provider = $args['DefaultProvider'];
@@ -475,9 +503,9 @@ class OAuth2Plugin {
     }
 
     /**
-     * Create a controller to handle entry request
+     * Create a controller to handle entry request.
      *
-     * @param $sender
+     * @param Gdn_Controller $sender
      * @param $code
      * @param $state
      * @throws Exception
@@ -489,7 +517,6 @@ class OAuth2Plugin {
             throw new Gdn_UserException($Error);
         }
 
-        // Get an access token.
         Gdn::session()->stash($this->getProviderKey()); // remove any stashed.
 
         $response = $this->requestAccessToken($code);
@@ -554,9 +581,9 @@ class OAuth2Plugin {
     }
 
     /**
-     * Allow child plugins to transalte the keys that are returned in profile to our keys
+     * Allow child plugins to translate the keys that are returned in profile from the provider into our keys.
      *
-     * @param array $rawProfle
+     * @param array $rawProfle profile as it is returned from the provider
      * @return array
      */
     public function translateProfileResults($rawProfle = array()) {
@@ -564,19 +591,16 @@ class OAuth2Plugin {
     }
 
     /**
-     * Get profile data from remote provider
-     * @return array
+     * Get profile data from authentication provider through API.
+     *
+     * @return array user profile from provider
      */
     public function getProfile() {
         $provider = $this->provider();
 
         $uri = $this->requireVal('ProfileUrl', $provider, "provider");
 
-        if (strpos($uri, '?') === false) {
-            $uri .= '?';
-        } else {
-            $uri .= '&';
-        }
+        $uri .= (strpos($uri, '?') === false) ? "?" : "&";
 
         $uri .= "access_token=".urlencode($this->accessToken());
 
@@ -585,6 +609,15 @@ class OAuth2Plugin {
         return $profile;
     }
 
+    /**
+     * Extract values from arrays.
+     *
+     * @param string $key needle
+     * @param array $arr haystack
+     * @param string $context pass context to error message
+     * @return mixed
+     * @throws Exception
+     */
     function requireVal($key, $arr, $context = null) {
         $result = val($key, $arr);
         if (!$result) {
@@ -594,15 +627,12 @@ class OAuth2Plugin {
     }
 
     /**
-     *  Get provider key
-     * @return null
+     *  Get provider key.
+     *
+     * @return string provider key
      */
     public function getProviderKey() {
         return $this->providerKey;
     }
 
-
-    public function getUrl() {
-        return;
-    }
 }

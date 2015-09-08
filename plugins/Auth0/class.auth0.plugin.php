@@ -1,6 +1,8 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+
 require_once('class.oauth2.plugin.php');
-$PluginInfo['Auth0'] = array(
+
+$pluginInfo['Auth0'] = array(
     'Name' => 'Auth0 SSO',
     'Description' => 'Allows user login to be authenticated on Auth0 SSO.',
     'Version' => '1.0.0',
@@ -18,8 +20,6 @@ $PluginInfo['Auth0'] = array(
 
 class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
 
-    /// Properties ///
-
     public function __construct() {
         $this
             ->setProviderKey('Auth0')
@@ -27,11 +27,10 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
     }
 
     /**
-     * Override parent provider with the url endpoints specific to this provider
+     * Override parent provider with the url endpoints specific to this provider.
      *
      * @return array|bool|stdClass
      */
-
     public function provider() {
         $provider = parent::provider();
 
@@ -52,7 +51,7 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
     }
 
     /**
-     * Create the structure in the database
+     * Create the structure in the database.
      */
     public function structure() {
         // Make sure we have the Auth0 provider.
@@ -70,7 +69,7 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
     }
 
     /**
-     * Add form fields to settings specific to this plugin
+     * Add form fields to settings specific to this plugin.
      *
      * @return array
      */
@@ -83,12 +82,11 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
     }
 
     /**
-     * Wrapper function for writing a generic settings controller
+     * Wrapper function for writing a generic settings controller.
      *
      * @param SettingsController $Sender
      */
     public function settingsController_auth0_create($sender, $args) {
-
         $sender->setData('Title', sprintf(T('%s Settings'), 'Auth0 SSO'));
 
         // Create send the possible redirect URLs that will be required by Auth0.
@@ -97,11 +95,10 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
         $sender->setData('redirectUrls', $redirectUrls);
 
         $this->settingsController_oAuth2_create($sender, $args);
-
     }
 
     /**
-     *  Wrapper function for writing a generic entry controller
+     *  Wrapper function for writing a generic entry controller.
      *
      * @param EntryController $Sender
      * @param string $Code
@@ -109,13 +106,11 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
      * @throws Gdn_UserException
      */
     public function entryController_auth0_create($sender, $code = false, $state = false) {
-
         $this->entryController_OAuth2_create($sender, $code, $state);
-
     }
 
     /**
-     * Translate the array keys for the profile returning from the provider so that they align with Vanilla keys
+     * Translate the array keys for the profile returning from the provider so that they align with Vanilla keys.
      *
      * @param array $rawProfile
      * @return array
@@ -136,7 +131,7 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
     }
 
     /**
-     * Create signup button specific to this plugin
+     * Create signup button specific to this plugin.
      *
      * @param string $type
      * @return string
@@ -149,7 +144,7 @@ class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
     }
 
     /**
-     * Insert css file for custom styling of signin button/icon
+     * Insert css file for custom styling of signin button/icon.
      *
      * @param AssetModel $Sender
      */
