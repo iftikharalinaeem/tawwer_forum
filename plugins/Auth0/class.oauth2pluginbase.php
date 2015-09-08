@@ -4,10 +4,13 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
-$pluginInfo['OAuth2PluginBase'] = array(
-    'ClassName'=> 'OAuth2PluginBase'
-);
 
+/**
+ * Class OAuth2PluginBase
+ *
+ * Base class to be extended by any plugin that wants to use Oauth2 protocol for SSO.
+ * Will eventually be moved to a library that will be included by composer.
+ */
 class OAuth2PluginBase {
 
     /** @var string token provider by authenticator  */
@@ -107,7 +110,7 @@ class OAuth2PluginBase {
      * @throws Gdn_UserException
      */
     protected function api($uri, $method = 'GET', $params = [], $options = []) {
-        $Proxy = new ProxyRequest();
+        $proxy = new ProxyRequest();
 
         // Create default values of options to be passed to ProxyRequest.
         $defaultOptions['ConnectTimeout'] = 10;
@@ -131,7 +134,7 @@ class OAuth2PluginBase {
         $proxyOptions['URL'] = $uri;
         $proxyOptions['Method'] = $method;
 
-        $response = $Proxy->Request(
+        $response = $proxy->Request(
             $proxyOptions,
             $params,
             null,
@@ -139,19 +142,19 @@ class OAuth2PluginBase {
         );
 
         // Extract response only if it arrives as JSON
-        if (stripos($Proxy->ContentType, 'application/json') !== false) {
-            $response = json_decode($Proxy->ResponseBody, true);
+        if (stripos($proxy->ContentType, 'application/json') !== false) {
+            $response = json_decode($proxy->ResponseBody, true);
         }
 
         // Return any errors
-        if (!$Proxy->responseClass('2xx')) {
+        if (!$proxy->responseClass('2xx')) {
             if (isset($response['error'])) {
                 $message = "Request server says: ".$response['error_description']." (code: ".$response['error'].")";
             } else {
-                $message = 'HTTP Error communicating Code: '.$Proxy->ResponseStatus;
+                $message = 'HTTP Error communicating Code: '.$proxy->ResponseStatus;
             }
 
-            throw new Gdn_UserException($message, $Proxy->ResponseStatus);
+            throw new Gdn_UserException($message, $proxy->ResponseStatus);
         }
 
         return $response;
@@ -172,16 +175,16 @@ class OAuth2PluginBase {
     /**
      * Renew or return access token.
      *
-     * @param bool $NewValue
+     * @param bool $newValue
      * @return bool|mixed|null
      */
-    public function accessToken($NewValue = false) {
+    public function accessToken($newValue = false) {
         if (!$this->isConfigured()) {
             return false;
         }
 
-        if ($NewValue !== false) {
-            $this->accessToken = $NewValue;
+        if ($newValue !== false) {
+            $this->accessToken = $newValue;
         }
 
         if ($this->accessToken === null) {
