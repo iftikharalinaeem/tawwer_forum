@@ -1,24 +1,22 @@
 <?php
 
-require_once('class.oauth2.plugin.php');
 
 $pluginInfo['Auth0'] = array(
     'Name' => 'Auth0 SSO',
+    'ClassName' => "Auth0Plugin",
     'Description' => 'Allows user login to be authenticated on Auth0 SSO.',
     'Version' => '1.0.0',
     'RequiredApplications' => array('Vanilla' => '1.0'),
-    'RequiredPlugins' => array(
-        'OAuth2' => '1.0.0'
-    ),
     'RequiredTheme' => false,
-    'RequiredPlugins' => false,
     'HasLocale' => false,
     'SettingsUrl' => '/settings/Auth0',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => TRUE
 );
 
-class Auth0Plugin extends OAuth2Plugin implements Gdn_IPlugin {
+require_once('class.oauth2pluginbase.php');
+
+class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
 
     public function __construct() {
         $this

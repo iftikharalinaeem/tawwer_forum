@@ -4,8 +4,11 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
+$pluginInfo['OAuth2PluginBase'] = array(
+    'ClassName'=> 'OAuth2PluginBase'
+);
 
-class OAuth2Plugin {
+class OAuth2PluginBase {
 
     /** @var string token provider by authenticator  */
     protected $accessToken;
