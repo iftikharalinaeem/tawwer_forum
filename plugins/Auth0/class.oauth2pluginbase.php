@@ -31,8 +31,8 @@ class OAuth2PluginBase {
     /**
      * Set up OAuth2 access properties.
      *
-     * @param string $providerKey
-     * @param string $accessToken
+     * @param string $providerKey Fixed key set in child class.
+     * @param bool|string $accessToken Provided by the authentication provider.
      */
     public function __construct($providerKey, $accessToken = false) {
         $this->providerKey = $providerKey;
@@ -50,7 +50,7 @@ class OAuth2PluginBase {
     /**
      *  Return all the information saved in provider table.
      *
-     * return array
+     * @return array Stored provider data (secret, client_id, etc.).
      */
     public function provider() {
         if (!$this->provider) {
@@ -62,7 +62,7 @@ class OAuth2PluginBase {
     /**
      * Check if there is enough data to connect to an authentication provider.
      *
-     * @return bool
+     * @return bool True if there is a secret and a client_id, false if not.
      */
     public function isConfigured() {
         $provider = $this->provider();
@@ -72,8 +72,9 @@ class OAuth2PluginBase {
     /**
      * Create the URI that can return an authorization.
      *
-     * @param array $state
-     * @return string
+     * @param array $state Optionally provide an array of variables to be sent to the provider.
+     *
+     * @return string Endpoint of the provider.
      */
     public function authorizeUri($state = array()) {
         $provider = $this->provider();
@@ -98,15 +99,17 @@ class OAuth2PluginBase {
     }
 
     /**
-     * Generic API uses Proxy->Request.
+     * Generic API uses ProxyRequest class to fetch data from remote endpoints.
      *
-     * @param $uri
-     * @param string $method
-     * @param array $params
-     * @param array $options
-     * @return mixed|type
-     * @throws Exception
-     * @throws Gdn_UserException
+     * @param $uri Endpoint on provider's server.
+     * @param string $method HTTP method required by provider.
+     * @param array $params Query string.
+     * @param array $options Configuration options for the request (e.g. Content-Type).
+     *
+     * @return mixed|type.
+     *
+     * @throws Exception.
+     * @throws Gdn_UserException.
      */
     protected function api($uri, $method = 'GET', $params = [], $options = []) {
         $proxy = new ProxyRequest();
@@ -162,23 +165,24 @@ class OAuth2PluginBase {
     /**
      * Check if an access token has been returned from the provider server.
      *
-     * @return bool
+     * @return bool True of there is an accessToken, fals if there is not.
      */
     public function isConnected() {
         if (!$this->accessToken) {
             return false;
         }
-        return TRUE;
+        return true;
     }
 
     /**
      * Renew or return access token.
      *
-     * @param bool $newValue
-     * @return bool|mixed|null
+     * @param bool|string $newValue Pass existing token if it exists.
+     *
+     * @return bool|string|null String if there is an accessToken passed or found in session, false or null if not.
      */
     public function accessToken($newValue = false) {
-        if (!$this->isConfigured()) {
+        if (!$this->isConfigured() && $newValue === false) {
             return false;
         }
 
@@ -186,6 +190,7 @@ class OAuth2PluginBase {
             $this->accessToken = $newValue;
         }
 
+        // If there is no token passed, try to retrieve one from the user's attributes.
         if ($this->accessToken === null) {
             $this->accessToken = valr($this->getProviderKey().'.AccessToken', Gdn::session()->User->Attributes);
         }
@@ -194,88 +199,11 @@ class OAuth2PluginBase {
     }
 
     /**
-     * Reestablish a valid token session using refresh_token.
-     *
-     * @throws Gdn_UserException
-     * @see Refresh()
-     */
-//    public function reconnect() {
-//            $response = $this->refresh($this->refreshToken);
-//            if (!$response) {
-//                return false;
-//            }
-//
-//            // Update user connection.
-//            $profile = valr('Attributes.'.$this->getProviderKey().'.Profile', Gdn::Session()->User);
-//            $Attributes = array(
-//                'RefreshToken' => $this->refreshToken,
-//                'AccessToken' => $response['access_token'],
-//                'InstanceUrl' => $response['instance_url'],
-//                'Profile' => $profile,
-//            );
-//
-//            Gdn::UserModel()->SaveAttribute(Gdn::Session()->UserID, $this->getProviderKey(), $Attributes);
-//            $this->setAccessToken($response['access_token']);
-//            $this->setInstanceUrl($response['instance_url']);
-//    }
-
-    /**
-     * Revoke an access token.
-     *
-     * @param $Token
-     * @return bool
-     * @throws Gdn_UserException
-     */
-//    public function revoke($token) {
-//        $Response = $this->HttpRequest(C('Plugins.Salesforce.AuthenticationUrl').'/services/oauth2/revoke?token='.$token);
-//        if ($Response['HttpCode'] == 200) {
-//            return TRUE;
-//        }
-//        return false;
-//    }
-
-    /**
-     * Sends refresh_token to API and simply returns the response.
-     *
-     * @param $Token
-     * @return bool|mixed On success, returns entire API response.
-     * @throws Gdn_UserException
-     * @see Reconnect() is probably what you want.
-     */
-//    public function refresh($token) {
-//        $provider = $this->provider();
-//        if($provider['TokenRequestEndpoint']) {
-//            $refreshUri = $provider['TokenRequestEndpoint'];
-//        } else {
-//            $refreshUri = $provider['BaseUrl'].'/oath/token';
-//        }
-//        $response = $this->httpRequest(
-//            $refreshUri,
-//            array(
-//                'grant_type' => 'refresh_token',
-//                'client_id' => $provider['AssociationKey'],
-//                'client_secret' => $provider['AssociationSecret'],
-//                'refresh_token' => $token
-//            )
-//        );
-//
-//        if ($response['HttpCode'] == 400) {
-//            throw new Gdn_UserException('Someone has Revoked your Connection.  Please reconnect manually,');
-//            return false;
-//        }
-//        if (strpos($response['ContentType'], 'application/json') !== false) {
-//            $refreshResponse = json_decode($response['Response'], true);
-//
-//            return $refreshResponse;
-//        }
-//        return false;
-//    }
-
-    /**
      * Request access token from provider.
      *
-     * @param string $code code returned from initial handshake with provider
-     * @return mixed
+     * @param string $code code returned from initial handshake with provider.
+     *
+     * @return mixed Result of the API call to the provider, usually JSON.
      */
     public function requestAccessToken($code) {
         $provider = $this->provider();
@@ -296,8 +224,9 @@ class OAuth2PluginBase {
     /**
      * Set access token received from provider.
      *
-     * @param string $accessToken
-     * @return $this
+     * @param string $accessToken Retrieved from provider to authenticate communication.
+     *
+     * @return $this Return this object for chaining purposes.
      */
     public function setAccessToken($accessToken) {
         $this->accessToken = $accessToken;
@@ -307,8 +236,9 @@ class OAuth2PluginBase {
     /**
      * Set provider key used to access settings stored in GDN_UserAuthenticationProvider.
      *
-     * @param string $providerKey
-     * @return $this
+     * @param string $providerKey Key to retrieve provider data hardcoded into child class.
+     *
+     * @return $this Return this object for chaining purposes.
      */
     public function setProviderKey($providerKey) {
         $this->providerKey = $providerKey;
@@ -318,8 +248,9 @@ class OAuth2PluginBase {
     /**
      * Set scope to be passed to provider.
      *
-     * @param string $scope
-     * @return $this
+     * @param string $scope.
+     *
+     * @return $this Return this object for chainging purposes.
      */
     public function setScope($scope) {
         $this->scope = $scope;
@@ -329,8 +260,8 @@ class OAuth2PluginBase {
     /**
      * Create a controller to deal with plugin settings in dashboard.
      *
-     * @param Gdn_Controller $sender
-     * @param array $args arguments passed from sender
+     * @param Gdn_Controller $sender.
+     * @param Gdn_Controller $args.
      */
     public function settingsController_oAuth2_create($sender, $args) {
         $sender->permission('Garden.Settings.Manage');
@@ -369,23 +300,23 @@ class OAuth2PluginBase {
     }
 
     /**
-     * Allow child plugins to over-ride or add form fields to settings.
+     * Allow child class to over-ride or add form fields to settings.
      *
-     * @return array
+     * @return array Form fields to appear in settings dashboard.
      */
     protected function getSettingsFormFields() {
-        $_form = array(
+        $form = array(
             'AssociationKey' => ['LabelCode' => 'Client ID', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => ''],
             'AssociationSecret' => ['LabelCode' => 'Secret', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => '']
         );
-        return $_form;
+        return $form;
     }
 
     /**
      * Inject into the process of the base connection.
      *
-     * @param Gdn_Controller $sender
-     * @param array $args arguments passed from sender
+     * @param Gdn_Controller $sender.
+     * @param Gdn_Controller $args.
      */
     public function base_connectData_handler($sender, $args) {
         if (val(0, $args) != $this->getProviderKey()) {
@@ -426,10 +357,10 @@ class OAuth2PluginBase {
     }
 
     /**
-     * Inject a sign-in icon into the ME menu
+     * Inject a sign-in icon into the ME menu.
      *
-     * @param Gdn_Controller $sender
-     * @param array $args arguments passed from sender
+     * @param Gdn_Controller $sender.
+     * @param Gdn_Controller $args.
      */
     public function base_beforeSignInButton_handler($sender, $args) {
         if(!$this->isConfigured() || $this->isDefault()) {
@@ -442,7 +373,7 @@ class OAuth2PluginBase {
     /**
      * Check authentication provider table to see if this is the default method for logging in.
      *
-     * @return bool
+     * @return bool Return the value of the IsDefault row of GDN_UserAuthenticationProvider .
      */
     public function isDefault() {
         $provider = $this->provider();
@@ -452,8 +383,10 @@ class OAuth2PluginBase {
     /**
      * Inject sign-in button into the sign in page.
      *
-     * @param Gdn_Controller $sender
-     * @param array $args arguments passed from sender
+     * @param EntryController $sender.
+     * @param EntryController $args.
+     *
+     * @return mixed|bool Return null if not configured
      */
     public function entryController_signIn_handler($sender, $args) {
         if(!$this->isConfigured()) {
@@ -474,8 +407,10 @@ class OAuth2PluginBase {
     /**
      * Redirect to provider's signin page if this is the default behaviour.
      *
-     * @param Gdn_Controller $sender
-     * @param array $args arguments passed from sender
+     * @param EntryController $sender.
+     * @param EntryController $args.
+     *
+     * @return mixed|bool Return null if not configured.
      */
     public function entryController_overrideSignIn_handler($sender, $args) {
         $provider = $args['DefaultProvider'];
@@ -491,8 +426,10 @@ class OAuth2PluginBase {
     /**
      * Redirect to provider's register page if this is the default behaviour.
      *
-     * @param Gdn_Controller $sender
-     * @param array $args arguments passed from sender
+     * @param EntryController $sender.
+     * @param EntryController $args.
+     *
+     * @return mixed|bool Return null if not configured.
      */
     public function entryController_overrideRegister_handler($sender, $args) {
         $provider = $args['DefaultProvider'];
@@ -507,18 +444,19 @@ class OAuth2PluginBase {
     /**
      * Create a controller to handle entry request.
      *
-     * @param Gdn_Controller $sender
-     * @param $code
-     * @param $state
-     * @throws Exception
-     * @throws Gdn_UserException
+     * @param Gdn_Controller $sender.
+     * @param $code string Retrieved from the response of the authentication provider, used to fetch an authentication token.
+     * @param $state string Values passed by us and returned in the response of the authentication provider.
+     *
+     * @throws Exception.
+     * @throws Gdn_UserException.
      */
     public function entryController_oAuth2_create($sender, $code, $state) {
         if ($error = $sender->Request->get('error')) {
             throw new Gdn_UserException($error);
         }
 
-        Gdn::session()->stash($this->getProviderKey()); // remove any stashed.
+        Gdn::session()->stash($this->getProviderKey()); // remove any stashed provider data.
 
         $response = $this->requestAccessToken($code);
         if (!$response) {
@@ -570,9 +508,11 @@ class OAuth2PluginBase {
             case 'entry':
             default:
 
-                // This is an sso request, we need to redispatch to /entry/connect/Auth0
+                // This is an sso request, we need to redispatch to /entry/connect/[providerKey] which is Base_ConnectData_Handler() in this class.
                 Gdn::session()->stash($this->getProviderKey(), array('AccessToken' => $response['access_token'], 'Profile' => $profile));
-                $url = '/entry/connect/'.$this->getProviderKey(); // to see this page got to Base_ConnectData_Handler() in this class
+                $url = '/entry/connect/'.$this->getProviderKey();
+
+                //pass the target if there is one so that the user will be redirected to where the request originated.
                 if ($target = val('target', $state)) {
                     $url .= '?Target='.urlencode($target);
                 }
@@ -584,17 +524,18 @@ class OAuth2PluginBase {
     /**
      * Allow child plugins to translate the keys that are returned in profile from the provider into our keys.
      *
-     * @param array $rawProfle profile as it is returned from the provider
-     * @return array
+     * @param array $rawProfile profile as it is returned from the provider.
+     *
+     * @return array Profile array transformed by child class or as is.
      */
-    public function translateProfileResults($rawProfle = array()) {
-        return $rawProfle;
+    public function translateProfileResults($rawProfile = array()) {
+        return $rawProfile;
     }
 
     /**
      * Get profile data from authentication provider through API.
      *
-     * @return array user profile from provider
+     * @return array User profile from provider.
      */
     public function getProfile() {
         $provider = $this->provider();
@@ -613,11 +554,13 @@ class OAuth2PluginBase {
     /**
      * Extract values from arrays.
      *
-     * @param string $key needle
-     * @param array $arr haystack
-     * @param string $context pass context to error message
-     * @return mixed
-     * @throws Exception
+     * @param string $key Needle.
+     * @param array $arr Haystack.
+     * @param string $context Context to make error messages clearer.
+     *
+     * @return mixed Extracted value from array.
+     *
+     * @throws Exception.
      */
     function requireVal($key, $arr, $context = null) {
         $result = val($key, $arr);
@@ -630,7 +573,7 @@ class OAuth2PluginBase {
     /**
      *  Get provider key.
      *
-     * @return string provider key
+     * @return string Provider key.
      */
     public function getProviderKey() {
         return $this->providerKey;

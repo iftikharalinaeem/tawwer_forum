@@ -27,7 +27,7 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     /**
      * Override parent provider with the url endpoints specific to this provider.
      *
-     * @return array|bool|stdClass
+     * @return array Row from GDN_UserAuthenticationProvider table customized.
      */
     public function provider() {
         $provider = parent::provider();
@@ -69,7 +69,7 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     /**
      * Add form fields to settings specific to this plugin.
      *
-     * @return array
+     * @return array Form fields.
      */
     protected function getSettingsFormFields() {
         $form = parent::getSettingsFormFields();
@@ -82,12 +82,13 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     /**
      * Wrapper function for writing a generic settings controller.
      *
-     * @param SettingsController $Sender
-     */
+     * @param SettingsController $sender.
+     * @param SettingsController $args.
+    */
     public function settingsController_auth0_create($sender, $args) {
         $sender->setData('Title', sprintf(T('%s Settings'), 'Auth0 SSO'));
 
-        // Create send the possible redirect URLs that will be required by Auth0.
+        // Create send the possible redirect URLs that will be required by Auth0 and display them in the dashboard.
         // Use Gdn::Request instead of convience function so that we can return http and https.
         $redirectUrls = Gdn::request()->Url('/entry/'. $this->getProviderKey(), true, false).','.Gdn::Request()->Url('/entry/'. $this->getProviderKey(), true, true);
         $sender->setData('redirectUrls', $redirectUrls);
@@ -98,11 +99,12 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     /**
      * Wrapper function for writing a generic entry controller.
      *
-     * @param $sender
-     * @param bool|false $code
-     * @param bool|false $state
-     * @throws Exception
-     * @throws Gdn_UserException
+     * @param EntryController $sender.
+     * @param $code string Retrieved from the response of the authentication provider, used to fetch an authentication token.
+     * @param $state string Values passed by us and returned in the response of the authentication provider.
+     *
+     * @throws Exception.
+     * @throws Gdn_UserException.
      */
     public function entryController_auth0_create($sender, $code = false, $state = false) {
         $this->entryController_OAuth2_create($sender, $code, $state);
@@ -111,8 +113,9 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     /**
      * Translate the array keys for the profile returning from the provider so that they align with Vanilla keys.
      *
-     * @param array $rawProfile
-     * @return array
+     * @param array $rawProfile Retrieved from authentication provider.
+     *
+     * @return array Profile with Vanilla keys.
      */
     public function translateProfileResults($rawProfile = array()) {
         $profile = arrayTranslate($rawProfile, [
@@ -132,8 +135,9 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     /**
      * Create signup button specific to this plugin.
      *
-     * @param string $type
-     * @return string
+     * @param string $type Either button or icon to be output.
+     *
+     * @return string Resulting HTML element (button).
      */
     public function signInButton($type = 'button') {
         $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
@@ -145,7 +149,7 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     /**
      * Insert css file for custom styling of signin button/icon.
      *
-     * @param AssetModel $sender
+     * @param AssetModel $sender.
      */
     public function assetModel_styleCss_handler($sender) {
         $sender->addCssFile('auth0.css', 'plugins/Auth0');
