@@ -514,7 +514,7 @@ class OAuth2PluginBase {
      * @throws Gdn_UserException
      */
     public function entryController_oAuth2_create($sender, $code, $state) {
-        if ($error = $sender->request->get('error')) {
+        if ($error = $sender->Request->get('error')) {
             throw new Gdn_UserException($error);
         }
 
