@@ -89,7 +89,6 @@ class OAuth2PluginBase {
         ];
 
         if (is_array($state)) {
-
             if (is_array($state)) {
                 $get['state'] = http_build_query($state);
             }
@@ -134,7 +133,7 @@ class OAuth2PluginBase {
         $proxyOptions['URL'] = $uri;
         $proxyOptions['Method'] = $method;
 
-        $response = $proxy->Request(
+        $response = $proxy->request(
             $proxyOptions,
             $params,
             null,
@@ -339,14 +338,14 @@ class OAuth2PluginBase {
         $model = new Gdn_AuthenticationProviderModel();
 
         $form = new Gdn_Form();
-        $form->SetModel($model);
-        $sender->Form = $form;
+        $form->setModel($model);
+        $sender->form = $form;
 
         if (!$form->AuthenticatedPostBack()) {
             $provider = Gdn_AuthenticationProviderModel::GetProviderByKey($this->getProviderKey());
-            $form->SetData($provider);
+            $form->setData($provider);
         } else {
-            $form->SetFormValue('AuthenticationKey', $this->getProviderKey());
+            $form->setFormValue('AuthenticationKey', $this->getProviderKey());
             $form->setFormValue('SignInUrl', '...'); // kludge for default provider
 
             if ($form->Save()) {
@@ -355,11 +354,11 @@ class OAuth2PluginBase {
         }
 
         // Set up the form.
-        $_Form = $this->getSettingsFormFields();
-        $_Form['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox'];
+        $_form = $this->getSettingsFormFields();
+        $_form['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox'];
 
 
-        $sender->setData('_Form', $_Form);
+        $sender->setData('_form', $_form);
 
         $sender->addSideMenu();
         if (!$sender->data('Title')) {
@@ -375,11 +374,11 @@ class OAuth2PluginBase {
      * @return array
      */
     protected function getSettingsFormFields() {
-        $_Form = array(
+        $_form = array(
             'AssociationKey' => ['LabelCode' => 'Client ID', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => ''],
             'AssociationSecret' => ['LabelCode' => 'Secret', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => '']
         );
-        return $_Form;
+        return $_form;
     }
 
     /**
@@ -421,7 +420,7 @@ class OAuth2PluginBase {
         // Throw an event so that other plugins can add/remove stuff from the basic sso.
         $sender->fireEvent('OAuth');
 
-        SpamModel::Disabled(TRUE);
+        SpamModel::disabled(TRUE);
         $sender->setData('Trusted', TRUE);
         $sender->setData('Verified', TRUE);
     }
@@ -438,7 +437,6 @@ class OAuth2PluginBase {
         }
 
         echo ' '.$this->signInButton('icon').' ';
-
     }
 
     /**
@@ -449,7 +447,6 @@ class OAuth2PluginBase {
     public function isDefault() {
         $provider = $this->provider();
         return $provider['IsDefault'];
-
     }
 
     /**
@@ -488,7 +485,6 @@ class OAuth2PluginBase {
 
         $url = $this->authorizeUri(array('target' => $args['Target']));
         $args['DefaultProvider']['SignInUrl'] = $url;
-
     }
 
 
@@ -518,20 +514,19 @@ class OAuth2PluginBase {
      * @throws Gdn_UserException
      */
     public function entryController_oAuth2_create($sender, $code, $state) {
-
-        if ($Error = $sender->Request->get('error')) {
-            throw new Gdn_UserException($Error);
+        if ($error = $sender->request->get('error')) {
+            throw new Gdn_UserException($error);
         }
 
         Gdn::session()->stash($this->getProviderKey()); // remove any stashed.
 
         $response = $this->requestAccessToken($code);
         if (!$response) {
-            throw new Gdn_UserException('The OAuth server did not return a valid response. line 506 ');
+            throw new Gdn_UserException('The OAuth server did not return a valid response.');
         }
 
         if (!empty($response['error'])) {
-            throw new Gdn_UserException("<h3>Authentication Error Response</h3>".$response->error."<br>".$response->error_description);
+            throw new Gdn_UserException($response->error, $response->error_description);
         } elseif (empty($response['access_token'])) {
             throw new Gdn_UserException("The OAuth server did not return an access token.", 400);
         } else {

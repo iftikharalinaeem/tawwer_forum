@@ -96,11 +96,12 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     }
 
     /**
-     *  Wrapper function for writing a generic entry controller.
+     * Wrapper function for writing a generic entry controller.
      *
-     * @param EntryController $Sender
-     * @param string $Code
-     * @param string $State
+     * @param $sender
+     * @param bool|false $code
+     * @param bool|false $state
+     * @throws Exception
      * @throws Gdn_UserException
      */
     public function entryController_auth0_create($sender, $code = false, $state = false) {
@@ -144,7 +145,7 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     /**
      * Insert css file for custom styling of signin button/icon.
      *
-     * @param AssetModel $Sender
+     * @param AssetModel $sender
      */
     public function assetModel_styleCss_handler($sender) {
         $sender->addCssFile('auth0.css', 'plugins/Auth0');
