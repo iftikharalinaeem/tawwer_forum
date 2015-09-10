@@ -1,7 +1,7 @@
 <?php
 
 
-$pluginInfo['Auth0'] = array(
+$PluginInfo['Auth0'] = array(
     'Name' => 'Auth0 SSO',
     'ClassName' => "Auth0Plugin",
     'Description' => 'Allows user login to be authenticated on Auth0 SSO.',
@@ -72,11 +72,11 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
      * @return array Form fields.
      */
     protected function getSettingsFormFields() {
-        $form = parent::getSettingsFormFields();
+        $formFields = parent::getSettingsFormFields();
 
-        $form['BaseUrl'] = ['LabelCode' => 'Domain', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the domain found in the dashboard of your Auth0 application.'];
+        $formFields['BaseUrl'] = ['LabelCode' => 'Domain', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the domain found in the dashboard of your Auth0 application.'];
 
-        return $form;
+        return $formFields;
     }
 
     /**

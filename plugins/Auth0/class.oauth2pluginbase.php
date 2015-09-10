@@ -268,9 +268,10 @@ class OAuth2PluginBase {
 
         $model = new Gdn_AuthenticationProviderModel();
 
+        /* @var Gdn_Form $form */
         $form = new Gdn_Form();
         $form->setModel($model);
-        $sender->form = $form;
+        $sender->Form = $form;
 
         if (!$form->AuthenticatedPostBack()) {
             $provider = Gdn_AuthenticationProviderModel::GetProviderByKey($this->getProviderKey());
@@ -285,11 +286,11 @@ class OAuth2PluginBase {
         }
 
         // Set up the form.
-        $_form = $this->getSettingsFormFields();
-        $_form['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox'];
+        $formFields = $this->getSettingsFormFields();
+        $formFields['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox'];
 
 
-        $sender->setData('_form', $_form);
+        $sender->setData('_Form', $formFields);
 
         $sender->addSideMenu();
         if (!$sender->data('Title')) {
@@ -305,11 +306,11 @@ class OAuth2PluginBase {
      * @return array Form fields to appear in settings dashboard.
      */
     protected function getSettingsFormFields() {
-        $form = array(
+        $formFields = array(
             'AssociationKey' => ['LabelCode' => 'Client ID', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => ''],
             'AssociationSecret' => ['LabelCode' => 'Secret', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => '']
         );
-        return $form;
+        return $formFields;
     }
 
     /**
