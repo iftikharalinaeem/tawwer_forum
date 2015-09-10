@@ -37,7 +37,7 @@ class MultisiteModel extends Gdn_Model {
         $multi = Infrastructure::getMulti(Infrastructure::site('name'));
         if (is_array($multi)) {
             $this->siteNameFormat = $multi['template'];
-            $this->siteUrlFormat = $multi['hosttemplate'];
+            $this->siteUrlFormat = '//'.$multi['hosttemplate'];
         } else {
             $this->siteNameFormat = '%s.vanillaforums.com';
             $this->siteUrlFormat = '//%s.vanillaforums.com';
