@@ -54,7 +54,7 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     public function structure() {
         // Make sure we have the Auth0 provider.
         $provider = $this->provider();
-        if (!$provider) {
+        if (!$provider['AuthenticationKey']) {
             $model = new Gdn_AuthenticationProviderModel();
             $provider = array(
                 'AuthenticationKey' => $this->providerKey,
