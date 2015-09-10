@@ -496,7 +496,10 @@ class OnlinePlugin extends Gdn_Plugin {
       }
 
       if (is_null($resolvedArgs)) {
-         $resolvedArgs = json_decode(Gdn::request()->getValue('ResolvedArgs'), true);
+         $resolvedArgs = Gdn::request()->getValue('ResolvedArgs');
+         if (is_string($resolvedArgs)) {
+            $resolvedArgs = json_decode($resolvedArgs, true);
+         }
       }
 
       if (!$resolvedPath) return $location;
