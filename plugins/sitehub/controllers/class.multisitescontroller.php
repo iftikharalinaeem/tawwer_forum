@@ -184,6 +184,11 @@ class MultisitesController extends DashboardController {
         }
     }
 
+    /**
+     * Handled updating sites?
+     * 
+     * @throws type
+     */
     protected function patch() {
         $this->permissionNoLog('Garden.Settings.Manage');
 
@@ -209,6 +214,11 @@ class MultisitesController extends DashboardController {
         $this->Render('api');
     }
 
+    /**
+     * Handled adding sites?
+     *
+     * @throws Gdn_UserException
+     */
     protected function post() {
         $this->permissionNoLog('Garden.Settings.Manage');
 

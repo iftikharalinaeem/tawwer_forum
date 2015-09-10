@@ -33,8 +33,15 @@ class MultisiteModel extends Gdn_Model {
         $this->Validation->AddRule('Slug', 'func:validate_slug');
         $this->Validation->ApplyRule('Slug', 'Slug', 'The slug must consist of numbers, lowercase letters or a slash.');
 
-        $this->siteNameFormat = C('SiteHub.SiteNameFormat', '%s.vanillaforums.com');
-        $this->siteUrlFormat = C('SiteHub.SiteUrlFormat', '//%s.vanillaforums.com');
+        // Determine url and name formats
+        $multi = Infrastructure::getMulti(Infrastructure::site('name'));
+        if (is_array($multi)) {
+            $this->siteNameFormat = $multi['template'];
+            $this->siteUrlFormat = $multi['hosttemplate'];
+        } else {
+            $this->siteNameFormat = '%s.vanillaforums.com';
+            $this->siteUrlFormat = '//%s.vanillaforums.com';
+        }
     }
 
     /**
