@@ -19,6 +19,13 @@ function DateTile($Date) {
 }
 endif;
 
+if (!function_exists('getGroupOptions')):
+/**
+ * Compiles the options for a group given a user's permissions.
+ *
+ * @param array $group The group to get options for.
+ * @return array The options for the group that the user can access.
+ */
 function getGroupOptions($group, $sectionId = 'home') {
     $options = array();
     if (GroupPermission('Edit', $group)) {
@@ -35,7 +42,15 @@ function getGroupOptions($group, $sectionId = 'home') {
     }
     return $options;
 }
+endif;
 
+if (!function_exists('getGroupButtons')):
+/**
+ * Compiles the buttons for a group given the user's membership and permissions.
+ *
+ * @param array $group The group to get buttons for.
+ * @return array The buttons for the group.
+ */
 function getGroupButtons($group) {
     $buttons = array();
     if (Gdn::session()->isValid() && !GroupPermission('Member', $group) && GroupPermission('Join', $group)) {
@@ -46,77 +61,20 @@ function getGroupButtons($group) {
     }
     return $buttons;
 }
-
-
-if (!function_exists('WriteDiscussionBlogList')):
-/**
- * Output discussions in expanded format with excerpts.
- *
- * @param array $Discussions
- * @param string $EmptyMessage What to show when there's no content.
- */
-function WriteDiscussionBlogList($Discussions, $EmptyMessage = '') {
-   if (!$Discussions)
-      WriteEmptyState($EmptyMessage);
-
-   if (!is_array($Discussions)) {
-     $Discussions = $Discussions->resultArray();
-   }
-
-   if (is_array($Discussions)) {
-      include_once(PATH_APPLICATIONS .'/vanilla/views/discussions/helper_functions.php');
-      //include_once(PATH_APPLICATIONS .'/vanilla/views/modules/helper_functions.php');
-      echo '<ul class="NarrowList Discussions DiscussionsBlog">';
-      foreach ($Discussions as $Discussion) {
-         WriteDiscussionBlog((object)$Discussion, 'Discussion');
-      }
-      echo '</ul>';
-   }
-}
 endif;
 
-
-if (!function_exists('WriteDiscussionBlog')):
+if (!function_exists('writeDiscussionList')):
 /**
- * Output discussions in expanded format with excerpts.
+ * Renders a list of discussions in the same format as in the vanilla application.
  *
- * @param object $Discussion
- * @param string $Px
+ * @param Controller $sender The sending object.
+ * @param string $emptyMessage The message to render if no discussions exist.
+ * @param string $title The title of the discussion list.
+ * @param string $layout The layout type, either 'modern' or 'table'.
  */
-function WriteDiscussionBlog($Discussion, $Px = 'Discussion') {
-?>
-<li id="<?php echo "{$Px}_{$Discussion->DiscussionID}"; ?>" class="<?php echo CssClass($Discussion); ?>">
-   <span class="Options">
-      <?php
-      echo BookmarkButton($Discussion);
-      echo OptionsList($Discussion);
-      ?>
-   </span>
-   <h3 class="Title"><?php
-      echo Anchor(Gdn_Format::Text($Discussion->Name, FALSE), DiscussionUrl($Discussion).($Discussion->CountCommentWatch > 0 ? '#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
-   ?></h3>
-   <div class="Excerpt"><?php
-      echo SliceString(Gdn_Format::Text($Discussion->Body, FALSE), C('Groups.Announcements.ExcerptLength', 240));
-   ?></div>
-   <div class="Meta">
-      <?php
-         $FirstUser = UserBuilder($Discussion, 'First');
-         echo '<span class="MItem UserTile">'.
-            T('by').' '.
-            UserAnchor($FirstUser).' '.
-            Gdn_Format::Date($Discussion->DateInserted, 'html').'</span>';
-      ?>
-   </div>
-</li>
-<?php
-}
-endif;
-
-if (!function_exists('writeFullDiscussionList')):
-
-function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussions', $view = '') {
-    if (!$view) {
-        $view = c('Vanilla.Discussions.Layout', 'modern');
+function writeDiscussionList($sender, $emptyMessage = '', $title = 'Discussions', $layout = '') {
+    if (!$layout) {
+        $layout = c('Vanilla.Discussions.Layout', 'modern');
     }
     ?>
     <div class="Group-Box Group-<?php echo $title; ?> Section-DiscussionList">
@@ -125,7 +83,7 @@ function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussi
             <?php
             if ($title == 'Announcements' && GroupPermission('Moderate')) {
                 echo '<div class="Button-Controls">';
-                echo anchor(sprintf(t('New %s'), t('Announcement')), GroupUrl($sender->data('Group'), 'announcement'), 'Button');
+                echo anchor(sprintf(t('New Announcement')), GroupUrl($sender->data('Group'), 'announcement'), 'Button Primary');
                 echo '</div>';
             } else if ($title == 'Discussions' && GroupPermission('Member')) {
                 echo '<div class="Button-Controls">';
@@ -133,17 +91,17 @@ function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussi
                 echo '</div>';
             }
             echo '</div>';
-            $sender->EventArguments['view'] = &$view;
+            $sender->EventArguments['layout'] = &$layout;
             $sender->EventArguments['title'] = &$title;
             $sender->fireEvent('beforeDiscussionList');
             if (!$sender->data('Discussions')->result()) {
                 echo '<div class="EmptyMessage">'.$emptyMessage.'</div>';
             } else {
-                if ($view == 'table') {
+                if ($layout == 'table') {
                     include_once($sender->fetchViewLocation('table_functions', 'discussions', 'vanilla'));
                     include_once($sender->fetchViewLocation('helper_functions', 'discussions', 'vanilla'));
                     writeDiscussionTable();
-                } else if ($view == 'modern') {
+                } else if ($layout == 'modern') {
                     include_once($sender->fetchViewLocation('helper_functions', 'discussions', 'vanilla')); ?>
                     <ul class="DataList <?php echo $title; ?>">
                         <?php foreach($sender->Data('Discussions') as $discussion) {
@@ -163,51 +121,21 @@ function writeFullDiscussionList($sender, $emptyMessage = '', $title = 'Discussi
 }
 endif;
 
-
-if (!function_exists('writeFullAnnouncementList')):
-
-function writeFullAnnouncementList($sender, $emptyMessage) {
+if (!function_exists('writeAnnouncementList')):
+/**
+ * Renders a list of announcements.
+ *
+ * @param Controller $sender The sending object.
+ * @param $emptyMessage The message to render if not announcements exist.
+ */
+function writeAnnouncementList($sender, $emptyMessage) {
   $bak = $sender->data('Discussions');
   $sender->setData('Discussions', $sender->data('Announcements'));
   $sender->setData('Announcements', false);
-  writeFullDiscussionList($sender, $emptyMessage, t('Announcements'));
+  writeDiscussionList($sender, $emptyMessage, t('Announcements'));
   $sender->setData('Discussions', $bak);
 }
 endif;
-
-
-if (!function_exists('WriteDiscussionList')):
-/**
- * Output discussions in a compact list.
- *
- * @param array $Discussions
- * @param string $EmptyMessage What to show when there's no content.
- */
-function WriteDiscussionList($Discussions, $EmptyMessage = '') {
-   if (!$Discussions)
-      WriteEmptyState($EmptyMessage);
-
-   if (!is_array($Discussions)) {
-     $Discussions = $Discussions->resultArray();
-   }
-
-   //if (C('Vanilla.Discussions.Layout') == 'table')
-   //WriteDiscussionRow($Discussion, $this, $Session, $Alt);
-   if (is_array($Discussions) && count($Discussions) > 0) {
-      include_once(PATH_APPLICATIONS .'/vanilla/views/discussions/helper_functions.php');
-      include_once(PATH_APPLICATIONS .'/vanilla/views/modules/helper_functions.php');
-
-
-
-      echo '<ul class="NarrowList Discussions">';
-      foreach ($Discussions as $Discussion) {
-         WriteModuleDiscussion((object)$Discussion, 'Group');
-      }
-      echo '</ul>';
-   }
-}
-endif;
-
 
 if (!function_exists('WriteEmptyState')):
 /**
@@ -221,73 +149,7 @@ function WriteEmptyState($Message) {
 }
 endif;
 
-if (!function_exists('WriteEventList')) :
-/**
- * Output an HTML list of events or an empty state message.
- *
- * @param array $Events
- * @param string $EmptyMessage What to show when there's no content.
- */
-function WriteEventList($Events, $Group = NULL, $EmptyMessage = '', $Button = TRUE) {
-   $GroupID = GetValue('GroupID', $Group, '');
-   if (GroupPermission('Member') && $Button) {
-      echo '<div class="Button-Controls">';
-      echo ' '.Anchor(T('New Event'), "/event/add/{$GroupID}", 'Button Primary Group-NewEventButton').' ';
-      echo '</div>';
-   }
-
-   if (!$Events)
-      WriteEmptyState($EmptyMessage);
-   else {
-      echo '<ul class="NarrowList DataList-Events">';
-      foreach ($Events as $Event) {
-         echo '<li>';
-         WriteEventCard($Event);
-         echo '</li>';
-      }
-      echo '</ul>';
-   }
-}
-endif;
-
-if (!function_exists('WriteEventCard')) :
-/**
- * Write an event card
- *
- * Optionally write rich listing
- *
- * @param array $Event
- */
-function WriteEventCard($Event) {
-   $UTC = new DateTimeZone('UTC');
-   $Timezone = new DateTimeZone($Event['Timezone']);
-   $DateStarts = new DateTime($Event['DateStarts'], $UTC);
-   if (Gdn::Session()->IsValid() && $HourOffset = Gdn::Session()->User->HourOffset)
-      $DateStarts->modify("{$HourOffset} hours");
-
-   echo '<div class="Event">';
-   if (GetValue('Rich', $Event)) {
-
-
-
-   } else {
-
-      echo DateTile($DateStarts->format('Y-m-d'));
-      echo '<h3 class="Event-Title">'.Anchor(Gdn_Format::Text($Event['Name']), EventUrl($Event));
-      if ($DateStarts->format('g:ia') != '12:00am')
-         echo ' <span class="Event-Time MItem">'.$DateStarts->format('g:ia').'</span>';
-      echo '</h3>';
-
-      echo '<div class="Event-Location">'.Gdn_Format::Text($Event['Location']).'</div>';
-      echo '<p class="Event-Description">'.SliceParagraph(Gdn_Format::Text($Event['Body']), 100).'</p>';
-
-   }
-   echo '</div>';
-}
-endif;
-
-
-if (!function_exists('writeGroupBanner')) :
+if (!function_exists('WriteGroupBanner')) :
 /**
  * Output optional group banner as a div background image to allow dynamic page resizing.
  */
@@ -304,52 +166,6 @@ function WriteGroupBanner($group = array()) {
    }
 }
 endif;
-
-if (!function_exists('WriteGroupApplicants')):
-function WriteGroupApplicants($Applicants) {
-   if (!$Applicants)
-      return;
-
-   $Group = Gdn::Controller()->Data('Group');
-
-   if (!GroupPermission('Leader', $Group))
-      return;
-
-   echo '<div class="Group-Box Group-Applicants">'.
-      '<h2>'.T('Applicants & Invitations').'</h2>'.
-      '<ul class="NarrowList Applicants">';
-
-
-   foreach ($Applicants as $Row) {
-      echo '<li id="GroupApplicant_'.$Row['GroupApplicantID'].'" class="Item">';
-         echo UserAnchor($Row);
-         echo ' <span class="Aside">';
-
-         switch (strtolower($Row['Type'])) {
-            case 'application':
-               echo Anchor(T('Approve Applicant', 'Approve'), GroupUrl($Group, 'approve')."?id={$Row['GroupApplicantID']}", 'Button SmallButton Hijack Button-Approve').
-               ' '.
-               Anchor(T('Deny Applicant', 'Deny'), GroupUrl($Group, 'approve')."?id={$Row['GroupApplicantID']}&value=denied", 'Button SmallButton Hijack Button-Deny');
-               break;
-            case 'invitation':
-               echo Anchor(T('Remove Invitation', 'Remove'), GroupUrl($Group, 'approve')."?id={$Row['GroupApplicantID']}&value=denied", 'Button SmallButton Hijack Button-Deny');
-               break;
-         }
-
-         echo '</span> ';
-
-         echo '<p class="Applicant-Reason">'.
-            htmlspecialchars($Row['Reason']).
-            '</p>';
-      echo '</li>';
-   }
-
-   echo '</ul>'.
-      '</div>';
-}
-
-endif;
-
 
 if (!function_exists('WriteGroupButtons')) :
 /**
@@ -399,12 +215,12 @@ function WriteGroupButtons($Group = NULL) {
 }
 endif;
 
-/**
- * Output discussion options.
- *
- * @since 2.1
- */
 if (!function_exists('writeGroupOptions')):
+/**
+ * Renders the options menu for a group in a cog (typically for group in a group list).
+ *
+ * @param array $options The options to render.
+ */
 function writeGroupOptions($options = array()) {
     if (empty($options)) {
         return;
@@ -421,8 +237,13 @@ function writeGroupOptions($options = array()) {
 }
 endif;
 
-if (!function_exists('writeGroupBannerOptions')):
-function writeGroupBannerOptions($options = array()) {
+if (!function_exists('writeGroupOptionsButton')):
+/**
+ * Renders the options menu for a group in a button dropdown format (typically for the group banner).
+ *
+ * @param array $options The options to render.
+ */
+function writeGroupOptionsButton($options = array()) {
     if (empty($options)) {
         return;
     }
@@ -459,7 +280,6 @@ function WriteGroupCards($Groups, $EmptyMessage = '') {
 }
 endif;
 
-
 if (!function_exists('WriteGroupCard')) :
 /**
  * Write a group card
@@ -489,207 +309,6 @@ function WriteGroupCard($Group, $WithButtons = TRUE) {
 }
 endif;
 
-
-if (!function_exists('WriteGroupTable')) :
-/**
- * Write a list of groups out as a table.
- *
- * @param array $Groups
- * @param string $EmptyMessage
- */
-function WriteGroupTable($Groups, $EmptyMessage = '') {
-    if (!$Groups) {
-        echo '<div class="ErrorMessage">';
-        WriteEmptyState($EmptyMessage);
-        echo '</div>';
-    }
-    else {
-        echo '<div class="DataTableWrap Groups">
-                <table class="DataTable GroupTable">
-                    <thead>
-                        <tr>
-                            <td class="CategoryName"><div class="Wrap">'.T('Group').'</div></td>
-                            <td class="BigCount CountComments"><div class="Wrap">'.T('Members').'</div></td>
-                            <td class="BigCount CountDiscussions"><div class="Wrap">'.T('Discussions').'</div></td>
-                            <td class="BlockColumn LatestPost"><div class="Wrap">'.T('Latest Post').'</div></td>
-                        </tr>
-                    </thead>';
-        foreach ($Groups as $Group) {
-            WriteGroupRow($Group);
-        }
-        echo '</table></div>';
-    }
-}
-endif;
-
-
-if (!function_exists('WriteGroupRow')) :
-/**
- * Write a group row.
- *
- * @param array $Group
- * @param string $EmptyMessage
- */
-function WriteGroupRow($Row) {
-?>
-    <tr class="<?php echo CssClass($Row); ?>">
-        <td class="GroupName">
-            <div class="Wrap">
-                <?php
-                echo "<h2>";
-                $Url = GroupUrl($Row);
-                echo "<a href=\"$Url\" class=\"TextColor\">";
-                WriteGroupIcon($Row, 'Group-Icon Card-Icon');
-                echo '<h3 class="Group-Name">'.htmlspecialchars($Row['Name']).'</h3>';
-                echo '</a>';
-                echo "</h2>";
-                echo '<div class="Group-Description">'.
-                    SliceString(
-                        Gdn_Format::PlainText($Row['Description'], $Row['Format']),
-                        C('Groups.ListDescription.ExcerptLength', 100)).'</div>'
-                     .'</div>';
-//                echo '<div class="Group-Members">'
-//                    .Plural($Row['CountMembers'], '%s member','%s members', number_format($Row['CountMembers']))
-//                    .'</div>';
-                ?>
-            </div>
-        </td>
-        <td class="BigCount CountMembers">
-            <div class="Wrap">
-                <?php
-                echo BigPlural($Row['CountMembers'], '%s member', '%s members');
-                ?>
-            </div>
-        </td>
-        <td class="BigCount CountDiscussions">
-            <div class="Wrap">
-                <?php
-                echo BigPlural($Row['CountDiscussions'], '%s discussion');
-                ?>
-            </div>
-        </td>
-        <td class="BlockColumn LatestPost">
-            <div class="Block Wrap">
-                <?php if ($Row['LastDiscussionID']):
-                    echo UserPhoto($Row, array('Size' => 'Small', 'Px' => 'Last'));
-                    echo Anchor(
-                        SliceString(Gdn_Format::Text($Row['LastTitle']), 100),
-                        $Row['LastUrl'],
-                        'BlockTitle LatestPostTitle',
-                        array('title' => html_entity_decode($Row['LastTitle'])));
-                    ?>
-                    <div class="Meta">
-                        <?php
-                            echo UserAnchor($Row, 'UserLink MItem', 'Last');
-                        ?>
-                        <span class="Bullet">•</span>
-                        <?php
-                        echo Anchor(
-                            Gdn_Format::Date($Row['LastDateInserted'], 'html'),
-                            $Row['LastUrl'],
-                            'CommentDate MItem');
-                        ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </td>
-    </tr>
-<?php
-}
-endif;
-
-if (!function_exists('WriteGroupItems')) :
-/**
- * Write a group list.
- *
- * @param array $Groups
- * @param string $EmptyMessage
- */
-function WriteGroupItems($Groups, $EmptyMessage = "") {
-   if (!$Groups) {
-      echo '<div class="ErrorMessage">';
-      WriteEmptyState($EmptyMessage);
-      echo '</div>';
-   }
-   else {
-      echo '<ul class="DataList GroupList">';
-      foreach ($Groups as $Group) {
-         echo '<li id="Group_'.$Group['GroupID'].'" class="Groups Item">
-               <div class="ItemContent Group">
-               <div class="TitleWrap">';
-         $Url = GroupUrl($Group);
-         echo '<a href="'.$Url.'" class=\"TextColor\">';
-         WriteGroupIcon($Group, 'Group-Icon Card-Icon');
-         echo '<h3 class="Group-Name">'.htmlspecialchars($Group['Name']).'</h3>';
-         echo '</a>';
-         echo "</h2>";
-         echo '<div class="Group-Description">'.
-               SliceString(
-                  Gdn_Format::PlainText($Group['Description'], $Group['Format']),
-                  C('Groups.ListDescription.ExcerptLength', 100)).'</div>';
-         echo '</div>
-               <div class="Meta">
-                  <span class="MItem DiscussionCount">'.sprintf(Plural(number_format($Group['CountDiscussions']), '%s discussion', '%s discussions'), $Group['CountDiscussions']).'</span>
-                  <span class="MItem CommentCount">'.sprintf(Plural(number_format($Group['CountMembers']), '%s member', '%s members'), $Group['CountMembers']).'</span>';
-         if ($Group["LastDiscussionID"]) {
-            $User = UserAnchor($Group, 'UserLink MItem', 'Last');
-            echo '<span class="MItem LastDiscussionTitle">'.sprintf(
-                      T('Most recent: %1$s by %2$s'),
-                      Anchor(
-                          SliceString(Gdn_Format::Text($Group['LastTitle']), 100),
-                          $Group['LastUrl'],
-                          'BlockTitle LatestPostTitle',
-                          array('title' => html_entity_decode($Group['LastTitle']))),
-                      $User);
-            echo '</span>'
-                  .'<span class="MItem LastCommentDate">'.Gdn_Format::Date($Group['LastDateInserted']).'</span>';
-         }
-      }
-      echo '</div></div></li>';
-   }
-   echo '</ul>';
-}
-endif;
-
-
-if (!function_exists('WriteGroupItemsMobile')) :
-  /**
-   * Write a group list formatted for lithe mobile theme.
-   *
-   * @param array $Groups
-   * @param string $EmptyMessage
-   */
-function WriteGroupItemsMobile ($Groups, $EmptyMessage = '') {
-   if (!$Groups) {
-      echo '<div class="ErrorMessage">';
-      WriteEmptyState($EmptyMessage);
-      echo '</div>';
-   }
-   else {
-      echo '<ul class="DataList GroupList">';
-      foreach ($Groups as $Group) {
-         echo '<li id="Group_'.$Group['GroupID'].'" class="Groups Item">
-                  <div class="ItemContent Group">
-                     <div class="Meta">
-                        <span class="MItem MItem-Count DiscussionCount">
-                             '.BigPlural($Group['CountDiscussions'], '%s discussion').'
-                           <i class="icon icon-discussion"></i>
-                        </span>
-                     </div>
-                     <div class="Group-Name TitleWrap">';
-                        $Url = GroupUrl($Group);
-                        echo '<a href="'.$Url.'" class=\"TextColor\">';
-                        WriteGroupIcon($Group, 'Group-Icon Card-Icon Hidden');
-                        echo '</a><a class="Group-Name Title" href="'.$Url.'">'.htmlspecialchars($Group['Name']).'</a>
-                     </div>
-                  </div>
-               </li>';
-      }
-   }
-}
-endif;
-
-
 if (!function_exists('WriteGroupIcon')) :
 /**
  * Output group icon image.
@@ -712,36 +331,6 @@ function WriteGroupIcon($group = FALSE, $class = 'Group-Icon') {
 }
 endif;
 
-if (!function_exists('WriteGroupInfo')) :
-function WriteGroupInfo() {
-   $c = Gdn::Controller();
-
-   $Owner = Gdn::UserModel()->GetID($c->Data('Group.InsertUserID'));
-
-   $Info = array(
-      'Created' => Gdn_Format::Date($c->Data('Group.DateInserted'), 'html'),
-      'Owner' => UserAnchor($Owner),
-      'Member Count' => array('Members', $c->Data('Group.CountMembers'))
-      );
-
-
-   echo '<dl class="Group-Info">';
-   foreach ($Info as $Code => $Row) {
-      if (is_array($Row)) {
-         $Label = T($Code, $Row[0]);
-         $Value = $Row[1];
-      } else {
-         $Label = T($Code);
-         $Value = $Row;
-      }
-
-      echo '<dt>'.$Label.'</dt>';
-      echo '<dd>'.$Value.'</dd>';
-   }
-   echo '</dl>';
-}
-endif;
-
 if (!function_exists('WriteGroupList')) :
 /**
  * Write a list of groups out as a list.
@@ -760,110 +349,6 @@ function WriteGroupList($Groups) {
    }
 }
 endif;
-
-if (!function_exists('WriteGroupsTable')) :
-
-function WriteGroupsTable($Groups, $Title) {
-   ?>
-   <div class="DataTableWrap">
-      <table class="DataTable GroupsTable">
-         <thead>
-            <td class="GroupName"><div class="Wrap"><?php echo $Title; ?></div></td>
-            <td class="BigCount CountMembers"><div class="Wrap"><?php echo T('Members'); ?></div></td>
-            <td class="BigCount CountDiscussions>"><div class="Wrap"><?php echo T('Discussions'); ?></div></td>
-         </thead>
-         <tbody>
-         <?php foreach ($Groups as $Group): ?>
-         <tr>
-            <td><div class="Wrap">
-               <?php
-               echo '<h3 class="Group-Name">'.
-                  Anchor(htmlspecialchars($Group['Name']), $Group['Url']).
-                  '</h3>';
-               ?>
-            </div></td>
-            <td class="BigCount CountMembers"><div class="Wrap">
-               <?php
-               echo BigPlural($Group['CountMembers'], '%s member');
-               ?>
-            </div></td>
-            <td class="BigCount CountDiscussions"><div class="Wrap">
-               <?php
-               echo BigPlural($Group['CountDiscussions'], '%s discussion');
-               ?>
-            </div></td>
-         </tr>
-         <?php endforeach; ?>
-         </tbody>
-      </table>
-   </div>
-   <?php
-}
-endif;
-
-
-if (!function_exists('WriteMemberCards')) :
-/**
- * Write a list of members out as cards.
- *
- * @param array $Members
- */
-function WriteMemberCards($Members) {
-   if (!$Members)
-      echo WriteEmptyState(T("GroupMembersEmpty", "No one has joined yet. Spread the word!"));
-
-   if (is_array($Members)) {
-      echo '<ul class="Cards Cards-Members">';
-      foreach ($Members as $Member) {
-         echo "<li id=\"Member_{$Member['UserID']}\" class=\"CardWrap\">";
-         WriteMemberCard($Member);
-         echo '</li>';
-      }
-      echo '</ul>';
-   }
-}
-endif;
-
-
-if (!function_exists('WriteMemberCard')) :
-/**
- * Write a list of members out as cards.
- *
- * @param array $Members
- */
-function WriteMemberCard($Member) {
-   $UserID = $Member['UserID'];
-   $Group = Gdn::Controller()->Data('Group');
-
-   echo '<div class="Card Card-Member">';
-
-   echo UserPhoto($Member, array('LinkClass' => 'Card-Icon')).' '.UserAnchor($Member).' ';
-   echo Wrap(sprintf(T('Joined %s', 'Joined %s'), Gdn_Format::Date($Member['DateInserted'], 'html')),
-      'span', array('class' => 'MItem DateJoined')).' ';
-
-   $Options = array();
-
-   if (GroupPermission('Moderate') && $Group['InsertUserID'] != $Member['UserID']) {
-      if (GroupPermission('Edit')) {
-         if ($Member['Role'] == 'Leader')
-            $Options['SetRole'] = array('Text' => sprintf(T('Make %s'), T('Member')), 'Url' => GroupUrl($Group, 'setrole')."?userid=$UserID&role=member", 'CssClass' => 'Group-MakeLeader Hijack');
-         else
-            $Options['SetRole'] = array('Text' => T('Make Leader', 'Leader'), 'Url' => GroupUrl($Group, 'setrole')."?userid=$UserID&role=leader", 'CssClass' => 'Group-MakeLeader Hijack');
-      }
-      $Options['Remove'] = array('Text' => T('Remove'), 'Url' => GroupUrl($Group, 'removemember')."?userid=$UserID", 'CssClass' => 'Group-RemoveMember Popup');
-
-   }
-
-   if (count($Options)) {
-      echo '<div class="Card-Buttons Group-MemberOptions">';
-      echo ButtonDropDown($Options, 'Button DropRight Member-OptionsButton', Sprite('SpOptions', 'Sprite16'));
-      echo '</div>';
-   }
-
-   echo '</div>';
-}
-endif;
-
 
 if (!function_exists('WriteMemberGrid')) :
 /**
@@ -886,7 +371,6 @@ function WriteMemberGrid($Members, $More = '') {
    }
 }
 endif;
-
 
 if (!function_exists('WriteMemberSimpleList')) :
 /**

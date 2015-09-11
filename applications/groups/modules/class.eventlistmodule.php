@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Groups Application - Event List Module
  *
@@ -8,50 +7,50 @@
 /**
  * Class EventListModule
  *
- * Consolidates the data and renders the view for a event list. Event lists appear on the group and events/group pages.
+ * Consolidates the data and renders the view for a event list. Currently, event lists appear on the group and events/group pages.
  */
 class EventListModule extends Gdn_Module {
 
     /**
      * @var array The events to render. (An array of event arrays.)
      */
-    public $events;
+    private $events;
     /**
      * @var string The event section title (i.e., 'Upcoming Events').
      */
-    public $title;
+    private $title;
     /**
      * @var string The message to display if there are no events.
      */
-    public $emptyMessage;
+    private $emptyMessage;
     /**
      * @var string The layout type, either 'modern' or 'table'.
      */
-    public $layout;
+    private $layout;
     /**
      * @var bool Whether to provide a link to see all of the events.
      */
-    public $showMore;
+    private $showMore;
     /**
      * @var string The url for the 'show more' link.
      */
-    public $showMoreUrl;
+    private $showMoreUrl = '';
     /**
      * @var bool Whether to show the 'New Event' button.
      */
-    public $addNewEventButton;
+    private $addNewEventButton;
     /**
      * @var string The url for the 'New Event' button.
      */
-    public $newEventUrl;
+    private $newEventUrl = '';
     /**
      * @var bool Whether to show the event's 'RSVP' dropdown.
      */
-    public $withJoinButtons;
+    private $withJoinButtons;
     /**
      * @var bool Whether to show the event edit options.
      */
-    public $withOptions;
+    private $withOptions;
 
     /**
      * Construct the EventListModule object.
@@ -72,6 +71,7 @@ class EventListModule extends Gdn_Module {
         $this->layout = $layout ?: c('Vanilla.Discussions.Layout', 'modern');
         $this->withJoinButtons = $withJoinButtons;
         $this->withOptions = $withOptions;
+        $this->setView('eventlist');
         $this->_ApplicationFolder = 'groups';
     }
 
@@ -81,7 +81,7 @@ class EventListModule extends Gdn_Module {
      * @param array $event The event to get options for.
      * @return array The event options.
      */
-    public function getEventOptions($event) {
+    private function getEventOptions($event) {
         $options = array();
         if (EventPermission('Edit', $event)) {
             $options[] = array('Text' => sprintf(t('Edit %s'), t('Event')), 'Url' => EventUrl($event, 'edit'));
@@ -96,7 +96,7 @@ class EventListModule extends Gdn_Module {
      * @param array $event The event to get the dropdown menu for.
      * @return array The event's RSVP dropdown.
      */
-    public function getEventDropdown($event) {
+    private function getEventDropdown($event) {
         if (EventPermission('Member', $event) && !EventModel::isEnded($event)) {
             $eventModel = new EventModel();
             $status = $eventModel->IsInvited(Gdn::session()->UserID, val('EventID', $event));
@@ -128,7 +128,7 @@ class EventListModule extends Gdn_Module {
      * @param string $url The url for the new event button.
      * @return array The buttons' data.
      */
-    public function getEventListButtons($url) {
+    private function getEventListButtons($url) {
         $buttons = array();
         $newEventButton['text'] = t('New Event');
         $newEventButton['url'] = $url;
@@ -168,7 +168,7 @@ class EventListModule extends Gdn_Module {
      * @param string $newEventUrl The url for the new event button, if one exists.
      * @return array An event list data array.
      */
-    public function getEventsInfo($layout, $events, $heading, $emptyMessage = '', $showMoreUrl = '', $newEventUrl = '') {
+    private function getEventsInfo($layout, $events, $heading, $emptyMessage, $showMoreUrl, $newEventUrl) {
 
         $eventList['layout'] = $layout;
         $eventList['emptyMessage'] = $emptyMessage;
@@ -210,7 +210,7 @@ class EventListModule extends Gdn_Module {
      * @param bool $withOptions Whether to show the event edit options.
      * @return array A data array representing an event item in an event list.
      */
-    public function getEventInfo($event, $layout, $withJoinButtons = true, $withOptions = true) {
+    private function getEventInfo($event, $layout, $withJoinButtons = true, $withOptions = true) {
 
         $utc = new DateTimeZone('UTC');
         $dateStarts = new DateTime($event['DateStarts'], $utc);
@@ -228,6 +228,11 @@ class EventListModule extends Gdn_Module {
         $item['url'] = EventUrl($event);
         $item['metaCssClass'] = '';
         $item['cssClass'] = 'Event event js-event';
+
+        $startTime = $dateStarts->format('g:ia') == '12:00am' ? '' : ' '.$dateStarts->format('g:ia');
+        $item['meta']['location']['text'] = Gdn_Format::text($event['Location']);
+        $item['meta']['date']['text'] = $dateStarts->format("F j, Y").$startTime;
+
         if ($withOptions) {
             $item['options'] = $this->getEventOptions($event);
         }
@@ -237,23 +242,18 @@ class EventListModule extends Gdn_Module {
         if ($layout == 'table') {
             $this->getEventTableItem($item, $event, $dateStarts);
         }
-        if ($layout != 'table') {
-            $startTime = $dateStarts->format('g:ia') == '12:00am' ? '' : ' '.$dateStarts->format('g:ia');
-            $item['meta']['location']['text'] = Gdn_Format::text($event['Location']);
-            $item['meta']['date']['text'] = $dateStarts->format("F j, Y").$startTime;
-        }
         return $item;
     }
 
 
     /**
-     * Adds the row data for an event item in an event layout group list.
+     * Adds the row data for an event item in a table layout group list.
      *
      * @param array $item The working event item for an event list.
      * @param array $event The event array we're parsing.
      * @param DateTime $dateStarts The starting date of the event.
      */
-    public function getEventTableItem(&$item, $event, $dateStarts) {
+    private function getEventTableItem(&$item, $event, $dateStarts) {
         $item['rows']['main']['type'] = 'main';
         $item['rows']['main']['cssClass'] = 'EventTitle';
 
@@ -276,6 +276,6 @@ class EventListModule extends Gdn_Module {
         $this->events = $this->getEventsInfo($this->layout, $this->events, $this->title, $this->emptyMessage, $this->showMoreUrl, $this->newEventUrl);
         $controller = new Gdn_Controller();
         $controller->setData('list', $this->events);
-        return $controller->fetchView('eventlist', 'modules', 'groups');
+        return $controller->fetchView($this->getView(), 'modules', 'groups');
     }
 }

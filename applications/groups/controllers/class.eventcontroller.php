@@ -281,6 +281,7 @@ class EventController extends Gdn_Controller {
 
       $this->Title($Event['Name']);
       $this->AddBreadcrumb($this->Title());
+      $this->CssClass .= ' NoPanel';
 
       $OrganizerID = $Event['InsertUserID'];
       $Organizer = Gdn::UserModel()->GetID($OrganizerID, DATASET_TYPE_ARRAY);

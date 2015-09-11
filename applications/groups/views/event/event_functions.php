@@ -29,9 +29,15 @@ function WriteEventButtons($Event = NULL) {
 }
 endif;
 
+if (!function_exists('writeEventOptions')) :
+  /**
+   * Writes event edit options.
+   *
+   * @param array $event The event to write options for.
+   */
 function writeEventOptions($event = null) {
    if (!$event) {
-      $event = Gdn::Controller()->Data('Event');
+      $event = Gdn::Controller()->data('Event');
    }
    if (!$event) {
       return;
@@ -44,44 +50,8 @@ function writeEventOptions($event = null) {
    }
 
    if (count($options)) {
-     writeGroupOptions($options);
+      writeGroupOptions($options);
    }
-}
-
-
-if (!function_exists('WriteEventCard')) :
-/**
- * Write an event card
- *
- * Optionally write rich listing
- *
- * @param array $Event
- */
-function WriteEventCard($Event) {
-   $UTC = new DateTimeZone('UTC');
-   $Timezone = new DateTimeZone($Event['Timezone']);
-   $DateStarts = new DateTime($Event['DateStarts'], $UTC);
-   if (Gdn::Session()->IsValid() && $HourOffset = Gdn::Session()->User->HourOffset)
-      $DateStarts->modify("{$HourOffset} hours");
-
-   echo '<div class="Event">';
-   if (GetValue('Rich', $Event)) {
-
-
-
-   } else {
-
-      echo DateTile($DateStarts->format('Y-m-d'));
-      echo '<h3 class="Event-Title">'.Anchor(Gdn_Format::Text($Event['Name']), EventUrl($Event));
-      if ($DateStarts->format('g:ia') != '12:00am')
-         echo ' <span class="Event-Time MItem">'.$DateStarts->format('g:ia').'</span>';
-      echo '</h3>';
-
-      echo '<div class="Event-Location">'.Gdn_Format::Text($Event['Location']).'</div>';
-      echo '<p class="Event-Description">'.SliceParagraph(Gdn_Format::Text($Event['Body']), 100).'</p>';
-
-   }
-   echo '</div>';
 }
 endif;
 
@@ -98,24 +68,4 @@ function HasEndDate($Event) {
    return val('DateEnds', $Event) !== val('DateStarts', $Event);
 }
 
-endif;
-
-if (!function_exists('WriteEventCards')) :
-/**
- * Write a list of events out as cards.
- *
- * @param array $Events
- * @param string $EmptyMessage
- */
-function WriteEventCards($Events, $EmptyMessage = '') {
-   if (!$Events)
-      WriteEmptyState($EmptyMessage);
-   else {
-      echo '<div class="Cards Cards-Events">';
-      foreach ($Events as $Event) {
-         WriteEventCard($Event);
-      }
-      echo '</div>';
-   }
-}
 endif;

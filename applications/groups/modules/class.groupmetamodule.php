@@ -1,20 +1,42 @@
 <?php
+/**
+ * Groups Application - Group Header Module
+ */
 
+/**
+ * Class GroupHeaderModule
+ *
+ *
+ */
 class GroupMetaModule extends Gdn_Module {
 
-    public $meta;
-    public $group;
+    /**
+     * @var array The compiled meta for the group.
+     */
+    private $meta;
+    /**
+     * @var array The group the meta is associated with.
+     */
+    private $group;
 
+    /**
+     * Construct the GroupMetaModule object.
+     *
+     * @param array $group The group the meta is associated with.
+     * @param string $cssClass The css class for the meta container.
+     */
     public function __construct($group, $cssClass = '') {
         $this->meta['cssClass'] = $cssClass;
         $this->group = $group;
     }
 
-    public function assetTarget() {
-        return 'Content';
-    }
-
-    public function getMetaInfo($group) {
+    /**
+     * Collect and organize the data for the group's meta.
+     *
+     * @param array $group The group the meta is associated with.
+     * @return array A meta items data array.
+     */
+    private function getMetaInfo($group) {
         $owner = Gdn::UserModel()->getID(val('InsertUserID', $group));
         $metaItems['owner']['text'] = t('Owner').': ';
         $metaItems['owner']['value'] = userAnchor($owner);
@@ -38,6 +60,11 @@ class GroupMetaModule extends Gdn_Module {
         return $metaItems;
     }
 
+    /**
+     * Render the group meta.
+     *
+     * @return string HTML view
+     */
     public function toString() {
         $this->meta['metaItems'] = $this->getMetaInfo($this->group);
         $controller = new Gdn_Controller();

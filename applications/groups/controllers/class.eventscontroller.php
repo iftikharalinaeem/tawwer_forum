@@ -53,10 +53,6 @@ class EventsController extends Gdn_Controller {
       $EventModel = new EventModel();
       $EventCriteria = array();
 
-      // Prepare RecentEventsModule
-      $RecentEventsModule = new EventModule('recent');
-      $RecentEventsModule->Button = FALSE;
-
       // Determine context
       switch ($Context) {
 
@@ -76,36 +72,24 @@ class EventsController extends Gdn_Controller {
 
             $this->AddBreadcrumb('Groups', Url('/groups'));
             $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+            $header = new GroupHeaderModule($Group);
+            $this->addModule($header);
 
             // Register GroupID as criteria
             $EventCriteria['GroupID'] = $Group['GroupID'];
-
-            $RecentEventsModule->GroupID = $Group['GroupID'];
-
-            $GroupModule = new GroupModule();
-            $GroupModule->GroupID = $Group['GroupID'];
-            $this->AddModule($GroupModule, 'Panel');
-
             break;
 
          // Events this user is invited to
          default:
-
             // Register logged-in user being invited as criteria
             $EventCriteria['Invited'] = Gdn::Session()->UserID;
-            $RecentEventsModule->UserID = Gdn::Session()->UserID;
-
             break;
-      }
-
-      if (isset($Group)) {
-         $header = new GroupHeaderModule($Group);
-         $this->addModule($header);
       }
       $this->Title(T('Events'));
       $this->AddBreadcrumb($this->Title());
+      $this->CssClass .= ' NoPanel';
 
-      // Upcoming events
+     // Upcoming events
       $UpcomingRange = c('Groups.Events.UpcomingRange', '+365 days');
       $Events = $EventModel->GetUpcoming($UpcomingRange, $EventCriteria, FALSE);
       $this->SetData('UpcomingEvents', $Events);
