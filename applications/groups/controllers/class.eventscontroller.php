@@ -53,10 +53,6 @@ class EventsController extends Gdn_Controller {
       $EventModel = new EventModel();
       $EventCriteria = array();
 
-      // Prepare RecentEventsModule
-      $RecentEventsModule = new EventModule('recent');
-      $RecentEventsModule->Button = FALSE;
-
       // Determine context
       switch ($Context) {
 
@@ -81,17 +77,12 @@ class EventsController extends Gdn_Controller {
 
             // Register GroupID as criteria
             $EventCriteria['GroupID'] = $Group['GroupID'];
-
-            $RecentEventsModule->GroupID = $Group['GroupID'];
             break;
 
          // Events this user is invited to
          default:
-
             // Register logged-in user being invited as criteria
             $EventCriteria['Invited'] = Gdn::Session()->UserID;
-            $RecentEventsModule->UserID = Gdn::Session()->UserID;
-
             break;
       }
       $this->Title(T('Events'));
