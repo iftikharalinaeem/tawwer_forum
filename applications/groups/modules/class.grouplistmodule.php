@@ -55,7 +55,7 @@ class GroupListModule extends Gdn_Module {
      * @param bool $showMore Whether to provide a link to see all of the group list's contents.
      * @param string $layout The layout type, either 'modern' or 'table'.
      */
-    public function __construct($groups, $id, $title = '', $emptyMessage = '', $cssClass = '', $showMore = true, $layout = '') {
+    public function __construct($groups, $id, $title = '', $emptyMessage = '', $cssClass = 'GroupList', $showMore = true, $layout = '') {
         $this->groups = $groups;
         $this->id = $id;
         $this->title = $title;
@@ -107,9 +107,25 @@ class GroupListModule extends Gdn_Module {
         if ($this->attachDiscussions && $layout == 'table') {
             $groupList['columns'][3]['columnLabel'] = t('Latest Post');
             $groupList['columns'][3]['columnCssClass'] = 'BlockColumn LatestPost';
+            $this->addEmpty($groupList['items'], 'lastPost');
         }
 
         return $groupList;
+    }
+
+    /**
+     * Adds a column type to an item row if it does not exist.
+     * Ensures the cell is generated even if it has no data.
+     *
+     * @param array $items The group items.
+     * @param string $column The column type to add to the group items.
+     */
+    public function addEmpty(&$items, $column) {
+        foreach ($items as &$item) {
+            if (!isset($item['rows'][$column])) {
+                $item['rows'][$column]['type'] = $column;
+            }
+        }
     }
 
     /**
