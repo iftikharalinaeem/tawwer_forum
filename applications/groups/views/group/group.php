@@ -7,8 +7,8 @@ if (GroupPermission('View')) {
         $applicantList = new ApplicantListModule($this->data('Applicants'), $this->data('Group'), t('Applicants & Invitations'));
         echo $applicantList;
     }
-    writeFullAnnouncementList($this, t('GroupEmptyAnnouncements', "Important stuff will go here one day."));
-    writeFullDiscussionList($this, t('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"), t('Discussions'));
+    writeAnnouncementList($this, t('GroupEmptyAnnouncements', "Important stuff will go here one day."));
+    writeDiscussionList($this, t('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"), t('Discussions'));
     $eventList = new EventListModule($this->data('Events'), t('Upcoming Events'), t('GroupEmptyEvents', "Aw snap, no events are coming up."));
     if (GroupPermission('Member', $this->data('Group'))) {
         $eventList->addNewEventButton(val('GroupID', $this->data('Group')));
