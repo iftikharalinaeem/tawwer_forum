@@ -29,6 +29,10 @@ class MemberListModule extends Gdn_Module {
      */
     private $emptyMessage;
     /**
+     * @var string A css class to add to the member list container.
+     */
+    private $cssClass;
+    /**
      * @var string The layout type, either 'modern' or 'table'.
      */
     private $layout;
@@ -44,14 +48,16 @@ class MemberListModule extends Gdn_Module {
    * @param array $group The group that the members are associated with.
    * @param string $title The member section title (i.e., 'Leaders' or 'Members').
    * @param string $emptyMessage The message to display if there are no members.
+   * @param string $cssClass A css class to add to the member list container.
    * @param string $layout The layout type, either 'modern' or 'table'.
    * @param bool $withButtons Whether to add the 'leader', 'member' and 'remove' buttons to member items.
    */
-    public function __construct($members, $group, $title = '', $emptyMessage = '', $layout = '', $withButtons = true) {
+    public function __construct($members, $group, $title = '', $emptyMessage = '', $cssClass = 'MemberList', $layout = '', $withButtons = true) {
         $this->members = $members;
         $this->group = $group;
         $this->title = $title;
         $this->emptyMessage = $emptyMessage;
+        $this->cssClass = $cssClass;
         $this->layout = $layout ?: c('Vanilla.Discussions.Layout', 'modern');
         $this->_ApplicationFolder = 'groups';
         $this->setView('memberlist');
@@ -93,22 +99,24 @@ class MemberListModule extends Gdn_Module {
         return $buttons;
     }
 
-    /**
-     * Collect and organize the data for the member list.
-     *
-     * @param string $layout The layout type, either 'modern' or 'table'.
-     * @param array $members The members to render.
-     * @param array $group The group that the members are associated with.
-     * @param string $title The applicant section title.
-     * @param string $emptyMessage The message to display if there are no applicants.
-     * @param bool $withButtons Whether to add the 'leader', 'member' and 'remove' to member items.
-     * @return array A member list data array.
-     */
-    private function getMembersInfo($layout, $members, $group, $title, $emptyMessage, $withButtons) {
+  /**
+   * Collect and organize the data for the member list.
+   *
+   * @param string $layout The layout type, either 'modern' or 'table'.
+   * @param array $members The members to render.
+   * @param array $group The group that the members are associated with.
+   * @param string $title The applicant section title.
+   * @param string $emptyMessage The message to display if there are no applicants.
+   * @param string $cssClass A css class to add to the member list container.
+   * @param bool $withButtons Whether to add the 'leader', 'member' and 'remove' to member items.
+   * @return array A member list data array.
+   */
+    private function getMembersInfo($layout, $members, $group, $title, $emptyMessage, $cssClass, $withButtons) {
 
         $memberList['layout'] = $layout;
         $memberList['emptyMessage'] = $emptyMessage;
         $memberList['title'] = $title;
+        $memberList['cssClass'] = $cssClass;
 
         if ($layout == 'table') {
             $memberList['columns'][0]['columnLabel'] = t('User');
@@ -186,7 +194,7 @@ class MemberListModule extends Gdn_Module {
      * @return string HTML view
      */
     public function toString() {
-        $this->members = $this->getMembersInfo($this->layout, $this->members, $this->group, $this->title, $this->emptyMessage, $this->withButtons);
+        $this->members = $this->getMembersInfo($this->layout, $this->members, $this->group, $this->title, $this->emptyMessage, $this->cssClass, $this->withButtons);
         $controller = new Gdn_Controller();
         $controller->setData('list', $this->members);
         return $controller->fetchView($this->getView(), 'modules', 'groups');
