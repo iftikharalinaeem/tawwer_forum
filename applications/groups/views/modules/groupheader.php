@@ -6,7 +6,7 @@ $hasBanner = val('Banner', $this->group);
   writeGroupBanner($this->group);
   WriteGroupIcon($this->group, 'Group-Icon Group-Icon-Big');
   if ($this->showOptions && $options = getGroupOptions($this->group)) {
-    writeGroupBannerOptions($options);
+    writeGroupOptionsButton($options);
   }
   if ($this->showButtons) {
   $buttons = getGroupButtons($this->group);
