@@ -182,7 +182,7 @@ class DisqusPlugin extends Gdn_Plugin {
         }
 
         $Sender->AddSideMenu();
-        $Sender->SetData('Title', T('Disqus Settings'));
+        $Sender->SetData('Title', sprintf(t('%s Settings'), 'Disqus'));
         $Sender->Render('Settings', '', 'plugins/Disqus');
     }
 
