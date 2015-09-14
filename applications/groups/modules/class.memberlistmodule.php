@@ -33,6 +33,10 @@ class MemberListModule extends Gdn_Module {
      */
     private $cssClass;
     /**
+     * @var bool Whether to provide a link to see all of the member list's contents.
+     */
+    private $showMore;
+    /**
      * @var string The layout type, either 'modern' or 'table'.
      */
     private $layout;
@@ -49,15 +53,17 @@ class MemberListModule extends Gdn_Module {
    * @param string $title The member section title (i.e., 'Leaders' or 'Members').
    * @param string $emptyMessage The message to display if there are no members.
    * @param string $cssClass A css class to add to the member list container.
+   * @param bool $showMore Whether to provide a link to see all of the member list's contents.
    * @param string $layout The layout type, either 'modern' or 'table'.
    * @param bool $withButtons Whether to add the 'leader', 'member' and 'remove' buttons to member items.
    */
-    public function __construct($members, $group, $title = '', $emptyMessage = '', $cssClass = 'MemberList', $layout = '', $withButtons = true) {
+    public function __construct($members, $group, $title = '', $emptyMessage = '', $cssClass = 'MemberList', $showMore = false, $layout = '', $withButtons = true) {
         $this->members = $members;
         $this->group = $group;
         $this->title = $title;
         $this->emptyMessage = $emptyMessage;
         $this->cssClass = $cssClass;
+        $this->showMore = $showMore;
         $this->layout = $layout ?: c('Vanilla.Discussions.Layout', 'modern');
         $this->_ApplicationFolder = 'groups';
         $this->setView('memberlist');
@@ -117,6 +123,12 @@ class MemberListModule extends Gdn_Module {
         $memberList['emptyMessage'] = $emptyMessage;
         $memberList['title'] = $title;
         $memberList['cssClass'] = $cssClass;
+
+        if ($this->showMore) {
+            $memberList['moreLink'] = sprintf(t('All %s...'), $title);
+            $memberList['moreUrl'] = GroupUrl($group, 'members');
+            $memberList['moreCssClass'] = 'More';
+        }
 
         if ($layout == 'table') {
             $memberList['columns'][0]['columnLabel'] = t('User');

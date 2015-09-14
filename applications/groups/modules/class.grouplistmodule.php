@@ -152,8 +152,16 @@ class GroupListModule extends Gdn_Module {
 
         $item['meta']['countDiscussions']['text'] = Plural(val('CountDiscussions', $group), '%s discussion', '%s discussions', number_format(val('CountDiscussions', $group)));
         $item['meta']['countDiscussions']['count'] = val('CountDiscussions', $group);
+        $item['meta']['countDiscussions']['cssClass'] = 'DiscussionCount MItem-Count';
         $item['meta']['countMembers']['text'] = Plural(val('CountMembers', $group), '%s member', '%s members', number_format(val('CountMembers', $group)));
         $item['meta']['countMembers']['count'] = val('CountMembers', $group);
+        $item['meta']['countMembers']['cssClass'] = 'MemberCount MItem-Count';
+        $item['meta']['countMembersNumber']['text'] = val('CountMembers', $group);
+        $item['meta']['countMembersNumber']['count'] = val('CountMembers', $group);
+        $item['meta']['countMembersNumber']['cssClass'] = 'Hidden DiscussionCountNumber Number MItem-Count';
+        $item['meta']['countDiscussionsNumber']['text'] = val('CountDiscussions', $group);
+        $item['meta']['countDiscussionsNumber']['count'] = val('CountDiscussions', $group);
+        $item['meta']['countDiscussionsNumber']['cssClass'] = 'Hidden MemberCountNumber Number MItem-Count';
 
         if ($attachDiscussionData) {
             $this->attachDiscussions = true;
