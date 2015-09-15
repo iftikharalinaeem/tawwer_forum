@@ -766,6 +766,8 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
       padding-right: 100px;
       border-color: transparent;
       border-radius: 4px; }
+    .masthead form .AdvancedSearch input[type="text"] {
+      padding: 0 20px; }
     .masthead form input[type="submit"] {
       position: absolute;
       top: 5px;
