@@ -3,7 +3,7 @@
 $ThemeInfo['deflector'] = array(
     'Name'        => "Deflector",
     'Description' => "A clean Vanilla theme focused on customer support communities",
-    'Version'     => '1.0.4-beta',
+    'Version'     => '1.0.5-beta',
     'Url'         => 'http://vanillaforums.com',
     'Author'      => "Kasper Kronborg Isager",
     'AuthorEmail' => 'kasper@vanillaforums.com',

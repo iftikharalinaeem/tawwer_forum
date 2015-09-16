@@ -46,6 +46,10 @@
     }
   }
 
+  .AdvancedSearch input[type="text"] {
+    padding: 0 20px;
+  }
+
   .container {
     > *:first-child {
       margin-top: 0;
