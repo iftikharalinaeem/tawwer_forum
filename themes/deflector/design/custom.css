@@ -774,6 +774,8 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
       right: 5px;
       float: right;
       padding: 10px 25px; }
+  .masthead .AdvancedSearch input[type="text"] {
+    padding: 0 20px; }
   .masthead .container > *:first-child {
     margin-top: 0; }
   .masthead .container > *:last-child {
