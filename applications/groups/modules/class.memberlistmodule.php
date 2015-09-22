@@ -15,35 +15,35 @@ class MemberListModule extends Gdn_Module {
     /**
      * @var array The members to render.
      */
-    private $members;
+    protected $members;
     /**
      * @var array The group that the members are associated with.
      */
-    private $group;
+    protected $group;
     /**
      * @var string The member section title (i.e., 'Leaders' or 'Members').
      */
-    private $title;
+    protected $title;
     /**
      * @var string The message to display if there are no members.
      */
-    private $emptyMessage;
+    protected $emptyMessage;
     /**
      * @var string A css class to add to the member list container.
      */
-    private $cssClass;
+    protected $cssClass;
     /**
      * @var bool Whether to provide a link to see all of the member list's contents.
      */
-    private $showMore;
+    protected $showMore;
     /**
      * @var string The layout type, either 'modern' or 'table'.
      */
-    private $layout;
+    protected $layout;
     /**
      * @var bool Whether to add the 'leader', 'member' and 'remove' buttons to member items.
      */
-    private $withButtons;
+    protected $withButtons;
 
   /**
    * Construct the MemberListModule object.
@@ -57,7 +57,7 @@ class MemberListModule extends Gdn_Module {
    * @param string $layout The layout type, either 'modern' or 'table'.
    * @param bool $withButtons Whether to add the 'leader', 'member' and 'remove' buttons to member items.
    */
-    public function __construct($members, $group, $title = '', $emptyMessage = '', $cssClass = 'MemberList', $showMore = false, $layout = '', $withButtons = true) {
+    public function __construct($members = array(), $group = array(), $title = '', $emptyMessage = '', $cssClass = 'MemberList', $showMore = false, $layout = '', $withButtons = true) {
         $this->members = $members;
         $this->group = $group;
         $this->title = $title;
@@ -77,7 +77,7 @@ class MemberListModule extends Gdn_Module {
      * @param array $group The group that the member is associated with.
      * @return array The member buttons.
      */
-    private function getMemberButtons($member, $group) {
+    protected function getMemberButtons($member, $group) {
         $userId = val('UserID', $member);
         $buttons = array();
         if (GroupPermission('Moderate') && (val('InsertUserID', $group) != $userId)) {
@@ -117,7 +117,7 @@ class MemberListModule extends Gdn_Module {
    * @param bool $withButtons Whether to add the 'leader', 'member' and 'remove' to member items.
    * @return array A member list data array.
    */
-    private function getMembersInfo($layout, $members, $group, $title, $emptyMessage, $cssClass, $withButtons) {
+    protected function getMembersInfo($layout, $members, $group, $title, $emptyMessage, $cssClass, $withButtons) {
 
         $memberList['layout'] = $layout;
         $memberList['emptyMessage'] = $emptyMessage;
@@ -155,7 +155,7 @@ class MemberListModule extends Gdn_Module {
      * @param bool $withButtons Whether to add the 'leader', 'member' and 'remove' buttons to member items.
      * @return array A data array representing a member item in a member list.
      */
-    private function getMemberInfo($member, $group, $layout, $withButtons) {
+    protected function getMemberInfo($member, $group, $layout, $withButtons) {
 
         $item['heading'] = Gdn_Format::text(val('Name', $member));
         $item['url'] = userUrl($member);
@@ -185,7 +185,7 @@ class MemberListModule extends Gdn_Module {
      * @param array $group The group that the member is associated with.
      * @param bool $withButtons Whether to add the 'leader', 'member' and 'remove' buttons to member items.
      */
-    private function getMemberTableItem(&$item, $member, $group, $withButtons) {
+    protected function getMemberTableItem(&$item, $member, $group, $withButtons) {
         $item['rows']['main']['type'] = 'main';
         $item['rows']['main']['cssClass'] = 'UserName';
 
@@ -206,6 +206,17 @@ class MemberListModule extends Gdn_Module {
      * @return string HTML view
      */
     public function toString() {
+        if (!$this->group) {
+            $controller = Gdn::controller();
+            $this->group = val('Group', $controller->Data);
+        }
+        if (!$this->members) {
+            $controller = Gdn::controller();
+            $this->members = val('Members', $controller->Data);
+        }
+        if (!$this->group || !$this->members) {
+            return '';
+        }
         $this->members = $this->getMembersInfo($this->layout, $this->members, $this->group, $this->title, $this->emptyMessage, $this->cssClass, $this->withButtons);
         $controller = new Gdn_Controller();
         $controller->setData('list', $this->members);

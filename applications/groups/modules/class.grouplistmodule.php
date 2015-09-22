@@ -14,48 +14,48 @@ class GroupListModule extends Gdn_Module {
     /**
      * @var array The groups to render. (An array of group arrays.)
      */
-    private $groups;
+    protected $groups;
     /**
-     * @var string The group list's unique endpoint slug ('mine', 'popular', 'new', etc.).
+     * @var string The group list's unique identifier or endpoint slug ('mine', 'popular', 'new', etc.).
      */
-    private $id;
+    public $id;
     /**
      * @var string The group list's title (i.e., 'My Groups').
      */
-    private $title;
+    protected $title;
     /**
      * @var string The message to display if there are no groups.
      */
-    private $emptyMessage;
+    protected $emptyMessage;
     /**
      * @var string A css class to add to the group list container.
      */
-    private $cssClass;
+    protected $cssClass;
     /**
      * @var bool Whether to provide a link to see all of the group list's contents.
      */
-    private $showMore;
+    protected $showMore;
     /**
      * @var string The layout type, either 'modern' or 'table'.
      */
-    private $layout;
+    protected $layout;
     /**
      * @var bool Whether the latest post is attached to a group item.
      */
-    private $attachDiscussions;
+    protected $attachDiscussions;
 
     /**
      * Construct the GroupListModule object.
      *
      * @param array $groups The groups to render. (An array of group arrays.)
-     * @param string $id The group list's unique endpoint slug ('mine', 'popular', 'new', etc.).
+     * @param string $id The group list's unique identifier or endpoint slug ('mine', 'popular', 'new', etc.).
      * @param string $title The group list's title (i.e., 'My Groups').
      * @param string $emptyMessage The message to display if there are no groups.
      * @param string $cssClass A css class to add to the group list container.
      * @param bool $showMore Whether to provide a link to see all of the group list's contents.
      * @param string $layout The layout type, either 'modern' or 'table'.
      */
-    public function __construct($groups, $id, $title = '', $emptyMessage = '', $cssClass = 'GroupList', $showMore = true, $layout = '') {
+    public function __construct($groups = array(), $id = 'groups', $title = '', $emptyMessage = '', $cssClass = 'GroupList', $showMore = true, $layout = '') {
         $this->groups = $groups;
         $this->id = $id;
         $this->title = $title;
@@ -75,10 +75,10 @@ class GroupListModule extends Gdn_Module {
      * @param string $heading The group list's title (i.e., 'My Groups').
      * @param string $emptyMessage The message to display if there are no groups.
      * @param string $cssClass A css class to add to the group list container.
-     * @param string $sectionId The group list's unique endpoint slug ('mine', 'popular', 'new', etc.).
+     * @param string $sectionId The group list's unique identifier or endpoint slug ('mine', 'popular', 'new', etc.).
      * @return array A group list data array.
      */
-    private function getGroupsInfo($layout, $groups, $heading, $emptyMessage, $cssClass, $sectionId) {
+    protected function getGroupsInfo($layout, $groups, $heading, $emptyMessage, $cssClass, $sectionId) {
 
         $groupList['layout'] = $layout;
         $groupList['emptyMessage'] = $emptyMessage;
@@ -137,7 +137,7 @@ class GroupListModule extends Gdn_Module {
      * @param string $sectionId The group list's unique endpoint slug.
      * @return array A data array representing a group item in a group list.
      */
-    private function getGroupInfo($group, $layout, $withOptions, $sectionId) {
+    protected function getGroupInfo($group, $layout, $withOptions, $sectionId) {
         $item['text'] = htmlspecialchars(sliceString(Gdn_Format::plainText(val('Description', $group), val('Format', $group)), c('Groups.CardDescription.ExcerptLength', 150)));
         $item['textCssClass'] = 'GroupDescription';
         $item['imageSource'] = val('Icon', $group) ? Gdn_Upload::url(val('Icon', $group)) : C('Groups.DefaultIcon', false);
@@ -198,7 +198,7 @@ class GroupListModule extends Gdn_Module {
      * @param array $item The working group item for a group list.
      * @param array $group The group array we're parsing.
      */
-    private function getGroupItemTableData(&$item, $group) {
+    protected function getGroupItemTableData(&$item, $group) {
         $item['rows']['main']['type'] = 'main';
         $item['rows']['main']['cssClass'] = 'Group-Name';
 
@@ -230,9 +230,16 @@ class GroupListModule extends Gdn_Module {
      */
     public function toString() {
         require_once Gdn::Controller()->fetchViewLocation('group_functions', 'Group', 'groups');
-        $this->groups = $this->getGroupsInfo($this->layout, $this->groups, $this->title, $this->emptyMessage, $this->cssClass, $this->id);
+        if (!$this->groups) {
+            $controller = Gdn::controller();
+            $this->groups = val('Groups', $controller->Data);
+        }
+        if (!$this->groups) {
+            return '';
+        }
+        $groupList = $this->getGroupsInfo($this->layout, $this->groups, $this->title, $this->emptyMessage, $this->cssClass, $this->id);
         $controller = new Gdn_Controller();
-        $controller->setData('list', $this->groups);
+        $controller->setData('list', $groupList);
         return $controller->fetchView($this->getView(), 'modules', 'groups');
     }
 
