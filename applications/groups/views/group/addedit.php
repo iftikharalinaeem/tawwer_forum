@@ -43,8 +43,28 @@
       ?>
       <div class="P P-Icon">
          <?php
-         echo $this->Form->Label('Icon', 'Icon_New', array('class' => 'B'));
-         echo $this->Form->ImageUpload('Icon');
+         $thumbnailSize = $this->data('thumbnailSize');
+         $icon = $crop = false;
+         if ($crop = $this->data('crop')) {
+             echo $this->Form->Label('Icon', 'Icon', array('class' => 'B'));
+             echo $crop;
+         }
+         elseif ($icon = $this->data('icon')) {
+             echo $this->Form->Label('Icon', 'Icon_New', array('class' => 'B'));  ?>
+             <div class="icons">
+                 <div class="Padded current-icon">
+                     <?php echo img($this->data('icon'), array('style' => 'width: '.$thumbnailSize.'px; height: '.$thumbnailSize.'px;')); ?>
+                 </div>
+             </div>
+         <?php } ?>
+          <?php
+          if ($icon || $crop) {
+              echo wrap(anchor(t('Remove Icon'), '/group/removegroupicon/'.val('GroupID', $this->data('Group')).'/'.Gdn::session()->transientKey(), 'Button StructuredForm P'), 'div');
+              echo $this->Form->Label('New Icon', 'Icon_New', array('class' => 'B'));
+          } else {
+              echo $this->Form->Label('Icon', 'Icon_New', array('class' => 'B'));
+          }
+          echo $this->Form->input('Icon_New', 'file');
          ?>
       </div>
       <div class="P P-Banner">
@@ -71,7 +91,7 @@
             echo Anchor(T('Cancel'), GroupUrl($Group), 'Button');
          else
             echo Anchor(T('Cancel'), '/groups', 'Button');
-         
+
          echo ' '.$this->Form->Button('Save', array('class' => 'Button Primary'));
          ?>
       </div>

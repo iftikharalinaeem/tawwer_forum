@@ -6,6 +6,11 @@
 
 class GroupController extends Gdn_Controller {
 
+   /**
+    * @var string The path to the group icons folder.
+    */
+   const GROUP_ICON_FOLDER = 'groups/icons';
+
    public $Uses = array('GroupModel', 'EventModel');
 
    /**
@@ -446,6 +451,49 @@ class GroupController extends Gdn_Controller {
       }
    }
 
+    /**
+     * Saves the group icon /uploads in two formats:
+     *   The thumbnail-sized image, which is constrained and cropped according to Groups.IconSize.
+     *   p* : The profile-sized image, which is constrained by Garden.Profile.MaxWidth and Garden.Profile.MaxHeight.
+     *
+     * @param string $source The path to the local copy of the image.
+     * @param array $thumbOptions The options to save the thumbnail-sized icon with.
+     * @return bool Whether the saves were successful.
+     */
+    private function saveIcons($source, $thumbOptions) {
+        try {
+            $upload = new Gdn_UploadImage();
+            // Generate the target image name
+            $targetImage = $upload->generateTargetName(PATH_UPLOADS);
+            $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
+
+            // Save the profile size image.
+            Gdn_UploadImage::saveImageAs(
+                $source,
+                self::GROUP_ICON_FOLDER."/p$imageBaseName",
+                c('Garden.Profile.MaxHeight', 1000),
+                c('Garden.Profile.MaxWidth', 250),
+                array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
+            );
+
+            $thumbnailSize = c('Groups.IconSize', 120);
+            // Save the thumbnail size image.
+            $parts = Gdn_UploadImage::saveImageAs(
+                $source,
+                self::GROUP_ICON_FOLDER.'/'."$imageBaseName",
+                $thumbnailSize,
+                $thumbnailSize,
+                $thumbOptions
+            );
+        } catch (Exception $ex) {
+            $this->Form->addError($ex);
+            return false;
+        }
+
+        $imageBaseName = $parts['SaveName'];
+        return $imageBaseName;
+    }
+
    protected function AddEdit($ID = FALSE) {
       $Form = new Gdn_Form();
       $Form->SetModel($this->GroupModel);
@@ -468,15 +516,81 @@ class GroupController extends Gdn_Controller {
 
       }
 
+       $icon = val('Icon', $Group);
+       //Get the image source so we can manipulate it in the crop module.
+       $upload = new Gdn_UploadImage();
+       $thumbnailSize = c('Groups.IconSize', 120);
+       $this->setData('thumbnailSize', $thumbnailSize);
+
+       // Uploaded icons used to be named 'icon_*' and only had one
+       // image saved. This kludge checks to see if this is a new, cropped icon.
+       $oldIcon = strpos($icon, 'icon_');
+
+       // Uploaded icons used to be named 'icon_*' and only had one
+       // image saved. This kludge checks to see if this is a new, cropped icon.
+       $oldIcon = strpos($icon, 'icon_');
+
+       if ($icon && $this->isUploadedGroupIcon($icon) && !$oldIcon) {
+           //Get the image source so we can manipulate it in the crop module.
+           $upload = new Gdn_UploadImage();
+           $basename = changeBasename($icon, "p%s");
+           $source = $upload->copyLocal($basename);
+
+           //Set up cropping.
+           $crop = new CropImageModule($this, $Form, $thumbnailSize, $thumbnailSize, $source);
+           $crop->setExistingCropUrl(Gdn_UploadImage::url($icon));
+           $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($icon, "p%s")));
+           $this->setData('crop', $crop);
+       } elseif ($icon && $this->isUploadedGroupIcon($icon)) {
+           // old icon, no crop set.
+           $this->setData('icon', Gdn_UploadImage::url($icon));
+       } elseif ($icon) {
+           $this->setData('icon', $icon);
+       } else {
+           // TODO: no icon, add default?
+       }
+
       // Get a list of categories suitable for the category dropdown.
       $Categories = array_filter(CategoryModel::Categories(), function($Row) { return $Row['AllowGroups']; });
       $Categories = ConsolidateArrayValuesByKey($Categories, 'CategoryID', 'Name');
       $this->SetData('Categories', $Categories);
 
       if ($Form->AuthenticatedPostBack()) {
-         // We need to save the images before saving to the database.
-         self::SaveImage($Form, 'Icon', array('Prefix' => 'groups/icons/icon_', 'Size' => C('Groups.IconSize', 100), 'Crop' => TRUE));
-         self::SaveImage($Form, 'Banner', array('Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => TRUE, 'OutputType' => 'jpeg'));
+
+          // We need to save the images before saving to the database.
+          self::SaveImage($Form, 'Banner', array('Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => TRUE, 'OutputType' => 'jpeg'));
+
+          if ($tmpIcon = $upload->validateUpload('Icon_New', false)) {
+
+              // New upload
+              $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
+              $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
+              $Form->SetFormValue('Icon', $newIcon);
+          } else if ($icon && $crop && $crop->isCropped()) {
+              // New thumbnail
+              $tmpIcon = $source;
+              $thumbOptions = array('Crop' => true,
+                  'SourceX' => $crop->getCropXValue(),
+                  'SourceY' => $crop->getCropYValue(),
+                  'SourceWidth' => $crop->getCropWidth(),
+                  'SourceHeight' => $crop->getCropHeight());
+              $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
+              $Form->SetFormValue('Icon', $newIcon);
+          }
+          if ($Form->errorCount() == 0) {
+              if ($newIcon) {
+                  $Form->SetFormValue('Icon_New', $newIcon);
+                  $icon = $newIcon;
+
+                  // Update crop properties.
+                  $basename = changeBasename($icon, "p%s");
+                  $source = $upload->copyLocal($basename);
+                  $crop = new CropImageModule($this, $Form, $thumbnailSize, $thumbnailSize, $source);
+                  $crop->setExistingCropUrl(Gdn_UploadImage::url($icon));
+                  $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($icon, "p%s")));
+                  $this->setData('crop', $crop);
+              }
+          }
 
          // Make sure the group ID can't be spoofed.
          if ($ID)
@@ -489,7 +603,7 @@ class GroupController extends Gdn_Controller {
          }
          if ($GroupID) {
             $Group = $this->GroupModel->GetID($GroupID);
-            Redirect(GroupUrl($Group));
+	        Redirect(GroupUrl($Group));
          } else {
             Trace($Form->FormValues());
          }
@@ -511,6 +625,149 @@ class GroupController extends Gdn_Controller {
       $this->CssClass .= ' NoPanel NarrowForm';
       $this->Render('AddEdit');
    }
+
+    /**
+     * Settings page for uploading, deleting and cropping a group icon.
+     *
+     * @throws Exception
+     */
+    public function groupIcon($id = false) {
+        if(!$id) {
+            throw NotFoundException();
+        }
+
+        $form = new Gdn_Form();
+        $form->setModel($this->GroupModel);
+        $this->title(t('Group Icon'));
+        $this->addJsFile('groupicons.js');
+
+        if ($id) {
+            $group = $this->GroupModel->GetID($id);
+            if (!$group) {
+                throw NotFoundException('Group');
+            }
+
+            // Make sure the user can edit this group.
+            if (!$this->GroupModel->CheckPermission('Edit', $group)) {
+                throw ForbiddenException('@' . $this->GroupModel->CheckPermission('Edit.Reason', $group));
+            }
+            $this->SetData('Group', $group);
+            $this->AddBreadcrumb($group['Name'], GroupUrl($group));
+        }
+
+        $thumbnailSize = c('Groups.IconSize', 120);
+        $this->setData('thumbnailSize', $thumbnailSize);
+        $icon = val('Icon', $group);
+
+        // Uploaded icons used to be named 'icon_*' and only had one
+        // image saved. This kludge checks to see if this is a new, cropped icon.
+        $oldIcon = strpos($icon, 'icon_');
+
+        if ($icon && $this->isUploadedGroupIcon($icon) && !$oldIcon) {
+            //Get the image source so we can manipulate it in the crop module.
+            $upload = new Gdn_UploadImage();
+            $basename = changeBasename($icon, "p%s");
+            $source = $upload->copyLocal($basename);
+
+            //Set up cropping.
+            $crop = new CropImageModule($this, $form, $thumbnailSize, $thumbnailSize, $source);
+            $crop->setExistingCropUrl(Gdn_UploadImage::url($icon));
+            $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($icon, "p%s")));
+            $this->setData('crop', $crop);
+        } elseif ($icon && $this->isUploadedGroupIcon($icon)) {
+            // old icon, no crop set.
+            $this->setData('icon', Gdn_UploadImage::url($icon));
+        } elseif ($icon) {
+            $this->setData('icon', $icon);
+        } else {
+            // TODO: no icon, add default?
+        }
+        if (!$form->authenticatedPostBack()) {
+//            $form->setData($this->GroupModel->Data);
+        } else {
+            $form->setData($group);
+            $upload = new Gdn_UploadImage();
+            $newIcon = false;
+            if ($tmpIcon = $upload->validateUpload('Icon', false)) {
+                // New upload
+                $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
+                $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
+                $form->SetFormValue('Icon', $newIcon);
+            } else if ($icon && $crop && $crop->isCropped()) {
+                // New thumbnail
+                $tmpIcon = $source;
+                $thumbOptions = array('Crop' => true,
+                    'SourceX' => $crop->getCropXValue(),
+                    'SourceY' => $crop->getCropYValue(),
+                    'SourceWidth' => $crop->getCropWidth(),
+                    'SourceHeight' => $crop->getCropHeight());
+                $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
+                $form->SetFormValue('Icon', $newIcon);
+            }
+            if ($form->errorCount() == 0) {
+                if ($newIcon) {
+                    if (!$this->GroupModel->save(array('GroupID' => val('GroupID', $group), 'Icon' => $newIcon))) {
+                        $form->setValidationResults($this->GroupModel->validationResults());
+                    } else {
+                        $this->deleteGroupIcons($icon);
+                        $icon = $newIcon;
+                        // Update crop properties.
+                        $basename = changeBasename($icon, "p%s");
+                        $source = $upload->copyLocal($basename);
+                        $crop = new CropImageModule($this, $form, $thumbnailSize, $thumbnailSize, $source);
+                        $crop->setSize($thumbnailSize, $thumbnailSize);
+                        $crop->setExistingCropUrl(Gdn_UploadImage::url($icon));
+                        $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($icon, "p%s")));
+                        $this->setData('crop', $crop);
+                    }
+                }
+            }
+            $this->informMessage(t("Your settings have been saved."));
+        }
+        $this->Form = $form;
+        $this->render();
+    }
+
+    /**
+     * Remove the icon from db & delete it.
+     *
+     * @since 2.0.0
+     * @access public
+     * @param string $transientKey Security token.
+     */
+    public function removeGroupIcon($id, $transientKey = '') {
+        $session = Gdn::session();
+        $group = $this->GroupModel->GetID($id);
+        if ($session->validateTransientKey($transientKey) && $this->GroupModel->CheckPermission('Edit', $group)) {
+            $icon = val('Icon', $group);
+            $this->GroupModel->setField($id, 'Icon', null);
+            $this->deleteGroupIcons($icon);
+        }
+        redirectUrl(GroupUrl($group, 'edit'));
+    }
+
+    /**
+     * Test whether a path is a relative path to the proper uploads directory.
+     *
+     * @param string $icon The path to the icon image to test.
+     * @return bool Whether the icon has been uploaded from the dashboard.
+     */
+    private function isUploadedGroupIcon($icon) {
+        return (strpos($icon, self::GROUP_ICON_FOLDER.'/') !== false);
+    }
+
+    /**
+     * Deletes uploaded icons.
+     *
+     * @param string $icon The icon to delete.
+     */
+    private function deleteGroupIcons($icon = '') {
+        if ($icon && $this->isUploadedGroupIcon($icon)) {
+            $upload = new Gdn_Upload();
+            $upload->delete(self::GROUP_ICON_FOLDER.'/'.basename($icon));
+            $upload->delete(self::GROUP_ICON_FOLDER.'/'.basename(changeBasename($icon, 'p%s')));
+        }
+    }
 
    public function Discussions($ID, $Page = FALSE) {
       Gdn_Theme::Section('DiscussionList');
