@@ -316,17 +316,20 @@ if (!function_exists('WriteGroupIcon')) :
  * @param array $Group Optional. Uses data array's Group if none is provided.
  */
 function WriteGroupIcon($group = FALSE, $class = 'Group-Icon') {
-   if (!$group)
-      $group = Gdn::Controller()->Data('Group');
+   if (!$group) {
+       $group = Gdn::Controller()->Data('Group');
+   }
 
    $icon = '';
-   if ($group['Icon'])
-      $icon = $group['Icon'];
-   else
-      $icon = C('Groups.DefaultIcon', '');
+   if (val('Icon', $group)) {
+       $icon = val('Icon', $group);
+   } else {
+       $icon = C('Groups.DefaultIcon', '');
+   }
 
-   if ($icon)
-      echo Img(Gdn_Upload::Url($icon), array('class' => $class));
+   if ($icon) {
+       echo Img(Gdn_Upload::Url($icon), array('class' => $class));
+   }
 
 }
 endif;

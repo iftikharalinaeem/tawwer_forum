@@ -517,14 +517,11 @@ class GroupController extends Gdn_Controller {
       }
 
        $icon = val('Icon', $Group);
+
        //Get the image source so we can manipulate it in the crop module.
        $upload = new Gdn_UploadImage();
        $thumbnailSize = c('Groups.IconSize', 120);
        $this->setData('thumbnailSize', $thumbnailSize);
-
-       // Uploaded icons used to be named 'icon_*' and only had one
-       // image saved. This kludge checks to see if this is a new, cropped icon.
-       $oldIcon = strpos($icon, 'icon_');
 
        // Uploaded icons used to be named 'icon_*' and only had one
        // image saved. This kludge checks to see if this is a new, cropped icon.
@@ -545,9 +542,11 @@ class GroupController extends Gdn_Controller {
            // old icon, no crop set.
            $this->setData('icon', Gdn_UploadImage::url($icon));
        } elseif ($icon) {
+           // not an uploaded icon
            $this->setData('icon', $icon);
        } else {
-           // TODO: no icon, add default?
+           // no icon, check for default.
+           $this->setData('icon', c('Groups.DefaultIcon', ''));
        }
 
       // Get a list of categories suitable for the category dropdown.
@@ -561,7 +560,6 @@ class GroupController extends Gdn_Controller {
           self::SaveImage($Form, 'Banner', array('Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => TRUE, 'OutputType' => 'jpeg'));
 
           if ($tmpIcon = $upload->validateUpload('Icon_New', false)) {
-
               // New upload
               $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
               $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
@@ -635,12 +633,10 @@ class GroupController extends Gdn_Controller {
         if(!$id) {
             throw NotFoundException();
         }
-
         $form = new Gdn_Form();
         $form->setModel($this->GroupModel);
         $this->title(t('Group Icon'));
         $this->addJsFile('groupicons.js');
-
         if ($id) {
             $group = $this->GroupModel->GetID($id);
             if (!$group) {
@@ -654,7 +650,6 @@ class GroupController extends Gdn_Controller {
             $this->SetData('Group', $group);
             $this->AddBreadcrumb($group['Name'], GroupUrl($group));
         }
-
         $thumbnailSize = c('Groups.IconSize', 120);
         $this->setData('thumbnailSize', $thumbnailSize);
         $icon = val('Icon', $group);
@@ -680,7 +675,7 @@ class GroupController extends Gdn_Controller {
         } elseif ($icon) {
             $this->setData('icon', $icon);
         } else {
-            // TODO: no icon, add default?
+            $this->setData('icon', c('Groups.DefaultIcon', ''));
         }
         if (!$form->authenticatedPostBack()) {
 //            $form->setData($this->GroupModel->Data);
