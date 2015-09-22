@@ -7,16 +7,13 @@ class SubcommunityToggleModule extends Gdn_Module {
     public function __construct($Sender = '', $ApplicationFolder = FALSE) {
         $this->_Sender = $Sender;
         $this->_ApplicationFolder = 'plugins/subcommunities';
-    }
-
-    protected function getView() {
         $style = strtolower($this->Style);
         if (!in_array($style, array('select'))) {
             $view = '';
         } else {
             $view = "subcommunitytoggle_$style";
         }
-        return $view;
+        $this->setView($view);
     }
 
     public function ToString() {
