@@ -109,7 +109,7 @@ class PromotedGroupsModule extends Gdn_Module {
      * @param string $promoteType The type of groups to return. Must be a key in $promoteTypes.
      * @return PromotedGroupsModule $this
      */
-    protected function setPromoteType($promoteType) {
+    public function setPromoteType($promoteType) {
         if (!array_key_exists($promoteType, $this->promoteTypes)) {
             $this->setData('ErrorMessage', T('No such groups listing.'));
         } else {
