@@ -528,6 +528,7 @@ class GroupController extends Gdn_Controller {
        $prefixes[] = 'icon_';
        $this->EventArguments['prefixes'] = &$prefixes;
        $this->fireEvent('beforeIconDisplay');
+       $oldIcon = false;
        foreach($prefixes as $prefix) {
            if (strpos($icon, $prefix) !== false) {
                $oldIcon = true;
@@ -545,6 +546,7 @@ class GroupController extends Gdn_Controller {
            $crop->setExistingCropUrl(Gdn_UploadImage::url($icon));
            $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($icon, "p%s")));
            $this->setData('crop', $crop);
+           $this->setData('icon', Gdn_UploadImage::url($icon));
        } elseif ($icon && $this->isUploadedGroupIcon($icon)) {
            // old icon, no crop set.
            $this->setData('icon', Gdn_UploadImage::url($icon));
