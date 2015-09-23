@@ -58,6 +58,9 @@
     float: left;
   }
 
+  .DataList .PhotoWrap {
+    float: left;
+  }
   // Warnings2 fix,
   .PhotoWrap {
     display: block;
@@ -152,4 +155,11 @@
 
 .Section-Members .DataList .Item .PhotoWrap {
   float: left;
+}
+
+// No site messages in groups
+.Section-Group {
+  .DismissMessage {
+    display: none;
+  }
 }

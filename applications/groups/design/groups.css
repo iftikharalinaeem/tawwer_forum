@@ -213,6 +213,8 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
   float: right; }
 .Group-Box .H {
   float: left; }
+.Group-Box .DataList .PhotoWrap {
+  float: left; }
 .Group-Box .PhotoWrap {
   display: block; }
 .Group-Box .PhotoGrid .PhotoWrap, .Group-Box .Group-Member.UserTile .PhotoWrap {
@@ -285,4 +287,7 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
 
 .Section-Members .DataList .Item .PhotoWrap {
   float: left; }
+
+.Section-Group .DismissMessage {
+  display: none; }
 /*# sourceMappingURL=groups.css.map */
