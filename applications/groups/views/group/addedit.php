@@ -45,11 +45,10 @@
          <?php
          $thumbnailSize = $this->data('thumbnailSize');
          $icon = $crop = false;
-         if ($crop = $this->data('crop')) {
+         if ($crop = $this->data('crop') && !isMobile()) {
              echo $this->Form->Label('Icon', 'Icon', array('class' => 'B'));
              echo $crop;
-         }
-         elseif ($icon = $this->data('icon')) {
+         } elseif ($icon = $this->data('icon')) {
              echo $this->Form->Label('Icon', 'Icon_New', array('class' => 'B'));  ?>
              <div class="icons">
                  <div class="Padded current-icon">
