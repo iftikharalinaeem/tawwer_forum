@@ -35,6 +35,10 @@ class ApplicantListModule extends Gdn_Module {
      * @var bool Whether to add the 'approve', 'deny' and 'remove' buttons to applicant items.
      */
     protected $withButtons;
+    /**
+     * @var bool Whether to show the applicant meta.
+     */
+    protected $showMeta;
 
     /**
      * Construct the ApplicantListModule object.
@@ -45,13 +49,16 @@ class ApplicantListModule extends Gdn_Module {
      * @param string $emptyMessage The message to display if there are no applicants.
      * @param string $layout The layout type, either 'modern' or 'table'.
      * @param bool $withButtons Whether to add the 'approve', 'deny' and 'remove' buttons to applicant items.
+     * @param bool $showMeta Whether to show the applicant meta.
      */
-    public function __construct($applicants, $group, $title = '', $emptyMessage = '', $layout = '', $withButtons = true) {
+    public function __construct($applicants, $group, $title = '', $emptyMessage = '', $layout = '', $withButtons = true, $showMeta = true) {
         $this->applicants = $applicants;
         $this->group = $group;
         $this->title = $title;
         $this->emptyMessage = $emptyMessage;
         $this->layout = $layout ?: c('Vanilla.Discussions.Layout', 'modern');
+        $this->withButtons = $withButtons;
+        $this->showMeta = $showMeta;
         $this->setView('applicantlist');
         $this->_ApplicationFolder = 'groups';
     }
@@ -96,11 +103,13 @@ class ApplicantListModule extends Gdn_Module {
      * @param string $title The applicant section title.
      * @param string $emptyMessage The message to display if there are no applicants.
      * @param bool $withButtons Whether to add the 'approve', 'deny' and 'remove' buttons to applicant items.
+     * @param bool $showMeta Whether to show the applicant meta.
      * @return array An applicant list data array.
      */
-    protected function getApplicantsInfo($layout, $applicants, $group, $title, $emptyMessage, $withButtons) {
+    protected function getApplicantsInfo($layout, $applicants, $group, $title, $emptyMessage, $withButtons, $showMeta) {
 
         $applicantList['layout'] = $layout;
+        $applicantList['showMeta'] = $showMeta;
         $applicantList['emptyMessage'] = $emptyMessage;
         $applicantList['title'] = $title;
         $applicantList['cssClass'] = 'ApplicantList';
@@ -108,8 +117,8 @@ class ApplicantListModule extends Gdn_Module {
         if ($layout == 'table') {
             $applicantList['columns'][0]['columnLabel'] = t('User');
             $applicantList['columns'][0]['columnCssClass'] = 'UserName';
-            $applicantList['columns'][2]['columnLabel'] = '';
-            $applicantList['columns'][2]['columnCssClass'] = 'Buttons';
+            $applicantList['columns'][1]['columnLabel'] = '';
+            $applicantList['columns'][1]['columnCssClass'] = 'Buttons';
         }
 
         foreach ($applicants as $applicant) {
@@ -192,7 +201,7 @@ class ApplicantListModule extends Gdn_Module {
         if (!$this->group) {
             return '';
         }
-        $this->applicants = $this->getApplicantsInfo($this->layout, $this->applicants, $this->group, $this->title, $this->emptyMessage, $this->withButtons);
+        $this->applicants = $this->getApplicantsInfo($this->layout, $this->applicants, $this->group, $this->title, $this->emptyMessage, $this->withButtons, $this->showMeta);
         $controller = new Gdn_Controller();
         $controller->setData('list', $this->applicants);
         if (GroupPermission('Leader', $this->group)) {
