@@ -45,7 +45,7 @@
          <?php
          $thumbnailSize = $this->data('thumbnailSize');
          $icon = $crop = false;
-         if ($crop = $this->data('crop') && !isMobile()) {
+         if (($crop = $this->data('crop')) && !isMobile()) {
              echo $this->Form->Label('Icon', 'Icon', array('class' => 'B'));
              echo $crop;
          } elseif ($icon = $this->data('icon')) {
