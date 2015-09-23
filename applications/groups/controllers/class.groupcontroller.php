@@ -525,10 +525,14 @@ class GroupController extends Gdn_Controller {
 
        // Uploaded icons used to be named 'icon_*' and only had one
        // image saved. This kludge checks to see if this is a new, cropped icon.
-       $prefix = 'icon_';
-       $this->EventArguments['prefix'] = &$prefix;
+       $prefixes[] = 'icon_';
+       $this->EventArguments['prefixes'] = &$prefixes;
        $this->fireEvent('beforeIconDisplay');
-       $oldIcon = strpos($icon, $prefix) !== false;
+       foreach($prefixes as $prefix) {
+           if (strpos($icon, $prefix) !== false) {
+               $oldIcon = true;
+           }
+       }
 
        if ($icon && $this->isUploadedGroupIcon($icon) && !$oldIcon) {
            //Get the image source so we can manipulate it in the crop module.
