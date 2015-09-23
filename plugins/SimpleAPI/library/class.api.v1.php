@@ -18,6 +18,7 @@ class ApiMapper extends SimpleApiMapper {
             'categories/edit'       => 'vanilla/settings/editcategory',
             'categories/delete'     => 'vanilla/settings/deletecategory',
             'categories/list'       => 'vanilla/categories/all',
+            'categories/get'        => 'vanilla/settings/getcategory',
 
             // Discussions
             'discussions/add'       => 'vanilla/post/discussion',
