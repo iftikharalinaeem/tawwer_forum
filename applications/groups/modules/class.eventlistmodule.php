@@ -275,10 +275,9 @@ class EventListModule extends Gdn_Module {
     public function toString() {
         if (!$this->events) {
             $controller = Gdn::controller();
-            $this->events = val('Events', $controller->Data);
-        }
-        if (!$this->events) {
-            return '';
+            if (val('Events', $controller->Data)) {
+                $this->events = val('Events', $controller->Data);
+            }
         }
         $this->events = $this->getEventsInfo($this->layout, $this->events, $this->title, $this->emptyMessage, $this->showMoreUrl, $this->newEventUrl);
         $controller = new Gdn_Controller();
