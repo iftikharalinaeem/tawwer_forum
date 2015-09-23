@@ -13,11 +13,11 @@ class GroupMetaModule extends Gdn_Module {
     /**
      * @var array The compiled meta for the group.
      */
-    private $meta;
+    protected $meta;
     /**
      * @var array The group the meta is associated with.
      */
-    private $group;
+    protected $group;
 
     /**
      * Construct the GroupMetaModule object.
@@ -25,7 +25,7 @@ class GroupMetaModule extends Gdn_Module {
      * @param array $group The group the meta is associated with.
      * @param string $cssClass The css class for the meta container.
      */
-    public function __construct($group, $cssClass = '') {
+    public function __construct($group = array(), $cssClass = '') {
         $this->meta['cssClass'] = $cssClass;
         $this->group = $group;
     }
@@ -36,7 +36,7 @@ class GroupMetaModule extends Gdn_Module {
      * @param array $group The group the meta is associated with.
      * @return array A meta items data array.
      */
-    private function getMetaInfo($group) {
+    protected function getMetaInfo($group) {
         $owner = Gdn::UserModel()->getID(val('InsertUserID', $group));
         $metaItems['owner']['text'] = t('Owner').': ';
         $metaItems['owner']['value'] = userAnchor($owner);
@@ -66,8 +66,16 @@ class GroupMetaModule extends Gdn_Module {
      * @return string HTML view
      */
     public function toString() {
-        $this->meta['metaItems'] = $this->getMetaInfo($this->group);
+        // Group not explicitly set, try to get from controller.
+        if (!$this->group) {
+            $controller = Gdn::controller();
+            $this->group = val('Group', $controller->Data);
+        }
+        if (!$this->group) {
+            return '';
+        }
         $controller = new Gdn_Controller();
+        $this->meta['metaItems'] = $this->getMetaInfo($this->group);
         $controller->setData('meta', $this->meta);
         return $controller->fetchView('groupmeta', 'modules', 'groups');
     }

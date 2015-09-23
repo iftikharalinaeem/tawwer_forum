@@ -20,7 +20,7 @@ $hasBanner = val('Banner', $this->group);
     </div>
   <?php } ?>
   <div class="Group-Header-Info">
-    <h1 class="Group-Title"><?php echo htmlspecialchars(val('Name', $this->group)); ?></h1>
+    <h1 class="Group-Title"><?php echo anchor(htmlspecialchars(val('Name', $this->group)), GroupUrl($this->group)); ?></h1>
     <?php
     if ($this->showDescription) { ?>
       <div class="Group-Description">

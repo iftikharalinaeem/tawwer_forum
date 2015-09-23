@@ -14,43 +14,43 @@ class EventListModule extends Gdn_Module {
     /**
      * @var array The events to render. (An array of event arrays.)
      */
-    private $events;
+    protected $events;
     /**
      * @var string The event section title (i.e., 'Upcoming Events').
      */
-    private $title;
+    protected $title;
     /**
      * @var string The message to display if there are no events.
      */
-    private $emptyMessage;
+    protected $emptyMessage;
     /**
      * @var string The layout type, either 'modern' or 'table'.
      */
-    private $layout;
+    protected $layout;
     /**
      * @var bool Whether to provide a link to see all of the events.
      */
-    private $showMore;
+    protected $showMore;
     /**
      * @var string The url for the 'show more' link.
      */
-    private $showMoreUrl = '';
+    protected $showMoreUrl = '';
     /**
      * @var bool Whether to show the 'New Event' button.
      */
-    private $addNewEventButton;
+    protected $addNewEventButton;
     /**
      * @var string The url for the 'New Event' button.
      */
-    private $newEventUrl = '';
+    protected $newEventUrl = '';
     /**
      * @var bool Whether to show the event's 'RSVP' dropdown.
      */
-    private $withJoinButtons;
+    protected $withJoinButtons;
     /**
      * @var bool Whether to show the event edit options.
      */
-    private $withOptions;
+    protected $withOptions;
 
     /**
      * Construct the EventListModule object.
@@ -64,7 +64,7 @@ class EventListModule extends Gdn_Module {
      * @internal param bool $showMore Whether to provide a link to see all of the events.
      * @internal param bool $withNewButton Whether to show the 'New Event' button.
      */
-    public function __construct($events, $title = '', $emptyMessage = '', $layout = '', $withJoinButtons = true, $withOptions = true) {
+    public function __construct($events = array(), $title = '', $emptyMessage = '', $layout = '', $withJoinButtons = true, $withOptions = true) {
         $this->events = $events;
         $this->title = $title;
         $this->emptyMessage = $emptyMessage;
@@ -81,7 +81,7 @@ class EventListModule extends Gdn_Module {
      * @param array $event The event to get options for.
      * @return array The event options.
      */
-    private function getEventOptions($event) {
+    protected function getEventOptions($event) {
         $options = array();
         if (EventPermission('Edit', $event)) {
             $options[] = array('Text' => sprintf(t('Edit %s'), t('Event')), 'Url' => EventUrl($event, 'edit'));
@@ -96,7 +96,7 @@ class EventListModule extends Gdn_Module {
      * @param array $event The event to get the dropdown menu for.
      * @return array The event's RSVP dropdown.
      */
-    private function getEventDropdown($event) {
+    protected function getEventDropdown($event) {
         if (EventPermission('Member', $event) && !EventModel::isEnded($event)) {
             $eventModel = new EventModel();
             $status = $eventModel->IsInvited(Gdn::session()->UserID, val('EventID', $event));
@@ -128,7 +128,7 @@ class EventListModule extends Gdn_Module {
      * @param string $url The url for the new event button.
      * @return array The buttons' data.
      */
-    private function getEventListButtons($url) {
+    protected function getEventListButtons($url) {
         $buttons = array();
         $newEventButton['text'] = t('New Event');
         $newEventButton['url'] = $url;
@@ -168,7 +168,7 @@ class EventListModule extends Gdn_Module {
      * @param string $newEventUrl The url for the new event button, if one exists.
      * @return array An event list data array.
      */
-    private function getEventsInfo($layout, $events, $heading, $emptyMessage, $showMoreUrl, $newEventUrl) {
+    protected function getEventsInfo($layout, $events, $heading, $emptyMessage, $showMoreUrl, $newEventUrl) {
 
         $eventList['layout'] = $layout;
         $eventList['emptyMessage'] = $emptyMessage;
@@ -210,7 +210,7 @@ class EventListModule extends Gdn_Module {
      * @param bool $withOptions Whether to show the event edit options.
      * @return array A data array representing an event item in an event list.
      */
-    private function getEventInfo($event, $layout, $withJoinButtons = true, $withOptions = true) {
+    protected function getEventInfo($event, $layout, $withJoinButtons = true, $withOptions = true) {
 
         $utc = new DateTimeZone('UTC');
         $dateStarts = new DateTime($event['DateStarts'], $utc);
@@ -253,7 +253,7 @@ class EventListModule extends Gdn_Module {
      * @param array $event The event array we're parsing.
      * @param DateTime $dateStarts The starting date of the event.
      */
-    private function getEventTableItem(&$item, $event, $dateStarts) {
+    protected function getEventTableItem(&$item, $event, $dateStarts) {
         $item['rows']['main']['type'] = 'main';
         $item['rows']['main']['cssClass'] = 'EventTitle';
 
@@ -273,6 +273,13 @@ class EventListModule extends Gdn_Module {
      * @return string HTML view
      */
     public function toString() {
+        if (!$this->events) {
+            $controller = Gdn::controller();
+            $this->events = val('Events', $controller->Data);
+        }
+        if (!$this->events) {
+            return '';
+        }
         $this->events = $this->getEventsInfo($this->layout, $this->events, $this->title, $this->emptyMessage, $this->showMoreUrl, $this->newEventUrl);
         $controller = new Gdn_Controller();
         $controller->setData('list', $this->events);

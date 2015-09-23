@@ -14,27 +14,27 @@ class ApplicantListModule extends Gdn_Module {
     /**
      * @var array The applicants to render.
      */
-    private $applicants;
+    protected $applicants;
     /**
      * @var array The group that the applicants are associated with.
      */
-    private $group;
+    protected $group;
     /**
      * @var string The applicant section title.
      */
-    private $title;
+    protected $title;
     /**
      * @var string The message to display if there are no applicants.
      */
-    private $emptyMessage;
+    protected $emptyMessage;
     /**
      * @var string The layout type, either 'modern' or 'table'.
      */
-    private $layout;
+    protected $layout;
     /**
      * @var bool Whether to add the 'approve', 'deny' and 'remove' buttons to applicant items.
      */
-    private $withButtons;
+    protected $withButtons;
 
     /**
      * Construct the ApplicantListModule object.
@@ -63,7 +63,7 @@ class ApplicantListModule extends Gdn_Module {
      * @param array $group The group that the applicant is associated with.
      * @return array The applicant buttons.
      */
-    private function getApplicantButtons($applicant, $group) {
+    protected function getApplicantButtons($applicant, $group) {
         $buttons = array();
         if (strtolower(val('Type', $applicant)) == 'application') {
             $approve['text'] = t('Approve');
@@ -98,7 +98,7 @@ class ApplicantListModule extends Gdn_Module {
      * @param bool $withButtons Whether to add the 'approve', 'deny' and 'remove' buttons to applicant items.
      * @return array An applicant list data array.
      */
-    private function getApplicantsInfo($layout, $applicants, $group, $title, $emptyMessage, $withButtons) {
+    protected function getApplicantsInfo($layout, $applicants, $group, $title, $emptyMessage, $withButtons) {
 
         $applicantList['layout'] = $layout;
         $applicantList['emptyMessage'] = $emptyMessage;
@@ -128,7 +128,7 @@ class ApplicantListModule extends Gdn_Module {
      * @param bool $withButtons Whether to add the 'approve', 'deny' and 'remove' buttons to applicant items.
      * @return array A data array representing an applicant item in an applicant list.
      */
-    private function getApplicantInfo($applicant, $group, $layout, $withButtons) {
+    protected function getApplicantInfo($applicant, $group, $layout, $withButtons) {
         $item['heading'] = Gdn_Format::text(val('Name', $applicant));
         $item['url'] = userUrl($applicant);
         $item['imageSource'] = userPhotoUrl($applicant);
@@ -167,7 +167,7 @@ class ApplicantListModule extends Gdn_Module {
      * @param array $applicant The applicant array we're parsing.
      * @param bool $withButtons Whether to add the 'approve', 'deny' and 'remove' buttons to applicant items.
      */
-    private function getApplicantTableItem(&$item, $applicant, $withButtons) {
+    protected function getApplicantTableItem(&$item, $applicant, $withButtons) {
         $item['rows']['main']['type'] = 'main';
         $item['rows']['main']['cssClass'] = 'UserName';
 
@@ -184,6 +184,14 @@ class ApplicantListModule extends Gdn_Module {
      * @return string HTML view
      */
     public function toString() {
+        // Group not explicitly set, try to get from controller.
+        if (!$this->group) {
+            $controller = Gdn::controller();
+            $this->group = val('Group', $controller->Data);
+        }
+        if (!$this->group) {
+            return '';
+        }
         $this->applicants = $this->getApplicantsInfo($this->layout, $this->applicants, $this->group, $this->title, $this->emptyMessage, $this->withButtons);
         $controller = new Gdn_Controller();
         $controller->setData('list', $this->applicants);
