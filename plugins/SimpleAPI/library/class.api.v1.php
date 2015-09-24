@@ -53,6 +53,8 @@ class ApiMapper extends SimpleApiMapper {
             'users/merge'           => 'dashboard/user/merge',
 
             // Roles
+            'roles/add'             => 'dashboard/role/add',
+            'roles/edit'            => 'dashboard/role/edit',
             'roles/list'            => 'dashboard/role',
             'roles/get'             => 'dashboard/role',
 
