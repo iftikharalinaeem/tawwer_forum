@@ -249,7 +249,6 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
     clear: both; }
 
 .Group-Icon {
-  float: left;
   max-width: 100px;
   max-height: 100px; }
 
@@ -258,11 +257,21 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
   height: 140px;
   max-width: 140px;
   max-height: 140px;
-  border: 3px solid #fff;
-  margin: 0 15px 15px 10px; }
+  border: 3px solid #fff; }
 
-.HasBanner .Group-Icon-Big {
-  margin-top: -40px; }
+.HasBanner .Group-Icon-Big-Wrap {
+  float: left;
+  width: 140px;
+  height: 140px;
+  top: -40px;
+  margin: 0 15px 15px 10px; }
+  .HasBanner .Group-Icon-Big-Wrap .ChangePicture {
+    top: 0;
+    height: 60px;
+    padding: 25px 0;
+    background: rgba(0, 0, 0, 0.375);
+    color: #fff;
+    font-size: 13px; }
 
 .Group-Title {
   margin-bottom: 10px;

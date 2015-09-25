@@ -40,6 +40,9 @@ function getGroupOptions($group, $sectionId = 'home') {
     if (GroupPermission('Leader', $group)) {
         $options['Invite'] = array('Text' => t('Invite Members'), 'Url' => GroupUrl($group, 'invite'), 'CssClass' => 'Popup');
     }
+    if (GroupPermission('Leader', $group)) {
+        $options['Members'] = array('Text' => t('Manage Members'), 'Url' => GroupUrl($group, 'members'));
+    }
     return $options;
 }
 endif;
@@ -315,7 +318,7 @@ if (!function_exists('WriteGroupIcon')) :
  *
  * @param array $Group Optional. Uses data array's Group if none is provided.
  */
-function WriteGroupIcon($group = FALSE, $class = 'Group-Icon') {
+function WriteGroupIcon($group = FALSE, $class = 'Group-Icon', $addChangeIconLink = false) {
    if (!$group) {
        $group = Gdn::Controller()->Data('Group');
    }
@@ -325,7 +328,13 @@ function WriteGroupIcon($group = FALSE, $class = 'Group-Icon') {
        $icon = c('Groups.DefaultIcon', '');
    }
    if ($icon) {
-       echo img(Gdn_Upload::Url($icon), array('class' => $class));
+       $output = '';
+       if ($addChangeIconLink && GroupPermission('Edit', val('GroupID', $group))) {
+           $output = anchor(t('Change Icon'), GroupUrl($group, 'groupicon'), 'ChangePicture');
+       }
+       $output .= img(Gdn_Upload::Url($icon), array('class' => $class));
+
+       echo wrap($output, 'div', array('class' => 'Photo PhotoWrap PhotoWrapLarge Group-Icon-Big-Wrap'));
    }
 }
 endif;
@@ -360,7 +369,7 @@ function WriteMemberGrid($Members, $More = '') {
    if (is_array($Members)) {
       echo '<div class="PhotoGrid PhotoGridSmall">';
       foreach ($Members as $Member) {
-          echo UserPhoto($Member);
+          echo UserPhoto($Member, val('Role', $Member));
       }
       if ($More) {
 

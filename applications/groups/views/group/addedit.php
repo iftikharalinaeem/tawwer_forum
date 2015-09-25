@@ -58,7 +58,7 @@
          <?php } ?>
           <?php
           if ($icon || $crop) {
-              echo wrap(anchor(t('Remove Icon'), '/group/removegroupicon/'.val('GroupID', $this->data('Group')).'/'.Gdn::session()->transientKey(), 'Button StructuredForm P'), 'div');
+              echo wrap(anchor(t('Remove Icon'), '/group/removegroupicon/'.val('GroupID', $this->data('Group')).'/'.Gdn::session()->transientKey().'/edit', 'Button StructuredForm P'), 'div');
               echo $this->Form->Label('New Icon', 'Icon_New', array('class' => 'B'));
           } else {
               echo $this->Form->Label('Icon', 'Icon_New', array('class' => 'B'));
