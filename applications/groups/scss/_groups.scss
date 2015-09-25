@@ -199,3 +199,9 @@
     display: none;
   }
 }
+
+.Section-Post.Groups.edit {
+  input[value="Save Thumbnail"] {
+    display: none !important;
+  }
+}

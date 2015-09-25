@@ -309,4 +309,7 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
 
 .Section-Group .DismissMessage {
   display: none; }
+
+.Section-Post.Groups.edit input[value="Save Thumbnail"] {
+  display: none !important; }
 /*# sourceMappingURL=groups.css.map */
