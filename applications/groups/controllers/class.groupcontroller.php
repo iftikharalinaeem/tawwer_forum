@@ -623,7 +623,8 @@ class GroupController extends Gdn_Controller {
          }
          if ($GroupID) {
             $Group = $this->GroupModel->GetID($GroupID);
-	          Redirect(GroupUrl($Group));
+            $this->informMessage(t("Your settings have been saved."));
+//            Redirect(GroupUrl($Group, 'edit'));
          } else {
             Trace($Form->FormValues());
          }
