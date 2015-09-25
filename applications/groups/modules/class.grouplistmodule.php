@@ -163,19 +163,15 @@ class GroupListModule extends Gdn_Module {
         $item['meta']['countDiscussionsNumber']['count'] = val('CountDiscussions', $group);
         $item['meta']['countDiscussionsNumber']['cssClass'] = 'Hidden MemberCountNumber Number MItem-Count';
 
-        if ($attachDiscussionData) {
+        $groupModel = new GroupModel();
+        if ($attachDiscussionData && $groupModel->CheckPermission('View', val('GroupID', $group))) {
             $this->attachDiscussions = true;
-            $groupModel = new GroupModel();
-            if ($groupModel->CheckPermission('View', val('GroupID', $group))) {
-                $item['meta']['lastDiscussion']['text'] = t('Most recent discussion:') . ' ';
-                $item['meta']['lastDiscussion']['linkText'] = htmlspecialchars(sliceString(Gdn_Format::text(val('LastTitle', $group)), 100));
-                $item['meta']['lastDiscussion']['url'] = url(val('LastUrl', $group));
-            }
-
+            $item['meta']['lastDiscussion']['text'] = t('Most recent discussion:') . ' ';
+            $item['meta']['lastDiscussion']['linkText'] = htmlspecialchars(sliceString(Gdn_Format::text(val('LastTitle', $group)), 100));
+            $item['meta']['lastDiscussion']['url'] = url(val('LastUrl', $group));
             $item['meta']['lastUser']['text'] = t('by') . ' ';
             $item['meta']['lastUser']['linkText'] = val('LastName', $group);
             $item['meta']['lastUser']['url'] = userUrl($group, 'Last');
-
             $item['meta']['lastDate']['text'] = Gdn_Format::date(val('LastDateInserted', $group));
         }
 
@@ -211,7 +207,8 @@ class GroupListModule extends Gdn_Module {
         $item['rows']['countDiscussions']['cssClass'] = 'CountDiscussions';
 
         $attachDiscussionData = val('LastTitle', $group);
-        if ($attachDiscussionData) {
+        $groupModel = new GroupModel();
+        if ($attachDiscussionData && $groupModel->CheckPermission('View', val('GroupID', $group))) {
             $item['rows']['lastPost']['type'] = 'lastPost';
             $item['rows']['lastPost']['title'] = val('LastTitle', $group);
             $item['rows']['lastPost']['url'] = val('LastUrl', $group);

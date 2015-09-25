@@ -16,7 +16,8 @@ class GroupMembersModule extends Gdn_Module {
         $GroupModel = new GroupModel();
         $Group = $GroupModel->GetID($GroupID);
         $Members = $GroupModel->GetMembers($GroupID, array('Role' => 'Member'), 30);
-
+        $Leaders = $GroupModel->GetMembers($GroupID, array('Role' => 'Leader'), 30);
+        $Members = array_merge($Leaders, $Members);
         ob_start();
         ?>
 

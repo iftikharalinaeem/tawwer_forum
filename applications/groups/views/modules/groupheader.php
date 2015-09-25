@@ -4,7 +4,7 @@ $hasBanner = val('Banner', $this->group);
 <div class="Group-Header<?php echo $hasBanner ? ' HasBanner' : ' NoBanner'; ?>">
   <?php
   writeGroupBanner($this->group);
-  WriteGroupIcon($this->group, 'Group-Icon Group-Icon-Big');
+  WriteGroupIcon($this->group, 'Group-Icon Group-Icon-Big', true);
   if ($this->showOptions && $options = getGroupOptions($this->group)) {
     writeGroupOptionsButton($options);
   }

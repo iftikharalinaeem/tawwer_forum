@@ -267,6 +267,22 @@ class GroupModel extends Gdn_Model {
       return $Users;
    }
 
+    public function GetApplicantIds($GroupID, $Where = array(), $Limit = FALSE, $Offset = FALSE) {
+        // First grab the members.
+        $users = $this->SQL
+          ->From('GroupApplicant')
+          ->Where('GroupID', $GroupID)
+          ->Where($Where)
+          ->OrderBy('DateInserted')
+          ->Limit($Limit, $Offset)
+          ->Get()->ResultArray();
+
+        $ids = array();
+        foreach ($users as $user) {
+            $ids[] = val('UserID', $user);
+        }
+        return $ids;    }
+
    public function GetMembers($GroupID, $Where = array(), $Limit = FALSE, $Offset = FALSE) {
       // First grab the members.
       $Users = $this->SQL
@@ -280,6 +296,23 @@ class GroupModel extends Gdn_Model {
       Gdn::UserModel()->JoinUsers($Users, array('UserID'));
       return $Users;
    }
+
+    public function GetMemberIds($GroupID, $Where = array(), $Limit = FALSE, $Offset = FALSE) {
+        // First grab the members.
+        $users = $this->SQL
+          ->From('UserGroup')
+          ->Where('GroupID', $GroupID)
+          ->Where($Where)
+          ->OrderBy('DateInserted')
+          ->Limit($Limit, $Offset)
+          ->Get()->ResultArray();
+
+        $ids = array();
+        foreach ($users as $user) {
+            $ids[] = val('UserID', $user);
+        }
+        return $ids;
+    }
 
    public function GetUserCount($UserID) {
       $Count = $this->SQL
