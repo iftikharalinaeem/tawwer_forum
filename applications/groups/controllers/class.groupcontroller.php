@@ -244,13 +244,26 @@ class GroupController extends Gdn_Controller {
          $Data['GroupID'] = $Group['GroupID'];
          $Recipients = explode(',', $Data['Recipients']);
          $UserIDs = array();
+         $memberIds = $this->GroupModel->getMemberIds(val('GroupID', $Group));
+         $applicantIds = $this->GroupModel->getApplicantIds(val('GroupID', $Group));
          foreach ($Recipients as $Recipient) {
-            $UserIDs[] = GetValue('UserID', Gdn::UserModel()->GetByUsername($Recipient));
+            $userId = GetValue('UserID', Gdn::UserModel()->GetByUsername($Recipient));
+            if (in_array($userId, $memberIds)) {
+               $this->InformMessage(t(sprintf("%s is already a member.", $Recipient)));
+            } elseif (in_array($userId, $applicantIds)) {
+              $this->InformMessage(t(sprintf("%s is already an applicant.", $Recipient)));
+            } else {
+               $UserIDs[] = $userId;
+            }
          }
-         $Data['UserID'] = $UserIDs;
-         $Saved = $this->GroupModel->Invite($Data);
-
-         $Form->SetValidationResults($this->GroupModel->ValidationResults());
+         if ($UserIDs) {
+            $Data['UserID'] = $UserIDs;
+            $Saved = $this->GroupModel->Invite($Data);
+            if ($Saved) {
+               $this->InformMessage(t('Invitation sent.'));
+               $Form->SetValidationResults($this->GroupModel->ValidationResults());
+            }
+         }
       }
 
       $this->SetData('Group', $Group);
@@ -476,7 +489,7 @@ class GroupController extends Gdn_Controller {
                 array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
             );
 
-            $thumbnailSize = c('Groups.IconSize', 120);
+            $thumbnailSize = c('Groups.IconSize', 140);
             // Save the thumbnail size image.
             $parts = Gdn_UploadImage::saveImageAs(
                 $source,
@@ -520,7 +533,7 @@ class GroupController extends Gdn_Controller {
 
        //Get the image source so we can manipulate it in the crop module.
        $upload = new Gdn_UploadImage();
-       $thumbnailSize = c('Groups.IconSize', 120);
+       $thumbnailSize = c('Groups.IconSize', 140);
        $this->setData('thumbnailSize', $thumbnailSize);
 
        // Uploaded icons used to be named 'icon_*' and only had one
@@ -610,7 +623,7 @@ class GroupController extends Gdn_Controller {
          }
          if ($GroupID) {
             $Group = $this->GroupModel->GetID($GroupID);
-	        Redirect(GroupUrl($Group));
+	          Redirect(GroupUrl($Group));
          } else {
             Trace($Form->FormValues());
          }
@@ -659,7 +672,7 @@ class GroupController extends Gdn_Controller {
             $this->SetData('Group', $group);
             $this->AddBreadcrumb($group['Name'], GroupUrl($group));
         }
-        $thumbnailSize = c('Groups.IconSize', 120);
+        $thumbnailSize = c('Groups.IconSize', 140);
         $this->setData('thumbnailSize', $thumbnailSize);
         $icon = val('Icon', $group);
 
@@ -689,6 +702,7 @@ class GroupController extends Gdn_Controller {
         if (!$form->authenticatedPostBack()) {
 //            $form->setData($this->GroupModel->Data);
         } else {
+            $target = null; // redirect to group home
             $form->setData($group);
             $upload = new Gdn_UploadImage();
             $newIcon = false;
@@ -697,6 +711,7 @@ class GroupController extends Gdn_Controller {
                 $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
                 $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
                 $form->SetFormValue('Icon', $newIcon);
+                $target = 'groupicon'; // redirect to groupicon page so user can set thumbnail
             } else if ($icon && $crop && $crop->isCropped()) {
                 // New thumbnail
                 $tmpIcon = $source;
@@ -724,9 +739,11 @@ class GroupController extends Gdn_Controller {
                         $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($icon, "p%s")));
                         $this->setData('crop', $crop);
                     }
+                    $this->informMessage(t("Your settings have been saved."));
+                    Redirect(GroupUrl($group, $target));
                 }
             }
-            $this->informMessage(t("Your settings have been saved."));
+//            $this->informMessage(t("Your settings have been saved."));
         }
         $this->Form = $form;
         $this->render();
@@ -739,7 +756,7 @@ class GroupController extends Gdn_Controller {
      * @access public
      * @param string $transientKey Security token.
      */
-    public function removeGroupIcon($id, $transientKey = '') {
+    public function removeGroupIcon($id, $transientKey = '', $target = 'groupicon') {
         $session = Gdn::session();
         $group = $this->GroupModel->GetID($id);
         if ($session->validateTransientKey($transientKey) && $this->GroupModel->CheckPermission('Edit', $group)) {
@@ -747,7 +764,7 @@ class GroupController extends Gdn_Controller {
             $this->GroupModel->setField($id, 'Icon', null);
             $this->deleteGroupIcons($icon);
         }
-        redirectUrl(GroupUrl($group, 'edit'));
+        redirectUrl(GroupUrl($group, $target));
     }
 
     /**
