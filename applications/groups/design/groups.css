@@ -262,26 +262,13 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
   box-sizing: border-box; }
 
 .Group-Icon-Big-Wrap {
+  position: relative;
   float: left;
   width: 140px;
-  height: 140px;
   top: -40px;
-  margin: 0 15px 15px 10px;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box; }
+  margin: 0 15px 15px 10px; }
   .Group-Icon-Big-Wrap .ChangePicture {
-    display: block;
-    bottom: 0;
-    padding-left: 10px;
-    z-index: 3;
-    transition: background 300ms;
-    font-size: 13px;
-    color: transparent;
-    background: 0;
-    text-align: left;
-    vertical-align: middle;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box; }
+    color: white; }
     .Group-Icon-Big-Wrap .ChangePicture .icon {
       display: inline-block;
       vertical-align: middle;
@@ -290,7 +277,6 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
       color: #fff;
       margin-right: 10px; }
     .Group-Icon-Big-Wrap .ChangePicture:hover {
-      background: rgba(0, 0, 0, 0.5);
       color: white; }
 
 .NoBanner .Group-Icon-Big-Wrap {
