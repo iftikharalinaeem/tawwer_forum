@@ -160,7 +160,7 @@ class ApplicantListModule extends Gdn_Module {
         $item['textCssClass'] = 'ApplicantReason';
 
         if ($layout == 'table') {
-            $this->getApplicantTableItem($item, $applicant, $withButtons);
+            $this->getApplicantTableItem($item, $applicant, $group, $withButtons);
         } elseif ($withButtons) {
             $item['buttons'] = $this->getApplicantButtons($applicant, $group);
         }
@@ -176,13 +176,13 @@ class ApplicantListModule extends Gdn_Module {
      * @param array $applicant The applicant array we're parsing.
      * @param bool $withButtons Whether to add the 'approve', 'deny' and 'remove' buttons to applicant items.
      */
-    protected function getApplicantTableItem(&$item, $applicant, $withButtons) {
+    protected function getApplicantTableItem(&$item, $applicant, $group, $withButtons) {
         $item['rows']['main']['type'] = 'main';
         $item['rows']['main']['cssClass'] = 'UserName';
 
         if ($withButtons) {
             $item['rows']['buttons']['type'] = 'buttons';
-            $item['rows']['buttons']['buttons'] = $this->getApplicantButtons($applicant, $item);
+            $item['rows']['buttons']['buttons'] = $this->getApplicantButtons($applicant, $group);
             $item['rows']['buttons']['cssClass'] = 'pull-right';
         }
     }
