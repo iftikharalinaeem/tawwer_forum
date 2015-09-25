@@ -210,6 +210,12 @@ class Salesforce {
       );
       $MissingFields = array_diff_key($RequiredFields, $Lead);
       if (!empty($MissingFields)) {
+         Logger::event(
+             'salesforce_failure',
+             Logger::ERROR,
+             'Failed to validate lead ',
+             $MissingFields
+         );
          return $MissingFields;
       }
       return TRUE;
@@ -244,6 +250,12 @@ class Salesforce {
       );
       $MissingFields = array_diff_key($RequiredFields, $Contact);
       if (!empty($MissingFields)) {
+         Logger::event(
+             'salesforce_failure',
+             Logger::ERROR,
+             'Failed to validate contact ',
+             $MissingFields
+         );
          return $MissingFields;
       }
       return TRUE;
@@ -282,6 +294,12 @@ class Salesforce {
       );
       $MissingFields = array_diff_key($RequiredFields, $Case);
       if (!empty($MissingFields)) {
+         Logger::event(
+             'salesforce_failure',
+             Logger::ERROR,
+             'Failed to validate case ',
+             $MissingFields
+         );
          return $MissingFields;
       }
       return TRUE;
