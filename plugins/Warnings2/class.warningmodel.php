@@ -131,6 +131,7 @@ class WarningModel extends UserNoteModel {
         if (!$alert) {
             return;
         }
+        unset($alert['DateInserted']); // not updating this column
 
         $now = time();
 
@@ -154,8 +155,8 @@ class WarningModel extends UserNoteModel {
 
         $punished = 0;
         if (!$banned && $warningLevel >= 3) {
-          // The user is punished (jailed).
-          $punished = 1;
+            // The user is punished (jailed).
+            $punished = 1;
         }
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
@@ -231,6 +232,7 @@ class WarningModel extends UserNoteModel {
         $alertModel = new UserAlertModel();
         $alert = $alertModel->getID($warning['UserID']);
         if ($alert) {
+            unset($alert['DateInserted']);
             $newWarningLevel = $alert['WarningLevel'] - $points;
             if ($newWarningLevel < 0) {
                 $newWarningLevel = 0;
@@ -350,6 +352,8 @@ class WarningModel extends UserNoteModel {
         $alert = $alertModel->getID($userID);
         if (!$alert) {
             $alert = array('UserID' => $userID);
+        } else {
+            unset($alert['DateInserted']);
         }
 
         if ($data['Points']) {

@@ -3,7 +3,7 @@
 $ThemeInfo['bootstrap3'] = array(
   'Name'        => 'Bootstrap 3',
   'Description' => "Bootstrap for Vanilla has been rewritten from scratch on top of <a href='http://getbootstrap.com'>Bootstrap 3</a> in this second installation of the most popular theme for Vanilla Forums. Kickstart your community with a fresh and solid theme that is ready to be customized to your heart's desires.",
-  'Version'     => '2.3.2',
+  'Version'     => '2.5.2',
   'Url'         => 'https://github.com/kasperisager/vanilla-bootstrap',
   'Author'      => 'Kasper Kronborg Isager',
   'AuthorEmail' => 'kasperisager@gmail.com',
@@ -15,7 +15,6 @@ $ThemeInfo['bootstrap3'] = array(
     'Styles' => array(
       'Default'   => '%s_default',
       'Bootstrap' => '%s_bootstrap',
-      'Amelia'    => '%s_amelia',
       'Cerulean'  => '%s_cerulean',
       'Cosmo'     => '%s_cosmo',
       'Cyborg'    => '%s_cyborg',
@@ -23,7 +22,9 @@ $ThemeInfo['bootstrap3'] = array(
       'Flatly'    => '%s_flatly',
       'Journal'   => '%s_journal',
       'Lumen'     => '%s_lumen',
+      'Paper'     => '%s_paper',
       'Readable'  => '%s_readable',
+      'Sandstone' => '%s_sandstone',
       'Simplex'   => '%s_simplex',
       'Slate'     => '%s_slate',
       'Spacelab'  => '%s_spacelab',

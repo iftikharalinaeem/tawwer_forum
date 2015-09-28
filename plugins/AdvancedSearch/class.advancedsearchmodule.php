@@ -44,15 +44,15 @@ class AdvancedSearchModule extends Gdn_Module {
       }
    }
 
-   public static function AddAssets() {
-      Gdn::Controller()->AddJsFile('jquery.tokeninput.js');
-      Gdn::Controller()->AddJsFile('jquery-ui.js');
-      Gdn::Controller()->AddJsFile('advanced-search.js', 'plugins/AdvancedSearch');
-      Gdn::Controller()->AddDefinition('TagHint', "Start to type...");
-      Gdn::Controller()->AddDefinition('TagSearching', "Searching...");
+   public static function addAssets() {
+      Gdn::Controller()->addJsFile('jquery.tokeninput.js');
+      Gdn::Controller()->addJsFile('jquery-ui.js');
+      Gdn::Controller()->addJsFile('advanced-search.js', 'plugins/AdvancedSearch');
+      Gdn::Controller()->addDefinition('TagHint', "Start to type...");
+      Gdn::Controller()->addDefinition('TagSearching', "Searching...");
    }
 
-   public function ToString() {
+   public function toString() {
       if ($this->IncludeTags === NULL) {
          $this->IncludeTags = Gdn::PluginManager()->IsEnabled('Tagging') && Gdn::PluginManager()->IsEnabled('Sphinx');
       }
@@ -63,10 +63,10 @@ class AdvancedSearchModule extends Gdn_Module {
       $Get = array_change_key_case(Gdn::Request()->Get());
 
       if ($this->Results) {
-         $Form->FormValues($Get);
+         $Form->formValues($Get);
       } else {
          if ($this->value !== null && !isset($Get['search']))
-            $Form->SetFormValue('search', $value);
+            $Form->setFormValue('search', $value);
       }
 
       // Add the tags as data.
@@ -82,17 +82,17 @@ class AdvancedSearchModule extends Gdn_Module {
       // See whether or not to check all of the  types.
       $onechecked = false;
       foreach ($this->Types as $name => $label) {
-         if ($Form->GetFormValue($name)) {
+         if ($Form->getFormValue($name)) {
             $onechecked = true;
             break;
          }
       }
       if (!$onechecked) {
          foreach ($this->Types as $name => $label) {
-            $Form->SetFormValue($name, true);
+            $Form->setFormValue($name, true);
          }
       }
 
-      return parent::ToString();
+      return parent::toString();
    }
 }

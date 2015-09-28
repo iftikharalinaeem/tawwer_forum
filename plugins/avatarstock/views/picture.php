@@ -26,7 +26,7 @@ if ($this->User->Photo != '') {
 // Only admins and users with the custom permission can upload their own avatar.
 $customAvatarUploadAllowed = false;
 if (CheckPermission('Garden.Settings.Manage')
-|| CheckPermission('AvatarStock.CustomUpload.Allow')) {
+|| CheckPermission('AvatarPool.CustomUpload.Allow')) {
     $customAvatarUploadAllowed = true;
 }
 

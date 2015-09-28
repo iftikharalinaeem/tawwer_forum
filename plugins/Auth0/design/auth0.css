@@ -1,0 +1,12 @@
+.SocialIcon-Auth0, .SocialIcon-Auth0.HasText .Icon {
+    background-color: #eb5424;
+}
+
+.SocialIcon-Auth0:hover {
+    background-color: #D93907;
+}
+.SocialIcon.SocialIcon-Auth0 .Icon {
+    background-image: url('auth0-logo.png');
+    background-size: 16px;
+    background-position: center;
+}
