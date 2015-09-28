@@ -25,7 +25,7 @@ class Search {
         $search = array_filter($search, function ($v) {
             return $v !== '';
         });
-        TouchValue('dosearch', $search, true);
+        $doSearch = false;
 
         /// Author ///
         if (isset($search['author'])) {
@@ -39,16 +39,19 @@ class Search {
                 $search['dosearch'] = FALSE;
             }
 
-            if (!empty($Users))
+            if (!empty($Users)) {
                 $search['users'] = $Users;
+                $doSearch = true;
+            }
         }
 
         /// Category ///
         $CategoryFilter = array();
         $Archived = GetValue('archived', $search, 0);
         $CategoryID = GetValue('cat', $search);
-        if (strcasecmp($CategoryID, 'all') === 0)
+        if (strcasecmp($CategoryID, 'all') === 0) {
             $CategoryID = null;
+        }
 
         if (!$CategoryID) {
             switch ($Archived) {
@@ -73,7 +76,7 @@ class Search {
         if ($CategoryID) {
             TouchValue('subcats', $search, 0);
             if ($search['subcats']) {
-                $CategoryID = ConsolidateArrayValuesByKey(CategoryModel::GetSubtree($CategoryID), 'CategoryID');
+                $CategoryID = array_column(CategoryModel::GetSubtree($CategoryID), 'CategoryID');
                 Trace($CategoryID, 'cats');
             }
 
@@ -81,9 +84,9 @@ class Search {
 
             if (empty($CategoryID)) {
                 $search['cat'] = FALSE;
-                $search['dosearch'] = FALSE;
             } else {
                 $search['cat'] = $CategoryID;
+                $doSearch = true;
             }
         } else {
             $search['cat'] = $Categories;
@@ -117,6 +120,7 @@ class Search {
 
         /// Tags ///
         if (isset($search['tags'])) {
+            $doSearch = true;
             $Tags = explode(',', $search['tags']);
             $Tags = array_map('trim', $Tags);
             $Tags = array_filter($Tags);
@@ -124,13 +128,13 @@ class Search {
             $TagData = Gdn::SQL()->Select('TagID, Name')->From('Tag')->Where('Name', $Tags)->Get()->ResultArray();
             if (count($Tags) == 1 && empty($TagData)) {
                 // Searching for one tag that doesn't exist.
-                $search['dosearch'] = FALSE;
+                $doSearch = false;
                 unset($search['tags']);
             }
 
             if (GetValue('tags-op', $Tags) === 'and' && count($Tags) > count($TagData)) {
                 // We are searching for all tags, but some of the tags don't exist.
-                $search['dosearch'] = FALSE;
+                $doSearch = false;
             }
 
             if (!empty($TagData)) {
@@ -181,18 +185,27 @@ class Search {
             $group = true;
 
             // Check to see if we should group.
-            if (isset($search['discussionid']))
+            if (isset($search['discussionid'])) {
                 $group = false; // searching within a discussion
-            elseif (isset($search['types']) && !isset($search['types']['comment']))
+            } elseif (isset($search['types']) && !isset($search['types']['comment'])) {
                 $group = false; // not search comments
+            }
 
             $search['group'] = $group;
         } else {
             $search['group'] = false;
         }
 
-        if (isset($search['discussionid']))
+        if (!empty($search['search']) || !empty($search['title'])) {
+            $doSearch = true;
+        }
+
+        if (isset($search['discussionid'])) {
+            $doSearch = true;
             unset($search['title']);
+        }
+
+        $search['dosearch'] = $doSearch;
 
         Trace($search, 'calc search');
         return $search;
