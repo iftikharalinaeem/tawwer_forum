@@ -330,7 +330,8 @@ function WriteGroupIcon($group = FALSE, $class = 'Group-Icon', $addChangeIconLin
    if ($icon) {
        $output = '';
        if ($addChangeIconLink && GroupPermission('Edit', val('GroupID', $group))) {
-           $output = anchor(t('Change Icon'), GroupUrl($group, 'groupicon'), 'ChangePicture');
+           $output .= '';
+           $output .= anchor('<span class="icon icon-camera"></span>'.t('Change Icon'), GroupUrl($group, 'groupicon'), 'ChangePicture');
        }
        $output .= img(Gdn_Upload::Url($icon), array('class' => $class));
 

@@ -623,7 +623,7 @@ class GroupController extends Gdn_Controller {
          }
          if ($GroupID) {
             $Group = $this->GroupModel->GetID($GroupID);
-	          Redirect(GroupUrl($Group));
+            Redirect(GroupUrl($Group));
          } else {
             Trace($Form->FormValues());
          }

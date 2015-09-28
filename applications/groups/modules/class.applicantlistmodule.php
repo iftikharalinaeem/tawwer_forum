@@ -143,6 +143,7 @@ class ApplicantListModule extends Gdn_Module {
         $item['imageSource'] = userPhotoUrl($applicant);
         $item['imageUrl'] = userUrl($applicant);
         $item['cssClass'] = val('Type', $applicant);
+        $item['id'] = 'GroupApplicant_'.val('UserID', $applicant);
 
         if (class_exists('RankModel')) {
             $userModel = new UserModel();

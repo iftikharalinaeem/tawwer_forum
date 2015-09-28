@@ -257,21 +257,31 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
   height: 140px;
   max-width: 140px;
   max-height: 140px;
-  border: 3px solid #fff; }
+  border: 3px solid #fff;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
 
-.HasBanner .Group-Icon-Big-Wrap {
+.Group-Icon-Big-Wrap {
+  position: relative;
   float: left;
   width: 140px;
-  height: 140px;
   top: -40px;
   margin: 0 15px 15px 10px; }
-  .HasBanner .Group-Icon-Big-Wrap .ChangePicture {
-    top: 0;
-    height: 60px;
-    padding: 25px 0;
-    background: rgba(0, 0, 0, 0.375);
-    color: #fff;
-    font-size: 13px; }
+  .Group-Icon-Big-Wrap .ChangePicture {
+    color: white; }
+    .Group-Icon-Big-Wrap .ChangePicture .icon {
+      display: inline-block;
+      vertical-align: middle;
+      padding-bottom: 2px;
+      font-size: 20px;
+      color: #fff;
+      margin-right: 10px; }
+    .Group-Icon-Big-Wrap .ChangePicture:hover {
+      color: white; }
+
+.NoBanner .Group-Icon-Big-Wrap {
+  top: 0;
+  margin-left: 0; }
 
 .Group-Title {
   margin-bottom: 10px;
@@ -299,4 +309,7 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
 
 .Section-Group .DismissMessage {
   display: none; }
+
+.Section-Post.Groups.edit input[value="Save Thumbnail"] {
+  display: none !important; }
 /*# sourceMappingURL=groups.css.map */

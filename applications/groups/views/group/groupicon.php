@@ -16,12 +16,15 @@ elseif ($icon = $this->data('icon')) { ?>
         </div>
     </div>
 <?php } ?>
-<div class="js-new-group-icon Button" style="margin-bottom: 20px;">Upload New Icon</div>
+<div class="ButtonGroup">
+<div class="js-new-group-icon Button ButtonGroup">Upload New Icon</div>
 <?php
 echo $this->Form->input('Icon', 'file', array('class' => 'js-new-group-icon-upload Hidden'));
 if ($icon || $crop) {
-    echo wrap(anchor(t('Remove Group Icon'), '/group/removegroupicon/'.val('GroupID', $this->data('Group')).'/'.Gdn::session()->transientKey(), 'Button'), 'div');
+    echo anchor(t('Remove Group Icon'), '/group/removegroupicon/'.val('GroupID', $this->data('Group')).'/'.Gdn::session()->transientKey(), 'Button ButtonGroup');
 }
 ?>
-<?php echo $this->Form->close(); ?>
+<?php echo $this->Form->close();
+echo anchor(t('Return to group'), GroupUrl($this->data('Group')), 'Button ButtonGroup');
+echo '</div>';
 

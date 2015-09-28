@@ -162,6 +162,7 @@ class MemberListModule extends Gdn_Module {
         $item['imageSource'] = userPhotoUrl($member);
         $item['imageUrl'] = userUrl($member);
         $item['metaCssClass'] = '';
+        $item['id'] = 'Member_'.val('UserID', $member);
 
         $item['meta']['joinDate']['text'] = sprintf(T('Joined %s', 'Joined %s'), Gdn_Format::date(val('DateInserted', $member), 'html'));
         $item['meta']['joinDate']['cssClass'] = 'JoinDate';
