@@ -484,8 +484,8 @@ class GroupController extends Gdn_Controller {
             Gdn_UploadImage::saveImageAs(
                 $source,
                 self::GROUP_ICON_FOLDER."/p$imageBaseName",
-                c('Garden.Profile.MaxHeight', 1000),
-                c('Garden.Profile.MaxWidth', 250),
+                c('Groups.Profile.MaxHeight', 1000),
+                c('Groups.Profile.MaxWidth', 550),
                 array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
             );
 

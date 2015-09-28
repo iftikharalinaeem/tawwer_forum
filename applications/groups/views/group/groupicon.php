@@ -2,6 +2,7 @@
 <h1><?php echo t('Group Icon'); ?></h1>
 <?php
 $thumbnailSize = $this->data('thumbnailSize');
+$icon = $crop = '';
 echo $this->Form->open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->errors();
 ?>
