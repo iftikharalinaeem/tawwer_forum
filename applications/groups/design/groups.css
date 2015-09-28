@@ -266,9 +266,14 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
   float: left;
   width: 140px;
   top: -40px;
-  margin: 0 15px 15px 10px; }
+  margin: 0 15px 15px 10px;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
   .Group-Icon-Big-Wrap .ChangePicture {
-    color: white; }
+    z-index: 3;
+    color: white;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; }
     .Group-Icon-Big-Wrap .ChangePicture .icon {
       display: inline-block;
       vertical-align: middle;
