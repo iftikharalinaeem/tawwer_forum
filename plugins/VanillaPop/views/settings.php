@@ -3,7 +3,7 @@
    <?php
    echo '<h2>', T('Need More Help?'), '</h2>';
    echo '<ul>';
-   echo '<li>', Anchor(T('Vanilla Pop Overview'), 'http://docs.vanillaforums.com/features/vanilla-pop/'), '</li>';
+   echo '<li>', Anchor(T('Vanilla Pop Overview'), 'http://docs.vanillaforums.com/addons/vanilla-pop/'), '</li>';
    echo '</ul>';
    ?>
 </div>

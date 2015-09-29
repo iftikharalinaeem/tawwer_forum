@@ -87,6 +87,9 @@ class ReportModel extends Gdn_Model {
         $discussionModel = new DiscussionModel();
         $discussion = $discussionModel->getForeignID($foreignID, 'Report');
 
+        $spamCheckDisabled = SpamModel::$Disabled;
+        SpamModel::$Disabled = true;
+
         // Can't find one, must create
         if (!$discussion) {
 
@@ -141,6 +144,7 @@ class ReportModel extends Gdn_Model {
             if (!$discussionID) {
                 trace('Discussion not saved.');
                 $this->Validation->AddValidationResult($discussionModel->ValidationResults());
+                SpamModel::$Disabled = $spamCheckDisabled;
                 return false;
             }
             $discussion['DiscussionID'] = $discussionID;
@@ -159,10 +163,12 @@ class ReportModel extends Gdn_Model {
             $commentModel = new CommentModel();
             $commentID = $commentModel->save($newComment);
             $this->Validation->AddValidationResult($commentModel->ValidationResults());
+            SpamModel::$Disabled = $spamCheckDisabled;
             return $commentID;
         }
 
         // Failed to add report
+        SpamModel::$Disabled = $spamCheckDisabled;
         return false;
     }
 
