@@ -766,12 +766,16 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
       padding-right: 100px;
       border-color: transparent;
       border-radius: 4px; }
+    .masthead form .AdvancedSearch input[type="text"] {
+      padding: 0 20px; }
     .masthead form input[type="submit"] {
       position: absolute;
       top: 5px;
       right: 5px;
       float: right;
       padding: 10px 25px; }
+  .masthead .AdvancedSearch input[type="text"] {
+    padding: 0 20px; }
   .masthead .container > *:first-child {
     margin-top: 0; }
   .masthead .container > *:last-child {

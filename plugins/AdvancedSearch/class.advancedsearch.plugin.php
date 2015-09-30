@@ -8,7 +8,7 @@
 $PluginInfo['AdvancedSearch'] = array(
     'Name' => 'Advanced Search',
     'Description' => "Enables advanced search on sites.",
-    'Version' => '1.0.5',
+    'Version' => '1.0.6',
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
