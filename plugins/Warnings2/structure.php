@@ -10,10 +10,10 @@ Gdn::Structure()->Table('UserNote')
    ->Column('RecordID', 'int', TRUE)
    ->Column('InsertUserID', 'int', FALSE, 'key')
    ->Column('DateInserted', 'datetime', FALSE, 'index.userdate')
-   ->Column('InsertIPAddress', 'varchar(15)', FALSE)
+   ->Column('InsertIPAddress', 'ipaddress', FALSE)
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('DateUpdated', 'datetime', TRUE)
-   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
+   ->Column('UpdateIPAddress', 'ipaddress', TRUE)
    ->Column('Attributes', 'text', TRUE)
    ->Set();
 
