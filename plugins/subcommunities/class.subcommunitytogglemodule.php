@@ -20,7 +20,7 @@ class SubcommunityToggleModule extends Gdn_Module {
         if (!$this->Visible) {
             return '';
         }
-        $this->SetData('Subcommunities', SubcommunityModel::all());
+        $this->SetData('Subcommunities', SubcommunityModel::getAvailable());
         $this->SetData('Current', SubcommunityModel::getCurrent());
 
         return parent::FetchView($this->getView());
