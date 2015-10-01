@@ -12,6 +12,8 @@ class SubcommunityModel extends Gdn_Model {
 
     protected static $all;
 
+    protected static $available;
+
     protected static $current;
 
     protected $localeNameTranslations = [
@@ -96,6 +98,28 @@ class SubcommunityModel extends Gdn_Model {
         }
 
         return self::$all;
+    }
+
+    /**
+     * Get a filtered array of all subcommunities available to the current user
+     *
+     * @return array Subcommunities available to the current user, indexed by folder.
+     */
+    public static function getAvailable() {
+        if (!isset(self::$available)) {
+            $all = self::all();
+            $available = array();
+
+            foreach ($all as $folder => $row) {
+                if (Gdn::session()->checkPermission('Vanilla.Discussions.View', true, 'Category', $row['CategoryID'])) {
+                    $available[$folder] = $row;
+                }
+            }
+
+            self::$available = $available;
+        }
+
+        return self::$available;
     }
 
     public static function getDefaultSite() {
