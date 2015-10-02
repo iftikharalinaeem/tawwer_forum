@@ -12,6 +12,9 @@ class SubcommunityModel extends Gdn_Model {
 
     protected static $all;
 
+    /**
+     * @var Array of subcommunities available to the current user.
+     */
     protected static $available;
 
     protected static $current;
@@ -111,8 +114,19 @@ class SubcommunityModel extends Gdn_Model {
             $available = array();
 
             foreach ($all as $folder => $row) {
-                if (Gdn::session()->checkPermission('Vanilla.Discussions.View', true, 'Category', $row['CategoryID'])) {
-                    $available[$folder] = $row;
+                $category = CategoryModel::categories($row['CategoryID']);
+
+                if ($category) {
+                    $canView = Gdn::session()->checkPermission(
+                        'Vanilla.Discussions.View',
+                        true,
+                        'Category',
+                        $category['PermissionCategoryID']
+                    );
+
+                    if ($canView) {
+                        $available[$folder] = $row;
+                    }
                 }
             }
 
