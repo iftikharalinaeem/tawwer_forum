@@ -290,8 +290,9 @@ class RankModel extends Gdn_Model {
       $RanksPlugin->CommentLinks = GetValue('CommentLinks', $Abilities);
       $RanksPlugin->ConversationLinks = GetValue('ConversationLinks', $Abilities);
 
+
       // Edit content timeout.
-      if ($V = GetValue('EditContentTimeout', $Abilities)) {
+      if (($V = GetValue('EditContentTimeout', $Abilities, FALSE)) !== FALSE) {
          SaveToConfig('Garden.EditContentTimeout', $V, FALSE);
       }
 
