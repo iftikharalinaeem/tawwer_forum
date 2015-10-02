@@ -72,8 +72,6 @@ class EventsController extends Gdn_Controller {
 
             $this->AddBreadcrumb('Groups', Url('/groups'));
             $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
-            $header = new GroupHeaderModule($Group);
-            $this->addModule($header);
 
             // Register GroupID as criteria
             $EventCriteria['GroupID'] = $Group['GroupID'];

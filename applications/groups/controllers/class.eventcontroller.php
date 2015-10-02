@@ -301,8 +301,6 @@ class EventController extends Gdn_Controller {
       require_once $this->FetchViewLocation('event_functions', 'Event');
       require_once $this->FetchViewLocation('group_functions', 'Group');
 
-      $header = new GroupHeaderModule($Group);
-      $this->addModule($header);
       $this->AddModule('DiscussionFilterModule');
       $this->RequestMethod = 'event';
       $this->View = 'event';

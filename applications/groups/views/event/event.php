@@ -1,3 +1,4 @@
+<?php echo Gdn_Theme::module('GroupHeaderModule'); ?>
 <div class="Event-Header PageTitle">
    <!-- Edit/Delete Buttons -->
    <div class="Options">
