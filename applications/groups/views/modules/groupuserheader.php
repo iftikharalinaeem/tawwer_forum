@@ -5,9 +5,8 @@ if (!$this->Data('Application') || $this->Data('Application.Type') != 'Invitatio
 <div class="DismissMessage InfoMessage GroupUserHeaderModule">
    <div class="Center">
       <?php
-      echo sprintf(T("You've been invited to join %s."),
+      echo sprintf(T("You've been invited to join %s.", "You've been invited to join %s. Would you like to accept the invitation to join this group?"),
          Anchor(htmlspecialchars($this->Data('Group.Name')), GroupUrl($this->Data('Group'))));
-      echo T('Would you like to accept the invitation to join this group?')
       ?>
       <div class="Buttons">
          <?php
