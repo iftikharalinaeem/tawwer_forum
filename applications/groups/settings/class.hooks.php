@@ -395,6 +395,15 @@ class GroupsHooks extends Gdn_Plugin {
        $this->OverridePermissions($Sender);
    }
 
+   /**
+    * Add groups link to mobile navigation.
+    *
+    * @param $sender
+    */
+   public function SiteNavModule_default_handler($sender) {
+      $sender->addLink('main.groups', array('text' => t('Groups'), 'url' => '/groups', 'sort' => 1, 'icon' => icon('group')));
+   }
+
 
    /**
     *
