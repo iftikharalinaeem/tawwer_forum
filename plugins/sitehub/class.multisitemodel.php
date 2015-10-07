@@ -37,7 +37,7 @@ class MultisiteModel extends Gdn_Model {
         $multi = Infrastructure::getMulti(Infrastructure::site('name'));
         if (is_array($multi)) {
             $this->siteNameFormat = $multi['template'];
-            $this->siteUrlFormat = '//'.$multi['hosttemplate'];
+            $this->siteUrlFormat = $multi['slugtemplate'];
         } else {
             $this->siteNameFormat = '%s.vanillaforums.com';
             $this->siteUrlFormat = '//%s.vanillaforums.com';
@@ -212,13 +212,14 @@ class MultisiteModel extends Gdn_Model {
      * @return string Returns the url of the site.
      */
     public function siteUrl($slug, $withDomain) {
-        if (IsUrl($slug)) {
+        if (isUrl($slug)) {
             throw new Gdn_UserException("$slug is not a valid slug.", 422);
         }
         $result = sprintf($this->siteUrlFormat, $slug);
+
         if ($withDomain) {
-            if (!IsUrl($result)) {
-                $result = Gdn::Request()->Domain().'/'.ltrim($result, '/');
+            if (!isUrl($result)) {
+                $result = paths(Gdn::request()->domain(), $result);
             }
         }
         return $result;
