@@ -85,15 +85,22 @@ if (!$ReactionTypeExists) {
    Gdn::Cache()->Remove('ReactionTypes');
 }
 
-// Change classes from Good/Bad to Positive/Negative
-$Sql->Update('ReactionType')
-   ->Set('Class', 'Positive')
-   ->Where('Class', 'Good')
-   ->Put();
-$Sql->Update('ReactionType')
-   ->Set('Class', 'Negative')
-   ->Where('Class', 'Bad')
-   ->Put();
+// Change classes from Good/Bad to Positive/Negative.
+if ($ReactionTypeExists && $Sql->getWhere('ReactionType', ['Class' => ['Good', 'Bad']])->firstRow()) {
+   $Sql->Put(
+       'ReactionType',
+       ['Class' => 'Positive'],
+       ['Class' => 'Good'],
+       true
+   );
+
+   $Sql->Put(
+       'ReactionType',
+       ['Class' => 'Negative'],
+       ['Class' => 'Bad'],
+       true
+   );
+}
 
 if (class_exists('BadgeModel')) {
    // Define some badges for the reactions.
