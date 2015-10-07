@@ -1,8 +1,5 @@
 <?php
 
-if (!defined('APPLICATION'))
-   exit();
-
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary
@@ -42,6 +39,7 @@ class GroupsController extends Gdn_Controller {
       $this->AddJsFile('jquery.gardenhandleajaxform.js');
       $this->AddJsFile('global.js');
       $this->AddJsFile('group.js');
+      $this->addCssFile('vanillicon.css', 'static');
       $this->AddCssFile('style.css');
 
       $this->AddBreadcrumb(T('Groups'), '/groups');
@@ -87,7 +85,7 @@ class GroupsController extends Gdn_Controller {
       $Sort = strtolower($Sort);
 
       $Sorts = array(
-         'newest' => array('Title' => T('Newest Groups'), 'OrderBy' => 'DateInserted'),
+         'new' => array('Title' => T('New Groups'), 'OrderBy' => 'DateInserted'),
          'popular' => array('Title' => T('Popular Groups'), 'OrderBy' => 'CountMembers'),
          'updated' => array('Title' => T('Recently Updated Groups'), 'OrderBy' => 'DateLastComment'),
          'mine' => array('Title' => T('My Groups'), 'OrderBy' => 'DateInserted')

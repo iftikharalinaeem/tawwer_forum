@@ -1,0 +1,207 @@
+
+// Listings
+
+.Groups {
+  .PageControls {
+    @include clearfix;
+  }
+
+
+  .DataList .ItemContent {
+    padding-left: 48px;
+  }
+
+  .Item {
+    .OptionsMenu,
+    .ButtonGroup {
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .Buttons {
+      padding-top: 0;
+      margin-top: 0;
+      margin-right: 5px;
+      display: inline-block;
+    }
+  }
+
+  .DataTableWrap {
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    .Excerpt {
+      font-size: 12px;
+    }
+
+    .Title-Wrapper {
+      margin: 0;
+    }
+
+    .EventLocation,
+    .EventDate {
+      width: 25%;
+    }
+  }
+
+  .Group-Discussions .MItem.Category,
+  .Group-Announcements .MItem.Category {
+    display: none;
+  }
+}
+
+.Group-Box {
+  .Button-Controls {
+    float: right;
+  }
+  .H {
+    float: left;
+  }
+
+  .DataList .PhotoWrap {
+    float: left;
+  }
+  // Warnings2 fix,
+  .PhotoWrap {
+    display: block;
+  }
+
+  .PhotoGrid .PhotoWrap,
+  .Group-Member.UserTile .PhotoWrap {
+    display: inline;
+  }
+}
+
+
+// Header
+
+.Group-Header {
+  margin-bottom: 20px;
+  @include clearfix;
+
+  .MItem {
+    display: inline-block;
+  }
+
+  .Meta {
+    font-size: 12px;
+  }
+
+  .OptionsMenu {
+    display: block;
+    float: right;
+  }
+
+  .Buttons {
+    float: right;
+    margin-top: 0;
+    margin-right: 5px;
+  }
+
+  .Dropdown {
+    right: 0;
+    left: auto;
+  }
+}
+
+.Group-Box {
+  margin-bottom: 20px;
+  @include clearfix;
+}
+
+.Group-Icon {
+  max-width: 100px;
+  max-height: 100px;
+}
+
+.Group-Icon-Big {
+  width: 140px;
+  height: 140px;
+  max-width: 140px;
+  max-height: 140px;
+  border: 3px solid #fff;
+  box-sizing: border-box;
+}
+
+.Group-Icon-Big-Wrap {
+  position: relative;
+  float: left;
+  width: 140px;
+  top: -40px;
+  margin: 0 15px 15px 10px;
+  box-sizing: border-box;
+
+  .ChangePicture {
+//    display: block;
+//    bottom: 0;
+//    padding-left: 10px;
+    z-index: 3;
+//    transition: background 300ms;
+//    font-size: 13px;
+    color: white;
+//    background: 0;
+//    text-align: left;
+//    vertical-align: middle;
+    box-sizing: border-box;
+
+    .icon {
+      display: inline-block;
+      vertical-align: middle;
+      padding-bottom: 2px;
+      font-size: 20px;
+      color: #fff;
+      margin-right: 10px;
+    }
+    &:hover {
+//      background: rgba(0, 0, 0, .5);
+      color: white;
+    }
+  }
+}
+
+.NoBanner .Group-Icon-Big-Wrap {
+  top: 0;
+  margin-left: 0;
+}
+
+.Group-Title {
+  margin-bottom: 10px;
+  font-size: 36px;
+  line-height: 1;
+}
+
+.NoBanner .Group-Title {
+  padding-top: 5px;
+}
+
+.Group-Description {
+  line-height: 1.4;
+  padding: 5px 0;
+}
+
+.Group-Banner {
+  height: 200px;
+  /* Fluid width centering */
+  width: 100%;
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  margin-bottom: 10px;
+}
+
+.Section-Members .DataList .Item .PhotoWrap {
+  float: left;
+}
+
+// No site messages in groups
+.Section-Group {
+  .DismissMessage {
+    display: none;
+  }
+}
+
+.Section-Post.Groups.edit {
+  input[value="Save Thumbnail"] {
+    display: none !important;
+  }
+}

@@ -1,13 +1,14 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
+<?php if (!defined('APPLICATION')) exit();
+echo Gdn_Theme::module('GroupHeaderModule');
 
-<h1><?php echo $this->Data('Title')?></h1>
+echo '<h1>'.$this->Data('Title').'</h1>';
 
-<div class="UpcomingEvents">
-   <h2><?php echo T('Upcoming Events'); ?></h2>
-   <?php WriteEventCards($this->Data('UpcomingEvents')); ?>
-</div>
+$eventList = new EventListModule($this->Data('UpcomingEvents'), t('Upcoming Events'), t('GroupEmptyUpcomingEvents', "Aw snap, no events are coming up."));
+if ($this->Data('Group') && GroupPermission('Member', val('GroupID', $this->Data('Group')))) {
+  $eventList->addNewEventButton($this->Data('NewButtonId'));
+}
+echo $eventList;
 
-<div class="RecentEvents">
-   <h2><?php echo T('Recent Events'); ?></h2>
-   <?php WriteEventCards($this->Data('RecentEvents')); ?>
-</div>
+$eventList = new EventListModule($this->Data('RecentEvents'), t('Recent Events'), t('GroupEmptyRecentEvents', "There aren't any recent events to show."));
+echo $eventList;
+

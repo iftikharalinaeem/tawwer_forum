@@ -1,101 +1,25 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-
-<div class="Group-Header">
-   <?php WriteGroupBanner(); ?>
-   <!-- Join/Apply Buttons -->
-   <?php WriteGroupButtons(); ?>
-   <?php WriteGroupIcon(); ?>
-   <h1 class="Group-Title"><?php echo htmlspecialchars($this->Data('Group.Name')); ?></h1>
-   <div class="Group-Description">
-      <?php echo Gdn_Format::To($this->Data('Group.Description'), $this->Data('Group.Format')); ?>
-   </div>
-   <?php
-   echo Gdn_Theme::Module('GroupUserHeaderModule');
-   ?>
-</div>
-
-<?php if (GroupPermission('View')): ?>
-
-<div class="Group-Content">
-   <?php
-   WriteGroupApplicants($this->Data('Applicants'));
-   ?>
-   
-   <div class="Group-Box Box-Events Group-Events">
-      <h2><?php echo T('Upcoming Events'); ?></h2>
-      <?php $EmptyMessage = T('GroupEmptyEvents', "Aw snap, no events are coming up."); ?>
-      <?php WriteEventList($this->Data('Events'), $this->Data('Group'), $EmptyMessage); ?>
-      <?php
-      echo '<div class="MoreWrap">'.Anchor(sprintf(T('All %s'), T('Events')), Url(CombinePaths(array("/events/group/", GroupSlug($this->Data('Group')))))).'</div>';
-      ?>
-   </div>
-   
-   <div class="Group-Box Group-Announcements Section-DiscussionList">
-      <h2><?php echo T('Announcements'); ?></h2>
-      <?php $EmptyMessage = T('GroupEmptyAnnouncements', "Important stuff will go here one day."); ?>
-      
-      <?php
-      if (GroupPermission('Moderate')) {
-         echo '<div class="Button-Controls">';
-         echo Anchor(sprintf(T('New %s'), T('Announcement')), GroupUrl($this->Data('Group'), 'announcement'), 'Button');
-         echo '</div>';
-      }
-      ?>
-      
-      <?php WriteDiscussionBlogList($this->Data('Announcements'), $EmptyMessage); ?>
-   </div>
-   
-   <div class="Group-Box Group-Discussions Section-DiscussionList">
-      <h2><?php echo T('Discussions'); ?></h2>
-      
-      <?php
-      if (GroupPermission('Member')) {
-         echo '<div class="Button-Controls">';
-         echo Gdn_Theme::Module('NewDiscussionModule', array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$this->Data('Group.GroupID')));
-         echo '</div>';
-      }
-      ?>
-      
-      <?php $EmptyMessage = T('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"); ?>
-      <?php WriteDiscussionList($this->Data('Discussions'), $EmptyMessage); ?>
-      <?php
-      if ($this->Data('Discussions')) {
-         echo '<div class="MoreWrap">'.
-            Anchor(T('All Discussions'), GroupUrl($this->Data('Group'), 'discussions')).
-            '</div>';
-      }
-      ?>
-   </div>
-</div>
-
-<div class="Group-Footer Box">
-   <h2><?php echo sprintf(T('More About %s'), htmlspecialchars($this->Data('Group.Name'))); ?></h2>
-   
-   <!-- Leaders -->
-   <div class="Group-Box Group-Leaders">
-      <h3><?php echo Anchor(T('Group Leaders', 'Leaders'), GroupUrl($this->Data('Group'), 'members')); ?></h3>
-      <?php WriteMemberSimpleList($this->Data('Leaders')); ?>
-   </div>
-   
-   <!-- Info -->
-   <div class="Group-Box Group-Info">
-      <h3><?php echo T('Group Info'); ?></h3>
-      <?php
-      WriteGroupInfo();
-      ?>
-   </div>
-    
-   <!-- Members -->
-   <div class="Group-Box Group-MembersPreview">
-      <h3><?php echo Anchor(T('Group Members', 'Members'), GroupUrl($this->Data('Group'), 'members'));?></h3>
-      <?php WriteMemberGrid($this->Data('Members'), Anchor(sprintf(T('All %s'), T('Members')), GroupUrl($this->Data('Group'), 'members'), 'MoreWrap')); ?>
-   </div>
-</div>
-
-<?php else: ?>
-<div class="Hero">
-   <?php
-   echo GroupPermission('View.Reason');
-   ?>
-</div>
-<?php endif; ?>
+<?php if (!defined('APPLICATION')) exit();
+$header = new GroupHeaderModule($this->data('Group'), true, true, true, true);
+echo $header;
+echo Gdn_Theme::module('GroupUserHeaderModule');
+if (GroupPermission('View')) {
+    echo '<div class="Group-Content">';
+    if ($this->data('Applicants')) {
+        $applicantList = new ApplicantListModule($this->data('Applicants'), $this->data('Group'), t('Applicants & Invitations'));
+        echo $applicantList;
+    }
+    writeAnnouncementList($this, t('GroupEmptyAnnouncements', "Important stuff will go here one day."));
+    writeDiscussionList($this, t('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"), t('Discussions'));
+    $eventList = new EventListModule($this->data('Events'), t('Upcoming Events'), t('GroupEmptyEvents', "Aw snap, no events are coming up."));
+    if (GroupPermission('Member', $this->data('Group'))) {
+        $eventList->addNewEventButton(val('GroupID', $this->data('Group')));
+        $eventList->showMore(url(combinePaths(array("/events/group/", GroupSlug($this->data('Group'))))));
+    }
+    echo $eventList;
+    echo '<div class="Group-Info ClearFix clearfix">';
+    echo Gdn_Theme::module('GroupMembersModule');
+    echo '</div>';
+    echo '</div>';
+} else {
+    echo '<div class="Hero">'.GroupPermission('View.Reason').'</div>';
+}

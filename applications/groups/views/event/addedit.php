@@ -1,21 +1,14 @@
 <div class="FormTitleWrapper">
    <h1><?php echo T($this->Data['Title']); ?></h1>
    <div class="FormWrapper StructuredForm AddEvent">
-      
-      <?php 
-         echo $this->Form->Errors(); 
+
+      <?php
+         echo $this->Form->Errors();
          echo $this->Form->Open();
       ?>
 
       <div class="Event" data-groupid="<?php echo $this->Data('Group.GroupID'); ?>">
-         
-         <?php if ($this->Data('Group')): ?>
-         <div class="P Group">
-            <?php echo $this->Form->Label('Group', 'Group'); ?>
-            <?php WriteGroupCard($this->Data('Group'), FALSE); ?>
-         </div>
-         <?php endif; ?>
-         
+
          <div class="P Name">
             <?php echo $this->Form->Label('Name of the Event', 'Name'); ?>
             <div><?php echo $this->Form->TextBox('Name'); ?></div>
@@ -30,12 +23,12 @@
             <?php echo $this->Form->Label('Where', 'Location'); ?>
             <div><?php echo $this->Form->TextBox('Location'); ?></div>
          </div>
-         
+
          <?php
          $Both = $this->Data('Event') && HasEndDate($this->Data('Event')) ? ' Both' : '';
          ?>
          <div class="EventTime Times <?php echo $Both; ?>">
-            
+
             <div class="P From">
                <?php echo $this->Form->Label('When', 'DateStarts', array('class' => 'When')); ?>
                <?php echo $this->Form->Label('From', 'DateStarts'); ?>
@@ -43,7 +36,7 @@
                   <?php echo $this->Form->TextBox('DateStarts', array(
                      'class'        => 'InputBox DatePicker',
                      'title'        => T("Date. Expects 'mm/dd/yyyy'.")
-                  )); ?> 
+                  )); ?>
                   <?php echo $this->Form->TextBox('TimeStarts', array(
                      'class'        => 'InputBox TimePicker',
                      'placeholder'  => T('Add a time?')
@@ -63,7 +56,7 @@
                   <?php echo $this->Form->TextBox('DateEnds', array(
                      'class'        => 'InputBox DatePicker',
                      'title'        => T("Date. Expects 'mm/dd/yyyy'.")
-                  )); ?> 
+                  )); ?>
                   <?php echo $this->Form->TextBox('TimeEnds', array(
                      'class'        => 'InputBox TimePicker',
                      'placeholder'  => T('Add a time?')
@@ -74,10 +67,10 @@
          </div>
 
          <div class="Buttons">
-            <?php echo $this->Form->Button('Save', array('Type' => 'submit', 'class' => 'Button Primary')); ?> 
+            <?php echo $this->Form->Button('Save', array('Type' => 'submit', 'class' => 'Button Primary')); ?>
             <?php echo $this->Form->Button('Cancel', array('Type' => 'button', 'class' => 'Button CancelButton')); ?>
          </div>
-         
+
          <?php
          echo '<div id="dropdown-timezone" class="EventTimezonePicker dropdown-menu has-tip has-scroll"><ul>';
          foreach ($this->Data('Timezones') as $TimezoneID => $TimezoneLabel) {
