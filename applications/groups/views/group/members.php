@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
-echo Gdn_Theme::module('GroupHeaderModule');
+
+$header = new GroupHeaderModule($this->data('Group'));
+echo $header;
 
 if (in_array($this->data('Filter'), array('', 'leaders'))) {
   $memberList = new MemberListModule($this->data('Leaders'), $this->data('Group'), t('Leaders'), t('GroupEmptyLeaders', "There are no group leaders."));

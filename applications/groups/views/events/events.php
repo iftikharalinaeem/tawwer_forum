@@ -1,6 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
-echo Gdn_Theme::module('GroupHeaderModule');
 
+$header = new GroupHeaderModule($this->data('Group'));
+echo $header;
 echo '<h1>'.$this->Data('Title').'</h1>';
 
 $eventList = new EventListModule($this->Data('UpcomingEvents'), t('Upcoming Events'), t('GroupEmptyUpcomingEvents', "Aw snap, no events are coming up."));
