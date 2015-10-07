@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+echo Gdn_Theme::module('GroupHeaderModule');
 
 echo '<h1>'.$this->Data('Title').'</h1>';
 

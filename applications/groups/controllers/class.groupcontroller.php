@@ -133,8 +133,6 @@ class GroupController extends Gdn_Controller {
       require_once $this->FetchViewLocation('group_functions');
       $this->CssClass .= ' NoPanel';
       $this->AddJsFile('discussions.js', 'vanilla');
-      $header = new GroupHeaderModule($Group, true, true, true, true);
-      $this->addModule($header);
       $this->Render('Group');
    }
 
@@ -909,9 +907,6 @@ class GroupController extends Gdn_Controller {
       }
 
       $this->Data['_properties']['newdiscussionmodule'] = array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$Group['GroupID']);
-
-      $header = new GroupHeaderModule($Group);
-      $this->addModule($header);
       $this->SetData('Filter', $Filter);
       $this->Title(T('Members').' - '.htmlspecialchars($Group['Name']));
       require_once $this->FetchViewLocation('group_functions');

@@ -1,5 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
-
+$header = new GroupHeaderModule($this->data('Group'), true, true, true, true);
+echo $header;
 echo Gdn_Theme::module('GroupUserHeaderModule');
 if (GroupPermission('View')) {
     echo '<div class="Group-Content">';
