@@ -71,24 +71,30 @@ if (!function_exists('writeDiscussionList')):
  * Renders a list of discussions in the same format as in the vanilla application.
  *
  * @param Controller $sender The sending object.
+ * @param string $type The type of listing, 'announcements' or 'discussions'.
  * @param string $emptyMessage The message to render if no discussions exist.
  * @param string $title The title of the discussion list.
  * @param string $layout The layout type, either 'modern' or 'table'.
  */
-function writeDiscussionList($sender, $emptyMessage = '', $title = 'Discussions', $layout = '') {
+function writeDiscussionList($sender, $type = 'discussions', $emptyMessage = '', $title = '', $layout = '') {
     if (!$layout) {
         $layout = c('Vanilla.Discussions.Layout', 'modern');
+    }
+    // Force discussions if bad type is sent
+    if (!in_array($type, array('announcements', 'discussions'))) {
+        trace('Wrong type argument sent.');
+        $type = 'discussions';
     }
     ?>
     <div class="Group-Box Group-<?php echo $title; ?> Section-DiscussionList">
         <div class="PageControls">
             <h2 class="H"><?php echo $title; ?></h2>
             <?php
-            if ($title == 'Announcements' && GroupPermission('Moderate')) {
+            if ($type == 'announcements' && GroupPermission('Moderate')) {
                 echo '<div class="Button-Controls">';
                 echo anchor(sprintf(t('New Announcement')), GroupUrl($sender->data('Group'), 'announcement'), 'Button Primary');
                 echo '</div>';
-            } else if ($title == 'Discussions' && GroupPermission('Member')) {
+            } else if ($type == 'discussions' && GroupPermission('Member')) {
                 echo '<div class="Button-Controls">';
                 echo Gdn_Theme::module('NewDiscussionModule', array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$sender->data('Group.GroupID')));
                 echo '</div>';
@@ -113,7 +119,7 @@ function writeDiscussionList($sender, $emptyMessage = '', $title = 'Discussions'
                     </ul> <?php
                 }
             }
-            if ($title == 'Discussions' && $sender->data('Discussions')->result()) {
+            if ($type == 'discussions' && $sender->data('Discussions')->result()) {
                 echo '<div class="MoreWrap">'.
                         anchor(t('All Discussions'), GroupUrl($sender->Data('Group'), 'discussions')).
                     '</div>';
@@ -135,7 +141,7 @@ function writeAnnouncementList($sender, $emptyMessage) {
   $bak = $sender->data('Discussions');
   $sender->setData('Discussions', $sender->data('Announcements'));
   $sender->setData('Announcements', false);
-  writeDiscussionList($sender, $emptyMessage, t('Announcements'));
+  writeDiscussionList($sender, 'announcements', $emptyMessage, t('Announcements'));
   $sender->setData('Discussions', $bak);
 }
 endif;
