@@ -605,29 +605,28 @@ class GroupModel extends Gdn_Model {
          $Discussion = GetValue($Row['LastDiscussionID'], $Discussions);
          if ($Discussion) {
             $Row['LastTitle'] = Gdn_Format::Text($Discussion['Name']);
-            $Row['LastUserID'] = $Discussion['InsertUserID'];
             $Row['LastDiscussionUserID'] = $Discussion['InsertUserID'];
             $Row['LastDateInserted'] = $Discussion['DateInserted'];
             $Row['LastUrl'] = DiscussionUrl($Discussion, FALSE, '/').'#latest';
          }
          $Comment = GetValue($Row['LastCommentID'], $Comments);
          if ($Comment) {
-            $Row['LastUserID'] = $Comment['InsertUserID'];
-            $Row['LastDateInserted'] = $Comment['DateInserted'];
+             $Row['LastCommentUserID'] = $Comment['InsertUserID'];
+             $Row['LastDateInserted'] = $Comment['DateInserted'];
          } else {
-            $Row['NoComment'] = TRUE;
+             $Row['NoComment'] = TRUE;
          }
 
          TouchValue('LastTitle', $Row, '');
-         TouchValue('LastUserID', $Row, NULL);
          TouchValue('LastDiscussionUserID', $Row, NULL);
+         TouchValue('LastCommentUserID', $Row, NULL);
          TouchValue('LastDateInserted', $Row, NULL);
          TouchValue('LastUrl', $Row, NULL);
       }
 
       // Now join the users.
       if ($JoinUsers) {
-         Gdn::UserModel()->JoinUsers($Data, array('LastCommentUserID'));
+         Gdn::UserModel()->JoinUsers($Data, array('LastCommentUserID', 'LastDiscussionUserID'));
       }
    }
 
