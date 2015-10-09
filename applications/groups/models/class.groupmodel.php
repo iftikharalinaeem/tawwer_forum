@@ -611,10 +611,10 @@ class GroupModel extends Gdn_Model {
          }
          $Comment = GetValue($Row['LastCommentID'], $Comments);
          if ($Comment) {
-             $Row['LastCommentUserID'] = $Comment['InsertUserID'];
-             $Row['LastDateInserted'] = $Comment['DateInserted'];
+            $Row['LastCommentUserID'] = $Comment['InsertUserID'];
+            $Row['LastDateInserted'] = $Comment['DateInserted'];
          } else {
-             $Row['NoComment'] = TRUE;
+            $Row['NoComment'] = TRUE;
          }
 
          TouchValue('LastTitle', $Row, '');
