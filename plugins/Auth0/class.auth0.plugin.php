@@ -37,6 +37,7 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $provider['AuthorizeUrl'] = "$baseUrl/authorize";
         $provider['ProfileUrl'] = "$baseUrl/userinfo";
         $provider['RegisterUrl'] = "$baseUrl/authorize";
+        $provider['SignOutUrl'] = "$baseUrl/v2/logout";
 
         return $provider;
     }
