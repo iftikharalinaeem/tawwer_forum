@@ -425,6 +425,25 @@ class OAuth2PluginBase {
 
 
     /**
+     * Redirect to provider's sign out page if this is the default behaviour.
+     *
+     * @param EntryController $sender.
+     * @param EntryController $args.
+     *
+     * @return mixed|bool Return null if not configured, signout url if it is.
+     */
+    public function entryController_overrideSignOut_handler($sender, $args) {
+        $provider = $this->provider();
+        if ($provider['AuthenticationSchemeAlias'] != $this->getProviderKey() || !$this->isConfigured()) {
+            return;
+        }
+        $redirect = Gdn::Request()->Url('/', true);
+        $url = $provider['SignOutUrl'];
+        $args['DefaultProvider']['SignOutUrl'] = $url . "?returnTo=" . urlencode($redirect);
+    }
+
+
+    /**
      * Redirect to provider's register page if this is the default behaviour.
      *
      * @param EntryController $sender.
