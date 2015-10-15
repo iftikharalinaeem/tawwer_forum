@@ -536,7 +536,7 @@ class Salesforce {
           'salesforce_data_sent',
           Logger::INFO,
           'Post data being sent to salesforce',
-          $QueryParams
+          (array)$Post
       );
 
       $Response = $Proxy->Request(
