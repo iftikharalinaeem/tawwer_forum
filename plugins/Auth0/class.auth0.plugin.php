@@ -123,7 +123,7 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
             'email' => 'Email',
             'provider' => 'Provider',
             'picture' => 'Photo',
-            'nickname' => 'Name',
+            'screen-name' => 'Name',
             'name' => 'FullName',
             'user_id' => 'UniqueID'
         ], true);
