@@ -530,6 +530,15 @@ class Salesforce {
       }
       $Headers['Authorization'] = 'OAuth ' . $this->AccessToken;
       Trace('Salesforce Request - ' . $Options['Method']. ' : ' . $Url);
+
+      // log the query params being sent to salesforce
+      Logger::event(
+          'salesforce_data_sent',
+          Logger::INFO,
+          'Post data being sent to salesforce',
+          $QueryParams
+      );
+
       $Response = $Proxy->Request(
          $Options,
          $QueryParams,
