@@ -37,6 +37,7 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $provider['AuthorizeUrl'] = "$baseUrl/authorize";
         $provider['ProfileUrl'] = "$baseUrl/userinfo";
         $provider['RegisterUrl'] = "$baseUrl/authorize";
+        $provider['SignOutUrl'] = "$baseUrl/v2/logout";
 
         return $provider;
     }
@@ -122,7 +123,7 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
             'email' => 'Email',
             'provider' => 'Provider',
             'picture' => 'Photo',
-            'nickname' => 'Name',
+            'displayname' => 'Name',
             'name' => 'FullName',
             'user_id' => 'UniqueID'
         ], true);
