@@ -345,7 +345,7 @@ class OAuth2PluginBase {
             'Profile' => $profile
         );
         $form->setFormValue('Attributes', $attributes);
-        print_r($attributes);
+
         $this->EventArguments['Profile'] = $profile;
         $this->EventArguments['Form'] = $form;
 
