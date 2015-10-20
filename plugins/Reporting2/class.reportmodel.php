@@ -113,13 +113,11 @@ class ReportModel extends Gdn_Model {
                 $reportAttributes['CategoryID'] = $contextDiscussion['CategoryID'];
             }
 
-            // Jailed users should be able to report posts.
-            if (val('Punished', Gdn::Session()->User)) {
-                Gdn::Session()->setPermission(
-                    'Vanilla.Discussions.Add',
-                    array($category['CategoryID'])
-                );
-            }
+            // All users should be able to report posts.
+            Gdn::session()->setPermission(
+                'Vanilla.Discussions.Add',
+                array($category['CategoryID'])
+            );
 
             // Build report name
             $reportName = sprintf(T('[Reported] %s', "%s"),
