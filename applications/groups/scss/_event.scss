@@ -1,11 +1,13 @@
 .Event.add, .Event.edit {
 
    .DatePicker {
-      width: 120px;
+       display: inline-block;
+       width: 120px;
    }
 
    .TimePicker {
-      width: 120px;
+       display: inline-block;
+       width: 120px;
    }
 
    .Group.Card {
@@ -212,7 +214,7 @@
 	height: 150px;
 	width: 6.5em;
 	background: #fff;
-   background: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.95);
 	border: 1px solid #ddd;
 	margin: 0;
 	padding: 0;
