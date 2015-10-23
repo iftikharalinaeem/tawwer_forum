@@ -341,7 +341,7 @@ function WriteGroupIcon($group = FALSE, $class = 'Group-Icon', $addChangeIconLin
        }
        $output .= img(Gdn_Upload::Url($icon), array('class' => $class));
 
-       echo wrap($output, 'div', array('class' => 'Photo PhotoWrap Group-Icon-Big-Wrap'));
+       echo wrap($output, 'div', array('class' => 'Photo PhotoWrap PhotoWrapLarge Group-Icon-Big-Wrap'));
    }
 }
 endif;
