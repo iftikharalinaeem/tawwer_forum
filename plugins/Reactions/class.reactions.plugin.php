@@ -742,6 +742,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
       $reactionModel = new ReactionModel();
       $reactionModel->mergeUsers(val('UserID', $oldUser), val('UserID', $newUser));
+      Gdn::sql()->put('UserMerge', ['ReactionsMerged' => 1], ['MergeID' => $args['MergeID']]);
    }
 }
 

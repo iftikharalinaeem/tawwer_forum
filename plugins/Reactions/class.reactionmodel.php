@@ -361,6 +361,21 @@ class ReactionModel {
    }
 
    /**
+    * Merge user reactions for all of the users that were never merged.
+    */
+   public function mergeOldUserReactions() {
+      $merges = $this->SQL->getWhere('UserMerge', ['ReactionsMerged' => 0], 'DateInserted')->resultArray();
+
+      $count = 0;
+      foreach ($merges as $merge) {
+         $this->mergeUsers($merge['OldUserID'], $merge['NewUserID']);
+         $this->SQL->put('UserMerge', ['ReactionsMerged' => 1], ['MergeID' => $merge['MergeID']]);
+         $count++;
+      }
+      return $count;
+   }
+
+   /**
     * Merge the reactions of two users.
     *
     * This copies the reactions from the {@link $oldUserID} to the {@link $newUserID}
