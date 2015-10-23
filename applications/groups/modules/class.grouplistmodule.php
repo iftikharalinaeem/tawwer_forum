@@ -43,6 +43,10 @@ class GroupListModule extends Gdn_Module {
      * @var bool Whether the latest post is attached to a group item.
      */
     protected $attachDiscussions;
+    /**
+     * @var bool The latest post type ('Discussion' or 'Comment').
+     */
+    protected $lastPostType;
 
     /**
      * Construct the GroupListModule object.
@@ -166,12 +170,16 @@ class GroupListModule extends Gdn_Module {
         $groupModel = new GroupModel();
         if ($attachDiscussionData && $groupModel->CheckPermission('View', val('GroupID', $group))) {
             $this->attachDiscussions = true;
+            $this->lastPostType = 'Comment';
+            if (val('NoComment', $group)) {
+                $this->lastPostType = 'Discussion';
+            }
             $item['meta']['lastDiscussion']['text'] = t('Most recent discussion:') . ' ';
             $item['meta']['lastDiscussion']['linkText'] = htmlspecialchars(sliceString(Gdn_Format::text(val('LastTitle', $group)), 100));
             $item['meta']['lastDiscussion']['url'] = url(val('LastUrl', $group));
             $item['meta']['lastUser']['text'] = t('by') . ' ';
-            $item['meta']['lastUser']['linkText'] = val('LastName', $group);
-            $item['meta']['lastUser']['url'] = userUrl($group, 'Last');
+            $item['meta']['lastUser']['linkText'] = val('Last'.$this->lastPostType.'Name', $group);
+            $item['meta']['lastUser']['url'] = userUrl($group, 'Last'.$this->lastPostType);
             $item['meta']['lastDate']['text'] = Gdn_Format::date(val('LastDateInserted', $group));
         }
 
@@ -210,13 +218,13 @@ class GroupListModule extends Gdn_Module {
         $groupModel = new GroupModel();
         if ($attachDiscussionData && $groupModel->CheckPermission('View', val('GroupID', $group))) {
             $item['rows']['lastPost']['type'] = 'lastPost';
-            $item['rows']['lastPost']['title'] = val('LastTitle', $group);
-            $item['rows']['lastPost']['url'] = val('LastUrl', $group);
-            $item['rows']['lastPost']['username'] = val('LastName', $group);
-            $item['rows']['lastPost']['userUrl'] = userUrl($group, 'Last');
-            $item['rows']['lastPost']['date'] = val('LastDateInserted', $group);
-            $item['rows']['lastPost']['imageSource'] = val('LastPhoto', $group);
-            $item['rows']['lastPost']['imageUrl'] = userUrl($group, 'Last');
+            $item['rows']['lastPost']['title'] = $item['meta']['lastDiscussion']['linkText'];
+            $item['rows']['lastPost']['url'] = $item['meta']['lastDiscussion']['url'];
+            $item['rows']['lastPost']['username'] = $item['meta']['lastUser']['linkText'];
+            $item['rows']['lastPost']['userUrl'] = $item['meta']['lastUser']['url'];
+            $item['rows']['lastPost']['date'] = $item['meta']['lastDate']['text'];
+            $item['rows']['lastPost']['imageSource'] = val('Last'.$this->lastPostType.'Photo', $group);
+            $item['rows']['lastPost']['imageUrl'] = userUrl($group, 'Last'.$this->lastPostType);
         }
     }
 
