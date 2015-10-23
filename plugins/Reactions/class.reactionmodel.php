@@ -4,6 +4,9 @@ class ReactionModel {
    /// Constants ///
    const USERID_SUM = 0;
    const USERID_OTHER = -1;
+
+   const FORCE_ADD = 'add';
+   const FORCE_REMOVE = 'remove';
    
    /// Properties ///
    
@@ -441,10 +444,16 @@ class ReactionModel {
    }
    
    /**
+    * Toggle a reaction on a record.
     *
-    * @param type $Data
-    * @param array $Record
-    * @param Gdn_Model $Model 
+    * @param array $Data The reaction data to add. This is an array with the following keys:
+    * - RecordType: The type of record (table name) being reacted to.
+    * - RecordID: The primary key ID of the record being reacted to.
+    * - TagID: The reaction tag to use.
+    * - UserID: The user reacting.
+    * - DateInserted: Optional. The date of the reaction.
+    * @param array $Record The record being reacted to as obtained from {@link ReactionModel::getRow()}.
+    * @param Gdn_Model $Model  The model of the record being reacted to as obtained from {@link ReactionModel::getRow()}.
     */
    public function ToggleUserTag(&$Data, &$Record, $Model, $Delete = NULL) {
       $Inc = GetValue('Total', $Data, 1);
@@ -463,13 +472,17 @@ class ReactionModel {
       
       if (isset($UserTags[$Data['TagID']])) {
          // The user is toggling a tag they've already done.
+         if ($Delete === self::FORCE_ADD) {
+            // The use is forcing a tag add so this is a no-op.
+            return;
+         }
          $Insert = FALSE;
             
          $Inc = -$UserTags[$Data['TagID']]['Total'];
          $Data['Total'] = $Inc;
       }
       
-      if ($Insert && $Delete === TRUE) {
+      if ($Insert && ($Delete === TRUE || $Delete === self::FORCE_REMOVE)) {
          return;
       }
       
