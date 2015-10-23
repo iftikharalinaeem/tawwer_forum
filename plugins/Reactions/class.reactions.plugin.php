@@ -8,7 +8,8 @@
  *  1.2.4   Allow some reactions to be protected so that users can't flag moderator posts.
  *  1.2.13  Added TagModel_Types_Handler.
  *  1.3     Add class permissions; fix GetReactionTypes attributes; fix descriptions.
- *  1.2.15  Added section 508 fixes.
+ *  1.2.15  Add section 508 fixes.
+ *  1.4.0   Add support for merging users' reactions.
  *
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary
@@ -18,7 +19,7 @@
 $PluginInfo['Reactions'] = array(
    'Name' => 'Reactions',
    'Description' => "Adds reaction options to discussions & comments.",
-   'Version' => '1.3.1',
+   'Version' => '1.4.0',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'RegisterPermissions' => array(
       'Reactions.Positive.Add' => 'Garden.SignIn.Allow',
@@ -729,7 +730,19 @@ class ReactionsPlugin extends Gdn_Plugin {
    }
 
 
+   /**
+    * Merge reactions alongside a user-merge.
+    *
+    * @param UserModel $sender
+    * @param array $args
+    */
+   public function userModel_merge_handler($sender, $args) {
+      $oldUser = $args['OldUser'];
+      $newUser = $args['NewUser'];
 
+      $reactionModel = new ReactionModel();
+      $reactionModel->mergeUsers(val('UserID', $oldUser), val('UserID', $newUser));
+   }
 }
 
 if (!function_exists('WriteReactions')):
