@@ -359,6 +359,49 @@ class ReactionModel {
          SetValue('UserTags', $Row, $TagRow);
       }
    }
+
+   /**
+    * Merge the reactions of two users.
+    *
+    * This copies the reactions from the {@link $oldUserID} to the {@link $newUserID}
+    *
+    * @param int $oldUserID The ID of the old user.
+    * @param int $newUserID The ID of the new user.
+    */
+   public function mergeUsers($oldUserID, $newUserID) {
+      $sql = $this->SQL;
+
+      // Get all of the reactions the user has made.
+      $reactions = $sql->getWhere(
+          'UserTag',
+          [
+             'UserID' => $oldUserID,
+             'RecordType' => ['Discussion', 'Comment', 'Activity', 'ActivityComment']
+          ]
+      )->resultArray();
+
+      // Go through the reactions and move them from the old user to the new user.
+      foreach ($reactions as $reaction) {
+         list($row, $model, $_) = $this->GetRow($reaction['RecordType'], $reaction['RecordID']);
+
+         // Add the reaction for the new user.
+         if ($reaction['Total'] > 0) {
+            $newReaction = [
+                'RecordType' => $reaction['RecordType'],
+                'RecordID' => $reaction['RecordID'],
+                'TagID' => $reaction['TagID'],
+                'UserID' => $newUserID,
+                'DateInserted' => $reaction['DateInserted']
+            ];
+            $this->ToggleUserTag($newReaction, $row, $model, self::FORCE_ADD);
+         }
+
+         // Remove the reaction for the old user.
+         $this->ToggleUserTag($reaction, $row, $model, self::FORCE_REMOVE);
+      }
+
+      return $reactions;
+   }
    
    public static function JoinRecords(&$Data) {
       $IDs = array();
