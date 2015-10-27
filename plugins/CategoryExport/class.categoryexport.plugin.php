@@ -20,6 +20,30 @@ class CategoryExport extends Gdn_Plugin  {
 
     const DEFAULT_MAX = 2000;
 
+    protected $fieldSep = ',';
+    protected $lineSep  = "\r\n";
+
+    protected $exportDiscussionFields = array(
+
+        'DiscussionID',
+        'CategoryID',
+        'InsertUserID',
+        'UpdateUserID',
+        'FirstCommentID',
+        'LastCommentID',
+        'Name',
+        'Body',
+        'Format',
+        'Tags',
+        'CountComments',
+        'CountBookmarks',
+        'DateInserted',
+        'DateUpdated',
+        'InsertIPAddress',
+        'UpdateIPAddress',
+        'DateLastComment',
+    );
+
     function __construct() {
 
         c('Plugins.CategoryExport.MaxDiscussions', self::DEFAULT_MAX);
@@ -49,15 +73,36 @@ class CategoryExport extends Gdn_Plugin  {
         // Set the model on the form.
         $sender->Form->SetModel($configurationModel);
         */
+
         $catList = $this->getCategoryList();
         // echo "<pre>Cat List: ".print_r($catList,true)."</pre>\n";
-        $sender->SetData('CategoryList', $catList);
+        $sender->setData('CategoryList', $catList);
         //$sender->SetData('CategoryList', ['test'=>'Tester Array','bla'=>'BlaBla']);
 
         $sender->Render($this->GetView('config.php'));
     }
     public function controller_download($sender) {
 
+        $discussions = $this->getDiscussions(2);
+        //echo "<pre>Results: ".print_r($discussions,true)."</pre>\n";
+
+        $csvHeader  = implode(",", $this->exportDiscussionFields) . $this->lineSep;
+        $csvContent = $this->parseCSV($discussions);
+
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="export.csv"');
+        //header('Content-Length: '.(strlen($csvHeader) + strlen($csvContent)) );
+
+        //echo $csvHeader;
+        echo $csvContent;
+
+
+
+        //$fh = fopen('php://stdout', 'w');
+        //fputcsv($fh, $discussions);
+
+        //$sender->setData('discussions', $discussions);
+        //$sender->Render($this->GetView('csv.php'));
     }
 
 
@@ -82,11 +127,34 @@ class CategoryExport extends Gdn_Plugin  {
         return $output;
     }
 
-    private function getDiscussions($category=false, $len=0, $start=0) {
+    private function getDiscussions($category=false, $limit=10, $offset=0) {
 
+        $sql = Gdn::database()->SQL();
+        $sql->select('*')
+            ->from('Discussion')
+            ->where("CategoryID", $category)
+            ->limit($limit,$offset)
+        ;
+        $output = $sql->get()->resultArray();
+
+        return $output;
     }
 
-    private function parseCSV($input) {
+
+    private function parseCSV($input, $fields=false) {
+
+        $fields = !empty($fields) ? $fields : $this->exportDiscussionFields;
+
+        foreach ($input AS $item) {
+
+            foreach ($fields AS $j => $field) {
+                echo ($j!=0) ? $this->fieldSep : '';
+
+                $value = str_replace(',', '\,', $item[$field]);
+                echo $value;
+            }
+            echo $this->lineSep;
+        }
 
     }
 
