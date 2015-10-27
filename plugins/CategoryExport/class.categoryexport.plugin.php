@@ -147,6 +147,8 @@ class CategoryExport extends Gdn_Plugin  {
             foreach ($fields AS $j => $field) {
                 $output .= ($j!=0) ? $this->fieldSep : '';
 
+                // @todo Escape line return as well as field seperator.
+
                 $value = str_replace(',', '\,', $item[$field]);
                 $output .= $value;
             }
