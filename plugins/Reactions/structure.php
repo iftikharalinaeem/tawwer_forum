@@ -102,6 +102,12 @@ if ($ReactionTypeExists && $Sql->getWhere('ReactionType', ['Class' => ['Good', '
    );
 }
 
+$St->table('UserMerge')
+    ->column('ReactionsMerged', 'tinyint', '0')
+    ->set();
+
+$Rm->mergeOldUserReactions();
+
 if (class_exists('BadgeModel')) {
    // Define some badges for the reactions.
    $BadgeModel = new BadgeModel();

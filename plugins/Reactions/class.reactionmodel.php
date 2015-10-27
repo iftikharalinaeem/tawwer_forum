@@ -4,6 +4,9 @@ class ReactionModel {
    /// Constants ///
    const USERID_SUM = 0;
    const USERID_OTHER = -1;
+
+   const FORCE_ADD = 'add';
+   const FORCE_REMOVE = 'remove';
    
    /// Properties ///
    
@@ -356,6 +359,64 @@ class ReactionModel {
          SetValue('UserTags', $Row, $TagRow);
       }
    }
+
+   /**
+    * Merge user reactions for all of the users that were never merged.
+    */
+   public function mergeOldUserReactions() {
+      $merges = $this->SQL->getWhere('UserMerge', ['ReactionsMerged' => 0], 'DateInserted')->resultArray();
+
+      $count = 0;
+      foreach ($merges as $merge) {
+         $this->mergeUsers($merge['OldUserID'], $merge['NewUserID']);
+         $this->SQL->put('UserMerge', ['ReactionsMerged' => 1], ['MergeID' => $merge['MergeID']]);
+         $count++;
+      }
+      return $count;
+   }
+
+   /**
+    * Merge the reactions of two users.
+    *
+    * This copies the reactions from the {@link $oldUserID} to the {@link $newUserID}
+    *
+    * @param int $oldUserID The ID of the old user.
+    * @param int $newUserID The ID of the new user.
+    */
+   public function mergeUsers($oldUserID, $newUserID) {
+      $sql = $this->SQL;
+
+      // Get all of the reactions the user has made.
+      $reactions = $sql->getWhere(
+          'UserTag',
+          [
+             'UserID' => $oldUserID,
+             'RecordType' => ['Discussion', 'Comment', 'Activity', 'ActivityComment']
+          ]
+      )->resultArray();
+
+      // Go through the reactions and move them from the old user to the new user.
+      foreach ($reactions as $reaction) {
+         list($row, $model, $_) = $this->GetRow($reaction['RecordType'], $reaction['RecordID']);
+
+         // Add the reaction for the new user.
+         if ($reaction['Total'] > 0) {
+            $newReaction = [
+                'RecordType' => $reaction['RecordType'],
+                'RecordID' => $reaction['RecordID'],
+                'TagID' => $reaction['TagID'],
+                'UserID' => $newUserID,
+                'DateInserted' => $reaction['DateInserted']
+            ];
+            $this->ToggleUserTag($newReaction, $row, $model, self::FORCE_ADD);
+         }
+
+         // Remove the reaction for the old user.
+         $this->ToggleUserTag($reaction, $row, $model, self::FORCE_REMOVE);
+      }
+
+      return $reactions;
+   }
    
    public static function JoinRecords(&$Data) {
       $IDs = array();
@@ -441,10 +502,19 @@ class ReactionModel {
    }
    
    /**
+    * Toggle a reaction on a record.
     *
-    * @param type $Data
-    * @param array $Record
-    * @param Gdn_Model $Model 
+    * @param array $Data The reaction data to add. This is an array with the following keys:
+    * - RecordType: The type of record (table name) being reacted to.
+    * - RecordID: The primary key ID of the record being reacted to.
+    * - TagID: The reaction tag to use.
+    * - UserID: The user reacting.
+    * - DateInserted: Optional. The date of the reaction.
+    * @param array $Record The record being reacted to as obtained from {@link ReactionModel::getRow()}.
+    * @param Gdn_Model $Model  The model of the record being reacted to as obtained from {@link ReactionModel::getRow()}.
+    * @param bool $Delete A hint to the toggle. One of the following:
+    * - ReactionModel::FORCE_ADD: Add the reaction if it does not exist. Otherwise do nothing.
+    * - ReactionModel::FORCE_REMOVE: Remove the reaction if it exists. Otherwise do nothing.
     */
    public function ToggleUserTag(&$Data, &$Record, $Model, $Delete = NULL) {
       $Inc = GetValue('Total', $Data, 1);
@@ -463,13 +533,17 @@ class ReactionModel {
       
       if (isset($UserTags[$Data['TagID']])) {
          // The user is toggling a tag they've already done.
+         if ($Delete === self::FORCE_ADD) {
+            // The use is forcing a tag add so this is a no-op.
+            return;
+         }
          $Insert = FALSE;
             
          $Inc = -$UserTags[$Data['TagID']]['Total'];
          $Data['Total'] = $Inc;
       }
       
-      if ($Insert && $Delete === TRUE) {
+      if ($Insert && ($Delete === TRUE || $Delete === self::FORCE_REMOVE)) {
          return;
       }
       
