@@ -89,20 +89,16 @@ class CategoryExport extends Gdn_Plugin  {
         $csvHeader  = implode(",", $this->exportDiscussionFields) . $this->lineSep;
         $csvContent = $this->parseCSV($discussions);
 
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="export.csv"');
+        //header('Content-Type: text/csv');
+        //header('Content-Disposition: attachment; filename="export.csv"');
         //header('Content-Length: '.(strlen($csvHeader) + strlen($csvContent)) );
 
-        //echo $csvHeader;
+        echo $csvHeader;
         echo $csvContent;
+        //echo implode(",", $this->exportDiscussionFields) . $this->lineSep;
+        //echo $this->parseCSV($discussions);
 
-
-
-        //$fh = fopen('php://stdout', 'w');
-        //fputcsv($fh, $discussions);
-
-        //$sender->setData('discussions', $discussions);
-        //$sender->Render($this->GetView('csv.php'));
+        exit();
     }
 
 
@@ -145,17 +141,19 @@ class CategoryExport extends Gdn_Plugin  {
 
         $fields = !empty($fields) ? $fields : $this->exportDiscussionFields;
 
+        $output = '';
         foreach ($input AS $item) {
 
             foreach ($fields AS $j => $field) {
-                echo ($j!=0) ? $this->fieldSep : '';
+                $output .= ($j!=0) ? $this->fieldSep : '';
 
                 $value = str_replace(',', '\,', $item[$field]);
-                echo $value;
+                $output .= $value;
             }
-            echo $this->lineSep;
+            $output .= $this->lineSep;
         }
 
+        return $output;
     }
 
 } // Closes CategoryExport Plugin Class...
