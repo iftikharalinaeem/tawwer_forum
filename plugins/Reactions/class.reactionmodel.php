@@ -512,6 +512,9 @@ class ReactionModel {
     * - DateInserted: Optional. The date of the reaction.
     * @param array $Record The record being reacted to as obtained from {@link ReactionModel::getRow()}.
     * @param Gdn_Model $Model  The model of the record being reacted to as obtained from {@link ReactionModel::getRow()}.
+    * @param bool $Delete A hint to the toggle. One of the following:
+    * - ReactionModel::FORCE_ADD: Add the reaction if it does not exist. Otherwise do nothing.
+    * - ReactionModel::FORCE_REMOVE: Remove the reaction if it exists. Otherwise do nothing.
     */
    public function ToggleUserTag(&$Data, &$Record, $Model, $Delete = NULL) {
       $Inc = GetValue('Total', $Data, 1);
