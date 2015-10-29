@@ -69,6 +69,7 @@ input.CopyInputLonger {
 </div>
 <div class="Configuration">
    <div class="ConfigurationForm">
+       <h2>Authentication Keys</h2>
       <?php
       $Cf = $this->ConfigurationModule;
       $Cf->Render();
@@ -96,12 +97,12 @@ input.CopyInputLonger {
               Under <b>OAuth 2.0 Redirect URLs</b> enter <input type="text" class="CopyInput CopyInputLonger" value="<?php echo rtrim(Gdn::Request()->Domain(), '/') . '/entry/connect/linkedin'; ?>" />
           </li>
          <li>
-            Once your application has been set up, you must copy the <b>API Key</b> and <b>Secret Key</b> into the form on this page.
+            Once your application has been set up, you must copy the <b>Client ID</b> and <b>Client Secret</b> into the form on this page.
          </li>
          <li>
             Don't forget to hit save!
          </li>
       </ol>
-      <p><?php echo Anchor(Img('/plugins/LinkedIn/design/linkedin-help.png', array('style' => 'max-width: 961px;')), '/plugins/LinkedIn/design/linkedin-help.png', array('target' => '_blank')); ?></p>
+      <p><?php echo Anchor(Img('/plugins/LinkedIn/design/linkedinscreenshot.jpg', array('style' => 'max-width: 837px;')), '/plugins/LinkedIn/design/linkedinscreenshot.jpg', array('target' => '_blank')); ?></p>
    </div>
 </div>

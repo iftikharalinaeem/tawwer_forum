@@ -103,7 +103,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         $IsValidRegistration = $Args['Valid'];
 
         if ($IsValidRegistration) {
-            $User = $Args['User'];
+            $User = $Args['RegisteringUser'];
             $ListID = GetValue('ListID', $this->Provider(), null);
             $Email = GetValue('Email', $User, null);
 

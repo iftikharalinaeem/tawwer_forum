@@ -243,7 +243,7 @@ class GroupController extends Gdn_Controller {
          $Recipients = explode(',', $Data['Recipients']);
          $UserIDs = array();
          $memberIds = $this->GroupModel->getMemberIds(val('GroupID', $Group));
-         $applicantIds = $this->GroupModel->getApplicantIds(val('GroupID', $Group));
+         $applicantIds = $this->GroupModel->getApplicantIds(val('GroupID', $Group), array('Type' => array('Application', 'Invitation')));
          foreach ($Recipients as $Recipient) {
             $userId = GetValue('UserID', Gdn::UserModel()->GetByUsername($Recipient));
             if (in_array($userId, $memberIds)) {
