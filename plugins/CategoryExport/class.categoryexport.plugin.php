@@ -20,11 +20,53 @@ class CategoryExport extends Gdn_Plugin  {
 
     const DEFAULT_MAX = 2000;
 
-    protected $fieldSep = ',';
-    protected $lineSep  = "\r\n";
+    protected $fieldSep   = ',';
+    protected $lineSep    = "\r\n";
+    protected $escapeChar = '"';
 
     protected $exportDiscussionFields = array(
-
+        'd.DiscussionID',
+        'd.CategoryID',
+        'd.InsertUserID',
+        'u.Email',
+        'd.UpdateUserID',
+        'd.FirstCommentID',
+        'd.LastCommentID',
+        'd.Name',
+        'd.Body',
+        'd.Format',
+        'd.Tags',
+        'd.CountComments',
+        'd.CountBookmarks',
+        'd.DateInserted',
+        'd.DateUpdated',
+        'd.InsertIPAddress',
+        'd.UpdateIPAddress',
+        'd.DateLastComment',
+    );
+/*
+    protected $exportDiscussionFields = array(
+        'DiscussionID',
+        'CategoryID',
+        'InsertUserID',
+        'UpdateUserID',
+        'FirstCommentID',
+        'LastCommentID',
+        'Name',
+        'Body',
+        'Format',
+        'Tags',
+        'CountComments',
+        'CountBookmarks',
+        'DateInserted',
+        'DateUpdated',
+        'InsertIPAddress',
+        'UpdateIPAddress',
+        'DateLastComment',
+    );
+*/
+    protected $exportCommentFields = array(
+        'CommentID',
         'DiscussionID',
         'CategoryID',
         'InsertUserID',
@@ -77,32 +119,55 @@ class CategoryExport extends Gdn_Plugin  {
         $catList = $this->getCategoryList();
         // echo "<pre>Cat List: ".print_r($catList,true)."</pre>\n";
         $sender->setData('CategoryList', $catList);
-        //$sender->SetData('CategoryList', ['test'=>'Tester Array','bla'=>'BlaBla']);
 
-        $sender->Render($this->GetView('config.php'));
+        $sender->Form->Action = "/plugin/categoryexport/download";
+        $sender->Form->Method = "get";
+
+        $sender->Render($this->GetView('export.php'));
     }
     public function controller_download($sender) {
 
-        $discussions = $this->getDiscussions(2);
-        //echo "<pre>Results: ".print_r($discussions,true)."</pre>\n";
+        // @todo Capture GET data
+        // @todo Make sure the number of rows does not exceed max value
 
-        $csvHeader  = implode(",", $this->exportDiscussionFields) . $this->lineSep;
-        $csvContent = $this->parseCSV($discussions);
+        // INPUT Params:
+        $table    = GDN::request()->get('table');
+        $category = GDN::request()->get('CategoryID');
+        $offset   = GDN::request()->get('offset', 0);
+        $limit    = GDN::request()->get('limit', self::DEFAULT_MAX);
 
-        //header('Content-Type: text/csv');
-        //header('Content-Disposition: attachment; filename="export.csv"');
-        //header('Content-Length: '.(strlen($csvHeader) + strlen($csvContent)) );
+        switch ($table) {
 
+            case 'discussions': case 'discussion':
+                $data   = $this->getDiscussions($category, $limit, $offset);
+                $fields = $this->exportDiscussionFields;
+                break;
+            case 'comments': case 'comment':
+                $data   = $this->getComments($category);
+                $fields = $this->exportCommentFields;
+                break;
+        }
+//echo "<pre>Data: ".print_r($data,true)."</pre>\n";
+
+        $csvHeader  = implode(",", $fields) . $this->lineSep;
+        $csvContent = $this->parseCSV($data, $fields);
+/*
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="export.csv"');
+        header('Content-Length: '.(strlen($csvHeader) + strlen($csvContent)) );
+*/
         echo $csvHeader;
         echo $csvContent;
-        //echo implode(",", $this->exportDiscussionFields) . $this->lineSep;
-        //echo $this->parseCSV($discussions);
 
         exit();
     }
 
 
     private function getCategoryList() {
+
+        // @todo Replace with proper ORM query.
+        //$categories = new CategoryModel();
+        //$results    = $categories->getWhere(['AllowDiscussions'=>1])->resultArray();
 
         $sql  = "SELECT\n";
         $sql .= "  CategoryID\n";
@@ -111,35 +176,51 @@ class CategoryExport extends Gdn_Plugin  {
         $sql .= "WHERE\n";
         $sql .= "  AllowDiscussions=1\n";
         $sql .= "  AND";
-        $sql .= "  (CountDiscussions > 0)\n";
-
+        $sql .= "  CountDiscussions > 0\n";
         $results = GDN::database()->connection()->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
         $output = [];
         foreach ($results AS $result) {
             $output[$result['CategoryID']] = $result['Name'];
         }
-
+//echo "<pre>Categories: ".print_r($output,true)."</pre>\n";
         return $output;
     }
 
-    private function getDiscussions($category=false, $limit=10, $offset=0) {
+    private function getDiscussions($category, $limit=100, $offset=0) {
+        //echo "Hello ".__METHOD__."()!\n";
+        //$discussions = new DiscussionModel();
+        //$results     = $discussions->getWhere(['CategoryID'=>$category], $offset, $limit);
+        //$output      = $results->resultArray();
 
         $sql = Gdn::database()->SQL();
-        $sql->select('*')
-            ->from('Discussion')
+        $sql->select($this->exportDiscussionFields)
+            ->from('Discussion AS d')
+            ->leftJoin('User AS u', 'InsertUserID')
             ->where("CategoryID", $category)
             ->limit($limit,$offset)
         ;
-        $output = $sql->get()->resultArray();
+        $results = $sql->get();
+        $output  = $results->resultArray();
+//echo "<pre>SQL Discussions: ".print_r($output,true)."</pre>\n";
 
         return $output;
     }
 
+    private function getComments($category, $limit=10, $offset=0) {
 
-    private function parseCSV($input, $fields=false) {
+        $comments    = new CommentModel();
+        //$results     = $comments->getWhere(['CategoryID'=>$category], $offset, $limit);
+        //$output      = $results->resultArray();
+//echo "<pre>OUTPUT: ".print_r($output,true)."</pre>\n";
+        //return $output;
+    }
 
-        $fields = !empty($fields) ? $fields : $this->exportDiscussionFields;
+
+    private function parseCSV($input, $fields) {
+        if (empty($fields) || !is_array($fields)) {
+            return false;
+        }
 
         $output = '';
         foreach ($input AS $item) {
@@ -147,15 +228,36 @@ class CategoryExport extends Gdn_Plugin  {
             foreach ($fields AS $j => $field) {
                 $output .= ($j!=0) ? $this->fieldSep : '';
 
-                // @todo Escape line return as well as field seperator.
+                $fieldName = stristr($field,'.') ? substr($field, strpos($field,'.')+1) : $field;
 
-                $value = str_replace(',', '\,', $item[$field]);
-                $output .= $value;
+                $value   = $item[$fieldName];
+                $value   = str_replace($this->fieldSep, "\\".$this->fieldSep, $value);
+                $value   = str_replace($this->escapeChar, "\\".$this->escapeChar, $value);
+                $output .= "{$this->escapeChar}{$value}{$this->escapeChar}";
             }
             $output .= $this->lineSep;
         }
 
         return $output;
+    }
+
+    public function setLineSep($input) {
+        if (empty($input) OR !is_string($input)) {
+            return false;
+        }
+        $this->lineSep = $input;
+    }
+    public function setFieldSep($input) {
+        if (empty($input) OR !is_string($input)) {
+            return false;
+        }
+        $this->fieldSep = $input;
+    }
+    public function setEscapeChar($input) {
+        if (empty($input) OR !is_string($input)) {
+            return false;
+        }
+        $this->escapeChar = $input;
     }
 
 } // Closes CategoryExport Plugin Class...
