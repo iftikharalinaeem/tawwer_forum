@@ -12,35 +12,35 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * Renders the best of filter menu
  */
 class BestOfFilterModule extends Gdn_Module {
-   
-   public function AssetTarget() {
-      return 'Panel';
-   }
-   
-   private function _Button($Name, $Code, $CurrentReactionType) {
-      $LCode = strtolower($Code);
-      $Url = Url("/bestof/$LCode");
-      $CssClass = $Code;
-      if ($CurrentReactionType == $LCode)
-         $CssClass .= ' Active';
 
-      return '<li class="BestOf'.$CssClass.'"><a href="'.$Url.'"><span class="ReactSprite React'.$Code.'"></span> '.$Name.'</a></li>';
-   }
-   
+    public function AssetTarget() {
+        return 'Panel';
+    }
 
-   public function ToString() {
-      $Controller = Gdn::Controller();
-      $CurrentReactionType = $Controller->Data('CurrentReaction');
-      $ReactionTypeData = $Controller->Data('ReactionTypes');
-      $FilterMenu = '';
-      $FilterMenu .= '<div class="BoxFilter BoxBestOfFilter">';
-         $FilterMenu .= '<ul class="FilterMenu">';
-            $FilterMenu .= $this->_Button(T('Everything'), 'Everything', $CurrentReactionType);
-            foreach ($ReactionTypeData as $Key => $ReactionType) {
-               $FilterMenu .= $this->_Button(T(GetValue('Name', $ReactionType, '')), GetValue('UrlCode', $ReactionType, ''), $CurrentReactionType);
-            }      
-         $FilterMenu .= '</ul>';
-      $FilterMenu .= '</div>';
-      return $FilterMenu;
-   }
+    private function _Button($Name, $Code, $CurrentReactionType) {
+        $LCode = strtolower($Code);
+        $Url = Url("/bestof/$LCode");
+        $CssClass = $Code;
+        if ($CurrentReactionType == $LCode)
+            $CssClass .= ' Active';
+
+        return '<li class="BestOf'.$CssClass.'"><a href="'.$Url.'"><span class="ReactSprite React'.$Code.'"></span> '.$Name.'</a></li>';
+    }
+
+
+    public function ToString() {
+        $Controller = Gdn::Controller();
+        $CurrentReactionType = $Controller->Data('CurrentReaction');
+        $ReactionTypeData = $Controller->Data('ReactionTypes');
+        $FilterMenu = '';
+        $FilterMenu .= '<div class="BoxFilter BoxBestOfFilter">';
+        $FilterMenu .= '<ul class="FilterMenu">';
+        $FilterMenu .= $this->_Button(T('Everything'), 'Everything', $CurrentReactionType);
+        foreach ($ReactionTypeData as $Key => $ReactionType) {
+            $FilterMenu .= $this->_Button(T(GetValue('Name', $ReactionType, '')), GetValue('UrlCode', $ReactionType, ''), $CurrentReactionType);
+        }
+        $FilterMenu .= '</ul>';
+        $FilterMenu .= '</div>';
+        return $FilterMenu;
+    }
 }
