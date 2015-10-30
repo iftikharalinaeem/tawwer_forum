@@ -112,7 +112,7 @@ class Reporting2Plugin extends Gdn_Plugin {
          '<span class="ReactSprite ReactFlag"></span> '.T('Report'),
          '/report/'.$RecordType.'/'.$RecordID,
          'ReactButton ReactButton-Report Popup',
-         array('title'=>'Report', 'rel'=>"nofollow")
+          array('title'=>t('Report'), 'rel'=>"nofollow")
       );
       return $Result;
    }
