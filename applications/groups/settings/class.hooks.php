@@ -350,6 +350,45 @@ class GroupsHooks extends Gdn_Plugin {
       }
    }
 
+   /**
+    * Usually discussion view permissions are based on the Category View permissions.
+    * In groups, discussion view permission is based on the group. This overrides the
+    * calculation of discussion view permissions.
+    *
+    * @param $sender
+    * @param $args
+    */
+   public function discussionModel_viewPermission_handler($sender, $args) {
+       $discussion = val('discussion', $args);
+       $categoryId = val('CategoryID', $discussion);
+       $userId = val('userId', $args);
+       if (in_array($categoryId, $this->getGroupCategoryIds()) && ($groupId = val('GroupID', $discussion, false))) {
+           $args['canView'] = $this->canViewGroupContent($userId, $groupId);
+       }
+   }
+
+   /**
+    * Checks whether a given user is able to view the content of a group.
+    *
+    * @param integer $userId The ID of the user to test.
+    * @param integer $groupId The group ID.
+    * @return bool Whether the user can view the group content.
+    */
+   protected function canViewGroupContent($userId, $groupId) {
+      $groupModel = new GroupModel();
+      $group = $groupModel->GetID($groupId);
+      if (val('Privacy', $group) == 'Public') {
+         return true;
+      }
+      if ($userId) {
+         $userGroup = Gdn::SQL()->GetWhere('UserGroup', array('GroupID' => $groupId, 'UserID' => $userId))->FirstRow(DATASET_TYPE_ARRAY);
+      }
+      if ($userGroup) {
+         return true;
+      }
+      return false;
+   }
+
    protected function OverridePermissions($Sender) {
       $DiscussionID = valr('ReflectArgs.DiscussionID', $Sender);
       if (!$DiscussionID) {
@@ -526,6 +565,27 @@ class GroupsHooks extends Gdn_Plugin {
       $Sender->Preferences['Notifications']['Popup.Events'] = T('Notify me when there is event activity.');
    }
 
+
+   /**
+    * Retrieves group category IDs.
+    *
+    * @return array An array of category IDs.
+    */
+   public function getGroupCategoryIds() {
+      $GroupCategoryIDs = Gdn::Cache()->Get('GroupCategoryIDs');
+      if ($GroupCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
+         $CategoryModel = new CategoryModel();
+         $GroupCategories = $CategoryModel->GetWhere(array('AllowGroups' => 1))->ResultArray();
+         $GroupCategoryIDs = array();
+         foreach ($GroupCategories as $GroupCategory) {
+            $GroupCategoryIDs[] = $GroupCategory['CategoryID'];
+         }
+
+         Gdn::Cache()->Store('GroupCategoryIDs', $GroupCategoryIDs);
+      }
+      return $GroupCategoryIDs;
+   }
+
     /**
      * Hide Private content.
      *
@@ -534,17 +594,7 @@ class GroupsHooks extends Gdn_Plugin {
      */
     public function SearchController_Render_Before($Sender, $Args) {
 
-        $GroupCategoryIDs = Gdn::Cache()->Get('GroupCategoryIDs');
-        if ($GroupCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
-            $CategoryModel = new CategoryModel();
-            $GroupCategories = $CategoryModel->GetWhere(array('AllowGroups' => 1))->ResultArray();
-            $GroupCategoryIDs = array();
-            foreach ($GroupCategories as $GroupCategory) {
-                $GroupCategoryIDs[] = $GroupCategory['CategoryID'];
-            }
-
-            Gdn::Cache()->Store('GroupCategoryIDs', $GroupCategoryIDs);
-        }
+        $GroupCategoryIDs = $this->getGroupCategoryIds();
 
         $SearchResults = $Sender->Data('SearchResults', array());
         foreach ($SearchResults as $ResultKey => &$Result) {
