@@ -359,11 +359,11 @@ class GroupsHooks extends Gdn_Plugin {
     * @param $args
     */
    public function discussionModel_viewPermission_handler($sender, $args) {
-       $discussion = val('discussion', $args);
+       $discussion = val('Discussion', $args);
        $categoryId = val('CategoryID', $discussion);
-       $userId = val('userId', $args);
+       $userId = val('UserID', $args);
        if (in_array($categoryId, $this->getGroupCategoryIds()) && ($groupId = val('GroupID', $discussion, false))) {
-           $args['canView'] = $this->canViewGroupContent($userId, $groupId);
+           $args['CanView'] = $this->canViewGroupContent($userId, $groupId);
        }
    }
 
