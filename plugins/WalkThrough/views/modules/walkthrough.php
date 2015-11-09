@@ -11,6 +11,7 @@
 <?php endif; ?>
         };
 
+        document.cookie="Vanilla-intro_tourname=<?php echo $this->data('TourName'); ?>";
         var totalSteps = <?php echo $this->data('TotalSteps'); ?>;
         var intro = introJs();
 
@@ -23,7 +24,7 @@
         intro.setOption('steps', <?php echo json_encode($this->data('IntroSteps')); ?>);
 
         intro.oncomplete(onCompleteCallback);
-        
+
         intro.onafterchange(function(target) {
             var item = intro._introItems[intro._currentStep];
             var currentStep = item.vanilla_step;

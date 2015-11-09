@@ -6,6 +6,9 @@ class WalkThroughModule extends Gdn_Module
         'redirectEnabled' => true
     );
 
+    private $tourName;
+    private $config;
+
     /**
      *
      * @param Gdn_Controller $Sender
@@ -14,60 +17,20 @@ class WalkThroughModule extends Gdn_Module
     public function __construct($Sender = '', $ApplicationFolder = false) {
         parent::__construct($Sender, $ApplicationFolder);
         $this->_ApplicationFolder = 'plugins/WalkThrough';
+        $this->fireEvent('Init');
+    }
+
+    public function setTour($name, $config) {
+        $this->tourName = $name;
+        $this->config = $config;
     }
 
     public function assetTarget() {
         return 'Foot';
     }
 
-    private function getStepsWithRigidPages() {
-        return array(
-            array(
-                'intro' => 'Welcome to this forum.  We will guide you though the features',
-                'page' => 'discussions'
-            ),
-            array(
-                'element' => '.SiteMenu',
-                'intro' => 'This is the site menu',
-            ),
-            array(
-                'element' => '.ActivityFormWrap',
-                'intro' => 'You can add a new activity post in here',
-                'page' => 'activity',
-            ),
-            array(
-                'element' => '#Panel',
-                'intro' => 'This is the panel section',
-                'page' => 'discussions'
-            ),
-
-        );
-    }
-
-    private function getStepsWithNoPages() {
-        return array(
-            array(
-                'intro' => 'Welcome to this forum.  We will guide you though the features',
-//                'vanilla_to'
-//                'position' => 'bottom',
-            ),
-            array(
-                'element' => '.SiteMenu',
-                'intro' => 'This is the site menu',
-//                'position' => 'bottom',
-            ),
-            array(
-                'element' => '#Panel',
-                'intro' => 'This is the panel section',
-//                'position' => 'bottom'
-            ),
-
-        );
-    }
-
     public function toString() {
-        $dbSteps = $this->getStepsWithRigidPages();
-//        $dbSteps = $this->getStepsWithNoPages();
+        $dbSteps = $this->config;
 
         // Inserts the steps number into the array
         foreach ($dbSteps as $k => $dbStep) {
@@ -148,7 +111,13 @@ class WalkThroughModule extends Gdn_Module
             }
         }
 
+        if (empty($group['steps'])) {
+            // Bail out if there are no steps to display!
+            return '';
+        }
 
+
+        $this->setData('TourName', $this->tourName);
         $this->setData('IntroSteps', $group['steps']);
         $this->setData('IntroStartingStep', $IntroStartingStep);
         $this->setData('NextUrl', $NextUrl);

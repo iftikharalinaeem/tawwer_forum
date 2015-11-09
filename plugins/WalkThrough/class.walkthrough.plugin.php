@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 /**
- * 
+ *
  * @copyright Copyright 2010 - 2015 Vanilla Forums Inc.
  * @license Proprietary
  */
@@ -18,61 +18,99 @@ $PluginInfo['WalkThrough'] = array(
 
 class WalkThroughPlugin extends Gdn_Plugin {
 
+    private $tourName;
+    private $tourConfig;
 
     /// Event Handlers.
 
 
     /**
-     * 
+     *
+     * @param WalkThroughModule $Sender
+     */
+    public function WalkthroughModule_Init_Handler($Sender) {
+        $Sender->setTour($this->tourName, $this->tourConfig);
+    }
+
+    /**
+     *
      * @param Gdn_Controller $Sender
      * @param type $args
      */
     public function base_render_before($Sender, $args) {
-        
         if ($Sender->MasterView == 'admin') {
             // Do not show on the admin section
             return;
-        }   
-        
-        if (!$this->shouldWeShowSteps()) {
+        }
+
+        if (!$this->shouldWeIncludeTheModule()) {
             return;
         }
-        
+
         $Sender->addCssFile('introjs.min.css', 'plugins/WalkThrough');
         $Sender->addJsFile('intro.min.js', 'plugins/WalkThrough');
         $Sender->addModule('WalkThroughModule');
     }
 
-    
+
     /// METHODS
 
-    
-    private function shouldWeShowSteps() {
+
+
+    /**
+     * This method should be used by the vfcom plugin to detect if it can push
+     * a tour to the user
+     *
+     * @param int $UserID
+     * @param string $TourName
+     */
+    public function shouldUserSeeTour($UserID, $TourName) {
+        $User = Gdn::userModel()->getID($UserID);
+        if (! $User) {
+            return false;
+        }
+
+        $isTourCompleted = $this->getUserMeta($UserID, $this->getMetaKeyForCompleted($TourName), false, true);
+        return ! $isTourCompleted;
+    }
+
+
+    /**
+     * This method pushes a new tour to be displayed to the user
+     *
+     * @param string $TourName
+     * @param array $TourConfig
+     */
+    public function loadTour($TourName, $TourConfig) {
+        $this->tourName = $this->sanitizeTourName($TourName);
+        $this->tourConfig = $TourConfig;
+    }
+
+
+    private function shouldWeIncludeTheModule() {
+        if (is_null($this->tourConfig)) {
+            return false;
+        }
+
+        if (! $this->shouldUserSeeTour(Gdn::session()->UserID, $this->tourName)) {
+            return false;
+        }
         if (Gdn::session()->getCookie('-intro_completed')) {
+            $this->setUserMeta(Gdn::session()->UserID, $this->getMetaKeyForCompleted($this->tourName), true);
             return false;
         }
         return true;
     }
-    
-    /**
-     * @todo Should be used by vfcom plugin to detect if it can push a tour
-     * 
-     * @param type $UserID
-     * @param type $TourName
-     */
-    public function shouldUserSeeTour($UserID, $TourName) {
-        
+
+
+    private function sanitizeTourName($TourName) {
+        return trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $TourName), '_');
     }
-    
-    /**
-     * @todo Should be used by vfcom plugin to push a new tour
-     * 
-     * @param type $TourName
-     * @param type $Config
-     */
-    public function loadTour($TourName, $Config) {
-        
+
+
+    private function getMetaKeyForCompleted($TourName) {
+        return 'Completed_Tour_' . $this->sanitizeTourName($TourName);
     }
-    
+
 
 }
