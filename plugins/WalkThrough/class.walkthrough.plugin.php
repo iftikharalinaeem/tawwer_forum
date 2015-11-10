@@ -21,16 +21,11 @@ class WalkThroughPlugin extends Gdn_Plugin {
     private $tourName;
     private $tourConfig;
 
+    private $options = array(
+        'redirectEnabled' => true
+    );
+
     /// Event Handlers.
-
-
-    /**
-     *
-     * @param WalkThroughModule $Sender
-     */
-    public function WalkthroughModule_Init_Handler($Sender) {
-        $Sender->setTour($this->tourName, $this->tourConfig);
-    }
 
     /**
      *
@@ -43,13 +38,27 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return;
         }
 
-        if (!$this->shouldWeIncludeTheModule()) {
+        if (!$this->shouldWeDisplayTheTour()) {
             return;
         }
 
+        $CurrentUrl = rtrim(htmlEntityDecode(url()), '&');
+        $CurrentStepNumber = Gdn::session()->getCookie('-intro_currentstep', 0);
+        // If possible and enabled, redirects to the page corresponding to the current step.
+        if (isset($this->tourConfig[$CurrentStepNumber]['url'])) {
+            if ($this->options['redirectEnabled'] && $this->tourConfig[$CurrentStepNumber]['url'] != $CurrentUrl) {
+                redirectUrl($this->tourConfig[$CurrentStepNumber]['url']);
+            }
+        }
+
+        $options = array(
+            'tourName' => $this->tourName,
+            'steps' => $this->tourConfig
+        );
+        $Sender->addDefinition('Plugin.WalkThrough.Options', $options);
         $Sender->addCssFile('introjs.min.css', 'plugins/WalkThrough');
         $Sender->addJsFile('intro.min.js', 'plugins/WalkThrough');
-        $Sender->addModule('WalkThroughModule');
+        $Sender->addJsFile('walkthrough.js', 'plugins/WalkThrough');
     }
 
 
@@ -83,19 +92,26 @@ class WalkThroughPlugin extends Gdn_Plugin {
      */
     public function loadTour($TourName, $TourConfig) {
         $this->tourName = $this->sanitizeTourName($TourName);
-        $this->tourConfig = $TourConfig;
+        $this->setTourConfig($TourConfig);
     }
 
 
-    private function shouldWeIncludeTheModule() {
+    private function shouldWeDisplayTheTour() {
         if (is_null($this->tourConfig)) {
+            return false;
+        }
+
+        // Bail out if there are no steps to display!
+        if (empty($this->tourConfig)) {
             return false;
         }
 
         if (! $this->shouldUserSeeTour(Gdn::session()->UserID, $this->tourName)) {
             return false;
         }
-        if (Gdn::session()->getCookie('-intro_completed')) {
+
+        $currentTourName = Gdn::session()->getCookie('-intro_tourname');
+        if (Gdn::session()->getCookie('-intro_completed') && $currentTourName == $this->tourName) {
             $this->setUserMeta(Gdn::session()->UserID, $this->getMetaKeyForCompleted($this->tourName), true);
             return false;
         }
@@ -112,5 +128,17 @@ class WalkThroughPlugin extends Gdn_Plugin {
         return 'Completed_Tour_' . $this->sanitizeTourName($TourName);
     }
 
+    private function setTourConfig($tourConfig) {
+        $steps = $tourConfig;
 
+        // adds the url property if needed
+        foreach ($steps as $k => $dbStep) {
+            $Page = val('page', $dbStep);
+            if ($Page) {
+                $steps[$k]['url'] = url($Page);
+            }
+        }
+
+        $this->tourConfig = $steps;
+    }
 }
