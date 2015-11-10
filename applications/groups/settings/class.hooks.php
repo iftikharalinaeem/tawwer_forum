@@ -246,12 +246,12 @@ class GroupsHooks extends Gdn_Plugin {
     */
    public function base_beforeRenderAsset_handler($sender, $args) {
       if (val('AssetName', $args) == 'Content' && is_a($sender, 'DiscussionController')) {
-         $groupId = $sender->Data('Discussion.GroupID');
-         if (!$groupId) {
+         $groupID = $sender->Data('Discussion.GroupID');
+         if (!$groupID) {
             return false;
          }
          $model = new GroupModel();
-         $group = $model->getID($groupId);
+         $group = $model->getID($groupID);
 
          $params = array('group' => $group,
             'showButtons' => true,
@@ -361,10 +361,10 @@ class GroupsHooks extends Gdn_Plugin {
    public function discussionModel_checkPermission_handler($sender, $args) {
        if (val('Permission', $args) === 'Vanilla.Discussions.View') {
            $discussion = val('Discussion', $args);
-           $categoryId = val('CategoryID', $discussion);
-           $userId = val('UserID', $args);
-           if (in_array($categoryId, $this->getGroupCategoryIds()) && ($groupId = val('GroupID', $discussion, false))) {
-               $args['HasPermission'] = $this->canViewGroupContent($userId, $groupId);
+           $categoryID = val('CategoryID', $discussion);
+           $userID = val('UserID', $args);
+           if (in_array($categoryID, $this->getGroupCategoryIDs()) && ($groupID = val('GroupID', $discussion, false))) {
+               $args['HasPermission'] = $this->canViewGroupContent($userID, $groupID);
            }
        }
    }
@@ -372,18 +372,18 @@ class GroupsHooks extends Gdn_Plugin {
    /**
     * Checks whether a given user is able to view the content of a group.
     *
-    * @param integer $userId The ID of the user to test.
-    * @param integer $groupId The group ID.
+    * @param integer $userID The ID of the user to test.
+    * @param integer $groupID The group ID.
     * @return bool Whether the user can view the group content.
     */
-   protected function canViewGroupContent($userId, $groupId) {
+   protected function canViewGroupContent($userID, $groupID) {
       $groupModel = new GroupModel();
-      $group = $groupModel->GetID($groupId);
+      $group = $groupModel->GetID($groupID);
       if (val('Privacy', $group) == 'Public') {
          return true;
       }
-      if ($userId) {
-         $userGroup = Gdn::SQL()->GetWhere('UserGroup', array('GroupID' => $groupId, 'UserID' => $userId))->FirstRow(DATASET_TYPE_ARRAY);
+      if ($userID) {
+         $userGroup = Gdn::SQL()->GetWhere('UserGroup', array('GroupID' => $groupID, 'UserID' => $userID))->FirstRow(DATASET_TYPE_ARRAY);
       }
       if ($userGroup) {
          return true;
@@ -573,7 +573,7 @@ class GroupsHooks extends Gdn_Plugin {
     *
     * @return array An array of category IDs.
     */
-   public function getGroupCategoryIds() {
+   public function getGroupCategoryIDs() {
       $GroupCategoryIDs = Gdn::Cache()->Get('GroupCategoryIDs');
       if ($GroupCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
          $CategoryModel = new CategoryModel();
@@ -596,7 +596,7 @@ class GroupsHooks extends Gdn_Plugin {
      */
     public function SearchController_Render_Before($Sender, $Args) {
 
-        $GroupCategoryIDs = $this->getGroupCategoryIds();
+        $GroupCategoryIDs = $this->getGroupCategoryIDs();
 
         $SearchResults = $Sender->Data('SearchResults', array());
         foreach ($SearchResults as $ResultKey => &$Result) {
