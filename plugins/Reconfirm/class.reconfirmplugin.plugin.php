@@ -38,19 +38,11 @@ class ReconfirmPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function structure() {
-        $columnExists = gdn::structure()->table('User')->columnExists('ConfirmedTerms');
 
         gdn::structure()->table('User')
-            ->column('ConfirmedTerms', 'int', '0', array('index'))
+            ->column('ConfirmedTerms', 'tinyint', 0, array('index'))
             ->set();
-
-        // If ConfirmedTerms already existed, don't update it.
-        if($columnExists === false) {
-            gdn::sql()
-                ->update('User u')
-                ->set('u.ConfirmedTerms', 0, false, false)
-                ->put();
-        }
+        return;
     }
 
     /**
@@ -66,21 +58,29 @@ class ReconfirmPlugin extends Gdn_Plugin {
             return;
         }
 
-        $user = gdn::session()->User;
-        $userConfirmed = val("ConfirmedTerms", $user, 0);
+        $userConfirmed = val("ConfirmedTerms", gdn::session()->User, 0);
         // Any authenticated user who has confirmed can browser the forum.
         if($userConfirmed) {
             return;
         }
 
-        $selfUrl = gdn::request()->url();
-        // Anyone, even unconfirmed users can sign in, sign out or confirm.
-        if(stristr($selfUrl, "/entry/confirm") || stristr($selfUrl, "/entry/signout") || stristr($selfUrl, "/entry/signin") || stristr($selfUrl, "/dashboard") || stristr($selfUrl, "/home/termsofservice")) {
-            return;
+        // Anyone, even unconfirmed users can visit these pages.
+        $urlWhiteList = array(
+            "/entry/confirm",
+            "/entry/signout",
+            "/entry/signin",
+            "/dashboard",
+            "/home/termsofservice"
+        );
+
+        foreach ($urlWhiteList as $url) {
+            if (stripos(gdn::request()->url(), $url) !== FALSE) {
+                return;
+            }
         }
 
         // All authenticated users who have not confirmed are redirected to the confirm page.
-        redirect(url('/entry/confirm'));
+        redirect('/entry/confirm');
     }
 
     /**
@@ -92,7 +92,7 @@ class ReconfirmPlugin extends Gdn_Plugin {
         $sender->addJsFile('password.js');
         $sender->Form->addHidden("UserID", gdn::session()->UserID);
         $sender->Form->addHidden("ConfirmedTerms", 1);
-        if ($sender->Form->authenticatedPostBack() === true) {
+        if ($sender->Form->authenticatedPostBack()) {
             $sender->UserModel->Validation->applyRule('TermsOfService', 'Required', t('You must agree to the terms of service.'));
             $sender->UserModel->Validation->applyRule('Password', 'Required');
             $sender->UserModel->Validation->applyRule('Password', 'Strength');
@@ -103,15 +103,15 @@ class ReconfirmPlugin extends Gdn_Plugin {
 
             $sender->UserModel->Validation->validate(gdn::request()->post());
             $errors = $sender->UserModel->Validation->resultsText();
-            if ($errors  && !c('Garden.Embed.Allow')) {
+            if ($errors) {
                 $sender->Form->addError('Please try again.');
                 $sender->Form->addError($errors);
             }
 
             // Check the user.
             if ($sender->Form->errorCount() == 0) {
-                $rowID = $sender->UserModel->save(gdn::request()->post());
-                redirect(gdn::request()->domain());
+                $sender->UserModel->save(gdn::request()->post());
+                redirect('/');
             }
         }
         $sender->render("confirm", "", "plugins/Reconfirm");
@@ -121,16 +121,15 @@ class ReconfirmPlugin extends Gdn_Plugin {
 /**
  * Validate that the new password is different from the existing password.
  *
- * @param $value
+ * @param $submittedPassword 'New' password supplied by user.
  * @return bool
  * @throws Gdn_UserException
  */
-function validateNewPassword ($value) {
-    $sessionUser = gdn::session()->User;
-    $user = gdn::userModel()->getByEmail(val('Email', $sessionUser));
-    $submittedPassword = $value;
+function validateNewPassword ($submittedPassword=null) {
+    $user = gdn::userModel()->getByEmail(val('Email', gdn::session()->User));
     $existingPassword = val("Password", $user);
     $passwordHash = new Gdn_PasswordHash();
     $passwordMatch = $passwordHash->checkPassword($submittedPassword, $existingPassword, val('HashMethod', $user), val('Name', $user));
-    return ($passwordMatch === true) ? false : true; // Since this is to validate that we are changing the password, if it matches return false.
+    // Since this is to validate that we are changing the password, if it matches return false.
+    return ($passwordMatch === true) ? false : true;
 }

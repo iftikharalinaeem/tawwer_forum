@@ -3,13 +3,13 @@
     <h1><?php echo t("Create a New Password") ?></h1>
 
     <div class="FormWrapper">
-        <div class="instructions"><?php echo t('ReconfirmTermsInstruction') ?></div>
+        <div class="instructions"><?php echo t('Reset password and agree to terms') ?></div>
         <?php
         $termsOfServiceUrl = Gdn::config('Garden.TermsOfService', '#');
         $termsOfServiceText = sprintf(t('I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'), url($termsOfServiceUrl));
         // Make sure to force this form to post to the correct place in case the view is
         // rendered within another view (ie. /dashboard/entry/index/):
-        echo $this->Form->open(array('Action' => url('/entry/confirm'), 'id' => 'Form_User_Confirm'));
+        echo $this->Form->open(array('action' => url('/entry/confirm'), 'id' => 'Form_User_Confirm'));
         echo $this->Form->errors();
         ?>
         <ul>
