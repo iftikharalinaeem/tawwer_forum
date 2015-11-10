@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) { exit(); }
 
 class WalkThroughModule extends Gdn_Module
 {
@@ -30,98 +30,34 @@ class WalkThroughModule extends Gdn_Module
     }
 
     public function toString() {
-        $dbSteps = $this->config;
+        $steps = $this->config;
 
-        // Inserts the steps number into the array
-        foreach ($dbSteps as $k => $dbStep) {
-            $dbSteps[$k]['vanilla_step'] = $k + 1;
-
-            // @TODO : REMOVE debug
-            $dbSteps[$k]['intro'] = 'Step# ' . $dbSteps[$k]['vanilla_step'] . '<br/>' . $dbStep['intro'];
-        }
-
-        $groups = array();
-        $GroupIndex = 0;
         $CurrentUrl = rtrim(htmlEntityDecode(url()), '&');
-        $LastStepUrl = $CurrentUrl;
 
-        $StartUrl = Gdn::session()->getCookie('-intro_start_url');
-        if (!$StartUrl) {
-            Gdn::session()->setCookie('-intro_start_url', $CurrentUrl, 3600);
-        } else {
-            $LastStepUrl = $StartUrl;
-        }
-
-        $groups[0] = array(
-            'show_on_url' => null,
-            'steps' => array()
-        );
-        // split into logical group of steps
-        foreach ($dbSteps as $dbStep) {
+        // adds the url property if needed
+        foreach ($steps as $k => $dbStep) {
             $Page = val('page', $dbStep);
             if ($Page) {
-                if (url($Page) == $LastStepUrl) {
-                    $groups[$GroupIndex]['show_on_url'] = url($Page);
-                } else {
-                    $LastStepUrl = url($Page);
-
-                    // new group needed
-                    $GroupIndex++;
-                    $groups[$GroupIndex] = array(
-                        'show_on_url' => $LastStepUrl,
-                        'steps' => array()
-                    );
-                }
-            }
-            $groups[$GroupIndex]['steps'][] = $dbStep;
-        }
-
-        $CurrentStepNumber = Gdn::session()->getCookie('-intro_currentstep', 1);
-
-
-        $NextUrl = null;
-        $IntroStartingStep = 1;
-
-
-        // find the group that contains the current step
-        foreach ($groups as $k => $group) {
-            foreach ($group['steps'] as $step) {
-                if ($step['vanilla_step'] == $CurrentStepNumber) {
-                    break 2;
-                }
+                $steps[$k]['url'] = url($Page);
             }
         }
 
-        if ($group['show_on_url'] && $group['show_on_url'] != $CurrentUrl) {
-            if ($this->options['redirectEnabled']) {
-                redirectUrl($group['show_on_url']);
-            }
-            return '';
-        }
+        $CurrentStepNumber = Gdn::session()->getCookie('-intro_currentstep', 0);
 
-        if (isset($groups[$k+1])) {
-            $NextUrl = val('show_on_url', $groups[$k+1], null);
-        }
-
-
-        foreach ($group['steps'] as $k=> $step) {
-            if ($step['vanilla_step'] == $CurrentStepNumber) {
-                $IntroStartingStep = $k + 1;
-                break;
+        // If possible and enabled, redirects to the page corresponding to the current step.
+        if (isset($steps[$CurrentStepNumber]['url'])) {
+            if ($this->options['redirectEnabled'] && $steps[$CurrentStepNumber]['url'] != $CurrentUrl) {
+                redirectUrl($steps[$CurrentStepNumber]['url']);
             }
         }
 
-        if (empty($group['steps'])) {
+        if (empty($steps)) {
             // Bail out if there are no steps to display!
             return '';
         }
 
-
         $this->setData('TourName', $this->tourName);
-        $this->setData('IntroSteps', $group['steps']);
-        $this->setData('IntroStartingStep', $IntroStartingStep);
-        $this->setData('NextUrl', $NextUrl);
-        $this->setData('TotalSteps', count($dbSteps));
+        $this->setData('IntroSteps', $steps);
 
         return parent::toString();
     }
