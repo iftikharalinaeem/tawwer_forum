@@ -64,24 +64,62 @@ class ReconfirmPlugin extends Gdn_Plugin {
             return;
         }
 
-        // Anyone, even unconfirmed users can visit these pages.
-        $urlWhiteList = array(
-            "/entry/confirm",
-            "/entry/signout",
-            "/entry/signin",
-            "/dashboard",
-            "/home/termsofservice"
-        );
+        // Override some URLs that will be banned by disallowUrl.
+        $allowUrls = array('/entry/confirm', '/profile/notificationspopin', '/messages/popin');
+        if($this->allowUrl($allowUrls)) {
+            return;
+        }
 
-        foreach ($urlWhiteList as $url) {
-            if (stripos(gdn::request()->url(), $url) !== FALSE) {
-                return;
+        // Redirect any url that has a query that begins the following string.
+        $disallowUrls = array('/discussion/', '/messages', '/profile', '/activity');
+        if($this->disallowUrl($disallowUrls)) {
+            // All authenticated users who have not confirmed are redirected to the confirm page.
+            redirect('/entry/confirm');
+        }
+
+        return;
+    }
+
+    /**
+     * Parse out which pages should redirect to the reconfirm page.
+     *
+     * @return bool
+     */
+    private function disallowUrl($disallowUrls) {
+        $queryString = val("QUERY_STRING", gdn::request()->getRequestArguments("server"));
+
+        /** @var $p parsed from $queryString */
+        parse_str($queryString);
+
+        foreach($disallowUrls as $url) {
+            if(substr($p, 0, strlen($url)) === $url) {
+                return true;
             }
         }
 
-        // All authenticated users who have not confirmed are redirected to the confirm page.
-        redirect('/entry/confirm');
+        return false;
     }
+
+    /**
+     * Parse out which pages should not redirect to the reconfirm page.
+     *
+     * @return bool
+     */
+    private function allowUrl($allowUrls) {
+        $queryString = val("QUERY_STRING", gdn::request()->getRequestArguments("server"));
+
+        /** @var $p parsed from $queryString */
+        parse_str($queryString);
+
+        foreach($allowUrls as $url) {
+            if(substr($p, 0, strlen($url)) === $url) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     /**
      * Create a form to capture the user's new password, validate that it doesn't match the existing password.
@@ -115,6 +153,17 @@ class ReconfirmPlugin extends Gdn_Plugin {
             }
         }
         $sender->render("confirm", "", "plugins/Reconfirm");
+    }
+
+    /**
+     * New users will be automatically confirmed because they have to agree to the new terms of use and will have new passwords.
+     *
+     * @param $sender
+     * @param $args
+     */
+
+    public function entryController_register_handler($sender, $args) {
+        $sender->Form->addHidden('ConfirmedTerms', 1);
     }
 }
 
