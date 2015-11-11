@@ -1,8 +1,8 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) { exit(); }
 
 /**
  *
- * @copyright Copyright 2010 - 2015 Vanilla Forums Inc.
+ * @copyright Copyright 2010-2015 Vanilla Forums Inc.
  * @license Proprietary
  */
 $PluginInfo['WalkThrough'] = array(
@@ -16,6 +16,18 @@ $PluginInfo['WalkThrough'] = array(
     'MobileFriendly' => false
 );
 
+/**
+ * WalkThrough Plugin
+ *
+ * Manage the display for tours provided by other plugins.
+ *
+ * @author Eric Vachaviolos <eric.v@vanillaforums.com>
+ * @copyright 2010-2015 Vanilla Forums Inc.
+ * @license Proprietary
+ * @package internal
+ * @subpackage WalkThrough
+ * @since 2.0
+ */
 class WalkThroughPlugin extends Gdn_Plugin {
 
     private $tourName;
@@ -28,11 +40,18 @@ class WalkThroughPlugin extends Gdn_Plugin {
     /// Event Handlers.
 
     /**
+     * Injects everything it needs to render a tour.
+     * If there is no tour or we shouldn't display it at that time,
+     * nothing will be injected
      *
      * @param Gdn_Controller $Sender
-     * @param type $args
      */
-    public function base_render_before($Sender, $args) {
+    public function base_render_before($Sender) {
+        // Do not display if the delivery method is not XHTML
+        if ($Sender->deliveryMethod() != DELIVERY_METHOD_XHTML) {
+            return;
+        }
+
         if ($Sender->MasterView == 'admin') {
             // Do not show on the admin section
             return;
@@ -43,11 +62,12 @@ class WalkThroughPlugin extends Gdn_Plugin {
         }
 
         $CurrentUrl = rtrim(htmlEntityDecode(url()), '&');
-        $CurrentStepNumber = Gdn::session()->getCookie('-intro_currentstep', 0);
+        $tourData = $this->loadTourMetaData();
+        $currentStepIndex = val('stepIndex', $tourData, 0);
         // If possible and enabled, redirects to the page corresponding to the current step.
-        if (isset($this->tourConfig[$CurrentStepNumber]['url'])) {
-            if ($this->options['redirectEnabled'] && $this->tourConfig[$CurrentStepNumber]['url'] != $CurrentUrl) {
-                redirectUrl($this->tourConfig[$CurrentStepNumber]['url']);
+        if (isset($this->tourConfig[$currentStepIndex]['url'])) {
+            if ($this->options['redirectEnabled'] && $this->tourConfig[$currentStepIndex]['url'] != $CurrentUrl) {
+                redirectUrl($this->tourConfig[$currentStepIndex]['url']);
             }
         }
 
@@ -62,9 +82,8 @@ class WalkThroughPlugin extends Gdn_Plugin {
     }
 
 
+
     /// METHODS
-
-
 
     /**
      * This method should be used by the vfcom plugin to detect if it can push
@@ -95,6 +114,55 @@ class WalkThroughPlugin extends Gdn_Plugin {
         $this->setTourConfig($TourConfig);
     }
 
+    /**
+     * Saves the tour has being completed for the current user.
+     *
+     * @param string $tourName
+     * @return boolean
+     */
+    public function setComplete($tourName) {
+
+        $userID = (int) Gdn::session()->UserID;
+        if ($userID <= 0 || ! $tourName) {
+            return false;
+        }
+
+        $tourData = $this->loadTourMetaData();
+        $runningTourName = val('name', $tourData);
+        if ($runningTourName && $runningTourName != $tourName) {
+            return false;
+        }
+
+        $this->setUserMeta($userID, 'TourData', null);
+        $this->setUserMeta($userID, $this->getMetaKeyForCompleted($tourName), true);
+        return true;
+    }
+
+    /**
+     * Saves the current step index of the tour that the current user has just viewed.
+     *
+     * @param string $tourName
+     * @param int $currentStep  The current step index
+     * @return boolean
+     */
+    public function setCurrentStep($tourName, $currentStep) {
+        $userID =  (int) Gdn::session()->UserID;
+        if ($userID <= 0 || ! $tourName) {
+            return false;
+        }
+
+        $tourData = array(
+            'name' => $tourName,
+            'stepIndex' => $currentStep
+        );
+
+        $this->setUserMeta($userID, 'TourData', json_encode($tourData));
+        return true;
+    }
+
+    private function loadTourMetaData() {
+        return json_decode($this->getUserMeta(Gdn::session()->UserID, 'TourData', '{}', true), true);
+    }
 
     private function shouldWeDisplayTheTour() {
         if (is_null($this->tourConfig)) {
@@ -110,19 +178,12 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $currentTourName = Gdn::session()->getCookie('-intro_tourname');
-        if (Gdn::session()->getCookie('-intro_completed') && $currentTourName == $this->tourName) {
-            $this->setUserMeta(Gdn::session()->UserID, $this->getMetaKeyForCompleted($this->tourName), true);
-            return false;
-        }
         return true;
     }
-
 
     private function sanitizeTourName($TourName) {
         return trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $TourName), '_');
     }
-
 
     private function getMetaKeyForCompleted($TourName) {
         return 'Completed_Tour_' . $this->sanitizeTourName($TourName);

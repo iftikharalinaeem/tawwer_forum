@@ -1,3 +1,29 @@
+/*
+ * Manage the display of a tour
+ *
+ * @author Eric Vachaviolos <eric.v@vanillaforums.com>
+ * @copyright 2010-2015 Vanilla Forums Inc.
+ * @license Proprietary
+ * @package internal
+ * @subpackage WalkThrough
+ * @since 2.0
+ */
+
+function walkthroughNotify(path, data) {
+    $.ajax({
+        type: "POST",
+        url: gdn.url(path),
+        data: data,
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+        },
+        success: function(json) {
+        },
+        dataType: 'json'
+    });
+};
+
+
+
 function startIntro() {
     if (typeof(gdn) !== 'object') {
         return;
@@ -12,7 +38,6 @@ function startIntro() {
         return;
     }
 
-    document.cookie="Vanilla-intro_tourname=" + options.tourName;
     var intro = introJs();
 
     var defaultNextLabel = intro._options['nextLabel'];
@@ -89,7 +114,10 @@ function startIntro() {
 
     intro.onchange(function(targetElement) {
         localStorage.setItem('intro_currentStep', intro._currentStep);
-        document.cookie="Vanilla-intro_currentstep="+intro._currentStep;
+        walkthroughNotify('walkthrough/currentstep', {
+            TourName: options.tourName,
+            CurrentStep: intro._currentStep
+        });
 
         var step = intro._introItems[intro._currentStep];
         redirectIfNeeded(step);
@@ -97,7 +125,9 @@ function startIntro() {
     });
 
     intro.oncomplete(function() {
-        document.cookie="Vanilla-intro_completed=1";
+        walkthroughNotify('walkthrough/complete', {
+            TourName: options.tourName
+        });
     });
 
     intro.onexit(function() {
@@ -108,7 +138,10 @@ function startIntro() {
     if (localStorage.intro_currentStep) {
         intro.goToStep( parseInt(localStorage.intro_currentStep) + 1);
     }
-    intro.start();
+
+    $(document).ready(function() {
+        intro.start();
+    });
 }
 
 startIntro();
