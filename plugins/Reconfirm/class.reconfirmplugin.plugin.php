@@ -81,6 +81,20 @@ class ReconfirmPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Redirect to the confirm page after login if user is unconfirmed.
+     *
+     */
+    public function userModel_afterSignIn_handler() {
+        $userConfirmed = val("ConfirmedTerms", gdn::session()->User, 0);
+        if(!$userConfirmed) {
+            // Break out of jquery to redirect.
+            die('<script type="text/javascript">window.location = window.location.protocol + "//" + window.location.host + "/entry/confirm";</script>');
+        }
+        return;
+    }
+
+
+    /**
      * Parse out which pages should redirect to the reconfirm page.
      *
      * @return bool
