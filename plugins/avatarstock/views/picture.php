@@ -80,7 +80,7 @@ if (CheckPermission('Garden.Settings.Manage')
 
     <?php
     if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-        echo Wrap(Anchor(T('Remove Picture'), CombinePaths(array(UserUrl($this->User, '', 'removepicture'), $Session->TransientKey())), 'Button Danger PopConfirm'), 'p', array('class' => 'remove-picture'));
+        echo wrap(Anchor(t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->TransientKey(), 'Button Danger PopConfirm'), 'p', array('class' => 'remove-picture'));
     }
     ?>
 

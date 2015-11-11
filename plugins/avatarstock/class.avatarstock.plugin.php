@@ -179,9 +179,9 @@ class AvatarStockPlugin extends Gdn_Plugin {
      * @param ProfileController $Sender The profile controller.
      * @param string $UserReference The user reference, if available.
      * @param string $Username The user's name, if available.
-     * @param string $TransientKey The transient key.
+     * @param string $tk The transient key.
      */
-    public function ProfileController_RemovePicture_Create($Sender, $UserReference = '', $Username = '', $TransientKey = '') {
+    public function ProfileController_RemovePicture_Create($Sender, $UserReference = '', $Username = '', $tk = '') {
         $Sender->Permission('Garden.SignIn.Allow');
         $Session = Gdn::Session();
         if (!$Session->IsValid())
@@ -190,7 +190,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
         // Get user data & another permission check
         $Sender->GetUserInfo($UserReference, $Username, '', TRUE);
         $RedirectUrl = UserUrl($Sender->User, '', 'picture');
-        if ($Session->ValidateTransientKey($TransientKey) && is_object($Sender->User)) {
+        if ($Session->ValidateTransientKey($tk) && is_object($Sender->User)) {
             $HasRemovePermission = CheckPermission('Garden.Users.Edit') || CheckPermission('Moderation.Profiles.Edit');
             if ($Sender->User->UserID == $Session->UserID || $HasRemovePermission) {
                 if (strpos($Sender->User->Photo, $this->file_destination_dir) === false) {
