@@ -139,9 +139,9 @@ function startIntro() {
         intro.goToStep( parseInt(localStorage.intro_currentStep) + 1);
     }
 
-    $(document).ready(function() {
-        intro.start();
-    });
+    intro.start();
 }
 
-startIntro();
+$(document).ready(function() {
+   startIntro();
+});
