@@ -61,6 +61,9 @@ function startIntro() {
     intro.setOption('tooltipPosition', 'auto');
     intro.setOption('positionPrecedence', ['left', 'right', 'bottom', 'top'])
     intro.setOption('showStepNumbers', true);
+    intro.setOption('exitOnEsc', false);
+    intro.setOption('exitOnOverlayClick', false);
+
     intro.setOption('steps', options.steps);
 
 
@@ -146,6 +149,9 @@ function startIntro() {
 
     intro.onexit(function() {
         // should put the skipping logic in here
+        walkthroughNotify('walkthrough/skip', {
+            TourName: options.tourName
+        });
     });
 
     // Resume on the current step

@@ -36,6 +36,18 @@ class WalkthroughController extends PluginController {
     }
 
     /**
+     * Notifies that the tour has been skipped
+     */
+    public function skip() {
+        $tourName = Gdn::request()->post('TourName');
+
+        // Delegate to the plugin
+        $result = $this->plugin->setSkipped($tourName);
+
+        $this->renderData(array('Result' => $result));
+    }
+
+    /**
      * Notifies which step is being viewed
      */
     public function currentStep() {

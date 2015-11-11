@@ -78,7 +78,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
         );
         $Sender->addDefinition('Plugin.WalkThrough.Options', $options);
         $Sender->addCssFile('introjs.min.css', 'plugins/WalkThrough');
-        $Sender->addJsFile('intro.js', 'plugins/WalkThrough');
+        $Sender->addJsFile('intro.min.js', 'plugins/WalkThrough');
         $Sender->addJsFile('walkthrough.js', 'plugins/WalkThrough');
     }
 
@@ -146,7 +146,6 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * @return boolean
      */
     public function setComplete($tourName) {
-
         $userID = (int) Gdn::session()->UserID;
         if ($userID <= 0 || ! $tourName) {
             return false;
@@ -161,6 +160,17 @@ class WalkThroughPlugin extends Gdn_Plugin {
         $this->setUserMeta($userID, 'TourData', null);
         $this->setUserMeta($userID, $this->getMetaKeyForCompleted($tourName), true);
         return true;
+    }
+
+    /**
+     * Saves the tour has being skipped for the current user.
+     *
+     * @param string $tourName
+     * @return boolean
+     */
+    public function setSkipped($tourName) {
+        // Currently, there's no distinction between complete or skipped
+        return $this->setComplete($tourName);
     }
 
     /**
