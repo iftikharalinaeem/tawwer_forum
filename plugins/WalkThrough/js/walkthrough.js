@@ -76,20 +76,19 @@ function startIntro() {
 
     function redirectIfNeeded(step) {
         // check if the step needs to navigate to another page
-        var newUrl = getStepUrlIfDifferentThanCurrentUrl(step);
+        var newUrl = getStepUrlIfDifferentThanCurrenPath(step);
         if (newUrl) {
             window.location.href = newUrl;
         }
     };
 
-    function getStepUrlIfDifferentThanCurrentUrl(step) {
-        if (typeof(step.url) === 'string') {
-            var anchor = document.createElement('a');
-            anchor.href = step.url;
-            var newUrl = anchor.href;
-
-            if (newUrl !== window.location.href) {
-                return newUrl;
+    /**
+     * Returns a URL if the step requires a url change.
+     */
+    function getStepUrlIfDifferentThanCurrenPath(step) {
+        if (typeof(step.page) === 'string') {
+            if (step.page !== gdn.getMeta('Path')) {
+                return gdn.url(step.page);
             }
         }
         return null;
@@ -115,7 +114,7 @@ function startIntro() {
 
         var nextStep = getStepByIndex(intro._currentStep + 1);
         if (nextStep) {
-            var newUrl = getStepUrlIfDifferentThanCurrentUrl(nextStep);
+            var newUrl = getStepUrlIfDifferentThanCurrenPath(nextStep);
             if (newUrl) {
                 changeLabel('nextLabel', 'Next page &rarr;');
             }
@@ -123,7 +122,7 @@ function startIntro() {
 
         var previousStep = getStepByIndex(intro._currentStep - 1);
         if (previousStep) {
-            var newUrl = getStepUrlIfDifferentThanCurrentUrl(previousStep);
+            var newUrl = getStepUrlIfDifferentThanCurrenPath(previousStep);
             if (newUrl) {
                 changeLabel('prevLabel', '&larr; Previous page');
             }

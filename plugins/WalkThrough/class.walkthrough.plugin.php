@@ -61,13 +61,14 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return;
         }
 
-        $CurrentUrl = rtrim(htmlEntityDecode(url()), '&');
         $tourData = $this->loadTourMetaData();
         $currentStepIndex = val('stepIndex', $tourData, 0);
+
         // If possible and enabled, redirects to the page corresponding to the current step.
-        if (isset($this->tourConfig[$currentStepIndex]['url'])) {
-            if ($this->options['redirectEnabled'] && $this->tourConfig[$currentStepIndex]['url'] != $CurrentUrl) {
-                redirectUrl($this->tourConfig[$currentStepIndex]['url']);
+        if ($this->options['redirectEnabled']) {
+            $stepPath = val('page', $this->tourConfig[$currentStepIndex]);
+            if ($stepPath && $stepPath != Gdn::request()->path()) {
+                redirectUrl(url($stepPath));
             }
         }
 
