@@ -30,12 +30,27 @@ function startIntro() {
     }
 
     var options = gdn.getMeta('Plugin.WalkThrough.Options', []);
+
     if (typeof(options.steps) === 'undefined') {
         return;
     }
 
     if (typeof(options.tourName) === 'undefined') {
         return;
+    }
+
+
+    var currentStepIndex = 0;
+    if (typeof(options.currentStepIndex) !== 'undefined') {
+        currentStepIndex = parseInt(options.currentStepIndex);
+    }
+
+    if (currentStepIndex < 0) {
+        currentStepIndex = 0;
+    }
+
+    if (currentStepIndex > options.steps.length - 1) {
+        currentStepIndex = options.steps.length - 1;
     }
 
     var intro = introJs();
@@ -113,7 +128,6 @@ function startIntro() {
     }
 
     intro.onchange(function(targetElement) {
-        localStorage.setItem('intro_currentStep', intro._currentStep);
         walkthroughNotify('walkthrough/currentstep', {
             TourName: options.tourName,
             CurrentStep: intro._currentStep
@@ -134,11 +148,8 @@ function startIntro() {
         // should put the skipping logic in here
     });
 
-    // Resume on the current step if needed
-    if (localStorage.intro_currentStep) {
-        intro.goToStep( parseInt(localStorage.intro_currentStep) + 1);
-    }
-
+    // Resume on the current step
+    intro.goToStep(currentStepIndex + 1);
     intro.start();
 }
 

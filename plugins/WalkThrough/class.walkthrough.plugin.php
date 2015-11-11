@@ -73,11 +73,12 @@ class WalkThroughPlugin extends Gdn_Plugin {
 
         $options = array(
             'tourName' => $this->tourName,
-            'steps' => $this->tourConfig
+            'steps' => $this->tourConfig,
+            'currentStepIndex' => $currentStepIndex
         );
         $Sender->addDefinition('Plugin.WalkThrough.Options', $options);
         $Sender->addCssFile('introjs.min.css', 'plugins/WalkThrough');
-        $Sender->addJsFile('intro.min.js', 'plugins/WalkThrough');
+        $Sender->addJsFile('intro.js', 'plugins/WalkThrough');
         $Sender->addJsFile('walkthrough.js', 'plugins/WalkThrough');
     }
 
@@ -98,6 +99,13 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return false;
         }
 
+        $tourData = $this->loadTourMetaData();
+        $runningTourName = val('name', $tourData);
+        if ($runningTourName && $runningTourName != $TourName) {
+            // A user must finish a tour before seeing a different one
+            return false;
+        }
+
         $isTourCompleted = $this->getUserMeta($UserID, $this->getMetaKeyForCompleted($TourName), false, true);
         return ! $isTourCompleted;
     }
@@ -110,8 +118,25 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * @param array $TourConfig
      */
     public function loadTour($TourName, $TourConfig) {
+        if (! $this->shouldUserSeeTour(Gdn::session()->UserID, $TourName)) {
+            return false;
+        }
         $this->tourName = $this->sanitizeTourName($TourName);
         $this->setTourConfig($TourConfig);
+
+
+        $tourData = $this->loadTourMetaData();
+
+        // Setup the tour metadata if it's the first time we load this tour.
+        // This way, tours are treated first come, first serve
+        if (empty($tourData)) {
+            $tourData = array(
+                'name' => $this->tourName,
+                'stepIndex' => 0
+            );
+
+            $this->setUserMeta(Gdn::session()->UserID, 'TourData', json_encode($tourData));
+        }
     }
 
     /**
