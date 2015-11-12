@@ -32,6 +32,8 @@ class WalkThroughPlugin extends Gdn_Plugin {
     private $tourName;
     private $tourConfig;
 
+    private $requestedTourNames = [];
+
     private $options = [
         'redirectEnabled' => true
     ];
@@ -46,13 +48,12 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      */
     public function base_render_before($sender) {
+        // Unblocks the user stuck on a tour which is not requested anymore.
+        // The next tour (if any), will be available on the next request
+        $this->cleanupOldTour();
+
         // Do not display if the delivery method is not XHTML
         if ($sender->deliveryMethod() != DELIVERY_METHOD_XHTML) {
-            return;
-        }
-
-        if ($sender->MasterView == 'admin') {
-            // Do not show on the admin section
             return;
         }
 
@@ -98,6 +99,8 @@ class WalkThroughPlugin extends Gdn_Plugin {
         if (! $User) {
             return false;
         }
+
+        $this->requestedTourNames[$this->sanitizeTourName($tourName)] = true;
 
         $tourData = $this->loadTourMetaData();
         $runningTourName = val('name', $tourData);
@@ -236,5 +239,23 @@ class WalkThroughPlugin extends Gdn_Plugin {
         }
 
         $this->tourConfig = $steps;
+    }
+
+    /**
+     * If the current user is watching a tour that is not requested
+     * anymore, we need to remove the UserMetadata so that we can push
+     * a new tour to that user
+     */
+    private function cleanupOldTour() {
+        $userID = Gdn::session()->UserID;
+        if ($userID <= 0) {
+            return;
+        }
+
+        $tourData = $this->loadTourMetaData();
+        $tourName = val('name', $tourData);
+        if (!isset($this->requestedTourNames[$tourName])) {
+            $this->setUserMeta($userID, 'TourData', null);
+        }
     }
 }
