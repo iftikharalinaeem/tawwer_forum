@@ -32,7 +32,7 @@ class WalkthroughController extends PluginController {
         // Delegate to the plugin
         $result = $this->plugin->setComplete($tourName);
 
-        $this->renderData(array('Result' => $result));
+        $this->renderData(['Result' => $result]);
     }
 
     /**
@@ -44,7 +44,7 @@ class WalkthroughController extends PluginController {
         // Delegate to the plugin
         $result = $this->plugin->setSkipped($tourName);
 
-        $this->renderData(array('Result' => $result));
+        $this->renderData(['Result' => $result]);
     }
 
     /**
@@ -57,7 +57,7 @@ class WalkthroughController extends PluginController {
         // Delegate to the plugin
         $result = $this->plugin->setCurrentStep($tourName, $currentStep);
 
-        $this->renderData(array('Result' => $result));
+        $this->renderData(['Result' => $result]);
     }
 
 

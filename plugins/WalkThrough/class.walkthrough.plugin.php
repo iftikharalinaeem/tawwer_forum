@@ -6,16 +6,16 @@
  */
 
 // Defines the plugin:
-$PluginInfo['WalkThrough'] = array(
+$PluginInfo['WalkThrough'] = [
     'Name' => 'Walk Through',
     'Description' => "Walks users through the features of the forum.",
     'Version' => '0.1',
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
+    'RequiredApplications' => ['Vanilla' => '2.1a'],
     'Author' => 'Eric Vachaviolos',
     'AuthorEmail' => 'eric.v@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/evach',
     'MobileFriendly' => false
-);
+];
 
 /**
  * WalkThrough Plugin
@@ -32,9 +32,9 @@ class WalkThroughPlugin extends Gdn_Plugin {
     private $tourName;
     private $tourConfig;
 
-    private $options = array(
+    private $options = [
         'redirectEnabled' => true
-    );
+    ];
 
     /// Event Handlers.
 
@@ -71,11 +71,11 @@ class WalkThroughPlugin extends Gdn_Plugin {
             }
         }
 
-        $options = array(
+        $options = [
             'tourName' => $this->tourName,
             'steps' => $this->tourConfig,
             'currentStepIndex' => $currentStepIndex
-        );
+        ];
         $sender->addDefinition('Plugin.WalkThrough.Options', $options);
         $sender->addCssFile('introjs.min.css', 'plugins/WalkThrough');
         $sender->addJsFile('intro.min.js', 'plugins/WalkThrough');
@@ -130,10 +130,10 @@ class WalkThroughPlugin extends Gdn_Plugin {
         // Setup the tour metadata if it's the first time we load this tour.
         // This way, tours are treated first come, first serve
         if (empty($tourData)) {
-            $tourData = array(
+            $tourData = [
                 'name' => $this->tourName,
                 'stepIndex' => 0
-            );
+            ];
 
             $this->setUserMeta(Gdn::session()->UserID, 'TourData', json_encode($tourData));
         }
@@ -186,10 +186,10 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $tourData = array(
+        $tourData = [
             'name' => $tourName,
             'stepIndex' => $currentStep
-        );
+        ];
 
         $this->setUserMeta($userID, 'TourData', json_encode($tourData));
         return true;
