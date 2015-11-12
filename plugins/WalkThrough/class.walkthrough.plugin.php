@@ -1,10 +1,11 @@
-<?php if (!defined('APPLICATION')) { exit(); }
+<?php
 
 /**
- *
  * @copyright Copyright 2010-2015 Vanilla Forums Inc.
  * @license Proprietary
  */
+
+// Defines the plugin:
 $PluginInfo['WalkThrough'] = array(
     'Name' => 'Walk Through',
     'Description' => "Walks users through the features of the forum.",
@@ -22,8 +23,6 @@ $PluginInfo['WalkThrough'] = array(
  * Manage the display for tours provided by other plugins.
  *
  * @author Eric Vachaviolos <eric.v@vanillaforums.com>
- * @copyright 2010-2015 Vanilla Forums Inc.
- * @license Proprietary
  * @package internal
  * @subpackage WalkThrough
  * @since 2.0
@@ -44,15 +43,15 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * If there is no tour or we shouldn't display it at that time,
      * nothing will be injected
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_render_before($Sender) {
+    public function base_render_before($sender) {
         // Do not display if the delivery method is not XHTML
-        if ($Sender->deliveryMethod() != DELIVERY_METHOD_XHTML) {
+        if ($sender->deliveryMethod() != DELIVERY_METHOD_XHTML) {
             return;
         }
 
-        if ($Sender->MasterView == 'admin') {
+        if ($sender->MasterView == 'admin') {
             // Do not show on the admin section
             return;
         }
@@ -77,10 +76,10 @@ class WalkThroughPlugin extends Gdn_Plugin {
             'steps' => $this->tourConfig,
             'currentStepIndex' => $currentStepIndex
         );
-        $Sender->addDefinition('Plugin.WalkThrough.Options', $options);
-        $Sender->addCssFile('introjs.min.css', 'plugins/WalkThrough');
-        $Sender->addJsFile('intro.min.js', 'plugins/WalkThrough');
-        $Sender->addJsFile('walkthrough.js', 'plugins/WalkThrough');
+        $sender->addDefinition('Plugin.WalkThrough.Options', $options);
+        $sender->addCssFile('introjs.min.css', 'plugins/WalkThrough');
+        $sender->addJsFile('intro.min.js', 'plugins/WalkThrough');
+        $sender->addJsFile('walkthrough.js', 'plugins/WalkThrough');
     }
 
 
@@ -91,23 +90,23 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * This method should be used by the vfcom plugin to detect if it can push
      * a tour to the user
      *
-     * @param int $UserID
-     * @param string $TourName
+     * @param int $userID
+     * @param string $tourName
      */
-    public function shouldUserSeeTour($UserID, $TourName) {
-        $User = Gdn::userModel()->getID($UserID);
+    public function shouldUserSeeTour($userID, $tourName) {
+        $User = Gdn::userModel()->getID($userID);
         if (! $User) {
             return false;
         }
 
         $tourData = $this->loadTourMetaData();
         $runningTourName = val('name', $tourData);
-        if ($runningTourName && $runningTourName != $TourName) {
+        if ($runningTourName && $runningTourName != $tourName) {
             // A user must finish a tour before seeing a different one
             return false;
         }
 
-        $isTourCompleted = $this->getUserMeta($UserID, $this->getMetaKeyForCompleted($TourName), false, true);
+        $isTourCompleted = $this->getUserMeta($userID, $this->getMetaKeyForCompleted($tourName), false, true);
         return ! $isTourCompleted;
     }
 
@@ -115,15 +114,15 @@ class WalkThroughPlugin extends Gdn_Plugin {
     /**
      * This method pushes a new tour to be displayed to the user
      *
-     * @param string $TourName
-     * @param array $TourConfig
+     * @param string $tourName
+     * @param array $tourConfig
      */
-    public function loadTour($TourName, $TourConfig) {
-        if (! $this->shouldUserSeeTour(Gdn::session()->UserID, $TourName)) {
+    public function loadTour($tourName, $tourConfig) {
+        if (! $this->shouldUserSeeTour(Gdn::session()->UserID, $tourName)) {
             return false;
         }
-        $this->tourName = $this->sanitizeTourName($TourName);
-        $this->setTourConfig($TourConfig);
+        $this->tourName = $this->sanitizeTourName($tourName);
+        $this->setTourConfig($tourConfig);
 
 
         $tourData = $this->loadTourMetaData();

@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) { exit(); }
+<?php
 
 /**
  * Handles the status of a tour.
