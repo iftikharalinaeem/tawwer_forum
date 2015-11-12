@@ -29,43 +29,73 @@ function startIntro() {
         return;
     }
 
-    var options = gdn.getMeta('Plugin.WalkThrough.Options', []);
+    // Options coming from Vanilla backend
+    var options = function(gdn) {
+        var _options = gdn.getMeta('Plugin.WalkThrough.Options', []);
 
-    if (typeof(options.steps) === 'undefined') {
+        function _isset(key) {
+                return typeof(_options[key]) !== 'undefined';
+        };
+
+        return {
+            get: function (key, defaultValue) {
+                if (!_isset(key)) {
+                    return defaultValue;
+                }
+                return _options[key];
+            },
+
+            isset: _isset
+        };
+    }(gdn);
+
+    // Mandatory or bail out
+    if (! options.isset('steps') || ! options.isset('tourName')) {
         return;
     }
 
-    if (typeof(options.tourName) === 'undefined') {
-        return;
-    }
-
-
-    var currentStepIndex = 0;
-    if (typeof(options.currentStepIndex) !== 'undefined') {
-        currentStepIndex = parseInt(options.currentStepIndex);
-    }
+    var currentStepIndex = parseInt(options.get('currentStepIndex', 0));
+    var steps = options.get('steps');
 
     if (currentStepIndex < 0) {
         currentStepIndex = 0;
     }
 
-    if (currentStepIndex > options.steps.length - 1) {
-        currentStepIndex = options.steps.length - 1;
+    if (currentStepIndex > steps.length - 1) {
+        currentStepIndex = steps.length - 1;
     }
 
     var intro = introJs();
 
+
+    // Sets the default options for introJs.
+    // Can be modified from a tour config.
+    intro.setOption('nextLabel', options.get('nextLabel', 'Next &rarr;'));
+    intro.setOption('nextPageLabel', options.get('nextPageLabel', 'Next page &rarr;'));
+    intro.setOption('prevLabel', options.get('prevLabel', '&larr; Back'));
+    intro.setOption('prevPageLabel', options.get('prevPageLabel', '&larr; Previous page'));
+    intro.setOption('skipLabel', options.get('skipLabel', 'Skip'));
+    intro.setOption('doneLabel', options.get('doneLabel', 'Done'));
+    intro.setOption('tooltipPosition', options.get('tooltipPosition', 'auto'));
+    intro.setOption('positionPrecedence', ['bottom', 'top', 'right', 'left']);
+    intro.setOption('tooltipClass', options.get('tooltipClass', ''));
+    intro.setOption('highlightClass', options.get('highlightClass', ''));
+    intro.setOption('exitOnEsc', options.get('exitOnEsc', false));
+    intro.setOption('exitOnOverlayClick', options.get('exitOnOverlayClick', false));
+    intro.setOption('showStepNumbers', options.get('showStepNumbers', true));
+    intro.setOption('keyboardNavigation', options.get('keyboardNavigation', true));
+    intro.setOption('showButtons', options.get('showButtons', true));
+    intro.setOption('showBullets', options.get('showBullets', true));
+    intro.setOption('showProgress', options.get('showProgress', false));
+    intro.setOption('scrollToElement', options.get('scrollToElement', true));
+    intro.setOption('overlayOpacity', options.get('overlayOpacity', 0.7));
+    intro.setOption('disableInteraction', options.get('disableInteraction', true));
+
+    // Sets the steps
+    intro.setOption('steps', steps);
+
     var defaultNextLabel = intro._options['nextLabel'];
     var defaultPreviousLabel = intro._options['prevLabel'];
-
-    intro.setOption('tooltipPosition', 'auto');
-    intro.setOption('positionPrecedence', ['left', 'right', 'bottom', 'top'])
-    intro.setOption('showStepNumbers', true);
-    intro.setOption('exitOnEsc', false);
-    intro.setOption('exitOnOverlayClick', false);
-
-    intro.setOption('steps', options.steps);
-
 
     function getStepByIndex(index) {
         if (typeof(intro._introItems[index]) !== 'undefined') {
@@ -84,6 +114,9 @@ function startIntro() {
 
     /**
      * Returns a URL if the step requires a url change.
+     *
+     * @param {string} step
+     * @returns {string}
      */
     function getStepUrlIfDifferentThanCurrenPath(step) {
         if (typeof(step.page) === 'string') {
@@ -116,7 +149,7 @@ function startIntro() {
         if (nextStep) {
             var newUrl = getStepUrlIfDifferentThanCurrenPath(nextStep);
             if (newUrl) {
-                changeLabel('nextLabel', 'Next page &rarr;');
+                changeLabel('nextLabel', intro._options['nextPageLabel']);
             }
         }
 
@@ -124,14 +157,14 @@ function startIntro() {
         if (previousStep) {
             var newUrl = getStepUrlIfDifferentThanCurrenPath(previousStep);
             if (newUrl) {
-                changeLabel('prevLabel', '&larr; Previous page');
+                changeLabel('prevLabel', intro._options['prevPageLabel']);
             }
         }
     }
 
     intro.onchange(function(targetElement) {
         walkthroughNotify('walkthrough/currentstep', {
-            TourName: options.tourName,
+            TourName: options.get('tourName'),
             CurrentStep: intro._currentStep
         });
 
@@ -142,14 +175,14 @@ function startIntro() {
 
     intro.oncomplete(function() {
         walkthroughNotify('walkthrough/complete', {
-            TourName: options.tourName
+            TourName: options.get('tourName')
         });
     });
 
     intro.onexit(function() {
         // should put the skipping logic in here
         walkthroughNotify('walkthrough/skip', {
-            TourName: options.tourName
+            TourName: options.get('tourName')
         });
     });
 

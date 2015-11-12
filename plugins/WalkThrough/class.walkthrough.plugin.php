@@ -31,6 +31,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
 
     private $tourName;
     private $tourConfig;
+    private $tourOptions;
 
     private $requestedTourNames = [];
 
@@ -72,11 +73,11 @@ class WalkThroughPlugin extends Gdn_Plugin {
             }
         }
 
-        $options = [
+        $options = array_merge($this->tourOptions, [
             'tourName' => $this->tourName,
             'steps' => $this->tourConfig,
             'currentStepIndex' => $currentStepIndex
-        ];
+        ]);
         $sender->addDefinition('Plugin.WalkThrough.Options', $options);
         $sender->addCssFile('introjs.min.css', 'plugins/WalkThrough');
         $sender->addJsFile('intro.min.js', 'plugins/WalkThrough');
@@ -100,7 +101,9 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $this->requestedTourNames[$this->sanitizeTourName($tourName)] = true;
+        $tourName = $this->sanitizeTourName($tourName);
+
+        $this->requestedTourNames[$tourName] = true;
 
         $tourData = $this->loadTourMetaData();
         $runningTourName = val('name', $tourData);
@@ -117,16 +120,21 @@ class WalkThroughPlugin extends Gdn_Plugin {
     /**
      * This method pushes a new tour to be displayed to the user
      *
-     * @param string $tourName
      * @param array $tourConfig
      */
-    public function loadTour($tourName, $tourConfig) {
+    public function loadTour($tourConfig) {
+        if (!$this->validateTourConfig($tourConfig)) {
+            return false;
+        }
+
+        $tourName = $this->sanitizeTourName($tourConfig['name']);
+
         if (! $this->shouldUserSeeTour(Gdn::session()->UserID, $tourName)) {
             return false;
         }
-        $this->tourName = $this->sanitizeTourName($tourName);
-        $this->setTourConfig($tourConfig);
 
+        $this->tourName = $tourName;
+        $this->setTourConfig($tourConfig);
 
         $tourData = $this->loadTourMetaData();
 
@@ -140,6 +148,28 @@ class WalkThroughPlugin extends Gdn_Plugin {
 
             $this->setUserMeta(Gdn::session()->UserID, 'TourData', json_encode($tourData));
         }
+    }
+
+    public function validateTourConfig($tourConfig) {
+        if (!is_array($tourConfig)) {
+            return false;
+        }
+
+        if (!isset($tourConfig['steps']) || !isset($tourConfig['name'])) {
+            return false;
+        }
+
+        foreach ($tourConfig['steps'] as $step) {
+            if (!is_array($step)) {
+                return false;
+            }
+
+            if (!isset($step['intro'])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -228,7 +258,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
     }
 
     private function setTourConfig($tourConfig) {
-        $steps = $tourConfig;
+        $steps = $tourConfig['steps'];
 
         // adds the url property if needed
         foreach ($steps as $k => $dbStep) {
@@ -238,6 +268,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
             }
         }
 
+        $this->tourOptions = val('options', $tourConfig, []);
         $this->tourConfig = $steps;
     }
 
