@@ -7,9 +7,9 @@
 $PluginInfo['dblogger'] = array(
     'Name' => 'Db Logger',
     'Description' => 'Enable database logging.',
-    'Version' => '1.0-beta',
-    'Author' => "John Ashton",
-    'AuthorEmail' => 'john@vanillaforums.com',
+    'Version' => '1.1.0',
+    'Author' => "Todd Burry",
+    'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
     'Hidden' => false
 );
@@ -47,6 +47,10 @@ class DbLoggerPlugin extends Gdn_Plugin {
             ->Column('IP', 'varchar(15)', true)
             ->Column('Attributes', 'text', true)
             ->Set();
+
+        // This is temporary to clean up some space after the logs have pruned.
+        $px = Gdn::database()->DatabasePrefix;
+        Gdn::database()->query("optimize table {$px}EventLog");
     }
 
     public function Base_GetAppSettingsMenuItems_Handler($Sender) {
@@ -56,11 +60,17 @@ class DbLoggerPlugin extends Gdn_Plugin {
 
     /**
      * Install the database logger as early as possible.
-     *
-     * @param Gdn_Dispatcher $Sender
      */
-    public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
-        Logger::setLogger(new DbLogger());
+    public function gdn_dispatcher_appStartup_handler() {
+        $logger = new DbLogger();
+
+        try {
+            $logger->setPruneAfter(c('Plugins.dblogger.PruneAfter', '-90 days'));
+        } catch (InvalidArgumentException $e) {
+            // Do nothing on an invalid date. Just don't set it.
+        }
+
+        Logger::setLogger($logger);
 
     }
 
