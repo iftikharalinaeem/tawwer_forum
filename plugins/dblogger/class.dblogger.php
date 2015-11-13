@@ -55,7 +55,7 @@ class DbLogger extends BaseLogger {
         }
         $insert['id'] = uniqid('', false).substr(dechex(mt_rand()), 0, 3);
 
-        $r = Gdn::sqL()->Insert('EventLog', $insert);
+        $r = Gdn::sql()->insert('EventLog', $insert);
 
         // Delete a couple of old logs.
         if ($timestamp = $this->getPruneAfterTimestamp()) {
@@ -101,10 +101,10 @@ class DbLogger extends BaseLogger {
             $now = time();
             $testTime = strtotime($pruneAfter, $now);
             if ($testTime === false) {
-                throw new InvalidArgumentException("Invalid timespan value for delete after.", 400);
+                throw new InvalidArgumentException('Invalid timespan value for "prune after".', 400);
             }
             if ($testTime >= $now) {
-                throw new InvalidArgumentException("You must specify a timespan in the past for delete after.", 400);
+                throw new InvalidArgumentException('You must specify a timespan in the past for "prune after".', 400);
             }
         }
 
