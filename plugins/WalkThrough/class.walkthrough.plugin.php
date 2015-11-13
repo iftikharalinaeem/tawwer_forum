@@ -35,9 +35,6 @@ class WalkThroughPlugin extends Gdn_Plugin {
 
     private $requestedTourNames = [];
 
-    private $options = [
-        'redirectEnabled' => true
-    ];
 
     /// Event Handlers.
 
@@ -62,15 +59,13 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return;
         }
 
-        $tourData = $this->loadTourMetaData();
-        $currentStepIndex = val('stepIndex', $tourData, 0);
+        $tourState = $this->loadTourState();
+        $currentStepIndex = val('stepIndex', $tourState, 0);
 
-        // If possible and enabled, redirects to the page corresponding to the current step.
-        if ($this->options['redirectEnabled']) {
-            $stepPath = val('page', $this->tourConfig[$currentStepIndex]);
-            if ($stepPath && $stepPath != Gdn::request()->path()) {
-                redirectUrl(url($stepPath));
-            }
+        // If needed, redirects to the page corresponding to the current step.
+        $stepPath = val('page', $this->tourConfig[$currentStepIndex]);
+        if ($stepPath && $stepPath != Gdn::request()->path()) {
+            redirectUrl(url($stepPath));
         }
 
         $options = array_merge($this->tourOptions, [
@@ -111,8 +106,8 @@ class WalkThroughPlugin extends Gdn_Plugin {
 
         $this->requestedTourNames[$tourName] = true;
 
-        $tourData = $this->loadTourMetaData();
-        $runningTourName = val('name', $tourData);
+        $tourState = $this->loadTourState($userID);
+        $runningTourName = val('name', $tourState);
         if ($runningTourName && $runningTourName != $tourName) {
             // A user must finish a tour before seeing a different one
             return false;
@@ -133,26 +128,29 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return false;
         }
 
+        $userID = Gdn::session()->UserID;
+
         $tourName = $this->sanitizeTourName($tourConfig['name']);
 
-        if (! $this->shouldUserSeeTour(Gdn::session()->UserID, $tourName)) {
+        if (! $this->shouldUserSeeTour($userID, $tourName)) {
             return false;
         }
 
         $this->tourName = $tourName;
         $this->setTourConfig($tourConfig);
 
-        $tourData = $this->loadTourMetaData();
+        $tourState = $this->loadTourState($userID);
 
-        // Setup the tour metadata if it's the first time we load this tour.
+        // Setup the tour state if it's the first time we load this tour.
         // This way, tours are treated first come, first serve
-        if (empty($tourData)) {
-            $tourData = [
+        if (empty($tourState)) {
+            $tourState = [
                 'name' => $this->tourName,
                 'stepIndex' => 0
             ];
 
-            $this->setUserMeta(Gdn::session()->UserID, 'TourData', json_encode($tourData));
+            $this->persistTourState($userID, $tourState);
+
         }
     }
 
@@ -169,9 +167,9 @@ class WalkThroughPlugin extends Gdn_Plugin {
         $this->setUserMeta($userID, $this->getMetaKeyForCompleted($tourName));
 
 
-        $tourData = $this->loadTourMetaData();
-        if (val('name', $tourData) == $this->sanitizeTourName($tourName)) {
-            $this->setUserMeta($userID, 'TourData');
+        $tourState = $this->loadTourState($userID);
+        if (val('name', $tourState) == $this->sanitizeTourName($tourName)) {
+            $this->deleteTourState($userID);
         }
     }
 
@@ -209,13 +207,13 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $tourData = $this->loadTourMetaData();
-        $runningTourName = val('name', $tourData);
+        $tourState = $this->loadTourState($userID);
+        $runningTourName = val('name', $tourState);
         if ($runningTourName && $runningTourName != $tourName) {
             return false;
         }
 
-        $this->setUserMeta($userID, 'TourData', null);
+        $this->deleteTourState($userID);
         $this->setUserMeta($userID, $this->getMetaKeyForCompleted($tourName), true);
         return true;
     }
@@ -249,12 +247,8 @@ class WalkThroughPlugin extends Gdn_Plugin {
             'stepIndex' => $currentStep
         ];
 
-        $this->setUserMeta($userID, 'TourData', json_encode($tourData));
+        $this->persistTourState($userID, $tourData);
         return true;
-    }
-
-    private function loadTourMetaData() {
-        return json_decode($this->getUserMeta(Gdn::session()->UserID, 'TourData', '{}', true), true);
     }
 
     private function shouldWeDisplayTheTour() {
@@ -278,8 +272,8 @@ class WalkThroughPlugin extends Gdn_Plugin {
         return trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $TourName), '_');
     }
 
-    private function getMetaKeyForCompleted($TourName) {
-        return 'Completed_Tour_' . $this->sanitizeTourName($TourName);
+    private function getMetaKeyForCompleted($tourName) {
+        return 'Tours.'.$this->sanitizeTourName($tourName).'.Completed';
     }
 
     private function setTourConfig($tourConfig) {
@@ -308,10 +302,27 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return;
         }
 
-        $tourData = $this->loadTourMetaData();
-        $tourName = val('name', $tourData);
+        $tourState = $this->loadTourState($userID);
+        $tourName = val('name', $tourState);
         if (!isset($this->requestedTourNames[$tourName])) {
-            $this->setUserMeta($userID, 'TourData', null);
+            $this->deleteTourState($userID);
         }
+    }
+
+
+    private function loadTourState($userID = null) {
+        if (is_null($userID)) {
+            $userID = Gdn::session()->UserID;
+        }
+
+        return json_decode($this->getUserMeta($userID, 'TourState', '{}', true), true);
+    }
+
+    private function deleteTourState($userID) {
+        $this->setUserMeta($userID, 'TourState', null);
+    }
+
+    private function persistTourState($userID, $state) {
+        $this->setUserMeta($userID, 'TourState', json_encode($state));
     }
 }
