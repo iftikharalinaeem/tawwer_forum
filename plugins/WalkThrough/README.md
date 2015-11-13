@@ -4,11 +4,10 @@
 In order to display a tour to a user, you need to get the instance of the WalkThroughPlugin.<br/>
 Once the plugin is acquired and after the UserID is known, you can push a new tour to the plugin.
 
-
 	$tour = [
 		// Required
 	    'name' => 'Tour example',
-	  
+
 	    // Required
 	    //
 	    // The attributes are described further in this document
@@ -26,7 +25,7 @@ Once the plugin is acquired and after the UserID is known, you can push a new to
 	            'page' => 'post/discussion',
 	        ]
 	    ]
-	    
+
 	    // Optional
 	    //
 	    // These options will affect the display of the tour.
@@ -35,21 +34,31 @@ Once the plugin is acquired and after the UserID is known, you can push a new to
 			//'cssFile' => 'http://domain.com/custom_tour.css',
 			'exitOnEsc' => true,
 			'exitOnOverlayClick' => true
-	    ],	    
+	    ],
 	];
-        
+
     // Make sure the plugin is enabled
 	if (! Gdn::pluginManager()->isEnabled('WalkThrough')) {
 		return;
 	}
-	
+
 	// Get the plugin instance
 	$plugin = Gdn::pluginManager()->getPluginInstance('WalkThrough', Gdn_PluginManager::ACCESS_PLUGINNAME);
-	
+
 	// Push a tour to the current user if possible
 	if ($plugin->shouldUserSeeTour(Gdn::session()->UserID, 'My tour name')) {
 		$plugin->loadTour($tour);
 	}
+
+
+##Reset a tour
+To reset a tour for a user, you need to call WalkThroughPlugin::resetTour($userID, $tourName).
+
+	// Get the plugin instance
+	$plugin = Gdn::pluginManager()->getPluginInstance('WalkThrough', Gdn_PluginManager::ACCESS_PLUGINNAME);
+
+	// Reset the tour for a specific user
+	$plugin->resetTour($userID, 'My tour name');
 
 
 ###Steps format
@@ -60,7 +69,7 @@ Once the plugin is acquired and after the UserID is known, you can push a new to
  - `highlightClass`: Optionally append a CSS class to the helperLayer
  - `position`: Optionally define the position of tooltip, `top`, `left`, `right`, `bottom`, `bottom-left-aligned` (same as 'bottom'), 'bottom-middle-aligned' and 'bottom-right-aligned'. Default is `bottom`
 
- 
+
 ###Options:
 
  - `cssFile`: Attach a custom CSS file to customize the tour.  File must be an `absolute URL`

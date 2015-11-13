@@ -156,6 +156,25 @@ class WalkThroughPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Reset the tour for a specific user.
+     *
+     * It will reset a tour that has been completed by someone,
+     * or that was already started but not finished yet.
+     *
+     * @param int $userID       The user id for which we want to reset the tour
+     * @param string $tourName  The name of the tour to reset
+     */
+    public function resetTour($userID, $tourName) {
+        $this->setUserMeta($userID, $this->getMetaKeyForCompleted($tourName));
+
+
+        $tourData = $this->loadTourMetaData();
+        if (val('name', $tourData) == $this->sanitizeTourName($tourName)) {
+            $this->setUserMeta($userID, 'TourData');
+        }
+    }
+
     public function validateTourConfig($tourConfig) {
         if (!is_array($tourConfig)) {
             return false;
