@@ -82,6 +82,12 @@ class WalkThroughPlugin extends Gdn_Plugin {
         $sender->addCssFile('introjs.min.css', 'plugins/WalkThrough');
         $sender->addJsFile('intro.min.js', 'plugins/WalkThrough');
         $sender->addJsFile('walkthrough.js', 'plugins/WalkThrough');
+
+        // Attach a custom css file if provided
+        $cssFile = val('cssFile', $this->tourOptions);
+        if ($cssFile) {
+            $sender->addCssFile($cssFile);
+        }
     }
 
 

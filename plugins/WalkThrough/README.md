@@ -32,8 +32,9 @@ Once the plugin is acquired and after the UserID is known, you can push a new to
 	    // These options will affect the display of the tour.
 	    // They are described further in this document
 	    'options' => [
-	        'exitOnEsc' => true,
-	        'exitOnOverlayClick' => true
+			//'cssFile' => 'http://domain.com/custom_tour.css',
+			'exitOnEsc' => true,
+			'exitOnOverlayClick' => true
 	    ],	    
 	];
         
@@ -62,6 +63,7 @@ Once the plugin is acquired and after the UserID is known, you can push a new to
  
 ###Options:
 
+ - `cssFile`: Attach a custom CSS file to customize the tour.  File must be an `absolute URL`
  - `nextLabel`: Next button label.  Default is `Next &rarr;`
  - `nextPageLabel`: Next page button label.  Default is `Next page &rarr;`
  - `prevLabel`: Previous button label.  Default is `&larr; Back`
