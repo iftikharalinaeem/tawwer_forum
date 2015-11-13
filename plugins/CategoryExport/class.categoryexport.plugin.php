@@ -77,7 +77,7 @@ class CategoryExportPlugin extends Gdn_Plugin  {
     protected static $escapeCharacter = '\\';
 
     /**
-     * Export inclusion receipes
+     * Export inclusion recipes
      * @var array
      */
     protected static $includes = [
@@ -219,20 +219,24 @@ class CategoryExportPlugin extends Gdn_Plugin  {
     public static function setExported($categoryID) {
         // Set global cooldown
         $globalCooldown = c('Plugins.CategoryExport.Cooldown', CategoryExportPlugin::DEFAULT_GLOBAL_COOLDOWN);
-        $globalCooldownExpiry = strtotime(sprintf('+%d hours', $globalCooldown));
-        $globalCooldownTime = $globalCooldown * 3600;
-        Gdn::cache()->store(self::COOLDOWN_GLOBAL_KEY, $globalCooldownExpiry, [
-            Gdn_Cache::FEATURE_EXPIRY => $globalCooldownTime
-        ]);
+        if ($globalCooldown) {
+            $globalCooldownExpiry = strtotime(sprintf('+%d hours', $globalCooldown));
+            $globalCooldownTime = $globalCooldown * 3600;
+            Gdn::cache()->store(self::COOLDOWN_GLOBAL_KEY, $globalCooldownExpiry, [
+                Gdn_Cache::FEATURE_EXPIRY => $globalCooldownTime
+            ]);
+        }
         
         // Set category cooldown
         $categoryCooldown = c('Plugins.CategoryExport.CategoryCooldown', CategoryExportPlugin::DEFAULT_CATEGORY_COOLDOWN);
-        $categoryCooldownExpiry = strtotime(sprintf('+%s hours', $categoryCooldown));
-        $categorykey = sprintf(self::COOLDOWN_CATEGORY_KEY, $categoryID);
-        $categoryCooldownTime = $categoryCooldown * 3600;
-        Gdn::cache()->store($categorykey, $categoryCooldownExpiry, [
-            Gdn_Cache::FEATURE_EXPIRY => $categoryCooldownTime
-        ]);
+        if ($categoryCooldown) {
+            $categoryCooldownExpiry = strtotime(sprintf('+%s hours', $categoryCooldown));
+            $categorykey = sprintf(self::COOLDOWN_CATEGORY_KEY, $categoryID);
+            $categoryCooldownTime = $categoryCooldown * 3600;
+            Gdn::cache()->store($categorykey, $categoryCooldownExpiry, [
+                Gdn_Cache::FEATURE_EXPIRY => $categoryCooldownTime
+            ]);
+        }
         
         // Set export date
         Gdn::cache()->store(self::EXPORT_DATE, date('Y-m-d H:i:s'));

@@ -105,7 +105,7 @@ class CategoryExportController extends DashboardController {
         
         // Try to get export permission based on category if provided, global if not
         
-        $canExport = CategoryExportPlugin::canExport($categoryID);
+        $canExport = CategoryExportPlugin::canExport();
         $this->setData('canexport', $canExport);
         
         // If we cannot export yet, provide wait time
@@ -116,13 +116,6 @@ class CategoryExportController extends DashboardController {
         }
 
         $this->render();
-    }
-    
-    /**
-     * 
-     */
-    protected static function toTime($minutes) {
-        
     }
     
 }
