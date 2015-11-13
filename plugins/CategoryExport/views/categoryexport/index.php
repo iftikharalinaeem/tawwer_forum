@@ -45,8 +45,8 @@ echo $this->form->Errors();
         <?php
         echo $this->form->label('Choose a format');
         echo $this->form->dropDown('Format', [
-            CategoryExportPlugin::FORMAT_CSV => 'Comma Separated (csv)',
-            CategoryExportPlugin::FORMAT_JSON => 'Javascript Object Notation (json)'
+            CategoryExportPlugin::FORMAT_CSV => t('Comma Separated (csv)'),
+            CategoryExportPlugin::FORMAT_JSON => t('Javascript Object Notation (json)')
         ], [
             'default' => CategoryExportPlugin::FORMAT_CSV,
             'IncludeNull' => false
