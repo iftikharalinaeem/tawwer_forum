@@ -44,7 +44,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
             ->Column('Path', 'varchar(255)', true)
             ->Column('UserID', 'int', true)
             ->Column('Username', 'varchar(50)', true)
-            ->Column('IP', 'varchar(15)', true)
+            ->Column('IP', 'ipaddress', true)
             ->Column('Attributes', 'text', true)
             ->Set();
 

@@ -21,5 +21,5 @@ $Structure
    ->Column('InsertIPAddress', 'varchar(64)')
    ->Column('DateUpdated', 'datetime', TRUE)
    ->Column('UpdateUserID', 'int', TRUE)
-   ->Column('UpdateIPAddress', 'varchar(15)', TRUE)
+   ->Column('UpdateIPAddress', 'ipaddress', TRUE)
    ->Set(FALSE, FALSE);
