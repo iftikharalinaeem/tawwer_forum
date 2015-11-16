@@ -113,6 +113,9 @@
             var newUrl = getStepUrlIfDifferentThanCurrenPath(step);
             if (newUrl) {
                 window.location.href = newUrl;
+
+                // Prevents the animation to show the next step before the URL changes
+                intro.disableAnimation(true);
             }
         };
 
@@ -123,6 +126,9 @@
          * @returns {string}
          */
         function getStepUrlIfDifferentThanCurrenPath(step) {
+            if (typeof(step) === 'undefined') {
+                return null;
+            }
             if (typeof(step.page) === 'string') {
                 if (step.page !== gdn.getMeta('Path')) {
                     return gdn.url(step.page);
@@ -138,7 +144,7 @@
             };
 
             // Need to change both the option and the button html,
-            // since sometimes, the buttons are created and someother time, the buttons are reused
+            // since sometimes, the buttons are created at some other time, the buttons are reused
             if (typeof(buttonClasses[labelName]) !== 'undefined') {
                 intro.setOption(labelName, label);
                 $(buttonClasses[labelName]).html(label);
@@ -166,7 +172,7 @@
             }
         }
 
-        intro.onchange(function(targetElement) {
+        intro.onbeforechange(function(targetElement) {
             walkthroughNotify('walkthrough/currentstep', {
                 TourName: options.get('tourName'),
                 CurrentStep: intro._currentStep
@@ -174,6 +180,9 @@
 
             var step = intro._introItems[intro._currentStep];
             redirectIfNeeded(step);
+        });
+
+        intro.onchange(function(targetElement) {
             changeTheLabelForButtons();
         });
 
