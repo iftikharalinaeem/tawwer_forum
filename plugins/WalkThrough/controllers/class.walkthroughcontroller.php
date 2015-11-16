@@ -18,6 +18,9 @@ class WalkthroughController extends PluginController {
      */
     private $plugin;
 
+    /**
+     * Instantiate objects
+     */
     public function __construct() {
         parent::__construct();
         $this->plugin = Gdn::pluginManager()->getPluginInstance('WalkThroughPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);

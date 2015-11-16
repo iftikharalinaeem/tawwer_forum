@@ -30,6 +30,12 @@
         localStorage = window.localStorage;
     }
 
+    /**
+     * Notify the WalkThrough Controller.
+     *
+     * @param {string} path
+     * @param {Array} data
+     */
     function walkthroughNotify(path, data) {
         $.ajax({
             type: "POST",
@@ -39,7 +45,9 @@
         });
     };
 
-
+    /**
+     * Start the tour.
+     */
     function startIntro() {
         if (typeof(gdn) !== 'object') {
             return;
@@ -120,6 +128,12 @@
         var defaultNextLabel = intro._options['nextLabel'];
         var defaultPreviousLabel = intro._options['prevLabel'];
 
+        /**
+         * Get a step using its index.
+         *
+         * @param {number} index
+         * @returns {Array|null}
+         */
         function getStepByIndex(index) {
             if (typeof(intro._introItems[index]) !== 'undefined') {
                 return intro._introItems[index];
@@ -127,6 +141,11 @@
             return null;
         }
 
+        /**
+         * Redirect to the step URL if needed.
+         *
+         * @param {Array} step
+         */
         function redirectIfNeeded(step) {
             // check if the step needs to navigate to another page
             var newUrl = getStepUrlIfDifferentThanCurrenPath(step);
@@ -159,6 +178,13 @@
             return null;
         }
 
+        /**
+         * Change the the previous or next button label.
+         *
+         * @param {string} labelName The name of the label.
+         * @param {string} label The text to use as a label.
+         * @returns {undefined}
+         */
         function changeLabel(labelName, label) {
             var buttonClasses = {
                 prevLabel: '.introjs-prevbutton',
@@ -173,6 +199,12 @@
             }
         }
 
+        /**
+         * Change the label for the previous and next button.
+         *
+         * It detects if the steps before or after will change the URL,
+         * and if so, will display a different label.
+         */
         function changeTheLabelForButtons() {
             changeLabel('prevLabel', defaultPreviousLabel);
             changeLabel('nextLabel', defaultNextLabel);

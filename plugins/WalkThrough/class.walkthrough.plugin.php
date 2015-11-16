@@ -8,7 +8,7 @@
 // Defines the plugin:
 $PluginInfo['WalkThrough'] = [
     'Name' => 'Walk Through',
-    'Description' => "Walks users through the features of the forum.",
+    'Description' => "Allow other plugins to display custom tours to users.",
     'Version' => '0.1',
     'RequiredApplications' => ['Vanilla' => '2.1a'],
     'Author' => 'Eric Vachaviolos',
@@ -29,16 +29,37 @@ $PluginInfo['WalkThrough'] = [
  */
 class WalkThroughPlugin extends Gdn_Plugin {
 
+    /**
+     * The name of the loaded tour.
+     *
+     * @var string
+     */
     private $tourName;
-    private $tourConfig;
-    private $tourOptions;
-
-    private $requestedTourNames = [];
-
-
-    /// Event Handlers.
 
     /**
+     * The config array of the loaded tour.
+     *
+     * @var array
+     */
+    private $tourConfig;
+
+    /**
+     * The options of the loaded tour.
+     *
+     * @var array
+     */
+    private $tourOptions;
+
+    /**
+     * Keep track of all requested tour names during a request.
+     *
+     * @var array
+     */
+    private $requestedTourNames = [];
+
+    /**
+     * Event triggered before rendering.
+     *
      * Injects everything it needs to render a tour.
      * If there is no tour or we shouldn't display it at that time,
      * nothing will be injected
@@ -47,7 +68,10 @@ class WalkThroughPlugin extends Gdn_Plugin {
      */
     public function base_render_before($sender) {
         // Unblocks the user stuck on a tour which is not requested anymore.
-        // The next tour (if any), will be available on the next request
+        // The next tour (if any), will be available on the next request.
+        //
+        // IMPORTANT: This needs to be called as late as possible in order to
+        // be aware of all the tours other plugins wants to push
         $this->cleanupOldTour();
 
         // Do not display if the delivery method is not XHTML
@@ -59,7 +83,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return;
         }
 
-        $tourState = $this->loadTourState();
+        $tourState = $this->loadTourState(Gdn::session()->UserID);
         $currentStepIndex = val('stepIndex', $tourState, 0);
 
         // If needed, redirects to the page corresponding to the current step.
@@ -85,10 +109,6 @@ class WalkThroughPlugin extends Gdn_Plugin {
         }
     }
 
-
-
-    /// METHODS
-
     /**
      * This method should be used by the vfcom plugin to detect if it can push
      * a tour to the user
@@ -97,8 +117,8 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * @param string $tourName
      */
     public function shouldUserSeeTour($userID, $tourName) {
-        $User = Gdn::userModel()->getID($userID);
-        if (! $User) {
+        // Bail out if invalid userID
+        if ($userID <= 0) {
             return false;
         }
 
@@ -114,9 +134,8 @@ class WalkThroughPlugin extends Gdn_Plugin {
         }
 
         $isTourCompleted = $this->getUserMeta($userID, $this->getMetaKeyForCompleted($tourName), false, true);
-        return ! $isTourCompleted;
+        return !$isTourCompleted;
     }
-
 
     /**
      * This method pushes a new tour to be displayed to the user
@@ -132,7 +151,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
 
         $tourName = $this->sanitizeTourName($tourConfig['name']);
 
-        if (! $this->shouldUserSeeTour($userID, $tourName)) {
+        if (!$this->shouldUserSeeTour($userID, $tourName)) {
             return false;
         }
 
@@ -173,6 +192,15 @@ class WalkThroughPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Validate a tour.
+     *
+     * It makes sure the attributes `steps` and `name` are provided and valid,
+     * otherwise it returns false.
+     *
+     * @param array $tourConfig The config array to validate
+     * @return boolean
+     */
     public function validateTourConfig($tourConfig) {
         if (!is_array($tourConfig)) {
             return false;
@@ -202,11 +230,10 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * @return boolean
      */
     public function setComplete($tourName) {
-        $userID = (int) Gdn::session()->UserID;
-        if ($userID <= 0 || ! $tourName) {
+        if (!Gdn::session()->isValid()) {
             return false;
         }
-
+        $userID = (int) Gdn::session()->UserID;
         $tourState = $this->loadTourState($userID);
         $runningTourName = val('name', $tourState);
         if ($runningTourName && $runningTourName != $tourName) {
@@ -238,7 +265,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
      */
     public function setCurrentStep($tourName, $currentStep) {
         $userID =  (int) Gdn::session()->UserID;
-        if ($userID <= 0 || ! $tourName) {
+        if ($userID <= 0 || !$tourName) {
             return false;
         }
 
@@ -251,6 +278,11 @@ class WalkThroughPlugin extends Gdn_Plugin {
         return true;
     }
 
+    /**
+     * Check if we can display the loaded tour.
+     *
+     * @return boolean
+     */
     private function shouldWeDisplayTheTour() {
         if (is_null($this->tourConfig)) {
             return false;
@@ -261,21 +293,40 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return false;
         }
 
-        if (! $this->shouldUserSeeTour(Gdn::session()->UserID, $this->tourName)) {
+        if (!$this->shouldUserSeeTour(Gdn::session()->UserID, $this->tourName)) {
             return false;
         }
 
         return true;
     }
 
-    private function sanitizeTourName($TourName) {
-        return trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $TourName), '_');
+    /**
+     * Sanitize a tour name
+     *
+     * @param string $tourName
+     * @return string
+     */
+    private function sanitizeTourName($tourName) {
+        return trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $tourName), '_');
     }
 
+    /**
+     * Get the meta key corresponding to a completed tour.
+     *
+     * @param string $tourName The tour name to generate a key for.
+     * @return string The formatted meta key.
+     */
     private function getMetaKeyForCompleted($tourName) {
         return 'Tours.'.$this->sanitizeTourName($tourName).'.Completed';
     }
 
+    /**
+     * Set the tour configurations.
+     *
+     * Also transforms the page attributes to corresponding URLs.
+     *
+     * @param array $tourConfig
+     */
     private function setTourConfig($tourConfig) {
         $steps = $tourConfig['steps'];
 
@@ -309,19 +360,31 @@ class WalkThroughPlugin extends Gdn_Plugin {
         }
     }
 
-
-    private function loadTourState($userID = null) {
-        if (is_null($userID)) {
-            $userID = Gdn::session()->UserID;
-        }
-
+    /**
+     * Load the tour state from user metadata.
+     *
+     * @param int $userID
+     * @return array Returns an array describing the tour state.  Defaults to empty array if not found
+     */
+    private function loadTourState($userID) {
         return json_decode($this->getUserMeta($userID, 'TourState', '{}', true), true);
     }
 
+    /**
+     * Delete the tour state for a user.
+     *
+     * @param int $userID
+     */
     private function deleteTourState($userID) {
         $this->setUserMeta($userID, 'TourState', null);
     }
 
+    /**
+     * Save the tour state.
+     *
+     * @param int $userID
+     * @param array $state The array describing the tour state.
+     */
     private function persistTourState($userID, $state) {
         $this->setUserMeta($userID, 'TourState', json_encode($state));
     }
