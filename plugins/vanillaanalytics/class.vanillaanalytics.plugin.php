@@ -17,36 +17,40 @@ $PluginInfo['VanillaAnalytics'] = array(
     'AuthorUrl' => 'http://vanillaforums.org/profile/initvector'
 );
 
+/**
+ * Facilitate the tracking of events from Vanilla to one (or more) analytics services.
+ */
 class VanillaAnalytics extends Gdn_Plugin {
+
+    public function __construct() {
+
+        // Grab the Composer autoloader.
+        require_once(dirname(__FILE__) . '/vendor/autoload.php');
+
+        // For now, using keen.io is hardwired.
+        AnalyticsTracker::addTracker(new KeenIOTracker());
+    }
+
+    /**
+     * Track the generic 404 response.
+     */
+    public function Gdn_Dispatcher_NotFound_Handler() {
+        AnalyticsTracker::trackEvent('notFound');
+    }
+
+    /**
+     * Track when a discussion is saved.  This can be used to record an event for inserts or edits.
+     *
+     * @param $sender Current instance of DiscussionModel
+     * @param $args Event arguments, passed from DiscussionModel, specifically for the AfterSaveDiscussion event.
+     */
     public function DiscussionModel_AfterSaveDiscussion_Handler($sender, &$args) {
-        $discussionModel = new DiscussionModel();
 
-        $discussion = $discussionModel->getID(val('DiscussionID', $args));
-        $isInserted = val('Insert', $args);
+        $data = AnalyticsData::discussion(val('DiscussionID', $args));
 
-        if ($discussion) {
-            $eventData = [
-                'discussionID' => $discussion->DiscussionID
-            ];
-
-            $eventData['discussionName'] = $discussion->Name;
-
-            $eventData['categories'] = [];
-            $categories = CategoryModel::getAncestors($discussion->CategoryID);
-            foreach ($categories as $currentCategory) {
-                $eventData['categories'][] = [
-                    'CategoryID' => $currentCategory['CategoryID'],
-                    'Name' => $currentCategory['Name']
-                ];
-            }
-
-            if ($isInserted) {
-                AnalyticsTracker::trackEvent('discussionInsert', $eventData);
-            } else {
-                AnalyticsTracker::trackEvent('discussionEdit', $eventData);
-            }
-        } else {
-            trace('Discussion not found: ' . val('DiscussionID', $args, 'No ID specified.'), TRACE_ERROR);
+        if ($data) {
+            $event = val('Insert', $args) ? 'discussionInsert' : 'discussionEdit';
+            AnalyticsTracker::trackEvent($event, $data);
         }
     }
 }

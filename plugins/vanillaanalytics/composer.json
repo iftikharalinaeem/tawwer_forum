@@ -1,0 +1,5 @@
+{
+    "require": {
+        "vanilla/garden-http": "~1.0"
+	}
+}
