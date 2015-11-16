@@ -18,6 +18,18 @@
  */
 (function ($, window, gdn) {
 
+    var localStorage;
+    if (typeof(window.localStorage) === 'undefined') {
+        // provide mock localStorage object for old browsers
+        localStorage = {
+            setItem: function(key, value) {},
+            getItem: function(key) { return null; },
+            removeItem: function(key) { return null; }
+        };
+    } else {
+        localStorage = window.localStorage;
+    }
+
     function walkthroughNotify(path, data) {
         $.ajax({
             type: "POST",
@@ -60,6 +72,13 @@
 
         var currentStepIndex = parseInt(options.get('currentStepIndex', 0));
         var steps = options.get('steps');
+
+        // Uses the localStorage to avoid race condition when switching URL between steps
+        var startIndexFromStorage = parseInt(localStorage.getItem('intro_startAtIndex'));
+        if (startIndexFromStorage >= 0) {
+            currentStepIndex = startIndexFromStorage;
+            localStorage.removeItem('intro_startAtIndex');
+        }
 
         if (currentStepIndex < 0) {
             currentStepIndex = 0;
@@ -113,6 +132,9 @@
             var newUrl = getStepUrlIfDifferentThanCurrenPath(step);
             if (newUrl) {
                 window.location.href = newUrl;
+
+                // Passes the index using localStorage to avoid race condition when switching URL
+                localStorage.setItem('intro_startAtIndex', intro._currentStep);
 
                 // Prevents the animation to show the next step before the URL changes
                 intro.disableAnimation(true);

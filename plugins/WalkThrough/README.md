@@ -1,8 +1,8 @@
-#WalkTrhough Plugin
+#WalkThrough Plugin
 
 ##How to display a tour
 In order to display a tour to a user, you need to get the instance of the WalkThroughPlugin.<br/>
-Once the plugin is acquired and after the UserID is known, you can push a new tour to the plugin.
+Once the plugin is acquired and the UserID is known, you can push a new tour to the plugin.
 
 	$tour = [
 		// Required
