@@ -1,6 +1,5 @@
 <?php
 /**
- * Reconfirm
  * @author Patrick Kelly <patrick.k@vanillaforums.com>
  * @copyright 2009-2015 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
@@ -19,8 +18,12 @@ $PluginInfo['Reconfirm'] = array(
     'AuthorEmail' => 'patrick.k@vanillaforums.com'
 );
 
+
 /**
- * Class ReconfirmPlugin
+ * The ReconfirmPlugin class forces users to reconfirm the terms of use.
+ *
+ * Block users from contributing to a forum until they have read the terms of use
+ * and updated their password. It is based on the flag ConfirmedTerms in GDN_Users.
  */
 class ReconfirmPlugin extends Gdn_Plugin {
 
@@ -38,7 +41,6 @@ class ReconfirmPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function structure() {
-
         gdn::structure()->table('User')
             ->column('ConfirmedTerms', 'tinyint', 0, array('index'))
             ->set();
@@ -54,25 +56,25 @@ class ReconfirmPlugin extends Gdn_Plugin {
      */
     public function gdn_dispatcher_beforeControllerMethod_handler($sender, $args) {
         // Any unauthenticated user can browse the forum.
-        if(!gdn::session()->isValid()) {
+        if (!gdn::session()->isValid() || gdn::session()->User->Admin == 2) {
             return;
         }
 
         $userConfirmed = val("ConfirmedTerms", gdn::session()->User, 0);
         // Any authenticated user who has confirmed can browser the forum.
-        if($userConfirmed) {
+        if ($userConfirmed) {
             return;
         }
 
         // Override some URLs that will be banned by disallowUrl.
         $allowUrls = array('/entry/confirm', '/profile/notificationspopin', '/messages/popin');
-        if($this->allowUrl($allowUrls)) {
+        if ($this->allowUrl($allowUrls)) {
             return;
         }
 
         // Redirect any url that has a query that begins the following string.
         $disallowUrls = array('/discussion/', '/messages', '/profile', '/activity');
-        if($this->disallowUrl($disallowUrls)) {
+        if ($this->disallowUrl($disallowUrls)) {
             // All authenticated users who have not confirmed are redirected to the confirm page.
             redirect('/entry/confirm');
         }
@@ -86,7 +88,7 @@ class ReconfirmPlugin extends Gdn_Plugin {
      */
     public function userModel_afterSignIn_handler() {
         $userConfirmed = val("ConfirmedTerms", gdn::session()->User, 0);
-        if(!$userConfirmed) {
+        if (!$userConfirmed) {
             // Break out of jquery to redirect.
             die('<script type="text/javascript">window.location = window.location.protocol + "//" + window.location.host + "/entry/confirm";</script>');
         }
@@ -105,8 +107,8 @@ class ReconfirmPlugin extends Gdn_Plugin {
         /** @var $p parsed from $queryString */
         parse_str($queryString);
 
-        foreach($disallowUrls as $url) {
-            if(substr($p, 0, strlen($url)) === $url) {
+        foreach ($disallowUrls as $url) {
+            if (substr($p, 0, strlen($url)) === $url) {
                 return true;
             }
         }
@@ -121,12 +123,10 @@ class ReconfirmPlugin extends Gdn_Plugin {
      */
     private function allowUrl($allowUrls) {
         $queryString = val("QUERY_STRING", gdn::request()->getRequestArguments("server"));
-
         /** @var $p parsed from $queryString */
         parse_str($queryString);
-
-        foreach($allowUrls as $url) {
-            if(substr($p, 0, strlen($url)) === $url) {
+        foreach ($allowUrls as $url) {
+            if (substr($p, 0, strlen($url)) === $url) {
                 return true;
             }
         }
@@ -141,8 +141,13 @@ class ReconfirmPlugin extends Gdn_Plugin {
      * @param $args
      */
     public function entryController_confirm_create($sender, $args) {
+        // Don't allow guests to fill see this page.
+        if (!gdn::session()->isValid()) {
+            return;
+        }
+
         $sender->addJsFile('password.js');
-        $sender->Form->addHidden("UserID", gdn::session()->UserID);
+
         $sender->Form->addHidden("ConfirmedTerms", 1);
         if ($sender->Form->authenticatedPostBack()) {
             $sender->UserModel->Validation->applyRule('TermsOfService', 'Required', t('You must agree to the terms of service.'));
@@ -162,7 +167,8 @@ class ReconfirmPlugin extends Gdn_Plugin {
 
             // Check the user.
             if ($sender->Form->errorCount() == 0) {
-                $sender->UserModel->save(gdn::request()->post());
+                $userInputs = array("UserID" => gdn::session()->UserID, "Password" => val(gdn::request()->post('Password')));
+                $sender->UserModel->save($userInputs);
                 redirect('/');
             }
         }
@@ -188,7 +194,7 @@ class ReconfirmPlugin extends Gdn_Plugin {
  * @return bool
  * @throws Gdn_UserException
  */
-function validateNewPassword ($submittedPassword=null) {
+function validateNewPassword ($submittedPassword = null) {
     $user = gdn::userModel()->getByEmail(val('Email', gdn::session()->User));
     $existingPassword = val("Password", $user);
     $passwordHash = new Gdn_PasswordHash();

@@ -17,13 +17,13 @@
                 <?php
                 echo $this->Form->label('Password', 'Password');
                 echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Registration.MinPasswordLength')), 'div', array('class' => 'Gloss'));
-                echo $this->Form->input('Password', 'password', array('Wrap' => true, 'Strength' => TRUE));
+                echo $this->Form->input('Password', 'password', array('Wrap' => true, 'Strength' => true));
                 ?>
             </li>
             <li>
                 <?php
                 echo $this->Form->label('Confirm Password', 'PasswordMatch');
-                echo $this->Form->input('PasswordMatch', 'password', array('Wrap' => TRUE));
+                echo $this->Form->input('PasswordMatch', 'password', array('Wrap' => true));
                 echo '<span id="PasswordsDontMatch" class="Incorrect" style="display: none;">'.t("Passwords don't match").'</span>';
                 ?>
             </li>
