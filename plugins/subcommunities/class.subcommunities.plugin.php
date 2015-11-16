@@ -152,6 +152,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         foreach ($sender->Data['Categories'] as &$category) {
             SetValue('Depth', $category, val('Depth', $category) + $adjust);
         }
+
+        // We add the Depth of the root Category to the MaxDisplayDepth before rendering the categories page.
+        // This resets it so the rendering respects the MaxDisplayDepth.
+        setValue('Depth', $sender->Data('Category'), 0);
     }
 
     /**
