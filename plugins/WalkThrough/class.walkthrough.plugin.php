@@ -67,19 +67,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      */
     public function base_render_before($sender) {
-        // Unblocks the user stuck on a tour which is not requested anymore.
-        // The next tour (if any), will be available on the next request.
-        //
-        // IMPORTANT: This needs to be called as late as possible in order to
-        // be aware of all the tours other plugins wants to push
-        $this->cleanupOldTour();
-
-        // Do not display if the delivery method is not XHTML
-        if ($sender->deliveryMethod() != DELIVERY_METHOD_XHTML) {
-            return;
-        }
-
-        if (!$this->shouldWeDisplayTheTour()) {
+        if (!$this->shouldDisplayTour()) {
             return;
         }
 
@@ -177,7 +165,6 @@ class WalkThroughPlugin extends Gdn_Plugin {
     public function resetTour($userID, $tourName) {
         $this->setUserMeta($userID, $this->getMetaKeyForCompleted($tourName));
 
-
         $tourState = $this->loadTourState($userID);
         if (val('name', $tourState) == $tourName) {
             $this->deleteTourState($userID);
@@ -255,6 +242,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
     /**
      * Saves the tour has being skipped for the current user.
      *
+     * @see WalkThroughPlugin::setComplete()
      * @param string $tourName
      * @return boolean
      */
@@ -295,8 +283,16 @@ class WalkThroughPlugin extends Gdn_Plugin {
      *
      * @return boolean
      */
-    private function shouldWeDisplayTheTour() {
-        if (is_null($this->tourConfig)) {
+    private function shouldDisplayTour() {
+        // Unblocks the user stuck on a tour which is not requested anymore.
+        // The next tour (if any), will be available on the next request.
+        //
+        // IMPORTANT: This needs to be called as late as possible in order to
+        // be aware of all the tours other plugins wants to push
+        $this->cleanupOldTour();
+
+        // Do not display if the delivery method is not XHTML
+        if (Gdn::controller()->deliveryMethod() != DELIVERY_METHOD_XHTML) {
             return false;
         }
 
@@ -334,9 +330,9 @@ class WalkThroughPlugin extends Gdn_Plugin {
 
         // adds the url property if needed
         foreach ($steps as $k => $dbStep) {
-            $Page = val('page', $dbStep);
-            if ($Page) {
-                $steps[$k]['url'] = url($Page);
+            $page = val('page', $dbStep);
+            if ($page) {
+                $steps[$k]['url'] = url($page);
             }
         }
 

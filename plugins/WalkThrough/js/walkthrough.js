@@ -54,7 +54,7 @@
      * @param {string} href2
      * @returns {Boolean}
      */
-    function hrefAreEquals(href1, href2) {
+    function hrefAreEqual(href1, href2) {
         var url1 = window.document.createElement('a');
         url1.href = href1;
 
@@ -167,7 +167,7 @@
          */
         function redirectIfNeeded(step) {
             // check if the step needs to navigate to another page
-            var newUrl = getStepUrlIfDifferentThanCurrenPath(step);
+            var newUrl = getStepRedirectUrl(step);
             if (newUrl) {
                 window.location.href = newUrl;
 
@@ -185,7 +185,7 @@
          * @param {string} step
          * @returns {string}
          */
-        function getStepUrlIfDifferentThanCurrenPath(step) {
+        function getStepRedirectUrl(step) {
             if (typeof(step) === 'undefined') {
                 return null;
             }
@@ -195,7 +195,7 @@
                     var newUrl = gdn.url(step.page);
 
                     // Do not return a new url if we are on this page already
-                    if (hrefAreEquals(newUrl, window.location.href)) {
+                    if (hrefAreEqual(newUrl, window.location.href)) {
                         return null;
                     }
 
@@ -238,7 +238,7 @@
 
             var nextStep = getStepByIndex(intro._currentStep + 1);
             if (nextStep) {
-                var newUrl = getStepUrlIfDifferentThanCurrenPath(nextStep);
+                var newUrl = getStepRedirectUrl(nextStep);
                 if (newUrl) {
                     changeLabel('nextLabel', intro._options['nextPageLabel']);
                 }
@@ -246,7 +246,7 @@
 
             var previousStep = getStepByIndex(intro._currentStep - 1);
             if (previousStep) {
-                var newUrl = getStepUrlIfDifferentThanCurrenPath(previousStep);
+                var newUrl = getStepRedirectUrl(previousStep);
                 if (newUrl) {
                     changeLabel('prevLabel', intro._options['prevPageLabel']);
                 }

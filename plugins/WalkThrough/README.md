@@ -1,7 +1,7 @@
 #WalkThrough Plugin
 
 ##How to display a tour
-In order to display a tour to a user, you need to get the instance of the WalkThroughPlugin.<br/>
+In order to display a tour to a user, you need to get the instance of the WalkThroughPlugin.  
 Once the plugin is acquired and the UserID is known, you can push a new tour to the plugin.
 
 	$tour = [
@@ -21,7 +21,8 @@ Once the plugin is acquired and the UserID is known, you can push a new tour to 
 	        ],
 	        [
 	            'element' => '#DiscussionForm',
-	            'intro' => 'This last step will appear on the post a new discussion page.  It shows the discussion form by referencing the element by its ID',
+	            'intro' => 'This last step will appear on the post a new discussion page.  ' .
+	            			'It shows the discussion form by referencing the element by its ID',
 	            'page' => 'post/discussion',
 	        ]
 	    ]
