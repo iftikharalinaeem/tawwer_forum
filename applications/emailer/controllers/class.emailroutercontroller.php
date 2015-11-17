@@ -243,7 +243,7 @@ class EmailRouterController extends Gdn_Controller {
                      $Domain = implode($ToParts).'.'.$Part;
                   } else {
                      // This is a to in the form of category.site.
-                     $Domain = $Part.'.vanillaforums.com';
+                     $Domain = $Part.'.'.$this->emailDomains[$emailDomain];
                      $Args = array_shift($ToParts);
                      $To = "$Part+$Args@email.vanillaforums.com";
                      $Data[$To] = $To;
