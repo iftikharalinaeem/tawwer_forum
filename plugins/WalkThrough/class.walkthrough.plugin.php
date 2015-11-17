@@ -202,14 +202,29 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return false;
         }
 
+        if (!is_array($tourConfig['steps'])) {
+            return false;
+        }
+
         foreach ($tourConfig['steps'] as $step) {
             if (!is_array($step)) {
                 return false;
             }
 
-            if (!isset($step['intro'])) {
+            // Attribute `intro` is required and must be a string
+            if (!isset($step['intro']) || !is_string($step['intro'])) {
                 return false;
             }
+
+            // Attribute `page` if provided, must be a string
+            if (isset($step['page']) && !is_string($step['page'])) {
+                return false;
+            }
+        }
+
+        // Attribute `options` if provided, must be an array
+        if (isset($tourConfig['options']) && !is_array($tourConfig['options'])) {
+            return false;
         }
 
         return true;
