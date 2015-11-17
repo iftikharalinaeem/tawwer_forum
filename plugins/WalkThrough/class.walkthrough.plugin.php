@@ -121,11 +121,10 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * This method pushes a new tour to be displayed to the user
      *
      * @param array $tourConfig
+     * @return boolean Returns false if the tour was not loaded
      */
     public function loadTour($tourConfig) {
-        if (!$this->validateTourConfig($tourConfig)) {
-            return false;
-        }
+        $this->validateTourConfig($tourConfig);
 
         $userID = Gdn::session()->UserID;
 
@@ -149,8 +148,9 @@ class WalkThroughPlugin extends Gdn_Plugin {
             ];
 
             $this->persistTourState($userID, $tourState);
-
         }
+
+        return true;
     }
 
     /**
@@ -175,46 +175,47 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * Validate a tour.
      *
      * It makes sure the attributes `steps` and `name` are provided and valid,
-     * otherwise it returns false.
+     * otherwise it throws an exception.
      *
      * @param array $tourConfig The config array to validate
      * @return boolean
+     * @throws Exception
      */
     public function validateTourConfig($tourConfig) {
         if (!is_array($tourConfig)) {
-            return false;
+            throw new Exception('The tour config is not an array');
         }
 
-        if (!isset($tourConfig['steps']) || !isset($tourConfig['name'])) {
-            return false;
+        if (!isset($tourConfig['name']) || !is_string($tourConfig['name']) || empty($tourConfig['name'])) {
+            throw new Exception('The tour config needs a non-empty `name` attribute');
         }
 
-        if (!is_array($tourConfig['steps'])) {
-            return false;
-        }
-
-        foreach ($tourConfig['steps'] as $step) {
-            if (!is_array($step)) {
-                return false;
-            }
-
-            // Attribute `intro` is required and must be a string
-            if (!isset($step['intro']) || !is_string($step['intro'])) {
-                return false;
-            }
-
-            // Attribute `page` if provided, must be a string
-            if (isset($step['page']) && !is_string($step['page'])) {
-                return false;
-            }
+        if (!isset($tourConfig['steps']) || !is_array($tourConfig['steps']) || empty($tourConfig['steps'])) {
+            throw new Exception('The tour config "'.$tourConfig['name'].'" needs a `steps` attribute and must be a non-empty array of steps');
         }
 
         // Attribute `options` if provided, must be an array
         if (isset($tourConfig['options']) && !is_array($tourConfig['options'])) {
-            return false;
+            throw new Exception('In tour config "'.$tourConfig['name'].'", the `options` attribute must be an array');
         }
 
-        return true;
+        $i = 0;
+        foreach ($tourConfig['steps'] as $step) {
+            if (!is_array($step)) {
+                throw new Exception('In tour "'.$tourConfig['name'].'", step #'.$i.' is not an array');
+            }
+
+            // Attribute `intro` is required and must be a string
+            if (!isset($step['intro']) || !is_string($step['intro']) || empty($step['intro'])) {
+                throw new Exception('In tour "'.$tourConfig['name'].'", step #'.$i.' must have a non-empty attribute `intro`');
+            }
+
+            // Attribute `page` if provided, must be a string
+            if (isset($step['page']) && !is_string($step['page'])) {
+                throw new Exception('In tour "'.$tourConfig['name'].'" step #'.$i.', the `page` attribute must be a string');
+            }
+            $i++;
+        }
     }
 
     /**
@@ -326,14 +327,18 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * @param array $tourConfig
      */
     private function setTourConfig($tourConfig) {
-        $steps = $tourConfig['steps'];
+        $steps = [];
 
-        // adds the url property if needed
-        foreach ($steps as $k => $dbStep) {
-            $page = val('page', $dbStep);
+        // Steps needs to be sequenced numerically started from 0
+        $i = 0;
+        foreach ($tourConfig['steps'] as $step) {
+            // adds the url property if needed
+            $page = val('page', $step);
             if ($page) {
-                $steps[$k]['url'] = url($page);
+                $step['url'] = url($page);
             }
+
+            $steps[$i++] = $step;
         }
 
         $this->tourOptions = val('options', $tourConfig, []);
