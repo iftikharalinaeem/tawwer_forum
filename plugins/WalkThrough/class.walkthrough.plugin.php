@@ -86,12 +86,6 @@ class WalkThroughPlugin extends Gdn_Plugin {
         $tourState = $this->loadTourState(Gdn::session()->UserID);
         $currentStepIndex = val('stepIndex', $tourState, 0);
 
-        // If needed, redirects to the page corresponding to the current step.
-        $stepPath = val('page', $this->tourConfig[$currentStepIndex]);
-        if ($stepPath && $stepPath != Gdn::request()->path()) {
-            redirectUrl(url($stepPath));
-        }
-
         $options = array_merge($this->tourOptions, [
             'tourName' => $this->tourName,
             'steps' => $this->tourConfig,
@@ -122,8 +116,6 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $tourName = $this->sanitizeTourName($tourName);
-
         $this->requestedTourNames[$tourName] = true;
 
         $tourState = $this->loadTourState($userID);
@@ -149,7 +141,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
 
         $userID = Gdn::session()->UserID;
 
-        $tourName = $this->sanitizeTourName($tourConfig['name']);
+        $tourName = $tourConfig['name'];
 
         if (!$this->shouldUserSeeTour($userID, $tourName)) {
             return false;
@@ -187,7 +179,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
 
 
         $tourState = $this->loadTourState($userID);
-        if (val('name', $tourState) == $this->sanitizeTourName($tourName)) {
+        if (val('name', $tourState) == $tourName) {
             $this->deleteTourState($userID);
         }
     }
@@ -260,18 +252,23 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * Saves the current step index of the tour that the current user has just viewed.
      *
      * @param string $tourName
-     * @param int $currentStep  The current step index
+     * @param int $currentStepIndex  The current step index
      * @return boolean
      */
-    public function setCurrentStep($tourName, $currentStep) {
+    public function setCurrentStep($tourName, $currentStepIndex) {
         $userID =  (int) Gdn::session()->UserID;
         if ($userID <= 0 || !$tourName) {
             return false;
         }
 
+        // Preventing bad input
+        if (!is_numeric($currentStepIndex) || $currentStepIndex < 0) {
+            return false;
+        }
+
         $tourData = [
             'name' => $tourName,
-            'stepIndex' => $currentStep
+            'stepIndex' => $currentStepIndex
         ];
 
         $this->persistTourState($userID, $tourData);
@@ -301,23 +298,13 @@ class WalkThroughPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Sanitize a tour name
-     *
-     * @param string $tourName
-     * @return string
-     */
-    private function sanitizeTourName($tourName) {
-        return trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $tourName), '_');
-    }
-
-    /**
      * Get the meta key corresponding to a completed tour.
      *
      * @param string $tourName The tour name to generate a key for.
      * @return string The formatted meta key.
      */
     private function getMetaKeyForCompleted($tourName) {
-        return 'Tours.'.$this->sanitizeTourName($tourName).'.Completed';
+        return 'Tours.'.md5($tourName).'.Completed';
     }
 
     /**
