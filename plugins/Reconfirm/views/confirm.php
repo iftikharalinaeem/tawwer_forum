@@ -30,7 +30,6 @@
             <li>
                 <?php
                 echo $this->Form->checkBox('TermsOfService', '@'.$termsOfServiceText, array('value' => '1'));
-                echo $this->Form->checkBox('RememberMe', 'Remember me on this computer', array('value' => '1'));
                 ?>
             </li>
             <li class="Buttons">

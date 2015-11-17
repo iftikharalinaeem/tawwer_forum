@@ -148,7 +148,6 @@ class ReconfirmPlugin extends Gdn_Plugin {
 
         $sender->addJsFile('password.js');
 
-        $sender->Form->addHidden("ConfirmedTerms", 1);
         if ($sender->Form->authenticatedPostBack()) {
             $sender->UserModel->Validation->applyRule('TermsOfService', 'Required', t('You must agree to the terms of service.'));
             $sender->UserModel->Validation->applyRule('Password', 'Required');
@@ -165,10 +164,10 @@ class ReconfirmPlugin extends Gdn_Plugin {
                 $sender->Form->addError($errors);
             }
 
-            // Check the user.
             if ($sender->Form->errorCount() == 0) {
-                $userInputs = array("UserID" => gdn::session()->UserID, "Password" => val(gdn::request()->post('Password')));
-                $sender->UserModel->save($userInputs);
+                //save the password, confirmed terms, etc.
+                $sender->UserModel->passwordReset(gdn::session()->UserID, gdn::request()->post('Password'));
+                $sender->UserModel->setField(gdn::session()->UserID, "ConfirmedTerms", 1);
                 redirect('/');
             }
         }
