@@ -46,6 +46,25 @@
     };
 
     /**
+     * Check if 2 hrefs are equals.
+     *
+     * Compares both absolute and relative urls.
+     *
+     * @param {string} href1
+     * @param {string} href2
+     * @returns {Boolean}
+     */
+    function hrefAreEquals(href1, href2) {
+        var url1 = window.document.createElement('a');
+        url1.href = href1;
+
+        var url2 = window.document.createElement('a');
+        url2.href = href2;
+
+        return url1.href === url2.href;
+    }
+
+    /**
      * Start the tour.
      */
     function startIntro() {
@@ -170,9 +189,17 @@
             if (typeof(step) === 'undefined') {
                 return null;
             }
+
             if (typeof(step.page) === 'string') {
                 if (step.page !== gdn.getMeta('Path')) {
-                    return gdn.url(step.page);
+                    var newUrl = gdn.url(step.page);
+
+                    // Do not return a new url if we are on this page already
+                    if (hrefAreEquals(newUrl, window.location.href)) {
+                        return null;
+                    }
+
+                    return newUrl;
                 }
             }
             return null;
@@ -247,7 +274,6 @@
         });
 
         intro.onexit(function() {
-            // should put the skipping logic in here
             walkthroughNotify('walkthrough/skip', {
                 TourName: options.get('tourName')
             });
