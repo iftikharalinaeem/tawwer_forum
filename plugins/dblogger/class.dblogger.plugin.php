@@ -49,6 +49,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
             ->Set();
 
         // This is temporary to clean up some space after the logs have pruned.
+        Gdn::sql()->delete('EventLog', ['Timestamp <=' => strtotime(c('Plugins.dblogger.PruneAfter', '-90 days'))]);
         $px = Gdn::database()->DatabasePrefix;
         Gdn::database()->query("optimize table {$px}EventLog");
     }
