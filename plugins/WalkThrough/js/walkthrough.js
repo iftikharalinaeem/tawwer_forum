@@ -10,14 +10,21 @@
  */
 
 /**
+ * The main Garden object
+ * @type Object
+ */
+window.gdn = window.gdn || {};
+
+/**
  * Walkthrough JS functions
  *
  * @param {jQuery} $
  * @param {window} window
  * @param {window.gdn} gdn - The main Garden Object
  */
-(function ($, window, gdn) {
+gdn.WalkThrough = (function ($, window, gdn) {
 
+    // Assigns the localStorage object or create a dummy
     var localStorage;
     if (typeof(window.localStorage) === 'undefined') {
         // provide mock localStorage object for old browsers
@@ -30,19 +37,188 @@
         localStorage = window.localStorage;
     }
 
+    // Options coming from Vanilla backend
+    var options = {
+        _options: gdn.getMeta('Plugin.WalkThrough.Options', []) ,
+
+        get: function(key, defaultValue) {
+            if (!this.isset(key)) {
+                return defaultValue;
+            }
+            return this._options[key];
+        },
+
+        isset: function(key) {
+            return typeof(this._options[key]) !== 'undefined';
+        }
+    };
+
+
+    /**
+     * The WalkThrough Class
+     *
+     * It's responsible for displaying and controlling the tour.
+     *
+     * Uses introJs to display the tour.
+     * @link https://github.com/usablica/intro.js
+     *
+     * @param {Object} options
+     * @returns {WalkThroughClass}
+     */
+    function WalkThroughClass(options) {
+        this.options = options;
+        this.intro = null;
+
+
+        /**
+         * Get the step index that the tour should start/resume to.
+         *
+         * Uses both the option 'currentStepIndex' and the localStorage
+         * to determined starting index.
+         *
+         * @returns {Number} - Returns the index of the starting step
+         */
+        function getStartingStepIndex() {
+            var currentStepIndex = parseInt(options.get('currentStepIndex', 0));
+            var steps = options.get('steps');
+
+            // Uses the localStorage to avoid race condition when switching URL between steps
+            var startIndexFromStorage = parseInt(localStorage.getItem('intro_startAtIndex'));
+            if (startIndexFromStorage >= 0) {
+                currentStepIndex = startIndexFromStorage;
+                localStorage.removeItem('intro_startAtIndex');
+            }
+
+            if (currentStepIndex < 0) {
+                currentStepIndex = 0;
+            }
+
+            if (currentStepIndex > steps.length - 1) {
+                currentStepIndex = steps.length - 1;
+            }
+            return currentStepIndex;
+        }
+
+        this.startingStepIndex = getStartingStepIndex();
+    };
+
+    /**
+     * Initialize the tour and it's options.
+     *
+     * @returns {undefined}
+     */
+    WalkThroughClass.prototype.initialize = function() {
+        var that = this;
+
+        // Mandatory or bail out
+        if (! options.isset('steps') || ! options.isset('tourName')) {
+            return;
+        }
+
+        this.intro = introJs();
+
+        // Sets the default options for introJs.
+        // Can be modified from a tour config.
+        this.intro.setOption('nextLabel', this.options.get('nextLabel', 'Next &rarr;'));
+        this.intro.setOption('nextPageLabel', options.get('nextPageLabel', 'Next page &rarr;'));
+        this.intro.setOption('prevLabel', this.options.get('prevLabel', '&larr; Back'));
+        this.intro.setOption('prevPageLabel', options.get('prevPageLabel', '&larr; Previous page'));
+        this.intro.setOption('skipLabel', options.get('skipLabel', 'Skip'));
+        this.intro.setOption('doneLabel', options.get('doneLabel', 'Done'));
+        this.intro.setOption('tooltipPosition', options.get('tooltipPosition', 'auto'));
+        this.intro.setOption('positionPrecedence', ['bottom', 'top', 'right', 'left']);
+        this.intro.setOption('tooltipClass', options.get('tooltipClass', ''));
+        this.intro.setOption('highlightClass', options.get('highlightClass', ''));
+        this.intro.setOption('exitOnEsc', options.get('exitOnEsc', false));
+        this.intro.setOption('exitOnOverlayClick', options.get('exitOnOverlayClick', false));
+        this.intro.setOption('showStepNumbers', options.get('showStepNumbers', true));
+        this.intro.setOption('keyboardNavigation', options.get('keyboardNavigation', true));
+        this.intro.setOption('showButtons', options.get('showButtons', true));
+        this.intro.setOption('showBullets', options.get('showBullets', true));
+        this.intro.setOption('showProgress', options.get('showProgress', false));
+        this.intro.setOption('scrollToElement', options.get('scrollToElement', true));
+        this.intro.setOption('overlayOpacity', options.get('overlayOpacity', 0.7));
+        this.intro.setOption('disableInteraction', options.get('disableInteraction', true));
+
+        // Keeps a reference of those labels so we can revert back later
+        this.defaultNextLabel = this.intro._options.nextLabel;
+        this.defaultPreviousLabel = this.intro._options.prevLabel;
+
+        // Sets the steps
+        this.intro.setOption('steps', options.get('steps'));
+
+        this.intro.onbeforechange(function(targetElement) {
+            that.notifyPlugin('walkthrough/currentstep', {
+                TourName: options.get('tourName'),
+                CurrentStep: that.intro._currentStep
+            });
+
+            var step = that.intro._introItems[that.intro._currentStep];
+            that.redirectIfNeeded(step);
+        });
+
+        this.intro.onchange(function(targetElement) {
+            that.changeTheLabelForButtons();
+        });
+
+        this.intro.oncomplete(function() {
+            that.notifyPlugin('walkthrough/complete', {
+                TourName: options.get('tourName')
+            });
+        });
+
+        this.intro.onexit(function() {
+            that.notifyPlugin('walkthrough/skip', {
+                TourName: options.get('tourName')
+            });
+        });
+
+    };
+
     /**
      * Notify the WalkThrough Controller.
      *
      * @param {string} path
      * @param {Array} data
      */
-    function walkthroughNotify(path, data) {
+    WalkThroughClass.prototype.notifyPlugin = function(path, data) {
         $.ajax({
             type: "POST",
             url: gdn.url(path),
             data: data,
             dataType: 'json'
         });
+    };
+
+    /**
+     * Start the tour.
+     */
+    WalkThroughClass.prototype.start = function() {
+        if (typeof(gdn) !== 'object') {
+            return;
+        }
+
+        if (!this.intro) {
+            return;
+        }
+
+        // Resume on the current step
+        this.intro.goToStep(this.startingStepIndex + 1);
+        this.intro.start();
+    };
+
+
+    /**
+     * Get a step using its index.
+     *
+     * @param {number} index
+     * @returns {Array|null}
+     */
+    WalkThroughClass.prototype.getStepByIndex = function(index) {
+        if (typeof(this.intro._introItems[index]) !== 'undefined') {
+            return this.intro._introItems[index];
+        }
+        return null;
     };
 
     /**
@@ -54,7 +230,7 @@
      * @param {string} href2
      * @returns {Boolean}
      */
-    function hrefAreEqual(href1, href2) {
+    WalkThroughClass.prototype.hrefAreEqual = function(href1, href2) {
         var url1 = window.document.createElement('a');
         url1.href = href1;
 
@@ -62,230 +238,121 @@
         url2.href = href2;
 
         return url1.href === url2.href;
-    }
+    };
 
     /**
-     * Start the tour.
+     * Returns a URL if the step requires a url change.
+     *
+     * @param {string} step
+     * @returns {string}
      */
-    function startIntro() {
-        if (typeof(gdn) !== 'object') {
-            return;
-        }
-
-        // Options coming from Vanilla backend
-        var options = function(gdn) {
-            var _options = gdn.getMeta('Plugin.WalkThrough.Options', []);
-
-            function _isset(key) {
-                    return typeof(_options[key]) !== 'undefined';
-            };
-
-            return {
-                get: function (key, defaultValue) {
-                    if (!_isset(key)) {
-                        return defaultValue;
-                    }
-                    return _options[key];
-                },
-
-                isset: _isset
-            };
-        }(gdn);
-
-        // Mandatory or bail out
-        if (! options.isset('steps') || ! options.isset('tourName')) {
-            return;
-        }
-
-        var currentStepIndex = parseInt(options.get('currentStepIndex', 0));
-        var steps = options.get('steps');
-
-        // Uses the localStorage to avoid race condition when switching URL between steps
-        var startIndexFromStorage = parseInt(localStorage.getItem('intro_startAtIndex'));
-        if (startIndexFromStorage >= 0) {
-            currentStepIndex = startIndexFromStorage;
-            localStorage.removeItem('intro_startAtIndex');
-        }
-
-        if (currentStepIndex < 0) {
-            currentStepIndex = 0;
-        }
-
-        if (currentStepIndex > steps.length - 1) {
-            currentStepIndex = steps.length - 1;
-        }
-
-        var intro = introJs();
-
-
-        // Sets the default options for introJs.
-        // Can be modified from a tour config.
-        intro.setOption('nextLabel', options.get('nextLabel', 'Next &rarr;'));
-        intro.setOption('nextPageLabel', options.get('nextPageLabel', 'Next page &rarr;'));
-        intro.setOption('prevLabel', options.get('prevLabel', '&larr; Back'));
-        intro.setOption('prevPageLabel', options.get('prevPageLabel', '&larr; Previous page'));
-        intro.setOption('skipLabel', options.get('skipLabel', 'Skip'));
-        intro.setOption('doneLabel', options.get('doneLabel', 'Done'));
-        intro.setOption('tooltipPosition', options.get('tooltipPosition', 'auto'));
-        intro.setOption('positionPrecedence', ['bottom', 'top', 'right', 'left']);
-        intro.setOption('tooltipClass', options.get('tooltipClass', ''));
-        intro.setOption('highlightClass', options.get('highlightClass', ''));
-        intro.setOption('exitOnEsc', options.get('exitOnEsc', false));
-        intro.setOption('exitOnOverlayClick', options.get('exitOnOverlayClick', false));
-        intro.setOption('showStepNumbers', options.get('showStepNumbers', true));
-        intro.setOption('keyboardNavigation', options.get('keyboardNavigation', true));
-        intro.setOption('showButtons', options.get('showButtons', true));
-        intro.setOption('showBullets', options.get('showBullets', true));
-        intro.setOption('showProgress', options.get('showProgress', false));
-        intro.setOption('scrollToElement', options.get('scrollToElement', true));
-        intro.setOption('overlayOpacity', options.get('overlayOpacity', 0.7));
-        intro.setOption('disableInteraction', options.get('disableInteraction', true));
-
-        // Sets the steps
-        intro.setOption('steps', steps);
-
-        var defaultNextLabel = intro._options['nextLabel'];
-        var defaultPreviousLabel = intro._options['prevLabel'];
-
-        /**
-         * Get a step using its index.
-         *
-         * @param {number} index
-         * @returns {Array|null}
-         */
-        function getStepByIndex(index) {
-            if (typeof(intro._introItems[index]) !== 'undefined') {
-                return intro._introItems[index];
-            }
+    WalkThroughClass.prototype.getStepRedirectUrl = function(step) {
+        if (typeof(step) === 'undefined') {
             return null;
         }
 
-        /**
-         * Redirect to the step URL if needed.
-         *
-         * @param {Array} step
-         */
-        function redirectIfNeeded(step) {
-            // check if the step needs to navigate to another page
-            var newUrl = getStepRedirectUrl(step);
-            if (newUrl) {
-                window.location.href = newUrl;
+        if (typeof(step.page) === 'string') {
+            if (step.page !== gdn.getMeta('Path')) {
+                var newUrl = gdn.url(step.page);
 
-                // Passes the index using localStorage to avoid race condition when switching URL
-                localStorage.setItem('intro_startAtIndex', intro._currentStep);
+                // Do not return a new url if we are on this page already
+                if (this.hrefAreEqual(newUrl, window.location.href)) {
+                    return null;
+                }
 
-                // Prevents the animation to show the next step before the URL changes
-                intro.disableAnimation(true);
+                return newUrl;
             }
+        }
+        return null;
+    };
+
+    /**
+     * Redirect to the step URL if needed.
+     *
+     * @param {Array} step
+     */
+    WalkThroughClass.prototype.redirectIfNeeded = function(step) {
+        // check if the step needs to navigate to another page
+        var newUrl = this.getStepRedirectUrl(step);
+        if (newUrl) {
+            window.location.href = newUrl;
+
+            // Passes the index using localStorage to avoid race condition when switching URL
+            localStorage.setItem('intro_startAtIndex', this.intro._currentStep);
+
+            // Prevents the animation to show the next step before the URL changes
+            this.intro.disableAnimation(true);
+        }
+    };
+
+    /**
+     * Change the the previous or next button label.
+     *
+     * @param {string} labelName The name of the label.
+     * @param {string} label The text to use as a label.
+     * @returns {undefined}
+     */
+    WalkThroughClass.prototype.changeLabel = function(labelName, label) {
+        var buttonClasses = {
+            prevLabel: '.introjs-prevbutton',
+            nextLabel: '.introjs-nextbutton'
         };
 
-        /**
-         * Returns a URL if the step requires a url change.
-         *
-         * @param {string} step
-         * @returns {string}
-         */
-        function getStepRedirectUrl(step) {
-            if (typeof(step) === 'undefined') {
-                return null;
-            }
-
-            if (typeof(step.page) === 'string') {
-                if (step.page !== gdn.getMeta('Path')) {
-                    var newUrl = gdn.url(step.page);
-
-                    // Do not return a new url if we are on this page already
-                    if (hrefAreEqual(newUrl, window.location.href)) {
-                        return null;
-                    }
-
-                    return newUrl;
-                }
-            }
-            return null;
+        // Need to change both the option and the button html,
+        // since sometimes, the buttons are created at some other time, the buttons are reused
+        if (typeof(buttonClasses[labelName]) !== 'undefined') {
+            this.intro.setOption(labelName, label);
+            $(buttonClasses[labelName]).html(label);
         }
+    };
 
-        /**
-         * Change the the previous or next button label.
-         *
-         * @param {string} labelName The name of the label.
-         * @param {string} label The text to use as a label.
-         * @returns {undefined}
-         */
-        function changeLabel(labelName, label) {
-            var buttonClasses = {
-                prevLabel: '.introjs-prevbutton',
-                nextLabel: '.introjs-nextbutton'
-            };
+    /**
+     * Change the label for the previous and next button.
+     *
+     * It detects if the steps before or after will change the URL,
+     * and if so, will display a different label.
+     */
+    WalkThroughClass.prototype.changeTheLabelForButtons = function() {
+        this.changeLabel('prevLabel', this.defaultPreviousLabel);
+        this.changeLabel('nextLabel', this.defaultNextLabel);
 
-            // Need to change both the option and the button html,
-            // since sometimes, the buttons are created at some other time, the buttons are reused
-            if (typeof(buttonClasses[labelName]) !== 'undefined') {
-                intro.setOption(labelName, label);
-                $(buttonClasses[labelName]).html(label);
+        var nextStep = this.getStepByIndex(this.intro._currentStep + 1);
+        if (nextStep) {
+            var newUrl = this.getStepRedirectUrl(nextStep);
+            if (newUrl) {
+                this.changeLabel('nextLabel', this.intro._options['nextPageLabel']);
             }
         }
 
-        /**
-         * Change the label for the previous and next button.
-         *
-         * It detects if the steps before or after will change the URL,
-         * and if so, will display a different label.
-         */
-        function changeTheLabelForButtons() {
-            changeLabel('prevLabel', defaultPreviousLabel);
-            changeLabel('nextLabel', defaultNextLabel);
-
-            var nextStep = getStepByIndex(intro._currentStep + 1);
-            if (nextStep) {
-                var newUrl = getStepRedirectUrl(nextStep);
-                if (newUrl) {
-                    changeLabel('nextLabel', intro._options['nextPageLabel']);
-                }
-            }
-
-            var previousStep = getStepByIndex(intro._currentStep - 1);
-            if (previousStep) {
-                var newUrl = getStepRedirectUrl(previousStep);
-                if (newUrl) {
-                    changeLabel('prevLabel', intro._options['prevPageLabel']);
-                }
+        var previousStep = this.getStepByIndex(this.intro._currentStep - 1);
+        if (previousStep) {
+            var newUrl = this.getStepRedirectUrl(previousStep);
+            if (newUrl) {
+                this.changeLabel('prevLabel', this.intro._options['prevPageLabel']);
             }
         }
+    };
 
-        intro.onbeforechange(function(targetElement) {
-            walkthroughNotify('walkthrough/currentstep', {
-                TourName: options.get('tourName'),
-                CurrentStep: intro._currentStep
-            });
+    var walkThroughInstance = new WalkThroughClass(options);
 
-            var step = intro._introItems[intro._currentStep];
-            redirectIfNeeded(step);
-        });
-
-        intro.onchange(function(targetElement) {
-            changeTheLabelForButtons();
-        });
-
-        intro.oncomplete(function() {
-            walkthroughNotify('walkthrough/complete', {
-                TourName: options.get('tourName')
-            });
-        });
-
-        intro.onexit(function() {
-            walkthroughNotify('walkthrough/skip', {
-                TourName: options.get('tourName')
-            });
-        });
-
-        // Resume on the current step
-        intro.goToStep(currentStepIndex + 1);
-        intro.start();
-    }
-
+    // Initialize and starts the tour on document ready.
     $(window.document).ready(function() {
-       startIntro();
+        walkThroughInstance.initialize();
+        walkThroughInstance.start();
     });
 
+    /*
+     * Exposes a few variables for debugging purposes
+     */
+    return {
+        tourName: options.get('tourName'),
+        options: options,
+        steps: options.get('steps'),
+        startingStepIndex: walkThroughInstance.startingStepIndex,
+        getIntroJs: function() {
+            return walkThroughInstance.intro;
+        }
+    };
+
 })(jQuery, window, window.gdn);
+
