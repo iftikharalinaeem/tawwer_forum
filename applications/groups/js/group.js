@@ -5,9 +5,9 @@
  */
 var userTokens = {
   start: function() {
-    var form = $('.Tokens-User');
-    if (form.length) {
-      var author = form.val();
+    var input = $('.Tokens-User');
+    if (input.length) {
+      var author = input.val();
       if (author && author.length) {
         author = author.split(",");
         for (i = 0; i < author.length; i++) {
@@ -17,7 +17,7 @@ var userTokens = {
         author = [];
       }
 
-      form.tokenInput(gdn.url('/user/tagsearch'), {
+      input.tokenInput(gdn.url('/user/tagsearch'), {
         hintText: gdn.definition("TagHint", "Start to type..."),
         tokenValue: 'name',
         searchingText: '', // search text gives flickery ux, don't like
