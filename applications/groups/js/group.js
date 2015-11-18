@@ -34,7 +34,7 @@ var userTokens = {
 jQuery(document).ready(function($) {
   userTokens.start();
 
-  $('a.InviteMembersLink').popup({
+  $('.js-invite-members').popup({
     afterLoad: userTokens.start
   });
 });
