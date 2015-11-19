@@ -504,13 +504,13 @@ class BadgesHooks extends Gdn_Plugin {
      * Custom badge trigger: 'Welcome Committee' (comment in user's first discussion).
      */
     public function WelcomeCommittee($Sender, $Args) {
-         // Get current discussion
-         $DiscussionModel = new DiscussionModel();
-         $DiscussionID = GetValue('DiscussionID', GetValue('FormPostValues', $Args));
-         $Discussion = $DiscussionModel->GetID($DiscussionID);
+        // Get current discussion
+        $DiscussionModel = new DiscussionModel();
+        $DiscussionID = GetValue('DiscussionID', GetValue('FormPostValues', $Args));
+        $Discussion = $DiscussionModel->GetID($DiscussionID);
 
-         // Is it discussion starter's first?
-         $FirstDiscussion = $DiscussionModel->GetWhere(array('InsertUserID' =>GetValue('InsertUserID', $Discussion)), 'DateInserted', 'asc', 1);
+        // Is it discussion starter's first?
+        $FirstDiscussion = $DiscussionModel->GetWhere(array('InsertUserID' =>GetValue('InsertUserID', $Discussion)), 'DateInserted', 'asc', 1);
         if ($DiscussionID == GetValue('DiscussionID', $FirstDiscussion)) {
             $UserBadgeModel = new UserBadgeModel();
             $UserBadgeModel->Give(Gdn::Session()->UserID, 'welcome');
