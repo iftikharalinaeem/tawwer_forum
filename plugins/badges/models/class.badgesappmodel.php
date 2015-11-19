@@ -11,14 +11,14 @@
  * @package Reputation
  */
 abstract class BadgesAppModel extends Gdn_Model {
-   /**
-    * Class constructor. Defines the related database table name.
-    * 
-    * @access public
-    * @param string $Name Database table name.
-    */
-   public function __construct($Name = '') {
-      parent::__construct($Name);
-   }
-   
+    /**
+     * Class constructor. Defines the related database table name.
+     *
+     * @access public
+     * @param string $Name Database table name.
+     */
+    public function __construct($Name = '') {
+        parent::__construct($Name);
+    }
+
 }
