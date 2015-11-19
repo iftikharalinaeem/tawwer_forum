@@ -224,8 +224,12 @@ class BadgeModel extends BadgesAppModel {
         }
 
         // Strict-mode.
-        if (isset($Data['Level']) && !is_int($Data['Level'])) {
-            $Data['Level'] = null;
+        if (isset($Data['Level'])) {
+            if (is_numeric($Data['Level'])) {
+                $Data['Level'] = (int)$Data['Level'];
+            } else {
+                $Data['Level'] = null;
+            }
         }
 
         return parent::Save($Data);
