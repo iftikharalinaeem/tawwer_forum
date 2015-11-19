@@ -2,7 +2,7 @@
 
 <h1><?php echo T('Manage Badges'); ?></h1>
 <div class="Info">
-   <?php echo Anchor(T('Add Badge'), 'reputation/badge/manage', 'SmallButton'); ?>
+   <?php echo Anchor(T('Add Badge'), '/badge/manage', 'SmallButton'); ?>
 </div>
 <table id="Badges" class="AltColumns ManageBadges">
    <thead>

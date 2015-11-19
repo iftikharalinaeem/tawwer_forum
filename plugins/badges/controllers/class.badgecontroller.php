@@ -4,7 +4,10 @@
  * 
  * @package Reputation
  */
- 
+
+// We can't rely on our autoloader in a plugin.
+require_once(dirname(__FILE__).'/class.badgesappcontroller.php');
+
 /**
  * Individual badges and doling to users.
  * 
@@ -16,7 +19,7 @@
  * @todo Requestable
  * @todo Graduated abilities
  */
-class BadgeController extends ReputationController {   
+class BadgeController extends BadgesAppController {
    /**
     * Before any call to the controller.
     * 
@@ -40,7 +43,7 @@ class BadgeController extends ReputationController {
 //      $this->BadgeData = $this->BadgeModel->GetList();
       $this->SetData('Badges', $this->BadgeModel->GetList());
       
-      $this->AddSideMenu('reputation/badge/all'); 
+      $this->AddSideMenu('/badge/all');
       $this->Render();
    }
    
@@ -97,7 +100,7 @@ class BadgeController extends ReputationController {
       
       // Validate BadgeID
       if (!is_numeric($BadgeID))
-         Redirect('reputation/badge/all');
+         Redirect('/badge/all');
       
       $Badge = $this->BadgeModel->GetID($BadgeID);
       if (!$Badge)
@@ -116,12 +119,12 @@ class BadgeController extends ReputationController {
             
             // Success & redirect
             $this->InformMessage(T('Badge deleted.'));
-            $this->RedirectUrl = Url('reputation/badge/all');
+            $this->RedirectUrl = Url('/badge/all');
          }
          else {
             // Failure & redirect
             $this->InformMessage(T('Badge cannot be deleted.'));
-            $this->RedirectUrl = Url('reputation/badge/all');
+            $this->RedirectUrl = Url('/badge/all');
          }
       }
       else {
@@ -170,7 +173,7 @@ class BadgeController extends ReputationController {
       
       // Validate BadgeID
       if (!is_numeric($BadgeID))
-         Redirect('reputation/badge/all');
+         Redirect('/badge/all');
       
       // Get info & confirm enabled  
       $Badge = $this->BadgeModel->GetID($BadgeID);
@@ -211,7 +214,7 @@ class BadgeController extends ReputationController {
          // Give to named users
          if ($Result) {
             $this->InformMessage(T('Gave badge to users.'));
-            $this->RedirectUrl = Url('reputation/badge/all');
+            $this->RedirectUrl = Url('/badge/all');
          }
       }
       
@@ -412,11 +415,11 @@ class BadgeController extends ReputationController {
             $Message = ($Insert) ? T('Created new badge') : T('Updated badge');
             $Message .= ' &ldquo;' . $BadgeName. '&rdquo;';
             $this->InformMessage($Message);
-            $this->RedirectUrl = Url('reputation/badge/all');
+            $this->RedirectUrl = Url('/badge/all');
          }
       }
       
-      $this->AddSideMenu('reputation/badge/all');
+      $this->AddSideMenu('/badge/all');
       $this->Render();
    }
    

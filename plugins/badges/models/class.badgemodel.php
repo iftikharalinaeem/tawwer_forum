@@ -4,13 +4,16 @@
  *
  * @package Reputation
  */
+
+// We can't rely on our autoloader in a plugin.
+require_once(dirname(__FILE__).'/class.badgesappmodel.php');
  
 /**
  * Badge handling.
  *
  * @package Reputation
  */
-class BadgeModel extends ReputationModel {
+class BadgeModel extends BadgesAppModel {
    /**
     * Class constructor. Defines the related database table name.
     * 

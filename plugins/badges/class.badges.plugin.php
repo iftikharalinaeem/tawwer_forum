@@ -1,10 +1,24 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
- * Places Reputation hooks into other applications.
+ * Places badges hooks into other applications.
  *
- * @package Reputation
+ * @package Badges
  */
-class ReputationHooks implements Gdn_IPlugin {
+$PluginInfo['badges'] = array(
+   'Name' => 'Badges',
+   'Description' => "Give badges to your users to reward them for contributing to your community.",
+   'Version' => '1.3.1',
+   'SetupController' => 'setup',
+   'Author' => "Lincoln Russell",
+   'AuthorEmail' => 'lincoln@vanillaforums.com',
+   'AuthorUrl' => 'http://lincolnwebs.com',
+   'License' => 'GNU GPL2'
+);
+
+/**
+ * Class BadgesHooks
+ */
+class BadgesHooks implements Gdn_IPlugin {
 
    public function MultisiteModel_SyncNodes_Handler($sender, $args) {
       $args['urls'][] = '/badges/syncnode.json';
@@ -19,14 +33,14 @@ class ReputationHooks implements Gdn_IPlugin {
       switch ($Sender->Mapper->Version) {
          case '1.0':
             $Sender->Mapper->AddMap(array(
-               'badges/give'           => 'reputation/badge/giveuser',
-               'badges/revoke'         => 'reputation/badge/revoke',
-               'badges/user'           => 'reputation/badges/user',
-               'badges/list'           => 'reputation/badges/all',
-               'badges/get'            => 'reputation/badge',
-               'badges/add'            => 'reputation/badge/manage',
-               'badges/edit'           => 'reputation/badge/manage',
-               'badges/delete'         => 'reputation/badge/delete',
+               'badges/give'           => '/badge/giveuser',
+               'badges/revoke'         => '/badge/revoke',
+               'badges/user'           => '/badges/user',
+               'badges/list'           => '/badges/all',
+               'badges/get'            => '/badge',
+               'badges/add'            => '/badge/manage',
+               'badges/edit'           => '/badge/manage',
+               'badges/delete'         => '/badge/delete',
             )/*, NULL, array(
                'slug'        => array('Strip'),
             )*/);
@@ -35,7 +49,7 @@ class ReputationHooks implements Gdn_IPlugin {
    }
 
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
-      $Sender->AddCssFile('reputation.css', 'reputation');
+      $Sender->AddCssFile('badges.css', 'plugin/badges');
    }
 
    public function Base_AfterConnection_Handler($Sender, $Args) {
@@ -67,8 +81,8 @@ class ReputationHooks implements Gdn_IPlugin {
     */
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
-      $Menu->AddLink('Reputation', T('Badges'), 'reputation/badge/all', 'Garden.Settings.Manage', array('class' => 'nav-badges'));
-      $Menu->AddLink('Reputation', T('Badge Requests'), 'reputation/badge/requests', 'Reputation.Badges.Give', array('class' => 'nav-badge-requests'));
+      $Menu->AddLink('Reputation', T('Badges'), '/badge/all', 'Garden.Settings.Manage', array('class' => 'nav-badges'));
+      $Menu->AddLink('Reputation', T('Badge Requests'), '/badge/requests', 'Reputation.Badges.Give', array('class' => 'nav-badge-requests'));
    }
 
 //   public function CommentModel_AfterSaveComment_Handler($Sender, $Args) {
@@ -294,14 +308,8 @@ class ReputationHooks implements Gdn_IPlugin {
     * Run structure & default badges.
     */
    public function Setup() {
-      include(PATH_APPLICATIONS . DS . 'reputation' . DS . 'settings' . DS . 'structure.php');
-
-//      // Allow us to opt out of installing the default badges
-//      if (C('Reputation.Badges.InstallDefaults', TRUE))
-//         include(PATH_APPLICATIONS . DS . 'reputation' . DS . 'settings' . DS . 'defaultbadges.php');
+      require_once(dirname(__FILE__).'/structure.php');
    }
-
-   ///   BADGE TRIGGERS   ///
 
    /**
     *

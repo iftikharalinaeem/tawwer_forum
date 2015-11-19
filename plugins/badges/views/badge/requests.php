@@ -3,7 +3,7 @@ $Session = Gdn::Session();
 ?>
 <h1><?php echo T('Manage Badge Requests'); ?></h1>
 <?php
-   echo $this->Form->Open(array('action' => Url('/reputation/badge/requests')));
+   echo $this->Form->Open(array('action' => Url('/badge/requests')));
    echo $this->Form->Errors();
    $NumRequests = $this->RequestData->NumRows();
    if ($NumRequests == 0) { ?>

@@ -4,13 +4,16 @@
  *
  * @package Reputation
  */
+
+// We can't rely on our autoloader in a plugin.
+require_once(dirname(__FILE__).'/class.badgesappmodel.php');
  
 /**
  * Deals with associating users with badges.
  *
  * @package Reputation
  */
-class UserBadgeModel extends ReputationModel {
+class UserBadgeModel extends BadgesAppModel {
    public $NoSpam = TRUE;
    
    /**
@@ -124,7 +127,7 @@ class UserBadgeModel extends ReputationModel {
       
       $Data = $this->SQL->Get()->ResultArray();
       
-      $Hooks = new ReputationHooks();
+      $Hooks = new BadgesHooks();
       
       $Count = 0;
       foreach ($Data as $Row) {
@@ -159,7 +162,7 @@ class UserBadgeModel extends ReputationModel {
          ->Limit($Limit)
          ->Get()->ResultArray();
       
-      $Hooks = new ReputationHooks();
+      $Hooks = new BadgesHooks();
       
       $Count = 0;
       foreach ($Data as $Row) {

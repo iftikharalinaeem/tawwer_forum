@@ -11,7 +11,7 @@
  * @since 1.0.0
  * @package Reputation
  */
-class ReputationController extends Gdn_Controller {
+class BadgesAppController extends Gdn_Controller {
    /*
     * @var BadgeModel
     */
@@ -60,8 +60,8 @@ class ReputationController extends Gdn_Controller {
             $this->AddCssFile('admin.css');
          
          // Reputation goodness
-         $this->AddCssFile('reputation.css');
-         $this->AddJsFile('reputation.js');
+         $this->AddCssFile('badges.css');
+         $this->AddJsFile('badges.js');
       }
       
       // Change master template

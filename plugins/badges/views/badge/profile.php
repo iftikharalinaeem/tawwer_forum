@@ -11,7 +11,7 @@ if ($this->BadgeData && $this->BadgeData->NumRows() > 0) : ?>
             <div class="ToggleFlyout OptionsMenu">
                <div class="MenuTitle">Options</div>
                <ul class="Flyout MenuItems">
-                  <li><?php echo Anchor(T('Revoke'), 'reputation/badge/revoke/'.$this->User->UserID.
+                  <li><?php echo Anchor(T('Revoke'), '/badge/revoke/'.$this->User->UserID.
                      '/'.GetValue('BadgeID', $Badge).'/'.$Session->TransientKey(), 'RevokeBadge'); ?></li>
                </ul>
             </div>

@@ -5,13 +5,16 @@
  * @package Reputation
  */
 
+// We can't rely on our autoloader in a plugin.
+require_once(dirname(__FILE__).'/class.badgesappcontroller.php');
+
 /**
  * Public badges lists.
  *
  * @since 1.0.0
  * @package Reputation
  */
-class BadgesController extends ReputationController {
+class BadgesController extends BadgesAppController {
 
    /**
     * View badges.

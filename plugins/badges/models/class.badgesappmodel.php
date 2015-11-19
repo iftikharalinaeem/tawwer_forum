@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
- * Reputation Model.
+ * BadgesApp Model.
  *
- * @package Reputation
+ * @package Badges
  */
  
 /**
@@ -10,7 +10,7 @@
  *
  * @package Reputation
  */
-abstract class ReputationModel extends Gdn_Model {
+abstract class BadgesAppModel extends Gdn_Model {
    /**
     * Class constructor. Defines the related database table name.
     * 

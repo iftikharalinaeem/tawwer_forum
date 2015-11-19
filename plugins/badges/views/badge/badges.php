@@ -22,7 +22,7 @@ foreach ($this->Data('Badges') as $Badge) :
          if ($Badge->Active) { // $Badge->Type == 'Manual'
             // Give badge
             if ($Session->CheckPermission('Reputation.Badges.Give') && $Badge->Active)
-               echo Anchor(T('Give'), 'reputation/badge/give/'.$Badge->BadgeID, 'GiveBadge SmallButton Popup');
+               echo Anchor(T('Give'), '/badge/give/'.$Badge->BadgeID, 'GiveBadge SmallButton Popup');
          } ?>
       </td>
       <?php endif; ?>
@@ -36,7 +36,7 @@ foreach ($this->Data('Badges') as $Badge) :
           // Disable badge
          if (CheckPermission('Reputation.Badges.Manage')) {
             echo Anchor(T($Badge->Active ? 'Yes' : 'No'),
-               'reputation/badge/disable/'.$Badge->BadgeID.'/'.$AjaxString,
+               '/badge/disable/'.$Badge->BadgeID.'/'.$AjaxString,
                'DisableBadge', array('title'=> ($Badge->Active ? 'Click to Disable' : 'Click to Enable')));
          }
          else
@@ -47,7 +47,7 @@ foreach ($this->Data('Badges') as $Badge) :
          // Hide badge
          if (CheckPermission('Reputation.Badges.Manage')) {
             echo Anchor(T($Badge->Visible == '1' ? 'Yes' : 'No'),
-               'reputation/badge/hide/'.$Badge->BadgeID.'/'.$AjaxString,
+               '/badge/hide/'.$Badge->BadgeID.'/'.$AjaxString,
                'HideBadge', array('title'=> ($Badge->Visible ? 'Hide' : 'Show')));
          }
          else
@@ -57,11 +57,11 @@ foreach ($this->Data('Badges') as $Badge) :
       <td><?php
          // Edit badge
          if (CheckPermission('Reputation.Badges.Manage'))
-            echo Anchor(T('Edit'), 'reputation/badge/manage/'.$Badge->BadgeID, 'EditBadge SmallButton');
+            echo Anchor(T('Edit'), '/badge/manage/'.$Badge->BadgeID, 'EditBadge SmallButton');
 
          // Delete badge
          if (CheckPermission('Reputation.Badges.Manage') && $Badge->CanDelete)
-            echo Anchor(T('Delete'), 'reputation/badge/delete/'.$Badge->BadgeID.'/'.$AjaxString, 'DeleteBadge Popup SmallButton'); ?>
+            echo Anchor(T('Delete'), '/badge/delete/'.$Badge->BadgeID.'/'.$AjaxString, 'DeleteBadge Popup SmallButton'); ?>
       </td>
 
    </tr>

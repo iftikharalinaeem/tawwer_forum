@@ -15,7 +15,7 @@ class LeaderBoardModule extends Gdn_Module {
    public $Limit = 10;
    
    public function __construct($Sender = '') {
-      parent::__construct($Sender, 'reputation');
+      parent::__construct($Sender, 'plugins/badges');
    }
    
    public function GetData($Limit = NULL) {

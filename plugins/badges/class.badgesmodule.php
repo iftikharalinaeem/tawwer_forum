@@ -23,8 +23,9 @@ class BadgesModule extends Gdn_Module {
       // Optionally only show highest badge in each class
       if (C('Reputation.Badges.FilterModuleByClass'))
          $this->Badges = BadgeModel::FilterByClass($this->Badges);
-      
-      parent::__construct($Sender, 'reputation');
+
+
+      parent::__construct($Sender, 'plugin/badges');
    }
    
    public function AssetTarget() {

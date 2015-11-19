@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
-require_once dirname(__FILE__).'/../models/class.reputationmodel.php';
-require_once dirname(__FILE__).'/../models/class.badgemodel.php';
+require_once dirname(__FILE__).'/models/class.badgesappmodel.php';
+require_once dirname(__FILE__).'/models/class.badgemodel.php';
 
 function DefaultPoints($Threshold) {
    if ($Threshold < 10)

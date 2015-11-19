@@ -10,7 +10,7 @@ $PluginInfo['flair'] = array(
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
    'MobileFriendly' => true,
-   'RequiredApplications' => array('Reputation' => '>=1.3.1')
+   'RequiredApplications' => array('badges' => '>=1.3.1')
 );
 
 class FlairPlugin extends Gdn_Plugin {
