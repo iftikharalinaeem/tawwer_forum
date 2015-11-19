@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * @copyright 2011 Vanilla Forums Inc
  * @package Reputation
