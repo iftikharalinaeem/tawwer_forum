@@ -14,7 +14,7 @@ require_once(dirname(__FILE__).'/class.badgesappmodel.php');
  * @package Reputation
  */
 class UserBadgeModel extends BadgesAppModel {
-    public $NoSpam = TRUE;
+    public $NoSpam = true;
 
     /**
      * Class constructor. Defines the related database table name.
@@ -42,15 +42,16 @@ class UserBadgeModel extends BadgesAppModel {
     public function AddTimeoutEvent($UserID, $BadgeID, $NewTimestamp) {
         // Get badge
         $Badge = $this->GetBadgeID($BadgeID, DATASET_TYPE_ARRAY);
-        if (!$Badge)
-            return FALSE;
+        if (!$Badge) {
+            return false;
+        }
 
         // Get user progress
         $UserBadge = $this->GetID($UserID, GetValue('BadgeID', $Badge));
 
         // Grab relevant parameters
         $Timeout = GetValue('Timeout', $UserBadge['Attributes'], 0);
-        $Threshold = GetValue('Threshold', $Badge, FALSE);
+        $Threshold = GetValue('Threshold', $Badge, false);
 
         // Get new timestamp and add to events
         $Events = GetValue('Events', $UserBadge['Attributes'], array());
@@ -59,8 +60,9 @@ class UserBadgeModel extends BadgesAppModel {
 
         // Only keep events that happened within last $MaxSeconds from $NewTimestamp
         foreach ($Events as $Key => $Timestamp) {
-            if ($Timestamp + $Timeout < $NewTimestamp)
+            if ($Timestamp + $Timeout < $NewTimestamp) {
                 unset($Events[$Key]);
+            }
         }
 
         // Save new event list
@@ -68,8 +70,9 @@ class UserBadgeModel extends BadgesAppModel {
         $this->Save($UserBadge);
 
         // If we've achieved threshold, give badge to user
-        if ($Threshold && count($Events) >= $Threshold)
+        if ($Threshold && count($Events) >= $Threshold) {
             $this->Give($UserID, $BadgeID);
+        }
 
         return count($Events);
     }
@@ -81,17 +84,18 @@ class UserBadgeModel extends BadgesAppModel {
      * @access public
      */
     public function BadgeCount($UserID = '') {
-        return $this->GetCount(array('UserID' => $UserID, 'DateCompleted is not null' => NULL));
+        return $this->GetCount(array('UserID' => $UserID, 'DateCompleted is not null' => null));
     }
 
     public static function BadgeName($Badge) {
         $Name = $Badge['Name'];
         $Threshold = $Badge['Threshold'];
 
-        if (!$Threshold)
+        if (!$Threshold) {
             return T($Name);
+        }
 
-        if (strpos($Name, $Threshold) !== FALSE) {
+        if (strpos($Name, $Threshold) !== false) {
             $Code = str_replace($Threshold, '%s', $Name);
 
             if ($Threshold == 1) {
@@ -107,9 +111,9 @@ class UserBadgeModel extends BadgesAppModel {
     public function BombAnniversary($Limit = 100) {
         // Make sure no one gets a notification.
         SaveToConfig(array(
-            'Preferences.Email.Badge' => FALSE,
-            'Preferences.Popup.Badge' => FALSE
-            ), '', FALSE);
+            'Preferences.Email.Badge' => false,
+            'Preferences.Popup.Badge' => false
+            ), '', false);
 
         $BadgeModel = new BadgeModel();
 
@@ -143,9 +147,9 @@ class UserBadgeModel extends BadgesAppModel {
     public function BombComment($Limit = 100) {
         // Make sure no one gets a notification.
         SaveToConfig(array(
-            'Preferences.Email.Badge' => FALSE,
-            'Preferences.Popup.Badge' => FALSE
-            ), '', FALSE);
+            'Preferences.Email.Badge' => false,
+            'Preferences.Popup.Badge' => false
+            ), '', false);
 
         $BadgeModel = new BadgeModel();
 
@@ -219,9 +223,9 @@ class UserBadgeModel extends BadgesAppModel {
         $Result = $this->SQL->GetWhere('UserBadge', array('UserID' => $UserID, 'BadgeID' => $BadgeID))->FirstRow(DATASET_TYPE_ARRAY);
 
         if (!$Result) {
-            $Result = array('UserID' => $UserID, 'BadgeID' => $BadgeID, '_New' => TRUE);
+            $Result = array('UserID' => $UserID, 'BadgeID' => $BadgeID, '_New' => true);
         } else {
-            $Result['_New'] = FALSE;
+            $Result['_New'] = false;
         }
 
         $Attributes = GetValue('Attributes', $Result);
@@ -247,20 +251,21 @@ class UserBadgeModel extends BadgesAppModel {
      * @param string $Send What data to return. Valid options: 'Object'.
      * @return mixed BadgeID (default) or Badge dataset if $Send == 'Object'.
      */
-    protected function GetBadgeID($BadgeID, $Send = FALSE) {
+    protected function GetBadgeID($BadgeID, $Send = false) {
         if ($Send) {
             $BadgeModel = new BadgeModel();
             $Badge = $BadgeModel->GetID($BadgeID);
 
-            if ($Send == DATASET_TYPE_OBJECT)
+            if ($Send == DATASET_TYPE_OBJECT) {
                 $Badge = (object)$Badge;
+            }
 
             return $Badge;
         }
 
-        if (is_numeric($BadgeID))
+        if (is_numeric($BadgeID)) {
             return $BadgeID;
-        elseif (is_array($BadgeID))
+        } elseif (is_array($BadgeID))
             return $BadgeID['BadgeID'];
         else {
             $BadgeModel = new BadgeModel();
@@ -301,8 +306,9 @@ class UserBadgeModel extends BadgesAppModel {
     public function GetUsers($BadgeID, $Options = array()) {
         // Get numeric ID
         $BadgeID = $this->GetBadgeID($BadgeID);
-        if (!$BadgeID)
-            return FALSE;
+        if (!$BadgeID) {
+            return false;
+        }
 
         // Get query options
         $Limit = GetValue('Limit', $Options, 5);
@@ -331,10 +337,10 @@ class UserBadgeModel extends BadgesAppModel {
      */
     public function Give($UserID, $BadgeID, $Reason = '') {
         if (C('Badges.Disabled')) {
-            return FALSE;
+            return false;
         }
 
-        static $BadgeGiven = FALSE;
+        static $BadgeGiven = false;
 
         $Badge = $this->GetBadgeID($BadgeID, DATASET_TYPE_ARRAY);
         $BadgeID = $Badge['BadgeID'];
@@ -342,14 +348,15 @@ class UserBadgeModel extends BadgesAppModel {
         $UserBadge = $this->GetID($UserID, GetValue('BadgeID', $Badge));
 
         // Allow badges to be disabled
-        if (!GetValue('Active', $Badge))
-            return FALSE;
+        if (!GetValue('Active', $Badge)) {
+            return false;
+        }
 
-        if (GetValue('DateCompleted', $UserBadge, NULL) != NULL) {
+        if (GetValue('DateCompleted', $UserBadge, null) != null) {
             $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
             $this->Validation->AddValidationResult('BadgeID', '@'.sprintf(T('The %s badge has already been given to %s.'), $Badge['Name'], $User['Name']));
 
-            return FALSE;
+            return false;
         }
 
         $UserBadge['Reason'] = $Reason;
@@ -377,7 +384,7 @@ class UserBadgeModel extends BadgesAppModel {
 
             // Notify people of the badge.
             $HeadlineFormat = T('HeadlineFormat.Badge', '{ActivityUserID,You} earned the <a href="{Url,html}">{Data.Name,text}</a> badge.');
-            if (StringBeginsWith(Gdn::Locale()->Locale, 'en', TRUE)) {
+            if (StringBeginsWith(Gdn::Locale()->Locale, 'en', true)) {
                 $BadgeBody = GetValue('Body', $Badge);
             } else {
                 $BadgeBody = '';
@@ -396,23 +403,24 @@ class UserBadgeModel extends BadgesAppModel {
             );
 
             // Photo optional
-            if ($Photo = GetValue('Photo', $Badge))
+            if ($Photo = GetValue('Photo', $Badge)) {
                 SetValue('Photo', $Activity, Gdn_Upload::Url($Photo));
+            }
 
             $ActivityModel = new ActivityModel();
 
             if (!$this->NoSpam || !$BadgeGiven) {
                 // Notify the user of their badge.
-                $ActivityModel->Queue($Activity, 'Badge', array('Force' => TRUE));
+                $ActivityModel->Queue($Activity, 'Badge', array('Force' => true));
             }
 
             // Notify everyone else of your badge.
             $Activity['NotifyUserID'] = ActivityModel::NOTIFY_PUBLIC;
             $Activity['Story'] = $Badge['Body'];
-            $ActivityModel->Queue($Activity, FALSE, array('GroupBy' => array('ActivityTypeID', 'RecordID', 'RecordType')));
+            $ActivityModel->Queue($Activity, false, array('GroupBy' => array('ActivityTypeID', 'RecordID', 'RecordType')));
 
             $ActivityModel->SaveQueue();
-            $BadgeGiven = TRUE;
+            $BadgeGiven = true;
 
             // Hook
             $this->EventArguments['UserBadge'] = $UserBadge;
@@ -428,7 +436,7 @@ class UserBadgeModel extends BadgesAppModel {
      * @since 1.0.0
      * @access public
      */
-    public static function GivePoints($UserID, $Points, $Source = 'Other', $Timestamp = FALSE) {
+    public static function GivePoints($UserID, $Points, $Source = 'Other', $Timestamp = false) {
         UserModel::GivePoints($UserID, $Points, $Source, $Timestamp);
     }
 
@@ -466,7 +474,7 @@ class UserBadgeModel extends BadgesAppModel {
      */
     public function RecipientCount($BadgeID = '') {
         $BadgeID = $this->GetBadgeID($BadgeID);
-        return $this->GetCount(array('BadgeID' => $BadgeID, 'DateCompleted is not null' => NULL));
+        return $this->GetCount(array('BadgeID' => $BadgeID, 'DateCompleted is not null' => null));
     }
 
     /**
@@ -485,17 +493,19 @@ class UserBadgeModel extends BadgesAppModel {
     public function Request($UserID, $BadgeID, $Reason = '') {
         $UserBadge = $this->GetID($UserID, $BadgeID);
         $Badge = $this->GetBadgeID($BadgeID, DATASET_TYPE_ARRAY);
-        $New = TRUE;
+        $New = true;
 
         // Check if request is already pending
-        if (GetValue('DateRequested', $UserBadge) && !GetValue('Declined', $UserBadge))
-            $New = FALSE;
+        if (GetValue('DateRequested', $UserBadge) && !GetValue('Declined', $UserBadge)) {
+            $New = false;
+        }
 
         // Check for declined requests in cooldown period
         $CoolDownDays = C('Reputation.Badges.RequestCoolDownDays', 30);
         $CooledDown = (strtotime(GetValue('DateRequested', $UserBadge)) > strtotime($CoolDownDays.' days ago'));
-        if (!$CooledDown && GetValue('Declined', $UserBadge))
-            $New = FALSE;
+        if (!$CooledDown && GetValue('Declined', $UserBadge)) {
+            $New = false;
+        }
 
         if ($New) {
             // Create the request
@@ -519,8 +529,9 @@ class UserBadgeModel extends BadgesAppModel {
             );
 
             // Optional photo
-            if ($Photo = GetValue('Photo', $Badge))
+            if ($Photo = GetValue('Photo', $Badge)) {
                 SetValue('Photo', $Activity, Gdn_Upload::Url($Photo));
+            }
 
             // Grab all of the users that need to be notified.
             $Data = $this->SQL
@@ -532,9 +543,9 @@ class UserBadgeModel extends BadgesAppModel {
             foreach ($Data as $Row) {
                 $UserID = GetValue('UserID', $Row);
                 $Name = GetValue('Name', $Row);
-                if (strpos($Name, '.Email.') !== FALSE) {
+                if (strpos($Name, '.Email.') !== false) {
                     $NotifyUsers[$UserID]['Emailed'] = ActivityModel::SENT_PENDING;
-                } elseif (strpos($Name, '.Popup.') !== FALSE) {
+                } elseif (strpos($Name, '.Popup.') !== false) {
                     $NotifyUsers[$UserID]['Notified'] = ActivityModel::SENT_PENDING;
                 }
             }
@@ -542,8 +553,8 @@ class UserBadgeModel extends BadgesAppModel {
             // Dispatch notifications
             foreach ($NotifyUsers as $UserID => $Prefs) {
                 $Activity['NotifyUserID'] = $UserID;
-                $Activity['Emailed'] = GetValue('Emailed', $Prefs, FALSE);
-                $Activity['Notified'] = GetValue('Notified', $Prefs, FALSE);
+                $Activity['Emailed'] = GetValue('Emailed', $Prefs, false);
+                $Activity['Notified'] = GetValue('Notified', $Prefs, false);
                 $ActivityModel->Queue($Activity);
             }
             $ActivityModel->SaveQueue();
@@ -563,8 +574,9 @@ class UserBadgeModel extends BadgesAppModel {
      */
     public function Revoke($UserID, $BadgeID) {
         $Badge = $this->GetBadgeID($BadgeID, DATASET_TYPE_ARRAY);
-        if (!$Badge)
-            return FALSE;
+        if (!$Badge) {
+            return false;
+        }
 
         // Delete it.
         $this->Delete(array('UserID' => $UserID, 'BadgeID' => $BadgeID));
@@ -615,7 +627,7 @@ class UserBadgeModel extends BadgesAppModel {
         //$this->AddUpdateFields($FormPostValues);
 
         // Validate the form posted values.
-        $this->Validation->Results(TRUE);
+        $this->Validation->Results(true);
 
         if ($this->Validate($FormPostValues)) {
             // Get the form field values.
@@ -643,12 +655,12 @@ class UserBadgeModel extends BadgesAppModel {
                 ->Where('BadgeID', $Fields['BadgeID'])
                 ->Put();
         } else {
-            $Message = "Couldn't save UserBadge ".print_r($FormPostValues, TRUE).' '.$this->Validation->ResultsText();
+            $Message = "Couldn't save UserBadge ".print_r($FormPostValues, true).' '.$this->Validation->ResultsText();
             LogException(new Exception($Message));
 
-            return FALSE;
+            return false;
         }
 
-        return TRUE;
+        return true;
     }
 }

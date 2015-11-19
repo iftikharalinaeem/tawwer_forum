@@ -35,7 +35,7 @@ class BadgesAppController extends Gdn_Controller {
      * @access public
      */
     public function Initialize() {
-        $FrontendStyle = FALSE;
+        $FrontendStyle = false;
 
         if ($this->DeliveryType() == DELIVERY_TYPE_ALL) {
             $this->Head = new HeadModule($this);
@@ -54,10 +54,11 @@ class BadgesAppController extends Gdn_Controller {
             $FrontendStyle = ($this->ControllerName == 'badgecontroller' && in_array($this->RequestMethod, array('Index', 'request')));
             $FrontendStyle = $FrontendStyle || $this->ControllerName == 'badgescontroller';
 
-            if ($FrontendStyle)
+            if ($FrontendStyle) {
                 $this->AddCssFile('style.css');
-            else
+            } else {
                 $this->AddCssFile('admin.css');
+            }
 
             // Reputation goodness
             $this->AddCssFile('badges.css');
@@ -65,8 +66,9 @@ class BadgesAppController extends Gdn_Controller {
         }
 
         // Change master template
-        if (!$FrontendStyle)
+        if (!$FrontendStyle) {
             $this->MasterView = 'admin';
+        }
 
         // Call Gdn_Controller's Initialize() as well.
         parent::Initialize();

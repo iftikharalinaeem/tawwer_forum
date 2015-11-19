@@ -15,8 +15,9 @@ class RequestBadgeModule extends Gdn_Module {
 
     public function ToString() {
         $HasPermission = Gdn::Session()->CheckPermission('Reputation.Badges.Request');
-        if ($HasPermission)
+        if ($HasPermission) {
             return parent::ToString();
+        }
 
         return '';
     }

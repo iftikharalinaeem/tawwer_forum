@@ -75,8 +75,8 @@ class BadgesController extends BadgesAppController {
     public function User() {
         $this->Permission('Reputation.Badges.View');
 
-        $UserID = Gdn::Request()->GetValue('UserID', FALSE);
-        $this->SetData('Badges', $this->BadgeModel->GetFilteredList($UserID, TRUE));
+        $UserID = Gdn::Request()->GetValue('UserID', false);
+        $this->SetData('Badges', $this->BadgeModel->GetFilteredList($UserID, true));
 
         $Module = new LeaderBoardModule();
         $Module->SlotType = 'a';
@@ -86,5 +86,4 @@ class BadgesController extends BadgesAppController {
         $this->MasterView = 'default';
         $this->Render('index');
     }
-
 }

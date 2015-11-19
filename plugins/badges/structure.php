@@ -1,10 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
 
-if (!isset($Drop))
-    $Drop = FALSE;
+if (!isset($Drop)) {
+    $Drop = false;
+}
 
-if (!isset($Explicit))
-    $Explicit = FALSE;
+if (!isset($Explicit)) {
+    $Explicit = false;
+}
 
 $Database = Gdn::Database();
 $SQL = $Database->SQL();
@@ -15,45 +17,45 @@ $Validation = new Gdn_Validation();
 $Construct->Table('Badge')
     ->PrimaryKey('BadgeID')
     ->Column('Name', 'varchar(64)')
-    ->Column('Slug', 'varchar(32)', TRUE, 'unique')
-    ->Column('Type', 'varchar(20)', TRUE)
-    ->Column('Body', 'text', TRUE)
-    ->Column('Photo', 'varchar(255)', TRUE)
-    ->Column('Points', 'int', TRUE)
+    ->Column('Slug', 'varchar(32)', true, 'unique')
+    ->Column('Type', 'varchar(20)', true)
+    ->Column('Body', 'text', true)
+    ->Column('Photo', 'varchar(255)', true)
+    ->Column('Points', 'int', true)
     ->Column('Active', 'tinyint', 1)
     ->Column('Visible', 'tinyint', 1)
     ->Column('Secret', 'tinyint', 0)
     ->Column('CanDelete', 'tinyint', 1)
     ->Column('DateInserted', 'datetime')
-    ->Column('DateUpdated', 'datetime', TRUE)
+    ->Column('DateUpdated', 'datetime', true)
     ->Column('InsertUserID', 'int')
-    ->Column('UpdateUser', 'int', TRUE)
+    ->Column('UpdateUser', 'int', true)
     ->Column('CountRecipients', 'int', 0)
     ->Column('Threshold', 'int', 0)
-    ->Column('Class', 'varchar(20)', TRUE)
-    ->Column('Level', 'smallint', TRUE)
-    ->Column('Attributes', 'text', TRUE)
+    ->Column('Class', 'varchar(20)', true)
+    ->Column('Level', 'smallint', true)
+    ->Column('Attributes', 'text', true)
     ->Set($Explicit, $Drop);
 
 // Badge Types
 $Construct->Table('BadgeType')
-    ->Column('BadgeType', 'varchar(20)', FALSE, 'primary')
-    ->Column('EditUrl', 'varchar(255)', TRUE)
-    ->Column('Attributes', 'text', TRUE)
+    ->Column('BadgeType', 'varchar(20)', false, 'primary')
+    ->Column('EditUrl', 'varchar(255)', true)
+    ->Column('Attributes', 'text', true)
     ->Set($Explicit, $Drop);
 
 // User Badges
 $Construct->Table('UserBadge')
-    ->Column('UserID', 'int', FALSE, 'primary')
-    ->Column('BadgeID', 'int', FALSE, 'primary')
-    ->Column('Attributes', 'text', TRUE)
-    ->Column('Reason', 'varchar(255)', TRUE)
+    ->Column('UserID', 'int', false, 'primary')
+    ->Column('BadgeID', 'int', false, 'primary')
+    ->Column('Attributes', 'text', true)
+    ->Column('Reason', 'varchar(255)', true)
     ->Column('ShowReason', 'tinyint', 1)
-    ->Column('DateRequested', 'datetime', TRUE)
-    ->Column('RequestReason', 'varchar(255)', TRUE)
+    ->Column('DateRequested', 'datetime', true)
+    ->Column('RequestReason', 'varchar(255)', true)
     ->Column('Declined', 'tinyint', 0)
     ->Column('Count', 'int', 0)
-    ->Column('DateCompleted', 'datetime', TRUE)
+    ->Column('DateCompleted', 'datetime', true)
     ->Column('DateInserted', 'datetime')
     ->Column('InsertUserID', 'int')
     ->Set($Explicit, $Drop);

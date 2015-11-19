@@ -18,11 +18,12 @@ class LeaderBoardModule extends Gdn_Module {
         parent::__construct($Sender, 'plugins/badges');
     }
 
-    public function GetData($Limit = NULL) {
-        if (!$Limit)
+    public function GetData($Limit = null) {
+        if (!$Limit) {
             $Limit = $this->Limit;
+        }
 
-        $TimeSlot = gmdate('Y-m-d', Gdn_Statistics::TimeSlotStamp($this->SlotType, FALSE));
+        $TimeSlot = gmdate('Y-m-d', Gdn_Statistics::TimeSlotStamp($this->SlotType, false));
 
         $CategoryID = $this->CategoryID;
         if ($CategoryID) {
@@ -40,7 +41,7 @@ class LeaderBoardModule extends Gdn_Module {
             'Points',
             'desc',
             $Limit
-            )->ResultArray();
+        )->ResultArray();
 
         Gdn::UserModel()->JoinUsers($Data, array('UserID'));
 
@@ -75,8 +76,9 @@ class LeaderBoardModule extends Gdn_Module {
     }
 
     public function ToString() {
-        if (empty($this->Leaders))
+        if (empty($this->Leaders)) {
             $this->GetData();
+        }
         return parent::ToString();
     }
 }

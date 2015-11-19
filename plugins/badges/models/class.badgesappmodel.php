@@ -20,5 +20,4 @@ abstract class BadgesAppModel extends Gdn_Model {
     public function __construct($Name = '') {
         parent::__construct($Name);
     }
-
 }
