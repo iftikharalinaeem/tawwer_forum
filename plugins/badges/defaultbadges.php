@@ -3,17 +3,19 @@
 require_once dirname(__FILE__).'/models/class.badgesappmodel.php';
 require_once dirname(__FILE__).'/models/class.badgemodel.php';
 
-function DefaultPoints($Threshold) {
-    if ($Threshold < 10) {
-        return 2;
-    }
-    if ($Threshold <= 250) {
-        return 5;
-    }
-    if ($Threshold < 1000) {
-        return 10;
-    }
-    return 20;
+if (!function_exists('DefaultPoints')) {
+     function DefaultPoints($Threshold) {
+         if ($Threshold < 10) {
+             return 2;
+         }
+         if ($Threshold <= 250) {
+             return 5;
+         }
+         if ($Threshold < 1000) {
+             return 10;
+         }
+         return 20;
+     }
 }
 
 // Insert some default badges
