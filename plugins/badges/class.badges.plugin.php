@@ -32,14 +32,14 @@ class BadgesHooks extends Gdn_Plugin {
       switch ($Sender->Mapper->Version) {
          case '1.0':
             $Sender->Mapper->AddMap(array(
-               'badges/give'           => '/badge/giveuser',
-               'badges/revoke'         => '/badge/revoke',
-               'badges/user'           => '/badges/user',
-               'badges/list'           => '/badges/all',
-               'badges/get'            => '/badge',
-               'badges/add'            => '/badge/manage',
-               'badges/edit'           => '/badge/manage',
-               'badges/delete'         => '/badge/delete',
+               'badges/give'           => 'badge/giveuser',
+               'badges/revoke'         => 'badge/revoke',
+               'badges/user'           => 'badges/user',
+               'badges/list'           => 'badges/all',
+               'badges/get'            => 'badge',
+               'badges/add'            => 'badge/manage',
+               'badges/edit'           => 'badge/manage',
+               'badges/delete'         => 'badge/delete',
             )/*, NULL, array(
                'slug'        => array('Strip'),
             )*/);
