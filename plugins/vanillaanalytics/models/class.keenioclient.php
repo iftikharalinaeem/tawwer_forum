@@ -11,6 +11,20 @@ class KeenIOClient extends Garden\Http\HttpClient {
      */
     const API_VERSION = '3.0';
 
+    const COMMAND_MASTER = 'master';
+
+    const COMMAND_READ = 'read';
+
+    const COMMAND_WRITE = 'write';
+
+    const REQUEST_DELETE = 'delete';
+
+    const REQUEST_GET = 'get';
+
+    const REQUEST_POST = 'post';
+
+    protected $masterKey;
+
     /**
      * The project ID we'll be recording events against.
      * @var string
@@ -35,20 +49,58 @@ class KeenIOClient extends Garden\Http\HttpClient {
     /**
      * Constructor.
      *
-     * @param string $projectID ID of the project to record events against.
-     * @param string $writeKey Scoped key for writing to the project.
-     * @param bool|false $readKey Scoped key for reading from the project.
+     * @param bool $baseUrl Not used here.  Added for compatibility with official keen.io library.
+     * @param array $config Configuration values for API communication.
      */
-    public function __construct($projectID, $writeKey, $readKey = false) {
+    public function __construct($baseUrl, $config) {
+        $default = array(
+            'baseUrl'   => 'https://api.keen.io/{version}/',
+            'version'   => self::API_VERSION,
+            'masterKey' => null,
+            'writeKey'  => null,
+            'readKey'   => null,
+            'projectId' => null
+        );
+
+        $config = array_merge($default, $config);
+        $baseUrl = str_replace(
+            '{version}',
+            $config['version'],
+            $config['baseUrl']
+        );
 
         // Building the basics for our API interface
-        parent::__construct('https://api.keen.io');
+        parent::__construct($baseUrl);
         $this->setDefaultHeader('Content-Type', 'application/json');
         $this->setThrowExceptions(true);
 
-        $this->projectID = $projectID;
-        $this->writeKey = $writeKey;
-        $this->readKey = $readKey;
+        $this->setMasterKey($config['masterKey']);
+        $this->setProjectID($config['projectId']);
+        $this->setWriteKey($config['writeKey']);
+        $this->setReadKey($config['readKey']);
+    }
+
+    /**
+     * Record an event against the currently configured project.
+     *
+     * @param $eventCollection Name of the event collection to save the current event to.
+     * @param $eventData Event data.
+     * @return bool|stdClass Object representing result on success, false on failure.
+     */
+    public function addEvent($eventCollection, $eventData) {
+        return $this->command(
+            "/projects/{$this->projectID}/events/{$eventCollection}",
+            $eventData,
+            self::COMMAND_WRITE
+        );
+    }
+
+    public function addEvents($data) {
+        return $this->command(
+            "/projects/{$this->projectID}/events",
+            $data,
+            self::COMMAND_WRITE
+        );
     }
 
     /**
@@ -59,14 +111,38 @@ class KeenIOClient extends Garden\Http\HttpClient {
      * @param string $authorization Value for the authorization header.
      * @return bool|stdClass Object representing result on success, false on failure.
      */
-    protected function apiCommand($endpoint, $data, $authorization) {
+    protected function command($endpoint, $data = [], $authorization = false, $requestMethod = self::REQUEST_POST) {
+        $validMethods = [
+            self::REQUEST_DELETE,
+            self::REQUEST_GET,
+            self::REQUEST_POST
+        ];
+
+        if (!in_array($requestMethod, $validMethods)) {
+            return false;
+        }
+
+        $headers = [];
+
+        if ($authorization) {
+            switch ($authorization) {
+                case self::COMMAND_MASTER:
+                    $headers['Authorization'] = $this->getMasterKey();
+                    break;
+                case self::COMMAND_READ:
+                    $headers['Authorization'] = $this->getReadKey();
+                    break;
+                case self::COMMAND_WRITE:
+                    $headers['Authorization'] = $this->getWriteKey();
+                    break;
+            }
+        }
+
         try {
-            $result = $this->post(
+            $result = $this->$requestMethod(
                 $endpoint,
                 $data,
-                [
-                    'Authorization' => $authorization
-                ]
+                $headers
             );
 
             return json_decode($result);
@@ -77,32 +153,120 @@ class KeenIOClient extends Garden\Http\HttpClient {
         return false;
     }
 
+    public function deleteEvents() {}
+
+    public function deleteEventProperties() {}
+
     /**
-     * Record an event against the currently configured project.
+     * Returns available schema information for this event collection, including properties and their type. It also
+     * returns links to sub-resources.
      *
-     * @param $collection Name of the event collection to save the current event to.
-     * @param $data Event data.
-     * @return bool|stdClass Object representing result on success, false on failure.
+     * @param $eventCollection
+     * @return bool|stdClass
      */
-    public function event($collection, $data) {
-        return $this->writeCommand(
-            self::API_VERSION . "/projects/{$this->projectID}/events/{$collection}",
-            $data
+    public function getCollection($eventCollection) {
+        return $this->command(
+            "projects/{$this->projectID}/events/{$eventCollection}",
+            [],
+            self::COMMAND_MASTER
         );
     }
 
     /**
-     * Perform a write command against the keen.io API.
+     * Returns schema information for all the event collections in this project, including properties and their type.
+     * It also returns links to sub-resources.
      *
-     * @param string $endpoint Target endpoint, without the host.
-     * @param array $data Payload for the API command.
-     * @return bool|stdClass Object representing result on success, false on failure.
+     * @return bool|stdClass
      */
-    protected function writeCommand($endpoint, $data) {
-        return $this->apiCommand(
-            $endpoint,
-            $data,
-            $this->writeKey
+    public function getCollections() {
+        return $this->command(
+            "projects/{$this->projectID}/events",
+            [],
+            self::COMMAND_MASTER
         );
+    }
+
+    public function getEventSchemas() {
+        return $this->getCollections();
+    }
+
+    public function getMasterKey() {
+        return $this->masterKey;
+    }
+
+    /**
+     * Returns the projects accessible to the API user, as well as links to project sub-resources for discovery.
+     */
+    public function getProject($projectID) {
+        return $this->command(
+            "projects/{$projectID}",
+            [],
+            self::COMMAND_MASTER
+        );
+    }
+
+    public function getProjectID() {
+        return $this->projectID;
+    }
+
+    /**
+     * Returns the projects accessible to the API user, as well as links to project sub-resources for discovery.
+     */
+    public function getProjects() {
+        return $this->command(
+            "projects",
+            [],
+            self::COMMAND_MASTER
+        );
+    }
+
+    /**
+     * Returns the property name, type, and a link to sub-resources.
+     *
+     * @param $eventCollection
+     * @param $propertyName
+     * @return bool|stdClass
+     */
+    public function getProperty($eventCollection, $propertyName) {
+        return $this->command(
+            "projects/{$this->projectID}/events/{$eventCollection}/properties/{$propertyName}",
+            [],
+            self::COMMAND_MASTER
+        );
+    }
+
+    /**
+     * Returns the available child resources. Currently, the only child resource is the Projects Resource.
+     */
+    public function getResources() {
+        return $this->command(
+            "",
+            [],
+            self::COMMAND_MASTER
+        );
+    }
+
+    public function getReadKey() {
+        return $this->readKey;
+    }
+
+    public function getWriteKey() {
+        return $this->writeKey;
+    }
+
+    public function setMasterKey($masterKey) {
+        return $this->masterKey = $masterKey;
+    }
+
+    public function setProjectID($projectID) {
+        return $this->projectID = $projectID;
+    }
+
+    public function setReadKey($readKey) {
+        return $this->readKey = $readKey;
+    }
+
+    public function setWriteKey($writeKey) {
+        return $this->writeKey = $writeKey;
     }
 }

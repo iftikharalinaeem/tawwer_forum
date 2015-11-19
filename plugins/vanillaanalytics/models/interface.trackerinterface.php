@@ -6,6 +6,15 @@
 interface TrackerInterface {
 
     /**
+     *
+     */
+    public function addDefinitions(Gdn_Controller $controller);
+
+    /**
+     *
+     */
+    public function addJsFiles(Gdn_Controller $controller);
+    /**
      * Track an event.
      *
      * @param string $type Name/type of the event being tracked.

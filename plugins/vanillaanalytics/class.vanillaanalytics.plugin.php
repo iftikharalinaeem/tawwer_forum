@@ -22,20 +22,43 @@ $PluginInfo['VanillaAnalytics'] = array(
  */
 class VanillaAnalytics extends Gdn_Plugin {
 
+    protected $analyticsTracker;
+
     public function __construct() {
 
         // Grab the Composer autoloader.
         require_once(dirname(__FILE__) . '/vendor/autoload.php');
 
+        $this->analyticsTracker = new AnalyticsTracker();
+
         // For now, using keen.io is hardwired.
-        AnalyticsTracker::addTracker(new KeenIOTracker());
+        $this->analyticsTracker()->addTracker(new KeenIOTracker());
+    }
+
+    /**
+     *
+     */
+    public function analyticsTracker() {
+        if (!$this->analyticsTracker) {
+            $this->analyticsTracker = new AnalyticsTracker();
+        }
+
+        return $this->analyticsTracker;
     }
 
     /**
      * Track the generic 404 response.
      */
-    public function Gdn_Dispatcher_NotFound_Handler() {
-        AnalyticsTracker::trackEvent('notFound');
+    public function gdn_dispatcher_notFound_handler() {
+        $this->analyticsTracker()->trackEvent('notFound');
+    }
+
+    /**
+     * @param $sender Controller instance
+     */
+    public function base_render_before($sender) {
+        $this->analyticsTracker()->addJsFiles($sender);
+        $this->analyticsTracker()->addDefinitions($sender);
     }
 
     /**
@@ -44,13 +67,13 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param $sender Current instance of DiscussionModel
      * @param $args Event arguments, passed from DiscussionModel, specifically for the AfterSaveDiscussion event.
      */
-    public function DiscussionModel_AfterSaveDiscussion_Handler($sender, &$args) {
+    public function discussionModel_afterSaveDiscussion_handler($sender, &$args) {
 
         $data = AnalyticsData::discussion(val('DiscussionID', $args));
 
         if ($data) {
             $event = val('Insert', $args) ? 'discussionInsert' : 'discussionEdit';
-            AnalyticsTracker::trackEvent($event, $data);
+            $this->analyticsTracker()->trackEvent($event, $data);
         }
     }
 }

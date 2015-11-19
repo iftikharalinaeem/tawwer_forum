@@ -11,15 +11,33 @@ class AnalyticsTracker {
      * @var array
      * @access protected
      */
-    protected static $trackers = [];
+    protected $trackers = [];
+
+    /**
+     *
+     */
+    public function addDefinitions(Gdn_Controller $controller) {
+        foreach ($this->trackers as $interface) {
+            $interface->addDefinitions($controller);
+        }
+    }
+
+    /**
+     *
+     */
+    public function addJsFiles(Gdn_Controller $controller) {
+        foreach ($this->trackers as $interface) {
+            $interface->addJsFiles($controller);
+        }
+    }
 
     /**
      * Adds a new tracker instance to the collection.
      *
      * @param TrackerInterface $interface
      */
-    public static function addTracker(TrackerInterface &$interface) {
-        static::$trackers[] = $interface;
+    public function addTracker(TrackerInterface &$interface) {
+        $this->trackers[] = $interface;
     }
 
     /**
@@ -27,7 +45,7 @@ class AnalyticsTracker {
      * @param $event
      * @param array $data
      */
-    public static function trackEvent($event, $data = array()) {
+    public function trackEvent($event, $data = array()) {
 
         // Load up the defaults we'd like to have and merge them into the data.
         $defaults = array(
@@ -42,7 +60,7 @@ class AnalyticsTracker {
         $data = array_merge($defaults, $data);
 
         // Iterate through our tracker list and tell each of them about our event.
-        foreach (static::$trackers as $interface) {
+        foreach ($this->trackers as $interface) {
             $interface->event($event, $data);
         }
 

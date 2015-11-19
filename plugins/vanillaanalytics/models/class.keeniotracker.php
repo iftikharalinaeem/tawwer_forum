@@ -11,16 +11,41 @@ class KeenIOTracker implements TrackerInterface {
      */
     protected $client;
 
+    protected $readKey;
+
+    protected $writeKey;
+
+    protected $projectID;
+
     /**
      * Constructor.
      */
     public function __construct() {
         // Load all necessary keys from the Vanilla config.
+        $this->projectID = c('VanillaAnalytics.KeenIO.ProjectID');
+        $this->writeKey = c('VanillaAnalytics.KeenIO.WriteKey');
+        $this->readKey = c('VanillaAnalytics.KeenIO.ReadKey');
+
         $this->client = new KeenIOClient(
-            c('VanillaAnalytics.KeenIO.ProjectID'),
-            c('VanillaAnalytics.KeenIO.WriteKey'),
-            c('VanillaAnalytics.KeenIO.ReadKey')
+            $this->projectID,
+            $this->writeKey,
+            $this->readKey
         );
+    }
+
+    /**
+     *
+     */
+    public function addDefinitions(Gdn_Controller $controller) {
+        $controller->addDefinition('keenio.projectID', $this->projectID);
+        $controller->addDefinition('keenio.writeKey', $this->writeKey);
+    }
+
+    /**
+     *
+     */
+    public function addJsFiles(Gdn_Controller $controller) {
+        $controller->addJsFile('https://d26b395fwzu5fz.cloudfront.net/3.3.0/keen.min.js');
     }
 
     /**
