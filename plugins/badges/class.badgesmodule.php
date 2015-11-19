@@ -27,7 +27,7 @@ class BadgesModule extends Gdn_Module {
         }
 
 
-        parent::__construct($Sender, 'plugin/badges');
+        parent::__construct($Sender, 'plugins/badges');
     }
 
     public function AssetTarget() {
