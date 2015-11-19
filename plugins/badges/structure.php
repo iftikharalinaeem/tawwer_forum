@@ -74,12 +74,4 @@ $Construct->Table('User')
 $ActivityModel = new ActivityModel();
 $ActivityModel->DefineType('Badge');
 
-$PermissionModel = Gdn::PermissionModel();
-$PermissionModel->Define(array(
-    'Reputation.Badges.View' => 1,
-    'Reputation.Badges.Request',
-    'Reputation.Badges.Give' => 'Garden.Settings.Manage',
-    'Reputation.Badges.Manage' => 'Garden.Settings.Manage'
-));
-
 require_once(dirname(__FILE__).'/defaultbadges.php');

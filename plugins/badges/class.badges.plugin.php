@@ -8,6 +8,12 @@ $PluginInfo['badges'] = array(
     'Name' => 'Badges',
     'Description' => "Give badges to your users to reward them for contributing to your community.",
     'Version' => '1.4',
+    'RegisterPermissions' => array(
+        'Reputation.Badges.View' => 1,
+        'Reputation.Badges.Request',
+        'Reputation.Badges.Give' => 'Garden.Settings.Manage',
+        'Reputation.Badges.Manage' => 'Garden.Settings.Manage'
+    ),
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',
     'AuthorUrl' => 'http://lincolnwebs.com',
@@ -310,8 +316,15 @@ class BadgesHooks extends Gdn_Plugin {
     /**
      * Run structure & default badges.
      */
-    public function Setup() {
+    public function setup() {
         Gdn::applicationManager()->disableApplication('reputation');
+        $this->structure();
+    }
+
+    /**
+     * Include our separate structure file because hot damn there's a lot to do.
+     */
+    public function structure() {
         require_once(dirname(__FILE__).'/structure.php');
     }
 
