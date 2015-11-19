@@ -223,6 +223,11 @@ class BadgeModel extends BadgesAppModel {
             TouchValue('Threshold', $Data, 0);
         }
 
+        // Strict-mode.
+        if (isset($Data['Level']) && !is_int($Data['Level'])) {
+            $Data['Level'] = null;
+        }
+
         return parent::Save($Data);
     }
 }
