@@ -8,7 +8,6 @@ $PluginInfo['badges'] = array(
    'Name' => 'Badges',
    'Description' => "Give badges to your users to reward them for contributing to your community.",
    'Version' => '1.3.1',
-   'SetupController' => 'setup',
    'Author' => "Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com',
@@ -18,7 +17,7 @@ $PluginInfo['badges'] = array(
 /**
  * Class BadgesHooks
  */
-class BadgesHooks implements Gdn_IPlugin {
+class BadgesHooks extends Gdn_Plugin {
 
    public function MultisiteModel_SyncNodes_Handler($sender, $args) {
       $args['urls'][] = '/badges/syncnode.json';
