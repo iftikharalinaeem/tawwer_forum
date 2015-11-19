@@ -308,6 +308,7 @@ class BadgesHooks implements Gdn_IPlugin {
     * Run structure & default badges.
     */
    public function Setup() {
+      Gdn::applicationManager()->disableApplication('reputation');
       require_once(dirname(__FILE__).'/structure.php');
    }
 
