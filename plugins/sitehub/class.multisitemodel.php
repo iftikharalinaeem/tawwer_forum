@@ -585,7 +585,8 @@ class MultisiteModel extends Gdn_Model {
                     ->parameter('headers', [
                         'Authorization' => self::apikey(true)
                     ])
-                    ->parameter('accountid', Infrastructure::site('accountid'));
+                    ->parameter('accountid', Infrastructure::site('accountid'))
+                    ->requestOption('LogResponseBody', false);
 
                 $result[$url] = $query->send();
             }
