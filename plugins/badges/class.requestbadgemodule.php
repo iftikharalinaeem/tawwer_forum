@@ -1,22 +1,41 @@
 <?php
+/**
+ * @copyright 2011-2015 Vanilla Forums, Inc.
+ * @package Badges
+ */
 
 /**
  * Renders the "Request This Badge" button.
  */
 class RequestBadgeModule extends Gdn_Module {
 
+    /**
+     *
+     *
+     * @param string $Sender
+     */
     public function __construct($Sender = '') {
         parent::__construct($Sender, 'plugins/badges');
     }
 
-    public function AssetTarget() {
+    /**
+     *
+     *
+     * @return string
+     */
+    public function assetTarget() {
         return 'Panel';
     }
 
-    public function ToString() {
-        $HasPermission = Gdn::Session()->CheckPermission('Reputation.Badges.Request');
+    /**
+     *
+     *
+     * @return string
+     */
+    public function toString() {
+        $HasPermission = Gdn::session()->checkPermission('Reputation.Badges.Request');
         if ($HasPermission) {
-            return parent::ToString();
+            return parent::toString();
         }
 
         return '';

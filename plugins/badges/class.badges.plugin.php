@@ -1,9 +1,10 @@
 <?php
 /**
- * Places badges hooks into other applications.
- *
+ * @copyright 2011-2015 Vanilla Forums, Inc.
+ * @author Lincoln Russell <lincoln@vanillaforums.com>
  * @package Badges
  */
+
 $PluginInfo['badges'] = array(
     'Name' => 'Badges',
     'Description' => "Give badges to your users to reward them for contributing to your community.",
@@ -17,15 +18,21 @@ $PluginInfo['badges'] = array(
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',
     'AuthorUrl' => 'http://lincolnwebs.com',
-    'License' => 'GNU GPL2'
+    'License' => 'Proprietary'
 );
 
 /**
- * Class BadgesHooks
+ * Places badges hooks into other applications.
  */
 class BadgesHooks extends Gdn_Plugin {
 
-    public function MultisiteModel_SyncNodes_Handler($sender, $args) {
+    /**
+     * Allow badge syncing from hub.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function multisiteModel_syncNodes_handler($sender, $args) {
         $args['urls'][] = '/badges/syncnode.json';
     }
 
@@ -34,46 +41,60 @@ class BadgesHooks extends Gdn_Plugin {
      *
      * @param SimpleApiPlugin $Sender
      */
-    public function SimpleApiPlugin_Mapper_Handler($Sender) {
-    switch ($Sender->Mapper->Version) {
-        case '1.0':
-            $Sender->Mapper->AddMap(array(
-                'badges/give'              => 'badge/giveuser',
-                'badges/revoke'            => 'badge/revoke',
-                'badges/user'              => 'badges/user',
-                'badges/list'              => 'badges/all',
-                'badges/get'                => 'badge',
-                'badges/add'                => 'badge/manage',
-                'badges/edit'              => 'badge/manage',
-                'badges/delete'            => 'badge/delete',
-            ));
-            break;
+    public function simpleApiPlugin_mapper_handler($Sender) {
+        switch ($Sender->Mapper->Version) {
+            case '1.0':
+                $Sender->Mapper->addMap(array(
+                    'badges/give'              => 'badge/giveuser',
+                    'badges/revoke'            => 'badge/revoke',
+                    'badges/user'              => 'badges/user',
+                    'badges/list'              => 'badges/all',
+                    'badges/get'               => 'badge',
+                    'badges/add'               => 'badge/manage',
+                    'badges/edit'              => 'badge/manage',
+                    'badges/delete'            => 'badge/delete',
+                ));
+                break;
         }
     }
 
-    public function AssetModel_StyleCss_Handler($Sender, $Args) {
-        $Sender->AddCssFile('badges.css', 'plugin/badges');
+    /**
+     * Add styling.
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function assetModel_styleCss_handler($Sender, $Args) {
+        $Sender->addCssFile('badges.css', 'plugin/badges');
     }
 
-    public function Base_AfterConnection_Handler($Sender, $Args) {
+    /**
+     * Trigger Connect-type badges.
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function base_afterConnection_handler($Sender, $Args) {
         $BadgeModel = new BadgeModel();
         $UserBadgeModel = new UserBadgeModel();
-
-        $Badges = $BadgeModel->GetByType('Connect');
+        $Badges = $BadgeModel->getByType('Connect');
 
         foreach ($Badges as $Badge) {
             if ($Badge['Attributes']['Provider'] == $Args['Provider']) {
-            $UserBadgeModel->Give(GetValueR('User.UserID', $Args), $Badge);
-            break;
+                $UserBadgeModel->give(valr('User.UserID', $Args), $Badge);
+                break;
             }
         }
     }
 
     /**
      * Delete & log UserPoints when a user is deleted.
+     *
+     * @param $Sender
+     * @param $Args
      */
-    public function Base_BeforeDeleteUser_Handler($Sender, $Args) {
-        Gdn::UserModel()->GetDelete('UserPoints', array('UserID' => $Args['UserID']), $Args['Content']);
+    public function base_beforeDeleteUser_handler($Sender, $Args) {
+        Gdn::userModel()->getDelete('UserPoints', array('UserID' => $Args['UserID']), $Args['Content']);
     }
 
     /**
@@ -82,29 +103,30 @@ class BadgesHooks extends Gdn_Plugin {
      * @since 1.0.0
      * @param object $Sender DashboardController.
      */
-    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
+    public function base_getAppSettingsMenuItems_handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
-        $Menu->AddLink('Reputation', T('Badges'), '/badge/all', 'Garden.Settings.Manage', array('class' => 'nav-badges'));
-        $Menu->AddLink('Reputation', T('Badge Requests'), '/badge/requests', 'Reputation.Badges.Give', array('class' => 'nav-badge-requests'));
+        $Menu->addLink('Reputation', t('Badges'), '/badge/all', 'Garden.Settings.Manage', array('class' => 'nav-badges'));
+        $Menu->addLink('Reputation', t('Badge Requests'), '/badge/requests', 'Reputation.Badges.Give', array('class' => 'nav-badge-requests'));
     }
 
-//    public function CommentModel_AfterSaveComment_Handler($Sender, $Args) {
-//        $this->DiscussionContent($Sender, $Args);
-//        $this->CommentMarathon($Sender, $Args);
-//        $this->LightningReflexes($Sender, $Args);
-//        $this->WelcomeCommittee($Sender, $Args);
-//    }
-
-    public function CommentModel_BeforeNotification_Handler($Sender, $Args) {
-        $this->NameDropper($Sender, $Args);
+    /**
+     * Trigger NameDropper.
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function commentModel_beforeNotification_handler($Sender, $Args) {
+        $this->nameDropper($Sender, $Args);
     }
 
-//    public function DiscussionModel_AfterSaveDiscussion_Handler($Sender, $Args) {
-//        $this->DiscussionContent($Sender, $Args);
-//    }
-
-    public function DiscussionModel_BeforeNotification_Handler($Sender, $Args) {
-        $this->NameDropper($Sender, $Args);
+    /**
+     * Trigger NameDropper.
+     *
+     * @param $Sender
+     * @param $Args
+     */
+    public function discussionModel_beforeNotification_handler($Sender, $Args) {
+        $this->nameDropper($Sender, $Args);
     }
 
     /**
@@ -112,9 +134,7 @@ class BadgesHooks extends Gdn_Plugin {
      */
 //    public function Gdn_Session_AfterGetSession_Handler($Sender, $Args) {
 //        $this->FreshStart($Sender, $Args);
-//        $this->Anniversaries($Sender, $Args);
 //        $this->Attendance($Sender, $Args);
-//        $this->EarlyMorningTreat($Sender, $Args);
 //    }
 
     /**
@@ -123,12 +143,12 @@ class BadgesHooks extends Gdn_Plugin {
      * @since 1.0.0
      * @access public
      */
-    public function Base_BeforeProfileOptions_Handler($Sender, &$Args) {
-        $SideMenu = GetValue('SideMenu', $Args);
+    public function base_beforeProfileOptions_handler($Sender, &$Args) {
+        $SideMenu = val('SideMenu', $Args);
 
         // Add 'Give Badge' to profiles
-        if (CheckPermission('Reputation.Badges.Give')) {
-            $Args['ProfileOptions'][] = array('Text' => T('Give Badge'), 'Url' => '/badge/giveuser/'.$Args['UserID'].'/', 'CssClass' => 'Popup');
+        if (checkPermission('Reputation.Badges.Give')) {
+            $Args['ProfileOptions'][] = array('Text' => t('Give Badge'), 'Url' => '/badge/giveuser/'.$Args['UserID'].'/', 'CssClass' => 'Popup');
         }
     }
 
@@ -139,29 +159,31 @@ class BadgesHooks extends Gdn_Plugin {
      * @access public
      * @param object $Sender ProfileController.
      */
-    public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
-        $Sender->Preferences['Notifications']['Email.Badge'] = T('PreferenceBadgeEmail', 'Notify me when I earn a badge.');
-        $Sender->Preferences['Notifications']['Popup.Badge'] = T('PreferenceBadgePopup', 'Notify me when I earn a badge.');
+    public function profileController_afterPreferencesDefined_handler($Sender) {
+        $Sender->Preferences['Notifications']['Email.Badge'] = t('PreferenceBadgeEmail', 'Notify me when I earn a badge.');
+        $Sender->Preferences['Notifications']['Popup.Badge'] = t('PreferenceBadgePopup', 'Notify me when I earn a badge.');
 
-        if (Gdn::Session()->CheckPermission('Reputation.Badges.Give')) {
-            $Sender->Preferences['Notifications']['Email.BadgeRequest'] = T('Notify me when a badge is requested.');
-            $Sender->Preferences['Notifications']['Popup.BadgeRequest'] = T('Notify me when a badge is requested.');
+        if (Gdn::session()->checkPermission('Reputation.Badges.Give')) {
+            $Sender->Preferences['Notifications']['Email.BadgeRequest'] = t('Notify me when a badge is requested.');
+            $Sender->Preferences['Notifications']['Popup.BadgeRequest'] = t('Notify me when a badge is requested.');
 
             // Save to list of users for notifications
-            if ($Sender->Form->IsPostBack()) {
+            if ($Sender->Form->authenticatedPostBack()) {
                 $Set = array();
                 $Prefixes = array('Email.BadgeRequest', 'Popup.BadgeRequest');
                 foreach ($Prefixes as $Prefix) {
-                    $Value = $Sender->Form->GetFormValue($Prefix, null);
+                    $Value = $Sender->Form->getFormValue($Prefix, null);
                     $Set[$Prefix] = ($Value) ? $Value : null;
                 }
-                UserModel::SetMeta($Sender->User->UserID, $Set, 'Preferences.');
+                UserModel::setMeta($Sender->User->UserID, $Set, 'Preferences.');
             }
         }
     }
 
     /**
      * Show user's badges in profile.
+     *
+     * @todo
      */
 //    public function ProfileController_Badges_Create($Sender) {
 //        $Sender->Permission('Reputation.Badges.View');
@@ -189,8 +211,8 @@ class BadgesHooks extends Gdn_Plugin {
      * @access public
      */
     public function ProfileController_Render_Before($Sender) {
-        if (C('Badges.BadgesModule.Target', 'Panel') == 'Panel') {
-            $Sender->AddModule('BadgesModule');
+        if (c('Badges.BadgesModule.Target', 'Panel') == 'Panel') {
+            $Sender->addModule('BadgesModule');
         }
     }
 
@@ -200,8 +222,8 @@ class BadgesHooks extends Gdn_Plugin {
      * @access public
      */
     public function Base_AfterUserInfo_Handler($Sender, $Args) {
-        if (C('Badges.BadgesModule.Target') == 'AfterUserInfo') {
-            echo Gdn_Theme::Module('BadgesModule');
+        if (c('Badges.BadgesModule.Target') == 'AfterUserInfo') {
+            echo Gdn_Theme::module('BadgesModule');
         }
     }
 
@@ -211,24 +233,25 @@ class BadgesHooks extends Gdn_Plugin {
      * @access public
      */
     public function Base_BeforeUserInfo_Handler($Sender, $Args) {
-        if (C('Badges.BadgesModule.Target') == 'BeforeUserInfo') {
-            echo Gdn_Theme::Module('BadgesModule');
+        if (c('Badges.BadgesModule.Target') == 'BeforeUserInfo') {
+            echo Gdn_Theme::module('BadgesModule');
         }
     }
 
     /**
      *
+     *
      * @param UserModel $Sender
      */
-    public function UserModel_Visit_Handler($Sender, $Args) {
-        $this->Anniversaries($Sender, $Args);
+    public function userModel_visit_handler($Sender, $Args) {
+        $this->anniversaries($Sender, $Args);
     }
 
     /**
      * Calculate whether any badges should be given... because of badges given.
      */
-    public function UserBadgeModel_AfterGive_Handler($Sender, $Args) {
-        $this->ComboBreaker($Sender, $Args);
+    public function userBadgeModel_afterGive_handler($Sender, $Args) {
+        $this->comboBreaker($Sender, $Args);
     }
 
     /**
@@ -240,31 +263,27 @@ class BadgesHooks extends Gdn_Plugin {
      * @param object $Sender ProfileController.
      * @todo Put in a view.
      */
-    public function UserInfoModule_OnBasicInfo_Handler($Sender) {
-        echo ' '.Wrap(T('Badges'), 'dt', array('class' => 'Badges'));
-        echo ' '.Wrap(GetValueR('User.CountBadges', $Sender, 0), 'dd', array('class' => 'Badges'));
+    public function userInfoModule_onBasicInfo_handler($Sender) {
+        echo ' '.wrap(t('Badges'), 'dt', array('class' => 'Badges'));
+        echo ' '.wrap(valr('User.CountBadges', $Sender, 0), 'dd', array('class' => 'Badges'));
     }
 
     /**
      * Calculate whether badges should be awarded after user is saved.
      */
-    public function UserModel_AfterSave_Handler($Sender, $Args) {
-        $this->Photogenic($Sender, $Args);
-//        $Fields = $Args['Fields'];
-//        if (isset($Fields['DateLastActive'])) {
-//            $this->Anniversaries($Sender, $Args);
-//        }
+    public function userModel_afterSave_handler($Sender, $Args) {
+        $this->photogenic($Sender, $Args);
     }
 
     /**
      * Calculate whether badges should be awarded after user is updated.
      */
-    public function UserModel_AfterSetField_Handler($Sender, $Args) {
+    public function userModel_afterSetField_handler($Sender, $Args) {
         $UserID = $Args['UserID'];
         $Fields = $Args['Fields'];
 
         if (isset($Fields['CountComments']) || isset($Fields['CountPosts'])) {
-            $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
+            $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
             $Fields['CountPosts'] = $User['CountComments'] + $User['CountDiscussions'];
         }
 
@@ -283,34 +302,15 @@ class BadgesHooks extends Gdn_Plugin {
         $BadgeModel = new BadgeModel();
         $UserBadgeModel = new UserBadgeModel();
 
-        $UserCountBadges = $BadgeModel->GetByType('UserCount');
+        $UserCountBadges = $BadgeModel->getByType('UserCount');
         foreach ($UserCountBadges as $Badge) {
             if (GetValue('Attributes', $Badge)) {
                 $Column = $Badge['Attributes']['Column'];
                 if (isset($Counts[$Column]) && $Counts[$Column] >= $Badge['Threshold']) {
-                    $UserBadgeModel->Give($UserID, $Badge);
+                    $UserBadgeModel->give($UserID, $Badge);
                 }
             }
         }
-    }
-
-    /**
-     * Dole out points for likes.
-     *
-     * @param VanillaLabsPlugin $Sender
-     * @param array $Args
-     */
-    public function VanillaLabsPlugin_IncrementUser_Handler($Sender, $Args) {
-        $Column = $Args['Column'];
-        $Inc = $Args['Inc'];
-        if ($Column != 'Likes' || $Inc == 0) {
-            return;
-        }
-
-        $UserID = $Args['UserID'];
-
-        $Points = $Inc > 0 ? 2 : -2;
-        UserBadgeModel::GivePoints($UserID, $Points, 'Reactions');
     }
 
     /**
@@ -329,44 +329,44 @@ class BadgesHooks extends Gdn_Plugin {
     }
 
     /**
+     * Add leaderboards to activity page.
      *
      * @param ActivityController $Sender
-     * @param type $Args
+     * @param array $Args
      */
-    public function ActivityController_Render_Before($Sender, $Args) {
-        if ($Sender->DeliveryMethod() == DELIVERY_METHOD_XHTML) {
-            $Sender->AddModule('LeaderBoardModule');
+    public function activityController_render_before($Sender, $Args) {
+        if ($Sender->deliveryMethod() == DELIVERY_METHOD_XHTML) {
+            $Sender->addModule('LeaderBoardModule');
 
             $Module = new LeaderBoardModule();
             $Module->SlotType = 'a';
-            $Sender->AddModule($Module);
+            $Sender->addModule($Module);
         }
     }
 
     /**
      * Custom badge trigger: All 'Anniversary'-class badges (X years of membership).
+     *
+     * @param $Sender
+     * @param $Args
      */
-    public function Anniversaries($Sender, $Args) {
-        if (Gdn::Session()->IsValid()) {
+    public function anniversaries($Sender, $Args) {
+        if (Gdn::session()->isValid()) {
             $UserBadgeModel = new UserBadgeModel();
-            $FirstVisit = GetValue('DateFirstVisit', Gdn::Session()->User);
-//            decho($FirstVisit, 'DateFirstVisit');
+            $FirstVisit = val('DateFirstVisit', Gdn::session()->User);
             if (!$FirstVisit) {
                 return;
             }
-            $FirstVisit = Gdn_Format::ToTimestamp($FirstVisit);
+            $FirstVisit = Gdn_Format::toTimestamp($FirstVisit);
             $Today = time();
-            $UserID = GetValue('UserID', Gdn::Session()->User);
+            $UserID = val('UserID', Gdn::session()->User);
 
             // Give most recent anniversary badge they've earned
             for ($i = 11; $i >= 1; $i--) {
                 $BadgeTime = strtotime("+$i years", $FirstVisit);
-//                decho(Gdn_Format::ToDateTime($BadgeTime), 'BadgeTime');
-//                decho(Gdn_Format::ToDateTime($Today), 'Today');
                 if ($BadgeTime <= $Today) {
                     $Suffix = ($i > 10) ? '-old' : (($i > 1) ? '-'.$i : '');
-//                    decho($Suffix, 'anniversary');
-                    $UserBadgeModel->Give($UserID, 'anniversary'.$Suffix);
+                    $UserBadgeModel->give($UserID, 'anniversary'.$Suffix);
                 }
             }
         }
@@ -376,157 +376,146 @@ class BadgesHooks extends Gdn_Plugin {
      * Badge type trigger: 'Attendance' (X consecutive day visits).
      *
      * @todo Finish this trigger.
+     *
+     * @param $Sender
+     * @param $Args
      */
-    public function Attendance($Sender, $Args) {
+    public function attendance($Sender, $Args) {
         $BadgeModel = new BadgeModel();
-        $UserCountBadges = $BadgeModel->GetByType('Attendance');
+        $UserCountBadges = $BadgeModel->getByType('Attendance');
         foreach ($UserCountBadges as $Badge) {
             // Skip completed
-            if (GetValue('DateCompleted', $Badge)) {
+            if (val('DateCompleted', $Badge)) {
                 continue;
             }
 
             // Log progress
-            $Attributes = GetValue('Attributes', $Badge);
+            $Attributes = val('Attributes', $Badge);
             if (false) {
-                $UserBadgeModel->Give($UserID, $Badge);
+                //$UserBadgeModel->give($UserID, $Badge);
             }
         }
     }
 
-//    public function Base_AfterUserInfo_Handler($Sender, $Args) {
-//        // Fetch the view helper functions.
-//        include_once Gdn::Controller()->FetchViewLocation('reputation_functions', '', 'Reputation');
-//
-//        echo '<h2>'.T('Points').'</h2>';
-//        WriteProfilePoints();
-//    }
-
     /**
      * Custom badge trigger: 'Combo Breaker' (5 badges in 1 day).
+     *
+     * @param $Sender
+     * @param $Args
      */
-    public function ComboBreaker($Sender, $Args) {
+    public function comboBreaker($Sender, $Args) {
         // Get badge given
-        $UserBadge = GetValue('UserBadge', $Args);
+        $UserBadge = val('UserBadge', $Args);
 
         // Register timeout event
         $UserBadgeModel = new UserBadgeModel();
-        $EventCount = $UserBadgeModel->AddTimeoutEvent(GetValue('UserID', $UserBadge), 'combo', GetValue('DateCompleted', $UserBadge));
+        $EventCount = $UserBadgeModel->addTimeoutEvent(val('UserID', $UserBadge), 'combo', val('DateCompleted', $UserBadge));
     }
 
     /**
-     * Custom badge trigger: 'Comment Marathon' (42 comments 1 day).
-     */
-//    public function CommentMarathon($Sender, $Args) {
-//        // Get comment
-//        $CommentModel = new CommentModel();
-//        $Comment = $CommentModel->GetID(GetValue('CommentID', $Args));
-//
-//        // Register timeout event
-//        $UserBadgeModel = new UserBadgeModel();
-//        $EventCount = $UserBadgeModel->AddTimeoutEvent(GetValue('InsertUserID', $Comment), 'marathon', GetValue('DateInserted', $Comment));
-//    }
-
-    /**
      * Badge type trigger: 'DiscussionContent' (pattern matching in Body of Discussions & Comments).
+     *
+     * @param $Sender
+     * @param $Args
      */
-    public function DiscussionContent($Sender, $Args) {
+    public function discussionContent($Sender, $Args) {
         $BadgeModel = new BadgeModel();
         $UserBadgeModel = new UserBadgeModel();
-        $Body = GetValue('Body', GetValue('FormPostValues', $Args));
+        $Body = val('Body', val('FormPostValues', $Args));
 
-        $UserCountBadges = $BadgeModel->GetByType('DiscussionContent');
+        $UserCountBadges = $BadgeModel->getByType('DiscussionContent');
         foreach ($UserCountBadges as $Badge) {
-            if ($Attributes = GetValue('Attributes', $Badge)) {
-                $Pattern = GetValue('Pattern', $Attributes);
+            if ($Attributes = val('Attributes', $Badge)) {
+                $Pattern = val('Pattern', $Attributes);
                 if (preg_match($Pattern, $Body)) {
-                    $UserBadgeModel->Give($UserID, $Badge);
+                    $UserBadgeModel->give($UserID, $Badge);
                 }
             }
         }
     }
 
     /**
-     * Custom badge trigger: 'Morning Treat' (visited 4am-6am local).
-     */
-    public function MorningTreat($Sender, $Args) {
-        if (Gdn::Session()->IsValid()) {
-            $Offset = GetValue('HourOffset', Gdn::Session()->User);
-            $Hour = date('G') + $Offset;
-            if ($Hour == 4 || $Hour == 5) {
-                $UserBadgeModel = new UserBadgeModel();
-                $UserBadgeModel->Give(GetValue('UserID', Gdn::Session()), 'morning');
-            }
-        }
-    }
-
-    /**
      * Custom badge trigger: 'Fresh Start' (visited Jan 1).
+     *
+     * @param $Sender
+     * @param $Args
      */
     public function FreshStart($Sender, $Args) {
         if (date('j') === '1' && date('n') === '1') {
-            $User = GetValue('User', $Args);
+            $User = val('User', $Args);
             $UserBadgeModel = new UserBadgeModel();
-            $UserBadgeModel->Give($User->UserID, 'fresh-start');
+            $UserBadgeModel->give($User->UserID, 'fresh-start');
         }
     }
 
     /**
      * Custom badge trigger: 'Lightning Reflexes' (comment within 1 min of discussion start).
+     *
+     * @param $Sender
+     * @param $Args
      */
-    public function LightningReflexes($Sender, $Args) {
+    public function lightningReflexes($Sender, $Args) {
         // Get Comment & its Discussion
-        $Comment = $Sender->SQL->GetWhere('Comment', array('CommentID' => GetValue('CommentID', $Args)))->FirstRow();
-        $Discussion = $Sender->SQL->GetWhere('Discussion', array('DiscussionID' => GetValue('DiscussionID', $Comment)))->FirstRow();
+        $Comment = $Sender->SQL->getWhere('Comment', array('CommentID' => val('CommentID', $Args)))->firstRow();
+        $Discussion = $Sender->SQL->getWhere('Discussion', array('DiscussionID' => val('DiscussionID', $Comment)))->firstRow();
 
         // Did less than 60 seconds elapse between Discussion & Comment insertion?
-        $ElapsedSeconds = strtotime(GetValue('DateInserted', $Comment)) - strtotime(GetValue('DateInserted', $Discussion));
+        $ElapsedSeconds = strtotime(val('DateInserted', $Comment)) - strtotime(val('DateInserted', $Discussion));
         if ($ElapsedSeconds < 60) {
             $UserBadgeModel = new UserBadgeModel();
-            $UserBadgeModel->Give($Comment->InsertUserID, 'lightning');
+            $UserBadgeModel->give($Comment->InsertUserID, 'lightning');
         }
     }
 
     /**
      * Custom badge trigger: 'Name Dropper' (mentioned another user).
+     *
+     * @param $Sender
+     * @param $Args
      */
-    public function NameDropper($Sender, $Args) {
-        $Mentions = GetValue('MentionedUsers', $Args, array());
+    public function nameDropper($Sender, $Args) {
+        $Mentions = val('MentionedUsers', $Args, array());
         if (count($Mentions)) {
-            $Comment = GetValue('Comment', $Args, GetValue('Discussion', $Args));
+            $Comment = val('Comment', $Args, val('Discussion', $Args));
             $UserBadgeModel = new UserBadgeModel();
-            $UserBadgeModel->Give(GetValue('InsertUserID', $Comment), 'name-dropper');
+            $UserBadgeModel->Give(val('InsertUserID', $Comment), 'name-dropper');
         }
     }
 
     /**
      * Custom badge trigger: 'Photogenic' (uploaded a profile photo).
+     *
+     * @param $Sender
+     * @param $Args
      */
-    public function Photogenic($Sender, $Args) {
+    public function photogenic($Sender, $Args) {
         $UserID = $Args['UserID'];
         $User = $Args['Fields'];
 
         $UserBadgeModel = new UserBadgeModel();
 
-        if (GetValue('Photo', $User)) {
-            $UserBadgeModel->Give($UserID, 'photogenic');
+        if (val('Photo', $User)) {
+            $UserBadgeModel->give($UserID, 'photogenic');
         }
     }
 
     /**
      * Custom badge trigger: 'Welcome Committee' (comment in user's first discussion).
+     *
+     * @param $Sender
+     * @param $Args
      */
-    public function WelcomeCommittee($Sender, $Args) {
+    public function welcomeCommittee($Sender, $Args) {
         // Get current discussion
         $DiscussionModel = new DiscussionModel();
-        $DiscussionID = GetValue('DiscussionID', GetValue('FormPostValues', $Args));
-        $Discussion = $DiscussionModel->GetID($DiscussionID);
+        $DiscussionID = GetValue('DiscussionID', val('FormPostValues', $Args));
+        $Discussion = $DiscussionModel->getID($DiscussionID);
 
         // Is it discussion starter's first?
-        $FirstDiscussion = $DiscussionModel->GetWhere(array('InsertUserID' =>GetValue('InsertUserID', $Discussion)), 'DateInserted', 'asc', 1);
+        $FirstDiscussion = $DiscussionModel->getWhere(array('InsertUserID' => val('InsertUserID', $Discussion)), 'DateInserted', 'asc', 1);
         if ($DiscussionID == GetValue('DiscussionID', $FirstDiscussion)) {
             $UserBadgeModel = new UserBadgeModel();
-            $UserBadgeModel->Give(Gdn::Session()->UserID, 'welcome');
+            $UserBadgeModel->give(Gdn::session()->UserID, 'welcome');
         }
     }
 }
