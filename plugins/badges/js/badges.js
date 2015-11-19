@@ -1,7 +1,6 @@
 jQuery(document).ready(function($) {
-
     // Enable multicomplete on selected inputs
-    $('.MultiComplete').livequery(function() {
+    $(document).on('focus', '.MultiComplete', function () {
         $(this).autocomplete(
             gdn.url('/dashboard/user/autocomplete/'),
             {
@@ -10,7 +9,6 @@ jQuery(document).ready(function($) {
                 scrollHeight: 220,
                 selectFirst: true
             }
-        ).autogrow();
+        );
     });
-
 });
