@@ -134,11 +134,11 @@ class MultisiteModel extends Gdn_Model {
      */
     public function validateSlugUnique($slug) {
         if (in_array(strtolower($slug), $this->reservedSlugs)) {
-            $this->Validation->AddValidationResult('Slug', 'The slug you entered is already in use by another site.');
+            $this->Validation->AddValidationResult('Slug', "The slug '$slug' is already in use by another site.");
             return false;
         }
         if ($this->getWhere(['Slug' => $slug])->NumRows()) {
-            $this->Validation->AddValidationResult('Slug', 'The slug you entered is already in use by another site.');
+            $this->Validation->AddValidationResult('Slug', "The slug '$slug' is already in use by another site.");
             return false;
         }
         return true;

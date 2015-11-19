@@ -369,7 +369,7 @@ class MultisitesController extends DashboardController {
             return;
         }
 
-        Logger::event('cleanspeak_proxy', Logger::DEBUG, 'Cleanspeak proxy postback.', array('post' => $post));
+        Logger::event('cleanspeak_proxy', Logger::INFO, 'Cleanspeak proxy postback.', array('post' => $post));
 
         switch ($post['type']) {
             case 'contentApproval':
@@ -383,7 +383,7 @@ class MultisitesController extends DashboardController {
 //                break;
             default:
                 $context = array('type' => $post['type']);
-                Logger::event('cleanspeak_proxy', Logger::DEBUG, 'Cleanspeak proxy does not support type {type}.', $context);
+                Logger::event('cleanspeak_proxy', Logger::INFO, 'Cleanspeak proxy does not support type {type}.', $context);
                 return;
 
         }
