@@ -1,37 +1,51 @@
 <?php
+/**
+ * @copyright 2009-2015 Vanilla Forums Inc.
+ * @license Proprietary
+ */
 
 /**
- * @copyright 2010-2014 Vanilla Forums Inc
- * @license Proprietary
+ * Handles data access for warnings.
  */
 class WarningModel extends UserNoteModel {
 
     /// Properties ///
 
-    protected static $_Special;
+    /**
+     * @var array See {@link WarningModel::special()}.
+     */
+    protected static $special;
 
     /**
      * Let the warned user know who warned them.
      *
      * @var bool
      */
-    public $HideWarnerIdentity = FALSE;
+    public $HideWarnerIdentity = false;
 
     /**
      * Send the warning to the user's inbox.
      *
      * @var bool
      */
-    public $NotifyWithMessage = TRUE;
+    public $NotifyWithMessage = true;
 
     /// Methods ///
 
+    /**
+     * Initialize an instance of the {@link WarningModel}.
+     */
     public function __construct() {
         parent::__construct();
 
         $this->FireEvent('Init');
     }
 
+    /**
+     * Notify a user of a warning with an activity.
+     *
+     * @param array|int $warning The warning to notify the user about.
+     */
     protected function notifyWithActivity($warning) {
         if (!is_array($warning)) {
             $warning = $this->getID($warning);
@@ -55,12 +69,12 @@ class WarningModel extends UserNoteModel {
             'Format' => $warning['Format'],
             'Route' => "/profile/viewnote/{$warning['WarningID']}",
             'NotifyUserID' => $warning['UserID'],
-            'Notified' => TRUE,
+            'Notified' => true,
             'Photo' => $Warnings2IconPath
         );
 
         $ActivityModel = new ActivityModel();
-        $Result = $ActivityModel->Save($Activity, FALSE, array('Force' => TRUE));
+        $Result = $ActivityModel->Save($Activity, false, array('Force' => true));
 
         $SavedActivityID = null;
         if (isset($Result['ActivityID'])) {
@@ -70,6 +84,13 @@ class WarningModel extends UserNoteModel {
         return $SavedActivityID;
     }
 
+    /**
+     * Notify a warned user with a private message.
+     *
+     * @param array|int $warning The warning to notify the user about.
+     * @return bool|int
+     * @throws Gdn_UserException Throws an exception when there was an error creating the private conversation.
+     */
     protected function notifyWithMessage($warning) {
         if (!is_array($warning)) {
             $warning = $this->getID($warning);
@@ -101,7 +122,12 @@ class WarningModel extends UserNoteModel {
         return $conversationID;
     }
 
-    public function ProcessAllWarnings() {
+    /**
+     * Process all of the pending warnings.
+     *
+     * @return array Returns an array about the process actions.
+     */
+    public function processAllWarnings() {
         $alerts = $this->SQL->GetWhere('UserAlert', array('TimeExpires <' => time()))->resultArray();
 
         $result = array();
@@ -113,14 +139,20 @@ class WarningModel extends UserNoteModel {
         return $result;
     }
 
+    /**
+     * Process all of the warnings for a single user.
+     *
+     * @param array|int $userID The user to process the warnings for.
+     * @return array Returns an array of processing information.
+     */
     public function processWarnings($userID) {
         $alertModel = new UserAlertModel();
 
         if (is_array($userID)) {
             if (array_key_exists('WarningLevel', $userID)) {
                 $alert = $userID;
+                $userID = $alert['UserID'];
             }
-            $userID = $alert['UserID'];
         }
 
         // Grab the user's current alert level.
@@ -129,7 +161,7 @@ class WarningModel extends UserNoteModel {
         }
 
         if (!$alert) {
-            return;
+            return [];
         }
         unset($alert['DateInserted']); // not updating this column
 
@@ -177,17 +209,17 @@ class WarningModel extends UserNoteModel {
     }
 
     /**
-     *
      * Checks record type and returns Model object representative of RecordType.
+     *
      * Returns false if RecordType is not discussion or comment.
      *
-     * @param string $RecordType
-     * @return Model Object
+     * @param string $recordType The type of record to get the model for.
+     * @return Gdn_Model Returns the model that handles {@link $recordType}.
      */
-    public function GetModel($RecordType) {
-        if ($RecordType === 'discussion') {
+    public function getModel($recordType) {
+        if ($recordType === 'discussion') {
             return new DiscussionModel();
-        } elseif ($RecordType === 'comment') {
+        } elseif ($recordType === 'comment') {
             return new CommentModel();
         }
         return null;
@@ -218,11 +250,11 @@ class WarningModel extends UserNoteModel {
 
         $model = $this->GetModel($warning['RecordType']);
         if ($model instanceof Gdn_Model) {
-           $Record = $model->GetID($warning['RecordID']);
+            $record = $model->getID($warning['RecordID']);
 
-           if (isset($Record->Attributes['WarningID'])) {
-              $model->saveToSerializedColumn('Attributes', $warning['RecordID'], 'WarningID', false);
-           }
+            if (isset($record->Attributes['WarningID'])) {
+                $model->saveToSerializedColumn('Attributes', $warning['RecordID'], 'WarningID', false);
+            }
         }
 
         // Reverse the amount of time on the warning and its points.
@@ -255,7 +287,10 @@ class WarningModel extends UserNoteModel {
     }
 
     /**
+     * Save a warning.
+     *
      * @param array $data The warning data to save.
+     *
      *  - UserID: The user being warned.
      *  - Body: A private message to the user being warned.
      *  - Format: The format of the body.
@@ -267,8 +302,9 @@ class WarningModel extends UserNoteModel {
      *
      *  **Or**
      *  - WarningTypeID: The type of warning given.
+     * @param array|false $settings Additional settings to modify the save behaviour.
      *
-     * @return type
+     * @return int|false Returns the ID of the warning or false if there was a problem saving it.
      */
     public function save($data, $settings = false) {
         $userID = val('UserID', $data);
@@ -283,8 +319,16 @@ class WarningModel extends UserNoteModel {
             } else {
                 touchValue('Points', $data, $warningType['Points']);
                 if ($warningType['ExpireNumber'] > 0) {
-                    touchValue('ExpiresString', $data, Plural($warningType['ExpireNumber'], '%s ' . rtrim($warningType['ExpireType'], 's'), '%s ' . $warningType['ExpireType']));
-                    $seconds = strtotime($warningType['ExpireNumber'] . ' ' . $warningType['ExpireType'], 0);
+                    touchValue(
+                        'ExpiresString',
+                        $data,
+                        plural(
+                            $warningType['ExpireNumber'],
+                            '%s '.rtrim($warningType['ExpireType'], 's'),
+                            '%s '.$warningType['ExpireType']
+                        )
+                    );
+                    $seconds = strtotime($warningType['ExpireNumber'].' '.$warningType['ExpireType'], 0);
                     touchValue('ExpiresTimespan', $data, $seconds);
                 }
             }
@@ -306,7 +350,7 @@ class WarningModel extends UserNoteModel {
         }
 
         // First we save the warning.
-        $ID = parent::save($data, $settings);
+        $ID = (int)parent::save($data, $settings);
         if (!$ID) {
             return false;
         }
@@ -321,14 +365,15 @@ class WarningModel extends UserNoteModel {
         $recordType = ucfirst(val('RecordType', $data));
         $recordID = val('RecordID', $data);
         if (in_array($recordType, array('Discussion', 'Comment', 'Activity')) && $recordID) {
-            $modelClass = $recordType . 'Model';
+            $modelClass = $recordType.'Model';
+            /* @var Gdn_Model $model */
             $model = new $modelClass;
             $model->saveToSerializedColumn('Attributes', $recordID, 'WarningID', $ID);
 
             $event = array_merge($event, array(
-                    'RecordType' => $recordType,
-                    'RecordID' => $recordID
-                ));
+                'RecordType' => $recordType,
+                'RecordID' => $recordID
+            ));
         }
 
         if ($this->NotifyWithMessage && class_exists('ConversationModel')) {
@@ -399,14 +444,18 @@ class WarningModel extends UserNoteModel {
         return $ID;
     }
 
+    /**
+     * Return the information for special meanings of total warning level values.
+     *
+     * @return array Returns an array in the form `[level => ['Label' => value, 'Title' => value]]`.
+     */
     public static function special() {
-        if (self::$_Special === null) {
-            self::$_Special = array(
+        if (self::$special === null) {
+            self::$special = array(
                 3 => array('Label' => T('Jail'), 'Title' => T('Jailed users have reduced abilities.')),
                 5 => array('Label' => T('Ban'), 'Title' => T("Banned users can no longer access the site."))
             );
         }
-        return self::$_Special;
+        return self::$special;
     }
-
 }
