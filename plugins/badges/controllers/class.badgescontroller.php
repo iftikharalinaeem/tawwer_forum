@@ -1,8 +1,7 @@
 <?php
 /**
- * Badges Controller.
- *
- * @package Reputation
+ * @copyright 2011-2015 Vanilla Forums, Inc.
+ * @package Badges
  */
 
 // We can't rely on our autoloader in a plugin.
@@ -22,68 +21,77 @@ class BadgesController extends BadgesAppController {
      * @since 1.0.0
      * @access public
      */
-    public function Index() {
-        $this->Permission('Reputation.Badges.View');
-        $this->SetData('Badges', $this->BadgeModel->GetFilteredList(Gdn::Session()->UserID));
+    public function index() {
+        $this->permission('Reputation.Badges.View');
+        $this->setData('Badges', $this->BadgeModel->getFilteredList(Gdn::session()->UserID));
 
         $Module = new LeaderBoardModule();
         $Module->SlotType = 'a';
-        $Module->GetData(C('Reputation.Badges.LeaderboardLimit', 25));
-        $this->AddModule($Module);
+        $Module->getData(c('Reputation.Badges.LeaderboardLimit', 25));
+        $this->addModule($Module);
 
         $this->MasterView = 'default';
-        $this->Render();
+        $this->render();
     }
 
-    public function All() {
+    /**
+     *
+     */
+    public function all() {
         $this->Permission('Reputation.Badges.View');
-        $Badges = $this->BadgeModel->GetList()->ResultArray();
+        $Badges = $this->BadgeModel->getList()->resultArray();
 
         if ($Badges) {
-            $this->BadgeModel->Calculate($Badges);
+            $this->BadgeModel->calculate($Badges);
         }
-        $this->SetData('Badges', $Badges);
+        $this->setData('Badges', $Badges);
         unset($Badges);
 
         $Module = new LeaderBoardModule();
         $Module->SlotType = 'a';
-        $Module->GetData(C('Reputation.Badges.LeaderboardLimit', 25));
-        $this->AddModule($Module);
+        $Module->getData(c('Reputation.Badges.LeaderboardLimit', 25));
+        $this->addModule($Module);
 
         $this->MasterView = 'default';
-        $this->Render('index');
+        $this->render('index');
     }
 
-    public function SyncNode() {
+    /**
+     * Endpoint for hub sync.
+     */
+    public function syncNode() {
         if (!class_exists('SiteNodePlugin')) {
             return;
         }
 
         /* @var SiteNodePlugin $nodePlugin */
-        $nodePlugin = SiteNodePlugin::Instance();
+        $nodePlugin = SiteNodePlugin::instance();
 
         $result = $nodePlugin->hubApi('/badges/all.json', 'GET', array(), true);
 
         $badges = $result['Badges'];
         foreach ($badges as $badge) {
-            $set = ArrayTranslate($badge, array('Slug', 'Name', 'Photo', 'Body', 'Points', 'Active', 'Visible', 'Class', 'Threshold', 'Level'));
-            $this->BadgeModel->Save($set);
-            $this->BadgeModel->Validation->Results(true);
+            $set = arrayTranslate($badge, array('Slug', 'Name', 'Photo', 'Body', 'Points', 'Active', 'Visible', 'Class', 'Threshold', 'Level'));
+            $this->BadgeModel->save($set);
+            $this->BadgeModel->Validation->results(true);
         }
     }
 
-    public function User() {
-        $this->Permission('Reputation.Badges.View');
+    /**
+     *
+     */
+    public function user() {
+        $this->permission('Reputation.Badges.View');
 
-        $UserID = Gdn::Request()->GetValue('UserID', false);
-        $this->SetData('Badges', $this->BadgeModel->GetFilteredList($UserID, true));
+        $UserID = Gdn::request()->getValue('UserID', false);
+        $this->setData('Badges', $this->BadgeModel->getFilteredList($UserID, true));
 
         $Module = new LeaderBoardModule();
         $Module->SlotType = 'a';
-        $Module->GetData(C('Reputation.Badges.LeaderboardLimit', 25));
-        $this->AddModule($Module);
+        $Module->getData(c('Reputation.Badges.LeaderboardLimit', 25));
+        $this->addModule($Module);
 
         $this->MasterView = 'default';
-        $this->Render('index');
+        $this->render('index');
     }
 }

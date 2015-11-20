@@ -1,14 +1,11 @@
 <?php
 /**
- * BadgesApp Model.
- *
+ * @copyright 2011-2015 Vanilla Forums, Inc.
  * @package Badges
  */
  
 /**
  * Introduces common methods that child classes can use.
- *
- * @package Reputation
  */
 abstract class BadgesAppModel extends Gdn_Model {
     /**

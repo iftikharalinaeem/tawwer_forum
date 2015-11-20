@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright 2011 Vanilla Forums Inc
- * @package Reputation
+ * @copyright 2011-2015 Vanilla Forums, Inc.
+ * @package Badges
  */
 
 /**
@@ -9,9 +9,14 @@
  */
 class BadgesModule extends Gdn_Module {
 
+    /**
+     *
+     *
+     * @param string $Sender
+     */
     public function __construct($Sender = '') {
         // Default to current user if none is set
-        $this->User = Gdn::Controller()->Data('Profile', Gdn::Session()->User);
+        $this->User = Gdn::controller()->data('Profile', Gdn::session()->User);
 
         if (!$this->User) {
             return;
@@ -19,26 +24,36 @@ class BadgesModule extends Gdn_Module {
 
         // Get badge list
         $UserBadgeModel = new UserBadgeModel();
-        $this->Badges = $UserBadgeModel->GetBadges(GetValue('UserID', $this->User))->ResultArray();
+        $this->Badges = $UserBadgeModel->getBadges(GetValue('UserID', $this->User))->resultArray();
 
         // Optionally only show highest badge in each class
         if (C('Reputation.Badges.FilterModuleByClass')) {
-            $this->Badges = BadgeModel::FilterByClass($this->Badges);
+            $this->Badges = BadgeModel::filterByClass($this->Badges);
         }
 
 
         parent::__construct($Sender, 'plugins/badges');
     }
 
-    public function AssetTarget() {
+    /**
+     *
+     *
+     * @return mixed
+     */
+    public function assetTarget() {
         return C('Badges.BadgesModule.Target', 'Panel');
     }
 
-    public function ToString() {
+    /**
+     *
+     *
+     * @return string|void
+     */
+    public function toString() {
         if (!$this->User) {
             return;
         }
 
-        return parent::ToString();
+        return parent::toString();
     }
 }

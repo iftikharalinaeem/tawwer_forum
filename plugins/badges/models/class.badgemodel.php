@@ -1,8 +1,7 @@
 <?php
 /**
- * Badge Model.
- *
- * @package Reputation
+ * @copyright 2011-2015 Vanilla Forums, Inc.
+ * @package Badges
  */
 
 // We can't rely on our autoloader in a plugin.
@@ -10,8 +9,6 @@ require_once(dirname(__FILE__).'/class.badgesappmodel.php');
  
 /**
  * Badge handling.
- *
- * @package Reputation
  */
 class BadgeModel extends BadgesAppModel {
     /**
@@ -26,7 +23,7 @@ class BadgeModel extends BadgesAppModel {
     /**
      * Set default select conditions.
      */
-    protected function _BeforeGet() {
+    protected function _beforeGet() {
 
     }
 
@@ -35,39 +32,39 @@ class BadgeModel extends BadgesAppModel {
      *
      * @param array $Badge
      */
-    public function Calculate(&$Badge) {
+    public function calculate(&$Badge) {
         if (is_array($Badge) && isset($Badge[0])) {
             // Multiple badges
             foreach ($Badge as &$B) {
-                $this->_Calculate($B);
+                $this->_calculate($B);
             }
         } elseif ($Badge) {
             // One valid result
-            $this->_Calculate($Badge);
+            $this->_calculate($Badge);
         }
     }
 
     /**
      * Prep badge data.
      */
-    protected function _Calculate(&$Badge) {
+    protected function _calculate(&$Badge) {
         if (isset($Badge['Attributes']) && !empty($Badge['Attributes'])) {
             $Badge['Attributes'] = @unserialize($Badge['Attributes']);
         } else {
             $Badge['Attributes'] = array();
         }
 
-        $Badge['Photo'] = Gdn_Upload::Url($Badge['Photo']);
+        $Badge['Photo'] = Gdn_Upload::url($Badge['Photo']);
     }
 
     /**
      * Create a new badge. Do not modify an existing badge.
      */
-    public function Define($Data) {
-        $Slug = GetValue('Slug', $Data);
-        $ExistingBadge = $this->GetID($Slug);
+    public function define($Data) {
+        $Slug = val('Slug', $Data);
+        $ExistingBadge = $this->getID($Slug);
 
-        return ($ExistingBadge) ? GetValue('BadgeID', $ExistingBadge) : $this->Save($Data);
+        return ($ExistingBadge) ? val('BadgeID', $ExistingBadge) : $this->save($Data);
     }
 
     /**
@@ -79,16 +76,16 @@ class BadgeModel extends BadgesAppModel {
      * @param array $Badges
      * @return array Filtered badge list.
      */
-    public static function FilterByClass($Badges) {
+    public static function filterByClass($Badges) {
         $FilteredBadges = array();
 
         foreach ($Badges as $Badge) {
-            $Class = GetValue('Class', $Badge);
+            $Class = val('Class', $Badge);
 
             // Keep highest level badge of each class and all classless badges
             if ($Class) {
                 if (isset($FilteredBadges[$Class])) {
-                    if (GetValue('Level', $Badge) > GetValue('Level', $FilteredBadges[$Class])) {
+                    if (val('Level', $Badge) > val('Level', $FilteredBadges[$Class])) {
                         $FilteredBadges[$Class] = $Badge;
                     }
                 } else {
@@ -108,9 +105,9 @@ class BadgeModel extends BadgesAppModel {
      * @param string $Type Valid: Custom, Manual, UserCount, Timeout, DiscussionContent.
      * @return Dataset
      */
-    public function GetByType($Type) {
-        $Result = $this->GetWhere(array('Type' => $Type), 'Threshold', 'desc')->ResultArray();
-        $this->Calculate($Result);
+    public function getByType($Type) {
+        $Result = $this->getWhere(array('Type' => $Type), 'Threshold', 'desc')->resultArray();
+        $this->calculate($Result);
         return $Result;
     }
 
@@ -120,11 +117,11 @@ class BadgeModel extends BadgesAppModel {
      * @param mixed $Badge Int, string, or array.
      * @return mixed Array if badge exists or false.
      */
-    public function GetID($Badge) {
+    public function getID($Badge) {
         if (is_numeric($Badge)) {
-            $Result = parent::GetID($Badge, DATASET_TYPE_ARRAY);
+            $Result = parent::getID($Badge, DATASET_TYPE_ARRAY);
         } elseif (is_string($Badge)) {
-            $Result = $this->GetWhere(array('Slug' => $Badge))->FirstRow(DATASET_TYPE_ARRAY);
+            $Result = $this->getWhere(array('Slug' => $Badge))->firstRow(DATASET_TYPE_ARRAY);
         } elseif (is_array($Badge)) {
             $Result = $Badge;
         } else {
@@ -132,7 +129,7 @@ class BadgeModel extends BadgesAppModel {
         }
 
         if ($Result) {
-            $this->Calculate($Result);
+            $this->calculate($Result);
             return $Result;
         }
 
@@ -142,52 +139,52 @@ class BadgeModel extends BadgesAppModel {
     /**
      * Get badges list for viewing.
      */
-    public function GetList() {
+    public function getList() {
         if (!CheckPermission('Reputation.Badges.Give') && !CheckPermission('Garden.Settings.Manage')) {
-            $this->SQL->Where('Visible', 1);
+            $this->SQL->where('Visible', 1);
         }
 
-        $this->SQL->OrderBy('Class, Threshold, Name', 'asc');
+        $this->SQL->orderBy('Class, Threshold, Name', 'asc');
 
-        return $this->Get();
+        return $this->get();
     }
 
     /**
      * Get badges list for public viewing.
      */
-    public function GetFilteredList($UserID, $Exclusive = false) {
+    public function getFilteredList($UserID, $Exclusive = false) {
         $ListQuery = $this->SQL
-            ->Select('b.*')
-            ->Select('ub.DateInserted', '', 'DateGiven')
-            ->Select('ub.InsertUserID', '', 'GivenByUserID')
-            ->Select('ub.Reason')
-            ->From('Badge b');
+            ->select('b.*')
+            ->select('ub.DateInserted', '', 'DateGiven')
+            ->select('ub.InsertUserID', '', 'GivenByUserID')
+            ->select('ub.Reason')
+            ->from('Badge b');
 
         // Only badges this user has earned
         if ($Exclusive) {
-            $ListQuery->Join('UserBadge ub', 'b.BadgeID = ub.BadgeID AND ub.UserID = '.intval($UserID).' AND ub.DateCompleted is not null');
+            $ListQuery->join('UserBadge ub', 'b.BadgeID = ub.BadgeID AND ub.UserID = '.intval($UserID).' AND ub.DateCompleted is not null');
         } // All badges, highlighting user's earned badges
         else {
-            $ListQuery->LeftJoin('UserBadge ub', 'b.BadgeID = ub.BadgeID AND ub.UserID = '.intval($UserID).' AND ub.DateCompleted is not null');
+            $ListQuery->leftJoin('UserBadge ub', 'b.BadgeID = ub.BadgeID AND ub.UserID = '.intval($UserID).' AND ub.DateCompleted is not null');
         }
 
-        $Badges = $ListQuery->Where('Visible', 1)
-            ->Where('Active', 1)
-            ->OrderBy('Name', 'asc')
-            ->Get()->ResultArray();
+        $Badges = $ListQuery->where('Visible', 1)
+            ->where('Active', 1)
+            ->orderBy('Name', 'asc')
+            ->get()->resultArray();
 
-        $this->Calculate($Badges);
+        $this->calculate($Badges);
         return $Badges;
     }
 
     /**
      * Get badges for dropdown.
      */
-    public function GetMenu() {
+    public function getMenu() {
         $this->SQL
-            ->Where('Active', 1)
-            ->OrderBy('Name', 'asc');
-        return $this->Get();
+            ->where('Active', 1)
+            ->orderBy('Name', 'asc');
+        return $this->get();
     }
 
     /**
@@ -195,16 +192,14 @@ class BadgeModel extends BadgesAppModel {
      *
      * @param array $Data The badge we're creating or updating.
      */
-    public function Save($Data) {
+    public function save($Data) {
         // See if there is an existing badge.
-        if (GetValue('Slug', $Data) && !GetValue('BadgeID', $Data)) {
-            $ExistingBadge = $this->GetID($Data['Slug']);
+        if (val('Slug', $Data) && !val('BadgeID', $Data)) {
+            $ExistingBadge = $this->setID($Data['Slug']);
             if ($ExistingBadge) {
                 $Different = false;
                 foreach ($Data as $Key => $Value) {
                     if (array_key_exists($Key, $ExistingBadge) && $ExistingBadge[$Key] != $Value) {
-//                        decho($ExistingBadge[$Key], "Existing $Key");
-//                        decho($Value, "New $Key");
                         $Different = true;
                         break;
                     }
@@ -232,6 +227,6 @@ class BadgeModel extends BadgesAppModel {
             }
         }
 
-        return parent::Save($Data);
+        return parent::save($Data);
     }
 }
