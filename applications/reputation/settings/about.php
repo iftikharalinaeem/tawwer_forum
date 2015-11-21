@@ -5,7 +5,7 @@
 $ApplicationInfo['Reputation'] = array(
    'Name' => 'Badges',
    'Description' => "Give badges to your users to reward them for contributing to your community.",
-   'Version' => '1.3.1',
+   'Version' => '1.3.2',
    'SetupController' => 'setup',
    'Author' => "Matt Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
