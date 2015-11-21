@@ -38,7 +38,7 @@ function getGroupOptions($group, $sectionId = 'home') {
         $options['Delete'] = array('Text' => sprintf(t('Delete %s'), t('Group')), 'Url' => GroupUrl($group, 'delete'), 'CssClass' => 'Popup');
     }
     if (GroupPermission('Leader', $group)) {
-        $options['Invite'] = array('Text' => t('Invite Members'), 'Url' => GroupUrl($group, 'invite'), 'CssClass' => 'Popup');
+        $options['Invite'] = array('Text' => t('Invite Members'), 'Url' => GroupUrl($group, 'invite'), 'CssClass' => 'js-invite-members');
     }
     if (GroupPermission('Leader', $group)) {
         $options['Members'] = array('Text' => t('Manage Members'), 'Url' => GroupUrl($group, 'members'));
