@@ -3,7 +3,7 @@ var multicomplete = {
         var input = $('.MultiComplete');
         if (input.length) {
             $('.MultiComplete').autocomplete(
-                gdn.url('/dashboard/user/autocomplete/'),
+                gdn.url('/user/autocomplete/'),
                 {
                     minChars: 1,
                     multiple: true,

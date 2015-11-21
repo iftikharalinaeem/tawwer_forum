@@ -970,7 +970,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = $Sender->EventArguments['SideMenu'];
 //      $Menu->AddItem('Pages', T('Pages Settings'), FALSE, array('class' => 'Pages', 'After' => 'Forum'));
-      $Menu->AddLink('Site Settings', T('Incoming Email'), '/settings/vanillapop', 'Garden.Settings.Manage', array('After' => 'dashboard/settings/email', 'class' => 'nav-email nav-email-in'));
+      $Menu->AddLink('Site Settings', T('Incoming Email'), '/settings/vanillapop', 'Garden.Settings.Manage', array('After' => 'settings/email', 'class' => 'nav-email nav-email-in'));
    }
 
    /**

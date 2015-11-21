@@ -362,7 +362,7 @@ class LinkedInPlugin extends Gdn_Plugin {
           'Plugins.LinkedIn.Secret' => array('LabelCode' => 'Secret Key')
           ));
 
-      $Sender->AddSideMenu('dashboard/social');
+      $Sender->AddSideMenu('social');
       $Sender->SetData('Title', sprintf(T('%s Settings'), 'LinkedIn'));
       $Sender->ConfigurationModule = $Cf;
       $Sender->Render('Settings', '', 'plugins/LinkedIn');

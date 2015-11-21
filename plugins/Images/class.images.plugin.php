@@ -272,7 +272,7 @@ class ImagesPlugin extends Gdn_Plugin {
    /* Render the comment file upload form. */
    public function DiscussionController_AfterCommentFormMenu_Handler($Sender) {
       $OldAction = $Sender->Form->Action;
-      $Sender->Form->Action = Url('vanilla/post/image');
+      $Sender->Form->Action = Url('post/image');
       echo $Sender->FetchView('commentform', '', 'plugins/Images');
       $Sender->Form->Action = $OldAction;
    }

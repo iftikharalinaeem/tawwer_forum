@@ -83,7 +83,7 @@ class SphinxPlugin extends Gdn_Plugin {
 
       $Sender->SetData('Title', 'Sphinx Settings');
 
-      $Sender->AddSideMenu('/dashboard/settings/plugins');
+      $Sender->AddSideMenu('/settings/plugins');
       $Sender->Render('settings', '', 'plugins/Sphinx');
    }
 }

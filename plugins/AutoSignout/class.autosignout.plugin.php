@@ -10,7 +10,7 @@ $PluginInfo['AutoSignout'] = array(
    'Version' => '1.1',
    'RequiredApplications' => array('Vanilla' => '2.1'),
 	'MobileFriendly' => TRUE,
-   'SettingsUrl' => '/dashboard/settings/autosignout',
+   'SettingsUrl' => '/settings/autosignout',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',

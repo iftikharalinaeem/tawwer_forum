@@ -10,7 +10,7 @@ $PluginInfo['Zendesk'] = array(
     'Description' => "Allow staff users to create tickets and cases from discussions and comments.",
     'Version' => '0.0.4-beta',
     'RequiredApplications' => array('Vanilla' => '2.1.18'),
-    'SettingsUrl' => '/dashboard/plugin/zendesk',
+    'SettingsUrl' => '/plugin/zendesk',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true,
     'Author' => 'John Ashton',

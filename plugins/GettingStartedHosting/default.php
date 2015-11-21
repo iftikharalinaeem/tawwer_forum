@@ -38,7 +38,7 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
       if (strcasecmp($Sender->RequestMethod, 'index') == 0) {
          $Session = Gdn::Session();
          $WelcomeMessage = '<div class="GettingStartedHosting">'
-            .Anchor('×', '/dashboard/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
+            .Anchor('×', '/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
    ."<h1>Tips on how to get started</h1>"
    .'<ul>
       <li class="One'.(C('Plugins.GettingStartedHosting.Dashboard', '0') == '1' ? ' Done' : '').'">
@@ -63,7 +63,7 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
          they visit '.Anchor(Gdn::Request()->Domain(), Gdn::Request()->Domain()).'.</p>
       </li>
       <li class="Four'.(C('Plugins.GettingStartedHosting.Categories', '0') == '1' ? ' Done' : '').'">
-         <strong>'.Anchor(T('Organize your Categories'), 'vanilla/settings/managecategories').'</strong>
+         <strong>'.Anchor(T('Organize your Categories'), 'settings/managecategories').'</strong>
          <p>Discussion categories are used to help your users organize their
          discussions in a way that is meaningful for your community.</p>
       </li>
