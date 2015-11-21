@@ -1,9 +1,7 @@
 var multicomplete = {
     start: function() {
-        console.log('step 1');
         var input = $('.MultiComplete');
         if (input.length) {
-            console.log('step 2');
             $('.MultiComplete').autocomplete(
                 gdn.url('/dashboard/user/autocomplete/'),
                 {
