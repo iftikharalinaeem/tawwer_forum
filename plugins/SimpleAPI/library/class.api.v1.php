@@ -32,10 +32,10 @@ class ApiMapper extends SimpleApiMapper {
             'comments/edit'         => 'vanilla/post/editcomment',
 
             // Badges
-            'badges/give'           => 'reputation/badge/giveuser',
-            'badges/revoke'         => 'reputation/badge/revoke',
-            'badges/user'           => 'reputation/badges/user',
-            'badges/list'           => 'reputation/badges/all',
+            'badges/give'           => 'badge/giveuser',
+            'badges/revoke'         => 'badge/revoke',
+            'badges/user'           => 'badges/user',
+            'badges/list'           => 'badges/all',
 
             // Users
             'users/authenticate'    => 'dashboard/user/authenticate',
