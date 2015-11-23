@@ -909,15 +909,14 @@ class GroupController extends Gdn_Controller {
          $this->SetData('Members', $Users);
       }
 
-
-       // Build a pager
+      // Build a pager
       $this->Pager = new MorePagerModule($this);
       $this->Pager->ClientID = 'Pager';
       $this->Pager->configure(
          $Offset,
          $Limit,
          $NumResults = val('CountMembers', $this->data('Group')) - count($this->data('Leaders')),
-         GroupUrl($this->data('Group'), 'members', '/').'/{Page}?filter=members',
+         groupUrl($this->data('Group'), 'members', '/').'/{Page}?filter=members',
          true
       );
 
