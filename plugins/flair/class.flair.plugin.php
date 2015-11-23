@@ -2,15 +2,15 @@
 
 $PluginInfo['flair'] = array(
    'Name' => 'Flair',
-   'Description' => 'Tie into Badges application.',
-   'Version' => '1.1.1',
+   'Description' => 'Displays badges on user posts.',
+   'Version' => '1.1.2',
    'SettingsUrl' => '/dashboard/settings/flair',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
    'MobileFriendly' => true,
-   'RequiredApplications' => array('Reputation' => '>=1.3.1')
+   'RequiredPlugins' => array('badges' => '1.4')
 );
 
 class FlairPlugin extends Gdn_Plugin {

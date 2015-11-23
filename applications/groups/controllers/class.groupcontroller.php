@@ -894,6 +894,9 @@ class GroupController extends Gdn_Controller {
          $Filter = '';
       }
 
+      $this->setData('_Limit', $Limit);
+      $this->setData('_Offset', $Limit);
+
       // Get Leaders
       if (in_array($Filter, array('', 'leaders'))) {
          $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Leader'), $Limit, $Offset);
@@ -905,6 +908,18 @@ class GroupController extends Gdn_Controller {
          $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Member'), $Limit, $Offset);
          $this->SetData('Members', $Users);
       }
+
+
+       // Build a pager
+      $this->Pager = new MorePagerModule($this);
+      $this->Pager->ClientID = 'Pager';
+      $this->Pager->configure(
+         $Offset,
+         $Limit,
+         $NumResults = val('CountMembers', $this->data('Group')) - count($this->data('Leaders')),
+         GroupUrl($this->data('Group'), 'members', '/').'/{Page}?filter=members',
+         true
+      );
 
       $this->Data['_properties']['newdiscussionmodule'] = array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$Group['GroupID']);
       $this->SetData('Filter', $Filter);

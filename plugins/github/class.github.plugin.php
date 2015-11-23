@@ -88,7 +88,7 @@ class GithubPlugin extends Gdn_Plugin {
             'redirect_uri' => $RedirectUri,
             'client_id' => $AppID,
             'response_type' => 'code',
-            'scope' => 'repo',
+            'scope' => 'repo:status',
 
         );
         return self::OAUTH_BASE_URL . '/login/oauth/authorize?' . http_build_query($Query);

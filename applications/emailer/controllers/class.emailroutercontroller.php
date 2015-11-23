@@ -240,10 +240,10 @@ class EmailRouterController extends Gdn_Controller {
                      $Domain = val('host', $UrlParts, 'email.vanillaforums.com');
                      $Folder = '/'.array_pop($ToParts);
                   } elseif (count($ToParts) > 1 || in_array($Part, array('com', 'org', 'net'))) {
-                     $Domain = implode($ToParts).'.'.$Part;
+                     $Domain = implode('.', $ToParts).'.'.$Part;
                   } else {
                      // This is a to in the form of category.site.
-                     $Domain = $Part.'.vanillaforums.com';
+                     $Domain = $Part.'.'.$this->emailDomains[$emailDomain];
                      $Args = array_shift($ToParts);
                      $To = "$Part+$Args@email.vanillaforums.com";
                      $Data[$To] = $To;

@@ -33,7 +33,7 @@ class WarningsPlugin extends Gdn_Plugin {
          ->Column('Points', 'smallint')
          ->Column('DateInserted', 'datetime')
          ->Column('InsertUserID', 'int') // who did the warning.
-         ->Column('InsertIPAddress', 'varchar(15)')
+         ->Column('InsertIPAddress', 'ipaddress')
          ->Column('Body', 'text', FALSE)
          ->Column('ModeratorNote', 'varchar(255)', TRUE)
          ->Column('Format', 'varchar(20)', TRUE)
