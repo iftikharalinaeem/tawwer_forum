@@ -38,8 +38,8 @@ class RanksPlugin extends Gdn_Plugin {
       switch ($Sender->Mapper->Version) {
          case '1.0':
             $Sender->Mapper->AddMap(array(
-               'ranks/list'            => 'dashboard/settings/ranks',
-               'ranks/get'             => 'dashboard/settings/ranks'
+               'ranks/list'            => 'settings/ranks',
+               'ranks/get'             => 'settings/ranks'
             ));
             break;
       }

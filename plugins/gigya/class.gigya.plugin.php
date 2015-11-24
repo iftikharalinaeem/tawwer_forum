@@ -203,7 +203,7 @@ class GigyaPlugin extends Gdn_Plugin {
          $Sender->Form->SetData($Provider);
       }
 
-      $Sender->AddSideMenu('dashboard/social');
+      $Sender->AddSideMenu('social');
       $Sender->SetData('Title', sprintf(T('%s Settings'), 'Gigya'));
       $Sender->Render('Settings', '', 'plugins/gigya');
    }

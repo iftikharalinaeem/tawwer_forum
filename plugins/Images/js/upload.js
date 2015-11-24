@@ -40,7 +40,7 @@ jQuery(document).ready(function($) {
 
    $(frmselector).fileupload('option', {
       autoUpload: true,
-      url: gdn.url('vanilla/post/uploadimage/'),
+      url: gdn.url('post/uploadimage/'),
       maxFileSize: 5000000,
       acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
       filesContainer: $('#filetable'),
@@ -70,7 +70,7 @@ jQuery(document).ready(function($) {
    // Upload server status check for browsers with CORS support:
    if ($.support.cors) {
       $.ajax({
-            url: gdn.url('vanilla/post/image/'),
+            url: gdn.url('post/image/'),
             type: 'HEAD'
       }).fail(function () {
             $('<span class="alert alert-error"/>')
@@ -87,7 +87,7 @@ jQuery(document).ready(function($) {
       $.ajax({
             data: { 'inputUrl' : $('.UrlInput').val() },
             dataType: 'json',
-            url: gdn.url('vanilla/post/uploadimage/'),
+            url: gdn.url('post/uploadimage/'),
             type: 'POST'
       }).fail(function () {
          $('.url-message').remove();
