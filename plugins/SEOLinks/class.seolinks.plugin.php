@@ -80,7 +80,7 @@ class SEOLinksPlugin extends Gdn_Plugin {
          CategoryModel::ClearCache();
       }
 
-      $Sender->AddSideMenu('dashboard/settings/plugins');
+      $Sender->AddSideMenu('settings/plugins');
       $Cf->RenderAll();
   }
 

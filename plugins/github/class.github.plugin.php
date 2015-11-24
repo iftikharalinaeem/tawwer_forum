@@ -16,7 +16,7 @@ $PluginInfo['github'] = array(
     'Description' => "Allow staff users to create issues from discussions and comments.",
     'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.1.18'),
-    'SettingsUrl' => '/dashboard/plugin/github',
+    'SettingsUrl' => '/plugin/github',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true,
     'Author' => 'John Ashton',
