@@ -136,7 +136,7 @@ class PromotedGroupsModule extends Gdn_Module {
         //get groups
         $groupModel = new GroupModel();
         if ($promoteType === 'mine' && Gdn::session()->UserID > 0) {
-            $groups = $groupModel->GetByUser(Gdn::session()->UserID, $orderBy, false, 'desc', $limit);
+            $groups = $groupModel->GetByUser(Gdn::session()->UserID, $orderBy, 'desc', $limit);
         }
         else {
             $groups = $groupModel->Get($orderBy, 'desc', $limit)->resultArray();
