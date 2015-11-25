@@ -195,7 +195,7 @@ class BadgeModel extends BadgesAppModel {
     public function save($Data) {
         // See if there is an existing badge.
         if (val('Slug', $Data) && !val('BadgeID', $Data)) {
-            $ExistingBadge = $this->setID($Data['Slug']);
+            $ExistingBadge = $this->getID($Data['Slug']);
             if ($ExistingBadge) {
                 $Different = false;
                 foreach ($Data as $Key => $Value) {
