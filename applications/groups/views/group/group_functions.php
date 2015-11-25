@@ -55,12 +55,23 @@ if (!function_exists('getGroupButtons')):
  * @return array The buttons for the group.
  */
 function getGroupButtons($group) {
+    $groupModel = new GroupModel();
     $buttons = array();
-    if (Gdn::session()->isValid() && !GroupPermission('Member', $group) && GroupPermission('Join', $group)) {
+    if (Gdn::session()->isValid() && !GroupPermission('Member', $group) && GroupPermission('Join', $group) && !$groupModel->getApplicantType(val('GroupID', $group))) {
         $joinButton['text'] = t('Join');
         $joinButton['url'] = GroupUrl($group, 'join');
         $joinButton['cssClass'] = 'Popup';
         $buttons[] = $joinButton;
+    }
+    if (Gdn::session()->isValid() && ($groupModel->getApplicantType(val('GroupID', $group))) === 'Invitation') {
+        $acceptButton['text'] = t('Join');
+        $acceptButton['url'] = GroupUrl($group, 'inviteaccept');
+        $acceptButton['cssClass'] = 'Hijack';
+        $declineButton['text'] = t('Decline');
+        $declineButton['url'] = GroupUrl($group, 'invitedecline');
+        $declineButton['cssClass'] = 'Hijack';
+        $buttons[] = $acceptButton;
+        $buttons[] = $declineButton;
     }
     return $buttons;
 }

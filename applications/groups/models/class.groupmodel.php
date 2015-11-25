@@ -253,6 +253,16 @@ class GroupModel extends Gdn_Model {
       return $Row;
    }
 
+   public function getApplicantType($groupID) {
+       $applicants = $this->GetApplicants($groupID);
+       foreach ($applicants as $applicant) {
+           if (val('UserID', $applicant) == Gdn::session()->UserID) {
+               return val('Type', $applicant);
+           }
+       }
+       return '';
+   }
+
    public function GetApplicants($GroupID, $Where = array(), $Limit = FALSE, $Offset = FALSE) {
       // First grab the members.
       $Users = $this->SQL
