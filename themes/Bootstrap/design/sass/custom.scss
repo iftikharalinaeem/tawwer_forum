@@ -862,6 +862,19 @@ a.Close:hover {
     right: 0;
 }
 
+/** Groups **/
+.Section-Group,
+.Groups.Section-DiscussionList {
+  .PhotoWrapLarge {
+    padding: 0;
+    margin-bottom: 0;
+
+    a.ChangePicture {
+      width: inherit;
+    }
+  }
+}
+
 /** General Sprite Stuff **/
 
 .Sprite, .Sprite16 {

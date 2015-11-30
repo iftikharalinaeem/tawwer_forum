@@ -847,6 +847,17 @@ a.Close:hover {
   right: 0;
 }
 
+/** Groups **/
+.Section-Group .PhotoWrapLarge,
+.Groups.Section-DiscussionList .PhotoWrapLarge {
+  padding: 0;
+  margin-bottom: 0;
+}
+.Section-Group .PhotoWrapLarge a.ChangePicture,
+.Groups.Section-DiscussionList .PhotoWrapLarge a.ChangePicture {
+  width: inherit;
+}
+
 /** General Sprite Stuff **/
 .Sprite, .Sprite16 {
   width: 16px;
