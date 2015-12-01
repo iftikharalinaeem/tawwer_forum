@@ -54,7 +54,7 @@ class KeenIOClient extends Garden\Http\HttpClient {
      */
     public function __construct($baseUrl, $config) {
         $default = array(
-            'baseUrl'   => 'https://api.keen.io/{version}/',
+            'baseUrl'   => 'https://api.keen.io/{version}',
             'version'   => self::API_VERSION,
             'masterKey' => null,
             'writeKey'  => null,
@@ -89,7 +89,7 @@ class KeenIOClient extends Garden\Http\HttpClient {
      */
     public function addEvent($eventCollection, $eventData) {
         return $this->command(
-            "/projects/{$this->projectID}/events/{$eventCollection}",
+            "projects/{$this->projectID}/events/{$eventCollection}",
             $eventData,
             self::COMMAND_WRITE
         );
@@ -97,7 +97,7 @@ class KeenIOClient extends Garden\Http\HttpClient {
 
     public function addEvents($data) {
         return $this->command(
-            "/projects/{$this->projectID}/events",
+            "projects/{$this->projectID}/events",
             $data,
             self::COMMAND_WRITE
         );

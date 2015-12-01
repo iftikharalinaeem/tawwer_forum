@@ -24,23 +24,17 @@ class VanillaAnalytics extends Gdn_Plugin {
 
     protected $analyticsTracker;
 
-    public function __construct() {
-
-        // Grab the Composer autoloader.
-        require_once(dirname(__FILE__) . '/vendor/autoload.php');
-
-        $this->analyticsTracker = new AnalyticsTracker();
-
-        // For now, using keen.io is hardwired.
-        $this->analyticsTracker()->addTracker(new KeenIOTracker());
-    }
-
     /**
      *
      */
     public function analyticsTracker() {
-        if (!$this->analyticsTracker) {
-            $this->analyticsTracker = new AnalyticsTracker();
+        if (empty($this->analyticsTracker)) {
+            $this->analyticsTracker = AnalyticsTracker::getInstance();
+
+            // For now, using keen.io is hardwired.
+            if (c('VanillaAnalytics.KeenIO.ProjectID') && c('VanillaAnalytics.KeenIO.WriteKey')) {
+                $this->analyticsTracker->addTracker(new KeenIOTracker());
+            }
         }
 
         return $this->analyticsTracker;

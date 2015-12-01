@@ -1,5 +1,5 @@
 {
     "require": {
-        "vanilla/garden-http": "~1.0"
+        "donatj/phpuseragentparser": "~0.5"
 	}
 }

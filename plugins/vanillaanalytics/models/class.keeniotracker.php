@@ -27,9 +27,12 @@ class KeenIOTracker implements TrackerInterface {
         $this->readKey = c('VanillaAnalytics.KeenIO.ReadKey');
 
         $this->client = new KeenIOClient(
-            $this->projectID,
-            $this->writeKey,
-            $this->readKey
+            'https://api.keen.io/{version}/',
+            [
+                'projectId' => $this->projectID,
+                'writeKey'   => $this->writeKey,
+                'readKey'  => $this->readKey
+            ]
         );
     }
 
@@ -55,6 +58,6 @@ class KeenIOTracker implements TrackerInterface {
      * @param array $data Details of this event.
      */
     public function event($collection, $data = array()) {
-        echo $this->client->event($collection, $data);
+        return $this->client->addEvent($collection, $data);
     }
 }
