@@ -493,4 +493,7 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
 
 .Section-Post.Groups.edit input[value="Save Thumbnail"] {
   display: none !important; }
+
+.Section-Group #Content .BoxNewDiscussion {
+  display: inline-block; }
 /*# sourceMappingURL=groups.css.map */
