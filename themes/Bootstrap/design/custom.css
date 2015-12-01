@@ -485,6 +485,10 @@ body > #Frame > .Head {
   color: #999999;
 }
 
+.Section-DiscussionList #Content .BoxNewDiscussion {
+    display: inline-block;
+}
+
 #Content .BoxNewDiscussion {
   display: inline-block;
 }
