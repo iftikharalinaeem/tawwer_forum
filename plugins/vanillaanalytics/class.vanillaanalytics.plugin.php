@@ -37,6 +37,15 @@ class VanillaAnalytics extends Gdn_Plugin {
         AnalyticsTracker::getInstance()->addDefinitions($sender);
     }
 
+    public function commentModel_afterSaveComment_handler($sender, &$args) {
+        $data = AnalyticsData::comment(val('CommentID', $args));
+
+        if ($data) {
+            $event = val('Insert', $args) ? 'commentInsert' : 'commentEdit';
+            AnalyticsTracker::getInstance()->trackEvent($event, $data);
+        }
+    }
+
     /**
      * Track when a discussion is saved.  This can be used to record an event for inserts or edits.
      *
@@ -44,12 +53,31 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param $args Event arguments, passed from DiscussionModel, specifically for the AfterSaveDiscussion event.
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, &$args) {
-
         $data = AnalyticsData::discussion(val('DiscussionID', $args));
 
         if ($data) {
             $event = val('Insert', $args) ? 'discussionInsert' : 'discussionEdit';
             AnalyticsTracker::getInstance()->trackEvent($event, $data);
         }
+    }
+
+    public function entryController_registrationSuccessful_handler($sender, &$args) {
+        AnalyticsTracker::getInstance()->trackEvent('userRegistration');
+    }
+
+    public function reactionsPlugin_reaction_handler($sender, &$args) {
+        $reactionData = val('ReactionData', $args);
+
+        $data = [
+            'reaction' => [
+                'recordType' => val('RecordType', $reactionData),
+                'recordID' => (int)val('RecordID', $args),
+                'urlCode' => val('ReactionUrlCode', $args),
+                'tagID' => (int)val('TagID', $reactionData),
+                'total' => (int)val('Total', $reactionData)
+            ]
+        ];
+
+        AnalyticsTracker::getInstance()->trackEvent('reaction', $data);
     }
 }
