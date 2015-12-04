@@ -22,37 +22,19 @@ $PluginInfo['VanillaAnalytics'] = array(
  */
 class VanillaAnalytics extends Gdn_Plugin {
 
-    protected $analyticsTracker;
-
-    /**
-     *
-     */
-    public function analyticsTracker() {
-        if (empty($this->analyticsTracker)) {
-            $this->analyticsTracker = AnalyticsTracker::getInstance();
-
-            // For now, using keen.io is hardwired.
-            if (c('VanillaAnalytics.KeenIO.ProjectID') && c('VanillaAnalytics.KeenIO.WriteKey')) {
-                $this->analyticsTracker->addTracker(new KeenIOTracker());
-            }
-        }
-
-        return $this->analyticsTracker;
-    }
-
     /**
      * Track the generic 404 response.
      */
     public function gdn_dispatcher_notFound_handler() {
-        $this->analyticsTracker()->trackEvent('notFound');
+        AnalyticsTracker::getInstance()->trackEvent('notFound');
     }
 
     /**
      * @param $sender Controller instance
      */
     public function base_render_before($sender) {
-        $this->analyticsTracker()->addJsFiles($sender);
-        $this->analyticsTracker()->addDefinitions($sender);
+        AnalyticsTracker::getInstance()->addJsFiles($sender);
+        AnalyticsTracker::getInstance()->addDefinitions($sender);
     }
 
     /**
@@ -67,7 +49,7 @@ class VanillaAnalytics extends Gdn_Plugin {
 
         if ($data) {
             $event = val('Insert', $args) ? 'discussionInsert' : 'discussionEdit';
-            $this->analyticsTracker()->trackEvent($event, $data);
+            AnalyticsTracker::getInstance()->trackEvent($event, $data);
         }
     }
 }

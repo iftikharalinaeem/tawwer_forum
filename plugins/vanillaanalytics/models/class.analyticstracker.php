@@ -17,15 +17,22 @@ class AnalyticsTracker {
 
     protected function __construct() {
         require_once(dirname(__FILE__) . '/../vendor/autoload.php');
+
+        // For now, using keen.io is hardwired.
+        if (c('VanillaAnalytics.KeenIO.ProjectID') && c('VanillaAnalytics.KeenIO.WriteKey')) {
+            $this->addTracker(new KeenIOTracker());
+        }
     }
 
     /**
      *
      */
     public function addDefinitions(Gdn_Controller $controller) {
-        foreach ($this->trackers as $interface) {
-            $interface->addDefinitions($controller);
+        foreach ($this->trackers as $tracker) {
+            $tracker->addDefinitions($controller);
         }
+
+        $controller->addDefinition('eventData', $this->getDefaultData());
     }
 
     /**
@@ -47,14 +54,26 @@ class AnalyticsTracker {
     }
 
     public function getDefaultData() {
+        $timestamp = gmmktime();
         $defaults = [
+            'dateTime' => [
+                'day' => (int)date('w', $timestamp),
+                'date' =>(int) date('j', $timestamp),
+                'month' => (int)date('n', $timestamp),
+                'year' => (int)date('Y', $timestamp),
+                'hour' => (int)date('G', $timestamp),
+                'minute' => (int)date('i', $timestamp),
+                'timezone' => date('T', $timestamp),
+                'timestamp' => $timestamp,
+                'iso8601' => date('c', $timestamp)
+            ],
+            'ip' => Gdn::request()->ipAddress(),
+            'method' => Gdn::request()->requestMethod(),
             'url' => [
                 'scheme' => Gdn::request()->scheme(),
                 'domain' => parse_url(Gdn::request()->domain(), PHP_URL_HOST),
                 'path' => Gdn::request()->path(),
-            ],
-            'ip'        => Gdn::request()->ipAddress(),
-            'method'    => Gdn::request()->requestMethod(),
+            ]
         ];
 
         if (Gdn::session()->isValid()) {
@@ -73,11 +92,10 @@ class AnalyticsTracker {
         if ($userAgent = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_USER_AGENT')) {
             try {
                 $defaults['userAgent'] = parse_user_agent($userAgent);
-                var_export($defaults['userAgent']);
 
                 if (!empty($defaults['userAgent']['version']) &&
                     preg_match('#^(?P<major>\d+)\.#', $defaults['userAgent']['version'], $version)) {
-                    $defaults['userAgent']['majorVersion'] = $version['major'];
+                    $defaults['userAgent']['majorVersion'] = (int)$version['major'];
                 }
             } catch (\InvalidArgumentException $e) {
             }
