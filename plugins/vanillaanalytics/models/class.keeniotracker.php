@@ -11,10 +11,22 @@ class KeenIOTracker implements TrackerInterface {
      */
     protected $client;
 
+    /**
+     * Scoped API read key for the current project.
+     * @var string
+     */
     protected $readKey;
 
+    /**
+     * Scoped API write key for the current project.
+     * @var string
+     */
     protected $writeKey;
 
+    /**
+     * Unique ID for the project we're tracking events against.
+     * @var string
+     */
     protected $projectID;
 
     /**
@@ -37,7 +49,9 @@ class KeenIOTracker implements TrackerInterface {
     }
 
     /**
+     * Add values to the gdn.meta JavaScript array on the page.
      *
+     * @param Gdn_Controller Instance of the current page's controller.
      */
     public function addDefinitions(Gdn_Controller $controller) {
         $controller->addDefinition('keenio.projectID', $this->projectID);
@@ -45,7 +59,9 @@ class KeenIOTracker implements TrackerInterface {
     }
 
     /**
+     * Add JavaScript files to the current page.
      *
+     * @param Gdn_Controller Instance of the current page's controller.
      */
     public function addJsFiles(Gdn_Controller $controller) {
         $controller->addJsFile('https://d26b395fwzu5fz.cloudfront.net/3.3.0/keen.min.js');
@@ -57,6 +73,7 @@ class KeenIOTracker implements TrackerInterface {
      *
      * @param string $collection Name of the event collection to record this data to.
      * @param array $data Details of this event.
+     * @return array Body of response from keen.io
      */
     public function event($collection, $data = array()) {
         return $this->client->addEvent($collection, $data);

@@ -30,15 +30,28 @@ class VanillaAnalytics extends Gdn_Plugin {
     }
 
     /**
+     * Hook in before a view is rendered.
+     *
      * @param $sender Controller instance
      */
     public function base_render_before($sender) {
+        // Give analytics trackers the ability to add JavaScript files
         AnalyticsTracker::getInstance()->addJsFiles($sender);
+
+        // Allow trackers to add to values in a page's gdn.meta JavaScript array
         AnalyticsTracker::getInstance()->addDefinitions($sender);
     }
 
+    /**
+     * Track when a comment is saved.  This includes inserts and updates.
+     *
+     * @param $sender Current instance of CommentModel
+     * @param $args Event arguments, passed from CommentModel, specifically for the event.
+     */
     public function commentModel_afterSaveComment_handler($sender, &$args) {
-        $data = AnalyticsData::comment(val('CommentID', $args));
+        $data = [
+            'comment' => AnalyticsData::comment(val('CommentID', $args))
+        ];
 
         if ($data) {
             $event = val('Insert', $args) ? 'commentInsert' : 'commentEdit';
@@ -50,10 +63,12 @@ class VanillaAnalytics extends Gdn_Plugin {
      * Track when a discussion is saved.  This can be used to record an event for inserts or edits.
      *
      * @param $sender Current instance of DiscussionModel
-     * @param $args Event arguments, passed from DiscussionModel, specifically for the AfterSaveDiscussion event.
+     * @param $args Event arguments, passed from DiscussionModel, specifically for the event.
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, &$args) {
-        $data = AnalyticsData::discussion(val('DiscussionID', $args));
+        $data = [
+            'discussion' => AnalyticsData::discussion(val('DiscussionID', $args))
+        ];
 
         if ($data) {
             $event = val('Insert', $args) ? 'discussionInsert' : 'discussionEdit';
@@ -61,13 +76,26 @@ class VanillaAnalytics extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Track when a user successfully registers for the site.
+     *
+     * @param $sender Current isntance of EntryController
+     * @param $args Event arguments, passed from EntryController, specifically for the event.
+     */
     public function entryController_registrationSuccessful_handler($sender, &$args) {
         AnalyticsTracker::getInstance()->trackEvent('userRegistration');
     }
 
+    /**
+     * Track when a user performs a reaction.
+     *
+     * @param $sender Current instance of ReactionsPlugin
+     * @param $args Event arguments, passed from ReactionsPlugin or ReactionModel, specifically for the event.
+     */
     public function reactionsPlugin_reaction_handler($sender, &$args) {
         $reactionData = val('ReactionData', $args);
 
+        // Grabbing the relevant information from the ReactionData event argument
         $data = [
             'reaction' => [
                 'recordType' => val('RecordType', $reactionData),

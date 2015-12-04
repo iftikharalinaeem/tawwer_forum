@@ -6,26 +6,27 @@
  */
 class AnalyticsData extends Gdn_Model {
 
+    /**
+     * Grab standard data for a comment.
+     *
+     * @param $commentID A comment's unique ID, used to query data.
+     * @return array|bool Array representing comment row on success, false on failure.
+     */
     public static function comment($commentID) {
         $commentModel = new CommentModel();
         $comment = $commentModel->getID($commentID);
 
         if ($comment) {
-            $discussionModel = new DiscussionModel();
-            $discussion = $discussionModel->getID($comment->DiscussionID);
+            $data = [
+                'commentID' => (int)$commentID
+            ];
+            $discussion = self::discussion($comment->DiscussionID);
 
             if ($discussion) {
-                return [
-                    'commentID' => (int)$commentID,
-                    'discussionID' => (int)$discussion->DiscussionID,
-                    'discussionName' => $discussion->Name,
-                    'categories' => self::getCategoryAncestors($discussion->CategoryID)
-                ];
-            } else {
-                return [
-                    'commentID' => (int)$commentID
-                ];
+                $data['discussion'] = $discussion;
             }
+
+            return $data;
         } else {
             return false;
         }
@@ -45,7 +46,7 @@ class AnalyticsData extends Gdn_Model {
             // We have a valid discussion, so we can put together the basic information using the record.
             return [
                 'discussionID' => (int)$discussion->DiscussionID,
-                'discussionName' => $discussion->Name,
+                'name' => $discussion->Name,
                 'categories' => self::getCategoryAncestors($discussion->CategoryID)
             ];
         } else {
