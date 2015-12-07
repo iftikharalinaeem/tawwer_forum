@@ -6,14 +6,26 @@
 interface TrackerInterface {
 
     /**
+     * Add definitions to the gdn.meta JavaScript array.
      *
+     * @param Gdn_Controller $controller
      */
     public function addDefinitions(Gdn_Controller $controller);
 
     /**
+     * Add JavaScript files to the current page.
      *
+     * @param Gdn_Controller $controller
      */
     public function addJsFiles(Gdn_Controller $controller);
+
+    /**
+     * Add and overwrite default event data values.
+     *
+     * @param $defaults
+     */
+    public function addDefaultData(&$defaults);
+
     /**
      * Track an event.
      *

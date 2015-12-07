@@ -68,6 +68,57 @@ class KeenIOTracker implements TrackerInterface {
         $controller->addJsFile('keenio.min.js', 'plugins/vanillaanalytics');
     }
 
+
+    /**
+     * @see https://keen.io/docs/api/#data-enrichment
+     */
+    public function addDefaultData(&$defaults) {
+        $additionalDefaults = [
+            'keen' => [
+                'addons' => [
+                    [
+                        'name' => 'keen:ip_to_geo',
+                        'input' => [
+                            'ip' => 'ip'
+                        ],
+                        'output' => 'ipGeo'
+                    ],
+                    [
+                        'name' => 'keen:url_parser',
+                        'input' => [
+                            'url' => 'url'
+                        ],
+                        'output' => 'urlParsed'
+                    ]
+                ]
+            ]
+        ];
+
+        $defaults = array_merge($defaults, $additionalDefaults);
+
+        if (!empty($defaults['referrer'])) {
+            $defaults['keen']['addons'][] = [
+                'name' => 'keen:referrer_parser',
+                'input' => [
+                    'referrer_url' => 'referrer',
+                    'page_url' => 'url'
+                ],
+                'output' => 'referrerParsed'
+            ];
+        }
+
+        if (!empty($defaults['userAgent'])) {
+            $defaults['keen']['addons'][] = [
+                'name' => 'keen:ua_parser',
+                'input' => [
+                    'ua_string' => 'userAgent'
+                ],
+                'output' => 'userAgent'
+            ];
+        }
+
+        return $defaults;
+    }
     /**
      * Record an event using the keen.io API.
      *
@@ -76,6 +127,8 @@ class KeenIOTracker implements TrackerInterface {
      * @return array Body of response from keen.io
      */
     public function event($collection, $data = array()) {
+        $data = array_merge($data, $this->getDefaultData());
+
         return $this->client->addEvent($collection, $data);
     }
 }

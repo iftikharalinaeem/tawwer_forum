@@ -86,41 +86,30 @@ class AnalyticsTracker {
             ],
             'ip' => Gdn::request()->ipAddress(),
             'method' => Gdn::request()->requestMethod(),
-            'url' => [
-                'scheme' => Gdn::request()->scheme(),
-                'domain' => parse_url(Gdn::request()->domain(), PHP_URL_HOST),
-                'path' => Gdn::request()->path(),
-            ]
+            'url' => Gdn::request()->url(
+                Gdn::request()->pathAndQuery(),
+                true
+            )
         ];
 
         // Only add user-related information if a user is signed in.
-        if (Gdn::session()->isValid()) {
-            $defaults['user'] = [
-                'userID'         => Gdn::session()->UserID,
-                'name'       => val('Name', Gdn::session()->User),
-                'dateFirstVisit' => val('DateFirstVisit', Gdn::session()->User)
-            ];
-        }
+        $defaults['user'] = [
+            'userID'         => Gdn::session()->isValid() ? Gdn::session()->UserID : null,
+            'name'           => Gdn::session()->isValid() ? val('Name', Gdn::session()->User) : null,
+            'dateFirstVisit' => Gdn::session()->isValid() ? val('DateFirstVisit', Gdn::session()->User) : null
+        ];
 
         // Attempt to grab the referrer, if there is one, and record it.
         $referrer = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER');
-        if ($referrer && $referrerParsed = parse_url($referrer)) {
-            $defaults['referer'] = $referrerParsed;
-        }
+        $defaults['referrer'] = $referrer ?: null;
 
         // Grab the browser's user agent value, if available.
-        if ($userAgent = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_USER_AGENT')) {
-            try {
-                $defaults['userAgent'] = parse_user_agent($userAgent);
+        $userAgent = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_USER_AGENT');
+        $defaults['userAgent'] = $userAgent ?: null;
 
-                // Attempt to grab the browser's major version number, if possible.
-                if (!empty($defaults['userAgent']['version']) &&
-                    preg_match('#^(?P<major>\d+)\.#', $defaults['userAgent']['version'], $version)) {
-                    $defaults['userAgent']['majorVersion'] = (int)$version['major'];
-                }
-            } catch (\InvalidArgumentException $e) {
-                // The function used to parse the user agent may throw a InvalidArgumentException exception.
-            }
+
+        foreach ($this->trackers as $interface) {
+            $interface->addDefaultData($defaults);
         }
 
         return $defaults;
