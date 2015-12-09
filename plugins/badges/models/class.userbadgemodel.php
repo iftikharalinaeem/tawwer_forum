@@ -227,12 +227,21 @@ class UserBadgeModel extends BadgesAppModel {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getID($id, $dataSetType = false, $options = []) {
+        if (is_numeric($id) && is_numeric($dataSetType)) {
+            deprecated('UserBadgeModel->getID(int, int)', 'UserBadgeModel->getByUser()');
+            return $this->getByUser($id, $dataSetType);
+        }
+        return parent::getID($id, $dataSetType, $options);
+    }
+
+    /**
      * Get badge data for single user/badge association.
      *
-     * @since 1.0.0
-     * @access public
      */
-    public function getID($UserID, $BadgeID) {
+    public function getByUser($UserID, $BadgeID) {
         $BadgeID = $this->getBadgeID($BadgeID);
 
         $Result = $this->SQL->getWhere('UserBadge', array('UserID' => $UserID, 'BadgeID' => $BadgeID))->firstRow(DATASET_TYPE_ARRAY);
@@ -620,13 +629,11 @@ class UserBadgeModel extends BadgesAppModel {
     /**
      * Save given user badge.
      *
-     * @since 1.0.0
-     * @access public
-     *
      * @param array $FormPostValues Values submitted via form.
+     * @param array $Settings Not used.
      * @return bool Whether save was successful.
      */
-    public function save($FormPostValues) {
+    public function save($FormPostValues, $Settings = []) {
         $Session = Gdn::session();
 
         // Define the primary key in this model's table.
