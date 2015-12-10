@@ -64,6 +64,7 @@ To reset a tour for a user, you need to call WalkThroughPlugin::resetTour($userI
 
 ###Steps format
  - `intro`: The tooltip text of step
+ - `title`: Optionally prepends a title to the intro text.
  - `element`: Optionally defines the element to showcase.  Can be a `.css_class`, `#any_id` or even`document.querySelector("input[name=login]")`
  - `page`: Optionally defines the Vanilla page that the step needs to be viewed on.  Example: `discussions`
  - `tooltipClass`: Optionally define a CSS class for tooltip
