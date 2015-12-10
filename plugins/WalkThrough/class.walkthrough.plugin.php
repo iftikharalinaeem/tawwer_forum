@@ -9,7 +9,7 @@
 $PluginInfo['WalkThrough'] = [
     'Name' => 'Walk Through',
     'Description' => "Allow other plugins to display custom tours to users.",
-    'Version' => '0.1',
+    'Version' => '0.2',
     'RequiredApplications' => ['Vanilla' => '2.1a'],
     'Author' => 'Eric Vachaviolos',
     'AuthorEmail' => 'eric.v@vanillaforums.com',
@@ -21,6 +21,10 @@ $PluginInfo['WalkThrough'] = [
  * WalkThrough Plugin
  *
  * Manage the display for tours provided by other plugins.
+ *
+ * Changes:
+ *  0.1        Initial Release
+ *  0.2        Add an optional title
  *
  * @author Eric Vachaviolos <eric.v@vanillaforums.com>
  * @package internal
@@ -214,6 +218,12 @@ class WalkThroughPlugin extends Gdn_Plugin {
             if (isset($step['page']) && !is_string($step['page'])) {
                 throw new Exception('In tour "'.$tourConfig['name'].'" step #'.$i.', the `page` attribute must be a string');
             }
+
+            // Attribute `title` if provided, must be a string
+            if (isset($step['title']) && !is_string($step['title'])) {
+                throw new Exception('In tour "'.$tourConfig['name'].'" step #'.$i.', the `title` attribute must be a string');
+            }
+
             $i++;
         }
     }
@@ -336,6 +346,12 @@ class WalkThroughPlugin extends Gdn_Plugin {
             $page = val('page', $step);
             if ($page) {
                 $step['url'] = url($page);
+            }
+
+            // If attribute `title` is provided, prepends the title to the intro text
+            $title = val('title', $step);
+            if (!empty($title)) {
+                $step['intro'] = '<b class="intro-title">'.$title.'</b> '.$step['intro'];
             }
 
             $steps[$i++] = $step;
