@@ -1,0 +1,28 @@
+.GuestBox .SocialIcon-Sega, .SocialIcon-Sega.HasText .Icon,
+.SignInPopup .SocialIcon-Sega {
+    background-color: rgba(29,54,110, 1);
+    border-radius: 3px;
+}
+
+.GuestBox .SocialIcon-Sega:hover,
+.SignInPopup .SocialIcon-Sega:hover {
+    background-color: rgba(29,54,110, 0.85);
+}
+
+.GuestBox .SocialIcon.SocialIcon-Sega .Icon,
+.SignInPopup .SocialIcon.SocialIcon-Sega .Icon {
+    background-image: url('sega-logo.png');
+    background-size: 50px;
+    background-position: 4px -17px;
+    width: 60px;
+    background-color: rgb(255, 255, 255);
+    border: #1D366E;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 3px;
+}
+
+.SignInPopup .SocialIcon.SocialIcon-Sega .Icon {
+    border-radius: 3px 0 0 3px;
+    background-position: 4px -13px;
+}
