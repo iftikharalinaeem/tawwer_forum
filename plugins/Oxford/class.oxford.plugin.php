@@ -195,7 +195,7 @@ class OxfordPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
             'email' => 'Email',
             'provider' => 'Provider',
             'picture' => 'Photo',
-            'name' => 'Name',
+            'username' => 'Name',
             'uid' => 'UniqueID'
         ], true);
 
