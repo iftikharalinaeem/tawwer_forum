@@ -39,8 +39,8 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $provider['TokenUrl'] = "$baseUrl/token";
         $provider['AuthorizeUrl'] = "$baseUrl/authorize";
         $provider['ProfileUrl'] = "$baseUrl/token";
-        $provider['RegisterUrl'] = "$baseUrl/authorize";
-        $provider['SignOutUrl'] = "$baseUrl/v2/logout";
+        $provider['RegisterUrl'] = "$baseUrl/signup";
+        $provider['SignOutUrl'] = "$baseUrl" . '/entry/signout?TransientKey=' . gdn::session()->transientKey();;
 
         return $provider;
     }
@@ -180,22 +180,6 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
                 redirect($url);
                 break;
         }
-    }
-
-    public function entryController_revoke_create($sender, $type=null) {
-        if ($type != $this->getProviderKey()) {
-            return;
-        }
-
-        $reason = gdn::request()->get('invalidation_reason');
-        $subject = gdn::request()->get('invalidation_subject');
-        $id = gdn::request()->get('ssoID');
-        $session_ids = gdn::request()->get('session_ids');
-        $secret = gdn::request()->get('shared_secret');
-        gdn::session()->setAttribute($this->getProviderKey() . ".AccessToken", "");
-        $this->setAccessToken("");
-        gdn::session()->end();
-        redirect('/');
     }
 
     /**
