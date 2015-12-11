@@ -210,7 +210,6 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
             'email' => 'Email',
             'provider' => 'Provider',
             'picture' => 'Photo',
-            'displayname' => 'Name',
             'name' => 'FullName',
             'ssoID' => 'UniqueID'
         ], true);
@@ -248,7 +247,7 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
      * @param array $args
      */
     public function base_render_before($sender, $args) {
-//        $sender->addJsFile('https://test-sso.reliclink.com/html/sdk/v1/reliclink.js', '', 'async');
+        $sender->addJsFile('https://test-sso.reliclink.com/html/sdk/v1/reliclink.js', '', 'async');
         $sender->addJsFile('managesession.js', 'plugins/SegaSSO', 'async');
 
         $loggedIn = (gdn::session()->UserID) ? true : false;

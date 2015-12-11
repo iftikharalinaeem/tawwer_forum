@@ -31,7 +31,7 @@ window.RelicLinkSDK = {
             }
         });
 
-        $(document).on("click", ".logout a", function(ev) {
+        $(document).on("click", "a[href='" + gdn_logout_url + "']", function(ev) {
             ev.preventDefault();
             RelicLinkSDK.logOut().then(function() {
                 window.location.href = gdn_logout_url;
