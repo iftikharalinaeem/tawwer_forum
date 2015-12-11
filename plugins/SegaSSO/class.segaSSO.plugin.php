@@ -4,7 +4,7 @@
 $PluginInfo['SegaSSO'] = array(
     'Name' => 'Sega SSO',
     'Description' => 'Allows user login to be authenticated on Sega SSO.',
-    'Version' => '1.0.0',
+    'Version' => '1.0.1',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'RequiredTheme' => false,
     'HasLocale' => false,
@@ -250,7 +250,18 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
     public function base_render_before($sender, $args) {
 //        $sender->addJsFile('https://test-sso.reliclink.com/html/sdk/v1/reliclink.js', '', 'async');
         $sender->addJsFile('managesession.js', 'plugins/SegaSSO', 'async');
+
+        $loggedIn = (gdn::session()->UserID) ? true : false;
+        $sender->addDefinition('userLoggedIn', $loggedIn);
+
+        $provider = $this->provider();
+        $loginURL = $this->requireVal('AuthorizeUrl', $provider, "provider");
+        $sender->addDefinition('loginURL', $loginURL);
+
+        $logoutURL = '/entry/signout?TransientKey=' . gdn::session()->transientKey();
+        $sender->addDefinition('logoutURL', $logoutURL);
     }
+
 
 
 }

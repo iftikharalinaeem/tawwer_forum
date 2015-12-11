@@ -1,26 +1,41 @@
 window.RelicLinkSDK = {
     onReady: function () {
-        $(document).on("click", "[href*='/entry/signout']", function(ev) {
-            ev.preventDefault();
-            var logoutURL = $(this).attr("href");
-            console.log('LogoutURL : ' + document.location + logoutURL);
-            RelicLinkSDK.logOut().then(function() {
-                console.log("Returned from logout");
-                //$.get(logoutURL).then(function() {
-                    console.log("Should be reloading window.");
-                    window.location.href = logoutURL;
-                //});
-            });
+        var gdn_session = gdn.getMeta('userLoggedIn');
+        var gdn_login_url = gdn.getMeta('loginURL');
+        var gdn_logout_url = gdn.getMeta('logoutURL');
+
+        console.log('gdn meta logged in: ' + gdn_session + ', login URL: ' + gdn_login_url + ', logout url: ' + gdn_logout_url);
+
+        RelicLinkSDK.on('logout', function() {
+            if (gdn_session && !status.loggedIn) {
+                // perform local logout
+                window.location.href = gdn_logout_url;
+            } else if (status.loggedIn) {
+                // perform automatic login
+                window.location.href = gdn_login_url;
+            }
         });
 
-        RelicLinkSDK.getSessionStatus().then(function(status){
-            var presentAddress = window.location.pathname;
-            console.log("PresentAddress: " + presentAddress);
-            console.log("LoggedIn: " + status.loggedIn);
-            if (!status.loggedIn && presentAddress.indexOf('/entry/signin') === -1) {
-                window.location.href = $("[href$='/entry/signin']").attr('href');
+
+        RelicLinkSDK.on('logout', function() {
+            if (gdn_session) {
+                // automatic logout
+                window.location.href = gdn_logout_url;
             }
+        });
+
+        RelicLinkSDK.on('login', function() {
+            if (!gdn_session) {
+                //automatic login
+                window.location.href = gdn_login_url;
+            }
+        });
+
+        $(document).on("click", ".logout a", function(ev) {
+            ev.preventDefault();
+            RelicLinkSDK.logOut().then(function() {
+                window.location.href = gdn_logout_url;
+            });
         });
     }
 };
-
