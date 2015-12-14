@@ -195,7 +195,8 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
             'provider' => 'Provider',
             'picture' => 'Photo',
             'name' => 'FullName',
-            'ssoID' => 'UniqueID'
+            'ssoID' => 'UniqueID',
+            'email_validated' => 'Verified'
         ], true);
 
         $profile['Provider'] = $this->providerKey;
