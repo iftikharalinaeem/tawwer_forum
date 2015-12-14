@@ -615,12 +615,11 @@ class OAuth2PluginBase {
 
         $uri .= "access_token=".urlencode($this->accessToken());
 
-        $uri .= "grant_type=client_credentials";
-
         $this->log('getProfile API call', array('ProfileUrl' => $uri));
 
         $rawProfile = $this->api($uri);
         $profile = $this->translateProfileResults($rawProfile);
+
         return $profile;
     }
 

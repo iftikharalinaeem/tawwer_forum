@@ -249,4 +249,8 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
 
 
 
+    public function profileController_AfterPreferencesDefined_handler() {
+        trace(gdn::session()->User, "User");
+    }
+    
 }
