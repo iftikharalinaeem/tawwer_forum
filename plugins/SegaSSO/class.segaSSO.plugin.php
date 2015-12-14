@@ -40,7 +40,7 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $provider['AuthorizeUrl'] = "$baseUrl/authorize";
         $provider['ProfileUrl'] = "$baseUrl/token";
         $provider['RegisterUrl'] = "$baseUrl/signup";
-        $provider['SignOutUrl'] = "$baseUrl" . '/entry/signout?TransientKey=' . gdn::session()->transientKey();;
+        $provider['SignOutUrl'] = null;
 
         return $provider;
     }
@@ -231,8 +231,8 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
      * @param array $args
      */
     public function base_render_before($sender, $args) {
-//        $sender->addJsFile('https://test-sso.reliclink.com/html/sdk/v1/reliclink.js', '', 'async');
-//        $sender->addJsFile('managesession.js', 'plugins/SegaSSO', 'async');
+        $sender->addJsFile('https://test-sso.reliclink.com/html/sdk/v1/reliclink.js', '', array('AddVersion' => array('AddVersion' => true, 'id' => 'reliclinksdk')));
+        $sender->addJsFile('managesession.js', 'plugins/SegaSSO', array('id' => 'reliclinksdk', 'class' => 'reliclickn', 'things'=>'stuff'));
 
         $loggedIn = (gdn::session()->UserID) ? true : false;
         $sender->addDefinition('userLoggedIn', $loggedIn);

@@ -480,7 +480,7 @@ class OAuth2PluginBase {
      */
     public function entryController_overrideSignOut_handler($sender, $args) {
         $provider = $this->provider();
-        if ($provider['AuthenticationSchemeAlias'] != $this->getProviderKey() || !$this->isConfigured()) {
+        if ($provider['AuthenticationSchemeAlias'] != $this->getProviderKey() || !$this->isConfigured() || $provider['SignOutUrl'] === null) {
             return;
         }
         $redirect = Gdn::Request()->Url('/', true);
