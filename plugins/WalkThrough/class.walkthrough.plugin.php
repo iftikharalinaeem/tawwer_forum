@@ -91,7 +91,12 @@ class WalkThroughPlugin extends Gdn_Plugin {
         // Attach a custom css file if provided
         $cssFile = val('cssFile', $this->tourOptions);
         if ($cssFile) {
-            $sender->addCssFile($cssFile);
+            if (!is_array($cssFile)) {
+                $cssFile = [$cssFile];
+            }
+            foreach ($cssFile as $includeFile) {
+                $sender->addCssFile($includeFile);
+            }
         }
     }
 
