@@ -257,7 +257,7 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         }
 
         if($dateOfBirth) {
-            $sender->Form->setFormValue('DateOfBirth', $dateOfBirth);
+            $sender->Form->setFormValue('DateOfBirth', date('Y-m-d', $dateOfBirth));
         }
 
         if($verified) {
