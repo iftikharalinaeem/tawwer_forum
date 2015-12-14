@@ -233,8 +233,8 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
      * @param array $args
      */
     public function base_render_before($sender, $args) {
-        $sender->addJsFile('https://test-sso.reliclink.com/html/sdk/v1/reliclink.js', '', array('AddVersion' => array('AddVersion' => true, 'id' => 'reliclinksdk')));
-        $sender->addJsFile('managesession.js', 'plugins/SegaSSO', array('id' => 'reliclinksdk', 'class' => 'reliclickn', 'things'=>'stuff'));
+//        $sender->addJsFile('https://test-sso.reliclink.com/html/sdk/v1/reliclink.js', '', array('AddVersion' => array('AddVersion' => true, 'id' => 'reliclinksdk')));
+//        $sender->addJsFile('managesession.js', 'plugins/SegaSSO', array('id' => 'reliclinksdk', 'class' => 'reliclickn', 'things'=>'stuff'));
 
         $loggedIn = (gdn::session()->UserID) ? true : false;
         $sender->addDefinition('userLoggedIn', $loggedIn);
@@ -248,9 +248,13 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
     }
 
 
+    public function entryController_OAuth_handler($sender, $args) {
+        $sender->Form->setFormValue('DateOfBirth', $args->profile['DateOfBirth'] ,null);
+        $sender->Form->setFormValue('Verified', $args->profile['Verified'], null);
+    }
 
     public function profileController_AfterPreferencesDefined_handler() {
         trace(gdn::session()->User, "User");
     }
-    
+
 }
