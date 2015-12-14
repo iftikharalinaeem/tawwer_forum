@@ -249,8 +249,23 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
 
 
     public function entryController_OAuth_handler($sender, $args) {
-        $sender->Form->setFormValue('DateOfBirth', $args->profile['DateOfBirth'] ,null);
-        $sender->Form->setFormValue('Verified', $args->profile['Verified'], null);
+
+        $formValues = $sender->Form->FormValues();
+        trace($sender->Form->FormValues(), "Sender Form Values");
+        if($formValues) {
+            $dateOfBirth = val("DateOfBirth", $formValues, null);
+//            $passedDisplayName = val("displayname", $formValues['user_metadata'], null);
+//            $sender->Form->setFormValue('Photo', null);
+        }
+
+        if($dateOfBirth) {
+            $sender->Form->setFormValue('DateOfBirth', "1977-09-07");
+        }
+
+//        if($chosenDisplayName) {
+//            $sender->Form->setFormValue('Name', $chosenDisplayName);
+//            $sender->Form->ValidateRule('Name', 'ValidateUsername');
+//        }
     }
 
     public function profileController_AfterPreferencesDefined_handler() {
