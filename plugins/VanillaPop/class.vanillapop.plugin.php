@@ -390,7 +390,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 break;
          }
       }
-      Trace("Save type: $SaveType");
 
       if (isset($InvalidReply)) {
          $Data['Body'] .= "\n\n".sprintf(T('Note: The email was trying to reply to an invalid %s.'), "$ReplyType ($ReplyID)");
@@ -408,13 +407,19 @@ class VanillaPopPlugin extends Gdn_Plugin {
          $PermissionCategoryID = -1;
       }
 
+      Trace("Save type: {$SaveType}, Permission Category ID: {$PermissionCategoryID}");
+
       switch ($SaveType) {
          case 'Comment':
             if (!Gdn::Session()->CheckPermission('Email.Comments.Add')) {
+               trace("Doesn't have Email.Comments.Add");
+
                $this->SendEmail($FromEmail, '',
                   T("Sorry! You don't have permission to comment through email."), $Data);
                return TRUE;
             } elseif (!Gdn::Session()->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $PermissionCategoryID)) {
+               trace("Doesn't have Vanilla.Comments.Add for category", TRACE_WARNING);
+
                $this->SendEmail($FromEmail, '',
                   T("Sorry! You don't have permission to post right now."), $Data);
                return TRUE;
@@ -465,7 +470,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                $this->SendEmail($FromEmail, '',
                   T("Sorry! You don't have permission to post discussions/questions through email."), $Data);
                return TRUE;
-            } elseif (!Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'CategoryID', $PermissionCategoryID)) {
+            } elseif (!Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $PermissionCategoryID)) {
                Trace("Sorry! You don't have permission to post right now.", TRACE_WARNING);
 
                $this->SendEmail($FromEmail, '',
