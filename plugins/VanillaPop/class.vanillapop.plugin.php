@@ -414,7 +414,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                $this->SendEmail($FromEmail, '',
                   T("Sorry! You don't have permission to comment through email."), $Data);
                return TRUE;
-            } elseif (!Gdn::Session()->CheckPermission('Vanilla.Comments.Add', TRUE, 'CategoryID', $PermissionCategoryID)) {
+            } elseif (!Gdn::Session()->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $PermissionCategoryID)) {
                $this->SendEmail($FromEmail, '',
                   T("Sorry! You don't have permission to post right now."), $Data);
                return TRUE;
