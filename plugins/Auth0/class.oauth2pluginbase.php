@@ -34,6 +34,8 @@ class OAuth2PluginBase {
     /** @var array optional additional post parameters to be passed in the accessToken request */
     protected $requestAccessTokenParams = [];
 
+    /** @var array optional additional get params to be passed in the request for profile */
+    protected $getProfileParams = [];
     /**
      * Set up OAuth2 access properties.
      *
@@ -249,6 +251,18 @@ class OAuth2PluginBase {
     }
 
     /**
+     * Set getProfile params received from provider.
+     *
+     * @param string $accessToken Retrieved from provider to authenticate communication.
+     *
+     * @return $this Return this object for chaining purposes.
+     */
+    public function setGetProfile($accessToken) {
+        $this->accessToken = $accessToken;
+        return $this;
+    }
+
+    /**
      * Set provider key used to access settings stored in GDN_UserAuthenticationProvider.
      *
      * @param string $providerKey Key to retrieve provider data hardcoded into child class.
@@ -293,6 +307,19 @@ class OAuth2PluginBase {
      */
     public function setRequestAccessTokenParams($params) {
         $this->requestAccessTokenParams = $params;
+        return $this;
+    }
+
+
+    /**
+     * Set additional params to be added to the get string in the getProfile request.
+     *
+     * @param string $params.
+     *
+     * @return $this Return this object for chaining purposes.
+     */
+    public function setGetProfileParams($params) {
+        $this->getProfileParams = $params;
         return $this;
     }
 
@@ -611,14 +638,17 @@ class OAuth2PluginBase {
 
         $uri = $this->requireVal('ProfileUrl', $provider, "provider");
 
-        $uri .= (strpos($uri, '?') === false) ? "?" : "&";
+        $defaultParams = array(
+            'access_token' => $this->accessToken()
+        );
 
-        $uri .= "access_token=".urlencode($this->accessToken());
+        $get = array_merge($defaultParams, $this->getProfileParams);
 
-        $this->log('getProfile API call', array('ProfileUrl' => $uri));
+        $rawProfile = $this->api($uri, 'GET', $get);
 
-        $rawProfile = $this->api($uri);
         $profile = $this->translateProfileResults($rawProfile);
+
+        $this->log('getProfile API call', array('ProfileUrl' => $uri, 'Params' => $get, 'RawProfile' => $rawProfile, 'Profile' => $profile));
 
         return $profile;
     }

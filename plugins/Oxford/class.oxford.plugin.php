@@ -23,6 +23,9 @@ class OxfordPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $this
             ->setProviderKey('Oxford')
             ->setRequestAccessTokenParams(array('grant_type' => 'authorization_code', 'response_type' => 'code', 'state' => gdn::request()->get('state')));
+
+        $provider = $this->provider();
+        $this->setGetProfileParams(array('client_id' => $this->requireVal('AssociationKey', $provider, "provider")));
     }
 
     /**
@@ -38,7 +41,7 @@ class OxfordPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $provider['AuthorizeUrl'] = "$baseUrl/oauth/authorize";
         $provider['ProfileUrl'] = "$baseUrl/user.json";
         $provider['RegisterUrl'] = "$baseUrl/users/signup";
-        $provider['SignOutUrl'] = "$baseUrl/users/signout";
+        $provider['SignOutUrl'] = "$baseUrl/users/sign_out";
 
         return $provider;
     }
@@ -96,32 +99,6 @@ class OxfordPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $sender->setData('redirectUrls', $redirectUrls);
 
         $this->settingsController_oAuth2_create($sender, $args);
-    }
-
-
-
-    /**
-     * Get profile data from authentication provider through API.
-     *
-     * @return array User profile from provider.
-     */
-    public function getProfile() {
-        $provider = $this->provider();
-
-        $uri = $this->requireVal('ProfileUrl', $provider, "provider");
-
-        $uri .= (strpos($uri, '?') === false) ? "?" : "&";
-
-        $uri .= "access_token=".urlencode($this->accessToken());
-
-        $uri .= "&client_id=" . $this->requireVal('AssociationKey', $provider, "provider");
-
-        $this->log('getProfile API call', array('ProfileUrl' => $uri));
-
-        $rawProfile = $this->api($uri);
-        $profile = $this->translateProfileResults($rawProfile['user']);
-
-        return $profile;
     }
 
 
@@ -191,7 +168,7 @@ class OxfordPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
      * @return array Profile with Vanilla keys.
      */
     public function translateProfileResults($rawProfile = array()) {
-        $profile = arrayTranslate($rawProfile, [
+        $profile = arrayTranslate($rawProfile['user'], [
             'email' => 'Email',
             'provider' => 'Provider',
             'picture' => 'Photo',
