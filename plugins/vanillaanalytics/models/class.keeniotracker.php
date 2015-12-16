@@ -127,8 +127,7 @@ class KeenIOTracker implements TrackerInterface {
      * @return array Body of response from keen.io
      */
     public function event($collection, $data = array()) {
-        $data = array_merge($data, $this->getDefaultData());
-
+        $this->addDefaultData($data);
         return $this->client->addEvent($collection, $data);
     }
 }
