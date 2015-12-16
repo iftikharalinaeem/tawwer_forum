@@ -340,6 +340,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                } else {
                   $SaveType = 'Comment';
                   $Data['DiscussionID'] = $ReplyID;
+                  $Data['CategoryID'] = val('CategoryID', $Discussion);
                }
 
                break;
@@ -407,7 +408,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
          $PermissionCategoryID = -1;
       }
 
-      Trace("Save type: {$SaveType}, Permission Category ID: {$PermissionCategoryID}");
+      trace("Save type: {$SaveType}, Permission Category ID: {$PermissionCategoryID}");
 
       switch ($SaveType) {
          case 'Comment':
