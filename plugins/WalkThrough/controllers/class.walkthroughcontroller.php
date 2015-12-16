@@ -47,12 +47,14 @@ class WalkthroughController extends PluginController {
     public function skip() {
         $tourName = Gdn::request()->post('TourName');
 
+        $userID = Gdn::session()->UserID;
+        $tourState = WalkThroughPlugin::instance()->getTourState($userID);
+
         // Delegate to the plugin
         $result = $this->plugin->setSkipped($tourName);
 
-        $userID = Gdn::session()->UserID;
         $this->EventArguments['TourName'] = $tourName;
-        $this->EventArguments['TourState'] = WalkThroughPlugin::instance()->getTourState($userID);
+        $this->EventArguments['TourState'] = $tourState;
         $this->fireEvent('skipped');
 
         $this->renderData(['Result' => $result]);
