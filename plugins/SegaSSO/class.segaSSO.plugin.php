@@ -255,13 +255,17 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
             $dateOfBirth = val("DateOfBirth", $formValues, null);
             $verified = val("Verified", $formValues, null);
             $titles_owned = val("titles_owned", $formValues);
+            $unconfirmedUserRole = c('Plugins.SegaSSO.UnconfirmedRole');
+            if(!$verified) {
+                $rolesList = $unconfirmedUserRole;
+            }
             if(is_array($titles_owned) && !empty($titles_owned)) {
                 $rolesList = $sender->Form->getFormValue('Roles');
                 foreach ($titles_owned as $title) {
                     $rolesList .= $title['title_name'] . ",";
                 }
-                $sender->Form->setFormValue('Roles', strtolower($rolesList), null);
             }
+            $sender->Form->setFormValue('Roles', strtolower($rolesList), null);
         }
 
         if($dateOfBirth) {
@@ -271,7 +275,6 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         if($verified) {
             $sender->Form->setFormValue('Verified', $verified);
         }
-
 
     }
 
