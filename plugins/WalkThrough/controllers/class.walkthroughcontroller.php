@@ -52,7 +52,7 @@ class WalkthroughController extends PluginController {
 
         $userID = Gdn::session()->UserID;
         $this->EventArguments['TourName'] = $tourName;
-        $this->EventArguments['TourState'] = WalkThroughPlugin::getTourState($userID);
+        $this->EventArguments['TourState'] = WalkThroughPlugin::instance()->getTourState($userID);
         $this->fireEvent('skipped');
 
         $this->renderData(['Result' => $result]);
