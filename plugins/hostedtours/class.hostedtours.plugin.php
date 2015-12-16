@@ -172,7 +172,7 @@ TOOLTIP
 <div class="intro-box">
     <b class="intro-heading">Time to get started!</b>
     <p>Now that you have a basic idea of how your community works, it's a good time to post a discussion and start exploring Vanilla's features for yourself! If you want to take the tour again, just visit the dashboard and click "Take the Tour!" at the top right.</p>
-    <p>If you run into problems, just contact our famously helpful support team - <a href="support@vanillaforums.com">support@vanillaforums.com</a></p>
+    <p>If you run into problems, just contact our famously helpful support team by email at <a href="support@vanillaforums.com">support@vanillaforums.com</a></p>
     <p>Good luck!</p>
 </div>
 TOOLTIP
