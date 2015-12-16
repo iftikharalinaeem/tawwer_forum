@@ -264,7 +264,10 @@ TOOLTIP
         }
         $tourKey = val('key', $tour);
 
-        $this->completion($tourKey, false);
+        $tourState = val('TourState', $sender->EventArguments);
+        $tourStep = val('stepIndex', $tourState, null);
+
+        $this->completion($tourKey, false, $tourStep);
     }
 
     /**
@@ -273,20 +276,38 @@ TOOLTIP
      * @param string $tourKey
      * @param boolean $skipped
      */
-    protected function completion($tourKey, $skipped = false) {
+    protected function completion($tourKey, $skipped = false, $tourStep = null) {
         $userName = val('Name', Gdn::session()->User);
         $userEmail = val('Email', Gdn::session()->User);
         $siteName = Infrastructure::site('name');
+        $userSlug = "<b>{$userName}</b> ({$userEmail})";
 
         $tour = HostedToursPlugin::getTour($tourKey);
         $tourName = val('name', $tour);
+        $tourSlug = "<b>{$tourName}</b>";
 
         $completionType = $skipped ? 'skipped' : 'completed';
-        $completionColor = $skipped ? HipNotify::COLOR_YELLOW : HipNotify::COLOR_GREEN;
-        Infrastructure::notify(Infrastructure::ROOM_NOTIFICATIONS, 0)
-                ->color($completionColor)
-                ->message(sprintf('<b>%s</b> (%s) %s <b>%s</b> on %s', $userName, $userEmail, $completionType, $tourName, $siteName))
-                ->send();
+        switch ($completionType) {
+            case 'skipped':
+                $tourStepText = '';
+                if (!is_null($tourStep)) {
+                    $tourStepData = valr("steps.{$tourStep}", $tour);
+                    $stepName = strip_tags(val('title', $tourStepData));
+                    $tourStepText = " at <b>{$stepName}</b> step ";
+                }
+                Infrastructure::notify(Infrastructure::ROOM_NOTIFICATIONS, 0)
+                        ->color(HipNotify::COLOR_RED)
+                        ->message("{$userSlug} skipped {$tourSlug}{$tourStepText} on {$siteName}")
+                        ->send();
+                break;
+
+            case 'completed':
+                Infrastructure::notify(Infrastructure::ROOM_NOTIFICATIONS, 0)
+                        ->color(HipNotify::COLOR_GREEN)
+                        ->message("{$userSlug} completed {$tourSlug} on {$siteName}")
+                        ->send();
+                break;
+        }
     }
 
     /**
