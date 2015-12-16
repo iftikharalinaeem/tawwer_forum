@@ -248,7 +248,10 @@ TOOLTIP
         }
         $tourKey = val('key', $tour);
 
-        $this->completion($tourKey, true);
+        $tourState = val('TourState', $sender->EventArguments);
+        $tourStep = val('stepIndex', $tourState, null);
+
+        $this->completion($tourKey, true, $tourStep);
     }
 
     /**
@@ -264,10 +267,7 @@ TOOLTIP
         }
         $tourKey = val('key', $tour);
 
-        $tourState = val('TourState', $sender->EventArguments);
-        $tourStep = val('stepIndex', $tourState, null);
-
-        $this->completion($tourKey, false, $tourStep);
+        $this->completion($tourKey, false);
     }
 
     /**
