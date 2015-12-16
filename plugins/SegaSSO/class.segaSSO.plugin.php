@@ -259,13 +259,13 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
             if(!$verified) {
                 $rolesList = $unconfirmedUserRole;
             }
-            if(is_array($titles_owned) && !empty($titles_owned)) {
-                $rolesList = $sender->Form->getFormValue('Roles');
-                foreach ($titles_owned as $title) {
-                    $rolesList .= $title['title_name'] . ",";
-                }
-            }
-            $sender->Form->setFormValue('Roles', strtolower($rolesList), null);
+//            if(is_array($titles_owned) && !empty($titles_owned)) {
+//                $rolesList = $sender->Form->getFormValue('Roles');
+//                foreach ($titles_owned as $title) {
+//                    $rolesList .= $title['title_name'] . ",";
+//                }
+//            }
+//            $sender->Form->setFormValue('Roles', strtolower($rolesList), null);
         }
 
         if($dateOfBirth) {
@@ -280,6 +280,36 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
 
     public function profileController_AfterPreferencesDefined_handler() {
         trace(gdn::session()->User, "User");
+    }
+
+    public function userModel_afterSave_handler($sender, $args) {
+        $titlesRoles = 'coh2,COH2,Moderator';
+        $userID = val('UserID', $args);
+        $fields = val('Fields', $args);
+
+
+        // The $RoleIDs are a comma delimited list of role names.
+        $titleRoleNames = array_map('trim', explode(',', $titlesRoles));
+        $titleRoleIDs = $sender->SQL
+            ->select('r.RoleID')
+            ->from('Role r')
+            ->whereIn('r.Name', $titleRoleNames)
+            ->get()->resultArray();
+        $titleRoleIDs = array_column($titleRoleIDs, 'RoleID');
+        $titleRoleList = implode(',', $titleRoleIDs);
+
+        $sender->SQL->whereIn('RoleID', "$titleRoleList")->delete('UserRole', array('UserID' => $userID));
+        $attributes = @unserialize($fields['Attributes']);
+
+        $titlesOwned = $attributes['SegaSSO']['Profile']['titles_owned'];
+
+        foreach($titlesOwned as $title) {
+            $titleRoleIDs = $sender->SQL->select('r.RoleID')->from('Role r')->where('r.Name', $title)->get()->resultArray();
+            $titleRoleID = array_column($titleRoleIDs, 'RoleID');
+            $sender->SQL->insert('UserRole', array('UserID' => $userID, 'RoleID' => $titleRoleID[0]));
+        }
+
+        $sender->clearCache($userID, array('roles', 'permissions'));
     }
 
 }

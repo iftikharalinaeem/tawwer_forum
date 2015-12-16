@@ -155,5 +155,4 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     public function assetModel_styleCss_handler($sender) {
         $sender->addCssFile('segaSSO.css', 'plugins/Auth0');
     }
-
 }
