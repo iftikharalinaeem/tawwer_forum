@@ -296,14 +296,14 @@ TOOLTIP
                     $stepNumber = $tourStep+1;
                     $tourStepText = " at <b>{$stepName}</b> step (#{$stepNumber}) ";
                 }
-                Infrastructure::notify(Infrastructure::ROOM_NOTIFICATIONS, 0)
+                Infrastructure::notify(Infrastructure::ROOM_SALES, 1)
                         ->color(HipNotify::COLOR_RED)
                         ->message("{$userSlug} skipped {$tourSlug}{$tourStepText} on {$siteName}")
                         ->send();
                 break;
 
             case 'completed':
-                Infrastructure::notify(Infrastructure::ROOM_NOTIFICATIONS, 0)
+                Infrastructure::notify(Infrastructure::ROOM_SALES, 1)
                         ->color(HipNotify::COLOR_GREEN)
                         ->message("{$userSlug} completed {$tourSlug} on {$siteName}")
                         ->send();
