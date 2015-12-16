@@ -73,16 +73,26 @@ class DebugbarPlugin extends Gdn_Plugin {
             return;
         }
 
+        $strings = [];
         foreach ($traces as $info) {
             list($message, $type) = $info;
 
             if ($message instanceof \Exception) {
                 $exceptions->addException($message);
+
+                if ($message instanceof \ErrorException && $type === TRACE_NOTICE) {
+                    // Display notices as messages so devs don't freak out too much.
+                    $str = $message->getMessage().' ('.$message->getFile(). ' line '.$message->getLine().')';
+                    if (!isset($strings[$str])) {
+                        $strings[$str] = true;
+                        $messages->notice($str);
+                    }
+                }
                 continue;
             }
 
             if (!is_string($message)) {
-                $message = $messages->getDataFormatter()->formatVar([$message]);
+                $message = $messages->getDataFormatter()->formatVar($message);
             }
             switch ($type) {
                 case TRACE_ERROR:
@@ -124,9 +134,8 @@ class DebugbarPlugin extends Gdn_Plugin {
                 $db->addCollector($this->debugBar);
             }
 
-            $this->debugBar->addCollector(new LoggerCollector());
-            $logger = $this->debugBar['log'];
-            Logger::setLogger($this->debugBar['log']);
+            $logger = new LoggerCollector($this->debugBar['messages']);
+            Logger::setLogger($logger);
 
             $this->debugBar->addCollector(new \DebugBar\DataCollector\ConfigCollector([], 'data'));
         }
@@ -149,6 +158,9 @@ class DebugbarPlugin extends Gdn_Plugin {
      * Add the debug bar's javascript after the body.
      */
     public function base_afterBody_handler() {
+        $bar = $this->debugBar();
+        $this->addTraces($bar['messages'], $bar['exceptions']);
+
         $body = $this->jsRenderer()->render();
         echo $body;
     }
@@ -168,7 +180,6 @@ class DebugbarPlugin extends Gdn_Plugin {
         $bar = $this->debugBar();
         $bar['time']->stopMeasure('controller');
 
-        $this->addTraces($bar['messages'], $bar['exceptions']);
         $bar['data']->setData($sender->Data);
 
 
@@ -178,9 +189,15 @@ class DebugbarPlugin extends Gdn_Plugin {
             return;
         }
 
-        $head = $this->jsRenderer()->renderHead();
-
-        $sender->AddAsset('Head', $head, 'debugbar-head');
+        if (val('HTTP_X_REQUESTED_WITH', $_SERVER) === 'XMLHttpRequest') {
+            $path = Gdn::request()->path();
+            if (!in_array($path, ['dashboard/notifications/inform', 'settings/analyticstick.json'])) {
+                $this->debugBar()->sendDataInHeaders();
+            }
+        } else {
+            $head = $this->jsRenderer()->renderHead();
+            $sender->AddAsset('Head', $head, 'debugbar-head');
+        }
         $called = true;
     }
 

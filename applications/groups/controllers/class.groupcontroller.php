@@ -211,11 +211,8 @@ class GroupController extends Gdn_Controller {
          'Type' => $Value
       ));
 
-      if ($Value == 'Approved') {
-         $this->JsonTarget("#GroupApplicant_$ID", "", 'SlideUp');
-      } else {
-         $this->JsonTarget("#GroupApplicant_$ID", "Read Join-Denied", 'AddClass');
-      }
+      $this->JsonTarget("#GroupApplicant_$ID", "", 'SlideUp');
+      $this->InformMessage(t('Applicant '.$Value));
 
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
@@ -294,6 +291,8 @@ class GroupController extends Gdn_Controller {
       $Result = $this->GroupModel->JoinInvite($Group['GroupID'], Gdn::Session()->UserID, FALSE);
       $this->SetData('Result', $Result);
       $this->JsonTarget('.GroupUserHeaderModule', '', 'SlideUp');
+      $this->RedirectUrl = GroupUrl($Group);
+      $this->InformMessage(t('Invitation declined.'));
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
 
