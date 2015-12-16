@@ -9,7 +9,7 @@
 $PluginInfo['WalkThrough'] = [
     'Name' => 'Walk Through',
     'Description' => "Allow other plugins to display custom tours to users.",
-    'Version' => '0.2',
+    'Version' => '1.0',
     'RequiredApplications' => ['Vanilla' => '2.1a'],
     'Author' => 'Eric Vachaviolos',
     'AuthorEmail' => 'eric.v@vanillaforums.com',
@@ -25,6 +25,7 @@ $PluginInfo['WalkThrough'] = [
  * Changes:
  *  0.1        Initial Release
  *  0.2        Add an optional title
+ *  1.0        Production release
  *
  * @author Eric Vachaviolos <eric.v@vanillaforums.com>
  * @package internal

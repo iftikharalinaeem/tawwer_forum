@@ -13,6 +13,7 @@
  *
  * Changes:
  *  1.0a    Development release
+ *  1.0     Production release
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @package internal
@@ -21,7 +22,7 @@
 $PluginInfo['hostedtours'] = [
     'Name' => 'Hosted Tours',
     'Description' => 'Provides new user walkthrough tours for hosted customers',
-    'Version' => '1.0a',
+    'Version' => '1.0',
     'MobileFriendly' => false,
     'RequiredApplications' => [
         'Vanilla' => '2.2'
