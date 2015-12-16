@@ -1,0 +1,267 @@
+.introjsFloatingElement {
+  top: 400px;
+  margin: 0px auto;
+}
+
+.tooltip-welcome {
+  padding: 0px;
+  border-radius: 0px;
+}
+.tooltip-welcome .introjs-tooltiptext {
+  color: #363636;
+  padding: 20px;
+}
+.tooltip-welcome .introjs-tooltiptext p {
+  line-height: 20px;
+}
+.tooltip-welcome .intro-title {
+  display: block;
+  font-size: 18px;
+  padding: 10px 15px;
+  margin: -20px -20px 15px -20px;
+}
+.tooltip-welcome .intro-title i {
+  margin-right: 5px;
+}
+.tooltip-welcome .introjs-tooltipbuttons {
+  margin: 0px -0px -0px -0px;
+  padding: 5px 15px 15px 15px;
+  background: #f1f1f1;
+}
+.tooltip-welcome .introjs-tooltipbuttons .introjs-button {
+  background: transparent;
+  border: none;
+  text-shadow: none;
+  text-transform: uppercase;
+  border-radius: 0px;
+}
+.tooltip-welcome .introjs-tooltipbuttons .introjs-button.introjs-disabled {
+  color: #b1b1b1;
+}
+.tooltip-welcome .introjs-tooltipbuttons .introjs-button:hover {
+  border: none;
+  box-shadow: none;
+}
+.tooltip-welcome .introjs-tooltipbuttons .introjs-skipbutton {
+  color: #616161;
+  float: left;
+  padding: 5px 10px;
+}
+.tooltip-welcome .introjs-tooltipbuttons .introjs-prevbutton {
+  color: #616161;
+  text-align: left;
+  margin-right: 5px;
+  padding: 5px 10px;
+}
+.tooltip-welcome .introjs-tooltipbuttons .introjs-nextbutton {
+  background: #F52C6E;
+  color: #ffffff;
+  text-align: right;
+  padding: 5px 10px;
+}
+.tooltip-welcome .introjs-tooltipbuttons .introjs-nextbutton.introjs-disabled {
+  display: none;
+  color: #FF74A1;
+}
+.tooltip-welcome .intro-heading {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+}
+.tooltip-welcome.welcome-intro {
+  min-width: 350px;
+}
+.tooltip-welcome.welcome-intro .introjs-tooltiptext {
+  background: white url("images/welcome.png") no-repeat bottom left;
+  min-height: 340px;
+}
+.tooltip-welcome.welcome-intro .introjs-tooltiptext .intro-box {
+  text-align: left;
+  margin-left: 100px;
+}
+.tooltip-welcome.welcome-intro .intro-title {
+  background-color: #0291db;
+  color: white;
+  text-align: left;
+}
+.tooltip-welcome.welcome-homepage {
+  min-width: 550px;
+}
+.tooltip-welcome.welcome-homepage .introjs-tooltiptext {
+  padding-bottom: 250px;
+  margin-bottom: 10px;
+}
+.tooltip-welcome.welcome-homepage .introjs-tooltiptext .intro-frame {
+  position: relative;
+}
+.tooltip-welcome.welcome-homepage .introjs-tooltiptext .intro-frame .intro-box {
+  text-align: left;
+  width: 275px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+.tooltip-welcome.welcome-homepage .introjs-tooltiptext .intro-frame .image-homepage {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 100;
+  width: 271px;
+  height: 276px;
+  background: transparent url("images/homepage.png") no-repeat top left;
+}
+.tooltip-welcome.welcome-homepage .intro-title {
+  background-color: #f0572C;
+  color: white;
+  text-align: left;
+}
+.tooltip-welcome.welcome-homepage .introjs-nextbutton {
+  background: #f0572C;
+}
+.tooltip-welcome.welcome-dashboard {
+  min-width: 550px;
+}
+.tooltip-welcome.welcome-dashboard .introjs-tooltiptext {
+  text-align: left;
+  background: white url("images/dashboard.png") no-repeat right bottom;
+  padding-bottom: 70px;
+  margin-bottom: 0px;
+}
+.tooltip-welcome.welcome-dashboard .introjs-tooltiptext .intro-box {
+  text-align: left;
+  width: 250px;
+}
+.tooltip-welcome.welcome-dashboard .intro-title {
+  background-color: #F52C6E;
+  color: white;
+  text-align: left;
+}
+.tooltip-welcome.welcome-appearance {
+  min-width: 550px;
+}
+.tooltip-welcome.welcome-appearance .introjs-tooltiptext {
+  text-align: left;
+  background: white url("images/appearance.png") no-repeat right bottom;
+  padding-bottom: 80px;
+  margin-bottom: 0px;
+}
+.tooltip-welcome.welcome-appearance .introjs-tooltiptext .intro-box {
+  text-align: left;
+  width: 310px;
+}
+.tooltip-welcome.welcome-appearance .intro-title {
+  background-color: #1d9d74;
+  color: white;
+  text-align: left;
+}
+.tooltip-welcome.welcome-appearance .introjs-nextbutton {
+  background: #1d9d74;
+  color: #8cffda;
+}
+.tooltip-welcome.welcome-appearance .introjs-nextbutton.introjs-disabled {
+  color: #276753;
+}
+.tooltip-welcome.welcome-categories {
+  min-width: 550px;
+}
+.tooltip-welcome.welcome-categories .introjs-tooltiptext {
+  text-align: left;
+  background: white url("images/categories.png") no-repeat right bottom;
+  margin-bottom: 0px;
+  min-height: 280px;
+  position: relative;
+}
+.tooltip-welcome.welcome-categories .introjs-tooltiptext .intro-box {
+  text-align: left;
+  width: 330px;
+}
+.tooltip-welcome.welcome-categories .intro-title {
+  background-color: #0291db;
+  color: white;
+  text-align: left;
+}
+.tooltip-welcome.welcome-roles {
+  min-width: 550px;
+}
+.tooltip-welcome.welcome-roles .introjs-tooltiptext {
+  text-align: left;
+  background: white url("images/roles.png") no-repeat right bottom;
+  margin-bottom: 0px;
+  min-height: 280px;
+  position: relative;
+}
+.tooltip-welcome.welcome-roles .introjs-tooltiptext .intro-box {
+  text-align: left;
+  width: 340px;
+}
+.tooltip-welcome.welcome-roles .introjs-tooltiptext .intro-more-box {
+  text-align: left;
+  width: 280px;
+}
+.tooltip-welcome.welcome-roles .intro-title {
+  background-color: #f0572C;
+  color: white;
+  text-align: left;
+}
+.tooltip-welcome.welcome-roles .introjs-nextbutton {
+  background: #f0572C;
+}
+.tooltip-welcome.welcome-users {
+  min-width: 550px;
+}
+.tooltip-welcome.welcome-users .introjs-tooltiptext {
+  text-align: center;
+  padding-bottom: 140px;
+  margin-bottom: 10px;
+  position: relative;
+}
+.tooltip-welcome.welcome-users .introjs-tooltiptext .intro-box {
+  text-align: left;
+  width: auto;
+}
+.tooltip-welcome.welcome-users .introjs-tooltiptext .image-users {
+  position: absolute;
+  bottom: -17px;
+  left: 55px;
+  z-index: 100;
+  width: 442px;
+  height: 149px;
+  background: transparent url("images/users.png") no-repeat center center;
+}
+.tooltip-welcome.welcome-users .intro-title {
+  background-color: #1d9d74;
+  color: white;
+  text-align: left;
+}
+.tooltip-welcome.welcome-users .introjs-nextbutton {
+  background: #1d9d74;
+  color: #8cffda;
+}
+.tooltip-welcome.welcome-users .introjs-nextbutton.introjs-disabled {
+  color: #276753;
+}
+.tooltip-welcome.welcome-getstarted {
+  min-width: 550px;
+}
+.tooltip-welcome.welcome-getstarted .introjs-tooltiptext {
+  text-align: center;
+  background: white url("images/trophy.png") no-repeat right bottom;
+  min-height: 330px;
+  margin-bottom: 10px;
+  position: relative;
+}
+.tooltip-welcome.welcome-getstarted .introjs-tooltiptext .intro-box {
+  text-align: left;
+  width: 350px;
+}
+.tooltip-welcome.welcome-getstarted .intro-title {
+  background-color: #0291db;
+  color: white;
+  text-align: left;
+}
+.tooltip-welcome.welcome-getstarted .introjs-skipbutton {
+  background: #F52C6E;
+  color: #ffffff;
+  text-align: left;
+  padding: 5px 10px;
+}

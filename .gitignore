@@ -11,9 +11,9 @@ _notes
 .settings
 .buildpath
 .idea
-sso/config.php
-sso/embed.html
-sso/functions.jsconnect.php
-sso/sso.php
+login/config.php
+login/embed.html
+login/functions.jsconnect.php
+login/sso.php
 *.log
 utils/mustacher/vendor/*

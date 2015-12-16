@@ -2,6 +2,7 @@
 session_start();
 global $DB;
 $DB = mysqli_connect($C['DB.Host'], $C['DB.User'], $C['DB.Pass'], $C['DB.Name']);
+mysqli_set_charset($DB, 'utf8');
 
 
 /**
