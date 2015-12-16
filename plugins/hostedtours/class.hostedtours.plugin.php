@@ -231,7 +231,7 @@ TOOLTIP
         $userID = Gdn::session()->UserID;
         $tourName = val('name', $tour);
         if (!$this->walkthrough()->shouldUserSeeTour($userID, $tourName)) {
-            echo anchor(t('Take the Tour!'), url("/plugin/hostedtours/reset/{$tourKey}"), 'reset-tour');
+            echo anchor(t('Take the Tour!'), url("/hostedtours/reset/{$tourKey}"), 'reset-tour');
         }
     }
 

@@ -34,7 +34,7 @@ class HostedToursController extends Gdn_Controller {
 
         $tourName = val('name', $tour);
         $userID = Gdn::session()->UserID;
-        $this->walkthrough()->resetTour($userID, $tourName);
+        HostedToursPlugin::walkthrough()->resetTour($userID, $tourName);
         redirect('/');
     }
 
