@@ -256,7 +256,7 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
             $verified = val("Verified", $formValues, null);
             $titles_owned = val("titles_owned", $formValues);
             if(is_array($titles_owned) && !empty($titles_owned)) {
-                $rolesList = null;
+                $rolesList = $sender->Form->getFormValue('Roles');
                 foreach ($titles_owned as $title) {
                     $rolesList .= $title['title_name'] . ",";
                 }
