@@ -23,7 +23,7 @@ class WalkthroughController extends PluginController {
      */
     public function __construct() {
         parent::__construct();
-        $this->plugin = Gdn::pluginManager()->getPluginInstance('WalkThroughPlugin', Gdn_PluginManager::ACCESS_CLASSNAME);
+        $this->plugin = WalkThroughPlugin::instance();
     }
 
     /**
@@ -34,6 +34,9 @@ class WalkthroughController extends PluginController {
 
         // Delegate to the plugin
         $result = $this->plugin->setComplete($tourName);
+
+        $this->EventArguments['TourName'] = $tourName;
+        $this->fireEvent('completed');
 
         $this->renderData(['Result' => $result]);
     }
@@ -46,6 +49,11 @@ class WalkthroughController extends PluginController {
 
         // Delegate to the plugin
         $result = $this->plugin->setSkipped($tourName);
+
+        $userID = Gdn::session()->UserID;
+        $this->EventArguments['TourName'] = $tourName;
+        $this->EventArguments['TourState'] = WalkThroughPlugin::getTourState($userID);
+        $this->fireEvent('skipped');
 
         $this->renderData(['Result' => $result]);
     }

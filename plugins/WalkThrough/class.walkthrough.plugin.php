@@ -75,7 +75,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return;
         }
 
-        $tourState = $this->loadTourState(Gdn::session()->UserID);
+        $tourState = $this->getTourState(Gdn::session()->UserID);
         $currentStepIndex = val('stepIndex', $tourState, 0);
 
         $options = array_merge($this->tourOptions, [
@@ -115,7 +115,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
 
         $this->requestedTourNames[$tourName] = true;
 
-        $tourState = $this->loadTourState($userID);
+        $tourState = $this->getTourState($userID);
         $runningTourName = val('name', $tourState);
         if ($runningTourName && $runningTourName != $tourName) {
             // A user must finish a tour before seeing a different one
@@ -146,7 +146,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
         $this->tourName = $tourName;
         $this->setTourConfig($tourConfig);
 
-        $tourState = $this->loadTourState($userID);
+        $tourState = $this->getTourState($userID);
 
         // Setup the tour state if it's the first time we load this tour.
         // This way, tours are treated first come, first serve
@@ -174,7 +174,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
     public function resetTour($userID, $tourName) {
         $this->setUserMeta($userID, $this->getMetaKeyForCompleted($tourName));
 
-        $tourState = $this->loadTourState($userID);
+        $tourState = $this->getTourState($userID);
         if (val('name', $tourState) == $tourName) {
             $this->deleteTourState($userID);
         }
@@ -244,7 +244,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return false;
         }
         $userID = (int) Gdn::session()->UserID;
-        $tourState = $this->loadTourState($userID);
+        $tourState = $this->getTourState($userID);
         $runningTourName = val('name', $tourState);
         if ($runningTourName && $runningTourName != $tourName) {
             return false;
@@ -377,7 +377,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
             return;
         }
 
-        $tourState = $this->loadTourState($userID);
+        $tourState = $this->getTourState($userID);
         $tourName = val('name', $tourState);
         if (!isset($this->requestedTourNames[$tourName])) {
             $this->deleteTourState($userID);
@@ -390,7 +390,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * @param int $userID
      * @return array Returns an array describing the tour state.  Defaults to empty array if not found
      */
-    private function loadTourState($userID) {
+    public function getTourState($userID) {
         return json_decode($this->getUserMeta($userID, 'TourState', '{}', true), true);
     }
 
@@ -399,7 +399,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
      *
      * @param int $userID
      */
-    private function deleteTourState($userID) {
+    public function deleteTourState($userID) {
         $this->setUserMeta($userID, 'TourState', null);
     }
 
@@ -409,7 +409,7 @@ class WalkThroughPlugin extends Gdn_Plugin {
      * @param int $userID
      * @param array $state The array describing the tour state.
      */
-    private function persistTourState($userID, $state) {
+    protected function persistTourState($userID, $state) {
         $this->setUserMeta($userID, 'TourState', json_encode($state));
     }
 }
