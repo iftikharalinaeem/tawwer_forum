@@ -72,6 +72,7 @@
             padding: 5px 10px;
             
             &.introjs-disabled {
+                display: none;
                 color: #FF74A1;
             }
         }
@@ -84,12 +85,16 @@
     }
     
     &.welcome-intro {
-        min-width: 250px;
+        min-width: 350px;
         
         .introjs-tooltiptext {
-            text-align: center;
-            background: white url('images/rocket.png') no-repeat center bottom;
-            padding-bottom: 180px;
+            background: white url('images/welcome.png') no-repeat bottom left;
+            min-height: 340px;
+            
+            .intro-box {
+                text-align: left;
+                margin-left: 100px;
+            }
         }
 
         .intro-title {
@@ -103,7 +108,6 @@
         min-width: 550px;
         
         .introjs-tooltiptext {
-            text-align: center;
             padding-bottom: 250px;
             margin-bottom: 10px;
             
@@ -287,6 +291,45 @@
             &.introjs-disabled {
                 color: #276753;
             }
+        }
+    }
+    
+    &.welcome-getstarted {
+        min-width: 550px;
+        
+        .introjs-tooltiptext {
+            text-align: center;
+            padding-bottom: 140px;
+            margin-bottom: 10px;
+            position: relative;
+                
+            .intro-box {
+                text-align: left;
+                width: auto;
+            }
+
+            .image-users {
+                position: absolute;
+                bottom: -17px;
+                left: 55px;
+                z-index: 100;
+                width: 442px;
+                height: 149px;
+                background: transparent url('images/users.png') no-repeat center center;
+            }
+        }
+
+        .intro-title {
+            background-color: #0291db;
+            color: white;
+            text-align: left;
+        }
+        
+        .introjs-skipbutton {
+            background: #F52C6E;
+            color: #ffffff;
+            text-align: left;
+            padding: 5px 10px;
         }
     }
     

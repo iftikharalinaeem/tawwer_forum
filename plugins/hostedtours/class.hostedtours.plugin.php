@@ -64,8 +64,11 @@ class HostedToursPlugin extends Gdn_Plugin {
                     'title' => '<i class="fa fa-heart-o"></i> Welcome!',
                     'tooltipClass' => 'tooltip-welcome welcome-intro',
                     'intro' => <<<TOOLTIP
-<b class="intro-heading">Thanks for signing up!</b>
-Let's spend a few minutes getting familiar with some of the features available in your new Vanilla Community, shall we?
+<div class="intro-box">
+    <b class="intro-heading">Thanks for signing up!</b>
+    <p>Vanilla is a powerful community platform with <i>tons of features</i> to offer.</p>
+    <p>We're very keen to make sure your community is a big success, so let's spend a few minutes getting familiar with some of those features, shall we?</p>
+</div>
 TOOLTIP
 ,
                 ],
@@ -163,12 +166,12 @@ TOOLTIP
                 ],
                 [
                     'page' => '/',
-                    'title' => '<i class="fa fa-star-o"></i> Congratulations',
+                    'title' => '<i class="fa fa-trophy"></i> Congratulations',
                     'tooltipClass' => 'tooltip-welcome welcome-getstarted',
                     'intro' => <<<TOOLTIP
 <div class="intro-box">
     <b class="intro-heading">Time to get started!</b>
-    <p>Now that you have a basic idea of how your community works, it's a good time to post a discussion and start exploring Vanilla's features for yourself! If you want to take the tour again, just visit the "Help & Tutorials" section in the dashboard.</p>
+    <p>Now that you have a basic idea of how your community works, it's a good time to post a discussion and start exploring Vanilla's features for yourself! If you want to take the tour again, just visit the dashboard and click "Take the Tour!" at the top right.</p>
     <p>If you run into problems, just contact our famously helpful support team - <a href="support@vanillaforums.com">support@vanillaforums.com</a></p>
     <p>Good luck!</p>
 </div>
@@ -178,15 +181,6 @@ TOOLTIP
             ]
         ]
     ];
-
-    public function pluginController_rtours_create($sender) {
-        $tourKey = 'welcome';
-        $tour = HostedToursPlugin::$tours[$tourKey];
-        $tourName = val('name', $tour);
-
-        $userID = Gdn::session()->UserID;
-        $this->walkthrough()->resetTour($userID, $tourName);
-    }
 
     /**
      * Push tours
@@ -216,6 +210,113 @@ TOOLTIP
     }
 
     /**
+     * Show 're-take the tour' button
+     *
+     * @param type $sender
+     */
+    public function base_beforeUserOptionsMenu_handler($sender) {
+        if (!Gdn::session()->isValid()) {
+            return;
+        }
+
+        if (Gdn::session()->User->Admin !== 1) {
+            return false;
+        }
+
+        // Show tour button
+
+        $tourKey = 'welcome';
+        $tour = HostedToursPlugin::$tours[$tourKey];
+
+        $userID = Gdn::session()->UserID;
+        $tourName = val('name', $tour);
+        if (!$this->walkthrough()->shouldUserSeeTour($userID, $tourName)) {
+            echo anchor(t('Take the Tour!'), url("/plugin/hostedtours/reset/{$tourKey}"), 'reset-tour');
+        }
+    }
+
+    /**
+     * Hook for tour skip
+     *
+     * @param WalkthroughController $sender
+     */
+    public function walkthroughController_skipped_handler($sender) {
+        $tourName = val('TourName', $sender->EventArguments);
+        $tour = self::getTourByName($tourName);
+        if (!$tour) {
+            return;
+        }
+        $tourKey = val('key', $tour);
+
+        $this->completion($tourKey, true);
+    }
+
+    /**
+     * Hook for tour completion
+     *
+     * @param WalkthroughController $sender
+     */
+    public function walkthroughController_completed_handler($sender) {
+        $tourName = val('TourName', $sender->EventArguments);
+        $tour = self::getTourByName($tourName);
+        if (!$tour) {
+            return;
+        }
+        $tourKey = val('key', $tour);
+
+        $this->completion($tourKey, false);
+    }
+
+    /**
+     * Note tour completion
+     *
+     * @param string $tourKey
+     * @param boolean $skipped
+     */
+    protected function completion($tourKey, $skipped = false) {
+        $userName = val('Name', Gdn::session()->User);
+        $userEmail = val('Email', Gdn::session()->User);
+        $siteName = Infrastructure::site('name');
+
+        $tour = HostedToursPlugin::getTour($tourKey);
+        $tourName = val('name', $tour);
+
+        $completionType = $skipped ? 'skipped' : 'completed';
+        $completionColor = $skipped ? HipNotify::COLOR_YELLOW : HipNotify::COLOR_GREEN;
+        Infrastructure::notify(Infrastructure::ROOM_NOTIFICATIONS, 0)
+                ->color($completionColor)
+                ->message(sprintf('<b>%s</b> (%s) %s <b>%s</b> on %s', $userName, $userEmail, $completionType, $tourName, $siteName))
+                ->send();
+    }
+
+    /**
+     * Get a tour array
+     *
+     * @param string $tourKey
+     * @return array|false
+     */
+    public static function getTour($tourKey) {
+        return valr($tourKey, self::$tours, false);
+    }
+
+    /**
+     * Get a tour array by name
+     *
+     * @param string $tourName
+     * @return array|false
+     */
+    public static function getTourByName($tourName) {
+        foreach (self::$tours as $tourKey => $tour) {
+            $thisTourName = $tour['name'];
+            if ($thisTourName == $tourName) {
+                $tour['key'] = $tourKey;
+                return $tour;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Pre parse a tour to prepare it for WalkThrough
      *
      * @param array $tour
@@ -236,6 +337,13 @@ TOOLTIP
         }
         setvalr('options.cssFile', $tour, $cssFile);
 
+        // Prepare completion steps
+
+        $tour['options'] = array_merge($tour['options'], [
+            'onComplete' => url('/plugin/hostedtours/completion/welcome'),
+            'onSkip' => url('/plugin/hostedtours/completion/welcome/skipped')
+        ]);
+
         return $tour;
     }
 
@@ -245,7 +353,7 @@ TOOLTIP
      * @staticvar WalkthroughPlugin $instance
      * @return WalkthroughPlugin
      */
-    protected function walkthrough() {
+    public function walkthrough() {
         static $instance = null;
         if (!($instance instanceof WalkThroughPlugin)) {
             $instance = WalkThroughPlugin::instance();
