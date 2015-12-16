@@ -293,7 +293,8 @@ TOOLTIP
                 if (!is_null($tourStep)) {
                     $tourStepData = valr("steps.{$tourStep}", $tour);
                     $stepName = strip_tags(val('title', $tourStepData));
-                    $tourStepText = " at <b>{$stepName}</b> step ";
+                    $stepNumber = $tourStep+1;
+                    $tourStepText = " at <b>{$stepName}</b> step (#{$stepNumber}) ";
                 }
                 Infrastructure::notify(Infrastructure::ROOM_NOTIFICATIONS, 0)
                         ->color(HipNotify::COLOR_RED)
