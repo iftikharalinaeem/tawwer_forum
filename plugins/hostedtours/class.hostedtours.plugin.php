@@ -189,7 +189,7 @@ TOOLTIP
      * @param Gdn_Dispatcher $sender
      */
     public function gdn_dispatcher_appStartup_handler($sender) {
-        if (!Gdn::session()->isValid()) {
+        if (!Gdn::session()->isValid() || isMobile()) {
             return;
         }
 
@@ -216,7 +216,7 @@ TOOLTIP
      * @param type $sender
      */
     public function base_beforeUserOptionsMenu_handler($sender) {
-        if (!Gdn::session()->isValid()) {
+        if (!Gdn::session()->isValid() || isMobile()) {
             return;
         }
 
