@@ -298,7 +298,7 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         // Delete all the roles associated with game titles in case the user no longer owns it.
         $titleRoleIDs = array_column($titleRoleIDs, 'RoleID');
         $delete = $sender->SQL->whereIn('RoleID', $titleRoleIDs)->delete('UserRole', array('UserID' => $userID));
-        $this->log("Titles Deleted in After Signin", $userAttributes);
+        $this->log("Titles Deleted in After Signin", $titleRoleIDs);
 
         $this->log("Session Attributes in After Signin", $userAttributes);
 
