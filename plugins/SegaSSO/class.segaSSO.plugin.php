@@ -247,25 +247,18 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $sender->addDefinition('logoutURL', $logoutURL);
     }
 
-
+    /**
+     * Add form fields to update the user with the properly formatted date and verified.
+     *
+     * @param $sender
+     * @param $args
+     */
     public function entryController_OAuth_handler($sender, $args) {
         $formValues = $sender->Form->FormValues();
 
         if($formValues) {
             $dateOfBirth = val("DateOfBirth", $formValues, null);
             $verified = val("Verified", $formValues, null);
-            $titles_owned = val("titles_owned", $formValues);
-            $unconfirmedUserRole = c('Plugins.SegaSSO.UnconfirmedRole');
-            if(!$verified) {
-                $rolesList = $unconfirmedUserRole;
-            }
-//            if(is_array($titles_owned) && !empty($titles_owned)) {
-//                $rolesList = $sender->Form->getFormValue('Roles');
-//                foreach ($titles_owned as $title) {
-//                    $rolesList .= $title['title_name'] . ",";
-//                }
-//            }
-//            $sender->Form->setFormValue('Roles', strtolower($rolesList), null);
         }
 
         if($dateOfBirth) {
@@ -282,29 +275,42 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         trace(gdn::session()->User, "User");
     }
 
-    public function userModel_afterSave_handler($sender, $args) {
-        $titlesRoles = 'coh2,COH2,Moderator';
-        $userID = val('UserID', $args);
-        $fields = val('Fields', $args);
+    /**
+     * Update roles after signin with the roles that are associated with titles owned by the user.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function userModel_afterSignIn_handler($sender, $args) {
+        $titlesRoles = c('Plugins.SegaSSO.TitlesRoles');
+        $unverifiedRole = c('Plugins.SegaSSO.UnverifiedRole');
 
+        $userID = gdn::session()->UserID;
+        $user = gdn::session()->User;
+        $userAttributes = gdn::session()->getAttributes();
 
-        // The $RoleIDs are a comma delimited list of role names.
+        // The $RoleIDs are a comma delimited list of game title role names in the config.
+        // Get the ID numbers of each role.
         $titleRoleNames = array_map('trim', explode(',', $titlesRoles));
         $titleRoleIDs = $sender->SQL
             ->select('r.RoleID')
             ->from('Role r')
             ->whereIn('r.Name', $titleRoleNames)
             ->get()->resultArray();
+
+        // Delete all the roles associated with game titles in case the user no longer owns it.
         $titleRoleIDs = array_column($titleRoleIDs, 'RoleID');
-        $titleRoleList = implode(',', $titleRoleIDs);
+        $delete = $sender->SQL->whereIn('RoleID', $titleRoleIDs)->delete('UserRole', array('UserID' => $userID));
 
-        $sender->SQL->whereIn('RoleID', "$titleRoleList")->delete('UserRole', array('UserID' => $userID));
-        $attributes = @unserialize($fields['Attributes']);
+        $this->log("Session Attributes in After Signin", $userAttributes);
 
-        $titlesOwned = $attributes['SegaSSO']['Profile']['titles_owned'];
+        // Get the titles currently owned by the user.
+        $titlesOwned = $userAttributes['SegaSSO']['Profile']['titles_owned'];
+        $this->log("Titles Owned in After Signin", $titlesOwned);
 
+        // Update user roles with the role associated with the game title the user currently owns.
         foreach($titlesOwned as $title) {
-            $titleRoleIDs = $sender->SQL->select('r.RoleID')->from('Role r')->where('r.Name', $title)->get()->resultArray();
+            $titleRoleIDs = $sender->SQL->select('r.RoleID')->from('Role r')->where('r.Name', $title['title_name'])->get()->resultArray();
             $titleRoleID = array_column($titleRoleIDs, 'RoleID');
             $sender->SQL->insert('UserRole', array('UserID' => $userID, 'RoleID' => $titleRoleID[0]));
         }
