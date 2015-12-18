@@ -271,14 +271,20 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
             $sender->Form->setFormValue('DateOfBirth', date('Y-m-d', $dateOfBirth));
         }
 
+        $roleModel = new RoleModel();
+
         if($verified) {
             $sender->Form->setFormValue('Verified', $verified);
-            $defaultRole = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
-            $sender->Form->setFormValue('Roles', $defaultRole);
+            $defaultRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
         } else {
-            $unverifiedUserRole = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
-            $sender->Form->setFormValue('Roles', $unverifiedUserRole);
+            $defaultRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
         }
+
+        $roleList = null;
+        foreach($defaultRoleIDs as $roleID) {
+            $roleList .= val("Name", $roleModel->getByRoleID($roleID)) . ",";
+        }
+        $sender->Form->setFormValue('Roles', $roleList);
 
     }
 
