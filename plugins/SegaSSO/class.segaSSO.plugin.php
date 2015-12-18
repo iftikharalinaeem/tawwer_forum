@@ -236,7 +236,13 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
 //        $sender->addJsFile('https://test-sso.reliclink.com/html/sdk/v1/reliclink.js', '', array('AddVersion' => array('AddVersion' => true, 'id' => 'reliclinksdk')));
 //        $sender->addJsFile('managesession.js', 'plugins/SegaSSO', array('id' => 'reliclinksdk', 'class' => 'reliclickn', 'things'=>'stuff'));
 
-        $loggedIn = (gdn::session()->UserID) ? true : false;
+        $user = gdn::session()->User;
+
+        if($user && !$user->Verified) {
+            $sender->addDefinition('UnconfirmedUser', 1);
+        }
+
+        $loggedIn = ($user) ? true : false;
         $sender->addDefinition('userLoggedIn', $loggedIn);
 
         $provider = $this->provider();
@@ -267,6 +273,11 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
 
         if($verified) {
             $sender->Form->setFormValue('Verified', $verified);
+            $defaultRole = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
+            $sender->Form->setFormValue('Roles', $defaultRole);
+        } else {
+            $unverifiedUserRole = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
+            $sender->Form->setFormValue('Roles', $unverifiedUserRole);
         }
 
     }
