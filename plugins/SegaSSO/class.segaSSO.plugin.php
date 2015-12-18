@@ -274,7 +274,6 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $roleModel = new RoleModel();
 
         if($verified) {
-            $sender->Form->setFormValue('Verified', $verified);
             $defaultRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
         } else {
             $defaultRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
