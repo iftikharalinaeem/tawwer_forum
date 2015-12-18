@@ -236,7 +236,13 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
 //        $sender->addJsFile('https://test-sso.reliclink.com/html/sdk/v1/reliclink.js', '', array('AddVersion' => array('AddVersion' => true, 'id' => 'reliclinksdk')));
 //        $sender->addJsFile('managesession.js', 'plugins/SegaSSO', array('id' => 'reliclinksdk', 'class' => 'reliclickn', 'things'=>'stuff'));
 
-        $loggedIn = (gdn::session()->UserID) ? true : false;
+        $user = gdn::session()->User;
+
+        if($user && !$user->Verified) {
+            $sender->addDefinition('UnconfirmedUser', 1);
+        }
+
+        $loggedIn = ($user) ? true : false;
         $sender->addDefinition('userLoggedIn', $loggedIn);
 
         $provider = $this->provider();
@@ -265,9 +271,19 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
             $sender->Form->setFormValue('DateOfBirth', date('Y-m-d', $dateOfBirth));
         }
 
+        $roleModel = new RoleModel();
+
         if($verified) {
-            $sender->Form->setFormValue('Verified', $verified);
+            $defaultRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
+        } else {
+            $defaultRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
         }
+
+        $roleList = null;
+        foreach($defaultRoleIDs as $roleID) {
+            $roleList .= val("Name", $roleModel->getByRoleID($roleID)) . ",";
+        }
+        $sender->Form->setFormValue('Roles', $roleList);
 
     }
 
