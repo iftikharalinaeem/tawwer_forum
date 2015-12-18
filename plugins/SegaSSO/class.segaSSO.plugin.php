@@ -112,7 +112,9 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
      */
     public function entryController_segaSSO_create($sender, $code = false, $state = false) {
         if ($error = $sender->Request->get('error')) {
-            throw new Gdn_UserException($error);
+            // Sega asked to send users to home page if it fails.
+            redirect('/');
+            //throw new Gdn_UserException($error);
         }
 
         Gdn::session()->stash($this->getProviderKey()); // remove any stashed provider data.
