@@ -214,7 +214,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         $Sender->ReactionsVersion = 2;
 
         $OrderBy = self::CommentOrder();
-        list($OrderColumn, $OrderDirection) = explode(' ', GetValue('0', self::CommentOrder()));
+        list($OrderColumn, $OrderDirection) = explode(' ', val('0', $OrderBy));
         $OrderColumn = StringBeginsWith($OrderColumn, 'c.', TRUE, TRUE);
 
         // Send back comment order for non-api calls.
