@@ -35,6 +35,19 @@ class HostedToursController extends Gdn_Controller {
         $tourName = val('name', $tour);
         $userID = Gdn::session()->UserID;
         HostedToursPlugin::walkthrough()->resetTour($userID, $tourName);
+
+        $userName = val('Name', Gdn::session()->User);
+        $userEmail = val('Email', Gdn::session()->User);
+        $siteName = Infrastructure::site('name');
+        $userSlug = "<b>{$userName}</b> ({$userEmail})";
+        $tourSlug = "<b>{$tourName}</b>";
+
+        // Notify
+        Infrastructure::notify(Infrastructure::ROOM_SALES, 1)
+                ->color(HipNotify::COLOR_PURPLE)
+                ->message("{$userSlug} wants to take the {$tourSlug} again on {$siteName}")
+                ->send();
+
         redirect('/');
     }
 

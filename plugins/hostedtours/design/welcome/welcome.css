@@ -118,6 +118,24 @@
 .tooltip-welcome.welcome-homepage .introjs-nextbutton {
   background: #f0572C;
 }
+.tooltip-welcome.welcome-mebox {
+  min-width: 300px;
+}
+.tooltip-welcome.welcome-mebox .introjs-tooltiptext {
+  margin-bottom: 0px;
+}
+.tooltip-welcome.welcome-mebox .introjs-tooltiptext .intro-box {
+  text-align: left;
+}
+.tooltip-welcome.welcome-mebox .intro-title {
+  background-color: #1d9d74;
+  color: white;
+  text-align: left;
+}
+.tooltip-welcome.welcome-mebox .introjs-nextbutton {
+  background: #1d9d74;
+  color: #8cffda;
+}
 .tooltip-welcome.welcome-dashboard {
   min-width: 550px;
 }

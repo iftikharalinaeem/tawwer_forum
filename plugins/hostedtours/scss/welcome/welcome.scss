@@ -145,6 +145,29 @@
         }
     }
     
+    &.welcome-mebox {
+        min-width: 300px;
+        
+        .introjs-tooltiptext {
+            margin-bottom: 0px;
+            
+            .intro-box {
+                text-align: left;
+            }
+        }
+
+        .intro-title {
+            background-color: #1d9d74;
+            color: white;
+            text-align: left;
+        }
+        
+        .introjs-nextbutton {
+            background: #1d9d74;
+            color: #8cffda;
+        }
+    }
+    
     &.welcome-dashboard {
         min-width: 550px;
         
