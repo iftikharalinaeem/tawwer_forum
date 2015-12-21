@@ -25,7 +25,6 @@
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
-echo $this->Form->InputPrefix;
 ?>
 
 <div class="Wrap">

@@ -199,7 +199,6 @@ class ReactionsController extends DashboardController {
     public function toggle($UrlCode, $Active) {
         $this->Permission('Garden.Community.Manage');
 
-        $this->Form->InputPrefix = '';
         if (!$this->Form->AuthenticatedPostBack()) {
             throw PermissionException('PostBack');
         }

@@ -1046,9 +1046,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
          Gdn::Session()->User->Admin = FALSE;
       }
 
-
-      $Sender->Form->InputPrefix = '';
-
       if ($Sender->Form->IsPostBack()) {
          $Data = $Sender->Form->FormValues();
          Trace('Saving data.');
@@ -1076,8 +1073,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
       try {
          Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE);
          Gdn::Session()->User->Admin = FALSE;
-
-         $Sender->Form->InputPrefix = '';
 
          if ($Sender->Form->IsPostBack()) {
             self::Log("Postback");

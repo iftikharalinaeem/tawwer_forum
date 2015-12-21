@@ -62,8 +62,7 @@ $Session = Gdn::Session();
             if (in_array(strtolower($this->ControllerName), array('discussionscontroller', 'categoriescontroller'))) {
                echo '<div class="SearchForm">';
                $Form = Gdn::Factory('Form');
-               $Form->InputPrefix = '';
-               echo 
+               echo
                   $Form->Open(array('action' => Url('/search'), 'method' => 'get')),
                   $Form->TextBox('Search'),
                   $Form->Button('Search', array('Name' => '')),

@@ -127,7 +127,6 @@ class EmailRouterController extends Gdn_Controller {
          Gdn::Session()->User->Admin = FALSE;
 
          $this->Form = new Gdn_Form();
-         $this->Form->InputPrefix = '';
 
          if ($this->Form->IsPostBack()) {
 //            self::Log("Postback");

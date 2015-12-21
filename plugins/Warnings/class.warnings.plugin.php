@@ -176,7 +176,6 @@ class WarningsPlugin extends Gdn_Plugin {
          throw NotFoundException('Warning');
       
       $Form = new Gdn_Form();
-      $Form->InputPrefix = '';
       $Sender->Form = $Form;
       
       if ($Form->AuthenticatedPostBack()) {
@@ -227,7 +226,6 @@ class WarningsPlugin extends Gdn_Plugin {
       $CurrentLevel = GetValue('Warnings.Level', $Meta, 0);
       
       $Form = new Gdn_Form();
-      $Form->InputPrefix = '';
       $Sender->Form = $Form;
       
       if (!$UserID)
@@ -236,8 +234,7 @@ class WarningsPlugin extends Gdn_Plugin {
       if ($Form->AuthenticatedPostBack()) {
          $Model = new WarningModel();
          $Form->SetModel($Model);
-         $Form->InputPrefix = '';
-         
+
          $Form->SetFormValue('WarnUserID', $UserID);
          
          if ($Form->Save()) {
