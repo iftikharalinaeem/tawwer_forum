@@ -115,9 +115,13 @@ class BadgeModel extends BadgesAppModel {
      * Get a single badge by ID, slug, or data array.
      *
      * @param mixed $Badge Int, string, or array.
-     * @return mixed Array if badge exists or false.
+     * @param string $datasetType The format for the badge.
+     * @param array $options Not used.
+     * @return array|ArrayObject|false Returns the badge or **false** if it isn't found.
      */
-    public function getID($Badge) {
+    public function getID($Badge, $datasetType = false, $options = []) {
+        $datasetType = $datasetType ?: DATASET_TYPE_ARRAY;
+
         if (is_numeric($Badge)) {
             $Result = parent::getID($Badge, DATASET_TYPE_ARRAY);
         } elseif (is_string($Badge)) {
@@ -130,6 +134,11 @@ class BadgeModel extends BadgesAppModel {
 
         if ($Result) {
             $this->calculate($Result);
+
+            if ($datasetType === DATASET_TYPE_OBJECT) {
+                $Result = new ArrayObject($Result);
+            }
+
             return $Result;
         }
 
@@ -190,15 +199,17 @@ class BadgeModel extends BadgesAppModel {
     /**
      * Insert or update badge data.
      *
-     * @param array $Data The badge we're creating or updating.
+     * @param array $data The badge we're creating or updating.
+     * @param array $settings Not used.
+     * @return int|false Returns the ID of the badge or **false** on error.
      */
-    public function save($Data) {
+    public function save($data, $settings = []) {
         // See if there is an existing badge.
-        if (val('Slug', $Data) && !val('BadgeID', $Data)) {
-            $ExistingBadge = $this->getID($Data['Slug']);
+        if (val('Slug', $data) && !val('BadgeID', $data)) {
+            $ExistingBadge = $this->getID($data['Slug']);
             if ($ExistingBadge) {
                 $Different = false;
-                foreach ($Data as $Key => $Value) {
+                foreach ($data as $Key => $Value) {
                     if (array_key_exists($Key, $ExistingBadge) && $ExistingBadge[$Key] != $Value) {
                         $Different = true;
                         break;
@@ -207,26 +218,26 @@ class BadgeModel extends BadgesAppModel {
                 if (!$Different) {
                     return $ExistingBadge['BadgeID'];
                 }
-                $Data['BadgeID'] = $ExistingBadge['BadgeID'];
+                $data['BadgeID'] = $ExistingBadge['BadgeID'];
 
             }
         }
-        if (isset($Data['Attributes']) && is_array($Data['Attributes'])) {
-            $Data['Attributes'] = serialize($Data['Attributes']);
+        if (isset($data['Attributes']) && is_array($data['Attributes'])) {
+            $data['Attributes'] = serialize($data['Attributes']);
         }
-        if (!isset($Data['BadgeID'])) {
-            TouchValue('Threshold', $Data, 0);
+        if (!isset($data['BadgeID'])) {
+            TouchValue('Threshold', $data, 0);
         }
 
         // Strict-mode.
-        if (isset($Data['Level'])) {
-            if (is_numeric($Data['Level'])) {
-                $Data['Level'] = (int)$Data['Level'];
+        if (isset($data['Level'])) {
+            if (is_numeric($data['Level'])) {
+                $data['Level'] = (int)$data['Level'];
             } else {
-                $Data['Level'] = null;
+                $data['Level'] = null;
             }
         }
 
-        return parent::save($Data);
+        return parent::save($data);
     }
 }

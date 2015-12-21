@@ -112,7 +112,9 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
      */
     public function entryController_segaSSO_create($sender, $code = false, $state = false) {
         if ($error = $sender->Request->get('error')) {
-            throw new Gdn_UserException($error);
+            // Sega asked to send users to home page if it fails.
+            redirect('/');
+            //throw new Gdn_UserException($error);
         }
 
         Gdn::session()->stash($this->getProviderKey()); // remove any stashed provider data.
@@ -236,7 +238,13 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
 //        $sender->addJsFile('https://test-sso.reliclink.com/html/sdk/v1/reliclink.js', '', array('AddVersion' => array('AddVersion' => true, 'id' => 'reliclinksdk')));
 //        $sender->addJsFile('managesession.js', 'plugins/SegaSSO', array('id' => 'reliclinksdk', 'class' => 'reliclickn', 'things'=>'stuff'));
 
-        $loggedIn = (gdn::session()->UserID) ? true : false;
+        $user = gdn::session()->User;
+
+        if($user && !$user->Verified) {
+            $sender->addDefinition('UnconfirmedUser', 1);
+        }
+
+        $loggedIn = ($user) ? true : false;
         $sender->addDefinition('userLoggedIn', $loggedIn);
 
         $provider = $this->provider();
@@ -247,40 +255,83 @@ class SegaSSOPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $sender->addDefinition('logoutURL', $logoutURL);
     }
 
-
+    /**
+     * Add form fields to update the user with the properly formatted date and verified.
+     *
+     * @param $sender
+     * @param $args
+     */
     public function entryController_OAuth_handler($sender, $args) {
         $formValues = $sender->Form->FormValues();
 
         if($formValues) {
             $dateOfBirth = val("DateOfBirth", $formValues, null);
             $verified = val("Verified", $formValues, null);
-            $titles_owned = val("titles_owned", $formValues);
-            $unconfirmedUserRole = c('Plugins.SegaSSO.UnconfirmedRole');
-            if(!$verified) {
-                $rolesList = $unconfirmedUserRole;
-            }
-            if(is_array($titles_owned) && !empty($titles_owned)) {
-                $rolesList = $sender->Form->getFormValue('Roles');
-                foreach ($titles_owned as $title) {
-                    $rolesList .= $title['title_name'] . ",";
-                }
-            }
-            $sender->Form->setFormValue('Roles', strtolower($rolesList), null);
         }
 
         if($dateOfBirth) {
             $sender->Form->setFormValue('DateOfBirth', date('Y-m-d', $dateOfBirth));
         }
 
+        $roleModel = new RoleModel();
+
         if($verified) {
-            $sender->Form->setFormValue('Verified', $verified);
+            $defaultRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
+        } else {
+            $defaultRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
         }
 
+        $roleList = null;
+        foreach($defaultRoleIDs as $roleID) {
+            $roleList .= val("Name", $roleModel->getByRoleID($roleID)) . ",";
+        }
+        $sender->Form->setFormValue('Roles', $roleList);
 
     }
 
     public function profileController_AfterPreferencesDefined_handler() {
         trace(gdn::session()->User, "User");
+    }
+
+    /**
+     * Update roles after signin with the roles that are associated with titles owned by the user.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function userModel_afterSignIn_handler($sender, $args) {
+        $titlesRoles = c('Plugins.SegaSSO.TitlesRoles');;
+        $userID = gdn::session()->UserID;
+        $userAttributes = gdn::session()->getAttributes();
+
+        // The $RoleIDs are a comma delimited list of game title role names in the config.
+        // Get the ID numbers of each role.
+        $titleRoleNames = array_map('trim', explode(',', $titlesRoles));
+        $titleRoleIDs = $sender->SQL
+            ->select('r.RoleID')
+            ->from('Role r')
+            ->whereIn('r.Name', $titleRoleNames)
+            ->get()->resultArray();
+
+        // Delete all the roles associated with game titles in case the user no longer owns it.
+        $titleRoleIDs = array_column($titleRoleIDs, 'RoleID');
+        $delete = $sender->SQL->whereIn('RoleID', $titleRoleIDs)->delete('UserRole', array('UserID' => $userID));
+        $this->log("Titles Deleted in After Signin", $titleRoleIDs);
+
+        $this->log("Session Attributes in After Signin", $userAttributes);
+
+        // Get the titles currently owned by the user.
+        $titlesOwned = $userAttributes['SegaSSO']['Profile']['titles_owned'];
+        $this->log("Titles Owned in After Signin", $titlesOwned);
+
+        // Update user roles with the role associated with the game title the user currently owns.
+        foreach($titlesOwned as $title) {
+            $titleRoleIDs = $sender->SQL->select('r.RoleID')->from('Role r')->where('r.Name', $title['title_name'])->get()->resultArray();
+            $titleRoleID = array_column($titleRoleIDs, 'RoleID');
+            $sender->SQL->insert('UserRole', array('UserID' => $userID, 'RoleID' => $titleRoleID[0]));
+        }
+
+        $sender->clearCache($userID, array('roles', 'permissions'));
     }
 
 }
