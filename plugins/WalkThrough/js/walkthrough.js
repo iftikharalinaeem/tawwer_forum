@@ -159,6 +159,8 @@ gdn.WalkThrough = (function ($, window, gdn) {
 
         this.intro.onchange(function(targetElement) {
             that.changeTheLabelForButtons();
+            var step = that.intro._introItems[that.intro._currentStep];
+            that.script(step);
         });
 
         this.intro.oncomplete(function() {
@@ -283,6 +285,22 @@ gdn.WalkThrough = (function ($, window, gdn) {
             // Prevents the animation to show the next step before the URL changes
             this.intro.disableAnimation(true);
         }
+    };
+    
+    /**
+     * Check for (and run) script execution step
+     * 
+     * @param {Array} step
+     */
+    WalkThroughClass.prototype.script = function(step) {
+        if (!step.hasOwnProperty('script')) {
+            return;
+        }
+        
+        var dynamic = document.createElement('script');
+        dynamic.setAttribute("type","text/javascript");
+        dynamic.innerText = step.script;
+        document.getElementsByTagName("head")[0].appendChild(dynamic);
     };
 
     /**
