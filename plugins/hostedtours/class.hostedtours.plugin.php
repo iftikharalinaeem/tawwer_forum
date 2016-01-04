@@ -218,7 +218,7 @@ TOOLTIP
             return;
         }
 
-        if (Gdn::session()->User->Admin !== 1) {
+        if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             return false;
         }
 
