@@ -219,7 +219,7 @@ TOOLTIP
         }
 
         if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-            return false;
+            return;
         }
 
         // Send tour
@@ -245,8 +245,8 @@ TOOLTIP
             return;
         }
 
-        if (Gdn::session()->User->Admin !== 1) {
-            return false;
+        if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+            return;
         }
 
         // Show tour button
