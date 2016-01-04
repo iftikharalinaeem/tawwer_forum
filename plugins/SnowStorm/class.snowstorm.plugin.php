@@ -11,7 +11,7 @@ $PluginInfo['SnowStorm'] = array(
 	'AuthorUrl'		=> 'http://francisfontaine.com/',
 	'License'		=> 'Free',
 	'RequiredApplications' => array('Vanilla' => '>=2.0.18'),
-	'MobileFriendly' => FALSE
+	'MobileFriendly' => true
 );
 
 /**
