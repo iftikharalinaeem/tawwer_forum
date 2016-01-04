@@ -268,7 +268,7 @@ class BadgeController extends BadgesAppController {
 
                 // Continue
                 if ($Saved) {
-                    $UserBadge = $this->UserBadgeModel->getID($UserID, $BadgeID);
+                    $UserBadge = $this->UserBadgeModel->getByUser($UserID, $BadgeID);
                     $OutputBadge = array_merge((array)$Badge, (array)$UserBadge);
                     $this->setData('Badge', $OutputBadge);
 
@@ -329,7 +329,7 @@ class BadgeController extends BadgesAppController {
         // Current user a recipient?
         $this->UserBadge = false;
         if (Gdn::session()->isValid()) {
-            $this->UserBadge = $this->UserBadgeModel->getID(Gdn::session()->User->UserID, $this->data('Badge.BadgeID'));
+            $this->UserBadge = $this->UserBadgeModel->getByUser(Gdn::session()->User->UserID, $this->data('Badge.BadgeID'));
         }
         $this->SetData('UserBadge', $this->UserBadge);
 

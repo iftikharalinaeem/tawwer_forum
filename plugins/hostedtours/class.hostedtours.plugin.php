@@ -14,6 +14,7 @@
  * Changes:
  *  1.0a    Development release
  *  1.0     Production release
+ *  1.1     Add mebox step to Welcome Tour
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @package internal
@@ -22,7 +23,7 @@
 $PluginInfo['hostedtours'] = [
     'Name' => 'Hosted Tours',
     'Description' => 'Provides new user walkthrough tours for hosted customers',
-    'Version' => '1.0',
+    'Version' => '1.1',
     'MobileFriendly' => false,
     'RequiredApplications' => [
         'Vanilla' => '2.2'
@@ -83,6 +84,30 @@ TOOLTIP
     <div class="intro-box">
         <b class="intro-heading">This is your homepage</b>
         Your members will land here when they visit your community. It can show recent discussions, a category list, or even your community's "Best Of" page. You can customize the layout in the dashboard later!
+    </div>
+</div>
+TOOLTIP
+,
+                ],
+                [
+                    'page' => '/',
+                    'element' => '.MeBox',
+                    'position' => 'left',
+                    'title' => '<i class="fa fa-home"></i> The "Me Box"',
+                    'tooltipClass' => 'tooltip-welcome welcome-mebox',
+                    'script' => <<<SCRIPT
+setTimeout(function(){
+    var cog = $('.MeMenu .ToggleFlyout a[href="/profile/edit"].MeButton');
+    cog.click();
+}, 2000);
+SCRIPT
+,
+                    'intro' => <<<TOOLTIP
+<div class="intro-frame">
+    <div class="intro-box">
+        <b class="intro-heading">What's the Me Box?</b>
+        <p>The MeBox shows your profile picture and username when you're logged in, and provides several vital links to other areas of the platform. You can view your notifications, bookmarks, visit your own profile page, and also go to the dashboard if you're a moderator or admin.</p>
+        <p>That's where we're going now, so click '<b>Next</b>' to visit the dashboard.</p>
     </div>
 </div>
 TOOLTIP
@@ -189,11 +214,11 @@ TOOLTIP
      * @param Gdn_Dispatcher $sender
      */
     public function gdn_dispatcher_appStartup_handler($sender) {
-        if (!Gdn::session()->isValid()) {
+        if (!Gdn::session()->isValid() || isMobile()) {
             return;
         }
 
-        if (Gdn::session()->User->Admin !== 1) {
+        if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             return false;
         }
 
@@ -216,7 +241,7 @@ TOOLTIP
      * @param type $sender
      */
     public function base_beforeUserOptionsMenu_handler($sender) {
-        if (!Gdn::session()->isValid()) {
+        if (!Gdn::session()->isValid() || isMobile()) {
             return;
         }
 
