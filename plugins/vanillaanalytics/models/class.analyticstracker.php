@@ -38,7 +38,7 @@ class AnalyticsTracker {
             $tracker->addDefinitions($controller);
         }
 
-        $controller->addDefinition('eventData', $this->getDefaultData());
+        $controller->addDefinition('eventData', $this->getDefaultData(true));
     }
 
     /**
@@ -56,7 +56,7 @@ class AnalyticsTracker {
      * Adds a new tracker instance to the collection.
      *
      * @param TrackerInterface $interface
-     * @return
+     * @return AnalyticsTracker
      */
     public function addTracker(TrackerInterface $interface) {
         $this->trackers[] = $interface;
@@ -67,9 +67,10 @@ class AnalyticsTracker {
     /**
      * Build an array of all the default data we'll need for most events.
      *
+     * @param bool $trackerDefaults Should defaults from enabled trackers be included?
      * @return array
      */
-    public function getDefaultData() {
+    public function getDefaultData($trackerDefaults = false) {
 
         // Basic information that should be universally available
         $defaults = [
@@ -93,6 +94,12 @@ class AnalyticsTracker {
         // Grab the browser's user agent value, if available.
         $userAgent = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_USER_AGENT');
         $defaults['userAgent'] = $userAgent ?: null;
+
+        if ($trackerDefaults) {
+            foreach ($this->trackers as $tracker) {
+                $defaults = $tracker->addDefaults($defaults);
+            }
+        }
 
         return $defaults;
     }
