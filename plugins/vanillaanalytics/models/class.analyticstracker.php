@@ -81,8 +81,7 @@ class AnalyticsTracker {
                 'hour' => (int)date('G', $timestamp),
                 'minute' => (int)date('i', $timestamp),
                 'timezone' => date('T', $timestamp),
-                'timestamp' => $timestamp,
-                'iso8601' => date('c', $timestamp)
+                'timestamp' => $timestamp
             ],
             'ip' => Gdn::request()->ipAddress(),
             'method' => Gdn::request()->requestMethod(),
