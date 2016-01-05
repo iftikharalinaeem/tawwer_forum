@@ -56,9 +56,12 @@ class AnalyticsTracker {
      * Adds a new tracker instance to the collection.
      *
      * @param TrackerInterface $interface
+     * @return
      */
     public function addTracker(TrackerInterface $interface) {
         $this->trackers[] = $interface;
+
+        return $this;
     }
 
     /**
@@ -119,13 +122,13 @@ class AnalyticsTracker {
      * @param $event
      * @param array $data
      */
-    public function trackEvent($event, $data = array()) {
+    public function trackEvent($collection, $event, $data = array()) {
         // Load up the defaults we'd like to have and merge them into the data.
         $data = array_merge($this->getDefaultData(), $data);
 
         // Iterate through our tracker list and tell each of them about our event.
         foreach ($this->trackers as $interface) {
-            $interface->event($event, $data);
+            $interface->event($collection, $event, $data);
         }
     }
 }

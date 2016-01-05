@@ -103,8 +103,10 @@ class KeenIOTracker implements TrackerInterface {
      * @param array $data Details of this event.
      * @return array Body of response from keen.io
      */
-    public function event($collection, $data = array()) {
+    public function event($collection, $event, $data = array()) {
+        $data['event'] = $event;
         $this->addDefaultData($data);
+
         return $this->client->addEvent($collection, $data);
     }
 }
