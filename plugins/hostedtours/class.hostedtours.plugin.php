@@ -15,6 +15,7 @@
  *  1.0a    Development release
  *  1.0     Production release
  *  1.1     Add mebox step to Welcome Tour
+ *  1.1.1   Refine permissions to exclude bots and the system user
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @package internal
@@ -23,7 +24,7 @@
 $PluginInfo['hostedtours'] = [
     'Name' => 'Hosted Tours',
     'Description' => 'Provides new user walkthrough tours for hosted customers',
-    'Version' => '1.1',
+    'Version' => '1.1.1',
     'MobileFriendly' => false,
     'RequiredApplications' => [
         'Vanilla' => '2.2'
@@ -214,10 +215,18 @@ TOOLTIP
      * @param Gdn_Dispatcher $sender
      */
     public function gdn_dispatcher_appStartup_handler($sender) {
+
+        // Only logged-in people
         if (!Gdn::session()->isValid() || isMobile()) {
             return;
         }
 
+        // No bots or the system user
+        if (Gdn::session()->User->Admin == 2 || Gdn::session()->User->Name === 'System') {
+            return;
+        }
+
+        // Only admins
         if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             return;
         }
@@ -241,10 +250,18 @@ TOOLTIP
      * @param type $sender
      */
     public function base_beforeUserOptionsMenu_handler($sender) {
+
+        // Only logged-in people
         if (!Gdn::session()->isValid() || isMobile()) {
             return;
         }
 
+        // No bots or the system user
+        if (Gdn::session()->User->Admin == 2 || Gdn::session()->User->Name === 'System') {
+            return;
+        }
+
+        // Only admins
         if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             return;
         }
