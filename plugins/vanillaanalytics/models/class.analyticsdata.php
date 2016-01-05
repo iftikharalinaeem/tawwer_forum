@@ -112,6 +112,29 @@ class AnalyticsData extends Gdn_Model {
     }
 
     /**
+     * Retrieve site information.  Use Infrastructure class, if available.  If not, try to load config values.
+     *
+     * @return array Basic information related to the current site.
+     */
+    public static function getSite() {
+        if (class_exists('\Infrastructure')) {
+            $site = [
+                'accountID' => \Infrastructure::site('accountid'),
+                'name'      => \Infrastructure::site('name'),
+                'siteID'    => \Infrastructure::site('siteid')
+            ];
+        } else {
+            $site = [
+                'accountID' => c('Vanilla.VanillaForums.AccountID', null),
+                'name'      => c('Garden.Domain', null),
+                'siteID'    => c('Vanilla.VanillaForums.SiteID', null)
+            ];
+        }
+
+        return $site;
+    }
+
+    /**
      * Retrieve information about a particular user for user in analytics.
      *
      * @param int $userID Record ID of the user to fetch.
