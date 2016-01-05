@@ -11,8 +11,10 @@ $(document).ready(function() {
         eventData = gdn.meta.eventData || false;
 
         if (eventData) {
+            eventData.event = 'page_view';
+
             keenClient.addEvent(
-                "pageView",
+                "page",
                 eventData,
                 function(error, response){
                     // If error isn't a falsy, an error was encountered.

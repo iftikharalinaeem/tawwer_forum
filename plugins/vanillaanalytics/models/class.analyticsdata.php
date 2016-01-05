@@ -73,7 +73,7 @@ class AnalyticsData extends Gdn_Model {
             'minute'      => (int)$dateTime->format('i'),
             'month'       => (int)$dateTime->format('n'),
             'startOfWeek' => (int)strtotime($startOfWeek, $dateTime->format('U')),
-            'timestamp  ' => (int)$dateTime->format('U'),
+            'timestamp'   => (int)$dateTime->format('U'),
             'timezone'    => $dateTime->format('T'),
             'year'        => (int)$dateTime->format('Y'),
         ];
