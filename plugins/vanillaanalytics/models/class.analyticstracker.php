@@ -57,7 +57,7 @@ class AnalyticsTracker {
      *
      * @param TrackerInterface $interface
      */
-    public function addTracker(TrackerInterface &$interface) {
+    public function addTracker(TrackerInterface $interface) {
         $this->trackers[] = $interface;
     }
 
