@@ -64,15 +64,18 @@ class AnalyticsData extends Gdn_Model {
     public static function getDateTime($time = 'now', DateTimeZone $timezone = null ) {
         $dateTime = new DateTime($time, $timezone);
 
+        $startOfWeek = $dateTime->format('w') === 0 ? 'today' : 'last sunday';
+
         return [
-            'day'       => (int)$dateTime->format('j'),
-            'dayOfWeek' => (int)$dateTime->format('w'),
-            'hour'      => (int)$dateTime->format('G'),
-            'minute'    => (int)$dateTime->format('i'),
-            'month'     => (int)$dateTime->format('n'),
-            'timestamp' => (int)$dateTime->format('U'),
-            'timezone'  => $dateTime->format('T'),
-            'year'      => (int)$dateTime->format('Y'),
+            'day'         => (int)$dateTime->format('j'),
+            'dayOfWeek'   => (int)$dateTime->format('w'),
+            'hour'        => (int)$dateTime->format('G'),
+            'minute'      => (int)$dateTime->format('i'),
+            'month'       => (int)$dateTime->format('n'),
+            'startOfWeek' => (int)strtotime($startOfWeek, $dateTime->format('U')),
+            'timestamp  ' => (int)$dateTime->format('U'),
+            'timezone'    => $dateTime->format('T'),
+            'year'        => (int)$dateTime->format('Y'),
         ];
     }
 
