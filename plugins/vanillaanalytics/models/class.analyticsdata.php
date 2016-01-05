@@ -61,6 +61,21 @@ class AnalyticsData extends Gdn_Model {
         return Gdn::session()->isValid() ? self::getUser(Gdn::session()->UserID) : self::getGuest();
     }
 
+    public static function getDateTime($time = 'now', DateTimeZone $timezone = null ) {
+        $dateTime = new DateTime($time, $timezone);
+
+        return [
+            'day'       => (int)$dateTime->format('j'),
+            'dayOfWeek' => (int)$dateTime->format('w'),
+            'hour'      => (int)$dateTime->format('G'),
+            'minute'    => (int)$dateTime->format('i'),
+            'month'     => (int)$dateTime->format('n'),
+            'timestamp' => (int)$dateTime->format('U'),
+            'timezone'  => $dateTime->format('T'),
+            'year'      => (int)$dateTime->format('Y'),
+        ];
+    }
+
     /**
      * Grab data about a discussion for use in analytics.
      * @param $discussionID ID of the discussion we're targeting.
@@ -109,7 +124,7 @@ class AnalyticsData extends Gdn_Model {
             $userInfo = [
                 'userID'         => (int)$user->UserID,
                 'name'           => $user->Name,
-                'dateFirstVisit' => $user->DateFirstVisit
+                'timeFirstVisit' => $user->DateFirstVisit
             ];
 
             return $userInfo;

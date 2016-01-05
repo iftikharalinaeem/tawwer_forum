@@ -71,18 +71,8 @@ class AnalyticsTracker {
     public function getDefaultData() {
 
         // Basic information that should be universally available
-        $timestamp = gmmktime();
         $defaults = [
-            'dateTime' => [
-                'day' => (int)date('w', $timestamp),
-                'date' =>(int) date('j', $timestamp),
-                'month' => (int)date('n', $timestamp),
-                'year' => (int)date('Y', $timestamp),
-                'hour' => (int)date('G', $timestamp),
-                'minute' => (int)date('i', $timestamp),
-                'timezone' => date('T', $timestamp),
-                'timestamp' => $timestamp
-            ],
+            'dateTime' => AnalyticsData::getDateTime(),
             'ip' => Gdn::request()->ipAddress(),
             'method' => Gdn::request()->requestMethod(),
             'url' => Gdn::request()->url(
