@@ -22,9 +22,10 @@ interface TrackerInterface {
     /**
      * Add and overwrite default event data values.
      *
-     * @param $defaults
+     * @param array $defaults
+     * @return array
      */
-    public function addDefaultData(&$defaults);
+    public function addDefaults(array $defaults = array());
 
     /**
      * Track an event.
@@ -33,5 +34,5 @@ interface TrackerInterface {
      * @param string $type Name/type of the event being tracked.
      * @param array $details A collection of details about the event.
      */
-    public function event($collection, $type, $details = array());
+    public function event($collection, $type, array $details = []);
 }

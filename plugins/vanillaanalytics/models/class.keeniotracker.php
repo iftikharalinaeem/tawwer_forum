@@ -45,11 +45,14 @@ class KeenIOTracker implements TrackerInterface {
         $controller->addJsFile('keenio.min.js', 'plugins/vanillaanalytics');
     }
 
-
     /**
-     * @see https://keen.io/docs/api/#data-enrichment
+     * Overwrite and append default key/value pairs to incoming array.
+     *
+     * @link https://keen.io/docs/api/#data-enrichment
+     * @param array $defaults List of default data pairs for all events.
+     * @return array
      */
-    public function addDefaultData(&$defaults) {
+    public function addDefaults(array $defaults = array()) {
         $additionalDefaults = [
             'keen' => [
                 'addons' => [
@@ -96,17 +99,18 @@ class KeenIOTracker implements TrackerInterface {
 
         return $defaults;
     }
+
     /**
      * Record an event using the keen.io API.
      *
-     * @param string $collection Name of the event collection to record this data to.
-     * @param array $data Details of this event.
+     * @param string $collection Grouping for the current event.
+     * @param string $type Name/type of the event being tracked.
+     * @param array $details A collection of details about the event.
      * @return array Body of response from keen.io
      */
-    public function event($collection, $event, $data = array()) {
-        $data['event'] = $event;
-        $this->addDefaultData($data);
+    public function event($collection, $type, array $details = []) {
+        $details['event'] = $type;
 
-        return $this->client->addEvent($collection, $data);
+        return $this->client->addEvent($collection, $details);
     }
 }

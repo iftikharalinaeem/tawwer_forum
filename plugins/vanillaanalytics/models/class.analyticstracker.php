@@ -94,11 +94,6 @@ class AnalyticsTracker {
         $userAgent = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_USER_AGENT');
         $defaults['userAgent'] = $userAgent ?: null;
 
-
-        foreach ($this->trackers as $interface) {
-            $interface->addDefaultData($defaults);
-        }
-
         return $defaults;
     }
 
@@ -121,11 +116,16 @@ class AnalyticsTracker {
      */
     public function trackEvent($collection, $event, $data = array()) {
         // Load up the defaults we'd like to have and merge them into the data.
-        $data = array_merge($this->getDefaultData(), $data);
+        $defaults = $this->getDefaultData();
 
         // Iterate through our tracker list and tell each of them about our event.
         foreach ($this->trackers as $interface) {
-            $interface->event($collection, $event, $data);
+            $interfaceDefaults = $interface->addDefaults($defaults);
+            $details = array_merge($interfaceDefaults, $data);
+
+            $interface->event($collection, $event, $details);
+
+            unset($interfaceDefaults, $details);
         }
     }
 }
