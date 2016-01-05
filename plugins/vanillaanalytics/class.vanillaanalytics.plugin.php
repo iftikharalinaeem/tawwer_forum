@@ -98,9 +98,9 @@ class VanillaAnalytics extends Gdn_Plugin {
         // Grabbing the relevant information from the ReactionData event argument
         $data = [
             'reaction' => [
-                'recordType' => val('RecordType', $reactionData),
+                'recordType' => strtolower(val('RecordType', $reactionData)),
                 'recordID' => (int)val('RecordID', $args),
-                'urlCode' => val('ReactionUrlCode', $args),
+                'urlCode' => strtolower(val('ReactionUrlCode', $args)),
                 'tagID' => (int)val('TagID', $reactionData),
                 'total' => (int)val('Total', $reactionData)
             ]
