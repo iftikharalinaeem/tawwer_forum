@@ -22,8 +22,6 @@ class AnalyticsTracker {
      * Our constructor.
      */
     protected function __construct() {
-        require_once(dirname(__FILE__) . '/../vendor/autoload.php');
-
         // For now, using keen.io is hardwired.
         if (c('VanillaAnalytics.KeenIO.ProjectID') && c('VanillaAnalytics.KeenIO.WriteKey')) {
             $this->addTracker(new KeenIOTracker());
