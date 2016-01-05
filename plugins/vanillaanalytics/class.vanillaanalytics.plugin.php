@@ -26,7 +26,7 @@ class VanillaAnalytics extends Gdn_Plugin {
      * Track the generic 404 response.
      */
     public function gdn_dispatcher_notFound_handler() {
-        AnalyticsTracker::getInstance()->trackEvent('notFound');
+        AnalyticsTracker::getInstance()->trackEvent('error', 'error_notFound');
     }
 
     /**
@@ -54,8 +54,8 @@ class VanillaAnalytics extends Gdn_Plugin {
         ];
 
         if ($data) {
-            $event = val('Insert', $args) ? 'commentInsert' : 'commentEdit';
-            AnalyticsTracker::getInstance()->trackEvent($event, $data);
+            $event = val('Insert', $args) ? 'comment_add' : 'comment_edit';
+            AnalyticsTracker::getInstance()->trackEvent('post', $event, $data);
         }
     }
 
@@ -71,8 +71,8 @@ class VanillaAnalytics extends Gdn_Plugin {
         ];
 
         if ($data) {
-            $event = val('Insert', $args) ? 'discussionInsert' : 'discussionEdit';
-            AnalyticsTracker::getInstance()->trackEvent($event, $data);
+            $event = val('Insert', $args) ? 'discussion_add' : 'discussion_edit';
+            AnalyticsTracker::getInstance()->trackEvent('post', $event, $data);
         }
     }
 
@@ -83,7 +83,7 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param $args Event arguments, passed from EntryController, specifically for the event.
      */
     public function entryController_registrationSuccessful_handler($sender, &$args) {
-        AnalyticsTracker::getInstance()->trackEvent('userRegistration');
+        AnalyticsTracker::getInstance()->trackEvent('registration', 'registration_add');
     }
 
     /**
@@ -106,6 +106,8 @@ class VanillaAnalytics extends Gdn_Plugin {
             ]
         ];
 
-        AnalyticsTracker::getInstance()->trackEvent('reaction', $data);
+        $event = val('Total', $reactionData) > 0 ? 'reaction_add' : 'reaction_delete';
+
+        AnalyticsTracker::getInstance()->trackEvent('reaction', $event, $data);
     }
 }
