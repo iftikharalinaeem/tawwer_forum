@@ -83,11 +83,7 @@ class AnalyticsTracker {
         ];
 
         // Only add user-related information if a user is signed in.
-        $defaults['user'] = [
-            'userID'         => Gdn::session()->isValid() ? Gdn::session()->UserID : null,
-            'name'           => Gdn::session()->isValid() ? val('Name', Gdn::session()->User) : null,
-            'dateFirstVisit' => Gdn::session()->isValid() ? val('DateFirstVisit', Gdn::session()->User) : null
-        ];
+        $defaults['user'] = AnalyticsData::getCurrentUser();
 
         // Attempt to grab the referrer, if there is one, and record it.
         $referrer = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER');
