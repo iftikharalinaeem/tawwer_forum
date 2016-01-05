@@ -50,7 +50,7 @@ class VanillaAnalytics extends Gdn_Plugin {
      */
     public function commentModel_afterSaveComment_handler($sender, &$args) {
         $data = [
-            'comment' => AnalyticsData::comment(val('CommentID', $args))
+            'comment' => AnalyticsData::getComment(val('CommentID', $args))
         ];
 
         if ($data) {
@@ -67,7 +67,7 @@ class VanillaAnalytics extends Gdn_Plugin {
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, &$args) {
         $data = [
-            'discussion' => AnalyticsData::discussion(val('DiscussionID', $args))
+            'discussion' => AnalyticsData::getDiscussion(val('DiscussionID', $args))
         ];
 
         if ($data) {
@@ -79,7 +79,7 @@ class VanillaAnalytics extends Gdn_Plugin {
     /**
      * Track when a user signs into the site.
      *
-     * @param $sender Current isntance of EntryController
+     * @param $sender Current instance of EntryController
      * @param $args Event arguments, passed from EntryController, specifically for the event.
      */
     public function entryController_afterSignIn_handler($sender, &$args) {
@@ -89,7 +89,7 @@ class VanillaAnalytics extends Gdn_Plugin {
     /**
      * Track when a user successfully registers for the site.
      *
-     * @param $sender Current isntance of EntryController
+     * @param $sender Current instance of EntryController
      * @param $args Event arguments, passed from EntryController, specifically for the event.
      */
     public function entryController_registrationSuccessful_handler($sender, &$args) {
@@ -99,7 +99,7 @@ class VanillaAnalytics extends Gdn_Plugin {
     /**
      * Track when a user signs out of the site.
      *
-     * @param $sender Current isntance of EntryController
+     * @param $sender Current instance of EntryController
      * @param $args Event arguments, passed from EntryController, specifically for the event.
      */
     public function entryController_signOut_handler($sender, &$args) {

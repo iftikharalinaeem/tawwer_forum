@@ -42,7 +42,7 @@ class AnalyticsData extends Gdn_Model {
             $data = [
                 'commentID' => (int)$commentID
             ];
-            $discussion = self::discussion($comment->DiscussionID);
+            $discussion = self::getDiscussion($comment->DiscussionID);
 
             if ($discussion) {
                 $data['discussion'] = $discussion;
