@@ -6,6 +6,8 @@
  */
 class AnalyticsData extends Gdn_Model {
 
+    private static $defaultTimeZone = null;
+
     /**
      * Fetch all ancestors up to, and including, the current category.
      *
@@ -53,6 +55,19 @@ class AnalyticsData extends Gdn_Model {
     }
 
     /**
+     * Grab the default time zone for creating dates/times.
+     *
+     * @return DateTimeZone
+     */
+    public static function getDefaultTimeZone() {
+        if (is_null(self::$defaultTimeZone)) {
+            self::$defaultTimeZone = new DateTimeZone('UTC');
+        }
+
+        return self::$defaultTimeZone;
+    }
+
+    /**
      * Build an array of analytics data for the current user, based on whether or not they are a logged-in user.
      *
      * @return array
@@ -61,8 +76,18 @@ class AnalyticsData extends Gdn_Model {
         return Gdn::session()->isValid() ? self::getUser(Gdn::session()->UserID) : self::getGuest();
     }
 
-    public static function getDateTime($time = 'now', DateTimeZone $timezone = null ) {
-        $dateTime = new DateTime($time, $timezone);
+    /**
+     * Grab an array of date/time parts representing the specified date/time.
+     *
+     * @param string $time Time to breakdown.
+     * @param DateTimeZone|null $timeZone Time zone to represent the specified time in.
+     * @return array
+     */
+    public static function getDateTime($time = 'now', DateTimeZone $timeZone = null ) {
+        $dateTime = new DateTime(
+            $time,
+            is_null($timeZone) ? self::getDefaultTimeZone() : $timeZone
+        );
 
         $startOfWeek = $dateTime->format('w') === 0 ? 'today' : 'last sunday';
 
@@ -74,7 +99,7 @@ class AnalyticsData extends Gdn_Model {
             'month'       => (int)$dateTime->format('n'),
             'startOfWeek' => (int)strtotime($startOfWeek, $dateTime->format('U')),
             'timestamp'   => (int)$dateTime->format('U'),
-            'timezone'    => $dateTime->format('T'),
+            'timeZone'    => $dateTime->format('T'),
             'year'        => (int)$dateTime->format('Y'),
         ];
     }
@@ -157,5 +182,14 @@ class AnalyticsData extends Gdn_Model {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Set the default time zone to the specified parameter.
+     *
+     * @param DateTimeZone $timeZone Target time zone.
+     */
+    public static function setDefaultTimeZone(DateTimeZone $timeZone) {
+        self::$defaultTimezone = $timeZone;
     }
 }
