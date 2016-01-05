@@ -77,13 +77,33 @@ class VanillaAnalytics extends Gdn_Plugin {
     }
 
     /**
+     * Track when a user signs into the site.
+     *
+     * @param $sender Current isntance of EntryController
+     * @param $args Event arguments, passed from EntryController, specifically for the event.
+     */
+    public function entryController_afterSignIn_handler($sender, &$args) {
+        AnalyticsTracker::getInstance()->trackEvent('session', 'session_start');
+    }
+
+    /**
      * Track when a user successfully registers for the site.
      *
      * @param $sender Current isntance of EntryController
      * @param $args Event arguments, passed from EntryController, specifically for the event.
      */
     public function entryController_registrationSuccessful_handler($sender, &$args) {
-        AnalyticsTracker::getInstance()->trackEvent('registration', 'registration_add');
+        AnalyticsTracker::getInstance()->trackEvent('registration', 'registration_success');
+    }
+
+    /**
+     * Track when a user signs out of the site.
+     *
+     * @param $sender Current isntance of EntryController
+     * @param $args Event arguments, passed from EntryController, specifically for the event.
+     */
+    public function entryController_signOut_handler($sender, &$args) {
+        AnalyticsTracker::getInstance()->trackEvent('session', 'session_end');
     }
 
     /**
