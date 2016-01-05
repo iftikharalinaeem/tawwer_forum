@@ -41,11 +41,11 @@ gdn.mustache = {
      * @param JSON template Template object
      */
     registerTemplate: function (template) {
-        gdn.mustache.templates[template.Name] = template;
-        gdn.mustache.templates[template.Name].downloading = false;
+        gdn.mustache.templates[template.name] = template;
+        gdn.mustache.templates[template.name].downloading = false;
 
         // Background download templates
-        if (gdn.mustache.background && template.type == 'defer') {
+        if (gdn.mustache.background && template.type === 'defer') {
             gdn.mustache.download(template.name);
         }
     },
@@ -169,7 +169,7 @@ gdn.mustache = {
                 async = true;
                 break;
         }
-        var templateURL = template.URL;
+        var templateURL = template.url;
         jQuery.ajax({
             url: templateURL,
             async: async,
@@ -192,3 +192,10 @@ gdn.mustache = {
     }
 
 };
+
+/*
+ * Register templates on document ready
+ */
+jQuery(window.document).ready(function() {
+    gdn.mustache.register(gdn.getMeta('Plugin.Mustache.Templates', []));
+});
