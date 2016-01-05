@@ -53,10 +53,22 @@ class VanillaAnalytics extends Gdn_Plugin {
             'comment' => AnalyticsData::getComment(val('CommentID', $args))
         ];
 
-        if ($data) {
-            $event = val('Insert', $args) ? 'comment_add' : 'comment_edit';
-            AnalyticsTracker::getInstance()->trackEvent('post', $event, $data);
-        }
+        $event = val('Insert', $args) ? 'comment_add' : 'comment_edit';
+        AnalyticsTracker::getInstance()->trackEvent('post', $event, $data);
+    }
+
+    /**
+     * Track when a comment is deleted.
+     *
+     * @param $sender Current instance of CommentModel
+     * @param $args Event arguments, passed from CommentModel, specifically for the event.
+     */
+    public function commentModel_deleteComment_handler($sender, &$args) {
+        $data = [
+            'comment' => AnalyticsData::getComment(val('CommentID', $args))
+        ];
+
+        AnalyticsTracker::getInstance()->trackEvent('post', 'comment_delete', $data);
     }
 
     /**
@@ -70,20 +82,22 @@ class VanillaAnalytics extends Gdn_Plugin {
             'discussion' => AnalyticsData::getDiscussion(val('DiscussionID', $args))
         ];
 
-        if ($data) {
-            $event = val('Insert', $args) ? 'discussion_add' : 'discussion_edit';
-            AnalyticsTracker::getInstance()->trackEvent('post', $event, $data);
-        }
+        $event = val('Insert', $args) ? 'discussion_add' : 'discussion_edit';
+        AnalyticsTracker::getInstance()->trackEvent('post', $event, $data);
     }
 
     /**
-     * Track when a user signs into the site.
+     * Track when a discussion is deleted.
      *
-     * @param $sender Current instance of EntryController
-     * @param $args Event arguments, passed from EntryController, specifically for the event.
+     * @param $sender Current instance of DiscussionModel
+     * @param $args Event arguments, passed from DiscussionModel, specifically for the event.
      */
-    public function entryController_afterSignIn_handler($sender, &$args) {
-        AnalyticsTracker::getInstance()->trackEvent('session', 'session_start');
+    public function discussionModel_deleteDiscussion_handler($sender, &$args) {
+        $data = [
+            'discussion' => AnalyticsData::getDiscussion(val('DiscussionID', $args))
+        ];
+
+        AnalyticsTracker::getInstance()->trackEvent('post', 'discussion_delete', $data);
     }
 
     /**
@@ -97,12 +111,22 @@ class VanillaAnalytics extends Gdn_Plugin {
     }
 
     /**
+     * Track when a user signs into the site.
+     *
+     * @param $sender Current instance of EntryController
+     * @param $args Event arguments, passed from EntryController, specifically for the event.
+     */
+    public function gdn_session_start_handler($sender, $args) {
+        AnalyticsTracker::getInstance()->trackEvent('session', 'session_start');
+    }
+
+    /**
      * Track when a user signs out of the site.
      *
      * @param $sender Current instance of EntryController
      * @param $args Event arguments, passed from EntryController, specifically for the event.
      */
-    public function entryController_signOut_handler($sender, &$args) {
+    public function gdn_session_end_handler($sender, $args) {
         AnalyticsTracker::getInstance()->trackEvent('session', 'session_end');
     }
 
