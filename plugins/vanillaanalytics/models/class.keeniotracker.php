@@ -93,7 +93,7 @@ class KeenIOTracker implements TrackerInterface {
                 'input' => [
                     'ua_string' => 'userAgent'
                 ],
-                'output' => 'userAgent'
+                'output' => 'userAgentParsed'
             ];
         }
 
