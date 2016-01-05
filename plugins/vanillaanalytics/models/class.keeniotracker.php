@@ -12,38 +12,15 @@ class KeenIOTracker implements TrackerInterface {
     protected $client;
 
     /**
-     * Scoped API read key for the current project.
-     * @var string
-     */
-    protected $readKey;
-
-    /**
-     * Scoped API write key for the current project.
-     * @var string
-     */
-    protected $writeKey;
-
-    /**
-     * Unique ID for the project we're tracking events against.
-     * @var string
-     */
-    protected $projectID;
-
-    /**
      * Constructor.
      */
     public function __construct() {
-        // Load all necessary keys from the Vanilla config.
-        $this->projectID = c('VanillaAnalytics.KeenIO.ProjectID');
-        $this->writeKey = c('VanillaAnalytics.KeenIO.WriteKey');
-        $this->readKey = c('VanillaAnalytics.KeenIO.ReadKey');
-
         $this->client = new KeenIOClient(
             'https://api.keen.io/{version}/',
             [
-                'projectId' => $this->projectID,
-                'writeKey'   => $this->writeKey,
-                'readKey'  => $this->readKey
+                'projectId' => c('VanillaAnalytics.KeenIO.ProjectID'),
+                'writeKey'   => c('VanillaAnalytics.KeenIO.WriteKey'),
+                'readKey'  => c('VanillaAnalytics.KeenIO.ReadKey')
             ]
         );
     }
@@ -54,8 +31,8 @@ class KeenIOTracker implements TrackerInterface {
      * @param Gdn_Controller Instance of the current page's controller.
      */
     public function addDefinitions(Gdn_Controller $controller) {
-        $controller->addDefinition('keenio.projectID', $this->projectID);
-        $controller->addDefinition('keenio.writeKey', $this->writeKey);
+        $controller->addDefinition('keenio.projectID', $this->client->getProjectID());
+        $controller->addDefinition('keenio.writeKey', $this->client->getWriteKey());
     }
 
     /**
