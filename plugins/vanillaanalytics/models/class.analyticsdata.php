@@ -169,12 +169,30 @@ class AnalyticsData extends Gdn_Model {
      * @return array|bool An array representing the user data on success, false on failure.
      */
     public static function getUser($userID) {
-        $user = Gdn::userModel()->getID($userID);
+        $userModel = Gdn::userModel();
+        $user = $userModel->getID($userID);
+        $roles = [];
 
         if ($user) {
+            /**
+             * Fetch the target user's roles.  If we have any (and we should), iterate through them and grab the
+             * relevant attributes.
+             */
+            $userRoles = $userModel->getRoles($userID);
+            if ($userRoles->count() > 0) {
+                foreach ($userRoles->resultObject() as $currentRole) {
+                    $roles[] = [
+                        'name'   => $currentRole->Name,
+                        'roleID' => $currentRole->RoleID,
+                        'type'   => $currentRole->Type
+                    ];
+                }
+            }
+
             $userInfo = [
                 'userID'         => (int)$user->UserID,
                 'name'           => $user->Name,
+                'roles'          => $roles,
                 'timeFirstVisit' => $user->DateFirstVisit
             ];
 
