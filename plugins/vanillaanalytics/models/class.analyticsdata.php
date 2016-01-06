@@ -50,7 +50,9 @@ class AnalyticsData extends Gdn_Model {
 
             return $data;
         } else {
-            return false;
+            return [
+                'commentID' => 0
+            ];
         }
     }
 
@@ -122,21 +124,10 @@ class AnalyticsData extends Gdn_Model {
                 'categories' => self::getCategoryAncestors($discussion->CategoryID)
             ];
         } else {
-            return false;
+            return [
+                'discussionID' => 0
+            ];
         }
-    }
-
-    /**
-     * Build and return guest data for the current user.
-     *
-     * @return array An array representing analytics data for the current user as a guest.
-     */
-    public static function getGuest() {
-        return [
-            'userID'         => -1,
-            'name'           => null,
-            'dateFirstVisit' => null
-        ];
     }
 
     /**
@@ -160,6 +151,19 @@ class AnalyticsData extends Gdn_Model {
         }
 
         return $site;
+    }
+
+    /**
+     * Build and return guest data for the current user.
+     *
+     * @return array An array representing analytics data for the current user as a guest.
+     */
+    public static function getGuest() {
+        return [
+            'userID'         => 0,
+            'name'           => '@guest',
+            'dateFirstVisit' => null
+        ];
     }
 
     /**
@@ -198,7 +202,10 @@ class AnalyticsData extends Gdn_Model {
 
             return $userInfo;
         } else {
-            return false;
+            return [
+                'userID'         => 0,
+                'name'           => '@notfound',
+            ];
         }
     }
 
