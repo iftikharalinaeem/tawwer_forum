@@ -56,8 +56,9 @@ class ReportModel extends Gdn_Model {
      *  - RecordID: The id of the record.
      *  - Body: The reason for the report.
      *  - Format: The format of the reason. TextEx is good.
+     * @param array|false $settings Not used.
      */
-    public function Save($data) {
+    public function Save($data, $settings = false) {
         // Validation and data-setting
         $this->Validation = new Gdn_Validation();
         $this->Validation->ApplyRule('RecordType', 'ValidateRequired');

@@ -22,7 +22,7 @@ foreach ($this->Data('Badges') as $Badge) :
          if ($Badge->Active) { // $Badge->Type == 'Manual'
             // Give badge
             if ($Session->CheckPermission('Reputation.Badges.Give') && $Badge->Active)
-               echo Anchor(T('Give'), 'reputation/badge/give/'.$Badge->BadgeID, 'GiveBadge SmallButton Popup');
+               echo Anchor(T('Give'), 'reputation/badge/give/'.$Badge->BadgeID, 'GiveBadge SmallButton js-give-badge');
          } ?>
       </td>
       <?php endif; ?>

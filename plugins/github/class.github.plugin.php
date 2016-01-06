@@ -16,7 +16,7 @@ $PluginInfo['github'] = array(
     'Description' => "Allow staff users to create issues from discussions and comments.",
     'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.1.18'),
-    'SettingsUrl' => '/dashboard/plugin/github',
+    'SettingsUrl' => '/plugin/github',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true,
     'Author' => 'John Ashton',
@@ -88,7 +88,7 @@ class GithubPlugin extends Gdn_Plugin {
             'redirect_uri' => $RedirectUri,
             'client_id' => $AppID,
             'response_type' => 'code',
-            'scope' => 'repo',
+            'scope' => 'repo:status',
 
         );
         return self::OAUTH_BASE_URL . '/login/oauth/authorize?' . http_build_query($Query);

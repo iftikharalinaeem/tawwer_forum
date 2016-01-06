@@ -71,15 +71,19 @@ class PollModel extends Gdn_Model {
 
    /**
     * Inserts a new poll returns the discussion id.
+    *
+    * @param array $formPostValues The data to save.
+    * @param array $settings Not used.
+    * @return int|false Returns the ID of the poll or **false** on error.
     */
-   public function Save($FormPostValues) {
-      $FormPostValues = $this->FilterForm($FormPostValues);
-      $this->AddInsertFields($FormPostValues);
-      $this->AddUpdateFields($FormPostValues);
+   public function Save($formPostValues, $settings = []) {
+      $formPostValues = $this->FilterForm($formPostValues);
+      $this->AddInsertFields($formPostValues);
+      $this->AddUpdateFields($formPostValues);
       if (C('Plugins.Polls.AnonymousPolls'))
-         $FormPostValues['Anonymous'] = 1;
+         $formPostValues['Anonymous'] = 1;
       $Session = Gdn::Session();
-      $FormPostValues['Type'] = 'poll'; // Force the "poll" discussion type.
+      $formPostValues['Type'] = 'poll'; // Force the "poll" discussion type.
       $DiscussionID = 0;
       $DiscussionModel = new DiscussionModel();
 
@@ -93,15 +97,15 @@ class PollModel extends Gdn_Model {
       // Add & apply any extra validation rules:
 
       // New poll? Set default category ID if none is defined.
-      if (!ArrayValue('DiscussionID', $FormPostValues, '')) {
-         if (!GetValue('CategoryID', $FormPostValues) && !C('Vanilla.Categories.Use')) {
-            $FormPostValues['CategoryID'] = GetValue('CategoryID', CategoryModel::DefaultCategory(), -1);
+      if (!ArrayValue('DiscussionID', $formPostValues, '')) {
+         if (!GetValue('CategoryID', $formPostValues) && !C('Vanilla.Categories.Use')) {
+            $formPostValues['CategoryID'] = GetValue('CategoryID', CategoryModel::DefaultCategory(), -1);
          }
       }
 
       // This should have been done in discussion model:
       // Validate category permissions.
-      $CategoryID = GetValue('CategoryID', $FormPostValues);
+      $CategoryID = GetValue('CategoryID', $formPostValues);
       if ($CategoryID > 0) {
          $Category = CategoryModel::Categories($CategoryID);
          if ($Category && !$Session->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', GetValue('PermissionCategoryID', $Category)))
@@ -110,20 +114,20 @@ class PollModel extends Gdn_Model {
 
       // This should have been done in discussion model:
       // Make sure that the title will not be invisible after rendering
-      $Name = trim(GetValue('Name', $FormPostValues, ''));
+      $Name = trim(GetValue('Name', $formPostValues, ''));
       if ($Name != '' && Gdn_Format::Text($Name) == '')
          $this->Validation->AddValidationResult('Name', 'You have entered an invalid poll title.');
       else {
          // Trim the name.
-         $FormPostValues['Name'] = $Name;
+         $formPostValues['Name'] = $Name;
       }
 
-      $this->EventArguments['FormPostValues'] = &$FormPostValues;
+      $this->EventArguments['FormPostValues'] = &$formPostValues;
 		$this->EventArguments['DiscussionID'] = $DiscussionID;
 		$this->FireAs('DiscussionModel')->FireEvent('BeforeSaveDiscussion');
 
       // Validate the discussion model's form fields
-      $DiscussionModel->Validate($FormPostValues, TRUE);
+      $DiscussionModel->Validate($formPostValues, TRUE);
 
       // Unset the body validation results (they're not required).
       $DiscussionValidationResults = $DiscussionModel->Validation->Results();
@@ -134,7 +138,7 @@ class PollModel extends Gdn_Model {
       $this->Validation->AddValidationResult($DiscussionValidationResults);
 
       // Are there enough non-empty poll options?
-      $PollOptions = GetValue('PollOption', $FormPostValues);
+      $PollOptions = GetValue('PollOption', $formPostValues);
       $ValidPollOptions = array();
       if (is_array($PollOptions))
          foreach ($PollOptions as $PollOption) {
@@ -152,13 +156,13 @@ class PollModel extends Gdn_Model {
 
       // If all validation passed, create the discussion with discmodel, and then insert all of the poll data.
       if (count($this->Validation->Results()) == 0) {
-         $DiscussionID = $DiscussionModel->Save($FormPostValues);
+         $DiscussionID = $DiscussionModel->Save($formPostValues);
          if ($DiscussionID > 0) {
             $Discussion = $DiscussionModel->GetID($DiscussionID);
             // Save the poll record.
             $Poll = array(
                'Name' => $Discussion->Name,
-               'Anonymous' => GetValue('Anonymous', $FormPostValues),
+               'Anonymous' => GetValue('Anonymous', $formPostValues),
                'DiscussionID' => $DiscussionID,
                'CountOptions' => $CountValidOptions,
                'CountVotes' => 0

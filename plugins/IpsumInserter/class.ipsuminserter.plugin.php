@@ -12,7 +12,7 @@ $PluginInfo['InpsumInserter'] = array(
    'Version' => '0.0.1',
    'RequiredApplications' => array('Vanilla' => '2.1.18'),
    'SettingsPermission' => 'Garden.Settings.Manage',
-   'SettingsUrl' => '/dashboard/plugin/IpsumInserter',
+   'SettingsUrl' => '/plugin/IpsumInserter',
    'Author' => 'John Ashton',
    'AuthorEmail' => 'john@vanillaforums.com',
    'AuthorUrl' => 'http://www.github.com/John0x00'

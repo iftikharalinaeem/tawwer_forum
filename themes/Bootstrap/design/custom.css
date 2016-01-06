@@ -485,6 +485,10 @@ body > #Frame > .Head {
   color: #999999;
 }
 
+.Section-DiscussionList #Content .BoxNewDiscussion {
+    display: inline-block;
+}
+
 #Content .BoxNewDiscussion {
   display: inline-block;
 }
@@ -845,6 +849,17 @@ a.Close:hover {
   text-shadow: none;
   top: 0;
   right: 0;
+}
+
+/** Groups **/
+.Section-Group .PhotoWrapLarge,
+.Groups.Section-DiscussionList .PhotoWrapLarge {
+  padding: 0;
+  margin-bottom: 0;
+}
+.Section-Group .PhotoWrapLarge a.ChangePicture,
+.Groups.Section-DiscussionList .PhotoWrapLarge a.ChangePicture {
+  width: inherit;
 }
 
 /** General Sprite Stuff **/

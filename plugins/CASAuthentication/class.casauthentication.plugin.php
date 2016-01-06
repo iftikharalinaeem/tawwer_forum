@@ -14,7 +14,7 @@ $PluginInfo['CASAuthentication'] = array(
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'SettingsUrl' => '/dashboard/settings/cas',
+   'SettingsUrl' => '/settings/cas',
    'SettingsPermission' => 'Garden.Settings.Manage',
 );
 

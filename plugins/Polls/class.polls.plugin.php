@@ -158,7 +158,7 @@ class PollsPlugin extends Gdn_Plugin {
 
    protected function _AddCss($Sender) {
 
-      $Discussions = &$Sender->Data('Discussions');
+      $Discussions = $Sender->Data('Discussions');
       if ($Discussions) {
          foreach ($Discussions as &$Row) {
             if (strtolower(GetValue('Type', $Row)) == 'poll')

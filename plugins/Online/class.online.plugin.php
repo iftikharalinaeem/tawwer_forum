@@ -155,8 +155,8 @@ class OnlinePlugin extends Gdn_Plugin {
       switch ($sender->Mapper->Version) {
          case '1.0':
             $sender->Mapper->addMap(array(
-               'online/privacy'        => 'dashboard/profile/online/privacy',
-               'online/count'          => 'dashboard/profile/online/count'
+               'online/privacy'        => 'profile/online/privacy',
+               'online/count'          => 'profile/online/count'
             ), null, array(
                'online/privacy'        => array('Success', 'Private'),
                'online/count'          => array('Online')
@@ -486,9 +486,9 @@ class OnlinePlugin extends Gdn_Plugin {
    public static function whereAmI($resolvedPath = null, $resolvedArgs = null) {
       $location = 'limbo';
       $wildLocations = array(
-         'vanilla/categories/index'   => 'category',
-         'vanilla/discussion/index'   => 'discussion',
-         'vanilla/discussion/comment' => 'comment'
+         'categories/index'   => 'category',
+         'discussion/index'   => 'discussion',
+         'discussion/comment' => 'comment'
       );
 
       if (is_null($resolvedPath)) {

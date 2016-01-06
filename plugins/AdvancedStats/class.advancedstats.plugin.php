@@ -164,7 +164,7 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
       $Menu = $Sender->EventArguments['SideMenu'];
       if (C('Garden.Analytics.Advanced')) {
          // Add stats menu option.
-         $Menu->AddLink('Dashboard', 'Statistics', '/dashboard/settings/statistics', 'Garden.Settings.Manage');
+         $Menu->AddLink('Dashboard', 'Statistics', '/settings/statistics', 'Garden.Settings.Manage');
       }
    }
    
@@ -197,7 +197,7 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
    public function SettingsController_Statistics_Create($Sender) {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Site Statistics');
-      $Sender->AddSideMenu('dashboard/settings/statistics');
+      $Sender->AddSideMenu('settings/statistics');
 		$Sender->Render('stats', '', 'plugins/AdvancedStats');
    }
    

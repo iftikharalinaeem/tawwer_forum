@@ -22,7 +22,7 @@ $PluginInfo['ProxyConnect'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,
-   'SettingsUrl' => '/dashboard/authentication/proxy',
+   'SettingsUrl' => '/authentication/proxy',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'HasLocale' => TRUE,
    'RegisterPermissions' => FALSE,
@@ -120,7 +120,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    * @param mixed $Sender
    */
    public function AuthenticationController_AuthenticatorConfigurationProxy_Handler($Sender) {
-      $Sender->AuthenticatorConfigure = '/dashboard/settings/proxyconnect';
+      $Sender->AuthenticatorConfigure = '/settings/proxyconnect';
    }
    
    public function Controller_Index($Sender) {
@@ -165,7 +165,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    }
    
    public function Controller_Test($Sender) {
-      $Sender->AddSideMenu('dashboard/authentication');
+      $Sender->AddSideMenu('authentication');
       $Sender->Form = new Gdn_Form();
       
       // Load Provider
@@ -409,7 +409,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
    public function EntryController_Land_Create($Sender) {
       if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
       $LandingRequest = Gdn_Request::Create()->FromImport(Gdn::Request())
-         ->WithURI("/dashboard/entry/signin")
+         ->WithURI("/entry/signin")
          ->WithCustomArgs(array(
             'Landing'   => TRUE
          ));

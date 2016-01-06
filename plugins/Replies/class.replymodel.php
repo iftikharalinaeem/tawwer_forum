@@ -98,7 +98,7 @@ class ReplyModel extends Gdn_Model {
             array('CommentID' => $ReplyToCommentID),
             array('CommentID' => GetValue('CommentID', $Comment)));
          
-         $CommentModel->Delete(GetValue('CommentID', $Comment), array('Log' => FALSE));
+         $CommentModel->DeleteID(GetValue('CommentID', $Comment), array('Log' => FALSE));
       }
       return $ReplyID;
    }

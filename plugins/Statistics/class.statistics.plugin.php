@@ -616,7 +616,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
       $Sender->FireEvent('DefineAdminPermissions');
       $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
-      $Sender->AddSideMenu('dashboard/settings');
+      $Sender->AddSideMenu('settings');
       
       $this->ConfigureRange($Sender);
       
@@ -635,7 +635,7 @@ class StatisticsPlugin extends Gdn_Plugin {
       $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
       $Sender->FireEvent('DefineAdminPermissions');
       $Sender->Permission($Sender->RequiredAdminPermissions, '', FALSE);
-      $Sender->AddSideMenu('dashboard/settings');
+      $Sender->AddSideMenu('settings');
       
       $this->ConfigureRange($Sender);
 

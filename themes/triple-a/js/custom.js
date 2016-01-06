@@ -6854,7 +6854,7 @@ if (typeof(module) !== 'undefined') {
     $('.BoxPromoted').swiper({
       mode: 'horizontal'
     , loop: true
-    , autoplay: 5000
+    , autoplay: gdn.getMeta('swiperAutoplay', 5000)
 
       // Navigation
     , keyboardControl: true

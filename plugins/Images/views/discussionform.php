@@ -2,9 +2,9 @@
 if (!defined('APPLICATION'))
    exit();
 $Session = Gdn::Session();
-$CancelUrl = '/vanilla/discussions';
+$CancelUrl = '/discussions';
 if (C('Vanilla.Categories.Use') && is_object($this->Category))
-   $CancelUrl = '/vanilla/categories/' . urlencode($this->Category->UrlCode);
+   $CancelUrl = '/categories/' . urlencode($this->Category->UrlCode);
 
 require_once dirname(__FILE__).'/helper_functions.php';
 
@@ -68,7 +68,7 @@ if (is_array($PostedImages)) {
       $file->type = substr(strrchr($Filename,'.'),1);
       $file->url = $PostedImage;
       $file->thumbnail_url = $Thumbnail;
-      $file->delete_url = Url('vanilla/post/uploadimage/', TRUE).'?file='.urlencode($Filename);
+      $file->delete_url = Url('post/uploadimage/', TRUE).'?file='.urlencode($Filename);
       $file->delete_type = 'DELETE';
       $Files[] = $file;
    }

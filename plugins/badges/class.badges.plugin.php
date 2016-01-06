@@ -8,7 +8,7 @@
 $PluginInfo['badges'] = array(
     'Name' => 'Badges',
     'Description' => "Give badges to your users to reward them for contributing to your community.",
-    'Version' => '1.4',
+    'Version' => '1.4.2',
     'RegisterPermissions' => array(
         'Reputation.Badges.View' => 1,
         'Reputation.Badges.Request',
@@ -65,7 +65,7 @@ class BadgesHooks extends Gdn_Plugin {
      * @param $Args
      */
     public function assetModel_styleCss_handler($Sender, $Args) {
-        $Sender->addCssFile('badges.css', 'plugin/badges');
+        $Sender->addCssFile('badges.css', 'plugins/badges');
     }
 
     /**

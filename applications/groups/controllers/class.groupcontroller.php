@@ -211,11 +211,8 @@ class GroupController extends Gdn_Controller {
          'Type' => $Value
       ));
 
-      if ($Value == 'Approved') {
-         $this->JsonTarget("#GroupApplicant_$ID", "", 'SlideUp');
-      } else {
-         $this->JsonTarget("#GroupApplicant_$ID", "Read Join-Denied", 'AddClass');
-      }
+      $this->JsonTarget("#GroupApplicant_$ID", "", 'SlideUp');
+      $this->InformMessage(t('Applicant '.$Value));
 
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
@@ -294,6 +291,8 @@ class GroupController extends Gdn_Controller {
       $Result = $this->GroupModel->JoinInvite($Group['GroupID'], Gdn::Session()->UserID, FALSE);
       $this->SetData('Result', $Result);
       $this->JsonTarget('.GroupUserHeaderModule', '', 'SlideUp');
+      $this->RedirectUrl = GroupUrl($Group);
+      $this->InformMessage(t('Invitation declined.'));
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
 
@@ -894,6 +893,9 @@ class GroupController extends Gdn_Controller {
          $Filter = '';
       }
 
+      $this->setData('_Limit', $Limit);
+      $this->setData('_Offset', $Limit);
+
       // Get Leaders
       if (in_array($Filter, array('', 'leaders'))) {
          $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Leader'), $Limit, $Offset);
@@ -905,6 +907,17 @@ class GroupController extends Gdn_Controller {
          $Users = $this->GroupModel->GetMembers($Group['GroupID'], array('Role' => 'Member'), $Limit, $Offset);
          $this->SetData('Members', $Users);
       }
+
+      // Build a pager
+      $this->Pager = new MorePagerModule($this);
+      $this->Pager->ClientID = 'Pager';
+      $this->Pager->configure(
+         $Offset,
+         $Limit,
+         $NumResults = val('CountMembers', $this->data('Group')) - count($this->data('Leaders')),
+         groupUrl($this->data('Group'), 'members', '/').'/{Page}?filter=members',
+         true
+      );
 
       $this->Data['_properties']['newdiscussionmodule'] = array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$Group['GroupID']);
       $this->SetData('Filter', $Filter);
