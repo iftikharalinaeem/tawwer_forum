@@ -26,6 +26,10 @@ class AnalyticsTracker {
         if (c('VanillaAnalytics.KeenIO.ProjectID') && c('VanillaAnalytics.KeenIO.WriteKey')) {
             $this->addTracker(new KeenIOTracker());
         }
+
+        if (count($this->trackers) == 0) {
+            Logger::event('No tracking services available for recording analytics data.', Logger::WARNING);
+        }
     }
 
     /**
@@ -78,10 +82,7 @@ class AnalyticsTracker {
             'ip'       => Gdn::request()->ipAddress(),
             'method'   => Gdn::request()->requestMethod(),
             'site'     => AnalyticsData::getSite(),
-            'url'      => Gdn::request()->url(
-                Gdn::request()->pathAndQuery(),
-                true
-            )
+            'url'      => url('', '/')
         ];
 
         // Only add user-related information if a user is signed in.
@@ -124,6 +125,18 @@ class AnalyticsTracker {
     public function trackEvent($collection, $event, $data = array()) {
         // Load up the defaults we'd like to have and merge them into the data.
         $defaults = $this->getDefaultData();
+
+        // Allow other add-ons to plug-in and modify the event.
+        $this->EventArguments['Collection'] =& $collection;
+        $this->EventArguments['Event']      =& $event;
+        $this->EventArguments['Data']       =& $data;
+        $this->EventArguments['Defaults']   =& $defaults;
+
+        Gdn::pluginManager()->callEventHandlers(
+            $this,
+            'AnalyticsTracker',
+            'BeforeTrackEvent'
+        );
 
         // Iterate through our tracker list and tell each of them about our event.
         foreach ($this->trackers as $interface) {

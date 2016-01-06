@@ -8,6 +8,26 @@ class AnalyticsData extends Gdn_Model {
 
     private static $defaultTimeZone = null;
 
+    public static function getCategory($categoryID) {
+        $categoryModel = new CategoryModel();
+
+        $categoryDetails = $categoryModel->getID($categoryID);
+        if ($categoryDetails) {
+            $category = [
+                'categoryID' => (int)$categoryDetails->CategoryID,
+                'name'       => $categoryDetails->Name,
+                'slug'       => $categoryDetails->UrlCode
+            ];
+        } else {
+            // Fallback category data
+            $category = [
+                'categoryID' => 0
+            ];
+        }
+
+        return $category;
+    }
+
     /**
      * Fetch all ancestors up to, and including, the current category.
      *
@@ -15,13 +35,19 @@ class AnalyticsData extends Gdn_Model {
      * @return array An array of objects containing the ID and name of each of the category's ancestors.
      */
     public static function getCategoryAncestors($categoryID) {
-        $ancestors = [];
+        $ancestors = new stdClass;
 
+        // Grab our category's ancestors, which include the current category.
         $categories = CategoryModel::getAncestors($categoryID);
+
+        $categoryLevel = 0;
         foreach ($categories as $currentCategory) {
-            $ancestors[] = [
+            $categoryLabel = "cat".(++$categoryLevel);
+
+            $ancestors->{$categoryLabel} = [
                 'categoryID' => (int)$currentCategory['CategoryID'],
-                'name' => $currentCategory['Name']
+                'name'       => $currentCategory['Name'],
+                'slug'       => $currentCategory['UrlCode']
             ];
         }
 
@@ -40,16 +66,29 @@ class AnalyticsData extends Gdn_Model {
 
         if ($comment) {
             $data = [
-                'commentID' => (int)$commentID
+                'commentID'    => (int)$commentID,
+                'discussionID' => (int)$comment->DiscussionID,
+                'insertUser'   => self::getUser($comment->InsertUserID)
             ];
             $discussion = self::getDiscussion($comment->DiscussionID);
 
             if ($discussion) {
-                $data['discussion'] = $discussion;
+                $data['category']          = val('category', $discussion);
+                $data['categoryAncestors'] = val('categoryAncestors', $discussion);
+                $data['discussionUser']    = val('discussionUser', $discussion);
+
+                // Removing those redundancies...
+                unset(
+                    $discussion['category'],
+                    $discussion['categoryAncestors'],
+                    $discussion['discussionUser']
+                );
+                $data['discussion']     = $discussion;
             }
 
             return $data;
         } else {
+            // Fallback comment data
             return [
                 'commentID' => 0
             ];
@@ -79,6 +118,24 @@ class AnalyticsData extends Gdn_Model {
     }
 
     /**
+     * Filter elements from getDateTime down to date-only fields.
+     *
+     * @param string $time Time to breakdown.
+     * @param DateTimeZone|null $timeZone Time zone to represent the specified time in.
+     * @return array
+     */
+    public static function getDate($time = 'now', DateTimeZone $timeZone = null) {
+        $dateTime = self::getDateTime($time, $timeZone);
+
+        return [
+            'year'      => $dateTime['year'],
+            'month'     => $dateTime['month'],
+            'day'       => $dateTime['day'],
+            'dayOfWeek' => $dateTime['dayOfWeek']
+        ];
+    }
+
+    /**
      * Grab an array of date/time parts representing the specified date/time.
      *
      * @param string $time Time to breakdown.
@@ -94,15 +151,15 @@ class AnalyticsData extends Gdn_Model {
         $startOfWeek = $dateTime->format('w') === 0 ? 'today' : 'last sunday';
 
         return [
+            'year'        => (int)$dateTime->format('Y'),
+            'month'       => (int)$dateTime->format('n'),
             'day'         => (int)$dateTime->format('j'),
-            'dayOfWeek'   => (int)$dateTime->format('w'),
             'hour'        => (int)$dateTime->format('G'),
             'minute'      => (int)$dateTime->format('i'),
-            'month'       => (int)$dateTime->format('n'),
+            'dayOfWeek'   => (int)$dateTime->format('w'),
             'startOfWeek' => (int)strtotime($startOfWeek, $dateTime->format('U')),
             'timestamp'   => (int)$dateTime->format('U'),
             'timeZone'    => $dateTime->format('T'),
-            'year'        => (int)$dateTime->format('Y'),
         ];
     }
 
@@ -119,11 +176,14 @@ class AnalyticsData extends Gdn_Model {
         if ($discussion) {
             // We have a valid discussion, so we can put together the basic information using the record.
             return [
-                'discussionID' => (int)$discussion->DiscussionID,
-                'name' => $discussion->Name,
-                'categories' => self::getCategoryAncestors($discussion->CategoryID)
+                'category'          => self::getCategory($discussion->CategoryID),
+                'categoryAncestors' => self::getCategoryAncestors($discussion->CategoryID),
+                'discussionID'      => (int)$discussion->DiscussionID,
+                'discussionUser'    => self::getUser($discussion->InsertUserID),
+                'name'              => $discussion->Name
             ];
         } else {
+            // Fallback discussion data
             return [
                 'discussionID' => 0
             ];
@@ -159,10 +219,12 @@ class AnalyticsData extends Gdn_Model {
      * @return array An array representing analytics data for the current user as a guest.
      */
     public static function getGuest() {
+        //@todo Add cookie and session values
         return [
-            'userID'         => 0,
+            'dateFirstVisit' => null,
             'name'           => '@guest',
-            'dateFirstVisit' => null
+            'roleType'       => 'guest',
+            'userID'         => 0
         ];
     }
 
@@ -193,15 +255,58 @@ class AnalyticsData extends Gdn_Model {
                 }
             }
 
+            if ($userModel->checkPermission($user, 'Garden.Settings.Manage')) {
+                $roleType = 'admin';
+            } elseif ($userModel->checkPermission($user, 'Garden.Community.Manage')) {
+                $roleType = 'cm';
+            } elseif ($userModel->checkPermission($user, 'Garden.Moderation.Manage')) {
+                $roleType = 'mod';
+            } else {
+                $roleType = 'member';
+            }
+
+            //@todo Add cookie and session values
             $userInfo = [
-                'userID'         => (int)$user->UserID,
-                'name'           => $user->Name,
-                'roles'          => $roles,
-                'timeFirstVisit' => $user->DateFirstVisit
+                'commentCount'    => (int)$user->CountComments,
+                'dateFirstVisit'  => self::getDate($user->DateFirstVisit),
+                'dateRegistered'  => self::getDate($user->DateInserted),
+                'discussionCount' => (int)$user->CountDiscussions,
+                'name'            => $user->Name,
+                'roles'           => $roles,
+                'roleType'        => $roleType,
+                'userID'          => (int)$user->UserID
             ];
+
+            $userInfo['points'] = val('Points', $user, 0);
+
+            // Attempto to fetch rank info for the current user.
+            if (($rankID = val('RankID', $user)) && class_exists('RankModel')) {
+                // If the rank ID is invalid, RankModel::ranks will return a null value.
+                $rankDetails = RankModel::ranks($rankID);
+            } else {
+                $rankDetails = null;
+            }
+
+            // Did the user have a rank ID and was it valid?
+            if (!is_null($rankDetails)) {
+                $rank = [
+                    'label'  => $rankDetails['Label'],
+                    'level'  => $rankDetails['Level'],
+                    'name'   => $rankDetails['Name'],
+                    'rankID' => $rankDetails['RankID']
+                ];
+            } else {
+                // Fallback rank data
+                $rank = [
+                    'rankID' => 0
+                ];
+            }
+
+            $userInfo['rank'] = $rank;
 
             return $userInfo;
         } else {
+            // Fallback user data
             return [
                 'userID'         => 0,
                 'name'           => '@notfound',

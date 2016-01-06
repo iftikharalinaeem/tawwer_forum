@@ -139,14 +139,37 @@ class VanillaAnalytics extends Gdn_Plugin {
     public function reactionsPlugin_reaction_handler($sender, &$args) {
         $reactionData = val('ReactionData', $args);
 
+        $recordType = strtolower(val('RecordType', $reactionData));
+        $recordID = val('RecordID', $args);
+        $recordUser = AnalyticsData::getUser(0);
+
+        switch ($recordType) {
+            case 'comment':
+                $commentModel = new CommentModel();
+                $commentDetails = $commentModel->getID($recordID);
+                if ($commentDetails) {
+                    $recordUser = AnalyticsData::getUser($commentDetails->InsertUserID);
+                }
+                break;
+            case 'discussion':
+                $discussionModel = new DiscussionModel();
+                $discussionDetails = $discussionModel->getID($recordID);
+                if ($discussionDetails) {
+                    $recordUser = AnalyticsData::getUser($discussionDetails->InsertUserID);
+                }
+                break;
+            default:
+        }
+
         // Grabbing the relevant information from the ReactionData event argument
         $data = [
             'reaction' => [
-                'recordType' => strtolower(val('RecordType', $reactionData)),
-                'recordID' => (int)val('RecordID', $args),
-                'urlCode' => strtolower(val('ReactionUrlCode', $args)),
-                'tagID' => (int)val('TagID', $reactionData),
-                'total' => (int)val('Total', $reactionData)
+                'recordType' => $recordType,
+                'recordID'   => (int)$recordID,
+                'recordUser' => $recordUser,
+                'urlCode'    => strtolower(val('ReactionUrlCode', $args)),
+                'tagID'      => (int)val('TagID', $reactionData),
+                'total'      => (int)val('Total', $reactionData)
             ]
         ];
 
