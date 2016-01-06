@@ -58,11 +58,18 @@ gdn.mustache = {
      *
      * @param string templateName Name of the template to render
      * @param JSON view View object for Mustache
-     * @param array partials A list of partial templates to include
      */
-    render: function (templateName, view, partials) {
+    render: function (templateName, view) {
         var templateSrc = gdn.mustache.getTemplateSrc(templateName);
         if (templateSrc) {
+            var partials = [];
+
+            // Add all registered templates as partials automatically.
+            // We're assuming that all provided templates can be used as partials.
+            jQuery.each(gdn.mustache.templates, function(i, template) {
+                partials.push(template.name);
+            });
+
             partials = gdn.mustache.getPartials(partials);
             return Mustache.render(templateSrc, view, partials);
         } else {
@@ -79,10 +86,9 @@ gdn.mustache = {
      * @param string template Name of the template to render
      * @param JSON view View object for Mustache
      * @param DOMObject element DOM object to replace
-     * @param array partials A list of partial templates to include
      */
-    renderInPlace: function (templateName, view, element, partials) {
-        var render = gdn.mustache.render(templateName, view, partials);
+    renderInPlace: function (templateName, view, element) {
+        var render = gdn.mustache.render(templateName, view);
         var replace = jQuery(render);
         jQuery(element).replaceWith(replace);
         return replace;
