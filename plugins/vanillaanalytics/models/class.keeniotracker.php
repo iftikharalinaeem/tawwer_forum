@@ -63,6 +63,9 @@ class KeenIOTracker implements TrackerInterface {
                         ],
                         'output' => 'ipGeo'
                     ],
+                    /**
+                     * url_parser doesn't work without a domain name.  Since we don't currently use domain name, we're
+                     * going to ditch keen's URL parser addon.
                     [
                         'name' => 'keen:url_parser',
                         'input' => [
@@ -70,6 +73,7 @@ class KeenIOTracker implements TrackerInterface {
                         ],
                         'output' => 'urlParsed'
                     ]
+                     */
                 ]
             ]
         ];
