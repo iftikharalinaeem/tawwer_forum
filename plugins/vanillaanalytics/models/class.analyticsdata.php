@@ -186,6 +186,7 @@ class AnalyticsData extends Gdn_Model {
 
     /**
      * Grab data about a discussion for use in analytics.
+     *
      * @param $discussionID ID of the discussion we're targeting.
      * @return array|bool An array representing the discussion data on success, false on failure.
      */
@@ -259,7 +260,9 @@ class AnalyticsData extends Gdn_Model {
     /**
      * Retrieve information about a particular user for user in analytics.
      *
-     * @todo Add cookie and session values
+     * @todo Add cookie (value that follows user from guest status through registration)
+     * @todo Add sessionID
+     * @todo Add topBadge
      * @param int $userID Record ID of the user to fetch.
      * @return array|bool An array representing the user data on success, false on failure.
      */
