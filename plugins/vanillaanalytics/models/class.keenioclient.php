@@ -13,6 +13,8 @@ class KeenIOClient extends Garden\Http\HttpClient {
 
     const COMMAND_MASTER = 'master';
 
+    const COMMAND_ORG = 'org';
+
     const COMMAND_READ = 'read';
 
     const COMMAND_WRITE = 'write';
@@ -23,26 +25,39 @@ class KeenIOClient extends Garden\Http\HttpClient {
 
     const REQUEST_POST = 'post';
 
+    /**
+     * Non-scoped key for the project, capable of reading and writing.
+     * @var string
+     */
     protected $masterKey;
+
+    /**
+     * Unique ID of the organization our projects belong to.
+     * @var string
+     */
+    protected $orgID;
+
+    /**
+     * Key with capabilities for managing a keen.io organization.
+     * @var string
+     */
+    protected $orgKey;
 
     /**
      * The project ID we'll be recording events against.
      * @var string
-     * @access protected
      */
     protected $projectID;
 
     /**
      * Scoped key for reading from the configured project.
      * @var string
-     * @access protected
      */
     protected $readKey;
 
     /**
      * Scoped key for writing to the configured project.
      * @var string
-     * @access protected
      */
     protected $writeKey;
 
@@ -57,9 +72,11 @@ class KeenIOClient extends Garden\Http\HttpClient {
             'baseUrl'   => 'https://api.keen.io/{version}',
             'version'   => self::API_VERSION,
             'masterKey' => null,
+            'orgID'     => null,
+            'orgKey'    => null,
             'writeKey'  => null,
             'readKey'   => null,
-            'projectId' => null
+            'projectID' => null
         );
 
         $config = array_merge($default, $config);
@@ -75,7 +92,9 @@ class KeenIOClient extends Garden\Http\HttpClient {
         $this->setThrowExceptions(true);
 
         $this->setMasterKey($config['masterKey']);
-        $this->setProjectID($config['projectId']);
+        $this->setOrgID($config['orgID']);
+        $this->setOrgKey($config['orgKey']);
+        $this->setProjectID($config['projectID']);
         $this->setWriteKey($config['writeKey']);
         $this->setReadKey($config['readKey']);
     }
@@ -100,6 +119,19 @@ class KeenIOClient extends Garden\Http\HttpClient {
             "projects/{$this->projectID}/events",
             $data,
             self::COMMAND_WRITE
+        );
+    }
+
+    public function addProject($name, array $users = []) {
+        $data = [
+            'name'  => $name,
+            'users' => $users
+        ];
+
+        return $this->command(
+            "organizations/{$this->orgID}/projects",
+            $data,
+            self::COMMAND_ORG
         );
     }
 
@@ -129,6 +161,8 @@ class KeenIOClient extends Garden\Http\HttpClient {
                 case self::COMMAND_MASTER:
                     $headers['Authorization'] = $this->getMasterKey();
                     break;
+                case self::COMMAND_ORG:
+                    $headers['Authorization'] = $this->getOrgKey();
                 case self::COMMAND_READ:
                     $headers['Authorization'] = $this->getReadKey();
                     break;
@@ -188,6 +222,14 @@ class KeenIOClient extends Garden\Http\HttpClient {
 
     public function getEventSchemas() {
         return $this->getCollections();
+    }
+
+    public function getOrgID() {
+        return $this->orgID;
+    }
+
+    public function getOrgKey() {
+        return $this->orgKey;
     }
 
     public function getMasterKey() {
@@ -256,6 +298,14 @@ class KeenIOClient extends Garden\Http\HttpClient {
 
     public function setMasterKey($masterKey) {
         return $this->masterKey = $masterKey;
+    }
+
+    public function setOrgID($orgID) {
+        return $this->orgID = $orgID;
+    }
+
+    public function setOrgKey($orgKey) {
+        return $this->orgKey = $orgKey;
     }
 
     public function setProjectID($projectID) {

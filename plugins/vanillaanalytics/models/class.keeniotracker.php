@@ -18,9 +18,11 @@ class KeenIOTracker implements TrackerInterface {
         $this->client = new KeenIOClient(
             'https://api.keen.io/{version}/',
             [
-                'projectId' => c('VanillaAnalytics.KeenIO.ProjectID'),
-                'writeKey'   => c('VanillaAnalytics.KeenIO.WriteKey'),
-                'readKey'  => c('VanillaAnalytics.KeenIO.ReadKey')
+                'orgID'      => c('VanillaAnalytics.KeenIO.OrgID'),
+                'orgKey'     => c('VanillaAnalytics.KeenIO.OrgKey'),
+                'projectID'  => c('VanillaAnalytics.KeenIO.ProjectID'),
+                'readKey'    => c('VanillaAnalytics.KeenIO.ReadKey'),
+                'writeKey'   => c('VanillaAnalytics.KeenIO.WriteKey')
             ]
         );
     }
