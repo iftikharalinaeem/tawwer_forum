@@ -8,13 +8,13 @@
  */
 
 $PluginInfo['VanillaAnalytics'] = array(
-    'Name' => 'Vanilla Analytics',
-    'Description' => 'Support for transmitting events to analytics services.',
-    'Version' => '1.0.0',
+    'Name'                 => 'Vanilla Analytics',
+    'Description'          => 'Support for transmitting events to analytics services.',
+    'Version'              => '1.0.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
-    'Author' => 'Ryan Perry',
-    'AuthorEmail' => 'ryan.p@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.org/profile/initvector'
+    'Author'               => 'Ryan Perry',
+    'AuthorEmail'          => 'ryan.p@vanillaforums.com',
+    'AuthorUrl'            => 'http://vanillaforums.org/profile/initvector'
 );
 
 /**
@@ -49,12 +49,13 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param $args Event arguments, passed from CommentModel, specifically for the event.
      */
     public function commentModel_afterSaveComment_handler($sender, &$args) {
+        $type = val('Insert', $args) ? 'comment_add' : 'comment_edit';
+
         $data = [
-            'comment' => AnalyticsData::getComment(val('CommentID', $args))
+            'comment' => AnalyticsData::getComment(val('CommentID', $args), $type)
         ];
 
-        $event = val('Insert', $args) ? 'comment_add' : 'comment_edit';
-        AnalyticsTracker::getInstance()->trackEvent('post', $event, $data);
+        AnalyticsTracker::getInstance()->trackEvent('post', $type, $data);
     }
 
     /**
@@ -78,12 +79,13 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param $args Event arguments, passed from DiscussionModel, specifically for the event.
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, &$args) {
+        $type = val('Insert', $args) ? 'discussion_add' : 'discussion_edit';
+
         $data = [
             'discussion' => AnalyticsData::getDiscussion(val('DiscussionID', $args))
         ];
 
-        $event = val('Insert', $args) ? 'discussion_add' : 'discussion_edit';
-        AnalyticsTracker::getInstance()->trackEvent('post', $event, $data);
+        AnalyticsTracker::getInstance()->trackEvent('post', $type, $data);
     }
 
     /**
@@ -123,6 +125,7 @@ class VanillaAnalytics extends Gdn_Plugin {
     /**
      * Track when a user signs out of the site.
      *
+     * @todo Add siteDuration (time between sign-in and sign-out)
      * @param $sender Current instance of EntryController
      * @param $args Event arguments, passed from EntryController, specifically for the event.
      */
@@ -139,15 +142,20 @@ class VanillaAnalytics extends Gdn_Plugin {
     public function reactionsPlugin_reaction_handler($sender, &$args) {
         $reactionData = val('ReactionData', $args);
 
-        $recordType = strtolower(val('RecordType', $reactionData));
+        $discussionID = 0;
         $recordID = val('RecordID', $args);
+        $recordType = strtolower(val('RecordType', $reactionData));
         $recordUser = AnalyticsData::getUser(0);
+        $urlCode = val('ReactionUrlCode', $args);
+
+        $reactionType = ReactionModel::reactionTypes($urlCode);
 
         switch ($recordType) {
             case 'comment':
                 $commentModel = new CommentModel();
                 $commentDetails = $commentModel->getID($recordID);
                 if ($commentDetails) {
+                    $discussionID = $commentDetails->DiscussionID;
                     $recordUser = AnalyticsData::getUser($commentDetails->InsertUserID);
                 }
                 break;
@@ -155,6 +163,7 @@ class VanillaAnalytics extends Gdn_Plugin {
                 $discussionModel = new DiscussionModel();
                 $discussionDetails = $discussionModel->getID($recordID);
                 if ($discussionDetails) {
+                    $discussionID = $discussionDetails->DiscussionID;
                     $recordUser = AnalyticsData::getUser($discussionDetails->InsertUserID);
                 }
                 break;
@@ -164,12 +173,14 @@ class VanillaAnalytics extends Gdn_Plugin {
         // Grabbing the relevant information from the ReactionData event argument
         $data = [
             'reaction' => [
-                'recordType' => $recordType,
-                'recordID'   => (int)$recordID,
-                'recordUser' => $recordUser,
-                'urlCode'    => strtolower(val('ReactionUrlCode', $args)),
-                'tagID'      => (int)val('TagID', $reactionData),
-                'total'      => (int)val('Total', $reactionData)
+                'discussionID' => (int)$discussionID,
+                'reactionType' => val('Name', $reactionType, null),
+                'recordType'   => $recordType,
+                'recordID'     => (int)$recordID,
+                'recordUser'   => $recordUser,
+                'urlCode'      => strtolower($urlCode),
+                'tagID'        => (int)val('TagID', $reactionData),
+                'total'        => (int)val('Total', $reactionData)
             ]
         ];
 

@@ -35,7 +35,7 @@ class AnalyticsData extends Gdn_Model {
      * @return array An array of objects containing the ID and name of each of the category's ancestors.
      */
     public static function getCategoryAncestors($categoryID) {
-        $ancestors = new stdClass;
+        $ancestors = [];
 
         // Grab our category's ancestors, which include the current category.
         $categories = CategoryModel::getAncestors($categoryID);
@@ -44,7 +44,7 @@ class AnalyticsData extends Gdn_Model {
         foreach ($categories as $currentCategory) {
             $categoryLabel = "cat".(++$categoryLevel);
 
-            $ancestors->{$categoryLabel} = [
+            $ancestors[$categoryLabel] = [
                 'categoryID' => (int)$currentCategory['CategoryID'],
                 'name'       => $currentCategory['Name'],
                 'slug'       => $currentCategory['UrlCode']
@@ -60,29 +60,43 @@ class AnalyticsData extends Gdn_Model {
      * @param $commentID A comment's unique ID, used to query data.
      * @return array|bool Array representing comment row on success, false on failure.
      */
-    public static function getComment($commentID) {
+    public static function getComment($commentID, $type = 'comment_add') {
         $commentModel = new CommentModel();
         $comment = $commentModel->getID($commentID);
 
         if ($comment) {
             $data = [
                 'commentID'    => (int)$commentID,
+                'dateInserted' => self::getDateTime($comment->DateInserted),
                 'discussionID' => (int)$comment->DiscussionID,
                 'insertUser'   => self::getUser($comment->InsertUserID)
             ];
             $discussion = self::getDiscussion($comment->DiscussionID);
 
             if ($discussion) {
+                $commentNumber = val('countComments', $discussion, 0);
+
                 $data['category']          = val('category', $discussion);
                 $data['categoryAncestors'] = val('categoryAncestors', $discussion);
                 $data['discussionUser']    = val('discussionUser', $discussion);
+
+                $timeSinceDiscussion = $data['dateInserted']['timestamp'] - $discussion['dateInserted']['timestamp'];
+                $data['commentMetric'] = [
+                    'firstComment' => $commentNumber === 0 ? true : false,
+                    'time'         => (int)$timeSinceDiscussion
+                ];
+
+                // The count of comments we get from the discussion doesn't include this one, so we compensate.
+                $discussion['countComments'] = ($commentNumber + 1);
 
                 // Removing those redundancies...
                 unset(
                     $discussion['category'],
                     $discussion['categoryAncestors'],
+                    $discussion['commentMetric'],
                     $discussion['discussionUser']
                 );
+
                 $data['discussion']     = $discussion;
             }
 
@@ -174,10 +188,17 @@ class AnalyticsData extends Gdn_Model {
         $discussion = $discussionModel->getID($discussionID);
 
         if ($discussion) {
+
             // We have a valid discussion, so we can put together the basic information using the record.
             return [
                 'category'          => self::getCategory($discussion->CategoryID),
                 'categoryAncestors' => self::getCategoryAncestors($discussion->CategoryID),
+                'commentMetric'     => [
+                    'firstComment' => false,
+                    'time'         => null
+                ],
+                'countComments'     => (int)$discussion->CountComments,
+                'dateInserted'      => self::getDateTime($discussion->DateInserted),
                 'discussionID'      => (int)$discussion->DiscussionID,
                 'discussionUser'    => self::getUser($discussion->InsertUserID),
                 'name'              => $discussion->Name
@@ -216,10 +237,10 @@ class AnalyticsData extends Gdn_Model {
     /**
      * Build and return guest data for the current user.
      *
+     * @todo Add cookie and session values
      * @return array An array representing analytics data for the current user as a guest.
      */
     public static function getGuest() {
-        //@todo Add cookie and session values
         return [
             'dateFirstVisit' => null,
             'name'           => '@guest',
@@ -231,6 +252,7 @@ class AnalyticsData extends Gdn_Model {
     /**
      * Retrieve information about a particular user for user in analytics.
      *
+     * @todo Add cookie and session values
      * @param int $userID Record ID of the user to fetch.
      * @return array|bool An array representing the user data on success, false on failure.
      */
@@ -265,7 +287,6 @@ class AnalyticsData extends Gdn_Model {
                 $roleType = 'member';
             }
 
-            //@todo Add cookie and session values
             $userInfo = [
                 'commentCount'    => (int)$user->CountComments,
                 'dateFirstVisit'  => self::getDate($user->DateFirstVisit),

@@ -109,7 +109,7 @@ class KeenIOTracker implements TrackerInterface {
      * @return array Body of response from keen.io
      */
     public function event($collection, $type, array $details = []) {
-        $details['event'] = $type;
+        $details['type'] = $type;
 
         return $this->client->addEvent($collection, $details);
     }

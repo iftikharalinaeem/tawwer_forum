@@ -42,7 +42,18 @@ class AnalyticsTracker {
             $tracker->addDefinitions($controller);
         }
 
-        $controller->addDefinition('eventData', $this->getDefaultData(true));
+        $defaultData = $this->getDefaultData(true);
+
+        // Figure out if we have a discussion.  If we do, include it in the event data.
+        if ($discussion = $controller->data('Discussion', false)) {
+            $defaultData['discussion'] = AnalyticsData::getDiscussion(val('DiscussionID', $discussion, 0));
+        } else {
+            $defaultData['discussion'] = [
+                'discussionID' => 0
+            ];
+        }
+
+        $controller->addDefinition('eventData', $defaultData);
     }
 
     /**
