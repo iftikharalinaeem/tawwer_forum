@@ -87,7 +87,14 @@ class AnalyticsData extends Gdn_Model {
                 ];
 
                 // The count of comments we get from the discussion doesn't include this one, so we compensate.
-                $discussion['countComments'] = ($commentNumber + 1);
+                $commentPosition = ($commentNumber + 1);
+                $discussion['countComments'] = $commentPosition;
+
+                if ($type == 'comment_add') {
+                    $data['commentPosition'] = $commentPosition;
+                } else {
+                    $data['commentPosition'] = 0;
+                }
 
                 // Removing those redundancies...
                 unset(
