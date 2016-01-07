@@ -51,9 +51,7 @@ class VanillaAnalytics extends Gdn_Plugin {
     public function commentModel_afterSaveComment_handler($sender, &$args) {
         $type = val('Insert', $args) ? 'comment_add' : 'comment_edit';
 
-        $data = [
-            'comment' => AnalyticsData::getComment(val('CommentID', $args), $type)
-        ];
+        $data = AnalyticsData::getComment(val('CommentID', $args), $type);
 
         AnalyticsTracker::getInstance()->trackEvent('post', $type, $data);
     }
@@ -65,9 +63,7 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param $args Event arguments, passed from CommentModel, specifically for the event.
      */
     public function commentModel_deleteComment_handler($sender, &$args) {
-        $data = [
-            'comment' => AnalyticsData::getComment(val('CommentID', $args))
-        ];
+        $data = AnalyticsData::getComment(val('CommentID', $args));
 
         AnalyticsTracker::getInstance()->trackEvent('post', 'comment_delete', $data);
     }
@@ -81,9 +77,7 @@ class VanillaAnalytics extends Gdn_Plugin {
     public function discussionModel_afterSaveDiscussion_handler($sender, &$args) {
         $type = val('Insert', $args) ? 'discussion_add' : 'discussion_edit';
 
-        $data = [
-            'discussion' => AnalyticsData::getDiscussion(val('DiscussionID', $args))
-        ];
+        $data = AnalyticsData::getDiscussion(val('DiscussionID', $args));
 
         AnalyticsTracker::getInstance()->trackEvent('post', $type, $data);
     }
@@ -95,9 +89,7 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param $args Event arguments, passed from DiscussionModel, specifically for the event.
      */
     public function discussionModel_deleteDiscussion_handler($sender, &$args) {
-        $data = [
-            'discussion' => AnalyticsData::getDiscussion(val('DiscussionID', $args))
-        ];
+        $data = AnalyticsData::getDiscussion(val('DiscussionID', $args));
 
         AnalyticsTracker::getInstance()->trackEvent('post', 'discussion_delete', $data);
     }
