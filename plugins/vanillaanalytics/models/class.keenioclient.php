@@ -163,6 +163,7 @@ class KeenIOClient extends Garden\Http\HttpClient {
                     break;
                 case self::COMMAND_ORG:
                     $headers['Authorization'] = $this->getOrgKey();
+                    break;
                 case self::COMMAND_READ:
                     $headers['Authorization'] = $this->getReadKey();
                     break;
