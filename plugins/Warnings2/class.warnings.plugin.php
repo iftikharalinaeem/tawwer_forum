@@ -475,12 +475,10 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         $Form = new Gdn_Form();
-        $Form->InputPrefix = '';
         $sender->Form = $Form;
 
         if ($Form->AuthenticatedPostBack()) {
             $Form->SetModel($Model);
-            $Form->InputPrefix = '';
 
             $Form->SetFormValue('Type', 'note');
 
@@ -741,7 +739,6 @@ class Warnings2Plugin extends Gdn_Plugin {
 //      $CurrentLevel = val('Warnings.Level', $Meta, 0);
 
         $Form = new Gdn_Form();
-        $Form->InputPrefix = '';
         $Sender->Form = $Form;
 
         if (!$UserID) {
@@ -767,7 +764,6 @@ class Warnings2Plugin extends Gdn_Plugin {
         if ($Form->AuthenticatedPostBack()) {
             $Model = new WarningModel();
             $Form->SetModel($Model);
-            $Form->InputPrefix = '';
 
             $Form->SetFormValue('UserID', $UserID);
 

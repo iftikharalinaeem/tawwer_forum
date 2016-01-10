@@ -87,8 +87,6 @@ class SpamCleanerPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Moderation.Manage');
       $Sender->Title(T('Clean Spam'));
       
-      $Sender->Form->InputPrefix = '';
-      
       if ($Sender->Form->IsPostBack()) {
          $Sender->AddDefinition('StartCleanSpam', TRUE);
          $Sender->SetData('StartCleanSpam', TRUE);
