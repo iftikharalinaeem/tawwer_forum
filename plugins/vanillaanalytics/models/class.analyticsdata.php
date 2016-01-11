@@ -208,9 +208,9 @@ class AnalyticsData extends Gdn_Model {
                 'countComments'     => (int)$discussion->CountComments,
                 'dateInserted'      => self::getDateTime($discussion->DateInserted),
                 'discussionID'      => (int)$discussion->DiscussionID,
+                'discussionType'    => $discussion->Type,
                 'discussionUser'    => self::getUser($discussion->InsertUserID),
-                'name'              => $discussion->Name,
-                'type'              => $discussion->Type
+                'name'              => $discussion->Name
             ];
         } else {
             // Fallback discussion data
