@@ -11,7 +11,7 @@ $(document).ready(function() {
         eventData = gdn.meta.eventData || false;
 
         if (eventData) {
-            eventData.event = 'page_view';
+            eventData.type = 'page_view';
 
             keenClient.addEvent(
                 "page",
