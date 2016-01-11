@@ -209,7 +209,8 @@ class AnalyticsData extends Gdn_Model {
                 'dateInserted'      => self::getDateTime($discussion->DateInserted),
                 'discussionID'      => (int)$discussion->DiscussionID,
                 'discussionUser'    => self::getUser($discussion->InsertUserID),
-                'name'              => $discussion->Name
+                'name'              => $discussion->Name,
+                'type'              => $discussion->Type
             ];
         } else {
             // Fallback discussion data
