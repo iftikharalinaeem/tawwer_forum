@@ -26,7 +26,7 @@ class VanillaAnalytics extends Gdn_Plugin {
      * Track the generic 404 response.
      */
     public function gdn_dispatcher_notFound_handler() {
-        AnalyticsTracker::getInstance()->trackEvent('error', 'error_notFound');
+        AnalyticsTracker::getInstance()->trackEvent('error', 'error_notfound');
     }
 
     /**
