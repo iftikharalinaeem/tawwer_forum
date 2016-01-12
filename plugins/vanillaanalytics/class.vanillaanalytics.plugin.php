@@ -81,7 +81,7 @@ class VanillaAnalytics extends Gdn_Plugin {
 
         $data = AnalyticsData::getDiscussion(val('DiscussionID', $args));
 
-        AnalyticsTracker::getInstance()->trackEvent('post', $type, $data);
+        AnalyticsTracker::getInstance()->trackEvent($collection, $type, $data);
     }
 
     /**
