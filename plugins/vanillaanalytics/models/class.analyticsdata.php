@@ -42,7 +42,7 @@ class AnalyticsData extends Gdn_Model {
 
         $categoryLevel = 0;
         foreach ($categories as $currentCategory) {
-            $categoryLabel = "cat".(++$categoryLevel);
+            $categoryLabel = 'cat' . sprintf('%02d', ++$categoryLevel);
 
             $ancestors[$categoryLabel] = [
                 'categoryID' => (int)$currentCategory['CategoryID'],
