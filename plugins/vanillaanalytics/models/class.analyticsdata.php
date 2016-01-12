@@ -300,8 +300,8 @@ class AnalyticsData extends Gdn_Model {
 
             $userInfo = [
                 'commentCount'    => (int)$user->CountComments,
-                'dateFirstVisit'  => self::getDate($user->DateFirstVisit),
-                'dateRegistered'  => self::getDate($user->DateInserted),
+                'dateFirstVisit'  => self::getDateTime($user->DateFirstVisit),
+                'dateRegistered'  => self::getDateTime($user->DateInserted),
                 'discussionCount' => (int)$user->CountDiscussions,
                 'name'            => $user->Name,
                 'roles'           => $roles,
