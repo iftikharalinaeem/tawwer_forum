@@ -8,7 +8,7 @@
 $PluginInfo['AdvancedSearch'] = array(
     'Name' => 'Advanced Search',
     'Description' => 'Enables advanced search on sites.',
-    'Version' => '1.0.6',
+    'Version' => '1.0.7',
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -154,7 +154,15 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
      * @param type $Args
      */
     public function gdn_smarty_init_handler($Sender, $Args) {
+        if (method_exists($Sender, 'registerPlugin')) {
+            $Sender->registerPlugin(
+                'function',
+                'searchbox_advanced',
+                'searchBoxAdvanced'
+            );
+        } else {
         $Sender->register_function('searchbox_advanced', 'searchBoxAdvanced');
+    }
     }
 
     public function searchController_autoComplete_create($sender, $term, $limit = 5) {
