@@ -139,7 +139,7 @@ class Cleanspeak extends Gdn_Pluggable {
 
         $proxyRequest = new ProxyRequest();
         $options = array(
-            'Url' => C('Plugins.Cleanspeak.ApiUrl') . '/'. ltrim($url, '/')
+            'Url' => rtrim(C('Plugins.Cleanspeak.ApiUrl'), '/').'/'.ltrim($url, '/')
         );
         $queryParams = array();
         if ($post != null) {
