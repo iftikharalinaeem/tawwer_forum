@@ -9,7 +9,7 @@
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.4.1',
+    'Version' => '2.4.2',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -61,7 +61,9 @@ class Warnings2Plugin extends Gdn_Plugin {
     public function structure() {
         require __DIR__.'/structure.php';
 
-        Gdn::PluginManager()->DisablePlugin('Warnings');
+        if (Gdn::pluginManager()->isEnabled('Warnings')) {
+            Gdn::PluginManager()->DisablePlugin('Warnings');
+        }
     }
 
     /**
