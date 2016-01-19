@@ -12,7 +12,6 @@ $PluginInfo['ImageRequired'] = array(
     'RequiredPlugins' => array(
         'FileUpload' => '1.8.4'
     ),
-    'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true,
     'Author' => "Patrick Kelly",
     'AuthorEmail' => 'patrick.k@vanillaforums.com'
@@ -27,14 +26,16 @@ $PluginInfo['ImageRequired'] = array(
 class ImageRequiredPlugin extends Gdn_Plugin {
 
     /**
-     * Add javascript to hide photo upload if it is not being used.
+     * Add javascript to:
+     *  - Populate hidden form field when an image has been selected for validation purposes.
+     *  - When a category has been selected using the dropdown, refresh the page so that the image upload like shows.
      *
      * @param $sender
      * @param $args
      */
     public function base_render_before($sender, $args) {
-        $imageRequiredCategory = c("Plugins.ImageRequired.ImageRequiredCategory");
-        if(!$imageRequiredCategory) {
+        $imageRequiredCategory = c("ImageRequired.ImageRequiredCategory");
+        if (!$imageRequiredCategory) {
             return;
         }
         $sender->addJsFile('image-required.js', 'plugins/ImageRequired');
@@ -49,29 +50,27 @@ class ImageRequiredPlugin extends Gdn_Plugin {
      * @param $args
      */
     public function postController_beforeDiscussionRender_handler($sender, $args) {
-        $imageRequiredCategory = c("Plugins.ImageRequired.ImageRequiredCategory");
-        if(!$imageRequiredCategory) {
+        $imageRequiredCategory = c("ImageRequired.ImageRequiredCategory");
+        if (!$imageRequiredCategory) {
             return;
         }
-
         $sender->Form->addHidden("imageName", '');
-        $sender->Form->addHidden("imageRequiredCategoryChosen", 'false');
+        $sender->Form->addHidden("imageRequiredCategoryChosen", in_array(gdn::request()->get('CategoryID'), $imageRequiredCategory));
     }
 
     /**
-     * On creation of a new discussion, validate that there was an image present. Close the discussion.
+     * On creation of a new discussion, validate that there was an image present.
      *
      * @param $sender
      * @param $args
      */
     public function discussionModel_beforeSaveDiscussion_handler($sender, $args) {
-        $imageRequiredCategory = c("Plugins.ImageRequired.ImageRequiredCategory");
-        if(!$imageRequiredCategory) {
+        $imageRequiredCategory = c("ImageRequired.ImageRequiredCategory");
+        if (!$imageRequiredCategory) {
             return;
         }
 
         if (in_array($args['FormPostValues']['CategoryID'], $imageRequiredCategory)) {
-            $args['FormPostValues']['Closed'] = 1;
             if (class_exists('FileUploadPlugin')) {
                 $sender->Validation->applyRule('imageName', 'Required', t('Please upload a photo.'));
             }
@@ -85,8 +84,8 @@ class ImageRequiredPlugin extends Gdn_Plugin {
      * @param $args
      */
     public function settingsController_afterCategorySettings_handler($sender, $args) {
-        $imageRequiredCategory = c("Plugins.ImageRequired.ImageRequiredCategory");
-        if(!$imageRequiredCategory) {
+        $imageRequiredCategory = c("ImageRequired.ImageRequiredCategory");
+        if (!$imageRequiredCategory) {
             $imageRequiredCategory = array();
         }
         $isChecked = in_array($sender->data('CategoryID'), $imageRequiredCategory) ? 1 : 0;
@@ -101,8 +100,8 @@ class ImageRequiredPlugin extends Gdn_Plugin {
      * @param $args
      */
     public function categoryModel_beforeSaveCategory_handler ($sender, $args) {
-        $imageRequiredCategory = c("Plugins.ImageRequired.ImageRequiredCategory");
-        if(!$imageRequiredCategory) {
+        $imageRequiredCategory = c("ImageRequired.ImageRequiredCategory");
+        if (!$imageRequiredCategory) {
             $imageRequiredCategory = array();
         }
         $category = $args['FormPostValues'];
@@ -110,7 +109,7 @@ class ImageRequiredPlugin extends Gdn_Plugin {
         if (!in_array($category['CategoryID'], $imageRequiredCategory) && $category['RequireImage']) {
             // Save to the Require Image Category array in config,
             array_push($imageRequiredCategory, $category['CategoryID']);
-            saveToConfig("Plugins.ImageRequired.ImageRequiredCategory", $imageRequiredCategory);
+            saveToConfig("ImageRequired.ImageRequiredCategory", $imageRequiredCategory);
         }
 
         if (in_array($category['CategoryID'], $imageRequiredCategory) && !$category['RequireImage']) {
@@ -119,7 +118,7 @@ class ImageRequiredPlugin extends Gdn_Plugin {
             if (false !== $key) {
                 unset($imageRequiredCategory[$key]);
             }
-            saveToConfig("Plugins.ImageRequired.ImageRequiredCategory", $imageRequiredCategory);
+            saveToConfig("ImageRequired.ImageRequiredCategory", $imageRequiredCategory);
         }
     }
 }
