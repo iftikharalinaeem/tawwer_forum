@@ -42,18 +42,10 @@ class AnalyticsTracker {
             $tracker->addDefinitions($controller);
         }
 
-        $defaultData = $this->getDefaultData(true);
+        $eventData = $this->getPageViewData($controller);
 
-        // Figure out if we have a discussion.  If we do, include it in the event data.
-        if ($discussion = $controller->data('Discussion', false)) {
-            $defaultData['discussion'] = AnalyticsData::getDiscussion(val('DiscussionID', $discussion, 0));
-        } else {
-            $defaultData['discussion'] = [
-                'discussionID' => 0
-            ];
-        }
-
-        $controller->addDefinition('eventData', $defaultData);
+        $controller->addDefinition('vaCookieName', c('Garden.Cookie.Name') . '-VA');
+        $controller->addDefinition('eventData', $eventData);
     }
 
     /**
@@ -62,6 +54,10 @@ class AnalyticsTracker {
      * @param Gdn_Controller Instance of the current controller.
      */
     public function addJsFiles(Gdn_Controller $controller) {
+        if (c('VanillaAnalytics.UseEventCookie')) {
+            $controller->addJsFile('js.cookie.min.js', 'plugins/vanillaanalytics');
+        }
+
         foreach ($this->trackers as $interface) {
             $interface->addJsFiles($controller);
         }
@@ -126,6 +122,27 @@ class AnalyticsTracker {
         }
 
         return static::$instance;
+    }
+
+    /**
+     * Fetch data for use in a page view event.
+     *
+     * @param Gdn_Controller $controller Current page controller instance.
+     * @return array
+     */
+    public function getPageViewData(Gdn_Controller $controller) {
+        $eventData = $this->getDefaultData(true);
+
+        // Figure out if we have a discussion.  If we do, include it in the event data.
+        if ($discussion = $controller->data('Discussion', false)) {
+            $eventData['discussion'] = AnalyticsData::getDiscussion(val('DiscussionID', $discussion, 0));
+        } else {
+            $eventData['discussion'] = [
+                'discussionID' => 0
+            ];
+        }
+
+        return $eventData;
     }
 
     /**

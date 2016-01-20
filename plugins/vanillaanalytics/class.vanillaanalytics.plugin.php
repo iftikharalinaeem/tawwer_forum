@@ -40,6 +40,18 @@ class VanillaAnalytics extends Gdn_Plugin {
 
         // Allow trackers to add to values in a page's gdn.meta JavaScript array
         AnalyticsTracker::getInstance()->addDefinitions($sender);
+
+        if (c('VanillaAnalytics.UseEventCookie')) {
+            $eventData = AnalyticsTracker::getInstance()->getPageViewData($sender);
+
+            setcookie(
+                c('Garden.Cookie.Name') . '-eD',
+                json_encode($eventData),
+                0,
+                '',
+                c('Garden.Cookie.Domain', '')
+            );
+        }
     }
 
     /**
