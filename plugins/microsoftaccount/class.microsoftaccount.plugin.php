@@ -20,15 +20,80 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
     public function __construct() {
         $this->setProviderKey('microsoftaccount');
 
+        /**
+         * @link https://azure.microsoft.com/en-us/documentation/articles/active-directory-v2-protocols-oauth-code/#request-an-access-token
+         */
         $this->setAuthorizeUriParams([
-            'response_type' => 'id_token',
-            'nonce'         => uniqid('', true)
+            'response_mode' => 'query'
         ]);
 
         /**
+         * @link https://azure.microsoft.com/en-us/documentation/articles/active-directory-v2-scopes/#scopes-amp-permissions
          * @link https://msdn.microsoft.com/Library/Azure/Ad/Graph/howto/azure-ad-graph-api-permission-scopes#PermissionScopeDetails
          */
-        $this->setScope('openid email profile');
+        $this->setScope('https://graph.microsoft.com/user.read');
+    }
+
+    /**
+     * Insert css file for custom styling of signin button/icon.
+     *
+     * @param AssetModel $sender.
+     */
+    public function assetModel_styleCss_handler($sender) {
+        $sender->addCssFile('microsoftaccount.css', 'plugins/microsoftaccount');
+    }
+
+    /**
+     * Wrapper function for writing a generic entry controller.
+     *
+     * @param EntryController $sender.
+     * @param $code string Retrieved from the response of the authentication provider, used to fetch an authentication token.
+     * @param $state string Values passed by us and returned in the response of the authentication provider.
+     * @throws Exception.
+     * @throws Gdn_UserException.
+     */
+    public function entryController_microsoftaccount_create($sender, $code = false, $state = false) {
+        $this->entryController_OAuth2_create($sender, $code, $state);
+    }
+
+    /**
+     * Get profile data from authentication provider through API.
+     *
+     * @link http://graph.microsoft.io/docs/api-reference/v1.0/api/user_get
+     * @return array User profile from provider.
+     */
+    public function getProfile() {
+        $provider = $this->provider();
+
+        $uri = $this->requireVal('ProfileUrl', $provider, 'provider');
+
+        $options = [
+            'Authorization-Header-Message' => 'Bearer ' . $this->accessToken()
+        ];
+
+        $get = [];
+
+        $rawProfile = $this->api($uri, 'GET', $get, $options);
+
+        $profile = $this->translateProfileResults($rawProfile);
+
+        $this->log('getProfile API call', array('ProfileUrl' => $uri, 'Params' => $get, 'RawProfile' => $rawProfile, 'Profile' => $profile));
+
+        return $profile;
+    }
+
+    /**
+     * Add form fields to settings specific to this plugin.
+     *
+     * @return array Form fields.
+     */
+    protected function getSettingsFormFields() {
+        $formFields = parent::getSettingsFormFields();
+
+        $formFields['AssociationKey']['LabelCode'] = 'Application ID';
+        $formFields['AssociationSecret']['LabelCode'] = 'Application Secret';
+
+        return $formFields;
     }
 
     /**
@@ -42,10 +107,56 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $baseUrl = 'https://login.microsoftonline.com/common/oauth2/v2.0';
 
         $provider['AuthorizeUrl'] = "{$baseUrl}/authorize";
+        $provider['ProfileUrl']   = "https://graph.microsoft.com/v1.0/me";
         $provider['TokenUrl']     = "{$baseUrl}/token";
 
-        Logger::event('sso_provider', Logger::DEBUG, print_r($provider, true));
         return $provider;
+    }
+
+    /**
+     * Create signup button specific to this plugin.
+     *
+     * @param string $type Either button or icon to be output.
+     * @return string Resulting HTML element (button).
+     */
+    public function signInButton($type = 'button') {
+        $target = Gdn::request()->post(
+            'Target',
+            Gdn::request()->get(
+                'Target',
+                url('', '/')
+            )
+        );
+        $url = $this->authorizeUri(
+            ['target' => $target]
+        );
+        $result = socialSignInButton(
+            'MicrosoftAccount',
+            $url,
+            $type,
+            [
+                'rel'   => 'nofollow',
+                'class' => 'default',
+                'title' => 'Sign in with a Microsoft Account'
+            ]
+        );
+
+        return $result;
+    }
+
+    /**
+     * Wrapper function for writing a generic settings controller.
+     *
+     * @param SettingsController $sender.
+     * @param SettingsController $args.
+     */
+    public function settingsController_microsoftaccount_create($sender, $args) {
+        $sender->setData('Title', sprintf(T('%s Settings'), 'Microsoft Account'));
+
+        $redirectUrls = Gdn::request()->Url('/entry/'. $this->getProviderKey(), true, false).','.Gdn::Request()->Url('/entry/'. $this->getProviderKey(), true, true);
+        $sender->setData('redirectUrls', $redirectUrls);
+
+        $this->settingsController_oAuth2_create($sender, $args);
     }
 
     /**
@@ -74,86 +185,24 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
     }
 
     /**
-     * Add form fields to settings specific to this plugin.
+     * Translate the array keys for the profile returning from the provider so that they align with Vanilla keys.
      *
-     * @return array Form fields.
+     * @link http://graph.microsoft.io/docs/api-reference/v1.0/api/user_get
+     * @param array $rawProfile Retrieved from authentication provider.
+     * @return array Profile with Vanilla keys.
      */
-    protected function getSettingsFormFields() {
-        $formFields = parent::getSettingsFormFields();
-
-        $formFields['AssociationKey']['LabelCode'] = 'Application ID';
-        $formFields['AssociationSecret']['LabelCode'] = 'Private Key';
-
-        return $formFields;
-    }
-
-    /**
-     * Wrapper function for writing a generic settings controller.
-     *
-     * @param SettingsController $sender.
-     * @param SettingsController $args.
-    */
-    public function settingsController_microsoftaccount_create($sender, $args) {
-        $sender->setData('Title', sprintf(T('%s Settings'), 'Microsoft Account'));
-
-        $redirectUrls = Gdn::request()->Url('/entry/'. $this->getProviderKey(), true, false).','.Gdn::Request()->Url('/entry/'. $this->getProviderKey(), true, true);
-        $sender->setData('redirectUrls', $redirectUrls);
-
-        $this->settingsController_oAuth2_create($sender, $args);
-    }
-
-    /**
-     * Wrapper function for writing a generic entry controller.
-     *
-     * @param EntryController $sender.
-     * @param $code string Retrieved from the response of the authentication provider, used to fetch an authentication token.
-     * @param $state string Values passed by us and returned in the response of the authentication provider.
-     *
-     * @throws Exception.
-     * @throws Gdn_UserException.
-     */
-    public function entryController_microsoftaccount_create($sender, $code = false, $state = false) {
-        $this->entryController_OAuth2_create($sender, $code, $state);
-    }
-
-    /**
-     * Create signup button specific to this plugin.
-     *
-     * @param string $type Either button or icon to be output.
-     *
-     * @return string Resulting HTML element (button).
-     */
-    public function signInButton($type = 'button') {
-        $target = Gdn::request()->post(
-            'Target',
-            Gdn::request()->get(
-                'Target',
-                url('', '/')
-            )
-        );
-        $url = $this->authorizeUri(
-            ['target' => $target]
-        );
-        $result = socialSignInButton(
-            'MicrosoftAccount',
-            $url,
-            $type,
+    public function translateProfileResults($rawProfile = array()) {
+        $profile = arrayTranslate(
+            $rawProfile,
             [
-                'rel'   => 'nofollow',
-                'class' => 'default',
-                'title' => 'Sign in with your Microsoft Account'
+                'id'                  => 'UniqueID',
+                'name'                => 'FullName',
+                'userPrincipalName'   => 'Email'
             ]
         );
 
-        return $result;
-    }
+        $profile['Provider'] = $this->providerKey;
 
-    /**
-     * Insert css file for custom styling of signin button/icon.
-     *
-     * @param AssetModel $sender.
-     */
-    public function assetModel_styleCss_handler($sender) {
-        $sender->addCssFile('microsoftaccount.css', 'plugins/microsoftaccount');
+        return $profile;
     }
 }
