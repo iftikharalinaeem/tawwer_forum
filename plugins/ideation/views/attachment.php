@@ -5,33 +5,29 @@
  */
 
 /**
- * Writes attachments for Idea Stage.
+ * Writes attachments for Idea Stages.
  *
  * @param array $attachment
  */
-
-echo('in view');
-
 function WriteStageAttachment($attachment) {
-    echo('attachme');
-
-    // Don't display anything for guest.
-//    if (!Gdn::Session()->IsValid()) {
-//        return;
-//    }
-//
-//    // Only display to Staff
-//    if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
-//        return;
-//    }
-
     ?>
     <div class="item-attachment">
-        <div class="alert">
+        <div class="alert <?php echo strtolower(val('StageStatus', $attachment)) ?>">
             <div class="media item">
                 <div class="pull-left">
                     <div class="media-object">
-                        <i class="icon icon-ticket"></i>
+<!--                        <i class="icon icon-ticket"></i>-->
+                    </div>
+                </div>
+                <div class="media-body">
+                    <div class="item-header">
+                        <h4 class="media-heading item-heading"><a href="<?php echo val('StageUrl', $attachment) ?>"><?php echo val('StageName', $attachment) ?></a> ·
+                            <span class="item-meta stage-description"><?php echo T('Last Updated').' '.Gdn_Format::Date($attachment['DateUpdated'], 'html') ?></span>
+                            <div class="item-meta stage-description"><?php echo val('StageDescription', $attachment) ?></div>
+                        </h4>
+                    </div>
+                    <div class="item-body">
+                        <div class="stage-notes"><?php echo val('StageNotes', $attachment) ?></div>
                     </div>
                 </div>
             </div>
