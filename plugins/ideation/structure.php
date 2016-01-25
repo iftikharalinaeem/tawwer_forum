@@ -27,3 +27,9 @@ if (!$stageExists) {
     $stageModel->save('Won\'t Implement', 'Closed', 'Not a candidate.');
     $stageModel->save('Implemented', 'Closed', 'All set.');
 }
+
+$reactionModel = new ReactionModel();
+$reactionModel->defineReactionType(array('UrlCode' => 'IdeaUp', 'Name' => 'Up', 'Sort' => 100, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'IncrementValue' => 1, 'Points' => 1, 'Hidden' => true, 'Active' => true,
+    'Description' => "This reaction is reserved for idea upvotes."));
+$reactionModel->defineReactionType(array('UrlCode' => 'IdeaDown', 'Name' => 'Down', 'Sort' => 101, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1, 'Hidden' => true, 'Active' => true,
+    'Description' => "This reaction is reserved for idea downvotes."));

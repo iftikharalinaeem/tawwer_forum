@@ -110,6 +110,7 @@ class StageModel extends Gdn_Model {
         if (!$row) {
             $tagID = Gdn::sql()->insert('Tag', array(
                     'Name' => $name,
+                    'FullName' => $name,
                     'Type' => 'Stage',
                     'InsertUserID' => Gdn::session()->UserID,
                     'DateInserted' => Gdn_Format::toDateTime())
@@ -119,11 +120,23 @@ class StageModel extends Gdn_Model {
             if ($row['Type'] != $type || $row['Name'] != $name) {
                 Gdn::sql()->put('Tag', array(
                     'Name' => $name,
+                    'FullName' => $name,
                     'Type' => $type
                 ), array('TagID' => $tagID));
             }
         }
         return $tagID;
+    }
+
+    public static function getStageByDiscussion($discussionID) {
+        $tagModel = new TagModel();
+        $tags = $tagModel->getDiscussionTags($discussionID);
+        if (val('Stage', $tags)) {
+            $tag = $tags['Stage'][0];
+            return self::getStageByTagID(val('TagID', $tag));
+        }
+
+        return null;
     }
 
 }

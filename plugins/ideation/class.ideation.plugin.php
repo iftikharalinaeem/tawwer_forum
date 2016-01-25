@@ -30,6 +30,7 @@ class IdeationPlugin extends Gdn_Plugin {
      * @return bool
      */
     public function setup() {
+        saveToConfig('Garden.AttachmentsEnabled', true);
         $this->structure();
     }
 
@@ -49,7 +50,7 @@ class IdeationPlugin extends Gdn_Plugin {
         $category = $categoryModel->getID($categoryID);
         $options = array();
 
-        if (in_array('Idea', val('AllowedDiscussionTypes', $category))) {
+        if ($this->isIdeaCategory($category)) {
             $options = array('checked' => 'checked');
         }
 
@@ -59,11 +60,12 @@ class IdeationPlugin extends Gdn_Plugin {
             $isIdea = $sender->Form->getValue('Idea_Category');
 
             if ($isIdea) {
-//                $types = $sender->Form->getValue('AllowedDiscussionTypes');
-//                $types['Idea'] = true;
+                // If it's an idea category, ideas are the only discussion type allowed.
                 $types[] = 'Idea';
                 $sender->Form->setFormValue('AllowedDiscussionTypes', $types);
             } else {
+                // We don't allow users to explicitly set the idea discussion type as allowed.
+                // If we're not an idea category, ensure that the idea discussion type is not allowed.
                 $types = $sender->Form->getValue('AllowedDiscussionTypes');
                 if (($key = array_search('Idea', $types)) !== false) {
                     unset($types[$key]);
@@ -167,16 +169,37 @@ class IdeationPlugin extends Gdn_Plugin {
         $sender->discussion($categoryCode);
     }
 
+    public function postController_editidea_create($sender, $args) {
+        if (!sizeof($args)) {
+            // No discussion was specified.
+        }
+
+        $discussionID = $args[0];
+        $discussionModel = $sender->DiscussionModel;
+        $discussionModel->getID($discussionID);
+        $sender->setData('Type', 'Idea');
+        $sender->Form->setFormValue('Type', 'Idea');
+        $sender->Form->setFormValue('Tags', val('TagID', StageModel::getStage($this->defaultStageID)));
+        $sender->View = 'discussion';
+        $sender->editDiscussion($discussionID);
+    }
+
     public function postController_beforeDiscussionRender_handler($sender, $args) {
         if (val('Type', $sender->Data) === 'Idea') {
             $sender->Discussion = 'Idea'; // Kludge to set 'Post Discussion' button to 'Save'
             $sender->setData('Title', sprintf(t('New %s'), t('Idea')));
             $sender->ShowCategorySelector = false;
+
+            if ($sender->data('Discussion')) {
+                $sender->setData('Title', sprintf(t('Edit %s'), t('Idea')));
+            } else {
+                $sender->setData('Title', sprintf(t('New %s'), t('Idea')));
+            }
         }
     }
 
     public function postController_discussionFormOptions_handler($sender, $args) {
-        // Clear out announcements. Kludge.
+        // Clear out announcements options. Kludge.
         if (val('Options', $args)) {
             $args['Options'] = '';
         }
@@ -201,16 +224,31 @@ class IdeationPlugin extends Gdn_Plugin {
         ));
     }
 
-    // Print tags
+    public function discussionController_render_before($sender, $args) {
+        // Don't display tags on a idea discussion.
+        if (val('Discussion', $sender) && val('Type', $sender->Discussion) == 'Idea') {
+            saveToConfig('Plugins.Tagging.DisableInline', true, true);
+        } else {
+            saveToConfig('Plugins.Tagging.DisableInline', false, true);
+        }
+    }
+
+
+    // Print tags on discussionlist
     public function base_beforeDiscussionMeta_handler($sender, $args) {
         $discussion = $args['Discussion'];
         if (!$this->isIdea($discussion)) {
             return;
         }
-        $stage = $this->getStageByDiscussion(val('DiscussionID', $discussion));
+        $stage = StageModel::getStageByDiscussion(val('DiscussionID', $discussion));
         if ($stage) {
-            echo ' <span class="Tag Stage-Tag-'.urlencode(val('Name', $stage)).'"">'.val('Name', $stage).'</span> ';
+            echo ' <a href="'.url('/discussions/tagged/'.urlencode(val('Name', $stage))).'"><span class="Tag Stage-Tag-'.urlencode(val('Name', $stage)).'"">'.val('Name', $stage).'</span></a> ';
         }
+
+        $counter = IdeaCounterModule::instance();
+        $counter->setDiscussion($discussion);
+        echo $counter->toString();
+
     }
 
     public function base_discussionOptions_handler($sender, $args) {
@@ -225,9 +263,19 @@ class IdeationPlugin extends Gdn_Plugin {
         }
 
         if (isset($args['DiscussionOptions'])) {
-            $args['DiscussionOptions']['Stage'] = array('Label' => T('Stage').'...', 'Url' => '/discussion/stageoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup');
+            $args['DiscussionOptions']['Stage'] = array('Label' => T('Edit Stage'), 'Url' => '/discussion/stageoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup');
         } elseif (isset($sender->Options)) {
-            $sender->Options .= '<li>'.anchor(t('Stage').'...', '/discussion/stageoptions?discussionid='.$discussion->DiscussionID, 'Popup QnAOptions') . '</li>';
+            $sender->Options .= '<li>'.anchor(t('Edit Stage'), '/discussion/stageoptions?discussionid='.$discussion->DiscussionID, 'Popup') . '</li>';
+        }
+
+        if (isset($args['DiscussionOptions']['EditDiscussion'])) {
+            $args['DiscussionOptions']['EditDiscussion']['Url'] = str_replace('editdiscussion', 'editidea', $args['DiscussionOptions']['EditDiscussion']['Url']);
+        } else {
+            $sender->Options = str_replace('editdiscussion', 'editidea', $sender->Options);
+        }
+
+        if (isset($args['DiscussionOptions']['DeleteDiscussion'])) {
+            $args['DiscussionOptions']['DeleteDiscussion']['Label'] = sprintf(t('Delete %s'), t('Idea'));
         }
     }
 
@@ -239,12 +287,11 @@ class IdeationPlugin extends Gdn_Plugin {
             }
 
             // TODO permission
-//            $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
+            // $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
 
             $sender->Form = new Gdn_Form();
             if ($sender->Form->authenticatedPostBack()) {
                 $this->updateDiscussionStage($discussion, $sender->Form->getFormValue('Stage'), $sender->Form->getFormValue('StageNotes'));
-//                $this->updateStageNotes($discussion, $sender->Form->getFormValue(''));
                 Gdn::controller()->jsonTarget('', '', 'Refresh');
             } else {
             }
@@ -253,29 +300,68 @@ class IdeationPlugin extends Gdn_Plugin {
             foreach($stages as &$stage) {
                 $stage = val('Name', $stage);
             }
+            $notes = $this->getStageNotes($discussion, $sender->DiscussionModel);
 
             $sender->setData('Discussion', $discussion);
             $sender->setData('Stages', $stages);
-//            $sender->DiscussionModel = new DiscussionModel();
-            $notes = $sender->DiscussionModel->getRecordAttribute($discussion, 'StageNotes');
             $sender->setData('StageNotes', $notes);
-            $sender->setData('CurrentStageID', val('StageID', $this->getStageByDiscussion($discussionID)));
-            $sender->setData('Title', T('Idea Options'));
+            $sender->setData('CurrentStageID', val('StageID', StageModel::getStageByDiscussion($discussionID)));
+            $sender->setData('Title', t('Edit Stage'));
+
             $sender->render('StageOptions', '', 'plugins/ideation');
         }
     }
 
+    // ATTACHMENTS
+
+    public function discussionController_fetchAttachmentViews_handler($sender) {
+        require_once $sender->fetchViewLocation('attachment', '', 'plugins/ideation');
+    }
+
+    protected function updateAttachment($discussionID, $stageID, $stageNotes) {
+
+        $stage = StageModel::getStage($stageID);
+        $attachment['Type'] = 'stage';
+        $attachment['StageName'] = val('Name', $stage);
+        $attachment['StageDescription'] = val('Description', $stage);
+        $attachment['StageStatus'] = val('Status', $stage);
+        $attachment['StageNotes'] = $stageNotes;
+        $attachment['StageUrl'] = url('/discussions/tagged/'.urlencode(val('StageName', $attachment)));
+        $attachment['ForeignID'] = 'd-'.$discussionID;
+        $attachment['ForeignUserID'] = 2;
+        $attachment['DateUpdated'] = Gdn_Format::toDateTime();
+
+        // Kludge. Not Null fields
+        $attachment['Source'] = 'none';
+        $attachment['SourceID'] = 'none';
+        $attachment['SourceURL'] = 'none';
+
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->GetID($discussionID);
+
+        //Save to Attachments
+        $attachmentModel = AttachmentModel::instance();
+
+        $attachmentModel->joinAttachments($discussion);
+
+        // Check if there's already an attachment and override.
+        if ($attachments = val('Attachments', $discussion)) {
+            foreach($attachments as $oldAttachment) {
+                if (val('Type', $oldAttachment) == 'stage') {
+                    $attachment['AttachmentID'] = val('AttachmentID', $oldAttachment);
+                }
+            }
+        }
+        $attachmentModel->save($attachment);
+    }
+
     // HELPERS
 
-    public function getStageByDiscussion($discussionID) {
-        $tagModel = $this->getTagModel();
-        $tags = $tagModel->getDiscussionTags($discussionID);
-        if (val('Stage', $tags)) {
-            $tag = $tags['Stage'][0];
-            return StageModel::getStageByTagID(val('TagID', $tag));
+    public function getStageNotes($discussion, $discussionModel = null) {
+        if (!$discussionModel) {
+            $discussionModel = new DiscussionModel();
         }
-
-        return null;
+        return $discussionModel->getRecordAttribute($discussion, 'StageNotes');
     }
 
     public function isIdea($discussion) {
@@ -287,7 +373,7 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     public function isIdeaCategory($category) {
-
+        return in_array('Idea', val('AllowedDiscussionTypes', $category));
     }
 
     public function updateDiscussionStage($discussion, $stageID, $notes) {
@@ -296,24 +382,28 @@ class IdeationPlugin extends Gdn_Plugin {
         }
 
         $discussionID = val('DiscussionID', $discussion);
-        $oldStage = $this->getStageByDiscussion($discussionID);
+
+        $this->updateDiscussionStageTag($discussionID, $stageID);
+        if ($notes) {
+            $this->updateDiscussionStageNotes($discussionID, $notes);
+        }
+
+        $this->updateAttachment($discussionID, $stageID, $notes);
+    }
+
+    private function updateDiscussionStageTag($discussionID, $stageID) {
+        // TODO:  Decrement tag discussion count
+        $oldStage = StageModel::getStageByDiscussion($discussionID);
         if (val('StageID', $oldStage) != $stageID) {
             $stage = StageModel::getStage($stageID);
             $tags = array(val('TagID', $stage));
             $tagModel = $this->getTagModel();
             $tagModel->saveDiscussion($discussionID, $tags, array('Stage'));
         }
-
-        if ($notes) {
-            $discussionModel = new DiscussionModel();
-            $discussionModel->saveToSerializedColumn('Attributes', $discussionID, 'StageNotes', $notes);
-        }
     }
 
-    // ATTACHMENT
-
-    protected function updateAttachment($attachment) {
-
+    private function updateDiscussionStageNotes($discussionID, $notes) {
+        $discussionModel = new DiscussionModel();
+        $discussionModel->saveToSerializedColumn('Attributes', $discussionID, 'StageNotes', $notes);
     }
-
 }
