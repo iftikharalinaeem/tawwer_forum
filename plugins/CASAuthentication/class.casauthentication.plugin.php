@@ -1,16 +1,16 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @copyright Copyright 2008-2016 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 // Define the plugin:
 $PluginInfo['CASAuthentication'] = array(
-   'Name' => 'CAS Authentication for CRN',
+   'Name' => 'CAS Authentication for Vanilla',
    'Description' => 'Allows Vanilla to authenticate against a <a href="http://en.wikipedia.org/wiki/Central_Authentication_Service">CAS</a> authentication server.',
-   'Version' => '1.0',
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'MobileFriendly' => TRUE,
+   'Version' => '1.1',
+   'RequiredApplications' => array('Vanilla' => '2.1'),
+   'MobileFriendly' => true,
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
@@ -18,12 +18,15 @@ $PluginInfo['CASAuthentication'] = array(
    'SettingsPermission' => 'Garden.Settings.Manage',
 );
 
+/**
+ * Class CASAuthenticationPlugin
+ */
 class CASAuthenticationPlugin extends Gdn_Plugin {
-   /// PROPERTIES ///
-   
-   /// METHODS ///
-   
-   public function InitializeCAS() {
+
+   /**
+    * Startup.
+    */
+   public function initializeCAS() {
       require_once dirname(__FILE__).'/CAS.php';
       
       $Host = C('Plugins.CASAuthentication.Host');
@@ -36,26 +39,27 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
       phpCAS::setNoClearTicketsFromUrl(FALSE);
       
       $Url = Url('/entry/cas', TRUE);
-      if (Gdn::Request()->Get('Target'))
-         $Url .= '?Target='.urlencode(Gdn::Request()->Get('Target'));
+      if (Gdn::request()->get('Target'))
+         $Url .= '?Target='.urlencode(Gdn::request()->get('Target'));
       phpCAS::setFixedServiceURL($Url);
    }
-   
-   public function Setup() {
-      SaveToConfig('Garden.SignIn.Popup', FALSE);
+
+   /**
+    *
+    */
+   public function setup() {
+      saveToConfig('Garden.SignIn.Popup', FALSE);
    }
-   
-   /// EVENT HANDLERS ///
-   
+
    /**
     * @param Gdn_Controller $Sender
     * @param array $Args
     */
-   public function Base_ConnectData_Handler($Sender, $Args) {
-      if (GetValue(0, $Args) != 'cas')
+   public function base_connectData_handler($Sender, $Args) {
+      if (val(0, $Args) != 'cas')
          return;
       
-      $User = Gdn::Session()->Stash('CASUser');
+      $User = Gdn::session()->stash('CASUser');
       if (!$User) {
          $Url = Url('/entry/cas');
          $Message = "There was an error retrieving your user data. Click <a href='$Url'>here</a> to try again.";
@@ -65,35 +69,37 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
       // Make sure there is a user.
 
       $Form = $Sender->Form;
-      $Form->SetFormValue('UniqueID', $User['UniqueID']);
-      $Form->SetFormValue('Provider', 'cas');
-      $Form->SetFormValue('ProviderName', 'CRN');
-      $Form->SetFormValue('Name', $User['Name']);
-      $Form->SetFormValue('FullName', $User['FirstName'].' '.$User['LastName']);
-      $Form->SetFormValue('Email', $User['Email']);
+      $Form->setFormValue('UniqueID', $User['UniqueID']);
+      $Form->setFormValue('Provider', 'cas');
+      $Form->setFormValue('ProviderName', 'CRN');
+      $Form->setFormValue('Name', $User['Name']);
+      $Form->setFormValue('FullName', $User['FirstName'].' '.$User['LastName']);
+      $Form->setFormValue('Email', $User['Email']);
       
-      SaveToConfig(array(
+      saveToConfig(array(
           'Garden.User.ValidationRegex' => UserModel::USERNAME_REGEX_MIN,
           'Garden.User.ValidationLength' => '{3,50}',
-          'Garden.Registration.NameUnique' => FALSE,
-          'Garden.Registration.AutoConnect' => TRUE
-      ), '', FALSE);
+          'Garden.Registration.NameUnique' => false,
+          'Garden.Registration.AutoConnect' => true
+      ), '', false);
       
       // Save some original data in the attributes of the connection for later API calls.
       $Attributes = array(
           'FirstName' => $User['FirstName'],
           'LastName' => $User['LastName']
       );
-      $Form->SetFormValue('Attributes', $Attributes);
+      $Form->setFormValue('Attributes', $Attributes);
       
-      $Sender->SetData('Verified', TRUE);
+      $Sender->setData('Verified', TRUE);
    }
    
    /**
+    *
+    *
     * @param EntryController $Sender 
     */
-   public function EntryController_CAS_Create($Sender) {
-      $this->InitializeCAS();
+   public function entryController_CAS_create($Sender) {
+      $this->initializeCAS();
       
       // force CAS authentication
       try {
@@ -109,42 +115,53 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
          die('Failed');
       } else {
          // We now have a user so we need to get some info.
-         $Url = sprintf(C('Plugins.CASAuthentication.ProfileUrl', 'http://www.crn.com/jive/util/get_user_profile.htm?email=%s'), urlencode($Email));
+         $Url = sprintf(C('Plugins.CASAuthentication.ProfileUrl'), urlencode($Email));
          $Data = file_get_contents($Url);
 
          $Xml = (array)simplexml_load_string($Data);
 
          $User = ArrayTranslate($Xml, array('email' => 'Email', 'nickname' => 'Name', 'firstName' => 'FirstName', 'lastName' => 'LastName'));
          $User['UniqueID'] = $User['Email'];
-         Gdn::Session()->Stash('CASUser', $User);
+         Gdn::session()->stash('CASUser', $User);
 
          // Now that we have the user we can redirect.
-         $Get = $Sender->Request->Get();
+         $Get = $Sender->Request->get();
          unset($Get['ticket']);
          $Url = '/entry/connect/cas?'.http_build_query($Get);
-         Redirect($Url);
+         redirect($Url);
       }
    }
-   
-   public function EntryController_Register_Handler($Sender) {
-      $Url = "http://www.crn.com/register.htm";
-      Redirect($Url);
+
+   /**
+    *
+    *
+    * @param $Sender
+    */
+   public function entryController_register_handler($Sender) {
+      $Url = c('Plugins.CASAuthentication.RegisterUrl');
+      redirect($Url);
    }
    
    /**
+    *
+    *
     * @param EntryController $Sender 
     */
-   public function EntryController_SignIn_Handler($Sender) {
-      if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
-         $Get = $Sender->Request->Get();
-//         $Get['rm'] = 'true';
+   public function entryController_signIn_handler($Sender) {
+      if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
+         $Get = $Sender->Request->get();
          $Url = '/entry/cas?'.http_build_query($Get);
          Redirect($Url);
       }
    }
-   
-   public function EntryController_SignOut_Handler($Sender) {
-      $this->InitializeCAS();
+
+   /**
+    *
+    *
+    * @param $Sender
+    */
+   public function entryController_signOut_handler($Sender) {
+      $this->initializeCAS();
       phpCAS::logout();
    }
    
@@ -152,18 +169,18 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
     *
     * @param Gdn_Controller $Sender 
     */
-   public function SettingsController_CAS_Create($Sender) {
+   public function settingsController_CAS_create($Sender) {
       $Cf = new ConfigurationModule($Sender);
-      $Cf->Initialize(array(
+      $Cf->initialize(array(
           'Plugins.CASAuthentication.Host',
           'Plugins.CASAuthentication.Context' => array('Control' => 'TextBox', 'Default' => '/cas'),
           'Plugins.CASAuthentication.Port' => array('Control' => 'TextBox', 'Default' => 443),
-          'Plugins.CASAuthentication.ProfileUrl' => array('Control' => 'TextBox', 'Default' => 'http://www.crn.com/jive/util/get_user_profile.htm?email=%s')
+          'Plugins.CASAuthentication.ProfileUrl' => array('Control' => 'TextBox'),
+          'Plugins.CASAuthentication.RegisterUrl' => array('Control' => 'TextBox')
       ));
-      
-      $Sender->AddSideMenu();
-      $Sender->Title('CAS Settings');
-      $Cf->RenderAll();
+      $Sender->addSideMenu();
+      $Sender->title('CAS Settings');
+      $Cf->renderAll();
    }
-   
+
 }
