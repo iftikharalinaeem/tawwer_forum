@@ -78,7 +78,7 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
             }
         }
 
-        return $uri.'?'.http_build_query($get);
+        return "{$uri}?" . http_build_query($get);
     }
 
     /**
