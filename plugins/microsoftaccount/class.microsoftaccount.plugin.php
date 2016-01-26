@@ -1,4 +1,9 @@
 <?php
+/**
+ * @copyright Copyright 2008-2016 Vanilla Forums Inc.
+ * @license Proprietary
+ * @package microsoftaccount
+ */
 
 $PluginInfo['microsoftaccount'] = array(
     'Name'                 => 'Microsoft Account',
@@ -15,22 +20,25 @@ $PluginInfo['microsoftaccount'] = array(
 
 require_once('class.oauth2pluginbase.php');
 
+/**
+ * Class MicrosoftAccountPlugin
+ *
+ * A plug-in to facilitate SSO connections authenticated by Microsoft's "v2.0 app model" OAuth2 service.
+ */
 class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
 
-    public function __construct() {
-        $this->setProviderKey('microsoftaccount');
+    /**
+     * MicrosoftAccountPlugin constructor.
+     *
+     * @link https://azure.microsoft.com/en-us/documentation/articles/active-directory-v2-protocols-oauth-code/#request-an-access-token
+     * @link https://azure.microsoft.com/en-us/documentation/articles/active-directory-v2-scopes/#scopes-amp-permissions
+     * @link https://msdn.microsoft.com/Library/Azure/Ad/Graph/howto/azure-ad-graph-api-permission-scopes#PermissionScopeDetails
+     */
+    public function __construct($accessToken = false) {
+        parent::__construct('microsoftaccount', $accessToken);
 
-        /**
-         * @link https://azure.microsoft.com/en-us/documentation/articles/active-directory-v2-protocols-oauth-code/#request-an-access-token
-         */
-        $this->setAuthorizeUriParams([
-            'response_mode' => 'query'
-        ]);
+        $this->setAuthorizeUriParams(['response_mode' => 'query']);
 
-        /**
-         * @link https://azure.microsoft.com/en-us/documentation/articles/active-directory-v2-scopes/#scopes-amp-permissions
-         * @link https://msdn.microsoft.com/Library/Azure/Ad/Graph/howto/azure-ad-graph-api-permission-scopes#PermissionScopeDetails
-         */
         $this->setScope('https://graph.microsoft.com/user.read');
     }
 
@@ -77,7 +85,15 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
 
         $profile = $this->translateProfileResults($rawProfile);
 
-        $this->log('getProfile API call', array('ProfileUrl' => $uri, 'Params' => $get, 'RawProfile' => $rawProfile, 'Profile' => $profile));
+        $this->log(
+            'getProfile API call',
+            [
+                'Params'     => $get,
+                'Profile'    => $profile,
+                'ProfileUrl' => $uri,
+                'RawProfile' => $rawProfile
+            ]
+        );
 
         return $profile;
     }
@@ -90,7 +106,7 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
     protected function getSettingsFormFields() {
         $formFields = parent::getSettingsFormFields();
 
-        $formFields['AssociationKey']['LabelCode'] = 'Application ID';
+        $formFields['AssociationKey']['LabelCode']    = 'Application ID';
         $formFields['AssociationSecret']['LabelCode'] = 'Application Secret';
 
         return $formFields;
@@ -127,16 +143,14 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
                 url('', '/')
             )
         );
-        $url = $this->authorizeUri(
-            ['target' => $target]
-        );
+        $url = $this->authorizeUri(['target' => $target]);
         $result = socialSignInButton(
             'MicrosoftAccount',
             $url,
             $type,
             [
-                'rel'   => 'nofollow',
                 'class' => 'default',
+                'rel'   => 'nofollow',
                 'title' => 'Sign in with a Microsoft Account'
             ]
         );
@@ -162,7 +176,7 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
     /**
      * Setup
      */
-    public function setUp() {
+    public function setup() {
         $this->structure();
     }
 
