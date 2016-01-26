@@ -261,8 +261,6 @@ class AnalyticsData extends Gdn_Model {
     /**
      * Retrieve information about a particular user for user in analytics.
      *
-     * @todo Add cookie (value that follows user from guest status through registration)
-     * @todo Add sessionID
      * @todo Add topBadge
      * @param int $userID Record ID of the user to fetch.
      * @return array|bool An array representing the user data on success, false on failure.
@@ -271,6 +269,7 @@ class AnalyticsData extends Gdn_Model {
         $userModel = Gdn::userModel();
         $user = $userModel->getID($userID);
         $roles = [];
+        $trackingIDs = AnalyticsTracker::getInstance()->trackingIDs();
 
         if ($user) {
             /**
@@ -306,7 +305,9 @@ class AnalyticsData extends Gdn_Model {
                 'name'            => $user->Name,
                 'roles'           => $roles,
                 'roleType'        => $roleType,
-                'userID'          => (int)$user->UserID
+                'userID'          => (int)$user->UserID,
+                'uuid'            => $trackingIDs['uuid'],
+                'sessionID'       => $trackingIDs['sessionID']
             ];
 
             $userInfo['points'] = val('Points', $user, 0);
@@ -344,6 +345,29 @@ class AnalyticsData extends Gdn_Model {
                 'name'           => '@notfound',
             ];
         }
+    }
+
+    /**
+     * Grab the saved UUID for a user or a new one for a guest.
+     *
+     * @param bool $create Should a new UUID be created and saved for a user if one doesn't exist?
+     * @return string A universally unique identifier.
+     */
+    public static function getUserUuid($create = true) {
+        if (Gdn::session()->isValid()) {
+            $user = Gdn::userModel()->getID(Gdn::session()->UserID);
+            $attributes = UserModel::attributes($user);
+            $uuid = val('UUID', $attributes, null);
+
+            if (is_null($uuid) && $create) {
+                $uuid = self::uuid();
+                Gdn::userModel()->saveAttribute(Gdn::session()->UserID, 'UUID', $uuid);
+            }
+        } else {
+            $uuid = self::uuid();
+        }
+
+        return $uuid;
     }
 
     /**

@@ -44,7 +44,7 @@ class KeenIOTracker implements TrackerInterface {
      */
     public function addJsFiles(Gdn_Controller $controller) {
         $controller->addJsFile('https://d26b395fwzu5fz.cloudfront.net/3.3.0/keen.min.js');
-        $controller->addJsFile('keenio.min.js', 'plugins/vanillaanalytics');
+        $controller->addJsFile('keenio.js', 'plugins/vanillaanalytics');
     }
 
     /**

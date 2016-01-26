@@ -8,26 +8,29 @@ $(document).ready(function() {
             writeKey: writeKey
         });
 
+        var eventData = gdn.meta.eventData || {};
+
         // If our cookie library is available, check to see if we have event data hiding in a cookie.
-        if (Cookies) {
+        if (typeof Cookies === 'function') {
             var cookieName  = gdn.definition('vaCookieName');
             var cookieValue = Cookies.get(cookieName);
 
             // Extract the event data, if available, and reset the cookie.  We only need to access it once.
-            eventData = cookieValue ? JSON.parse(cookieValue) : false;
-            Cookies.remove(cookieName);
-        }
+            if (cookieValue) {
+                var cookieData = JSON.parse(cookieValue);
 
-        /**
-         * If eventData still hasn't been set, it means our attempt to grab event details from the cookie failed.  Try
-         * to grab them from the gdn.meta collection.
-         */
-        if (!eventData) {
-            eventData = gdn.meta.eventData || false;
+                if (typeof cookieData.eventData === 'object' && Object.keys(cookieData.eventData).length > 0) {
+                    $.extend(eventData, cookieData.eventData);
+                    cookieData.eventData = {};
+                    cookieValue = JSON.stringify(cookieData);
+                }
+            }
+
+            Cookies.set(cookieName, cookieValue);
         }
 
         // If we get this far and still don't have any event data, there's nothing to get.
-        if (eventData) {
+        if (typeof eventData === 'object' && Object.keys(eventData).length > 0) {
             eventData.type = 'page_view';
 
             keenClient.addEvent(

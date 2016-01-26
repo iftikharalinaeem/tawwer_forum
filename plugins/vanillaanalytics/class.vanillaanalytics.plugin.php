@@ -43,15 +43,17 @@ class VanillaAnalytics extends Gdn_Plugin {
 
         if (c('VanillaAnalytics.UseEventCookie')) {
             $eventData = AnalyticsTracker::getInstance()->getPageViewData($sender);
-
-            setcookie(
-                c('Garden.Cookie.Name') . '-eD',
-                json_encode($eventData),
-                0,
-                '',
-                c('Garden.Cookie.Domain', '')
-            );
+        } else {
+            $eventData = [];
         }
+
+        setcookie(
+            AnalyticsTracker::getInstance()->cookieName(),
+            json_encode(AnalyticsTracker::getInstance()->getCookieData($eventData)),
+            0,
+            '',
+            c('Garden.Cookie.Domain', '')
+        );
     }
 
     /**

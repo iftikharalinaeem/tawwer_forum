@@ -10,3 +10,9 @@ $Configuration['VanillaAnalytics']['KeenIO']['OrgID'] = '123abc';
 // All keen.io projects require at least one user to be assigned to them. This is the e-mail address of that user.
 $Configuration['VanillaAnalytics']['KeenIO']['DefaultProjectUser'] = 'user@host.net';
 ```
+
+// Requirements
+
+// HowTo Use
+
+// Purpose

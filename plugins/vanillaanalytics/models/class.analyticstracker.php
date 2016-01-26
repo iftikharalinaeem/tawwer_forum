@@ -19,6 +19,12 @@ class AnalyticsTracker {
     protected $trackers = [];
 
     /**
+     * An array containing the user's unique ID and session ID values.
+     * @var array
+     */
+    protected $trackingIDs = [];
+
+    /**
      * Our constructor.
      */
     protected function __construct() {
@@ -28,7 +34,7 @@ class AnalyticsTracker {
         }
 
         if (count($this->trackers) == 0) {
-            Logger::event('No tracking services available for recording analytics data.', Logger::WARNING);
+            Logger::event('vanilla_analytics', Logger::DEBUG, 'No tracking services available for recording analytics data.');
         }
     }
 
@@ -44,7 +50,7 @@ class AnalyticsTracker {
 
         $eventData = $this->getPageViewData($controller);
 
-        $controller->addDefinition('vaCookieName', c('Garden.Cookie.Name') . '-VA');
+        $controller->addDefinition('vaCookieName', $this->cookieName());
         $controller->addDefinition('eventData', $eventData);
     }
 
@@ -73,6 +79,23 @@ class AnalyticsTracker {
         $this->trackers[] = $interface;
 
         return $this;
+    }
+
+    /**
+     * Fetch default data to populate a tracking cookie.
+     *
+     * @param array $eventData If an event is being tracked via cookie, pass the details here.
+     * @return array
+     */
+    public function getCookieData(array $eventData = []) {
+        return [
+            'eventData'   => $eventData,
+            'trackingIDs' => $this->trackingIDs()
+        ];
+    }
+
+    public function cookieName() {
+        return c('Garden.Cookie.Name') . '-vA';
     }
 
     /**
@@ -175,5 +198,61 @@ class AnalyticsTracker {
 
             unset($interfaceDefaults, $details);
         }
+    }
+
+    /**
+     * Set and get tracking ID detail array.
+     *
+     * @param string|null $uuid Universally unique ID for users.
+     * @param string|null $sessionID Unique ID for tracking user sessions.
+     * @return array UUID and session ID values for the current user.
+     */
+    public function trackingIDs($uuid = null, $sessionID = null) {
+        if (empty($this->trackingIDs)) {
+            $this->trackingIDs = [
+                'sessionID' => null,
+                'uuid'      => null
+            ];
+
+            $cookieTrackingRaw = Gdn::request()->getValueFrom(
+                Gdn_Request::INPUT_COOKIES,
+                $this->cookieName(),
+                false
+            );
+
+            if ($cookieTracking = @json_decode($cookieTrackingRaw)) {
+                if ($cookieIDs = val('trackingIDs', $cookieTracking)) {
+                    if ($uuid = val('uuid', $cookieIDs)) {
+                        if (Gdn::session()->isValid() && AnalyticsData::getUserUuid() != $uuid) {
+                            Logger::event('vanilla_analytics', Logger::DEBUG, 'User UUID mismatch.');
+                            $uuid = AnalyticsData::getUserUuid();
+                        }
+
+                        $this->trackingIDs['uuid'] = $uuid;
+                    } else {
+                        $this->trackingIDs['uuid'] = AnalyticsData::getUserUuid();
+                    }
+
+                    if ($sessionID = val('sessionID', $cookieIDs)) {
+                        $this->trackingIDs['sessionID'] = $sessionID;
+                    } elseif (Gdn::session()->newVisit()) {
+                        $this->trackingIDs['sessionID'] = AnalyticsData::uuid();
+                    }
+                } else {
+                    Logger::event('vanilla_analytics', Logger::DEBUG, 'No IDs in tracking cookie.');
+                }
+            } else {
+                Logger::event('vanilla_analytics', Logger::DEBUG, 'Unable to json_decode cookie tracking IDs.');
+            }
+        }
+
+        if ($uuid) {
+            $this->trackingIDs['uuid'] = $uuid;
+        }
+        if ($sessionID) {
+            $this->trackingIDs['sessionID'] = $sessionID;
+        }
+
+        return $this->trackingIDs;
     }
 }
