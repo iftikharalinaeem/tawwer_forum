@@ -354,4 +354,25 @@ class AnalyticsData extends Gdn_Model {
     public static function setDefaultTimeZone(DateTimeZone $timeZone) {
         self::$defaultTimezone = $timeZone;
     }
+
+    /**
+     * Generate a random universally unique identifier.
+     *
+     * @link https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_.28random.29
+     * @link http://php.net/manual/en/function.uniqid.php#94959
+     * @return string A UUIDv4-compliant string
+     */
+    public static function uuid() {
+        return sprintf(
+            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0x0fff) | 0x4000,
+            mt_rand(0, 0x3fff) | 0x8000,
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff)
+        );
+    }
 }
