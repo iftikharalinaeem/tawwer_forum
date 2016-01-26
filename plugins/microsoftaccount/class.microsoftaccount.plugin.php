@@ -37,9 +37,17 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
     public function __construct($accessToken = false) {
         parent::__construct('microsoftaccount', $accessToken);
 
-        $this->setAuthorizeUriParams(['response_mode' => 'query']);
-
         $this->setScope('https://graph.microsoft.com/user.read');
+
+        $provider = $this->provider();
+
+        $this->setAuthorizeUriParams([
+            'client_id'     => $provider['AssociationKey'],
+            'redirect_uri'  => Gdn::request()->url("/entry/{$this->getProviderKey()}", true, true),
+            'response_mode' => 'query',
+            'response_type' => 'code',
+            'scope'         => $this->scope
+        ]);
     }
 
     /**
@@ -49,6 +57,28 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
      */
     public function assetModel_styleCss_handler($sender) {
         $sender->addCssFile('microsoftaccount.css', 'plugins/microsoftaccount');
+    }
+
+    /**
+     * Create the URI that can return an authorization.
+     *
+     * @param array $state Optionally provide an array of variables to be sent to the provider.
+     * @return string Endpoint of the provider.
+     */
+    public function authorizeUri($state = array()) {
+        $provider = $this->provider();
+
+        $uri = $provider['AuthorizeUrl'];
+
+        $get = $this->authorizeUriParams;
+
+        if (is_array($state)) {
+            if (is_array($state)) {
+                $get['state'] = http_build_query($state);
+            }
+        }
+
+        return $uri.'?'.http_build_query($get);
     }
 
     /**
