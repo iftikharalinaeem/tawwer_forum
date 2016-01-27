@@ -47,6 +47,12 @@ class VanillaAnalytics extends Gdn_Plugin {
             $eventData = [];
         }
 
+        /**
+         * Save a tracking cookie.  The contents are tracking IDs and, potentially, event data for the current page
+         * view.  The intended use of saving event data in this cookie is to allow cached data on the page to be
+         * overwritten.  If the service tracker's JavaScript reads this event data, it can merge it into the data
+         * available in the page's gdn.meta and provide up-to-date information that can dodge the cached page contents.
+         */
         Gdn::session()->setCookie(
             '-vA',
             json_encode(AnalyticsTracker::getInstance()->getCookieData($eventData)),
