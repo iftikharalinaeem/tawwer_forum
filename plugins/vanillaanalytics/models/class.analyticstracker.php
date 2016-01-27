@@ -50,7 +50,7 @@ class AnalyticsTracker {
 
         $eventData = $this->getPageViewData($controller);
 
-        $controller->addDefinition('vaCookieName', $this->cookieName());
+        $controller->addDefinition('vaCookieName', c('Garden.Cookie.Name') . '-vA');
         $controller->addDefinition('eventData', $eventData);
     }
 
@@ -92,10 +92,6 @@ class AnalyticsTracker {
             'eventData'   => $eventData,
             'trackingIDs' => $this->trackingIDs()
         ];
-    }
-
-    public function cookieName() {
-        return c('Garden.Cookie.Name') . '-vA';
     }
 
     /**
@@ -217,11 +213,7 @@ class AnalyticsTracker {
             ];
 
             // Fetch our tracking cookie.
-            $cookieTrackingRaw = Gdn::request()->getValueFrom(
-                Gdn_Request::INPUT_COOKIES,
-                $this->cookieName(),
-                false
-            );
+            $cookieTrackingRaw = Gdn::session()->getCookie('-vA', false);
 
             // Does the tracking cookie contain valid JSON?
             if ($cookieTracking = @json_decode($cookieTrackingRaw)) {

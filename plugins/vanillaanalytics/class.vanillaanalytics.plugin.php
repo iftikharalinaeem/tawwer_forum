@@ -47,12 +47,10 @@ class VanillaAnalytics extends Gdn_Plugin {
             $eventData = [];
         }
 
-        setcookie(
-            AnalyticsTracker::getInstance()->cookieName(),
+        Gdn::session()->setCookie(
+            '-vA',
             json_encode(AnalyticsTracker::getInstance()->getCookieData($eventData)),
-            0,
-            '',
-            c('Garden.Cookie.Domain', '')
+            31536000
         );
     }
 
@@ -120,11 +118,7 @@ class VanillaAnalytics extends Gdn_Plugin {
         $uuid = null;
 
         // Fetch our tracking cookie.
-        $cookieTrackingRaw = Gdn::request()->getValueFrom(
-            Gdn_Request::INPUT_COOKIES,
-            AnalyticsTracker::getInstance()->cookieName(),
-            false
-        );
+        $cookieTrackingRaw = Gdn::session()->getCookie('-vA', false);
 
         // Grab the UUID from our cookie data, if available.
         if ($cookieTracking = @json_decode($cookieTrackingRaw)) {
