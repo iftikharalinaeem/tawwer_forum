@@ -8,7 +8,7 @@
                     t('Register your application at %1$s'),
                     anchor('https://apps.dev.microsoft.com', 'https://apps.dev.microsoft.com')
             ); ?></li>
-            <li><?php echo t('SSL is required. Users will be redirected back to this site via HTTPS.'); ?>
+            <li><?php echo t('SSL is required. Users will be redirected back to this site via HTTPS.'); ?></li>
         </ul>
     </div>
 
