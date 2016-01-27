@@ -207,50 +207,56 @@ class AnalyticsTracker {
      * @param string|null $sessionID Unique ID for tracking user sessions.
      * @return array UUID and session ID values for the current user.
      */
-    public function trackingIDs($uuid = null, $sessionID = null) {
+    public function trackingIDs() {
+        // No tracking IDs?  Well, let's generate some...
         if (empty($this->trackingIDs)) {
+            // Start with an empty template.
             $this->trackingIDs = [
                 'sessionID' => null,
                 'uuid'      => null
             ];
 
+            // Fetch our tracking cookie.
             $cookieTrackingRaw = Gdn::request()->getValueFrom(
                 Gdn_Request::INPUT_COOKIES,
                 $this->cookieName(),
                 false
             );
 
+            // Does the tracking cookie contain valid JSON?
             if ($cookieTracking = @json_decode($cookieTrackingRaw)) {
+                // The tracking cookie should contain our IDs in a trackingIDs field.
                 if ($cookieIDs = val('trackingIDs', $cookieTracking)) {
+                    // Do we already have a UUID for this user?
                     if ($uuid = val('uuid', $cookieIDs)) {
+                        // Is the user logged, but their UUID doesn't match what we have on file?
                         if (Gdn::session()->isValid() && AnalyticsData::getUserUuid() != $uuid) {
+                            // Log the mismatch and update the UUID to the one we have saved for the user.
                             Logger::event('vanilla_analytics', Logger::DEBUG, 'User UUID mismatch.');
                             $uuid = AnalyticsData::getUserUuid();
                         }
 
                         $this->trackingIDs['uuid'] = $uuid;
                     } else {
+                        // No UUID? No problem.  Create a new one.
                         $this->trackingIDs['uuid'] = AnalyticsData::getUserUuid();
                     }
 
-                    if ($sessionID = val('sessionID', $cookieIDs)) {
+                    // Is this *not* a new visit and we have an existing session ID in our cookie?
+                    if (!Gdn::session()->newVisit() && $sessionID = val('sessionID', $cookieIDs)) {
                         $this->trackingIDs['sessionID'] = $sessionID;
-                    } elseif (Gdn::session()->newVisit()) {
+                    } else {
+                        // New session or no existing session ID? Create a new one.
                         $this->trackingIDs['sessionID'] = AnalyticsData::uuid();
                     }
-                } else {
-                    Logger::event('vanilla_analytics', Logger::DEBUG, 'No IDs in tracking cookie.');
                 }
             } else {
-                Logger::event('vanilla_analytics', Logger::DEBUG, 'Unable to json_decode cookie tracking IDs.');
+                // We've got nothing.  Start from scratch.
+                $this->trackingIDs = [
+                    'sessionID' => AnalyticsData::uuid(),
+                    'uuid'      => AnalyticsData::getUserUuid()
+                ];
             }
-        }
-
-        if ($uuid) {
-            $this->trackingIDs['uuid'] = $uuid;
-        }
-        if ($sessionID) {
-            $this->trackingIDs['sessionID'] = $sessionID;
         }
 
         return $this->trackingIDs;

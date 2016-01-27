@@ -250,11 +250,15 @@ class AnalyticsData extends Gdn_Model {
      * @return array An array representing analytics data for the current user as a guest.
      */
     public static function getGuest() {
+        $trackingIDs = AnalyticsTracker::getInstance()->trackingIDs();
+
         return [
             'dateFirstVisit' => null,
             'name'           => '@guest',
             'roleType'       => 'guest',
-            'userID'         => 0
+            'sessionID'      => $trackingIDs['sessionID'],
+            'userID'         => 0,
+            'uuid'           => $trackingIDs['uuid']
         ];
     }
 
@@ -359,7 +363,7 @@ class AnalyticsData extends Gdn_Model {
             $attributes = UserModel::attributes($user);
             $uuid = val('UUID', $attributes, null);
 
-            if (is_null($uuid) && $create) {
+            if (empty($uuid) && $create) {
                 $uuid = self::uuid();
                 Gdn::userModel()->saveAttribute(Gdn::session()->UserID, 'UUID', $uuid);
             }

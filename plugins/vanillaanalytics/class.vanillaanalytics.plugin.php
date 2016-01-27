@@ -117,6 +117,34 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param $args Event arguments, passed from EntryController, specifically for the event.
      */
     public function entryController_registrationSuccessful_handler($sender, &$args) {
+        $uuid = null;
+
+        // Fetch our tracking cookie.
+        $cookieTrackingRaw = Gdn::request()->getValueFrom(
+            Gdn_Request::INPUT_COOKIES,
+            AnalyticsTracker::getInstance()->cookieName(),
+            false
+        );
+
+        // Grab the UUID from our cookie data, if available.
+        if ($cookieTracking = @json_decode($cookieTrackingRaw)) {
+            if ($cookieIDs = val('trackingIDs', $cookieTracking)) {
+                $uuid = val('uuid', $cookieIDs);
+            }
+        }
+
+        // If we weren't able to recover a UUID from the tracking cookie, generate a enw one.
+        if (empty($uuid)) {
+            $uuid = AnalyticsData::uuid();
+        }
+
+        // Save the new user's UUID attribute
+        Gdn::userModel()->saveAttribute(
+            Gdn::session()->UserID,
+            'UUID',
+            $uuid
+        );
+
         AnalyticsTracker::getInstance()->trackEvent('registration', 'registration_success');
     }
 
