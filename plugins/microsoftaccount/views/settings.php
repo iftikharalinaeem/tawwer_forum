@@ -4,8 +4,11 @@
 
     <div class="PageInfo">
         <ul>
-            <li>If you haven't already, visit <a href="http://apps.dev.microsoft.com">apps.dev.microsoft.com</a> to register your application.</li>
-            <li>Due to Microsoft security requirements, after users sign in they will be directed back to this site behind SSL (HTTPS).</li>
+            <li><?php printf(
+                    t('Register your application at %1$s'),
+                    anchor('https://apps.dev.microsoft.com', 'https://apps.dev.microsoft.com')
+            ); ?></li>
+            <li><?php echo t('SSL is required. Users will be redirected back to this site via HTTPS.'); ?>
         </ul>
     </div>
 
