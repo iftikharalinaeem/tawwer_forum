@@ -7,6 +7,12 @@
 class AnalyticsTracker {
 
     /**
+     * Used to determine if we should avoid tracking events.
+     * @var bool
+     */
+    private $disableTracking = false;
+
+    /**
      * Holds the instance for our singleton
      * @var AnalyticsTracker
      */
@@ -28,6 +34,8 @@ class AnalyticsTracker {
      * Our constructor.
      */
     protected function __construct() {
+        $this->disableTracking = c('VanillaAnalytics.DisableTracking', false);
+
         // For now, using keen.io is hardwired.
         if (c('VanillaAnalytics.KeenIO.ProjectID') && c('VanillaAnalytics.KeenIO.WriteKey')) {
             $this->addTracker(new KeenIOTracker());
@@ -44,6 +52,10 @@ class AnalyticsTracker {
      * @param Gdn_Controller Instance of the current controller.
      */
     public function addDefinitions(Gdn_Controller $controller) {
+        if ($this->trackingDisabled()) {
+            return;
+        }
+
         foreach ($this->trackers as $tracker) {
             $tracker->addDefinitions($controller);
         }
@@ -60,9 +72,11 @@ class AnalyticsTracker {
      * @param Gdn_Controller Instance of the current controller.
      */
     public function addJsFiles(Gdn_Controller $controller) {
-        if (c('VanillaAnalytics.UseEventCookie')) {
-            $controller->addJsFile('js.cookie.min.js', 'plugins/vanillaanalytics');
+        if ($this->trackingDisabled()) {
+            return;
         }
+
+        $controller->addJsFile('js.cookie.min.js', 'plugins/vanillaanalytics');
 
         foreach ($this->trackers as $interface) {
             $interface->addJsFiles($controller);
@@ -166,10 +180,16 @@ class AnalyticsTracker {
 
     /**
      * Tracks an event.  Calls analytics service interfaces to record event details.
-     * @param $event
-     * @param array $data
+     *
+     * @param string $collection Bucket to place the event data into
+     * @param string $event Name of the event
+     * @param array $data Specific details about the event
      */
     public function trackEvent($collection, $event, $data = array()) {
+        if ($this->trackingDisabled()) {
+            return;
+        }
+
         // Load up the defaults we'd like to have and merge them into the data.
         $defaults = $this->getDefaultData();
 
@@ -194,6 +214,15 @@ class AnalyticsTracker {
 
             unset($interfaceDefaults, $details);
         }
+    }
+
+    /**
+     * Is event tracking disabled?
+     *
+     * @return bool True on disabled, false on enabled
+     */
+    public function trackingDisabled() {
+        return (bool)$this->disableTracking;
     }
 
     /**
