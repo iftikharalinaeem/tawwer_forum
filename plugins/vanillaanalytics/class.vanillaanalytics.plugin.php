@@ -40,24 +40,6 @@ class VanillaAnalytics extends Gdn_Plugin {
 
         // Allow trackers to add to values in a page's gdn.meta JavaScript array
         AnalyticsTracker::getInstance()->addDefinitions($sender);
-
-        if (c('VanillaAnalytics.UseEventCookie')) {
-            $eventData = AnalyticsTracker::getInstance()->getPageViewData($sender);
-        } else {
-            $eventData = [];
-        }
-
-        /**
-         * Save a tracking cookie.  The contents are tracking IDs and, potentially, event data for the current page
-         * view.  The intended use of saving event data in this cookie is to allow cached data on the page to be
-         * overwritten.  If the service tracker's JavaScript reads this event data, it can merge it into the data
-         * available in the page's gdn.meta and provide up-to-date information that can dodge the cached page contents.
-         */
-        Gdn::session()->setCookie(
-            '-vA',
-            json_encode(AnalyticsTracker::getInstance()->getCookieData($eventData)),
-            31536000
-        );
     }
 
     /**
@@ -124,13 +106,11 @@ class VanillaAnalytics extends Gdn_Plugin {
         $uuid = null;
 
         // Fetch our tracking cookie.
-        $cookieTrackingRaw = Gdn::session()->getCookie('-vA', false);
+        $cookieIDsRaw = Gdn::session()->getCookie('-vA', false);
 
         // Grab the UUID from our cookie data, if available.
-        if ($cookieTracking = @json_decode($cookieTrackingRaw)) {
-            if ($cookieIDs = val('trackingIDs', $cookieTracking)) {
-                $uuid = val('uuid', $cookieIDs);
-            }
+        if ($cookieIDs = @json_decode($cookieIDsRaw)) {
+            $uuid = val('uuid', $cookieIDs);
         }
 
         // If we weren't able to recover a UUID from the tracking cookie, generate a enw one.
@@ -146,6 +126,40 @@ class VanillaAnalytics extends Gdn_Plugin {
         );
 
         AnalyticsTracker::getInstance()->trackEvent('registration', 'registration_success');
+    }
+
+    /**
+     * Hook in early, before a request is dispatched to the target controller.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function gdn_dispatcher_beforeDispatch_handler($sender, $args) {
+        $setCookie = true;
+        $trackingCookieRaw = Gdn::session()->getCookie('-vA');
+
+        // Determine if we need to set a tracking cookie.
+        if ($trackingCookie = @json_decode($trackingCookieRaw)) {
+            $uuid      = val('uuid', $trackingCookie);
+            $sessionID = val('sessionID', $trackingCookie);
+
+            /**
+             * Don't send the cookie to the user again if they meet the following:
+             * 1. A UUID and session ID are already set
+             * 2. The user isn't logged in or, if they are, their cookie's UUID matches the one we have on record
+             */
+            if ($uuid && $sessionID && (!Gdn::session()->isValid() || AnalyticsData::getUserUuid() == $uuid)) {
+                $setCookie = false;
+            }
+        }
+
+        if ($setCookie) {
+            Gdn::session()->setCookie(
+                '-vA',
+                json_encode(AnalyticsTracker::getInstance()->trackingIDs()),
+                strtotime('+2 years')
+            );
+        }
     }
 
     /**

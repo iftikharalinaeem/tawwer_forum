@@ -250,15 +250,11 @@ class AnalyticsData extends Gdn_Model {
      * @return array An array representing analytics data for the current user as a guest.
      */
     public static function getGuest() {
-        $trackingIDs = AnalyticsTracker::getInstance()->trackingIDs();
-
         return [
             'dateFirstVisit' => null,
             'name'           => '@guest',
             'roleType'       => 'guest',
-            'sessionID'      => $trackingIDs['sessionID'],
-            'userID'         => 0,
-            'uuid'           => $trackingIDs['uuid']
+            'userID'         => 0
         ];
     }
 

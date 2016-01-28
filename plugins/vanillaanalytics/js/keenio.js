@@ -10,36 +10,47 @@ $(document).ready(function() {
 
         var eventData = gdn.meta.eventData || {};
 
-        // If our cookie library is available, check to see if we have event data hiding in a cookie.
-        if (typeof Cookies === 'function') {
-            var cookieName  = gdn.definition('vaCookieName');
-            var cookieValue = Cookies.get(cookieName);
+        if (typeof eventData === 'object') {
+            if (typeof eventData.user === 'object') {
+                var userData = eventData.user;
 
-            // Extract the event data, if available, and reset the cookie.  We only need to access it once.
-            if (cookieValue) {
-                var cookieData = JSON.parse(cookieValue);
+                if ((typeof userData.uuid === 'undefined' || typeof userData.sessionID === 'undefined') &&
+                    typeof Cookies === 'function') {
 
-                if (typeof cookieData.eventData === 'object' && Object.keys(cookieData.eventData).length > 0) {
-                    $.extend(eventData, cookieData.eventData);
-                    cookieData.eventData = {};
-                    cookieValue = JSON.stringify(cookieData);
+                    var cookieRaw = Cookies.get(gdn.definition('vaCookieName'));
+
+                    // Extract the event data, if available, and reset the cookie.  We only need to access it once.
+                    if (cookieRaw) {
+                        var trackingIDs;
+
+                        try {
+                            trackingIDs = JSON.parse(cookieRaw);
+                        } catch (e) {
+                        }
+
+                        if (typeof userData.uuid === 'undefined' && typeof trackingIDs.uuid !== 'undefined') {
+                            userData.uuid = trackingIDs.uuid;
+                        }
+
+                        if (typeof userData.sessionID === 'undefined' && typeof trackingIDs.sessionID !== 'undefined') {
+                            userData.sessionID = trackingIDs.sessionID;
+                        }
+                    }
                 }
             }
 
-            Cookies.set(cookieName, cookieValue);
-        }
+            // If we get this far and still don't have any event data, there's nothing to get.
+            if (Object.keys(eventData).length > 0) {
+                eventData.type = 'page_view';
 
-        // If we get this far and still don't have any event data, there's nothing to get.
-        if (typeof eventData === 'object' && Object.keys(eventData).length > 0) {
-            eventData.type = 'page_view';
-
-            keenClient.addEvent(
-                "page",
-                eventData,
-                function(error, response){
-                    // If error isn't a falsy, an error was encountered.
-                }
-            );
+                keenClient.addEvent(
+                    'page',
+                    eventData,
+                    function (error, response) {
+                        // If error isn't a falsy, an error was encountered.
+                    }
+                );
+            }
         }
     }
 });
