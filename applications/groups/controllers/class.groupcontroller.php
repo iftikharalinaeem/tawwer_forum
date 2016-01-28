@@ -89,7 +89,7 @@ class GroupController extends Gdn_Controller {
 
       // Get Discussions
       $discussionModel = new DiscussionModel();
-      $discussions = $discussionModel->getWhere(array('d.GroupID' => $GroupID, 'd.Announce' => 0), 0, $this->HomepageDiscussionCount);
+      $discussions = $discussionModel->getWhereRecent(array('d.GroupID' => $GroupID, 'd.Announce' => 0), $this->HomepageDiscussionCount);
       $this->setData('Discussions', $discussions);
 
       $discussions = $discussionModel->getAnnouncements(array('d.GroupID' => $GroupID), 0, 10);

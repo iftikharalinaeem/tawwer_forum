@@ -13,7 +13,8 @@ $list = $this->data('list');
     <?php } ?>
   </div>
   <ul class="media-list DataList">
-    <?php foreach(val('items', $list) as $item) { ?>
+    <?php if (val('items', $list)) {
+    foreach(val('items', $list) as $item) { ?>
       <li id="<?php echo val('id', $item); ?>" class="Item <?php echo val('cssClass', $item); ?>">
         <?php if (val('imageSource', $item)) { ?>
           <a href="<?php echo val('url', $item); ?>" class="PhotoWrap">
@@ -66,7 +67,8 @@ $list = $this->data('list');
           </div>
         </div>
       </li>
-    <?php } ?>
+    <?php }
+    } ?>
   </ul>
   <?php if (val('emptyMessage', $list) && !val('items', $list)) { ?>
     <div class="EmptyMessage <?php echo val('emptyMessageCssClass', $list); ?>"><?php echo val('emptyMessage', $list); ?></div>
