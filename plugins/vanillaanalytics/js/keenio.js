@@ -10,20 +10,6 @@ var keenTracker = {
 };
 
 /**
- * Hit the /settings/analyticstick endpoint to trigger an event and update the user's cookies.
- */
-keenTracker.analyticsTick =  function() {
-    $.ajax({
-        'dataType': 'json',
-        'type'    : 'post',
-        'url'     : gdn.url('settings/analyticstick.json'),
-        'success' : function(json) {
-            keenTracker.event('page_view');
-        }
-    });
-};
-
-/**
  * Log an event with keen.io.
  * @param {string} eventType The type/name of the event being tracked.
  * @param {string} collection The collection to store the event under.  Defaults to "page".
@@ -109,5 +95,12 @@ keenTracker.getUser = function(eventData) {
     return userData;
 };
 
-// Hit the analyticstick endpoint as soon as the page loads to get the whole thing rolling.
-$(document).ready(keenTracker.analyticsTick);
+$(document).ready(function() {
+    // Hook into analyticsTick, called by gdn.stats
+    $(gdn).on('analyticsTick', function(event, sendData, jqXHR, textStatus) {
+        // Only track the page view if the hit to analyticstick was a success.
+        if (textStatus === 'success') {
+            keenTracker.event('page_view');
+        }
+    })
+});
