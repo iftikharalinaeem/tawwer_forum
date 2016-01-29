@@ -66,8 +66,7 @@ $list = $this->data('list');
           </div>
         </div>
       </li>
-    <?php }
-    } ?>
+    <?php } ?>
   </ul>
   <?php if (val('emptyMessage', $list) && !val('items', $list)) { ?>
     <div class="EmptyMessage <?php echo val('emptyMessageCssClass', $list); ?>"><?php echo val('emptyMessage', $list); ?></div>
