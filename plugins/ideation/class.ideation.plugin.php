@@ -283,13 +283,15 @@ class IdeationPlugin extends Gdn_Plugin {
             return;
         }
 
-
         $userVote = $this->getUserVoteReaction();
+        $useDownVotes = $this->allowDownVotes($discussion, 'discussion');
+
         // Set counter module for rendering in attachment
         $ideaCounterModule = IdeaCounterModule::instance();
         $ideaCounterModule->setDiscussion($discussion);
         $ideaCounterModule->setShowVotes(true);
-        $ideaCounterModule->userVote = $userVote;
+        $ideaCounterModule->setUseDownVotes($useDownVotes);
+        $ideaCounterModule->setUserVote($userVote);
         $sender->setData('IdeaCounterModule', $ideaCounterModule);
     }
 
@@ -314,10 +316,13 @@ class IdeationPlugin extends Gdn_Plugin {
         }
         if (c('Vanilla.Discussions.Layout') == 'modern') {
             $ideaCounterModule = IdeaCounterModule::instance();
+            $userVote = '';
             if ($tagID = val('UserVote', $discussion)) {
                 $userVote = $this->getReactionFromTagID($tagID);
             }
-            $ideaCounterModule->userVote = $userVote;
+            $ideaCounterModule->setUserVote($userVote);
+            $useDownVotes = $this->allowDownVotes($discussion, 'discussion');
+            $ideaCounterModule->setUseDownVotes($useDownVotes);
             $ideaCounterModule->setDiscussion($discussion);
             echo $ideaCounterModule->toString();
         }
@@ -331,10 +336,13 @@ class IdeationPlugin extends Gdn_Plugin {
         }
         if (c('Vanilla.Discussions.Layout') == 'table') {
             $ideaCounterModule = IdeaCounterModule::instance();
+            $userVote = '';
             if ($tagID = val('UserVote', $discussion)) {
                 $userVote = $this->getReactionFromTagID($tagID);
             }
-            $ideaCounterModule->userVote = $userVote;
+            $ideaCounterModule->setUserVote($userVote);
+            $useDownVotes = $this->allowDownVotes($discussion, 'discussion');
+            $ideaCounterModule->setUseDownVotes($useDownVotes);
             $ideaCounterModule->setDiscussion($discussion);
             echo $ideaCounterModule->toString();
         }
@@ -413,6 +421,12 @@ class IdeationPlugin extends Gdn_Plugin {
         require_once $sender->fetchViewLocation('attachment', '', 'plugins/ideation');
     }
 
+    public function discussionModel_AfterSaveDiscussion_handler($sender, $args) {
+        if ($this->isIdea(val('DiscussionID', $args))) {
+            $this->updateAttachment(val('DiscussionID', $args), 1, '');
+        }
+    }
+
     protected function updateAttachment($discussionID, $stageID, $stageNotes) {
 
         $stage = StageModel::getStage($stageID);
@@ -457,12 +471,13 @@ class IdeationPlugin extends Gdn_Plugin {
             if ($urlCode != self::REACTION_UP && $urlCode != self::REACTION_DOWN) {
                 return;
             }
+            decho($urlCode);
         }
         $discussion = val('Record', $args);
         $reaction = ReactionModel::ReactionTypes($urlCode);
-
+        $new = val('Insert', $args);
         $cssClass = '';
-        if (val('Insert', $args)) {
+        if ($new) {
             $cssClass = 'uservote';
         }
         $args['Button'] = self::writeIdeaReactionsButton($discussion, $urlCode, $reaction, array('cssClass' => $cssClass));
@@ -477,10 +492,17 @@ class IdeationPlugin extends Gdn_Plugin {
             '<div class="score">'.$score.'</div>',
             'ReplaceWith'
         );
+
+        if ($this->allowDownVotes($discussion, 'discussion') && $new) {
+            Gdn::Controller()->JsonTarget('#Discussion_'.val('DiscussionID', $discussion).' .uservote', 'uservote', 'RemoveClass');
+        }
     }
 
-    public function base_flags_handler($sender, $args) {
-
+    public function base_afterFlag_handler($sender, $args) {
+        if (val('Type', $args) == 'Discussion' && val('Type', val('Discussion', $args)) == 'Idea') {
+//            decho($args);
+            $args['ReactionTypes'] = array();
+        }
     }
 
     public function base_beforeReactionsScore_handler($sender, $args) {
@@ -612,6 +634,21 @@ class IdeationPlugin extends Gdn_Plugin {
 
     public function isIdeaCategory($category) {
         return in_array('Idea', val('AllowedDiscussionTypes', $category));
+    }
+
+    public function allowDownVotes($data, $datatype = 'category') {
+        switch(strtolower($datatype)) {
+            case 'category' :
+                $category = $data;
+                break;
+            case 'discussion' :
+                $category = CategoryModel::categories(val('CategoryID', $data));
+                break;
+            default:
+                $category = array();
+        }
+
+        return val('UseDownVotes', $category);
     }
 
     public function updateDiscussionStage($discussion, $stageID, $notes) {

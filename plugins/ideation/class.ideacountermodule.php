@@ -45,7 +45,7 @@ class IdeaCounterModule extends Gdn_Module {
     /**
      * @var string
      */
-    public $userVote;
+    protected $userVote;
     /**
      * @var IdeaCounterModule
      */
@@ -88,6 +88,21 @@ class IdeaCounterModule extends Gdn_Module {
         $this->showVotes = $showVotes;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getUserVote() {
+        return $this->userVote;
+    }
+
+    /**
+     * @param string $userVote
+     */
+    public function setUserVote($userVote) {
+        $this->userVote = $userVote;
+    }
+
     /**
      * @param boolean $useDownVotes
      */
@@ -102,17 +117,18 @@ class IdeaCounterModule extends Gdn_Module {
      */
     public function prepare() {
         if ($this->discussion) {
+            if (!$score = val('Score', $this->discussion)) {
+                $score = '0';
+            }
             $discussionID = val('DiscussionID', $this->discussion);
             $stage = StageModel::getStageByDiscussion($discussionID);
             $this->isOpen = (val('Status', $stage) == 'Open');
             $counter = array();
             $counter['upUrl'] = url('/react/discussion/'.$this->ideaUpReactionSlug.'?id='.$discussionID);
-            $counter['score'] = val('Score', $this->discussion, '0');
-            $counter['numberVotes'] = val('Score', $this->discussion, '0');
+            $counter['score'] = $score;
+            $counter['numberVotes'] = $score;
             $counter['stage'] = val('Name', $stage);
             $counter['status'] = val('Status', $stage);
-
-//            $counter['cssClass'] = '';
             $counter['upCssClass'] = '';
 
             if ($this->userVote) {
