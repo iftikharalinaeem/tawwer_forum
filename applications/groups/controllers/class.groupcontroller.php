@@ -799,7 +799,7 @@ class GroupController extends Gdn_Controller {
 
       list($Offset, $Limit) = OffsetLimit($Page, C('Vanilla.Discussions.PerPage', 30));
       $DiscussionModel = new DiscussionModel();
-      $this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->GetWhere(array('GroupID' => $Group['GroupID']), $Offset, $Limit));
+      $this->DiscussionData = $this->SetData('Discussions', $DiscussionModel->GetWhereRecent(array('GroupID' => $Group['GroupID']), $Limit, $Offset));
       $this->CountCommentsPerPage = C('Vanilla.Comments.PerPage', 30);
       $this->SetData('_ShowCategoryLink', FALSE);
 
