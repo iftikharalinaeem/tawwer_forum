@@ -10,6 +10,21 @@ var keenTracker = {
 };
 
 /**
+ *
+ * @param {object} event
+ * @param {object} sendData Data sent by the browser as part of the analyticstick request.
+ * @param {jqXHR} jqXHR Superset of the browser's native XMLHttpRequest object.
+ * @param {string} textStatus Status of the request (e.g. success, error, timeout)
+ * @link http://api.jquery.com/jQuery.ajax/#jqXHR
+ */
+keenTracker.analyticsTickHandler = function(event, sendData, jqXHR, textStatus) {
+    // Only track the page view if the hit to analyticstick was a success.
+    if (textStatus === 'success') {
+        keenTracker.event('page_view');
+    }
+};
+
+/**
  * Log an event with keen.io.
  * @param {string} eventType The type/name of the event being tracked.
  * @param {string} collection The collection to store the event under.  Defaults to "page".
@@ -95,12 +110,5 @@ keenTracker.getUser = function(eventData) {
     return userData;
 };
 
-$(document).ready(function() {
-    // Hook into analyticsTick, called by gdn.stats
-    $(gdn).on('analyticsTick', function(event, sendData, jqXHR, textStatus) {
-        // Only track the page view if the hit to analyticstick was a success.
-        if (textStatus === 'success') {
-            keenTracker.event('page_view');
-        }
-    })
-});
+// Attach our listener.
+$(document).on('analyticsTick', keenTracker.analyticsTickHandler);
