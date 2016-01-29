@@ -694,6 +694,7 @@ class ReactionModel {
                 $reactionsPlugin->EventArguments['UrlCode'] = $UrlCode;
                 $reactionsPlugin->EventArguments['Record'] = $Record;
                 $reactionsPlugin->EventArguments['Insert'] = $Insert;
+                $reactionsPlugin->EventArguments['TagID'] = val('TagID', $Data);
                 $reactionsPlugin->EventArguments['Button'] = &$Button;
                 $reactionsPlugin->fireEvent('ReactionsButtonReplacement');
 

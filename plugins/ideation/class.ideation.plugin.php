@@ -466,26 +466,47 @@ class IdeationPlugin extends Gdn_Plugin {
 
     // REACTIONS
 
+    /**
+     * Each reaction that is changed runs through this event. Some votes change 2 reactions.
+     * For example, if a user has previously downvoted something and then upvotes it, then we remove the downvote and
+     * insert the upvote. This checks to see if the changed reaction is an insert and then appends the 'uservote' css
+     * class to it and removes the css class from any reaction that is not inserted. It also recalculates and updates
+     * the score and vote count and replaces them in the view.
+     *
+     * @param ReactionsPlugin $sender
+     * @param array $args
+     */
     public function reactionsPlugin_reactionsButtonReplacement_handler($sender, $args) {
         if ($urlCode = val('UrlCode', $args)) {
             if ($urlCode != self::REACTION_UP && $urlCode != self::REACTION_DOWN) {
                 return;
             }
-            decho($urlCode);
         }
+
+        $reactionTagID = val('TagID', $args); // This id is of the reaction that was selected
+
+        if ($reactionTagID == $this->getDownTagID()) {
+            $vote = self::REACTION_DOWN;
+        } else {
+            $vote = self::REACTION_UP;
+        }
+
         $discussion = val('Record', $args);
         $reaction = ReactionModel::ReactionTypes($urlCode);
-        $new = val('Insert', $args);
         $cssClass = '';
-        if ($new) {
+
+        // If the changed reaction is the one that was selected and if we're inserting (not removing) the reaction, then add the css class.
+        if ($urlCode == $vote && val('Insert', $args)) {
             $cssClass = 'uservote';
         }
-        $args['Button'] = self::writeIdeaReactionsButton($discussion, $urlCode, $reaction, array('cssClass' => $cssClass));
+
+        $args['Button'] = self::getIdeaReactionButton($discussion, $urlCode, $reaction, array('cssClass' => $cssClass));
 
         $countUp = getValueR('Attributes.React.'.self::REACTION_UP, $discussion, 0);
         $countDown = getValueR('Attributes.React.'.self::REACTION_DOWN, $discussion, 0);
 
         $score = $countUp - $countDown;
+        $votes = $countUp + $countDown;
 
         Gdn::controller()->jsonTarget(
             '#Discussion_'.val('DiscussionID', $discussion).' .score',
@@ -493,18 +514,32 @@ class IdeationPlugin extends Gdn_Plugin {
             'ReplaceWith'
         );
 
-        if ($this->allowDownVotes($discussion, 'discussion') && $new) {
-            Gdn::Controller()->JsonTarget('#Discussion_'.val('DiscussionID', $discussion).' .uservote', 'uservote', 'RemoveClass');
-        }
+        Gdn::controller()->jsonTarget(
+            '#Discussion_'.val('DiscussionID', $discussion).' .votes',
+            '<div class="votes meta">'.sprintf(t('%s votes'), $votes).'</div>',
+            'ReplaceWith'
+        );
     }
 
+    /**
+     * Removes non-flag-type reactions from any Idea-type discussion.
+     *
+     * @param Gdn_Controller $sender
+     * @param $args
+     */
     public function base_afterFlag_handler($sender, $args) {
         if (val('Type', $args) == 'Discussion' && val('Type', val('Discussion', $args)) == 'Idea') {
-//            decho($args);
             $args['ReactionTypes'] = array();
         }
     }
 
+    /**
+     * Stops the reactions model from scoring non-idea-type reactions in Idea discussions.
+     * Only the up and down reactions should contribute to the score.
+     *
+     * @param Gdn_Controller $sender
+     * @param $args
+     */
     public function base_beforeReactionsScore_handler($sender, $args) {
         if (val('ReactionType', $args) && (val('Type', val('Record', $args)) == 'Idea')) {
             $reaction = val('ReactionType', $args);
@@ -515,8 +550,17 @@ class IdeationPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Adds the sessioned user's Idea* reaction to the discussion data in the form [UserVote] => TagID
+     * where TagID is the TagID of the reaction.
+     *
+     * @param Gdn_DataSet $discussions
+     */
     public function addUserVotesToDiscussions($discussions) {
         $userVotes = $this->getUserVotes();
+        if (!$userVotes) {
+            return;
+        }
         foreach ($discussions as &$discussion) {
             $discussionID = val('DiscussionID', $discussion);
             if (val($discussionID, $userVotes)) {
@@ -525,31 +569,51 @@ class IdeationPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Adds the sessioned user's Idea* reaction to the discussion data in the form [UserVote] => TagID
+     * where TagID is the TagID of the reaction.
+     *
+     * @param DiscussionsController $sender
+     * @param array $args
+     */
     public function discussionsController_render_before($sender, $args) {
         $discussions = $sender->data('Discussions')->result();
         $this->addUserVotesToDiscussions($discussions);
     }
 
+    /**
+     * Adds the sessioned user's Idea* reaction to the discussion data in the form [UserVote] => TagID
+     * where TagID is the TagID of the reaction.
+     *
+     * @param CategoriesController $sender
+     * @param array $args
+     */
     public function categoriesController_render_before($sender, $args) {
         $discussions = $sender->data('Discussions')->result();
         $this->addUserVotesToDiscussions($discussions);
     }
 
-
+    /**
+     * Returns an array of the sessioned user's votes where the key is the discussion ID and the value is the reaction's tag ID.
+     *
+     * @return array The sessioned user's votes
+     */
     public function getUserVotes() {
+
+        $userVotes = array();
         $tagIDs = array($this->getUpTagID(), $this->getDownTagID());
 
-        $limit = 50;
-        $offset = 0;
+        $limit = 50; // TODO: Set this to be the same length of the discussions page.
         $user = Gdn::session();
         $userID = val('UserID', $user);
 
         if ($userID) {
-
             $reactionModel = new ReactionModel();
+
+            // TODO: Cache this thing.
             $data = $reactionModel->GetRecordsWhere(array('TagID' => $tagIDs, 'RecordType' => array('Discussion'), 'UserID' => $userID, 'Total >' => 0),
                 'DateInserted', 'desc',
-                $limit + 1, $offset);
+                $limit + 1);
 
             foreach ($data as $discussion) {
                 $userVotes[val('RecordID', $discussion)] = val('TagID', $discussion);
@@ -559,6 +623,13 @@ class IdeationPlugin extends Gdn_Plugin {
         return $userVotes;
     }
 
+    /**
+     * Gets the user's Idea-type reaction on a discussion. Returns the reaction URL code.
+     *
+     * @param array|object $discussion The discussion to test. If not provided, tries to get from the Data array.
+     * @param array|object $user The user to get the reaction from. If not provided, gets the sessioned user.
+     * @return string The urlCode of the Idea* reaction of the user's on a discussion
+     */
     public function getUserVoteReaction($discussion = null, $user = null) {
         if(!$user) {
             $user = Gdn::session();
@@ -585,7 +656,16 @@ class IdeationPlugin extends Gdn_Plugin {
         return '';
     }
 
-    public static function writeIdeaReactionsButton($discussion, $urlCode, $reaction = null, $options = array()) {
+    /**
+     * Returns an HTML string of an Idea type reaction button.
+     *
+     * @param array|object $discussion
+     * @param string $urlCode
+     * @param array $reaction
+     * @param array $options
+     * @return string An HTML string representing an idea-type reaction button.
+     */
+    public static function getIdeaReactionButton($discussion, $urlCode, $reaction = null, $options = array()) {
         if (!$reaction) {
             $reaction = ReactionModel::ReactionTypes($urlCode);
         }
@@ -601,6 +681,7 @@ class IdeationPlugin extends Gdn_Plugin {
         return self::getReactionButtonHtml($linkClass, $url, $label, $dataAttr);
     }
 
+    // TODO: Figure out how to make this override-able
     public static function getReactionButtonHtml($cssClass, $url, $label, $dataAttr = '') {
         return '<a class="Hijack '.$cssClass.'" href="'.$url.'" title="'.$label.'" '.$dataAttr.' rel="nofollow"><span class="icon icon-arrow-'.strtolower($label).'"></span> <span class="idea-label">'.$label.'</span></a>';
     }
