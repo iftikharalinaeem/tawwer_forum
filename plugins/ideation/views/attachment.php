@@ -16,7 +16,11 @@ function WriteStageAttachment($attachment) {
             <div class="media item">
                 <div class="pull-left">
                     <div class="media-object">
-<!--                        <i class="icon icon-ticket"></i>-->
+                            <?php
+                            if (Gdn::controller()->data('IdeaCounterModule')) {
+                                echo Gdn::controller()->data('IdeaCounterModule')->toString();
+                            }
+                            ?>
                     </div>
                 </div>
                 <div class="media-body">

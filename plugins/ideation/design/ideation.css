@@ -1,0 +1,52 @@
+.PanelColumn {
+  position: absolute;
+  margin: 0; }
+
+.DataTable.DiscussionsTable {
+  table-layout: auto; }
+
+.ItemIdea:after {
+  content: "";
+  display: table;
+  clear: both; }
+.ItemIdea .PhotoWrap {
+  display: none; }
+
+.idea-label {
+  display: none; }
+
+.idea-counter-module {
+  background-color: transparent;
+  padding: 0; }
+  .idea-counter-module.Closed .idea-counter {
+    background-color: rgba(0, 0, 0, 0.3); }
+  .idea-counter-module .uservote {
+    color: #f52c6e; }
+  .idea-counter-module .score {
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 14px; }
+  .idea-counter-module .idea-counter-box {
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 9px 0; }
+  .idea-counter-module .idea-menu {
+    margin-top: 4px; }
+  .idea-counter-module .idea-counter {
+    padding: 13px 2px; }
+  .idea-counter-module .votes {
+    margin-top: 5px;
+    font-size: 10px;
+    color: rgba(0, 0, 0, 0.6);
+    background-color: transparent; }
+
+.item-attachment .idea-counter-module a {
+  color: #0291db; }
+.item-attachment .idea-counter-module .uservote {
+  color: #f52c6e; }
+.item-attachment .idea-counter-module .icon {
+  display: inline;
+  min-width: 14px;
+  font-size: 14px;
+  line-height: 1; }
+/*# sourceMappingURL=ideation.css.map */

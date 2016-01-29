@@ -22,6 +22,12 @@ class IdeationPlugin extends Gdn_Plugin {
     protected $defaultStageID = 1;
     protected $tagModel;
 
+    const REACTION_UP = 'IdeaUp';
+    const REACTION_DOWN = 'IdeaDown';
+
+    protected static $upTagID;
+    protected static $downTagID;
+
     /**
      * This will run when you "Enable" the plugin
      *
@@ -40,6 +46,44 @@ class IdeationPlugin extends Gdn_Plugin {
 
     public function base_render_before($sender) {
         $sender->addJsFile('ideation.js', 'plugins/ideation');
+        $sender->addCssFile('ideation.css', 'plugins/ideation');
+    }
+
+
+    /**
+     * @return int
+     */
+    public static function getUpTagID() {
+        if (!self::$upTagID) {
+            $reactionUp = ReactionModel::ReactionTypes(self::REACTION_UP);
+            self::setUpTagID(val('TagID', $reactionUp));
+        }
+        return self::$upTagID;
+    }
+
+    /**
+     * @param int $upTagID
+     */
+    protected static function setUpTagID($upTagID) {
+        self::$upTagID = $upTagID;
+    }
+
+    /**
+     * @return int
+     */
+    public static function getDownTagID() {
+        if (!self::$downTagID) {
+            $reactionDown = ReactionModel::ReactionTypes(self::REACTION_DOWN);
+            self::setDownTagID(val('TagID', $reactionDown));
+        }
+        return self::$downTagID;
+    }
+
+    /**
+     * @param int $downTagID
+     */
+    protected static function setDownTagID($downTagID) {
+        self::$downTagID = $downTagID;
     }
 
     // CATEGORY
@@ -48,15 +92,16 @@ class IdeationPlugin extends Gdn_Plugin {
         $categoryID = val('CategoryID', $sender->Data);
         $categoryModel = new CategoryModel();
         $category = $categoryModel->getID($categoryID);
-        $options = array();
+        $ideaOptions = array();
 
         if ($this->isIdeaCategory($category)) {
-            $options = array('checked' => 'checked');
+            $ideaOptions = array('checked' => 'checked');
         }
 
-        $sender->Data['_ExtendedFields']['IsIdea'] = array('Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => '<strong>Ideation</strong> <small><a href="#">Learn more about Ideas</a></small>', 'Options' => $options);
+        $sender->Data['_ExtendedFields']['IsIdea'] = array('Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => '<strong>Ideation</strong> <small><a href="#">Learn more about Ideas</a></small>', 'Options' => $ideaOptions);
+        $sender->Data['_ExtendedFields']['UseDownVotes'] = array('Name' => 'UseDownVotes', 'Control' => 'CheckBox');
 
-        if ($sender->Form->isPostBack()) {
+        if ($sender->Form->authenticatedPostBack()) {
             $isIdea = $sender->Form->getValue('Idea_Category');
 
             if ($isIdea) {
@@ -225,14 +270,28 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     public function discussionController_render_before($sender, $args) {
+        $isIdea = false;
+        if (($discussion = val('Discussion', $sender)) && val('Type', $sender->Discussion) == 'Idea') {
+            $isIdea = true;
+        }
+
         // Don't display tags on a idea discussion.
-        if (val('Discussion', $sender) && val('Type', $sender->Discussion) == 'Idea') {
+        if ($isIdea) {
             saveToConfig('Plugins.Tagging.DisableInline', true, true);
         } else {
             saveToConfig('Plugins.Tagging.DisableInline', false, true);
+            return;
         }
-    }
 
+
+        $userVote = $this->getUserVoteReaction();
+        // Set counter module for rendering in attachment
+        $ideaCounterModule = IdeaCounterModule::instance();
+        $ideaCounterModule->setDiscussion($discussion);
+        $ideaCounterModule->setShowVotes(true);
+        $ideaCounterModule->userVote = $userVote;
+        $sender->setData('IdeaCounterModule', $ideaCounterModule);
+    }
 
     // Print tags on discussionlist
     public function base_beforeDiscussionMeta_handler($sender, $args) {
@@ -243,12 +302,48 @@ class IdeationPlugin extends Gdn_Plugin {
         $stage = StageModel::getStageByDiscussion(val('DiscussionID', $discussion));
         if ($stage) {
             echo ' <a href="'.url('/discussions/tagged/'.urlencode(val('Name', $stage))).'"><span class="Tag Stage-Tag-'.urlencode(val('Name', $stage)).'"">'.val('Name', $stage).'</span></a> ';
+//            echo ' <span class="MItem MCount IdeaVoteCount"><span class="Number">'.self::getTotalVotes($discussion).'</span> '.t('votes').'</span>';
         }
+    }
 
-        $counter = IdeaCounterModule::instance();
-        $counter->setDiscussion($discussion);
-        echo $counter->toString();
+    // Modern layout discussion list counter placement.
+    public function base_beforeDiscussionContent_handler($sender, $args) {
+        $discussion = $args['Discussion'];
+        if (!$this->isIdea($discussion)) {
+            return;
+        }
+        if (c('Vanilla.Discussions.Layout') == 'modern') {
+            $ideaCounterModule = IdeaCounterModule::instance();
+            if ($tagID = val('UserVote', $discussion)) {
+                $userVote = $this->getReactionFromTagID($tagID);
+            }
+            $ideaCounterModule->userVote = $userVote;
+            $ideaCounterModule->setDiscussion($discussion);
+            echo $ideaCounterModule->toString();
+        }
+    }
 
+    // Table layout discussion list counter placement.
+    public function base_beforeDiscussionTitle_handler($sender, $args) {
+        $discussion = $args['Discussion'];
+        if (!$this->isIdea($discussion)) {
+            return;
+        }
+        if (c('Vanilla.Discussions.Layout') == 'table') {
+            $ideaCounterModule = IdeaCounterModule::instance();
+            if ($tagID = val('UserVote', $discussion)) {
+                $userVote = $this->getReactionFromTagID($tagID);
+            }
+            $ideaCounterModule->userVote = $userVote;
+            $ideaCounterModule->setDiscussion($discussion);
+            echo $ideaCounterModule->toString();
+        }
+    }
+
+    public function base_beforeDiscussionName_handler($sender, $args) {
+        if ((val('Type', val('Discussion', $args)) == 'Idea')) {
+            $args['CssClass'] .= ' ItemIdea';
+        }
     }
 
     public function base_discussionOptions_handler($sender, $args) {
@@ -355,6 +450,139 @@ class IdeationPlugin extends Gdn_Plugin {
         $attachmentModel->save($attachment);
     }
 
+    // REACTIONS
+
+    public function reactionsPlugin_reactionsButtonReplacement_handler($sender, $args) {
+        if ($urlCode = val('UrlCode', $args)) {
+            if ($urlCode != self::REACTION_UP && $urlCode != self::REACTION_DOWN) {
+                return;
+            }
+        }
+        $discussion = val('Record', $args);
+        $reaction = ReactionModel::ReactionTypes($urlCode);
+
+        $cssClass = '';
+        if (val('Insert', $args)) {
+            $cssClass = 'uservote';
+        }
+        $args['Button'] = self::writeIdeaReactionsButton($discussion, $urlCode, $reaction, array('cssClass' => $cssClass));
+
+        $countUp = getValueR('Attributes.React.'.self::REACTION_UP, $discussion, 0);
+        $countDown = getValueR('Attributes.React.'.self::REACTION_DOWN, $discussion, 0);
+
+        $score = $countUp - $countDown;
+
+        Gdn::controller()->jsonTarget(
+            '#Discussion_'.val('DiscussionID', $discussion).' .score',
+            '<div class="score">'.$score.'</div>',
+            'ReplaceWith'
+        );
+    }
+
+    public function base_flags_handler($sender, $args) {
+
+    }
+
+    public function base_beforeReactionsScore_handler($sender, $args) {
+        if (val('ReactionType', $args) && (val('Type', val('Record', $args)) == 'Idea')) {
+            $reaction = val('ReactionType', $args);
+            if ((val('UrlCode', $reaction) != self::REACTION_UP) && (val('UrlCode', $reaction) != self::REACTION_DOWN)) {
+                $args['Set'] = array();
+
+            }
+        }
+    }
+
+    public function addUserVotesToDiscussions($discussions) {
+        $userVotes = $this->getUserVotes();
+        foreach ($discussions as &$discussion) {
+            $discussionID = val('DiscussionID', $discussion);
+            if (val($discussionID, $userVotes)) {
+                $discussion->UserVote = $userVotes[$discussionID];
+            }
+        }
+    }
+
+    public function discussionsController_render_before($sender, $args) {
+        $discussions = $sender->data('Discussions')->result();
+        $this->addUserVotesToDiscussions($discussions);
+    }
+
+    public function categoriesController_render_before($sender, $args) {
+        $discussions = $sender->data('Discussions')->result();
+        $this->addUserVotesToDiscussions($discussions);
+    }
+
+
+    public function getUserVotes() {
+        $tagIDs = array($this->getUpTagID(), $this->getDownTagID());
+
+        $limit = 50;
+        $offset = 0;
+        $user = Gdn::session();
+        $userID = val('UserID', $user);
+
+        if ($userID) {
+
+            $reactionModel = new ReactionModel();
+            $data = $reactionModel->GetRecordsWhere(array('TagID' => $tagIDs, 'RecordType' => array('Discussion'), 'UserID' => $userID, 'Total >' => 0),
+                'DateInserted', 'desc',
+                $limit + 1, $offset);
+
+            foreach ($data as $discussion) {
+                $userVotes[val('RecordID', $discussion)] = val('TagID', $discussion);
+            }
+        }
+
+        return $userVotes;
+    }
+
+    public function getUserVoteReaction($discussion = null, $user = null) {
+        if(!$user) {
+            $user = Gdn::session();
+        }
+        if (!$discussion) {
+            $discussion = Gdn::controller()->data('Discussion');
+        }
+
+        if (!$discussion || !$user) {
+            return '';
+        }
+
+        $votes = $this->getUserVotes();
+        $discussionID = val('DiscussionID', $discussion);
+
+        if (val($discussionID, $votes) == self::getUpTagID()) {
+            return self::REACTION_UP;
+        }
+
+        if (val($discussionID, $votes) == self::getDownTagID()) {
+            return self::REACTION_DOWN;
+        }
+
+        return '';
+    }
+
+    public static function writeIdeaReactionsButton($discussion, $urlCode, $reaction = null, $options = array()) {
+        if (!$reaction) {
+            $reaction = ReactionModel::ReactionTypes($urlCode);
+        }
+
+        $name = $reaction['Name'];
+        $label = T($name);
+        $id = GetValue('DiscussionID', $discussion);
+        $linkClass = 'ReactButton-'.$urlCode.' '.val('cssClass', $options);
+        $urlCode2 = strtolower($urlCode);
+        $url = Url("/react/discussion/$urlCode2?id=$id");
+        $dataAttr = "data-reaction=\"$urlCode2\"";
+
+        return self::getReactionButtonHtml($linkClass, $url, $label, $dataAttr);
+    }
+
+    public static function getReactionButtonHtml($cssClass, $url, $label, $dataAttr = '') {
+        return '<a class="Hijack '.$cssClass.'" href="'.$url.'" title="'.$label.'" '.$dataAttr.' rel="nofollow"><span class="icon icon-arrow-'.strtolower($label).'"></span> <span class="idea-label">'.$label.'</span></a>';
+    }
+
     // HELPERS
 
     public function getStageNotes($discussion, $discussionModel = null) {
@@ -364,12 +592,22 @@ class IdeationPlugin extends Gdn_Plugin {
         return $discussionModel->getRecordAttribute($discussion, 'StageNotes');
     }
 
+    public function getReactionFromTagID($tagID) {
+        if ($tagID == self::getUpTagID()) {
+            return self::REACTION_UP;
+        }
+        if ($tagID ==self::getDownTagID()) {
+            return self::REACTION_DOWN;
+        }
+        return '';
+    }
+
     public function isIdea($discussion) {
         if (is_numeric($discussion)) {
             $discussionModel = new DiscussionModel();
             $discussion = $discussionModel->getID($discussion);
         }
-        return (strtolower(val('Type', $discussion)) == 'idea');
+        return (strtolower(val('Type', $discussion)) === 'idea');
     }
 
     public function isIdeaCategory($category) {
@@ -391,7 +629,7 @@ class IdeationPlugin extends Gdn_Plugin {
         $this->updateAttachment($discussionID, $stageID, $notes);
     }
 
-    private function updateDiscussionStageTag($discussionID, $stageID) {
+    protected function updateDiscussionStageTag($discussionID, $stageID) {
         // TODO:  Decrement tag discussion count
         $oldStage = StageModel::getStageByDiscussion($discussionID);
         if (val('StageID', $oldStage) != $stageID) {
@@ -402,8 +640,19 @@ class IdeationPlugin extends Gdn_Plugin {
         }
     }
 
-    private function updateDiscussionStageNotes($discussionID, $notes) {
+    protected function updateDiscussionStageNotes($discussionID, $notes) {
         $discussionModel = new DiscussionModel();
         $discussionModel->saveToSerializedColumn('Attributes', $discussionID, 'StageNotes', $notes);
     }
+
+    public static function getTotalVotes($discussion) {
+        if (val('Attributes', $discussion) && $reactions = val('React', $discussion->Attributes)) {
+            $noUp = val(self::REACTION_UP, $reactions, 0);
+            $noDown = val(self::REACTION_DOWN, $reactions, 0);
+            return $noUp + $noDown;
+        }
+        return 0;
+    }
 }
+
+

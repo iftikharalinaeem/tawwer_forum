@@ -28,8 +28,13 @@ if (!$stageExists) {
     $stageModel->save('Implemented', 'Closed', 'All set.');
 }
 
+Gdn::structure()
+    ->table('Category')
+    ->column('UseDownVotes', 'tinyint', true)
+    ->set();
+
 $reactionModel = new ReactionModel();
-$reactionModel->defineReactionType(array('UrlCode' => 'IdeaUp', 'Name' => 'Up', 'Sort' => 100, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'IncrementValue' => 1, 'Points' => 1, 'Hidden' => true, 'Active' => true,
+$reactionModel->defineReactionType(array('UrlCode' => IdeationPlugin::REACTION_UP, 'Name' => 'Up', 'Sort' => 100, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'IncrementValue' => 1, 'Points' => 1, 'Hidden' => true, 'Active' => true,
     'Description' => "This reaction is reserved for idea upvotes."));
-$reactionModel->defineReactionType(array('UrlCode' => 'IdeaDown', 'Name' => 'Down', 'Sort' => 101, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1, 'Hidden' => true, 'Active' => true,
+$reactionModel->defineReactionType(array('UrlCode' => IdeationPlugin::REACTION_DOWN, 'Name' => 'Down', 'Sort' => 101, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1, 'Hidden' => true, 'Active' => true,
     'Description' => "This reaction is reserved for idea downvotes."));

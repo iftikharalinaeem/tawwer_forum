@@ -13,32 +13,49 @@ class IdeaCounterModule extends Gdn_Module {
     /**
      * @var string
      */
-    protected $ideaUpReactionSlug = 'IdeaUp';
+    protected $ideaUpReactionSlug = IdeationPlugin::REACTION_UP;
     /**
      * @var string
      */
-    protected $ideaDownReactionSlug = 'IdeaDown';
+    protected $ideaDownReactionSlug = IdeationPlugin::REACTION_DOWN;
     /**
-     * @var boolean
+     * @var bool
      */
     protected $isOpen;
     /**
+     * @var bool
+     */
+    protected $showClosedStageTag = false;
+    /**
+     * @var bool
+     */
+    protected $showVotes = false;
+    /**
      * @var object
      */
-    public $discussion;
+    protected $discussion;
     /**
      * @var array
      */
-    public $counter;
+    protected $counter;
+    /**
+     * @var bool
+     */
+    protected $useDownVotes = true;
+    /**
+     * @var string
+     */
+    public $userVote;
     /**
      * @var IdeaCounterModule
      */
     protected static $instance;
 
 
-    function __construct() {
 
-    }
+    // Empty constructor so we don't call parent::construct.
+    // We don't need all that extra data floating around.
+    function __construct() {}
 
     /**
      * Return the singleton instance of this class.
@@ -57,15 +74,32 @@ class IdeaCounterModule extends Gdn_Module {
         return $this;
     }
 
-    protected function calculateVotes() {
-        if (val('Attributes', $this->discussion) && $reactions = val('React', $this->discussion->Attributes)) {
-            $noUp = val('IdeaUp', $reactions, 0);
-            $noDown = val('IdeaDown', $reactions, 0);
-            return $noUp + $noDown;
-        }
-        return 0;
+    /**
+     * @param boolean $showClosedStageTag
+     */
+    public function setShowClosedStageTag($showClosedStageTag) {
+        $this->showClosedStageTag = $showClosedStageTag;
     }
 
+    /**
+     * @param boolean $showVotes
+     */
+    public function setShowVotes($showVotes) {
+        $this->showVotes = $showVotes;
+    }
+
+    /**
+     * @param boolean $useDownVotes
+     */
+    public function setUseDownVotes($useDownVotes) {
+        $this->useDownVotes = $useDownVotes;
+    }
+
+    /**
+     * Compiles the data for the counter module for the discussion property.
+     *
+     * @return bool Whether to render the counter or not.
+     */
     public function prepare() {
         if ($this->discussion) {
             $discussionID = val('DiscussionID', $this->discussion);
@@ -73,11 +107,25 @@ class IdeaCounterModule extends Gdn_Module {
             $this->isOpen = (val('Status', $stage) == 'Open');
             $counter = array();
             $counter['upUrl'] = url('/react/discussion/'.$this->ideaUpReactionSlug.'?id='.$discussionID);
-            $counter['downUrl'] = url('/react/discussion/'.$this->ideaDownReactionSlug.'?id='.$discussionID);
-            $counter['score'] = val('Score', $this->discussion);
-            $counter['numberVotes'] = $this->calculateVotes();
+            $counter['score'] = val('Score', $this->discussion, '0');
+            $counter['numberVotes'] = val('Score', $this->discussion, '0');
             $counter['stage'] = val('Name', $stage);
             $counter['status'] = val('Status', $stage);
+
+//            $counter['cssClass'] = '';
+            $counter['upCssClass'] = '';
+
+            if ($this->userVote) {
+//                $counter['cssClass'] = 'voted voted-'.strtolower($this->userVote);
+                $counter['upCssClass'] = ($this->userVote == $this->ideaUpReactionSlug) ? 'uservote' : '';
+            }
+
+
+            if ($this->useDownVotes) {
+                $counter['downUrl'] = url('/react/discussion/'.$this->ideaDownReactionSlug.'?id='.$discussionID);
+                $counter['downCssClass'] = ($this->userVote == $this->ideaDownReactionSlug) ? 'uservote' : '';
+                $counter['numberVotes'] = IdeationPlugin::getTotalVotes($this->discussion);
+            }
 
             $this->counter = $counter;
             return true;
@@ -85,6 +133,9 @@ class IdeaCounterModule extends Gdn_Module {
         return false;
     }
 
+    /**
+     * Renders the idea counter module.
+     */
     public function toString() {
         if ($this->prepare()) {
             if ($this->isOpen) {
@@ -92,27 +143,49 @@ class IdeaCounterModule extends Gdn_Module {
             } else {
                 $this->renderClosedCounterBox();
             }
+        } else {
+            echo '';
         }
     }
 
+    /**
+     * Outputs a counter that includes voting buttons.
+     */
     protected function renderOpenCounterBox() { ?>
-        <div class="idea-counter-module <?php echo val('status', $this->counter) ?>">
-            <div class="score"><h1><?php echo val('score', $this->counter) ?></h1></div>
-            <div class="vote idea-menu">
-                <span class="idea-buttons">
-                    <a class="up Hijack ReactButton-IdeaUp" href="<?php echo val('upUrl', $this->counter) ?>" title="Up" data-reaction="ideaup" rel="nofollow"><span class="icon icon-arrow-up"></span> <span class="idea-label">Up</span></a>
-                    <a class="down Hijack ReactButton-IdeaDown" href="<?php echo val('downUrl', $this->counter) ?>" title="Down" data-reaction="ideadown" rel="nofollow"><span class="icon icon-arrow-down"></span> <span class="idea-label">Down</span></a>
-                </span>
+        <div class="DateTile idea-counter-module <?php echo val('status', $this->counter); ?>">
+            <div class="idea-counter-box">
+                <div class="score"><?php echo val('score', $this->counter) ?></div>
+                <div class="vote idea-menu">
+                    <span class="idea-buttons">
+                        <?php
+                        echo IdeationPlugin::getReactionButtonHtml('ReactButton-'.$this->ideaUpReactionSlug.' '.val('upCssClass', $this->counter), val('upUrl', $this->counter), 'Up', 'data-reaction="'.strtolower($this->ideaUpReactionSlug).'"');
+                        if ($this->useDownVotes) {
+                            echo IdeationPlugin::getReactionButtonHtml('ReactButton-'.$this->ideaDownReactionSlug.' '.val('downCssClass', $this->counter), val('downUrl', $this->counter), 'Down', 'data-reaction="'.strtolower($this->ideaDownReactionSlug).'"');
+                        }
+                        ?>
+                    </span>
+                </div>
             </div>
-            <div class="number-votes meta"><?php echo sprintf(t('Vote count: %s'), val('numberVotes', $this->counter)); ?></div>
+            <?php if ($this->showVotes) { ?>
+            <div class="votes meta"><?php echo sprintf(t('%s votes'), val('numberVotes', $this->counter)); ?></div>
+            <?php } ?>
         </div>
     <?php }
 
+    /**
+     * Outputs a counter without voting buttons.
+     */
     protected function renderClosedCounterBox() { ?>
-        <div class="idea-counter-module <?php echo val('status', $this->counter) ?>">
-            <div class="score"><h1><?php echo val('score', $this->counter) ?></h1></div>
-            <span class="Tag tag-stage"><?php echo val('stage', $this->counter) ?></span>
-            <div class="number-votes meta"><?php echo sprintf(t('Vote count: %s'), val('numberVotes', $this->counter)); ?></div>
+        <div class="DateTile idea-counter-module <?php echo val('status', $this->counter).' '.val('cssClass', $this->counter) ?>">
+            <div class="idea-counter">
+                <div class="score"><?php echo val('score', $this->counter) ?></div>
+            </div>
+            <?php if ($this->showClosedStageTag) { ?>
+            <div class="Tag tag-stage"><?php echo val('stage', $this->counter) ?></div>
+            <?php } ?>
+            <?php if ($this->showVotes) { ?>
+            <div class="votes meta"><?php echo sprintf(t('%s votes'), val('numberVotes', $this->counter)); ?></div>
+            <?php } ?>
         </div>
     <?php }
 }

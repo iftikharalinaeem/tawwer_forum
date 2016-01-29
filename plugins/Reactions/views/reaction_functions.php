@@ -66,6 +66,10 @@ function ReactionButton($Row, $UrlCode, $Options = array()) {
       $IsHeading = TRUE;
    }
 
+   if (val('Hidden', $ReactionType)) {
+       return '';
+   }
+
    // Check reaction's permissions
    if ($PermissionClass = GetValue('Class', $ReactionType)) {
       if (!Gdn::Session()->CheckPermission('Reactions.'.$PermissionClass.'.Add'))

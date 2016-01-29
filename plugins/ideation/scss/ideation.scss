@@ -1,0 +1,109 @@
+// ## Vendors
+//
+// Library dependencies installed using Bower are automagically wired up when
+// running the `npm run build` command. Don't manually edit this section!
+//
+// bower:scss
+// endbower
+// bower:sass
+// endbower
+
+$vanillapink: #f52c6e;
+$vanillablue: #0291db;
+
+$vote-color: $vanillablue;
+$voted-color: $vanillapink;
+$background-color-open: rgba(0,0,0,.9);
+$background-color-closed: rgba(0,0,0,.3);
+
+@mixin clearfix {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+.PanelColumn {
+  position: absolute;
+  margin: 0;
+}
+
+.DataTable.DiscussionsTable {
+  table-layout: auto;
+}
+
+.ItemIdea {
+  @include clearfix;
+
+  .PhotoWrap {
+    display: none;
+  }
+}
+
+.idea-label {
+  display: none;
+}
+
+.idea-counter-module {
+  background-color: transparent;
+  padding: 0;
+
+  &.Closed {
+    .idea-counter {
+      background-color: $background-color-closed;
+    }
+  }
+
+  .uservote {
+    color: $voted-color;
+  }
+
+  .score {
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 14px;
+  }
+
+  .idea-counter-box {
+    background-color: $background-color-open;
+    padding: 9px 0;
+  }
+
+  .idea-menu {
+    margin-top: 4px;
+  }
+
+  .idea-counter {
+    padding: 13px 2px;
+  }
+
+  .votes {
+    margin-top: 5px;
+    font-size: 10px;
+    color: rgba(0,0,0,.6);
+    background-color: transparent;
+  }
+}
+
+// Reset attachment styles
+.item-attachment {
+  .idea-counter-module {
+    a {
+      color: $vote-color;
+    }
+
+    .uservote {
+      color: $voted-color;
+    }
+
+    .icon {
+      display: inline;
+      min-width: 14px;
+      font-size: 14px;
+      line-height: 1;
+    }
+  }
+}
+

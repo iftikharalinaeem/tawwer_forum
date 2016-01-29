@@ -613,6 +613,7 @@ class ReactionModel {
         $React = array();
         $Diffs = array();
         $Set = array();
+
         foreach ($ReactionTypes as $TagID => $Type) {
             if (isset($TotalTags[$TagID])) {
                 $React[$Type['UrlCode']] = $TotalTags[$TagID]['Total'];
@@ -628,6 +629,12 @@ class ReactionModel {
                 $Diffs[] = $Type['UrlCode'];
             }
         }
+
+        Gdn::controller()->EventArguments['ReactionTypes'] &= $ReactionTypes;
+        Gdn::controller()->EventArguments['Record'] = $Record;
+        Gdn::controller()->EventArguments['Set'] = &$Set;
+        Gdn::controller()->fireEvent('BeforeReactionsScore');
+
 
         // Send back the current scores.
         foreach ($Set as $Column => $Value) {
@@ -682,6 +689,14 @@ class ReactionModel {
             $Diffs[] = 'Flag'; // always send back flag button.
             foreach ($Diffs as $UrlCode) {
                 $Button = ReactionButton($Record, $UrlCode);
+
+                $reactionsPlugin = ReactionsPlugin::Instance();
+                $reactionsPlugin->EventArguments['UrlCode'] = $UrlCode;
+                $reactionsPlugin->EventArguments['Record'] = $Record;
+                $reactionsPlugin->EventArguments['Insert'] = $Insert;
+                $reactionsPlugin->EventArguments['Button'] = &$Button;
+                $reactionsPlugin->fireEvent('ReactionsButtonReplacement');
+
                 Gdn::Controller()->JsonTarget(
                     "#{$RecordType}_{$Data['RecordID']} .ReactButton-".$UrlCode,
                     $Button,
