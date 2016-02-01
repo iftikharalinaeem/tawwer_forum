@@ -43,7 +43,7 @@ class GroupMetaModule extends Gdn_Module {
 
         $groupModel = new GroupModel();
         $leaders = $groupModel->getMembers(val('GroupID', $group), array('Role' => 'Leader'), 10);
-        $leaderString = '';
+        $leaderString = array();
         foreach ($leaders as $leader) {
             $leaderString[] = userAnchor($leader);
         }
