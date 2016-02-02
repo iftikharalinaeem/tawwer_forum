@@ -70,7 +70,7 @@ class CommentImporterPlugin extends Gdn_Plugin {
         } else {
             // Preserve plugin RequiredApplications version.
             $increaseMaxExecutionTime =
-                function_exists('increaseMaxExecutionTime')
+                function_exists('increaseMaxExecutionTime') // Exists in Vanilla 2.3
                     ? 'increaseMaxExecutionTime'
                     : function ($maxExecutionTime) {
 
