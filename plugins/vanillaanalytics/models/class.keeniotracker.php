@@ -61,8 +61,9 @@ class KeenIOTracker implements TrackerInterface {
      * Add values to the gdn.meta JavaScript array on the page.
      *
      * @param Gdn_Controller Instance of the current page's controller.
+     * @param bool $inDashboard Is the current page a dashboard page?
      */
-    public function addDefinitions(Gdn_Controller $controller) {
+    public function addDefinitions(Gdn_Controller $controller, $inDashboard = false) {
         $controller->addDefinition('keenio.projectID', $this->client->getProjectID());
         $controller->addDefinition('keenio.writeKey', $this->client->getWriteKey());
     }
@@ -71,8 +72,9 @@ class KeenIOTracker implements TrackerInterface {
      * Add JavaScript files to the current page.
      *
      * @param Gdn_Controller Instance of the current page's controller.
+     * @param bool $inDashboard Is the current page a dashboard page?
      */
-    public function addJsFiles(Gdn_Controller $controller) {
+    public function addJsFiles(Gdn_Controller $controller, $inDashboard = false) {
         $controller->addJsFile('keenio.sdk.min.js', 'plugins/vanillaanalytics');
         $controller->addJsFile('keenio.min.js', 'plugins/vanillaanalytics');
     }

@@ -16,15 +16,17 @@ interface TrackerInterface {
      * Add definitions to the gdn.meta JavaScript array.
      *
      * @param Gdn_Controller $controller
+     * @param bool $inDashboard Is the current page a dashboard page?
      */
-    public function addDefinitions(Gdn_Controller $controller);
+    public function addDefinitions(Gdn_Controller $controller, $inDashboard = false);
 
     /**
      * Add JavaScript files to the current page.
      *
      * @param Gdn_Controller $controller
+     * @param bool $inDashboard Is the current page a dashboard page?
      */
-    public function addJsFiles(Gdn_Controller $controller);
+    public function addJsFiles(Gdn_Controller $controller, $inDashboard = false);
 
     /**
      * Add and overwrite default event data values.

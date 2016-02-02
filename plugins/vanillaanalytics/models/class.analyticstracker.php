@@ -66,8 +66,10 @@ class AnalyticsTracker {
             return;
         }
 
+        $inDashboard = $controller->MasterView == 'admin';
+
         foreach ($this->trackers as $tracker) {
-            $tracker->addDefinitions($controller);
+            $tracker->addDefinitions($controller, $inDashboard);
         }
 
         $eventData = $this->getPageViewData($controller);
@@ -86,10 +88,12 @@ class AnalyticsTracker {
             return;
         }
 
+        $inDashboard = $controller->MasterView == 'admin';
+
         $controller->addJsFile('js.cookie.min.js', 'plugins/vanillaanalytics');
 
         foreach ($this->trackers as $interface) {
-            $interface->addJsFiles($controller);
+            $interface->addJsFiles($controller, $inDashboard);
         }
     }
 
