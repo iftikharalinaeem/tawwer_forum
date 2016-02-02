@@ -294,7 +294,7 @@ class SearchModel extends Gdn_Model {
       }
 
       if (isset($Search['users'])) {
-         $Sphinx->setFilter('InsertUserID', ConsolidateArrayValuesByKey($Search['users'], 'UserID'));
+         $Sphinx->setFilter('InsertUserID', array_column($Search['users'], 'UserID'));
          $Filtered = TRUE;
       }
 
@@ -304,7 +304,7 @@ class SearchModel extends Gdn_Model {
                $Sphinx->setFilter('Tags', (array)$Row['TagID']);
             }
          } else {
-            $Sphinx->setFilter('Tags', ConsolidateArrayValuesByKey($Search['tags'], 'TagID'));
+            $Sphinx->setFilter('Tags', array_column($Search['tags'], 'TagID'));
          }
 
          $Filtered = TRUE;
@@ -347,7 +347,7 @@ class SearchModel extends Gdn_Model {
 //            // This was a grouped search so join the sub-documents.
 //            $Subsearch = $Search;
 //            $Subsearch['group'] = false;
-//            $Subsearch['discussionid'] = ConsolidateArrayValuesByKey($Results['SearchResults'], 'DiscussionID');
+//            $Subsearch['discussionid'] = array_column($Results['SearchResults'], 'DiscussionID');
 //            unset($Subsearch['cat']);
 //            $Sphinx->resetFilters();
 //            $Sphinx->resetGroupBy();
@@ -383,7 +383,7 @@ class SearchModel extends Gdn_Model {
                $sphinx->setFilter('Tags', (array)$trow['TagID']);
             }
          } else {
-            $sphinx->setFilter('Tags', ConsolidateArrayValuesByKey($search['tags'], 'TagID'));
+            $sphinx->setFilter('Tags', array_column($search['tags'], 'TagID'));
          }
 
       }
@@ -563,7 +563,7 @@ class SearchModel extends Gdn_Model {
             if ($CategoryID = Gdn::Controller()->Request->Get('CategoryID')) {
                $Cats2 = CategoryModel::GetSubtree($CategoryID);
                Gdn::Controller()->SetData('Categories', $Cats2);
-               $Cats2 = ConsolidateArrayValuesByKey($Cats2, 'CategoryID');
+               $Cats2 = array_column($Cats2, 'CategoryID');
                if (is_array($Cats))
                   $Cats = array_intersect($Cats, $Cats2);
                elseif ($Cats)

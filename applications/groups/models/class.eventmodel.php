@@ -29,7 +29,7 @@ class EventModel extends Gdn_Model {
     */
    public function GetByUser($UserID) {
       $UserGroups = $this->SQL->GetWhere('UserGroup', array('UserID' => $UserID))->ResultArray();
-      $IDs = ConsolidateArrayValuesByKey($UserGroups, 'GroupID');
+      $IDs = array_column($UserGroups, 'GroupID');
 
       $Result = $this->GetWhere(array('GroupID' => $IDs), 'Name')->ResultArray();
       return $Result;

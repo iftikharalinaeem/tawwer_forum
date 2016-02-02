@@ -94,7 +94,7 @@ class SpamCleanerPlugin extends Gdn_Plugin {
          if ($Sender->Form->GetFormValue('VerifyModerators')) {
             $RoleModel = new RoleModel();
             $RoleIDs = $RoleModel->GetByPermission('Garden.Moderation.Manage')->ResultArray();
-            $RoleIDs = ConsolidateArrayValuesByKey($RoleIDs, 'RoleID');
+            $RoleIDs = array_column($RoleIDs, 'RoleID');
             
             Gdn::SQL()
                ->Update('User u')

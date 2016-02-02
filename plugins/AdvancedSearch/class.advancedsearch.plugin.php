@@ -110,7 +110,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $tags = $Sender->Data('Tags');
         if (is_array($tags) && class_exists('TagModel')) {
             $tags = TagModel::instance()->unpivot($tags);
-            $tags = ConsolidateArrayValuesByKey($tags, 'Name');
+            $tags = array_column($tags, 'Name');
             $args['tags'] = implode(',', $tags);
             $args['tags-op'] = 'and';
             $args['adv'] = 1;
@@ -390,7 +390,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         /// Author ///
         if (isset($search['users'])) {
-            $author = ConsolidateArrayValuesByKey($search['users'], 'UserID');
+            $author = array_column($search['users'], 'UserID');
 
             $cwhere['c.InsertUserID'] = $author;
             $dwhere['d.InsertUserID'] = $author;

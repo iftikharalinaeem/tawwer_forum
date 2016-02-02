@@ -433,7 +433,7 @@ class ReactionsPlugin extends Gdn_Plugin {
             $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Positive', 'Active' => 1));
 
             $Sender->SetData('ReactionTypes', $ReactionTypes);
-//         $ReactionTypes = array_merge($ReactionTypes, ConsolidateArrayValuesByKey($ReactionTypeData, 'UrlCode'));
+//         $ReactionTypes = array_merge($ReactionTypes, array_column($ReactionTypeData, 'UrlCode'));
 //         array_map('strtolower', $ReactionTypes);
         } catch (Exception $ex) {
             $Sender->SetData('ReactionTypes', array());
@@ -528,7 +528,7 @@ class ReactionsPlugin extends Gdn_Plugin {
             $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Positive', 'Active' => 1));
 
             $Sender->SetData('ReactionTypes', $ReactionTypes);
-//         $ReactionTypes = array_merge($ReactionTypes, ConsolidateArrayValuesByKey($ReactionTypeData, 'UrlCode'));
+//         $ReactionTypes = array_merge($ReactionTypes, array_column($ReactionTypeData, 'UrlCode'));
 //         array_map('strtolower', $ReactionTypes);
         } catch (Exception $ex) {
             $Sender->SetData('ReactionTypes', array());
