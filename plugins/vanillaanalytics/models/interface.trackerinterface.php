@@ -28,6 +28,15 @@ interface TrackerInterface {
     public function addDefaults(array $defaults = array());
 
     /**
+     * Detect if an analytics tracker is configured for use.
+     *
+     * @param bool $write Configured to write to the tracker?
+     * @param bool $read Configured to read from the tracker?
+     * @return bool True on configured, false otherwise
+     */
+    public static function isConfigured($write = true, $read = true);
+
+    /**
      * Track an event.
      *
      * @param string $collection Grouping for the current event.
@@ -35,4 +44,9 @@ interface TrackerInterface {
      * @param array $details A collection of details about the event.
      */
     public function event($collection, $type, array $details = []);
+
+    /**
+     * Setup routine, called when plug-in is enabled.
+     */
+    public function setup();
 }

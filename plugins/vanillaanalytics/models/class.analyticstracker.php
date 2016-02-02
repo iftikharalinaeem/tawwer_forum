@@ -25,6 +25,14 @@ class AnalyticsTracker {
     protected $trackers = [];
 
     /**
+     * An array of class names for available analytics service trackers.
+     * @var array
+     */
+    protected $trackerClasses = [
+        'KeenIOTracker'
+    ];
+
+    /**
      * An array containing the user's unique ID and session ID values.
      * @var array
      */
@@ -34,11 +42,15 @@ class AnalyticsTracker {
      * Our constructor.
      */
     protected function __construct() {
-        $this->disableTracking = c('VanillaAnalytics.DisableTracking', false);
+        $this->disableTracking = (bool)c('VanillaAnalytics.DisableTracking', false);
 
-        // For now, using keen.io is hardwired.
-        if (c('VanillaAnalytics.KeenIO.ProjectID') && c('VanillaAnalytics.KeenIO.WriteKey')) {
-            $this->addTracker(new KeenIOTracker());
+        $trackerClasses = $this->getTrackerClasses();
+        foreach ($trackerClasses as $currentTrackerClass) {
+            if (call_user_func("{$currentTrackerClass}::isConfigured")) {
+                $this->addTracker(new $currentTrackerClass);
+            } else {
+                exit('Boop');
+            }
         }
 
         if (count($this->trackers) == 0) {
@@ -178,6 +190,19 @@ class AnalyticsTracker {
         return $eventData;
     }
 
+    public function getTrackerClasses() {
+        return $this->trackerClasses;
+    }
+
+    /**
+     * Setup routine, called when plug-in is enabled.
+     */
+    public function setup() {
+        foreach ($this->trackers as $interface) {
+            $interface->setup();
+        }
+    }
+
     /**
      * Tracks an event.  Calls analytics service interfaces to record event details.
      *
@@ -222,7 +247,7 @@ class AnalyticsTracker {
      * @return bool True on disabled, false on enabled
      */
     public function trackingDisabled() {
-        return (bool)$this->disableTracking;
+        return $this->disableTracking;
     }
 
     /**

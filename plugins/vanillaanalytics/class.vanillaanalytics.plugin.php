@@ -30,6 +30,20 @@ class VanillaAnalytics extends Gdn_Plugin {
     }
 
     /**
+     * Adds items to dashboard menu.
+     *
+     * @param object $sender DashboardController.
+     */
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        $sender->EventArguments['SideMenu']->addLink(
+            'Dashboard',
+            T('Analytics'),
+            'dashboard/settings',
+            'Garden.Settings.Manage'
+        );
+    }
+
+    /**
      * Hook in before a view is rendered.
      *
      * @param $sender Controller instance
@@ -252,54 +266,6 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function structure() {
-        // Are we missing a valid keen.io project ID or a write key?
-        if (!c('VanillaAnalytics.KeenIO.ProjectID') || !c('VanillaAnalytics.KeenIO.WriteKey')) {
-            // When the plug-in is first enabled, our KeenIOClient class won't be enabled.  Grab the class.
-            if (!class_exists('KeenIOClient')) {
-                require_once(PATH_PLUGINS . '/vanillaanalytics/models/class.keenioclient.php');
-            }
-
-            // Attempt to grab all the necessary data for creating a project with keen.io
-            $defaultProjectUser = c('VanillaAnalytics.KeenIO.DefaultProjectUser');
-            $site = class_exists('Infrastructure') ? Infrastructure::site('name') : c('Garden.Domain', null);
-            $orgID  = c('VanillaAnalytics.KeenIO.OrgID');
-            $orgKey = c('VanillaAnalytics.KeenIO.OrgKey');
-
-            // All of these pieces are essential for creating a project.  Fail without them.
-            if (!$orgID) {
-                throw new Gdn_UserException('Empty value for VanillaAnalytics.KeenIO.OrgID');
-            }
-            if (!$orgKey) {
-                throw new Gdn_UserException('Empty value for VanillaAnalytics.KeenIO.OrgKey');
-            }
-            if (!$defaultProjectUser) {
-                throw new Gdn_UserException('Empty value for VanillaAnalytics.KeenIO.DefaultProjectUser');
-            }
-
-            // Build the keen.io client and attempt to create a new project
-            $keenIOConfig = [
-                'orgID'  => $orgID,
-                'orgKey' => $orgKey
-            ];
-            $keenIOClient = new KeenIOClient(null, $keenIOConfig);
-
-            $project = $keenIOClient->addProject(
-                $site,
-                [
-                    [
-                        'email' => $defaultProjectUser
-                    ]
-                ]
-            );
-
-            // If we were successful, save the details.  If not, trigger an error.
-            if ($project) {
-                saveToConfig('VanillaAnalytics.KeenIO.ProjectID', $project->id);
-                saveToConfig('VanillaAnalytics.KeenIO.ReadKey', $project->apiKeys->readKey);
-                saveToConfig('VanillaAnalytics.KeenIO.WriteKey', $project->apiKeys->writeKey);
-            } else {
-                throw new Gdn_UserException('Unable to create project on keen.io');
-            }
-        }
+        analyticsTracker::getInstance()->setup();
     }
 }
