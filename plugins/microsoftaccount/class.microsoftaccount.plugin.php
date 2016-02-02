@@ -37,9 +37,12 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
     public function __construct($accessToken = false) {
         parent::__construct('microsoftaccount', $accessToken);
 
-        $this->setAuthorizeUriParams(['response_mode' => 'query']);
-
         $this->setScope('https://graph.microsoft.com/user.read');
+
+        $this->setAuthorizeUriParams([
+            'redirect_uri'  => Gdn::request()->url("/entry/{$this->getProviderKey()}", true, true),
+            'response_mode' => 'query',
+        ]);
     }
 
     /**
