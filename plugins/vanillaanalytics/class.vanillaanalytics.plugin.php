@@ -269,6 +269,8 @@ class VanillaAnalytics extends Gdn_Plugin {
             analyticsTracker::getInstance()->getCharts()
         );
 
+        $sender->addJsFile('admin.min.js', 'plugins/vanillaanalytics');
+
         $sender->render(
             'analytics',
             false,
