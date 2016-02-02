@@ -72,7 +72,7 @@
    position: absolute;
    height: 100%;
    width: 100%;
-   
+
    filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='.myBackground.jpg', sizingMethod='scale');
    -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='myBackground.jpg', sizingMethod='scale')";
    -webkit-background-size: cover;
@@ -85,8 +85,8 @@
    background-image: url(jailed-200.png);
 }
 
-.Jailed .ProfilePhotoLarge {
-   height: 200px;
+.PhotoWrap.Jailed {
+    position: relative;
 }
 
 .PhotoWrap * {
