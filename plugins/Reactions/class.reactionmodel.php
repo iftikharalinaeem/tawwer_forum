@@ -663,10 +663,10 @@ class ReactionModel {
                     'DateInserted' => Gdn_Format::ToDateTime()));
 
 
-//         $Sql = "insert GDN_UserTag set 
-//            RecordType = :RecordType, 
-//            RecordID = :RecordID, 
-//            UserID = :UserID, 
+//         $Sql = "insert GDN_UserTag set
+//            RecordType = :RecordType,
+//            RecordID = :RecordID,
+//            UserID = :UserID,
 //            DateInserted = :DateInserted
 //            ";
         }
@@ -713,8 +713,9 @@ class ReactionModel {
      * @param string $RecordType
      * @param int $ID
      * @param string $ReactionUrlCode
+     * @param bool $selfReact Whether a user can react to their own post
      */
-    public function react($RecordType, $ID, $ReactionUrlCode, $UserID = NULL) {
+    public function react($RecordType, $ID, $ReactionUrlCode, $UserID = NULL, $selfReact = false) {
         if (is_null($UserID)) {
             $UserID = Gdn::Session()->UserID;
             $User = Gdn::Session()->User;
@@ -744,8 +745,8 @@ class ReactionModel {
         $LogOperation = GetValue('Log', $ReactionType);
 
         list($Row, $Model, $Log) = $this->GetRow($RecordType, $ID, $LogOperation);
-
-        if (!$IsModerator && $Row['InsertUserID'] == $UserID) {
+        
+        if (!$selfReact && !$IsModerator && ($Row['InsertUserID'] == $UserID)) {
             throw new Gdn_UserException(T("You can't react to your own post."));
         }
 
@@ -862,17 +863,17 @@ class ReactionModel {
 //         $UndoButton = $this->Button(T('Report '.ucfirst($Reaction), ucfirst($Reaction)), $Reaction, $RecordType, $ID, FALSE);
 //      else
 //         $UndoButton = $this->Button(T('Undo '.ucfirst($Reaction), 'Undo'), 'undo-'.$Reaction, $RecordType, $ID, FALSE);
-//      
-//      
+//
+//
 //      $Targets = array();
-//      if ($Reaction == 'like') 
+//      if ($Reaction == 'like')
 //         $MessageBody = sprintf('You liked the %s. Thanks!', strtolower($RecordType));
 //      else
 //         $MessageBody = sprintf('The %s has been flagged. Thanks!', strtolower($RecordType));
-//      
+//
 //      $MessageBody = T($MessageBody);
 //      $Message = array('<span class="InformSprite Flag"></span> '.$MessageBody, array('CssClass' => 'Dismissable AutoDismiss HasSprite', 'id' => 'mod'));
-//      
+//
 //      if ($Undo) {
 //         if ($Log) {
 //            // The row was logged and now must be restored.
@@ -898,20 +899,20 @@ class ReactionModel {
 //         $LogOptions = array('GroupBy' => array('RecordID'));
 //         // Get the User IDs that marked as spam.
 //         $OtherUserIDs = array();
-//         
+//
 //         foreach ($UserIDs as $UserID => $Val) {
 //            if ($Val == $Abbrev && $UserID != Gdn::Session()->UserID)
 //               $OtherUserIDs[] = $UserID;
 //         }
 //         $LogOptions['OtherUserIDs'] = $OtherUserIDs;
-//         
+//
 //         if (RemoveThreshold && $Value >= RemoveThreshold) {
 //            // We still need to update the row before deleting to get the right values in there.
 //            $Model->SetProperty($ID,
 //               array($Column => $Row[$Column], 'Attributes' => serialize($Row['Attributes'])),
 //               ''
 //            );
-//            
+//
 //            // The row needs to be deleted.
 //            $Model->Delete($ID, array('Log' => $LogOperation, 'LogOptions' => $LogOptions));
 //            $Message = array(
@@ -931,7 +932,7 @@ class ReactionModel {
 //               array($Column => $Row[$Column], 'Attributes' => serialize($Row['Attributes'])),
 //               ''
 //            );
-//            
+//
 //            LogModel::Insert($LogOperation, $RecordType, $Row, $LogOptions);
 //         } else {
 //            // The row needs to just be updated.
@@ -941,10 +942,10 @@ class ReactionModel {
 //            );
 //         }
 //      }
-//      
+//
 //      // Send back a button to undo/redo the operation.
 //      $Targets[] = array('Target' => "#{$RecordType}_$ID .Mod-".ucfirst($Reaction), 'Type' => 'Html', 'Data' => $UndoButton);
-//         
+//
 //      // Send back the likes.
 //      $Targets[] = array('Target' => "#{$RecordType}_$ID .Mod-Likes", 'Type' => 'Html', 'Data' => $this->Likes($Row, FALSE));
 //      $Sender->InformMessage($Message[0], $Message[1]);
