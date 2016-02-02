@@ -28,6 +28,36 @@ class KeenIOTracker implements TrackerInterface {
     }
 
     /**
+     * Add chart configurations to the ongoing list of charts.
+     *
+     * @param array $charts Incoming array of charts to add to.
+     */
+    public function addCharts(array &$charts) {
+        $keenCharts = [];
+
+        // Pageviews
+        $pageViews = new KeenIOQuery();
+        $pageViews->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection('page')
+            ->setTimeframe('previous_1_months')
+            ->setInterval('daily')
+            ->setFilters([
+                'operator'       => 'eq',
+                'property_name'  => 'event',
+                'property_value' => 'page_view'
+            ]);
+        $keenCharts[] = [
+            'chart' => [
+                'chartType' => 'linechart',
+                'title'     => t('Pageviews')
+            ],
+            'query' => $pageViews
+        ];
+
+        $charts['keenio'] = $keenCharts;
+    }
+
+    /**
      * Add values to the gdn.meta JavaScript array on the page.
      *
      * @param Gdn_Controller Instance of the current page's controller.

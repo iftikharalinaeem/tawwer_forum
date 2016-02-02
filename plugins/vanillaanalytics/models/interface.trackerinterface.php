@@ -6,6 +6,13 @@
 interface TrackerInterface {
 
     /**
+     * Add chart configurations to the ongoing list of charts.
+     *
+     * @param array $charts Incoming array of charts to add to.
+     */
+    public function addCharts(array &$charts);
+
+    /**
      * Add definitions to the gdn.meta JavaScript array.
      *
      * @param Gdn_Controller $controller

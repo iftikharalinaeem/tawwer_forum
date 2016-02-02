@@ -259,8 +259,16 @@ class VanillaAnalytics extends Gdn_Plugin {
      */
     public function settingsController_analytics_create($sender) {
         $sender->permission('Garden.Settings.Manage');
+
         $sender->addSideMenu();
-        $sender->setData('Title', t('Vanilla Analytics'));
+
+        $sender->setData('Title', t('Analytics'));
+
+        $sender->addDefinition(
+            'analyticsCharts',
+            analyticsTracker::getInstance()->getCharts()
+        );
+
         $sender->render(
             'analytics',
             false,

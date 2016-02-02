@@ -119,6 +119,21 @@ class AnalyticsTracker {
     }
 
     /**
+     * Grab an array representing available analytics charts.
+     *
+     * @return array
+     */
+    public function getCharts() {
+        $charts = [];
+
+        foreach ($this->trackers as $interface) {
+            $interface->addCharts($charts);
+        }
+
+        return $charts;
+    }
+
+    /**
      * Build an array of all the default data we'll need for most events.
      *
      * @param bool $trackerDefaults Should defaults from enabled trackers be included?
