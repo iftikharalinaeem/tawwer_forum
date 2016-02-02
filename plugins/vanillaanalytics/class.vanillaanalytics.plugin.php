@@ -38,7 +38,7 @@ class VanillaAnalytics extends Gdn_Plugin {
         $sender->EventArguments['SideMenu']->addLink(
             'Dashboard',
             T('Analytics'),
-            'dashboard/settings',
+            'settings/analytics',
             'Garden.Settings.Manage'
         );
     }
@@ -251,6 +251,21 @@ class VanillaAnalytics extends Gdn_Plugin {
         $event = val('Total', $reactionData) > 0 ? 'reaction_add' : 'reaction_delete';
 
         AnalyticsTracker::getInstance()->trackEvent('reaction', $event, $data);
+    }
+
+    /**
+     * Add our primary analytics page.
+     * @param $sender
+     */
+    public function settingsController_analytics_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
+        $sender->addSideMenu();
+        $sender->setData('Title', t('Vanilla Analytics'));
+        $sender->render(
+            'analytics',
+            false,
+            'plugins/vanillaanalytics'
+        );
     }
 
     /**

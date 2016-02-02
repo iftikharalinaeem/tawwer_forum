@@ -48,8 +48,6 @@ class AnalyticsTracker {
         foreach ($trackerClasses as $currentTrackerClass) {
             if (call_user_func("{$currentTrackerClass}::isConfigured")) {
                 $this->addTracker(new $currentTrackerClass);
-            } else {
-                exit('Boop');
             }
         }
 
