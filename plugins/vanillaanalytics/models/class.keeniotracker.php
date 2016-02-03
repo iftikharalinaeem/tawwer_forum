@@ -41,7 +41,7 @@ class KeenIOTracker implements TrackerInterface {
             ->setEventCollection('page')
             ->setTimeframe('previous_1_months')
             ->setInterval('daily')
-            ->setFilters([
+            ->addFilter([
                 'operator'       => 'eq',
                 'property_name'  => 'event',
                 'property_value' => 'page_view'
@@ -66,6 +66,10 @@ class KeenIOTracker implements TrackerInterface {
     public function addDefinitions(Gdn_Controller $controller, $inDashboard = false) {
         $controller->addDefinition('keenio.projectID', $this->client->getProjectID());
         $controller->addDefinition('keenio.writeKey', $this->client->getWriteKey());
+
+        if ($inDashboard) {
+            $controller->addDefinition('keenio.readKey', $this->client->getReadKey());
+        }
     }
 
     /**
@@ -77,6 +81,10 @@ class KeenIOTracker implements TrackerInterface {
     public function addJsFiles(Gdn_Controller $controller, $inDashboard = false) {
         $controller->addJsFile('keenio.sdk.min.js', 'plugins/vanillaanalytics');
         $controller->addJsFile('keenio.min.js', 'plugins/vanillaanalytics');
+
+        if ($inDashboard) {
+            $controller->addJsFile('keeniochart.min.js', 'plugins/vanillaanalytics');
+        }
     }
 
     /**

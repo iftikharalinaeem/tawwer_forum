@@ -86,6 +86,16 @@ class KeenIOQuery implements JsonSerializable {
     protected $timezone;
 
     /**
+     * @link https://keen.io/docs/api/#filters
+     * @param array $filters
+     * @return $this
+     */
+    public function addFilter(array $filters) {
+        $this->filters[] = $filters;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getAnalysisType() {
@@ -132,12 +142,13 @@ class KeenIOQuery implements JsonSerializable {
      */
     public function jsonSerialize() {
         return [
-            'analisysType' => $this->analysisType,
-            'filters'      => $this->filters,
-            'groupBy'      => $this->groupBy,
-            'interval'     => $this->interval,
-            'timeframe'    => $this->timeframe,
-            'timezone'     => $this->timezone
+            'analisysType'    => $this->analysisType,
+            'eventCollection' => $this->eventCollection,
+            'filters'         => $this->filters,
+            'groupBy'         => $this->groupBy,
+            'interval'        => $this->interval,
+            'timeframe'       => $this->timeframe,
+            'timezone'        => $this->timezone
         ];
     }
 
@@ -160,15 +171,7 @@ class KeenIOQuery implements JsonSerializable {
         $this->eventCollection = $eventCollection;
         return $this;
     }
-    /**
-     * @link https://keen.io/docs/api/#filters
-     * @param array $filters
-     * @return $this
-     */
-    public function setFilters(array $filters) {
-        $this->filters = $filters;
-        return $this;
-    }
+
     /**
      * @link https://keen.io/docs/api/#group-by
      * @param string $groupBy
@@ -178,6 +181,7 @@ class KeenIOQuery implements JsonSerializable {
         $this->groupBy = $groupBy;
         return $this;
     }
+
     /**
      * @link https://keen.io/docs/api/#interval
      * @param string $interval
