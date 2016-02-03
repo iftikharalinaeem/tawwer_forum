@@ -373,7 +373,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param int $ID
      * @param bool $Undo
      */
-    public function rootController_react_create($Sender, $RecordType, $Reaction, $ID) {
+    public function rootController_react_create($Sender, $RecordType, $Reaction, $ID, $selfReact) {
         if (!Gdn::Session()->IsValid()) {
             throw new Gdn_UserException(T('You need to sign in before you can do this.'), 403);
         }
@@ -402,7 +402,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         }
 
         $ReactionModel = new ReactionModel();
-        $ReactionModel->React($RecordType, $ID, $Reaction);
+        $ReactionModel->React($RecordType, $ID, $Reaction, NULL, $selfReact);
 
         $Sender->Render('Blank', 'Utility', 'Dashboard');
     }
