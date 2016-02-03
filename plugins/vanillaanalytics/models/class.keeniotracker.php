@@ -54,7 +54,11 @@ class KeenIOTracker implements TrackerInterface {
             'query' => $pageViews
         ];
 
-        $charts['keenio'] = $keenCharts;
+        if (array_key_exists('KeenIOChart', $charts) && is_array($charts['KeenIOChart'])) {
+            $charts['KeenIOChart'] = array_merge($charts['KeenIOChart'], $keenCharts);
+        } else {
+            $charts['KeenIOChart'] = $keenCharts;
+        }
     }
 
     /**

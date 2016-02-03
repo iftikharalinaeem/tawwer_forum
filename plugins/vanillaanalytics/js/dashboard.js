@@ -6,17 +6,14 @@ $(document).ready(function() {
         return;
     }
 
-    var tracker, chart, chartIndex, trackerChart;
+    var chartCollection, chartIndex, trackerChart;
 
-    for (tracker in analyticsCharts) {
-        var trackerChartClass = tracker + 'Chart';
-        trackerChartClass = trackerChartClass.toUpperCase();
-
-        if (typeof window[trackerChartClass] === 'function') {
-            for (chartIndex in analyticsCharts[tracker]) {
-                chart = analyticsCharts[tracker][chartIndex];
+    for (chartCollection in analyticsCharts) {
+        if (typeof window[chartCollection] === 'function') {
+            for (chartIndex in analyticsCharts[chartCollection]) {
+                chart = analyticsCharts[chartCollection][chartIndex];
                 if (typeof chart === 'object') {
-                    trackerChart = new window[trackerChartClass](chart);
+                    trackerChart = new window[chartCollection](chart);
                     trackerChart.write(chartContainer);
                 }
             }
