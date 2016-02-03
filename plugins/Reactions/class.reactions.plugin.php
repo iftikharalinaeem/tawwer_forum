@@ -369,9 +369,9 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $Sender
      * @param string $RecordType
-     * @param string $ReactionType
+     * @param string $Reaction
      * @param int $ID
-     * @param bool $Undo
+     * @param bool $selfReact Whether a user can react to their own post
      */
     public function rootController_react_create($Sender, $RecordType, $Reaction, $ID, $selfReact) {
         if (!Gdn::Session()->IsValid()) {
