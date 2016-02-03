@@ -50,7 +50,6 @@ class OneLogin_Saml_Response
      */
     public function isValid() {
         $this->decrypt();
-        Logger::event('saml_response_validate', Logger::DEBUG, array($this->document));
         $xmlSec = new OneLogin_Saml_XmlSec($this->_settings, $this);
 
         return $xmlSec->isValid();
