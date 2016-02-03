@@ -368,10 +368,12 @@ class ReactionsPlugin extends Gdn_Plugin {
      * Handle user reactions.
      *
      * @param Gdn_Controller $Sender
-     * @param string $RecordType
-     * @param string $Reaction
-     * @param int $ID
+     * @param string $RecordType Type of record we're reacting to. Discussion, comment or activity.
+     * @param string $Reaction The url code of the reaction.
+     * @param int $ID The ID of the record.
      * @param bool $selfReact Whether a user can react to their own post
+     * @throws Exception
+     * @throws Gdn_UserException
      */
     public function rootController_react_create($Sender, $RecordType, $Reaction, $ID, $selfReact) {
         if (!Gdn::Session()->IsValid()) {
