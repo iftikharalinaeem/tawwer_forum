@@ -675,13 +675,13 @@ class IdeationPlugin extends Gdn_Plugin {
         $id = GetValue('DiscussionID', $discussion);
         $linkClass = 'ReactButton-'.$urlCode.' '.val('cssClass', $options);
         $urlCode2 = strtolower($urlCode);
-        $url = Url("/react/discussion/$urlCode2?id=$id");
+        $url = Url("/react/discussion/$urlCode2?id=$id&selfreact=true");
         $dataAttr = "data-reaction=\"$urlCode2\"";
 
         return self::getReactionButtonHtml($linkClass, $url, $label, $dataAttr);
     }
 
-    // TODO: Figure out how to make this override-able
+    // TODO: Figure out how to let this be override-able
     public static function getReactionButtonHtml($cssClass, $url, $label, $dataAttr = '') {
         return '<a class="Hijack '.$cssClass.'" href="'.$url.'" title="'.$label.'" '.$dataAttr.' rel="nofollow"><span class="icon icon-arrow-'.strtolower($label).'"></span> <span class="idea-label">'.$label.'</span></a>';
     }

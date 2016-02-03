@@ -124,7 +124,7 @@ class IdeaCounterModule extends Gdn_Module {
             $stage = StageModel::getStageByDiscussion($discussionID);
             $this->isOpen = (val('Status', $stage) == 'Open');
             $counter = array();
-            $counter['upUrl'] = url('/react/discussion/'.$this->ideaUpReactionSlug.'?id='.$discussionID);
+            $counter['upUrl'] = url('/react/discussion/'.$this->ideaUpReactionSlug.'?id='.$discussionID.'&selfreact=true');
             $counter['score'] = $score;
             $counter['numberVotes'] = $score;
             $counter['stage'] = val('Name', $stage);
@@ -138,7 +138,7 @@ class IdeaCounterModule extends Gdn_Module {
 
 
             if ($this->useDownVotes) {
-                $counter['downUrl'] = url('/react/discussion/'.$this->ideaDownReactionSlug.'?id='.$discussionID);
+                $counter['downUrl'] = url('/react/discussion/'.$this->ideaDownReactionSlug.'?id='.$discussionID.'&selfreact=true');
                 $counter['downCssClass'] = ($this->userVote == $this->ideaDownReactionSlug) ? 'uservote' : '';
                 $counter['numberVotes'] = IdeationPlugin::getTotalVotes($this->discussion);
             }
