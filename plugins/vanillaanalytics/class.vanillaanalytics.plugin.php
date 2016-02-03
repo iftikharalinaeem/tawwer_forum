@@ -49,11 +49,15 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param $sender Controller instance
      */
     public function base_render_before($sender) {
-        // Give analytics trackers the ability to add JavaScript files
+        // Give analytics trackers the ability to add JavaScript files.
         AnalyticsTracker::getInstance()->addJsFiles($sender);
 
-        // Allow trackers to add to values in a page's gdn.meta JavaScript array
+        // Allow trackers to add to values in a page's gdn.meta JavaScript array.
         AnalyticsTracker::getInstance()->addDefinitions($sender);
+
+
+        // Allow trackers to add CSS files to the page.
+        AnalyticsTracker::getInstance()->addCssFiles($sender);
     }
 
     /**

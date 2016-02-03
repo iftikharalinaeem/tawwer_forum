@@ -13,6 +13,14 @@ interface TrackerInterface {
     public function addCharts(array &$charts);
 
     /**
+     * Add CSS files to the current page.
+     *
+     * @param Gdn_Controller $controller Instance of the current page's controller.
+     * @param bool $inDashboard Is the current page a dashboard page?
+     */
+    public function addCssFiles(Gdn_Controller $controller, $inDashboard = false);
+
+    /**
      * Add definitions to the gdn.meta JavaScript array.
      *
      * @param Gdn_Controller $controller

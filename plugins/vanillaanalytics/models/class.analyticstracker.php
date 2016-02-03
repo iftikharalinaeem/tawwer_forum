@@ -56,16 +56,20 @@ class AnalyticsTracker {
         }
     }
 
+    public function addCssFiles(Gdn_Controller $controller) {
+        $inDashboard = $controller->MasterView == 'admin';
+
+        foreach ($this->trackers as $tracker) {
+            $tracker->addCssFiles($controller, $inDashboard);
+        }
+    }
+
     /**
      * Call service trackers to add values to the gdn.meta JavaScript array
      *
      * @param Gdn_Controller Instance of the current controller.
      */
     public function addDefinitions(Gdn_Controller $controller) {
-        if ($this->trackingDisabled()) {
-            return;
-        }
-
         $inDashboard = $controller->MasterView == 'admin';
 
         foreach ($this->trackers as $tracker) {
@@ -84,10 +88,6 @@ class AnalyticsTracker {
      * @param Gdn_Controller Instance of the current controller.
      */
     public function addJsFiles(Gdn_Controller $controller) {
-        if ($this->trackingDisabled()) {
-            return;
-        }
-
         $inDashboard = $controller->MasterView == 'admin';
 
         $controller->addJsFile('js.cookie.min.js', 'plugins/vanillaanalytics');

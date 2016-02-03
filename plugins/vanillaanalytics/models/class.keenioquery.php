@@ -86,6 +86,11 @@ class KeenIOQuery implements JsonSerializable {
     protected $timezone;
 
     /**
+     * @var string
+     */
+    protected $title = '';
+
+    /**
      * @link https://keen.io/docs/api/#filters
      * @param array $filters
      * @return $this
@@ -138,6 +143,13 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * @return string
+     */
+    public function getTitle() {
+        return $this->title;
+    }
+
+    /**
      * Specify data which should be serialized to JSON.
      */
     public function jsonSerialize() {
@@ -148,7 +160,8 @@ class KeenIOQuery implements JsonSerializable {
             'groupBy'         => $this->groupBy,
             'interval'        => $this->interval,
             'timeframe'       => $this->timeframe,
-            'timezone'        => $this->timezone
+            'timezone'        => $this->timezone,
+            'title'           => $this->title
         ];
     }
 
@@ -209,6 +222,15 @@ class KeenIOQuery implements JsonSerializable {
      */
     public function setTimezone($timezone) {
         $this->timezone = $timezone;
+        return $this;
+    }
+
+    /**
+     * @param string $title
+     * @return $this
+     */
+    public function setTitle($title) {
+        $this->title = $title;
         return $this;
     }
 }

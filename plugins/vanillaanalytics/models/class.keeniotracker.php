@@ -38,6 +38,7 @@ class KeenIOTracker implements TrackerInterface {
         // Pageviews
         $pageViews = new KeenIOQuery();
         $pageViews->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Pageviews'))
             ->setEventCollection('page')
             ->setTimeframe('previous_1_months')
             ->setInterval('daily')
@@ -48,8 +49,9 @@ class KeenIOTracker implements TrackerInterface {
             ]);
         $keenCharts[] = [
             'chart' => [
-                'chartType' => 'linechart',
-                'title'     => t('Pageviews')
+                'type' => 'spline',
+                'options'   => [
+                ]
             ],
             'query' => $pageViews
         ];
@@ -58,6 +60,18 @@ class KeenIOTracker implements TrackerInterface {
             $charts['KeenIOChart'] = array_merge($charts['KeenIOChart'], $keenCharts);
         } else {
             $charts['KeenIOChart'] = $keenCharts;
+        }
+    }
+
+    /**
+     * Add CSS files to the current page.
+     *
+     * @param Gdn_Controller $controller Instance of the current page's controller.
+     * @param bool $inDashboard Is the current page a dashboard page?
+     */
+    public function addCssFiles(Gdn_Controller $controller, $inDashboard = false) {
+        if ($inDashboard) {
+            $controller->addCssFile('c3.min.css', 'plugins/vanillaanalytics');
         }
     }
 
@@ -83,10 +97,14 @@ class KeenIOTracker implements TrackerInterface {
      * @param bool $inDashboard Is the current page a dashboard page?
      */
     public function addJsFiles(Gdn_Controller $controller, $inDashboard = false) {
-        $controller->addJsFile('keenio.sdk.min.js', 'plugins/vanillaanalytics');
-        $controller->addJsFile('keenio.min.js', 'plugins/vanillaanalytics');
+        if (!AnalyticsTracker::getInstance()->trackingDisabled() || $inDashboard) {
+            $controller->addJsFile('keenio.sdk.min.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('keenio.min.js', 'plugins/vanillaanalytics');
+        }
 
         if ($inDashboard) {
+            $controller->addJsFile('d3.min.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('c3.min.js', 'plugins/vanillaanalytics');
             $controller->addJsFile('keeniochart.min.js', 'plugins/vanillaanalytics');
         }
     }
