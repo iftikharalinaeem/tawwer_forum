@@ -1,17 +1,18 @@
 <?php if (!defined('APPLICATION')) { exit(); }
+require_once Gdn::controller()->fetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
+
 $popularPosts = $this->data('popularPosts');
 $session = Gdn::session();
 ?>
-<h1 class="H HomepageTitle">Popular Discussions</h1>
-<br/>
-<ul class="DataList Discussions">
-    <?php
-    $alt = '';
-    foreach ($popularPosts->result() as $discussion) {
-        $alt = $alt == ' Alt' ? '' : ' Alt';
-        WriteDiscussion($discussion, $this, $session, $alt);
-    }
-    ?>
-</ul>
-<br/>
-<?php
+<div class="PopularPosts">
+    <h1 class="H HomepageTitle">[Popular Discussions]</h1>
+    <ul class="DataList Discussions">
+        <?php
+        $alt = '';
+        foreach ($popularPosts->result() as $discussion) {
+            $alt = $alt == ' Alt' ? '' : ' Alt';
+            writeDiscussion($discussion, $this, $session, $alt);
+        }
+        ?>
+    </ul>
+<div>
