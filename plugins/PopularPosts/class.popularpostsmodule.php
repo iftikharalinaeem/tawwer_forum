@@ -6,7 +6,7 @@
 
 class PopularPostsModule extends Gdn_Module {
 
-
+    // We use writeDiscussion() function from the Discussions view and it needs this variable.
     public $CountCommentsPerPage = 10;
 
     public function __construct(&$sender = '') {
@@ -48,7 +48,7 @@ class PopularPostsModule extends Gdn_Module {
             $where['CategoryID'] = $currentCategory['CategoryID'];
         }
 
-        $discussions = $discussionModel->getWhere($where, 'd.CountViews', 'desc', 10);
+        $discussions = $discussionModel->getWhere($where, 'd.CountViews', 'desc', $this->CountCommentsPerPage);
 
         // Restore allowedSortFields just by precaution.
         DiscussionModel::allowedSortFields($originalAllowedFields);

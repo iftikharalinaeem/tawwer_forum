@@ -45,7 +45,7 @@ class PopularPostsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Always document every method.
+     * Define what to do for the /index page of this plugin.
      *
      * @param $sender
      */
@@ -60,12 +60,10 @@ class PopularPostsPlugin extends Gdn_Plugin {
             'Plugin.PopularPosts.MaxAge' => '30',
         ));
 
-        // Set the model on the form.
         $sender->Form->setModel($configurationModel);
 
         // If seeing the form for the first time...
         if ($sender->Form->authenticatedPostBack() === false) {
-            // Apply the config settings to the form.
             $sender->Form->setData($configurationModel->Data);
         } else {
             $configurationModel->Validation->applyRule('Plugin.PopularPosts.MaxAge', 'Required');
@@ -83,15 +81,11 @@ class PopularPostsPlugin extends Gdn_Plugin {
             }
         }
 
-        // GetView() looks for files inside plugins/PluginFolderName/views/ and returns their full path. Useful!
         $sender->render($this->getView('configuration.php'));
     }
 
     /**
      * Add a link to the dashboard menu
-     *
-     * By grabbing a reference to the current SideMenu object we gain access to its methods, allowing us
-     * to add a menu link to the newly created /plugin/Example method.
      *
      * @param $sender Sending controller instance
      */
