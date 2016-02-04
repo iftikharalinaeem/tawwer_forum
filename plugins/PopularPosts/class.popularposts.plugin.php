@@ -8,7 +8,7 @@ $PluginInfo['PopularPosts'] = array(
     'Name' => 'Popular posts',
     'Description' => 'Shows popular posts',
     'Version' => '1.0',
-    //'RequiredApplications' => array('Vanilla' => '????'), // TODO Ask how to determine plugin version
+    'RequiredApplications' => array('Vanilla' => '2.2'),
     /*'RequiredTheme' => false,*/
     'HasLocale' => false,
     'License' => 'GNU GPL2',
