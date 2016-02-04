@@ -16,10 +16,14 @@ class PopularPostsModule extends Gdn_Module {
     public function toString() {
         $this->loadPopularPosts();
 
-        ob_start();
-            include(__DIR__.'/views/posts.php');
-            $result = ob_get_contents();
-        ob_end_clean();
+        $result = null;
+
+        if (!empty($this->data('popularPosts'))) {
+            ob_start();
+                include(__DIR__ . '/views/posts.php');
+                $result = ob_get_contents();
+            ob_end_clean();
+        }
 
         return $result;
     }
@@ -28,18 +32,28 @@ class PopularPostsModule extends Gdn_Module {
      * Load the 10 most popular (highest view count) discussions.
      */
     protected function loadPopularPosts() {
+
         $originalAllowedFields = DiscussionModel::allowedSortFields();
         $customAllowedFields = array_merge($originalAllowedFields, ['d.CountViews']);
         DiscussionModel::allowedSortFields($customAllowedFields);
 
         $discussionModel = new DiscussionModel();
-        // TODO limit time to 30 days. Currently 90 because of test data :D
-        $discussions = $discussionModel->getWhere(array('DateInserted >=' => date('Y-m-d', time() - 60 * 60 * 24 * 90)), 'd.CountViews', 'desc', 10);
+
+        // TODO limit time to 30 days. Currently more because of test data :D
+        $where = array('DateInserted >=' => date('Y-m-d', time() - 60 * 60 * 24 * 200));
+
+        $currentCategory = category();
+        if ($currentCategory !== null) {
+            $where['CategoryID'] = $currentCategory['CategoryID'];
+        }
+
+        $discussions = $discussionModel->getWhere($where, 'd.CountViews', 'desc', 10);
 
         // Restore allowedSortFields just by precaution.
         DiscussionModel::allowedSortFields($originalAllowedFields);
 
-        $this->setData('popularPosts', $discussions);
+        if ($discussions->count()) {
+            $this->setData('popularPosts', $discussions);
+        }
     }
-
 }
