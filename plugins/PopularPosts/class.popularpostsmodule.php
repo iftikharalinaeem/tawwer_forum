@@ -39,8 +39,9 @@ class PopularPostsModule extends Gdn_Module {
 
         $discussionModel = new DiscussionModel();
 
-        // TODO limit time to 30 days. Currently more because of test data :D
-        $where = array('DateInserted >=' => date('Y-m-d', time() - 60 * 60 * 24 * 200));
+        // TODO remove that + 90 :D.
+        $maxAge = 60 * 60 * 24 * (c('Plugin.PopularPosts.MaxAge', 30) + 90);
+        $where = array('DateInserted >=' => date('Y-m-d', time() - $maxAge));
 
         $currentCategory = category();
         if ($currentCategory !== null) {
