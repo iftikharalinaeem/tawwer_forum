@@ -92,6 +92,28 @@ class StageModel extends Gdn_Model {
         return false;
     }
 
+    public static function getOpenStages() {
+        $stages = self::stages();
+        $openStages = array();
+        foreach($stages as $stage) {
+            if (val('Status', $stage) == 'Open') {
+                $openStages[] = $stage;
+            }
+        }
+        return $openStages;
+    }
+
+    public static function getClosedStages() {
+        $stages = self::stages();
+        $closedStages = array();
+        foreach($stages as $stage) {
+            if (val('Status', $stage) == 'Closed') {
+                $closedStages[] = $stage;
+            }
+        }
+        return $closedStages;
+    }
+
     public static function getStages() {
         return self::stages();
     }
