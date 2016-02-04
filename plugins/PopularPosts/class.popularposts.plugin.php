@@ -9,12 +9,12 @@ $PluginInfo['PopularPosts'] = array(
     'Description' => 'Shows popular posts',
     'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
-    /*'RequiredTheme' => false,*/
+    /*'RequiredTheme' => false,*/ // TODO determine correct value for this
     'HasLocale' => false,
     'License' => 'GNU GPL2',
     'SettingsUrl' => '/plugin/popularPosts',
     'SettingsPermission' => 'Garden.Settings.Manage',
-    /*'MobileFriendly' => true,*/
+    /*'MobileFriendly' => true,*/ // TODO determine correct value for this
     'Author' => 'Alexandre (DaazKu) Chouinard',
     'AuthorEmail' => 'alexandre.c@vanillaforums.com'
 );
@@ -24,12 +24,8 @@ $PluginInfo['PopularPosts'] = array(
  */
 class PopularPostsPlugin extends Gdn_Plugin {
 
-    public function __construct() {
-        parent::__construct();
-    }
-
     /**
-     * Create a method called "popularPosts" on the PluginController
+     * Create a method called "popularPosts" on the PluginController.
      *
      * @param $sender Sending controller instance
      */
@@ -47,7 +43,7 @@ class PopularPostsPlugin extends Gdn_Plugin {
     /**
      * Define what to do for the /index page of this plugin.
      *
-     * @param $sender
+     * @param $sender Sending controller instance
      */
     public function controller_index($sender) {
         // Prevent non-admins from accessing this page
@@ -85,9 +81,9 @@ class PopularPostsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add a link to the dashboard menu
+     * Add a link to the dashboard menu.
      *
-     * @param $sender Sending controller instance
+     * @param $sender Sending controller instance.
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = &$sender->EventArguments['SideMenu'];

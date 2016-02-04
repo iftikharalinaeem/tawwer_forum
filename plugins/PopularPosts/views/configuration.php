@@ -15,6 +15,4 @@ echo $this->Form->errors();
         echo $this->Form->textbox('Plugin.PopularPosts.MaxAge');
         ?></li>
 </ul>
-<?php
-echo $this->Form->close('Save');
-?>
+<?php echo $this->Form->close('Save');

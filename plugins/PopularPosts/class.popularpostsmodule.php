@@ -9,10 +9,14 @@ class PopularPostsModule extends Gdn_Module {
     // We use writeDiscussion() function from the Discussions view and it needs this variable.
     public $CountCommentsPerPage = 10;
 
-    public function __construct(&$sender = '') {
-        parent::__construct($sender);
-    }
-
+    /**
+     * Returns the component as a string to be rendered to the screen.
+     *
+     * Unless this method is overridden, it will attempt to find and return a view
+     * related to this module automatically.
+     *
+     * @return string
+     */
     public function toString() {
         $this->loadPopularPosts();
 
@@ -29,7 +33,10 @@ class PopularPostsModule extends Gdn_Module {
     }
 
     /**
-     * Load the 10 most popular (highest view count) discussions.
+     * Load the top popular posts
+     *
+     * Load the 10 most popular (highest view count) discussions,
+     * filtered by category if applicable, that are below the MaxAge configuration.
      */
     protected function loadPopularPosts() {
 
