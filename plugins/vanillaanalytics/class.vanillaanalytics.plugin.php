@@ -7,7 +7,7 @@
  * @package Analytics
  */
 
-$PluginInfo['VanillaAnalytics'] = array(
+$PluginInfo['vanillaanalytics'] = array(
     'Name'                 => 'Vanilla Analytics',
     'Description'          => 'Support for transmitting events to analytics services.',
     'Version'              => '1.0.0',
@@ -35,12 +35,14 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param object $sender DashboardController.
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
+        /*
         $sender->EventArguments['SideMenu']->addLink(
             'Dashboard',
             T('Analytics'),
             'settings/analytics',
             'Garden.Settings.Manage'
         );
+        */
     }
 
     /**
@@ -270,7 +272,7 @@ class VanillaAnalytics extends Gdn_Plugin {
 
         $sender->addDefinition(
             'analyticsCharts',
-            analyticsTracker::getInstance()->getCharts()
+            AnalyticsTracker::getInstance()->getCharts()
         );
 
         $sender->addJsFile('dashboard.min.js', 'plugins/vanillaanalytics');
@@ -288,6 +290,15 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function setup() {
+        // On enable, the plug-in's classes aren't available in the autoloader.
+        $modelPath = PATH_PLUGINS . '/vanillaanalytics/models';
+        require_once("{$modelPath}/interface.trackerinterface.php");
+        require_once("{$modelPath}/class.analyticsdata.php");
+        require_once("{$modelPath}/class.analyticstracker.php");
+        require_once("{$modelPath}/class.keenioclient.php");
+        require_once("{$modelPath}/class.keenioquery.php");
+        require_once("{$modelPath}/class.keeniotracker.php");
+
         $this->structure();
     }
 
@@ -295,6 +306,6 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function structure() {
-        analyticsTracker::getInstance()->setup();
+        AnalyticsTracker::getInstance()->setup();
     }
 }

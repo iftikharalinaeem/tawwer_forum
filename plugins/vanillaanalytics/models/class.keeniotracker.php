@@ -208,52 +208,50 @@ class KeenIOTracker implements TrackerInterface {
     /**
      * Setup routine, called when plug-in is enabled.
      */
-    public function setup() {
-        // When the plug-in is first enabled, our KeenIOClient class won't be enabled.  Grab the class.
-        if (!class_exists('KeenIOClient')) {
-            require_once(PATH_PLUGINS . '/vanillaanalytics/models/class.keenioclient.php');
-        }
+    public function setup()
+    {
+        if (!c('VanillaAnalytics.KeenIO.ProjectID')) {
+            // Attempt to grab all the necessary data for creating a project with keen.io
+            $defaultProjectUser = c('VanillaAnalytics.KeenIO.DefaultProjectUser');
+            $site = class_exists('Infrastructure') ? Infrastructure::site('name') : c('Garden.Domain', null);
+            $orgID = c('VanillaAnalytics.KeenIO.OrgID');
+            $orgKey = c('VanillaAnalytics.KeenIO.OrgKey');
 
-        // Attempt to grab all the necessary data for creating a project with keen.io
-        $defaultProjectUser = c('VanillaAnalytics.KeenIO.DefaultProjectUser');
-        $site = class_exists('Infrastructure') ? Infrastructure::site('name') : c('Garden.Domain', null);
-        $orgID  = c('VanillaAnalytics.KeenIO.OrgID');
-        $orgKey = c('VanillaAnalytics.KeenIO.OrgKey');
+            // All of these pieces are essential for creating a project.  Fail without them.
+            if (!$orgID) {
+                throw new Gdn_UserException('Empty value for VanillaAnalytics.KeenIO.OrgID');
+            }
+            if (!$orgKey) {
+                throw new Gdn_UserException('Empty value for VanillaAnalytics.KeenIO.OrgKey');
+            }
+            if (!$defaultProjectUser) {
+                throw new Gdn_UserException('Empty value for VanillaAnalytics.KeenIO.DefaultProjectUser');
+            }
 
-        // All of these pieces are essential for creating a project.  Fail without them.
-        if (!$orgID) {
-            throw new Gdn_UserException('Empty value for VanillaAnalytics.KeenIO.OrgID');
-        }
-        if (!$orgKey) {
-            throw new Gdn_UserException('Empty value for VanillaAnalytics.KeenIO.OrgKey');
-        }
-        if (!$defaultProjectUser) {
-            throw new Gdn_UserException('Empty value for VanillaAnalytics.KeenIO.DefaultProjectUser');
-        }
+            // Build the keen.io client and attempt to create a new project
+            $keenIOConfig = [
+                'orgID' => $orgID,
+                'orgKey' => $orgKey
+            ];
+            $keenIOClient = new KeenIOClient(null, $keenIOConfig);
 
-        // Build the keen.io client and attempt to create a new project
-        $keenIOConfig = [
-            'orgID'  => $orgID,
-            'orgKey' => $orgKey
-        ];
-        $keenIOClient = new KeenIOClient(null, $keenIOConfig);
-
-        $project = $keenIOClient->addProject(
-            $site,
-            [
+            $project = $keenIOClient->addProject(
+                $site,
                 [
-                    'email' => $defaultProjectUser
+                    [
+                        'email' => $defaultProjectUser
+                    ]
                 ]
-            ]
-        );
+            );
 
-        // If we were successful, save the details.  If not, trigger an error.
-        if ($project) {
-            saveToConfig('VanillaAnalytics.KeenIO.ProjectID', $project->id);
-            saveToConfig('VanillaAnalytics.KeenIO.ReadKey', $project->apiKeys->readKey);
-            saveToConfig('VanillaAnalytics.KeenIO.WriteKey', $project->apiKeys->writeKey);
-        } else {
-            throw new Gdn_UserException('Unable to create project on keen.io');
+            // If we were successful, save the details.  If not, trigger an error.
+            if ($project) {
+                saveToConfig('VanillaAnalytics.KeenIO.ProjectID', $project->id);
+                saveToConfig('VanillaAnalytics.KeenIO.ReadKey', $project->apiKeys->readKey);
+                saveToConfig('VanillaAnalytics.KeenIO.WriteKey', $project->apiKeys->writeKey);
+            } else {
+                throw new Gdn_UserException('Unable to create project on keen.io');
+            }
         }
     }
 }
