@@ -6,24 +6,11 @@
 
 class PopularPostsModule extends Gdn_Module {
 
+
+    public $CountCommentsPerPage = 10;
+
     public function __construct(&$sender = '') {
         parent::__construct($sender);
-
-        // DaazKu: that module is sooooo gonna appear before the normal disucssions :D
-        // TODO: Check if we could put that code in a less called function
-        $modulesPositions = c('Modules.Vanilla.Content');
-        if (!in_array(__CLASS__, $modulesPositions)) {
-            $pos   = array_search('DiscussionFilterModule', $modulesPositions);
-
-            if ($pos !== false) {
-                array_splice($modulesPositions, $pos, 0, __CLASS__);
-                saveToConfig('Modules.Vanilla.Content', $modulesPositions);
-            }
-        }
-    }
-
-    public function assetTarget() {
-        return 'Content';
     }
 
     public function toString() {
@@ -46,7 +33,8 @@ class PopularPostsModule extends Gdn_Module {
         DiscussionModel::allowedSortFields($customAllowedFields);
 
         $discussionModel = new DiscussionModel();
-        $discussions = $discussionModel->getWhere(false, 'd.CountViews', 'desc', 10);
+        // TODO limit time to 30 days. Currently 90 because of test data :D
+        $discussions = $discussionModel->getWhere(array('DateInserted >=' => date('Y-m-d', time() - 60 * 60 * 24 * 90)), 'd.CountViews', 'desc', 10);
 
         // Restore allowedSortFields just by precaution.
         DiscussionModel::allowedSortFields($originalAllowedFields);
