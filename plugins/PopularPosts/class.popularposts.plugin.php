@@ -19,24 +19,11 @@ $PluginInfo['PopularPosts'] = array(
 );
 
 /**
- * Class PrivateCommunityPlugin
+ * Class PopularPostsPlugin
  */
 class PopularPostsPlugin extends Gdn_Plugin {
 
     public function __construct() {
         parent::__construct();
-    }
-
-    /**
-     * Inject the popular posts module on discussions/index
-     *
-     * @param $sender Sending controller instance
-     */
-    public function discussionsController_render_before($sender) {
-
-        if ($sender->OriginalRequestMethod === 'index') {
-            $sender->addModule('popularPostsModule');
-        }
-
     }
 }
