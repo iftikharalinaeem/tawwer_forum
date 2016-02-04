@@ -47,14 +47,25 @@ class KeenIOTracker implements TrackerInterface {
                 'property_name'  => 'event',
                 'property_value' => 'page_view'
             ]);
-        $keenCharts[] = [
-            'chart' => [
-                'type' => 'spline',
-                'options'   => [
-                ]
-            ],
-            'query' => $pageViews
-        ];
+
+        $pageviewChart = new KeenIOChart();
+        $keenCharts[] = $pageviewChart->setType('spline')
+            ->addQuery($pageViews);
+
+        $newDiscussions = new KeenIOQuery();
+        $newDiscussions->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Discussions'))
+            ->setEventCollection('posts')
+            ->setTimeframe('previous_1_months')
+            ->setInterval('daily')
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'type',
+                'property_value' => 'discussion_add'
+            ]);
+        $discussionChart = new KeenIOChart();
+        $keenCharts[] = $discussionChart->setType('spline')
+            ->addQuery($newDiscussions);
 
         if (array_key_exists('KeenIOChart', $charts) && is_array($charts['KeenIOChart'])) {
             $charts['KeenIOChart'] = array_merge($charts['KeenIOChart'], $keenCharts);

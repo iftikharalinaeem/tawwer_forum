@@ -32,10 +32,11 @@ KeenIOChart.prototype.addQuery = function(config ) {
      */
     var interval, timeframe;
     if (this.query.length > 0 && typeof this.query[0] !== 'undefined') {
-        var alphaQuery = this.query[0];
+        var alphaQuery       = this.query[0];
+        var alphaQueryParams = alphaQuery.params || {};
 
-        interval  = alphaQuery.interval || null;
-        timeframe = alphaQuery.timeframe || null;
+        interval  = alphaQueryParams.interval || null;
+        timeframe = alphaQueryParams.timeframe || null;
     } else {
         interval  = config.interval || null;
         timeframe = config.timeframe || null;
@@ -94,38 +95,40 @@ KeenIOChart.prototype.write = function(container) {
 
         chart.el(container)
             .library('c3')
-            .chartType(this.chartConfig.type || null)
-            .chartOptions(this.chartConfig.options || null)
+            .chartType(this.chartConfig.type || '')
+            .chartOptions(this.chartConfig.options || {})
             .prepare();
 
-        client.run(this.query, function(error, response) {
-
-            if (error) {
-                return;
+        // Run our queries and chart the results.
+        client.run(this.query, function(error, analyses) {
+            // Normalize our result to always be an array.
+            if (!(analyses instanceof Array)) {
+                analyses = [analyses];
             }
 
-            var data   = [];
+            var alphaAnalysis = analyses[0].result;
+            var data = [];
 
-            if (!(response instanceof Array)) {
-                response = [response];
-            }
-
-            var alphaResult = response[0].result;
-
-            for (i in alphaResult) {
+            // Use the first analysis to guide the charting of the other analyses, if available.
+            alphaAnalysis.forEach(function(stepValue, step) {
                 var value = [];
 
-                value.push({
-                    category : categories[0],
-                    result   : alphaResult[i]['value']
+                // Grab the individual values and labels for this charting step.
+                analyses.forEach(function(analysis, analysisIndex) {
+                    value.push({
+                        category: categories[analysisIndex],
+                        result: analysis.result[step]['value']
+                    });
                 });
 
-                data.push({
-                    timeframe: alphaResult[i]['timeframe'],
+                // Build onto our data object.
+                data.push({ // format the data so it can be charted
+                    timeframe: stepValue['timeframe'],
                     value: value
                 });
-            }
+            });
 
+            // Hand it all off to our Keen.Dataviz object to takeover.
             chart.parseRawData({ result: data }).render();
         });
     }
