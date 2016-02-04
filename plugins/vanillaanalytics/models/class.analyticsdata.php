@@ -6,8 +6,17 @@
  */
 class AnalyticsData extends Gdn_Model {
 
+    /**
+     * @var DateTimeZone An instance of DateTimeZone for date calculations.
+     */
     private static $defaultTimeZone = null;
 
+    /**
+     * Grab basic information about a category, based on a category ID.
+     *
+     * @param int $categoryID The target category's integer ID.
+     * @return array An array representing basic category data.
+     */
     public static function getCategory($categoryID) {
         $categoryModel = new CategoryModel();
 
@@ -373,6 +382,7 @@ class AnalyticsData extends Gdn_Model {
     /**
      * Set the default time zone to the specified parameter.
      *
+     * @link http://php.net/manual/en/timezones.php
      * @param DateTimeZone $timeZone Target time zone.
      */
     public static function setDefaultTimeZone(DateTimeZone $timeZone) {

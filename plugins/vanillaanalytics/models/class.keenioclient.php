@@ -26,38 +26,36 @@ class KeenIOClient extends Garden\Http\HttpClient {
     const REQUEST_POST = 'post';
 
     /**
-     * Non-scoped key for the project, capable of reading and writing.
-     * @var string
+     * @link https://keen.io/docs/api/#master-key
+     * @var string Non-scoped key for the project, capable of reading and writing.
      */
     protected $masterKey;
 
     /**
-     * Unique ID of the organization our projects belong to.
-     * @var string
+     * @var string Unique ID of the organization our projects belong to.
      */
     protected $orgID;
 
     /**
-     * Key with capabilities for managing a keen.io organization.
-     * @var string
+     * @link https://keen.io/docs/api/#organization-key
+     * @var string Key with capabilities for managing a keen.io organization.
      */
     protected $orgKey;
 
     /**
-     * The project ID we'll be recording events against.
-     * @var string
+     * @var string The project ID we'll be recording events against.
      */
     protected $projectID;
 
     /**
-     * Scoped key for reading from the configured project.
-     * @var string
+     * @link https://keen.io/docs/api/#read-key
+     * @var string Scoped key for reading from the configured project.
      */
     protected $readKey;
 
     /**
-     * Scoped key for writing to the configured project.
-     * @var string
+     * @link https://keen.io/docs/api/#write-key
+     * @var string Scoped key for writing to the configured project.
      */
     protected $writeKey;
 
@@ -102,8 +100,9 @@ class KeenIOClient extends Garden\Http\HttpClient {
     /**
      * Record an event against the currently configured project.
      *
-     * @param $eventCollection Name of the event collection to save the current event to.
-     * @param $eventData Event data.
+     * @link https://keen.io/docs/api/#record-a-single-event
+     * @param string $eventCollection Name of the event collection to save the current event to.
+     * @param object $eventData Event data.
      * @return bool|stdClass Object representing result on success, false on failure.
      */
     public function addEvent($eventCollection, $eventData) {
@@ -114,7 +113,14 @@ class KeenIOClient extends Garden\Http\HttpClient {
         );
     }
 
-    public function addEvents($data) {
+    /**
+     * Record multiple events against the currently configured project.
+     *
+     * @link https://keen.io/docs/api/#record-multiple-events
+     * @param array $data Data for multiple events, grouped by collection.
+     * @return bool|stdClass Object representing result on success, false on failure.
+     */
+    public function addEvents(array $data) {
         return $this->command(
             "projects/{$this->projectID}/events",
             $data,
@@ -122,6 +128,14 @@ class KeenIOClient extends Garden\Http\HttpClient {
         );
     }
 
+    /**
+     * Create a new project in the configured organization.
+     *
+     * @link https://keen.io/docs/api/#create-project
+     * @param string $name Specifies the name of the project to be created.
+     * @param array $users Specifies users for the project.
+     * @return bool|stdClass Object representing result on success, false on failure.
+     */
     public function addProject($name, array $users = []) {
         $data = [
             'name'  => $name,
@@ -188,16 +202,24 @@ class KeenIOClient extends Garden\Http\HttpClient {
         return false;
     }
 
+    /**
+     * @link https://keen.io/docs/api/#delete-events
+     * @todo Implement this, if we ever need it.
+     */
     public function deleteEvents() {}
 
+    /**
+     * https://keen.io/docs/api/#delete-a-property
+     * @todo Implement this, if we ever need it.
+     */
     public function deleteEventProperties() {}
 
     /**
      * Returns available schema information for this event collection, including properties and their type. It also
      * returns links to sub-resources.
      *
-     * @param $eventCollection
-     * @return bool|stdClass
+     * @param string $eventCollection
+     * @return bool|stdClass Object representing result on success, false on failure.
      */
     public function getCollection($eventCollection) {
         return $this->command(
@@ -211,7 +233,8 @@ class KeenIOClient extends Garden\Http\HttpClient {
      * Returns schema information for all the event collections in this project, including properties and their type.
      * It also returns links to sub-resources.
      *
-     * @return bool|stdClass
+     * @link https://keen.io/docs/api/#inspect-all-collections
+     * @return bool|stdClass Object representing result on success, false on failure.
      */
     public function getCollections() {
         return $this->command(
@@ -225,20 +248,38 @@ class KeenIOClient extends Garden\Http\HttpClient {
         return $this->getCollections();
     }
 
+    /**
+     * Grab the organization ID.
+     *
+     * @return string The currently configured organization ID.
+     */
     public function getOrgID() {
         return $this->orgID;
     }
 
+    /**
+     * Grab the organization-level API key.
+     *
+     * @return string The currently configured organization-level API key.
+     */
     public function getOrgKey() {
         return $this->orgKey;
     }
 
+    /**
+     * Grab the project-level master API key.
+     *
+     * @return string The currently configured master key.
+     */
     public function getMasterKey() {
         return $this->masterKey;
     }
 
     /**
      * Returns the projects accessible to the API user, as well as links to project sub-resources for discovery.
+     *
+     * @param string $projectID A keen.io project's unique ID.
+     * @return bool|stdClass Object representing result on success, false on failure.
      */
     public function getProject($projectID) {
         return $this->command(
@@ -248,12 +289,19 @@ class KeenIOClient extends Garden\Http\HttpClient {
         );
     }
 
+    /**
+     * Grab the current project ID.
+     *
+     * @return string The currently configured project ID.
+     */
     public function getProjectID() {
         return $this->projectID;
     }
 
     /**
      * Returns the projects accessible to the API user, as well as links to project sub-resources for discovery.
+     *
+     * @return bool|stdClass Object representing result on success, false on failure.
      */
     public function getProjects() {
         return $this->command(
@@ -280,6 +328,8 @@ class KeenIOClient extends Garden\Http\HttpClient {
 
     /**
      * Returns the available child resources. Currently, the only child resource is the Projects Resource.
+     *
+     * @return bool|stdClass Object representing result on success, false on failure.
      */
     public function getResources() {
         return $this->command(
@@ -289,35 +339,83 @@ class KeenIOClient extends Garden\Http\HttpClient {
         );
     }
 
+    /**
+     * @return string
+     */
     public function getReadKey() {
         return $this->readKey;
     }
 
+    /**
+     * @return string
+     */
     public function getWriteKey() {
         return $this->writeKey;
     }
 
+    /**
+     * Set the new master API key.
+     *
+     * @param $masterKey The new project-level master API key.
+     * @return $this
+     */
     public function setMasterKey($masterKey) {
-        return $this->masterKey = $masterKey;
+        $this->masterKey = $masterKey;
+        return $this;
     }
 
+    /**
+     * Set the new organization ID.
+     *
+     * @param string $orgID The new organization ID.
+     * @return $this
+     */
     public function setOrgID($orgID) {
-        return $this->orgID = $orgID;
+        $this->orgID = $orgID;
+        return $this;
     }
 
+    /**
+     * Set the new organization API key.
+     *
+     * @param string $orgKey The new organization-level API key.
+     * @return $this
+     */
     public function setOrgKey($orgKey) {
-        return $this->orgKey = $orgKey;
+        $this->orgKey = $orgKey;
+        return $this;
     }
 
+    /**
+     * Set the new project ID.
+     *
+     * @param string $projectID The new keen.io project unique identifier.
+     * @return $this
+     */
     public function setProjectID($projectID) {
-        return $this->projectID = $projectID;
+        $this->projectID = $projectID;
+        return $this;
     }
 
+    /**
+     * Set the new read API key.
+     *
+     * @param string $readKey The new project-level read API key.
+     * @return $this
+     */
     public function setReadKey($readKey) {
-        return $this->readKey = $readKey;
+        $this->readKey = $readKey;
+        return $this;
     }
 
+    /**
+     * Set the new write API key.
+     *
+     * @param string $writeKey The new project-level write API key.
+     * @return $this
+     */
     public function setWriteKey($writeKey) {
-        return $this->writeKey = $writeKey;
+        $this->writeKey = $writeKey;
+        return $this;
     }
 }

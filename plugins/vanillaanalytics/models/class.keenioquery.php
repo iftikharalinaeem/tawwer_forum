@@ -51,46 +51,52 @@ class KeenIOQuery implements JsonSerializable {
     const ANALYSIS_SELECT_UNIQUE = 'select_unique';
 
     /**
-     * @var string
+     * @var string Query analysis type.  One of the ANALYSIS_* constants.
      */
     protected $analysisType;
 
     /**
-     * @var string
+     * @var string Target event collection.
      */
     protected $eventCollection;
 
     /**
-     * @var array
+     * @link https://keen.io/docs/api/#filters
+     * @var array Used to refine the scope of events to be included in an analysis.
      */
     protected $filters = [];
 
     /**
-     * @var string
+     * @link https://keen.io/docs/api/#group-by
+     * @var string Groups results categorically, by co-occurrence of a specified property.
      */
     protected $groupBy;
 
     /**
-     * @var string
+     * @link https://keen.io/docs/api/#interval
+     * @var string Groups results into sub-timeframes spanning a specified length of time.
      */
     protected $interval;
 
     /**
-     * @var string
+     * @var string Specifies a period of time over which to run an analysis.
      */
     protected $timeframe;
 
     /**
-     * @var string
+     * @link https://keen.io/docs/api/#timezone
+     * @var string Used to ensure we’re getting the data from our local definition of “today”, rather than UTC.
      */
     protected $timezone;
 
     /**
-     * @var string
+     * @var string A title for this query.  May be used in charting.
      */
     protected $title = '';
 
     /**
+     * Add a filter to the query.
+     *
      * @link https://keen.io/docs/api/#filters
      * @param array $filters
      * @return $this
@@ -101,6 +107,8 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Fetch the current analysis type.
+     *
      * @return string
      */
     public function getAnalysisType() {
@@ -108,6 +116,8 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Fetch the current filters.
+     *
      * @return array
      */
     public function getFilters() {
@@ -115,6 +125,8 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Fetch the current "group by" value.
+     *
      * @return string
      */
     public function getGroupBy() {
@@ -122,6 +134,8 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Fetch the current interval.
+     *
      * @return string
      */
     public function getInterval() {
@@ -129,6 +143,8 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Fetch the current timeframe.
+     *
      * @return string
      */
     public function getTimeframe() {
@@ -136,6 +152,8 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Fetch the current timezone.
+     *
      * @return string
      */
     public function getTimezone() {
@@ -143,6 +161,8 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Fetch the current title.
+     *
      * @return string
      */
     public function getTitle() {
@@ -150,7 +170,9 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
-     * Specify data which should be serialized to JSON.
+     * Specify data which should be represented when converted to JSON.
+     *
+     * @return array An array representing how this object should be represented when converted.
      */
     public function jsonSerialize() {
         return [

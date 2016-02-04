@@ -7,34 +7,29 @@
 class AnalyticsTracker {
 
     /**
-     * Used to determine if we should avoid tracking events.
-     * @var bool
+     * @var bool Used to determine if we should avoid tracking events.
      */
     private $disableTracking = false;
 
     /**
-     * Holds the instance for our singleton
-     * @var AnalyticsTracker
+     * @var AnalyticsTracker Holds the instance for our singleton
      */
     private static $instance;
 
     /**
-     * An array containing instances of individual service tracker interfaces.
-     * @var array
+     * @var array An array containing instances of individual service tracker interfaces.
      */
     protected $trackers = [];
 
     /**
-     * An array of class names for available analytics service trackers.
-     * @var array
+     * @var array An array of class names for available analytics service trackers.
      */
     protected $trackerClasses = [
         'KeenIOTracker'
     ];
 
     /**
-     * An array containing the user's unique ID and session ID values.
-     * @var array
+     * @var array An array containing the user's unique ID and session ID values.
      */
     protected $trackingIDs = null;
 
@@ -56,6 +51,11 @@ class AnalyticsTracker {
         }
     }
 
+    /**
+     * Allow trackers to add CSS files to the current page.
+     *
+     * @param Gdn_Controller $controller Instance of the current page's controller.
+     */
     public function addCssFiles(Gdn_Controller $controller) {
         $inDashboard = $controller->MasterView == 'admin';
 
@@ -207,6 +207,11 @@ class AnalyticsTracker {
         return $eventData;
     }
 
+    /**
+     * Grab a list of all available analytics service tracker classes.
+     *
+     * @return array An array of available analytics service tracker classes.
+     */
     public function getTrackerClasses() {
         return $this->trackerClasses;
     }
