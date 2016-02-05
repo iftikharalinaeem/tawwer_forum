@@ -61,8 +61,8 @@ class PopularPostsModule extends Gdn_Module {
 
             $discussionModel = new DiscussionModel();
 
-            // TODO remove that + 90 :D.
-            $maxAge = 60 * 60 * 24 * (c('Plugin.PopularPosts.MaxAge', 30) + 90);
+            // Max age in days
+            $maxAge = 60 * 60 * 24 * c('Plugin.PopularPosts.MaxAge', 30);
             $where = array('DateInserted >=' => date('Y-m-d', time() - $maxAge));
 
 
@@ -75,7 +75,7 @@ class PopularPostsModule extends Gdn_Module {
             // Restore allowedSortFields just by precaution.
             DiscussionModel::allowedSortFields($originalAllowedFields);
 
-            Gdn::cache()->store($key, $discussions, array(Gdn_Cache::FEATURE_EXPIRY => 600));
+            Gdn::cache()->store($key, $discussions, array(Gdn_Cache::FEATURE_EXPIRY => 10 * 60));
         }
 
         if ($discussions->count()) {
