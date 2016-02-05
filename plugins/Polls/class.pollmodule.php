@@ -63,44 +63,43 @@ class PollModule extends Gdn_Module {
     /**
      * Get poll options for a given poll.
      *
-     * @param $PollID
-     * @param null $PollModel
-     * @return array|null
+     * @param $pollID The ID of the poll to retrieve.
+     * @return array|null An array representation of the Poll.
      */
-   public function getPollOptions($PollID) {
-       $PollOptionModel = new Gdn_Model('PollOption');
-       return $PollOptionModel->GetWhere(array('PollID' => $PollID), 'Sort', 'asc')->ResultArray();
+   public function getPollOptions($pollID) {
+       $pollOptionModel = new Gdn_Model('PollOption');
+       return $pollOptionModel->GetWhere(array('PollID' => $pollID), 'Sort', 'asc')->ResultArray();
    }
 
     /**
-     * Add voting info to the poll options array
+     * Add voting info to the poll options array and return.
      *
-     * @param $Poll
-     * @param $OptionData
-     * @param null $PollModel
-     * @return array
+     * @param array $optionData The poll options.
+     * @param object $poll The poll to join the votes in on.
+     * @param PollModel|null $pollModel The poll model. Instantiates if not passed in.
+     * @return array The poll options array with voting info joined in.
      */
-   public function joinPollVotes($OptionData, $Poll, $PollModel = null) {
+   public function joinPollVotes($optionData, $poll, $pollModel = null) {
       // Load the poll votes
-      $Anonymous = val('Anonymous', $Poll) || C('Plugins.Polls.AnonymousPolls');
-      if (!$Anonymous) {
-         if (!is_a($PollModel, 'PollModel')) {
-            $PollModel = new PollModel();
+      $anonymous = val('Anonymous', $poll) || C('Plugins.Polls.AnonymousPolls');
+      if (!$anonymous) {
+         if (!is_a($pollModel, 'PollModel')) {
+            $pollModel = new PollModel();
          }
-         $VoteData = $this->GetPollVotes($OptionData, $PollModel);
+         $voteData = $this->GetPollVotes($optionData, $pollModel);
       }
 
       // Build the result set to deliver to the page
-      $PollOptions = array();
-      foreach ($OptionData as $Option) {
-         if (!$Anonymous) {
-            $Votes = val($Option['PollOptionID'], $VoteData, array());
-            $Option['Votes'] = $Votes;
+      $pollOptions = array();
+      foreach ($optionData as $option) {
+         if (!$anonymous) {
+            $votes = val($option['PollOptionID'], $voteData, array());
+            $option['Votes'] = $votes;
          }
-         $PollOptions[] = $Option;
+         $pollOptions[] = $option;
       }
 
-      return $PollOptions;
+      return $pollOptions;
    }
 
 
