@@ -87,11 +87,4 @@ class PopularPostsPlugin extends Gdn_Plugin {
         $menu = &$sender->EventArguments['SideMenu'];
         $menu->addLink('Add-ons', t('Popular Posts'), 'settings/popularPosts', 'Garden.Settings.Manage');
     }
-
-    /**
-     * Plugin cleanup
-     */
-    public function onDisable() {
-        removeFromConfig('PopularPosts.MaxAge');
-    }
 }
