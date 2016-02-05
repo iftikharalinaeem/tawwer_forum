@@ -18,6 +18,7 @@ class PopularPostsModule extends Gdn_Module {
      * @return string
      */
     public function toString() {
+
         $this->loadPopularPosts();
 
         $result = null;
@@ -39,26 +40,43 @@ class PopularPostsModule extends Gdn_Module {
      * filtered by category if applicable, that are below the MaxAge configuration.
      */
     protected function loadPopularPosts() {
-
-        $originalAllowedFields = DiscussionModel::allowedSortFields();
-        $customAllowedFields = array_merge($originalAllowedFields, ['d.CountViews']);
-        DiscussionModel::allowedSortFields($customAllowedFields);
-
-        $discussionModel = new DiscussionModel();
-
-        // TODO remove that + 90 :D.
-        $maxAge = 60 * 60 * 24 * (c('Plugin.PopularPosts.MaxAge', 30) + 90);
-        $where = array('DateInserted >=' => date('Y-m-d', time() - $maxAge));
-
-        $currentCategory = category();
-        if ($currentCategory !== null) {
-            $where['CategoryID'] = $currentCategory['CategoryID'];
+        if (!Gdn_Cache::activeEnabled() && c('Cache.Enabled')) {
+            trace('Popular Posts caching has failed');
+            return;
         }
 
-        $discussions = $discussionModel->getWhere($where, 'd.CountViews', 'desc', $this->CountCommentsPerPage);
+        $key = 'plugin.popularPosts.data';
+        $currentCategory = category();
 
-        // Restore allowedSortFields just by precaution.
-        DiscussionModel::allowedSortFields($originalAllowedFields);
+        // Cache data per category too
+        if ($currentCategory !== null) {
+            $key .= '.category'.$currentCategory['CategoryID'];
+        }
+
+        $discussions = Gdn::cache()->get($key);
+        if ($discussions === Gdn_Cache::CACHEOP_FAILURE) {
+            $originalAllowedFields = DiscussionModel::allowedSortFields();
+            $customAllowedFields = array_merge($originalAllowedFields, ['d.CountViews']);
+            DiscussionModel::allowedSortFields($customAllowedFields);
+
+            $discussionModel = new DiscussionModel();
+
+            // TODO remove that + 90 :D.
+            $maxAge = 60 * 60 * 24 * (c('Plugin.PopularPosts.MaxAge', 30) + 90);
+            $where = array('DateInserted >=' => date('Y-m-d', time() - $maxAge));
+
+
+            if ($currentCategory !== null) {
+                $where['CategoryID'] = $currentCategory['CategoryID'];
+            }
+
+            $discussions = $discussionModel->getWhere($where, 'd.CountViews', 'desc', $this->CountCommentsPerPage);
+
+            // Restore allowedSortFields just by precaution.
+            DiscussionModel::allowedSortFields($originalAllowedFields);
+
+            Gdn::cache()->store($key, $discussions, array(Gdn_Cache::FEATURE_EXPIRY => 600));
+        }
 
         if ($discussions->count()) {
             $this->setData('popularPosts', $discussions);
