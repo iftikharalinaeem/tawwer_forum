@@ -9,6 +9,9 @@ class PopularPostsModule extends Gdn_Module {
     // We use writeDiscussion() function from the Discussions view and it needs this variable.
     public $CountCommentsPerPage = 10;
 
+    // Usually set from the template. Ex: {module name="PopularPostsModule" categoryID="X"}
+    public $categoryID = null;
+
     /**
      * Returns the component as a string to be rendered to the screen.
      *
@@ -40,21 +43,20 @@ class PopularPostsModule extends Gdn_Module {
      * filtered by category if applicable, that are below the MaxAge configuration.
      */
     protected function loadPopularPosts() {
+
         if (!Gdn_Cache::activeEnabled() && c('Cache.Enabled')) {
             trace('Popular Posts caching has failed');
             return;
         }
 
         $key = 'plugin.popularPosts.data';
-        $currentCategory = category();
 
         // Cache data per category too
-        if ($currentCategory !== null) {
-            $key .= '.category'.$currentCategory['CategoryID'];
+        if ($this->categoryID !== null) {
+            $key .= '.category'.$this->categoryID;
         }
 
         $data = Gdn::cache()->get($key);
-        decho($data);
         if ($data === Gdn_Cache::CACHEOP_FAILURE) {
             $originalAllowedFields = DiscussionModel::allowedSortFields();
             $customAllowedFields = array_merge($originalAllowedFields, ['d.CountViews']);
@@ -67,8 +69,8 @@ class PopularPostsModule extends Gdn_Module {
             $where = array('DateInserted >=' => date('Y-m-d', time() - $maxAge));
 
 
-            if ($currentCategory !== null) {
-                $where['CategoryID'] = $currentCategory['CategoryID'];
+            if ($this->categoryID !== null) {
+                $where['CategoryID'] = $this->categoryID;
             }
 
             $discussions = $discussionModel->getWhere($where, 'd.CountViews', 'desc', $this->CountCommentsPerPage)->result();
