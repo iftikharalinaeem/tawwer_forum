@@ -9,12 +9,10 @@ $PluginInfo['PopularPosts'] = array(
     'Description' => 'Shows popular posts',
     'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
-    /*'RequiredTheme' => false,*/ // TODO determine correct value for this
     'HasLocale' => false,
     'License' => 'GNU GPL2',
-    'SettingsUrl' => '/plugin/popularPosts',
+    'SettingsUrl' => '/settings/popularPosts',
     'SettingsPermission' => 'Garden.Settings.Manage',
-    /*'MobileFriendly' => true,*/ // TODO determine correct value for this
     'Author' => 'Alexandre (DaazKu) Chouinard',
     'AuthorEmail' => 'alexandre.c@vanillaforums.com'
 );
@@ -25,14 +23,14 @@ $PluginInfo['PopularPosts'] = array(
 class PopularPostsPlugin extends Gdn_Plugin {
 
     /**
-     * Create a method called "popularPosts" on the PluginController.
+     * Create a method called "popularPosts" on the SettingController.
      *
      * @param $sender Sending controller instance
      */
-    public function pluginController_popularPosts_create($sender) {
+    public function settingsController_popularPosts_create($sender) {
 
-        $sender->title('Popular posts plugin');
-        $sender->addSideMenu('plugin/popularPosts');
+        $sender->title(sprintf(t('%s settings'), 'Popular Posts'));
+        $sender->addSideMenu('settings/popularPosts');
 
         // If your sub-pages use forms, this is a good place to get it ready
         $sender->Form = new Gdn_Form();
@@ -87,6 +85,6 @@ class PopularPostsPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = &$sender->EventArguments['SideMenu'];
-        $menu->addLink('Add-ons', 'Popular Posts', 'plugin/popularPosts', 'Garden.Settings.Manage');
+        $menu->addLink('Add-ons', t('Popular Posts'), 'settings/popularPosts', 'Garden.Settings.Manage');
     }
 }
