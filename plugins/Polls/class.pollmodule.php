@@ -18,60 +18,93 @@ class PollModule extends Gdn_Module {
 	public function AssetTarget() {
 		return 'Panel';
 	}
-   
+
    private function LoadPoll() {
       $PollModel = new PollModel();
       $Poll = FALSE;
       $PollID = Gdn::Controller()->Data('PollID');
       $Discussion = Gdn::Controller()->Data('Discussion');
-      
+
       // Look in the controller for a PollID
       if ($PollID > 0)
          $Poll = $PollModel->GetID($PollID);
-      
+
       // Failing that, look for a DiscussionID
       if (!$Poll && $Discussion)
          $Poll = $PollModel->GetByDiscussionID(GetValue('DiscussionID', $Discussion));
 
-      $this->SetData('Poll', $Poll);
       if ($Poll) {
          // Load the poll options
          $PollID = GetValue('PollID', $Poll);
-         $PollOptionModel = new Gdn_Model('PollOption');
-         $OptionData = $PollOptionModel->GetWhere(array('PollID' => $PollID), 'Sort', 'asc')->ResultArray();
-         
-         // Load the poll votes
-         $Anonymous = val('Anonymous', $Poll) || C('Plugins.Polls.AnonymousPolls');
-         if (!$Anonymous) {
-            $VoteData = $this->GetPollVotes($OptionData, $PollModel);
-         }
+         $OptionData = $this->getPollOptions($PollID);
+         $PollOptions = $this->joinPollVotes($OptionData, $Poll, $PollModel);
 
-         // Build the result set to deliver to the page
-         $PollOptions = array();
-         foreach ($OptionData as $Option) {
-            if (!$Anonymous) {
-               $Votes = val($Option['PollOptionID'], $VoteData, array());
-               $Option['Votes'] = $Votes;
-            }
-            $PollOptions[] = $Option;
-         }
-         $this->SetData('PollOptions', $PollOptions);
-         
          // Has this user voted?
          $this->SetData('UserHasVoted', $PollModel->SQL
             ->Select()
             ->From('PollVote pv')
             ->Where(array(
-               'pv.UserID' => Gdn::Session()->UserID, 
+               'pv.UserID' => Gdn::Session()->UserID,
                'pv.PollOptionID' => array_column($OptionData, 'PollOptionID')
             ))
             ->Get()
             ->NumRows() > 0
          );
       }
+
+      $this->EventArguments['Poll'] = &$Poll;
+      $this->EventArguments['PollOptions'] = &$PollOptions;
+      $this->FireEvent('AfterLoadPoll');
+
+      $this->setData('PollOptions', $PollOptions);
+      $this->SetData('Poll', $Poll);
    }
 
-	public function ToString() {
+    /**
+     * Get poll options for a given poll.
+     *
+     * @param $PollID
+     * @param null $PollModel
+     * @return array|null
+     */
+   public function getPollOptions($PollID) {
+       $PollOptionModel = new Gdn_Model('PollOption');
+       return $PollOptionModel->GetWhere(array('PollID' => $PollID), 'Sort', 'asc')->ResultArray();
+   }
+
+    /**
+     * Add voting info to the poll options array
+     *
+     * @param $Poll
+     * @param $OptionData
+     * @param null $PollModel
+     * @return array
+     */
+   public function joinPollVotes($OptionData, $Poll, $PollModel = null) {
+      // Load the poll votes
+      $Anonymous = val('Anonymous', $Poll) || C('Plugins.Polls.AnonymousPolls');
+      if (!$Anonymous) {
+         if (!is_a($PollModel, 'PollModel')) {
+            $PollModel = new PollModel();
+         }
+         $VoteData = $this->GetPollVotes($OptionData, $PollModel);
+      }
+
+      // Build the result set to deliver to the page
+      $PollOptions = array();
+      foreach ($OptionData as $Option) {
+         if (!$Anonymous) {
+            $Votes = val($Option['PollOptionID'], $VoteData, array());
+            $Option['Votes'] = $Votes;
+         }
+         $PollOptions[] = $Option;
+      }
+
+      return $PollOptions;
+   }
+
+
+    public function ToString() {
         $this->LoadPoll();
         $String = '';
 		ob_start();
