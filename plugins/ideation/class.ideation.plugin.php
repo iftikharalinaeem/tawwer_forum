@@ -466,6 +466,18 @@ class IdeationPlugin extends Gdn_Plugin {
 
     // REACTIONS
 
+    public function reactionModel_getReaction_handler($sender, $args) {
+        if ($reaction = val('ReactionType', $args)) {
+            if ((val('UrlCode', $reaction) == self::REACTION_UP) || (val('UrlCode', $reaction) == self::REACTION_DOWN)) {
+                $stageModel = new StageModel();
+                if (strtolower(val('RecordType', $args) == 'discussion')
+                    && (val('Status', $stageModel->getStageByDiscussion(val('RecordID', $args))) == 'Closed')) {
+                    $args['ReactionType']['Active'] = false;
+                }
+            }
+        }
+    }
+
     /**
      * Each reaction that is changed runs through this event. Some votes change 2 reactions.
      * For example, if a user has previously downvoted something and then upvotes it, then we remove the downvote and
@@ -577,8 +589,10 @@ class IdeationPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionsController_render_before($sender, $args) {
-        $discussions = $sender->data('Discussions')->result();
-        $this->addUserVotesToDiscussions($discussions);
+        if ($sender->DeliveryType() == DELIVERY_TYPE_ALL) {
+            $discussions = $sender->data('Discussions')->result();
+            $this->addUserVotesToDiscussions($discussions);
+        }
     }
 
     /**
