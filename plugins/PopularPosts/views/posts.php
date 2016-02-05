@@ -9,7 +9,7 @@ $session = Gdn::session();
     <ul class="DataList Discussions">
         <?php
         $alt = '';
-        foreach ($popularPosts->result() as $discussion) {
+        foreach ($popularPosts as $discussion) {
             $alt = $alt == ' Alt' ? '' : ' Alt';
             writeDiscussion($discussion, $this, $session, $alt);
         }

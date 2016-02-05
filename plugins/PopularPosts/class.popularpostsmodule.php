@@ -53,8 +53,9 @@ class PopularPostsModule extends Gdn_Module {
             $key .= '.category'.$currentCategory['CategoryID'];
         }
 
-        $discussions = Gdn::cache()->get($key);
-        if ($discussions === Gdn_Cache::CACHEOP_FAILURE) {
+        $data = Gdn::cache()->get($key);
+        decho($data);
+        if ($data === Gdn_Cache::CACHEOP_FAILURE) {
             $originalAllowedFields = DiscussionModel::allowedSortFields();
             $customAllowedFields = array_merge($originalAllowedFields, ['d.CountViews']);
             DiscussionModel::allowedSortFields($customAllowedFields);
@@ -70,15 +71,21 @@ class PopularPostsModule extends Gdn_Module {
                 $where['CategoryID'] = $currentCategory['CategoryID'];
             }
 
-            $discussions = $discussionModel->getWhere($where, 'd.CountViews', 'desc', $this->CountCommentsPerPage);
+            $discussions = $discussionModel->getWhere($where, 'd.CountViews', 'desc', $this->CountCommentsPerPage)->result();
 
             // Restore allowedSortFields just by precaution.
             DiscussionModel::allowedSortFields($originalAllowedFields);
 
-            Gdn::cache()->store($key, $discussions, array(Gdn_Cache::FEATURE_EXPIRY => 10 * 60));
+            Gdn::cache()->store($key, serialize($discussions), array(Gdn_Cache::FEATURE_EXPIRY => 10 * 60));
+        } else {
+            $discussions = unserialize($data);
+            if ($discussions === false) {
+                trace('Popular Posts caching retrieval failed');
+                return;
+            }
         }
 
-        if ($discussions->count()) {
+        if (!empty($discussions)) {
             $this->setData('popularPosts', $discussions);
         }
     }
