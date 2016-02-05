@@ -51,7 +51,7 @@ class PopularPostsPlugin extends Gdn_Plugin {
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(
-            'Plugin.PopularPosts.MaxAge' => '30',
+            'PopularPosts.MaxAge' => '30',
         ));
 
         $sender->Form->setModel($configurationModel);
@@ -60,13 +60,13 @@ class PopularPostsPlugin extends Gdn_Plugin {
         if ($sender->Form->authenticatedPostBack() === false) {
             $sender->Form->setData($configurationModel->Data);
         } else {
-            $configurationModel->Validation->applyRule('Plugin.PopularPosts.MaxAge', 'Required');
-            $configurationModel->Validation->applyRule('Plugin.PopularPosts.MaxAge', 'Integer');
+            $configurationModel->Validation->applyRule('PopularPosts.MaxAge', 'Required');
+            $configurationModel->Validation->applyRule('PopularPosts.MaxAge', 'Integer');
 
-            if ($sender->Form->getFormValue('Plugin.PopularPosts.MaxAge') > 30) {
-                $sender->Form->setFormValue('Plugin.PopularPosts.MaxAge', 30);
-            } else if ($sender->Form->getFormValue('Plugin.PopularPosts.MaxAge') < 0) {
-                $sender->Form->setFormValue('Plugin.PopularPosts.MaxAge', 0);
+            if ($sender->Form->getFormValue('PopularPosts.MaxAge') > 30) {
+                $sender->Form->setFormValue('PopularPosts.MaxAge', 30);
+            } else if ($sender->Form->getFormValue('PopularPosts.MaxAge') < 0) {
+                $sender->Form->setFormValue('PopularPosts.MaxAge', 0);
             }
 
             $saved = $sender->Form->save();

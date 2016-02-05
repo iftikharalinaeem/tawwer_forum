@@ -49,7 +49,7 @@ class PopularPostsModule extends Gdn_Module {
             return;
         }
 
-        $key = 'plugin.popularPosts.data';
+        $key = 'popularPosts.data';
 
         // Cache data per category too
         if ($this->categoryID !== null) {
@@ -65,7 +65,7 @@ class PopularPostsModule extends Gdn_Module {
             $discussionModel = new DiscussionModel();
 
             // Max age in days
-            $maxAge = 60 * 60 * 24 * c('Plugin.PopularPosts.MaxAge', 30);
+            $maxAge = 60 * 60 * 24 * c('PopularPosts.MaxAge', 30);
             $where = array('DateInserted >=' => date('Y-m-d', time() - $maxAge));
 
 
