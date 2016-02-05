@@ -40,31 +40,30 @@ class KeenIOTracker implements TrackerInterface {
         $pageViews->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
             ->setTitle(t('Pageviews'))
             ->setEventCollection('page')
-            ->setTimeframe('previous_1_months')
+            ->setRelativeTimeframe('this', 1, 'month')
             ->setInterval('daily')
             ->addFilter([
                 'operator'       => 'eq',
-                'property_name'  => 'event',
+                'property_name'  => 'type',
                 'property_value' => 'page_view'
             ]);
 
         $pageviewChart = new KeenIOChart();
-        $keenCharts[] = $pageviewChart->setType('spline')
-            ->addQuery($pageViews);
 
         $newDiscussions = new KeenIOQuery();
         $newDiscussions->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
             ->setTitle(t('Discussions'))
-            ->setEventCollection('posts')
-            ->setTimeframe('previous_1_months')
+            ->setEventCollection('post')
+            ->setRelativeTimeframe('this', 1, 'month')
             ->setInterval('daily')
             ->addFilter([
                 'operator'       => 'eq',
                 'property_name'  => 'type',
                 'property_value' => 'discussion_add'
             ]);
-        $discussionChart = new KeenIOChart();
-        $keenCharts[] = $discussionChart->setType('spline')
+
+        $keenCharts[] = $pageviewChart->setType('spline')
+            ->addQuery($pageViews)
             ->addQuery($newDiscussions);
 
         if (array_key_exists('KeenIOChart', $charts) && is_array($charts['KeenIOChart'])) {

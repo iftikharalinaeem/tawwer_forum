@@ -188,6 +188,20 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * @link https://keen.io/docs/api/#absolute-timeframes
+     * @param string $start A ISO-8601-formatted date string, representing the beginning of the timeframe.
+     * @param string $end A ISO-8601-formatted date string representing the end of the timeframe.
+     * @return $this
+     */
+    public function setAbsoluteTimeframe($start, $end) {
+        $this->timeframe =[
+            'start' => $start,
+            'end'   => $end
+        ];
+        return $this;
+    }
+
+    /**
      * @link https://keen.io/docs/api/#analyses
      * @param string $analysisType
      * @return $this
@@ -228,12 +242,14 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
-     * @link https://keen.io/docs/api/#timeframe
-     * @param string $timeframe
+     * @link https://keen.io/docs/api/#relative-timeframes
+     * @param string $rel Use "this" to include units to current.  Use "previous" to omit current, incomplete unit.
+     * @param int $number Any whole number greater than 0 to indicate number of units.
+     * @param string $units Time interval (e.g. “minutes”, “hours”, “days”, “weeks”, “months”, or “years”).
      * @return $this
      */
-    public function setTimeframe($timeframe) {
-        $this->timeframe = $timeframe;
+    public function setRelativeTimeframe($rel, $number, $units) {
+        $this->timeframe = "{$rel}_{$number}_{$units}";
         return $this;
     }
 
