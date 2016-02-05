@@ -46,6 +46,7 @@ One the dashboard is created it will be blank. There should be a message instruc
 
 - All user-generated dashboards cannot be locked.
 - All user-generated dashboards will go in a single section called "Dashboards".
+- All shared dashboards must have a unique name.
 - Users should be able to edit their name/shared information of their dashboards.
 - There should be a permission to allow roles to edit other users' shared dashboards.
 - When viewing other dashboards there will be a button on each widget to allow a user to add that widget to their dashboard. If they have several dashoards then they can choose which one to add the widget to.
@@ -62,3 +63,11 @@ The architecture presented here should have some sort of data structure. The dat
 - The data structure should probably contain a mixture of classes and arrays. - The data structure will be presented in the database in the case of personal dashboards and in a PHP file in the case of built-in dashboards.
 - The database structure will be loaded and merged with the built-in dashboard. This will then be passed off to the client where the client will interpret the rendering of the widgets. The process can be done dashboard-by-dashboard, but eventually the entire data structure will be client-side to allow for a full javascript analytics application.
 - It should be possible to add a widget to a built-in dashboard in a plugin or by adding another row in the database. If it's added in the database it will just be merged with the rest of the personal dashboards. This feature will be useful for adding custom analytics reports for VIP customers.
+
+## Version 1
+
+The version 1 of anlytics will limit some of the features described above.
+
+- In terms of sections/dashboards. The initial development will not display sections, but just use them for ordering. There will be one section on the side-menu called "Analytics". Then each dashboard will just be a link under that.
+- There won't be a way to add personal dashboards. Instead, the button on widgets should say "add to my dashboard". The first time a user does this the system will create a personal dashboard called "My Dashboard".
+- **Recommendation**: Get the basics of built-in dashboards working before doing any personal dashboard work. This way we can add as many built-in widgets as possible and iterate on the needs of them before the customization work is one. There is a chance all personal dashboard functionality will be released post version 1.
