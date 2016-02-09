@@ -123,18 +123,18 @@ class AnalyticsTracker {
     }
 
     /**
-     * Grab an array representing available analytics charts.
+     * Grab an array representing available default analytics widgets.
      *
      * @return array
      */
-    public function getCharts() {
-        $charts = [];
+    public function getDefaultWidgets() {
+        $widgets = [];
 
         foreach ($this->trackers as $interface) {
-            $interface->addCharts($charts);
+            $interface->addWidgets($widgets);
         }
 
-        return $charts;
+        return $widgets;
     }
 
     /**

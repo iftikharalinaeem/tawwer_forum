@@ -28,19 +28,16 @@ class KeenIOTracker implements TrackerInterface {
     }
 
     /**
-     * Add chart configurations to the ongoing list of charts.
+     * Add widget configurations to the ongoing list.
      *
-     * @param array $charts Incoming array of charts to add to.
+     * @param array $widgets Incoming array of charts to add to.
      */
-    public function addCharts(array &$charts) {
-        $keenCharts = [];
-
-        // Pageviews
-        $pageViews = new KeenIOQuery();
-        $pageViews->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+    public function addWidgets(array &$widgets) {
+        // Build our query.
+        $pageViewQuery = new KeenIOQuery();
+        $pageViewQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
             ->setTitle(t('Pageviews'))
             ->setEventCollection('page')
-            ->setRelativeTimeframe('this', 1, 'month')
             ->setInterval('daily')
             ->addFilter([
                 'operator'       => 'eq',
@@ -48,13 +45,22 @@ class KeenIOTracker implements TrackerInterface {
                 'property_value' => 'page_view'
             ]);
 
-        $pageviewChart = new KeenIOChart();
+        // Configure our widget, complete with query.
+        $pageViewsWidget = new AnalyticsWidget();
+        $pageViewsWidget->setID('pageviews')
+            ->setTitle(t('Pageviews'))
+            ->setHandler('KeenIOWidget')
+            ->setType('chart')
+            ->setData(['query' => $pageViewQuery]);
 
-        $newDiscussions = new KeenIOQuery();
-        $newDiscussions->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+        // Save that widget.
+        $widgets['pageviews'] = $pageViewsWidget;
+
+        // Rinse and repeat.
+        $newDiscussionsQuery = new KeenIOQuery();
+        $newDiscussionsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
             ->setTitle(t('Discussions'))
             ->setEventCollection('post')
-            ->setRelativeTimeframe('this', 1, 'month')
             ->setInterval('daily')
             ->addFilter([
                 'operator'       => 'eq',
@@ -62,15 +68,13 @@ class KeenIOTracker implements TrackerInterface {
                 'property_value' => 'discussion_add'
             ]);
 
-        $keenCharts[] = $pageviewChart->setType('spline')
-            ->addQuery($pageViews)
-            ->addQuery($newDiscussions);
-
-        if (array_key_exists('KeenIOChart', $charts) && is_array($charts['KeenIOChart'])) {
-            $charts['KeenIOChart'] = array_merge($charts['KeenIOChart'], $keenCharts);
-        } else {
-            $charts['KeenIOChart'] = $keenCharts;
-        }
+        $newDiscussionsWidget = new AnalyticsWidget();
+        $newDiscussionsWidget->setID('new-discussions')
+            ->setTitle(t('New Discussions'))
+            ->setHandler('KeenIOWidget')
+            ->setType('chart')
+            ->setData(['query' => $newDiscussionsQuery]);
+        $widgets['new-discussions'] = $newDiscussionsWidget;
     }
 
     /**
@@ -115,7 +119,7 @@ class KeenIOTracker implements TrackerInterface {
         if ($inDashboard) {
             $controller->addJsFile('d3.min.js', 'plugins/vanillaanalytics');
             $controller->addJsFile('c3.min.js', 'plugins/vanillaanalytics');
-            $controller->addJsFile('keeniochart.min.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('keeniowidget.min.js', 'plugins/vanillaanalytics');
         }
     }
 

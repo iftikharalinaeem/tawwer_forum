@@ -1,12 +1,25 @@
 /**
- * keen.io chart object.
+ * keen.io widget object.
  * @param {object} rawConfig Configuration object containing chart details.
  */
-function KeenIOChart(rawConfig) {
+function KeenIOWidget(rangeStart, rangeEnd, config, type, title) {
     this.client      = null;
-    this.config      = rawConfig || {};
+    this.config      = config || {};
     this.chartConfig = this.config.chart || {};
     this.query       = [];
+
+    if (typeof rangeEnd !== 'object' || !(rangeEnd instanceof Date)) {
+        this.rangeEnd = new Date();
+    } else {
+        this.rangeEnd = rangeEnd;
+    }
+
+    if (typeof rangeStart !== 'object' || !(rangeStart instanceof Date)) {
+        this.rangeStart = new Date();
+        this.rangeStart.setMonth(rangeEnd.getMonth() - 1);
+    } else {
+        this.rangeStart = rangeStart;
+    }
 
     this.addQuery(this.config.query || {});
 }
@@ -15,7 +28,7 @@ function KeenIOChart(rawConfig) {
  * Setup the query object we'll need for the chart.
  * @param {object} config A DOM element where the chart should be written.
  */
-KeenIOChart.prototype.addQuery = function(config ) {
+KeenIOWidget.prototype.addQuery = function(config ) {
     if (config instanceof Array) {
         for (i in config) {
             this.addQuery(config[i]);
@@ -25,21 +38,19 @@ KeenIOChart.prototype.addQuery = function(config ) {
         return;
     }
 
-    /**
-     * If we're including multiple queries in this chart, we need to make sure their interval and timeframe are
-     * in sync with one another.  To do this, we take the first query's values and use them for all subsequent
-     * queries, just to be sure.
-     */
-    var interval, timeframe;
+    var timeframe = {
+        start : this.rangeStart.toISOString(),
+        end   : this.rangeEnd.toISOString()
+    };
+
+    var interval;
     if (this.query.length > 0 && typeof this.query[0] !== 'undefined') {
         var alphaQuery       = this.query[0];
         var alphaQueryParams = alphaQuery.params || {};
 
         interval  = alphaQueryParams.interval || null;
-        timeframe = alphaQueryParams.timeframe || null;
     } else {
         interval  = config.interval || null;
-        timeframe = config.timeframe || null;
     }
 
     var query = new Keen.Query(
@@ -60,7 +71,7 @@ KeenIOChart.prototype.addQuery = function(config ) {
  * Get the current instance of the Keen SDK client.  Create a new one, if necessary.
  * @returns {null|Keen}
  */
-KeenIOChart.prototype.getClient = function() {
+KeenIOWidget.prototype.getClient = function() {
     if (!this.client && typeof Keen == 'function') {
         var projectID = gdn.meta['keenio.projectID'] || false;
         var readKey = gdn.meta['keenio.readKey'] || false;
@@ -78,7 +89,7 @@ KeenIOChart.prototype.getClient = function() {
  * Output a chart into the target container element.
  * @param {object} container A DOM element where the chart should be written.
  */
-KeenIOChart.prototype.write = function(container) {
+KeenIOWidget.prototype.write = function(container) {
     if (typeof container !== 'object') {
         return;
     }

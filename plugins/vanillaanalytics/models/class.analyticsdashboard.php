@@ -3,7 +3,7 @@
 /**
  * A collection of analytics charts and metrics, grouped by panels.
  */
-class AnalyticsDashboard {
+class AnalyticsDashboard implements JsonSerializable {
 
     /**
      * @var array Collection of panels.
@@ -18,7 +18,12 @@ class AnalyticsDashboard {
     /**
      * @var array An associative array of default dashboard configurations.
      */
-    protected static $defaultDashboards = [];
+    protected static $defaults = [];
+
+    /**
+     * @var string Title for this dashboard.
+     */
+    protected $title = '';
 
     /**
      * AnalyticsDashboard constructor.
@@ -30,8 +35,8 @@ class AnalyticsDashboard {
         }
 
         // Create the default panels: metrics and charts.
-        $this->panels['metrics'] = new AnalyticsPanel();
-        $this->panels['charts']  = new AnalyticsPanel();
+        $this->panels['metrics'] = new AnalyticsPanel('metrics');
+        $this->panels['charts']  = new AnalyticsPanel('charts');
     }
 
     /**
@@ -42,15 +47,54 @@ class AnalyticsDashboard {
      * @return bool|AnalyticsDashboard An AnalyticsDashboard on success, false on failure.
      */
     public function getID($dashboardID) {
+        $defaults = $this->getDefaults();
         $result = false;
 
         if (ctype_digit($dashboardID)) {
             // Database lookup
-        } elseif (array_key_exists($dashboardID, static::$defaultDashboards)) {
-            $result = static::$defaultDashboards[$dashboardID];
+        } elseif (array_key_exists($dashboardID, $defaults)) {
+            $result = $defaults[$dashboardID];
         }
 
         return $result;
+    }
+
+    /**
+     * Grab a list of default dashboard configurations.
+     *
+     * @return array
+     */
+    public function getDefaults() {
+        if (empty(static::$defaults)) {
+            $defaults = [
+                'Overview' => [
+                    'metrics' => [],
+                    'charts' => ['pageviews', 'new-discussions']
+                ]
+            ];
+
+            foreach ($defaults as $title => $panels) {
+                $dashboardID = strtolower(preg_replace(
+                    '#[^A-Za-z0-9\-]#',
+                    '',
+                    str_replace(' ', '-', $title)
+                ));
+                $dashboard = new AnalyticsDashboard($dashboardID);
+                $dashboard->setTitle(t($title));
+
+                if (is_array($panels)) {
+                    foreach ($panels as $panelID => $widgets) {
+                        if ($currentPanel = $dashboard->getPanel($panelID)) {
+                            $currentPanel->addWidget($widgets);
+                        }
+                    }
+                }
+
+                static::$defaults[$dashboardID] = $dashboard;
+            }
+        }
+
+        return static::$defaults;
     }
 
     /**
@@ -62,7 +106,7 @@ class AnalyticsDashboard {
     public function getPanel($panelID) {
         $result = false;
 
-        if (in_array($panelID, $this->panels)) {
+        if (array_key_exists($panelID, $this->panels)) {
             $result = $this->panels[$panelID];
         }
 
@@ -79,6 +123,59 @@ class AnalyticsDashboard {
     }
 
     /**
+     * Get the title for this dashboard.
+     *
+     * @return string
+     */
+    public function getTitle() {
+        return $this->title;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON.
+     */
+    public function jsonSerialize() {
+        return [
+            'dashboardID' => $this->dashboardID,
+            'panels'      => $this->panels,
+            'title'       => $this->title
+        ];
+    }
+
+    /**
+     * Render an analytics dashboard page.
+     *
+     * @param Gdn_Controller $sender
+     * @param AnalyticsDashboard $dashboard
+     */
+    public function render(Gdn_Controller $sender, AnalyticsDashboard $dashboard) {
+        $sender->addSideMenu();
+
+        $sender->setData('Title', sprintf(
+            t('Analytics: %1$s'),
+            $dashboard->getTitle()
+        ));
+
+        $sender->setData(
+            'AnalyticsDashboard',
+            $dashboard
+        );
+
+        $sender->addDefinition(
+            'analyticsDashboard',
+            $dashboard
+        );
+
+        $sender->addJsFile('dashboard.min.js', 'plugins/vanillaanalytics');
+
+        $sender->render(
+            'analytics',
+            false,
+            'plugins/vanillaanalytics'
+        );
+    }
+
+    /**
      * Set this dashboard's unique identifier.
      *
      * @param string $dashboardID A unique identifier for this instance.
@@ -86,6 +183,17 @@ class AnalyticsDashboard {
      */
     public function setID($dashboardID) {
         $this->dashboardID = $dashboardID;
+        return $this;
+    }
+
+    /**
+     * Set the title for this dashboard.
+     *
+     * @param string $title New title for this dashboard.
+     * @return $this
+     */
+    public function setTitle($title) {
+        $this->title = $title;
         return $this;
     }
 }

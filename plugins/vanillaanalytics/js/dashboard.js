@@ -1,28 +1,49 @@
 $(document).ready(function() {
-    var analyticsCharts = gdn.meta.analyticsCharts || false;
-    var chartContainer = document.getElementById('charts') || false;
+    var analyticsDashboard = gdn.meta.analyticsDashboard || false;
 
-    if (typeof analyticsCharts !== 'object' || typeof chartContainer !== 'object') {
+    if (typeof analyticsDashboard !== 'object' || typeof analyticsDashboard.panels !== 'object') {
         return;
     }
 
-    var chartCollection, chartIndex, trackerChart;
+    var panels = analyticsDashboard.panels;
 
-    for (chartCollection in analyticsCharts) {
-        if (typeof window[chartCollection] === 'function') {
-            for (chartIndex in analyticsCharts[chartCollection]) {
-                chart = analyticsCharts[chartCollection][chartIndex];
-                if (typeof chart === 'object') {
+    if (typeof rangeEnd !== 'object' || !(rangeEnd instanceof Date)) {
+        var rangeEnd = new Date();
+    }
+    if (typeof rangeStart !== 'object' || !(rangeStart instanceof Date)) {
+        var rangeStart = new Date();
+        rangeStart.setMonth(rangeEnd.getMonth() - 1);
+    }
+
+    for (var panelID in panels) {
+        var panelContainer = document.getElementById('analytics_panel_' + panelID);
+        var widgets = panels[panelID].widgets || false;
+
+        if (typeof panelContainer !== 'object' || !Array.isArray(widgets)) {
+            continue;
+        }
+
+        widgets.forEach(function(currentValue, index, array) {
+            var data     = currentValue.data || [];
+            var handler  = currentValue.handler || false;
+            var title    = currentValue.title || '';
+            var type     = currentValue.type || false;
+            var widgetID = currentValue.widgetID || false;
+
+            if (typeof window[handler] === 'function') {
+                if (handler || widgetID || type) {
                     var chartCanvas = document.createElement('div');
-                    chartCanvas.setAttribute('id', 'chart-' + chartCollection + '-' + (parseInt(chartIndex) + 1));
-                    chartCanvas.setAttribute('class', 'va-chart');
+                    chartCanvas.setAttribute('id', 'analytics_widget_' + widgetID);
+                    chartCanvas.setAttribute('class', 'analytics-widget analytics-widget-' + type);
 
-                    trackerChart = new window[chartCollection](chart);
+                    var trackerChart = new window[handler](rangeStart, rangeEnd, data, type, title);
                     trackerChart.write(chartCanvas);
 
-                    chartContainer.appendChild(chartCanvas);
+                    panelContainer.appendChild(chartCanvas);
                 }
+            } else {
+                console.log('Failed to locate handler: ' + handler);
             }
-        }
+        });
     }
 });

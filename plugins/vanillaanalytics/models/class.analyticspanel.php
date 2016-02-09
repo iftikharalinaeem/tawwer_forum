@@ -3,7 +3,7 @@
 /**
  * A collection of analytics widgets.
  */
-class AnalyticsPanel {
+class AnalyticsPanel implements JsonSerializable {
 
     /**
      * @var bool Unique identifier, per dashboard, for this panel.
@@ -28,12 +28,47 @@ class AnalyticsPanel {
     /**
      * Add a new widget to this panel.
      *
-     * @param AnalyticsWidget $widget Widget to add to the panel.
+     * @param array|string|AnalyticsWidget $widget Widget to add to the panel.
      * @return $this
      */
-    public function addWidget(AnalyticsWidget $widget) {
-        $this->widgets[] = $widget;
+    public function addWidget($widget) {
+        if ($widget instanceof Analyticswidget) {
+            // Is this an actual widget instance?
+            $this->widgets[] = $widget;
+        } elseif (is_array($widget)) {
+            // Is this an array we need to iterate through?
+            foreach ($widget as $currentWidget) {
+                $this->addWidget($currentWidget);
+            }
+        } elseif (is_string($widget)) {
+            // Is this a string we can use to lookup a dashboard?
+            $widgetModel = new AnalyticsWidget();
+            $newWidget = $widgetModel->getID($widget);
+            if ($newWidget) {
+                $this->widgets[] = $newWidget;
+            }
+        }
+
         return $this;
+    }
+
+    /**
+     * Fetch the list of widgets in this panel.
+     *
+     * @return array
+     */
+    public function getWidgets() {
+        return $this->widgets;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON.
+     */
+    public function jsonSerialize() {
+        return [
+            'panelID' => $this->panelID,
+            'widgets' => $this->widgets
+        ];
     }
 
     /**

@@ -11,9 +11,19 @@ class AnalyticsSection {
     protected $dashboards = [];
 
     /**
+     * @var array A list of default section configurations.
+     */
+    static protected $defaults = [];
+
+    /**
      * @var string A unique identifier for this section.
      */
     public $sectionID;
+
+    /**
+     * @var string Human-readable title for this section.
+     */
+    protected $title = '';
 
     /**
      * AnalyticsSection constructor.
@@ -28,11 +38,27 @@ class AnalyticsSection {
     /**
      * Add an instance of AnalyticsDashboard to the section.
      *
-     * @param AnalyticsDashboard $dashboard New dashboard for the collection.
+     * @param array|string|AnalyticsDashboard $dashboard New dashboard for the collection.
      * @return $this
      */
-    public function addDashboard(AnalyticsDashboard $dashboard) {
-        $this->dashboards[] = $dashboard;
+    public function addDashboard($dashboard) {
+        if ($dashboard instanceof AnalyticsDashboard) {
+            // Is this an actual dashboard instance?
+            $this->dashboards[] = $dashboard;
+        } elseif (is_array($dashboard)) {
+            // Is this an array we need to iterate through?
+            foreach ($dashboard as $currentDashboard) {
+                $this->addDashboard($currentDashboard);
+            }
+        } elseif (is_string($dashboard)) {
+            // Is this a string we can use to lookup a dashboard?
+            $dashboardModel = new AnalyticsDashboard();
+            $newDashboard = $dashboardModel->getID($dashboard);
+            if ($newDashboard) {
+                $this->dashboards[] = $newDashboard;
+            }
+        }
+
         return $this;
     }
 
@@ -46,6 +72,59 @@ class AnalyticsSection {
     }
 
     /**
+     * Attempt to fetch a section by its ID.
+     *
+     * @param string $sectionID Unique identifier used to lookup the section.
+     * @return bool|AnalyticsSection An AnalyticsSection on success, false on failure.
+     */
+    public function getID($sectionID) {
+        $result = false;
+        $defaults = $this->getDefaults();
+
+        if (array_key_exists($sectionID, $defaults)) {
+            $result = $defaults[$sectionID];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Fetch the title for this section.
+     *
+     * @return string
+     */
+    public function getTitle() {
+        return $this->title;
+    }
+
+    /**
+     * Get the default section configurations.  Generate them, if necessary.
+     *
+     * @return array
+     */
+    public function getDefaults() {
+        if (empty(static::$defaults)) {
+            $defaultSections = [
+                'Basic' => ['overview']
+            ];
+
+            foreach ($defaultSections as $title => $dashboards) {
+                $sectionID = strtolower(preg_replace(
+                    '#[^A-Za-z0-9\-]#',
+                    '',
+                    str_replace(' ', '-', $title)
+                ));
+                $section = new AnalyticsSection($sectionID);
+                $section->setTitle = t($title);
+                $section->addDashboard($dashboards);
+                static::$defaults[$sectionID] = $section;
+            }
+        }
+
+        return static::$defaults;
+    }
+
+    /**
      * Set this section's unique identifier.
      *
      * @param string $sectionID The unique identifier for this section.
@@ -53,6 +132,17 @@ class AnalyticsSection {
      */
     public function setID($sectionID) {
         $this->sectionID = $sectionID;
+        return $this;
+    }
+
+    /**
+     * Set the title for this section.
+     *
+     * @param $title New title for this section.
+     * @return $this
+     */
+    public function setTitle($title) {
+        $this->title = $title;
         return $this;
     }
 }

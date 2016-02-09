@@ -35,14 +35,18 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param object $sender DashboardController.
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
-        /*
-        $sender->EventArguments['SideMenu']->addLink(
-            'Dashboard',
-            T('Analytics'),
-            'settings/analytics',
-            'Garden.Settings.Manage'
-        );
-        */
+        $sectionModel = new AnalyticsSection();
+        Logger::event('analytics_menu', Logger::INFO, 'Sections', $sectionModel->getDefaults());
+        foreach ($sectionModel->getDefaults() as $section) {
+            foreach ($section->getDashboards() as $dashboard) {
+                $sender->EventArguments['SideMenu']->addLink(
+                    T('Analytics'),
+                    T($dashboard->getTitle()),
+                    "settings/analytics/dashboard/{$dashboard->dashboardID}",
+                    'Garden.Settings.Manage'
+                );
+            }
+        }
     }
 
     /**
@@ -263,25 +267,24 @@ class VanillaAnalytics extends Gdn_Plugin {
      * Add our primary analytics page.
      * @param $sender
      */
-    public function settingsController_analytics_create($sender) {
+    public function settingsController_analytics_create($sender, $entityType = false, $entityID = false) {
         $sender->permission('Garden.Settings.Manage');
 
-        $sender->addSideMenu();
+        switch($entityType) {
+            case 'dashboard':
+                $dashboardModel = new AnalyticsDashboard();
+                $dashboard = $dashboardModel->getID($entityID);
 
-        $sender->setData('Title', t('Analytics'));
+                if ($dashboard) {
+                    $dashboardModel->render($sender, $dashboard);
+                } else {
+                    redirect('settings');
+                }
 
-        $sender->addDefinition(
-            'analyticsCharts',
-            AnalyticsTracker::getInstance()->getCharts()
-        );
-
-        $sender->addJsFile('dashboard.min.js', 'plugins/vanillaanalytics');
-
-        $sender->render(
-            'analytics',
-            false,
-            'plugins/vanillaanalytics'
-        );
+                break;
+            default:
+                redirect('settings');
+        }
     }
 
     /**
