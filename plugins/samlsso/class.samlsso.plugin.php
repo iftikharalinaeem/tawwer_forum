@@ -44,7 +44,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $request->relayState = $target;
         $url = $request->getRedirectUrl();
         Gdn::session()->stash('samlsso', null, true);
-        Logger::event('saml_authrequest_sent', Logger::DEBUG, 'SAML request {requetid} sent to {requesthost}.',
+        Logger::event('saml_authrequest_sent', Logger::INFO, 'SAML request {requetid} sent to {requesthost}.',
              array('requestid' => $request->lastID, 'requesthost' => parse_url($url, PHP_URL_HOST), 'requesturl' => $url));
         redirect($url);
     }
@@ -218,7 +218,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
         $url = $request->getRedirectUrl();
         Gdn::session()->stash('samlsso', null, true);
-        Logger::event('saml_authrequest_sent', Logger::DEBUG, 'SAML request {requestid} sent to {requesthost}.',
+        Logger::event('saml_authrequest_sent', Logger::INFO, 'SAML request {requestid} sent to {requesthost}.',
              array('requestid' => $request->lastID, 'requesthost' => parse_url(''), 'requesturl' => $url));
         redirect($url);
     }
@@ -304,7 +304,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
             $response = new OneLogin_Saml_Response($settings, $Sender->Request->post('SAMLResponse'));
 //            $xml = $response->document->saveXML();
 
-            Logger::event('saml_response_received', Logger::DEBUG, "SAML response received.");
+            Logger::event('saml_response_received', Logger::INFO, "SAML response received.");
 
             try {
                 if (!$response->isValid()) {
