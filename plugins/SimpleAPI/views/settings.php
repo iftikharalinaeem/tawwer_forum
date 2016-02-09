@@ -11,7 +11,7 @@
    <?php
    echo Wrap(T('Need More Help?'), 'h2');
    echo '<ul>';
-   echo Wrap(Anchor("Vanilla API Documentation", 'http://vanillaforums.com/blog/api/'), 'li');
+   echo Wrap(Anchor("Vanilla API Documentation", 'https://docs.vanillaforums.com/api/'), 'li');
    echo '</ul>';
    ?>
 </div>
