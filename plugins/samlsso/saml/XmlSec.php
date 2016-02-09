@@ -50,6 +50,51 @@ class OneLogin_Saml_XmlSec
     }
 
     /**
+     * Verify that the document contains a successful status.
+     *
+     * If the document doesn't contain any status then it's also considered valid for the purposes of this check. The
+     * reason for this is another validation should fail in this case and its error message should be seen.
+     *
+     * @param bool $throw Whether or not to throw an exception if the validation fails.
+     * @return bool Returns **true** if the stats is successful or **false** otherwise.
+     */
+    public function validateStatus($throw = false) {
+        $rootNode = $this->getDocument();
+
+        $errors = [];
+        $statusNodes = $rootNode->getElementsByTagName('StatusCode');
+        for ($i = 0; $i < $statusNodes->length; $i++) {
+            $node = $statusNodes->item($i);
+
+            $value = $node->attributes->getNamedItem('Value');
+            $value = $value ? $value->textContent : '';
+
+            if (!$value || stripos($value, 'success') !== false) {
+                return true;
+            }
+
+            $error = t('saml.error.'.$value, '');
+            if (!$error) {
+                // There is no translation for this error.
+                if (empty($errors)) {
+                    $error = sprintf(t('The IDP returned the following error: "%s".'), $value);
+                } else {
+                    $error = sprintf(t('The IDP also returned the following error: "%s".'), $value);
+                }
+            }
+            $errors[$value] = $error;
+        }
+
+        if (empty($errors)) {
+            return true;
+        } elseif ($throw) {
+            throw new Gdn_UserException(implode(' ', $errors), 400);
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Verify that the document is still valid according
      *
      * @return bool
@@ -122,6 +167,8 @@ class OneLogin_Saml_XmlSec
         if (!$retVal) {
             throw new Exception('Reference Validation Failed');
         }
+
+        $this->validateStatus(true);
 
         $singleAssertion = $this->validateNumAssertions();
         if (!$singleAssertion) {
