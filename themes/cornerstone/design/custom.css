@@ -799,11 +799,15 @@ a.Bookmarked:hover:before {
 .nav > li {
   position: relative;
   float: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .nav > li > a {
   position: relative;
   display: block;
   padding: 10px 15px;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .nav-stacked {
   margin-bottom: 20px;
@@ -1007,11 +1011,15 @@ a.Bookmarked:hover:before {
 .FilterMenu > li {
   position: relative;
   float: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .FilterMenu > li > a {
   position: relative;
   display: block;
   padding: 10px 15px;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .FilterMenu > li {
   float: none;
@@ -1055,11 +1063,15 @@ a.Bookmarked:hover:before {
 .PanelInfo > li {
   position: relative;
   float: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .PanelInfo > li > a {
   position: relative;
   display: block;
   padding: 10px 15px;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .PanelInfo > li {
   float: none;
