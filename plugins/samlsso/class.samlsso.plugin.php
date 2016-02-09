@@ -354,6 +354,13 @@ class SamlSSOPlugin extends Gdn_Plugin {
     }
 
     /**
+     * @param Gdn_Controller $sender
+     */
+    public function base_render_before($sender) {
+        saveToConfig('Garden.SignIn.Popup', false, false);
+    }
+
+    /**
      *
      *
      * @param $name
