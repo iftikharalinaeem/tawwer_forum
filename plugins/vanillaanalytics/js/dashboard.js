@@ -9,9 +9,11 @@ $(document).ready(function() {
 
     if (typeof rangeEnd !== 'object' || !(rangeEnd instanceof Date)) {
         var rangeEnd = new Date();
+        rangeEnd.setHours(0, 0, 0);
     }
     if (typeof rangeStart !== 'object' || !(rangeStart instanceof Date)) {
         var rangeStart = new Date();
+        rangeStart.setHours(0, 0, 0);
         rangeStart.setMonth(rangeEnd.getMonth() - 1);
     }
 

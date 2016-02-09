@@ -10,12 +10,14 @@ function KeenIOWidget(rangeStart, rangeEnd, config, type, title) {
 
     if (typeof rangeEnd !== 'object' || !(rangeEnd instanceof Date)) {
         this.rangeEnd = new Date();
+        this.rangeEnd.setHours(0, 0, 0);
     } else {
         this.rangeEnd = rangeEnd;
     }
 
     if (typeof rangeStart !== 'object' || !(rangeStart instanceof Date)) {
         this.rangeStart = new Date();
+        this.rangeStart.setHours(0, 0, 0);
         this.rangeStart.setMonth(rangeEnd.getMonth() - 1);
     } else {
         this.rangeStart = rangeStart;
