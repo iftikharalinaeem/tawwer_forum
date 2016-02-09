@@ -46,7 +46,7 @@ class OneLogin_Saml_XmlSec
     {
         $rootNode = $this->_document;
         $assertionNodes = $rootNode->getElementsByTagName('Assertion');
-        return ($assertionNodes->length == 1);
+        return ($assertionNodes->length < 2);
     }
 
     /**
