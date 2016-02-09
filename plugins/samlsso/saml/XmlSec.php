@@ -87,7 +87,19 @@ class OneLogin_Saml_XmlSec
 
         if (empty($errors)) {
             return true;
-        } elseif ($throw) {
+        }
+
+        // Check to see if there is a dedicated error message from the response.
+        $statusMessage = $rootNode->getElementsByTagName('StatusMessage');
+        if ($statusMessage->length > 0) {
+            $errors = [];
+            for ($i = 0; $i < $statusMessage->length; $i++) {
+                $node = $statusMessage->item($i);
+                $errors[] = $node->textContent;
+            }
+        }
+
+        if ($throw) {
             throw new Gdn_UserException(implode(' ', $errors), 400);
         } else {
             return false;
