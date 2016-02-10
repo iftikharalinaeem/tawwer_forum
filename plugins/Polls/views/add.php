@@ -35,7 +35,7 @@ if (!$CancelUrl) {
 
       echo '<div class="P">';
          echo $this->Form->Label('Optional Description', 'Body');
-         echo Wrap($this->Form->BodyBox('Body'), 'div');
+         echo Wrap($this->Form->bodyBox(), 'div');
       echo '</div>';
 
       if (!$this->Data('_AnonymousPolls')) {
