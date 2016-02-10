@@ -17,10 +17,16 @@
     position: relative;
     float: left;
 
+    // For headings
+    text-overflow: ellipsis;
+    overflow: hidden;
+
     > a {
       position: relative;
       display: block;
       padding: @nav-link-padding-vertical @nav-link-padding-horizontal;
+      text-overflow: ellipsis;
+      overflow: hidden;
     }
   }
 }
