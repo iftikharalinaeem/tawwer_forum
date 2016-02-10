@@ -368,12 +368,14 @@ class ReactionsPlugin extends Gdn_Plugin {
      * Handle user reactions.
      *
      * @param Gdn_Controller $Sender
-     * @param string $RecordType
-     * @param string $ReactionType
-     * @param int $ID
-     * @param bool $Undo
+     * @param string $RecordType Type of record we're reacting to. Discussion, comment or activity.
+     * @param string $Reaction The url code of the reaction.
+     * @param int $ID The ID of the record.
+     * @param bool $selfReact Whether a user can react to their own post
+     * @throws Exception
+     * @throws Gdn_UserException
      */
-    public function rootController_react_create($Sender, $RecordType, $Reaction, $ID) {
+    public function rootController_react_create($Sender, $RecordType, $Reaction, $ID, $selfReact) {
         if (!Gdn::Session()->IsValid()) {
             throw new Gdn_UserException(T('You need to sign in before you can do this.'), 403);
         }
@@ -402,7 +404,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         }
 
         $ReactionModel = new ReactionModel();
-        $ReactionModel->React($RecordType, $ID, $Reaction);
+        $ReactionModel->React($RecordType, $ID, $Reaction, null, $selfReact);
 
         $Sender->Render('Blank', 'Utility', 'Dashboard');
     }
