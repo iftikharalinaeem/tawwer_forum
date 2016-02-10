@@ -404,7 +404,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         }
 
         $ReactionModel = new ReactionModel();
-        $ReactionModel->React($RecordType, $ID, $Reaction, NULL, $selfReact);
+        $ReactionModel->React($RecordType, $ID, $Reaction, null, $selfReact);
 
         $Sender->Render('Blank', 'Utility', 'Dashboard');
     }
