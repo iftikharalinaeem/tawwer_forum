@@ -18,60 +18,92 @@ class PollModule extends Gdn_Module {
 	public function AssetTarget() {
 		return 'Panel';
 	}
-   
+
    private function LoadPoll() {
       $PollModel = new PollModel();
       $Poll = FALSE;
       $PollID = Gdn::Controller()->Data('PollID');
       $Discussion = Gdn::Controller()->Data('Discussion');
-      
+
       // Look in the controller for a PollID
       if ($PollID > 0)
          $Poll = $PollModel->GetID($PollID);
-      
+
       // Failing that, look for a DiscussionID
       if (!$Poll && $Discussion)
          $Poll = $PollModel->GetByDiscussionID(GetValue('DiscussionID', $Discussion));
 
-      $this->SetData('Poll', $Poll);
       if ($Poll) {
          // Load the poll options
          $PollID = GetValue('PollID', $Poll);
-         $PollOptionModel = new Gdn_Model('PollOption');
-         $OptionData = $PollOptionModel->GetWhere(array('PollID' => $PollID), 'Sort', 'asc')->ResultArray();
-         
-         // Load the poll votes
-         $Anonymous = val('Anonymous', $Poll) || C('Plugins.Polls.AnonymousPolls');
-         if (!$Anonymous) {
-            $VoteData = $this->GetPollVotes($OptionData, $PollModel);
-         }
+         $OptionData = $this->getPollOptions($PollID);
+         $PollOptions = $this->joinPollVotes($OptionData, $Poll, $PollModel);
 
-         // Build the result set to deliver to the page
-         $PollOptions = array();
-         foreach ($OptionData as $Option) {
-            if (!$Anonymous) {
-               $Votes = val($Option['PollOptionID'], $VoteData, array());
-               $Option['Votes'] = $Votes;
-            }
-            $PollOptions[] = $Option;
-         }
-         $this->SetData('PollOptions', $PollOptions);
-         
          // Has this user voted?
          $this->SetData('UserHasVoted', $PollModel->SQL
             ->Select()
             ->From('PollVote pv')
             ->Where(array(
-               'pv.UserID' => Gdn::Session()->UserID, 
+               'pv.UserID' => Gdn::Session()->UserID,
                'pv.PollOptionID' => array_column($OptionData, 'PollOptionID')
             ))
             ->Get()
             ->NumRows() > 0
          );
       }
+
+      $this->EventArguments['Poll'] = &$Poll;
+      $this->EventArguments['PollOptions'] = &$PollOptions;
+      $this->fireEvent('AfterLoadPoll');
+
+      $this->setData('PollOptions', $PollOptions);
+      $this->setData('Poll', $Poll);
    }
 
-	public function ToString() {
+    /**
+     * Get poll options for a given poll.
+     *
+     * @param $pollID The ID of the poll to retrieve.
+     * @return array|null An array representation of the Poll.
+     */
+   public function getPollOptions($pollID) {
+       $pollOptionModel = new Gdn_Model('PollOption');
+       return $pollOptionModel->getWhere(array('PollID' => $pollID), 'Sort', 'asc')->resultArray();
+   }
+
+    /**
+     * Add voting info to the poll options array and return.
+     *
+     * @param array $optionData The poll options.
+     * @param object $poll The poll to join the votes in on.
+     * @param PollModel|null $pollModel The poll model. Instantiates if not passed in.
+     * @return array The poll options array with voting info joined in.
+     */
+   public function joinPollVotes($optionData, $poll, $pollModel = null) {
+      // Load the poll votes
+      $anonymous = val('Anonymous', $poll) || C('Plugins.Polls.AnonymousPolls');
+      if (!$anonymous) {
+         if (!is_a($pollModel, 'PollModel')) {
+            $pollModel = new PollModel();
+         }
+         $voteData = $this->getPollVotes($optionData, $pollModel);
+      }
+
+      // Build the result set to deliver to the page
+      $pollOptions = array();
+      foreach ($optionData as $option) {
+         if (!$anonymous) {
+            $votes = val($option['PollOptionID'], $voteData, array());
+            $option['Votes'] = $votes;
+         }
+         $pollOptions[] = $option;
+      }
+
+      return $pollOptions;
+   }
+
+
+    public function ToString() {
         $this->LoadPoll();
         $String = '';
 		ob_start();
