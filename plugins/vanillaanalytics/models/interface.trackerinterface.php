@@ -6,13 +6,6 @@
 interface TrackerInterface {
 
     /**
-     * Add chart configurations to the ongoing list of charts.
-     *
-     * @param array $charts Incoming array of charts to add to.
-     */
-    public function addCharts(array &$charts);
-
-    /**
      * Add CSS files to the current page.
      *
      * @param Gdn_Controller $controller Instance of the current page's controller.
@@ -43,6 +36,13 @@ interface TrackerInterface {
      * @return array
      */
     public function addDefaults(array $defaults = array());
+
+    /**
+     * Add wiget configurations to the ongoing list.
+     *
+     * @param array $widgets Incoming array of widgets to add to.
+     */
+    public function addWidgets(array &$widgets);
 
     /**
      * Detect if an analytics tracker is configured for use.
