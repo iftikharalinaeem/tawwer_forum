@@ -54,10 +54,10 @@ class PollModule extends Gdn_Module {
 
       $this->EventArguments['Poll'] = &$Poll;
       $this->EventArguments['PollOptions'] = &$PollOptions;
-      $this->FireEvent('AfterLoadPoll');
+      $this->fireEvent('AfterLoadPoll');
 
       $this->setData('PollOptions', $PollOptions);
-      $this->SetData('Poll', $Poll);
+      $this->setData('Poll', $Poll);
    }
 
     /**
@@ -68,7 +68,7 @@ class PollModule extends Gdn_Module {
      */
    public function getPollOptions($pollID) {
        $pollOptionModel = new Gdn_Model('PollOption');
-       return $pollOptionModel->GetWhere(array('PollID' => $pollID), 'Sort', 'asc')->ResultArray();
+       return $pollOptionModel->getWhere(array('PollID' => $pollID), 'Sort', 'asc')->resultArray();
    }
 
     /**
@@ -86,7 +86,7 @@ class PollModule extends Gdn_Module {
          if (!is_a($pollModel, 'PollModel')) {
             $pollModel = new PollModel();
          }
-         $voteData = $this->GetPollVotes($optionData, $pollModel);
+         $voteData = $this->getPollVotes($optionData, $pollModel);
       }
 
       // Build the result set to deliver to the page
