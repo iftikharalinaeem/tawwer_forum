@@ -57,7 +57,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
         $sender->Form->setModel($configurationModel);
 
         // If seeing the form for the first time...
-        if ($sender->Form->authenticatedPostBack()) {
+        if ($sender->Form->authenticatedPostBack() === false) {
             $sender->Form->setData($configurationModel->Data);
         } elseif ($sender->Form->save()) {
             $sender->StatusMessage = t('Your changes have been saved.');
