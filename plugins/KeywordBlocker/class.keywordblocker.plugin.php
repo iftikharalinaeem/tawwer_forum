@@ -122,7 +122,6 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
 
             if (preg_match('#\b'.preg_quote($word, '#').'\b#i', $toTest) === 1) {
                 return false;
-                break;
             }
         }
 
@@ -139,13 +138,16 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
 
         if ($words === null) {
             $words = array();
+
             $wordsString = c('KeywordBlocker.Words', null);
             if ($wordsString !== null) {
+
                 $explodedWords = explode(';', $wordsString);
                 foreach ($explodedWords as &$word) {
                     $word = trim($word);
                 }
                 unset($word);
+
                 $words = $explodedWords;
             }
         }
