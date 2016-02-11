@@ -57,12 +57,10 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
         $sender->Form->setModel($configurationModel);
 
         // If seeing the form for the first time...
-        if ($sender->Form->authenticatedPostBack() === false) {
+        if ($sender->Form->authenticatedPostBack()) {
             $sender->Form->setData($configurationModel->Data);
-        } else {
-            if ($sender->Form->save()) {
-                $sender->StatusMessage = t('Your changes have been saved.');
-            }
+        } elseif ($sender->Form->save()) {
+            $sender->StatusMessage = t('Your changes have been saved.');
         }
 
         $sender->render($this->getView('configuration.php'));
@@ -87,6 +85,11 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
      * @param $args Event arguments.
      */
     public function base_checkSpam_handler($sender, $args) {
+
+        // If the post is already flagged as spam let's abort :D
+        if ($sender->EventArguments['IsSpam']) {
+            return;
+        }
 
         $isPostClean = $this->isPostClean($args['RecordType'], $args['Data']);
         if (!$isPostClean) {
