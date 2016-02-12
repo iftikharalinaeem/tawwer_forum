@@ -154,11 +154,7 @@ class IdeaCounterModule extends Gdn_Module {
      */
     public function toString() {
         if ($this->prepare()) {
-            if ($this->isOpen) {
-                $this->renderOpenCounterBox();
-            } else {
-                $this->renderClosedCounterBox();
-            }
+            $this->renderCounterBox();
         } else {
             echo '';
         }
@@ -167,10 +163,11 @@ class IdeaCounterModule extends Gdn_Module {
     /**
      * Outputs a counter that includes voting buttons.
      */
-    protected function renderOpenCounterBox() { ?>
-        <div class="DateTile idea-counter-module <?php echo val('status', $this->counter); ?>">
+    protected function renderCounterBox() { ?>
+        <div class="idea-counter-module <?php echo val('status', $this->counter).' '.val('cssClass', $this->counter); ?>">
             <div class="idea-counter-box">
                 <div class="score"><?php echo val('score', $this->counter) ?></div>
+                <?php if (val('status', $this->counter) == 'Open') { ?>
                 <div class="vote idea-menu">
                     <span class="idea-buttons">
                         <?php
@@ -181,24 +178,8 @@ class IdeaCounterModule extends Gdn_Module {
                         ?>
                     </span>
                 </div>
+                <?php } ?>
             </div>
-            <?php if ($this->showVotes) { ?>
-            <div class="votes meta"><?php echo sprintf(t('%s votes'), val('numberVotes', $this->counter)); ?></div>
-            <?php } ?>
-        </div>
-    <?php }
-
-    /**
-     * Outputs a counter without voting buttons.
-     */
-    protected function renderClosedCounterBox() { ?>
-        <div class="DateTile idea-counter-module <?php echo val('status', $this->counter).' '.val('cssClass', $this->counter) ?>">
-            <div class="idea-counter">
-                <div class="score"><?php echo val('score', $this->counter) ?></div>
-            </div>
-            <?php if ($this->showClosedStageTag) { ?>
-            <div class="Tag tag-stage"><?php echo val('stage', $this->counter) ?></div>
-            <?php } ?>
             <?php if ($this->showVotes) { ?>
             <div class="votes meta"><?php echo sprintf(t('%s votes'), val('numberVotes', $this->counter)); ?></div>
             <?php } ?>
