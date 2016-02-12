@@ -197,7 +197,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
                 // Clean up logs in case a user edit the post multiple times
                 $logModel = new LogModel();
                 $rows = $logModel->getWhere(array(
-                    'Operation' => MODERATION_QUEUE,
+                    'Operation' => self::MODERATION_QUEUE,
                     'RecordType' => $postType,
                     'RecordID' => $postData[$postType.'ID'],
                     'RecordUserID' => Gdn::session()->UserID,
@@ -228,7 +228,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
                 $postData['Body'] = $oldData['Body'];
             }
 
-            LogModel::insert(MODERATION_QUEUE, $postType, $postData);
+            LogModel::insert(self::MODERATION_QUEUE, $postType, $postData);
         }
     }
 
