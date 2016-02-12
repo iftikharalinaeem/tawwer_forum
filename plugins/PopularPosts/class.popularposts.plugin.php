@@ -6,7 +6,7 @@
 
 $PluginInfo['PopularPosts'] = array(
     'Name' => 'Popular posts',
-    'Description' => 'Shows popular posts',
+    'Description' => 'Shows popular posts (most viewed) for the selected timeframe.',
     'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'HasLocale' => false,
@@ -29,7 +29,7 @@ class PopularPostsPlugin extends Gdn_Plugin {
      */
     public function settingsController_popularPosts_create($sender) {
 
-        $sender->title(sprintf(t('%s settings'), 'Popular Posts'));
+        $sender->title(sprintf(t('%s settings'), t('Popular Posts')));
         $sender->addSideMenu('settings/popularPosts');
 
         // If your sub-pages use forms, this is a good place to get it ready
@@ -71,7 +71,7 @@ class PopularPostsPlugin extends Gdn_Plugin {
 
             $saved = $sender->Form->save();
             if ($saved) {
-                $sender->StatusMessage = t("Your changes have been saved.");
+                $sender->StatusMessage = t('Your changes have been saved.');
             }
         }
 
