@@ -195,8 +195,12 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function Gdn_Dispatcher_AppStartup_Handler($sender) {
 
-        // If this is an API call powered by SimpleAPI, $sender will have API set to true.
-        $this->api = (bool)val('API', $sender, false);
+        /**
+         * SimpleAPI adds an "API" property to Gdn_Dispatcher with a value of true if this is an API request.  However,
+         * relying on this assumes that its handler for this same event has run before this handler.  The following
+         * check attempts to verify the "API" property presence and, failing that, verifies the URL format.
+         */
+        $this->api = (bool)(val('API', $sender, false) || preg_match('`^/?api/(v[\d\.]+)/(.+)`i', Gdn::request()->requestURI()));
 
         saveToConfig(
             [
@@ -219,7 +223,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             Gdn::Request()->webRoot(trim("$webroot/$root", '/'));
 
             $this->initializeSite($site);
-        } elseif (!in_array($root, ['api', 'utility', 'sso', 'entry']) && !$this->api) {
+        } elseif (!in_array($root, ['utility', 'sso', 'entry']) && !$this->api) {
             $defaultSite = SubcommunityModel::getDefaultSite();
             if ($defaultSite) {
                 $url = Gdn::Request()->assetRoot().'/'.$defaultSite['Folder'].rtrim('/'.Gdn::Request()->Path(), '/');
