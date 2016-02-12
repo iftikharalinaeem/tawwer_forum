@@ -316,6 +316,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
             }
             $id = $response->getNameId();
             $profile = $response->getAttributes();
+            trace($profile, "Profile Extracted from SAML Response");
             Gdn::session()->stash('samlsso', array('id' => $id, 'profile' => $profile));
         }
 
