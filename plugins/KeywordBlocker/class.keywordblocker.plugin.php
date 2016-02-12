@@ -78,34 +78,34 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook on BeforeDiscussionSave event.
+     * Hook on AfterValidateDiscussion event.
      *
      * Checks discussion cleanliness and send it for review if it is dirty.
      *
      * @param $sender Sending controller instance.
      * @param $args Event arguments.
      */
-    public function base_beforeDiscussionSave_handler($sender, $args) {
+    public function discussionModel_afterValidateDiscussion_handler($sender, $args) {
         $this->reviewPostCleaniness($sender, 'Discussion', $args['DiscussionData']);
     }
 
     /**
-     * Hook on BeforeDiscussionSave event.
+     * Hook on AfterValidateComment event.
      *
      * @param $sender Sending controller instance.
      * @param $args Event arguments.
      */
-    public function base_beforeCommentSave_handler($sender, $args) {
+    public function commentModel_afterValidateComment_handler($sender, $args) {
         $this->reviewPostCleaniness($sender, 'Comment', $args['CommentData']);
     }
 
     /**
-     * Hook on BeforeRestore (LogModel) event.
+     * Hook on BeforeRestore event.
      *
      * @param $sender Sending controller instance.
      * @param $args Event arguments.
      */
-    public function base_beforeRestore_handler($sender, $args) {
+    public function logModel_beforeRestore_handler($sender, $args) {
         if (isset($sender->EventArguments['Log']['Data']['KeywordBlocker'])) {
             if ($sender->EventArguments['Handled']) {
                 trace('That particular log should not have been handled by another plugin.', TRACE_WARNING);
@@ -127,11 +127,14 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
         $tableName = $log['RecordType'];
         $postData = $log['Data'];
 
-        $oldData = $this->getOldPostData($tableName, $postData[$tableName.'ID']);
 
-        // Do not update if the post was deleted or if the log was done before the last valid update of the post.
-        if (!$oldData || strtotime($oldData['DateUpdated']) > strtotime($log['DateInserted'])) {
-            return;
+        if (!empty($log['RecordID'])) {
+            $oldData = $this->getOldPostData($tableName, $postData[$tableName.'ID']);
+
+            // Do not update if the post was deleted or if the log was done before the last valid update of the post.
+            if (!$oldData || strtotime($oldData['DateUpdated']) > strtotime($log['DateInserted'])) {
+                return;
+            }
         }
 
         if (!isset($columns[$tableName])) {
