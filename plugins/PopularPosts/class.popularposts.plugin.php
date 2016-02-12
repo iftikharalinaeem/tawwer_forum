@@ -32,7 +32,6 @@ class PopularPostsPlugin extends Gdn_Plugin {
         $sender->title(sprintf(t('%s settings'), t('Popular Posts')));
         $sender->addSideMenu('settings/popularPosts');
 
-        // If your sub-pages use forms, this is a good place to get it ready
         $sender->Form = new Gdn_Form();
 
         $this->dispatch($sender, $sender->RequestArgs);
@@ -46,7 +45,7 @@ class PopularPostsPlugin extends Gdn_Plugin {
     public function controller_index($sender) {
         // Prevent non-admins from accessing this page
         $sender->permission('Garden.Settings.Manage');
-        $sender->setData('PluginDescription',$this->getPluginKey('Description'));
+        $sender->setData('PluginDescription', $this->getPluginKey('Description'));
 
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
@@ -69,8 +68,7 @@ class PopularPostsPlugin extends Gdn_Plugin {
                 $sender->Form->setFormValue('PopularPosts.MaxAge', 0);
             }
 
-            $saved = $sender->Form->save();
-            if ($saved) {
+            if ($sender->Form->save()) {
                 $sender->StatusMessage = t('Your changes have been saved.');
             }
         }

@@ -5,7 +5,7 @@ $popularPosts = $this->data('popularPosts');
 $session = Gdn::session();
 ?>
 <div class="PopularPosts">
-    <h1 class="H HomepageTitle">Popular Posts</h1>
+    <h1 class="H HomepageTitle"><?php echo t('Popular Posts'); ?></h1>
     <ul class="DataList Discussions">
         <?php
         $alt = '';
