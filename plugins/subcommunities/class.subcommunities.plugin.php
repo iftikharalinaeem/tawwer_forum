@@ -219,7 +219,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             Gdn::Request()->webRoot(trim("$webroot/$root", '/'));
 
             $this->initializeSite($site);
-        } elseif (!in_array($root, ['utility', 'sso', 'entry']) && !$this->api) {
+        } elseif (!in_array($root, ['api', 'utility', 'sso', 'entry']) && !$this->api) {
             $defaultSite = SubcommunityModel::getDefaultSite();
             if ($defaultSite) {
                 $url = Gdn::Request()->assetRoot().'/'.$defaultSite['Folder'].rtrim('/'.Gdn::Request()->Path(), '/');
