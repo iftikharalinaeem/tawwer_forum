@@ -56,7 +56,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function getCategoryIDs() {
         if (!isset($this->categoryIDs)) {
-            if ($this->api) {
+            if ($this->api && SubCommunityModel::getCurrent() === null) {
                 $categories = CategoryModel::getSubtree(-1, false);
             } else {
                 $site = SubcommunityModel::getCurrent();
