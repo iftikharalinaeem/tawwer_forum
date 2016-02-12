@@ -77,32 +77,165 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook on CheckSpam event.
+     * Hook on BeforeDiscussionSave event.
      *
-     * Checks post cleanliness and send it for review if it is dirty.
+     * Checks discussion cleanliness and send it for review if it is dirty.
      *
      * @param $sender Sending controller instance.
      * @param $args Event arguments.
      */
-    public function base_checkSpam_handler($sender, $args) {
+    public function base_beforeDiscussionSave_handler($sender, $args) {
+        $this->reviewPostCleaniness($sender, 'Discussion', $args['DiscussionData']);
+    }
 
-        // If the post is already flagged as spam let's abort :D
-        if ($sender->EventArguments['IsSpam']) {
+    /**
+     * Hook on BeforeDiscussionSave event.
+     *
+     * @param $sender Sending controller instance.
+     * @param $args Event arguments.
+     */
+    public function base_beforeCommentSave_handler($sender, $args) {
+        $this->reviewPostCleaniness($sender, 'Comment', $args['CommentData']);
+    }
+
+    /**
+     * Hook on BeforeRestore (LogModel) event.
+     *
+     * @param $sender Sending controller instance.
+     * @param $args Event arguments.
+     */
+    public function base_beforeRestore_handler($sender, $args) {
+        if (isset($sender->EventArguments['Log']['Data']['KeywordBlocker'])) {
+            if ($sender->EventArguments['Handled']) {
+                trace('That particular log should not have been handled by another plugin.', TRACE_WARNING);
+                return;
+            }
+
+            $sender->EventArguments['Handled'] = true;
+            $this->restorePostFromLog($sender->EventArguments['Log']);
+            Gdn::sql()->where('LogID', $sender->EventArguments['Log']['LogID'])->delete('Log');
+        }
+    }
+
+    /**
+     * Restore a post that was sent for review and that is now approved.
+     *
+     * @param $log Log containing the data to be restored
+     */
+    protected function restorePostFromLog($log) {
+        $tableName = $log['RecordType'];
+        $postData = $log['Data'];
+
+        $oldData = $this->getOldPostData($tableName, $postData[$tableName.'ID']);
+
+        // Do not update if the log was done before the last post valid update.
+        if (strtotime($oldData['DateUpdated']) > strtotime($log['DateInserted'])) {
             return;
         }
 
-        $isPostClean = $this->isPostClean($args['RecordType'], $args['Data']);
-        if (!$isPostClean) {
-            $sender->EventArguments['IsSpam'] = true;
+        if (!isset($columns[$tableName])) {
+            $columns[$tableName] = Gdn::sql()->fetchColumns($tableName);
+        }
 
-            // Use isSpam to stop the post from being posted and log it for moderation review.
-            if (c('KeywordBlocker.BlockMode', 'Moderation') === 'Moderation') {
-                $sender->EventArguments['Options'] = array_merge(
-                    $sender->EventArguments['Options'],
-                    array('Log' => false) // Do not log this post as Spam
-                );
-                LogModel::insert('Pending', $args['RecordType'], $args['Data']);
+        $set = array_flip($columns[$tableName]);
+        // Set the sets from the data.
+        foreach ($set as $key => $value) {
+            if (isset($postData[$key])) {
+                if (isset($postData['_New'][$key])) {
+                    $value = $postData['_New'][$key];
+                } else {
+                    $value = $postData[$key];
+                }
+
+                if (is_array($value)) {
+                    $value = serialize($value);
+                }
+                $set[$key] = $value;
+            } else {
+                unset($set[$key]);
             }
+        }
+
+        Gdn::sql()->Options('Replace', true)->insert($tableName, $set);
+    }
+
+    /**
+     * Checks post cleanliness and send it for review if it is dirty.
+     *
+     * @param $sender Sending controller instance.
+     * @param $postType Type of post being inspected. (Comment, Discussion...)
+     * @param $postData Content of the post.
+     */
+    protected function reviewPostCleaniness($sender, $postType, $postData) {
+
+        // If the post is already flagged as invalid let's abort :D
+        if (!$sender->EventArguments['IsValid']) {
+            return;
+        }
+
+        $isPostClean = $this->isPostClean($postType, $postData);
+        if (!$isPostClean) {
+            $sender->EventArguments['IsValid'] = false;
+
+            if (c('KeywordBlocker.BlockMode', 'Moderation') === 'Moderation') {
+                $reviewQueue = 'Pending';
+                $sender->EventArguments['InvalidReturnType'] = UNAPPROVED;
+            } else {
+                $reviewQueue = 'Spam';
+                $sender->EventArguments['InvalidReturnType'] = SPAM;
+
+            }
+
+            // Set some information about the user in the data.
+            touchValue('InsertUserID', $postData, Gdn::session()->UserID);
+
+            $user = Gdn::userModel()->getID(val('InsertUserID', $postData), DATASET_TYPE_ARRAY);
+            if ($user) {
+                touchValue('Username', $postData, $user['Name']);
+                touchValue('Email', $postData, $user['Email']);
+                touchValue('IPAddress', $postData, $user['LastIPAddress']);
+            }
+
+            // Set custom flag to handle log restoration later on
+            $postData['KeywordBlocker'] = true;
+
+            // Update :D
+            if (isset($postData[$postType.'ID'])) {
+                // Clean up logs in case a user edit the post multiple times
+                $logModel = new LogModel();
+                $rows = $logModel->getWhere(array(
+                    'Operation' => $reviewQueue,
+                    'RecordType' => $postType,
+                    'RecordID' => $postData[$postType.'ID'],
+                    'RecordUserID' => Gdn::session()->UserID,
+                ));
+
+                $logIDs = array();
+                foreach($rows as $row) {
+                    $logIDs[] = $row['LogID'];
+                }
+                if (!empty($logIDs)) {
+                    Gdn::sql()->whereIn('LogID', $logIDs)->delete('Log');
+                }
+
+                $oldData = $this->getOldPostData($postType, $postData[$postType.'ID']);
+
+                // Preserve fields for restoration.
+                $postData = array_merge($oldData, $postData);
+
+                // Show diff on post review.
+                $postData['_New'] = array();
+
+                if ($postType === 'Discussion') {
+                    $postData['_New']['Name'] = $postData['Name'];
+                    $postData['Name'] = $oldData['Name'];
+                }
+
+                $postData['_New']['Body'] = $postData['Body'];
+                $postData['Body'] = $oldData['Body'];
+            }
+
+            LogModel::insert($reviewQueue, $postType, $postData);
         }
     }
 
@@ -156,5 +289,22 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
         }
 
         return $words;
+    }
+
+    /**
+     * Retrieve the data of the post that will be updated.
+     *
+     * @param $postType Type of record (Comment, Discussion...)
+     * @param $postID Record ID
+     * @return array Post data
+     */
+    protected function getOldPostData($postType, $postID) {
+        if ($postType === 'Comment') {
+            $model = new CommentModel();
+        } else {
+            $model = new DiscussionModel();
+        }
+
+        return $model->getID($postID, DATASET_TYPE_ARRAY);
     }
 }
