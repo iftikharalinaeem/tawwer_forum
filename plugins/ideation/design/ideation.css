@@ -12,41 +12,71 @@
 .ItemIdea .PhotoWrap {
   display: none; }
 
+.PageControls:after {
+  content: "";
+  display: table;
+  clear: both; }
+.PageControls .BoxNewDiscussion {
+  float: left;
+  margin-right: 10px; }
+
 .idea-label {
   display: none; }
 
 .idea-counter-module {
-  background-color: transparent;
-  padding: 0; }
-  .idea-counter-module.Closed .idea-counter {
-    background-color: rgba(0, 0, 0, 0.3); }
+  display: block;
+  float: left;
+  padding: 0;
+  line-height: 1; }
+  .idea-counter-module *, .idea-counter-module *:before, .idea-counter-module *:after {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; }
+  .idea-counter-module .idea-counter-box {
+    width: 40px;
+    min-height: 40px;
+    margin: 2px 10px 0 0;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.1); }
+  .idea-counter-module.Closed .idea-counter-box {
+    background-color: rgba(0, 0, 0, 0.05); }
+  .idea-counter-module a {
+    color: rgba(0, 0, 0, 0.25); }
   .idea-counter-module .uservote {
-    color: #f52c6e; }
+    color: rgba(0, 0, 0, 0.8); }
   .idea-counter-module .score {
     font-size: 14px;
     font-weight: 700;
     text-align: center;
     line-height: 14px; }
+  .idea-counter-module .arrow {
+    position: relative;
+    display: inline-block;
+    width: 14px;
+    height: 14px; }
+    .idea-counter-module .arrow:before {
+      position: absolute;
+      display: block;
+      width: 14px;
+      height: 14px;
+      border: solid rgba(0, 0, 0, 0.25) 7px;
+      border-left-color: transparent !important;
+      border-right-color: transparent !important;
+      content: ''; }
+  .idea-counter-module .arrow-up:before {
+    top: -3.5px;
+    border-top-color: transparent !important; }
+  .idea-counter-module .arrow-down:before {
+    bottom: -3.5px;
+    border-bottom-color: transparent !important; }
+  .idea-counter-module .uservote .arrow:before {
+    border-color: rgba(0, 0, 0, 0.8); }
   .idea-counter-module .idea-counter-box {
-    background-color: rgba(0, 0, 0, 0.9);
-    padding: 9px 0; }
+    padding: 6px 0 2px; }
   .idea-counter-module .idea-menu {
-    margin-top: 4px; }
-  .idea-counter-module .idea-counter {
-    padding: 13px 2px; }
+    margin-top: 2px; }
   .idea-counter-module .votes {
     margin-top: 5px;
     font-size: 10px;
     color: rgba(0, 0, 0, 0.6);
     background-color: transparent; }
-
-.item-attachment .idea-counter-module a {
-  color: #0291db; }
-.item-attachment .idea-counter-module .uservote {
-  color: #f52c6e; }
-.item-attachment .idea-counter-module .icon {
-  display: inline;
-  min-width: 14px;
-  font-size: 14px;
-  line-height: 1; }
 /*# sourceMappingURL=ideation.css.map */
