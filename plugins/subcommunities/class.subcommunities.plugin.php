@@ -14,6 +14,11 @@ $PluginInfo['subcommunities'] = array(
 class SubcommunitiesPlugin extends Gdn_Plugin {
     /// Properties ///
 
+    /**
+     * @var bool Is this an API call?
+     */
+    protected $api = false;
+
     protected $savedDefaultRoute = '';
     protected $savedDoHeadings = '';
     protected $categoryIDs = null;
@@ -51,11 +56,16 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function getCategoryIDs() {
         if (!isset($this->categoryIDs)) {
-            $site = SubcommunityModel::getCurrent();
-            $categoryID = val('CategoryID', $site);
+            if ($this->api) {
+                $categories = CategoryModel::getSubtree(-1, false);
+            } else {
+                $site = SubcommunityModel::getCurrent();
+                $categoryID = val('CategoryID', $site);
 
-            // Get all of the category IDs associated with the subcommunity.
-            $categories = CategoryModel::GetSubtree($categoryID, true);
+                // Get all of the category IDs associated with the subcommunity.
+                $categories = CategoryModel::GetSubtree($categoryID, true);
+            }
+
             $this->categoryIDs = array_keys($categories);
         }
         return $this->categoryIDs;
@@ -180,7 +190,14 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $sender->setCategoryIDs($this->getCategoryIDs());
     }
 
-    public function Gdn_Dispatcher_AppStartup_Handler() {
+    /**
+     * @param Gdn_Dispatcher $sender
+     */
+    public function Gdn_Dispatcher_AppStartup_Handler($sender) {
+
+        // If this is an API call powered by SimpleAPI, $sender will have API set to true.
+        $this->api = (bool)val('API', $sender, false);
+
         saveToConfig(
             [
                 'Vanilla.Categories.NavDepth' => 1
@@ -201,9 +218,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             Gdn::Request()->assetRoot($webroot);
             Gdn::Request()->webRoot(trim("$webroot/$root", '/'));
 
-
             $this->initializeSite($site);
-        } elseif (!in_array($root, ['utility', 'sso', 'entry'])) {
+        } elseif (!in_array($root, ['utility', 'sso', 'entry']) && !$this->api) {
             $defaultSite = SubcommunityModel::getDefaultSite();
             if ($defaultSite) {
                 $url = Gdn::Request()->assetRoot().'/'.$defaultSite['Folder'].rtrim('/'.Gdn::Request()->Path(), '/');
