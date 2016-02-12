@@ -95,6 +95,24 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         SubcommunityModel::setCurrent($site);
     }
 
+    /**
+     * Determine if the current request is an API request. SimpleAPI adds an "API" property to Gdn_Dispatcher with a
+     * value of true if this is an API request.  However, relying on this assumes its Gdn_Dispatcher AppStartup
+     * handler has run before now.  We check the "API" property presence and, failing that, analyze the URL format.
+     *
+     * @param Gdn_Dispatcher $dispatcher Instance of Gdn_Dispatcher to analyze.
+     * @return bool True if determined to be an API request.  Otherwise, false.
+     */
+    protected function isAPI(Gdn_Dispatcher $dispatcher) {
+        if (val('API', $dispatcher, false)) {
+            return true;
+        } elseif (preg_match('`^/?api/(v[\d\.]+)/(.+)`i', Gdn::request()->requestURI())) {
+            return true;
+        }
+
+        return false;
+    }
+
     /// Event Handlers ///
 
     public function base_render_before($sender) {
@@ -195,12 +213,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function Gdn_Dispatcher_AppStartup_Handler($sender) {
 
-        /**
-         * SimpleAPI adds an "API" property to Gdn_Dispatcher with a value of true if this is an API request.  However,
-         * relying on this assumes that its handler for this same event has run before this handler.  The following
-         * check attempts to verify the "API" property presence and, failing that, verifies the URL format.
-         */
-        $this->api = (bool)(val('API', $sender, false) || preg_match('`^/?api/(v[\d\.]+)/(.+)`i', Gdn::request()->requestURI()));
+        $this->api = $this->isAPI($sender);
 
         saveToConfig(
             [
