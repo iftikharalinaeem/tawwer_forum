@@ -7,6 +7,8 @@ function KeenIOWidget(rangeStart, rangeEnd, config, type, title) {
     this.config      = config || {};
     this.chartConfig = this.config.chart || {};
     this.query       = [];
+    this.type        = type || '';
+    this.title       = title || '';
 
     if (typeof rangeEnd !== 'object' || !(rangeEnd instanceof Date)) {
         this.rangeEnd = new Date();
@@ -29,8 +31,10 @@ function KeenIOWidget(rangeStart, rangeEnd, config, type, title) {
 /**
  * Setup the query object we'll need for the chart.
  * @param {object} config A DOM element where the chart should be written.
+ * @param {object} properties Additional properties to add to the query object.
+ * @todo Remove hardwired timeframe
  */
-KeenIOWidget.prototype.addQuery = function(config ) {
+KeenIOWidget.prototype.addQuery = function(config, properties) {
     if (config instanceof Array) {
         for (i in config) {
             this.addQuery(config[i]);
@@ -45,6 +49,8 @@ KeenIOWidget.prototype.addQuery = function(config ) {
         end   : this.rangeEnd.toISOString()
     };
 
+    timeframe = 'this_8_days';
+
     var interval;
     if (this.query.length > 0 && typeof this.query[0] !== 'undefined') {
         var alphaQuery       = this.query[0];
@@ -55,14 +61,23 @@ KeenIOWidget.prototype.addQuery = function(config ) {
         interval  = config.interval || null;
     }
 
+    var queryParams = {
+        eventCollection : config.eventCollection || null,
+        filters         : config.filters || [],
+        interval        : interval,
+        timeframe       : timeframe
+    }
+
+    if (typeof config.groupBy !== 'undefined') {
+        queryParams.groupBy = config.groupBy;
+    }
+    if (typeof config.target_property !== 'undefined') {
+        queryParams.target_property = config.target_property;
+    }
+
     var query = new Keen.Query(
         config.analisysType || null,
-        {
-            eventCollection : config.eventCollection || null,
-            filters         : config.filters || [],
-            interval        : interval,
-            timeframe       : timeframe
-        }
+        queryParams
     );
     query.title = config.title || null;
 
@@ -98,7 +113,39 @@ KeenIOWidget.prototype.write = function(container) {
 
     var client = this.getClient();
 
+    var query;
+
     if (typeof client === 'object') {
+        if (Array.isArray(this.query)) {
+            query = this.query.shift();
+        } else {
+            query = this.query;
+        }
+
+        var config;
+
+        switch (this.type.toLowerCase()) {
+            case 'metric':
+                config = {
+                    colors: ["transparent"]
+                };
+                break;
+            default:
+                config = {
+                    library: 'c3'
+                };
+        }
+
+        jQuery.extend(true, config, this.chartConfig);
+
+        console.log(config);
+
+        client.draw(
+            query,
+            container,
+            config
+        );
+        /*
         var chart = new Keen.Dataviz();
         var categories = [];
 
@@ -144,5 +191,6 @@ KeenIOWidget.prototype.write = function(container) {
             // Hand it all off to our Keen.Dataviz object to takeover.
             chart.parseRawData({ result: data }).render();
         });
+        */
     }
 };

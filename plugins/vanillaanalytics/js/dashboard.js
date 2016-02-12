@@ -34,14 +34,27 @@ $(document).ready(function() {
 
             if (typeof window[handler] === 'function') {
                 if (handler || widgetID || type) {
-                    var chartCanvas = document.createElement('div');
-                    chartCanvas.setAttribute('id', 'analytics_widget_' + widgetID);
-                    chartCanvas.setAttribute('class', 'analytics-widget analytics-widget-' + type);
+                    var widgetContainer = document.createElement('div');
+                    widgetContainer.setAttribute('id', 'analytics_widget_' + widgetID);
+                    widgetContainer.setAttribute('class', 'analytics-widget analytics-widget-' + type);
+
+                    if (type !== 'metric') {
+                        var widgetTitle = document.createElement('h4');
+                        widgetTitle.setAttribute('class', 'title')
+                        widgetTitle.innerHTML = title;
+                        widgetContainer.appendChild(widgetTitle);
+                    }
+
+
+                    var widgetBody = document.createElement('div');
+                    widgetBody.setAttribute('class', 'body');
+                    widgetContainer.appendChild(widgetBody);
+
 
                     var trackerChart = new window[handler](rangeStart, rangeEnd, data, type, title);
-                    trackerChart.write(chartCanvas);
+                    trackerChart.write(widgetBody);
 
-                    panelContainer.appendChild(chartCanvas);
+                    panelContainer.appendChild(widgetContainer);
                 }
             } else {
                 console.log('Failed to locate handler: ' + handler);

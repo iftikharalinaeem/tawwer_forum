@@ -79,6 +79,12 @@ class KeenIOQuery implements JsonSerializable {
     protected $interval;
 
     /**
+     * @link https://keen.io/docs/api/#count-unique
+     * @var string Name of the property to analyze.
+     */
+    protected $targetProperty;
+
+    /**
      * @var string Specifies a period of time over which to run an analysis.
      */
     protected $timeframe;
@@ -143,6 +149,14 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Fetch the current target property.
+     * @return string
+     */
+    public function getTargetProperty() {
+        return $this->targetProperty;
+    }
+
+    /**
      * Fetch the current timeframe.
      *
      * @return string
@@ -181,6 +195,7 @@ class KeenIOQuery implements JsonSerializable {
             'filters'         => $this->filters,
             'groupBy'         => $this->groupBy,
             'interval'        => $this->interval,
+            'target_property' => $this->targetProperty,
             'timeframe'       => $this->timeframe,
             'timezone'        => $this->timezone,
             'title'           => $this->title
@@ -224,6 +239,18 @@ class KeenIOQuery implements JsonSerializable {
      */
     public function setInterval($interval) {
         $this->interval = $interval;
+        return $this;
+    }
+
+    /**
+     * Specify the name of the property to analyze.
+     *
+     * @link https://keen.io/docs/api/#count-unique
+     * @param string $targetProperty
+     * @return $this
+     */
+    public function setTargetProperty($targetProperty) {
+        $this->targetProperty = $targetProperty;
         return $this;
     }
 

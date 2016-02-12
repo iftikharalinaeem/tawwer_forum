@@ -1,0 +1,35 @@
+#analytics_toolbar {
+    background: #e0e0e0;
+    border: #777777 dashed;
+    color: #c0c0c0;
+    font-weight: bold;
+    font-size: 3em;
+    height: 75px;
+    line-height: 75px;
+    text-align: center;
+}
+
+#analytics_panel_metrics .analytics-widget-metric {
+    display: inline-block;
+    width: 33%;
+}
+
+.analytics-panel {
+    margin: 20px 0;
+}
+
+.analytics-widget .title {
+    font-size: 25px;
+    text-align: center;
+}
+
+.analytics-widget-metric .keen-metric {
+    color: #000;
+}
+.analytics-widget-metric .keen-metric-value {
+    font-size: 50px;
+    line-height: 50px;
+}
+.analytics-widget-metric .keen-metric-title {
+    font-size: 20px;
+}

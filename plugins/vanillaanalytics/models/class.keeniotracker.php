@@ -30,51 +30,170 @@ class KeenIOTracker implements TrackerInterface {
     /**
      * Add widget configurations to the ongoing list.
      *
+     * @todo Add Visits
+     * @todo Add Visits by Role Type
      * @param array $widgets Incoming array of charts to add to.
      */
     public function addWidgets(array &$widgets) {
-        // Build our query.
+        // Pageviews (chart)
         $pageViewQuery = new KeenIOQuery();
         $pageViewQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
             ->setTitle(t('Pageviews'))
             ->setEventCollection('page')
-            ->setInterval('daily')
-            ->addFilter([
-                'operator'       => 'eq',
-                'property_name'  => 'type',
-                'property_value' => 'page_view'
-            ]);
+            ->setInterval('daily');
 
-        // Configure our widget, complete with query.
         $pageViewsWidget = new AnalyticsWidget();
         $pageViewsWidget->setID('pageviews')
             ->setTitle(t('Pageviews'))
             ->setHandler('KeenIOWidget')
             ->setType('chart')
-            ->setData(['query' => $pageViewQuery]);
-
-        // Save that widget.
-        $widgets['pageviews'] = $pageViewsWidget;
-
-        // Rinse and repeat.
-        $newDiscussionsQuery = new KeenIOQuery();
-        $newDiscussionsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
-            ->setTitle(t('Discussions'))
-            ->setEventCollection('post')
-            ->setInterval('daily')
-            ->addFilter([
-                'operator'       => 'eq',
-                'property_name'  => 'type',
-                'property_value' => 'discussion_add'
+            ->setData([
+                'chart' => [
+                    'labels' => ['Pageviews']
+                ],
+                'query' => $pageViewQuery
             ]);
 
-        $newDiscussionsWidget = new AnalyticsWidget();
-        $newDiscussionsWidget->setID('new-discussions')
-            ->setTitle(t('New Discussions'))
+        $widgets['pageviews'] = $pageViewsWidget;
+
+        // Pageviews (metric)
+        $totalPageViewQuery = new KeenIOQuery();
+        $totalPageViewQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Pageviews'))
+            ->setEventCollection('page');
+
+        $totalPageViewsWidget = new AnalyticsWidget();
+        $totalPageViewsWidget->setID('total-pageviews')
+            ->setTitle(t('Pageviews'))
+            ->setHandler('KeenIOWidget')
+            ->setType('metric')
+            ->setData([
+                'chart' => [
+                    'title' => 'Pageviews'
+                ],
+                'query' => $totalPageViewQuery
+            ]);
+
+        $widgets['total-pageviews'] = $totalPageViewsWidget;
+
+        // Active Users (chart)
+        $activeUsersQuery = new KeenIOQuery();
+        $activeUsersQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Active Users'))
+            ->setEventCollection('page')
+            ->setTargetProperty('user.userID')
+            ->setInterval('daily')
+            ->addFilter([
+                'operator'       => 'gt',
+                'property_name'  => 'user.userID',
+                'property_value' => 0
+            ]);
+
+        $activeUsersWidget = new AnalyticsWidget();
+        $activeUsersWidget->setID('active-users')
+            ->setTitle(t('Active Users'))
             ->setHandler('KeenIOWidget')
             ->setType('chart')
-            ->setData(['query' => $newDiscussionsQuery]);
-        $widgets['new-discussions'] = $newDiscussionsWidget;
+            ->setData([
+                'chart' => [
+                    'labels' => ['Active Users']
+                ],
+                'query' => $activeUsersQuery
+            ]);
+
+        $widgets['active-users'] = $activeUsersWidget;
+
+        // Active Users (metric)
+        $totalActiveUsersQuery = new KeenIOQuery();
+        $totalActiveUsersQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Active Users'))
+            ->setEventCollection('page')
+            ->setTargetProperty('user.userID')
+            ->addFilter([
+                'operator'       => 'gt',
+                'property_name'  => 'user.userID',
+                'property_value' => 0
+            ]);
+
+        $totalActiveUsersWidget = new AnalyticsWidget();
+        $totalActiveUsersWidget->setID('total-active-users')
+            ->setTitle(t('Active Users'))
+            ->setHandler('KeenIOWidget')
+            ->setType('metric')
+            ->setData([
+                'chart' => [
+                    'title' => 'Active Users'
+                ],
+                'query' => $totalActiveUsersQuery
+            ]);
+
+        $widgets['total-active-users'] = $totalActiveUsersWidget;
+
+        // Unique Pageviews (chart)
+        $uniquePageviewsQuery = new KeenIOQuery();
+        $uniquePageviewsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Unique Pageviews'))
+            ->setEventCollection('page')
+            ->setTargetProperty('user.userID')
+            ->setInterval('daily');
+
+        $uniquePageviewsWidget = new AnalyticsWidget();
+        $uniquePageviewsWidget->setID('unique-pageviews')
+            ->setTitle(t('Unique Pageviews'))
+            ->setHandler('KeenIOWidget')
+            ->setType('chart')
+            ->setData([
+                'chart' => [
+                    'labels' => ['Unique Pageviews']
+                ],
+                'query' => $uniquePageviewsQuery
+            ]);
+
+        $widgets['unique-pageviews'] = $uniquePageviewsWidget;
+
+        // Unique Pageviews (metric)
+        $totalUniquePageviewsQuery = new KeenIOQuery();
+        $totalUniquePageviewsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Unique Pageviews'))
+            ->setEventCollection('page')
+            ->setTargetProperty('user.userID');
+
+        $totalUniquePageviewsWidget = new AnalyticsWidget();
+        $totalUniquePageviewsWidget->setID('total-unique-pageviews')
+            ->setTitle(t('Unique Pageviews'))
+            ->setHandler('KeenIOWidget')
+            ->setType('metric')
+            ->setData([
+                'chart' => [
+                    'title' => 'Unique Pageviews'
+                ],
+                'query' => $totalUniquePageviewsQuery
+            ]);
+
+        $widgets['total-unique-pageviews'] = $totalUniquePageviewsWidget;
+
+        // Unique Visits by Role Type
+        $uniqueVisitsByRoleTypeQuery = new KeenIOQuery();
+        $uniqueVisitsByRoleTypeQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Unique Visits by Role Type'))
+            ->setEventCollection('page')
+            ->setTargetProperty('user.sessionID')
+            ->setInterval('daily')
+            ->setGroupBy('user.roleType');
+
+        $uniqueVisitsByRoleTypeWidget = new AnalyticsWidget();
+        $uniqueVisitsByRoleTypeWidget->setID('unique-visits-by-role-type')
+            ->setTitle(t('Unique Visits by Role Type'))
+            ->setHandler('KeenIOWidget')
+            ->setType('chart')
+            ->setData([
+                'chart' => [
+                    'chartType' => 'area'
+                ],
+                'query' => $uniqueVisitsByRoleTypeQuery
+            ]);
+
+        $widgets['unique-visits-by-role-type'] = $uniqueVisitsByRoleTypeWidget;
     }
 
     /**
@@ -84,9 +203,6 @@ class KeenIOTracker implements TrackerInterface {
      * @param bool $inDashboard Is the current page a dashboard page?
      */
     public function addCssFiles(Gdn_Controller $controller, $inDashboard = false) {
-        if ($inDashboard) {
-            $controller->addCssFile('c3.min.css', 'plugins/vanillaanalytics');
-        }
     }
 
     /**
@@ -113,12 +229,13 @@ class KeenIOTracker implements TrackerInterface {
     public function addJsFiles(Gdn_Controller $controller, $inDashboard = false) {
         if (!AnalyticsTracker::getInstance()->trackingDisabled() || $inDashboard) {
             $controller->addJsFile('keenio.sdk.min.js', 'plugins/vanillaanalytics');
+        }
+
+        if (!AnalyticsTracker::getInstance()->trackingDisabled()) {
             $controller->addJsFile('keenio.min.js', 'plugins/vanillaanalytics');
         }
 
         if ($inDashboard) {
-            $controller->addJsFile('d3.min.js', 'plugins/vanillaanalytics');
-            $controller->addJsFile('c3.min.js', 'plugins/vanillaanalytics');
             $controller->addJsFile('keeniowidget.min.js', 'plugins/vanillaanalytics');
         }
     }

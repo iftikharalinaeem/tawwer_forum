@@ -264,11 +264,20 @@ class VanillaAnalytics extends Gdn_Plugin {
     }
 
     /**
-     * Add our primary analytics page.
-     * @param $sender
+     * Add our primary analytics pages.
+     *
+     * @param Gdn_Controller $sender An instance of the settings controller.
+     * @param string $entityType The resource type (e.g. dashboard)
+     * @param string $entityID The unique identifier for the resource
      */
     public function settingsController_analytics_create($sender, $entityType = false, $entityID = false) {
         $sender->permission('Garden.Settings.Manage');
+
+        $sender->addCssFile('c3.min.css', 'plugins/vanillaanalytics');
+        $sender->addCssFile('dashboard.css', 'plugins/vanillaanalytics');
+
+        $sender->addJsFile('d3.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('c3.min.js', 'plugins/vanillaanalytics');
 
         switch($entityType) {
             case 'dashboard':
