@@ -129,8 +129,8 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
 
         $oldData = $this->getOldPostData($tableName, $postData[$tableName.'ID']);
 
-        // Do not update if the log was done before the last post valid update.
-        if (strtotime($oldData['DateUpdated']) > strtotime($log['DateInserted'])) {
+        // Do not update if the post was deleted or if the log was done before the last valid update of the post.
+        if (!$oldData || strtotime($oldData['DateUpdated']) > strtotime($log['DateInserted'])) {
             return;
         }
 
