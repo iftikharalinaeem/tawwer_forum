@@ -20,7 +20,6 @@ $PluginInfo['ideation'] = array(
 class IdeationPlugin extends Gdn_Plugin {
 
     protected $defaultStageID = 1;
-    protected $tagModel;
 
     const REACTION_UP = 'IdeaUp';
     const REACTION_DOWN = 'IdeaDown';
@@ -251,13 +250,6 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     // TAGS
-
-    public function getTagModel() {
-        if ($this->tagModel == null) {
-            $this->tagModel = new TagModel();
-        }
-        return $this->tagModel;
-    }
 
     public function tagModel_types_handler($sender) {
         $sender->addType('Stage', array(
@@ -603,8 +595,48 @@ class IdeationPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function categoriesController_render_before($sender, $args) {
-        $discussions = $sender->data('Discussions')->result();
-        $this->addUserVotesToDiscussions($discussions);
+        if ($sender->data('Discussions') && $this->isIdeaCategory(val('Category', $sender))) {
+            $discussions = $sender->data('Discussions')->result();
+            $this->addUserVotesToDiscussions($discussions);
+
+//            = array('0' => array(
+//                'open' => array('key' => 'open', 'name' => 'Open', 'group' => 'status', 'wheres' => array('d.CountComments >' => '0')),
+//                'closed' => array('key' => 'closed', 'name' => 'Closed', 'group' => 'status', 'wheres' => array('d.CountComments' => '0')))
+//            );
+        }
+    }
+
+    public function categoriesController_index_before($sender) {
+        $categoryCode = val('CategoryIdentifier', val('ReflectArgs', $sender, false));
+        if (!$categoryCode || !$this->isIdeaCategory(CategoryModel::categories($categoryCode))) {
+//            DiscussionSortFilterModule::addFilter('discussion-type', 'Discussion', array('d.Type' => null, 'd.Announce' => 0), 'type');
+//            DiscussionSortFilterModule::addFilter('announcement-type', 'Announcement', array('d.Announce >' => 0), 'type');
+//            DiscussionSortFilterModule::addFilter('question-type', 'Question', array('d.Type' => 'Question'), 'type');
+//            DiscussionSortFilterModule::addFilter('poll-type', 'Poll', array('d.Type' => 'poll'), 'type');
+            return;
+        }
+        $openStages = StageModel::getOpenStages();
+        $openTags = array();
+        foreach ($openStages as $openStage) {
+            $openTags[] = val('TagID', $openStage);
+        }
+        DiscussionSortFilterModule::addFilter('open', 'Status: Open',
+            array('d.Tags' => $openTags), 'status'
+        );
+
+        $closedStages = StageModel::getClosedStages();
+        $closedTags = array();
+        foreach ($closedStages as $closedStage) {
+            $closedTags[] = val('TagID', $closedStage);
+        }
+        DiscussionSortFilterModule::addFilter('closed', 'Status: Closed',
+            array('d.Tags' => $closedTags), 'status'
+        );
+        foreach(StageModel::getStages() as $stage) {
+            DiscussionSortFilterModule::addFilter(strtolower(val('Name', $stage)).'-stage' , val('Name', $stage),
+                array('d.Tags' => val('TagID', $stage)), 'stage'
+            );
+        }
     }
 
     /**
@@ -697,7 +729,7 @@ class IdeationPlugin extends Gdn_Plugin {
 
     // TODO: Figure out how to let this be override-able
     public static function getReactionButtonHtml($cssClass, $url, $label, $dataAttr = '') {
-        return '<a class="Hijack '.$cssClass.'" href="'.$url.'" title="'.$label.'" '.$dataAttr.' rel="nofollow"><span class="icon icon-arrow-'.strtolower($label).'"></span> <span class="idea-label">'.$label.'</span></a>';
+        return '<a class="Hijack idea-button '.$cssClass.'" href="'.$url.'" title="'.$label.'" '.$dataAttr.' rel="nofollow"><span class="arrow arrow-'.strtolower($label).'"></span> <span class="idea-label">'.$label.'</span></a>';
     }
 
     // HELPERS
@@ -728,7 +760,7 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     public function isIdeaCategory($category) {
-        return in_array('Idea', val('AllowedDiscussionTypes', $category));
+        return in_array('Idea', val('AllowedDiscussionTypes', $category, array()));
     }
 
     public function allowDownVotes($data, $datatype = 'category') {
@@ -767,8 +799,11 @@ class IdeationPlugin extends Gdn_Plugin {
         if (val('StageID', $oldStage) != $stageID) {
             $stage = StageModel::getStage($stageID);
             $tags = array(val('TagID', $stage));
-            $tagModel = $this->getTagModel();
-            $tagModel->saveDiscussion($discussionID, $tags, array('Stage'));
+            TagModel::instance()->saveDiscussion($discussionID, $tags, array('Stage'));
+
+            // Save tags in discussions table
+            $discussionModel = new DiscussionModel();
+            $discussionModel->setField($discussionID, 'Tags', val('TagID', $stage));
         }
     }
 
