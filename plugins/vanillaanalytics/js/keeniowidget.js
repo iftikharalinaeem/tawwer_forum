@@ -49,8 +49,6 @@ KeenIOWidget.prototype.addQuery = function(config, properties) {
         end   : this.rangeEnd.toISOString()
     };
 
-    timeframe = 'this_8_days';
-
     var interval;
     if (this.query.length > 0 && typeof this.query[0] !== 'undefined') {
         var alphaQuery       = this.query[0];
@@ -65,8 +63,9 @@ KeenIOWidget.prototype.addQuery = function(config, properties) {
         eventCollection : config.eventCollection || null,
         filters         : config.filters || [],
         interval        : interval,
+        maxAge          : 86400,
         timeframe       : timeframe
-    }
+    };
 
     if (typeof config.groupBy !== 'undefined') {
         queryParams.groupBy = config.groupBy;
@@ -137,8 +136,6 @@ KeenIOWidget.prototype.write = function(container) {
         }
 
         jQuery.extend(true, config, this.chartConfig);
-
-        console.log(config);
 
         client.draw(
             query,

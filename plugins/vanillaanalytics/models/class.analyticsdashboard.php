@@ -68,8 +68,9 @@ class AnalyticsDashboard implements JsonSerializable {
         if (empty(static::$defaults)) {
             $defaults = [
                 'Posting' => [
-                    'metrics' => [],
-                    'charts'  => []
+                    'metrics' => ['total-discussions', 'total-comments', 'total-contributors'],
+                    'charts'  => ['discussions', 'comments', 'posts', 'posts-by-type', 'posts-by-category',
+                        'posts-by-role-type', 'contributors', 'contributors-by-category', 'contributors-by-role-type']
                 ],
                 'Traffic' => [
                     'metrics' => ['total-pageviews', 'total-active-users', 'total-unique-pageviews'],

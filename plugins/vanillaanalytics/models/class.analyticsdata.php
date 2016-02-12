@@ -37,6 +37,22 @@ class AnalyticsData extends Gdn_Model {
         return $category;
     }
 
+    public static function getCategoryMap() {
+        $categories = [];
+        $categoriesRaw = Gdn::sql()
+            ->select('CategoryID')
+            ->select('Name')
+            ->from('Category')
+            ->get()
+            ->resultArray();
+
+        foreach ($categoriesRaw as $category) {
+            $categories[$category['CategoryID']] = $category['Name'];
+        }
+
+        return $categories;
+    }
+
     /**
      * Fetch all ancestors up to, and including, the current category.
      *

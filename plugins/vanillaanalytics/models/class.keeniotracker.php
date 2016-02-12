@@ -35,26 +35,35 @@ class KeenIOTracker implements TrackerInterface {
      * @param array $widgets Incoming array of charts to add to.
      */
     public function addWidgets(array &$widgets) {
-        // Pageviews (chart)
-        $pageViewQuery = new KeenIOQuery();
-        $pageViewQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
-            ->setTitle(t('Pageviews'))
-            ->setEventCollection('page')
-            ->setInterval('daily');
+        /**
+         * Metrics
+         */
 
-        $pageViewsWidget = new AnalyticsWidget();
-        $pageViewsWidget->setID('pageviews')
-            ->setTitle(t('Pageviews'))
-            ->setHandler('KeenIOWidget')
-            ->setType('chart')
-            ->setData([
-                'chart' => [
-                    'labels' => ['Pageviews']
-                ],
-                'query' => $pageViewQuery
+        // Active Users (metric)
+        $totalActiveUsersQuery = new KeenIOQuery();
+        $totalActiveUsersQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Active Users'))
+            ->setEventCollection('page')
+            ->setTargetProperty('user.userID')
+            ->addFilter([
+                'operator'       => 'gt',
+                'property_name'  => 'user.userID',
+                'property_value' => 0
             ]);
 
-        $widgets['pageviews'] = $pageViewsWidget;
+        $totalActiveUsersWidget = new AnalyticsWidget();
+        $totalActiveUsersWidget->setID('total-active-users')
+            ->setTitle(t('Active Users'))
+            ->setHandler('KeenIOWidget')
+            ->setType('metric')
+            ->setData([
+                'chart' => [
+                    'title' => 'Active Users'
+                ],
+                'query' => $totalActiveUsersQuery
+            ]);
+
+        $widgets['total-active-users'] = $totalActiveUsersWidget;
 
         // Pageviews (metric)
         $totalPageViewQuery = new KeenIOQuery();
@@ -75,6 +84,123 @@ class KeenIOTracker implements TrackerInterface {
             ]);
 
         $widgets['total-pageviews'] = $totalPageViewsWidget;
+
+        // Unique Pageviews (metric)
+        $totalUniquePageviewsQuery = new KeenIOQuery();
+        $totalUniquePageviewsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Unique Pageviews'))
+            ->setEventCollection('page')
+            ->setTargetProperty('user.sessionID');
+
+        $totalUniquePageviewsWidget = new AnalyticsWidget();
+        $totalUniquePageviewsWidget->setID('total-unique-pageviews')
+            ->setTitle(t('Unique Pageviews'))
+            ->setHandler('KeenIOWidget')
+            ->setType('metric')
+            ->setData([
+                'chart' => [
+                    'title' => 'Unique Pageviews'
+                ],
+                'query' => $totalUniquePageviewsQuery
+            ]);
+
+        $widgets['total-unique-pageviews'] = $totalUniquePageviewsWidget;
+
+        // Discussions (metric)
+        $totalDiscussionsQuery = new KeenIOQuery();
+        $totalDiscussionsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Discussions'))
+            ->setEventCollection('post')
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'type',
+                'property_value' => 'discussion_add'
+            ]);
+
+        $totalDiscussionsWidget = new AnalyticsWidget();
+        $totalDiscussionsWidget->setID('total-discussions')
+            ->setTitle(t('Discussions'))
+            ->setHandler('KeenIOWidget')
+            ->setType('metric')
+            ->setData([
+                'chart' => [
+                    'title' => 'Discussions'
+                ],
+                'query' => $totalDiscussionsQuery
+            ]);
+
+        $widgets['total-discussions'] = $totalDiscussionsWidget;
+
+        // Comments (metric)
+        $totalCommentsQuery = new KeenIOQuery();
+        $totalCommentsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Comments'))
+            ->setEventCollection('post')
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'type',
+                'property_value' => 'comment_add'
+            ]);
+
+        $totalCommentsWidget = new AnalyticsWidget();
+        $totalCommentsWidget->setID('total-comments')
+            ->setTitle(t('Comments'))
+            ->setHandler('KeenIOWidget')
+            ->setType('metric')
+            ->setData([
+                'chart' => [
+                    'title' => 'Comments'
+                ],
+                'query' => $totalCommentsQuery
+            ]);
+
+        $widgets['total-comments'] = $totalCommentsWidget;
+
+        // Contributors (metric)
+        $totalContributorsQuery = new KeenIOQuery();
+        $totalContributorsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Contributors'))
+            ->setEventCollection('post')
+            ->setTargetProperty('user.userID');
+
+        $totalContributorsWidget = new AnalyticsWidget();
+        $totalContributorsWidget->setID('total-contributors')
+            ->setTitle(t('Contributors'))
+            ->setHandler('KeenIOWidget')
+            ->setType('metric')
+            ->setData([
+                'chart' => [
+                    'title' => 'Contributors'
+                ],
+                'query' => $totalContributorsQuery
+            ]);
+
+        $widgets['total-contributors'] = $totalContributorsWidget;
+
+        /**
+         * Charts
+         */
+
+        // Pageviews (chart)
+        $pageViewQuery = new KeenIOQuery();
+        $pageViewQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Pageviews'))
+            ->setEventCollection('page')
+            ->setInterval('daily');
+
+        $pageViewsWidget = new AnalyticsWidget();
+        $pageViewsWidget->setID('pageviews')
+            ->setTitle(t('Pageviews'))
+            ->setHandler('KeenIOWidget')
+            ->setType('chart')
+            ->setData([
+                'chart' => [
+                    'labels' => ['Pageviews']
+                ],
+                'query' => $pageViewQuery
+            ]);
+
+        $widgets['pageviews'] = $pageViewsWidget;
 
         // Active Users (chart)
         $activeUsersQuery = new KeenIOQuery();
@@ -103,32 +229,6 @@ class KeenIOTracker implements TrackerInterface {
 
         $widgets['active-users'] = $activeUsersWidget;
 
-        // Active Users (metric)
-        $totalActiveUsersQuery = new KeenIOQuery();
-        $totalActiveUsersQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
-            ->setTitle(t('Active Users'))
-            ->setEventCollection('page')
-            ->setTargetProperty('user.userID')
-            ->addFilter([
-                'operator'       => 'gt',
-                'property_name'  => 'user.userID',
-                'property_value' => 0
-            ]);
-
-        $totalActiveUsersWidget = new AnalyticsWidget();
-        $totalActiveUsersWidget->setID('total-active-users')
-            ->setTitle(t('Active Users'))
-            ->setHandler('KeenIOWidget')
-            ->setType('metric')
-            ->setData([
-                'chart' => [
-                    'title' => 'Active Users'
-                ],
-                'query' => $totalActiveUsersQuery
-            ]);
-
-        $widgets['total-active-users'] = $totalActiveUsersWidget;
-
         // Unique Pageviews (chart)
         $uniquePageviewsQuery = new KeenIOQuery();
         $uniquePageviewsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
@@ -151,27 +251,6 @@ class KeenIOTracker implements TrackerInterface {
 
         $widgets['unique-pageviews'] = $uniquePageviewsWidget;
 
-        // Unique Pageviews (metric)
-        $totalUniquePageviewsQuery = new KeenIOQuery();
-        $totalUniquePageviewsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
-            ->setTitle(t('Unique Pageviews'))
-            ->setEventCollection('page')
-            ->setTargetProperty('user.userID');
-
-        $totalUniquePageviewsWidget = new AnalyticsWidget();
-        $totalUniquePageviewsWidget->setID('total-unique-pageviews')
-            ->setTitle(t('Unique Pageviews'))
-            ->setHandler('KeenIOWidget')
-            ->setType('metric')
-            ->setData([
-                'chart' => [
-                    'title' => 'Unique Pageviews'
-                ],
-                'query' => $totalUniquePageviewsQuery
-            ]);
-
-        $widgets['total-unique-pageviews'] = $totalUniquePageviewsWidget;
-
         // Unique Visits by Role Type
         $uniqueVisitsByRoleTypeQuery = new KeenIOQuery();
         $uniqueVisitsByRoleTypeQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
@@ -187,13 +266,215 @@ class KeenIOTracker implements TrackerInterface {
             ->setHandler('KeenIOWidget')
             ->setType('chart')
             ->setData([
-                'chart' => [
-                    'chartType' => 'area'
-                ],
+                'chart' => ['chartType' => 'area'],
                 'query' => $uniqueVisitsByRoleTypeQuery
             ]);
 
         $widgets['unique-visits-by-role-type'] = $uniqueVisitsByRoleTypeWidget;
+
+        // Discussions
+        $discussionsQuery = new KeenIOQuery();
+        $discussionsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Discussions'))
+            ->setEventCollection('post')
+            ->setInterval('daily')
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'type',
+                'property_value' => 'discussion_add'
+            ]);
+
+        $discussionsWidget = new AnalyticsWidget();
+        $discussionsWidget->setID('discussions')
+            ->setTitle(t('Discussions'))
+            ->setHandler('KeenIOWidget')
+            ->setData([
+                'chart' => [
+                    'labels' => ['Discussions']
+                ],
+                'query' => $discussionsQuery
+            ]);
+
+        $widgets['discussions'] = $discussionsWidget;
+
+        // Comments
+        $commentsQuery = new KeenIOQuery();
+        $commentsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Comments'))
+            ->setEventCollection('post')
+            ->setInterval('daily')
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'type',
+                'property_value' => 'comment_add'
+            ]);
+
+        $commentsWidget = new AnalyticsWidget();
+        $commentsWidget->setID('comments')
+            ->setTitle(t('Comments'))
+            ->setHandler('KeenIOWidget')
+            ->setData([
+                'chart' => [
+                    'labels' => ['Comments']
+                ],
+                'query' => $commentsQuery
+            ]);
+
+        $widgets['comments'] = $commentsWidget;
+
+        // Posts
+        $postsQuery = new KeenIOQuery();
+        $postsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Posts'))
+            ->setEventCollection('post')
+            ->setInterval('daily');
+
+        $postsWidget = new AnalyticsWidget();
+        $postsWidget->setID('posts')
+            ->setTitle(t('Posts'))
+            ->setHandler('KeenIOWidget')
+            ->setData([
+                'chart' => [
+                    'labels' => ['Posts']
+                ],
+                'query' => $postsQuery
+            ]);
+
+        $widgets['posts'] = $postsWidget;
+
+        // Posts by type
+        $postsByTypeQuery = new KeenIOQuery();
+        $postsByTypeQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Posts By Type'))
+            ->setEventCollection('post')
+            ->setInterval('daily')
+            ->setGroupBy('type');
+
+        $postsByTypeWidget = new AnalyticsWidget();
+        $postsByTypeWidget->setID('posts-by-type')
+            ->setTitle(t('Posts By Type'))
+            ->setHandler('KeenIOWidget')
+            ->setData([
+                'chart' => [
+                    'labelMapping' => [
+                        'discussion_add' => 'Discussions',
+                        'comment_add' => 'Comments'
+                    ],
+                    'chartType' => 'area'
+                ],
+                'query' => $postsByTypeQuery
+            ]);
+
+        $widgets['posts-by-type'] = $postsByTypeWidget;
+
+        // Posts by category
+        $postsByCategoryQuery = new KeenIOQuery();
+        $postsByCategoryQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Posts By Category'))
+            ->setEventCollection('post')
+            ->setInterval('daily')
+            ->setGroupBy('category.categoryID');
+
+        $postsByCategoryWidget = new AnalyticsWidget();
+        $postsByCategoryWidget->setID('posts-by-category')
+            ->setTitle(t('Posts By Category'))
+            ->setHandler('KeenIOWidget')
+            ->setData([
+                'chart' => [
+                    'labelMapping' => AnalyticsData::getCategoryMap(),
+                    'chartType' => 'area'
+                ],
+                'query' => $postsByCategoryQuery
+            ]);
+
+        $widgets['posts-by-category'] = $postsByCategoryWidget;
+
+        // Posts by role type
+        $postsByRoleTypeQuery = new KeenIOQuery();
+        $postsByRoleTypeQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Posts By Role Type'))
+            ->setEventCollection('post')
+            ->setInterval('daily')
+            ->setGroupBy('user.roleType');
+
+        $postsByRoleTypeWidget = new AnalyticsWidget();
+        $postsByRoleTypeWidget->setID('posts-by-role-type')
+            ->setTitle(t('Posts By Role Type'))
+            ->setHandler('KeenIOWidget')
+            ->setData([
+                'chart' => [
+                    'chartType' => 'area'
+                ],
+                'query' => $postsByRoleTypeQuery
+            ]);
+
+        $widgets['posts-by-role-type'] = $postsByRoleTypeWidget;
+
+        // Contributors (chart)
+        $contributorsQuery = new KeenIOQuery();
+        $contributorsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Contributors'))
+            ->setEventCollection('post')
+            ->setInterval('daily')
+            ->setTargetProperty('user.userID');
+
+        $contributorsWidget = new AnalyticsWidget();
+        $contributorsWidget->setID('contributors')
+            ->setTitle(t('Contributors'))
+            ->setHandler('KeenIOWidget')
+            ->setType('chart')
+            ->setData([
+                'chart' => [
+                    'labels' => ['Contributors']
+                ],
+                'query' => $contributorsQuery
+            ]);
+
+        $widgets['contributors'] = $contributorsWidget;
+
+        // Contributors by category (chart)
+        $contributorsByCategoryQuery = new KeenIOQuery();
+        $contributorsByCategoryQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Contributors by Category'))
+            ->setEventCollection('post')
+            ->setInterval('daily')
+            ->setTargetProperty('user.userID')
+            ->setGroupBy('category.categoryID');
+
+        $contributorsByCategoryWidget = new AnalyticsWidget();
+        $contributorsByCategoryWidget->setID('contributors')
+            ->setTitle(t('Contributors by Category'))
+            ->setHandler('KeenIOWidget')
+            ->setType('chart')
+            ->setData([
+                'chart' => [
+                    'chartType' => 'area'
+                ],
+                'query' => $contributorsByCategoryQuery
+            ]);
+        $widgets['contributors-by-category'] = $contributorsByCategoryWidget;
+
+        // Contributors by role type (chart)
+        $contributorsByRoleTypeQuery = new KeenIOQuery();
+        $contributorsByRoleTypeQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Contributors by Role Type'))
+            ->setEventCollection('post')
+            ->setInterval('daily')
+            ->setTargetProperty('user.userID')
+            ->setGroupBy('user.roleType');
+
+        $contributorsByRoleTypeWidget = new AnalyticsWidget();
+        $contributorsByRoleTypeWidget->setID('contributors')
+            ->setTitle(t('Contributors by Role Type'))
+            ->setHandler('KeenIOWidget')
+            ->setType('chart')
+            ->setData([
+                'chart' => [
+                    'chartType' => 'area'
+                ],
+                'query' => $contributorsByRoleTypeQuery
+            ]);
+        $widgets['contributors-by-role-type'] = $contributorsByRoleTypeWidget;
     }
 
     /**
