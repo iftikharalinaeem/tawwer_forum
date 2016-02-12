@@ -8,13 +8,6 @@ echo $this->Form->errors();
 ?>
     <ul>
         <li><?php
-            echo $this->Form->label(t('Blocking mode'), 'KeywordBlocker.BlockMode');
-            echo $this->Form->radioList(
-                'KeywordBlocker.BlockMode',
-                array('Moderation' => t('Moderation'), 'Spam' => t('Spam'))
-            );
-            ?></li>
-        <li><?php
             echo $this->Form->label(t('Forbidden words'), 'KeywordBlocker.Words');
             echo wrap(t('Seperate each word with a semi-colon ";"'), 'p');
             echo $this->Form->textBox('KeywordBlocker.Words', array('MultiLine' => true));

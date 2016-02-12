@@ -22,6 +22,8 @@ $PluginInfo['KeywordBlocker'] = array(
  */
 class KeywordBlockerPlugin extends Gdn_Plugin {
 
+    const MODERATION_QUEUE = 'Pending';
+
     /**
      * Create a method called "keywordBlocker" on the SettingController.
      *
@@ -50,7 +52,6 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(
-            'KeywordBlocker.BlockMode' => c('KeywordBlocker.BlockMode', 'Moderation'),
             'KeywordBlocker.Words',
         ));
 
@@ -176,15 +177,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
         $isPostClean = $this->isPostClean($postType, $postData);
         if (!$isPostClean) {
             $sender->EventArguments['IsValid'] = false;
-
-            if (c('KeywordBlocker.BlockMode', 'Moderation') === 'Moderation') {
-                $reviewQueue = 'Pending';
-                $sender->EventArguments['InvalidReturnType'] = UNAPPROVED;
-            } else {
-                $reviewQueue = 'Spam';
-                $sender->EventArguments['InvalidReturnType'] = SPAM;
-
-            }
+            $sender->EventArguments['InvalidReturnType'] = UNAPPROVED;
 
             // Set some information about the user in the data.
             touchValue('InsertUserID', $postData, Gdn::session()->UserID);
@@ -204,7 +197,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
                 // Clean up logs in case a user edit the post multiple times
                 $logModel = new LogModel();
                 $rows = $logModel->getWhere(array(
-                    'Operation' => $reviewQueue,
+                    'Operation' => MODERATION_QUEUE,
                     'RecordType' => $postType,
                     'RecordID' => $postData[$postType.'ID'],
                     'RecordUserID' => Gdn::session()->UserID,
@@ -235,7 +228,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
                 $postData['Body'] = $oldData['Body'];
             }
 
-            LogModel::insert($reviewQueue, $postType, $postData);
+            LogModel::insert(MODERATION_QUEUE, $postType, $postData);
         }
     }
 
