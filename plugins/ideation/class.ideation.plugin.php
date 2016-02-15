@@ -598,11 +598,6 @@ class IdeationPlugin extends Gdn_Plugin {
         if ($sender->data('Discussions') && $this->isIdeaCategory(val('Category', $sender))) {
             $discussions = $sender->data('Discussions')->result();
             $this->addUserVotesToDiscussions($discussions);
-
-//            = array('0' => array(
-//                'open' => array('key' => 'open', 'name' => 'Open', 'group' => 'status', 'wheres' => array('d.CountComments >' => '0')),
-//                'closed' => array('key' => 'closed', 'name' => 'Closed', 'group' => 'status', 'wheres' => array('d.CountComments' => '0')))
-//            );
         }
     }
 
