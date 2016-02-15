@@ -343,7 +343,6 @@ class SamlSSOPlugin extends Gdn_Plugin {
             if (IsUrl($relay_state) || preg_match('`^[/a-z]`i', $relay_state))
                 $Form->setFormValue('Target', $relay_state);
         }
-        trace($Form);
         $this->EventArguments['Profile'] = $profile;
         $this->EventArguments['Form'] = $Form;
 
