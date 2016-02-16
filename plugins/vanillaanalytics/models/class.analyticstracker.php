@@ -220,8 +220,12 @@ class AnalyticsTracker {
      * Setup routine, called when plug-in is enabled.
      */
     public function setup() {
-        foreach ($this->trackers as $interface) {
-            $interface->setup();
+        $trackerClasses = $this->getTrackerClasses();
+
+        // Allow each individual tracker to make preparations.
+        foreach ($trackerClasses as $currentTrackerClass) {
+            $tracker = new $currentTrackerClass;
+            $tracker->setup();
         }
     }
 
