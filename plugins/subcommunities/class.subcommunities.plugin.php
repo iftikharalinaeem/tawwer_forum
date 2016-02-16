@@ -14,6 +14,11 @@ $PluginInfo['subcommunities'] = array(
 class SubcommunitiesPlugin extends Gdn_Plugin {
     /// Properties ///
 
+    /**
+     * @var bool Is this an API call?
+     */
+    protected $api = false;
+
     protected $savedDefaultRoute = '';
     protected $savedDoHeadings = '';
     protected $categoryIDs = null;
@@ -51,11 +56,16 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function getCategoryIDs() {
         if (!isset($this->categoryIDs)) {
-            $site = SubcommunityModel::getCurrent();
-            $categoryID = val('CategoryID', $site);
+            if ($this->api && SubCommunityModel::getCurrent() === null) {
+                $categories = CategoryModel::getSubtree(-1, false);
+            } else {
+                $site = SubcommunityModel::getCurrent();
+                $categoryID = val('CategoryID', $site);
 
-            // Get all of the category IDs associated with the subcommunity.
-            $categories = CategoryModel::GetSubtree($categoryID, true);
+                // Get all of the category IDs associated with the subcommunity.
+                $categories = CategoryModel::GetSubtree($categoryID, true);
+            }
+
             $this->categoryIDs = array_keys($categories);
         }
         return $this->categoryIDs;
@@ -83,6 +93,24 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 //        }
 
         SubcommunityModel::setCurrent($site);
+    }
+
+    /**
+     * Determine if the current request is an API request. SimpleAPI adds an "API" property to Gdn_Dispatcher with a
+     * value of true if this is an API request.  However, relying on this assumes its Gdn_Dispatcher AppStartup
+     * handler has run before now.  We check the "API" property presence and, failing that, analyze the URL format.
+     *
+     * @param Gdn_Dispatcher $dispatcher Instance of Gdn_Dispatcher to analyze.
+     * @return bool True if determined to be an API request.  Otherwise, false.
+     */
+    protected function isAPI(Gdn_Dispatcher $dispatcher) {
+        if (val('API', $dispatcher, false)) {
+            return true;
+        } elseif (preg_match('`^/?api/(v[\d\.]+)/(.+)`i', Gdn::request()->requestURI())) {
+            return true;
+        }
+
+        return false;
     }
 
     /// Event Handlers ///
@@ -180,7 +208,13 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $sender->setCategoryIDs($this->getCategoryIDs());
     }
 
-    public function Gdn_Dispatcher_AppStartup_Handler() {
+    /**
+     * @param Gdn_Dispatcher $sender
+     */
+    public function Gdn_Dispatcher_AppStartup_Handler($sender) {
+
+        $this->api = $this->isAPI($sender);
+
         saveToConfig(
             [
                 'Vanilla.Categories.NavDepth' => 1
@@ -201,9 +235,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             Gdn::Request()->assetRoot($webroot);
             Gdn::Request()->webRoot(trim("$webroot/$root", '/'));
 
-
             $this->initializeSite($site);
-        } elseif (!in_array($root, ['utility', 'sso', 'entry'])) {
+        } elseif (!in_array($root, ['utility', 'sso', 'entry']) && !$this->api) {
             $defaultSite = SubcommunityModel::getDefaultSite();
             if ($defaultSite) {
                 $url = Gdn::Request()->assetRoot().'/'.$defaultSite['Folder'].rtrim('/'.Gdn::Request()->Path(), '/');
