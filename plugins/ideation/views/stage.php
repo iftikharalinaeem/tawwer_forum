@@ -28,6 +28,15 @@ echo $this->Form->errors();
             $this->Form->textBox('Description', array('Multiline' => true));
             ?>
         </li>
+        <li>
+            <?php
+            if (val('IsDefaultStage', $this->Form->formData())) {
+                echo '<strong>'.t('Default Stage').'</strong> '.t("This is the starting stage for new ideas.");
+            } else {
+                echo $this->Form->checkbox('IsDefaultStage', '<strong>'.t('Default Stage').'</strong> '.t("Make this the starting stage for new ideas."));
+            }
+            ?>
+        </li>
     </ul>
 <?php
 echo '<div class="Buttons">';

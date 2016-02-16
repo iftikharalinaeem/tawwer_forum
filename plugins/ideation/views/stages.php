@@ -47,6 +47,7 @@
             <td class="NameColumn"><div class="CellWrap">
                     <?php
                     echo $row['Name'];
+                    echo ($row['StageID'] == $this->data('DefaultStageID')) ? '<span class="default-tag Tag Meta">'.t('Default').'</span>' : '';
                     ?></div>
             </td>
             <td>

@@ -13,8 +13,10 @@ Gdn::structure()
     ->set();
 
 // Add the activity type for stages.
-// $activityModel = new ActivityModel();
-// $activityModel->defineType('Stage');
+$activityModel = new ActivityModel();
+$activityModel->defineType('AuthorStage');
+$activityModel = new ActivityModel();
+$activityModel->defineType('VoterStage');
 
 if (!$stageExists) {
     // Add some default statuses.
@@ -38,3 +40,5 @@ $reactionModel->defineReactionType(array('UrlCode' => IdeationPlugin::REACTION_U
     'Description' => "This reaction is reserved for idea upvotes."));
 $reactionModel->defineReactionType(array('UrlCode' => IdeationPlugin::REACTION_DOWN, 'Name' => 'Down', 'Sort' => 101, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1, 'Hidden' => true, 'Active' => true,
     'Description' => "This reaction is reserved for idea downvotes."));
+
+touchConfig('Plugins.Ideation.DefaultStageID', 1);
