@@ -1,4 +1,11 @@
 <?php
+/**
+ * AnalyticsWidget class file.
+ *
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanillaanalytics
+ */
 
 /**
  * A data container for graphical representation in the browser (e.g. charts, metrics).

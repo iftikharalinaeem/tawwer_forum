@@ -1,4 +1,11 @@
 <?php
+/**
+ * AnalyticsPanel class file.
+ *
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanillaanalytics
+ */
 
 /**
  * A collection of analytics widgets.
@@ -17,7 +24,8 @@ class AnalyticsPanel implements JsonSerializable {
 
     /**
      * AnalyticsPanel constructor.
-     * @param bool $panelID
+     *
+     * @param bool|integer|string $panelID Unique identifier for this panel.  False if none.
      */
     public function __construct($panelID = false) {
         if ($panelID) {
@@ -63,6 +71,8 @@ class AnalyticsPanel implements JsonSerializable {
 
     /**
      * Specify data which should be serialized to JSON.
+     *
+     * @return array
      */
     public function jsonSerialize() {
         return [

@@ -1,4 +1,11 @@
 <?php
+/**
+ * AnalyticsDashboard class file.
+ *
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanillaanalytics
+ */
 
 /**
  * A collection of analytics charts and metrics, grouped by panels.
@@ -27,7 +34,8 @@ class AnalyticsDashboard implements JsonSerializable {
 
     /**
      * AnalyticsDashboard constructor.
-     * @param bool $dashboardID
+     *
+     * @param bool|integer|string $dashboardID Unique identifier for this dashboard.  False if none.
      */
     public function __construct($dashboardID = false) {
         if ($dashboardID) {
@@ -138,6 +146,8 @@ class AnalyticsDashboard implements JsonSerializable {
 
     /**
      * Specify data which should be serialized to JSON.
+     *
+     * @return array
      */
     public function jsonSerialize() {
         return [

@@ -1,4 +1,11 @@
 <?php
+/**
+ * AnalyticsSection class file.
+ *
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanillaanalytics
+ */
 
 /**
  * A logical grouping of dashboards.
@@ -27,7 +34,8 @@ class AnalyticsSection {
 
     /**
      * AnalyticsSection constructor.
-     * @param string|bool $sectionID This section's unique identifier.
+     *
+     * @param bool|integer|string $sectionID This section's unique identifier. False if none.
      */
     public function __construct($sectionID = false) {
         if ($sectionID) {
@@ -138,7 +146,7 @@ class AnalyticsSection {
     /**
      * Set the title for this section.
      *
-     * @param $title New title for this section.
+     * @param string $title New title for this section.
      * @return $this
      */
     public function setTitle($title) {

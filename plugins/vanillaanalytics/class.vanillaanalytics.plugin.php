@@ -2,9 +2,9 @@
 /**
  * VanillaAnalytics plugin.
  *
- * @copyright 2009-2015 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
- * @package Analytics
+ * @package vanillaanalytics
  */
 
 $PluginInfo['vanillaanalytics'] = array(
@@ -315,6 +315,8 @@ class VanillaAnalytics extends Gdn_Plugin {
     }
 
     /**
+     * Perform any necessary database or configuration updates.
+     *
      * @throws Gdn_UserException
      */
     public function structure() {

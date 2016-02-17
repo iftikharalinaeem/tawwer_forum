@@ -1,8 +1,14 @@
 <?php
+/**
+ * KeenIOClient class file.
+ *
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanillaanalytics
+ */
 
 /**
  * keen.io client built on Garden HTTP
- * @package VanillaAnalytics
  */
 class KeenIOClient extends Garden\Http\HttpClient {
 
@@ -155,6 +161,7 @@ class KeenIOClient extends Garden\Http\HttpClient {
      * @param string $endpoint Target endpoint, without the host.
      * @param array $data Payload for API command.
      * @param string $authorization Value for the authorization header.
+     * @param string $requestMethod Method to use for the request. Should be one of the REQUEST_* constants.
      * @return bool|stdClass Object representing result on success, false on failure.
      */
     protected function command($endpoint, $data = [], $authorization = false, $requestMethod = self::REQUEST_POST) {
@@ -203,13 +210,17 @@ class KeenIOClient extends Garden\Http\HttpClient {
     }
 
     /**
+     * Delete an event or subset of an event collection.
+     *
      * @link https://keen.io/docs/api/#delete-events
      * @todo Implement this, if we ever need it.
      */
     public function deleteEvents() {}
 
     /**
-     * https://keen.io/docs/api/#delete-a-property
+     * Remove a property from an event collection.
+     *
+     * @link https://keen.io/docs/api/#delete-a-property
      * @todo Implement this, if we ever need it.
      */
     public function deleteEventProperties() {}
@@ -244,6 +255,12 @@ class KeenIOClient extends Garden\Http\HttpClient {
         );
     }
 
+    /**
+     * Return schema information for all the event collections.
+     *
+     * @link https://keen.io/docs/api/#inspect-all-collections
+     * @return bool|stdClass
+     */
     public function getEventSchemas() {
         return $this->getCollections();
     }
@@ -340,6 +357,8 @@ class KeenIOClient extends Garden\Http\HttpClient {
     }
 
     /**
+     * Fetch the currently-configured API read key.
+     *
      * @return string
      */
     public function getReadKey() {
@@ -347,6 +366,8 @@ class KeenIOClient extends Garden\Http\HttpClient {
     }
 
     /**
+     * Fetch the currently-configured API write key.
+     *
      * @return string
      */
     public function getWriteKey() {

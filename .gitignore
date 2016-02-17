@@ -7,4 +7,5 @@
 *.kpf
 *.swp
 _notes
+phpdoc.dist.xml
 Thumbs.db

@@ -1,4 +1,11 @@
 <?php
+/**
+ * KeenIOChart class file.
+ *
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanillaanalytics
+ */
 
 /**
  * A representation of a chart configuration.
@@ -56,24 +63,46 @@ class KeenIOChart implements JsonSerializable {
         return $this;
     }
 
+    /**
+     * Fetch the current chart's options.
+     *
+     * @return array
+     */
     public function getOptions() {
         return $this->options;
     }
 
+    /**
+     * Fetch the current chart's query collection.
+     *
+     * @return array
+     */
     public function getQueries() {
         return $this->queries;
     }
 
+    /**
+     * Fetch the current chart's title.
+     *
+     * @return string
+     */
     public function getTitle() {
         return $this->title;
     }
 
+    /**
+     * Fetch the current chart's type.
+     *
+     * @return string
+     */
     public function getType() {
         return $this->type;
     }
 
     /**
      * Specify data which should be serialized to JSON.
+     *
+     * @return array
      */
     public function jsonSerialize() {
         return [

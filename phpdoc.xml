@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+    <parser>
+        <extensions>
+            <extension>php</extension>
+        </extensions>
+        <markers></markers>
+        <target>docs/source</target>
+    </parser>
+    <transformer>
+        <target>docs/source</target>
+        <template name="responsive" />
+    </transformer>
+    <files>
+        <directory>plugins/vanillaanalytics</directory>
+        <ignore>plugins/vanillaanalytics/vendor/*</ignore>
+        <ignore>plugins/vanillaanalytics/views/*</ignore>
+
+    </files>
+    <title>Vanilla Analytics</title>
+</phpdoc>

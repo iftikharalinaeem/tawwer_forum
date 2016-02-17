@@ -1,8 +1,14 @@
 <?php
+/**
+ * AnalyticsData class file.
+ *
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanillaanalytics
+ */
 
 /**
  * A collection of methods for simplifying the task of gathering information on records.
- * @package VanillaAnalytics
  */
 class AnalyticsData extends Gdn_Model {
 
@@ -37,6 +43,11 @@ class AnalyticsData extends Gdn_Model {
         return $category;
     }
 
+    /**
+     * Build and return an array mapping category IDs to category names.
+     *
+     * @return array
+     */
     public static function getCategoryMap() {
         $categories = [];
         $categoriesRaw = Gdn::sql()
@@ -56,7 +67,7 @@ class AnalyticsData extends Gdn_Model {
     /**
      * Fetch all ancestors up to, and including, the current category.
      *
-     * @param $categoryID ID of the category we're tracking down the ancestors of.
+     * @param integer $categoryID ID of the category we're tracking down the ancestors of.
      * @return array An array of objects containing the ID and name of each of the category's ancestors.
      */
     public static function getCategoryAncestors($categoryID) {
@@ -82,7 +93,8 @@ class AnalyticsData extends Gdn_Model {
     /**
      * Grab standard data for a comment.
      *
-     * @param $commentID A comment's unique ID, used to query data.
+     * @param integer $commentID A comment's unique ID, used to query data.
+     * @param string $type Event type (e.g. comment_add or comment_edit).
      * @return array|bool Array representing comment row on success, false on failure.
      */
     public static function getComment($commentID, $type = 'comment_add') {
@@ -212,7 +224,7 @@ class AnalyticsData extends Gdn_Model {
     /**
      * Grab data about a discussion for use in analytics.
      *
-     * @param $discussionID ID of the discussion we're targeting.
+     * @param integer $discussionID ID of the discussion we're targeting.
      * @return array|bool An array representing the discussion data on success, false on failure.
      */
     public static function getDiscussion($discussionID) {
@@ -287,7 +299,7 @@ class AnalyticsData extends Gdn_Model {
      * Retrieve information about a particular user for user in analytics.
      *
      * @todo Add topBadge
-     * @param int $userID Record ID of the user to fetch.
+     * @param integer $userID Record ID of the user to fetch.
      * @return array|bool An array representing the user data on success, false on failure.
      */
     public static function getUser($userID) {

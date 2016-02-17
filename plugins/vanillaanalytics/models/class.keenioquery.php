@@ -1,4 +1,11 @@
 <?php
+/**
+ * KeenIOQuery class file.
+ *
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package vanillaanalytics
+ */
 
 /**
  * Build an analysis query object for keen.io.
@@ -203,8 +210,10 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Define the analysis type for this query.
+     *
      * @link https://keen.io/docs/api/#analyses
-     * @param string $analysisType
+     * @param string $analysisType Type of analysis for this query. Should be one of the ANALYSIS_* constants.
      * @return $this
      */
     public function setAnalysisType($analysisType) {
@@ -213,8 +222,10 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Define the collection to query against.
+     *
      * @link https://keen.io/docs/api/#event-collections
-     * @param string $eventCollection
+     * @param string $eventCollection Identifier for the collection to analyze.
      * @return $this
      */
     public function setEventCollection($eventCollection) {
@@ -223,8 +234,10 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Define the grouping parameters for this query.
+     *
      * @link https://keen.io/docs/api/#group-by
-     * @param string $groupBy
+     * @param string $groupBy A property of the current event collection to group by.
      * @return $this
      */
     public function setGroupBy($groupBy) {
@@ -233,8 +246,10 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Define the interval for this query.
+     *
      * @link https://keen.io/docs/api/#interval
-     * @param string $interval
+     * @param string $interval The interval type to use for this analysis (e.g. daily, weekly)
      * @return $this
      */
     public function setInterval($interval) {
@@ -255,8 +270,10 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Define the timezone for this query.
+     *
      * @link https://keen.io/docs/api/#timezone
-     * @param string $timezone
+     * @param string $timezone Timezone, whether absolute or relative, for this analysis.
      * @return $this
      */
     public function setTimezone($timezone) {
@@ -265,6 +282,8 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Define an absolute timeframe for this query.
+     *
      * @link https://keen.io/docs/api/#absolute-timeframes
      * @param string $start A ISO-8601-formatted date string, representing the beginning of the timeframe.
      * @param string $end A ISO-8601-formatted date string representing the end of the timeframe.
@@ -279,6 +298,8 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Define a relative timeframe for this query.
+     *
      * @link https://keen.io/docs/api/#relative-timeframes
      * @param string $rel Use "this" to include units to current.  Use "previous" to omit current, incomplete unit.
      * @param int $number Any whole number greater than 0 to indicate number of units.
@@ -291,7 +312,9 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
-     * @param string $title
+     * Define the title of this query.
+     *
+     * @param string $title New title for this analysis.
      * @return $this
      */
     public function setTitle($title) {
