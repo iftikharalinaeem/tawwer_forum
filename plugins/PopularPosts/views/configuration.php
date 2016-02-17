@@ -7,8 +7,8 @@ echo $this->Form->errors();
 ?>
 <ul>
     <li><?php
-        echo $this->Form->label(t('Popular Posts max age (Max 30 days)'), 'Plugin.PopularPosts.MaxAge');
-        echo $this->Form->textbox('Plugin.PopularPosts.MaxAge');
+        echo $this->Form->label(t('Popular Posts max age (Max 30 days)'), 'PopularPosts.MaxAge');
+        echo $this->Form->textbox('PopularPosts.MaxAge');
         ?></li>
 </ul>
 <?php echo $this->Form->close('Save');
