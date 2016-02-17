@@ -1,4 +1,5 @@
 /**
+ * @class
  * @property {boolean|Keen} keenClient Instance of a Keen object.
  * @property {string} projectID Project ID for a valid project on keen.io.
  * @property {string} writeKey An API key with write access to the configured project.
@@ -11,6 +12,7 @@ var keenTracker = {
 
 /**
  *
+ * @memberof keenTracker
  * @param {object} event
  * @param {object} sendData Data sent by the browser as part of the analyticstick request.
  * @param {jqXHR} jqXHR Superset of the browser's native XMLHttpRequest object.
@@ -26,6 +28,8 @@ keenTracker.analyticsTickHandler = function(event, sendData, jqXHR, textStatus) 
 
 /**
  * Log an event with keen.io.
+ *
+ * @memberof keenTracker
  * @param {string} eventType The type/name of the event being tracked.
  * @param {string} collection The collection to store the event under.  Defaults to "page".
  */
@@ -53,6 +57,8 @@ keenTracker.event = function(eventType, collection) {
 
 /**
  * Fetch the current instance of our keen.io client or create a new one, if possible.
+ *
+ * @memberof keenTracker
  * @return {boolean|Keen} An instance of Keen on success.  False (default value) on fail.
  */
 keenTracker.getKeenClient = function() {
@@ -75,6 +81,8 @@ keenTracker.getKeenClient = function() {
 
 /**
  * Extract the user-specific data from an eventData collection.  Augment it as necessary.
+ *
+ * @memberof keenTracker
  * @param {object} eventData An object with properties representing specifics of the current event.
  * @return {object} An object representing the current user.  May be an empty object.
  */

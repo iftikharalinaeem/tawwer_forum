@@ -181,8 +181,6 @@ class AnalyticsDashboard implements JsonSerializable {
             $dashboard
         );
 
-        $sender->addJsFile('dashboard.min.js', 'plugins/vanillaanalytics');
-
         $sender->render(
             'analytics',
             false,

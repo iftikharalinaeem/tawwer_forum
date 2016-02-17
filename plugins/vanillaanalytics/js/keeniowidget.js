@@ -1,5 +1,7 @@
 /**
  * keen.io widget object.
+ *
+ * @class
  * @param {object} rawConfig Configuration object containing chart details.
  */
 function KeenIOWidget(rangeStart, rangeEnd, config, type, title) {
@@ -30,6 +32,7 @@ function KeenIOWidget(rangeStart, rangeEnd, config, type, title) {
 
 /**
  * Setup the query object we'll need for the chart.
+ *
  * @param {object} config A DOM element where the chart should be written.
  * @param {object} properties Additional properties to add to the query object.
  * @todo Remove hardwired timeframe
@@ -85,6 +88,7 @@ KeenIOWidget.prototype.addQuery = function(config, properties) {
 
 /**
  * Get the current instance of the Keen SDK client.  Create a new one, if necessary.
+ *
  * @returns {null|Keen}
  */
 KeenIOWidget.prototype.getClient = function() {
@@ -102,16 +106,12 @@ KeenIOWidget.prototype.getClient = function() {
 };
 
 /**
- * Output a chart into the target container element.
- * @param {object} container A DOM element where the chart should be written.
+ * Write the markup for the widget to the provided container.
+ *
+ * @return string
  */
-KeenIOWidget.prototype.write = function(container) {
-    if (typeof container !== 'object') {
-        return;
-    }
-
+KeenIOWidget.prototype.writeContents = function(container) {
     var client = this.getClient();
-
     var query;
 
     if (typeof client === 'object') {
@@ -126,7 +126,7 @@ KeenIOWidget.prototype.write = function(container) {
         switch (this.type.toLowerCase()) {
             case 'metric':
                 config = {
-                    colors: ["transparent"]
+                    colors: ['transparent']
                 };
                 break;
             default:
@@ -142,6 +142,7 @@ KeenIOWidget.prototype.write = function(container) {
             container,
             config
         );
+
         /*
         var chart = new Keen.Dataviz();
         var categories = [];
