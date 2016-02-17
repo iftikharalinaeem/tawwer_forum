@@ -86,7 +86,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
      * @param $args Event arguments.
      */
     public function discussionModel_afterValidateDiscussion_handler($sender, $args) {
-        $this->reviewPostCleaniness($sender, 'Discussion', $args['DiscussionData']);
+        $this->reviewPostCleanliness($sender, 'Discussion', $args['DiscussionData']);
     }
 
     /**
@@ -96,7 +96,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
      * @param $args Event arguments.
      */
     public function commentModel_afterValidateComment_handler($sender, $args) {
-        $this->reviewPostCleaniness($sender, 'Comment', $args['CommentData']);
+        $this->reviewPostCleanliness($sender, 'Comment', $args['CommentData']);
     }
 
     /**
@@ -170,7 +170,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
      * @param $postType Type of post being inspected. (Comment, Discussion...)
      * @param $postData Content of the post.
      */
-    protected function reviewPostCleaniness($sender, $postType, $postData) {
+    protected function reviewPostCleanliness($sender, $postType, $postData) {
 
         // If the post is already flagged as invalid let's abort :D
         if (!$sender->EventArguments['IsValid']) {
