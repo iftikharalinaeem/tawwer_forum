@@ -176,6 +176,11 @@ class MustacheHandler {
         };
 
         $controller->Data = array_change_key_case(array_merge($controller->Data, $virtualData), CASE_LOWER);
+
+        // Keep a UCFirst copy for 'title' and 'breadcrumbs' since the master template uses them.
+        foreach (['title', 'breadcrumbs'] as $key) {
+            $controller->setData(ucfirst($key), $controller->data($key, []));
+        }
     }
 
     /**
