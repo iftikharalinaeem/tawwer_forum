@@ -42,3 +42,4 @@ $reactionModel->defineReactionType(array('UrlCode' => IdeationPlugin::REACTION_D
     'Description' => "This reaction is reserved for idea downvotes."));
 
 touchConfig('Plugins.Ideation.DefaultStageID', 1);
+saveToConfig('Garden.AttachmentsEnabled', true);

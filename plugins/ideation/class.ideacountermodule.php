@@ -166,7 +166,7 @@ class IdeaCounterModule extends Gdn_Module {
     protected function renderCounterBox() { ?>
         <div class="idea-counter-module <?php echo val('status', $this->counter).' '.val('cssClass', $this->counter); ?>">
             <div class="idea-counter-box">
-                <div class="score"><?php echo val('score', $this->counter) ?></div>
+                <?php echo IdeationPlugin::getScoreHtml(val('score', $this->counter)); ?>
                 <?php if (val('status', $this->counter) == 'Open') { ?>
                 <div class="vote idea-menu">
                     <span class="idea-buttons">
@@ -180,9 +180,9 @@ class IdeaCounterModule extends Gdn_Module {
                 </div>
                 <?php } ?>
             </div>
-            <?php if ($this->showVotes) { ?>
-            <div class="votes meta"><?php echo sprintf(t('%s votes'), val('numberVotes', $this->counter)); ?></div>
-            <?php } ?>
+            <?php if ($this->showVotes) {
+                echo IdeationPlugin::getVotesHtml(val('numberVotes', $this->counter));
+            } ?>
         </div>
     <?php }
 }

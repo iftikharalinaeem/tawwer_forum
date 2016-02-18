@@ -13,19 +13,33 @@ $PluginInfo['ideation'] = array(
  * Ideation Plugin
  *
  * @author    Becky Van Bussel <becky@vanillaforums.com>
- * @copyright 2016 (c) Becky Van Bussel
  * @license   Proprietary
- * @since     1.0.0
+ * @since     2.2
  */
 class IdeationPlugin extends Gdn_Plugin {
 
-    protected $defaultStageID;
-
+    /**
+     *
+     */
     const REACTION_UP = 'IdeaUp';
+    /**
+     *
+     */
     const REACTION_DOWN = 'IdeaDown';
 
+    /**
+     * @var
+     */
     protected static $upTagID;
+    /**
+     * @var
+     */
     protected static $downTagID;
+
+    /**
+     * @var
+     */
+    protected $defaultStageID;
 
     /**
      * This will run when you "Enable" the plugin
@@ -35,22 +49,30 @@ class IdeationPlugin extends Gdn_Plugin {
      * @return bool
      */
     public function setup() {
-        saveToConfig('Garden.AttachmentsEnabled', true);
         $this->structure();
     }
 
+    /**
+     *
+     */
     public function structure() {
         require dirname(__FILE__).'/structure.php';
     }
 
+    /**
+     * @param $sender
+     */
     public function base_render_before($sender) {
         $sender->addJsFile('ideation.js', 'plugins/ideation');
         $sender->addCssFile('ideation.css', 'plugins/ideation');
     }
 
+    /**
+     * @return mixed
+     */
     public function getDefaultStageID() {
         if (!$this->defaultStageID) {
-            $this->defaultStageID = c('Plugins.Ideation.DefaultStageID', '1');
+            $this->defaultStageID = c('Plugins.Ideation.DefaultStageID', 1);
         }
         return $this->defaultStageID;
     }
@@ -91,8 +113,18 @@ class IdeationPlugin extends Gdn_Plugin {
         self::$downTagID = $downTagID;
     }
 
-    // CATEGORY
+    /**
+     * CATEGORY SETTINGS
+     * -----------------
+     */
 
+    /**
+     * Adds ideation options to the categories setting page -> enabling ideation on a category and enabling downvotes.
+     * Also manipulates the allowed discussion types options when ideation is enabled on a category.
+     * Ideas are the only discussion type allowed in an ideation category.
+     *
+     * @param SettingsController $sender
+     */
     public function settingsController_addEditCategory_handler($sender) {
         $categoryID = val('CategoryID', $sender->Data);
         $category = CategoryModel::categories($categoryID);
@@ -102,7 +134,7 @@ class IdeationPlugin extends Gdn_Plugin {
             $ideaOptions = array('checked' => 'checked');
         }
 
-        $sender->Data['_ExtendedFields']['IsIdea'] = array('Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => '<strong>Ideation</strong> <small><a href="#">Learn more about Ideas</a></small>', 'Options' => $ideaOptions);
+        $sender->Data['_ExtendedFields']['IsIdea'] = array('Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => '<strong>Ideation</strong> <small><a href="#">Learn more about ideas</a></small>', 'Options' => $ideaOptions);
         $sender->Data['_ExtendedFields']['UseDownVotes'] = array('Name' => 'UseDownVotes', 'Control' => 'CheckBox');
 
         if ($sender->Form->authenticatedPostBack()) {
@@ -122,23 +154,86 @@ class IdeationPlugin extends Gdn_Plugin {
                 $sender->Form->setFormValue('AllowedDiscussionTypes', $types);
             }
 
+            // Strict mode compliant.
             $sender->Form->setFormValue('IsIdea', forceBool($sender->Form->getFormValue('IsIdea'), '0', '1', '0'));
             $sender->Form->setFormValue('UseDownVotes', forceBool($sender->Form->getFormValue('UseDownVotes'), '0', '1', '0'));
         }
     }
 
-    // SETTINGS
+    /**
+     * STAGE SETTINGS
+     * --------------
+     */
 
+    /**
+     * Adds endpoint for editing a stage, renders the form and performs the update operation.
+     *
+     * @param SettingsController $sender
+     * @param $stageID The ID of the stage to edit.
+     * @throws Exception
+     */
     public function settingsController_editStage_create($sender, $stageID) {
+        if (!$stageID) {
+            throw NotFoundException('Stage');
+        }
         $sender->title(sprintf(T('Edit %s'), T('Stage')));
         $this->addEdit($sender, $stageID);
     }
 
+    /**
+     * Adds endpoint for adding a stage, renders the form and performs the insert operation.
+     *
+     * @param SettingsController $sender
+     * @throws Exception
+     */
     public function settingsController_addStage_create($sender) {
         $sender->title(sprintf(T('Add %s'), T('Stage')));
         $this->addEdit($sender);
     }
 
+    /**
+     * Renders the add/edit stage form and performs the corresponding operation.
+     *
+     * @param SettingsController $sender
+     * @param int $stageID The ID of the stage to edit.
+     * @throws Exception
+     */
+    protected function addEdit($sender, $stageID = 0) {
+        $sender->permission('Garden.Settings.Manage');
+        $stageModel = new StageModel();
+
+        if ($sender->Form->authenticatedPostBack()) {
+            $data = $sender->Form->formValues();
+            $result = $stageModel->save(val('Name', $data), val('Status', $data), val('Description', $data), array(), $stageID);
+            $sender->Form->setValidationResults($stageModel->validationResults());
+            if ($result) {
+                if (val('IsDefaultStage', $data, false)) {
+                    saveToConfig('Plugins.Ideation.DefaultStageID', $stageID);
+                }
+                $sender->informMessage(t('Your changes have been saved.'));
+                $sender->RedirectUrl = url('/settings/stages');
+                $sender->setData('Stage', StageModel::getStage($result));
+            }
+        } elseif ($stageID) {
+            // We're about to edit, set up the data from the stage.
+            $data = StageModel::getStage($stageID);
+            if (!$data) {
+                throw NotFoundException('Stage');
+            }
+            $data['IsDefaultStage'] = (c('Plugins.Ideation.DefaultStageID') == $stageID);
+            $sender->Form->setData($data);
+            $sender->Form->addHidden('StageID', $stageID);
+        }
+        $sender->addSideMenu();
+        $sender->render('stage', '', 'plugins/ideation');
+    }
+
+    /**
+     * Adds endpoint for deleting a stage, renders the form and performs the delete operation.
+     *
+     * @param SettingsController $sender
+     * @param $stageID
+     */
     public function settingsController_deleteStage_create($sender, $stageID) {
         $sender->permission('Garden.Settings.Manage');
 
@@ -154,6 +249,11 @@ class IdeationPlugin extends Gdn_Plugin {
         $sender->render('DeleteStage', '', 'plugins/ideation');
     }
 
+    /**
+     * Adds endpoint in the dashboard for viewing all stages and renders the view.
+     *
+     * @param SettingsController $sender
+     */
     public function settingsController_stages_create($sender) {
         $sender->permission('Garden.Settings.Manage');
         $sender->setData('Stages', StageModel::getStages());
@@ -163,37 +263,18 @@ class IdeationPlugin extends Gdn_Plugin {
         $sender->render('stages', '', 'plugins/ideation');
     }
 
-    protected function addEdit($sender, $stageID = 0) {
-        $sender->permission('Garden.Settings.Manage');
-        $stageModel = new StageModel();
-        if ($sender->Form->authenticatedPostBack()) {
-            $data = $sender->Form->formValues();
-            $result = $stageModel->save(val('Name', $data), val('Status', $data), val('Description', $data), array(), $stageID);
-            $sender->Form->setValidationResults($stageModel->validationResults());
-            if ($result) {
-                if (val('IsDefaultStage', $data, false)) {
-                    saveToConfig('Plugins.Ideation.DefaultStageID', $stageID);
-                }
-                $sender->informMessage(t('Your changes have been saved.'));
-                $sender->RedirectUrl = url('/settings/stages');
-                $sender->setData('Stage', StageModel::getStage($result));
-            }
-        } elseif ($stageID) {
-            // We're editting
-            $data = StageModel::getStage($stageID);
-            if (!$data) {
-                throw NotFoundException('Stage');
-            }
-            $data['IsDefaultStage'] = (c('Plugins.Ideation.DefaultStageID') == $stageID);
-            $sender->Form->setData($data);
-            $sender->Form->addHidden('StageID', $stageID);
-        }
-        $sender->addSideMenu();
-        $sender->render('stage', '', 'plugins/ideation');
-    }
+    /**
+     * IDEA POST FORM
+     * --------------
+     * Adds a new, stripped-down post type: 'Idea', without announcing or tagging capabilities beyond stage-type tags.
+     */
 
-    // POST
-
+    /**
+     * Add an Idea discussion type.
+     *
+     * @param Controller $sender
+     * @param array $args
+     */
     public function base_discussionTypes_handler($sender, $args) {
         $args['Types']['Idea'] = array(
             'Singular' => 'Idea',
@@ -204,15 +285,25 @@ class IdeationPlugin extends Gdn_Plugin {
         );
     }
 
+    /**
+     * Adds a post/idea endpoint, ensures there's a category and that the category is an idea category,
+     * and then sets the default stage and Idea type on the discussion post.
+     *
+     * @param PostController $sender
+     * @param array $args The event arguments. The first argument should be the category slug.
+     * @throws Exception
+     */
     public function postController_idea_create($sender, $args) {
+        //TODO: Permission to post idea?
+
         if (!sizeof($args)) {
             // No category was specified.
-            throw new Exception(t('An idea can only be posted in an Idea category.'), 401);
+            throw NotFoundException('Category');
         }
         $categoryCode = $args[0];
         $category = CategoryModel::categories($categoryCode);
-        if (!in_array('Idea', val('AllowedDiscussionTypes', $category))) {
-            // This isn't an idea category.
+
+        if (!$this->isIdeaCategory($category)) {
             throw new Exception(t('An idea can only be posted in an Idea category.'), 401);
         }
         $sender->setData('Type', 'Idea');
@@ -224,27 +315,37 @@ class IdeationPlugin extends Gdn_Plugin {
         $sender->discussion($categoryCode);
     }
 
+    /**
+     * Adds a post/editidea endpoint
+     *
+     * @param PostController $sender
+     * @param $args
+     * @throws Exception
+     */
     public function postController_editidea_create($sender, $args) {
+        // TODO: Permission... Who can edit an idea?
+
         if (!sizeof($args)) {
-            // No discussion was specified.
+            throw NotFoundException('Idea');
         }
-
-        // TODO: Permission... Can an idea be editted?
-
         $discussionID = $args[0];
-        $discussionModel = $sender->DiscussionModel;
-        $discussionModel->getID($discussionID);
-        $sender->setData('Type', 'Idea');
-        $sender->Form->setFormValue('Type', 'Idea');
-        $sender->Form->setFormValue('Tags', val('TagID', StageModel::getStage($this->getDefaultStageID())));
+
+        if (!$this->isIdea($discussionID)) {
+            throw NotFoundException('Idea');
+        }
         $sender->View = 'discussion';
         $sender->editDiscussion($discussionID);
     }
 
-    public function postController_beforeDiscussionRender_handler($sender, $args) {
+    /**
+     * Makes changes to the default discussion post form for an idea:
+     * Removes category selector, adds idea-specific title and changes text on the Save button.
+     *
+     * @param PostController $sender
+     */
+    public function postController_beforeDiscussionRender_handler($sender) {
         if (val('Type', $sender->Data) === 'Idea') {
-            $sender->Discussion = 'Idea'; // Kludge to set 'Post Discussion' button to 'Save'
-            $sender->setData('Title', sprintf(t('New %s'), t('Idea')));
+            $sender->Discussion = 'Idea'; // Kludge to set text on 'Post Discussion' button to 'Save'
             $sender->ShowCategorySelector = false;
 
             if ($sender->data('Discussion')) {
@@ -255,15 +356,30 @@ class IdeationPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * The idea post form is a stripped down version of the discussion form. This removes any options from the form
+     * including announcing option.
+     *
+     * @param PostController $sender
+     * @param array $args
+     */
     public function postController_discussionFormOptions_handler($sender, $args) {
-        // Clear out announcements options. Kludge.
+        // Clear out options.
         if (val('Options', $args)) {
             $args['Options'] = '';
         }
     }
 
-    // TAGS
+    /**
+     * STAGE TAGGING
+     * -------------
+     */
 
+    /**
+     * Register a new tag type: Stage
+     *
+     * @param TagModel $sender
+     */
     public function tagModel_types_handler($sender) {
         $sender->addType('Stage', array(
             'key' => 'Stage',
@@ -274,16 +390,92 @@ class IdeationPlugin extends Gdn_Plugin {
         ));
     }
 
-    public function discussionController_render_before($sender, $args) {
-        $isIdea = false;
-        if (($discussion = val('Discussion', $sender)) && val('Type', $sender->Discussion) == 'Idea') {
-            $isIdea = true;
+    /**
+     * Prints Stage-type tags on discussions in a discussion list
+     *
+     * @param Controller $sender
+     * @param array $args
+     */
+    public function base_beforeDiscussionMeta_handler($sender, $args) {
+        $discussion = val('Discussion', $args);
+        if (!$this->isIdea($discussion)) {
+            return;
         }
+        $stage = StageModel::getStageByDiscussion(val('DiscussionID', $discussion));
+        if ($stage) {
+            echo ' <a href="'.url('/discussions/tagged/'.urlencode(val('Name', $stage))).'"><span class="Tag Stage-Tag-'.urlencode(val('Name', $stage)).'"">'.val('Name', $stage).'</span></a> ';
+//            echo ' <span class="MItem MCount IdeaVoteCount"><span class="Number">'.self::getTotalVotes($discussion).'</span> '.t('votes').'</span>';
+        }
+    }
 
-        // Don't display tags on a idea discussion.
-        if ($isIdea) {
+    /**
+     * IDEA COUNTER
+     * ------------
+     */
+
+    /**
+     * Modern layout discussion list counter placement.
+     *
+     * @param Controller $sender
+     * @param array $args
+     */
+    public function base_beforeDiscussionContent_handler($sender, $args) {
+        $discussion = val('Discussion', $args);
+        if (!$this->isIdea($discussion)) {
+            return;
+        }
+        if (c('Vanilla.Discussions.Layout') == 'modern') {
+            $this->renderIdeaCounter($discussion);
+        }
+    }
+
+    /**
+     * Table layout discussion list counter placement.
+     *
+     * @param Controller $sender
+     * @param array $args
+     */
+    public function base_beforeDiscussionTitle_handler($sender, $args) {
+        $discussion = val('Discussion', $args);
+        if (!$this->isIdea($discussion)) {
+            return;
+        }
+        if (c('Vanilla.Discussions.Layout') == 'table') {
+            $this->renderIdeaCounter($discussion);
+        }
+    }
+
+    /**
+     * Renders the idea counter module for a discussion.
+     *
+     * @param object $discussion
+     */
+    public function renderIdeaCounter($discussion) {
+        $ideaCounterModule = IdeaCounterModule::instance();
+        $userVote = '';
+        if ($tagID = val('UserVote', $discussion)) {
+            $userVote = $this->getReactionFromTagID($tagID);
+        }
+        $ideaCounterModule->setUserVote($userVote);
+        $useDownVotes = $this->allowDownVotes($discussion, 'discussion');
+        $ideaCounterModule->setUseDownVotes($useDownVotes);
+        $ideaCounterModule->setDiscussion($discussion);
+        echo $ideaCounterModule->toString();
+    }
+
+    /**
+     * Disables rendering of tags in a discussion and sets up the idea counter module for the discussion attachment.
+     *
+     * @param DiscussionController $sender
+     */
+    public function discussionController_render_before($sender) {
+        $discussion = val('Discussion', $sender);
+
+        if ($this->isIdea($discussion)) {
+            // Don't display tags on a idea discussion.
             saveToConfig('Plugins.Tagging.DisableInline', true, true);
         } else {
+            // Display tags otherwise and return.
             saveToConfig('Plugins.Tagging.DisableInline', false, true);
             return;
         }
@@ -300,65 +492,22 @@ class IdeationPlugin extends Gdn_Plugin {
         $sender->setData('IdeaCounterModule', $ideaCounterModule);
     }
 
-    // Print tags on discussionlist
-    public function base_beforeDiscussionMeta_handler($sender, $args) {
-        $discussion = $args['Discussion'];
-        if (!$this->isIdea($discussion)) {
-            return;
-        }
-        $stage = StageModel::getStageByDiscussion(val('DiscussionID', $discussion));
-        if ($stage) {
-            echo ' <a href="'.url('/discussions/tagged/'.urlencode(val('Name', $stage))).'"><span class="Tag Stage-Tag-'.urlencode(val('Name', $stage)).'"">'.val('Name', $stage).'</span></a> ';
-//            echo ' <span class="MItem MCount IdeaVoteCount"><span class="Number">'.self::getTotalVotes($discussion).'</span> '.t('votes').'</span>';
-        }
-    }
-
-    // Modern layout discussion list counter placement.
-    public function base_beforeDiscussionContent_handler($sender, $args) {
-        $discussion = $args['Discussion'];
-        if (!$this->isIdea($discussion)) {
-            return;
-        }
-        if (c('Vanilla.Discussions.Layout') == 'modern') {
-            $ideaCounterModule = IdeaCounterModule::instance();
-            $userVote = '';
-            if ($tagID = val('UserVote', $discussion)) {
-                $userVote = $this->getReactionFromTagID($tagID);
-            }
-            $ideaCounterModule->setUserVote($userVote);
-            $useDownVotes = $this->allowDownVotes($discussion, 'discussion');
-            $ideaCounterModule->setUseDownVotes($useDownVotes);
-            $ideaCounterModule->setDiscussion($discussion);
-            echo $ideaCounterModule->toString();
-        }
-    }
-
-    // Table layout discussion list counter placement.
-    public function base_beforeDiscussionTitle_handler($sender, $args) {
-        $discussion = $args['Discussion'];
-        if (!$this->isIdea($discussion)) {
-            return;
-        }
-        if (c('Vanilla.Discussions.Layout') == 'table') {
-            $ideaCounterModule = IdeaCounterModule::instance();
-            $userVote = '';
-            if ($tagID = val('UserVote', $discussion)) {
-                $userVote = $this->getReactionFromTagID($tagID);
-            }
-            $ideaCounterModule->setUserVote($userVote);
-            $useDownVotes = $this->allowDownVotes($discussion, 'discussion');
-            $ideaCounterModule->setUseDownVotes($useDownVotes);
-            $ideaCounterModule->setDiscussion($discussion);
-            echo $ideaCounterModule->toString();
-        }
-    }
-
+    /**
+     * Adds the ItemIdea CSS class to a Idea-type discussion in a discussion list.
+     *
+     * @param Controller $sender
+     * @param array $args
+     */
     public function base_beforeDiscussionName_handler($sender, $args) {
-        if ((val('Type', val('Discussion', $args)) == 'Idea')) {
+        if ($this->isIdea(val('Discussion', $args))) {
             $args['CssClass'] .= ' ItemIdea';
         }
     }
 
+    /**
+     * @param $sender
+     * @param $args
+     */
     public function base_discussionOptions_handler($sender, $args) {
         $discussion = $args['Discussion'];
         if (!$this->isIdea($discussion)) {
@@ -387,6 +536,12 @@ class IdeationPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * @param $sender
+     * @param string $discussionID
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
     public function discussionController_stageOptions_create($sender, $discussionID = '') {
         if ($discussionID) {
             $discussion = $sender->DiscussionModel->GetID($discussionID);
@@ -420,18 +575,37 @@ class IdeationPlugin extends Gdn_Plugin {
         }
     }
 
-    // ATTACHMENTS
+    /**
+     * ATTACHMENTS
+     * -----------
+     */
 
+    /**
+     * @param $sender
+     */
     public function discussionController_fetchAttachmentViews_handler($sender) {
         require_once $sender->fetchViewLocation('attachment', '', 'plugins/ideation');
     }
 
+    /**
+     * @param $sender
+     * @param $args
+     */
     public function discussionModel_AfterSaveDiscussion_handler($sender, $args) {
-        if ($this->isIdea(val('DiscussionID', $args))) {
-            $this->updateAttachment(val('DiscussionID', $args), self::getDefaultStageID(), '');
+        if ($this->isIdea($discussionID = val('DiscussionID', $args))) {
+            $stage = StageModel::getStageByDiscussion($discussionID);
+            if (!$stage) {
+                // We've got a new idea, add an attachment.
+                $this->updateAttachment(val('DiscussionID', $args), self::getDefaultStageID(), '');
+            }
         }
     }
 
+    /**
+     * @param $discussionID
+     * @param $stageID
+     * @param $stageNotes
+     */
     protected function updateAttachment($discussionID, $stageID, $stageNotes) {
 
         $stage = StageModel::getStage($stageID);
@@ -469,8 +643,17 @@ class IdeationPlugin extends Gdn_Plugin {
         $attachmentModel->save($attachment);
     }
 
-    // REACTIONS
+    /**
+     * REACTIONS
+     * ---------
+     */
 
+    /**
+     * Close down any reacting to ideas with closed statuses.
+     *
+     * @param ReactionModel $sender
+     * @param array $args
+     */
     public function reactionModel_getReaction_handler($sender, $args) {
         if ($reaction = val('ReactionType', $args)) {
             if ((val('UrlCode', $reaction) == self::REACTION_UP) || (val('UrlCode', $reaction) == self::REACTION_DOWN)) {
@@ -517,7 +700,7 @@ class IdeationPlugin extends Gdn_Plugin {
             $cssClass = 'uservote';
         }
 
-        $args['Button'] = self::getIdeaReactionButton($discussion, $urlCode, $reaction, array('cssClass' => $cssClass));
+        $args['Button'] = getIdeaReactionButton($discussion, $urlCode, $reaction, array('cssClass' => $cssClass));
 
         $countUp = getValueR('Attributes.React.'.self::REACTION_UP, $discussion, 0);
         $countDown = getValueR('Attributes.React.'.self::REACTION_DOWN, $discussion, 0);
@@ -527,13 +710,13 @@ class IdeationPlugin extends Gdn_Plugin {
 
         Gdn::controller()->jsonTarget(
             '#Discussion_'.val('DiscussionID', $discussion).' .score',
-            '<div class="score">'.$score.'</div>',
+            getScoreHtml($score),
             'ReplaceWith'
         );
 
         Gdn::controller()->jsonTarget(
             '#Discussion_'.val('DiscussionID', $discussion).' .votes',
-            '<div class="votes meta">'.sprintf(t('%s votes'), $votes).'</div>',
+            getVotesHtml($votes),
             'ReplaceWith'
         );
     }
@@ -551,7 +734,7 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Stops the reactions model from scoring non-idea-type reactions in Idea discussions.
+     * Stops the reactions model from scoring non-idea-type reactions in idea discussions.
      * Only the up and down reactions should contribute to the score.
      *
      * @param Gdn_Controller $sender
@@ -699,19 +882,21 @@ class IdeationPlugin extends Gdn_Plugin {
         $url = Url("/react/discussion/$urlCode2?id=$id&selfreact=true");
         $dataAttr = "data-reaction=\"$urlCode2\"";
 
-        return self::getReactionButtonHtml($linkClass, $url, $label, $dataAttr);
-    }
-
-    // TODO: Figure out how to let this be override-able
-    public static function getReactionButtonHtml($cssClass, $url, $label, $dataAttr = '') {
-        return '<a class="Hijack idea-button '.$cssClass.'" href="'.$url.'" title="'.$label.'" '.$dataAttr.' rel="nofollow"><span class="arrow arrow-'.strtolower($label).'"></span> <span class="idea-label">'.$label.'</span></a>';
+        return getReactionButtonHtml($linkClass, $url, $label, $dataAttr);
     }
 
     // SORT/FILTER
 
+    /**
+     * @param $sender
+     */
     public function categoriesController_index_before($sender) {
         $categoryCode = val('CategoryIdentifier', val('ReflectArgs', $sender, false));
         if (!$categoryCode || !$this->isIdeaCategory(CategoryModel::categories($categoryCode))) {
+            DiscussionsSortFilterModule::addFilter('discussion-type', 'Discussions', array('d.Type' => null, 'd.Announce' => 0), 'type');
+            DiscussionsSortFilterModule::addFilter('announcement-type', 'Announcements', array('d.Announce >' => 0), 'type');
+            DiscussionsSortFilterModule::addFilter('question-type', 'Questions', array('d.Type' => 'Question'), 'type');
+            DiscussionsSortFilterModule::addFilter('poll-type', 'Polls', array('d.Type' => 'poll'), 'type');
             return;
         }
         $openStages = StageModel::getOpenStages();
@@ -719,7 +904,7 @@ class IdeationPlugin extends Gdn_Plugin {
         foreach ($openStages as $openStage) {
             $openTags[] = val('TagID', $openStage);
         }
-        DiscussionSortFilterModule::addFilter('open', 'Status: Open',
+        DiscussionsSortFilterModule::addFilter('open', 'Status: Open',
             array('d.Tags' => $openTags), 'status'
         );
 
@@ -728,34 +913,44 @@ class IdeationPlugin extends Gdn_Plugin {
         foreach ($closedStages as $closedStage) {
             $closedTags[] = val('TagID', $closedStage);
         }
-        DiscussionSortFilterModule::addFilter('closed', 'Status: Closed',
+        DiscussionsSortFilterModule::addFilter('closed', 'Status: Closed',
             array('d.Tags' => $closedTags), 'status'
         );
         foreach(StageModel::getStages() as $stage) {
-            DiscussionSortFilterModule::addFilter(strtolower(val('Name', $stage)).'-stage' , val('Name', $stage),
+            DiscussionsSortFilterModule::addFilter(strtolower(val('Name', $stage)).'-stage' , val('Name', $stage),
                 array('d.Tags' => val('TagID', $stage)), 'stage'
             );
         }
     }
 
+    /**
+     * @param $sender
+     */
     public function categoriesController_pageControls_handler($sender) {
         $categoryID = val('CategoryID', $sender);
         if (!$categoryID || !$this->isIdeaCategory(CategoryModel::categories($categoryID))) {
-            return;
+//            return;
         }
-        $discussionSortFilterModule = new DiscussionSortFilterModule();
+        $discussionSortFilterModule = new DiscussionsSortFilterModule();
         echo $discussionSortFilterModule;
     }
 
     // ACTIVITY
 
+    /**
+     * @param $authorID
+     * @param $discussionID
+     * @param $discussionName
+     * @param $newStage
+     * @throws Exception
+     */
     public function notifyIdeaAuthor($authorID, $discussionID, $discussionName, $newStage) {
         if (sizeof($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
         $headline = t("Progress on your idea!");
         $lead = sprintf(t('The stage for "%s" has changed to %s.'),
-            '<em><a href="'.url('/discussion/'.$discussionID).'">'.$discussionName.'</a></em>',
+            $discussionName,
             '<strong>'.val('Name', $newStage).'</strong>'
         );
         $story = ' '.sprintf(t("Voting for the idea is now %s."), strtolower(val('Status', $newStage)));
@@ -777,6 +972,12 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
 
+    /**
+     * @param $discussionID
+     * @param $discussionName
+     * @param $newStage
+     * @throws Exception
+     */
     public function notifyVoters($discussionID, $discussionName, $newStage) {
         if (sizeof($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
@@ -785,7 +986,7 @@ class IdeationPlugin extends Gdn_Plugin {
         $voters = $this->getVoterIDs($discussionID);
         $headline = t('Progress on an idea you voted on!');
         $lead = sprintf(t('The stage for "%s" has changed to %s.'),
-            '<em><a href="'.url('/discussion/'.$discussionID).'">'.$discussionName.'</a></em>',
+            $discussionName,
             '<strong>'.val('Name', $newStage).'</strong>'
         );
         $story = ' '.sprintf(t("Voting for the idea is now %s."), strtolower(val('Status', $newStage)));
@@ -823,6 +1024,11 @@ class IdeationPlugin extends Gdn_Plugin {
 
     // HELPERS
 
+    /**
+     * @param $discussion
+     * @param null $discussionModel
+     * @return mixed
+     */
     public function getStageNotes($discussion, $discussionModel = null) {
         if (!$discussionModel) {
             $discussionModel = new DiscussionModel();
@@ -830,6 +1036,10 @@ class IdeationPlugin extends Gdn_Plugin {
         return $discussionModel->getRecordAttribute($discussion, 'StageNotes');
     }
 
+    /**
+     * @param $tagID
+     * @return string
+     */
     public function getReactionFromTagID($tagID) {
         if ($tagID == self::getUpTagID()) {
             return self::REACTION_UP;
@@ -840,6 +1050,10 @@ class IdeationPlugin extends Gdn_Plugin {
         return '';
     }
 
+    /**
+     * @param $discussionID
+     * @return array
+     */
     public function getVoterIDs($discussionID) {
         $userTagModel = new Gdn_Model('UserTag');
         $userTags = $userTagModel->getWhere(array(
@@ -856,6 +1070,10 @@ class IdeationPlugin extends Gdn_Plugin {
         return $users;
     }
 
+    /**
+     * @param $discussion
+     * @return bool
+     */
     public function isIdea($discussion) {
         if (is_numeric($discussion)) {
             $discussionModel = new DiscussionModel();
@@ -864,10 +1082,19 @@ class IdeationPlugin extends Gdn_Plugin {
         return (strtolower(val('Type', $discussion)) === 'idea');
     }
 
+    /**
+     * @param $category
+     * @return bool
+     */
     public function isIdeaCategory($category) {
         return in_array('Idea', val('AllowedDiscussionTypes', $category, array()));
     }
 
+    /**
+     * @param $data
+     * @param string $datatype
+     * @return bool|mixed
+     */
     public function allowDownVotes($data, $datatype = 'category') {
         switch(strtolower($datatype)) {
             case 'category' :
@@ -883,6 +1110,11 @@ class IdeationPlugin extends Gdn_Plugin {
         return val('UseDownVotes', $category);
     }
 
+    /**
+     * @param $discussion
+     * @param $stageID
+     * @param $notes
+     */
     public function updateDiscussionStage($discussion, $stageID, $notes) {
         if (!$this->isIdea($discussion) || !is_numeric($stageID)) {
             return;
@@ -898,6 +1130,10 @@ class IdeationPlugin extends Gdn_Plugin {
         $this->notifyVoters($discussionID, val('Name', $discussion), $newStage);
     }
 
+    /**
+     * @param $discussionID
+     * @param $stageID
+     */
     protected function updateDiscussionStageTag($discussionID, $stageID) {
         // TODO:  Decrement tag discussion count
         $oldStage = StageModel::getStageByDiscussion($discussionID);
@@ -912,11 +1148,20 @@ class IdeationPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * @param $discussionID
+     * @param $notes
+     * @throws Exception
+     */
     protected function updateDiscussionStageNotes($discussionID, $notes) {
         $discussionModel = new DiscussionModel();
         $discussionModel->saveToSerializedColumn('Attributes', $discussionID, 'StageNotes', $notes);
     }
 
+    /**
+     * @param $discussion
+     * @return bool|int|mixed
+     */
     public static function getTotalVotes($discussion) {
         if (val('Attributes', $discussion) && $reactions = val('React', $discussion->Attributes)) {
             $noUp = val(self::REACTION_UP, $reactions, 0);
@@ -925,6 +1170,39 @@ class IdeationPlugin extends Gdn_Plugin {
         }
         return 0;
     }
+}
+
+/**
+ * Renders ideation reaction buttons (for upvotes and downvotes).
+ *
+ * @param string $cssClass The reaction-specific css class
+ * @param string $url The url for the reaction
+ * @param string $label The reaction's label
+ * @param string $dataAttr The data attribute for the reaction (used in reaction javascript)
+ * @return string HTML representation of the ideation reactions (up and down votes)
+ */
+function getReactionButtonHtml($cssClass, $url, $label, $dataAttr = '') {
+    return '<a class="Hijack idea-button '.$cssClass.'" href="'.$url.'" title="'.$label.'" '.$dataAttr.' rel="nofollow"><span class="arrow arrow-'.strtolower($label).'"></span> <span class="idea-label">'.$label.'</span></a>';
+}
+
+/**
+ * Renders the score block, used in the idea counter.
+ *
+ * @param int|string $score The score
+ * @return string HTML representation of the score block
+ */
+function getScoreHtml($score) {
+    return '<div class="score">'.$score.'</div>';
+}
+
+/**
+ * Renders the votes block, used in the idea counter.
+ *
+ * @param int|string $votes The number of votes
+ * @return string HTML representation of the votes block
+ */
+function getVotesHtml($votes) {
+    return '<div class="votes meta">'.sprintf(t('%s votes'), $votes).'</div>';
 }
 
 
