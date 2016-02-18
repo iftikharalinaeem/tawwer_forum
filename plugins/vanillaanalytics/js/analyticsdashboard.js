@@ -235,6 +235,9 @@ AnalyticsDashboard.prototype.writeDashboard = function() {
 /**
  * Write a panel's contents to an existing HTML element on the page.
  * @param {number|string} panelID The unique identifier for the panel to be written.
+ * @throws Throw an error when unable to retrieve the specified panel configuration.
+ * @throws Throw an error if the panel's document element cannot be found.
+ * @throws Throw an error if the panel has no widgets array.
  */
 AnalyticsDashboard.prototype.writePanel = function(panelID) {
     var panel = this.getPanel(panelID);
@@ -264,6 +267,9 @@ AnalyticsDashboard.prototype.writePanel = function(panelID) {
  * Output a widget's contents to the specified container.
  * @param {object} widgetConfig The configuration values for the widget.
  * @param {object} container An object representing an HTML element where the widget will be written.
+ * @throws Throw an error if the widget's config isn't an object.
+ * @throws Throw an error if the container isn't an object.
+ * @throws Throw an error if unable to find a compatible handler for this widget.
  */
 AnalyticsDashboard.prototype.writeWidget = function(widgetConfig, container) {
     if (typeof widgetConfig !== 'object') {
