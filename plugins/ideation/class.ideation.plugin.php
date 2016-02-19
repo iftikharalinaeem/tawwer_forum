@@ -19,56 +19,57 @@ $PluginInfo['ideation'] = array(
 class IdeationPlugin extends Gdn_Plugin {
 
     /**
-     *
+     * The Reaction name of the upvote.
      */
     const REACTION_UP = 'IdeaUp';
+
     /**
-     *
+     * The Reaction name of the downvote.
      */
     const REACTION_DOWN = 'IdeaDown';
 
     /**
-     * @var
+     * @var int The tag ID of the upvote reaction.
      */
     protected static $upTagID;
+
     /**
-     * @var
+     * @var int The tag ID of the downvote reaction.
      */
     protected static $downTagID;
 
     /**
-     * @var
+     * @var int The ID of the default stage for new ideas.
      */
     protected $defaultStageID;
 
     /**
-     * This will run when you "Enable" the plugin
-     *
-     * @since  1.0.0
-     * @access public
-     * @return bool
+     * This will run when you "Enable" the plugin.
      */
     public function setup() {
         $this->structure();
     }
 
     /**
-     *
+     * Runs structure.php on /utility/update and on enabling the plugin.
      */
     public function structure() {
         require dirname(__FILE__).'/structure.php';
     }
 
     /**
+     * Adds the ideation CSS asset.
+     *
      * @param $sender
      */
     public function base_render_before($sender) {
-        $sender->addJsFile('ideation.js', 'plugins/ideation');
         $sender->addCssFile('ideation.css', 'plugins/ideation');
     }
 
     /**
-     * @return mixed
+     * Get the default stage ID. Fetches from config if not set.
+     *
+     * @return int|string The default stage ID.
      */
     public function getDefaultStageID() {
         if (!$this->defaultStageID) {
@@ -78,7 +79,9 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @return int
+     * Gets the upvote reaction tag ID.
+     *
+     * @return int The upvote reaction tag ID.
      */
     public static function getUpTagID() {
         if (!self::$upTagID) {
@@ -89,14 +92,18 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @param int $upTagID
+     * Sets the upvote reaction tag ID.
+     *
+     * @param int $upTagID The upvote reaction tag ID.
      */
     protected static function setUpTagID($upTagID) {
         self::$upTagID = $upTagID;
     }
 
     /**
-     * @return int
+     * Gets the downvote reaction tag ID.
+     *
+     * @return int The downvote reaction tag ID.
      */
     public static function getDownTagID() {
         if (!self::$downTagID) {
@@ -107,7 +114,9 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @param int $downTagID
+     * Sets the downvote reaction tag ID.
+     *
+     * @param int $downTagID The downvote reaction tag ID.
      */
     protected static function setDownTagID($downTagID) {
         self::$downTagID = $downTagID;
@@ -126,6 +135,9 @@ class IdeationPlugin extends Gdn_Plugin {
      * @param SettingsController $sender
      */
     public function settingsController_addEditCategory_handler($sender) {
+
+        $sender->addJsFile('ideation.js', 'plugins/ideation'); // Show/hide allowed discussions and downvote option
+
         $categoryID = val('CategoryID', $sender->Data);
         $category = CategoryModel::categories($categoryID);
         $ideaOptions = array();
@@ -425,7 +437,11 @@ class IdeationPlugin extends Gdn_Plugin {
             return;
         }
         if (c('Vanilla.Discussions.Layout') == 'modern') {
-            $this->renderIdeaCounter($discussion);
+            $userVote = '';
+            if ($tagID = val('UserVote', $discussion)) {
+                $userVote = $this->getReactionFromTagID($tagID);
+            }
+            echo $this->getIdeaCounter($discussion, $userVote);
         }
     }
 
@@ -441,26 +457,29 @@ class IdeationPlugin extends Gdn_Plugin {
             return;
         }
         if (c('Vanilla.Discussions.Layout') == 'table') {
-            $this->renderIdeaCounter($discussion);
+            $userVote = '';
+            if ($tagID = val('UserVote', $discussion)) {
+                $userVote = $this->getReactionFromTagID($tagID);
+            }
+            echo $this->getIdeaCounter($discussion, $userVote);
         }
     }
 
     /**
-     * Renders the idea counter module for a discussion.
+     * Returns the idea counter module for a discussion.
      *
-     * @param object $discussion
+     * @param object $discussion The discussion that the idea counter belongs to.
+     * @param string $uservoteReactionName The name of the user's Idea-type reaction.
+     * @return IdeaCounterModule The discussion's idea counter module.
      */
-    public function renderIdeaCounter($discussion) {
+    public function getIdeaCounter($discussion, $uservoteReactionName) {
         $ideaCounterModule = IdeaCounterModule::instance();
-        $userVote = '';
-        if ($tagID = val('UserVote', $discussion)) {
-            $userVote = $this->getReactionFromTagID($tagID);
-        }
-        $ideaCounterModule->setUserVote($userVote);
         $useDownVotes = $this->allowDownVotes($discussion, 'discussion');
         $ideaCounterModule->setUseDownVotes($useDownVotes);
+        $ideaCounterModule->setUserVote($uservoteReactionName);
         $ideaCounterModule->setDiscussion($discussion);
-        echo $ideaCounterModule->toString();
+
+        return $ideaCounterModule;
     }
 
     /**
@@ -480,16 +499,12 @@ class IdeationPlugin extends Gdn_Plugin {
             return;
         }
 
-        $userVote = $this->getUserVoteReaction();
-        $useDownVotes = $this->allowDownVotes($discussion, 'discussion');
-
-        // Set counter module for rendering in attachment
-        $ideaCounterModule = IdeaCounterModule::instance();
-        $ideaCounterModule->setDiscussion($discussion);
+        // Get Counter for discussion.
+        $uservote = $this->getUserVoteReaction($discussion);
+        $ideaCounterModule = $this->getIdeaCounter($discussion, $uservote);
         $ideaCounterModule->setShowVotes(true);
-        $ideaCounterModule->setUseDownVotes($useDownVotes);
-        $ideaCounterModule->setUserVote($userVote);
-        $sender->setData('IdeaCounterModule', $ideaCounterModule);
+
+        $sender->setData('IdeaCounter', $ideaCounterModule);
     }
 
     /**
@@ -505,8 +520,12 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @param $sender
-     * @param $args
+     * Handles the discussion options (the links in the cog dropdown) for an idea. Adds a link to edit the stage,
+     * changes the url for the edit option from /editdiscussion to /editidea and changes the delete label
+     * from 'Delete Discussion' to 'Delete Idea'.
+     *
+     * @param Controller $sender
+     * @param array $args
      */
     public function base_discussionOptions_handler($sender, $args) {
         $discussion = $args['Discussion'];
@@ -514,8 +533,8 @@ class IdeationPlugin extends Gdn_Plugin {
             return;
         }
 
-        // TODO permission
-        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
+        if (!Gdn::session()->checkPermission('Vanilla.Moderation.Manage')
+            && !Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
             return;
         }
 
@@ -537,8 +556,10 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @param $sender
-     * @param string $discussionID
+     * Renders stage options form and handles editting the stage and/or stage notes.
+     *
+     * @param DiscussionController $sender
+     * @param string|int $discussionID The ID of the Idea-type discussion
      * @throws Exception
      * @throws Gdn_UserException
      */
@@ -549,14 +570,15 @@ class IdeationPlugin extends Gdn_Plugin {
                 throw NotFoundException('Idea');
             }
 
-            // TODO permission
-            // $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
+            if (!Gdn::session()->checkPermission('Vanilla.Moderation.Manage')
+                && !Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
+                return;
+            }
 
             $sender->Form = new Gdn_Form();
             if ($sender->Form->authenticatedPostBack()) {
                 $this->updateDiscussionStage($discussion, $sender->Form->getFormValue('Stage'), $sender->Form->getFormValue('StageNotes'));
                 Gdn::controller()->jsonTarget('', '', 'Refresh');
-            } else {
             }
 
             $stages = StageModel::getStages();
@@ -578,18 +600,24 @@ class IdeationPlugin extends Gdn_Plugin {
     /**
      * ATTACHMENTS
      * -----------
+     * Attachments appear in the discussion view. They include the stage, stage description and stage notes.
+     * The view also renders the idea discussion model from the discussion controller's data array.
      */
 
     /**
-     * @param $sender
+     * Get the ideation attachment view.
+     *
+     * @param DiscussionController $sender
      */
     public function discussionController_fetchAttachmentViews_handler($sender) {
         require_once $sender->fetchViewLocation('attachment', '', 'plugins/ideation');
     }
 
     /**
-     * @param $sender
-     * @param $args
+     * Add an attachment to a new idea.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
      */
     public function discussionModel_AfterSaveDiscussion_handler($sender, $args) {
         if ($this->isIdea($discussionID = val('DiscussionID', $args))) {
@@ -602,6 +630,8 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Updates the attachment for a discussion. Attachments include the stage info (name, description, status, notes).
+     *
      * @param $discussionID
      * @param $stageID
      * @param $stageNotes
@@ -616,7 +646,7 @@ class IdeationPlugin extends Gdn_Plugin {
         $attachment['StageNotes'] = $stageNotes;
         $attachment['StageUrl'] = url('/discussions/tagged/'.urlencode(val('StageName', $attachment)));
         $attachment['ForeignID'] = 'd-'.$discussionID;
-        $attachment['ForeignUserID'] = 2;
+        $attachment['ForeignUserID'] = 2; // TODO: What goes here?
         $attachment['DateUpdated'] = Gdn_Format::toDateTime();
 
         // Kludge. Not Null fields
@@ -649,7 +679,7 @@ class IdeationPlugin extends Gdn_Plugin {
      */
 
     /**
-     * Close down any reacting to ideas with closed statuses.
+     * Shuts down any reacting to ideas with closed statuses.
      *
      * @param ReactionModel $sender
      * @param array $args
@@ -700,7 +730,7 @@ class IdeationPlugin extends Gdn_Plugin {
             $cssClass = 'uservote';
         }
 
-        $args['Button'] = getIdeaReactionButton($discussion, $urlCode, $reaction, array('cssClass' => $cssClass));
+        $args['Button'] = $this->getIdeaReactionButton($discussion, $urlCode, $reaction, array('cssClass' => $cssClass));
 
         $countUp = getValueR('Attributes.React.'.self::REACTION_UP, $discussion, 0);
         $countDown = getValueR('Attributes.React.'.self::REACTION_DOWN, $discussion, 0);
@@ -888,6 +918,8 @@ class IdeationPlugin extends Gdn_Plugin {
     // SORT/FILTER
 
     /**
+     *
+     *
      * @param $sender
      */
     public function categoriesController_index_before($sender) {

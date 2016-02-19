@@ -51,10 +51,6 @@ class IdeaCounterModule extends Gdn_Module {
      */
     protected static $instance;
 
-
-
-    // Empty constructor so we don't call parent::construct.
-    // We don't need all that extra data floating around.
     function __construct() {}
 
     /**
@@ -154,35 +150,39 @@ class IdeaCounterModule extends Gdn_Module {
      */
     public function toString() {
         if ($this->prepare()) {
-            $this->renderCounterBox();
+            ob_start();
+            renderCounterBox($this->counter, $this->useDownVotes, $this->showVotes, $this->ideaUpReactionSlug, $this->ideaDownReactionSlug);
+            $box = ob_get_contents();
+            ob_end_clean();
+            return $box;
         } else {
-            echo '';
+            return '';
         }
     }
+}
 
-    /**
-     * Outputs a counter that includes voting buttons.
-     */
-    protected function renderCounterBox() { ?>
-        <div class="idea-counter-module <?php echo val('status', $this->counter).' '.val('cssClass', $this->counter); ?>">
-            <div class="idea-counter-box">
-                <?php echo IdeationPlugin::getScoreHtml(val('score', $this->counter)); ?>
-                <?php if (val('status', $this->counter) == 'Open') { ?>
+/**
+ * Outputs a counter that includes voting buttons.
+ */
+function renderCounterBox($counter, $useDownVotes, $showVotes, $ideaUpReactionSlug, $ideaDownReactionSlug) { ?>
+    <div class="idea-counter-module <?php echo val('status', $counter).' '.val('cssClass', $counter); ?>">
+        <div class="idea-counter-box">
+            <?php echo getScoreHtml(val('score', $counter)); ?>
+            <?php if (val('status', $counter) == 'Open') { ?>
                 <div class="vote idea-menu">
                     <span class="idea-buttons">
                         <?php
-                        echo IdeationPlugin::getReactionButtonHtml('ReactButton-'.$this->ideaUpReactionSlug.' '.val('upCssClass', $this->counter), val('upUrl', $this->counter), 'Up', 'data-reaction="'.strtolower($this->ideaUpReactionSlug).'"');
-                        if ($this->useDownVotes) {
-                            echo IdeationPlugin::getReactionButtonHtml('ReactButton-'.$this->ideaDownReactionSlug.' '.val('downCssClass', $this->counter), val('downUrl', $this->counter), 'Down', 'data-reaction="'.strtolower($this->ideaDownReactionSlug).'"');
+                        echo getReactionButtonHtml('ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter), val('upUrl', $counter), 'Up', 'data-reaction="'.strtolower($ideaUpReactionSlug).'"');
+                        if ($useDownVotes) {
+                            echo getReactionButtonHtml('ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter), val('downUrl', $counter), 'Down', 'data-reaction="'.strtolower($ideaDownReactionSlug).'"');
                         }
                         ?>
                     </span>
                 </div>
-                <?php } ?>
-            </div>
-            <?php if ($this->showVotes) {
-                echo IdeationPlugin::getVotesHtml(val('numberVotes', $this->counter));
-            } ?>
+            <?php } ?>
         </div>
-    <?php }
-}
+        <?php if ($showVotes) {
+            echo getVotesHtml(val('numberVotes', $counter));
+        } ?>
+    </div>
+<?php }
