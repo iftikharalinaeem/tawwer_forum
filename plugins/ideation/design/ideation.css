@@ -1,3 +1,7 @@
+.PageControls .BoxNewDiscussion {
+  float: left;
+  margin-right: 10px; }
+
 .PanelColumn {
   position: absolute;
   margin: 0; }
@@ -11,14 +15,6 @@
   clear: both; }
 .ItemIdea .PhotoWrap {
   display: none; }
-
-.PageControls:after {
-  content: "";
-  display: table;
-  clear: both; }
-.PageControls .BoxNewDiscussion {
-  float: left;
-  margin-right: 10px; }
 
 .idea-label {
   display: none; }

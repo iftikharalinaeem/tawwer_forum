@@ -27,6 +27,15 @@ $icon-caret-place-adjustment: -($icon-caret-width/4);
   }
 }
 
+// Need this for whatever theme overrides style.css (i.e., Bootstrap 3)
+.PageControls {
+  .BoxNewDiscussion {
+    float: left;
+    margin-right: 10px;
+  }
+}
+
+// When clearfix the .Item class, we gotta take care of a few things in the base theme.
 .PanelColumn {
   position: absolute;
   margin: 0;
@@ -41,15 +50,6 @@ $icon-caret-place-adjustment: -($icon-caret-width/4);
 
   .PhotoWrap {
     display: none;
-  }
-}
-
-.PageControls {
-  @include clearfix;
-
-  .BoxNewDiscussion {
-    float: left;
-    margin-right: 10px;
   }
 }
 

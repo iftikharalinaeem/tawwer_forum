@@ -1,5 +1,6 @@
 var ideation = {
-  start: function() {
+  start: function($) {
+    'use strict';
 
     // Hide idea checkbox
     $('input[value="Idea"]').parents('label').hide();
@@ -20,6 +21,7 @@ var ideation = {
   }
 }
 
-jQuery(document).ready(function($) {
-  ideation.start();
-});
+;(function ($, window, document, undefined) {
+  'use strict';
+  ideation.start($);
+})(window.jQuery, window, document);

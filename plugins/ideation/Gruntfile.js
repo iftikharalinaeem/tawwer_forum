@@ -93,7 +93,7 @@ module.exports = function (grunt) {
         src: (dependencies.js || []).concat([
           'js/src/main.js'
         ])
-      , dest: 'js/custom.js'
+      , dest: 'js/ideation.js'
       }
     },
 
