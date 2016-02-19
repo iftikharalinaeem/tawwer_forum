@@ -29,7 +29,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
      *
      * @param $sender Sending controller instance
      */
-    public function settingsController_keywordBLocker_create($sender) {
+    public function settingsController_keywordBlocker_create($sender) {
 
         $sender->title(sprintf(t('%s settings'), t('Keyword Blocker')));
         $sender->addSideMenu('settings/keywordBlocker');
