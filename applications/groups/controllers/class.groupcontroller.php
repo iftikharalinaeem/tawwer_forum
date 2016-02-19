@@ -570,7 +570,7 @@ class GroupController extends Gdn_Controller {
 
       // Get a list of categories suitable for the category dropdown.
       $Categories = array_filter(CategoryModel::Categories(), function($Row) { return $Row['AllowGroups']; });
-      $Categories = ConsolidateArrayValuesByKey($Categories, 'CategoryID', 'Name');
+      $Categories = array_column($Categories, 'Name', 'CategoryID');
       $this->SetData('Categories', $Categories);
 
       if ($Form->AuthenticatedPostBack()) {

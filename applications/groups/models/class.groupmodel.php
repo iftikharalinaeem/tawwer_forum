@@ -213,7 +213,7 @@ class GroupModel extends Gdn_Model {
 
    public function GetByUser($UserID, $OrderFields = '', $OrderDirection = 'desc', $Limit = 9, $Offset = false) {
       $UserGroups = $this->SQL->GetWhere('UserGroup', array('UserID' => $UserID))->ResultArray();
-      $IDs = ConsolidateArrayValuesByKey($UserGroups, 'GroupID');
+      $IDs = array_column($UserGroups, 'GroupID');
 
       $Result = $this->GetWhere(array('GroupID' => $IDs), $OrderFields, $OrderDirection, $Limit, $Offset)->ResultArray();
       $this->Calc($Result);

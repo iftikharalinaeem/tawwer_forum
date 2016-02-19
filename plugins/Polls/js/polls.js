@@ -26,7 +26,6 @@ jQuery(document).ready(function($) {
             gdn.informError(xhr);
          },
          success: function(json) {
-            json = $.postParseJson(json);
             $('.PollForm').replaceWith(json.PollHtml);
             gdn.inform(json);
             return false;
