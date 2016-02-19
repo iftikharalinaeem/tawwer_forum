@@ -164,25 +164,27 @@ class IdeaCounterModule extends Gdn_Module {
 /**
  * Outputs a counter that includes voting buttons.
  */
-function renderCounterBox($counter, $useDownVotes, $showVotes, $ideaUpReactionSlug, $ideaDownReactionSlug) { ?>
-    <div class="idea-counter-module <?php echo val('status', $counter).' '.val('cssClass', $counter); ?>">
-        <div class="idea-counter-box">
-            <?php echo getScoreHtml(val('score', $counter)); ?>
-            <?php if (val('status', $counter) == 'Open') { ?>
-                <div class="vote idea-menu">
-                    <span class="idea-buttons">
-                        <?php
-                        echo getReactionButtonHtml('ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter), val('upUrl', $counter), 'Up', 'data-reaction="'.strtolower($ideaUpReactionSlug).'"');
-                        if ($useDownVotes) {
-                            echo getReactionButtonHtml('ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter), val('downUrl', $counter), 'Down', 'data-reaction="'.strtolower($ideaDownReactionSlug).'"');
-                        }
-                        ?>
-                    </span>
-                </div>
-            <?php } ?>
+if (!function_exists('renderCounterBox')) {
+    function renderCounterBox($counter, $useDownVotes, $showVotes, $ideaUpReactionSlug, $ideaDownReactionSlug) { ?>
+        <div class="idea-counter-module <?php echo val('status', $counter).' '.val('cssClass', $counter); ?>">
+            <div class="idea-counter-box">
+                <?php echo getScoreHtml(val('score', $counter)); ?>
+                <?php if (val('status', $counter) == 'Open') { ?>
+                    <div class="vote idea-menu">
+                        <span class="idea-buttons">
+                            <?php
+                            echo getReactionButtonHtml('ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter), val('upUrl', $counter), 'Up', 'data-reaction="'.strtolower($ideaUpReactionSlug).'"');
+                            if ($useDownVotes) {
+                                echo getReactionButtonHtml('ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter), val('downUrl', $counter), 'Down', 'data-reaction="'.strtolower($ideaDownReactionSlug).'"');
+                            }
+                            ?>
+                        </span>
+                    </div>
+                <?php } ?>
+            </div>
+            <?php if ($showVotes) {
+                echo getVotesHtml(val('numberVotes', $counter));
+            } ?>
         </div>
-        <?php if ($showVotes) {
-            echo getVotesHtml(val('numberVotes', $counter));
-        } ?>
-    </div>
-<?php }
+    <?php }
+}
