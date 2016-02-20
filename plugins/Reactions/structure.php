@@ -49,7 +49,7 @@ $Rm->defineReactionType(array('UrlCode' => 'Promote', 'Name' => 'Promote', 'Sort
     'Description' => "Moderators have the ability to promote the best posts in the community. This way they can be featured for new visitors."));
 
 $Rm->defineReactionType(array('UrlCode' => 'OffTopic', 'Name' => 'Off Topic', 'Sort' => 1, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
-    'Description' => "Off topic posts are not releveant to the topic being discussed. If a post gets enough off-topic votes then it will be buried so it won't derail the discussion."));
+    'Description' => "Off topic posts are not relevant to the topic being discussed. If a post gets enough off-topic votes then it will be buried so it won't derail the discussion."));
 $Rm->defineReactionType(array('UrlCode' => 'Insightful', 'Name' => 'Insightful', 'Sort' => 2, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'Points' => 1,
     'Description' => "Insightful comments bring new information or perspective to the discussion and increase the value of the conversation as a whole."));
 
