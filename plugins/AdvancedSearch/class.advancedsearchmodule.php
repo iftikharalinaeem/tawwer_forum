@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
-
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license Proprietary
  */
+
 class AdvancedSearchModule extends Gdn_Module {
+
     /**
-     *
      * @var Gdn_Form
      */
     public $Form;

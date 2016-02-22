@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license Proprietary
+ */
 
 /**
  * A utility class to help with searches.

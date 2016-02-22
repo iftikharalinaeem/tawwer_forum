@@ -1,13 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 // Define the plugin:
 $PluginInfo['AdvancedSearch'] = array(
     'Name' => 'Advanced Search',
-    'Description' => "Enables advanced search on sites.",
+    'Description' => 'Enables advanced search on sites.',
     'Version' => '1.0.6',
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
@@ -496,8 +496,6 @@ if (!function_exists('searchBoxAdvanced')):
         ), $options);
 
         echo Gdn_Theme::Module('AdvancedSearchModule', array('value' => $options['value']));
-
-        return $Result;
     }
 
 endif;
