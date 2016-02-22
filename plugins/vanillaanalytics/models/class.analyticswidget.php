@@ -13,9 +13,9 @@
 class AnalyticsWidget implements JsonSerializable {
 
     /**
-     * @var string Unique identifier for this widget.
+     * @var bool Does this widget support the category selector?
      */
-    public $widgetID;
+    protected $categorySupport = false;
 
     /**
      * @var array A collection of data to drive the widget.
@@ -43,6 +43,11 @@ class AnalyticsWidget implements JsonSerializable {
     protected $type;
 
     /**
+     * @var string Unique identifier for this widget.
+     */
+    public $widgetID;
+
+    /**
      * AnalyticsWidget constructor.
      * @param bool $widgetID
      * @param array $data
@@ -52,6 +57,15 @@ class AnalyticsWidget implements JsonSerializable {
         if ($widgetID) {
             $this->setID($widgetID);
         }
+    }
+
+    /**
+     * Grab the support status of the category selector.
+     *
+     * @return bool
+     */
+    public function getCategorySupport() {
+        return $this->categorySupport;
     }
 
     /**
@@ -125,12 +139,24 @@ class AnalyticsWidget implements JsonSerializable {
      */
     public function jsonSerialize() {
         return [
-            'data'     => $this->data,
-            'handler'  => $this->handler,
-            'title'    => $this->title,
-            'type'     => $this->type,
-            'widgetID' => $this->widgetID
+            'categorySupport' => $this->categorySupport,
+            'data'            => $this->data,
+            'handler'         => $this->handler,
+            'title'           => $this->title,
+            'type'            => $this->type,
+            'widgetID'        => $this->widgetID
         ];
+    }
+
+    /**
+     * Flag whether or not this widget supports the category selector.
+     *
+     * @param bool $categorySupport Is the category selector supported by this widget?
+     * @return $this
+     */
+    public function setCategorySupport($categorySupport) {
+        $this->categorySupport = (bool)$categorySupport;
+        return $this;
     }
 
     /**

@@ -3,7 +3,15 @@
  * @class
  * @param {object} config Configuration details for this dashboard.
  */
-function AnalyticsDashboard (config, start, end) {
+function AnalyticsDashboard (config, start, end, initialCategoryID) {
+
+    /**
+     * Category ID for this dashboard.
+     * @access private
+     * @type {null}
+     */
+    var categoryID = null;
+
     /**
      * Unique identifier for this dashboard.
      * @access private
@@ -47,6 +55,14 @@ function AnalyticsDashboard (config, start, end) {
         } else {
             return false;
         }
+    };
+
+    /**
+     * Fetch the category ID for this dashboard.
+     * @returns {null}
+     */
+    this.getCategoryID = function() {
+        return categoryID;
     };
 
     /**
@@ -99,6 +115,19 @@ function AnalyticsDashboard (config, start, end) {
         }
 
         return panels = {};
+    };
+
+    /**
+     * Update this dashboard's category ID.
+     * @param {null|number} newCategoryID New category ID.
+     * @returns {boolean|null|number}
+     */
+    this.setCategoryID = function(newCategoryID) {
+        if (typeof newCategoryID === 'undefined') {
+            return false;
+        }
+
+        this.categoryID = newCategoryID === null ? null : parseInt(newCategoryID);
     };
 
     /**
@@ -161,6 +190,10 @@ function AnalyticsDashboard (config, start, end) {
     // Attempt to use incoming dates, if available.
     if (start instanceof Date && end instanceof Date) {
         this.setTimeframe(start, end);
+    }
+
+    if (typeof initialCategoryID !== 'undefined') {
+        this.setCategoryID(initialCategoryID);
     }
 
     // Parse the config object for dashboard properties.
