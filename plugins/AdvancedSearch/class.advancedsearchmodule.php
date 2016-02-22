@@ -1,9 +1,12 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) { exit(); }
 /**
  * @copyright 2009-2016 Vanilla Forums Inc.
  * @license Proprietary
  */
 
+/**
+ * Class AdvancedSearchModule
+ */
 class AdvancedSearchModule extends Gdn_Module {
 
     /**
@@ -65,8 +68,9 @@ class AdvancedSearchModule extends Gdn_Module {
         if ($this->Results) {
             $Form->formValues($Get);
         } else {
-            if ($this->value !== null && !isset($Get['search']))
+            if ($this->value !== null && !isset($Get['search'])) {
                 $Form->setFormValue('search', $value);
+            }
         }
 
         // Add the tags as data.

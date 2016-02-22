@@ -146,7 +146,6 @@ class Search {
             } else {
                 unset($search['tags'], $search['tags-op']);
             }
-
         }
 
         /// Types ///
@@ -267,8 +266,9 @@ EOT;
                             if (isset($parts['query'])) {
                                 parse_str($parts['query'], $get);
                                 trace($get);
-                                if (isset($get['clip_id']))
+                                if (isset($get['clip_id'])) {
                                     $id = $get['clip_id'];
+                                }
                             }
 
                             if ($id) {

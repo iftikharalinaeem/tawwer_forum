@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) { exit(); }
 /**
  * @copyright 2009-2016 Vanilla Forums Inc.
  * @license Proprietary
@@ -15,6 +15,9 @@ $PluginInfo['AdvancedSearch'] = array(
     'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
+/**
+ * Class AdvancedSearchPlugin
+ */
 class AdvancedSearchPlugin extends Gdn_Plugin {
     /// Properties ///
 
@@ -225,14 +228,14 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
                     $Sender->SetData('Discussion', $Discussion);
                 }
             }
-
         } else {
             $Results = $this->devancedSearch($SearchModel, $Sender->Request->Get(), $Offset, $Limit);
             $Sender->SetData('SearchResults', $Results, true);
-            if ($SearchTerms)
+            if ($SearchTerms) {
                 $SearchTerms = explode(' ', $SearchTerms);
-            else
+            } else {
                 $SearchTerms = array();
+            }
         }
         Gdn::UserModel()->JoinUsers($Sender->Data['SearchResults'], array('UserID'));
         $this->CalculateResults($Sender->Data['SearchResults'], $SearchTerms, !$Sender->Request->Get('nomark'));
@@ -315,23 +318,19 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
             $Type = strtolower(GetValue('Type', $Row));
             if (isset($Row['CommentID'])) {
-
                 if ($Type == 'question') {
                     $Type = 'answer';
                 } else {
                     $Type = 'comment';
                 }
-
             } elseif (isset($Row['PageID'])) {
                 $Type = 'doc';
             } else {
-
                 if (!$Type) {
                     $Type = 'discussion';
                 } elseif ($Type == 'page' && isset($Row['DiscussionID'])) {
                     $Type = 'link';
                 }
-
             }
             $Row['Type'] = $Type;
 

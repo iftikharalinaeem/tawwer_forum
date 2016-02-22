@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined('APPLICATION')) { exit(); }
 
 echo Gdn_Theme::Module('AdvancedSearchModule', array('Results' => TRUE));
 
