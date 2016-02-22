@@ -16,15 +16,15 @@ class AdvancedSearchModule extends Gdn_Module {
 
     public $DateWithinOptions;
 
-    public $IncludeTags = TRUE;
+    public $IncludeTags = true;
 
-    public $Results = FALSE; // whether or not to show results in the form.
+    public $Results = false; // whether or not to show results in the form.
 
     public $Types = array();
 
     public $value = null;
 
-    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
+    public function __construct($Sender = '', $ApplicationFolder = false) {
         $this->_ApplicationFolder = 'plugins/AdvancedSearch';
 
         $this->DateWithinOptions = array(
@@ -56,7 +56,7 @@ class AdvancedSearchModule extends Gdn_Module {
     }
 
     public function toString() {
-        if ($this->IncludeTags === NULL) {
+        if ($this->IncludeTags === null) {
             $this->IncludeTags = Gdn::pluginManager()->isEnabled('Tagging') && Gdn::pluginManager()->isEnabled('Sphinx');
         }
 

@@ -23,7 +23,7 @@
                 <?php
                 echo
                     $Form->label('Discussion', 'discussionid', array('class' => 'Heading')).
-                    $Form->checkBox('discussionid', Gdn_Format::text(getValue('Name', $Discussion)), array('nohidden' => TRUE, 'value' => getValue('DiscussionID', $Discussion)));
+                    $Form->checkBox('discussionid', Gdn_Format::text(getValue('Name', $Discussion)), array('nohidden' => true, 'value' => getValue('DiscussionID', $Discussion)));
                 ?>
             </div>
         <?php endif; ?>
@@ -44,13 +44,13 @@
         <div class="P">
             <?php
             echo $Form->label('Category', 'cat', array('class' => 'Heading')).
-                $Form->categoryDropDown('cat', array('Permission' => 'view', 'Headings' => FALSE, 'IncludeNull' => array('all', t('(All)')), 'class' => 'BigInput'));
+                $Form->categoryDropDown('cat', array('Permission' => 'view', 'Headings' => false, 'IncludeNull' => array('all', t('(All)')), 'class' => 'BigInput'));
             ?>
             <div class="Checkboxes Inline">
                 <?php
-                echo $Form->checkBox('subcats', t('search subcategories'), array('nohidden' => TRUE)).
+                echo $Form->checkBox('subcats', t('search subcategories'), array('nohidden' => true)).
                     ' '.
-                    $Form->checkBox('archived', t('search archived'), array('nohidden' => TRUE))
+                    $Form->checkBox('archived', t('search archived'), array('nohidden' => true))
                 ?>
             </div>
         </div>

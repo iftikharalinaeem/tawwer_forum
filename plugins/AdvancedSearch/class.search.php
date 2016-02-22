@@ -39,7 +39,7 @@ class Search {
             $Users = Gdn::SQL()->select('UserID, Name')->from('User')->where('Name', $Usernames)->get()->resultArray();
             if (count($Usernames) == 1 && empty($Users)) {
                 // Searching for one author that doesn't exist.
-                $search['dosearch'] = FALSE;
+                $search['dosearch'] = false;
             }
 
             if (!empty($Users)) {
@@ -71,7 +71,7 @@ class Search {
                     $CategoryFilter['Archived'] = 0;
             }
         }
-        $Categories = CategoryModel::getByPermission('Discussions.View', NULL, $CategoryFilter);
+        $Categories = CategoryModel::getByPermission('Discussions.View', null, $CategoryFilter);
         $Categories[0] = true; // allow uncategorized too.
         $Categories = array_keys($Categories);
         //      Trace($Categories, 'allowed cats');
@@ -86,7 +86,7 @@ class Search {
             $CategoryID = array_intersect((array)$CategoryID, $Categories);
 
             if (empty($CategoryID)) {
-                $search['cat'] = FALSE;
+                $search['cat'] = false;
             } else {
                 $search['cat'] = $CategoryID;
                 $doSearch = true;

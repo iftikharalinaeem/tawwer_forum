@@ -44,7 +44,7 @@
 
                     if (isset($Row['Breadcrumbs'])) {
                         echo bullet(' ');
-                        echo ' <span class="MItem-Location">'.Gdn_Theme::breadcrumbs($Row['Breadcrumbs'], FALSE).'</span> ';
+                        echo ' <span class="MItem-Location">'.Gdn_Theme::breadcrumbs($Row['Breadcrumbs'], false).'</span> ';
                     }
 
                     if (isset($Row['Notes'])) {
