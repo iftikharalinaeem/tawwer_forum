@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) { exit(); }
 
-echo Gdn_Theme::Module('AdvancedSearchModule', array('Results' => TRUE));
+echo Gdn_Theme::module('AdvancedSearchModule', array('Results' => TRUE));
 
-echo $this->FetchView('search-results', '', 'plugins/AdvancedSearch');
+echo $this->fetchView('search-results', '', 'plugins/AdvancedSearch');

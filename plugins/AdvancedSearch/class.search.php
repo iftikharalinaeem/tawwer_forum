@@ -36,7 +36,7 @@ class Search {
             $Usernames = array_map('trim', $Usernames);
             $Usernames = array_filter($Usernames);
 
-            $Users = Gdn::SQL()->Select('UserID, Name')->From('User')->Where('Name', $Usernames)->Get()->ResultArray();
+            $Users = Gdn::SQL()->select('UserID, Name')->from('User')->where('Name', $Usernames)->get()->resultArray();
             if (count($Usernames) == 1 && empty($Users)) {
                 // Searching for one author that doesn't exist.
                 $search['dosearch'] = FALSE;
@@ -50,8 +50,8 @@ class Search {
 
         /// Category ///
         $CategoryFilter = array();
-        $Archived = GetValue('archived', $search, 0);
-        $CategoryID = GetValue('cat', $search);
+        $Archived = getValue('archived', $search, 0);
+        $CategoryID = getValue('cat', $search);
         if (strcasecmp($CategoryID, 'all') === 0) {
             $CategoryID = null;
         }
@@ -71,16 +71,16 @@ class Search {
                     $CategoryFilter['Archived'] = 0;
             }
         }
-        $Categories = CategoryModel::GetByPermission('Discussions.View', NULL, $CategoryFilter);
+        $Categories = CategoryModel::getByPermission('Discussions.View', NULL, $CategoryFilter);
         $Categories[0] = true; // allow uncategorized too.
         $Categories = array_keys($Categories);
         //      Trace($Categories, 'allowed cats');
 
         if ($CategoryID) {
-            TouchValue('subcats', $search, 0);
+            touchValue('subcats', $search, 0);
             if ($search['subcats']) {
-                $CategoryID = array_column(CategoryModel::GetSubtree($CategoryID), 'CategoryID');
-                Trace($CategoryID, 'cats');
+                $CategoryID = array_column(CategoryModel::getSubtree($CategoryID), 'CategoryID');
+                trace($CategoryID, 'cats');
             }
 
             $CategoryID = array_intersect((array)$CategoryID, $Categories);
@@ -101,9 +101,9 @@ class Search {
             // Try setting the date.
             $Timestamp = strtotime($search['date']);
             if ($Timestamp) {
-                $search['houroffset'] = Gdn::Session()->HourOffset();
-                $Timestamp += -Gdn::Session()->HourOffset() * 3600;
-                $search['date'] = Gdn_Format::ToDateTime($Timestamp);
+                $search['houroffset'] = Gdn::session()->hourOffset();
+                $Timestamp += -Gdn::session()->hourOffset() * 3600;
+                $search['date'] = Gdn_Format::toDateTime($Timestamp);
 
                 if (isset($search['within'])) {
                     $search['timestamp-from'] = strtotime('-'.$search['within'], $Timestamp);
@@ -112,8 +112,8 @@ class Search {
                     $search['timestamp-from'] = $search['date'];
                     $search['timestamp-to'] = strtotime('+1 day', $Timestamp);
                 }
-                $search['date-from'] = Gdn_Format::ToDateTime($search['timestamp-from']);
-                $search['date-to'] = Gdn_Format::ToDateTime($search['timestamp-to']);
+                $search['date-from'] = Gdn_Format::toDateTime($search['timestamp-from']);
+                $search['date-to'] = Gdn_Format::toDateTime($search['timestamp-to']);
             } else {
                 unset($search['date']);
             }
@@ -128,21 +128,21 @@ class Search {
             $Tags = array_map('trim', $Tags);
             $Tags = array_filter($Tags);
 
-            $TagData = Gdn::SQL()->Select('TagID, Name')->From('Tag')->Where('Name', $Tags)->Get()->ResultArray();
+            $TagData = Gdn::SQL()->select('TagID, Name')->from('Tag')->where('Name', $Tags)->get()->resultArray();
             if (count($Tags) == 1 && empty($TagData)) {
                 // Searching for one tag that doesn't exist.
                 $doSearch = false;
                 unset($search['tags']);
             }
 
-            if (GetValue('tags-op', $Tags) === 'and' && count($Tags) > count($TagData)) {
+            if (getValue('tags-op', $Tags) === 'and' && count($Tags) > count($TagData)) {
                 // We are searching for all tags, but some of the tags don't exist.
                 $doSearch = false;
             }
 
             if (!empty($TagData)) {
                 $search['tags'] = $TagData;
-                TouchValue('tags-op', $search, 'or');
+                touchValue('tags-op', $search, 'or');
             } else {
                 unset($search['tags'], $search['tags-op']);
             }
@@ -160,7 +160,7 @@ class Search {
                 $typecount++;
                 $key = $table.'_'.$name;
 
-                if (GetValue($key, $search)) {
+                if (getValue($key, $search)) {
                     $selectedcount++;
                     $types[$table][] = $name;
                 } else {
@@ -209,7 +209,7 @@ class Search {
 
         $search['dosearch'] = $doSearch;
 
-        Trace($search, 'calc search');
+        trace($search, 'calc search');
         return $search;
     }
 
@@ -234,7 +234,7 @@ EOT;
                     'type' => 'img',
                     'src' => $src,
                     'href' => $src,
-                    'preview' => Img($src)
+                    'preview' => img($src)
                 );
 
                 $parts = parse_url($src);
@@ -307,20 +307,20 @@ EOT;
                 'comment' => array('c' => 'comments')
             );
 
-            if (Gdn::PluginManager()->IsEnabled('QnA')) {
+            if (Gdn::pluginManager()->isEnabled('QnA')) {
                 $types['discussion']['question'] = 'questions';
                 $types['comment']['answer'] = 'answers';
             }
 
-            if (Gdn::PluginManager()->IsEnabled('Polls')) {
+            if (Gdn::pluginManager()->isEnabled('Polls')) {
                 $types['discussion']['poll'] = 'polls';
             }
 
-            if (Gdn::ApplicationManager()->CheckApplication('Pages')) {
+            if (Gdn::applicationManager()->checkApplication('Pages')) {
                 $types['page']['p'] = 'docs';
             }
 
-            if (Gdn::ApplicationManager()->CheckApplication('Groups')) {
+            if (Gdn::applicationManager()->checkApplication('Groups')) {
                 $types['group']['group'] = 'group';
             }
 
