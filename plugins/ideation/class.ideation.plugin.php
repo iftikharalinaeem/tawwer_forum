@@ -128,6 +128,16 @@ class IdeationPlugin extends Gdn_Plugin {
      */
 
     /**
+     * Adds Stages link to Dashboard menu.
+     *
+     * @param Controller $sender
+     */
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        $menu = &$sender->EventArguments['SideMenu'];
+        $menu->addLink('Forum', t('Stages'), '/dashboard/settings/stages', 'Garden.Settings.Manage', array('class' => 'nav-stages'));
+    }
+
+    /**
      * Adds ideation options to the categories setting page -> enabling ideation on a category and enabling downvotes.
      * Also manipulates the allowed discussion types options when ideation is enabled on a category.
      * Ideas are the only discussion type allowed in an ideation category.
@@ -292,8 +302,7 @@ class IdeationPlugin extends Gdn_Plugin {
             'Singular' => 'Idea',
             'Plural' => 'Ideas',
             'AddUrl' => '/post/idea',
-            'AddText' => 'New Idea',
-            'Global' => false // Don't show in the global new discussion module.
+            'AddText' => 'New Idea'
         ];
     }
 
@@ -306,22 +315,9 @@ class IdeationPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function postController_idea_create($sender, $args) {
-        //TODO: Permission to post idea?
-
-        if (!sizeof($args)) {
-            // No category was specified.
-            throw NotFoundException('Category');
-        }
-        $categoryCode = $args[0];
-        $category = CategoryModel::categories($categoryCode);
-
-        if (!$this->isIdeaCategory($category)) {
-            throw new Exception(t('An idea can only be posted in an Idea category.'), 401);
-        }
+        $categoryCode = val(0, $args, '');
         $sender->setData('Type', 'Idea');
         $sender->Form->setFormValue('Type', 'Idea');
-        $sender->Form->setFormValue('StageID', $this->getDefaultStageID());
-        $sender->Form->setFormValue('CategoryID', val('CategoryID', $category));
         $sender->Form->setFormValue('Tags', val('TagID', StageModel::getStage($this->getDefaultStageID())));
         $sender->View = 'discussion';
         $sender->discussion($categoryCode);
@@ -356,7 +352,6 @@ class IdeationPlugin extends Gdn_Plugin {
     public function postController_beforeDiscussionRender_handler($sender) {
         if (val('Type', $sender->Data) === 'Idea') {
             $sender->Discussion = 'Idea'; // Kludge to set text on 'Post Discussion' button to 'Save'
-            $sender->ShowCategorySelector = false;
 
             if ($sender->data('Discussion')) {
                 $sender->setData('Title', sprintf(t('Edit %s'), t('Idea')));
@@ -398,6 +393,22 @@ class IdeationPlugin extends Gdn_Plugin {
             'addtag' => false,
             'default' => false
         ]);
+    }
+
+    /**
+     * Registers reserved Stage-type tags.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    public function discussionModel_reservedTags_handler($sender, $args) {
+        if (isset($args['ReservedTags'])) {
+            $stages = StageModel::getStages();
+            foreach ($stages as $stage) {
+                $tagName = val('Name', TagModel::instance()->getID(val('TagID', $stage)));
+                $args['ReservedTags'][] = $tagName;
+            }
+        }
     }
 
     /**
@@ -684,10 +695,11 @@ class IdeationPlugin extends Gdn_Plugin {
      * @param DiscussionModel $sender
      * @param array $args
      */
-    public function discussionModel_AfterSaveDiscussion_handler($sender, $args) {
+    public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
         if ($this->isIdea($discussionID = val('DiscussionID', $args))) {
-            $stage = StageModel::getStageByDiscussion($discussionID);
-            if (!$stage) {
+            $attachmentModel = AttachmentModel::instance();
+            $attachment = $attachmentModel->getWhere(['ForeignID' => 'd-'.$discussionID])->resultArray();
+            if (empty($attachment)) {
                 // We've got a new idea, add an attachment.
                 $this->updateAttachment(val('DiscussionID', $args), self::getDefaultStageID(), '');
             }
