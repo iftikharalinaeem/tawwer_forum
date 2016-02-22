@@ -278,6 +278,8 @@ class VanillaAnalytics extends Gdn_Plugin {
 
         $sender->addJsFile('d3.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('c3.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('dashboard.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('analyticsdashboard.min.js', 'plugins/vanillaanalytics');
 
         switch($entityType) {
             case 'dashboard':

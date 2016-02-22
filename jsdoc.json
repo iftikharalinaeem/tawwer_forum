@@ -1,0 +1,13 @@
+{
+  "opts": {
+    "encoding": "utf8",
+    "destination": "./docs/jsdoc/"
+  },
+  "tags": {
+    "dictionaries": ["jsdoc"]
+  },
+  "source": {
+    "include": ["plugins/vanillaanalytics/js"],
+    "includePattern": ".+\\.js?$"
+  }
+}
