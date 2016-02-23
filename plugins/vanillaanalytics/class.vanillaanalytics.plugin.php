@@ -37,10 +37,18 @@ class VanillaAnalytics extends Gdn_Plugin {
     public function base_getAppSettingsMenuItems_handler($sender) {
         $sectionModel = new AnalyticsSection();
         Logger::event('analytics_menu', Logger::INFO, 'Sections', $sectionModel->getDefaults());
+
+        $sender->EventArguments['SideMenu']->addItem(
+            'analytics',
+            T('Analytics'),
+            'Garden.Settings.Manage',
+            ['class' => 'Analytics']
+        );
+
         foreach ($sectionModel->getDefaults() as $section) {
             foreach ($section->getDashboards() as $dashboard) {
                 $sender->EventArguments['SideMenu']->addLink(
-                    T('Analytics'),
+                    'analytics',
                     T($dashboard->getTitle()),
                     "settings/analytics/dashboard/{$dashboard->dashboardID}",
                     'Garden.Settings.Manage'
@@ -60,7 +68,6 @@ class VanillaAnalytics extends Gdn_Plugin {
 
         // Allow trackers to add to values in a page's gdn.meta JavaScript array.
         AnalyticsTracker::getInstance()->addDefinitions($sender);
-
 
         // Allow trackers to add CSS files to the page.
         AnalyticsTracker::getInstance()->addCssFiles($sender);
@@ -274,7 +281,6 @@ class VanillaAnalytics extends Gdn_Plugin {
         $sender->permission('Garden.Settings.Manage');
 
         $sender->addCssFile('c3.min.css', 'plugins/vanillaanalytics');
-        $sender->addCssFile('dashboard.css', 'plugins/vanillaanalytics');
 
         $sender->addJsFile('d3.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('c3.min.js', 'plugins/vanillaanalytics');
