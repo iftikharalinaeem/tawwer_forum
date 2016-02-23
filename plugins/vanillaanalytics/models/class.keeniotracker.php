@@ -254,7 +254,8 @@ class KeenIOTracker implements TrackerInterface {
                     'labels' => ['Unique Pageviews']
                 ],
                 'query' => $uniquePageviewsQuery
-            ]);
+            ])
+            ->addSupport('cat1');
 
         $widgets['unique-pageviews'] = $uniquePageviewsWidget;
 
