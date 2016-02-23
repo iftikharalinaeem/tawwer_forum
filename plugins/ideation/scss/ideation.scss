@@ -35,7 +35,7 @@ $icon-caret-place-adjustment: -($icon-caret-width/4);
   }
 }
 
-// When clearfix the .Item class, we gotta take care of a few things in the base theme.
+// When clearfixing the .Item class, we gotta take care of a few things in the base theme.
 .PanelColumn {
   position: absolute;
   margin: 0;
@@ -50,6 +50,10 @@ $icon-caret-place-adjustment: -($icon-caret-width/4);
 
   .PhotoWrap {
     display: none;
+  }
+
+  .BlockColumn-User .PhotoWrap {
+    display: block;
   }
 }
 

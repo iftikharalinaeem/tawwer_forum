@@ -15,6 +15,8 @@
   clear: both; }
 .ItemIdea .PhotoWrap {
   display: none; }
+.ItemIdea .BlockColumn-User .PhotoWrap {
+  display: block; }
 
 .idea-label {
   display: none; }

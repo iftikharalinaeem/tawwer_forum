@@ -19,9 +19,9 @@ var ideation = {
       $('#Form_UseDownVotes').parents('label').toggle();
     });
   }
-}
+};
 
-;(function ($, window, document, undefined) {
+jQuery(document).ready(function($) {
   'use strict';
   ideation.start($);
-})(window.jQuery, window, document);
+});

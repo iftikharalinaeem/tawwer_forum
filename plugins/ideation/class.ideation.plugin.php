@@ -1006,12 +1006,10 @@ class IdeationPlugin extends Gdn_Plugin {
     public function categoriesController_index_before($sender) {
         $categoryCode = val('CategoryIdentifier', val('ReflectArgs', $sender, false));
         if (!$categoryCode || !$this->isIdeaCategory(CategoryModel::categories($categoryCode))) {
-            DiscussionsSortFilterModule::addFilter('discussion-type', 'Discussions', ['d.Type' => null, 'd.Announce' => 0], 'type');
-            DiscussionsSortFilterModule::addFilter('announcement-type', 'Announcements', ['d.Announce >' => 0], 'type');
-            DiscussionsSortFilterModule::addFilter('question-type', 'Questions', ['d.Type' => 'Question'], 'type');
-            DiscussionsSortFilterModule::addFilter('poll-type', 'Polls', ['d.Type' => 'poll'], 'type');
             return;
         }
+
+        DiscussionModel::addFilterSet('stage', sprintf(t('All %s'), t('Stages')));
 
         // Open status
         $openStages = StageModel::getOpenStages();
@@ -1019,8 +1017,8 @@ class IdeationPlugin extends Gdn_Plugin {
         foreach ($openStages as $openStage) {
             $openTags[] = val('TagID', $openStage);
         }
-        DiscussionsSortFilterModule::addFilter('open', 'Status: Open',
-            ['d.Tags' => $openTags], 'status'
+        DiscussionModel::addFilter('open', 'Status: Open',
+            ['d.Tags' => $openTags], 'status', 'stage'
         );
 
         // Closed status
@@ -1029,14 +1027,14 @@ class IdeationPlugin extends Gdn_Plugin {
         foreach ($closedStages as $closedStage) {
             $closedTags[] = val('TagID', $closedStage);
         }
-        DiscussionsSortFilterModule::addFilter('closed', 'Status: Closed',
-            ['d.Tags' => $closedTags], 'status'
+        DiscussionModel::addFilter('closed', 'Status: Closed',
+            ['d.Tags' => $closedTags], 'status', 'stage'
         );
 
         // Stages
         foreach(StageModel::getStages() as $stage) {
-            DiscussionsSortFilterModule::addFilter(strtolower(val('Name', $stage)).'-stage' , val('Name', $stage),
-                ['d.Tags' => val('TagID', $stage)], 'stage'
+            DiscussionModel::addFilter(strtolower(val('Name', $stage)).'-stage' , val('Name', $stage),
+                ['d.Tags' => val('TagID', $stage)], 'stage', 'stage'
             );
         }
     }
