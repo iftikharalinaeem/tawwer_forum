@@ -2,6 +2,9 @@
  * Create a new analytics dashboard object.
  * @class
  * @param {object} config Configuration details for this dashboard.
+ * @param {object} start A Date object representing the start of the date range.
+ * @param {object} end A Date object representing the end of the date range.
+ * @param {number} initialCategoryID A category's unique ID to limit the results to.
  */
 function AnalyticsDashboard (config, start, end, initialCategoryID) {
 
@@ -51,6 +54,20 @@ function AnalyticsDashboard (config, start, end, initialCategoryID) {
      */
     this.addPanel = function(panelID, config) {
         if (typeof config === 'object') {
+            var widgets;
+
+            if (typeof config.widgets !== 'undefined' && Array.isArray(config.widgets)) {
+                widgets = [];
+                for (var i = 0; i < config.widgets.length; i++) {
+                    config.widgets[i].timeframe = this.getTimeframe();
+                    widgets.push(new AnalyticsWidget(config.widgets[i]));
+                }
+                delete config.widgets;
+            } else {
+                widgets = [];
+            }
+
+            config.widgets = widgets;
             return panels[panelID] = config;
         } else {
             return false;
@@ -227,10 +244,11 @@ AnalyticsDashboard.prototype.emptyPanelContainer = function(panelID) {
 /**
  * Read the incoming config object and update our dashboard with its values.
  * @param {object} config A properly-formatted object containing our dashboard settings.
+ * @throws Throw an error when an invalid config is provided.
  */
 AnalyticsDashboard.prototype.loadConfig = function(config) {
     if (typeof config !== 'object') {
-        return;
+        throw 'Invalid dashboard config';
     }
 
     if (typeof config.dashboardID !== 'undefined') {
@@ -292,66 +310,7 @@ AnalyticsDashboard.prototype.writePanel = function(panelID) {
     }
 
     for (var i = 0; i < panel.widgets.length; i++) {
-        this.writeWidget(panel.widgets[i], panelContainer);
-    }
-};
-
-/**
- * Output a widget's contents to the specified container.
- * @param {object} widgetConfig The configuration values for the widget.
- * @param {object} container An object representing an HTML element where the widget will be written.
- * @throws Throw an error if the widget's config isn't an object.
- * @throws Throw an error if the container isn't an object.
- * @throws Throw an error if unable to find a compatible handler for this widget.
- */
-AnalyticsDashboard.prototype.writeWidget = function(widgetConfig, container) {
-    if (typeof widgetConfig !== 'object') {
-        throw 'Invalid widget config';
-    }
-
-    if (typeof container !== 'object') {
-        throw 'Invalid widget container.'
-    }
-
-    // Extract all of the necessary information from widgetConfig.
-    var data = widgetConfig.data || [];
-    var handler = widgetConfig.handler || false;
-    var title = widgetConfig.title || '';
-    var type = widgetConfig.type || false;
-    var widgetID = widgetConfig.widgetID || false;
-    var dashboardTimeframe = this.getTimeframe();
-
-    // We need a class available to handle the widget.  Verify we have one available on the page.
-    if (typeof window[handler] === 'function') {
-        // These three pieces of information are vital.  Do not attempt to output without them.
-        if (handler || widgetID || type) {
-            // Setup an instance of our widget object.
-            var trackerWidget = new window[handler](dashboardTimeframe.start, dashboardTimeframe.end, data, type, title);
-
-            // Setup the document elements we'll be using.
-            var widget = {
-                body:      document.createElement('div'),
-                container: document.createElement('div'),
-                title:     document.createElement('h4')
-            };
-
-            widget.container.setAttribute('id', 'analytics_widget_' + widgetID);
-            widget.container.setAttribute('class', 'analytics-widget analytics-widget-' + type);
-
-            // Metrics are a special case where a title is redundant.  Otherwise, we need a title element.
-            if (type !== 'metric') {
-                widget.title.setAttribute('class', 'title');
-                widget.title.innerHTML = title;
-                widget.container.appendChild(widget.title);
-            }
-
-            widget.body.setAttribute('class', 'body');
-            trackerWidget.writeContents(widget.body);
-            widget.container.appendChild(widget.body);
-
-            container.appendChild(widget.container);
-        }
-    } else {
-        throw 'Failed to locate handler: ' + handler;
+        panel.widgets[i].render();
+        panelContainer.appendChild(panel.widgets[i].getElements('container'));
     }
 };

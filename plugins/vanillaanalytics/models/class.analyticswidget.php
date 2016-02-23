@@ -13,11 +13,6 @@
 class AnalyticsWidget implements JsonSerializable {
 
     /**
-     * @var bool Does this widget support the category selector?
-     */
-    protected $categorySupport = false;
-
-    /**
      * @var array A collection of data to drive the widget.
      */
     protected $data = [];
@@ -31,6 +26,11 @@ class AnalyticsWidget implements JsonSerializable {
      * @var string Name of the JavaScript object to handle the data.
      */
     protected $handler;
+
+    /**
+     * @var array A collection of special event properties, used to indicate support (e.g. cat1, roleType)
+     */
+    protected $supports = [];
 
     /**
      * @var string Title of this widget.
@@ -60,12 +60,20 @@ class AnalyticsWidget implements JsonSerializable {
     }
 
     /**
-     * Grab the support status of the category selector.
+     * Add an event property to this widget's support array.
      *
-     * @return bool
+     * @param array|string $eventProperty
+     * @return $this
      */
-    public function getCategorySupport() {
-        return $this->categorySupport;
+    public function addSupport($eventProperty) {
+        if (is_array($eventProperty)) {
+            foreach ($eventProperty as $property) {
+                $this->addSupport($property);
+            }
+        }
+
+        $this->supports[] = $eventProperty;
+        return $this;
     }
 
     /**
@@ -117,6 +125,15 @@ class AnalyticsWidget implements JsonSerializable {
     }
 
     /**
+     * Grab the support slugs for this widget.
+     *
+     * @return array
+     */
+    public function getSupports() {
+        return $this->supports;
+    }
+
+    /**
      * Fetch the title of this widget.
      *
      * @return string
@@ -142,6 +159,7 @@ class AnalyticsWidget implements JsonSerializable {
             'categorySupport' => $this->categorySupport,
             'data'            => $this->data,
             'handler'         => $this->handler,
+            'supports'        => $this->supports,
             'title'           => $this->title,
             'type'            => $this->type,
             'widgetID'        => $this->widgetID
