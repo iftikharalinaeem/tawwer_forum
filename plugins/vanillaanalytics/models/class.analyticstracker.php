@@ -65,6 +65,10 @@ class AnalyticsTracker {
     public function addCssFiles(Gdn_Controller $controller) {
         $inDashboard = $controller->MasterView == 'admin';
 
+        if ($inDashboard) {
+            $controller->addCssFile('dashboard.css', 'plugins/vanillaanalytics');
+        }
+
         foreach ($this->trackers as $tracker) {
             $tracker->addCssFiles($controller, $inDashboard);
         }
