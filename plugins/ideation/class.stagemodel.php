@@ -6,13 +6,26 @@
 
 class StageModel extends Gdn_Model {
 
+    /**
+     * @var array An array representation of all the stages in the database.
+     */
     private static $stages;
 
     public function __construct() {
         parent::__construct('Stage');
     }
 
-    public function save($name, $status, $description = '', $attributes = array(), $stageID = 0) {
+    /**
+     * Inserts or updates a stage in the Stage table.
+     *
+     * @param string $name The name of the stage.
+     * @param string $status Either 'Open' or 'Closed'.
+     * @param string $description The global description for the stage.
+     * @param int $stageID The ID of the stage. Use if updating.
+     * @return bool|int The ID of the saved stage.
+     * @throws Exception
+     */
+    public function save($name, $status, $description = '', $stageID = 0) {
         // Put the data into a format that's savable.
         $this->defineSchema();
         $this->Validation->setSchema($this->Schema);
@@ -30,16 +43,12 @@ class StageModel extends Gdn_Model {
             $saveData['StageID'] = $stageID;
         }
 
-        if (sizeof($attributes)) {
-            $saveData['Attributes'] = $attributes;
-        }
-
         $insert = true;
 
         // Grab the current stage.
         if (isset($saveData['StageID'])) {
             $primaryKeyVal = $saveData['StageID'];
-            $stage = $this->SQL->getWhere('Stage', array('StageID' => $primaryKeyVal))->FirstRow(DATASET_TYPE_ARRAY);
+            $stage = $this->SQL->getWhere('Stage', array('StageID' => $primaryKeyVal))->firstRow(DATASET_TYPE_ARRAY);
             if ($stage) {
                 $insert = false;
                 $oldStage = StageModel::getStage($saveData['StageID']);
@@ -53,7 +62,7 @@ class StageModel extends Gdn_Model {
             $fields = $this->Validation->validationFields();
 
             if ($insert === false) {
-                $fields = RemoveKeyFromArray($fields, $this->PrimaryKey); // Don't try to update the primary key
+                unset($fields[$this->PrimaryKey]); // Don't try to update the primary key
                 $this->update($fields, array($this->PrimaryKey => $primaryKeyVal));
                 $this->defineTag($name, 'Stage', val('Name', $oldStage));
             } else {
@@ -67,6 +76,12 @@ class StageModel extends Gdn_Model {
         return $primaryKeyVal;
     }
 
+    /**
+     * Retrieves either the set of stages or a specific stage with the given ID.
+     *
+     * @param int $stageID The ID of the stage to retrieve.
+     * @return array A set of all the stages or the specific stage with the passed ID.
+     */
     protected static function stages($stageID = 0) {
         if (self::$stages === null) {
             // Fetch stages
@@ -82,6 +97,12 @@ class StageModel extends Gdn_Model {
         }
     }
 
+    /**
+     * Retrieves the stage with the given tag ID.
+     *
+     * @param $tagID The ID of the tag to find the stage from.
+     * @return array The stage with the given tag ID or an empty array.
+     */
     public static function getStageByTagID($tagID) {
         $stages = self::stages();
         foreach($stages as $stage) {
@@ -89,12 +110,17 @@ class StageModel extends Gdn_Model {
                 return $stage;
             }
         }
-        return false;
+        return [];
     }
 
+    /**
+     * Retrieves stages with open statuses.
+     *
+     * @return array The stages with an open status.
+     */
     public static function getOpenStages() {
         $stages = self::stages();
-        $openStages = array();
+        $openStages = [];
         foreach($stages as $stage) {
             if (val('Status', $stage) == 'Open') {
                 $openStages[] = $stage;
@@ -103,6 +129,11 @@ class StageModel extends Gdn_Model {
         return $openStages;
     }
 
+    /**
+     * Retrieves stages with closed statuses.
+     *
+     * @return array The stages with a closed status.
+     */
     public static function getClosedStages() {
         $stages = self::stages();
         $closedStages = array();
@@ -114,15 +145,34 @@ class StageModel extends Gdn_Model {
         return $closedStages;
     }
 
+    /**
+     * Returns all the stages.
+     *
+     * @return array A set of all the stages.
+     */
     public static function getStages() {
         return self::stages();
     }
 
+    /**
+     * Returns a stage with the given ID.
+     *
+     * @param int $stageID The stage ID of the stage to retrieve.
+     * @return array The stage with the passed ID.
+     */
     public static function getStage($stageID = 0) {
         return self::stages($stageID);
     }
 
-    protected function defineTag($name, $type = 'Stage', $oldName = FALSE) {
+    /**
+     * Add or updates a tag in the Tag table. A Stage-type tag must be defined when inserting a new Stage.
+     *
+     * @param $name The name of Tag to add.
+     * @param string $type The type of the tag.
+     * @param bool $oldName The old name of the tag to update.
+     * @return int The ID of the tag updated or inserted.
+     */
+    protected function defineTag($name, $type = 'Stage', $oldName = false) {
         $row = Gdn::sql()->getWhere('Tag', array('Name' => $name))->firstRow(DATASET_TYPE_ARRAY);
 
         if (!$row && $oldName) {
@@ -150,6 +200,12 @@ class StageModel extends Gdn_Model {
         return $tagID;
     }
 
+    /**
+     * Retrieves the stage of a discussion with the given ID.
+     *
+     * @param int $discussionID The ID of the discussion.
+     * @return array The stage of the discussion with the given ID.
+     */
     public static function getStageByDiscussion($discussionID) {
         $tagModel = new TagModel();
         $tags = $tagModel->getDiscussionTags($discussionID);
@@ -158,7 +214,7 @@ class StageModel extends Gdn_Model {
             return self::getStageByTagID(val('TagID', $tag));
         }
 
-        return null;
+        return [];
     }
 
 }

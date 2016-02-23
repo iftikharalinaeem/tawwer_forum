@@ -11,50 +11,47 @@
 class IdeaCounterModule extends Gdn_Module {
 
     /**
-     * @var string
+     * @var string The upvote reaction name.
      */
     protected $ideaUpReactionSlug = IdeationPlugin::REACTION_UP;
     /**
-     * @var string
+     * @var string The downvote reation name.
      */
     protected $ideaDownReactionSlug = IdeationPlugin::REACTION_DOWN;
     /**
-     * @var bool
+     * @var bool Whether the idea is open.
      */
     protected $isOpen;
     /**
-     * @var bool
-     */
-    protected $showClosedStageTag = false;
-    /**
-     * @var bool
+     * @var bool Whether to render a div showing the number of votes.
      */
     protected $showVotes = false;
     /**
-     * @var object
+     * @var object|array The discussion to render the counter module for.
      */
     protected $discussion;
     /**
-     * @var array
+     * @var array The compiled data to output in the rendering function.
      */
     protected $counter;
     /**
-     * @var bool
+     * @var bool Whether to render the downvoting options.
      */
     protected $useDownVotes = true;
     /**
-     * @var string
+     * @var string If the user has voted, should be equal to the $ideaUpReactionSlug or $ideaDownReactionSlug.
      */
     protected $userVote;
     /**
-     * @var IdeaCounterModule
+     * @var IdeaCounterModule An instance of this object.
      */
     protected static $instance;
 
     function __construct() {}
 
     /**
-     * Return the singleton instance of this class.
+     * Return the singleton instance of this class. Should be used instead of instantiating a new IdeaCounterModule
+     * for each discussion.
      *
      * @return IdeaCounterModule
      */
@@ -65,49 +62,45 @@ class IdeaCounterModule extends Gdn_Module {
         return self::$instance;
     }
 
+    /**
+     * @param object|array $discussion The discussion to render the counter module for.
+     * @return IdeaCounterModule $this
+     */
     public function setDiscussion($discussion) {
         $this->discussion = $discussion;
         return $this;
     }
 
     /**
-     * @param boolean $showClosedStageTag
-     */
-    public function setShowClosedStageTag($showClosedStageTag) {
-        $this->showClosedStageTag = $showClosedStageTag;
-    }
-
-    /**
-     * @param boolean $showVotes
+     * @param boolean $showVotes Whether to render a div showing the number of votes.
      */
     public function setShowVotes($showVotes) {
         $this->showVotes = $showVotes;
     }
 
-
     /**
-     * @return string
+     * @return string The user's vote, equal to the $ideaUpReactionSlug or $ideaDownReactionSlug.
      */
     public function getUserVote() {
         return $this->userVote;
     }
 
     /**
-     * @param string $userVote
+     * @param string $userVote If the user has voted, should be equal to the $ideaUpReactionSlug or $ideaDownReactionSlug.
      */
     public function setUserVote($userVote) {
         $this->userVote = $userVote;
     }
 
     /**
-     * @param boolean $useDownVotes
+     * @param boolean $useDownVotes Whether to render the downvoting options.
      */
     public function setUseDownVotes($useDownVotes) {
         $this->useDownVotes = $useDownVotes;
     }
 
     /**
-     * Compiles the data for the counter module for the discussion property.
+     * Compiles the data for the counter module.
      *
      * @return bool Whether to render the counter or not.
      */

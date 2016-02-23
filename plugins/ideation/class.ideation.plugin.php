@@ -226,7 +226,7 @@ class IdeationPlugin extends Gdn_Plugin {
 
         if ($sender->Form->authenticatedPostBack()) {
             $data = $sender->Form->formValues();
-            $result = $stageModel->save(val('Name', $data), val('Status', $data), val('Description', $data), [], $stageID);
+            $result = $stageModel->save(val('Name', $data), val('Status', $data), val('Description', $data), $stageID);
             $sender->Form->setValidationResults($stageModel->validationResults());
             if ($result) {
                 if (val('IsDefaultStage', $data, false)) {
