@@ -28,8 +28,8 @@ class SubcommunityModel extends Gdn_Model {
     public function __construct($name = '') {
         parent::__construct('Subcommunity');
 
-        $this->Validation->AddRule('Folder', 'function:validate_folder');
-        $this->Validation->ApplyRule('Folder', 'Folder', '%s must be a valid folder name.');
+        $this->Validation->addRule('Folder', 'function:validate_folder');
+        $this->Validation->applyRule('Folder', 'Folder', '%s must be a valid folder name.');
     }
 
     public static function addAlternativeUrls() {
@@ -38,12 +38,12 @@ class SubcommunityModel extends Gdn_Model {
 
         $currentSite = static::getCurrent();
         $currentFolder = $currentSite['Folder'];
-        $path = trim(Gdn::Request()->Path(), '/');
+        $path = trim(Gdn::request()->path(), '/');
 
         // Strip the current folder off of the category code.
-        if ($baseCategoryCode = Gdn::Controller()->Data('Category.UrlCode')) {
-            $baseCategoryCode = StringBeginsWith($baseCategoryCode, "$currentFolder-", true, true);
-            $baseCategoryCode = StringEndsWith($baseCategoryCode, "-$currentFolder", true, true);
+        if ($baseCategoryCode = Gdn::controller()->data('Category.UrlCode')) {
+            $baseCategoryCode = stringBeginsWith($baseCategoryCode, "$currentFolder-", true, true);
+            $baseCategoryCode = stringEndsWith($baseCategoryCode, "-$currentFolder", true, true);
         }
 
         foreach ($sites as &$site) {
@@ -51,34 +51,34 @@ class SubcommunityModel extends Gdn_Model {
 
             if (!$path || $folder === $currentFolder || $currentSite['CategoryID'] == $site['CategoryID']) {
                 $site['AlternatePath'] = rtrim("/$path", '/');
-                $site['AlternateUrl'] = Gdn::Request()->UrlDomain('//')."/$folder/$path";
+                $site['AlternateUrl'] = Gdn::request()->urlDomain('//')."/$folder/$path";
                 continue;
             }
 
             // Try and find an appropriate alternative category.
-            if (!($category = CategoryModel::Categories("$folder-$baseCategoryCode"))) {
-                $category = CategoryModel::Categories("$baseCategoryCode-$folder");
+            if (!($category = CategoryModel::categories("$folder-$baseCategoryCode"))) {
+                $category = CategoryModel::categories("$baseCategoryCode-$folder");
             }
 
             $altPath = $path;
-            if (Gdn_Theme::InSection('CategoryList')) {
+            if (Gdn_Theme::inSection('CategoryList')) {
                 if ($category) {
-                    $altPath = ltrim(CategoryUrl($category, '', '/'), '/');
+                    $altPath = ltrim(categoryUrl($category, '', '/'), '/');
                 }
-            } elseif (Gdn_Theme::InSection('DiscussionList')) {
+            } elseif (Gdn_Theme::inSection('DiscussionList')) {
                 if ($category) {
-                    $altPath = ltrim(CategoryUrl($category, '', '/'), '/');
-                } elseif (StringBeginsWith($path, 'discussions')) {
+                    $altPath = ltrim(categoryUrl($category, '', '/'), '/');
+                } elseif (stringBeginsWith($path, 'discussions')) {
                     $altPath = "discussions";
                 } else {
                     $altPath = '';
                 }
-            } elseif (Gdn_Theme::InSection('Discussion')) {
+            } elseif (Gdn_Theme::inSection('Discussion')) {
                 $altPath = '';
             }
 
             $site['AlternatePath'] = rtrim("/$altPath", '/');
-            $site['AlternateUrl'] = rtrim(Gdn::Request()->UrlDomain('//')."/$folder/$altPath", '/');
+            $site['AlternateUrl'] = rtrim(Gdn::request()->urlDomain('//')."/$folder/$altPath", '/');
         }
     }
 
@@ -87,15 +87,15 @@ class SubcommunityModel extends Gdn_Model {
      */
     public static function all() {
         if (!isset(self::$all)) {
-            $all = Gdn::Cache()->Get(self::CACHE_KEY);
+            $all = Gdn::cache()->get(self::CACHE_KEY);
             if (!$all) {
                 $all = array_column(
-                    static::instance()->getWhere(false, 'Sort,Name')->ResultArray(),
+                    static::instance()->getWhere(false, 'Sort,Name')->resultArray(),
                     null,
                     'Folder'
                 );
 
-                Gdn::Cache()->Store(self::CACHE_KEY, $all);
+                Gdn::cache()->store(self::CACHE_KEY, $all);
             }
             self::$all = $all;
         }
@@ -166,7 +166,7 @@ class SubcommunityModel extends Gdn_Model {
 
     public function calculateRow(&$row) {
         $locale = val('Locale', $row);
-        $canonicalLocale = Gdn_Locale::Canonicalize($locale);
+        $canonicalLocale = Gdn_Locale::canonicalize($locale);
         if (class_exists('Locale')) {
             $displayLocale = val($canonicalLocale, $this->localeNameTranslations, $canonicalLocale);
             $row['LocaleDisplayName'] = static::mb_ucfirst(Locale::getDisplayName($displayLocale, $canonicalLocale));
@@ -175,7 +175,7 @@ class SubcommunityModel extends Gdn_Model {
         }
         $row['Locale'] = $canonicalLocale;
         $row['LocaleShortName'] = str_replace('_', '-', $canonicalLocale);
-        $row['Url'] = Gdn::Request()->UrlDomain('//').'/'.$row['Folder'];
+        $row['Url'] = Gdn::request()->urlDomain('//').'/'.$row['Folder'];
     }
 
     public static function mb_ucfirst($str, $encoding = "UTF-8", $lower_str_end = false) {
@@ -190,12 +190,12 @@ class SubcommunityModel extends Gdn_Model {
     }
 
     protected static function clearCache() {
-        Gdn::Cache()->Remove(self::CACHE_KEY);
+        Gdn::cache()->remove(self::CACHE_KEY);
         self::$all = null;
     }
 
     public function delete($where = '', $Limit = FALSE, $ResetData = FALSE) {
-        $result = parent::Delete($where, $Limit, $ResetData);
+        $result = parent::delete($where, $Limit, $ResetData);
         static::clearCache();
         return $result;
     }
@@ -214,24 +214,24 @@ class SubcommunityModel extends Gdn_Model {
         }
 
         if (empty($where)) {
-            $rows = parent::Get($orderFields, $orderDirection, $limit, PageNumber($offset, $limit));
+            $rows = parent::get($orderFields, $orderDirection, $limit, pageNumber($offset, $limit));
         } else {
-            $rows = parent::GetWhere($where, $orderFields, $orderDirection, $limit, $offset);
+            $rows = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
         }
-        array_walk($rows->ResultArray(), [$this, 'calculateRow']);
+        array_walk($rows->resultArray(), [$this, 'calculateRow']);
         return $rows;
     }
 
     public function insert($Fields) {
-        $this->AddInsertFields($Fields);
-        if ($this->Validate($Fields, TRUE)) {
+        $this->addInsertFields($Fields);
+        if ($this->validate($Fields, TRUE)) {
             if (val('IsDefault', $Fields)) {
-                $this->SQL->Put('Subcommunity', ['IsDefault' => null]);
+                $this->SQL->put('Subcommunity', ['IsDefault' => null]);
             }
 
             static::clearCache();
 
-            return parent::Insert($Fields);
+            return parent::insert($Fields);
         }
     }
 
@@ -244,11 +244,11 @@ class SubcommunityModel extends Gdn_Model {
             $allFields = array_merge($row, $where);
         }
 
-        if ($this->Validate($allFields)) {
+        if ($this->validate($allFields)) {
             if (val('IsDefault', $row)) {
-                $this->SQL->Put('Subcommunity', ['IsDefault' => null], ['SubcommunityID <>' => $allFields['SubcommunityID']]);
+                $this->SQL->put('Subcommunity', ['IsDefault' => null], ['SubcommunityID <>' => $allFields['SubcommunityID']]);
             }
-            parent::Update($row, $where);
+            parent::update($row, $where);
             static::clearCache();
         }
     }
@@ -281,10 +281,10 @@ class SubcommunityModel extends Gdn_Model {
         }
 
         $this->SQL
-            ->BeginWhereGroup()
-            ->OrLike('Name', $search)
-            ->OrLike('Folder', $search)
-            ->EndWhereGroup();
+            ->beginWhereGroup()
+            ->orLike('Name', $search)
+            ->orLike('Folder', $search)
+            ->endWhereGroup();
 
         return $this->getWhere(false, $orderFields, $orderDirection, $limit, $offset);
     }
@@ -292,7 +292,7 @@ class SubcommunityModel extends Gdn_Model {
 
 if (!function_exists('validate_folder')) {
     function validate_folder($value) {
-        if (!ValidateRequired($value)) {
+        if (!validateRequired($value)) {
             return true;
         }
         return !preg_match('`[\\/]`', $value);

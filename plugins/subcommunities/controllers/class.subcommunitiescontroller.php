@@ -28,94 +28,94 @@ class SubcommunitiesController extends DashboardController {
     /// Methods ///
 
     public function add() {
-        $this->Title(sprintf(T('Add %s'), T('Site')));
+        $this->title(sprintf(t('Add %s'), t('Site')));
         $this->addedit();
     }
 
     protected function addedit() {
-        $this->Permission('Garden.Settings.Manage');
+        $this->permission('Garden.Settings.Manage');
 
         $localeModel = new LocaleModel();
 
         // Get the enabled locale packs.
 
-        if ($this->Request->IsAuthenticatedPostBack()) {
+        if ($this->Request->isAuthenticatedPostBack()) {
             if ($this->site) {
                 $siteID = $this->site['SubcommunityID'];
-                $this->siteModel->update($this->Request->Post(), ['SubcommunityID' => $siteID]);
+                $this->siteModel->update($this->Request->post(), ['SubcommunityID' => $siteID]);
             } else {
-                $siteID = $this->siteModel->insert($this->Request->Post());
+                $siteID = $this->siteModel->insert($this->Request->post());
             }
             if ($siteID) {
                 $site = $this->siteModel->getID($siteID);
-                $this->SetData('Site', $site);
+                $this->setData('Site', $site);
             } else {
-                $this->form->SetValidationResults($this->siteModel->Validation->Results());
+                $this->form->setValidationResults($this->siteModel->Validation->results());
             }
 
-            if ($this->form->ErrorCount() == 0) {
-                if ($this->DeliveryType() === DELIVERY_TYPE_VIEW) {
-                    $this->JsonTarget('', '', 'Refresh');
-                } elseif ($this->DeliveryType() === DELIVERY_TYPE_ALL) {
-                    Redirect('/subcommunities');
+            if ($this->form->errorCount() == 0) {
+                if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
+                    $this->jsonTarget('', '', 'Refresh');
+                } elseif ($this->deliveryType() === DELIVERY_TYPE_ALL) {
+                    redirect('/subcommunities');
                 }
             }
         } elseif ($this->site) {
-            $this->form->SetData($this->site);
+            $this->form->setData($this->site);
         }
 
-        $locales = $localeModel->EnabledLocalePacks(true);
+        $locales = $localeModel->enabledLocalePacks(true);
         $locales = array_column($locales, 'Locale', 'Locale');
         $locales = array_combine($locales, $locales);
         $locales = array_replace(['en' => 'en'], $locales);
-        $this->SetData('Locales', $locales);
+        $this->setData('Locales', $locales);
 
-        $categories = CategoryModel::MakeTree(CategoryModel::Categories());
+        $categories = CategoryModel::makeTree(CategoryModel::categories());
         $categories = array_column($categories, 'Name', 'CategoryID');
-        $this->SetData('Categories', $categories);
+        $this->setData('Categories', $categories);
 
         $this->View = 'addedit';
-        $this->AddSideMenu();
-        $this->Render();
+        $this->addSideMenu();
+        $this->render();
     }
 
     public function edit() {
         if (!$this->site) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
 
-        $this->Title(sprintf(T('Edit %s'), T('Site')));
+        $this->title(sprintf(t('Edit %s'), t('Site')));
         $this->addedit();
     }
 
     public function delete() {
         if (!$this->site) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
 
-        if ($this->form->AuthenticatedPostBack()) {
-            $this->siteModel->Delete(['SubcommunityID' => $this->site['SubcommunityID']]);
+        if ($this->form->authenticatedPostBack()) {
+            $this->siteModel->delete(['SubcommunityID' => $this->site['SubcommunityID']]);
 
-            if ($this->form->ErrorCount() == 0) {
-                if ($this->DeliveryType() === DELIVERY_TYPE_VIEW) {
-                    $this->JsonTarget('', '', 'Refresh');
-                } elseif ($this->DeliveryType() === DELIVERY_TYPE_ALL) {
-                    Redirect('/subcommunities');
+            if ($this->form->errorCount() == 0) {
+                if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
+                    $this->jsonTarget('', '', 'Refresh');
+                } elseif ($this->deliveryType() === DELIVERY_TYPE_ALL) {
+                    redirect('/subcommunities');
                 }
             }
         }
 
         $this->View = 'Delete';
-        $this->Title(sprintf(T('Delete %s'), T('Site')));
-        $this->Render();
+        $this->title(sprintf(t('Delete %s'), t('Site')));
+        $this->render();
     }
 
     protected function getSite($siteID) {
-        $this->site = $this->siteModel->GetID($siteID);
+        $this->site = $this->siteModel->getID($siteID);
     }
 
     public function index($page = '') {
-        switch ($this->Request->RequestMethod()) {
+        switch ($this->Request->requestMethod()) {
             case 'GET':
                 if ($this->site) {
                     return $this->get();
@@ -133,14 +133,14 @@ class SubcommunitiesController extends DashboardController {
                 break;
         }
 
-        $this->Permission('Garden.Settings.Manage');
+        $this->permission('Garden.Settings.Manage');
         $pageSize = 20;
-        list($offset, $limit) = OffsetLimit($page, $pageSize);
+        list($offset, $limit) = offsetLimit($page, $pageSize);
         $this->form = new Gdn_Form();
         $this->form->Method = 'get';
 
-        if ($search = $this->Request->Get('search')) {
-            $sites = $this->siteModel->search($search, 'Sort,Folder', 'asc', $limit + 1, $offset)->ResultArray();
+        if ($search = $this->Request->get('search')) {
+            $sites = $this->siteModel->search($search, 'Sort,Folder', 'asc', $limit + 1, $offset)->resultArray();
 
             // Select 1 more than page size so we can know whether or not to display the next link.
             $this->setData('_CurrentRecords', count($sites));
@@ -151,27 +151,27 @@ class SubcommunitiesController extends DashboardController {
             $this->setData('Sites', $sites);
         } else {
             $where = [];
-            $this->setData('Sites', $this->siteModel->GetWhere($where, 'Sort,Folder', 'asc', $limit, $offset)->ResultArray());
-            $this->setData('RecordCount', $this->siteModel->GetCount($where));
+            $this->setData('Sites', $this->siteModel->getWhere($where, 'Sort,Folder', 'asc', $limit, $offset)->resultArray());
+            $this->setData('RecordCount', $this->siteModel->getCount($where));
         }
 
         $this->setData('_Limit', $pageSize);
-        $this->AddJsFile('jquery.tablednd.js');
+        $this->addJsFile('jquery.tablednd.js');
 //        $this->AddJsFile('subcommunities_admin.js', 'plugins/subcommunities');
 
-        $this->Title(T('Sites'));
-        $this->AddSideMenu();
-        $this->Render();
+        $this->title(t('Sites'));
+        $this->addSideMenu();
+        $this->render();
     }
 
     public function initialize() {
-        parent::Initialize();
+        parent::initialize();
 
         $this->siteModel = SubcommunityModel::instance();
         $this->form = new Gdn_Form;
 
         // Check for a site.
-        $args = Gdn::Dispatcher()->ControllerArguments();
+        $args = Gdn::dispatcher()->controllerArguments();
         if (isset($args[0]) && is_numeric($args[0])) {
             $id = array_shift($args);
             $this->getSite($id);
@@ -179,48 +179,48 @@ class SubcommunitiesController extends DashboardController {
             // See if there is a method next.
             $method = array_shift($args);
             if ($method) {
-                if (StringEndsWith($method, '.json', TRUE)) {
-                    $method = StringEndsWith($method, '.json', TRUE, TRUE);
-                    $this->DeliveryType(DELIVERY_TYPE_DATA);
-                    $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+                if (stringEndsWith($method, '.json', TRUE)) {
+                    $method = stringEndsWith($method, '.json', TRUE, TRUE);
+                    $this->deliveryType(DELIVERY_TYPE_DATA);
+                    $this->deliveryMethod(DELIVERY_METHOD_JSON);
                 }
                 if (method_exists($this, $method)) {
-                    Gdn::Dispatcher()->EventArguments['ControllerMethod'] = $method;
-                    Gdn::Dispatcher()->ControllerMethod = $method;
+                    Gdn::dispatcher()->EventArguments['ControllerMethod'] = $method;
+                    Gdn::dispatcher()->ControllerMethod = $method;
                 } else {
                     array_unshift($args, $method);
                 }
             }
 
-            Gdn::Dispatcher()->ControllerArguments($args);
+            Gdn::dispatcher()->controllerArguments($args);
         }
     }
 
     protected function post() {
-        if (!$this->Request->IsAuthenticatedPostBack()) {
-            throw ForbiddenException('CSRF POST');
+        if (!$this->Request->isAuthenticatedPostBack()) {
+            throw forbiddenException('CSRF POST');
         }
 
         if ($this->site) {
             throw new Gdn_UserException('Site invalid when creating a site.');
         } else {
-            $siteID = $this->siteModel->insert($this->Request->Post());
+            $siteID = $this->siteModel->insert($this->Request->post());
             if ($siteID) {
                 $site = $this->siteModel->getID($siteID);
-                $this->SetData('Site', $site);
+                $this->setData('Site', $site);
             } else {
-                $this->form->SetValidationResults($this->siteModel->Validation->Results());
+                $this->form->setValidationResults($this->siteModel->Validation->results());
             }
         }
 
-        if ($this->form->ErrorCount() == 0) {
-            if ($this->DeliveryType() === DELIVERY_TYPE_VIEW) {
-                $this->JsonTarget('', '', 'Refresh');
-            } elseif ($this->DeliveryType() === DELIVERY_TYPE_ALL) {
-                Redirect('/subcommunities');
+        if ($this->form->errorCount() == 0) {
+            if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
+                $this->jsonTarget('', '', 'Refresh');
+            } elseif ($this->deliveryType() === DELIVERY_TYPE_ALL) {
+                redirect('/subcommunities');
             }
         }
 
-        $this->Render();
+        $this->render();
     }
 }

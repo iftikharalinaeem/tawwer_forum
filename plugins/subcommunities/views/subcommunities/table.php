@@ -1,18 +1,18 @@
 <?php
-PagerModule::Write(array('Sender' => $this));
+PagerModule::write(array('Sender' => $this));
 ?>
     <table id="SubcommunityTable" class="Sortable AltColumns">
         <thead>
         <tr>
-            <th><?php echo T('Name'); ?></th>
-            <th><?php echo T('Folder') ?></th>
-            <th><?php echo T('Locale') ?></th>
-            <th><?php echo T('Options') ?></th>
+            <th><?php echo t('Name'); ?></th>
+            <th><?php echo t('Folder') ?></th>
+            <th><?php echo t('Locale') ?></th>
+            <th><?php echo t('Options') ?></th>
         </tr>
         </thead>
         <tbody>
         <?php
-        foreach ($this->Data('Sites') as $Row):
+        foreach ($this->data('Sites') as $Row):
             $id = $Row['SubcommunityID'];
             ?>
             <tr data-id="<?php echo $id; ?>" id="<?php echo "Subcommunity_$id"; ?>">
@@ -20,15 +20,15 @@ PagerModule::Write(array('Sender' => $this));
                 <td>
                     <?php
                     $url = Gdn::request()->urlDomain('//').Gdn::request()->assetRoot().'/'.htmlspecialchars($Row['Folder']);
-                    echo Anchor('/'.htmlspecialchars($Row['Folder']), $url);
+                    echo anchor('/'.htmlspecialchars($Row['Folder']), $url);
                     ?>
                 </td>
                 <td><?php echo strtolower($Row['Locale']); ?></td>
                 <td>
                     <?php
 
-                    echo Anchor(T('Edit'), "/subcommunities/$id/edit", 'Popup SmallButton'),
-                        Anchor(T('Delete'), "/subcommunities/$id/delete", 'Popup SmallButton');
+                    echo anchor(t('Edit'), "/subcommunities/$id/edit", 'Popup SmallButton'),
+                        anchor(t('Delete'), "/subcommunities/$id/delete", 'Popup SmallButton');
                     ?>
                 </td>
             </tr>
@@ -38,4 +38,4 @@ PagerModule::Write(array('Sender' => $this));
         </tbody>
     </table>
 <?php
-PagerModule::Write();
+PagerModule::write();

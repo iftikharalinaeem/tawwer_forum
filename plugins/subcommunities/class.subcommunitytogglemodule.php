@@ -9,7 +9,7 @@ class SubcommunityToggleModule extends Gdn_Module {
         $this->_ApplicationFolder = 'plugins/subcommunities';
     }
 
-    public function ToString() {
+    public function toString() {
         if (!$this->Visible) {
             return '';
         }
@@ -17,9 +17,9 @@ class SubcommunityToggleModule extends Gdn_Module {
         if (in_array($style, array('select'))) {
             $this->setView("subcommunitytoggle_$style");
         }
-        $this->SetData('Subcommunities', SubcommunityModel::getAvailable());
-        $this->SetData('Current', SubcommunityModel::getCurrent());
+        $this->setData('Subcommunities', SubcommunityModel::getAvailable());
+        $this->setData('Current', SubcommunityModel::getCurrent());
 
-        return parent::FetchView($this->getView());
+        return parent::fetchView($this->getView());
     }
 }
