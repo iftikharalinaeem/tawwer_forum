@@ -179,8 +179,8 @@ class SubcommunitiesController extends DashboardController {
             // See if there is a method next.
             $method = array_shift($args);
             if ($method) {
-                if (stringEndsWith($method, '.json', TRUE)) {
-                    $method = stringEndsWith($method, '.json', TRUE, TRUE);
+                if (stringEndsWith($method, '.json', true)) {
+                    $method = stringEndsWith($method, '.json', true, true);
                     $this->deliveryType(DELIVERY_TYPE_DATA);
                     $this->deliveryMethod(DELIVERY_METHOD_JSON);
                 }

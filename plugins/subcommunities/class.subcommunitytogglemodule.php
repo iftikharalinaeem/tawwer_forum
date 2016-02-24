@@ -4,7 +4,7 @@ class SubcommunityToggleModule extends Gdn_Module {
     public $LabelField = 'Name';
     public $Style = '';
 
-    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
+    public function __construct($Sender = '', $ApplicationFolder = false) {
         $this->_Sender = $Sender;
         $this->_ApplicationFolder = 'plugins/subcommunities';
     }

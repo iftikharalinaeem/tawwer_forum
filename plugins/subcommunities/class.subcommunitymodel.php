@@ -194,7 +194,7 @@ class SubcommunityModel extends Gdn_Model {
         self::$all = null;
     }
 
-    public function delete($where = '', $Limit = FALSE, $ResetData = FALSE) {
+    public function delete($where = '', $Limit = false, $ResetData = false) {
         $result = parent::delete($where, $Limit, $ResetData);
         static::clearCache();
         return $result;
@@ -208,7 +208,7 @@ class SubcommunityModel extends Gdn_Model {
         return $row;
     }
 
-    public function getWhere($where = FALSE, $orderFields = '', $orderDirection = 'asc', $limit = FALSE, $offset = FALSE) {
+    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
         if (!$limit) {
             $limit = 1000;
         }
@@ -224,7 +224,7 @@ class SubcommunityModel extends Gdn_Model {
 
     public function insert($Fields) {
         $this->addInsertFields($Fields);
-        if ($this->validate($Fields, TRUE)) {
+        if ($this->validate($Fields, true)) {
             if (val('IsDefault', $Fields)) {
                 $this->SQL->put('Subcommunity', ['IsDefault' => null]);
             }
@@ -236,7 +236,7 @@ class SubcommunityModel extends Gdn_Model {
     }
 
     public function update($row, $where) {
-        $Result = FALSE;
+        $Result = false;
 
         // primary key (always included in $Where when updating) might be "required"
         $allFields = $row;
@@ -275,7 +275,7 @@ class SubcommunityModel extends Gdn_Model {
      * @param int|bool $offset
      * @return Gdn_DataSet
      */
-    public function search($search, $orderFields = '', $orderDirection = 'asc', $limit = FALSE, $offset = FALSE) {
+    public function search($search, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
         if (!$search) {
             return $this->getWhere(false, $orderFields, $orderDirection, $limit, $offset);
         }
