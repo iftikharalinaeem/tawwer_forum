@@ -1,38 +1,41 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php if (!defined('APPLICATION')) { exit(); }
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license Proprietary
  */
+
+/**
+ * Class AdvancedSearchModule
+ */
 class AdvancedSearchModule extends Gdn_Module {
+
     /**
-     *
      * @var Gdn_Form
      */
     public $Form;
 
     public $DateWithinOptions;
 
-    public $IncludeTags = TRUE;
+    public $IncludeTags = true;
 
-    public $Results = FALSE; // whether or not to show results in the form.
+    public $Results = false; // whether or not to show results in the form.
 
     public $Types = array();
 
     public $value = null;
 
-    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
+    public function __construct($Sender = '', $ApplicationFolder = false) {
         $this->_ApplicationFolder = 'plugins/AdvancedSearch';
 
         $this->DateWithinOptions = array(
-            '1 day' => Plural(1, '%s day', '%s days'),
-            '3 days' => Plural(3, '%s day', '%s days'),
-            '1 week' => Plural(1, '%s week', '%s weeks'),
-            '2 weeks' => Plural(2, '%s week', '%s weeks'),
-            '1 month' => Plural(1, '%s month', '%s months'),
-            '2 months' => Plural(2, '%s month', '%s months'),
-            '6 months' => Plural(6, '%s month', '%s months'),
-            '1 year' => Plural(1, '%s year', '%s years')
+            '1 day' => plural(1, '%s day', '%s days'),
+            '3 days' => plural(3, '%s day', '%s days'),
+            '1 week' => plural(1, '%s week', '%s weeks'),
+            '2 weeks' => plural(2, '%s week', '%s weeks'),
+            '1 month' => plural(1, '%s month', '%s months'),
+            '2 months' => plural(2, '%s month', '%s months'),
+            '6 months' => plural(6, '%s month', '%s months'),
+            '1 year' => plural(1, '%s year', '%s years')
         );
 
         // Set the initial types.
@@ -45,37 +48,38 @@ class AdvancedSearchModule extends Gdn_Module {
     }
 
     public static function addAssets() {
-        Gdn::Controller()->addJsFile('jquery.tokeninput.js');
-        Gdn::Controller()->addJsFile('jquery-ui.js');
-        Gdn::Controller()->addJsFile('advanced-search.js', 'plugins/AdvancedSearch');
-        Gdn::Controller()->addDefinition('TagHint', t('TagHint', 'Start to type...'));
-        Gdn::Controller()->addDefinition('TagSearching', t('Searching...'));
+        Gdn::controller()->addJsFile('jquery.tokeninput.js');
+        Gdn::controller()->addJsFile('jquery-ui.js');
+        Gdn::controller()->addJsFile('advanced-search.js', 'plugins/AdvancedSearch');
+        Gdn::controller()->addDefinition('TagHint', t('TagHint', 'Start to type...'));
+        Gdn::controller()->addDefinition('TagSearching', t('Searching...'));
     }
 
     public function toString() {
-        if ($this->IncludeTags === NULL) {
-            $this->IncludeTags = Gdn::PluginManager()->IsEnabled('Tagging') && Gdn::PluginManager()->IsEnabled('Sphinx');
+        if ($this->IncludeTags === null) {
+            $this->IncludeTags = Gdn::pluginManager()->isEnabled('Tagging') && Gdn::pluginManager()->isEnabled('Sphinx');
         }
 
         // We want the advanced search form to populate from the get and have lowercase fields.
         $Form = $this->Form = new Gdn_Form();
         $Form->Method = 'get';
-        $Get = array_change_key_case(Gdn::Request()->Get());
+        $Get = array_change_key_case(Gdn::request()->get());
 
         if ($this->Results) {
             $Form->formValues($Get);
         } else {
-            if ($this->value !== null && !isset($Get['search']))
+            if ($this->value !== null && !isset($Get['search'])) {
                 $Form->setFormValue('search', $value);
+            }
         }
 
         // Add the tags as data.
         if (isset($Get['tags'])) {
             $tags = explode(',', $Get['tags']);
             $tags = array_filter($tags);
-            $tags = Gdn::SQL()->GetWhere('Tag', array('Name' => $tags))->ResultArray();
+            $tags = Gdn::SQL()->getWhere('Tag', array('Name' => $tags))->resultArray();
             if (count($tags) > 0 && isset($tags[0]['FullName'])) {
-                $this->SetData('Tags', array_column($tags, 'FullName', 'Name'));
+                $this->setData('Tags', array_column($tags, 'FullName', 'Name'));
             }
         }
 
