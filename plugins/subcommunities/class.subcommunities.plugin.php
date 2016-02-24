@@ -2,7 +2,7 @@
 
 $PluginInfo['subcommunities'] = array(
     'Name'        => "Subcommunities",
-    'Description' => "Allows you to use categories as virtual mini forums for multilingual or multi-product communities.",
+    'Description' => "Allows you to use top level categories as virtual mini forums for multilingual or multi-product communities.",
     'Version'     => '1.0.2',
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -312,6 +312,21 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function gdn_smarty_init_handler($sender) {
         $sender->assign('Subcommunity', SubcommunityModel::getCurrent());
+    }
+
+    public function postController_beforeFormInputs_handler($sender, $args) {
+        $site = SubcommunityModel::getCurrent();
+        $categoryID = val('CategoryID', $site);
+
+        // Get the child categories
+        $categories = CategoryModel::getSubtree($categoryID, false, true);
+
+        // Remove categories I can't view.
+        $categories = array_filter($categories, function($category) {
+            return (bool)val('PermsDiscussionsView', $category);
+        });
+
+        $args['CategoryDropDownOptions']['CategoryData'] = $categories;
     }
 
     /**
