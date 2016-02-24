@@ -101,6 +101,46 @@ class VanillaAnalytics extends Gdn_Plugin {
     }
 
     /**
+     * Handle requests for the analytics index in Vanilla's dashboard.
+     *
+     * @param Gdn_Controller $sender
+     */
+    public function controller_index($sender) {
+        redirect('settings');
+    }
+
+    /**
+     * Handle requests for an analytics dashboard.
+     *
+     * @param Gdn_Controller $sender
+     * @param $requestArgs
+     */
+    public function controller_dashboard($sender, $requestArgs) {
+        list($dashboardID) = $requestArgs;
+
+        if (empty($dashboardID)) {
+            redirect('settings');
+        }
+
+        $sender->addCssFile('c3.min.css', 'plugins/vanillaanalytics');
+
+        $sender->addJsFile('d3.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('c3.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('dashboard.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('analyticsdashboard.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('analyticswidget.min.js', 'plugins/vanillaanalytics');
+
+        $dashboardModel = new AnalyticsDashboard();
+        $dashboard = $dashboardModel->getID($dashboardID);
+
+        if ($dashboard) {
+            $dashboardModel->render($sender, $dashboard);
+        } else {
+            redirect('settings');
+        }
+    }
+
+    /**
      * Track when a discussion is saved.  This can be used to record an event for inserts or edits.
      *
      * @param $sender Current instance of DiscussionModel
@@ -280,29 +320,7 @@ class VanillaAnalytics extends Gdn_Plugin {
     public function settingsController_analytics_create($sender, $entityType = false, $entityID = false) {
         $sender->permission('Garden.Settings.Manage');
 
-        $sender->addCssFile('c3.min.css', 'plugins/vanillaanalytics');
-
-        $sender->addJsFile('d3.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('c3.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('dashboard.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('analyticsdashboard.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('analyticswidget.min.js', 'plugins/vanillaanalytics');
-
-        switch($entityType) {
-            case 'dashboard':
-                $dashboardModel = new AnalyticsDashboard();
-                $dashboard = $dashboardModel->getID($entityID);
-
-                if ($dashboard) {
-                    $dashboardModel->render($sender, $dashboard);
-                } else {
-                    redirect('settings');
-                }
-
-                break;
-            default:
-                redirect('settings');
-        }
+        $this->dispatch($sender, $sender->RequestArgs);
     }
 
     /**
