@@ -347,6 +347,14 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function structure() {
+        Gdn::structure()
+            ->table('AnalyticsDashboardWidget')
+            ->column('UserID', 'int', false, 'index')
+            ->column('DashboardID', 'varchar(32)', null, 'index')
+            ->column('WidgetID', 'varchar(32)', false)
+            ->column('DateInserted', 'datetime')
+            ->set();
+
         AnalyticsTracker::getInstance()->setup();
     }
 }
