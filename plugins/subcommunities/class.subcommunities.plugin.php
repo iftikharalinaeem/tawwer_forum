@@ -314,6 +314,14 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $sender->assign('Subcommunity', SubcommunityModel::getCurrent());
     }
 
+    /**
+     * Hook on PostController's BeforeFormInputs event.
+     *
+     * Used to filter down the category dropdown when you create a discussion.
+     *
+     * @param $sender Sending controller instance.
+     * @param $args Event arguments.
+     */
     public function postController_beforeFormInputs_handler($sender, $args) {
         $site = SubcommunityModel::getCurrent();
         $categoryID = val('CategoryID', $site);
