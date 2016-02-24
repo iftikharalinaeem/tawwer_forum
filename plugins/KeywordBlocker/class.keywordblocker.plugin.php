@@ -114,6 +114,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
 
             $sender->EventArguments['Handled'] = true;
             $this->restorePostFromLog($sender->EventArguments['Log']);
+            // LogModel::delete() is not used here because that function delete the linked record.
             Gdn::sql()->where('LogID', $sender->EventArguments['Log']['LogID'])->delete('Log');
         }
     }
