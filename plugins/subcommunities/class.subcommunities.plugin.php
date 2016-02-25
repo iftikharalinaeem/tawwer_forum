@@ -68,7 +68,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     /**
      * Get the categories for the current subcommunity.
      *
-     * @return array Returns an array of category IDs
+     * @return array Returns an array of categories
      */
     public function getCategories() {
         if ($this->categories === null) {
