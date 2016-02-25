@@ -35,7 +35,9 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param object $sender DashboardController.
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
-        $sectionModel = new AnalyticsSection();
+        $sectionModel            = new AnalyticsSection();
+        $analyticsDashboardModel = new AnalyticsDashboard();
+
         Logger::event('analytics_menu', Logger::INFO, 'Sections', $sectionModel->getDefaults());
 
         $sender->EventArguments['SideMenu']->addItem(
@@ -44,6 +46,16 @@ class VanillaAnalytics extends Gdn_Plugin {
             'Garden.Settings.Manage',
             ['class' => 'Analytics']
         );
+
+        $personalDashboard = $analyticsDashboardModel->getUserDashboardWidgets(AnalyticsDashboard::DASHBOARD_PERSONAL);
+        if (count($personalDashboard) > 0) {
+            $sender->EventArguments['SideMenu']->addLink(
+                'analytics',
+                T('Personal Dashboard'),
+                "settings/analytics/dashboard/personal",
+                'Garden.Settings.Manage'
+            );
+        }
 
         foreach ($sectionModel->getDefaults() as $section) {
             foreach ($section->getDashboards() as $dashboard) {
@@ -101,11 +113,62 @@ class VanillaAnalytics extends Gdn_Plugin {
     }
 
     /**
+     * Save a widget to the current user's personal dashboard.
+     *
+     * @param Gdn_Controller $sender
+     * @param array $requestArgs
+     */
+    public function controller_bookmarkWidget($sender, $requestArgs) {
+        list($widgetID, $dashboardID) = $requestArgs;
+
+        $dashboardModel = new AnalyticsDashboard();
+        $widgetModel    = new AnalyticsWidget();
+        $widget         = $widgetModel->getID($widgetID);
+        $userID         = Gdn::session()->UserID;
+
+        if ($widget) {
+            if ($widget->isBookmarked()) {
+                $dashboardModel->removeWidget(
+                    $widgetID,
+                    AnalyticsDashboard::DASHBOARD_PERSONAL,
+                    $userID
+                );
+                $bookmarked = false;
+
+                $sender->informMessage(t('Removed widget bookmark'));
+            } else {
+                $dashboardModel->addWidget(
+                    $widgetID,
+                    AnalyticsDashboard::DASHBOARD_PERSONAL,
+                    $userID
+                );
+                $bookmarked = true;
+
+                $sender->informMessage(t('Bookmarked widget'));
+            }
+
+            $html = anchor(
+                t('Bookmark'),
+                "/settings/analytics/bookmarkwidget/{$widgetID}",
+                'Hijack Bookmark'.($bookmarked ? ' Bookmarked' : ''),
+                array('title' => $widget->getTitle())
+            );
+            $sender->jsonTarget('!element', $html, 'ReplaceWith');
+        } else {
+            $sender->informMessage(t('Invalid widget ID'));
+        }
+
+        $sender->deliveryMethod(DELIVERY_METHOD_JSON);
+        $sender->deliveryTYpe(DELIVERY_TYPE_MESSAGE);
+        $sender->render('Blank', 'Utility');
+    }
+
+    /**
      * Handle requests for the analytics index in Vanilla's dashboard.
      *
      * @param Gdn_Controller $sender
      */
-    public function controller_index($sender) {
+    public function controller_index($sender, $requestArgs) {
         redirect('settings');
     }
 
@@ -349,9 +412,10 @@ class VanillaAnalytics extends Gdn_Plugin {
     public function structure() {
         Gdn::structure()
             ->table('AnalyticsDashboardWidget')
-            ->column('UserID', 'int', false, 'index')
-            ->column('DashboardID', 'varchar(32)', null, 'index')
+            ->column('DashboardID', 'varchar(32)', null, ['index', 'index.DashboardSort'])
             ->column('WidgetID', 'varchar(32)', false)
+            ->column('Sort', 'int', false, ['index', 'index.DashboardSort'])
+            ->column('InsertUserID', 'int', false, 'index')
             ->column('DateInserted', 'datetime')
             ->set();
 

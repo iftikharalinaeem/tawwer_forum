@@ -450,7 +450,7 @@ class KeenIOTracker implements TrackerInterface {
             ->setGroupBy('category.categoryID');
 
         $contributorsByCategoryWidget = new AnalyticsWidget();
-        $contributorsByCategoryWidget->setID('contributors')
+        $contributorsByCategoryWidget->setID('contributors-by-category')
             ->setTitle(t('Contributors by Category'))
             ->setHandler('KeenIOWidget')
             ->setType('chart')
@@ -472,7 +472,7 @@ class KeenIOTracker implements TrackerInterface {
             ->setGroupBy('user.roleType');
 
         $contributorsByRoleTypeWidget = new AnalyticsWidget();
-        $contributorsByRoleTypeWidget->setID('contributors')
+        $contributorsByRoleTypeWidget->setID('contributors-by-role-type')
             ->setTitle(t('Contributors by Role Type'))
             ->setHandler('KeenIOWidget')
             ->setType('chart')
