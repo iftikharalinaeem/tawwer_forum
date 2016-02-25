@@ -13,9 +13,9 @@
 class AnalyticsDashboard implements JsonSerializable {
 
     /**
-     * @var array Collection of panels.
+     * Slug for a user's private/personal dashboard.
      */
-    protected $panels = [];
+    const DASHBOARD_PERSONAL = 'personal';
 
     /**
      * @var string Unique identifier for this dashboard.
@@ -28,6 +28,14 @@ class AnalyticsDashboard implements JsonSerializable {
     protected static $defaults = [];
 
     /**
+     * @var array Collection of panels.
+     */
+    protected $panels = [];
+
+    /** @var Gdn_SQLDriver Contains the sql driver for the object. */
+    public $sql;
+
+    /**
      * @var string Title for this dashboard.
      */
     protected $title = '';
@@ -37,14 +45,64 @@ class AnalyticsDashboard implements JsonSerializable {
      *
      * @param bool|integer|string $dashboardID Unique identifier for this dashboard.  False if none.
      */
-    public function __construct($dashboardID = false) {
-        if ($dashboardID) {
-            $this->setID($dashboardID);
+    public function __construct($title = false, $metrics = [], $charts = []) {
+        $this->sql = Gdn::database()->sql();
+
+        if ($title) {
+            $dashboardID = strtolower(preg_replace(
+                '#[^A-Za-z0-9\-]#',
+                '',
+                str_replace(' ', '-', $title)
+            ));
+            $this->setTitle(t($title));
+            $this->setDashboardID($dashboardID);
         }
 
         // Create the default panels: metrics and charts.
         $this->panels['metrics'] = new AnalyticsPanel('metrics');
         $this->panels['charts']  = new AnalyticsPanel('charts');
+
+        if (is_array($metrics) && !empty($metrics)) {
+            $this->getPanel('metrics')->addWidget($metrics);
+        }
+
+        if (is_array($charts) && !empty($charts)) {
+            $this->getPanel('charts')->addWidget($charts);
+        }
+    }
+
+    /**
+     * Save a widget to a custom dashboard.
+     *
+     * @param string $widgetID
+     * @param string $dashboardID
+     * @param int $userID
+     */
+    public function addWidget($widgetID, $dashboardID, $userID) {
+        // Check to see if we've already made this association.
+        $dashboardWidget = $this->sql->getWhere(
+            'AnalyticsDashboardWidget',
+            [
+                'DashboardID'  => $dashboardID,
+                'InsertUserID' => $userID,
+                'WidgetID'     => $widgetID
+            ]
+        )->numRows();
+
+        if ($dashboardWidget > 0) {
+            // Nothing to do here.
+            return;
+        }
+
+        $this->sql->insert(
+            'AnalyticsDashboardWidget',
+            [
+                'DashboardID'  => $dashboardID,
+                'DateInserted' => Gdn_Format::toDateTime(),
+                'InsertUserID' => $userID,
+                'WidgetID'     => $widgetID
+            ]
+        );
     }
 
     /**
@@ -58,13 +116,29 @@ class AnalyticsDashboard implements JsonSerializable {
         $defaults = $this->getDefaults();
         $result = false;
 
-        if (ctype_digit($dashboardID)) {
+        if ($dashboardID == self::DASHBOARD_PERSONAL) {
+            $result = new AnalyticsDashboard(
+                'Personal Dashboard',
+                [],
+                $this->getUserDashboardWidgets(self::DASHBOARD_PERSONAL)
+            );
+        }
+        elseif (ctype_digit($dashboardID)) {
             // Database lookup
         } elseif (array_key_exists($dashboardID, $defaults)) {
             $result = $defaults[$dashboardID];
         }
 
         return $result;
+    }
+
+    /**
+     * Fetch the current dashboard's ID.
+     *
+     * @return string
+     */
+    public function getDashboardID() {
+        return $this->dashboardID;
     }
 
     /**
@@ -87,21 +161,16 @@ class AnalyticsDashboard implements JsonSerializable {
             ];
 
             foreach ($defaults as $title => $panels) {
-                $dashboardID = strtolower(preg_replace(
-                    '#[^A-Za-z0-9\-]#',
-                    '',
-                    str_replace(' ', '-', $title)
-                ));
-                $dashboard = new AnalyticsDashboard($dashboardID);
-                $dashboard->setTitle(t($title));
+                $metrics = [];
+                $charts  = [];
 
                 if (is_array($panels)) {
-                    foreach ($panels as $panelID => $widgets) {
-                        if ($currentPanel = $dashboard->getPanel($panelID)) {
-                            $currentPanel->addWidget($widgets);
-                        }
-                    }
+                    $metrics = array_key_exists('metrics', $panels) && is_array($panels['metrics']) ? $panels['metrics'] : [];
+                    $charts = array_key_exists('charts', $panels) && is_array($panels['charts']) ? $panels['charts'] : [];
                 }
+
+                $dashboard   = new AnalyticsDashboard($title, $metrics, $charts);
+                $dashboardID = $dashboard->getDashboardID();
 
                 static::$defaults[$dashboardID] = $dashboard;
             }
@@ -145,6 +214,38 @@ class AnalyticsDashboard implements JsonSerializable {
     }
 
     /**
+     * Perform a database lookup to grab the widgets associated with a custom dashboard.
+     *
+     * @param string $dashboardID
+     * @param int|null $userID
+     * @return array
+     */
+    public function getUserDashboardWidgets($dashboardID, $userID = null) {
+        if ($dashboardID == self::DASHBOARD_PERSONAL && $userID == null) {
+            // This is a user-specific dashboard lookup.  We need a user ID.
+            if (Gdn::session()->isValid()) {
+                $userID = Gdn::session()->UserID;
+            } else {
+                return [];
+            }
+        }
+
+        $result = $this->sql
+            ->getWhere(
+                'AnalyticsDashboardWidget',
+                [
+                    'DashboardID' => self::DASHBOARD_PERSONAL,
+                    'InsertUserID'      => $userID
+                ],
+                'Sort',
+                'asc'
+            )
+            ->resultArray();
+
+        return array_column($result, 'WidgetID');
+    }
+
+    /**
      * Specify data which should be serialized to JSON.
      *
      * @return array
@@ -155,6 +256,24 @@ class AnalyticsDashboard implements JsonSerializable {
             'panels'      => $this->panels,
             'title'       => $this->title
         ];
+    }
+
+    /**
+     * Remove a widget from a custom dashboard.
+     *
+     * @param string $widgetID
+     * @param string $dashboardID
+     * @param int $userID
+     */
+    public function removeWidget($widgetID, $dashboardID, $userID) {
+        $this->sql->delete(
+            'AnalyticsDashboardWidget',
+            [
+                'DashboardID'  => $dashboardID,
+                'InsertUserID' => $userID,
+                'WidgetID'     => $widgetID
+            ]
+        );
     }
 
     /**
@@ -194,7 +313,7 @@ class AnalyticsDashboard implements JsonSerializable {
      * @param string $dashboardID A unique identifier for this instance.
      * @return $this
      */
-    public function setID($dashboardID) {
+    public function setDashboardID($dashboardID) {
         $this->dashboardID = $dashboardID;
         return $this;
     }

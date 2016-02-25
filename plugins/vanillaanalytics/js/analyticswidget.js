@@ -7,6 +7,12 @@ function AnalyticsWidget(config) {
 
     /**
      *
+     * @type {boolean}
+     */
+    var bookmarked = false;
+
+    /**
+     *
      * @type {Array}
      */
     var data = [];
@@ -85,6 +91,7 @@ function AnalyticsWidget(config) {
         // Setup the document elements we'll be using.
         var newElements = {
             body      : document.createElement('div'),
+            bookmark  : document.createElement('a'),
             container : document.createElement('div'),
             title     : null
         };
@@ -92,15 +99,25 @@ function AnalyticsWidget(config) {
         newElements.container.setAttribute('id', 'analytics_widget_' + widgetID);
         newElements.container.setAttribute('class', 'analytics-widget analytics-widget-' + type);
 
+        if (this.isBookmarked()) {
+            newElements.bookmark.setAttribute('class', 'Hijack Bookmark Bookmarked');
+        } else {
+            newElements.bookmark.setAttribute('class', 'Hijack Bookmark');
+        }
+        newElements.bookmark.setAttribute('href', gdn.url('/settings/analytics/bookmarkwidget/' + this.getWidgetID()));
+        newElements.bookmark.innerHTML = 'Bookmark';
+
         // Metrics are a special case where a title is redundant.  Otherwise, we need a title element.
         if (this.getType() !== 'metric') {
             newElements.title = document.createElement('h4');
             newElements.title.setAttribute('class', 'title');
             newElements.title.innerHTML = this.getTitle();
+            newElements.title.appendChild(newElements.bookmark);
             newElements.container.appendChild(newElements.title);
         }
 
         newElements.body.setAttribute('class', 'body');
+
         newElements.container.appendChild(newElements.body);
 
         elements = newElements;
@@ -145,6 +162,16 @@ function AnalyticsWidget(config) {
 
     this.getWidgetID = function() {
         return widgetID;
+    };
+
+    this.isBookmarked = function() {
+        return bookmarked;
+    };
+
+    this.setBookmarked = function(newBookmarked) {
+        if (typeof newBookmarked === 'boolean') {
+            bookmarked = newBookmarked;
+        }
     };
 
     this.setData = function(newData) {
@@ -211,6 +238,10 @@ function AnalyticsWidget(config) {
 AnalyticsWidget.prototype.loadConfig = function(config) {
     if (typeof config !== 'object') {
         throw 'Invalid dashboard config';
+    }
+
+    if (typeof config.bookmarked !== 'undefined') {
+        this.setBookmarked(config.bookmarked);
     }
 
     if (typeof config.data !== 'undefined') {

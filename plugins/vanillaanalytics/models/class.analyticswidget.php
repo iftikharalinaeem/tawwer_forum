@@ -13,6 +13,11 @@
 class AnalyticsWidget implements JsonSerializable {
 
     /**
+     * @var bool Is this widget bookmarked by the current user?
+     */
+    protected $bookmarked = null;
+
+    /**
      * @var array A collection of data to drive the widget.
      */
     protected $data = [];
@@ -26,6 +31,9 @@ class AnalyticsWidget implements JsonSerializable {
      * @var string Name of the JavaScript object to handle the data.
      */
     protected $handler;
+
+    /** @var Gdn_SQLDriver Contains the sql driver for the object. */
+    public $sql;
 
     /**
      * @var array A collection of special event properties, used to indicate support (e.g. cat1, roleType)
@@ -54,6 +62,8 @@ class AnalyticsWidget implements JsonSerializable {
      * @param bool $handler
      */
     public function __construct($widgetID = false, $data = [], $handler = false) {
+        $this->sql = Gdn::database()->sql();
+
         if ($widgetID) {
             $this->setID($widgetID);
         }
@@ -152,10 +162,28 @@ class AnalyticsWidget implements JsonSerializable {
     }
 
     /**
+     * Is this widget bookmarked by the current user?
+     *
+     * @return bool
+     */
+    public function isBookmarked() {
+        if ($this->bookmarked === null) {
+            $dashboardModel = new AnalyticsDashboard();
+            $this->bookmarked = in_array(
+                $this->widgetID,
+                $dashboardModel->getUserDashboardWidgets(AnalyticsDashboard::DASHBOARD_PERSONAL)
+            );
+        }
+
+        return $this->bookmarked;
+    }
+
+    /**
      * Specify data which should be serialized to JSON.
      */
     public function jsonSerialize() {
         return [
+            'bookmarked'      => $this->isBookmarked(),
             'categorySupport' => $this->categorySupport,
             'data'            => $this->data,
             'handler'         => $this->handler,

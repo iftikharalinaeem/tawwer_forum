@@ -35,3 +35,33 @@
 .analytics-widget-metric .keen-metric-title {
     font-size: 20px;
 }
+
+a.Bookmark,
+a.Bookmarked,
+a.Bookmarking {
+    background: url('/applications/dashboard/design/images/ui_sprites.png') 0 -2px no-repeat;
+    display: inline-block;
+    font-size: 1px;
+    height: 18px;
+    overflow: hidden;
+    text-indent: -1000px;
+    vertical-align: top;
+    width: 18px;
+}
+
+a.Bookmark:hover {
+    background-position: 0 -22px;
+}
+
+a.Bookmarked {
+    background-position: 0 -42px;
+}
+
+a.Bookmarked:hover {
+    background-position: 0 -82px;
+}
+
+a.Bookmarking,
+a.Bookmarking:hover {
+    background-position: 0 -62px;
+}
