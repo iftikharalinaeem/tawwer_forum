@@ -135,6 +135,11 @@ class VanillaAnalytics extends Gdn_Plugin {
                 );
                 $bookmarked = false;
 
+                $sender->jsonTarget(
+                    "#analytics_widget_{$widgetID}",
+                    'removeAnalyticsWidget',
+                    'Callback'
+                );
                 $sender->informMessage(t('Removed widget bookmark'));
             } else {
                 $dashboardModel->addWidget(
