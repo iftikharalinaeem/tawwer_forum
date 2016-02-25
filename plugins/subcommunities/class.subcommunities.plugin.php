@@ -1,4 +1,4 @@
-<?php if (!defined('APPLICATION')) exit;
+<?php if (!defined('APPLICATION')) { exit; }
 
 $PluginInfo['subcommunities'] = array(
     'Name'        => "Subcommunities",
@@ -32,21 +32,21 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     public function structure() {
-        Gdn::Structure()
-            ->Table('Subcommunity')
-            ->PrimaryKey('SubcommunityID')
-            ->Column('Name', 'varchar(255)')
-            ->Column('Folder', 'varchar(255)', false, 'unique.Folder')
-            ->Column('CategoryID', 'int', true)
-            ->Column('Locale', 'varchar(20)')
-            ->Column('DateInserted', 'datetime')
-            ->Column('InsertUserID', 'int')
-            ->Column('DateUpdated', 'datetime', true)
-            ->Column('UpdateUserID', 'int', true)
-            ->Column('Attributes', 'text', true)
-            ->Column('Sort', 'smallint', '1000')
-            ->Column('IsDefault', 'tinyint(1)', true, 'unique.IsDefault')
-            ->Set();
+        Gdn::structure()
+            ->table('Subcommunity')
+            ->primaryKey('SubcommunityID')
+            ->column('Name', 'varchar(255)')
+            ->column('Folder', 'varchar(255)', false, 'unique.Folder')
+            ->column('CategoryID', 'int', true)
+            ->column('Locale', 'varchar(20)')
+            ->column('DateInserted', 'datetime')
+            ->column('InsertUserID', 'int')
+            ->column('DateUpdated', 'datetime', true)
+            ->column('UpdateUserID', 'int', true)
+            ->column('Attributes', 'text', true)
+            ->column('Sort', 'smallint', '1000')
+            ->column('IsDefault', 'tinyint(1)', true, 'unique.IsDefault')
+            ->set();
     }
 
     /**
@@ -63,7 +63,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
                 $categoryID = val('CategoryID', $site);
 
                 // Get all of the category IDs associated with the subcommunity.
-                $categories = CategoryModel::GetSubtree($categoryID, true);
+                $categories = CategoryModel::getSubtree($categoryID, true);
             }
 
             $this->categoryIDs = array_keys($categories);
@@ -77,8 +77,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     protected function initializeSite(array $site) {
         // Set the locale from the site.
-        if ($site['Locale'] !== Gdn::Locale()->Current()) {
-            Gdn::Locale()->Set($site['Locale'], Gdn::ApplicationManager()->EnabledApplicationFolders(), Gdn::PluginManager()->EnabledPluginFolders());
+        if ($site['Locale'] !== Gdn::locale()->current()) {
+            Gdn::locale()->set($site['Locale'], Gdn::applicationManager()->enabledApplicationFolders(), Gdn::pluginManager()->enabledPluginFolders());
         }
 
 //        // Set the default routes.
@@ -120,13 +120,13 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         SubcommunityModel::addAlternativeUrls();
 
         // Set alternative urls.
-        $domain = Gdn::Request()->UrlDomain();
+        $domain = Gdn::request()->urlDomain();
         foreach (SubcommunityModel::all() as $site) {
             if (!$site['AlternatePath']) {
                 continue;
             }
             $url = "$domain/{$site['Folder']}{$site['AlternatePath']}";
-            $sender->Head->AddTag(
+            $sender->Head->addTag(
                 'link',
                 [
                     'rel' => 'alternate',
@@ -140,7 +140,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     public function base_getAppSettingsMenuItems_handler($sender) {
         /* @var SideMenuModule */
         $menu = $sender->EventArguments['SideMenu'];
-        $menu->AddLink('Forum', T('Subcommunities'), '/subcommunities', 'Garden.Settings.Manage', ['After' => 'vanilla/settings/managecategories']);
+        $menu->addLink('Forum', t('Subcommunities'), '/subcommunities', 'Garden.Settings.Manage', ['After' => 'vanilla/settings/managecategories']);
     }
 
     /**
@@ -153,7 +153,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $categoryID = val('CategoryID', $site);
 
         // Get the child categories
-        $categories = CategoryModel::GetSubtree($categoryID, false, true);
+        $categories = CategoryModel::getSubtree($categoryID, false, true);
 
         // Remove categories I can't view.
         $categories = array_filter($categories, function($category) {
@@ -161,8 +161,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         });
 
         $data = new Gdn_DataSet($categories);
-        $data->DatasetType(DATASET_TYPE_ARRAY);
-        $data->DatasetType(DATASET_TYPE_OBJECT);
+        $data->datasetType(DATASET_TYPE_ARRAY);
+        $data->datasetType(DATASET_TYPE_OBJECT);
         $sender->Data = $data;
     }
 
@@ -176,14 +176,14 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             return;
         }
 
-        $adjust = -$sender->Data('Category.Depth');
+        $adjust = -$sender->data('Category.Depth');
         foreach ($sender->Data['Categories'] as &$category) {
-            SetValue('Depth', $category, val('Depth', $category) + $adjust);
+            setValue('Depth', $category, val('Depth', $category) + $adjust);
         }
 
         // We add the Depth of the root Category to the MaxDisplayDepth before rendering the categories page.
         // This resets it so the rendering respects the MaxDisplayDepth.
-        setValue('Depth', $sender->Data('Category'), 0);
+        setValue('Depth', $sender->data('Category'), 0);
     }
 
     /**
@@ -211,7 +211,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     /**
      * @param Gdn_Dispatcher $sender
      */
-    public function Gdn_Dispatcher_AppStartup_Handler($sender) {
+    public function gdn_dispatcher_appStartup_handler($sender) {
 
         $this->api = $this->isAPI($sender);
 
@@ -230,17 +230,17 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         // Look the root up in the mini sites.
         $site = SubcommunityModel::getSite($root);
         if ($site) {
-            Gdn::Request()->path($path);
+            Gdn::request()->path($path);
             $webroot = Gdn::request()->webRoot();
-            Gdn::Request()->assetRoot($webroot);
-            Gdn::Request()->webRoot(trim("$webroot/$root", '/'));
+            Gdn::request()->assetRoot($webroot);
+            Gdn::request()->webRoot(trim("$webroot/$root", '/'));
 
             $this->initializeSite($site);
         } elseif (!in_array($root, ['utility', 'sso', 'entry']) && !$this->api) {
             $defaultSite = SubcommunityModel::getDefaultSite();
             if ($defaultSite) {
-                $url = Gdn::Request()->assetRoot().'/'.$defaultSite['Folder'].rtrim('/'.Gdn::Request()->Path(), '/');
-                $get = Gdn::Request()->get();
+                $url = Gdn::request()->assetRoot().'/'.$defaultSite['Folder'].rtrim('/'.Gdn::request()->path(), '/');
+                $get = Gdn::request()->get();
                 if (!empty($get)) {
                     $url .= '?'.http_build_query($get);
                 }
@@ -249,8 +249,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             }
         }
 
-        $this->savedDoHeadings = C('Vanilla.Categories.DoHeadings');
-        $navDepth = C('Vanilla.Categories.NavDepth', 0);
+        $this->savedDoHeadings = c('Vanilla.Categories.DoHeadings');
+        $navDepth = c('Vanilla.Categories.NavDepth', 0);
         if ($navDepth == 0) {
             saveToConfig('Vanilla.Categories.NavDepth', 1);
         }
@@ -264,16 +264,16 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Router $sender
      */
-    public function Gdn_Router_beforeLoadRoutes_Handler($sender, $args) {
+    public function gdn_router_beforeLoadRoutes_handler($sender, $args) {
         $routes =& $args['Routes'];
         $site = SubcommunityModel::getCurrent();
 
         // Set the default routes.
         if (val('CategoryID', $site)) {
-            $category = CategoryModel::Categories($site['CategoryID']);
+            $category = CategoryModel::categories($site['CategoryID']);
 
             // Set the default category root.
-            $routes[base64_encode('categories(.json)?$')] = ltrim(CategoryUrl($category, '', '/'), '/').'$1';
+            $routes[base64_encode('categories(.json)?$')] = ltrim(categoryUrl($category, '', '/'), '/').'$1';
 
             $defaultRoute = val('DefaultController', $routes);
             if (is_array($defaultRoute)) {
@@ -282,7 +282,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $this->savedDefaultRoute = $defaultRoute;
             switch ($defaultRoute) {
                 case 'categories':
-                    $defaultRoute = ltrim(CategoryUrl($category, '', '/'), '/');
+                    $defaultRoute = ltrim(categoryUrl($category, '', '/'), '/');
                     break;
             }
             if ($defaultRoute) {
@@ -310,7 +310,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     /**
      * @param Smarty $sender
      */
-    public function Gdn_Smarty_Init_Handler($sender) {
+    public function gdn_smarty_init_handler($sender) {
         $sender->assign('Subcommunity', SubcommunityModel::getCurrent());
     }
 
@@ -318,6 +318,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @return SubcommunitiesPlugin
      */
     public static function instance() {
-        return Gdn::PluginManager()->GetPluginInstance(__CLASS__, Gdn_PluginManager::ACCESS_CLASSNAME);
+        return Gdn::pluginManager()->getPluginInstance(__CLASS__, Gdn_PluginManager::ACCESS_CLASSNAME);
     }
 }
