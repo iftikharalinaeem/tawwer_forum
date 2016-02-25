@@ -32,6 +32,11 @@ class AnalyticsDashboard implements JsonSerializable {
      */
     protected $panels = [];
 
+    /**
+     * @var bool Is this a user's personal dashboard?
+     */
+    protected $personal = false;
+
     /** @var Gdn_SQLDriver Contains the sql driver for the object. */
     public $sql;
 
@@ -122,6 +127,7 @@ class AnalyticsDashboard implements JsonSerializable {
                 [],
                 $this->getUserDashboardWidgets(self::DASHBOARD_PERSONAL)
             );
+            $result->setPersonal(true);
         }
         elseif (ctype_digit($dashboardID)) {
             // Database lookup
@@ -246,6 +252,14 @@ class AnalyticsDashboard implements JsonSerializable {
     }
 
     /**
+     * Is this a user's personal dashboard?
+     * @return bool
+     */
+    public function isPersonal() {
+        return $this->personal;
+    }
+
+    /**
      * Specify data which should be serialized to JSON.
      *
      * @return array
@@ -254,6 +268,7 @@ class AnalyticsDashboard implements JsonSerializable {
         return [
             'dashboardID' => $this->dashboardID,
             'panels'      => $this->panels,
+            'personal'    => $this->isPersonal(),
             'title'       => $this->title
         ];
     }
@@ -326,6 +341,17 @@ class AnalyticsDashboard implements JsonSerializable {
      */
     public function setTitle($title) {
         $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * Set the flag to determine if this is a user's personal dashboard.
+     *
+     * @param bool $personal
+     * @return $this
+     */
+    public function setPersonal($personal) {
+        $this->personal = (bool)$personal;
         return $this;
     }
 }
