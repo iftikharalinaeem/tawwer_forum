@@ -22,6 +22,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     protected $savedDefaultRoute = '';
     protected $savedDoHeadings = '';
 
+    protected $categories;
+
     /// Methods ///
 
     /**
