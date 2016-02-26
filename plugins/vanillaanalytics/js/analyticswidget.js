@@ -202,6 +202,7 @@ function AnalyticsWidget(config) {
             }
         }
         if (!value) {
+            this.drillGroupBy(support, true);
             return true;
         }
         if (filter === undefined) {
@@ -213,7 +214,26 @@ function AnalyticsWidget(config) {
         } else {
             filter.property_value = value;
         }
+        this.drillGroupBy(support);
     };
+
+    this.drillGroupBy = function(name, undo) {
+        if (data['query'] === undefined || !data['query']['groupBy']) {
+            return;
+        }
+
+        var find, replace;
+
+        if (undo) {
+            find = name.replace('01', '02');
+            replace = name
+        } else {
+            find = name;
+            replace = name.replace('01', '02');
+        }
+
+        data['query']['groupBy'] = data['query']['groupBy'].replace(find, replace);
+    }
 
     this.setHandler = function(newHandler) {
         if (typeof newHandler === 'string' && typeof window[newHandler] === 'function') {
