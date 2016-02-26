@@ -10,12 +10,12 @@
  */
 $PluginInfo['UserPointBooster'] = array(
     'Name' => 'User Point Booster',
-    'Description' => 'Allow to give more points to users for certain actions',
+    'Description' => 'Allow giving more points to users for certain actions',
     'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'HasLocale' => false,
     'License' => 'GNU GPL2',
-    'SettingsUrl' => '/settings/userPointBooster',
+    'SettingsUrl' => '/settings/userpointbooster',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => 'Alexandre (DaazKu) Chouinard',
     'AuthorEmail' => 'alexandre.c@vanillaforums.com'
@@ -30,7 +30,7 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
      * Plugin setup
      */
     public function setup() {
-        touchConfig('UserPointBooster.PostPointValue', 1);
+        touchConfig('UserPointBooster.PostPoint', 1);
     }
 
     /**
@@ -47,7 +47,7 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(
-            'UserPointBooster.PostPointValue' => c('UserPointBooster.PostPointValue', 1),
+            'UserPointBooster.PostPoint' => c('UserPointBooster.PostPoint', 1),
         ));
         $sender->Form->setModel($configurationModel);
 
@@ -55,11 +55,11 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
         if ($sender->Form->authenticatedPostBack() === false) {
             $sender->Form->setData($configurationModel->Data);
         } else {
-            $configurationModel->Validation->applyRule('UserPointBooster.PostPointValue', 'Required');
-            $configurationModel->Validation->applyRule('UserPointBooster.PostPointValue', 'Integer');
+            $configurationModel->Validation->applyRule('UserPointBooster.PostPoint', 'Required');
+            $configurationModel->Validation->applyRule('UserPointBooster.PostPoint', 'Integer');
 
-            if ($sender->Form->getFormValue('UserPointBooster.PostPointValue') < 0) {
-                $sender->Form->setFormValue('UserPointBooster.PostPointValue', 0);
+            if ($sender->Form->getFormValue('UserPointBooster.PostPoint') < 0) {
+                $sender->Form->setFormValue('UserPointBooster.PostPoint', 0);
             }
 
             if ($sender->Form->save()) {
@@ -73,13 +73,13 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
     /**
      * Create a method called "userPointBooster" on the SettingController.
      *
-     * @param $sender Sending controller instance
+     * @param SettingsController $sender Sending controller instance
      */
     public function settingsController_userPointBooster_create($sender) {
         $sender->title(sprintf(t('%s settings'), t('User Point Booster')));
-        $sender->addSideMenu('settings/userPointBooster');
+        $sender->addSideMenu('settings/userpointbooster');
         $sender->Form = new Gdn_Form();
-        $this->dispatch($sender, $sender->RequestArgs);
+        $this->controller_index($sender, $sender->RequestArgs);
     }
 
     /**
@@ -89,19 +89,16 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
-        $menu->addLink('Add-ons', t('User Point Booster'), 'settings/userPointBooster', 'Garden.Settings.Manage');
+        $menu->addLink('Add-ons', t('User Point Booster'), 'settings/userpointbooster', 'Garden.Settings.Manage');
     }
 
     /**
-     * Hook on AfterSaveDiscussion event.
-     *
      * Adds point for new Discussions
      *
-     * @param $sender Sending controller instance.
-     * @param $args Event arguments.
+     * @param DiscussionModel $sender Sending controller instance.
+     * @param array $args Event arguments.
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
-
         // We do not want to grant any points to edited discussions ;)
         if (!$args['Insert']) {
             return;
@@ -111,15 +108,12 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook on AfterSaveComment event.
-     *
      * Adds point for new Comments
      *
-     * @param $sender Sending controller instance.
-     * @param $args Event arguments.
+     * @param CommentModel $sender Sending controller instance.
+     * @param array $args Event arguments.
      */
     public function commentModel_afterSaveComment_handler($sender, $args) {
-
         // We do not want to grant any points to edited comments ;)
         if (!$args['Insert']) {
             return;
@@ -131,7 +125,7 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
     /**
      * Gives point(s), according to the per points per post configuration, to the current user.
      */
-    protected function addPostPoint() {
-        UserModel::givePoints(Gdn::session()->UserID, c('UserPointBooster.PostPointValue'), 'Posts');
+    protected function addPostPoints() {
+        UserModel::givePoints(Gdn::session()->UserID, c('UserPointBooster.PostPoint'), 'Posts');
     }
 }
