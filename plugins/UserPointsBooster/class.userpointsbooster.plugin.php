@@ -34,11 +34,15 @@ class UserPointsBoosterPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Define what to do for the /index page of this plugin.
+     * Create a method called "userPointsBooster" on the SettingController.
      *
-     * @param $sender Sending controller instance
+     * @param SettingsController $sender Sending controller instance
      */
-    public function controller_index($sender) {
+    public function settingsController_userPointsBooster_create($sender) {
+        $sender->title(sprintf(t('%s settings'), t('User Point Booster')));
+        $sender->addSideMenu('settings/userpointsbooster');
+        $sender->Form = new Gdn_Form();
+
         // Prevent non-admins from accessing this page
         $sender->permission('Garden.Settings.Manage');
 
@@ -68,18 +72,6 @@ class UserPointsBoosterPlugin extends Gdn_Plugin {
         }
 
         $sender->render($this->getView('configuration.php'));
-    }
-
-    /**
-     * Create a method called "userPointBooster" on the SettingController.
-     *
-     * @param SettingsController $sender Sending controller instance
-     */
-    public function settingsController_userPointBooster_create($sender) {
-        $sender->title(sprintf(t('%s settings'), t('User Point Booster')));
-        $sender->addSideMenu('settings/userpointsbooster');
-        $sender->Form = new Gdn_Form();
-        $this->controller_index($sender, $sender->RequestArgs);
     }
 
     /**
