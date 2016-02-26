@@ -1,28 +1,58 @@
+#dashboard_settings_analytics #Content {
+    background-color: #f5f5f5;
+}
+
 #analytics_toolbar {
-    background: #e0e0e0;
-    border: #777777 dashed;
-    color: #c0c0c0;
-    font-weight: bold;
-    font-size: 3em;
-    height: 75px;
-    line-height: 75px;
-    text-align: center;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+    padding: 10px 20px;
+}
+
+#analytics_toolbar .toolbar-controls {
+    float: right;
+}
+
+#analytics_toolbar:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: right;
+    height: 0;
+}
+
+#analytics_toolbar select {
+    height: 30px;
+    line-height: 30px;
+    border: none;
+    font-size: 16px;
+    background: transparent;
 }
 
 #analytics_panel_metrics .analytics-widget-metric {
     display: inline-block;
-    width: 33%;
+    width: 33.3333333%;
 }
 
 #Panel div.Analytics h4 { background-position: 166px -644px; }
 
 .analytics-panel {
-    margin: 20px 0;
+    margin: 10px;
+}
+
+.analytics-widget {
+    box-sizing: border-box;
+    padding: 10px;
 }
 
 .analytics-widget .title {
     font-size: 25px;
     text-align: center;
+}
+
+.analytics-widget-metric .body {
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
 }
 
 .analytics-widget-metric .keen-metric {
@@ -34,6 +64,12 @@
 }
 .analytics-widget-metric .keen-metric-title {
     font-size: 20px;
+}
+
+.analytics-widget.analytics-widget-chart {
+    background: #fff;
+    margin: 10px 10px 20px 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
 }
 
 a.Bookmark,
