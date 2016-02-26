@@ -381,7 +381,7 @@ class KeenIOTracker implements TrackerInterface {
             ->setTitle(t('Posts By Category'))
             ->setEventCollection('post')
             ->setInterval('daily')
-            ->setGroupBy('category.categoryID');
+            ->setGroupBy('category.name');
 
         $postsByCategoryWidget = new AnalyticsWidget();
         $postsByCategoryWidget->setID('posts-by-category')
@@ -447,7 +447,7 @@ class KeenIOTracker implements TrackerInterface {
             ->setEventCollection('post')
             ->setInterval('daily')
             ->setTargetProperty('user.userID')
-            ->setGroupBy('category.categoryID');
+            ->setGroupBy('category.name');
 
         $contributorsByCategoryWidget = new AnalyticsWidget();
         $contributorsByCategoryWidget->setID('contributors-by-category')
