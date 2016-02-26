@@ -15,5 +15,5 @@ $session = Gdn::session();
         }
         ?>
     </ul>
-<div>
+</div>
 <?php
