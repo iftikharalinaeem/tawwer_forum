@@ -125,7 +125,7 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
     /**
      * Gives point(s), according to the per points per post configuration, to the current user.
      */
-    protected function addPostPoints() {
+    protected function addPostPoint() {
         UserModel::givePoints(Gdn::session()->UserID, c('UserPointBooster.PostPoint'), 'Posts');
     }
 }
