@@ -8,8 +8,8 @@ echo $this->Form->errors();
 ?>
     <ul>
         <li><?php
-            echo $this->Form->label(t('Point(s) awarded per post'), 'UserPointsBooster.PostPoint');
-            echo $this->Form->input('UserPointsBooster.PostPoint');
+            echo $this->Form->label(t('Point(s) awarded per post'), 'UserPointsBooster.PostPoints');
+            echo $this->Form->input('UserPointsBooster.PostPoints');
             ?></li>
     </ul>
 <?php echo $this->Form->close('Save');

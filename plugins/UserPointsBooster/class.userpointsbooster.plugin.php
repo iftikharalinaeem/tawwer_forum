@@ -30,7 +30,7 @@ class UserPointsBoosterPlugin extends Gdn_Plugin {
      * Plugin setup
      */
     public function setup() {
-        touchConfig('UserPointsBooster.PostPoint', 1);
+        touchConfig('UserPointsBooster.PostPoints', 1);
     }
 
     /**
@@ -51,7 +51,7 @@ class UserPointsBoosterPlugin extends Gdn_Plugin {
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(
-            'UserPointsBooster.PostPoint' => c('UserPointsBooster.PostPoint', 1),
+            'UserPointsBooster.PostPoints' => c('UserPointsBooster.PostPoints', 1),
         ));
         $sender->Form->setModel($configurationModel);
 
@@ -59,11 +59,11 @@ class UserPointsBoosterPlugin extends Gdn_Plugin {
         if ($sender->Form->authenticatedPostBack() === false) {
             $sender->Form->setData($configurationModel->Data);
         } else {
-            $configurationModel->Validation->applyRule('UserPointsBooster.PostPoint', 'Required');
-            $configurationModel->Validation->applyRule('UserPointsBooster.PostPoint', 'Integer');
+            $configurationModel->Validation->applyRule('UserPointsBooster.PostPoints', 'Required');
+            $configurationModel->Validation->applyRule('UserPointsBooster.PostPoints', 'Integer');
 
-            if ($sender->Form->getFormValue('UserPointsBooster.PostPoint') < 0) {
-                $sender->Form->setFormValue('UserPointsBooster.PostPoint', 0);
+            if ($sender->Form->getFormValue('UserPointsBooster.PostPoints') < 0) {
+                $sender->Form->setFormValue('UserPointsBooster.PostPoints', 0);
             }
 
             if ($sender->Form->save()) {
@@ -115,9 +115,9 @@ class UserPointsBoosterPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Gives point(s), according to the UserPointsBooster.PostPoint configuration, to the current user.
+     * Gives point(s), according to the UserPointsBooster.PostPoints configuration, to the current user.
      */
     protected function addPostPoints() {
-        UserModel::givePoints(Gdn::session()->UserID, c('UserPointsBooster.PostPoint'), 'Posts');
+        UserModel::givePoints(Gdn::session()->UserID, c('UserPointsBooster.PostPoints'), 'Posts');
     }
 }
