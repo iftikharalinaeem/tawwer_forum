@@ -30,6 +30,13 @@ function AnalyticsDashboard (config, start, end, initialCategoryID) {
     var panels = {};
 
     /**
+     * Is this a user's personal dashboard?
+     * @access private
+     * @type {boolean}
+     */
+    var personal = false;
+
+    /**
      * A collection of two date objects: start and end.  Used for applying a timeframe to queries.
      * @access private
      * @type {object}
@@ -120,6 +127,14 @@ function AnalyticsDashboard (config, start, end, initialCategoryID) {
     };
 
     /**
+     * Fetch whether or not this is a user's personal dashboard.
+     * @returns {boolean}
+     */
+    this.isPersonal = function() {
+        return personal;
+    };
+
+    /**
      * Empty the current dashboard's panels collection.
      * @param {boolean} [emptyContainers] Clear out the panels' document containers, if present?
      * @returns {object} The current (empty) panel collection.
@@ -185,6 +200,19 @@ function AnalyticsDashboard (config, start, end, initialCategoryID) {
         timeframe.end   = newEnd;
 
         return timeframe;
+    };
+
+    /**
+     * Set the flag determining whether or not this is a user's personal dashboard.
+     * @param {boolean} newPersonal
+     * @returns {boolean}
+     */
+    this.setPersonal = function(newPersonal) {
+        if (typeof newPersonal !== 'boolean') {
+            return false;
+        }
+
+        return personal = newPersonal;
     };
 
     /**
@@ -268,8 +296,44 @@ AnalyticsDashboard.prototype.loadConfig = function(config) {
         }
     }
 
+    if (typeof config.personal !== 'undefined') {
+        this.setPersonal(config.personal);
+    }
+
     if (typeof config.title == 'string') {
         this.setTitle(config.title);
+    }
+};
+
+/**
+ * Remove a widget, by ID, from the dashboard.
+ *
+ * @param {string} widgetID
+ */
+AnalyticsDashboard.prototype.removeWidget = function(widgetID) {
+    var panels = this.getPanel();
+    for (var panelID in this.getPanel()) {
+        var panelContainerID = 'analytics_panel_' + panelID;
+        var panelContainer = document.getElementById(panelContainerID);
+
+        if (typeof panelContainer !== 'object') {
+            return;
+        }
+
+        var widgets = panels[panelID].widgets;
+        if (widgets.length === 0) {
+            continue;
+        }
+
+        for (var i = 0; i < widgets.length; i++) {
+            if (widgets[i].getWidgetID() === widgetID) {
+                var widgetContainer = widgets[i].getElements('container');
+                if (widgetContainer instanceof HTMLElement) {
+                    panelContainer.removeChild(widgetContainer);
+                }
+                widgets.splice(i, 1);
+            }
+        }
     }
 };
 
