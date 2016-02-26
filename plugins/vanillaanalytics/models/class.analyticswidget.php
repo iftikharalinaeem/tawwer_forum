@@ -184,7 +184,6 @@ class AnalyticsWidget implements JsonSerializable {
     public function jsonSerialize() {
         return [
             'bookmarked'      => $this->isBookmarked(),
-            'categorySupport' => $this->categorySupport,
             'data'            => $this->data,
             'handler'         => $this->handler,
             'supports'        => $this->supports,
