@@ -134,7 +134,8 @@ class KeenIOTracker implements TrackerInterface {
                     'title' => 'Discussions'
                 ],
                 'query' => $totalDiscussionsQuery
-            ]);
+            ])
+            ->addSupport('cat01');
 
         $widgets['total-discussions'] = $totalDiscussionsWidget;
 
@@ -159,7 +160,8 @@ class KeenIOTracker implements TrackerInterface {
                     'title' => 'Comments'
                 ],
                 'query' => $totalCommentsQuery
-            ]);
+            ])
+            ->addSupport('cat01');
 
         $widgets['total-comments'] = $totalCommentsWidget;
 
@@ -180,7 +182,8 @@ class KeenIOTracker implements TrackerInterface {
                     'title' => 'Contributors'
                 ],
                 'query' => $totalContributorsQuery
-            ]);
+            ])
+            ->addSupport('cat01');
 
         $widgets['total-contributors'] = $totalContributorsWidget;
 
@@ -255,7 +258,7 @@ class KeenIOTracker implements TrackerInterface {
                 ],
                 'query' => $uniquePageviewsQuery
             ])
-            ->addSupport('cat1');
+            ->addSupport('cat01');
 
         $widgets['unique-pageviews'] = $uniquePageviewsWidget;
 
@@ -301,7 +304,8 @@ class KeenIOTracker implements TrackerInterface {
                     'labels' => ['Discussions']
                 ],
                 'query' => $discussionsQuery
-            ]);
+            ])
+            ->addSupport('cat01');
 
         $widgets['discussions'] = $discussionsWidget;
 
@@ -326,7 +330,8 @@ class KeenIOTracker implements TrackerInterface {
                     'labels' => ['Comments']
                 ],
                 'query' => $commentsQuery
-            ]);
+            ])
+            ->addSupport('cat01');
 
         $widgets['comments'] = $commentsWidget;
 
@@ -346,7 +351,8 @@ class KeenIOTracker implements TrackerInterface {
                     'labels' => ['Posts']
                 ],
                 'query' => $postsQuery
-            ]);
+            ])
+            ->addSupport('cat01');
 
         $widgets['posts'] = $postsWidget;
 
@@ -371,7 +377,8 @@ class KeenIOTracker implements TrackerInterface {
                     'chartType' => 'area'
                 ],
                 'query' => $postsByTypeQuery
-            ]);
+            ])
+            ->addSupport('cat01');
 
         $widgets['posts-by-type'] = $postsByTypeWidget;
 
@@ -381,7 +388,7 @@ class KeenIOTracker implements TrackerInterface {
             ->setTitle(t('Posts By Category'))
             ->setEventCollection('post')
             ->setInterval('daily')
-            ->setGroupBy('category.name');
+            ->setGroupBy('categoryAncestors.cat01.name');
 
         $postsByCategoryWidget = new AnalyticsWidget();
         $postsByCategoryWidget->setID('posts-by-category')
@@ -393,7 +400,8 @@ class KeenIOTracker implements TrackerInterface {
                     'chartType' => 'area'
                 ],
                 'query' => $postsByCategoryQuery
-            ]);
+            ])
+            ->addSupport('cat01');
 
         $widgets['posts-by-category'] = $postsByCategoryWidget;
 
@@ -414,7 +422,8 @@ class KeenIOTracker implements TrackerInterface {
                     'chartType' => 'area'
                 ],
                 'query' => $postsByRoleTypeQuery
-            ]);
+            ])
+            ->addSupport('cat01');
 
         $widgets['posts-by-role-type'] = $postsByRoleTypeWidget;
 
@@ -436,7 +445,8 @@ class KeenIOTracker implements TrackerInterface {
                     'labels' => ['Contributors']
                 ],
                 'query' => $contributorsQuery
-            ]);
+            ])
+            ->addSupport('cat01');
 
         $widgets['contributors'] = $contributorsWidget;
 
@@ -447,7 +457,7 @@ class KeenIOTracker implements TrackerInterface {
             ->setEventCollection('post')
             ->setInterval('daily')
             ->setTargetProperty('user.userID')
-            ->setGroupBy('category.name');
+            ->setGroupBy('categoryAncestors.cat01.name');
 
         $contributorsByCategoryWidget = new AnalyticsWidget();
         $contributorsByCategoryWidget->setID('contributors-by-category')
@@ -459,7 +469,8 @@ class KeenIOTracker implements TrackerInterface {
                     'chartType' => 'area'
                 ],
                 'query' => $contributorsByCategoryQuery
-            ]);
+            ])
+            ->addSupport('cat01');
         $widgets['contributors-by-category'] = $contributorsByCategoryWidget;
 
         // Contributors by role type (chart)
@@ -481,7 +492,8 @@ class KeenIOTracker implements TrackerInterface {
                     'chartType' => 'area'
                 ],
                 'query' => $contributorsByRoleTypeQuery
-            ]);
+            ])
+            ->addSupport('cat01');
         $widgets['contributors-by-role-type'] = $contributorsByRoleTypeWidget;
     }
 

@@ -148,6 +148,10 @@ function AnalyticsWidget(config) {
         return handler;
     };
 
+    this.getInterval = function () {
+        return data['query']['interval'];
+    };
+
     this.getTitle = function() {
         return title;
     };
@@ -180,10 +184,50 @@ function AnalyticsWidget(config) {
         }
     };
 
+    this.setFilter = function(name, value, support) {
+        if (support && !this.supports(support)) {
+            return false;
+        }
+
+        var filters = data['query']['filters'] = data['query']['filters'] || [];
+        var filter = undefined;
+
+        for (var i in filters) {
+            if (filters[i]['property_name'] === name) {
+                if (!value) {
+                    filters.splice(i, 1);
+                }
+                filter = filters[i];
+                break;
+            }
+        }
+        if (!value) {
+            return true;
+        }
+        if (filter === undefined) {
+            filters.push({
+                'operator': 'eq',
+                'property_name': name,
+                'property_value': value
+            });
+        } else {
+            filter.property_value = value;
+        }
+    };
+
     this.setHandler = function(newHandler) {
         if (typeof newHandler === 'string' && typeof window[newHandler] === 'function') {
             handler = window[newHandler];
         }
+    };
+
+    this.setInterval = function(newInterval) {
+        if (data['query'] === undefined || !data['query']['interval']) {
+            return false;
+        }
+
+        data['query']['interval'] = newInterval;
+        return true;
     };
 
     this.setTitle = function(newTitle) {

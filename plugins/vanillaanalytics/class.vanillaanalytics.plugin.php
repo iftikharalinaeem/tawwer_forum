@@ -194,9 +194,10 @@ class VanillaAnalytics extends Gdn_Plugin {
 
         $sender->addJsFile('d3.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('c3.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('dashboard.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('analyticsdashboard.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('analyticswidget.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('dashboard.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('analyticsdashboard.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('analyticswidget.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('analyticstoolbar.js', 'plugins/vanillaanalytics');
 
         $dashboardModel = new AnalyticsDashboard();
         $dashboard = $dashboardModel->getID($dashboardID);
