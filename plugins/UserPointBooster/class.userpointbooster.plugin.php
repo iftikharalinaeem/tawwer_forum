@@ -8,29 +8,29 @@
  * This plugin was originally done for Xamarin
  * https://vanillaforums.teamwork.com/tasks/3448780
  */
-$PluginInfo['UserPointBooster'] = array(
-    'Name' => 'User Point Booster',
+$PluginInfo['UserPointsBooster'] = array(
+    'Name' => 'User Points Booster',
     'Description' => 'Allow giving more points to users for certain actions',
     'Version' => '1.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'HasLocale' => false,
     'License' => 'GNU GPL2',
-    'SettingsUrl' => '/settings/userpointbooster',
+    'SettingsUrl' => '/settings/userpointsbooster',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => 'Alexandre (DaazKu) Chouinard',
     'AuthorEmail' => 'alexandre.c@vanillaforums.com'
 );
 
 /**
- * Class UserPointBoosterPlugin
+ * Class UserPointsBoosterPlugin
  */
-class UserPointBoosterPlugin extends Gdn_Plugin {
+class UserPointsBoosterPlugin extends Gdn_Plugin {
 
     /**
      * Plugin setup
      */
     public function setup() {
-        touchConfig('UserPointBooster.PostPoint', 1);
+        touchConfig('UserPointsBooster.PostPoint', 1);
     }
 
     /**
@@ -47,7 +47,7 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(
-            'UserPointBooster.PostPoint' => c('UserPointBooster.PostPoint', 1),
+            'UserPointsBooster.PostPoint' => c('UserPointsBooster.PostPoint', 1),
         ));
         $sender->Form->setModel($configurationModel);
 
@@ -55,11 +55,11 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
         if ($sender->Form->authenticatedPostBack() === false) {
             $sender->Form->setData($configurationModel->Data);
         } else {
-            $configurationModel->Validation->applyRule('UserPointBooster.PostPoint', 'Required');
-            $configurationModel->Validation->applyRule('UserPointBooster.PostPoint', 'Integer');
+            $configurationModel->Validation->applyRule('UserPointsBooster.PostPoint', 'Required');
+            $configurationModel->Validation->applyRule('UserPointsBooster.PostPoint', 'Integer');
 
-            if ($sender->Form->getFormValue('UserPointBooster.PostPoint') < 0) {
-                $sender->Form->setFormValue('UserPointBooster.PostPoint', 0);
+            if ($sender->Form->getFormValue('UserPointsBooster.PostPoint') < 0) {
+                $sender->Form->setFormValue('UserPointsBooster.PostPoint', 0);
             }
 
             if ($sender->Form->save()) {
@@ -77,7 +77,7 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
      */
     public function settingsController_userPointBooster_create($sender) {
         $sender->title(sprintf(t('%s settings'), t('User Point Booster')));
-        $sender->addSideMenu('settings/userpointbooster');
+        $sender->addSideMenu('settings/userpointsbooster');
         $sender->Form = new Gdn_Form();
         $this->controller_index($sender, $sender->RequestArgs);
     }
@@ -89,7 +89,7 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
-        $menu->addLink('Add-ons', t('User Point Booster'), 'settings/userpointbooster', 'Garden.Settings.Manage');
+        $menu->addLink('Add-ons', t('User Point Booster'), 'settings/userpointsbooster', 'Garden.Settings.Manage');
     }
 
     /**
@@ -104,7 +104,7 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
             return;
         }
 
-        $this->addPostPoint();
+        $this->addPostPoints();
     }
 
     /**
@@ -119,13 +119,13 @@ class UserPointBoosterPlugin extends Gdn_Plugin {
             return;
         }
 
-        $this->addPostPoint();
+        $this->addPostPoints();
     }
 
     /**
-     * Gives point(s), according to the per points per post configuration, to the current user.
+     * Gives point(s), according to the UserPointsBooster.PostPoint configuration, to the current user.
      */
-    protected function addPostPoint() {
-        UserModel::givePoints(Gdn::session()->UserID, c('UserPointBooster.PostPoint'), 'Posts');
+    protected function addPostPoints() {
+        UserModel::givePoints(Gdn::session()->UserID, c('UserPointsBooster.PostPoint'), 'Posts');
     }
 }
