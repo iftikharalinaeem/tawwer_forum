@@ -42,10 +42,18 @@ class SubcommunitiesController extends DashboardController {
         if ($this->Request->isAuthenticatedPostBack()) {
             if ($this->site) {
                 $siteID = $this->site['SubcommunityID'];
-                $this->siteModel->update($this->Request->post(), ['SubcommunityID' => $siteID]);
+
+                $postData = $this->Request->post();
+                // Unchecked checkboxes are not sent in post data :P
+                if (!isset($postData['IsDefault'])) {
+                    $postData['IsDefault'] = false;
+                }
+
+                $this->siteModel->update($postData, ['SubcommunityID' => $siteID]);
             } else {
                 $siteID = $this->siteModel->insert($this->Request->post());
             }
+
             if ($siteID) {
                 $site = $this->siteModel->getID($siteID);
                 $this->setData('Site', $site);
