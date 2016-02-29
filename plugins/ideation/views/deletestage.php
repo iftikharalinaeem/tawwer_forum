@@ -7,7 +7,7 @@ echo $this->Form->errors();
 ?>
     <div class="Info Center">
         <?php
-        printf(T('Are you sure you want to delete this %s?'), T('Stage'));
+        printf(t('Are you sure you want to delete this %s?'), t('Stage'));
         ?>
     </div>
 

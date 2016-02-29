@@ -72,6 +72,6 @@
 </table>
 <div class="Wrap">
     <?php
-    echo Anchor(sprintf(T('Add %s'), T('Stage')), '/settings/addstage', 'SmallButton');
+    echo Anchor(sprintf(t('Add %s'), t('Stage')), '/settings/addstage', 'SmallButton');
     ?>
 </div>

@@ -198,7 +198,7 @@ class IdeationPlugin extends Gdn_Plugin {
         if (!$stageID) {
             throw NotFoundException('Stage');
         }
-        $sender->title(sprintf(T('Edit %s'), T('Stage')));
+        $sender->title(sprintf(t('Edit %s'), t('Stage')));
         $this->addEdit($sender, $stageID);
     }
 
@@ -209,7 +209,7 @@ class IdeationPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function settingsController_addStage_create($sender) {
-        $sender->title(sprintf(T('Add %s'), T('Stage')));
+        $sender->title(sprintf(t('Add %s'), t('Stage')));
         $this->addEdit($sender);
     }
 
@@ -267,7 +267,7 @@ class IdeationPlugin extends Gdn_Plugin {
             }
         }
 
-        $sender->title(sprintf(T('Delete %s'), T('Stage')));
+        $sender->title(sprintf(t('Delete %s'), t('Stage')));
         $sender->render('DeleteStage', '', 'plugins/ideation');
     }
 
@@ -547,9 +547,9 @@ class IdeationPlugin extends Gdn_Plugin {
         }
 
         if (isset($args['DiscussionOptions'])) {
-            $args['DiscussionOptions']['Stage'] = ['Label' => T('Edit Stage'), 'Url' => '/discussion/stageoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup'];
+            $args['DiscussionOptions']['Stage'] = ['Label' => sprintf(t('Edit %s'), t('Stage')), 'Url' => '/discussion/stageoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup'];
         } elseif (isset($sender->Options)) {
-            $sender->Options .= '<li>'.anchor(t('Edit Stage'), '/discussion/stageoptions?discussionid='.$discussion->DiscussionID, 'Popup').'</li>';
+            $sender->Options .= '<li>'.anchor(sprintf(t('Edit %s'), t('Stage')), '/discussion/stageoptions?discussionid='.$discussion->DiscussionID, 'Popup').'</li>';
         }
 
         if (isset($args['DiscussionOptions']['EditDiscussion'])) {
@@ -599,7 +599,7 @@ class IdeationPlugin extends Gdn_Plugin {
             $sender->setData('Stages', $stages);
             $sender->setData('StageNotes', $notes);
             $sender->setData('CurrentStageID', val('StageID', StageModel::getStageByDiscussion($discussionID)));
-            $sender->setData('Title', t('Edit Stage'));
+            $sender->setData('Title', sprintf(t('Edit %s'), t('Stage')));
 
             $sender->render('StageOptions', '', 'plugins/ideation');
         }
@@ -980,7 +980,7 @@ class IdeationPlugin extends Gdn_Plugin {
         }
 
         $name = $reaction['Name'];
-        $label = T($name);
+        $label = t($name);
         $id = GetValue('DiscussionID', $discussion);
         $linkClass = 'ReactButton-'.$urlCode.' '.val('cssClass', $options);
         $urlCode2 = strtolower($urlCode);

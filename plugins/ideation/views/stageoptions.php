@@ -17,8 +17,8 @@
 
     <?php
     echo '<div class="Buttons Buttons-Confirm">',
-    $this->Form->button(T('OK')), ' ',
-    $this->Form->button(T('Cancel'), array('type' => 'button', 'class' => 'Button Close')),
+    $this->Form->button(t('OK')), ' ',
+    $this->Form->button(t('Cancel'), array('type' => 'button', 'class' => 'Button Close')),
     '</div>';
     echo $this->Form->close();
     ?>
