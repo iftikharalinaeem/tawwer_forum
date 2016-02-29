@@ -424,8 +424,7 @@ class IdeationPlugin extends Gdn_Plugin {
         }
         $stage = StageModel::getStageByDiscussion(val('DiscussionID', $discussion));
         if ($stage) {
-            echo ' <a href="'.url('/discussions/tagged/'.urlencode(val('Name', $stage))).'"><span class="Tag Stage-Tag-'.urlencode(val('Name', $stage)).'"">'.val('Name', $stage).'</span></a> ';
-//            echo ' <span class="MItem MCount IdeaVoteCount"><span class="Number">'.self::getTotalVotes($discussion).'</span> '.t('votes').'</span>';
+            echo getStageTagHtml(val('Name', $stage));
         }
     }
 
@@ -882,9 +881,8 @@ class IdeationPlugin extends Gdn_Plugin {
      * where TagID is the TagID of the reaction.
      *
      * @param DiscussionsController $sender
-     * @param array $args
      */
-    public function discussionsController_render_before($sender, $args) {
+    public function discussionsController_render_before($sender) {
         if ($sender->DeliveryType() == DELIVERY_TYPE_ALL) {
             $discussions = $sender->data('Discussions')->result();
             $this->addUserVotesToDiscussions($discussions);
@@ -896,9 +894,8 @@ class IdeationPlugin extends Gdn_Plugin {
      * where TagID is the TagID of the reaction.
      *
      * @param CategoriesController $sender
-     * @param array $args
      */
-    public function categoriesController_render_before($sender, $args) {
+    public function categoriesController_render_before($sender) {
         if ($sender->data('Discussions') && $this->isIdeaCategory(val('Category', $sender))) {
             $discussions = $sender->data('Discussions')->result();
             $this->addUserVotesToDiscussions($discussions);
@@ -1056,6 +1053,7 @@ class IdeationPlugin extends Gdn_Plugin {
     /**
      * NOTIFICATIONS/ACTIVITY
      * ----------------------
+     * Uses activity notifications to notify idea creators and voters of stage changes.
      */
 
     /**
@@ -1148,15 +1146,16 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * HELPER FUNCTIONS
+     * HELPERS
+     * -------
      */
 
     /**
      * Gets the stage notes for a given discussion array.
      *
-     * @param array $discussion
-     * @param DiscussionModel|null $discussionModel
-     * @return string
+     * @param object|array $discussion The discussion to get the notes for.
+     * @param DiscussionModel|null $discussionModel If it exists, pass it in.
+     * @return string The notes on the discussion's stage.
      */
     public function getStageNotes($discussion, $discussionModel = null) {
         if (!$discussionModel) {
@@ -1184,8 +1183,8 @@ class IdeationPlugin extends Gdn_Plugin {
     /**
      * Returns an array of all the users who have voted on a given discussion.
      *
-     * @param int $discussionID The discussion ID
-     * @return array The users who have voted on a discussion
+     * @param int $discussionID The discussion ID.
+     * @return array The users who have voted on a discussion.
      */
     public function getVoterIDs($discussionID) {
         $userTagModel = new Gdn_Model('UserTag');
@@ -1206,8 +1205,8 @@ class IdeationPlugin extends Gdn_Plugin {
     /**
      * Determines whether a discussion is an Idea-type.
      *
-     * @param int|object|array $discussion The discussion ID, object or array
-     * @return bool Whether a discussion is an Idea-type
+     * @param int|object|array $discussion The discussion ID, object or array.
+     * @return bool Whether a discussion is an Idea-type.
      */
     public function isIdea($discussion) {
         if (is_numeric($discussion)) {
@@ -1220,8 +1219,8 @@ class IdeationPlugin extends Gdn_Plugin {
     /**
      * Determines whether a category is an Idea category.
      *
-     * @param object|array $category The category to check
-     * @return bool Whether the category is an Idea category
+     * @param object|array $category The category to check.
+     * @return bool Whether the category is an Idea category.
      */
     public function isIdeaCategory($category) {
         return in_array('Idea', val('AllowedDiscussionTypes', $category, []));
@@ -1230,9 +1229,9 @@ class IdeationPlugin extends Gdn_Plugin {
     /**
      * Determines whether a given discussion or category uses downvotes.
      *
-     * @param object|array $data The category or discussion to check
-     * @param string $datatype What datatype we're checking, either 'category' or 'discussion'
-     * @return bool Whether the given discussion or category uses downvotes
+     * @param object|array $data The category or discussion to check.
+     * @param string $datatype What datatype we're checking, either 'category' or 'discussion'.
+     * @return bool Whether the given discussion or category uses downvotes.
      */
     public function allowDownVotes($data, $datatype = 'category') {
         switch(strtolower($datatype)) {
@@ -1252,8 +1251,8 @@ class IdeationPlugin extends Gdn_Plugin {
     /**
      * Returns the total number of votes on an idea.
      *
-     * @param object $discussion The discussion to get the total votes for
-     * @return int The total number of votes on a discussion
+     * @param object $discussion The discussion to get the total votes for.
+     * @return int The total number of votes on a discussion.
      */
     public static function getTotalVotes($discussion) {
         if (val('Attributes', $discussion) && $reactions = val('React', $discussion->Attributes)) {
@@ -1266,41 +1265,64 @@ class IdeationPlugin extends Gdn_Plugin {
 }
 
 /**
- * Renders ideation reaction buttons (for upvotes and downvotes).
- *
- * @param string $cssClass The reaction-specific css class
- * @param string $url The url for the reaction
- * @param string $label The reaction's label
- * @param string $dataAttr The data attribute for the reaction (used in reaction javascript)
- * @return string HTML representation of the ideation reactions (up and down votes)
+ * RENDERING FUNCTIONS
+ * -------------------
+ * Set apart so they can be overridden.
  */
+
+
 if (!function_exists('getReactionButtonHtml')) {
+    /**
+     * Renders ideation reaction buttons (for upvotes and downvotes).
+     *
+     * @param string $cssClass The reaction-specific css class.
+     * @param string $url The url for the reaction.
+     * @param string $label The reaction's label.
+     * @param string $dataAttr The data attribute for the reaction (used in reaction javascript).
+     * @return string HTML representation of the ideation reactions (up and down votes).
+     */
     function getReactionButtonHtml($cssClass, $url, $label, $dataAttr = '') {
         return '<a class="Hijack idea-button '.$cssClass.'" href="'.$url.'" title="'.$label.'" '.$dataAttr.' rel="nofollow"><span class="arrow arrow-'.strtolower($label).'"></span> <span class="idea-label">'.$label.'</span></a>';
     }
 }
 
-/**
- * Renders the score block, used in the idea counter.
- *
- * @param int|string $score The score
- * @return string HTML representation of the score block
- */
 if (!function_exists('getScoreHtml')) {
+    /**
+     * Renders the score block, used in the idea counter.
+     *
+     * @param int|string $score The score.
+     * @return string HTML representation of the score block.
+     */
     function getScoreHtml($score) {
         return '<div class="score">'.$score.'</div>';
     }
 }
 
-/**
- * Renders the votes block, used in the idea counter.
- *
- * @param int|string $votes The number of votes
- * @return string HTML representation of the votes block
- */
 if (!function_exists('getVotesHtml')) {
+    /**
+     * Renders the votes block, used in the idea counter.
+     *
+     * @param int|string $votes The number of votes.
+     * @return string HTML representation of the votes block.
+     */
     function getVotesHtml($votes) {
         return '<div class="votes meta">'.sprintf(t('%s votes'), $votes).'</div>';
+    }
+}
+
+if (!function_exists('getStageTagHtml')) {
+    /**
+     * Renders the stage tags for the discussion list.
+     *
+     * @param string $stageName The name of the stage.
+     * @param string $stageCode The url-code of the stage.
+     * @return string The stage tag.
+     */
+    function getStageTagHtml($stageName, $stageCode = '') {
+        if (empty($stageCode)) {
+            $stageCode = urlencode($stageName);
+        }
+        return ' <a href="'.url('/discussions/tagged/'.$stageCode).'"><span class="Tag Stage-Tag-'.$stageCode.'"">'.$stageName.'</span></a> ';
     }
 }
 
