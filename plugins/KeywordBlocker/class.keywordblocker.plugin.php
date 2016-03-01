@@ -272,8 +272,8 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
         if ($words === null) {
             $words = array();
 
-            $wordsString = c('KeywordBlocker.Words', null);
-            if ($wordsString !== null) {
+            $wordsString = c('KeywordBlocker.Words', '');
+            if (strlen($wordsString)) {
 
                 $explodedWords = explode(';', $wordsString);
                 foreach ($explodedWords as &$word) {
