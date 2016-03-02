@@ -280,6 +280,9 @@ class SiteNodePlugin extends Gdn_Plugin {
         Trace('Synchronizing authenticators.');
         $this->syncAuthenticators(val('Authenticators', $config, []));
 
+        // Push the categories.
+        $this->pushCategories();
+
         $this->FireEvent('AfterSync');
 
         // Tell the hub that we've synchronized.
