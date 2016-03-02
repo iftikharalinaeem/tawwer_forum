@@ -96,6 +96,16 @@ class PopularPostsModule extends Gdn_Module {
         if (!empty($discussions)) {
 
             switch($this->sortMethod) {
+
+                case 'date-asc':
+                    uasort($discussions, function($a, $b) {
+                        if ($a->DateInserted === $b->DateInserted) {
+                            return 0;
+                        }
+
+                        return (strtotime($a->DateInserted) < strtotime($b->DateInserted)) ? -1 : 1;
+                    });
+                    break;
                 case 'date-desc':
                     uasort($discussions, function($a, $b) {
                         if ($a->DateInserted === $b->DateInserted) {
@@ -104,8 +114,6 @@ class PopularPostsModule extends Gdn_Module {
 
                         return (strtotime($a->DateInserted) > strtotime($b->DateInserted)) ? -1 : 1;
                     });
-                case 'date-asc':
-                    $discussions = array_reverse($discussions, true);
                     break;
                 // Default = don't do anything!
             }
