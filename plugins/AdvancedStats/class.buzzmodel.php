@@ -9,7 +9,7 @@ class BuzzModel {
       $this->SlotRange = $SlotRange;
       $RoleModel = new RoleModel();
       $ModRoleIDs = $RoleModel->GetByPermission('Garden.Moderation.Manage')->ResultArray();
-      $ModRoleIDs = ConsolidateArrayValuesByKey($ModRoleIDs, 'RoleID');
+      $ModRoleIDs = array_column($ModRoleIDs, 'RoleID');
       $SlotString = Gdn_Statistics::TimeSlot($Slot, Gdn_Format::ToTimestamp($Date));
 
       $ModUserIDs = Gdn::SQL()
@@ -18,7 +18,7 @@ class BuzzModel {
          ->WhereIn('RoleID', $ModRoleIDs)
          ->Get()
          ->ResultArray();
-      $ModUserIDs = ConsolidateArrayValuesByKey($ModUserIDs, 'UserID');
+      $ModUserIDs = array_column($ModUserIDs, 'UserID');
       if (count($ModUserIDs) == 0)
          $ModUserIDs[0] = 0;
       $this->ModUserIDs = $ModUserIDs;
@@ -135,7 +135,7 @@ class BuzzModel {
       $SlotRange = $this->SlotRange;
       $TagRows = Gdn::SQL()->WhereIn('Name', $Tags)->Get('Tag')->ResultArray();
       $TagRows = Gdn_DataSet::Index($TagRows, array('Name'));
-      $TagIDs = ConsolidateArrayValuesByKey($TagRows, 'TagID');
+      $TagIDs = array_column($TagRows, 'TagID');
       
       // Get all of the tag stats.
       $TagCounts = Gdn::SQL()

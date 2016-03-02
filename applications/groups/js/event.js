@@ -224,8 +224,6 @@ jQuery(document).ready(function($) {
             data: {'EventID':eventId, 'Attending':result},
             dataType: 'json',
             success: function(json) {
-               json = $.postParseJson(json);
-
                // Process targets
                if (json.Targets && json.Targets.length > 0)
                   gdn.processTargets(json.Targets);

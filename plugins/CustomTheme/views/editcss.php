@@ -39,7 +39,6 @@ jQuery(document).ready(function($) {
             gdn.informError(xhr);
          },
          success: function(json) {
-            json = $.postParseJson(json);
             gdn.inform(json);
          }
       });

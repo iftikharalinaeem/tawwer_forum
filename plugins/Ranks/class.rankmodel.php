@@ -452,7 +452,7 @@ class RankModel extends Gdn_Model {
          $Fields = $this->Validation->ValidationFields();
 
          if ($Insert === FALSE) {
-            $Fields = RemoveKeyFromArray($Fields, $this->PrimaryKey); // Don't try to update the primary key
+            unset($Fields[$this->PrimaryKey]); // Don't try to update the primary key
             $this->Update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
          } else {
             $PrimaryKeyVal = $this->Insert($Fields);

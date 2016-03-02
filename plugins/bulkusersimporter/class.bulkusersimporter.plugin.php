@@ -987,7 +987,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                ->From('Role r')
                ->WhereIn('LOWER(r.Name)', $role_names)
                ->Get()->ResultArray();
-            $role_ids = ConsolidateArrayValuesByKey($role_ids, 'RoleID');
+            $role_ids = array_column($role_ids, 'RoleID');
          }
       }
 

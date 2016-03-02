@@ -41,11 +41,11 @@ gdn.mustache = {
      * @param JSON template Template object
      */
     registerTemplate: function (template) {
-        gdn.mustache.templates[template.Name] = template;
-        gdn.mustache.templates[template.Name].downloading = false;
+        gdn.mustache.templates[template.name] = template;
+        gdn.mustache.templates[template.name].downloading = false;
 
         // Background download templates
-        if (gdn.mustache.background && template.type == 'defer') {
+        if (gdn.mustache.background && template.type === 'defer') {
             gdn.mustache.download(template.name);
         }
     },
@@ -58,11 +58,18 @@ gdn.mustache = {
      *
      * @param string templateName Name of the template to render
      * @param JSON view View object for Mustache
-     * @param array partials A list of partial templates to include
      */
-    render: function (templateName, view, partials) {
+    render: function (templateName, view) {
         var templateSrc = gdn.mustache.getTemplateSrc(templateName);
         if (templateSrc) {
+            var partials = [];
+
+            // Add all registered templates as partials automatically.
+            // We're assuming that all provided templates can be used as partials.
+            jQuery.each(gdn.mustache.templates, function(i, template) {
+                partials.push(template.name);
+            });
+
             partials = gdn.mustache.getPartials(partials);
             return Mustache.render(templateSrc, view, partials);
         } else {
@@ -79,10 +86,9 @@ gdn.mustache = {
      * @param string template Name of the template to render
      * @param JSON view View object for Mustache
      * @param DOMObject element DOM object to replace
-     * @param array partials A list of partial templates to include
      */
-    renderInPlace: function (templateName, view, element, partials) {
-        var render = gdn.mustache.render(templateName, view, partials);
+    renderInPlace: function (templateName, view, element) {
+        var render = gdn.mustache.render(templateName, view);
         var replace = jQuery(render);
         jQuery(element).replaceWith(replace);
         return replace;
@@ -169,7 +175,7 @@ gdn.mustache = {
                 async = true;
                 break;
         }
-        var templateURL = template.URL;
+        var templateURL = template.url;
         jQuery.ajax({
             url: templateURL,
             async: async,
@@ -192,3 +198,10 @@ gdn.mustache = {
     }
 
 };
+
+/*
+ * Register templates on document ready
+ */
+jQuery(window.document).ready(function() {
+    gdn.mustache.register(gdn.getMeta('Plugin.Mustache.Templates', []));
+});

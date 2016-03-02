@@ -41,7 +41,7 @@ class ReplyModel extends Gdn_Model {
    }
    
    function JoinReplies(&$Discussion, &$Comments) {
-      $CommentIDs = ConsolidateArrayValuesByKey($Comments, 'CommentID');
+      $CommentIDs = array_column($Comments, 'CommentID');
       
       if ($Discussion) {
          $DiscussionID = GetValue('DiscussionID', $Discussion);

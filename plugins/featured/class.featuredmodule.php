@@ -32,7 +32,7 @@ class FeaturedModule extends Gdn_Module {
                'TagID' => $TagID,
                'Total >' => 0
                ), 'DateInserted', 'desc', $this->count)->ResultArray();
-            $DiscussionIDs = ConsolidateArrayValuesByKey($DiscussionIDs, 'RecordID');
+            $DiscussionIDs = array_column($DiscussionIDs, 'RecordID');
             if (!empty($DiscussionIDs)) {
                $DiscussionData = $DiscussionModel->GetWhere(array('d.DiscussionID' => $DiscussionIDs, 'Announce' => 'all'))->ResultArray();
                $DiscussionData = Gdn_DataSet::Index($DiscussionData, 'DiscussionID');
