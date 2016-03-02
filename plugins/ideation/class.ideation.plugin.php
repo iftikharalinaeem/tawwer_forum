@@ -997,16 +997,10 @@ class IdeationPlugin extends Gdn_Plugin {
 
     /**
      * Adds stage and status filtering to the DiscussionFilterModule.
-     *
-     * @param CategoriesController $sender
      */
-    public function categoriesController_index_before($sender) {
-        $categoryCode = val('CategoryIdentifier', val('ReflectArgs', $sender, false));
-        if (!$categoryCode || !$this->isIdeaCategory(CategoryModel::categories($categoryCode))) {
-            return;
-        }
-
-        DiscussionModel::addFilterSet('stage', sprintf(t('All %s'), t('Stages')));
+    public function discussionModel_discussionFilters_handler() {
+        $categories = $this->getIdeaCategoryIDs();
+        DiscussionModel::addFilterSet('stage', sprintf(t('All %s'), t('Stages')), $categories);
 
         // Open status
         $openStages = StageModel::getOpenStages();
@@ -1046,7 +1040,7 @@ class IdeationPlugin extends Gdn_Plugin {
         if (!$categoryID || !$this->isIdeaCategory(CategoryModel::categories($categoryID))) {
             return;
         }
-        $discussionSortFilterModule = new DiscussionsSortFilterModule();
+        $discussionSortFilterModule = new DiscussionsSortFilterModule($categoryID);
         echo $discussionSortFilterModule;
     }
 
@@ -1217,13 +1211,27 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Returns an array of Idea-type category IDs.
+     */
+    public function getIdeaCategoryIDs() {
+        $ideaCategoryIDs = [];
+        $categories = CategoryModel::categories();
+        foreach($categories as $category) {
+            if (val('AllowedDiscussionTypes', $category) && in_array('Idea', val('AllowedDiscussionTypes', $category, []))) {
+                $ideaCategoryIDs[] = val('CategoryID', $category);
+            }
+        }
+        return $ideaCategoryIDs;
+    }
+
+    /**
      * Determines whether a category is an Idea category.
      *
      * @param object|array $category The category to check.
      * @return bool Whether the category is an Idea category.
      */
     public function isIdeaCategory($category) {
-        return in_array('Idea', val('AllowedDiscussionTypes', $category, []));
+        return val('AllowedDiscussionTypes', $category) && in_array('Idea', val('AllowedDiscussionTypes', $category));
     }
 
     /**
