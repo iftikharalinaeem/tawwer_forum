@@ -1048,8 +1048,8 @@ class IdeationPlugin extends Gdn_Plugin {
             '<strong>'.val('Name', $newStatus).'</strong>'
         );
 
-        $story = ($statusNotes) ? '<p>'.$statusNotes.'</p>' : '';
-        $story .= '<p>'.sprintf(t("Voting for the idea is now %s."), strtolower(val('State', $newStatus))).'</p>';
+        $story = ($statusNotes) ? '<br/><br/>'.sprintf(t('%s: %s'), t('Notes'), $statusNotes) : '';
+        $story .= '<br/><br/>'.sprintf(t("Voting for the idea is now %s."), strtolower(val('State', $newStatus)));
 
         $activity = [
             'ActivityType' => 'AuthorStatus',
@@ -1089,8 +1089,8 @@ class IdeationPlugin extends Gdn_Plugin {
             '<strong>'.val('Name', $newStatus).'</strong>'
         );
 
-        $story = ($statusNotes) ? '<p>'.$statusNotes.'</p>' : '';
-        $story .= '<p>'.sprintf(t("Voting for the idea is now %s."), strtolower(val('State', $newStatus))).'</p>';
+        $story = ($statusNotes) ? '<br/><br/>'.sprintf(t('%s: %s'), t('Notes'), $statusNotes) : '';
+        $story .= '<br/><br/>'.sprintf(t("Voting for the idea is %s."), strtolower(val('State', $newStatus)));
 
         foreach($voters as $voter) {
             $activity = [
