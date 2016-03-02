@@ -105,7 +105,7 @@ class PopularPostsModule extends Gdn_Module {
                         return (strtotime($a['DateInserted']) > strtotime($b['DateInserted'])) ? -1 : 1;
                     });
                 case 'date-asc':
-                    array_reverse($discussions, true);
+                    $discussions = array_reverse($discussions, true);
                     break;
                 // Default = don't do anything!
             }
