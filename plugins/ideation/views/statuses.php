@@ -36,7 +36,6 @@
     <thead>
     <tr>
         <th class="NameColumn"><?php echo t('Status'); ?></th>
-        <th class="DescriptionColumn"><?php echo t('Description'); ?></th>
         <th class="IsOpenColumn"><?php echo t('State'); ?></th>
         <th class="OptionsColumn"><?php echo t('Options'); ?></th>
     </tr>

@@ -23,13 +23,6 @@ echo $this->Form->errors();
         </li>
         <li>
             <?php
-            echo $this->Form->label('Description', 'Description'),
-                '<div class="Info2">'.t("An idea in this status will have this message displayed on its discussion page.").'</div>',
-            $this->Form->textBox('Description', array('Multiline' => true));
-            ?>
-        </li>
-        <li>
-            <?php
             if (val('IsDefaultStatus', $this->Form->formData())) {
                 echo '<strong>'.t('Default Status').'</strong> '.t("This is the starting status for new ideas.");
             } else {
