@@ -23,10 +23,10 @@ echo $this->Form->errors();
         </li>
         <li>
             <?php
-            if (val('IsDefaultStatus', $this->Form->formData())) {
+            if (val('IsDefault', $this->Form->formData())) {
                 echo '<strong>'.t('Default Status').'</strong> '.t("This is the starting status for new ideas.");
             } else {
-                echo $this->Form->checkbox('IsDefaultStatus', '<strong>'.t('Default Status').'</strong> '.t("Make this the starting status for new ideas."));
+                echo $this->Form->checkbox('IsDefault', '<strong>'.t('Default Status').'</strong> '.t("Make this the starting status for new ideas."));
             }
             ?>
         </li>

@@ -20,11 +20,12 @@ class StatusModel extends Gdn_Model {
      *
      * @param string $name The name of the status.
      * @param string $state Either 'Open' or 'Closed'.
+     * @param int $isDefault Whether the stage is default or not.
      * @param int $statusID The ID of the status. Use if updating.
      * @return bool|int The ID of the saved status.
      * @throws Exception
      */
-    public function save($name, $state, $statusID = 0) {
+    public function save($name, $state, $isDefault = 0, $statusID = 0) {
         // Put the data into a format that's savable.
         $this->defineSchema();
         $this->Validation->setSchema($this->Schema);
@@ -37,6 +38,14 @@ class StatusModel extends Gdn_Model {
         if ($statusID) {
             $saveData['StatusID'] = $statusID;
         }
+
+        if ($isDefault === 1) {
+            //TODO: Set all other defaults to 0.
+        } else {
+            $isDefault = 0;
+        }
+
+        $saveData['IsDefault'] = $isDefault;
 
         $insert = true;
 
@@ -69,6 +78,21 @@ class StatusModel extends Gdn_Model {
             $primaryKeyVal = false;
         }
         return $primaryKeyVal;
+    }
+
+    /**
+     * Retrieves the default status.
+     *
+     * @return int|string The default status.
+     */
+    public static function getDefaultStatus() {
+        $statuses = self::statuses();
+        foreach($statuses as $status) {
+            if (val('IsDefault', $status)) {
+                return $status;
+            }
+        }
+        return [];
     }
 
     /**

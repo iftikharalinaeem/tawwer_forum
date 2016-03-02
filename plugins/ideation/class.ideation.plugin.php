@@ -39,11 +39,6 @@ class IdeationPlugin extends Gdn_Plugin {
     protected static $downTagID;
 
     /**
-     * @var int The ID of the default status for new ideas.
-     */
-    protected $defaultStatusID;
-
-    /**
      * This will run when you "Enable" the plugin.
      */
     public function setup() {
@@ -64,18 +59,6 @@ class IdeationPlugin extends Gdn_Plugin {
      */
     public function base_render_before($sender) {
         $sender->addCssFile('ideation.css', 'plugins/ideation');
-    }
-
-    /**
-     * Get the default status ID. Fetches from config if not set.
-     *
-     * @return int|string The default status ID.
-     */
-    public function getDefaultStatusID() {
-        if (!$this->defaultStatusID) {
-            $this->defaultStatusID = c('Plugins.Ideation.DefaultStatusID', 1);
-        }
-        return $this->defaultStatusID;
     }
 
     /**
@@ -229,9 +212,6 @@ class IdeationPlugin extends Gdn_Plugin {
             $result = $statusModel->save(val('Name', $data), val('State', $data), val('Description', $data), $statusID);
             $sender->Form->setValidationResults($statusModel->validationResults());
             if ($result) {
-                if (val('IsDefaultStatus', $data, false)) {
-                    saveToConfig('Plugins.Ideation.DefaultStatusID', $statusID);
-                }
                 $sender->informMessage(t('Your changes have been saved.'));
                 $sender->RedirectUrl = url('/settings/statuses');
                 $sender->setData('Status', StatusModel::getStatus($result));
@@ -242,7 +222,7 @@ class IdeationPlugin extends Gdn_Plugin {
             if (!$data) {
                 throw NotFoundException('Status');
             }
-            $data['IsDefaultStatus'] = (c('Plugins.Ideation.DefaultStatusID') == $statusID);
+            $data['IsDefaultStatus'] = (val('StatusID', StatusModel::getDefaultStatus()) == $statusID);
             $sender->Form->setData($data);
             $sender->Form->addHidden('StatusID', $statusID);
         }
@@ -279,7 +259,6 @@ class IdeationPlugin extends Gdn_Plugin {
     public function settingsController_statuses_create($sender) {
         $sender->permission('Garden.Settings.Manage');
         $sender->setData('Statuses', StatusModel::getStatuses());
-        $sender->setData('DefaultStatusID', c('Plugins.Ideation.DefaultStatusID', 1));
         $sender->setData('Title', sprintf(t('All %s'), t('Statuses')));
         $sender->addSideMenu();
         $sender->render('statuses', '', 'plugins/ideation');
@@ -318,7 +297,7 @@ class IdeationPlugin extends Gdn_Plugin {
         $categoryCode = val(0, $args, '');
         $sender->setData('Type', 'Idea');
         $sender->Form->setFormValue('Type', 'Idea');
-        $sender->Form->setFormValue('Tags', val('TagID', StatusModel::getStatus($this->getDefaultStatusID())));
+        $sender->Form->setFormValue('Tags', val('TagID', StatusModel::getDefaultStatus()));
         $sender->View = 'discussion';
         $sender->discussion($categoryCode);
     }
@@ -700,7 +679,7 @@ class IdeationPlugin extends Gdn_Plugin {
             $attachment = $attachmentModel->getWhere(['ForeignID' => 'd-'.$discussionID])->resultArray();
             if (empty($attachment)) {
                 // We've got a new idea, add an attachment.
-                $this->updateAttachment(val('DiscussionID', $args), self::getDefaultStatusID(), '');
+                $this->updateAttachment(val('DiscussionID', $args), val('StatusID', StatusModel::getDefaultStatus()), '');
             }
         }
     }

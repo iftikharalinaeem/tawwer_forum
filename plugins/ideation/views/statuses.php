@@ -46,13 +46,8 @@
             <td class="NameColumn"><div class="CellWrap">
                     <?php
                     echo $row['Name'];
-                    echo ($row['StatusID'] == $this->data('DefaultStatusID')) ? '<span class="default-tag Tag Meta">'.t('Default').'</span>' : '';
+                    echo ($row['IsDefault']) ? '<span class="default-tag Tag Meta">'.t('Default').'</span>' : '';
                     ?></div>
-            </td>
-            <td>
-                <?php
-                echo $row['Description'];
-                ?>
             </td>
             <td>
                 <?php
