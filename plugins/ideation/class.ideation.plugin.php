@@ -986,7 +986,7 @@ class IdeationPlugin extends Gdn_Plugin {
         foreach ($openStatuses as $openStatus) {
             $openTags[] = val('TagID', $openStatus);
         }
-        DiscussionModel::addFilter('open', 'State: Open',
+        DiscussionModel::addFilter('open', t('Open'),
             ['d.Tags' => $openTags], 'state', 'status'
         );
 
@@ -996,7 +996,7 @@ class IdeationPlugin extends Gdn_Plugin {
         foreach ($closedStatuses as $closedStatus) {
             $closedTags[] = val('TagID', $closedStatus);
         }
-        DiscussionModel::addFilter('closed', 'State: Closed',
+        DiscussionModel::addFilter('closed', t('Closed'),
             ['d.Tags' => $closedTags], 'state', 'status'
         );
 
