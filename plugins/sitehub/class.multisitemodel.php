@@ -630,7 +630,12 @@ class MultisiteModel extends Gdn_Model {
         if ($delete) {
             // Delete all of the node categories that no longer exist.
             $this->SQL->delete('NodeCategory', ['MultisiteID' => $multiSiteID, 'DateLastSync <' => $now]);
+            $d = $this->Database;
+            $result['Deleted'] = val('RowCount', $this->Database->LastInfo, 0);
+
         }
+
+        return $result;
     }
 
     public function syncNodes() {

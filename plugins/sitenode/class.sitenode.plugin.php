@@ -305,6 +305,44 @@ class SiteNodePlugin extends Gdn_Plugin {
     }
 
     /**
+     * The /utility/pushcategories endpoint.
+     *
+     * @param UtilityController $sender
+     */
+    public function utilityController_pushCategories_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
+        if (!$sender->Request->IsAuthenticatedPostBack(true)) {
+            throw forbiddenException('GET');
+        }
+
+        $this->Data = $this->pushCategories();
+
+        $sender->render('Blank', 'Utility', 'Dashboard');
+    }
+
+    /**
+     * Push the categories from this node to the hub.
+     *
+     * @return mixed
+     */
+    public function pushCategories() {
+        $categories = Gdn::sql()
+            ->select('CategoryID, Name, UrlCode, HubID')
+            ->getWhere('Category', ['CategoryID >' => 0], '', '', 250)->resultArray();
+
+        $post = [
+            'Slug' => $this->slug(),
+            'Categories' => $categories,
+            'Delete' => true
+        ];
+
+        $json = json_encode($post, JSON_PRETTY_PRINT);
+
+        $r = $this->hubApi('/multisites/syncnodecategories.json', 'POST', $post);
+        return $r;
+    }
+
+    /**
      * Synchronize the categories with an array from the hub.
      *
      * @param array $categories The categories to sync.

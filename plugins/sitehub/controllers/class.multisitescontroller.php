@@ -340,7 +340,7 @@ class MultisitesController extends DashboardController {
         }
 
         $result = $this->siteModel->syncNodeCategories($site['MultisiteID'], $categories, val('Delete', $post, true));
-        $this->setData('Result', $result);
+        $this->Data = $result;
 
 
         $this->render('api');
