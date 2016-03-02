@@ -20,12 +20,11 @@ class StatusModel extends Gdn_Model {
      *
      * @param string $name The name of the status.
      * @param string $state Either 'Open' or 'Closed'.
-     * @param string $description The global description for the status.
      * @param int $statusID The ID of the status. Use if updating.
      * @return bool|int The ID of the saved status.
      * @throws Exception
      */
-    public function save($name, $state, $description = '', $statusID = 0) {
+    public function save($name, $state, $statusID = 0) {
         // Put the data into a format that's savable.
         $this->defineSchema();
         $this->Validation->setSchema($this->Schema);
@@ -34,10 +33,6 @@ class StatusModel extends Gdn_Model {
             'Name' => $name,
             'State' => $state
         );
-
-        if ($description) {
-            $saveData['Description'] = $description;
-        }
 
         if ($statusID) {
             $saveData['StatusID'] = $statusID;
