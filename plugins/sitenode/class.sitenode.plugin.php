@@ -553,9 +553,9 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $roles = val('Roles', $user);
                 if (is_array($roles)) {
                     $roleModel = new RoleModel();
-                    $roleHubIDs = ConsolidateArrayValuesByKey($roles, 'HubID');
+                    $roleHubIDs = array_column($roles, 'HubID');
                     $roles = $roleModel->GetWhere(['HubID' => $roleHubIDs])->ResultArray();
-                    $user['Roles'] = ConsolidateArrayValuesByKey($roles, 'RoleID');
+                    $user['Roles'] = array_column($roles, 'RoleID');
                     $user['RoleID'] = $user['Roles'];
                 }
 

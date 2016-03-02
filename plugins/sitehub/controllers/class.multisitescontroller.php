@@ -318,6 +318,35 @@ class MultisitesController extends DashboardController {
     }
 
     /**
+     * Synchronize the categories from a node into the NodeCategory table.
+     */
+    public function syncNodeCategories() {
+        $this->permissionNoLog('Garden.Settings.Manage');
+
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Gdn_UserException("This resource only accepts POST.", 405);
+        }
+
+        // Lookup the site.
+        $post = $this->Request->post();
+        $site = $this->siteModel->getSiteFromKey(val('MultisiteID', $post), val('SiteID', $post), val('Slug', $post));
+        if (!$site) {
+            throw notFoundException('Site');
+        }
+
+        $categories = val('Categories', $post);
+        if (!is_array($categories)) {
+            throw new Gdn_UserException('Categories are required');
+        }
+
+        $result = $this->siteModel->syncNodeCategories($site['MultisiteID'], $categories, val('Delete', $post, true));
+        $this->setData('Result', $result);
+
+
+        $this->render('api');
+    }
+
+    /**
      * Include JS, CSS, and modules used by all methods.
      *
      * Always called by dispatcher before controller's requested method.

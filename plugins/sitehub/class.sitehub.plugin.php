@@ -53,22 +53,34 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->column('Attributes', 'text', true)
             ->set();
 
-        Gdn::Structure()
+        gdn::structure()
             ->table('Role')
             ->column('HubSync', ['settings', 'membership'], true)
             ->set();
 
-        Gdn::Structure()
+        gdn::structure()
             ->table('Category')
             ->column('HubSync', ['', 'settings'], 'settings')
             ->set();
 
-        Gdn::Structure()
-            ->Table('UserAuthenticationProvider')
-            ->Column('SyncToNodes', 'tinyint(1)', '0')
-            ->Set();
+        gdn::structure()
+            ->table('UserAuthenticationProvider')
+            ->column('SyncToNodes', 'tinyint(1)', '0')
+            ->set();
 
-        TouchConfig('Badges.Disabled', true);
+        touchConfig('Badges.Disabled', true);
+
+        // This table contains a mirror of all of the categories on all of the nodes.
+        gdn::structure()
+            ->table('NodeCategory')
+            ->primaryKey('NodeCategoryID')
+            ->column('MultisiteID', 'int', false, 'key')
+            ->column('CategoryID', 'int', false)
+            ->column('Name', 'varchar(255)')
+            ->column('UrlCode', 'varchar(255)', true)
+            ->column('HubID', 'int', true)
+            ->column('DateLastSync', 'datetime', false, 'index')
+            ->set();
     }
 
     /**
