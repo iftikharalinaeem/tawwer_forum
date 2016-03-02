@@ -12,6 +12,9 @@ class PopularPostsModule extends Gdn_Module {
     // Usually set from the template. Ex: {module name="PopularPostsModule" categoryID="X"}
     public $categoryID = null;
 
+    // Usually set from the template. Ex: {module name="PopularPostsModule" sortMethod="X"}
+    public $sortMethod = null;
+
     /**
      * Returns the component as a string to be rendered to the screen.
      *
@@ -39,7 +42,7 @@ class PopularPostsModule extends Gdn_Module {
     /**
      * Load the top popular posts
      *
-     * Load the 10 most popular (highest view count) discussions,
+     * Load the $CountCommentsPerPage most popular (highest view count) discussions,
      * filtered by category if applicable, that are below the MaxAge configuration.
      */
     protected function loadPopularPosts() {
@@ -88,6 +91,22 @@ class PopularPostsModule extends Gdn_Module {
         }
 
         if (!empty($discussions)) {
+
+            switch($this->sortMethod) {
+                case 'date-desc':
+                    uasort($discussions, function($a, $b) {
+                        if ($a['DateInserted'] === $b['DateInserted']) {
+                            return 0;
+                        }
+
+                        return (strtotime($a['DateInserted']) > strtotime($b['DateInserted'])) ? -1 : 1;
+                    });
+                case 'date-asc':
+                    array_reverse($discussions, true);
+                    break;
+                // Default = don't do anything!
+            }
+
             $this->setData('popularPosts', $discussions);
         }
     }
