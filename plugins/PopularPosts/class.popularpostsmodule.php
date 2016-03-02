@@ -59,6 +59,9 @@ class PopularPostsModule extends Gdn_Module {
             $key .= '.category'.$this->categoryID;
         }
 
+        // Don't forget that $CountCommentsPerPage could change!
+        $key .= '-'.$this->CountCommentsPerPage;
+
         $data = Gdn::cache()->get($key);
         if ($data === Gdn_Cache::CACHEOP_FAILURE) {
             $originalAllowedFields = DiscussionModel::allowedSortFields();
