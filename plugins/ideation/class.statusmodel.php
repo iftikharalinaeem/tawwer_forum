@@ -39,10 +39,11 @@ class StatusModel extends Gdn_Model {
             $saveData['StatusID'] = $statusID;
         }
 
-        if ($isDefault === 1) {
-            //TODO: Set all other defaults to 0.
+        if ($isDefault == 1) {
+            $isDefault = '1';
+            $this->update(array('IsDefault' => '0'), array('IsDefault' => '1'));
         } else {
-            $isDefault = 0;
+            $isDefault = '0';
         }
 
         $saveData['IsDefault'] = $isDefault;
@@ -186,7 +187,7 @@ class StatusModel extends Gdn_Model {
     /**
      * Add or updates a tag in the Tag table. A Status-type tag must be defined when inserting a new Status.
      *
-     * @param $name The name of Tag to add.
+     * @param string $name The name of Tag to add.
      * @param string $type The type of the tag.
      * @param bool $oldName The old name of the tag to update.
      * @return int The ID of the tag updated or inserted.

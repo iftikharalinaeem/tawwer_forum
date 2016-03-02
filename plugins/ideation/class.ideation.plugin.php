@@ -209,7 +209,7 @@ class IdeationPlugin extends Gdn_Plugin {
 
         if ($sender->Form->authenticatedPostBack()) {
             $data = $sender->Form->formValues();
-            $result = $statusModel->save(val('Name', $data), val('State', $data), val('Description', $data), $statusID);
+            $result = $statusModel->save(val('Name', $data), val('State', $data), val('IsDefault', $data), $statusID);
             $sender->Form->setValidationResults($statusModel->validationResults());
             if ($result) {
                 $sender->informMessage(t('Your changes have been saved.'));
@@ -222,7 +222,6 @@ class IdeationPlugin extends Gdn_Plugin {
             if (!$data) {
                 throw NotFoundException('Status');
             }
-            $data['IsDefaultStatus'] = (val('StatusID', StatusModel::getDefaultStatus()) == $statusID);
             $sender->Form->setData($data);
             $sender->Form->addHidden('StatusID', $statusID);
         }
@@ -611,8 +610,8 @@ class IdeationPlugin extends Gdn_Plugin {
             $this->updateDiscussionStatusNotes($discussionID, $notes);
         }
         $this->updateAttachment($discussionID, $statusID, $notes);
-        $this->notifyIdeaAuthor(val('InsertUserID', $discussion), $discussionID, val('Name', $discussion), $newStatus);
-        $this->notifyVoters($discussionID, val('Name', $discussion), $newStatus);
+        $this->notifyIdeaAuthor(val('InsertUserID', $discussion), $discussionID, val('Name', $discussion), $newStatus, $notes);
+        $this->notifyVoters($discussionID, val('Name', $discussion), $newStatus, $notes);
     }
 
     /**
@@ -1036,9 +1035,10 @@ class IdeationPlugin extends Gdn_Plugin {
      * @param int $discussionID The discussion whose status has changed
      * @param string $discussionName The Idea-type discussion name
      * @param array $newStatus An array representation of the status
+     * @param string $statusNotes The notes on the discussion's status.
      * @throws Exception
      */
-    public function notifyIdeaAuthor($authorID, $discussionID, $discussionName, $newStatus) {
+    public function notifyIdeaAuthor($authorID, $discussionID, $discussionName, $newStatus, $statusNotes = '') {
         if (sizeof($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
@@ -1047,7 +1047,9 @@ class IdeationPlugin extends Gdn_Plugin {
             $discussionName,
             '<strong>'.val('Name', $newStatus).'</strong>'
         );
-        $story = ' '.sprintf(t("Voting for the idea is now %s."), strtolower(val('State', $newStatus)));
+
+        $story = ($statusNotes) ? '<p>'.$statusNotes.'</p>' : '';
+        $story .= '<p>'.sprintf(t("Voting for the idea is now %s."), strtolower(val('State', $newStatus))).'</p>';
 
         $activity = [
             'ActivityType' => 'AuthorStatus',
@@ -1072,9 +1074,10 @@ class IdeationPlugin extends Gdn_Plugin {
      * @param int $discussionID The discussion whose status has changed
      * @param string $discussionName The Idea-type discussion name
      * @param array $newStatus An array representation of the status
+     * @param string $statusNotes The notes on the discussion's status.
      * @throws Exception
      */
-    public function notifyVoters($discussionID, $discussionName, $newStatus) {
+    public function notifyVoters($discussionID, $discussionName, $newStatus, $statusNotes = '') {
         if (sizeof($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
@@ -1085,7 +1088,9 @@ class IdeationPlugin extends Gdn_Plugin {
             $discussionName,
             '<strong>'.val('Name', $newStatus).'</strong>'
         );
-        $story = ' '.sprintf(t("Voting for the idea is now %s."), strtolower(val('State', $newStatus)));
+
+        $story = ($statusNotes) ? '<p>'.$statusNotes.'</p>' : '';
+        $story .= '<p>'.sprintf(t("Voting for the idea is now %s."), strtolower(val('State', $newStatus))).'</p>';
 
         foreach($voters as $voter) {
             $activity = [
