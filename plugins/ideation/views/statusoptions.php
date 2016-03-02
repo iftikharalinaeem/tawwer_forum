@@ -9,9 +9,9 @@
     <div class="P">
         <?php
 //        $this->Form = new Gdn_Form();
-        echo '<div>'.$this->Form->dropDown('Stage', $this->data('Stages'), array('Default' => $this->data('CurrentStageID'), 'list' => true)).'</div>';
+        echo '<div>'.$this->Form->dropDown('Status', $this->data('Statuses'), array('Default' => $this->data('CurrentStatusID'), 'list' => true)).'</div>';
         echo '<div>'.t('Add an explanation.').'</div>';
-        echo $this->Form->textbox('StageNotes', array('Multiline' => true, 'value' => $this->data('StageNotes')));
+        echo $this->Form->textbox('StatusNotes', array('Multiline' => true, 'value' => $this->data('StatusNotes')));
         ?>
     </div>
 

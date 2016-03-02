@@ -32,22 +32,22 @@
 <!--        </li>-->
 <!--    </ol>-->
 <!--</div>-->
-<table id="stages" class="AltColumns">
+<table id="statuses" class="AltColumns">
     <thead>
     <tr>
-        <th class="NameColumn"><?php echo t('Stage'); ?></th>
+        <th class="NameColumn"><?php echo t('Status'); ?></th>
         <th class="DescriptionColumn"><?php echo t('Description'); ?></th>
-        <th class="IsOpenColumn"><?php echo t('Status'); ?></th>
+        <th class="IsOpenColumn"><?php echo t('State'); ?></th>
         <th class="OptionsColumn"><?php echo t('Options'); ?></th>
     </tr>
     </thead>
     <tbody>
-    <?php foreach ($this->data('Stages') as $row): ?>
-        <tr id="Stage_<?php echo $row['StageID']; ?>">
+    <?php foreach ($this->data('Statuses') as $row): ?>
+        <tr id="Status_<?php echo $row['StatusID']; ?>">
             <td class="NameColumn"><div class="CellWrap">
                     <?php
                     echo $row['Name'];
-                    echo ($row['StageID'] == $this->data('DefaultStageID')) ? '<span class="default-tag Tag Meta">'.t('Default').'</span>' : '';
+                    echo ($row['StatusID'] == $this->data('DefaultStatusID')) ? '<span class="default-tag Tag Meta">'.t('Default').'</span>' : '';
                     ?></div>
             </td>
             <td>
@@ -57,13 +57,13 @@
             </td>
             <td>
                 <?php
-                echo $row['Status'];
+                echo $row['State'];
                 ?>
             </td>
             <td>
                 <?php
-                echo anchor(t('Edit'), '/settings/editstage/'.$row['StageID'], 'SmallButton Popup');
-                echo anchor(t('Delete'), '/settings/deletestage?stageid='.$row['StageID'], 'SmallButton Popup');
+                echo anchor(t('Edit'), '/settings/editstatus/'.$row['StatusID'], 'SmallButton Popup');
+                echo anchor(t('Delete'), '/settings/deletestatus?statusid='.$row['StatusID'], 'SmallButton Popup');
                 ?>
             </td>
         </tr>
@@ -72,6 +72,6 @@
 </table>
 <div class="Wrap">
     <?php
-    echo Anchor(sprintf(t('Add %s'), t('Stage')), '/settings/addstage', 'SmallButton');
+    echo Anchor(sprintf(t('Add %s'), t('Status')), '/settings/addstatus', 'SmallButton');
     ?>
 </div>

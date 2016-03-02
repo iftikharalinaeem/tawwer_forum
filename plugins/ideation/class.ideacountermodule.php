@@ -110,14 +110,14 @@ class IdeaCounterModule extends Gdn_Module {
                 $score = '0';
             }
             $discussionID = val('DiscussionID', $this->discussion);
-            $stage = StageModel::getStageByDiscussion($discussionID);
-            $this->isOpen = (val('Status', $stage) == 'Open');
+            $status = StatusModel::getStatusByDiscussion($discussionID);
+            $this->isOpen = (val('State', $status) == 'Open');
             $counter = array();
             $counter['upUrl'] = url('/react/discussion/'.$this->ideaUpReactionSlug.'?id='.$discussionID.'&selfreact=true');
             $counter['score'] = $score;
             $counter['numberVotes'] = $score;
-            $counter['stage'] = val('Name', $stage);
-            $counter['status'] = val('Status', $stage);
+            $counter['status'] = val('Name', $status);
+            $counter['state'] = val('State', $status);
             $counter['upCssClass'] = '';
 
             if ($this->userVote) {
@@ -159,10 +159,10 @@ class IdeaCounterModule extends Gdn_Module {
  */
 if (!function_exists('renderCounterBox')) {
     function renderCounterBox($counter, $useDownVotes, $showVotes, $ideaUpReactionSlug, $ideaDownReactionSlug) { ?>
-        <div class="idea-counter-module <?php echo val('status', $counter).' '.val('cssClass', $counter); ?>">
+        <div class="idea-counter-module <?php echo val('state', $counter).' '.val('cssClass', $counter); ?>">
             <div class="idea-counter-box">
                 <?php echo getScoreHtml(val('score', $counter)); ?>
-                <?php if (val('status', $counter) == 'Open') { ?>
+                <?php if (val('state', $counter) == 'Open') { ?>
                     <div class="vote idea-menu">
                         <span class="idea-buttons">
                             <?php

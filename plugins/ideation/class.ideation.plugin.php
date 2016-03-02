@@ -39,9 +39,9 @@ class IdeationPlugin extends Gdn_Plugin {
     protected static $downTagID;
 
     /**
-     * @var int The ID of the default stage for new ideas.
+     * @var int The ID of the default status for new ideas.
      */
-    protected $defaultStageID;
+    protected $defaultStatusID;
 
     /**
      * This will run when you "Enable" the plugin.
@@ -67,15 +67,15 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Get the default stage ID. Fetches from config if not set.
+     * Get the default status ID. Fetches from config if not set.
      *
-     * @return int|string The default stage ID.
+     * @return int|string The default status ID.
      */
-    public function getDefaultStageID() {
-        if (!$this->defaultStageID) {
-            $this->defaultStageID = c('Plugins.Ideation.DefaultStageID', 1);
+    public function getDefaultStatusID() {
+        if (!$this->defaultStatusID) {
+            $this->defaultStatusID = c('Plugins.Ideation.DefaultStatusID', 1);
         }
-        return $this->defaultStageID;
+        return $this->defaultStatusID;
     }
 
     /**
@@ -128,13 +128,13 @@ class IdeationPlugin extends Gdn_Plugin {
      */
 
     /**
-     * Adds Stages link to Dashboard menu.
+     * Adds Statuses link to Dashboard menu.
      *
      * @param Controller $sender
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = &$sender->EventArguments['SideMenu'];
-        $menu->addLink('Forum', t('Stages'), '/dashboard/settings/stages', 'Garden.Settings.Manage', array('class' => 'nav-stages'));
+        $menu->addLink('Forum', t('Statuses'), '/dashboard/settings/statuses', 'Garden.Settings.Manage', array('class' => 'nav-statuses'));
     }
 
     /**
@@ -183,112 +183,112 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * STAGE SETTINGS
+     * STATUS SETTINGS
      * --------------
      */
 
     /**
-     * Adds endpoint for editing a stage, renders the form and performs the update operation.
+     * Adds endpoint for editing a status, renders the form and performs the update operation.
      *
      * @param SettingsController $sender
-     * @param $stageID The ID of the stage to edit.
+     * @param $statusID The ID of the status to edit.
      * @throws Exception
      */
-    public function settingsController_editStage_create($sender, $stageID) {
-        if (!$stageID) {
-            throw NotFoundException('Stage');
+    public function settingsController_editStatus_create($sender, $statusID) {
+        if (!$statusID) {
+            throw NotFoundException('Status');
         }
-        $sender->title(sprintf(t('Edit %s'), t('Stage')));
-        $this->addEdit($sender, $stageID);
+        $sender->title(sprintf(t('Edit %s'), t('Status')));
+        $this->addEdit($sender, $statusID);
     }
 
     /**
-     * Adds endpoint for adding a stage, renders the form and performs the insert operation.
+     * Adds endpoint for adding a status, renders the form and performs the insert operation.
      *
      * @param SettingsController $sender
      * @throws Exception
      */
-    public function settingsController_addStage_create($sender) {
-        $sender->title(sprintf(t('Add %s'), t('Stage')));
+    public function settingsController_addStatus_create($sender) {
+        $sender->title(sprintf(t('Add %s'), t('Status')));
         $this->addEdit($sender);
     }
 
     /**
-     * Renders the add/edit stage form and performs the corresponding operation.
+     * Renders the add/edit status form and performs the corresponding operation.
      *
      * @param SettingsController $sender
-     * @param int $stageID The ID of the stage to edit.
+     * @param int $statusID The ID of the status to edit.
      * @throws Exception
      */
-    protected function addEdit($sender, $stageID = 0) {
+    protected function addEdit($sender, $statusID = 0) {
         $sender->permission('Garden.Settings.Manage');
-        $stageModel = new StageModel();
+        $statusModel = new StatusModel();
 
         if ($sender->Form->authenticatedPostBack()) {
             $data = $sender->Form->formValues();
-            $result = $stageModel->save(val('Name', $data), val('Status', $data), val('Description', $data), $stageID);
-            $sender->Form->setValidationResults($stageModel->validationResults());
+            $result = $statusModel->save(val('Name', $data), val('State', $data), val('Description', $data), $statusID);
+            $sender->Form->setValidationResults($statusModel->validationResults());
             if ($result) {
-                if (val('IsDefaultStage', $data, false)) {
-                    saveToConfig('Plugins.Ideation.DefaultStageID', $stageID);
+                if (val('IsDefaultStatus', $data, false)) {
+                    saveToConfig('Plugins.Ideation.DefaultStatusID', $statusID);
                 }
                 $sender->informMessage(t('Your changes have been saved.'));
-                $sender->RedirectUrl = url('/settings/stages');
-                $sender->setData('Stage', StageModel::getStage($result));
+                $sender->RedirectUrl = url('/settings/statuses');
+                $sender->setData('Status', StatusModel::getStatus($result));
             }
-        } elseif ($stageID) {
-            // We're about to edit, set up the data from the stage.
-            $data = StageModel::getStage($stageID);
+        } elseif ($statusID) {
+            // We're about to edit, set up the data from the status.
+            $data = StatusModel::getStatus($statusID);
             if (!$data) {
-                throw NotFoundException('Stage');
+                throw NotFoundException('Status');
             }
-            $data['IsDefaultStage'] = (c('Plugins.Ideation.DefaultStageID') == $stageID);
+            $data['IsDefaultStatus'] = (c('Plugins.Ideation.DefaultStatusID') == $statusID);
             $sender->Form->setData($data);
-            $sender->Form->addHidden('StageID', $stageID);
+            $sender->Form->addHidden('StatusID', $statusID);
         }
         $sender->addSideMenu();
-        $sender->render('stage', '', 'plugins/ideation');
+        $sender->render('status', '', 'plugins/ideation');
     }
 
     /**
-     * Adds endpoint for deleting a stage, renders the form and performs the delete operation.
+     * Adds endpoint for deleting a status, renders the form and performs the delete operation.
      *
      * @param SettingsController $sender
-     * @param $stageID
+     * @param $statusID
      */
-    public function settingsController_deleteStage_create($sender, $stageID) {
+    public function settingsController_deleteStatus_create($sender, $statusID) {
         $sender->permission('Garden.Settings.Manage');
 
         if ($sender->Form->authenticatedPostBack()) {
             if ($sender->Form->getFormValue('Yes')) {
-                $stageModel = new StageModel();
-                $stageModel->delete(['StageID' => $stageID]);
-                $sender->jsonTarget("#Stage_$stageID", NULL, 'SlideUp');
+                $statusModel = new StatusModel();
+                $statusModel->delete(['StatusID' => $statusID]);
+                $sender->jsonTarget("#Status_$statusID", NULL, 'SlideUp');
             }
         }
 
-        $sender->title(sprintf(t('Delete %s'), t('Stage')));
-        $sender->render('DeleteStage', '', 'plugins/ideation');
+        $sender->title(sprintf(t('Delete %s'), t('Status')));
+        $sender->render('DeleteStatus', '', 'plugins/ideation');
     }
 
     /**
-     * Adds endpoint in the dashboard for viewing all stages and renders the view.
+     * Adds endpoint in the dashboard for viewing all statuses and renders the view.
      *
      * @param SettingsController $sender
      */
-    public function settingsController_stages_create($sender) {
+    public function settingsController_statuses_create($sender) {
         $sender->permission('Garden.Settings.Manage');
-        $sender->setData('Stages', StageModel::getStages());
-        $sender->setData('DefaultStageID', c('Plugins.Ideation.DefaultStageID', 1));
-        $sender->setData('Title', sprintf(t('All %s'), t('Stages')));
+        $sender->setData('Statuses', StatusModel::getStatuses());
+        $sender->setData('DefaultStatusID', c('Plugins.Ideation.DefaultStatusID', 1));
+        $sender->setData('Title', sprintf(t('All %s'), t('Statuses')));
         $sender->addSideMenu();
-        $sender->render('stages', '', 'plugins/ideation');
+        $sender->render('statuses', '', 'plugins/ideation');
     }
 
     /**
      * IDEA POST FORM
      * --------------
-     * Adds a new, stripped-down post type: 'Idea', without announcing or tagging capabilities beyond stage-type tags.
+     * Adds a new, stripped-down post type: 'Idea', without announcing or tagging capabilities beyond status-type tags.
      */
 
     /**
@@ -308,7 +308,7 @@ class IdeationPlugin extends Gdn_Plugin {
 
     /**
      * Adds a post/idea endpoint, ensures there's a category and that the category is an idea category,
-     * and then sets the default stage and Idea type on the discussion post.
+     * and then sets the default status and Idea type on the discussion post.
      *
      * @param PostController $sender
      * @param array $args The event arguments. The first argument should be the category slug.
@@ -318,7 +318,7 @@ class IdeationPlugin extends Gdn_Plugin {
         $categoryCode = val(0, $args, '');
         $sender->setData('Type', 'Idea');
         $sender->Form->setFormValue('Type', 'Idea');
-        $sender->Form->setFormValue('Tags', val('TagID', StageModel::getStage($this->getDefaultStageID())));
+        $sender->Form->setFormValue('Tags', val('TagID', StatusModel::getStatus($this->getDefaultStatusID())));
         $sender->View = 'discussion';
         $sender->discussion($categoryCode);
     }
@@ -376,43 +376,43 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * STAGE TAGGING
+     * STATUS TAGGING
      * -------------
      */
 
     /**
-     * Register a new tag type: Stage
+     * Register a new tag type: Status
      *
      * @param TagModel $sender
      */
     public function tagModel_types_handler($sender) {
-        $sender->addType('Stage', [
-            'key' => 'Stage',
-            'name' => 'Stage',
-            'plural' => 'Stages',
+        $sender->addType('Status', [
+            'key' => 'Status',
+            'name' => 'Status',
+            'plural' => 'Statuses',
             'addtag' => false,
             'default' => false
         ]);
     }
 
     /**
-     * Registers reserved Stage-type tags.
+     * Registers reserved Status-type tags.
      *
      * @param DiscussionModel $sender
      * @param array $args
      */
     public function discussionModel_reservedTags_handler($sender, $args) {
         if (isset($args['ReservedTags'])) {
-            $stages = StageModel::getStages();
-            foreach ($stages as $stage) {
-                $tagName = val('Name', TagModel::instance()->getID(val('TagID', $stage)));
+            $statuses = StatusModel::getStatuses();
+            foreach ($statuses as $status) {
+                $tagName = val('Name', TagModel::instance()->getID(val('TagID', $status)));
                 $args['ReservedTags'][] = $tagName;
             }
         }
     }
 
     /**
-     * Prints Stage-type tags on discussions in a discussion list
+     * Prints Status-type tags on discussions in a discussion list
      *
      * @param Controller $sender
      * @param array $args
@@ -422,9 +422,9 @@ class IdeationPlugin extends Gdn_Plugin {
         if (!$this->isIdea($discussion)) {
             return;
         }
-        $stage = StageModel::getStageByDiscussion(val('DiscussionID', $discussion));
-        if ($stage) {
-            echo getStageTagHtml(val('Name', $stage));
+        $status = StatusModel::getStatusByDiscussion(val('DiscussionID', $discussion));
+        if ($status) {
+            echo getStatusTagHtml(val('Name', $status));
         }
     }
 
@@ -528,7 +528,7 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Handles the discussion options (the links in the cog dropdown) for an idea. Adds a link to edit the stage,
+     * Handles the discussion options (the links in the cog dropdown) for an idea. Adds a link to edit the status,
      * changes the url for the edit option from /editdiscussion to /editidea and changes the delete label
      * from 'Delete Discussion' to 'Delete Idea'.
      *
@@ -547,9 +547,9 @@ class IdeationPlugin extends Gdn_Plugin {
         }
 
         if (isset($args['DiscussionOptions'])) {
-            $args['DiscussionOptions']['Stage'] = ['Label' => sprintf(t('Edit %s'), t('Stage')), 'Url' => '/discussion/stageoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup'];
+            $args['DiscussionOptions']['Status'] = ['Label' => sprintf(t('Edit %s'), t('Status')), 'Url' => '/discussion/statusoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup'];
         } elseif (isset($sender->Options)) {
-            $sender->Options .= '<li>'.anchor(sprintf(t('Edit %s'), t('Stage')), '/discussion/stageoptions?discussionid='.$discussion->DiscussionID, 'Popup').'</li>';
+            $sender->Options .= '<li>'.anchor(sprintf(t('Edit %s'), t('Status')), '/discussion/statusoptions?discussionid='.$discussion->DiscussionID, 'Popup').'</li>';
         }
 
         if (isset($args['DiscussionOptions']['EditDiscussion'])) {
@@ -564,14 +564,14 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Renders stage options form and handles editting the stage and/or stage notes.
+     * Renders status options form and handles editting the status and/or status notes.
      *
      * @param DiscussionController $sender
      * @param string|int $discussionID The ID of the Idea-type discussion
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function discussionController_stageOptions_create($sender, $discussionID = '') {
+    public function discussionController_statusOptions_create($sender, $discussionID = '') {
         if ($discussionID) {
             $discussion = $sender->DiscussionModel->GetID($discussionID);
             if (!$discussion || !$this->isIdea($discussion)) {
@@ -585,97 +585,97 @@ class IdeationPlugin extends Gdn_Plugin {
 
             $sender->Form = new Gdn_Form();
             if ($sender->Form->authenticatedPostBack()) {
-                $this->updateDiscussionStage($discussion, $sender->Form->getFormValue('Stage'), $sender->Form->getFormValue('StageNotes'));
+                $this->updateDiscussionStatus($discussion, $sender->Form->getFormValue('Status'), $sender->Form->getFormValue('StatusNotes'));
                 Gdn::controller()->jsonTarget('', '', 'Refresh');
             }
 
-            $stages = StageModel::getStages();
-            foreach($stages as &$stage) {
-                $stage = val('Name', $stage);
+            $statuses = StatusModel::getStatuses();
+            foreach($statuses as &$status) {
+                $status = val('Name', $status);
             }
-            $notes = $this->getStageNotes($discussion, $sender->DiscussionModel);
+            $notes = $this->getStatusNotes($discussion, $sender->DiscussionModel);
 
             $sender->setData('Discussion', $discussion);
-            $sender->setData('Stages', $stages);
-            $sender->setData('StageNotes', $notes);
-            $sender->setData('CurrentStageID', val('StageID', StageModel::getStageByDiscussion($discussionID)));
-            $sender->setData('Title', sprintf(t('Edit %s'), t('Stage')));
+            $sender->setData('Statuses', $statuses);
+            $sender->setData('StatusNotes', $notes);
+            $sender->setData('CurrentStatusID', val('StatusID', StatusModel::getStatusByDiscussion($discussionID)));
+            $sender->setData('Title', sprintf(t('Edit %s'), t('Status')));
 
-            $sender->render('StageOptions', '', 'plugins/ideation');
+            $sender->render('StatusOptions', '', 'plugins/ideation');
         }
     }
 
     /**
-     * DISCUSSION STAGE
+     * DISCUSSION STATUS
      * ----------------
-     * Stage notes are serialized and stored in the Attributes column. We find out what stage a discussion has
-     * by its tag (in the TagDiscussion table). Any Idea-type discussion will also have its stage tag as the only TagID
-     * in the Discussion table. There are attachments on a discussion that display the stage info that need to be
-     * updated when the StageNotes or StageTag is changed.
+     * Status notes are serialized and stored in the Attributes column. We find out what status a discussion has
+     * by its tag (in the TagDiscussion table). Any Idea-type discussion will also have its status tag as the only TagID
+     * in the Discussion table. There are attachments on a discussion that display the status info that need to be
+     * updated when the StatusNotes or StatusTag is changed.
      */
 
     /**
-     * Update a discussion's stage. Handles notifications, updating the stage tag, stage notes, and attachments.
+     * Update a discussion's status. Handles notifications, updating the status tag, status notes, and attachments.
      *
      * @param object|array $discussion The discussion to update
-     * @param int $stageID The new stage for the discussion
-     * @param string $notes The stage notes
+     * @param int $statusID The new status for the discussion
+     * @param string $notes The status notes
      */
-    public function updateDiscussionStage($discussion, $stageID, $notes) {
-        if (!$this->isIdea($discussion) || !is_numeric($stageID)) {
+    public function updateDiscussionStatus($discussion, $statusID, $notes) {
+        if (!$this->isIdea($discussion) || !is_numeric($statusID)) {
             return;
         }
         $discussionID = val('DiscussionID', $discussion);
-        $newStage = StageModel::getStage($stageID);
-        $this->updateDiscussionStageTag($discussionID, $stageID);
+        $newStatus = StatusModel::getStatus($statusID);
+        $this->updateDiscussionStatusTag($discussionID, $statusID);
         if ($notes) {
-            $this->updateDiscussionStageNotes($discussionID, $notes);
+            $this->updateDiscussionStatusNotes($discussionID, $notes);
         }
-        $this->updateAttachment($discussionID, $stageID, $notes);
-        $this->notifyIdeaAuthor(val('InsertUserID', $discussion), $discussionID, val('Name', $discussion), $newStage);
-        $this->notifyVoters($discussionID, val('Name', $discussion), $newStage);
+        $this->updateAttachment($discussionID, $statusID, $notes);
+        $this->notifyIdeaAuthor(val('InsertUserID', $discussion), $discussionID, val('Name', $discussion), $newStatus);
+        $this->notifyVoters($discussionID, val('Name', $discussion), $newStatus);
     }
 
     /**
      * Updates the tag on a discussion. Updates the TagDiscussion table and the TagID column of the Discussion table.
      *
      * @param int $discussionID The ID of the discussion to update
-     * @param int $stageID The new stage ID
+     * @param int $statusID The new status ID
      */
-    protected function updateDiscussionStageTag($discussionID, $stageID) {
+    protected function updateDiscussionStatusTag($discussionID, $statusID) {
         // TODO: Logging. We shoud probably keep a record of this.
 
-        $oldStage = StageModel::getStageByDiscussion($discussionID);
+        $oldStatus = StatusModel::getStatusByDiscussion($discussionID);
         // Don't change anything if nothing's changed.
-        if (val('StageID', $oldStage) != $stageID) {
+        if (val('StatusID', $oldStatus) != $statusID) {
 
             // Save tag info in TagDiscussion
-            $stage = StageModel::getStage($stageID);
-            $tags = [val('TagID', $stage)];
-            TagModel::instance()->saveDiscussion($discussionID, $tags, ['Stage']);
+            $status = StatusModel::getStatus($statusID);
+            $tags = [val('TagID', $status)];
+            TagModel::instance()->saveDiscussion($discussionID, $tags, ['Status']);
 
             // Save tags in discussions table
             $discussionModel = new DiscussionModel();
-            $discussionModel->setField($discussionID, 'Tags', val('TagID', $stage));
+            $discussionModel->setField($discussionID, 'Tags', val('TagID', $status));
         }
     }
 
     /**
-     * Saves the discussion stage notes in its Attributes.
+     * Saves the discussion status notes in its Attributes.
      *
      * @param int $discussionID The ID of the discussion to update
      * @param string $notes The new notes to save
      * @throws Exception
      */
-    protected function updateDiscussionStageNotes($discussionID, $notes) {
+    protected function updateDiscussionStatusNotes($discussionID, $notes) {
         $discussionModel = new DiscussionModel();
-        $discussionModel->saveToSerializedColumn('Attributes', $discussionID, 'StageNotes', $notes);
+        $discussionModel->saveToSerializedColumn('Attributes', $discussionID, 'StatusNotes', $notes);
     }
 
     /**
      * ATTACHMENTS
      * -----------
-     * Attachments appear in the discussion view. They include the stage, stage description and stage notes.
+     * Attachments appear in the discussion view. They include the status, status description and status notes.
      * The view also renders the idea discussion model from the discussion controller's data array.
      */
 
@@ -700,27 +700,27 @@ class IdeationPlugin extends Gdn_Plugin {
             $attachment = $attachmentModel->getWhere(['ForeignID' => 'd-'.$discussionID])->resultArray();
             if (empty($attachment)) {
                 // We've got a new idea, add an attachment.
-                $this->updateAttachment(val('DiscussionID', $args), self::getDefaultStageID(), '');
+                $this->updateAttachment(val('DiscussionID', $args), self::getDefaultStatusID(), '');
             }
         }
     }
 
     /**
-     * Updates the attachment for a discussion. Attachments include the stage info (name, description, status, notes).
+     * Updates the attachment for a discussion. Attachments include the status info (name, description, state, notes).
      *
      * @param $discussionID
-     * @param $stageID
-     * @param $stageNotes
+     * @param $statusID
+     * @param $statusNotes
      */
-    protected function updateAttachment($discussionID, $stageID, $stageNotes) {
+    protected function updateAttachment($discussionID, $statusID, $statusNotes) {
 
-        $stage = StageModel::getStage($stageID);
-        $attachment['Type'] = 'stage';
-        $attachment['StageName'] = val('Name', $stage);
-        $attachment['StageDescription'] = val('Description', $stage);
-        $attachment['StageStatus'] = val('Status', $stage);
-        $attachment['StageNotes'] = $stageNotes;
-        $attachment['StageUrl'] = url('/discussions/tagged/'.urlencode(val('StageName', $attachment)));
+        $status = StatusModel::getStatus($statusID);
+        $attachment['Type'] = 'status';
+        $attachment['StatusName'] = val('Name', $status);
+        $attachment['StatusDescription'] = val('Description', $status);
+        $attachment['Statusestate'] = val('State', $status);
+        $attachment['StatusNotes'] = $statusNotes;
+        $attachment['StatusUrl'] = url('/discussions/tagged/'.urlencode(val('StatusName', $attachment)));
         $attachment['DateUpdated'] = Gdn_Format::toDateTime();
 
         // Kludge. Not Null fields
@@ -742,7 +742,7 @@ class IdeationPlugin extends Gdn_Plugin {
         // Check if there's already an attachment and override.
         if ($attachments = val('Attachments', $discussion)) {
             foreach($attachments as $oldAttachment) {
-                if (val('Type', $oldAttachment) == 'stage') {
+                if (val('Type', $oldAttachment) == 'status') {
                     $attachment['AttachmentID'] = val('AttachmentID', $oldAttachment);
                 }
             }
@@ -756,7 +756,7 @@ class IdeationPlugin extends Gdn_Plugin {
      */
 
     /**
-     * Shuts down any reacting to ideas with closed statuses.
+     * Shuts down any reacting to ideas with closed states.
      *
      * @param ReactionModel $sender
      * @param array $args
@@ -764,9 +764,9 @@ class IdeationPlugin extends Gdn_Plugin {
     public function reactionModel_getReaction_handler($sender, $args) {
         if ($reaction = val('ReactionType', $args)) {
             if ((val('UrlCode', $reaction) == self::REACTION_UP) || (val('UrlCode', $reaction) == self::REACTION_DOWN)) {
-                $stageModel = new StageModel();
+                $statusModel = new StatusModel();
                 if (strtolower(val('RecordType', $args) == 'discussion')
-                    && (val('Status', $stageModel->getStageByDiscussion(val('RecordID', $args))) == 'Closed')) {
+                    && (val('State', $statusModel->getStatusByDiscussion(val('RecordID', $args))) == 'Closed')) {
                     $args['ReactionType']['Active'] = false;
                 }
             }
@@ -996,36 +996,36 @@ class IdeationPlugin extends Gdn_Plugin {
      */
 
     /**
-     * Adds stage and status filtering to the DiscussionFilterModule.
+     * Adds status and state filtering to the DiscussionFilterModule.
      */
     public function discussionModel_discussionFilters_handler() {
         $categories = $this->getIdeaCategoryIDs();
-        DiscussionModel::addFilterSet('stage', sprintf(t('All %s'), t('Stages')), $categories);
+        DiscussionModel::addFilterSet('status', sprintf(t('All %s'), t('Statuses')), $categories);
 
-        // Open status
-        $openStages = StageModel::getOpenStages();
+        // Open state
+        $openStatuses = StatusModel::getOpenStatuses();
         $openTags = [];
-        foreach ($openStages as $openStage) {
-            $openTags[] = val('TagID', $openStage);
+        foreach ($openStatuses as $openStatus) {
+            $openTags[] = val('TagID', $openStatus);
         }
-        DiscussionModel::addFilter('open', 'Status: Open',
-            ['d.Tags' => $openTags], 'status', 'stage'
+        DiscussionModel::addFilter('open', 'State: Open',
+            ['d.Tags' => $openTags], 'state', 'status'
         );
 
-        // Closed status
-        $closedStages = StageModel::getClosedStages();
+        // Closed state
+        $closedStatuses = StatusModel::getClosedStatuses();
         $closedTags = [];
-        foreach ($closedStages as $closedStage) {
-            $closedTags[] = val('TagID', $closedStage);
+        foreach ($closedStatuses as $closedStatus) {
+            $closedTags[] = val('TagID', $closedStatus);
         }
-        DiscussionModel::addFilter('closed', 'Status: Closed',
-            ['d.Tags' => $closedTags], 'status', 'stage'
+        DiscussionModel::addFilter('closed', 'State: Closed',
+            ['d.Tags' => $closedTags], 'state', 'status'
         );
 
-        // Stages
-        foreach(StageModel::getStages() as $stage) {
-            DiscussionModel::addFilter(strtolower(val('Name', $stage)).'-stage' , val('Name', $stage),
-                ['d.Tags' => val('TagID', $stage)], 'stage', 'stage'
+        // Statuses
+        foreach(StatusModel::getStatuses() as $status) {
+            DiscussionModel::addFilter(strtolower(val('Name', $status)).'-status' , val('Name', $status),
+                ['d.Tags' => val('TagID', $status)], 'status', 'status'
             );
         }
     }
@@ -1047,31 +1047,31 @@ class IdeationPlugin extends Gdn_Plugin {
     /**
      * NOTIFICATIONS/ACTIVITY
      * ----------------------
-     * Uses activity notifications to notify idea creators and voters of stage changes.
+     * Uses activity notifications to notify idea creators and voters of status changes.
      */
 
     /**
-     * Notifies the author of an idea of a stage change.
+     * Notifies the author of an idea of a status change.
      *
      * @param int $authorID The ID of the idea author
-     * @param int $discussionID The discussion whose stage has changed
+     * @param int $discussionID The discussion whose status has changed
      * @param string $discussionName The Idea-type discussion name
-     * @param array $newStage An array representation of the stage
+     * @param array $newStatus An array representation of the status
      * @throws Exception
      */
-    public function notifyIdeaAuthor($authorID, $discussionID, $discussionName, $newStage) {
+    public function notifyIdeaAuthor($authorID, $discussionID, $discussionName, $newStatus) {
         if (sizeof($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
         $headline = t("Progress on your idea!");
-        $lead = sprintf(t('The stage for "%s" has changed to %s.'),
+        $lead = sprintf(t('The status for "%s" has changed to %s.'),
             $discussionName,
-            '<strong>'.val('Name', $newStage).'</strong>'
+            '<strong>'.val('Name', $newStatus).'</strong>'
         );
-        $story = ' '.sprintf(t("Voting for the idea is now %s."), strtolower(val('Status', $newStage)));
+        $story = ' '.sprintf(t("Voting for the idea is now %s."), strtolower(val('State', $newStatus)));
 
         $activity = [
-            'ActivityType' => 'AuthorStage',
+            'ActivityType' => 'AuthorStatus',
             'NotifyUserID' => $authorID,
             'HeadlineFormat' => $headline,
             'Story' => $lead.' '.$story,
@@ -1082,35 +1082,35 @@ class IdeationPlugin extends Gdn_Plugin {
         ];
 
         $activityModel = new ActivityModel();
-        $activityModel->queue($activity, 'AuthorStage', ['Force' => true]);
+        $activityModel->queue($activity, 'AuthorStatus', ['Force' => true]);
         $activityModel->saveQueue();
     }
 
 
     /**
-     * Notifies the voters on an idea of a stage change.
+     * Notifies the voters on an idea of a status change.
      *
-     * @param int $discussionID The discussion whose stage has changed
+     * @param int $discussionID The discussion whose status has changed
      * @param string $discussionName The Idea-type discussion name
-     * @param array $newStage An array representation of the stage
+     * @param array $newStatus An array representation of the status
      * @throws Exception
      */
-    public function notifyVoters($discussionID, $discussionName, $newStage) {
+    public function notifyVoters($discussionID, $discussionName, $newStatus) {
         if (sizeof($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
 
         $voters = $this->getVoterIDs($discussionID);
         $headline = t('Progress on an idea you voted on!');
-        $lead = sprintf(t('The stage for "%s" has changed to %s.'),
+        $lead = sprintf(t('The status for "%s" has changed to %s.'),
             $discussionName,
-            '<strong>'.val('Name', $newStage).'</strong>'
+            '<strong>'.val('Name', $newStatus).'</strong>'
         );
-        $story = ' '.sprintf(t("Voting for the idea is now %s."), strtolower(val('Status', $newStage)));
+        $story = ' '.sprintf(t("Voting for the idea is now %s."), strtolower(val('State', $newStatus)));
 
         foreach($voters as $voter) {
             $activity = [
-                'ActivityType' => 'VoterStage',
+                'ActivityType' => 'VoterStatus',
                 'NotifyUserID' => $voter,
                 'HeadlineFormat' => $headline,
                 'Story' => $lead.' '.$story,
@@ -1121,22 +1121,22 @@ class IdeationPlugin extends Gdn_Plugin {
             ];
 
             $activityModel = new ActivityModel();
-            $activityModel->queue($activity, 'VoterStage');
+            $activityModel->queue($activity, 'VoterStatus');
             $activityModel->saveQueue();
         }
     }
 
     /**
-     * Adds stage notification options to profiles.
+     * Adds status notification options to profiles.
      *
      * @param ProfileController $sender
      */
     public function profileController_afterPreferencesDefined_handler($sender) {
-        $sender->Preferences['Notifications']['Email.AuthorStage'] = t('Notify me when my ideas\' stages change.');
-        $sender->Preferences['Notifications']['Popup.AuthorStage'] = t('Notify me when my ideas\' stages change.');
+        $sender->Preferences['Notifications']['Email.AuthorStatus'] = t('Notify me when my ideas\' statuses change.');
+        $sender->Preferences['Notifications']['Popup.AuthorStatus'] = t('Notify me when my ideas\' statuses change.');
 
-        $sender->Preferences['Notifications']['Email.VoterStage'] = t('Notify me when the stage changes on an idea I\'ve voted on.');
-        $sender->Preferences['Notifications']['Popup.VoterStage'] = t('Notify me when the stage changes on an idea I\'ve voted on.');
+        $sender->Preferences['Notifications']['Email.VoterStatus'] = t('Notify me when the status changes on an idea I\'ve voted on.');
+        $sender->Preferences['Notifications']['Popup.VoterStatus'] = t('Notify me when the status changes on an idea I\'ve voted on.');
     }
 
     /**
@@ -1145,17 +1145,17 @@ class IdeationPlugin extends Gdn_Plugin {
      */
 
     /**
-     * Gets the stage notes for a given discussion array.
+     * Gets the status notes for a given discussion array.
      *
      * @param object|array $discussion The discussion to get the notes for.
      * @param DiscussionModel|null $discussionModel If it exists, pass it in.
-     * @return string The notes on the discussion's stage.
+     * @return string The notes on the discussion's status.
      */
-    public function getStageNotes($discussion, $discussionModel = null) {
+    public function getStatusNotes($discussion, $discussionModel = null) {
         if (!$discussionModel) {
             $discussionModel = new DiscussionModel();
         }
-        return $discussionModel->getRecordAttribute($discussion, 'StageNotes');
+        return $discussionModel->getRecordAttribute($discussion, 'StatusNotes');
     }
 
     /**
@@ -1318,19 +1318,19 @@ if (!function_exists('getVotesHtml')) {
     }
 }
 
-if (!function_exists('getStageTagHtml')) {
+if (!function_exists('getStatusTagHtml')) {
     /**
-     * Renders the stage tags for the discussion list.
+     * Renders the status tags for the discussion list.
      *
-     * @param string $stageName The name of the stage.
-     * @param string $stageCode The url-code of the stage.
-     * @return string The stage tag.
+     * @param string $statusName The name of the status.
+     * @param string $statusCode The url-code of the status.
+     * @return string The status tag.
      */
-    function getStageTagHtml($stageName, $stageCode = '') {
-        if (empty($stageCode)) {
-            $stageCode = urlencode($stageName);
+    function getStatusTagHtml($statusName, $statusCode = '') {
+        if (empty($statusCode)) {
+            $statusCode = urlencode($statusName);
         }
-        return ' <a href="'.url('/discussions/tagged/'.$stageCode).'"><span class="Tag Stage-Tag-'.$stageCode.'"">'.$stageName.'</span></a> ';
+        return ' <a href="'.url('/discussions/tagged/'.$statusCode).'"><span class="Tag Status-Tag-'.$statusCode.'"">'.$statusName.'</span></a> ';
     }
 }
 

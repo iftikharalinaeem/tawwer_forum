@@ -1,33 +1,32 @@
 <?php if (!defined('APPLICATION')) exit;
 
-Gdn::structure()->table('Stage');
-$stageExists = Gdn::Structure()->TableExists();
+Gdn::structure()->table('Status');
+$statusExists = Gdn::Structure()->TableExists();
 
 Gdn::structure()
-    ->table('Stage')
-    ->primaryKey('StageID')
+    ->table('Status')
+    ->primaryKey('StatusID')
     ->column('Name', 'varchar(100)', false, array('unique'))
-    ->column('Status', array('Open', 'Closed'))
-    ->column('Description', 'text', true)
+    ->column('State', array('Open', 'Closed'))
     ->column('TagID', 'int', true)
     ->set();
 
-// Add the activity type for stages.
+// Add the activity type for statuses.
 $activityModel = new ActivityModel();
-$activityModel->defineType('AuthorStage');
+$activityModel->defineType('AuthorStatus');
 $activityModel = new ActivityModel();
-$activityModel->defineType('VoterStage');
+$activityModel->defineType('VoterStatus');
 
-if (!$stageExists) {
+if (!$statusExists) {
     // Add some default statuses.
-    require_once dirname(__FILE__).'/class.stagemodel.php';
-    $stageModel = new StageModel();
-    $stageModel->save('Open', 'Open', 'Make your vote count.');
-    $stageModel->save('Resolved', 'Closed', 'We\'ve resolved this one.');
-    $stageModel->save('Planned', 'Closed', 'It\'s in the works.');
-    $stageModel->save('Duplicate', 'Closed', 'We\'ve seen this one before.');
-    $stageModel->save('Won\'t Implement', 'Closed', 'Not a candidate.');
-    $stageModel->save('Implemented', 'Closed', 'All set.');
+    require_once dirname(__FILE__).'/class.statusmodel.php';
+    $statusModel = new StatusModel();
+    $statusModel->save('Open', 'Open');
+    $statusModel->save('Resolved', 'Closed');
+    $statusModel->save('Planned', 'Closed');
+    $statusModel->save('Duplicate', 'Closed');
+    $statusModel->save('Won\'t Implement', 'Closed');
+    $statusModel->save('Implemented', 'Closed');
 }
 
 Gdn::structure()
@@ -41,5 +40,5 @@ $reactionModel->defineReactionType(array('UrlCode' => IdeationPlugin::REACTION_U
 $reactionModel->defineReactionType(array('UrlCode' => IdeationPlugin::REACTION_DOWN, 'Name' => 'Down', 'Sort' => 101, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1, 'Hidden' => true, 'Active' => true,
     'Description' => "This reaction is reserved for idea downvotes."));
 
-touchConfig('Plugins.Ideation.DefaultStageID', 1);
+touchConfig('Plugins.Ideation.DefaultStatusID', 1);
 saveToConfig('Garden.AttachmentsEnabled', true);

@@ -5,14 +5,14 @@
  */
 
 /**
- * Writes attachments for Idea Stages.
+ * Writes attachments for Idea Statuses.
  *
  * @param array $attachment
  */
-function WriteStageAttachment($attachment) {
+function WriteStatusAttachment($attachment) {
     ?>
     <div class="item-attachment">
-        <div class="alert <?php echo strtolower(val('StageStatus', $attachment)); ?>">
+        <div class="alert <?php echo strtolower(val('Statusestate', $attachment)); ?>">
             <div class="media item">
                 <div class="pull-left">
                     <div class="media-object">
@@ -21,13 +21,13 @@ function WriteStageAttachment($attachment) {
                 </div>
                 <div class="media-body">
                     <div class="item-header">
-                        <h4 class="media-heading item-heading"><a href="<?php echo val('StageUrl', $attachment) ?>"><?php echo val('StageName', $attachment); ?></a> ·
-                            <span class="item-meta stage-description"><?php echo t('Last Updated').' '.Gdn_Format::Date($attachment['DateUpdated'], 'html'); ?></span>
-                            <div class="item-meta stage-description"><?php echo val('StageDescription', $attachment); ?></div>
+                        <h4 class="media-heading item-heading"><a href="<?php echo val('StatusUrl', $attachment) ?>"><?php echo val('StatusName', $attachment); ?></a> ·
+                            <span class="item-meta status-description"><?php echo t('Last Updated').' '.Gdn_Format::Date($attachment['DateUpdated'], 'html'); ?></span>
+                            <div class="item-meta status-description"><?php echo val('StatusDescription', $attachment); ?></div>
                         </h4>
                     </div>
                     <div class="item-body">
-                        <div class="stage-notes"><?php echo val('StageNotes', $attachment); ?></div>
+                        <div class="status-notes"><?php echo val('StatusNotes', $attachment); ?></div>
                     </div>
                 </div>
             </div>
