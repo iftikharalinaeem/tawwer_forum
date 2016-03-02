@@ -98,11 +98,11 @@ class PopularPostsModule extends Gdn_Module {
             switch($this->sortMethod) {
                 case 'date-desc':
                     uasort($discussions, function($a, $b) {
-                        if ($a['DateInserted'] === $b['DateInserted']) {
+                        if ($a->DateInserted === $b->DateInserted) {
                             return 0;
                         }
 
-                        return (strtotime($a['DateInserted']) > strtotime($b['DateInserted'])) ? -1 : 1;
+                        return (strtotime($a->DateInserted) > strtotime($b->DateInserted)) ? -1 : 1;
                     });
                 case 'date-asc':
                     $discussions = array_reverse($discussions, true);
