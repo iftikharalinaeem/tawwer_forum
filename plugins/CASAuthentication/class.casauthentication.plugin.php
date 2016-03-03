@@ -170,20 +170,43 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
 
     /**
     *
-    * @param Gdn_Controller $Sender
+    * @param SettingsController $sender
     */
-    public function settingsController_CAS_create($Sender) {
-        $Cf = new ConfigurationModule($Sender);
-        $Cf->initialize(array(
-            'Plugins.CASAuthentication.Host',
-            'Plugins.CASAuthentication.Context' => array('Control' => 'TextBox', 'Default' => '/cas'),
-            'Plugins.CASAuthentication.Port' => array('Control' => 'TextBox', 'Default' => 443),
-            'Plugins.CASAuthentication.ProfileUrl' => array('Control' => 'TextBox'),
-            'Plugins.CASAuthentication.RegisterUrl' => array('Control' => 'TextBox')
-        ));
-        $Sender->addSideMenu();
-        $Sender->title('CAS Settings');
-        $Cf->renderAll();
-    }
+    public function settingsController_CAS_create($sender) {
+        $sender->addSideMenu();
+        $sender->title('CAS Settings');
 
+        // Prevent non-admins from accessing this page
+        $sender->permission('Garden.Settings.Manage');
+        $sender->setData('PluginDescription', $this->getPluginKey('Description'));
+
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField([
+            'Plugins.CASAuthentication.Host',
+            'Plugins.CASAuthentication.Context' => c('Plugins.CASAuthentication.Context', '/cas'),
+            'Plugins.CASAuthentication.Port' => c('Plugins.CASAuthentication.Port', 443),
+            'Plugins.CASAuthentication.ProfileUrl',
+            'Plugins.CASAuthentication.RegisterUrl',
+        ]);
+
+        $sender->Form->setModel($configurationModel);
+
+        // If seeing the form for the first time...
+        if ($sender->Form->authenticatedPostBack() === false) {
+            $sender->Form->setData($configurationModel->Data);
+        } else {
+            $configurationModel->Validation->applyRule('Plugins.CASAuthentication.Host', 'Required');
+            $configurationModel->Validation->applyRule('Plugins.CASAuthentication.Context', 'Required');
+            $configurationModel->Validation->applyRule('Plugins.CASAuthentication.Port', 'Required');
+            $configurationModel->Validation->applyRule('Plugins.CASAuthentication.ProfileUrl', 'Required');
+            $configurationModel->Validation->applyRule('Plugins.CASAuthentication.RegisterUrl', 'Required');
+
+            if ($sender->Form->save()) {
+                $sender->informMessage(t('Your changes have been saved.'));
+            }
+        }
+
+        $sender->render($this->getView('configuration.php'));
+    }
 }
