@@ -120,10 +120,10 @@ class MultisiteModel extends Gdn_Model {
             return true;
         } elseif (valr('site.state', $deleteResponse) === 'deleted') {
             // The site was already deleted.
-            $this->deleteID($id);
+            return $this->delete([$this->PrimaryKey => $id]);
         } else {
             // The site has an error.
-            $error = $deleteQuery->errorMsg().' '.json_encode($deleteResponse, JSON_UNESCAPED_SLASHES);
+            $error = $deleteQuery->errorMsg();
             $this->Validation->AddValidationResult('MultisiteID', '@'.$error);
             return false;
         }
