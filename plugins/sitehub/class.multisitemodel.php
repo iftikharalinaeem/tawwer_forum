@@ -123,7 +123,7 @@ class MultisiteModel extends Gdn_Model {
             $this->deleteID($id);
         } else {
             // The site has an error.
-            $error = $deleteQuery->code().' '.$deleteQuery->errorMsg();
+            $error = $deleteQuery->code().' '.$deleteQuery->errorMsg().json_encode($deleteResponse);
             $this->Validation->AddValidationResult('MultisiteID', '@'.$error);
             return false;
         }
