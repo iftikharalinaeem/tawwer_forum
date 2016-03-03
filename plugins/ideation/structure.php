@@ -30,6 +30,19 @@ if (!$statusExists) {
     $statusModel->save(t('In Review'), 'Closed');
 }
 
+// Make sure that AllowedDiscussionTypes are explicitly set on Category
+$categories = CategoryModel::categories();
+$categoryModel = new CategoryModel();
+$discussionTypes = DiscussionModel::discussionTypes();
+if (val('Idea', $discussionTypes)) {
+    unset($discussionTypes['Idea']);
+}
+$discussionTypesString = serialize(array_keys($discussionTypes));
+foreach ($categories as $category) {
+    $sql = Gdn::sql();
+    $sql->put('Category', array('AllowedDiscussionTypes' => $discussionTypesString), array('AllowedDiscussionTypes' => NULL, 'CategoryID >' => -1));
+}
+
 Gdn::structure()
     ->table('Category')
     ->column('UseDownVotes', 'tinyint', true)
