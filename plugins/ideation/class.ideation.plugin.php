@@ -1,12 +1,16 @@
 <?php if (!defined('APPLICATION')) exit;
 
 $PluginInfo['ideation'] = [
-    'Name'        => "Ideation",
-    'Description' => "Let users vote on discussions in a Idea category",
-    'Version'     => '1.0.0',
-    'Author'      => "Becky Van Bussel",
-    'AuthorEmail' => 'becky@vanillaforums.com',
-    'License'     => 'Proprietary'
+    'Name'            => "Ideation",
+    'Description'     => "Let users vote on discussions in a Idea category",
+    'Version'         => '1.0.0',
+    'RequiredPlugins' => array(
+        'Reactions'   => '1.4.0',
+        'Tagging'     => '1.8.12'
+    ),
+    'Author'          => "Becky Van Bussel",
+    'AuthorEmail'     => 'becky@vanillaforums.com',
+    'License'         => 'Proprietary'
 ];
 
 /**
@@ -368,8 +372,7 @@ class IdeationPlugin extends Gdn_Plugin {
             'key' => 'Status',
             'name' => 'Status',
             'plural' => 'Statuses',
-            'addtag' => false,
-            'default' => false
+            'addtag' => false
         ]);
     }
 
