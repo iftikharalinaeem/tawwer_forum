@@ -681,6 +681,11 @@ class SiteNodePlugin extends Gdn_Plugin {
     public function gdn_session_end_handler($sender) {
         // Delete the hub cookie when signing out too.
         if (val(self::HUB_COOKIE, $_COOKIE)) {
+            ob_start();
+            debug_print_backtrace();
+            $trace = ob_end_clean();
+            Logger::event('session_end_node', Logger::INFO, ['trace' => $trace]);
+
             Gdn_CookieIdentity::DeleteCookie(SiteNodePlugin::HUB_COOKIE, '/');
         }
     }
