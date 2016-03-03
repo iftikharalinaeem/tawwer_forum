@@ -684,7 +684,7 @@ class SiteNodePlugin extends Gdn_Plugin {
             ob_start();
             debug_print_backtrace();
             $trace = ob_end_clean();
-            Logger::event('session_end_node', Logger::INFO, ['trace' => $trace]);
+            Logger::event('session_end_node', Logger::INFO, 'Hub session ending from node.', ['trace' => $trace]);
 
             Gdn_CookieIdentity::DeleteCookie(SiteNodePlugin::HUB_COOKIE, '/');
         }
