@@ -90,7 +90,7 @@ class MultisiteModel extends Gdn_Model {
 
         $valid = true;
 
-        if (!in_array($site['Status'], ['active', 'error'])) {
+        if (!in_array($site['Status'], ['active', 'error', 'building'])) {
             $this->Validation->AddValidationResult('Status', 'Cannot delete a site that isn\'t active.');
             $valid = false;
         }
@@ -123,7 +123,7 @@ class MultisiteModel extends Gdn_Model {
             $this->deleteID($id);
         } else {
             // The site has an error.
-            $error = $deleteQuery->code().' '.$deleteQuery->errorMsg().json_encode($deleteResponse);
+            $error = $deleteQuery->errorMsg();
             $this->Validation->AddValidationResult('MultisiteID', '@'.$error);
             return false;
         }
