@@ -282,7 +282,11 @@ class SiteNodePlugin extends Gdn_Plugin {
         $this->syncAuthenticators(val('Authenticators', $config, []));
 
         // Push the categories.
-        $this->pushCategories();
+        try {
+            $this->pushCategories();
+        } catch (Exception $ex) {
+            // Do nothing. The exception is logged.
+        }
 
         $this->FireEvent('AfterSync');
 
@@ -343,7 +347,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         $json = json_encode($post, JSON_PRETTY_PRINT);
 
-        $r = $this->hubApi('/multisites/syncnodecategories.json', 'POST', $post);
+        $r = $this->hubApi('/multisites/syncnodecategories.json', 'POST', $post, true);
         return $r;
     }
 
