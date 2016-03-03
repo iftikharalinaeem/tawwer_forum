@@ -90,7 +90,7 @@ class MultisiteModel extends Gdn_Model {
 
         $valid = true;
 
-        if (!in_array($site['Status'], ['active', 'error', 'building'])) {
+        if (!in_array($site['Status'], ['active', 'error', 'building', 'deleting'])) {
             $this->Validation->AddValidationResult('Status', 'Cannot delete a site that isn\'t active.');
             $valid = false;
         }
