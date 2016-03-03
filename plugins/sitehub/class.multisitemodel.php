@@ -118,7 +118,7 @@ class MultisiteModel extends Gdn_Model {
                 'SiteID' => valr('site.SiteID', $deleteResponse)
             ]);
             return true;
-        } elseif (valr('state', $deleteResponse) === 'deleted') {
+        } elseif (valr('site.state', $deleteResponse) === 'deleted') {
             // The site was already deleted.
             $this->deleteID($id);
         } else {
