@@ -256,10 +256,11 @@ class MultisitesController extends DashboardController {
             if (!$this->site['SiteID']) {
                 // There is no site associated with this role so just delete the row.
                 $this->siteModel->delete(['MultisiteID' => $this->site['MultisiteID']]);
-
                 $this->jsonTarget("#Multisite_{$this->site['MultisiteID']}", '', 'SlideUp');
             } elseif (!$this->siteModel->queueDelete($this->site['MultisiteID'])) {
                 $this->Form->SetValidationResults($this->siteModel->ValidationResults());
+            } else {
+                $this->jsonTarget("#Multisite_{$this->site['MultisiteID']} td.js-status", t('deleting'), 'Html');
             }
         }
 
