@@ -31,7 +31,7 @@ class MultisitesController extends DashboardController {
         $this->site = $this->siteModel->GetID($siteID);
     }
 
-    public function index($page = '') {
+    public function index($page = '', $sort = '') {
         switch ($this->Request->RequestMethod()) {
             case 'GET':
                 if ($this->site) {
@@ -60,8 +60,12 @@ class MultisitesController extends DashboardController {
         $this->form = new Gdn_Form();
         $this->form->Method = 'get';
 
+        if (!in_array(strtolower($sort), ['url', 'dateinserted'])) {
+            $sort = 'url';
+        }
+
         if ($search = $this->Request->Get('search')) {
-            $sites = $this->siteModel->search($search, 'Url', 'asc', $limit + 1, $offset)->ResultArray();
+            $sites = $this->siteModel->search($search, $sort, 'asc', $limit + 1, $offset)->ResultArray();
 
             // Select 1 more than page size so we can know whether or not to display the next link.
             $this->setData('_CurrentRecords', count($sites));
@@ -72,7 +76,7 @@ class MultisitesController extends DashboardController {
             $this->setData('Sites', $sites);
         } else {
             $where = [];
-            $this->setData('Sites', $this->siteModel->GetWhere($where, 'Url', 'asc', $limit, $offset)->ResultArray());
+            $this->setData('Sites', $this->siteModel->GetWhere($where, $sort, 'asc', $limit, $offset)->ResultArray());
             $this->setData('RecordCount', $this->siteModel->GetCount($where));
         }
 
