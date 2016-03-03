@@ -234,6 +234,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Get the config from the hub.
         $config = $this->hubApi('/multisites/nodeconfig.json', 'GET', ['from' => $this->slug()], true);
         if (!val('Sync', $config)) {
+            Logger::event('syncnode_skip', Logger::INFO, "The hub told us not to sync.");
             return;
         }
 
@@ -291,6 +292,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         $result = $this->hubApi("/multisites/$siteID.json", 'POST', ['DateLastSync' => $now, 'Status' => 'active'], true);
 
         Gdn::Config()->Shutdown();
+        Logger::event('syncnode_complete', Logger::INFO, "The node has completed it's sync.");
     }
 
     public function syncAuthenticators(array $authenticators) {
