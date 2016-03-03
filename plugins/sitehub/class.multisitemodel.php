@@ -120,7 +120,7 @@ class MultisiteModel extends Gdn_Model {
             return true;
         } else {
             // The site has an error.
-            $error = $deleteQuery->errorMsg();
+            $error = $deleteQuery->code().' '.$deleteQuery->errorMsg();
             $this->Validation->AddValidationResult('MultisiteID', '@'.$error);
             return false;
         }
