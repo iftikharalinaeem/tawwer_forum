@@ -581,7 +581,13 @@ class SiteNodePlugin extends Gdn_Plugin {
             // Check the cookie expiry here.
             $hubCookie = explode('|', val(self::HUB_COOKIE, $_COOKIE));
             $expiry = val(4, $hubCookie);
-            if($expiry < time()) {
+            if ($expiry < time()) {
+                Logger::event(
+                    'hubsso_expired',
+                    Logger::INFO,
+                    "Skipping hub SSO because the hub's cookie has expired.",
+                    ['cookieExpiry' => $expiry]
+                );
                 return;
             }
 
@@ -608,7 +614,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
                 Trace($user, 'hubSSO');
 
-                $user_id = Gdn::UserModel()->Connect($user['UniqueID'], self::PROVIDER_KEY, $user);
+                $user_id = Gdn::userModel()->connect($user['UniqueID'], self::PROVIDER_KEY, $user);
                 Trace($user_id, 'user ID');
                 if ($user_id) {
                     // Add additional authentication.
@@ -625,7 +631,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
                     Gdn::Session()->Start($user_id, true);
                 }
-            } catch(Exception $ex) {
+            } catch (Exception $ex) {
                 if ($ex->getCode() == 401) {
                     Gdn::Dispatcher()
                         ->PassData('Code', $ex->getCode())
