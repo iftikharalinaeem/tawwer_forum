@@ -45,6 +45,25 @@ class MultisiteModel extends Gdn_Model {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function delete($where = [], $options = []) {
+        if (!empty($where[$this->PrimaryKey])) {
+            $ids = (array)$where[$this->PrimaryKey];
+        } else {
+            $rows = $this->getWhere($where)->resultArray();
+            $ids = array_column($rows, $this->PrimaryKey);
+        }
+
+        $r = parent::delete($where, $options);
+
+        // Delete the NodeCategories too.
+        $this->SQL->delete('NodeCategory', [$this->PrimaryKey => $ids]);
+
+        return $r;
+    }
+
+    /**
      * Gets the singleton instance of this class.
      *
      * @return MultisiteModel Returns the singleton instance of this class.
