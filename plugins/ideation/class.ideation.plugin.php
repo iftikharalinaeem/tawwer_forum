@@ -528,9 +528,9 @@ class IdeationPlugin extends Gdn_Plugin {
         }
 
         if (isset($args['DiscussionOptions'])) {
-            $args['DiscussionOptions']['Status'] = ['Label' => sprintf(t('Edit %s'), t('Status')), 'Url' => '/discussion/statusoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup'];
+            $args['DiscussionOptions']['Status'] = ['Label' => sprintf(t('Edit %s'), t('Idea Status')), 'Url' => '/discussion/statusoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup'];
         } elseif (isset($sender->Options)) {
-            $sender->Options .= '<li>'.anchor(sprintf(t('Edit %s'), t('Status')), '/discussion/statusoptions?discussionid='.$discussion->DiscussionID, 'Popup').'</li>';
+            $sender->Options .= '<li>'.anchor(sprintf(t('Edit %s'), t('Idea Status')), '/discussion/statusoptions?discussionid='.$discussion->DiscussionID, 'Popup').'</li>';
         }
 
         if (isset($args['DiscussionOptions']['EditDiscussion'])) {
@@ -580,7 +580,7 @@ class IdeationPlugin extends Gdn_Plugin {
             $sender->setData('Statuses', $statuses);
             $sender->setData('StatusNotes', $notes);
             $sender->setData('CurrentStatusID', val('StatusID', StatusModel::getStatusByDiscussion($discussionID)));
-            $sender->setData('Title', sprintf(t('Edit %s'), t('Status')));
+            $sender->setData('Title', sprintf(t('Edit %s'), t('Idea Status')));
 
             $sender->render('StatusOptions', '', 'plugins/ideation');
         }
