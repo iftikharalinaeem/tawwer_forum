@@ -571,6 +571,8 @@ class SiteNodePlugin extends Gdn_Plugin {
      * @param Gdn_Dispatcher $sender
      */
     public function gdn_dispatcher_appStartup_handler($sender) {
+        Logger::event('hubsso_start', Logger::INFO, "Hub SSO start.");
+
         if (Gdn::PluginManager()->IsEnabled('sitehub')) {
             return;
         }
