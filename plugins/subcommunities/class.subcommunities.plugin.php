@@ -2,7 +2,7 @@
 
 $PluginInfo['subcommunities'] = array(
     'Name'        => "Subcommunities",
-    'Description' => "Allows you to use categories as virtual mini forums for multilingual or multi-product communities.",
+    'Description' => "Allows you to use top level categories as virtual mini forums for multilingual or multi-product communities.",
     'Version'     => '1.0.2',
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -21,7 +21,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
     protected $savedDefaultRoute = '';
     protected $savedDoHeadings = '';
-    protected $categoryIDs = null;
+
+    protected $categories;
 
     /// Methods ///
 
@@ -55,22 +56,35 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @return array Returns an array of category IDs
      */
     public function getCategoryIDs() {
-        if (!isset($this->categoryIDs)) {
+        static $categoryIDs = null;
+
+        if ($categoryIDs === null) {
+            $categories = $this->getCategories();;
+            $categoryIDs = array_keys($categories);
+        }
+        return $categoryIDs;
+    }
+
+    /**
+     * Get the categories for the current subcommunity.
+     *
+     * @return array Returns an array of categories
+     */
+    public function getCategories() {
+        if ($this->categories === null) {
             if ($this->api && SubCommunityModel::getCurrent() === null) {
-                $categories = CategoryModel::getSubtree(-1, false);
+                $this->categories = CategoryModel::getSubtree(-1, false);
             } else {
                 $site = SubcommunityModel::getCurrent();
                 $categoryID = val('CategoryID', $site);
 
                 // Get all of the category IDs associated with the subcommunity.
-                $categories = CategoryModel::getSubtree($categoryID, true);
+                $this->categories = CategoryModel::getSubtree($categoryID, true);
             }
-
-            $this->categoryIDs = array_keys($categories);
         }
-        return $this->categoryIDs;
-    }
 
+        return $this->categories;
+    }
     /**
      * Initialize the environment on a mini site.
      * @param array $site The site to set.
@@ -319,5 +333,46 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public static function instance() {
         return Gdn::pluginManager()->getPluginInstance(__CLASS__, Gdn_PluginManager::ACCESS_CLASSNAME);
+    }
+
+    /**
+     * Hook on CategoryModel's CategoryWatch event.
+     *
+     * Used to filter down the categories used in the normal search.
+     *
+     * @param $sender Sending controller instance.
+     * @param $args Event arguments.
+     */
+    public function gdn_pluginManager_categoryWatch_handler($sender, $args) {
+        $args['CategoryIDs'] = $this->getCategoryIDs();
+    }
+
+    /**
+     * Hook on AdvancedSearchPlugin's BeforeSearchCompilation event.
+     *
+     * Used to filter down the categories used in the advanced search
+     *
+     * @param $sender Sending controller instance.
+     * @param $args Event arguments.
+     */
+    public function advancedSearchPlugin_beforeSearchCompilation_handler($sender, $args) {
+        $allowsUncategorized = in_array(0, $args['Search']['cat']);
+        $args['Search']['cat'] = $this->getCategoryIDs();
+
+        if ($allowsUncategorized) {
+            $args['Search']['cat'][] = 0;
+        }
+    }
+
+    /**
+     * Hook on Gdn_Form BeforeCategoryDropDown event.
+     *
+     * Used to filter down the category dropdown when you are in a subcommunity.
+     *
+     * @param $sender Sending controller instance.
+     * @param $args Event arguments.
+     */
+    public function gdn_form_beforeCategoryDropDown_handler($sender, $args) {
+        $args['Options']['CategoryData'] =  $this->getCategories();
     }
 }
