@@ -121,32 +121,50 @@ class IdeationPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = &$sender->EventArguments['SideMenu'];
-        $menu->addLink('Forum', t('Statuses'), '/dashboard/settings/statuses', 'Garden.Settings.Manage', array('class' => 'nav-statuses'));
+        $menu->addLink('Forum', t('Idea Statuses'), '/dashboard/settings/statuses', 'Garden.Settings.Manage', array('class' => 'nav-statuses'));
     }
 
     /**
      * Adds ideation options to the categories setting page -> enabling ideation on a category and enabling downvotes.
      * Also manipulates the allowed discussion types options when ideation is enabled on a category.
-     * Ideas are the only discussion type allowed in an ideation category.
+     * Ideas are the only discussion type allowed in an ideation category. Existing idea categories cannot be changed
+     * into normal categories and existing normal categories cannot be changed into ideation categories.
      *
      * @param SettingsController $sender
      */
     public function settingsController_addEditCategory_handler($sender) {
-
-        $sender->addJsFile('ideation.js', 'plugins/ideation'); // Show/hide allowed discussions and downvote option
-
         $categoryID = val('CategoryID', $sender->Data);
-        $category = CategoryModel::categories($categoryID);
-        $ideaOptions = [];
+        $sender->Head->AddString(
+            <<<EOT
+<script>
+	jQuery(document).ready(function($) {
+    $('input[value="Idea"]').parents('label').hide();
+    });
+</script>'
+EOT
+        );
+        if (!$sender->Form->authenticatedPostBack()) {
+            $category = CategoryModel::categories($categoryID);
+            if ($categoryID && !$this->isIdeaCategory($category)) {
+                // Don't the ideation state of existing categories be changed.
+                return;
+            }
 
-        if ($this->isIdeaCategory($category)) {
-            $ideaOptions = ['checked' => 'checked'];
-        }
+            $sender->addJsFile('ideation.js', 'plugins/ideation'); // Show/hide allowed discussions and downvote option
 
-        $sender->Data['_ExtendedFields']['IsIdea'] = ['Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => '<strong>Ideation</strong> <small><a href="#">Learn more about ideas</a></small>', 'Options' => $ideaOptions];
-        $sender->Data['_ExtendedFields']['UseDownVotes'] = ['Name' => 'UseDownVotes', 'Control' => 'CheckBox'];
+            if (!$categoryID) {
+                $sender->Data['_ExtendedFields']['IsIdea'] = ['Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => '<strong>' . t('Ideation') . '</strong> <small><a href="http://docs.vanillaforums.com/addons/ideation/">' . sprintf(t('Learn more about %s'), t('ideas')) . '</a></small>'];
+            }
 
-        if ($sender->Form->authenticatedPostBack()) {
+            if ($this->isIdeaCategory($category)) {
+                $sender->title('Edit Idea Category');
+                $sender->Form->addHidden('Idea_Category', true);
+            }
+
+            $sender->Data['_ExtendedFields']['UseDownVotes'] = ['Name' => 'UseDownVotes', 'Control' => 'CheckBox'];
+
+        } else {
+
             $isIdea = $sender->Form->getValue('Idea_Category');
 
             if ($isIdea) {
@@ -185,7 +203,7 @@ class IdeationPlugin extends Gdn_Plugin {
         if (!$statusID) {
             throw NotFoundException('Status');
         }
-        $sender->title(sprintf(t('Edit %s'), t('Status')));
+        $sender->title(sprintf(t('Edit %s'), t('Idea Status')));
         $this->addEdit($sender, $statusID);
     }
 
@@ -196,7 +214,7 @@ class IdeationPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function settingsController_addStatus_create($sender) {
-        $sender->title(sprintf(t('Add %s'), t('Status')));
+        $sender->title(sprintf(t('Add %s'), t('Idea Status')));
         $this->addEdit($sender);
     }
 
