@@ -2,9 +2,9 @@
  * Create a new analytics dashboard object.
  * @class
  * @param {object} config Configuration details for this dashboard.
- * @param {object} start A Date object representing the start of the date range.
- * @param {object} end A Date object representing the end of the date range.
- * @param {number} initialCategoryID A category's unique ID to limit the results to.
+ * @param {object} [start] A Date object representing the start of the date range.
+ * @param {object} [end] A Date object representing the end of the date range.
+ * @param {number} [initialCategoryID] A category's unique ID to limit the results to.
  */
 function AnalyticsDashboard (config, start, end, initialCategoryID) {
 

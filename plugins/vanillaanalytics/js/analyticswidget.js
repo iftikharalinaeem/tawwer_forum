@@ -82,10 +82,14 @@ function AnalyticsWidget(config) {
     /**
      * Create the widget's elements in the DOM.
      */
-    this.createElements = function() {
-        var oldElements = this.getElements();
-        if (oldElements !== null) {
-            oldElements.container.parentNode.removeChild(oldElements.container);
+    this.createElements = function(removeExisting) {
+        removeExisting = typeof removeExisting === 'undefined' ? true : !!removeExisting;
+
+        if (removeExisting) {
+            var existingElements = this.getElements();
+            if (existingElements !== null) {
+                existingElements.container.parentNode.removeChild(oldElements.container);
+            }
         }
 
         // Setup the document elements we'll be using.
@@ -129,10 +133,14 @@ function AnalyticsWidget(config) {
 
     /**
      * Retrieve this widget's DOM element.
-     * @param {string} child
+     * @param {string} [child]
      * @returns {null|object}
      */
     this.getElements = function(child) {
+        if (elements === null) {
+            this.createElements(false);
+        }
+
         if (typeof child === 'string') {
             if (typeof elements[child] !== 'undefined') {
                 return elements[child];
@@ -232,21 +240,31 @@ function AnalyticsWidget(config) {
             replace = name.replace('01', '02');
         }
 
-        data['query']['groupBy'] = data['query']['groupBy'].replace(find, replace);
-    }
+        var groupBy = this.getHandler().getQueryParam('groupBy');
+        this.getHandler().updateQueryParams({
+            groupBy: groupBy.replace(find, replace)
+        });
+    };
 
     this.setHandler = function(newHandler) {
         if (typeof newHandler === 'string' && typeof window[newHandler] === 'function') {
-            handler = window[newHandler];
+            var widgetData = this.getData();
+            handler = new window[newHandler]({
+                chartConfig: widgetData.chartConfig,
+                query      : widgetData.query,
+                range      : this.getTimeframe(),
+                title      : this.getTitle(),
+                type       : this.getType()
+            });
+        } else if (typeof newHandler === 'object') {
+            handler = newHandler;
+        } else {
+            throw 'Invalid value for newHandler';
         }
     };
 
     this.setInterval = function(newInterval) {
-        if (data['query'] === undefined || !data['query']['interval']) {
-            return false;
-        }
-
-        data['query']['interval'] = newInterval;
+        this.getHandler().setInterval(newInterval);
         return true;
     };
 
@@ -312,10 +330,6 @@ AnalyticsWidget.prototype.loadConfig = function(config) {
         this.setData(config.data);
     }
 
-    if (typeof config.handler !== 'undefined') {
-        this.setHandler(config.handler);
-    }
-
     if (typeof config.supports !== 'undefined') {
         this.addSupport(config.supports);
     }
@@ -337,6 +351,10 @@ AnalyticsWidget.prototype.loadConfig = function(config) {
             this.setTimeframe(config.timeframe.start, config.timeframe.end);
         }
     }
+
+    if (typeof config.handler !== 'undefined') {
+        this.setHandler(config.handler);
+    }
 };
 
 /**
@@ -344,19 +362,11 @@ AnalyticsWidget.prototype.loadConfig = function(config) {
  * @throws Throw an error if unable to find a compatible handler for this widget.
  */
 AnalyticsWidget.prototype.render = function() {
-    if (this.getElements() === null) {
-        this.createElements();
-    }
-
     // We need a class available to handle the widget.  Verify we have one available on the page.
     var handler = this.getHandler();
 
     if (handler !== null) {
-        // Setup an instance of our widget object.
-        var timeframe = this.getTimeframe();
-        var trackerWidget = new handler(timeframe.start, timeframe.end, this.getData(), this.getType(), this.getTitle());
-
-        trackerWidget.writeContents(this.getElements('body'));
+        handler.writeContents(this.getElements('body'));
     } else {
         throw 'No data handler configured for widget';
     }
