@@ -717,7 +717,7 @@ EOT
         $attachment['Type'] = 'status';
         $attachment['StatusName'] = val('Name', $status);
         $attachment['StatusDescription'] = val('Description', $status);
-        $attachment['Statusestate'] = val('State', $status);
+        $attachment['StatusState'] = val('State', $status);
         $attachment['StatusNotes'] = $statusNotes;
         $attachment['StatusUrl'] = url('/discussions/tagged/'.urlencode(val('StatusName', $attachment)));
         $attachment['DateUpdated'] = Gdn_Format::toDateTime();

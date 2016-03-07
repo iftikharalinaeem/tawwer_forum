@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2014 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
@@ -12,23 +12,18 @@
 function WriteStatusAttachment($attachment) {
     ?>
     <div class="item-attachment">
-        <div class="alert <?php echo strtolower(val('Statusestate', $attachment)); ?>">
-            <div class="media item">
+        <div class="alert alert-info <?php echo strtolower(val('StatusState', $attachment)); ?>">
+            <div class="media">
                 <div class="pull-left">
                     <div class="media-object">
                         <?php echo Gdn::controller()->data('IdeaCounter', ''); ?>
                     </div>
                 </div>
                 <div class="media-body">
-                    <div class="item-header">
-                        <h4 class="media-heading item-heading"><a href="<?php echo val('StatusUrl', $attachment) ?>"><?php echo val('StatusName', $attachment); ?></a> ·
-                            <span class="item-meta status-description"><?php echo t('Last Updated').' '.Gdn_Format::Date($attachment['DateUpdated'], 'html'); ?></span>
-                            <div class="item-meta status-description"><?php echo val('StatusDescription', $attachment); ?></div>
-                        </h4>
-                    </div>
-                    <div class="item-body">
-                        <div class="status-notes"><?php echo val('StatusNotes', $attachment); ?></div>
-                    </div>
+                    <h4 class="media-heading status-heading"><a href="<?php echo val('StatusUrl', $attachment) ?>"><?php echo val('StatusName', $attachment); ?></a> ·
+                        <small class="status-meta"><?php echo t('Last Updated').' '.Gdn_Format::Date($attachment['DateUpdated'], 'html'); ?></small>
+                    </h4>
+                    <p class="status-notes"><?php echo val('StatusNotes', $attachment); ?></p>
                 </div>
             </div>
         </div>

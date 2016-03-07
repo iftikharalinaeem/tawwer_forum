@@ -36,9 +36,15 @@ $icon-caret-place-adjustment: -($icon-caret-width/4);
 }
 
 // When clearfixing the .Item class, we gotta take care of a few things in the base theme.
-.PanelColumn {
+#Panel.PanelColumn {
   position: absolute;
+  float: none;
   margin: 0;
+}
+
+// Embed-friendly hack
+.BreadcrumbsWrapper.P + .PanelColumn {
+  right: 0;
 }
 
 .DataTable.DiscussionsTable {

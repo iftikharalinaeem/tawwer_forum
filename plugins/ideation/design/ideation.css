@@ -2,9 +2,13 @@
   float: left;
   margin-right: 10px; }
 
-.PanelColumn {
+#Panel.PanelColumn {
   position: absolute;
+  float: none;
   margin: 0; }
+
+.BreadcrumbsWrapper.P + .PanelColumn {
+  right: 0; }
 
 .DataTable.DiscussionsTable {
   table-layout: auto; }

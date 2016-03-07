@@ -20,7 +20,7 @@ class StatusModel extends Gdn_Model {
      *
      * @param string $name The name of the status.
      * @param string $state Either 'Open' or 'Closed'.
-     * @param int $isDefault Whether the stage is default or not.
+     * @param int $isDefault Whether the status is default or not.
      * @param int $statusID The ID of the status. Use if updating.
      * @return bool|int The ID of the saved status.
      * @throws Exception
