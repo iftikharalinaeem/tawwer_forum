@@ -5,7 +5,7 @@ $(document).ready(function() {
         return;
     }
 
-    dashboard = new AnalyticsDashboard(dashboardConfig);
+    var dashboard = new AnalyticsDashboard(dashboardConfig);
     dashboard.writeDashboard();
 
     window.analyticsDashboard = dashboard;
