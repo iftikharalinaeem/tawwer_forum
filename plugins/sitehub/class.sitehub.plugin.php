@@ -28,7 +28,28 @@ class SiteHubPlugin extends Gdn_Plugin {
     const HUB_COOKIE = 'vf_hub_ENDTX';
     const NODE_COOKIE = 'vf_node_ENDTX';
 
+    const EMAIL_MATCH_SUBJECT = 'subject';
+    const EMAIL_MATCH_TO = 'to';
+
+    /**
+     * @var string The regular expression stub to be used to match a node/category from an incoming email.
+     */
+    protected $emailRegex;
+
+    /**
+     * @var string What part of an email to match to find the node/category.
+     */
+    protected $emailMatch;
+
     /// Methods ///
+
+    /**
+     * Initialize a new instance of the {@link SiteHubPlugin} .
+     */
+    public function __construct() {
+        $this->emailRegex = c('SiteHub.EmailRegex', '(?:(?<category>[a-z0-9_-]+)\.)?(?<node>[a-z0-9_-]+)');
+        $this->emailMatch = c('SiteHub.EmailMatch', self::EMAIL_MATCH_TO);
+    }
 
     public function setup() {
         $this->structure();
@@ -107,6 +128,24 @@ class SiteHubPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Get the regular expression used to extract nodes/categories from email addresses.
+     *
+     * @return string Returns a regular expression as a string.
+     */
+    public function getEmailAddressRegex() {
+        return "`{$this->emailRegex}@`i";
+    }
+
+    /**
+     * Get the regular expression used to extract nodes/categories from an email subject.
+     *
+     * @return string string Returns a regular expression as a string.
+     */
+    public function getEmailSubjectRegex() {
+        return "`^{$this->emailRegex}`i";
+    }
+
     /// Event Handlers ///
 
 
@@ -128,6 +167,80 @@ class SiteHubPlugin extends Gdn_Plugin {
             'Description' => 'Specify how this category synchronizes to the node sites.',
             'Items' => ['' => 'None', 'settings' => 'Settings']
         ];
+    }
+
+    /**
+     * Tell the email router which node to route an email to.
+     *
+     * @param Gdn_Controller $sender The controller dispatching this endpoint.
+     */
+    public function utilityController_emailRoute_create($sender) {
+        if (!$sender->Request->isPostBack()) {
+            throw forbiddenException('GET');
+        }
+
+        $email = $sender->Request->post('Email');
+        $subject = trim($sender->Request->post('Subject'));
+
+        $valid = false;
+        switch ($this->emailMatch) {
+            case self::EMAIL_MATCH_SUBJECT:
+                // Check for a subject that uses square brackets first.
+                if (stringBeginsWith($subject, '[')) {
+                    $subject = substr($subject, 1);
+                    if ($pos = strpos($subject, ']')) {
+                        $subject = trim(substr($subject, 0, $pos));
+                    }
+                }
+
+                $sender->setData('Tested', $subject);
+                $valid = preg_match($this->getEmailSubjectRegex(), $subject, $matches);
+                break;
+            case self::EMAIL_MATCH_TO:
+                $sender->setData('Tested', $email);
+                $valid = preg_match($this->getEmailAddressRegex(), $email, $matches);
+                break;
+        }
+
+        if ($valid) {
+            $nodeSlug = val('node', $matches, null);
+            $categorySlug = val('category', $matches, null);
+
+            if ($nodeSlug) {
+                $node = MultisiteModel::instance()->getWhere(['Slug' => $nodeSlug])->firstRow(DATASET_TYPE_ARRAY);
+            }
+            if ($nodeSlug !== null && empty($node)) {
+                throw notFoundException('Site');
+            }
+
+            if ($categorySlug) {
+                $where = ['UrlCode' => $categorySlug];
+
+                if ($node) {
+                    $where['MultisiteID'] = $node['MultisiteID'];
+                }
+                $category = Gdn::sql()->getWhere('NodeCategory', $where)->firstRow(DATASET_TYPE_ARRAY);
+
+                if ($category && empty($node)) {
+                    $node = MultisiteModel::instance()->getID($category['MultisiteID']);
+                }
+            }
+
+            if (!empty($node)) {
+                $sender->setData('Url', $node['FullUrl']);
+            }
+            if (!empty($category)) {
+                $sender->setData('Data', ['CategoryID' => $category['CategoryID']]);
+            }
+        } else {
+            throw notFoundException(sprintf('The email %s did not match.', $this->emailMatch));
+        }
+
+        if (!$sender->data('Url')) {
+            throw notFoundException('Site');
+        }
+
+        $sender->render('Blank');
     }
 
     /**
