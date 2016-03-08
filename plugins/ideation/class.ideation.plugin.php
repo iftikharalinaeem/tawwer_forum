@@ -1039,7 +1039,7 @@ EOT
         if (!$categoryID || !$this->isIdeaCategory(CategoryModel::categories($categoryID))) {
             return;
         }
-        $discussionSortFilterModule = new DiscussionsSortFilterModule($categoryID);
+        $discussionSortFilterModule = new DiscussionsSortFilterModule($categoryID, $sender->data('Sort', ''), $sender->data('Filters', []));
         echo $discussionSortFilterModule;
     }
 
