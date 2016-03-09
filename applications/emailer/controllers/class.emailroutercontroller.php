@@ -17,6 +17,7 @@ class EmailRouterController extends Gdn_Controller {
    public $Aliases = [
       'adobeprerelease' => 'https://forums.adobeprerelease.com',
       'adobeprereleasestage' => 'https://forums.stage.adobeprerelease.com',
+      'adobeprereleasestaging' => 'https://forums.stage.adobeprerelease.com',
       'vanilladev' => 'http://vanilla.dev'
    ];
 
@@ -281,7 +282,12 @@ class EmailRouterController extends Gdn_Controller {
                      $Data[$To] = $To;
                   }
                } else {
-                  $Domain = $ToParts[0].'.'.$this->emailDomains[$emailDomain];
+                  $subdomain = $ToParts[0];
+                  $Domain = "$subdomain.{$this->emailDomains[$emailDomain]}";
+
+                  if (strpos($subdomain, '-') !== false) {
+                     $Url = $this->fixMultisiteDomain($Domain)."/utility/email.json";
+                  }
                }
 
                if (empty($Url)) {
@@ -512,5 +518,48 @@ class EmailRouterController extends Gdn_Controller {
       }
       $Result = trim(implode("\n", $Lines));
       return $Result;
+   }
+
+   /**
+    * Look up a site and see what it should be called as.
+    *
+    * Nodes will use their Vanilla name convention by default (i.e. slug-node.vanillaforums.com). A node with this URL
+    * cannot be called directly and must fall back to its multisite format.
+    *
+    * @param string $host The hostname to look at.
+    */
+   private function fixMultisiteDomain($host) {
+      $default = "http://$host";
+
+      if (!class_exists('Communication')) {
+         return $default;
+      }
+
+      // Look up the site ID.
+      list($code, $queryResponse) = Communication::orchestration('/site/query')
+          ->method('get')
+          ->parameter('query', $host)
+          ->parameter('users', 0)
+          ->parameter('verbose', 0)
+          ->send();
+      if (empty(val('sites', $queryResponse))) {
+         return $default;
+      }
+
+      // Look up the site.
+      list($code, $siteResponse) = Communication::orchestration('/site/full')
+          ->method('get')
+          ->parameter('siteid', valr('sites.0.SiteID', $queryResponse))
+          ->send();
+
+      if ($code == 200 && is_array(val('multisite', $siteResponse))) {
+         // This is a multisite and must use a different URL format.
+         $multisite = $siteResponse['multisite'];
+         $result = "https://{$multisite['real']}";
+         return $result;
+      }
+
+      return $default;
+
    }
 }
