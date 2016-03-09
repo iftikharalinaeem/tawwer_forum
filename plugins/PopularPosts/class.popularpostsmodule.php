@@ -89,17 +89,14 @@ class PopularPostsModule extends Gdn_Module {
 
             $discussionsIDs = [];
             foreach($discussionsLists as $discussionsList) {
-                $discussionsIDs[] = $discussionsList['GroupedDiscussionIDs'];
+                $discussionsIDs += explode(',', $discussionsList['GroupedDiscussionIDs']);
             }
 
-            $query = "
-                select
-                    GDN_Discussion.*
-                from GDN_Discussion
-                    where DiscussionID in (".implode(',', $discussionsIDs).");
-            ";
-
-            $discussions = Gdn::sql()->query($query)->result();
+            $discussions = Gdn::sql()
+                ->select('*')
+                ->from('Discussion')
+                ->whereIn('DiscussionID', $discussionsIDs)
+                ->get();
 
             // Index discussions by categories for easier filtering later on.
             $discussionsByCategories = [];
