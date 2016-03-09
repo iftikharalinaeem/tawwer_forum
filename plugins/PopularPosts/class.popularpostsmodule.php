@@ -61,7 +61,7 @@ class PopularPostsModule extends Gdn_Module {
         }
 
         // Max age in days
-        $maxAge = 60 * 60 * 24 * c('PopularPosts.MaxAge', 300);
+        $maxAge = 60 * 60 * 24 * c('PopularPosts.MaxAge', 30);
         $minDateInserted = date('Y-m-d', time() - $maxAge);
 
         $countCommentPerPage = ctype_digit((string)$this->CountCommentsPerPage) ? $this->CountCommentsPerPage : 10;
@@ -85,7 +85,7 @@ class PopularPostsModule extends Gdn_Module {
                                 $countCommentPerPage
                             ) as GroupedDiscussionIDs
                         from GDN_Discussion
-                        where DateInserted >= '$minDateInserted'
+                        where GDN_Discussion.DateInserted >= '$minDateInserted'
                         group by GDN_Discussion.CategoryID
                     ) as tmp
                     /* Join discussion on matching category and then on discussion id
