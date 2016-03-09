@@ -200,8 +200,8 @@ class EmailRouterController extends Gdn_Controller {
                }
             }
             
-            $LogModel = new Gdn_Model('EmailLog');
-            $Data['Post'] = http_build_query($Data, '', '&');
+            $LogModel = new EmailLogModel();
+            $Data['Post'] = $Data;
             $Data['Charsets'] = GetValue('charsets', $Post, NULL);
 
             if ($this->isOutOfOffice($Headers, $Data)) {
@@ -259,7 +259,7 @@ class EmailRouterController extends Gdn_Controller {
 
                   if (!empty($forwardInfo)) {
                      $Url = val('Url', $forwardInfo).'/utility/email.json';
-                     $Data = array_replace($Data, val('Data', $forwardInfo, []));
+                     $Data['Post'] = array_replace($Data['Post'], val('Data', $forwardInfo, []));
                   } else {
                      array_pop($ToParts); // pop node name
 
@@ -312,7 +312,7 @@ class EmailRouterController extends Gdn_Controller {
 //            curl_setopt($C, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
             curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($C, CURLOPT_POST, 1);
-            curl_setopt($C, CURLOPT_POSTFIELDS, $Data['Post']);
+            curl_setopt($C, CURLOPT_POSTFIELDS, http_build_query($Data['Post'], '', '&'));
             
             $Result = curl_exec($C);
             $Code = curl_getinfo($C, CURLINFO_HTTP_CODE);
@@ -322,10 +322,10 @@ class EmailRouterController extends Gdn_Controller {
                if ($ResultData) {
                   $this->Data = $Data;
                }
-               $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Result));
+               $LogModel->SetField($LogID, array('Post' => $Data['Post'], 'Response' => $Code, 'ResponseText' => $Result));
             } else {
                $Error = curl_error($C)."\n\n$Result";
-               $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Error));
+               $LogModel->SetField($LogID, array('Post' => $Data['Post'], 'Response' => $Code, 'ResponseText' => $Error));
 
                if ($Code != 404) {
                   throw new Exception($Error, $Code);
