@@ -27,20 +27,7 @@ if (!$statusExists) {
     $statusModel->save(t('Declined'), 'Closed');
     $statusModel->save(t('Completed'), 'Closed');
     $statusModel->save(t('In Progress'), 'Closed');
-    $statusModel->save(t('In Review'), 'Closed');
-}
-
-// Make sure that AllowedDiscussionTypes are explicitly set on Category
-$categories = CategoryModel::categories();
-$categoryModel = new CategoryModel();
-$discussionTypes = DiscussionModel::discussionTypes();
-if (val('Idea', $discussionTypes)) {
-    unset($discussionTypes['Idea']);
-}
-$discussionTypesString = serialize(array_keys($discussionTypes));
-foreach ($categories as $category) {
-    $sql = Gdn::sql();
-    $sql->put('Category', array('AllowedDiscussionTypes' => $discussionTypesString), array('AllowedDiscussionTypes' => NULL, 'CategoryID >' => -1));
+    $statusModel->save(t('In Review'), 'Open');
 }
 
 Gdn::structure()
@@ -48,10 +35,11 @@ Gdn::structure()
     ->column('UseDownVotes', 'tinyint', true)
     ->set();
 
+// Make sure we've got the needed reactions
 $reactionModel = new ReactionModel();
-$reactionModel->defineReactionType(array('UrlCode' => IdeationPlugin::REACTION_UP, 'Name' => 'Up', 'Sort' => 100, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'IncrementValue' => 1, 'Points' => 1, 'Hidden' => true, 'Active' => true,
-    'Description' => "This reaction is reserved for idea upvotes."));
-$reactionModel->defineReactionType(array('UrlCode' => IdeationPlugin::REACTION_DOWN, 'Name' => 'Down', 'Sort' => 101, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1, 'Hidden' => true, 'Active' => true,
-    'Description' => "This reaction is reserved for idea downvotes."));
+$reactionModel->defineReactionType(array('UrlCode' => 'Down', 'Name' => 'Vote Down', 'Sort' => 7, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
+    'Description' => "A down vote is a general disapproval of a post. Enough down votes will bury a post."));
+$reactionModel->defineReactionType(array('UrlCode' => 'Up', 'Name' => 'Vote Up', 'Sort' => 8, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'Points' => 1,
+    'Description' => "An up vote is a general approval of a post. Enough up votes will promote a post."));
 
 saveToConfig('Garden.AttachmentsEnabled', true);

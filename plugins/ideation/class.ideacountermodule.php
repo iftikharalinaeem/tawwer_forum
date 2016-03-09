@@ -110,7 +110,7 @@ class IdeaCounterModule extends Gdn_Module {
                 $score = '0';
             }
             $discussionID = val('DiscussionID', $this->discussion);
-            $status = StatusModel::getStatusByDiscussion($discussionID);
+            $status = StatusModel::instance()->getStatusByDiscussion($discussionID);
             $this->isOpen = (val('State', $status) == 'Open');
             $counter = array();
             $counter['upUrl'] = url('/react/discussion/'.$this->ideaUpReactionSlug.'?id='.$discussionID.'&selfreact=true');
@@ -166,9 +166,9 @@ if (!function_exists('renderCounterBox')) {
                     <div class="vote idea-menu">
                         <span class="idea-buttons">
                             <?php
-                            echo getReactionButtonHtml('ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter), val('upUrl', $counter), 'Up', 'data-reaction="'.strtolower($ideaUpReactionSlug).'"');
+                            echo getReactionButtonHtml('ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter), val('upUrl', $counter), $ideaUpReactionSlug, strtolower($ideaUpReactionSlug), 'data-reaction="'.strtolower($ideaUpReactionSlug).'"');
                             if ($useDownVotes) {
-                                echo getReactionButtonHtml('ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter), val('downUrl', $counter), 'Down', 'data-reaction="'.strtolower($ideaDownReactionSlug).'"');
+                                echo getReactionButtonHtml('ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter), val('downUrl', $counter), $ideaDownReactionSlug, strtolower($ideaDownReactionSlug), 'data-reaction="'.strtolower($ideaDownReactionSlug).'"');
                             }
                             ?>
                         </span>

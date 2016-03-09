@@ -25,12 +25,12 @@ class IdeationPlugin extends Gdn_Plugin {
     /**
      * The Reaction name of the upvote.
      */
-    const REACTION_UP = 'IdeaUp';
+    const REACTION_UP = 'Up';
 
     /**
      * The Reaction name of the downvote.
      */
-    const REACTION_DOWN = 'IdeaDown';
+    const REACTION_DOWN = 'Down';
 
     /**
      * @var int The tag ID of the upvote reaction.
@@ -236,11 +236,11 @@ EOT
             if ($result) {
                 $sender->informMessage(t('Your changes have been saved.'));
                 $sender->RedirectUrl = url('/settings/statuses');
-                $sender->setData('Status', StatusModel::getStatus($result));
+                $sender->setData('Status', StatusModel::instance()->getStatus($result));
             }
         } elseif ($statusID) {
             // We're about to edit, set up the data from the status.
-            $data = StatusModel::getStatus($statusID);
+            $data = StatusModel::instance()->getStatus($statusID);
             if (!$data) {
                 throw NotFoundException('Status');
             }
@@ -279,7 +279,7 @@ EOT
      */
     public function settingsController_statuses_create($sender) {
         $sender->permission('Garden.Settings.Manage');
-        $sender->setData('Statuses', StatusModel::getStatuses());
+        $sender->setData('Statuses', StatusModel::instance()->getStatuses());
         $sender->setData('Title', sprintf(t('All %s'), t('Statuses')));
         $sender->addSideMenu();
         $sender->render('statuses', '', 'plugins/ideation');
@@ -318,7 +318,7 @@ EOT
         $categoryCode = val(0, $args, '');
         $sender->setData('Type', 'Idea');
         $sender->Form->setFormValue('Type', 'Idea');
-        $sender->Form->setFormValue('Tags', val('TagID', StatusModel::getDefaultStatus()));
+        $sender->Form->setFormValue('Tags', val('TagID', StatusModel::instance()->getDefaultStatus()));
         $sender->View = 'discussion';
         $sender->discussion($categoryCode);
     }
@@ -402,7 +402,7 @@ EOT
      */
     public function discussionModel_reservedTags_handler($sender, $args) {
         if (isset($args['ReservedTags'])) {
-            $statuses = StatusModel::getStatuses();
+            $statuses = StatusModel::instance()->getStatuses();
             foreach ($statuses as $status) {
                 $tagName = val('Name', TagModel::instance()->getID(val('TagID', $status)));
                 $args['ReservedTags'][] = $tagName;
@@ -421,7 +421,7 @@ EOT
         if (!$this->isIdea($discussion)) {
             return;
         }
-        $status = StatusModel::getStatusByDiscussion(val('DiscussionID', $discussion));
+        $status = StatusModel::instance()->getStatusByDiscussion(val('DiscussionID', $discussion));
         if ($status) {
             echo getStatusTagHtml(val('Name', $status));
         }
@@ -588,7 +588,7 @@ EOT
                 Gdn::controller()->jsonTarget('', '', 'Refresh');
             }
 
-            $statuses = StatusModel::getStatuses();
+            $statuses = StatusModel::instance()->getStatuses();
             foreach($statuses as &$status) {
                 $status = val('Name', $status);
             }
@@ -597,7 +597,7 @@ EOT
             $sender->setData('Discussion', $discussion);
             $sender->setData('Statuses', $statuses);
             $sender->setData('StatusNotes', $notes);
-            $sender->setData('CurrentStatusID', val('StatusID', StatusModel::getStatusByDiscussion($discussionID)));
+            $sender->setData('CurrentStatusID', val('StatusID', StatusModel::instance()->getStatusByDiscussion($discussionID)));
             $sender->setData('Title', sprintf(t('Edit %s'), t('Idea Status')));
 
             $sender->render('StatusOptions', '', 'plugins/ideation');
@@ -625,7 +625,7 @@ EOT
             return;
         }
         $discussionID = val('DiscussionID', $discussion);
-        $newStatus = StatusModel::getStatus($statusID);
+        $newStatus = StatusModel::instance()->getStatus($statusID);
         $this->updateDiscussionStatusTag($discussionID, $statusID);
         if ($notes) {
             $this->updateDiscussionStatusNotes($discussionID, $notes);
@@ -644,12 +644,12 @@ EOT
     protected function updateDiscussionStatusTag($discussionID, $statusID) {
         // TODO: Logging. We shoud probably keep a record of this.
 
-        $oldStatus = StatusModel::getStatusByDiscussion($discussionID);
+        $oldStatus = StatusModel::instance()->getStatusByDiscussion($discussionID);
         // Don't change anything if nothing's changed.
         if (val('StatusID', $oldStatus) != $statusID) {
 
             // Save tag info in TagDiscussion
-            $status = StatusModel::getStatus($statusID);
+            $status = StatusModel::instance()->getStatus($statusID);
             $tags = [val('TagID', $status)];
             TagModel::instance()->saveDiscussion($discussionID, $tags, ['Status']);
 
@@ -699,7 +699,7 @@ EOT
             $attachment = $attachmentModel->getWhere(['ForeignID' => 'd-'.$discussionID])->resultArray();
             if (empty($attachment)) {
                 // We've got a new idea, add an attachment.
-                $this->updateAttachment(val('DiscussionID', $args), val('StatusID', StatusModel::getDefaultStatus()), '');
+                $this->updateAttachment(val('DiscussionID', $args), val('StatusID', StatusModel::instance()->getDefaultStatus()), '');
             }
         }
     }
@@ -713,7 +713,7 @@ EOT
      */
     protected function updateAttachment($discussionID, $statusID, $statusNotes) {
 
-        $status = StatusModel::getStatus($statusID);
+        $status = StatusModel::instance()->getStatus($statusID);
         $attachment['Type'] = 'status';
         $attachment['StatusName'] = val('Name', $status);
         $attachment['StatusDescription'] = val('Description', $status);
@@ -755,7 +755,8 @@ EOT
      */
 
     /**
-     * Shuts down any reacting to ideas with closed states.
+     * Shuts down any reacting to ideas with closed states and make upvote/downvotes active nomatter what it says
+     * in the reaction list dashboard.
      *
      * @param ReactionModel $sender
      * @param array $args
@@ -767,6 +768,8 @@ EOT
                 if (strtolower(val('RecordType', $args) == 'discussion')
                     && (val('State', $statusModel->getStatusByDiscussion(val('RecordID', $args))) == 'Closed')) {
                     $args['ReactionType']['Active'] = false;
+                } else {
+                    $args['ReactionType']['Active'] = true;
                 }
             }
         }
@@ -783,6 +786,11 @@ EOT
      * @param array $args
      */
     public function reactionsPlugin_reactionsButtonReplacement_handler($sender, $args) {
+        $discussion = val('Record', $args);
+        if (val('Type', $discussion) != 'Idea') {
+            return;
+        }
+
         if ($urlCode = val('UrlCode', $args)) {
             if ($urlCode != self::REACTION_UP && $urlCode != self::REACTION_DOWN) {
                 return;
@@ -797,7 +805,6 @@ EOT
             $vote = self::REACTION_UP;
         }
 
-        $discussion = val('Record', $args);
         $reaction = ReactionModel::ReactionTypes($urlCode);
         $cssClass = '';
 
@@ -862,7 +869,7 @@ EOT
      *
      * @param Gdn_DataSet $discussions
      */
-    public function addUserVotesToDiscussions($discussions) {
+    protected function addUserVotesToDiscussions($discussions) {
         $userVotes = $this->getUserVotes();
         if (!$userVotes) {
             return;
@@ -938,7 +945,7 @@ EOT
      * @param array|object $user The user to get the reaction from. If not provided, gets the sessioned user.
      * @return string The urlCode of the Idea* reaction of the user's on a discussion
      */
-    public function getUserVoteReaction($discussion = null, $user = null) {
+    protected function getUserVoteReaction($discussion = null, $user = null) {
         if(!$user) {
             $user = Gdn::session();
         }
@@ -973,7 +980,7 @@ EOT
      * @param array $options
      * @return string An HTML string representing an idea-type reaction button.
      */
-    public static function getIdeaReactionButton($discussion, $urlCode, $reaction = null, $options = []) {
+    protected function getIdeaReactionButton($discussion, $urlCode, $reaction = null, $options = []) {
         if (!$reaction) {
             $reaction = ReactionModel::ReactionTypes($urlCode);
         }
@@ -986,7 +993,7 @@ EOT
         $url = Url("/react/discussion/$urlCode2?id=$id&selfreact=true");
         $dataAttr = "data-reaction=\"$urlCode2\"";
 
-        return getReactionButtonHtml($linkClass, $url, $label, $dataAttr);
+        return getReactionButtonHtml($linkClass, $url, $label, $urlCode2, $dataAttr);
     }
 
     /**
@@ -997,12 +1004,12 @@ EOT
     /**
      * Adds status and state filtering to the DiscussionFilterModule.
      */
-    public function discussionModel_discussionFilters_handler() {
+    public function discussionModel_initStatic_handler() {
         $categories = $this->getIdeaCategoryIDs();
         DiscussionModel::addFilterSet('status', sprintf(t('All %s'), t('Statuses')), $categories);
 
         // Open state
-        $openStatuses = StatusModel::getOpenStatuses();
+        $openStatuses = StatusModel::instance()->getOpenStatuses();
         $openTags = [];
         foreach ($openStatuses as $openStatus) {
             $openTags[] = val('TagID', $openStatus);
@@ -1012,7 +1019,7 @@ EOT
         );
 
         // Closed state
-        $closedStatuses = StatusModel::getClosedStatuses();
+        $closedStatuses = StatusModel::instance()->getClosedStatuses();
         $closedTags = [];
         foreach ($closedStatuses as $closedStatus) {
             $closedTags[] = val('TagID', $closedStatus);
@@ -1022,7 +1029,7 @@ EOT
         );
 
         // Statuses
-        foreach(StatusModel::getStatuses() as $status) {
+        foreach(StatusModel::instance()->getStatuses() as $status) {
             DiscussionModel::addFilter(strtolower(val('Name', $status)).'-status' , val('Name', $status),
                 ['d.Tags' => val('TagID', $status)], 'status', 'status'
             );
@@ -1291,11 +1298,12 @@ if (!function_exists('getReactionButtonHtml')) {
      * @param string $cssClass The reaction-specific css class.
      * @param string $url The url for the reaction.
      * @param string $label The reaction's label.
+     * @param string $urlCode The url code of the reaction to be appended to the arrow css class.
      * @param string $dataAttr The data attribute for the reaction (used in reaction javascript).
      * @return string HTML representation of the ideation reactions (up and down votes).
      */
-    function getReactionButtonHtml($cssClass, $url, $label, $dataAttr = '') {
-        return '<a class="Hijack idea-button '.$cssClass.'" href="'.$url.'" title="'.$label.'" '.$dataAttr.' rel="nofollow"><span class="arrow arrow-'.strtolower($label).'"></span> <span class="idea-label">'.$label.'</span></a>';
+    function getReactionButtonHtml($cssClass, $url, $label, $urlCode, $dataAttr = '') {
+        return '<a class="Hijack idea-button '.$cssClass.'" href="'.$url.'" title="'.$label.'" '.$dataAttr.' rel="nofollow"><span class="arrow arrow-'.$urlCode.'"></span> <span class="idea-label">'.$label.'</span></a>';
     }
 }
 

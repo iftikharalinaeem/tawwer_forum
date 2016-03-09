@@ -9,10 +9,27 @@ class StatusModel extends Gdn_Model {
     /**
      * @var array An array representation of all the statuses in the database.
      */
-    private static $statuses;
+    protected $statuses;
+
+    /**
+     * @var StatusModel An instance of this class. Use this instead of instantiating a new class.
+     */
+    protected static $instance;
 
     public function __construct() {
         parent::__construct('Status');
+    }
+
+    /**
+     * Returns an instance of this StatusModel class.
+     *
+     * @return StatusModel An instance of this class.
+     */
+    public static function instance() {
+        if (is_null(self::$instance)) {
+            self::$instance = new StatusModel();
+        }
+        return self::$instance;
     }
 
     /**
@@ -56,7 +73,7 @@ class StatusModel extends Gdn_Model {
             $status = $this->SQL->getWhere('Status', array('StatusID' => $primaryKeyVal))->firstRow(DATASET_TYPE_ARRAY);
             if ($status) {
                 $insert = false;
-                $oldStatus = StatusModel::getStatus($saveData['StatusID']);
+                $oldStatus = StatusModel::instance()->getStatus($saveData['StatusID']);
             }
         } else {
             $primaryKeyVal = false;
@@ -86,7 +103,7 @@ class StatusModel extends Gdn_Model {
      *
      * @return int|string The default status.
      */
-    public static function getDefaultStatus() {
+    public function getDefaultStatus() {
         $statuses = self::statuses();
         foreach($statuses as $status) {
             if (val('IsDefault', $status)) {
@@ -102,18 +119,18 @@ class StatusModel extends Gdn_Model {
      * @param int $statusID The ID of the status to retrieve.
      * @return array A set of all the statuses or the specific status with the passed ID.
      */
-    protected static function statuses($statusID = 0) {
-        if (self::$statuses === null) {
+    protected function statuses($statusID = 0) {
+        if ($this->statuses === null) {
             // Fetch statuses
             $statusModel = new StatusModel();
             $statuses = $statusModel->getWhere()->resultArray();
-            self::$statuses = Gdn_DataSet::index($statuses, array('StatusID'));
+            $this->statuses = Gdn_DataSet::index($statuses, array('StatusID'));
         }
 
         if ($statusID) {
-            return val($statusID, self::$statuses, NULL);
+            return val($statusID, $this->statuses, NULL);
         } else {
-            return self::$statuses;
+            return $this->statuses;
         }
     }
 
@@ -123,8 +140,8 @@ class StatusModel extends Gdn_Model {
      * @param $tagID The ID of the tag to find the status from.
      * @return array The status with the given tag ID or an empty array.
      */
-    public static function getStatusByTagID($tagID) {
-        $statuses = self::statuses();
+    public function getStatusByTagID($tagID) {
+        $statuses = $this->statuses();
         foreach($statuses as $status) {
             if (val('TagID', $status) == $tagID) {
                 return $status;
@@ -138,8 +155,8 @@ class StatusModel extends Gdn_Model {
      *
      * @return array The statuses with an open state.
      */
-    public static function getOpenStatuses() {
-        $statuses = self::statuses();
+    public function getOpenStatuses() {
+        $statuses = $this->statuses();
         $openStatuses = [];
         foreach($statuses as $status) {
             if (val('State', $status) == 'Open') {
@@ -154,8 +171,8 @@ class StatusModel extends Gdn_Model {
      *
      * @return array The statuses with a closed state.
      */
-    public static function getClosedStatuses() {
-        $statuses = self::statuses();
+    public function getClosedStatuses() {
+        $statuses = $this->statuses();
         $closedStatuses = array();
         foreach($statuses as $status) {
             if (val('State', $status) == 'Closed') {
@@ -170,8 +187,8 @@ class StatusModel extends Gdn_Model {
      *
      * @return array A set of all the statuses.
      */
-    public static function getStatuses() {
-        return self::statuses();
+    public function getStatuses() {
+        return $this->statuses();
     }
 
     /**
@@ -180,8 +197,8 @@ class StatusModel extends Gdn_Model {
      * @param int $statusID The status ID of the status to retrieve.
      * @return array The status with the passed ID.
      */
-    public static function getStatus($statusID = 0) {
-        return self::statuses($statusID);
+    public function getStatus($statusID = 0) {
+        return $this->statuses($statusID);
     }
 
     /**
@@ -226,12 +243,12 @@ class StatusModel extends Gdn_Model {
      * @param int $discussionID The ID of the discussion.
      * @return array The status of the discussion with the given ID.
      */
-    public static function getStatusByDiscussion($discussionID) {
+    public function getStatusByDiscussion($discussionID) {
         $tagModel = new TagModel();
         $tags = $tagModel->getDiscussionTags($discussionID);
         if (val('Status', $tags)) {
             $tag = $tags['Status'][0];
-            return self::getStatusByTagID(val('TagID', $tag));
+            return $this->getStatusByTagID(val('TagID', $tag));
         }
 
         return [];
