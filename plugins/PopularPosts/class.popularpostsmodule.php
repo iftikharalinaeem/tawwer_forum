@@ -71,29 +71,34 @@ class PopularPostsModule extends Gdn_Module {
 
         // Cache the top 10 posts of each categories
         if ($data === Gdn_Cache::CACHEOP_FAILURE) {
+
+            $query = "
+                select
+                    GDN_Discussion.CategoryID,
+                    SUBSTRING_INDEX(
+                        GROUP_CONCAT(GDN_Discussion.DiscussionID order by GDN_Discussion.CountViews desc),
+                        ',',
+                        $countCommentPerPage
+                    ) as GroupedDiscussionIDs
+                from GDN_Discussion
+                where GDN_Discussion.DateInserted >= '$minDateInserted'
+                group by GDN_Discussion.CategoryID
+            ";
+
+            $discussionsLists = Gdn::sql()->query($query)->resultArray();
+
+            $discussionsIDs = [];
+            foreach($discussionsLists as $discussionsList) {
+                $discussionsIDs[] = $discussionsList['GroupedDiscussionIDs'];
+            }
+
             $query = "
                 select
                     GDN_Discussion.*
                 from GDN_Discussion
-                    inner join (
-                        /* Get the list of the top 10 most viewed discussions by categories */
-                        select
-                            GDN_Discussion.CategoryID,
-                            SUBSTRING_INDEX(
-                                GROUP_CONCAT(GDN_Discussion.DiscussionID order by GDN_Discussion.CountViews desc),
-                                ',',
-                                $countCommentPerPage
-                            ) as GroupedDiscussionIDs
-                        from GDN_Discussion
-                        where GDN_Discussion.DateInserted >= '$minDateInserted'
-                        group by GDN_Discussion.CategoryID
-                    ) as tmp
-                    /* Join discussion on matching category and then on discussion id
-                       found in the list of top 10 discussions of that category */
-                    on GDN_Discussion.CategoryID = tmp.CategoryID
-                        and GDN_Discussion.DateInserted >= '$minDateInserted'
-                        and FIND_IN_SET(GDN_Discussion.DiscussionID, tmp.GroupedDiscussionIDs) != 0
+                    where DiscussionID in (".implode(',', $discussionsIDs).");
             ";
+
             $discussions = Gdn::sql()->query($query)->result();
 
             // Index discussions by categories for easier filtering later on.
