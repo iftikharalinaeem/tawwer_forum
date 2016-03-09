@@ -257,7 +257,7 @@ class EmailRouterController extends Gdn_Controller {
                   }
 
                   if (!empty($forwardInfo)) {
-                     $Url = val('Url', $forwardInfo);
+                     $Url = val('Url', $forwardInfo).'/utility/email.json';
                      $Data = array_replace($Data, val('Data', $forwardInfo, []));
                   } else {
                      array_pop($ToParts); // pop node name
