@@ -1190,7 +1190,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         // Correct the slug for the site hub format.
         if ($nodeSlug = val('NODE_SLUG', $_SERVER)) {
-            $slug = $nodeSlug.'.'.rtrim(stringEndsWith($nodeSlug, $nodeSlug, true, true), '-';
+            $slug = $nodeSlug.'.'.rtrim(stringEndsWith($nodeSlug, $nodeSlug, true, true), '-');
         }
 
         if ($emailDomain && $slug) {
