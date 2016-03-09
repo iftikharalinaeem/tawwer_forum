@@ -242,6 +242,12 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         // Enable plugins.
         foreach (val('Addons', $config, []) as $addonKey => $enabled) {
+            if (strcasecmp($addonKey, 'sitehub') === 0 && $enabled) {
+                Logger::event('snycnode_skipaddon', Logger::WARNING, "The sitehub addon should not be enabled in nodes.");
+                $this->toggleAddon($addonKey, false);
+                continue;
+            }
+
             try {
                 $this->toggleAddon($addonKey, $enabled);
             } catch (Exception $ex) {
@@ -575,20 +581,20 @@ class SiteNodePlugin extends Gdn_Plugin {
      * @param Gdn_Dispatcher $sender
      */
     public function gdn_dispatcher_appStartup_handler($sender) {
-        Logger::event('hubsso_start', Logger::INFO, "Hub SSO start.");
+        Logger::event('hubsso_start', Logger::DEBUG, "Hub SSO start.");
 
         if (Gdn::PluginManager()->IsEnabled('sitehub')) {
-            Logger::event('hubsso_skip', Logger::INFO, "Site hub is enabled. Skipping Hub SSO.");
+            Logger::event('hubsso_skip', Logger::DEBUG, "Site hub is enabled. Skipping Hub SSO.");
             return;
         }
 
         $this->checkSSO();
 
         if (Gdn::session()->isValid()) {
-            Logger::event('hubsso_skip', Logger::INFO, "Session is valid. Skipping Hub SSO.");
+            Logger::event('hubsso_skip', Logger::DEBUG, "Session is valid. Skipping Hub SSO.");
         }
         if (!val(self::HUB_COOKIE, $_COOKIE)) {
-            Logger::event('hubsso_skip', Logger::INFO, "Hub cookie not present. Skipping Hub SSO.");
+            Logger::event('hubsso_skip', Logger::DEBUG, "Hub cookie not present. Skipping Hub SSO.");
         }
 
         if (!Gdn::Session()->IsValid() && val(self::HUB_COOKIE, $_COOKIE)) {
