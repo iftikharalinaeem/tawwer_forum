@@ -252,12 +252,16 @@ class EmailRouterController extends Gdn_Controller {
                   $aliasUrl = $this->Aliases[$Part];
 
                   // Check this email against the hub to see if it should be forwarded somewhere.
-                  $forwardInfo = $this->checkHub($aliasUrl, $Email, $Data['Subject']);
+                  if (strpos($Email, '+') === false) {
+                     $forwardInfo = $this->checkHub($aliasUrl, $Email, $Data['Subject']);
+                  }
 
                   if (!empty($forwardInfo)) {
                      $Url = val('Url', $forwardInfo);
                      $Data = array_replace($Data, val('Data', $forwardInfo, []));
                   } else {
+                     array_pop($ToParts); // pop node name
+
                      // This is a site node alias in the form: folder.alias+args@email.vanillaforums.com.
                      $UrlParts = parse_url($this->Aliases[$Part]);
                      $Scheme = val('scheme', $UrlParts, 'http');
