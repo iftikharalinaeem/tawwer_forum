@@ -182,6 +182,11 @@ class SiteHubPlugin extends Gdn_Plugin {
         $email = $sender->Request->post('Email');
         $subject = trim($sender->Request->post('Subject'));
 
+        // Pass the data to the dispatcher for errors.
+        Gdn::dispatcher()
+            ->passData('Email', $email)
+            ->passData('Subject', $subject);
+
         $valid = false;
         switch ($this->emailMatch) {
             case self::EMAIL_MATCH_SUBJECT:
@@ -233,7 +238,7 @@ class SiteHubPlugin extends Gdn_Plugin {
                 $sender->setData('Data', ['CategoryID' => $category['CategoryID']]);
             }
         } else {
-            throw notFoundException(sprintf('The email %s did not match.', $this->emailMatch));
+            throw notFoundException('@'.sprintf('The email %s did not match.', $this->emailMatch));
         }
 
         if (!$sender->data('Url')) {
