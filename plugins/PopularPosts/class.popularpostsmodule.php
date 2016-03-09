@@ -91,6 +91,7 @@ class PopularPostsModule extends Gdn_Module {
                     /* Join discussion on matching category and then on discussion id
                        found in the list of top 10 discussions of that category */
                     on GDN_Discussion.CategoryID = tmp.CategoryID
+                        and GDN_Discussion.DateInserted >= '$minDateInserted'
                         and FIND_IN_SET(GDN_Discussion.DiscussionID, tmp.GroupedDiscussionIDs) != 0
             ";
             $discussions = Gdn::sql()->query($query)->result();
