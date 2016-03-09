@@ -1187,9 +1187,15 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         $emailDomain = $this->getEmailDomain();
         list($slug, $tld) = $this->splitHostname($this->getSiteHostname());
+
+        // Correct the slug for the site hub format.
+        if ($nodeSlug = val('NODE_SLUG', $_SERVER)) {
+            $slug = $nodeSlug.'.'.rtrim(stringEndsWith($nodeSlug, $nodeSlug, true, true), '-';
+        }
+
         if ($emailDomain && $slug) {
             $sender->SetData('IncomingAddress', "$slug@$emailDomain");
-            if (strpos($slug, '.') === false) {
+            if (!empty($nodeSlug) || strpos($slug, '.') === false) {
                 $sender->SetData('CategoryAddress', "categorycode.$slug@$emailDomain");
             } else {
                 $sender->SetData('CategoryAddress', "$slug+categorycode@$emailDomain");
