@@ -578,10 +578,18 @@ class SiteNodePlugin extends Gdn_Plugin {
         Logger::event('hubsso_start', Logger::INFO, "Hub SSO start.");
 
         if (Gdn::PluginManager()->IsEnabled('sitehub')) {
+            Logger::event('hubsso_skip', Logger::INFO, "Site hub is enabled. Skipping Hub SSO.");
             return;
         }
 
         $this->checkSSO();
+
+        if (Gdn::session()->isValid()) {
+            Logger::event('hubsso_skip', Logger::INFO, "Session is valid. Skipping Hub SSO.");
+        }
+        if (!val(self::HUB_COOKIE, $_COOKIE)) {
+            Logger::event('hubsso_skip', Logger::INFO, "Hub cookie not present. Skipping Hub SSO.");
+        }
 
         if (!Gdn::Session()->IsValid() && val(self::HUB_COOKIE, $_COOKIE)) {
             // Check the cookie expiry here.
