@@ -148,6 +148,9 @@ class PopularPostsModule extends Gdn_Module {
                 $filteredDiscussions = array_slice($filteredDiscussions, 0, $countCommentPerPage, true);
             }
 
+            $discussionModel = new DiscussionModel();
+            array_walk($filteredDiscussions, array($discussionModel, 'calculate'));
+
             // Join user data
             Gdn::userModel()->joinUsers($filteredDiscussions, array('FirstUserID', 'LastUserID'));
             // Join categories
