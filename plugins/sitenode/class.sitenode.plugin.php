@@ -668,10 +668,10 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         // Override the from email address.
-        if ($alias = C('Plugins.VanillaPop.Alias')) {
-            $supportEmail = $this->slug().".$alias@vanillaforums.email";
-            SaveToConfig('Garden.Email.SupportAddress', $supportEmail, false);
-        }
+//        if ($alias = C('Plugins.VanillaPop.Alias')) {
+//            $supportEmail = $this->slug().".$alias@vanillaforums.email";
+//            SaveToConfig('Garden.Email.SupportAddress', $supportEmail, false);
+//        }
     }
 
     /**

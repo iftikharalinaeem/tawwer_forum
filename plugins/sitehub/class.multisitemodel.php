@@ -45,6 +45,16 @@ class MultisiteModel extends Gdn_Model {
     }
 
     /**
+     * Get the hub slug that is prepended to every node slug when a node is created.
+     */
+    public function getHubSlug() {
+        $nameFormat = sprintf($this->siteNameFormat, '%s'); // in case the format uses fancy %s
+
+        $slug = rtrim(strstr($nameFormat, '%s', true), '-');
+        return $slug;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function delete($where = [], $options = []) {
@@ -190,12 +200,21 @@ class MultisiteModel extends Gdn_Model {
 
         $name = sprintf($this->siteNameFormat, $site['Slug']);
 
+        $config = [
+            'Garden' => [
+                'Email' => [
+                    'SupportAddress' => strtolower($site['Slug']).'.'.$this->getHubSlug().'@vanillaforums.email'
+                ]
+            ]
+        ];
+
         $buildQuery = Communication::orchestration('/site/createnode')
             ->method('post')
             ->parameter('name', $name)
             ->parameter('accountid', Infrastructure::site('accountid'))
             ->parameter('domain', Gdn::Request()->Host()) // TODO: make work for non-dirs
             ->parameter('flavor', 'node')
+            ->parameter('config', $config)
             ->parameter('callback', [
                 'url' => Gdn::Request()->Domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/buildcallback.json",
                 'headers' => [
