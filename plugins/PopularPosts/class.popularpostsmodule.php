@@ -12,6 +12,9 @@ class PopularPostsModule extends Gdn_Module {
     // Usually set from the template. Ex: {module name="PopularPostsModule" categoryID="X"}
     public $categoryID = null;
 
+    // Usually set from the template. Ex: {module name="PopularPostsModule" sortMethod="X"}
+    public $sortMethod = null;
+
     /**
      * Returns the component as a string to be rendered to the screen.
      *
@@ -39,56 +42,146 @@ class PopularPostsModule extends Gdn_Module {
     /**
      * Load the top popular posts
      *
-     * Load the 10 most popular (highest view count) discussions,
+     * Load the $CountCommentsPerPage most popular (highest view count) discussions,
      * filtered by category if applicable, that are below the MaxAge configuration.
      */
     protected function loadPopularPosts() {
-
         if (!Gdn_Cache::activeEnabled() && c('Cache.Enabled')) {
             trace('Popular Posts caching has failed');
             return;
         }
 
-        $key = 'popularPosts.data';
+        $showSpecificCategory = $this->categoryID !== null;
+        $userCategoryPerm = DiscussionModel::categoryPermissions();
+        $hasAllPermissions = $userCategoryPerm === true;
 
-        // Cache data per category too
-        if ($this->categoryID !== null) {
-            $key .= '.category'.$this->categoryID;
+        // Abort if we are to show posts from a specific category and the user does not have acces to it
+        if ($showSpecificCategory && !$hasAllPermissions && !in_array($this->categoryID, $userCategoryPerm)) {
+            return;
         }
 
-        $data = Gdn::cache()->get($key);
+        // Max age in days
+        $maxAge = 60 * 60 * 24 * c('PopularPosts.MaxAge', 30);
+        $minDateInserted = date('Y-m-d', time() - $maxAge);
+
+        $countCommentPerPage = ctype_digit((string)$this->CountCommentsPerPage) ? $this->CountCommentsPerPage : 10;
+
+        $cacheKey = "popularPosts.data[top:$countCommentPerPage,mindate:$minDateInserted]";
+        $data = Gdn::cache()->get($cacheKey);
+
+        // Cache the top 10 posts of each categories
         if ($data === Gdn_Cache::CACHEOP_FAILURE) {
-            $originalAllowedFields = DiscussionModel::allowedSortFields();
-            $customAllowedFields = array_merge($originalAllowedFields, ['d.CountViews']);
-            DiscussionModel::allowedSortFields($customAllowedFields);
 
-            $discussionModel = new DiscussionModel();
+            $query = "
+                select
+                    GDN_Discussion.CategoryID,
+                    SUBSTRING_INDEX(
+                        GROUP_CONCAT(GDN_Discussion.DiscussionID order by GDN_Discussion.CountViews desc),
+                        ',',
+                        $countCommentPerPage
+                    ) as GroupedDiscussionIDs
+                from GDN_Discussion
+                where GDN_Discussion.DateInserted >= '$minDateInserted'
+                group by GDN_Discussion.CategoryID
+            ";
 
-            // Max age in days
-            $maxAge = 60 * 60 * 24 * c('PopularPosts.MaxAge', 30);
-            $where = array('DateInserted >=' => date('Y-m-d', time() - $maxAge));
+            $discussionsLists = Gdn::sql()->query($query)->resultArray();
 
-
-            if ($this->categoryID !== null) {
-                $where['CategoryID'] = $this->categoryID;
+            $discussionsIDs = [];
+            foreach($discussionsLists as $discussionsList) {
+                $discussionsIDs += explode(',', $discussionsList['GroupedDiscussionIDs']);
             }
 
-            $discussions = $discussionModel->getWhere($where, 'd.CountViews', 'desc', $this->CountCommentsPerPage)->result();
+            $discussions = Gdn::sql()
+                ->select('*')
+                ->from('Discussion')
+                ->whereIn('DiscussionID', $discussionsIDs)
+                ->get();
 
-            // Restore allowedSortFields just by precaution.
-            DiscussionModel::allowedSortFields($originalAllowedFields);
+            // Index discussions by categories for easier filtering later on.
+            $discussionsByCategories = [];
+            foreach($discussions as $discussion) {
+                if (!isset($discussionsByCategories[$discussion->CategoryID])) {
+                    $discussionsByCategories[$discussion->CategoryID] = [];
+                }
+                $discussionsByCategories[$discussion->CategoryID][] = $discussion;
+            }
 
-            Gdn::cache()->store($key, serialize($discussions), array(Gdn_Cache::FEATURE_EXPIRY => 10 * 60));
+            Gdn::cache()->store($cacheKey, serialize($discussionsByCategories), [Gdn_Cache::FEATURE_EXPIRY => 10 * 60]);
         } else {
-            $discussions = unserialize($data);
-            if ($discussions === false) {
+            $discussionsByCategories = unserialize($data);
+            if ($discussionsByCategories === false) {
                 trace('Popular Posts caching retrieval failed');
                 return;
             }
         }
 
-        if (!empty($discussions)) {
-            $this->setData('popularPosts', $discussions);
+        if (!empty($discussionsByCategories)) {
+
+            // Aggregate and filter down the posts to match user permissions and/or specified category
+            $filteredDiscussions = [];
+            if ($showSpecificCategory) {
+                $filteredDiscussions = val($discussion->CategoryID, $discussionsByCategories, []);
+            } else {
+                $userAllowedData = $discussionsByCategories;
+                if (!$hasAllPermissions) {
+                    $userAllowedData = array_intersect_key($discussionsByCategories, array_flip($userCategoryPerm));
+                }
+
+                foreach($userAllowedData as $categoryID => $discussions) {
+                    $filteredDiscussions += $discussions;
+                }
+            }
+
+            $needSlicing = !$showSpecificCategory;
+            $needSorting = $needSlicing || (!$needSlicing && !$this->sortMethod);
+
+            // Order the posts by CountViews!
+            if ($needSorting) {
+                uasort($filteredDiscussions, function ($a, $b) {
+                    if ($a->CountViews === $b->CountViews) {
+                        return 0;
+                    }
+
+                    return $a->CountViews > $b->CountViews ? -1 : 1;
+                });
+            }
+
+            if ($needSlicing) {
+                $filteredDiscussions = array_slice($filteredDiscussions, 0, $countCommentPerPage, true);
+            }
+
+            $discussionModel = new DiscussionModel();
+            array_walk($filteredDiscussions, array($discussionModel, 'calculate'));
+
+            // Join user data
+            Gdn::userModel()->joinUsers($filteredDiscussions, array('FirstUserID', 'LastUserID'));
+            // Join categories
+            CategoryModel::joinCategories($filteredDiscussions);
+
+            switch($this->sortMethod) {
+                case 'date-asc':
+                    uasort($filteredDiscussions, function($a, $b) {
+                        if ($a->DateInserted === $b->DateInserted) {
+                            return 0;
+                        }
+
+                        return (strtotime($a->DateInserted) < strtotime($b->DateInserted)) ? -1 : 1;
+                    });
+                    break;
+                case 'date-desc':
+                    uasort($filteredDiscussions, function($a, $b) {
+                        if ($a->DateInserted === $b->DateInserted) {
+                            return 0;
+                        }
+
+                        return (strtotime($a->DateInserted) > strtotime($b->DateInserted)) ? -1 : 1;
+                    });
+                    break;
+                // Default = don't do anything!
+            }
+
+            $this->setData('popularPosts', $filteredDiscussions);
         }
     }
 }
