@@ -164,7 +164,8 @@ class EmailRouterController extends Gdn_Controller {
                 'to' => 'To',
                 'subject' => 'Subject',
                 'headers' => 'Headers',
-                'text' => 'Source'
+                'text' => 'Source',
+                'spam_score' => 'SpamScore'
             ));
 
    //         self::Log('Parsing headers.'.GetValue('headers', $Post, ''));
