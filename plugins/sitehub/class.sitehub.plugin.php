@@ -134,7 +134,7 @@ class SiteHubPlugin extends Gdn_Plugin {
      * @return string Returns a regular expression as a string.
      */
     public function getEmailAddressRegex() {
-        return "`{$this->emailRegex}\.[a-z0-9_-]@`i";
+        return "`{$this->emailRegex}\.[a-z0-9_-](?:\+(?<args>[^@]+))?@`i";
     }
 
     /**
