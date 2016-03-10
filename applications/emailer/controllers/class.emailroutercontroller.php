@@ -419,13 +419,12 @@ class EmailRouterController extends Gdn_Controller {
          if (preg_match('`-s(\d+)@`', $source, $matches)) {
             $siteID = $matches[1];
 
-            list($code, $response) = Communication::orchestration('/site/full')
+            $response = Communication::orchestration('/site/full')
                ->method('get')
                ->parameter('siteid', $siteID)
                ->send();
 
-
-            if ($code == 200 && is_array(val('site', $response))) {
+            if (is_array(val('site', $response))) {
                $site = $response['site'];
 
                Logger::event(
@@ -544,20 +543,20 @@ class EmailRouterController extends Gdn_Controller {
           ->parameter('verbose', 0)
           ->send();
       Logger::event('orchestration_site_query', Logger::DEBUG, "Sites", ['response' => $queryResponse]);
-      if (empty(valr('response.sites', $queryResponse))) {
+      if (empty(val('sites', $queryResponse))) {
          return $default;
       }
 
       // Look up the site.
       $siteResponse = Communication::orchestration('/site/full')
           ->method('get')
-          ->parameter('siteid', valr('response.sites.0.SiteID', $queryResponse))
+          ->parameter('siteid', valr('sites.0.SiteID', $queryResponse))
           ->send();
       Logger::event('orchestration_site_full', Logger::DEBUG, "Site", ['response' => $siteResponse]);
 
-      if ($siteResponse['code'] == 200 && is_array(valr('response.multisite', $siteResponse))) {
+      if (is_array(val('multisite', $siteResponse))) {
          // This is a multisite and must use a different URL format.
-         $multisite = $siteResponse['response']['multisite'];
+         $multisite = $siteResponse['multisite'];
          $result = "https://{$multisite['real']}";
          return $result;
       }
