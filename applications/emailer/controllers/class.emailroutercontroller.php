@@ -287,7 +287,7 @@ class EmailRouterController extends Gdn_Controller {
                   $Domain = "$subdomain.{$this->emailDomains[$emailDomain]}";
 
                   if (strpos($subdomain, '-') !== false) {
-                     $Url = $this->fixMultisiteDomain($Domain)."/utility/email.json";
+                     $Url = $this->getSiteUrlFromHost($Domain)."/utility/email.json";
                   }
                }
 
@@ -325,11 +325,20 @@ class EmailRouterController extends Gdn_Controller {
                }
                $LogModel->SetField($LogID, array('Post' => $Data['Post'], 'Response' => $Code, 'ResponseText' => $Result));
             } else {
-               $Error = curl_error($C)."\n\n$Result";
-               $LogModel->SetField($LogID, array('Post' => $Data['Post'], 'Response' => $Code, 'ResponseText' => $Error));
+               // Check to see if the site exists at all.
+               $r = $this->getSiteUrlFromHost(parse_url($Url, PHP_URL_HOST));
+               if (empty($host)) {
+                  $LogModel->setFeild(
+                      $LogID,
+                      ['Post' => $Data['Post'], 'Response' => 410, 'ResponseText' => 'Site does not exist.']
+                  );
+               } else {
+                  $Error = curl_error($C)."\n\n$Result";
+                  $LogModel->SetField($LogID, array('Post' => $Data['Post'], 'Response' => $Code, 'ResponseText' => $Error));
 
-               if ($Code != 404) {
-                  throw new Exception($Error, $Code);
+                  if ($Code != 404) {
+                     throw new Exception($Error, $Code);
+                  }
                }
             }
          }
@@ -422,6 +431,7 @@ class EmailRouterController extends Gdn_Controller {
             $response = Communication::orchestration('/site/full')
                ->method('get')
                ->parameter('siteid', $siteID)
+               ->cache(60)
                ->send();
 
             if (is_array(val('site', $response))) {
@@ -526,9 +536,9 @@ class EmailRouterController extends Gdn_Controller {
     * Nodes will use their Vanilla name convention by default (i.e. slug-node.vanillaforums.com). A node with this URL
     * cannot be called directly and must fall back to its multisite format.
     *
-    * @param string $host The hostname to look at.
+    * @param string $host The hostname to look at or an empty string if there is no site.
     */
-   private function fixMultisiteDomain($host) {
+   private function getSiteUrlFromHost($host) {
       $default = "http://$host";
 
       if (!class_exists('Communication')) {
@@ -541,18 +551,20 @@ class EmailRouterController extends Gdn_Controller {
           ->parameter('query', $host)
           ->parameter('users', 0)
           ->parameter('verbose', 0)
+          ->cache(60)
           ->send();
-      Logger::event('orchestration_site_query', Logger::DEBUG, "Sites", ['response' => $queryResponse]);
+//      Logger::event('orchestration_site_query', Logger::DEBUG, "Sites", ['response' => $queryResponse]);
       if (empty(val('sites', $queryResponse))) {
-         return $default;
+         return '';
       }
 
       // Look up the site.
       $siteResponse = Communication::orchestration('/site/full')
           ->method('get')
           ->parameter('siteid', valr('sites.0.SiteID', $queryResponse))
+          ->cache(60)
           ->send();
-      Logger::event('orchestration_site_full', Logger::DEBUG, "Site", ['response' => $siteResponse]);
+//      Logger::event('orchestration_site_full', Logger::DEBUG, "Site", ['response' => $siteResponse]);
 
       if (is_array(val('multisite', $siteResponse))) {
          // This is a multisite and must use a different URL format.
@@ -562,6 +574,7 @@ class EmailRouterController extends Gdn_Controller {
       }
 
       return $default;
-
    }
+
+
 }
