@@ -157,7 +157,7 @@ class PopularPostsModule extends Gdn_Module {
             // Join user data
             Gdn::userModel()->joinUsers($filteredDiscussions, array('FirstUserID', 'LastUserID'));
             // Join categories
-            CategoryModel::JoinCategories($filteredDiscussions);
+            CategoryModel::joinCategories($filteredDiscussions);
 
             switch($this->sortMethod) {
                 case 'date-asc':
