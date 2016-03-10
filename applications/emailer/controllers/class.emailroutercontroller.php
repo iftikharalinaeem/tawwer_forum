@@ -224,9 +224,9 @@ class EmailRouterController extends Gdn_Controller {
 
             // Check for a site.
             $sources = array_merge(
-               [val('ReplyTo', $HeaderData, '')],
+               ['replyTo' => val('ReplyTo', $HeaderData, '')],
                $this->explodeReferences(val('References', $HeaderData, '')),
-               [$Email]
+               ['to' => $Email]
             );
 
             $site = $this->getSiteFromEmail($sources);
@@ -424,7 +424,7 @@ class EmailRouterController extends Gdn_Controller {
          return null;
       }
 
-      foreach ($sources as $source) {
+      foreach ($sources as $key => $source) {
          if (preg_match('`-s(\d+)@`', $source, $matches)) {
             $siteID = $matches[1];
 
@@ -438,9 +438,10 @@ class EmailRouterController extends Gdn_Controller {
                $site = $response['site'];
 
                Logger::event(
-                  'emailer_site', 'Site {site.name} found from source: {source}.',
+                  'emailer_site',
                   Logger::INFO,
-                  ['source' => $source, 'site' => $site]
+                  'Site {site.name} found from source: {source}.',
+                  ['source' => $source, 'site' => $site, 'sourceKey' => $key]
                );
 
                if (!empty($response['multisite'])) {
@@ -462,12 +463,21 @@ class EmailRouterController extends Gdn_Controller {
     */
    private function explodeReferences($referencesString) {
       $references = preg_split('`>\s*<`', $referencesString);
+      $result = [];
 
-      array_walk($references, function (&$str) {
-         $str = '<'.trim($str, '<>').'>';
-      });
+      $i = 0;
+      foreach ($references as $reference) {
+         $reference = trim($reference);
+         if (!$reference) {
+            continue;
+         }
+         $reference = '<'.trim($reference, '<>').'>';
+         $result[sprintf('reference%02d', $i)] = $reference;
 
-      return $references;
+         $i++;
+      }
+
+      return $result;
    }
 
    /**
