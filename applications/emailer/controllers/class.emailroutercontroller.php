@@ -542,6 +542,7 @@ class EmailRouterController extends Gdn_Controller {
           ->parameter('users', 0)
           ->parameter('verbose', 0)
           ->send();
+      Logger::event('orchestration_site_query', Logger::DEBUG, "Sites", $queryResponse);
       if (empty(val('sites', $queryResponse))) {
          return $default;
       }
@@ -551,6 +552,7 @@ class EmailRouterController extends Gdn_Controller {
           ->method('get')
           ->parameter('siteid', valr('sites.0.SiteID', $queryResponse))
           ->send();
+      Logger::event('orchestration_site_full', Logger::DEBUG, "Site", $siteResponse);
 
       if ($code == 200 && is_array(val('multisite', $siteResponse))) {
          // This is a multisite and must use a different URL format.
