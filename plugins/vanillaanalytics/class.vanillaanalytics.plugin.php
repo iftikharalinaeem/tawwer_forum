@@ -35,6 +35,7 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param object $sender DashboardController.
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
+        /*
         $sectionModel = new AnalyticsSection();
         Logger::event('analytics_menu', Logger::INFO, 'Sections', $sectionModel->getDefaults());
         foreach ($sectionModel->getDefaults() as $section) {
@@ -47,6 +48,7 @@ class VanillaAnalytics extends Gdn_Plugin {
                 );
             }
         }
+        */
     }
 
     /**
