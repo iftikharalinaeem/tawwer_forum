@@ -28,18 +28,13 @@ class SiteHubPlugin extends Gdn_Plugin {
     const HUB_COOKIE = 'vf_hub_ENDTX';
     const NODE_COOKIE = 'vf_node_ENDTX';
 
-    const EMAIL_MATCH_SUBJECT = 'subject';
-    const EMAIL_MATCH_TO = 'to';
+    const EMAIL_NODE_REGEX = '(?:(?<category>[a-z0-9_-]+)\.)?(?<node>[a-z0-9_-]+)';
+    const EMAIL_CATEGORY_REGEX = '(?<category>[a-z0-9_-]+)(?:\.(?<node>[a-z0-9_-]+))?';
 
     /**
-     * @var string The regular expression stub to be used to match a node/category from an incoming email.
+     * @var bool Whether to match categories before nodes in email routing.
      */
-    protected $emailRegex;
-
-    /**
-     * @var string What part of an email to match to find the node/category.
-     */
-    protected $emailMatch;
+    protected $emailMatchCategories;
 
     /// Methods ///
 
@@ -47,8 +42,7 @@ class SiteHubPlugin extends Gdn_Plugin {
      * Initialize a new instance of the {@link SiteHubPlugin} .
      */
     public function __construct() {
-        $this->emailRegex = c('SiteHub.EmailRegex', '(?:(?<category>[a-z0-9_-]+)\.)?(?<node>[a-z0-9_-]+)');
-        $this->emailMatch = c('SiteHub.EmailMatch', self::EMAIL_MATCH_TO);
+        $this->emailMatchCategories = c('SiteHub.EmailMatchCategories', false);
     }
 
     public function setup() {
@@ -129,12 +123,27 @@ class SiteHubPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Get the regex used to match emails.
+     *
+     * @return string Returns a part of a regex as a string.
+     */
+    public function getEmailRegex() {
+        if ($this->emailMatchCategories) {
+            return self::EMAIL_CATEGORY_REGEX;
+        } else {
+            return self::EMAIL_NODE_REGEX;
+        }
+    }
+
+    /**
      * Get the regular expression used to extract nodes/categories from email addresses.
      *
      * @return string Returns a regular expression as a string.
      */
     public function getEmailAddressRegex() {
-        return "`{$this->emailRegex}\.[a-z0-9_-](?:\+(?<args>[^@]+))?@`i";
+        $regex = $this->getEmailRegex();
+
+        return "`^\s*$regex\.[a-z0-9_-](?:\+(?<args>[^@]+))?@`i";
     }
 
     /**
@@ -143,7 +152,9 @@ class SiteHubPlugin extends Gdn_Plugin {
      * @return string string Returns a regular expression as a string.
      */
     public function getEmailSubjectRegex() {
-        return "`^{$this->emailRegex}`i";
+        $regex = $this->getEmailRegex();
+
+        return "`^\s*{$regex}`i";
     }
 
     /// Event Handlers ///
@@ -187,24 +198,17 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->passData('Email', $email)
             ->passData('Subject', $subject);
 
-        $valid = false;
-        switch ($this->emailMatch) {
-            case self::EMAIL_MATCH_SUBJECT:
-                // Check for a subject that uses square brackets first.
-                if (stringBeginsWith($subject, '[')) {
-                    $subject = substr($subject, 1);
-                    if ($pos = strpos($subject, ']')) {
-                        $subject = trim(substr($subject, 0, $pos));
-                    }
-                }
+        // Look for a match against the email address first.
+        $valid = preg_match($this->getEmailAddressRegex(), $email, $matches);
+        if (!$valid || (empty($matches['node']) && empty($matches['category']))) {
+            // The email address is not valid so look at the subject.
+            $valid = preg_match($this->getEmailSubjectRegex(), $subject, $matches);
 
-                $sender->setData('Tested', $subject);
-                $valid = preg_match($this->getEmailSubjectRegex(), $subject, $matches);
-                break;
-            case self::EMAIL_MATCH_TO:
-                $sender->setData('Tested', $email);
-                $valid = preg_match($this->getEmailAddressRegex(), $email, $matches);
-                break;
+            if ($valid) {
+                $sender->setData('Matched', $subject);
+            }
+        } else {
+            $sender->setData('Matched', $email);
         }
 
         if ($valid) {
