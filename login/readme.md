@@ -49,4 +49,4 @@ Requirements
 1. Uh, mysqli and PHP 5.3 or something.
 2. A suppressed urge to puke at terrible code.
 
-That's pretty much it. _So_ sorry.
+That's pretty much it. _So_ terribly sorry.
