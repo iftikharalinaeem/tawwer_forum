@@ -437,16 +437,16 @@ class EmailRouterController extends Gdn_Controller {
             if (is_array(val('site', $response))) {
                $site = $response['site'];
 
+               if (!empty($response['multisite'])) {
+                  $site['multisite'] = $response['multisite'];
+               }
+
                Logger::event(
                   'emailer_site',
                   Logger::INFO,
                   'Site {site.name} found from source: {source}.',
-                  ['source' => $source, 'site' => $site, 'sourceKey' => $key]
+                  ['source' => $source, 'site' => $this->trimSiteForLog($site), 'sourceKey' => $key]
                );
-
-               if (!empty($response['multisite'])) {
-                  $site['multisite'] = $response['multisite'];
-               }
 
                return $site;
             }
@@ -574,6 +574,19 @@ class EmailRouterController extends Gdn_Controller {
           ->parameter('siteid', valr('sites.0.SiteID', $queryResponse))
           ->cache(60)
           ->send();
+
+      Logger::event(
+          'emailer_site',
+          Logger::INFO,
+          'Site {site.name} found from source: {source}.',
+          [
+              'source' => $host,
+              'site' => $this->trimSiteForLog($siteResponse['site'], val('multisite', $siteResponse, null)),
+              'sourceKey' => 'host'
+          ]
+      );
+
+
 //      Logger::event('orchestration_site_full', Logger::DEBUG, "Site", ['response' => $siteResponse]);
 
       if (is_array(val('multisite', $siteResponse))) {
@@ -586,5 +599,20 @@ class EmailRouterController extends Gdn_Controller {
       return $default;
    }
 
+
+   /**
+    * Trim a site row so it doesn't take up too much room in the log.
+    *
+    * @param array $site The site to trim.
+    * @param array|null $multisite The multisite info, if any.
+    * @return array Returns a subset of the site as an array.
+    */
+   private function trimSiteForLog($site, $multisite = null) {
+      $r = arrayTranslate($site, ['siteid', 'accountid', 'name', 'state', 'cluster', 'domain', 'multisite']);
+
+      if (is_array($multisite) && !empty($multisite)) {
+         $r['multisite'] = $multisite;
+      }
+   }
 
 }
