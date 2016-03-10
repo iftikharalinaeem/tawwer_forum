@@ -28,8 +28,8 @@ class SiteHubPlugin extends Gdn_Plugin {
     const HUB_COOKIE = 'vf_hub_ENDTX';
     const NODE_COOKIE = 'vf_node_ENDTX';
 
-    const EMAIL_NODE_REGEX = '(?:(?<category>[a-z0-9_-]+)\.)?(?<node>[a-z0-9_-]+)';
-    const EMAIL_CATEGORY_REGEX = '(?<category>[a-z0-9_-]+)(?:\.(?<node>[a-z0-9_-]+))?';
+    const EMAIL_NODE_REGEX = '(?:(?<category>[a-z0-9-]+)\.)?(?<node>[a-z0-9-]+)';
+    const EMAIL_CATEGORY_REGEX = '(?<category>[a-z0-9-]+)(?:\.(?<node>[a-z0-9-]+))?';
 
     /**
      * @var bool Whether to match categories before nodes in email routing.
@@ -143,7 +143,7 @@ class SiteHubPlugin extends Gdn_Plugin {
     public function getEmailAddressRegex() {
         $regex = $this->getEmailRegex();
 
-        return "`^\s*$regex\.[a-z0-9_-](?:\+(?<args>[^@]+))?@`i";
+        return "`^\s*$regex\.[a-z0-9-]+(?:\+(?<args>[^@]+))?@`i";
     }
 
     /**
