@@ -229,9 +229,11 @@ class EmailRouterController extends Gdn_Controller {
                ['to' => $Email]
             );
 
+            $guessed = true;
             $site = $this->getSiteFromEmail($sources);
 
             if (!empty($site)) {
+               $quessed = false;
                // Check for a multisite.
                if (!empty($site['multisite'])) {
                   $Url = "https://{$site['multisite']['real']}/utility/email.json";
@@ -251,6 +253,7 @@ class EmailRouterController extends Gdn_Controller {
                $Folder = '';
                $Part = end($ToParts);
                if (isset($this->Aliases[$Part])) {
+                  $guessed = false;
                   $aliasUrl = $this->Aliases[$Part];
 
                   // Check this email against the hub to see if it should be forwarded somewhere.
@@ -287,7 +290,8 @@ class EmailRouterController extends Gdn_Controller {
                   $Domain = "$subdomain.{$this->emailDomains[$emailDomain]}";
 
                   if (strpos($subdomain, '-') !== false) {
-                     $Url = $this->getSiteUrlFromHost($Domain)."/utility/email.json";
+                     $Url = $this->getSiteUrlFromHost($Domain, $found)."/utility/email.json";
+                     $guessed = !$found;
                   }
                }
 
@@ -326,8 +330,10 @@ class EmailRouterController extends Gdn_Controller {
                $LogModel->SetField($LogID, array('Post' => $Data['Post'], 'Response' => $Code, 'ResponseText' => $Result));
             } else {
                // Check to see if the site exists at all.
-               $r = $this->getSiteUrlFromHost(parse_url($Url, PHP_URL_HOST));
-               if (empty($host)) {
+               if ($guessed) {
+                  $r = $this->getSiteUrlFromHost(parse_url($Url, PHP_URL_HOST));
+               }
+               if ($guessed && empty($r)) {
                   $LogModel->setFeild(
                       $LogID,
                       ['Post' => $Data['Post'], 'Response' => 410, 'ResponseText' => 'Site does not exist.']
@@ -547,8 +553,10 @@ class EmailRouterController extends Gdn_Controller {
     * cannot be called directly and must fall back to its multisite format.
     *
     * @param string $host The hostname to look at or an empty string if there is no site.
+    * @param bool &$found Whether or not the site was found.
+    * @return string Returns the site URL.
     */
-   private function getSiteUrlFromHost($host) {
+   private function getSiteUrlFromHost($host, &$found = false) {
       $default = "http://$host";
 
       if (!class_exists('Communication')) {
@@ -575,16 +583,20 @@ class EmailRouterController extends Gdn_Controller {
           ->cache(60)
           ->send();
 
-      Logger::event(
-          'emailer_site',
-          Logger::INFO,
-          'Site {site.name} found from source: {source}.',
-          [
-              'source' => $host,
-              'site' => $this->trimSiteForLog($siteResponse['site'], val('multisite', $siteResponse, null)),
-              'sourceKey' => 'host'
-          ]
-      );
+      if (!empty($siteResponse['site'])) {
+         $found = true;
+
+         Logger::event(
+             'emailer_site',
+             Logger::INFO,
+             'Site {site.name} found from source: {source}.',
+             [
+                 'source' => $host,
+                 'site' => $this->trimSiteForLog($siteResponse['site'], val('multisite', $siteResponse, null)),
+                 'sourceKey' => 'host'
+             ]
+         );
+      }
 
 
 //      Logger::event('orchestration_site_full', Logger::DEBUG, "Site", ['response' => $siteResponse]);
