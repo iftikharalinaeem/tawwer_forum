@@ -135,6 +135,7 @@ class EmailRouterController extends Gdn_Controller {
 
 //            self::Log("Getting post...");
             $Post = $this->Form->FormValues();
+            Logger::event('email_received', Logger::DEBUG, "Email received.", ['data' => $Post]);
             
             // All of the post data can come in a variety of encodings.
             $Charsets = @json_decode($Post['charsets']);
