@@ -32,6 +32,15 @@ class SamlSSOPlugin extends Gdn_Plugin {
     protected $_Provider = null;
 
     /**
+     * Insert css file for custom styling of signin button/icon.
+     *
+     * @param AssetModel $sender.
+     */
+    public function assetModel_styleCss_handler($sender) {
+        $sender->addCssFile('saml.css', 'plugins/samlsso');
+    }
+
+    /**
      * Force a saml authentication to the identity provider.
      *
      * @param bool $passive Whether or not to make a passive request.
@@ -47,6 +56,41 @@ class SamlSSOPlugin extends Gdn_Plugin {
         Logger::event('saml_authrequest_sent', Logger::INFO, 'SAML request {requetid} sent to {requesthost}.',
              array('requestid' => $request->lastID, 'requesthost' => parse_url($url, PHP_URL_HOST), 'requesturl' => $url));
         redirect($url);
+    }
+
+    /**
+     * Inject a sign-in icon into the ME menu.
+     *
+     * @param Gdn_Controller $sender.
+     * @param Gdn_Controller $args.
+     */
+    public function base_beforeSignInButton_handler($sender, $args) {
+        if(!$this->isConfigured() || $this->isDefault()) {
+            return;
+        }
+        echo ' '.$this->signInButton('icon').' ';
+    }
+
+    /**
+     * Inject sign-in button into the sign in page.
+     *
+     * @param EntryController $sender.
+     * @param EntryController $args.
+     *
+     * @return mixed|bool Return null if not configured
+     */
+    public function entryController_signIn_handler($sender, $args) {
+        if(!$this->isConfigured()) {
+            return;
+        }
+        if (isset($sender->Data['Methods'])) {
+            // Add the sign in button method to the controller.
+            $method = array(
+                'Name' => self::ProviderKey,
+                'SignInHtml' => $this->signInButton()
+            );
+            $sender->Data['Methods'][] = $method;
+        }
     }
 
     /**
@@ -70,11 +114,31 @@ class SamlSSOPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Check if there is enough data to connect to an authentication provider.
+     *
+     * @return bool True if there is a secret and a client_id, false if not.
+     */
+    protected function isConfigured() {
+        $provider = $this->provider();
+        return $provider['AssociationSecret'] && $provider['EntityID'] && $provider['SignInUrl'];
+    }
+
+    /**
+     * Check authentication provider table to see if this is the default method for logging in.
+     *
+     * @return bool Return the value of the IsDefault row of GDN_UserAuthenticationProvider .
+     */
+    public function isDefault() {
+        $provider = $this->provider();
+        return (bool)$provider['IsDefault'];
+    }
+
+    /**
      *
      */
     public function provider() {
         if ($this->_Provider === null) {
-            $this->_Provider = Gdn_AuthenticationProviderModel::getProviderByKey('saml');
+            $this->_Provider = Gdn_AuthenticationProviderModel::getProviderByKey(self::ProviderKey);
         }
         return $this->_Provider;
     }
@@ -357,7 +421,9 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      */
     public function base_render_before($sender) {
-        saveToConfig('Garden.SignIn.Popup', false, false);
+        if ($this->isDefault()) {
+            saveToConfig('Garden.SignIn.Popup', false, false);
+        }
     }
 
     /**
@@ -450,6 +516,34 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $Sender->addSideMenu();
         $Sender->setData('Title', sprintf(t('%s Settings'), 'SAML SSO'));
         $this->render('Settings');
+    }
+
+    /**
+     * Create signup button specific to this plugin.
+     *
+     * @param string $type Either button or icon to be output.
+     * @return string Resulting HTML element (button).
+     */
+    protected function signInButton($type = 'button') {
+        $target = Gdn::request()->post(
+            'Target',
+            Gdn::request()->get(
+                'Target',
+                url('', '/')
+            )
+        );
+        $url = '/entry/' . self::ProviderKey;
+
+        return socialSignInButton(
+            'SAMLSSO',
+            $url,
+            $type,
+            [
+                'class' => 'default',
+                'rel'   => 'nofollow',
+                'title' => 'Sign in with SAML'
+            ]
+        );
     }
 
     /**
