@@ -537,27 +537,27 @@ class EmailRouterController extends Gdn_Controller {
       }
 
       // Look up the site ID.
-      list($code, $queryResponse) = Communication::orchestration('/site/query')
+      $queryResponse = Communication::orchestration('/site/query')
           ->method('get')
           ->parameter('query', $host)
           ->parameter('users', 0)
           ->parameter('verbose', 0)
           ->send();
       Logger::event('orchestration_site_query', Logger::DEBUG, "Sites", ['response' => $queryResponse]);
-      if (empty(val('sites', $queryResponse))) {
+      if (empty(valr('response.sites', $queryResponse))) {
          return $default;
       }
 
       // Look up the site.
-      list($code, $siteResponse) = Communication::orchestration('/site/full')
+      $siteResponse = Communication::orchestration('/site/full')
           ->method('get')
-          ->parameter('siteid', valr('sites.0.SiteID', $queryResponse))
+          ->parameter('siteid', valr('response.sites.0.SiteID', $queryResponse))
           ->send();
       Logger::event('orchestration_site_full', Logger::DEBUG, "Site", ['response' => $siteResponse]);
 
-      if ($code == 200 && is_array(val('multisite', $siteResponse))) {
+      if ($siteResponse['code'] == 200 && is_array(valr('response.multisite', $siteResponse))) {
          // This is a multisite and must use a different URL format.
-         $multisite = $siteResponse['multisite'];
+         $multisite = $siteResponse['response']['multisite'];
          $result = "https://{$multisite['real']}";
          return $result;
       }
