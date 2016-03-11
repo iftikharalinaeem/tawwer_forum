@@ -246,6 +246,19 @@ function AnalyticsWidget(config) {
         });
     };
 
+    /**
+     * @param {string} newCallback
+     * @return this
+     */
+    this.setCallback = function(newCallback) {
+        if (handler !== null) {
+            handler.setCallback(newCallback);
+            return this;
+        } else {
+            throw 'No handler present for callback';
+        }
+    };
+
     this.setHandler = function(newHandler) {
         if (typeof newHandler === 'string' && typeof window[newHandler] === 'function') {
             var widgetData = this.getData();
@@ -354,6 +367,10 @@ AnalyticsWidget.prototype.loadConfig = function(config) {
 
     if (typeof config.handler !== 'undefined') {
         this.setHandler(config.handler);
+
+        if (typeof config.callback !== 'undefined' && config.callback) {
+            this.setCallback(config.callback);
+        }
     }
 };
 

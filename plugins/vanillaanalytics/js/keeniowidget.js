@@ -7,6 +7,12 @@
 function KeenIOWidget(config) {
 
     /**
+     *
+     * @type {null|function}
+     */
+    var callback = null;
+
+    /**
      * @type {object}
      */
     var chartConfig = {};
@@ -98,6 +104,14 @@ function KeenIOWidget(config) {
         newQuery.title = config.title || null;
 
         query.push(newQuery);
+    };
+
+    /**
+     *
+     * @returns {null|function}
+     */
+    this.getCallback = function() {
+        return callback;
     };
 
     /**
@@ -215,6 +229,20 @@ function KeenIOWidget(config) {
     };
 
     /**
+     *
+     * @param {string} newCallback
+     * @returns {AnalyticsWidget}
+     */
+    this.setCallback = function(newCallback) {
+        if (typeof this[newCallback] === 'function') {
+            callback = this[newCallback];
+            return this;
+        } else {
+            throw 'Invalid value for newCallback';
+        }
+    };
+
+    /**
      * @param {Array} newData
      * @returns {KeenIOWidget}
      */
@@ -325,6 +353,40 @@ function KeenIOWidget(config) {
 }
 
 /**
+ *
+ * @param {Array} result
+ * @return {Array}
+ */
+KeenIOWidget.prototype.divideResult = function(result) {
+    var revisedResult = [];
+
+    if (!Array.isArray(result)) {
+        throw 'divideResult requires an array';
+    }
+
+    if (result[0].value.length !== 2) {
+        throw 'divideResult requires exactly two results';
+    }
+
+    for (var i = 0; i < result.length; i++) {
+        var value;
+
+        if (result[i].value[1].result > 0) {
+            value = parseFloat((result[i].value[0].result / result[i].value[1].result).toFixed(2));
+        } else {
+            value = 0;
+        }
+
+        revisedResult.push({
+            timeframe: result[i].timeframe,
+            value    : value
+        });
+    }
+
+    return revisedResult;
+};
+
+/**
  * @param {object} config
  */
 KeenIOWidget.prototype.loadConfig = function(config) {
@@ -391,7 +453,6 @@ KeenIOWidget.prototype.renderBody = function() {
  */
 KeenIOWidget.prototype.runQuery = function(callback) {
     var client = this.getClient();
-    var query  = this.getQuery().slice(0);
     var widget = this;
 
     var updateParams = {
@@ -404,6 +465,8 @@ KeenIOWidget.prototype.runQuery = function(callback) {
 
     this.updateQueryParams(updateParams);
 
+    var query  = this.getQuery();
+
     client.run(query, function(error, analyses) {
         if (error === null) {
             var result = widget.getQueryResult(analyses, query);
@@ -411,7 +474,7 @@ KeenIOWidget.prototype.runQuery = function(callback) {
             widget.setData(result);
 
             if (typeof callback === 'function') {
-                boundCallback = callback.bind(widget);
+                var boundCallback = callback.bind(widget);
                 boundCallback();
             }
         }
@@ -424,11 +487,12 @@ KeenIOWidget.prototype.runQuery = function(callback) {
  * @return Array
  */
 KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
+    var callback = this.getCallback();
     var result = [];
 
     if (typeof analyses !== 'undefined' && typeof query !== 'undefined') {
         if (Array.isArray(analyses) && analyses.length > 0) {
-            var primaryResult = analyses.shift();
+            var primaryResult = analyses.shift().result;
 
             if (analyses.length >= 1) {
                 for (var i = 0; i < primaryResult.length; i++) {
@@ -442,13 +506,13 @@ KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
                         // Compensate for popping primaryResult off the top.
                         var offsetComp = (x + 1);
                         intervalValues.push({
-                            category: query[offsetComp].value,
-                            result  : analyses[offsetComp].value
+                            category: query[offsetComp].title,
+                            result  : analyses[x].result[i].value
                         });
                     }
 
                     result.push({
-                        timeframe: primaryResult.timeframe,
+                        timeframe: primaryResult[i].timeframe,
                         value    : intervalValues
                     });
                 }
@@ -466,6 +530,10 @@ KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
                 }
             }
         }
+    }
+
+    if (callback) {
+        result = callback(result);
     }
 
     return result;
