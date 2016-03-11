@@ -59,7 +59,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         static $categoryIDs = null;
 
         if ($categoryIDs === null) {
-            $categories = $this->getCategories();;
+            $categories = $this->getCategories();
             $categoryIDs = array_keys($categories);
         }
         return $categoryIDs;
@@ -344,6 +344,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param $args Event arguments.
      */
     public function gdn_pluginManager_categoryWatch_handler($sender, $args) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
         $args['CategoryIDs'] = $this->getCategoryIDs();
     }
 
@@ -356,6 +360,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param $args Event arguments.
      */
     public function advancedSearchPlugin_beforeSearchCompilation_handler($sender, $args) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
         $allowsUncategorized = in_array(0, $args['Search']['cat']);
         $args['Search']['cat'] = $this->getCategoryIDs();
 
