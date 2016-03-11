@@ -130,6 +130,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     /// Event Handlers ///
 
     public function base_render_before($sender) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
         // Add the alternate urls to the current crop of sites.
         SubcommunityModel::addAlternativeUrls();
 
@@ -164,6 +168,11 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function categoriesModule_getData_handler($sender) {
         $site = SubcommunityModel::getCurrent();
+
+        if (!$site) {
+            return;
+        }
+
         $categoryID = val('CategoryID', $site);
 
         // Get the child categories
@@ -186,6 +195,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param CategoriesController $sender
      */
     public function categoriesController_render_before($sender) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
         if (empty($sender->Data['Category']) || empty($sender->Data['Categories'])) {
             return;
         }
@@ -207,6 +220,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionsController_index_before($sender, $args) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
         // Get all of the category IDs associated with the subcommunity.
         $categoryIDs = $this->getCategoryIDs();
         $sender->setCategoryIDs($categoryIDs);
@@ -219,6 +236,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionsModule_init_handler($sender, $args) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
         $sender->setCategoryIDs($this->getCategoryIDs());
     }
 
@@ -229,6 +250,18 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         $this->api = $this->isAPI($sender);
 
+        $parts = explode('/', trim(Gdn::request()->path(), '/'), 2);
+        $root = $parts[0];
+        $path = val(1, $parts, '');
+
+        // Look the root up in the mini sites.
+        $site = SubcommunityModel::getSite($root);
+        $defaultSite = SubcommunityModel::getDefaultSite();
+
+        if (!$site && !$defaultSite) {
+            return;
+        }
+
         saveToConfig(
             [
                 'Vanilla.Categories.NavDepth' => 1
@@ -237,12 +270,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             false
         );
 
-        $parts = explode('/', trim(Gdn::request()->path(), '/'), 2);
-        $root = $parts[0];
-        $path = val(1, $parts, '');
-
-        // Look the root up in the mini sites.
-        $site = SubcommunityModel::getSite($root);
         if ($site) {
             Gdn::request()->path($path);
             $webroot = Gdn::request()->webRoot();
@@ -251,7 +278,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
             $this->initializeSite($site);
         } elseif (!in_array($root, ['utility', 'sso', 'entry']) && !$this->api) {
-            $defaultSite = SubcommunityModel::getDefaultSite();
             if ($defaultSite) {
                 $url = Gdn::request()->assetRoot().'/'.$defaultSite['Folder'].rtrim('/'.Gdn::request()->path(), '/');
                 $get = Gdn::request()->get();
@@ -381,6 +407,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param $args Event arguments.
      */
     public function gdn_form_beforeCategoryDropDown_handler($sender, $args) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
         $args['Options']['CategoryData'] =  $this->getCategories();
     }
 }
