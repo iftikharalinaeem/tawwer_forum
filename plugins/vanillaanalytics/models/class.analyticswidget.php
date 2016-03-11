@@ -18,6 +18,11 @@ class AnalyticsWidget implements JsonSerializable {
     protected $bookmarked = null;
 
     /**
+     * @var string Name of a function in the handler's JavaScript class to call against query results.
+     */
+    protected $callback = null;
+
+    /**
      * @var array A collection of data to drive the widget.
      */
     protected $data = [];
@@ -84,6 +89,15 @@ class AnalyticsWidget implements JsonSerializable {
 
         $this->supports[] = $eventProperty;
         return $this;
+    }
+
+    /**
+     * Retrieve the name of the handler's JavaScript class to call on query results.
+     *
+     * @return string
+     */
+    public function getCallback() {
+        return $this->callback;
     }
 
     /**
@@ -184,6 +198,7 @@ class AnalyticsWidget implements JsonSerializable {
     public function jsonSerialize() {
         return [
             'bookmarked'      => $this->isBookmarked(),
+            'callback'        => $this->getCallback(),
             'data'            => $this->data,
             'handler'         => $this->handler,
             'supports'        => $this->supports,
@@ -191,6 +206,17 @@ class AnalyticsWidget implements JsonSerializable {
             'type'            => $this->type,
             'widgetID'        => $this->widgetID
         ];
+    }
+
+    /**
+     * Set a callback for query results.  This callback must be a member of the handler's JavaScript class.
+     *
+     * @param string $callback
+     * @return $this
+     */
+    public function setCallback($callback) {
+        $this->callback = $callback;
+        return $this;
     }
 
     /**
