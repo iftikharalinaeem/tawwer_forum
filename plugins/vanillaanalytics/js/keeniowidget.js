@@ -386,6 +386,17 @@ KeenIOWidget.prototype.divideResult = function(result) {
     return revisedResult;
 };
 
+KeenIOWidget.prototype.getMetricMarkup = function() {
+    var markup = "<span class=\"metric-value\">{data}</span><span class=\"metric-title\">{title}</span>";
+    var data = this.getData();
+    var title = this.getTitle();
+
+    markup = markup.replace("{data}", Number(data).toLocaleString());
+    markup = markup.replace("{title}", this.getTitle());
+
+    return markup;
+};
+
 /**
  * @param {object} config
  */
@@ -437,7 +448,7 @@ KeenIOWidget.prototype.renderBody = function() {
     if (typeof element === 'object' && element instanceof HTMLElement) {
         switch (this.getType()) {
             case 'metric':
-                element.innerHTML = this.getData() + " " + this.getTitle();
+                element.innerHTML = this.getMetricMarkup();
                 break;
             default:
                 dataviz.parseRawData({result: this.getData()});
