@@ -89,7 +89,7 @@ class PopularPostsModule extends Gdn_Module {
 
             $discussionsIDs = [];
             foreach($discussionsLists as $discussionsList) {
-                $discussionsIDs += explode(',', $discussionsList['GroupedDiscussionIDs']);
+                $discussionsIDs = array_merge($discussionsIDs, explode(',', $discussionsList['GroupedDiscussionIDs']));
             }
 
             $discussions = Gdn::sql()
@@ -129,7 +129,7 @@ class PopularPostsModule extends Gdn_Module {
                 }
 
                 foreach($userAllowedData as $categoryID => $discussions) {
-                    $filteredDiscussions += $discussions;
+                    $filteredDiscussions = array_merge($filteredDiscussions, $discussions);
                 }
             }
 
