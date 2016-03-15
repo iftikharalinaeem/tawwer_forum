@@ -242,9 +242,9 @@ function FormatQuote($Body) {
 
    $User = Gdn::UserModel()->GetID(GetValue('InsertUserID', $Body));
    if ($User) {
-      $Result = '<blockquote class="Quote Media">'.
-         '<div class="Img">'.UserPhoto($User).'</div>'.
-         '<div class="Media-Body">'.
+      $Result = '<blockquote class="Quote UserQuote Media">'.
+         '<div class="Img QuoteAuthor">'.UserPhoto($User).'</div>'.
+         '<div class="Media-Body QuoteText">'.
             '<div>'.UserAnchor($User).' - '.Gdn_Format::DateFull($Body['DateInserted'],'html').'</div>'.
             Gdn_Format::To($Body['Body'], $Body['Format']).
          '</div>'.
