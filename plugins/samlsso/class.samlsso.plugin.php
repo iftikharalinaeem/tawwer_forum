@@ -331,7 +331,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $Form->setFormValue('Photo', $this->rval('photo', $profile));
 
         // Don't overwrite ConnectName if it already exists.
-        if (!$Form->getFormValue('ConnectName', false)) {
+        if ($this->rval('uid', $profile)) {
             $Form->setFormValue('ConnectName', $this->rval('uid', $profile));
         }
 
