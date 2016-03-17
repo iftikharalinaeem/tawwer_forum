@@ -4,7 +4,7 @@
  */
 $ApplicationInfo['Emailer'] = array(
    'Description' => "Routes email to individual sites.",
-   'Version' => '1.1.0',
+   'Version' => '1.2.0',
    'RegisterPermissions' => FALSE,
    'Url' => 'http://vanillaforums.com',
    'Author' => "Todd Burry",
