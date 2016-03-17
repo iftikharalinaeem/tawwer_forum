@@ -19,16 +19,24 @@ $PluginInfo['Whitelist'] = array(
 
 /**
  * Class WhitelistPlugin
+ *
+ * By default this plugin allows "BlockExceptions" to be requested by non whitelisted sources.
+ * It works like this to prevent an administrator to lock himself out of his own forum.
+ *
+ * It is possible to disregard "BlockExceptions"
+ * by manually setting the Whitelist.BlockMode to "HARDCORE" in the config
+ *
+ * IPs from Whitelist.MasterIPList will never be blocked by anything even the "HARDCORE" block mode.
+ * This config has to be set in the config directly. Use the same format than Whitelist.IPList but separated by ;
  */
 class WhitelistPlugin extends Gdn_Plugin {
 
     /**
      * Create a method called "whitelist" on the SettingController.
      *
-     * @param $sender Sending controller instance
+     * @param SettingsController $sender Sending controller instance
      */
     public function settingsController_whitelist_create($sender) {
-
         $sender->title(sprintf(t('%s settings'), t('Whitelist')));
         $sender->addSideMenu('settings/whitelist');
 
@@ -39,10 +47,10 @@ class WhitelistPlugin extends Gdn_Plugin {
 
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
-        $configurationModel->setField(array(
+        $configurationModel->setField([
             'Whitelist.Active' => c('Whitelist.Active', false),
             'Whitelist.IPList' => c('Whitelist.IPList', null),
-        ));
+        ]);
 
         $sender->Form->setModel($configurationModel);
 
@@ -50,6 +58,8 @@ class WhitelistPlugin extends Gdn_Plugin {
         if ($sender->Form->authenticatedPostBack() === false) {
             $sender->Form->setData($configurationModel->Data);
         } else {
+            $sender->Form->setFormValue('Whitelist.Active', (bool)$sender->Form->getFormValue('Whitelist.Active'));
+
             if ($sender->Form->save()) {
                 $sender->StatusMessage = t('Your changes have been saved.');
             }
@@ -61,7 +71,7 @@ class WhitelistPlugin extends Gdn_Plugin {
     /**
      * Add a link to the dashboard menu.
      *
-     * @param $sender Sending controller instance.
+     * @param object $sender Sending controller instance.
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = &$sender->EventArguments['SideMenu'];
@@ -74,31 +84,37 @@ class WhitelistPlugin extends Gdn_Plugin {
             return;
         }
 
-        // If you are an admin we should not block you even if you are not whitelisted
-        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-            return;
-        }
-
+        $isBlockModeHardcore = (c('Whitelist.BlockMode', false) === 'HARDCORE');
         $request = $args['Request'];
-        $blockExceptions = $args['BlockExceptions'];
-        $pathRequested = $request->path();
 
-        // Lets use block exceptions as a whitelist of URLs that must not be blocked (ex. entry/*)
-        foreach ($blockExceptions as $blockException => $blockLevel) {
-            if (preg_match($blockException, $pathRequested)) {
+        if (!$isBlockModeHardcore) {
+            // If you are an admin we should not block you even if you are not whitelisted
+            // unless... HARDCORE BLOCK MODE! (don't make a whitelisting error lolz)
+            if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
                 return;
+            }
+
+            $blockExceptions = $args['BlockExceptions'];
+            $pathRequested = $request->path();
+
+            // Lets use block exceptions as a whitelist of URLs that must not be blocked (ex. entry/*)
+            foreach ($blockExceptions as $blockException => $blockLevel) {
+                if (preg_match($blockException, $pathRequested)) {
+                    return;
+                }
             }
         }
 
         $ip = $request->ipAddress();
 
         // Lets check if you are whitelisted
-        if ($this->isIpWhitelisted($ip)) {
+        if ($this->isIpWhitelisted($ip, $this->loadMasterIPList())
+            || $this->isIpWhitelisted($ip, $this->loadWhitelistedIPs())) {
             return;
         }
 
         // Check your privileges son :P
-        if (Gdn::session()->isValid()) {
+        if ($isBlockModeHardcore || Gdn::session()->isValid()) {
             safeHeader('HTTP/1.0 403 Unauthorized', true, 403);
             if (Gdn::request()->get('DeliveryType') === DELIVERY_TYPE_DATA) {
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
@@ -108,7 +124,10 @@ class WhitelistPlugin extends Gdn_Plugin {
             if (Gdn::request()->get('DeliveryType') === DELIVERY_TYPE_DATA) {
                 safeHeader('HTTP/1.0 401 Unauthorized', true, 401);
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
-                echo json_encode(array('Code' => '401', 'Exception' => t('You must sign in.')));
+                echo json_encode([
+                    'Code' => '401',
+                    'Exception' => t('You must sign in.'),
+                ]);
             } else {
                 redirect('/entry/signin?Target='.urlencode($request->path(false)));
             }
@@ -125,19 +144,49 @@ class WhitelistPlugin extends Gdn_Plugin {
         $whitelistedIPs = [];
 
         if (($rawList = c('Whitelist.IPList', false)) !== false) {
-            $self = $this;
-
-            // Convert the list to array, trim each IPs and tokenize them, filter any falsy value.
-            $whitelistedIPs = array_filter(
-                array_map(
-                    function($value) use ($self) {
-                        $value = trim($value);
-                        return $self->tokenizeIP($value);
-                    },
-                    explode("\n", $rawList)
-                )
-            );
+            $whitelistedIPs = $this->parseIPsListDefinition($rawList, "\n");
         }
+
+        return $whitelistedIPs;
+    }
+
+    /**
+     * Load the tokenized list of master IPs.
+     *
+     * @return array tokenized IPs
+     */
+    protected function loadMasterIPList() {
+        $masterIPList = [];
+
+        if (($rawList = c('Whitelist.MasterIPList', false)) !== false) {
+            $masterIPList = $this->parseIPsListDefinition($rawList, ';');
+        }
+
+        return $masterIPList;
+    }
+
+
+    /**
+     * Parse a list, potentially malformed, of IPs
+     *
+     * @param string $ipList List of IPs
+     * @param string $separator List's separator
+     *
+     * @return array tokenized IPs
+     */
+    protected function parseIPsListDefinition($ipList, $separator) {
+        $that = $this;
+
+        // Convert the list to array, trim each IPs and tokenize them, filter any falsy value.
+        $whitelistedIPs = array_filter(
+            array_map(
+                function($value) use ($that) {
+                    $value = trim($value);
+                    return $that->tokenizeIP($value);
+                },
+                explode($separator, $ipList)
+            )
+        );
 
         return $whitelistedIPs;
     }
@@ -146,17 +195,17 @@ class WhitelistPlugin extends Gdn_Plugin {
      * Check whether an IP is whitelisted or not.
      *
      * @param string $ip IP address
+     * @param string $whitelist list of whitelisted IPs
+     *
      * @return bool true if the IP whitelisted false otherwise
      */
-    protected function isIPWhitelisted($ip) {
+    protected function isIPWhitelisted($ip, $whitelist) {
         $tokenizedIP = $this->tokenizeIP($ip);
         if (!$tokenizedIP) {
             return false;
         }
 
-        $whitelistedIPs = $this->loadWhitelistedIPs();
-
-        foreach($whitelistedIPs as $whitelistedIP) {
+        foreach($whitelist as $whitelistedIP) {
             $expandedIP = $this->expandWhitelistedIP($whitelistedIP);
 
             for ($i = 0; $i < count($tokenizedIP); $i++) {
