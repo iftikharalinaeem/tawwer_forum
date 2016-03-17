@@ -784,7 +784,6 @@ a.Bookmarked:hover:before {
   }
 }
 .nav {
-  white-space: nowrap;
   *zoom: 1;
 }
 .nav:before,
@@ -799,8 +798,6 @@ a.Bookmarked:hover:before {
 .nav > li {
   position: relative;
   float: left;
-  text-overflow: ellipsis;
-  overflow: hidden;
 }
 .nav > li > a {
   position: relative;
@@ -995,7 +992,6 @@ a.Bookmarked:hover:before {
   display: none;
 }
 .FilterMenu {
-  white-space: nowrap;
   *zoom: 1;
   margin-bottom: 20px;
 }
@@ -1011,8 +1007,6 @@ a.Bookmarked:hover:before {
 .FilterMenu > li {
   position: relative;
   float: left;
-  text-overflow: ellipsis;
-  overflow: hidden;
 }
 .FilterMenu > li > a {
   position: relative;
@@ -1047,7 +1041,6 @@ a.Bookmarked:hover:before {
   display: none;
 }
 .PanelInfo {
-  white-space: nowrap;
   *zoom: 1;
   margin-bottom: 20px;
 }
@@ -1063,8 +1056,6 @@ a.Bookmarked:hover:before {
 .PanelInfo > li {
   position: relative;
   float: left;
-  text-overflow: ellipsis;
-  overflow: hidden;
 }
 .PanelInfo > li > a {
   position: relative;
