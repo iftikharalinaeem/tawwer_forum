@@ -31,6 +31,8 @@ $PluginInfo['Whitelist'] = array(
  */
 class WhitelistPlugin extends Gdn_Plugin {
 
+    protected $informMessage = null;
+
     /**
      * Create a method called "whitelist" on the SettingController.
      *
@@ -78,6 +80,18 @@ class WhitelistPlugin extends Gdn_Plugin {
         $menu->addLink('Add-ons', t('Whitelist'), 'settings/whitelist', 'Garden.Settings.Manage');
     }
 
+    /**
+     * Add a link to the dashboard menu.
+     *
+     * @param object $sender Sending controller instance.
+     */
+    public function base_render_before($sender) {
+        if ($this->informMessage !== null) {
+            $sender->informMessage($this->informMessage);
+            $this->informMessage = null;
+        }
+    }
+
     public function gdn_dispatcher_afterAnalyzeRequest_handler($sender, $args) {
         // The plugin is not active
         if (!c('Whitelist.Active', false)) {
@@ -108,8 +122,14 @@ class WhitelistPlugin extends Gdn_Plugin {
         $ip = $request->ipAddress();
 
         // Lets check if you are whitelisted
-        if ($this->isIPWhitelisted($ip, $this->loadMasterIPList())
-            || $this->isIPWhitelisted($ip, $this->loadWhitelistedIPs())) {
+        if ($this->isIPWhitelisted($ip, $this->loadWhitelistedIPs())) {
+            return;
+        }
+
+        // Lets check the master IP list just in case!
+        if ($this->isIPWhitelisted($ip, $this->loadMasterIPList())) {
+            // Register an inform message for when controllers will be initialized.
+            $this->informMessage = __CLASS__.': '.t('Request allowed by MasterIPList');
             return;
         }
 
