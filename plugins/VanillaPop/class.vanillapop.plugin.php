@@ -8,7 +8,7 @@
 $PluginInfo['VanillaPop'] = array(
     'Name' => 'Vanilla Pop',
     'Description' => "Users may start discussions, make comments, and even automatically register for your site via email.",
-    'Version' => '1.2.0',
+    'Version' => '1.3.0',
     'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -591,8 +591,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $Subject = FormatString(C('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
         $Email->Subject($Subject);
 
-        $Email->PhpMailer->MessageID = self::UID('Discussion', $Discussion['DiscussionID'], 'email');
-        $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Discussion', $Discussion['DiscussionID']));
+        $Email->PhpMailer->MessageID = self::uid('Discussion', $Discussion['DiscussionID'], 'email');
+        $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::uid('Discussion', $Discussion['DiscussionID']));
         $Email->To($User['Email'], $User['Name']);
 
         $ReplyTo = GetValue('SourceID', $Discussion);
@@ -813,16 +813,38 @@ class VanillaPopPlugin extends Gdn_Plugin {
         return $Result;
     }
 
-    public static function UID($Type, $ID, $Format = FALSE) {
-        $TypeKey = GetValue($Type, array_flip(self::$Types), NULL);
-        if (!$TypeKey)
-            return NULL;
-        $UID = $TypeKey.$ID;
-        switch (strtolower($Format)) {
-            case 'email':
-                $UID = '<'.$UID.'@'.Gdn::Request()->Host().'>';
+    /**
+     * Generate an email UID from a record.
+     *
+     * The UID is used when replying to email notifications to know which email to reply to.
+     *
+     * This method adds the current site ID to the UID at the end so that the email router will know which site the
+     * email originated from and be able to send replies to the current site. If VanillaPop isn't running on
+     * infrastructure then the site ID will not be added.
+     *
+     * @param string $type The type of record.
+     * @param int $id The record's ID.
+     * @param string $format An optional format to apply to the result. This can be an empty string or "email" to format
+     * in a way appropriate to add to an email header.
+     * @return null|string Returns a UID as a string or **null** of {@link $type} is unknown.
+     */
+    public static function uid($type, $id, $format = '') {
+        $typeKey = GetValue($type, array_flip(self::$Types), null);
+        if (!$typeKey) {
+            return null;
         }
-        return $UID;
+        $uid = $typeKey.$id;
+
+        // Add the site ID to the end of the UID.
+        if (class_exists('Infrastructure')) {
+            $uid .= '-s'.Infrastructure::siteID();
+        }
+
+        switch (strtolower($format)) {
+            case 'email':
+                $uid = '<'.$uid.'@'.Gdn::Request()->Host().'>';
+        }
+        return $uid;
     }
 
     /// Event Handlers ///
@@ -870,7 +892,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                         $Email->Subject($Subject);
 
                         $this->SetFrom($Email, $Discussion['InsertUserID']);
-                        $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Discussion', GetValue('DiscussionID', $Discussion)));
+                        $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::uid('Discussion', GetValue('DiscussionID', $Discussion)));
                     }
                     break;
                 case 'Comment':
@@ -917,9 +939,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
                             if ($Source == 'Email')
                                 $ReplyTo = GetValue('SourceID', $Discussion); // replying to an email...
                             else
-                                $ReplyTo = self::UID('Discussion', GetValue('DiscussionID', $Discussion), 'email');
+                                $ReplyTo = self::uid('Discussion', GetValue('DiscussionID', $Discussion), 'email');
 
-                            $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Discussion', GetValue('DiscussionID', $Discussion)));
+                            $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::uid('Discussion', GetValue('DiscussionID', $Discussion)));
                         }
                     }
 
@@ -945,10 +967,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
                             if ($Message2['Source'] == 'Email')
                                 $ReplyTo = $Message2['SourceID'];
                             else
-                                $ReplyTo = self::UID('Message', $Message2['MessageID'], 'email');
+                                $ReplyTo = self::uid('Message', $Message2['MessageID'], 'email');
                         }
 
-                        $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::UID('Message', GetValue('MessageID', $Message)));
+                        $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::uid('Message', GetValue('MessageID', $Message)));
                     }
 
                     // See if the user has permission to view this discussion on the site.
@@ -964,7 +986,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 $Email->PhpMailer->AddCustomHeader("In-Reply-To:$ReplyTo");
                 $Email->PhpMailer->AddCustomHeader("References:$ReplyTo");
             }
-            $Email->PhpMailer->MessageID = self::UID($Type, $ID, 'email');
+            $Email->PhpMailer->MessageID = self::uid($Type, $ID, 'email');
         }
     }
 
@@ -1165,9 +1187,15 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         $emailDomain = $this->getEmailDomain();
         list($slug, $tld) = $this->splitHostname($this->getSiteHostname());
+
+        // Correct the slug for the site hub format.
+        if ($nodeSlug = val('NODE_SLUG', $_SERVER)) {
+            $slug = $nodeSlug.'.'.rtrim(stringEndsWith($slug, $nodeSlug, true, true), '-');
+        }
+
         if ($emailDomain && $slug) {
             $sender->SetData('IncomingAddress', "$slug@$emailDomain");
-            if (strpos($slug, '.') === false) {
+            if (!empty($nodeSlug) || strpos($slug, '.') === false) {
                 $sender->SetData('CategoryAddress', "categorycode.$slug@$emailDomain");
             } else {
                 $sender->SetData('CategoryAddress', "$slug+categorycode@$emailDomain");
