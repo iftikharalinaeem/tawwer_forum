@@ -60,8 +60,8 @@ class WhitelistPlugin extends Gdn_Plugin {
         } else {
             $sender->Form->setFormValue('Whitelist.Active', (bool)$sender->Form->getFormValue('Whitelist.Active'));
 
-            if ($sender->Form->save()) {
-                $sender->StatusMessage = t('Your changes have been saved.');
+            if ($sender->Form->save() !== false) {
+                $sender->informMessage(t('Your changes have been saved.'));
             }
         }
 
@@ -108,8 +108,8 @@ class WhitelistPlugin extends Gdn_Plugin {
         $ip = $request->ipAddress();
 
         // Lets check if you are whitelisted
-        if ($this->isIpWhitelisted($ip, $this->loadMasterIPList())
-            || $this->isIpWhitelisted($ip, $this->loadWhitelistedIPs())) {
+        if ($this->isIPWhitelisted($ip, $this->loadMasterIPList())
+            || $this->isIPWhitelisted($ip, $this->loadWhitelistedIPs())) {
             return;
         }
 
