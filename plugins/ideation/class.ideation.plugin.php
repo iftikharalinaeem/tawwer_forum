@@ -33,6 +33,21 @@ class IdeationPlugin extends Gdn_Plugin {
     const REACTION_DOWN = 'Down';
 
     /**
+     * The Ideation category type name for allowing only up votes.
+     */
+    const CATEGORY_TYPE_UP = 'up';
+
+    /**
+     * The Ideation category type name for allowing up and down votes.
+     */
+    const CATEGORY_TYPE_UP_AND_DOWN = 'up-down';
+
+    /**
+     * Ideation column name in the Category table.
+     */
+    const CATEGORY_IDEATION_COLUMN_NAME = 'IdeationType';
+
+    /**
      * @var int The tag ID of the upvote reaction.
      */
     protected static $upTagID;
@@ -146,7 +161,7 @@ EOT
         if (!$sender->Form->authenticatedPostBack()) {
             $category = CategoryModel::categories($categoryID);
             if ($categoryID && !$this->isIdeaCategory($category)) {
-                // Don't the ideation state of existing categories be changed.
+                // Don't let the ideation state of existing categories be changed.
                 return;
             }
 
@@ -156,35 +171,67 @@ EOT
                 $sender->Data['_ExtendedFields']['IsIdea'] = ['Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => '<strong>' . t('Ideation') . '</strong> <small><a href="http://docs.vanillaforums.com/addons/ideation/">' . sprintf(t('Learn more about %s'), t('ideas')) . '</a></small>'];
             }
 
+            $downVoteOptions = [];
             if ($this->isIdeaCategory($category)) {
                 $sender->title('Edit Idea Category');
                 $sender->Form->addHidden('Idea_Category', true);
+                $downVoteOptions = $this->allowDownVotes($category) ? ['checked' => 'checked'] : [];
             }
 
-            $sender->Data['_ExtendedFields']['UseDownVotes'] = ['Name' => 'UseDownVotes', 'Control' => 'CheckBox'];
+            $sender->Data['_ExtendedFields']['UseDownVotes'] = ['Name' => 'UseDownVotes', 'Control' => 'CheckBox', 'Options' => $downVoteOptions];
 
         } else {
-
-            $isIdea = $sender->Form->getValue('Idea_Category');
-
-            if ($isIdea) {
-                // If it's an idea category, ideas are the only discussion type allowed.
-                $types[] = 'Idea';
-                $sender->Form->setFormValue('AllowedDiscussionTypes', $types);
-            } else {
-                // We don't allow users to explicitly set the idea discussion type as allowed.
-                // If we're not an idea category, ensure that the idea discussion type is not allowed.
-                $types = $sender->Form->getValue('AllowedDiscussionTypes');
-                if (($key = array_search('Idea', $types)) !== false) {
-                    unset($types[$key]);
-                }
-                $sender->Form->setFormValue('AllowedDiscussionTypes', $types);
+            if ($sender->Form->getValue('Idea_Category')) {
+                $sender->Form->setFormValue(self::CATEGORY_IDEATION_COLUMN_NAME, $sender->Form->getFormValue('UseDownVotes') ? self::CATEGORY_TYPE_UP_AND_DOWN : self::CATEGORY_TYPE_UP);
             }
-
-            // Strict mode compliant.
-            $sender->Form->setFormValue('IsIdea', forceBool($sender->Form->getFormValue('IsIdea'), '0', '1', '0'));
-            $sender->Form->setFormValue('UseDownVotes', forceBool($sender->Form->getFormValue('UseDownVotes'), '0', '1', '0'));
         }
+    }
+
+    /**
+     * Removes the idea type from the allowed discussion types of non-idea categories and enforces the idea type on idea categories.
+     *
+     * @param Controller $sender
+     * @param $args
+     */
+    public function base_allowedDiscussionTypes_handler($sender, $args) {
+        $category = val('Category', $args);
+        if (empty($category)) {
+            $category = val('PermissionCategory', $args);
+        }
+        if ($this->isIdeaCategory($category)) {
+            $args['AllowedDiscussionTypes'] = ['Idea' => $this->getIdeaDiscussionType()];
+        } elseif (isset($args['AllowedDiscussionTypes']['Idea'])) {
+            unset($args['AllowedDiscussionTypes']['Idea']);
+        }
+    }
+
+
+    /**
+     * Removes non-idea categories from the category dropdown on the new idea form.
+     *
+     * @param Controller $sender
+     * @param $args
+     */
+    public function base_beforeCategoryDropDown_handler($sender, $args) {
+        $type = val('Type', $sender->formValues());
+        if ($type !== 'Idea') {
+            return;
+        }
+        $Value = arrayValueI('Value', $Options = $args['Options']); // The selected category id
+        $categoryData = CategoryModel::GetByPermission(
+            'Discussions.View',
+            $Value,
+            val('Filter', $Options, array('Archived' => 0)),
+            val('PermFilter', $Options, array())
+        );
+        $ideaCategoryIDs = $this->getIdeaCategoryIDs();
+        $ideaCategories = [];
+        foreach($categoryData as $id => $category) {
+            if (in_array($id, $ideaCategoryIDs)) {
+                $ideaCategories[$id] = $category;
+            }
+        }
+        $args['Options']['CategoryData'] = $ideaCategories;
     }
 
     /**
@@ -298,7 +345,16 @@ EOT
      * @param array $args
      */
     public function base_discussionTypes_handler($sender, $args) {
-        $args['Types']['Idea'] = [
+        $args['Types']['Idea'] = $this->getIdeaDiscussionType();
+    }
+
+    /**
+     * Returns an array consisting of the Idea discussion type data.
+     *
+     * @return array The Idea discussion type.
+     */
+    public function getIdeaDiscussionType() {
+        return [
             'Singular' => 'Idea',
             'Plural' => 'Ideas',
             'AddUrl' => '/post/idea',
@@ -1005,6 +1061,16 @@ EOT
      * Adds status and state filtering to the DiscussionFilterModule.
      */
     public function discussionModel_initStatic_handler() {
+        DiscussionModel::addFilterSet('my-discussions', 'My Discussions');
+        DiscussionModel::addFilter('bookmarks', 'Bookmarked', ['w.Bookmarked' => true, 'w.UserID' => Gdn::session()->UserID], 'mine', 'my-discussions');
+        DiscussionModel::addFilter('participated', 'Participated', ['w.Participated' => true, 'w.UserID' => Gdn::session()->UserID], 'mine', 'my-discussions');
+
+        DiscussionModel::addFilterSet('discussion-types', 'Discussions Types');
+        DiscussionModel::addFilter('discussion-type', 'Discussion', ['Type' => null, 'Announce' => 0], 'type', 'discussion-types');
+        DiscussionModel::addFilter('announcement-type', 'Announcement', ['Announce >' => 0], 'type', 'discussion-types');
+        DiscussionModel::addFilter('question-type', 'Question', ['Type' => 'Question'], 'type', 'discussion-types');
+        DiscussionModel::addFilter('poll-type', 'Poll', ['Type' => 'poll'], 'type', 'discussion-types');
+
         $categories = $this->getIdeaCategoryIDs();
         DiscussionModel::addFilterSet('status', sprintf(t('All %s'), t('Statuses')), $categories);
 
@@ -1047,6 +1113,11 @@ EOT
             return;
         }
         $discussionSortFilterModule = new DiscussionsSortFilterModule($categoryID, $sender->data('Sort', ''), $sender->data('Filters', []));
+        echo $discussionSortFilterModule;
+    }
+
+    public function discussionsController_pageControls_handler($sender) {
+        $discussionSortFilterModule = new DiscussionsSortFilterModule(0, $sender->data('Sort', ''), $sender->data('Filters', []));
         echo $discussionSortFilterModule;
     }
 
@@ -1229,7 +1300,7 @@ EOT
         $ideaCategoryIDs = [];
         $categories = CategoryModel::categories();
         foreach($categories as $category) {
-            if (val('AllowedDiscussionTypes', $category) && in_array('Idea', val('AllowedDiscussionTypes', $category, []))) {
+            if ($this->isIdeaCategory($category)) {
                 $ideaCategoryIDs[] = val('CategoryID', $category);
             }
         }
@@ -1243,7 +1314,7 @@ EOT
      * @return bool Whether the category is an Idea category.
      */
     public function isIdeaCategory($category) {
-        return val('AllowedDiscussionTypes', $category) && in_array('Idea', val('AllowedDiscussionTypes', $category));
+        return val(self::CATEGORY_IDEATION_COLUMN_NAME, $category, false);
     }
 
     /**
@@ -1265,7 +1336,7 @@ EOT
                 $category = [];
         }
 
-        return val('UseDownVotes', $category, false);
+        return val(self::CATEGORY_IDEATION_COLUMN_NAME, $category, false) === self::CATEGORY_TYPE_UP_AND_DOWN;
     }
 
     /**
