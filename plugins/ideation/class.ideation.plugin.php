@@ -1106,11 +1106,6 @@ EOT
         echo $discussionSortFilterModule;
     }
 
-    public function discussionsController_pageControls_handler($sender) {
-        $discussionSortFilterModule = new DiscussionsSortFilterModule(0, $sender->data('Sort', ''), $sender->data('Filters', []));
-        echo $discussionSortFilterModule;
-    }
-
     /**
      * NOTIFICATIONS/ACTIVITY
      * ----------------------
