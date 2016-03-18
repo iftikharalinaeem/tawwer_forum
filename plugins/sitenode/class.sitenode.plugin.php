@@ -234,6 +234,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Get the config from the hub.
         $config = $this->hubApi('/multisites/nodeconfig.json', 'GET', ['from' => $this->slug()], true);
         if (!val('Sync', $config)) {
+            Logger::event('syncnode_skip', Logger::INFO, "The hub told us not to sync.");
             return;
         }
 
@@ -241,6 +242,12 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         // Enable plugins.
         foreach (val('Addons', $config, []) as $addonKey => $enabled) {
+            if (strcasecmp($addonKey, 'sitehub') === 0 && $enabled) {
+                Logger::event('snycnode_skipaddon', Logger::WARNING, "The sitehub addon should not be enabled in nodes.");
+                $this->toggleAddon($addonKey, false);
+                continue;
+            }
+
             try {
                 $this->toggleAddon($addonKey, $enabled);
             } catch (Exception $ex) {
@@ -280,6 +287,13 @@ class SiteNodePlugin extends Gdn_Plugin {
         Trace('Synchronizing authenticators.');
         $this->syncAuthenticators(val('Authenticators', $config, []));
 
+        // Push the categories.
+        try {
+            $this->pushCategories();
+        } catch (Exception $ex) {
+            // Do nothing. The exception is logged.
+        }
+
         $this->FireEvent('AfterSync');
 
         // Tell the hub that we've synchronized.
@@ -288,6 +302,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         $result = $this->hubApi("/multisites/$siteID.json", 'POST', ['DateLastSync' => $now, 'Status' => 'active'], true);
 
         Gdn::Config()->Shutdown();
+        Logger::event('syncnode_complete', Logger::INFO, "The node has completed it's sync.");
     }
 
     public function syncAuthenticators(array $authenticators) {
@@ -302,6 +317,44 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $model->Save($row);
             }
         }
+    }
+
+    /**
+     * The /utility/pushcategories endpoint.
+     *
+     * @param UtilityController $sender
+     */
+    public function utilityController_pushCategories_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
+        if (!$sender->Request->IsAuthenticatedPostBack(true)) {
+            throw forbiddenException('GET');
+        }
+
+        $this->Data = $this->pushCategories();
+
+        $sender->render('Blank', 'Utility', 'Dashboard');
+    }
+
+    /**
+     * Push the categories from this node to the hub.
+     *
+     * @return mixed
+     */
+    public function pushCategories() {
+        $categories = Gdn::sql()
+            ->select('CategoryID, Name, UrlCode, HubID')
+            ->getWhere('Category', ['CategoryID >' => 0], '', '', 250)->resultArray();
+
+        $post = [
+            'Slug' => $this->slug(),
+            'Categories' => $categories,
+            'Delete' => true
+        ];
+
+        $json = json_encode($post, JSON_PRETTY_PRINT);
+
+        $r = $this->hubApi('/multisites/syncnodecategories.json', 'POST', $post, true);
+        return $r;
     }
 
     /**
@@ -528,17 +581,33 @@ class SiteNodePlugin extends Gdn_Plugin {
      * @param Gdn_Dispatcher $sender
      */
     public function gdn_dispatcher_appStartup_handler($sender) {
+        Logger::event('hubsso_start', Logger::DEBUG, "Hub SSO start.");
+
         if (Gdn::PluginManager()->IsEnabled('sitehub')) {
+            Logger::event('hubsso_skip', Logger::DEBUG, "Site hub is enabled. Skipping Hub SSO.");
             return;
         }
 
         $this->checkSSO();
 
+        if (Gdn::session()->isValid()) {
+            Logger::event('hubsso_skip', Logger::DEBUG, "Session is valid. Skipping Hub SSO.");
+        }
+        if (!val(self::HUB_COOKIE, $_COOKIE)) {
+            Logger::event('hubsso_skip', Logger::DEBUG, "Hub cookie not present. Skipping Hub SSO.");
+        }
+
         if (!Gdn::Session()->IsValid() && val(self::HUB_COOKIE, $_COOKIE)) {
             // Check the cookie expiry here.
             $hubCookie = explode('|', val(self::HUB_COOKIE, $_COOKIE));
             $expiry = val(4, $hubCookie);
-            if($expiry < time()) {
+            if ($expiry < time()) {
+                Logger::event(
+                    'hubsso_expired',
+                    Logger::INFO,
+                    "Skipping hub SSO because the hub's cookie has expired.",
+                    ['cookieExpiry' => $expiry]
+                );
                 return;
             }
 
@@ -553,9 +622,9 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $roles = val('Roles', $user);
                 if (is_array($roles)) {
                     $roleModel = new RoleModel();
-                    $roleHubIDs = ConsolidateArrayValuesByKey($roles, 'HubID');
+                    $roleHubIDs = array_column($roles, 'HubID');
                     $roles = $roleModel->GetWhere(['HubID' => $roleHubIDs])->ResultArray();
-                    $user['Roles'] = ConsolidateArrayValuesByKey($roles, 'RoleID');
+                    $user['Roles'] = array_column($roles, 'RoleID');
                     $user['RoleID'] = $user['Roles'];
                 }
 
@@ -565,7 +634,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
                 Trace($user, 'hubSSO');
 
-                $user_id = Gdn::UserModel()->Connect($user['UniqueID'], self::PROVIDER_KEY, $user);
+                $user_id = Gdn::userModel()->connect($user['UniqueID'], self::PROVIDER_KEY, $user);
                 Trace($user_id, 'user ID');
                 if ($user_id) {
                     // Add additional authentication.
@@ -582,7 +651,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
                     Gdn::Session()->Start($user_id, true);
                 }
-            } catch(Exception $ex) {
+            } catch (Exception $ex) {
                 if ($ex->getCode() == 401) {
                     Gdn::Dispatcher()
                         ->PassData('Code', $ex->getCode())
@@ -599,10 +668,10 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         // Override the from email address.
-        if ($alias = C('Plugins.VanillaPop.Alias')) {
-            $supportEmail = $this->slug().".$alias@email.vanillaforums.com";
-            SaveToConfig('Garden.Email.SupportAddress', $supportEmail, false);
-        }
+//        if ($alias = C('Plugins.VanillaPop.Alias')) {
+//            $supportEmail = $this->slug().".$alias@vanillaforums.email";
+//            SaveToConfig('Garden.Email.SupportAddress', $supportEmail, false);
+//        }
     }
 
     /**
@@ -638,6 +707,11 @@ class SiteNodePlugin extends Gdn_Plugin {
     public function gdn_session_end_handler($sender) {
         // Delete the hub cookie when signing out too.
         if (val(self::HUB_COOKIE, $_COOKIE)) {
+            ob_start();
+            debug_print_backtrace();
+            $trace = ob_end_clean();
+            Logger::event('session_end_node', Logger::INFO, 'Hub session ending from node.', ['trace' => $trace]);
+
             Gdn_CookieIdentity::DeleteCookie(SiteNodePlugin::HUB_COOKIE, '/');
         }
     }

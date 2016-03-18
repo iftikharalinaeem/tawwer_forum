@@ -33,6 +33,10 @@ class Infrastructure {
         return $result;
     }
 
+    public static function getMulti($name) {
+        return null;
+    }
+
     public static function site($key) {
         switch (strtolower($key)) {
             case 'accountid':

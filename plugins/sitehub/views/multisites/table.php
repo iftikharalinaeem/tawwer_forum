@@ -27,7 +27,7 @@ PagerModule::Write(array('Sender' => $this));
                 echo Gdn_Format::Date($Row['DateLastSync'], 'html');
                 ?>
             </td>
-            <td><?php echo strtolower($Row['Status']); ?></td>
+            <td class="js-status"><?php echo strtolower($Row['Status']); ?></td>
             <td>
                 <?php
                 echo Anchor(T('Delete'), "/multisites/{$Row['MultisiteID']}/delete", 'SmallButton Popup');

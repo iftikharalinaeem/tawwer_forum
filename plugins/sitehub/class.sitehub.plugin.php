@@ -28,7 +28,22 @@ class SiteHubPlugin extends Gdn_Plugin {
     const HUB_COOKIE = 'vf_hub_ENDTX';
     const NODE_COOKIE = 'vf_node_ENDTX';
 
+    const EMAIL_NODE_REGEX = '(?:(?<category>[a-z0-9-]+)\.)?(?<node>[a-z0-9-]+)';
+    const EMAIL_CATEGORY_REGEX = '(?<category>[a-z0-9-]+)(?:\.(?<node>[a-z0-9-]+))?';
+
+    /**
+     * @var bool Whether to match categories before nodes in email routing.
+     */
+    protected $emailMatchCategories;
+
     /// Methods ///
+
+    /**
+     * Initialize a new instance of the {@link SiteHubPlugin} .
+     */
+    public function __construct() {
+        $this->emailMatchCategories = c('SiteHub.EmailMatchCategories', false);
+    }
 
     public function setup() {
         $this->structure();
@@ -53,22 +68,34 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->column('Attributes', 'text', true)
             ->set();
 
-        Gdn::Structure()
+        gdn::structure()
             ->table('Role')
             ->column('HubSync', ['settings', 'membership'], true)
             ->set();
 
-        Gdn::Structure()
+        gdn::structure()
             ->table('Category')
             ->column('HubSync', ['', 'settings'], 'settings')
             ->set();
 
-        Gdn::Structure()
-            ->Table('UserAuthenticationProvider')
-            ->Column('SyncToNodes', 'tinyint(1)', '0')
-            ->Set();
+        gdn::structure()
+            ->table('UserAuthenticationProvider')
+            ->column('SyncToNodes', 'tinyint(1)', '0')
+            ->set();
 
-        TouchConfig('Badges.Disabled', true);
+        touchConfig('Badges.Disabled', true);
+
+        // This table contains a mirror of all of the categories on all of the nodes.
+        gdn::structure()
+            ->table('NodeCategory')
+            ->primaryKey('NodeCategoryID')
+            ->column('MultisiteID', 'int', false, 'key')
+            ->column('CategoryID', 'int', false)
+            ->column('Name', 'varchar(255)')
+            ->column('UrlCode', 'varchar(255)', true)
+            ->column('HubID', 'int', true)
+            ->column('DateLastSync', 'datetime', false, 'index')
+            ->set();
     }
 
     /**
@@ -95,6 +122,41 @@ class SiteHubPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Get the regex used to match emails.
+     *
+     * @return string Returns a part of a regex as a string.
+     */
+    public function getEmailRegex() {
+        if ($this->emailMatchCategories) {
+            return self::EMAIL_CATEGORY_REGEX;
+        } else {
+            return self::EMAIL_NODE_REGEX;
+        }
+    }
+
+    /**
+     * Get the regular expression used to extract nodes/categories from email addresses.
+     *
+     * @return string Returns a regular expression as a string.
+     */
+    public function getEmailAddressRegex() {
+        $regex = $this->getEmailRegex();
+
+        return "`^\s*$regex\.[a-z0-9-]+(?:\+(?<args>[^@]+))?@`i";
+    }
+
+    /**
+     * Get the regular expression used to extract nodes/categories from an email subject.
+     *
+     * @return string string Returns a regular expression as a string.
+     */
+    public function getEmailSubjectRegex() {
+        $regex = $this->getEmailRegex();
+
+        return "`^\s*{$regex}`i";
+    }
+
     /// Event Handlers ///
 
 
@@ -116,6 +178,78 @@ class SiteHubPlugin extends Gdn_Plugin {
             'Description' => 'Specify how this category synchronizes to the node sites.',
             'Items' => ['' => 'None', 'settings' => 'Settings']
         ];
+    }
+
+    /**
+     * Tell the email router which node to route an email to.
+     *
+     * @param Gdn_Controller $sender The controller dispatching this endpoint.
+     */
+    public function utilityController_emailRoute_create($sender) {
+        if (!$sender->Request->isPostBack()) {
+            throw forbiddenException('GET');
+        }
+
+        $email = $sender->Request->post('Email');
+        $subject = trim($sender->Request->post('Subject'));
+
+        // Pass the data to the dispatcher for errors.
+        Gdn::dispatcher()
+            ->passData('Email', $email)
+            ->passData('Subject', $subject);
+
+        // Look for a match against the email address first.
+        $valid = preg_match($this->getEmailAddressRegex(), $email, $matches);
+        if (!$valid || (empty($matches['node']) && empty($matches['category']))) {
+            // The email address is not valid so look at the subject.
+            $valid = preg_match($this->getEmailSubjectRegex(), $subject, $matches);
+
+            if ($valid) {
+                $sender->setData('Matched', $subject);
+            }
+        } else {
+            $sender->setData('Matched', $email);
+        }
+
+        if ($valid) {
+            $nodeSlug = val('node', $matches, null);
+            $categorySlug = val('category', $matches, null);
+
+            if ($nodeSlug) {
+                $node = MultisiteModel::instance()->getWhere(['Slug' => $nodeSlug])->firstRow(DATASET_TYPE_ARRAY);
+            }
+            if ($nodeSlug !== null && empty($node)) {
+                throw notFoundException('Site');
+            }
+
+            if ($categorySlug) {
+                $where = ['UrlCode' => $categorySlug];
+
+                if ($node) {
+                    $where['MultisiteID'] = $node['MultisiteID'];
+                }
+                $category = Gdn::sql()->getWhere('NodeCategory', $where)->firstRow(DATASET_TYPE_ARRAY);
+
+                if ($category && empty($node)) {
+                    $node = MultisiteModel::instance()->getID($category['MultisiteID']);
+                }
+            }
+
+            if (!empty($node)) {
+                $sender->setData('Url', $node['FullUrl']);
+            }
+            if (!empty($category)) {
+                $sender->setData('Data', ['CategoryID' => $category['CategoryID']]);
+            }
+        } else {
+            throw notFoundException('@'.sprintf('The email %s did not match.', $this->emailMatch));
+        }
+
+        if (!$sender->data('Url')) {
+            throw notFoundException('Site');
+        }
+
+        $sender->render('Blank');
     }
 
     /**

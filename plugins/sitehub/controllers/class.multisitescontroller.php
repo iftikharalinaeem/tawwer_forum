@@ -31,7 +31,7 @@ class MultisitesController extends DashboardController {
         $this->site = $this->siteModel->GetID($siteID);
     }
 
-    public function index($page = '') {
+    public function index($page = '', $sort = '') {
         switch ($this->Request->RequestMethod()) {
             case 'GET':
                 if ($this->site) {
@@ -60,8 +60,12 @@ class MultisitesController extends DashboardController {
         $this->form = new Gdn_Form();
         $this->form->Method = 'get';
 
+        if (!in_array(strtolower($sort), ['url', 'dateinserted'])) {
+            $sort = 'url';
+        }
+
         if ($search = $this->Request->Get('search')) {
-            $sites = $this->siteModel->search($search, 'Url', 'asc', $limit + 1, $offset)->ResultArray();
+            $sites = $this->siteModel->search($search, $sort, 'asc', $limit + 1, $offset)->ResultArray();
 
             // Select 1 more than page size so we can know whether or not to display the next link.
             $this->setData('_CurrentRecords', count($sites));
@@ -72,7 +76,7 @@ class MultisitesController extends DashboardController {
             $this->setData('Sites', $sites);
         } else {
             $where = [];
-            $this->setData('Sites', $this->siteModel->GetWhere($where, 'Url', 'asc', $limit, $offset)->ResultArray());
+            $this->setData('Sites', $this->siteModel->GetWhere($where, $sort, 'asc', $limit, $offset)->ResultArray());
             $this->setData('RecordCount', $this->siteModel->GetCount($where));
         }
 
@@ -255,9 +259,12 @@ class MultisitesController extends DashboardController {
         if ($this->Form->AuthenticatedPostBack()) {
             if (!$this->site['SiteID']) {
                 // There is no site associated with this role so just delete the row.
-                $this->siteModel->Delete(['MultisiteID' => $this->site['MultisiteID']]);
+                $this->siteModel->delete(['MultisiteID' => $this->site['MultisiteID']]);
+                $this->jsonTarget("#Multisite_{$this->site['MultisiteID']}", '', 'SlideUp');
             } elseif (!$this->siteModel->queueDelete($this->site['MultisiteID'])) {
                 $this->Form->SetValidationResults($this->siteModel->ValidationResults());
+            } else {
+                $this->jsonTarget("#Multisite_{$this->site['MultisiteID']} td.js-status", t('deleting'), 'Html');
             }
         }
 
@@ -315,6 +322,35 @@ class MultisitesController extends DashboardController {
             }
         }
         $this->Render('api');
+    }
+
+    /**
+     * Synchronize the categories from a node into the NodeCategory table.
+     */
+    public function syncNodeCategories() {
+        $this->permissionNoLog('Garden.Settings.Manage');
+
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Gdn_UserException("This resource only accepts POST.", 405);
+        }
+
+        // Lookup the site.
+        $post = $this->Request->post();
+        $site = $this->siteModel->getSiteFromKey(val('MultisiteID', $post), val('SiteID', $post), val('Slug', $post));
+        if (!$site) {
+            throw notFoundException('Site');
+        }
+
+        $categories = val('Categories', $post);
+        if (!is_array($categories)) {
+            throw new Gdn_UserException('Categories are required');
+        }
+
+        $result = $this->siteModel->syncNodeCategories($site['MultisiteID'], $categories, val('Delete', $post, true));
+        $this->Data = $result;
+
+
+        $this->render('api');
     }
 
     /**

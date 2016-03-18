@@ -45,6 +45,35 @@ class MultisiteModel extends Gdn_Model {
     }
 
     /**
+     * Get the hub slug that is prepended to every node slug when a node is created.
+     */
+    public function getHubSlug() {
+        $nameFormat = sprintf($this->siteNameFormat, '%s'); // in case the format uses fancy %s
+
+        $slug = rtrim(strstr($nameFormat, '%s', true), '-');
+        return $slug;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete($where = [], $options = []) {
+        if (!empty($where[$this->PrimaryKey])) {
+            $ids = (array)$where[$this->PrimaryKey];
+        } else {
+            $rows = $this->getWhere($where)->resultArray();
+            $ids = array_column($rows, $this->PrimaryKey);
+        }
+
+        $r = parent::delete($where, $options);
+
+        // Delete the NodeCategories too.
+        $this->SQL->delete('NodeCategory', [$this->PrimaryKey => $ids]);
+
+        return $r;
+    }
+
+    /**
      * Gets the singleton instance of this class.
      *
      * @return MultisiteModel Returns the singleton instance of this class.
@@ -90,7 +119,7 @@ class MultisiteModel extends Gdn_Model {
 
         $valid = true;
 
-        if (!in_array($site['Status'], ['active', 'error'])) {
+        if (!in_array($site['Status'], ['active', 'error', 'building', 'deleting'])) {
             $this->Validation->AddValidationResult('Status', 'Cannot delete a site that isn\'t active.');
             $valid = false;
         }
@@ -118,6 +147,9 @@ class MultisiteModel extends Gdn_Model {
                 'SiteID' => valr('site.SiteID', $deleteResponse)
             ]);
             return true;
+        } elseif (valr('site.state', $deleteResponse) === 'deleted') {
+            // The site was already deleted.
+            return $this->delete([$this->PrimaryKey => $id]);
         } else {
             // The site has an error.
             $error = $deleteQuery->errorMsg();
@@ -168,12 +200,21 @@ class MultisiteModel extends Gdn_Model {
 
         $name = sprintf($this->siteNameFormat, $site['Slug']);
 
+        $config = [
+            'Garden' => [
+                'Email' => [
+                    'SupportAddress' => strtolower($site['Slug']).'.'.$this->getHubSlug().'@vanillaforums.email'
+                ]
+            ]
+        ];
+
         $buildQuery = Communication::orchestration('/site/createnode')
             ->method('post')
             ->parameter('name', $name)
             ->parameter('accountid', Infrastructure::site('accountid'))
             ->parameter('domain', Gdn::Request()->Host()) // TODO: make work for non-dirs
             ->parameter('flavor', 'node')
+            ->parameter('config', $config)
             ->parameter('callback', [
                 'url' => Gdn::Request()->Domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/buildcallback.json",
                 'headers' => [
@@ -336,6 +377,9 @@ class MultisiteModel extends Gdn_Model {
         return $slug;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getWhere($where = FALSE, $orderFields = '', $orderDirection = 'asc', $limit = FALSE, $offset = FALSE) {
         if (!$limit) {
             $limit = 1000;
@@ -351,7 +395,30 @@ class MultisiteModel extends Gdn_Model {
     }
 
     /**
+     * Look up a site row from one of its three keys.
+     *
+     * @param int $multisiteID The multisite ID of the site.
+     * @param int $siteID The infrastructure ID of the site.
+     * @param string $slug The slug of the site.
+     * @return array|false Returns the multisite row or **false** if one isn't found.
+     */
+    public function getSiteFromKey($multisiteID, $siteID = 0, $slug = '') {
+        if (!empty($multisiteID)) {
+            $where = ['MultisiteID' => $multisiteID];
+        } elseif (!empty($siteID)) {
+            $where = ['SiteID' => $siteID];
+        } elseif (!empty($slug)) {
+            $where = ['Slug' => $slug];
+        } else {
+            return false;
+        }
+
+        return $this->getWhere($where)->firstRow(DATASET_TYPE_ARRAY);
+    }
+
+    /**
      * Get a list of roles to sync with a node.
+     *
      * @param array|int $site The site id.
      * @return array A dataset containing the nodes.
      */
@@ -369,7 +436,7 @@ class MultisiteModel extends Gdn_Model {
             ->ResultArray();
 
         // Get the global permissions on the roles.
-        $permissions = Gdn::PermissionModel()->GetGlobalPermissions(ConsolidateArrayValuesByKey($roles, 'HubID'));
+        $permissions = Gdn::PermissionModel()->GetGlobalPermissions(array_column($roles, 'HubID'));
         foreach ($roles as &$role) {
             $role['Permissions'] = $permissions[$role['HubID']];
             unset($role['Permissions']['PermissionID']);
@@ -519,7 +586,7 @@ class MultisiteModel extends Gdn_Model {
      * @param mixed The value being saved.
      * @return bool Whether or not the attribute as saved.
      */
-    public function SaveAttribute($siteID, $attribute, $value = '') {
+    public function saveAttribute($siteID, $attribute, $value = '') {
         return $this->SaveToSerializedColumn('Attributes', $siteID, $attribute, $value);
     }
 
@@ -560,6 +627,55 @@ class MultisiteModel extends Gdn_Model {
             $result = ['Code' => $ex->getCode(), 'Exception' => $ex->getMessage()];
             LogException($ex);
         }
+        return $result;
+    }
+
+    /**
+     * Synchronize all of the categories that exist in one node.
+     *
+     * @param int $multiSiteID The ID of the node.
+     * @param array[array] $nodeCategories A dataset of node category information.
+     * @param bool $delete Whether or not to delete categories that no longer exist on the node.
+     */
+    public function syncNodeCategories($multiSiteID, $nodeCategories, $delete = true) {
+        $now = Gdn_Format::toDateTime();
+
+        // Get the current node categories.
+        $currentCategories = $this->SQL->getWhere('NodeCategory', ['MultisiteID' => $multiSiteID])->resultArray();
+        $currentCategories = Gdn_DataSet::index($currentCategories, 'CategoryID');
+        $result = ['Inserted' => 0, 'Updated' => 0];
+
+        foreach ($nodeCategories as $category) {
+            $categoryID = $category['CategoryID'];
+            $set = arrayTranslate($category, ['Name', 'UrlCode', 'HubID']);
+            $set['DateLastSync'] = $now;
+
+            if (array_key_exists($category['CategoryID'], $currentCategories)) {
+                $this->SQL->put(
+                    'NodeCategory',
+                    $set,
+                    ['NodeCategoryID' => $currentCategories[$categoryID]['NodeCategoryID']]
+                );
+                $result['Updated']++;
+            } else {
+                $set['MultisiteID'] = $multiSiteID;
+                $set['CategoryID'] = $categoryID;
+                $this->SQL->insert(
+                    'NodeCategory',
+                    $set
+                );
+                $result['Inserted']++;
+            }
+        }
+
+        if ($delete) {
+            // Delete all of the node categories that no longer exist.
+            $this->SQL->delete('NodeCategory', ['MultisiteID' => $multiSiteID, 'DateLastSync <' => $now]);
+            $d = $this->Database;
+            $result['Deleted'] = val('RowCount', $this->Database->LastInfo, 0);
+
+        }
+
         return $result;
     }
 
