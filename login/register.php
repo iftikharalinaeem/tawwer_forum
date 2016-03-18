@@ -3,15 +3,22 @@ include_once('config.php');
 include_once('functions.php');
 
 if (isset($_REQUEST['Name'])) {
-   // Try register
-   $User = array(
+    ob_start();
+    // Try register
+    $User = array(
       'Name' => $_REQUEST['Name'],
       'Email' => $_REQUEST['Email'],
       'Role' => $_REQUEST['Role'],
       'Password' => $_REQUEST['Password']
-   );
-   WriteUser($User);
-   echo '<p>Created user '.$_REQUEST['Name'].'</p>';
+    );
+    WriteUser($User);
+    echo '<p>Created user '.$_REQUEST['Name'].'</p>';
+
+    if (isset($_REQUEST['back'])) {
+        header('Location: '.$_REQUEST['back']);
+        exit;
+    }
+    ob_end_flush();
 }
 
 PageHeader();
@@ -22,7 +29,7 @@ if ($Name = GetLogin()) {
 
 ?>
    <h3>Register a new user</h3>
-   <form action="register.php">
+   <form action="register.php<?php echo isset($_REQUEST['back']) ? '?back='.rawurlencode($_REQUEST['back']) : null ?>" method="post">
       <ul>
       <li><label for="Name">Name</label><input name="Name" /></li>
       <li><label for="Email">Email</label><input name="Email" /></li>
