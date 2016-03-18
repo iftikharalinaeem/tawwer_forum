@@ -1061,16 +1061,6 @@ EOT
      * Adds status and state filtering to the DiscussionFilterModule.
      */
     public function discussionModel_initStatic_handler() {
-        DiscussionModel::addFilterSet('my-discussions', 'My Discussions');
-        DiscussionModel::addFilter('bookmarks', 'Bookmarked', ['w.Bookmarked' => true, 'w.UserID' => Gdn::session()->UserID], 'mine', 'my-discussions');
-        DiscussionModel::addFilter('participated', 'Participated', ['w.Participated' => true, 'w.UserID' => Gdn::session()->UserID], 'mine', 'my-discussions');
-
-        DiscussionModel::addFilterSet('discussion-types', 'Discussions Types');
-        DiscussionModel::addFilter('discussion-type', 'Discussion', ['Type' => null, 'Announce' => 0], 'type', 'discussion-types');
-        DiscussionModel::addFilter('announcement-type', 'Announcement', ['Announce >' => 0], 'type', 'discussion-types');
-        DiscussionModel::addFilter('question-type', 'Question', ['Type' => 'Question'], 'type', 'discussion-types');
-        DiscussionModel::addFilter('poll-type', 'Poll', ['Type' => 'poll'], 'type', 'discussion-types');
-
         $categories = $this->getIdeaCategoryIDs();
         DiscussionModel::addFilterSet('status', sprintf(t('All %s'), t('Statuses')), $categories);
 
