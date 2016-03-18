@@ -16,7 +16,9 @@ class EmailRouterController extends Gdn_Controller {
     */
    public $Aliases = [
       'adobeprerelease' => 'https://forums.adobeprerelease.com',
-      'adobeprereleasestage' => 'https://forums.stage.adobeprerelease.com'
+      'adobeprereleasestage' => 'https://forums.stage.adobeprerelease.com',
+      'adobeprereleasestaging' => 'https://forums.stage.adobeprerelease.com',
+      'vanilladev' => 'http://vanilla.dev'
    ];
 
    /**
@@ -133,6 +135,7 @@ class EmailRouterController extends Gdn_Controller {
 
 //            self::Log("Getting post...");
             $Post = $this->Form->FormValues();
+            Logger::event('email_received', Logger::DEBUG, "Email received.", ['data' => $Post]);
             
             // All of the post data can come in a variety of encodings.
             $Charsets = @json_decode($Post['charsets']);
@@ -161,7 +164,8 @@ class EmailRouterController extends Gdn_Controller {
                 'to' => 'To',
                 'subject' => 'Subject',
                 'headers' => 'Headers',
-                'text' => 'Source'
+                'text' => 'Source',
+                'spam_score' => 'SpamScore'
             ));
 
    //         self::Log('Parsing headers.'.GetValue('headers', $Post, ''));
@@ -198,8 +202,8 @@ class EmailRouterController extends Gdn_Controller {
                }
             }
             
-            $LogModel = new Gdn_Model('EmailLog');
-            $Data['Post'] = http_build_query($Data, '', '&');
+            $LogModel = new EmailLogModel();
+            $Data['Post'] = $Data;
             $Data['Charsets'] = GetValue('charsets', $Post, NULL);
 
             if ($this->isOutOfOffice($Headers, $Data)) {
@@ -218,7 +222,26 @@ class EmailRouterController extends Gdn_Controller {
             
             list($Name, $Email) = self::ParseEmailAddress($To);
             list($slug, $emailDomain) = $this->parseEmailDomain($Email, true);
-            if ($emailDomain && preg_match('`([^+@]+)([^@]*)$`', $slug, $Matches)) {
+
+            // Check for a site.
+            $sources = array_merge(
+               ['replyTo' => val('ReplyTo', $HeaderData, '')],
+               $this->explodeReferences(val('References', $HeaderData, '')),
+               ['to' => $Email]
+            );
+
+            $guessed = true;
+            $site = $this->getSiteFromEmail($sources);
+
+            if (!empty($site)) {
+               $quessed = false;
+               // Check for a multisite.
+               if (!empty($site['multisite'])) {
+                  $Url = "https://{$site['multisite']['real']}/utility/email.json";
+               } else {
+                  $Url = "http://{$site['name']}/utility/email.json";
+               }
+            } elseif ($emailDomain && preg_match('`([^+@]+)([^@]*)$`', $slug, $Matches)) {
                $ToParts = explode('.', strtolower($Matches[1]));
 //               $Args = $Matches[2];
 
@@ -229,16 +252,32 @@ class EmailRouterController extends Gdn_Controller {
                }
 
                $Folder = '';
-               if (count($ToParts) > 1) {
-                  // Check for a full domain. We are just going to support a few tlds because this is a legacy format.
-                  $Part = array_pop($ToParts);
-                  if (isset($this->Aliases[$Part])) {
+               $Part = end($ToParts);
+               if (isset($this->Aliases[$Part])) {
+                  $guessed = false;
+                  $aliasUrl = $this->Aliases[$Part];
+
+                  // Check this email against the hub to see if it should be forwarded somewhere.
+                  if (strpos($Email, '+') === false) {
+                     $forwardInfo = $this->checkHub($aliasUrl, $Email, $Data['Subject']);
+                  }
+
+                  if (!empty($forwardInfo)) {
+                     $Url = val('Url', $forwardInfo).'/utility/email.json';
+                     $Data['Post'] = array_replace($Data['Post'], val('Data', $forwardInfo, []));
+                  } else {
+                     array_pop($ToParts); // pop node name
+
                      // This is a site node alias in the form: folder.alias+args@email.vanillaforums.com.
                      $UrlParts = parse_url($this->Aliases[$Part]);
                      $Scheme = val('scheme', $UrlParts, 'http');
                      $Domain = val('host', $UrlParts, 'email.vanillaforums.com');
                      $Folder = '/'.array_pop($ToParts);
-                  } elseif (count($ToParts) > 1 || in_array($Part, array('com', 'org', 'net'))) {
+                  }
+               } elseif (count($ToParts) > 1) {
+                  // Check for a full domain. We are just going to support a few TLDs because this is a legacy format.
+                  $Part = array_pop($ToParts);
+                   if (count($ToParts) > 1 || in_array($Part, array('com', 'org', 'net'))) {
                      $Domain = implode('.', $ToParts).'.'.$Part;
                   } else {
                      // This is a to in the form of category.site.
@@ -248,10 +287,18 @@ class EmailRouterController extends Gdn_Controller {
                      $Data[$To] = $To;
                   }
                } else {
-                  $Domain = $ToParts[0].'.'.$this->emailDomains[$emailDomain];
+                  $subdomain = $ToParts[0];
+                  $Domain = "$subdomain.{$this->emailDomains[$emailDomain]}";
+
+                  if (strpos($subdomain, '-') !== false) {
+                     $Url = $this->getSiteUrlFromHost($Domain, $found)."/utility/email.json";
+                     $guessed = !$found;
+                  }
                }
 
-               $Url = "$Scheme://{$Domain}{$Folder}/utility/email.json";
+               if (empty($Url)) {
+                  $Url = "$Scheme://{$Domain}{$Folder}/utility/email.json";
+               }
                $LogModel->SetField($LogID, array('Url' => $Url));
             } else {
                $LogModel->SetField($LogID, array('Response' => 400, 'ResponseText' => "Invalid to: $To, $Email."));
@@ -271,7 +318,7 @@ class EmailRouterController extends Gdn_Controller {
 //            curl_setopt($C, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
             curl_setopt($C, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($C, CURLOPT_POST, 1);
-            curl_setopt($C, CURLOPT_POSTFIELDS, $Data['Post']);
+            curl_setopt($C, CURLOPT_POSTFIELDS, http_build_query($Data['Post'], '', '&'));
             
             $Result = curl_exec($C);
             $Code = curl_getinfo($C, CURLINFO_HTTP_CODE);
@@ -281,13 +328,24 @@ class EmailRouterController extends Gdn_Controller {
                if ($ResultData) {
                   $this->Data = $Data;
                }
-               $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Result));
+               $LogModel->SetField($LogID, array('Post' => $Data['Post'], 'Response' => $Code, 'ResponseText' => $Result));
             } else {
-               $Error = curl_error($C)."\n\n$Result";
-               $LogModel->SetField($LogID, array('Response' => $Code, 'ResponseText' => $Error));
+               // Check to see if the site exists at all.
+               if ($guessed) {
+                  $r = $this->getSiteUrlFromHost(parse_url($Url, PHP_URL_HOST));
+               }
+               if ($guessed && empty($r)) {
+                  $LogModel->setFeild(
+                      $LogID,
+                      ['Post' => $Data['Post'], 'Response' => 410, 'ResponseText' => 'Site does not exist.']
+                  );
+               } else {
+                  $Error = curl_error($C)."\n\n$Result";
+                  $LogModel->SetField($LogID, array('Post' => $Data['Post'], 'Response' => $Code, 'ResponseText' => $Error));
 
-               if ($Code != 404) {
-                  throw new Exception($Error, $Code);
+                  if ($Code != 404) {
+                     throw new Exception($Error, $Code);
+                  }
                }
             }
          }
@@ -320,6 +378,113 @@ class EmailRouterController extends Gdn_Controller {
          return true;
       }
       return false;
+   }
+
+   /**
+    * Make an API call to the hub to see where the email should be forwarded to.
+    *
+    * @param string $baseUrl The base URL of the hub.
+    * @param string $email The email address that the email has been sent to.
+    * @param string $subject The subject of the email.
+    */
+   private function checkHub($baseUrl, $email, $subject) {
+      $url = "$baseUrl/hub/api/v1/utility/emailroute.json";
+      $params = ['Email' => $email, 'Subject' => $subject];
+      $headers = [];
+
+      $urlParts = parse_url($url);
+
+      // Fix the URL for localhost calls.
+      if ($urlParts['host'] === 'localhost' || stringEndsWith($urlParts['host'], '.dev')) {
+         $headers['Host'] = $urlParts['host'];
+         $urlParts['host'] = '127.0.0.1';
+         $url = http_build_url($baseUrl, $urlParts);
+      }
+
+      $request = new ProxyRequest();
+      $response = $request->Request([
+          'URL' => $url,
+          'Cookies' => false,
+          'Method' => 'POST',
+          'Timeout' => 100,
+      ], $params, null, $headers);
+
+      if (strpos($request->ContentType, 'application/json') !== false) {
+         $response = json_decode($response, true);
+      }
+
+      if ($request->responseClass('2xx') && is_array($response)) {
+         return $response;
+      }
+
+      return null;
+   }
+
+   /**
+    * Get the site row from a list of email address sources.
+    *
+    * @param string[] $sources The possible reply-to sources of the email.
+    * @return array|null Returns the site row or null if a site could not be determined.
+    */
+   private function getSiteFromEmail($sources) {
+      if (!class_exists('Communication')) {
+         return null;
+      }
+
+      foreach ($sources as $key => $source) {
+         if (preg_match('`-s(\d+)@`', $source, $matches)) {
+            $siteID = $matches[1];
+
+            $response = Communication::orchestration('/site/full')
+               ->method('get')
+               ->parameter('siteid', $siteID)
+               ->cache(60)
+               ->send();
+
+            if (is_array(val('site', $response))) {
+               $site = $response['site'];
+
+               if (!empty($response['multisite'])) {
+                  $site['multisite'] = $response['multisite'];
+               }
+
+               Logger::event(
+                  'emailer_site',
+                  Logger::INFO,
+                  'Site {site.name} found from source: {source}.',
+                  ['source' => $source, 'site' => $this->trimSiteForLog($site), 'sourceKey' => $key]
+               );
+
+               return $site;
+            }
+         }
+      }
+
+      return null;
+   }
+
+   /**
+    * Take a string in the form of an email references header and explode it into individual email IDs.
+    *
+    * @param $referencesString
+    */
+   private function explodeReferences($referencesString) {
+      $references = preg_split('`>\s*<`', $referencesString);
+      $result = [];
+
+      $i = 0;
+      foreach ($references as $reference) {
+         $reference = trim($reference);
+         if (!$reference) {
+            continue;
+         }
+         $reference = '<'.trim($reference, '<>').'>';
+         $result[sprintf('reference%02d', $i)] = $reference;
+
+         $i++;
+      }
+
+      return $result;
    }
 
    /**
@@ -381,4 +546,86 @@ class EmailRouterController extends Gdn_Controller {
       $Result = trim(implode("\n", $Lines));
       return $Result;
    }
+
+   /**
+    * Look up a site and see what it should be called as.
+    *
+    * Nodes will use their Vanilla name convention by default (i.e. slug-node.vanillaforums.com). A node with this URL
+    * cannot be called directly and must fall back to its multisite format.
+    *
+    * @param string $host The hostname to look at or an empty string if there is no site.
+    * @param bool &$found Whether or not the site was found.
+    * @return string Returns the site URL.
+    */
+   private function getSiteUrlFromHost($host, &$found = false) {
+      $default = "http://$host";
+
+      if (!class_exists('Communication')) {
+         return $default;
+      }
+
+      // Look up the site ID.
+      $queryResponse = Communication::orchestration('/site/query')
+          ->method('get')
+          ->parameter('query', $host)
+          ->parameter('users', 0)
+          ->parameter('verbose', 0)
+          ->cache(60)
+          ->send();
+//      Logger::event('orchestration_site_query', Logger::DEBUG, "Sites", ['response' => $queryResponse]);
+      if (empty(val('sites', $queryResponse))) {
+         return '';
+      }
+
+      // Look up the site.
+      $siteResponse = Communication::orchestration('/site/full')
+          ->method('get')
+          ->parameter('siteid', valr('sites.0.SiteID', $queryResponse))
+          ->cache(60)
+          ->send();
+
+      if (!empty($siteResponse['site'])) {
+         $found = true;
+
+         Logger::event(
+             'emailer_site',
+             Logger::INFO,
+             'Site {site.name} found from source: {source}.',
+             [
+                 'source' => $host,
+                 'site' => $this->trimSiteForLog($siteResponse['site'], val('multisite', $siteResponse, null)),
+                 'sourceKey' => 'host'
+             ]
+         );
+      }
+
+
+//      Logger::event('orchestration_site_full', Logger::DEBUG, "Site", ['response' => $siteResponse]);
+
+      if (is_array(val('multisite', $siteResponse))) {
+         // This is a multisite and must use a different URL format.
+         $multisite = $siteResponse['multisite'];
+         $result = "https://{$multisite['real']}";
+         return $result;
+      }
+
+      return $default;
+   }
+
+
+   /**
+    * Trim a site row so it doesn't take up too much room in the log.
+    *
+    * @param array $site The site to trim.
+    * @param array|null $multisite The multisite info, if any.
+    * @return array Returns a subset of the site as an array.
+    */
+   private function trimSiteForLog($site, $multisite = null) {
+      $r = arrayTranslate($site, ['siteid', 'accountid', 'name', 'state', 'cluster', 'domain', 'multisite']);
+
+      if (is_array($multisite) && !empty($multisite)) {
+         $r['multisite'] = $multisite;
+      }
+   }
+
 }
