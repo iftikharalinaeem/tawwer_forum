@@ -325,11 +325,15 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $Form->setFormValue('UniqueID', $id);
         $Form->setFormValue('Provider', self::ProviderKey);
         $Form->setFormValue('ProviderName', $provider['Name']);
-        $Form->setFormValue('ConnectName', $this->rval('uid', $profile));
         $Form->setFormValue('Name', $this->rval('uid', $profile));
         $Form->setFormValue('FullName', $this->rval('cn', $profile));
         $Form->setFormValue('Email', $this->rval('mail', $profile));
         $Form->setFormValue('Photo', $this->rval('photo', $profile));
+
+        // Don't overwrite ConnectName if it already exists.
+        if ($this->rval('uid', $profile)) {
+            $Form->setFormValue('ConnectName', $this->rval('uid', $profile));
+        }
 
         $roles = $this->rval('roles', $profile);
         if ($roles) {
