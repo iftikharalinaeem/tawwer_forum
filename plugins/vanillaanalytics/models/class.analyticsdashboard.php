@@ -15,7 +15,7 @@ class AnalyticsDashboard implements JsonSerializable {
     /**
      * Slug for a user's private/personal dashboard.
      */
-    const DASHBOARD_PERSONAL = 'personal';
+    const DASHBOARD_PERSONAL = 'personal-dashboard';
 
     /**
      * @var string Unique identifier for this dashboard.

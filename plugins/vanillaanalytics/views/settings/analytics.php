@@ -5,6 +5,6 @@ echo Gdn_Theme::module('AnalyticsToolbarModule');
 ?>
 <div id="analytics_panels">
     <?php foreach ($this->data('AnalyticsDashboard')->getPanels() as $panel): ?>
-    <div class="analytics-panel" id="analytics_panel_<?php echo htmlspecialchars($panel->panelID); ?>"></div>
+    <ol class="analytics-panel Sortable" id="analytics_panel_<?php echo htmlspecialchars($panel->panelID); ?>"></ol>
     <?php endforeach; ?>
 </div>
