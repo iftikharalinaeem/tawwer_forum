@@ -181,6 +181,14 @@ class AnalyticsTracker {
             }
         }
 
+        $this->EventArguments['Defaults']   =& $defaults;
+
+        Gdn::pluginManager()->callEventHandlers(
+            $this,
+            'AnalyticsTracker',
+            'GetDefaultData'
+        );
+
         return $defaults;
     }
 
