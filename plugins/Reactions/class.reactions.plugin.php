@@ -382,11 +382,14 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
 
-        if (!$Sender->Request->IsPostBack())
+        if (!$Sender->Request->IsPostBack()) {
             throw PermissionException('Javascript');
+        }
 
         $ReactionType = ReactionModel::ReactionTypes($Reaction);
         $Sender->EventArguments['ReactionType'] = &$ReactionType;
+        $Sender->EventArguments['RecordType'] = $RecordType;
+        $Sender->EventArguments['RecordID'] = $ID;
         $Sender->FireAs('ReactionModel')->FireEvent('GetReaction');
 
         // Only allow enabled reactions
