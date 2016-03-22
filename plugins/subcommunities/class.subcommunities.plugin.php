@@ -129,6 +129,27 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
     /// Event Handlers ///
 
+    /**
+     * Add subcommunity to default analytics data for events tracked with VanillaAnalytics.
+     *
+     * @param AnalyticsTracker $sender
+     * @param array $args
+     */
+    public function analyticsTracker_GetDefaultData_handler($sender, &$args) {
+        $subcommunity = SubcommunityModel::getCurrent();
+
+        if (!is_array($subcommunity)) {
+            return;
+        }
+
+        $args['Defaults']['Subcommunity'] = [
+            'Locale'         => $subcommunity['Locale'],
+            'Folder'         => $subcommunity['Folder'],
+            'Name'           => $subcommunity['Name'],
+            'SubcommunityID' => $subcommunity['SubcommunityID']
+        ];
+    }
+
     public function base_render_before($sender) {
         if (!SubCommunityModel::getCurrent()) {
             return;
