@@ -96,7 +96,7 @@ function AnalyticsWidget(config) {
         var newElements = {
             body      : document.createElement('div'),
             bookmark  : document.createElement('a'),
-            container : document.createElement('div'),
+            container : document.createElement('li'),
             title     : null
         };
 
@@ -329,6 +329,20 @@ function AnalyticsWidget(config) {
 
     this.loadConfig(config);
 }
+
+/**
+ * @param {string} idAttribute
+ * @return {bool|string}
+ */
+AnalyticsWidget.getIDFromAttribute = function(idAttribute) {
+    var idParts = /analytics_widget_([a-z0-9\-]+)/i.exec(idAttribute);
+
+    if (Array.isArray(idParts)) {
+        return idParts[1];
+    } else {
+        return false;
+    }
+};
 
 AnalyticsWidget.prototype.loadConfig = function(config) {
     if (typeof config !== 'object') {
