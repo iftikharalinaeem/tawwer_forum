@@ -143,9 +143,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         }
 
         $args['Defaults']['Subcommunity'] = [
-            'Name'   => $subcommunity['Name'],
-            'Folder' => $subcommunity['Folder'],
-            'Locale' => $subcommunity['Locale']
+            'Locale'         => $subcommunity['Locale'],
+            'Folder'         => $subcommunity['Folder'],
+            'Name'           => $subcommunity['Name'],
+            'SubcommunityID' => $subcommunity['SubcommunityID']
         ];
     }
 
