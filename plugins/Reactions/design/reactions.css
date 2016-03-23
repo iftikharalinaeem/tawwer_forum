@@ -105,7 +105,7 @@
 .CountItemWrap {
    width: 10%;
    display: inline-block;
-}   
+}
 .CountItem {
    display: block;
    text-align: center;
@@ -237,18 +237,6 @@ li.Buried:hover:before {
     -webkit-border-radius: 3px;
     margin-right: 4px;
 }
-.Item .Reactions > * {
-    visibility: hidden;
-}
-.Item .Reactions > *.Visible {
-    visibility: visible;
-}
-.Item.Open .Reactions > *,
-.Item:hover .Reactions > *, 
-.Item .Reactions > .FlagMenu {
-    visibility: visible;
-}
-
 .Reactions > a.React > .ReactSprite {
    margin-right: 2px;
 }
@@ -278,7 +266,7 @@ li.Buried:hover:before {
    margin: 8px 0;
 }
 .ReactionFilters .ReactButton {
-   opacity: 1;  
+   opacity: 1;
    margin-right: 6px;
 }
 .ReactionFilters .ReactButton .ReactSprite {
@@ -301,12 +289,6 @@ li.Buried:hover:before {
 }
 /* End "Best Of" */
 
-/* iPad/iPhone */
-@media only screen and (device-width: 768px),
-only screen and (max-device-width: 480px) {
-   .Item .Reactions > * { visibility: visible; }
-}
-
 /** Best of tiling stuff. **/
 
 .Tile {
@@ -316,7 +298,7 @@ only screen and (max-device-width: 480px) {
    margin: 5px;
    padding: 10px;
    border-radius: 2px;
-   
+
    -webkit-transition: opacity .3s ease-in-out;
    -moz-transition: opacity .3s ease-in-out;
    -o-transition: opacity .3s ease-in-out;
