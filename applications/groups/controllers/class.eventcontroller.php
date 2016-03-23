@@ -315,8 +315,9 @@ class EventController extends Gdn_Controller {
    public function Delete($EventID) {
       list($Event, $Group) = $this->AddEdit($EventID);
 
-      if (!EventPermission('Organizer'))
+      if (!EventPermission('Edit')) {
          throw ForbiddenException('delete this event');
+      }
 
       if ($this->Form->AuthenticatedPostBack()) {
          $EventModel = new EventModel();
