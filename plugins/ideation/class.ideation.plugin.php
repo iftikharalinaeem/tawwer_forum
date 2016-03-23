@@ -603,13 +603,13 @@ EOT
 
         if (isset($args['DiscussionOptions'])) {
             $args['DiscussionOptions']['Status'] = ['Label' => sprintf(t('Edit %s'), t('Idea Status')), 'Url' => '/discussion/statusoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup'];
-        } elseif (isset($sender->Options)) {
+        } elseif(isset($sender->Options) && is_string($sender->Options)) {
             $sender->Options .= '<li>'.anchor(sprintf(t('Edit %s'), t('Idea Status')), '/discussion/statusoptions?discussionid='.$discussion->DiscussionID, 'Popup').'</li>';
         }
 
         if (isset($args['DiscussionOptions']['EditDiscussion'])) {
             $args['DiscussionOptions']['EditDiscussion']['Url'] = str_replace('editdiscussion', 'editidea', $args['DiscussionOptions']['EditDiscussion']['Url']);
-        } else {
+        } elseif(isset($sender->Options) && is_string($sender->Options)) {
             $sender->Options = str_replace('editdiscussion', 'editidea', $sender->Options);
         }
 
