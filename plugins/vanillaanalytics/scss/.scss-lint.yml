@@ -86,7 +86,7 @@ linters:
     exclude: legacy/**
 
   IdSelector:
-    enabled: true
+    enabled: false # Needed to target sidebar nav
 
   ImportantRule:
     enabled: true
