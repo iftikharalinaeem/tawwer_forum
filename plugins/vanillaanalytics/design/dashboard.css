@@ -1,123 +1,131 @@
-#dashboard_settings_analytics #Content {
-    background-color: #f5f5f5;
+.Analytics h4 {
+  background-position: 166px -644px;
 }
 
-#analytics_toolbar {
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
-    padding: 10px 20px;
+.analytics-dashboard-content {
+  background-color: #f5f5f5;
 }
 
-#analytics_toolbar .toolbar-controls {
-    float: right;
+.analytics-toolbar {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  padding: 10px 20px;
 }
 
-#analytics_toolbar:after {
-    visibility: hidden;
-    display: block;
-    font-size: 0;
-    content: " ";
-    clear: right;
-    height: 0;
+.analytics-toolbar select {
+  height: 30px;
+  line-height: 30px;
+  border: 0;
+  font-size: 16px;
+  background: transparent;
 }
 
-#analytics_toolbar select {
-    height: 30px;
-    line-height: 30px;
-    border: none;
-    font-size: 16px;
-    background: transparent;
+.analytics-toolbar .toolbar-controls {
+  float: right;
 }
 
-#analytics_panel_metrics .analytics-widget-metric {
-    display: inline-block;
-    width: 33.3333333%;
+.analytics-toolbar::after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: ' ';
+  clear: right;
+  height: 0;
 }
-
-#Panel div.Analytics h4 { background-position: 166px -644px; }
 
 .analytics-panel {
-    margin: 10px;
+  margin: 10px;
+}
+
+.analytics-widget-metric {
+  display: inline-block;
+  width: 33.3333333%;
+}
+
+.analytics-widget-metric .body {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  color: #000;
+  padding: 10px;
+}
+
+.analytics-widget-metric .metric-value {
+  font-size: 50px;
+  line-height: 50px;
+}
+
+.analytics-widget-metric .metric-title {
+  font-size: 20px;
 }
 
 .analytics-widget {
-    box-sizing: border-box;
-    padding: 10px;
+  box-sizing: border-box;
+  padding: 10px;
 }
 
-.analytics-widget .title {
-    font-size: 25px;
-    text-align: center;
+.analytics-widget.analytics-widget.analytics-widget-chart {
+  background: #fff;
+  margin: 10px 10px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .analytics-widget span {
-    display: block;
-    text-align: center;
-}
-.analytics-widget-metric .body {
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
-    color: #000;
-    padding: 10px;
-}
-.analytics-widget-metric .metric-value {
-    font-size: 50px;
-    line-height: 50px;
-}
-.analytics-widget-metric .metric-title {
-    font-size: 20px;
+  display: block;
+  text-align: center;
 }
 
-.analytics-widget.analytics-widget-chart {
-    background: #fff;
-    margin: 10px 10px 20px 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+.analytics-widget .title {
+  font-size: 25px;
+  text-align: center;
 }
 
-a.Bookmark,
-a.Bookmarked,
-a.Bookmarking {
-    background: url('/applications/dashboard/design/images/ui_sprites.png') 0 -2px no-repeat;
-    display: inline-block;
-    font-size: 1px;
-    height: 18px;
-    overflow: hidden;
-    text-indent: -1000px;
-    vertical-align: top;
-    width: 18px;
+.Bookmark,
+.Bookmarked,
+.Bookmarking {
+  background: url("/applications/dashboard/design/images/ui_sprites.png") 0 -2px no-repeat;
+  display: inline-block;
+  font-size: 1px;
+  height: 18px;
+  overflow: hidden;
+  text-indent: -1000px;
+  vertical-align: top;
+  width: 18px;
 }
 
-a.Bookmark:hover {
-    background-position: 0 -22px;
+.Bookmark:hover {
+  background-position: 0 -22px;
 }
 
-a.Bookmarked {
-    background-position: 0 -42px;
+.Bookmarked {
+  background-position: 0 -42px;
 }
 
-a.Bookmarked:hover {
-    background-position: 0 -82px;
+.Bookmarked:hover {
+  background-position: 0 -82px;
 }
 
-a.Bookmarking,
-a.Bookmarking:hover {
-    background-position: 0 -62px;
+.Bookmarking,
+.Bookmarking:hover {
+  background-position: 0 -62px;
 }
 
 .c3-legend-item-tile {
-    rx: 100%;
-    ry: 100%;
+  rx: 100%;
+  ry: 100%;
 }
+
 .c3-circle {
-    r: 4;
-    stroke-width: 2px;
-    stroke: #fff;
+  r: 4;
+  stroke-width: 2px;
+  stroke: #fff;
 }
 
 .c3-line {
-    stroke-width: 2px;
+  stroke-width: 2px;
 }
 
-.c3-tooltip tr td.name span {
-    border-radius: 100%;
+.c3-tooltip .name span {
+  border-radius: 100%;
 }
+
+/*# sourceMappingURL=dashboard.css.map */

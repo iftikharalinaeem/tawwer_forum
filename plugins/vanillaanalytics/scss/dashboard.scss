@@ -1,0 +1,141 @@
+// Colors!
+$black: #000;
+$black-trans: rgba(0, 0, 0, .2);
+$gray: #f5f5f5;
+$white: #fff;
+
+// Sidebar nav icon
+.Analytics h4 { background-position: 166px -644px; }
+
+// Main dashboard body
+.analytics-dashboard-content {
+  background-color: $gray;
+}
+
+// Dashboard toolbar
+.analytics-toolbar {
+  background: $white;
+  box-shadow: 0 1px 3px $black-trans;
+  padding: 10px 20px;
+
+  select {
+    height: 30px;
+    line-height: 30px;
+    border: 0;
+    font-size: 16px;
+    background: transparent;
+  }
+
+  .toolbar-controls {
+    float: right;
+  }
+}
+
+.analytics-toolbar::after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: ' ';
+  clear: right;
+  height: 0;
+}
+
+// General panel styling
+.analytics-panel {
+  margin: 10px;
+}
+
+// Metrics styling
+.analytics-widget-metric {
+  display: inline-block;
+  width: 33.3333333%;
+
+  .body {
+    background: $white;
+    box-shadow: 0 1px 3px $black-trans;
+    color: $black;
+    padding: 10px;
+  }
+
+  .metric-value {
+    font-size: 50px;
+    line-height: 50px;
+  }
+
+  .metric-title {
+    font-size: 20px;
+  }
+}
+
+// General widget stlying
+.analytics-widget {
+  box-sizing: border-box;
+  padding: 10px;
+
+  &.analytics-widget.analytics-widget-chart {
+    background: $white;
+    margin: 10px 10px 20px;
+    box-shadow: 0 1px 3px $black-trans;
+  }
+
+  span {
+    display: block;
+    text-align: center;
+  }
+
+  .title {
+    font-size: 25px;
+    text-align: center;
+  }
+}
+
+// Bookmark widget button styling
+.Bookmark,
+.Bookmarked,
+.Bookmarking {
+  background: url('/applications/dashboard/design/images/ui_sprites.png') 0 -2px no-repeat;
+  display: inline-block;
+  font-size: 1px;
+  height: 18px;
+  overflow: hidden;
+  text-indent: -1000px;
+  vertical-align: top;
+  width: 18px;
+}
+
+.Bookmark:hover {
+  background-position: 0 -22px;
+}
+
+.Bookmarked {
+  background-position: 0 -42px;
+}
+
+.Bookmarked:hover {
+  background-position: 0 -82px;
+}
+
+.Bookmarking,
+.Bookmarking:hover {
+  background-position: 0 -62px;
+}
+
+// Chart SVG styling
+.c3-legend-item-tile {
+  rx: 100%;
+  ry: 100%;
+}
+
+.c3-circle {
+  r: 4;
+  stroke-width: 2px;
+  stroke: $white;
+}
+
+.c3-line {
+  stroke-width: 2px;
+}
+
+.c3-tooltip .name span {
+  border-radius: 100%;
+}
