@@ -433,8 +433,24 @@ KeenIOWidget.prototype.loadConfig = function(config) {
 KeenIOWidget.prototype.loadDatavizConfig = function (config) {
     var dataviz = this.getDataviz();
 
+    /*
+    var defaultColors = dataviz.colors();
+    var counter = defaultColors.length;
+
+    console.log($("#analytics_panel_charts .analytics-widget").length);
+
+    var index, temp;
+    while (counter > 0) {
+        index = Math.floor(Math.random() * counter);
+        temp  = defaultColors[--counter];
+
+        defaultColors[counter] = defaultColors[index];
+        defaultColors[index]   = temp;
+    }
+    */
+
     dataviz.library('c3');
-    dataviz.chartType(this.getConfig('type', ''));
+    dataviz.chartType(this.getConfig('type', 'area'));
     dataviz.chartOptions(this.getConfig('options', {}));
 };
 
@@ -444,6 +460,7 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
 KeenIOWidget.prototype.renderBody = function() {
     var dataviz = this.getDataviz();
     var element = dataviz.el();
+    var stackedCharts = ['area', 'line', 'spline'];
 
     if (typeof element === 'object' && element instanceof HTMLElement) {
         switch (this.getType()) {
@@ -452,6 +469,15 @@ KeenIOWidget.prototype.renderBody = function() {
                 break;
             default:
                 dataviz.parseRawData({result: this.getData()});
+
+                if (dataviz.labels().length > 1) {
+                    dataviz.stacked(true);
+                } else {
+                    var index = $(element).parent(".analytics-widget").index();
+                    var colors = dataviz.colors();
+                    dataviz.colors([colors[(index) % colors.length]]);
+                }
+
                 dataviz.render();
         }
     } else {

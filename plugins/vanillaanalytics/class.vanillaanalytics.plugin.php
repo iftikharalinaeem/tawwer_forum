@@ -51,7 +51,7 @@ class VanillaAnalytics extends Gdn_Plugin {
         if (count($personalDashboard) > 0) {
             $sender->EventArguments['SideMenu']->addLink(
                 'analytics',
-                T('Personal Dashboard'),
+                T('My Dashboard'),
                 "settings/analytics/dashboard/" . AnalyticsDashboard::DASHBOARD_PERSONAL,
                 'Garden.Settings.Manage'
             );
