@@ -44,7 +44,7 @@ class VanillaAnalytics extends Gdn_Plugin {
             'analytics',
             T('Analytics'),
             'Garden.Settings.Manage',
-            ['class' => 'Analytics']
+            ['After' => 'Moderation', 'class' => 'Analytics']
         );
 
         $personalDashboard = $analyticsDashboardModel->getUserDashboardWidgets(AnalyticsDashboard::DASHBOARD_PERSONAL);
