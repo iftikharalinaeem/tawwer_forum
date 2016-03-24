@@ -1,4 +1,4 @@
-<div id="analytics_toolbar">
+<div class="analytics-toolbar" id="analytics_toolbar">
     <div class="toolbar-controls">
 
     <?php
