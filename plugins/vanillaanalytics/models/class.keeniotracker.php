@@ -75,17 +75,17 @@ class KeenIOTracker implements TrackerInterface {
         // Pageviews (metric)
         $totalPageViewQuery = new KeenIOQuery();
         $totalPageViewQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
-            ->setTitle(t('Pageviews'))
+            ->setTitle(t('Page Views'))
             ->setEventCollection('page');
 
         $totalPageViewsWidget = new AnalyticsWidget();
         $totalPageViewsWidget->setID('total-pageviews')
-            ->setTitle(t('Pageviews'))
+            ->setTitle(t('Page Views'))
             ->setHandler('KeenIOWidget')
             ->setType('metric')
             ->setData([
                 'chart' => [
-                    'title' => 'Pageviews'
+                    'title' => 'Page Views'
                 ],
                 'query' => $totalPageViewQuery
             ]);
@@ -95,18 +95,18 @@ class KeenIOTracker implements TrackerInterface {
         // Unique Pageviews (metric)
         $totalUniquePageviewsQuery = new KeenIOQuery();
         $totalUniquePageviewsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
-            ->setTitle(t('Unique Pageviews'))
+            ->setTitle(t('Unique Page Views'))
             ->setEventCollection('page')
             ->setTargetProperty('user.sessionID');
 
         $totalUniquePageviewsWidget = new AnalyticsWidget();
         $totalUniquePageviewsWidget->setID('total-unique-pageviews')
-            ->setTitle(t('Unique Pageviews'))
+            ->setTitle(t('Unique Page Views'))
             ->setHandler('KeenIOWidget')
             ->setType('metric')
             ->setData([
                 'chart' => [
-                    'title' => 'Unique Pageviews'
+                    'title' => 'Unique Page Views'
                 ],
                 'query' => $totalUniquePageviewsQuery
             ]);
@@ -194,18 +194,18 @@ class KeenIOTracker implements TrackerInterface {
         // Pageviews (chart)
         $pageViewQuery = new KeenIOQuery();
         $pageViewQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
-            ->setTitle(t('Pageviews'))
+            ->setTitle(t('Page Views'))
             ->setEventCollection('page')
             ->setInterval('daily');
 
         $pageViewsWidget = new AnalyticsWidget();
         $pageViewsWidget->setID('pageviews')
-            ->setTitle(t('Pageviews'))
+            ->setTitle(t('Page Views'))
             ->setHandler('KeenIOWidget')
             ->setType('chart')
             ->setData([
                 'chart' => [
-                    'labels' => ['Pageviews']
+                    'labels' => ['Page Views']
                 ],
                 'query' => $pageViewQuery
             ]);
@@ -242,19 +242,19 @@ class KeenIOTracker implements TrackerInterface {
         // Unique Pageviews (chart)
         $uniquePageviewsQuery = new KeenIOQuery();
         $uniquePageviewsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
-            ->setTitle(t('Unique Pageviews'))
+            ->setTitle(t('Unique Page Views'))
             ->setEventCollection('page')
             ->setTargetProperty('user.userID')
             ->setInterval('daily');
 
         $uniquePageviewsWidget = new AnalyticsWidget();
         $uniquePageviewsWidget->setID('unique-pageviews')
-            ->setTitle(t('Unique Pageviews'))
+            ->setTitle(t('Unique Page Views'))
             ->setHandler('KeenIOWidget')
             ->setType('chart')
             ->setData([
                 'chart' => [
-                    'labels' => ['Unique Pageviews']
+                    'labels' => ['Unique Page Views']
                 ],
                 'query' => $uniquePageviewsQuery
             ])
