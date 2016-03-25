@@ -21,10 +21,10 @@ module.exports = function (grunt) {
                 files: ['bower.json']
                 , tasks: ['wiredep']
             }
-            , js: {
-                files: ['js/src/**/*.js']
-                , tasks: ['jshint']
-            }
+            // , js: {
+            //     files: ['js/src/**/*.js']
+            //     , tasks: ['jshint']
+            // }
             , gruntfile: {
                 files: ['Gruntfile.js']
             }
@@ -123,7 +123,7 @@ module.exports = function (grunt) {
         , 'scsslint'
         , 'sass'
         , 'autoprefixer'
-        , 'jshint'
+        // , 'jshint'
         , 'csslint'
         , 'imagemin'
     ]);
