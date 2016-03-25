@@ -191,6 +191,7 @@ class VanillaAnalytics extends Gdn_Plugin {
         }
 
         $sender->addCssFile('c3.min.css', 'plugins/vanillaanalytics');
+        $sender->addCssFile('jquery-ui.css', 'plugins/vanillaanalytics');
 
         $sender->addJsFile('d3.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('c3.min.js', 'plugins/vanillaanalytics');
@@ -198,7 +199,9 @@ class VanillaAnalytics extends Gdn_Plugin {
         $sender->addJsFile('analyticsdashboard.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('analyticswidget.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('analyticstoolbar.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('jquery-ui.js');
+        $sender->addJsFile('jquery-ui.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('moment.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('jquery.comiseo.daterangepicker.js', 'plugins/vanillaanalytics');
 
         $dashboardModel = new AnalyticsDashboard();
         $dashboard = $dashboardModel->getID($dashboardID);
@@ -472,7 +475,7 @@ class VanillaAnalytics extends Gdn_Plugin {
             ->table('AnalyticsDashboardWidget')
             ->column('DashboardID', 'varchar(32)', null, ['index', 'index.DashboardSort'])
             ->column('WidgetID', 'varchar(32)', false)
-            ->column('Sort', 'int', false, ['index', 'index.DashboardSort'])
+            ->column('Sort', 'int', '0', ['index', 'index.DashboardSort'])
             ->column('InsertUserID', 'int', false, 'index')
             ->column('DateInserted', 'datetime')
             ->set();

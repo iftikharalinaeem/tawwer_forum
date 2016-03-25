@@ -30,4 +30,15 @@ $(document).ready(function() {
         var newInterval = $(this).val();
         setWidgets('setInterval', [newInterval]);
     });
+
+    $(".js-date-range").daterangepicker({
+        datepickerOptions : {
+            numberOfMonths : 2
+        },
+        onChange: function() {
+            var range = $(".js-date-range").daterangepicker("getRange");
+            setWidgets('setRange', [range]);
+        }
+    });
+
 });

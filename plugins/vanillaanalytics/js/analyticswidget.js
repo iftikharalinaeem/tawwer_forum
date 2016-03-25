@@ -281,6 +281,11 @@ function AnalyticsWidget(config) {
         return true;
     };
 
+    this.setRange = function(newRange) {
+        this.getHandler().setRange(newRange);
+        return true;
+    };
+
     this.setTitle = function(newTitle) {
         if (typeof newTitle === 'string') {
             title = newTitle;
