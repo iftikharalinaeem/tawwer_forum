@@ -7,6 +7,8 @@
     echo $form->dropDown('cat01', $this->data('cat01'), ['IncludeNull' => 'All Categories']);
     echo ' ';
     echo $form->dropDown('intervals', $this->data('Intervals'), ['value' => 'daily']);
+    echo ' ';
+    echo $form->textBox('dates', ['class' => 'InputBox js-date-range']);
     ?>
     </div>
 </div>

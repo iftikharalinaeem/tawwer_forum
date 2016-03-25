@@ -289,8 +289,8 @@ function KeenIOWidget(config) {
             throw 'Invalid newRange';
         }
 
-        var end = newRange.rangeEnd || false;
-        var start = newRange.rangeEnd || false;
+        var end = newRange.end || false;
+        var start = newRange.start || false;
 
         if (typeof end !== 'object' || !(end instanceof Date)) {
             range.end = new Date();
