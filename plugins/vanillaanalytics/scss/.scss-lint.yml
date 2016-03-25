@@ -111,7 +111,7 @@ linters:
     style: exclude_zero # or 'include_zero'
 
   MergeableSelector:
-    enabled: true
+    enabled: false
     exclude: legacy/**
     force_nesting: true
 
@@ -168,14 +168,14 @@ linters:
     exclude: legacy/**
 
   QualifyingElement:
-    enabled: true
+    enabled: false
     exclude: legacy/**
     allow_element_with_attribute: false
     allow_element_with_class: false
     allow_element_with_id: false
 
   SelectorDepth:
-    enabled: true
+    enabled: false
     exclude: legacy/**
     max_depth: 3
 
