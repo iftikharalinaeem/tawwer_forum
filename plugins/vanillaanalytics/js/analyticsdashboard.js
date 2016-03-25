@@ -2,9 +2,9 @@
  * Create a new analytics dashboard object.
  * @class
  * @param {object} config Configuration details for this dashboard.
- * @param {object} start A Date object representing the start of the date range.
- * @param {object} end A Date object representing the end of the date range.
- * @param {number} initialCategoryID A category's unique ID to limit the results to.
+ * @param {object} [start] A Date object representing the start of the date range.
+ * @param {object} [end] A Date object representing the end of the date range.
+ * @param {number} [initialCategoryID] A category's unique ID to limit the results to.
  */
 function AnalyticsDashboard (config, start, end, initialCategoryID) {
 
@@ -338,12 +338,53 @@ AnalyticsDashboard.prototype.removeWidget = function(widgetID) {
 };
 
 /**
+ *
+ */
+AnalyticsDashboard.prototype.setupSorting = function() {
+    if (typeof $.fn.sortable === 'undefined') {
+        return;
+    }
+
+    $(".Sortable").sortable({
+        handle: ".title",
+        update: this.sortUpdate.bind(this)
+    });
+
+    $(".Sortable").disableSelection();
+};
+
+AnalyticsDashboard.prototype.sortUpdate = function(e, ui) {
+    var elements = $(e.target).sortable("toArray");
+    var widgets  = {};
+
+    var widgetID;
+    for (var i = 0; i < elements.length; i++) {
+        widgetID = AnalyticsWidget.getIDFromAttribute(elements[i]);
+        if (widgetID) {
+            widgets[widgetID] = (i + 1);
+        }
+    }
+
+    $.post(
+        gdn.url("/settings/analytics/dashboardsort/" + this.getDashboardID()),
+        {
+            TransientKey: gdn.definition("TransientKey"),
+            Widgets     : widgets
+        }
+    );
+};
+
+/**
  * Write the dashboard's contents to the current page.
  */
 AnalyticsDashboard.prototype.writeDashboard = function() {
     for (var panelID in this.getPanel()) {
         this.emptyPanelContainer(panelID);
         this.writePanel(panelID);
+    }
+
+    if (this.isPersonal()) {
+        this.setupSorting();
     }
 };
 

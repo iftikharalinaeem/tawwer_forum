@@ -44,15 +44,15 @@ class VanillaAnalytics extends Gdn_Plugin {
             'analytics',
             T('Analytics'),
             'Garden.Settings.Manage',
-            ['class' => 'Analytics']
+            ['After' => 'Moderation', 'class' => 'Analytics']
         );
 
         $personalDashboard = $analyticsDashboardModel->getUserDashboardWidgets(AnalyticsDashboard::DASHBOARD_PERSONAL);
         if (count($personalDashboard) > 0) {
             $sender->EventArguments['SideMenu']->addLink(
                 'analytics',
-                T('Personal Dashboard'),
-                "settings/analytics/dashboard/personal",
+                T('My Dashboard'),
+                "settings/analytics/dashboard/" . AnalyticsDashboard::DASHBOARD_PERSONAL,
                 'Garden.Settings.Manage'
             );
         }
@@ -198,6 +198,7 @@ class VanillaAnalytics extends Gdn_Plugin {
         $sender->addJsFile('analyticsdashboard.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('analyticswidget.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('analyticstoolbar.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('jquery-ui.js');
 
         $dashboardModel = new AnalyticsDashboard();
         $dashboard = $dashboardModel->getID($dashboardID);
@@ -207,6 +208,57 @@ class VanillaAnalytics extends Gdn_Plugin {
         } else {
             redirect('settings');
         }
+    }
+
+    /**
+     * Sort the widgets in a custom dashboard.
+     *
+     * @param Gdn_Controller $sender
+     * @param array $requestArgs
+     * @throws
+     */
+    public function controller_dashboardSort($sender, $requestArgs) {
+        if (!Gdn::request()->isPostBack()) {
+            throw new Gdn_UserException('POST required.', 403);
+        }
+
+        $transientKey = Gdn::request()->getValueFrom(Gdn_Request::INPUT_POST, 'TransientKey', false);
+
+        // If this isn't a postback then return false if there isn't a transient key.
+        if (!$transientKey) {
+            throw new Gdn_UserException('No CSRF token provided.', 403);
+        }
+
+        if (!Gdn::session()->validateTransientKey($transientKey)) {
+            throw new Gdn_UserException('The CSRF token is invalid.', 403);
+        }
+
+        list($dashboardID) = $requestArgs;
+        $success = true;
+        $widgets = Gdn::request()->getValueFrom(Gdn_Request::INPUT_POST, 'Widgets', []);
+
+        foreach ($widgets as $widgetID => $position) {
+            try {
+                Gdn::sql()->update(
+                    'AnalyticsDashboardWidget',
+                    ['Sort' => $position],
+                    [
+                        'DashboardID' => $dashboardID,
+                        'WidgetID' => $widgetID
+                    ]
+                )->put();
+            } catch (Exception $e) {
+                $success = false;
+            }
+        }
+
+        $sender->setData('DashboardID', $dashboardID);
+        $sender->setData('Widgets', $widgets);
+        $sender->setData('Success', $success);
+
+        $sender->deliveryType(DELIVERY_TYPE_DATA);
+        $sender->deliveryMethod(DELIVERY_METHOD_JSON);
+        $sender->render();
     }
 
     /**

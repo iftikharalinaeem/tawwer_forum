@@ -495,6 +495,24 @@ class KeenIOTracker implements TrackerInterface {
             ])
             ->addSupport('cat01');
         $widgets['contributors-by-role-type'] = $contributorsByRoleTypeWidget;
+
+        // Posts per user (chart)
+        $postsPerUserWidget = new AnalyticsWidget();
+        $postsPerUserWidget->setID('posts-per-user')
+            ->setTitle(t('Posts Per User'))
+            ->setHandler('KeenIOWidget')
+            ->setType('chart')
+            ->setData([
+                'chart' => [
+                    'chartType' => 'area'
+                ],
+                'query' => [
+                    $postsQuery,
+                    $activeUsersQuery
+                ]
+            ])
+            ->setCallback('divideResult');
+        $widgets['posts-per-user'] = $postsPerUserWidget;
     }
 
     /**
