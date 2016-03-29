@@ -215,7 +215,7 @@ class Search {
 
     public static function youtube($id) {
         return <<<EOT
-<span class="Video YouTube" id="youtube-$id"><span class="VideoPreview"><a href="http://youtube.com/watch?v=$id"><img src="http://img.youtube.com/vi/$id/0.jpg" /></a></span><span class="VideoPlayer"></span></span>
+<span class="Video YouTube" id="youtube-$id"><span class="VideoPreview"><a href="https://www.youtube.com/watch?v=$id"><img src="https://img.youtube.com/vi/$id/0.jpg" /></a></span><span class="VideoPlayer"></span></span>
 EOT;
     }
 
