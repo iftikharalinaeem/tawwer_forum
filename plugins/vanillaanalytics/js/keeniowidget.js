@@ -463,6 +463,8 @@ KeenIOWidget.prototype.renderBody = function() {
     var stackedCharts = ['area', 'line', 'spline'];
 
     if (typeof element === 'object' && element instanceof HTMLElement) {
+        $(element).parent().removeClass("data-loading");
+
         switch (this.getType()) {
             case 'metric':
                 element.innerHTML = this.getMetricMarkup();
@@ -602,6 +604,8 @@ KeenIOWidget.prototype.writeContents = function(container, forceNewElement) {
         if (dataviz.view._prepared === false) {
             dataviz.prepare();
         }
+
+        $(container).parent().addClass("data-loading");
         this.runQuery(this.renderBody);
     }
 };
