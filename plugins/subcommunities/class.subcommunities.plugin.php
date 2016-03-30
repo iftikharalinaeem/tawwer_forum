@@ -79,7 +79,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
                 $categoryID = val('CategoryID', $site);
 
                 // Get all of the category IDs associated with the subcommunity.
-                $this->categories = CategoryModel::getSubtree($categoryID, true);
+                $this->categories = CategoryModel::getSubtree($categoryID, false);
             }
         }
 
