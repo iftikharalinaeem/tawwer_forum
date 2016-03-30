@@ -61,6 +61,7 @@ class KeenIOTracker implements TrackerInterface {
         $totalActiveUsersWidget = new AnalyticsWidget();
         $totalActiveUsersWidget->setID('total-active-users')
             ->setTitle(t('Active Users'))
+            ->isBasic(true)
             ->setHandler('KeenIOWidget')
             ->setType('metric')
             ->setData([
@@ -81,6 +82,7 @@ class KeenIOTracker implements TrackerInterface {
         $totalPageViewsWidget = new AnalyticsWidget();
         $totalPageViewsWidget->setID('total-pageviews')
             ->setTitle(t('Page Views'))
+            ->isBasic(true)
             ->setHandler('KeenIOWidget')
             ->setType('metric')
             ->setData([
@@ -102,6 +104,7 @@ class KeenIOTracker implements TrackerInterface {
         $totalUniquePageviewsWidget = new AnalyticsWidget();
         $totalUniquePageviewsWidget->setID('total-unique-pageviews')
             ->setTitle(t('Unique Page Views'))
+            ->isBasic(true)
             ->setHandler('KeenIOWidget')
             ->setType('metric')
             ->setData([
@@ -127,6 +130,7 @@ class KeenIOTracker implements TrackerInterface {
         $totalDiscussionsWidget = new AnalyticsWidget();
         $totalDiscussionsWidget->setID('total-discussions')
             ->setTitle(t('Discussions'))
+            ->isBasic(true)
             ->setHandler('KeenIOWidget')
             ->setType('metric')
             ->setData([
@@ -153,6 +157,7 @@ class KeenIOTracker implements TrackerInterface {
         $totalCommentsWidget = new AnalyticsWidget();
         $totalCommentsWidget->setID('total-comments')
             ->setTitle(t('Comments'))
+            ->isBasic(true)
             ->setHandler('KeenIOWidget')
             ->setType('metric')
             ->setData([
@@ -175,6 +180,7 @@ class KeenIOTracker implements TrackerInterface {
         $totalContributorsWidget = new AnalyticsWidget();
         $totalContributorsWidget->setID('total-contributors')
             ->setTitle(t('Contributors'))
+            ->isBasic(true)
             ->setHandler('KeenIOWidget')
             ->setType('metric')
             ->setData([
@@ -201,6 +207,7 @@ class KeenIOTracker implements TrackerInterface {
         $pageViewsWidget = new AnalyticsWidget();
         $pageViewsWidget->setID('pageviews')
             ->setTitle(t('Page Views'))
+            ->isBasic(true)
             ->setHandler('KeenIOWidget')
             ->setType('chart')
             ->setData([
@@ -298,6 +305,7 @@ class KeenIOTracker implements TrackerInterface {
         $discussionsWidget = new AnalyticsWidget();
         $discussionsWidget->setID('discussions')
             ->setTitle(t('Discussions'))
+            ->isBasic(true)
             ->setHandler('KeenIOWidget')
             ->setData([
                 'chart' => [
@@ -324,6 +332,7 @@ class KeenIOTracker implements TrackerInterface {
         $commentsWidget = new AnalyticsWidget();
         $commentsWidget->setID('comments')
             ->setTitle(t('Comments'))
+            ->isBasic(true)
             ->setHandler('KeenIOWidget')
             ->setData([
                 'chart' => [
