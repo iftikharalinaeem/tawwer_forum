@@ -478,7 +478,11 @@ KeenIOWidget.prototype.renderBody = function() {
                     dataviz.colors([colors[(index) % colors.length]]);
                 }
 
-                dataviz.render();
+                if (dataviz.view._rendered) {
+                    dataviz.update();
+                } else {
+                    dataviz.render();
+                }
         }
     } else {
         throw 'No valid dataviz element';
@@ -595,7 +599,9 @@ KeenIOWidget.prototype.writeContents = function(container, forceNewElement) {
             dataviz.el(container);
         }
 
-        dataviz.prepare();
+        if (dataviz.view._prepared === false) {
+            dataviz.prepare();
+        }
         this.runQuery(this.renderBody);
     }
 };
