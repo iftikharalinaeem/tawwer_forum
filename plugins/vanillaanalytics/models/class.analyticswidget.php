@@ -37,6 +37,11 @@ class AnalyticsWidget implements JsonSerializable {
      */
     protected $handler;
 
+    /**
+     * @var bool Is this a basic widget, available to everyone?
+     */
+    protected $isBasic = false;
+
     /** @var Gdn_SQLDriver Contains the sql driver for the object. */
     public $sql;
 
@@ -190,6 +195,32 @@ class AnalyticsWidget implements JsonSerializable {
         }
 
         return $this->bookmarked;
+    }
+
+    /**
+     * Is this a basic widget, available to everyone?
+     *
+     * @param bool $basic
+     * @return bool|$this
+     */
+    public function isBasic($basic = null) {
+        if ($basic !== null) {
+            $this->isBasic = (bool)$basic;
+            return $this;
+        }
+
+        return $this->isBasic;
+    }
+
+    /**
+     * Determine if a widget is enabled in the site config.
+     *
+     * @param bool $default Default value for a widget's enabled status.
+     */
+    public function isEnabled() {
+        $configSlug = "VanillaAnalytics.Widget.{$this->widgetID}";
+
+        return c($configSlug, $this->isBasic());
     }
 
     /**
