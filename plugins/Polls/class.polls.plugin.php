@@ -47,6 +47,9 @@ class PollsPlugin extends Gdn_Plugin {
       $Comment = GetValue('Comment', $Sender->EventArguments);
       $PollVote = GetValue('PollVote', $Comment);
       if ($PollVote) {
+         $this->EventArguments['String'] = &$PollVote;
+         $this->fireEvent('FilterContent');
+
          echo '<div class="PollVote">';
          // Use the sort as the color indicator (it should match up)
          echo '<span class="PollColor PollColor'.GetValue('Sort', $PollVote).'"></span>';
