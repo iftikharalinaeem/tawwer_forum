@@ -35,6 +35,10 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param object $sender DashboardController.
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
+        if (c('VanillaAnalytics.DisableDashboard', false)) {
+            return;
+        }
+
         $sectionModel            = new AnalyticsSection();
         $analyticsDashboardModel = new AnalyticsDashboard();
 
