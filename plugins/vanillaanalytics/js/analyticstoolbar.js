@@ -35,6 +35,33 @@ $(document).ready(function() {
         datepickerOptions : {
             numberOfMonths : 2
         },
+        presetRanges: [
+            {
+                text: 'Past 30 Days',
+                dateStart: function() { return moment().subtract('days', 30); },
+                dateEnd: function() { return moment(); }
+            },
+            {
+                text: 'This Month',
+                dateStart: function() { return moment().startOf('month'); },
+                dateEnd: function() { return moment().endOf('month'); }
+            },
+            {
+                text: 'Last Month',
+                dateStart: function() { return moment().subtract('month', 1).startOf('month'); },
+                dateEnd: function() { return moment().subtract('month', 1).endOf('month'); }
+            },
+            {
+                text: 'Past Year',
+                dateStart: function() { return moment().subtract('year', 1); },
+                dateEnd: function() { return moment(); }
+            },
+            {
+                text: 'Year to Date',
+                dateStart: function() { return moment().startOf('year'); },
+                dateEnd: function() { return moment(); }
+            }
+        ],
         onChange: function() {
             var range = $(".js-date-range").daterangepicker("getRange");
             setWidgets('setRange', [range]);
