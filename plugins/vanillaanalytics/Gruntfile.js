@@ -68,7 +68,8 @@ module.exports = function (grunt) {
             options: {
                 config: 'scss/.scss-lint.yml',
                 maxBuffer: 3000 * 1024,
-                colorizeOutput: true
+                colorizeOutput: true,
+                exclude: ['scss/_jquery*.scss']
             }
             , all: ['scss/**/*.scss']
         },
@@ -79,8 +80,7 @@ module.exports = function (grunt) {
                 cascade: false
             },
             dist: {
-                src: ['design/admin.css'
-                    ,'design/style.css' ]
+                src: ['design/dashboard.css']
             }
         },
 

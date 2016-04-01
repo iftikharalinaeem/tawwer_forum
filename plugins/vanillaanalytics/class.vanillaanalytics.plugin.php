@@ -195,7 +195,7 @@ class VanillaAnalytics extends Gdn_Plugin {
         }
 
         $sender->addCssFile('c3.min.css', 'plugins/vanillaanalytics');
-        $sender->addCssFile('jquery-ui.css', 'plugins/vanillaanalytics');
+//        $sender->addCssFile('jquery-ui.css', 'plugins/vanillaanalytics');
 
         $sender->addJsFile('d3.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('c3.min.js', 'plugins/vanillaanalytics');
