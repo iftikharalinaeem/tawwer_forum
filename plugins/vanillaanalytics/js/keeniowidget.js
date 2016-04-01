@@ -463,6 +463,8 @@ KeenIOWidget.prototype.renderBody = function() {
     var stackedCharts = ['area', 'line', 'spline'];
 
     if (typeof element === 'object' && element instanceof HTMLElement) {
+        $(element).parent().removeClass("data-loading");
+
         switch (this.getType()) {
             case 'metric':
                 element.innerHTML = this.getMetricMarkup();
@@ -478,7 +480,11 @@ KeenIOWidget.prototype.renderBody = function() {
                     dataviz.colors([colors[(index) % colors.length]]);
                 }
 
-                dataviz.render();
+                if (dataviz.view._rendered) {
+                    dataviz.update();
+                } else {
+                    dataviz.render();
+                }
         }
     } else {
         throw 'No valid dataviz element';
@@ -595,7 +601,11 @@ KeenIOWidget.prototype.writeContents = function(container, forceNewElement) {
             dataviz.el(container);
         }
 
-        dataviz.prepare();
+        if (dataviz.view._prepared === false) {
+            dataviz.prepare();
+        }
+
+        $(container).parent().addClass("data-loading");
         this.runQuery(this.renderBody);
     }
 };
