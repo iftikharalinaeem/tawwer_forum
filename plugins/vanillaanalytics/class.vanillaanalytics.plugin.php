@@ -301,7 +301,7 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param $sender Current instance of EntryController
      * @param $args Event arguments, passed from EntryController, specifically for the event.
      */
-    public function entryController_registrationSuccessful_handler($sender, &$args) {
+    public function userModel_afterRegister_handler($sender, &$args) {
         $uuid = null;
 
         // Fetch our tracking cookie.
@@ -319,7 +319,7 @@ class VanillaAnalytics extends Gdn_Plugin {
 
         // Save the new user's UUID attribute
         Gdn::userModel()->saveAttribute(
-            Gdn::session()->UserID,
+            $args['UserID'],
             'UUID',
             $uuid
         );
