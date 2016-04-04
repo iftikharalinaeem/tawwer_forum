@@ -36,6 +36,7 @@ class WatermarkPlugin extends Gdn_Plugin {
     public function base_render_before () {
         gdn::controller()->removeJsFile('autosave.js');
     }
+
     /**
      * After a discussion is saved in post controller, any images that were uploaded
      * with the discussion are then linked to the discussion, at this point we call the
@@ -61,7 +62,7 @@ class WatermarkPlugin extends Gdn_Plugin {
             $mediaRow = $sender->MediaModel()->GetID($media[0]);
             if (substr($mediaRow->Type, 0, 5) == 'image') {
                 if (self::watermark($mediaRow->Path, $watermarkParams, $mediaRow->Path, $quality) === true) {
-                    if (self::watermark($mediaRow->ThumbPath, $watermarkParams, $mediaRow->ThumbPath, $quality) === true) {
+                    if (self::watermark("/".$mediaRow->ThumbPath, $watermarkParams, "/".$mediaRow->ThumbPath, $quality) === true) {
                         return;
                     }
                 }
