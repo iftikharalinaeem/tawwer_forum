@@ -45,7 +45,7 @@ class WatermarkPlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    function fileUploadPlugin_insertDiscussionMedia_handler($sender, $args) {
+    public function fileUploadPlugin_insertDiscussionMedia_handler($sender, $args) {
         $watermarkCategories = c('Watermark.WatermarkCategories');
         if (in_array($args['CategoryID'], $watermarkCategories)) {
             $media = $args['AllFilesData'];
@@ -215,11 +215,11 @@ class WatermarkPlugin extends Gdn_Plugin {
         // Since this media was already vetted by the upload script we can trust the file endings to get the type.
         $uploadImage = new Gdn_UploadImage();
         $copiedSourceFile = $uploadImage->copyLocal($name);
-        $destination = $copiedSourceFile;
+        $destination = $name;
         Logger::event(
             'watermarking_image',
             Logger::INFO,
-            '{destination} chosen',
+            'Destination chosen',
             array('Name' => $name, 'SourceFile' => $sourceFile, 'CopiedSourceFile' => $copiedSourceFile, 'WatermarkParams' => $watermarkParams)
         );
 
@@ -242,7 +242,7 @@ class WatermarkPlugin extends Gdn_Plugin {
         Logger::event(
             'watermarking_image',
             Logger::INFO,
-            'SourceImage "{sourcefile_id}" made',
+            'SourceImage made',
             array('Sourcefile ID' => $sourcefile_id, 'SourceFile' => $sourceFile, 'CopiedSourceFile' => $copiedSourceFile, 'WatermarkParams' => $watermarkParams)
         );
 
@@ -273,7 +273,7 @@ class WatermarkPlugin extends Gdn_Plugin {
         Logger::event(
             'watermarking_image',
             Logger::INFO,
-            'WatermarkImage "{watermarkfile_id}" made',
+            'WatermarkImage made',
             array('WaterMarkFile Copied Source' => $copiedWatermarkSource, '\$watermarkfile_height' => $watermarkfile_height, '\$watermarkfile_width' => $watermarkfile_width, 'WatermarkParams' => $watermarkParams)
         );
 
@@ -334,17 +334,17 @@ class WatermarkPlugin extends Gdn_Plugin {
         }
 
         if (imagecopy($sourcefile_id, $watermarkfile_id, $dest_x, $dest_y, 0, 0, $watermarkfile_width, $watermarkfile_height) === false) {
-            die('Unable to create the cotton pickin\' image.');
+            die('Unable to impose watermark on sourcefile.');
         }
         imagedestroy($watermarkfile_id);
 
         if ($outputtype == 'gif') {
             if (imagegif ($sourcefile_id, $copiedSourceFile) === false) {
-                die('Failed to mke the composite gif.');
+                die('Failed to make the composite gif.');
             }
         } elseif ($outputtype == 'png') {
             if (imagepng($sourcefile_id, $copiedSourceFile, $quality) === false) {
-                die('Failed to make the cpmposite png.');
+                die('Failed to make the composite png.');
             }
         } else {
             if (imagejpeg($sourcefile_id, $copiedSourceFile, $quality) === false) {
@@ -360,7 +360,7 @@ class WatermarkPlugin extends Gdn_Plugin {
             array('\$destination ID' => $destination)
         );
 
-        $savedAs = $uploadImage->saveImageAs($copiedSourceFile, $name);
+        $savedAs = $uploadImage->saveImageAs($copiedSourceFile, $destination);
 
         imagedestroy($sourcefile_id);
 
