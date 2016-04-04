@@ -294,8 +294,6 @@ class WatermarkPlugin extends Gdn_Plugin {
             $watermark_resize_height = round($watermark_resize_width/$ratio);
         }
 
-        $watermark_resize_height = $watermarkfile_height;
-        $watermark_resize_width = $watermarkfile_width;
         $im_dest = imagecreatetruecolor ($watermark_resize_width, $watermark_resize_height);
         imagealphablending($im_dest, false);
         if (imagecopyresized($im_dest, $watermarkfile_id, 0, 0, 0, 0, $watermark_resize_width, $watermark_resize_height, $watermarkfile_width, $watermarkfile_height) === false) {
@@ -341,11 +339,17 @@ class WatermarkPlugin extends Gdn_Plugin {
         imagedestroy($watermarkfile_id);
 
         if ($outputtype == 'gif') {
-            imagegif ($sourcefile_id, $copiedSourceFile);
+            if (imagegif ($sourcefile_id, $copiedSourceFile) === false) {
+                die('Failed to mke the composite gif.');
+            }
         } elseif ($outputtype == 'png') {
-            imagepng($sourcefile_id, $copiedSourceFile, $quality);
+            if (imagepng($sourcefile_id, $copiedSourceFile, $quality) === false) {
+                die('Failed to make the cpmposite png.');
+            }
         } else {
-            imagejpeg($sourcefile_id, $copiedSourceFile, $quality);
+            if (imagejpeg($sourcefile_id, $copiedSourceFile, $quality) === false) {
+                die('Failed to make the composite jpg.');
+            }
         }
 
 
