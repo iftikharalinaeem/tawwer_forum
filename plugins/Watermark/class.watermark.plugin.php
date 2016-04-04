@@ -60,11 +60,11 @@ class WatermarkPlugin extends Gdn_Plugin {
 
             $mediaRow = $sender->MediaModel()->GetID($media[0]);
             if (substr($mediaRow->Type, 0, 5) == 'image') {
-                if (self::watermark($mediaRow->Path, $watermarkParams, $mediaRow->Path, $quality) === true) {
+//                if (self::watermark($mediaRow->Path, $watermarkParams, $mediaRow->Path, $quality) === true) {
                     if (self::watermark($mediaRow->ThumbPath, $watermarkParams, $mediaRow->ThumbPath, $quality) === true) {
                         return;
                     }
-                }
+//                }
             }
         }
     }
