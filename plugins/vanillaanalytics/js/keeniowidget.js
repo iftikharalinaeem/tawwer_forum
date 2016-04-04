@@ -84,11 +84,14 @@ function KeenIOWidget(config) {
 
         var queryParams = {
             eventCollection : config.eventCollection || null,
-            filters         : config.filters || [],
             maxAge          : 86400
         };
 
-        if (typeof config.groupBy !== 'undefined') {
+        if (typeof config.filters !== "undefined" && Array.isArray(config.filters) && config.filters.length > 0) {
+            queryParams.filters = config.filters;
+        }
+
+        if (typeof config.groupBy !== 'undefined' && config.groupBy !== null) {
             queryParams.groupBy = config.groupBy;
         }
 
@@ -472,13 +475,22 @@ KeenIOWidget.prototype.renderBody = function() {
             default:
                 dataviz.parseRawData({result: this.getData()});
 
-                if (dataviz.labels().length > 1) {
+                var labels = dataviz.labels();
+
+                if (labels.length > 1) {
                     dataviz.stacked(true);
                 } else {
                     var index = $(element).parent(".analytics-widget").index();
                     var colors = dataviz.colors();
                     dataviz.colors([colors[(index) % colors.length]]);
                 }
+
+                for (var x = 0; x < labels.length; x++) {
+                    if (labels[x] === "") {
+                        labels[x] = "(None)";
+                    }
+                }
+                dataviz.labels(labels);
 
                 if (dataviz.view._rendered) {
                     dataviz.update();
