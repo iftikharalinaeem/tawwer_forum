@@ -9,9 +9,9 @@ $PluginInfo['Watermark'] = array(
     'Description' => 'Allow for configured categories to watermark the images attached to discussions.',
     'Version' => '1.0.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
-    'RequiredPlugins' => array(
-        'FileUpload' => '1.8.4'
-    ),
+//    'RequiredPlugins' => array(
+//        'FileUpload' => '1.8.4'
+//    ),
     'MobileFriendly' => true,
     'Author' => "Patrick Kelly",
     'AuthorEmail' => 'patrick.k@vanillaforums.com',
@@ -45,10 +45,11 @@ class WatermarkPlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function fileUploadPlugin_insertDiscussionMedia_handler($sender, $args) {
+    public function editorPlugin_beforeSaveUploads_handler($sender, $args) {
         $watermarkCategories = c('Watermark.WatermarkCategories');
         if (in_array($args['CategoryID'], $watermarkCategories)) {
-            $media = $args['AllFilesData'];
+            $filePath = $args['TmpFilePath'];
+            $fileExtension = $args['FileExtension'];
 
             // these params are passed to the image and the thumbnail, theoretically, if a client wants we could create param arrays, one for each.
             $watermarkParams = array(
@@ -59,13 +60,8 @@ class WatermarkPlugin extends Gdn_Plugin {
 
             $quality = c('Watermark.Quality', 70);
 
-            $mediaRow = $sender->MediaModel()->GetID($media[0]);
-            if (substr($mediaRow->Type, 0, 5) == 'image') {
-                if (self::watermark($mediaRow->Path, $watermarkParams, $mediaRow->Path, $quality) === true) {
-                    if (self::watermark("/".$mediaRow->ThumbPath, $watermarkParams, "/".$mediaRow->ThumbPath, $quality) === true) {
-                        return;
-                    }
-                }
+            if (self::watermark($filePath, $watermarkParams, $fileExtension, $quality) === true) {
+                    return true;
             }
         }
     }
@@ -211,28 +207,25 @@ class WatermarkPlugin extends Gdn_Plugin {
      *
      * @return true for chaining purposes.
     */
-    static function watermark($sourceFile, $watermarkParams = array(), $name = null, $quality = 90) {
-        // Since this media was already vetted by the upload script we can trust the file endings to get the type.
-        $uploadImage = new Gdn_UploadImage();
-        $copiedSourceFile = $uploadImage->copyLocal($name);
-        $destination = $name;
+    static function watermark($sourceFile, $watermarkParams = array(), $extension = null, $quality = 90) {
+        $destination = $sourceFile;
         Logger::event(
             'watermarking_image',
             Logger::INFO,
             'Destination chosen',
-            array('Name' => $name, 'SourceFile' => $sourceFile, 'CopiedSourceFile' => $copiedSourceFile, 'WatermarkParams' => $watermarkParams)
+            array('SourceFile' => $sourceFile, 'CopiedSourceFile' => $sourceFile, 'WatermarkParams' => $watermarkParams)
         );
 
         $sourcefile_id = false;
-        if (stringEndsWith($copiedSourceFile, '.png')) {
+        if ($extension === 'png') {
             $outputtype = 'png';
-            $sourcefile_id = imagecreatefrompng($copiedSourceFile);
-        } elseif (stringEndsWith($copiedSourceFile, '.gif')) {
+            $sourcefile_id = imagecreatefrompng($sourceFile);
+        } elseif ($extension === 'gif') {
             $outputtype = 'gif';
-            $sourcefile_id = imagecreatefromgif($copiedSourceFile);
+            $sourcefile_id = imagecreatefromgif($sourceFile);
         } else {
             $outputtype = 'jpg';
-            $sourcefile_id = imagecreatefromjpeg($copiedSourceFile);
+            $sourcefile_id = imagecreatefromjpeg($sourceFile);
         }
 
         if($sourcefile_id === false) {
@@ -243,7 +236,7 @@ class WatermarkPlugin extends Gdn_Plugin {
             'watermarking_image',
             Logger::INFO,
             'SourceImage made',
-            array('Sourcefile ID' => $sourcefile_id, 'SourceFile' => $sourceFile, 'CopiedSourceFile' => $copiedSourceFile, 'WatermarkParams' => $watermarkParams)
+            array('Sourcefile ID' => $sourcefile_id, 'SourceFile' => $sourceFile, 'CopiedSourceFile' => $sourceFile, 'WatermarkParams' => $watermarkParams)
         );
 
         // Get the source file size
@@ -265,8 +258,9 @@ class WatermarkPlugin extends Gdn_Plugin {
         if($watermarkfile_id === false) {
             die('No Watermark file was made.');
         }
-//        imageAlphaBlending($watermarkfile_id, false);
-//        imagesavealpha($watermarkfile_id, true);
+
+        imageAlphaBlending($watermarkfile_id, false);
+        imagesavealpha($watermarkfile_id, true);
         $watermarkfile_width=imageSX($watermarkfile_id);
         $watermarkfile_height=imageSY($watermarkfile_id);
 
@@ -339,15 +333,15 @@ class WatermarkPlugin extends Gdn_Plugin {
         imagedestroy($watermarkfile_id);
 
         if ($outputtype == 'gif') {
-            if (imagegif ($sourcefile_id, $copiedSourceFile) === false) {
+            if (imagegif ($sourcefile_id, $sourceFile) === false) {
                 die('Failed to make the composite gif.');
             }
         } elseif ($outputtype == 'png') {
-            if (imagepng($sourcefile_id, $copiedSourceFile, $quality) === false) {
+            if (imagepng($sourcefile_id, $sourceFile, $quality) === false) {
                 die('Failed to make the composite png.');
             }
         } else {
-            if (imagejpeg($sourcefile_id, $copiedSourceFile, $quality) === false) {
+            if (imagejpeg($sourcefile_id, $sourceFile, $quality) === false) {
                 die('Failed to make the composite jpg.');
             }
         }
@@ -360,16 +354,7 @@ class WatermarkPlugin extends Gdn_Plugin {
             array('\$destination ID' => $destination)
         );
 
-        $savedAs = $uploadImage->saveImageAs($copiedSourceFile, $destination);
-
         imagedestroy($sourcefile_id);
-
-        Logger::event(
-            'watermarking_image',
-            Logger::INFO,
-            'Before Return',
-            array('$savedAs' => $savedAs)
-        );
 
         return true;
     }
