@@ -13,6 +13,17 @@
   }
 }
 
+.clear-right {
+  &::after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: ' ';
+    clear: right;
+    height: 0;
+  }
+}
+
 //From Twitter Bootstrap
 .hide-text {
   background-color: transparent;

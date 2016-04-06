@@ -3,18 +3,24 @@
   background-position: 166px -644px;
 }
 
-.analytics-panel {
-  display: flex;
-  flex-wrap: wrap;
+// General widget styling
+.analytics-widget {
+  padding: 10px;
 }
 
-// General widget stlying
-.analytics-widget {
-  flex-grow: 1;
-  padding: 10px;
+.analytics-panel-charts {
+  @extend .clear-right;
+}
 
-  &.analytics-widget.analytics-widget-chart {
-    background: transparent;
+//Charts
+.analytics-widget-chart {
+  display: block;
+  float: left;
+  width: 50%;
+
+  .analytics-widget-header {
+    @extend .clearfix;
+    padding: 20px 0 20px 20px;
   }
 
   .title {
@@ -24,44 +30,38 @@
   }
 }
 
-//Charts
-.analytics-widget-chart {
-  padding: 20px;
-  flex: 0 1 50%;
-}
-
-.analytics-widget-header {
-  @extend .clearfix;
-  padding: 20px 0 20px 20px;
-}
-
 
 //Metrics
 .analytics-panel-metrics {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+
+  padding-top: 20px;
+  padding-bottom: 10px;
   background-color: $grey-1;
   border-bottom: 1px solid $grey-2;
   box-shadow: 0 4px 4px -2px $grey-2;
 }
 
 .analytics-widget-metric {
-  padding: 36px 0;
+  position: relative;
+  padding: 0 30px 10px;
 
-  &:first-child {
-    .body {
-      border-left: 0;
-    }
+  .analytics-widget-header {
+    position: absolute;
+    top: 10px;
+    right: 0;
   }
 
   .body {
-    padding: 10px;
     text-align: center;
     color: $grey-3;
-    border-left: 1px dashed $blue-2;
   }
 
   .metric-value {
     display: block;
-    font-size: 64px;
+    font-size: 48px;
     line-height: $line-height-headings;
     font-weight: 700;
   }
@@ -81,16 +81,16 @@
 // Bookmark Icons
 .bookmark {
   @extend .hide-text;
-  @include font-vanillicon('\f19a', $text-light-color);
+  @include font-vanillicon('\f19a', $text-light-color, 18px);
 
 
   &:hover,
   &:focus {
-    @include font-vanillicon('\f199', $yellow);
+    @include font-vanillicon('\f199', $yellow, 18px);
     text-decoration: none;
   }
 }
 
 .bookmarked {
-  @include font-vanillicon('\f199', $yellow);
+  @include font-vanillicon('\f199', $yellow, 18px);
 }

@@ -1,5 +1,7 @@
 // Dashboard toolbar
 .analytics-toolbar {
+  @extend .clear-right;
+
   background: $blue-1;
   border-top: 1px solid $blue-2;
   border-bottom: 2px solid $blue-2;
@@ -14,15 +16,6 @@
 
   .toolbar-controls {
     float: right;
-  }
-
-  &::after {
-    visibility: hidden;
-    display: block;
-    font-size: 0;
-    content: ' ';
-    clear: right;
-    height: 0;
   }
 }
 

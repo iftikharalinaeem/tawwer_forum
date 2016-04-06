@@ -351,6 +351,13 @@ AnalyticsDashboard.prototype.setupSorting = function() {
     });
 
     $(".analytics-panel-charts").disableSelection();
+
+    $(".analytics-panel-metrics").sortable({
+        handle: ".body",
+        update: this.sortUpdate.bind(this)
+    });
+
+    $(".analytics-panel-metrics").disableSelection();
 };
 
 AnalyticsDashboard.prototype.sortUpdate = function(e, ui) {

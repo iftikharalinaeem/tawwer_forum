@@ -455,6 +455,7 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
     dataviz.library('c3');
     dataviz.chartType(this.getConfig('type', 'area'));
     dataviz.chartOptions(this.getConfig('options', {}));
+    dataviz.dateFormat('%Y-%m');
 };
 
 /**

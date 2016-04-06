@@ -124,7 +124,6 @@ class AnalyticsDashboard implements JsonSerializable {
         $result = false;
 
         if ($dashboardID == self::DASHBOARD_PERSONAL) {
-            $userWidgets = $this->getUserDashboardWidgets(self::DASHBOARD_PERSONAL);
             $result = new AnalyticsDashboard(
                 'Personal Dashboard',
                 $this->getUserDashboardWidgets(self::DASHBOARD_PERSONAL)
