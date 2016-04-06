@@ -523,6 +523,23 @@ class KeenIOTracker implements TrackerInterface {
             ])
             ->setCallback('divideResult');
         $widgets['posts-per-user'] = $postsPerUserWidget;
+
+        // Registrations
+        $registrationsQuery = new KeenIOQuery();
+        $registrationsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Registrations'))
+            ->setEventCollection('registration')
+            ->setInterval('daily');
+
+        $registrationsWidget = new AnalyticsWidget();
+        $registrationsWidget->setID('registrations')
+            ->setTitle(t('Registrations'))
+            ->setHandler('KeenIOWidget')
+            ->setType('chart')
+            ->setData([
+                'query' => $registrationsQuery
+            ]);
+        $widgets['registrations'] = $registrationsWidget;
     }
 
     /**
