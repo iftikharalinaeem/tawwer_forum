@@ -102,6 +102,10 @@ module.exports = function (grunt) {
                     , 'views/**/*.tpl'
                 ]
             }
+            , scripts: {
+                files: ['js/src/*.js']
+                , tasks: ['uglify']
+            }
         },
 
         sass: {
