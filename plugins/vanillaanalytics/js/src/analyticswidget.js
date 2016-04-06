@@ -120,12 +120,12 @@ function AnalyticsWidget(config) {
             newElements.title = document.createElement('h4');
             newElements.title.setAttribute('class', 'title');
             newElements.title.innerHTML = this.getTitle();
-            newElements.options.appendChild(newElements.bookmark);
             newElements.header.appendChild(newElements.title);
-            newElements.header.appendChild(newElements.options);
-            newElements.container.appendChild(newElements.header);
-
         }
+
+        newElements.options.appendChild(newElements.bookmark);
+        newElements.header.appendChild(newElements.options);
+        newElements.container.appendChild(newElements.header);
 
         newElements.body.setAttribute('class', 'body');
 
