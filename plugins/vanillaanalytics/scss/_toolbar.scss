@@ -1,0 +1,142 @@
+// Dashboard toolbar
+.analytics-toolbar {
+  background: $blue-1;
+  border-top: 1px solid $blue-2;
+  border-bottom: 2px solid $blue-2;
+  padding: 4px 20px;
+  font-size: 14px;
+  min-height: 47px;
+  margin: 0;
+
+  select {
+    @extend .toolbar-input;
+  }
+
+  .toolbar-controls {
+    float: right;
+  }
+
+  &::after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: ' ';
+    clear: right;
+    height: 0;
+  }
+}
+
+.toolbar-input {
+  height: 34px;
+  margin: 0;
+  vertical-align: middle;
+  font-family: $font-family;
+  color: $text-light-color;
+  background: 0;
+  background-color: $white;
+  border: 2px solid $border-color;
+}
+
+// jQueryUI
+.ui-widget button {
+  font-family: $font-family;
+}
+
+.ui-button {
+  position: relative;
+  background-color: $blue-3;
+}
+
+.ui-button-text {
+  font-size: 14px;
+}
+
+.ui-icon.ui-icon-triangle-1-s {
+  @include font-vanillicon('\f115', $text-light-color, 20px);
+  position: absolute;
+  display: block;
+  right: 10px;
+  top: 5px;
+}
+
+.ui-icon.ui-icon-circle-triangle-w {
+  @extend .hide-text;
+  @include font-vanillicon('\f123', $text-light-color, 20px);
+  position: absolute;
+  display: block;
+  right: 10px;
+  top: 5px;
+}
+
+.ui-icon.ui-icon-circle-triangle-e {
+  @extend .hide-text;
+  @include font-vanillicon('\f124', $text-light-color, 20px);
+  position: absolute;
+  display: block;
+  right: 10px;
+  top: 5px;
+}
+
+.ui-button {
+  @extend .toolbar-input;
+}
+
+.ui-state-highlight,
+.ui-widget-content .ui-state-highlight {
+  background: 0;
+  border-color: $grey-3;
+}
+
+.ui-widget-content .ui-state-default {
+  background: 0;
+  border-radius: 2px;
+}
+
+.ui-datepicker {
+  font-family: $font-family;
+
+  table thead th {
+    background: 0;
+  }
+
+  table {
+    border: 0;
+  }
+}
+
+.ui-widget-header {
+  background: 0;
+  border: 0;
+}
+
+.ui-widget-content {
+  border: 0;
+  background: 0;
+  background-color: $white;
+}
+
+.ui-widget-content .ui-state-focus {
+  background: 0;
+  border: 0;
+}
+
+.comiseo-daterangepicker {
+  border: 1px solid $border-color;
+}
+
+.comiseo-daterangepicker-presets {
+  a {
+    font-family: $font-family;
+    background: 0;
+
+    &:hover {
+      background: 0;
+      text-decoration: underline;
+    }
+  }
+
+}
+
+.comiseo-daterangepicker-calendar .ui-state-highlight a.ui-state-default {
+  background: $grey-2;
+}

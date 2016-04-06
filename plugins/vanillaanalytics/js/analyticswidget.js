@@ -95,18 +95,22 @@ function AnalyticsWidget(config) {
         // Setup the document elements we'll be using.
         var newElements = {
             body      : document.createElement('div'),
+            header    : document.createElement('div'),
             bookmark  : document.createElement('a'),
+            options   : document.createElement('div'),
             container : document.createElement('li'),
             title     : null
         };
 
         newElements.container.setAttribute('id', 'analytics_widget_' + widgetID);
         newElements.container.setAttribute('class', 'analytics-widget analytics-widget-' + type);
+        newElements.options.setAttribute('class', 'analytics-widget-options');
+        newElements.header.setAttribute('class', 'analytics-widget-header');
 
         if (this.isBookmarked()) {
-            newElements.bookmark.setAttribute('class', 'Hijack Bookmark Bookmarked');
+            newElements.bookmark.setAttribute('class', 'Hijack bookmark bookmarked');
         } else {
-            newElements.bookmark.setAttribute('class', 'Hijack Bookmark');
+            newElements.bookmark.setAttribute('class', 'Hijack bookmark');
         }
         newElements.bookmark.setAttribute('href', gdn.url('/settings/analytics/bookmarkwidget/' + this.getWidgetID()));
         newElements.bookmark.innerHTML = 'Bookmark';
@@ -116,8 +120,11 @@ function AnalyticsWidget(config) {
             newElements.title = document.createElement('h4');
             newElements.title.setAttribute('class', 'title');
             newElements.title.innerHTML = this.getTitle();
-            newElements.title.appendChild(newElements.bookmark);
-            newElements.container.appendChild(newElements.title);
+            newElements.options.appendChild(newElements.bookmark);
+            newElements.header.appendChild(newElements.title);
+            newElements.header.appendChild(newElements.options);
+            newElements.container.appendChild(newElements.header);
+
         }
 
         newElements.body.setAttribute('class', 'body');
@@ -267,7 +274,8 @@ function AnalyticsWidget(config) {
                 query      : widgetData.query,
                 range      : this.getTimeframe(),
                 title      : this.getTitle(),
-                type       : this.getType()
+                type       : this.getType(),
+                height     : '30'
             });
         } else if (typeof newHandler === 'object') {
             handler = newHandler;

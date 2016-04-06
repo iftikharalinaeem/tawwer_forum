@@ -1,0 +1,40 @@
+// Chart SVG styling
+.c3-legend-item-tile {
+  rx: 100%;
+  ry: 100%;
+}
+
+.c3-circle {
+  r: 7;
+  stroke-width: 3px;
+  stroke: $white;
+}
+
+.c3-line {
+  stroke-width: 2px;
+}
+
+.c3-tooltip .name span {
+  border-radius: 100%;
+}
+
+.c3-grid {
+  stroke-width: 2px;
+}
+
+.c3-regions {
+  stroke-width: 8px;
+}
+
+text {
+  font: 11px $font-family;
+  font-weight: 700;
+  fill: $grey-3;
+}
+
+.c3-axis path,
+.tick line {
+  stroke-width: 2
+  px;
+  stroke: $grey-4;
+}

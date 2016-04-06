@@ -16,6 +16,58 @@ module.exports = function (grunt) {
 
         pkg: grunt.file.readJSON('package.json'),
 
+        copy: {
+            main: {
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        cwd: 'bower_components',
+                        src: [
+                            'jquery-ui/**/jquery-ui.min.js'
+                            , 'c3/**/*.min.js'
+                            , 'd3/**/*.min.js'
+                            , 'js-cookie/**/*.js'
+                            , 'jquery-ui-daterangepicker/**/*.min.js'
+                            , 'momentjs/**/moment.min.js'
+                            , 'keen-js/dist/keen.min.js'
+                        ],
+                        dest: 'js/vendors'
+                    },
+                    {
+                        expand: true,
+                        flatten: true,
+                        cwd: 'bower_components',
+                        src: [
+                            'c3/**/*.min.css'
+                            , 'jquery-ui-daterangepicker/**/*.css'
+                            , 'jquery-ui/**/jquery.ui.theme.min.css'
+                            , 'jquery-ui/**/jquery.ui.datepicker.css'
+                        ],
+                        dest: 'design/vendors'
+                    }
+                ]
+            }
+        },
+
+        concat: {
+            //js: {
+            //   src: ['js/vendors/*.js'],
+            //   dest: 'js/custom.js'
+            //},
+            css: {
+                src: ['design/vendors/*.css'],
+                dest: 'design/vendors.css'
+            }
+        },
+
+        cssmin: {
+            css:{
+                src: 'design/vendors.css',
+                dest: 'design/vendors.min.css'
+            }
+        },
+
         watch: {
             bower: {
                 files: ['bower.json']
@@ -68,8 +120,7 @@ module.exports = function (grunt) {
             options: {
                 config: 'scss/.scss-lint.yml',
                 maxBuffer: 3000 * 1024,
-                colorizeOutput: true,
-                exclude: ['scss/_jquery*.scss']
+                colorizeOutput: true
             }
             , all: ['scss/**/*.scss']
         },
@@ -95,8 +146,7 @@ module.exports = function (grunt) {
             options: {
                 csslintrc: 'design/.csslintrc'
             }
-            , all: ['design/admin.css'
-                ,'design/style.css']
+            , all: ['design/dashboard.css']
         },
 
         imagemin: {
@@ -122,8 +172,11 @@ module.exports = function (grunt) {
         'wiredep'
         , 'scsslint'
         , 'sass'
+        , 'copy'
+        , 'concat'
+        , 'cssmin'
         , 'autoprefixer'
-        // , 'jshint'
+        //, 'jshint'
         , 'csslint'
         , 'imagemin'
     ]);

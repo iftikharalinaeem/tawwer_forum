@@ -601,6 +601,10 @@ KeenIOWidget.prototype.writeContents = function(container, forceNewElement) {
             dataviz.el(container);
         }
 
+        if (this.getType() == 'metric') {
+            dataviz.height(100);
+        }
+
         if (dataviz.view._prepared === false) {
             dataviz.prepare();
         }

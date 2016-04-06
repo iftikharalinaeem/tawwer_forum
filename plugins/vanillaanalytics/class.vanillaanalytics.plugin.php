@@ -159,7 +159,7 @@ class VanillaAnalytics extends Gdn_Plugin {
             $html = anchor(
                 t('Bookmark'),
                 "/settings/analytics/bookmarkwidget/{$widgetID}",
-                'Hijack Bookmark'.($bookmarked ? ' Bookmarked' : ''),
+                'Hijack bookmark'.($bookmarked ? ' bookmarked' : ''),
                 array('title' => $widget->getTitle())
             );
             $sender->jsonTarget('!element', $html, 'ReplaceWith');
@@ -193,19 +193,17 @@ class VanillaAnalytics extends Gdn_Plugin {
         if (empty($dashboardID)) {
             redirect('settings');
         }
+        $sender->addCssFile('vendors.min.css', 'plugins/vanillaanalytics');
 
-        $sender->addCssFile('c3.min.css', 'plugins/vanillaanalytics');
-//        $sender->addCssFile('jquery-ui.css', 'plugins/vanillaanalytics');
-
-        $sender->addJsFile('d3.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('c3.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('dashboard.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('vendors/d3.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('vendors/c3.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('dashboard.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('analyticsdashboard.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('analyticswidget.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('analyticstoolbar.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('jquery-ui.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('moment.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('jquery.comiseo.daterangepicker.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('vendors/jquery-ui.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('vendors/moment.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('vendors/jquery.comiseo.daterangepicker.min.js', 'plugins/vanillaanalytics');
 
         $dashboardModel = new AnalyticsDashboard();
         $dashboard = $dashboardModel->getID($dashboardID);

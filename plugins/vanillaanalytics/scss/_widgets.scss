@@ -1,0 +1,96 @@
+// Sidebar nav icon
+#Panel div.Box.Analytics h4 {
+  background-position: 166px -644px;
+}
+
+.analytics-panel {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+// General widget stlying
+.analytics-widget {
+  flex-grow: 1;
+  padding: 10px;
+
+  &.analytics-widget.analytics-widget-chart {
+    background: transparent;
+  }
+
+  .title {
+    float: left;
+    font-size: 16px;
+    color: $grey-3;
+  }
+}
+
+//Charts
+.analytics-widget-chart {
+  padding: 20px;
+  flex: 0 1 50%;
+}
+
+.analytics-widget-header {
+  @extend .clearfix;
+  padding: 20px 0 20px 20px;
+}
+
+
+//Metrics
+.analytics-panel-metrics {
+  background-color: $grey-1;
+  border-bottom: 1px solid $grey-2;
+  box-shadow: 0 4px 4px -2px $grey-2;
+}
+
+.analytics-widget-metric {
+  padding: 36px 0;
+
+  &:first-child {
+    .body {
+      border-left: 0;
+    }
+  }
+
+  .body {
+    padding: 10px;
+    text-align: center;
+    color: $grey-3;
+    border-left: 1px dashed $blue-2;
+  }
+
+  .metric-value {
+    display: block;
+    font-size: 64px;
+    line-height: $line-height-headings;
+    font-weight: 700;
+  }
+
+  .metric-title {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+//Options
+.analytics-widget-options {
+  float: right;
+}
+
+// Bookmark Icons
+.bookmark {
+  @extend .hide-text;
+  @include font-vanillicon('\f19a', $text-light-color);
+
+
+  &:hover,
+  &:focus {
+    @include font-vanillicon('\f199', $yellow);
+    text-decoration: none;
+  }
+}
+
+.bookmarked {
+  @include font-vanillicon('\f199', $yellow);
+}

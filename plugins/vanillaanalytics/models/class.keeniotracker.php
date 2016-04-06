@@ -66,7 +66,8 @@ class KeenIOTracker implements TrackerInterface {
             ->setType('metric')
             ->setData([
                 'chart' => [
-                    'title' => 'Active Users'
+                    'title' => 'Active Users',
+                    'height' => '30'
                 ],
                 'query' => $totalActiveUsersQuery
             ]);
@@ -556,7 +557,7 @@ class KeenIOTracker implements TrackerInterface {
      */
     public function addJsFiles(Gdn_Controller $controller, $inDashboard = false) {
         if (!AnalyticsTracker::getInstance()->trackingDisabled() || $inDashboard) {
-            $controller->addJsFile('keenio.sdk.min.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('vendors/keen.min.js', 'plugins/vanillaanalytics');
         }
 
         if (!AnalyticsTracker::getInstance()->trackingDisabled()) {

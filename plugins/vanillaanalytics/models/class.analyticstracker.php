@@ -66,6 +66,7 @@ class AnalyticsTracker {
         $inDashboard = $controller->MasterView == 'admin';
 
         if ($inDashboard) {
+            $controller->addCssFile('vanillicon.css', 'static');
             $controller->addCssFile('dashboard.css', 'plugins/vanillaanalytics');
         }
 
