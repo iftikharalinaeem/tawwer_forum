@@ -345,12 +345,12 @@ AnalyticsDashboard.prototype.setupSorting = function() {
         return;
     }
 
-    $(".Sortable").sortable({
+    $(".analytics-panel-charts").sortable({
         handle: ".title",
         update: this.sortUpdate.bind(this)
     });
 
-    $(".Sortable").disableSelection();
+    $(".analytics-panel-charts").disableSelection();
 };
 
 AnalyticsDashboard.prototype.sortUpdate = function(e, ui) {

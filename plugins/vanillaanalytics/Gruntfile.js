@@ -51,10 +51,6 @@ module.exports = function (grunt) {
         },
 
         concat: {
-            //js: {
-            //   src: ['js/vendors/*.js'],
-            //   dest: 'js/custom.js'
-            //},
             css: {
                 src: ['design/vendors/*.css'],
                 dest: 'design/vendors.css'
@@ -68,15 +64,26 @@ module.exports = function (grunt) {
             }
         },
 
+        uglify: {
+            js: {
+                options: {
+                    sourceMap: true
+                },
+                files: [{
+                    expand: true
+                    , src: 'js/src/*.js'
+                    , dest: 'js'
+                    , ext: '.min.js'
+                    , flatten: true
+                }]
+            }
+        },
+
         watch: {
             bower: {
                 files: ['bower.json']
                 , tasks: ['wiredep']
             }
-            // , js: {
-            //     files: ['js/src/**/*.js']
-            //     , tasks: ['jshint']
-            // }
             , gruntfile: {
                 files: ['Gruntfile.js']
             }
@@ -135,13 +142,6 @@ module.exports = function (grunt) {
             }
         },
 
-        jshint: {
-            options: {
-                jshintrc: 'js/.jshintrc'
-            }
-            , all: ['js/src/**/*.js']
-        },
-
         csslint: {
             options: {
                 csslintrc: 'design/.csslintrc'
@@ -175,8 +175,8 @@ module.exports = function (grunt) {
         , 'copy'
         , 'concat'
         , 'cssmin'
+        , 'uglify'
         , 'autoprefixer'
-        //, 'jshint'
         , 'csslint'
         , 'imagemin'
     ]);

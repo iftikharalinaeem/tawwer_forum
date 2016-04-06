@@ -198,9 +198,9 @@ class VanillaAnalytics extends Gdn_Plugin {
         $sender->addJsFile('vendors/d3.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('vendors/c3.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('dashboard.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('analyticsdashboard.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('analyticswidget.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('analyticstoolbar.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('analyticsdashboard.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('analyticswidget.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('analyticstoolbar.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('vendors/jquery-ui.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('vendors/moment.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('vendors/jquery.comiseo.daterangepicker.min.js', 'plugins/vanillaanalytics');

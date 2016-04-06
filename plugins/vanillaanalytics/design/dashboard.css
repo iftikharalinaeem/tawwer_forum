@@ -208,12 +208,12 @@
 
 .c3-circle {
   r: 7;
-  stroke-width: 3px;
+  stroke-width: 3;
   stroke: #fff;
 }
 
 .c3-line {
-  stroke-width: 2px;
+  stroke-width: 2;
 }
 
 .c3-tooltip .name span {
@@ -221,11 +221,11 @@
 }
 
 .c3-grid {
-  stroke-width: 2px;
+  stroke-width: 2;
 }
 
 .c3-regions {
-  stroke-width: 8px;
+  stroke-width: 8;
 }
 
 text {
@@ -236,7 +236,7 @@ text {
 
 .c3-axis path,
 .tick line {
-  stroke-width: 2 px;
+  stroke-width: 1.5;
   stroke: #e9e9e9;
 }
 
