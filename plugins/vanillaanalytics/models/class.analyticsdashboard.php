@@ -161,8 +161,8 @@ class AnalyticsDashboard implements JsonSerializable {
                         'posts-by-role-type', 'contributors', 'contributors-by-category', 'contributors-by-role-type']
                 ],
                 'Traffic' => [
-                    'metrics' => ['total-pageviews', 'total-active-users', 'total-unique-visits'],
-                    'charts'  => ['active-users', 'unique-visits', 'unique-visits-by-role-type', 'pageviews', 'registrations']
+                    'metrics' => ['total-pageviews', 'total-active-users', 'total-visits'],
+                    'charts'  => ['active-users', 'visits', 'visits-by-role-type', 'pageviews', 'registrations']
                 ]
             ];
 

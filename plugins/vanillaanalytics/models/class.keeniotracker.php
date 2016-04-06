@@ -94,27 +94,27 @@ class KeenIOTracker implements TrackerInterface {
 
         $widgets['total-pageviews'] = $totalPageViewsWidget;
 
-        // Unique Pageviews (metric)
-        $totalUniqueVisitsQuery = new KeenIOQuery();
-        $totalUniqueVisitsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
-            ->setTitle(t('Unique Visits'))
+        // Visits (metric)
+        $totalVisitsQuery = new KeenIOQuery();
+        $totalVisitsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Visits'))
             ->setEventCollection('page')
             ->setTargetProperty('user.sessionID');
 
-        $totalUniqueVisitsWidget = new AnalyticsWidget();
-        $totalUniqueVisitsWidget->setID('total-unique-visits')
-            ->setTitle(t('Unique Visits'))
+        $totalVisitsWidget = new AnalyticsWidget();
+        $totalVisitsWidget->setID('total-visits')
+            ->setTitle(t('Visits'))
             ->isBasic(true)
             ->setHandler('KeenIOWidget')
             ->setType('metric')
             ->setData([
                 'chart' => [
-                    'title' => 'Unique Visits'
+                    'title' => ' Visits'
                 ],
-                'query' => $totalUniqueVisitsQuery
+                'query' => $totalVisitsQuery
             ]);
 
-        $widgets['total-unique-visits'] = $totalUniqueVisitsWidget;
+        $widgets['total-visits'] = $totalVisitsWidget;
 
         // Discussions (metric)
         $totalDiscussionsQuery = new KeenIOQuery();
@@ -246,49 +246,49 @@ class KeenIOTracker implements TrackerInterface {
 
         $widgets['active-users'] = $activeUsersWidget;
 
-        // Unique Visits (chart)
-        $uniqueVisitsQuery = new KeenIOQuery();
-        $uniqueVisitsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
-            ->setTitle(t('Unique Visits'))
+        // Visits (chart)
+        $visitsQuery = new KeenIOQuery();
+        $visitsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Visits'))
             ->setEventCollection('page')
             ->setTargetProperty('user.sessionID')
             ->setInterval('daily');
 
-        $uniqueVisitsWidget = new AnalyticsWidget();
-        $uniqueVisitsWidget->setID('unique-visits')
-            ->setTitle(t('Unique Visits'))
+        $visitsWidget = new AnalyticsWidget();
+        $visitsWidget->setID('visits')
+            ->setTitle(t('Visits'))
             ->setHandler('KeenIOWidget')
             ->setType('chart')
             ->setData([
                 'chart' => [
-                    'labels' => ['Unique Visits']
+                    'labels' => ['Visits']
                 ],
-                'query' => $uniqueVisitsQuery
+                'query' => $visitsQuery
             ])
             ->addSupport('cat01');
 
-        $widgets['unique-visits'] = $uniqueVisitsWidget;
+        $widgets['visits'] = $visitsWidget;
 
-        // Unique Visits by Role Type
-        $uniqueVisitsByRoleTypeQuery = new KeenIOQuery();
-        $uniqueVisitsByRoleTypeQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
-            ->setTitle(t('Unique Visits by Role Type'))
+        // Visits by Role Type
+        $visitsByRoleTypeQuery = new KeenIOQuery();
+        $visitsByRoleTypeQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Visits by Role Type'))
             ->setEventCollection('page')
             ->setTargetProperty('user.sessionID')
             ->setInterval('daily')
             ->setGroupBy('user.roleType');
 
-        $uniqueVisitsByRoleTypeWidget = new AnalyticsWidget();
-        $uniqueVisitsByRoleTypeWidget->setID('unique-visits-by-role-type')
-            ->setTitle(t('Unique Visits by Role Type'))
+        $visitsByRoleTypeWidget = new AnalyticsWidget();
+        $visitsByRoleTypeWidget->setID('visits-by-role-type')
+            ->setTitle(t('Visits by Role Type'))
             ->setHandler('KeenIOWidget')
             ->setType('chart')
             ->setData([
                 'chart' => ['chartType' => 'area'],
-                'query' => $uniqueVisitsByRoleTypeQuery
+                'query' => $visitsByRoleTypeQuery
             ]);
 
-        $widgets['unique-visits-by-role-type'] = $uniqueVisitsByRoleTypeWidget;
+        $widgets['visits-by-role-type'] = $visitsByRoleTypeWidget;
 
         // Discussions
         $discussionsQuery = new KeenIOQuery();
