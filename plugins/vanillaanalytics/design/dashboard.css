@@ -1,14 +1,14 @@
 @charset "UTF-8";
-.clearfix, .analytics-widget-chart .analytics-widget-header {
+.clearfix, .analytics-widget-chart .analytics-widget-header, .comiseo-daterangepicker-presets {
   zoom: 1;
 }
 
-.clearfix::before, .analytics-widget-chart .analytics-widget-header::before, .clearfix::after, .analytics-widget-chart .analytics-widget-header::after {
+.clearfix::before, .analytics-widget-chart .analytics-widget-header::before, .comiseo-daterangepicker-presets::before, .clearfix::after, .analytics-widget-chart .analytics-widget-header::after, .comiseo-daterangepicker-presets::after {
   content: ' ';
   display: table;
 }
 
-.clearfix::after, .analytics-widget-chart .analytics-widget-header::after {
+.clearfix::after, .analytics-widget-chart .analytics-widget-header::after, .comiseo-daterangepicker-presets::after {
   clear: both;
 }
 
@@ -282,6 +282,10 @@ text {
   fill: #999;
 }
 
+.c3-legend-item text {
+  font-size: 12px;
+}
+
 .c3-axis path,
 .tick line {
   stroke-width: 1.5;
@@ -404,32 +408,87 @@ text {
   content: "";
 }
 
-.ui-state-highlight,
+.ui-widget-content {
+  font-weight: 700;
+}
+
+.ui-widget-content .ui-state-default,
 .ui-widget-content .ui-state-highlight {
   background: 0;
-  border-color: #414141;
-}
-
-.ui-widget-content .ui-state-default {
-  background: 0;
-  border-radius: 2px;
-}
-
-.ui-datepicker {
-  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-}
-
-.ui-datepicker table thead th {
-  background: 0;
-}
-
-.ui-datepicker table {
   border: 0;
+}
+
+.ui-widget-content .ui-datepicker {
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+.ui-widget-content .ui-datepicker table thead th {
+  background: 0;
+  color: #414141;
+  text-shadow: 0;
+}
+
+.ui-widget-content .ui-datepicker table {
+  border: 0;
+  border-collapse: collapse;
+}
+
+.ui-widget-content .ui-datepicker td {
+  border: 0;
+  padding: 2px 0;
+}
+
+.ui-widget-content .ui-datepicker td a,
+.ui-widget-content .ui-datepicker td span {
+  font-weight: 500;
+  text-align: center;
+  font-size: 14px;
+  margin: 0;
+  padding: 3px 0;
 }
 
 .ui-widget-header {
   background: 0;
   border: 0;
+}
+
+.comiseo-daterangepicker-buttonpanel .ui-button {
+  width: 100px;
+  margin: 0 10px 15px;
+  background-color: #6cbfe7;
+  color: #fff;
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+.comiseo-daterangepicker-buttonpanel .ui-priority-secondary {
+  color: #414141;
+  background-color: #e9e9e9;
+}
+
+.ui-widget-content .ui-datepicker-prev.ui-state-focus,
+.ui-widget-content .ui-datepicker-prev.ui-state-hover,
+.ui-widget-content .ui-datepicker-next.ui-state-focus,
+.ui-widget-content .ui-datepicker-next.ui-state-hover {
+  border: 0;
+  background: 0;
+  font-weight: 400;
+  color: transparent;
+}
+
+.ui-datepicker .ui-datepicker-next,
+.ui-datepicker .ui-datepicker-prev {
+  top: 1px;
+  cursor: pointer;
+}
+
+.ui-datepicker .ui-datepicker-next {
+  right: 1px;
+}
+
+.ui-datepicker .ui-datepicker-prev {
+  left: 1px;
 }
 
 .ui-widget-content {
@@ -439,25 +498,56 @@ text {
 }
 
 .ui-widget-content .ui-state-focus {
+  font-weight: inherit;
   background: 0;
   border: 0;
 }
 
 .comiseo-daterangepicker {
   border: 1px solid #e9e9e9;
+  box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.05);
 }
 
-.comiseo-daterangepicker-presets a {
+.comiseo-daterangepicker-presets {
+  float: left;
+}
+
+.comiseo-daterangepicker-presets li {
+  display: inline-block;
+  margin: 0 5px 5px;
+}
+
+.comiseo-daterangepicker-presets a,
+.comiseo-daterangepicker-presets a.ui-corner-all,
+.comiseo-daterangepicker-presets a.ui-state-focus {
+  display: block;
+  width: 87px;
+  padding: 2px 0;
+  font-size: 13px;
   font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-  background: 0;
+  background-color: #e9e9e9;
+  color: #414141;
+  border-radius: 2px;
+  font-weight: 500;
+  text-align: center;
 }
 
-.comiseo-daterangepicker-presets a:hover {
+.comiseo-daterangepicker-presets a:hover,
+.comiseo-daterangepicker-presets a.ui-corner-all:hover,
+.comiseo-daterangepicker-presets a.ui-state-focus:hover {
+  font-weight: 500;
   background: 0;
+  background-color: #e9e9e9;
   text-decoration: underline;
 }
 
 .comiseo-daterangepicker-calendar .ui-state-highlight a.ui-state-default {
-  background: #dadada;
+  background: #dbf3fc;
+  color: #414141;
+  border-color: #414141;
+}
+
+td.ui-state-highlight {
+  border-right: 3px solid #dbf3fc;
 }
 /*# sourceMappingURL=dashboard.css.map */

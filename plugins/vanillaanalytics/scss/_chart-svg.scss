@@ -29,11 +29,17 @@
 text {
   font: 11px $font-family;
   font-weight: 700;
-  fill: $grey-5;
+  fill: $text-light-color;
+}
+
+.c3-legend-item {
+  text {
+    font-size: 12px;
+  }
 }
 
 .c3-axis path,
 .tick line {
   stroke-width: 1.5;
-  stroke: $grey-4;
+  stroke: $border-color;
 }
