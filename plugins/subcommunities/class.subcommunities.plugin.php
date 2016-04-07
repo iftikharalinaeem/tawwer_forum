@@ -432,6 +432,12 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             return;
         }
 
+        // Allow moving a post to another subcommunity!
+        $path = Gdn::request()->path();
+        if ($path === 'moderation/confirmdiscussionmoves') {
+            return;
+        }
+
         $args['Options']['CategoryData'] =  $this->getCategories();
     }
 }
