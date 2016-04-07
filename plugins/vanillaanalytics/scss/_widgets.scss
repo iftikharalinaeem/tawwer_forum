@@ -86,12 +86,12 @@
 
   &:hover,
   &:focus {
-    @include font-vanillicon('\f17f', $yellow, 18px);
+    @include font-vanillicon('\f17f', $blue-4, 18px);
   }
 }
 
 .bookmarked {
-  @include font-vanillicon('\f17f', $yellow, 18px);
+  @include font-vanillicon('\f17f', $blue-4, 18px);
   &:hover,
   &:focus {
     @include font-vanillicon('\f17f', $text-light-color, 18px);

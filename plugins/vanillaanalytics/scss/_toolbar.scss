@@ -153,6 +153,11 @@
   cursor: pointer;
 }
 
+.ui-datepicker-group-first {
+  box-sizing: border-box;
+  border-right: 1px solid $border-color;
+}
+
 .ui-datepicker .ui-datepicker-next {
   right: 1px;
 }
@@ -181,11 +186,15 @@
 .comiseo-daterangepicker-presets {
   @extend .clearfix;
   float: left;
+  height: inherit;
+  margin-top: 10px;
 
   li {
     display: inline-block;
     margin: 0 5px 5px;
   }
+
+
 
   a,
   a.ui-corner-all,

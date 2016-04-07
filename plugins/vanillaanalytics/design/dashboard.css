@@ -171,7 +171,7 @@
   font-variant: normal;
   font-weight: normal;
   font-style: normal;
-  color: #ffce44;
+  color: #6cbfe7;
   min-width: 1em;
   text-align: center;
   text-decoration: inherit;
@@ -193,7 +193,7 @@
   font-variant: normal;
   font-weight: normal;
   font-style: normal;
-  color: #ffce44;
+  color: #6cbfe7;
   min-width: 1em;
   text-align: center;
   text-decoration: inherit;
@@ -483,6 +483,11 @@ text {
   cursor: pointer;
 }
 
+.ui-datepicker-group-first {
+  box-sizing: border-box;
+  border-right: 1px solid #e9e9e9;
+}
+
 .ui-datepicker .ui-datepicker-next {
   right: 1px;
 }
@@ -510,6 +515,8 @@ text {
 
 .comiseo-daterangepicker-presets {
   float: left;
+  height: inherit;
+  margin-top: 10px;
 }
 
 .comiseo-daterangepicker-presets li {
