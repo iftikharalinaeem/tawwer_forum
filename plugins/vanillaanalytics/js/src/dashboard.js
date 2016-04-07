@@ -5,6 +5,12 @@ $(document).ready(function() {
         return;
     }
 
+    if (typeof c3 === "object") {
+        c3.chart.internal.fn.additionalConfig = {
+            axis_x_tick_count: 3
+        };
+    }
+
     var dashboard = new AnalyticsDashboard(dashboardConfig);
     dashboard.writeDashboard();
 

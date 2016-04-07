@@ -444,6 +444,7 @@ KeenIOWidget.prototype.loadConfig = function(config) {
  */
 KeenIOWidget.prototype.loadDatavizConfig = function (config) {
     var dataviz = this.getDataviz();
+    var chartOptions = this.getConfig('options', {});
 
     /*
     var defaultColors = dataviz.colors();
@@ -465,21 +466,10 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
 
     if (this.getType() == 'metric') {
         dataviz.height(this.getConfig('height', 85));
-    } else {
-        var options = {
-            axis: {
-                x: {
-                    tick: {
-                        fit: true,
-                        count: 3
-                    }
-                }
-            }
-        }
     }
 
     dataviz.chartType(this.getConfig('type', 'area'));
-    dataviz.chartOptions(this.getConfig('options', options));
+    dataviz.chartOptions(chartOptions);
     dataviz.dateFormat('%Y-%m-%d');
 
 };
