@@ -3,7 +3,7 @@
  * AnalyticsTracker class file.
  *
  * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license Proprietary
  * @package vanillaanalytics
  */
 
@@ -158,10 +158,10 @@ class AnalyticsTracker {
         // Basic information that should be universally available
         $defaults = [
             'dateTime' => AnalyticsData::getDateTime(),
-            'ip'       => Gdn::request()->ipAddress(),
-            'method'   => Gdn::request()->requestMethod(),
-            'site'     => AnalyticsData::getSite(),
-            'url'      => url('', '/')
+            'ip' => Gdn::request()->ipAddress(),
+            'method' => Gdn::request()->requestMethod(),
+            'site' => AnalyticsData::getSite(),
+            'url' => url('', '/')
         ];
 
         // Only add user-related information if a user is signed in.
@@ -181,7 +181,7 @@ class AnalyticsTracker {
             }
         }
 
-        $this->EventArguments['Defaults']   =& $defaults;
+        $this->EventArguments['Defaults'] =& $defaults;
 
         Gdn::pluginManager()->callEventHandlers(
             $this,
@@ -217,9 +217,7 @@ class AnalyticsTracker {
         if ($discussion = $controller->data('Discussion', false)) {
             $eventData['discussion'] = AnalyticsData::getDiscussion(val('DiscussionID', $discussion, 0));
         } else {
-            $eventData['discussion'] = [
-                'discussionID' => 0
-            ];
+            $eventData['discussion'] = ['discussionID' => 0];
         }
 
         return $eventData;
@@ -264,9 +262,9 @@ class AnalyticsTracker {
 
         // Allow other add-ons to plug-in and modify the event.
         $this->EventArguments['Collection'] =& $collection;
-        $this->EventArguments['Event']      =& $event;
-        $this->EventArguments['Data']       =& $data;
-        $this->EventArguments['Defaults']   =& $defaults;
+        $this->EventArguments['Event'] =& $event;
+        $this->EventArguments['Data'] =& $data;
+        $this->EventArguments['Defaults'] =& $defaults;
 
         Gdn::pluginManager()->callEventHandlers(
             $this,
@@ -307,7 +305,7 @@ class AnalyticsTracker {
             // Start with an empty template.
             $this->trackingIDs = [
                 'sessionID' => null,
-                'uuid'      => null
+                'uuid' => null
             ];
 
             // Fetch our tracking cookie.
@@ -341,7 +339,7 @@ class AnalyticsTracker {
                 // We've got nothing.  Start from scratch.
                 $this->trackingIDs = [
                     'sessionID' => AnalyticsData::uuid(),
-                    'uuid'      => AnalyticsData::getUserUuid()
+                    'uuid' => AnalyticsData::getUserUuid()
                 ];
             }
         }

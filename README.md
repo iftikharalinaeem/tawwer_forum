@@ -1,4 +1,1 @@
-vanilla-analytics
-=================
-
-The vanilla analytics site.
+See the README for the `vanillaanalytics` plugin.
