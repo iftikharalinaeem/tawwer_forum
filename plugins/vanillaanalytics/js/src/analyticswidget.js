@@ -104,8 +104,8 @@ function AnalyticsWidget(config) {
 
         newElements.container.setAttribute('id', 'analytics_widget_' + widgetID);
         newElements.container.setAttribute('class', 'analytics-widget analytics-widget-' + type);
-        newElements.options.setAttribute('class', 'analytics-widget-options');
         newElements.header.setAttribute('class', 'analytics-widget-header');
+        newElements.options.setAttribute('class', 'analytics-widget-options');
 
         if (this.isBookmarked()) {
             newElements.bookmark.setAttribute('class', 'Hijack bookmark bookmarked');
@@ -274,8 +274,7 @@ function AnalyticsWidget(config) {
                 query      : widgetData.query,
                 range      : this.getTimeframe(),
                 title      : this.getTitle(),
-                type       : this.getType(),
-                height     : '30'
+                type       : this.getType()
             });
         } else if (typeof newHandler === 'object') {
             handler = newHandler;

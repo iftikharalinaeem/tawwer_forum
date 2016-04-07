@@ -41,7 +41,7 @@
   padding-bottom: 10px;
   background-color: $grey-1;
   border-bottom: 1px solid $grey-2;
-  box-shadow: 0 4px 4px -2px $grey-2;
+  box-shadow: 0 2px 2px -1px $grey-6;
 }
 
 .analytics-widget-metric {
@@ -56,6 +56,7 @@
 
   .body {
     text-align: center;
+    cursor: move;
     color: $grey-3;
   }
 
@@ -81,16 +82,25 @@
 // Bookmark Icons
 .bookmark {
   @extend .hide-text;
-  @include font-vanillicon('\f19a', $text-light-color, 18px);
-
+  @include font-vanillicon('\f17f', $text-light-color, 18px);
 
   &:hover,
   &:focus {
-    @include font-vanillicon('\f199', $yellow, 18px);
-    text-decoration: none;
+    @include font-vanillicon('\f17f', $yellow, 18px);
   }
 }
 
 .bookmarked {
-  @include font-vanillicon('\f199', $yellow, 18px);
+  @include font-vanillicon('\f17f', $yellow, 18px);
+  &:hover,
+  &:focus {
+    @include font-vanillicon('\f17f', $text-light-color, 18px);
+  }
+}
+
+//Move Icon
+.analytics-widget-move {
+  @include font-vanillicon('\f1db', $text-light-color, 18px);
+  margin-left: 10px;
+  cursor: move;
 }

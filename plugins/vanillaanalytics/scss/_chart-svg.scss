@@ -5,8 +5,8 @@
 }
 
 .c3-circle {
-  r: 7;
-  stroke-width: 3;
+  r: 5;
+  stroke-width: 2;
   stroke: $white;
 }
 
@@ -29,7 +29,7 @@
 text {
   font: 11px $font-family;
   font-weight: 700;
-  fill: $grey-3;
+  fill: $grey-5;
 }
 
 .c3-axis path,

@@ -345,8 +345,10 @@ AnalyticsDashboard.prototype.setupSorting = function() {
         return;
     }
 
+    $(".analytics-panel-charts .analytics-widget-options").append('<span class="analytics-widget-move">');
+
     $(".analytics-panel-charts").sortable({
-        handle: ".title",
+        handle: ".analytics-widget-move",
         update: this.sortUpdate.bind(this)
     });
 

@@ -245,6 +245,15 @@ function KeenIOWidget(config) {
         }
     };
 
+    this.setChartConfig= function(newChartConfig) {
+        if (typeof this[newChartConfig] !== 'undefined') {
+            chartConfig = this[newChartConfig];
+            return this;
+        } else {
+            throw 'Invalid newChartConfig';
+        }
+    };
+
     /**
      * @param {Array} newData
      * @returns {KeenIOWidget}
@@ -453,9 +462,26 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
     */
 
     dataviz.library('c3');
+
+    if (this.getType() == 'metric') {
+        dataviz.height(this.getConfig('height', 85));
+    } else {
+        var options = {
+            axis: {
+                x: {
+                    tick: {
+                        fit: true,
+                        count: 3
+                    }
+                }
+            }
+        }
+    }
+
     dataviz.chartType(this.getConfig('type', 'area'));
-    dataviz.chartOptions(this.getConfig('options', {}));
-    dataviz.dateFormat('%Y-%m');
+    dataviz.chartOptions(this.getConfig('options', options));
+    dataviz.dateFormat('%Y-%m-%d');
+
 };
 
 /**
@@ -612,10 +638,6 @@ KeenIOWidget.prototype.writeContents = function(container, forceNewElement) {
 
         if (forceNewElement || (typeof element !== 'object' && !(element instanceof HTMLElement))) {
             dataviz.el(container);
-        }
-
-        if (this.getType() == 'metric') {
-            dataviz.height(100);
         }
 
         if (dataviz.view._prepared === false) {
