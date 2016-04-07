@@ -53,19 +53,19 @@ class KeenIOTracker implements TrackerInterface {
              'title' => 'Discussions',
              'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
              'type' => 'metric',
-             'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+             'support' => 'cat01'
          ],
          'total-comments' => [
              'title' => 'Comments',
              'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
              'type' => 'metric',
-             'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+             'support' => 'cat01'
          ],
          'total-contributors' => [
              'title' => 'Comments',
              'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
              'type' => 'metric',
-             'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+             'support' => 'cat01'
          ],
          'pageviews' => [
              'title' => 'Page Views',
@@ -81,7 +81,7 @@ class KeenIOTracker implements TrackerInterface {
              'title' => 'Unique Pageviews',
              'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
              'type' => 'chart',
-             'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+             'support' => 'cat01'
          ],
          'visits-by-role-type' => [
              'title' => 'Unique Visits By Role Type',
@@ -92,18 +92,18 @@ class KeenIOTracker implements TrackerInterface {
          'discussions' => [
              'title' => 'Discussions',
              'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-             'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+             'support' => 'cat01'
          ],
          'comments' => [
             'title' => 'Comments',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-            'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+            'support' => 'cat01'
          ],
          'posts' => [
              'title' => 'Post',
              'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
              'type' => 'chart',
-             'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+             'support' => 'cat01'
          ],
          'posts-by-type' => [
              'title' => 'Posts By Type',
@@ -115,19 +115,19 @@ class KeenIOTracker implements TrackerInterface {
                  ],
                  'chartType' => 'area'
              ],
-             'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+             'support' => 'cat01'
          ],
          'posts-by-category' => [
              'title' => 'Posts By Category',
              'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
              'chart' => ['chartType' => 'area'],
-             'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+             'support' => 'cat01'
          ],
          'posts-by-role-type' => [
              'title' => 'Posts By Role Type',
              'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
              'chart' => ['chartType' => 'area'],
-             'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+             'support' => 'cat01'
          ],
          'posts-per-user' => [
              'title' => 'Posts Per User',
@@ -140,21 +140,21 @@ class KeenIOTracker implements TrackerInterface {
              'title' => 'Contributors',
              'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
              'type' => 'chart',
-             'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+             'support' => 'cat01'
          ],
          'contributors-by-category' => [
              'title' => 'Contributors By Category',
              'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
              'type' => 'chart',
              'chart' => ['chartType' => 'area'],
-             'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+             'support' => 'cat01'
          ],
          'contributors-by-role-type' => [
              'title' => 'Contributors By Role Type',
              'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
              'type' => 'chart',
              'chart' => ['chartType' => 'area'],
-             'support' => 'cat0AnalyticsWidget::SMALL_WIDGET_RANK'
+             'support' => 'cat01'
          ],
          'registrations' => [
              'title' => 'Registrations',
