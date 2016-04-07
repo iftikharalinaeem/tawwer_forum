@@ -3,7 +3,7 @@
  * KeenIOClient class file.
  *
  * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license Proprietary
  * @package vanillaanalytics
  */
 
@@ -73,13 +73,13 @@ class KeenIOClient extends Garden\Http\HttpClient {
      */
     public function __construct($baseUrl, $config) {
         $default = array(
-            'baseUrl'   => 'https://api.keen.io/{version}',
-            'version'   => self::API_VERSION,
+            'baseUrl' => 'https://api.keen.io/{version}',
+            'version' => self::API_VERSION,
             'masterKey' => null,
-            'orgID'     => null,
-            'orgKey'    => null,
-            'writeKey'  => null,
-            'readKey'   => null,
+            'orgID' => null,
+            'orgKey' => null,
+            'writeKey' => null,
+            'readKey' => null,
             'projectID' => null
         );
 

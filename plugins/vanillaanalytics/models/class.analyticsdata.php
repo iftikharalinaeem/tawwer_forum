@@ -3,7 +3,7 @@
  * AnalyticsData class file.
  *
  * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license Proprietary
  * @package vanillaanalytics
  */
 
@@ -30,14 +30,12 @@ class AnalyticsData extends Gdn_Model {
         if ($categoryDetails) {
             $category = [
                 'categoryID' => (int)$categoryDetails->CategoryID,
-                'name'       => $categoryDetails->Name,
-                'slug'       => $categoryDetails->UrlCode
+                'name' => $categoryDetails->Name,
+                'slug' => $categoryDetails->UrlCode
             ];
         } else {
             // Fallback category data
-            $category = [
-                'categoryID' => 0
-            ];
+            $category = ['categoryID' => 0];
         }
 
         return $category;
@@ -82,8 +80,8 @@ class AnalyticsData extends Gdn_Model {
 
             $ancestors[$categoryLabel] = [
                 'categoryID' => (int)$currentCategory['CategoryID'],
-                'name'       => $currentCategory['Name'],
-                'slug'       => $currentCategory['UrlCode']
+                'name' => $currentCategory['Name'],
+                'slug' => $currentCategory['UrlCode']
             ];
         }
 
@@ -103,24 +101,24 @@ class AnalyticsData extends Gdn_Model {
 
         if ($comment) {
             $data = [
-                'commentID'    => (int)$commentID,
+                'commentID' => (int)$commentID,
                 'dateInserted' => self::getDateTime($comment->DateInserted),
                 'discussionID' => (int)$comment->DiscussionID,
-                'insertUser'   => self::getUser($comment->InsertUserID)
+                'insertUser' => self::getUser($comment->InsertUserID)
             ];
             $discussion = self::getDiscussion($comment->DiscussionID);
 
             if ($discussion) {
                 $commentNumber = val('countComments', $discussion, 0);
 
-                $data['category']          = val('category', $discussion);
+                $data['category'] = val('category', $discussion);
                 $data['categoryAncestors'] = val('categoryAncestors', $discussion);
-                $data['discussionUser']    = val('discussionUser', $discussion);
+                $data['discussionUser'] = val('discussionUser', $discussion);
 
                 $timeSinceDiscussion = $data['dateInserted']['timestamp'] - $discussion['dateInserted']['timestamp'];
                 $data['commentMetric'] = [
                     'firstComment' => $commentNumber === 0 ? true : false,
-                    'time'         => (int)$timeSinceDiscussion
+                    'time' => (int)$timeSinceDiscussion
                 ];
 
                 // The count of comments we get from the discussion doesn't include this one, so we compensate.
@@ -141,15 +139,13 @@ class AnalyticsData extends Gdn_Model {
                     $discussion['discussionUser']
                 );
 
-                $data['discussion']     = $discussion;
+                $data['discussion'] = $discussion;
             }
 
             return $data;
         } else {
             // Fallback comment data
-            return [
-                'commentID' => 0
-            ];
+            return ['commentID' => 0];
         }
     }
 
@@ -186,9 +182,9 @@ class AnalyticsData extends Gdn_Model {
         $dateTime = self::getDateTime($time, $timeZone);
 
         return [
-            'year'      => $dateTime['year'],
-            'month'     => $dateTime['month'],
-            'day'       => $dateTime['day'],
+            'year' => $dateTime['year'],
+            'month' => $dateTime['month'],
+            'day' => $dateTime['day'],
             'dayOfWeek' => $dateTime['dayOfWeek']
         ];
     }
@@ -209,15 +205,15 @@ class AnalyticsData extends Gdn_Model {
         $startOfWeek = $dateTime->format('w') === 0 ? 'today' : 'last sunday';
 
         return [
-            'year'        => (int)$dateTime->format('Y'),
-            'month'       => (int)$dateTime->format('n'),
-            'day'         => (int)$dateTime->format('j'),
-            'hour'        => (int)$dateTime->format('G'),
-            'minute'      => (int)$dateTime->format('i'),
-            'dayOfWeek'   => (int)$dateTime->format('w'),
+            'year' => (int)$dateTime->format('Y'),
+            'month' => (int)$dateTime->format('n'),
+            'day' => (int)$dateTime->format('j'),
+            'hour' => (int)$dateTime->format('G'),
+            'minute' => (int)$dateTime->format('i'),
+            'dayOfWeek' => (int)$dateTime->format('w'),
             'startOfWeek' => (int)strtotime($startOfWeek, $dateTime->format('U')),
-            'timestamp'   => (int)$dateTime->format('U'),
-            'timeZone'    => $dateTime->format('T'),
+            'timestamp' => (int)$dateTime->format('U'),
+            'timeZone' => $dateTime->format('T'),
         ];
     }
 
@@ -233,21 +229,20 @@ class AnalyticsData extends Gdn_Model {
         $discussion = $discussionModel->getID($discussionID);
 
         if ($discussion) {
-
             // We have a valid discussion, so we can put together the basic information using the record.
             return [
-                'category'          => self::getCategory($discussion->CategoryID),
+                'category' => self::getCategory($discussion->CategoryID),
                 'categoryAncestors' => self::getCategoryAncestors($discussion->CategoryID),
-                'commentMetric'     => [
+                'commentMetric' => [
                     'firstComment' => false,
-                    'time'         => null
+                    'time' => null
                 ],
-                'countComments'     => (int)$discussion->CountComments,
-                'dateInserted'      => self::getDateTime($discussion->DateInserted),
-                'discussionID'      => (int)$discussion->DiscussionID,
-                'discussionType'    => $discussion->Type,
-                'discussionUser'    => self::getUser($discussion->InsertUserID),
-                'name'              => $discussion->Name
+                'countComments' => (int)$discussion->CountComments,
+                'dateInserted' => self::getDateTime($discussion->DateInserted),
+                'discussionID' => (int)$discussion->DiscussionID,
+                'discussionType' => $discussion->Type,
+                'discussionUser' => self::getUser($discussion->InsertUserID),
+                'name' => $discussion->Name
             ];
         } else {
             // Fallback discussion data
@@ -266,14 +261,14 @@ class AnalyticsData extends Gdn_Model {
         if (class_exists('\Infrastructure')) {
             $site = [
                 'accountID' => \Infrastructure::site('accountid'),
-                'name'      => \Infrastructure::site('name'),
-                'siteID'    => \Infrastructure::site('siteid')
+                'name' => \Infrastructure::site('name'),
+                'siteID' => \Infrastructure::site('siteid')
             ];
         } else {
             $site = [
                 'accountID' => c('Vanilla.VanillaForums.AccountID', null),
-                'name'      => c('Garden.Domain', null),
-                'siteID'    => c('Vanilla.VanillaForums.SiteID', null)
+                'name'  => c('Garden.Domain', null),
+                'siteID' => c('Vanilla.VanillaForums.SiteID', null)
             ];
         }
 
@@ -289,9 +284,9 @@ class AnalyticsData extends Gdn_Model {
     public static function getGuest() {
         return [
             'dateFirstVisit' => null,
-            'name'           => '@guest',
-            'roleType'       => 'guest',
-            'userID'         => 0
+            'name' => '@guest',
+            'roleType' => 'guest',
+            'userID' => 0
         ];
     }
 
@@ -317,9 +312,9 @@ class AnalyticsData extends Gdn_Model {
             if ($userRoles->count() > 0) {
                 foreach ($userRoles->resultObject() as $currentRole) {
                     $roles[] = [
-                        'name'   => $currentRole->Name,
+                        'name' => $currentRole->Name,
                         'roleID' => $currentRole->RoleID,
-                        'type'   => $currentRole->Type
+                        'type' => $currentRole->Type
                     ];
                 }
             }
@@ -335,16 +330,16 @@ class AnalyticsData extends Gdn_Model {
             }
 
             $userInfo = [
-                'commentCount'    => (int)$user->CountComments,
-                'dateFirstVisit'  => self::getDateTime($user->DateFirstVisit),
-                'dateRegistered'  => self::getDateTime($user->DateInserted),
+                'commentCount' => (int)$user->CountComments,
+                'dateFirstVisit' => self::getDateTime($user->DateFirstVisit),
+                'dateRegistered' => self::getDateTime($user->DateInserted),
                 'discussionCount' => (int)$user->CountDiscussions,
-                'name'            => $user->Name,
-                'roles'           => $roles,
-                'roleType'        => $roleType,
-                'userID'          => (int)$user->UserID,
-                'uuid'            => $trackingIDs['uuid'],
-                'sessionID'       => $trackingIDs['sessionID']
+                'name' => $user->Name,
+                'roles' => $roles,
+                'roleType' => $roleType,
+                'userID' => (int)$user->UserID,
+                'uuid' => $trackingIDs['uuid'],
+                'sessionID' => $trackingIDs['sessionID']
             ];
 
             $userInfo['points'] = val('Points', $user, 0);
@@ -360,16 +355,14 @@ class AnalyticsData extends Gdn_Model {
             // Did the user have a rank ID and was it valid?
             if (!is_null($rankDetails)) {
                 $rank = [
-                    'label'  => $rankDetails['Label'],
-                    'level'  => $rankDetails['Level'],
-                    'name'   => $rankDetails['Name'],
+                    'label' => $rankDetails['Label'],
+                    'level' => $rankDetails['Level'],
+                    'name' => $rankDetails['Name'],
                     'rankID' => $rankDetails['RankID']
                 ];
             } else {
                 // Fallback rank data
-                $rank = [
-                    'rankID' => 0
-                ];
+                $rank = ['rankID' => 0];
             }
 
             $userInfo['rank'] = $rank;
@@ -378,8 +371,8 @@ class AnalyticsData extends Gdn_Model {
         } else {
             // Fallback user data
             return [
-                'userID'         => 0,
-                'name'           => '@notfound',
+                'userID' => 0,
+                'name' => '@notfound',
             ];
         }
     }

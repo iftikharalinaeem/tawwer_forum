@@ -3,7 +3,7 @@
  * AnalyticsDashboard class file.
  *
  * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license Proprietary
  * @package vanillaanalytics
  */
 
@@ -65,7 +65,7 @@ class AnalyticsDashboard implements JsonSerializable {
 
         // Create the default panels: metrics and charts.
         $this->panels['metrics'] = new AnalyticsPanel('metrics');
-        $this->panels['charts']  = new AnalyticsPanel('charts');
+        $this->panels['charts'] = new AnalyticsPanel('charts');
 
         $widgetModel = new AnalyticsWidget();
         foreach($widgets as $widget) {
@@ -90,9 +90,9 @@ class AnalyticsDashboard implements JsonSerializable {
         $dashboardWidget = $this->sql->getWhere(
             'AnalyticsDashboardWidget',
             [
-                'DashboardID'  => $dashboardID,
+                'DashboardID' => $dashboardID,
                 'InsertUserID' => $userID,
-                'WidgetID'     => $widgetID
+                'WidgetID' => $widgetID
             ]
         )->numRows();
 
@@ -104,10 +104,10 @@ class AnalyticsDashboard implements JsonSerializable {
         $this->sql->insert(
             'AnalyticsDashboardWidget',
             [
-                'DashboardID'  => $dashboardID,
+                'DashboardID' => $dashboardID,
                 'DateInserted' => Gdn_Format::toDateTime(),
                 'InsertUserID' => $userID,
-                'WidgetID'     => $widgetID
+                'WidgetID'  => $widgetID
             ]
         );
     }
@@ -157,15 +157,19 @@ class AnalyticsDashboard implements JsonSerializable {
         if (empty(static::$defaults)) {
             $defaults = [
                 'Posting' => [
-                    'widgets' => ['total-discussions', 'total-comments', 'total-contributors', 'discussions',
-                        'comments', 'posts', 'posts-by-type', 'posts-by-category',
+                    'metrics' => ['total-discussions', 'total-comments', 'total-contributors'],
+                    'charts' => ['discussions', 'comments', 'posts', 'posts-by-type', 'posts-by-category',
                         'posts-by-role-type', 'contributors', 'contributors-by-category', 'contributors-by-role-type']
                 ],
                 'Traffic' => [
-                    'widgets' => ['total-pageviews', 'total-active-users', 'total-unique-pageviews', 'active-users',
-                        'unique-pageviews', 'unique-visits-by-role-type', 'pageviews', 'registrations']
+                    'metrics' => ['total-pageviews', 'total-active-users', 'total-visits'],
+                    'charts' => ['active-users', 'visits', 'visits-by-role-type', 'pageviews', 'registrations']
                 ]
             ];
+
+            foreach ($defaults as $title => $panels) {
+                $metrics = [];
+                $charts = [];
 
             foreach ($defaults as $title => $dashboardConfig) {
                 $widgets = val('widgets', $dashboardConfig, []);
@@ -235,7 +239,7 @@ class AnalyticsDashboard implements JsonSerializable {
                 'AnalyticsDashboardWidget',
                 [
                     'DashboardID' => self::DASHBOARD_PERSONAL,
-                    'InsertUserID'      => $userID
+                    'InsertUserID'=> $userID
                 ],
                 'Sort',
                 'asc'
@@ -261,9 +265,9 @@ class AnalyticsDashboard implements JsonSerializable {
     public function jsonSerialize() {
         return [
             'dashboardID' => $this->dashboardID,
-            'panels'      => $this->panels,
-            'personal'    => $this->isPersonal(),
-            'title'       => $this->title
+            'panels' => $this->panels,
+            'personal' => $this->isPersonal(),
+            'title' => $this->title
         ];
     }
 
@@ -278,9 +282,9 @@ class AnalyticsDashboard implements JsonSerializable {
         $this->sql->delete(
             'AnalyticsDashboardWidget',
             [
-                'DashboardID'  => $dashboardID,
+                'DashboardID' => $dashboardID,
                 'InsertUserID' => $userID,
-                'WidgetID'     => $widgetID
+                'WidgetID' => $widgetID
             ]
         );
     }
@@ -294,26 +298,11 @@ class AnalyticsDashboard implements JsonSerializable {
     public function render(Gdn_Controller $sender, AnalyticsDashboard $dashboard) {
         $sender->addSideMenu();
 
-        $sender->setData('Title', sprintf(
-            t('Analytics: %1$s'),
-            $dashboard->getTitle()
-        ));
+        $sender->setData('Title', sprintf(t('Analytics: %1$s'), $dashboard->getTitle()));
+        $sender->setData('AnalyticsDashboard', $dashboard);
+        $sender->addDefinition('analyticsDashboard', $dashboard);
 
-        $sender->setData(
-            'AnalyticsDashboard',
-            $dashboard
-        );
-
-        $sender->addDefinition(
-            'analyticsDashboard',
-            $dashboard
-        );
-
-        $sender->render(
-            'analytics',
-            false,
-            'plugins/vanillaanalytics'
-        );
+        $sender->render('analytics', false, 'plugins/vanillaanalytics');
     }
 
     /**

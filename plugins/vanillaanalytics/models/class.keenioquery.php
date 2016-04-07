@@ -3,7 +3,7 @@
  * KeenIOQuery class file.
  *
  * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license Proprietary
  * @package vanillaanalytics
  */
 
@@ -197,15 +197,15 @@ class KeenIOQuery implements JsonSerializable {
      */
     public function jsonSerialize() {
         return [
-            'analisysType'    => $this->analysisType,
+            'analisysType' => $this->analysisType,
             'eventCollection' => $this->eventCollection,
-            'filters'         => $this->filters,
-            'groupBy'         => $this->groupBy,
-            'interval'        => $this->interval,
+            'filters' => $this->filters,
+            'groupBy' => $this->groupBy,
+            'interval' => $this->interval,
             'target_property' => $this->targetProperty,
-            'timeframe'       => $this->timeframe,
-            'timezone'        => $this->timezone,
-            'title'           => $this->title
+            'timeframe' => $this->timeframe,
+            'timezone' => $this->timezone,
+            'title' => $this->title
         ];
     }
 
@@ -292,7 +292,7 @@ class KeenIOQuery implements JsonSerializable {
     public function setTimeframeAbsolute($start, $end) {
         $this->timeframe =[
             'start' => $start,
-            'end'   => $end
+            'end' => $end
         ];
         return $this;
     }
