@@ -3,18 +3,18 @@
  * VanillaAnalytics plugin.
  *
  * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license Proprietary
  * @package vanillaanalytics
  */
 
 $PluginInfo['vanillaanalytics'] = array(
-    'Name'                 => 'Vanilla Analytics',
-    'Description'          => 'Support for transmitting events to analytics services.',
-    'Version'              => '1.0.0',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
-    'Author'               => 'Ryan Perry',
-    'AuthorEmail'          => 'ryan.p@vanillaforums.com',
-    'AuthorUrl'            => 'http://vanillaforums.org/profile/initvector'
+    'Name' => 'Vanilla Analytics',
+    'Description' => 'Track important trends on your forum and chart them in a customizable dashboard.',
+    'Version' => '1.0.0',
+    'RequiredApplications' => array('Vanilla' => '2.2.105'),
+    'Author' => 'Ryan Perry',
+    'AuthorEmail' => 'ryan.p@vanillaforums.com',
+    'AuthorUrl' => 'http://vanillaforums.org/profile/initvector'
 );
 
 /**
@@ -39,14 +39,14 @@ class VanillaAnalytics extends Gdn_Plugin {
             return;
         }
 
-        $sectionModel            = new AnalyticsSection();
+        $sectionModel = new AnalyticsSection();
         $analyticsDashboardModel = new AnalyticsDashboard();
 
         Logger::event('analytics_menu', Logger::INFO, 'Sections', $sectionModel->getDefaults());
 
         $sender->EventArguments['SideMenu']->addItem(
             'analytics',
-            T('Analytics'),
+            t('Analytics'),
             'Garden.Settings.Manage',
             ['After' => 'Moderation', 'class' => 'Analytics']
         );
@@ -55,7 +55,7 @@ class VanillaAnalytics extends Gdn_Plugin {
         if (count($personalDashboard) > 0) {
             $sender->EventArguments['SideMenu']->addLink(
                 'analytics',
-                T('My Dashboard'),
+                t('My Dashboard'),
                 "settings/analytics/dashboard/" . AnalyticsDashboard::DASHBOARD_PERSONAL,
                 'Garden.Settings.Manage'
             );
@@ -65,7 +65,7 @@ class VanillaAnalytics extends Gdn_Plugin {
             foreach ($section->getDashboards() as $dashboard) {
                 $sender->EventArguments['SideMenu']->addLink(
                     'analytics',
-                    T($dashboard->getTitle()),
+                    t($dashboard->getTitle()),
                     "settings/analytics/dashboard/{$dashboard->dashboardID}",
                     'Garden.Settings.Manage'
                 );
@@ -96,8 +96,8 @@ class VanillaAnalytics extends Gdn_Plugin {
      * @param $args Event arguments, passed from CommentModel, specifically for the event.
      */
     public function commentModel_afterSaveComment_handler($sender, &$args) {
-        $type       = val('Insert', $args) ? 'comment_add' : 'comment_edit';
-        $collection = $type == 'comment_add' ? 'post' : 'post_modify';
+        $type = val('Insert', $args) ? 'comment_add' : 'comment_edit';
+        $collection = ($type == 'comment_add') ? 'post' : 'post_modify';
 
         $data = AnalyticsData::getComment(val('CommentID', $args), $type);
 
@@ -126,9 +126,9 @@ class VanillaAnalytics extends Gdn_Plugin {
         list($widgetID, $dashboardID) = $requestArgs;
 
         $dashboardModel = new AnalyticsDashboard();
-        $widgetModel    = new AnalyticsWidget();
-        $widget         = $widgetModel->getID($widgetID);
-        $userID         = Gdn::session()->UserID;
+        $widgetModel = new AnalyticsWidget();
+        $widget = $widgetModel->getID($widgetID);
+        $userID = Gdn::session()->UserID;
 
         if ($widget) {
             if ($widget->isBookmarked()) {
@@ -276,7 +276,7 @@ class VanillaAnalytics extends Gdn_Plugin {
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, &$args) {
         $type = val('Insert', $args) ? 'discussion_add' : 'discussion_edit';
-        $collection = $type == 'discussion_add' ? 'post' : 'post_modify';
+        $collection = ($type == 'discussion_add') ? 'post' : 'post_modify';
 
         $data = AnalyticsData::getDiscussion(val('DiscussionID', $args));
 
@@ -318,11 +318,7 @@ class VanillaAnalytics extends Gdn_Plugin {
         }
 
         // Save the new user's UUID attribute
-        Gdn::userModel()->saveAttribute(
-            $args['UserID'],
-            'UUID',
-            $uuid
-        );
+        Gdn::userModel()->saveAttribute($args['UserID'], 'UUID', $uuid);
 
         AnalyticsTracker::getInstance()->trackEvent('registration', 'registration_success');
     }
@@ -339,7 +335,7 @@ class VanillaAnalytics extends Gdn_Plugin {
 
         // Determine if we need to set a tracking cookie.
         if ($trackingCookie = @json_decode($trackingCookieRaw)) {
-            $uuid      = val('uuid', $trackingCookie);
+            $uuid = val('uuid', $trackingCookie);
             $sessionID = val('sessionID', $trackingCookie);
 
             /**
@@ -424,12 +420,12 @@ class VanillaAnalytics extends Gdn_Plugin {
             'reaction' => [
                 'discussionID' => (int)$discussionID,
                 'reactionType' => val('Name', $reactionType, null),
-                'recordType'   => $recordType,
-                'recordID'     => (int)$recordID,
-                'recordUser'   => $recordUser,
-                'urlCode'      => strtolower($urlCode),
-                'tagID'        => (int)val('TagID', $reactionData),
-                'total'        => (int)val('Total', $reactionData)
+                'recordType' => $recordType,
+                'recordID' => (int)$recordID,
+                'recordUser' => $recordUser,
+                'urlCode' => strtolower($urlCode),
+                'tagID' => (int)val('TagID', $reactionData),
+                'total' => (int)val('Total', $reactionData)
             ]
         ];
 

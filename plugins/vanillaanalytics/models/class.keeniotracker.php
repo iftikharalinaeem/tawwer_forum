@@ -3,7 +3,7 @@
  * KeenIOTracker class file.
  *
  * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license Proprietary
  * @package vanillaanalytics
  */
 
@@ -25,11 +25,11 @@ class KeenIOTracker implements TrackerInterface {
         $this->client = new KeenIOClient(
             'https://api.keen.io/{version}/',
             [
-                'orgID'      => c('VanillaAnalytics.KeenIO.OrgID'),
-                'orgKey'     => c('VanillaAnalytics.KeenIO.OrgKey'),
-                'projectID'  => c('VanillaAnalytics.KeenIO.ProjectID'),
-                'readKey'    => c('VanillaAnalytics.KeenIO.ReadKey'),
-                'writeKey'   => c('VanillaAnalytics.KeenIO.WriteKey')
+                'orgID' => c('VanillaAnalytics.KeenIO.OrgID'),
+                'orgKey' => c('VanillaAnalytics.KeenIO.OrgKey'),
+                'projectID' => c('VanillaAnalytics.KeenIO.ProjectID'),
+                'readKey' => c('VanillaAnalytics.KeenIO.ReadKey'),
+                'writeKey' => c('VanillaAnalytics.KeenIO.WriteKey')
             ]
         );
     }
@@ -53,8 +53,8 @@ class KeenIOTracker implements TrackerInterface {
             ->setEventCollection('page')
             ->setTargetProperty('user.userID')
             ->addFilter([
-                'operator'       => 'gt',
-                'property_name'  => 'user.userID',
+                'operator' => 'gt',
+                'property_name' => 'user.userID',
                 'property_value' => 0
             ]);
 
@@ -227,8 +227,8 @@ class KeenIOTracker implements TrackerInterface {
             ->setTargetProperty('user.userID')
             ->setInterval('daily')
             ->addFilter([
-                'operator'       => 'gt',
-                'property_name'  => 'user.userID',
+                'operator' => 'gt',
+                'property_name' => 'user.userID',
                 'property_value' => 0
             ]);
 
@@ -297,8 +297,8 @@ class KeenIOTracker implements TrackerInterface {
             ->setEventCollection('post')
             ->setInterval('daily')
             ->addFilter([
-                'operator'       => 'eq',
-                'property_name'  => 'type',
+                'operator' => 'eq',
+                'property_name' => 'type',
                 'property_value' => 'discussion_add'
             ]);
 
@@ -324,8 +324,8 @@ class KeenIOTracker implements TrackerInterface {
             ->setEventCollection('post')
             ->setInterval('daily')
             ->addFilter([
-                'operator'       => 'eq',
-                'property_name'  => 'type',
+                'operator' => 'eq',
+                'property_name' => 'type',
                 'property_value' => 'comment_add'
             ]);
 

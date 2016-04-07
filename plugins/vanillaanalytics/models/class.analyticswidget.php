@@ -3,7 +3,7 @@
  * AnalyticsWidget class file.
  *
  * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @license Proprietary
  * @package vanillaanalytics
  */
 
@@ -228,14 +228,14 @@ class AnalyticsWidget implements JsonSerializable {
      */
     public function jsonSerialize() {
         return [
-            'bookmarked'      => $this->isBookmarked(),
-            'callback'        => $this->getCallback(),
-            'data'            => $this->data,
-            'handler'         => $this->handler,
-            'supports'        => $this->supports,
-            'title'           => $this->title,
-            'type'            => $this->type,
-            'widgetID'        => $this->widgetID
+            'bookmarked' => $this->isBookmarked(),
+            'callback' => $this->getCallback(),
+            'data' => $this->data,
+            'handler' => $this->handler,
+            'supports' => $this->supports,
+            'title' => $this->title,
+            'type' => $this->type,
+            'widgetID' => $this->widgetID
         ];
     }
 
