@@ -9,9 +9,6 @@ $PluginInfo['Watermark'] = array(
     'Description' => 'Allow for configured categories to watermark the images attached to discussions.',
     'Version' => '1.0.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
-//    'RequiredPlugins' => array(
-//        'FileUpload' => '1.8.4'
-//    ),
     'MobileFriendly' => true,
     'Author' => "Patrick Kelly",
     'AuthorEmail' => 'patrick.k@vanillaforums.com',
@@ -28,14 +25,6 @@ $PluginInfo['Watermark'] = array(
  * plugin will presumably be configured to add watermarks to those images.
  */
 class WatermarkPlugin extends Gdn_Plugin {
-
-    function __construct() {
-
-    }
-
-    public function base_render_before () {
-        gdn::controller()->removeJsFile('autosave.js');
-    }
 
     /**
      * After a discussion is saved in post controller, any images that were uploaded
@@ -61,7 +50,7 @@ class WatermarkPlugin extends Gdn_Plugin {
             $quality = c('Watermark.Quality', 70);
 
             if (self::watermark($filePath, $watermarkParams, $fileExtension, $quality) === true) {
-                    return true;
+                return true;
             }
         }
     }
@@ -193,7 +182,8 @@ class WatermarkPlugin extends Gdn_Plugin {
     public function removeWatermark() {
         $watermark = c('Watermark.WatermarkPath', '');
         removeFromConfig('Watermark.WatermarkPath');
-        @unlink(PATH_ROOT.DS.$watermark);
+        $upload = new Gdn_Upload();
+        $upload->delete($watermark);
         redirect('/settings/watermark');
     }
 
@@ -216,19 +206,18 @@ class WatermarkPlugin extends Gdn_Plugin {
             array('SourceFile' => $sourceFile, 'CopiedSourceFile' => $sourceFile, 'WatermarkParams' => $watermarkParams)
         );
 
-        $sourcefile_id = false;
         if ($extension === 'png') {
-            $outputtype = 'png';
-            $sourcefile_id = imagecreatefrompng($sourceFile);
+            $outputType = 'png';
+            $sourceFileID = imagecreatefrompng($sourceFile);
         } elseif ($extension === 'gif') {
-            $outputtype = 'gif';
-            $sourcefile_id = imagecreatefromgif($sourceFile);
+            $outputType = 'gif';
+            $sourceFileID = imagecreatefromgif($sourceFile);
         } else {
-            $outputtype = 'jpg';
-            $sourcefile_id = imagecreatefromjpeg($sourceFile);
+            $outputType = 'jpg';
+            $sourceFileID = imagecreatefromjpeg($sourceFile);
         }
 
-        if($sourcefile_id === false) {
+        if($sourceFileID === false) {
             die('No Source file.');
         }
 
@@ -236,112 +225,87 @@ class WatermarkPlugin extends Gdn_Plugin {
             'watermarking_image',
             Logger::INFO,
             'SourceImage made',
-            array('Sourcefile ID' => $sourcefile_id, 'SourceFile' => $sourceFile, 'CopiedSourceFile' => $sourceFile, 'WatermarkParams' => $watermarkParams)
+            array('Sourcefile ID' => $sourceFileID, 'SourceFile' => $sourceFile, 'CopiedSourceFile' => $sourceFile, 'WatermarkParams' => $watermarkParams)
         );
 
         // Get the source file size
-        $sourcefile_width = imageSX($sourcefile_id);
-        $sourcefile_height = imageSY($sourcefile_id);
+        $sourcefileWidth = imageSX($sourceFileID);
+        $sourcefileHeight = imageSY($sourceFileID);
 
         Logger::event(
             'watermarking_image',
             Logger::INFO,
             'SourceImage measured',
-            array('\$sourcefile_height ID' => $sourcefile_height, '\$sourcefile_width' => $sourcefile_width)
+            array('\$sourcefile_height ID' => $sourcefileHeight, '\$sourcefile_width' => $sourcefileWidth)
         );
 
         // Create the watermark image from the path supplied in params
         $upload = new Gdn_Upload();
         $copiedWatermarkSource = $upload->copyLocal($watermarkParams['filename']);
-        $watermarkfile_id = imagecreatefrompng($copiedWatermarkSource);
+        $watermarkFileID = imagecreatefrompng($copiedWatermarkSource);
 
-        if($watermarkfile_id === false) {
+        if($watermarkFileID === false) {
             die('No Watermark file was made.');
         }
 
-        imageAlphaBlending($watermarkfile_id, false);
-        imagesavealpha($watermarkfile_id, true);
-        $watermarkfile_width=imageSX($watermarkfile_id);
-        $watermarkfile_height=imageSY($watermarkfile_id);
+        imageAlphaBlending($watermarkFileID, false);
+        imagesavealpha($watermarkFileID, true);
+        $watermarkFileWidth=imageSX($watermarkFileID);
+        $watermarkFileHeight=imageSY($watermarkFileID);
 
         Logger::event(
             'watermarking_image',
             Logger::INFO,
             'WatermarkImage made',
-            array('WaterMarkFile Copied Source' => $copiedWatermarkSource, '\$watermarkfile_height' => $watermarkfile_height, '\$watermarkfile_width' => $watermarkfile_width, 'WatermarkParams' => $watermarkParams)
+            array('WaterMarkFile Copied Source' => $copiedWatermarkSource, '\$watermarkfile_height' => $watermarkFileHeight, '\$watermarkfile_width' => $watermarkFileWidth, 'WatermarkParams' => $watermarkParams)
         );
 
         /**
-        * Resize the watermark.
-        *
-        * The resize value is a percentage of the parent image.
-        * The watermark is resized maintaining its aspect ratio.
-        * If no resize is supplied, do not resize.
+         * Resize the watermark.
+         *
+         * The resize value is a percentage of the parent image.
+         * The watermark is resized maintaining its aspect ratio.
+         * If no resize is supplied, do not resize.
         */
         $resize = $watermarkParams['resize'];
-        $ratio = $watermarkfile_width/$watermarkfile_height;
-        $watermark_resize_width = $sourcefile_width * ($resize/100);
-        $watermark_resize_height = $sourcefile_height * ($resize/100);
-        if ($watermark_resize_width/$watermark_resize_height > $ratio) {
-            $watermark_resize_width = round($watermark_resize_height*$ratio);
+        $ratio = $watermarkFileWidth/$watermarkFileHeight;
+        $watermarkResizeWidth = $sourcefileWidth * ($resize/100);
+        $watermarkResizeHeight = $sourcefileHeight * ($resize/100);
+        if ($watermarkResizeWidth/$watermarkResizeHeight > $ratio) {
+            $watermarkResizeWidth = round($watermarkResizeHeight*$ratio);
         } else {
-            $watermark_resize_height = round($watermark_resize_width/$ratio);
+            $watermarkResizeHeight = round($watermarkResizeWidth/$ratio);
         }
 
-        $im_dest = imagecreatetruecolor ($watermark_resize_width, $watermark_resize_height);
-        imagealphablending($im_dest, false);
-        if (imagecopyresized($im_dest, $watermarkfile_id, 0, 0, 0, 0, $watermark_resize_width, $watermark_resize_height, $watermarkfile_width, $watermarkfile_height) === false) {
+        $imageDestination = imagecreatetruecolor ($watermarkResizeWidth, $watermarkResizeHeight);
+        imagealphablending($imageDestination, false);
+        if (imagecopyresized($imageDestination, $watermarkFileID, 0, 0, 0, 0, $watermarkResizeWidth, $watermarkResizeHeight, $watermarkFileWidth, $watermarkFileHeight) === false) {
             die('Failed to resize watermark');
         }
-        imagesavealpha($im_dest, true);
-        imagedestroy($watermarkfile_id);
-        $watermarkfile_id = $im_dest;
-        $watermarkfile_width = $watermark_resize_width;
-        $watermarkfile_height = $watermark_resize_height;
+        imagesavealpha($imageDestination, true);
+        imagedestroy($watermarkFileID);
+        $watermarkFileID = $imageDestination;
+        $watermarkFileWidth = $watermarkResizeWidth;
+        $watermarkFileHeight = $watermarkResizeHeight;
 
-        /**
-         * Position the watermark.
-         *
-         * Positioning is done similar to CSS standard short hand positioning
-         * i.e it takes and array of 4 coordinates (top, left, right bottom)
-         * If the first 2 coordinates are present, position it from the top left corner.
-         * If the second 2 coordinates are present, top right corner.
-         * If the the third 2 coordinates are present, bottom right corner.
-         * If the first and fourth coordinates are present, bottom left corner,
-         * and if no coordinates are present, center it.
-         */
-        if ($watermarkParams['position'][0] && $watermarkParams['position'][1]) { // top left
-            $dest_y = $watermarkParams['position'][0];
-            $dest_x = $watermarkParams['position'][1];
-        } elseif ($watermarkParams['position'][1] && $watermarkParams['position'][2]) { // top right
-            $dest_y = $watermarkParams['position'][1];
-            $dest_x = $sourcefile_width - ($watermarkParams['position'][2] + $watermarkfile_width);
-        } elseif ($watermarkParams['position'][2] && $watermarkParams['position'][3]) { // bottom right
-            $dest_y = $sourcefile_height - ($watermarkParams['position'][2] + $watermarkfile_height);
-            $dest_x = $sourcefile_width - ($watermarkParams['position'][3] + $watermarkfile_width);
-        } elseif ($watermarkParams['position'][0] && $watermarkParams['position'][3]) { // bottom left
-            $dest_y = $sourcefile_height - ($watermarkParams['position'][0] + $watermarkfile_height);
-            $dest_x = $watermarkParams['position'][3];
-        } else { // center
-            $dest_x = ( $sourcefile_width / 2 ) - ( $watermarkfile_width / 2 ); // centered
-            $dest_y = ( $sourcefile_height / 2 ) - ( $watermarkfile_height / 2 ); // centered
-        }
+        list($watermarkYPos, $watermarkXPos) = self::watermarkPosition($watermarkParams, $sourcefileWidth, $watermarkFileWidth, $sourcefileHeight, $watermarkFileHeight);
 
-        if (imagecopy($sourcefile_id, $watermarkfile_id, $dest_x, $dest_y, 0, 0, $watermarkfile_width, $watermarkfile_height) === false) {
+
+        if (imagecopy($sourceFileID, $watermarkFileID, $watermarkXPos, $watermarkYPos, 0, 0, $watermarkFileWidth, $watermarkFileHeight) === false) {
             die('Unable to impose watermark on sourcefile.');
         }
-        imagedestroy($watermarkfile_id);
+        imagedestroy($watermarkFileID);
 
-        if ($outputtype == 'gif') {
-            if (imagegif ($sourcefile_id, $sourceFile) === false) {
+        if ($outputType == 'gif') {
+            if (imagegif ($sourceFileID, $sourceFile) === false) {
                 die('Failed to make the composite gif.');
             }
-        } elseif ($outputtype == 'png') {
-            if (imagepng($sourcefile_id, $sourceFile, $quality) === false) {
+        } elseif ($outputType == 'png') {
+            if (imagepng($sourceFileID, $sourceFile, $quality) === false) {
                 die('Failed to make the composite png.');
             }
         } else {
-            if (imagejpeg($sourcefile_id, $sourceFile, $quality) === false) {
+            if (imagejpeg($sourceFileID, $sourceFile, $quality) === false) {
                 die('Failed to make the composite jpg.');
             }
         }
@@ -354,8 +318,52 @@ class WatermarkPlugin extends Gdn_Plugin {
             array('\$destination ID' => $destination)
         );
 
-        imagedestroy($sourcefile_id);
+        imagedestroy($sourceFileID);
 
         return true;
+    }
+
+
+    /**
+     * Position the watermark.
+     *
+     * @param $watermarkParams
+     * @param $sourcefileWidth
+     * @param $watermarkFileWidth
+     * @param $sourcefileHeight
+     * @param $watermarkFileHeight
+     * @return array
+     */
+    public static function watermarkPosition($watermarkParams, $sourcefileWidth, $watermarkFileWidth, $sourcefileHeight, $watermarkFileHeight) {
+        /**
+         * Positioning is done similar to CSS standard short hand positioning
+         * i.e it takes and array of 4 coordinates (top, right, bottom, left)
+         * If the first 2 coordinates are present, position it from the top left corner.
+         * If the second 2 coordinates are present, top right corner.
+         * If the the third 2 coordinates are present, bottom right corner.
+         * If the first and fourth coordinates are present, bottom left corner,
+         * and if no coordinates are present, center it.
+         */
+        if ($watermarkParams['position'][0] && $watermarkParams['position'][1]) { // top left
+            $destinationY = $watermarkParams['position'][0];
+            $destinationX = $watermarkParams['position'][1];
+            return array($destinationY, $destinationX);
+        } elseif ($watermarkParams['position'][1] && $watermarkParams['position'][2]) { // top right
+            $destinationY = $watermarkParams['position'][1];
+            $destinationX = $sourcefileWidth - ($watermarkParams['position'][2] + $watermarkFileWidth);
+            return array($destinationY, $destinationX);
+        } elseif ($watermarkParams['position'][2] && $watermarkParams['position'][3]) { // bottom right
+            $destinationY = $sourcefileHeight - ($watermarkParams['position'][2] + $watermarkFileHeight);
+            $destinationX = $sourcefileWidth - ($watermarkParams['position'][3] + $watermarkFileWidth);
+            return array($destinationY, $destinationX);
+        } elseif ($watermarkParams['position'][0] && $watermarkParams['position'][3]) { // bottom left
+            $destinationY = $sourcefileHeight - ($watermarkParams['position'][0] + $watermarkFileHeight);
+            $destinationX = $watermarkParams['position'][3];
+            return array($destinationY, $destinationX);
+        } else { // center
+            $destinationX = ($sourcefileWidth / 2) - ($watermarkFileWidth / 2); // centered
+            $destinationY = ($sourcefileHeight / 2) - ($watermarkFileHeight / 2);
+            return array($destinationY, $destinationX); // centered
+        }
     }
 }
