@@ -177,7 +177,7 @@ class VanillaAnalytics extends Gdn_Plugin {
      *
      * @param Gdn_Controller $sender
      */
-    public function controller_index($sender, $requestArgs) {
+    public function controller_index($sender) {
         redirect('settings');
     }
 
