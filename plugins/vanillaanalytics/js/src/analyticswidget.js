@@ -270,7 +270,7 @@ function AnalyticsWidget(config) {
         if (typeof newHandler === 'string' && typeof window[newHandler] === 'function') {
             var widgetData = this.getData();
             handler = new window[newHandler]({
-                chartConfig: widgetData.chartConfig,
+                chartConfig: widgetData.chart,
                 query      : widgetData.query,
                 range      : this.getTimeframe(),
                 title      : this.getTitle(),
