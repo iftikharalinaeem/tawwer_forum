@@ -146,7 +146,7 @@ class KeenIOTracker implements TrackerInterface {
             'support' => 'cat01'
         ],
         'registrations' => [
-            'title' => 'Registrations',
+            'title' => 'New Users',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart'
         ]
