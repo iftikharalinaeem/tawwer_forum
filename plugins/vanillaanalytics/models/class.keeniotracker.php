@@ -32,11 +32,6 @@ class KeenIOTracker implements TrackerInterface {
              'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
              'type' => 'metric'
          ],
-         'total-unique-pageviews'  => [
-             'title' => 'Unique Page Views',
-             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-             'type' => 'metric'
-         ],
          'total-visits' => [
              'title' => 'Visits',
              'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
@@ -76,12 +71,6 @@ class KeenIOTracker implements TrackerInterface {
              'title' => 'Active Users',
              'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
              'type' => 'chart'
-         ],
-         'unique-pageviews' => [
-             'title' => 'Unique Pageviews',
-             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-             'type' => 'chart',
-             'support' => 'cat01'
          ],
          'visits-by-role-type' => [
              'title' => 'Unique Visits By Role Type',
