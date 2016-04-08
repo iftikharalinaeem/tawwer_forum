@@ -21,136 +21,136 @@ class KeenIOTracker implements TrackerInterface {
     /**
      * @var array The widgets and their settings.
      */
-     private $widgets = [
-         'total-active-users' => [
-             'title' => 'Active Users',
-             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-             'type' => 'metric'
-         ],
-         'total-pageviews' => [
-             'title' => 'Page Views',
-             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-             'type' => 'metric'
-         ],
-         'total-visits' => [
-             'title' => 'Visits',
-             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-             'type' => 'metric'
-         ],
-         'visits' => [
-             'title' => 'Visits',
-             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-             'type' => 'chart',
-             'chart' => ['labels' => ['Visits']],
-             'support' => 'cat01'
-         ],
-         'total-discussions' => [
-             'title' => 'Discussions',
-             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-             'type' => 'metric',
-             'support' => 'cat01'
-         ],
-         'total-comments' => [
-             'title' => 'Comments',
-             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-             'type' => 'metric',
-             'support' => 'cat01'
-         ],
-         'total-contributors' => [
-             'title' => 'Comments',
-             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-             'type' => 'metric',
-             'support' => 'cat01'
-         ],
-         'pageviews' => [
-             'title' => 'Page Views',
-             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-             'type' => 'chart'
-         ],
-         'active-users' => [
-             'title' => 'Active Users',
-             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-             'type' => 'chart'
-         ],
-         'visits-by-role-type' => [
-             'title' => 'Unique Visits By Role Type',
-             'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
-             'type' => 'chart',
-             'chart' => ['chartType' => 'area']
-         ],
-         'discussions' => [
-             'title' => 'Discussions',
-             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-             'support' => 'cat01'
-         ],
-         'comments' => [
+    protected $widgets = [
+        'total-active-users' => [
+            'title' => 'Active Users',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric'
+        ],
+        'total-pageviews' => [
+            'title' => 'Page Views',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric'
+        ],
+        'total-visits' => [
+            'title' => 'Visits',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric'
+        ],
+        'visits' => [
+            'title' => 'Visits',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'chart',
+            'chart' => ['labels' => ['Visits']],
+            'support' => 'cat01'
+        ],
+        'total-discussions' => [
+            'title' => 'Discussions',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric',
+            'support' => 'cat01'
+        ],
+        'total-comments' => [
+            'title' => 'Comments',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric',
+            'support' => 'cat01'
+        ],
+        'total-contributors' => [
+            'title' => 'Comments',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric',
+            'support' => 'cat01'
+        ],
+        'pageviews' => [
+            'title' => 'Page Views',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'chart'
+        ],
+        'active-users' => [
+            'title' => 'Active Users',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart'
+        ],
+        'visits-by-role-type' => [
+            'title' => 'Unique Visits By Role Type',
+            'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
+            'type' => 'chart',
+            'chart' => ['chartType' => 'area']
+        ],
+        'discussions' => [
+            'title' => 'Discussions',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'support' => 'cat01'
+        ],
+        'comments' => [
             'title' => 'Comments',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'support' => 'cat01'
-         ],
-         'posts' => [
-             'title' => 'Post',
-             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-             'type' => 'chart',
-             'support' => 'cat01'
-         ],
-         'posts-by-type' => [
-             'title' => 'Posts By Type',
-             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-             'chart' => [
-                 'labelMapping' => [
-                     'discussion_add' => 'Discussions',
-                     'comment_add' => 'Comments'
-                 ],
-                 'chartType' => 'area'
-             ],
-             'support' => 'cat01'
-         ],
-         'posts-by-category' => [
-             'title' => 'Posts By Category',
-             'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
-             'chart' => ['chartType' => 'area'],
-             'support' => 'cat01'
-         ],
-         'posts-by-role-type' => [
-             'title' => 'Posts By Role Type',
-             'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
-             'chart' => ['chartType' => 'area'],
-             'support' => 'cat01'
-         ],
-         'posts-per-user' => [
-             'title' => 'Posts Per User',
-             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-             'type' => 'chart',
-             'chart' => ['chartType' => 'area'],
-             'callback' => 'divideResult'
-         ],
-         'contributors' => [
-             'title' => 'Contributors',
-             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-             'type' => 'chart',
-             'support' => 'cat01'
-         ],
-         'contributors-by-category' => [
-             'title' => 'Contributors By Category',
-             'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
-             'type' => 'chart',
-             'chart' => ['chartType' => 'area'],
-             'support' => 'cat01'
-         ],
-         'contributors-by-role-type' => [
-             'title' => 'Contributors By Role Type',
-             'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
-             'type' => 'chart',
-             'chart' => ['chartType' => 'area'],
-             'support' => 'cat01'
-         ],
-         'registrations' => [
-             'title' => 'Registrations',
-             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-             'type' => 'chart'
-         ]
-     ];
+        ],
+        'posts' => [
+            'title' => 'Post',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart',
+            'support' => 'cat01'
+        ],
+        'posts-by-type' => [
+            'title' => 'Posts By Type',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'chart' => [
+                'labelMapping' => [
+                    'discussion_add' => 'Discussions',
+                    'comment_add' => 'Comments'
+                ],
+                'chartType' => 'area'
+            ],
+            'support' => 'cat01'
+        ],
+        'posts-by-category' => [
+            'title' => 'Posts By Category',
+            'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
+            'chart' => ['chartType' => 'area'],
+            'support' => 'cat01'
+        ],
+        'posts-by-role-type' => [
+            'title' => 'Posts By Role Type',
+            'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
+            'chart' => ['chartType' => 'area'],
+            'support' => 'cat01'
+        ],
+        'posts-per-user' => [
+            'title' => 'Posts Per User',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart',
+            'chart' => ['chartType' => 'area'],
+            'callback' => 'divideResult'
+        ],
+        'contributors' => [
+            'title' => 'Contributors',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart',
+            'support' => 'cat01'
+        ],
+        'contributors-by-category' => [
+            'title' => 'Contributors By Category',
+            'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
+            'type' => 'chart',
+            'chart' => ['chartType' => 'area'],
+            'support' => 'cat01'
+        ],
+        'contributors-by-role-type' => [
+            'title' => 'Contributors By Role Type',
+            'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
+            'type' => 'chart',
+            'chart' => ['chartType' => 'area'],
+            'support' => 'cat01'
+        ],
+        'registrations' => [
+            'title' => 'Registrations',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart'
+        ]
+    ];
 
     /**
      * Constructor.
@@ -175,7 +175,7 @@ class KeenIOTracker implements TrackerInterface {
      * @param string $id The slug-type ID of the widget.
      * @return AnalyticsWidget|null The Analytics widget object.
      */
-    private function buildWidget($id) {
+    protected function buildWidget($id) {
         $widget = val($id, $this->widgets, []);
         if (empty($widget) || !val('query', $widget)) {
             return null;
