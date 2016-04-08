@@ -145,6 +145,13 @@ class KeenIOTracker implements TrackerInterface {
             'chart' => ['chartType' => 'area'],
             'support' => 'cat01'
         ],
+        'comments-per-discussion' => [
+            'title' => 'Comments Per Discussion',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart',
+            'chart' => ['chartType' => 'area'],
+            'callback' => 'divideResult'
+        ],
         'registrations' => [
             'title' => 'Registrations',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
@@ -458,6 +465,9 @@ class KeenIOTracker implements TrackerInterface {
 
         // Posts per user (chart)
         $this->widgets['posts-per-user']['query'] = [$postsQuery, $activeUsersQuery];
+
+        // Comments per discussion (chart)
+        $this->widgets['comments-per-discussion']['query'] = [$commentsQuery, $discussionsQuery];
 
         // Registrations
         $registrationsQuery = new KeenIOQuery();
