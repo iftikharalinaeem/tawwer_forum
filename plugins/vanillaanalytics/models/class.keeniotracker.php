@@ -145,6 +145,13 @@ class KeenIOTracker implements TrackerInterface {
             'chart' => ['chartType' => 'area'],
             'support' => 'cat01'
         ],
+        'comments-per-discussion' => [
+            'title' => 'Comments Per Discussion',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart',
+            'chart' => ['chartType' => 'area'],
+            'callback' => 'divideResult'
+        ],
         'registrations' => [
             'title' => 'New Users',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
@@ -181,13 +188,18 @@ class KeenIOTracker implements TrackerInterface {
             return null;
         }
 
-        if (!$chart = val('chart', $widget)) {
-            if (val('type', $widget) == 'metric') {
-                $chart = ['title' => val('title', $widget)];
-            } else {
+        if (!$chart = val('chart', $widget, [])) {
+            if (val('type', $widget) != 'metric') {
                 $chart = ['labels' => val('title', $widget)];
             }
         }
+
+        if (!val('title', $chart)) {
+            $chart['title'] = val('title', $widget);
+        }
+
+        // Override default chart 'Result' label in c3
+        $chart['labelMapping']['Result'] = val('title', $widget);
 
         $widgetObj = new AnalyticsWidget();
         $widgetObj->setID($id)
@@ -459,6 +471,9 @@ class KeenIOTracker implements TrackerInterface {
         // Posts per user (chart)
         $this->widgets['posts-per-user']['query'] = [$postsQuery, $activeUsersQuery];
 
+        // Comments per discussion (chart)
+        $this->widgets['comments-per-discussion']['query'] = [$commentsQuery, $discussionsQuery];
+
         // Registrations
         $registrationsQuery = new KeenIOQuery();
         $registrationsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
@@ -501,7 +516,7 @@ class KeenIOTracker implements TrackerInterface {
      */
     public function addJsFiles(Gdn_Controller $controller, $inDashboard = false) {
         if (!AnalyticsTracker::getInstance()->trackingDisabled() || $inDashboard) {
-            $controller->addJsFile('keenio.sdk.min.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('vendors/keen.min.js', 'plugins/vanillaanalytics');
         }
 
         if (!AnalyticsTracker::getInstance()->trackingDisabled()) {
@@ -509,7 +524,7 @@ class KeenIOTracker implements TrackerInterface {
         }
 
         if ($inDashboard) {
-            $controller->addJsFile('keeniowidget.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('keeniowidget.min.js', 'plugins/vanillaanalytics');
         }
     }
 

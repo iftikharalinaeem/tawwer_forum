@@ -9,4 +9,5 @@
 _notes
 phpdoc.dist.xml
 Thumbs.db
+plugins/vanillaanalytics/bower_components
 plugins/vanillaanalytics/node_modules

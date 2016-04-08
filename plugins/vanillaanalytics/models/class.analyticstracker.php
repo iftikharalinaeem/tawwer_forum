@@ -66,6 +66,7 @@ class AnalyticsTracker {
         $inDashboard = $controller->MasterView == 'admin';
 
         if ($inDashboard) {
+            $controller->addCssFile('vanillicon.css', 'static');
             $controller->addCssFile('dashboard.css', 'plugins/vanillaanalytics');
         }
 
@@ -100,7 +101,7 @@ class AnalyticsTracker {
     public function addJsFiles(Gdn_Controller $controller) {
         $inDashboard = $controller->MasterView == 'admin';
 
-        $controller->addJsFile('js.cookie.min.js', 'plugins/vanillaanalytics');
+        $controller->addJsFile('vendors/js.cookie.js', 'plugins/vanillaanalytics');
 
         foreach ($this->trackers as $interface) {
             $interface->addJsFiles($controller, $inDashboard);

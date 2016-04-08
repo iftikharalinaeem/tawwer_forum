@@ -40,7 +40,7 @@ class AnalyticsPanel implements JsonSerializable {
      * @return $this
      */
     public function addWidget($widget) {
-        if ($widget instanceof Analyticswidget && $widget->isEnabled($widget->getType() === 'metric')) {
+        if ($widget instanceof Analyticswidget && $widget->isEnabled()) {
             // Is this an actual widget instance?
             $this->widgets[] = $widget;
         } elseif (is_array($widget)) {
@@ -52,7 +52,7 @@ class AnalyticsPanel implements JsonSerializable {
             // Is this a string we can use to lookup a dashboard?
             $widgetModel = new AnalyticsWidget();
             $newWidget = $widgetModel->getID($widget);
-            if ($newWidget && $newWidget->isEnabled($newWidget->getType() === 'metric')) {
+            if ($newWidget && $newWidget->isEnabled()) {
                 $this->widgets[] = $newWidget;
             }
         }

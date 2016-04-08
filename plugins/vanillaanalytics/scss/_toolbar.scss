@@ -1,0 +1,231 @@
+// Dashboard toolbar
+.analytics-toolbar {
+  @extend .clear-right;
+  background: $blue-2;
+  border-top: 1px solid $blue-3;
+  border-bottom: 2px solid $blue-3;
+  padding: 4px 20px;
+  font-size: 14px;
+  min-height: 47px;
+  margin: 0;
+
+  select {
+    @extend .toolbar-input;
+  }
+
+  .toolbar-controls {
+    float: right;
+  }
+}
+
+.toolbar-input {
+  height: 34px;
+  margin: 0;
+  vertical-align: middle;
+  font-family: $font-family;
+  color: $text-light-color;
+  background: 0;
+  background-color: $white;
+  border: 2px solid $border-color;
+}
+
+// jQueryUI
+.ui-widget button {
+  font-family: $font-family;
+}
+
+.ui-button {
+  position: relative;
+  background-color: $blue-1;
+}
+
+.ui-button-text {
+  font-size: 14px;
+}
+
+.ui-icon.ui-icon-triangle-1-s {
+  @include font-vanillicon('\f115', $text-light-color, 20px);
+  position: absolute;
+  display: block;
+  right: 10px;
+  top: 5px;
+}
+
+.ui-icon.ui-icon-circle-triangle-w {
+  @extend .hide-text;
+  @include font-vanillicon('\f123', $text-light-color, 20px);
+  position: absolute;
+  display: block;
+  right: 10px;
+  top: 5px;
+}
+
+.ui-icon.ui-icon-circle-triangle-e {
+  @extend .hide-text;
+  @include font-vanillicon('\f124', $text-light-color, 20px);
+  position: absolute;
+  display: block;
+  right: 10px;
+  top: 5px;
+}
+
+.ui-button {
+  @extend .toolbar-input;
+}
+
+.ui-widget-content {
+  font-weight: 700;
+}
+
+.ui-widget-content .ui-state-default,
+.ui-widget-content .ui-state-highlight {
+  background: 0;
+  border: 0;
+}
+
+.ui-widget-content {
+
+  .ui-datepicker {
+    font-family: $font-family;
+    font-weight: 700;
+
+    table thead th {
+      background: 0;
+      color: $text-color;
+      text-shadow: 0;
+    }
+
+    table {
+      border: 0;
+      border-collapse: collapse;
+    }
+
+    td {
+      border: 0;
+      padding: 2px 0;
+    }
+
+    td a,
+    td span {
+      font-weight: 500;
+      text-align: center;
+      font-size: 14px;
+      margin: 0;
+      padding: 3px 0;
+    }
+  }
+}
+
+.ui-widget-header {
+  background: 0;
+  border: 0;
+}
+
+.comiseo-daterangepicker-buttonpanel {
+  .ui-button {
+    width: 100px;
+    margin: 0 10px 15px;
+    background-color: $blue-4;
+    color: $white;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  .ui-priority-secondary {
+    color: $text-color;
+    background-color: $border-color;
+  }
+}
+
+.ui-widget-content .ui-datepicker-prev.ui-state-focus,
+.ui-widget-content .ui-datepicker-prev.ui-state-hover,
+.ui-widget-content .ui-datepicker-next.ui-state-focus,
+.ui-widget-content .ui-datepicker-next.ui-state-hover {
+  border: 0;
+  background: 0;
+  font-weight: 400;
+  color: transparent;
+}
+
+.ui-datepicker .ui-datepicker-next,
+.ui-datepicker .ui-datepicker-prev {
+  top: 1px;
+  cursor: pointer;
+}
+
+.ui-datepicker-group-first {
+  box-sizing: border-box;
+  border-right: 1px solid $border-color;
+}
+
+.ui-datepicker .ui-datepicker-next {
+  right: 1px;
+}
+
+.ui-datepicker .ui-datepicker-prev {
+  left: 1px;
+}
+
+.ui-widget-content {
+  border: 0;
+  background: 0;
+  background-color: $white;
+}
+
+.ui-widget-content .ui-state-focus {
+  font-weight: inherit;
+  background: 0;
+  border: 0;
+}
+
+.comiseo-daterangepicker {
+  border: 1px solid $border-color;
+  box-shadow: 0 0 3px 2px $grey-6;
+}
+
+.comiseo-daterangepicker-presets {
+  @extend .clearfix;
+  float: left;
+  height: inherit;
+  margin-top: 10px;
+
+  li {
+    display: inline-block;
+    margin: 0 5px 5px;
+  }
+
+
+
+  a,
+  a.ui-corner-all,
+  a.ui-state-focus {
+    display: block;
+    width: 87px;
+    padding: 2px 0;
+    font-size: 13px;
+    font-family: $font-family;
+    background-color: $border-color;
+    color: $text-color;
+    border-radius: 2px;
+    font-weight: 500;
+    text-align: center;
+
+    &:hover {
+      font-weight: 500;
+      background: 0;
+      background-color: $border-color;
+      text-decoration: underline;
+    }
+  }
+
+}
+
+.comiseo-daterangepicker-calendar .ui-state-highlight a.ui-state-default {
+  background: $blue-2;
+  color: $text-color;
+  border-color: $text-color;
+}
+
+td.ui-state-highlight {
+  border-right: 3px solid $blue-2;
+}

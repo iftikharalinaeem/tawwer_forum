@@ -16,15 +16,74 @@ module.exports = function (grunt) {
 
         pkg: grunt.file.readJSON('package.json'),
 
+        copy: {
+            main: {
+                files: [
+                    {
+                        expand: true,
+                        flatten: true,
+                        cwd: 'bower_components',
+                        src: [
+                            'jquery-ui/**/jquery-ui.min.js'
+                            , 'c3/**/*.min.js'
+                            , 'd3/**/*.min.js'
+                            , 'js-cookie/**/*.js'
+                            , 'jquery-ui-daterangepicker/**/*.min.js'
+                            , 'momentjs/**/moment.min.js'
+                            , 'keen-js/dist/keen.min.js'
+                        ],
+                        dest: 'js/vendors'
+                    },
+                    {
+                        expand: true,
+                        flatten: true,
+                        cwd: 'bower_components',
+                        src: [
+                            'c3/**/*.min.css'
+                            , 'jquery-ui-daterangepicker/**/*.css'
+                            , 'jquery-ui/**/jquery.ui.theme.min.css'
+                            , 'jquery-ui/**/jquery.ui.datepicker.css'
+                        ],
+                        dest: 'design/vendors'
+                    }
+                ]
+            }
+        },
+
+        concat: {
+            css: {
+                src: ['design/vendors/*.css'],
+                dest: 'design/vendors.css'
+            }
+        },
+
+        cssmin: {
+            css:{
+                src: 'design/vendors.css',
+                dest: 'design/vendors.min.css'
+            }
+        },
+
+        uglify: {
+            js: {
+                options: {
+                    sourceMap: true
+                },
+                files: [{
+                    expand: true
+                    , src: 'js/src/*.js'
+                    , dest: 'js'
+                    , ext: '.min.js'
+                    , flatten: true
+                }]
+            }
+        },
+
         watch: {
             bower: {
                 files: ['bower.json']
                 , tasks: ['wiredep']
             }
-            // , js: {
-            //     files: ['js/src/**/*.js']
-            //     , tasks: ['jshint']
-            // }
             , gruntfile: {
                 files: ['Gruntfile.js']
             }
@@ -42,6 +101,10 @@ module.exports = function (grunt) {
                     , 'js/**/*.js'
                     , 'views/**/*.tpl'
                 ]
+            }
+            , scripts: {
+                files: ['js/src/*.js']
+                , tasks: ['uglify']
             }
         },
 
@@ -68,8 +131,7 @@ module.exports = function (grunt) {
             options: {
                 config: 'scss/.scss-lint.yml',
                 maxBuffer: 3000 * 1024,
-                colorizeOutput: true,
-                exclude: ['scss/_jquery*.scss']
+                colorizeOutput: true
             }
             , all: ['scss/**/*.scss']
         },
@@ -84,19 +146,11 @@ module.exports = function (grunt) {
             }
         },
 
-        jshint: {
-            options: {
-                jshintrc: 'js/.jshintrc'
-            }
-            , all: ['js/src/**/*.js']
-        },
-
         csslint: {
             options: {
                 csslintrc: 'design/.csslintrc'
             }
-            , all: ['design/admin.css'
-                ,'design/style.css']
+            , all: ['design/dashboard.css']
         },
 
         imagemin: {
@@ -122,8 +176,11 @@ module.exports = function (grunt) {
         'wiredep'
         , 'scsslint'
         , 'sass'
+        , 'copy'
+        , 'concat'
+        , 'cssmin'
+        , 'uglify'
         , 'autoprefixer'
-        // , 'jshint'
         , 'csslint'
         , 'imagemin'
     ]);

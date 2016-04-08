@@ -50,7 +50,8 @@ class AnalyticsDashboard implements JsonSerializable {
      *
      * @param bool|integer|string $dashboardID Unique identifier for this dashboard.  False if none.
      */
-    public function __construct($title = false, $metrics = [], $charts = []) {
+    public function __construct($title = false, $widgets = []) {
+
         $this->sql = Gdn::database()->sql();
 
         if ($title) {
@@ -67,12 +68,16 @@ class AnalyticsDashboard implements JsonSerializable {
         $this->panels['metrics'] = new AnalyticsPanel('metrics');
         $this->panels['charts'] = new AnalyticsPanel('charts');
 
-        if (is_array($metrics) && !empty($metrics)) {
-            $this->getPanel('metrics')->addWidget($metrics);
-        }
-
-        if (is_array($charts) && !empty($charts)) {
-            $this->getPanel('charts')->addWidget($charts);
+        $widgetModel = new AnalyticsWidget();
+        foreach($widgets as $widget) {
+            $widget = $widgetModel->getID($widget);
+            if ($widget) {
+                if ($widget->getType() === 'metric') {
+                    $this->getPanel('metrics')->addWidget($widget);
+                } else {
+                    $this->getPanel('charts')->addWidget($widget);
+                }
+            }
         }
     }
 
@@ -124,7 +129,6 @@ class AnalyticsDashboard implements JsonSerializable {
         if ($dashboardID == self::DASHBOARD_PERSONAL) {
             $result = new AnalyticsDashboard(
                 'Personal Dashboard',
-                [],
                 $this->getUserDashboardWidgets(self::DASHBOARD_PERSONAL)
             );
             $result->setPersonal(true);
@@ -156,28 +160,22 @@ class AnalyticsDashboard implements JsonSerializable {
         if (empty(static::$defaults)) {
             $defaults = [
                 'Posting' => [
-                    'metrics' => ['total-discussions', 'total-comments', 'total-contributors'],
-                    'charts' => ['discussions', 'comments', 'posts', 'posts-by-type', 'posts-by-category',
-                        'posts-by-role-type', 'contributors', 'contributors-by-category', 'contributors-by-role-type']
+                    'widgets' => ['total-discussions', 'total-comments', 'total-contributors', 'discussions',
+                        'comments', 'posts', 'posts-by-type', 'posts-by-category', 'posts-by-role-type', 'contributors',
+                        'contributors-by-category', 'contributors-by-role-type'
+                    ]
                 ],
                 'Traffic' => [
-                    'metrics' => ['total-pageviews', 'total-active-users', 'total-visits'],
-                    'charts' => ['active-users', 'visits', 'visits-by-role-type', 'pageviews', 'registrations']
+                    'widgets' => ['total-pageviews', 'total-active-users', 'total-visits', 'active-users', 'visits',
+                        'visits-by-role-type', 'pageviews', 'registrations'
+                    ]
                 ]
             ];
 
-            foreach ($defaults as $title => $panels) {
-                $metrics = [];
-                $charts = [];
-
-                if (is_array($panels)) {
-                    $metrics = array_key_exists('metrics', $panels) && is_array($panels['metrics']) ? $panels['metrics'] : [];
-                    $charts = array_key_exists('charts', $panels) && is_array($panels['charts']) ? $panels['charts'] : [];
-                }
-
-                $dashboard = new AnalyticsDashboard($title, $metrics, $charts);
+            foreach ($defaults as $title => $dashboardConfig) {
+                $widgets = val('widgets', $dashboardConfig, []);
+                $dashboard = new AnalyticsDashboard($title, $widgets);
                 $dashboardID = $dashboard->getDashboardID();
-
                 static::$defaults[$dashboardID] = $dashboard;
             }
         }
