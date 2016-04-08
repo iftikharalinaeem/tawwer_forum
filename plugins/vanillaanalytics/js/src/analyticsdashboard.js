@@ -345,12 +345,21 @@ AnalyticsDashboard.prototype.setupSorting = function() {
         return;
     }
 
-    $(".Sortable").sortable({
-        handle: ".title",
+    $(".analytics-panel-charts .analytics-widget-options").append('<span class="analytics-widget-move">');
+
+    $(".analytics-panel-charts").sortable({
+        handle: ".analytics-widget-move",
         update: this.sortUpdate.bind(this)
     });
 
-    $(".Sortable").disableSelection();
+    $(".analytics-panel-charts").disableSelection();
+
+    $(".analytics-panel-metrics").sortable({
+        handle: ".body",
+        update: this.sortUpdate.bind(this)
+    });
+
+    $(".analytics-panel-metrics").disableSelection();
 };
 
 AnalyticsDashboard.prototype.sortUpdate = function(e, ui) {

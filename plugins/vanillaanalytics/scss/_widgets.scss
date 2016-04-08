@@ -1,0 +1,106 @@
+// Sidebar nav icon
+#Panel div.Box.Analytics h4 {
+  background-position: 166px -644px;
+}
+
+// General widget styling
+.analytics-widget {
+  padding: 10px;
+}
+
+.analytics-panel-charts {
+  @extend .clear-right;
+}
+
+//Charts
+.analytics-widget-chart {
+  display: block;
+  float: left;
+  width: 50%;
+
+  .analytics-widget-header {
+    @extend .clearfix;
+    padding: 20px 0 20px 20px;
+  }
+
+  .title {
+    float: left;
+    font-size: 16px;
+    color: $grey-5;
+  }
+}
+
+
+//Metrics
+.analytics-panel-metrics {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+
+  padding-top: 20px;
+  padding-bottom: 10px;
+  background-color: $grey-1;
+  border-bottom: 1px solid $grey-3;
+  box-shadow: 0 2px 2px -1px $grey-6;
+}
+
+.analytics-widget-metric {
+  position: relative;
+  padding: 0 30px 10px;
+
+  .analytics-widget-header {
+    position: absolute;
+    top: 10px;
+    right: 0;
+  }
+
+  .body {
+    text-align: center;
+    cursor: move;
+    color: $grey-5;
+  }
+
+  .metric-value {
+    display: block;
+    font-size: 48px;
+    line-height: $headings-line-height;
+    font-weight: 700;
+  }
+
+  .metric-title {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+//Options
+.analytics-widget-options {
+  float: right;
+}
+
+// Bookmark Icons
+.bookmark {
+  @extend .hide-text;
+  @include font-vanillicon('\f17f', $text-light-color, 18px);
+
+  &:hover,
+  &:focus {
+    @include font-vanillicon('\f17f', $blue-4, 18px);
+  }
+}
+
+.bookmarked {
+  @include font-vanillicon('\f17f', $blue-4, 18px);
+  &:hover,
+  &:focus {
+    @include font-vanillicon('\f17f', $text-light-color, 18px);
+  }
+}
+
+//Move Icon
+.analytics-widget-move {
+  @include font-vanillicon('\f1db', $text-light-color, 18px);
+  margin-left: 10px;
+  cursor: move;
+}

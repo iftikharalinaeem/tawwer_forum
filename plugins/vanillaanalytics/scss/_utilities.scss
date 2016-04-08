@@ -1,0 +1,56 @@
+//Nicolas Gallagher's micro clearfix hack: http://nicolasgallagher.com/micro-clearfix-hack/
+.clearfix {
+  zoom: 1;
+
+  &::before,
+  &::after {
+    content: ' ';
+    display: table;
+  }
+
+  &::after {
+    clear: both;
+  }
+}
+
+.clear-right {
+  &::after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: ' ';
+    clear: right;
+    height: 0;
+  }
+}
+
+//From Twitter Bootstrap
+.hide-text {
+  background-color: transparent;
+  color: transparent;
+  border: 0;
+  font: 0/0 a;
+  text-shadow: none;
+}
+
+@mixin font-vanillicon($char, $color, $size: 24px) {
+  background-image: none;
+
+  &::before {
+    display: inline-block;
+    font: initial;
+    font-size: $size;
+    font-family: 'vanillicon';
+    font-variant: normal;
+    font-weight: normal;
+    font-style: normal;
+    color: $color;
+    min-width: 1em;
+    text-align: center;
+    text-decoration: inherit;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    content: $char;
+  }
+}

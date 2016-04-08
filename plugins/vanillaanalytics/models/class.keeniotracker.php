@@ -511,7 +511,7 @@ class KeenIOTracker implements TrackerInterface {
      */
     public function addJsFiles(Gdn_Controller $controller, $inDashboard = false) {
         if (!AnalyticsTracker::getInstance()->trackingDisabled() || $inDashboard) {
-            $controller->addJsFile('keenio.sdk.min.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('vendors/keen.min.js', 'plugins/vanillaanalytics');
         }
 
         if (!AnalyticsTracker::getInstance()->trackingDisabled()) {
@@ -519,7 +519,7 @@ class KeenIOTracker implements TrackerInterface {
         }
 
         if ($inDashboard) {
-            $controller->addJsFile('keeniowidget.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('keeniowidget.min.js', 'plugins/vanillaanalytics');
         }
     }
 

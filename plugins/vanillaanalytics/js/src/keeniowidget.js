@@ -245,6 +245,15 @@ function KeenIOWidget(config) {
         }
     };
 
+    this.setChartConfig= function(newChartConfig) {
+        if (typeof this[newChartConfig] !== 'undefined') {
+            chartConfig = this[newChartConfig];
+            return this;
+        } else {
+            throw 'Invalid newChartConfig';
+        }
+    };
+
     /**
      * @param {Array} newData
      * @returns {KeenIOWidget}
@@ -435,6 +444,7 @@ KeenIOWidget.prototype.loadConfig = function(config) {
  */
 KeenIOWidget.prototype.loadDatavizConfig = function (config) {
     var dataviz = this.getDataviz();
+    var chartOptions = this.getConfig('options', {});
 
     /*
     var defaultColors = dataviz.colors();
@@ -453,8 +463,15 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
     */
 
     dataviz.library('c3');
+
+    if (this.getType() == 'metric') {
+        dataviz.height(this.getConfig('height', 85));
+    }
+
     dataviz.chartType(this.getConfig('type', 'area'));
-    dataviz.chartOptions(this.getConfig('options', {}));
+    dataviz.chartOptions(chartOptions);
+    dataviz.dateFormat('%Y-%m-%d');
+
 };
 
 /**
