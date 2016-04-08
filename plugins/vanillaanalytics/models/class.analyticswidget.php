@@ -13,6 +13,13 @@
 class AnalyticsWidget implements JsonSerializable {
 
     /**
+     * Our Rank categories.
+     */
+    const SMALL_WIDGET_RANK = 1;
+    const MEDIUM_WIDGET_RANK = 2;
+    const LARGE_WIDGET_RANK = 3;
+
+    /**
      * @var bool Is this widget bookmarked by the current user?
      */
     protected $bookmarked = null;
@@ -38,11 +45,13 @@ class AnalyticsWidget implements JsonSerializable {
     protected $handler;
 
     /**
-     * @var bool Is this a basic widget, available to everyone?
+     * @var int The rank of the widget. One of the *_WIDGET_RANK
      */
-    protected $isBasic = false;
+    protected $rank;
 
-    /** @var Gdn_SQLDriver Contains the sql driver for the object. */
+    /**
+     * @var Gdn_SQLDriver Contains the sql driver for the object.
+     */
     public $sql;
 
     /**
@@ -154,6 +163,13 @@ class AnalyticsWidget implements JsonSerializable {
     }
 
     /**
+     * @return int The rank of the widget or 1.
+     */
+    public function getRank() {
+        return $this->rank ? $this->rank : self::SMALL_WIDGET_RANK;
+    }
+
+    /**
      * Grab the support slugs for this widget.
      *
      * @return array
@@ -200,27 +216,17 @@ class AnalyticsWidget implements JsonSerializable {
     /**
      * Is this a basic widget, available to everyone?
      *
-     * @param bool $basic
-     * @return bool|$this
+     * @return bool
      */
-    public function isBasic($basic = null) {
-        if ($basic !== null) {
-            $this->isBasic = (bool)$basic;
-            return $this;
-        }
-
-        return $this->isBasic;
+    public function isBasic() {
+        return $this->getRank() === 1;
     }
 
     /**
-     * Determine if a widget is enabled in the site config.
-     *
-     * @param bool $default Default value for a widget's enabled status.
+     * Determine if a widget is enabled.
      */
     public function isEnabled() {
-        $configSlug = "VanillaAnalytics.Widget.{$this->widgetID}";
-
-        return c($configSlug, $this->isBasic());
+        return $this->getRank() <= c("VanillaAnalytics.Level", 1);
     }
 
     /**
@@ -291,6 +297,15 @@ class AnalyticsWidget implements JsonSerializable {
      */
     public function setID($widgetID) {
         $this->widgetID = $widgetID;
+        return $this;
+    }
+
+    /**
+     * @param int $rank The rank of the widget.
+     * @return $this
+     */
+    public function setRank($rank) {
+        $this->rank = $rank;
         return $this;
     }
 
