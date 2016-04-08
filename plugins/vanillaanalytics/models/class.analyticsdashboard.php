@@ -50,7 +50,7 @@ class AnalyticsDashboard implements JsonSerializable {
      *
      * @param bool|integer|string $dashboardID Unique identifier for this dashboard.  False if none.
      */
-    public function __construct($title = false, $metrics = [], $charts = []) {
+    public function __construct($title = false, $widgets = []) {
 
         $this->sql = Gdn::database()->sql();
 
