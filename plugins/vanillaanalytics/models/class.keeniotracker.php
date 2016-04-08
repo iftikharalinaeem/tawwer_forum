@@ -188,13 +188,18 @@ class KeenIOTracker implements TrackerInterface {
             return null;
         }
 
-        if (!$chart = val('chart', $widget)) {
-            if (val('type', $widget) == 'metric') {
-                $chart = ['title' => val('title', $widget)];
-            } else {
+        if (!$chart = val('chart', $widget, [])) {
+            if (val('type', $widget) != 'metric') {
                 $chart = ['labels' => val('title', $widget)];
             }
         }
+
+        if (!val('title', $chart)) {
+            $chart['title'] = val('title', $widget);
+        }
+
+        // Override default chart 'Result' label in c3
+        $chart['labelMapping']['Result'] = val('title', $widget);
 
         $widgetObj = new AnalyticsWidget();
         $widgetObj->setID($id)
