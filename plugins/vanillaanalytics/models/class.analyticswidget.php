@@ -223,10 +223,24 @@ class AnalyticsWidget implements JsonSerializable {
     }
 
     /**
-     * Determine if a widget is enabled.
+     * Determine if a widget is enabled. This checks the config level against the rank of the widget.
      */
     public function isEnabled() {
-        return $this->getRank() <= c("VanillaAnalytics.Level", 1);
+        return $this->getRank() <= $this->getLevel();
+    }
+
+    /**
+     * Resolves the config's level setting to a number ranking.
+     */
+    protected function getLevel() {
+        $level = trim(strtolower(c('VanillaAnalytics.Level', 'basic')));
+        if ($level === 'vip' || $level === 'enterprise') {
+            return self::LARGE_WIDGET_RANK;
+        }
+        if ($level == 'corporate') {
+            return self::MEDIUM_WIDGET_RANK;
+        }
+        return self::SMALL_WIDGET_RANK;
     }
 
     /**
