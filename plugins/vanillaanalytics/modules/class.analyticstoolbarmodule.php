@@ -10,19 +10,14 @@ class AnalyticsToolbarModule extends Gdn_Module {
 
     private function getData() {
         // Get the data for the 1st level of categories.
-        // This is hardcoded for the demo so that we can query against Icrontic.
-        $categories = [
-            38	=> 'Leaders',
-            19	=> 'Gaming',
-            11	=> 'Hardware',
-            10	=> 'Science & Tech',
-            22	=> 'Internet & Media',
-            57	=> 'Spyware & Virus Removal',
-            120	=> 'Life',
-            20	=> 'Community'
-        ];
-        $this->setData('cat01', $categories);
-
+        $categories = CategoryModel::$Categories;
+        $categoryData = [];
+        foreach($categories as $category) {
+            if (val('Depth', $category) == 1) {
+                $categoryData[val('CategoryID', $category)] = val('Name', $category);
+            }
+        }
+        $this->setData('cat01', $categoryData);
 
         // Get the data for the intervals.
         $this->setData('Intervals', [
