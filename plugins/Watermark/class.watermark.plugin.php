@@ -10,7 +10,7 @@ $PluginInfo['Watermark'] = array(
     'Version' => '1.0.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => true,
-    'Author' => "Patrick Kelly",
+    'Author' => 'Patrick Kelly',
     'AuthorEmail' => 'patrick.k@vanillaforums.com',
     'SettingsUrl' => '/settings/watermark'
 );
@@ -134,7 +134,7 @@ class WatermarkPlugin extends Gdn_Plugin {
             // Apply the config settings to the form.
             $sender->Form->setData($configurationModel->Data);
         } else {
-            if(gdn::request()->post('delete_watermark')) {
+            if (gdn::request()->post('delete_watermark')) {
                 // Remove the existing watermark in form. Redirect back to form.
                 $this->removeWatermark();
                 return;
@@ -211,13 +211,13 @@ class WatermarkPlugin extends Gdn_Plugin {
             $sourceFileID = imagecreatefrompng($sourceFile);
         } elseif ($extension === 'gif') {
             $outputType = 'gif';
-            $sourceFileID = imagecreatefromgif($sourceFile);
+            $sourceFileID = imagecreatefromgif ($sourceFile);
         } else {
             $outputType = 'jpg';
             $sourceFileID = imagecreatefromjpeg($sourceFile);
         }
 
-        if($sourceFileID === false) {
+        if ($sourceFileID === false) {
             die('No Source file.');
         }
 
@@ -244,7 +244,7 @@ class WatermarkPlugin extends Gdn_Plugin {
         $copiedWatermarkSource = $upload->copyLocal($watermarkParams['filename']);
         $watermarkFileID = imagecreatefrompng($copiedWatermarkSource);
 
-        if($watermarkFileID === false) {
+        if ($watermarkFileID === false) {
             die('No Watermark file was made.');
         }
 
