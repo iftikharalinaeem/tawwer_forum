@@ -444,7 +444,7 @@ KeenIOWidget.prototype.loadConfig = function(config) {
  */
 KeenIOWidget.prototype.loadDatavizConfig = function (config) {
     var dataviz = this.getDataviz();
-    var chartOptions = this.getConfig('chartOptions');
+    var chartOptions = this.getConfig('options');
     var labelMapping = this.getConfig('labelMapping');
 
     dataviz.library('c3');
