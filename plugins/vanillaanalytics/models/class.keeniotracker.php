@@ -57,7 +57,7 @@ class KeenIOTracker implements TrackerInterface {
             'support' => 'cat01'
         ],
         'total-contributors' => [
-            'title' => 'Comments',
+            'title' => 'Contributors',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'metric',
             'support' => 'cat01'
