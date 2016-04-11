@@ -20,7 +20,7 @@ $PluginInfo['vanillaanalytics'] = array(
 /**
  * Facilitate the tracking of events from Vanilla to one (or more) analytics services.
  */
-class VanillaAnalytics extends Gdn_Plugin {
+class VanillaAnalyticsPlugin extends Gdn_Plugin {
 
     /**
      * Track the generic 404 response.
