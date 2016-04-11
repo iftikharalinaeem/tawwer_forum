@@ -456,6 +456,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         require_once("{$modelPath}/interface.trackerinterface.php");
         require_once("{$modelPath}/class.analyticsdata.php");
         require_once("{$modelPath}/class.analyticstracker.php");
+        require_once("{$modelPath}/class.analyticswidget.php");
         require_once("{$modelPath}/class.keenioclient.php");
         require_once("{$modelPath}/class.keenioquery.php");
         require_once("{$modelPath}/class.keeniotracker.php");
