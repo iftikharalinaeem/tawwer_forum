@@ -78,7 +78,7 @@ class WatermarkPlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function categoryModel_beforeSaveCategory_handler ($sender, $args) {
+    public function categoryModel_beforeSaveCategory_handler($sender, $args) {
         $watermarkImageCategory = c("Watermark.WatermarkCategories");
         if (!$watermarkImageCategory) {
             $watermarkImageCategory = array();
@@ -186,7 +186,6 @@ class WatermarkPlugin extends Gdn_Plugin {
         removeFromConfig('Watermark.WatermarkPath');
         $upload = new Gdn_Upload();
         $upload->delete($watermark);
-        return;
     }
 
     /**
@@ -213,7 +212,7 @@ class WatermarkPlugin extends Gdn_Plugin {
             $sourceFileID = imagecreatefrompng($sourceFile);
         } elseif ($extension === 'gif') {
             $outputType = 'gif';
-            $sourceFileID = imagecreatefromgif ($sourceFile);
+            $sourceFileID = imagecreatefromgif($sourceFile);
         } else {
             $outputType = 'jpg';
             $sourceFileID = imagecreatefromjpeg($sourceFile);
@@ -252,8 +251,8 @@ class WatermarkPlugin extends Gdn_Plugin {
 
         imageAlphaBlending($watermarkFileID, false);
         imagesavealpha($watermarkFileID, true);
-        $watermarkFileWidth=imageSX($watermarkFileID);
-        $watermarkFileHeight=imageSY($watermarkFileID);
+        $watermarkFileWidth = imageSX($watermarkFileID);
+        $watermarkFileHeight = imageSY($watermarkFileID);
 
         Logger::event(
             'watermarking_image',
@@ -279,10 +278,10 @@ class WatermarkPlugin extends Gdn_Plugin {
             $watermarkResizeHeight = round($watermarkResizeWidth/$ratio);
         }
 
-        $imageDestination = imagecreatetruecolor ($watermarkResizeWidth, $watermarkResizeHeight);
+        $imageDestination = imagecreatetruecolor($watermarkResizeWidth, $watermarkResizeHeight);
         imagealphablending($imageDestination, false);
-        if (imagecopyresized($imageDestination, $watermarkFileID, 0, 0, 0, 0, $watermarkResizeWidth, $watermarkResizeHeight, $watermarkFileWidth, $watermarkFileHeight) === false) {
-            die('Failed to resize watermark');
+        if (imagecopyresampled($imageDestination, $watermarkFileID, 0, 0, 0, 0, $watermarkResizeWidth, $watermarkResizeHeight, $watermarkFileWidth, $watermarkFileHeight) === false) {
+            die('Failed to resample watermark');
         }
         imagesavealpha($imageDestination, true);
         imagedestroy($watermarkFileID);
@@ -299,7 +298,7 @@ class WatermarkPlugin extends Gdn_Plugin {
         imagedestroy($watermarkFileID);
 
         if ($outputType == 'gif') {
-            if (imagegif ($sourceFileID, $sourceFile) === false) {
+            if (imagegif($sourceFileID, $sourceFile) === false) {
                 die('Failed to make the composite gif.');
             }
         } elseif ($outputType == 'png') {
@@ -370,6 +369,6 @@ class WatermarkPlugin extends Gdn_Plugin {
     }
 }
 
-function validWaterMarkType () {
+function validWaterMarkType() {
     return ($_FILES['watermark']['type']==='image/png');
 }
