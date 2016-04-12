@@ -301,10 +301,7 @@ class WatermarkPlugin extends Gdn_Plugin {
                 die('Failed to make the composite gif.');
             }
         } elseif ($outputType == 'png') {
-            // PNG "quality" property is compression, 0 (no compression) to 10.
-            // Invert the config supplied $quality for jpeg and convert for a scale of 1 to 10.
-            $compression = 10 - round($quality/10);
-            if (imagepng($sourceFileID, $sourceFile, $compression) === false) {
+            if (imagepng($sourceFileID, $sourceFile, Gdn_UploadImage::PNG_COMPRESSION) === false) {
                 die('Failed to make the composite png.');
             }
         } else {
