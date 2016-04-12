@@ -369,6 +369,7 @@ class WatermarkPlugin extends Gdn_Plugin {
     }
 }
 
-function validWaterMarkType() {
-    return ($_FILES['watermark']['type']==='image/png');
+function validWaterMarkType($val, $info) {
+    $fileData = Gdn::request()->getValueFrom(Gdn_Request::INPUT_FILES, $info->Name, false);
+    return ($fileData['type'] === 'image/png');
 }
