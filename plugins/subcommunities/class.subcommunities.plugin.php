@@ -440,4 +440,29 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         $args['Options']['CategoryData'] =  $this->getCategories();
     }
+
+    /**
+     * Adds an endpoint to render the subcommunity toggle.
+     *
+     * @param CategoriesController $sender The sending object.
+     * @param array $args Expects a variation of the SubcommunityToggleModule view.
+     */
+    public function categoriesController_subcommunitySelect_create($sender, $args) {
+        $module = new SubcommunityToggleModule();
+        if (!empty($args)) {
+            $module->Style = $args[0];
+        }
+        $sender->setData('SubcommunitiesModule', $module);
+        $sender->render('subcommunityselect', '', 'plugins/subcommunities');
+    }
+
+    /**
+     * Adds a link to the site nav module to change subcommunities.
+     *
+     * @param SiteNavModule $sender
+     */
+    public function siteNavModule_default_handler($sender) {
+        $subName = val('Name', SubcommunityModel::getCurrent());
+        $sender->addLink('etc.subcommuntyselect', array('text' => $subName.'<span class="pull-right icon icon-arrow-right"></span>', 'url' => 'categories/subcommunityselect', false, 'sort' => 99, 'icon' => icon('globe')));
+    }
 }
