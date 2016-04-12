@@ -452,6 +452,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         if (!empty($args)) {
             $module->Style = $args[0];
         }
+        $sender->title('Choose a Forum');
         $sender->setData('SubcommunitiesModule', $module);
         $sender->render('subcommunityselect', '', 'plugins/subcommunities');
     }
