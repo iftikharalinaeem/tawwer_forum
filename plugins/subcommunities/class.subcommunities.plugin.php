@@ -432,12 +432,28 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             return;
         }
 
+        $categories = $this->getCategories();
+
         // Allow moving a post to another subcommunity!
         $path = Gdn::request()->path();
         if ($path === 'moderation/confirmdiscussionmoves') {
-            return;
+            $options = $args['Options'];
+            $defaultCategories = CategoryModel::getByPermission(
+                'Discussions.View',
+                null,
+                val('Filter', $options, ['Archived' => 0]),
+                val('PermFilter', $options, [])
+            );
+
+            // Prevent moving posts into a subcommunity root category
+            $subcommunities = SubcommunityModel::all();
+            foreach($subcommunities as $subcommunity) {
+                $defaultCategories[$subcommunity['CategoryID']]['AllowDiscussions'] = 0;
+            }
+
+            $categories = $defaultCategories;
         }
 
-        $args['Options']['CategoryData'] =  $this->getCategories();
+        $args['Options']['CategoryData'] = $categories;
     }
 }
