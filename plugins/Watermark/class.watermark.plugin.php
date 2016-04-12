@@ -113,11 +113,12 @@ class WatermarkPlugin extends Gdn_Plugin {
         $sender->title(t('Watermark'));
 
         $validation = new Gdn_Validation();
+        $validation->addRule('validWatermarkType', 'function:validWaterMarkType');
+        $validation->applyRule('watermark', 'validWatermarkType', t('Watermark has to be in the PNG format'));
         $configurationModel = new Gdn_ConfigurationModel($validation);
 
         // Set the model on the form.
         $sender->Form->setModel($configurationModel);
-
         // Get the current logo.
         $watermark = c('Watermark.WatermarkPath');
         if ($watermark) {
@@ -139,6 +140,7 @@ class WatermarkPlugin extends Gdn_Plugin {
                 $this->removeWatermark();
                 redirect('/settings/watermark');
             }
+
             if ($sender->Form->save() !== false) {
                 $upload = new Gdn_Upload();
                 try {
@@ -366,4 +368,8 @@ class WatermarkPlugin extends Gdn_Plugin {
             return array($destinationY, $destinationX); // centered
         }
     }
+}
+
+function validWaterMarkType () {
+    return ($_FILES['watermark']['type']==='image/png');
 }
