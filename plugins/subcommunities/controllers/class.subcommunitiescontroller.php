@@ -46,7 +46,7 @@ class SubcommunitiesController extends DashboardController {
                 $postData = $this->Request->post();
                 // Unchecked checkboxes are not sent in post data :P
                 if (!isset($postData['IsDefault'])) {
-                    $postData['IsDefault'] = false;
+                    $postData['IsDefault'] = null;
                 }
 
                 $this->siteModel->update($postData, ['SubcommunityID' => $siteID]);
