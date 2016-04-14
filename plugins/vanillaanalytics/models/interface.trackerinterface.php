@@ -54,11 +54,11 @@ interface TrackerInterface {
     /**
      * Detect if an analytics tracker is configured for use.
      *
-     * @param bool $write Configured to write to the tracker?
-     * @param bool $read Configured to read from the tracker?
+     * @param bool $disableWrite Disable writing to the tracker?
+     * @param bool $disableRead Disable reading from the tracker?
      * @return bool True on configured, false otherwise
      */
-    public static function isConfigured($write = true, $read = true);
+    public static function isConfigured($disableWrite = false, $disableRead = false);
 
     /**
      * Track an event.

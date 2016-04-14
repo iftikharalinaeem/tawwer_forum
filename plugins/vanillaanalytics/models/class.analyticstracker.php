@@ -47,7 +47,7 @@ class AnalyticsTracker {
 
         $trackerClasses = $this->getTrackerClasses();
         foreach ($trackerClasses as $currentTrackerClass) {
-            if (call_user_func("{$currentTrackerClass}::isConfigured")) {
+            if (call_user_func("{$currentTrackerClass}::isConfigured", $this->disableTracking)) {
                 $this->addTracker(new $currentTrackerClass);
             }
         }
