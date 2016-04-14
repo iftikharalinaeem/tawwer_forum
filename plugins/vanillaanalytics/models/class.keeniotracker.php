@@ -605,18 +605,18 @@ class KeenIOTracker implements TrackerInterface {
     /**
      * Detect if tracker is configured for use.
      *
-     * @param bool $write Configured to write to the tracker?
-     * @param bool $read Configured to read from the tracker?
+     * @param bool $disableWrite Disable writing to the tracker?
+     * @param bool $disableRead Disable reading from the tracker?
      * @return bool True on configured, false otherwise
      */
-    public static function isConfigured($write = true, $read = true) {
+    public static function isConfigured($disableWrite = false, $disableRead = false) {
         $configured = false;
 
         // Do we at least have a project ID configured?
         if (c('VanillaAnalytics.KeenIO.ProjectID')) {
             // Do we need either a read or write key and have them configured?
-            if ((!$write || c('VanillaAnalytics.KeenIO.WriteKey')) &&
-                (!$read || c('VanillaAnalytics.KeenIO.ReadKey'))) {
+            if (($disableWrite || c('VanillaAnalytics.KeenIO.WriteKey')) &&
+                ($disableRead || c('VanillaAnalytics.KeenIO.ReadKey'))) {
                 $configured = true;
             }
         }
