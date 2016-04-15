@@ -3,7 +3,7 @@
 $PluginInfo['featured'] = array(
    'Name' => 'Featured Discussions',
    'Description' => 'Feature discussions.',
-   'Version' => '1.0',
+   'Version' => '1.0.1',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
@@ -21,7 +21,7 @@ $PluginInfo['featured'] = array(
    'SettingsPermission' => 'Garden.Setttings.Manage'
 );
 
-class Featured extends Gdn_Plugin {
+class FeaturedPlugin extends Gdn_Plugin {
 
    public function Setup() {
       $this->Structure();
