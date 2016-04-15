@@ -161,8 +161,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
                 'searchBoxAdvanced'
             );
         } else {
-        $Sender->register_function('searchbox_advanced', 'searchBoxAdvanced');
-    }
+            $Sender->register_function('searchbox_advanced', 'searchBoxAdvanced');
+        }
     }
 
     public function searchController_autoComplete_create($sender, $term, $limit = 5) {
