@@ -105,7 +105,7 @@ function writeDiscussionList($sender, $type = 'discussions', $emptyMessage = '',
                 echo '<div class="Button-Controls">';
                 echo anchor(sprintf(t('New Announcement')), GroupUrl($sender->data('Group'), 'announcement'), 'Button Primary');
                 echo '</div>';
-            } else if ($type == 'discussions' && GroupPermission('Member')) {
+            } else if ($type == 'discussions' && (GroupPermission('Member') || GroupPermission('Moderate'))) {
                 echo '<div class="Button-Controls">';
                 echo Gdn_Theme::module('NewDiscussionModule', array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$sender->data('Group.GroupID')));
                 echo '</div>';

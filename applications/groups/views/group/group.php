@@ -11,7 +11,7 @@ if (GroupPermission('View')) {
     writeAnnouncementList($this, t('GroupEmptyAnnouncements', "Important stuff will go here one day."));
     writeDiscussionList($this, 'discussions', t('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"), t('Discussions'));
     $eventList = new EventListModule($this->data('Events'), t('Upcoming Events'), t('GroupEmptyEvents', "Aw snap, no events are coming up."));
-    if (GroupPermission('Member', $this->data('Group'))) {
+    if (GroupPermission('Member', $this->data('Group')) || GroupPermission('Moderate', $this->data('Group'))) {
         $eventList->addNewEventButton(val('GroupID', $this->data('Group')));
         $eventList->showMore(url(combinePaths(array("/events/group/", GroupSlug($this->data('Group'))))));
     }
