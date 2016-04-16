@@ -15,7 +15,8 @@ $PluginInfo['LinkedIn'] = array(
    'AuthorUrl' => 'http://vanillaforums.com',
    'MobileFriendly' => TRUE,
    'SettingsUrl' => '/social/linkedin',
-   'SocialConnect' => TRUE
+   'SocialConnect' => TRUE,
+   'Icon' => 'linkedin.svg'
 );
 
 class LinkedInPlugin extends Gdn_Plugin {
