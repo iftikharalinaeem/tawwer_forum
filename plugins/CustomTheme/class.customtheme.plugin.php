@@ -7,7 +7,7 @@
 $PluginInfo['CustomTheme'] = array(
    'Name' => 'Custom Theme',
    'Description' => 'Allows administrators to customize the CSS & master HTML template of the currently enabled theme.',
-   'Version' => '2.2.1',
+   'Version' => '2.2',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
@@ -306,7 +306,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
       $Sender->AddJsFile('jquery.textarea.js', 'plugins/CustomTheme');
 		$Sender->AddCssFile('customtheme.css', 'plugins/CustomTheme');
 		
-		$ThemeManager = Gdn::themeManager();
+		$ThemeManager = new Gdn_ThemeManager();
 		$CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
 		$CurrentThemeFolder = basename(GetValue('ThemeRoot', $CurrentThemeInfo));
 		$Folder = PATH_THEMES . DS . $CurrentThemeFolder;
@@ -660,7 +660,7 @@ Here are some things you should know before you begin:
             Gdn::SQL()->Put('CustomThemeRevision', $Set, array('RevisionID' => $WorkingRevisionID));
          } else {
             // If there isn't a working revision, create it.
-            $ThemeManager = Gdn::themeManager();
+            $ThemeManager = new Gdn_ThemeManager();
             $CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
             $CurrentThemeFolder = basename(GetValue('ThemeRoot', $CurrentThemeInfo));
             $Folder = PATH_THEMES . DS . $CurrentThemeFolder;
