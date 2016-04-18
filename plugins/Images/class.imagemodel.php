@@ -80,7 +80,7 @@ class ImageModel extends Gdn_Model {
 
       if (!$DiscussionID) {
          $Image = array_shift($Images);
-         $SerializedImage = serialize($Image);
+         $SerializedImage = dbencode($Image);
          // Build the discussion data to be saved
          $DiscussionFormValues = array(
              'Type' => 'Image',
@@ -119,7 +119,7 @@ class ImageModel extends Gdn_Model {
       if ($Timestamp === NULL)
          $Timestamp = time();
       
-      $S = serialize($Image);
+      $S = dbencode($Image);
       $Row = array(
             'Type' => 'Image',
             'Format' => 'Image',

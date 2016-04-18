@@ -58,7 +58,7 @@ class UserNoteModel extends Gdn_Model {
         } else {
             $Row = $this->SQL->Select('Attributes')->GetWhere('UserNote', array('UserNoteID' => $RowID))->FirstRow(DATASET_TYPE_ARRAY);
             if (isset($Row['Attributes'])) {
-                $Attributes = @unserialize($Row['Attributes']);
+                $Attributes = dbdecode($Row['Attributes']);
                 if (is_array($Attributes))
                     $Attributes = array_merge($Attributes, $NotInSchema);
                 else

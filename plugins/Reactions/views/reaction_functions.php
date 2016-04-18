@@ -164,7 +164,7 @@ if (!function_exists('WriteImageItem')):
       }
       $Attributes = GetValue('Attributes', $Record);
       if (!is_array($Attributes))
-         $Attributes = @unserialize($Attributes);
+         $Attributes = dbdecode($Attributes);
 
       $Image = FALSE;
       if (GetValue('Image', $Attributes)) {
@@ -181,8 +181,8 @@ if (!function_exists('WriteImageItem')):
 
       // A little kludge for my test data where the serialized array was put
       // directly inside the body.
-      if (!$Image && is_array(@unserialize($Body)))
-         $Image = unserialize($Body);
+      if (!$Image && is_array(dbdecode($Body)))
+         $Image = dbdecode($Body);
 
       $RecordID = GetValue('RecordID', $Record); // Explicitly defined?
       if ($RecordID) {

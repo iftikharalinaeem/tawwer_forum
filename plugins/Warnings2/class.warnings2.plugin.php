@@ -9,7 +9,7 @@
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.4.2',
+    'Version' => '2.4.3',
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -134,7 +134,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $Data = $Activity['Data'];
         if (is_string($Data)) {
-            $Data = @unserialize($Data);
+            $Data = dbdecode($Data);
         }
 
         $body = val('Story', $Activity);
@@ -188,7 +188,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             }
         }
 
-        $Row->Attributes = Gdn_Format::Unserialize($Row->Attributes);
+        $Row->Attributes = dbdecode($Row->Attributes);
         if (isset($Row->Attributes['WarningID']) && $Row->Attributes['WarningID']) {
 
             //Check if warning has been reversed.

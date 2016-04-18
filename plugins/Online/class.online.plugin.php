@@ -30,7 +30,7 @@
 $PluginInfo['Online'] = array(
    'Name' => 'Online',
    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-   'Version' => '1.7',
+   'Version' => '1.7.1',
    'MobileFriendly' => false,
    'RequiredApplications' => array('Vanilla' => '2.1a20'),
    'RequiredTheme' => false,
@@ -938,7 +938,7 @@ class OnlinePlugin extends Gdn_Plugin {
       $sender->getUserInfo($userReference, $username);
       $sender->_setBreadcrumbs(T('Online Preferences'), '/profile/online');
 
-      $userPrefs = Gdn_Format::unserialize($sender->User->Preferences);
+      $userPrefs = dbdecode($sender->User->Preferences);
       if (!is_array($userPrefs)) {
          $userPrefs = array();
       }

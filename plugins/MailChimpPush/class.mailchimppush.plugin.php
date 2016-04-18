@@ -13,7 +13,7 @@
 $PluginInfo['MailChimpPush'] = array(
    'Name' => 'MailChimp Push',
    'Description' => "Updates MailChimp when users adjust their email address.",
-   'Version' => '2.0.2',
+   'Version' => '2.0.3',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Tim Gunter',
    'AuthorEmail' => 'tim@vanillaforums.com',

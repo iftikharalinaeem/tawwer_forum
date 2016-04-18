@@ -8,7 +8,7 @@
 $PluginInfo['VanillaPop'] = array(
     'Name' => 'Vanilla Pop',
     'Description' => "Users may start discussions, make comments, and even automatically register for your site via email.",
-    'Version' => '1.3.0',
+    'Version' => '1.3.1',
     'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -274,7 +274,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         // Save the full post for debugging.
-        $Data['Attributes'] = serialize(ArrayTranslate($Data, array('Headers', 'Source')));
+        $Data['Attributes'] = dbencode(ArrayTranslate($Data, array('Headers', 'Source')));
 
         $Data['Body'] = self::StripEmail($Data['Body']);
         if (!$Data['Body'])

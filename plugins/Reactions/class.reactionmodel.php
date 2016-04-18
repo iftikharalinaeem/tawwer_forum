@@ -51,7 +51,7 @@ class ReactionModel {
                     $RecordCount++;
 
                     $RecordID = $Row[$RecordType.'ID'];
-                    $Attributes = @unserialize($Row['Attributes']);
+                    $Attributes = dbdecode($Row['Attributes']);
                     if (!is_array($Attributes))
                         $Attributes = array();
                     $ModUserIDs = GetValue('ModUserIDs', $Attributes);
@@ -82,7 +82,7 @@ class ReactionModel {
                         if (empty($Attributes))
                             $Set['Attributes'] = NULL;
                         else
-                            $Set['Attributes'] = serialize($Attributes);
+                            $Set['Attributes'] = dbencode($Attributes);
                         $this->SQL->Put($RecordType, $Set, array($RecordType.'ID' => $RecordID));
                     }
                     unset($Attributes['ModUserIDs']);
@@ -153,7 +153,7 @@ class ReactionModel {
         }
 
         if (!empty($Data)) {
-            $Row['Attributes'] = serialize($Data);
+            $Row['Attributes'] = dbencode($Data);
         } //else {
         //$Row['Attributes'] = NULL; // No! Wipes field incorrectly when partial data is passed.
         //}
@@ -173,7 +173,7 @@ class ReactionModel {
                 // Set Attributes as fields
                 $Attributes = val('Attributes', $Type);
                 if (is_string($Attributes)) {
-                    $Attributes = @unserialize($Attributes);
+                    $Attributes = dbdecode($Attributes);
                     $Attributes = (is_array($Attributes)) ? $Attributes : array();
                     SetValue('Attributes', $Type, $Attributes);
                 }
@@ -261,7 +261,7 @@ class ReactionModel {
         // Make sure the attributes are in the row and unserialized.
         $Attributes = GetValue($AttrColumn, $Row, array());
         if (is_string($Attributes))
-            $Attributes = @unserialize($Attributes);
+            $Attributes = dbdecode($Attributes);
         if (!is_array($Attributes))
             $Attributes = array();
 
@@ -679,7 +679,7 @@ class ReactionModel {
         }
 
         $Record[$AttrColumn]['React'] = $React;
-        $Set[$AttrColumn] = serialize($Record[$AttrColumn]);
+        $Set[$AttrColumn] = dbencode($Record[$AttrColumn]);
 
         $Model->SetField($Data['RecordID'], $Set);
 
@@ -906,7 +906,7 @@ class ReactionModel {
 //         } else {
 //            // The row just needs to be updated.
 //            $Model->SetProperty($ID,
-//               array($Column => $Row[$Column], 'Attributes' => serialize($Row['Attributes'])),
+//               array($Column => $Row[$Column], 'Attributes' => dbencode($Row['Attributes'])),
 //               ''
 //            );
 //         }
@@ -925,7 +925,7 @@ class ReactionModel {
 //         if (RemoveThreshold && $Value >= RemoveThreshold) {
 //            // We still need to update the row before deleting to get the right values in there.
 //            $Model->SetProperty($ID,
-//               array($Column => $Row[$Column], 'Attributes' => serialize($Row['Attributes'])),
+//               array($Column => $Row[$Column], 'Attributes' => dbencode($Row['Attributes'])),
 //               ''
 //            );
 //
@@ -945,7 +945,7 @@ class ReactionModel {
 //         } elseif ($LogThreshold && $Value >= $LogThreshold) {
 //            // The row needs to be logged and updated.
 //            $Model->SetProperty($ID,
-//               array($Column => $Row[$Column], 'Attributes' => serialize($Row['Attributes'])),
+//               array($Column => $Row[$Column], 'Attributes' => dbencode($Row['Attributes'])),
 //               ''
 //            );
 //
@@ -953,7 +953,7 @@ class ReactionModel {
 //         } else {
 //            // The row needs to just be updated.
 //            $Model->SetProperty($ID,
-//               array($Column => $Row[$Column], 'Attributes' => serialize($Row['Attributes'])),
+//               array($Column => $Row[$Column], 'Attributes' => dbencode($Row['Attributes'])),
 //               ''
 //            );
 //         }
@@ -1001,7 +1001,7 @@ class ReactionModel {
                 $ReactionTypes = Gdn::SQL()->Get('ReactionType', 'Sort, Name')->ResultArray();
                 foreach ($ReactionTypes as $Type) {
                     $Row = $Type;
-                    $Attributes = @unserialize($Row['Attributes']);
+                    $Attributes = dbdecode($Row['Attributes']);
                     //unset($Row['Attributes']); // No! Wipes field when it's re-saved.
                     if (is_array($Attributes)) {
                         foreach ($Attributes as $Name => $Value) {
@@ -1138,7 +1138,7 @@ class ReactionModel {
         $AttrColumn = $RecordType == 'Activity' ? 'Data' : 'Attributes';
 
         $Row = $this->SQL->GetWhere($RecordType, array($RecordType.'ID' => $RecordID))->FirstRow(DATASET_TYPE_ARRAY);
-        $Attributes = @unserialize($Row[$AttrColumn]);
+        $Attributes = dbdecode($Row[$AttrColumn]);
         if (!is_array($Attributes))
             $Attributes = array();
 
@@ -1150,7 +1150,7 @@ class ReactionModel {
         if (empty($Attributes))
             $Attributes = NULL;
         else
-            $Attributes = serialize($Attributes);
+            $Attributes = dbencode($Attributes);
         $Set[$AttrColumn] = $Attributes;
 
         // Calculate the record's score too.

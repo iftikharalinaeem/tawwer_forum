@@ -8,7 +8,7 @@
 $PluginInfo['Whispers'] = array(
    'Name' => 'Whispers',
    'Description' => "Users may 'whisper' private comments to each other in the middle of normal discussions. Caution: this can be a confusing feature for some people.",
-   'Version' => '1.1.1',
+   'Version' => '1.1.2',
    'RequiredApplications' => array('Vanilla' => '2.0.18a3', 'Conversations' => '2.0.18a3'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
@@ -286,7 +286,7 @@ class WhispersPlugin extends Gdn_Plugin {
             $Discussion['Attributes']['WhisperConversationID'] = TRUE;
             $Discussion['Attributes']['WhisperUserIDs'] = $CheckedIDs;
 
-            $Sender->DiscussionModel->SetProperty($Discussion['DiscussionID'], 'Attributes', serialize($Discussion['Attributes']));
+            $Sender->DiscussionModel->SetProperty($Discussion['DiscussionID'], 'Attributes', dbencode($Discussion['Attributes']));
 
             if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
                Redirect($Discussion['Url'].'#Form_Comment', 302);
@@ -320,7 +320,7 @@ class WhispersPlugin extends Gdn_Plugin {
          $Discussion['Attributes']['WhisperUserIDs']
          );
 
-      $Sender->DiscussionModel->SetProperty($DiscussionID, 'Attributes', serialize($Discussion['Attributes']));
+      $Sender->DiscussionModel->SetProperty($DiscussionID, 'Attributes', dbencode($Discussion['Attributes']));
       Redirect($Discussion['Url'].'#Form_Comment', 302);
    }
 
@@ -487,7 +487,7 @@ class WhispersPlugin extends Gdn_Plugin {
          } else {
             if ($WhisperConversationID === TRUE) {
                $Discussion->Attributes['WhisperConversationID'] = $ID;
-               $DiscussionModel->SetProperty($DiscussionID, 'Attributes', serialize($Discussion->Attributes));
+               $DiscussionModel->SetProperty($DiscussionID, 'Attributes', dbencode($Discussion->Attributes));
             }
 
             $LastCommentID = GetValue('LastCommentID', $Discussion);

@@ -3,7 +3,7 @@
 $PluginInfo['bulkusersimporter'] = array(
    'Name' => 'Bulk User Import',
    'Description' => 'Bulk user import with standardized CSV files. Send invites or directly insert new members.',
-   'Version' => '1.2.2',
+   'Version' => '1.2.3',
    'Author' => 'Dane MacMillan',
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
@@ -681,7 +681,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                   $form_post_values = array(
                      'Name' => $username,
                      'Email' => $user['Email'],
-                     'RoleIDs' => serialize($role_ids),
+                     'RoleIDs' => dbencode($role_ids),
                      // For some reason this is only way for null to be set.
                      // If trying to assign variable to null, it ends up with
                      // first unix datetime possible (1970).

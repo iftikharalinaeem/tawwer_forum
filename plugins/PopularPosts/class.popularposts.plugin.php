@@ -7,7 +7,7 @@
 $PluginInfo['PopularPosts'] = array(
     'Name' => 'Popular posts',
     'Description' => 'Shows popular posts (most viewed) for the selected timeframe.',
-    'Version' => '1.0',
+    'Version' => '1.0.1',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'HasLocale' => false,
     'License' => 'GNU GPL2',

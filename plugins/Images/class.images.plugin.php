@@ -7,7 +7,7 @@
 $PluginInfo['Images'] = array(
    'Name' => 'Images',
    'Description' => "Upload images as discussions, comments, and activities.",
-   'Version' => '1.0.2a',
+   'Version' => '1.0.3a',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',

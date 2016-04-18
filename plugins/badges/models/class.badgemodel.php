@@ -49,7 +49,7 @@ class BadgeModel extends BadgesAppModel {
      */
     protected function _calculate(&$Badge) {
         if (isset($Badge['Attributes']) && !empty($Badge['Attributes'])) {
-            $Badge['Attributes'] = @unserialize($Badge['Attributes']);
+            $Badge['Attributes'] = dbdecode($Badge['Attributes']);
         } else {
             $Badge['Attributes'] = array();
         }
@@ -223,7 +223,7 @@ class BadgeModel extends BadgesAppModel {
             }
         }
         if (isset($data['Attributes']) && is_array($data['Attributes'])) {
-            $data['Attributes'] = serialize($data['Attributes']);
+            $data['Attributes'] = dbencode($data['Attributes']);
         }
         if (!isset($data['BadgeID'])) {
             TouchValue('Threshold', $data, 0);

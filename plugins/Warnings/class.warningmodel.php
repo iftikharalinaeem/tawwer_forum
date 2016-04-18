@@ -224,7 +224,7 @@ class WarningModel extends Gdn_Model {
          }
       }
       
-//      $Data['Attributes'] = serialize($Attributes);
+//      $Data['Attributes'] = dbencode($Attributes);
       $Insert = GetValue('WarningID', $Data) == FALSE;
       $ID = parent::Save($Data);
       
