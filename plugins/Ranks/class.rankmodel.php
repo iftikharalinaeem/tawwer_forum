@@ -365,7 +365,7 @@ class RankModel extends Gdn_Model {
 
    protected function _Calculate(&$Data) {
       if (isset($Data['Attributes']) && !empty($Data['Attributes']))
-         $Attributes = @unserialize($Data['Attributes']);
+         $Attributes = dbdecode($Data['Attributes']);
       else
          $Attributes = array();
 

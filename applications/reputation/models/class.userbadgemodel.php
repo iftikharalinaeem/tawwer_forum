@@ -223,7 +223,7 @@ class UserBadgeModel extends ReputationModel {
       
       $Attributes = GetValue('Attributes', $Result);
       if ($Attributes) {
-         $Attributes = @unserialize($Attributes);
+         $Attributes = dbdecode($Attributes);
       } else {
          $Attributes = array();
       }
@@ -620,7 +620,7 @@ class UserBadgeModel extends ReputationModel {
          $Current = $this->GetID($Fields['UserID'], $Fields['BadgeID']);
          
          if (isset($Fields['Attributes']) && is_array($Fields['Attributes'])) {
-            $Fields['Attributes'] = serialize($Fields['Attributes']);
+            $Fields['Attributes'] = dbencode($Fields['Attributes']);
          }
          
          if ($Current['_New']) {

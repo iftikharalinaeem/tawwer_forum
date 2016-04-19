@@ -8,7 +8,7 @@
 $PluginInfo['DisqusImporter'] = array(
    'Name' => 'Disqus Importer',
    'Description' => 'Imports commments from Disqus into Vanilla.',
-   'Version' => '1.0a',
+   'Version' => '1.0.1a',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => FALSE,
    'Author' => 'Todd Burry',
@@ -34,7 +34,7 @@ class DisqusImporter extends Gdn_Plugin {
       static $Rows = array();
 
       if (isset($Row['Attributes']) && is_array($Row['Attributes']))
-         $Row['Attributes'] = serialize($Row['Attributes']);
+         $Row['Attributes'] = dbencode($Row['Attributes']);
 
 
       if ($Table === NULL) {
@@ -191,7 +191,7 @@ class DisqusImporter extends Gdn_Plugin {
           'ForeignUrl' => (string)$Xml->link,
           'RegenerateBody' => TRUE
           );
-      $Row['Attributes'] = serialize($Attributes);
+      $Row['Attributes'] = dbencode($Attributes);
 
       $this->Insert('zDisqusDiscussion', $Row);
 

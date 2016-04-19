@@ -19,7 +19,7 @@
 $PluginInfo['Reactions'] = array(
     'Name' => 'Reactions',
     'Description' => "Adds reaction options to discussions & comments.",
-    'Version' => '1.4.1',
+    'Version' => '1.4.2',
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'RegisterPermissions' => array(
         'Reactions.Positive.Add' => 'Garden.SignIn.Allow',
@@ -757,7 +757,7 @@ if (!function_exists('writeReactions')):
     function writeReactions($Row) {
         $Attributes = GetValue('Attributes', $Row);
         if (is_string($Attributes)) {
-            $Attributes = @unserialize($Attributes);
+            $Attributes = dbdecode($Attributes);
             SetValue('Attributes', $Row, $Attributes);
         }
 

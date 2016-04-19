@@ -49,7 +49,7 @@ class BadgeModel extends ReputationModel {
     */
    protected function _Calculate(&$Badge) {
       if (isset($Badge['Attributes']) && !empty($Badge['Attributes']))
-         $Badge['Attributes'] = @unserialize($Badge['Attributes']);
+         $Badge['Attributes'] = dbdecode($Badge['Attributes']);
       else
          $Badge['Attributes'] = array();
       
@@ -209,7 +209,7 @@ class BadgeModel extends ReputationModel {
          }
       }
       if (isset($Data['Attributes']) && is_array($Data['Attributes'])) {
-         $Data['Attributes'] = serialize($Data['Attributes']);
+         $Data['Attributes'] = dbencode($Data['Attributes']);
       }
       if (!isset($Data['BadgeID']))
          TouchValue('Threshold', $Data, 0);

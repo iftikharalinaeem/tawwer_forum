@@ -14,7 +14,7 @@
 $PluginInfo['Cleanspeak'] = array(
     'Name' => 'Cleanspeak',
     'Description' => 'Cleanspeak integration for Vanilla.',
-    'Version' => '1.2.0',
+    'Version' => '1.2.1',
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'SettingsUrl' => '/settings/cleanspeak',
     'SettingsPermission' => 'Garden.Settings.Manage',
@@ -803,7 +803,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $log = $args['Log'];
         if ($log['Operation'] === 'Moderate') {
 
-            $record = unserialize($log['Data']);
+            $record = dbdecode($log['Data']);
             $cleanspeakID = valr('Attributes.CleanspeakID', $record);
             if (!$cleanspeakID) {
                 $cleanspeakID = valr('Data.CleanspeakID', $record);
@@ -888,10 +888,10 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $commentModel = new CommentModel();
         $comment = $commentModel->GetID($args['CommentID'], DATASET_TYPE_ARRAY);
         if (val('Attributes', $comment)) {
-            $attributes = unserialize($comment['Attributes']);
+            $attributes = dbdecode($comment['Attributes']);
         }
         $attributes['CleanspeakID'] = $cleanspeakID;
-        $commentModel->SetField($args['CommentID'], 'Attributes', serialize($attributes));
+        $commentModel->SetField($args['CommentID'], 'Attributes', dbencode($attributes));
 
     }
 
@@ -917,10 +917,10 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $discussionModel = new DiscussionModel();
         $discussion = $discussionModel->GetID($args['DiscussionID']);
         if (val('Attributes', $discussion)) {
-            $attributes = unserialize($discussion['Attributes']);
+            $attributes = dbdecode($discussion['Attributes']);
         }
         $attributes['CleanspeakID'] = $cleanspeakID;
-        $discussionModel->SetField($args['DiscussionID'], 'Attributes', serialize($attributes));
+        $discussionModel->SetField($args['DiscussionID'], 'Attributes', dbencode($attributes));
 
     }
 
@@ -944,10 +944,10 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $activityModel = new ActivityModel();
         $activity = $activityModel->GetID($args['Activity']['ActivityID']);
         if (val('Data', $activity)) {
-            $data = unserialize($activity['Activity']['Data']);
+            $data = dbdecode($activity['Activity']['Data']);
         }
         $data['CleanspeakID'] = $cleanspeakID;
-        $activityModel->SetField($args['Activity']['ActivityID'], 'Data', serialize($data));
+        $activityModel->SetField($args['Activity']['ActivityID'], 'Data', dbencode($data));
     }
 
     /**

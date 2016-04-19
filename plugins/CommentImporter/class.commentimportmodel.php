@@ -51,7 +51,7 @@ class CommentImportModel {
       static $Rows = array();
       
       if (isset($Row['Attributes']) && is_array($Row['Attributes']))
-         $Row['Attributes'] = serialize($Row['Attributes']);
+         $Row['Attributes'] = dbencode($Row['Attributes']);
       
       
       if ($Table === NULL) {

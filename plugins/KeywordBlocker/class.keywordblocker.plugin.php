@@ -7,7 +7,7 @@
 $PluginInfo['KeywordBlocker'] = array(
     'Name' => 'Keyword Blocker',
     'Description' => 'Block posts containing certain words and send them for review.',
-    'Version' => '1.0',
+    'Version' => '1.0.1',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'HasLocale' => false,
     'License' => 'GNU GPL2',
@@ -153,7 +153,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
                 }
 
                 if (is_array($value)) {
-                    $value = serialize($value);
+                    $value = dbencode($value);
                 }
                 $set[$key] = $value;
             } else {

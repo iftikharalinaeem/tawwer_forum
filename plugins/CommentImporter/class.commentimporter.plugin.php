@@ -7,7 +7,7 @@
 $PluginInfo['CommentImporter'] = array(
     'Name' => 'Comment Importer',
     'Description' => 'Import Comments from Wordpress or Disqus into Vanilla.',
-    'Version' => '1.0a',
+    'Version' => '1.0.1a',
     'MobileFriendly' => FALSE,
     'RequiredApplications' => array('Vanilla' => '2.1a'),
     'RequiredTheme' => FALSE,

@@ -172,7 +172,7 @@ class Gdn_Session extends Gdn_Pluggable {
                $this->_Permissions =& $this->User->Permissions;
             } else {
                // This is a guest session.
-               $Attributes = @unserialize($Session['Attributes']);
+               $Attributes = dbdecode($Session['Attributes']);
                if (!is_array($Attributes))
                   $Attributes = array();
                $this->_Attributes =& $Attributes;
