@@ -27,8 +27,15 @@
       $TimezoneOffset = $LocaleTimezone->getOffset($RefDate);
       $TimezoneOffset /= 3600;
 
-      if (Gdn::Session()->IsValid())
-         $HourOffset = Gdn::Session()->User->HourOffset ? Gdn::Session()->User->HourOffset : FALSE;
+      if (Gdn::Session()->IsValid()) {
+         $userTimeZone = Gdn::session()->getAttribute('TimeZone');
+         if ($userTimeZone && $offsetTimeZone = new DateTimeZone($userTimeZone)) {
+            $userDateStarts = new DateTime($this->Data('Event.DateStarts'), $offsetTimeZone);
+            $HourOffset = $userDateStarts->getOffset()/3600;
+         } else {
+            $HourOffset = Gdn::Session()->User->HourOffset ? Gdn::Session()->User->HourOffset : FALSE;
+         }
+      }
 
       $FromDate = new DateTime($this->Data('Event.DateStarts'), $UTC);
       if ($HourOffset) {
@@ -76,7 +83,6 @@
          $TimezoneLabel = $Matches[1];
       }
       $TimezoneAbbr = $Transition['abbr'];
-
       ?>
 
       <li class="When">
