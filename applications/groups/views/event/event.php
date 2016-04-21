@@ -29,7 +29,13 @@
 
       if (Gdn::Session()->IsValid()) {
          $userTimeZone = Gdn::session()->getAttribute('TimeZone');
-         if ($userTimeZone && $offsetTimeZone = new DateTimeZone($userTimeZone)) {
+         try {
+            $offsetTimeZone = $userTimeZone ? new DateTimeZone($userTimeZone) : false;
+         } catch (Exception $e) {
+            $offsetTimeZone = false;
+         }
+
+         if ($offsetTimeZone) {
             $userDateStarts = new DateTime($this->Data('Event.DateStarts'), $offsetTimeZone);
             $HourOffset = $userDateStarts->getOffset()/3600;
          } else {
