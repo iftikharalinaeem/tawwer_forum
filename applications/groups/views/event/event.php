@@ -80,8 +80,7 @@
       ?>
 
       <li class="When">
-         <span class="Label"><?php echo T('When'); ?></span>
-         <span class="FieldInfo"><?php echo FormatString($WhenFormat, array(
+         <span class="Label"><?php echo T('When'); ?></span><span class="FieldInfo"><?php echo FormatString($WhenFormat, array(
             'ShowDates' => $ShowDates,
             'AllDay'    => ''
 //                 ($AllDay) ? Wrap(T('all day'), 'span', array('class' => 'Tag Tag-AllDay')) : ''

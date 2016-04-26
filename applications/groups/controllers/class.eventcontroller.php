@@ -73,7 +73,6 @@ class EventController extends Gdn_Controller {
 
       $this->AddJsFile('jquery.timepicker.min.js');
       $this->AddJsFile('jquery.dropdown.js');
-      $this->AddJsFile('jstz.min.js');
       $this->AddCssFile('jquery.dropdown.css');
 
       $Event = NULL;
@@ -102,9 +101,6 @@ class EventController extends Gdn_Controller {
 
       if ($Event)
          $this->AddBreadcrumb($Event['Name'], EventUrl($Event));
-
-      // Timezones
-      $this->SetData('Timezones', EventModel::Timezones());
 
       return array($Event, $Group);
    }
@@ -172,27 +168,6 @@ class EventController extends Gdn_Controller {
 
       $this->Title(T('Edit Event'));
       $this->AddBreadcrumb($this->Title());
-
-      // Pre-fill form
-      if ($Event) {
-         $UTC = new DateTimeZone('UTC');
-         $Timezone = new DateTimeZone($Event['Timezone']);
-
-         // Get TZ transition
-         $Transition = array_shift($T = $Timezone->getTransitions(time(), time()));
-         $Event['TimezoneAbbr'] = $Transition['abbr'];
-
-         $EventStarts = new DateTime($Event['DateStarts'], $UTC);
-         $EventStarts->setTimezone($Timezone);
-         $Event['DateStarts'] = $EventStarts->format('m/d/Y');
-         $Event['TimeStarts'] = $EventStarts->format('h:ia');
-
-         $EventEnds = new DateTime($Event['DateEnds'], $UTC);
-         $EventEnds->setTimezone($Timezone);
-         $Event['DateEnds'] = $EventEnds->format('m/d/Y');
-         $Event['TimeEnds'] = $EventEnds->format('h:ia');
-      }
-
       $this->Form->SetData($Event);
 
       $EventModel = new EventModel();
@@ -415,29 +390,34 @@ class EventController extends Gdn_Controller {
    }
 
    /**
-    * Lookup abbreviation for timezone
-    *
-    * @param type $TimezoneID
+    * @param string $sx
     */
-   public function GetTimezoneAbbr($TimezoneID) {
-      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-      $this->DeliveryType(DELIVERY_TYPE_DATA);
+   public function dateTimePicker($sx, $emptyTime = '') {
+      $form = $this->Form;
+      $result = '<span class="js-datetime-picker">';
 
-      $this->SetData('TimezoneID', $TimezoneID);
-      try {
-         $Timezone = new DateTimeZone($TimezoneID);
-         $NowTime = new DateTime('now', $Timezone);
+      $result .= $form->textBox("RawDate$sx", [
+          'class' => 'InputBox DatePicker',
+          'title' => t("Date. Expects 'mm/dd/yyyy'.")
+      ]);
 
-         $Transition = array_shift($T = $Timezone->getTransitions(time(), time()));
-         $this->SetData('Abbr', $Transition['abbr']);
-         $Offset = $Timezone->getOffset($NowTime);
-         $OffsetHours = ($Offset / 3600);
-         $this->SetData('Offset', 'GMT '.(($OffsetHours >= 0) ? "+{$OffsetHours}" : $OffsetHours));
-      } catch (Exception $Ex) {
-         $this->SetData('Abbr', 'unknown');
+      $result .= ' '.$form->textBox("Time$sx", [
+          'class' => 'InputBox TimePicker',
+          'placeholder' => t('Add a time?'),
+          'data-empty' => $emptyTime
+      ]);
+
+      if (!$form->isPostBack()) {
+         // Format the date as ISO 8601 so that javascript can recognize it better.
+         $date = $form->getValue("Date$sx");
+         if ($date) {
+            $timestamp = Gdn_Format::toTimestamp($date);
+            $form->setValue("Date$sx", gmdate('c', $timestamp));
+         }
       }
 
-      $this->Render();
-   }
+      $result .= $form->hidden("Date$sx").'</span>';
 
+      return $result;
+   }
 }
