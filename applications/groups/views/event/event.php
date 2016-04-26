@@ -12,103 +12,16 @@
 
 <div class="P EventInfo" data-eventid="<?php echo $this->Data('Event.EventID'); ?>">
    <ul>
-      <?php
-      $AllDay = (bool)$this->Data('Event.AllDayEvent');
-
-      $DateFormatString = '{Date} at {Time}';
-      $DateFormat = '%A, %B %e, %G';
-      $TimeFormat = T('Date.DefaultTimeFormat', '%l:%M%p');
-      $ShowDates = array();
-      $UTC = new DateTimeZone('UTC');
-      $TimezoneID = $this->Data('Event.Timezone');
-      $LocaleTimezone = new DateTimeZone($TimezoneID);
-      $RefDate = new DateTime($this->Data('Event.DateStarts'), $UTC);
-      $RefDate->setTimezone($LocaleTimezone);
-      $TimezoneOffset = $LocaleTimezone->getOffset($RefDate);
-      $TimezoneOffset /= 3600;
-
-      if (Gdn::Session()->IsValid()) {
-         $userTimeZone = Gdn::session()->getAttribute('TimeZone');
-         try {
-            $offsetTimeZone = $userTimeZone ? new DateTimeZone($userTimeZone) : false;
-         } catch (Exception $e) {
-            $offsetTimeZone = false;
-         }
-
-         if ($offsetTimeZone) {
-            $userDateStarts = new DateTime($this->Data('Event.DateStarts'), $offsetTimeZone);
-            $HourOffset = $userDateStarts->getOffset()/3600;
-         } else {
-            $HourOffset = Gdn::Session()->User->HourOffset ? Gdn::Session()->User->HourOffset : FALSE;
-         }
-      }
-
-      $FromDate = new DateTime($this->Data('Event.DateStarts'), $UTC);
-      if ($HourOffset) {
-         $FromDate->modify("{$HourOffset} hours");
-      }
-      $FromDateSlot = $FromDate->format('Ymd');
-
-      $ToDate = new DateTime($this->Data('Event.DateEnds'), $UTC);
-      if ($HourOffset) {
-         $ToDate->modify("{$HourOffset} hours");
-      }
-      $ToDateSlot = $ToDate->format('Ymd');
-
-      // If we're 'all day' and only on one day
-      if ($AllDay && $FromDateSlot == $ToDateSlot) {
-         $DateFormatString = '{Date}';
-      }
-
-      $ShowDates['From'] = FormatString($DateFormatString, array(
-         'Date'   => strftime($DateFormat, $FromDate->getTimestamp()),
-         'Time'   => strftime($TimeFormat, $FromDate->getTimestamp())
-      ));
-
-      // If we're not 'all day', or if 'all day' spans multiple days
-      if (!$AllDay || $FromDateSlot != $ToDateSlot) {
-         $ShowDates['To'] = FormatString($DateFormatString, array(
-            'Date' => strftime($DateFormat, $ToDate->getTimestamp()),
-            'Time' => strftime($TimeFormat, $ToDate->getTimestamp())
-         ));
-      }
-
-      // Output format
-      $WhenFormat = "{ShowDates.From}{AllDay}";
-      if (sizeof($ShowDates) > 1 && HasEndDate($this->Data['Event'])) {
-         $WhenFormat = "{ShowDates.From} <b>until</b> {ShowDates.To}{AllDay}";
-      }
-
-      $TimezoneLabel = EventModel::Timezones($TimezoneID);
-      $Transition = array_shift($T = $LocaleTimezone->getTransitions(time(), time()));
-      if (!$TimezoneLabel) {
-         $TZLocation = $LocaleTimezone->getLocation();
-         $TimezoneLabel = GetValue('comments', $TZLocation);
-      } else {
-         preg_match('`([\w& -]+) [A-Z]+$`', $TimezoneLabel, $Matches);
-         $TimezoneLabel = $Matches[1];
-      }
-      $TimezoneAbbr = $Transition['abbr'];
-      ?>
-
       <li class="When">
-         <span class="Label"><?php echo T('When'); ?></span><span class="FieldInfo"><?php echo FormatString($WhenFormat, array(
-            'ShowDates' => $ShowDates,
-            'AllDay'    => ''
-//                 ($AllDay) ? Wrap(T('all day'), 'span', array('class' => 'Tag Tag-AllDay')) : ''
-         )); ?>
-           <span class="Tip">(&nbsp;<?php echo Wrap($TimezoneAbbr, 'span', array('class' => 'Timezone', 'title' => $TimezoneLabel)); ?>&nbsp;)</span>
+         <span class="Label"><?php echo T('When'); ?></span><span class="FieldInfo"><?php
+            echo $this->formatEventDates(
+                $this->data('Event.DateStarts'),
+                $this->data('Event.DateEnds')
+            );
+            ?>
          </span>
 
       </li>
-
-      <?php if ($HourOffset != $TimezoneOffset): ?>
-      <li class="WhenInfo">
-         <span class="Label"></span>
-         <span class="Tip"><?php echo T('These times have been converted to your timezone.'); ?></span>
-      </li>
-      <?php endif; ?>
-
       <li class="Where">
          <span class="Label"><?php echo T('Where'); ?></span><span class="FieldInfo"><?php echo htmlspecialchars($this->Data('Event.Location')); ?></span>
       </li>

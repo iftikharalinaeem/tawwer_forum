@@ -420,4 +420,71 @@ class EventController extends Gdn_Controller {
 
       return $result;
    }
+
+   /**
+    * Format the start/end times of an event.
+    *
+    * This method intelligently determines whether or not to add the times to the dates and where to show both the start
+    * and end date or just the start date if its a one day event.
+    *
+    * @param string $start The UTC start time of the event.
+    * @param string $end The UTC end time of the event.
+    * @return string Returns the formatted dates.
+    */
+   public function formatEventDates($start, $end) {
+      $fromParts = $this->formatEventDate($start);
+      $toParts = $this->formatEventDate($end);
+
+      $fromStr = $fromParts[0];
+      $toStr = $toParts[0];
+
+      // Add the times only if we aren't on a date boundry.
+      if ($fromParts[1] && $toParts[1] && !($fromParts[2] === '00:00' && $toParts[2] === '23:59')) {
+         $fmt = t('{Date} at {Time}');
+         $fromStr = formatString($fmt, ['Date' => $fromStr, 'Time' => $fromParts[1]]);
+         $toStr = formatString($fmt, ['Date' => $toStr, 'Time' => $toParts[1]]);
+      }
+
+      if ($fromStr === $toStr || !$toStr) {
+         return wrap($fromStr, 'time', ['datetime' => gmdate('c', $fromParts[3])]);
+      } else {
+         return sprintf(
+             t('%s <b>until</b> %s'),
+             wrap($fromStr, 'time', ['datetime' => gmdate('c', $fromParts[3])]),
+             wrap($toStr, 'time', ['datetime' => gmdate('c', $toStr[3])])
+         );
+      }
+   }
+
+   /**
+    * Format a date using the current timezone.
+    *
+    * This is sort of a stop-gap until the **Gdn_Format::*** methods.
+    *
+    * @param string $dateString
+    * @return string
+    */
+   private function formatEventDate($dateString, $from = true) {
+      if (!$dateString) {
+         return ['', '', '', ''];
+      }
+      if (method_exists(Gdn::session(), 'getTimeZone')) {
+         $tz = Gdn::session()->getTimeZone();
+      } else {
+         $tz = new DateTimeZone('UTC');
+      }
+
+      $timestamp = Gdn_Format::toTimestamp($dateString);
+      $dt = new DateTime('@'.$timestamp);
+      $dt->setTimezone($tz);
+
+      $offTimestamp = $timestamp + $dt->getOffset();
+
+      $dateFormat = '%A, %B %e, %G';
+      $dateStr = strftime($dateFormat, $offTimestamp);
+      $timeFormat = t('Date.DefaultTimeFormat', '%l:%M%p');
+      $timeStr = strftime($timeFormat, $offTimestamp);
+
+      return [$dateStr, $timeStr, $dt->format('H:i'), $timestamp];
+   }
 }
