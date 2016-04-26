@@ -73,7 +73,7 @@ class EventController extends Gdn_Controller {
 
       $this->AddJsFile('jquery.timepicker.min.js');
       $this->AddJsFile('jquery.dropdown.js');
-      $this->AddCssFile('jquery.dropdown.css');
+      $this->AddCssFile('jquery.dropdown.css', 'Dashboard');
 
       $Event = NULL;
       $Group = NULL;
