@@ -449,12 +449,12 @@ class EventController extends Gdn_Controller {
       }
 
       if ($fromStr === $toStr || !$toStr) {
-         return wrap($fromStr, 'time', ['datetime' => gmdate('c', $fromParts[3])]);
+         return wrap($fromStr, 'time', ['datetime' => $fromParts[3]]);
       } else {
          return sprintf(
              t('%s <b>until</b> %s'),
-             wrap($fromStr, 'time', ['datetime' => gmdate('c', $fromParts[3])]),
-             wrap($toStr, 'time', ['datetime' => gmdate('c', $toStr[3])])
+             wrap($fromStr, 'time', ['datetime' => $fromParts[3]]),
+             wrap($toStr, 'time', ['datetime' => $toParts[3]])
          );
       }
    }
@@ -488,6 +488,6 @@ class EventController extends Gdn_Controller {
       $timeFormat = t('Date.DefaultTimeFormat', '%l:%M%p');
       $timeStr = strftime($timeFormat, $offTimestamp);
 
-      return [$dateStr, $timeStr, $dt->format('H:i'), $timestamp];
+      return [$dateStr, $timeStr, $dt->format('H:i'), $dt->format('c')];
    }
 }
