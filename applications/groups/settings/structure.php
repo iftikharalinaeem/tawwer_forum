@@ -126,7 +126,7 @@ $St->Table('Event')
    ->Column('GroupID', 'int', TRUE, 'key') // eventually make events stand-alone.
    ->Set($Explicit, $Drop);
 
-$St->dropColumn('Timezone');
+$St->Table('Event')->dropColumn('Timezone');
 
 $St->Table('UserEvent')
    ->Column('EventID', 'int', FALSE, 'primary')
