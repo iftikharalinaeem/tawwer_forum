@@ -98,10 +98,10 @@ class GroupController extends Gdn_Controller {
       // Get Events
       $MaxEvents = C('Groups.Events.MaxList', 5);
       $EventModel = new EventModel();
-      $Events = $EventModel->GetWhere(array(
+      $Events = $EventModel->GetWhere([
          'GroupID'      => $GroupID,
-         'DateEnds >=' => gmdate('Y-m-d H:i:s')
-         ),
+         'DateStarts >=' => gmdate('Y-m-d H:i:s')
+         ],
          'DateStarts', 'asc', $MaxEvents)->ResultArray();
       $this->SetData('Events', $Events);
 

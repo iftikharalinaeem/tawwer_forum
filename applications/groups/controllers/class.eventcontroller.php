@@ -73,7 +73,6 @@ class EventController extends Gdn_Controller {
 
       $this->AddJsFile('jquery.timepicker.min.js');
       $this->AddJsFile('jquery.dropdown.js');
-      $this->AddJsFile('jstz.min.js');
       $this->AddCssFile('jquery.dropdown.css');
 
       $Event = NULL;
@@ -102,9 +101,6 @@ class EventController extends Gdn_Controller {
 
       if ($Event)
          $this->AddBreadcrumb($Event['Name'], EventUrl($Event));
-
-      // Timezones
-      $this->SetData('Timezones', EventModel::Timezones());
 
       return array($Event, $Group);
    }
@@ -172,27 +168,6 @@ class EventController extends Gdn_Controller {
 
       $this->Title(T('Edit Event'));
       $this->AddBreadcrumb($this->Title());
-
-      // Pre-fill form
-      if ($Event) {
-         $UTC = new DateTimeZone('UTC');
-         $Timezone = new DateTimeZone($Event['Timezone']);
-
-         // Get TZ transition
-         $Transition = array_shift($T = $Timezone->getTransitions(time(), time()));
-         $Event['TimezoneAbbr'] = $Transition['abbr'];
-
-         $EventStarts = new DateTime($Event['DateStarts'], $UTC);
-         $EventStarts->setTimezone($Timezone);
-         $Event['DateStarts'] = $EventStarts->format('m/d/Y');
-         $Event['TimeStarts'] = $EventStarts->format('h:ia');
-
-         $EventEnds = new DateTime($Event['DateEnds'], $UTC);
-         $EventEnds->setTimezone($Timezone);
-         $Event['DateEnds'] = $EventEnds->format('m/d/Y');
-         $Event['TimeEnds'] = $EventEnds->format('h:ia');
-      }
-
       $this->Form->SetData($Event);
 
       $EventModel = new EventModel();
@@ -415,29 +390,111 @@ class EventController extends Gdn_Controller {
    }
 
    /**
-    * Lookup abbreviation for timezone
+    * Return the HTML for the controls required by a js-datetime-picker.
     *
-    * @param type $TimezoneID
+    * @param string $sx The suffix of the database field (ex. Starts, Ends).
+    * @return string Returns the control's HTML.
     */
-   public function GetTimezoneAbbr($TimezoneID) {
-      $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-      $this->DeliveryType(DELIVERY_TYPE_DATA);
+   public function dateTimePicker($sx, $emptyTime = '') {
+      $form = $this->Form;
+      $result = '<span class="js-datetime-picker">';
 
-      $this->SetData('TimezoneID', $TimezoneID);
-      try {
-         $Timezone = new DateTimeZone($TimezoneID);
-         $NowTime = new DateTime('now', $Timezone);
+      $result .= $form->textBox("RawDate$sx", [
+          'class' => 'InputBox DatePicker',
+          'title' => t("Date. Expects 'mm/dd/yyyy'.")
+      ]);
 
-         $Transition = array_shift($T = $Timezone->getTransitions(time(), time()));
-         $this->SetData('Abbr', $Transition['abbr']);
-         $Offset = $Timezone->getOffset($NowTime);
-         $OffsetHours = ($Offset / 3600);
-         $this->SetData('Offset', 'GMT '.(($OffsetHours >= 0) ? "+{$OffsetHours}" : $OffsetHours));
-      } catch (Exception $Ex) {
-         $this->SetData('Abbr', 'unknown');
+      $result .= ' '.$form->textBox("Time$sx", [
+          'class' => 'InputBox TimePicker',
+          'placeholder' => t('Add a time?'),
+          'data-empty' => $emptyTime
+      ]);
+
+      if (!$form->isPostBack()) {
+         // Format the date as ISO 8601 so that javascript can recognize it better.
+         $date = $form->getValue("Date$sx");
+         if ($date) {
+            $timestamp = Gdn_Format::toTimestamp($date);
+            $form->setValue("Date$sx", gmdate('c', $timestamp));
+         }
       }
 
-      $this->Render();
+      $result .= $form->hidden("Date$sx").'</span>';
+
+      return $result;
    }
 
+   /**
+    * Format the start/end times of an event.
+    *
+    * This method intelligently determines whether or not to add the times to the dates and where to show both the start
+    * and end date or just the start date if its a one day event.
+    *
+    * @param string $start The UTC start time of the event.
+    * @param string $end The UTC end time of the event.
+    * @return string Returns the formatted dates.
+    */
+   public function formatEventDates($start, $end) {
+      $fromParts = $this->formatEventDate($start);
+      $toParts = $this->formatEventDate($end);
+
+      $fromStr = $fromParts[0];
+      $toStr = $toParts[0];
+
+      // Add the times only if we aren't on a date boundary.
+      if ($fromParts[1] && !($fromParts[2] === '00:00' && ($toParts[2] === '23:59' || $toParts[2] === ''))) {
+         $fmt = t('{Date} at {Time}');
+         $fromStr = formatString($fmt, ['Date' => $fromStr, 'Time' => $fromParts[1]]);
+
+         if ($toParts[2]) {
+            $toStr = formatString($fmt, ['Date' => $toStr, 'Time' => $toParts[1]]);
+         }
+      }
+
+      if ($fromStr === $toStr || !$toStr) {
+         return wrap($fromStr, 'time', ['datetime' => $fromParts[3]]);
+      } else {
+         return sprintf(
+             t('%s <b>until</b> %s'),
+             wrap($fromStr, 'time', ['datetime' => $fromParts[3]]),
+             wrap($toStr, 'time', ['datetime' => $toParts[3]])
+         );
+      }
+   }
+
+   /**
+    * Format a date using the current timezone.
+    *
+    * This is sort of a stop-gap until the **Gdn_Format::*** methods.
+    *
+    * @param string $dateString
+    * @return array
+    */
+   private function formatEventDate($dateString, $from = true) {
+      if (!$dateString) {
+         return ['', '', '', ''];
+      }
+      if (method_exists(Gdn::session(), 'getTimeZone')) {
+         $tz = Gdn::session()->getTimeZone();
+      } else {
+         $tz = new DateTimeZone('UTC');
+      }
+
+      $timestamp = Gdn_Format::toTimestamp($dateString);
+      if (!$timestamp) {
+         return [false, false, false, false];
+      }
+
+      $dt = new DateTime('@'.$timestamp);
+      $dt->setTimezone($tz);
+
+      $offTimestamp = $timestamp + $dt->getOffset();
+
+      $dateFormat = '%A, %B %e, %G';
+      $dateStr = strftime($dateFormat, $offTimestamp);
+      $timeFormat = t('Date.DefaultTimeFormat', '%l:%M%p');
+      $timeStr = strftime($timeFormat, $offTimestamp);
+
+      return [$dateStr, $timeStr, $dt->format('H:i'), $dt->format('c')];
+   }
 }

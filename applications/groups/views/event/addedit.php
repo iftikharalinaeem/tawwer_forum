@@ -30,38 +30,15 @@
          <div class="EventTime Times <?php echo $Both; ?>">
 
             <div class="P From">
-               <?php echo $this->Form->Label('When', 'DateStarts', array('class' => 'When')); ?>
-               <?php echo $this->Form->Label('From', 'DateStarts'); ?>
-               <span>
-                  <?php echo $this->Form->TextBox('DateStarts', array(
-                     'class'        => 'InputBox DatePicker',
-                     'title'        => T("Date. Expects 'mm/dd/yyyy'.")
-                  )); ?>
-                  <?php echo $this->Form->TextBox('TimeStarts', array(
-                     'class'        => 'InputBox TimePicker',
-                     'placeholder'  => T('Add a time?')
-                  )); ?>
-               </span>
-               <span class="Timebased Timezone">
-                  <?php echo $this->Form->Hidden('Timezone', array('class' => 'EventTimezone')); ?>
-                  <?php echo $this->Form->Hidden('TimezoneAbbr', array('class' => 'EventTimezoneAbbr')); ?>
-                  <a class="EventTimezoneDisplay" data-dropdown="#dropdown-timezone"><?php echo $this->Data('Event.TimezoneAbbr'); ?></a>
-               </span>
+               <?php echo $this->Form->Label('When', 'RawDateStarts', array('class' => 'When')); ?>
+               <?php echo $this->Form->Label('From', 'RawDateStarts'); ?>
+               <?php echo $this->dateTimePicker('Starts', '12:00am'); ?>
                <span class="Timebased EndTime"><?php echo Anchor(T('End time?'), '#'); ?></span>
             </div>
 
             <div class="P To">
-               <?php echo $this->Form->Label('To', 'DateEnds'); ?>
-               <span>
-                  <?php echo $this->Form->TextBox('DateEnds', array(
-                     'class'        => 'InputBox DatePicker',
-                     'title'        => T("Date. Expects 'mm/dd/yyyy'.")
-                  )); ?>
-                  <?php echo $this->Form->TextBox('TimeEnds', array(
-                     'class'        => 'InputBox TimePicker',
-                     'placeholder'  => T('Add a time?')
-                  )); ?>
-               </span>
+               <?php echo $this->Form->Label('To', 'RawDateEnds'); ?>
+               <?php echo $this->dateTimePicker('Ends', '11:59pm'); ?>
                <span class="Timebased NoEndTime"><?php echo Anchor('&times;', '#'); ?></span>
             </div>
          </div>
@@ -70,17 +47,6 @@
             <?php echo $this->Form->Button('Save', array('Type' => 'submit', 'class' => 'Button Primary')); ?>
             <?php echo $this->Form->Button('Cancel', array('Type' => 'button', 'class' => 'Button CancelButton')); ?>
          </div>
-
-         <?php
-         echo '<div id="dropdown-timezone" class="EventTimezonePicker dropdown-menu has-tip has-scroll"><ul>';
-         foreach ($this->Data('Timezones') as $TimezoneID => $TimezoneLabel) {
-            echo Wrap(Wrap($TimezoneLabel, 'a', array(
-               'data-timezoneid' => $TimezoneID
-            )), 'li');
-         }
-         echo '</ul></div>';
-         ?>
-
       </div>
       <?php echo $this->Form->Close(); ?>
    </div>

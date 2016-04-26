@@ -110,14 +110,16 @@ if (!$CountDiscussionsExists) {
    $GroupModel->Counts('CountDiscussions');
 }
 
-$St->Table('Event')
-   ->PrimaryKey('EventID')
+$St->Table('Event');
+
+$timeZoneExists = $St->columnExists('Timezone');
+
+$St->PrimaryKey('EventID')
    ->Column('Name', 'varchar(255)')
    ->Column('Body', 'text')
    ->Column('Format', 'varchar(10)', TRUE)
    ->Column('DateStarts', 'datetime')
    ->Column('DateEnds', 'datetime', TRUE)
-   ->Column('Timezone', 'varchar(64)')
    ->Column('AllDayEvent', 'tinyint', '0')
    ->Column('Location', 'varchar(255)', TRUE)
    ->Column('DateInserted', 'datetime')
@@ -126,6 +128,10 @@ $St->Table('Event')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('GroupID', 'int', TRUE, 'key') // eventually make events stand-alone.
    ->Set($Explicit, $Drop);
+
+if ($timeZoneExists) {
+   $St->Table('Event')->dropColumn('Timezone');
+}
 
 $St->Table('UserEvent')
    ->Column('EventID', 'int', FALSE, 'primary')
