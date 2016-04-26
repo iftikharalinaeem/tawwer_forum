@@ -390,7 +390,10 @@ class EventController extends Gdn_Controller {
    }
 
    /**
-    * @param string $sx
+    * Return the HTML for the controls required by a js-datetime-picker.
+    *
+    * @param string $sx The suffix of the database field (ex. Starts, Ends).
+    * @return string Returns the control's HTML.
     */
    public function dateTimePicker($sx, $emptyTime = '') {
       $form = $this->Form;
