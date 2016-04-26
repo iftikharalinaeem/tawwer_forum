@@ -11,7 +11,7 @@
     ?>
     <div class="KeywordsWrap InputAndButton">
         <?php
-        echo $Form->textBox('search', array('class' => 'InputBox BigInput', 'placeholder' => t('Search'), 'autocomplete' => 'off')).
+        echo $Form->textBox('search', array('class' => 'InputBox BigInput', 'placeholder' => t('Search'), 'autocomplete' => 'off', 'aria-label' => t('Enter your search term.'))).
             ' <a href="#" class="Handle" title="'.t('Advanced Search').'"><span class="Arrow"></span></a> '.
             '<span class="bwrap"><button type="submit" class="Button" title="'.t('Search').'">'.sprite('SpSearch').'</button></span>';
         ?>
@@ -83,7 +83,7 @@
         </div>
         <div class="P Buttons">
             <?php
-            echo '<button type="submit" class="Button" title="'.t('Search').'">'.t('Search').'</button>';
+            echo '<button type="submit" class="Button" title="'.t('Search').'" aria-label="'.t('Search').'">'.t('Search').'</button>';
             ?>
         </div>
     </div>
