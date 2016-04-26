@@ -468,7 +468,7 @@ class EventController extends Gdn_Controller {
     * This is sort of a stop-gap until the **Gdn_Format::*** methods.
     *
     * @param string $dateString
-    * @return string
+    * @return array
     */
    private function formatEventDate($dateString, $from = true) {
       if (!$dateString) {
@@ -481,6 +481,10 @@ class EventController extends Gdn_Controller {
       }
 
       $timestamp = Gdn_Format::toTimestamp($dateString);
+      if (!$timestamp) {
+         return [false, false, false, false];
+      }
+
       $dt = new DateTime('@'.$timestamp);
       $dt->setTimezone($tz);
 
