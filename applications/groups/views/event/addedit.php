@@ -47,17 +47,6 @@
             <?php echo $this->Form->Button('Save', array('Type' => 'submit', 'class' => 'Button Primary')); ?>
             <?php echo $this->Form->Button('Cancel', array('Type' => 'button', 'class' => 'Button CancelButton')); ?>
          </div>
-
-         <?php
-         echo '<div id="dropdown-timezone" class="EventTimezonePicker dropdown-menu has-tip has-scroll"><ul>';
-         foreach ($this->Data('Timezones') as $TimezoneID => $TimezoneLabel) {
-            echo Wrap(Wrap($TimezoneLabel, 'a', array(
-               'data-timezoneid' => $TimezoneID
-            )), 'li');
-         }
-         echo '</ul></div>';
-         ?>
-
       </div>
       <?php echo $this->Form->Close(); ?>
    </div>
