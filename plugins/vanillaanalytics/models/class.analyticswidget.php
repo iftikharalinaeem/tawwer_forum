@@ -231,8 +231,6 @@ class AnalyticsWidget implements JsonSerializable {
 
     /**
      * Resolves the config's level setting to a number ranking.
-     *
-     * @todo Reset corporate rank when preview ends.
      */
     protected function getLevel() {
         $level = trim(strtolower(c('VanillaAnalytics.Level', 'basic')));
@@ -240,8 +238,7 @@ class AnalyticsWidget implements JsonSerializable {
             return self::LARGE_WIDGET_RANK;
         }
         if ($level == 'corporate') {
-            return self::LARGE_WIDGET_RANK;
-            //return self::MEDIUM_WIDGET_RANK;
+            return self::MEDIUM_WIDGET_RANK;
         }
         return self::SMALL_WIDGET_RANK;
     }
