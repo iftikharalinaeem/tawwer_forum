@@ -43,9 +43,7 @@ function WriteEventList($Events, $Group = NULL, $EmptyMessage = '', $Button = TR
  * @param array $Event
  */
 function WriteEventCard($Event) {
-    $UTC = new DateTimeZone('UTC');
-    $Timezone = new DateTimeZone($Event['Timezone']);
-    $DateStarts = new DateTime($Event['DateStarts'], $UTC);
+    $DateStarts = new DateTime($Event['DateStarts'], Gdn::session()->getTimeZone());
     if (Gdn::Session()->IsValid() && $HourOffset = Gdn::Session()->User->HourOffset)
         $DateStarts->modify("{$HourOffset} hours");
 

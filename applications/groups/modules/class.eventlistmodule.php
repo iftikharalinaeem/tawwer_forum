@@ -101,7 +101,7 @@ class EventListModule extends Gdn_Module {
             $eventModel = new EventModel();
             $status = $eventModel->IsInvited(Gdn::session()->UserID, val('EventID', $event));
             $statuses = array('Yes' => t('Attending'), 'No' => t('Not Attending'), 'Maybe' => t('Maybe'));
-            if (!array_key_exists($status, $statuses)) {
+            if (!$status || !array_key_exists($status, $statuses)) {
                 $realStatus = t('RSVP');
                 $status = 'rsvp';
             } else {
@@ -211,16 +211,15 @@ class EventListModule extends Gdn_Module {
      * @return array A data array representing an event item in an event list.
      */
     protected function getEventInfo($event, $layout, $withJoinButtons = true, $withOptions = true) {
-
-        $utc = new DateTimeZone('UTC');
-        $dateStarts = new DateTime($event['DateStarts'], $utc);
+        $timeZone = Gdn::session()->getTimeZone();
+        $dateStarts = new DateTime($event['DateStarts'], $timeZone);
         if (Gdn::session()->isValid() && $hourOffset = Gdn::session()->User->HourOffset) {
             $dateStarts->modify("{$hourOffset} hours");
         }
 
         $item['id'] = val('EventID', $event);
         $item['dateTile'] = true;
-        $item['monthTile'] = strftime('%b', $dateStarts->getTimestamp());
+        $item['monthTile'] = strftime('%b', $dateStarts->getTimestamp() + $dateStarts->getOffset());
         $item['dayTile'] = $dateStarts->format('j');
         $item['text'] = sliceParagraph(Gdn_Format::plainText(val('Body', $event), val('Format', $event)), 100);
         $item['textCssClass'] = 'EventDescription';
