@@ -441,11 +441,14 @@ class EventController extends Gdn_Controller {
       $fromStr = $fromParts[0];
       $toStr = $toParts[0];
 
-      // Add the times only if we aren't on a date boundry.
-      if ($fromParts[1] && $toParts[1] && !($fromParts[2] === '00:00' && $toParts[2] === '23:59')) {
+      // Add the times only if we aren't on a date boundary.
+      if ($fromParts[1] && !($fromParts[2] === '00:00' && ($toParts[2] === '23:59' || $toParts[2] === ''))) {
          $fmt = t('{Date} at {Time}');
          $fromStr = formatString($fmt, ['Date' => $fromStr, 'Time' => $fromParts[1]]);
-         $toStr = formatString($fmt, ['Date' => $toStr, 'Time' => $toParts[1]]);
+
+         if ($toParts[2]) {
+            $toStr = formatString($fmt, ['Date' => $toStr, 'Time' => $toParts[1]]);
+         }
       }
 
       if ($fromStr === $toStr || !$toStr) {
