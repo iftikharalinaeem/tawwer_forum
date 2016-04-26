@@ -117,7 +117,6 @@ $St->Table('Event')
    ->Column('Format', 'varchar(10)', TRUE)
    ->Column('DateStarts', 'datetime')
    ->Column('DateEnds', 'datetime', TRUE)
-   ->Column('Timezone', 'varchar(64)')
    ->Column('AllDayEvent', 'tinyint', '0')
    ->Column('Location', 'varchar(255)', TRUE)
    ->Column('DateInserted', 'datetime')
@@ -126,6 +125,8 @@ $St->Table('Event')
    ->Column('UpdateUserID', 'int', TRUE)
    ->Column('GroupID', 'int', TRUE, 'key') // eventually make events stand-alone.
    ->Set($Explicit, $Drop);
+
+$St->dropColumn('Timezone');
 
 $St->Table('UserEvent')
    ->Column('EventID', 'int', FALSE, 'primary')

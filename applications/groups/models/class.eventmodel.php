@@ -358,6 +358,9 @@ class EventModel extends Gdn_Model {
             $Event['DateEnds'] = Gdn_Format::toDateTime($ts);
          }
       }
+      
+      // Add a timezone in case the database wasn't updated.
+      touchValue('Timezone', $Event, Gdn::session()->getTimeZone()->getName());
 
       $this->Validation->ApplyRule('DateStarts', 'ValidateDate');
       $this->Validation->ApplyRule('DateEnds', 'ValidateDate');
