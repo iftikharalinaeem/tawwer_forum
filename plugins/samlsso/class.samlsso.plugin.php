@@ -65,7 +65,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $args.
      */
     public function base_beforeSignInButton_handler($sender, $args) {
-        if(!$this->isConfigured() || $this->isDefault()) {
+        if (!$this->isConfigured() || $this->isDefault()) {
             return;
         }
         echo ' '.$this->signInButton().' ';
@@ -80,7 +80,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @return mixed|bool Return null if not configured
      */
     public function entryController_signIn_handler($sender, $args) {
-        if(!$this->isConfigured()) {
+        if (!$this->isConfigured()) {
             return;
         }
         if (isset($sender->Data['Methods'])) {
