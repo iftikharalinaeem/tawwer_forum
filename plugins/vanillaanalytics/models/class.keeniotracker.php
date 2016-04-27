@@ -74,7 +74,7 @@ class KeenIOTracker implements TrackerInterface {
         ],
         'visits-by-role-type' => [
             'title' => 'Unique Visits By Role Type',
-            'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
             'chart' => ['chartType' => 'area']
         ],
@@ -108,13 +108,13 @@ class KeenIOTracker implements TrackerInterface {
         ],
         'posts-by-category' => [
             'title' => 'Posts By Category',
-            'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'chart' => ['chartType' => 'area'],
             'support' => 'cat01'
         ],
         'posts-by-role-type' => [
             'title' => 'Posts By Role Type',
-            'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'chart' => ['chartType' => 'area'],
             'support' => 'cat01'
         ],
@@ -133,14 +133,14 @@ class KeenIOTracker implements TrackerInterface {
         ],
         'contributors-by-category' => [
             'title' => 'Contributors By Category',
-            'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
             'chart' => ['chartType' => 'area'],
             'support' => 'cat01'
         ],
         'contributors-by-role-type' => [
             'title' => 'Contributors By Role Type',
-            'rank' => AnalyticsWidget::LARGE_WIDGET_RANK,
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
             'chart' => ['chartType' => 'area'],
             'support' => 'cat01'
