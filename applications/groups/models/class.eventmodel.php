@@ -345,84 +345,22 @@ class EventModel extends Gdn_Model {
     * @param array $Event
     */
    public function Save($Event) {
-
-      // Fix malformed or partial dates
-      if (GetValue('Fix', $Event, TRUE)) {
-
-         $Event['AllDayEvent'] = 0;
-
-         // Get some Timezone objects
-         $Timezone = new DateTimeZone($Event['Timezone']);
-         $UTC = new DateTimeZone('UTC');
-
-         // Check if DateStarts triggers 'AllDay' mode
-         if (!empty($Event['DateStarts'])) {
-
-            if (empty($Event['TimeStarts']))
-               $Event['AllDayEvent'] = 1;
-
-         } else { unset($Event['DateStarts']); }
-
-         // Check if DateEnds triggers 'AllDay' mode
-         if (!empty($Event['DateEnds'])) {
-
-            if (empty($Event['TimeEnds']))
-               $Event['AllDayEvent'] = 1;
-
-         } else { unset($Event['DateEnds']); }
-
-         // If we're 'AllDay', munge the times to midnight
-         if ($Event['AllDayEvent']) {
-            $Event['TimeStarts'] = '12:00am';
-            $Event['TimeEnds'] = '11:59pm';
+      // Fix the dates.
+      if (!empty($Event['DateStarts'])) {
+         $ts = strtotime($Event['DateStarts']);
+         if ($ts !== false) {
+            $Event['DateStarts'] = Gdn_Format::toDateTime($ts);
          }
-
-         $InputDateFormat = '!m/d/Y h:ia';
-         $OneDay = new DateInterval('P1D');
-
-         // Load and format start date
-         try {
-            $EventDateStartsStr = "{$Event['DateStarts']} {$Event['TimeStarts']}";
-            $EventDateStarts = DateTime::createFromFormat($InputDateFormat, $EventDateStartsStr, $Timezone);
-            if (!$EventDateStarts) throw new Exception();
-            $EventDateStarts->setTimezone($UTC);
-            $Event['DateStarts'] = $EventDateStarts->format('Y-m-d H:i:00');
-         } catch (Exception $Ex) {
-            $this->Validation->AddValidationResult('DateStarts', 'ValidateDate');
-         }
-
-         // Load and format end date
-         try {
-            // Force a sane end date
-            if (!isset($Event['DateEnds']) || is_null($Event['DateEnds'])) {
-               $DateEnds = DateTime::createFromFormat($InputDateFormat, $EventDateStartsStr, $Timezone);
-
-               $Event['DateEnds'] = $DateEnds->format('m/d/Y');
-               if (!$Event['TimeEnds'])
-                  $Event['TimeEnds'] = $DateEnds->format('h:ia');
-               unset($DateEnds);
-            }
-
-            $EventDateEndsStr = "{$Event['DateEnds']} {$Event['TimeEnds']}";
-            $EventDateEnds = DateTime::createFromFormat($InputDateFormat, $EventDateEndsStr, $Timezone);
-            if (!$EventDateEnds) throw new Exception();
-            $EventDateEnds->setTimezone($UTC);
-            $Event['DateEnds'] = $EventDateEnds->format('Y-m-d H:i:00');
-         } catch (Exception $Ex) {
-            $this->Validation->AddValidationResult('DateEnds', 'ValidateDate');
-         }
-
-         // Fix clean up
-         unset($OneDay);
-         unset($EventDateStarts);
-         unset($EventDateEnds);
-         unset($Timezone);
-         unset($UTC);
       }
-
-      // Default clean up
-      unset($Event['TimeStarts']);
-      unset($Event['TimeEnds']);
+      if (!empty($Event['DateEnds'])) {
+         $ts = strtotime($Event['DateEnds']);
+         if ($ts !== false) {
+            $Event['DateEnds'] = Gdn_Format::toDateTime($ts);
+         }
+      }
+      
+      // Add a timezone in case the database wasn't updated.
+      touchValue('Timezone', $Event, Gdn::session()->getTimeZone()->getName());
 
       $this->Validation->ApplyRule('DateStarts', 'ValidateDate');
       $this->Validation->ApplyRule('DateEnds', 'ValidateDate');

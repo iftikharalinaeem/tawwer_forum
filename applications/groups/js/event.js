@@ -4,16 +4,73 @@
  *
  */
 
+(function(window, $) {
+   // Synchronize the hidden date whenever there is an update.
+   if (!Date.prototype.toISOString) {
+      (function() {
+
+         function pad(number) {
+            if (number < 10) {
+               return '0' + number;
+            }
+            return number;
+         }
+
+         Date.prototype.toISOString = function() {
+            return this.getUTCFullYear() +
+                '-' + pad(this.getUTCMonth() + 1) +
+                '-' + pad(this.getUTCDate()) +
+                'T' + pad(this.getUTCHours()) +
+                ':' + pad(this.getUTCMinutes()) +
+                ':' + pad(this.getUTCSeconds()) +
+                '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
+                'Z';
+         };
+
+      }());
+   }
+
+   var syncDate = function () {
+      var $picker = $(this).closest('.js-datetime-picker');
+      var dateStr = $('.DatePicker', $picker).val();
+      var timeStr = $('.TimePicker', $picker).val();
+
+      // Adjust the time string to add a space between the time and am/pm.
+      if (!timeStr) {
+         timeStr = $('.TimePicker', $picker).data('empty') || '';
+      }
+      timeStr = timeStr.replace(/(\d)([ap]m)/i, '$1 $2', timeStr);
+
+      var dateTimeStr = '';
+      if (dateStr && !isNaN(Date.parse(dateStr+' '+timeStr))) {
+         var dt = new Date(dateStr+' '+timeStr);
+         dateTimeStr = dt.toISOString();
+      }
+      console.log(dateTimeStr);
+      $('input[type="hidden"]', $picker).val(dateTimeStr);
+   };
+
+   $(document).on('blur', '.js-datetime-picker input[type="text"]', syncDate);
+   $(document).on('submit', 'form', function() {
+      $('.js-datetime-picker', this).each(function () {
+         syncDate.apply(this);
+      });
+   });
+})(window, jQuery);
+
 jQuery(document).ready(function($) {
 
-   if ($('.Event.add').length)
+   if ($('.Event.add').length) {
       EventAddEdit($);
+   }
 
-   if ($('.Event.edit').length)
+   if ($('.Event.edit').length) {
       EventAddEdit($);
+   }
 
-   if ($('.Event.event').length)
+   if ($('.Event.event').length) {
       EventShow($);
+   }
 
    function UpdateTimezoneDisplay(TimezoneID, TimezoneLabel) {
       var TimezoneAbbr = TimezoneLabel.match(/[A-Z]+$/).pop();
@@ -35,9 +92,36 @@ jQuery(document).ready(function($) {
          'forceRoundTime': true
       });
 
-      var DateNow = new Date();
-      var DateNowStr = (DateNow.getMonth()+1)+'/'+DateNow.getDate()+'/'+DateNow.getFullYear();
-      $('.DatePicker').val(DateNowStr);
+      // Set the initial date picker values from the full hidden date.
+      $('.js-datetime-picker').each(function () {
+         var str = $('input[type="hidden"]', this).val();
+         if (str && !isNaN(Date.parse(str))) {
+            var dt = new Date(str);
+
+            // Fill in the date.
+            $('.DatePicker', this).val((dt.getMonth() + 1)+'/'+dt.getDate()+'/'+dt.getFullYear());
+
+            // Fill in the time.
+            var timeStr, mins;
+            mins = dt.getMinutes().toString();
+            if (mins.length === 1) {
+               mins = '0'+mins;
+            }
+
+            if (dt.getHours() === 0) {
+               timeStr = '12:'+mins+'am';
+            } else if (dt.getHours() < 12) {
+               timeStr = dt.getHours().toString()+':'+mins+'am';
+            } else {
+               timeStr = (dt.getHours() - 12).toString()+':'+mins+'pm';
+            }
+
+            if (timeStr === $('.TimePicker', this).data('empty')) {
+               timeStr = '';
+            }
+            $('.TimePicker', this).val(timeStr);
+         }
+      });
 
       $('.Event .CancelButton').on('click', function(e){
          var Event = $(e.target).closest('.Event');
@@ -46,41 +130,6 @@ jQuery(document).ready(function($) {
             window.location.replace(gdn.url('/group/'+GroupID));
          else
             window.location.replace(gdn.url('/groups'));
-      });
-
-      var DefaultTimezone = jstz.determine();
-      DefaultTimezone = DefaultTimezone.name();
-
-      var Timezone = $('.Event .EventTimezone');
-      var TimezoneAbbr = $('.Event .EventTimezoneAbbr');
-
-      // Lookup timezone automatically
-      var TimezoneRequestData = {
-         'TimezoneID': DefaultTimezone,
-         'Auto': true
-      }
-
-      // If TZ was supplied in form, use that
-      if (Timezone.val()) {
-         TimezoneRequestData.TimezoneID = Timezone.val();
-         TimezoneRequestData.Auto = false;
-      }
-
-      $.ajax({
-         url: gdn.url('/event/gettimezoneabbr'),
-         data: TimezoneRequestData,
-         dataType: 'json',
-         method: 'GET',
-         success: function(data, str, xhr) {
-            if (data.Abbr != 'unknown') {
-               //if (TimezoneRequestData.Auto)
-               //   var TimezoneLabel = "("+data.Offset+") Automatically detected "+data.Abbr;
-               //else
-               var TimezoneLabel = "("+data.Offset+") "+data.Abbr;
-
-               UpdateTimezoneDisplay(data.TimezoneID, TimezoneLabel);
-            }
-         }
       });
 
       // Intercept form submission and strip end date/time if not visible
