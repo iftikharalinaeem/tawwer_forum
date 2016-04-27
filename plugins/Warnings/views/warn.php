@@ -35,11 +35,11 @@ jQuery(document).ready(function($) {
    $('input[name="Level"]:checked').each(function() {
       $(this).closest('.WarnBox').addClass('Selected');
    });
-   
+
 });
 </script>
 <h1><?php echo $this->Data('Title'); ?></h1>
-<div class="Wrap FormWrappper WarningsForm">
+<div class="Wrap FormWrapper WarningsForm">
 <?php
 echo $this->Form->Open();
 echo $this->Form->Errors();
@@ -52,19 +52,19 @@ $CurrentLevel = $this->Data('CurrentLevel');
       <div class="WarningBar"></div>
    <?php
    $Special = WarningModel::Special();
-   
+
    for ($i = 0; $i <= $this->Data('MaxLevel'); $i++) {
       $CssClass = "Warn-Level$i";
-      
+
       if ($i == $CurrentLevel) {
          $CssClass .= ' Selected';
       }
-      
+
       echo '<div class="WarnBox '.$CssClass.'">';
-      
-      
+
+
       $Points = $i - $CurrentLevel;
-      
+
       echo '<div class="WarnLevel">';
       if ($Points >= 0) {
          echo $this->Form->Radio('Level', '@'.$i, array('value' => $i));
@@ -72,12 +72,12 @@ $CurrentLevel = $this->Data('CurrentLevel');
          echo Wrap($i, 'div', array('class' => 'Disabled', 'title' => T('If you want to decrease the warning level then remove a warning.')));
       }
       echo '</div>';
-      
+
       if (isset($Special[$i])) {
          $Sp = $Special[$i];
          echo Wrap($Sp['Label'], 'div', array('class' => 'Special', 'title' => $Sp['Title']));
       }
-      
+
       echo '</div>';
    }
    ?>
@@ -121,7 +121,7 @@ echo $this->Form->Label("Tell the user why you're warning them", 'Body');
 echo $this->Form->TextBox('Body', array('Multiline' => TRUE, 'Wrap' => TRUE));
 ?>
 </div>
-   
+
 <div class="P">
 <?php
 echo $this->Form->Label("Private Note for Moderators", 'ModeratorNote');
@@ -130,7 +130,7 @@ echo $this->Form->TextBox('ModeratorNote', array('Wrap' => TRUE));
 </div>
 
 <?php
-echo '<div class="Buttons Buttons-Confirm">', 
+echo '<div class="Buttons Buttons-Confirm">',
    $this->Form->Button('OK'), ' ',
    $this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
    '</div>';
