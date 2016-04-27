@@ -167,7 +167,7 @@ class ClearOff extends Worker {
         foreach ($job as $filePath) {
             $pathsToDelete[] = self::$container.'/'.$filePath;
         }
-        
+
         $maxTries = 5;
         $tries = 0;
         $success = false;

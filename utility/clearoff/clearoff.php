@@ -3,7 +3,7 @@
 /**
  * This file is part of Infrastructure.
  *
- * SendUp is threaded. It transfers the contents of entire folders to CloudFiles
+ * ClearOff is threaded. It transfers the contents of entire folders to CloudFiles
  * in a multi-threaded and efficient way.
  *
  * Environment Variables:
