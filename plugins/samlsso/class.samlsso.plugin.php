@@ -68,7 +68,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         if(!$this->isConfigured() || $this->isDefault()) {
             return;
         }
-        echo ' '.$this->signInButton('icon').' ';
+        echo ' '.$this->signInButton().' ';
     }
 
     /**
@@ -525,25 +525,27 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @return string Resulting HTML element (button).
      */
     protected function signInButton($type = 'button') {
-        $target = Gdn::request()->post(
-            'Target',
-            Gdn::request()->get(
-                'Target',
-                url('', '/')
-            )
-        );
         $url = '/entry/' . self::ProviderKey;
+        $provider = $this->provider();
 
-        return socialSignInButton(
-            'SAMLSSO',
-            $url,
-            $type,
-            [
-                'class' => 'default',
-                'rel'   => 'nofollow',
-                'title' => 'Sign in with SAML'
-            ]
-        );
+        if ($type === 'icon') {
+            return socialSignInButton(
+                'SAMLSSO',
+                $url,
+                $type,
+                [
+                    'class' => 'default',
+                    'rel' => 'nofollow',
+                    'title' => 'Sign in with SAML'
+                ]
+            );
+        } else {
+            return anchor(
+                sprintf(t('Sign In with %s'), $provider['Name']),
+                $url,
+                'Button Primary SignInLink'
+            );
+        }
     }
 
     /**
