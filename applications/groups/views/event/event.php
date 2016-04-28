@@ -1,6 +1,7 @@
 <?php
    $header = new GroupHeaderModule($this->data('Group'));
    echo $header;
+   /* @var EventController $this */
 ?>
 <div class="Event-Header PageTitle">
    <!-- Edit/Delete Buttons -->
@@ -27,7 +28,7 @@
       </li>
 
       <?php if ($this->Data('Group')): ?>
-         <li class="EventGroup"><span class="Label"><?php echo T('Group'); ?></span><span class="FieldInfo"><?php echo Anchor(GetValue('Name', $this->Data('Group')), GroupUrl($this->Data('Group'))); ?></li>
+         <li class="EventGroup"><span class="Label"><?php echo T('Group'); ?></span><span class="FieldInfo"><?php echo Anchor($this->Data('Group.Name'), GroupUrl($this->Data('Group'))); ?></li>
       <?php endif; ?>
 
       <li class="Organizer"><span class="Label"><?php echo T('Organizer'); ?></span><span class="FieldInfo"><?php echo UserAnchor($this->Data('Event.Organizer')); ?></span></li>

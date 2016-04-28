@@ -19,7 +19,7 @@ class OnlineCountModule extends Gdn_Module {
    public $selectorID = NULL;
    public $selectorField = NULL;
 
-   public function __construct(&$sender = '') {
+   public function __construct($sender = null) {
       parent::__construct($sender);
 
       $this->selector = 'auto';

@@ -240,7 +240,13 @@ class GroupModel extends Gdn_Model {
       return $Count;
    }
 
-   public function GetID($ID, $DatasetType = DATASET_TYPE_ARRAY) {
+   /**
+    * @param int|string $ID The ID or slug of the group.
+    * @param bool|string $DatasetType The type of return.
+    * @param array $options Base class compatibility.
+    * @return array|mixed|object
+    */
+   public function GetID($ID, $DatasetType = DATASET_TYPE_ARRAY, $options = []) {
       static $Cache = array();
 
       $ID = self::ParseID($ID);

@@ -45,7 +45,7 @@ class OnlineModule extends Gdn_Module {
 
    public $showGuests = TRUE;
 
-   public function __construct(&$sender = '') {
+   public function __construct($sender = null) {
       parent::__construct($sender);
       $this->onlineUsers = NULL;
       $this->showInvisible = Gdn::session()->checkPermission('Plugins.Online.ViewHidden');

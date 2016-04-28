@@ -40,9 +40,10 @@ class EventModel extends Gdn_Model {
     *
     * @param integer $EventID
     * @param integer $DatasetType
+    * @param array $options Base class compatibility.
     * @return type
     */
-   public function GetID($EventID, $DatasetType = DATASET_TYPE_ARRAY) {
+   public function GetID($EventID, $DatasetType = DATASET_TYPE_ARRAY, $options = []) {
       $EventID = self::ParseID($EventID);
 
       $Row = parent::GetID($EventID, $DatasetType);
@@ -343,8 +344,9 @@ class EventModel extends Gdn_Model {
     * Set 'Fix' = FALSE to bypass date munging
     *
     * @param array $Event
+    * @param array $settings Base class compatibility.
     */
-   public function Save($Event) {
+   public function Save($Event, $settings = []) {
       // Fix the dates.
       if (!empty($Event['DateStarts'])) {
          $ts = strtotime($Event['DateStarts']);
