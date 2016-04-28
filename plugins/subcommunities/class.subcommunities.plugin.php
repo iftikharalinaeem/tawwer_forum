@@ -436,7 +436,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         // Allow moving a post to another subcommunity!
         $path = Gdn::request()->path();
-        if ($path === 'moderation/confirmdiscussionmoves') {
+        if (stringBeginsWith($path, 'moderation/')) {
             $options = $args['Options'];
             $defaultCategories = CategoryModel::getByPermission(
                 'Discussions.View',
