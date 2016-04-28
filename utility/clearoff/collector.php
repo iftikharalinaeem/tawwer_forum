@@ -1,7 +1,7 @@
 <?php
 ob_start();
 // Include Rackspace API
-require_once(__DIR__.'/../../vendor/autoload.php');
+require_once(__DIR__.'/vendor/autoload.php');
 
 use OpenCloud\Rackspace;
 
