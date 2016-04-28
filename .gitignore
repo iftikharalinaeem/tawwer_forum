@@ -17,3 +17,4 @@ login/functions.jsconnect.php
 login/sso.php
 *.log
 utils/mustacher/vendor/*
+vendor/
