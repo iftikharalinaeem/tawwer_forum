@@ -44,7 +44,7 @@ define('APPLICATION_ROOT', getcwd());
 define('LOCKFILE', APPLICATION_ROOT . '/' . strtolower(APPLICATION) . '.pid');
 
 // Include Rackspace API
-require_once(__DIR__.'/../../vendor/autoload.php');
+require_once(__DIR__.'/vendor/autoload.php');
 
 // First, load basic functions and classes
 require_once(__DIR__.'/library/functions.php');
