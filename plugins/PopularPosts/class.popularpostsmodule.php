@@ -107,9 +107,9 @@ class PopularPostsModule extends Gdn_Module {
                 $discussionsByCategories[$discussion->CategoryID][] = $discussion;
             }
 
-            Gdn::cache()->store($cacheKey, dbencode($discussionsByCategories), [Gdn_Cache::FEATURE_EXPIRY => 10 * 60]);
+            Gdn::cache()->store($cacheKey, $discussionsByCategories, [Gdn_Cache::FEATURE_EXPIRY => 10 * 60]);
         } else {
-            $discussionsByCategories = dbdecode($data);
+            $discussionsByCategories = $data;
             if ($discussionsByCategories === false) {
                 trace('Popular Posts caching retrieval failed');
                 return;

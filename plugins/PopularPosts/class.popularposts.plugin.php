@@ -6,7 +6,7 @@
 
 $PluginInfo['PopularPosts'] = array(
     'Name' => 'Popular posts',
-    'Description' => 'Shows popular posts (most viewed) for the selected timeframe.',
+    'Description' => 'Shows popular posts (most viewed) for the selected timeframe. This plugin is meant for small sites only.',
     'Version' => '1.0.1',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'HasLocale' => false,
@@ -18,7 +18,7 @@ $PluginInfo['PopularPosts'] = array(
 );
 
 /**
- * Class PopularPostsPlugin
+ * THIS PLUGIN DOES NOT CURRENTLY SCALE. THIS PLUGIN SHOULD NOT BE DEPLOYED TO NEW SITES. DO NOT SUGGEST THIS PLUGIN FOR CUSTOMER SITES.
  */
 class PopularPostsPlugin extends Gdn_Plugin {
 
