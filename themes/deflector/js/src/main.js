@@ -33,6 +33,6 @@
 
 })(jQuery, window, document);
 
-$(document).ready(function() {
+$(window).load(function() {
   $('.navbar').scrollToFixed();
 });
