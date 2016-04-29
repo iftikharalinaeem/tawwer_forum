@@ -1,14 +1,18 @@
 <?php
 /**
- * @copyright 2009-2014 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license Proprietary
  */
+
+use Psr\Log\LoggerInterface;
+
 /**
  * Database Logger
  *
  * Class DbLogger
  */
-class DbLogger extends BaseLogger {
+class DbLogger implements LoggerInterface {
+    use \Psr\Log\LoggerTrait;
 
     /**
      * @var string The amount of time to delete logs after.

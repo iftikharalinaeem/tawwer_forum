@@ -1,12 +1,20 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2014 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-class Syslogger extends BaseLogger {
-    protected $format;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
+
+/**
+ * A logger that writes using {@link syslog()}.
+ */
+class Syslogger implements LoggerInterface {
+    use LoggerTrait;
+
+    private $format;
 
     public $extra = [];
 

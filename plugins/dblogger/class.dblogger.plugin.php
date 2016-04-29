@@ -7,7 +7,7 @@
 $PluginInfo['dblogger'] = array(
     'Name' => 'Db Logger',
     'Description' => 'Enable database logging.',
-    'Version' => '1.1.0',
+    'Version' => '1.2.0',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
@@ -15,6 +15,16 @@ $PluginInfo['dblogger'] = array(
 );
 
 class DbLoggerPlugin extends Gdn_Plugin {
+    private $level;
+
+    /**
+     * Initialize a new instance of the {@link DbLoggerPlugin} class.
+     */
+    public function __construct() {
+        parent::__construct();
+
+        $this->setLevel(c('Plugins.dblogger.Level', Logger::INFO));
+    }
 
     public $severityOptions = array(
         'info' => true,
@@ -71,8 +81,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
             // Do nothing on an invalid date. Just don't set it.
         }
 
-        Logger::setLogger($logger);
-
+        Logger::addLogger($logger, $this->getLevel());
     }
 
     /**
@@ -188,6 +197,26 @@ class DbLoggerPlugin extends Gdn_Plugin {
     public static function getArrayWithKeysAsValues($array) {
         $keys = array_keys($array);
         return array_combine($keys, $keys);
+    }
+
+    /**
+     * Get the level.
+     *
+     * @return mixed Returns the level.
+     */
+    public function getLevel() {
+        return $this->level;
+    }
+
+    /**
+     * Set the level.
+     *
+     * @param mixed $level
+     * @return DbLoggerPlugin Returns `$this` for fluent calls.
+     */
+    public function setLevel($level) {
+        $this->level = $level;
+        return $this;
     }
 
 }
