@@ -12,7 +12,6 @@ $themingNotices = '<br/>'.t('This plugin does not block any request to assets (I
             } else {
                 echo wrap(wrap(t('This plugin will not block any request needed to serve the login page.').$themingNotices, 'strong'), 'span', ['class' => 'WarningMessage']);
             }
-
             ?><hr></li>
         <li><?php
             echo $this->Form->label('Enabled', 'Whitelist.Active');
