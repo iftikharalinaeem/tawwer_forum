@@ -62,6 +62,11 @@ class WhitelistPlugin extends Gdn_Plugin {
         } else {
             $sender->Form->setFormValue('Whitelist.Active', (bool)$sender->Form->getFormValue('Whitelist.Active'));
 
+            // Make sure only valid characters are part of the whitelist
+            $IPList = $sender->Form->getFormValue('Whitelist.IPList');
+            $IPList = $this->cleanIPWhiteList($IPList);
+            $sender->Form->setFormValue('Whitelist.IPList', $IPList);
+
             if ($sender->Form->save() !== false) {
                 $sender->informMessage(t('Your changes have been saved.'));
             }
@@ -164,10 +169,23 @@ class WhitelistPlugin extends Gdn_Plugin {
         $whitelistedIPs = [];
 
         if (($rawList = c('Whitelist.IPList', false)) !== false) {
-            $whitelistedIPs = $this->parseIPsListDefinition($rawList, "\n");
+            $rawList = $this->cleanIPWhiteList($rawList);
+            if ($rawList) {
+                $whitelistedIPs = $this->parseIPsListDefinition($rawList, "\n");
+            }
         }
 
         return $whitelistedIPs;
+    }
+
+    /**
+     * Clean the IPWhitelist from invalid characters.
+     *
+     * @param $ipWhiteList
+     * @return string Clean IPWhitelist
+     */
+    protected function cleanIPWhiteList($ipWhitelist) {
+        return preg_replace('/[^\d\n\-*.]/', null, $ipWhitelist);
     }
 
     /**
@@ -184,7 +202,6 @@ class WhitelistPlugin extends Gdn_Plugin {
 
         return $masterIPList;
     }
-
 
     /**
      * Parse a list, potentially malformed, of IPs
