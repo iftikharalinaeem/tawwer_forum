@@ -490,7 +490,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionsController_beforeNewDiscussionButton_handler($sender, $args) {
-        if (val('NewDiscussionModule', $args)) {
+        if (val('NewDiscussionModule', $args) && !$args['NewDiscussionModule']->CategoryID) {
             $args['NewDiscussionModule']->CategoryID = val('CategoryID', SubcommunityModel::getCurrent());
         }
     }
