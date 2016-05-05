@@ -482,4 +482,16 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $subName = val('Name', SubcommunityModel::getCurrent());
         $sender->addLink('etc.subcommuntyselect', array('text' => $subName.'<span class="pull-right icon icon-arrow-right"></span>', 'url' => 'categories/subcommunityselect', false, 'sort' => 99, 'icon' => icon('globe')));
     }
+
+    /**
+     * Adds the subcommunity CategoryID to the new discussion button so it can check its permissions.
+     *
+     * @param DiscussionsController $sender
+     * @param array $args
+     */
+    public function discussionsController_beforeNewDiscussionButton_handler($sender, $args) {
+        if (val('NewDiscussionModule', $args) && !$args['NewDiscussionModule']->CategoryID) {
+            $args['NewDiscussionModule']->CategoryID = val('CategoryID', SubcommunityModel::getCurrent());
+        }
+    }
 }
