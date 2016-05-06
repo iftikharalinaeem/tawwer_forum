@@ -10,7 +10,7 @@
 $PluginInfo['vanillaanalytics'] = array(
     'Name' => 'Vanilla Analytics',
     'Description' => 'Track important trends on your forum and chart them in a customizable dashboard.',
-    'Version' => '1.0.1',
+    'Version' => '1.0.2',
     'RequiredApplications' => array('Vanilla' => '2.2.103'),
     'Author' => 'Ryan Perry',
     'AuthorEmail' => 'ryan.p@vanillaforums.com',
