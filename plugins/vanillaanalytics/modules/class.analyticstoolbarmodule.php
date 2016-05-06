@@ -8,6 +8,26 @@
 
 class AnalyticsToolbarModule extends Gdn_Module {
 
+    private $intervals = [
+        'hourly' => [
+            'Text' => 'Hourly',
+            'data-seconds' => 3600
+        ],
+        'daily' => [
+            'Text' => 'Daily',
+            'data-seconds' => 86400
+        ],
+        'weekly' => [
+            'Text' => 'Weekly',
+            'data-seconds' => 604800
+        ],
+        'monthly' => [
+            'Text' => 'Monthly',
+            'data-seconds' => 2620800
+
+        ]
+    ];
+
     private function getData() {
         // Get the data for the 1st level of categories.
         $categories = CategoryModel::$Categories;
@@ -19,13 +39,13 @@ class AnalyticsToolbarModule extends Gdn_Module {
         }
         $this->setData('cat01', $categoryData);
 
-        // Get the data for the intervals.
-        $this->setData('Intervals', [
-            'hourly' => t('Hourly'),
-            'daily' => t('Daily'),
-            'weekly' => t('Weekly'),
-            'monthly' => t('Monthly')
-        ]);
+        // Translate the interval titles
+        foreach($this->intervals as &$interval) {
+            $interval['Text'] = t($interval['Text']);
+        }
+
+        // Set the data for the intervals.
+        $this->setData('Intervals', $this->intervals);
     }
 
     public function toString() {
