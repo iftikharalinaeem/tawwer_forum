@@ -1,14 +1,18 @@
 <?php
 /**
- * @copyright 2009-2014 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license Proprietary
  */
+
+use Psr\Log\LoggerInterface;
+
 /**
  * Database Logger
  *
  * Class DbLogger
  */
-class DbLogger extends BaseLogger {
+class DbLogger implements LoggerInterface {
+    use \Psr\Log\LoggerTrait;
 
     /**
      * @var string The amount of time to delete logs after.
@@ -16,9 +20,21 @@ class DbLogger extends BaseLogger {
     protected $pruneAfter;
 
     /**
+     * @var Gdn_SQLDriver $sql
+     */
+    private $sql;
+
+    /**
      * Initialize a new instance of the {@link DbLogger} class.
      */
-    public function __construct() {
+    public function __construct(Gdn_SQLDriver $sql = null) {
+        if ($sql === null) {
+            $sql = Gdn::sql();
+            $sql = clone $sql;
+            $sql->reset();
+        }
+        $this->sql = $sql;
+
         $this->setPruneAfter('-90 days');
     }
 
@@ -55,13 +71,13 @@ class DbLogger extends BaseLogger {
         }
         $insert['id'] = uniqid('', false).substr(dechex(mt_rand()), 0, 3);
 
-        $r = Gdn::sql()->insert('EventLog', $insert);
+        $r = $this->sql->insert('EventLog', $insert);
 
         // Delete a couple of old logs.
         if ($timestamp = $this->getPruneAfterTimestamp()) {
-            $px = Gdn::sql()->Database->DatabasePrefix;
+            $px = $this->sql->Database->DatabasePrefix;
             $sql = "delete from {$px}EventLog where timestamp <= :timestamp limit 10";
-            $rd = Gdn::database()->query($sql, [':timestamp' => $timestamp]);
+            $rd = $this->sql->Database->query($sql, [':timestamp' => $timestamp]);
         }
 
         return $r;

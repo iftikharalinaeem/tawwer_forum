@@ -3,7 +3,7 @@
 $PluginInfo['syslogger'] = array(
     'Name'        => "Syslogger",
     'Description' => "Logs events from the Logger object to the syslog.",
-    'Version'     => '1.0.0-beta',
+    'Version'     => '1.1.0',
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
@@ -20,15 +20,14 @@ $PluginInfo['syslogger'] = array(
  * @since     1.0.0
  */
 class SysloggerPlugin extends Gdn_Plugin {
+    private $level;
+
     /**
-     * This will run when you "Enable" the plugin
-     *
-     * @since  1.0.0
-     * @access public
-     * @return bool
+     * Initialize a new instance of the {@link SysloggerPlugin} class.
      */
-    public function setup() {
-        return true;
+    public function __construct() {
+        parent::__construct();
+        $this->setLevel(c('Plugins.Syslogger.Level', Logger::INFO));
     }
 
     /**
@@ -51,7 +50,27 @@ class SysloggerPlugin extends Gdn_Plugin {
         $logger = new Syslogger(C('Plugins.Syslogger.MessageFormat', 'json'), $ident);
         $logger->extra = $extra;
 
-        Logger::setLogger($logger);
+        Logger::addLogger($logger, $this->getLevel());
 
+    }
+
+    /**
+     * Get the level.
+     *
+     * @return mixed Returns the level.
+     */
+    public function getLevel() {
+        return $this->level;
+    }
+
+    /**
+     * Set the level.
+     *
+     * @param mixed $level
+     * @return SysloggerPlugin Returns `$this` for fluent calls.
+     */
+    public function setLevel($level) {
+        $this->level = $level;
+        return $this;
     }
 }
