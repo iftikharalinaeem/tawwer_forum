@@ -14,7 +14,7 @@
 $PluginInfo['github'] = array(
     'Name' => 'GitHub',
     'Description' => "Allow staff users to create issues from discussions and comments.",
-    'Version' => '1.0',
+    'Version' => '1.1.0',
     'RequiredApplications' => array('Vanilla' => '2.1.18'),
     'SettingsUrl' => '/plugin/github',
     'SettingsPermission' => 'Garden.Settings.Manage',
@@ -31,6 +31,10 @@ $PluginInfo['github'] = array(
  */
 class GithubPlugin extends Gdn_Plugin {
 
+    /**
+     * @var Garden\Http\HttpClient Instance of HTTP client for API operations.
+     */
+    private $api;
 
     /**
      * @var string
@@ -55,17 +59,22 @@ class GithubPlugin extends Gdn_Plugin {
 
     /**
      * Set AccessToken to be used.
+     *
+     * @param string|bool $newToken A new access token.
+     * @return string|null The value of the access token.
      */
-    public function setAccessToken() {
-
-        $this->accessToken = GetValueR('Attributes.' . self::PROVIDER_KEY . '.AccessToken', Gdn::Session()->User);
-        if (!$this->accessToken) {
-            $this->accessToken = C('Plugins.Github.GlobalLogin.AccessToken');
-            if ($this->accessToken) {
-                Trace('GitHub Using Global Login');
+    public function setAccessToken($newToken = false) {
+        if ($newToken) {
+            $this->accessToken = $newToken;
+        } else {
+            $userGithub = Gdn::session()->getAttribute(self::PROVIDER_KEY, []);
+            $existingToken = val('AccessToken', $userGithub, c('Plugins.Github.GlobalLogin.AccessToken'));
+            if ($existingToken) {
+                $this->accessToken = $existingToken;
             }
         }
 
+        return $this->accessToken;
     }
 
     /**
@@ -88,7 +97,7 @@ class GithubPlugin extends Gdn_Plugin {
             'redirect_uri' => $RedirectUri,
             'client_id' => $AppID,
             'response_type' => 'code',
-            'scope' => 'repo:status',
+            'scope' => 'repo',
 
         );
         return self::OAUTH_BASE_URL . '/login/oauth/authorize?' . http_build_query($Query);
@@ -105,53 +114,55 @@ class GithubPlugin extends Gdn_Plugin {
         if ($NewValue !== null) {
             $RedirectUri = $NewValue;
         } else {
-            $RedirectUri = Url('/profile/github', true, true, true);
+            $RedirectUri = url('/profile/github', true);
         }
         return $RedirectUri;
     }
 
     /**
+     * Grab the GitHub API access token.
+     * 
+     * @return string|null The currently configured access token.
+     */
+    private function getAccessToken() {
+        if ($this->accessToken === null) {
+            $this->setAccessToken();
+        }
+
+        return $this->accessToken;
+    }
+
+    /**
      * OAuth Method.  Sends request to validate tokens.
      *
-     * @param string $Code OAuth Code.
-     * @param string $RedirectUri Redirect Uri.
-     *
-     * @return string Response
+     * @param string $code OAuth Code.
+     * @param string $redirectURI Redirect Uri.
+     * @return array Response
      * @throws Gdn_UserException If error.
      */
-    public static function getTokens($Code, $RedirectUri) {
+    private function getTokens($code, $redirectURI) {
         if (!self::isConfigured()) {
             throw new Gdn_UserException('GitHub is not configured yet');
         }
-        $Post = array(
-            'client_id' => C('Plugins.Github.ApplicationID'),
-            'client_secret' => C('Plugins.Github.Secret'),
-            'code' => $Code,
-            'redirect_uri' => $RedirectUri,
+
+        $response = $this->apiRequest(
+            self::OAUTH_BASE_URL.'/login/oauth/access_token',
+            [
+                'client_id' => c('Plugins.Github.ApplicationID'),
+                'client_secret' => c('Plugins.Github.Secret'),
+                'code' => $code,
+                'redirect_uri' => $redirectURI,
+            ],
+            false
         );
 
-
-        $Proxy = new ProxyRequest();
-        $Response = $Proxy->Request(
-            array(
-                'URL' => self::OAUTH_BASE_URL . '/login/oauth/access_token',
-                'Method' => 'POST',
-            ),
-            $Post,
-            '',
-            array('Accept' => 'application/json')
-        );
-
-        if ($Proxy->ResponseStatus == 404) {
-            throw new Gdn_UserException('Error Communicating with GitHub API');
+        if ($response) {
+            parse_str($response, $tokens);
+        } else {
+            $tokens = [];
         }
 
-        if (isset($Response->error)) {
-            throw new Gdn_UserException('Error Communicating with GitHub API: ' . $Response->error_description);
-        }
-
-        return json_decode($Response);
-
+        return $tokens;
     }
 
     /**
@@ -160,7 +171,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @return string $Url
      */
     public static function profileConnectUrl() {
-        return Gdn::Request()->Url('/profile/githubconnect', true, true, true);
+        return Gdn::Request()->url('/profile/githubconnect', true);
     }
 
     /**
@@ -183,12 +194,8 @@ class GithubPlugin extends Gdn_Plugin {
      * @return bool
      */
     public function isConnected() {
-        if ($this->accessToken) {
-            return true;
-        }
-        return false;
+        return (bool)$this->getAccessToken();
     }
-
 
     /**
      * Profile Social Connections.
@@ -229,12 +236,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @param string $Username Username.
      * @param bool|string $Code Authorize Code.
      */
-    public function profileController_githubConnect_create(
-        $Sender,
-        $UserReference = '',
-        $Username = '',
-        $Code = false
-    ) {
+    public function profileController_githubConnect_create($Sender, $UserReference = '', $Username = '', $Code = false) {
 
         if (Gdn::Request()->Get('error')) {
             $Message = Gdn::Request()->Get('error_description');
@@ -252,7 +254,6 @@ class GithubPlugin extends Gdn_Plugin {
 
         try {
             $Tokens = $this->getTokens($Code, self::profileConnectUrl());
-
         } catch (Gdn_UserException $e) {
             $Attributes = array(
                 'AccessToken' => null,
@@ -265,7 +266,7 @@ class GithubPlugin extends Gdn_Plugin {
             return;
         }
         $AccessToken = GetValue('access_token', $Tokens);
-        $this->accessToken = $AccessToken;
+        $this->setAccessToken($AccessToken);
         $profile = $this->getProfile();
 
         Gdn::UserModel()->SaveAuthentication(
@@ -305,7 +306,7 @@ class GithubPlugin extends Gdn_Plugin {
         $AccessToken = GetValue('access_token', $Tokens);
 
         if ($AccessToken) {
-            $this->accessToken = $AccessToken;
+            $this->setAccessToken($AccessToken);
             SaveToConfig(
                 array(
                     'Plugins.Github.GlobalLogin.Enabled' => true,
@@ -375,6 +376,20 @@ class GithubPlugin extends Gdn_Plugin {
         );
         Gdn::PermissionModel()->Define(array('Garden.Staff.Allow' => 'Garden.Moderation.Manage'));
         $this->setupConfig();
+    }
+
+    /**
+     * Perform appropriate database structure updates.
+     */
+    public function structure() {
+        // Correct invalid casing.
+        $provider = Gdn_AuthenticationProviderModel::getProviderByKey(self::PROVIDER_KEY);
+
+        if ($provider['AuthenticationKey'] !== self::PROVIDER_KEY) {
+            $provider['AuthenticationKey'] = self::PROVIDER_KEY;
+            $model = new Gdn_AuthenticationProviderModel();
+            $model->save($provider);
+        }
     }
 
     /**
@@ -637,14 +652,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @throws Exception Permission Denied.
      */
     public function discussionController_githubIssue_create($Sender, $Args) {
-
-        if ($this->accessToken === null) {
-            $this->setAccessToken();
-        }
-
-
         if (!$this->isConnected()) {
-
             $Sender->SetData('LoginURL', Url('/profile/connections'));
             $Sender->Render('reconnect', '', 'plugins/github');
             return;
@@ -837,28 +845,53 @@ class GithubPlugin extends Gdn_Plugin {
      *
      * @return string JSON response from GitHub.
      */
-    public function apiRequest($endPoint, $post = null) {
-        if ($this->accessToken === null) {
-            $this->setAccessToken();
-        }
-        $Proxy = new ProxyRequest();
-        $Response = $Proxy->Request(
-            array(
-                'URL' => self::API_BASE_URL . $endPoint,
-                'Method' => ($post === null) ? 'GET' : 'POST',
-                'PreEncodePost' => ($post === null) ? false : true,
-            ),
-            $post,
-            null,
-            array(
-                'Authorization' => ' token ' . $this->accessToken,
-                'Accept' => 'application/json'
-            )
-        );
-        Trace('GitHub API Request: ' . self::API_BASE_URL . $endPoint);
-        $DecodedResponse = json_decode($Response, true);
+    public function apiRequest($endPoint, $post = null, $authenticate = true) {
+        $api = $this->getAPI();
+        $additionalHeaders = [];
 
-        return $DecodedResponse;
+        if ($authenticate) {
+            $additionalHeaders['Authorization'] = 'token ' . $this->getAccessToken();
+        }
+
+        try {
+            if ($post === null) {
+                $response = $api->get($endPoint, [], $additionalHeaders);
+            } else {
+                $response = $api->post($endPoint, $post, $additionalHeaders);
+            }
+        } catch (\Exception $e) {
+            Logger::log(Logger::ERROR, 'github_error', [
+                'endpoint' => $endPoint,
+                'errorCode' => $e->getCode(),
+                'errorMessage' => $e->getMessage(),
+                'post' => $post
+            ]);
+
+            return false;
+        }
+
+        $responseBody = $response->getBody();
+        Logger::log(Logger::DEBUG, 'github_api', [
+            'endpoint' => $endPoint,
+            'post' => $post,
+            'response' => $responseBody
+        ]);
+        return $responseBody;
+    }
+
+    /**
+     * Grab the current instance of the API client.
+     *
+     * @return \Garden\Http\HttpClient The HTTP interface for the API client.
+     */
+    private function getAPI() {
+        if ($this->api === null) {
+            $this->api = new \Garden\Http\HttpClient(self::API_BASE_URL);
+            $this->api->setThrowExceptions(true);
+            $this->api->setDefaultHeader('Content-Type', 'application/json');
+        }
+
+        return $this->api;
     }
 
     /**
@@ -891,15 +924,13 @@ class GithubPlugin extends Gdn_Plugin {
      * @return array|bool
      */
     protected function createIssue($repo, $issue) {
+        $response = $this->apiRequest('/repos/' . $repo . '/issues', $issue);
 
-        $response = $this->apiRequest('/repos/' . $repo . '/issues', json_encode($issue));
-        if (GetValue('id', $response)) {
-            return $response;
-        }
-        if (GetValue('message', $response)) {
+        if (val('message', $response)) {
             throw new Gdn_UserException('Error creating issue: ' . $response['message']);
         }
-        return false;
+
+        return val('id', $response) ? $response : false;
     }
 
     /**
