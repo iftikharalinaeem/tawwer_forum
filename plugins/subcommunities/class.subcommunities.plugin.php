@@ -438,8 +438,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     /**
      * Filter permissions when counting questions from the QnA plugin to avoid counting questions for other subcommunities.
      *
-     * @param $sender
-     * @param $args
+     * @param $sender Sending controller instance.
+     * @param $args Event arguments.
      */
     public function base_unansweredCount_handler($sender, $args) {
         $discussionModel = new DiscussionModel();
