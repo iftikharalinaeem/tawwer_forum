@@ -442,20 +442,14 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param $args Event arguments.
      */
     public function base_unansweredCount_handler($sender, $args) {
-        $discussionModel = new DiscussionModel();
-
         // Check for individual categories.
         $categoryIDs = $this->getCategoryIDs();
-        $where = array();
-        $where['Type'] = 'Question';
-        $where['QnA'] = array('Unanswered', 'Rejected');
-        if ($categoryIDs) {
-            $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
-        } else {
-            $discussionModel->Watching = true;
-        }
+        $questionCount = Gdn::sql()
+            ->whereIn('CategoryID', $categoryIDs)
+            ->whereIn('QnA', array('Unanswered', 'Rejected'))
+            ->getCount('Discussion', array('Type' => 'Question'));
 
         // Pass number of questions back to sender.
-        $args['questionCount'] = $discussionModel->getCount($where);
+        $args['questionCount'] = $questionCount;
     }
 }
