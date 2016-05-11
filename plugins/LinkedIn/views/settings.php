@@ -88,19 +88,20 @@ input.CopyInputLonger {
             When you create the application, you can choose what to enter in most fields, but you have to make sure you enter specific information for some fields.
          </li>
          <li>
-            Under <b>Website URL</b> enter <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::Request()->Domain(), '/').'/'; ?>" />.
+            Under <b>Website URL</b> enter <input type="text" class="CopyInput" value="<?php echo url('/', true); ?>" />.
          </li>
          <li>
             Under <b>Default Scope</b> make sure you've selected at least <b>r_basicprofile</b> and <b>r_emailaddress</b>.
          </li>
           <li>
-              Under <b>OAuth 2.0 Redirect URLs</b> enter <input type="text" class="CopyInput CopyInputLonger" value="<?php echo rtrim(Gdn::Request()->Domain(), '/') . '/entry/connect/linkedin'; ?>" />
+              Under <b>OAuth 2.0 Redirect URLs</b> add <input type="text" class="CopyInput CopyInputLonger" value="<?php echo url('/entry/connect/linkedin', true); ?>" />
+              <b>and</b> <input type="text" class="CopyInput CopyInputLonger" value="<?php echo url('/profile/linkedinconnect', true); ?>" />
           </li>
          <li>
             Once your application has been set up, you must copy the <b>Client ID</b> and <b>Client Secret</b> into the form on this page.
          </li>
          <li>
-            Don't forget to hit save!
+            Don't forget to hit update!
          </li>
       </ol>
       <p><?php echo Anchor(Img('/plugins/LinkedIn/design/linkedinscreenshot.jpg', array('style' => 'max-width: 837px;')), '/plugins/LinkedIn/design/linkedinscreenshot.jpg', array('target' => '_blank')); ?></p>
