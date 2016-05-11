@@ -494,4 +494,22 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $args['NewDiscussionModule']->CategoryID = val('CategoryID', SubcommunityModel::getCurrent());
         }
     }
+
+    /**
+     * Filter permissions when counting questions from the QnA plugin to avoid counting questions for other subcommunities.
+     *
+     * @param $sender Sending controller instance.
+     * @param $args Event arguments.
+     */
+    public function base_unansweredCount_handler($sender, $args) {
+        // Check for individual categories.
+        $categoryIDs = $this->getCategoryIDs();
+        $questionCount = Gdn::sql()
+            ->whereIn('CategoryID', $categoryIDs)
+            ->whereIn('QnA', array('Unanswered', 'Rejected'))
+            ->getCount('Discussion', array('Type' => 'Question'));
+
+        // Pass number of questions back to sender.
+        $args['questionCount'] = $questionCount;
+    }
 }
