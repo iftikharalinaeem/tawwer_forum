@@ -65,6 +65,24 @@ class RoleTracker extends Gdn_Plugin {
         return str_replace(' ', '_', Gdn_Format::alphaNumeric($role)).'_Tracker';
     }
 
+    /**
+     * Add user role tracker's tag(s) to discussion.
+     *
+     * @param array $args Caller's event arguments.
+     * @param string $source Discussion || Comment
+     */
+    private function addTagsToDiscussion($args, $source) {
+        $userTrackedRoles = $this->getRoleTrackerModel()->getUserTrackedRoles(val('InsertUserID', $args[$source]));
+        if (!$userTrackedRoles) {
+            return;
+        }
+
+        $tagModel = TagModel::instance();
+        $trackerRoleTagIDs = array_column($userTrackedRoles, 'TrackerTagID');
+
+        $tagModel->addDiscussion(val('DiscussionID', $args['Discussion']), $trackerRoleTagIDs);
+    }
+
     #######################################
     ## Plugin's hooks
     #######################################
@@ -81,7 +99,7 @@ class RoleTracker extends Gdn_Plugin {
     /**
      * Create a method called "roletracker" on the SettingsController.
      *
-     * @param SettingsController $sender Sending controller instance
+     * @param SettingsController $sender Sending controller instance.
      */
     public function settingsController_roleTracker_create($sender) {
         // Prevent non-admins from accessing this page
@@ -226,6 +244,27 @@ class RoleTracker extends Gdn_Plugin {
         }
 
         echo '<span class="MItem RoleTracker"><span class="Tags">'.$postTags.'</span></span> ';
+    }
+
+    /**
+     * Add user role tracker's tag(s) to discussion after discussion save.
+     *
+     * @param PostController $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function postController_afterDiscussionSave_handler($sender, $args) {
+        $this->addTagsToDiscussion($args, 'Discussion');
+    }
+
+
+    /**
+     * Add user role tracker's tag(s) to discussion after comment save.
+     *
+     * @param PostController $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function postController_afterCommentSave_handler($sender, $args) {
+        $this->addTagsToDiscussion($args, 'Comment');
     }
 
 }
