@@ -54,6 +54,17 @@ class RoleTracker extends Gdn_Plugin {
         return $roleTrackingModel;
     }
 
+    /**
+     * Generate a valid css class from a role.
+     *
+     * @param string $role role name
+     *
+     * @return string CSS class
+     */
+    private function formatRoleCss($role) {
+        return str_replace(' ', '_', Gdn_Format::alphaNumeric($role)).'_Tracker';
+    }
+
     #######################################
     ## Plugin's hooks
     #######################################
@@ -87,7 +98,7 @@ class RoleTracker extends Gdn_Plugin {
         $formData = $roleTrackerModel->getFormData(false);
         $sender->Form->setModel($roleTrackerModel, $formData);
 
-        $sender->setData('Roles', $roleTrackerModel->getRoles());
+        $sender->setData('Roles', $roleTrackerModel->getPublicRoles());
 
         // If we are not seeing the form for the first time
         if ($sender->Form->authenticatedPostBack() !== false) {
@@ -112,6 +123,109 @@ class RoleTracker extends Gdn_Plugin {
             'addtag' => false,
             'default' => false
         ));
+    }
+
+    /**
+     * Join the roles to every discussions and comments. Also add  CSS to the discussion
+     *
+     * @param DiscussionController $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function discussionController_render_before($sender, $args) {
+
+        // Join the users' role(s) to the discussion and comments
+        $joinDiscussion = [$sender->Discussion];
+        RoleModel::setUserRoles($joinDiscussion, 'InsertUserID');
+        $comments = $sender->data('Comments');
+        RoleModel::setUserRoles($comments->result(), 'InsertUserID');
+
+        // And add the css class to the discussion
+        if (is_array($sender->Discussion->Roles)) {
+            if (count($sender->Discussion->Roles)) {
+                $trackedRoles = $this->getRoleTrackerModel()->getTrackedRoles();
+                $cssTrackerRoles = [];
+                foreach (val('Roles', $sender->Discussion, []) as $roleID => $roleName) {
+                    if (array_key_exists($roleID, $trackedRoles)) {
+                        $cssTrackerRoles[] = $this->formatRoleCss($roleName);
+                    }
+                }
+
+                if (!empty($cssTrackerRoles)) {
+                    $sender->Discussion->_CssClass = val('_CssClass', $sender->Discussion, '').' '.implode(' ', $cssTrackerRoles);
+                }
+            }
+        }
+    }
+
+    /**
+     * Add the tracked role CSS to every comments
+     *
+     * @param object $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function base_beforeCommentDisplay_handler($sender, $args) {
+
+        $trackedRoles = $this->getRoleTrackerModel()->getTrackedRoles();
+
+        $cssClass = val('CssClass', $args, null);
+
+        $cssTrackerRoles = [];
+        foreach (val('Roles', $args['Comment'], []) as $roleID => $roleName) {
+            if (array_key_exists($roleID, $trackedRoles)) {
+                $cssTrackerRoles[] = $this->formatRoleCss($roleName);
+            }
+        }
+
+        if (!empty($cssTrackerRoles)) {
+            $args['CssClass'] = trim($cssClass.' '.implode(' ', $cssTrackerRoles));
+        }
+    }
+
+    /**
+     * Inject tracker roles' tag into authorInfo
+     *
+     * @param DiscussionController $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function discussionController_authorInfo_handler($sender, $args) {
+        $target = $args['Type'];
+
+        $postRoles = val('Roles', $args[$target]);
+        if (!$postRoles) {
+            return;
+        }
+        $trackedRoles = $this->getRoleTrackerModel()->getTrackedRoles();
+        $tagsID = [];
+
+        foreach($postRoles as $roleID => $roleName) {
+            if (array_key_exists($roleID, $trackedRoles)) {
+                $tagsID[] = $trackedRoles[$roleID]['TrackerTagID'];
+            }
+        }
+
+        if (!$tagsID) {
+            return;
+        }
+
+        static $tags;
+        if ($tags === null) {
+            $tagModel = TagModel::instance();
+            $tags = $tagModel->getWhere(['Type' => 'Tracker'])->resultArray();
+            $tags = Gdn_DataSet::index($tags, 'TagID');
+        }
+
+        $postTags = '';
+        foreach($tagsID as $tagID) {
+            if (!isset($tags[$tagID])) {
+                continue;
+            }
+            $trackerTag = $tags[$tagID];
+            $tagName = Gdn_Format::display($trackerTag['FullName']);
+            // TODO add href to custom view!
+            $postTags .= '<a href="" class="Tag Tracker '.$tagName.'-Tracker">'.$tagName.'</a> ';
+        }
+
+        echo '<span class="MItem RoleTracker"><span class="Tags">'.$postTags.'</span></span> ';
     }
 
 }

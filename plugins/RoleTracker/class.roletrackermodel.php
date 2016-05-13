@@ -65,7 +65,7 @@ class RoleTrackerModel {
     /**
      * @return array
      */
-    public function getRoles($refreshCache = false) {
+    public function getPublicRoles($refreshCache = false) {
         static $roles;
 
         if ($refreshCache || $roles === null) {
@@ -75,6 +75,19 @@ class RoleTrackerModel {
             );
 
             $roles = $this->filterOutUnusedRoleFields($roles);
+        }
+
+        return $roles;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTrackedRoles($refreshCache = false) {
+        static $trackedRoles;
+
+        if ($refreshCache || $trackedRoles === null) {
+            $roles = self::filterOutNonTrackedRole($this->getPublicRoles($refreshCache));
         }
 
         return $roles;
@@ -111,7 +124,7 @@ class RoleTrackerModel {
     public function getFormData($forSave) {
         $formData = [];
 
-        $roles = $this->getRoles();
+        $roles = $this->getPublicRoles();
         if ($forSave) {
             $roles = self::filterFieldsForSave($roles);
         }
@@ -164,7 +177,7 @@ class RoleTrackerModel {
     public function save($formPostValues) {
         // Get current data
         $rolesData = $this->formDataToRoleData($formPostValues);
-        $roles = $this->getRoles();
+        $roles = $this->getPublicRoles();
         $success = true;
 
         $this->roleModel->Database->beginTransaction();
@@ -176,7 +189,7 @@ class RoleTrackerModel {
                 $trackerTagIdExist = !empty($roles[$roleID]['TrackerTagID']);
                 if ($roleData['IsTracked'] && !$trackerTagIdExist) {
                     $newTag = [
-                        'Name' => Gdn_Format::url($roles[$roleID]['Name']),
+                        'Name' => TagModel::tagSlug($roles[$roleID]['Name']),
                         'FullName' => $roles[$roleID]['Name'],
                         'Type' => 'Tracker',
                         'CategoryID' => -1,
