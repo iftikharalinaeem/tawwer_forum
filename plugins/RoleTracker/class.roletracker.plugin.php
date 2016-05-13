@@ -9,7 +9,7 @@ $PluginInfo['RoleTracker'] = [
     'Description' => 'Highlight and track posts made by users in selected roles.',
     'Version' => '1.0',
     'RequiredApplications' => ['Vanilla' => '2.2.111'],
-    'RequiredPlugins' => ['Tagging' => '1.8.12'], // TODO Bump that when it is possible
+    'RequiredPlugins' => ['Tagging' => '1.9.0'],
     'HasLocale' => false,
     'License' => 'GNU GPL2',
     'SettingsUrl' => '/settings/roletracker',
