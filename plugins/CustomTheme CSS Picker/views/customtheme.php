@@ -487,7 +487,7 @@ jQuery(document).ready(function($) {
             <div class="InfoBox">
                <div>If you are new to HTML, here are some links you should check out:</div>
                <?php
-               echo '&rarr; '.Anchor('Our Custom HTML Documentation', 'http://vanillaforums.com/blog/help-tutorials/how-to-use-custom-theme-part-1-edit-html/', '', array('target' => '_blank'));
+               echo '&rarr; '.Anchor('Our Custom HTML Documentation', 'http://docs.vanillaforums.com/theming/css/', '', array('target' => '_blank'));
                ?>            
             </div>
          </div>
