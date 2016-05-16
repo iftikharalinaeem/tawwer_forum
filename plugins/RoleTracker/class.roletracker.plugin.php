@@ -1,5 +1,7 @@
 <?php
 /**
+ * RoleTracker Plugin
+ *
  * @copyright 2009-2016 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
@@ -19,9 +21,9 @@ $PluginInfo['RoleTracker'] = [
 ];
 
 /**
- * Class RoleTracker
+ * Class RoleTrackerPlugin
  */
-class RoleTracker extends Gdn_Plugin {
+class RoleTrackerPlugin extends Gdn_Plugin {
     /**
      * Setup is called when the plugin is enabled. It prepares the config and db.
      */
@@ -48,7 +50,7 @@ class RoleTracker extends Gdn_Plugin {
         static $roleTrackingModel;
 
         if ($roleTrackingModel === null) {
-            $roleTrackingModel = new RoleTrackerModel(new RoleModel(), TagModel::instance());
+            $roleTrackingModel = new RoleTrackerModel(new RoleModel());
         }
 
         return $roleTrackingModel;

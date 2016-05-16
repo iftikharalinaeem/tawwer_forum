@@ -1,6 +1,13 @@
 <?php
 /**
+ * RoleTrackerModel
  *
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ */
+
+/**
+ * Class RoleTrackerModel
  */
 class RoleTrackerModel {
 
@@ -8,11 +15,6 @@ class RoleTrackerModel {
      * @var $roleModel RoleModel
      */
     private $roleModel;
-
-    /**
-     * @var $roleModel RoleModel
-     */
-    private $tagModel;
 
     /**
      * 'FieldName' => keepForSave
@@ -27,31 +29,15 @@ class RoleTrackerModel {
     /**
      * Class constructor.
      */
-    public function __construct(RoleModel $roleModel, TagModel $tagModel) {
+    public function __construct(RoleModel $roleModel) {
         $this->roleModel = $roleModel;
-        $this->tagModel = $tagModel;
     }
 
     /**
-     * @param $roles
-     * @return array
-     */
-    public static function filterFieldsForSave($roles) {
-        $rolesData = [];
-        foreach($roles as $roleID => $roleData) {
-            $rolesData[$roleID] = array_intersect_key(
-                $roleData,
-                array_filter(
-                    self::$roleTrackerFields
-                )
-            );
-        }
-        return $rolesData;
-    }
-
-    /**
-     * @param $roles
-     * @return array
+     * Filters out non tracked roles.
+     *
+     * @param array $roles Roles to be filtered.
+     * @return array Tracked roles.
      */
     public static function filterOutNonTrackedRole($roles) {
         return array_filter(
@@ -63,7 +49,9 @@ class RoleTrackerModel {
     }
 
     /**
-     * @return array
+     * Get every public roles with relevant data for this model.
+     *
+     * @return array Public roles.
      */
     public function getPublicRoles($refreshCache = false) {
         static $roles;
@@ -81,7 +69,10 @@ class RoleTrackerModel {
     }
 
     /**
-     * @return array
+     * Get every tracked roles.
+     *
+     * @params bool $refreshCache Force a cache refresh if true
+     * @return array Tracked roles.
      */
     public function getTrackedRoles($refreshCache = false) {
         static $trackedRoles;
@@ -94,20 +85,10 @@ class RoleTrackerModel {
     }
 
     /**
-     * @param $roles
-     * @return array
-     */
-    protected function filterOutUnusedRoleFields($roles) {
-        $rolesData = [];
-        foreach($roles as $role) {
-            $rolesData[$role['RoleID']] = array_intersect_key($role, self::$roleTrackerFields);
-        }
-        return $rolesData;
-    }
-
-    /**
-     * @param $userID
-     * @return array
+     * Get tracked roles of a specific user.
+     *
+     * @param int $userID The user identifier
+     * @return array The tracked roles, if any.
      */
     public function getUserTrackedRoles($userID) {
         return self::filterOutNonTrackedRole(
@@ -116,17 +97,17 @@ class RoleTrackerModel {
     }
 
     /**
+     * Take the roles and flatten the structure to be used in a Form.
      *
-     *
-     * @param bool $forSave
-     * @return array
+     * @param bool $forSave filters out every fields that are not required when saving.
+     * @return array The form data.
      */
     public function getFormData($forSave) {
         $formData = [];
 
         $roles = $this->getPublicRoles();
         if ($forSave) {
-            $roles = self::filterFieldsForSave($roles);
+            $roles = $this->filterFieldsForSave($roles);
         }
 
         foreach($roles as $roleID => $role) {
@@ -139,7 +120,7 @@ class RoleTrackerModel {
     }
 
     /**
-     *
+     * Take Form data and convert it into a "per role" structure.
      *
      * @param array $formData
      * @return array
@@ -169,23 +150,25 @@ class RoleTrackerModel {
     }
 
     /**
-     * Save received from a Form.
+     * Save data received from a Form.
      *
      * @param array $formPostValues The data to save.
      * @return bool Returns true on success, false otherwise.
      */
     public function save($formPostValues) {
-        // Get current data
+
         $rolesData = $this->formDataToRoleData($formPostValues);
         $roles = $this->getPublicRoles();
         $success = true;
 
-        $this->roleModel->Database->beginTransaction();
+        $database = $this->roleModel->Database;
+        $database->beginTransaction();
             foreach($rolesData as $roleID => $roleData) {
                 if ($roles[$roleID]['IsTracked'] == $roleData['IsTracked']) {
                     continue;
                 }
 
+                // If we check a role as tracked for the first time we need to create a Tracker tag for it.
                 $trackerTagIdExist = !empty($roles[$roleID]['TrackerTagID']);
                 if ($roleData['IsTracked'] && !$trackerTagIdExist) {
                     $newTag = [
@@ -197,7 +180,7 @@ class RoleTrackerModel {
                         'DateInserted' => Gdn_Format::toDateTime(),
                         'CountDiscussions' => 0
                     ];
-                    $tagID = $this->roleModel->Database->sql()->options('Ignore', true)->insert('Tag', $newTag);
+                    $tagID = $database->sql()->options('Ignore', true)->insert('Tag', $newTag);
 
                     $success = $success && $tagID;
                     $roleData['TrackerTagID'] = $tagID;
@@ -205,12 +188,50 @@ class RoleTrackerModel {
 
                 $success = $success && $this->roleModel->update($roleData, ['RoleID' => $roleID]);
             }
-        $success ? $this->roleModel->Database->commitTransaction() : $this->roleModel->Database->rollbackTransaction();
+        $success ? $database->commitTransaction() : $database->rollbackTransaction();
 
         return $success;
     }
 
+    /**
+     * Validation will not fail unless there is a coding error.
+     *
+     * @return array
+     */
     public function validationResults() {
         return [];
+    }
+
+    /**
+     * Remove every fields from roles data that are unused by this model.
+     *
+     * @param $roles
+     * @return array
+     */
+    protected function filterOutUnusedRoleFields($roles) {
+        $rolesData = [];
+        foreach($roles as $role) {
+            $rolesData[$role['RoleID']] = array_intersect_key($role, self::$roleTrackerFields);
+        }
+        return $rolesData;
+    }
+
+    /**
+     * Filter out unwanted fields for the purpose of saving.
+     *
+     * @param $roles Roles' data
+     * @return array Filtered roles' data
+     */
+    protected function filterFieldsForSave($roles) {
+        $rolesData = [];
+        foreach($roles as $roleID => $roleData) {
+            $rolesData[$roleID] = array_intersect_key(
+                $roleData,
+                array_filter(
+                    self::$roleTrackerFields
+                )
+            );
+        }
+        return $rolesData;
     }
 }
