@@ -57,14 +57,14 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Generate a valid css class from a role.
+     * Generate a valid css class from a role's name.
      *
-     * @param string $role role name
+     * @param string $roleName role name
      *
      * @return string CSS class
      */
-    private function formatRoleCss($role) {
-        return str_replace(' ', '_', Gdn_Format::alphaNumeric($role)).'_Tracker';
+    private function formatRoleCss($roleName) {
+        return str_replace(' ', '_', Gdn_Format::alphaNumeric($roleName)).'-Tracker';
     }
 
     /**
@@ -80,9 +80,9 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         }
 
         $tagModel = TagModel::instance();
-        $trackerRoleTagIDs = array_column($userTrackedRoles, 'TrackerTagID');
+        $trackerRolesTagID = array_column($userTrackedRoles, 'TrackerTagID');
 
-        $tagModel->addDiscussion(val('DiscussionID', $args['Discussion']), $trackerRoleTagIDs);
+        $tagModel->addDiscussion(val('DiscussionID', $args['Discussion']), $trackerRolesTagID);
     }
 
     #######################################
@@ -152,6 +152,9 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function discussionController_render_before($sender, $args) {
+        if (!val('Discussion', $sender)) {
+            return;
+        }
 
         // Join the users' role(s) to the discussion and comments
         $joinDiscussion = [$sender->Discussion];
@@ -241,8 +244,8 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             }
             $trackerTag = $tags[$tagID];
             $tagName = Gdn_Format::display($trackerTag['FullName']);
-            // TODO add href to custom view!
-            $postTags .= '<a href="" class="Tag Tracker '.$tagName.'-Tracker">'.$tagName.'</a> ';
+            // Keep those spaces before and after the tag :D
+            $postTags .= ' <span class="Tag Tag-'.$tagName.'-Tracker">'.$tagName.'</span> ';
         }
 
         echo '<span class="MItem RoleTracker"><span class="Tags">'.$postTags.'</span></span> ';
@@ -258,7 +261,6 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         $this->addTagsToDiscussion($args, 'Discussion');
     }
 
-
     /**
      * Add user role tracker's tag(s) to discussion after comment save.
      *
@@ -267,6 +269,42 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      */
     public function postController_afterCommentSave_handler($sender, $args) {
         $this->addTagsToDiscussion($args, 'Comment');
+    }
+
+    /**
+     * Add user role tracker's tag(s) in discussions list.
+     *
+     * @param object $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function base_afterDiscussionLabels_handler($sender, $args) {
+        if (!($discussion = val('Discussion', $args, false))) {
+            return;
+        }
+
+        if (!($discussionTags = val('Tags', $discussion, false))) {
+            return;
+        }
+
+
+        $trackedRoles = $this->getRoleTrackerModel()->getTrackedRoles();
+        if (!$trackedRoles) {
+            return;
+        }
+
+        static $trackedRolesTagID;
+        if ($trackedRolesTagID === null) {
+            $trackedRolesTagID = array_column($trackedRoles, 'TrackerTagID');
+        }
+
+        foreach($discussionTags as $tagData) {
+            if (in_array($tagData['TagID'], $trackedRolesTagID)) {
+                $tagName = Gdn_Format::display(t($tagData['FullName']));
+                echo ' <span class="Tag Tag-'.ucfirst(t($tagData['Name'])).'-Tracker">'.$tagName.'</span> ';
+
+            }
+        }
+
     }
 
 }
