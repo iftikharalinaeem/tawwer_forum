@@ -1,0 +1,248 @@
+.Section-BestOf,
+.Section-Group,
+.Section-GroupList {
+  .page-content {
+    width: 100%;
+  }
+
+  .page-sidebar {
+    display: none;
+  }
+}
+
+// Tiles
+.Tiles {
+  margin: -1%;
+
+  .Tile {
+    &:extend(.panel);
+    &:extend(.panel-default);
+    width: ((100% / 3) - 2%) !important;
+    margin: 1% !important;
+
+    .Author {
+      display: block;
+
+      .ProfilePhoto {
+        .square(@line-height-computed);
+        margin-right: 4px;
+      }
+    }
+
+    .AuthorWrap {
+      &:extend(.panel-footer);
+    }
+
+    .Reactions {
+      margin-top: 5px;
+    }
+
+    .Body {
+      margin-bottom: 10px;
+    }
+  }
+}
+
+// Cards
+.CardWrap .Card {
+  &:extend(.panel);
+  &:extend(.panel-default);
+}
+
+// Groups
+.Group-Content {
+  -webkit-column-count: 1 !important;
+  -moz-column-count: 1 !important;
+  column-count: 1 !important;
+}
+
+.Cards-Groups .Card {
+  padding-bottom: 70px;
+
+  .Group-Name {
+    .text-overflow();
+  }
+
+  .Group-Description {
+    display: block;
+    .text-overflow();
+  }
+
+  .Group-Buttons {
+    &:extend(.panel-footer);
+    right: 0;
+    left: 0;
+    float: none;
+  }
+}
+
+// Advanced Search
+.AdvancedSearch {
+  .Handle {
+    &:extend(.btn);
+    &:extend(.btn-default);
+
+    .Arrow {
+      &:before {
+        &:extend(.Sprite);
+        content: @fa-var-caret-down;
+      }
+    }
+  }
+
+  .InputAndButton {
+    position: relative;
+    padding-right: 100px;
+    margin-bottom: @line-height-computed;
+
+    .Handle,
+    .Button {
+      position: absolute;
+      top: 0;
+      width: 40px;
+    }
+
+    .Handle {
+      right: 50px;
+    }
+
+    .Button {
+      right: 0;
+    }
+  }
+}
+
+.DataList-Search {
+  .MItem-Location {
+    display: none;
+  }
+}
+
+// Sprites
+.SpSearch {
+  &:before { content: @fa-var-search; }
+}
+
+// Tags
+.TagCloud li {
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+
+  a {
+    &:extend(.label);
+    &:extend(.label-default);
+
+    &:hover {
+      &:extend(a.label:hover);
+      &:extend(a.label-default:hover);
+    }
+  }
+}
+
+// Reactions
+
+.ReactSprite {
+  width: auto;
+  height: auto;
+  background-image: none !important;
+
+  &:before {
+    .icon();
+    min-width: 1em;
+    text-align: center;
+  }
+}
+
+.ReactSprite {
+  &:before {
+    font-size: 14px;
+  }
+}
+
+//Reactions
+.ReactPromote:before {
+  content: @icon-hand-up;
+}
+.ReactOffTopic:before {
+  content: @icon-meh;
+}
+.ReactInsightful:before {
+  content: @icon-lightbulb;
+}
+.ReactDisagree:before {
+  content: @icon-frown;
+}
+.ReactAgree:before {
+  content: @icon-smile;
+}
+.ReactDislike:before {
+  content: @icon-thumbs-down;
+}
+.ReactLike:before {
+  content: @icon-thumbs-up;
+}
+.ReactDown:before {
+  content: @icon-arrow-down;
+}
+.ReactUp:before {
+  content: @icon-arrow-up;
+}
+.ReactWTF:before {
+  content: @icon-wtf;
+}
+.ReactAwesome:before {
+  content: @icon-heart;
+}
+.ReactLOL:before {
+  content: @icon-lol;
+}
+.ReactFlag:before {
+  content: @icon-flag;
+}
+.ReactAbuse:before {
+  content: @icon-exclamation-sign;
+}
+.ReactSpam:before {
+  content: @icon-spam;
+}
+.ReactQuote:before {
+  content: @icon-quote;
+}
+.ReactWarn:before {
+  content: @icon-warn;
+}
+.ReactFacebook:before {
+  content: @icon-facebook-alt;
+}
+.ReactFacebook:hover {
+  &:before {
+    color: #3a5795;
+  }
+}
+.ReactTwitter:before {
+  content: @icon-twitter;
+}
+.ReactTwitter:hover {
+  &:before {
+    color: #55acee;
+  }
+}
+.ReactGooglePlus:before {
+  content: @icon-google-plus-alt;
+}
+.ReactGooglePlus:hover {
+  &:before {
+    color: #dd4b39;
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+.ReactButton.PopupWindow {
+  &:hover {
+    .Sprite:before {
+      color: @text-color;
+    }
+  }
+}
