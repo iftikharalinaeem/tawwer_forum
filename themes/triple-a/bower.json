@@ -2,7 +2,7 @@
   "name": "triple-a",
   "private": true,
   "dependencies": {
-    "vanilla-bootstrap": "vanilla/vanilla-bootstrap#~2.5.3",
+    "vanilla-bootstrap": "vanilla/vanilla-bootstrap#~2.5.4",
     "swiper": "~2.7.0"
   },
   "overrides": {
