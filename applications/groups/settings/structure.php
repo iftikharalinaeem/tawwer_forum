@@ -4,11 +4,13 @@
  * @license Proprietary
  */
 
-if (!isset($Drop))
-   $Drop = FALSE;
+if (!isset($Drop)) {
+   $Drop = false;
+}
    
-if (!isset($Explicit))
-   $Explicit = TRUE;
+if (!isset($Explicit)) {
+   $Explicit = false;
+}
 
 $Sql = Gdn::SQL();
 $St = Gdn::Structure();
