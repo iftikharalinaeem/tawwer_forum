@@ -378,7 +378,8 @@ class OAuth2PluginBase {
     protected function getSettingsFormFields() {
         $formFields = array(
             'AssociationKey' => ['LabelCode' => 'Client ID', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => ''],
-            'AssociationSecret' => ['LabelCode' => 'Secret', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => '']
+            'AssociationSecret' => ['LabelCode' => 'Secret', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => ''],
+            'SignOutRedirect' => ['LabelCode' => t('Sign Out URL'), 'Description' => t('Enter the <b><i>full</i></b> URL (i.e. with "https://") to where you want users to be redirected wherever they click on the logout button.')]
         );
         return $formFields;
     }
@@ -511,7 +512,7 @@ class OAuth2PluginBase {
         if ($provider['AuthenticationSchemeAlias'] != $this->getProviderKey() || !$this->isConfigured() || $provider['SignOutUrl'] === null) {
             return;
         }
-        $redirect = c('Plugins.Auth0.SignOutRedirect', Gdn::Request()->Url('/', true));
+        $redirect = val('SignOutRedirect', $provider, Gdn::Request()->Url('/', true));
         $url = $provider['SignOutUrl'];
         $args['DefaultProvider']['SignOutUrl'] = $url . "?returnTo=" . urlencode($redirect);
     }
