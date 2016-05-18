@@ -34,7 +34,6 @@ var analyticsToolbar = {
         // Set bad intervals to disabled.
         $('#Form_intervals > option').each(function() {
             if ($(this).attr('data-seconds') < threshold) {
-                console.log('disabling' + $(this).val());
                 $(this).attr('disabled', 'disabled');
             } else {
                 $(this).removeAttr('disabled');
@@ -125,4 +124,7 @@ $(document).on('ready', function() {
             analyticsToolbar.setWidgets('setRange', [range]);
         }
     });
+
+
+    $(".js-date-range").daterangepicker("setRange", {'start': moment().subtract('month', 1).toDate(), 'end': moment().toDate()});
 });
