@@ -43,31 +43,55 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $analyticsDashboardModel = new AnalyticsDashboard();
 
         Logger::event('analytics_menu', Logger::INFO, 'Sections', $sectionModel->getDefaults());
+    }
 
-        $sender->EventArguments['SideMenu']->addItem(
-            'analytics',
-            t('Analytics'),
-            'Garden.Settings.Manage',
-            ['After' => 'Dashboard', 'class' => 'Analytics']
-        );
+    /**
+     * Adds items to dashboard menu.
+     *
+     * @param DashboardNavModule $sender
+     */
+    public function dashboardNavModule_init_handler($sender) {
+        if (c('VanillaAnalytics.DisableDashboard', false)) {
+            return;
+        }
+
+        /** @var DashboardNavModule $nav */
+        $nav = $sender;
+
+        $section = [
+            'section' => 'Analytics',
+            'title' => 'Analytics',
+            'description' => 'Eye Candy For Your Boss',
+            'url' => '/settings/analytics/dashboard/personal-dashboard'
+        ];
+
+        $nav->registerSection($section);
+
+        $sectionModel = new AnalyticsSection();
+        $analyticsDashboardModel = new AnalyticsDashboard();
+
+        Logger::event('analytics_menu', Logger::INFO, 'Sections', $sectionModel->getDefaults());
+        $nav->addGroupToSection('Analytics', t('Analytics'), 'analytics');
 
         $personalDashboard = $analyticsDashboardModel->getUserDashboardWidgets(AnalyticsDashboard::DASHBOARD_PERSONAL);
         if (count($personalDashboard) > 0) {
-            $sender->EventArguments['SideMenu']->addLink(
-                'analytics',
+            $nav->addLinkToSectionIf(
+                'Garden.Settings.Manage',
+                'Analytics',
                 t('My Dashboard'),
-                "settings/analytics/dashboard/" . AnalyticsDashboard::DASHBOARD_PERSONAL,
-                'Garden.Settings.Manage'
+                'settings/analytics/dashboard/'.AnalyticsDashboard::DASHBOARD_PERSONAL,
+                'analytics.my-dashboard'
             );
         }
 
         foreach ($sectionModel->getDefaults() as $section) {
             foreach ($section->getDashboards() as $dashboard) {
-                $sender->EventArguments['SideMenu']->addLink(
-                    'analytics',
+                $nav->addLinkToSectionIf(
+                    'Garden.Settings.Manage',
+                    'Analytics',
                     t($dashboard->getTitle()),
                     "settings/analytics/dashboard/{$dashboard->dashboardID}",
-                    'Garden.Settings.Manage'
+                    "analytics.{$dashboard->dashboardID}"
                 );
             }
         }
@@ -209,6 +233,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $dashboard = $dashboardModel->getID($dashboardID);
 
         if ($dashboard) {
+            Gdn_Theme::section('Analytics');
             $dashboardModel->render($sender, $dashboard);
         } else {
             redirect('settings');
