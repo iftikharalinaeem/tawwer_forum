@@ -414,7 +414,12 @@ class RankModel extends Gdn_Model {
          return self::$_Ranks;
    }
 
-   public function Save($Data) {
+   /**
+    * @param array $Data Form post data.
+    * @param bool|false $Settings Unused
+    * @return bool
+    */
+   public function save($Data, $Settings = false) {
       // Put the data into a format that's savible.
       $this->DefineSchema();
       $SchemaFields = $this->Schema->Fields();
