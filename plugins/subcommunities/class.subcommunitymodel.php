@@ -200,7 +200,15 @@ class SubcommunityModel extends Gdn_Model {
         return $result;
     }
 
-    public function getID($id) {
+    /**
+     * Get a subcommunity record by its ID
+     *
+     * @param mixed $id The value of the primary key in the database.
+     * @param null $datasetType Unused
+     * @param null $Options Unused
+     * @return array|object
+     */
+    public function getID($id, $datasetType = null, $Options = null) {
         $row = parent::getID($id, DATASET_TYPE_ARRAY);
         if ($row) {
             $this->calculateRow($row);
@@ -235,9 +243,7 @@ class SubcommunityModel extends Gdn_Model {
         }
     }
 
-    public function update($row, $where) {
-        $Result = false;
-
+    public function update($row, $where = false, $limit = false) {
         // primary key (always included in $Where when updating) might be "required"
         $allFields = $row;
         if (is_array($where)) {
@@ -248,7 +254,7 @@ class SubcommunityModel extends Gdn_Model {
             if (val('IsDefault', $row)) {
                 $this->SQL->put('Subcommunity', ['IsDefault' => null], ['SubcommunityID <>' => $allFields['SubcommunityID']]);
             }
-            parent::update($row, $where);
+            parent::update($row, $where, $limit);
             static::clearCache();
         }
     }
