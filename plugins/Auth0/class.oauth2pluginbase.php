@@ -512,7 +512,8 @@ class OAuth2PluginBase {
         if ($provider['AuthenticationSchemeAlias'] != $this->getProviderKey() || !$this->isConfigured() || $provider['SignOutUrl'] === null) {
             return;
         }
-        $redirect = val('SignOutRedirect', $provider, Gdn::Request()->Url('/', true));
+        $redirect = val('SignOutRedirect', $provider);
+        $redirect = ($redirect) ? $redirect : Gdn::Request()->url('/', true);
         $url = $provider['SignOutUrl'];
         $args['DefaultProvider']['SignOutUrl'] = $url . "?returnTo=" . urlencode($redirect);
     }
