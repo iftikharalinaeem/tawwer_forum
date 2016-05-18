@@ -278,7 +278,7 @@ EOT
 
         if ($sender->Form->authenticatedPostBack()) {
             $data = $sender->Form->formValues();
-            $result = $statusModel->save(val('Name', $data), val('State', $data), val('IsDefault', $data), $statusID);
+            $result = $statusModel->upsert(val('Name', $data), val('State', $data), val('IsDefault', $data), $statusID);
             $sender->Form->setValidationResults($statusModel->validationResults());
             if ($result) {
                 $sender->informMessage(t('Your changes have been saved.'));

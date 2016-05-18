@@ -33,7 +33,7 @@ class StatusModel extends Gdn_Model {
     }
 
     /**
-     * Inserts or updates a status in the Status table.
+     * Update or insert a status in the Status table.
      *
      * @param string $name The name of the status.
      * @param string $state Either 'Open' or 'Closed'.
@@ -42,7 +42,7 @@ class StatusModel extends Gdn_Model {
      * @return bool|int The ID of the saved status.
      * @throws Exception
      */
-    public function save($name, $state, $isDefault = 0, $statusID = 0) {
+    public function upsert($name, $state, $isDefault = 0, $statusID = 0) {
         // Put the data into a format that's savable.
         $this->defineSchema();
         $this->Validation->setSchema($this->Schema);

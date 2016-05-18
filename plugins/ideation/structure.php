@@ -22,12 +22,12 @@ if (!$statusExists) {
     // Add some default statuses.
     require_once dirname(__FILE__).'/class.statusmodel.php';
     $statusModel = new StatusModel();
-    $statusModel->save(t('Active'), 'Open', 1);
-    $statusModel->save(t('Already Offered'), 'Closed');
-    $statusModel->save(t('Declined'), 'Closed');
-    $statusModel->save(t('Completed'), 'Closed');
-    $statusModel->save(t('In Progress'), 'Closed');
-    $statusModel->save(t('In Review'), 'Open');
+    $statusModel->upsert(t('Active'), 'Open', 1);
+    $statusModel->upsert(t('Already Offered'), 'Closed');
+    $statusModel->upsert(t('Declined'), 'Closed');
+    $statusModel->upsert(t('Completed'), 'Closed');
+    $statusModel->upsert(t('In Progress'), 'Closed');
+    $statusModel->upsert(t('In Review'), 'Open');
 }
 
 Gdn::structure()
