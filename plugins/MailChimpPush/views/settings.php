@@ -153,7 +153,7 @@
    <ul class="SyncList">
       <li><?php
          echo $this->Sync->label("Sync to List", "SyncListID");
-         echo $this->Sync->dropDown('SyncListID', $this->data('Lists'), array('IncludeNull' => TRUE));
+         echo $this->Sync->dropDown('SyncListID', $this->data('Lists'), array('IncludeNull' => true));
       ?></li>
       <li><?php
          echo $this->Sync->checkBox('SyncConfirmJoin', 'Send confirmation email?');

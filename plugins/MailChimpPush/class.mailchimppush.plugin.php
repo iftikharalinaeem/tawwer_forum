@@ -266,7 +266,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             $sender->setData('Configured', true);
             $listsResponse = $this->MCAPI()->lists();
             $lists = val('data', $listsResponse);
-            $lists = Gdn_DataSet::Index($lists, 'id');
+            $lists = Gdn_DataSet::index($lists, 'id');
             $lists = array_column($lists, 'id', 'name');
             $sender->setData('Lists', $lists);
          } else {
@@ -295,9 +295,9 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
          $options = array();
          foreach ($opts as $opt => $default) {
-            $val = Gdn::Request()->getValue($opt, null);
+            $val = Gdn::request()->getValue($opt, null);
             if ((!isset($val) || $val == '') && in_array($opt, $requiredOpts))
-               throw new Exception(sprintf(T("%s is required."), $opt),400);
+               throw new Exception(sprintf(t("%s is required."), $opt), 400);
             $options[$opt] = is_null($val) ? $default : $val;
          }
          extract($options);
@@ -318,11 +318,11 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          if ($syncUnconfirmed == false)
             $criteria['Confirmed'] = 1;
 
-         $totalUsers = Gdn::UserModel()->getCount($criteria);
+         $totalUsers = Gdn::userModel()->getCount($criteria);
          if ($totalUsers) {
 
             // Fetch users
-            $processUsers = Gdn::UserModel()->getWhere($criteria, 'UserID', 'desc', $chunkSize, $offset);
+            $processUsers = Gdn::userModel()->getWhere($criteria, 'UserID', 'desc', $chunkSize, $offset);
             $newOffset = $offset+$processUsers->NumRows();
 
             // Extract email addresses
