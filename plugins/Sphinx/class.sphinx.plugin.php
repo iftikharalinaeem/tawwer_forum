@@ -1,89 +1,111 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['Sphinx'] = array(
-   'Name' => 'Sphinx Search',
-   'Description' => "Upgrades search to use the powerful Sphinx engine instead of the default search.",
-   'Version' => '1.1.3',
-   'RequiredApplications' => array('Vanilla' => '2.0.17'),
-   'Author' => 'Todd Burry',
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'SettingsUrl' => '/settings/sphinx',
-);
+$PluginInfo['Sphinx'] = [
+    'Name' => 'Sphinx Search',
+    'Description' => "Upgrades search to use the powerful Sphinx engine instead of the default search.",
+    'Version' => '1.1.3',
+    'RequiredApplications' => [
+        'Vanilla' => '2.0.17'
+    ],
+    'Author' => 'Todd Burry',
+    'AuthorEmail' => 'todd@vanillaforums.com',
+    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'SettingsUrl' => '/settings/sphinx',
+];
 
 // Force require our sphinx so that an incomplete autoloader doesn't miss it.
 if (!class_exists('SearchModel', false)) {
-   require_once __DIR__.'/class.searchmodel.php';
+    require_once __DIR__ . '/class.searchmodel.php';
 }
 
+/**
+ * Sphinx Plugin
+ *
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @package internal
+ */
 class SphinxPlugin extends Gdn_Plugin {
-   public function  __construct() {
-      parent::__construct();
-   }
 
-   public function OnDisable() {
-      // Remove the current library map so re-indexing will occur
-      @unlink(PATH_CACHE.'/library_map.ini');
-   }
+    /**
+     * Fired when plugin is disabled
+     *
+     * This code forces vanilla to re-index its files.
+     */
+    public function onDisable() {
+        // Remove the current library map so re-indexing will occur
+        @unlink(PATH_CACHE . '/library_map.ini');
+    }
 
-   public function Setup() {
-      if (!class_exists('SphinxClient')) {
-         throw new Exception('Sphinx requires the sphinx client to be installed. See http://www.php.net/manual/en/book.sphinx.php');
-      }
+    /**
+     * Fired when plugin is enabled
+     *
+     * @throws Exception
+     */
+    public function setup() {
+        if (!class_exists('SphinxClient')) {
+            throw new Exception('Sphinx requires the sphinx client to be installed. See http://www.php.net/manual/en/book.sphinx.php');
+        }
 
-      // Remove the current library map so that the core file won't be grabbed.
-      @unlink(PATH_CACHE.'/library_map.ini');
-      $this->Structure();
-   }
+        // Remove the current library map so that the core file won't be grabbed.
+        @unlink(PATH_CACHE . '/library_map.ini');
+        $this->structure();
+    }
 
-   public function Structure() {
-      Gdn::Structure()
-         ->Table('SphinxCounter')
-         ->Column('CounterID', 'uint', FALSE, 'primary')
-         ->Column('MaxID', 'uint', '0')
-         ->Engine('InnoDB')
-         ->Set();
-   }
+    /**
+     * Fired when the structure is executed
+     *
+     */
+    public function structure() {
+        Gdn::structure()
+            ->table('SphinxCounter')
+            ->column('CounterID', 'uint', false, 'primary')
+            ->column('MaxID', 'uint', '0')
+            ->engine('InnoDB')
+            ->set();
+    }
 
-   /**
-    *
-    * @param SettingsController $Sender
-    * @param array $Args
-    */
-   public function SettingsController_Sphinx_Create($Sender, $Args = array()) {
-      $Sender->Permission('Garden.Settings.Manage');
+    /**
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_sphinx_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
 
-		// Load up config options we'll be setting
-		$Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array(
-         'Plugins.Sphinx.Server' => 'int.sphinx1.vanilladev.com',
-         'Plugins.Sphinx.Port' => 9312,
-         'Plugins.Sphinx.UseDeltas' => TRUE
-      ));
+        // Load up config options we'll be setting
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField([
+            'Plugins.Sphinx.Server'     => 'auto',
+            'Plugins.Sphinx.Port'       => 9312,
+            'Plugins.Sphinx.UseDeltas'  => true
+        ]);
 
-      // Set the model on the form.
-      $Sender->Form = new Gdn_Form();
-      $Sender->Form->SetModel($ConfigurationModel);
+        // Set the model on the form.
+        $sender->Form = new Gdn_Form();
+        $sender->Form->setModel($configurationModel);
 
-      // If seeing the form for the first time...
-      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
-         // Apply the config settings to the form.
-         $Sender->Form->SetData($ConfigurationModel->Data);
-		} else {
-			// Save new settings
-			$Saved = $Sender->Form->Save();
-         if ($Saved)
-            $Sender->InformMessage(T('Saved'));
-		}
+        // If seeing the form for the first time...
+        if ($sender->Form->authenticatedPostBack() === false) {
+            // Apply the config settings to the form.
+            $sender->Form->setData($configurationModel->Data);
+        } else {
+            // Save new settings
+            $Saved = $sender->Form->save();
+            if ($Saved) {
+                $sender->informMessage(t('Saved'));
+            }
+        }
 
-      $Sender->SetData('Title', 'Sphinx Settings');
+        $sender->setData('Title', 'Sphinx Settings');
 
-      $Sender->AddSideMenu('/settings/plugins');
-      $Sender->Render('settings', '', 'plugins/Sphinx');
-   }
+        $sender->addSideMenu('/settings/plugins');
+        $sender->render('settings', '', 'plugins/Sphinx');
+    }
+
 }
