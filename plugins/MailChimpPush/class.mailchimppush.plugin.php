@@ -40,8 +40,8 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     */
    protected function provider() {
       if (!$this->provider) {
-         $ProviderModel = new Gdn_AuthenticationProviderModel();
-         $this->provider = $ProviderModel->getProviderByScheme(self::PROVIDER_ALIAS);
+         $providerModel = new Gdn_AuthenticationProviderModel();
+         $this->provider = $providerModel->getProviderByScheme(self::PROVIDER_ALIAS);
 
          if (is_array($this->provider)) {
             foreach (self::$settings as $setting)
@@ -71,7 +71,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     * @param type $sender
     * @return type
     */
-   public function userModel_AfterSave_Handler($sender) {
+   public function userModel_afterSave_handler($sender) {
       $suppliedEmail = val('Email', $sender->EventArguments['Fields'], null);
       if (empty($suppliedEmail)) return;
 
@@ -99,7 +99,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
      * @param UserModel $Sender The User Model.
      * @param Event $Args The arguments.
      */
-    public function userModel_AfterRegister_Handler($Sender, $Args) {
+    public function userModel_afterRegister_handler($Sender, $Args) {
         $isValidRegistration = $Args['Valid'];
 
         if ($isValidRegistration) {
@@ -181,12 +181,12 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     *
     * @param PluginController $sender
     */
-   public function pluginController_MailChimp_Create($sender) {
+   public function pluginController_mailChimp_create($sender) {
       $sender->permission('Garden.Settings.Manage');
       $this->dispatch($sender);
    }
 
-   public function controller_Index($sender) {
+   public function controller_index($sender) {
       $sender->title('MailChimp Settings');
       $sender->addSideMenu();
       $sender->Form = new Gdn_Form();
@@ -277,7 +277,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       $sender->render('settings','','plugins/MailChimpPush');
    }
 
-   public function controller_Sync($sender) {
+   public function controller_sync($sender) {
       $sender->deliveryMethod(DELIVERY_METHOD_JSON);
       $sender->deliveryType(DELIVERY_TYPE_DATA);
 
