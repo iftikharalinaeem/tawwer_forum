@@ -228,17 +228,30 @@ class CustomThemePlugin implements Gdn_IPlugin {
 	}
 	
    /** 
-   *	Hook smarty up with our custom template resource (functions at bottom of this file)
-   * @param type $Smarty 
+   * Hook smarty up with our custom template resource (functions at bottom of this file)
+	*
+   * @param Smarty $smarty Vanilla's instance of the Smarty object.
    */
-   public function Gdn_Smarty_Init_Handler($Smarty) {
-		// Register the resource name "customtheme"
-      $Smarty->register_resource("customtheme", array(
-         "customtheme_smarty_get_template", 
-         "customtheme_smarty_get_timestamp",
-         "customtheme_smarty_get_secure",
-         "customtheme_smarty_get_trusted"
-      ));
+   public function gdn_smarty_init_handler($smarty) {
+	   $smartyVersion = defined('Smarty::SMARTY_VERSION') ? Smarty::SMARTY_VERSION : $smarty->_version;
+
+	   // Register the resource name "customtheme"
+	   // registerResource, introduced in Smart v3, is accessed via __call, so it cannot be detected with method_exists.
+	   if (version_compare($smartyVersion, '3.0.0', '>=')) {
+		   $smarty->registerResource("customtheme", [
+			   "customtheme_smarty_get_template",
+			   "customtheme_smarty_get_timestamp",
+			   "customtheme_smarty_get_secure",
+			   "customtheme_smarty_get_trusted"
+		   ]);
+	   } else {
+		   $smarty->register_resource("customtheme", [
+			   "customtheme_smarty_get_template",
+			   "customtheme_smarty_get_timestamp",
+			   "customtheme_smarty_get_secure",
+			   "customtheme_smarty_get_trusted"
+		   ]);
+	   }
    }
 
    public static function GetRevisionFromFileName($FileName, $Default = 0) {

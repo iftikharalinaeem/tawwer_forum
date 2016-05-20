@@ -154,7 +154,10 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
      * @param type $Args
      */
     public function gdn_smarty_init_handler($Sender, $Args) {
-        if (method_exists($Sender, 'registerPlugin')) {
+        $smartyVersion = defined('Smarty::SMARTY_VERSION') ? Smarty::SMARTY_VERSION : $Sender->_version;
+
+        // registerPlugin, introduced in Smart v3, is accessed via __call, so it cannot be detected with method_exists.
+        if (version_compare($smartyVersion, '3.0.0', '>=')) {
             $Sender->registerPlugin(
                 'function',
                 'searchbox_advanced',
