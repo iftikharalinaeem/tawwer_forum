@@ -7,7 +7,7 @@
 $PluginInfo['CustomTheme'] = array(
    'Name' => 'Custom Theme',
    'Description' => 'Allows administrators to customize the CSS & master HTML template of the currently enabled theme.',
-   'Version' => '2.2',
+   'Version' => '2.2.1',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com',
@@ -753,8 +753,9 @@ function customtheme_smarty_get_timestamp($tpl_name, &$tpl_timestamp, $smarty_ob
     // with unix epoch time value of last template modification.
     // This is used to determine if recompile is necessary.
     $tpl_timestamp = C('Plugins.CustomTheme.LiveTime');
-	 if ($tpl_timestamp)
-		$tpl_timestamp = time(); // this will always recompile!
+	 if ($tpl_timestamp) {
+		 return $tpl_timestamp;
+	 }
 		
     // return true on success, false to generate failure notification
     return true;
