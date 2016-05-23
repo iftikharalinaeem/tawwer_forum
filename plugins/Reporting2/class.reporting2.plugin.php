@@ -7,7 +7,7 @@
 $PluginInfo['Reporting2'] = array(
    'Name' => 'Reporting',
    'Description' => 'Allows users to report posts to moderators for abuse, terms of service violations etc.',
-   'Version' => '2.0',
+   'Version' => '2.0.1',
    'RequiredApplications' => array('Vanilla' => '2.1'),
    'SettingsUrl' => '/settings/reporting',
    'SettingsPermission' => 'Garden.Settings.Manage',
@@ -33,7 +33,7 @@ class Reporting2Plugin extends Gdn_Plugin {
 
       // Try and find the category by type.
       $CategoryModel = new CategoryModel();
-      $Category = $CategoryModel->GetWhereCache(array('Type' => 'Reporting'));
+      $Category = $CategoryModel->GetWhere(array('Type' => 'Reporting'))->firstRow(DATASET_TYPE_ARRAY);
 
       if (empty($Category)) {
          // Try and get the category by slug.

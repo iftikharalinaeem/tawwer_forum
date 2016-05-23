@@ -18,12 +18,13 @@ class ReportModel extends Gdn_Model {
      * @return bool|mixed
      */
     public static function getReportCategory() {
-        $categoryModel = new CategoryModel();
-        $category = $categoryModel->GetWhereCache(array('Type' => 'Reporting'));
-        if (empty($category)) {
-            return false;
+        $category = Gdn::cache()->get('reporting.category');
+        if ($category === Gdn_Cache::CACHEOP_FAILURE) {
+            $categoryModel = new CategoryModel();
+            $category = $categoryModel->GetWhere(array('Type' => 'Reporting'))->firstRow(DATASET_TYPE_ARRAY);
+            Gdn::cache()->store('reporting.category', $category, [Gdn_Cache::FEATURE_EXPIRY => 300]);
         }
-        $category = array_pop($category);
+
         return $category;
     }
 
