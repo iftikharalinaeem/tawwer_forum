@@ -431,14 +431,27 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             return;
         }
 
+        $categories = $this->getCategories();
+        $categoriesID = array_keys($categories);
+
         $isEditing = $sender->data('Discussion', false);
-        $isInCategory = $sender->data('Category', false);
+        $currentCategoryID = val('CategoryID', $sender->data('Category'), -1);
+
+        // Check that we are in a category we can post in (ie. not the root category)
+        $isInCategory = in_array($currentCategoryID, $categoriesID);
+
         if ($isInCategory || $isEditing) {
             return;
         }
 
-        if (count($this->getCategories()) > 1  && val('ShowCategorySelector', $sender, null) === false) {
-            $sender->ShowCategorySelector = true;
+        if (count($categories) > 1) {
+            if (val('ShowCategorySelector', $sender, null) === false) {
+                $sender->ShowCategorySelector = true;
+            }
+        } else {
+            // By default the root category is set in the form.
+            // Overwrite that by the only category of this subcommunity.
+            $sender->Form->addHidden('CategoryID', $categoriesID[0]);
         }
     }
 
