@@ -427,11 +427,17 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param PostController $sender Sending controller instance.
      */
     public function postController_beforeDiscussionRender_handler($sender) {
-        if (!SubCommunityModel::getCurrent() || $sender->data('Discussion', false)) {
+        if (!SubCommunityModel::getCurrent()) {
             return;
         }
 
-        if ($this->getCategories() && val('ShowCategorySelector', $sender, null) === false) {
+        $isEditing = $sender->data('Discussion', false);
+        $isInCategory = $sender->data('Category', false);
+        if ($isInCategory || $isEditing) {
+            return;
+        }
+
+        if ($this->getCategories() > 1 && val('ShowCategorySelector', $sender, null) === false) {
             $sender->ShowCategorySelector = true;
         }
         return;
