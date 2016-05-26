@@ -437,7 +437,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             return;
         }
 
-        if ($this->getCategories() > 1 && val('ShowCategorySelector', $sender, null) === false) {
+        if (count($this->getCategories()) > 1  && val('ShowCategorySelector', $sender, null) === false) {
             $sender->ShowCategorySelector = true;
         }
     }
