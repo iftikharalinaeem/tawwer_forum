@@ -3,7 +3,7 @@
 $PluginInfo['ideation'] = [
     'Name'            => "Ideation",
     'Description'     => "Let users vote on discussions in a Idea category",
-    'Version'         => '1.0.0',
+    'Version'         => '1.0.1',
     'RequiredPlugins' => array(
         'Reactions'   => '1.4.0',
         'Tagging'     => '1.8.12'
@@ -155,7 +155,7 @@ class IdeationPlugin extends Gdn_Plugin {
 	jQuery(document).ready(function($) {
     $('input[value="Idea"]').parents('label').hide();
     });
-</script>'
+</script>
 EOT
         );
         if (!$sender->Form->authenticatedPostBack()) {
@@ -1205,6 +1205,21 @@ EOT
 
         $sender->Preferences['Notifications']['Email.VoterStatus'] = t('Notify me when the status changes on an idea I\'ve voted on.');
         $sender->Preferences['Notifications']['Popup.VoterStatus'] = t('Notify me when the status changes on an idea I\'ve voted on.');
+    }
+
+    /**
+     * MESSAGES
+     * ---------
+     */
+
+    /**
+     * Allow to choose
+     *
+     * @param MessageController $sender Sending controller
+     * @param array $args Event's arguments
+     */
+    public function messageController_afterGetLocationData_handler($sender, $args) {
+        $args['ControllerData']['Vanilla/Post/Idea'] = t('New Idea Form');
     }
 
     /**
