@@ -35,6 +35,7 @@ $PluginInfo['Reactions'] = array(
 class ReactionsPlugin extends Gdn_Plugin {
 
     const RECORD_REACTIONS_DEFAULT = 'popup';
+    const BEST_OF_MAX_PAGES = 300;
 
     /**
      * Include ReactionsController for /reactions requests
@@ -543,11 +544,16 @@ class ReactionsPlugin extends Gdn_Plugin {
         }
         $Sender->SetData('CurrentReaction', $Reaction);
 
-
         // Define the query offset & limit.
-        $Page = 'p'.GetIncomingValue('Page', 1);
+        $Page = Gdn::request()->get('Page', 1);
+
+        // Limit the number of pages.
+        if (self::BEST_OF_MAX_PAGES && $Page > self::BEST_OF_MAX_PAGES) {
+            $Page = self::BEST_OF_MAX_PAGES;
+        }
+        $Page = 'p'.$Page;
+
         $Limit = C('Plugins.Reactions.BestOfPerPage', 10);
-        //      $OffsetProvided = $Page != '';
         list($Offset, $Limit) = OffsetLimit($Page, $Limit);
 
         $Sender->SetData('_Limit', $Limit + 1);
