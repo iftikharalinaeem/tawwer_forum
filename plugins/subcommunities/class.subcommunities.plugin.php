@@ -420,6 +420,39 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Force ShowCategorySelector to true when we are creating a discussion
+     *
+     * @param PostController $sender Sending controller instance.
+     */
+    public function postController_beforeDiscussionRender_handler($sender) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
+        $subCommunityCategoryIDs = $this->getCategoryIDs();
+
+        $isEditing = $sender->data('Discussion', false);
+        $currentCategoryID = val('CategoryID', $sender->data('Category'), -1);
+
+        // Check that we are in a category we can post in (ie. not the root category)
+        $isInCategory = in_array($currentCategoryID, $subCommunityCategoryIDs);
+
+        if ($isInCategory || $isEditing) {
+            return;
+        }
+
+        if (count($subCommunityCategoryIDs) > 1) {
+            if (val('ShowCategorySelector', $sender, null) === false) {
+                $sender->ShowCategorySelector = true;
+            }
+        } else {
+            // By default the root category is set in the form.
+            // Overwrite that by the only category of this subcommunity.
+            $sender->Form->addHidden('CategoryID', $subCommunityCategoryIDs[0]);
+        }
+    }
+
+    /**
      * Hook on Gdn_Form BeforeCategoryDropDown event.
      *
      * Used to filter down the category dropdown when you are in a subcommunity.
