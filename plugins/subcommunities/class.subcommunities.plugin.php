@@ -419,6 +419,17 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         }
     }
 
+    public function postController_beforeDiscussionRender_handler($sender, $args) {
+        if (!SubCommunityModel::getCurrent() || $sender->data('Discussion', false)) {
+            return;
+        }
+
+        if ($this->getCategories() && val('ShowCategorySelector', $sender, null) === false) {
+            $sender->ShowCategorySelector = true;
+        }
+        return;
+    }
+
     /**
      * Hook on Gdn_Form BeforeCategoryDropDown event.
      *
