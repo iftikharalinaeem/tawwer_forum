@@ -450,7 +450,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         } else {
             // By default the root category is set in the form.
             // Overwrite that by the only category of this subcommunity.
-            $sender->Form->addHidden('CategoryID', $categoriesID[0]);
+            $sender->Form->addHidden('CategoryID', $subCommunityCategoryIDs[0]);
         }
     }
 
