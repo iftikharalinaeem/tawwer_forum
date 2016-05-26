@@ -12,7 +12,7 @@
 // Define the plugin:
 $PluginInfo['MailChimpPush'] = array(
    'Name' => 'MailChimp Push',
-   'Description' => "Updates MailChimp when users adjust their email address.",
+   'Description' => 'Updates MailChimp when users adjust their email address.',
    'Version' => '2.0.3',
    'RequiredApplications' => array('Vanilla' => '2.1a'),
    'Author' => 'Tim Gunter',
@@ -30,8 +30,6 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
    const PROVIDER_KEY = 'MailChimpAPI';
    const PROVIDER_ALIAS = 'mcapi';
-
-   const MAILCHIMP_OK = "Everything's Chimpy!";
 
    /**
     * Get our Provider record
@@ -59,8 +57,8 @@ class MailChimpPushPlugin extends Gdn_Plugin {
    protected function MCAPI() {
       if (!$this->MCAPI) {
          $provider = $this->provider();
-         $key = val("AssociationSecret", $provider);
-         $this->MCAPI = new MCAPI($key);
+         $key = val('AssociationSecret', $provider);
+         $this->MCAPI = new MailChimpWrapper($key);
       }
 
       return $this->MCAPI;
@@ -171,9 +169,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
       // Update existing user
       $confirmJoin = val('ConfirmJoin', $this->provider(), false);
-      return $this->MCAPI()->listSubscribe($listID, $email, array(
-         'EMAIL'  => $newEmail
-      ), $options['Format'], $options['ConfirmJoin'], true);
+      return $this->MCAPI()->listSubscribe($listID, $email, array('EMAIL'  => $newEmail), $options['Format'], $options['ConfirmJoin'], true);
    }
 
    /**
@@ -256,21 +252,22 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          }
 
          if ($modified)
-            $sender->informMessage(t("Changes saved"));
+            $sender->informMessage(t('Changes saved'));
       }
 
       $apiKey = val('AssociationSecret', $provider);
       if (!empty($apiKey)) {
          $ping = $this->MCAPI()->ping();
-         if ($ping == self::MAILCHIMP_OK) {
+         if ($ping === true) {
             $sender->setData('Configured', true);
             $listsResponse = $this->MCAPI()->lists();
-            $lists = val('data', $listsResponse);
+             $listsResponse = $this->MCAPI()->toArray($listsResponse);
+            $lists = val('lists', $listsResponse);
             $lists = Gdn_DataSet::index($lists, 'id');
-            $lists = array_column($lists, 'id', 'name');
+            $lists = array_column($lists, 'name', 'id');
             $sender->setData('Lists', $lists);
          } else {
-            $sender->Form->addError("Bad API Key");
+            $sender->Form->addError('Bad API Key');
          }
       }
 
@@ -297,7 +294,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          foreach ($opts as $opt => $default) {
             $val = Gdn::request()->getValue($opt, null);
             if ((!isset($val) || $val == '') && in_array($opt, $requiredOpts))
-               throw new Exception(sprintf(t("%s is required."), $opt), 400);
+               throw new Exception(sprintf(t('%s is required.'), $opt), 400);
             $options[$opt] = is_null($val) ? $default : $val;
          }
          extract($options);
