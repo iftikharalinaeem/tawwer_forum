@@ -421,7 +421,12 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         }
     }
 
-    public function postController_beforeDiscussionRender_handler($sender, $args) {
+    /**
+     * Force ShowCategorySelector to true when we are creating a discussion
+     *
+     * @param PostController $sender Sending controller instance.
+     */
+    public function postController_beforeDiscussionRender_handler($sender) {
         if (!SubCommunityModel::getCurrent() || $sender->data('Discussion', false)) {
             return;
         }
