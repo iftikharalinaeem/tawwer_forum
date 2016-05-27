@@ -9,7 +9,7 @@
 /**
  * Class RoleTrackerModel
  */
-class RoleTrackerModel extends Gdn_Model {
+class RoleTrackerModel {
 
     /**
      * @var $roleModel RoleModel
@@ -30,7 +30,6 @@ class RoleTrackerModel extends Gdn_Model {
      * Class constructor.
      */
     public function __construct(RoleModel $roleModel) {
-        parent::__construct(__CLASS__);
         $this->roleModel = $roleModel;
     }
 
@@ -154,11 +153,9 @@ class RoleTrackerModel extends Gdn_Model {
      * Save data received from a Form.
      *
      * @param array $formPostValues The data to save.
-     * @param bool $settings Unused
-     *
      * @return bool Returns true on success, false otherwise.
      */
-    public function save($formPostValues, $settings = false) {
+    public function save($formPostValues) {
 
         $rolesData = $this->formDataToRoleData($formPostValues);
         $roles = $this->getPublicRoles();
