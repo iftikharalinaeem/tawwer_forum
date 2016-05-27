@@ -40,7 +40,7 @@ class RoleTrackerModel extends Gdn_Model {
      * @param array $roles Roles to be filtered.
      * @return array Tracked roles.
      */
-    public static function filterOutNonTrackedRole($roles) {
+    public static function filterRoles($roles) {
         return array_filter(
             $roles,
             function($role) {
@@ -79,7 +79,7 @@ class RoleTrackerModel extends Gdn_Model {
         static $trackedRoles;
 
         if ($refreshCache || $trackedRoles === null) {
-            $roles = self::filterOutNonTrackedRole($this->getPublicRoles($refreshCache));
+            $roles = self::filterRoles($this->getPublicRoles($refreshCache));
         }
 
         return $roles;
@@ -92,7 +92,7 @@ class RoleTrackerModel extends Gdn_Model {
      * @return array The tracked roles, if any.
      */
     public function getUserTrackedRoles($userID) {
-        return self::filterOutNonTrackedRole(
+        return self::filterRoles(
             $this->roleModel->getByUserID($userID)->resultArray()
         );
     }
