@@ -73,7 +73,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param array $args Caller's event arguments.
      * @param string $source Discussion || Comment
      */
-    private function addTagsToDiscussion($args, $source) {
+    private function trackDiscussion($args, $source) {
         $userTrackedRoles = $this->getRoleTrackerModel()->getUserTrackedRoles(val('InsertUserID', $args[$source]));
         if (!$userTrackedRoles) {
             return;
@@ -258,7 +258,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function postController_afterDiscussionSave_handler($sender, $args) {
-        $this->addTagsToDiscussion($args, 'Discussion');
+        $this->trackDiscussion($args, 'Discussion');
     }
 
     /**
@@ -268,7 +268,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function postController_afterCommentSave_handler($sender, $args) {
-        $this->addTagsToDiscussion($args, 'Comment');
+        $this->trackDiscussion($args, 'Comment');
     }
 
     /**
