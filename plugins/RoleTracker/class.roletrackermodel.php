@@ -63,7 +63,7 @@ class RoleTrackerModel extends Gdn_Model {
                 'RoleModel::filterPersonalInfo'
             );
 
-            $roles = $this->filterOutUnusedRoleFields($roles);
+            $roles = $this->filterRoleFields($roles);
         }
 
         return $roles;
@@ -211,7 +211,7 @@ class RoleTrackerModel extends Gdn_Model {
      * @param array $roles List of roles.
      * @return array
      */
-    protected function filterOutUnusedRoleFields($roles) {
+    protected function filterRoleFields($roles) {
         $rolesData = [];
         foreach($roles as $role) {
             $rolesData[$role['RoleID']] = array_intersect_key($role, self::$roleTrackerFields);
