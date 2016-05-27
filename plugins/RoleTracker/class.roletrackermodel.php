@@ -206,9 +206,9 @@ class RoleTrackerModel extends Gdn_Model {
     }
 
     /**
-     * Remove every fields from roles data that are unused by this model.
+     * Remove fields from roles data that are not used by this model.
      *
-     * @param $roles
+     * @param array $roles List of roles.
      * @return array
      */
     protected function filterOutUnusedRoleFields($roles) {
