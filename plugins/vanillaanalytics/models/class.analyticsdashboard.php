@@ -169,6 +169,9 @@ class AnalyticsDashboard implements JsonSerializable {
                     'widgets' => ['total-pageviews', 'total-active-users', 'total-visits', 'active-users', 'visits',
                         'visits-by-role-type', 'pageviews', 'registrations'
                     ]
+                ],
+                'QnA' => [
+                    'widgets' => ['questions-asked', 'questions-answered', 'answers-accepted']
                 ]
             ];
 

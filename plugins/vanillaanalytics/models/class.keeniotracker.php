@@ -156,6 +156,21 @@ class KeenIOTracker implements TrackerInterface {
             'title' => 'New Users',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart'
+        ],
+        'questions-asked' => [
+            'title' => 'Questions Asked',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart'
+        ],
+        'questions-answered' => [
+            'title' => 'Questions Answered',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart'
+        ],
+        'answers-accepted' => [
+            'title' => 'Accepted Answers',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart'
         ]
     ];
 
@@ -482,6 +497,59 @@ class KeenIOTracker implements TrackerInterface {
             ->setInterval('daily');
 
         $this->widgets['registrations']['query'] = $registrationsQuery;
+
+        // Questions asked
+        $questionsAskedQuery = new KeenIOQuery();
+        $questionsAskedQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Questions Asked'))
+            ->setEventCollection('post')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'type',
+                'property_value' => 'discussion_add'
+            ])
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'discussionType',
+                'property_value' => 'Question'
+            ])
+            ->setInterval('daily');
+
+        $this->widgets['questions-asked']['query'] = $questionsAskedQuery;
+
+        // Questions answered
+        $questionsAnsweredQuery = new KeenIOQuery();
+        $questionsAnsweredQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Questions Answered'))
+            ->setEventCollection('post')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'type',
+                'property_value' => 'comment_add'
+            ])
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'discussion.discussionType',
+                'property_value' => 'Question'
+            ])
+            ->setTargetProperty('discussionID')
+            ->setInterval('daily');
+
+        $this->widgets['questions-answered']['query'] = $questionsAnsweredQuery;
+
+        // Answers accepted
+        $answersAcceptedQuery = new KeenIOQuery();
+        $answersAcceptedQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Answers Accepted'))
+            ->setEventCollection('qna')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'type',
+                'property_value' => 'answer_accepted'
+            ])
+            ->setInterval('daily');
+
+        $this->widgets['answers-accepted']['query'] = $answersAcceptedQuery;
     }
 
     /**
