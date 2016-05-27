@@ -127,7 +127,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             }
         }
 
-        $sender->render($this->getView('settings.php'));
+        $sender->render($sender->fetchViewLocation('settings', '', 'plugins/RoleTracker'));
     }
 
     /**
