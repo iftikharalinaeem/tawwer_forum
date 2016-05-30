@@ -30,7 +30,7 @@ class RoleTrackerModel extends Gdn_Model {
      * Class constructor.
      */
     public function __construct(RoleModel $roleModel) {
-        parent::__construct(__CLASS__);
+        parent::__construct('RoleTracker');
         $this->roleModel = $roleModel;
     }
 
