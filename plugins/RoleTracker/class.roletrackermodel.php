@@ -126,8 +126,8 @@ class RoleTrackerModel extends Gdn_Model {
             $roles = $this->filterFieldsForSave($roles);
         }
 
-        foreach($roles as $roleID => $role) {
-            foreach($role as $fieldName => $fieldValue) {
+        foreach ($roles as $roleID => $role) {
+            foreach ($role as $fieldName => $fieldValue) {
                 $formData[$roleID.'_'.$fieldName] = $fieldValue;
             }
         }
@@ -148,7 +148,7 @@ class RoleTrackerModel extends Gdn_Model {
         $validFormData = $this->getFormData(true);
         $formData = array_intersect_key($formData, $validFormData);
 
-        foreach($formData as $roleIDFieldName => $fieldValue) {
+        foreach ($formData as $roleIDFieldName => $fieldValue) {
             $pos = strpos($roleIDFieldName, '_');
             if ($pos && strlen($roleIDFieldName) > $pos + 1) {
                 $roleID = substr($roleIDFieldName, 0, $pos);
@@ -221,7 +221,7 @@ class RoleTrackerModel extends Gdn_Model {
      */
     protected function filterRoleFields($roles) {
         $rolesData = [];
-        foreach($roles as $role) {
+        foreach ($roles as $role) {
             $rolesData[$role['RoleID']] = array_intersect_key($role, self::$roleTrackerFields);
         }
         return $rolesData;
@@ -235,7 +235,7 @@ class RoleTrackerModel extends Gdn_Model {
      */
     protected function filterFieldsForSave($roles) {
         $rolesData = [];
-        foreach($roles as $roleID => $roleData) {
+        foreach ($roles as $roleID => $roleData) {
             $rolesData[$roleID] = array_intersect_key(
                 $roleData,
                 array_filter(
