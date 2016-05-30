@@ -41,6 +41,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     #######################################
     ## Plugin's functions
     #######################################
+
     /**
      * Return an instance of RoleTrackerModel
      *
@@ -88,6 +89,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     #######################################
     ## Plugin's hooks
     #######################################
+
     /**
      * Add a link to the dashboard menu.
      *
