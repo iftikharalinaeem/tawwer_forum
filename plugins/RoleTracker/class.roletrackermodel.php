@@ -35,6 +35,21 @@ class RoleTrackerModel extends Gdn_Model {
     }
 
     /**
+     * Return an instance of RoleTrackerModel
+     *
+     * @return RoleTrackerModel roleTrackerModel
+     */
+    public static function instance() {
+        static $roleTrackingModel;
+
+        if ($roleTrackingModel === null) {
+            $roleTrackingModel = new RoleTrackerModel(new RoleModel());
+        }
+
+        return $roleTrackingModel;
+    }
+
+    /**
      * Filters out non tracked roles.
      *
      * @param array $roles Roles to be filtered.

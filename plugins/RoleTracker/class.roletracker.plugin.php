@@ -43,21 +43,6 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     #######################################
 
     /**
-     * Return an instance of RoleTrackerModel
-     *
-     * @return RoleTrackerModel roleTrackerModel
-     */
-    protected function getRoleTrackerModel() {
-        static $roleTrackingModel;
-
-        if ($roleTrackingModel === null) {
-            $roleTrackingModel = new RoleTrackerModel(new RoleModel());
-        }
-
-        return $roleTrackingModel;
-    }
-
-    /**
      * Generate a valid css class from a role's name.
      *
      * @param string $roleName role name
@@ -75,7 +60,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param string $source Discussion || Comment
      */
     private function trackDiscussion($args, $source) {
-        $userTrackedRoles = $this->getRoleTrackerModel()->getUserTrackedRoles(val('InsertUserID', $args[$source]));
+        $userTrackedRoles = RoleTrackerModel::instance()->getUserTrackedRoles(val('InsertUserID', $args[$source]));
         if (!$userTrackedRoles) {
             return;
         }
@@ -116,7 +101,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
 
         $sender->Form = new Gdn_Form();
 
-        $roleTrackerModel = $this->getRoleTrackerModel();
+        $roleTrackerModel = RoleTrackerModel::instance();
         $formData = $roleTrackerModel->getFormData(false);
         $sender->Form->setModel($roleTrackerModel, $formData);
 
@@ -167,7 +152,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         // And add the css class to the discussion
         if (is_array($sender->Discussion->Roles)) {
             if (count($sender->Discussion->Roles)) {
-                $trackedRoles = $this->getRoleTrackerModel()->getTrackedRoles();
+                $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
                 $cssTrackerRoles = [];
                 foreach (val('Roles', $sender->Discussion, []) as $roleID => $roleName) {
                     if (array_key_exists($roleID, $trackedRoles)) {
@@ -190,7 +175,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      */
     public function base_beforeCommentDisplay_handler($sender, $args) {
 
-        $trackedRoles = $this->getRoleTrackerModel()->getTrackedRoles();
+        $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
 
         $cssClass = val('CssClass', $args, null);
 
@@ -219,7 +204,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         if (!$postRoles) {
             return;
         }
-        $trackedRoles = $this->getRoleTrackerModel()->getTrackedRoles();
+        $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
         $tagsID = [];
 
         foreach ($postRoles as $roleID => $roleName) {
@@ -289,7 +274,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         }
 
 
-        $trackedRoles = $this->getRoleTrackerModel()->getTrackedRoles();
+        $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
         if (!$trackedRoles) {
             return;
         }
