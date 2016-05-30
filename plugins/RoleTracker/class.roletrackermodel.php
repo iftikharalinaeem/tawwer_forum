@@ -40,7 +40,7 @@ class RoleTrackerModel extends Gdn_Model {
      * @return RoleTrackerModel roleTrackerModel
      */
     public static function instance() {
-        static $roleTrackingModel;
+        static $roleTrackingModel = null;
 
         if ($roleTrackingModel === null) {
             $roleTrackingModel = new RoleTrackerModel(new RoleModel());
@@ -70,7 +70,7 @@ class RoleTrackerModel extends Gdn_Model {
      * @return array Public roles.
      */
     public function getPublicRoles($refreshCache = false) {
-        static $roles;
+        static $roles = null;
 
         if ($refreshCache || $roles === null) {
             $roles = array_filter(
@@ -91,7 +91,7 @@ class RoleTrackerModel extends Gdn_Model {
      * @return array Tracked roles.
      */
     public function getTrackedRoles($refreshCache = false) {
-        static $trackedRoles;
+        static $trackedRoles = null;
 
         if ($refreshCache || $trackedRoles === null) {
             $roles = self::filterRoles($this->getPublicRoles($refreshCache));

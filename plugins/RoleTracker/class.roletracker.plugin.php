@@ -174,7 +174,6 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function base_beforeCommentDisplay_handler($sender, $args) {
-
         $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
 
         $cssClass = val('CssClass', $args, null);
@@ -198,6 +197,8 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function discussionController_authorInfo_handler($sender, $args) {
+        static $tags = null;
+
         $target = $args['Type'];
 
         $postRoles = val('Roles', $args[$target]);
@@ -217,7 +218,6 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             return;
         }
 
-        static $tags;
         if ($tags === null) {
             $tagModel = TagModel::instance();
             $tags = $tagModel->getWhere(['Type' => 'Tracker'])->resultArray();
@@ -265,6 +265,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function base_afterDiscussionLabels_handler($sender, $args) {
+        static $trackedRolesTagIDs = null;
 
         if (!($discussion = val('Discussion', $args, false))) {
             return;
@@ -279,7 +280,6 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             return;
         }
 
-        static $trackedRolesTagIDs = null;
         if ($trackedRolesTagIDs === null) {
             $trackedRolesTagIDs = array_column($trackedRoles, 'TrackerTagID');
         }
