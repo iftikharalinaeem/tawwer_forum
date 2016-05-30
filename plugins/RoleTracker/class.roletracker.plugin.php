@@ -252,6 +252,31 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Prevent the tagging plugin from linking an user generated tag that
+     * would have the same name than a RoleTracker tag.
+     *
+     * @param TaggingPlugin $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function taggingPlugin_saveDiscussion_handler($sender, $args) {
+        $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
+        if (!$trackedRoles) {
+            return;
+        }
+
+        $tagIDs = array_column($trackedRoles, 'TrackerTagID');
+        $tags = TagModel::instance()->getWhere(['TagID' => $tagIDs])->resultArray();
+        $tagNames = array_column($tags, 'Name');
+        array_walk($tagNames, 'strtolower');
+
+        foreach ($args['Tags'] as $index => $tag) {
+            if (in_array(strtolower($tag), $tagNames)) {
+                unset($args['Tags'][$index]);
+            }
+        }
+    }
+
+    /**
      * Add user role tracker's tag(s) to discussion after comment save.
      *
      * @param PostController $sender Sending controller instance.
