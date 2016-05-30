@@ -35,7 +35,10 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * Update the DB structure. Called on /utility/update and when the plugin is enabled
      */
     public function structure() {
-        require(__DIR__.'/structure.php');
+        Gdn::structure()->table('Role')
+            ->column('IsTracked', 'tinyint(1)', 0)
+            ->column('TrackerTagID', 'tinyint(1)', true)
+            ->set(false, false);
     }
 
     #######################################
