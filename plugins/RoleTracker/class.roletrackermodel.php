@@ -181,43 +181,36 @@ class RoleTrackerModel extends Gdn_Model {
 
         $database = $this->roleModel->Database;
         $database->beginTransaction();
-            foreach($rolesData as $roleID => $roleData) {
-                if ($roles[$roleID]['IsTracked'] == $roleData['IsTracked']) {
-                    continue;
-                }
 
-                // If we check a role as tracked for the first time we need to create a Tracker tag for it.
-                $trackerTagIdExist = !empty($roles[$roleID]['TrackerTagID']);
-                if ($roleData['IsTracked'] && !$trackerTagIdExist) {
-                    $newTag = [
-                        'Name' => TagModel::tagSlug($roles[$roleID]['Name']),
-                        'FullName' => $roles[$roleID]['Name'],
-                        'Type' => 'Tracker',
-                        'CategoryID' => -1,
-                        'InsertUserID' => Gdn::session()->UserID,
-                        'DateInserted' => Gdn_Format::toDateTime(),
-                        'CountDiscussions' => 0
-                    ];
-                    $tagID = $database->sql()->options('Ignore', true)->insert('Tag', $newTag);
-
-                    $success = $success && $tagID;
-                    $roleData['TrackerTagID'] = $tagID;
-                }
-
-                $success = $success && $this->roleModel->update($roleData, ['RoleID' => $roleID]);
+        foreach ($rolesData as $roleID => $roleData) {
+            if ($roles[$roleID]['IsTracked'] == $roleData['IsTracked']) {
+                continue;
             }
+
+            // If we check a role as tracked for the first time we need to create a Tracker tag for it.
+            $trackerTagIdExist = !empty($roles[$roleID]['TrackerTagID']);
+            if ($roleData['IsTracked'] && !$trackerTagIdExist) {
+                $newTag = [
+                    'Name' => TagModel::tagSlug($roles[$roleID]['Name']),
+                    'FullName' => $roles[$roleID]['Name'],
+                    'Type' => 'Tracker',
+                    'CategoryID' => -1,
+                    'InsertUserID' => Gdn::session()->UserID,
+                    'DateInserted' => Gdn_Format::toDateTime(),
+                    'CountDiscussions' => 0
+                ];
+                $tagID = $database->sql()->options('Ignore', true)->insert('Tag', $newTag);
+
+                $success = $success && $tagID;
+                $roleData['TrackerTagID'] = $tagID;
+            }
+
+            $success = $success && $this->roleModel->update($roleData, ['RoleID' => $roleID]);
+        }
+
         $success ? $database->commitTransaction() : $database->rollbackTransaction();
 
         return $success;
-    }
-
-    /**
-     * Validation will not fail unless there is a coding error.
-     *
-     * @return array
-     */
-    public function validationResults() {
-        return [];
     }
 
     /**
