@@ -50,7 +50,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @return string CSS class
      */
     private function formatRoleCss($roleName) {
-        return str_replace(' ', '_', Gdn_Format::alphaNumeric($roleName)).'-Tracker';
+        return str_replace(' ', '_', Gdn_Format::alphaNumeric(strtolower($roleName))).'-tracker';
     }
 
     /**
@@ -232,7 +232,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             $trackerTag = $tags[$tagID];
             $tagName = Gdn_Format::display($trackerTag['FullName']);
             // Keep those spaces before and after the tag :D
-            $postTags .= ' <span class="Tag Tag-'.$tagName.'-Tracker">'.$tagName.'</span> ';
+            $postTags .= ' <span class="Tag tag-'.$tagName.'-tracker">'.$tagName.'</span> ';
         }
 
         echo '<span class="MItem RoleTracker"><span class="Tags">'.$postTags.'</span></span> ';
@@ -287,7 +287,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         foreach ($discussionTags as $tagData) {
             if (in_array($tagData['TagID'], $trackedRolesTagIDs)) {
                 $tagName = Gdn_Format::display(t($tagData['FullName']));
-                echo ' <span class="Tag Tag-'.ucfirst(t($tagData['Name'])).'-Tracker">'.$tagName.'</span> ';
+                echo ' <span class="Tag tag-'.ucfirst(t($tagData['Name'])).'-tracker">'.$tagName.'</span> ';
 
             }
         }
