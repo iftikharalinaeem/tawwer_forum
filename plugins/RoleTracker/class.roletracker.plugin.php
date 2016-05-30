@@ -235,7 +235,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             $trackerTag = $tags[$tagID];
             $tagName = htmlspecialchars($trackerTag['FullName']);
             // Keep those spaces before and after the tag :D
-            $postTags .= ' <span class="Tag tag-'.$tagName.'-tracker">'.$tagName.'</span> ';
+            $postTags .= ' <span class="Tag tag-'.strtolower(t($trackerTag['Name'])).'-tracker">'.$tagName.'</span> ';
         }
 
         echo '<span class="MItem RoleTracker"><span class="Tags">'.$postTags.'</span></span> ';
@@ -288,7 +288,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         foreach ($discussionTags as $tagData) {
             if (in_array($tagData['TagID'], $tagIDs)) {
                 $tagName = htmlspecialchars(t($tagData['FullName']));
-                echo ' <span class="Tag tag-'.ucfirst(t($tagData['Name'])).'-tracker">'.$tagName.'</span> ';
+                echo ' <span class="Tag tag-'.strtolower(t($tagData['Name'])).'-tracker">'.$tagName.'</span> ';
 
             }
         }
