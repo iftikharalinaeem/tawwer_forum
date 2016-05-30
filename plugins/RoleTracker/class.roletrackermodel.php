@@ -141,7 +141,7 @@ class RoleTrackerModel extends Gdn_Model {
      * @param array $formData
      * @return array
      */
-    public function formDataToRoleData($formData) {
+    public function convertFormData($formData) {
         $roleData = [];
 
         // Keep only what is good
@@ -175,7 +175,7 @@ class RoleTrackerModel extends Gdn_Model {
      */
     public function save($formPostValues, $settings = false) {
 
-        $rolesData = $this->formDataToRoleData($formPostValues);
+        $rolesData = $this->convertFormData($formPostValues);
         $roles = $this->getPublicRoles();
         $success = true;
 
