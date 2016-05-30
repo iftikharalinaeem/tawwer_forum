@@ -60,10 +60,10 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * Add user role tracker's tag(s) to discussion.
      *
      * @param int $discussionID Identifier of the discussion
-     * @param array $post Discussion || Comment
+     * @param int $userID User identifier
      */
-    private function addPostTagsToDiscussion($discussionID, $post) {
-        $userTrackedRoles = RoleTrackerModel::instance()->getUserTrackedRoles(val('InsertUserID', $post));
+    private function addUserTagsToDiscussion($discussionID, $userID) {
+        $userTrackedRoles = RoleTrackerModel::instance()->getUserTrackedRoles($userID);
         if (!$userTrackedRoles) {
             return;
         }
@@ -249,7 +249,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      */
     public function postController_afterDiscussionSave_handler($sender, $args) {
         $discussion = $args['Discussion'];
-        $this->addPostTagsToDiscussion(val('DiscussionID', $discussion), $discussion);
+        $this->addPostTagsToDiscussion(val('DiscussionID', $discussion), val('InsertUserID', $discussion));
     }
 
     /**
@@ -284,7 +284,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function postController_afterCommentSave_handler($sender, $args) {
-        $this->addPostTagsToDiscussion(val('DiscussionID', $args['Discussion']), $args['Comment']);
+        $this->addPostTagsToDiscussion(val('DiscussionID', $args['Discussion']), val('InsertUserID', $args['Comment']));
     }
 
     /**
