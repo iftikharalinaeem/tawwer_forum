@@ -66,9 +66,9 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         }
 
         $tagModel = TagModel::instance();
-        $trackerRolesTagIDs = array_column($userTrackedRoles, 'TrackerTagID');
+        $tagIDs = array_column($userTrackedRoles, 'TrackerTagID');
 
-        $tagModel->addDiscussion(val('DiscussionID', $args['Discussion']), $trackerRolesTagIDs);
+        $tagModel->addDiscussion(val('DiscussionID', $args['Discussion']), $tagIDs);
     }
 
     #######################################
@@ -265,7 +265,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function base_afterDiscussionLabels_handler($sender, $args) {
-        static $trackedRolesTagIDs = null;
+        static $tagIDs = null;
 
         if (!($discussion = val('Discussion', $args, false))) {
             return;
@@ -280,12 +280,12 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             return;
         }
 
-        if ($trackedRolesTagIDs === null) {
-            $trackedRolesTagIDs = array_column($trackedRoles, 'TrackerTagID');
+        if ($tagIDs === null) {
+            $tagIDs = array_column($trackedRoles, 'TrackerTagID');
         }
 
         foreach ($discussionTags as $tagData) {
-            if (in_array($tagData['TagID'], $trackedRolesTagIDs)) {
+            if (in_array($tagData['TagID'], $tagIDs)) {
                 $tagName = Gdn_Format::display(t($tagData['FullName']));
                 echo ' <span class="Tag tag-'.ucfirst(t($tagData['Name'])).'-tracker">'.$tagName.'</span> ';
 
