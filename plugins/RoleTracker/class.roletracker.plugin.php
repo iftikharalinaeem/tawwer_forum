@@ -222,7 +222,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         $trackedRoles = $this->getRoleTrackerModel()->getTrackedRoles();
         $tagsID = [];
 
-        foreach($postRoles as $roleID => $roleName) {
+        foreach ($postRoles as $roleID => $roleName) {
             if (array_key_exists($roleID, $trackedRoles)) {
                 $tagsID[] = $trackedRoles[$roleID]['TrackerTagID'];
             }
@@ -240,7 +240,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         }
 
         $postTags = '';
-        foreach($tagsID as $tagID) {
+        foreach ($tagsID as $tagID) {
             if (!isset($tags[$tagID])) {
                 continue;
             }
@@ -299,7 +299,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             $trackedRolesTagID = array_column($trackedRoles, 'TrackerTagID');
         }
 
-        foreach($discussionTags as $tagData) {
+        foreach ($discussionTags as $tagData) {
             if (in_array($tagData['TagID'], $trackedRolesTagID)) {
                 $tagName = Gdn_Format::display(t($tagData['FullName']));
                 echo ' <span class="Tag Tag-'.ucfirst(t($tagData['Name'])).'-Tracker">'.$tagName.'</span> ';
