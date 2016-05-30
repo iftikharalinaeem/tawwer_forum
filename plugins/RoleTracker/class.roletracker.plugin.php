@@ -267,11 +267,9 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     public function base_afterDiscussionLabels_handler($sender, $args) {
         static $tagIDs = null;
 
-        if (!($discussion = val('Discussion', $args, false))) {
-            return;
-        }
-
-        if (!($discussionTags = val('Tags', $discussion, false))) {
+        $discussion = val('Discussion', $args, false);
+        $discussionTags = val('Tags', $discussion, false);
+        if (!$discussion || !$discussionTags) {
             return;
         }
 
