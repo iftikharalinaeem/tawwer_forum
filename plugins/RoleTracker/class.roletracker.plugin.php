@@ -230,7 +230,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
                 continue;
             }
             $trackerTag = $tags[$tagID];
-            $tagName = Gdn_Format::display($trackerTag['FullName']);
+            $tagName = htmlspecialchars($trackerTag['FullName']);
             // Keep those spaces before and after the tag :D
             $postTags .= ' <span class="Tag tag-'.$tagName.'-tracker">'.$tagName.'</span> ';
         }
@@ -286,7 +286,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
 
         foreach ($discussionTags as $tagData) {
             if (in_array($tagData['TagID'], $tagIDs)) {
-                $tagName = Gdn_Format::display(t($tagData['FullName']));
+                $tagName = htmlspecialchars(t($tagData['FullName']));
                 echo ' <span class="Tag tag-'.ucfirst(t($tagData['Name'])).'-tracker">'.$tagName.'</span> ';
 
             }
