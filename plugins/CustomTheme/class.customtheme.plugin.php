@@ -765,13 +765,9 @@ class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
                 $this->smarty->template_dir = $dir;
             }
 
-            $mtime = $this->fetchTimestamp($name);
+            $mtime = strtotime($data->DateInserted);
             if (!$mtime) {
-                if ($data->DateInserted) {
-                    $mtime = strtotime($data->DateInserted);
-                } else {
-                    $mtime = time();
-                }
+                $mtime = time();
             }
             $source = $data->Html;
             return true;
@@ -780,19 +776,20 @@ class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
     }
 
     /**
-     * Fetch a template's modification time from database
+     * Fetch a template's modification time from config
+     *
+     * This is a shortcut. If LiveTime has not been set, this returns null and
+     * will cause a fallback to fetch(), which will pull from the database if
+     * needed.
      *
      * @param string $name template name
      * @return integer timestamp (epoch) the template was modified
      */
     protected function fetchTimestamp($name) {
         $modTime = C('Plugins.CustomTheme.LiveTime');
-        if (!$modTime) {
+        if (!$modTime || !($mtime = strtotime($modTime))) {
             return null;
         }
-        if (!($mtime = strtotime($modTime))) {
-            return null;
-        }
-        return $modTime;
+        return $mtime;
     }
 }
