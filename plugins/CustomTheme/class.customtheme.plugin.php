@@ -117,7 +117,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 	 * Can the current theme be customized?
 	 */
 	private function _CanCustomizeTheme() {
-		$ThemeInfo = Gdn::ThemeManager()->EnabledThemeInfo();
+		$ThemeInfo = Gdn::addonManager()->getTheme()->getInfo();
       if (empty($ThemeInfo)) return FALSE;
 		// Make sure the current theme uses a smarty master template instead of php
       $ThemeRoot = PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '');
@@ -131,7 +131,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
     * @return string Returns the theme root.
     */
    public static function getThemeRoot($folder = '') {
-      $ThemeInfo = Gdn::ThemeManager()->EnabledThemeInfo();
+      $ThemeInfo = Gdn::addonManager()->getTheme()->getInfo();
       $result = val('ThemeRoot', $ThemeInfo, '');
 
       if (!$result) {
@@ -319,8 +319,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
       $Sender->AddJsFile('jquery.textarea.js', 'plugins/CustomTheme');
 		$Sender->AddCssFile('customtheme.css', 'plugins/CustomTheme');
 		
-		$ThemeManager = new Gdn_ThemeManager();
-		$CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
+		$CurrentThemeInfo = Gdn::addonManager()->getTheme()->getInfo();
 		$CurrentThemeFolder = basename(GetValue('ThemeRoot', $CurrentThemeInfo));
 		$Folder = PATH_THEMES . DS . $CurrentThemeFolder;
 		
@@ -673,8 +672,7 @@ Here are some things you should know before you begin:
             Gdn::SQL()->Put('CustomThemeRevision', $Set, array('RevisionID' => $WorkingRevisionID));
          } else {
             // If there isn't a working revision, create it.
-            $ThemeManager = new Gdn_ThemeManager();
-            $CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
+            $CurrentThemeInfo = Gdn::addonManager()->getTheme()->getInfo();
             $CurrentThemeFolder = basename(GetValue('ThemeRoot', $CurrentThemeInfo));
             $Folder = PATH_THEMES . DS . $CurrentThemeFolder;
             if (file_exists($Folder . DS . 'views' . DS . 'default.master.tpl'))
