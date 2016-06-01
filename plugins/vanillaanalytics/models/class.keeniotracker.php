@@ -62,6 +62,33 @@ class KeenIOTracker implements TrackerInterface {
             'type' => 'metric',
             'support' => 'cat01'
         ],
+        'total-asked' => [
+            'title' => 'Questions Asked',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric'
+        ],
+        'total-answered' => [
+            'title' => 'Questions Answered',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric'
+        ],
+        'total-accepted' => [
+            'title' => 'Answers Accepted',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric'
+        ],
+        'time-to-answer' => [
+            'title' => 'Average Time to Answer',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric',
+            'callback' => 'formatSeconds'
+        ],
+        'time-to-accept' => [
+            'title' => 'Average Time to Accept',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric',
+            'callback' => 'formatSeconds'
+        ],
         'pageviews' => [
             'title' => 'Page Views',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
@@ -333,6 +360,90 @@ class KeenIOTracker implements TrackerInterface {
             ->setTargetProperty('user.userID');
 
         $this->widgets['total-contributors']['query'] = $totalContributorsQuery;
+
+        // Questions Asked (metric)
+        $totalAskedQuery = new KeenIOQuery();
+        $totalAskedQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Questions Asked'))
+            ->setEventCollection('post')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'type',
+                'property_value' => 'discussion_add'
+            ])
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'discussionType',
+                'property_value' => 'Question'
+            ]);
+
+        $this->widgets['total-asked']['query'] = $totalAskedQuery;
+
+        // Questions Answered (metric)
+        $totalAnsweredQuery = new KeenIOQuery();
+        $totalAnsweredQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Questions Answered'))
+            ->setEventCollection('post')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'type',
+                'property_value' => 'comment_add'
+            ])
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'discussion.discussionType',
+                'property_value' => 'Question'
+            ])
+            ->setTargetProperty('discussionID');
+
+        $this->widgets['total-answered']['query'] = $totalAnsweredQuery;
+
+        // Answers Accepted (metric)
+        $totalAcceptedQuery = new KeenIOQuery();
+        $totalAcceptedQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Answers Accepted'))
+            ->setEventCollection('qna')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'type',
+                'property_value' => 'answer_accepted'
+            ])
+            ->setTargetProperty('user.userID');
+
+        $this->widgets['total-accepted']['query'] = $totalAcceptedQuery;
+
+        // Average Time to Answer (metric)
+        $timeToAnswerQuery = new KeenIOQuery();
+        $timeToAnswerQuery->setAnalysisType(KeenIOQuery::ANALYSIS_AVERAGE)
+            ->setTitle(t('Average Time to Answer'))
+            ->setEventCollection('post')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'type',
+                'property_value' => 'comment_add'
+            ])
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'discussion.discussionType',
+                'property_value' => 'Question'
+            ])
+            ->setTargetProperty('commentMetric.time');
+
+        $this->widgets['time-to-answer']['query'] = $timeToAnswerQuery;
+
+        // Average Time to Accept (metric)
+        $timeToAcceptQuery = new KeenIOQuery();
+        $timeToAcceptQuery->setAnalysisType(KeenIOQuery::ANALYSIS_AVERAGE)
+            ->setTitle(t('Average Time to Accept'))
+            ->setEventCollection('qna')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'type',
+                'property_value' => 'answer_accepted'
+            ])
+            ->setTargetProperty('commentMetric.time');
+
+        $this->widgets['time-to-accept']['query'] = $timeToAcceptQuery;
 
         /**
          * Charts

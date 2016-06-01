@@ -403,7 +403,11 @@ KeenIOWidget.prototype.getMetricMarkup = function() {
     var data = this.getData();
     var title = this.getTitle();
 
-    markup = markup.replace("{data}", Number(data).toLocaleString());
+    if (typeof data === "number") {
+        data = Number(data).toLocaleString();
+    }
+
+    markup = markup.replace("{data}", data);
     markup = markup.replace("{title}", this.getTitle());
 
     return markup;
@@ -456,6 +460,32 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
     dataviz.chartOptions(chartOptions);
     dataviz.dateFormat('%Y-%m-%d');
     dataviz.labelMapping(labelMapping);
+};
+
+/**
+ * @param result
+ */
+KeenIOWidget.prototype.formatSeconds = function (totalSeconds) {
+    if (typeof totalSeconds !== "number") {
+        return totalSeconds;
+    }
+
+    var hours   = Math.floor(totalSeconds / 3600);
+    var minutes = Math.floor((totalSeconds - (hours * 3600)) / 60);
+    var seconds = Math.floor(totalSeconds - (hours * 3600) - (minutes * 60));
+
+    var result = "";
+    if (hours > 0) {
+        result += hours.toString() + "h";
+    }
+    if (minutes > 0) {
+        result += minutes.toString() + "m";
+    }
+    if (seconds > 0) {
+        result += seconds.toString() + "s";
+    }
+
+    return result;
 };
 
 /**
