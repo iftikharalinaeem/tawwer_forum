@@ -253,7 +253,7 @@ class CustomThemePlugin extends Gdn_Plugin {
      */
     public function gdn_smarty_init_handler($smarty) {
         // Register the resource name "customtheme"
-        $smarty->registerResource("customtheme", new Smarty_Resource_CustomTheme());
+        $smarty->registerResource("customtheme", new Smarty_Resource_CustomTheme($smarty));
     }
 
     public static function getRevisionFromFileName($fileName, $default = 0) {
@@ -740,6 +740,12 @@ Here are some things you should know before you begin:
  */
 class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
 
+    protected $smarty;
+
+    public function __construct($smarty) {
+        $this->smarty = $smarty;
+    }
+
     /**
      * Fetch a template and its modification time from database
      *
@@ -754,12 +760,10 @@ class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
         $revisionID = CustomThemePlugin::getRevisionFromFileName($name);
         $data = Gdn::SQL()->select('Html')->from('CustomThemeRevision')->where('RevisionID', $revisionID)->get()->firstRow();
         if ($data) {
-            /*
             $dir = CustomThemePlugin::getThemeRoot('/views');
             if ($dir) {
-                $smarty->template_dir = $dir;
+                $this->smarty->template_dir = $dir;
             }
-            */
 
             $modTime = C('Plugins.CustomTheme.LiveTime');
             $mtime = strtotime($modTime);
