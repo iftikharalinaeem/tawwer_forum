@@ -1087,7 +1087,7 @@ class OnlinePlugin extends Gdn_Plugin {
 
       // Disable WhosOnline
 
-      if (Gdn::pluginManager()->checkPlugin('WhosOnline')) {
+      if (Gdn::addonManager()->isEnabled('WhosOnline', \Vanilla\Addon::TYPE_ADDON)) {
          Gdn::pluginManager()->disablePlugin('WhosOnline');
       }
 

@@ -307,20 +307,20 @@ EOT;
                 'comment' => array('c' => 'comments')
             );
 
-            if (Gdn::pluginManager()->isEnabled('QnA')) {
+            if (Gdn::addonManager()->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
                 $types['discussion']['question'] = 'questions';
                 $types['comment']['answer'] = 'answers';
             }
 
-            if (Gdn::pluginManager()->isEnabled('Polls')) {
+            if (Gdn::addonManager()->isEnabled('Polls', \Vanilla\Addon::TYPE_ADDON)) {
                 $types['discussion']['poll'] = 'polls';
             }
 
-            if (Gdn::applicationManager()->checkApplication('Pages')) {
+            if (Gdn::addonManager()->isEnabled('Pages', \Vanilla\Addon::TYPE_ADDON)) {
                 $types['page']['p'] = 'docs';
             }
 
-            if (Gdn::applicationManager()->checkApplication('Groups')) {
+            if (Gdn::addonManager()->isEnabled('Groups', \Vanilla\Addon::TYPE_ADDON)) {
                 $types['group']['group'] = 'group';
             }
 
