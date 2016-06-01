@@ -758,15 +758,21 @@ class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
         // do database call here to fetch your template,
         // populating $tpl_source with actual template contents
         $revisionID = CustomThemePlugin::getRevisionFromFileName($name);
-        $data = Gdn::SQL()->select('Html')->from('CustomThemeRevision')->where('RevisionID', $revisionID)->get()->firstRow();
+        $data = Gdn::SQL()->select('Html,DateInserted')->from('CustomThemeRevision')->where('RevisionID', $revisionID)->get()->firstRow();
         if ($data) {
             $dir = CustomThemePlugin::getThemeRoot('/views');
             if ($dir) {
                 $this->smarty->template_dir = $dir;
             }
 
-            $modTime = C('Plugins.CustomTheme.LiveTime');
-            $mtime = strtotime($modTime);
+            $mtime = $this->fetchTimestamp($name);
+            if (!$mtime) {
+                if ($data->DateInserted) {
+                    $mtime = strtotime($data->DateInserted);
+                } else {
+                    $mtime = time();
+                }
+            }
             $source = $data->Html;
             return true;
         }
@@ -781,6 +787,12 @@ class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
      */
     protected function fetchTimestamp($name) {
         $modTime = C('Plugins.CustomTheme.LiveTime');
-        return strtotime($modTime);
+        if (!$modTime) {
+            return null;
+        }
+        if (!($mtime = strtotime($modTime))) {
+            return null;
+        }
+        return $modTime;
     }
 }
