@@ -252,25 +252,8 @@ class CustomThemePlugin extends Gdn_Plugin {
      * @param Smarty $smarty Vanilla's instance of the Smarty object.
      */
     public function gdn_smarty_init_handler($smarty) {
-        $smartyVersion = defined('Smarty::SMARTY_VERSION') ? Smarty::SMARTY_VERSION : $smarty->_version;
-
         // Register the resource name "customtheme"
-        // registerResource, introduced in Smart v3, is accessed via __call, so it cannot be detected with method_exists.
-        if (version_compare($smartyVersion, '3.0.0', '>=')) {
-            $smarty->registerResource("customtheme", [
-                "customtheme_smarty_get_template",
-                "customtheme_smarty_get_timestamp",
-                "customtheme_smarty_get_secure",
-                "customtheme_smarty_get_trusted"
-            ]);
-        } else {
-            $smarty->register_resource("customtheme", [
-                "customtheme_smarty_get_template",
-                "customtheme_smarty_get_timestamp",
-                "customtheme_smarty_get_secure",
-                "customtheme_smarty_get_trusted"
-            ]);
-        }
+        $smarty->registerResource("customtheme", new Smarty_Resource_CustomTheme());
     }
 
     public static function getRevisionFromFileName($fileName, $default = 0) {
@@ -749,51 +732,51 @@ Here are some things you should know before you begin:
 }
 
 /**
- * Smarty functions to allow reading the template from the db as a resource.
+ * CustomTheme Smarty Resource
  *
- * @param string $tpl_name The name of the template.
- * @param string $tpl_source Return the template source to this variable.
- * @param Smarty $smarty The smarty object rendering the template.
- * @return bool Returns true if the template was fetched or false otherwise.
+ * Allow Smarty to load CustomTheme templates from the database.
+ *
+ * @author Tim Gunter <tim@vanillaforums.com>
  */
-function customtheme_smarty_get_template($tpl_name, &$tpl_source, $smarty) {
-    // do database call here to fetch your template,
-    // populating $tpl_source with actual template contents
-    $revisionID = CustomThemePlugin::getRevisionFromFileName($tpl_name);
-    $data = Gdn::SQL()->select('Html')->from('CustomThemeRevision')->where('RevisionID', $revisionID)->get()->firstRow();
-    if ($data) {
-        $dir = CustomThemePlugin::getThemeRoot('/views');
-        if ($dir) {
-            $smarty->template_dir = $dir;
-        }
+class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
 
-        $tpl_source = $data->Html;
-    } else {
+    /**
+     * Fetch a template and its modification time from database
+     *
+     * @param string $name template name
+     * @param string $source template source
+     * @param integer $mtime template modification timestamp (epoch)
+     * @return void
+     */
+    protected function fetch($name, &$source, &$mtime) {
+        // do database call here to fetch your template,
+        // populating $tpl_source with actual template contents
+        $revisionID = CustomThemePlugin::getRevisionFromFileName($name);
+        $data = Gdn::SQL()->select('Html')->from('CustomThemeRevision')->where('RevisionID', $revisionID)->get()->firstRow();
+        if ($data) {
+            /*
+            $dir = CustomThemePlugin::getThemeRoot('/views');
+            if ($dir) {
+                $smarty->template_dir = $dir;
+            }
+            */
+
+            $modTime = C('Plugins.CustomTheme.LiveTime');
+            $mtime = strtotime($modTime);
+            $source = $data->Html;
+            return true;
+        }
         return false;
     }
 
-    // return true on success, false to generate failure notification
-    return true;
-}
-
-function customtheme_smarty_get_timestamp($tpl_name, &$tpl_timestamp, $smarty_obj) {
-    // do database call here to populate $tpl_timestamp
-    // with unix epoch time value of last template modification.
-    // This is used to determine if recompile is necessary.
-    $tpl_timestamp = C('Plugins.CustomTheme.LiveTime');
-    if ($tpl_timestamp) {
-        return $tpl_timestamp;
+    /**
+     * Fetch a template's modification time from database
+     *
+     * @param string $name template name
+     * @return integer timestamp (epoch) the template was modified
+     */
+    protected function fetchTimestamp($name) {
+        $modTime = C('Plugins.CustomTheme.LiveTime');
+        return strtotime($modTime);
     }
-
-    // return true on success, false to generate failure notification
-    return true;
-}
-
-function customtheme_smarty_get_secure($tpl_name, $smarty_obj) {
-    // assume all templates are secure
-    return true;
-}
-
-function customtheme_smarty_get_trusted($tpl_name, $smarty_obj) {
-    // not used for templates
 }
