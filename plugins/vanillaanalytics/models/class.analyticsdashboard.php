@@ -172,6 +172,13 @@ class AnalyticsDashboard implements JsonSerializable {
                 ]
             ];
 
+            if (Gdn::addonManager()->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
+                $defaults['QnA'] = [
+                    'widgets' => ['total-asked', 'total-answered', 'total-accepted', 'time-to-answer', 'time-to-accept',
+                        'questions-asked', 'questions-answered', 'answers-accepted']
+                ];
+            }
+
             foreach ($defaults as $title => $dashboardConfig) {
                 $widgets = val('widgets', $dashboardConfig, []);
                 $dashboard = new AnalyticsDashboard($title, $widgets);
