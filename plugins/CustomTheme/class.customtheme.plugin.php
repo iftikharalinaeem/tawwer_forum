@@ -346,9 +346,9 @@ class CustomThemePlugin extends Gdn_Plugin {
         $sender->addJsFile('jquery.textarea.js', 'plugins/CustomTheme');
         $sender->addCssFile('customtheme.css', 'plugins/CustomTheme');
 
-        $currentThemeInfo = Gdn::addonManager()->getTheme()->getInfo();
-        $currentThemeFolder = basename(val('ThemeRoot', $currentThemeInfo));
-        $folder = paths(PATH_THEMES, $currentThemeFolder);
+        // Get our folder, which must match our key.
+        $themeKey = Gdn::addonManager()->getTheme()->getKey();
+        $folder = paths(PATH_THEMES, $themeKey);
 
         // This is the new method:
         $liveRevisionID = self::getRevisionID('LiveRevisionID');
@@ -376,15 +376,8 @@ class CustomThemePlugin extends Gdn_Plugin {
             $label = $themeData->Label;
             $saveWorkingRevisionID = self::setRevisionID($workingRevisionID, $themeData->DateInserted);
         } else {
-            $cssContents = '';
             $label = '';
-            $customThemeCSS = paths($folder, '/design/customtheme.css');
-            if (file_exists($customThemeCSS)) {
-                $cssContents = file_get_contents($customThemeCSS);
-            }
-
-            if ($cssContents == '') {
-                $cssContents = '/* ---- Edit CSS ----
+            $cssContents = '/* ---- Edit CSS ----
 
 If you are unfamiliar with CSS, there are some learning resources in the help
 section on the right-hand side of the page.
@@ -404,7 +397,6 @@ Here are some things you should know before you begin:
 4. Feel free to delete these comments!
 
 */';
-            }
 
             $themeMasterView = paths($folder, 'views/default.master.tpl');
             if (file_exists($themeMasterView)) {
