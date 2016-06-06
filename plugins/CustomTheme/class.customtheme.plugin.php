@@ -162,21 +162,17 @@ class CustomThemePlugin extends Gdn_Plugin {
     /**
      * Get the root of the theme.
      *
-     * @param string $folder The name of the subfolder, if any. (ex. views)
+     * @param string $subfolder The name of the subfolder, if any. (ex. views)
      * @return string Returns the theme root.
      */
-    public static function getThemeRoot($folder = '') {
-        $themeInfo = Gdn::addonManager()->getTheme()->getInfo();
-        $result = val('ThemeRoot', $themeInfo, '');
-
-        if (!$result) {
-            return '';
+    public static function getThemeRoot($subfolder = '') {
+        if ($subfolder) {
+            $path = paths(PATH_THEMES, Gdn::addonManager()->getTheme()->getKey(), ltrim($subfolder, '/'));
+        } else {
+            $path = paths(PATH_THEMES, Gdn::addonManager()->getTheme()->getKey());
         }
 
-        if ($folder) {
-            $result .= '/' . ltrim($folder, '/');
-        }
-        return $result;
+        return $path;
     }
 
     /**
