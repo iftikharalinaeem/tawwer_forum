@@ -2,7 +2,7 @@
 
 $PluginInfo['sitenode'] = array(
     'Name'        => "Multisite Node",
-    'Version'     => '1.1.1',
+    'Version'     => '1.2.0',
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
@@ -482,7 +482,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         foreach ($roles as $hubID => &$role) {
             $permissions = $role['Permissions'];
-            unset($role['RoleID'], $role['Permissions']);
+            unset($role['RoleID'], $role['Permissions'], $role['Deleteable']);
 
             if (!$hubID) {
                 Logger::event('nodesync_error', Logger::ERROR, "Node tried to sync a role with no hubID.");
