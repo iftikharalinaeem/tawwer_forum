@@ -195,7 +195,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Kludge for osx that doesn't allow host files.
         $urlParts = parse_url($this->hubUrl);
 
-        if ($urlParts['host'] === 'localhost' || StringEndsWith($urlParts['host'], '.lc')) {
+        if ($urlParts['host'] === 'localhost' || StringEndsWith($urlParts['host'], '.lc') || stringEndsWith($urlParts['host'], '.dev')) {
             $headers['Host'] = $urlParts['host'];
             $urlParts['host'] = '127.0.0.1';
         }
@@ -482,7 +482,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         foreach ($roles as $hubID => &$role) {
             $permissions = $role['Permissions'];
-            unset($role['RoleID'], $role['Permissions'], $role['Deleteable']);
+            unset($role['RoleID'], $role['Permissions'], $role['Deletable']);
 
             if (!$hubID) {
                 Logger::event('nodesync_error', Logger::ERROR, "Node tried to sync a role with no hubID.");
