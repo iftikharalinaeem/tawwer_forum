@@ -463,11 +463,12 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
 };
 
 /**
- * @param result
+ * @param {number} totalSeconds
+ * @return {string}
  */
 KeenIOWidget.prototype.formatSeconds = function (totalSeconds) {
     if (typeof totalSeconds !== "number") {
-        return totalSeconds;
+        return "-";
     }
 
     var hours   = Math.floor(totalSeconds / 3600);
