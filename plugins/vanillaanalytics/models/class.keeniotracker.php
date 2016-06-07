@@ -414,7 +414,7 @@ class KeenIOTracker implements TrackerInterface {
 
         // Average Time to Answer (metric)
         $timeToAnswerQuery = new KeenIOQuery();
-        $timeToAnswerQuery->setAnalysisType(KeenIOQuery::ANALYSIS_AVERAGE)
+        $timeToAnswerQuery->setAnalysisType(KeenIOQuery::ANALYSIS_MEDIAN)
             ->setTitle(t('Average Time to Answer'))
             ->setEventCollection('post')
             ->addFilter([
@@ -433,7 +433,7 @@ class KeenIOTracker implements TrackerInterface {
 
         // Average Time to Accept (metric)
         $timeToAcceptQuery = new KeenIOQuery();
-        $timeToAcceptQuery->setAnalysisType(KeenIOQuery::ANALYSIS_AVERAGE)
+        $timeToAcceptQuery->setAnalysisType(KeenIOQuery::ANALYSIS_MEDIAN)
             ->setTitle(t('Average Time to Accept'))
             ->setEventCollection('qna')
             ->addFilter([
