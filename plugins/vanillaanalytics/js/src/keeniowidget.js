@@ -451,6 +451,29 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
     var chartOptions = this.getConfig('options');
     var labelMapping = this.getConfig('labelMapping');
 
+    if (typeof chartOptions !== "object" || chartOptions === null) {
+        chartOptions = {};
+    }
+
+    if (typeof chartOptions.axis !== "object") {
+        chartOptions.axis = {};
+    }
+    if (typeof chartOptions.axis.y !== "object") {
+        chartOptions.axis.y = {
+            tick: {
+                outer: false,
+                format: function (x) {
+                    if (typeof x === "number") {
+                        var floor = Math.floor(x);
+                        return x === floor ? x : "";
+                    } else {
+                        return x;
+                    }
+                }
+            }
+        };
+    }
+
     dataviz.library('c3');
 
     if (this.getType() == 'metric') {
