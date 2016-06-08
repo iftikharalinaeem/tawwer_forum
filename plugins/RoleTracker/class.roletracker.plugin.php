@@ -249,7 +249,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      */
     public function postController_afterDiscussionSave_handler($sender, $args) {
         $discussion = $args['Discussion'];
-        $this->addPostTagsToDiscussion(val('DiscussionID', $discussion), val('InsertUserID', $discussion));
+        $this->addUserTagsToDiscussion(val('DiscussionID', $discussion), val('InsertUserID', $discussion));
     }
 
     /**
@@ -284,7 +284,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function postController_afterCommentSave_handler($sender, $args) {
-        $this->addPostTagsToDiscussion(val('DiscussionID', $args['Discussion']), val('InsertUserID', $args['Comment']));
+        $this->addUserTagsToDiscussion(val('DiscussionID', $args['Discussion']), val('InsertUserID', $args['Comment']));
     }
 
     /**
