@@ -29,7 +29,12 @@ jQuery(document).ready(function($) {
       var auto = true;
       var rerun = false;
       var reseterrors = true;
-      
+       if(data) {
+       Object.keys(data).forEach(function(key) {
+           console.log(key, data[key]);
+       });
+       }
+       //console.log('BatchID: '+batchID);
       // Clear mode
       if (data == undefined) {
          data = {
@@ -112,7 +117,7 @@ jQuery(document).ready(function($) {
       
       // Start at 0
       var offset = $('.Synchronization .SyncProgress').data('offset');
-      var url = '/plugin/mailchimp/sync';
+      var url = 'https://vanilla.dev/baz/plugin/mailchimp/sync';
       var syncListID = $('.MailChimpSync #Form_SyncListID').val();
       var syncConfirmJoin = $('.MailChimpSync #Form_SyncConfirmJoin').prop('checked') ? 1 : 0;
       var syncBanned = $('.MailChimpSync #Form_SyncBanned').prop('checked') ? 1 : 0;
@@ -131,7 +136,8 @@ jQuery(document).ready(function($) {
          
       if (syncUnconfirmed != undefined)
          send.SyncUnconfirmed = syncUnconfirmed;
-      
+
+       console.log('Sending to list: ' + send.SyncListID);
       // AJAX
       progress();
       $.ajax({
@@ -139,10 +145,12 @@ jQuery(document).ready(function($) {
          type: 'POST',
          data: send,
          success: function(data) {
+             console.log(url);
+             console.log(data.toString());
             var syncprogress = data.Progress;
             var syncoffset = data.Offset;
-            
             // Some kind of error
+             console.log(data.Progress);
             if (syncprogress == undefined) {
                if (!data.Error) {
                   data = {
@@ -154,7 +162,7 @@ jQuery(document).ready(function($) {
                if (isNaN(syncprogress))
                   data.Error = syncprogress;
             }
-            
+            console.log('before calling trackprogress');
             progress(data);
          },
          error: function(xhr) {
@@ -162,12 +170,17 @@ jQuery(document).ready(function($) {
                Error: 'XHR error',
                Fatal: true
             };
+             console.log('having failed.');
             progress(data);
          }
       });
       
    };
-   
+
+    var trackprogress = function(data) {
+        console.log('BatchID: '+data.BatchID);
+    }
+
    var finish = function(success) {
       $('.Synchronization').addClass('Finished');
       if (success) {

@@ -169,7 +169,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
       // Update existing user
       $confirmJoin = val('ConfirmJoin', $this->provider(), false);
-      return $this->MCAPI()->listSubscribe($listID, $email, array('EMAIL'  => $newEmail), $options['Format'], $options['ConfirmJoin'], true);
+      return $this->MCAPI()->listUpdateAddress($listID, array('EMAIL'  => $email, 'NEW_EMAIL' => $newEmail, 'EMAIL_TYPE' => $options['Format']), $options['ConfirmJoin'], true);
    }
 
    /**
@@ -261,7 +261,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          if ($ping === true) {
             $sender->setData('Configured', true);
             $listsResponse = $this->MCAPI()->lists();
-             $listsResponse = $this->MCAPI()->toArray($listsResponse);
+            $listsResponse = $this->MCAPI()->toArray($listsResponse);
             $lists = val('lists', $listsResponse);
             $lists = Gdn_DataSet::index($lists, 'id');
             $lists = array_column($lists, 'name', 'id');
@@ -270,6 +270,11 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             $sender->Form->addError('Bad API Key');
          }
       }
+
+
+       if ($_GET['changeemail']) {
+           $this->update('a7a3af111c', $_GET['email'], $_GET['new_email']);
+        }
 
       $sender->render('settings','','plugins/MailChimpPush');
    }
@@ -288,7 +293,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             'SyncDeleted'     => 0,
             'SyncUnconfirmed' => null
          );
-         $requiredOpts = array('SyncListID', 'SyncBanned', 'SyncDeleted');
+//         $requiredOpts = array('SyncListID', 'SyncBanned', 'SyncDeleted');
 
          $options = array();
          foreach ($opts as $opt => $default) {
@@ -298,20 +303,24 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             $options[$opt] = is_null($val) ? $default : $val;
          }
          extract($options);
-
+        $syncListID = "eabcc0c399";
+          /* @var  $syncConfirmJoin passed in $options array*/
          // Chunk size depends on whether we're sending confirmation emails
-         $chunkSize = $syncConfirmJoin ? 25 : 200;
+         $chunkSize = $syncConfirmJoin ?  200 : 1000;
 
          $criteria = array();
 
+          /* @var $syncBanned passed in $options array */
          // Only if true do we care
          if (!$syncBanned)
             $criteria['Banned'] = 0;
 
+          /* @var $syncDeleted passed in $options array */
          if (!$syncDeleted)
             $criteria['Deleted'] = 0;
 
-         // Only if supplied and false do we care
+          /* @var $syncUnconfirmed passed in $options array */
+          // Only if supplied and false do we care
          if ($syncUnconfirmed == false)
             $criteria['Confirmed'] = 1;
 
@@ -319,8 +328,8 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          if ($totalUsers) {
 
             // Fetch users
+             /* @var $offset passed in $options array */
             $processUsers = Gdn::userModel()->getWhere($criteria, 'UserID', 'desc', $chunkSize, $offset);
-            $newOffset = $offset+$processUsers->NumRows();
 
             // Extract email addresses
             $emails = array();
@@ -328,24 +337,25 @@ class MailChimpPushPlugin extends Gdn_Plugin {
                if (!empty($processUser['Email']))
                   $emails[] = $processUser['Email'];
             }
-
             // Subscribe users
             $start = microtime(true);
-            $response = $this->add($syncListID, $emails, array(
-               'ConfirmJoin'  => (bool)$syncConfirmJoin
-            ));
-            $elapsed = microtime(true) - $start;
 
-            $SPU = $elapsed / sizeof($emails);
-            $ETA = ceil(($totalUsers - $newOffset) * $SPU);
-            $ETAMin = ceil($ETA / 60);
-            $sender->setData('ETA', $ETA);
-            $sender->setData('ETAMinutes', $ETAMin);
-
-            $progress = round(($newOffset / $totalUsers) * 100, 2);
+             /* @var $syncListID passed in $options array */
+             $response = $this->add($syncListID, $emails, array('ConfirmJoin'  => (bool)$syncConfirmJoin));
+            $response->getBody();
+             $sender->setData('BatchID', val('id', $response), 'willywonka');
+//            $elapsed = microtime(true) - $start;
+//
+//            $SPU = $elapsed / sizeof($emails);
+//            $ETA = ceil(($totalUsers - $newOffset) * $SPU);
+//            $ETAMin = ceil($ETA / 60);
+//            $sender->setData('ETA', $ETA);
+//            $sender->setData('ETAMinutes', $ETAMin);
+//            $sender->setData('NumberOfUsers', $totalUsers);
+            $progress = 5;
             $sender->setData('Progress', $progress);
-            $sender->setData('Offset', $newOffset);
-            $sender->setData('Count', sizeof($emails));
+//            $sender->setData('Offset', 0);
+//            $sender->setData('Count', sizeof($emails));
          } else {
             throw new Exception('No users match criteria', 400);
          }
