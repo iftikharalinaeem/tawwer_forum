@@ -3,7 +3,7 @@
 <div class="P PageDescription"><?php echo $this->Description(); ?></div>
 <div class="CategoriesWrap">
 <?php
-$Categories = CategoryModel::MakeTree($this->Data('Categories'), $this->Data('Category', NULL));
+$Categories = $this->data('CategoryTree');
 
 //decho($Categories);
 //die();
