@@ -946,8 +946,11 @@ EOT
      */
     public function discussionsController_render_before($sender) {
         if ($sender->DeliveryType() == DELIVERY_TYPE_ALL) {
-            $discussions = $sender->data('Discussions')->result();
-            $this->addUserVotesToDiscussions($discussions);
+            $discussionsData = $sender->data('Discussions', false);
+            if ($discussionsData !== false && $discussionsData instanceof Gdn_DataSet) {
+                $discussions = $discussionsData->result();
+                $this->addUserVotesToDiscussions($discussions);
+            }
         }
     }
 
