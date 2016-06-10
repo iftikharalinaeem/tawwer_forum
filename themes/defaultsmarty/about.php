@@ -11,7 +11,7 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 /**
  * An associative array of information about this application.
  */
-$ThemeInfo['DefaultSmarty'] = array(
+$ThemeInfo['defaultsmarty'] = array(
    'Name' => 'Compatibility 2011',
    'Description' => "An older version of the default theme for backwards-compatibility.",
    'Version' => '2.0a',
