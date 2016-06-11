@@ -429,11 +429,13 @@ class MultisiteModel extends Gdn_Model {
 
         // Get the roles.
         $roles = $this->SQL
-            ->Select('RoleID', '', 'HubID')
-            ->Select('Name')
-            ->Select('Description')
             ->GetWhere('Role', ['HubSync' => ['settings', 'membership']])
             ->ResultArray();
+
+        foreach ($roles as &$role) {
+            $role['HubID'] = $role['RoleID'];
+            unset($role['RoleID'], $role['HubSettings'], $role['HubMembership'], $role['HubSync']);
+        }
 
         // Get the global permissions on the roles.
         $permissions = Gdn::PermissionModel()->GetGlobalPermissions(array_column($roles, 'HubID'));
