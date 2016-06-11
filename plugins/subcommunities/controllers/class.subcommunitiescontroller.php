@@ -78,7 +78,7 @@ class SubcommunitiesController extends DashboardController {
         $locales = array_replace(['en' => 'en'], $locales);
         $this->setData('Locales', $locales);
 
-        $categories = CategoryModel::makeTree(CategoryModel::categories());
+        $categories = Gdn::sql()->getWhere('Category', ['Depth' => 1], 'Name')->resultArray();
         $categories = array_column($categories, 'Name', 'CategoryID');
         $this->setData('Categories', $categories);
 
