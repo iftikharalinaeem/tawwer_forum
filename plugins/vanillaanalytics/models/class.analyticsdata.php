@@ -342,6 +342,12 @@ class AnalyticsData extends Gdn_Model {
                 'sessionID' => $trackingIDs['sessionID']
             ];
 
+            $timeFirstVisit = strtotime($user->DateFirstVisit) ?: 0;
+            $timeRegistered = strtotime($user->DateInserted) ?: 0;
+
+            $userInfo['sinceFirstVisit'] = time() - $timeFirstVisit;
+            $userInfo['sinceRegistered'] = time() - $timeRegistered;
+
             $userInfo['points'] = val('Points', $user, 0);
 
             // Attempto to fetch rank info for the current user.
