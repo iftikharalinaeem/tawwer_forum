@@ -30,8 +30,8 @@ class MultisiteModel extends Gdn_Model {
     public function __construct($name = '') {
         parent::__construct('Multisite');
 
-        $this->Validation->AddRule('Slug', 'func:validate_slug');
-        $this->Validation->ApplyRule('Slug', 'Slug', 'The slug must consist of numbers, lowercase letters or a slash.');
+        $this->Validation->addRule('Slug', 'func:validate_slug');
+        $this->Validation->applyRule('Slug', 'Slug', 'The slug must consist of numbers, lowercase letters or a slash.');
 
         // Determine url and name formats
         $multi = Infrastructure::getMulti(Infrastructure::site('name'));
@@ -116,13 +116,13 @@ class MultisiteModel extends Gdn_Model {
 
         $site = $this->getID($id);
         if (!$site) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
 
         $valid = true;
 
         if (!in_array($site['Status'], ['active', 'error', 'building', 'deleting'])) {
-            $this->Validation->AddValidationResult('Status', 'Cannot delete a site that isn\'t active.');
+            $this->Validation->addValidationResult('Status', 'Cannot delete a site that isn\'t active.');
             $valid = false;
         }
 
@@ -134,7 +134,7 @@ class MultisiteModel extends Gdn_Model {
             ->method('post')
             ->parameter('siteid', val('SiteID', $site))
             ->parameter('callback', [
-                'url' => Gdn::Request()->Domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/deletecallback.json",
+                'url' => Gdn::request()->domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/deletecallback.json",
                 'headers' => [
                     'Authorization' => self::apikey(true)
                 ]
@@ -143,9 +143,9 @@ class MultisiteModel extends Gdn_Model {
 
         if ($deleteQuery->responseClass('2xx')) {
             // The site built.
-            $this->SetField($id, [
+            $this->setField($id, [
                 'Status' => 'deleting',
-                'DateStatus' => Gdn_Format::ToDateTime(),
+                'DateStatus' => Gdn_Format::toDateTime(),
                 'SiteID' => valr('site.SiteID', $deleteResponse)
             ]);
             return true;
@@ -155,7 +155,7 @@ class MultisiteModel extends Gdn_Model {
         } else {
             // The site has an error.
             $error = $deleteQuery->errorMsg();
-            $this->Validation->AddValidationResult('MultisiteID', '@'.$error);
+            $this->Validation->addValidationResult('MultisiteID', '@'.$error);
             return false;
         }
     }
@@ -168,11 +168,11 @@ class MultisiteModel extends Gdn_Model {
      */
     public function validateSlugUnique($slug) {
         if (in_array(strtolower($slug), $this->reservedSlugs)) {
-            $this->Validation->AddValidationResult('Slug', "The slug '$slug' is already in use by another site.");
+            $this->Validation->addValidationResult('Slug', "The slug '$slug' is already in use by another site.");
             return false;
         }
-        if ($this->getWhere(['Slug' => $slug])->NumRows()) {
-            $this->Validation->AddValidationResult('Slug', "The slug '$slug' is already in use by another site.");
+        if ($this->getWhere(['Slug' => $slug])->numRows()) {
+            $this->Validation->addValidationResult('Slug', "The slug '$slug' is already in use by another site.");
             return false;
         }
         return true;
@@ -186,13 +186,13 @@ class MultisiteModel extends Gdn_Model {
 
         $site = $this->getID($id);
         if (!$site) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
 
         $valid = true;
 
         if (!in_array($site['Status'], ['pending', 'error'])) {
-            $this->Validation->AddValidationResult('Status', 'Cannot build a site that isn\'t pending.');
+            $this->Validation->addValidationResult('Status', 'Cannot build a site that isn\'t pending.');
             $valid = false;
         }
 
@@ -214,11 +214,11 @@ class MultisiteModel extends Gdn_Model {
             ->method('post')
             ->parameter('name', $name)
             ->parameter('accountid', Infrastructure::site('accountid'))
-            ->parameter('domain', Gdn::Request()->Host()) // TODO: make work for non-dirs
+            ->parameter('domain', Gdn::request()->host()) // TODO: make work for non-dirs
             ->parameter('flavor', 'node')
             ->parameter('config', $config)
             ->parameter('callback', [
-                'url' => Gdn::Request()->Domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/buildcallback.json",
+                'url' => Gdn::request()->domain()."/hub/api/v1/multisites/{$site['MultisiteID']}/buildcallback.json",
                 'headers' => [
                     'Authorization' => self::apikey(true)
                 ]
@@ -227,9 +227,9 @@ class MultisiteModel extends Gdn_Model {
 
         if ($buildQuery->responseClass('2xx')) {
             // The site built.
-            $this->SetField($id, [
+            $this->setField($id, [
                 'Status' => 'building',
-                'DateStatus' => Gdn_Format::ToDateTime(),
+                'DateStatus' => Gdn_Format::toDateTime(),
                 'SiteID' => valr('site.SiteID', $build)
             ]);
             return true;
@@ -238,7 +238,7 @@ class MultisiteModel extends Gdn_Model {
             $this->status($id, 'active');
             $siteID = valr('site.SiteID', $build);
             if ($siteID) {
-                $this->SetField($id, 'SiteID', $siteID);
+                $this->setField($id, 'SiteID', $siteID);
             }
         } else {
             // The site has an error.
@@ -280,7 +280,7 @@ class MultisiteModel extends Gdn_Model {
         $attributes = $site['Attributes'];
         $set = [
             'Status' => $status,
-            'DateStatus' => Gdn_Format::ToDateTime()
+            'DateStatus' => Gdn_Format::toDateTime()
         ];
 
         if ($error) {
@@ -291,7 +291,7 @@ class MultisiteModel extends Gdn_Model {
             $set['Attributes'] = $attributes;
         }
 
-        $this->SetField($id, $set);
+        $this->setField($id, $set);
     }
 
     public function insert($fields) {
@@ -299,20 +299,20 @@ class MultisiteModel extends Gdn_Model {
 
         // Sites can only be inserted in the pending status.
         $fields['Status'] = 'pending';
-        $fields['DateStatus'] = Gdn_Format::ToDateTime();
+        $fields['DateStatus'] = Gdn_Format::toDateTime();
 
         $slug = val('Slug', $fields);
 
         if ($slug) {
-            TouchValue('Name', $fields, sprintf($this->siteNameFormat, $slug));
-            TouchValue('Url', $fields, $this->siteUrl($slug, false));
+            touchValue('Name', $fields, sprintf($this->siteNameFormat, $slug));
+            touchValue('Url', $fields, $this->siteUrl($slug, false));
 
             // Check to see if the slug already exists.
             $result = $this->validateSlugUnique($slug);
         }
 
         if ($result) {
-            $result = parent::Insert($fields);
+            $result = parent::insert($fields);
         }
 
         if ($result) {
@@ -333,15 +333,15 @@ class MultisiteModel extends Gdn_Model {
             $fields['DateStatus']
         );
 
-        return parent::Update($fields, $where, $limit);
+        return parent::update($fields, $where, $limit);
     }
 
     public function calculateRow(&$row) {
         $url = $row['Url'];
-        if (IsUrl($url)) {
+        if (isUrl($url)) {
             $row['FullUrl'] = $url;
         } else {
-            $row['FullUrl'] = Gdn::Request()->Domain().$url;
+            $row['FullUrl'] = Gdn::request()->domain().$url;
         }
 
         if (isset($row['Attributes']) && is_string($row['Attributes'])) {
@@ -353,7 +353,7 @@ class MultisiteModel extends Gdn_Model {
     }
 
     public function getID($id) {
-        $row = parent::GETID($id, DATASET_TYPE_ARRAY);
+        $row = parent::getID($id, DATASET_TYPE_ARRAY);
         if ($row) {
             $this->calculateRow($row);
         }
@@ -362,14 +362,14 @@ class MultisiteModel extends Gdn_Model {
 
     public function getFromUrl($url) {
         $slug = $this->slugFromUrl($url);
-        $row = $this->getWhere(['Slug' => $slug])->FirstRow(DATASET_TYPE_ARRAY);
+        $row = $this->getWhere(['Slug' => $slug])->firstRow(DATASET_TYPE_ARRAY);
         return $row;
     }
 
     public function slugFromUrl($url) {
         $format = $this->siteUrlFormat;
 
-        if (!IsUrl($format)) {
+        if (!isUrl($format)) {
             $slug = trim(parse_url($url, PHP_URL_PATH), '/');
         } else {
             $domain = parse_url($url, PHP_URL_HOST);
@@ -388,11 +388,11 @@ class MultisiteModel extends Gdn_Model {
         }
 
         if (empty($where)) {
-            $rows = parent::Get($orderFields, $orderDirection, $limit, PageNumber($offset, $limit));
+            $rows = parent::get($orderFields, $orderDirection, $limit, pageNumber($offset, $limit));
         } else {
-            $rows = parent::GetWhere($where, $orderFields, $orderDirection, $limit, $offset);
+            $rows = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
         }
-        array_walk($rows->ResultArray(), [$this, 'calculateRow']);
+        array_walk($rows->resultArray(), [$this, 'calculateRow']);
         return $rows;
     }
 
@@ -431,8 +431,8 @@ class MultisiteModel extends Gdn_Model {
 
         // Get the roles.
         $roles = $this->SQL
-            ->GetWhere('Role', ['HubSync' => ['settings', 'membership']])
-            ->ResultArray();
+            ->getWhere('Role', ['HubSync' => ['settings', 'membership']])
+            ->resultArray();
 
         foreach ($roles as &$role) {
             $role['HubID'] = $role['RoleID'];
@@ -440,7 +440,7 @@ class MultisiteModel extends Gdn_Model {
         }
 
         // Get the global permissions on the roles.
-        $permissions = Gdn::PermissionModel()->GetGlobalPermissions(array_column($roles, 'HubID'));
+        $permissions = Gdn::permissionModel()->getGlobalPermissions(array_column($roles, 'HubID'));
         foreach ($roles as &$role) {
             $role['Permissions'] = $permissions[$role['HubID']];
             unset($role['Permissions']['PermissionID']);
@@ -448,7 +448,7 @@ class MultisiteModel extends Gdn_Model {
 
         $this->EventArguments['Multisite'] = $site;
         $this->EventArguments['Roles'] =& $roles;
-        $this->FireEvent('getSyncRoles');
+        $this->fireEvent('getSyncRoles');
 
         return $roles;
     }
@@ -459,12 +459,12 @@ class MultisiteModel extends Gdn_Model {
         }
 
         $categories = $this->SQL
-            ->Select('CategoryID', '', 'HubID')
-            ->Select('UrlCode,Name,Description')
-            ->Select('ParentCategoryID', '', 'ParentHubID')
-            ->OrderBy('TreeLeft')
-            ->GetWhere('Category', ['CategoryID >' => 0, 'HubSync' => 'Settings'])
-            ->ResultArray();
+            ->select('CategoryID', '', 'HubID')
+            ->select('UrlCode,Name,Description')
+            ->select('ParentCategoryID', '', 'ParentHubID')
+            ->orderBy('TreeLeft')
+            ->getWhere('Category', ['CategoryID >' => 0, 'HubSync' => 'Settings'])
+            ->resultArray();
         $categories = array_column($categories, null, 'HubID');
 
         // Add a psuedo root category to get permissions.
@@ -475,30 +475,30 @@ class MultisiteModel extends Gdn_Model {
 
         // Get the RoleIDs for permissions.
         $roles = $this->SQL
-            ->Select('RoleID', '', 'HubID')
-            ->GetWhere('Role', ['HubSync' => ['settings', 'membership']])
-            ->ResultArray();
+            ->select('RoleID', '', 'HubID')
+            ->getWhere('Role', ['HubSync' => ['settings', 'membership']])
+            ->resultArray();
         $roleIDs = array_column($roles, 'HubID');
 
         // Get the default row for junction permissions.
-        $defaultRow = $this->SQL->GetWhere('Permission', [
+        $defaultRow = $this->SQL->getWhere('Permission', [
             'RoleID' => 0,
             'JunctionID' => null,
             'JunctionTable' => 'Category'
-        ])->FirstRow(DATASET_TYPE_ARRAY);
+        ])->firstRow(DATASET_TYPE_ARRAY);
         unset($defaultRow['PermissionID']);
         $defaultRow['RoleID'] = 2; // make sure in the array
-        $defaultRow = array_Filter($defaultRow, function($v) {
+        $defaultRow = array_filter($defaultRow, function($v) {
             return in_array($v, [2, 3]);
         });
 
         // Now we need to grab the permissions for each role-category combination.
         $permissions = $this->SQL
-            ->OrderBy('RoleID, JunctionID')
-            ->GetWhere('Permission', [
+            ->orderBy('RoleID, JunctionID')
+            ->getWhere('Permission', [
                 'RoleID' => $roleIDs,
                 'JunctionID' => array_keys($categories)
-            ])->ResultArray();
+            ])->resultArray();
 
         // Walk through the permissions and nest them under the correct category.
         foreach ($permissions as $permissionRow) {
@@ -509,7 +509,7 @@ class MultisiteModel extends Gdn_Model {
 
         $this->EventArguments['Multisite'] = $site;
         $this->EventArguments['Categories'] =& $categories;
-        $this->FireEvent('getSyncCategories');
+        $this->fireEvent('getSyncCategories');
 
         return $categories;
     }
@@ -522,9 +522,9 @@ class MultisiteModel extends Gdn_Model {
      */
     public function getDontSyncCategories($site) {
         $categories = $this->SQL
-            ->Select('CategoryID', '', 'HubID')
-            ->GetWhere('Category', ['CategoryID >' => 0, 'HubSync' => ''])
-            ->ResultArray();
+            ->select('CategoryID', '', 'HubID')
+            ->getWhere('Category', ['CategoryID >' => 0, 'HubSync' => ''])
+            ->resultArray();
         $categories = array_column($categories, 'HubID');
         return $categories;
     }
@@ -560,7 +560,7 @@ class MultisiteModel extends Gdn_Model {
         }
 
         $request = new ProxyRequest();
-        $response = $request->Request([
+        $response = $request->request([
             'URL' => $url,
             'Method' => $method,
             'Cookies' => false,
@@ -572,11 +572,11 @@ class MultisiteModel extends Gdn_Model {
         }
 
         if ($request->ResponseStatus != 200) {
-            Trace($response, "Error {$request->ResponseStatus}");
+            trace($response, "Error {$request->ResponseStatus}");
             throw new Gdn_UserException('api: '.val('Exception', $response, 'There was an error performing your request.'), $request->ResponseStatus);
         }
 
-        Trace($response, "hub api response");
+        trace($response, "hub api response");
         return $response;
     }
 
@@ -585,13 +585,14 @@ class MultisiteModel extends Gdn_Model {
      *
      * This is a convenience method that uses $this->SaveToSerializedColumn().
      *
-     * @param int The site ID to save.
-     * @param string|array The name of the attribute being saved, or an associative array of name => value pairs to be saved. If this is an associative array, the $Value argument will be ignored.
-     * @param mixed The value being saved.
+     * @param int $siteID The site ID to save.
+     * @param string|array $attribute The name of the attribute being saved, or an associative array of name => value pairs to be saved.
+     * If this is an associative array, the $Value argument will be ignored.
+     * @param mixed $value The value being saved.
      * @return bool Whether or not the attribute as saved.
      */
     public function saveAttribute($siteID, $attribute, $value = '') {
-        return $this->SaveToSerializedColumn('Attributes', $siteID, $attribute, $value);
+        return $this->saveToSerializedColumn('Attributes', $siteID, $attribute, $value);
     }
 
     /**
@@ -610,10 +611,10 @@ class MultisiteModel extends Gdn_Model {
         }
 
         $this->SQL
-            ->BeginWhereGroup()
-            ->OrLike('Name', $search)
-            ->OrLike('Url', $search)
-            ->EndWhereGroup();
+            ->beginWhereGroup()
+            ->orLike('Name', $search)
+            ->orLike('Url', $search)
+            ->endWhereGroup();
 
         return $this->getWhere(false, $orderFields, $orderDirection, $limit, $offset);
     }
@@ -629,7 +630,7 @@ class MultisiteModel extends Gdn_Model {
             $result = $this->nodeApi($nodeSlug, $url, 'POST');
         } catch (Exception $ex) {
             $result = ['Code' => $ex->getCode(), 'Exception' => $ex->getMessage()];
-            LogException($ex);
+            logException($ex);
         }
         return $result;
     }
@@ -785,7 +786,7 @@ class MultisiteModel extends Gdn_Model {
 }
 
 function validate_slug($value) {
-    if (!ValidateRequired($value)) {
+    if (!validateRequired($value)) {
         return true;
     }
     return preg_match('`^[a-z0-9-]+$`', $value);

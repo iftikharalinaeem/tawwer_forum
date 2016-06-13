@@ -587,7 +587,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Try the key as a plugin first.
         $info = Gdn::PluginManager()->GetPluginInfo($key, Gdn_PluginManager::ACCESS_PLUGINNAME);
         if ($info) {
-            $currentEnabled = Gdn::PluginManager()->IsEnabled($key);
+            $currentEnabled = Gdn::addonManager()->isEnabled($key, Addon::TYPE_ADDON);
             if ($enabled && !$currentEnabled) {
                 Gdn::PluginManager()->EnablePlugin($key, $valid);
                 Trace("Plugin $key enabled.");
@@ -620,7 +620,7 @@ class SiteNodePlugin extends Gdn_Plugin {
      * @param Gdn_Dispatcher $sender
      */
     public function gdn_dispatcher_appStartup_handler($sender) {
-        if (Gdn::PluginManager()->IsEnabled('sitehub')) {
+        if (Gdn::addonManager()->isEnabled('sitehub', Addon::TYPE_ADDON)) {
             Logger::event('hubsso_skip', Logger::DEBUG, "Site hub is enabled. Skipping Hub SSO.");
             return;
         }
@@ -725,7 +725,7 @@ class SiteNodePlugin extends Gdn_Plugin {
      * @param Gdn_PluginManager $sender
      */
     public function gdn_pluginManager_afterStart_handler($sender) {
-        if (Gdn::PluginManager()->IsEnabled('sitehub')) {
+        if (Gdn::addonManager()->isEnabled('sitehub', Addon::TYPE_ADDON)) {
             return;
         }
 
