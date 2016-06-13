@@ -58,6 +58,10 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     */
    protected function MCAPI() {
       if (!$this->MCAPI) {
+         if (!class_exists('MCAPI', false)) {
+            require_once(__DIR__.'/library/mailchimp/class.mcapi.php');
+         }
+
          $provider = $this->provider();
          $key = val("AssociationSecret", $provider);
          $this->MCAPI = new MCAPI($key);
