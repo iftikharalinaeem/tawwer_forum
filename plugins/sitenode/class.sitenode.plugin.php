@@ -7,7 +7,8 @@ $PluginInfo['sitenode'] = array(
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl'   => 'http://vanillaforums.com',
-    'License'     => 'Proprietary'
+    'License'     => 'Proprietary',
+    'Icon'        => 'node.png'
 );
 
 /**

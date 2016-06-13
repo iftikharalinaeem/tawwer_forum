@@ -11,6 +11,7 @@ $PluginInfo['sitehub'] = array(
     'RequiredPlugins' => array(
         'SimpleAPI' => '1.0',
     ),
+    'Icon' => 'hub.png'
 );
 
 /**
