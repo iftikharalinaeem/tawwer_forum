@@ -168,6 +168,11 @@ class AnalyticsTracker {
         // Only add user-related information if a user is signed in.
         $defaults['user'] = AnalyticsData::getCurrentUser();
 
+
+        // Grab the browser's user agent value, if available.
+        $userAgent = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_USER_AGENT');
+        $eventData['userAgent'] = $userAgent ?: null;
+
         if ($trackerDefaults) {
             foreach ($this->trackers as $tracker) {
                 $defaults = $tracker->addDefaults($defaults);
@@ -209,10 +214,6 @@ class AnalyticsTracker {
         // Attempt to grab the referrer, if there is one, and record it.
         $referrer = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER');
         $eventData['referrer'] = $referrer ?: null;
-
-        // Grab the browser's user agent value, if available.
-        $userAgent = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_USER_AGENT');
-        $eventData['userAgent'] = $userAgent ?: null;
 
         // Figure out if we have a discussion.  If we do, include it in the event data.
         if ($discussion = $controller->data('Discussion', false)) {
