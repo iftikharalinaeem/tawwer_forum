@@ -69,6 +69,8 @@ class MultisiteModel extends Gdn_Model {
 
         // Delete the NodeCategories too.
         $this->SQL->delete('NodeCategory', [$this->PrimaryKey => $ids]);
+        // Delete the subcommunities.
+        $this->SQL->delete('NodeSubcommunity', [$this->PrimaryKey => $ids]);
 
         return $r;
     }
@@ -681,13 +683,62 @@ class MultisiteModel extends Gdn_Model {
         return $result;
     }
 
+    /**
+     * Synchronize all of the subcommunities that exist in one node.
+     *
+     * @param int $multiSiteID The ID of the node.
+     * @param array[array] $nodeSubcommunities A dataset of node subcommunity information.
+     * @param bool $delete Whether or not to delete subcommunities that no longer exist on the node.
+     */
+    public function syncNodeSubcommunities($multiSiteID, $nodeSubcommunities, $delete = true) {
+        $now = Gdn_Format::toDateTime();
+
+        // Get the current node subcommunity.
+        $currentSubcommunities = $this->SQL->getWhere('NodeSubcommunity', ['MultisiteID' => $multiSiteID])->resultArray();
+        $currentSubcommunities = array_column($currentSubcommunities, null, 'SubcommunityID');
+        $result = ['Inserted' => 0, 'Updated' => 0];
+
+        foreach ($nodeSubcommunities as $subcommunity) {
+            $subcommunityID = $subcommunity['SubcommunityID'];
+            $set = arrayTranslate($subcommunity, ['Name', 'Folder', 'CategoryID', 'Locale', 'IsDefault']);
+            $set['DateLastSync'] = $now;
+
+            if (array_key_exists($subcommunityID, $currentSubcommunities)) {
+                $this->SQL->put(
+                    'NodeSubcommunity',
+                    $set,
+                    ['NodeSubcommunityID' => $currentSubcommunities[$subcommunityID]['NodeSubcommunityID']]
+                );
+                $result['Updated']++;
+            } else {
+                $set['MultisiteID'] = $multiSiteID;
+                $set['SubcommunityID'] = $subcommunityID;
+                $this->SQL->insert(
+                    'NodeSubcommunity',
+                    $set
+                );
+                $result['Inserted']++;
+            }
+        }
+
+        if ($delete) {
+            // Delete all of the node subcommunities that no longer exist.
+            $this->SQL->delete('NodeSubcommunity', ['MultisiteID' => $multiSiteID, 'DateLastSync <' => $now]);
+            $d = $this->Database;
+            $result['Deleted'] = val('RowCount', $d->LastInfo, 0);
+
+        }
+
+        return $result;
+    }
+
     public function syncNodes() {
         $urls = [
             '/utility/syncnode.json',
         ];
 
         $this->EventArguments['urls'] =& $urls;
-        $this->FireEvent('SyncNodes');
+        $this->fireEvent('SyncNodes');
 
         list($match) = explode('.', $this->siteNameFormat, 2);
         $match = sprintf($match, '*');

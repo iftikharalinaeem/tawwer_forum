@@ -202,7 +202,7 @@ class MultisitesController extends DashboardController {
 
         $post = $this->Request->Post();
 
-        $allowed = ['DateLastSync', 'Status'];
+        $allowed = ['DateLastSync', 'Status', 'Locale'];
         $post = ArrayTranslate($post, $allowed);
         if (val('Status', $post) === 'active' && $this->site['Status'] !== 'active') {
             $post['DateStatus'] = Gdn_Format::ToDateTime();
@@ -349,6 +349,34 @@ class MultisitesController extends DashboardController {
         $result = $this->siteModel->syncNodeCategories($site['MultisiteID'], $categories, val('Delete', $post, true));
         $this->Data = $result;
 
+
+        $this->render('api');
+    }
+
+    /**
+     * Synchronize the subcommunities from a node into the NodeSubcommunity table.
+     */
+    public function syncNodeSubcommunities() {
+        $this->permissionNoLog('Garden.Settings.Manage');
+
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Gdn_UserException("This resource only accepts POST.", 405);
+        }
+
+        // Lookup the site.
+        $post = $this->Request->post();
+        $site = $this->siteModel->getSiteFromKey(val('MultisiteID', $post), val('SiteID', $post), val('Slug', $post));
+        if (!$site) {
+            throw notFoundException('Site');
+        }
+
+        $subcommunities = val('Subcommunities', $post);
+        if (!is_array($subcommunities)) {
+            throw new Gdn_UserException('Subcommunities is required.');
+        }
+
+        $result = $this->siteModel->syncNodeSubcommunities($site['MultisiteID'], $subcommunities, val('Delete', $post, true));
+        $this->Data = $result;
 
         $this->render('api');
     }

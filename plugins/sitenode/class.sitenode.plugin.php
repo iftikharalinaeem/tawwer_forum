@@ -1,4 +1,5 @@
-<?php if (!defined('APPLICATION')) exit;
+<?php
+use Vanilla\Addon;
 
 $PluginInfo['sitenode'] = array(
     'Name'        => "Multisite Node",
@@ -289,7 +290,18 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         // Push the categories.
         try {
-            $this->pushCategories();
+            trace('Pushing categories.');
+            $r = $this->pushCategories();
+            Gdn::controller()->setData('NodeCategories', $r);
+        } catch (Exception $ex) {
+            // Do nothing. The exception is logged.
+        }
+
+        // Push the subcommunities.
+        try {
+            trace('Pushing subcommunities.');
+            $r = $this->pushSubcommunities();
+            Gdn::controller()->setData('NodeSubcommunities', $r);
         } catch (Exception $ex) {
             // Do nothing. The exception is logged.
         }
@@ -299,7 +311,12 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Tell the hub that we've synchronized.
         $now = Gdn_Format::ToDateTime();
         Gdn::UserMetaModel()->SetUserMeta(0, 'siteNode.dateLastSync', $now);
-        $result = $this->hubApi("/multisites/$siteID.json", 'POST', ['DateLastSync' => $now, 'Status' => 'active'], true);
+        $result = $this->hubApi(
+            "/multisites/$siteID.json",
+            'POST',
+            ['Locale' => Gdn::locale()->current(), 'DateLastSync' => $now, 'Status' => 'active'],
+            true
+        );
 
         Gdn::Config()->Shutdown();
         Logger::event('syncnode_complete', Logger::INFO, "The node has completed it's sync.");
@@ -354,6 +371,28 @@ class SiteNodePlugin extends Gdn_Plugin {
         $json = json_encode($post, JSON_PRETTY_PRINT);
 
         $r = $this->hubApi('/multisites/syncnodecategories.json', 'POST', $post, true);
+        return $r;
+    }
+
+    /**
+     * Push subcommunities from this node to the hub.
+     *
+     * @return mixed Returns the result of the API call or **false** if subcommunities is not enabled.
+     */
+    public function pushSubcommunities() {
+        if (!class_exists('SubcommunityModel')) {
+            return false;
+        }
+
+        $subcommunities = SubcommunityModel::instance()->getWhere()->resultArray();
+        $post = [
+            'Slug' => $this->slug(),
+            'Subcommunities' => $subcommunities,
+            'Delete' => true
+        ];
+
+        $json = json_encode($post);
+        $r = $this->hubApi('/multisites/syncnodesubcommunities.json', 'POST', $post, true);
         return $r;
     }
 
