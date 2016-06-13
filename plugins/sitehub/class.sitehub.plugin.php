@@ -56,6 +56,7 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->column('Name', 'varchar(255)', false)
             ->column('Slug', 'varchar(50)', false, 'unique.slug')
             ->column('Url', 'varchar(255)', false, 'unique.url')
+            ->column('Locale', 'varchar(20)', true, 'index')
             ->column('SiteID', 'int', true)
             ->column('Status', ['pending', 'building', 'active', 'error', 'deleting'], 'pending')
             ->column('DateStatus', 'datetime')
@@ -94,6 +95,20 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->column('Name', 'varchar(255)')
             ->column('UrlCode', 'varchar(255)', true)
             ->column('HubID', 'int', true)
+            ->column('DateLastSync', 'datetime', false, 'index')
+            ->set();
+
+        // This table contains a mirror of all of the subcommunities on all of the nodes (if any).
+        gdn::structure()
+            ->table('NodeSubcommunity')
+            ->primaryKey('NodeSubcommunityID')
+            ->column('MultisiteID', 'int', false, 'key')
+            ->column('SubcommunityID', 'int', false)
+            ->column('Name', 'varchar(255)')
+            ->column('Folder', 'varchar(255)')
+            ->column('CategoryID', 'int', false)
+            ->column('Locale', 'varchar(20)')
+            ->column('IsDefault', 'tinyint(1)', '0')
             ->column('DateLastSync', 'datetime', false, 'index')
             ->set();
     }
