@@ -7,7 +7,8 @@ $PluginInfo['subcommunities'] = array(
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl'   => 'https://vanillaforums.com',
-    'License'     => 'Proprietary'
+    'License'     => 'Proprietary',
+    'Icon'        => 'subcommunities.png'
 );
 
 
