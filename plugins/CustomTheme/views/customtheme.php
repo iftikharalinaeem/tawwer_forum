@@ -4,7 +4,7 @@ function WriteRevisions($Sender, $Tab = '') {
    $LiveRevisionID = GetValue('LiveRevisionID', $Sender->Data);
    if (!$Data || $Data->NumRows() == 0)
       return;
-   
+
    ?>
    <strong>Recent Revisions</strong>
    <div class="InfoBox RecentRevisions">
@@ -20,13 +20,13 @@ function WriteRevisions($Sender, $Tab = '') {
       echo '<div class="Revision'.($Row->RevisionID == $LiveRevisionID ? ' LiveRevision' : '').'">&rarr;'
          .Anchor(date("g:i:sa", Gdn_Format::ToTimeStamp($Row->DateInserted)), 'settings/customtheme/revision/'.$Tab.'/'.$Row->RevisionID)
          .($Row->Label ? htmlspecialchars($Row->Label).' ' : '');
-      
+
       if ($Row->Live == 1)
          echo ' Live Version';
       elseif ($Row->Live == 2)
          echo ' Previewing';
       echo '</div>';
-   }  
+   }
    ?>
       <div class="NewDay"><?php echo Anchor(T('Original Version'), 'settings/customtheme/revision/'.$Tab.'/0'); ?></div>
    </div>
@@ -35,7 +35,7 @@ function WriteRevisions($Sender, $Tab = '') {
 $CurrentTab = $this->Form->GetFormValue('CurrentTab', GetValue(1, $this->RequestArgs, 'html'));
 if (!in_array($CurrentTab, array('html', 'css')))
    $CurrentTab = 'html';
-   
+
 $this->Form->AddHidden('CurrentTab', $CurrentTab);
 echo $this->Form->Open();
 ?>
@@ -67,7 +67,7 @@ echo $this->Form->Errors();
                   echo $this->Form->Button('Apply', array('class' => 'Button Apply'));
                else
                   echo Anchor('Apply', 'settings/customthemeupgrade/', 'Button Apply');
-   
+
                ?>
                </div>
             </div>
@@ -79,7 +79,7 @@ echo $this->Form->Errors();
                echo '&rarr; '.Anchor('Our Custom CSS Documentation', 'http://vanillaforums.com/help/customcss', '', array('target' => '_blank'));
                echo '<br />&rarr; '.Anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', array('target' => '_blank'));
                echo '<br />&rarr; '.Anchor("HTML Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', array('target' => '_blank'));
-               ?>            
+               ?>
             </div>
          </div>
       </li>
@@ -109,18 +109,22 @@ echo $this->Form->Errors();
                   echo $this->Form->Button('Apply', array('class' => 'Button Apply'));
                else
                   echo Anchor('Apply', 'settings/customthemeupgrade/', 'Button Apply');
-   
+
                ?>
                </div>
             </div>
             <?php WriteRevisions($this, 'html'); ?>
-            <strong>Help</strong>
-            <div class="InfoBox">
-               <div>If you are new to HTML, here are some links you should check out:</div>
-               <?php
-               echo '&rarr; '.Anchor('Our Custom HTML Documentation', 'http://vanillaforums.com/blog/help-tutorials/how-to-use-custom-theme-part-1-edit-html/', '', array('target' => '_blank'));
-               ?>            
+            <?php Gdn_Theme::assetBegin('Help'); ?>
+            <div class="Help Aside">
+               <h2>Help</h2>
+               <div class="InfoBox">
+                  <div>If you are new to HTML, here are some links you should check out:</div>
+                  <?php
+                  echo '&rarr; '.Anchor('Our Custom HTML Documentation', 'http://vanillaforums.com/blog/help-tutorials/how-to-use-custom-theme-part-1-edit-html/', '', array('target' => '_blank'));
+                  ?>
+               </div>
             </div>
+            <?php Gdn_Theme::assetEnd(); ?>
          </div>
       </li>
    </ul>

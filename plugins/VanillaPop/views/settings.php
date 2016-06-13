@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<?php Gdn_Theme::assetBegin('Help') ?>
     <div class="Help Aside">
         <?php
         echo '<h2>', T('Need More Help?'), '</h2>';
@@ -7,6 +8,7 @@
         echo '</ul>';
         ?>
     </div>
+<?php Gdn_Theme::assetEnd() ?>
     <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
 $IncomingAddress = $this->Data('IncomingAddress');

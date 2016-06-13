@@ -1,12 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<style class="text-css">
-   .ApiEndpoint {
-      padding: 10px !important;
-      background: #f1f1f1;
-      font-size: 16px;
-      font-family: "Courier New";
-   }
-</style>
+<?php Gdn_Theme::assetBegin('Help'); ?>
 <div class="Help Aside">
    <?php
    echo Wrap(T('Need More Help?'), 'h2');
@@ -15,6 +8,7 @@
    echo '</ul>';
    ?>
 </div>
+<?php Gdn_Theme::assetEnd(); ?>
 <?php
 echo '<h1>', $this->Data('Title'), '</h1>';
 
@@ -27,7 +21,7 @@ echo $Form->Errors();
       <?php
          echo $Form->Label('Endpoint', 'Endpoint');
          echo '<div class="Info2">Access your forum\'s API through this Endpoint URL:</div>';
-         echo '<div class="ApiEndpoint">https://'.CLIENT_NAME.'/api/v1/</blockquote>';
+         echo '<pre>https://'.CLIENT_NAME.'/api/v1/</pre>';
       ?>
    </li>
    <li>

@@ -91,11 +91,11 @@ echo $this->Form->Errors();
     </li>
 
     <li>
-        <?php
-        echo $this->Form->Label('Repositories', 'Repositories');
-        ?><span><?php echo T('List of Repositories separted by newline.  Enter the GitHub username and repo, E.g. \'username/reponame\''); ?></span><?php
-        echo $this->Form->TextBox('Repositories', array('MultiLine' => true));
-        ?>
+        <div class="label-wrap">
+            <?php echo $this->Form->Label('Repositories', 'Repositories'); ?>
+            <div class="Info"><?php echo T('List of Repositories separted by newline.  Enter the GitHub username and repo, E.g. \'username/reponame\''); ?></div>
+        </div>
+        <?php echo $this->Form->TextBox('Repositories', array('MultiLine' => true)); ?>
     </li>
 
 </ul>

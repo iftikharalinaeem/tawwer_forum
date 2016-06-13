@@ -1,19 +1,4 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<style>
-   select {
-      border: 1px solid #ccc;
-      height: 28px;
-   }
-
-   label + .RadioLabel {
-      margin-left: 5px;
-   }
-
-   .SmallLabel {
-      font-size: 12px;
-      margin: 5px 0 0 3px;
-  }
-</style>
 <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
 echo $this->Form->Open(), $this->Form->Errors();

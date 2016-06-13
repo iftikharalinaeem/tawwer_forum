@@ -104,6 +104,7 @@ class BadgesHooks extends Gdn_Plugin {
      * @param object $Sender DashboardController.
      */
     public function base_getAppSettingsMenuItems_handler($Sender) {
+        /** @var NestedCollectionAdapter $Menu $Menu */
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->addLink('Reputation', t('Badges'), '/badge/all', 'Garden.Settings.Manage', array('class' => 'nav-badges'));
         $Menu->addLink('Reputation', t('Badge Requests'), '/badge/requests', 'Reputation.Badges.Give', array('class' => 'nav-badge-requests'));

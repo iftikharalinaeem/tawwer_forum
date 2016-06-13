@@ -1,32 +1,4 @@
 <?php if (!defined('APPLICATION')) exit; ?>
-<style>
-   .NameColumn {
-      width: 175px;
-   }
-   
-   .LevelColumn {
-      text-align: center;
-      width: 75px;
-   }
-   
-   tbody .NameColumn,
-   tbody .LevelColumn {
-      font-size: 15px;
-      font-weight: bold;
-      vertical-align: middle;
-   }
-   
-   tbody .NameColumn img {
-      vertical-align: middle;
-   }
-   
-   tbody .AutoDescription {
-      font-size: 11px;
-      margin: 10px 0 0;
-      border-top: solid 1px #ddd;
-      padding: 5px 0 0 0;
-   }
-</style>
 <!--<div class="Help Aside">
    <?php
    echo '<h2>', T('Need More Help?'), '</h2>';
@@ -36,8 +8,15 @@
    ?>
 </div>-->
 
-<h1><?php echo $this->Data('Title'); ?></h1>
-<div class="Info PageInfo">
+<div class="header-block">
+   <h1><?php echo t('Ranks'); ?></h1>
+   <div class="btn-group">
+      <?php
+      echo Anchor(sprintf(T('Add %s'), T('Rank')), '/settings/addrank', 'btn btn-primary');
+      ?>
+   </div>
+</div>
+<div class="PageInfo">
    <p><b>Heads up!</b> Here are the ranks that users can achieve on your site.
       You can customize these ranks and even add new ones.
       Here are some tips.
@@ -54,53 +33,50 @@
       </li>
    </ol>
 </div>
-<table id="Ranks" class="AltColumns">
-   <thead>
-      <tr>
-         <th class="LevelColumn"><?php echo T('Level'); ?></th>
-         <th class="NameColumn"><?php echo T('Name'); ?></th>
-         <th class=""><?php echo T('Label'); ?></th>
-         <th class="CriteriaColumn"><?php echo T('Criteria'); ?></th>
-         <th class="AbilitiesColumn"><?php echo T('Abilites'); ?></th>
-         <th class="OptionsColumn"><?php echo T('Options'); ?></th>
-      </tr>
-   </thead>
-   <tbody>
-      <?php foreach ($this->Data('Ranks') as $Row): ?>
-      <tr id="Rank_<?php echo $Row['RankID']; ?>">
-         <td class="LevelColumn"><?php echo $Row['Level']; ?></td>
-         <td class="NameColumn"><div class="CellWrap">
-            <?php
-            echo $Row['Name'];
-            ?></div>
-         </td>
-         <td>
-            <?php
-            echo $Row['Label'];
-            ?>
-         </td>
-         <td>
-            <?php
-            echo RankModel::CriteriaString($Row);
-            ?>
-         </td>
-         <td>
-            <?php
-            echo RankModel::AbilitiesString($Row);
-            ?>
-         </td>
-         <td>
-            <?php
-            echo Anchor(T('Edit'), '/settings/editrank?rankid='.$Row['RankID'], 'SmallButton');
-            echo Anchor(T('Delete'), '/settings/deleterank?rankid='.$Row['RankID'], 'SmallButton Popup');
-            ?>
-         </td>
-      </tr>
-      <?php endforeach; ?>
-   </tbody>
-</table>
-<div class="Wrap">
-   <?php
-   echo Anchor(sprintf(T('Add %s'), T('Rank')), '/settings/addrank', 'SmallButton');
-   ?>
+<div class="table-wrap">
+   <table id="Ranks" class="AltColumns">
+      <thead>
+         <tr>
+            <th class="LevelColumn"><?php echo T('Level'); ?></th>
+            <th class="NameColumn"><?php echo T('Name'); ?></th>
+            <th class=""><?php echo T('Label'); ?></th>
+            <th class="CriteriaColumn"><?php echo T('Criteria'); ?></th>
+            <th class="AbilitiesColumn"><?php echo T('Abilites'); ?></th>
+            <th class="OptionsColumn"><?php echo T('Options'); ?></th>
+         </tr>
+      </thead>
+      <tbody>
+         <?php foreach ($this->Data('Ranks') as $Row): ?>
+         <tr id="Rank_<?php echo $Row['RankID']; ?>">
+            <td class="LevelColumn"><?php echo $Row['Level']; ?></td>
+            <td class="NameColumn"><div class="CellWrap">
+               <?php
+               echo $Row['Name'];
+               ?></div>
+            </td>
+            <td>
+               <?php
+               echo $Row['Label'];
+               ?>
+            </td>
+            <td>
+               <?php
+               echo RankModel::CriteriaString($Row);
+               ?>
+            </td>
+            <td>
+               <?php
+               echo RankModel::AbilitiesString($Row);
+               ?>
+            </td>
+            <td>
+               <?php
+               echo Anchor(T('Edit'), '/settings/editrank?rankid='.$Row['RankID'], 'btn btn-edit');
+               echo Anchor(T('Delete'), '/settings/deleterank?rankid='.$Row['RankID'], 'btn btn-delete Popup');
+               ?>
+            </td>
+         </tr>
+         <?php endforeach; ?>
+      </tbody>
+   </table>
 </div>

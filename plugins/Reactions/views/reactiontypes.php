@@ -1,60 +1,5 @@
 <?php if (!defined('APPLICATION')) exit; ?>
-<style>
-   .ActivateSlider {
-    display: block;
-    width: 80px;
-    background: #001F44;
-    border-radius: 2px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    box-shadow: 0 -5px 10px #0B64C6 inset;;
-    -moz-box-shadow: 0 -5px 10px #0B64C6 inset;;
-    -webkit-box-shadow: 0 -5px 10px #0B64C6 inset;;
-   }
-
-   .ActivateSlider-Active {
-       text-align: right;
-   }
-
-   .ActivateSlider .SmallButton {
-       margin: 0;
-       min-width: 45px;
-   }
-   
-   tr.InActive td {
-      background: #efefef;
-      color: #444;
-   }
-   
-   tr.InActive img {
-      opacity: .5;
-   }
-   
-   .NameColumn {
-      width: 175px;
-   }
-   
-   tbody .NameColumn {
-      font-size: 15px;
-      font-weight: bold;
-      vertical-align: middle;
-   }
-   
-   tbody .NameColumn img {
-      vertical-align: middle;
-   }
-   
-   tbody .AutoDescription {
-      width: 300px;
-      margin: 10px 0 0;
-      border-top: solid 1px #ddd;
-      padding: 5px 0 0 35px;
-   }
-
-   tbody .AutoDescription ul {
-      list-style-type: disc;
-   }
-</style>
+<?php Gdn_Theme::assetBegin('Help'); ?>
 <div class="Help Aside">
    <?php
    echo '<h2>', T('Need More Help?'), '</h2>';
@@ -63,8 +8,17 @@
    echo '</ul>';
    ?>
 </div>
-
-<h1><?php echo $this->Data('Title'); ?></h1>
+<?php Gdn_Theme::assetEnd(); ?>
+<div class="header-block">
+   <h1><?php echo $this->Data('Title'); ?></h1>
+   <?php if (CheckPermission('Garden.Settings.Manage')) { ?>
+      <div class="Wrap">
+         <?php
+         echo Anchor(T('Advanced Settings'), '/reactions/advanced', 'Button');
+         ?>
+      </div>
+   <?php } ?>
+</div>
 <div class="Info PageInfo">
    <p><b>Heads up!</b> Here are all of the reactions you can use on your site.
       Which reactions you use really depends on your community, but we recommend keeping a couple of points in mind.
@@ -78,13 +32,7 @@
       </li>
    </ol>
 </div>
-<?php if (CheckPermission('Garden.Settings.Manage')) { ?>
-<div class="Wrap">
-   <?php
-   echo Anchor(T('Advanced Settings'), '/reactions/advanced', 'Button');
-   ?>
-</div>
-<?php } ?>
+<div class="table-wrap">
 <table id="Badges" class="AltColumns ManageBadges">
    <thead>
       <tr>
@@ -110,9 +58,9 @@
          </td>
          <td><?php echo $ReactionType['Description']; ?></td>
          <td class="AutoDescription">
-            <?php            
+            <?php
             $AutoDescription = implode('</li><li>', AutoDescription($ReactionType));
-            if ($AutoDescription) 
+            if ($AutoDescription)
                echo Wrap('<li>'.$AutoDescription.'</li>', 'ul');
             ?>
          </td>
@@ -125,3 +73,4 @@
       <?php endforeach; ?>
    </tbody>
 </table>
+</div>

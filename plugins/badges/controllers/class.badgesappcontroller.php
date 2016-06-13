@@ -3,7 +3,7 @@
  * @copyright 2011-2015 Vanilla Forums, Inc.
  * @package Badges
  */
- 
+
 /**
  * Base controller for Reputation app.
  *
@@ -84,13 +84,13 @@ class BadgesAppController extends Gdn_Controller {
         Gdn_Theme::section('Dashboard');
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            $SideMenu = new SideMenuModule($this);
-            $SideMenu->HtmlId = '';
-            $SideMenu->highlightRoute($CurrentUrl);
-            $SideMenu->Sort = c('Garden.DashboardMenu.Sort');
-            $this->EventArguments['SideMenu'] = &$SideMenu;
+            $nav = new DashboardNavModule();
+            $navAdapter = new NestedCollectionAdapter($nav);
+            $this->EventArguments['SideMenu'] = $navAdapter;
             $this->fireEvent('GetAppSettingsMenuItems');
-            $this->addModule($SideMenu, 'Panel');
+
+            // Add the module
+            $this->addModule($nav, 'Panel');
         }
     }
 
