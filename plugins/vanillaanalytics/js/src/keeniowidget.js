@@ -301,20 +301,18 @@ function KeenIOWidget(config) {
             throw 'Invalid newRange';
         }
 
+        var defaultRange = analyticsToolbar.getDefaultRange();
         var end = newRange.end || false;
         var start = newRange.start || false;
 
         if (typeof end !== 'object' || !(end instanceof Date)) {
-            range.end = new Date();
-            range.end.setHours(0, 0, 0);
+            range.end = defaultRange.end;
         } else {
             range.end = end;
         }
 
         if (typeof start !== 'object' || !(start instanceof Date)) {
-            range.start = new Date();
-            range.start.setHours(0, 0, 0);
-            range.start.setMonth(range.end.getMonth() - 1);
+            range.start = defaultRange.start;
         } else {
             range.start = start;
         }
