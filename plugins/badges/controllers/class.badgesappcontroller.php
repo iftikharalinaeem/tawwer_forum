@@ -34,6 +34,8 @@ class BadgesAppController extends Gdn_Controller {
      * @access public
      */
     public function initialize() {
+        $this->Application = 'badges';
+
         $FrontendStyle = false;
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
@@ -84,13 +86,28 @@ class BadgesAppController extends Gdn_Controller {
         Gdn_Theme::section('Dashboard');
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            $SideMenu = new SideMenuModule($this);
-            $SideMenu->HtmlId = '';
-            $SideMenu->highlightRoute($CurrentUrl);
-            $SideMenu->Sort = c('Garden.DashboardMenu.Sort');
-            $this->EventArguments['SideMenu'] = &$SideMenu;
+            $sideMenu = new SideMenuModule($this);
+
+            // Add the heading here so that they sort properly.
+            $sideMenu->addItem('Dashboard', t('Dashboard'), false, ['class' => 'Dashboard']);
+            $sideMenu->addItem('Appearance', t('Appearance'), false, ['class' => 'Appearance']);
+            $sideMenu->addItem('Users', t('Users'), false, ['class' => 'Users']);
+            $sideMenu->addItem('Moderation', t('Moderation'), false, ['class' => 'Moderation']);
+
+            // Hook for initial setup. Do NOT use this for addons.
+            $this->EventArguments['SideMenu'] = $sideMenu;
+            $this->fireEvent('earlyAppSettingsMenuItems');
+
+            // Module setup.
+            $sideMenu->HtmlId = '';
+            $sideMenu->highlightRoute($CurrentUrl);
+            $sideMenu->Sort = c('Garden.DashboardMenu.Sort');
+
+            // Hook for adding to menu.
             $this->fireEvent('GetAppSettingsMenuItems');
-            $this->addModule($SideMenu, 'Panel');
+
+            // Add the module
+            $this->addModule($sideMenu, 'Panel');
         }
     }
 
