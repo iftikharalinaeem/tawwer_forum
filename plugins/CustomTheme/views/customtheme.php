@@ -35,20 +35,15 @@ function WriteRevisions($Sender, $Tab = '') {
 $CurrentTab = $this->Form->GetFormValue('CurrentTab', GetValue(1, $this->RequestArgs, 'html'));
 if (!in_array($CurrentTab, array('html', 'css')))
    $CurrentTab = 'html';
-
+?>
+<div class="header-menu js-custom-theme-menu">
+   <a href="<?php echo url('settings/customtheme/#'); ?>" class="js-custom-html <?php echo $CurrentTab == 'html' ? 'active' : ''; ?>"><?php echo t('Edit HTML'); ?></a>
+   <a href="<?php echo url('settings/customtheme/#'); ?>" class="js-custom-css <?php echo $CurrentTab == 'html' ? '' : 'active'; ?>"><?php echo t('Edit CSS'); ?></a>
+</div>
+<?php
 $this->Form->AddHidden('CurrentTab', $CurrentTab);
 echo $this->Form->Open();
-?>
-<h1>Customize Theme</h1>
-<?php
-echo $this->Form->Errors();
-?>
-<div class="Tabs CustomThemeTabs">
-   <ul>
-      <li class="CustomHtml<?php echo $CurrentTab == 'html' ? ' Active' : ''; ?>"><?php echo Anchor(T('Edit HTML'), 'settings/customtheme/#'); ?></li>
-      <li class="CustomCSS<?php echo $CurrentTab == 'html' ? '' : ' Active'; ?>"><?php echo Anchor(T('Edit CSS'), 'settings/customtheme/#'); ?></li>
-   </ul>
-</div>
+echo $this->Form->Errors(); ?>
 <div class="Container CustomCSSContainer<?php echo $CurrentTab == 'html' ? ' Hidden' : ''; ?>">
    <ul>
       <li>

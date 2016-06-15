@@ -54,7 +54,9 @@ foreach ($this->Data('Badges') as $Badge) :
                 echo Gdn_Format::Text(($Badge->Visible) ? 'Yes' : 'No'); ?>
         </td>-->
 
-        <td><?php
+        <td>
+            <div class="btn-group">
+            <?php
             // Edit badge
             if (CheckPermission('Reputation.Badges.Manage'))
                 echo Anchor(T('Edit'), '/badge/manage/'.$Badge->BadgeID, 'EditBadge SmallButton btn btn-edit');
@@ -62,6 +64,7 @@ foreach ($this->Data('Badges') as $Badge) :
             // Delete badge
             if (CheckPermission('Reputation.Badges.Manage') && $Badge->CanDelete)
                 echo Anchor(T('Delete'), '/badge/delete/'.$Badge->BadgeID.'/'.$AjaxString, 'DeleteBadge Popup SmallButton btn btn-delete'); ?>
+            </div>
         </td>
 
     </tr>

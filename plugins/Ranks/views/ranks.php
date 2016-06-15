@@ -1,23 +1,7 @@
 <?php if (!defined('APPLICATION')) exit; ?>
-<!--<div class="Help Aside">
-   <?php
-   echo '<h2>', T('Need More Help?'), '</h2>';
-   echo '<ul>';
-   echo Wrap(Anchor(T("Introducing Vanilla Reactions and Badges"), 'http://vanillaforums.com/blog/news/introducing-vanilla-reactions-and-badges'), 'li');
-   echo '</ul>';
-   ?>
-</div>-->
-
-<div class="header-block">
-   <h1><?php echo t('Ranks'); ?></h1>
-   <div class="btn-group">
-      <?php
-      echo Anchor(sprintf(T('Add %s'), T('Rank')), '/settings/addrank', 'btn btn-primary');
-      ?>
-   </div>
-</div>
-<div class="PageInfo">
-   <p><b>Heads up!</b> Here are the ranks that users can achieve on your site.
+<?php Gdn_Theme::assetBegin('Help'); ?>
+   <h2>Heads up!</h2>
+   <p>Here are the ranks that users can achieve on your site.
       You can customize these ranks and even add new ones.
       Here are some tips.
    </p>
@@ -32,6 +16,14 @@
          Be creative! Try naming your ranks after things that the community talks about.
       </li>
    </ol>
+<?php Gdn_Theme::assetEnd(); ?>
+<div class="header-block">
+   <h1><?php echo t('Ranks'); ?></h1>
+   <div class="btn-group">
+      <?php
+      echo Anchor(sprintf(T('Add %s'), T('Rank')), '/settings/addrank', 'btn btn-primary');
+      ?>
+   </div>
 </div>
 <div class="table-wrap">
    <table id="Ranks" class="AltColumns">
@@ -70,10 +62,12 @@
                ?>
             </td>
             <td>
+               <div class="btn-group">
                <?php
                echo Anchor(T('Edit'), '/settings/editrank?rankid='.$Row['RankID'], 'btn btn-edit');
                echo Anchor(T('Delete'), '/settings/deleterank?rankid='.$Row['RankID'], 'btn btn-delete Popup');
                ?>
+               </div>
             </td>
          </tr>
          <?php endforeach; ?>

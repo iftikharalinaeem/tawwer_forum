@@ -38,7 +38,8 @@ $PluginInfo['Online'] = array(
    'SettingsUrl' => '/plugin/online',
    'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/tim'
+   'AuthorUrl' => 'http://www.vanillaforums.org/profile/tim',
+   'Icon' => 'online.png'
 );
 
 class OnlinePlugin extends Gdn_Plugin {

@@ -13,7 +13,8 @@ $PluginInfo['Ranks'] = array(
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'MobileFriendly' => TRUE
+   'MobileFriendly' => TRUE,
+   'Icon' => 'ranks.png'
 );
 
 class RanksPlugin extends Gdn_Plugin {

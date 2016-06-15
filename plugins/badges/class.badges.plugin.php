@@ -18,7 +18,8 @@ $PluginInfo['badges'] = array(
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',
     'AuthorUrl' => 'http://lincolnwebs.com',
-    'License' => 'Proprietary'
+    'License' => 'Proprietary',
+    'Icon' => 'badges.png'
 );
 
 /**

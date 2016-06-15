@@ -1,6 +1,19 @@
 <?php if (!defined('APPLICATION')) exit; ?>
 <?php Gdn_Theme::assetBegin('Help'); ?>
 <div class="Help Aside">
+   <h2>Heads up!</h2>
+   <p>
+      Here are all of the reactions you can use on your site.
+      Which reactions you use really depends on your community, but we recommend keeping a couple of points in mind.
+   </p>
+   <ol>
+      <li>
+         Don't use too many reactions. You don't  want to give your users information overload.
+      </li>
+      <li>
+         We recommend mostly positive reactions to encourage participation.
+      </li>
+   </ol>
    <?php
    echo '<h2>', T('Need More Help?'), '</h2>';
    echo '<ul>';
@@ -18,19 +31,6 @@
          ?>
       </div>
    <?php } ?>
-</div>
-<div class="Info PageInfo">
-   <p><b>Heads up!</b> Here are all of the reactions you can use on your site.
-      Which reactions you use really depends on your community, but we recommend keeping a couple of points in mind.
-   </p>
-   <ol>
-      <li>
-         Don't use too many reactions. You don't  want to give your users information overload.
-      </li>
-      <li>
-         We recommend mostly positive reactions to encourage participation.
-      </li>
-   </ol>
 </div>
 <div class="table-wrap">
 <table id="Badges" class="AltColumns ManageBadges">

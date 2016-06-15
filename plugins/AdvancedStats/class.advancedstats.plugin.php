@@ -12,7 +12,8 @@ $PluginInfo['AdvancedStats'] = array(
     'MobileFriendly' => TRUE,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'Icon' => 'analytics.png'
 );
 
 class AdvancedStatsPlugin extends Gdn_Plugin {

@@ -15,7 +15,8 @@ $PluginInfo['AutoSignout'] = array(
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',
-   'MobileFriendly' => TRUE
+   'MobileFriendly' => TRUE,
+   'Icon' => 'auto-signout-timer.png'
 );
 
 // v1.1 2015-05-04 Lincoln
@@ -30,7 +31,7 @@ class AutoSignoutPlugin extends Gdn_Plugin {
    public function AssetModel_StyleCss_Handler($Sender) {
       $Sender->AddCssFile('autosignout.css', 'plugins/AutoSignout');
    }
-   
+
    /**
     * Add page assets & configuration.
     *
@@ -46,7 +47,7 @@ class AutoSignoutPlugin extends Gdn_Plugin {
       ob_start();
       include $Path;
       $WarningAsset = ob_get_clean();
-      
+
       $Sender->AddAsset('Content', $WarningAsset, 'SignoutWarning');
    }
 

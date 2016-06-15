@@ -1,11 +1,10 @@
 // This file contains javascript that is specific to the dashboard/profile controller.
 jQuery(document).ready(function($) {
    // Load tab content on tab-click
-   $('.Tabs li a').click(function() {
-      $('.Tabs li').removeClass('Active');
-      var li = $(this).parent('li');
-      $(li).addClass('Active');
-      if ($(li).hasClass('CustomHtml')) {
+   $('.js-custom-theme-menu a').click(function() {
+      $('.js-custom-theme-menu a').removeClass('active');
+      $(this).addClass('active');
+      if ($(this).hasClass('js-custom-html')) {
          $('input[name$=CurrentTab]').val('html');
          $('div.CustomHtmlContainer').show();
          $('div.CustomCSSContainer').hide();
@@ -16,8 +15,6 @@ jQuery(document).ready(function($) {
       }
       return false;
    });
-   
+
    $('a.Apply').popup();
-   
-   $("textarea").tabby();
 });

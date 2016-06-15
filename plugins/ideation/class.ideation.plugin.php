@@ -10,7 +10,8 @@ $PluginInfo['ideation'] = [
     ),
     'Author'          => "Becky Van Bussel",
     'AuthorEmail'     => 'becky@vanillaforums.com',
-    'License'         => 'Proprietary'
+    'License'         => 'Proprietary',
+    'Icon'            => 'ideation.png'
 ];
 
 /**
@@ -1417,5 +1418,3 @@ if (!function_exists('getStatusTagHtml')) {
         return ' <a href="'.url('/discussions/tagged/'.$statusCode).'"><span class="Tag Status-Tag-'.$statusCode.'"">'.$statusName.'</span></a> ';
     }
 }
-
-

@@ -41,10 +41,12 @@
                     ?>
                 </td>
                 <td>
+                    <div class="btn-group">
                     <?php
                     echo anchor(t('Edit'), '/settings/editstatus/'.$row['StatusID'], 'btn btn-edit Popup');
                     echo anchor(t('Delete'), '/settings/deletestatus?statusid='.$row['StatusID'], 'btn btn-delete Popup');
                     ?>
+                    </div>
                 </td>
             </tr>
         <?php endforeach; ?>

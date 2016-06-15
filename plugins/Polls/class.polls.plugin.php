@@ -14,7 +14,8 @@ $PluginInfo['Polls'] = array(
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://markosullivan.ca',
     'MobileFriendly' => TRUE,
-    'RegisterPermissions' => array('Plugins.Polls.Add' => 'Garden.Profiles.Edit')
+    'RegisterPermissions' => array('Plugins.Polls.Add' => 'Garden.Profiles.Edit'),
+    'Icon' => 'polls.png'
 );
 
 class PollsPlugin extends Gdn_Plugin {

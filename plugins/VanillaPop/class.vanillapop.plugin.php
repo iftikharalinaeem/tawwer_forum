@@ -18,7 +18,8 @@ $PluginInfo['VanillaPop'] = array(
     'RegisterPermissions' => array(
         'Email.Discussions.Add' => 'Garden.Profiles.Edit',
         'Email.Comments.Add' => 'Garden.Profiles.Edit',
-        'Email.Conversations.Add' => 'Garden.Profiles.Edit')
+        'Email.Conversations.Add' => 'Garden.Profiles.Edit'),
+    'Icon' => 'vanillapop.png'
 );
 
 // 1.0.6 - Lincoln, Apr 2013

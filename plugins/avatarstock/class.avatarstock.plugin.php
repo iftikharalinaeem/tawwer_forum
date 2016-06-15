@@ -18,7 +18,8 @@ $PluginInfo['avatarstock'] = array(
     ),
     'SettingsUrl' => '/settings/avatarstock',
     'SettingsPermission' => 'Garden.Settings.Manage',
-    'MobileFriendly' => true
+    'MobileFriendly' => true,
+    'Icon' => 'avatar-pool.png'
 );
 
 /**

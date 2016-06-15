@@ -29,7 +29,8 @@ $PluginInfo['Reactions'] = array(
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'MobileFriendly' => TRUE
+    'MobileFriendly' => TRUE,
+    'Icon' => 'reactions.png'
 );
 
 class ReactionsPlugin extends Gdn_Plugin {

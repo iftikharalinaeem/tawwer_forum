@@ -13,7 +13,8 @@ $PluginInfo['bulkusersimporter'] = array(
    'HasLocale' => false,
    'RegisterPermissions' => false,
    'SettingsUrl' => '/settings/bulkusersimporter',
-   'SettingsPermission' => 'Garden.Setttings.Manage'
+   'SettingsPermission' => 'Garden.Setttings.Manage',
+   'Icon' => 'bulk-user-import.png'
 );
 
 /**

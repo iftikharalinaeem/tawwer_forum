@@ -14,7 +14,8 @@ $PluginInfo['Reporting2'] = array(
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',
-   'MobileFriendly' => true
+   'MobileFriendly' => true,
+   'Icon' => 'reporting.png'
 );
 
 class Reporting2Plugin extends Gdn_Plugin {

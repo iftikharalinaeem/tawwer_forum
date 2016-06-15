@@ -1,69 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
-?>
-<style type="text/css">
-.Configuration {
-   margin: 0 20px 20px;
-   background: #f5f5f5;
-   float: left;
-}
-.ConfigurationForm {
-   padding: 20px;
-   float: left;
-}
-#Content form .ConfigurationForm ul {
-   padding: 0;
-}
-#Content form .ConfigurationForm input.Button {
-   margin: 0;
-}
-.ConfigurationHelp {
-   border-left: 1px solid #aaa;
-   margin-left: 340px;
-   padding: 20px;
-}
-.ConfigurationHelp strong {
-    display: block;
-}
-.ConfigurationHelp img {
-   width: 99%;
-}
-.ConfigurationHelp a img {
-    border: 1px solid #aaa;
-}
-.ConfigurationHelp a:hover img {
-    border: 1px solid #777;
-}
-input.CopyInput {
-   font-family: monospace;
-   color: #000;
-   width: 240px;
-   font-size: 12px;
-   padding: 4px 3px;
-}
-
-input.CopyInputLonger {
-    width: 300px;
-}
-
-.ConfigurationHelp ol {
-   margin: 1em 0 1em 3em;
-}
-.ConfigurationHelp ol li {
-  list-style: decimal !important;
-  margin: 10px 0;
-}
-</style>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('.CopyInput').on('click', function(e) {
-            $(this).select();
-        });
-    });
-</script>
-
+<?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo $this->Data('Title'); ?></h1>
-<div class="Info">
+<div class="message alert-danger danger">
    Linked In social sign in allows users to sign in using their LinkedIn account.
    <b>You must register your application with LinkedIn for this addon to work.</b>
 </div>
@@ -88,14 +25,14 @@ input.CopyInputLonger {
             When you create the application, you can choose what to enter in most fields, but you have to make sure you enter specific information for some fields.
          </li>
          <li>
-            Under <b>Website URL</b> enter <input type="text" class="CopyInput" value="<?php echo url('/', true); ?>" />.
+            Under <b>Website URL</b> enter <code class="prettyprint"><?php echo url('/', true); ?></code>.
          </li>
          <li>
             Under <b>Default Scope</b> make sure you've selected at least <b>r_basicprofile</b> and <b>r_emailaddress</b>.
          </li>
           <li>
-              Under <b>OAuth 2.0 Redirect URLs</b> add <input type="text" class="CopyInput CopyInputLonger" value="<?php echo url('/entry/connect/linkedin', true); ?>" />
-              <b>and</b> <input type="text" class="CopyInput CopyInputLonger" value="<?php echo url('/profile/linkedinconnect', true); ?>" />
+              Under <b>OAuth 2.0 Redirect URLs</b> add <code class="prettyprint"><?php echo url('/entry/connect/linkedin', true); ?></code>
+              <b>and</b> <code class="prettyprint"><?php echo url('/profile/linkedinconnect', true); ?></code>
           </li>
          <li>
             Once your application has been set up, you must copy the <b>Client ID</b> and <b>Client Secret</b> into the form on this page.
