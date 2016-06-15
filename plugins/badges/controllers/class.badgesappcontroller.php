@@ -10,7 +10,7 @@
  * @since 1.0.0
  * @package Reputation
  */
-class BadgesAppController extends Gdn_Controller {
+class BadgesAppController extends DashboardController {
     /*
      * @var BadgeModel
      */
@@ -34,6 +34,8 @@ class BadgesAppController extends Gdn_Controller {
      * @access public
      */
     public function initialize() {
+        $this->Application = 'badges';
+
         $FrontendStyle = false;
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
@@ -70,28 +72,6 @@ class BadgesAppController extends Gdn_Controller {
 
         // Call Gdn_Controller's Initialize() as well.
         parent::initialize();
-    }
-
-    /**
-     * Configures navigation sidebar in Dashboard.
-     *
-     * @since 1.0.0
-     * @access public
-     *
-     * @param $CurrentUrl Path to current location in dashboard.
-     */
-    public function addSideMenu($CurrentUrl) {
-        Gdn_Theme::section('Dashboard');
-        // Only add to the assets if this is not a view-only request
-        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            $SideMenu = new SideMenuModule($this);
-            $SideMenu->HtmlId = '';
-            $SideMenu->highlightRoute($CurrentUrl);
-            $SideMenu->Sort = c('Garden.DashboardMenu.Sort');
-            $this->EventArguments['SideMenu'] = &$SideMenu;
-            $this->fireEvent('GetAppSettingsMenuItems');
-            $this->addModule($SideMenu, 'Panel');
-        }
     }
 
     /**

@@ -317,7 +317,11 @@ class BadgesHooks extends Gdn_Plugin {
      * Run structure & default badges.
      */
     public function setup() {
-        Gdn::applicationManager()->disableApplication('reputation');
+        // If Reputation is enabled, disable it.
+        if (Gdn::addonManager()->isEnabled('reputation', \Vanilla\Addon::TYPE_ADDON)) {
+            Gdn::applicationManager()->disableApplication('reputation');
+        }
+
         $this->structure();
     }
 
