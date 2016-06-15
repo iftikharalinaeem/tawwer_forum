@@ -65,7 +65,9 @@ class RoleTrackerModel extends Gdn_Model {
     }
 
     /**
-     * Get every public roles with relevant data for this model.
+     * Get every public role with relevant data for this model.
+     *
+     * Ignore roles that do not support signin (guest, etc).
      *
      * @return array Public roles.
      */
@@ -74,7 +76,7 @@ class RoleTrackerModel extends Gdn_Model {
 
         if ($refreshCache || $roles === null) {
             $roles = array_filter(
-                $this->roleModel->get()->resultArray(),
+                $this->roleModel->getByPermission('Garden.SignIn.Allow')->resultArray(),
                 'RoleModel::filterPersonalInfo'
             );
 
@@ -85,7 +87,7 @@ class RoleTrackerModel extends Gdn_Model {
     }
 
     /**
-     * Get every tracked roles.
+     * Get every tracked role.
      *
      * @params bool $refreshCache Force a cache refresh if true
      * @return array Tracked roles.
