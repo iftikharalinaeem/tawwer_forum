@@ -42,8 +42,8 @@ function AnalyticsDashboard (config, start, end, initialCategoryID) {
      * @type {object}
      * */
     var timeframe = {
-        end   : new Date(),
-        start : new Date()
+        end   : null,
+        start : null
     };
 
     /**
@@ -115,6 +115,10 @@ function AnalyticsDashboard (config, start, end, initialCategoryID) {
      * @returns {object}
      */
     this.getTimeframe = function() {
+        if (timeframe.start === null || timeframe.end === null) {
+            return analyticsToolbar.getDefaultRange();
+        }
+
         return timeframe;
     };
 
@@ -227,10 +231,6 @@ function AnalyticsDashboard (config, start, end, initialCategoryID) {
 
         return title = newTitle;
     };
-
-    // Default timeframe from previous month, until current day.
-    timeframe.start.setHours(0, 0, 0);
-    timeframe.start.setMonth(timeframe.end.getMonth() - 1);
 
     // Attempt to use incoming dates, if available.
     if (start instanceof Date && end instanceof Date) {

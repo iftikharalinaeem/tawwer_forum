@@ -11,7 +11,8 @@ $(document).ready(function() {
         };
     }
 
-    var dashboard = new AnalyticsDashboard(dashboardConfig);
+    var dateRange = analyticsToolbar.getDefaultRange();
+    var dashboard = new AnalyticsDashboard(dashboardConfig, dateRange.start, dateRange.end);
     dashboard.writeDashboard();
 
     window.analyticsDashboard = dashboard;

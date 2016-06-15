@@ -2,6 +2,28 @@ var analyticsToolbar = {
 
     maxTicks: 200,
 
+    /**
+     * Grab default date range.
+     * @returns {Object}
+     */
+    getDefaultRange: function() {
+        // Grab the date range from a cookie.  If we don't have one, build the default starting from a month ago.
+        var dateRange = Cookies.getJSON('va-dateRange');
+        if (typeof dateRange !== "object" || typeof dateRange.start !== "string" || typeof dateRange.end !== "string") {
+            dateRange = {
+                start: moment().subtract("month", 1).toDate(),
+                end: moment().toDate()
+            };
+        } else {
+            dateRange = {
+                start: new Date(dateRange.start),
+                end: new Date(dateRange.end)
+            }
+        }
+
+        return dateRange;
+    },
+
     setWidgets: function(method, newValue) {
         var panels = [window.analyticsDashboard.getPanel('metrics'), window.analyticsDashboard.getPanel('charts')];
 
@@ -50,7 +72,7 @@ var analyticsToolbar = {
             });
         }
     }
-}
+};
 
 
 $(document).on('change', '#Form_cat01', function() {
@@ -120,11 +142,11 @@ $(document).on('ready', function() {
         ],
         onChange: function () {
             var range = $(".js-date-range").daterangepicker("getRange");
+            Cookies.set('va-dateRange', range);
             analyticsToolbar.updateIntervals(range);
             analyticsToolbar.setWidgets('setRange', [range]);
         }
     });
 
-
-    $(".js-date-range").daterangepicker("setRange", {'start': moment().subtract('month', 1).toDate(), 'end': moment().toDate()});
+    $(".js-date-range").daterangepicker("setRange", analyticsToolbar.getDefaultRange());
 });
