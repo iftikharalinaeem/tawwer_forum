@@ -677,10 +677,31 @@ class KeenIOTracker implements TrackerInterface {
      *
      * @param Gdn_Controller Instance of the current page's controller.
      * @param bool $inDashboard Is the current page a dashboard page?
+     * @param array $eventData Data for the current event.
      */
-    public function addDefinitions(Gdn_Controller $controller, $inDashboard = false) {
+    public function addDefinitions(Gdn_Controller $controller, $inDashboard = false, &$eventData = []) {
         $controller->addDefinition('keenio.projectID', $this->client->getProjectID());
         $controller->addDefinition('keenio.writeKey', $this->client->getWriteKey());
+
+        // Make sure we have the structure we need.
+        if (!array_key_exists('keen', $eventData)) {
+            $eventData['keen'] = [
+                'addons' => []
+            ];
+        } elseif (!array_key_exists('addons', $eventData['keen'])) {
+            $eventData['keen']['addons'] = [];
+        }
+
+        if (!empty($eventData['referrer'])) {
+            $eventData['keen']['addons'][] = [
+                'name' => 'keen:referrer_parser',
+                'input' => [
+                    'referrer_url' => 'referrer',
+                    'page_url' => 'url'
+                ],
+                'output' => 'referrerParsed'
+            ];
+        }
 
         if ($inDashboard) {
             $controller->addDefinition('keenio.readKey', $this->client->getReadKey());
@@ -725,9 +746,6 @@ class KeenIOTracker implements TrackerInterface {
                         ],
                         'output' => 'ipGeo'
                     ],
-                    /**
-                     * url_parser doesn't work without a domain name.  Since we don't currently use domain name, we're
-                     * going to ditch keen's URL parser addon.
                     [
                         'name' => 'keen:url_parser',
                         'input' => [
@@ -735,26 +753,14 @@ class KeenIOTracker implements TrackerInterface {
                         ],
                         'output' => 'urlParsed'
                     ]
-                     */
                 ]
             ]
         ];
 
         $defaults = array_merge($defaults, $additionalDefaults);
 
-        if (!empty($defaults['referrer'])) {
-            $defaults['keen']['addons'][] = [
-                'name' => 'keen:referrer_parser',
-                'input' => [
-                    'referrer_url' => 'referrer',
-                    'page_url' => 'url'
-                ],
-                'output' => 'referrerParsed'
-            ];
-        }
-
-        if (!empty($defaults['userAgent'])) {
-            $defaults['keen']['addons'][] = [
+        if (!empty($eventData['userAgent'])) {
+            $eventData['keen']['addons'][] = [
                 'name' => 'keen:ua_parser',
                 'input' => [
                     'ua_string' => 'userAgent'

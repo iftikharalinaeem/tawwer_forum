@@ -25,8 +25,9 @@ interface TrackerInterface {
      *
      * @param Gdn_Controller $controller
      * @param bool $inDashboard Is the current page a dashboard page?
+     * @param array $eventData Data for the current event.
      */
-    public function addDefinitions(Gdn_Controller $controller, $inDashboard = false);
+    public function addDefinitions(Gdn_Controller $controller, $inDashboard = false, &$eventData = []);
 
     /**
      * Add JavaScript files to the current page.

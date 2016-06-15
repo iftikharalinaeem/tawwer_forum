@@ -83,11 +83,11 @@ class AnalyticsTracker {
     public function addDefinitions(Gdn_Controller $controller) {
         $inDashboard = $controller->MasterView == 'admin';
 
-        foreach ($this->trackers as $tracker) {
-            $tracker->addDefinitions($controller, $inDashboard);
-        }
-
         $eventData = $this->getPageViewData($controller);
+
+        foreach ($this->trackers as $tracker) {
+            $tracker->addDefinitions($controller, $inDashboard, $eventData);
+        }
 
         $controller->addDefinition('vaCookieName', c('Garden.Cookie.Name') . '-vA');
         $controller->addDefinition('eventData', $eventData);
@@ -162,19 +162,16 @@ class AnalyticsTracker {
             'ip' => Gdn::request()->ipAddress(),
             'method' => Gdn::request()->requestMethod(),
             'site' => AnalyticsData::getSite(),
-            'url' => url('', '/')
+            'url' => url('', true)
         ];
 
         // Only add user-related information if a user is signed in.
         $defaults['user'] = AnalyticsData::getCurrentUser();
 
-        // Attempt to grab the referrer, if there is one, and record it.
-        $referrer = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER');
-        $defaults['referrer'] = $referrer ?: null;
 
         // Grab the browser's user agent value, if available.
         $userAgent = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_USER_AGENT');
-        $defaults['userAgent'] = $userAgent ?: null;
+        $eventData['userAgent'] = $userAgent ?: null;
 
         if ($trackerDefaults) {
             foreach ($this->trackers as $tracker) {
@@ -213,6 +210,10 @@ class AnalyticsTracker {
      */
     public function getPageViewData(Gdn_Controller $controller) {
         $eventData = $this->getDefaultData(true);
+
+        // Attempt to grab the referrer, if there is one, and record it.
+        $referrer = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER');
+        $eventData['referrer'] = $referrer ?: null;
 
         // Figure out if we have a discussion.  If we do, include it in the event data.
         if ($discussion = $controller->data('Discussion', false)) {
