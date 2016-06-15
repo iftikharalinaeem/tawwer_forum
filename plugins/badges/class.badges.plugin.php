@@ -107,6 +107,7 @@ class BadgesHooks extends Gdn_Plugin {
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->addLink('Reputation', t('Badges'), '/badge/all', 'Garden.Settings.Manage', array('class' => 'nav-badges'));
         $Menu->addLink('Reputation', t('Badge Requests'), '/badge/requests', 'Reputation.Badges.Give', array('class' => 'nav-badge-requests'));
+        $Menu->addLink('Reputation', t('Settings'), '/badge/settings', 'Garden.Settings.Manage');
     }
 
     /**

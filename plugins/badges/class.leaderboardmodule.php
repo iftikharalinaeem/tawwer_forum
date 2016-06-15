@@ -35,34 +35,79 @@ class LeaderBoardModule extends Gdn_Module {
      *
      * @param null $Limit
      */
-    public function getData($Limit = null) {
-        if (!$Limit) {
-            $Limit = $this->Limit;
+    public function getData($limit = null) {
+        if (!$limit) {
+            $limit = $this->Limit;
         }
 
-        $TimeSlot = gmdate('Y-m-d', Gdn_Statistics::timeSlotStamp($this->SlotType, false));
+        $timeSlot = gmdate('Y-m-d', Gdn_Statistics::timeSlotStamp($this->SlotType, false));
 
-        $CategoryID = $this->CategoryID;
-        if ($CategoryID) {
-            $Category = CategoryModel::categories($CategoryID);
-            $CategoryID = GetValue('PointsCategoryID', $Category, 0);
-            $Category = CategoryModel::categories($CategoryID);
+        $categoryID = $this->CategoryID;
+        if ($categoryID) {
+            $Category = CategoryModel::categories($categoryID);
+            $categoryID = GetValue('PointsCategoryID', $Category, 0);
+            $Category = CategoryModel::categories($categoryID);
             $this->setData('Category', $Category);
         } else {
-            $CategoryID = 0;
+            $categoryID = 0;
         }
 
-        $Data = Gdn::sql()->getWhere(
-            'UserPoints',
-            array('TimeSlot' => $TimeSlot, 'SlotType' => $this->SlotType, 'Source' => 'Total', 'CategoryID' => $CategoryID),
-            'Points',
-            'desc',
-            $Limit
-        )->resultArray();
+        $excludePermission = c('Badges.ExcludePermission');
+        $moderatorRoleIDs = [];
+        $rankedPermissions = [
+            'Garden.Settings.Manage',
+            'Garden.Community.Manage',
+            'Garden.Moderation.Manage'
+        ];
 
-        Gdn::userModel()->joinUsers($Data, array('UserID'));
+        if ($excludePermission && in_array($excludePermission, $rankedPermissions)) {
+            $roleModel = new RoleModel();
+            $roles = $roleModel->getWithRankPermissions()->resultArray();
 
-        $this->Leaders = $Data;
+            $currentPermissionRank = array_search($excludePermission, $rankedPermissions);
+
+            foreach ($roles as $currentRole) {
+                for ($i = 0; $i <= $currentPermissionRank; $i++) {
+                    if (val($rankedPermissions[$i], $currentRole)) {
+                        $moderatorRoleIDs[] = $currentRole['RoleID'];
+                        continue 2;
+                    }
+                }
+            }
+        }
+
+        $leadersSql = Gdn::sql()
+            ->select([
+                'SlotType',
+                'TimeSlot',
+                'Source',
+                'CategoryID',
+                'up.UserID',
+                'Points'
+            ])
+            ->from('UserPoints up')
+            ->where([
+                'TimeSlot' => $timeSlot,
+                'SlotType' => $this->SlotType,
+                'Source' => 'Total',
+                'CategoryID' => $categoryID
+            ]);
+
+        if (!empty($moderatorRoleIDs)) {
+            $leadersSql->join('UserRole ur', 'up.UserID = ur.UserID', 'left')
+                ->whereNotIn('ur.RoleID', $moderatorRoleIDs)
+            ->distinct(true);
+        }
+
+        $data = $leadersSql
+            ->orderBy('Points', 'desc')
+            ->limit($limit)
+            ->get()
+            ->resultArray();
+
+        Gdn::userModel()->joinUsers($data, ['UserID']);
+
+        $this->Leaders = $data;
     }
 
     /**
