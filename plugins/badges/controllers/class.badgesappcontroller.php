@@ -10,7 +10,7 @@
  * @since 1.0.0
  * @package Reputation
  */
-class BadgesAppController extends DashboardController {
+class BadgesAppController extends Gdn_Controller {
     /*
      * @var BadgeModel
      */
@@ -72,6 +72,43 @@ class BadgesAppController extends DashboardController {
 
         // Call Gdn_Controller's Initialize() as well.
         parent::initialize();
+    }
+
+    /**
+     * Configures navigation sidebar in Dashboard.
+     *
+     * @since 1.0.0
+     * @access public
+     *
+     * @param $CurrentUrl Path to current location in dashboard.
+     */
+    public function addSideMenu($CurrentUrl) {
+        Gdn_Theme::section('Dashboard');
+        // Only add to the assets if this is not a view-only request
+        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+            $sideMenu = new SideMenuModule($this);
+
+            // Add the heading here so that they sort properly.
+            $sideMenu->addItem('Dashboard', t('Dashboard'), false, ['class' => 'Dashboard']);
+            $sideMenu->addItem('Appearance', t('Appearance'), false, ['class' => 'Appearance']);
+            $sideMenu->addItem('Users', t('Users'), false, ['class' => 'Users']);
+            $sideMenu->addItem('Moderation', t('Moderation'), false, ['class' => 'Moderation']);
+
+            // Hook for initial setup. Do NOT use this for addons.
+            $this->EventArguments['SideMenu'] = $sideMenu;
+            $this->fireEvent('earlyAppSettingsMenuItems');
+
+            // Module setup.
+            $sideMenu->HtmlId = '';
+            $sideMenu->highlightRoute($CurrentUrl);
+            $sideMenu->Sort = c('Garden.DashboardMenu.Sort');
+
+            // Hook for adding to menu.
+            $this->fireEvent('GetAppSettingsMenuItems');
+
+            // Add the module
+            $this->addModule($sideMenu, 'Panel');
+        }
     }
 
     /**
