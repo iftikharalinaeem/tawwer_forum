@@ -97,7 +97,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         // Prevent non-admins from accessing this page
         $sender->permission('Garden.Settings.Manage');
 
-        $sender->title(sprintf(t('%s settings'), t('RoleTracker')));
+        $sender->title(sprintf(t('%s Settings'), t('RoleTracker')));
         $sender->addSideMenu('settings/roletracker');
 
         $sender->setData('PluginDescription', $this->getPluginKey('Description'));
