@@ -1271,7 +1271,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         // Add an activity for each person and pray we don't melt the wibbles.
         foreach ($UserRoles as $UserRole) {
-            $Activity['ActivityUserID'] = $UserRole['UserID'];
             $Activity['NotifyUserID'] = $UserRole['UserID'];
             $ActivityModel->Queue($Activity, FALSE, array('Force' => TRUE));
         }
