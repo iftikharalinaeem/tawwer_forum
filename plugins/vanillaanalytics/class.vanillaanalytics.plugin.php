@@ -182,6 +182,101 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Generate data for leaderboards.
+     */
+    public function controller_leaderboard($sender, $requestArgs) {
+        list($widget, $size) = $requestArgs;
+
+        if (empty($widget)) {
+            throw new Gdn_UserException('Leaderboard widget required.');
+        }
+
+        $size = (int)$size;
+        $maxSize = 100;
+
+        if ($size < 1) {
+            $size = 10;
+        } elseif ($size > $maxSize) {
+            $size = $maxSize;
+        }
+
+        $defaultWidgets = AnalyticsTracker::getInstance()->getDefaultWidgets();
+        $leaderboard = val($widget, $defaultWidgets);
+        if (!$leaderboard || $leaderboard->getType() !== 'leaderboard') {
+            throw new Gdn_UserException('Invalid leaderboard widget.');
+        }
+
+        $sender->title($leaderboard->getTitle());
+        $query = val('query', $leaderboard->getData());
+        if (!$query) {
+            throw new Gdn_UserException('No query available.');
+        }
+
+        $response = $query->setTimeframeRelative('this', 30, 'days')->exec();
+        if (empty($response)) {
+            throw new Gdn_UserException('An error was encountered while querying data.');
+        }
+        $result = $response->result;
+
+        $detectTypes = [
+            'user.userID',
+            'discussion.discussionID'
+        ];
+        $typeID = false;
+
+        $firstResult = current($result);
+        foreach ($detectTypes as $currentType) {
+            if ($firstResult->$currentType) {
+                $typeID = $currentType;
+                break;
+            }
+        }
+        if (!$typeID) {
+            throw new Gdn_UserException('Unable to determine result type of query.');
+        }
+
+        usort($result, function($r1, $r2) use ($typeID) {
+            if ($r1->result === $r2->result) {
+                return 0;
+            } else {
+                return $r1->result > $r2->result ? -1 : 1;
+            }
+        });
+
+        $resultIndexed = [];
+        switch ($typeID) {
+            case 'discussion.discussionID':
+                $recordModel = new DiscussionModel();
+                $recordUrl = '/discussion/%d';
+                $titleAttribute = 'Name';
+                break;
+            case 'user.userID':
+                $recordModel = Gdn::userModel();
+                $recordUrl = '/profile?UserID=%d';
+                $titleAttribute = 'Name';
+                break;
+            default:
+                throw new Gdn_UserException('Invalid type ID.');
+        }
+        foreach ($result as $currentResult) {
+            $recordID = $currentResult->$typeID;
+            $record = $recordModel->getID($recordID, DATASET_TYPE_ARRAY);
+            $record['LeaderRecord'] = [
+                'ID' => $recordID,
+                'Url' => sprintf($recordUrl, $recordID),
+                'Title' =>$record[$titleAttribute]
+            ];
+            $resultIndexed[$recordID] = $record;
+        }
+
+        $sender->setData(
+            'Leaderboard',
+            array_slice($resultIndexed, 0, $maxSize, true)
+        );
+        $sender->render($sender->fetchViewLocation('leaderboard', '', 'plugins/vanillaanalytics'));
+    }
+
+    /**
      * Handle requests for an analytics dashboard.
      *
      * @param Gdn_Controller $sender

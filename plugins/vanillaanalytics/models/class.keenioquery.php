@@ -68,6 +68,11 @@ class KeenIOQuery implements JsonSerializable {
     protected $eventCollection;
 
     /**
+     * @var KeenIOClient Instance of keen.io API client.
+     */
+    protected $client;
+
+    /**
      * @link https://keen.io/docs/api/#filters
      * @var array Used to refine the scope of events to be included in an analysis.
      */
@@ -108,6 +113,22 @@ class KeenIOQuery implements JsonSerializable {
     protected $title = '';
 
     /**
+     * KeenIOQuery constructor.
+     */
+    public function __construct() {
+        $this->client = new KeenIOClient(
+            'https://api.keen.io/{version}/',
+            [
+                'orgID' => c('VanillaAnalytics.KeenIO.OrgID'),
+                'orgKey' => c('VanillaAnalytics.KeenIO.OrgKey'),
+                'projectID' => c('VanillaAnalytics.KeenIO.ProjectID'),
+                'readKey' => c('VanillaAnalytics.KeenIO.ReadKey'),
+                'writeKey' => c('VanillaAnalytics.KeenIO.WriteKey')
+            ]
+        );
+    }
+
+    /**
      * Add a filter to the query.
      *
      * @link https://keen.io/docs/api/#filters
@@ -117,6 +138,55 @@ class KeenIOQuery implements JsonSerializable {
     public function addFilter(array $filters) {
         $this->filters[] = $filters;
         return $this;
+    }
+
+    /**
+     * Execute this query and return the result.
+     */
+    public function exec() {
+        if (empty($this->analysisType)) {
+            throw new Gdn_UserException('Analysis type not configured.');
+        }
+        if (empty($this->eventCollection)) {
+            throw new Gdn_UserException('Event collection not configured.');
+        }
+
+        $data = [
+            'maxAge' => 300
+        ];
+        $projectID = $this->client->getProjectID();
+        $analysisType = $this->analysisType;
+
+        if ($this->eventCollection) {
+            $data['event_collection'] = $this->eventCollection;
+        }
+        if ($this->filters) {
+            $data['filters'] = json_encode($this->filters);
+        }
+        if ($this->eventCollection) {
+            $data['group_by'] = $this->groupBy;
+        }
+        if ($this->eventCollection) {
+            $data['interval'] = $this->interval;
+        }
+        if ($this->eventCollection) {
+            $data['target_property'] = $this->targetProperty;
+        }
+        if ($this->eventCollection) {
+            $data['timeframe'] = $this->timeframe;
+        }
+        if ($this->eventCollection) {
+            $data['timezone'] = $this->timezone;
+        }
+
+        $response = $this->client->command(
+            "projects/{$projectID}/queries/{$analysisType}",
+            $data,
+            KeenIOClient::COMMAND_READ,
+            KeenIOClient::REQUEST_GET
+        );
+
+        return $response ?: false;
     }
 
     /**
