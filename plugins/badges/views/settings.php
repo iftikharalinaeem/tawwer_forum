@@ -7,10 +7,10 @@ echo $this->Form->errors();
 <ul>
     <li>
         <?php echo $this->Form->label('Exclude users from leaderboards', 'ExcludePermission'); ?>
-        <div class="Info"><?php echo t('Users in selected roles will be excluded from leaderboards.'); ?></div>
+        <div class="Info"><?php echo t('Users in selected the roles will be excluded from leaderboards.'); ?></div>
         <?php echo $this->Form->dropdown('ExcludePermission', [
-            'Garden.Settings.Manage' => 'Administrators',
-            'Garden.Moderation.Manage' => 'Administrators and moderators',
+            'Garden.Settings.Manage' => 'Administrator',
+            'Garden.Moderation.Manage' => 'Administrator and moderator',
             'None' => 'None'
         ]); ?>
     </li>
