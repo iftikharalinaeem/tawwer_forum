@@ -11,7 +11,7 @@ echo $this->Form->errors();
         <?php echo $this->Form->dropdown('ExcludePermission', [
             'Garden.Settings.Manage' => 'Administrators',
             'Garden.Moderation.Manage' => 'Administrators and moderators',
-            'None' => 'No exclusions'
+            'None' => 'None'
         ]); ?>
     </li>
 </ul>
