@@ -514,13 +514,14 @@ class OAuth2PluginBase {
         }
 
         $returnTo = parse_url(urldecode(gdn::request()->get('Target')));
-        if($returnTo['path']) {
-            if(c('Auth0.SignOutRedirect.FullPath')) {
+        if (val('path', $returnTo)) {
+            if (c('Auth0.SignOutRedirect.FullPath')) {
                 $passedUrl = urldecode(Gdn::request()->get('Target'));
             } else {
                 $passedUrl = val('scheme', $returnTo, 'http').'://'. val('host', $returnTo, Gdn::request()->url('/', true));
             }
         }
+
         // if the client has explicitly overwritten the signout redirect url...
         $redirect = val('SignOutRedirect', $provider, $passedUrl);
 
