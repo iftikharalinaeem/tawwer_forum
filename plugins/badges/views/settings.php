@@ -1,7 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-
-<h1><?echo t('Leaderboards'); ?></h1>
-<?php echo $this->Form->open(); ?>
+<h1><?php echo $this->title(); ?></h1>
+<?php
+echo $this->Form->open();
+echo $this->Form->errors();
+?>
 <ul>
     <li>
         <?php echo $this->Form->label('Exclude users from leaderboards', 'ExcludePermission'); ?>

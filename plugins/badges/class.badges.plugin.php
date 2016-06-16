@@ -18,7 +18,9 @@ $PluginInfo['badges'] = array(
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',
     'AuthorUrl' => 'http://lincolnwebs.com',
-    'License' => 'Proprietary'
+    'License' => 'Proprietary',
+    'SettingsUrl' => '/settings/badges',
+    'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
 /**
@@ -107,7 +109,6 @@ class BadgesHooks extends Gdn_Plugin {
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->addLink('Reputation', t('Badges'), '/badge/all', 'Garden.Settings.Manage', array('class' => 'nav-badges'));
         $Menu->addLink('Reputation', t('Badge Requests'), '/badge/requests', 'Reputation.Badges.Give', array('class' => 'nav-badge-requests'));
-        $Menu->addLink('Reputation', t('Settings'), '/badge/settings', 'Garden.Settings.Manage');
     }
 
     /**
@@ -237,6 +238,30 @@ class BadgesHooks extends Gdn_Plugin {
         if (c('Badges.BadgesModule.Target') == 'BeforeUserInfo') {
             echo Gdn_Theme::module('BadgesModule');
         }
+    }
+
+    /**
+     * General configuration page for Badges.
+     */
+    public function settingsController_badges_create($sender, $args) {
+        $sender->permission('Garden.Settings.Manage');
+
+        if ($sender->Form->authenticatedPostback()) {
+            $excludePermission = $sender->Form->getFormValue('ExcludePermission', '');
+
+            if ($excludePermission === 'None') {
+                removeFromConfig('Badges.ExcludePermission');
+            } else {
+                saveToConfig('Badges.ExcludePermission', $excludePermission);
+            }
+        } else {
+            $sender->Form->setValue('ExcludePermission', c('Badges.ExcludePermission', 'None'));
+        }
+
+        $sender->title(sprintf(t('%s settings'), t('Badges')));
+        $sender->setData('PluginDescription', $this->getPluginKey('Description'));
+        $sender->addSideMenu('dashboard/settings/plugins');
+        $sender->render($sender->fetchViewLocation('settings', '', 'plugins/badges'));
     }
 
     /**

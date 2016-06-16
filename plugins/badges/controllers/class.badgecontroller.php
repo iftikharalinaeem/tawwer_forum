@@ -515,26 +515,4 @@ class BadgeController extends BadgesAppController {
         $this->setView404();
         $this->render();
     }
-
-    /**
-     * General configuration page for Badges.
-     */
-    public function settings() {
-        $this->permission('Garden.Settings.Manage');
-
-        if ($this->Form->authenticatedPostback()) {
-            $excludePermission = $this->Form->getFormValue('ExcludePermission', '');
-
-            if ($excludePermission === 'None') {
-                removeFromConfig('Badges.ExcludePermission');
-            } else {
-                saveToConfig('Badges.ExcludePermission', $excludePermission);
-            }
-        } else {
-            $this->Form->setValue('ExcludePermission', c('Badges.ExcludePermission', 'None'));
-        }
-
-        $this->addSideMenu('/badge/settings');
-        $this->render();
-    }
 }
