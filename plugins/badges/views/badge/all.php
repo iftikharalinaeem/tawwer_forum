@@ -19,7 +19,7 @@
                 <th><?php echo T('Given'); ?></th>
                 <th class="Alt"><?php echo T('Active'); ?></th>
                 <!--<th><?php echo T('Visible'); ?></th>-->
-                <th class="Alt Options"><?php echo T('Options'); ?></th>
+                <th class="options"><?php echo T('Options'); ?></th>
             </tr>
         </thead>
         <tbody>

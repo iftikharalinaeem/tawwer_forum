@@ -1,5 +1,10 @@
 <?php if (!defined('APPLICATION')) exit; ?>
-<h1><?php echo $this->data('Title'); ?></h1>
+<div class="header-block">
+    <h1><?php echo $this->data('Title'); ?></h1>
+    <div class="btn-group">
+        <?php echo anchor(sprintf(t('Add %s'), t('Status')), '/settings/addstatus', 'btn btn-primary'); ?>
+    </div>
+</div>
 <!--<div class="Info PageInfo">-->
 <!--    <p><b>Heads up!</b> Here are the ranks that users can achieve on your site.-->
 <!--        You can customize these ranks and even add new ones.-->
@@ -23,7 +28,7 @@
         <tr>
             <th class="NameColumn"><?php echo t('Status'); ?></th>
             <th class="IsOpenColumn"><?php echo t('State'); ?></th>
-            <th class="OptionsColumn"><?php echo t('Options'); ?></th>
+            <th class="options"><?php echo t('Options'); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -43,8 +48,8 @@
                 <td>
                     <div class="btn-group">
                     <?php
-                    echo anchor(t('Edit'), '/settings/editstatus/'.$row['StatusID'], 'btn btn-edit Popup');
-                    echo anchor(t('Delete'), '/settings/deletestatus?statusid='.$row['StatusID'], 'btn btn-delete Popup');
+                    echo anchor(dashboardSymbol('edit'), '/settings/editstatus/'.$row['StatusID'], 'Popup btn btn-icon', ['aria-label' => t('Edit')]);
+                    echo anchor(dashboardSymbol('delete'), '/settings/deletestatus?statusid='.$row['StatusID'], 'Popup btn btn-icon', ['aria-label' => t('Delete')]);
                     ?>
                     </div>
                 </td>
@@ -52,9 +57,4 @@
         <?php endforeach; ?>
         </tbody>
     </table>
-</div>
-<div class="Wrap">
-    <?php
-    echo Anchor(sprintf(t('Add %s'), t('Status')), '/settings/addstatus', 'SmallButton');
-    ?>
 </div>

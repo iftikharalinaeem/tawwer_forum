@@ -34,7 +34,7 @@
             <th class=""><?php echo T('Label'); ?></th>
             <th class="CriteriaColumn"><?php echo T('Criteria'); ?></th>
             <th class="AbilitiesColumn"><?php echo T('Abilites'); ?></th>
-            <th class="OptionsColumn"><?php echo T('Options'); ?></th>
+            <th class="options"><?php echo T('Options'); ?></th>
          </tr>
       </thead>
       <tbody>
@@ -64,8 +64,8 @@
             <td>
                <div class="btn-group">
                <?php
-               echo Anchor(T('Edit'), '/settings/editrank?rankid='.$Row['RankID'], 'btn btn-edit');
-               echo Anchor(T('Delete'), '/settings/deleterank?rankid='.$Row['RankID'], 'btn btn-delete Popup');
+               echo anchor(dashboardSymbol('edit'), '/settings/editrank?rankid='.$Row['RankID'], 'btn btn-icon', ['aria-label' => t('Edit')]);
+               echo anchor(dashboardSymbol('delete'), '/settings/deleterank?rankid='.$Row['RankID'], 'Popup btn btn-icon', ['aria-label' => t('Delete')]);
                ?>
                </div>
             </td>
