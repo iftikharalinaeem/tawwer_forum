@@ -163,19 +163,23 @@ class KeenIOQuery implements JsonSerializable {
         if ($this->filters) {
             $data['filters'] = json_encode($this->filters);
         }
-        if ($this->eventCollection) {
+        if ($this->groupBy) {
             $data['group_by'] = $this->groupBy;
         }
-        if ($this->eventCollection) {
+        if ($this->interval) {
             $data['interval'] = $this->interval;
         }
-        if ($this->eventCollection) {
+        if ($this->targetProperty) {
             $data['target_property'] = $this->targetProperty;
         }
-        if ($this->eventCollection) {
+        if ($this->timeframe) {
             $data['timeframe'] = $this->timeframe;
+            $data['timeframe'] = [
+                "start" => "2016-01-22T00:00:00.000Z",
+                "end" => "2016-01-23T00:00:00.000Z"
+            ];
         }
-        if ($this->eventCollection) {
+        if ($this->timezone) {
             $data['timezone'] = $this->timezone;
         }
 
@@ -183,7 +187,7 @@ class KeenIOQuery implements JsonSerializable {
             "projects/{$projectID}/queries/{$analysisType}",
             $data,
             KeenIOClient::COMMAND_READ,
-            KeenIOClient::REQUEST_GET
+            KeenIOClient::REQUEST_POST
         );
 
         return $response ?: false;
@@ -360,7 +364,7 @@ class KeenIOQuery implements JsonSerializable {
      * @return $this
      */
     public function setTimeframeAbsolute($start, $end) {
-        $this->timeframe =[
+        $this->timeframe = [
             'start' => $start,
             'end' => $end
         ];

@@ -185,12 +185,14 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
      * Generate data for leaderboards.
      */
     public function controller_leaderboard($sender, $requestArgs) {
+        // Pull data from the request arguments and verify they're usable.
         list($widget, $size) = $requestArgs;
 
         if (empty($widget)) {
             throw new Gdn_UserException('Leaderboard widget required.');
         }
 
+        // Some analytics providers (e.g. keen) cap their "count" results to 100 rows, so this may be redundant.
         $size = (int)$size;
         $maxSize = 100;
 
@@ -212,7 +214,21 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
             throw new Gdn_UserException('No query available.');
         }
 
-        $response = $query->setTimeframeRelative('this', 30, 'days')->exec();
+        $timeframe = [
+            'Start' => @strtotime(Gdn::request()->get('Start')),
+            'End' => @strtotime(Gdn::request()->get('End'))
+        ];
+        if ($timeframe['Start'] && $timeframe['End']) {
+            $query->setTimeframeAbsolute(
+                date('c', $timeframe['Start']),
+                date('c', $timeframe['End'])
+            );
+        } else {
+            $query->setTimeframeRelative('this', 30, 'days');
+        }
+
+        $response = $query->exec();
+
         if (empty($response)) {
             throw new Gdn_UserException('An error was encountered while querying data.');
         }
@@ -225,6 +241,8 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $typeID = false;
 
         $firstResult = current($result);
+        var_export($result);
+        exit();
         foreach ($detectTypes as $currentType) {
             if ($firstResult->$currentType) {
                 $typeID = $currentType;
@@ -271,7 +289,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
 
         $sender->setData(
             'Leaderboard',
-            array_slice($resultIndexed, 0, $maxSize, true)
+            array_slice($resultIndexed, 0, $size, true)
         );
         $sender->render($sender->fetchViewLocation('leaderboard', '', 'plugins/vanillaanalytics'));
     }
