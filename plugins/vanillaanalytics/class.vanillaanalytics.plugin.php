@@ -192,158 +192,29 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
             throw new Gdn_UserException('Leaderboard widget required.');
         }
 
-        // Some analytics providers (e.g. keen) cap their "count" results to 100 rows, so this may be redundant.
-        $size = (int)$size;
-        $maxSize = 100;
-
-        if ($size < 1) {
-            $size = 10;
-        } elseif ($size > $maxSize) {
-            $size = $maxSize;
-        }
-
         // Verify the slug is a valid leaderboard widget.
         $defaultWidgets = AnalyticsTracker::getInstance()->getDefaultWidgets();
-        $leaderboard = val($widget, $defaultWidgets);
-        if (!$leaderboard || $leaderboard->getType() !== 'leaderboard') {
+        $widget = val($widget, $defaultWidgets);
+        if (!$widget || $widget->getType() !== 'leaderboard') {
             throw new Gdn_UserException('Invalid leaderboard widget.');
         }
+        $leaderboard = new AnalyticsLeaderboard();
 
         // Verify we have a query to run.
-        $sender->title($leaderboard->getTitle());
-        $query = val('query', $leaderboard->getData());
+        $sender->title($widget->getTitle());
+        $query = val('query', $widget->getData());
         if (!$query) {
             throw new Gdn_UserException('No query available.');
         }
-        $queryPrevious = clone $query;
-
-        // Fetch Start and End from the requst.  If we have valid dates for each, use them to build a timeframe.
-        $timeframe = [
-            'Start' => @strtotime(Gdn::request()->get('Start')),
-            'End' => @strtotime(Gdn::request()->get('End'))
-        ];
-
-        // Determine the timeframe for the leaderboard, as well as previous user standings.
-        if ($timeframe['Start'] && $timeframe['End']) {
-            $duration = $timeframe['End'] - $timeframe['Start'];
-
-            $query->setTimeframeAbsolute(
-                date('c', $timeframe['Start']),
-                date('c', $timeframe['End'])
-            );
-            $queryPrevious->setTimeframeAbsolute(
-                date('c', strtotime('-'.$duration.' seconds', $timeframe['Start'])),
-                date('c', $timeframe['Start'])
-            );
-        } else {
-            $defaultLength = 30;
-
-            $query->setTimeframeRelative('this', $defaultLength, 'days');
-            $queryPrevious->setTimeframeAbsolute(
-                date('c', strtotime('-'.($defaultLength*2).' days')),
-                date('c', strtotime('-'.$defaultLength.' days'))
-            );
-        }
-
-        $response = $query->exec();
-        $responsePrevious = $queryPrevious->exec();
-
-        if (empty($response) || empty($responsePrevious)) {
-            throw new Gdn_UserException('An error was encountered while querying data.');
-        }
-        $result = $response->result;
-        $resultPrevious = $responsePrevious->result;
-        $resultIndexed = [];
-
-        // Have results? Process them.
-        if (is_array($result) && !empty($result)) {
-            $detectTypes = [
-                'user.userID',
-                'discussion.discussionID'
-            ];
-            $typeID = false;
-
-            // Attempt to determine the type based on the first row's attributes.
-            $firstResult = current($result);
-            foreach ($detectTypes as $currentType) {
-                if ($firstResult->$currentType) {
-                    $typeID = $currentType;
-                    break;
-                }
-            }
-            if (!$typeID) {
-                throw new Gdn_UserException('Unable to determine result type of query.');
-            }
-
-            // Sort results based on their count total, descending.
-            usort($result, function ($r1, $r2) {
-                if ($r1->result === $r2->result) {
-                    return 0;
-                } else {
-                    return $r1->result > $r2->result ? -1 : 1;
-                }
-            });
-
-            // Prepare to build out the values we need for the leaderboard.
-            switch ($typeID) {
-                case 'discussion.discussionID':
-                    $recordModel = new DiscussionModel();
-                    $recordUrl = '/discussion/%d';
-                    $titleAttribute = 'Name';
-                    break;
-                case 'user.userID':
-                    $recordModel = Gdn::userModel();
-                    $recordUrl = '/profile?UserID=%d';
-                    $titleAttribute = 'Name';
-                    break;
-                default:
-                    throw new Gdn_UserException('Invalid type ID.');
-            }
-
-            $previousPositions = [];
-            usort($resultPrevious, function ($r1, $r2) {
-                if ($r1->result === $r2->result) {
-                    return 0;
-                } else {
-                    return $r1->result > $r2->result ? -1 : 1;
-                }
-            });
-            foreach ($resultPrevious as $previousStanding) {
-                $previousPositions[] = $previousStanding->$typeID;
-            }
-
-            $position = 0;
-            foreach ($result as $currentResult) {
-                $recordID = $currentResult->$typeID;
-                $record = $recordModel->getID($recordID, DATASET_TYPE_ARRAY);
-                $previous = array_search($recordID, $previousPositions);
-
-                if ($previous === false) {
-                    $positionChange = "New";
-                } elseif ($position === $previous) {
-                    $positionChange = "Same";
-                } elseif ($position < $previous) {
-                    $positionChange = "Rise";
-                } else {
-                    $positionChange = "Fall";
-                }
-
-                $record['LeaderRecord'] = [
-                    'ID' => $recordID,
-                    'Position' => ($position + 1),
-                    'PositionChange' => $positionChange,
-                    'Previous' => $previous !== false ? ($previous + 1) : false,
-                    'Url' => sprintf($recordUrl, $recordID),
-                    'Title' => $record[$titleAttribute]
-                ];
-                $resultIndexed[$recordID] = $record;
-                $position++;
-            }
-        }
+        $leaderboard->setQuery($query);
+        $leaderboard->setPreviousQuery(clone $query);
 
         $sender->setData(
             'Leaderboard',
-            array_slice($resultIndexed, 0, $size, true)
+            $leaderboard->lookupData(
+                @strtotime(Gdn::request()->get('Start')),
+                @strtotime(Gdn::request()->get('End'))
+            )
         );
         $sender->render($sender->fetchViewLocation('leaderboard', '', 'plugins/vanillaanalytics'));
     }
