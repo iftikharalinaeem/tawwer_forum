@@ -424,7 +424,8 @@ AnalyticsDashboard.prototype.writePanel = function(panelID) {
     }
 
     for (var i = 0; i < panel.widgets.length; i++) {
-        panel.widgets[i].render();
+        // Render here should no longer be needed since we're rendering from the toolbar.
+        //panel.widgets[i].render();
         panelContainer.appendChild(panel.widgets[i].getElements('container'));
     }
 };

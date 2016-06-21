@@ -127,8 +127,8 @@ class AnalyticsLeaderboard {
             }
 
             $previousPositions = [];
-            usort($resultPrevious, [$this, 'sortResults']);
-            foreach ($resultPrevious as $previousStanding) {
+            usort($previousResult, [$this, 'sortResults']);
+            foreach ($previousResult as $previousStanding) {
                 $previousPositions[] = $previousStanding->$typeID;
             }
 
