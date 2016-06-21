@@ -174,10 +174,6 @@ class KeenIOQuery implements JsonSerializable {
         }
         if ($this->timeframe) {
             $data['timeframe'] = $this->timeframe;
-            $data['timeframe'] = [
-                "start" => "2016-01-22T00:00:00.000Z",
-                "end" => "2016-01-23T00:00:00.000Z"
-            ];
         }
         if ($this->timezone) {
             $data['timezone'] = $this->timezone;
