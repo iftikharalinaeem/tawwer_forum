@@ -432,6 +432,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $data = [
             'reaction' => [
                 'discussionID' => (int)$discussionID,
+                'reactionClass' => val('Class', $reactionType, null),
                 'reactionType' => val('Name', $reactionType, null),
                 'recordType' => $recordType,
                 'recordID' => (int)$recordID,
