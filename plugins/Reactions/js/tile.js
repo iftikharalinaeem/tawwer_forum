@@ -33,16 +33,16 @@ jQuery(document).ready(function($) {
             selector: '.LoadingMore',
              finishedMsg: '&nbsp;',
              msgText: '&nbsp;',
-             img: '//cdn.vanillaforums.com/images/progress.gif'
+             img: 'https://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.ssl.cf1.rackcdn.com/images/progress.gif'
            },
          pixelsFromNavToBottom: 800
       }, function(newElements) {
            var $newElems = $(newElements).addClass('Invisible');
            $newElems.imagesLoaded(function(){
-             $container.masonry('appended', $newElems, true ); 
+             $container.masonry('appended', $newElems, true );
              $newElems.removeClass('Invisible');
            });
          }
-      );   
+      );
    }
 });
