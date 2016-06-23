@@ -14,7 +14,7 @@
 $PluginInfo['github'] = array(
     'Name' => 'GitHub',
     'Description' => "Allow staff users to create issues from discussions and comments.",
-    'Version' => '1.1.0',
+    'Version' => '1.1.1',
     'RequiredApplications' => array('Vanilla' => '2.1.18'),
     'SettingsUrl' => '/plugin/github',
     'SettingsPermission' => 'Garden.Settings.Manage',
@@ -820,17 +820,6 @@ class GithubPlugin extends Gdn_Plugin {
                 'Class' => 'Popup'
             );
         }
-    }
-
-    /**
-     * Add needed CSS.
-     *
-     * @param AssetModel $Sender Sending Controller.
-     *
-     * @todo Remove this after css has been added to core.
-     */
-    public function assetModel_styleCss_handler($Sender) {
-        $Sender->AddCssFile('github.css', 'plugins/github');
     }
 
     //API Calls

@@ -161,7 +161,7 @@ class BuzzModel {
     }
 
     protected function QnAStats(&$Result) {
-        if (!array_key_exists('QnA', Gdn::PluginManager()->EnabledPlugins())) {
+        if (!Gdn::addonManager()->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
             return;
         }
 

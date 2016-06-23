@@ -35,6 +35,7 @@ $PluginInfo['Reactions'] = array(
 class ReactionsPlugin extends Gdn_Plugin {
 
     const RECORD_REACTIONS_DEFAULT = 'popup';
+    const BEST_OF_MAX_PAGES = 300;
 
     /**
      * Include ReactionsController for /reactions requests
@@ -306,15 +307,18 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         list($Offset, $Limit) = OffsetLimit($Page, 5);
 
+        // If this value is less-than-or-equal-to _CurrentRecords, we'll get a "next" pagination link.
         $Sender->SetData('_Limit', $Limit + 1);
 
+        // Try to query five additional records to compensate for user permission and deleted record issues.
         $ReactionModel = new ReactionModel();
         $Data = $ReactionModel->GetRecordsWhere(array('TagID' => $ReactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'UserID' => $UserID, 'Total >' => 0),
             'DateInserted', 'desc',
-            $Limit + 1, $Offset);
-
+            $Limit + 5, $Offset);
         $Sender->SetData('_CurrentRecords', count($Data));
-        if (count($Data) > $Limit) {
+
+        // If necessary, shave records off the end to get back down to the original size limit.
+        while (count($Data) > $Limit) {
             array_pop($Data);
         }
         if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) === 'avatars') {
@@ -543,11 +547,16 @@ class ReactionsPlugin extends Gdn_Plugin {
         }
         $Sender->SetData('CurrentReaction', $Reaction);
 
-
         // Define the query offset & limit.
-        $Page = 'p'.GetIncomingValue('Page', 1);
+        $Page = Gdn::request()->get('Page', 1);
+
+        // Limit the number of pages.
+        if (self::BEST_OF_MAX_PAGES && $Page > self::BEST_OF_MAX_PAGES) {
+            $Page = self::BEST_OF_MAX_PAGES;
+        }
+        $Page = 'p'.$Page;
+
         $Limit = C('Plugins.Reactions.BestOfPerPage', 10);
-        //      $OffsetProvided = $Page != '';
         list($Offset, $Limit) = OffsetLimit($Page, $Limit);
 
         $Sender->SetData('_Limit', $Limit + 1);

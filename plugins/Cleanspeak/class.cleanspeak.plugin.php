@@ -340,7 +340,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
      * @return bool|string false if SimpleAPU is disabled.
      */
     public function getPostBackURL($multiSite = false) {
-        if (!Gdn::PluginManager()->CheckPlugin('SimpleAPI')) {
+        if (!Gdn::addonManager()->isEnabled('SimpleAPI', \Vanilla\Addon::TYPE_ADDON)) {
             return false;
         }
 
@@ -757,7 +757,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $sender->SetData('IsConfigured', $this->isConfigured());
 
         $sender->SetData('PostBackURL', $this->getPostBackURL());
-        if (Gdn::PluginManager()->CheckPlugin('sitenode')) {
+        if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON)) {
 
             $sender->SetData('PostBackURL', $this->getPostBackURL(true));
         }

@@ -61,7 +61,7 @@ class Warnings2Plugin extends Gdn_Plugin {
     public function structure() {
         require __DIR__.'/structure.php';
 
-        if (Gdn::pluginManager()->isEnabled('Warnings')) {
+        if (Gdn::addonManager()->isEnabled('Warnings', \Vanilla\Addon::TYPE_ADDON)) {
             Gdn::PluginManager()->DisablePlugin('Warnings');
         }
     }

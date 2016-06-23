@@ -33,17 +33,17 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             'comment' => array('c' => 'comments')
         );
 
-        if (Gdn::pluginManager()->isEnabled('Sphinx')) {
-            if (Gdn::pluginManager()->isEnabled('QnA')) {
+        if (Gdn::addonManager()->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON)) {
+            if (Gdn::addonManager()->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
                 self::$Types['discussion']['question'] = 'questions';
                 self::$Types['comment']['answer'] = 'answers';
             }
 
-            if (Gdn::pluginManager()->isEnabled('Polls')) {
+            if (Gdn::addonManager()->isEnabled('Polls', \Vanilla\Addon::TYPE_ADDON)) {
                 self::$Types['discussion']['poll'] = 'polls';
             }
 
-            if (Gdn::applicationManager()->checkApplication('Pages')) {
+            if (Gdn::addonManager()->isEnabled('Pages', \Vanilla\Addon::TYPE_ADDON)) {
                 self::$Types['page']['p'] = 'docs';
             }
 
@@ -94,7 +94,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         if (!inSection('Dashboard')) {
             AdvancedSearchModule::addAssets();
 
-            if (!Gdn::pluginManager()->isEnabled('Sphinx')) {
+            if (!Gdn::addonManager()->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON)) {
                 $Sender->addDefinition('searchAutocomplete', '0');
             }
         }

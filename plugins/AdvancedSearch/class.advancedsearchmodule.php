@@ -57,7 +57,7 @@ class AdvancedSearchModule extends Gdn_Module {
 
     public function toString() {
         if ($this->IncludeTags === null) {
-            $this->IncludeTags = Gdn::pluginManager()->isEnabled('Tagging') && Gdn::pluginManager()->isEnabled('Sphinx');
+            $this->IncludeTags = Gdn::addonManager()->isEnabled('Tagging', \Vanilla\Addon::TYPE_ADDON) && Gdn::addonManager()->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON);
         }
 
         // We want the advanced search form to populate from the get and have lowercase fields.

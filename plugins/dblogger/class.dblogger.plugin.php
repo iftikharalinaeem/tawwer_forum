@@ -7,7 +7,7 @@
 $PluginInfo['dblogger'] = array(
     'Name' => 'Db Logger',
     'Description' => 'Enable database logging.',
-    'Version' => '1.2.0',
+    'Version' => '1.3.0',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
@@ -57,11 +57,6 @@ class DbLoggerPlugin extends Gdn_Plugin {
             ->Column('IP', 'ipaddress', true)
             ->Column('Attributes', 'text', true)
             ->Set();
-
-        // This is temporary to clean up some space after the logs have pruned.
-        Gdn::sql()->delete('EventLog', ['Timestamp <=' => strtotime(c('Plugins.dblogger.PruneAfter', '-90 days'))]);
-        $px = Gdn::database()->DatabasePrefix;
-        Gdn::database()->query("optimize table {$px}EventLog");
     }
 
     public function Base_GetAppSettingsMenuItems_Handler($Sender) {

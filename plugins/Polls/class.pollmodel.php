@@ -167,6 +167,7 @@ class PollModel extends Gdn_Model {
                'CountOptions' => $CountValidOptions,
                'CountVotes' => 0
             );
+            $Poll = $this->coerceData($Poll);
             $PollID = $this->Insert($Poll);
 
             // Save the poll options.
