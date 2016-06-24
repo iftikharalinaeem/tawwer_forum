@@ -199,6 +199,8 @@ class SiteHubPlugin extends Gdn_Plugin {
 
         $sites = MultisiteModel::instance()->getNodeSites($locale);
         $sender->setData('Sites', $sites);
+        
+        $sender->title(t(c('Garden.SitesTitle', c('Garden.Title', 'Communities'))), '');
         $sender->render('Sites', 'Categories', 'plugins/sitehub');
     }
 

@@ -418,6 +418,91 @@ class MultisiteModel extends Gdn_Model {
         return $row;
     }
 
+    /**
+     * Get all of the locales used on the nodes.
+     *
+     * @return array Returns a locales dataset.
+     */
+    public function getNodeLocales() {
+        // Get all of the locales from the nodes.
+        $nodeLocales = $this->SQL
+            ->select('Locale')
+            ->from('Multisite')
+            ->groupBy('Locale')
+            ->get()
+            ->resultArray();
+        $locales = array_column($nodeLocales, 'Locale', 'Locale');
+
+        $subcommunityLocales = $this->SQL
+            ->select('Locale')
+            ->from('NodeSubcommunity')
+            ->groupBy('Locale')
+            ->get()
+            ->resultArray();
+        $locales = array_replace($locales, array_column($subcommunityLocales, 'Locale', 'Locale'));
+        $locales = array_filter($locales);
+
+        // Sort the array, keeping English up top.
+        usort($locales, function ($a, $b) {
+            if ($a === $b) {
+                return 0;
+            } elseif ($a === 'en') {
+                return -1;
+            } elseif ($b === 'en') {
+                return 1;
+            } else {
+                return strcasecmp($a, $b);
+            }
+        });
+
+        $exceptions = [
+            'ru__PETR1708' => ['Locale' => 'ru', 'Name' => 'русский', 'Language' => 'русский'],
+
+        ];
+
+        // Add some more information to the locales.
+        $result = [];
+        foreach ($locales as $locale) {
+            $code = str_replace('_', '-', $locale);
+            $locale = Gdn_Locale::canonicalize($locale);
+
+            if (class_exists('Locale')) {
+                $row = [
+                    'Locale' => $code,
+                    'Name' => self::mb_ucfirst(Locale::getDisplayName($locale, $locale)),
+                    'Language' => self::mb_ucfirst(Locale::getDisplayLanguage($locale, $locale)),
+                    'Url' => url("/categories/sites/$code")
+                ];
+
+                if (isset($exceptions[$locale])) {
+                    $row = array_replace($row, $exceptions[$locale]);
+                }
+            } else {
+                $row = [
+                    'Locale' => $code,
+                    'Name' => $code,
+                    'Language' => $code,
+                    'Url' => url("/categories/$code")
+                ];
+            }
+            $result[$locale] = $row;
+        }
+
+        return $result;
+    }
+
+    private static function mb_ucfirst($str, $encoding = "UTF-8", $lower_str_end = false) {
+        $first_letter = mb_strtoupper(mb_substr($str, 0, 1, $encoding), $encoding);
+        $str_end = "";
+        if ($lower_str_end) {
+            $str_end = mb_strtolower(mb_substr($str, 1, mb_strlen($str, $encoding), $encoding), $encoding);
+        } else {
+            $str_end = mb_substr($str, 1, mb_strlen($str, $encoding), $encoding);
+        }
+        $str = $first_letter . $str_end;
+        return $str;
+    }
+
     public function getFromUrl($url) {
         $slug = $this->slugFromUrl($url);
         $row = $this->getWhere(['Slug' => $slug])->firstRow(DATASET_TYPE_ARRAY);
