@@ -410,7 +410,7 @@ class MultisiteModel extends Gdn_Model {
         }
     }
 
-    public function getID($id) {
+    public function getID($id, $datasetTye = false, $options = []) {
         $row = parent::getID($id, DATASET_TYPE_ARRAY);
         if ($row) {
             $this->calculateRow($row);
