@@ -20,7 +20,7 @@ class HubLocaleChooserModule extends Gdn_Module {
     }
 
     private function getLocales() {
-        $locales = []; //Gdn::cache()->get('hubLocales');
+        $locales = Gdn::cache()->get('hubLocales');
         if (empty($locales)) {
             try {
                 /* @var SiteNodePlugin $plugin */
