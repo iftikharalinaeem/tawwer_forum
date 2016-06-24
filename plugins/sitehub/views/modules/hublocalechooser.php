@@ -1,7 +1,7 @@
 <?php
 /* @var HubLocaleChooserModule $this */
 ?>
-<span class="ToggleFlyout LocaleDropDown">
+<span class="ToggleFlyout LocaleDropDown <?php echo $this->cssClass ?>">
     <span title="<?php echo t('Select a community.') ?>"><?php echo htmlspecialchars($this->data('Current.'.$this->currentLabel)); ?></span>
     <?php echo sprite('SpFlyoutHandle', 'Arrow'); ?>
     <ul class="Flyout MenuItems" role="menu">
