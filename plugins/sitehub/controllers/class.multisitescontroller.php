@@ -611,5 +611,20 @@ class MultisitesController extends DashboardController {
         throw PermissionException($permission);
     }
 
+    /**
+     * Get a list of supported locales from the hub.
+     *
+     * This is an API-only endpoint.
+     */
+    public function locales() {
+        $locales = MultisiteModel::instance()->getNodeLocales();
+        array_walk($locales, function (&$row) {
+            if (!empty($row['Url'])) {
+                $row['Url'] = url($row['Url'], '//');
+            }
+        });
 
+        $this->setData('Locales', $locales);
+        $this->render('api');
+    }
 }
