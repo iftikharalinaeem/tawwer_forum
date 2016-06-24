@@ -45,6 +45,64 @@ class MultisiteModel extends Gdn_Model {
     }
 
     /**
+     * Get all of the node sites for a locale.
+     *
+     * The node sites consist of the following:
+     *
+     * - All of the nodes.
+     * - All of the subcommunities on nodes with subcommunities enabled.
+     *
+     * If a node has subcommunities enabled then its main site is not returned, just its subcommunities.
+     *
+     * @param string $locale The locale to get the sites for.
+     * @return array Returns an array of sites.
+     */
+    public function getNodeSites($locale) {
+        // Get all of the nodes.
+        $nodes = $this->getWhere(['Locale' => $locale])->resultArray();
+        $nodes = array_column($nodes, null, 'MultisiteID');
+
+        // Get all of the subcommunities.
+        $subcommunities = $this->SQL->getWhere('NodeSubcommunity', ['Locale' => $locale])->resultArray();
+
+        // Combine the nodes and subcommunities.
+        $result = [];
+        $remainingNodes = $nodes;
+        foreach ($subcommunities as $subcommunity) {
+            $node = $nodes[$subcommunity['MultisiteID']];
+
+            $result[] = [
+                'Name' => $subcommunity['Name'],
+                'Url' => $node['FullUrl'].'/'.$subcommunity['Folder'],
+                'Locale' => $subcommunity['Locale'],
+                'MultisiteID' => $subcommunity['MultisiteID'],
+                'Type' => 'subcommunity'
+            ];
+
+            // This node has subcommunities so can be taken out of circulation.
+            unset($remainingNodes[$node['MultisiteID']]);
+        }
+
+        // Add the remaining nodes.
+        foreach ($remainingNodes as $node) {
+            $result[] = [
+                'Name' => $node['Name'],
+                'Url' => $node['FullUrl'],
+                'Locale' => $node['Locale'],
+                'MultisiteID' => $node['MultisiteID'],
+                'Type' => 'node'
+            ];
+        }
+
+        // Sort the results by name.
+        usort($result, function ($a, $b) {
+            return strcasecmp($a['Name'], $b['Name']);
+        });
+
+        return $result;
+    }
+
+    /**
      * Get the hub slug that is prepended to every node slug when a node is created.
      */
     public function getHubSlug() {
