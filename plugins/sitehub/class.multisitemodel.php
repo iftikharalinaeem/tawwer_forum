@@ -471,7 +471,7 @@ class MultisiteModel extends Gdn_Model {
                     'Locale' => $code,
                     'Name' => self::mb_ucfirst(Locale::getDisplayName($locale, $locale)),
                     'Language' => self::mb_ucfirst(Locale::getDisplayLanguage($locale, $locale)),
-                    'Url' => url("/categories/sites/$code")
+                    'Url' => url("/categories/sites/$code", '/')
                 ];
 
                 if (isset($exceptions[$locale])) {

@@ -19,6 +19,9 @@ class HubLocaleChooserModule extends Gdn_Module {
     public function toString() {
         $this->setData('Locales', MultisiteModel::instance()->getNodeLocales());
         $this->setData('Current', $this->data('Locales.'.Gdn_Locale::canonicalize(Gdn::locale()->current())));
+        if (empty($this->Data['Locales'])) {
+            return '<!-- No locales -->';
+        }
         return parent::toString();
     }
 }
