@@ -91,6 +91,7 @@ class AnalyticsTracker {
 
         $controller->addDefinition('vaCookieName', c('Garden.Cookie.Name') . '-vA');
         $controller->addDefinition('eventData', $eventData);
+        $controller->addDefinition('viewEventType', AnalyticsData::getViewEventType());
     }
 
     /**

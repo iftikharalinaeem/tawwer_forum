@@ -407,6 +407,23 @@ class AnalyticsData extends Gdn_Model {
     }
 
     /**
+     * Determine the type of page view for the current request.
+     *
+     * @return string
+     */
+    public static function getViewEventType() {
+        switch (Gdn::controller()->ControllerName) {
+            case 'discussioncontroller':
+                $type = 'discussion_view';
+                break;
+            default:
+                $type = 'page_view';
+        }
+
+        return $type;
+    }
+
+    /**
      * Set the default time zone to the specified parameter.
      *
      * @link http://php.net/manual/en/timezones.php

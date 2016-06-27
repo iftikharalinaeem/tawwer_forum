@@ -22,7 +22,7 @@ var keenTracker = {
 keenTracker.analyticsTickHandler = function(event, sendData, jqXHR, textStatus) {
     // Only track the page view if the hit to analyticstick was a success.
     if (textStatus === 'success') {
-        keenTracker.event('page_view');
+        keenTracker.event(gdn.definition("viewEventType", "page_view"));
     }
 };
 
