@@ -316,7 +316,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         $result = $this->hubApi(
             "/multisites/$siteID.json",
             'POST',
-            ['Name' => c('Garden.HomepageTitle'), 'Locale' => Gdn::locale()->current(), 'DateLastSync' => $now, 'Status' => 'active'],
+            ['Name' => c('Garden.HomepageTitle', c('Garden.Title', $this->slug())), 'Locale' => Gdn::locale()->current(), 'DateLastSync' => $now, 'Status' => 'active'],
             true
         );
 
