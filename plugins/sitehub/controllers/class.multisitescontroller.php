@@ -202,7 +202,7 @@ class MultisitesController extends DashboardController {
 
         $post = $this->Request->Post();
 
-        $allowed = ['DateLastSync', 'Status', 'Locale'];
+        $allowed = ['DateLastSync', 'Status', 'Locale', 'Name'];
         $post = ArrayTranslate($post, $allowed);
         if (val('Status', $post) === 'active' && $this->site['Status'] !== 'active') {
             $post['DateStatus'] = Gdn_Format::ToDateTime();
