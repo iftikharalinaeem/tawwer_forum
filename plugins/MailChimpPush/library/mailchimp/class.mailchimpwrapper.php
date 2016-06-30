@@ -154,6 +154,20 @@ class MailChimpWrapper {
     }
 
     /**
+     * Get the status of a batch that is being processed at MailChimp
+     *
+     * @param $batchID
+     * @return Http\HttpResponse
+     * @throws Exception
+     */
+    function getBatchStatus($batchID = null) {
+        if ($batchID) {
+            $batchID = '/'.$batchID;
+        }
+        return $this->callServer('batches'.$batchID);
+    }
+
+    /**
      * Check to see if the account is valid.
      *
      * @return bool

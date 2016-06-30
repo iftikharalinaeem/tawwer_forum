@@ -139,17 +139,17 @@
    ?>
    
    <div class="Warning"><?php echo t('Mass Synchronization'); ?></div>
-   <div class="Info">
+   <div class="Info" id="SychronizationMessages">
       <?php echo t('About MailChimpPush Synchronization', "By default, Vanilla only sends <b>changes</b> to MailChimp. Synchronization
       is a one-time action that allows an entire forum's worth of users email 
       addresses to be pushed to MailChimp to populate a list."); ?>
    </div>
-   
+
    <div class="Synchronization">
-      <div class="SyncProgressTitle">Progress <span></span></div>
+      <div class="SyncProgressTitle">Creating Mail Chimp Batch Queue<span></span></div>
       <div class="SyncBar"><div class="SyncProgress"></div></div>
    </div>
-   
+
    <ul class="SyncList">
       <li><?php
          echo $this->Sync->label("Sync to List", "SyncListID");

@@ -59,7 +59,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
          // This will ensure that the class is loaded until the addon autoloader is fixed properly.
          if (!class_exists('MCAPI')) {
-            require_once(__DIR__.'/library/mailchimp/class.mcapi.php');
+            require_once(__DIR__.'/library/mailchimp/class.mailchimpwrapper.php');
          }
 
          $provider = $this->provider();
@@ -140,8 +140,9 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          $email = array($email);
 
       $emails = array();
-      foreach ($email as $emailAddress)
-         $emails[] = array('EMAIL' => $emailAddress, 'EMAIL_TYPE' => $options['Format']);
+      foreach ($email as $emailAddress) {
+          $emails[] = array('EMAIL' => $emailAddress, 'EMAIL_TYPE' => $options['Format']);
+      }
 
       // Send request
       return $this->MCAPI()->listBatchSubscribe($listID, $emails, $options['ConfirmJoin'], true);
@@ -172,7 +173,6 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       );
       $options = (array)$options;
       $options = array_merge($defaults, $options);
-
       // Update existing user
       $confirmJoin = val('ConfirmJoin', $this->provider(), false);
       return $this->MCAPI()->listUpdateAddress($listID, array('EMAIL'  => $email, 'NEW_EMAIL' => $newEmail, 'EMAIL_TYPE' => $options['Format']), $options['ConfirmJoin'], true);
@@ -277,14 +277,21 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          }
       }
 
+      $syncURL = gdn::request()->url("", true).'/sync';
+      $sender->Sync->addHidden('SyncURL', $syncURL);
 
-       if ($_GET['changeemail']) {
-           $this->update('a7a3af111c', $_GET['email'], $_GET['new_email']);
-        }
+      $trackBatchesURL = gdn::request()->url("", true).'/trackbatches';
+      $sender->Sync->addHidden('TrackBatchesURL', $trackBatchesURL);
 
       $sender->render('settings','','plugins/MailChimpPush');
    }
 
+
+   /**
+    * Send massive list to Mailchimp to synchronize emails in GDN_User
+    *
+    * @param $sender
+    */
    public function controller_sync($sender) {
       $sender->deliveryMethod(DELIVERY_METHOD_JSON);
       $sender->deliveryType(DELIVERY_TYPE_DATA);
@@ -299,7 +306,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             'SyncDeleted'     => 0,
             'SyncUnconfirmed' => null
          );
-//         $requiredOpts = array('SyncListID', 'SyncBanned', 'SyncDeleted');
+         $requiredOpts = array('SyncListID', 'SyncBanned', 'SyncDeleted');
 
          $options = array();
          foreach ($opts as $opt => $default) {
@@ -309,59 +316,53 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             $options[$opt] = is_null($val) ? $default : $val;
          }
          extract($options);
-        $syncListID = "eabcc0c399";
-          /* @var  $syncConfirmJoin passed in $options array*/
+
+          /* @var  $SyncConfirmJoin passed in $options array*/
          // Chunk size depends on whether we're sending confirmation emails
-         $chunkSize = $syncConfirmJoin ?  200 : 1000;
+         $chunkSize = $SyncConfirmJoin ?  300 : 2000;
 
          $criteria = array();
 
-          /* @var $syncBanned passed in $options array */
+          /* @var $SyncBanned passed in $options array */
          // Only if true do we care
-         if (!$syncBanned)
+         if (!$SyncBanned)
             $criteria['Banned'] = 0;
 
-          /* @var $syncDeleted passed in $options array */
-         if (!$syncDeleted)
+          /* @var $SyncDeleted passed in $options array */
+         if (!$SyncDeleted)
             $criteria['Deleted'] = 0;
 
-          /* @var $syncUnconfirmed passed in $options array */
+          /* @var $SyncUnconfirmed passed in $options array */
           // Only if supplied and false do we care
-         if ($syncUnconfirmed == false)
+         if ($SyncUnconfirmed == false)
             $criteria['Confirmed'] = 1;
 
          $totalUsers = Gdn::userModel()->getCount($criteria);
          if ($totalUsers) {
 
             // Fetch users
-             /* @var $offset passed in $options array */
-            $processUsers = Gdn::userModel()->getWhere($criteria, 'UserID', 'desc', $chunkSize, $offset);
+             /* @var $Offset passed in $options array */
+            $processUsers = Gdn::userModel()->getWhere($criteria, 'UserID', 'desc', $chunkSize, $Offset);
 
             // Extract email addresses
             $emails = array();
             while ($processUser = $processUsers->NextRow(DATASET_TYPE_ARRAY)) {
-               if (!empty($processUser['Email']))
+               if (!empty($processUser['Email'])) {
                   $emails[] = $processUser['Email'];
+               }
             }
-            // Subscribe users
-            $start = microtime(true);
 
-             /* @var $syncListID passed in $options array */
-             $response = $this->add($syncListID, $emails, array('ConfirmJoin'  => (bool)$syncConfirmJoin));
-            $response->getBody();
-             $sender->setData('BatchID', val('id', $response), 'willywonka');
-//            $elapsed = microtime(true) - $start;
-//
-//            $SPU = $elapsed / sizeof($emails);
-//            $ETA = ceil(($totalUsers - $newOffset) * $SPU);
-//            $ETAMin = ceil($ETA / 60);
-//            $sender->setData('ETA', $ETA);
-//            $sender->setData('ETAMinutes', $ETAMin);
-//            $sender->setData('NumberOfUsers', $totalUsers);
-            $progress = 5;
+            // Subscribe users
+             /* @var $SyncListID passed in $options array */
+             $response = $this->add($SyncListID, $emails, array('ConfirmJoin'  => (bool)$SyncConfirmJoin));
+
+            $response = $response->getBody();
+
+            $sender->setData('BatchID', val('id', $response));
+            $sender->setData('NumberOfUsers', $totalUsers);
+            $progress = floor(($Offset / $totalUsers) * 100);
+            $sender->setData('Offset', ($Offset + $chunkSize));
             $sender->setData('Progress', $progress);
-//            $sender->setData('Offset', 0);
-//            $sender->setData('Count', sizeof($emails));
          } else {
             throw new Exception('No users match criteria', 400);
          }
@@ -373,6 +374,23 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             $sender->setData('Fatal', true);
       }
 
+      $sender->render();
+   }
+
+
+
+   /**
+    * Send massive list to Mailchimp to synchronize emails in GDN_User
+    *
+    * @param $sender
+    */
+   public function controller_trackbatches($sender) {
+      $sender->deliveryMethod(DELIVERY_METHOD_JSON);
+      $sender->deliveryType(DELIVERY_TYPE_DATA);
+      $batchID = Gdn::request()->getValue('batchID');
+      $response = $this->MCAPI()->getBatchStatus($batchID);
+      $response = $response->getBody();
+      $sender->setData('response', $response);
       $sender->render();
    }
 
