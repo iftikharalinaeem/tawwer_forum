@@ -305,6 +305,7 @@ class SiteNodePlugin extends Gdn_Plugin {
             Gdn::controller()->setData('NodeSubcommunities', $r);
         } catch (Exception $ex) {
             // Do nothing. The exception is logged.
+            Gdn::controller()->setData('NodeSubcommunities', 'error');
         }
 
         $this->FireEvent('AfterSync');
@@ -315,7 +316,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         $result = $this->hubApi(
             "/multisites/$siteID.json",
             'POST',
-            ['Locale' => Gdn::locale()->current(), 'DateLastSync' => $now, 'Status' => 'active'],
+            ['Name' => c('Garden.HomepageTitle', c('Garden.Title', $this->slug())), 'Locale' => Gdn::locale()->current(), 'DateLastSync' => $now, 'Status' => 'active'],
             true
         );
 
@@ -386,6 +387,9 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         $subcommunities = SubcommunityModel::instance()->getWhere()->resultArray();
+        array_walk($subcommunities, function (&$row) {
+            $row['IsDefault'] = (bool)$row['IsDefault'];
+        });
         $post = [
             'Slug' => $this->slug(),
             'Subcommunities' => $subcommunities,

@@ -45,6 +45,64 @@ class MultisiteModel extends Gdn_Model {
     }
 
     /**
+     * Get all of the node sites for a locale.
+     *
+     * The node sites consist of the following:
+     *
+     * - All of the nodes.
+     * - All of the subcommunities on nodes with subcommunities enabled.
+     *
+     * If a node has subcommunities enabled then its main site is not returned, just its subcommunities.
+     *
+     * @param string $locale The locale to get the sites for.
+     * @return array Returns an array of sites.
+     */
+    public function getNodeSites($locale) {
+        // Get all of the nodes.
+        $nodes = $this->getWhere(['Locale' => $locale])->resultArray();
+        $nodes = array_column($nodes, null, 'MultisiteID');
+
+        // Get all of the subcommunities.
+        $subcommunities = $this->SQL->getWhere('NodeSubcommunity', ['Locale' => $locale])->resultArray();
+
+        // Combine the nodes and subcommunities.
+        $result = [];
+        $remainingNodes = $nodes;
+        foreach ($subcommunities as $subcommunity) {
+            $node = $nodes[$subcommunity['MultisiteID']];
+
+            $result[] = [
+                'Name' => $subcommunity['Name'],
+                'Url' => $node['FullUrl'].'/'.$subcommunity['Folder'],
+                'Locale' => $subcommunity['Locale'],
+                'MultisiteID' => $subcommunity['MultisiteID'],
+                'Type' => 'subcommunity'
+            ];
+
+            // This node has subcommunities so can be taken out of circulation.
+            unset($remainingNodes[$node['MultisiteID']]);
+        }
+
+        // Add the remaining nodes.
+        foreach ($remainingNodes as $node) {
+            $result[] = [
+                'Name' => $node['Name'],
+                'Url' => $node['FullUrl'],
+                'Locale' => $node['Locale'],
+                'MultisiteID' => $node['MultisiteID'],
+                'Type' => 'node'
+            ];
+        }
+
+        // Sort the results by name.
+        usort($result, function ($a, $b) {
+            return strcasecmp($a['Name'], $b['Name']);
+        });
+
+        return $result;
+    }
+
+    /**
      * Get the hub slug that is prepended to every node slug when a node is created.
      */
     public function getHubSlug() {
@@ -352,12 +410,97 @@ class MultisiteModel extends Gdn_Model {
         }
     }
 
-    public function getID($id) {
+    public function getID($id, $datasetTye = false, $options = []) {
         $row = parent::getID($id, DATASET_TYPE_ARRAY);
         if ($row) {
             $this->calculateRow($row);
         }
         return $row;
+    }
+
+    /**
+     * Get all of the locales used on the nodes.
+     *
+     * @return array Returns a locales dataset.
+     */
+    public function getNodeLocales() {
+        // Get all of the locales from the nodes.
+        $nodeLocales = $this->SQL
+            ->select('Locale')
+            ->from('Multisite')
+            ->groupBy('Locale')
+            ->get()
+            ->resultArray();
+        $locales = array_column($nodeLocales, 'Locale', 'Locale');
+
+        $subcommunityLocales = $this->SQL
+            ->select('Locale')
+            ->from('NodeSubcommunity')
+            ->groupBy('Locale')
+            ->get()
+            ->resultArray();
+        $locales = array_replace($locales, array_column($subcommunityLocales, 'Locale', 'Locale'));
+        $locales = array_filter($locales);
+
+        // Sort the array, keeping English up top.
+        usort($locales, function ($a, $b) {
+            if ($a === $b) {
+                return 0;
+            } elseif ($a === 'en') {
+                return -1;
+            } elseif ($b === 'en') {
+                return 1;
+            } else {
+                return strcasecmp($a, $b);
+            }
+        });
+
+        $exceptions = [
+            'ru__PETR1708' => ['Locale' => 'ru', 'Name' => 'русский', 'Language' => 'русский'],
+
+        ];
+
+        // Add some more information to the locales.
+        $result = [];
+        foreach ($locales as $locale) {
+            $code = str_replace('_', '-', $locale);
+            $locale = Gdn_Locale::canonicalize($locale);
+
+            if (class_exists('Locale')) {
+                $row = [
+                    'Locale' => $code,
+                    'Name' => self::mb_ucfirst(Locale::getDisplayName($locale, $locale)),
+                    'Language' => self::mb_ucfirst(Locale::getDisplayLanguage($locale, $locale)),
+                    'Url' => url("/categories/sites/$code", '/')
+                ];
+
+                if (isset($exceptions[$locale])) {
+                    $row = array_replace($row, $exceptions[$locale]);
+                }
+            } else {
+                $row = [
+                    'Locale' => $code,
+                    'Name' => $code,
+                    'Language' => $code,
+                    'Url' => url("/categories/$code")
+                ];
+            }
+            $result[$locale] = $row;
+        }
+
+        return $result;
+    }
+
+    private static function mb_ucfirst($str, $encoding = "UTF-8", $lower_str_end = false) {
+        $first_letter = mb_strtoupper(mb_substr($str, 0, 1, $encoding), $encoding);
+        $str_end = "";
+        if ($lower_str_end) {
+            $str_end = mb_strtolower(mb_substr($str, 1, mb_strlen($str, $encoding), $encoding), $encoding);
+        } else {
+            $str_end = mb_substr($str, 1, mb_strlen($str, $encoding), $encoding);
+        }
+        $str = $first_letter . $str_end;
+        return $str;
     }
 
     public function getFromUrl($url) {

@@ -93,7 +93,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     protected function initializeSite(array $site) {
         // Set the locale from the site.
         if ($site['Locale'] !== Gdn::locale()->current()) {
-            Gdn::locale()->set($site['Locale'], Gdn::applicationManager()->enabledApplicationFolders(), Gdn::pluginManager()->enabledPluginFolders());
+            Gdn::locale()->set($site['Locale']);
         }
 
 //        // Set the default routes.

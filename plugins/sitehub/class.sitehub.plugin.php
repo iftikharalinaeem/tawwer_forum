@@ -184,6 +184,26 @@ class SiteHubPlugin extends Gdn_Plugin {
         $menu->AddLink('sitehub', T('Sites'), '/multisites', 'Garden.Settings.Manage');
     }
 
+    /**
+     * An endpoint that lists the communities on the nodes, by language.
+     *
+     * @param CategoriesController $sender
+     * @param string $locale The locale being looked at.
+     */
+    public function categoriesController_sites_create($sender, $locale = '') {
+        if (empty($locale)) {
+            $locale = Gdn::locale()->current();
+        } elseif ($locale !== Gdn::locale()->current()) {
+            Gdn::locale()->set($locale);
+        }
+
+        $sites = MultisiteModel::instance()->getNodeSites($locale);
+        $sender->setData('Sites', $sites);
+        
+        $sender->title(t(c('Garden.SitesTitle', c('Garden.Title', 'Communities'))), '');
+        $sender->render('Sites', 'Categories', 'plugins/sitehub');
+    }
+
     /*
     *
     * @param Gdn_Controller $Sender
