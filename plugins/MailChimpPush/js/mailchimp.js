@@ -1,7 +1,7 @@
 jQuery(document).ready(function($) {
    
    
-   $('.MailChimpSync').on('click', '#MailChimp-Synchronize', function(e){
+   $('.MailChimpSync').on('click', '#MailChimp-Synchronize', function(e) {
       
       // Start processing users
       process(0);
@@ -139,7 +139,6 @@ jQuery(document).ready(function($) {
          type: 'POST',
          data: send,
          success: function(data) {
-            console.log(url);
             var syncprogress = data.Progress;
             var syncoffset = data.Offset;
             // Some kind of error
@@ -187,7 +186,7 @@ jQuery(document).ready(function($) {
     * Remove the progress bar and add a warning message that informs users that the batch process has been uploaded but
     * has not necessarily been processed on MailChimp
     */
-   var reset = function(){
+   var reset = function() {
       $('.Synchronization').css('display', 'none');
       var successMessage = "Mail Chimp will now process the list you have uploaded. Check your Mail Chimp Dashboard later.";
       $("#SychronizationMessages").removeClass('Info').addClass('Warning').html("<b>" + successMessage + "</b>");

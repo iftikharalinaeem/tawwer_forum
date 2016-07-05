@@ -42,7 +42,7 @@ class MailChimpWrapper {
     public function callServer($endpoint = null, $method = 'GET', $body = array(), $returnBody = false) {
         // parse out which data center the request should be sent to from the API key
         $dataCenter = 'us1';
-        if (strstr($this->api_key,'-')){
+        if (strstr($this->api_key,'-')) {
             list($key, $dataCenter) = explode('-',$this->api_key,2);
             if (!$dataCenter) $dataCenter = 'us1';
         }
