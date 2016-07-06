@@ -671,6 +671,20 @@ KeenIOWidget.prototype.writeContents = function(container, forceNewElement) {
         }
 
         $(container).parent().addClass("data-loading");
-        this.runQuery(this.renderBody);
+
+        switch (this.getType()) {
+            case 'leaderboard':
+                var widgetID = AnalyticsWidget.getIDFromAttribute($(container).parent().attr('id'));
+                var range = this.getRange();
+                var parameters = {
+                    Start: range.start,
+                    End: range.end
+                };
+                var url = gdn.url("/settings/analytics/leaderboard/" + widgetID);
+                AnalyticsWidget.popin(container, url, parameters);
+                break;
+            default:
+                this.runQuery(this.renderBody);
+        }
     }
 };

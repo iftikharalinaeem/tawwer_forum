@@ -22,6 +22,11 @@ class KeenIOTracker implements TrackerInterface {
      * @var array The widgets and their settings.
      */
     protected $widgets = [
+        'top-posters' => [
+            'title' => 'Top Posters',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'leaderboard'
+        ],
         'total-active-users' => [
             'title' => 'Active Users',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
@@ -291,6 +296,18 @@ class KeenIOTracker implements TrackerInterface {
      * This builds the KeenIOQueries and adds them to the widgets array.
      */
     protected function registerQueries() {
+        /**
+         * Leaderboards
+         */
+
+        // Top Posters (leaderboard)
+        $topPostersQuery = new KeenIOQuery();
+        $topPostersQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Top Posters'))
+            ->setEventCollection('post')
+            ->setGroupBy('user.userID');
+        $this->widgets['top-posters']['query'] = $topPostersQuery;
+
         /**
          * Metrics
          */

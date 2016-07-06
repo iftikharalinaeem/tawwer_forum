@@ -400,6 +400,21 @@ AnalyticsWidget.prototype.loadConfig = function(config) {
     }
 };
 
+AnalyticsWidget.popin = function(element, url, parameters) {
+    var $elem = $(element);
+    var data = $.extend({ DeliveryType: 'VIEW' }, parameters);
+    $.ajax({
+        url: url,
+        data: data,
+        success: function(response) {
+            $elem.html($.parseHTML(response + "")).trigger("contentLoad");
+        },
+        complete: function() {
+            $elem.parent().removeClass("data-loading");
+        }
+    });
+};
+
 /**
  * Output a widget's contents to the specified container.
  * @throws Throw an error if unable to find a compatible handler for this widget.

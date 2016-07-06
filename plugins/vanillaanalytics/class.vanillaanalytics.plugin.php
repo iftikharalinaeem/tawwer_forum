@@ -182,6 +182,44 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Generate data for leaderboards.
+     */
+    public function controller_leaderboard($sender, $requestArgs) {
+        // Pull data from the request arguments and verify they're usable.
+        list($widget, $size) = $requestArgs;
+
+        if (empty($widget)) {
+            throw new Gdn_UserException('Leaderboard widget required.');
+        }
+
+        // Verify the slug is a valid leaderboard widget.
+        $defaultWidgets = AnalyticsTracker::getInstance()->getDefaultWidgets();
+        $widget = val($widget, $defaultWidgets);
+        if (!$widget || $widget->getType() !== 'leaderboard') {
+            throw new Gdn_UserException('Invalid leaderboard widget.');
+        }
+        $leaderboard = new AnalyticsLeaderboard();
+
+        // Verify we have a query to run.
+        $sender->title($widget->getTitle());
+        $query = val('query', $widget->getData());
+        if (!$query) {
+            throw new Gdn_UserException('No query available.');
+        }
+        $leaderboard->setQuery($query);
+        $leaderboard->setPreviousQuery(clone $query);
+
+        $sender->setData(
+            'Leaderboard',
+            $leaderboard->lookupData(
+                @strtotime(Gdn::request()->get('Start')),
+                @strtotime(Gdn::request()->get('End'))
+            )
+        );
+        $sender->render($sender->fetchViewLocation('leaderboard', '', 'plugins/vanillaanalytics'));
+    }
+
+    /**
      * Handle requests for an analytics dashboard.
      *
      * @param Gdn_Controller $sender

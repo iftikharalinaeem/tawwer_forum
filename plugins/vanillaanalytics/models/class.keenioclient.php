@@ -164,7 +164,7 @@ class KeenIOClient extends Garden\Http\HttpClient {
      * @param string $requestMethod Method to use for the request. Should be one of the REQUEST_* constants.
      * @return bool|stdClass Object representing result on success, false on failure.
      */
-    protected function command($endpoint, $data = [], $authorization = false, $requestMethod = self::REQUEST_POST) {
+    public function command($endpoint, $data = [], $authorization = false, $requestMethod = self::REQUEST_POST) {
         $validMethods = [
             self::REQUEST_DELETE,
             self::REQUEST_GET,
