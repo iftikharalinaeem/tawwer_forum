@@ -9,22 +9,27 @@ use Garden\Http;
  */
 
 class MailChimpWrapper {
-    var $version = '3.0';
-    var $secure = false;
-    var $timeout = 300;
+    /**
+     * @var string MailChimp's API version
+     */
+    public $version = '3.0';
+
+    /**
+     * @var int set time limit for the request
+     */
+    public $timeout = 300;
 
     /**
      * Cache the user api_key so we only have to log in once per client instantiation
      */
-    var $api_key;
+    public $api_key;
 
     /**
      * Cache the information on the API location on the server
      */
-    var $apiUrl;
+    public $apiUrl;
 
-    public function __construct($apikey, $secure=false) {
-        $this->secure = $secure;
+    public function __construct($apikey) {
         $this->apiUrl = parse_url('https://api.mailchimp.com/' . $this->version . '/');
         $this->api_key = $apikey;
     }
@@ -47,9 +52,8 @@ class MailChimpWrapper {
             if (!$dataCenter) $dataCenter = 'us1';
         }
 
-        if (!$endpoint && $endpoint !== 'ping') {
-            throw
-                new Exception('Missing Endpoint');
+        if (!$endpoint) {
+            throw new Exception('Missing Endpoint');
         }
 
         if ($endpoint === 'ping') {
@@ -68,7 +72,7 @@ class MailChimpWrapper {
 
         $response = $httpRequest->send();
         if ($returnBody) {
-            $response->getBody();
+            return $response->getBody();
         }
         return $response;
     }
@@ -86,8 +90,8 @@ class MailChimpWrapper {
     /**
      * Send an array of emails to be subscribed to a mailing list at Mail Chimp.
      *
-     * @param $id
-     * @param $batch
+     * @param string $id
+     * @param array $batch
      * @param bool|true $double_optin
      * @param bool|false $update_existing
      * @param bool|true $replace_interests
@@ -102,7 +106,7 @@ class MailChimpWrapper {
             $mergeFields = json_encode(['EMAIL_TYPE' => $emailType]);
             $body['operations'][] = [
                 'method' => 'PUT',
-                'path' => 'lists/'.$id.'/members/'.md5(strtolower($email)),
+                'path' => "lists/{$id}/members/".md5(strtolower($email)),
                 'body' => json_encode(['email_address' => $email, 'status_if_new' => 'subscribed']),
                 'merge_fields' => $mergeFields
             ];
@@ -126,8 +130,8 @@ class MailChimpWrapper {
     public function listUpdateAddress($listID, $email = array(), $double_optin=true, $update_existing=false, $replace_interests=true) {
         $emailID = md5(strtolower(val('EMAIL', $email)));
 
-        $removeBody = ["status" => "unsubscribed"];
-        $removedResponse = $this->callServer('lists/'.$listID.'/members/'.$emailID, 'PATCH', $removeBody);
+        $removeBody = ['status' => 'unsubscribed'];
+        $removedResponse = $this->callServer("lists/{$listID}/members/{$emailID}", 'PATCH', $removeBody);
         $removed = $this->toArray($removedResponse);
         if (val('id', $removed) === $emailID && val('status', $removed) === 'unsubscribed') {
             $emailType = val('EMAIL_TYPE', $email, 'html');
@@ -137,7 +141,7 @@ class MailChimpWrapper {
                 'status' => 'subscribed',
                 'merge_fields' => $mergeFields
             ];
-            $addResponse = $this->callServer('lists/'.$listID.'/members', 'POST', $addBody);
+            $addResponse = $this->callServer("lists/{$listID}/members", 'POST', $addBody);
         }
     }
 
@@ -150,7 +154,7 @@ class MailChimpWrapper {
      * @throws Exception
      */
     function listMemberInfo($listID, $email_address) {
-        return $this->callServer('lists/'.$listID.'/members/'.md5(strtolower($email_address[0])));
+        return $this->callServer("lists/{$listID}/members/".md5(strtolower($email_address[0])));
     }
 
     /**
@@ -181,7 +185,7 @@ class MailChimpWrapper {
     /**
      * JSON decode helper function
      *
-     * @param null $json
+     * @param string $json
      * @return mixed
      */
     function toArray($json = null) {

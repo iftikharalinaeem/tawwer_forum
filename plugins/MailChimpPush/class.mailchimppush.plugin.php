@@ -175,7 +175,11 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       $options = array_merge($defaults, $options);
       // Update existing user
       $confirmJoin = val('ConfirmJoin', $this->provider(), false);
-      return $this->MCAPI()->listUpdateAddress($listID, array('EMAIL'  => $email, 'NEW_EMAIL' => $newEmail, 'EMAIL_TYPE' => $options['Format']), $options['ConfirmJoin'], true);
+      return $this->MCAPI()->listUpdateAddress(
+          $listID,
+          array('EMAIL'  => $email, 'NEW_EMAIL' => $newEmail, 'EMAIL_TYPE' => $options['Format']),
+          $options['ConfirmJoin'],
+          true);
    }
 
    /**
@@ -277,10 +281,10 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          }
       }
 
-      $syncURL = gdn::request()->url("", true).'/sync';
+      $syncURL = gdn::request()->url('', true).'/sync';
       $sender->Sync->addHidden('SyncURL', $syncURL);
 
-      $trackBatchesURL = gdn::request()->url("", true).'/trackbatches';
+      $trackBatchesURL = gdn::request()->url('', true).'/trackbatches';
       $sender->Sync->addHidden('TrackBatchesURL', $trackBatchesURL);
 
       $sender->render('settings','','plugins/MailChimpPush');
