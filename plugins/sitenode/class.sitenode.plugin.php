@@ -411,6 +411,7 @@ class SiteNodePlugin extends Gdn_Plugin {
     public function syncCategories(array $categories, array $otherCategories, array $roleMap) {
         $categoryMap = [];
         $sort = 0;
+        $roles = RoleModel::roles();
 
         foreach ($categories as $category) {
             $categoryModel = new CategoryModel(); // have to recreate each time
@@ -432,6 +433,12 @@ class SiteNodePlugin extends Gdn_Plugin {
                 foreach ($permissions as $i => $permissionRow) {
                     if (empty($roleMap[$permissionRow['RoleID']])) {
                         continue; // role disconnected
+                    }
+
+                    // Do not molest roles that respectfully requested some goddamn peace and quiet.
+                    $role = val($permissionRow['RoleID'], $roles);
+                    if (val('OverrideHub', $role)) {
+                        continue;
                     }
 
                     $permissions[$i]['JunctionTable'] = 'Category';
