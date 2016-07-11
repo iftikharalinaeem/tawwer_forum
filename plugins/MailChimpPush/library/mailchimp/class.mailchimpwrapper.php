@@ -20,12 +20,12 @@ class MailChimpWrapper {
     public $timeout = 300;
 
     /**
-     * Cache the user api_key so we only have to log in once per client instantiation
+     * @var string Cache the user api_key so we only have to log in once per client instantiation
      */
     public $api_key;
 
     /**
-     * Cache the information on the API location on the server
+     * @var string Cache the information on the API location on the server
      */
     public $apiUrl;
 
@@ -38,7 +38,7 @@ class MailChimpWrapper {
      * Actually connect to the server and call the requested methods, parsing the result
      * You should never have to call this function manually
      *
-     * @param null $endpoint
+     * @param string $endpoint
      * @param string $method
      * @param array $body
      * @return Http\HttpResponse
@@ -49,7 +49,9 @@ class MailChimpWrapper {
         $dataCenter = 'us1';
         if (strstr($this->api_key,'-')) {
             list($key, $dataCenter) = explode('-',$this->api_key,2);
-            if (!$dataCenter) $dataCenter = 'us1';
+            if (!$dataCenter) {
+                $dataCenter = 'us1';
+            }
         }
 
         if (!$endpoint) {
@@ -92,13 +94,10 @@ class MailChimpWrapper {
      *
      * @param string $id
      * @param array $batch
-     * @param bool|true $double_optin
-     * @param bool|false $update_existing
-     * @param bool|true $replace_interests
      * @return Http\HttpResponse
      * @throws Exception
      */
-    public function listBatchSubscribe($id, $batch, $double_optin=true, $update_existing=false, $replace_interests=true) {
+    public function listBatchSubscribe($id, $batch) {
         $body = [];
         foreach ($batch as $userInfo) {
             $emailType = val('EMAIL_TYPE', $userInfo, 'html');
@@ -119,18 +118,19 @@ class MailChimpWrapper {
     /**
      * Send an array of emails to be subscribed to a mailing list at Mail Chimp.
      *
-     * @param $id
-     * @param $batch
-     * @param bool|true $double_optin
-     * @param bool|false $update_existing
-     * @param bool|true $replace_interests
+     * @param string $listID
+     * @param array $email
      * @return Http\HttpResponse
      * @throws Exception
      */
-    public function listUpdateAddress($listID, $email = array(), $double_optin=true, $update_existing=false, $replace_interests=true) {
+    public function listUpdateAddress($listID, $email = array()) {
         $emailID = md5(strtolower(val('EMAIL', $email)));
-
         $removeBody = ['status' => 'unsubscribed'];
+
+        if (!$listID) {
+            throw new Exception('Missing ListID');
+        }
+
         $removedResponse = $this->callServer("lists/{$listID}/members/{$emailID}", 'PATCH', $removeBody);
         $removed = $this->toArray($removedResponse);
         if (val('id', $removed) === $emailID && val('status', $removed) === 'unsubscribed') {
@@ -148,21 +148,19 @@ class MailChimpWrapper {
     /**
      * Get the information for one specific member of one specific mailing list at Mail Chimp.
      *
-     * @param $listID
-     * @param $email_address
+     * @param string $listID
+     * @param array $emailAddress
      * @return Http\HttpResponse
-     * @throws Exception
      */
-    function listMemberInfo($listID, $email_address) {
-        return $this->callServer("lists/{$listID}/members/".md5(strtolower($email_address[0])));
+    function listMemberInfo($listID, $emailAddress) {
+        return $this->callServer("lists/{$listID}/members/".md5(strtolower($emailAddress[0])));
     }
 
     /**
      * Get the status of a batch that is being processed at MailChimp
      *
-     * @param $batchID
+     * @param string $batchID
      * @return Http\HttpResponse
-     * @throws Exception
      */
     function getBatchStatus($batchID = null) {
         if ($batchID) {
@@ -175,7 +173,6 @@ class MailChimpWrapper {
      * Check to see if the account is valid.
      *
      * @return bool
-     * @throws Exception
      */
     function ping() {
         $response = $this->callServer('ping');
@@ -185,7 +182,7 @@ class MailChimpWrapper {
     /**
      * JSON decode helper function
      *
-     * @param string $json
+     * @param string|null $json
      * @return mixed
      */
     function toArray($json = null) {

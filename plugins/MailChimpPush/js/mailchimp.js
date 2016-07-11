@@ -2,16 +2,12 @@ jQuery(document).ready(function($) {
    
    
    $('.MailChimpSync').on('click', '#MailChimp-Synchronize', function(e) {
-      
       // Start processing users
       process(0);
-      
    });
    
    /**
     * Reveal progress bar
-    * 
-    * @returns {undefined}
     */
    var progressBar = function() {
       $('.Synchronization').css('display', 'block');
@@ -21,8 +17,8 @@ jQuery(document).ready(function($) {
    /**
     * Update progress bar
     * 
-    * @param {type} syncprogress
-    * @returns {undefined}
+    * @param {object} data - Data object returned from ajax call
+    * @returns {bool}
     */
    var progress = function(data) {
       progressBar();
@@ -111,7 +107,7 @@ jQuery(document).ready(function($) {
       $('.MailChimpSync #MailChimp-Synchronize').prop('disabled', 'disabled');
       
       // Start at 0
-      var offset = $('.Synchronization .SyncProgress').data('offset') ? $('.Synchronization .SyncProgress').data('offset') : 0;
+      var offset = $('.Synchronization .SyncProgress').data('offset') || 0;
       var url = $('#Form_SyncURL').val();
       var syncListID = $('.MailChimpSync #Form_SyncListID').val();
       var syncConfirmJoin = $('.MailChimpSync #Form_SyncConfirmJoin').prop('checked') ? 1 : 0;
@@ -129,8 +125,9 @@ jQuery(document).ready(function($) {
             SyncDeleted: syncDeleted
          };
          
-      if (syncUnconfirmed != undefined)
+      if (syncUnconfirmed != undefined) {
          send.SyncUnconfirmed = syncUnconfirmed;
+      }
 
       // AJAX
       progress();
@@ -169,14 +166,14 @@ jQuery(document).ready(function($) {
 
    /**
     * Once the batches have been transfered show success status.
-    * @param success
+    * @param {object} success - Success object returned from ajax call.
     */
    var finish = function(success) {
       $('.Synchronization').addClass('Finished');
       if (success) {
          $('.Synchronization .SyncProgress').css('width', '100%');
          $('.Synchronization').removeClass('Error');
-         $('.Synchronization .SyncProgress').html("Completed");
+         $('.Synchronization .SyncProgress').html('Completed');
          setTimeout(reset, 3000);
       }
       $('.MailChimpSync #MailChimp-Synchronize').prop('disabled', '');
@@ -188,7 +185,7 @@ jQuery(document).ready(function($) {
     */
    var reset = function() {
       $('.Synchronization').css('display', 'none');
-      var successMessage = "Mail Chimp will now process the list you have uploaded. Check your Mail Chimp Dashboard later.";
-      $("#SychronizationMessages").removeClass('Info').addClass('Warning').html("<b>" + successMessage + "</b>");
+      var successMessage = gdn.getMeta('MailChimpUploadSuccessMessage', 'Mail Chimp will now process the list you have uploaded. Check your Mail Chimp Dashboard later.');
+      $('#SychronizationMessages').removeClass('Info').addClass('Warning').html(successMessage);
    }
 });

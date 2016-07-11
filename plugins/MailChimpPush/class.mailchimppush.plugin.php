@@ -50,7 +50,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
    }
 
    /**
-    * Get an instance of MCAPI
+    * Get an instance of MCAPI, the MailChimp wrapper class.
     *
     * @return MCAPI
     */
@@ -71,9 +71,10 @@ class MailChimpPushPlugin extends Gdn_Plugin {
    }
 
    /**
+    * After a user signs up for the forum, send his email to MailChimp.
     *
-    * @param type $sender
-    * @return type
+    * @param type $sender.
+    * @return type.
     */
    public function userModel_afterSave_handler($sender) {
       $suppliedEmail = val('Email', $sender->EventArguments['Fields'], null);
@@ -117,11 +118,11 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     }
 
    /**
-    * Add an address to Mail Chimp
+    * Add an address to Mail Chimp.
     *
-    * @param string $listID
-    * @param string $email
-    * @param array $user
+    * @param string $listID.
+    * @param string $email.
+    * @param array $user.
     */
    public function add($listID, $email, $options = null, $user = null) {
       if (!$listID)
@@ -149,11 +150,11 @@ class MailChimpPushPlugin extends Gdn_Plugin {
    }
 
    /**
-    * Try to update an existing address in Mail Chimp
+    * Try to update an existing address in Mail Chimp.
     *
-    * @param string $email Old/current email address
-    * @param string $newEmail New email address
-    * @param array $user
+    * @param string $email Old/current email address.
+    * @param string $newEmail New email address.
+    * @param array $user.
     */
    public function update($listID, $email, $newEmail, $options = null, $user = null) {
       if (!$listID)
@@ -183,7 +184,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
    }
 
    /**
-    * Config
+    * Config page in the dashboard.
     *
     * @param PluginController $sender
     */
@@ -192,6 +193,12 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       $this->dispatch($sender);
    }
 
+   /**
+    * Settings controller for storing API key, creating settings page in dashboard.
+    *
+    * @param PluginController $sender.
+    * @throws Gdn_UserException.
+    */
    public function controller_index($sender) {
       $sender->title('MailChimp Settings');
       $sender->addSideMenu();
@@ -199,6 +206,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       $sender->Sync = new Gdn_Form();
 
       $sender->addJsFile('mailchimp.js', 'plugins/MailChimpPush');
+      $sender->addDefinition('MailChimpUploadSuccessMessage', t('Mail Chimp will now process the list you have uploaded. Check your Mail Chimp Dashboard later.'));
 
       $provider = $this->provider();
 
@@ -206,7 +214,6 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       $sender->Form->setValue('ApiKey', $apiKey);
 
       // Get additional settings
-
       $settingValues = array();
       foreach (self::$settings as $setting) {
          $settingValues[$setting] = val($setting, $provider);
@@ -281,10 +288,10 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          }
       }
 
-      $syncURL = gdn::request()->url('', true).'/sync';
+      $syncURL = gdn::request()->url('plugin/mailchimp/sync', true, true);
       $sender->Sync->addHidden('SyncURL', $syncURL);
 
-      $trackBatchesURL = gdn::request()->url('', true).'/trackbatches';
+      $trackBatchesURL = gdn::request()->url('plugin/mailchimp/trackbatches', true, true);
       $sender->Sync->addHidden('TrackBatchesURL', $trackBatchesURL);
 
       $sender->render('settings','','plugins/MailChimpPush');
@@ -292,9 +299,9 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
 
    /**
-    * Send massive list to Mailchimp to synchronize emails in GDN_User
+    * Send massive list to Mailchimp to synchronize emails in GDN_User.
     *
-    * @param $sender
+    * @param PluginController $sender.
     */
    public function controller_sync($sender) {
       $sender->deliveryMethod(DELIVERY_METHOD_JSON);
@@ -357,10 +364,8 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             }
 
             // Subscribe users
-             /* @var $SyncListID passed in $options array */
-             $response = $this->add($SyncListID, $emails, array('ConfirmJoin'  => (bool)$SyncConfirmJoin));
-
-            $response = $response->getBody();
+            /* @var $SyncListID passed in $options array */
+            $response = $this->add($SyncListID, $emails, array('ConfirmJoin'  => (bool)$SyncConfirmJoin));
 
             $sender->setData('BatchID', val('id', $response));
             $sender->setData('NumberOfUsers', $totalUsers);
@@ -384,9 +389,9 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
 
    /**
-    * Send massive list to Mailchimp to synchronize emails in GDN_User
+    * Send massive list to Mailchimp to synchronize emails in GDN_User.
     *
-    * @param $sender
+    * @param PluginController $sender.
     */
    public function controller_trackbatches($sender) {
       $sender->deliveryMethod(DELIVERY_METHOD_JSON);
