@@ -58,10 +58,10 @@ foreach ($this->Data('Badges') as $Badge) :
             <div class="btn-group">
             <?php
             if (CheckPermission('Reputation.Badges.Manage')) {
-                echo anchor(dashboardSymbol('edit'), '/badge/manage/'.$Badge->BadgeID, 'EditBadge btn btn-icon', ['aria-label' => t('Edit')]);
+                echo anchor(dashboardSymbol('edit'), '/badge/manage/'.$Badge->BadgeID, 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
             }
             if (CheckPermission('Reputation.Badges.Manage') && $Badge->CanDelete) {
-                echo anchor(dashboardSymbol('delete'), '/badge/delete/'.$Badge->BadgeID.'/'.$AjaxString, 'DeleteBadge Popup btn btn-icon', ['aria-label' => t('Delete')]);
+                echo anchor(dashboardSymbol('delete'), '/badge/delete/'.$Badge->BadgeID.'/'.$AjaxString, 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'data-content' => ['body' => t('Are you sure you want to delete this badge?')]]);
             }
             ?>
             </div>

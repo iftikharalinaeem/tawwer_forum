@@ -71,6 +71,16 @@ class CustomThemePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Opt out of popup settings page on addons page
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_beforeAddonList_handler($sender, &$args) {
+        $args['AvailableAddons']['CustomTheme']['HasPopupFriendlySettings'] = false;
+    }
+
+    /**
      *
      *
      * @param AssetModel $sender
