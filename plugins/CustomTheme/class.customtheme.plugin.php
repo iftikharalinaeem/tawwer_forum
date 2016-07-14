@@ -77,7 +77,9 @@ class CustomThemePlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function settingsController_beforeAddonList_handler($sender, &$args) {
-        $args['AvailableAddons']['CustomTheme']['HasPopupFriendlySettings'] = false;
+        if (val('CustomTheme', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['CustomTheme']['HasPopupFriendlySettings'] = false;
+        }
     }
 
     /**
