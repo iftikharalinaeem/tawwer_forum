@@ -379,7 +379,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function rootController_react_create($Sender, $RecordType, $Reaction, $ID, $selfReact) {
+    public function rootController_react_create($Sender, $RecordType, $Reaction, $ID, $selfReact = false) {
         if (!Gdn::Session()->IsValid()) {
             throw new Gdn_UserException(T('You need to sign in before you can do this.'), 403);
         }
