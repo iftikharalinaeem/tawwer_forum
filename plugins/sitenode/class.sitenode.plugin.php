@@ -412,8 +412,9 @@ class SiteNodePlugin extends Gdn_Plugin {
         $categoryMap = [];
         $sort = 0;
         $roles = RoleModel::roles();
+        $permissionModel = new PermissionModel();
 
-        foreach ($categories as $category) {
+        foreach ($categories as $categoryID => $category) {
             $categoryModel = new CategoryModel(); // have to recreate each time
 
             $sort++;
@@ -430,25 +431,31 @@ class SiteNodePlugin extends Gdn_Plugin {
 
             if (!empty($permissions)) {
                 $category['CustomPermissions'] = true;
+
+                // Get all of the currently selected role/permission combinations for this junction.
+                $currentCategoryPermissions = $permissionModel->getJunctionPermissions(array('JunctionID' => 5), 'Category');
+                $currentCategoryPermissions = Gdn_DataSet::index($currentCategoryPermissions, 'RoleID');
+
                 foreach ($permissions as $i => $permissionRow) {
-                    if (empty($roleMap[$permissionRow['RoleID']])) {
+                    $roleID = $permissionRow['RoleID'];
+
+                    if (empty($roleMap[$roleID])) {
                         continue; // role disconnected
                     }
 
                     // Do not molest roles that respectfully requested some goddamn peace and quiet.
-                    $role = val($permissionRow['RoleID'], $roles);
+                    $role = val($roleID, $roles);
                     if (val('OverrideHub', $role)) {
                         continue;
                     }
 
-                    $permissions[$i]['JunctionTable'] = 'Category';
-                    $permissions[$i]['JunctionColumn'] = 'PermissionCategoryID';
-                    $permissions[$i]['RoleID'] = $roleMap[$permissionRow['RoleID']];
-                    if ($hubID == '-1') {
-                        $permissions[$i]['JunctionID'] = $hubID;
-                    }
+                    $currentCategoryPermissions[$roleID] = array_merge(
+                        $currentCategoryPermissions[$roleID],
+                        $permissionRow
+                    );
                 }
-                $category['Permissions'] = $permissions;
+                // New set of permission! CategoryModel save want them all!
+                $category['Permissions'] = $currentCategoryPermissions;
             }
 
             if ($hubID != '-1') {
@@ -475,13 +482,6 @@ class SiteNodePlugin extends Gdn_Plugin {
                     $categoryMap[$hubID] = $categoryID;
                 }
                 $categoryModel->Validation->Results(true);
-            }
-
-            foreach ($permissions as $permissionRow) {
-                TouchValue('JunctionID', $permissionRow, $categoryID);
-                Gdn::PermissionModel()->Validation->Results(true);
-                $result = Gdn::PermissionModel()->Save($permissionRow);
-                Trace(Gdn::PermissionModel()->Validation->ResultsText());
             }
         }
 
