@@ -433,7 +433,7 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $category['CustomPermissions'] = true;
 
                 // Get all of the currently selected role/permission combinations for this junction.
-                $currentCategoryPermissions = $permissionModel->getJunctionPermissions(array('JunctionID' => 5), 'Category');
+                $currentCategoryPermissions = $permissionModel->getJunctionPermissions(array('JunctionID' => $categoryID), 'Category');
                 $currentCategoryPermissions = Gdn_DataSet::index($currentCategoryPermissions, 'RoleID');
 
                 foreach ($permissions as $i => $permissionRow) {
