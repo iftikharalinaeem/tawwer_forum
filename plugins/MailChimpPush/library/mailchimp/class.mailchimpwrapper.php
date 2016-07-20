@@ -110,7 +110,15 @@ class MailChimpWrapper {
                 'merge_fields' => $mergeFields
             ];
         }
+
         $response = $this->callServer('batches', 'POST', $body, true);
+
+        // Log what is sent, only show the first 10 items in the array, these arrays can be huge
+        Logger::event('mailchimp_api', Logger::INFO, 'Batch Subscribe', array_slice($body['operations'], 0, 10));
+
+        // Log the response.
+        Logger::event('mailchimp_api', Logger::INFO, 'Batch Subscribe Response', $this->toArray($response));
+
         return $response;
     }
 
@@ -132,16 +140,19 @@ class MailChimpWrapper {
         }
 
         $removedResponse = $this->callServer("lists/{$listID}/members/{$emailID}", 'PATCH', $removeBody);
+        Logger::event('mailchimp_api', Logger::INFO, 'Remove Address', $this->toArray($removedResponse));
+
         $removed = $this->toArray($removedResponse);
         if (val('id', $removed) === $emailID && val('status', $removed) === 'unsubscribed') {
             $emailType = val('EMAIL_TYPE', $email, 'html');
-            $mergeFields = json_encode(['EMAIL_TYPE' => $emailType]);
+            $mergeFields = ['EMAIL_TYPE' => $emailType];
             $addBody = [
                 'email_address' => val('NEW_EMAIL', $email),
                 'status' => 'subscribed',
                 'merge_fields' => $mergeFields
             ];
             $addResponse = $this->callServer("lists/{$listID}/members", 'POST', $addBody);
+            Logger::event('mailchimp_api', Logger::INFO, 'Update Address', $this->toArray($addResponse));
         }
     }
 
@@ -153,7 +164,7 @@ class MailChimpWrapper {
      * @return Http\HttpResponse
      */
     function listMemberInfo($listID, $emailAddress) {
-        return $this->callServer("lists/{$listID}/members/".md5(strtolower($emailAddress[0])));
+        return $this->callServer("lists/{$listID}/members/".md5(strtolower($emailAddress[0])), 'GET', [], true);
     }
 
     /**
@@ -186,8 +197,12 @@ class MailChimpWrapper {
      * @return mixed
      */
     function toArray($json = null) {
+        if (is_array($json)) {
+            return $json;
+        }
         if ($array = json_decode($json, true)) {
             return $array;
         }
+        return [];
     }
 }

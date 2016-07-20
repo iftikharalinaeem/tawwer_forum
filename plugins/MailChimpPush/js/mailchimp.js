@@ -77,7 +77,7 @@ jQuery(document).ready(function($) {
 
          // Check for rerun
          if (auto) {
-            if (data.Progress < 100) {
+            if (data.Progress <= 100) {
                rerun = true;
             } else {
                finish(true);
@@ -130,7 +130,6 @@ jQuery(document).ready(function($) {
       }
 
       // AJAX
-      progress();
       $.ajax({
          url: url,
          type: 'POST',
@@ -138,6 +137,7 @@ jQuery(document).ready(function($) {
          success: function(data) {
             var syncprogress = data.Progress;
             var syncoffset = data.Offset;
+            var status = data.Status;
             // Some kind of error
             if (syncprogress == undefined) {
                if (!data.Error) {

@@ -86,7 +86,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       if (empty($originalEmail)) {
          // Post update to Chimp List
          $this->add($listID, $suppliedEmail, null, (array)$sender->EventArguments['User']);
-      } else if ($originalEmail != $suppliedEmail) {
+      } elseif ($originalEmail != $suppliedEmail) {
          // Post update to Chimp List
          $this->update($listID, $originalEmail, $suppliedEmail, null, (array)$sender->EventArguments['User']);
       }
@@ -118,7 +118,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     }
 
    /**
-    * Add an address to Mail Chimp.
+    * Add an address to MailChimp.
     *
     * @param string $listID.
     * @param string $email.
@@ -127,6 +127,9 @@ class MailChimpPushPlugin extends Gdn_Plugin {
    public function add($listID, $email, $options = null, $user = null) {
       if (!$listID)
          return;
+
+      if (!$email)
+         return ['error' => 'no emails'];
 
       // Configure subscription
       $defaults = array(
@@ -150,37 +153,48 @@ class MailChimpPushPlugin extends Gdn_Plugin {
    }
 
    /**
-    * Try to update an existing address in Mail Chimp.
+    * Try to update an existing address in MailChimp.
     *
     * @param string $email Old/current email address.
     * @param string $newEmail New email address.
     * @param array $user.
+    * @return null|string
     */
-   public function update($listID, $email, $newEmail, $options = null, $user = null) {
-      if (!$listID)
-         return;
+   public function update($defaultListID, $email, $newEmail, $options = null, $user = null) {
+      $lists = $this->MCAPI()->lists();
+      $allLists = array_keys($lists);
+      $updated = false;
+      foreach ($allLists as $listID) {
+         // Lookup member
+         $memberInfo = $this->MCAPI()->listMemberInfo($listID, array($email));
+         $memberInfo = $this->MCAPI()->toArray($memberInfo);
 
-      // Lookup member
-      $memberInfo = $this->MCAPI()->listMemberInfo($listID, array($email));
+         if ($memberInfo['status'] === 'subscribed') {
+            // Configure subscription
+            $defaults = array(
+               'ConfirmJoin'     => false,
+               'Format'          => 'html'
+            );
+            $options = (array)$options;
+            $options = array_merge($defaults, $options);
 
-      // Add member if they don't exist
-      if (!$memberInfo)
-         return $this->add($listID, $newEmail, $options, $user);
+            // Update existing user
+            $this->MCAPI()->listUpdateAddress(
+                $listID,
+                array(
+                    'EMAIL'  => $email,
+                    'NEW_EMAIL' => $newEmail,
+                    'EMAIL_TYPE' => $options['Format'])
+            );
 
-      // Configure subscription
-      $defaults = array(
-         'ConfirmJoin'     => false,
-         'Format'          => 'html'
-      );
-      $options = (array)$options;
-      $options = array_merge($defaults, $options);
-      // Update existing user
-      $confirmJoin = val('ConfirmJoin', $this->provider(), false);
-      return $this->MCAPI()->listUpdateAddress(
-          $listID,
-          array('EMAIL'  => $email, 'NEW_EMAIL' => $newEmail, 'EMAIL_TYPE' => $options['Format']),
-          $options['ConfirmJoin'],
-          true);
+            $updated = true;
+         }
+      }
+
+      // if the user was not on a list, add the user to the default list.
+      if (!$updated) {
+         $this->add($defaultListID, $newEmail, $options, $user);
+      }
    }
 
    /**
@@ -206,7 +220,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       $sender->Sync = new Gdn_Form();
 
       $sender->addJsFile('mailchimp.js', 'plugins/MailChimpPush');
-      $sender->addDefinition('MailChimpUploadSuccessMessage', t('Mail Chimp will now process the list you have uploaded. Check your Mail Chimp Dashboard later.'));
+      $sender->addDefinition('MailChimpUploadSuccessMessage', t('MailChimp will now process the list you have uploaded. Check your MailChimp Dashboard later.'));
 
       $provider = $this->provider();
 
@@ -277,21 +291,17 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          $ping = $this->MCAPI()->ping();
          if ($ping === true) {
             $sender->setData('Configured', true);
-            $listsResponse = $this->MCAPI()->lists();
-            $listsResponse = $this->MCAPI()->toArray($listsResponse);
-            $lists = val('lists', $listsResponse);
-            $lists = Gdn_DataSet::index($lists, 'id');
-            $lists = array_column($lists, 'name', 'id');
-            $sender->setData('Lists', $lists);
+            $allLists = $this->MCAPI()->lists();
+            $sender->setData('Lists', $allLists);
          } else {
             $sender->Form->addError('Bad API Key');
          }
       }
 
-      $syncURL = gdn::request()->url('plugin/mailchimp/sync', true, true);
+      $syncURL = gdn::request()->url('plugin/mailchimp/sync', true);
       $sender->Sync->addHidden('SyncURL', $syncURL);
 
-      $trackBatchesURL = gdn::request()->url('plugin/mailchimp/trackbatches', true, true);
+      $trackBatchesURL = gdn::request()->url('plugin/mailchimp/trackbatches', true);
       $sender->Sync->addHidden('TrackBatchesURL', $trackBatchesURL);
 
       $sender->render('settings','','plugins/MailChimpPush');
@@ -365,12 +375,19 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
             // Subscribe users
             /* @var $SyncListID passed in $options array */
-            $response = $this->add($SyncListID, $emails, array('ConfirmJoin'  => (bool)$SyncConfirmJoin));
+            $response = [];
+            if (count($emails)) {
+               $response = $this->add($SyncListID, $emails, array('ConfirmJoin'  => (bool)$SyncConfirmJoin));
+            }
 
+            $response = $this->MCAPI()->toArray($response);
+
+            $sender->setData('Status', val('status', $response, 'unknown'));
             $sender->setData('BatchID', val('id', $response));
             $sender->setData('NumberOfUsers', $totalUsers);
             $progress = floor(($Offset / $totalUsers) * 100);
             $sender->setData('Offset', ($Offset + $chunkSize));
+            $sender->setData('ChunkSize', $chunkSize);
             $sender->setData('Progress', $progress);
          } else {
             throw new Exception('No users match criteria', 400);
@@ -385,8 +402,6 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
       $sender->render();
    }
-
-
 
    /**
     * Send massive list to Mailchimp to synchronize emails in GDN_User.
