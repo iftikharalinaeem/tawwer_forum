@@ -86,7 +86,11 @@ class MailChimpWrapper {
      * @throws Exception
      */
     function lists() {
-        return $this->callServer('lists');
+        $listsResponse = $this->callServer('lists');
+        $listsResponse = $this->toArray($listsResponse);
+        $lists = val('lists', $listsResponse);
+        $lists = Gdn_DataSet::index($lists, 'id');
+        return array_column($lists, 'name', 'id');
     }
 
     /**
