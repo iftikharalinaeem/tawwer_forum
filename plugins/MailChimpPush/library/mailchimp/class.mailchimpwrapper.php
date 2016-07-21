@@ -5,7 +5,7 @@ use Garden\Http;
 /**
  * Class MailChimpWrapper
  *
- * Methods to facilitate commumicating with Mail Chimp.
+ * Methods to facilitate commumicating with MailChimp.
  */
 
 class MailChimpWrapper {
@@ -80,7 +80,7 @@ class MailChimpWrapper {
     }
 
     /**
-     * Get a json encoded list of mailing lists at Mail Chimp.
+     * Get a json encoded list of mailing lists at MailChimp.
      *
      * @return Http\HttpResponse
      * @throws Exception
@@ -90,7 +90,7 @@ class MailChimpWrapper {
     }
 
     /**
-     * Send an array of emails to be subscribed to a mailing list at Mail Chimp.
+     * Send an array of emails to be subscribed to a mailing list at MailChimp.
      *
      * @param string $id
      * @param array $batch
@@ -124,7 +124,7 @@ class MailChimpWrapper {
 
 
     /**
-     * Send an array of emails to be subscribed to a mailing list at Mail Chimp.
+     * Send an array of emails to be subscribed to a mailing list at MailChimp.
      *
      * @param string $listID
      * @param array $email
@@ -157,7 +157,7 @@ class MailChimpWrapper {
     }
 
     /**
-     * Get the information for one specific member of one specific mailing list at Mail Chimp.
+     * Get the information for one specific member of one specific mailing list at MailChimp.
      *
      * @param string $listID
      * @param array $emailAddress

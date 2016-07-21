@@ -78,7 +78,9 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     */
    public function userModel_afterSave_handler($sender) {
       $suppliedEmail = val('Email', $sender->EventArguments['Fields'], null);
-      if (empty($suppliedEmail)) return;
+      if (empty($suppliedEmail)) {
+          return;
+      }
 
       $originalEmail = val('Email', $sender->EventArguments['User'], null);
 
@@ -122,14 +124,15 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     *
     * @param string $listID.
     * @param string $email.
-    * @param array $user.
     */
-   public function add($listID, $email, $options = null, $user = null) {
-      if (!$listID)
+   public function add($listID, $email, $options = null) {
+      if (!$listID) {
          return;
+      }
 
-      if (!$email)
+      if (!$email) {
          return ['error' => 'no emails'];
+      }
 
       // Configure subscription
       $defaults = array(
@@ -140,8 +143,9 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       $options = array_merge($defaults, $options);
 
       // Subscribe user to list
-      if (!is_array($email))
+      if (!is_array($email)) {
          $email = array($email);
+      }
 
       $emails = array();
       foreach ($email as $emailAddress) {
@@ -155,12 +159,14 @@ class MailChimpPushPlugin extends Gdn_Plugin {
    /**
     * Try to update an existing address in MailChimp.
     *
+    * @param string $defaultListID if the user doesn't exist in MailChimp db, add the user to this list.
     * @param string $email Old/current email address.
     * @param string $newEmail New email address.
-    * @param array $user.
+    * @param array $options.
+    *
     * @return null|string
     */
-   public function update($defaultListID, $email, $newEmail, $options = null, $user = null) {
+   public function update($defaultListID, $email, $newEmail, $options = null) {
       $lists = $this->MCAPI()->lists();
       $allLists = array_keys($lists);
       $updated = false;
@@ -184,7 +190,8 @@ class MailChimpPushPlugin extends Gdn_Plugin {
                 array(
                     'EMAIL'  => $email,
                     'NEW_EMAIL' => $newEmail,
-                    'EMAIL_TYPE' => $options['Format'])
+                    'EMAIL_TYPE' => $options['Format']
+                )
             );
 
             $updated = true;
@@ -193,7 +200,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
       // if the user was not on a list, add the user to the default list.
       if (!$updated) {
-         $this->add($defaultListID, $newEmail, $options, $user);
+         $this->add($defaultListID, $newEmail, $options);
       }
    }
 
@@ -282,8 +289,9 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             }
          }
 
-         if ($modified)
+         if ($modified) {
             $sender->informMessage(t('Changes saved'));
+         }
       }
 
       $apiKey = val('AssociationSecret', $provider);
@@ -332,8 +340,9 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          $options = array();
          foreach ($opts as $opt => $default) {
             $val = Gdn::request()->getValue($opt, null);
-            if ((!isset($val) || $val == '') && in_array($opt, $requiredOpts))
+            if ((!isset($val) || $val == '') && in_array($opt, $requiredOpts)) {
                throw new Exception(sprintf(t('%s is required.'), $opt), 400);
+            }
             $options[$opt] = is_null($val) ? $default : $val;
          }
          extract($options);
@@ -344,19 +353,22 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
          $criteria = array();
 
-          /* @var $SyncBanned passed in $options array */
+         /* @var $SyncBanned passed in $options array */
          // Only if true do we care
-         if (!$SyncBanned)
-            $criteria['Banned'] = 0;
+         if (!$SyncBanned) {
+             $criteria['Banned'] = 0;
+         }
 
-          /* @var $SyncDeleted passed in $options array */
-         if (!$SyncDeleted)
-            $criteria['Deleted'] = 0;
+         /* @var $SyncDeleted passed in $options array */
+         if (!$SyncDeleted) {
+             $criteria['Deleted'] = 0;
+         }
 
-          /* @var $SyncUnconfirmed passed in $options array */
-          // Only if supplied and false do we care
-         if ($SyncUnconfirmed == false)
-            $criteria['Confirmed'] = 1;
+         /* @var $SyncUnconfirmed passed in $options array */
+         // Only if supplied and false do we care
+         if ($SyncUnconfirmed == false) {
+             $criteria['Confirmed'] = 1;
+         }
 
          $totalUsers = Gdn::userModel()->getCount($criteria);
          if ($totalUsers) {
@@ -396,8 +408,9 @@ class MailChimpPushPlugin extends Gdn_Plugin {
       } catch (Exception $ex) {
          $sender->setData('Error', $ex->getMessage());
 
-         if ($ex->getCode() == 400)
+         if ($ex->getCode() == 400) {
             $sender->setData('Fatal', true);
+         }
       }
 
       $sender->render();

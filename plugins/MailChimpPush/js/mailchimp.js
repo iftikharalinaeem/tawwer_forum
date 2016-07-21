@@ -185,7 +185,7 @@ jQuery(document).ready(function($) {
     */
    var reset = function() {
       $('.Synchronization').css('display', 'none');
-      var successMessage = gdn.getMeta('MailChimpUploadSuccessMessage', 'Mail Chimp will now process the list you have uploaded. Check your Mail Chimp Dashboard later.');
+      var successMessage = gdn.getMeta('MailChimpUploadSuccessMessage', 'MailChimp will now process the list you have uploaded. Check your MailChimp Dashboard later.');
       $('#SychronizationMessages').removeClass('Info').addClass('Warning').html(successMessage);
    }
 });
