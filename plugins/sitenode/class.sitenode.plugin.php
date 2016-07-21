@@ -431,10 +431,10 @@ class SiteNodePlugin extends Gdn_Plugin {
 
             if ($hubID != '-1') {
                 // See if there is an existing category.
-                $existingCategory = $categoryModel->GetWhereCache(['HubID' => $hubID]);
+                $existingCategory = $categoryModel->getWhereCache(['HubID' => $hubID]);
                 if (!$existingCategory) {
                     // Try linking by url code.
-                    $existingCategory = $categoryModel->GetWhereCache(['UrlCode' => $category['UrlCode']]);
+                    $existingCategory = $categoryModel->getWhereCache(['UrlCode' => $category['UrlCode']]);
                     if ($existingCategory) {
                         $existingCategory = array_shift($existingCategory);
                     }
@@ -480,11 +480,11 @@ class SiteNodePlugin extends Gdn_Plugin {
 
 
             if ($hubID != '-1') {
-                $categoryID = $categoryModel->Save($category);
+                $categoryID = $categoryModel->save($category);
                 if ($categoryID) {
                     $categoryMap[$hubID] = $categoryID;
                 }
-                $categoryModel->Validation->Results(true);
+                $categoryModel->Validation->results(true);
             }
 
         }
