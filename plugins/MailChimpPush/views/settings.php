@@ -146,7 +146,7 @@
    </div>
 
    <div class="Synchronization">
-      <div class="SyncProgressTitle">Creating Mail Chimp Batch Queue<span></span></div>
+      <div class="SyncProgressTitle"><?php echo t('Processing Data'); ?><span></span></div>
       <div class="SyncBar"><div class="SyncProgress"></div></div>
    </div>
 
