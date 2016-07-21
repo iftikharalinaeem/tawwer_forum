@@ -152,10 +152,13 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         $comments = $sender->data('Comments');
         RoleModel::setUserRoles($comments->result(), 'InsertUserID');
 
-
         // And add the css class to the discussion
         $roles = val('Roles', $sender->Discussion, []);
-        $tags = val('Tags', $sender->Discussion, []);
+        $tags = val('Tags', $sender->Discussion);
+        if (!$tags) {
+            $tags = val('Tracker', val('XTags', $sender->Discussion));
+        }
+
         if (is_array($roles) && count($roles) && is_array($tags) && count($tags)) {
             $tags = Gdn_DataSet::index($tags, 'TagID');
             $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
