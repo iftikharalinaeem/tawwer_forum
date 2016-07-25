@@ -104,6 +104,50 @@ class SubcommunityModel extends Gdn_Model {
     }
 
     /**
+     * Reinterpret the current URL as represented in another subcommunity site.
+     *
+     * @param array $site A subcommunity site record.
+     * @return string
+     */
+    public static function getAlternativeUrl($site) {
+        $path = trim(Gdn::request()->path(), '/');
+        $currentSite = static::getCurrent();
+        $currentFolder = $currentSite['Folder'];
+        $folder = val('Folder', $site);
+
+        // Strip the current folder off of the category code.
+        if ($baseCategoryCode = Gdn::controller()->data('Category.UrlCode')) {
+            $baseCategoryCode = stringBeginsWith($baseCategoryCode, "$currentFolder-", true, true);
+            $baseCategoryCode = stringEndsWith($baseCategoryCode, "-$currentFolder", true, true);
+        }
+
+        // Try and find an appropriate alternative category.
+        if (!($category = CategoryModel::categories("$folder-$baseCategoryCode"))) {
+            $category = CategoryModel::categories("$baseCategoryCode-$folder");
+        }
+
+        $altPath = $path;
+        if (Gdn_Theme::inSection('CategoryList')) {
+            if ($category) {
+                $altPath = ltrim(categoryUrl($category, '', '/'), '/');
+            }
+        } elseif (Gdn_Theme::inSection('DiscussionList')) {
+            if ($category) {
+                $altPath = ltrim(categoryUrl($category, '', '/'), '/');
+            } elseif (stringBeginsWith($path, 'discussions')) {
+                $altPath = "discussions";
+            } else {
+                $altPath = '';
+            }
+        } elseif (Gdn_Theme::inSection('Discussion')) {
+            $altPath = '';
+        }
+
+        $alternateUrl = rtrim(Gdn::request()->urlDomain('//')."/$folder/$altPath", '/');
+        return $alternateUrl;
+    }
+
+    /**
      * Get a filtered array of all subcommunities available to the current user
      *
      * @return array Subcommunities available to the current user, indexed by folder.

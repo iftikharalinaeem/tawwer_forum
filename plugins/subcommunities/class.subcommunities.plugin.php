@@ -156,9 +156,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             return;
         }
 
-        // Add the alternate urls to the current crop of sites.
-        SubcommunityModel::addAlternativeUrls();
-
         // Set alternative urls.
         $domain = Gdn::request()->urlDomain();
         foreach (SubcommunityModel::all() as $site) {
