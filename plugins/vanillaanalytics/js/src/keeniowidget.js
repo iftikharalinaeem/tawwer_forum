@@ -499,11 +499,9 @@ KeenIOWidget.prototype.formatSeconds = function (totalSeconds) {
     var result = "";
     if (hours > 0) {
         result += hours.toString() + "h";
-    }
-    if (minutes > 0) {
         result += minutes.toString() + "m";
-    }
-    if (seconds > 0) {
+    } else {
+        result += minutes.toString() + "m";
         result += seconds.toString() + "s";
     }
 
