@@ -262,16 +262,12 @@ class RanksPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
 
       if ($Sender->Form->AuthenticatedPostBack()) {
-         if ($Sender->Form->GetFormValue('Yes')) {
-            $RankModel = new RankModel();
-            $RankModel->Delete(array('RankID' => $RankID));
-
-            $Sender->JsonTarget("#Rank_$RankID", NULL, 'SlideUp');
-         }
+         $RankModel = new RankModel();
+         $RankModel->Delete(array('RankID' => $RankID));
+         $Sender->JsonTarget("#Rank_$RankID", NULL, 'SlideUp');
       }
 
-      $Sender->Title(sprintf(T('Delete %s'), T('Rank')));
-      $Sender->Render('Rank_Delete', '', 'plugins/Ranks');
+      $Sender->render('blank', 'utility', 'dashboard');
    }
 
    /**

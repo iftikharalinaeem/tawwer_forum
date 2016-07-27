@@ -2,7 +2,7 @@
 <div class="header-block">
     <h1><?php echo T('Manage Badges'); ?></h1>
     <div class="btn-group">
-        <?php echo Anchor(T('Add Badge'), '/badge/manage', 'btn btn-primary'); ?>
+        <?php echo anchor(T('Add Badge'), '/badge/manage', 'js-modal btn btn-primary'); ?>
     </div>
 </div>
 <div class="table-wrap">

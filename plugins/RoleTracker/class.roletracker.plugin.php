@@ -79,16 +79,6 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     #######################################
 
     /**
-     * Add a link to the dashboard menu.
-     *
-     * @param object $sender Sending controller instance.
-     */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        $menu = &$sender->EventArguments['SideMenu'];
-        $menu->addLink('Add-ons', t('Role Tracker'), 'settings/roletracker', 'Garden.Settings.Manage');
-    }
-
-    /**
      * Create a method called "roletracker" on the SettingsController.
      *
      * @param SettingsController $sender Sending controller instance.

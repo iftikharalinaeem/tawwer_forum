@@ -26,7 +26,7 @@ $CurrentTab = 'html';
    <a href="<?php echo url('settings/customtheme/#'); ?>" class="js-custom-html <?php echo $CurrentTab == 'html' ? 'active' : ''; ?>"><?php echo t('Edit HTML'); ?></a>
    <a href="<?php echo url('settings/customtheme/#'); ?>" class="js-custom-css <?php echo $CurrentTab == 'html' ? '' : 'active'; ?>"><?php echo t('Edit CSS'); ?></a>
 </div>
-<div class="toolbar full-border">
+<div class="toolbar">
    <div class="text-input-button toolbar-main">
       <?php
       echo wrap($this->Form->Label('Revision Label:', 'Label'), 'div', ['class' => 'label-wrap']);

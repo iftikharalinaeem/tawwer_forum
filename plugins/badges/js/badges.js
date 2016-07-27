@@ -1,6 +1,6 @@
 var multicomplete = {
-    start: function() {
-        var input = $('.MultiComplete');
+    start: function(element) {
+        var input = $('.MultiComplete', element);
         if (input.length) {
             $('.MultiComplete').autocomplete(
                 gdn.url('/user/autocomplete/'),
@@ -15,9 +15,6 @@ var multicomplete = {
     }
 }
 
-jQuery(document).ready(function($) {
-    multicomplete.start();
-    $('.js-give-badge').popup({
-        afterLoad: multicomplete.start
-    });
+$(document).on('contentLoad', function(e) {
+    multicomplete.start(e.target);
 });

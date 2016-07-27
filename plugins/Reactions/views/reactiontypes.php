@@ -39,7 +39,7 @@
          <th class="NameColumn"><?php echo T('Reaction'); ?></th>
          <th><?php echo T('Description'); ?></th>
          <th><?php echo T("Actions and Permissions"); ?></th>
-         <th class="Options"><?php echo T('Active'); ?></th>
+         <th class="options"><?php echo T('Active'); ?></th>
       </tr>
    </thead>
    <tbody>

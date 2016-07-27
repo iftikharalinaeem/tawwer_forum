@@ -132,7 +132,7 @@ class BadgeController extends BadgesAppController {
             }
         }
 
-        $this->render();
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -354,7 +354,6 @@ class BadgeController extends BadgesAppController {
         $this->permission('Garden.Settings.Manage');
 
         // Form setup
-        $this->Form->wrapElements = true;
         $this->Form->setModel($this->BadgeModel);
         $this->Form->showErrors();
 

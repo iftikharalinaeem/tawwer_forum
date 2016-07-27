@@ -22,7 +22,7 @@ foreach ($this->Data('Badges') as $Badge) :
             if ($Badge->Active) { // $Badge->Type == 'Manual'
                 // Give badge
                 if ($Session->CheckPermission('Reputation.Badges.Give') && $Badge->Active)
-                    echo Anchor(T('Give'), '/badge/give/'.$Badge->BadgeID, 'GiveBadge SmallButton js-give-badge');
+                    echo Anchor(T('Give'), '/badge/give/'.$Badge->BadgeID, 'js-modal');
             } ?>
         </td>
         <?php endif; ?>
@@ -61,7 +61,7 @@ foreach ($this->Data('Badges') as $Badge) :
                 echo anchor(dashboardSymbol('edit'), '/badge/manage/'.$Badge->BadgeID, 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
             }
             if (CheckPermission('Reputation.Badges.Manage') && $Badge->CanDelete) {
-                echo anchor(dashboardSymbol('delete'), '/badge/delete/'.$Badge->BadgeID.'/'.$AjaxString, 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'data-content' => ['body' => t('Are you sure you want to delete this badge?')]]);
+                echo anchor(dashboardSymbol('delete'), '/badge/delete/'.$Badge->BadgeID.'/?Target='.urlencode($this->SelfUrl), 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'data-content' => ['body' => t('Are you sure you want to delete this badge?')]]);
             }
             ?>
             </div>

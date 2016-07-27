@@ -15,7 +15,7 @@ $IncomingAddress = $this->Data('IncomingAddress');
 //$OutgoingAddress = C();
 if ($IncomingAddress):
     ?>
-    <div class="Info">
+    <div class="padded">
         <p>Your forum's email address is <code><?php echo $IncomingAddress ?></code>.
             If you want to set up your own email address for the site then forward it to this one.
             We recommend using the same account as your outgoing address so that people can reply to email sent by the

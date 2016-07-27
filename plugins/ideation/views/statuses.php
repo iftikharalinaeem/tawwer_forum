@@ -2,7 +2,7 @@
 <div class="header-block">
     <h1><?php echo $this->data('Title'); ?></h1>
     <div class="btn-group">
-        <?php echo anchor(sprintf(t('Add %s'), t('Status')), '/settings/addstatus', 'btn btn-primary'); ?>
+        <?php echo anchor(sprintf(t('Add %s'), t('Status')), '/settings/addstatus', 'btn btn-primary js-modal'); ?>
     </div>
 </div>
 <!--<div class="Info PageInfo">-->

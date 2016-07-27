@@ -3,28 +3,19 @@
 /* @var SettingsController $this */
 echo $this->Form->open(['class' => 'RoleTracker Settings', 'enctype' => 'multipart/form-data']);
 echo $this->Form->errors();
+echo '<div class="padded">'.t('Choose which roles to track.').'</div>';
+foreach($this->data('Roles') as $roleID => $role) { ?>
+    <div class="form-group row">
+        <div class="label-wrap-wide">
+            <?php echo $this->Form->label($this->Form->formData()[$roleID.'_Name'], $roleID.'_Name'); ?>
+        </div>
+        <div class="input-wrap-right">
+            <?php echo $this->Form->toggle($roleID.'_IsTracked'); ?>
+        </div>
+    </div>
+<?php
+}
 ?>
-<ul>
-    <li><?php echo wrap(t('Roles'), 'h2');?></li>
-    <li>
-        <table>
-            <thead>
-            <tr>
-                <th><?php echo t('Role\'s name')?></th>
-                <th><?php echo t('Is tracked')?></th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php
-            foreach($this->data('Roles') as $roleID => $role) {
-                echo '<tr>';
-                echo    '<td>'.$this->Form->label($this->Form->formData()[$roleID.'_Name'], $roleID.'_Name').'</td>';
-                echo    '<td>'.$this->Form->checkBox($roleID.'_IsTracked').'</td>';
-                echo '</tr>';
-            }
-            ?>
-            </tbody>
-        </table>
-    </li>
-</ul>
-<?php echo $this->Form->close('Save');
+<div class="form-footer">
+    <?php echo $this->Form->close('Save'); ?>
+</div>

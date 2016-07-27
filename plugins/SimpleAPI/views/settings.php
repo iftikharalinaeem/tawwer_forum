@@ -17,38 +17,46 @@ echo $Form->Open();
 echo $Form->Errors();
 ?>
 <ul>
-   <li>
-      <?php
-         echo $Form->Label('Endpoint', 'Endpoint');
-         echo '<div class="Info2">Access your forum\'s API through this Endpoint URL:</div>';
-         echo '<pre>https://'.CLIENT_NAME.'/api/v1/</pre>';
-      ?>
+   <li class="form-group row">
+      <div class="label-wrap">
+         <?php echo $Form->Label('Endpoint', 'Endpoint');
+         echo '<div class="info">Access your forum\'s API through this Endpoint URL:</div>'; ?>
+      </div>
+      <div class="input-wrap">
+         <?php echo '<pre>https://'.CLIENT_NAME.'/api/v1/</pre>'; ?>
+      </div>
    </li>
-   <li>
-      <?php
-         echo $Form->Label('Access Token', 'AccessToken');
-         echo '<div class="Info2">This is the access token for api calls. It\'s like a password for the API. <b>Do not give this access token out to anyone.</b></div>';
-         echo $Form->TextBox('AccessToken', array('class' => 'InputBox BigInput'));
-      ?>
+   <li class="form-group row">
+      <div class="label-wrap">
+         <?php echo $Form->Label('Access Token', 'AccessToken');
+         echo '<div class="info">This is the access token for api calls. It\'s like a password for the API. <b>Do not give this access token out to anyone.</b></div>'; ?>
+      </div>
+      <div class="input-wrap">
+         <?php echo $Form->TextBox('AccessToken', array('class' => 'InputBox BigInput')); ?>
+      </div>
    </li>
-   <li>
-      <?php
-         echo $Form->Label('User', 'Username');
-         echo '<div class="Info2">This is the name of the user that all API calls will be made as. You can create another user and enter it here. Keep in mind that all calls will be made with this user\'s permissions.</div>';
-         echo $Form->TextBox('Username');
-      ?>
+   <li class="form-group row">
+      <div class="label-wrap">
+         <?php echo $Form->Label('User', 'Username');
+         echo '<div class="info">This is the name of the user that all API calls will be made as. You can create another user and enter it here. Keep in mind that all calls will be made with this user\'s permissions.</div>'; ?>
+      </div>
+      <div class="input-wrap">
+         <?php echo $Form->TextBox('Username'); ?>
+      </div>
    </li>
-   <li>
-      <?php
-         echo $Form->Label('Security', 'Security');
-         echo '<div class="Info2">'.sprintf('You can make sure that api calls can only be called through ssl. Your ssl url is %s.', 'https://'.CLIENT_NAME).'</div>';
-         echo $Form->CheckBox('OnlyHttps', 'Only allow API calls through ssl.');
-      ?>
+   <li class="form-group row">
+      <div class="label-wrap">
+         <?php echo $Form->Label('Security', 'Security');
+         echo '<div class="info">'.sprintf('You can make sure that api calls can only be called through ssl. Your ssl url is %s.', 'https://'.CLIENT_NAME).'</div>'; ?>
+      </div>
+      <div class="input-wrap">
+         <?php echo $Form->CheckBox('OnlyHttps', 'Only allow API calls through ssl.'); ?>
+      </div>
    </li>
 </ul>
-
+<div class="form-footer js-modal-footer">
 <?php
-
 echo $Form->Button('Save');
 echo $Form->Close();
 ?>
+</div>

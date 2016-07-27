@@ -992,17 +992,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Adds items to dashboard menu.
-     *
-     * @param object $Sender DashboardController.
-     */
-    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-        $Menu = $Sender->EventArguments['SideMenu'];
-//      $Menu->AddItem('Pages', T('Pages Settings'), FALSE, array('class' => 'Pages', 'After' => 'Forum'));
-        $Menu->AddLink('Site Settings', T('Incoming Email'), '/settings/vanillapop', 'Garden.Settings.Manage', array('After' => 'settings/email', 'class' => 'nav-email nav-email-in'));
-    }
-
-    /**
      * Add notifications.
      */
     public function CommentModel_BeforeNotification_Handler($Sender, $Args) {

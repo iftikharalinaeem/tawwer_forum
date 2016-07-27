@@ -169,7 +169,7 @@ EOT
             $sender->addJsFile('ideation.js', 'plugins/ideation'); // Show/hide allowed discussions and downvote option
 
             if (!$categoryID) {
-                $sender->Data['_ExtendedFields']['IsIdea'] = ['Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => '<strong>' . t('Ideation') . '</strong> <small><a href="http://docs.vanillaforums.com/addons/ideation/">' . sprintf(t('Learn more about %s'), t('ideas')) . '</a></small>'];
+                $sender->Data['_ExtendedFields']['IsIdea'] = ['Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => t('Ideation') .'<div class="info"><a href="http://docs.vanillaforums.com/addons/ideation/">' . sprintf(t('Learn more about %s'), t('ideas')) . '</a></div>'];
             }
 
             $downVoteOptions = [];
@@ -179,7 +179,7 @@ EOT
                 $downVoteOptions = $this->allowDownVotes($category) ? ['checked' => 'checked'] : [];
             }
 
-            $sender->Data['_ExtendedFields']['UseDownVotes'] = ['Name' => 'UseDownVotes', 'Control' => 'CheckBox', 'Options' => $downVoteOptions];
+            $sender->Data['_ExtendedFields']['UseDownVotes'] = ['Name' => 'UseDownVotes', 'Control' => 'CheckBox', 'Description' => t('Down Votes').' <div class="info">'.t('Let users vote up or down.').'</div>', 'Options' => $downVoteOptions];
 
         } else {
             if ($sender->Form->getValue('Idea_Category')) {
