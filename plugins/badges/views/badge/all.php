@@ -9,11 +9,10 @@
     <table id="Badges" class="AltColumns ManageBadges">
         <thead>
             <tr>
-                <th class="BadgeNameHead"><?php echo T('Badge Name', 'Name'); ?></th>
+                <th class="BadgeNameHead" colspan="2"><?php echo T('Badge'); ?></th>
                 <?php if (CheckPermission('Reputation.Badges.Give')) : ?>
                     <th></th>
                 <?php endif; ?>
-                <th class="Alt"><?php echo T('Description'); ?></th>
                 <th><?php echo T('Class'); ?></th>
                 <th><?php echo T('Level'); ?></th>
                 <th><?php echo T('Given'); ?></th>

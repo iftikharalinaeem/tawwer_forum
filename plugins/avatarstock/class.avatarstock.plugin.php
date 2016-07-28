@@ -53,6 +53,18 @@ class AvatarStockPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Opt out of popup settings page on addons page
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_beforeAddonList_handler($sender, &$args) {
+        if (val('avatarstock', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['avatarstock']['HasPopupFriendlySettings'] = false;
+        }
+    }
+
+    /**
      * Allow utility/structure calls to restructure plugin.
      */
     public function structure() {

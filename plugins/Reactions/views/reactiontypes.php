@@ -36,10 +36,10 @@
 <table id="Badges" class="AltColumns ManageBadges">
    <thead>
       <tr>
-         <th class="NameColumn"><?php echo T('Reaction'); ?></th>
-         <th><?php echo T('Description'); ?></th>
+         <th class="NameColumn" colspan="2"><?php echo T('Reaction'); ?></th>
          <th><?php echo T("Actions and Permissions"); ?></th>
-         <th class="options"><?php echo T('Active'); ?></th>
+         <th class="active"><?php echo T('Active'); ?></th>
+         <th class="options"><?php echo T('Options'); ?></th>
       </tr>
    </thead>
    <tbody>
@@ -53,10 +53,16 @@
          <td class="NameColumn"><div class="CellWrap">
             <?php
             echo Img('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png', array('ReactionImage')), ' ';
-            echo Anchor(T($ReactionType['Name']), "/reactions/edit/{$UrlCode}");
             ?></div>
          </td>
-         <td><?php echo $ReactionType['Description']; ?></td>
+         <td>
+            <div class="title strong">
+               <?php echo t($ReactionType['Name']); ?>
+            </div>
+            <div class="description">
+               <?php echo $ReactionType['Description']; ?>
+            </div>
+         </td>
          <td class="AutoDescription">
             <?php
             $AutoDescription = implode('</li><li>', AutoDescription($ReactionType));
@@ -68,6 +74,9 @@
             <?php
             echo ActivateButton($ReactionType);
             ?>
+         </td>
+         <td>
+            <?php echo anchor(dashboardSymbol('edit'), "/reactions/edit/{$UrlCode}", 'js-modal btn btn-icon', ['aria-label' => t('Edit')]); ?>
          </td>
       </tr>
       <?php endforeach; ?>
