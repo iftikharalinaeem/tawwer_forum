@@ -676,7 +676,7 @@ EOT
                     ]);
             }
 
-            $sender->DiscussionModel->setField($discussionID, 'Type', $sender->Form->getFormValue('Type'));
+            $sender->DiscussionModel->setField($discussionID, 'Type', $type);
             $sender->Form->setValidationResults($sender->DiscussionModel->validationResults());
             Gdn::controller()->jsonTarget('', '', 'Refresh');
         } else {
