@@ -122,7 +122,7 @@ class GroupsHooks extends Gdn_Plugin {
 
       /* Ensure that there are discussions */
 
-      if (!$sender->data('Discussions') && !($sender->data('Discussions') instanceof Gdn_DataSet)) {
+      if (!$sender->data('Discussions') || !($sender->data('Discussions') instanceof Gdn_DataSet)) {
          trigger_error("No discussions found in the data array.", E_USER_NOTICE);
          return;
       }
