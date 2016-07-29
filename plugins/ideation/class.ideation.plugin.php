@@ -947,8 +947,11 @@ EOT
      */
     public function discussionsController_render_before($sender) {
         if ($sender->DeliveryType() == DELIVERY_TYPE_ALL) {
-            $discussions = $sender->data('Discussions')->result();
-            $this->addUserVotesToDiscussions($discussions);
+            $discussionsData = $sender->data('Discussions', false);
+            if ($discussionsData !== false && $discussionsData instanceof Gdn_DataSet) {
+                $discussions = $discussionsData->result();
+                $this->addUserVotesToDiscussions($discussions);
+            }
         }
     }
 
@@ -975,7 +978,6 @@ EOT
         $userVotes = [];
         $tagIDs = [$this->getUpTagID(), $this->getDownTagID()];
 
-        $limit = c('Vanilla.Discussions.PerPage', 30);
         $user = Gdn::session();
         $userID = val('UserID', $user);
 
@@ -983,9 +985,12 @@ EOT
             $reactionModel = new ReactionModel();
 
             // TODO: Cache this thing.
-            $data = $reactionModel->GetRecordsWhere(['TagID' => $tagIDs, 'RecordType' => ['Discussion'], 'UserID' => $userID, 'Total >' => 0],
-                'DateInserted', 'desc',
-                $limit + 1);
+            $data = $reactionModel->GetRecordsWhere(
+                ['TagID' => $tagIDs, 'RecordType' => ['Discussion'], 'UserID' => $userID, 'Total >' => 0],
+                'DateInserted',
+                'desc',
+                1000 // This is affecting the up arrow being toggled so let fetch a lot of them!
+            );
 
             foreach ($data as $discussion) {
                 $userVotes[val('RecordID', $discussion)] = val('TagID', $discussion);

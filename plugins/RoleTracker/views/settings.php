@@ -3,7 +3,11 @@
 /* @var SettingsController $this */
 echo $this->Form->open(['class' => 'RoleTracker Settings', 'enctype' => 'multipart/form-data']);
 echo $this->Form->errors();
-echo '<div class="padded">'.t('Choose which roles to track.').'</div>';
+<div class="padded">
+    <p><?php echo t('Tracked roles get extra CSS classes.', 'Discussions and comments made by users with a <b>tracked role</b> will be tagged with that role, and will receive a CSS class to allow visual customization.'); ?></p>
+    <p><?php echo t('Tracked roles make content more visible.', 'This is useful for letting regular members know that a staff member has posted in a discussion, for example. <b>This functionality is not retro-active.</b>'); ?></p>
+    <p><?php echo t('Choose which roles to track below.'); ?></p>
+</div>
 foreach($this->data('Roles') as $roleID => $role) { ?>
     <div class="form-group row">
         <div class="label-wrap-wide">

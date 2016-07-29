@@ -19,7 +19,9 @@ $PluginInfo['badges'] = array(
     'AuthorEmail' => 'lincoln@vanillaforums.com',
     'AuthorUrl' => 'http://lincolnwebs.com',
     'License' => 'Proprietary',
-    'Icon' => 'badges.png'
+    'SettingsUrl' => '/settings/badges',
+    'Icon' => 'badges.png',
+    'SettingsPermission' => 'Garden.Settings.Manage'
 );
 
 /**
@@ -241,6 +243,30 @@ class BadgesHooks extends Gdn_Plugin {
     }
 
     /**
+     * General configuration page for Badges.
+     */
+    public function settingsController_badges_create($sender, $args) {
+        $sender->permission('Garden.Settings.Manage');
+
+        if ($sender->Form->authenticatedPostback()) {
+            $excludePermission = $sender->Form->getFormValue('ExcludePermission', '');
+
+            if ($excludePermission === 'None') {
+                removeFromConfig('Badges.ExcludePermission');
+            } else {
+                saveToConfig('Badges.ExcludePermission', $excludePermission);
+            }
+        } else {
+            $sender->Form->setValue('ExcludePermission', c('Badges.ExcludePermission', 'None'));
+        }
+
+        $sender->title(sprintf(t('%s settings'), t('Badges')));
+        $sender->setData('PluginDescription', $this->getPluginKey('Description'));
+        $sender->addSideMenu('dashboard/settings/plugins');
+        $sender->render($sender->fetchViewLocation('settings', '', 'plugins/badges'));
+    }
+
+    /**
      *
      *
      * @param UserModel $Sender
@@ -319,7 +345,11 @@ class BadgesHooks extends Gdn_Plugin {
      * Run structure & default badges.
      */
     public function setup() {
-        Gdn::applicationManager()->disableApplication('reputation');
+        // If Reputation is enabled, disable it.
+        if (Gdn::addonManager()->isEnabled('reputation', \Vanilla\Addon::TYPE_ADDON)) {
+            Gdn::applicationManager()->disableApplication('reputation');
+        }
+
         $this->structure();
     }
 

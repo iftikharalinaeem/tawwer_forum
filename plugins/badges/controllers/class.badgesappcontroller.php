@@ -34,6 +34,8 @@ class BadgesAppController extends Gdn_Controller {
      * @access public
      */
     public function initialize() {
+        $this->Application = 'badges';
+
         $FrontendStyle = false;
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
@@ -84,7 +86,7 @@ class BadgesAppController extends Gdn_Controller {
         Gdn_Theme::section('Dashboard');
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            $nav = new DashboardNavModule();
+            $sideMenu = new SideMenuModule($this);
             $navAdapter = new NestedCollectionAdapter($nav);
             $this->EventArguments['SideMenu'] = $navAdapter;
             $this->fireEvent('GetAppSettingsMenuItems');

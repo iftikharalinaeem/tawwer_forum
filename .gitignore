@@ -18,3 +18,5 @@ login/sso.php
 *.log
 utils/mustacher/vendor/*
 vendor/
+node_modules/
+bower_components/

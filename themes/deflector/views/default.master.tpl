@@ -58,7 +58,7 @@
 
     <footer class="site-footer" role="contentinfo">
       <div class="container">
-        <p class="pull-left">{t c="Copyright"} &copy; {$smarty.now|date:"%Y"} <a href="{link path="home"}">{logo}</a>. {t c="All rights reserved"}.</p>
+        <p class="pull-left">{t c="Copyright"} &copy; {$smarty.now|date:"%Y"}. {t c="All rights reserved"}.</p>
         <p class="pull-right">{t c="Powered by"} <a href="http://vanillaforums.com">Vanilla Forums</a></p>
       </div>
     </footer>

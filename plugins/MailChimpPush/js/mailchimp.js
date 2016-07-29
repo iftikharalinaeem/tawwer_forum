@@ -1,17 +1,13 @@
 jQuery(document).ready(function($) {
    
    
-   $('.MailChimpSync').on('click', '#MailChimp-Synchronize', function(e){
-      
+   $('.MailChimpSync').on('click', '#MailChimp-Synchronize', function(e) {
       // Start processing users
       process(0);
-      
    });
    
    /**
     * Reveal progress bar
-    * 
-    * @returns {undefined}
     */
    var progressBar = function() {
       $('.Synchronization').css('display', 'block');
@@ -21,15 +17,15 @@ jQuery(document).ready(function($) {
    /**
     * Update progress bar
     * 
-    * @param {type} syncprogress
-    * @returns {undefined}
+    * @param {object} data - Data object returned from ajax call
+    * @returns {bool}
     */
    var progress = function(data) {
       progressBar();
+
       var auto = true;
       var rerun = false;
       var reseterrors = true;
-      
       // Clear mode
       if (data == undefined) {
          data = {
@@ -41,7 +37,7 @@ jQuery(document).ready(function($) {
          
          auto = false;
       }
-      
+
       var isError = data.hasOwnProperty('Error');
       var isError = (isError || isNaN(data.Progress));
       
@@ -78,22 +74,19 @@ jQuery(document).ready(function($) {
          $('.Synchronization .SyncProgress').css('width', data.Progress+'%');
          $('.Synchronization .SyncProgress').html('<span>'+data.Progress+'%</span>');
          $('.Synchronization').removeClass('Error');
-         
-         if (data.hasOwnProperty('ETAMinutes'))
-            $('.Synchronization .SyncProgressTitle span').html(data.ETAMinutes+' minutes left');
-         
+
          // Check for rerun
          if (auto) {
-            if (data.Progress < 100)
+            if (data.Progress <= 100) {
                rerun = true;
-            else
+            } else {
                finish(true);
+            }
          
             // Reset errors on success
             if (reseterrors)
                $('.Synchronization .SyncProgress').data('errors', 0);
          }
-         
       }
       
       
@@ -102,17 +95,20 @@ jQuery(document).ready(function($) {
          var waitTime = isError ? 5000 : 50;
          setTimeout(process, waitTime);
       }
-      
+
       if (!rerun && isError)
          finish(false);
    }
-   
+
+   /**
+    * Send data to MailChimp in batches, track the progress.
+    */
    var process = function() {
       $('.MailChimpSync #MailChimp-Synchronize').prop('disabled', 'disabled');
       
       // Start at 0
-      var offset = $('.Synchronization .SyncProgress').data('offset');
-      var url = '/plugin/mailchimp/sync';
+      var offset = $('.Synchronization .SyncProgress').data('offset') || 0;
+      var url = $('#Form_SyncURL').val();
       var syncListID = $('.MailChimpSync #Form_SyncListID').val();
       var syncConfirmJoin = $('.MailChimpSync #Form_SyncConfirmJoin').prop('checked') ? 1 : 0;
       var syncBanned = $('.MailChimpSync #Form_SyncBanned').prop('checked') ? 1 : 0;
@@ -129,11 +125,11 @@ jQuery(document).ready(function($) {
             SyncDeleted: syncDeleted
          };
          
-      if (syncUnconfirmed != undefined)
+      if (syncUnconfirmed != undefined) {
          send.SyncUnconfirmed = syncUnconfirmed;
-      
+      }
+
       // AJAX
-      progress();
       $.ajax({
          url: url,
          type: 'POST',
@@ -141,7 +137,7 @@ jQuery(document).ready(function($) {
          success: function(data) {
             var syncprogress = data.Progress;
             var syncoffset = data.Offset;
-            
+            var status = data.Status;
             // Some kind of error
             if (syncprogress == undefined) {
                if (!data.Error) {
@@ -154,7 +150,7 @@ jQuery(document).ready(function($) {
                if (isNaN(syncprogress))
                   data.Error = syncprogress;
             }
-            
+
             progress(data);
          },
          error: function(xhr) {
@@ -167,16 +163,29 @@ jQuery(document).ready(function($) {
       });
       
    };
-   
+
+   /**
+    * Once the batches have been transfered show success status.
+    * @param {object} success - Success object returned from ajax call.
+    */
    var finish = function(success) {
       $('.Synchronization').addClass('Finished');
       if (success) {
          $('.Synchronization .SyncProgress').css('width', '100%');
          $('.Synchronization').removeClass('Error');
-         $('.Synchronization .SyncProgress').html("Completed");
-      } 
-      
+         $('.Synchronization .SyncProgress').html('Completed');
+         setTimeout(reset, 3000);
+      }
       $('.MailChimpSync #MailChimp-Synchronize').prop('disabled', '');
    }
-   
+
+   /**
+    * Remove the progress bar and add a warning message that informs users that the batch process has been uploaded but
+    * has not necessarily been processed on MailChimp
+    */
+   var reset = function() {
+      $('.Synchronization').css('display', 'none');
+      var successMessage = gdn.getMeta('MailChimpUploadSuccessMessage', 'MailChimp will now process the list you have uploaded. Check your MailChimp Dashboard later.');
+      $('#SychronizationMessages').removeClass('Info').addClass('Warning').html(successMessage);
+   }
 });
