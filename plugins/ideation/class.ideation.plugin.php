@@ -641,7 +641,7 @@ EOT
 
         $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $Discussion));
 
-        // Both '' and 'Discussion' denote a discussion type of discussion.
+        // We're only allowing conversion between idea and discussion.  If it isn't an idea, make it a discussion.
         if (val('Type', $Discussion) !== 'Idea') {
             setValue('Type', $Discussion, 'Discussion');
         }
