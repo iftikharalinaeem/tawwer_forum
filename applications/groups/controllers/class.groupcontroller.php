@@ -71,6 +71,10 @@ class GroupController extends Gdn_Controller {
       $this->AllowJSONP(TRUE);
 
       $Group = $this->GroupModel->GetID($ID);
+
+      $this->EventArguments['Group'] = &$Group;
+      $this->fireEvent('GroupLoaded');
+
       if (!$Group)
          throw NotFoundException('Group');
 
