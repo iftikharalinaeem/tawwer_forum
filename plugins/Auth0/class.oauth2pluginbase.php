@@ -346,7 +346,7 @@ class OAuth2PluginBase {
 
             $form->setFormValue('AuthenticationKey', $this->getProviderKey());
             $form->setFormValue('SignInUrl', '...'); // kludge for default provider
-            
+
             //Make sure we store a complete url.
             if (preg_match("#https://#", $form->getValue("BaseUrl")) === 0) {
                 $form->setFormValue("BaseUrl", 'https://'. str_replace("http://", "", $form->getValue("BaseUrl")));
@@ -420,8 +420,8 @@ class OAuth2PluginBase {
         );
         $form->setFormValue('Attributes', $attributes);
 
-        $this->EventArguments['Profile'] = $profile;
-        $this->EventArguments['Form'] = $form;
+        $sender->EventArguments['Profile'] = $profile;
+        $sender->EventArguments['Form'] = $form;
 
         $this->log('Base Connect Data Before OAuth Event', array('profile' => $profile, 'form' => $form));
         // Throw an event so that other plugins can add/remove stuff from the basic sso.
