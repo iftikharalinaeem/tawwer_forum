@@ -128,7 +128,10 @@ class SubcommunityModel extends Gdn_Model {
 
         $altPath = $path;
         if (Gdn_Theme::inSection('CategoryList')) {
-            if ($category) {
+            // If this category is the root category for the current site, don't translate the path.
+            if (Gdn::controller()->data('Category.CategoryID') == val('CategoryID', $currentSite)) {
+                $altPath = '';
+            } elseif ($category) {
                 $altPath = ltrim(categoryUrl($category, '', '/'), '/');
             }
         } elseif (Gdn_Theme::inSection('DiscussionList')) {
