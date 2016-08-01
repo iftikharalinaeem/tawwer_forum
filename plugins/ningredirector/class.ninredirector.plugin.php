@@ -22,7 +22,7 @@ $PluginInfo['ningredirector'] = [
  */
 class NingRedirectorPlugin extends Gdn_Plugin {
     /**
-     *
+     * Catch the NotFound error and try to redirect!
      */
     public function gdn_dispatcher_notFound_handler() {
         $path = Gdn::request()->path();
@@ -86,7 +86,7 @@ class NingRedirectorPlugin extends Gdn_Plugin {
         }
 
         if ($urlData) {
-            $this->handleURLData($urlData);
+            $this->redirectRequest($urlData);
         }
     }
 
@@ -104,10 +104,10 @@ class NingRedirectorPlugin extends Gdn_Plugin {
     }
 
     /*
-     * Treat "user not found" as "dispatcher didn't find correct route"
-     * Needed for ning since they use /profile/NAME
+     * Treat "group not found" as "dispatcher didn't find correct route"
+     * Needed for ning since they use /group/NAME
      *
-     * @param ProfileController $sender Sending controller instance.
+     * @param GroupController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
     public function groupController_groupLoaded_handler($sender, $args) {
@@ -117,9 +117,11 @@ class NingRedirectorPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Determine the correct URL to redirect the request to, from the supplied data.
      *
+     * @param $urlData Data containing the IDs or URLCode used to find the correct route.
      */
-    public function handleURLData($urlData) {
+    public function redirectRequest($urlData) {
         $destinationURL = false;
 
         if (isset($urlData['CommentID'])) {
@@ -215,7 +217,7 @@ class NingRedirectorPlugin extends Gdn_Plugin {
     /**
      * Split a Ning's ID string into its components
      *
-     * @param $value
+     * @param $value int:string:int
      * @return array [ParentID, IDType, ID]
      */
     protected function ningIDSplitter($value) {
@@ -230,14 +232,14 @@ class NingRedirectorPlugin extends Gdn_Plugin {
     /**
      * Get ID value from a Ning's ID string.
      *
-     * @param $value
+     * @param $value int:string:int
      * @return mixed
      */
     protected function ningIDFilter($value) {
         return $this->ningIDSplitter($value)['Id'];
     }
 
-        /**
+    /**
      * Return the page number from the given variables that may have an offset or a page.
      *
      * @param array $vars The variables that should contain an Offset or Page key.
