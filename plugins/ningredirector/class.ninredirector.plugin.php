@@ -121,7 +121,7 @@ class NingRedirectorPlugin extends Gdn_Plugin {
      *
      * @param $urlData Data containing the IDs or URLCode used to find the correct route.
      */
-    public function redirectRequest($urlData) {
+    protected function redirectRequest($urlData) {
         $destinationURL = false;
 
         if (isset($urlData['CommentID'])) {
