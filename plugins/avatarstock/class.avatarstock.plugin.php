@@ -388,12 +388,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
      *
      * @throws Exception User cannot edit photos.
      */
-    public function profileController_picture_create(
-        $sender,
-        $UserReference = '',
-        $Username = '',
-        $UserID = ''
-    ) {
+    public function profileController_picture_create($sender, $UserReference = '', $Username = '', $UserID = '') {
         if (!C('Garden.Profile.EditPhotos', true)) {
             throw ForbiddenException('@Editing user photos has been disabled.');
         }
@@ -515,18 +510,18 @@ class AvatarStockPlugin extends Gdn_Plugin {
             }
 
             // If there were no problems, redirect back to the user account
-            if ($sender->Form->ErrorCount() == 0) {
-                $sender->InformMessage(
-                    Sprite('Check', 'InformSprite') . T(
-                        'Your changes have been saved.'
-                    ),
+            if ($sender->Form->errorCount() === 0) {
+                $sender->informMessage(
+                    sprite('Check', 'InformSprite').t('Your changes have been saved.'),
                     'Dismissable AutoDismiss HasSprite'
                 );
-                Redirect(
-                    $sender->DeliveryType() == DELIVERY_TYPE_VIEW ? UserUrl(
-                        $sender->User
-                    ) : UserUrl($sender->User, '', 'picture')
-                );
+
+                // If there were no problems, redirect back to the user account
+                if ($sender->deliveryType() === DELIVERY_TYPE_VIEW) {
+                    $sender->RedirectUrl = userUrl($sender->User);
+                } else {
+                    $sender->RedirectUrl = userUrl($sender->User, '', 'picture');
+                }
             }
         }
 
