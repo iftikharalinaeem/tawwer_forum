@@ -52,6 +52,26 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Recursively adjust the depth of a category tree.
+     *
+     * @param array $tree
+     * @param int $offset
+     */
+    protected static function adjustTreeDepth(&$tree, $offset = 0) {
+        if (!is_array($tree)) {
+            return;
+        }
+
+        foreach ($tree as &$category) {
+            setValue('Depth', $category, val('Depth', $category) + $offset);
+
+            if (!empty($category['Children'])) {
+                static::adjustTreeDepth($category['Children'], $offset);
+            }
+        }
+    }
+
+    /**
      * Get the category IDs for the current subcommunity.
      *
      * @return array Returns an array of category IDs
@@ -218,16 +238,11 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             return;
         }
 
-        $category = $sender->data('Category');
-        $categories = $sender->data('CategoryTree');
-        if (empty($category) || empty($categories)) {
+        if (empty($sender->Data['Category']) || empty($sender->Data['CategoryTree'])) {
             return;
         }
 
-        $adjust = -$sender->data('Category.Depth');
-        foreach ($categories as &$category) {
-            setValue('Depth', $category, val('Depth', $category) + $adjust);
-        }
+        self::adjustTreeDepth($sender->Data['CategoryTree'], -$sender->data('Category.Depth'));
 
         // We add the Depth of the root Category to the MaxDisplayDepth before rendering the categories page.
         // This resets it so the rendering respects the MaxDisplayDepth.
