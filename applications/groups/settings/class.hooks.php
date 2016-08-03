@@ -2,9 +2,16 @@
 
 class GroupsHooks extends Gdn_Plugin {
    /**
-    * Run structure & default badges.
+    * Setup routine for when the application is enabled.
     */
-   public function Setup() {
+    public function setup() {
+        $this->structure();
+    }
+
+    /**
+     * Run structure & default badges.
+     */
+   public function structure() {
       include(dirname(__FILE__).'/structure.php');
    }
 
