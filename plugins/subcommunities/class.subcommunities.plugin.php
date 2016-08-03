@@ -214,16 +214,18 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param CategoriesController $sender
      */
     public function categoriesController_render_before($sender) {
-        if (!SubCommunityModel::getCurrent()) {
+        if (!SubcommunityModel::getCurrent()) {
             return;
         }
 
-        if (empty($sender->Data['Category']) || empty($sender->Data['Categories'])) {
+        $category = $sender->data('Category');
+        $categories = $sender->data('CategoryTree');
+        if (empty($category) || empty($categories)) {
             return;
         }
 
         $adjust = -$sender->data('Category.Depth');
-        foreach ($sender->Data['Categories'] as &$category) {
+        foreach ($categories as &$category) {
             setValue('Depth', $category, val('Depth', $category) + $adjust);
         }
 
