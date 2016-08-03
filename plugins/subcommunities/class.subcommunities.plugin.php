@@ -159,7 +159,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         // Set alternative urls.
         $domain = Gdn::request()->urlDomain();
         foreach (SubcommunityModel::all() as $site) {
-            if (!$site['AlternatePath']) {
+            if (!val('AlternatePath', $site)) {
                 continue;
             }
             $url = "$domain/{$site['Folder']}{$site['AlternatePath']}";
@@ -230,22 +230,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         // We add the Depth of the root Category to the MaxDisplayDepth before rendering the categories page.
         // This resets it so the rendering respects the MaxDisplayDepth.
         $sender->setData('Category.Depth', 0);
-    }
-
-    /**
-     * Make sure the discussions controller is filtering by subcommunity.
-     *
-     * @param DiscussionsController $sender
-     * @param array $args
-     */
-    public function discussionsController_index_before($sender, $args) {
-        if (!SubCommunityModel::getCurrent()) {
-            return;
-        }
-
-        // Get all of the category IDs associated with the subcommunity.
-        $categoryIDs = $this->getCategoryIDs();
-        $sender->setCategoryIDs($categoryIDs);
     }
 
     /**
@@ -384,16 +368,20 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * Hook on CategoryModel's CategoryWatch event.
      *
      * Used to filter down the categories used in the normal search.
+     * Also filter down discussions controller categories.
      *
-     * @param $sender Sending controller instance.
-     * @param $args Event arguments.
+     * @param CategoryModel $sender Sending controller instance.
+     * @param array $args Event arguments.
      */
-    public function gdn_pluginManager_categoryWatch_handler($sender, $args) {
+    public function categoryModel_categoryWatch_handler($sender, $args) {
         if (!SubCommunityModel::getCurrent()) {
             return;
         }
 
-        $args['CategoryIDs'] = $this->getCategoryIDs();
+        $watchedCategoryIDs = $args['CategoryIDs'];
+        $subcommunityCategoryIDs = $this->getCategoryIDs();
+
+        $args['CategoryIDs'] = array_intersect($subcommunityCategoryIDs, $watchedCategoryIDs);
     }
 
     /**
