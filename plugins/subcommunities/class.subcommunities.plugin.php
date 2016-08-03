@@ -54,8 +54,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     /**
      * Recursively adjust the depth of a category tree.
      *
-     * @param array $tree
-     * @param int $offset
+     * @param array $tree The current category tree.
+     * @param int $offset An offset, positive or negative, to add to each category's depth attribute.
      */
     protected static function adjustTreeDepth(&$tree, $offset = 0) {
         if (!is_array($tree)) {
