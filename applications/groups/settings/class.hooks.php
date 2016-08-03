@@ -641,4 +641,24 @@ class GroupsHooks extends Gdn_Plugin {
         }
 
     }
+
+    /**
+     * Hook in before VanillaSettingsController renders any output.
+     *
+     * @param VanillaSettingsController $sender
+     * @param array $args
+     */
+    public function vanillaSettingsController_render_before($sender, $args) {
+        $requestMethod = strtolower(val('RequestMethod', $sender));
+
+        switch ($requestMethod) {
+            case 'index':
+            case 'managecategories':
+                foreach ($sender->Data['CategoryData'] as &$category) {
+                    if (val('AllowGroups', $category)) {
+                        setValue('CanDelete', $category, 0);
+                    }
+                }
+        }
+    }
 }
