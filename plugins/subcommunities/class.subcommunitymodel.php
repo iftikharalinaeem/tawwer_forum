@@ -32,56 +32,6 @@ class SubcommunityModel extends Gdn_Model {
         $this->Validation->applyRule('Folder', 'Folder', '%s must be a valid folder name.');
     }
 
-    public static function addAlternativeUrls() {
-        static::all();
-        $sites =& static::$all;
-
-        $currentSite = static::getCurrent();
-        $currentFolder = $currentSite['Folder'];
-        $path = trim(Gdn::request()->path(), '/');
-
-        // Strip the current folder off of the category code.
-        if ($baseCategoryCode = Gdn::controller()->data('Category.UrlCode')) {
-            $baseCategoryCode = stringBeginsWith($baseCategoryCode, "$currentFolder-", true, true);
-            $baseCategoryCode = stringEndsWith($baseCategoryCode, "-$currentFolder", true, true);
-        }
-
-        foreach ($sites as &$site) {
-            $folder = $site['Folder'];
-
-            if (!$path || $folder === $currentFolder || $currentSite['CategoryID'] == $site['CategoryID']) {
-                $site['AlternatePath'] = rtrim("/$path", '/');
-                $site['AlternateUrl'] = Gdn::request()->urlDomain('//')."/$folder/$path";
-                continue;
-            }
-
-            // Try and find an appropriate alternative category.
-            if (!($category = CategoryModel::categories("$folder-$baseCategoryCode"))) {
-                $category = CategoryModel::categories("$baseCategoryCode-$folder");
-            }
-
-            $altPath = $path;
-            if (Gdn_Theme::inSection('CategoryList')) {
-                if ($category) {
-                    $altPath = ltrim(categoryUrl($category, '', '/'), '/');
-                }
-            } elseif (Gdn_Theme::inSection('DiscussionList')) {
-                if ($category) {
-                    $altPath = ltrim(categoryUrl($category, '', '/'), '/');
-                } elseif (stringBeginsWith($path, 'discussions')) {
-                    $altPath = "discussions";
-                } else {
-                    $altPath = '';
-                }
-            } elseif (Gdn_Theme::inSection('Discussion')) {
-                $altPath = '';
-            }
-
-            $site['AlternatePath'] = rtrim("/$altPath", '/');
-            $site['AlternateUrl'] = rtrim(Gdn::request()->urlDomain('//')."/$folder/$altPath", '/');
-        }
-    }
-
     /**
      * Get an array of all multisites indexed by folder.
      */

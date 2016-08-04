@@ -151,29 +151,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         ];
     }
 
-    public function base_render_before($sender) {
-        if (!SubCommunityModel::getCurrent()) {
-            return;
-        }
-
-        // Set alternative urls.
-        $domain = Gdn::request()->urlDomain();
-        foreach (SubcommunityModel::all() as $site) {
-            if (!val('AlternatePath', $site)) {
-                continue;
-            }
-            $url = "$domain/{$site['Folder']}{$site['AlternatePath']}";
-            $sender->Head->addTag(
-                'link',
-                [
-                    'rel' => 'alternate',
-                    'href' => $url,
-                    'hreflang' => str_replace('_', '-', $site['Locale']),
-                    HeadModule::SORT_KEY => 1000
-                ]);
-        }
-    }
-
     public function base_getAppSettingsMenuItems_handler($sender) {
         /* @var SideMenuModule */
         $menu = $sender->EventArguments['SideMenu'];
