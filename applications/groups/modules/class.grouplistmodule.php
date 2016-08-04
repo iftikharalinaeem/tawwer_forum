@@ -174,7 +174,7 @@ class GroupListModule extends Gdn_Module {
             if (val('NoComment', $group)) {
                 $this->lastPostType = 'Discussion';
             }
-            $item['meta']['lastDiscussion']['text'] = t('Most recent discussion:') . ' ';
+            $item['meta']['lastDiscussion']['text'] = sprintf(t('%s: %s'), t('Most recent discussion'), ' ');
             $item['meta']['lastDiscussion']['linkText'] = htmlspecialchars(sliceString(Gdn_Format::text(val('LastTitle', $group)), 100));
             $item['meta']['lastDiscussion']['url'] = url(val('LastUrl', $group));
             $item['meta']['lastUser']['text'] = t('by') . ' ';
