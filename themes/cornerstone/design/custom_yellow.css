@@ -216,8 +216,7 @@ body {
 a {
   color: #ffdc00;
   text-decoration: none;
-  -webkit-transition: color 150ms, background-color 150ms, border-color 150ms;
-          transition: color 150ms, background-color 150ms, border-color 150ms;
+  transition: color 150ms, background-color 150ms, border-color 150ms;
 }
 a:hover,
 a:focus {
@@ -416,8 +415,7 @@ textarea.TextBox:focus {
   font-weight: 500;
   line-height: 20px;
   border-radius: 2px;
-  -webkit-transition: color 150ms, background-color 150ms, border-color 150ms;
-          transition: color 150ms, background-color 150ms, border-color 150ms;
+  transition: color 150ms, background-color 150ms, border-color 150ms;
   -webkit-font-smoothing: inherit;
   color: #808080;
   background-color: #fafafa;
@@ -889,8 +887,7 @@ a.Bookmarked:hover:before {
 }
 .navbar-search input[type="text"] {
   width: 200px;
-  -webkit-transition: width 150ms;
-          transition: width 150ms;
+  transition: width 150ms;
 }
 .navbar-search input[type="text"]:focus {
   width: 240px;
@@ -961,8 +958,7 @@ a.Bookmarked:hover:before {
   border-style: solid;
   border-width: 1.5em 0 1.5em 1em;
   content: " ";
-  -webkit-transition: border-color 150ms;
-          transition: border-color 150ms;
+  transition: border-color 150ms;
 }
 .trail a,
 .trail span {
@@ -1335,8 +1331,4 @@ a.Bookmarked:hover:before {
   border: #d5d5d5 solid 1px;
   border-radius: 1px;
   box-shadow: 0 0 0 3px #eeeeee;
-}
-.CategoryList .Depth1,
-.CategoryList .Depth2 {
-  padding-left: 15px !important;
 }
