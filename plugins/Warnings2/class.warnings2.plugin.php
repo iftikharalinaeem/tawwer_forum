@@ -8,13 +8,15 @@
 // Define the plugin:
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
-    'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.4.3',
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
+    'Description' => 'Allows moderators to warn users and add private notes to profiles to help police the community.',
+    'Version' => '2.5',
+    'RequiredApplications' => ['Vanilla' => '2.1a'],
+    'MobileFriendly' => true,
+    'SettingsUrl' => '/settings/warnings',
+    'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'MobileFriendly' => true,
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
 );
 
 /**
@@ -66,6 +68,47 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Add a link to the dashboard menu.
+     *
+     * @param object $sender Sending controller instance.
+     */
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        $menu = &$sender->EventArguments['SideMenu'];
+        $menu->addLink('Add-ons', t('Warnings & Notes'), 'settings/warnings', 'Garden.Settings.Manage');
+    }
+
+    /**
+     * Create a new endpoint on the SettingsController.
+     *
+     * @param SettingsController $sender Sending controller instance.
+     */
+    public function settingsController_warnings_create($sender) {
+        // Prevent non-admins from accessing this page
+        $sender->permission('Garden.Settings.Manage');
+
+        $sender->title(sprintf(t('%s Settings'), t('Warnings & Notes')));
+        $sender->addSideMenu('settings/warnings');
+
+        $sender->setData('PluginDescription', $this->getPluginKey('Description'));
+
+        $sender->Form = new Gdn_Form();
+
+        $warningTypeModel = new WarningTypeModel();
+        $formData = $warningTypeModel->getFormData();
+        $sender->Form->setModel($warningTypeModel, $formData);
+
+        $sender->setData('Warnings', $warningTypeModel->getAll());
+
+        // If we are not seeing the form for the first time
+        if ($sender->Form->authenticatedPostBack() !== false) {
+            if ($sender->Form->save() !== false) {
+                $sender->informMessage(t('Your changes have been saved.'));
+            }
+        }
+
+        $sender->render($sender->fetchViewLocation('settings', '', 'plugins/Warnings2'));
+    }
     /**
      * Return the HTML for a warning reaction button.
      *
