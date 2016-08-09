@@ -168,7 +168,7 @@ class CustomThemePlugin extends Gdn_Plugin {
         }
         // Make sure the current theme uses a smarty master template instead of php
         $themeRoot = PATH_THEMES . '/' . val('Folder', $themeInfo, '');
-        return $themeInfo['Index'] == 'default' || !file_exists($themeRoot . '/views/default.master.php');
+        return val('Index', $themeInfo) === 'default' || !file_exists($themeRoot . '/views/default.master.php');
     }
 
     /**
