@@ -84,16 +84,6 @@ class BadgesAppController extends Gdn_Controller {
      */
     public function addSideMenu($CurrentUrl) {
         Gdn_Theme::section('Dashboard');
-        // Only add to the assets if this is not a view-only request
-        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            $sideMenu = new SideMenuModule($this);
-            $navAdapter = new NestedCollectionAdapter($nav);
-            $this->EventArguments['SideMenu'] = $navAdapter;
-            $this->fireEvent('GetAppSettingsMenuItems');
-
-            // Add the module
-            $this->addModule($nav, 'Panel');
-        }
     }
 
     /**
