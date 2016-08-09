@@ -118,9 +118,17 @@
    <ul class="MailingList">
       <li><?php
          echo $this->Form->label("Mailing List", "ListID");
-         echo $this->Form->dropDown('ListID', $this->data('Lists'), array('IncludeNull' => TRUE));
+         echo $this->Form->dropDown('ListID', $this->data('Lists'), array('IncludeNull' => true));
       ?></li>
-      
+      <?php
+         $interests = $this->data('Interests');
+         foreach ($interests as $list => $interest) {
+            echo "<li id='InterestDropdown{$list}' class='InterestDropdowns'>";
+            echo $this->Form->label("Interest", "InterestID");
+            echo $this->Form->dropDown('InterestID['.$list.']', $interest, array('IncludeNull' => true, 'disabled' => true, 'Value' => $this->Form->getValue('InterestID')));
+            echo "</li>";
+         }
+      ?>
       <li><?php
          echo $this->Form->checkBox('ConfirmJoin', 'Send confirmation email?');
       ?></li>
@@ -155,6 +163,14 @@
          echo $this->Sync->label("Sync to List", "SyncListID");
          echo $this->Sync->dropDown('SyncListID', $this->data('Lists'), array('IncludeNull' => true));
       ?></li>
+      <?php
+      foreach ($interests as $list => $interest) {
+         echo "<li id='SyncInterestDropdown{$list}' class='SyncInterestDropdowns'>";
+         echo $this->Sync->label('Interest', 'SyncInterestID'.$list);
+         echo $this->Sync->dropDown('SyncInterestID['.$list.']', $interest, array('IncludeNull' => true, 'disabled' => true));
+         echo "</li>";
+      }
+      ?>
       <li><?php
          echo $this->Sync->checkBox('SyncConfirmJoin', 'Send confirmation email?');
       ?></li>

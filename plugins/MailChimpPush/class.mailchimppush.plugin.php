@@ -26,7 +26,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     protected $MCAPI = null;
     protected $provider = null;
 
-    protected static $settings = array('ListID', 'ConfirmJoin');
+    protected static $settings = array('ListID', 'ConfirmJoin', 'InterestID');
 
     const PROVIDER_KEY = 'MailChimpAPI';
     const PROVIDER_ALIAS = 'mcapi';
@@ -84,13 +84,14 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
         $originalEmail = val('Email', $sender->EventArguments['User'], null);
 
-        $listID = val('ListID', $this->provider(), null);
+        $listID = val('ListID', $this->provider());
+        $interestID = val('InterestID', $this->provider());
         if (empty($originalEmail)) {
             // Post update to Chimp List
-            $this->add($listID, $suppliedEmail, null, (array)$sender->EventArguments['User']);
+            $this->add($listID, $suppliedEmail, ['InterestID' => $interestID]);
         } elseif ($originalEmail != $suppliedEmail) {
             // Post update to Chimp List
-            $this->update($listID, $originalEmail, $suppliedEmail, null, (array)$sender->EventArguments['User']);
+            $this->update($listID, $originalEmail, $suppliedEmail, ['InterestID' => $interestID]);
         }
     }
 
@@ -115,7 +116,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             $email = val('Email', $user, null);
 
             // Add the email to the given MailChimp list.
-            $this->add($listID, $email, null, (array)$user);
+            $this->add($listID, $email, ['InterestID' => val('InterestID', $this->provider())]);
         }
     }
 
@@ -124,6 +125,8 @@ class MailChimpPushPlugin extends Gdn_Plugin {
      *
      * @param string $listID.
      * @param string $email.
+     * @param array $options.
+     * @return string (json) response from MailChimp after batch adding emails.
      */
     public function add($listID, $email, $options = null) {
         if (!$listID) {
@@ -137,6 +140,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         // Configure subscription
         $defaults = array(
             'ConfirmJoin'     => val('ConfirmJoin', $this->provider(), false),
+            'InterestID'     => val('InterestID', $this->provider(), false),
             'Format'          => 'html'
         );
         $options = (array)$options;
@@ -149,11 +153,11 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
         $emails = array();
         foreach ($email as $emailAddress) {
-            $emails[] = array('EMAIL' => $emailAddress, 'EMAIL_TYPE' => $options['Format']);
+            $emails[] = array('EMAIL' => $emailAddress, 'EMAIL_TYPE' => $options['Format'], 'DoubleOptIn' => $options['ConfirmJoin'], 'InterestID' => $options['InterestID']);
         }
 
         // Send request
-        return $this->MCAPI()->listBatchSubscribe($listID, $emails, $options['ConfirmJoin'], true);
+        return $this->MCAPI()->listBatchSubscribe($listID, $emails);
     }
 
     /**
@@ -169,6 +173,15 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     public function update($defaultListID, $email, $newEmail, $options = null) {
         $lists = $this->MCAPI()->lists();
         $allLists = array_keys($lists);
+
+        // Configure subscription
+        $defaults = array(
+            'ConfirmJoin'     => false,
+            'Format'          => 'html'
+        );
+        $options = (array)$options;
+        $options = array_merge($defaults, $options);
+
         $updated = false;
         foreach ($allLists as $listID) {
             // Lookup member
@@ -176,14 +189,6 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             $memberInfo = $this->MCAPI()->toArray($memberInfo);
 
             if ($memberInfo['status'] === 'subscribed') {
-                // Configure subscription
-                $defaults = array(
-                    'ConfirmJoin'     => false,
-                    'Format'          => 'html'
-                );
-                $options = (array)$options;
-                $options = array_merge($defaults, $options);
-
                 // Update existing user
                 $this->MCAPI()->listUpdateAddress(
                     $listID,
@@ -279,10 +284,18 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             }
 
             // Update settings?
-
             foreach (self::$settings as $setting) {
                 $suppliedSettingValue = $sender->Form->getValue($setting);
-                if ($suppliedSettingValue != $settingValues[$setting]) {
+                if (is_array($suppliedSettingValue)) {
+                    $suppliedSettingValues = array_values($suppliedSettingValue);
+                    foreach ($suppliedSettingValues as $value) {
+                        if ($value != $settingValues[$setting]) {
+                            $modified = true;
+                            $this->setUserMeta(0, $setting, $value);
+                            $provider[$setting] = $value;
+                        }
+                    }
+                } elseif ($suppliedSettingValue != $settingValues[$setting]) {
                     $modified = true;
                     $this->setUserMeta(0, $setting, $suppliedSettingValue);
                     $provider[$setting] = $suppliedSettingValue;
@@ -301,6 +314,21 @@ class MailChimpPushPlugin extends Gdn_Plugin {
                 $sender->setData('Configured', true);
                 $allLists = $this->MCAPI()->lists();
                 $sender->setData('Lists', $allLists);
+
+                // Get all the interest categories (Groups) attached to each list from MailChimp
+                $listIDs = array_keys($allLists);
+                $interests = [];
+                foreach ($listIDs as $list) {
+                    $interestCategories = $this->MCAPI()->listInterestCategories($list);
+                    $interestList = [];
+                    if ($interestCategories) {
+                        foreach ($interestCategories as $categoryID) {
+                            $interestList = array_merge($interestList, $this->MCAPI()->listInterest($list, $categoryID));
+                        }
+                        $interests[$list] = $interestList;
+                    }
+                }
+                $sender->setData('Interests', $interests);
             } else {
                 $sender->Form->addError('Bad API Key');
             }
@@ -389,7 +417,9 @@ class MailChimpPushPlugin extends Gdn_Plugin {
                 /* @var $SyncListID passed in $options array */
                 $response = [];
                 if (count($emails)) {
-                    $response = $this->add($SyncListID, $emails, array('ConfirmJoin'  => (bool)$SyncConfirmJoin));
+                    $interestID = Gdn::request()->getValue('SyncInterestID');
+                    $options = ['ConfirmJoin'  => (bool)$SyncConfirmJoin, 'InterestID' => $interestID];
+                    $response = $this->add($SyncListID, $emails, $options);
                 }
 
                 $response = $this->MCAPI()->toArray($response);

@@ -1,5 +1,30 @@
 jQuery(document).ready(function($) {
-   
+   var showInterestOptions = function () {
+      var activeList = $('#Form_ListID').val();
+      $(".InterestDropdowns select").prop('disabled', true);
+      $(".InterestDropdowns").addClass("Hidden");
+      $("#Form_InterestID"+activeList).prop('disabled', false);
+      $("#InterestDropdown"+activeList).removeClass("Hidden");
+   }
+
+   var showSyncInterestOptions = function () {
+      var activeList = $('#Form_SyncListID').val();
+      $(".SyncInterestDropdowns select").prop('disabled', true);
+      $(".SyncInterestDropdowns").addClass("Hidden");
+      $("#Form_SyncInterestID"+activeList).prop('disabled', false);
+      $("#SyncInterestDropdown"+activeList).removeClass("Hidden");
+   }
+
+   showInterestOptions();
+   showSyncInterestOptions();
+
+   $('#Form_ListID').on('change', this, function(e){
+      showInterestOptions();
+   });
+
+   $('#Form_SyncListID').on('change', this, function(e){
+      showSyncInterestOptions();
+   });
    
    $('.MailChimpSync').on('click', '#MailChimp-Synchronize', function(e) {
       // Start processing users
@@ -114,6 +139,7 @@ jQuery(document).ready(function($) {
       var syncBanned = $('.MailChimpSync #Form_SyncBanned').prop('checked') ? 1 : 0;
       var syncDeleted = $('.MailChimpSync #Form_SyncDeleted').prop('checked') ? 1 : 0;
       var syncUnconfirmed = $('.MailChimpSync #Form_SyncUnconfirmed').prop('checked') ? 1 : 0;
+      var syncInterestID = $('.MailChimpSync #Form_SyncInterestID'+syncListID).val();
       
       var send = {
             Postback: true, 
@@ -122,7 +148,8 @@ jQuery(document).ready(function($) {
             SyncListID: syncListID,
             SyncConfirmJoin: syncConfirmJoin,
             SyncBanned: syncBanned,
-            SyncDeleted: syncDeleted
+            SyncDeleted: syncDeleted,
+            SyncInterestID: syncInterestID
          };
          
       if (syncUnconfirmed != undefined) {

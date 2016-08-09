@@ -94,6 +94,37 @@ class MailChimpWrapper {
     }
 
     /**
+     * Get a list of categoryIDs from MailChimp, used to query the list of interests.
+     *
+     * @param null $list
+     * @return array
+     * @throws Exception
+     */
+    function listInterestCategories($list = null) {
+        $listInterestCategories = $this->callServer('lists/'.$list.'/interest-categories');
+        $listInterestCategories = $this->toArray($listInterestCategories);
+        $categories = val('categories', $listInterestCategories);
+        $categories = Gdn_DataSet::index($categories, 'id');
+        return array_column($categories, 'id');
+    }
+
+    /**
+     * Get a list of interests from MailChimp.
+     *
+     * @param null $list
+     * @param null $category
+     * @return array
+     * @throws Exception
+     */
+    function listInterest($list = null, $category = null) {
+        $listInterest = $this->callServer('lists/'.$list.'/interest-categories/'.$category.'/interests');
+        $listInterest = $this->toArray($listInterest);
+        $interests = val('interests', $listInterest);
+        $interests = Gdn_DataSet::index($interests, 'id');
+        return array_column($interests, 'name', 'id');
+    }
+
+    /**
      * Send an array of emails to be subscribed to a mailing list at MailChimp.
      *
      * @param string $id
@@ -107,10 +138,16 @@ class MailChimpWrapper {
             $emailType = val('EMAIL_TYPE', $userInfo, 'html');
             $email = val('EMAIL', $userInfo);
             $mergeFields = json_encode(['EMAIL_TYPE' => $emailType]);
+            $interestFields = val('InterestID', $userInfo);
+            $interestValues = [];
+            if ($interestFields) {
+                $interestValues = ['interests' => [val('InterestID', $userInfo) => true]];
+            }
+            $bodyValues = ['email_address' => $email, 'status_if_new' => 'subscribed', 'interests' => [val('InterestID', $userInfo) => true]];//+ $interestValues;
             $body['operations'][] = [
                 'method' => 'PUT',
                 'path' => "lists/{$id}/members/".md5(strtolower($email)),
-                'body' => json_encode(['email_address' => $email, 'status_if_new' => 'subscribed']),
+                'body' => json_encode($bodyValues),
                 'merge_fields' => $mergeFields
             ];
         }
@@ -153,7 +190,8 @@ class MailChimpWrapper {
             $addBody = [
                 'email_address' => val('NEW_EMAIL', $email),
                 'status' => 'subscribed',
-                'merge_fields' => $mergeFields
+                'merge_fields' => $mergeFields,
+                'interests' => val('interests', $removed)
             ];
             $addResponse = $this->callServer("lists/{$listID}/members", 'POST', $addBody);
             Logger::event('mailchimp_api', Logger::INFO, 'Update Address', $this->toArray($addResponse));
