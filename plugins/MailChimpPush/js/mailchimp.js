@@ -1,4 +1,11 @@
 jQuery(document).ready(function($) {
+
+   /**
+    * InterestDropdowns are select elements of "interests" that have been
+    * created created on MailChimp. Each list of interests is associated with a list.
+    * When the list is chosen, show the interests select and hide and disable
+    * any other interest selects.
+    */
    var showInterestOptions = function () {
       var activeList = $('#Form_ListID').val();
       $(".InterestDropdowns select").prop('disabled', true);
@@ -7,6 +14,10 @@ jQuery(document).ready(function($) {
       $("#InterestDropdown"+activeList).removeClass("Hidden");
    }
 
+   /**
+    * Show or hide interests select boxes to be to assign interests users being added
+    * to MailChimp in bulk.
+    */
    var showSyncInterestOptions = function () {
       var activeList = $('#Form_SyncListID').val();
       $(".SyncInterestDropdowns select").prop('disabled', true);
@@ -15,13 +26,16 @@ jQuery(document).ready(function($) {
       $("#SyncInterestDropdown"+activeList).removeClass("Hidden");
    }
 
+   // On load, show the active interest select.
    showInterestOptions();
    showSyncInterestOptions();
 
+   // When changing selection of list as the default list for users signing up, present interest choices.
    $('#Form_ListID').on('change', this, function(e){
       showInterestOptions();
    });
 
+   // When changing selection of list where users will be synchronized to on MailChimp, present the interest choices.
    $('#Form_SyncListID').on('change', this, function(e){
       showSyncInterestOptions();
    });

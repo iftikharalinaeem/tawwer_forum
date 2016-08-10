@@ -122,9 +122,12 @@
       ?></li>
       <?php
          $interests = $this->data('Interests');
+         // Create any dropdowns of interests associated with lists, each dropdown is hidden
+         // by javascript unless the list is selected.
          foreach ($interests as $list => $interest) {
             echo "<li id='InterestDropdown{$list}' class='InterestDropdowns'>";
             echo $this->Form->label("Interest", "InterestID");
+            // Disable the interest dropdown by default. Will be activated by javascript if needed.
             echo $this->Form->dropDown('InterestID['.$list.']', $interest, array('IncludeNull' => true, 'disabled' => true, 'Value' => $this->Form->getValue('InterestID')));
             echo "</li>";
          }
@@ -164,9 +167,13 @@
          echo $this->Sync->dropDown('SyncListID', $this->data('Lists'), array('IncludeNull' => true));
       ?></li>
       <?php
+
+      // Create any dropdowns of interests associated with lists, each dropdown is hidden
+      // by javascript unless the list is selected.
       foreach ($interests as $list => $interest) {
          echo "<li id='SyncInterestDropdown{$list}' class='SyncInterestDropdowns'>";
          echo $this->Sync->label('Interest', 'SyncInterestID'.$list);
+         // Disable the sync interest dropdown by default. Will be activated by javascript if needed.
          echo $this->Sync->dropDown('SyncInterestID['.$list.']', $interest, array('IncludeNull' => true, 'disabled' => true));
          echo "</li>";
       }
