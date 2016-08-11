@@ -69,16 +69,6 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     /**
-     * Add a link to the dashboard menu.
-     *
-     * @param object $sender Sending controller instance.
-     */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        $menu = &$sender->EventArguments['SideMenu'];
-        $menu->addLink('Add-ons', t('Warnings & Notes'), 'settings/warnings', 'Garden.Settings.Manage');
-    }
-
-    /**
      * Create a new endpoint on the SettingsController.
      *
      * @param SettingsController $sender Sending controller instance.
