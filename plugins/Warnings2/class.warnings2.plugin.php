@@ -92,20 +92,8 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $sender->setData('PluginDescription', $this->getPluginKey('Description'));
 
-        $sender->Form = new Gdn_Form();
-
         $warningTypeModel = new WarningTypeModel();
-        $formData = $warningTypeModel->getFormData();
-        $sender->Form->setModel($warningTypeModel, $formData);
-
         $sender->setData('Warnings', $warningTypeModel->getAll());
-
-        // If we are not seeing the form for the first time
-        if ($sender->Form->authenticatedPostBack() !== false) {
-            if ($sender->Form->save() !== false) {
-                $sender->informMessage(t('Your changes have been saved.'));
-            }
-        }
 
         $sender->render($sender->fetchViewLocation('settings', '', 'plugins/Warnings2'));
     }

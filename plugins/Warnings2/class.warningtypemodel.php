@@ -43,48 +43,6 @@ class WarningTypeModel extends Gdn_Model {
     }
 
     /**
-     * Take the row like structure and flatten it to be used in a Form.
-     *
-     * @return array The form data.
-     */
-    public function getFormData() {
-        $formData = [];
-
-        foreach ($this->getAll() as $warningTypeID => $warningType) {
-            foreach ($warningType as $fieldName => $fieldValue) {
-                $formData[$warningTypeID.'_'.$fieldName] = $fieldValue;
-            }
-        }
-
-        return $formData;
-    }
-
-    /**
-     * Take the form's data and convert it into a row like structure.
-     *
-     * @param array $formData
-     * @return array
-     */
-    public function convertFormData($formData) {
-        $warningTypesData = [];
-
-        // Keep only what is good
-        $validFormData = $this->getFormData();
-        $formData = array_intersect_key($formData, $validFormData);
-
-        foreach ($formData as $warningTypeIDFieldName => $fieldValue) {
-            $pos = strpos($warningTypeIDFieldName, '_');
-            if ($pos && strlen($warningTypeIDFieldName) > $pos + 1) {
-                $warningTypeID = substr($warningTypeIDFieldName, 0, $pos);
-                $fieldName = substr($warningTypeIDFieldName, $pos + 1);
-                $warningTypesData[$warningTypeID][$fieldName] = $fieldValue;
-            }
-        }
-
-        return $warningTypesData;
-    }
-
-    /**
      * Save data received from a Form.
      *
      * @param array $formPostValues The data to save.
@@ -93,8 +51,6 @@ class WarningTypeModel extends Gdn_Model {
      * @return bool Returns true on success, false otherwise.
      */
     public function save($formPostValues, $settings = false) {
-        $success = true;
-
         $this->Validation->applyRule('Name', 'Required');
         $this->Validation->applyRule('Points', 'Integer');
         $this->Validation->applyRule('Points', 'Required');
@@ -103,9 +59,11 @@ class WarningTypeModel extends Gdn_Model {
         $this->Validation->applyRule('ExpireType', 'Enum');
         $this->Validation->applyRule('ExpireType', 'Required');
 
-        $warningTypesData = $this->convertFormData($formPostValues);
-        foreach ($warningTypesData as $warningTypeID => $warningTypeData) {
-            $success = $success && $this->update($warningTypeData, ['WarningTypeID' => $warningTypeID]);
+        $warningTypeID = val('WarningTypeID', $formPostValues);
+        if ($warningTypeID) {
+            $success = (bool)$this->update($formPostValues, ['WarningTypeID' => $warningTypeID]);
+        } else {
+            $success = $this->insert($formPostValues);
         }
 
         return $success;

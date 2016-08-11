@@ -3,50 +3,57 @@
 <h1><?php echo t($this->Data['Title']); ?></h1>
 
 <div class="Info">
-    <?php echo t('Warning types description', 'Users are banned when they reach a total of 5 (non expired) points.')?>
+    <?php echo t('Warning types description',
+                    'Users are banned when they reach a total of 5 (non expired) points.<br>'
+                    .'Keep in mind that editing the expiration or number of points of a warning type may affect many users.'
+                )
+    ?>
 </div>
 
 <?php
     /* @var SettingsController $this */
-    echo $this->Form->open(['class' => 'RoleTracker Settings', 'enctype' => 'multipart/form-data']);
-    echo $this->Form->errors();
-
-    $durationPeriods = [
-        'hours' => 'hours',
-        'days' => 'days',
-        'weeks' => 'weeks',
-        'months' => 'months',
-    ];
+    echo $this->Form->open(['class' => 'Warnings Settings', 'enctype' => 'multipart/form-data']);
 ?>
-
-<table cellspacing="0" id="WarningsTable">
-    <thead>
-        <tr>
-            <th><?php echo t('Name')?></th>
-            <th><?php echo t('Points')?></th>
-            <th><?php echo t('Expiration')?></th>
-        </tr>
-    </thead>
-    <tbody>
+    <div class="Wrap">
         <?php
-        foreach($this->data('Warnings') as $warningID => $warning) {
-            echo '<tr>';
-            echo    '<td>'.$this->Form->input($warningID.'_Name').'</td>';
-            echo    '<td>'.$this->Form->input($warningID.'_Points').'</td>';
-            echo    '<td>'
-                        .$this->Form->input($warningID.'_ExpireNumber')
-                        .' '
-                        .$this->Form->dropDown(
-                            $warningID.'_ExpireType',
-                            $durationPeriods,
-                            ['Default' => $this->Form->formData()[$warningID.'_ExpireType']]
-                        )
-                    .'</td>';
-            echo "</tr>\n";
-        }
-        ?>
-    </tbody>
-</table>
-<br/>
-<?php echo $this->Form->close('Save');
+            echo $this->Form->errors();
 
+            $durationPeriods = [
+                'hours' => 'hours',
+                'days' => 'days',
+                'weeks' => 'weeks',
+                'months' => 'months',
+            ];
+
+            echo anchor(t('Add warning type'), '/warningtypes/add', 'Popup SmallButton');
+        ?>
+    </div>
+    <table cellspacing="0" id="WarningsTable">
+        <thead>
+            <tr>
+                <th><?php echo t('Name')?></th>
+                <th><?php echo t('Description')?></th>
+                <th><?php echo t('Points')?></th>
+                <th><?php echo t('Expiration')?></th>
+                <th><?php echo t('Options')?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            $warnings = $this->data('Warnings');
+            foreach($this->data('Warnings') as $warningID => $warning) {
+                echo '<tr>';
+                echo    '<td>'.htmlentities($warning['Name']).'</td>';
+                echo    '<td>'.htmlentities($warning['Description']).'</td>';
+                echo    '<td>'.$warning['Points'].'</td>';
+                echo    '<td>'.$warning['ExpireNumber'].' '.$warning['ExpireType'].'</td>';
+                echo    '<td>'
+                            .anchor(t('Edit'), '/warningtypes/edit/'.$warningID, 'Popup SmallButton')
+                            .anchor(t('Delete'), '/warningtypes/delete/'.$warningID, 'Popup SmallButton')
+                        .'</td>';
+                echo "</tr>\n";
+            }
+            ?>
+        </tbody>
+    </table>
+<?php echo $this->Form->close();
