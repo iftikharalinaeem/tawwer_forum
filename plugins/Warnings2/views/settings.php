@@ -5,7 +5,7 @@
 <div class="Info">
     <?php echo t('Warning types description',
                     'Users are banned when they reach a total of 5 (non expired) points.<br>'
-                    .'Keep in mind that editing the expiration or number of points of a warning type may affect many users.'
+                    .'Editing a warning type will not affect any previous warning.'
                 )
     ?>
 </div>
