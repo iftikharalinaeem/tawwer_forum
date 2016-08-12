@@ -227,22 +227,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Make sure the discussions controller is filtering by subcommunity.
-     *
-     * @param DiscussionsController $sender
-     * @param array $args
-     */
-    public function discussionsController_index_before($sender, $args) {
-        if (!SubCommunityModel::getCurrent()) {
-            return;
-        }
-
-        // Get all of the category IDs associated with the subcommunity.
-        $categoryIDs = $this->getCategoryIDs();
-        $sender->setCategoryIDs($categoryIDs);
-    }
-
-    /**
      * Make sure the discussions module is filtering by subcommunity.
      *
      * @param DiscussionsModule $sender
@@ -378,16 +362,20 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * Hook on CategoryModel's CategoryWatch event.
      *
      * Used to filter down the categories used in the normal search.
+     * Also filter down discussions controller categories.
      *
-     * @param $sender Sending controller instance.
-     * @param $args Event arguments.
+     * @param CategoryModel $sender Sending controller instance.
+     * @param array $args Event arguments.
      */
-    public function gdn_pluginManager_categoryWatch_handler($sender, $args) {
+    public function categoryModel_categoryWatch_handler($sender, $args) {
         if (!SubCommunityModel::getCurrent()) {
             return;
         }
 
-        $args['CategoryIDs'] = $this->getCategoryIDs();
+        $watchedCategoryIDs = $args['CategoryIDs'];
+        $subcommunityCategoryIDs = $this->getCategoryIDs();
+
+        $args['CategoryIDs'] = array_intersect($subcommunityCategoryIDs, $watchedCategoryIDs);
     }
 
     /**
