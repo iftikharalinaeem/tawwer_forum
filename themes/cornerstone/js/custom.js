@@ -1,6 +1,6 @@
 /*!
- * iCheck v2.0.0, http://git.io/arlzeA
- * ===================================
+ * iCheck v2.0.0 rc1, http://git.io/arlzeA
+ * =======================================
  * Cross-platform checkboxes and radio buttons customization
  *
  * (c) Damir Sultanov - http://fronteed.com
@@ -21,7 +21,7 @@
         autoInit: true,
 
         // auto handle ajax loaded inputs
-        autoAjax: true,
+        autoAjax: false,
 
         // remove 300ms click delay on touch devices
         tap: true,
@@ -299,16 +299,16 @@
         name = 'if' + name;
 
         // callbacks are allowed
-        if (hashes[key].callbacks !== false) {
-
-          // direct callback
-          if (typeof hashes[key].callbacks[name] == 'function') {
-            hashes[key].callbacks[name](node, hashes[key]);
-          }
+        if (!!hashes[key].callbacks) {
 
           // indirect callback
           if (hashes[key].callbacks[name] !== false) {
             $(node).trigger(name);
+
+            // direct callback
+            if (typeof hashes[key].callbacks[name] == 'function') {
+              hashes[key].callbacks[name](node, hashes[key]);
+            }
           }
         }
       };
@@ -947,7 +947,8 @@
                 operate(self, parent, key, 'click', false, true); // 'toggle' method
               }
 
-              hashes[key].keydown = hashes[lastKey].keydown = false;
+              hashes[key].keydown = false;
+              hashes[lastKey] && (hashes[lastKey].keydown = false);
 
             // keydown
             } else {
