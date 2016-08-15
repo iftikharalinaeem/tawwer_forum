@@ -1,15 +1,11 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<?php Gdn_Theme::assetBegin('Help') ?>
-    <div class="Help Aside">
-        <?php
-        echo '<h2>', T('Need More Help?'), '</h2>';
-        echo '<ul>';
-        echo '<li>', Anchor(T('Vanilla Pop Overview'), 'http://docs.vanillaforums.com/addons/vanilla-pop/'), '</li>';
-        echo '</ul>';
-        ?>
-    </div>
-<?php Gdn_Theme::assetEnd() ?>
     <h1><?php echo $this->Data('Title'); ?></h1>
+<div class="alert alert-info padded">
+<?php echo t('Need More Help?').' '.sprintf(
+                t('Read our docs on %s'),
+                anchor(t('Vanilla Pop'), 'http://docs.vanillaforums.com/addons/vanilla-pop/')
+            ); ?>
+</div>
 <?php
 $IncomingAddress = $this->Data('IncomingAddress');
 //$OutgoingAddress = C();
