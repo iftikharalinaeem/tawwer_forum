@@ -309,15 +309,12 @@ EOT
         $sender->permission('Garden.Settings.Manage');
 
         if ($sender->Form->authenticatedPostBack()) {
-            if ($sender->Form->getFormValue('Yes')) {
-                $statusModel = new StatusModel();
-                $statusModel->delete(['StatusID' => $statusID]);
-                $sender->jsonTarget("#Status_$statusID", NULL, 'SlideUp');
-            }
+            $statusModel = new StatusModel();
+            $statusModel->delete(['StatusID' => $statusID]);
+            $sender->jsonTarget("#Status_$statusID", NULL, 'SlideUp');
+            $sender->informMessage(sprintf(t('%s deleted.'), t('Status')));
         }
-
-        $sender->title(sprintf(t('Delete %s'), t('Status')));
-        $sender->render('DeleteStatus', '', 'plugins/ideation');
+        $sender->render('blank', 'utility', 'dashboard');
     }
 
     /**
