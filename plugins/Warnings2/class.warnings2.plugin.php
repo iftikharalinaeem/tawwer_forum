@@ -8,9 +8,9 @@
 // Define the plugin:
 $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
-    'Description' => "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    'Version' => '2.4.3',
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
+    'Description' => 'Allows moderators to warn users and add private notes to profiles to help police the community.',
+    'Version' => '2.5',
+    'RequiredApplications' => array('Vanilla' => '2.1'),
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'MobileFriendly' => true,
@@ -282,6 +282,43 @@ class Warnings2Plugin extends Gdn_Plugin {
                 'class' => 'WarningContext'
             ));
         }
+    }
+
+    /**
+     * Show the warning context in the email.
+     *
+     * @param ActivityModel $sender The event sender.
+     * @param array $args Event arguments.
+     */
+    public function activityModel_beforeSendNotification_handler($sender, $args) {
+        if (!isset($args['Email'])) {
+            return;
+        }
+
+        $request = Gdn::request();
+        $path = $request->path();
+        $recordID = $request->get('recordid');
+        $recordType = $request->get('recordtype');
+
+        if (strpos($path, 'profile/warn') !== false && $recordID && $recordType) {
+            $recordType = strtolower($recordType);
+            if (in_array($recordType, ['comment', 'discussion'])) {
+                $modelName = $recordType.'Model';
+                $model = new $modelName();
+                $record = $model->getID($recordID);
+
+                /**
+                 * @var $email Gdn_Email
+                 */
+                $email = $args['Email'];
+                $emailTemplate = $email->getEmailTemplate();
+                $message = $emailTemplate->getMessage();
+
+                $message .= '<br>'.t('Post that triggered the warning:').'<br>'.formatQuote($record, false);
+                $emailTemplate->setMessage($message);
+            }
+        }
+        return;
     }
 
     /**
