@@ -5,6 +5,11 @@
 echo $this->Form->Open();
 echo $this->Form->Errors();
 
+$post = $this->data('Record');
+if ($post) {
+    echo formatQuote($post);
+}
+
 if (count($this->Data('WarningTypes', array())) <= 1) {
     foreach ($this->Data('WarningTypes', array()) as $Row) {
         echo $this->Form->Hidden('WarningTypeID', array('value' => $Row['WarningTypeID']));
