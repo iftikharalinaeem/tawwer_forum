@@ -229,28 +229,46 @@ class Warnings2Plugin extends Gdn_Plugin {
             return;
         }
 
-        $quote = null;
+        $quote = false;
         switch ($warning['RecordType']) {
             // comment warning
             case 'comment':
                 $commentModel = new CommentModel;
-                $comment = (array)$commentModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
+                $comment = $commentModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
                 $discussionModel = new DiscussionModel;
-                $discussion = (array)$discussionModel->getID($comment['DiscussionID'], DATASET_TYPE_ARRAY);
+                $discussion = $discussionModel->getID($comment['DiscussionID'], DATASET_TYPE_ARRAY);
 
                 $quote = true;
-                $context = formatQuote($comment);
-                $location = warningContext($comment, $discussion);
+                if ($comment && $discussion) {
+                    $context = formatQuote($comment);
+                    $location = warningContext($comment, $discussion);
+                // Fallback. Use the warning's "RecordBody" field.
+                } else {
+                    $context = formatQuote([
+                        'Body' => val('RecordBody', $warning),
+                        'Format' => val('RecordFormat', $warning),
+                    ], false);
+                    $location = 'Comment content';
+                }
                 break;
 
             // discussion warning
             case 'discussion':
                 $discussionModel = new DiscussionModel;
-                $discussion = (array)$discussionModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
+                $discussion = $discussionModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
 
                 $quote = true;
-                $context = formatQuote($discussion);
-                $location = warningContext($discussion);
+                if ($discussion) {
+                    $context = formatQuote($discussion);
+                    $location = warningContext($discussion);
+                // Fallback. Use the warning's "RecordBody" field.
+                } else {
+                    $context = formatQuote([
+                        'Body' => val('RecordBody', $warning),
+                        'Format' => val('RecordFormat', $warning),
+                    ], false);
+                    $location = 'Discussion content';
+                }
                 break;
 
             // activity warning
