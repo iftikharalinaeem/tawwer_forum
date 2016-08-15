@@ -10,7 +10,7 @@ $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => 'Allows moderators to warn users and add private notes to profiles to help police the community.',
     'Version' => '2.5',
-    'RequiredApplications' => ['Vanilla' => '2.1a'],
+    'RequiredApplications' => ['Vanilla' => '2.1'],
     'MobileFriendly' => true,
     'SettingsUrl' => '/settings/warnings',
     'SettingsPermission' => 'Garden.Settings.Manage',
