@@ -29,7 +29,7 @@ if (!function_exists('getGroupOptions')):
 function getGroupOptions($group, $sectionId = 'home') {
     $options = array();
     if (GroupPermission('Edit', $group)) {
-        $options['Edit'] = array('Text' => t('Edit Group'), 'Url' => GroupUrl($group, 'edit'));
+        $options['Edit'] = array('Text' => sprintf(t('Edit %s'), t('Group')), 'Url' => GroupUrl($group, 'edit'));
     }
     if (GroupPermission('Leave', $group)) {
         $options['Leave'] = array('Text' => t('Leave Group'), 'Url' => GroupUrl($group, 'leave'), 'CssClass' => 'Popup');
