@@ -134,7 +134,7 @@
       ?>
       <li><?php
          echo $this->Form->checkBox('ConfirmJoin', 'Send confirmation email?');
-         echo $this->Sync->label('For more information see MailChimp\'s <a href=\'http://kb.mailchimp.com/lists/signup-forms/understanding-the-double-opt-in-process\'>"Understanding the Double Opt-In Process"</a>', 'ConfirmJoin');
+         echo $this->Form->label('For more information see MailChimp\'s <a href=\'http://kb.mailchimp.com/lists/signup-forms/understanding-the-double-opt-in-process\'>"Understanding the Double Opt-In Process"</a>', 'ConfirmJoin');
       ?></li>
    </ul>
    <?php endif; ?>
