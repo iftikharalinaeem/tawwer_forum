@@ -83,7 +83,6 @@ class SubcommunitiesController extends DashboardController {
         $this->setData('Categories', $categories);
 
         $this->View = 'addedit';
-        $this->addSideMenu();
         $this->render();
     }
 
@@ -105,6 +104,7 @@ class SubcommunitiesController extends DashboardController {
             $this->siteModel->delete(['SubcommunityID' => $this->site['SubcommunityID']]);
 
             if ($this->form->errorCount() == 0) {
+                $this->informMessage(t('Site deleted.'));
                 if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
                     $this->jsonTarget('', '', 'Refresh');
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_ALL) {
@@ -113,9 +113,7 @@ class SubcommunitiesController extends DashboardController {
             }
         }
 
-        $this->View = 'Delete';
-        $this->title(sprintf(t('Delete %s'), t('Site')));
-        $this->render();
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     protected function getSite($siteID) {
@@ -144,7 +142,7 @@ class SubcommunitiesController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
         $pageSize = 20;
         list($offset, $limit) = offsetLimit($page, $pageSize);
-        $this->form = new Gdn_Form();
+        $this->form = new Gdn_Form('', 'bootstrap');
         $this->form->Method = 'get';
 
         if ($search = $this->Request->get('search')) {
@@ -168,7 +166,6 @@ class SubcommunitiesController extends DashboardController {
 //        $this->AddJsFile('subcommunities_admin.js', 'plugins/subcommunities');
 
         $this->title(t('Sites'));
-        $this->addSideMenu();
         $this->render();
     }
 
@@ -176,7 +173,7 @@ class SubcommunitiesController extends DashboardController {
         parent::initialize();
 
         $this->siteModel = SubcommunityModel::instance();
-        $this->form = new Gdn_Form;
+        $this->form = new Gdn_Form('', 'bootstrap');
 
         // Check for a site.
         $args = Gdn::dispatcher()->controllerArguments();

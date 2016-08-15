@@ -1,24 +1,29 @@
 <?php if (!defined('APPLICATION')) { exit(); } ?>
 
-<h1><?php echo $this->data('Title'); ?></h1>
+<div class="header-block">
+    <h1><?php echo $this->data('Title'); ?></h1>
+    <div class="btn-group">
+        <?php echo anchor(sprintf(t('Add %s'), t('Subcommunity')), '/subcommunities/add', 'Popup btn btn-primary'); ?>
+    </div>
+</div>
 
 <?php echo $this->form->open(array('action' => url('/subcommunities'))); ?>
-<div class="Wrap">
-    <?php
-    echo $this->form->errors();
-
-    echo '<div>', t('Search subcommunities.', 'Search for subcommunities by the name or slug.'), '</div>';
-
-    echo '<div>';
-    echo $this->form->textBox('search');
-    echo ' ', $this->form->button(t('Go'), ['name' => 'go']);
-    echo '</div>';
-
-    ?>
+<div class="toolbar">
+    <div class="toolbar-main">
+        <?php
+        echo $this->form->errors();
+        echo '<div class="search-wrap input-wrap">';
+        echo '<div class="icon-wrap icon-search-wrap">'.dashboardSymbol('search').'</div>';
+        echo $this->form->textBox('search', ['class' => 'form-control', 'placeholder' => t('Search subcommunities.', 'Search for subcommunities by the name or slug.')]);
+        echo ' ', $this->form->button(t('Go'));
+        echo '<a class="icon-wrap icon-clear-wrap" href="'.url('/subcommunities').'">'.dashboardSymbol('close').'</a>';
+        echo '</div>';
+        ?>
+    </div>
+    <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
 </div>
-<div class="Wrap">
-    <?php echo anchor(sprintf(t('Add %s'), t('Subcommunity')), '/subcommunities/add', 'Popup SmallButton'); ?>
-</div>
+
+<?php echo $this->form->close(); ?>
 
 <div id="sites-wrap">
     <?php
