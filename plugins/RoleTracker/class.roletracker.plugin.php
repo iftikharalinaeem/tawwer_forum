@@ -275,6 +275,9 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             return;
         }
 
+        // In case we fiddled with the tags and assigned multiple roles to 1 tag :D
+        $tagsID = array_unique($tagsID);
+
         if ($tags === null) {
             $tagModel = TagModel::instance();
             $tags = $tagModel->getWhere(['Type' => 'Tracker'])->resultArray();
