@@ -24,6 +24,8 @@ Controller_sync is used to push bulk lists of users from the User table to MailC
 
 ### Gotchas and Pitfalls
 
+When adding users with the opt-in ("Send confirmation email?" checked in the dashboard) the user will not show up at all in the MailChimp dashboard until the user has confirmed.
+
 When uploading users to MailChimp, a list is sent that then sits in a queue on MailChimp servers as a batch to be processed. Especially when there is a big list, there could be some latency. I created methods (`controller_trackbatches` and `getBatchStatus`) for tracking the progress of batches but elected not to implement them.
 
 Turn on db tracking to debug. Bulk lists are truncated to 10 users when stored in the debugger to save space. 

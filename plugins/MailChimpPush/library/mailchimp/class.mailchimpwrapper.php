@@ -143,7 +143,7 @@ class MailChimpWrapper {
             if ($interestFields) {
                 $interestValues = ['interests' => [val('InterestID', $userInfo) => true]];
             }
-            $bodyValues = ['email_address' => $email, 'status_if_new' => 'subscribed', 'interests' => [val('InterestID', $userInfo) => true]];//+ $interestValues;
+            $bodyValues = ['email_address' => $email, 'status' => ($userInfo['DoubleOptIn']) ? 'pending' : 'subscribed', 'interests' => [val('InterestID', $userInfo) => true]];
             $body['operations'][] = [
                 'method' => 'PUT',
                 'path' => "lists/{$id}/members/".md5(strtolower($email)),
