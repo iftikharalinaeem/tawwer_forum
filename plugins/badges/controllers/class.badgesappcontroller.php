@@ -51,7 +51,7 @@ class BadgesAppController extends Gdn_Controller {
             $this->addJsFile('jquery.autocomplete.js');
 
             // When we use front end style instead of admin style
-            $FrontendStyle = ($this->ControllerName == 'badgecontroller' && in_array($this->RequestMethod, array('Index', 'request')));
+            $FrontendStyle = ($this->ControllerName == 'badgecontroller' && in_array($this->RequestMethod, array('', 'Index', 'request')));
             $FrontendStyle = $FrontendStyle || $this->ControllerName == 'badgescontroller';
 
             if ($FrontendStyle) {
