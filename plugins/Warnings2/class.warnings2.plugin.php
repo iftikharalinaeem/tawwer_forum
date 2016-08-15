@@ -294,19 +294,25 @@ class Warnings2Plugin extends Gdn_Plugin {
         if (!isset($args['Email'])) {
             return;
         }
-
         $request = Gdn::request();
         $path = $request->path();
+        if (strpos($path, 'profile/warn') !== false) {
+            return;
+        }
+
         $recordID = $request->get('recordid');
         $recordType = $request->get('recordtype');
+        if (!$recordID || !$recordType) {
+            return;
+        }
 
-        if (strpos($path, 'profile/warn') !== false && $recordID && $recordType) {
-            $recordType = strtolower($recordType);
-            if (in_array($recordType, ['comment', 'discussion'])) {
-                $modelName = $recordType.'Model';
-                $model = new $modelName();
-                $record = $model->getID($recordID);
+        $recordType = strtolower($recordType);
+        if (in_array($recordType, ['comment', 'discussion'])) {
+            $modelName = $recordType.'Model';
+            $model = new $modelName();
+            $record = $model->getID($recordID);
 
+            if ($record) {
                 /**
                  * @var $email Gdn_Email
                  */
@@ -318,7 +324,6 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $emailTemplate->setMessage($message);
             }
         }
-        return;
     }
 
     /**
