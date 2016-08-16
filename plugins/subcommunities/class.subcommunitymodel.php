@@ -173,6 +173,12 @@ class SubcommunityModel extends Gdn_Model {
         $row['Locale'] = $canonicalLocale;
         $row['LocaleShortName'] = str_replace('_', '-', $canonicalLocale);
         $row['Url'] = Gdn::request()->urlDomain('//').'/'.$row['Folder'];
+
+        $attributes = dbdecode($row['Attributes']);
+        if (is_array($attributes)) {
+            $row = array_replace($attributes, $row);
+            unset($row['Attributes']);
+        }
     }
 
     public static function mb_ucfirst($str, $encoding = "UTF-8", $lower_str_end = false) {
@@ -229,6 +235,7 @@ class SubcommunityModel extends Gdn_Model {
 
     public function insert($Fields) {
         $this->addInsertFields($Fields);
+        $Fields = $this->serialize($Fields);
         if ($this->validate($Fields, true)) {
             if (val('IsDefault', $Fields)) {
                 $this->SQL->put('Subcommunity', ['IsDefault' => null]);
@@ -238,6 +245,20 @@ class SubcommunityModel extends Gdn_Model {
 
             return parent::insert($Fields);
         }
+    }
+
+    private function serialize($fields) {
+        // Get the columns and put the extended data in the attributes.
+        $this->defineSchema();
+        $columns = $this->Schema->fields();
+        $remove = array('TransientKey' => 1, 'hpt' => 1, 'Save' => 1, 'Checkboxes' => 1);
+        $fields = array_diff_key($fields, $remove);
+        $attributes = array_diff_key($fields, $columns);
+
+        if (!empty($attributes)) {
+            $fields['Attributes'] = dbencode($attributes);
+        }
+        return $fields;
     }
 
     public function update($row, $where = false, $limit = false) {
@@ -251,7 +272,7 @@ class SubcommunityModel extends Gdn_Model {
             if (val('IsDefault', $row)) {
                 $this->SQL->put('Subcommunity', ['IsDefault' => null], ['SubcommunityID <>' => $allFields['SubcommunityID']]);
             }
-            parent::update($row, $where, $limit);
+            parent::update($this->serialize($row), $where, $limit);
             static::clearCache();
         }
     }
