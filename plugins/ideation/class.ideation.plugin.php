@@ -590,12 +590,19 @@ EOT
      */
     public function base_discussionOptions_handler($sender, $args) {
         $discussion = $args['Discussion'];
-        if (!$this->isIdea($discussion)) {
-            return;
-        }
 
         if (!Gdn::session()->checkPermission('Vanilla.Moderation.Manage')
             && !Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
+            return;
+        }
+
+        if (isset($args['DiscussionOptions'])) {
+            $args['DiscussionOptions']['Ideation'] = array('Label' => t('Ideation').'...', 'Url' => '/discussion/ideationoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup');
+        } elseif (isset($sender->Options)) {
+            $sender->Options .= '<li>'.anchor(t('Ideation').'...', '/discussion/ideationoptions?discussionid='.$discussion->DiscussionID, 'Popup IdeationOptions') . '</li>';
+        }
+
+        if (!$this->isIdea($discussion)) {
             return;
         }
 
@@ -614,6 +621,70 @@ EOT
         if (isset($args['DiscussionOptions']['DeleteDiscussion'])) {
             $args['DiscussionOptions']['DeleteDiscussion']['Label'] = sprintf(t('Delete %s'), t('Idea'));
         }
+    }
+
+    /**
+     *
+     * @param DiscussionController $sender Sending controller instance.
+     * @param string|int $discussionID Identifier of the discussion
+     */
+    public function discussionController_ideationOptions_create($sender, $discussionID = '') {
+        $sender->Form = new Gdn_Form();
+
+        $Discussion = $sender->DiscussionModel->getID($discussionID);
+
+        if (!$Discussion) {
+            throw notFoundException('Discussion');
+        }
+
+        $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $Discussion));
+
+        // We're only allowing conversion between idea and discussion.  If it isn't an idea, make it a discussion.
+        if (val('Type', $Discussion) !== 'Idea') {
+            setValue('Type', $Discussion, 'Discussion');
+        }
+
+        if ($sender->Form->isPostBack()) {
+            $type = $sender->Form->getFormValue('Type');
+            switch ($type) {
+                case 'Idea':
+                    $statusID = val('StatusID', StatusModel::instance()->getDefaultStatus());
+                    // Update the type
+                    $sender->DiscussionModel->setField(
+                        $discussionID,
+                        'Type',
+                        $type
+                    );
+
+                    // Setup the default idea status
+                    $this->updateDiscussionStatusTag($discussionID, $statusID);
+
+                    // Add the status attachment
+                    $this->updateAttachment(
+                        $discussionID,
+                        $statusID,
+                        ''
+                    );
+                    break;
+                default:
+                    // Prune away any ideation status attachments, since this isn't an idea.
+                    AttachmentModel::instance()->delete([
+                        'ForeignID' => "d-{$discussionID}",
+                        'Type' => 'status'
+                    ]);
+            }
+
+            $sender->DiscussionModel->setField($discussionID, 'Type', $type);
+            $sender->Form->setValidationResults($sender->DiscussionModel->validationResults());
+            Gdn::controller()->jsonTarget('', '', 'Refresh');
+        } else {
+            $sender->Form->setData($Discussion);
+        }
+
+        $sender->setData('Discussion', $Discussion);
+        $sender->setData('_Types', array('Idea' => '@'.t('Ideation Type', 'Idea'), 'Discussion' => '@'.t('Discussion Type', 'Discussion')));
+        $sender->setData('Title', t('Ideation Options'));
+        $sender->render('DiscussionOptions', '', 'plugins/ideation');
     }
 
     /**

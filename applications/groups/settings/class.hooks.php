@@ -2,9 +2,16 @@
 
 class GroupsHooks extends Gdn_Plugin {
    /**
-    * Run structure & default badges.
+    * Setup routine for when the application is enabled.
     */
-   public function Setup() {
+    public function setup() {
+        $this->structure();
+    }
+
+    /**
+     * Run structure & default badges.
+     */
+   public function structure() {
       include(dirname(__FILE__).'/structure.php');
    }
 
@@ -122,7 +129,7 @@ class GroupsHooks extends Gdn_Plugin {
 
       /* Ensure that there are discussions */
 
-      if (!$sender->data('Discussions') && !($sender->data('Discussions') instanceof Gdn_DataSet)) {
+      if (!$sender->data('Discussions') || !($sender->data('Discussions') instanceof Gdn_DataSet)) {
          trigger_error("No discussions found in the data array.", E_USER_NOTICE);
          return;
       }
@@ -640,5 +647,25 @@ class GroupsHooks extends Gdn_Plugin {
             $Sender->SetData('SearchResults', $SearchResults);
         }
 
+    }
+
+    /**
+     * Hook in before VanillaSettingsController renders any output.
+     *
+     * @param VanillaSettingsController $sender
+     * @param array $args
+     */
+    public function vanillaSettingsController_render_before($sender, $args) {
+        $requestMethod = strtolower(val('RequestMethod', $sender));
+
+        switch ($requestMethod) {
+            case 'index':
+            case 'managecategories':
+                foreach ($sender->Data['CategoryData'] as &$category) {
+                    if (val('AllowGroups', $category)) {
+                        setValue('CanDelete', $category, 0);
+                    }
+                }
+        }
     }
 }
