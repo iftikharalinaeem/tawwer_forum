@@ -37,10 +37,9 @@ class BadgeController extends BadgesAppController {
      * @access public
      */
     public function all() {
+        Gdn_Theme::section('Dashboard');
         $this->permission('Garden.Settings.Manage');
         $this->setData('Badges', $this->BadgeModel->getList());
-
-        $this->addSideMenu('/badge/all');
         $this->render();
     }
 

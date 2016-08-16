@@ -80,10 +80,12 @@ class BadgesAppController extends Gdn_Controller {
      * @since 1.0.0
      * @access public
      *
-     * @param $CurrentUrl Path to current location in dashboard.
+     * @param $currentUrl Path to current location in dashboard.
      */
-    public function addSideMenu($CurrentUrl) {
-        Gdn_Theme::section('Dashboard');
+    public function addSideMenu($currentUrl) {
+        if ($currentUrl) {
+            DashboardNavModule::getDashboardNav()->setHighlightRoute($currentUrl);
+        }
     }
 
     /**
