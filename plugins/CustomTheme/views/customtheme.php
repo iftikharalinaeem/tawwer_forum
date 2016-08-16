@@ -1,17 +1,16 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <?php Gdn_Theme::assetBegin('Help'); ?>
    <?php WriteRevisions($this, 'css'); ?>
-   <div class="Help Aside">
-      <h2>Help</h2>
-      <div class="InfoBox">
-         <div>If you are new to HTML and/or CSS, here are some links you should check out:</div>
-         <?php
-         echo '<ul><li>'.Anchor('Our Custom HTML Documentation', 'http://vanillaforums.com/blog/help-tutorials/how-to-use-custom-theme-part-1-edit-html/', '', array('target' => '_blank')).'</li>';
-         echo '<li>'.Anchor('Our Custom CSS Documentation', 'http://vanillaforums.com/help/customcss', '', array('target' => '_blank')).'</li>';
-         echo '<li>'.Anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', array('target' => '_blank')).'</li>';
-         echo '<li>'.Anchor("HTML Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', array('target' => '_blank')).'</li></ul>';
-         ?>
-      </div>
+   <div class="help">
+      <h2><?php echo t('Need more help?'); ?></h2>
+      <?php
+      echo '<ul><li>'.sprintf(t('Check out our %s'), Anchor('Vanilla Forums Theming Guide', 'https://blog.vanillaforums.com/help/vanilla-custom-themes/', '', array('target' => '_blank'))).'</li></ul>';
+      ?>
+      <p><?php echo t('If you are new to HTML and/or CSS, here are some tutorials to get you started:'); ?></p>
+      <?php
+      echo '<ul><li>'.Anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', array('target' => '_blank')).'</li>';
+      echo '<li>'.Anchor("HTML Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', array('target' => '_blank')).'</li></ul>';
+      ?>
    </div>
 <?php Gdn_Theme::assetEnd(); ?>
 <?php
