@@ -162,19 +162,6 @@ class PegaPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add Pega to Dashboard menu.
-     *
-     * @param Controller $Sender
-     * @param array $Arguments
-     */
-    public function Base_GetAppSettingsMenuItems_Handler($Sender, $Arguments) {
-        $LinkText = T('Pega');
-        $Menu = $Arguments['SideMenu'];
-        $Menu->AddItem('Forum', T('Forum'));
-        $Menu->AddLink('Forum', $LinkText, 'plugin/Pega', 'Garden.Settings.Manage');
-    }
-
-    /**
      * Creates the Virtual Controller
      *
      * @param DashboardController $Sender
