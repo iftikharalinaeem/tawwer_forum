@@ -5,17 +5,18 @@
  */
 class WarningTypesController extends PluginController {
     /**
-     * Instantiate objects
+     * Add endpoint
      */
-    public function __construct() {
-        parent::__construct();
-    }
-
     public function add() {
         $this->edit(false);
     }
 
-    public function edit($warningID) {
+    /**
+     * Edit endpoint
+     *
+     * @param string $warningTypeID WarningType ID
+     */
+    public function edit($warningTypeID) {
         // Prevent non-admins from accessing this page
         $this->permission('Garden.Settings.Manage');
 
@@ -23,9 +24,9 @@ class WarningTypesController extends PluginController {
         $this->Form = new Gdn_Form();
         $warningType = false;
 
-        if ($warningID && ctype_digit($warningID)) {
+        if ($warningTypeID && ctype_digit($warningTypeID)) {
             $warningTypeModel = new WarningTypeModel();
-            $warningType = $warningTypeModel->getID($warningID, DATASET_TYPE_ARRAY);
+            $warningType = $warningTypeModel->getID($warningTypeID, DATASET_TYPE_ARRAY);
 
             $this->Form->addHidden('WarningTypeID', val('WarningTypeID', $warningType));
             $this->setData('WarningType', $warningType);
@@ -41,23 +42,29 @@ class WarningTypesController extends PluginController {
             }
         }
 
-        $this->render();
+        $this->render('addedit');
     }
 
-    public function delete($warningID, $action) {
+    /**
+     * Delete endpoint
+     *
+     * @param string $warningTypeID WarningType ID
+     * @param string $action Either nothing or delete (which confirm the delete)
+     */
+    public function delete($warningTypeID, $action = '') {
         // Prevent non-admins from accessing this page
         $this->permission('Garden.Settings.Manage');
 
-        if (!$warningID && ctype_digit($warningID)) {
+        if (!$warningTypeID && ctype_digit($warningTypeID)) {
             return;
         }
 
-        $this->setData('WarningID', $warningID);
+        $this->setData('WarningTypeID', $warningTypeID);
 
         if ($action) {
             if ($action === 'delete') {
                 $warningTypeModel = new WarningTypeModel();
-                $warningTypeModel->deleteID($warningID);
+                $warningTypeModel->deleteID($warningTypeID);
             }
 
             redirect('settings/warnings');
