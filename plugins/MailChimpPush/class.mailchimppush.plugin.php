@@ -214,6 +214,19 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         $this->dispatch($sender);
     }
 
+
+    /**
+     * Add mailchimp js to dashboard
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function base_render_before($sender, $args) {
+        if ($sender->MasterView == 'admin') {
+            $sender->addJsFile('mailchimp.js', 'plugins/MailChimpPush');
+        }
+    }
+
     /**
      * Settings controller for storing API key, creating settings page in dashboard.
      *
@@ -226,7 +239,6 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         $sender->Form = new Gdn_Form();
         $sender->Sync = new Gdn_Form();
 
-        $sender->addJsFile('mailchimp.js', 'plugins/MailChimpPush');
         $sender->addDefinition('MailChimpUploadSuccessMessage', t('MailChimp will now process the list you have uploaded. Check your MailChimp Dashboard later.'));
 
         $provider = $this->provider();

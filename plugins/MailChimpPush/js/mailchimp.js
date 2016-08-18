@@ -1,6 +1,5 @@
-jQuery(document).ready(function($) {
-   
-   
+$(document).on('contentLoad', function(e) {
+
    $('.MailChimpSync').on('click', '#MailChimp-Synchronize', function(e) {
       // Start processing users
       process(0);
@@ -186,6 +185,6 @@ jQuery(document).ready(function($) {
    var reset = function() {
       $('.Synchronization').css('display', 'none');
       var successMessage = gdn.getMeta('MailChimpUploadSuccessMessage', 'MailChimp will now process the list you have uploaded. Check your MailChimp Dashboard later.');
-      $('#SychronizationMessages').removeClass('Info').addClass('Warning').html(successMessage);
+      $('#SychronizationMessages').removeClass('alert-info').addClass('alert-warning').html(successMessage);
    }
 });
