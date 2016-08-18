@@ -190,7 +190,7 @@ class MultisitesController extends DashboardController {
 
     /**
      * Handled updating sites?
-     * 
+     *
      * @throws type
      */
     protected function patch() {
@@ -268,8 +268,7 @@ class MultisitesController extends DashboardController {
             }
         }
 
-        $this->Title(sprintf(T('Delete %s'), T('Site')));
-        $this->Render('Delete');
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**

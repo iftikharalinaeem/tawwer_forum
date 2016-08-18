@@ -1,23 +1,26 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-
-<h1><?php echo $this->Data('Title'); ?></h1>
-
-<?php echo $this->form->Open(array('action' => Url('/multisites'))); ?>
-<div class="Wrap">
-    <?php
-    echo $this->form->Errors();
-
-    echo '<div>', T('Search sites.', 'Search for sites by the name of the site or its url.'), '</div>';
-
-    echo '<div>';
-    echo $this->form->TextBox('search');
-    echo ' ', $this->form->Button(T('Go'), ['name' => 'go']);
-    echo '</div>';
-
-    ?>
+<div class="header-block">
+    <h1><?php echo $this->Data('Title'); ?></h1>
+    <div class="buttons">
+        <?php echo anchor(t('Add Site'), '/multisites/add', 'btn btn-primary js-modal'); ?>
+    </div>
 </div>
-<div class="Wrap">
-    <?php echo Anchor(T('Add Site'), '/multisites/add', 'Popup SmallButton'); ?>
+
+<div class="toolbar">
+    <div class="toolbar-main">
+        <?php
+        echo $this->form->open(['action' => url('/multisites')]);
+        echo $this->form->errors();
+        echo '<div class="search-wrap input-wrap">';
+        echo '<div class="icon-wrap icon-search-wrap">'.dashboardSymbol('search').'</div>';
+        echo $this->form->textBox('search', ['placeholder' => t('Search sites', 'Search for sites by the name of the site or its url'), 'class' => 'form-control']);
+        echo ' ', $this->form->button(t('Go'), ['name' => 'go', 'class' => 'search-submit']);
+        echo '<a class="icon-wrap icon-clear-wrap" href="'.url('/multisites').'">'.dashboardSymbol('close').'</a>';
+        echo '</div>';
+        echo $this->form->close();
+        ?>
+    </div>
+    <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
 </div>
 
 <div id="multisites-wrap">
@@ -26,11 +29,11 @@ require $this->FetchViewLocation('table');
 ?>
 </div>
 
-<div class="Wrap">
-    <div class="Info2">
-        The sites are synchronized with the hub roughly every 10 minutes.
-        <?php
-        echo Anchor(T('Sync Now'), '/multisites/syncnode.json', 'SmallButton Hijack');
-        ?>
+<div class="form-group row">
+    <div class="label-wrap-wide">
+        <div class="label"><?php echo t('The sites are synchronized with the hub roughly every 10 minutes.'); ?></div>
+    </div>
+    <div class="input-wrap-right">
+        <?php echo anchor(T('Sync Now'), '/multisites/syncnode.json', 'btn btn-primary Hijack'); ?>
     </div>
 </div>
