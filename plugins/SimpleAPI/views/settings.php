@@ -32,7 +32,7 @@ echo $Form->Errors();
          echo '<div class="info">This is the access token for api calls. It\'s like a password for the API. <b>Do not give this access token out to anyone.</b></div>'; ?>
       </div>
       <div class="input-wrap">
-         <?php echo $Form->TextBox('AccessToken', array('class' => 'InputBox BigInput')); ?>
+         <?php echo $Form->TextBox('AccessToken'); ?>
       </div>
    </li>
    <li class="form-group row">

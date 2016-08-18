@@ -376,8 +376,8 @@ abstract class OAuth2PluginBase {
      */
     protected function getSettingsFormFields() {
         $formFields = array(
-            'AssociationKey' => ['LabelCode' => 'Client ID', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => ''],
-            'AssociationSecret' => ['LabelCode' => 'Secret', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => '']
+            'AssociationKey' => ['LabelCode' => 'Client ID', 'Description' => ''],
+            'AssociationSecret' => ['LabelCode' => 'Secret', 'Description' => '']
         );
         return $formFields;
     }
