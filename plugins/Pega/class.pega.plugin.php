@@ -16,7 +16,7 @@ $PluginInfo['Pega'] = array(
     'Author' => 'Patrick Kelly',
     'AuthorEmail' => 'patrick.k@vanillaforums.com',
     'AuthorUrl' => 'http://www.github.com/nervoustwit',
-    'SocialConnect' => false
+    'SocialConnect' => true
 );
 
 /**
