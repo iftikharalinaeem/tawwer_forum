@@ -253,7 +253,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
                 $toTest = $recordData['Name']."\n".$toTest;
             }
 
-            if (preg_match('#\b'.preg_quote($word, '#').'\b#i', $toTest) === 1) {
+            if (preg_match('#\b'.preg_quote($word, '#').'\b#iu', $toTest) === 1) {
                 return false;
             }
         }
