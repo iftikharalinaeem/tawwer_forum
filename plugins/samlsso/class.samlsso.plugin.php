@@ -410,6 +410,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
                 $Form->setFormValue('Target', $relay_state);
         }
 
+        Logger::event('saml_profile', Logger::INFO, 'Profile Received from SAML', (array) $profile);
+
         $this->EventArguments['Profile'] = $profile;
         $this->EventArguments['Form'] = $Form;
 
