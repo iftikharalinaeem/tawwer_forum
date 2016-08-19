@@ -93,7 +93,8 @@ class CustomThemePlugin extends Gdn_Plugin {
         $revisionID = CustomThemePlugin::getRevisionFromFileName($liveRevisionID);
         $css = Gdn::sql()->reset()->getWhere('CustomThemeRevision', array('RevisionID' => $revisionID))->value('CSS');
 
-        if ($css) {
+        $trimmedCSS = trim(preg_replace('#/\*.*?\*/#s', null, $css));
+        if ($trimmedCSS) {
             $host = Gdn::request()->host();
             $sender->addCssFile(false, "/plugin/customcss/{$host}/rev_{$liveRevisionID}.css", ['Css' => $css, 'Sort' => 100]);
         }
