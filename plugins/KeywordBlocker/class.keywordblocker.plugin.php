@@ -4,18 +4,19 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-$PluginInfo['KeywordBlocker'] = array(
+$PluginInfo['KeywordBlocker'] = [
     'Name' => 'Keyword Blocker',
     'Description' => 'Block posts containing certain words and send them for review.',
-    'Version' => '1.0.1',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
+    'Version' => '1.1',
+    'RequiredApplications' => ['Vanilla' => '2.2'],
     'HasLocale' => false,
     'License' => 'GNU GPL2',
     'SettingsUrl' => '/settings/keywordBlocker',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => 'Alexandre (DaazKu) Chouinard',
-    'AuthorEmail' => 'alexandre.c@vanillaforums.com'
-);
+    'AuthorEmail' => 'alexandre.c@vanillaforums.com',
+    'AuthorUrl' => 'https://github.com/DaazKu',
+];
 
 /**
  * Class KeywordBlocker
@@ -30,7 +31,6 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
      * @param $sender Sending controller instance
      */
     public function settingsController_keywordBlocker_create($sender) {
-
         $sender->title(sprintf(t('%s settings'), t('Keyword Blocker')));
         $sender->addSideMenu('settings/keywordBlocker');
 
@@ -253,7 +253,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
                 $toTest = $recordData['Name']."\n".$toTest;
             }
 
-            if (preg_match('#\b'.preg_quote($word, '#').'\b#i', $toTest) === 1) {
+            if (preg_match('#\b'.preg_quote($word, '#').'\b#iu', $toTest) === 1) {
                 return false;
             }
         }
