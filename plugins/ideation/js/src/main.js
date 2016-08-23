@@ -14,7 +14,6 @@ var ideation = {
 
     // Toggle discussion type settings
     $('#Form_IdeaCategory').click(function() {
-      console.log($('#Form_IdeaCategory').val());
       $('.P.DiscussionTypes').toggle();
       $('#Form_UseDownVotes').parents('label').toggle();
     });

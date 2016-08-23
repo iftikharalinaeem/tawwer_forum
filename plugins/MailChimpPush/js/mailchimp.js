@@ -1,5 +1,44 @@
 jQuery(document).ready(function($) {
-   
+
+   /**
+    * InterestDropdowns are select elements of "interests" that have been
+    * created created on MailChimp. Each list of interests is associated with a list.
+    * When the list is chosen, show the interests select and hide and disable
+    * any other interest selects.
+    */
+   var showInterestOptions = function () {
+      var activeList = $('#Form_ListID').val();
+      $(".InterestDropdowns select").prop('disabled', true);
+      $(".InterestDropdowns").addClass("Hidden");
+      $("#Form_InterestID"+activeList).prop('disabled', false);
+      $("#InterestDropdown"+activeList).removeClass("Hidden");
+   }
+
+   /**
+    * Show or hide interests select boxes to be to assign interests users being added
+    * to MailChimp in bulk.
+    */
+   var showSyncInterestOptions = function () {
+      var activeList = $('#Form_SyncListID').val();
+      $(".SyncInterestDropdowns select").prop('disabled', true);
+      $(".SyncInterestDropdowns").addClass("Hidden");
+      $("#Form_SyncInterestID"+activeList).prop('disabled', false);
+      $("#SyncInterestDropdown"+activeList).removeClass("Hidden");
+   }
+
+   // On load, show the active interest select.
+   showInterestOptions();
+   showSyncInterestOptions();
+
+   // When changing selection of list as the default list for users signing up, present interest choices.
+   $('#Form_ListID').on('change', this, function(e){
+      showInterestOptions();
+   });
+
+   // When changing selection of list where users will be synchronized to on MailChimp, present the interest choices.
+   $('#Form_SyncListID').on('change', this, function(e){
+      showSyncInterestOptions();
+   });
    
    $('.MailChimpSync').on('click', '#MailChimp-Synchronize', function(e) {
       // Start processing users
@@ -114,6 +153,7 @@ jQuery(document).ready(function($) {
       var syncBanned = $('.MailChimpSync #Form_SyncBanned').prop('checked') ? 1 : 0;
       var syncDeleted = $('.MailChimpSync #Form_SyncDeleted').prop('checked') ? 1 : 0;
       var syncUnconfirmed = $('.MailChimpSync #Form_SyncUnconfirmed').prop('checked') ? 1 : 0;
+      var syncInterestID = $('.MailChimpSync #Form_SyncInterestID'+syncListID).val();
       
       var send = {
             Postback: true, 
@@ -122,7 +162,8 @@ jQuery(document).ready(function($) {
             SyncListID: syncListID,
             SyncConfirmJoin: syncConfirmJoin,
             SyncBanned: syncBanned,
-            SyncDeleted: syncDeleted
+            SyncDeleted: syncDeleted,
+            SyncInterestID: syncInterestID
          };
          
       if (syncUnconfirmed != undefined) {

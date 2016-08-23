@@ -250,28 +250,46 @@ class Warnings2Plugin extends Gdn_Plugin {
             return;
         }
 
-        $quote = null;
+        $quote = false;
         switch ($warning['RecordType']) {
             // comment warning
             case 'comment':
                 $commentModel = new CommentModel;
-                $comment = (array)$commentModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
+                $comment = $commentModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
                 $discussionModel = new DiscussionModel;
-                $discussion = (array)$discussionModel->getID($comment['DiscussionID'], DATASET_TYPE_ARRAY);
+                $discussion = $discussionModel->getID($comment['DiscussionID'], DATASET_TYPE_ARRAY);
 
                 $quote = true;
-                $context = formatQuote($comment);
-                $location = warningContext($comment, $discussion);
+                if ($comment && $discussion) {
+                    $context = formatQuote($comment);
+                    $location = warningContext($comment, $discussion);
+                // Fallback. Use the warning's "RecordBody" field.
+                } else {
+                    $context = formatQuote([
+                        'Body' => val('RecordBody', $warning),
+                        'Format' => val('RecordFormat', $warning),
+                    ], false);
+                    $location = 'Comment content';
+                }
                 break;
 
             // discussion warning
             case 'discussion':
                 $discussionModel = new DiscussionModel;
-                $discussion = (array)$discussionModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
+                $discussion = $discussionModel->getID($warning['RecordID'], DATASET_TYPE_ARRAY);
 
                 $quote = true;
-                $context = formatQuote($discussion);
-                $location = warningContext($discussion);
+                if ($discussion) {
+                    $context = formatQuote($discussion);
+                    $location = warningContext($discussion);
+                // Fallback. Use the warning's "RecordBody" field.
+                } else {
+                    $context = formatQuote([
+                        'Body' => val('RecordBody', $warning),
+                        'Format' => val('RecordFormat', $warning),
+                    ], false);
+                    $location = 'Discussion content';
+                }
                 break;
 
             // activity warning
@@ -302,6 +320,48 @@ class Warnings2Plugin extends Gdn_Plugin {
             echo wrap($content, 'div', array(
                 'class' => 'WarningContext'
             ));
+        }
+    }
+
+    /**
+     * Show the warning context in the email.
+     *
+     * @param ActivityModel $sender The event sender.
+     * @param array $args Event arguments.
+     */
+    public function activityModel_beforeSendNotification_handler($sender, $args) {
+        if (!isset($args['Email'])) {
+            return;
+        }
+        $request = Gdn::request();
+        $path = $request->path();
+        if (strpos($path, 'profile/warn') !== false) {
+            return;
+        }
+
+        $recordID = $request->get('recordid');
+        $recordType = $request->get('recordtype');
+        if (!$recordID || !$recordType) {
+            return;
+        }
+
+        $recordType = strtolower($recordType);
+        if (in_array($recordType, ['comment', 'discussion'])) {
+            $modelName = $recordType.'Model';
+            $model = new $modelName();
+            $record = $model->getID($recordID);
+
+            if ($record) {
+                /**
+                 * @var $email Gdn_Email
+                 */
+                $email = $args['Email'];
+                $emailTemplate = $email->getEmailTemplate();
+                $message = $emailTemplate->getMessage();
+
+                $message .= '<br>'.t('Post that triggered the warning:').'<br>'.formatQuote($record, false);
+                $emailTemplate->setMessage($message);
+            }
         }
     }
 

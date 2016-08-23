@@ -118,11 +118,23 @@
    <ul class="MailingList">
       <li><?php
          echo $this->Form->label("Mailing List", "ListID");
-         echo $this->Form->dropDown('ListID', $this->data('Lists'), array('IncludeNull' => TRUE));
+         echo $this->Form->dropDown('ListID', $this->data('Lists'), array('IncludeNull' => true));
       ?></li>
-      
+      <?php
+         $interests = $this->data('Interests');
+         // Create any dropdowns of interests associated with lists, each dropdown is hidden
+         // by javascript unless the list is selected.
+         foreach ($interests as $list => $interest) {
+            echo "<li id='InterestDropdown{$list}' class='InterestDropdowns'>";
+            echo $this->Form->label("Interest", "InterestID");
+            // Disable the interest dropdown by default. Will be activated by javascript if needed.
+            echo $this->Form->dropDown('InterestID['.$list.']', $interest, array('IncludeNull' => true, 'disabled' => true, 'Value' => $this->Form->getValue('InterestID')));
+            echo "</li>";
+         }
+      ?>
       <li><?php
          echo $this->Form->checkBox('ConfirmJoin', 'Send confirmation email?');
+         echo $this->Form->label('For more information see MailChimp\'s <a href=\'http://kb.mailchimp.com/lists/signup-forms/understanding-the-double-opt-in-process\'>"Understanding the Double Opt-In Process"</a>', 'ConfirmJoin');
       ?></li>
    </ul>
    <?php endif; ?>
@@ -155,8 +167,21 @@
          echo $this->Sync->label("Sync to List", "SyncListID");
          echo $this->Sync->dropDown('SyncListID', $this->data('Lists'), array('IncludeNull' => true));
       ?></li>
+      <?php
+
+      // Create any dropdowns of interests associated with lists, each dropdown is hidden
+      // by javascript unless the list is selected.
+      foreach ($interests as $list => $interest) {
+         echo "<li id='SyncInterestDropdown{$list}' class='SyncInterestDropdowns'>";
+         echo $this->Sync->label('Interest', 'SyncInterestID'.$list);
+         // Disable the sync interest dropdown by default. Will be activated by javascript if needed.
+         echo $this->Sync->dropDown('SyncInterestID['.$list.']', $interest, array('IncludeNull' => true, 'disabled' => true));
+         echo "</li>";
+      }
+      ?>
       <li><?php
          echo $this->Sync->checkBox('SyncConfirmJoin', 'Send confirmation email?');
+         echo $this->Sync->label('For more information see MailChimp\'s <a href=\'http://kb.mailchimp.com/lists/signup-forms/understanding-the-double-opt-in-process\'>"Understanding the Double Opt-In Process"</a>', 'SyncConfirmJoin');
       ?></li>
       <li><?php
          echo $this->Sync->label("User Selection");
