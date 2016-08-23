@@ -3,6 +3,9 @@
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
+if (val('IsDefault', $this->Form->formData())) {
+    echo '<div class="alert alert-info padded"><span class="label">'.t('Default Status').'</span> '.t("This is the starting status for new ideas.").'</div>';
+}
 ?>
     <ul>
         <li class="form-group row">
@@ -21,9 +24,7 @@ echo $this->Form->errors();
         </li>
 
     <?php
-    if (val('IsDefault', $this->Form->formData())) {
-        echo '<li class="alert alert-success padded">'.t('Default Status').'</> '.t("This is the starting status for new ideas.").'</li>';
-    } else { ?>
+    if (!val('IsDefault', $this->Form->formData())) { ?>
         <li class="form-group row">
             <div class="input-wrap no-label">
                 <?php echo $this->Form->checkbox('IsDefault', '<strong>'.t('Default Status').'</strong> '.t("Make this the starting status for new ideas.")); ?>
