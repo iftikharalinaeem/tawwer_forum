@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<h1><?php echo $this->data('Title'); ?></h1>
 <div class="analytics-dashboard-content">
-    <h1><?php echo $this->data('Title'); ?></h1>
     <?php
     echo Gdn_Theme::module('AnalyticsToolbarModule');
     ?>

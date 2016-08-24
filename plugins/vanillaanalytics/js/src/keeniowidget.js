@@ -397,7 +397,7 @@ KeenIOWidget.prototype.divideResult = function(result) {
 };
 
 KeenIOWidget.prototype.getMetricMarkup = function() {
-    var markup = "<span class=\"metric-value\">{data}</span><span class=\"metric-title\">{title}</span>";
+    var markup = "<div class=\"metric-value\">{data}</div><div class=\"metric-title\">{title}</div>";
     var data = this.getData();
     var title = this.getTitle();
 

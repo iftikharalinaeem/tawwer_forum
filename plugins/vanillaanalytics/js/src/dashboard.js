@@ -7,7 +7,15 @@ $(document).ready(function() {
 
     if (typeof c3 === "object") {
         c3.chart.internal.fn.additionalConfig = {
-            axis_x_tick_count: 3
+            grid_x_show: true,
+            grid_y_show: true,
+            axis_x_tick_format: (function(date) { return this.formatDate(date) }).bind(this),
+            axis_x_tick_type: "timeseries",
+            axis_y_tick_format: (function (d) {if (d % 1 !== 0) {return '';} return d;}),
+            tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+                    d = Math.floor(d[0].value)
+                    return '<div id="tooltip" class="module-triangle-bottom">' + d + '</div>'
+            }
         };
     }
 

@@ -54,19 +54,20 @@ var analyticsToolbar = {
         var threshold = rangeSeconds / analyticsToolbar.maxTicks;
 
         // Set bad intervals to disabled.
-        $('#Form_intervals > option').each(function() {
-            if ($(this).attr('data-seconds') < threshold) {
-                $(this).attr('disabled', 'disabled');
+        $('.js-analytics-interval').each(function() {
+            if ($(this).data('seconds') < threshold) {
+                $(this).addClass('disabled');
             } else {
-                $(this).removeAttr('disabled');
+                $(this).removeClass('disabled');
             }
         });
 
         // Choose the first good interval.
-        if ($('#Form_intervals option:selected').attr('disabled') === 'disabled') {
-            $('#Form_intervals > option').each(function() {
-                if (!$(this).attr('disabled')) {
-                    $('#Form_intervals').val($(this).val()).trigger('change');
+        if ($('.js-analytics-interval.active').hasClass('disabled') || $('.js-analytics-interval.active').length === 0) {
+            $('.js-analytics-interval.active').removeClass('active');
+            $('.js-analytics-interval').each(function() {
+                if (!$(this).hasClass('disabled')) {
+                    $(this).trigger('click');
                     return false;
                 }
             });
@@ -82,71 +83,55 @@ $(document).on('change', '#Form_cat01', function() {
 
 
 // Re-render the graphs with new intervals.
-$(document).on('change', '#Form_intervals', function() {
-    var newInterval = $(this).val();
+$(document).on('click', '.js-analytics-interval:not(.disabled)', function() {
+    $('.js-analytics-interval').removeClass('active');
+    $(this).addClass('active');
+    var newInterval = $(this).data('interval');
     analyticsToolbar.setWidgets('setInterval', [newInterval]);
 });
 
-$(document).on('ready', function() {
+$(document).ready(function() {
+    var defaultRange = analyticsToolbar.getDefaultRange();
 
     $(".js-date-range").daterangepicker({
-        datepickerOptions: {
-            numberOfMonths: 2
-        },
-        presetRanges: [
-            {
-                text: 'Past 30 Days',
-                dateStart: function () {
-                    return moment().subtract('days', 30);
-                },
-                dateEnd: function () {
-                    return moment();
-                }
-            },
-            {
-                text: 'This Month',
-                dateStart: function () {
-                    return moment().startOf('month');
-                },
-                dateEnd: function () {
-                    return moment().endOf('month');
-                }
-            },
-            {
-                text: 'Last Month',
-                dateStart: function () {
-                    return moment().subtract('month', 1).startOf('month');
-                },
-                dateEnd: function () {
-                    return moment().subtract('month', 1).endOf('month');
-                }
-            },
-            {
-                text: 'Past Year',
-                dateStart: function () {
-                    return moment().subtract('year', 1);
-                },
-                dateEnd: function () {
-                    return moment();
-                }
-            },
-            {
-                text: 'Year to Date',
-                dateStart: function () {
-                    return moment().startOf('year');
-                },
-                dateEnd: function () {
-                    return moment();
-                }
-            }
-        ],
-        onChange: function () {
-            var range = $(".js-date-range").daterangepicker("getRange");
-            Cookies.set('va-dateRange', range);
-            analyticsToolbar.updateIntervals(range);
-            analyticsToolbar.setWidgets('setRange', [range]);
+        alwaysShowCalendars: true,
+        startDate: defaultRange.start,
+        endDate: defaultRange.end,
+        opens: 'left',
+        buttonClasses: "btn",
+        applyClass: "btn-primary",
+        cancelClass: "btn-secondary",
+        ranges: {
+            'Past 30 Days': [moment().subtract(30, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            'Past Year': [moment().subtract(1, 'year'), moment()],
+            'Year to Date': [moment().startOf('year'), moment()]
         }
     });
 
-    $(".js-date-range").daterangepicker("setRange", analyticsToolbar.getDefaultRange());
+    $(".js-date-range").on('apply.daterangepicker', function (ev, picker) {
+        var range = {
+            start: picker.startDate.toDate(),
+            end: picker.endDate.toDate()
+        };
+        Cookies.set('va-dateRange', range);
+        analyticsToolbar.updateIntervals(range);
+        analyticsToolbar.setWidgets('setRange', [range]);
+    });
+
+    $(".js-date-range").on('show.daterangepicker', function (ev, picker) {
+        console.log('show!');
+        $('.daterangepicker').addClass('got-it');
+        $('.daterangepicker').css('display', 'flex');
+    });
+
+    // $(".js-date-range").on('hideCalendar.daterangepicker', function (ev, picker) {
+    //     $(picker).css('display', 'none');
+    // });
+
+    analyticsToolbar.updateIntervals(defaultRange);
+    analyticsToolbar.setWidgets('setRange', [defaultRange]);
 });
+
+

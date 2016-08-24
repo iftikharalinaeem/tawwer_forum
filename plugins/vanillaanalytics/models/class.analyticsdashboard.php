@@ -303,7 +303,7 @@ class AnalyticsDashboard implements JsonSerializable {
      * @param AnalyticsDashboard $dashboard
      */
     public function render(Gdn_Controller $sender, AnalyticsDashboard $dashboard) {
-        $sender->addSideMenu();
+        
 
         $sender->setData('Title', sprintf(t('Analytics: %1$s'), $dashboard->getTitle()));
         $sender->setData('AnalyticsDashboard', $dashboard);

@@ -117,7 +117,7 @@ function AnalyticsWidget(config) {
 
         // Metrics are a special case where a title is redundant.  Otherwise, we need a title element.
         if (this.getType() !== 'metric') {
-            newElements.title = document.createElement('h4');
+            newElements.title = document.createElement('h3');
             newElements.title.setAttribute('class', 'title');
             newElements.title.innerHTML = this.getTitle();
             newElements.header.appendChild(newElements.title);
