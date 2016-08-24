@@ -104,7 +104,7 @@ class CustomThemePlugin extends Gdn_Plugin {
                 'content' => $content,
             ];
 
-            Gdn::cache()->store($cacheKey, $data, [Gdn_Cache::FEATURE_EXPIRY => 3600]);
+            Gdn::cache()->store($cacheKey, $data, [Gdn_Cache::FEATURE_EXPIRY => c('Plugins.CustomTheme.CSSCacheTime', 3600)]);
         }
 
         if ($data['serveFile']) {
