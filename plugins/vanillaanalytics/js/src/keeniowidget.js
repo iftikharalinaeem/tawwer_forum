@@ -522,6 +522,7 @@ KeenIOWidget.prototype.renderBody = function() {
         switch (this.getType()) {
             case 'metric':
                 element.innerHTML = this.getMetricMarkup();
+                $(element).trigger('contentLoad');
                 break;
             default:
                 dataviz.parseRawData({result: this.getData()});

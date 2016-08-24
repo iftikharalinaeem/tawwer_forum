@@ -7,6 +7,7 @@ $(document).ready(function() {
 
     if (typeof c3 === "object") {
         c3.chart.internal.fn.additionalConfig = {
+            axis_x_tick_count: 5,
             grid_x_show: true,
             grid_y_show: true,
             axis_x_tick_format: (function(date) { return this.formatDate(date) }).bind(this),

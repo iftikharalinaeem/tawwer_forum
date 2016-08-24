@@ -45,6 +45,9 @@ var analyticsToolbar = {
     },
 
     updateIntervals: function(range) {
+
+        var interval = Cookies.getJSON('va-interval');
+
         var end = new Date(range['end']);
         var start = new Date(range['start']);
         var rangeSeconds = (end - start)/1000;
@@ -62,15 +65,21 @@ var analyticsToolbar = {
             }
         });
 
-        // Choose the first good interval.
-        if ($('.js-analytics-interval.active').hasClass('disabled') || $('.js-analytics-interval.active').length === 0) {
-            $('.js-analytics-interval.active').removeClass('active');
-            $('.js-analytics-interval').each(function() {
-                if (!$(this).hasClass('disabled')) {
-                    $(this).trigger('click');
-                    return false;
-                }
-            });
+        var $cookiedInterval = $('.js-analytics-interval[data-interval="' + interval + '"]');
+
+        if ($cookiedInterval.length > 0 && !$cookiedInterval.hasClass('disabled')) {
+            $cookiedInterval.trigger('click');
+        } else {
+            // Choose the first good interval.
+            if ($('.js-analytics-interval.active').hasClass('disabled') || $('.js-analytics-interval.active').length === 0) {
+                $('.js-analytics-interval.active').removeClass('active');
+                $('.js-analytics-interval').each(function() {
+                    if (!$(this).hasClass('disabled')) {
+                        $(this).trigger('click');
+                        return false;
+                    }
+                });
+            }
         }
     }
 };
@@ -86,6 +95,7 @@ $(document).on('change', '#Form_cat01', function() {
 $(document).on('click', '.js-analytics-interval:not(.disabled)', function() {
     $('.js-analytics-interval').removeClass('active');
     $(this).addClass('active');
+    Cookies.set('va-interval', $(this).data('interval'));
     var newInterval = $(this).data('interval');
     analyticsToolbar.setWidgets('setInterval', [newInterval]);
 });
@@ -121,14 +131,8 @@ $(document).ready(function() {
     });
 
     $(".js-date-range").on('show.daterangepicker', function (ev, picker) {
-        console.log('show!');
-        $('.daterangepicker').addClass('got-it');
         $('.daterangepicker').css('display', 'flex');
     });
-
-    // $(".js-date-range").on('hideCalendar.daterangepicker', function (ev, picker) {
-    //     $(picker).css('display', 'none');
-    // });
 
     analyticsToolbar.updateIntervals(defaultRange);
     analyticsToolbar.setWidgets('setRange', [defaultRange]);

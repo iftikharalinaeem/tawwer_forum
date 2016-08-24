@@ -168,7 +168,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
                     'removeAnalyticsWidget',
                     'Callback'
                 );
-                $sender->informMessage(t('Removed widget bookmark'));
+                $sender->informMessage(t('Unpinned widget'));
             } else {
                 $dashboardModel->addWidget(
                     $widgetID,
@@ -177,14 +177,14 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
                 );
                 $bookmarked = true;
 
-                $sender->informMessage(t('Bookmarked widget'));
+                $sender->informMessage(t('Pinned widget'));
             }
 
             $html = anchor(
-                t('Bookmark'),
+                dashboardSymbol('pin'),
                 "/settings/analytics/bookmarkwidget/{$widgetID}",
-                'Hijack bookmark'.($bookmarked ? ' bookmarked' : ''),
-                array('title' => $widget->getTitle())
+                'Hijack bookmark'.($bookmarked ? ' bookmarked' : '')
+//                array('title' => $widget->getTitle())
             );
             $sender->jsonTarget('!element', $html, 'ReplaceWith');
         } else {
