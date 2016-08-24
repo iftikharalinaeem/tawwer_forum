@@ -24,11 +24,9 @@ module.exports = function (grunt) {
                         flatten: true,
                         cwd: 'bower_components',
                         src: [
-                            'jquery-ui/**/jquery-ui.min.js'
-                            , 'c3/**/*.min.js'
+                            'c3/**/*.min.js'
                             , 'd3/**/*.min.js'
                             , 'js-cookie/**/*.js'
-                            , 'jquery-ui-daterangepicker/**/*.min.js'
                             , 'momentjs/**/moment.min.js'
                             , 'keen-js/dist/keen.min.js'
                         ],
@@ -40,9 +38,6 @@ module.exports = function (grunt) {
                         cwd: 'bower_components',
                         src: [
                             'c3/**/*.min.css'
-                            , 'jquery-ui-daterangepicker/**/*.css'
-                            , 'jquery-ui/**/jquery.ui.theme.min.css'
-                            , 'jquery-ui/**/jquery.ui.datepicker.css'
                         ],
                         dest: 'design/vendors'
                     }
@@ -80,77 +75,21 @@ module.exports = function (grunt) {
         },
 
         watch: {
-            bower: {
-                files: ['bower.json']
-                , tasks: ['wiredep']
-            }
-            , gruntfile: {
+            gruntfile: {
                 files: ['Gruntfile.js']
-            }
-            , sass: {
-                files: ['scss/**/*.scss']
-                , tasks: ['scsslint', 'sass', 'autoprefixer', 'csslint']
             }
             , livereload: {
                 options: {
                     livereload: true
                 }
                 , files: [
-                    'design/**/*.css'
-                    , 'design/images/**/*'
-                    , 'js/**/*.js'
-                    , 'views/**/*.tpl'
+                    'js/**/*.js'
                 ]
             }
             , scripts: {
                 files: ['js/src/*.js']
                 , tasks: ['uglify']
             }
-        },
-
-        sass: {
-            options: {
-                sourceMap: true,
-                outputStyle: "expanded"
-            },
-            dist: {
-                files: [{
-                    expand: true
-                    , cwd: 'scss/'
-                    , src: [
-                        '*.scss'
-                        , '!_*.scss'
-                    ]
-                    , dest: 'design/'
-                    , ext: '.css'
-                }]
-            }
-        },
-
-        scsslint: {
-            options: {
-                config: 'scss/.scss-lint.yml',
-                maxBuffer: 3000 * 1024,
-                colorizeOutput: true
-            }
-            , all: ['scss/**/*.scss']
-        },
-
-        autoprefixer: {
-            options: {
-                map: true,
-                cascade: false
-            },
-            dist: {
-                src: ['design/dashboard.css']
-            }
-        },
-
-        csslint: {
-            options: {
-                csslintrc: 'design/.csslintrc'
-            }
-            , all: ['design/dashboard.css']
         },
 
         imagemin: {
@@ -162,26 +101,14 @@ module.exports = function (grunt) {
                     dest: 'design/images'
                 }]
             }
-        },
-
-        wiredep: {
-            dist: {
-                src: ['scss/**/*.scss']
-            }
         }
-
     });
 
     grunt.registerTask('default', [
-        'wiredep'
-        , 'scsslint'
-        , 'sass'
-        , 'copy'
+        'copy'
         , 'concat'
         , 'cssmin'
         , 'uglify'
-        , 'autoprefixer'
-        , 'csslint'
         , 'imagemin'
     ]);
 };
