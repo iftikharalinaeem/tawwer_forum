@@ -67,7 +67,7 @@ var analyticsToolbar = {
 
         var $cookiedInterval = $('.js-analytics-interval[data-interval="' + interval + '"]');
 
-        if ($cookiedInterval.length > 0 && !$cookiedInterval.hasClass('disabled')) {
+        if (interval !== 'undefined' && $cookiedInterval.length > 0 && !$cookiedInterval.hasClass('disabled')) {
             $cookiedInterval.trigger('click');
         } else {
             // Choose the first good interval.
