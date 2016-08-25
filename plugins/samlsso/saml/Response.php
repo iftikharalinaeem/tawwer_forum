@@ -127,6 +127,7 @@ class OneLogin_Saml_Response
         $xml->registerXPathNamespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
         $xml->registerXPathNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
 
+        // Some SAML responses put the signature in the assertion, some don't. Loop through the possible paths.
         $signatureQueries = [
             '/samlp:Response//saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference',
             '/samlp:Response//ds:Signature/ds:SignedInfo/ds:Reference'
@@ -140,6 +141,7 @@ class OneLogin_Saml_Response
             }
         }
         if (!$refNode) {
+            // if no signature is found, dump the structure to the Logger, throw an error message.
             $xmlstr = $this->document->saveXML();
             Logger::event('saml_response', Logger::ERROR, 'SAML Signature not found', (array) $xmlstr);
             throw new Exception('Unable to query assertion, no Signature Reference found?', 422);
