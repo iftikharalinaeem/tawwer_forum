@@ -91,11 +91,25 @@ class CustomThemePlugin extends Gdn_Plugin {
 
         $liveRevisionID = c('Plugins.CustomTheme.LiveRevisionID', 0);
         $revisionID = CustomThemePlugin::getRevisionFromFileName($liveRevisionID);
-        $css = Gdn::sql()->reset()->getWhere('CustomThemeRevision', array('RevisionID' => $revisionID))->value('CSS');
 
-        if ($css) {
+        $cacheKey = "customtheme.css[$revisionID]";
+        $data = Gdn::cache()->get($cacheKey);
+
+        if ($data === Gdn_Cache::CACHEOP_FAILURE) {
+            $content = Gdn::sql()->reset()->getWhere('CustomThemeRevision', array('RevisionID' => $revisionID))->value('CSS');
+            $serveFile = (bool)trim(preg_replace('#/\*.*?\*/#s', null, $content));
+
+            $data = [
+                'serveFile' => $serveFile,
+                'content' => $content,
+            ];
+
+            Gdn::cache()->store($cacheKey, $data, [Gdn_Cache::FEATURE_EXPIRY => c('Plugins.CustomTheme.CSSCacheTime', 3600)]);
+        }
+
+        if ($data['serveFile']) {
             $host = Gdn::request()->host();
-            $sender->addCssFile(false, "/plugin/customcss/{$host}/rev_{$liveRevisionID}.css", ['Css' => $css, 'Sort' => 100]);
+            $sender->addCssFile(false, "/plugin/customcss/{$host}/rev_{$liveRevisionID}.css", ['Css' => $data['content'], 'Sort' => 100]);
         }
     }
 
