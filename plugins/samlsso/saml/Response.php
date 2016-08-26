@@ -127,7 +127,7 @@ class OneLogin_Saml_Response
         $xml->registerXPathNamespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
         $xml->registerXPathNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
 
-        // Some SAML responses put the signature in the assertion, some don't. Loop through the possible paths.
+        // Some SAML responses put the Signature in the Assertion, some don't. Loop through the possible paths.
         $signatureQueries = [
             '/samlp:Response//saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference',
             '/samlp:Response//ds:Signature/ds:SignedInfo/ds:Reference'
@@ -149,7 +149,30 @@ class OneLogin_Saml_Response
 
         $id = substr((string)$refNode['URI'], 1);
 
-        $nameQuery = "/samlp:Response//saml:Assertion[@ID='$id']".$assertionXpath;
-        return $xml->xpath($nameQuery);
+        // Again, to accommodate SAML documents that put the ID on the Assertion
+        // AND documents that nest the Assertion somewhere in a node with the ID
+        // we loop through the possible places until we find an assertion.
+        $nameQueries = [
+            "/samlp:Response//saml:Assertion[@ID='$id']".$assertionXpath,
+            ".//*[@ID='$id']//saml:Assertion".$assertionXpath
+        ];
+        foreach ($nameQueries as $nameQuery) {
+            $assertion = reset($xml->xpath($nameQuery));
+            if ($assertion) {
+                break;
+            }
+        }
+        if (!$assertion) {
+            if ($assertionXpath === '/saml:Subject/saml:NameID') {
+                // This means no NameID has been found, dump the structure to the Logger, throw an error message.
+                $xmlstr = $this->document->saveXML();
+                Logger::event('saml_response', Logger::ERROR, 'SAML NameID Not Found.', (array) $xmlstr);
+                throw new Exception('Unable to find the unique identifier sent by the identity provider.', 422);
+            } else {
+                // if no assertion is found, dump the structure to the Logger, don't throw an error message.
+                Logger::event('saml_response', Logger::INFO, "SAML Missing Assertion {$assertionXpath}.", []);
+            }
+        }
+        return $assertion;
     }
 }
