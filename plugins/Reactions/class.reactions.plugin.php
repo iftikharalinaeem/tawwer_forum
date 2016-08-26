@@ -1,5 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php
 /**
  *
  * Changes:
@@ -11,31 +10,40 @@
  *  1.2.15  Add section 508 fixes.
  *  1.4.0   Add support for merging users' reactions.
  *
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @copyright 2009-2016 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['Reactions'] = array(
+$PluginInfo['Reactions'] = [
     'Name' => 'Reactions',
     'Description' => "Adds reaction options to discussions & comments.",
-    'Version' => '1.4.3',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
-    'RegisterPermissions' => array(
+    'Version' => '1.4.4',
+    'RequiredApplications' => ['Vanilla' => '2.1'],
+    'RegisterPermissions' => [
         'Reactions.Positive.Add' => 'Garden.SignIn.Allow',
         'Reactions.Negative.Add' => 'Garden.SignIn.Allow',
         'Reactions.Flag.Add' => 'Garden.SignIn.Allow'
-    ),
+    ],
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'MobileFriendly' => TRUE
-);
+    'MobileFriendly' => true
+];
 
+/**
+ * Class ReactionsPlugin
+ */
 class ReactionsPlugin extends Gdn_Plugin {
 
     const RECORD_REACTIONS_DEFAULT = 'popup';
+
     const BEST_OF_MAX_PAGES = 300;
+
+    /** @var array */
+    protected static $_CommentOrder;
+
+    /** @var array Get the user's preference for comment sorting (if enabled). */
+    protected static $_CommentSort;
 
     /**
      * Include ReactionsController for /reactions requests
@@ -46,12 +54,13 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param Gdn_Dispatcher $Sender
      */
     public function gdn_dispatcher_beforeDispatch_handler($Sender, $Args) {
-        if (!isset($Args['Request']))
+        if (!isset($Args['Request'])) {
             return;
+        }
 
-        $Path = $Args['Request']->Path();
+        $Path = $Args['Request']->path();
         if (preg_match('`^/?reactions`i', $Path)) {
-            require_once($this->GetResource('controllers/class.reactionscontroller.php'));
+            require_once($this->getResource('controllers/class.reactionscontroller.php'));
         }
     }
 
@@ -62,13 +71,13 @@ class ReactionsPlugin extends Gdn_Plugin {
      */
     public function promotedContentModule_selectByReaction_handler($sender) {
         $model = new ReactionModel();
-        $reactionType = ReactionModel::ReactionTypes($sender->Selection);
+        $reactionType = ReactionModel::reactionTypes($sender->Selection);
 
         if (!$reactionType) {
             return;
         }
 
-        $data = $model->GetRecordsWhere(
+        $data = $model->getRecordsWhere(
             array('TagID' => $reactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'Total >=' => 1),
             'DateInserted', 'desc',
             $sender->Limit, 0);
@@ -76,21 +85,21 @@ class ReactionsPlugin extends Gdn_Plugin {
         // Massage the data for the promoted content module.
         foreach ($data as &$row) {
             $row['ItemType'] = $row['RecordType'];
-            $row['Author'] = Gdn::UserModel()->GetID($row['InsertUserID']);
+            $row['Author'] = Gdn::userModel()->getID($row['InsertUserID']);
         }
 
-        $sender->SetData('Content', $data);
+        $sender->setData('Content', $data);
     }
 
     /**
-     * Add mapper methods
+     * Add mapper methods.
      *
-     * @param SimpleApiPlugin $Sender
+     * @param SimpleApiPlugin $sender
      */
-    public function simpleApiPlugin_mapper_handler($Sender) {
-        switch ($Sender->Mapper->Version) {
+    public function simpleApiPlugin_mapper_handler($sender) {
+        switch ($sender->Mapper->Version) {
             case '1.0':
-                $Sender->Mapper->AddMap(array(
+                $sender->Mapper->addMap(array(
                     'reactions/list' => 'reactions',
                     'reactions/get' => 'reactions/get',
                     'reactions/add' => 'reactions/add',
@@ -101,31 +110,39 @@ class ReactionsPlugin extends Gdn_Plugin {
         }
     }
 
-    private function addJs($Sender) {
-        $Sender->AddJsFile('jquery-ui.js');
-        $Sender->AddJsFile('reactions.js', 'plugins/Reactions');
+    /**
+     *
+     *
+     * @param $sender
+     */
+    private function addJs($sender) {
+        $sender->AddJsFile('jquery-ui.js');
+        $sender->AddJsFile('reactions.js', 'plugins/Reactions');
     }
 
-    protected static $_CommentOrder;
-
+    /**
+     *
+     *
+     * @return array
+     */
     public static function commentOrder() {
-//      die();
         if (!self::$_CommentOrder) {
-            $SetPreference = FALSE;
+            $SetPreference = false;
 
-            if (!Gdn::Session()->IsValid()) {
-                if (Gdn::Controller() != NULL && strcasecmp(Gdn::Controller()->RequestMethod, 'embed') == 0)
-                    $OrderColumn = C('Plugins.Reactions.DefaultEmbedOrderBy', 'Score');
-                else
-                    $OrderColumn = C('Plugins.Reactions.DefaultOrderBy', 'DateInserted');
+            if (!Gdn::session()->isValid()) {
+                if (Gdn::controller() != null && strcasecmp(Gdn::controller()->RequestMethod, 'embed') == 0) {
+                    $OrderColumn = c('Plugins.Reactions.DefaultEmbedOrderBy', 'Score');
+                } else {
+                    $OrderColumn = c('Plugins.Reactions.DefaultOrderBy', 'DateInserted');
+                }
             } else {
                 $DefaultOrderParts = array('DateInserted', 'asc');
 
-                $OrderBy = Gdn::Request()->Get('orderby', '');
+                $OrderBy = Gdn::request()->get('orderby', '');
                 if ($OrderBy) {
-                    $SetPreference = TRUE;
+                    $SetPreference = true;
                 } else {
-                    $OrderBy = Gdn::Session()->GetPreference('Comments.OrderBy');
+                    $OrderBy = Gdn::session()->getPreference('Comments.OrderBy');
                 }
                 $OrderParts = explode(' ', $OrderBy);
                 $OrderColumn = GetValue(0, $OrderParts, $DefaultOrderParts[0]);
@@ -136,7 +153,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
 
                 if ($SetPreference) {
-                    Gdn::Session()->SetPreference('Comments.OrderBy', $OrderColumn);
+                    Gdn::session()->setPreference('Comments.OrderBy', $OrderColumn);
                 }
             }
             $OrderDirection = $OrderColumn == 'Score' ? 'desc' : 'asc';
@@ -154,130 +171,145 @@ class ReactionsPlugin extends Gdn_Plugin {
         return self::$_CommentOrder;
     }
 
+    /**
+     * Run once on enable.
+     */
     public function setup() {
-        $this->Structure();
+        $this->structure();
     }
 
+    /**
+     * Database updates.
+     */
     public function structure() {
         include dirname(__FILE__).'/structure.php';
     }
 
-    public function assetModel_styleCss_handler($Sender, $Args) {
-        $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
+    /**
+     *
+     *
+     * @param $sender
+     */
+    public function assetModel_styleCss_handler($sender) {
+        $sender->addCssFile('reactions.css', 'plugins/Reactions');
     }
 
     /**
      *
-     * @param ActivityController $Sender
+     *
+     * @param ActivityController $sender
      */
-    public function activityController_render_before($Sender) {
-        if ($Sender->DeliveryMethod() == DELIVERY_METHOD_XHTML || $Sender->DeliveryType() == DELIVERY_TYPE_VIEW) {
-            $this->AddJs($Sender);
-            include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+    public function activityController_render_before($sender) {
+        if ($sender->deliveryMethod() == DELIVERY_METHOD_XHTML || $sender->deliveryType() == DELIVERY_TYPE_VIEW) {
+            $this->addJs($sender);
+            include_once $sender->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
         }
     }
-
-    /// Event Handlers ///
 
     /**
      * Adds items to Dashboard menu.
      *
      * @since 1.0.0
-     * @param object $Sender DashboardController.
+     * @param DashboardController $sender
      */
-    public function base_getAppSettingsMenuItems_handler($Sender) {
-        $Menu = $Sender->EventArguments['SideMenu'];
-        $Menu->AddLink('Reputation', T('Reactions'), 'reactions', 'Garden.Community.Manage', array('class' => 'nav-reactions'));
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        $Menu = $sender->EventArguments['SideMenu'];
+        $Menu->addLink('Reputation', t('Reactions'), 'reactions', 'Garden.Community.Manage', array('class' => 'nav-reactions'));
+    }
+
+    /**
+     * New Html method of adding to discussion filters.
+     *
+     * @param Gdn_Controller $sender
+     */
+    public function base_afterDiscussionFilters_handler($sender) {
+        echo '<li class="Reactions-BestOf">'.anchor(sprite('SpBestOf').' '.t('Best Of...'), '/bestof/everything', '').'</li>';
     }
 
     /**
      *
-     * @param CommentModel $Sender
-     * @param array $Args
-     */
-//   public function CommentModel_AfterConstruct_Handler($Sender, $Args) {
-//      $OrderBy = self::CommentOrder($Sender);
-//      $Sender->OrderBy($OrderBy);
-//   }
-
-    /* New Html method of adding to discussion filters */
-    public function base_afterDiscussionFilters_handler($Sender) {
-        echo '<li class="Reactions-BestOf">'
-            .Anchor(Sprite('SpBestOf').' '.T('Best Of...'), '/bestof/everything', '')
-            .'</li>';
-    }
-
-    /**
      *
      * @param Gdn_Controller $Sender
      */
     public function discussionController_render_before($Sender) {
         $Sender->ReactionsVersion = 2;
 
-        $OrderBy = self::CommentOrder();
+        $OrderBy = self::commentOrder();
         list($OrderColumn, $OrderDirection) = explode(' ', val('0', $OrderBy));
-        $OrderColumn = StringBeginsWith($OrderColumn, 'c.', TRUE, TRUE);
+        $OrderColumn = stringBeginsWith($OrderColumn, 'c.', true, true);
 
         // Send back comment order for non-api calls.
-        if ($Sender->DeliveryType() !== DELIVERY_TYPE_DATA)
-            $Sender->SetData('CommentOrder', array('Column' => $OrderColumn, 'Direction' => $OrderDirection));
+        if ($Sender->deliveryType() !== DELIVERY_TYPE_DATA) {
+            $Sender->setData('CommentOrder', array('Column' => $OrderColumn, 'Direction' => $OrderDirection));
+        }
 
-        if ($Sender->ReactionsVersion == 1) {
-//         $Sender->AddCssFile('reactions-1.css', 'plugins/Reactions');
-        } else {
-//         $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
-            $this->AddJs($Sender);
+        if ($Sender->ReactionsVersion != 1) {
+            $this->addJs($Sender);
         }
 
         $ReactionModel = new ReactionModel();
-        if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars') {
+        if (c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars') {
             $ReactionModel->JoinUserTags($Sender->Data['Discussion'], 'Discussion');
             $ReactionModel->JoinUserTags($Sender->Data['Comments'], 'Comment');
 
-            if (isset($Sender->Data['Answers']))
+            if (isset($Sender->Data['Answers'])) {
                 $ReactionModel->JoinUserTags($Sender->Data['Answers'], 'Comment');
+            }
         }
 
-        include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+        include_once $Sender->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     */
     public function commentModel_beforeUpdateCommentCount_handler($Sender, $Args) {
-        if (!isset($Args['Discussion']))
+        if (!isset($Args['Discussion'])) {
             return;
+        }
 
         // A discussion with a low score counts as sunk.
         $Discussion =& $Args['Discussion'];
-        if ((int)GetValue('Score', $Discussion) <= -5) {
-            Gdn::Controller()->SetData('Score', GetValue('Score', $Discussion));
-            SetValue('Sink', $Discussion, TRUE);
+        if ((int)val('Score', $Discussion) <= -5) {
+            Gdn::controller()->setData('Score', val('Score', $Discussion));
+            setValue('Sink', $Discussion, true);
         }
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function base_beforeCommentRender_handler($Sender) {
-        include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+        include_once $Sender->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
     }
 
-    // Moved to core w/ stub
-    /*   public function ActivityController_AfterActivityBody_Handler($Sender, $Args) {
-          $Activity = $Args['Activity'];
-          if (in_array(GetValue('ActivityType', $Activity), array('Status', 'WallPost'))) {
-             WriteReactions($Activity);
-          }
-       }*/
-
-//   public function DiscussionController_CommentHeading_Handler($Sender, $Args) {
-//      WriteOrderByButtons();
-//   }
-
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     * @throws Exception
+     */
     public function base_afterUserInfo_handler($Sender, $Args) {
         // Fetch the view helper functions.
-        include_once Gdn::Controller()->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+        include_once Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
         echo '<div class="ReactionsWrap">';
-        echo '<h2 class="H">'.T('Reactions').'</h2>';
-        WriteProfileCounts();
+        echo '<h2 class="H">'.t('Reactions').'</h2>';
+        writeProfileCounts();
         echo '</div>';
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     * @param $Args
+     */
     public function base_beforeCommentDisplay_handler($Sender, $Args) {
         $CssClass = ScoreCssClass($Args['Object']);
         if ($CssClass) {
@@ -291,13 +323,14 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param ProfileController $Sender Duh.
      * @param string|int $UserReference A username or userid.
+     * @param string $Username
      * @param string $Reaction Which reaction is selected.
      * @param int $Page What page to show. Defaults to 1.
      */
     public function profileController_reactions_create($Sender, $UserReference, $Username = '', $Reaction = '', $Page = '') {
-        $Sender->Permission('Garden.Profiles.View');
+        $Sender->permission('Garden.Profiles.View');
 
-        $ReactionType = ReactionModel::ReactionTypes($Reaction);
+        $ReactionType = ReactionModel::reactionTypes($Reaction);
         if (!$ReactionType) {
             throw NotFoundException();
         }
@@ -308,64 +341,73 @@ class ReactionsPlugin extends Gdn_Plugin {
         list($Offset, $Limit) = OffsetLimit($Page, 5);
 
         // If this value is less-than-or-equal-to _CurrentRecords, we'll get a "next" pagination link.
-        $Sender->SetData('_Limit', $Limit + 1);
+        $Sender->setData('_Limit', $Limit + 1);
 
         // Try to query five additional records to compensate for user permission and deleted record issues.
         $ReactionModel = new ReactionModel();
-        $Data = $ReactionModel->GetRecordsWhere(array('TagID' => $ReactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'UserID' => $UserID, 'Total >' => 0),
+        $Data = $ReactionModel->getRecordsWhere(
+            ['TagID' => $ReactionType['TagID'], 'RecordType' => ['Discussion-Total', 'Comment-Total'], 'UserID' => $UserID, 'Total >' => 0],
             'DateInserted', 'desc',
             $Limit + 5, $Offset);
-        $Sender->SetData('_CurrentRecords', count($Data));
+        $Sender->setData('_CurrentRecords', count($Data));
 
         // If necessary, shave records off the end to get back down to the original size limit.
         while (count($Data) > $Limit) {
             array_pop($Data);
         }
-        if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) === 'avatars') {
-            $ReactionModel->JoinUserTags($Data);
+        if (c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) === 'avatars') {
+            $ReactionModel->joinUserTags($Data);
         }
 
-        $Sender->SetData('Data', $Data);
-        $Sender->SetData('EditMode', false, true);
+        $Sender->setData('Data', $Data);
+        $Sender->setData('EditMode', false, true);
 
-        $Sender->_SetBreadcrumbs($ReactionType['Name'], $Sender->CanonicalUrl());
-        $Sender->SetTabView('Reactions', 'DataList', '', 'plugins/Reactions');
-        $this->AddJs($Sender);
-        $Sender->AddJsFile('jquery.expander.js');
-        $Sender->AddDefinition('ExpandText', T('(more)'));
-        $Sender->AddDefinition('CollapseText', T('(less)'));
+        $Sender->_setBreadcrumbs($ReactionType['Name'], $Sender->canonicalUrl());
+        $Sender->setTabView('Reactions', 'DataList', '', 'plugins/Reactions');
+        $this->addJs($Sender);
+        $Sender->addJsFile('jquery.expander.js');
+        $Sender->addDefinition('ExpandText', T('(more)'));
+        $Sender->addDefinition('CollapseText', T('(less)'));
 
-        $Sender->Render();
+        $Sender->render();
     }
 
+    /**
+     *
+     *
+     * @param $Sender
+     */
     public function profileController_render_before($Sender) {
-        if (!$Sender->Data('Profile'))
+        if (!$Sender->data('Profile')) {
             return;
+        }
 
         // Grab all of the counts for the user.
-        $Data = Gdn::SQL()
-            ->GetWhere('UserTag', array('RecordID' => $Sender->Data('Profile.UserID'), 'RecordType' => 'User', 'UserID' => ReactionModel::USERID_OTHER))->ResultArray();
-        $Data = Gdn_DataSet::Index($Data, array('TagID'));
+        $Data = Gdn::sql()
+            ->getWhere('UserTag', ['RecordID' => $Sender->data('Profile.UserID'), 'RecordType' => 'User', 'UserID' => ReactionModel::USERID_OTHER])
+            ->resultArray();
+        $Data = Gdn_DataSet::index($Data, ['TagID']);
 
-        $Counts = $Sender->Data('Counts', array());
-        foreach (ReactionModel::ReactionTypes() as $Code => $Type) {
-            if (!$Type['Active'])
+        $Counts = $Sender->data('Counts', []);
+        foreach (ReactionModel::reactionTypes() as $Code => $Type) {
+            if (!$Type['Active']) {
                 continue;
+            }
 
-            $Row = array(
+            $Row = [
                 'Name' => $Type['Name'],
-                'Url' => Url(UserUrl($Sender->Data('Profile'), '', 'reactions').'?reaction='.urlencode($Code), TRUE),
-                'Total' => 0);
+                'Url' => Url(UserUrl($Sender->data('Profile'), '', 'reactions').'?reaction='.urlencode($Code), true),
+                'Total' => 0
+            ];
 
             if (isset($Data[$Type['TagID']])) {
                 $Row['Total'] = $Data[$Type['TagID']]['Total'];
             }
             $Counts[$Type['Name']] = $Row;
         }
-        $Sender->SetData('Counts', $Counts);
 
-//      $Sender->AddCssFile('reactions.css', 'plugins/Reactions');
-        $this->AddJs($Sender);
+        $Sender->setData('Counts', $Counts);
+        $this->addJs($Sender);
     }
 
     /**
@@ -380,51 +422,53 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function rootController_react_create($Sender, $RecordType, $Reaction, $ID, $selfReact = false) {
-        if (!Gdn::Session()->IsValid()) {
-            throw new Gdn_UserException(T('You need to sign in before you can do this.'), 403);
+        if (!Gdn::session()->isValid()) {
+            throw new Gdn_UserException(t('You need to sign in before you can do this.'), 403);
         }
 
-        include_once $Sender->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+        include_once $Sender->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
 
-        if (!$Sender->Request->IsPostBack()) {
+        if (!$Sender->Request->isPostBack()) {
             throw PermissionException('Javascript');
         }
 
-        $ReactionType = ReactionModel::ReactionTypes($Reaction);
+        $ReactionType = ReactionModel::reactionTypes($Reaction);
         $Sender->EventArguments['ReactionType'] = &$ReactionType;
         $Sender->EventArguments['RecordType'] = $RecordType;
         $Sender->EventArguments['RecordID'] = $ID;
-        $Sender->FireAs('ReactionModel')->FireEvent('GetReaction');
+        $Sender->fireAs('ReactionModel')->fireEvent('GetReaction');
 
         // Only allow enabled reactions
-        if (!GetValue('Active', $ReactionType)) {
+        if (!val('Active', $ReactionType)) {
             throw ForbiddenException("@You may not use that Reaction.");
         }
 
         // Permission
-        if ($Permission = GetValue('Permission', $ReactionType)) {
+        if ($Permission = val('Permission', $ReactionType)) {
             // Check reaction's permission if a custom/specific one is applied
-            $Sender->Permission($Permission);
+            $Sender->permission($Permission);
         } elseif ($PermissionClass = val('Class', $ReactionType)) {
             // Check reaction's permission based on class
-            $Sender->Permission('Reactions.'.$PermissionClass.'.Add');
+            $Sender->permission('Reactions.'.$PermissionClass.'.Add');
         }
 
         $ReactionModel = new ReactionModel();
-        $ReactionModel->React($RecordType, $ID, $Reaction, null, $selfReact);
-
-        $Sender->Render('Blank', 'Utility', 'Dashboard');
+        $ReactionModel->react($RecordType, $ID, $Reaction, null, $selfReact);
+        $Sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
      * Add the "Best Of..." link to the main menu.
+     *
+     * @param Gdn_Controller $Sender
      */
     public function base_render_before($Sender) {
-        if (is_object($Menu = GetValue('Menu', $Sender))) {
-            $Menu->AddLink('BestOf', T('Best Of...'), '/bestof/everything', FALSE, array('class' => 'BestOf'));
+        if (is_object($Menu = val('Menu', $Sender))) {
+            $Menu->addLink('BestOf', t('Best Of...'), '/bestof/everything', false, array('class' => 'BestOf'));
         }
-        if (!IsMobile())
-            $Sender->AddDefinition('ShowUserReactions', C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT));
+        if (!isMobile()) {
+            $Sender->addDefinition('ShowUserReactions', c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT));
+        }
     }
 
 
@@ -438,88 +482,82 @@ class ReactionsPlugin extends Gdn_Plugin {
     public function rootController_bestOfOld_create($Sender, $Reaction = 'everything') {
         // Load all of the reaction types.
         try {
-            $ReactionModel = new ReactionModel();
-            $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Positive', 'Active' => 1));
-
-            $Sender->SetData('ReactionTypes', $ReactionTypes);
-//         $ReactionTypes = array_merge($ReactionTypes, array_column($ReactionTypeData, 'UrlCode'));
-//         array_map('strtolower', $ReactionTypes);
+            $ReactionTypes = ReactionModel::getReactionTypes(['Class' => 'Positive', 'Active' => 1]);
+            $Sender->setData('ReactionTypes', $ReactionTypes);
         } catch (Exception $ex) {
-            $Sender->SetData('ReactionTypes', array());
+            $Sender->setData('ReactionTypes', []);
         }
         if (!isset($ReactionTypes[$Reaction])) {
             $Reaction = 'everything';
         }
-        $Sender->SetData('CurrentReaction', $Reaction);
+        $Sender->setData('CurrentReaction', $Reaction);
 
         // Define the query offset & limit.
-        $Page = 'p'.GetIncomingValue('Page', 1);
-        $Limit = C('Plugins.Reactions.BestOfPerPage', 30);
-        //      $OffsetProvided = $Page != '';
-        list($Offset, $Limit) = OffsetLimit($Page, $Limit);
-
+        $Page = 'p'.getIncomingValue('Page', 1);
+        $Limit = c('Plugins.Reactions.BestOfPerPage', 30);
+        list($Offset, $Limit) = offsetLimit($Page, $Limit);
         $Sender->SetData('_Limit', $Limit + 1);
 
         $ReactionModel = new ReactionModel();
         if ($Reaction == 'everything') {
-            $PromotedTagID = $ReactionModel->DefineTag('Promoted', 'BestOf');
-            $Data = $ReactionModel->GetRecordsWhere(
+            $PromotedTagID = $ReactionModel->defineTag('Promoted', 'BestOf');
+            $Data = $ReactionModel->detRecordsWhere(
                 array('TagID' => $PromotedTagID, 'RecordType' => array('Discussion', 'Comment')),
                 'DateInserted', 'desc',
                 $Limit + 1, $Offset);
         } else {
             $ReactionType = $ReactionTypes[$Reaction];
-            $Data = $ReactionModel->GetRecordsWhere(
+            $Data = $ReactionModel->getRecordsWhere(
                 array('TagID' => $ReactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'Total >=' => 1),
                 'DateInserted', 'desc',
                 $Limit + 1, $Offset);
         }
 
-        $Sender->SetData('_CurrentRecords', count($Data));
+        $Sender->setData('_CurrentRecords', count($Data));
         if (count($Data) > $Limit) {
             array_pop($Data);
         }
-        if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars')
-            $ReactionModel->JoinUserTags($Data);
-        $Sender->SetData('Data', $Data);
+        if (c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars') {
+            $ReactionModel->joinUserTags($Data);
+        }
+        $Sender->setData('Data', $Data);
 
-        // Set up head
+        // Set up head.
         $Sender->Head = new HeadModule($Sender);
-        $Sender->AddJsFile('jquery.js');
-        $Sender->AddJsFile('jquery.livequery.js');
-        $Sender->AddJsFile('global.js');
-        $Sender->AddJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions'); // I customized this to get proper callbacks.
-        $Sender->AddJsFile('library/jQuery-Wookmark/jquery.imagesloaded.js', 'plugins/Reactions');
-        $Sender->AddJsFile('library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js', 'plugins/Reactions');
-        $Sender->AddJsFile('tile.js', 'plugins/Reactions');
-        $Sender->AddCssFile('style.css');
-        $Sender->AddCssFile('vanillicon.css', 'static');
-        // Set the title, breadcrumbs, canonical
-        $Sender->Title(T('Best Of'));
-        $Sender->SetData('Breadcrumbs', array(array('Name' => T('Best Of'), 'Url' => '/bestof/everything')));
-        $Sender->CanonicalUrl(
-            Url(
-                ConcatSep('/', 'bestof/'.$Reaction, PageNumber($Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)),
-                TRUE),
-            Gdn::Session()->UserID == 0
+        $Sender->addJsFile('jquery.js');
+        $Sender->addJsFile('jquery.livequery.js');
+        $Sender->addJsFile('global.js');
+        $Sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions'); // I customized this to get proper callbacks.
+        $Sender->addJsFile('library/jQuery-Wookmark/jquery.imagesloaded.js', 'plugins/Reactions');
+        $Sender->addJsFile('library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js', 'plugins/Reactions');
+        $Sender->addJsFile('tile.js', 'plugins/Reactions');
+        $Sender->addCssFile('style.css');
+        $Sender->addCssFile('vanillicon.css', 'static');
+
+        // Set the title, breadcrumbs, canonical.
+        $Sender->title(t('Best Of'));
+        $Sender->setData('Breadcrumbs', [['Name' => t('Best Of'), 'Url' => '/bestof/everything']]);
+        $Sender->canonicalUrl(
+            url(concatSep('/', 'bestof/'.$Reaction, pageNumber($Offset, $Limit, true, Gdn::session()->UserID != 0)), true),
+            Gdn::session()->UserID == 0
         );
 
         // Modules
-        $Sender->AddModule('GuestModule');
-        $Sender->AddModule('SignedInModule');
-        $Sender->AddModule('BestOfFilterModule');
+        $Sender->addModule('GuestModule');
+        $Sender->addModule('SignedInModule');
+        $Sender->addModule('BestOfFilterModule');
 
         // Render the page.
         if (class_exists('LeaderBoardModule')) {
-            $Sender->AddModule('LeaderBoardModule');
+            $Sender->addModule('LeaderBoardModule');
 
             $Module = new LeaderBoardModule();
             $Module->SlotType = 'a';
-            $Sender->AddModule($Module);
+            $Sender->addModule($Module);
         }
 
         // Render the page (or deliver the view)
-        $Sender->Render('bestof_old', '', 'plugins/Reactions');
+        $Sender->render('bestof_old', '', 'plugins/Reactions');
     }
 
     /**
@@ -530,22 +568,20 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param int $Page The current page of content
      */
     public function rootController_bestOf_create($Sender, $Reaction = 'everything') {
-        Gdn_Theme::Section('BestOf');
+        Gdn_Theme::section('BestOf');
         // Load all of the reaction types.
         try {
-            $ReactionModel = new ReactionModel();
-            $ReactionTypes = ReactionModel::GetReactionTypes(array('Class' => 'Positive', 'Active' => 1));
+            $ReactionTypes = ReactionModel::getReactionTypes(array('Class' => 'Positive', 'Active' => 1));
 
-            $Sender->SetData('ReactionTypes', $ReactionTypes);
-//         $ReactionTypes = array_merge($ReactionTypes, array_column($ReactionTypeData, 'UrlCode'));
-//         array_map('strtolower', $ReactionTypes);
+            $Sender->setData('ReactionTypes', $ReactionTypes);
         } catch (Exception $ex) {
-            $Sender->SetData('ReactionTypes', array());
+            $Sender->setData('ReactionTypes', array());
         }
+
         if (!isset($ReactionTypes[$Reaction])) {
             $Reaction = 'everything';
         }
-        $Sender->SetData('CurrentReaction', $Reaction);
+        $Sender->setData('CurrentReaction', $Reaction);
 
         // Define the query offset & limit.
         $Page = Gdn::request()->get('Page', 1);
@@ -556,73 +592,73 @@ class ReactionsPlugin extends Gdn_Plugin {
         }
         $Page = 'p'.$Page;
 
-        $Limit = C('Plugins.Reactions.BestOfPerPage', 10);
-        list($Offset, $Limit) = OffsetLimit($Page, $Limit);
+        $Limit = c('Plugins.Reactions.BestOfPerPage', 10);
+        list($Offset, $Limit) = offsetLimit($Page, $Limit);
 
-        $Sender->SetData('_Limit', $Limit + 1);
+        $Sender->setData('_Limit', $Limit + 1);
 
         $ReactionModel = new ReactionModel();
-        SaveToConfig('Plugins.Reactions.ShowUserReactions', FALSE, FALSE);
+        saveToConfig('Plugins.Reactions.ShowUserReactions', false, false);
         if ($Reaction == 'everything') {
-            $PromotedTagID = $ReactionModel->DefineTag('Promoted', 'BestOf');
-            $Data = $ReactionModel->GetRecordsWhere(
-                array('TagID' => $PromotedTagID, 'RecordType' => array('Discussion', 'Comment')),
+            $PromotedTagID = $ReactionModel->defineTag('Promoted', 'BestOf');
+            $Data = $ReactionModel->getRecordsWhere(
+                ['TagID' => $PromotedTagID, 'RecordType' => ['Discussion', 'Comment']],
                 'DateInserted', 'desc',
                 $Limit + 1, $Offset);
         } else {
             $ReactionType = $ReactionTypes[$Reaction];
-            $Data = $ReactionModel->GetRecordsWhere(
-                array('TagID' => $ReactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'Total >=' => 1),
+            $Data = $ReactionModel->getRecordsWhere(
+                ['TagID' => $ReactionType['TagID'], 'RecordType' =>['Discussion-Total', 'Comment-Total'], 'Total >=' => 1],
                 'DateInserted', 'desc',
                 $Limit + 1, $Offset);
         }
 
-        $Sender->SetData('_CurrentRecords', count($Data));
+        $Sender->setData('_CurrentRecords', count($Data));
         if (count($Data) > $Limit) {
             array_pop($Data);
         }
-        $Sender->SetData('Data', $Data);
+        $Sender->setData('Data', $Data);
 
         // Set up head
         $Sender->Head = new HeadModule($Sender);
 
-        $Sender->AddJsFile('jquery.js');
-        $Sender->AddJsFile('jquery.livequery.js');
-        $Sender->AddJsFile('global.js');
+        $Sender->addJsFile('jquery.js');
+        $Sender->addJsFile('jquery.livequery.js');
+        $Sender->addJsFile('global.js');
 
-        if (C('Plugins.Reactions.BestOfStyle', 'Tiles') == 'Tiles') {
-            $Sender->AddJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions'); // I customized this to get proper callbacks.
-            $Sender->AddJsFile('library/jQuery-Wookmark/jquery.imagesloaded.js', 'plugins/Reactions');
-            $Sender->AddJsFile('library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js', 'plugins/Reactions');
-            $Sender->AddJsFile('tile.js', 'plugins/Reactions');
+        if (c('Plugins.Reactions.BestOfStyle', 'Tiles') == 'Tiles') {
+            $Sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions'); // I customized this to get proper callbacks.
+            $Sender->addJsFile('library/jQuery-Wookmark/jquery.imagesloaded.js', 'plugins/Reactions');
+            $Sender->addJsFile('library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js', 'plugins/Reactions');
+            $Sender->addJsFile('tile.js', 'plugins/Reactions');
             $Sender->CssClass .= ' NoPanel';
-            $View = $Sender->DeliveryType() == DELIVERY_TYPE_VIEW ? 'tile_items' : 'tiles';
+            $View = $Sender->deliveryType() == DELIVERY_TYPE_VIEW ? 'tile_items' : 'tiles';
         } else {
             $View = 'BestOf';
-            $Sender->AddModule('GuestModule');
-            $Sender->AddModule('SignedInModule');
-            $Sender->AddModule('BestOfFilterModule');
+            $Sender->addModule('GuestModule');
+            $Sender->addModule('SignedInModule');
+            $Sender->addModule('BestOfFilterModule');
         }
 
-        $Sender->AddCssFile('style.css');
-        $Sender->AddCssFile('vanillicon.css', 'static');
+        $Sender->addCssFile('style.css');
+        $Sender->addCssFile('vanillicon.css', 'static');
 
         // Set the title, breadcrumbs, canonical
-        $Sender->Title(T('Best Of'));
-        $Sender->SetData('Breadcrumbs', array(array('Name' => T('Best Of'), 'Url' => '/bestof/everything')));
-        $Sender->CanonicalUrl(
-            Url(
-                ConcatSep('/', 'bestof/'.$Reaction, PageNumber($Offset, $Limit, TRUE, Gdn::Session()->UserID != 0)),
-                TRUE),
-            Gdn::Session()->UserID == 0
+        $Sender->title(t('Best Of'));
+        $Sender->setData('Breadcrumbs', [['Name' => t('Best Of'), 'Url' => '/bestof/everything']]);
+        $Sender->canonicalUrl(
+            url(concatSep('/', 'bestof/'.$Reaction, pageNumber($Offset, $Limit, true, Gdn::session()->UserID != 0)), true),
+            Gdn::session()->UserID == 0
         );
 
         // Render the page (or deliver the view)
-        $Sender->Render($View, '', 'plugins/Reactions');
+        $Sender->render($View, '', 'plugins/Reactions');
     }
 
     /**
-     * Recalculate all reaction data, including totals
+     * Recalculate all reaction data, including totals.
+     *
+     * @param utilityController $sender
      */
     public function utilityController_recalculateReactions_create($sender) {
         $sender->permission('Garden.Settings.Manage');
@@ -641,110 +677,133 @@ class ReactionsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Sort the comments by score if necessary
+     * Sort the comments by score if necessary.
+     *
      * @param CommentModel $CommentModel
      */
     public function commentModel_afterConstruct_handler($CommentModel) {
-        if (!C('Plugins.Reactions.CommentSortEnabled'))
+        if (!c('Plugins.Reactions.CommentSortEnabled')) {
             return;
+        }
 
-        $Sort = self::CommentSort();
+        $Sort = self::commentSort();
         switch (strtolower($Sort)) {
             case 'score':
-                $CommentModel->OrderBy(array('coalesce(c.Score, 0) desc', 'c.CommentID'));
+                $CommentModel->orderBy(['coalesce(c.Score, 0) desc', 'c.CommentID']);
                 break;
             case 'date':
             default:
-                $CommentModel->OrderBy('c.DateInserted');
+                $CommentModel->orderBy('c.DateInserted');
                 break;
         }
     }
 
-    public function settingsController_addEditCategory_handler($Sender) {
-        $Sender->ShowCustomPoints = TRUE;
+    /**
+     *
+     *
+     * @param $sender
+     */
+    public function settingsController_addEditCategory_handler($sender) {
+        $sender->ShowCustomPoints = true;
     }
 
     /**
-     * Get the user's preference for comment sorting (if enabled).
+     *
+     *
+     * @return array|bool|mixed|null|string|void
      */
-    protected static $_CommentSort;
-
     public static function commentSort() {
-        if (!C('Plugins.Reactions.CommentSortEnabled'))
+        if (!c('Plugins.Reactions.CommentSortEnabled')) {
             return;
+        }
 
-        if (self::$_CommentSort)
+        if (self::$_CommentSort) {
             return self::$_CommentSort;
+        }
 
-        $Sort = GetIncomingValue('Sort', '');
-        if (Gdn::Session()->IsValid()) {
+        $Sort = getIncomingValue('Sort', '');
+        if (Gdn::session()->isValid()) {
             if ($Sort == '') {
                 // No sort was specified so grab it from the user's preferences.
-                $Sort = Gdn::Session()->GetPreference('Plugins.Reactions.CommentSort', 'score');
+                $Sort = Gdn::session()->getPreference('Plugins.Reactions.CommentSort', 'score');
             } else {
                 // Save the sort to the user's preferences.
-                Gdn::Session()->SetPreference('Plugins.Reactions.CommentSort', $Sort == 'score' ? 'score' : $Sort);
+                Gdn::session()->setPreference('Plugins.Reactions.CommentSort', $Sort == 'score' ? 'score' : $Sort);
             }
         }
 
-        if (!in_array($Sort, array('score', 'date')))
+        if (!in_array($Sort, array('score', 'date'))) {
             $Sort = 'date';
+        }
 
         self::$_CommentSort = $Sort;
+
         return $Sort;
     }
 
     /**
      * Allow comments to be sorted by score?
+     *
+     * @param discussionController $Sender
      */
     public function discussionController_beforeCommentDisplay_handler($Sender) {
-        if (!C('Plugins.Reactions.CommentSortEnabled'))
+        if (!c('Plugins.Reactions.CommentSortEnabled')) {
             return;
+        }
 
-        if (
-            GetValue('Type', $Sender->EventArguments, 'Comment') == 'Comment'
-            && !GetValue('VoteHeaderWritten', $this)
-        ):
+        if (val('Type', $Sender->EventArguments, 'Comment') == 'Comment' && !val('VoteHeaderWritten', $this)) {
             ?>
             <li class="Item">
-                <span class="NavLabel"><?php echo T('Sort by'); ?></span>
+                <span class="NavLabel"><?php echo t('Sort by'); ?></span>
             <span class="DiscussionSort NavBar">
-               <?php
-               $Query = $_GET;
-               $Query['Sort'] = 'score';
-               echo Anchor('Points', Url('?'.http_build_query($Query), TRUE), 'NoTop Button'.(self::CommentSort() == 'score' ? ' Active' : ''), array('rel' => 'nofollow', 'alt' => T('Sort by reaction points')));
-               $Query['Sort'] = 'date';
-               echo Anchor('Date Added', Url('?'.http_build_query($Query), TRUE), 'NoTop Button'.(self::CommentSort() == 'date' ? ' Active' : ''), array('rel' => 'nofollow', 'alt' => T('Sort by date added')));
-               ?>
+            <?php
+                $Query = Gdn::request()->get();
+
+                $Query['Sort'] = 'score';
+
+                echo anchor('Points',
+                    url('?'.http_build_query($Query), true),
+                    'NoTop Button'.(self::commentSort() == 'score' ? ' Active' : ''),
+                    ['rel' => 'nofollow', 'alt' => t('Sort by reaction points')]
+                );
+
+                $Query['Sort'] = 'date';
+
+                echo anchor('Date Added',
+                    url('?'.http_build_query($Query), true),
+                    'NoTop Button'.(self::commentSort() == 'date' ? ' Active' : ''),
+                    ['rel' => 'nofollow', 'alt' => t('Sort by date added')]
+                );
+            ?>
             </span>
             </li>
             <?php
-            $this->VoteHeaderWritten = TRUE;
-        endif;
+            $this->VoteHeaderWritten = true;
+        }
     }
 
     /**
-     * Add Types to TagModel so that tabs in the dashboard will have more info
-     * to work with.
+     * Add Types to TagModel so that tabs in the dashboard will have more info to work with.
+     *
+     * @sender TagModel $sender
      */
-    public function tagModel_types_handler($Sender) {
-        $Sender->AddType('BestOf', array(
+    public function tagModel_types_handler($sender) {
+        $sender->addType('BestOf', [
             'key' => 'BestOf',
             'name' => 'BestOf',
             'plural' => 'BestOf',
             'addtag' => false,
             'default' => false
-        ));
+        ]);
 
-        $Sender->AddType('Reaction', array(
+        $sender->addType('Reaction', [
             'key' => 'Reaction',
             'name' => 'Reaction',
             'plural' => 'Reactions',
             'addtag' => false,
             'default' => false
-        ));
+        ]);
     }
-
 
     /**
      * Merge reactions alongside a user-merge.
@@ -762,99 +821,109 @@ class ReactionsPlugin extends Gdn_Plugin {
     }
 }
 
-if (!function_exists('writeReactions')):
+if (!function_exists('writeReactions')) {
+    /**
+     *
+     *
+     * @param $Row
+     * @throws Exception
+     */
     function writeReactions($Row) {
-        $Attributes = GetValue('Attributes', $Row);
+        $Attributes = val('Attributes', $Row);
         if (is_string($Attributes)) {
             $Attributes = dbdecode($Attributes);
-            SetValue('Attributes', $Row, $Attributes);
+            setValue('Attributes', $Row, $Attributes);
         }
 
-        static $Types = NULL;
-        if ($Types === NULL)
-            $Types = ReactionModel::GetReactionTypes(array('Class' => array('Positive', 'Negative'), 'Active' => 1));
-        Gdn::Controller()->EventArguments['ReactionTypes'] = &$Types;
+        static $Types = null;
+        if ($Types === null) {
+            $Types = ReactionModel::getReactionTypes(array('Class' => array('Positive', 'Negative'), 'Active' => 1));
+        }
+        Gdn::controller()->EventArguments['ReactionTypes'] = &$Types;
 
-        if ($ID = GetValue('CommentID', $Row)) {
+        if ($ID = val('CommentID', $Row)) {
             $RecordType = 'comment';
-        } elseif ($ID = GetValue('ActivityID', $Row)) {
+        } elseif ($ID = val('ActivityID', $Row)) {
             $RecordType = 'activity';
         } else {
             $RecordType = 'discussion';
-            $ID = GetValue('DiscussionID', $Row);
+            $ID = val('DiscussionID', $Row);
         }
-        Gdn::Controller()->EventArguments['RecordType'] = $RecordType;
-        Gdn::Controller()->EventArguments['RecordID'] = $ID;
+        Gdn::controller()->EventArguments['RecordType'] = $RecordType;
+        Gdn::controller()->EventArguments['RecordID'] = $ID;
 
-
-        if (C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars')
-            WriteRecordReactions($Row);
+        if (c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars') {
+            writeRecordReactions($Row);
+        }
 
         echo '<div class="Reactions">';
-        Gdn_Theme::BulletRow();
+        Gdn_Theme::bulletRow();
 
         // Write the flags.
-        static $Flags = NULL;
-        if ($Flags === NULL && CheckPermission('Reactions.Flag.Add')) {
-            $Flags = ReactionModel::GetReactionTypes(array('Class' => 'Flag', 'Active' => 1));
+        static $Flags = null;
+        if ($Flags === null && checkPermission('Reactions.Flag.Add')) {
+            $Flags = ReactionModel::getReactionTypes(array('Class' => 'Flag', 'Active' => 1));
             $FlagCodes = array();
             foreach ($Flags as $Flag) {
                 $FlagCodes[] = $Flag['UrlCode'];
             }
-            Gdn::Controller()->EventArguments['Flags'] = &$Flags;
-            Gdn::Controller()->FireEvent('Flags');
+            Gdn::controller()->EventArguments['Flags'] = &$Flags;
+            Gdn::controller()->fireEvent('Flags');
         }
 
         // Allow addons to work with flags
-        Gdn::Controller()->EventArguments['Flags'] = &$Flags;
-        Gdn::Controller()->FireEvent('BeforeFlag');
+        Gdn::controller()->EventArguments['Flags'] = &$Flags;
+        Gdn::controller()->fireEvent('BeforeFlag');
 
         if (!empty($Flags) && is_array($Flags)) {
-            echo Gdn_Theme::BulletItem('Flags');
+            echo Gdn_Theme::bulletItem('Flags');
 
             echo ' <span class="FlagMenu ToggleFlyout">';
             // Write the handle.
-            echo ReactionButton($Row, 'Flag', array('LinkClass' => 'FlyoutButton', 'IsHeading' => TRUE));
-//            echo Sprite('SpFlyoutHandle', 'Arrow');
+            echo reactionButton($Row, 'Flag', array('LinkClass' => 'FlyoutButton', 'IsHeading' => true));
             echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
+
             foreach ($Flags as $Flag) {
-                if (is_callable($Flag))
+                if (is_callable($Flag)) {
                     echo '<li>'.call_user_func($Flag, $Row, $RecordType, $ID).'</li>';
-                else
-                    echo '<li>'.ReactionButton($Row, $Flag['UrlCode']).'</li>';
+                } else {
+                    echo '<li>'.reactionButton($Row, $Flag['UrlCode']).'</li>';
+                }
             }
-            Gdn::Controller()->FireEvent('AfterFlagOptions');
+
+            Gdn::controller()->fireEvent('AfterFlagOptions');
             echo '</ul>';
             echo '</span> ';
         }
-        Gdn::Controller()->FireEvent('AfterFlag');
+        Gdn::controller()->fireEvent('AfterFlag');
 
-        $Score = FormatScore(GetValue('Score', $Row));
+        $Score = formatScore(val('Score', $Row));
         echo '<span class="Column-Score Hidden">'.$Score.'</span>';
 
-
         // Write the reactions.
-        echo Gdn_Theme::BulletItem('Reactions');
+        echo Gdn_Theme::bulletItem('Reactions');
         echo '<span class="ReactMenu">';
         echo '<span class="ReactButtons">';
         foreach ($Types as $Type) {
-            if (isset($Type['RecordTypes']) && !in_array($RecordType, (array)$Type['RecordTypes']))
+            if (isset($Type['RecordTypes']) && !in_array($RecordType, (array)$Type['RecordTypes'])) {
                 continue;
-
+            }
             echo ' '.ReactionButton($Row, $Type['UrlCode']).' ';
         }
         echo '</span>';
         echo '</span>';
 
-        if (Gdn::Session()->CheckPermission(array('Garden.Moderation.Manage', 'Moderation.Reactions.Edit'), FALSE)) {
-            echo Gdn_Theme::BulletItem('ReactionsMod').
-                Anchor(T('Log'), "/reactions/log/{$RecordType}/{$ID}", 'Popup ReactButton');
+        if (checkPermission(['Garden.Moderation.Manage', 'Moderation.Reactions.Edit'])) {
+            echo Gdn_Theme::bulletItem('ReactionsMod').anchor(
+                t('Log'),
+                "/reactions/log/{$RecordType}/{$ID}",
+                'Popup ReactButton'
+            );
         }
 
-        Gdn::Controller()->FireEvent('AfterReactions');
+        Gdn::controller()->fireEvent('AfterReactions');
 
         echo '</div>';
-        Gdn::Controller()->FireAs('DiscussionController')->FireEvent('Replies');
+        Gdn::controller()->fireAs('DiscussionController')->fireEvent('Replies');
     }
-
-endif;
+}
