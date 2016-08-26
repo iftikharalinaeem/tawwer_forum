@@ -228,6 +228,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
     /**
      *
+     *
      * @param Gdn_Controller $Sender
      */
     public function discussionController_render_before($Sender) {
@@ -438,12 +439,12 @@ class ReactionsPlugin extends Gdn_Plugin {
         $Sender->fireAs('ReactionModel')->fireEvent('GetReaction');
 
         // Only allow enabled reactions
-        if (!GetValue('Active', $ReactionType)) {
+        if (!val('Active', $ReactionType)) {
             throw ForbiddenException("@You may not use that Reaction.");
         }
 
         // Permission
-        if ($Permission = GetValue('Permission', $ReactionType)) {
+        if ($Permission = val('Permission', $ReactionType)) {
             // Check reaction's permission if a custom/specific one is applied
             $Sender->permission($Permission);
         } elseif ($PermissionClass = val('Class', $ReactionType)) {
@@ -458,6 +459,8 @@ class ReactionsPlugin extends Gdn_Plugin {
 
     /**
      * Add the "Best Of..." link to the main menu.
+     *
+     * @param Gdn_Controller $Sender
      */
     public function base_render_before($Sender) {
         if (is_object($Menu = val('Menu', $Sender))) {
