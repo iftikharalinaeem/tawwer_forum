@@ -179,7 +179,7 @@ class ReactionModel {
      * @return mixed|null
      */
     public static function fromTagID($TagID) {
-        if (self::$TagIDs === NULL) {
+        if (self::$TagIDs === null) {
             $Types = self::reactionTypes();
             self::$TagIDs = Gdn_DataSet::index($Types, array('TagID'));
 

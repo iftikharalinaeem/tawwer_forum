@@ -914,8 +914,8 @@ if (!function_exists('writeReactions')) {
         echo '</span>';
 
         if (checkPermission(['Garden.Moderation.Manage', 'Moderation.Reactions.Edit'])) {
-            echo Gdn_Theme::bulletItem(
-                'ReactionsMod').anchor(t('Log'),
+            echo Gdn_Theme::bulletItem('ReactionsMod').anchor(
+                t('Log'),
                 "/reactions/log/{$RecordType}/{$ID}",
                 'Popup ReactButton'
             );
