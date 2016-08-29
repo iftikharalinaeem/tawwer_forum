@@ -917,7 +917,7 @@ if (!function_exists('writeReactions')) {
             echo Gdn_Theme::bulletItem('ReactionsMod').anchor(
                 t('Log'),
                 "/reactions/log/{$RecordType}/{$ID}",
-                'Popup ReactButton'
+                'Popup ReactButton ReactButton-Log'
             );
         }
 
