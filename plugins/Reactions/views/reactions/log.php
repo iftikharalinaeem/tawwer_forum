@@ -6,15 +6,15 @@
       foreach ($this->Data('UserTags') as $Row): 
       ?>
       <tr class="Item">
-         <td class="ReactionsLog-DateCol"><?php echo Gdn_Format::Date($Row['DateInserted']); ?></td>
-         <td class="ReactionsLog-UserCol"><?php echo UserAnchor($Row); ?></td>
-         <td class="ReactionsLog-ReactionCol">
+         <td class="ReactionsLog-Date"><?php echo Gdn_Format::Date($Row['DateInserted']); ?></td>
+         <td class="ReactionsLog-User"><?php echo UserAnchor($Row); ?></td>
+         <td class="ReactionsLog-Reaction">
             <?php
             $ReactionType = ReactionModel::FromTagID($Row['TagID']);
             echo htmlspecialchars($ReactionType['Name']);
             ?>
          </td>
-         <td class="ReactionsLog-OptionsCol">
+         <td class="ReactionsLog-Options">
             <div class="Options">
             <?php
             echo Anchor('&times;', "/reactions/undo/{$this->Data['RecordType']}/{$this->Data['RecordID']}/{$ReactionType['UrlCode']}?userid={$Row['UserID']}&tagid={$Row['TagID']}", 'TextColor Hijack',
