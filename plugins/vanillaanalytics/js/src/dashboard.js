@@ -14,8 +14,33 @@ $(document).ready(function() {
             axis_x_tick_type: "timeseries",
             axis_y_tick_format: (function (d) {if (d % 1 !== 0) {return '';} return d;}),
             tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
-                    d = Math.floor(d[0].value)
-                    return '<div id="tooltip" class="module-triangle-bottom">' + d + '</div>'
+                var titleFormat = defaultTitleFormat,
+                    nameFormat = function (name) { return name; },
+                    valueFormat = defaultValueFormat,
+                    text, i, title, value, name, bgcolor;
+
+                // one value, no title necessary
+                if (d.length === 1) {
+                    value = valueFormat(d[0].value, d[0].ratio, d[0].id, d[0].index);
+                    return '<div class="popover popover-analytics-single popover-analytics popover-name-" + d[0].id + ">' + value + '</div>';
+                }
+
+                var text = '<div class="popover popover-analytics">';
+                for (i = 0; i < d.length; i++) {
+                    if (text.length === 0) {}
+
+                    if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
+
+                    name = nameFormat(d[i].name);
+                    value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
+                    bgcolor = color(d[i].id);
+
+                    text += "<div class='flex popover-row popover-name-" + d[i].id + "'>";
+                    text += "<div class='name'>" + name + "</div>";
+                    text += "<div class='value'><span style='color:" + bgcolor + "'>" + value + "</span></div>";
+                    text += "</div>";
+                }
+                return text + '</div>';
             }
         };
     }
