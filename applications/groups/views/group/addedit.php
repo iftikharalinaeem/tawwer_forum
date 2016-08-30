@@ -38,7 +38,7 @@
         } else {
             echo '<div class="P P-Category">';
             echo $this->Form->Label('Category', 'CategoryID', array('class' => 'B'));
-            echo ' '.$this->Form->DropDown('CategoryID', $Categories, array('IncludeNull' => TRUE));
+            echo ' '.$this->Form->DropDown('CategoryID', $Categories, array('IncludeNull' => true));
             echo '</div>';
         }
         ?>
@@ -81,7 +81,7 @@
                 'Public' => '@'.T('Public').'. <span class="Gloss">'.T('Public group.', 'Anyone can see the group and its content. Anyone can join.').'</span>',
                 'Private' => '@'.T('Private').'. <span class="Gloss">'.T('Private group.', 'Anyone can see the group, but only members can see its content. People must apply or be invited to join.').'</span>',
                 ),
-                array('list' => TRUE));
+                array('list' => true));
             ?>
         </div>
         <div class="Buttons">

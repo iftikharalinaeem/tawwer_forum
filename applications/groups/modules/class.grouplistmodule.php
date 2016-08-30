@@ -158,7 +158,7 @@ class GroupListModule extends Gdn_Module {
           $item['meta']['countDiscussionsNumber']['cssClass'] = 'Hidden MemberCountNumber Number MItem-Count';
 
           $groupModel = new GroupModel();
-          if ($attachDiscussionData && $groupModel->CheckPermission('View', val('GroupID', $group))) {
+          if ($attachDiscussionData && $groupModel->checkPermission('View', val('GroupID', $group))) {
                 $this->attachDiscussions = true;
                 $this->lastPostType = 'Comment';
                 if (val('NoComment', $group)) {
@@ -206,7 +206,7 @@ class GroupListModule extends Gdn_Module {
 
           $attachDiscussionData = val('LastTitle', $group);
           $groupModel = new GroupModel();
-          if ($attachDiscussionData && $groupModel->CheckPermission('View', val('GroupID', $group))) {
+          if ($attachDiscussionData && $groupModel->checkPermission('View', val('GroupID', $group))) {
                 $item['rows']['lastPost']['type'] = 'lastPost';
                 $item['rows']['lastPost']['title'] = $item['meta']['lastDiscussion']['linkText'];
                 $item['rows']['lastPost']['url'] = $item['meta']['lastDiscussion']['url'];

@@ -12,7 +12,7 @@ function GroupSlug($Group) {
     return $Group['GroupID'].'-'.Gdn_Format::Url($Group['Name']);
 }
 
-function GroupUrl($Group, $Method = NULL, $WithDomain = '//') {
+function GroupUrl($Group, $Method = null, $WithDomain = '//') {
     if ($Method) {
         return Url("/group/$Method/".GroupSlug($Group), $WithDomain);
     } else {
@@ -23,7 +23,7 @@ function EventSlug($Event) {
     return $Event['EventID'].'-'.Gdn_Format::Url($Event['Name']);
 }
 
-function EventUrl($Event, $Method = NULL) {
+function EventUrl($Event, $Method = null) {
     if ($Method) {
         return Url("/event/$Method/".EventSlug($Event), '//');
     } else {
@@ -31,8 +31,8 @@ function EventUrl($Event, $Method = NULL) {
     }
 }
 
-function GroupPermission($Permission = NULL, $GroupID = NULL) {
-    if ($GroupID === NULL) {
+function GroupPermission($Permission = null, $GroupID = null) {
+    if ($GroupID === null) {
         $GroupID = Gdn::Controller()->Data('Group');
     }
 
@@ -42,8 +42,8 @@ function GroupPermission($Permission = NULL, $GroupID = NULL) {
     return $GroupModel->CheckPermission($Permission, $GroupID);
 }
 
-function EventPermission($Permission = NULL, $EventID = NULL) {
-    if ($EventID === NULL) {
+function EventPermission($Permission = null, $EventID = null) {
+    if ($EventID === null) {
         $EventID = Gdn::Controller()->Data('Event');
     }
 

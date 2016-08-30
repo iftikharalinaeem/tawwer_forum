@@ -27,25 +27,25 @@ $GroupPrivacyExists = $St->ColumnExists('Privacy');
 
 $St
     ->PrimaryKey('GroupID')
-    ->Column('Name', 'varchar(150)', FALSE, 'unique')
+    ->Column('Name', 'varchar(150)', false, 'unique')
     ->Column('Description', 'text')
-    ->Column('Format', 'varchar(10)', TRUE)
-    ->Column('CategoryID', 'int', FALSE, 'key')
-    ->Column('Icon', 'varchar(255)', TRUE)
-    ->Column('Banner', 'varchar(255)', TRUE)
+    ->Column('Format', 'varchar(10)', true)
+    ->Column('CategoryID', 'int', false, 'key')
+    ->Column('Icon', 'varchar(255)', true)
+    ->Column('Banner', 'varchar(255)', true)
     ->Column('Privacy', array('Public', 'Private'), 'Public') // add secret later.
-    ->Column('Registration', array('Public', 'Approval', 'Invite'), TRUE) // deprecated
-    ->Column('Visibility', array('Public', 'Members'), TRUE) // deprecated
+    ->Column('Registration', array('Public', 'Approval', 'Invite'), true) // deprecated
+    ->Column('Visibility', array('Public', 'Members'), true) // deprecated
     ->Column('CountMembers', 'uint', '0')
     ->Column('CountDiscussions', 'uint', '0')
-    ->Column('DateLastComment', 'datetime', TRUE)
-    ->Column('LastCommentID', 'int', NULL)
-    ->Column('LastDiscussionID', 'int', NULL)
+    ->Column('DateLastComment', 'datetime', true)
+    ->Column('LastCommentID', 'int', null)
+    ->Column('LastDiscussionID', 'int', null)
     ->Column('DateInserted', 'datetime')
     ->Column('InsertUserID', 'int')
-    ->Column('DateUpdated', 'datetime', TRUE)
-    ->Column('UpdateUserID', 'int', TRUE)
-    ->Column('Attributes', 'text', TRUE)
+    ->Column('DateUpdated', 'datetime', true)
+    ->Column('UpdateUserID', 'int', true)
+    ->Column('Attributes', 'text', true)
     ->Set($Explicit, $Drop);
 
 if ($GroupExists && !$GroupPrivacyExists) {
@@ -55,8 +55,8 @@ if ($GroupExists && !$GroupPrivacyExists) {
 
 $St->Table('UserGroup')
     ->PrimaryKey('UserGroupID')
-    ->Column('GroupID', 'int', FALSE, 'unique')
-    ->Column('UserID', 'int', FALSE, array('unique', 'key'))
+    ->Column('GroupID', 'int', false, 'unique')
+    ->Column('UserID', 'int', false, array('unique', 'key'))
     ->Column('DateInserted', 'datetime')
     ->Column('InsertUserID', 'int')
     ->Column('Role', array('Leader', 'Member'))
@@ -64,14 +64,14 @@ $St->Table('UserGroup')
 
 $St->Table('GroupApplicant')
     ->PrimaryKey('GroupApplicantID')
-    ->Column('GroupID', 'int', FALSE, 'unique')
-    ->Column('UserID', 'int', FALSE, array('unique', 'key'))
+    ->Column('GroupID', 'int', false, 'unique')
+    ->Column('UserID', 'int', false, array('unique', 'key'))
     ->Column('Type', array('Application', 'Invitation', 'Denied', 'Banned'))
-    ->Column('Reason', 'varchar(200)', TRUE) // reason for wanting to join.
+    ->Column('Reason', 'varchar(200)', true) // reason for wanting to join.
     ->Column('DateInserted', 'datetime')
     ->Column('InsertUserID', 'int')
-    ->Column('DateUpdated', 'datetime', TRUE)
-    ->Column('UpdateUserID', 'int', TRUE)
+    ->Column('DateUpdated', 'datetime', true)
+    ->Column('UpdateUserID', 'int', true)
     ->Set($Explicit, $Drop);
 
 if ($St->TableExists('Category')) {
@@ -103,7 +103,7 @@ if ($St->TableExists('Category')) {
 
 if ($St->TableExists('Discussion')) {
     $St->Table('Discussion')
-        ->Column('GroupID', 'int', TRUE, 'key')
+        ->Column('GroupID', 'int', true, 'key')
         ->Set();
 }
 
@@ -119,16 +119,16 @@ $timeZoneExists = $St->columnExists('Timezone');
 $St->PrimaryKey('EventID')
     ->Column('Name', 'varchar(255)')
     ->Column('Body', 'text')
-    ->Column('Format', 'varchar(10)', TRUE)
+    ->Column('Format', 'varchar(10)', true)
     ->Column('DateStarts', 'datetime')
-    ->Column('DateEnds', 'datetime', TRUE)
+    ->Column('DateEnds', 'datetime', true)
     ->Column('AllDayEvent', 'tinyint', '0')
-    ->Column('Location', 'varchar(255)', TRUE)
+    ->Column('Location', 'varchar(255)', true)
     ->Column('DateInserted', 'datetime')
     ->Column('InsertUserID', 'int') // organizer
-    ->Column('DateUpdated', 'datetime', TRUE)
-    ->Column('UpdateUserID', 'int', TRUE)
-    ->Column('GroupID', 'int', TRUE, 'key') // eventually make events stand-alone.
+    ->Column('DateUpdated', 'datetime', true)
+    ->Column('UpdateUserID', 'int', true)
+    ->Column('GroupID', 'int', true, 'key') // eventually make events stand-alone.
     ->Set($Explicit, $Drop);
 
 if ($timeZoneExists) {
@@ -136,16 +136,16 @@ if ($timeZoneExists) {
 }
 
 $St->Table('UserEvent')
-    ->Column('EventID', 'int', FALSE, 'primary')
-    ->Column('UserID', 'int', FALSE, array('primary', 'key'))
+    ->Column('EventID', 'int', false, 'primary')
+    ->Column('UserID', 'int', false, array('primary', 'key'))
     ->Column('DateInserted', 'datetime')
     ->Column('Attending', array('Yes', 'No', 'Maybe', 'Invited'), 'Invited')
     ->Set($Explicit, $Drop);
 
 // Make sure the activity table has an index that the event wall can use.
 $St->Table('Activity')
-    ->Column('RecordType', 'varchar(20)', TRUE, 'index.Record')
-    ->Column('RecordID', 'int', TRUE, 'index.Record')
+    ->Column('RecordType', 'varchar(20)', true, 'index.Record')
+    ->Column('RecordID', 'int', true, 'index.Record')
     ->Set();
 
 $ActivityModel = new ActivityModel();

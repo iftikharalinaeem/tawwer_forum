@@ -88,7 +88,7 @@ class EventListModule extends Gdn_Module {
      protected function getEventDropdown($event) {
           if (EventPermission('Member', $event) && !EventModel::isEnded($event)) {
                 $eventModel = new EventModel();
-                $status = $eventModel->IsInvited(Gdn::session()->UserID, val('EventID', $event));
+                $status = $eventModel->isInvited(Gdn::session()->UserID, val('EventID', $event));
                 $statuses = array('Yes' => t('Attending'), 'No' => t('Not Attending'), 'Maybe' => t('Maybe'));
                 if (!$status || !array_key_exists($status, $statuses)) {
                      $realStatus = t('RSVP');

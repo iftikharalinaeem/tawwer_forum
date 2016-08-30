@@ -6,7 +6,7 @@ if (!function_exists('WriteEventButtons')) :
      *
      * @param array $Event Optional. Uses data array's Event if none is provided.
      */
-    function WriteEventButtons($Event = NULL) {
+    function WriteEventButtons($Event = null) {
         if (!$Event)
             $Event = Gdn::Controller()->Data('Event');
         if (!$Event)

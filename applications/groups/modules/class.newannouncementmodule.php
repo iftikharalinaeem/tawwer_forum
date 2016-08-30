@@ -17,13 +17,13 @@ class NewAnnouncementModule extends Gdn_Module {
      *
      * @return string
      */
-    public function ToString() {
+    public function toString() {
         if (!$this->GroupID) {
-            $GroupID = Gdn::Controller()->Data('Group.GroupID');
+            $GroupID = Gdn::controller()->data('Group.GroupID');
         }
 
-        if (GroupPermission('Moderate', $GroupID)) {
-            return ' '.Anchor(T('New Announcement'), GroupUrl(Gdn::Controller()->Data('Group'), 'announcement'), 'Button').' ';
+        if (groupPermission('Moderate', $GroupID)) {
+            return ' '.anchor(t('New Announcement'), groupUrl(Gdn::controller()->data('Group'), 'announcement'), 'Button').' ';
         }
         return '';
     }

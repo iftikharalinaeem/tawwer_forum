@@ -10,10 +10,10 @@
 class GroupUserHeaderModule extends Gdn_Module {
 
     /** @var null  */
-    public $GroupID = NULL;
+    public $GroupID = null;
 
     /** @var null  */
-    public $UserID = NULL;
+    public $UserID = null;
 
     /**
      * GroupUserHeaderModule constructor.

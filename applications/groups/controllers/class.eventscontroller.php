@@ -18,26 +18,33 @@ class EventsController extends Gdn_Controller {
      *
      * Always called by dispatcher before controller's requested method.
      */
-    public function Initialize() {
+    public function initialize() {
         // Set up head
         $this->Head = new HeadModule($this);
-        $this->AddJsFile('jquery.js');
-        $this->AddJsFile('jquery.livequery.js');
-        $this->AddJsFile('jquery-ui.js');
-        $this->AddJsFile('jquery.form.js');
-        $this->AddJsFile('jquery.popup.js');
-        $this->AddJsFile('jquery.gardenhandleajaxform.js');
-        $this->AddJsFile('global.js');
-        $this->AddJsFile('event.js');
+        $this->addJsFile('jquery.js');
+        $this->addJsFile('jquery.livequery.js');
+        $this->addJsFile('jquery-ui.js');
+        $this->addJsFile('jquery.form.js');
+        $this->addJsFile('jquery.popup.js');
+        $this->addJsFile('jquery.gardenhandleajaxform.js');
+        $this->addJsFile('global.js');
+        $this->addJsFile('event.js');
         $this->addCssFile('vanillicon.css', 'static');
-        $this->AddCssFile('style.css');
-        Gdn_Theme::Section('Events');
+        $this->addCssFile('style.css');
+        Gdn_Theme::section('Events');
 
-        parent::Initialize();
+        parent::initialize();
     }
 
-    public function Index($Context = NULL, $ContextID = NULL) {
-        return $this->Events($Context, $ContextID);
+    /**
+     *
+     *
+     * @param null $Context
+     * @param null $ContextID
+     * @throws Exception
+     */
+    public function index($Context = null, $ContextID = null) {
+        return $this->events($Context, $ContextID);
     }
 
     /**
@@ -48,29 +55,30 @@ class EventsController extends Gdn_Controller {
      * @param string $Context
      * @param integer $ContextID
      */
-    public function Events($Context = NULL, $ContextID = NULL) {
+    public function events($Context = null, $ContextID = null) {
         $EventModel = new EventModel();
         $EventCriteria = array();
 
         // Determine context
         switch ($Context) {
-
             // Events for this group
             case 'group':
                 $GroupModel = new GroupModel();
-                $Group = $GroupModel->GetID($ContextID, DATASET_TYPE_ARRAY);
-                if (!$Group)
+                $Group = $GroupModel->getID($ContextID, DATASET_TYPE_ARRAY);
+                if (!$Group) {
                     throw NotFoundException('Group');
-                $this->SetData('Group', $Group);
-                $this->SetData('NewButtonId', val('GroupID', $Group));
+                }
+                $this->setData('Group', $Group);
+                $this->setData('NewButtonId', val('GroupID', $Group));
 
                 // Check if this person is a member of the group or a moderator
-                $ViewGroupEvents = GroupPermission('View', $Group);
-                if (!$ViewGroupEvents)
+                $ViewGroupEvents = groupPermission('View', $Group);
+                if (!$ViewGroupEvents) {
                     throw PermissionException();
+                }
 
-                $this->AddBreadcrumb('Groups', Url('/groups'));
-                $this->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+                $this->addBreadcrumb('Groups', url('/groups'));
+                $this->addBreadcrumb($Group['Name'], groupUrl($Group));
 
                 // Register GroupID as criteria
                 $EventCriteria['GroupID'] = $Group['GroupID'];
@@ -79,29 +87,29 @@ class EventsController extends Gdn_Controller {
             // Events this user is invited to
             default:
                 // Register logged-in user being invited as criteria
-                $EventCriteria['Invited'] = Gdn::Session()->UserID;
+                $EventCriteria['Invited'] = Gdn::session()->UserID;
                 break;
         }
-        $this->Title(T('Events'));
-        $this->AddBreadcrumb($this->Title());
+        $this->title(t('Events'));
+        $this->addBreadcrumb($this->title());
         $this->CssClass .= ' NoPanel';
 
-      // Upcoming events
+        // Upcoming events
         $UpcomingRange = c('Groups.Events.UpcomingRange', '+365 days');
-        $Events = $EventModel->GetUpcoming($UpcomingRange, $EventCriteria, FALSE);
-        $this->SetData('UpcomingEvents', $Events);
+        $Events = $EventModel->getUpcoming($UpcomingRange, $EventCriteria, false);
+        $this->setData('UpcomingEvents', $Events);
 
         // Recent events
         $RecentRange = c('Groups.Events.RecentRange', '-365 days');
-        $Events = $EventModel->GetUpcoming($RecentRange, $EventCriteria, TRUE);
-        $this->SetData('RecentEvents', $Events);
+        $Events = $EventModel->getUpcoming($RecentRange, $EventCriteria, true);
+        $this->setData('RecentEvents', $Events);
 
-        $this->FetchView('event_functions', 'event', 'groups');
-        $this->FetchView('group_functions', 'group', 'groups');
+        $this->fetchView('event_functions', 'event', 'groups');
+        $this->fetchView('group_functions', 'group', 'groups');
 
         $this->RequestMethod = 'events';
         $this->View = 'events';
-        $this->Render();
+        $this->render();
     }
 
 }

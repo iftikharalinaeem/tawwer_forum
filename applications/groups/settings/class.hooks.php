@@ -28,9 +28,9 @@ class GroupsHooks extends Gdn_Plugin {
      *
      * @param null $Group
      */
-    protected function setBreadcrumbs($Group = NULL) {
+    protected function setBreadcrumbs($Group = null) {
         if (!$Group)
-            $Group = Gdn::Controller()->Data('Group', NULL);
+            $Group = Gdn::Controller()->Data('Group', null);
 
         if ($Group) {
             $Sender = Gdn::Controller();
@@ -53,7 +53,7 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     public function AssetModel_StyleCss_Handler($Sender, $Args) {
-        $Sender->AddCssFile('groups.css', 'groups');
+        $Sender->addCssFile('groups.css', 'groups');
     }
 
     /**
@@ -61,7 +61,7 @@ class GroupsHooks extends Gdn_Plugin {
      */
     public function Base_Render_Before($Sender) {
         if (is_object($Menu = GetValue('Menu', $Sender))) {
-            $Menu->AddLink('Groups', T('Groups'), '/groups/', FALSE, array('class' => 'Groups'));
+            $Menu->AddLink('Groups', T('Groups'), '/groups/', false, array('class' => 'Groups'));
         }
     }
 
@@ -482,7 +482,7 @@ class GroupsHooks extends Gdn_Plugin {
                 $Sender->AddBreadcrumb($Group['Name'], GroupUrl($Group));
             }
 
-            Gdn_Theme::Section('Group');
+            Gdn_Theme::section('Group');
         }
     }
 
@@ -535,7 +535,7 @@ class GroupsHooks extends Gdn_Plugin {
 
     public function PostController_EditDiscussion_Before($Sender) {
         $DiscussionID = GetValue('DiscussionID', $Sender->ReflectArgs);
-        $GroupID = FALSE;
+        $GroupID = false;
         if ($DiscussionID) {
             $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
             $GroupID = GetValue('GroupID', $Discussion);
@@ -562,7 +562,7 @@ class GroupsHooks extends Gdn_Plugin {
 
         if ($Group) {
             // Hide the category drop-down.
-            $Sender->ShowCategorySelector = FALSE;
+            $Sender->ShowCategorySelector = false;
 
             // Reduce the announce options.
             $Options = array(
