@@ -82,8 +82,8 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         // Reporting categories should be managed locally. Set them to override hub, if they aren't already.
         $hubReporting = Gdn::sql()->getWhere([
-            ['Type' => 'Reporting', 'OverrideHub' => 0],
-            'Category'
+            'Category',
+            ['Type' => 'Reporting', 'OverrideHub' => 0]
         ])->count();
 
         if ($hubReporting > 0) {
