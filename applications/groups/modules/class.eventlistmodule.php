@@ -1,7 +1,7 @@
 <?php
 /**
- * Groups Application - Event List Module
- *
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
  */
 
 /**
@@ -11,45 +11,34 @@
  */
 class EventListModule extends Gdn_Module {
 
-     /**
-      * @var array The events to render. (An array of event arrays.)
-      */
+     /** @var array The events to render. (An array of event arrays.) */
      protected $events;
-     /**
-      * @var string The event section title (i.e., 'Upcoming Events').
-      */
+
+     /** @var string The event section title (i.e., 'Upcoming Events'). */
      protected $title;
-     /**
-      * @var string The message to display if there are no events.
-      */
+
+     /** @var string The message to display if there are no events. */
      protected $emptyMessage;
-     /**
-      * @var string The layout type, either 'modern' or 'table'.
-      */
+
+     /** @var string The layout type, either 'modern' or 'table'. */
      protected $layout;
-     /**
-      * @var bool Whether to provide a link to see all of the events.
-      */
+
+     /** @var bool Whether to provide a link to see all of the events. */
      protected $showMore;
-     /**
-      * @var string The url for the 'show more' link.
-      */
+
+     /** @var string The url for the 'show more' link. */
      protected $showMoreUrl = '';
-     /**
-      * @var bool Whether to show the 'New Event' button.
-      */
+
+     /** @var bool Whether to show the 'New Event' button. */
      protected $addNewEventButton;
-     /**
-      * @var string The url for the 'New Event' button.
-      */
+
+     /** @var string The url for the 'New Event' button. */
      protected $newEventUrl = '';
-     /**
-      * @var bool Whether to show the event's 'RSVP' dropdown.
-      */
+
+     /** @var bool Whether to show the event's 'RSVP' dropdown. */
      protected $withJoinButtons;
-     /**
-      * @var bool Whether to show the event edit options.
-      */
+     /** @var bool Whether to show the event edit options. */
+
      protected $withOptions;
 
      /**

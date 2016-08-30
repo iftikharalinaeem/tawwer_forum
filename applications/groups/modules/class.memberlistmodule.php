@@ -1,8 +1,7 @@
 <?php
-
 /**
- * Groups Application - Member List Module
- *
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
  */
 
 /**
@@ -12,37 +11,28 @@
  */
 class MemberListModule extends Gdn_Module {
 
-    /**
-     * @var array The members to render.
-     */
+    /** @var array The members to render. */
     protected $members;
-    /**
-     * @var array The group that the members are associated with.
-     */
+
+    /** @var array The group that the members are associated with. */
     protected $group;
-    /**
-     * @var string The member section title (i.e., 'Leaders' or 'Members').
-     */
+
+    /** @var string The member section title (i.e., 'Leaders' or 'Members'). */
     protected $title;
-    /**
-     * @var string The message to display if there are no members.
-     */
+
+    /** @var string The message to display if there are no members. */
     protected $emptyMessage;
-    /**
-     * @var string A css class to add to the member list container.
-     */
+
+    /** @var string A css class to add to the member list container. */
     protected $cssClass;
-    /**
-     * @var bool Whether to provide a link to see all of the member list's contents.
-     */
+
+    /** @var bool Whether to provide a link to see all of the member list's contents. */
     protected $showMore;
-    /**
-     * @var string The layout type, either 'modern' or 'table'.
-     */
+
+    /** @var string The layout type, either 'modern' or 'table'. */
     protected $layout;
-    /**
-     * @var bool Whether to add the 'leader', 'member' and 'remove' buttons to member items.
-     */
+
+    /** @var bool Whether to add the 'leader', 'member' and 'remove' buttons to member items. */
     protected $withButtons;
 
   /**

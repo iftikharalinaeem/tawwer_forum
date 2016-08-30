@@ -1,12 +1,22 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
+/**
+ * Class NewAnnouncementModule
+ */
 class NewAnnouncementModule extends Gdn_Module {
-    /// Properties ///
+
+    /** @var   */
     public $GroupID;
 
-
-    /// Methods ///
-
+    /**
+     *
+     *
+     * @return string
+     */
     public function ToString() {
         if (!$this->GroupID) {
             $GroupID = Gdn::Controller()->Data('Group.GroupID');
@@ -18,4 +28,3 @@ class NewAnnouncementModule extends Gdn_Module {
         return '';
     }
 }
-

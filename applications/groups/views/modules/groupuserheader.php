@@ -1,6 +1,8 @@
-<?php
-if (!$this->Data('Application') || $this->Data('Application.Type') != 'Invitation')
+<?php if (!defined('APPLICATION')) exit();
+
+if (!$this->data('Application') || $this->data('Application.Type') != 'Invitation') {
     return;
+}
 ?>
 <div class="DismissMessage InfoMessage GroupUserHeaderModule">
     <div class="Center">

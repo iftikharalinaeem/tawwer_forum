@@ -1,7 +1,7 @@
 <?php
 /**
- * Groups Application - Applicant List Module
- *
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
  */
 
 /**

@@ -1,7 +1,8 @@
-<?php
-    $header = new GroupHeaderModule($this->data('Group'));
-    echo $header;
-    /* @var EventController $this */
+<?php if (!defined('APPLICATION')) exit();
+
+$header = new GroupHeaderModule($this->data('Group'));
+echo $header;
+/* @var EventController $this */
 ?>
 <div class="Event-Header PageTitle">
     <!-- Edit/Delete Buttons -->

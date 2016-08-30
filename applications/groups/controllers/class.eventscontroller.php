@@ -1,23 +1,22 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
 /**
  * Groups Application - Events Controller
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license Proprietary
  * @package groups
  * @since 1.0
  */
-
 class EventsController extends Gdn_Controller {
 
     /**
      * Include JS, CSS, and modules used by all methods.
      *
      * Always called by dispatcher before controller's requested method.
-     *
-     * @access public
      */
     public function Initialize() {
         // Set up head

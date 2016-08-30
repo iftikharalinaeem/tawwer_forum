@@ -1,3 +1,5 @@
+<?php if (!defined('APPLICATION')) exit(); ?>
+
 <div class="FormTitleWrapper">
     <h1><?php echo T($this->Data['Title']); ?></h1>
     <div class="FormWrapper StructuredForm AddEvent">

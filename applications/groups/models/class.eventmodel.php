@@ -1,15 +1,16 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
 /**
  * Groups Application - Event Model
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license Proprietary
  * @package groups
  * @since 1.0
  */
-
 class EventModel extends Gdn_Model {
 
     /**

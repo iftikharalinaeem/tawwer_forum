@@ -1,23 +1,24 @@
 <?php
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @copyright 2008-2016 Vanilla Forums, Inc.
  * @license Proprietary
+ */
+
+/**
+ * Class GroupsController
+ *
+ * @package groups
  */
 class GroupsController extends Gdn_Controller {
 
-
+    /** @var array  */
     public $Uses = array('GroupModel');
 
-    /**
-     * @var GroupModel
-     */
+    /** @var GroupModel */
     public $GroupModel;
 
-    /**
-     * @var int The page size of groups when browsing.
-     */
+    /** @var int The page size of groups when browsing. */
     public $PageSize = 24;
-
 
     /**
      * Include JS, CSS, and modules used by all methods.

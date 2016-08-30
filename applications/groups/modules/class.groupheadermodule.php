@@ -1,34 +1,27 @@
 <?php
 /**
- * Groups Application - Group Header Module
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
  */
 
 /**
  * Class GroupHeaderModule
- *
- *
  */
 class GroupHeaderModule extends Gdn_Module {
 
-     /**
-      * @var array The group the header is associated with.
-      */
+     /** @var array The group the header is associated with. */
      public $group;
-     /**
-      * @var bool Whether to include the group edit options.
-      */
+
+     /** @var bool Whether to include the group edit options. */
      public $showOptions;
-     /**
-      * @var bool Whether to include the group buttons (i.e., 'Join').
-      */
+
+     /** @var bool Whether to include the group buttons (i.e., 'Join'). */
      public $showButtons;
-     /**
-      * @var bool Whether to include the group meta.
-      */
+
+     /** @var bool Whether to include the group meta. */
      public $showMeta;
-     /**
-      * @var bool Whether to include the group description.
-      */
+
+     /** @var bool Whether to include the group description. */
      public $showDescription;
 
      /**

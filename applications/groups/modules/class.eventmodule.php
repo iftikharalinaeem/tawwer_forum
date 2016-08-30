@@ -1,4 +1,8 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
 /**
  * Groups Application - Event Module
@@ -6,19 +10,31 @@
  * Shows a small events list based on the provided Group or User context.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license Proprietary
  * @package groups
  * @since 1.0
  */
-
 class EventModule extends Gdn_Module {
 
+    /** @var null  */
     protected $Filter = NULL;
+
+    /** @var null  */
     protected $FilterBy = NULL;
+
+    /** @var null  */
     protected $Type = NULL;
+
+    /** @var null  */
     protected $Button = NULL;
 
+    /**
+     * EventModule constructor.
+     *
+     * @param null $Type
+     * @param null $FilterBy
+     * @param null $Filter
+     * @param null $Button
+     */
     public function __construct($Type = NULL, $FilterBy = NULL, $Filter = NULL, $Button = NULL) {
         parent::__construct();
         $this->_ApplicationFolder = 'groups';

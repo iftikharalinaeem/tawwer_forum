@@ -1,3 +1,5 @@
+<?php if (!defined('APPLICATION')) exit(); ?>
+
 <h1><?php echo $this->Title(); ?></h1>
 
 <div class="StructuredForm Form-Confirm">
