@@ -1,61 +1,44 @@
 <?php
-
 /**
- * Groups Application - Promoted Groups Module
- *
- * @author Becky Van Bussel <becky@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
+ * @copyright 2008-2016 Vanilla Forums, Inc.
  * @license Proprietary
- * @package groups
  */
 
 /**
  * Class PromotedGroupsModule
  *
  * Outputs a list of new, popular, updated or 'my' groups.
+ *
+ * @author Becky Van Bussel <becky@vanillaforums.com>
+ * @package groups
  */
 class PromotedGroupsModule extends Gdn_Module {
 
-    /**
-     * @var int The max number of groups to retrieve.
-     */
+    /** @var int The max number of groups to retrieve. */
     protected $limit = 3;
-    /**
-     * @var string The type of groups to return. Must be a key in $promoteTypes.
-     */
+
+    /** @var string The type of groups to return. Must be a key in $promoteTypes. */
     protected $promoteType;
-    /**
-     * @var bool Whether to attach data from the group's last discussion to the group.
-     */
+
+    /** @var bool Whether to attach data from the group's last discussion to the group. */
     protected $attachLastDiscussion = false;
-    /**
-     * @var array The categories of promoted types and data associated with them.
+
+    /** @var array The categories of promoted types and data associated with them.
      */
-    protected $promoteTypes = array(
-        'popular' => array('title'   => 'Popular Groups',
-                           'url'     => '/groups/browse/popular',
-                           'orderBy' => 'CountMembers'),
-        'new'     => array('title'   => 'New Groups',
-                           'url'     => '/groups/browse/new',
-                           'orderBy' => 'DateInserted'),
-        'updated' => array('title'   => 'Recently Updated Groups',
-                           'url'     => '/groups/browse/updated',
-                           'orderBy' => 'DateLastComment'),
-        'mine'    => array('title'   => 'My Groups',
-                           'url'     => '/groups/browse/mine',
-                           'orderBy' => 'DateLastComment')
-    );
-    /**
-     * @var string The title to be rendered for the module.
-     */
+    protected $promoteTypes = [
+        'popular' => ['title' => 'Popular Groups', 'url' => '/groups/browse/popular', 'orderBy' => 'CountMembers'],
+        'new' => ['title' => 'New Groups', 'url' => '/groups/browse/new', 'orderBy' => 'DateInserted'],
+        'updated' => ['title' => 'Recently Updated Groups', 'url' => '/groups/browse/updated', 'orderBy' => 'DateLastComment'],
+        'mine' => ['title' => 'My Groups', 'url' => '/groups/browse/mine', 'orderBy' => 'DateLastComment']
+    ];
+
+    /** @var string The title to be rendered for the module. */
     protected $title;
-    /**
-     * @var string The url for the 'show more' link.
-     */
+
+    /** @var string The url for the 'show more' link. */
     protected $url;
-    /**
-     * @var string The field to order the group results by.
-     */
+
+    /** @var string The field to order the group results by. */
     protected $orderBy;
 
     /**

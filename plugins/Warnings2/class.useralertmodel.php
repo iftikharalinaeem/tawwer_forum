@@ -7,8 +7,14 @@ class UserAlertModel extends Gdn_Model {
         $this->PrimaryKey = 'UserID';
     }
 
-    public function GetID($ID) {
-        $Row = parent::GetID($ID, DATASET_TYPE_ARRAY);
+    /**
+     * @param mixed $ID
+     * @param bool $DatasetType Unused
+     * @param array $Options Unused
+     * @return array
+     */
+    public function getID($ID, $DatasetType = false, $Options = array()) {
+        $Row = parent::getID($ID, DATASET_TYPE_ARRAY);
         if (empty($Row))
             return $Row;
         $Row = $this->ExpandAttributes($Row);

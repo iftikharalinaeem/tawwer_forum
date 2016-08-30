@@ -410,6 +410,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
                 $Form->setFormValue('Target', $relay_state);
         }
 
+        Logger::event('saml_profile', Logger::INFO, 'Profile Received from SAML', (array) $profile);
+
         $this->EventArguments['Profile'] = $profile;
         $this->EventArguments['Form'] = $Form;
 
@@ -511,7 +513,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
                     return $form->label('Metadata').
                         '<div class="Info">'.
                             'You can get the metadata for this service provider here: '.
-                            Anchor('get metadata', Url('/settings/samlsso/metadata.xml'), '', array('target' => '_blank')).'.'.
+                            Anchor('get metadata', '/settings/samlsso/metadata.xml', '', array('target' => '_blank')).'.'.
                         '</div>';
                 })
             );

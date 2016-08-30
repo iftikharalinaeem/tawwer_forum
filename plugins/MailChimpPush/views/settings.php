@@ -88,7 +88,10 @@
                 <div class="label-wrap">
                     <?php echo $this->Form->label("Mailing List", "ListID"); ?>
                     <div class="info">
+      ?></li>
+      <?php
                         <?php echo t('MailChimpPush List Settings', "Choose which list MailChimp
+         // Create any dropdowns of interests associated with lists, each dropdown is hidden
             will synchronize to when new users register, or existing ones change 
             their email address."); ?>
                     </div>
@@ -99,6 +102,7 @@
             </li>
 
             <li class="form-group row">
+      ?>
                 <div class="input-wrap no-label">
                     <?php echo $this->Form->checkBox('ConfirmJoin', 'Send confirmation email?'); ?>
                 </div>
@@ -151,8 +155,16 @@
                     echo $this->Sync->checkBox('SyncDeleted', 'Sync deleted users');
 
                     if ($this->data('ConfirmEmail', false)) {
+      // by javascript unless the list is selected.
+      foreach ($interests as $list => $interest) {
+         echo "<li id='SyncInterestDropdown{$list}' class='SyncInterestDropdowns'>";
+         echo $this->Sync->label('Interest', 'SyncInterestID'.$list);
+         // Disable the sync interest dropdown by default. Will be activated by javascript if needed.
                         echo $this->Sync->checkBox('SyncUnconfirmed', 'Sync users with unconfirmed email addreses');
                     } ?>
+      }
+      ?>
+      <li><?php
                 </div>
             </li>
         </ul>

@@ -183,12 +183,22 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Join the roles to every discussions.
+     *
+     * @param CategoriesController $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function categoriesController_render_before($sender, $args) {
+        $this->discussionsController_render_before($sender, $args);
+    }
+
+    /**
      * Add CSS hook to the tracked discussions
      *
      * @param $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function discussionsController_beforeDiscussionName_handler($sender, $args) {
+    public function base_beforeDiscussionName_handler($sender, $args) {
         $discussion = val('Discussion', $args);
         if (!$discussion) {
             return;
@@ -264,6 +274,9 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         if (!$tagsID) {
             return;
         }
+
+        // In case we fiddled with the tags and assigned multiple roles to 1 tag :D
+        $tagsID = array_unique($tagsID);
 
         if ($tags === null) {
             $tagModel = TagModel::instance();

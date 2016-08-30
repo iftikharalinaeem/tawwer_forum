@@ -121,18 +121,29 @@ class OneLogin_Saml_Response
     protected function queryAssertion($assertionXpath) {
         // The DOMDocument doesn't xpath namespaces properly if they aren't on the root element.
         // Use SimpleXML instead.
-        $xmlstr = $this->document->saveXML();
 
         $xml = simplexml_load_string($this->document->saveXML());
         $xml->registerXPathNamespace('samlp', 'urn:oasis:names:tc:SAML:2.0:protocol');
         $xml->registerXPathNamespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
         $xml->registerXPathNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
 
-        $signatureQuery = '/samlp:Response//saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference';
+        // Some SAML responses put the signature in the assertion, some don't. Loop through the possible paths.
+        $signatureQueries = [
+            '/samlp:Response//saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference',
+            '/samlp:Response//ds:Signature/ds:SignedInfo/ds:Reference'
+        ];
 
-        /* @var SimpleXMLElement $refNode */
-        $refNode = reset($xml->xpath($signatureQuery));
+        foreach ($signatureQueries as $signatureQuery) {
+            /* @var SimpleXMLElement $refNode */
+            $refNode = reset($xml->xpath($signatureQuery));
+            if ($refNode) {
+                break;
+            }
+        }
         if (!$refNode) {
+            // if no signature is found, dump the structure to the Logger, throw an error message.
+            $xmlstr = $this->document->saveXML();
+            Logger::event('saml_response', Logger::ERROR, 'SAML Signature not found', (array) $xmlstr);
             throw new Exception('Unable to query assertion, no Signature Reference found?', 422);
         }
 

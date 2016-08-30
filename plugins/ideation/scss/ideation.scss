@@ -10,17 +10,18 @@
 
 
 
-$vote-color: rgba(0,0,0,.25);
-$voted-color: rgba(0,0,0,.8);
-$background-color-open: rgba(0,0,0,.1);
-$background-color-closed: rgba(0,0,0,.05);
+$vote-color: rgba(0, 0, 0, .25);
+$voted-color: rgba(0, 0, 0, .8);
+$background-color-open: rgba(0, 0, 0, .1);
+$background-color-closed: rgba(0, 0, 0, .05);
+$votes-color: rgba(0, 0, 0, .6);
 
 $icon-caret-width: 14px;
-$icon-caret-border-width: $icon-caret-width/2;
-$icon-caret-place-adjustment: -($icon-caret-width/4);
+$icon-caret-border-width: $icon-caret-width / 2;
+$icon-caret-place-adjustment: -($icon-caret-width / 4);
 
 @mixin clearfix {
-  &:after {
+  &::after {
     content: "";
     display: table;
     clear: both;
@@ -56,6 +57,11 @@ $icon-caret-place-adjustment: -($icon-caret-width/4);
 
   .PhotoWrap {
     display: none;
+
+    &.IndexPhoto {
+      display: block;
+      margin: 2px 10px 0 0;
+    }
   }
 
   .BlockColumn-User .PhotoWrap {
@@ -74,8 +80,8 @@ $icon-caret-place-adjustment: -($icon-caret-width/4);
   line-height: 1;
 
   *,
-  *:before,
-  *:after {
+  *::before,
+  *::after {
     box-sizing: border-box;
   }
 
@@ -83,6 +89,7 @@ $icon-caret-place-adjustment: -($icon-caret-width/4);
     width: 40px;
     min-height: 40px;
     margin: 2px 10px 0 0;
+    padding: 6px 0 2px;
     text-align: center;
     background-color: $background-color-open;
   }
@@ -97,6 +104,10 @@ $icon-caret-place-adjustment: -($icon-caret-width/4);
 
   .uservote {
     color: $voted-color;
+
+    .arrow::before {
+      border-color: $voted-color;
+    }
   }
 
   .score {
@@ -112,7 +123,7 @@ $icon-caret-place-adjustment: -($icon-caret-width/4);
     width: $icon-caret-width;
     height: $icon-caret-width;
 
-    &:before {
+    &::before {
       position: absolute;
       display: block;
       width: $icon-caret-width;
@@ -120,25 +131,18 @@ $icon-caret-place-adjustment: -($icon-caret-width/4);
       border: solid $vote-color $icon-caret-border-width;
       border-left-color: transparent !important;
       border-right-color: transparent !important;
-      content: '';
+      content: "";
     }
   }
 
-  .arrow-up:before {
+  .arrow-up::before {
     top: $icon-caret-place-adjustment;
     border-top-color: transparent !important;
   }
-  .arrow-down:before {
+
+  .arrow-down::before {
     bottom: $icon-caret-place-adjustment;
     border-bottom-color: transparent !important;
-  }
-
-  .uservote .arrow:before {
-    border-color: $voted-color;
-  }
-
-  .idea-counter-box {
-    padding: 6px 0 2px;
   }
 
   .idea-menu {
@@ -148,7 +152,7 @@ $icon-caret-place-adjustment: -($icon-caret-width/4);
   .votes {
     margin-top: 5px;
     font-size: 10px;
-    color: rgba(0,0,0,.6);
+    color: $votes-color;
     background-color: transparent;
   }
 }

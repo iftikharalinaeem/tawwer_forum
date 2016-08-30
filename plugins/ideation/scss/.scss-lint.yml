@@ -47,6 +47,12 @@ linters:
   IdWithExtraneousSelector:
     enabled: true
 
+  IdSelector:
+    enabled: false
+
+  ImportantRule:
+    enabled: false
+
   LeadingZero:
     enabled: true
     style: exclude_zero
@@ -71,6 +77,9 @@ linters:
   SelectorDepth:
     enabled: true
     max_depth: 3
+
+  SelectorFormat:
+    enabled: false
 
   Shorthand:
     enabled: true

@@ -19,7 +19,7 @@ class UserWarningModule extends Gdn_Module {
 
         // Grab the data.
         $UserAlertModel = new UserAlertModel();
-        $Alert = $UserAlertModel->GetID($this->UserID, DATASET_TYPE_ARRAY);
+        $Alert = $UserAlertModel->GetID($this->UserID);
         $this->Data = $Alert;
         if (!$this->Data('WarningLevel'))
             return '';

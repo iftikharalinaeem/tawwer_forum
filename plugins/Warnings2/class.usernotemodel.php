@@ -23,7 +23,15 @@ class UserNoteModel extends Gdn_Model {
         }
     }
 
-    public function GetID($ID) {
+    /**
+     * Get a UserNote by ID
+     *
+     * @param mixed $ID
+     * @param bool|false $DatasetType Unused
+     * @param array $Options Unused
+     * @return array|object
+     */
+    public function GetID($ID, $DatasetType = false, $Options = []) {
         $Row = parent::GetID($ID, DATASET_TYPE_ARRAY);
         $Row = $this->ExpandAttributes($Row);
         $this->CalculateRow($Row);
