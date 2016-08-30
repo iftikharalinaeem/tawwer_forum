@@ -5,7 +5,7 @@
  */
 
 /**
- * Reactions controller
+ * Reactions controller.
  *
  * @since 1.0.0
  */
@@ -51,12 +51,11 @@ class ReactionsController extends DashboardController {
         }
 
         $this->setData('Reaction', $Reaction);
-
         $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
-     * Add a reaction
+     * Add a reaction.
      *
      * Parameters:
      *  UrlCode
@@ -64,27 +63,24 @@ class ReactionsController extends DashboardController {
      *  Description
      *  Class
      *  Points
-     *
      */
     public function add() {
         $this->permission('Garden.Community.Manage');
         $this->title('Add Reaction');
         $this->addSideMenu('reactions');
 
-        $ReactionModel = new ReactionModel();
+        $reactionModel = new ReactionModel();
         if ($this->Form->authenticatedPostBack()) {
-            $Reaction = $this->Form->formValues();
-            $newReaction = $ReactionModel->defineReactionType($Reaction);
+            $reaction = $this->Form->formValues();
+            $definedReaction = $reactionModel->defineReactionType($reaction);
 
-            if ($newReaction) {
-                $this->setData('Reaction', $Reaction);
-
+            if ($definedReaction) {
+                $this->setData('Reaction', $reaction);
                 if ($this->deliveryType() != DELIVERY_TYPE_DATA) {
-                    $this->informMessage(formatString(t("New reaction created"), $Reaction));
+                    $this->informMessage(formatString(t("New reaction created"), $reaction));
                     redirect('/reactions');
                 }
             }
-
         }
 
         $this->render('addedit', '', 'plugins/Reactions');
@@ -128,7 +124,6 @@ class ReactionsController extends DashboardController {
         $ReactionModel = new ReactionModel();
         list($Offset, $Limit) = OffsetLimit($Page, 10);
         $this->setData('Users', $ReactionModel->getUsers($Type, $ID, $Reaction, $Offset, $Limit));
-
         $this->render('', 'reactions', 'plugins/Reactions');
     }
 
@@ -150,7 +145,7 @@ class ReactionsController extends DashboardController {
         $this->title('Edit Reaction');
         $this->addSideMenu('reactions');
 
-        $ReactionModel = new ReactionModel();
+        $reactionModel = new ReactionModel();
         $Reaction = ReactionModel::reactionTypes($UrlCode);
         if (!$Reaction) {
             throw NotFoundException('reaction');
@@ -160,9 +155,9 @@ class ReactionsController extends DashboardController {
         $this->Form->setData($Reaction);
 
         if ($this->Form->authenticatedPostBack()) {
-            $ReactionData = $this->Form->formValues();
+            $ReactionData = $this->Form->FormValues();
             $ReactionData = array_merge($Reaction, $ReactionData);
-            $ReactionID = $ReactionModel->defineReactionType($ReactionData);
+            $ReactionID = $reactionModel->defineReactionType($ReactionData);
 
             if ($ReactionID) {
                 $Reaction['ReactionID'] = $ReactionID;
@@ -180,7 +175,7 @@ class ReactionsController extends DashboardController {
     }
 
     /**
-     *
+     * Generate the reaction logs.
      *
      * @param $Type
      * @param $ID
@@ -266,7 +261,7 @@ class ReactionsController extends DashboardController {
     }
 
     /**
-     *
+     * Settings page.
      */
     public function advanced() {
         $this->permission('Garden.Settings.Manage');

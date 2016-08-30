@@ -2,11 +2,8 @@
 
 echo '<ul>';
 
-foreach($this->Data('Users') as $User) {
-   echo '<li>'.
-      UserPhoto($User, array('Size' => 'Small')).
-      UserAnchor($User).
-      '</li>';
+foreach($this->data('Users') as $User) {
+    echo '<li>'.userPhoto($User, ['Size' => 'Small']).userAnchor($User).'</li>';
 }
 
 echo '</ul>';
