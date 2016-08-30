@@ -97,7 +97,7 @@ class ReactionsController extends DashboardController {
      * @throws Gdn_UserException
      */
     public function undo($Type, $ID, $Reaction, $UserID) {
-        $this->permission(array('Garden.Moderation.Manage'), FALSE);
+        $this->permission(['Garden.Moderation.Manage'], false);
 
         $ReactionModel = new ReactionModel();
         $ReactionModel->react($Type, $ID, 'Undo-'.$Reaction, $UserID);
