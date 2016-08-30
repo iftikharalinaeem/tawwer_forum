@@ -75,7 +75,7 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     protected function getSettingsFormFields() {
         $formFields = parent::getSettingsFormFields();
 
-        $formFields['BaseUrl'] = ['LabelCode' => 'Domain', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the domain found in the dashboard of your Auth0 application.'];
+        $formFields['BaseUrl'] = ['LabelCode' => 'Domain', 'Description' => 'Enter the domain found in the dashboard of your Auth0 application.'];
 
         return $formFields;
     }

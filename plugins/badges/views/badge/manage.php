@@ -1,39 +1,35 @@
 <?php if (!defined('APPLICATION')) exit();
 $Action = ($this->Data('Badge.BadgeID')) ? 'Edit' : 'Add';
 $this->Title($Action . ' ' . T('a Badge')); ?>
+<h1><?php echo $this->Data('Title'); ?></h1>
 <div id="BadgeForm">
-    <h1><?php echo $this->Data('Title'); ?></h1>
     <?php
     echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
     echo $this->Form->Errors();
 
     echo '<ul>';
 
-    echo Wrap($this->Form->Label('Name').
-        $this->Form->Input('Name'), 'li');
+    echo Wrap($this->Form->labelWrap('Name').
+        $this->Form->inputWrap('Name'), 'li', ['class' => 'form-group row']);
 
-    echo Wrap($this->Form->Label('Slug').
-        $this->Form->Input('Slug'), 'li');
+    echo Wrap($this->Form->labelWrap('Slug').
+        $this->Form->inputWrap('Slug'), 'li', ['class' => 'form-group row']);
 
-    echo Wrap($this->Form->Label('Description', 'Body').
-        $this->Form->TextBox('Body', array('MultiLine' => TRUE)), 'li');
+    echo Wrap($this->Form->labelWrap('Description', 'Body').
+        $this->Form->textBoxWrap('Body', array('MultiLine' => TRUE)), 'li', ['class' => 'form-group row']);
 
-    if ($this->Data('Badge.Photo')) {
-        echo Img(Gdn_Upload::Url($this->Data('Badge.Photo')));
-    }
+    echo Wrap($this->Form->labelWrap('Points').
+        $this->Form->inputWrap('Points'), 'li', ['class' => 'form-group row']);
 
-    echo Wrap($this->Form->Label('Points').
-        $this->Form->Input('Points'), 'li');
+    echo Wrap($this->Form->labelWrap('Badge Class', 'Class').
+      $this->Form->inputWrap('Class'), 'li', ['class' => 'form-group row']);
 
-    echo Wrap($this->Form->Label('Badge Class', 'Class').
-      $this->Form->Input('Class'), 'li');
-
-    echo Wrap($this->Form->Label('Badge Class Level', 'Level').
-      $this->Form->Input('Level'), 'li');
+    echo Wrap($this->Form->labelWrap('Badge Class Level', 'Level').
+      $this->Form->inputWrap('Level'), 'li', ['class' => 'form-group row']);
 
     $UploadText = $this->Data('Badge.Photo') ? T('Replace Image') : T('Add Image');
-    echo Wrap($this->Form->Label($UploadText, 'Photo').
-        $this->Form->Input('Photo', 'file'), 'li');
+    echo Wrap($this->Form->labelWrap($UploadText.($this->Data('Badge.Photo') ? '<div class="image-wrap">'.img(Gdn_Upload::Url($this->Data('Badge.Photo'))).'</div>' : ''), 'Photo').
+        $this->Form->fileUploadWrap('Photo'), 'li', ['class' => 'form-group row']);
 
     echo '</ul>';
 

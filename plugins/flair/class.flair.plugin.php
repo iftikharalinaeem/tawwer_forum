@@ -4,7 +4,6 @@ $PluginInfo['flair'] = array(
    'Name' => 'Flair',
    'Description' => 'Displays badges on user posts.',
    'Version' => '1.1.2',
-   'SettingsUrl' => '/settings/flair',
    'SettingsPermission' => 'Garden.Settings.Manage',
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',

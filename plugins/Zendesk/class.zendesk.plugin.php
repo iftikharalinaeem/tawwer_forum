@@ -499,19 +499,6 @@ class ZendeskPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add Zendesk to Dashboard menu.
-     *
-     * @param Controller $Sender Sending controller.
-     * @param array $Arguments Event arguments.
-     */
-    public function base_getAppSettingsMenuItems_handler($Sender, $Arguments) {
-        $LinkText = T('Zendesk');
-        $Menu = $Arguments['SideMenu'];
-        $Menu->AddItem('Forum', T('Forum'));
-        $Menu->AddLink('Forum', $LinkText, 'plugin/zendesk', 'Garden.Settings.Manage');
-    }
-
-    /**
      * Setup to plugin.
      */
     public function setup() {

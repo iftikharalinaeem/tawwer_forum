@@ -10,7 +10,8 @@ $PluginInfo['ideation'] = [
     ),
     'Author'          => "Becky Van Bussel",
     'AuthorEmail'     => 'becky@vanillaforums.com',
-    'License'         => 'Proprietary'
+    'License'         => 'Proprietary',
+    'Icon'            => 'ideation.png'
 ];
 
 /**
@@ -168,7 +169,7 @@ EOT
             $sender->addJsFile('ideation.js', 'plugins/ideation'); // Show/hide allowed discussions and downvote option
 
             if (!$categoryID) {
-                $sender->Data['_ExtendedFields']['IsIdea'] = ['Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => '<strong>' . t('Ideation') . '</strong> <small><a href="http://docs.vanillaforums.com/addons/ideation/">' . sprintf(t('Learn more about %s'), t('ideas')) . '</a></small>'];
+                $sender->Data['_ExtendedFields']['IsIdea'] = ['Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => t('Ideation') .'<div class="info"><a href="http://docs.vanillaforums.com/addons/ideation/">' . sprintf(t('Learn more about %s'), t('ideas')) . '</a></div>'];
             }
 
             $downVoteOptions = [];
@@ -178,7 +179,7 @@ EOT
                 $downVoteOptions = $this->allowDownVotes($category) ? ['checked' => 'checked'] : [];
             }
 
-            $sender->Data['_ExtendedFields']['UseDownVotes'] = ['Name' => 'UseDownVotes', 'Control' => 'CheckBox', 'Options' => $downVoteOptions];
+            $sender->Data['_ExtendedFields']['UseDownVotes'] = ['Name' => 'UseDownVotes', 'Control' => 'CheckBox', 'Description' => t('Down Votes').' <div class="info">'.t('Let users vote up or down.').'</div>', 'Options' => $downVoteOptions];
 
         } else {
             if ($sender->Form->getValue('Idea_Category')) {
@@ -308,15 +309,12 @@ EOT
         $sender->permission('Garden.Settings.Manage');
 
         if ($sender->Form->authenticatedPostBack()) {
-            if ($sender->Form->getFormValue('Yes')) {
-                $statusModel = new StatusModel();
-                $statusModel->delete(['StatusID' => $statusID]);
-                $sender->jsonTarget("#Status_$statusID", NULL, 'SlideUp');
-            }
+            $statusModel = new StatusModel();
+            $statusModel->delete(['StatusID' => $statusID]);
+            $sender->jsonTarget("#Status_$statusID", NULL, 'SlideUp');
+            $sender->informMessage(sprintf(t('%s deleted.'), t('Status')));
         }
-
-        $sender->title(sprintf(t('Delete %s'), t('Status')));
-        $sender->render('DeleteStatus', '', 'plugins/ideation');
+        $sender->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -1493,5 +1491,3 @@ if (!function_exists('getStatusTagHtml')) {
         return ' <a href="'.url('/discussions/tagged/'.$statusCode).'"><span class="Tag Status-Tag-'.$statusCode.'"">'.$statusName.'</span></a> ';
     }
 }
-
-

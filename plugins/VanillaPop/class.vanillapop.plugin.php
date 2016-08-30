@@ -18,7 +18,8 @@ $PluginInfo['VanillaPop'] = array(
     'RegisterPermissions' => array(
         'Email.Discussions.Add' => 'Garden.Profiles.Edit',
         'Email.Comments.Add' => 'Garden.Profiles.Edit',
-        'Email.Conversations.Add' => 'Garden.Profiles.Edit')
+        'Email.Conversations.Add' => 'Garden.Profiles.Edit'),
+    'Icon' => 'vanillapop.png'
 );
 
 // 1.0.6 - Lincoln, Apr 2013
@@ -991,17 +992,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Adds items to dashboard menu.
-     *
-     * @param object $Sender DashboardController.
-     */
-    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-        $Menu = $Sender->EventArguments['SideMenu'];
-//      $Menu->AddItem('Pages', T('Pages Settings'), FALSE, array('class' => 'Pages', 'After' => 'Forum'));
-        $Menu->AddLink('Site Settings', T('Incoming Email'), '/settings/vanillapop', 'Garden.Settings.Manage', array('After' => 'settings/email', 'class' => 'nav-email nav-email-in'));
-    }
-
-    /**
      * Add notifications.
      */
     public function CommentModel_BeforeNotification_Handler($Sender, $Args) {
@@ -1164,10 +1154,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
             'Plugins.VanillaPop.DefaultCategoryID' => array('Control' => 'CategoryDropDown', 'Description' => 'Place discussions started through email in the following category.'),
             'Plugins.VanillaPop.AllowUserRegistration' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow new users to be registered through email.'),
             'Plugins.VanillaPop.AugmentFrom' => array('Control' => 'CheckBox', 'LabelCode' => 'Add information into the from field in email addresses to help with replies (recommended).', 'Default' => TRUE),
-            'Garden.Email.SupportAddress' => array('Control' => 'TextBox', 'LabelCode' => 'Outgoing Email Address', 'Description' => 'This is the address that will show up in the from field of emails sent from the application.', 'Options' => array('class' => 'InputBox BigInput')),
-            'EmailFormat.DiscussionSubject' => array('Control' => 'TextBox', 'Options' => array('class' => 'InputBox BigInput')),
+            'Garden.Email.SupportAddress' => array('Control' => 'TextBox', 'LabelCode' => 'Outgoing Email Address', 'Description' => 'This is the address that will show up in the from field of emails sent from the application.'),
+            'EmailFormat.DiscussionSubject' => array('Control' => 'TextBox'),
             'EmailFormat.DiscussionBody' => array(),
-            'EmailFormat.CommentSubject' => array('Options' => array('class' => 'InputBox BigInput')),
+            'EmailFormat.CommentSubject' => [],
             'EmailFormat.CommentBody' => array(),
             'Plugins.VanillaPop.SendConfirmationEmail' => array('Control' => 'CheckBox', 'LabelCode' => 'Send a confirmation email when people ask a question or start a discussion over email.'),
             'EmailFormat.ConfirmationBody' => array(),

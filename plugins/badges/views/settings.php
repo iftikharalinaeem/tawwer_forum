@@ -5,14 +5,20 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
 <ul>
-    <li>
-        <?php echo $this->Form->label('Exclude users from leaderboards', 'ExcludePermission'); ?>
-        <div class="Info"><?php echo t('Users in selected the roles will be excluded from leaderboards.'); ?></div>
-        <?php echo $this->Form->dropdown('ExcludePermission', [
+    <li class="form-group row">
+        <div class="label-wrap">
+            <?php echo $this->Form->label('Exclude users from leaderboards', 'ExcludePermission'); ?>
+            <div class="info"><?php echo t('Users in selected the roles will be excluded from leaderboards.'); ?></div>
+        </div>
+        <div class="input-wrap">
+            <?php echo $this->Form->dropdown('ExcludePermission', [
             'Garden.Settings.Manage' => 'Administrator',
             'Garden.Moderation.Manage' => 'Administrator and moderator',
             'None' => 'None'
         ]); ?>
+        </div>
     </li>
 </ul>
-<?php echo $this->Form->close('Save'); ?>
+<div class="js-modal-footer form-footer">
+    <?php echo $this->Form->close('Save'); ?>
+</div>

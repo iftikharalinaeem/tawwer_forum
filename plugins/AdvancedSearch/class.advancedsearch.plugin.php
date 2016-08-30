@@ -12,7 +12,8 @@ $PluginInfo['AdvancedSearch'] = array(
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
+    'AuthorUrl' => 'http://www.vanillaforums.com',
+    'Icon' => 'advanced-search.png'
 );
 
 /**

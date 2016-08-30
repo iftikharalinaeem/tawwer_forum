@@ -6,5 +6,6 @@ $ApplicationInfo['Groups'] =[
     'Url' => 'http://vanillaforums.com',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com'
+    'AuthorUrl' => 'http://vanillaforums.com',
+    'Icon' => 'social-groups.png'
 ];

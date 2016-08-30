@@ -1,71 +1,11 @@
-<?php if (!defined('APPLICATION')) exit();
-?>
-<style type="text/css">
-.Configuration {
-   margin: 0 20px 20px;
-   background: #f5f5f5;
-   float: left;
-}
-.ConfigurationForm {
-   padding: 20px;
-   float: left;
-}
-#Content form .ConfigurationForm ul {
-   padding: 0;
-}
-#Content form .ConfigurationForm input.Button {
-   margin: 0;
-}
-.ConfigurationHelp {
-   border-left: 1px solid #aaa;
-   margin-left: 340px;
-   padding: 20px;
-}
-.ConfigurationHelp strong {
-    display: block;
-}
-.ConfigurationHelp img {
-   width: 99%;
-}
-.ConfigurationHelp a img {
-    border: 1px solid #aaa;
-}
-.ConfigurationHelp a:hover img {
-    border: 1px solid #777;
-}
-input.CopyInput {
-   font-family: monospace;
-   color: #000;
-   width: 240px;
-   font-size: 12px;
-   padding: 4px 3px;
-}
-
-input.CopyInputLonger {
-    width: 300px;
-}
-
-.ConfigurationHelp ol {
-   margin: 1em 0 1em 3em;
-}
-.ConfigurationHelp ol li {
-  list-style: decimal !important;
-  margin: 10px 0;
-}
-</style>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('.CopyInput').on('click', function(e) {
-            $(this).select();
-        });
-    });
-</script>
-
+<?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo $this->Data('Title'); ?></h1>
-<div class="Info">
-   Linked In social sign in allows users to sign in using their LinkedIn account.
-   <b>You must register your application with LinkedIn for this addon to work.</b>
+<div class="padded alert alert-warning">
+   <?php echo sprintf(t('You must register your application with %s for this plugin to work.'), t('LinkedIn')); ?>
+</div>
+<div class="padded">
+   <?php echo t('Linked In social sign in allows users to sign in using their LinkedIn account.'); ?>
+   <?php echo ' '.anchor(sprintf(t('How to set up %s.'), t('LinkedIn social sign in')), 'http://docs.vanillaforums.com/addons/social/linkedin/', array('target' => '_blank')); ?>
 </div>
 <div class="Configuration">
    <div class="ConfigurationForm">
@@ -74,36 +14,5 @@ input.CopyInputLonger {
       $Cf = $this->ConfigurationModule;
       $Cf->Render();
       ?>
-   </div>
-   <div class="ConfigurationHelp">
-      <strong>How to set up LinkedIn Social Sign in</strong>
-      <ol>
-         <li>
-            Go to the LinkedIn Developer Network at <a href="https://www.linkedin.com/secure/developer">https://www.linkedin.com/secure/developer</a>.
-         </li>
-         <li>
-            Click <b>Add New Application</b>.
-         </li>
-         <li>
-            When you create the application, you can choose what to enter in most fields, but you have to make sure you enter specific information for some fields.
-         </li>
-         <li>
-            Under <b>Website URL</b> enter <input type="text" class="CopyInput" value="<?php echo url('/', true); ?>" />.
-         </li>
-         <li>
-            Under <b>Default Scope</b> make sure you've selected at least <b>r_basicprofile</b> and <b>r_emailaddress</b>.
-         </li>
-          <li>
-              Under <b>OAuth 2.0 Redirect URLs</b> add <input type="text" class="CopyInput CopyInputLonger" value="<?php echo url('/entry/connect/linkedin', true); ?>" />
-              <b>and</b> <input type="text" class="CopyInput CopyInputLonger" value="<?php echo url('/profile/linkedinconnect', true); ?>" />
-          </li>
-         <li>
-            Once your application has been set up, you must copy the <b>Client ID</b> and <b>Client Secret</b> into the form on this page.
-         </li>
-         <li>
-            Don't forget to hit update!
-         </li>
-      </ol>
-      <p><?php echo Anchor(Img('/plugins/LinkedIn/design/linkedinscreenshot.jpg', array('style' => 'max-width: 837px;')), '/plugins/LinkedIn/design/linkedinscreenshot.jpg', array('target' => '_blank')); ?></p>
    </div>
 </div>

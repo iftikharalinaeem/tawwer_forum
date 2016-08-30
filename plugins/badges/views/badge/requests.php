@@ -7,12 +7,12 @@ $Session = Gdn::Session();
     echo $this->Form->Errors();
     $NumRequests = $this->RequestData->NumRows();
     if ($NumRequests == 0) { ?>
-        <div class="Info"><?php echo T('There are currently no requests.'); ?></div>
+        <div class="padded"><?php echo T('There are currently no requests.'); ?></div>
     <?php } else { ?>
 <?php
     $AppText = Plural($NumRequests, 'There is currently %s request.', 'There are currently %s requests.');
 ?>
-<div class="Info"><?php echo sprintf($AppText, $NumRequests); ?></div>
+<div class="padded"><?php echo sprintf($AppText, $NumRequests); ?></div>
 <table class="CheckColumn">
     <thead>
         <tr>
