@@ -1,60 +1,61 @@
 <?php if (!defined('APPLICATION')) exit();
-$Poll = $this->Data('Poll');
-$Anonymous = GetValue('Anonymous', $Poll) || C('Plugins.Polls.AnonymousPolls');
-$CountPollVotes = GetValue('CountVotes', $Poll);
-$PollOptions = $this->Data('PollOptions');
+
+$Poll = $this->data('Poll');
+$Anonymous = val('Anonymous', $Poll) || c('Plugins.Polls.AnonymousPolls');
+$CountPollVotes = val('CountVotes', $Poll);
+$PollOptions = $this->data('PollOptions');
+
 $cssResultDisplay = 'style="display: none"';
 if ($this->Data['UserHasVoted']) {
     $cssResultDisplay = '';
 }
 
-if (!$Poll):
-    echo Wrap(T('Failed to load the poll.'), 'div class="Poll PollNotFound"');
-else:
-    // Display the poll
+if (!$Poll) :
+    echo wrap(t('Failed to load the poll.'), 'div class="Poll PollNotFound"');
+else : // Display the poll
     ?>
     <div class="Poll PollResults Hero js-poll-results" <?php echo $cssResultDisplay; ?>>
         <h2 class="PollQuestion"><?php
-            //         echo Sprite('SpPoll');
-            echo Gdn_Format::PlainText(GetValue('Name', $Poll, ''));
-            echo ' '.Wrap(Plural(GetValue('CountVotes', $Poll), '%s vote', '%s votes'), 'span class="TotalVotes Gloss"');
+            echo Gdn_Format::plainText(val('Name', $Poll, ''));
+            echo ' '.wrap(plural(val('CountVotes', $Poll), '%s vote', '%s votes'), 'span class="TotalVotes Gloss"');
             ?></h2>
         <div class="PollOptions">
             <?php
             $Item = 0;
             foreach ($PollOptions as $Option) {
                 $Item = $Item + 1;
-                $CountVotes = GetValue('CountVotes', $Option);
-                $Votes = GetValue('Votes', $Option);
+                $CountVotes = val('CountVotes', $Option);
+                $Votes = val('Votes', $Option);
                 $Percent = $CountPollVotes > 0 ? floor(($CountVotes * 100) / $CountPollVotes) : 0;
                 ?>
                 <div class="PollOption PollOption<?php echo $Item; ?>">
-                    <div class="VoteOption"><?php echo Gdn_Format::To(GetValue('Body', $Option, ''), GetValue('Format', $Option, 'Text')); ?></div>
+                    <div class="VoteOption"><?php echo Gdn_Format::to(val('Body', $Option, ''), val('Format', $Option, 'Text')); ?></div>
                     <div class="VoteBar">
                         <div class="VoteBarBG"></div>
                         <span class="VoteBarWidth PollColor PollColor<?php echo $Item; ?>" style="width: <?php echo $Percent; ?>%"></span>
                         <span class="VotePercent"><?php echo $Percent; ?>%</span>
                         <?php
-                        if ($Anonymous)
-                            echo Wrap(Plural($CountVotes, '%s vote', '%s votes'), 'span class="Gloss VoteCount"');
+                        if ($Anonymous) {
+                            echo wrap(plural($CountVotes, '%s vote', '%s votes'), 'span class="Gloss VoteCount"');
+                        }
                         ?>
                     </div>
-                    <?php if (!$Anonymous && is_array($Votes) && $CountVotes > 0): ?>
+                    <?php if (!$Anonymous && is_array($Votes) && $CountVotes > 0) : ?>
                         <div class="VoteUsers">
-               <span class="PhotoGrid PhotoGridSmall">
-                  <?php
-                  $MaxLimit = C('Plugins.Polls.MaxShowVotes', 20);
-                  $i = 0;
-                  foreach ($Votes as $Vote) {
-                      if ($i >= $MaxLimit)
-                          break;
-
-                      echo UserPhoto($Vote, array('Size' => 'Small'));
-                      $i++;
-                  }
-                  ?>
-               </span>
-                            <span class="VoteCount"><?php echo Plural($CountVotes, '%s vote', '%s votes'); ?></span>
+                            <span class="PhotoGrid PhotoGridSmall">
+                            <?php
+                            $MaxLimit = c('Plugins.Polls.MaxShowVotes', 20);
+                            $i = 0;
+                            foreach ($Votes as $Vote) {
+                                if ($i >= $MaxLimit) {
+                                    break;
+                                }
+                                echo userPhoto($Vote, ['Size' => 'Small']);
+                                $i++;
+                            }
+                            ?>
+                            </span>
+                            <span class="VoteCount"><?php echo plural($CountVotes, '%s vote', '%s votes'); ?></span>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -64,10 +65,9 @@ else:
         </div>
         <?php
         if (!$this->Data['UserHasVoted']) {
-            echo Anchor(T('Hide Results'), '#', 'js-poll-result-btn');
+            echo anchor(t('Hide Results'), '#', 'js-poll-result-btn');
         }
         ?>
-
     </div>
 <?php
 endif;
