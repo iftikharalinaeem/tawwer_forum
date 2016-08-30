@@ -1,13 +1,19 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
+/**
+ * @copyright 2009-2016 Vanilla Forums Inc.
+ * @license Proprietary
+ */
 
 /**
- * Reactions controller
+ * Reactions controller.
  *
  * @since 1.0.0
- * @package Reputation
  */
 class ReactionsController extends DashboardController {
 
+    /**
+     *
+     */
     public function initialize() {
         parent::initialize();
         $this->Form = new Gdn_Form;
@@ -15,21 +21,19 @@ class ReactionsController extends DashboardController {
     }
 
     /**
-     * List reactions
+     * List reactions.
      */
     public function index() {
-        $this->Permission('Garden.Community.Manage');
-        $this->Title(T('Reaction Types'));
-        $this->AddSideMenu();
+        $this->permission('Garden.Community.Manage');
+        $this->title(t('Reaction Types'));
+        $this->addSideMenu();
 
         // Grab all of the reaction types.
-        $ReactionModel = new ReactionModel();
-        $ReactionTypes = ReactionModel::GetReactionTypes();
+        $ReactionTypes = ReactionModel::getReactionTypes();
+        $this->setData('ReactionTypes', $ReactionTypes);
 
-        $this->SetData('ReactionTypes', $ReactionTypes);
-        include_once $this->FetchViewLocation('settings_functions', '', 'plugins/Reactions');
-
-        $this->Render('reactiontypes', '', 'plugins/Reactions');
+        include_once $this->fetchViewLocation('settings_functions', '', 'plugins/Reactions');
+        $this->render('reactiontypes', '', 'plugins/Reactions');
     }
 
     /**
@@ -39,19 +43,19 @@ class ReactionsController extends DashboardController {
      * @throws
      */
     public function get($UrlCode) {
-        $this->Permission('Garden.Community.Manage');
+        $this->permission('Garden.Community.Manage');
 
-        $Reaction = ReactionModel::ReactionTypes($UrlCode);
-        if (!$Reaction)
+        $Reaction = ReactionModel::reactionTypes($UrlCode);
+        if (!$Reaction) {
             throw NotFoundException('reaction');
+        }
 
-        $this->SetData('Reaction', $Reaction);
-
-        $this->Render('blank', 'utility', 'dashboard');
+        $this->setData('Reaction', $Reaction);
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
-     * Add a reaction
+     * Add a reaction.
      *
      * Parameters:
      *  UrlCode
@@ -59,59 +63,73 @@ class ReactionsController extends DashboardController {
      *  Description
      *  Class
      *  Points
-     *
      */
     public function add() {
-        $this->Permission('Garden.Community.Manage');
-        $this->Title('Add Reaction');
-        $this->AddSideMenu('reactions');
+        $this->permission('Garden.Community.Manage');
+        $this->title('Add Reaction');
+        $this->addSideMenu('reactions');
 
-        $Rm = new ReactionModel();
-        if ($this->Form->AuthenticatedPostBack()) {
-            $Reaction = $this->Form->FormValues();
-            $R = $Rm->DefineReactionType($Reaction);
+        $reactionModel = new ReactionModel();
+        if ($this->Form->authenticatedPostBack()) {
+            $reaction = $this->Form->formValues();
+            $definedReaction = $reactionModel->defineReactionType($reaction);
 
-            if ($R) {
-                $this->SetData('Reaction', $Reaction);
-
-                if ($this->DeliveryType() != DELIVERY_TYPE_DATA) {
-                    $this->InformMessage(FormatString(T("New reaction created"), $Reaction));
-                    Redirect('/reactions');
+            if ($definedReaction) {
+                $this->setData('Reaction', $reaction);
+                if ($this->deliveryType() != DELIVERY_TYPE_DATA) {
+                    $this->informMessage(formatString(t("New reaction created"), $reaction));
+                    redirect('/reactions');
                 }
             }
-
         }
 
-        $this->Render('addedit', '', 'plugins/Reactions');
-    }
-
-    public function undo($Type, $ID, $Reaction, $UserID) {
-        $this->Permission(array('Garden.Moderation.Manage'), FALSE);
-        include_once $this->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
-
-        $ReactionModel = new ReactionModel();
-        $ReactionModel->React($Type, $ID, 'Undo-'.$Reaction, $UserID);
-
-        $this->JsonTarget('!parent', '', 'SlideUp');
-
-        $this->Render('Blank', 'Utility', 'Dashboard');
-    }
-
-    public function users($Type, $ID, $Reaction, $Page = NULL) {
-        if (!C('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT))
-            throw PermissionException();
-
-        $Model = new ReactionModel();
-
-        list($Offset, $Limit) = OffsetLimit($Page, 10);
-
-        $this->SetData('Users', $Model->GetUsers($Type, $ID, $Reaction, $Offset, $Limit));
-
-        $this->Render('', 'reactions', 'plugins/Reactions');
+        $this->render('addedit', '', 'plugins/Reactions');
     }
 
     /**
-     * Edit a reaction
+     *
+     *
+     * @param $Type
+     * @param $ID
+     * @param $Reaction
+     * @param $UserID
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    public function undo($Type, $ID, $Reaction, $UserID) {
+        $this->permission(array('Garden.Moderation.Manage'), FALSE);
+
+        $ReactionModel = new ReactionModel();
+        $ReactionModel->react($Type, $ID, 'Undo-'.$Reaction, $UserID);
+
+        $this->jsonTarget('!parent', '', 'SlideUp');
+        include_once $this->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+        $this->render('Blank', 'Utility', 'Dashboard');
+    }
+
+    /**
+     *
+     *
+     * @param $Type
+     * @param $ID
+     * @param $Reaction
+     * @param null $Page
+     * @throws Exception
+     */
+    public function users($Type, $ID, $Reaction, $Page = NULL) {
+        if (!c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT)) {
+            throw PermissionException();
+        }
+
+        $Model = new ReactionModel();
+        list($Offset, $Limit) = offsetLimit($Page, 10);
+
+        $this->setData('Users', $Model->getUsers($Type, $ID, $Reaction, $Offset, $Limit));
+        $this->render('', 'reactions', 'plugins/Reactions');
+    }
+
+    /**
+     * Edit a reaction.
      *
      * Parameters:
      *  UrlCode
@@ -124,128 +142,178 @@ class ReactionsController extends DashboardController {
      * @throws type
      */
     public function edit($UrlCode) {
-        $this->Permission('Garden.Community.Manage');
-        $this->Title('Edit Reaction');
-        $this->AddSideMenu('reactions');
+        $this->permission('Garden.Community.Manage');
+        $this->title('Edit Reaction');
+        $this->addSideMenu('reactions');
 
-        $Rm = new ReactionModel();
-        $Reaction = ReactionModel::ReactionTypes($UrlCode);
-        if (!$Reaction)
+        $reactionModel = new ReactionModel();
+        $Reaction = ReactionModel::reactionTypes($UrlCode);
+        if (!$Reaction) {
             throw NotFoundException('reaction');
+        }
 
-        $this->SetData('Reaction', $Reaction);
-        $this->Form->SetData($Reaction);
+        $this->setData('Reaction', $Reaction);
+        $this->Form->setData($Reaction);
 
-        if ($this->Form->AuthenticatedPostBack()) {
+        if ($this->Form->authenticatedPostBack()) {
             $ReactionData = $this->Form->FormValues();
             $ReactionData = array_merge($Reaction, $ReactionData);
-            $ReactionID = $Rm->DefineReactionType($ReactionData);
+            $ReactionID = $reactionModel->defineReactionType($ReactionData);
 
             if ($ReactionID) {
                 $Reaction['ReactionID'] = $ReactionID;
-                $this->SetData('Reaction', $ReactionData);
+                $this->setData('Reaction', $ReactionData);
 
-                if ($this->DeliveryType() != DELIVERY_TYPE_DATA) {
-                    $this->InformMessage(FormatString(T("New reaction created"), $ReactionData));
-                    Redirect('/reactions');
+                if ($this->deliveryType() != DELIVERY_TYPE_DATA) {
+                    $this->informMessage(formatString(t("New reaction created"), $ReactionData));
+                    redirect('/reactions');
                 }
             }
 
         }
 
-        $this->Render('addedit', '', 'plugins/Reactions');
-    }
-
-    public function log($Type, $ID) {
-        $this->Permission(array('Garden.Moderation.Manage', 'Moderation.Reactions.Edit'), FALSE);
-        $Type = ucfirst($Type);
-
-        $ReactionModel = new ReactionModel();
-        list($Row, $Model) = $ReactionModel->GetRow($Type, $ID);
-        if (!$Row)
-            throw NotFoundException(ucfirst($Type));
-
-        $ReactionModel->JoinUserTags($Row, $Type);
-
-        TouchValue('UserTags', $Row, array());
-        Gdn::UserModel()->JoinUsers($Row['UserTags'], array('UserID'));
-
-        $this->Data = $Row;
-        $this->SetData('RecordType', $Type);
-        $this->SetData('RecordID', $ID);
-
-        $this->Render('log', 'reactions', 'plugins/Reactions');
-    }
-
-    public function recalculateRecordCache($Day = FALSE) {
-        $this->Permission('Garden.Settings.Manage');
-
-        if (!$this->Request->IsAuthenticatedPostBack())
-            throw ForbiddenException('GET');
-
-        $ReactionModel = new ReactionModel();
-        $Count = $ReactionModel->RecalculateRecordCache($Day);
-        $this->SetData('Count', $Count);
-        $this->SetData('Success', TRUE);
-        $this->Render();
+        $this->render('addedit', '', 'plugins/Reactions');
     }
 
     /**
-     * Toggle a given reaction on or off
+     * Generate the reaction logs.
+     *
+     * @param $Type
+     * @param $ID
+     * @throws Exception
+     */
+    public function log($Type, $ID) {
+        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Reactions.Edit'), FALSE);
+        $Type = ucfirst($Type);
+
+        $ReactionModel = new ReactionModel();
+        list($Row, $Model) = $ReactionModel->getRow($Type, $ID);
+        if (!$Row) {
+            throw NotFoundException(ucfirst($Type));
+        }
+
+        $ReactionModel->joinUserTags($Row, $Type);
+        touchValue('UserTags', $Row, array());
+        Gdn::userModel()->joinUsers($Row['UserTags'], ['UserID']);
+
+        $this->Data = $Row;
+        $this->setData('RecordType', $Type);
+        $this->setData('RecordID', $ID);
+
+        $this->render('log', 'reactions', 'plugins/Reactions');
+    }
+
+    /**
+     *
+     *
+     * @param bool $Day
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    public function recalculateRecordCache($Day = false) {
+        $this->permission('Garden.Settings.Manage');
+        if (!$this->Request->isAuthenticatedPostBack()) {
+            throw ForbiddenException('GET');
+        }
+
+        $ReactionModel = new ReactionModel();
+        $Count = $ReactionModel->recalculateRecordCache($Day);
+        $this->setData('Count', $Count);
+        $this->setData('Success', true);
+        $this->render();
+    }
+
+    /**
+     * Toggle a given reaction on or off.
      *
      * @param string $UrlCode
      * @param boolean $Active
      */
     public function toggle($UrlCode, $Active) {
-        $this->Permission('Garden.Community.Manage');
-
-        if (!$this->Form->AuthenticatedPostBack()) {
+        $this->permission('Garden.Community.Manage');
+        if (!$this->Form->authenticatedPostBack()) {
             throw PermissionException('PostBack');
         }
 
-        $ReactionType = ReactionModel::ReactionTypes($UrlCode);
-        if (!$ReactionType)
+        $ReactionType = ReactionModel::reactionTypes($UrlCode);
+        if (!$ReactionType) {
             throw NotFoundException('Reaction Type');
-
-        $ReactionModel = new ReactionModel();
-        $Reaction = ReactionModel::ReactionTypes($UrlCode);
-        $ReactionType['Active'] = $Active;
-        $Set = ArrayTranslate($ReactionType, array('UrlCode', 'Active'));
-        $ReactionModel->DefineReactionType($Set);
-
-        $Reaction = array_merge($Reaction, $Set);
-        $this->SetData('Reaction', $Reaction);
-
-        if ($this->DeliveryType() != DELIVERY_TYPE_DATA) {
-            // Send back the new button.
-            include_once $this->FetchViewLocation('settings_functions', '', 'plugins/Reactions');
-            $this->DeliveryMethod(DELIVERY_METHOD_JSON);
-
-            $this->JsonTarget("#ReactionType_{$ReactionType['UrlCode']} .ActivateSlider", ActivateButton($ReactionType), 'ReplaceWith');
-
-            $this->JsonTarget("#ReactionType_{$ReactionType['UrlCode']}", 'InActive', $ReactionType['Active'] ? 'RemoveClass' : 'AddClass');
         }
 
-        $this->Render('blank', 'utility', 'dashboard');
+        $ReactionModel = new ReactionModel();
+        $Reaction = ReactionModel::reactionTypes($UrlCode);
+        $ReactionType['Active'] = $Active;
+        $Set = arrayTranslate($ReactionType, ['UrlCode', 'Active']);
+        $ReactionModel->defineReactionType($Set);
+
+        $Reaction = array_merge($Reaction, $Set);
+        $this->setData('Reaction', $Reaction);
+
+        if ($this->deliveryType() != DELIVERY_TYPE_DATA) {
+            // Send back the new button.
+            include_once $this->fetchViewLocation('settings_functions', '', 'plugins/Reactions');
+            $this->deliveryMethod(DELIVERY_METHOD_JSON);
+            $this->jsonTarget("#ReactionType_{$ReactionType['UrlCode']} .ActivateSlider", activateButton($ReactionType), 'ReplaceWith');
+            $this->jsonTarget("#ReactionType_{$ReactionType['UrlCode']}", 'InActive', $ReactionType['Active'] ? 'RemoveClass' : 'AddClass');
+        }
+
+        $this->render('blank', 'utility', 'dashboard');
     }
 
+    /**
+     * Settings page.
+     */
     public function advanced() {
-        $this->Permission('Garden.Settings.Manage');
+        $this->permission('Garden.Settings.Manage');
 
         $Conf = new ConfigurationModule($this);
-        $Conf->Initialize(array(
-            'Plugins.Reactions.ShowUserReactions' => array('LabelCode' => 'Show Who Reacted to Posts', 'Control' => 'RadioList', 'Items' => array('popup' => 'In a popup', 'avatars' => 'As avatars', 'off' => "Don't show"), 'Default' => ReactionsPlugin::RECORD_REACTIONS_DEFAULT),
-            'Plugins.Reactions.BestOfStyle' => array('LabelCode' => 'Best of Style', 'Control' => 'RadioList', 'Items' => array('Tiles' => 'Tiles', 'List' => 'List'), 'Default' => 'Tiles'),
-            'Plugins.Reactions.DefaultOrderBy' => array('LabelCode' => 'Order Comments By', 'Control' => 'RadioList', 'Items' => array('DateInserted' => 'Date', 'Score' => 'Score'), 'Default' => 'DateInserted',
-                'Description' => 'You can order your comments based on reactions. We recommend ordering the comments by date.'),
-            'Plugins.Reactions.DefaultEmbedOrderBy' => array('LabelCode' => 'Order Embedded Comments By', 'Control' => 'RadioList', 'Items' => array('DateInserted' => 'Date', 'Score' => 'Score'), 'Default' => 'Score',
-                'Description' => 'Ordering your embedded comments by reaction will show just the best comments. Then users can head into the community to see the full discussion.'),
-            'Reactions.PromoteValue' => array('Type' => 'int', 'LabelCode' => 'Promote Threshold', 'Description' => 'Points required for a post to be promoted to Best Of. Changes are not retroactive.', 'Control' => 'DropDown', 'Items' => array(3 => 3, 5 => 5, 10 => 10, 20 => 20), 'Default' => C('Reactions.PromoteValue', 5)),
-            'Reactions.BuryValue' => array('Type' => 'int', 'LabelCode' => 'Bury Threshold', 'Description' => 'Points required for a post to be buried. Changes are not retroactive.', 'Control' => 'DropDown', 'Items' => array(-3 => -3, -5 => -5, -10 => -10, -20 => -20), 'Default' => C('Reactions.BuryValue', -5)),
+        $Conf->initialize(array(
+            'Plugins.Reactions.ShowUserReactions' => [
+                'LabelCode' => 'Show Who Reacted to Posts',
+                'Control' => 'RadioList',
+                'Items' => ['popup' => 'In a popup', 'avatars' => 'As avatars', 'off' => "Don't show"],
+                'Default' => ReactionsPlugin::RECORD_REACTIONS_DEFAULT
+            ],
+            'Plugins.Reactions.BestOfStyle' => [
+                'LabelCode' => 'Best of Style',
+                'Control' => 'RadioList',
+                'Items' => ['Tiles' => 'Tiles', 'List' => 'List'],
+                'Default' => 'Tiles'
+            ],
+            'Plugins.Reactions.DefaultOrderBy' => [
+                'LabelCode' => 'Order Comments By',
+                'Control' => 'RadioList',
+                'Items' => ['DateInserted' => 'Date', 'Score' => 'Score'],
+                'Default' => 'DateInserted',
+                'Description' => 'You can order your comments based on reactions. We recommend ordering the comments by date.'
+            ],
+            'Plugins.Reactions.DefaultEmbedOrderBy' => [
+                'LabelCode' => 'Order Embedded Comments By',
+                'Control' => 'RadioList',
+                'Items' => ['DateInserted' => 'Date', 'Score' => 'Score'],
+                'Default' => 'Score',
+                'Description' => 'Ordering your embedded comments by reaction will show just the best comments. Then users can head into the community to see the full discussion.'
+            ],
+            'Reactions.PromoteValue' => [
+                'Type' => 'int',
+                'LabelCode' => 'Promote Threshold',
+                'Description' => 'Points required for a post to be promoted to Best Of. Changes are not retroactive.',
+                'Control' => 'DropDown',
+                'Items' => [3 => 3, 5 => 5, 10 => 10, 20 => 20],
+                'Default' => c('Reactions.PromoteValue', 5)
+            ],
+            'Reactions.BuryValue' => [
+                'Type' => 'int',
+                'LabelCode' => 'Bury Threshold',
+                'Description' => 'Points required for a post to be buried. Changes are not retroactive.',
+                'Control' => 'DropDown',
+                'Items' => [-3 => -3, -5 => -5, -10 => -10, -20 => -20],
+                'Default' => c('Reactions.BuryValue', -5)
+            ],
         ));
 
-        $this->Title(sprintf(T('%s Settings'), 'Reaction'));
-        $this->AddSideMenu('reactions');
-        $Conf->RenderAll();
+        $this->title(sprintf(t('%s Settings'), 'Reaction'));
+        $this->addSideMenu('reactions');
+        $Conf->renderAll();
     }
 }
