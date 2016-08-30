@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+
 $list = $this->data('list');
 ?>
 <div class="media-list-container Group-Box <?php echo val('cssClass', $list); ?>">

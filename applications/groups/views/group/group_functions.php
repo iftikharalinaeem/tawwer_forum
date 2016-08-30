@@ -1,22 +1,22 @@
 <?php if (!defined('APPLICATION')) exit();
 
 if (!function_exists('DateTile')):
-/**
- * Get HTML to display date as a calendar tile block.
- *
- * @param string $Date
- */
-function DateTile($Date) {
-    if (is_string($Date)) {
-        $Date = new DateTime($Date);
-    }
+    /**
+     * Get HTML to display date as a calendar tile block.
+     *
+     * @param string $Date
+     */
+    function DateTile($Date) {
+        if (is_string($Date)) {
+            $Date = new DateTime($Date);
+        }
 
-    return '
-    <span class="DateTile">
-        <span class="Month">'.strftime('%b', $Date->getTimestamp()).'</span>
-        <span class="Day">'.$Date->format('j').'</span>
-    </span>';
-}
+        return '
+        <span class="DateTile">
+            <span class="Month">'.strftime('%b', $Date->getTimestamp()).'</span>
+            <span class="Day">'.$Date->format('j').'</span>
+        </span>';
+    }
 endif;
 
 if (!function_exists('getGroupOptions')):

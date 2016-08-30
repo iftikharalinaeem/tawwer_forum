@@ -1,7 +1,7 @@
 <?php
 /**
- * Groups Application - Group List Module
- *
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
  */
 
 /**
@@ -11,41 +11,31 @@
  */
 class GroupListModule extends Gdn_Module {
 
-     /**
-      * @var array The groups to render. (An array of group arrays.)
-      */
+     /** @var array The groups to render. (An array of group arrays.)*/
      protected $groups;
-     /**
-      * @var string The group list's unique identifier or endpoint slug ('mine', 'popular', 'new', etc.).
-      */
+
+     /** @var string The group list's unique identifier or endpoint slug ('mine', 'popular', 'new', etc.). */
      public $id;
-     /**
-      * @var string The group list's title (i.e., 'My Groups').
-      */
+
+     /** @var string The group list's title (i.e., 'My Groups'). */
      protected $title;
-     /**
-      * @var string The message to display if there are no groups.
-      */
+
+     /** @var string The message to display if there are no groups. */
      protected $emptyMessage;
-     /**
-      * @var string A css class to add to the group list container.
-      */
+
+     /** @var string A css class to add to the group list container. */
      protected $cssClass;
-     /**
-      * @var bool Whether to provide a link to see all of the group list's contents.
-      */
+
+     /** @var bool Whether to provide a link to see all of the group list's contents. */
      protected $showMore;
-     /**
-      * @var string The layout type, either 'modern' or 'table'.
-      */
+
+     /** @var string The layout type, either 'modern' or 'table'. */
      protected $layout;
-     /**
-      * @var bool Whether the latest post is attached to a group item.
-      */
+
+     /** @var bool Whether the latest post is attached to a group item. */
      protected $attachDiscussions;
-     /**
-      * @var bool The latest post type ('Discussion' or 'Comment').
-      */
+
+     /** @var bool The latest post type ('Discussion' or 'Comment'). */
      protected $lastPostType;
 
      /**

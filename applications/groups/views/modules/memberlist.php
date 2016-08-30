@@ -8,4 +8,3 @@ if (val('layout', $list) == 'table') {
 } else if (val('layout', $list) == 'modern') {
     include('grouplist-modern.php');
 }
-

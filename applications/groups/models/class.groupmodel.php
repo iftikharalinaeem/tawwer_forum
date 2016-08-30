@@ -1,17 +1,19 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
+/**
+ * Class GroupModel
+ */
 class GroupModel extends Gdn_Model {
 
-    /**
-     * @var int The maximum number of groups a regular user is allowed to create.
-     */
+    /** @var int The maximum number of groups a regular user is allowed to create. */
     public $MaxUserGroups = 0;
 
-    /**
-     * @var int The number of members per page.
-     */
+    /** @var int The number of members per page. */
     public $MemberPageSize = 30;
-
 
     /**
      * Class constructor. Defines the related database table name.
@@ -25,6 +27,7 @@ class GroupModel extends Gdn_Model {
 
     /**
      * Calculate the rows in a groups dataset.
+     *
      * @param Gdn_DataSet $Result
      */
     public function Calc(&$Result) {

@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+
 $meta = $this->data('meta');
 
 echo '<div class="Meta Group-Meta Group-Info '.val('cssClass', $meta).'">';

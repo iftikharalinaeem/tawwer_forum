@@ -1,4 +1,8 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
 /**
  * Groups Application - Group Module
@@ -6,17 +10,20 @@
  * Shows a group box with basic group info.
  * 
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license Proprietary
  * @package groups
  * @since 1.0
  */
-
 class GroupModule extends Gdn_Module {
 
+    /** @var   */
     protected $GroupID;
+
+    /** @var null  */
     protected $Group = NULL;
 
+    /**
+     * GroupModule constructor.
+     */
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'groups';

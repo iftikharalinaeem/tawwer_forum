@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+
 <div id="GroupForm" class="FormTitleWrapper">
     <h1><?php echo $this->Data('Title'); ?></h1>
 

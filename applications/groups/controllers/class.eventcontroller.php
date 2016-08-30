@@ -1,23 +1,22 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
 /**
  * Groups Application - Event Controller
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license Proprietary
  * @package groups
  * @since 1.0
  */
-
 class EventController extends Gdn_Controller {
 
+    /** @var array  */
     protected $Uses = array('Form');
 
-    /**
-     * Form
-     * @var Gdn_Form
-     */
+    /** @var Gdn_Form */
     protected $Form;
 
     /**

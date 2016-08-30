@@ -1,4 +1,5 @@
-<?php
+<?php if (!defined('APPLICATION')) exit();
+
 $isEnded = EventModel::isEnded($this->Data('Event'));
 ?>
 <div class="AttendeeList YesAttending"><?php

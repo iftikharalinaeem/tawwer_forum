@@ -1,21 +1,34 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
+/**
+ * Class GroupsHooks
+ */
 class GroupsHooks extends Gdn_Plugin {
+
     /**
      * Setup routine for when the application is enabled.
      */
-     public function setup() {
-          $this->structure();
-     }
+    public function setup() {
+        $this->structure();
+    }
 
-     /**
-      * Run structure & default badges.
-      */
+    /**
+     * Run structure & default badges.
+     */
     public function structure() {
         include(dirname(__FILE__).'/structure.php');
     }
 
-    protected function SetBreadcrumbs($Group = NULL) {
+    /**
+     *
+     *
+     * @param null $Group
+     */
+    protected function setBreadcrumbs($Group = NULL) {
         if (!$Group)
             $Group = Gdn::Controller()->Data('Group', NULL);
 

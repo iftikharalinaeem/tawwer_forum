@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+
 $hasBanner = val('Banner', $this->group);
 ?>
 <div class="Group-Header<?php echo $hasBanner ? ' HasBanner' : ' NoBanner'; ?>">

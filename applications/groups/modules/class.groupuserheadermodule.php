@@ -1,14 +1,31 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
+
+/**
+ * Class GroupUserHeaderModule
+ */
 class GroupUserHeaderModule extends Gdn_Module {
+
+    /** @var null  */
     public $GroupID = NULL;
+
+    /** @var null  */
     public $UserID = NULL;
 
-
+    /**
+     * GroupUserHeaderModule constructor.
+     */
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'groups';
     }
 
+    /**
+     *
+     */
     protected function GetData() {
         $Model = new GroupModel();
 
@@ -20,6 +37,9 @@ class GroupUserHeaderModule extends Gdn_Module {
         }
     }
 
+    /**
+     * @return string
+     */
     public function ToString() {
         if (!$this->GroupID)
             $this->GroupID = Gdn::Controller()->Data('Group.GroupID');

@@ -1,5 +1,13 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
+/**
+ * @param $Group
+ * @return string
+ */
 function GroupSlug($Group) {
     return $Group['GroupID'].'-'.Gdn_Format::Url($Group['Name']);
 }
