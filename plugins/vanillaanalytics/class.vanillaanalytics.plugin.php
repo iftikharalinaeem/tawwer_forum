@@ -62,7 +62,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
             'section' => 'Analytics',
             'title' => 'Analytics',
             'description' => 'Eye Candy For Your Boss',
-            'url' => '/settings/analytics/dashboard/personal-dashboard'
+            'url' => '/settings/analytics/dashboard/traffic'
         ];
 
         $nav->registerSection($section);
