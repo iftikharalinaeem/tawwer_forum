@@ -32,56 +32,6 @@ class SubcommunityModel extends Gdn_Model {
         $this->Validation->applyRule('Folder', 'Folder', '%s must be a valid folder name.');
     }
 
-    public static function addAlternativeUrls() {
-        static::all();
-        $sites =& static::$all;
-
-        $currentSite = static::getCurrent();
-        $currentFolder = $currentSite['Folder'];
-        $path = trim(Gdn::request()->path(), '/');
-
-        // Strip the current folder off of the category code.
-        if ($baseCategoryCode = Gdn::controller()->data('Category.UrlCode')) {
-            $baseCategoryCode = stringBeginsWith($baseCategoryCode, "$currentFolder-", true, true);
-            $baseCategoryCode = stringEndsWith($baseCategoryCode, "-$currentFolder", true, true);
-        }
-
-        foreach ($sites as &$site) {
-            $folder = $site['Folder'];
-
-            if (!$path || $folder === $currentFolder || $currentSite['CategoryID'] == $site['CategoryID']) {
-                $site['AlternatePath'] = rtrim("/$path", '/');
-                $site['AlternateUrl'] = Gdn::request()->urlDomain('//')."/$folder/$path";
-                continue;
-            }
-
-            // Try and find an appropriate alternative category.
-            if (!($category = CategoryModel::categories("$folder-$baseCategoryCode"))) {
-                $category = CategoryModel::categories("$baseCategoryCode-$folder");
-            }
-
-            $altPath = $path;
-            if (Gdn_Theme::inSection('CategoryList')) {
-                if ($category) {
-                    $altPath = ltrim(categoryUrl($category, '', '/'), '/');
-                }
-            } elseif (Gdn_Theme::inSection('DiscussionList')) {
-                if ($category) {
-                    $altPath = ltrim(categoryUrl($category, '', '/'), '/');
-                } elseif (stringBeginsWith($path, 'discussions')) {
-                    $altPath = "discussions";
-                } else {
-                    $altPath = '';
-                }
-            } elseif (Gdn_Theme::inSection('Discussion')) {
-                $altPath = '';
-            }
-
-            $site['AlternatePath'] = rtrim("/$altPath", '/');
-            $site['AlternateUrl'] = rtrim(Gdn::request()->urlDomain('//')."/$folder/$altPath", '/');
-        }
-    }
-
     /**
      * Get an array of all multisites indexed by folder.
      */
@@ -223,6 +173,12 @@ class SubcommunityModel extends Gdn_Model {
         $row['Locale'] = $canonicalLocale;
         $row['LocaleShortName'] = str_replace('_', '-', $canonicalLocale);
         $row['Url'] = Gdn::request()->urlDomain('//').'/'.$row['Folder'];
+
+        $attributes = dbdecode($row['Attributes']);
+        if (is_array($attributes)) {
+            $row = array_replace($attributes, $row);
+            unset($row['Attributes']);
+        }
     }
 
     public static function mb_ucfirst($str, $encoding = "UTF-8", $lower_str_end = false) {
@@ -279,6 +235,7 @@ class SubcommunityModel extends Gdn_Model {
 
     public function insert($Fields) {
         $this->addInsertFields($Fields);
+        $Fields = $this->serialize($Fields);
         if ($this->validate($Fields, true)) {
             if (val('IsDefault', $Fields)) {
                 $this->SQL->put('Subcommunity', ['IsDefault' => null]);
@@ -288,6 +245,20 @@ class SubcommunityModel extends Gdn_Model {
 
             return parent::insert($Fields);
         }
+    }
+
+    private function serialize($fields) {
+        // Get the columns and put the extended data in the attributes.
+        $this->defineSchema();
+        $columns = $this->Schema->fields();
+        $remove = array('TransientKey' => 1, 'hpt' => 1, 'Save' => 1, 'Checkboxes' => 1);
+        $fields = array_diff_key($fields, $remove);
+        $attributes = array_diff_key($fields, $columns);
+
+        if (!empty($attributes)) {
+            $fields['Attributes'] = dbencode($attributes);
+        }
+        return $fields;
     }
 
     public function update($row, $where = false, $limit = false) {
@@ -301,7 +272,7 @@ class SubcommunityModel extends Gdn_Model {
             if (val('IsDefault', $row)) {
                 $this->SQL->put('Subcommunity', ['IsDefault' => null], ['SubcommunityID <>' => $allFields['SubcommunityID']]);
             }
-            parent::update($row, $where, $limit);
+            parent::update($this->serialize($row), $where, $limit);
             static::clearCache();
         }
     }

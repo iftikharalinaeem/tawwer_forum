@@ -1,16 +1,15 @@
 <h1><?php echo $this->data('Title'); ?></h1>
 <?php
-echo $this->form->open(), $this->form->errors();
+$options = [];
+if ($this->data('_HasFile')) {
+    $options['enctype'] = 'multipart/form-data';
+}
+
+echo $this->form->open($options), $this->form->errors();
 ?>
 <ul>
     <?php
-    echo $this->form->simple([
-        'Name' => ['Description' => 'Enter a friendly name for the site.'],
-        'Folder' => ['Description' => 'Enter a url-friendly folder name for the site.'],
-        'CategoryID' => ['LabelCode' => 'Category', 'Control' => 'DropDown', 'Items' => $this->data('Categories'), 'Options' => ['IncludeNull' => true]],
-        'Locale' => ['Control' => 'DropDown', 'Items' => $this->data('Locales'), 'Options' => ['IncludeNull' => true]],
-        'IsDefault' => ['Control' => 'Checkbox', 'LabelCode' => 'Default']
-    ]);
+    echo $this->form->simple($this->data('_Form'));
     ?>
 </ul>
 

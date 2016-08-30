@@ -52,6 +52,26 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Recursively adjust the depth of a category tree.
+     *
+     * @param array $tree The current category tree.
+     * @param int $offset An offset, positive or negative, to add to each category's depth attribute.
+     */
+    protected static function adjustTreeDepth(&$tree, $offset = 0) {
+        if (!is_array($tree)) {
+            return;
+        }
+
+        foreach ($tree as &$category) {
+            setValue('Depth', $category, val('Depth', $category) + $offset);
+
+            if (!empty($category['Children'])) {
+                static::adjustTreeDepth($category['Children'], $offset);
+            }
+        }
+    }
+
+    /**
      * Get the category IDs for the current subcommunity.
      *
      * @return array Returns an array of category IDs
@@ -151,29 +171,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         ];
     }
 
-    public function base_render_before($sender) {
-        if (!SubCommunityModel::getCurrent()) {
-            return;
-        }
-
-        // Set alternative urls.
-        $domain = Gdn::request()->urlDomain();
-        foreach (SubcommunityModel::all() as $site) {
-            if (!$site['AlternatePath']) {
-                continue;
-            }
-            $url = "$domain/{$site['Folder']}{$site['AlternatePath']}";
-            $sender->Head->addTag(
-                'link',
-                [
-                    'rel' => 'alternate',
-                    'href' => $url,
-                    'hreflang' => str_replace('_', '-', $site['Locale']),
-                    HeadModule::SORT_KEY => 1000
-                ]);
-        }
-    }
-
     public function base_getAppSettingsMenuItems_handler($sender) {
         /* @var SideMenuModule */
         $menu = $sender->EventArguments['SideMenu'];
@@ -214,38 +211,19 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param CategoriesController $sender
      */
     public function categoriesController_render_before($sender) {
-        if (!SubCommunityModel::getCurrent()) {
+        if (!SubcommunityModel::getCurrent()) {
             return;
         }
 
-        if (empty($sender->Data['Category']) || empty($sender->Data['Categories'])) {
+        if (empty($sender->Data['Category']) || empty($sender->Data['CategoryTree'])) {
             return;
         }
 
-        $adjust = -$sender->data('Category.Depth');
-        foreach ($sender->Data['Categories'] as &$category) {
-            setValue('Depth', $category, val('Depth', $category) + $adjust);
-        }
+        self::adjustTreeDepth($sender->Data['CategoryTree'], -$sender->data('Category.Depth'));
 
         // We add the Depth of the root Category to the MaxDisplayDepth before rendering the categories page.
         // This resets it so the rendering respects the MaxDisplayDepth.
         $sender->setData('Category.Depth', 0);
-    }
-
-    /**
-     * Make sure the discussions controller is filtering by subcommunity.
-     *
-     * @param DiscussionsController $sender
-     * @param array $args
-     */
-    public function discussionsController_index_before($sender, $args) {
-        if (!SubCommunityModel::getCurrent()) {
-            return;
-        }
-
-        // Get all of the category IDs associated with the subcommunity.
-        $categoryIDs = $this->getCategoryIDs();
-        $sender->setCategoryIDs($categoryIDs);
     }
 
     /**
@@ -384,16 +362,20 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * Hook on CategoryModel's CategoryWatch event.
      *
      * Used to filter down the categories used in the normal search.
+     * Also filter down discussions controller categories.
      *
-     * @param $sender Sending controller instance.
-     * @param $args Event arguments.
+     * @param CategoryModel $sender Sending controller instance.
+     * @param array $args Event arguments.
      */
-    public function gdn_pluginManager_categoryWatch_handler($sender, $args) {
+    public function categoryModel_categoryWatch_handler($sender, $args) {
         if (!SubCommunityModel::getCurrent()) {
             return;
         }
 
-        $args['CategoryIDs'] = $this->getCategoryIDs();
+        $watchedCategoryIDs = $args['CategoryIDs'];
+        $subcommunityCategoryIDs = $this->getCategoryIDs();
+
+        $args['CategoryIDs'] = array_intersect($subcommunityCategoryIDs, $watchedCategoryIDs);
     }
 
     /**

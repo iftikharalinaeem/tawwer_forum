@@ -32,26 +32,69 @@ class SubcommunitiesController extends DashboardController {
         $this->addedit();
     }
 
+    /**
+     * @param array $form
+     */
+    private function saveForm($form) {
+        $result = [];
+        foreach ($form as $field => $row) {
+            if (strcasecmp(val('Control', $row), 'imageupload') === 0) {
+                $this->form->saveImage($field, ['Prefix' => 'subcommunities/']);
+            }
+            $value = $this->form->getFormValue($field);
+
+            if (strpos($field, 'Config.') === 0) {
+                setvalr($field, $result, $value);
+            } else {
+                $result[$field] = $value;
+            }
+        }
+
+        return $result;
+    }
+
     protected function addedit() {
         $this->permission('Garden.Settings.Manage');
 
         $localeModel = new LocaleModel();
+        $locales = $localeModel->enabledLocalePacks(true);
+        $locales = array_column($locales, 'Locale', 'Locale');
+        $locales = array_combine($locales, $locales);
+        $locales = array_replace(['en' => 'en'], $locales);
+        $this->setData('Locales', $locales);
 
-        // Get the enabled locale packs.
+        $categories = Gdn::sql()->getWhere('Category', ['Depth' => 1], 'Name')->resultArray();
+        $categories = array_column($categories, 'Name', 'CategoryID');
+        $this->setData('Categories', $categories);
+
+        // Set the form elements on the add/edit form.
+        $form = [
+            'Name' => ['Description' => 'Enter a friendly name for the site.'],
+            'Folder' => ['Description' => 'Enter a url-friendly folder name for the site.'],
+            'CategoryID' => ['LabelCode' => 'Category', 'Control' => 'DropDown', 'Items' => $this->data('Categories'), 'Options' => ['IncludeNull' => true]],
+            'Locale' => ['Control' => 'DropDown', 'Items' => $this->data('Locales'), 'Options' => ['IncludeNull' => true]],
+        ];
+
+        $this->EventArguments['Form'] =& $form;
+        $this->fireEvent('addedit');
+
+        $form['IsDefault'] =['Control' => 'Checkbox', 'LabelCode' => 'Default'];
+        $this->setData('_Form', $form);
 
         if ($this->Request->isAuthenticatedPostBack()) {
+            $postData = $this->saveForm($form, $this->Request->post());
+
+            // Unchecked checkboxes are not sent in post data :P
+            if (empty($postData['IsDefault'])) {
+                $postData['IsDefault'] = null;
+            }
+
             if ($this->site) {
                 $siteID = $this->site['SubcommunityID'];
 
-                $postData = $this->Request->post();
-                // Unchecked checkboxes are not sent in post data :P
-                if (!isset($postData['IsDefault'])) {
-                    $postData['IsDefault'] = null;
-                }
-
                 $this->siteModel->update($postData, ['SubcommunityID' => $siteID]);
             } else {
-                $siteID = $this->siteModel->insert($this->Request->post());
+                $siteID = $this->siteModel->insert($postData);
             }
 
             if ($siteID) {
@@ -69,18 +112,18 @@ class SubcommunitiesController extends DashboardController {
                 }
             }
         } elseif ($this->site) {
-            $this->form->setData($this->site);
+            $site = $this->site;
+            if (array_key_exists('Config', $site) && is_array($site['Config'])) {
+                $site = array_replace($site, flattenArray('.', ['Config' => $site['Config']]));
+            }
+            $this->form->setData($site);
         }
 
-        $locales = $localeModel->enabledLocalePacks(true);
-        $locales = array_column($locales, 'Locale', 'Locale');
-        $locales = array_combine($locales, $locales);
-        $locales = array_replace(['en' => 'en'], $locales);
-        $this->setData('Locales', $locales);
-
-        $categories = Gdn::sql()->getWhere('Category', ['Depth' => 1], 'Name')->resultArray();
-        $categories = array_column($categories, 'Name', 'CategoryID');
-        $this->setData('Categories', $categories);
+        foreach ($form as $row) {
+            if (strcasecmp(val('Control', $row), 'imageupload')) {
+                $this->setData('_HasFile', true);
+            }
+        }
 
         $this->View = 'addedit';
         $this->render();
