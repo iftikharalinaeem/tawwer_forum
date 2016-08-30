@@ -37,7 +37,7 @@ class ReactionsController extends DashboardController {
     }
 
     /**
-     * Get a reaction
+     * Get a reaction.
      *
      * @param string $UrlCode
      * @throws
@@ -108,7 +108,7 @@ class ReactionsController extends DashboardController {
     }
 
     /**
-     *
+     * List users who reacted.
      *
      * @param $Type
      * @param $ID
@@ -116,15 +116,14 @@ class ReactionsController extends DashboardController {
      * @param null $Page
      * @throws Exception
      */
-    public function users($Type, $ID, $Reaction, $Page = NULL) {
+    public function users($Type, $ID, $Reaction, $Page = null) {
         if (!c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT)) {
             throw PermissionException();
         }
 
-        $Model = new ReactionModel();
-        list($Offset, $Limit) = offsetLimit($Page, 10);
-
-        $this->setData('Users', $Model->getUsers($Type, $ID, $Reaction, $Offset, $Limit));
+        $ReactionModel = new ReactionModel();
+        list($Offset, $Limit) = OffsetLimit($Page, 10);
+        $this->setData('Users', $ReactionModel->getUsers($Type, $ID, $Reaction, $Offset, $Limit));
         $this->render('', 'reactions', 'plugins/Reactions');
     }
 
@@ -183,7 +182,7 @@ class ReactionsController extends DashboardController {
      * @throws Exception
      */
     public function log($Type, $ID) {
-        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Reactions.Edit'), FALSE);
+        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Reactions.Edit'), false);
         $Type = ucfirst($Type);
 
         $ReactionModel = new ReactionModel();
@@ -193,7 +192,7 @@ class ReactionsController extends DashboardController {
         }
 
         $ReactionModel->joinUserTags($Row, $Type);
-        touchValue('UserTags', $Row, array());
+        touchValue('UserTags', $Row, []);
         Gdn::userModel()->joinUsers($Row['UserTags'], ['UserID']);
 
         $this->Data = $Row;
@@ -212,6 +211,7 @@ class ReactionsController extends DashboardController {
      */
     public function recalculateRecordCache($Day = false) {
         $this->permission('Garden.Settings.Manage');
+
         if (!$this->Request->isAuthenticatedPostBack()) {
             throw ForbiddenException('GET');
         }
@@ -231,6 +231,7 @@ class ReactionsController extends DashboardController {
      */
     public function toggle($UrlCode, $Active) {
         $this->permission('Garden.Community.Manage');
+
         if (!$this->Form->authenticatedPostBack()) {
             throw PermissionException('PostBack');
         }
