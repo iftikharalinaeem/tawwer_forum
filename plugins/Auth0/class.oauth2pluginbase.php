@@ -377,8 +377,8 @@ class OAuth2PluginBase {
      */
     protected function getSettingsFormFields() {
         $formFields = array(
-            'AssociationKey' => ['LabelCode' => 'Client ID', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => ''],
-            'AssociationSecret' => ['LabelCode' => 'Secret', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => ''],
+            'AssociationKey' => ['LabelCode' => 'Client ID', 'Description' => ''],
+            'AssociationSecret' => ['LabelCode' => 'Secret', 'Description' => ''],
             'SignOutRedirect' => ['LabelCode' => t('Sign Out URL'), 'Description' => t('Enter the <b><i>full</i></b> URL (i.e. with "https://") to where you want users to be redirected wherever they click on the logout button.')]
         );
         return $formFields;

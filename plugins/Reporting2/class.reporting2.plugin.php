@@ -14,7 +14,8 @@ $PluginInfo['Reporting2'] = array(
    'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com',
-   'MobileFriendly' => true
+   'MobileFriendly' => true,
+   'Icon' => 'reporting.png'
 );
 
 class Reporting2Plugin extends Gdn_Plugin {
@@ -129,7 +130,7 @@ class Reporting2Plugin extends Gdn_Plugin {
       $ConfItems = array(
          'Plugins.Reporting2.Reasons' => array(
             'Description' => 'Optionally add pre-defined reasons a user must select from to report content. One reason per line.',
-            'Options' => array('MultiLine' => TRUE, 'Class' => 'TextBox'))
+            'Options' => array('MultiLine' => TRUE))
       );
       $Conf->Initialize($ConfItems);
 

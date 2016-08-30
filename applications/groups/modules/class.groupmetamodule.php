@@ -1,22 +1,18 @@
 <?php
 /**
- * Groups Application - Group Header Module
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
  */
 
 /**
  * Class GroupHeaderModule
- *
- *
  */
 class GroupMetaModule extends Gdn_Module {
 
-    /**
-     * @var array The compiled meta for the group.
-     */
+    /** @var array The compiled meta for the group. */
     protected $meta;
-    /**
-     * @var array The group the meta is associated with.
-     */
+
+    /** @var array The group the meta is associated with. */
     protected $group;
 
     /**

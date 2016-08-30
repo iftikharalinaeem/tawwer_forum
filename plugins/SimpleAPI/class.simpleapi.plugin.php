@@ -27,7 +27,8 @@ $PluginInfo['SimpleAPI'] = array(
     'Author' => 'Tim Gunter',
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://about.me/timgunter',
-    'SettingsUrl' => '/settings/api'
+    'SettingsUrl' => '/settings/api',
+    'Icon' => 'simple-api.png'
 );
 
 class SimpleAPIPlugin extends Gdn_Plugin {

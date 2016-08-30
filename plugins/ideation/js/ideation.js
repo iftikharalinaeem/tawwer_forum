@@ -1,21 +1,18 @@
 var ideation = {
   start: function($) {
     'use strict';
-
-    // Hide idea checkbox
-    $('input[value="Idea"]').parents('label').hide();
-    $('#Form_UseDownVotes').parents('label').hide();
-
     // Hide discussion type settings if ideas is checked.
     if ($('#Form_IdeaCategory').attr('checked') === 'checked') {
       $('.P.DiscussionTypes').hide();
-      $('#Form_UseDownVotes').parents('label').show();
+      $('#Form_UseDownVotes').parents('.form-group').show();
+    } else {
+      $('#Form_UseDownVotes').parents('.form-group').hide();
     }
 
     // Toggle discussion type settings
-    $('#Form_IdeaCategory').click(function() {
-      $('.P.DiscussionTypes').toggle();
-      $('#Form_UseDownVotes').parents('label').toggle();
+    $('#Form_IdeaCategory').on('change', function() {
+      $('.DiscussionTypes').toggle();
+      $('#Form_UseDownVotes').parents('.form-group').toggle();
     });
   }
 };

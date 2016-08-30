@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+
 <h1><?php echo t('Group Icon'); ?></h1>
 <?php
 $thumbnailSize = $this->data('thumbnailSize');

@@ -17,6 +17,7 @@ $PluginInfo['Warnings2'] = array(
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'Icon' => 'warnings.png'
 );
 
 /**

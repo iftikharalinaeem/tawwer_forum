@@ -1,31 +1,44 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
+/**
+ * Class GroupInfoModule
+ */
 class GroupInfoModule extends Gdn_Module {
 
-    public function __construct() {
-    }
-
+    /**
+     *
+     *
+     * @return string
+     */
     public function assetTarget() {
         return 'Content';
     }
 
+    /**
+     *
+     *
+     * @return string
+     * @throws Exception
+     */
     public function toString() {
         require_once Gdn::Controller()->FetchViewLocation('group_functions', 'Group', 'groups');
         ob_start();
         ?>
-
-        <div class="Group-Box Group-Info">
-            <h3><?php echo T('Group Info'); ?></h3>
-            <?php
-            $this->WriteGroupInfo();
-            ?>
-        </div>
-
+            <div class="Group-Box Group-Info">
+                <h3><?php echo T('Group Info'); ?></h3>
+                <?php
+                $this->WriteGroupInfo();
+                ?>
+            </div>
         <?php
         $return = ob_get_contents();
         ob_end_clean();
         return $return;
-    }
+     }
 
     public function WriteGroupInfo() {
         $c = Gdn::Controller();
@@ -44,10 +57,9 @@ class GroupInfoModule extends Gdn_Module {
                 $Label = T($Code);
                 $Value = $Row;
             }
-
             echo '<dt>'.$Label.'</dt>';
             echo '<dd>'.$Value.'</dd>';
         }
         echo '</dl>';
-    }
+     }
 }

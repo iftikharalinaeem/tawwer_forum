@@ -1,48 +1,44 @@
 <?php if (!defined('APPLICATION')) exit;
       
-$St = Gdn::Structure();
-$Sql = Gdn::SQL();
-$Database = Gdn::Database();
+Gdn::structure()->table('Poll')
+   ->primaryKey('PollID')
+   ->column('Name', 'varchar(255)', false)
+   ->column('DiscussionID', 'int', true)
+   ->column('CountOptions', 'int', '0')
+   ->column('CountVotes', 'int', '0')
+   ->column('Anonymous', 'int', '0')
+   ->column('DateInserted', 'datetime')
+   ->column('InsertUserID', 'int', false, 'key')
+   ->column('DateUpdated', 'datetime', true)
+   ->column('UpdateUserID', 'int', true)
+   ->set();
 
-$St->Table('Poll')
-   ->PrimaryKey('PollID')
-   ->Column('Name', 'varchar(255)', FALSE)
-   ->Column('DiscussionID', 'int', TRUE)
-   ->Column('CountOptions', 'int', '0')
-   ->Column('CountVotes', 'int', '0')
-   ->Column('Anonymous', 'int', '0')
-   ->Column('DateInserted', 'datetime')
-   ->Column('InsertUserID', 'int', FALSE, 'key')
-   ->Column('DateUpdated', 'datetime', TRUE)
-   ->Column('UpdateUserID', 'int', TRUE)
-   ->Set();
+Gdn::structure()->table('PollOption')
+   ->primaryKey('PollOptionID')
+   ->column('PollID', 'int', false, 'key')
+   ->column('Body', 'varchar(500)', true)
+   ->column('Format', 'varchar(20)', true)
+   ->column('Sort', 'smallint', false, '0')
+   ->column('CountVotes', 'int', '0')
+   ->column('DateInserted', 'datetime')
+   ->column('InsertUserID', 'int', false, 'key')
+   ->column('DateUpdated', 'datetime', true)
+   ->column('UpdateUserID', 'int', true)
+   ->set();
 
-$St->Table('PollOption')
-   ->PrimaryKey('PollOptionID')
-   ->Column('PollID', 'int', FALSE, 'key')
-   ->Column('Body', 'varchar(500)', TRUE)
-   ->Column('Format', 'varchar(20)', TRUE)
-   ->Column('Sort', 'smallint', FALSE, '0')
-   ->Column('CountVotes', 'int', '0')
-   ->Column('DateInserted', 'datetime')
-   ->Column('InsertUserID', 'int', FALSE, 'key')
-   ->Column('DateUpdated', 'datetime', TRUE)
-   ->Column('UpdateUserID', 'int', TRUE)
-   ->Set();
-
-$St->Table('PollVote')
-   ->Column('UserID', 'int', FALSE, 'primary')
-   ->Column('PollOptionID', 'int', FALSE, array('primary', 'key'))
-   ->Column('DateInserted', 'datetime', TRUE)
-   ->Set();
+Gdn::structure()->table('PollVote')
+   ->column('UserID', 'int', false, 'primary')
+   ->column('PollOptionID', 'int', false, ['primary', 'key'])
+   ->column('DateInserted', 'datetime', true)
+   ->set();
 
 // Define permissions
-$PermissionModel = Gdn::PermissionModel();
-$PermissionModel->Database = $Database;
-$PermissionModel->SQL = $Sql;
+$PermissionModel = Gdn::permissionModel();
+$PermissionModel->Database = Gdn::database();
+$PermissionModel->SQL = Gdn::sql();
 
 // Define some permissions for the Polls categories.
-$PermissionModel->Define(array(
+$PermissionModel->define([
 	'Plugins.Polls.Add' => 'Garden.Profiles.Edit'
-));
+]);
    

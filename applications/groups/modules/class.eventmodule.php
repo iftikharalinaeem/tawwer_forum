@@ -1,4 +1,8 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
 /**
  * Groups Application - Event Module
@@ -6,109 +10,121 @@
  * Shows a small events list based on the provided Group or User context.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
- * @license Proprietary
  * @package groups
  * @since 1.0
  */
-
 class EventModule extends Gdn_Module {
 
-   protected $Filter = NULL;
-   protected $FilterBy = NULL;
-   protected $Type = NULL;
-   protected $Button = NULL;
+    /** @var null  */
+    protected $Filter = NULL;
 
-   public function __construct($Type = NULL, $FilterBy = NULL, $Filter = NULL, $Button = NULL) {
-      parent::__construct();
-      $this->_ApplicationFolder = 'groups';
+    /** @var null  */
+    protected $FilterBy = NULL;
 
-      if (!is_null($Type))
-         $this->Type = $Type;
+    /** @var null  */
+    protected $Type = NULL;
 
-      if (!is_null($FilterBy))
-         $this->FilterBy = $FilterBy;
+    /** @var null  */
+    protected $Button = NULL;
 
-      if (!is_null($Filter))
-         $this->Filter = $Filter;
+    /**
+     * EventModule constructor.
+     *
+     * @param null $Type
+     * @param null $FilterBy
+     * @param null $Filter
+     * @param null $Button
+     */
+    public function __construct($Type = NULL, $FilterBy = NULL, $Filter = NULL, $Button = NULL) {
+        parent::__construct();
+        $this->_ApplicationFolder = 'groups';
 
-      if (!is_null($Button))
-         $this->Button = $Button;
-   }
+        if (!is_null($Type))
+            $this->Type = $Type;
 
-   public function __set($Name, $Value) {
-      $Name = strtolower($Name);
-      switch ($Name) {
-         case 'groupid':
-            $this->Filter = $Value;
-            $this->FilterBy = 'group';
-            break;
+        if (!is_null($FilterBy))
+            $this->FilterBy = $FilterBy;
 
-         case 'userid':
-            $this->Filter = $Value;
-            $this->FilterBy = 'user';
-            break;
+        if (!is_null($Filter))
+            $this->Filter = $Filter;
 
-         case 'type':
-            $this->Type = $Value;
-            break;
+        if (!is_null($Button))
+            $this->Button = $Button;
+    }
 
-         case 'button':
-            $this->Button = $Value;
-            break;
-      }
+    public function __set($Name, $Value) {
+        $Name = strtolower($Name);
+        switch ($Name) {
+            case 'groupid':
+                $this->Filter = $Value;
+                $this->FilterBy = 'group';
+                break;
 
-      return $this;
-   }
+            case 'userid':
+                $this->Filter = $Value;
+                $this->FilterBy = 'user';
+                break;
 
-   public function GetData() {
+            case 'type':
+                $this->Type = $Value;
+                break;
 
-      // Only callable if configured
-      if (!$this->Type) return;
+            case 'button':
+                $this->Button = $Value;
+                break;
+        }
 
-      // Callable multiple times
-      if (!is_null($this->Data('Events', NULL))) return;
+        return $this;
+    }
 
-      $EventCriteria = array();
-      switch ($this->FilterBy) {
-         case 'group':
-            $GroupModel = new GroupModel();
-            $Group = $GroupModel->GetID($this->Filter, DATASET_TYPE_ARRAY);
-            $this->SetData('Group', $Group);
-            $EventCriteria['GroupID'] = $Group['GroupID'];
-            break;
+    public function GetData() {
 
-         case 'user':
-            $User = Gdn::UserModel()->GetID($this->Filter, DATASET_TYPE_ARRAY);
-            $this->SetData('User', $User);
-            $EventCriteria['Invited'] = $User['UserID'];
-            break;
-      }
+        // Only callable if configured
+        if (!$this->Type) return;
 
-      switch ($this->Type) {
-         case 'upcoming':
-            $FilterDate = C('Groups.Events.UpcomingRange', '+365 days');
-            $Ended = FALSE;
-            $this->SetData('Title', T('Upcoming Events'));
-            break;
+        // Callable multiple times
+        if (!is_null($this->Data('Events', NULL))) return;
 
-         case 'recent':
-            $FilterDate = C('Groups.Events.RecentRange', '-365 days');
-            $Ended = TRUE;
-            $this->SetData('Title', T('Recent Events'));
-            break;
-      }
+        $EventCriteria = array();
+        switch ($this->FilterBy) {
+            case 'group':
+                $GroupModel = new GroupModel();
+                $Group = $GroupModel->GetID($this->Filter, DATASET_TYPE_ARRAY);
+                $this->SetData('Group', $Group);
+                $EventCriteria['GroupID'] = $Group['GroupID'];
+                break;
 
-      $EventModel = new EventModel();
-      $this->SetData('Events', $EventModel->GetUpcoming($FilterDate, $EventCriteria, $Ended));
+            case 'user':
+                $User = Gdn::UserModel()->GetID($this->Filter, DATASET_TYPE_ARRAY);
+                $this->SetData('User', $User);
+                $EventCriteria['Invited'] = $User['UserID'];
+                break;
+        }
 
-   }
+        switch ($this->Type) {
+            case 'upcoming':
+                $FilterDate = C('Groups.Events.UpcomingRange', '+365 days');
+                $Ended = FALSE;
+                $this->SetData('Title', T('Upcoming Events'));
+                break;
 
-   public function ToString() {
-      $this->GetData();
-      if (!is_null($this->Button))
-         $this->SetData('Button', $this->Button);
-      return $this->FetchView();
-   }
+            case 'recent':
+                $FilterDate = C('Groups.Events.RecentRange', '-365 days');
+                $Ended = TRUE;
+                $this->SetData('Title', T('Recent Events'));
+                break;
+        }
+
+        $EventModel = new EventModel();
+        $this->SetData('Events', $EventModel->GetUpcoming($FilterDate, $EventCriteria, $Ended));
+
+    }
+
+    public function ToString() {
+        $this->GetData();
+        if (!is_null($this->Button))
+            $this->SetData('Button', $this->Button);
+        return $this->FetchView();
+    }
 
 }

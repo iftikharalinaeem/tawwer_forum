@@ -259,8 +259,7 @@ class ReactionsController extends DashboardController {
             // Send back the new button.
             include_once $this->fetchViewLocation('settings_functions', '', 'plugins/Reactions');
             $this->deliveryMethod(DELIVERY_METHOD_JSON);
-            $this->jsonTarget("#ReactionType_{$ReactionType['UrlCode']} .ActivateSlider", ActivateButton($ReactionType), 'ReplaceWith');
-            $this->jsonTarget("#ReactionType_{$ReactionType['UrlCode']}", 'InActive', $ReactionType['Active'] ? 'RemoveClass' : 'AddClass');
+            $this->jsonTarget("#ReactionType_{$ReactionType['UrlCode']} #reactions-toggle", activateButton($ReactionType), 'ReplaceWith');
         }
 
         $this->render('blank', 'utility', 'dashboard');

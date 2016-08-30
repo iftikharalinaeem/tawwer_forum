@@ -1,7 +1,9 @@
-jQuery(document).ready(function($) {
+$(document).on('contentLoad', function(e) {
+
+   var element = e.target;
 
    // Upload new photos without needing to press anything.
-   var $avatar_upload = $('.avatar-upload-input');
+   var $avatar_upload = $('.avatar-upload-input', element);
    $avatar_upload.on('change', function(e) {
       var filename = e.target.value.toLowerCase();
       if (filename != '') {
@@ -16,7 +18,7 @@ jQuery(document).ready(function($) {
    });
 
    // Showing the delete selected avatars button.
-   var $avatar_delete_input = $('.avatar-delete-input');
+   var $avatar_delete_input = $('.avatar-delete-input', element);
    $avatar_delete_input.on('change', function(e) {
       var total_checked = 0;
       $avatar_delete_input.each(function(i, el) {
@@ -25,7 +27,8 @@ jQuery(document).ready(function($) {
          }
       });
 
-      var $delete_selected_avatars = $('.delete-selected-avatars');
+      var $delete_selected_avatars = $('.delete-selected-avatars', element);
+      console.log($delete_selected_avatars);
       if (total_checked) {
          $delete_selected_avatars.addClass('show-delete-button');
       } else {
@@ -34,10 +37,10 @@ jQuery(document).ready(function($) {
    });
 
    // Submit the delete selected avatars form.
-   var $delete_selected_avatars = $('.delete-selected-avatars');
+   var $delete_selected_avatars = $('.delete-selected-avatars', element);
    $delete_selected_avatars.on('click', function(e) {
       // Get form--currently only one for this.
-       var $avatarstock_form_modify = $('#avatarstock-form-modify');
+       var $avatarstock_form_modify = $('#avatarstock-form-modify', element);
        $avatarstock_form_modify.submit();
    });
 

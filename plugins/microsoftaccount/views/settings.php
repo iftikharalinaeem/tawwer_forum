@@ -2,15 +2,13 @@
 
     <h1><?php echo $this->data('Title'); ?></h1>
 
-    <div class="PageInfo">
-        <ul>
-            <li><?php printf(
-                    t('Register your application at %1$s using your redirect URI: %2$s'),
-                    anchor('https://apps.dev.microsoft.com', 'https://apps.dev.microsoft.com'),
-                    Gdn::request()->url('/entry/microsoftaccount', true, true)
-            ); ?></li>
-            <li><?php echo t('SSL is required. Users will be redirected back to this site via HTTPS.'); ?></li>
-        </ul>
+    <div class="padded">
+        <p><?php printf(
+                t('Register your application at %1$s using your redirect URI: %2$s'),
+                anchor('https://apps.dev.microsoft.com', 'https://apps.dev.microsoft.com'),
+                Gdn::request()->url('/entry/microsoftaccount', true, true)
+        ); ?></p>
+        <p><?php echo t('SSL is required. Users will be redirected back to this site via HTTPS.'); ?></p>
     </div>
 
     <?php

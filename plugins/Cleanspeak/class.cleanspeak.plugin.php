@@ -768,20 +768,27 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
 
     /**
+     *
      * @param SettingsController $sender Sending controller.
      * @param array $args Sending arguments.
+     * @throws Exception
+     * @throws Gdn_UserException
      */
     public function settingsController_cleanspeakToggle_create($sender, $args) {
-
-        if (C('Plugins.Cleanspeak.Enabled')) {
-            SaveToConfig('Plugins.Cleanspeak.Enabled', false);
-            $buttonText = T('Enable');
-        } else {
-            SaveToConfig('Plugins.Cleanspeak.Enabled', true);
-            $buttonText = T('Disable');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
-        $sender->InformMessage(T('Changes Saved'));
-        $sender->JsonTarget("#cstoggle", $buttonText);
+        if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
+            if (C('Plugins.Cleanspeak.Enabled')) {
+                SaveToConfig('Plugins.Cleanspeak.Enabled', false);
+                $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/cleanspeaktoggle', 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+            } else {
+                SaveToConfig('Plugins.Cleanspeak.Enabled', true);
+                $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/cleanspeaktoggle', 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+            }
+            $sender->InformMessage(T('Changes Saved'));
+            $sender->JsonTarget("#cstoggle", $newToggle);
+        }
         $sender->Render('Blank', 'Utility', 'Dashboard');
     }
 

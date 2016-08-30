@@ -3,8 +3,8 @@
  * @copyright 2009-2014 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
-
 ?>
+<h1>Event Logs</h1>
 <script>
     $( document ).ready(function() {
         $( "#filter-reset" ).click(function() {
@@ -13,113 +13,41 @@
         });
     });
 </script>
-
-<style>
-    .cf:before,
-    .cf:after {
-        content: " "; /* 1 */
-        display: table; /* 2 */
-    }
-
-    .cf:after {
-        clear: both;
-    }
-
-    .odd {background-color: #f4f4f4;}
-    tr:hover {
-        background-color: lightyellow;
-    }
-    .float-left {
-        float: left;
-    }
-    .floatfix {
-        float: left;
-        width: 100%
-    }
-    .blockgrid {
-        margin-left: -20px;
-    }
-    .blockgrid li.float-left {
-        padding: 0 20px;
-    }
-    input.Short {
-        width: 165px;
-    }
-    .buttons {
-        margin-top: 15px;
-    }
-    .table-el {
-        table-layout: fixed;
-    }
-
-    .table-el th,
-    .table-el td {
-        padding: 5px 8px;
-        word-wrap: break-word;
-    }
-
-    .el-date {
-        width: 100px;
-    }
-    .el-user {
-        width: 100px;
-    }
-    .el-severity {
-        width: 75px;
-    }
-    .el-event {
-        width: 150px;
-    }
-    .el-ip {
-        width: 100px;
-    }
-
-/*<th class="el-date">Date</th>*/
-/*<th class="el-message">Message</th>*/
-/*<th class="el-user">User</th>*/
-/*<th class="el-severity">Severity</th>*/
-/*<th class="el-event">Event</th>*/
-/*<th class="el-ip">IP Address</th>*/
-</style>
-
-<h1>Event Logs</h1>
 <?php
 echo $this->Form->Open(array('action' => URL('/settings/eventlog'), 'Method' => 'GET', 'id' => 'filter-form'));
 echo $this->Form->Errors();
+//$this->Form = new Gdn_Form();
 ?>
-<div class="floatfix">
-    <ul class="cf blockgrid">
-        <li class="float-left">
-            <?php echo $this->Form->Label('Date From', 'datefrom');  ?>
-            <?php echo $this->Form->TextBox('datefrom', array('class' => 'InputBox Short')); ?>
-        </li>
-        <li class="float-left">
-            <?php echo $this->Form->Label('Date To', 'dateto');  ?>
-            <?php echo $this->Form->TextBox('dateto', array('class' => 'InputBox Short')); ?>
-        </li>
-        <li class="float-left">
-            <?php echo $this->Form->Label('Event Name', 'event');  ?>
-            <?php echo $this->Form->TextBox('event', array('class' => 'InputBox Short')); ?>
-        </li>
-        <li class="float-left">
-            <?php echo $this->Form->Label('Severity', 'severity');  ?>
-            <?php echo $this->Form->DropDown('severity', $this->Data['SeverityOptions']); ?>
-        </li>
-        <li class="float-left">
-            <?php echo $this->Form->Label('Sort Order', 'sortorder');  ?>
-            <?php echo $this->Form->DropDown('sortorder', array('desc' => 'DESC', 'asc' => 'ASC')); ?>
-
-        </li>
-        <li class="float-left buttons">
-            <?php echo $this->Form->Button("Filter"); ?>
-            <?php echo $this->Form->Button("Reset", array('id' => 'filter-reset', 'type' => 'reset')); ?>
-            <?php echo $this->Form->Close(); ?>
-
-        </li>
-    </ul>
+<div class="toolbar">
+    <div class="date-from">
+        <?php echo $this->Form->TextBox('datefrom', array('class' => 'form-control', 'placeholder' => t('Date From'), 'aria-label' => t('Date From'))); ?>
+    </div>
+    <div class="date-to">
+        <?php echo $this->Form->TextBox('dateto', array('class' => 'form-control', 'placeholder' => t('Date To'), 'aria-label' => t('Date To'))); ?>
+    </div>
+    <div class="event-name">
+        <?php echo $this->Form->TextBox('event', array('class' => 'form-control', 'placeholder' => t('Event Name'), 'aria-label' => t('Event Name'))); ?>
+    </div>
+    <div class="flex severity">
+        <?php echo $this->Form->labelWrap('Severity', 'severity');  ?>
+        <div class="input-wrap">
+            <?php echo $this->Form->DropDown('severity', $this->Data['SeverityOptions'], ['class' => 'form-control']); ?>
+        </div>
+    </div>
+    <div class="flex sort-order">
+        <?php echo $this->Form->labelWrap('Sort Order', 'sortorder');  ?>
+        <div class="input-wrap">
+            <?php echo $this->Form->DropDown('sortorder', array('desc' => 'DESC', 'asc' => 'ASC'), ['class' => 'form-control']); ?>
+        </div>
+    </div>
+    <div class="buttons">
+        <?php echo $this->Form->Button("Filter"); ?>
+        <?php echo $this->Form->Button("Reset", array('id' => 'filter-reset', 'type' => 'reset')); ?>
+    </div>
 </div>
-<?php PagerModule::Write(array('Sender' => $this)); ?>
-
+<?php echo $this->Form->Close(); ?>
+<?php PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard', 'CssClass' => 'pull-right padded-bottom']); ?>
+<div class="table-wrap">
 <table class="AltColumns table-el">
     <thead>
         <tr>
@@ -162,10 +90,9 @@ echo $this->Form->Errors();
         ?>
     </tbody>
 </table>
+</div>
 
-<?php PagerModule::Write(); ?>
-
-<div class="Info">
+<div class="padded alert alert-info">
 
 <p>This report is also available in JSON or XML</p>
 <ul>

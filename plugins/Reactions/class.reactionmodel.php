@@ -374,7 +374,7 @@ class ReactionModel {
                 $TagRow = [];
             }
 
-            val('UserTags', $Row, $TagRow);
+            setValue('UserTags', $Row, $TagRow);
         }
     }
 

@@ -71,6 +71,18 @@ class CustomThemePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Opt out of popup settings page on addons page
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_beforeAddonList_handler($sender, &$args) {
+        if (val('CustomTheme', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['CustomTheme']['HasPopupFriendlySettings'] = false;
+        }
+    }
+
+    /**
      *
      *
      * @param AssetModel $sender
@@ -170,7 +182,7 @@ class CustomThemePlugin extends Gdn_Plugin {
         }
         // Make sure the current theme uses a smarty master template instead of php
         $themeRoot = PATH_THEMES . '/' . val('Folder', $themeInfo, '');
-        return $themeInfo['Index'] == 'default' || !file_exists($themeRoot . '/views/default.master.php');
+        return val('Index', $themeInfo) === 'default' || !file_exists($themeRoot . '/views/default.master.php');
     }
 
     /**
@@ -422,9 +434,11 @@ Here are some things you should know before you begin:
             $sender->Form->setValue('CustomHtml', $htmlContents);
             $sender->Form->setValue('Label', $label);
         } else {
+            $values = $sender->Form->formValues();
+
             // If saving the form
-            $isApply = $sender->Form->getFormValue('Apply') ? true : false;
-            $isPreview = $sender->Form->getFormValue('Preview') ? true : false;
+            $isApply = (isset($values['Apply'])) ? true : false;
+            $isPreview = (isset($values['Preview'])) ? true : false;
             $isApplyPreview = $sender->Form->getFormValue('Apply_Changes') ? true : false;
 
             // If applying the changes from a preview
