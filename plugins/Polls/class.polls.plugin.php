@@ -298,7 +298,7 @@ class PollsPlugin extends Gdn_Plugin {
         $Sender->Form->setModel($PollModel);
         if ($Sender->Form->authenticatedPostBack() === false) {
             if ($Sender->Category !== null) {
-                $Sender->Form->setData(array('CategoryID' => $Sender->Category->CategoryID));
+                $Sender->Form->setData(['CategoryID' => $Sender->Category->CategoryID]);
             }
         } else { // Form was submitted
             $FormValues = $Sender->Form->formValues();
