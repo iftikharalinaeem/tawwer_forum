@@ -13,7 +13,8 @@ $PluginInfo['Polls'] = [
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://markosullivan.ca',
     'MobileFriendly' => true,
-    'RegisterPermissions' => ['Plugins.Polls.Add' => 'Garden.Profiles.Edit']
+    'RegisterPermissions' => ['Plugins.Polls.Add' => 'Garden.Profiles.Edit'],
+    'Icon' => 'polls.png'
 ];
 
 /**

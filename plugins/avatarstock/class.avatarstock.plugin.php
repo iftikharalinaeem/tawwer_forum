@@ -18,7 +18,8 @@ $PluginInfo['avatarstock'] = array(
     ),
     'SettingsUrl' => '/settings/avatarstock',
     'SettingsPermission' => 'Garden.Settings.Manage',
-    'MobileFriendly' => true
+    'MobileFriendly' => true,
+    'Icon' => 'avatar-pool.png'
 );
 
 /**
@@ -49,6 +50,18 @@ class AvatarStockPlugin extends Gdn_Plugin {
      */
     public function setup() {
         $this->Structure();
+    }
+
+    /**
+     * Opt out of popup settings page on addons page
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_beforeAddonList_handler($sender, &$args) {
+        if (val('avatarstock', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['avatarstock']['HasPopupFriendlySettings'] = false;
+        }
     }
 
     /**

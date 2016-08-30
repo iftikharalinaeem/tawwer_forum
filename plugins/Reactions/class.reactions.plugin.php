@@ -27,7 +27,8 @@ $PluginInfo['Reactions'] = [
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'MobileFriendly' => true
+    'MobileFriendly' => true,
+    'Icon' => 'reactions.png'
 ];
 
 /**
@@ -38,8 +39,8 @@ class ReactionsPlugin extends Gdn_Plugin {
     const RECORD_REACTIONS_DEFAULT = 'popup';
 
     const BEST_OF_MAX_PAGES = 300;
-
     /** @var array */
+
     protected static $_CommentOrder;
 
     /** @var array Get the user's preference for comment sorting (if enabled). */
@@ -287,8 +288,8 @@ class ReactionsPlugin extends Gdn_Plugin {
     public function base_beforeCommentRender_handler($Sender) {
         include_once $Sender->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
     }
-
     /**
+
      *
      *
      * @param $Sender

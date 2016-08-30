@@ -6,9 +6,11 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
 <ul>
-    <li><?php
-        echo $this->Form->label(t('Popular Posts max age (Max 30 days)'), 'PopularPosts.MaxAge');
-        echo $this->Form->textbox('PopularPosts.MaxAge');
+    <li class="form-group row"><?php
+        echo $this->Form->labelWrap(t('Popular Posts max age (Max 30 days)'), 'PopularPosts.MaxAge');
+        echo $this->Form->textboxWrap('PopularPosts.MaxAge');
         ?></li>
 </ul>
-<?php echo $this->Form->close('Save');
+<div class="form-footer js-modal-footer">
+<?php echo $this->Form->close('Save'); ?>
+</div>

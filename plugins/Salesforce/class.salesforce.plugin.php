@@ -172,19 +172,6 @@ class SalesforcePlugin extends Gdn_Plugin {
    }
 
    /**
-    * Add Salesforce to Dashboard menu.
-    *
-    * @param Controller $Sender
-    * @param array $Arguments
-    */
-   public function Base_GetAppSettingsMenuItems_Handler($Sender, $Arguments) {
-      $LinkText = T('Salesforce');
-      $Menu = $Arguments['SideMenu'];
-      $Menu->AddItem('Forum', T('Forum'));
-      $Menu->AddLink('Forum', $LinkText, 'plugin/Salesforce', 'Garden.Settings.Manage');
-   }
-
-   /**
     * Creates the Virtual Controller
     *
     * @param DashboardController $Sender

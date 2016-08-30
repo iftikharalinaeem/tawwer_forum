@@ -1,4 +1,4 @@
-jQuery(document).ready(function($) {
+$(document).on('contentLoad', function(e) {
 
    /**
     * InterestDropdowns are select elements of "interests" that have been
@@ -227,6 +227,6 @@ jQuery(document).ready(function($) {
    var reset = function() {
       $('.Synchronization').css('display', 'none');
       var successMessage = gdn.getMeta('MailChimpUploadSuccessMessage', 'MailChimp will now process the list you have uploaded. Check your MailChimp Dashboard later.');
-      $('#SychronizationMessages').removeClass('Info').addClass('Warning').html(successMessage);
+      $('#SychronizationMessages').removeClass('alert-info').addClass('alert-warning').html(successMessage);
    }
 });

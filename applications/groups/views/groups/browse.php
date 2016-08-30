@@ -1,7 +1,9 @@
+<?php if (!defined('APPLICATION')) exit(); ?>
+
 <div class="PageControls Top">
-  <?php
-  echo PagerModule::write();
-  ?>
+<?php
+    echo PagerModule::write();
+?>
 </div>
 
 <?php
@@ -21,7 +23,7 @@ echo $list;
 ?>
 
 <div class="PageControls Bottom">
-  <?php
-  echo PagerModule::write();
-  ?>
+<?php
+    echo PagerModule::write();
+?>
 </div>

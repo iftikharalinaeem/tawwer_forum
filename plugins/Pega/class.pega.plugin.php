@@ -16,7 +16,7 @@ $PluginInfo['Pega'] = array(
     'Author' => 'Patrick Kelly',
     'AuthorEmail' => 'patrick.k@vanillaforums.com',
     'AuthorUrl' => 'http://www.github.com/nervoustwit',
-    'SocialConnect' => false
+    'SocialConnect' => true
 );
 
 /**
@@ -159,19 +159,6 @@ class PegaPlugin extends Gdn_Plugin {
         $RedirectUrl = UserUrl($Sender->User, '', 'connections');
 
         Redirect($RedirectUrl);
-    }
-
-    /**
-     * Add Pega to Dashboard menu.
-     *
-     * @param Controller $Sender
-     * @param array $Arguments
-     */
-    public function Base_GetAppSettingsMenuItems_Handler($Sender, $Arguments) {
-        $LinkText = T('Pega');
-        $Menu = $Arguments['SideMenu'];
-        $Menu->AddItem('Forum', T('Forum'));
-        $Menu->AddLink('Forum', $LinkText, 'plugin/Pega', 'Garden.Settings.Manage');
     }
 
     /**

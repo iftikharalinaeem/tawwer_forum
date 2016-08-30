@@ -131,13 +131,12 @@ class CategoryExportPlugin extends Gdn_Plugin  {
     ];
 
     /**
-     * Add sidemenu
+     * Add link to dashboard menu
      *
-     * @param Gdn_Controller $sender
+     * @param DashboardNavModule $sender
      */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        $menu = $sender->EventArguments['SideMenu'];
-        $menu->addLink('Dashboard', T('Category Export'), '/categoryexport', 'Garden.Settings.Manage');
+    public function dashboardNavModule_init_handler($sender) {
+        $sender->addLinkIf('Garden.Settings.Manage', t('Category Export'), '/categoryexport', 'forum-data.category-export');
     }
     
     /**
