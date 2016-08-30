@@ -1,51 +1,46 @@
 <?php if (!defined('APPLICATION')) exit();
-$Poll = $this->Data('Poll');
-$PollOptions = $this->Data('PollOptions');
-if (!$Poll):
-    echo Wrap(T('Failed to load the poll.'), 'div class="Poll PollNotFound"');
-else:
-    // Display the poll
+
+$Poll = $this->data('Poll');
+$PollOptions = $this->data('PollOptions');
+
+if (!$Poll) :
+    echo wrap(t('Failed to load the poll.'), 'div class="Poll PollNotFound"');
+else : // Display the poll
     ?>
     <div class="Poll PollForm Hero js-poll-form">
-        <h2 class="PollQuestion"><?php
-            echo Gdn_Format::PlainText(GetValue('Name', $Poll, ''));
-            ?></h2>
+        <h2 class="PollQuestion"><?php echo Gdn_Format::plainText(val('Name', $Poll, '')); ?></h2>
         <div class="PollOptions">
             <?php
             $Form = new Gdn_Form();
-            $Form->AddHidden('PollID', GetValue('PollID', $Poll));
-            $Form->Action = Url('discussion/pollvote');
-            echo $Form->Open();
+            $Form->addHidden('PollID', val('PollID', $Poll));
+            $Form->Action = url('discussion/pollvote');
+            echo $Form->open();
             foreach ($PollOptions as $Option) {
                 echo '<div class="PollOption">';
-                echo $Form->Radio('PollOptionID', '@'.Gdn_Format::To($Option['Body'], $Option['Format']), array('Value' => $Option['PollOptionID']));
+                echo $Form->radio('PollOptionID', '@'.Gdn_Format::to($Option['Body'], $Option['Format']), array('Value' => $Option['PollOptionID']));
                 echo '</div>';
             }
-            if (Gdn::Session()->IsValid())
-                echo $Form->Button('Vote', array('class' => 'Button Primary'));
-            else {
-                $ReturnUrl = Gdn::Request()->PathAndQuery();
-                $AuthenticationUrl = SignInUrl($ReturnUrl);
-                $CssClass = C('Garden.SignIn.Popup') ? 'SignInPopup' : '';
-                echo Anchor(T('Sign in to vote!'), $AuthenticationUrl, $CssClass);
+            if (Gdn::session()->isValid()) {
+                echo $Form->button('Vote', array('class' => 'Button Primary'));
+            } else {
+                $ReturnUrl = Gdn::request()->pathAndQuery();
+                $AuthenticationUrl = signInUrl($ReturnUrl);
+                $CssClass = c('Garden.SignIn.Popup') ? 'SignInPopup' : '';
+                echo anchor(t('Sign in to vote!'), $AuthenticationUrl, $CssClass);
             }
-            if (Gdn::Session()->IsValid()) {
-                echo Anchor(T('View Results'), '#', 'js-poll-result-btn');
+            if (Gdn::session()->isValid()) {
+                echo anchor(t('View Results'), '#', 'js-poll-result-btn');
             }
 
-
-            echo $Form->Close();
+            echo $Form->close();
             echo '<div class="AnonymousWarning">';
-            if (GetValue('Anonymous', $Poll) == '0')
-                echo T('This is a public poll: others will see what you voted for.');
-            else
-                echo T('This is a private poll: no-one will see what you voted for.');
+            if (val('Anonymous', $Poll) == '0') {
+                echo t('This is a public poll: others will see what you voted for.');
+            } else {
+                echo t('This is a private poll: no-one will see what you voted for.');
+            }
             echo '</div>';
-
-
             ?>
-
-
         </div>
     </div>
 <?php

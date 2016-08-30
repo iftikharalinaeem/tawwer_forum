@@ -1,70 +1,72 @@
-<?php
-if (!defined('APPLICATION'))
-   exit();
-$Session = Gdn::Session();
-$CancelUrl = $this->Data('_CancelUrl');
+<?php if (!defined('APPLICATION')) exit();
+
+$Session = Gdn::session();
+$CancelUrl = $this->data('_CancelUrl');
 if (!$CancelUrl) {
-   $CancelUrl = '/discussions';
-   if (C('Vanilla.Categories.Use') && is_object($this->Category))
-   $CancelUrl = '/categories/' . urlencode($this->Category->UrlCode);
+    $CancelUrl = '/discussions';
+    if (c('Vanilla.Categories.Use') && is_object($this->Category)) {
+        $CancelUrl = '/categories/'.urlencode($this->Category->UrlCode);
+    }
 }
 ?>
 
 <div id="NewPollForm" class="NewPollForm DiscussionForm FormTitleWrapper">
-   <?php
-   if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
-      echo Wrap($this->Data('Title'), 'h1 class="H"');
+    <?php
+    if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
+        echo wrap($this->data('Title'), 'h1 class="H"');
+    }
 
-   echo '<div class="FormWrapper">';
-      echo $this->Form->Open();
-      echo $this->Form->Errors();
+    echo '<div class="FormWrapper">';
+    echo $this->Form->open();
+    echo $this->Form->errors();
 
-      if ($this->ShowCategorySelector === TRUE) {
-         echo '<div class="P">';
-         echo '<div class="Category">';
-         echo $this->Form->Label('Category', 'CategoryID'), ' ';
-         echo $this->Form->CategoryDropDown('CategoryID', array('Value' => GetValue('CategoryID', $this->Category), 'PermFilter' => array('AllowedDiscussionTypes' => 'Poll')));
-         echo '</div>';
-         echo '</div>';
-      }
+    if ($this->ShowCategorySelector === true) {
+        echo '<div class="P">';
+        echo '<div class="Category">';
+        echo $this->Form->label('Category', 'CategoryID'), ' ';
+        echo $this->Form->categoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'PermFilter' => ['AllowedDiscussionTypes' => 'Poll']));
+        echo '</div>';
+        echo '</div>';
+    }
 
-      echo '<div class="P">';
-         echo $this->Form->Label('Poll Question', 'Name');
-         echo Wrap($this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput')), 'div', array('class' => 'TextBoxWrapper'));
-      echo '</div>';
+    echo '<div class="P">';
+    echo $this->Form->label('Poll Question', 'Name');
+    echo wrap($this->Form->textBox('Name', ['maxlength' => 100, 'class' => 'InputBox BigInput']), 'div', ['class' => 'TextBoxWrapper']);
+    echo '</div>';
 
-      echo '<div class="P">';
-         echo $this->Form->Label('Optional Description', 'Body');
-         echo Wrap($this->Form->bodyBox(), 'div');
-      echo '</div>';
+    echo '<div class="P">';
+    echo $this->Form->label('Optional Description', 'Body');
+    echo wrap($this->Form->bodyBox(), 'div');
+    echo '</div>';
 
-      if (!$this->Data('_AnonymousPolls')) {
-         echo '<div class="P PostOptions" style="margin-bottom: 10px;">';
-            echo $this->Form->CheckBox('Anonymous', T('Make this poll anonymous (user votes are not made public).'), array('value' => '1'));
-         echo '</div>';
-      }
+    if (!$this->data('_AnonymousPolls')) {
+        echo '<div class="P PostOptions" style="margin-bottom: 10px;">';
+        echo $this->Form->checkBox('Anonymous', t('Make this poll anonymous (user votes are not made public).'), ['value' => '1']);
+        echo '</div>';
+    }
 
-      echo '<div class="P">';
-         echo $this->Form->Label('Poll Options', 'PollOption[]');
-         echo '<ol class="PollOptions">';
-            echo '<li class="PollOption">' . $this->Form->TextBox('PollOption[]', array('class' => 'InputBox BigInput NoIE')) . '</li>';
-            $PollOptions = GetValue('PollOption', $this->Form->FormValues());
-            if (is_array($PollOptions)) {
-               foreach ($PollOptions as $PollOption) {
-                  $PollOption = trim(Gdn_Format::PlainText($PollOption));
-                  if ($PollOption != '')
-                     echo '<li class="PollOption">' . $this->Form->TextBox('PollOption[]', array('value' => $PollOption, 'class' => 'InputBox BigInput')) . '</li>';
-               }
+    echo '<div class="P">';
+    echo $this->Form->label('Poll Options', 'PollOption[]');
+    echo '<ol class="PollOptions">';
+    echo '<li class="PollOption">' . $this->Form->textBox('PollOption[]', ['class' => 'InputBox BigInput NoIE']) . '</li>';
+    $PollOptions = val('PollOption', $this->Form->formValues());
+    if (is_array($PollOptions)) {
+        foreach ($PollOptions as $PollOption) {
+            $PollOption = trim(Gdn_Format::plainText($PollOption));
+            if ($PollOption != '') {
+                echo '<li class="PollOption">' . $this->Form->textBox('PollOption[]', ['value' => $PollOption, 'class' => 'InputBox BigInput']) . '</li>';
             }
-         echo '</ol>';
-         echo Anchor(T('Add another poll option ...'), '#', array('class' => 'AddPollOption'));
-      echo '</div>';
+        }
+    }
+    echo '</ol>';
+    echo anchor(t('Add another poll option ...'), '#', ['class' => 'AddPollOption']);
+    echo '</div>';
 
-      echo '<div class="Buttons">';
-         echo $this->Form->Button('Save Poll', array('class' => 'Button PollButton Primary'));
-         echo ' '.Anchor(T('Cancel'), $CancelUrl, 'Button Cancel');
-      echo '</div>';
-      echo $this->Form->Close();
-   echo '</div>';
-   ?>
+    echo '<div class="Buttons">';
+    echo $this->Form->button('Save Poll', ['class' => 'Button PollButton Primary']);
+    echo ' '.anchor(t('Cancel'), $CancelUrl, 'Button Cancel');
+    echo '</div>';
+    echo $this->Form->close();
+    echo '</div>';
+    ?>
 </div>
