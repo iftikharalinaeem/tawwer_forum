@@ -1,21 +1,21 @@
 <?php
 
 class NewAnnouncementModule extends Gdn_Module {
-   /// Properties ///
-   public $GroupID;
+    /// Properties ///
+    public $GroupID;
 
 
-   /// Methods ///
+    /// Methods ///
 
-   public function ToString() {
-      if (!$this->GroupID) {
-         $GroupID = Gdn::Controller()->Data('Group.GroupID');
-      }
+    public function ToString() {
+        if (!$this->GroupID) {
+            $GroupID = Gdn::Controller()->Data('Group.GroupID');
+        }
 
-      if (GroupPermission('Moderate', $GroupID)) {
-         return ' '.Anchor(T('New Announcement'), GroupUrl(Gdn::Controller()->Data('Group'), 'announcement'), 'Button').' ';
-      }
-      return '';
-   }
+        if (GroupPermission('Moderate', $GroupID)) {
+            return ' '.Anchor(T('New Announcement'), GroupUrl(Gdn::Controller()->Data('Group'), 'announcement'), 'Button').' ';
+        }
+        return '';
+    }
 }
 
