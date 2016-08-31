@@ -79,6 +79,20 @@ class SiteNodePlugin extends Gdn_Plugin {
             ->Table('UserAuthenticationProvider')
             ->Column('SyncWithHub', 'tinyint(1)', '1')
             ->Set();
+
+        // Reporting categories should be managed locally. Set them to override hub, if they aren't already.
+        $hubReporting = Gdn::sql()->getWhere([
+            'Category',
+            ['Type' => 'Reporting', 'OverrideHub' => 0]
+        ])->count();
+
+        if ($hubReporting > 0) {
+            Gdn::sql()->update(
+                'Category',
+                ['OverrideHub' => 1],
+                ['Type' => 'Reporting', 'OverrideHub' => 0]
+            );
+        }
     }
 
     /**
