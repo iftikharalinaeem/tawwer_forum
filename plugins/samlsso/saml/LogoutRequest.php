@@ -32,8 +32,8 @@ class OneLogin_Saml_LogoutRequest
      */
     public function getRedirectUrl()
     {
-        $id = $this->_generateUniqueID();
-        $issueInstant = $this->_getTimestamp();
+        $id = $this->generateUniqueID();
+        $issueInstant = $this->getTimestamp();
 
         $request = <<<AUTHNREQUEST
 <samlp:LogoutRequest
@@ -51,7 +51,7 @@ AUTHNREQUEST;
 
       $deflatedRequest = gzdeflate($request);
       $base64Request = base64_encode($deflatedRequest);
-      $get = array('SAMLRequest' => $base64Request);
+      $get = ['SAMLRequest' => $base64Request];
 
       try {
          $this->signRequest($get);
@@ -71,17 +71,17 @@ AUTHNREQUEST;
        // Construct the string.
        $get['SigAlg'] = XMLSecurityKey::RSA_SHA1;
        $msg = http_build_query($get);
-       $key = new XMLSecurityKey($get['SigAlg'], array('type' => 'private'));
+       $key = new XMLSecurityKey($get['SigAlg'], ['type' => 'private']);
        $key->loadKey($this->_settings->spPrivateKey, false, false);
        $get['Signature'] = base64_encode($key->signData($msg));
     }
 
-    protected function _generateUniqueID()
+    protected function generateUniqueID()
     {
-        return self::ID_PREFIX . sha1(uniqid(mt_rand(), TRUE));
+        return self::ID_PREFIX.sha1(uniqid(mt_rand(), true));
     }
 
-    protected function _getTimestamp()
+    protected function getTimestamp()
     {
         $defaultTimezone = date_default_timezone_get();
         date_default_timezone_set('UTC');
