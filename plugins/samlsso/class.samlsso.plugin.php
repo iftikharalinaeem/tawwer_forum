@@ -516,10 +516,11 @@ class SamlSSOPlugin extends Gdn_Plugin {
                     return $form->label('Metadata').
                         '<div class="Info">'.
                             'You can get the metadata for this service provider here: '.
-                            Anchor('get metadata', '/settings/samlsso/metadata.xml', '', ['target' => '_blank')].'.'.
+                            Anchor('get metadata', '/settings/samlsso/metadata.xml', '', ['target' => '_blank']).'.'.
                         '</div>';
-                }]
-            );
+                }
+            ]
+        ];
 
         $Sender->setData('_Form', $_Form);
         $Sender->addSideMenu();
