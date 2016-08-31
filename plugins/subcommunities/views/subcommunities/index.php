@@ -3,7 +3,7 @@
 <div class="header-block">
     <h1><?php echo $this->data('Title'); ?></h1>
     <div class="btn-group">
-        <?php echo anchor(sprintf(t('Add %s'), t('Subcommunity')), '/subcommunities/add', 'Popup btn btn-primary'); ?>
+        <?php echo anchor(sprintf(t('Add %s'), t('Subcommunity')), '/subcommunities/add', 'js-modal btn btn-primary'); ?>
     </div>
 </div>
 
