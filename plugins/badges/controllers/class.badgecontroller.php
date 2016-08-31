@@ -318,6 +318,10 @@ class BadgeController extends BadgesAppController {
      */
     public function index($BadgeID = '', $Name = '') {
 
+        $this->MasterView = 'default';
+        $this->addCssFile('style.css');
+        $this->removeCssFile('admin.css');
+
         // Get badge data or 404
         $this->Badge = $this->BadgeModel->getID($BadgeID);
         if (!$this->Badge) {
@@ -436,6 +440,10 @@ class BadgeController extends BadgesAppController {
      * @param mixed $BadgeID Unique numeric ID or slug.
      */
     public function request($BadgeID) {
+        $this->MasterView = 'default';
+        $this->addCssFile('style.css');
+        $this->removeCssFile('admin.css');
+
         $this->permission('Reputation.Badges.Request');
         $Session = Gdn::session();
 
