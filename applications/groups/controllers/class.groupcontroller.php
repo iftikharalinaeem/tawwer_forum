@@ -775,21 +775,21 @@ class GroupController extends Gdn_Controller {
             $upload = new Gdn_UploadImage();
             $newIcon = false;
             if ($tmpIcon = $upload->validateUpload('Icon', false)) {
-                     // New upload
-                     $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
-                     $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
-                     $form->SetFormValue('Icon', $newIcon);
-                     $target = 'groupicon'; // redirect to groupicon page so user can set thumbnail
+                 // New upload
+                 $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
+                 $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
+                 $form->setFormValue('Icon', $newIcon);
+                 $target = 'groupicon'; // redirect to groupicon page so user can set thumbnail
             } elseif ($icon && $crop && $crop->isCropped()) {
-                     // New thumbnail
-                     $tmpIcon = $source;
-                     $thumbOptions = array('Crop' => true,
-                          'SourceX' => $crop->getCropXValue(),
-                          'SourceY' => $crop->getCropYValue(),
-                          'SourceWidth' => $crop->getCropWidth(),
-                          'SourceHeight' => $crop->getCropHeight());
-                     $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
-                     $form->SetFormValue('Icon', $newIcon);
+                 // New thumbnail
+                 $tmpIcon = $source;
+                 $thumbOptions = array('Crop' => true,
+                      'SourceX' => $crop->getCropXValue(),
+                      'SourceY' => $crop->getCropYValue(),
+                      'SourceWidth' => $crop->getCropWidth(),
+                      'SourceHeight' => $crop->getCropHeight());
+                 $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
+                 $form->setFormValue('Icon', $newIcon);
             }
 
             if ($form->errorCount() == 0 && $newIcon) {
@@ -810,7 +810,7 @@ class GroupController extends Gdn_Controller {
                 }
 
                 $this->informMessage(t("Your settings have been saved."));
-                redirect(GroupUrl($group, $target));
+                redirect(groupUrl($group, $target));
             }
         }
         $this->Form = $form;
