@@ -372,8 +372,6 @@ class BadgeController extends BadgesAppController {
 
         // Form submitted
         if ($this->Form->authenticatedPostBack()) {
-            $Data = $this->Form->formValues();
-
             // Set BadgeID for existing or set Type = Manual for new
             if (!$Insert) {
                 $this->Form->setFormValue('BadgeID', $BadgeID);
@@ -382,11 +380,11 @@ class BadgeController extends BadgesAppController {
             }
 
             try {
-                    // Upload image
-                    $UploadImage = new Gdn_UploadImage();
+                // Upload image
+                $UploadImage = new Gdn_UploadImage();
 
-                    // Validate the upload
-                    $TmpImage = $UploadImage->validateUpload('Photo', false);
+                // Validate the upload
+                $TmpImage = $UploadImage->validateUpload('Photo', false);
 
                 if ($TmpImage) {
                     // Generate the target image name.

@@ -6,7 +6,7 @@
 
 // We can't rely on our autoloader in a plugin.
 require_once(dirname(__FILE__).'/class.badgesappmodel.php');
- 
+
 /**
  * Badge handling.
  */
@@ -236,6 +236,11 @@ class BadgeModel extends BadgesAppModel {
             } else {
                 $data['Level'] = null;
             }
+        }
+
+        // Be sure that we won't have the duplicate name (emptystring) since the column is unique.
+        if (isset($data['Slug']) && $data['Slug'] === '') {
+            $data['Slug'] = null;
         }
 
         return parent::save($data);
