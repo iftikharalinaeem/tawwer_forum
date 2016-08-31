@@ -10,7 +10,7 @@
     <div class="P">
         <?php
         echo $this->Form->Label('Invite one or more people to join this group.', 'To');
-        echo Wrap($this->Form->TextBox('Recipients', array('MultiLine' => TRUE, 'class' => 'Tokens-User MultiComplete')), 'div', array('class' => 'TextBoxWrapper'));
+        echo Wrap($this->Form->TextBox('Recipients', array('MultiLine' => true, 'class' => 'Tokens-User MultiComplete')), 'div', array('class' => 'TextBoxWrapper'));
         ?>
     </div>
     <div class="Buttons Buttons-Confirm">

@@ -193,7 +193,7 @@ if (!function_exists('WriteGroupButtons')) :
  *
  * @param array $Group Optional. Uses data array's Group if none is provided.
  */
-function WriteGroupButtons($Group = NULL) {
+function WriteGroupButtons($Group = null) {
     if (!$Group)
         $Group = Gdn::Controller()->Data('Group');
     if (!$Group)
@@ -307,7 +307,7 @@ if (!function_exists('WriteGroupCard')) :
  * @param array $Group
  * @param bool $WithButtons Optional. Whether to show group management option cog
  */
-function WriteGroupCard($Group, $WithButtons = TRUE) {
+function WriteGroupCard($Group, $WithButtons = true) {
     echo '<div class="CardWrap"><div class="Group Card">';
         $Url = GroupUrl($Group);
         echo "<a href=\"$Url\" class=\"TextColor\">";
@@ -335,7 +335,7 @@ if (!function_exists('WriteGroupIcon')) :
  *
  * @param array $Group Optional. Uses data array's Group if none is provided.
  */
-function WriteGroupIcon($group = FALSE, $class = 'Group-Icon', $addChangeIconLink = false) {
+function WriteGroupIcon($group = false, $class = 'Group-Icon', $addChangeIconLink = false) {
     if (!$group) {
          $group = Gdn::Controller()->Data('Group');
     }

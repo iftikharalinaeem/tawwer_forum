@@ -14,7 +14,7 @@ echo $this->Form->Errors();
 <div class="P">
     <?php
         echo $this->Form->Label('Why do you want to join?', 'Reason');
-        echo $this->Form->TextBox('Reason', array('MultiLine' => TRUE, 'Wrap' => TRUE));
+        echo $this->Form->TextBox('Reason', array('MultiLine' => true, 'Wrap' => true));
     ?>
 </div>
 <?php else: ?>

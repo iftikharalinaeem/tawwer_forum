@@ -19,7 +19,7 @@ class GroupModule extends Gdn_Module {
     protected $GroupID;
 
     /** @var null  */
-    protected $Group = NULL;
+    protected $Group = null;
 
     /**
      * GroupModule constructor.
@@ -48,7 +48,7 @@ class GroupModule extends Gdn_Module {
      *
      * @return void
      */
-    public function GetData($GroupID = NULL) {
+    public function GetData($GroupID = null) {
 
         if (is_null($GroupID))
             $GroupID = $this->GroupID;

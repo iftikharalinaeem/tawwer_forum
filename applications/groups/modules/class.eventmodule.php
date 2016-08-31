@@ -16,16 +16,16 @@
 class EventModule extends Gdn_Module {
 
     /** @var null  */
-    protected $Filter = NULL;
+    protected $Filter = null;
 
     /** @var null  */
-    protected $FilterBy = NULL;
+    protected $FilterBy = null;
 
     /** @var null  */
-    protected $Type = NULL;
+    protected $Type = null;
 
     /** @var null  */
-    protected $Button = NULL;
+    protected $Button = null;
 
     /**
      * EventModule constructor.
@@ -35,7 +35,7 @@ class EventModule extends Gdn_Module {
      * @param null $Filter
      * @param null $Button
      */
-    public function __construct($Type = NULL, $FilterBy = NULL, $Filter = NULL, $Button = NULL) {
+    public function __construct($Type = null, $FilterBy = null, $Filter = null, $Button = null) {
         parent::__construct();
         $this->_ApplicationFolder = 'groups';
 
@@ -83,7 +83,7 @@ class EventModule extends Gdn_Module {
         if (!$this->Type) return;
 
         // Callable multiple times
-        if (!is_null($this->Data('Events', NULL))) return;
+        if (!is_null($this->Data('Events', null))) return;
 
         $EventCriteria = array();
         switch ($this->FilterBy) {
@@ -104,13 +104,13 @@ class EventModule extends Gdn_Module {
         switch ($this->Type) {
             case 'upcoming':
                 $FilterDate = C('Groups.Events.UpcomingRange', '+365 days');
-                $Ended = FALSE;
+                $Ended = false;
                 $this->SetData('Title', T('Upcoming Events'));
                 break;
 
             case 'recent':
                 $FilterDate = C('Groups.Events.RecentRange', '-365 days');
-                $Ended = TRUE;
+                $Ended = true;
                 $this->SetData('Title', T('Recent Events'));
                 break;
         }

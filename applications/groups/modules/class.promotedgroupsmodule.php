@@ -115,17 +115,17 @@ class PromotedGroupsModule extends Gdn_Module {
      * @param string $orderBy
      * @return array|null
      */
-    private function GetData($promoteType, $limit, $attachLastDiscussion, $orderBy) {
+    private function getData($promoteType, $limit, $attachLastDiscussion, $orderBy) {
         //get groups
         $groupModel = new GroupModel();
         if ($promoteType === 'mine' && Gdn::session()->UserID > 0) {
-            $groups = $groupModel->GetByUser(Gdn::session()->UserID, $orderBy, 'desc', $limit);
+            $groups = $groupModel->getByUser(Gdn::session()->UserID, $orderBy, 'desc', $limit);
         }
         else {
-            $groups = $groupModel->Get($orderBy, 'desc', $limit)->resultArray();
+            $groups = $groupModel->get($orderBy, 'desc', $limit)->resultArray();
         }
         if ($attachLastDiscussion) {
-            $groupModel->JoinRecentPosts($groups);
+            $groupModel->joinRecentPosts($groups);
         }
         return $groups;
     }
@@ -135,8 +135,8 @@ class PromotedGroupsModule extends Gdn_Module {
      *
      * @return string HTML view
      */
-    public function ToString() {
-        $groups = $this->GetData($this->promoteType, $this->limit, $this->attachLastDiscussion, $this->orderBy);
+    public function toString() {
+        $groups = $this->getData($this->promoteType, $this->limit, $this->attachLastDiscussion, $this->orderBy);
         $groupList = new GroupListModule($groups, $this->promoteType, $this->title, t("There aren't any groups yet."), 'groups-'.$this->promoteType);
         $groupList->setView($this->getView());
         return $groupList->toString();

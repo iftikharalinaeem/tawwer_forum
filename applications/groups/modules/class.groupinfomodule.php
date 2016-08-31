@@ -25,13 +25,13 @@ class GroupInfoModule extends Gdn_Module {
      * @throws Exception
      */
     public function toString() {
-        require_once Gdn::Controller()->FetchViewLocation('group_functions', 'Group', 'groups');
+        require_once Gdn::controller()->fetchViewLocation('group_functions', 'Group', 'groups');
         ob_start();
         ?>
             <div class="Group-Box Group-Info">
-                <h3><?php echo T('Group Info'); ?></h3>
+                <h3><?php echo t('Group Info'); ?></h3>
                 <?php
-                $this->WriteGroupInfo();
+                $this->writeGroupInfo();
                 ?>
             </div>
         <?php
@@ -40,21 +40,24 @@ class GroupInfoModule extends Gdn_Module {
         return $return;
      }
 
-    public function WriteGroupInfo() {
-        $c = Gdn::Controller();
-        $Owner = Gdn::UserModel()->GetID($c->Data('Group.InsertUserID'));
+    /**
+     *
+     */
+    public function writeGroupInfo() {
+        $c = Gdn::controller();
+        $Owner = Gdn::userModel()->getID($c->data('Group.InsertUserID'));
         $Info = array(
-            'Created' => Gdn_Format::Date($c->Data('Group.DateInserted'), 'html'),
+            'Created' => Gdn_Format::date($c->data('Group.DateInserted'), 'html'),
             'Owner' => UserAnchor($Owner),
-            'Member Count' => array('Members', $c->Data('Group.CountMembers'))
+            'Member Count' => array('Members', $c->data('Group.CountMembers'))
         );
         echo '<dl class="Group-Info">';
         foreach ($Info as $Code => $Row) {
             if (is_array($Row)) {
-                $Label = T($Code, $Row[0]);
+                $Label = t($Code, $Row[0]);
                 $Value = $Row[1];
             } else {
-                $Label = T($Code);
+                $Label = t($Code);
                 $Value = $Row;
             }
             echo '<dt>'.$Label.'</dt>';

@@ -3,7 +3,7 @@
   <div class="Box-Events">
     <h2><?php echo T($this->Data('Title')); ?></h2>
     <?php $EmptyMessage = T('GroupEmptyEvents', "Aw snap, no events are coming up."); ?>
-    <?php WriteEventList($this->Data('Events'), $this->Data('Group'), $EmptyMessage, $this->Data('Button', TRUE)); ?>
+    <?php WriteEventList($this->Data('Events'), $this->Data('Group'), $EmptyMessage, $this->Data('Button', true)); ?>
   </div>
 
 <?php
@@ -14,7 +14,7 @@
  * @param array $Events
  * @param string $EmptyMessage What to show when there's no content.
  */
-function WriteEventList($Events, $Group = NULL, $EmptyMessage = '', $Button = TRUE) {
+function WriteEventList($Events, $Group = null, $EmptyMessage = '', $Button = true) {
     $GroupID = GetValue('GroupID', $Group, '');
     if (GroupPermission('Member') && $Button) {
         echo '<div class="Button-Controls">';

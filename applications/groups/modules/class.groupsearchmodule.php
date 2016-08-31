@@ -28,12 +28,12 @@ class GroupSearchModule extends Gdn_Module {
     /**
      * @return string
      */
-    public function ToString() {
+    public function toString() {
         if (!$this->Visible) {
             return '';
         }
 
         $this->Form = new Gdn_Form();
-        return $this->FetchView();
+        return $this->fetchView();
     }
 }
