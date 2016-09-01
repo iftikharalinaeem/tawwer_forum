@@ -379,6 +379,25 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
+     *
+     * Also filter down unanswered questions.
+     * categoryWatch does not work here because the QnA controller set some categories himself.
+     *
+     * @param DiscussionsController $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function QnAPlugin_unansweredBeforeSetCategories_handler($sender, $args) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
+        $subcommunityCategoryIDs = $this->getCategoryIDs();
+
+        $args['Categories'] = array_intersect_key($args['Categories'], array_flip($subcommunityCategoryIDs));
+    }
+
+    /**
      * Hook on AdvancedSearchPlugin's BeforeSearchCompilation event.
      *
      * Used to filter down the categories used in the advanced search
@@ -515,6 +534,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param $args Event arguments.
      */
     public function base_unansweredCount_handler($sender, $args) {
+
         // Check for individual categories.
         $categoryIDs = $this->getCategoryIDs();
         $questionCount = Gdn::sql()
