@@ -497,7 +497,6 @@ class BadgeController extends BadgesAppController {
             }
         }
 
-        $this->addSideMenu('reputation/badge/requests');
         $this->View = 'requests';
         $this->render();
     }
