@@ -6,19 +6,16 @@
     </div>
 </div>
 <div class="table-wrap">
-    <table id="Badges" class="AltColumns ManageBadges">
+    <table id="Badges" class="table-data">
         <thead>
             <tr>
-                <th class="BadgeNameHead" colspan="2"><?php echo T('Badge'); ?></th>
-                <?php if (CheckPermission('Reputation.Badges.Give')) : ?>
-                    <th></th>
-                <?php endif; ?>
+                <th class="BadgeNameHead column-xl"><?php echo T('Badge'); ?></th>
                 <th><?php echo T('Class'); ?></th>
-                <th><?php echo T('Level'); ?></th>
-                <th><?php echo T('Given'); ?></th>
-                <th class="Alt"><?php echo T('Active'); ?></th>
+                <th class="column-xs"><?php echo T('Level'); ?></th>
+                <th class="column-xs"><?php echo T('Given'); ?></th>
+                <th class="column-sm"><?php echo T('Active'); ?></th>
                 <!--<th><?php echo T('Visible'); ?></th>-->
-                <th class="options"><?php echo T('Options'); ?></th>
+                <th class="options column-md"><?php echo T('Options'); ?></th>
             </tr>
         </thead>
         <tbody>

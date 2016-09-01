@@ -10,28 +10,21 @@ foreach ($this->Data('Badges') as $Badge) :
     <tr class="<?php if ($Alt) echo 'Alt '; if (!$Badge->Visible) echo 'HiddenBadge'; ?>">
 
         <td>
+            <div class="media-sm">
             <?php if ($Badge->Photo) : ?>
+                <div class="media-sm-image-wrap-no-border">
                 <?php echo Img(Gdn_Upload::Url($Badge->Photo),
-                    array('height' => '50px', 'width' => '50px', 'class' => 'BadgePhoto')); ?>
+                    array('class' => 'BadgePhoto')); ?>
+                </div>
             <?php endif; ?>
-        </td>
-        <td>
-            <div class="title strong">
-                <?php echo Anchor(UserBadgeModel::BadgeName((array)$Badge), 'badge/'.$Badge->BadgeID, 'Title'); ?>
+                <div class="media-sm-content">
+                    <div class="media-sm-title strong">
+                        <?php echo Anchor(UserBadgeModel::BadgeName((array)$Badge), 'badge/'.$Badge->BadgeID, 'Title'); ?>
+                    </div>
+                    <div class="media-sm-description"><?php echo Gdn_Format::Text($Badge->Body); ?></div>
+                </div>
             </div>
-            <div class="description"><?php echo Gdn_Format::Text($Badge->Body); ?></div>
         </td>
-
-        <?php if (CheckPermission('Reputation.Badges.Give')) : ?>
-        <td><?php
-            if ($Badge->Active) { // $Badge->Type == 'Manual'
-                // Give badge
-                if ($Session->CheckPermission('Reputation.Badges.Give') && $Badge->Active)
-                    echo Anchor(T('Give'), '/badge/give/'.$Badge->BadgeID, 'js-modal');
-            } ?>
-        </td>
-        <?php endif; ?>
-
         <td><?php echo Gdn_Format::Text($Badge->Class); ?></td>
         <td><?php echo Gdn_Format::Text($Badge->Level); ?></td>
         <td><?php echo Gdn_Format::Text($Badge->CountRecipients); ?></td>
@@ -68,11 +61,15 @@ foreach ($this->Data('Badges') as $Badge) :
             }
             if (CheckPermission('Reputation.Badges.Manage') && $Badge->CanDelete) {
                 echo anchor(dashboardSymbol('delete'), '/badge/delete/'.$Badge->BadgeID.'/?Target='.urlencode($this->SelfUrl), 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'data-content' => ['body' => t('Are you sure you want to delete this badge?')]]);
+            } else {
+                echo wrap(dashboardSymbol('delete'), 'div', ['class' => 'disabled btn btn-icon', 'aria-label' => t('Delete')]);
+            }
+            if ($Session->CheckPermission('Reputation.Badges.Give') && $Badge->Active) {
+                echo anchor(t('Give'), '/badge/give/'.$Badge->BadgeID, 'js-modal btn btn-icon');
             }
             ?>
             </div>
         </td>
-
     </tr>
 
 <?php endforeach;

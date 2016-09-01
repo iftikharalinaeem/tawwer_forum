@@ -33,13 +33,13 @@
    <?php } ?>
 </div>
 <div class="table-wrap">
-<table id="Badges" class="AltColumns ManageBadges">
+<table class="table-data">
    <thead>
       <tr>
-         <th class="NameColumn" colspan="2"><?php echo T('Reaction'); ?></th>
-         <th><?php echo T("Actions and Permissions"); ?></th>
-         <th class="active"><?php echo T('Active'); ?></th>
-         <th class="options"><?php echo T('Options'); ?></th>
+         <th class="NameColumn column-lg"><?php echo T('Reaction'); ?></th>
+         <th class="column-xl"><?php echo T("Actions and Permissions"); ?></th>
+         <th class="active column-sm"><?php echo T('Active'); ?></th>
+         <th class="options column-sm"><?php echo T('Options'); ?></th>
       </tr>
    </thead>
    <tbody>
@@ -50,17 +50,21 @@
       $State = $ReactionType['Active'] ? 'Active' : 'InActive';
       ?>
       <tr id="ReactionType_<?php echo $ReactionType['UrlCode']; ?>" class="<?php echo $State; ?>">
-         <td class="NameColumn"><div class="CellWrap">
-            <?php
-            echo Img('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png', array('ReactionImage')), ' ';
-            ?></div>
-         </td>
-         <td>
-            <div class="title strong">
-               <?php echo t($ReactionType['Name']); ?>
-            </div>
-            <div class="description">
-               <?php echo $ReactionType['Description']; ?>
+         <td class="NameColumn">
+            <div class="media-sm">
+               <div class="media-sm-image-wrap-no-border">
+                  <?php
+                  echo Img('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png', array('ReactionImage')), ' ';
+                  ?>
+               </div>
+               <div class="media-sm-content">
+                  <div class="media-sm-title strong">
+                     <?php echo t($ReactionType['Name']); ?>
+                  </div>
+                  <div class="media-sm-description">
+                     <?php echo $ReactionType['Description']; ?>
+                  </div>
+               </div>
             </div>
          </td>
          <td class="AutoDescription">

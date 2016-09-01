@@ -26,15 +26,15 @@
     </div>
 </div>
 <div class="table-wrap">
-    <table id="Ranks" class="AltColumns">
+    <table id="Ranks" class="table-data">
         <thead>
             <tr>
-                <th class="LevelColumn"><?php echo T('Level'); ?></th>
+                <th class="LevelColumn column-xs"><?php echo T('Level'); ?></th>
                 <th class="NameColumn"><?php echo T('Name'); ?></th>
                 <th class=""><?php echo T('Label'); ?></th>
-                <th class="CriteriaColumn"><?php echo T('Criteria'); ?></th>
-                <th class="AbilitiesColumn"><?php echo T('Abilites'); ?></th>
-                <th class="options"><?php echo T('Options'); ?></th>
+                <th class="CriteriaColumn column-md"><?php echo T('Criteria'); ?></th>
+                <th class="AbilitiesColumn column-md"><?php echo T('Abilites'); ?></th>
+                <th class="options column-sm"><?php echo T('Options'); ?></th>
             </tr>
         </thead>
         <tbody>
