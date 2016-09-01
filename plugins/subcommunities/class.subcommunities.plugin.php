@@ -379,6 +379,25 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
+     *
+     *
+     * Also filter down unanswered questions.
+     * categoryWatch does not work here because the QnA controller set some categories himself.
+     *
+     * @param DiscussionsController $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function QnAPlugin_unansweredBeforeSetCategories_handler($sender, $args) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
+        $subcommunityCategoryIDs = $this->getCategoryIDs();
+
+        $args['Categories'] = array_intersect_key($args['Categories'], array_flip($subcommunityCategoryIDs));
+    }
+
+    /**
      * Hook on AdvancedSearchPlugin's BeforeSearchCompilation event.
      *
      * Used to filter down the categories used in the advanced search
@@ -489,7 +508,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     /**
      * Adds a link to the site nav module to change subcommunities.
      *
-     * @param SiteNavModule $sender
+     * @param SiteNavModule $sender Sending controller instance.
      */
     public function siteNavModule_default_handler($sender) {
         $subName = val('Name', SubcommunityModel::getCurrent());
@@ -499,8 +518,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     /**
      * Adds the subcommunity CategoryID to the new discussion button so it can check its permissions.
      *
-     * @param DiscussionsController $sender
-     * @param array $args
+     * @param DiscussionsController $sender Sending controller instance.
+     * @param array $args Event arguments.
      */
     public function discussionsController_beforeNewDiscussionButton_handler($sender, $args) {
         if (val('NewDiscussionModule', $args) && !$args['NewDiscussionModule']->CategoryID) {
@@ -511,10 +530,14 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     /**
      * Filter permissions when counting questions from the QnA plugin to avoid counting questions for other subcommunities.
      *
-     * @param $sender Sending controller instance.
-     * @param $args Event arguments.
+     * @param QnAPlugin $sender Sending controller instance.
+     * @param array $args Event arguments.
      */
-    public function base_unansweredCount_handler($sender, $args) {
+    public function QnAPlugin_unansweredCount_handler($sender, $args) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
         // Check for individual categories.
         $categoryIDs = $this->getCategoryIDs();
         $questionCount = Gdn::sql()
