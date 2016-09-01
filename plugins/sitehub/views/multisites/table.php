@@ -1,13 +1,13 @@
 <div class="table-wrap">
-    <table id="multisites" class="AltColumns">
+    <table id="multisites" class="table-data">
         <thead>
         <tr>
             <th><?php echo T('Name'); ?></th>
-            <th><?php echo T('Url'); ?></th>
-            <th><?php echo T('Locale'); ?></th>
+            <th class="column-xl"><?php echo T('Url'); ?></th>
+            <th class="column-sm"><?php echo T('Locale'); ?></th>
             <th><?php echo T('Last Sync'); ?></th>
-            <th><?php echo T('Status'); ?></th>
-            <th><?php echo T('Options'); ?></th>
+            <th class="column-sm"><?php echo T('Status'); ?></th>
+            <th class="column-sm"><?php echo T('Options'); ?></th>
         </tr>
         </thead>
         <tbody>

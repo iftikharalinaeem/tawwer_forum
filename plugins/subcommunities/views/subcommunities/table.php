@@ -1,11 +1,11 @@
 <div class="table-wrap">
-    <table id="SubcommunityTable" class="Sortable AltColumns">
+    <table id="SubcommunityTable" class="Sortable table-data">
         <thead>
         <tr>
-            <th><?php echo t('Name'); ?></th>
+            <th class="column-md"><?php echo t('Name'); ?></th>
             <th><?php echo t('Folder') ?></th>
-            <th><?php echo t('Locale') ?></th>
-            <th><?php echo t('Options') ?></th>
+            <th class="column-sm"><?php echo t('Locale') ?></th>
+            <th class="column-sm"><?php echo t('Options') ?></th>
         </tr>
         </thead>
         <tbody>
