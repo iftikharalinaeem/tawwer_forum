@@ -366,12 +366,13 @@ class GroupController extends Gdn_Controller {
             $Saved = $this->GroupModel->join($Data);
             $Form->setValidationResults($this->GroupModel->validationResults());
 
-            if ($Saved)
-                $this->RedirectUrl = Url(GroupUrl($Group));
+            if ($Saved) {
+                $this->RedirectUrl = url(groupUrl($Group));
+            }
         }
 
         $this->setData('Group', $Group);
-        $this->addBreadcrumb($Group['Name'], GroupUrl($Group));
+        $this->addBreadcrumb($Group['Name'], groupUrl($Group));
         $this->render();
     }
 
