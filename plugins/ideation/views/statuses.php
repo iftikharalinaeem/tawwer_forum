@@ -23,12 +23,12 @@
 <!--    </ol>-->
 <!--</div>-->
 <div class="table-wrap">
-    <table id="statuses" class="AltColumns">
+    <table id="statuses" class="table-data">
         <thead>
         <tr>
-            <th class="NameColumn"><?php echo t('Status'); ?></th>
+            <th class="NameColumn column-lg"><?php echo t('Status'); ?></th>
             <th class="IsOpenColumn"><?php echo t('State'); ?></th>
-            <th class="options"><?php echo t('Options'); ?></th>
+            <th class="options column-sm"><?php echo t('Options'); ?></th>
         </tr>
         </thead>
         <tbody>

@@ -48,10 +48,10 @@ echo $this->Form->Errors();
 <?php echo $this->Form->Close(); ?>
 <?php PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard', 'CssClass' => 'pull-right padded-bottom']); ?>
 <div class="table-wrap">
-<table class="AltColumns table-el">
+<table class="AltColumns table-el table-data">
     <thead>
         <tr>
-            <th class="el-date">Date</th>
+            <th class="el-date column-lg">Date</th>
             <th class="el-message">Message</th>
             <th class="el-user">User</th>
             <th class="el-severity">Severity</th>
