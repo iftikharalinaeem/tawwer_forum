@@ -476,9 +476,6 @@ class BadgeController extends BadgesAppController {
     public function requests() {
         $this->permission('Reputation.Badges.Give');
 
-        $this->RequestData = $this->UserBadgeModel->getRequests();
-        Gdn::userModel()->joinUsers($this->RequestData, array('UserID'));
-
         if ($this->Form->authenticatedPostBack() === true) {
             $Action = $this->Form->getValue('Submit');
             $Requests = $this->Form->getValue('Requests');
@@ -491,14 +488,16 @@ class BadgeController extends BadgesAppController {
                     }
                     if ($Action == 'Approve') {
                         $this->UserBadgeModel->give($Data[0], $Data[1]);
-                    } elseif ($Action == 'Decline')
+                    } elseif ($Action == 'Decline') {
                         $this->UserBadgeModel->declineRequest($Data[0], $Data[1]);
+                    }
                 }
             }
         }
 
-        $this->View = 'requests';
-        $this->render();
+        $this->RequestData = $this->UserBadgeModel->getRequests();
+        Gdn::userModel()->joinUsers($this->RequestData, array('UserID'));
+        $this->render('requests', 'badge');
     }
 
     /**

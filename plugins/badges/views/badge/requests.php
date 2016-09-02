@@ -7,20 +7,25 @@ $Session = Gdn::Session();
     echo $this->Form->Errors();
     $NumRequests = $this->RequestData->NumRows();
     if ($NumRequests == 0) { ?>
-        <div class="padded"><?php echo T('There are currently no requests.'); ?></div>
+        <div class="padded italic"><?php echo T('There are currently no requests.'); ?></div>
     <?php } else { ?>
 <?php
-    $AppText = Plural($NumRequests, 'There is currently %s request.', 'There are currently %s requests.');
-?>
-<div class="padded"><?php echo sprintf($AppText, $NumRequests); ?></div>
-<table class="CheckColumn">
+    $AppText = Plural($NumRequests, 'There is currently %s request.', 'There are currently %s requests.'); ?>
+<div>
+    <?php echo
+    $this->Form->button('Approve', array('type' => 'submit', 'name' => 'Submit', 'value' => 'Approve', 'class' => 'btn btn-primary'));
+    echo $this->Form->button('Decline', array('type' => 'submit', 'name' => 'Submit', 'value' => 'Decline', 'class' => 'btn btn-primary')); ?>
+</div>
+<div class="padded italic"><?php echo sprintf($AppText, $NumRequests); ?></div>
+<div class="table-wrap">
+<table class="table-data">
     <thead>
         <tr>
-            <td><?php echo T('Action'); ?></td>
-            <th class="Alt"><?php echo T('User'); ?></th>
-            <th><?php echo T('BadgeRequestColumnLabel', 'Request'); ?></th>
-            <th class="Alt"><?php echo T('Date'); ?></th>
-            <th><?php echo T('Options'); ?></th>
+            <td class="column-checkbox" data-tj-ignore=true></td>
+            <th class=""><?php echo T('User'); ?></th>
+            <th class="column-lg" data-tj-main=true><?php echo T('BadgeRequestColumnLabel', 'Request'); ?></th>
+            <th class="column-md"><?php echo T('Date'); ?></th>
+            <th class="options column-sm"><?php echo T('Options'); ?></th>
         </tr>
     </thead>
     <tbody>
@@ -29,23 +34,23 @@ $Session = Gdn::Session();
     ?>
         <tr>
             <td><?php echo $this->Form->CheckBox('Requests[]', '', array('value' => $Request->UserID.'-'.$Request->BadgeID)); ?></td>
-            <td class="Alt"><?php echo UserAnchor($Request); ?></td>
-            <td class="Alt"><?php
+            <td><?php echo UserAnchor($Request); ?></td>
+            <td><?php
                 echo Wrap(Anchor($Request->BadgeName, 'badge/'.$Request->Slug), 'strong'), '<br />&ldquo;', $Request->RequestReason, '&rdquo;';
             ?></td>
-            <td class="Alt"><?php echo Gdn_Format::Date($Request->DateRequested); ?></td>
-            <td><?php
-            echo Anchor(T('Approve'), '/badge/approve/'.$Request->UserID.'/'.$Request->BadgeID.'/'.$Session->TransientKey())
-                .', '.Anchor(T('Decline'), '/badge/decline/'.$Request->UserID.'/'.$Request->BadgeID.'/'.$Session->TransientKey());
-            ?></td>
+            <td><?php echo Gdn_Format::Date($Request->DateRequested); ?></td>
+            <td>
+                <div class="btn-group">
+                    <?php
+                    echo anchor(dashboardSymbol('checkmark'), '/badge/approve/'.$Request->UserID.'/'.$Request->BadgeID.'/'.$Session->TransientKey(), 'btn btn-icon', ['aria-label' => t('Approve')]);
+                    echo anchor(dashboardSymbol('delete'), '/badge/decline/'.$Request->UserID.'/'.$Request->BadgeID.'/'.$Session->TransientKey(), 'btn btn-icon', ['aria-label' => t('Delete')]);
+                    ?>
+                </div>
+            </td>
         </tr>
     <?php } ?>
     </tbody>
 </table>
-<div class="Info">
-<?php
-    echo $this->Form->Button('Approve', array('Name' => 'Submit', 'class' => 'SmallButton'));
-    echo $this->Form->Button('Decline', array('Name' => 'Submit', 'class' => 'SmallButton'));
-?></div><?php
-}
+</div>
+<?php }
 echo $this->Form->Close();

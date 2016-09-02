@@ -61,9 +61,7 @@ foreach ($this->Data('Badges') as $Badge) :
             }
             if (CheckPermission('Reputation.Badges.Manage') && $Badge->CanDelete) {
                 echo anchor(dashboardSymbol('delete'), '/badge/delete/'.$Badge->BadgeID.'/?Target='.urlencode($this->SelfUrl), 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'data-content' => ['body' => t('Are you sure you want to delete this badge?')]]);
-            } else {
-                echo wrap(dashboardSymbol('delete'), 'div', ['class' => 'disabled btn btn-icon', 'aria-label' => t('Delete')]);
-            }
+            } 
             if ($Session->CheckPermission('Reputation.Badges.Give') && $Badge->Active) {
                 echo anchor(t('Give'), '/badge/give/'.$Badge->BadgeID, 'js-modal btn btn-icon');
             }
