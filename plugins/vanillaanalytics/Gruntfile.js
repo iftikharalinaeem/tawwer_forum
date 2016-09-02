@@ -26,6 +26,7 @@ module.exports = function (grunt) {
                         src: [
                             'c3/**/*.min.js'
                             , 'd3/**/*.min.js'
+                            , 'jquery-ui/jquery-ui.min.js'
                             , 'js-cookie/**/*.js'
                             , 'momentjs/**/moment.min.js'
                             , 'keen-js/dist/keen.min.js'

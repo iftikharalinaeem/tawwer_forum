@@ -263,6 +263,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $sender->addJsFile('analyticsdashboard.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('analyticswidget.min.js', 'plugins/vanillaanalytics');
         $sender->addJsFile('analyticstoolbar.min.js', 'plugins/vanillaanalytics');
+        $sender->addJsFile('vendors/jquery-ui.min.js', 'plugins/vanillaanalytics');
 
 
         $dashboardModel = new AnalyticsDashboard();
