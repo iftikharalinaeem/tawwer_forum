@@ -266,6 +266,10 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $sender->addJsFile('vendors/jquery-ui.min.js', 'plugins/vanillaanalytics');
 
 
+        // Translations
+        $sender->addDefinition('Unpin from your dashboard', t('Unpin from your dashboard'));
+        $sender->addDefinition('Pin to your dashboard', t('Pin to your dashboard'));
+
         $dashboardModel = new AnalyticsDashboard();
         $dashboard = $dashboardModel->getID($dashboardID);
 
