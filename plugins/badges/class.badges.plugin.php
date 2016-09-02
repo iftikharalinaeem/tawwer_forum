@@ -145,7 +145,7 @@ class BadgesHooks extends Gdn_Plugin {
      * @since 1.0.0
      * @access public
      */
-    public function base_beforeProfileOptions_handler($Sender, &$Args) {
+    public function base_beforeProfileOptions_handler($Sender, $Args) {
         $SideMenu = val('SideMenu', $Args);
 
         // Add 'Give Badge' to profiles
