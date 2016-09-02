@@ -19,13 +19,11 @@ $(document).ready(function() {
                     valueFormat = defaultValueFormat,
                     text, i, title, value, name, bgcolor;
 
-                // one value, no title necessary
-                if (d.length === 1) {
-                    value = valueFormat(d[0].value, d[0].ratio, d[0].id, d[0].index);
-                    return '<div class="popover popover-analytics-single popover-analytics popover-name-" + d[0].id + ">' + value + '</div>';
-                }
+                var date = new Date(d[0].x);
 
-                var text = '<div class="popover popover-analytics">';
+                var text = '<div class="popover popover-analytics">' +
+                    '<div class="title">' + date.toLocaleDateString("en-US") + '</div>' +
+                    '<div class="body">';
                 for (i = 0; i < d.length; i++) {
                     if (text.length === 0) {}
 
@@ -40,7 +38,7 @@ $(document).ready(function() {
                     text += "<div class='value'><span style='color:" + bgcolor + "'>" + value + "</span></div>";
                     text += "</div>";
                 }
-                return text + '</div>';
+                return text + '</div></div>';
             }
         };
     }
