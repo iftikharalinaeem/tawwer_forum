@@ -30,10 +30,10 @@
         <thead>
             <tr>
                 <th class="LevelColumn column-xs"><?php echo T('Level'); ?></th>
-                <th class="NameColumn"><?php echo T('Name'); ?></th>
+                <th class="NameColumn column-md" data-tj-main="true"><?php echo T('Name'); ?></th>
                 <th class=""><?php echo T('Label'); ?></th>
-                <th class="CriteriaColumn column-md"><?php echo T('Criteria'); ?></th>
-                <th class="AbilitiesColumn column-md"><?php echo T('Abilites'); ?></th>
+                <th class="CriteriaColumn column-lg"><?php echo T('Criteria'); ?></th>
+                <th class="AbilitiesColumn column-lg"><?php echo T('Abilites'); ?></th>
                 <th class="options column-sm"><?php echo T('Options'); ?></th>
             </tr>
         </thead>
@@ -41,7 +41,7 @@
             <?php foreach ($this->Data('Ranks') as $Row): ?>
             <tr id="Rank_<?php echo $Row['RankID']; ?>">
                 <td class="LevelColumn"><?php echo $Row['Level']; ?></td>
-                <td class="NameColumn"><div class="CellWrap">
+                <td class="NameColumn"><div class="strong">
                     <?php
                     echo $Row['Name'];
                     ?></div>
