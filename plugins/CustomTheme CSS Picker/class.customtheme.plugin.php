@@ -274,7 +274,10 @@ class CustomThemePlugin implements Gdn_IPlugin {
 	/**
 	 * Write the button to customize the current theme.
 	 */
-	public function SettingsController_AfterCurrentTheme_Handler($Sender) {
+	public function SettingsController_AfterCurrentTheme_Handler($sender, $args) {
+		if (val('IsMobile', $args)) {
+			return;
+		}
 		if ($this->_CanCustomizeTheme())
 			echo Wrap(sprintf(T('You can customize the HTML and CSS for this theme on the %s page.'), Anchor('Customize Theme', 'settings/customtheme')), 'div', array('class' => 'CustomThemeOptions'));
 
