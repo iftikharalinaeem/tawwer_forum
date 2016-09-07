@@ -8,16 +8,17 @@
  */
 
 $PluginInfo['samlsso'] = [
-     'Name' => 'SAML SSO',
-     'Description' => 'Allows Vanilla to SSO to a SAML 2.0 compliant identity provider.',
-     'Version' => '1.3.0',
-     'RequiredApplications' => ['Vanilla' => '2.1'],
-     'RequiredTheme' => false,
-     'RequiredPlugins' => false,
-     'HasLocale' => false,
-     'SettingsUrl' => '/settings/samlsso',
-     'SettingsPermission' => 'Garden.Settings.Manage',
-     'MobileFriendly' => true
+    'Name' => 'SAML SSO',
+    'Description' => 'Allows Vanilla to SSO to a SAML 2.0 compliant identity provider.',
+    'Version' => '1.3.0',
+    'RequiredApplications' => ['Vanilla' => '2.1'],
+    'RequiredTheme' => false,
+    'RequiredPlugins' => false,
+    'HasLocale' => false,
+    'SettingsUrl' => '/settings/samlsso',
+    'SettingsPermission' => 'Garden.Settings.Manage',
+    'MobileFriendly' => true,
+    'HasPopupFriendlySettings' => false,
 ];
 
 /**
@@ -27,6 +28,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
     /**  */
     const ProviderKey = 'saml';
+    const IdentifierFormat = 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified';
 
     /** @var null  */
     protected $_Provider = null;
@@ -68,7 +70,12 @@ class SamlSSOPlugin extends Gdn_Plugin {
         if (!$this->isConfigured() || $this->isDefault()) {
             return;
         }
-        echo ' '.$this->signInButton().' ';
+
+        $providers = $this->getProvider();
+        foreach ($providers as $provider) {
+            echo ' '.$this->signInButton($provider).' ';
+        }
+
     }
 
     /**
@@ -83,12 +90,15 @@ class SamlSSOPlugin extends Gdn_Plugin {
         if (!$this->isConfigured()) {
             return;
         }
-        if (isset($sender->Data['Methods'])) {
-            // Add the sign in button method to the controller.
+
+        $providers = $this->getProvider();
+
+        foreach ($providers as $provider) {
             $method = [
-                'Name' => self::ProviderKey,
-                'SignInHtml' => $this->signInButton()
+                'Name' => $provider['Name'],
+                'SignInHtml' => $this->signInButton($provider),
             ];
+
             $sender->Data['Methods'][] = $method;
         }
     }
@@ -96,10 +106,10 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      * @return OneLogin_Saml_Settings
      */
-    public function getSettings() {
+    public function getSettings($authenticationKey) {
         self::requireFiles();
         $settings = new OneLogin_Saml_Settings();
-        $provider = $this->provider();
+        $provider = $this->getProvider($authenticationKey);
         $settings->idpSingleSignOnUrl = $provider['SignInUrl'];
         $settings->idpSingleSignOutUrl = $provider['SignOutUrl'];
         $settings->idpPublicCertificate = $provider['AssociationSecret'];
@@ -119,28 +129,46 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @return bool True if there is a secret and a client_id, false if not.
      */
     protected function isConfigured() {
-        $provider = $this->provider();
-        return $provider['AssociationSecret'] && $provider['EntityID'] && $provider['SignInUrl'];
+        $providers = $this->getProvider();
+        foreach($providers as $provider) {
+            if ($provider['AssociationSecret'] && $provider['EntityID'] && $provider['SignInUrl']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
      * Check authentication provider table to see if this is the default method for logging in.
      *
-     * @return bool Return the value of the IsDefault row of GDN_UserAuthenticationProvider .
+     * @return mixed Return the default samlProvider or false.
      */
     public function isDefault() {
-        $provider = $this->provider();
-        return (bool)$provider['IsDefault'];
+        return (bool)$this->getDefaultProvider();
     }
 
     /**
+     * Check authentication provider table to see if this is the default method for logging in.
      *
+     * @return mixed Return the default samlProvider or false.
      */
-    public function provider() {
-        if ($this->_Provider === null) {
-            $this->_Provider = Gdn_AuthenticationProviderModel::getProviderByKey(self::ProviderKey);
+    public function getDefaultProvider() {
+        static $result;
+
+        if ($result === null) {
+            $result = false;
+
+            $providers = $this->getProvider();
+            foreach ($providers as $provider) {
+                if ($provider['IsDefault']) {
+                    $result = $provider;
+                    break;
+                }
+            }
         }
-        return $this->_Provider;
+
+        return $result;
     }
 
     /**
@@ -156,62 +184,6 @@ class SamlSSOPlugin extends Gdn_Plugin {
         require_once "$root/saml/LogoutRequest.php";
         require_once "$root/saml/LogoutResponse.php";
         require_once "$root/saml/XmlSec.php";
-    }
-
-    /**
-     *
-     */
-    public function setup() {
-        $this->structure();
-    }
-
-    /**
-     *
-     *
-     * @param $cert
-     * @return mixed|string
-     */
-    public static function trimCert($cert) {
-        $cert = preg_replace('`-----[^-]*-----`i', '', $cert);
-        $cert = trim(str_replace(["\r", "\n"], '', $cert));
-        return $cert;
-    }
-
-    /**
-     *
-     *
-     * @param $cert
-     * @param string $type
-     * @return string
-     */
-    public static function untrimCert($cert, $type = 'CERTIFICATE') {
-        if (strpos($cert, '---BEGIN') === false) {
-            // Convert the secret to a proper x509 certificate.
-            $x509cert = trim(str_replace(["\r", "\n"], "", $cert));
-            $x509cert = "-----BEGIN $type-----\n".chunk_split($x509cert, 64, "\n")."-----END $type-----\n";
-            $cert = $x509cert;
-        }
-        return $cert;
-    }
-
-    /**
-     *
-     */
-    public function structure() {
-        // Make sure we have the saml provider.
-        $Provider = Gdn_AuthenticationProviderModel::getProviderByKey('saml');
-
-        if (!$Provider) {
-            $Model = new Gdn_AuthenticationProviderModel();
-            $Provider = [
-                'AuthenticationKey' => 'saml',
-                'AuthenticationSchemeAlias' => 'saml',
-                'Name' => C('Garden.Title'),
-                'IdentifierFormat' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified'
-                ];
-
-            $Model->save($Provider);
-        }
     }
 
     /**
@@ -261,7 +233,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @param $Args
      */
     public function entryController_overrideSignIn_handler($Sender, $Args) {
-        $Provider = $Args['DefaultProvider'];
+        $Provider = $Args['getDefaultProvider'];
         if ($Provider['AuthenticationSchemeAlias'] != 'saml') {
             return;
         }
@@ -298,7 +270,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function entryController_overrideSignOut_handler($sender, $args) {
-        $provider = $args['DefaultProvider'];
+        $provider = $args['getDefaultProvider'];
         if ($provider['AuthenticationSchemeAlias'] != 'saml' || !$provider['SignOutUrl']) {
             return;
         }
@@ -458,74 +430,46 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param SettingsController $Sender
-     * @param string $Action
+     * @param SettingsController $sender
+     * @param string $action
      */
-    public function settingsController_samlSSO_create($Sender, $Action = '') {
-        $Sender->permission('Garden.Settings.Manage');
-        $this->Sender = $Sender;
+    public function settingsController_samlSSO_create($sender, $authenticationKey = '', $action = '') {
+        $sender->permission('Garden.Settings.Manage');
+        $this->Sender = $sender;
 
-        switch ($Action) {
-            case 'metadata':
-            case 'metadata.xml':
-                return $this->metaData($Sender);
-                break;
+        if ($authenticationKey && in_array($action, ['metadata', 'metadata.xml'])) {
+            return $this->metaData($authenticationKey);
         }
 
-        $Model = new Gdn_AuthenticationProviderModel();
-        $Form = new Gdn_Form();
-        $Form->setModel($Model);
-        $Sender->Form = $Form;
+        $providers = $this->getProvider();
+        $sender->setData('Providers', $providers);
 
-        if ($Form->authenticatedPostBack()) {
-            $Form->setFormValue('AuthenticationKey', 'saml');
+        $sender->setData('Title', sprintf(t('%s Settings'), 'SAML SSO'));
+        $this->render('settings');
+    }
 
-            // Make sure the key is in the correct form.
-            $secret = $Form->getFormValue('AssociationSecret');
-            $Form->setFormValue('AssociationSecret', self::untrimCert($secret));
-
-            $key = $Form->getFormValue('PrivateKey');
-            $Form->SetFormValue('PrivateKey', self::untrimCert($key, 'RSA PRIVATE KEY'));
-
-            $key = $Form->getFormValue('PublicKey');
-            $Form->setFormValue('PublicKey', self::untrimCert($key, 'RSA PUBLIC KEY'));
-
-            if ($Form->save()) {
-                $Sender->informMessage(T('Saved'));
-            }
+    /**
+     * Return a specific or all saml provider.
+     *
+     * @param int $clientID
+     * @return array A specific or all saml provider.
+     */
+    private function getProvider($authenticationKey = null) {
+        if ($authenticationKey !== null) {
+            $where = ['AuthenticationKey' => $authenticationKey];
         } else {
-            $Provider = Gdn_AuthenticationProviderModel::getProviderByKey('saml');
-            trace($Provider);
-            $Form->setData($Provider);
+            $where = ['AuthenticationSchemeAlias' => 'saml'];
         }
 
-        // Set up the form.
-        $_Form = [
-            'EntityID' => [],
-            'Name' => [],
-            'SignInUrl' => [],
-            'SignOutUrl' => [],
-            'RegisterUrl' => [],
-            'AssociationSecret' => ['LabelCode' => 'IDP Certificate', 'Options' => ['Multiline' => true, 'Class' => 'TextBox BigInput']],
-            'IdentifierFormat' => [],
-            'IsDefault' => ['Control' => 'CheckBox', 'LabelCode' => 'Make this connection your default signin method.'],
-            'SpPrivateKey' => ['LabelCode' => 'SP Private Key', 'Description' => 'If you want to sign your requests then you need this key.', 'Options' => ['Multiline' => true, 'Class' => 'TextBox BigInput']],
-            'SpCertificate' => ['LabelCode' => 'SP Certificate', 'Description' => 'This is the certificate that you will give to your IDP.', 'Options' => ['Multiline' => true, 'Class' => 'TextBox BigInput']],
-            'SignoutWithSAML' => ['Control' => 'CheckBox', 'LabelCode' => 'Only sign out with valid SAML logout requests.'],
-            'Metadata' => ['Control' => 'Callback', 'Callback' => function($form) {
-                    return $form->label('Metadata').
-                        '<div class="Info">'.
-                            'You can get the metadata for this service provider here: '.
-                            Anchor('get metadata', '/settings/samlsso/metadata.xml', '', ['target' => '_blank']).'.'.
-                        '</div>';
-                }
-            ]
-        ];
+        $dataSet = Gdn::sql()->getWhere('UserAuthenticationProvider', $where);
+        $dataSet->expandAttributes();
+        $result = $dataSet->resultArray();
 
-        $Sender->setData('_Form', $_Form);
-        $Sender->addSideMenu();
-        $Sender->setData('Title', sprintf(t('%s Settings'), 'SAML SSO'));
-        $this->render('Settings');
+        if ($authenticationKey) {
+            return val(0, $result);
+        } else {
+            return $result;
+        }
     }
 
     /**
@@ -534,40 +478,24 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @param string $type Either button or icon to be output.
      * @return string Resulting HTML element (button).
      */
-    protected function signInButton($type = 'button') {
-        $url = '/entry/' . self::ProviderKey;
-        $provider = $this->provider();
-
-        if ($type === 'icon') {
-            return socialSignInButton(
-                'SAMLSSO',
-                $url,
-                $type,
-                [
-                    'class' => 'default',
-                    'rel' => 'nofollow',
-                    'title' => 'Sign in with SAML'
-                ]
-            );
-        } else {
-            return anchor(
-                sprintf(t('Sign In with %s'), $provider['Name']),
-                $url,
-                'Button Primary SignInLink'
-            );
-        }
+    protected function signInButton($provider) {
+        return anchor(
+            sprintf(t('Sign In with %s'), $provider['Name']),
+            '/entry/saml/'.$provider['AuthenticationKey'],
+            'Button Primary SignInLink'
+        );
     }
 
     /**
      *
      *
      */
-    protected function metaData() {
-        $Settings = $this->getSettings();
-        $Meta = new OneLogin_Saml_Metadata($Settings);
-        $Meta->validSeconds = strtotime(C('Plugins.samlsso.ValidSeconds', '+5 years'), 0);
+    protected function metaData($authenticationKey) {
+        $settings = $this->getSettings($authenticationKey);
+        $meta = new OneLogin_Saml_Metadata($settings);
+        $meta->validSeconds = strtotime(c('Plugins.samlsso.ValidSeconds', '+5 years'), 0);
 
         header('Content-Type: application/xml; charset=UTF-8');
-        die($Meta->getXml());
+        die($meta->getXml());
     }
 }
