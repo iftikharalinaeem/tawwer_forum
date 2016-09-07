@@ -1,9 +1,9 @@
-<?php if (!defined('APPLICATION')) exit(); 
+<?php if (!defined('APPLICATION')) exit();
     $Title = ($this->User->UserID == Gdn::Session()->UserID) ? T('MyBadgesModuleTitle', 'My Badges') : T('BadgesModuleTitle', 'Badges');
     $Title = T($Title);
 ?>
 <div id="Badges" class="Box BadgeGrid<?php if (!count($this->Badges)) echo ' NoItems'; ?>">
-    <h4><?php echo $Title; ?></h4>
+    <?php echo panelHeading($Title); ?>
     <div class="PhotoGrid">
     <?php
     if (count($this->Badges) > 20)
