@@ -1,46 +1,42 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo $this->Data('Title'); ?></h1>
-<div class="Warning">
+<div class="alert alert-warning padded">
    <?php
-   echo T('Warning: This is for advanced users.');
-   ?>
-</div>
-<div class="Help Aside">
-   <?php
-   echo '<h2>', T('Need More Help?'), '</h2>';
-   echo '<ul>';
-   echo '<li>', Anchor(T('Vanilla Sphinx Help'), 'http://vanillaforums.org/docs/sphinx'), '</li>';
-   echo '</ul>';
+   echo t('Warning: This is for advanced users.');
    ?>
 </div>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+Gdn_Theme::assetBegin('Help');
+echo '<h2>', t('Need More Help?'), '</h2>';
+echo '<ul>';
+echo '<li>', anchor(t('Vanilla Sphinx Help'), 'http://vanillaforums.org/docs/sphinx'), '</li>';
+echo '</ul>';
+Gdn_Theme::assetEnd();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
+<?php echo '<div class="padded">',
+t('Enter the connection settings for your sphinx server below.'),
+'</div>'; ?>
 <ul>
-   <li>
+   <li class="form-group row">
       <?php
-      echo '<div class="Info">',
-         T('Enter the connection settings for your sphinx server below.'),
-         '</div>';
+         echo $this->Form->labelWrap('Server', 'Plugins.Sphinx.Server');
+         echo $this->Form->textBoxWrap('Plugins.Sphinx.Server');
       ?>
    </li>
-   <li>
+   <li class="form-group row">
       <?php
-         echo $this->Form->Label('Server', 'Plugins.Sphinx.Server');
-         echo $this->Form->TextBox('Plugins.Sphinx.Server');
+         echo $this->Form->labelWrap('Port', 'Plugins.Sphinx.Port');
+         echo $this->Form->textBoxWrap('Plugins.Sphinx.Port', array('class' => 'InputBox SmallInput'));
       ?>
    </li>
-   <li>
-      <?php
-         echo $this->Form->Label('Port', 'Plugins.Sphinx.Port');
-         echo $this->Form->TextBox('Plugins.Sphinx.Port', array('class' => 'InputBox SmallInput'));
-      ?>
-   </li>
-   <li>
-      <?php
-         echo $this->Form->CheckBox('Plugins.Sphinx.UseDeltas', T('Use delta indexes', 'Use delta indexes (recommended for massive sites)'));
-      ?>
+   <li class="form-group row">
+      <div class="input-wrap no-label">
+         <?php echo $this->Form->checkBox('Plugins.Sphinx.UseDeltas', T('Use delta indexes', 'Use delta indexes (recommended for massive sites)')); ?>
+      </div>
    </li>
 </ul>
-<?php echo $this->Form->Close('Save'); ?>
+<div class="form-footer js-modal-footer">
+   <?php echo $this->Form->close('Save'); ?>
+</div>
