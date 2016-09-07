@@ -336,7 +336,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
         $request = Gdn::request();
         $path = $request->path();
-        if (strpos($path, 'profile/warn') !== false) {
+        if (strpos($path, 'profile/warn') === false) {
             return;
         }
 
