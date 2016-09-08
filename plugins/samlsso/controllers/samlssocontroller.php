@@ -6,6 +6,8 @@ class SAMLSSOController extends PluginController {
     }
 
     public function edit($authenticationKey = null) {
+        $this->Permission('Garden.Settings.Manage');
+
         $model = new Gdn_AuthenticationProviderModel();
         $form = new Gdn_Form();
         $form->setModel($model);

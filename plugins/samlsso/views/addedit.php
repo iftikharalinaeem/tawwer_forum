@@ -24,5 +24,5 @@ echo $this->Form->simple($this->data('FormStructure'));
 <div class="form-footer">
     <?php echo $this->Form->button('Save'); ?>
 </div>
-
+<?php
 echo $this->Form->close();

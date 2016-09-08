@@ -106,7 +106,12 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      * @return OneLogin_Saml_Settings
      */
-    public function getSettings($authenticationKey) {
+    public function getSettings($authenticationKey = false) {
+        file_put_contents(__DIR__.'/output.txt', print_r([debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), $_SERVER], true).PHP_EOL);
+
+        if ($authenticationKey === false) {
+            die('NOPE');
+        }
         self::requireFiles();
         $settings = new OneLogin_Saml_Settings();
         $provider = $this->getProvider($authenticationKey);
@@ -115,7 +120,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $settings->idpPublicCertificate = $provider['AssociationSecret'];
         $settings->requestedNameIdFormat = $provider['IdentifierFormat'];
         $settings->spIssuer = val('EntityID', $provider, $provider['Name']);
-        $settings->spReturnUrl = url('/entry/connect/saml', true);
+        $settings->spReturnUrl = url('/entry/connect/saml?authKey='.urlencode($authenticationKey), true);
         $settings->spSignoutReturnUrl = url('/entry/signout', true);
         $settings->spPrivateKey = val('SpPrivateKey', $provider);
         $settings->spCertificate = val('SpCertificate', $provider);
@@ -246,10 +251,10 @@ class SamlSSOPlugin extends Gdn_Plugin {
      *
      * @param EntryController $Sender
      */
-    public function entryController_saml_create($Sender) {
-        $settings = $this->getSettings();
+    public function entryController_saml_create($sender, $args) {
+        $settings = $this->getSettings(val(0, $args));
         $request = new OneLogin_Saml_AuthRequest($settings);
-        $request->isPassive = (bool)$Sender->Request->get('ispassive');
+        $request->isPassive = (bool)$sender->Request->get('ispassive');
 
         if ($target = Gdn::request()->get('Target'))
             $request->relayState = $target;
@@ -329,9 +334,14 @@ class SamlSSOPlugin extends Gdn_Plugin {
         if (val(0, $Args) != 'saml') {
             return;
         }
+        $authenticationKey = $Sender->Request->get('authKey');
+        if (!$authenticationKey) {
+            return;
+        }
 
-        if (!$Sender->Request->isPostBack())
+        if (!$Sender->Request->isPostBack()) {
             throw ForbiddenException('GET');
+        }
 
         $saml = Gdn::session()->stash('samlsso', '', false);
         if ($saml) {
@@ -340,7 +350,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
             $profile = $saml['profile'];
         } else {
             // Grab the saml session from the saml response.
-            $settings = $this->getSettings();
+            $settings = $this->getSettings($authenticationKey);
             $response = new OneLogin_Saml_Response($settings, $Sender->Request->post('SAMLResponse'));
 
             Logger::event('saml_response_received', Logger::INFO, "SAML response received.");
@@ -358,7 +368,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
             Gdn::session()->stash('samlsso', ['id' => $id, 'profile' => $profile]);
         }
 
-        $provider = $this->provider();
+        $provider = $this->getProvider($authenticationKey);
 
         $Form = $Sender->Form; //new Gdn_Form();
         $Form->setFormValue('UniqueID', $id);
