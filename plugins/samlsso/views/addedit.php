@@ -1,6 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="header-block">
     <h1><?php echo $this->data('Title'); ?></h1>
+    <?php echo anchor(t('Return to settings'), '/settings/samlsso', 'btn btn-primary'); ?>
 </div>
 <?php
 $authenticationKey = $this->data('AuthenticationKey');
