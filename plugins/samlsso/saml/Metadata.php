@@ -73,7 +73,7 @@ METADATA_TEMPLATE;
     protected static function keyDescriptor($cert, $use = 'signing') {
        $x509 = openssl_x509_read($cert);
        openssl_x509_export($x509, $str_cert);
-       $str_cert = SamlSSOPlugin::TrimCert($str_cert);
+       $str_cert = SamlSSOPlugin::trimCert($str_cert);
 
        $result = <<<EOT
 <md:KeyDescriptor use="$use">

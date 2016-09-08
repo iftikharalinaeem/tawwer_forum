@@ -13,6 +13,8 @@ class SAMLSSOController extends PluginController {
     public function edit($authenticationKey = null) {
         $this->permission('Garden.Settings.Manage');
 
+        $this->setData('AuthenticationKey', $authenticationKey);
+
         $model = new Gdn_AuthenticationProviderModel();
         $form = $this->Form;
         $form->setModel($model);
@@ -21,6 +23,10 @@ class SAMLSSOController extends PluginController {
         $formStructure = [
             'AuthenticationKey' => [
                 'LabelCode' => 'Connexion ID',
+                'Description' => t('The connexion ID uniquely identifies this connection. (Letters and digits only'),
+            ],
+            'EntityID' => [
+                'LabelCode' => 'Entity ID',
                 'Description' => t('The connexion ID uniquely identifies this connection.'),
             ],
             'Name' => [
@@ -70,20 +76,21 @@ class SAMLSSOController extends PluginController {
         if ($form->authenticatedPostBack()) {
             $editedAuthenticationKey = $form->getFormValue('AuthenticationKey');
 
-            $form->setFormValue('EntityID', $editedAuthenticationKey);
             $form->setFormValue('AuthenticationSchemeAlias', 'saml');
 
             // Make sure the keys are in the correct form.
             $secret = $form->getFormValue('AssociationSecret');
-            $form->setFormValue('AssociationSecret', $this->untrimCert($secret));
+            $form->setFormValue('AssociationSecret', SamlSSOPlugin::untrimCert($secret));
 
             $key = $form->getFormValue('PrivateKey');
-            $form->setFormValue('PrivateKey', $this->untrimCert($key, 'RSA PRIVATE KEY'));
+            $form->setFormValue('PrivateKey', SamlSSOPlugin::untrimCert($key, 'RSA PRIVATE KEY'));
 
             $key = $form->getFormValue('PublicKey');
-            $form->setFormValue('PublicKey', $this->untrimCert($key, 'RSA PUBLIC KEY'));
+            $form->setFormValue('PublicKey', SamlSSOPlugin::untrimCert($key, 'RSA PUBLIC KEY'));
 
             $form->validateRule('AuthenticationKey', 'ValidateRequired', sprintf(t('%s is required.'), $formStructure['AuthenticationKey']['LabelCode']));
+            $form->validateRule('AuthenticationKey', 'regex:/^[a-zA-Z0-9]+$/', sprintf(t('%s must be composed of letters and digits only.'), $formStructure['AuthenticationKey']['LabelCode']));
+            $form->validateRule('EntityID', 'ValidateRequired', sprintf(t('%s is required.'), $formStructure['EntityID']['LabelCode']));
             $form->validateRule('Name', 'ValidateRequired', sprintf(t('%s is required.'), $formStructure['Name']['LabelCode']));
             $form->validateRule('IdentifierFormat', 'ValidateRequired', sprintf(t('%s is required.'), $formStructure['IdentifierFormat']['LabelCode']));
 
@@ -100,7 +107,6 @@ class SAMLSSOController extends PluginController {
         } elseif ($authenticationKey !== null) {
             $provider = Gdn_AuthenticationProviderModel::getProviderByKey($authenticationKey);
             $form->setData($provider);
-            $this->setData('AuthenticationKey', $authenticationKey);
         }
 
         $this->setData('FormStructure', $formStructure);
@@ -129,34 +135,5 @@ class SAMLSSOController extends PluginController {
 
         $this->RedirectUrl = url('/settings/samlsso');
         $this->render('blank', 'utility', 'dashboard');
-    }
-
-    /**
-     *
-     *
-     * @param $cert
-     * @return mixed|string
-     */
-    protected function trimCert($cert) {
-        $cert = preg_replace('`-----[^-]*-----`i', '', $cert);
-        $cert = trim(str_replace(["\r", "\n"], '', $cert));
-        return $cert;
-    }
-
-    /**
-     *
-     *
-     * @param $cert
-     * @param string $type
-     * @return string
-     */
-    protected function untrimCert($cert, $type = 'CERTIFICATE') {
-        if (strpos($cert, '---BEGIN') === false) {
-            // Convert the secret to a proper x509 certificate.
-            $x509cert = trim(str_replace(["\r", "\n"], "", $cert));
-            $x509cert = "-----BEGIN $type-----\n".chunk_split($x509cert, 64, "\n")."-----END $type-----\n";
-            $cert = $x509cert;
-        }
-        return $cert;
     }
 }

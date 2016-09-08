@@ -15,7 +15,7 @@
         <tr>
             <th><?php echo t('Client ID'); ?></th>
             <th><?php echo t('Site Name'); ?></th>
-            <th><?php echo t('Authentication URL'); ?></th>
+            <th class="column-lg"><?php echo t('SignIn URL'); ?></th>
             <th class="options column-sm"><?php echo t('Options'); ?></th>
         </tr>
         </thead>
@@ -32,10 +32,10 @@
                     <?php echo $provider['Name']; ?>
                 </td>
                 <td>
-                    <?php echo $provider['AuthenticateUrl']; ?>
+                    <?php echo $provider['SignInUrl']; ?>
                 </td>
                 <td>
-                    <div class="btn-group column-sm">
+                    <div class="btn-group">
                     <?php
                         echo anchor(dashboardSymbol('edit'), "/samlsso/edit/{$provider['AuthenticationKey']}", 'btn btn-icon', ['aria-label' => t('Edit')]);
                         echo anchor(dashboardSymbol('delete'), "/samlsso/delete/{$provider['AuthenticationKey']}", 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete')]);
