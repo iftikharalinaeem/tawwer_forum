@@ -1037,19 +1037,34 @@ class GroupModel extends Gdn_Model {
      */
     public function delete($Where = '', $Limit = false, $ResetData = false) {
         // Get list of matching groups
-        $MatchGroups = $this->getWhere($Where,'','',$Limit);
+        $matchGroups = $this->getWhere($Where,'','',$Limit);
+        // Clean up UserGroups
+        $groupIDs = array();
+        foreach ($matchGroups as $event) {
+            $groupIDs[] = val('GroupID', $event);
+        }
+
+        // Add Logging on deletion of groups
+        LogModel::beginTransaction();
+        // Get the row(s) of the group(s) being deleted to save to the log.
+        $groups = $this->SQL->getWhere('Group', ['GroupID' => $groupIDs])->resultArray();
+        // Include the first 20 applicants and users in the log
+        $groupMembers = $this->SQL->getWhere('UserGroup', ['GroupID' => $groupIDs], "", "asc", 20)->resultArray();
+        $groupApplicants = $this->SQL->getWhere('GroupApplicant', ['GroupID' => $groupIDs], "", "asc", 20)->resultArray();
+
+        $data['_Data']['Group'] = $groups;
+        $data['_Data']['GroupMembers'] = $groupMembers;
+        $data['_Data']['GroupApplicants'] = $groupApplicants;
+        LogModel::insert('Delete', 'Group', $data);
+
+        LogModel::endTransaction();
 
         // Delete groups
-        $Deleted = parent::delete($Where, $Limit, $ResetData);
+        $deleted = parent::delete($Where, $Limit, $ResetData);
 
-        // Clean up UserGroups
-        $GroupIDs = array();
-        foreach ($MatchGroups as $Event) {
-            $GroupIDs[] = GetValue('GroupID', $Event);
-        }
-        $this->SQL->delete('UserGroup', ['GroupID'=> $GroupIDs]);
-        $this->SQL->delete('GroupApplicant', ['GroupID' => $GroupIDs]);
+        $this->SQL->delete('UserGroup', ['GroupID'=> $groupIDs]);
+        $this->SQL->delete('GroupApplicant', ['GroupID' => $groupIDs]);
 
-        return $Deleted;
+        return $deleted;
     }
 }
