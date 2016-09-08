@@ -232,13 +232,14 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function entryController_overrideSignIn_handler($Sender, $Args) {
-        $Provider = $Args['getDefaultProvider'];
-        if ($Provider['AuthenticationSchemeAlias'] != 'saml') {
+    public function entryController_overrideSignIn_handler($sender, $args) {
+        $provider = $args['DefaultProvider'];
+        if ($provider['AuthenticationSchemeAlias'] != 'saml') {
             return;
         }
 
-        $this->entryController_saml_create($Sender, $Args);
+        $args[0] = $provider['AuthenticationKey'];
+        $this->entryController_saml_create($sender, $args);
     }
 
     /**
@@ -270,7 +271,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function entryController_overrideSignOut_handler($sender, $args) {
-        $provider = $args['getDefaultProvider'];
+        $provider = $args['DefaultProvider'];
         if ($provider['AuthenticationSchemeAlias'] != 'saml' || !$provider['SignOutUrl']) {
             return;
         }
@@ -280,7 +281,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $get = $sender->Request->get();
         $samlRequest = $sender->Request->get('SAMLRequest');
         $samlResponse = $sender->Request->get('SAMLResponse');
-        $settings = $this->getSettings();
+        $settings = $this->getSettings($provider['AuthenticationKey']);
 
         if ($samlRequest) {
             // The user signed out from the other site.
@@ -304,6 +305,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
                 redirect('/');
             }
         } else {
+            $saml = Gdn::session()->stash('samlsso', '', false);
             if (!val('SignoutWithSAML', $provider)
                  && (Gdn::session()->validateTransientKey($args['TransientKey']) || Gdn::request()->isPostBack())) {
 
@@ -313,7 +315,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
             // The user is signing out from Vanilla and must make a request.
             if (val('idpSingleSignOutUrl', $settings)) {
                  $request = new OneLogin_Saml_LogoutRequest($settings);
-                 $url = $request->getRedirectUrl();
+                 $url = $request->getRedirectUrl($saml['id']);
                  redirect($url);
             }
         }
@@ -369,15 +371,15 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $Form->setFormValue('UniqueID', $id);
         $Form->setFormValue('Provider', $authenticationKey);
         $Form->setFormValue('ProviderName', $provider['Name']);
-        $Form->setFormValue('Name', $this->rval('uid', $profile));
-        $Form->setFormValue('FullName', $this->rval('cn', $profile));
-        $Form->setFormValue('Email', $this->rval('mail', $profile));
-        $Form->setFormValue('Photo', $this->rval('photo', $profile));
+        $Form->setFormValue('Name', 'SSOAccount');
+        $Form->setFormValue('FullName', 'SSOAccount');
+        $Form->setFormValue('Email', 'ssoaccount@mailinator.com');
+        $Form->setFormValue('Photo', false);
 
         // Don't overwrite ConnectName if it already exists.
-        if ($this->rval('uid', $profile)) {
-            $Form->setFormValue('ConnectName', $this->rval('uid', $profile));
-        }
+        //if ($this->rval('uid', $profile)) {
+            $Form->setFormValue('ConnectName', 'SSOAccount');
+        //}
 
         $roles = $this->rval('roles', $profile);
         if ($roles) {

@@ -30,7 +30,7 @@ class OneLogin_Saml_LogoutRequest
      *
      * @return string A fully qualified URL that can be redirected to in order to process the authorization request.
      */
-    public function getRedirectUrl()
+    public function getRedirectUrl($nameID)
     {
         $id = $this->generateUniqueID();
         $issueInstant = $this->getTimestamp();
@@ -45,7 +45,7 @@ class OneLogin_Saml_LogoutRequest
     Destination="{$this->_settings->spSignoutReturnUrl}">
     <saml:Issuer>{$this->_settings->spIssuer}</saml:Issuer>
     <saml:NameID
-        Format="{$this->_settings->requestedNameIdFormat}"></saml:NameID>
+        Format="{$this->_settings->requestedNameIdFormat}">{$nameID}</saml:NameID>
 </samlp:LogoutRequest>
 AUTHNREQUEST;
 
