@@ -238,16 +238,17 @@ class SamlSSOPlugin extends Gdn_Plugin {
             return;
         }
 
+        $authenticationKey = $provider['AuthenticationKey'];
         saveToConfig('Garden.SSO.Signout', 'none', false);
 
         $get = $sender->Request->get();
         $samlRequest = $sender->Request->get('SAMLRequest');
         $samlResponse = $sender->Request->get('SAMLResponse');
-        $settings = $this->getSettings($provider['AuthenticationKey']);
+        $settings = $this->getSettings($authenticationKey);
 
         if ($samlRequest) {
             // The user signed out from the other site.
-            $valid = $this->validateSignature($get, 'SAMLRequest', $id);
+            $valid = $this->validateSignature($get, $settings, 'SAMLRequest', $id);
 
             if ($valid) {
                 Gdn::session()->end();
@@ -260,7 +261,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
             }
         } elseif ($samlResponse) {
             // The user signed out from vanilla and is now coming back.
-            $valid = $this->validateSignature($get, 'SAMLResponse');
+            $valid = $this->validateSignature($get, $settings, 'SAMLResponse');
 
             if ($valid) {
                 Gdn::session()->end();
@@ -333,12 +334,10 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @param string $name  The key we should validate the query against.
      * @return bool True if valid, false otherwise.
      */
-    public function validateSignature(array $data, $name = 'SAMLResponse', &$id = null) {
+    public function validateSignature(array $data, $settings, $name, &$id = null) {
         if (!array_key_exists($name, $data) || !array_key_exists('SigAlg', $data) || !array_key_exists('Signature', $data)) {
             return false;
         }
-
-        $settings = $this->getSettings();
 
 		$sigAlg = $data['SigAlg'];
 		$signature = $data['Signature'];
