@@ -42,23 +42,23 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $sender->addCssFile('saml.css', 'plugins/samlsso');
     }
 
-    /**
-     * Force a saml authentication to the identity provider.
-     *
-     * @param bool $passive Whether or not to make a passive request.
-     * @param string $target The target url to redirect to after the signin.
-     */
-    public function authenticate($passive = false, $target = false) {
-        $settings = $this->getSettings();
-        $request = new OneLogin_Saml_AuthRequest($settings);
-        $request->isPassive = $passive;
-        $request->relayState = $target;
-        $url = $request->getRedirectUrl();
-        Gdn::session()->stash('samlsso', null, true);
-        Logger::event('saml_authrequest_sent', Logger::INFO, 'SAML request {requetid} sent to {requesthost}.',
-             ['requestid' => $request->lastID, 'requesthost' => parse_url($url, PHP_URL_HOST), 'requesturl' => $url]);
-        redirect($url);
-    }
+//    /**
+//     * Force a saml authentication to the identity provider.
+//     *
+//     * @param bool $passive Whether or not to make a passive request.
+//     * @param string $target The target url to redirect to after the signin.
+//     */
+//    public function authenticate($passive = false, $target = false) {
+//        $settings = $this->getSettings();
+//        $request = new OneLogin_Saml_AuthRequest($settings);
+//        $request->isPassive = $passive;
+//        $request->relayState = $target;
+//        $url = $request->getRedirectUrl();
+//        Gdn::session()->stash('samlsso', null, true);
+//        Logger::event('saml_authrequest_sent', Logger::INFO, 'SAML request {requetid} sent to {requesthost}.',
+//             ['requestid' => $request->lastID, 'requesthost' => parse_url($url, PHP_URL_HOST), 'requesturl' => $url]);
+//        redirect($url);
+//    }
 
     /**
      * Inject a sign-in icon into the ME menu.
@@ -238,7 +238,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
             return;
         }
 
-        $this->entryController_saml_create($Sender);
+        $this->entryController_saml_create($Sender, $Args);
     }
 
     /**
@@ -367,7 +367,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
         $Form = $Sender->Form; //new Gdn_Form();
         $Form->setFormValue('UniqueID', $id);
-        $Form->setFormValue('Provider', self::ProviderKey);
+        $Form->setFormValue('Provider', $authenticationKey);
         $Form->setFormValue('ProviderName', $provider['Name']);
         $Form->setFormValue('Name', $this->rval('uid', $profile));
         $Form->setFormValue('FullName', $this->rval('cn', $profile));
