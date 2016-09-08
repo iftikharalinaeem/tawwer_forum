@@ -17,37 +17,6 @@ class SAMLSSOController extends PluginController {
         $form = $this->Form;
         $form->setModel($model);
 
-        if ($form->authenticatedPostBack()) {
-            $editedAuthenticationKey = $form->getFormValue('AuthenticationKey');
-
-            $form->setFormValue('AuthenticationSchemeAlias', 'saml');
-
-            // Make sure the keys are in the correct form.
-            $secret = $form->getFormValue('AssociationSecret');
-            $form->setFormValue('AssociationSecret', $this->untrimCert($secret));
-
-            $key = $form->getFormValue('PrivateKey');
-            $form->setFormValue('PrivateKey', $this->untrimCert($key, 'RSA PRIVATE KEY'));
-
-            $key = $form->getFormValue('PublicKey');
-            $form->setFormValue('PublicKey', $this->untrimCert($key, 'RSA PUBLIC KEY'));
-
-            if ($form->save() !== false) {
-                $this->informMessage(t('Saved'));
-
-                if ($editedAuthenticationKey != $authenticationKey) {
-                    if ($authenticationKey !== null) {
-                        $model->deleteID($authenticationKey);
-                    }
-                    redirect('/samlsso/edit/'.$editedAuthenticationKey);
-                }
-            }
-        } elseif ($authenticationKey !== null) {
-            $provider = Gdn_AuthenticationProviderModel::getProviderByKey($authenticationKey);
-            $form->setData($provider);
-            $this->setData('AuthenticationKey', $authenticationKey);
-        }
-
         // Set up the form.
         $formStructure = [
             'AuthenticationKey' => [
@@ -57,9 +26,6 @@ class SAMLSSOController extends PluginController {
             'Name' => [
                 'LabelCode' => 'Site Name',
                 'Description' => t('Enter a short name for the site.', 'Enter a short name for the site. This is displayed on the signin buttons.'),
-            ],
-            'EntityID' => [
-                'Description' => t('[???]'),
             ],
             'SignInUrl' => [
                 'LabelCode' => 'Sign In URL',
@@ -75,9 +41,11 @@ class SAMLSSOController extends PluginController {
             ],
             'AssociationSecret' => [
                 'LabelCode' => 'IDP Certificate',
-                'Options' => ['Multiline' => true, 'Class' => 'TextBox BigInput']],
+                'Options' => ['Multiline' => true, 'Class' => 'TextBox BigInput']
+            ],
             'IdentifierFormat' => [
-                'Description' => sprintf(t('Something like %s'), SamlSSOPlugin::IdentifierFormat),
+                'LabelCode' => 'Identifier Format',
+                'Description' => sprintf(t('Something like "%s"'), SamlSSOPlugin::IdentifierFormat),
             ],
             'IsDefault' => [
                 'Control' => 'CheckBox',
@@ -97,10 +65,43 @@ class SAMLSSOController extends PluginController {
                 'Control' => 'CheckBox',
                 'LabelCode' => 'Only sign out with valid SAML logout requests.'
             ],
-            'Metadata' => [
-                'Description' => 'Only sign out with valid SAML logout requests.'
-            ],
         ];
+
+        if ($form->authenticatedPostBack()) {
+            $editedAuthenticationKey = $form->getFormValue('AuthenticationKey');
+
+            $form->setFormValue('EntityID', $editedAuthenticationKey);
+            $form->setFormValue('AuthenticationSchemeAlias', 'saml');
+
+            // Make sure the keys are in the correct form.
+            $secret = $form->getFormValue('AssociationSecret');
+            $form->setFormValue('AssociationSecret', $this->untrimCert($secret));
+
+            $key = $form->getFormValue('PrivateKey');
+            $form->setFormValue('PrivateKey', $this->untrimCert($key, 'RSA PRIVATE KEY'));
+
+            $key = $form->getFormValue('PublicKey');
+            $form->setFormValue('PublicKey', $this->untrimCert($key, 'RSA PUBLIC KEY'));
+
+            $form->validateRule('AuthenticationKey', 'ValidateRequired', sprintf(t('%s is required.'), $formStructure['AuthenticationKey']['LabelCode']));
+            $form->validateRule('Name', 'ValidateRequired', sprintf(t('%s is required.'), $formStructure['Name']['LabelCode']));
+            $form->validateRule('IdentifierFormat', 'ValidateRequired', sprintf(t('%s is required.'), $formStructure['IdentifierFormat']['LabelCode']));
+
+            if ($form->save() !== false) {
+                $this->informMessage(t('Saved'));
+
+                if ($editedAuthenticationKey != $authenticationKey) {
+                    if ($authenticationKey !== null) {
+                        $model->deleteID($authenticationKey);
+                    }
+                    redirect('/samlsso/edit/'.$editedAuthenticationKey);
+                }
+            }
+        } elseif ($authenticationKey !== null) {
+            $provider = Gdn_AuthenticationProviderModel::getProviderByKey($authenticationKey);
+            $form->setData($provider);
+            $this->setData('AuthenticationKey', $authenticationKey);
+        }
 
         $this->setData('FormStructure', $formStructure);
         $this->setData('Title', t('SAML Connexion'));
