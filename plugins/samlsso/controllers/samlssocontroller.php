@@ -1,17 +1,21 @@
 <?php
 class SAMLSSOController extends PluginController {
 
+    public function __construct() {
+        parent::__construct();
+        $this->Form = new Gdn_Form();
+    }
+
     public function add() {
         $this->edit();
     }
 
     public function edit($authenticationKey = null) {
-        $this->Permission('Garden.Settings.Manage');
+        $this->permission('Garden.Settings.Manage');
 
         $model = new Gdn_AuthenticationProviderModel();
-        $form = new Gdn_Form();
+        $form = $this->Form;
         $form->setModel($model);
-        $this->Form = $form;
 
         if ($form->authenticatedPostBack()) {
             $editedAuthenticationKey = $form->getFormValue('AuthenticationKey');
@@ -20,13 +24,13 @@ class SAMLSSOController extends PluginController {
 
             // Make sure the keys are in the correct form.
             $secret = $form->getFormValue('AssociationSecret');
-            $form->setFormValue('AssociationSecret', self::untrimCert($secret));
+            $form->setFormValue('AssociationSecret', $this->untrimCert($secret));
 
             $key = $form->getFormValue('PrivateKey');
-            $form->setFormValue('PrivateKey', self::untrimCert($key, 'RSA PRIVATE KEY'));
+            $form->setFormValue('PrivateKey', $this->untrimCert($key, 'RSA PRIVATE KEY'));
 
             $key = $form->getFormValue('PublicKey');
-            $form->setFormValue('PublicKey', self::untrimCert($key, 'RSA PUBLIC KEY'));
+            $form->setFormValue('PublicKey', $this->untrimCert($key, 'RSA PUBLIC KEY'));
 
             if ($form->save() !== false) {
                 $this->informMessage(t('Saved'));
@@ -104,6 +108,27 @@ class SAMLSSOController extends PluginController {
         $this->render('addedit', '', 'plugins/samlsso');
     }
 
+    /**
+     *
+     */
+    public function delete($authenticationKey) {
+        $this->permission('Garden.Settings.Manage');
+
+        if (!$authenticationKey) {
+            return;
+        }
+
+        if ($this->Form->authenticatedPostBack()) {
+            $model = new Gdn_AuthenticationProviderModel();
+            $model->delete([
+                'AuthenticationSchemeAlias' => 'saml',
+                'AuthenticationKey' => $authenticationKey,
+            ]);
+        }
+
+        $this->RedirectUrl = url('/settings/samlsso');
+        $this->render('blank', 'utility', 'dashboard');
+    }
 
     /**
      *
@@ -111,7 +136,7 @@ class SAMLSSOController extends PluginController {
      * @param $cert
      * @return mixed|string
      */
-    public static function trimCert($cert) {
+    protected function trimCert($cert) {
         $cert = preg_replace('`-----[^-]*-----`i', '', $cert);
         $cert = trim(str_replace(["\r", "\n"], '', $cert));
         return $cert;
@@ -124,7 +149,7 @@ class SAMLSSOController extends PluginController {
      * @param string $type
      * @return string
      */
-    public static function untrimCert($cert, $type = 'CERTIFICATE') {
+    protected function untrimCert($cert, $type = 'CERTIFICATE') {
         if (strpos($cert, '---BEGIN') === false) {
             // Convert the secret to a proper x509 certificate.
             $x509cert = trim(str_replace(["\r", "\n"], "", $cert));

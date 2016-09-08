@@ -106,12 +106,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      * @return OneLogin_Saml_Settings
      */
-    public function getSettings($authenticationKey = false) {
-        file_put_contents(__DIR__.'/output.txt', print_r([debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), $_SERVER], true).PHP_EOL);
-
-        if ($authenticationKey === false) {
-            die('NOPE');
-        }
+    public function getSettings($authenticationKey) {
         self::requireFiles();
         $settings = new OneLogin_Saml_Settings();
         $provider = $this->getProvider($authenticationKey);
