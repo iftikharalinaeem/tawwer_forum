@@ -10,7 +10,7 @@ class SAMLSSOController extends PluginController {
         $this->edit();
     }
 
-    public function edit($authenticationKey = null) {
+    public function edit($authenticationKey = '') {
         $this->permission('Garden.Settings.Manage');
 
         $this->setData('AuthenticationKey', $authenticationKey);
@@ -23,7 +23,7 @@ class SAMLSSOController extends PluginController {
         $formStructure = [
             'AuthenticationKey' => [
                 'LabelCode' => 'Connexion ID',
-                'Description' => t('The connexion ID uniquely identifies this connection. (Letters and digits only'),
+                'Description' => t('The connexion ID uniquely identifies this connection. (Letters and digits only)'),
             ],
             'EntityID' => [
                 'LabelCode' => 'Entity ID',
@@ -73,10 +73,18 @@ class SAMLSSOController extends PluginController {
             ],
         ];
 
-        if ($form->authenticatedPostBack()) {
-            $editedAuthenticationKey = $form->getFormValue('AuthenticationKey');
+        if ($authenticationKey) {
+            $formStructure['AuthenticationKey']['Options'] = [
+                'Disabled' => true,
+            ];
+        }
 
+        if ($form->authenticatedPostBack()) {
             $form->setFormValue('AuthenticationSchemeAlias', 'saml');
+
+            if ($authenticationKey) {
+                $form->setFormValue('AuthenticationKey', $authenticationKey);
+            }
 
             // Make sure the keys are in the correct form.
             $secret = $form->getFormValue('AssociationSecret');
@@ -97,11 +105,8 @@ class SAMLSSOController extends PluginController {
             if ($form->save() !== false) {
                 $this->informMessage(t('Saved'));
 
-                if ($editedAuthenticationKey != $authenticationKey) {
-                    if ($authenticationKey !== null) {
-                        $model->deleteID($authenticationKey);
-                    }
-                    redirect('/samlsso/edit/'.$editedAuthenticationKey);
+                if (!$authenticationKey) {
+                    redirect('/samlsso/edit/'.$form->getFormValue('AuthenticationKey'));
                 }
             }
         } elseif ($authenticationKey !== null) {
