@@ -37,13 +37,13 @@ class SAMLSSOController extends PluginController {
                 'LabelCode' => 'Sign In URL',
                 'Description' => t('The url that users use to sign in.').' '.t('Use {target} to specify a redirect.'),
             ],
-            'RegisterUrl' => [
-                'LabelCode' => 'Registration URL',
-                'Description' => t('The url that users use to register for a new account.')
-            ],
             'SignOutUrl' => [
                 'LabelCode' => 'Sign Out URL',
                 'Description' => t('The url that users use to sign out of your site.')
+            ],
+            'RegisterUrl' => [
+                'LabelCode' => 'Registration URL',
+                'Description' => t('The url that users use to register for a new account.')
             ],
             'AssociationSecret' => [
                 'LabelCode' => 'IDP Certificate',
@@ -98,6 +98,7 @@ class SAMLSSOController extends PluginController {
 
             $form->validateRule('AuthenticationKey', 'ValidateRequired', sprintf(t('%s is required.'), $formStructure['AuthenticationKey']['LabelCode']));
             $form->validateRule('AuthenticationKey', 'regex:/^[a-zA-Z0-9]+$/', sprintf(t('%s must be composed of letters and digits only.'), $formStructure['AuthenticationKey']['LabelCode']));
+            $form->validateRule('SignInUrl', 'ValidateRequired', sprintf(t('%s is required.'), $formStructure['SignInUrl']['LabelCode']));
             $form->validateRule('EntityID', 'ValidateRequired', sprintf(t('%s is required.'), $formStructure['EntityID']['LabelCode']));
             $form->validateRule('Name', 'ValidateRequired', sprintf(t('%s is required.'), $formStructure['Name']['LabelCode']));
             $form->validateRule('IdentifierFormat', 'ValidateRequired', sprintf(t('%s is required.'), $formStructure['IdentifierFormat']['LabelCode']));
@@ -158,8 +159,17 @@ class SAMLSSOController extends PluginController {
         }
 
         $model = new Gdn_AuthenticationProviderModel();
+
+        $updatedFields = [
+            'Active' => $state === 'active' ? 1 : 0
+        ];
+        // Safeguard against stupid people
+        if (!$updatedFields['Active']) {
+            $updatedFields['IsDefault'] = 0;
+        }
+
         $model->update(
-            ['Active' => $state === 'active' ? 1 : 0],
+            $updatedFields,
             [
                 'AuthenticationSchemeAlias' => 'saml',
                 'AuthenticationKey' => $authenticationKey,
