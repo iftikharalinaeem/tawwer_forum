@@ -9,8 +9,8 @@
 
 $PluginInfo['samlsso'] = [
     'Name' => 'SAML SSO',
-    'Description' => 'Allows Vanilla to SSO to a SAML 2.0 compliant identity provider.',
-    'Version' => '1.3.0',
+    'Description' => 'Allows Vanilla to SSO to SAML 2.0 compliant identity providers.',
+    'Version' => '1.4',
     'RequiredApplications' => ['Vanilla' => '2.1'],
     'SettingsUrl' => '/settings/samlsso',
     'SettingsPermission' => 'Garden.Settings.Manage',
