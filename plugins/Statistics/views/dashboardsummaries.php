@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Summary PopularDiscussionSummary">
-   <table>
+   <table class="table-data">
       <thead>
          <tr>
             <th><?php echo T('Popular Discussions'); ?></th>
@@ -22,7 +22,7 @@
    </table>
 </div>
 <div class="Summary ActiveUserSummary">
-   <table>
+   <table class="table-data">
       <thead>
          <tr>
             <th><?php echo T('Active Users'); ?></th>
