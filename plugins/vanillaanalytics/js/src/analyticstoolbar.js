@@ -112,6 +112,7 @@ $(document).ready(function() {
         buttonClasses: "btn",
         applyClass: "btn-primary",
         cancelClass: "btn-secondary",
+        maxDate: moment(),
         ranges: {
             'Past 30 Days': [moment().subtract(30, 'days'), moment()],
             'This Month': [moment().startOf('month'), moment().endOf('month')],

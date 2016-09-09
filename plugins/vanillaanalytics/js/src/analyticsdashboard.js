@@ -383,6 +383,46 @@ AnalyticsDashboard.prototype.sortUpdate = function(e, ui) {
     );
 };
 
+
+AnalyticsDashboard.prototype.setUpPinTooltips = function() {
+    if (typeof $.fn.tooltip === 'undefined') {
+        return;
+    }
+
+    var options = {
+        title: gdn.definition('Pin to your dashboard'),
+        trigger: 'hover',
+        placement: 'left',
+        delay: {
+            show: 100
+        }
+    };
+
+    // Chart tooltip placements go to the left, metric tooltip placements go to the top.
+
+    $('.analytics-widget-chart .bookmark:not(.bookmarked)').tooltip(options).on('click', function() {
+        $(this).tooltip('hide');
+    });
+
+    options.placement = 'top';
+
+    $('.analytics-widget-metric .bookmark:not(.bookmarked)').tooltip(options).on('click', function() {
+        $(this).tooltip('hide');
+    });
+
+    options.title = gdn.definition('Unpin from your dashboard');
+
+    $('.analytics-widget-metric .bookmarked').tooltip(options).on('click', function() {
+        $(this).tooltip('hide');
+    });
+
+    options.placement = 'left';
+
+    $('.analytics-widget-chart .bookmarked').tooltip(options).on('click', function() {
+        $(this).tooltip('hide');
+    });
+}
+
 /**
  * Write the dashboard's contents to the current page.
  */
@@ -391,6 +431,8 @@ AnalyticsDashboard.prototype.writeDashboard = function() {
         this.emptyPanelContainer(panelID);
         this.writePanel(panelID);
     }
+    
+    this.setUpPinTooltips();
 
     if (this.isPersonal()) {
         this.setupSorting();
