@@ -211,7 +211,7 @@ class OnlineModule extends Gdn_Module {
 
       ?>
       <div id="WhosOnline" class="WhosOnline Box">
-         <h4><?php echo $title; ?> <span class="Count"><?php echo Gdn_Format::bigNumber($trackCount, 'html') ?></span></h4>
+         <?php echo panelHeading($title.'<span class="Count">'.Gdn_Format::bigNumber($trackCount, 'html').'</span>'); ?> 
          <?php
 
             if ($this->style == 'pictures') {
