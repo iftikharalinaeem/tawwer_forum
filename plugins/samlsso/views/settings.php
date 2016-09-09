@@ -16,6 +16,7 @@
             <th><?php echo t('Client ID'); ?></th>
             <th><?php echo t('Site Name'); ?></th>
             <th class="column-lg"><?php echo t('SignIn URL'); ?></th>
+            <th class="column-sm"><?php echo t('Active'); ?></th>
             <th class="options column-sm"><?php echo t('Options'); ?></th>
         </tr>
         </thead>
@@ -24,7 +25,7 @@
         $Alt = false;
         foreach ($this->data('Providers') as $provider) {
             ?>
-            <tr>
+            <tr id="provider_<?php echo $provider['AuthenticationKey'] ?>">
                 <td>
                     <?php echo $provider['AuthenticationKey']; ?>
                 </td>
@@ -33,6 +34,22 @@
                 </td>
                 <td>
                     <?php echo $provider['SignInUrl']; ?>
+                </td>
+                <td class="toggle-container">
+                <?php
+                if ($provider['Active']) {
+                    $state = 'on';
+                    $url = '/samlsso/state/'.$provider['AuthenticationKey'].'/disabled';
+                } else {
+                    $state = 'off';
+                    $url = '/samlsso/state/'.$provider['AuthenticationKey'].'/active';
+                }
+                echo wrap(
+                    anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', $url, 'Hijack'),
+                    'span',
+                    array('class' => "toggle-wrap toggle-wrap-$state")
+                );
+                ?>
                 </td>
                 <td>
                     <div class="btn-group">

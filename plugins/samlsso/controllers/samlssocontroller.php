@@ -141,4 +141,46 @@ class SAMLSSOController extends PluginController {
         $this->RedirectUrl = url('/settings/samlsso');
         $this->render('blank', 'utility', 'dashboard');
     }
+
+    /**
+     * @param $authenticationKey
+     * @param $state
+     * @throws Exception
+     */
+    public function state($authenticationKey, $state) {
+        $this->permission('Garden.Settings.Manage');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+
+        if (!$authenticationKey || !in_array($state, ['active', 'disabled'])) {
+            return;
+        }
+
+        $model = new Gdn_AuthenticationProviderModel();
+        $model->update(
+            ['Active' => $state === 'active' ? 1 : 0],
+            [
+                'AuthenticationSchemeAlias' => 'saml',
+                'AuthenticationKey' => $authenticationKey,
+            ]
+        );
+
+        if ($state === 'active' ? 1 : 0) {
+            $state = 'on';
+            $url = '/samlsso/state/'.$authenticationKey.'/disabled';
+        } else {
+            $state = 'off';
+            $url = '/samlsso/state/'.$authenticationKey.'/active';
+        }
+        $newToggle = wrap(
+            anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', $url, 'Hijack'),
+            'span',
+            array('class' => "toggle-wrap toggle-wrap-$state")
+        );
+
+        $this->jsonTarget("#provider_$authenticationKey .toggle-container", $newToggle);
+
+        $this->render('blank', 'utility', 'dashboard');
+    }
 }
