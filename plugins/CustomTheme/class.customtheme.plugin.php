@@ -338,7 +338,10 @@ class CustomThemePlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender
      */
-    public function settingsController_afterCurrentTheme_handler($sender) {
+    public function settingsController_afterCurrentTheme_handler($sender, $args) {
+        if (val('IsMobile', $args)) {
+            return;
+        }
         if ($this->canCustomizeTheme()) {
             echo wrap(sprintf(t('You can customize the HTML and CSS for this theme on the %s page.'),
                 anchor('Customize Theme', 'settings/customtheme')), 'div', array('class' => 'CustomThemeOptions'));
