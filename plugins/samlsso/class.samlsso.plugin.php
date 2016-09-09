@@ -48,7 +48,9 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
         $providers = $this->getProvider();
         foreach ($providers as $provider) {
-            echo ' '.$this->signInButton($provider).' ';
+            if ($provider['Active']) {
+                echo ' '.$this->signInButton($provider).' ';
+            }
         }
 
     }
@@ -67,14 +69,15 @@ class SamlSSOPlugin extends Gdn_Plugin {
         }
 
         $providers = $this->getProvider();
-
         foreach ($providers as $provider) {
-            $method = [
-                'Name' => $provider['Name'],
-                'SignInHtml' => $this->signInButton($provider),
-            ];
+            if ($provider['Active']) {
+                $method = [
+                    'Name' => $provider['Name'],
+                    'SignInHtml' => $this->signInButton($provider),
+                ];
 
-            $sender->Data['Methods'][] = $method;
+                $sender->Data['Methods'][] = $method;
+            }
         }
     }
 
@@ -395,7 +398,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
     protected function isConfigured() {
         $providers = $this->getProvider();
         foreach($providers as $provider) {
-            if ($provider['AssociationSecret'] && $provider['EntityID'] && $provider['SignInUrl']) {
+            if ($provider['AssociationSecret'] && $provider['EntityID'] && $provider['SignInUrl'] && $provider['Active']) {
                 return true;
             }
         }
