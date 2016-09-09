@@ -11,7 +11,7 @@ $PluginInfo['CustomTheme'] = array(
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
     'SettingsUrl' => '/settings/customtheme',
-    'HasPopupFriendlySettings' => false,
+    'UsePopupSettings' => false,
     'MobileFriendly' => true
 );
 
