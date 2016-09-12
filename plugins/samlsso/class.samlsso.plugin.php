@@ -15,7 +15,7 @@ $PluginInfo['samlsso'] = [
     'SettingsUrl' => '/settings/samlsso',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true,
-    'HasPopupFriendlySettings' => false,
+    'UsePopupSettings' => false,
 ];
 
 /**
