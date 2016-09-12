@@ -27,7 +27,7 @@ class SAMLSSOController extends PluginController {
             ],
             'EntityID' => [
                 'LabelCode' => 'Entity ID',
-                'Description' => t('The connexion ID uniquely identifies this connection.'),
+                'Description' => t('Globally unique name of the SAML entity.'),
             ],
             'Name' => [
                 'LabelCode' => 'Site Name',
