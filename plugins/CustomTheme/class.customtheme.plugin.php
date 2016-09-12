@@ -11,6 +11,7 @@ $PluginInfo['CustomTheme'] = array(
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
     'SettingsUrl' => '/settings/customtheme',
+    'UsePopupSettings' => false,
     'MobileFriendly' => true
 );
 
@@ -68,18 +69,6 @@ class CustomThemePlugin extends Gdn_Plugin {
 
         $liveRevisionID = c('Plugins.CustomTheme.LiveRevisionID', 0);
         $args['ETagData']["customtheme-$liveRevisionID"] = true;
-    }
-
-    /**
-     * Opt out of popup settings page on addons page
-     *
-     * @param SettingsController $sender
-     * @param array $args
-     */
-    public function settingsController_beforeAddonList_handler($sender, &$args) {
-        if (val('CustomTheme', $args['AvailableAddons'])) {
-            $args['AvailableAddons']['CustomTheme']['HasPopupFriendlySettings'] = false;
-        }
     }
 
     /**
