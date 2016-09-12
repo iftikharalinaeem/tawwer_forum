@@ -116,8 +116,9 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $request = new OneLogin_Saml_AuthRequest($settings);
         $request->isPassive = (bool)$sender->Request->get('ispassive');
 
-        if ($target = Gdn::request()->get('Target'))
+        if ($target = Gdn::request()->get('Target')) {
             $request->relayState = $target;
+        }
 
         $url = $request->getRedirectUrl();
         Gdn::session()->stash('samlsso', null, true);
