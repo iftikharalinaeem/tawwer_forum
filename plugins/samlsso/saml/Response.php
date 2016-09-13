@@ -166,6 +166,7 @@ class OneLogin_Saml_Response
             if ($assertionXpath === '/saml:Subject/saml:NameID') {
                 // This means no NameID has been found, dump the structure to the Logger, throw an error message.
                 $xmlstr = $this->document->saveXML();
+                // Protip: if you want to read this output, you have to convert the \" to ' and use an XML formatter in Sublime.
                 Logger::event('saml_response', Logger::ERROR, 'SAML NameID Not Found.', (array) $xmlstr);
                 throw new Exception('Unable to find the unique identifier sent by the identity provider.', 422);
             } else {
