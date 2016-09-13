@@ -12,7 +12,8 @@ $PluginInfo['AdvancedStats'] = array(
     'MobileFriendly' => TRUE,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'Icon' => 'analytics.png'
 );
 
 class AdvancedStatsPlugin extends Gdn_Plugin {
@@ -164,13 +165,12 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Adds & removes dashboard menu options.
+     * @param DashboardNavModule $nav
      */
-    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-        $Menu = $Sender->EventArguments['SideMenu'];
+    public function dashboardNavModule_init_handler($nav) {
         if (C('Garden.Analytics.Advanced')) {
             // Add stats menu option.
-            $Menu->AddLink('Dashboard', 'Statistics', '/settings/statistics', 'Garden.Settings.Manage');
+            $nav->addLinkIf('Garden.Settings.Manage', 'Statistics', '/settings/statistics', 'forum-data.statistics');
         }
     }
 

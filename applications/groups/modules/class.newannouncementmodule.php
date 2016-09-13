@@ -1,21 +1,30 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
+/**
+ * Class NewAnnouncementModule
+ */
 class NewAnnouncementModule extends Gdn_Module {
-   /// Properties ///
-   public $GroupID;
 
+    /** @var   */
+    public $GroupID;
 
-   /// Methods ///
+    /**
+     *
+     *
+     * @return string
+     */
+    public function toString() {
+        if (!$this->GroupID) {
+            $GroupID = Gdn::controller()->data('Group.GroupID');
+        }
 
-   public function ToString() {
-      if (!$this->GroupID) {
-         $GroupID = Gdn::Controller()->Data('Group.GroupID');
-      }
-
-      if (GroupPermission('Moderate', $GroupID)) {
-         return ' '.Anchor(T('New Announcement'), GroupUrl(Gdn::Controller()->Data('Group'), 'announcement'), 'Button').' ';
-      }
-      return '';
-   }
+        if (groupPermission('Moderate', $GroupID)) {
+            return ' '.anchor(t('New Announcement'), groupUrl(Gdn::controller()->data('Group'), 'announcement'), 'Button').' ';
+        }
+        return '';
+    }
 }
-

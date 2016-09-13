@@ -10,14 +10,12 @@
 
 ?>
 
+<h1>
+   <?php echo $this->Data('Title'); ?>
+</h1>
 <div id="avatarstock">
-   <h1>
-      <?php echo $this->Data('Title'); ?>
-   </h1>
-
-   <div class="Info">
-      Upload a stock of photos that members must choose between for
-      their avatar.
+   <div class="padded">
+      Upload a stock of photos that members must choose between for their avatar.
    </div>
 
    <h3>Basic avatars</h3>
@@ -25,7 +23,7 @@
    <div class="display-avatars">
 
       <?php
-         echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => Url('/settings/avatarstock/modify'), 'id' => 'avatarstock-form-modify'));
+         echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => url('/settings/avatarstock/modify'), 'id' => 'avatarstock-form-modify'));
          echo $this->Form->Errors();
       ?>
 

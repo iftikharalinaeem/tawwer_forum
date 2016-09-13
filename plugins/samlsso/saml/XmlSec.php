@@ -40,7 +40,7 @@ class OneLogin_Saml_XmlSec
     /**
      * Verify that the document only contains a single Assertion
      *
-     * @return bool TRUE if the document passes.
+     * @return bool true if the document passes.
      */
     public function validateNumAssertions()
     {
@@ -149,7 +149,7 @@ class OneLogin_Saml_XmlSec
             $decKey = $encKey->encryptedCtx->decryptKey($encKey);
         }
 
-        $key->loadKey($decKey, FALSE, FALSE);
+        $key->loadKey($decKey, false, false);
         $enc->decryptNode($key);
     }
 
@@ -173,7 +173,7 @@ class OneLogin_Saml_XmlSec
             throw new Exception('Cannot locate Signature Node');
         }
         $objXMLSecDSig->canonicalizeSignedInfo();
-        $objXMLSecDSig->idKeys = array('ID');
+        $objXMLSecDSig->idKeys = ['ID'];
 
         $retVal = $objXMLSecDSig->validateReference();
         if (!$retVal) {
@@ -200,7 +200,7 @@ class OneLogin_Saml_XmlSec
 
         XMLSecEnc::staticLocateKeyInfo($objKey, $objDSig);
 
-        $objKey->loadKey($this->_settings->idpPublicCertificate, FALSE, TRUE);
+        $objKey->loadKey($this->_settings->idpPublicCertificate, false, true);
 
         return ($objXMLSecDSig->verify($objKey) === 1);
     }

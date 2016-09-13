@@ -75,14 +75,4 @@ class PopularPostsPlugin extends Gdn_Plugin {
 
         $sender->render($this->getView('configuration.php'));
     }
-
-    /**
-     * Add a link to the dashboard menu.
-     *
-     * @param $sender Sending controller instance.
-     */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        $menu = &$sender->EventArguments['SideMenu'];
-        $menu->addLink('Add-ons', t('Popular Posts'), 'settings/popularPosts', 'Garden.Settings.Manage');
-    }
 }

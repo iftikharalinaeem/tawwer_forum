@@ -10,11 +10,14 @@ $PluginInfo['Warnings2'] = array(
     'Name' => 'Warnings & Notes',
     'Description' => 'Allows moderators to warn users and add private notes to profiles to help police the community.',
     'Version' => '2.5',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
+    'RequiredApplications' => ['Vanilla' => '2.1'],
+    'MobileFriendly' => true,
+    'SettingsUrl' => '/settings/warnings',
+    'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'MobileFriendly' => true,
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'Icon' => 'warnings.png'
 );
 
 /**
@@ -66,6 +69,25 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Create a new endpoint on the SettingsController.
+     *
+     * @param SettingsController $sender Sending controller instance.
+     */
+    public function settingsController_warnings_create($sender) {
+        // Prevent non-admins from accessing this page
+        $sender->permission('Garden.Settings.Manage');
+
+        $sender->title(sprintf(t('%s Settings'), t('Warnings & Notes')));
+        $sender->addSideMenu('settings/warnings');
+
+        $sender->setData('PluginDescription', $this->getPluginKey('Description'));
+
+        $warningTypeModel = new WarningTypeModel();
+        $sender->setData('Warnings', $warningTypeModel->getAll());
+
+        $sender->render($sender->fetchViewLocation('settings', '', 'plugins/Warnings2'));
+    }
     /**
      * Return the HTML for a warning reaction button.
      *
@@ -314,7 +336,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
         $request = Gdn::request();
         $path = $request->path();
-        if (strpos($path, 'profile/warn') !== false) {
+        if (strpos($path, 'profile/warn') === false) {
             return;
         }
 

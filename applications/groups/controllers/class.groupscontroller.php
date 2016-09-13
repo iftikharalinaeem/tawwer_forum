@@ -1,127 +1,139 @@
 <?php
+/**
+ * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
- * @license Proprietary
+ * Class GroupsController
+ *
+ * @package groups
  */
 class GroupsController extends Gdn_Controller {
 
+    /** @var array  */
+    public $Uses = array('GroupModel');
 
-   public $Uses = array('GroupModel');
+    /** @var GroupModel */
+    public $GroupModel;
 
-   /**
-    * @var GroupModel
-    */
-   public $GroupModel;
+    /** @var int The page size of groups when browsing. */
+    public $PageSize = 24;
 
-   /**
-    * @var int The page size of groups when browsing.
-    */
-   public $PageSize = 24;
+    /**
+     * Include JS, CSS, and modules used by all methods.
+     *
+     * Always called by dispatcher before controller's requested method.
+     *
+     * @access public
+     */
+    public function initialize() {
+        // Set up head
+        $this->Head = new HeadModule($this);
+        $this->addJsFile('jquery.js');
+        $this->addJsFile('jquery.livequery.js');
+        $this->addJsFile('jquery-ui.js');
+        $this->addJsFile('jquery.tokeninput.js');
+        $this->addJsFile('jquery.form.js');
+        $this->addJsFile('jquery.popup.js');
+        $this->addJsFile('jquery.gardenhandleajaxform.js');
+        $this->addJsFile('global.js');
+        $this->addJsFile('group.js');
+        $this->addCssFile('vanillicon.css', 'static');
+        $this->addCssFile('style.css');
 
+        $this->addBreadcrumb(t('Groups'), '/groups');
+        parent::initialize();
+    }
 
-   /**
-    * Include JS, CSS, and modules used by all methods.
-    *
-    * Always called by dispatcher before controller's requested method.
-    *
-    * @access public
-    */
-   public function Initialize() {
-      // Set up head
-      $this->Head = new HeadModule($this);
-      $this->AddJsFile('jquery.js');
-      $this->AddJsFile('jquery.livequery.js');
-      $this->AddJsFile('jquery-ui.js');
-      $this->AddJsFile('jquery.tokeninput.js');
-      $this->AddJsFile('jquery.form.js');
-      $this->AddJsFile('jquery.popup.js');
-      $this->AddJsFile('jquery.gardenhandleajaxform.js');
-      $this->AddJsFile('global.js');
-      $this->AddJsFile('group.js');
-      $this->addCssFile('vanillicon.css', 'static');
-      $this->AddCssFile('style.css');
+    /**
+     *
+     *
+     * @param int $Limit
+     * @throws Exception
+     */
+    public function index($Limit = 9) {
+        Gdn_Theme::section('GroupList');
 
-      $this->AddBreadcrumb(T('Groups'), '/groups');
+        if (!is_numeric($Limit)) {
+             $Limit = 9;
+        } elseif ($Limit > 30) {
+             $Limit = 30;
+        } elseif ($Limit < 0) {
+             $Limit = 9;
+        }
 
-      parent::Initialize();
-   }
+        // Get popular groups.
+        $Groups = $this->GroupModel->get('CountMembers', 'desc', $Limit)->resultArray();
+        $this->setData('Groups', $Groups);
 
-   public function Index($Limit = 9) {
-      Gdn_Theme::Section('GroupList');
+        // Get new groups.
+        $NewGroups = $this->GroupModel->get('DateInserted', 'desc', $Limit)->resultArray();
+        $this->setData('NewGroups', $NewGroups);
 
-      if (!is_numeric($Limit))
-          $Limit = 9;
-      elseif ($Limit > 30)
-          $Limit = 30;
-      elseif ($Limit < 0)
-          $Limit = 9;
+        // Get my groups.
+        if (Gdn::session()->isValid()) {
+            $MyGroups = $this->GroupModel->getByUser(Gdn::session()->UserID, $Limit);
+            $this->setData('MyGroups', $MyGroups);
+        }
 
-      // Get popular groups.
-      $Groups = $this->GroupModel->Get('CountMembers', 'desc', $Limit)->ResultArray();
-      $this->SetData('Groups', $Groups);
+        if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
+            $this->title(t('Groups'));
+            require_once $this->fetchViewLocation('group_functions', 'Group');
+            $this->CssClass .= ' NoPanel';
+        }
+        $this->render('Groups');
+    }
 
-      // Get new groups.
-      $NewGroups = $this->GroupModel->Get('DateInserted', 'desc', $Limit)->ResultArray();
-      $this->SetData('NewGroups', $NewGroups);
+    /**
+     *
+     *
+     * @param string $Sort
+     * @param string $Page
+     * @throws Exception
+     */
+    public function browse($Sort = 'newest', $Page = '') {
+        Gdn_Theme::section('GroupList');
+        $Sort = strtolower($Sort);
 
-      // Get my groups.
-      if (Gdn::Session()->IsValid()) {
-         $MyGroups = $this->GroupModel->GetByUser(Gdn::Session()->UserID, $Limit);
-         $this->SetData('MyGroups', $MyGroups);
-      }
+        $Sorts = [
+            'new' => ['Title' => t('New Groups'), 'OrderBy' => 'DateInserted'],
+            'popular' => ['Title' => t('Popular Groups'), 'OrderBy' => 'CountMembers'],
+            'updated' => ['Title' => t('Recently Updated Groups'), 'OrderBy' => 'DateLastComment'],
+            'mine' => ['Title' => t('My Groups'), 'OrderBy' => 'DateInserted']
+        ];
 
-      if ($this->DeliveryType() !== DELIVERY_TYPE_DATA) {
-         $this->Title(T('Groups'));
+        if (!array_key_exists($Sort, $Sorts)) {
+            $Sort = array_pop(array_keys($Sorts));
+        }
 
-         require_once $this->FetchViewLocation('group_functions', 'Group');
-         $this->CssClass .= ' NoPanel';
-      }
-      $this->Render('Groups');
-   }
+        $SortRow = $Sorts[$Sort];
+        $PageSize = $this->PageSize; // good size for 4, 3, 2 columns.
+        list($Offset, $Limit) = offsetLimit($Page, $PageSize);
+        $PageNumber = pageNumber($Offset, $Limit);
 
-   public function Browse($Sort = 'newest', $Page = '') {
-      Gdn_Theme::Section('GroupList');
-      $Sort = strtolower($Sort);
+        if (Gdn::session()->UserID && $Sort == 'mine') {
+             $Groups = $this->GroupModel->getByUser(Gdn::session()->UserID, '', 'desc', $Limit, $Offset);
+        } else {
+             $Groups = $this->GroupModel->get($SortRow['OrderBy'], 'desc', $Limit, $PageNumber)->resultArray();
+             $TotalRecords = $this->GroupModel->getCount();
+        }
+        $this->setData('Groups', $Groups);
 
-      $Sorts = array(
-         'new' => array('Title' => T('New Groups'), 'OrderBy' => 'DateInserted'),
-         'popular' => array('Title' => T('Popular Groups'), 'OrderBy' => 'CountMembers'),
-         'updated' => array('Title' => T('Recently Updated Groups'), 'OrderBy' => 'DateLastComment'),
-         'mine' => array('Title' => T('My Groups'), 'OrderBy' => 'DateInserted')
-      );
+        // Set the pager data.
+        $this->setData('_Limit', $Limit);
+        $this->setData('_CurrentRecords', count($Groups));
 
-      if (!array_key_exists($Sort, $Sorts)) {
-         $Sort = array_pop(array_keys($Sorts));
-      }
+        $Pager = PagerModule::current();
+        // Use simple pager for 'mine'
+        if (Gdn::session()->UserID && $Sort != 'mine') {
+            $Pager->configure($Offset, $Limit, $TotalRecords, "groups/browse/$Sort/{Page}");
+        }
 
-      $SortRow = $Sorts[$Sort];
-      $PageSize = $this->PageSize; // good size for 4, 3, 2 columns.
-      list($Offset, $Limit) = OffsetLimit($Page, $PageSize);
-      $PageNumber = PageNumber($Offset, $Limit);
+        $this->title($SortRow['Title']);
+        $this->addBreadcrumb($this->title(), "/groups/browse/$Sort");
 
-      if (Gdn::Session()->UserID && $Sort == 'mine') {
-          $Groups = $this->GroupModel->GetByUser(Gdn::Session()->UserID, '', 'desc', $Limit, $Offset);
-      } else {
-          $Groups = $this->GroupModel->Get($SortRow['OrderBy'], 'desc', $Limit, $PageNumber)->ResultArray();
-          $TotalRecords = $this->GroupModel->GetCount();
-      }
-      $this->SetData('Groups', $Groups);
-
-      // Set the pager data.
-      $this->SetData('_Limit', $Limit);
-      $this->SetData('_CurrentRecords', count($Groups));
-
-      $Pager = PagerModule::Current();
-      // Use simple pager for 'mine'
-      if (Gdn::Session()->UserID && $Sort != 'mine') {
-         $Pager->Configure($Offset, $Limit, $TotalRecords, "groups/browse/$Sort/{Page}");
-      }
-
-      $this->Title($SortRow['Title']);
-      $this->AddBreadcrumb($this->Title(), "/groups/browse/$Sort");
-
-      require_once $this->FetchViewLocation('group_functions', 'Group');
-      $this->Render();
-   }
+        require_once $this->fetchViewLocation('group_functions', 'Group');
+        $this->render();
+    }
 }

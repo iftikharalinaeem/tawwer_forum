@@ -4,20 +4,32 @@ $this->Title(T('Give a Badge')); ?>
 
 <div class="UserBadgeForm">
     <h1><?php echo T('Give Badge') . ': ' . Gdn_Format::Text($this->Data('Badge.Name')); ?></h1>
-    <p><?php echo Gdn_Format::Text($this->Data('Badge.Body')); ?></p>
+    <p class="padded"><?php echo Gdn_Format::Text($this->Data('Badge.Body')); ?></p>
 
     <?php
     echo $this->Form->Open();
-    echo $this->Form->Errors();
+    echo $this->Form->Errors(); ?>
 
-    echo '<p>', $this->Form->Label('Recipients', 'To');
-    echo $this->Form->TextBox('To', array('MultiLine' => TRUE, 'class' => 'MultiComplete')), '</p>';
+    <div class="form-group row">
+        <div class="label-wrap">
+            <?php echo $this->Form->Label('Recipients', 'To'); ?>
+        </div>
+        <div class="input-wrap">
+            <?php echo $this->Form->TextBox('To', array('MultiLine' => TRUE, 'class' => 'MultiComplete')), '</p>'; ?>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="label-wrap">
+            <?php echo $this->Form->Label('Reason (optional)', 'Reason'); ?>
+        </div>
+        <div class="input-wrap">
+            <?php echo $this->Form->TextBox('Reason', array('MultiLine' => TRUE)); ?>
+        </div>
+    </div>
+    <div class="js-modal-footer form-footer">
+        <?php echo $this->Form->button('Cancel', ['type' => 'button', 'class' => 'btn btn-link js-modal-close']);
+        echo $this->Form->button('Give Badge'); ?>
+    </div>
 
-    echo '<p>', $this->Form->Label('Reason (optional)', 'Reason');
-    echo $this->Form->TextBox('Reason', array('MultiLine' => TRUE)), '</p>';
-
-    echo Anchor('Cancel', 'badge/'.$this->Data('Badge.BadgeID'));
-
-    echo $this->Form->Close('Give Badge');
-    ?>
+    <?php echo $this->Form->close(); ?>
 </div>

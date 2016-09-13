@@ -4,8 +4,7 @@ $list = $this->data('list');
 
 // Table view
 if (val('layout', $list) == 'table') {
-  include('grouplist-table.php');
+    include('grouplist-table.php');
 } else if (val('layout', $list) == 'modern') {
-  include('grouplist-modern.php');
+    include('grouplist-modern.php');
 }
-

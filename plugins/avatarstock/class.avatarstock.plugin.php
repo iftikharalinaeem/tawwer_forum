@@ -17,8 +17,10 @@ $PluginInfo['avatarstock'] = array(
         'AvatarPool.CustomUpload.Allow' => 0
     ),
     'SettingsUrl' => '/settings/avatarstock',
+    'UsePopupSettings' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
-    'MobileFriendly' => true
+    'MobileFriendly' => true,
+    'Icon' => 'avatar-pool.png'
 );
 
 /**

@@ -68,8 +68,8 @@ class OneLogin_Saml_Response
      * AuthnStatement element.
      * Using this attribute, the IdP suggests the local session expiration
      * time.
-     * 
-     * @return The SessionNotOnOrAfter as unix epoc or NULL if not present
+     *
+     * @return The SessionNotOnOrAfter as unix epoc or null if not present
      */
     public function getSessionNotOnOrAfter() {
         $entries = $this->queryAssertion('/saml:AuthnStatement[@SessionNotOnOrAfter]');
@@ -88,7 +88,7 @@ class OneLogin_Saml_Response
     public function getAttributes() {
         $entries = $this->queryAssertion('/saml:AttributeStatement/saml:Attribute');
 
-        $attributes = array();
+        $attributes = [];
         /* @var SimpleXMLElement $entry */
         foreach ($entries as $entry) {
             $friendlyName = (string)$entry['FriendlyName'];
@@ -96,7 +96,7 @@ class OneLogin_Saml_Response
 
             // We have to do another xpath to get our desired child nodes here.
             $entry->registerXPathNamespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
-            $attributeValues = array();
+            $attributeValues = [];
 
             /* @var SimpleXMLElement $childNode */
             foreach ($entry->xpath('saml:AttributeValue') as $childNode) {

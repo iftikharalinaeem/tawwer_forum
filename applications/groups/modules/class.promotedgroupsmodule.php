@@ -1,61 +1,44 @@
 <?php
-
 /**
- * Groups Application - Promoted Groups Module
- *
- * @author Becky Van Bussel <becky@vanillaforums.com>
- * @copyright 2003 Vanilla Forums, Inc
+ * @copyright 2008-2016 Vanilla Forums, Inc.
  * @license Proprietary
- * @package groups
  */
 
 /**
  * Class PromotedGroupsModule
  *
  * Outputs a list of new, popular, updated or 'my' groups.
+ *
+ * @author Becky Van Bussel <becky@vanillaforums.com>
+ * @package groups
  */
 class PromotedGroupsModule extends Gdn_Module {
 
-    /**
-     * @var int The max number of groups to retrieve.
-     */
+    /** @var int The max number of groups to retrieve. */
     protected $limit = 3;
-    /**
-     * @var string The type of groups to return. Must be a key in $promoteTypes.
-     */
+
+    /** @var string The type of groups to return. Must be a key in $promoteTypes. */
     protected $promoteType;
-    /**
-     * @var bool Whether to attach data from the group's last discussion to the group.
-     */
+
+    /** @var bool Whether to attach data from the group's last discussion to the group. */
     protected $attachLastDiscussion = false;
-    /**
-     * @var array The categories of promoted types and data associated with them.
+
+    /** @var array The categories of promoted types and data associated with them.
      */
-    protected $promoteTypes = array(
-        'popular' => array('title'   => 'Popular Groups',
-                           'url'     => '/groups/browse/popular',
-                           'orderBy' => 'CountMembers'),
-        'new'     => array('title'   => 'New Groups',
-                           'url'     => '/groups/browse/new',
-                           'orderBy' => 'DateInserted'),
-        'updated' => array('title'   => 'Recently Updated Groups',
-                           'url'     => '/groups/browse/updated',
-                           'orderBy' => 'DateLastComment'),
-        'mine'    => array('title'   => 'My Groups',
-                           'url'     => '/groups/browse/mine',
-                           'orderBy' => 'DateLastComment')
-    );
-    /**
-     * @var string The title to be rendered for the module.
-     */
+    protected $promoteTypes = [
+        'popular' => ['title' => 'Popular Groups', 'url' => '/groups/browse/popular', 'orderBy' => 'CountMembers'],
+        'new' => ['title' => 'New Groups', 'url' => '/groups/browse/new', 'orderBy' => 'DateInserted'],
+        'updated' => ['title' => 'Recently Updated Groups', 'url' => '/groups/browse/updated', 'orderBy' => 'DateLastComment'],
+        'mine' => ['title' => 'My Groups', 'url' => '/groups/browse/mine', 'orderBy' => 'DateLastComment']
+    ];
+
+    /** @var string The title to be rendered for the module. */
     protected $title;
-    /**
-     * @var string The url for the 'show more' link.
-     */
+
+    /** @var string The url for the 'show more' link. */
     protected $url;
-    /**
-     * @var string The field to order the group results by.
-     */
+
+    /** @var string The field to order the group results by. */
     protected $orderBy;
 
     /**
@@ -132,17 +115,17 @@ class PromotedGroupsModule extends Gdn_Module {
      * @param string $orderBy
      * @return array|null
      */
-    private function GetData($promoteType, $limit, $attachLastDiscussion, $orderBy) {
+    private function getData($promoteType, $limit, $attachLastDiscussion, $orderBy) {
         //get groups
         $groupModel = new GroupModel();
         if ($promoteType === 'mine' && Gdn::session()->UserID > 0) {
-            $groups = $groupModel->GetByUser(Gdn::session()->UserID, $orderBy, 'desc', $limit);
+            $groups = $groupModel->getByUser(Gdn::session()->UserID, $orderBy, 'desc', $limit);
         }
         else {
-            $groups = $groupModel->Get($orderBy, 'desc', $limit)->resultArray();
+            $groups = $groupModel->get($orderBy, 'desc', $limit)->resultArray();
         }
         if ($attachLastDiscussion) {
-            $groupModel->JoinRecentPosts($groups);
+            $groupModel->joinRecentPosts($groups);
         }
         return $groups;
     }
@@ -152,8 +135,8 @@ class PromotedGroupsModule extends Gdn_Module {
      *
      * @return string HTML view
      */
-    public function ToString() {
-        $groups = $this->GetData($this->promoteType, $this->limit, $this->attachLastDiscussion, $this->orderBy);
+    public function toString() {
+        $groups = $this->getData($this->promoteType, $this->limit, $this->attachLastDiscussion, $this->orderBy);
         $groupList = new GroupListModule($groups, $this->promoteType, $this->title, t("There aren't any groups yet."), 'groups-'.$this->promoteType);
         $groupList->setView($this->getView());
         return $groupList->toString();

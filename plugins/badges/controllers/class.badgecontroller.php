@@ -37,10 +37,9 @@ class BadgeController extends BadgesAppController {
      * @access public
      */
     public function all() {
+        Gdn_Theme::section('Dashboard');
         $this->permission('Garden.Settings.Manage');
         $this->setData('Badges', $this->BadgeModel->getList());
-
-        $this->addSideMenu('/badge/all');
         $this->render();
     }
 
@@ -132,7 +131,7 @@ class BadgeController extends BadgesAppController {
             }
         }
 
-        $this->render();
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -319,6 +318,10 @@ class BadgeController extends BadgesAppController {
      */
     public function index($BadgeID = '', $Name = '') {
 
+        $this->MasterView = 'default';
+        $this->addCssFile('style.css');
+        $this->removeCssFile('admin.css');
+
         // Get badge data or 404
         $this->Badge = $this->BadgeModel->getID($BadgeID);
         if (!$this->Badge) {
@@ -369,8 +372,6 @@ class BadgeController extends BadgesAppController {
 
         // Form submitted
         if ($this->Form->authenticatedPostBack()) {
-            $Data = $this->Form->formValues();
-
             // Set BadgeID for existing or set Type = Manual for new
             if (!$Insert) {
                 $this->Form->setFormValue('BadgeID', $BadgeID);
@@ -379,11 +380,11 @@ class BadgeController extends BadgesAppController {
             }
 
             try {
-                    // Upload image
-                    $UploadImage = new Gdn_UploadImage();
+                // Upload image
+                $UploadImage = new Gdn_UploadImage();
 
-                    // Validate the upload
-                    $TmpImage = $UploadImage->validateUpload('Photo', false);
+                // Validate the upload
+                $TmpImage = $UploadImage->validateUpload('Photo', false);
 
                 if ($TmpImage) {
                     // Generate the target image name.
@@ -437,6 +438,10 @@ class BadgeController extends BadgesAppController {
      * @param mixed $BadgeID Unique numeric ID or slug.
      */
     public function request($BadgeID) {
+        $this->MasterView = 'default';
+        $this->addCssFile('style.css');
+        $this->removeCssFile('admin.css');
+
         $this->permission('Reputation.Badges.Request');
         $Session = Gdn::session();
 
@@ -471,9 +476,6 @@ class BadgeController extends BadgesAppController {
     public function requests() {
         $this->permission('Reputation.Badges.Give');
 
-        $this->RequestData = $this->UserBadgeModel->getRequests();
-        Gdn::userModel()->joinUsers($this->RequestData, array('UserID'));
-
         if ($this->Form->authenticatedPostBack() === true) {
             $Action = $this->Form->getValue('Submit');
             $Requests = $this->Form->getValue('Requests');
@@ -486,15 +488,16 @@ class BadgeController extends BadgesAppController {
                     }
                     if ($Action == 'Approve') {
                         $this->UserBadgeModel->give($Data[0], $Data[1]);
-                    } elseif ($Action == 'Decline')
+                    } elseif ($Action == 'Decline') {
                         $this->UserBadgeModel->declineRequest($Data[0], $Data[1]);
+                    }
                 }
             }
         }
 
-        $this->addSideMenu('reputation/badge/requests');
-        $this->View = 'requests';
-        $this->render();
+        $this->RequestData = $this->UserBadgeModel->getRequests();
+        Gdn::userModel()->joinUsers($this->RequestData, array('UserID'));
+        $this->render('requests', 'badge');
     }
 
     /**
