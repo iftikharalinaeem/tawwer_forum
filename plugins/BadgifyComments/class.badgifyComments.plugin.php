@@ -15,6 +15,15 @@ $PluginInfo['BadgifyComments'] = array(
 
 class BadgifyCommentsPlugin extends Gdn_Plugin {
 
+    private $defaultSettings = [
+        'Name' => 'Commented in Discussion',
+        'Slug' =>'commented-in-discussion',
+        'Description' =>'Comment in a specially marked discussion, get a badge!',
+        'Points' =>'5',
+        'BadgeClass' =>'Cool',
+        'BadgeClassLevel' =>'11',
+
+    ];
     /**
      * Hook into flyout menu on discussions.
      * TODO Check if there is already a badge assigned to this discussion
@@ -42,10 +51,23 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      */
     public function badgeController_manageBadgeForm_handler ($sender, $args) {
         $formArray = (array) $sender->Form->formData();
-        $discussionID = Gdn::request()->get('discussionID');
-        $defaultValues = ['Name' => 'Comment Ninja', 'Slug' => 'commented-on-discussion-'.$discussionID];
-        $defaults = array_merge($defaultValues, $formArray);
-        $sender->Form->setData($defaults);
+        $discussionIDAppend = Gdn::request()->get('discussionID');
+
+        if ($discussionIDAppend) {
+            $defaultValues = [
+                'Name' => c('Badgify.Default.Name', $this->defaultSettings['Name']),
+                'Slug' => c('Badgify.Default.Slug', $this->defaultSettings['Slug']).'-'.$discussionIDAppend,
+                'Body' => c('Badgify.Default.Description', $this->defaultSettings['Description']),
+                'Points' => c('Badgify.Default.Points', $this->defaultSettings['Points']),
+                'Class' => c('Badgify.Default.BadgeClass', $this->defaultSettings['BadgeClass']),
+                'Level' => c('Badgify.Default.BadgeClassLevel', $this->defaultSettings['BadgeClassLevel'])
+            ];
+            $defaults = array_merge($defaultValues, $formArray);
+            $sender->Form->setData($defaults);
+            $sender->Form->input('Name2', 'Text', ['Disabled' => true]);
+            $sender->View = null;
+            $sender->render('status', '', 'plugins/ideation');
+        }
     }
 
     /**
@@ -54,7 +76,24 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      * @param $args
      */
     public function settingsController_badgifyComments_create ($sender, $args) {
+        $sender->Permission('Garden.Settings.Manage');
 
+        $cf = new ConfigurationModule($sender);
+
+        $cf->Initialize(
+            array(
+                'Badgify.Default.Name' => ['Default' => $this->defaultSettings['Name']],
+                'Badgify.Default.Slug' => ['Default' => $this->defaultSettings['Slug']],
+                'Badgify.Default.Description' => ['Default' => $this->defaultSettings['Description']],
+                'Badgify.Default.Points' => ['Default' => 10],
+                'Badgify.Default.BadgeClass' => ['Default' => $this->defaultSettings['BadgeClass']],
+                'Badgify.Default.BadgeClassLevel' => ['Default' => $this->defaultSettings['BadgeClassLevel']]
+            )
+        );
+
+        $sender->AddSideMenu();
+        $sender->SetData('Title', T('Badgification Settings'));
+        $cf->RenderAll();
     }
 
     /**
