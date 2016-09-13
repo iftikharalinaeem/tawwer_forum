@@ -56,7 +56,8 @@ class EventModel extends Gdn_Model {
      *
      * @param strtotime $Future Relative time offset. Like "+30 days"
      * @param array $Where
-     * @param boolean $Ended Optional. Only events that have ended?
+     * @param boolean $Ended Optional. Only events that have due to their end date?
+     *      (End date is optional so setting this will exclude events with no end date.)
      * @return type
      */
     public function getUpcoming($Future, $Where = null, $Ended = null) {
