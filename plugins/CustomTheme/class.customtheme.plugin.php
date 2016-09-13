@@ -133,7 +133,7 @@ class CustomThemePlugin extends Gdn_Plugin {
      *
      * @param $sender
      */
-    public function base_render_before(&$sender) {
+    public function base_render_before($sender) {
         if (isMobile() && !c('Plugins.CustomTheme.OverrideMobile')) {
             return;
         }

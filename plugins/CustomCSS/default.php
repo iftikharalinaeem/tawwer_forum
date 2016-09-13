@@ -14,14 +14,14 @@ class CustomCSSPlugin implements Gdn_IPlugin {
    
    /**
     * Adds "Custom CSS" menu option to the dashboard.
-   public function Base_GetAppSettingsMenuItems_Handler(&$Sender) {
+   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
       $Menu = &$Sender->EventArguments['SideMenu'];
 		$Menu->AddItem('Appearance', 'Appearance');
       $Menu->AddLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
    }
     */
 	
-   public function Base_Render_Before(&$Sender) {
+   public function Base_Render_Before($Sender) {
 		// If we are using the default master view, and in preview mode, add the custom css file
 		$Session = Gdn::Session();
 		$Preview = $Session->GetPreference('PreviewCustomCSS', FALSE);

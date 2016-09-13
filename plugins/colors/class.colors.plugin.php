@@ -30,7 +30,7 @@ class Colors extends Gdn_Plugin {
     * Placed these components everywhere due to some Web sites loading the 
     * editor in some areas where the values were not yet injected into HTML.
     */
-   public function Base_Render_Before(&$Sender) {
+   public function Base_Render_Before($Sender) {
       $c = Gdn::Controller();
       // Load JavaScript
       $c->AddJsFile('spectrum.js', 'plugins/colors');
