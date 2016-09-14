@@ -7,7 +7,7 @@
             <th class="column-sm"><?php echo T('Locale'); ?></th>
             <th><?php echo T('Last Sync'); ?></th>
             <th class="column-sm"><?php echo T('Status'); ?></th>
-            <th class="column-sm"><?php echo T('Options'); ?></th>
+            <th class="column-sm"></th>
         </tr>
         </thead>
         <tbody>
@@ -32,7 +32,7 @@
                     ?>
                 </td>
                 <td class="js-status"><?php echo strtolower($Row['Status']); ?></td>
-                <td>
+                <td class="options">
                     <?php
                     echo anchor(dashboardSymbol('delete'), "/multisites/{$Row['MultisiteID']}/delete", 'btn btn-icon js-modal-confirm js-hijack',
                         ['aria-label' => t('Delete'), 'data-content' => ['body' => sprintf(t('Are you sure you want to delete this %s?'), t('site'))]]);
