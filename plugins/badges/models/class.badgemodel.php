@@ -54,7 +54,9 @@ class BadgeModel extends BadgesAppModel {
             $Badge['Attributes'] = array();
         }
 
-        $Badge['Photo'] = Gdn_Upload::url($Badge['Photo']);
+        if ($Badge['Photo'] != '') {
+            $Badge['Photo'] = Gdn_Upload::url($Badge['Photo']);
+        }
     }
 
     /**
