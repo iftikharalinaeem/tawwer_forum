@@ -6,15 +6,24 @@ $PluginInfo['BadgifyComments'] = array(
     'Description' => 'Allows user login to be authenticated on Auth0 SSO.',
     'Version' => '1.0.0',
     'RequiredApplications' => ['Vanilla' => '1.0', 'Reputation' => '1.0'],
-    'RequiredTheme' => false,
-    'HasLocale' => false,
     'SettingsUrl' => '/settings/BadgifyComments',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true
 );
 
+/**
+ * This plugin will allow admins to designate certain discussions so that whenver
+ * users comment in the discussion they receive a badge.
+ *
+ * Class BadgifyCommentsPlugin
+ */
 class BadgifyCommentsPlugin extends Gdn_Plugin {
 
+    /**
+     * Set default settings, add a field to the badge table to link badges to discussions.
+     *
+     * @throws Exception
+     */
     public function setup() {
         Gdn::structure()->table('Badge')
             ->column('BadgeDiscussion', 'int', '0', array('index'))
@@ -32,6 +41,7 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
 
     /**
      * Hook into flyout menu on discussions.
+     *
      * @param $sender
      * @param $args
      */
