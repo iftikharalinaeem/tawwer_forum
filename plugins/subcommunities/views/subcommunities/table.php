@@ -5,7 +5,7 @@
             <th class="column-md"><?php echo t('Name'); ?></th>
             <th><?php echo t('Folder') ?></th>
             <th class="column-sm"><?php echo t('Locale') ?></th>
-            <th class="column-sm"><?php echo t('Options') ?></th>
+            <th class="column-sm"></th>
         </tr>
         </thead>
         <tbody>
@@ -22,12 +22,11 @@
                     ?>
                 </td>
                 <td><?php echo strtolower($Row['Locale']); ?></td>
-                <td>
+                <td class="options">
                     <div class="btn-group">
                     <?php
-                    echo anchor(dashboardSymbol('edit'), "/subcommunities/$id/edit", 'js-modal btn btn-icon',  ['aria-label' => t('Edit')]),
-                        anchor(dashboardSymbol('delete'), "/subcommunities/$id/delete", 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'data-content' => ['body' => sprintf(t('Are you sure you want to delete this %s?'), t('site'))]]);
-
+                    echo anchor(dashboardSymbol('edit'), "/subcommunities/$id/edit", 'js-modal btn btn-icon',  ['aria-label' => t('Edit'), 'title' => t('Edit')]),
+                        anchor(dashboardSymbol('delete'), "/subcommunities/$id/delete", 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-content' => ['body' => sprintf(t('Are you sure you want to delete this %s?'), t('site'))]]);
                     ?>
                     </div>
                 </td>
