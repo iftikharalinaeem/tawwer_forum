@@ -74,7 +74,7 @@
             ?>
          </td>
          <td class="options">
-            <?php echo anchor(dashboardSymbol('edit'), "/reactions/edit/{$UrlCode}", 'js-modal btn btn-icon', ['aria-label' => t('Edit')]); ?>
+            <?php echo anchor(dashboardSymbol('edit'), "/reactions/edit/{$UrlCode}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]); ?>
             <?php echo ActivateButton($ReactionType); ?>
          </td>
       </tr>

@@ -42,7 +42,7 @@ $Session = Gdn::Session();
                 <div class="btn-group">
                     <?php
                     echo anchor(dashboardSymbol('checkmark'), '/badge/approve/'.$Request->UserID.'/'.$Request->BadgeID.'/'.$Session->TransientKey(), 'btn btn-icon', ['aria-label' => t('Approve')]);
-                    echo anchor(dashboardSymbol('delete'), '/badge/decline/'.$Request->UserID.'/'.$Request->BadgeID.'/'.$Session->TransientKey(), 'btn btn-icon', ['aria-label' => t('Delete')]);
+                    echo anchor(dashboardSymbol('delete'), '/badge/decline/'.$Request->UserID.'/'.$Request->BadgeID.'/'.$Session->TransientKey(), 'btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                     ?>
                 </div>
             </td>

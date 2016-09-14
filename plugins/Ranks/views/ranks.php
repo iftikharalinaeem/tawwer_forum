@@ -64,8 +64,8 @@
                 <td class="options">
                     <div class="btn-group">
                     <?php
-                    echo anchor(dashboardSymbol('edit'), '/settings/editrank?rankid='.$Row['RankID'], 'btn btn-icon', ['aria-label' => t('Edit')]);
-                    echo anchor(dashboardSymbol('delete'), '/settings/deleterank?rankid='.$Row['RankID'], 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete')]);
+                    echo anchor(dashboardSymbol('edit'), '/settings/editrank?rankid='.$Row['RankID'], 'btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
+                    echo anchor(dashboardSymbol('delete'), '/settings/deleterank?rankid='.$Row['RankID'], 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                     ?>
                     </div>
                 </td>
