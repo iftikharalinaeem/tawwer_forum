@@ -11,12 +11,11 @@ foreach ($this->Data('Badges') as $Badge) :
 
         <td>
             <div class="media-sm">
-            <?php if ($Badge->Photo) : ?>
                 <div class="media-sm-image-wrap-no-border">
-                <?php echo Img(Gdn_Upload::Url($Badge->Photo),
-                    array('class' => 'BadgePhoto')); ?>
+                <?php if ($Badge->Photo) :
+                    echo Img(Gdn_Upload::Url($Badge->Photo), array('class' => 'BadgePhoto'));
+                endif; ?>
                 </div>
-            <?php endif; ?>
                 <div class="media-sm-content">
                     <div class="media-sm-title strong">
                         <?php echo Anchor(UserBadgeModel::BadgeName((array)$Badge), 'badge/'.$Badge->BadgeID, 'Title'); ?>
@@ -61,7 +60,7 @@ foreach ($this->Data('Badges') as $Badge) :
             }
             if (CheckPermission('Reputation.Badges.Manage') && $Badge->CanDelete) {
                 echo anchor(dashboardSymbol('delete'), '/badge/delete/'.$Badge->BadgeID.'/?Target='.urlencode($this->SelfUrl), 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'data-content' => ['body' => t('Are you sure you want to delete this badge?')]]);
-            } 
+            }
             if ($Session->CheckPermission('Reputation.Badges.Give') && $Badge->Active) {
                 echo anchor(t('Give'), '/badge/give/'.$Badge->BadgeID, 'js-modal btn btn-icon');
             }
