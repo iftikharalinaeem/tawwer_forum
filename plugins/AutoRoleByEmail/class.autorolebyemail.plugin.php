@@ -22,10 +22,14 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
 	/**
     * Add 'Domains' box to Edit Role page.
     */
-   public function RoleController_BeforeRolePermissions_Handler($Sender) {
-      echo Wrap($Sender->Form->Label('Domains', 'Domains') .
-         Wrap(T('RoleDomainInfo', "Assign new users to this role if their email is from one of these domains (space-separated)."), 'div', array('class' => 'Info')) .
-         $Sender->Form->TextBox('Domains', array('MultiLine' => TRUE)), 'li');
+   public function RoleController_BeforeRolePermissions_Handler($sender) {
+      echo '<li class="form-group row">
+                <div class="label-wrap">'.
+                $sender->Form->label('Domains', 'Domains').
+                wrap(t('RoleDomainInfo', "Assign new users to this role if their email is from one of these domains (space-separated)."), 'div', ['class' => 'info']).
+                '</div>'.
+                $sender->Form->textBoxWrap('Domains', ['MultiLine' => true]).
+            '</li>';
 	}
    
    /**

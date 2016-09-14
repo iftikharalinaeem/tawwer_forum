@@ -27,19 +27,6 @@ foreach ($this->Data('Badges') as $Badge) :
         <td><?php echo Gdn_Format::Text($Badge->Class); ?></td>
         <td><?php echo Gdn_Format::Text($Badge->Level); ?></td>
         <td><?php echo Gdn_Format::Text($Badge->CountRecipients); ?></td>
-
-        <td><?php
-             // Disable badge
-            if (CheckPermission('Reputation.Badges.Manage')) {
-//                echo Anchor(T($Badge->Active ? 'Yes' : 'No'),
-//                    '/badge/disable/'.$Badge->BadgeID.'/'.$AjaxString,
-//                    'DisableBadge', array('title'=> ($Badge->Active ? 'Click to Disable' : 'Click to Enable')));
-                echo ActivateBadge($Badge, $AjaxString);
-            }
-            else
-                echo Gdn_Format::Text(($Badge->Active) ? 'Yes' : 'No'); ?>
-        </td>
-
         <!--<td><?php
             // Hide badge
             if (CheckPermission('Reputation.Badges.Manage')) {
@@ -52,7 +39,7 @@ foreach ($this->Data('Badges') as $Badge) :
                 echo Gdn_Format::Text(($Badge->Visible) ? 'Yes' : 'No'); ?>
         </td>-->
 
-        <td>
+        <td class="options">
             <div class="btn-group">
             <?php
             if (CheckPermission('Reputation.Badges.Manage')) {
@@ -63,6 +50,9 @@ foreach ($this->Data('Badges') as $Badge) :
             }
             if ($Session->CheckPermission('Reputation.Badges.Give') && $Badge->Active) {
                 echo anchor(t('Give'), '/badge/give/'.$Badge->BadgeID, 'js-modal btn btn-icon');
+            }
+            if (CheckPermission('Reputation.Badges.Manage')) {
+                echo ActivateBadge($Badge, $AjaxString);
             }
             ?>
             </div>

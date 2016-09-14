@@ -34,7 +34,7 @@
                 <th class=""><?php echo T('Label'); ?></th>
                 <th class="CriteriaColumn column-lg"><?php echo T('Criteria'); ?></th>
                 <th class="AbilitiesColumn column-lg"><?php echo T('Abilites'); ?></th>
-                <th class="options column-sm"><?php echo T('Options'); ?></th>
+                <th class="options column-sm"></th>
             </tr>
         </thead>
         <tbody>
@@ -61,7 +61,7 @@
                     echo RankModel::AbilitiesString($Row);
                     ?>
                 </td>
-                <td>
+                <td class="options">
                     <div class="btn-group">
                     <?php
                     echo anchor(dashboardSymbol('edit'), '/settings/editrank?rankid='.$Row['RankID'], 'btn btn-icon', ['aria-label' => t('Edit')]);

@@ -28,7 +28,7 @@
         <tr>
             <th class="NameColumn column-lg"><?php echo t('Status'); ?></th>
             <th class="IsOpenColumn"><?php echo t('State'); ?></th>
-            <th class="options column-sm"><?php echo t('Options'); ?></th>
+            <th class="options column-sm"></th>
         </tr>
         </thead>
         <tbody>
@@ -45,7 +45,7 @@
                     echo $row['State'];
                     ?>
                 </td>
-                <td>
+                <td class="options">
                     <div class="btn-group">
                     <?php
                     echo anchor(dashboardSymbol('edit'), '/settings/editstatus/'.$row['StatusID'], 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
