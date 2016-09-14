@@ -163,8 +163,10 @@ class ReactionsController extends DashboardController {
                 $Reaction['ReactionID'] = $ReactionID;
                 $this->setData('Reaction', $ReactionData);
 
-                if ($this->deliveryType() != DELIVERY_TYPE_DATA) {
-                    $this->informMessage(formatString(t("New reaction created"), $ReactionData));
+                $this->informMessage(t('Reaction saved.'));
+                if ($this->_DeliveryType !== DELIVERY_TYPE_ALL) {
+                    $this->render('blank', 'utility', 'dashboard');
+                } else {
                     redirect('/reactions');
                 }
             }
