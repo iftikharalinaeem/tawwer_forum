@@ -88,7 +88,7 @@ class ProxyConnectManualPlugin extends Gdn_Plugin {
       return $this->GetView('cookie.php');
    }
    
-   public function ProxyConnectPlugin_ConfigureIntegrationManager_Handler(&$Sender) {
+   public function ProxyConnectPlugin_ConfigureIntegrationManager_Handler($Sender) {
       $this->ProxyConnect = $Sender;
       
       // Check that we should be handling this

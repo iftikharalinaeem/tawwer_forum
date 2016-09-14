@@ -479,7 +479,7 @@ class Gdn_ProxyAuthenticator extends Gdn_Authenticator implements Gdn_IHandshake
       if ($Id < 0) return Gdn_Authenticator::MODE_NOAUTH;
    }
    
-   public function AuthenticatorConfiguration(&$Sender) {
+   public function AuthenticatorConfiguration($Sender) {
       // Let the plugin handle the config
       $Sender->AuthenticatorConfigure = NULL;
       $Sender->FireEvent('AuthenticatorConfigurationProxy');

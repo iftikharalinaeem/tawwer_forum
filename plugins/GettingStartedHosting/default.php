@@ -21,7 +21,7 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
 */    
     
    // Save various steps, and render the getting started message.
-   public function SettingsController_Render_Before(&$Sender) {
+   public function SettingsController_Render_Before($Sender) {
       // Save the action if editing registration settings
       if (strtolower($Sender->RequestMethod) != 'index')
          $this->SaveStep('Plugins.GettingStartedHosting.Dashboard');
@@ -106,18 +106,18 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
    }
    
    // If the user posts back any forms to their profile, they've completed step 4: profile customization
-   public function ProfileController_Render_Before(&$Sender) {
+   public function ProfileController_Render_Before($Sender) {
       if (property_exists($Sender, 'Form') && $Sender->Form->AuthenticatedPostBack() === TRUE)
          $this->SaveStep('Plugins.GettingStartedHosting.Profile');
    }
 
    // If the user starts a discussion
-   public function PostController_Render_Before(&$Sender) {
+   public function PostController_Render_Before($Sender) {
       if (strcasecmp($Sender->RequestMethod, 'discussion') == 0 && $Sender->Form->AuthenticatedPostBack() === TRUE)
          $this->SaveStep('Plugins.GettingStartedHosting.Discussion');
    }
 
-   public function DiscussionsController_Render_Before(&$Sender) {
+   public function DiscussionsController_Render_Before($Sender) {
       $this->SaveStep('Plugins.GettingStartedHosting.Discussions');
    }
    

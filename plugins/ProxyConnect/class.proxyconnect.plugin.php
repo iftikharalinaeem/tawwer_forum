@@ -309,7 +309,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       return ($Provider) ? $Provider : NULL;
    }
    
-   public function EntryController_SignIn_Handler(&$Sender) {
+   public function EntryController_SignIn_Handler($Sender) {
       if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
       $AllowCallout = !Gdn::Request()->GetValue('Landing', FALSE);
       $this->SigninLoopback($Sender, $AllowCallout);
@@ -416,7 +416,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       return Gdn::Dispatcher()->Dispatch($LandingRequest);
    }
    
-   public function EntryController_BeforeSignOut_Handler(&$Sender) {
+   public function EntryController_BeforeSignOut_Handler($Sender) {
       if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
       $SessionAuthenticator = Gdn::Session()->GetPreference('Authenticator');
       if ($SessionAuthenticator != 'proxy') return;
@@ -427,7 +427,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       Redirect($SignoutURL,302);
    }
    
-   public function EntryController_Register_Handler(&$Sender) {
+   public function EntryController_Register_Handler($Sender) {
       if (!Gdn::Authenticator()->IsPrimary('proxy')) return;
       
       $Redirect = Gdn::Request()->GetValue('HTTP_REFERER');
@@ -494,7 +494,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       return ($Inserted !== FALSE) ? $Provider : FALSE;
    }
    
-   public function AuthenticationController_DisableAuthenticatorProxy_Handler(&$Sender) {
+   public function AuthenticationController_DisableAuthenticatorProxy_Handler($Sender) {
       $this->_Disable();
    }
    
@@ -512,7 +512,7 @@ class ProxyConnectPlugin extends Gdn_Plugin {
       } catch (Exception $e) {}
    }
 	
-   public function AuthenticationController_EnableAuthenticatorProxy_Handler(&$Sender) {
+   public function AuthenticationController_EnableAuthenticatorProxy_Handler($Sender) {
       $this->_Enable();
    }
 	
