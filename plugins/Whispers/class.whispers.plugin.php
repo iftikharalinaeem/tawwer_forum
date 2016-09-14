@@ -347,7 +347,7 @@ class WhispersPlugin extends Gdn_Plugin {
             ->Where('ConversationID', $ConversationID)
             ->Where('Deleted', 0)
             ->Get()->ResultArray();
-         $UserIDs = ConsolidateArrayValuesByKey($WhisperUsers, 'UserID');
+         $UserIDs = array_column($WhisperUsers, 'UserID');
       }
 
       if (!Gdn::Session()->CheckPermission('Conversations.Moderation.Manage') && !in_array(Gdn::Session()->UserID, $UserIDs)) {
