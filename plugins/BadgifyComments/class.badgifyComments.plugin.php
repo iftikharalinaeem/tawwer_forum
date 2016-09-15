@@ -49,7 +49,7 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
         $discussionID = valr('Discussion.DiscussionID', $args);
 
         // If there isn't already a badge assigned to this discussion, add link to flyout menu.
-        if (!$this->discussionBadgeExists($discussionID) && Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+        if (!$this->getDiscussionBadge($discussionID) && Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             $args['DiscussionOptions']['Add a Badge'] = [
                 'Label' => t('Add a Badge'),
                 'Url' => "/badge/manage/?discussionID={$discussionID}",
@@ -117,13 +117,13 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
     /**
      * Query the badge table to find out if a badge already exists for this discussion.
      *
-     * @param null $discussionID
+     * @param int $discussionID
      *
-     * @return int $discussionID
+     * @return array|bool $badge A badge that is associated with this Discussion, if not false.
      */
-    public function discussionBadgeExists($discussionID = null) {
+    public function getDiscussionBadge($discussionID = null) {
         if ($discussionID) {
-            $badge = reset(Gdn::sql()->select()->from('Badge')->where(['BadgeDiscussion' => $discussionID])->get()->resultArray());
+            $badge = Gdn::sql()->select()->from('Badge')->where(['BadgeDiscussion' => $discussionID])->get()->resultArray()->firstRow();
             if ($badge) {
                 return $badge;
             }
@@ -133,17 +133,18 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
 
 
     /**
-     * Hook into comment save and give the bandge.
+     * Hook into comment save and give the badge.
+     *
      * @param $sender
      * @param $args
      */
     public function commentModel_afterSaveComment_handler($sender, $args) {
         $discussionID = valr('FormPostValues.DiscussionID', $args);
         $userID = valr('FormPostValues.InsertUserID', $args);
-        $badge = $this->discussionBadgeExists($discussionID);
+        $badge = $this->getDiscussionBadge($discussionID);
         if ($badge) {
             $userBadgeModel = new UserBadgeModel();
-            $userBadgeModel->Give($userID, val('BadgeID', $badge), val('Body', $badge));
+            $userBadgeModel->give($userID, val('BadgeID', $badge), val('Body', $badge));
         }
     }
 
@@ -155,7 +156,7 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      * @param $args
      */
     public function discussionsController_beforeDiscussionName_handler($sender, $args) {
-        if ($this->discussionBadgeExists(valr('Discussion.DiscussionID', $args))) {
+        if ($this->getDiscussionBadge(valr('Discussion.DiscussionID', $args))) {
             $args['CssClass'] .= ' Badgified';
         }
     }

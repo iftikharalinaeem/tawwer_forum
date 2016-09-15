@@ -1,4 +1,4 @@
-### Badgification
+### Badgify Comments
 
 This plugin allows admins to add a preformatted badge to a discussion that is awarded to anyone who comments on a discussion. There will be one badge per discussion.
 
@@ -8,7 +8,7 @@ This plugin allows admins to add a preformatted badge to a discussion that is aw
  - Link in the flyout menu which would display based on permission to create a badge for a discussion
  - Badges awarded automatically on submission of the comment form
 
- ##Possible Features
+## Possible Features
 
  - Upload an image feauture as a default badge
  - Hide this class of badge on the user's profile page since he/she might have many of them.
