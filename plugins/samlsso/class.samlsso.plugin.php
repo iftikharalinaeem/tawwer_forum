@@ -371,7 +371,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
             $settings = $this->getSettings();
             $response = new OneLogin_Saml_Response($settings, $Sender->Request->post('SAMLResponse'));
 
-            Logger::event('saml_response_received', Logger::INFO, "SAML response received.");
+            Logger::event('saml_response_received', Logger::INFO, "SAML response received.", (array)$response->assertion);
 
             try {
                 if (!$response->isValid()) {
