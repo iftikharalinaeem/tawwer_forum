@@ -165,7 +165,7 @@ class EventListModule extends Gdn_Module {
           $eventList['cssClass'] = 'EventList';
 
           if ($showMoreUrl) {
-                $eventList['moreLink'] = sprintf(T('All %s...'), T('Events'));
+                $eventList['moreLink'] = t('All Events');
                 $eventList['moreCssClass'] = 'More';
                 $eventList['moreUrl'] =  $showMoreUrl;
           }
