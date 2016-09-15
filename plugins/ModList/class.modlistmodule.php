@@ -20,7 +20,7 @@ class ModListModule extends Gdn_Module {
     */
    public $CategoryID;
    
-   public function __construct(&$Sender = '') {
+   public function __construct($Sender = '') {
       parent::__construct($Sender);
       
       $this->_ApplicationFolder = 'plugins/ModList';

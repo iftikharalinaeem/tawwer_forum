@@ -28,7 +28,7 @@
         <tr>
             <th class="NameColumn column-lg"><?php echo t('Status'); ?></th>
             <th class="IsOpenColumn"><?php echo t('State'); ?></th>
-            <th class="options column-sm"><?php echo t('Options'); ?></th>
+            <th class="options column-sm"></th>
         </tr>
         </thead>
         <tbody>
@@ -45,11 +45,11 @@
                     echo $row['State'];
                     ?>
                 </td>
-                <td>
+                <td class="options">
                     <div class="btn-group">
                     <?php
-                    echo anchor(dashboardSymbol('edit'), '/settings/editstatus/'.$row['StatusID'], 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
-                    echo anchor(dashboardSymbol('delete'), '/settings/deletestatus?statusid='.$row['StatusID'], 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'data-content' => ['body' => sprintf(t('Are you sure you want to delete this %s?'), t('Status'))]]);
+                    echo anchor(dashboardSymbol('edit'), '/settings/editstatus/'.$row['StatusID'], 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
+                    echo anchor(dashboardSymbol('delete'), '/settings/deletestatus?statusid='.$row['StatusID'], 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-content' => ['body' => sprintf(t('Are you sure you want to delete this %s?'), t('Status'))]]);
                     ?>
                     </div>
                 </td>

@@ -122,7 +122,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
      *
      * @param Base &$sender The base controller.
      */
-    public function base_getAppSettingsMenuItems_handler(&$sender) {
+    public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
         $menu->AddItem('Users', T('Users'));
         $menu->AddLink(
@@ -591,7 +591,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
      *
      * @param profileController &$sender The profile controller.
      */
-    public function profileController_afterAddSideMenu_handler(&$sender) {
+    public function profileController_afterAddSideMenu_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
         $menu->RemoveLink('Options', '/profile/thumbnail');
     }

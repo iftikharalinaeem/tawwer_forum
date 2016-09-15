@@ -27,7 +27,7 @@ $PluginInfo['TwitterForUserGroup'] = array(
 
 class TwitterForUserGroupPlugin extends Gdn_Plugin {
 
-   public function Base_Render_Before(&$Sender) {
+   public function Base_Render_Before($Sender) {
       
       // Only display this in panels loaded from the default master view... prevent loading in admin panel
       if (!in_array($Sender->MasterView, array('','default.master.php'))) return;

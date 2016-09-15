@@ -110,7 +110,7 @@ class CustomThemePlugin extends Gdn_Plugin {
 
         if ($data['serveFile']) {
             $host = Gdn::request()->host();
-            $sender->addCssFile(false, "/plugin/customcss/{$host}/rev_{$liveRevisionID}.css", ['Css' => $data['content'], 'Sort' => 100]);
+            $sender->addCssFile(false, "/plugin/customcss/{$host}/rev_{$liveRevisionID}.css", ['Css' => $data['content'], 'Sort' => 2000]);
         }
     }
 
@@ -133,7 +133,7 @@ class CustomThemePlugin extends Gdn_Plugin {
      *
      * @param $sender
      */
-    public function base_render_before(&$sender) {
+    public function base_render_before($sender) {
         if (isMobile() && !c('Plugins.CustomTheme.OverrideMobile')) {
             return;
         }

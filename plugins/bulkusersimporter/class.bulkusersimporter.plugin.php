@@ -178,7 +178,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    /**
     * Adds menu option to the left in dashboard.
     */
-   public function Base_GetAppSettingsMenuItems_Handler(&$sender) {
+   public function Base_GetAppSettingsMenuItems_Handler($sender) {
       $menu = $sender->EventArguments['SideMenu'];
       $menu->AddItem('Import', T('Import'));
       $menu->AddLink('Import', T($this->plugin_title), '/settings/bulkusersimporter', 'Garden.Settings.Manage');

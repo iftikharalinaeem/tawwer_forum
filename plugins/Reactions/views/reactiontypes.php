@@ -27,7 +27,7 @@
    <?php if (CheckPermission('Garden.Settings.Manage')) { ?>
       <div class="Wrap">
          <?php
-         echo Anchor(T('Advanced Settings'), '/reactions/advanced', 'Button');
+         echo Anchor(T('Advanced Settings'), '/reactions/advanced', 'js-modal btn btn-primary');
          ?>
       </div>
    <?php } ?>
@@ -38,8 +38,7 @@
       <tr>
          <th class="NameColumn column-lg"><?php echo T('Reaction'); ?></th>
          <th class="column-xl"><?php echo T("Actions and Permissions"); ?></th>
-         <th class="active column-sm"><?php echo T('Active'); ?></th>
-         <th class="options column-sm"><?php echo T('Options'); ?></th>
+         <th class="options"></th>
       </tr>
    </thead>
    <tbody>
@@ -74,13 +73,9 @@
                echo Wrap('<li>'.$AutoDescription.'</li>', 'ul');
             ?>
          </td>
-         <td>
-            <?php
-            echo ActivateButton($ReactionType);
-            ?>
-         </td>
-         <td>
-            <?php echo anchor(dashboardSymbol('edit'), "/reactions/edit/{$UrlCode}", 'js-modal btn btn-icon', ['aria-label' => t('Edit')]); ?>
+         <td class="options">
+            <?php echo anchor(dashboardSymbol('edit'), "/reactions/edit/{$UrlCode}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]); ?>
+            <?php echo ActivateButton($ReactionType); ?>
          </td>
       </tr>
       <?php endforeach; ?>

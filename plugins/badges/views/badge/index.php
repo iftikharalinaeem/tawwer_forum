@@ -35,8 +35,10 @@ $Session = Gdn::Session();
 
 $this->Title(T('View Badge') . ': ' . $this->Data('Badge.Name')); ?>
 
-<?php if ($Photo = $this->Data('Badge.Photo'))
-    echo Img( Gdn_Upload::Url(ChangeBasename($Photo, '%s')), array('class' => 'BadgePhotoDisplay') ); ?>
+<?php if ($Photo = $this->Data('Badge.Photo')) {
+    echo Img( Gdn_Upload::Url(ChangeBasename($Photo, '%s')), array('class' => 'BadgePhotoDisplay') );
+}
+?>
 
 <h1><?php echo Gdn_Format::Text($this->Data('Badge.Name')); ?></h1>
 <p><?php echo Gdn_Format::Html($this->Data('Badge.Body')); ?></p>

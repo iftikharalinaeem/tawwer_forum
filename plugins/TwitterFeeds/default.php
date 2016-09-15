@@ -39,7 +39,7 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 	 *
 	 * @todo Make use of http://twitter.com/javascripts/blogger.js ??
 	 */
-	public function ProfileController_AddProfileTabs_Handler(&$Sender)
+	public function ProfileController_AddProfileTabs_Handler($Sender)
 	{
 		// Get the selected User's Twitter Name
 		$TwitterName = $Sender->User->TwitterName;
@@ -133,7 +133,7 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 	 * @since 1.0
 	 * @author Oliver Raduner <vanilla@raduner.ch>
 	 */
-	public function ProfileController_EditMyAccountAfter_Handler(&$Sender) {
+	public function ProfileController_EditMyAccountAfter_Handler($Sender) {
 		echo '<li>';
 		echo $Sender->Form->Label('Twitter Name', 'TwitterName');
 		echo $Sender->Form->Input('TwitterName', 'text', array('maxlength' => 15));

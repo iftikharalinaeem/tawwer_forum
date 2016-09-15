@@ -94,7 +94,7 @@ class SecurityWordsPlugin extends Gdn_Plugin {
      *
      * @param Controller &$sender The controller for the given context.
      */
-    public function base_getAppSettingsMenuItems_handler(&$sender) {
+    public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
         $menu->AddItem('Moderation', T('Moderation'));
         $menu->AddLink('Moderation', T('Security Words'), '/settings/securitywords', 'Garden.Settings.Manage');

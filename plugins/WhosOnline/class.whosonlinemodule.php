@@ -6,7 +6,7 @@ class WhosOnlineModule extends Gdn_Module {
 
 	protected $_OnlineUsers;
 
-	public function __construct(&$Sender = '') {
+	public function __construct($Sender = '') {
 		parent::__construct($Sender);
 	}
 

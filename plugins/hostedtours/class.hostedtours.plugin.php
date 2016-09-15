@@ -115,7 +115,7 @@ TOOLTIP
 ,
                 ],
                 [
-                    'page' => '/settings',
+                    'page' => '/dashboard/settings/home',
                     'title' => '<i class="fa fa-cogs"></i> Dashboard',
                     'tooltipClass' => 'tooltip-welcome welcome-dashboard',
                     'intro' => <<<TOOLTIP
@@ -128,8 +128,8 @@ TOOLTIP
 ,
                 ],
                 [
-                    'page' => '/settings/themes',
-                    'element' => '.Box.Group.Appearance',
+                    'page' => '/dashboard/settings/themes',
+                    'element' => '#nav-header-appearance',
                     'position' => 'right',
                     'title' => '<i class="fa fa-picture-o"></i> Appearance',
                     'tooltipClass' => 'tooltip-welcome welcome-appearance',
@@ -143,8 +143,8 @@ TOOLTIP
 ,
                 ],
                 [
-                    'page' => '/vanilla/settings/managecategories',
-                    'element' => '.Box.Group.Forum',
+                    'page' => '/vanilla/settings/categories',
+                    'element' => '#nav-header-forum',
                     'position' => 'right',
                     'title' => '<i class="fa fa-th-list"></i> Categories',
                     'tooltipClass' => 'tooltip-welcome welcome-categories',
@@ -160,7 +160,7 @@ TOOLTIP
                 ],
                 [
                     'page' => '/dashboard/role',
-                    'element' => '.Box.Group.Users',
+                    'element' => '#nav-header-users',
                     'position' => 'right',
                     'title' => '<i class="fa fa-lock"></i> Roles & Permissions',
                     'tooltipClass' => 'tooltip-welcome welcome-roles',
@@ -177,7 +177,7 @@ TOOLTIP
                 ],
                 [
                     'page' => '/dashboard/user',
-                    'element' => '.Box.Group.Users',
+                    'element' => '#nav-header-site',
                     'position' => 'right',
                     'title' => '<i class="fa fa-users"></i> Users',
                     'tooltipClass' => 'tooltip-welcome welcome-users',

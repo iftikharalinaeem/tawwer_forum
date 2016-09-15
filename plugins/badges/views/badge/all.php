@@ -13,9 +13,8 @@
                 <th><?php echo T('Class'); ?></th>
                 <th class="column-xs"><?php echo T('Level'); ?></th>
                 <th class="column-xs"><?php echo T('Given'); ?></th>
-                <th class="column-sm"><?php echo T('Active'); ?></th>
                 <!--<th><?php echo T('Visible'); ?></th>-->
-                <th class="options column-md"><?php echo T('Options'); ?></th>
+                <th class="options column-md"></th>
             </tr>
         </thead>
         <tbody>
