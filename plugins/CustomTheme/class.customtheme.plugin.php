@@ -110,7 +110,7 @@ class CustomThemePlugin extends Gdn_Plugin {
 
         if ($data['serveFile']) {
             $host = Gdn::request()->host();
-            $sender->addCssFile(false, "/plugin/customcss/{$host}/rev_{$liveRevisionID}.css", ['Css' => $data['content'], 'Sort' => 100]);
+            $sender->addCssFile(false, "/plugin/customcss/{$host}/rev_{$liveRevisionID}.css", ['Css' => $data['content'], 'Sort' => 1001]);
         }
     }
 
