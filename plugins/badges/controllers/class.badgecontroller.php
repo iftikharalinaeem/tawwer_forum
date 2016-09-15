@@ -375,6 +375,7 @@ class BadgeController extends BadgesAppController {
             // Set BadgeID for existing or set Type = Manual for new
             if (!$Insert) {
                 $this->Form->setFormValue('BadgeID', $BadgeID);
+                $this->Form->setFormValue('Photo', val('Photo', $Badge));
             } else {
                 $this->Form->setFormValue('Type', 'Manual');
             }
