@@ -154,7 +154,7 @@ class OneLogin_Saml_Response
         // we loop through the possible places until we find an assertion.
         $nameQueries = [
             "/samlp:Response//saml:Assertion[@ID='$id']".$assertionXpath,
-            ".//*[@ID='$id']//saml:Assertion".$assertionXpath
+            "//*[@ID='$id']//saml:Assertion".$assertionXpath
         ];
         foreach ($nameQueries as $nameQuery) {
             $assertion = reset($xml->xpath($nameQuery));
