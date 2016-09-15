@@ -3,9 +3,9 @@
 $PluginInfo['BadgifyComments'] = array(
     'Name' => 'Badgify Comments',
     'ClassName' => 'BadgifyCommentsPlugin',
-    'Description' => 'Allows user login to be authenticated on Auth0 SSO.',
+    'Description' => 'It\'s gamification with badges. Assign badges to discussions to incentivise users to comment.',
     'Version' => '1.0.0',
-    'RequiredApplications' => ['Vanilla' => '1.0', 'Reputation' => '1.0'],
+    'RequiredApplications' => ['Vanilla' => '2.0', 'Reputation' => '1.0'],
     'SettingsUrl' => '/settings/BadgifyComments',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true
@@ -45,7 +45,7 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function base_discussionOptions_handler ($sender, $args) {
+    public function base_discussionOptions_handler($sender, $args) {
         $discussionID = valr('Discussion.DiscussionID', $args);
 
         // If there isn't already a badge assigned to this discussion, add link to flyout menu.
@@ -92,12 +92,12 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function settingsController_badgifyComments_create ($sender, $args) {
-        $sender->Permission('Garden.Settings.Manage');
+    public function settingsController_badgifyComments_create($sender, $args) {
+        $sender->permission('Garden.Settings.Manage');
 
-        $cf = new ConfigurationModule($sender);
+        $configurationModule = new ConfigurationModule($sender);
 
-        $cf->Initialize(
+        $configurationModule->initialize(
             array(
                 'Badgify.Default.Name',
                 'Badgify.Default.Slug',
@@ -108,9 +108,9 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
             )
         );
 
-        $sender->AddSideMenu();
-        $sender->SetData('Title', T('Badgification Settings'));
-        $cf->RenderAll();
+        $sender->addSideMenu();
+        $sender->setData('Title', t('Badgification Settings'));
+        $configurationModule->renderAll();
     }
 
 
