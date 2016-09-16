@@ -1,7 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$Drop = false;
-$Explicit = false;
 $Database = Gdn::database();
 $SQL = $Database->sql();
 $Construct = $Database->structure();
@@ -29,14 +27,14 @@ $Construct->table('Badge')
     ->column('Class', 'varchar(20)', true)
     ->column('Level', 'smallint', true)
     ->column('Attributes', 'text', true)
-    ->set($Explicit, $Drop);
+    ->set();
 
 // Badge Types
 $Construct->table('BadgeType')
     ->column('BadgeType', 'varchar(20)', false, 'primary')
     ->column('EditUrl', 'varchar(255)', true)
     ->column('Attributes', 'text', true)
-    ->set($Explicit, $Drop);
+    ->set();
 
 // User Badges
 $Construct->table('UserBadge')
@@ -52,7 +50,7 @@ $Construct->table('UserBadge')
     ->column('DateCompleted', 'datetime', true)
     ->column('DateInserted', 'datetime')
     ->column('InsertUserID', 'int')
-    ->set($Explicit, $Drop);
+    ->set();
 
 $Construct
     ->table('UserBadge')
