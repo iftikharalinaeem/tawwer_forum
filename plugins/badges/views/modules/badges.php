@@ -1,29 +1,30 @@
 <?php if (!defined('APPLICATION')) exit();
-    $Title = ($this->User->UserID == Gdn::Session()->UserID) ? T('MyBadgesModuleTitle', 'My Badges') : T('BadgesModuleTitle', 'Badges');
-    $Title = T($Title);
+
+$Title = ($this->User->UserID == Gdn::session()->UserID) ? t('MyBadgesModuleTitle', 'My Badges') : t('BadgesModuleTitle', 'Badges');
+$Title = t($Title);
 ?>
 <div id="Badges" class="Box BadgeGrid<?php if (!count($this->Badges)) echo ' NoItems'; ?>">
     <?php echo panelHeading($Title); ?>
     <div class="PhotoGrid">
     <?php
-    if (count($this->Badges) > 20)
+    if (count($this->Badges) > 20) {
         $CssClass = 'ProfilePhoto ProfilePhotoSmall';
-    else
+    } else {
         $CssClass = 'ProfilePhoto ProfilePhotoMedium';
+    }
 
-    foreach ($this->Badges as $Badge) :
-    ?>
-        <?php if (GetValue('Photo', $Badge, FALSE)) : ?>
-            <?php echo Anchor(
-                Img(Gdn_Upload::Url(ChangeBasename(GetValue('Photo', $Badge), '%s')), array('class' => $CssClass)),
-                Url('/badge/'.GetValue('Slug', $Badge), TRUE),
-                array('title' => GetValue('Name', $Badge))
-            ); ?>
-        <?php endif; ?>
-    <?php endforeach; ?>
+    foreach ($this->Badges as $Badge) {
+        if (val('Photo', $Badge, false)) {
+            echo anchor(
+                img(Gdn_Upload::url(changeBasename(val('Photo', $Badge), '%s')), ['class' => $CssClass]),
+                url('/badge/'.val('Slug', $Badge), true),
+                ['title' => val('Name', $Badge)]
+            );
+        }
+    }
 
-    <?php if (!count($this->Badges)) : ?>
-    <span><?php echo T('NoBadgesEarned', 'Any minute now&hellip;'); ?></span>
+    if (!count($this->Badges)) : ?>
+    <span><?php echo t('NoBadgesEarned', 'Any minute now&hellip;'); ?></span>
     <?php endif; ?>
     </div>
 </div>

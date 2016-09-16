@@ -1,77 +1,69 @@
 <?php if (!defined('APPLICATION')) exit();
 
-if (!isset($Drop)) {
-    $Drop = false;
-}
-
-if (!isset($Explicit)) {
-    $Explicit = false;
-}
-
-$Database = Gdn::Database();
-$SQL = $Database->SQL();
-$Construct = $Database->Structure();
+$Database = Gdn::database();
+$SQL = $Database->sql();
+$Construct = $Database->structure();
 $Validation = new Gdn_Validation();
 
 // Badges
-$Construct->Table('Badge')
-    ->PrimaryKey('BadgeID')
-    ->Column('Name', 'varchar(64)')
-    ->Column('Slug', 'varchar(32)', true, 'unique')
-    ->Column('Type', 'varchar(20)', true)
-    ->Column('Body', 'text', true)
-    ->Column('Photo', 'varchar(255)', true)
-    ->Column('Points', 'int', true)
-    ->Column('Active', 'tinyint', 1)
-    ->Column('Visible', 'tinyint', 1)
-    ->Column('Secret', 'tinyint', 0)
-    ->Column('CanDelete', 'tinyint', 1)
-    ->Column('DateInserted', 'datetime')
-    ->Column('DateUpdated', 'datetime', true)
-    ->Column('InsertUserID', 'int')
-    ->Column('UpdateUser', 'int', true)
-    ->Column('CountRecipients', 'int', 0)
-    ->Column('Threshold', 'int', 0)
-    ->Column('Class', 'varchar(20)', true)
-    ->Column('Level', 'smallint', true)
-    ->Column('Attributes', 'text', true)
-    ->Set($Explicit, $Drop);
+$Construct->table('Badge')
+    ->primaryKey('BadgeID')
+    ->column('Name', 'varchar(64)')
+    ->column('Slug', 'varchar(32)', true, 'unique')
+    ->column('Type', 'varchar(20)', true)
+    ->column('Body', 'text', true)
+    ->column('Photo', 'varchar(255)', true)
+    ->column('Points', 'int', true)
+    ->column('Active', 'tinyint', 1)
+    ->column('Visible', 'tinyint', 1)
+    ->column('Secret', 'tinyint', 0)
+    ->column('CanDelete', 'tinyint', 1)
+    ->column('DateInserted', 'datetime')
+    ->column('DateUpdated', 'datetime', true)
+    ->column('InsertUserID', 'int')
+    ->column('UpdateUser', 'int', true)
+    ->column('CountRecipients', 'int', 0)
+    ->column('Threshold', 'int', 0)
+    ->column('Class', 'varchar(20)', true)
+    ->column('Level', 'smallint', true)
+    ->column('Attributes', 'text', true)
+    ->set();
 
 // Badge Types
-$Construct->Table('BadgeType')
-    ->Column('BadgeType', 'varchar(20)', false, 'primary')
-    ->Column('EditUrl', 'varchar(255)', true)
-    ->Column('Attributes', 'text', true)
-    ->Set($Explicit, $Drop);
+$Construct->table('BadgeType')
+    ->column('BadgeType', 'varchar(20)', false, 'primary')
+    ->column('EditUrl', 'varchar(255)', true)
+    ->column('Attributes', 'text', true)
+    ->set();
 
 // User Badges
-$Construct->Table('UserBadge')
-    ->Column('UserID', 'int', false, 'primary')
-    ->Column('BadgeID', 'int', false, 'primary')
-    ->Column('Attributes', 'text', true)
-    ->Column('Reason', 'varchar(255)', true)
-    ->Column('ShowReason', 'tinyint', 1)
-    ->Column('DateRequested', 'datetime', true)
-    ->Column('RequestReason', 'varchar(255)', true)
-    ->Column('Declined', 'tinyint', 0)
-    ->Column('Count', 'int', 0)
-    ->Column('DateCompleted', 'datetime', true)
-    ->Column('DateInserted', 'datetime')
-    ->Column('InsertUserID', 'int')
-    ->Set($Explicit, $Drop);
+$Construct->table('UserBadge')
+    ->column('UserID', 'int', false, 'primary')
+    ->column('BadgeID', 'int', false, 'primary')
+    ->column('Attributes', 'text', true)
+    ->column('Reason', 'varchar(255)', true)
+    ->column('ShowReason', 'tinyint', 1)
+    ->column('DateRequested', 'datetime', true)
+    ->column('RequestReason', 'varchar(255)', true)
+    ->column('Declined', 'tinyint', 0)
+    ->column('Count', 'int', 0)
+    ->column('DateCompleted', 'datetime', true)
+    ->column('DateInserted', 'datetime')
+    ->column('InsertUserID', 'int')
+    ->set();
 
 $Construct
-    ->Table('UserBadge')
-    ->Column('BadgeID', 'int', false, 'index.earned')
-    ->Column('DateCompleted', 'datetime', true, 'index.earned')
-    ->Set();
+    ->table('UserBadge')
+    ->column('BadgeID', 'int', false, 'index.earned')
+    ->column('DateCompleted', 'datetime', true, 'index.earned')
+    ->set();
 
 // Add badge count to Users
-$Construct->Table('User')
-    ->Column('CountBadges', 'int', 0)
-    ->Set();
+$Construct->table('User')
+    ->column('CountBadges', 'int', 0)
+    ->set();
 
 $ActivityModel = new ActivityModel();
-$ActivityModel->DefineType('Badge');
+$ActivityModel->defineType('Badge');
 
 require_once(dirname(__FILE__).'/defaultbadges.php');

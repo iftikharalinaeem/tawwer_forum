@@ -8,14 +8,11 @@
  * Base controller for Reputation app.
  *
  * @since 1.0.0
- * @package Reputation
  */
 class BadgesAppController extends Gdn_Controller {
-    /*
-     * @var BadgeModel
-     */
-    public $BadgeModel;
 
+    /* @var BadgeModel */
+    public $BadgeModel;
 
     /**
      * Models to include.

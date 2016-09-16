@@ -1,21 +1,26 @@
 <?php if (!defined('APPLICATION')) exit();
 
-require_once dirname(__FILE__).'/models/class.badgesappmodel.php';
 require_once dirname(__FILE__).'/models/class.badgemodel.php';
 
 if (!function_exists('DefaultPoints')) {
-     function DefaultPoints($Threshold) {
-         if ($Threshold < 10) {
-             return 2;
-         }
-         if ($Threshold <= 250) {
-             return 5;
-         }
-         if ($Threshold < 1000) {
-             return 10;
-         }
-         return 20;
-     }
+    /**
+     *
+     *
+     * @param $Threshold
+     * @return int
+     */
+    function DefaultPoints($Threshold) {
+        if ($Threshold < 10) {
+            return 2;
+        }
+        if ($Threshold <= 250) {
+            return 5;
+        }
+        if ($Threshold < 1000) {
+            return 10;
+        }
+        return 20;
+    }
 }
 
 // Insert some default badges
@@ -26,7 +31,7 @@ $BadgeModel = new BadgeModel();
  */
 
 // Getting Started
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => 'Photogenic',
      'Slug' => 'photogenic',
      'Type' => 'Custom',
@@ -35,7 +40,7 @@ $BadgeModel->Define(array(
      'Points' => 10,
      'CanDelete' => 0
 ));
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => 'Name Dropper',
      'Slug' => 'name-dropper',
      'Type' => 'Custom',
@@ -46,7 +51,7 @@ $BadgeModel->Define(array(
 ));
 
 // Helper
-//$BadgeModel->Define(array(
+//$BadgeModel->define(array(
 //     'Name' => 'Welcoming Committee',
 //     'Slug' => 'welcome',
 //     'Type' => 'Custom',
@@ -56,7 +61,7 @@ $BadgeModel->Define(array(
 //));
 
 // Holiday / Timing
-//$BadgeModel->Define(array(
+//$BadgeModel->define(array(
 //     'Name' => 'Fresh Start',
 //     'Slug' => 'fresh-start',
 //     'Type' => 'Custom',
@@ -64,7 +69,7 @@ $BadgeModel->Define(array(
 //     'Photo' => 'http://badges.vni.la/100/flower.png',
 //     'Points' => 5
 //));
-//$BadgeModel->Define(array(
+//$BadgeModel->define(array(
 //     'Name' => 'Morning Treat',
 //     'Slug' => 'morning',
 //     'Type' => 'Custom',
@@ -74,7 +79,7 @@ $BadgeModel->Define(array(
 //));
 
 // Timeouts
-/*$BadgeModel->Define(array(
+/*$BadgeModel->define(array(
      'Name' => 'Comment Marathon',
      'Slug' => 'marathon',
      'Type' => 'Timeout',
@@ -84,7 +89,7 @@ $BadgeModel->Define(array(
      'Attributes' => array('Timeout' => 86400), // 24 hours
      'Threshold' => 42,
 )); */
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => 'Combo Breaker',
      'Slug' => 'combo',
      'Type' => 'Timeout',
@@ -97,7 +102,7 @@ $BadgeModel->Define(array(
 ));
 
 // Speed
-/*$BadgeModel->Define(array(
+/*$BadgeModel->define(array(
      'Name' => 'Lightning Reflexes',
      'Slug' => 'lightning',
      'Type' => 'Custom',
@@ -107,7 +112,7 @@ $BadgeModel->Define(array(
 ));*/
 
 // Comment Counts
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => 'First Comment',
      'Slug' => 'comment',
      'Type' => 'UserCount',
@@ -120,7 +125,7 @@ $BadgeModel->Define(array(
      'Level' => 1,
      'CanDelete' => 0
 ));
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => '10 Comments',
      'Slug' => 'comment-10',
      'Type' => 'UserCount',
@@ -133,7 +138,7 @@ $BadgeModel->Define(array(
      'Level' => 2,
      'CanDelete' => 0
 ));
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => '100 Comments',
      'Slug' => 'comment-100',
      'Type' => 'UserCount',
@@ -146,7 +151,7 @@ $BadgeModel->Define(array(
      'Level' => 3,
      'CanDelete' => 0
 ));
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => '500 Comments',
      'Slug' => 'comment-500',
      'Type' => 'UserCount',
@@ -159,7 +164,7 @@ $BadgeModel->Define(array(
      'Level' => 4,
      'CanDelete' => 0
 ));
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => '1000 Comments',
      'Slug' => 'comment-1000',
      'Type' => 'UserCount',
@@ -172,7 +177,7 @@ $BadgeModel->Define(array(
      'Level' => 5,
      'CanDelete' => 0
 ));
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => '2500 Comments',
      'Slug' => 'comment-2500',
      'Type' => 'UserCount',
@@ -185,7 +190,7 @@ $BadgeModel->Define(array(
      'Level' => 6,
      'CanDelete' => 0
 ));
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => '5000 Comments',
      'Slug' => 'comment-5000',
      'Type' => 'UserCount',
@@ -198,7 +203,7 @@ $BadgeModel->Define(array(
      'Level' => 7,
      'CanDelete' => 0
 ));
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => '10000 Comments',
      'Slug' => 'comment-10000',
      'Type' => 'UserCount',
@@ -211,7 +216,7 @@ $BadgeModel->Define(array(
      'Level' => 8,
      'CanDelete' => 0
 ));
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => '25000 Comments',
      'Slug' => 'comment-25000',
      'Type' => 'UserCount',
@@ -224,7 +229,7 @@ $BadgeModel->Define(array(
      'Level' => 9,
      'CanDelete' => 0
 ));
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => '50000 Comments',
      'Slug' => 'comment-50000',
      'Type' => 'UserCount',
@@ -248,7 +253,7 @@ $BadgeModel->Define(array(
 //
 //$Level = 1;
 //foreach ($Likes as $Count => $Body) {
-//    $BadgeModel->Define(array(
+//    $BadgeModel->define(array(
 //         'Name' => $Count == 1 ? 'First Like' : ("$Count Likes"),
 //         'Slug' => 'like-'.$Count,
 //         'Type' => 'UserCount',
@@ -265,7 +270,7 @@ $BadgeModel->Define(array(
 //}
 
 // Attendance
-//$BadgeModel->Define(array(
+//$BadgeModel->define(array(
 //     'Name' => 'Welcome Back',
 //     'Slug' => 'day-3',
 //     'Type' => 'Attendance',
@@ -277,7 +282,7 @@ $BadgeModel->Define(array(
 //     'Class' => 'Attendance',
 //     'Level' => 1
 //));
-//$BadgeModel->Define(array(
+//$BadgeModel->define(array(
 //     'Name' => 'Perfect Week',
 //     'Slug' => 'day-7',
 //     'Type' => 'Attendance',
@@ -289,7 +294,7 @@ $BadgeModel->Define(array(
 //     'Class' => 'Attendance',
 //     'Level' => 2
 //));
-//$BadgeModel->Define(array(
+//$BadgeModel->define(array(
 //     'Name' => 'A Month To Remember',
 //     'Slug' => 'day-30',
 //     'Type' => 'Attendance',
@@ -301,7 +306,7 @@ $BadgeModel->Define(array(
 //     'Class' => 'Attendance',
 //     'Level' => 3
 //));
-//$BadgeModel->Define(array(
+//$BadgeModel->define(array(
 //     'Name' => 'Seasoned Veteran',
 //     'Slug' => 'day-90',
 //     'Type' => 'Attendance',
@@ -313,7 +318,7 @@ $BadgeModel->Define(array(
 //     'Class' => 'Attendance',
 //     'Level' => 4
 //));
-//$BadgeModel->Define(array(
+//$BadgeModel->define(array(
 //     'Name' => 'It Was A Very Good Year',
 //     'Slug' => 'day-365',
 //     'Type' => 'Attendance',
@@ -329,7 +334,7 @@ $BadgeModel->Define(array(
 // Anniversary
 $Order = array(1 => 'First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth');
 for ($i = 1; $i < 11; $i++) {
-    $BadgeModel->Define(array(
+    $BadgeModel->define(array(
         'Name' => $Order[$i].' Anniversary',
         'Slug' => 'anniversary'.(($i > 1) ? '-'.$i : ''),
         'Type' => 'Custom',
@@ -343,7 +348,7 @@ for ($i = 1; $i < 11; $i++) {
         'CanDelete' => 0
     ));
 }
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => 'Ancient Membership',
      'Slug' => 'anniversary-old',
      'Type' => 'Custom',
@@ -359,7 +364,7 @@ $BadgeModel->Define(array(
 
 // Social badges.
 
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => 'Facebook Connector',
      'Slug' => 'facebook-connect',
      'Type' => 'Connect',
@@ -371,7 +376,7 @@ $BadgeModel->Define(array(
      'CanDelete' => 0
 ));
 
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => 'Twitter Connector',
      'Slug' => 'twitter-connect',
      'Type' => 'Connect',
@@ -384,7 +389,7 @@ $BadgeModel->Define(array(
 ));
 
 // Silly
-//$BadgeModel->Define(array(
+//$BadgeModel->define(array(
 //     'Name' => 'Say Cheese!',
 //     'Slug' => 'cheese',
 //     'Type' => 'DiscussionContent',
@@ -397,7 +402,7 @@ $BadgeModel->Define(array(
 
 // Ambassador 
 // @see Garden issue #1265
-/*$BadgeModel->Define(array(
+/*$BadgeModel->define(array(
      'Name' => 'Junior Ambassador',
      'Slug' => 'ambassador',
      'Type' => 'UserCount',
@@ -409,7 +414,7 @@ $BadgeModel->Define(array(
      'Class' => 'Ambassador',
      'Level' => 1
 ));
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => 'Ambassador, First Class',
      'Slug' => 'ambassador-3',
      'Type' => 'UserCount',
@@ -421,7 +426,7 @@ $BadgeModel->Define(array(
      'Class' => 'Ambassador',
      'Level' => 2
 ));
-$BadgeModel->Define(array(
+$BadgeModel->define(array(
      'Name' => 'Ambassador Extraordinaire',
      'Slug' => 'ambassador-10',
      'Type' => 'UserCount',

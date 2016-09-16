@@ -31,47 +31,46 @@
 
 <div class="Badge-Details">
 <?php
-$Session = Gdn::Session();
+$Session = Gdn::session();
 
-$this->Title(T('View Badge') . ': ' . $this->Data('Badge.Name')); ?>
+$this->title(t('View Badge') . ': ' . $this->data('Badge.Name')); ?>
 
-<?php if ($Photo = $this->Data('Badge.Photo')) {
-    echo Img( Gdn_Upload::Url(ChangeBasename($Photo, '%s')), array('class' => 'BadgePhotoDisplay') );
-}
-?>
+<?php if ($Photo = $this->data('Badge.Photo')) {
+    echo img( Gdn_Upload::url(changeBasename($Photo, '%s')), ['class' => 'BadgePhotoDisplay']);
+} ?>
 
-<h1><?php echo Gdn_Format::Text($this->Data('Badge.Name')); ?></h1>
-<p><?php echo Gdn_Format::Html($this->Data('Badge.Body')); ?></p>
+<h1><?php echo Gdn_Format::text($this->data('Badge.Name')); ?></h1>
+<p><?php echo Gdn_Format::html($this->data('Badge.Body')); ?></p>
 </div>
 
 <div class="Badge-Earned">
-<?php if ($this->Data('UserBadge.DateCompleted')) : ?>
+<?php if ($this->data('UserBadge.DateCompleted')) : ?>
 <div class="EarnedThisBadge">
-    <?php echo UserPhoto(Gdn::Session()->User); echo T('YouEarnedBadge', 'You earned this badge'); ?>
-    <span class="DateReceived"><?php echo Gdn_Format::Date($this->Data('UserBadge.DateCompleted'), 'html'); ?></span>
+    <?php echo UserPhoto(Gdn::session()->User); echo t('YouEarnedBadge', 'You earned this badge'); ?>
+    <span class="DateReceived"><?php echo Gdn_Format::date($this->data('UserBadge.DateCompleted'), 'html'); ?></span>
 </div>
 <?php endif; ?>
 
-<?php if ((count($this->Data('Recipients')) > 0) && ($Count = $this->Data('Badge.CountRecipients'))) : ?>
+<?php if ((count($this->data('Recipients')) > 0) && ($Count = $this->data('Badge.CountRecipients'))) : ?>
 
     <p class="BadgeCountDisplay"><?php
-        echo Plural($Count, T('%s person has earned this badge.'), T('%s people have earned this badge.'));
+        echo plural($Count, t('%s person has earned this badge.'), t('%s people have earned this badge.'));
     ?></p>
 
-    <h2><?php echo T('BadgeRecipientsHeading', "Most recent recipients"); ?></h2>
+    <h2><?php echo t('BadgeRecipientsHeading', "Most recent recipients"); ?></h2>
     <div class="RecentRecipients">
-        <?php foreach($this->Data('Recipients', array()) as $User) : ?>
+        <?php foreach($this->Data('Recipients', []) as $User) : ?>
         <div class="CellWrap"><div class="Cell"><?php
-            echo UserPhoto($User);
-            echo UserAnchor($User);
-        ?> <span class="DateReceived"><?php echo Gdn_Format::Date(GetValue('DateCompleted', $User), 'html'); ?> </span>
+            echo userPhoto($User);
+            echo userAnchor($User);
+        ?> <span class="DateReceived"><?php echo Gdn_Format::date(val('DateCompleted', $User), 'html'); ?> </span>
             </div></div>
         <?php endforeach; ?>
     </div>
 
 <?php else : ?>
 
-    <p><?php echo T('BadgesNobody', 'Nobody has earned this badge yet.'); ?></p>
+    <p><?php echo t('BadgesNobody', 'Nobody has earned this badge yet.'); ?></p>
 
 <?php endif; ?>
 </div>

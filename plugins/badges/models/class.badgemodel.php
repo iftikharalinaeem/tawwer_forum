@@ -4,13 +4,11 @@
  * @package Badges
  */
 
-// We can't rely on our autoloader in a plugin.
-require_once(dirname(__FILE__).'/class.badgesappmodel.php');
-
 /**
  * Badge handling.
  */
-class BadgeModel extends BadgesAppModel {
+class BadgeModel extends Gdn_Model {
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -18,13 +16,6 @@ class BadgeModel extends BadgesAppModel {
      */
     public function __construct() {
         parent::__construct('Badge');
-    }
-
-    /**
-     * Set default select conditions.
-     */
-    protected function _beforeGet() {
-
     }
 
     /**

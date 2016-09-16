@@ -1,22 +1,22 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$this->Title(sprintf(T('Give a Badge to %s'), GetValue('Name', $this->User))); ?>
+$this->title(sprintf(t('Give a Badge to %s'), val('Name', $this->User))); ?>
 
 <div id="UserBadgeForm">
-    <h1><?php echo sprintf(T('Give a Badge to %s'), GetValue('Name', $this->User)); ?></h1>
+    <h1><?php echo sprintf(t('Give a Badge to %s'), val('Name', $this->User)); ?></h1>
 
     <?php
-    echo $this->Form->Open();
-    echo $this->Form->Errors();
+    echo $this->Form->open();
+    echo $this->Form->errors();
 
-    echo '<p>', $this->Form->Label('Badge', 'BadgeID');
-    echo $this->Form->DropDown('BadgeID', $this->BadgeData, array('ValueField' => 'BadgeID', 'TextField' => 'Name')), '</p>';
+    echo '<p>', $this->Form->label('Badge', 'BadgeID');
+    echo $this->Form->dropDown('BadgeID', $this->BadgeData, ['ValueField' => 'BadgeID', 'TextField' => 'Name']), '</p>';
 
-    echo '<p>', $this->Form->Label('Reason (optional)', 'Reason');
-    echo $this->Form->TextBox('Reason', array('MultiLine' => TRUE)), '</p>';
+    echo '<p>', $this->Form->label('Reason (optional)', 'Reason');
+    echo $this->Form->textBox('Reason', array('MultiLine' => true)), '</p>';
 
-    echo Anchor('Cancel', 'badge/'.$this->Data('Badge.BadgeID'));
+    echo anchor('Cancel', 'badge/'.$this->data('Badge.BadgeID'));
 
-    echo $this->Form->Close('Give Badge');
+    echo $this->Form->close('Give Badge');
     ?>
 </div>

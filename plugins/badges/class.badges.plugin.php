@@ -148,8 +148,6 @@ class BadgesHooks extends Gdn_Plugin {
      * @access public
      */
     public function base_beforeProfileOptions_handler($Sender, $Args) {
-        $SideMenu = val('SideMenu', $Args);
-
         // Add 'Give Badge' to profiles
         if (checkPermission('Reputation.Badges.Give')) {
             $Args['ProfileOptions'][] = array('Text' => t('Give Badge'), 'Url' => '/badge/giveuser/'.$Args['UserID'].'/', 'CssClass' => 'Popup');
@@ -186,8 +184,6 @@ class BadgesHooks extends Gdn_Plugin {
 
     /**
      * Show user's badges in profile.
-     *
-     * @todo
      */
 //    public function ProfileController_Badges_Create($Sender) {
 //        $Sender->Permission('Reputation.Badges.View');
@@ -214,7 +210,7 @@ class BadgesHooks extends Gdn_Plugin {
      * @since 1.0.0
      * @access public
      */
-    public function ProfileController_Render_Before($Sender) {
+    public function profileController_render_before($Sender) {
         if (c('Badges.BadgesModule.Target', 'Panel') == 'Panel') {
             $Sender->addModule('BadgesModule');
         }
@@ -225,7 +221,7 @@ class BadgesHooks extends Gdn_Plugin {
      *
      * @access public
      */
-    public function Base_AfterUserInfo_Handler($Sender, $Args) {
+    public function base_afterUserInfo_handler($Sender, $Args) {
         if (c('Badges.BadgesModule.Target') == 'AfterUserInfo') {
             echo Gdn_Theme::module('BadgesModule');
         }
@@ -236,7 +232,7 @@ class BadgesHooks extends Gdn_Plugin {
      *
      * @access public
      */
-    public function Base_BeforeUserInfo_Handler($Sender, $Args) {
+    public function base_beforeUserInfo_handler($Sender, $Args) {
         if (c('Badges.BadgesModule.Target') == 'BeforeUserInfo') {
             echo Gdn_Theme::module('BadgesModule');
         }
@@ -332,7 +328,7 @@ class BadgesHooks extends Gdn_Plugin {
 
         $UserCountBadges = $BadgeModel->getByType('UserCount');
         foreach ($UserCountBadges as $Badge) {
-            if (GetValue('Attributes', $Badge)) {
+            if (val('Attributes', $Badge)) {
                 $Column = $Badge['Attributes']['Column'];
                 if (isset($Counts[$Column]) && $Counts[$Column] >= $Badge['Threshold']) {
                     $UserBadgeModel->give($UserID, $Badge);
@@ -441,7 +437,7 @@ class BadgesHooks extends Gdn_Plugin {
 
         // Register timeout event
         $UserBadgeModel = new UserBadgeModel();
-        $EventCount = $UserBadgeModel->addTimeoutEvent(val('UserID', $UserBadge), 'combo', val('DateCompleted', $UserBadge));
+        $UserBadgeModel->addTimeoutEvent(val('UserID', $UserBadge), 'combo', val('DateCompleted', $UserBadge));
     }
 
     /**
@@ -472,7 +468,7 @@ class BadgesHooks extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function FreshStart($Sender, $Args) {
+    public function freshStart($Sender, $Args) {
         if (date('j') === '1' && date('n') === '1') {
             $User = val('User', $Args);
             $UserBadgeModel = new UserBadgeModel();
@@ -540,12 +536,12 @@ class BadgesHooks extends Gdn_Plugin {
     public function welcomeCommittee($Sender, $Args) {
         // Get current discussion
         $DiscussionModel = new DiscussionModel();
-        $DiscussionID = GetValue('DiscussionID', val('FormPostValues', $Args));
+        $DiscussionID = val('DiscussionID', val('FormPostValues', $Args));
         $Discussion = $DiscussionModel->getID($DiscussionID);
 
         // Is it discussion starter's first?
         $FirstDiscussion = $DiscussionModel->getWhere(array('InsertUserID' => val('InsertUserID', $Discussion)), 'DateInserted', 'asc', 1);
-        if ($DiscussionID == GetValue('DiscussionID', $FirstDiscussion)) {
+        if ($DiscussionID == val('DiscussionID', $FirstDiscussion)) {
             $UserBadgeModel = new UserBadgeModel();
             $UserBadgeModel->give(Gdn::session()->UserID, 'welcome');
         }

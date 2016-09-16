@@ -22,7 +22,7 @@ class LeaderBoardModule extends Gdn_Module {
     public $Limit = 10;
 
     /**
-     *
+     * Create the module instance.
      *
      * @param string $Sender
      */
@@ -31,7 +31,7 @@ class LeaderBoardModule extends Gdn_Module {
     }
 
     /**
-     *
+     * Load module data.
      *
      * @param null $Limit
      */
@@ -111,7 +111,7 @@ class LeaderBoardModule extends Gdn_Module {
     }
 
     /**
-     *
+     * Where the module will render by default.
      *
      * @return string
      */
@@ -148,7 +148,7 @@ class LeaderBoardModule extends Gdn_Module {
     }
 
     /**
-     *
+     * Render the module.
      *
      * @return string
      */
