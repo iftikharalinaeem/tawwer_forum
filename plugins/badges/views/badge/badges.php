@@ -35,7 +35,7 @@ foreach ($this->data('Badges') as $Badge) :
         <!--<td><?php
             // Hide badge
             if (checkPermission('Reputation.Badges.Manage')) {
-                echo anchor(y($Badge->Visible == '1' ? 'Yes' : 'No'),
+                echo anchor(t($Badge->Visible == '1' ? 'Yes' : 'No'),
                     '/badge/hide/'.$Badge->BadgeID.'/'.$AjaxString,
                     'HideBadge', ['title'=> ($Badge->Visible ? 'Hide' : 'Show')]);
             } else {
