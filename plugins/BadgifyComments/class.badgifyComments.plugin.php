@@ -1,6 +1,6 @@
 <?php
 
-$PluginInfo['BadgifyComments'] = array(
+$PluginInfo['BadgifyComments'] = [
     'Name' => 'Badgify Comments',
     'ClassName' => 'BadgifyCommentsPlugin',
     'Description' => 'It\'s gamification with badges. Assign badges to discussions to incentivise users to comment.',
@@ -9,7 +9,7 @@ $PluginInfo['BadgifyComments'] = array(
     'SettingsUrl' => '/settings/BadgifyComments',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true
-);
+];
 
 /**
  * This plugin will allow admins to designate certain discussions so that whenver
@@ -26,7 +26,7 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      */
     public function setup() {
         Gdn::structure()->table('Badge')
-            ->column('BadgeDiscussion', 'int', '0', array('index'))
+            ->column('BadgeDiscussion', 'int', '0', ['index'])
             ->set();
 
         touchConfig('Badgify.Default.Name', 'Commented in Discussion');
@@ -98,14 +98,14 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
         $configurationModule = new ConfigurationModule($sender);
 
         $configurationModule->initialize(
-            array(
+            [
                 'Badgify.Default.Name',
                 'Badgify.Default.Slug',
                 'Badgify.Default.Description',
                 'Badgify.Default.Points',
                 'Badgify.Default.BadgeClass',
                 'Badgify.Default.BadgeClassLevel'
-            )
+            ]
         );
 
         $sender->addSideMenu();
