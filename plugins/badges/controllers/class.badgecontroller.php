@@ -379,6 +379,10 @@ class BadgeController extends BadgesAppController {
                 $this->Form->setFormValue('Type', 'Manual');
             }
 
+            if ($this->Form->formValues('Photo') == '') {
+                $this->Form->removeFormValue('Photo');
+            }
+
             try {
                 // Upload image
                 $UploadImage = new Gdn_UploadImage();
