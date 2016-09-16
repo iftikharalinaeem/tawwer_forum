@@ -42,8 +42,8 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
     /**
      * Hook into flyout menu on discussions.
      *
-     * @param $sender
-     * @param $args
+     * @param DiscussionController $sender
+     * @param array $args
      */
     public function base_discussionOptions_handler($sender, $args) {
         $discussionID = valr('Discussion.DiscussionID', $args);
@@ -62,8 +62,8 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
     /**
      * Hook into badge creation form and set default fields.
      *
-     * @param $sender
-     * @param $args
+     * @param BadgeController $sender
+     * @param array $args
      */
     public function badgeController_manageBadgeForm_handler($sender, $args) {
         $formArray = (array) $sender->Form->formData();
@@ -89,24 +89,22 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
     /**
      * Create a settings page in the dashboard where the default values for discussion badges.
      *
-     * @param $sender
-     * @param $args
+     * @param SettingsController $sender
+     * @param array $args
      */
     public function settingsController_badgifyComments_create($sender, $args) {
         $sender->permission('Garden.Settings.Manage');
 
         $configurationModule = new ConfigurationModule($sender);
 
-        $configurationModule->initialize(
-            [
-                'Badgify.Default.Name',
-                'Badgify.Default.Slug',
-                'Badgify.Default.Description',
-                'Badgify.Default.Points',
-                'Badgify.Default.BadgeClass',
-                'Badgify.Default.BadgeClassLevel'
-            ]
-        );
+        $configurationModule->initialize([
+            'Badgify.Default.Name',
+            'Badgify.Default.Slug',
+            'Badgify.Default.Description',
+            'Badgify.Default.Points',
+            'Badgify.Default.BadgeClass',
+            'Badgify.Default.BadgeClassLevel'
+        ]);
 
         $sender->addSideMenu();
         $sender->setData('Title', t('Badgification Settings'));
@@ -115,15 +113,14 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
 
 
     /**
-     * Query the badge table to find out if a badge already exists for this discussion.
+     * Get all the badge data if a badge has been assigned to this discussion.
      *
      * @param int $discussionID
-     *
-     * @return array|bool $badge A badge that is associated with this Discussion, if not false.
+     * @return array|bool $badge A badge that is associated with this discussion, if not false.
      */
-    public function getDiscussionBadge($discussionID = null) {
+    private function getDiscussionBadge($discussionID) {
         if ($discussionID) {
-            $badge = Gdn::sql()->select()->from('Badge')->where(['BadgeDiscussion' => $discussionID])->get()->resultArray()->firstRow();
+            $badge = Gdn::sql()->select()->from('Badge')->where(['BadgeDiscussion' => $discussionID])->get()->firstRow();
             if ($badge) {
                 return $badge;
             }
@@ -135,8 +132,8 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
     /**
      * Hook into comment save and give the badge.
      *
-     * @param $sender
-     * @param $args
+     * @param CommentModel $sender
+     * @param array $args
      */
     public function commentModel_afterSaveComment_handler($sender, $args) {
         $discussionID = valr('FormPostValues.DiscussionID', $args);
@@ -152,8 +149,8 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
     /**
      * Add a CSS class to any discussion that has a badge attached to it.
      *
-     * @param $sender
-     * @param $args
+     * @param DiscussionsController $sender
+     * @param array $args
      */
     public function discussionsController_beforeDiscussionName_handler($sender, $args) {
         if ($this->getDiscussionBadge(valr('Discussion.DiscussionID', $args))) {
