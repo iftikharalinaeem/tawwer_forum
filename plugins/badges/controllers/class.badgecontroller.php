@@ -13,6 +13,7 @@ require_once(dirname(__FILE__).'/class.badgesappcontroller.php');
  * @since 1.0.0
  */
 class BadgeController extends BadgesAppController {
+
     /**
      * Before any call to the controller.
      *
@@ -297,7 +298,7 @@ class BadgeController extends BadgesAppController {
         }
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            redirect(getIncomingValue('Target', $this->SelfUrl));
+            safeRedirect(getIncomingValue('Target', $this->SelfUrl));
         }
 
         $this->setView404();
@@ -311,7 +312,6 @@ class BadgeController extends BadgesAppController {
      * @access public
      */
     public function index($BadgeID = '', $Name = '') {
-
         $this->MasterView = 'default';
         $this->addCssFile('style.css');
         $this->removeCssFile('admin.css');
@@ -333,7 +333,7 @@ class BadgeController extends BadgesAppController {
         // Get recipients
         $this->setData('Recipients', $this->UserBadgeModel->getUsers($BadgeID, array('Limit' => 15))->resultArray());
         $this->setData('BadgeID', $BadgeID, true);
-        if (GetValue('_New', $this->UserBadge) && GetValue('Type', $this->Badge) == 'Manual') {
+        if (val('_New', $this->UserBadge) && val('Type', $this->Badge) == 'Manual') {
             $this->addModule('RequestBadgeModule');
         }
         $this->addModule('BadgesModule');
@@ -425,6 +425,22 @@ class BadgeController extends BadgesAppController {
         }
 
         $this->addSideMenu('/badge/all');
+        $this->render();
+    }
+
+    /**
+     * See who has received a badge.
+     *
+     * @param mixed $BadgeID Unique numeric ID or slug.
+     */
+    public function recipients($BadgeID) {
+        // Set badge info.
+        $Badge = $this->BadgeModel->getID($BadgeID);
+        $this->setData('Badge', $Badge);
+
+        // Set recipient info.
+        $this->setData('Recipients', $this->UserBadgeModel->getUsers($BadgeID, array('Limit' => 15))->resultArray());
+
         $this->render();
     }
 
