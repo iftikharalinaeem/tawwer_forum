@@ -157,7 +157,7 @@ class OneLogin_Saml_Response
             "//*[@ID='$id']//saml:Assertion".$assertionXpath
         ];
         foreach ($nameQueries as $nameQuery) {
-            $assertion = reset($xml->xpath($nameQuery));
+            $assertion = $xml->xpath($nameQuery);
             if ($assertion) {
                 break;
             }
@@ -175,7 +175,7 @@ class OneLogin_Saml_Response
             }
         }
 
-        Logger::event('saml_response', Logger::INFO, "Assertion Found {$assertionXpath} {$assertion}.", []);
+        Logger::event('saml_response', Logger::INFO, "Assertion Found {$nameQuery}.", (array)$assertion);
         return $assertion;
     }
 }
