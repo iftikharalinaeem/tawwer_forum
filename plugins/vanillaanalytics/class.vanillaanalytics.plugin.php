@@ -116,10 +116,10 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     /**
      * Track when a comment is saved.  This includes inserts and updates.
      *
-     * @param $sender Current instance of CommentModel
-     * @param $args Event arguments, passed from CommentModel, specifically for the event.
+     * @param CommentModel $sender Current instance of CommentModel
+     * @param array $args Event arguments, passed from CommentModel, specifically for the event.
      */
-    public function commentModel_afterSaveComment_handler($sender, &$args) {
+    public function commentModel_afterSaveComment_handler($sender, $args) {
         $type = val('Insert', $args) ? 'comment_add' : 'comment_edit';
         $collection = ($type == 'comment_add') ? 'post' : 'post_modify';
 
@@ -131,10 +131,10 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     /**
      * Track when a comment is deleted.
      *
-     * @param $sender Current instance of CommentModel
-     * @param $args Event arguments, passed from CommentModel, specifically for the event.
+     * @param CommentModel $sender Current instance of CommentModel
+     * @param array $args Event arguments, passed from CommentModel, specifically for the event.
      */
-    public function commentModel_deleteComment_handler($sender, &$args) {
+    public function commentModel_deleteComment_handler($sender, $args) {
         $data = AnalyticsData::getComment(val('CommentID', $args));
 
         AnalyticsTracker::getInstance()->trackEvent('post_modify', 'comment_delete', $data);
@@ -335,10 +335,10 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     /**
      * Track when a discussion is saved.  This can be used to record an event for inserts or edits.
      *
-     * @param $sender Current instance of DiscussionModel
-     * @param $args Event arguments, passed from DiscussionModel, specifically for the event.
+     * @param DiscussionModel $sender Current instance of DiscussionModel
+     * @param array $args Event arguments, passed from DiscussionModel, specifically for the event.
      */
-    public function discussionModel_afterSaveDiscussion_handler($sender, &$args) {
+    public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
         $type = val('Insert', $args) ? 'discussion_add' : 'discussion_edit';
         $collection = ($type == 'discussion_add') ? 'post' : 'post_modify';
 
@@ -350,10 +350,10 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     /**
      * Track when a discussion is deleted.
      *
-     * @param $sender Current instance of DiscussionModel
-     * @param $args Event arguments, passed from DiscussionModel, specifically for the event.
+     * @param DiscussionModel $sender Current instance of DiscussionModel
+     * @param array $args Event arguments, passed from DiscussionModel, specifically for the event.
      */
-    public function discussionModel_deleteDiscussion_handler($sender, &$args) {
+    public function discussionModel_deleteDiscussion_handler($sender, $args) {
         $data = AnalyticsData::getDiscussion(val('DiscussionID', $args));
 
         AnalyticsTracker::getInstance()->trackEvent('post_modify', 'discussion_delete', $data);
@@ -362,10 +362,10 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     /**
      * Track when a user successfully registers for the site.
      *
-     * @param $sender Current instance of EntryController
-     * @param $args Event arguments, passed from EntryController, specifically for the event.
+     * @param UserModel $sender Current instance of EntryController
+     * @param array $args Event arguments, passed from EntryController, specifically for the event.
      */
-    public function userModel_afterRegister_handler($sender, &$args) {
+    public function userModel_afterRegister_handler($sender, $args) {
         $uuid = null;
 
         // Fetch our tracking cookie.
@@ -390,8 +390,8 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     /**
      * Hook in early, before a request is dispatched to the target controller.
      *
-     * @param $sender
-     * @param $args
+     * @param Gdn_Dispatcher $sender
+     * @param array $args
      */
     public function gdn_dispatcher_beforeDispatch_handler($sender, $args) {
         $setCookie = true;
@@ -424,8 +424,8 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     /**
      * Track when a user signs into the site.
      *
-     * @param $sender Current instance of EntryController
-     * @param $args Event arguments, passed from EntryController, specifically for the event.
+     * @param Gdn_Session $sender
+     * @param array $args
      */
     public function gdn_session_start_handler($sender, $args) {
         AnalyticsTracker::getInstance()->trackEvent('session', 'session_start');
@@ -435,8 +435,8 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
      * Track when a user signs out of the site.
      *
      * @todo Add siteDuration (time between sign-in and sign-out)
-     * @param $sender Current instance of EntryController
-     * @param $args Event arguments, passed from EntryController, specifically for the event.
+     * @param Gdn_Session $sender Current instance of EntryController
+     * @param array $args Event arguments, passed from EntryController, specifically for the event.
      */
     public function gdn_session_end_handler($sender, $args) {
         AnalyticsTracker::getInstance()->trackEvent('session', 'session_end');
@@ -460,10 +460,10 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     /**
      * Track when a user performs a reaction.
      *
-     * @param $sender Current instance of ReactionsPlugin
-     * @param $args Event arguments, passed from ReactionsPlugin or ReactionModel, specifically for the event.
+     * @param ReactionsPlugin $sender Current instance of ReactionsPlugin
+     * @param array $args Event arguments, passed from ReactionsPlugin or ReactionModel, specifically for the event.
      */
-    public function reactionsPlugin_reaction_handler($sender, &$args) {
+    public function reactionsPlugin_reaction_handler($sender, $args) {
         $reactionData = val('ReactionData', $args);
 
         $discussionID = 0;
