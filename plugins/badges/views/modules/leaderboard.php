@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+
 <style>
      .PanelInfo li {
           clear: both;
@@ -9,21 +10,22 @@
      }
 </style>
 <div class="Box Leaderboard">
-     <h4><?php echo $this->Title(); ?></h4>
+     <?php echo panelHeading($this->title()); ?>
      <ul class="PanelInfo">
           <?php foreach ($this->Leaders as $Leader) : ?>
                 <li>
                      <?php
-                     $Username = GetValue('Name', $Leader);
-                     $Photo = GetValue('Photo', $Leader);
+                     $Username = val('Name', $Leader);
+                     $Photo = val('Photo', $Leader);
 
-                     echo Anchor(
-                          Wrap(Wrap(Plural($Leader['Points'], '%s Point', '%s Points'), 'span', array('class' => 'Count')), 'span', array('class' => 'Aside')).' '.
-                          Wrap(
-                                Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')).' '.
-                                Wrap(htmlspecialchars($Username), 'span', array('class' => 'Username'))
-                          , 'span', array('class' => 'Leaderboard-User')),
-                          UserUrl($Leader)
+                     echo anchor(
+                          wrap(wrap(plural($Leader['Points'], '%s Point', '%s Points'), 'span', ['class' => 'Count']), 'span', ['class' => 'Aside']).' '
+                              .wrap(
+                                   img($Photo, ['class' => 'ProfilePhoto ProfilePhotoSmall']).' '.wrap(htmlspecialchars($Username), 'span', ['class' => 'Username']),
+                                   'span',
+                                   ['class' => 'Leaderboard-User']
+                              ),
+                          userUrl($Leader)
                      )
                      ?>
                 </li>

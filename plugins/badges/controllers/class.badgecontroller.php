@@ -11,12 +11,6 @@ require_once(dirname(__FILE__).'/class.badgesappcontroller.php');
  * Individual badges and doling to users.
  *
  * @since 1.0.0
- * @package Reputation
- *
- * @todo Points
- * @todo Secret
- * @todo Requestable
- * @todo Graduated abilities
  */
 class BadgeController extends BadgesAppController {
     /**

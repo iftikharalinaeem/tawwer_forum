@@ -10,7 +10,7 @@
 class RequestBadgeModule extends Gdn_Module {
 
     /**
-     *
+     * Create our instance of the module.
      *
      * @param string $Sender
      */
@@ -19,7 +19,7 @@ class RequestBadgeModule extends Gdn_Module {
     }
 
     /**
-     *
+     * Where the module will render by default.
      *
      * @return string
      */
@@ -28,13 +28,12 @@ class RequestBadgeModule extends Gdn_Module {
     }
 
     /**
-     *
+     * Render the module.
      *
      * @return string
      */
     public function toString() {
-        $HasPermission = Gdn::session()->checkPermission('Reputation.Badges.Request');
-        if ($HasPermission) {
+        if (checkPermission('Reputation.Badges.Request')) {
             return parent::toString();
         }
 

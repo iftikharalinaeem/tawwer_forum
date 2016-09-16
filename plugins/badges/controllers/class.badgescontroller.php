@@ -11,7 +11,6 @@ require_once(dirname(__FILE__).'/class.badgesappcontroller.php');
  * Public badges lists.
  *
  * @since 1.0.0
- * @package Reputation
  */
 class BadgesController extends BadgesAppController {
 
@@ -35,10 +34,10 @@ class BadgesController extends BadgesAppController {
     }
 
     /**
-     *
+     * Show a list of all badges.
      */
     public function all() {
-        $this->Permission('Reputation.Badges.View');
+        $this->permission('Reputation.Badges.View');
         $Badges = $this->BadgeModel->getList()->resultArray();
 
         if ($Badges) {

@@ -10,7 +10,7 @@
 class BadgesModule extends Gdn_Module {
 
     /**
-     *
+     * Create the module instance.
      *
      * @param string $Sender
      */
@@ -24,7 +24,7 @@ class BadgesModule extends Gdn_Module {
 
         // Get badge list
         $UserBadgeModel = new UserBadgeModel();
-        $this->Badges = $UserBadgeModel->getBadges(GetValue('UserID', $this->User))->resultArray();
+        $this->Badges = $UserBadgeModel->getBadges(val('UserID', $this->User))->resultArray();
 
         // Optionally only show highest badge in each class
         if (C('Reputation.Badges.FilterModuleByClass')) {
@@ -36,16 +36,16 @@ class BadgesModule extends Gdn_Module {
     }
 
     /**
-     *
+     * Where the module will render by default.
      *
      * @return mixed
      */
     public function assetTarget() {
-        return C('Badges.BadgesModule.Target', 'Panel');
+        return c('Badges.BadgesModule.Target', 'Panel');
     }
 
     /**
-     *
+     * Render the module.
      *
      * @return string|void
      */

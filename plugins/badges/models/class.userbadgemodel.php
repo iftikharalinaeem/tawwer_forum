@@ -10,7 +10,9 @@ require_once(dirname(__FILE__).'/class.badgesappmodel.php');
 /**
  * Deals with associating users with badges.
  */
-class UserBadgeModel extends BadgesAppModel {
+class UserBadgeModel extends Gdn_Model {
+
+    /** @var bool  */
     public $NoSpam = true;
 
     /**
