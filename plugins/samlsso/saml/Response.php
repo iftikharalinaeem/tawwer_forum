@@ -174,6 +174,8 @@ class OneLogin_Saml_Response
                 Logger::event('saml_response', Logger::INFO, "SAML Missing Assertion {$assertionXpath}.", []);
             }
         }
+
+        Logger::event('saml_response', Logger::INFO, "Assertion Found {$assertionXpath} {$assertion}.", []);
         return $assertion;
     }
 }
