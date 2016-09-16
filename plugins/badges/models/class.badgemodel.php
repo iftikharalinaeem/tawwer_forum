@@ -4,9 +4,6 @@
  * @package Badges
  */
 
-// We can't rely on our autoloader in a plugin.
-require_once(dirname(__FILE__).'/class.badgesappmodel.php');
-
 /**
  * Badge handling.
  */
