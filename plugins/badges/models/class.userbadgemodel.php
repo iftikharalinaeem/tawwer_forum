@@ -327,7 +327,7 @@ class UserBadgeModel extends Gdn_Model {
      * @since 1.0.0
      * @access public
      */
-    public function getUsers($BadgeID, $Options = array()) {
+    public function getUsers($BadgeID, $Options = []) {
         // Get numeric ID
         $BadgeID = $this->getBadgeID($BadgeID);
         if (!$BadgeID) {
@@ -336,6 +336,7 @@ class UserBadgeModel extends Gdn_Model {
 
         // Get query options
         $Limit = val('Limit', $Options, 5);
+        $Offset = val('Offset', $Options, 0);
 
         return $this->SQL
             ->select('u.*')
@@ -345,7 +346,7 @@ class UserBadgeModel extends Gdn_Model {
             ->where('ub.BadgeID', $BadgeID)
             ->where('ub.DateCompleted is not null')
             ->orderBy('ub.DateCompleted', 'desc')
-            ->limit($Limit)
+            ->limit($Limit, $Offset)
             ->get();
     }
 

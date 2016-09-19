@@ -147,11 +147,12 @@ class BadgeController extends BadgesAppController {
             $this->informMessage($Message);
         }
 
-        if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            redirect(getIncomingValue('Target', $this->SelfUrl));
+        if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
+            redirect('badge/all');
         }
 
-        $this->setView404();
+        // Regenerate the view we take this action from.
+        $this->View = 'all';
         $this->render();
     }
 
@@ -206,11 +207,16 @@ class BadgeController extends BadgesAppController {
             }
             $this->Form->setFormValue('DateCompleted', date('Y-m-d H:i:s'));
 
-            // Give to named users
+            // Give to named users.
             if ($Result) {
                 $this->informMessage(t('Gave badge to users.'));
-                $this->RedirectUrl = url('/badge/all');
+            } else {
+                // Not everyone got their badge.
+
             }
+
+            // Regenerate the page we came from.
+            $this->View = 'all';
         }
 
         $this->render();
@@ -433,13 +439,30 @@ class BadgeController extends BadgesAppController {
      *
      * @param mixed $BadgeID Unique numeric ID or slug.
      */
-    public function recipients($BadgeID) {
+    public function recipients($BadgeID, $Page = '') {
+        $this->permission('Reputation.Badges.Give');
+
+        // Page setup
+        $this->title(t('Badge Recipients'));
+        Gdn_Theme::section('Settings');
+
         // Set badge info.
         $Badge = $this->BadgeModel->getID($BadgeID);
         $this->setData('Badge', $Badge);
 
+        // Detect pagination.
+        list($Offset, $Limit) = offsetLimit($Page, 30);
+
         // Set recipient info.
-        $this->setData('Recipients', $this->UserBadgeModel->getUsers($BadgeID, array('Limit' => 15))->resultArray());
+        $recipients = $this->UserBadgeModel->getUsers($BadgeID, ['Limit' => $Limit, 'Offset' => $Offset])->resultArray();
+        $this->setData('Recipients', $recipients);
+
+        // Let us page by giving result count.
+        $this->setData('_CurrentRecords', count($recipients));
+        // Stop paging at the right spot.
+        $this->setData('_Limit', $Limit);
+        // Give us "of X" pager info.
+        $this->setData('RecordCount', $this->UserBadgeModel->recipientCount($BadgeID));
 
         $this->render();
     }
@@ -521,15 +544,19 @@ class BadgeController extends BadgesAppController {
      * @access public
      */
     public function revoke($UserID, $BadgeID) {
-        $this->permission('Garden.Settings.Manage');
+        $this->permission('Reputation.Badges.Give');
 
         if ($this->Form->authenticatedPostBack() && is_numeric($UserID) && is_numeric($BadgeID)) {
-            $UserID = $this->UserBadgeModel->revoke($UserID, $BadgeID);
-            $this->informMessage(T('Revoked badge.'));
-            redirect('profile/badges/'.$UserID.'/x');
+            $this->UserBadgeModel->revoke($UserID, $BadgeID);
+            $this->informMessage(t('Revoked badge.'));
         }
 
-        $this->setView404();
+        if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
+            safeRedirect('badge/recipients/'.$BadgeID);
+        }
+
+        // Regenerate the page we take this action from.
+        $this->View = 'recipients';
         $this->render();
     }
 }

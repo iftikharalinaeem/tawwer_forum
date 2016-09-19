@@ -1,10 +1,13 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
 <div class="header-block">
-    <h1><?php echo sprintf(t('%s recipients'), $this->data('Badge.Name')); ?></h1>
-
-    <!-- View badge link icon goes here -->
-
+    <div class="title-block">
+        <?php echo anchor(dashboardSymbol('chevron-left'), "/badge/all", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
+        <h1><?php echo $this->data('Badge.Name'); ?></h1>
+    </div>
+</div>
+<div class="toolbar">
+    <?php PagerModule::write(['View' => 'pager-dashboard']); ?>
 </div>
 <div class="table-wrap">
     <table id="Recipients" class="table-data">
