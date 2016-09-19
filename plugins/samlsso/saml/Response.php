@@ -135,7 +135,12 @@ class OneLogin_Saml_Response
 
         foreach ($signatureQueries as $signatureQuery) {
             /* @var SimpleXMLElement $refNode */
-            $refNode = reset($xml->xpath($signatureQuery));
+            $refNode = null;
+            $signatureQueryResult = $xml->xpath($signatureQuery);
+            // Check if the signature query returns a result before calling reset, avoid generating warning.
+            if ($signatureQueryResult) {
+                $refNode = reset($signatureQueryResult);
+            }
             if ($refNode) {
                 break;
             }
