@@ -358,7 +358,8 @@ class BadgeController extends ReputationController {
          $this->SetData('Badge', $Badge);
          $this->Form->SetData($this->Data('Badge'));
       }
-      
+
+      $this->fireEvent('ManageBadgeForm');
       // Form submitted
       if ($this->Form->AuthenticatedPostBack()) {
          $Data = $this->Form->FormValues();

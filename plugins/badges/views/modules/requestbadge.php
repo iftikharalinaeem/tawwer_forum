@@ -1,11 +1,12 @@
 <?php if (!defined('APPLICATION')) exit();
+
 echo '<div class="BoxButtons BoxRequestBadge">';
 
-echo Anchor(
-    T('Request This Badge'),
+echo anchor(
+    t('Request This Badge'),
     '/badge/request/'.$Data['BadgeID'],
     'Button BigButton Popup'
 );
-Gdn::Controller()->FireEvent('AfterRequestBadgeButton');
+Gdn::controller()->fireEvent('AfterRequestBadgeButton');
 
 echo '</div>';
