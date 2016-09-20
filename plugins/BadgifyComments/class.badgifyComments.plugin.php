@@ -52,7 +52,7 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
         if (!$this->getDiscussionBadge($discussionID) && Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             $args['DiscussionOptions']['Add a Badge'] = [
                 'Label' => t('Add a Badge'),
-                'Url' => "/badge/manage/?discussionID={$discussionID}",
+                'Url' => "/badge/manage/?discussionid={$discussionID}",
                 'Class' => 'Popup'
             ];
         }
