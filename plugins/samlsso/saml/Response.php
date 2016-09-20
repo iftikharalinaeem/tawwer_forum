@@ -180,7 +180,6 @@ class OneLogin_Saml_Response
             }
         }
 
-        Logger::event('saml_response', Logger::INFO, "Assertion Found {$nameQuery}.", (array)$assertion);
         return $assertion;
     }
 }
