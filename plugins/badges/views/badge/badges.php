@@ -31,7 +31,13 @@ foreach ($this->data('Badges') as $Badge) :
         </td>
         <td><?php echo Gdn_Format::text($Badge->Class); ?></td>
         <td><?php echo Gdn_Format::text($Badge->Level); ?></td>
-        <td><?php echo Gdn_Format::text($Badge->CountRecipients); ?></td>
+        <td><?php
+            if ($Badge->CountRecipients == 0) {
+                echo 0;
+            } else {
+                echo anchor($Badge->CountRecipients, '/badge/recipients/'.$Badge->BadgeID);
+            }
+        ?></td>
         <!--<td><?php
             // Hide badge
             if (checkPermission('Reputation.Badges.Manage')) {

@@ -13,11 +13,11 @@ require_once(dirname(__FILE__).'/class.badgesappcontroller.php');
  * @since 1.0.0
  */
 class BadgeController extends BadgesAppController {
+
     /**
      * Before any call to the controller.
      *
      * @since 1.0.0
-     * @access public
      */
     public function initialize() {
         parent::initialize();
@@ -28,7 +28,6 @@ class BadgeController extends BadgesAppController {
      * Manage badges.
      *
      * @since 1.0.0
-     * @access public
      */
     public function all() {
         Gdn_Theme::section('Dashboard');
@@ -41,7 +40,9 @@ class BadgeController extends BadgesAppController {
      * Approve badge request.
      *
      * @since 1.1
-     * @access public
+     * @param int $UserID
+     * @param string|int $BadgeID
+     * @param string $TransientKey
      */
     public function approve($UserID = '', $BadgeID = '', $TransientKey = '') {
         $this->permission('Reputation.Badges.Give');
@@ -62,7 +63,9 @@ class BadgeController extends BadgesAppController {
      * Decline badge request.
      *
      * @since 1.1
-     * @access public
+     * @param int $UserID
+     * @param string|int $BadgeID
+     * @param string $TransientKey
      */
     public function decline($UserID = '', $BadgeID = '', $TransientKey = '') {
         $this->permission('Reputation.Badges.Give');
@@ -83,7 +86,7 @@ class BadgeController extends BadgesAppController {
      * Delete an badge & revoke from all users.
      *
      * @since 1.0.0
-     * @access public
+     * param string|int $BadgeID
      */
     public function delete($BadgeID = '') {
         $this->permission('Garden.Settings.Manage');
@@ -132,7 +135,8 @@ class BadgeController extends BadgesAppController {
      * Disable/enable an badge from being given. It will still show on users who have it.
      *
      * @since 1.0.0
-     * @access public
+     * @param string|int $BadgeID
+     * @oaram string $TransientKey
      */
     public function disable($BadgeID = '', $TransientKey = '') {
         $this->permission('Garden.Settings.Manage');
@@ -146,11 +150,12 @@ class BadgeController extends BadgesAppController {
             $this->informMessage($Message);
         }
 
-        if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            redirect(getIncomingValue('Target', $this->SelfUrl));
+        if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
+            redirect('badge/all');
         }
 
-        $this->setView404();
+        // Regenerate the view we take this action from.
+        $this->View = 'all';
         $this->render();
     }
 
@@ -158,7 +163,7 @@ class BadgeController extends BadgesAppController {
      * Give selected badge to 1 or more users.
      *
      * @since 1.0.0
-     * @access public
+     * @param string|int $BadgeID
      */
     public function give($BadgeID = '') {
         $this->permission('Reputation.Badges.Give');
@@ -205,11 +210,16 @@ class BadgeController extends BadgesAppController {
             }
             $this->Form->setFormValue('DateCompleted', date('Y-m-d H:i:s'));
 
-            // Give to named users
+            // Give to named users.
             if ($Result) {
                 $this->informMessage(t('Gave badge to users.'));
-                $this->RedirectUrl = url('/badge/all');
+            } else {
+                // Not everyone got their badge.
+
             }
+
+            // Regenerate the page we came from.
+            $this->View = 'all';
         }
 
         $this->render();
@@ -219,7 +229,7 @@ class BadgeController extends BadgesAppController {
      * Give any badge to selected user.
      *
      * @since 1.0.0
-     * @access public
+     * @param int $UserID
      */
     public function giveUser($UserID = '') {
         $this->permission('Reputation.Badges.Give');
@@ -282,7 +292,8 @@ class BadgeController extends BadgesAppController {
      * Hide/Unhide an badge from being listed. It will still show on users who have it.
      *
      * @since 1.0.0
-     * @access public
+     * @param string|int $BadgeID
+     * @param string $TransientKey
      */
     public function hide($BadgeID = '', $TransientKey = '') {
         $this->permission('Garden.Settings.Manage');
@@ -297,7 +308,7 @@ class BadgeController extends BadgesAppController {
         }
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            redirect(getIncomingValue('Target', $this->SelfUrl));
+            safeRedirect(getIncomingValue('Target', $this->SelfUrl));
         }
 
         $this->setView404();
@@ -308,10 +319,10 @@ class BadgeController extends BadgesAppController {
      * View a badge.
      *
      * @since 1.0.0
-     * @access public
+     * @param string|int $BadgeID
+     * @param string $Name
      */
     public function index($BadgeID = '', $Name = '') {
-
         $this->MasterView = 'default';
         $this->addCssFile('style.css');
         $this->removeCssFile('admin.css');
@@ -333,7 +344,7 @@ class BadgeController extends BadgesAppController {
         // Get recipients
         $this->setData('Recipients', $this->UserBadgeModel->getUsers($BadgeID, array('Limit' => 15))->resultArray());
         $this->setData('BadgeID', $BadgeID, true);
-        if (GetValue('_New', $this->UserBadge) && GetValue('Type', $this->Badge) == 'Manual') {
+        if (val('_New', $this->UserBadge) && val('Type', $this->Badge) == 'Manual') {
             $this->addModule('RequestBadgeModule');
         }
         $this->addModule('BadgesModule');
@@ -345,7 +356,7 @@ class BadgeController extends BadgesAppController {
      * Create or edit an badge.
      *
      * @since 1.0.0
-     * @access public
+     * @param string|int $BadgeID
      */
     public function manage($BadgeID = '') {
         $this->permission('Garden.Settings.Manage');
@@ -429,10 +440,44 @@ class BadgeController extends BadgesAppController {
     }
 
     /**
+     * See who has received a badge.
+     *
+     * @since 1.5
+     * @param string|int $BadgeID Unique numeric ID or slug.
+     * @param string|int $Page Page number.
+     */
+    public function recipients($BadgeID, $Page = '') {
+        $this->permission('Reputation.Badges.Give');
+
+        // Page setup
+        $this->title(t('Badge Recipients'));
+        Gdn_Theme::section('Settings');
+
+        // Set badge info.
+        $Badge = $this->BadgeModel->getID($BadgeID);
+        $this->setData('Badge', $Badge);
+
+        // Detect pagination.
+        list($Offset, $Limit) = offsetLimit($Page, 30);
+
+        // Set recipient info.
+        $recipients = $this->UserBadgeModel->getUsers($BadgeID, ['Limit' => $Limit, 'Offset' => $Offset])->resultArray();
+        $this->setData('Recipients', $recipients);
+
+        // Let us page by giving result count.
+        $this->setData('_CurrentRecords', count($recipients));
+        // Stop paging at the right spot.
+        $this->setData('_Limit', $Limit);
+        // Give us "of X" pager info.
+        $this->setData('RecordCount', $this->UserBadgeModel->recipientCount($BadgeID));
+
+        $this->render();
+    }
+
+    /**
      * Request a badge.
      *
      * @since 1.1
-     * @access public
      * @param mixed $BadgeID Unique numeric ID or slug.
      */
     public function request($BadgeID) {
@@ -469,7 +514,6 @@ class BadgeController extends BadgesAppController {
      * Current badge requests.
      *
      * @since 1.1
-     * @access public
      */
     public function requests() {
         $this->permission('Reputation.Badges.Give');
@@ -505,15 +549,19 @@ class BadgeController extends BadgesAppController {
      * @access public
      */
     public function revoke($UserID, $BadgeID) {
-        $this->permission('Garden.Settings.Manage');
+        $this->permission('Reputation.Badges.Give');
 
         if ($this->Form->authenticatedPostBack() && is_numeric($UserID) && is_numeric($BadgeID)) {
-            $UserID = $this->UserBadgeModel->revoke($UserID, $BadgeID);
-            $this->informMessage(T('Revoked badge.'));
-            redirect('profile/badges/'.$UserID.'/x');
+            $this->UserBadgeModel->revoke($UserID, $BadgeID);
+            $this->informMessage(t('Revoked badge.'));
         }
 
-        $this->setView404();
+        if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
+            safeRedirect('badge/recipients/'.$BadgeID);
+        }
+
+        // Regenerate the page we take this action from.
+        $this->View = 'recipients';
         $this->render();
     }
 }

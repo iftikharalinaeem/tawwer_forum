@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+
 <div class="header-block">
     <h1><?php echo t('Manage Badges'); ?></h1>
     <div class="btn-group">
@@ -19,10 +20,10 @@
         </thead>
         <tbody>
             <?php
-            if (count($this->Data('Badges'))) :
-                include($this->FetchViewLocation('badges'));
+            if (count($this->data('Badges'))) :
+                include($this->fetchViewLocation('badges'));
             else :
-                echo '<tr><td colspan="' . (checkPermission('Reputation.Badges.Give') ? '7' : '6') . '">' . T('No badges yet.') . '</td></tr>';
+                echo '<tr><td colspan="' . (checkPermission('Reputation.Badges.Give') ? '7' : '6') . '">' . t('No badges yet.') . '</td></tr>';
             endif;
             ?>
         </tbody>

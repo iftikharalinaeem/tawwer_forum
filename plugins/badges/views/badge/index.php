@@ -54,7 +54,8 @@ $this->title(t('View Badge') . ': ' . $this->data('Badge.Name')); ?>
 <?php if ((count($this->data('Recipients')) > 0) && ($Count = $this->data('Badge.CountRecipients'))) : ?>
 
     <p class="BadgeCountDisplay"><?php
-        echo plural($Count, t('%s person has earned this badge.'), t('%s people have earned this badge.'));
+        $text = plural($Count, t('%s person has earned this badge.'), t('%s people have earned this badge.'));
+        echo (checkPermission('Reputation.Badges.Give')) ? anchor($text, '/badge/recipients/'.$this->data('Badge.BadgeID')) : $text;
     ?></p>
 
     <h2><?php echo t('BadgeRecipientsHeading', "Most recent recipients"); ?></h2>

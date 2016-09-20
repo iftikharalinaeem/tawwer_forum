@@ -1,20 +1,20 @@
 <?php
 /**
- * @copyright 2011-2015 Vanilla Forums, Inc.
+ * @copyright 2011-2016 Vanilla Forums, Inc.
  * @author Lincoln Russell <lincoln@vanillaforums.com>
  * @package Badges
  */
 
-$PluginInfo['badges'] = array(
+$PluginInfo['badges'] = [
     'Name' => 'Badges',
     'Description' => "Give badges to your users to reward them for contributing to your community.",
-    'Version' => '1.4.3',
-    'RegisterPermissions' => array(
+    'Version' => '1.5',
+    'RegisterPermissions' => [
         'Reputation.Badges.View' => 1,
         'Reputation.Badges.Request',
         'Reputation.Badges.Give' => 'Garden.Settings.Manage',
         'Reputation.Badges.Manage' => 'Garden.Settings.Manage'
-    ),
+    ],
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',
     'AuthorUrl' => 'http://lincolnwebs.com',
@@ -22,7 +22,7 @@ $PluginInfo['badges'] = array(
     'SettingsUrl' => '/settings/badges',
     'Icon' => 'badges.png',
     'SettingsPermission' => 'Garden.Settings.Manage'
-);
+];
 
 /**
  * Places badges hooks into other applications.
