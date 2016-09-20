@@ -18,7 +18,6 @@ class BadgeController extends BadgesAppController {
      * Before any call to the controller.
      *
      * @since 1.0.0
-     * @access public
      */
     public function initialize() {
         parent::initialize();
@@ -29,7 +28,6 @@ class BadgeController extends BadgesAppController {
      * Manage badges.
      *
      * @since 1.0.0
-     * @access public
      */
     public function all() {
         Gdn_Theme::section('Dashboard');
@@ -42,7 +40,9 @@ class BadgeController extends BadgesAppController {
      * Approve badge request.
      *
      * @since 1.1
-     * @access public
+     * @param int $UserID
+     * @param string|int $BadgeID
+     * @param string $TransientKey
      */
     public function approve($UserID = '', $BadgeID = '', $TransientKey = '') {
         $this->permission('Reputation.Badges.Give');
@@ -63,7 +63,9 @@ class BadgeController extends BadgesAppController {
      * Decline badge request.
      *
      * @since 1.1
-     * @access public
+     * @param int $UserID
+     * @param string|int $BadgeID
+     * @param string $TransientKey
      */
     public function decline($UserID = '', $BadgeID = '', $TransientKey = '') {
         $this->permission('Reputation.Badges.Give');
@@ -84,7 +86,7 @@ class BadgeController extends BadgesAppController {
      * Delete an badge & revoke from all users.
      *
      * @since 1.0.0
-     * @access public
+     * param string|int $BadgeID
      */
     public function delete($BadgeID = '') {
         $this->permission('Garden.Settings.Manage');
@@ -133,7 +135,8 @@ class BadgeController extends BadgesAppController {
      * Disable/enable an badge from being given. It will still show on users who have it.
      *
      * @since 1.0.0
-     * @access public
+     * @param string|int $BadgeID
+     * @oaram string $TransientKey
      */
     public function disable($BadgeID = '', $TransientKey = '') {
         $this->permission('Garden.Settings.Manage');
@@ -160,7 +163,7 @@ class BadgeController extends BadgesAppController {
      * Give selected badge to 1 or more users.
      *
      * @since 1.0.0
-     * @access public
+     * @param string|int $BadgeID
      */
     public function give($BadgeID = '') {
         $this->permission('Reputation.Badges.Give');
@@ -226,7 +229,7 @@ class BadgeController extends BadgesAppController {
      * Give any badge to selected user.
      *
      * @since 1.0.0
-     * @access public
+     * @param int $UserID
      */
     public function giveUser($UserID = '') {
         $this->permission('Reputation.Badges.Give');
@@ -289,7 +292,8 @@ class BadgeController extends BadgesAppController {
      * Hide/Unhide an badge from being listed. It will still show on users who have it.
      *
      * @since 1.0.0
-     * @access public
+     * @param string|int $BadgeID
+     * @param string $TransientKey
      */
     public function hide($BadgeID = '', $TransientKey = '') {
         $this->permission('Garden.Settings.Manage');
@@ -315,7 +319,8 @@ class BadgeController extends BadgesAppController {
      * View a badge.
      *
      * @since 1.0.0
-     * @access public
+     * @param string|int $BadgeID
+     * @param string $Name
      */
     public function index($BadgeID = '', $Name = '') {
         $this->MasterView = 'default';
@@ -351,7 +356,7 @@ class BadgeController extends BadgesAppController {
      * Create or edit an badge.
      *
      * @since 1.0.0
-     * @access public
+     * @param string|int $BadgeID
      */
     public function manage($BadgeID = '') {
         $this->permission('Garden.Settings.Manage');
@@ -437,7 +442,9 @@ class BadgeController extends BadgesAppController {
     /**
      * See who has received a badge.
      *
-     * @param mixed $BadgeID Unique numeric ID or slug.
+     * @since 1.5
+     * @param string|int $BadgeID Unique numeric ID or slug.
+     * @param string|int $Page Page number.
      */
     public function recipients($BadgeID, $Page = '') {
         $this->permission('Reputation.Badges.Give');
@@ -471,7 +478,6 @@ class BadgeController extends BadgesAppController {
      * Request a badge.
      *
      * @since 1.1
-     * @access public
      * @param mixed $BadgeID Unique numeric ID or slug.
      */
     public function request($BadgeID) {
@@ -508,7 +514,6 @@ class BadgeController extends BadgesAppController {
      * Current badge requests.
      *
      * @since 1.1
-     * @access public
      */
     public function requests() {
         $this->permission('Reputation.Badges.Give');
