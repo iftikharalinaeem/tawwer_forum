@@ -67,7 +67,8 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      */
     public function badgeController_manageBadgeForm_handler($sender, $args) {
         $formArray = (array) $sender->Form->formData();
-        $discussionID = Gdn::request()->get('discussionID');
+        // check for lowercase discussionID because Garden Request lowercases all get vars.
+        $discussionID = Gdn::request()->get('discussionid');
         if ($discussionID) {
             $defaultValues = [
                 'Name' => c('Badgify.Default.Name'),
