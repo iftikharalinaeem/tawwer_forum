@@ -151,7 +151,7 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
     /**
      * Add a CSS class to any discussion that has a badge attached to it.
      *
-     * @param DiscussionsController $sender
+     * @param object $sender DiscussionsController|DiscussionController
      * @param array $args
      */
     public function base_beforeDiscussionName_handler($sender, $args) {
