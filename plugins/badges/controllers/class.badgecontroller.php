@@ -375,6 +375,8 @@ class BadgeController extends BadgesAppController {
             $this->Form->setData($this->data('Badge'));
         }
 
+        $this->fireEvent('ManageBadgeForm');
+
         // Form submitted
         if ($this->Form->authenticatedPostBack()) {
             // Set BadgeID for existing or set Type = Manual for new
