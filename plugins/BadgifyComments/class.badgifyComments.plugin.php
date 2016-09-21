@@ -5,7 +5,8 @@ $PluginInfo['BadgifyComments'] = [
     'ClassName' => 'BadgifyCommentsPlugin',
     'Description' => 'It\'s gamification with badges. Assign badges to discussions to incentivize users to comment.',
     'Version' => '1.0.0',
-    'RequiredApplications' => ['Vanilla' => '2.0', 'Reputation' => '1.0'],
+    'RequiredApplications' => ['Vanilla' => '2.0'],
+    'RequiredPlugins' => ['badges' => '1.5'],
     'SettingsUrl' => '/settings/BadgifyComments',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true
