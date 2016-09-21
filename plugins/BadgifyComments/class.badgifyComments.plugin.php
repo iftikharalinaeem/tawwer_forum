@@ -154,7 +154,7 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      * @param DiscussionsController $sender
      * @param array $args
      */
-    public function discussionsController_beforeDiscussionName_handler($sender, $args) {
+    public function base_beforeDiscussionName_handler($sender, $args) {
         if ($this->getDiscussionBadge(valr('Discussion.DiscussionID', $args))) {
             $args['CssClass'] .= ' Badgified';
         }
