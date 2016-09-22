@@ -211,7 +211,7 @@ class RankModel extends Gdn_Model {
 
         $RanksPlugin = Gdn::pluginManager()->getPluginInstance('RanksPlugin');
 
-        $Rank = self::ranks(GetValue('RankID', $Session->User, false));
+        $Rank = self::ranks(val('RankID', $Session->User, false));
         if (!$Rank) {
             return;
         }
@@ -219,83 +219,83 @@ class RankModel extends Gdn_Model {
         $Abilities = val('Abilities', $Rank, []);
 
         // Post discussions.
-        if ($V = val('DiscussionsAdd', $Abilities)) {
-            if ($V == 'no') {
+        if ($allowed = val('DiscussionsAdd', $Abilities)) {
+            if ($allowed == 'no') {
                 $Session->setPermission('Vanilla.Discussions.Add', []);
             }
         }
 
         // Add comments.
-        if ($V = val('CommentsAdd', $Abilities)) {
-            if ($V == 'no') {
+        if ($allowed = val('CommentsAdd', $Abilities)) {
+            if ($allowed == 'no') {
                 $Session->setPermission('Vanilla.Comments.Add', []);
             }
         }
 
         // Add conversations.
-        if ($V = val('ConversationsAdd', $Abilities)) {
-            $Session->setPermission('Conversations.Conversations.Add', $V == 'yes' ? true : false);
+        if ($allowed = val('ConversationsAdd', $Abilities)) {
+            $Session->setPermission('Conversations.Conversations.Add', ($allowed === 'yes'));
         }
 
         // Verified.
-        if ($V = val('Verified', $Abilities)) {
+        if ($allowed = val('Verified', $Abilities)) {
             $Verified = ['yes' => 1, 'no'  => 0];
-            $Verified = val($V, $Verified, null);
+            $Verified = val($allowed, $Verified, null);
             if (is_integer($Verified)) {
                 $Session->User->Verified = $Verified;
             }
         }
 
         // Post Format.
-        if ($V = val('Format', $Abilities)) {
+        if ($allowed = val('Format', $Abilities)) {
             saveToConfig([
-                'Garden.InputFormatter' => $V,
+                'Garden.InputFormatter' => $allowed,
                 'Garden.InputFormatterBak' => c('Garden.InputFormatter'),
                 'Garden.ForceInputFormatter' => true
             ], null, false);
         }
 
         // Titles.
-        if ($V = val('Titles', $Abilities)) {
-            saveToConfig('Garden.Profile.Titles', $V == 'yes' ? true : false, false);
+        if ($allowed = val('Titles', $Abilities)) {
+            saveToConfig('Garden.Profile.Titles', ($allowed === 'yes'), false);
         }
 
         // Locations.
-        if ($V = val('Locations', $Abilities)) {
-            saveToConfig('Garden.Profile.Locations', $V == 'yes' ? true : false, false);
+        if ($allowed = val('Locations', $Abilities)) {
+            saveToConfig('Garden.Profile.Locations', ($allowed === 'yes'), false);
         }
 
         // Avatars.
-        if ($V = val('Avatars', $Abilities)) {
-            saveToConfig('Garden.Profile.EditPhotos', $V == 'yes' ? true : false, false);
+        if ($allowed = val('Avatars', $Abilities)) {
+            saveToConfig('Garden.Profile.EditPhotos', ($allowed === 'yes'), false);
         }
 
         // Signatures.
-        if ($V = val('Signatures', $Abilities)) {
-            $Session->setPermission('Plugins.Signatures.Edit', $V == 'yes' ? true : false);
+        if ($allowed = val('Signatures', $Abilities)) {
+            $Session->setPermission('Plugins.Signatures.Edit', ($allowed === 'yes'));
         }
 
-        if ($V = val('SignatureMaxNumberImages', $Abilities)) {
-            saveToConfig('Plugins.Signatures.MaxNumberImages', $V, false);
+        if ($allowed = val('SignatureMaxNumberImages', $Abilities)) {
+            saveToConfig('Plugins.Signatures.MaxNumberImages', $allowed, false);
         }
 
-        if ($V = val('SignatureMaxLength', $Abilities)) {
-            saveToConfig('Plugins.Signatures.MaxLength', $V, false);
+        if ($allowed = val('SignatureMaxLength', $Abilities)) {
+            saveToConfig('Plugins.Signatures.MaxLength', $allowed, false);
         }
 
         // Polls.
-        if ($V = val('Polls', $Abilities)) {
-            $Session->setPermission('Plugins.Polls.Add', $V == 'yes' ? true : false);
+        if ($allowed = val('Polls', $Abilities)) {
+            $Session->setPermission('Plugins.Polls.Add', ($allowed === 'yes'));
         }
 
         // MeActions.
-        if ($V = val('MeAction', $Abilities)) {
-            $Session->setPermission('Vanilla.Comments.Me', $V == 'yes' ? true : false);
+        if ($allowed = val('MeAction', $Abilities)) {
+            $Session->setPermission('Vanilla.Comments.Me', ($allowed === 'yes'));
         }
 
         /// Content curation.
-        if ($V = val('Curation', $Abilities)) {
-            $Session->setPermission('Garden.Curation.Manage', $V == 'yes' ? true : false);
+        if ($allowed = val('Curation', $Abilities)) {
+            $Session->setPermission('Garden.Curation.Manage', ($allowed === 'yes'));
         }
 
         // Links.
@@ -305,8 +305,8 @@ class RankModel extends Gdn_Model {
 
 
         // Edit content timeout.
-        if (($V = val('EditContentTimeout', $Abilities, false)) !== false) {
-            saveToConfig('Garden.EditContentTimeout', $V, false);
+        if (($allowed = val('EditContentTimeout', $Abilities, false)) !== false) {
+            saveToConfig('Garden.EditContentTimeout', $allowed, false);
         }
 
          $permissionRole = val('PermissionRole', $Abilities);
