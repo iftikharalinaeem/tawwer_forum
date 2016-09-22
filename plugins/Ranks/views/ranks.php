@@ -33,7 +33,7 @@
                 <th class="NameColumn column-md" data-tj-main="true"><?php echo T('Name'); ?></th>
                 <th class=""><?php echo T('Label'); ?></th>
                 <th class="CriteriaColumn column-lg"><?php echo T('Criteria'); ?></th>
-                <th class="AbilitiesColumn column-lg"><?php echo T('Abilites'); ?></th>
+                <th class="AbilitiesColumn column-lg"><?php echo T('Abilites', 'Abilities'); ?></th>
                 <th class="options column-sm"></th>
             </tr>
         </thead>
