@@ -1,10 +1,20 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
- * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
+ * @copyright Copyright 2008-2016 Vanilla Forums, Inc.
  * @license Proprietary
  */
 
+/**
+ * Class RankModel
+ */
 class RankModel extends Gdn_Model {
+
+    /** @var null|array  */
+    protected static $_Ranks = null;
+
+    /**
+     * RankModel constructor.
+     */
     public function __construct() {
         parent::__construct('Rank');
     }
@@ -15,45 +25,47 @@ class RankModel extends Gdn_Model {
      * @param $User
      * @return array Key 'CurrentRank' with value of set RankID.
      */
-    public function ApplyRank($User) {
+    public function applyRank($User) {
         if (is_numeric($User)) {
-            $User = Gdn::UserModel()->GetID($User, DATASET_TYPE_ARRAY);
+            $User = Gdn::userModel()->getID($User, DATASET_TYPE_ARRAY);
         }
         $User = (array)$User;
 
-        $CurrentRankID = GetValue('RankID', $User);
-        $Result = array('CurrentRank' => $CurrentRankID ? self::Ranks($CurrentRankID) : NULL);
+        $CurrentRankID = val('RankID', $User);
+        $Result = ['CurrentRank' => $CurrentRankID ? self::ranks($CurrentRankID) : null];
 
-        $Ranks = self::Ranks();
+        $Ranks = self::ranks();
 
         // Check the ranks backwards so we know which rank to apply.
         $Ranks = array_reverse($Ranks);
         foreach ($Ranks as $Rank) {
-            if (self::TestRank($User, $Rank)) {
+            if (self::testRank($User, $Rank)) {
                 $RankID = $Rank['RankID'];
                 $Result['NewRank'] = $Rank;
                 break;
             }
         }
 
-        if (!isset($RankID))
+        if (!isset($RankID)) {
             return $Result;
-
-        if (isset($RankID) && $RankID == $CurrentRankID)
+        }
+        if (isset($RankID) && $RankID == $CurrentRankID) {
             return $Result;
+        }
 
         // Apply the rank.
-        $UserID = GetValue('UserID', $User);
-        Gdn::UserModel()->SetField($UserID, 'RankID', $RankID);
+        $UserID = val('UserID', $User);
+        Gdn::userModel()->setField($UserID, 'RankID', $RankID);
 
+        // Notify the user?
         $Notify = $Rank['Level'] > 1;
-
-        if (!isset($Result['NewRank']) || ($Result['CurrentRank'] && $Result['NewRank']['Level'] < $Result['CurrentRank']['Level']))
-            $Notify = FALSE;
-
-        if ($Notify) {
-            $this->Notify($User, $Rank);
+        if (!isset($Result['NewRank']) || ($Result['CurrentRank'] && $Result['NewRank']['Level'] < $Result['CurrentRank']['Level'])) {
+            $Notify = false;
         }
+        if ($Notify) {
+            $this->notify($User, $Rank);
+        }
+
         return $Result;
     }
 
@@ -64,39 +76,38 @@ class RankModel extends Gdn_Model {
      * @param $Rank
      * @throws Exception
      */
-    public function Notify($User, $Rank) {
-        $UserID = GetValue('UserID', $User);
+    public function notify($User, $Rank) {
+        $UserID = val('UserID', $User);
         $RankID = $Rank['RankID'];
 
-
         // Notify people of the rank.
-        $Activity = array(
+        $Activity = [
                 'ActivityType' => 'Rank',
                 'ActivityUserID' => $UserID,
                 'NotifyUserID' => $UserID,
-                'HeadlineFormat' => T('Ranks.NotificationFormat', 'Congratulations! You\'ve been promoted to {Data.Name,plaintext}.'),
-                'Story' => GetValue('Body', $Rank),
+                'HeadlineFormat' => t('Ranks.NotificationFormat', 'Congratulations! You\'ve been promoted to {Data.Name,plaintext}.'),
+                'Story' => val('Body', $Rank),
                 'RecordType' => 'Rank',
                 'RecordID' => $RankID,
                 'Route' => "/profile",
                 'Emailed' => ActivityModel::SENT_PENDING,
                 'Notified' => ActivityModel::SENT_PENDING,
                 'Photo' => 'https://c3409409.ssl.cf0.rackcdn.com/images/ranks_100.png',
-                'Data' => array('Name' => $Rank['Name'], 'Label' => $Rank['Label'])
-        );
+                'Data' => ['Name' => $Rank['Name'], 'Label' => $Rank['Label']]
+        ];
 
         $ActivityModel = new ActivityModel();
-        $ActivityModel->Queue($Activity, FALSE, array('Force' => TRUE));
+        $ActivityModel->queue($Activity, false, ['Force' => true]);
 
         // Notify everyone else of your badge.
         $Activity['NotifyUserID'] = ActivityModel::NOTIFY_PUBLIC;
-        $Activity['HeadlineFormat'] = T('Ranks.ActivityFormat', '{ActivityUserID,user} {ActivityUserID,plural,was,were} promoted to {Data.Name,plaintext}.');
+        $Activity['HeadlineFormat'] = t('Ranks.ActivityFormat', '{ActivityUserID,user} {ActivityUserID,plural,was,were} promoted to {Data.Name,plaintext}.');
         $Activity['Emailed'] = ActivityModel::SENT_OK;
         $Activity['Popup'] = ActivityModel::SENT_OK;
         unset($Activity['Route']);
-        $ActivityModel->Queue($Activity, FALSE, array('GroupBy' => array('ActivityTypeID', 'RecordID', 'RecordType')));
+        $ActivityModel->queue($Activity, false, ['GroupBy' => ['ActivityTypeID', 'RecordID', 'RecordType']]);
 
-        $ActivityModel->SaveQueue();
+        $ActivityModel->saveQueue();
     }
 
     /**
@@ -105,49 +116,49 @@ class RankModel extends Gdn_Model {
      * @param $Rank
      * @return mixed|string
      */
-    public static function AbilitiesString($Rank) {
-        $Abilities = GetValue('Abilities', $Rank);
-        $Result = array();
+    public static function abilitiesString($Rank) {
+        $Abilities = val('Abilities', $Rank);
+        $Result = [];
 
-        self::AbilityString($Abilities, 'DiscussionsAdd', 'Add Discussions', $Result);
-        self::AbilityString($Abilities, 'CommentsAdd', 'Add Comments', $Result);
-        self::AbilityString($Abilities, 'ConversationsAdd', 'Start Private Conversations', $Result);
-        self::AbilityString($Abilities, 'Verified', 'Verified', $Result);
+        self::abilityString($Abilities, 'DiscussionsAdd', 'Add Discussions', $Result);
+        self::abilityString($Abilities, 'CommentsAdd', 'Add Comments', $Result);
+        self::abilityString($Abilities, 'ConversationsAdd', 'Start Private Conversations', $Result);
+        self::abilityString($Abilities, 'Verified', 'Verified', $Result);
 
-        $V = GetValue('Format', $Abilities);
+        $V = val('Format', $Abilities);
         if ($V) {
             $V = strtolower($V);
-            if ($V == 'textex')
+            if ($V == 'textex') {
                 $V = 'text, links, youtube';
-
+            }
             $Result[] = '<b>Post Format</b>: '.$V;
         }
 
-        self::AbilityString($Abilities, 'ActivityLinks', 'Activity Links', $Result);
-        self::AbilityString($Abilities, 'CommentLinks', 'Discussion & Comment Links', $Result);
-        self::AbilityString($Abilities, 'ConversationLinks', 'Conversation Links', $Result);
+        self::abilityString($Abilities, 'ActivityLinks', 'Activity Links', $Result);
+        self::abilityString($Abilities, 'CommentLinks', 'Discussion & Comment Links', $Result);
+        self::abilityString($Abilities, 'ConversationLinks', 'Conversation Links', $Result);
 
-        self::AbilityString($Abilities, 'Titles', 'Titles', $Result);
-        self::AbilityString($Abilities, 'Locations', 'Locations', $Result);
-        self::AbilityString($Abilities, 'Avatars', 'Avatars', $Result);
-        self::AbilityString($Abilities, 'Signatures', 'Signatures', $Result);
+        self::abilityString($Abilities, 'Titles', 'Titles', $Result);
+        self::abilityString($Abilities, 'Locations', 'Locations', $Result);
+        self::abilityString($Abilities, 'Avatars', 'Avatars', $Result);
+        self::abilityString($Abilities, 'Signatures', 'Signatures', $Result);
 
-        if ($V = GetValue('SignatureMaxNumberImages', $Abilities)) {
+        if ($V = val('SignatureMaxNumberImages', $Abilities)) {
             $Result[] = '<b>Max number of images in signature</b>: '.$V;
         }
 
-        if ($V = GetValue('SignatureMaxLength', $Abilities)) {
+        if ($V = val('SignatureMaxLength', $Abilities)) {
             $Result[] = '<b>Max number of characters in signature</b>: '.$V;
         }
 
-        self::AbilityString($Abilities, 'Polls', 'Polls', $Result);
-        self::AbilityString($Abilities, 'MeAction', 'Me Actions', $Result);
-        self::AbilityString($Abilities, 'Curation', 'Content Curation', $Result);
+        self::abilityString($Abilities, 'Polls', 'Polls', $Result);
+        self::abilityString($Abilities, 'MeAction', 'Me Actions', $Result);
+        self::abilityString($Abilities, 'Curation', 'Content Curation', $Result);
 
-        $V = GetValue('EditContentTimeout', $Abilities, '');
+        $V = val('EditContentTimeout', $Abilities, '');
         if ($V !== '') {
-            $Options = self::ContentEditingOptions();
-            $Result[] = '<b>'.T('Editing').'</b>: '.GetValue($V, $Options);
+            $Options = self::contentEditingOptions();
+            $Result[] = '<b>'.t('Editing').'</b>: '.val($V, $Options);
         }
 
         if ($v = val('PermissionRole', $Abilities)) {
@@ -174,8 +185,8 @@ class RankModel extends Gdn_Model {
      * @param string $String What we're call in the ability in the UI.
      * @param array $Result Store the HTML output for this line.
      */
-    public static function AbilityString($Abilities, $Value, $String, &$Result) {
-        $V = GetValue($Value, $Abilities);
+    public static function abilityString($Abilities, $Value, $String, &$Result) {
+        $V = val($Value, $Abilities);
 
         if ($V === 'yes') {
             $Result[] = '<b>Add</b>: '.$String;
@@ -192,147 +203,160 @@ class RankModel extends Gdn_Model {
      *
      * @throws Exception
      */
-    public static function ApplyAbilities() {
-        $Session = Gdn::Session();
-        if (!$Session->User)
+    public static function applyAbilities() {
+        $Session = Gdn::session();
+        if (!$Session->User) {
             return;
+        }
 
-        $RanksPlugin = Gdn::PluginManager()->GetPluginInstance('RanksPlugin');
+        $RanksPlugin = Gdn::pluginManager()->getPluginInstance('RanksPlugin');
 
-        $Rank = self::Ranks(GetValue('RankID', $Session->User, FALSE));
-        if (!$Rank)
+        $Rank = self::ranks(val('RankID', $Session->User, false));
+        if (!$Rank) {
             return;
+        }
 
-        $Abilities = GetValue('Abilities', $Rank, array());
+        $Abilities = val('Abilities', $Rank, []);
 
         // Post discussions.
-        if ($V = GetValue('DiscussionsAdd', $Abilities)) {
-            if ($V == 'no')
-                $Session->SetPermission('Vanilla.Discussions.Add', array());
+        if ($allowed = val('DiscussionsAdd', $Abilities)) {
+            if ($allowed === 'no') {
+                $Session->setPermission('Vanilla.Discussions.Add', []);
+            }
         }
 
         // Add comments.
-        if ($V = GetValue('CommentsAdd', $Abilities)) {
-            if ($V == 'no')
-                $Session->SetPermission('Vanilla.Comments.Add', array());
+        if ($allowed = val('CommentsAdd', $Abilities)) {
+            if ($allowed === 'no') {
+                $Session->setPermission('Vanilla.Comments.Add', []);
+            }
         }
 
         // Add conversations.
-        if ($V = GetValue('ConversationsAdd', $Abilities)) {
-            $Session->SetPermission('Conversations.Conversations.Add', $V == 'yes' ? TRUE : FALSE);
+        if ($allowed = val('ConversationsAdd', $Abilities)) {
+            $Session->setPermission('Conversations.Conversations.Add', ($allowed === 'yes'));
         }
 
         // Verified.
-        if ($V = GetValue('Verified', $Abilities)) {
-            $Verified = array(
-                'yes' => 1,
-                'no'  => 0
-            );
-            $Verified = GetValue($V, $Verified, null);
-            if (is_integer($Verified))
+        if ($allowed = val('Verified', $Abilities)) {
+            $Verified = ['yes' => 1, 'no'  => 0];
+            $Verified = val($allowed, $Verified, null);
+            if (is_integer($Verified)) {
                 $Session->User->Verified = $Verified;
+            }
         }
 
         // Post Format.
-        if ($V = GetValue('Format', $Abilities)) {
-            SaveToConfig(array(
-                'Garden.InputFormatter' => $V,
-                'Garden.InputFormatterBak' => C('Garden.InputFormatter'),
-                'Garden.ForceInputFormatter' => TRUE),
-                NULL, FALSE);
+        if ($allowed = val('Format', $Abilities)) {
+            saveToConfig([
+                'Garden.InputFormatter' => $allowed,
+                'Garden.InputFormatterBak' => c('Garden.InputFormatter'),
+                'Garden.ForceInputFormatter' => true
+            ], null, false);
         }
 
         // Titles.
-        if ($V = GetValue('Titles', $Abilities)) {
-            SaveToConfig('Garden.Profile.Titles', $V == 'yes' ? TRUE : FALSE, FALSE);
+        if ($allowed = val('Titles', $Abilities)) {
+            saveToConfig('Garden.Profile.Titles', ($allowed === 'yes'), false);
         }
 
         // Locations.
-        if ($V = GetValue('Locations', $Abilities)) {
-            SaveToConfig('Garden.Profile.Locations', $V == 'yes' ? TRUE : FALSE, FALSE);
+        if ($allowed = val('Locations', $Abilities)) {
+            saveToConfig('Garden.Profile.Locations', ($allowed === 'yes'), false);
         }
 
         // Avatars.
-        if ($V = GetValue('Avatars', $Abilities)) {
-            SaveToConfig('Garden.Profile.EditPhotos', $V == 'yes' ? TRUE : FALSE, FALSE);
+        if ($allowed = val('Avatars', $Abilities)) {
+            saveToConfig('Garden.Profile.EditPhotos', ($allowed === 'yes'), false);
         }
 
         // Signatures.
-        if ($V = GetValue('Signatures', $Abilities)) {
-            $Session->SetPermission('Plugins.Signatures.Edit', $V == 'yes' ? TRUE : FALSE);
+        if ($allowed = val('Signatures', $Abilities)) {
+            $Session->setPermission('Plugins.Signatures.Edit', ($allowed === 'yes'));
         }
 
-        if ($V = GetValue('SignatureMaxNumberImages', $Abilities)) {
-            SaveToConfig('Plugins.Signatures.MaxNumberImages', $V, FALSE);
+        if ($allowed = val('SignatureMaxNumberImages', $Abilities)) {
+            saveToConfig('Plugins.Signatures.MaxNumberImages', $allowed, false);
         }
 
-        if ($V = GetValue('SignatureMaxLength', $Abilities)) {
-            SaveToConfig('Plugins.Signatures.MaxLength', $V, FALSE);
+        if ($allowed = val('SignatureMaxLength', $Abilities)) {
+            saveToConfig('Plugins.Signatures.MaxLength', $allowed, false);
         }
 
         // Polls.
-        if ($V = GetValue('Polls', $Abilities)) {
-            $Session->SetPermission('Plugins.Polls.Add', $V == 'yes' ? TRUE : FALSE);
+        if ($allowed = val('Polls', $Abilities)) {
+            $Session->setPermission('Plugins.Polls.Add', ($allowed === 'yes'));
         }
 
         // MeActions.
-        if ($V = GetValue('MeAction', $Abilities)) {
-            $Session->SetPermission('Vanilla.Comments.Me', $V == 'yes' ? TRUE : FALSE);
+        if ($allowed = val('MeAction', $Abilities)) {
+            $Session->setPermission('Vanilla.Comments.Me', ($allowed === 'yes'));
         }
 
         /// Content curation.
-        if ($V = GetValue('Curation', $Abilities)) {
-            $Session->SetPermission('Garden.Curation.Manage', $V == 'yes' ? TRUE : FALSE);
+        if ($allowed = val('Curation', $Abilities)) {
+            $Session->setPermission('Garden.Curation.Manage', ($allowed === 'yes'));
         }
 
         // Links.
-        $RanksPlugin->ActivityLinks = GetValue('ActivityLinks', $Abilities);
-        $RanksPlugin->CommentLinks = GetValue('CommentLinks', $Abilities);
-        $RanksPlugin->ConversationLinks = GetValue('ConversationLinks', $Abilities);
+        $RanksPlugin->ActivityLinks = val('ActivityLinks', $Abilities);
+        $RanksPlugin->CommentLinks = val('CommentLinks', $Abilities);
+        $RanksPlugin->ConversationLinks = val('ConversationLinks', $Abilities);
 
 
         // Edit content timeout.
-        if (($V = GetValue('EditContentTimeout', $Abilities, FALSE)) !== FALSE) {
-            SaveToConfig('Garden.EditContentTimeout', $V, FALSE);
+        if (($allowed = val('EditContentTimeout', $Abilities, false)) !== false) {
+            saveToConfig('Garden.EditContentTimeout', $allowed, false);
         }
 
          $permissionRole = val('PermissionRole', $Abilities);
-         if($permissionRole) {
+         if ($permissionRole) {
               $rankPermissions = Gdn::permissionModel()->getPermissionsByRole($permissionRole);
               Gdn::session()->addPermissions($rankPermissions);
          }
     }
 
-    public function Calculate(&$Data) {
+    /**
+     *
+     *
+     * @param $Data
+     */
+    public function calculate(&$Data) {
         if (is_array($Data) && isset($Data[0])) {
             // Multiple badges
             foreach ($Data as &$B) {
-                $this->_Calculate($B);
+                $this->_calculate($B);
             }
         } elseif ($Data) {
             // One valid result
-            $this->_Calculate($Data);
+            $this->_calculate($Data);
         }
     }
 
-    public static function CriteriaString($Rank) {
-        $Criteria = GetValue('Criteria', $Rank);
-        $Result = array();
+    /**
+     * Get HTML describing rank criteria.
+     *
+     * @param $Rank
+     * @return mixed|string
+     */
+    public static function criteriaString($Rank) {
+        $Criteria = val('Criteria', $Rank);
+        $Result = [];
 
-        if ($V = GetValue('Points', $Criteria)) {
-            $Result[] = Plural($V, '%s point', '%s points');
+        if ($V = val('Points', $Criteria)) {
+            $Result[] = plural($V, '%s point', '%s points');
         }
 
-        if ($V = GetValue('Time', $Criteria)) {
-            $Result[] = sprintf(T('member for %s'), $V);
+        if ($V = val('Time', $Criteria)) {
+            $Result[] = sprintf(t('member for %s'), $V);
         }
 
-        if ($V = GetValue('CountPosts', $Criteria)) {
-            $Result[] = Plural($V, '%s post', '%s posts');
+        if ($V = val('CountPosts', $Criteria)) {
+            $Result[] = plural($V, '%s post', '%s posts');
         }
 
-        if ($V = GetValue('Role', $Criteria)) {
-            $Result[] = sprintf(T('Must have role of %s'), $V);
+        if ($V = val('Role', $Criteria)) {
+            $Result[] = sprintf(t('Must have role of %s'), $V);
         }
 
         if (isset($Criteria['Permission'])) {
@@ -349,122 +373,160 @@ class RankModel extends Gdn_Model {
             }
         }
 
-        if ($V = GetValue('Manual', $Criteria)) {
-            $Result[] = T('Applied Manually');
+        if ($V = val('Manual', $Criteria)) {
+            $Result[] = t('Applied Manually');
         }
 
         if (sizeof($Result)) {
-            if (count($Result) == 1)
+            if (count($Result) == 1) {
                 return array_pop($Result);
-            else
+            } else {
                 return '<ul BulletList><li>'.implode('</li><li>', $Result).'</li></ul>';
+            }
         } else {
             return '';
         }
     }
 
-    protected function _Calculate(&$Data) {
-        if (isset($Data['Attributes']) && !empty($Data['Attributes']))
+    /**
+     *
+     *
+     * @param $Data
+     */
+    protected function _calculate(&$Data) {
+        if (isset($Data['Attributes']) && !empty($Data['Attributes'])) {
             $Attributes = dbdecode($Data['Attributes']);
-        else
-            $Attributes = array();
+        } else {
+            $Attributes = [];
+        }
 
         unset($Data['Attributes']);
         $Data = array_merge($Data, $Attributes);
     }
 
-    public static function ContentEditingOptions() {
-        static $Options = NULL;
+    /**
+     * Get options for post editing timeouts.
+     *
+     * @return array|null
+     */
+    public static function contentEditingOptions() {
+        static $Options = null;
 
         if (!isset($Options)) {
-            $Options = array('' => T('default'),
-                        '0' => T('Authors may never edit'),
-                    '350' => sprintf(T('Authors may edit for %s'), T('5 minutes')),
-                    '900' => sprintf(T('Authors may edit for %s'), T('15 minutes')),
-                    '3600' => sprintf(T('Authors may edit for %s'), T('1 hour')),
-                    '14400' => sprintf(T('Authors may edit for %s'), T('4 hours')),
-                    '86400' => sprintf(T('Authors may edit for %s'), T('1 day')),
-                '604800' => sprintf(T('Authors may edit for %s'), T('1 week')),
-                '2592000' => sprintf(T('Authors may edit for %s'), T('1 month')),
-                        '-1' => T('Authors may always edit'));
+            $Options = [
+                '' => t('default'),
+                '0' => t('Authors may never edit'),
+                '350' => sprintf(t('Authors may edit for %s'), t('5 minutes')),
+                '900' => sprintf(t('Authors may edit for %s'), t('15 minutes')),
+                '3600' => sprintf(t('Authors may edit for %s'), t('1 hour')),
+                '14400' => sprintf(t('Authors may edit for %s'), t('4 hours')),
+                '86400' => sprintf(t('Authors may edit for %s'), t('1 day')),
+                '604800' => sprintf(t('Authors may edit for %s'), t('1 week')),
+                '2592000' => sprintf(t('Authors may edit for %s'), t('1 month')),
+                '-1' => t('Authors may always edit')
+            ];
         }
 
         return $Options;
     }
 
-    public function GetWhere($Where = FALSE, $OrderFields = 'Level', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
-        $Result = parent::GetWhere($Where, $OrderFields, $OrderDirection, $Limit, $Offset);
-        $this->Calculate($Result->ResultArray());
+    /**
+     * Get a selection of ranks.
+     *
+     * @param bool $Where
+     * @param string $OrderFields
+     * @param string $OrderDirection
+     * @param bool|int $Limit
+     * @param bool|int $Offset
+     * @return Gdn_DataSet
+     */
+    public function getWhere($Where = false, $OrderFields = 'Level', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
+        $Result = parent::getWhere($Where, $OrderFields, $OrderDirection, $Limit, $Offset);
+        $this->calculate($Result->resultArray());
+
         return $Result;
     }
 
-    protected static $_Ranks = NULL;
-
-    public static function Ranks($RankID = NULL) {
-        if (self::$_Ranks === NULL) {
+    /**
+     * Get all ranks data.
+     *
+     * This is what to (nearly always) use when you need a list of ranks.
+     *
+     * @param null|int $RankID
+     * @return array|mixed|null
+     */
+    public static function ranks($RankID = null) {
+        if (self::$_Ranks === null) {
             $M = new RankModel();
-            $Ranks = $M->GetWhere()->ResultArray();
-            $Ranks = Gdn_DataSet::Index($Ranks, array('RankID'));
+            $Ranks = $M->getWhere()->resultArray();
+            $Ranks = Gdn_DataSet::index($Ranks, ['RankID']);
             self::$_Ranks = $Ranks;
         }
 
-        if (!is_null($RankID) && !is_bool($RankID))
-            return GetValue($RankID, self::$_Ranks, NULL);
-        else
+        if (!is_null($RankID) && !is_bool($RankID)) {
+            return val($RankID, self::$_Ranks, null);
+        } else {
             return self::$_Ranks;
+        }
     }
 
     /**
+     * Save a rank.
+     *
      * @param array $Data Form post data.
      * @param bool|false $Settings Unused
      * @return bool
      */
     public function save($Data, $Settings = false) {
         // Put the data into a format that's savible.
-        $this->DefineSchema();
-        $SchemaFields = $this->Schema->Fields();
+        $this->defineSchema();
+        $SchemaFields = $this->Schema->fields();
 
-        $SaveData = array();
-        $Attributes = array();
+        $SaveData = [];
+        $Attributes = [];
 
         foreach ($Data as $Name => $Value) {
-            if ($Name == 'Attributes')
+            if ($Name == 'Attributes') {
                 continue;
-            if (isset($SchemaFields[$Name]))
+            }
+            if (isset($SchemaFields[$Name])) {
                 $SaveData[$Name] = $Value;
-            else
+            } else {
                 $Attributes[$Name] = $Value;
+            }
         }
-        if (sizeof($Attributes))
+        if (sizeof($Attributes)) {
             $SaveData['Attributes'] = $Attributes;
-
+        }
 
         // Grab the current rank.
         if (isset($SaveData['RankID'])) {
             $PrimaryKeyVal = $SaveData['RankID'];
-            $CurrentRank = $this->SQL->GetWhere('Rank', array('RankID' => $PrimaryKeyVal))->FirstRow(DATASET_TYPE_ARRAY);
-            if ($CurrentRank)
-                $Insert = FALSE;
-            else
-                $Insert = TRUE;
+            $CurrentRank = $this->SQL->getWhere('Rank', ['RankID' => $PrimaryKeyVal])->firstRow(DATASET_TYPE_ARRAY);
+            if ($CurrentRank) {
+                $Insert = false;
+            } else {
+                $Insert = true;
+            }
         } else {
-            $PrimaryKeyVal = FALSE;
-            $Insert = TRUE;
+            $PrimaryKeyVal = false;
+            $Insert = true;
         }
 
         // Validate the form posted values.
-        if ($this->Validate($SaveData, $Insert) === TRUE) {
-            $Fields = $this->Validation->ValidationFields();
+        if ($this->validate($SaveData, $Insert) === true) {
+            $Fields = $this->Validation->validationFields();
 
-            if ($Insert === FALSE) {
+            if ($Insert === false) {
                 unset($Fields[$this->PrimaryKey]); // Don't try to update the primary key
-                $this->Update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
+                $this->update($Fields, [$this->PrimaryKey => $PrimaryKeyVal]);
             } else {
-                $PrimaryKeyVal = $this->Insert($Fields);
+                $PrimaryKeyVal = $this->insert($Fields);
             }
         } else {
-            $PrimaryKeyVal = FALSE;
+            $PrimaryKeyVal = false;
         }
+
         return $PrimaryKeyVal;
     }
 
@@ -473,67 +535,73 @@ class RankModel extends Gdn_Model {
      *
      * @param array|object $User
      * @param array $Rank
+     * @return bool
      */
-    public static function TestRank($User, $Rank) {
+    public static function testRank($User, $Rank) {
         if (!isset($Rank['Criteria']) || !is_array($Rank['Criteria'])) {
-            return TRUE;
+            return true;
         }
 
         $Criteria = $Rank['Criteria'];
         // All criteria must apply so return false if any of the criteria doesn't match.
-        $UserPoints = GetValue('Points', $User);
+        $UserPoints = val('Points', $User);
 
         if (isset($Criteria['Points'])) {
             $PointsCriteria = $Criteria['Points'];
 
-            if ($PointsCriteria >= 0 && $UserPoints < $PointsCriteria)
-                return FALSE;
-            elseif ($PointsCriteria < 0 && $UserPoints > $PointsCriteria)
-                return FALSE;
+            if ($PointsCriteria >= 0 && $UserPoints < $PointsCriteria) {
+                return false;
+            } elseif ($PointsCriteria < 0 && $UserPoints > $PointsCriteria) {
+                return false;
+            }
         }
 
         if (isset($Criteria['Time'])) {
-            $TimeFirstVisit = Gdn_Format::ToTimestamp(GetValue('DateFirstVisit', $User));
+            $TimeFirstVisit = Gdn_Format::toTimestamp(val('DateFirstVisit', $User));
             $TimeCriteria = strtotime($Criteria['Time'], 0);
 
-            if ($TimeCriteria && ($TimeFirstVisit + $TimeCriteria > time()))
-                return FALSE;
+            if ($TimeCriteria && ($TimeFirstVisit + $TimeCriteria > time())) {
+                return false;
+            }
         }
 
         if (isset($Criteria['CountPosts'])) {
-            $CountPosts = GetValue('CountDiscussions', $User, 0) + GetValue('CountComments', $User, 0);
-            if ($CountPosts < $Criteria['CountPosts'])
-                return FALSE;
+            $CountPosts = val('CountDiscussions', $User, 0) + val('CountComments', $User, 0);
+            if ($CountPosts < $Criteria['CountPosts']) {
+                return false;
+            }
         }
 
         if ($Role = val('Role', $Criteria)) {
-            $Roles = RoleModel::GetByName($Role);
+            $Roles = RoleModel::getByName($Role);
             $RankRoleID = key($Roles);
 
-            $UserModel = Gdn::UserModel();
+            $UserModel = Gdn::userModel();
             // TODO: Refactor: Make method GetRoleIDs in UserModel.
-            $RoleData = $UserModel->GetRoles(GetValue('UserID', $User));
-            $UserRoles = $RoleData->Result(DATASET_TYPE_ARRAY);
+            $RoleData = $UserModel->getRoles(val('UserID', $User));
+            $UserRoles = $RoleData->result(DATASET_TYPE_ARRAY);
             $UserRoles = array_column($UserRoles, 'RoleID');
 
             if (!in_array($RankRoleID, $UserRoles)) {
-                return FALSE;
+                return false;
             }
         }
 
         if (isset($Criteria['Permission'])) {
             $Permissions = (array)$Criteria['Permission'];
             foreach ($Permissions as $Perm) {
-                if (!Gdn::UserModel()->CheckPermission($User, $Perm))
-                    return FALSE;
+                if (!Gdn::userModel()->checkPermission($User, $Perm)) {
+                    return false;
+                }
             }
         }
 
-        if ($V = GetValue('Manual', $Criteria)) {
-            if (GetValue('RankID', $User) != $Rank['RankID'])
-                return FALSE;
+        if ($V = val('Manual', $Criteria)) {
+            if (val('RankID', $User) != $Rank['RankID']) {
+                return false;
+            }
         }
 
-        return TRUE;
+        return true;
     }
 }
