@@ -76,7 +76,7 @@ class RankModel extends Gdn_Model {
      * @param $Rank
      * @throws Exception
      */
-    public function Notify($User, $Rank) {
+    public function notify($User, $Rank) {
         $UserID = val('UserID', $User);
         $RankID = $Rank['RankID'];
 
