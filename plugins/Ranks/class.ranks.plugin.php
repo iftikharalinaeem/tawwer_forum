@@ -220,7 +220,7 @@ class RanksPlugin extends Gdn_Plugin {
      * @param ConversationMessageModel $Sender The conversation message model.
      * @param array $Args The event properties.
      */
-    public function conversationMessageModel_BeforeSaveValidation_Handler($Sender, $Args) {
+    public function conversationMessageModel_beforeSaveValidation_handler($Sender, $Args) {
          if ($this->ConversationLinks !== 'no') {
               return;
          }
@@ -244,7 +244,7 @@ class RanksPlugin extends Gdn_Plugin {
      *
      * @param ProfileController $Sender
      */
-    public function profileController_Render_Before($Sender) {
+    public function profileController_render_before($Sender) {
         $RankID = $Sender->data('Profile.RankID');
         $Rank = RankModel::ranks($RankID);
         if ($Rank) {
