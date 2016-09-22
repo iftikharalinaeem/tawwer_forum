@@ -39,7 +39,7 @@ $Rm = new ReactionModel();
 
 // Insert some default tags.
 $Rm->defineReactionType(array('UrlCode' => 'Spam', 'Name' => 'Spam', 'Sort' => 100, 'Class' => 'Flag', 'Log' => 'Spam', 'LogThreshold' => 5, 'RemoveThreshold' => 5, 'ModeratorInc' => 5, 'Protected' => TRUE, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
-    'Description' => "Allow your community to report any spam that get's posted so that it can be removed as quickly as possible."));
+    'Description' => "Allow your community to report any spam that gets posted so that it can be removed as quickly as possible."));
 $Rm->defineReactionType(array('UrlCode' => 'Abuse', 'Name' => 'Abuse', 'Sort' => 101, 'Class' => 'Flag', 'Log' => 'Moderate', 'LogThreshold' => 5, 'RemoveThreshold' => 10, 'ModeratorInc' => 5, 'Protected' => TRUE, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
     'Description' => "Report posts that are abusive or violate your terms of service so that they can be alerted to a moderator's attention."));
 //$Rm->defineReactionType(array('UrlCode' => 'Troll', 'Name' => 'Troll', 'Sort' => 102, 'Class' => 'Flag', 'ModeratorInc' => 5, 'Protected' => TRUE, 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => -1,
@@ -54,9 +54,9 @@ $Rm->defineReactionType(array('UrlCode' => 'Insightful', 'Name' => 'Insightful',
     'Description' => "Insightful comments bring new information or perspective to the discussion and increase the value of the conversation as a whole."));
 
 $Rm->defineReactionType(array('UrlCode' => 'Disagree', 'Name' => 'Disagree', 'Sort' => 3, 'Class' => 'Negative',
-    'Description' => "Users that disagree with a post can give their opinion with this reaction. Since a disagreement is highly subjective, this reaction desn't promote or bury the post or give any points."));
+    'Description' => "Users that disagree with a post can give their opinion with this reaction. Since a disagreement is highly subjective, this reaction doesn't promote or bury the post or give any points."));
 $Rm->defineReactionType(array('UrlCode' => 'Agree', 'Name' => 'Agree', 'Sort' => 4, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'Points' => 1,
-    'Description' => "Users that agree with a post can give their option with this reaction."));
+    'Description' => "Users that agree with a post can give their opinion with this reaction."));
 
 $Rm->defineReactionType(array('UrlCode' => 'Dislike', 'Name' => 'Dislike', 'Sort' => 5, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
     'Description' => "A dislike is a general disapproval of a post. Enough dislikes will bury a post."));
