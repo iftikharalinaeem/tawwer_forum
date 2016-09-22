@@ -36,7 +36,7 @@ class RanksPlugin extends Gdn_Plugin {
      *
      * @param SimpleApiPlugin $Sender
      */
-    public function simpleApiPlugin_Mapper_Handler($Sender) {
+    public function simpleAPIPlugin_mapper_handler($Sender) {
         switch ($Sender->Mapper->Version) {
             case '1.0':
                 $Sender->Mapper->addMap([
