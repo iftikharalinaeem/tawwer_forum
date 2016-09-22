@@ -10,13 +10,13 @@ Gdn::Structure()
             ->Column('Name', 'varchar(100)')
             ->Column('Level', 'smallint')
             ->Column('Label', 'varchar(255)')
-            ->Column('Body', 'text', TRUE)
-            ->Column('Attributes', 'text', TRUE)
+            ->Column('Body', 'text', true)
+            ->Column('Attributes', 'text', true)
             ->Set();
 
 Gdn::Structure()
     ->Table('User')
-    ->Column('RankID', 'int', TRUE)
+    ->Column('RankID', 'int', true)
     ->Set();
 
 // Add the activity type for ranks.
