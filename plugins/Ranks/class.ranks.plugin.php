@@ -36,10 +36,10 @@ class RanksPlugin extends Gdn_Plugin {
      *
      * @param SimpleApiPlugin $Sender
      */
-    public function SimpleApiPlugin_Mapper_Handler($Sender) {
+    public function simpleApiPlugin_Mapper_Handler($Sender) {
         switch ($Sender->Mapper->Version) {
             case '1.0':
-                $Sender->Mapper->AddMap([
+                $Sender->Mapper->addMap([
                     'ranks/list' => 'settings/ranks',
                     'ranks/get' => 'settings/ranks'
                 ]);
@@ -220,12 +220,11 @@ class RanksPlugin extends Gdn_Plugin {
      * @param ConversationMessageModel $Sender The conversation message model.
      * @param array $Args The event properties.
      */
-    public function ConversationMessageModel_BeforeSaveValidation_Handler($Sender, $Args) {
+    public function conversationMessageModel_BeforeSaveValidation_Handler($Sender, $Args) {
          if ($this->ConversationLinks !== 'no') {
               return;
          }
-
-         $this->CheckForLinks($Sender, $Args['FormPostValues'], 'Body');
+         $this->checkForLinks($Sender, $Args['FormPostValues'], 'Body');
     }
 
     /**
@@ -237,7 +236,6 @@ class RanksPlugin extends Gdn_Plugin {
         if (!Gdn::session()->UserID) {
             return;
         }
-
         RankModel::applyAbilities();
     }
 
@@ -246,7 +244,7 @@ class RanksPlugin extends Gdn_Plugin {
      *
      * @param ProfileController $Sender
      */
-    public function ProfileController_Render_Before($Sender) {
+    public function profileController_Render_Before($Sender) {
         $RankID = $Sender->data('Profile.RankID');
         $Rank = RankModel::ranks($RankID);
         if ($Rank) {
@@ -290,7 +288,7 @@ class RanksPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $Sender
      */
-    protected function AddManualRanks($Sender) {
+    protected function addManualRanks($Sender) {
         if (!checkPermission('Garden.Settings.Manage')) {
             return;
         }
@@ -457,7 +455,6 @@ class RanksPlugin extends Gdn_Plugin {
      */
     public function profileController_applyRank_create($Sender) {
         $User = Gdn::session()->User;
-
         if (!$User) {
             return;
         }
@@ -594,8 +591,8 @@ if (!function_exists('WriteUserRank')):
     /**
      * Output HTML for a user's rank.
      *
-     * @param $User
-     * @param $CssClass
+     * @param array|object $User
+     * @param string $CssClass
      * @param string $Px
      * @return string|void
      */

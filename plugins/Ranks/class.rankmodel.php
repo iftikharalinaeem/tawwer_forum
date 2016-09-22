@@ -220,14 +220,14 @@ class RankModel extends Gdn_Model {
 
         // Post discussions.
         if ($allowed = val('DiscussionsAdd', $Abilities)) {
-            if ($allowed == 'no') {
+            if ($allowed === 'no') {
                 $Session->setPermission('Vanilla.Discussions.Add', []);
             }
         }
 
         // Add comments.
         if ($allowed = val('CommentsAdd', $Abilities)) {
-            if ($allowed == 'no') {
+            if ($allowed === 'no') {
                 $Session->setPermission('Vanilla.Comments.Add', []);
             }
         }
@@ -341,7 +341,7 @@ class RankModel extends Gdn_Model {
      */
     public static function criteriaString($Rank) {
         $Criteria = val('Criteria', $Rank);
-        $Result = array();
+        $Result = [];
 
         if ($V = val('Points', $Criteria)) {
             $Result[] = plural($V, '%s point', '%s points');
