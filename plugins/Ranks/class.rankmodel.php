@@ -436,8 +436,8 @@ class RankModel extends Gdn_Model {
      * @param bool $Where
      * @param string $OrderFields
      * @param string $OrderDirection
-     * @param bool $Limit
-     * @param bool $Offset
+     * @param bool|int $Limit
+     * @param bool|int $Offset
      * @return Gdn_DataSet
      */
     public function getWhere($Where = false, $OrderFields = 'Level', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
