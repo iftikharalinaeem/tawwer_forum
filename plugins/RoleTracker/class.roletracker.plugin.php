@@ -17,7 +17,8 @@ $PluginInfo['RoleTracker'] = [
     'SettingsUrl' => '/settings/roletracker',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => 'Alexandre (DaazKu) Chouinard',
-    'AuthorEmail' => 'alexandre.c@vanillaforums.com'
+    'AuthorEmail' => 'alexandre.c@vanillaforums.com',
+    'Icon' => 'role-tracker.png'
 ];
 
 /**
@@ -77,6 +78,15 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     #######################################
     ## Plugin's hooks
     #######################################
+
+   /**
+    * Add assets to the page.
+    *
+    * @param Gdn_Controller $sender
+    */
+   public function base_render_before($sender) {
+      $sender->addJsFile('roletracker.js', 'plugins/RoleTracker');
+   }
 
     /**
      * Create a method called "roletracker" on the SettingsController.
@@ -195,7 +205,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     /**
      * Add CSS hook to the tracked discussions
      *
-     * @param $sender Sending controller instance.
+     * @param DiscussionsController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
     public function base_beforeDiscussionName_handler($sender, $args) {
@@ -204,22 +214,25 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             return;
         }
 
-        // And add the css class to the discussion
-        $roles = val('Roles', $discussion, []);
+        // Used by $this->base_discussionMeta_handler
+        $sender->EventArguments['DiscussionIsTracked'] = false;
+
+        // Determine if the discussion is tagged with the TrackerTagID of a role.
         $tags = val('Tags', $discussion, []);
-        if (is_array($roles) && count($roles) && is_array($tags) && count($tags)) {
+        if (is_array($tags) && count($tags)) {
             $tags = Gdn_DataSet::index($tags, 'TagID');
             $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
 
             $cssTrackerRoles = [];
-            foreach ($roles as $roleID => $roleName) {
-                if (array_key_exists($roleID, $trackedRoles) && isset($tags[$trackedRoles[$roleID]['TrackerTagID']])) {
-                    $cssTrackerRoles[] = $this->formatRoleCss($roleName);
+            foreach ($trackedRoles as $roleID => $roleData) {
+                if (isset($tags[$roleData['TrackerTagID']])) {
+                    $cssTrackerRoles[] = $this->formatRoleCss($roleData['Name']);
                 }
             }
 
             if (!empty($cssTrackerRoles)) {
                 $args['CssClass'] = val('CssClass', $args, '').' tracked '.implode(' ', $cssTrackerRoles);
+                $sender->EventArguments['DiscussionIsTracked'] = true;
             }
         }
     }
@@ -227,7 +240,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     /**
      * Add the tracked role CSS to every comments
      *
-     * @param object $sender Sending controller instance.
+     * @param Gdn_Controller $sender Sending controller instance.
      * @param array $args Event arguments.
      */
     public function base_beforeCommentDisplay_handler($sender, $args) {
@@ -254,48 +267,17 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function discussionController_authorInfo_handler($sender, $args) {
-        static $tags = null;
+        $postType = $args['Type'];
+        $post = $args[$postType];
 
-        $target = $args['Type'];
-
-        $postRoles = val('Roles', $args[$target]);
-        if (!$postRoles) {
-            return;
-        }
-        $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
-        $tagsID = [];
-
-        foreach ($postRoles as $roleID => $roleName) {
-            if (array_key_exists($roleID, $trackedRoles)) {
-                $tagsID[] = $trackedRoles[$roleID]['TrackerTagID'];
-            }
-        }
-
-        if (!$tagsID) {
+        if (!val('Roles', $post)) {
             return;
         }
 
-        // In case we fiddled with the tags and assigned multiple roles to 1 tag :D
-        $tagsID = array_unique($tagsID);
+        $discussion = val('Discussion', $args);
+        $comment = val('Comment', $args);
 
-        if ($tags === null) {
-            $tagModel = TagModel::instance();
-            $tags = $tagModel->getWhere(['Type' => 'Tracker'])->resultArray();
-            $tags = Gdn_DataSet::index($tags, 'TagID');
-        }
-
-        $postTags = '';
-        foreach ($tagsID as $tagID) {
-            if (!isset($tags[$tagID])) {
-                continue;
-            }
-            $trackerTag = $tags[$tagID];
-            $tagName = htmlspecialchars($trackerTag['FullName']);
-            // Keep those spaces before and after the tag :D
-            $postTags .= ' <span class="Tag tag-'.strtolower(t($trackerTag['Name'])).'-tracker">'.$tagName.'</span> ';
-        }
-
-        echo '<span class="MItem RoleTracker"><span class="Tags">'.$postTags.'</span></span> ';
+        writePostTrackedTags($discussion, $comment);
     }
 
     /**
@@ -368,14 +350,71 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             $tagIDs = array_column($trackedRoles, 'TrackerTagID');
         }
 
+        $linksTitle = t('Jump to first tracked post.');
         foreach ($discussionTags as $tagData) {
             if (in_array($tagData['TagID'], $tagIDs)) {
                 $tagName = htmlspecialchars(t($tagData['FullName']));
-                echo ' <span class="Tag tag-'.strtolower(t($tagData['Name'])).'-tracker">'.$tagName.'</span> ';
+                echo ' <a href="'.url('/roletracker/jump/'.val('DiscussionID', $discussion)).'" nofollow class="Tag tag-'.strtolower(t($tagData['Name'])).'-tracker" title="'.$linksTitle.'">'.$tagName.'</a> ';
 
             }
         }
-
     }
+}
 
+if (!function_exists('writePostTrackedTags')) {
+    function writePostTrackedTags($discussion, $comment = false) {
+        static $tags = null;
+
+        $discussionID = val('DiscussionID', $discussion);
+
+        if ($comment) {
+            $from = val('DateInserted', $comment);
+            $postRoles = val('Roles', $comment);
+        } else {
+            $from = val('DateInserted', $discussion);
+            $postRoles = val('Roles', $discussion);
+        }
+        $from = rawurlencode($from);
+
+        $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
+        $tagsID = [];
+
+        foreach ($postRoles as $roleID => $roleName) {
+            if (array_key_exists($roleID, $trackedRoles)) {
+                $tagsID[] = $trackedRoles[$roleID]['TrackerTagID'];
+            }
+        }
+
+        if (!$tagsID) {
+            return;
+        }
+
+        // In case we fiddled with the tags and assigned multiple roles to 1 tag :D
+        $tagsID = array_unique($tagsID);
+
+        if ($tags === null) {
+            $tagModel = TagModel::instance();
+            $tags = $tagModel->getWhere(['Type' => 'Tracker'])->resultArray();
+            $tags = Gdn_DataSet::index($tags, 'TagID');
+        }
+
+        $classes = [];
+        $names = [];
+        foreach ($tagsID as $tagID) {
+            if (!isset($tags[$tagID])) {
+                continue;
+            }
+            $trackerTag = $tags[$tagID];
+            $tagName = htmlspecialchars($trackerTag['FullName']);
+            // Keep those spaces before and after the tag :D
+            $classesp[] = 'tag-'.strtolower(t($trackerTag['Name'])).'-tracker';
+            $names[] = $tagName;
+        }
+
+        echo '<span class="MItem RoleTracker">'
+            .'<a href="'.url("/roletracker/jump/$discussionID/$from").'" nofollow class="JumpTo Next Tag '.implode(' ', $classes).'" title="'.t('[Title] Next', 'Next tracked post').'">'
+                .implode(c('RoleTrackerTagSeparator', '&#8729;'), $names).' '.c('RoleTrackerTagIcon', '&rsaquo;')
+            .'</a>'
+         .'</span> ';
+    }
 }
