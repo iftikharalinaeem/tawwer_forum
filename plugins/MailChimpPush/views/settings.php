@@ -62,8 +62,8 @@
 
    <div class="padded alert-info alert">
       <?php echo t('About MailChimpPush', "MailChimp Push synchronizes your users'
-      email addresses with a MailChimp mailing list of your choice. When a new 
-      user signs up, or when an existing user changed their email, Vanilla will 
+      email addresses with a MailChimp mailing list of your choice. When a new
+      user signs up, or when an existing user changed their email, Vanilla will
       send a notification to MailChimp to add or update the user."); ?>
    </div>
 
@@ -89,7 +89,7 @@
                <?php echo $this->Form->label("Mailing List", "ListID"); ?>
                <div class="info">
                   <?php echo t('MailChimpPush List Settings', "Choose which list MailChimp
-            will synchronize to when new users register, or existing ones change 
+            will synchronize to when new users register, or existing ones change
             their email address."); ?>
                </div>
             </div>
@@ -103,7 +103,7 @@
          // by javascript unless the list is selected.
          foreach ($interests as $list => $interest) {
             echo "<li id='InterestDropdown{$list}' class='InterestDropdowns form-group row'>";
-            echo $this->Form->labeWrapl("Interest", "InterestID");
+            echo $this->Form->labelWrap("Interest", "InterestID");
             echo '<div class="input-wrap>';
             // Disable the interest dropdown by default. Will be activated by javascript if needed.
             echo $this->Form->dropDown('InterestID['.$list.']', $interest, array('IncludeNull' => true, 'disabled' => true, 'Value' => $this->Form->getValue('InterestID')));
@@ -135,7 +135,7 @@
       <h2><?php echo t('Mass Synchronization'); ?></h2>
       <div class="alert alert-info padded" id="SychronizationMessages">
          <?php echo t('About MailChimpPush Synchronization', "By default, Vanilla only sends <b>changes</b> to MailChimp. Synchronization
-      is a one-time action that allows an entire forum's worth of users email 
+      is a one-time action that allows an entire forum's worth of users email
       addresses to be pushed to MailChimp to populate a list."); ?>
       </div>
 
