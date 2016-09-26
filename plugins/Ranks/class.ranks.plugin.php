@@ -491,7 +491,7 @@ class RanksPlugin extends Gdn_Plugin {
             return;
         }
         $RankModel = new RankModel();
-        $RankModel->applyRank(Gdn::session()->User);
+        $RankModel->applyRank(Gdn::session()->UserID);
     }
 
     /**
@@ -543,7 +543,7 @@ class RanksPlugin extends Gdn_Plugin {
             return;
         }
         $RankModel = new RankModel();
-        $RankModel->applyRank(Gdn::session()->User);
+        $RankModel->applyRank(Gdn::session()->UserID);
     }
 
     /**
