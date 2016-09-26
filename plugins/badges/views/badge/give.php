@@ -10,7 +10,7 @@ $this->title(t('Give a Badge')); ?>
     echo $this->Form->open();
     echo $this->Form->errors(); ?>
 
-    <div class="form-group row">
+    <div class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Recipients', 'To'); ?>
         </div>
@@ -18,7 +18,7 @@ $this->title(t('Give a Badge')); ?>
             <?php echo $this->Form->textBox('To', ['MultiLine' => true, 'class' => 'MultiComplete']), '</p>'; ?>
         </div>
     </div>
-    <div class="form-group row">
+    <div class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Reason (optional)', 'Reason'); ?>
         </div>

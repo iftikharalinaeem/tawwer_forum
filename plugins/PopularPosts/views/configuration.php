@@ -6,7 +6,7 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
 <ul>
-    <li class="form-group row"><?php
+    <li class="form-group"><?php
         echo $this->Form->labelWrap(t('Popular Posts max age (Max 30 days)'), 'PopularPosts.MaxAge');
         echo $this->Form->textboxWrap('PopularPosts.MaxAge');
         ?></li>

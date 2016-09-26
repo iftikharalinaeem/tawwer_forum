@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<li class="RankItem form-group row">
+<li class="RankItem form-group">
     <div class="label-wrap">
         <?php echo $Sender->Form->label('Rank', 'RankID'); ?>
     </div>

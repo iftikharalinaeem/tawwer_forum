@@ -14,7 +14,7 @@ echo $this->Form->Errors();
 ?>
 <ul>
 
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Your Zendesk URL', 'Url'); ?>
             <div class="info">
@@ -24,14 +24,14 @@ echo $this->Form->Errors();
         <?php echo $this->Form->textBoxWrap('Url'); ?>
     </li>
 
-    <li class="form-group row">
+    <li class="form-group">
         <?php
         echo $this->Form->labelWrap('Unique Identifier', 'ApplicationID');
         echo $this->Form->textBoxWrap('ApplicationID');
         ?>
     </li>
 
-    <li class="form-group row">
+    <li class="form-group">
         <?php
         echo $this->Form->labelWrap('Secret', 'Secret');
         echo $this->Form->textBoxWrap('Secret');
@@ -43,7 +43,7 @@ echo $this->Form->Errors();
     <?php echo $this->Form->Close('Save'); ?>
 </div>
 
-<div class="form-group row">
+<div class="form-group">
     <div class="label-wrap-wide">
         <div class="label-title"><?php echo t('Global Login'); ?>
             <span class="text-success">

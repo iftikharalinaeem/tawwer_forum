@@ -12,7 +12,7 @@ echo $this->Form->errors();
 <?php
 foreach($this->data('Roles') as $roleID => $role) {
 ?>
-    <div class="form-group row">
+    <div class="form-group">
         <div class="label-wrap-wide">
             <?php echo $this->Form->label($this->Form->formData()[$roleID.'_Name'], $roleID.'_Name'); ?>
         </div>

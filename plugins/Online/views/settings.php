@@ -5,7 +5,7 @@ echo $this->Form->errors();
 <h1><?php echo T("Online Settings"); ?></h1>
 <h2>Placement and Visual Settings</h2>
 <ul>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label("Where should the Online list be displayed?", "Plugins.Online.Location"); ?>
         </div>
@@ -19,7 +19,7 @@ echo $this->Form->errors();
             ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label("How should the list be rendered?", "Plugins.Online.Style"); ?>
         </div>
@@ -31,7 +31,7 @@ echo $this->Form->errors();
             ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label("Hide the Online list from guests?", "Plugins.Online.HideForGuests"); ?>
         </div>
@@ -47,7 +47,7 @@ echo $this->Form->errors();
 
 <h2>Internal Settings</h2>
 <ul>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label("How long are you 'online' for after you visit a page?", "Plugins.Online.PruneDelay"); ?>
         </div>

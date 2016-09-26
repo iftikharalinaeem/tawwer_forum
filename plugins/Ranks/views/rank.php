@@ -18,7 +18,7 @@ $takeOptions = ['no' => 'take away', '' => 'default'];
 echo $this->Form->open(), $this->Form->errors();
 ?>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Name', 'Name'); ?>
             </div>
@@ -26,7 +26,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->textBox('Name'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Label', 'Label'),
                     '<div class="info">'."This label will display beside the user. It can be the same as the rank's name or have a more visual appearance. HTML is allowed.".'</div>'; ?>
@@ -35,7 +35,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->textBox('Label'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php
                 echo $this->Form->label('Level', 'Level'),
@@ -45,7 +45,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->textBox('Level'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php
                 echo $this->Form->label('CssClass', 'CssClass'),
@@ -55,7 +55,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->textBox('CssClass'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php
                 echo $this->Form->label('Body', 'Body'),
@@ -65,7 +65,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->textBox('Body', ['Multiline' => true]); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php
                 echo $this->Form->label('Message', 'Message'),
@@ -81,7 +81,7 @@ echo $this->Form->open(), $this->Form->errors();
         This section determines what a user needs to get this rank. Users must satisfy <em>all</em> of the criteria.
     </div>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Points', 'Criteria_Points'),
                     '<div class="info">'."Users will need this many points to gain this rank.".'</div>'; ?>
@@ -90,7 +90,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->textBox('Criteria_Points'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Time', 'Criteria_Time'),
                     '<div class="info">'."Users need to have been members for this length of time to gain this rank. (examples: 1 day, 3 weeks, 1 month)".'</div>'; ?>
@@ -99,7 +99,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->textBox('Criteria_Time'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Posts', 'Criteria_CountPosts'),
                     '<div class="info">'."Users will need this many posts to gain this rank.".'</div>'; ?>
@@ -108,7 +108,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->textBox('Criteria_CountPosts'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Role', 'Criteria_Points'),
                     '<div class="info">'."Users with the following roles will gain this rank.".'</div>'; ?>
@@ -117,7 +117,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->DropDown('Criteria_Role', $RoleNames); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Permission', 'Criteria_Permission'),
                     '<div class="info">'."Users will need this permission to gain this rank.".'</div>'; ?>
@@ -126,7 +126,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php $this->Form->dropDown('Criteria_Permission', ['' => '', 'Garden.Moderation.Manage' => 'Moderator', 'Garden.Settings.Manage' => 'Administrator']); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo
                     '<div class="info">'."You can have administrators manually apply ranks. This is useful if only a few people will have the rank and its criteria is subjective.".'</div>'; ?>
@@ -141,7 +141,7 @@ echo $this->Form->open(), $this->Form->errors();
         This section determines what abilities users with this rank get.
     </div>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Start Discussions', 'Abilities_DiscussionsAdd'),
                     '<div class="info">'."You can remove the ability to start discussions from lower-ranking members.".'</div>'; ?>
@@ -150,7 +150,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->radioList('Abilities_DiscussionsAdd', $takeOptions); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php
                 echo $this->Form->label('Add Comments', 'Abilities_CommentsAdd'),
@@ -160,7 +160,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->radioList('Abilities_CommentsAdd', $takeOptions); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php
                 echo $this->Form->label('Start Private Conversations', 'Abilities_ConversationsAdd'),
@@ -170,7 +170,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->radioList('Abilities_ConversationsAdd', $giveTakeOptions); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php
                 echo $this->Form->label('Verified', 'Abilities_Verified'),
@@ -180,7 +180,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->radioList('Abilities_Verified', ['yes' => 'bypass', 'no' => 'force check', '' => 'default']); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php
                 echo $this->Form->label('Formatting Posts', 'Abilities_Format'),
@@ -190,7 +190,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->radioList('Abilities_Format', $this->data('_Formats')); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Post Links', ''),
                     '<div class="info">'."You can take away the ability to post links to help prevent link spammers.".'</div>'; ?>
@@ -222,7 +222,7 @@ echo $this->Form->open(), $this->Form->errors();
                 </div>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Titles', 'Abilities_Titles'),
                     '<div class="info">'."You can give or take away the ability to have a user title.".'</div>'; ?>
@@ -231,7 +231,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->radioList('Abilities_Titles', $giveTakeOptions); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Locations', 'Abilities_Locations'),
                     '<div class="info">'."You can give or take away the ability to have a user location.".'</div>'; ?>
@@ -240,7 +240,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->radioList('Abilities_Locations', $giveTakeOptions); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php
                 echo $this->Form->label('Avatars', 'Abilities_Avatars'),
@@ -250,7 +250,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->RadioList('Abilities_Avatars', $takeOptions); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Signatures', 'Abilities_Signatures'),
                     '<div class="info">'."You can give or take away the ability to have signatures. (Requires the signatures addon)".'</div>'; ?>
@@ -259,7 +259,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->radioList('Abilities_Signatures', $giveTakeOptions); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php
                 $sigImageOptions = ['' => t('Default'), 'Unlimited' => t('Unlimited'), 'None' => t('None'), '1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5'];
@@ -269,7 +269,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->dropDown('Abilities_SignatureMaxNumberImages', $sigImageOptions); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Max signature length', 'Abilities_SignatureMaxLength'); ?>
             </div>
@@ -277,7 +277,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->textBox('Abilities_SignatureMaxLength'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Polls', 'Abilities_Polls'),
                     '<div class="info">'."You can give or take away the ability to add polls. (Requires the polls addon)".'</div>'; ?>
@@ -286,7 +286,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->radioList('Abilities_Polls', $giveTakeOptions); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Me Actions', 'Abilities_MeAction'),
                     '<div class="info">'."You can give or take away the ability to use 'me actions'.".'</div>'; ?>
@@ -295,7 +295,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->radioList('Abilities_MeAction', $giveTakeOptions); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php
                 echo $this->Form->label('Content Curation', 'Abilities_Curation'),
@@ -305,7 +305,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->radioList('Abilities_Curation', $giveTakeOptions); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php
                 $editingOptions = RankModel::contentEditingOptions();
@@ -318,7 +318,7 @@ echo $this->Form->open(), $this->Form->errors();
                 <?php echo $this->Form->dropDown('Abilities_EditContentTimeout', $editingOptions, $fields); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Role Permissions', 'Abilities_PermissionRole'),
                     '<div class="info">'.t('Grant the permissions of this role.', "Users with this rank will gain the permissions of this role.").'</div>'; ?>
