@@ -127,35 +127,17 @@ class OneLogin_Saml_Response
         $xml->registerXPathNamespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
         $xml->registerXPathNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
 
-        // Get the unique signatureID from the Reference node in the Signature node
+        // Get the unique ID from the Reference node in the Signature node
 
         /*
-         * Sample SAML code
+         * Loop through possible queries that would locate the Signature Reference
          *
          * Normally the Signature is nested in the Assertion, so this query would find it:
          *  '/samlp:Response//saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference'
          *
-         * But in the case of this example it is not nested, so this query would find it:
+         * But if it is not, look anywhere in the Response:
          *  '/samlp:Response//ds:Signature/ds:SignedInfo/ds:Reference'
          *
-         * For this reason, we loop through and try both scenarios.
-         *
-        <samlp:Response Destination="https://myforum.com/entry/connect/saml" ID="_d643b1ff-e351-4381-8c3e-c98b4d68f783" ...>
-            <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">https://myidp.com/secureauth20</saml:Issuer>
-            <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
-                <SignedInfo>
-                    <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
-                    <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-                    <Reference URI="#_d643b1ff-e351-4381-8c3e-c98b4d68f783">
-                        ...
-                    </Reference>
-                </SignedInfo>
-            </Signature>
-            ...
-            <saml:Assertion ID="_89df40dc-ce7e-4594-9657-d52b9fb546c8" IssueInstant="2016-09-20T14:12:47.355Z" ...>
-            ...
-            </saml:Assertion>
-        </samlp:Response>
         */
 
         $signatureQueries = [
@@ -187,8 +169,6 @@ class OneLogin_Saml_Response
         // Get the Assertion based on the ID
 
         /*
-         * Sample SAML code
-         *
          * Again, to accommodate SAML documents that put the ID on the Assertion
          * AND documents that nest the Assertion somewhere in a node with the ID
          * we loop through the possible places until we find an assertion.
@@ -196,27 +176,8 @@ class OneLogin_Saml_Response
          * Normally the ID is on the Assertion, so this query would find it:
          *  "/samlp:Response//saml:Assertion[@ID='{$id}']{$assertionXpath}"
          *
-         * But in the case of this example it is on a parent node (the Response itself), so this query would find it:
+         * If it is on a parent node (e.g. the Response itself) this query would find it:
          *  "//*[@ID='{$id}']//saml:Assertion{$assertionXpath}"
-         *
-         * For this reason, we loop through and try both scenarios.
-         *
-        <samlp:Response Destination="https://myforum.com/entry/connect/saml" ID="_d643b1ff-e351-4381-8c3e-c98b4d68f783" ...>
-            <saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">https://myidp.com/secureauth20</saml:Issuer>
-            <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
-                <SignedInfo>
-                    <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
-                    <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
-                    <Reference URI="#_d643b1ff-e351-4381-8c3e-c98b4d68f783">
-                        ...
-                    </Reference>
-                </SignedInfo>
-            </Signature>
-            ...
-            <saml:Assertion ID="_89df40dc-ce7e-4594-9657-d52b9fb546c8" IssueInstant="2016-09-20T14:12:47.355Z" ...>
-            ...
-            </saml:Assertion>
-        </samlp:Response>
         */
         $nameQueries = [
             "/samlp:Response//saml:Assertion[@ID='{$id}']{$assertionXpath}",
