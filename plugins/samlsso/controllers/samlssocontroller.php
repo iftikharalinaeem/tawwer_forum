@@ -33,8 +33,8 @@ class SAMLSSOController extends PluginController {
         // Set up the form.
         $formStructure = [
             'AuthenticationKey' => [
-                'LabelCode' => 'Connexion ID',
-                'Description' => t('The connexion ID uniquely identifies this connection. (Letters and digits only)'),
+                'LabelCode' => 'Connection ID',
+                'Description' => t('The connection ID uniquely identifies this connection. (Letters and digits only)'),
             ],
             'EntityID' => [
                 'LabelCode' => 'Entity ID',
@@ -127,7 +127,7 @@ class SAMLSSOController extends PluginController {
         }
 
         $this->setData('FormStructure', $formStructure);
-        $this->setData('Title', t('SAML Connexion'));
+        $this->setData('Title', t('SAML Connection'));
 
         $this->render('addedit', '', 'plugins/samlsso');
     }
