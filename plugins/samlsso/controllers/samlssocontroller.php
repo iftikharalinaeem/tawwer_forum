@@ -1,15 +1,26 @@
 <?php
 class SAMLSSOController extends PluginController {
 
+    /**
+     * SAMLSSOController constructor.
+     */
     public function __construct() {
         parent::__construct();
         $this->Form = new Gdn_Form();
     }
 
+    /**
+     * Add endpoint.
+     */
     public function add() {
         $this->edit();
     }
 
+    /**
+     * Edit endpoint
+     *
+     * @param string $authenticationKey SAML authentication key
+     */
     public function edit($authenticationKey = '') {
         $this->permission('Garden.Settings.Manage');
 
@@ -122,7 +133,9 @@ class SAMLSSOController extends PluginController {
     }
 
     /**
+     * Delete endpoint.
      *
+     * @param $authenticationKey SAML Authentication key
      */
     public function delete($authenticationKey) {
         $this->permission('Garden.Settings.Manage');
@@ -144,8 +157,10 @@ class SAMLSSOController extends PluginController {
     }
 
     /**
-     * @param $authenticationKey
-     * @param $state
+     * Set the state of a particular SAML connection.
+     *
+     * @param string $authenticationKey SAML Authentication key
+     * @param string $state
      * @throws Exception
      */
     public function state($authenticationKey, $state) {

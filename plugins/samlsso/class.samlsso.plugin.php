@@ -108,8 +108,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $sender
-     * @param $args
+     * @param EntryController $sender Sending instance.
+     * @param array $args Event's arguments.
      */
     public function entryController_saml_create($sender, $args) {
         $settings = $this->getSettings(val(0, $args));
@@ -131,8 +131,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $sender
-     * @param $args
+     * @param EntryController $sender Sending instance.
+     * @param array $args Event's arguments.
      */
     public function entryController_overrideSignIn_handler($sender, $args) {
         $provider = $args['DefaultProvider'];
@@ -232,8 +232,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $sender
-     * @param $args
+     * @param EntryController $sender Sending instance.
+     * @param array $args Event's arguments.
      * @throws Gdn_UserException
      */
     public function entryController_overrideSignOut_handler($sender, $args) {
@@ -291,7 +291,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param SettingsController $sender
+     * @param SettingsController $sender Sending instance.
+     * @param string $authenticationKey SAML authentication key
      * @param string $action
      */
     public function settingsController_samlSSO_create($sender, $authenticationKey = '', $action = '') {
@@ -312,8 +313,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $name
-     * @param $array
+     * @param string $name
+     * @param array $array
      * @param bool|false $default
      * @return array|bool|mixed
      */
@@ -335,7 +336,9 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * Throws an exception if we are unable to validate the signature.
      *
      * @param array $data  The data we need to validate the query string.
+     * @param OneLogin_Saml_Settings $settings SAML plugin settings
      * @param string $name  The key we should validate the query against.
+     * @param string $id
      * @return bool True if valid, false otherwise.
      */
     public function validateSignature(array $data, $settings, $name, &$id = null) {
@@ -343,8 +346,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
             return false;
         }
 
-		$sigAlg = $data['SigAlg'];
-		$signature = $data['Signature'];
+        $sigAlg = $data['SigAlg'];
+        $signature = $data['Signature'];
         $signature = base64_decode($signature);
 
         // Get the id from the saml.
@@ -365,13 +368,13 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $valid = $key->verifySignature($msg, $signature);
 
         return $valid;
-	}
+    }
 
 
     /**
+     * Return SAML settings.
      *
-     *
-     * @param $authenticationKey
+     * @param string $authenticationKey SAML authentication key
      * @return OneLogin_Saml_Settings
      */
     public function getSettings($authenticationKey) {
@@ -442,7 +445,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      * Return a specific or all saml provider.
      *
-     * @param string $authenticationKey
+     * @param string $authenticationKey SAML authentication key
      * @return array A specific or all saml provider.
      */
     private function getProvider($authenticationKey = null) {
@@ -480,7 +483,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $authenticationKey
+     * @param string $authenticationKey SAML authentication key
      */
     protected function metaData($authenticationKey) {
         $settings = $this->getSettings($authenticationKey);
@@ -494,8 +497,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $cert
-     * @return mixed|string
+     * @param string $cert
+     * @return string
      */
     public static function trimCert($cert) {
         $cert = preg_replace('`-----[^-]*-----`i', '', $cert);
@@ -507,7 +510,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $cert
+     * @param string $cert
      * @param string $type
      * @return string
      */
