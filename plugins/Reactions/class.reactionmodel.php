@@ -710,7 +710,7 @@ class ReactionModel {
         if (function_exists('ReactionButton')) {
             $Diffs[] = 'Flag'; // always send back flag button.
             foreach ($Diffs as $UrlCode) {
-                $Button = reactionButton($Record, $UrlCode);
+                $Button = reactionButton($Record, $UrlCode, ['LinkClass' => 'FlyoutButton']);
                 $reactionsPlugin = ReactionsPlugin::instance();
                 $reactionsPlugin->EventArguments['UrlCode'] = $UrlCode;
                 $reactionsPlugin->EventArguments['Record'] = $Record;
@@ -779,7 +779,7 @@ class ReactionModel {
         $LogOperation = val('Log', $ReactionType);
 
         list($Row, $Model, $Log) = $this->getRow($RecordType, $ID, $LogOperation);
-        
+
         if (!$selfReact && !$IsModerator && ($Row['InsertUserID'] == $UserID)) {
             throw new Gdn_UserException(T("You can't react to your own post."));
         }
