@@ -25,7 +25,8 @@ var userTokens = {
         minChars: 1,
         maxLength: 25,
         prePopulate: author,
-        animateDropdown: false
+        animateDropdown: false,
+        allowTabOut: true
       });
     }
   }
