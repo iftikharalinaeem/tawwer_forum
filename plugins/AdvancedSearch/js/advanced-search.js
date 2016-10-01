@@ -4,10 +4,10 @@ $(document).on('click', '.AdvancedSearch .Handle', function(e) {
     e.preventDefault();
     var $container = $(this).closest('.AdvancedSearch');
     var $adv = $container.find('input[name="adv"]');
-    
+
     var setState = function() {
         var method = '';
-        
+
         if ($container.find('.AdvancedWrap').css('display') == 'none') {
             $container.removeClass('Open');
             $adv.val('0');
@@ -16,15 +16,15 @@ $(document).on('click', '.AdvancedSearch .Handle', function(e) {
             $container.addClass('Open');
             $adv.val('1');
             method = 'disable';
-            
+
         }
-        
+
         if (gdn.definition('searchAutocomplete', true) != '0') {
            $('#Form_search', $container).autocomplete(method);
            $('.js-search-groups').autocomplete(method);
         }
     }
-    
+
     if ($container.hasClass('Open')) {
         $container.find('.AdvancedWrap').slideUp(100, setState);
     } else {
@@ -39,14 +39,14 @@ $(document).on('click', '.AdvancedSearch .Handle', function(e) {
     if ($qs.hasClass('Open')) {
         $qs.find('#Form_search').focus();
     }
-    
+
     return false;
 });
 
 $.fn.searchAutocomplete = function(options) {
     this.each(function() {
         var $this = $(this);
-        
+
         var settings = $.extend({
             source: '/search/autocomplete.json',
             position: { collision: "flip" },
@@ -54,14 +54,14 @@ $.fn.searchAutocomplete = function(options) {
               // prevent value inserted on focus
               return false;
             },
-            select: function( event, ui ) { 
+            select: function( event, ui ) {
                 window.location = gdn.url(ui.item.Url);
             }
         }, options, $this.data());
-        
+
         if (settings.addForm)
             settings.source += '?'+$this.closest('form').serialize()
-        
+
         $this.autocomplete(settings);
 
         var $ac = $this.data( "ui-autocomplete" );
@@ -104,8 +104,8 @@ jQuery(document).ready(function($) {
 
         $('.QuickSearch #Form_search').each(function() {
             var $this = $(this);
-            
-            $this.searchAutocomplete({ 
+
+            $this.searchAutocomplete({
                 addForm: true,
                 position: {
                     collision: "flip",
@@ -127,13 +127,13 @@ jQuery(document).ready(function($) {
             });
         });
     }
-    
+
     if ($('.AdvancedSearch').length === 0)
         return;
 
     /// Author tag token input.
     var $author = $('.AdvancedSearch input[name="author"]');
-    
+
     var author = $author.val();
     if (author && author.length) {
         author = author.split(",");
@@ -143,7 +143,7 @@ jQuery(document).ready(function($) {
     } else {
         author = [];
     }
-    
+
     $author.tokenInput(gdn.url('/user/tagsearch'), {
         hintText: gdn.definition("TagHint", "Start to type..."),
         tokenValue: 'name',
@@ -152,7 +152,8 @@ jQuery(document).ready(function($) {
         minChars: 1,
         maxLength: 25,
         prePopulate: author,
-        animateDropdown: false
+        animateDropdown: false,
+        allowTabOut: true
     });
 
     /// Tag token input.
@@ -160,7 +161,7 @@ jQuery(document).ready(function($) {
 
     var data_tags = $tags.data('tags');
     var tags = $tags.val();
-   
+
     if (data_tags) {
        tags = [];
        if (jQuery.isPlainObject(data_tags)) {
@@ -185,6 +186,7 @@ jQuery(document).ready(function($) {
       minChars: 1,
       maxLength: 25,
       prePopulate: tags,
-      animateDropdown: false
+      animateDropdown: false,
+      allowTabOut: true
   });
 });
