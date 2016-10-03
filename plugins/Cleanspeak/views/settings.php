@@ -24,7 +24,7 @@ been configured will force all new content to go into the premoderation queue.')
 </div>
 
 
-<div class="form-group row">
+<div class="form-group">
     <div class="label-wrap-wide">
         <div class="label"><?php echo t('Enable Cleanspeak'); ?></div>
         <div class="info"><?php echo t('Send new discussions, comments, activity posts and comments to Cleanspeak for premoderation'); ?></div>
@@ -49,21 +49,21 @@ echo $this->Form->Errors();
 ?>
 
 <ul>
-    <li class="form-group row">
+    <li class="form-group">
         <?php
         echo $this->Form->labelWrap('Cleanspeak API URL', 'ApiUrl');
         echo $this->Form->textBoxWrap('ApiUrl');
         ?>
     </li>
 
-    <li class="form-group row">
+    <li class="form-group">
         <?php
         echo $this->Form->labelWrap('Application ID', 'ApplicationID');
         echo $this->Form->textBoxWrap('ApplicationID');
         ?>
     </li>
 
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Authentication Key', 'AccessToken'); ?>
             <div class="info">

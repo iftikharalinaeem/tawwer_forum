@@ -23,7 +23,7 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
     * Add 'Domains' box to Edit Role page.
     */
    public function RoleController_BeforeRolePermissions_Handler($sender) {
-      echo '<li class="form-group row">
+      echo '<li class="form-group">
                 <div class="label-wrap">'.
                 $sender->Form->label('Domains', 'Domains').
                 wrap(t('RoleDomainInfo', "Assign new users to this role if their email is from one of these domains (space-separated)."), 'div', ['class' => 'info']).

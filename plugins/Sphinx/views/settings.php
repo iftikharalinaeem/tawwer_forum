@@ -19,19 +19,19 @@ echo $this->Form->errors();
 t('Enter the connection settings for your sphinx server below.'),
 '</div>'; ?>
 <ul>
-   <li class="form-group row">
+   <li class="form-group">
       <?php
          echo $this->Form->labelWrap('Server', 'Plugins.Sphinx.Server');
          echo $this->Form->textBoxWrap('Plugins.Sphinx.Server');
       ?>
    </li>
-   <li class="form-group row">
+   <li class="form-group">
       <?php
          echo $this->Form->labelWrap('Port', 'Plugins.Sphinx.Port');
          echo $this->Form->textBoxWrap('Plugins.Sphinx.Port', array('class' => 'InputBox SmallInput'));
       ?>
    </li>
-   <li class="form-group row">
+   <li class="form-group">
       <div class="input-wrap no-label">
          <?php echo $this->Form->checkBox('Plugins.Sphinx.UseDeltas', T('Use delta indexes', 'Use delta indexes (recommended for massive sites)')); ?>
       </div>

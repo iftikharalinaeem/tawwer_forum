@@ -7,7 +7,7 @@ echo $this->Form->Errors();
 <div class="Configuration">
    <div class="ConfigurationForm">
       <ul>
-         <li class="form-group row">
+         <li class="form-group">
             <div class="label-wrap">
                <?php echo $this->Form->Label(T('VigLink.ApiKeyLabel'), 'ApiKey'); ?>
                <div class="info"><?php echo T('VigLink.GetAPIKey'); ?></div>

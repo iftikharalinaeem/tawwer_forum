@@ -70,7 +70,7 @@
    <h2><?php echo t('API Authentication settings'); ?></h2>
 
    <ul>
-      <li class="form-group row">
+      <li class="form-group">
          <div class="label-wrap">
             <?php echo $this->Form->label("API Key", "ApiKey"); ?>
             <div class="info">
@@ -84,7 +84,7 @@
 
    <?php if ($this->data('Configured')): ?>
       <ul class="MailingList">
-         <li class="form-group row">
+         <li class="form-group">
             <div class="label-wrap">
                <?php echo $this->Form->label("Mailing List", "ListID"); ?>
                <div class="info">
@@ -102,7 +102,7 @@
          // Create any dropdowns of interests associated with lists, each dropdown is hidden
          // by javascript unless the list is selected.
          foreach ($interests as $list => $interest) {
-            echo "<li id='InterestDropdown{$list}' class='InterestDropdowns form-group row'>";
+            echo "<li id='InterestDropdown{$list}' class='InterestDropdowns form-group'>";
             echo $this->Form->labelWrap("Interest", "InterestID");
             echo '<div class="input-wrap>';
             // Disable the interest dropdown by default. Will be activated by javascript if needed.
@@ -111,7 +111,7 @@
             echo "</li>";
          }
          ?>
-         <li class="form-group row">
+         <li class="form-group">
             <div class="input-wrap no-label">
                <?php echo $this->Form->checkBox('ConfirmJoin', 'Send confirmation email?'); ?>
             </div>
@@ -144,7 +144,7 @@
          <div class="SyncBar"><div class="SyncProgress"></div></div>
       </div>
       <ul class="SyncList">
-         <li class="form-group row">
+         <li class="form-group">
             <?php echo $this->Sync->labelWrap("Sync to List", "SyncListID"); ?>
             <div class="input-wrap">
                <?php echo $this->Sync->dropDown('SyncListID', $this->data('Lists'), array('IncludeNull' => true)); ?>
@@ -154,7 +154,7 @@
          // Create any dropdowns of interests associated with lists, each dropdown is hidden
          // by javascript unless the list is selected.
          foreach ($interests as $list => $interest) {
-            echo "<li id='SyncInterestDropdown{$list}' class='SyncInterestDropdowns form-group row'>";
+            echo "<li id='SyncInterestDropdown{$list}' class='SyncInterestDropdowns form-group'>";
             echo $this->Sync->labelWrap('Interest', 'SyncInterestID'.$list);
             echo '<div class="input-wrap">';
             // Disable the sync interest dropdown by default. Will be activated by javascript if needed.
@@ -163,12 +163,12 @@
             echo "</li>";
          }
          ?>
-         <li class="form-group row">
+         <li class="form-group">
             <div class="input-wrap no-label">
                <?php echo $this->Sync->checkBox('SyncConfirmJoin', 'Send confirmation email?'); ?>
             </div>
          </li>
-         <li class="form-group row">
+         <li class="form-group">
             <?php echo $this->Sync->labelWrap("User Selection"); ?>
             <div class="input-wrap stacked">
                <?php

@@ -24,7 +24,7 @@ echo $this->form->Errors();
 
 <ul>
 
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->form->label('Choose a category'); ?>
         </div>
@@ -35,7 +35,7 @@ echo $this->form->Errors();
         </div>
     </li>
 
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->form->label('Included data'); ?>
         </div>
@@ -45,7 +45,7 @@ echo $this->form->Errors();
         </div>
     </li>
 
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->form->label('Choose a format'); ?>
         </div>

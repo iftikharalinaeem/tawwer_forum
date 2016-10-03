@@ -5,7 +5,7 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
 <ul>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Exclude users from leaderboards', 'ExcludePermission'); ?>
             <div class="info"><?php echo t('Users in selected the roles will be excluded from leaderboards.'); ?></div>

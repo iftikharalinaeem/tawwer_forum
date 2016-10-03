@@ -14,21 +14,21 @@ echo $this->Form->Errors();
 ?>
 <ul>
 
-    <li class="form-group row">
+    <li class="form-group">
         <?php
         echo $this->Form->labelWrap('ClientID', 'ApplicationID');
         echo $this->Form->textBoxWrap('ApplicationID');
         ?>
     </li>
 
-    <li class="form-group row">
+    <li class="form-group">
         <?php
         echo $this->Form->labelWrap('Secret', 'Secret');
         echo $this->Form->textBoxWrap('Secret');
         ?>
     </li>
 
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->Label('Repositories', 'Repositories'); ?>
             <div class="info"><?php echo T('List of Repositories separted by newline.  Enter the GitHub username and repo, E.g. \'username/reponame\''); ?></div>
@@ -41,7 +41,7 @@ echo $this->Form->Errors();
 <div class="form-footer js-modal-footer">
     <?php echo $this->Form->Close('Save'); ?>
 </div>
-<div class="form-group row">
+<div class="form-group">
     <div class="label-wrap-wide">
         <div class="label-title"><?php echo t('Global Login'); ?>
             <span class="text-success">

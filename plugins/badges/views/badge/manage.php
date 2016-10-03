@@ -10,26 +10,26 @@ $this->title($Action . ' ' . t('a Badge')); ?>
     echo '<ul>';
 
     echo wrap($this->Form->labelwrap('Name').
-        $this->Form->inputwrap('Name'), 'li', ['class' => 'form-group row']);
+        $this->Form->inputwrap('Name'), 'li', ['class' => 'form-group']);
 
     echo wrap($this->Form->labelwrap('Slug').
-        $this->Form->inputwrap('Slug'), 'li', ['class' => 'form-group row']);
+        $this->Form->inputwrap('Slug'), 'li', ['class' => 'form-group']);
 
     echo wrap($this->Form->labelwrap('Description', 'Body').
-        $this->Form->textBoxwrap('Body', ['MultiLine' => true]), 'li', ['class' => 'form-group row']);
+        $this->Form->textBoxwrap('Body', ['MultiLine' => true]), 'li', ['class' => 'form-group']);
 
     echo wrap($this->Form->labelwrap('Points').
-        $this->Form->inputwrap('Points'), 'li', ['class' => 'form-group row']);
+        $this->Form->inputwrap('Points'), 'li', ['class' => 'form-group']);
 
     echo wrap($this->Form->labelwrap('Badge Class', 'Class').
-      $this->Form->inputwrap('Class'), 'li', ['class' => 'form-group row']);
+      $this->Form->inputwrap('Class'), 'li', ['class' => 'form-group']);
 
     echo wrap($this->Form->labelwrap('Badge Class Level', 'Level').
-      $this->Form->inputwrap('Level'), 'li', ['class' => 'form-group row']);
+      $this->Form->inputwrap('Level'), 'li', ['class' => 'form-group']);
 
     $UploadText = $this->data('Badge.Photo') ? t('Replace Image') : T('Add Image');
     echo wrap($this->Form->labelwrap($UploadText.($this->data('Badge.Photo') ? '<div class="image-wrap">'.img(Gdn_Upload::url($this->data('Badge.Photo'))).'</div>' : ''), 'Photo').
-        $this->Form->fileUploadwrap('Photo'), 'li', ['class' => 'form-group row']);
+        $this->Form->fileUploadwrap('Photo'), 'li', ['class' => 'form-group']);
 
     echo '</ul>';
 
