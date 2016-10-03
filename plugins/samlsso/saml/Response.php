@@ -127,7 +127,19 @@ class OneLogin_Saml_Response
         $xml->registerXPathNamespace('saml', 'urn:oasis:names:tc:SAML:2.0:assertion');
         $xml->registerXPathNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
 
-        // Some SAML responses put the signature in the assertion, some don't. Loop through the possible paths.
+        // Get the unique ID from the Reference node in the Signature node
+
+        /*
+         * Loop through possible queries that would locate the Signature Reference
+         *
+         * Normally the Signature is nested in the Assertion, so this query would find it:
+         *  '/samlp:Response//saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference'
+         *
+         * But if it is not, look anywhere in the Response:
+         *  '/samlp:Response//ds:Signature/ds:SignedInfo/ds:Reference'
+         *
+        */
+
         $signatureQueries = [
             '/samlp:Response//saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference',
             '/samlp:Response//ds:Signature/ds:SignedInfo/ds:Reference'
@@ -135,7 +147,12 @@ class OneLogin_Saml_Response
 
         foreach ($signatureQueries as $signatureQuery) {
             /* @var SimpleXMLElement $refNode */
-            $refNode = reset($xml->xpath($signatureQuery));
+            $refNode = null;
+            $signatureQueryResult = $xml->xpath($signatureQuery);
+            // Check if the signature query returns a result before calling reset, avoid generating warning.
+            if ($signatureQueryResult) {
+                $refNode = reset($signatureQueryResult);
+            }
             if ($refNode) {
                 break;
             }
@@ -149,7 +166,42 @@ class OneLogin_Saml_Response
 
         $id = substr((string)$refNode['URI'], 1);
 
-        $nameQuery = "/samlp:Response//saml:Assertion[@ID='$id']".$assertionXpath;
-        return $xml->xpath($nameQuery);
+        // Get the Assertion based on the ID
+
+        /*
+         * Again, to accommodate SAML documents that put the ID on the Assertion
+         * AND documents that nest the Assertion somewhere in a node with the ID
+         * we loop through the possible places until we find an assertion.
+         *
+         * Normally the ID is on the Assertion, so this query would find it:
+         *  "/samlp:Response//saml:Assertion[@ID='{$id}']{$assertionXpath}"
+         *
+         * If it is on a parent node (e.g. the Response itself) this query would find it:
+         *  "//*[@ID='{$id}']//saml:Assertion{$assertionXpath}"
+        */
+        $nameQueries = [
+            "/samlp:Response//saml:Assertion[@ID='{$id}']{$assertionXpath}",
+            "//*[@ID='{$id}']//saml:Assertion{$assertionXpath}"
+        ];
+        foreach ($nameQueries as $nameQuery) {
+            $assertion = $xml->xpath($nameQuery);
+            if ($assertion) {
+                break;
+            }
+        }
+        if (!$assertion) {
+            if ($assertionXpath === '/saml:Subject/saml:NameID') {
+                // This means no NameID has been found, dump the structure to the Logger, throw an error message.
+                $xmlstr = $this->document->saveXML();
+                // Protip: if you want to read this output, you have to convert the \" to ' and use an XML formatter in Sublime.
+                Logger::event('saml_response', Logger::ERROR, 'SAML NameID Not Found.', (array) $xmlstr);
+                throw new Exception('Unable to find the unique identifier sent by the identity provider.', 422);
+            } else {
+                // if no assertion is found, dump the structure to the Logger, don't throw an error message.
+                Logger::event('saml_response', Logger::INFO, "SAML Missing Assertion {$assertionXpath}.", []);
+            }
+        }
+
+        return $assertion;
     }
 }
