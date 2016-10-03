@@ -6,15 +6,15 @@
 
 class WordpressImportModel extends CommentImportModel {
    /// Properties ///
-   
+
    public $CurrentItemID;
-   
+
    /// Methods ///
-   
+
    public function __construct() {
       $this->Source = 'Wordpress';
    }
-   
+
    public function DefineTables() {
       $St = Gdn::Structure();
       $Sql = Gdn::SQL();
@@ -46,7 +46,7 @@ class WordpressImportModel extends CommentImportModel {
          ->Column('UserID', 'int', TRUE, 'key')
          ->Set(TRUE);
       $Sql->Truncate('zWordpressUser');
-      
+
       $St->Table('zWordpressCategory')
          ->Column('ForeignID', 'int', FALSE, 'primary')
          ->Column('UrlCode', 'varchar(255)', FALSE, 'index')
@@ -56,7 +56,7 @@ class WordpressImportModel extends CommentImportModel {
          ->Column('ParentCategoryID', 'int', TRUE)
          ->Set();
       $Sql->Truncate('zWordpressCategory');
-      
+
       $St->Table('zWordpressDiscussion')
          ->Column('ForeignID', 'int', FALSE, 'primary')
          ->Column('CategoryUrlCode', 'varchar(255)', TRUE)
@@ -73,7 +73,7 @@ class WordpressImportModel extends CommentImportModel {
          ->Column('UserName', 'varchar(50)', TRUE)
          ->Set(TRUE);
       $Sql->Truncate('zWordpressDiscussion');
-      
+
       $St->Table('zWordpressComment')
          ->Column('ForeignID', 'int', FALSE, 'primary')
          ->Column('DiscussionForeignID', 'int', FALSE, 'key')
@@ -90,11 +90,11 @@ class WordpressImportModel extends CommentImportModel {
          ->Set(TRUE);
       $Sql->Truncate('zWordpressComment');
    }
-   
+
    public function InsertUsers() {
       $Sql = "update GDN_zWordpressUser set UserID = null";
       $this->Query($Sql);
-      
+
       // First try and link up as many users as possible.
       $Sql = "update GDN_zWordpressUser zu
          join GDN_User u
@@ -115,7 +115,7 @@ class WordpressImportModel extends CommentImportModel {
             on zu.Name = u.Name
          set zu.UserID = u.UserID
          where zu.UserID is null");
-      
+
       $this->Query("
          insert GDN_User (
             Name,
@@ -136,15 +136,15 @@ class WordpressImportModel extends CommentImportModel {
              zu.ForeignID as ForeignID
          from GDN_zWordpressUser zu
          where zu.UserID is null");
-      
+
       $this->Query($Sql);
    }
-   
+
    public function InsertCatgories() {
       $Sql = "update GDN_zWordpressCategory set CategoryID = null";
       $this->Query($Sql);
-      
-      
+
+
       $Sql = "update GDN_zWordpressCategory zc
          join GDN_Category c
             on zc.ForeignID = c.ForeignID and c.Source = '_source_'
@@ -180,9 +180,9 @@ class WordpressImportModel extends CommentImportModel {
             '_source_'
          from GDN_zWordpressCategory zc
          where zc.CategoryID is null");
-      
+
       $this->Query($Sql);
-      
+
       // Update the parents now.
       $this->Query("update GDN_zWordpressCategory zc
          join GDN_zWordpressCategory zc2
@@ -194,19 +194,19 @@ class WordpressImportModel extends CommentImportModel {
             on c.CategoryID = zc.CategoryID
          set c.ParentCategoryID = zc.ParentCategoryID
          where zc.ParentCategoryID is not null");
-      
+
       $CategoryModel = new CategoryModel();
       $CategoryModel->RebuildTree();
    }
-   
+
    public function InsertComments() {
       $Sql = "update GDN_zWordpressComment set InsertUserID = null";
       $this->Query($Sql);
-      
-      
+
+
       // Insert any missing users.
       $this->_InsertUsers('zWordpressComment', array('Email', 'Name'), 'zWordpressUser');
-      
+
       $Sql = "
          insert GDN_Comment (
             DiscussionID,
@@ -233,30 +233,30 @@ class WordpressImportModel extends CommentImportModel {
          left join GDN_Comment c
             on c.ForeignID = zc.ForeignID and c.Source = '_source_'
          where c.CommentID is null";
-      
+
       $this->Query($Sql);
    }
-   
+
    public function InsertDiscussions() {
       $Sql = "update GDN_zWordpressDiscussion set InsertUserID = null, DiscussionID = null";
       $this->Query($Sql);
-      
+
       $SystemUserID = Gdn::UserModel()->GetSystemUserID();
-      
+
       // First assign all of the authors.
       $Sql = "update GDN_zWordpressDiscussion zd
          left join GDN_zWordpressUser zu
             on zd.UserName = zu.Name
          set zd.InsertUserID = coalesce(zu.UserID, $SystemUserID)";
       $this->Query($Sql);
-      
+
       // Assign all of the discussion foreign IDs that already exist.
       $Sql = "update GDN_zWordpressDiscussion zd
          join GDN_Discussion d
             on zd.ForeignID = d.ForeignID and d.Source = '_source_'
          set zd.DiscussionID = d.DiscussionID";
       $this->Query($Sql);
-      
+
       // Insert the new discussions.
       $this->Query("
       insert GDN_Discussion (
@@ -291,48 +291,45 @@ class WordpressImportModel extends CommentImportModel {
       left join GDN_zWordpressCategory zc
          on zd.CategoryUrlCode = zc.UrlCode
       where zd.DiscussionID is null");
-      
+
       // Assign all of the discussion IDs for comment inserts.
       $this->Query($Sql);
    }
-   
+
    public function InsertTables() {
       $this->InsertUsers();
       $this->InsertCatgories();
       $this->InsertDiscussions();
       $this->InsertComments();
    }
-   
+
    public function Parse() {
-      require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
-      
-      
 //      $xml = simplexml_load_file($this->Path);
 //      decho($xml);
 //      die();
-      
-      
+
+
       $Xml = new XmlReader();
 //      decho($this->Path);
 //      die();
       $Xml->open($this->Path);
-      
+
       $Counts = array('Categories' => 0, 'Discussions' => 0, 'Comments' => 0);
-      
+
       $Names = array();
-      
+
       while ($Xml->read()) {
          if ($Xml->nodeType != XMLReader::ELEMENT)
             continue;
-         
+
          $Name = $Xml->name;
-         
+
          if (!isset($Names[$Name])) {
 //            decho($Name);
             $Names[$Name] = TRUE;
          }
-         
-         
+
+
          switch ($Name) {
             case 'wp:author':
                $Str = $Xml->readOuterXml();
@@ -347,7 +344,7 @@ class WordpressImportModel extends CommentImportModel {
             case 'item':
 //               $Dom = $Xml->expand();
 //               $Str = $Xml->readString();
-               
+
                $Str = $Xml->readOuterXml();
 //               if ($Str) {
                   $this->ParseDiscussion($Str);
@@ -358,31 +355,31 @@ class WordpressImportModel extends CommentImportModel {
 //               $Str = $Xml->readOuterXml();
 //               $this->ParseComment($Str);
 //               $Xml->next();
-//               
+//
 //               $Counts['Comments']++;
-//               
-//               
+//
+//
 //               break;
          }
       }
       $this->Insert(NULL);
-      
+
       decho($Names, 'Names');
    }
-   
+
    public function ParseCategory($Str) {
       $Xml = new SimpleXMLElement($Str);
       $Wp = $Xml->children('wp', TRUE);
-      
+
       $Row = array(
           'ForeignID' => (int)$Wp->term_id,
           'UrlCode' => (string)$Wp->category_nicename,
           'Name' => (string)$Wp->cat_name,
           'ParentUrlCode' => (string)$Wp->category_parent);
-      
+
       $this->Insert('zWordpressCategory', $Row);
    }
-   
+
    /**
     *
     * @param SimpleXml $Xml
@@ -404,11 +401,11 @@ class WordpressImportModel extends CommentImportModel {
           'UserEmail' => $Xml->comment_author_email
 //          'Approved' => (int)$Xml->comment_approved
       );
-      
+
       $this->Insert('zWordpressComment', $Row);
    }
-   
-   
+
+
    public function ParseDiscussion($Str) {
       // Set up some SimpleXml objects to parse the content.
       try {
@@ -418,40 +415,40 @@ class WordpressImportModel extends CommentImportModel {
          die();
       }
       $Wp = $Xml->children('wp', TRUE);
-      
+
       if (strcasecmp($Wp->post_type, 'post') != 0)
          return;
-      
+
       // Figure out the body.
       $Excerpt = (string)$Xml->children('excerpt', TRUE)->encoded;
       $Content = (string)$Xml->children('content', TRUE)->encoded;
       $ImgSrc = FALSE;
       $Url = (string)$Xml->link;
-      
+
       // See if we can't find an image in the body.
-      $Dom = str_get_html($Content);
+      $Dom = pQuery::parseStr($Content);
       if ($Dom) {
-         foreach ($Dom->find('img') as $element) {
-            $ImgSrc = AbsoluteSource($element->src, $Url);
+         foreach ($Dom->query('img') as $element) {
+            $ImgSrc = AbsoluteSource($element->attr('src'), $Url);
             break;
          }
       }
       unset($Dom);
-            
+
       if (!$Excerpt)
          $Excerpt = SliceParagraph(Gdn_Format::PlainText($Content, 'Html'));
       $Image = '';
       if ($ImgSrc) {
          $Image = Img($ImgSrc, array('class' => 'LeftAlign'));
       }
-      
+
       $Body = FormatString(T('EmbeddedDiscussionFormat'), array(
           'Title' => (string)$Xml->title,
           'Excerpt' => $Excerpt,
           'Image' => $Image,
           'Url' => $Url
       ));
-      
+
       // There are lots of category records. Find one with 'category' domain.
       foreach ($Xml->category as $XmlCategory) {
          if ($XmlCategory['domain'] == 'category') {
@@ -475,30 +472,30 @@ class WordpressImportModel extends CommentImportModel {
           'Attributes' => array(
               'ForeignUrl' => (string)$Xml->link
           ));
-      
+
       $HasComments = FALSE;
       foreach ($Wp->comment as $CommentXml) {
          $HasComments = TRUE;
          $this->ParseComment($CommentXml, $Wp);
       }
-      
+
       if (TRUE || $HasComments)
          $this->Insert('zWordpressDiscussion', $Row);
-      
+
 //      $Row = array(
 //          'ForeignID' => (int)$Xml->a
 //          );
    }
-   
+
    public function ParseUser($Str) {
       $Xml = new SimpleXMLElement($Str);
       $Wp = $Xml->children('wp', TRUE);
-      
+
       $Row = array(
           'ForeignID' => (int)$Wp->author_id,
           'Name' => (string)$Wp->author_display_name,
           'Email' => (string)$Wp->author_email);
-      
+
       $this->Insert('zWordpressUser', $Row);
    }
 }
