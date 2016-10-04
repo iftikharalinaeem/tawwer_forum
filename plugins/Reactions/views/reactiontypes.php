@@ -33,7 +33,7 @@
    <?php } ?>
 </div>
 <div class="table-wrap">
-<table class="table-data">
+<table class="table-data js-tj">
    <thead>
       <tr>
          <th class="NameColumn column-lg"><?php echo T('Reaction'); ?></th>
@@ -50,17 +50,19 @@
       ?>
       <tr id="ReactionType_<?php echo $ReactionType['UrlCode']; ?>" class="<?php echo $State; ?>">
          <td class="NameColumn">
-            <div class="media-sm">
-               <div class="media-sm-image-wrap-no-border">
-                  <?php
-                  echo Img('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png', array('ReactionImage')), ' ';
-                  ?>
+            <div class="media media-sm">
+               <div class="media-left">
+                  <div class="media-image-wrap-no-border">
+                     <?php
+                     echo Img('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png', array('ReactionImage')), ' ';
+                     ?>
+                  </div>
                </div>
-               <div class="media-sm-content">
-                  <div class="media-sm-title strong">
+               <div class="media-body">
+                  <div class="media-title strong">
                      <?php echo t($ReactionType['Name']); ?>
                   </div>
-                  <div class="media-sm-description">
+                  <div class="media-description">
                      <?php echo $ReactionType['Description']; ?>
                   </div>
                </div>
@@ -74,8 +76,10 @@
             ?>
          </td>
          <td class="options">
-            <?php echo anchor(dashboardSymbol('edit'), "/reactions/edit/{$UrlCode}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]); ?>
-            <?php echo ActivateButton($ReactionType); ?>
+            <div class="btn-group">
+               <?php echo anchor(dashboardSymbol('edit'), "/reactions/edit/{$UrlCode}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]); ?>
+               <?php echo ActivateButton($ReactionType); ?>
+            </div>
          </td>
       </tr>
       <?php endforeach; ?>

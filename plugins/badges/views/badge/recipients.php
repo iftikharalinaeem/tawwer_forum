@@ -10,7 +10,7 @@
     <?php PagerModule::write(['View' => 'pager-dashboard']); ?>
 </div>
 <div class="table-wrap">
-    <table id="Recipients" class="table-data">
+    <table id="Recipients" class="table-data js-tj">
         <thead>
             <tr>
                 <th class="BadgeNameHead column-xl"><?php echo t('Badge Recipient Name', 'Recipient'); ?></th>
@@ -24,15 +24,17 @@
             foreach($this->data('Recipients') as $recipient) : ?>
             <tr>
                 <td>
-                    <div class="media-sm">
-                        <div class="media-sm-image-wrap-no-border">
-                        <?php echo userPhoto($recipient); ?>
+                    <div class="media media-sm">
+                        <div class="media-left">
+                            <div class="media-image-wrap-no-border">
+                            <?php echo userPhoto($recipient); ?>
+                            </div>
                         </div>
-                        <div class="media-sm-content">
-                            <div class="media-sm-title strong">
+                        <div class="media-body">
+                            <div class="media-title strong">
                                 <?php echo userAnchor($recipient); ?>
                             </div>
-                            <div class="media-sm-description"><?php echo htmlspecialchars(val('Reason', $recipient)); ?></div>
+                            <div class="media-description"><?php echo htmlspecialchars(val('Reason', $recipient)); ?></div>
                         </div>
                     </div>
                 </td>

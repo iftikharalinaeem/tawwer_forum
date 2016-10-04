@@ -23,7 +23,7 @@
 <!--    </ol>-->
 <!--</div>-->
 <div class="table-wrap">
-    <table id="statuses" class="table-data">
+    <table id="statuses" class="table-data js-tj">
         <thead>
         <tr>
             <th class="NameColumn column-lg"><?php echo t('Status'); ?></th>

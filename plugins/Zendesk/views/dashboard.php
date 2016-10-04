@@ -45,7 +45,7 @@ echo $this->Form->Errors();
 
 <div class="form-group">
     <div class="label-wrap-wide">
-        <div class="label-title"><?php echo t('Global Login'); ?>
+        <div class="label"><?php echo t('Global Login'); ?>
             <span class="text-success">
                 <?php if ($this->Data['GlobalLoginConnected']) { ?>
                     <?php echo T('You are connected as'); ?>

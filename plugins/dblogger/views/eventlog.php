@@ -18,7 +18,7 @@ echo $this->Form->Open(array('action' => URL('/settings/eventlog'), 'Method' => 
 echo $this->Form->Errors();
 //$this->Form = new Gdn_Form();
 ?>
-<div class="toolbar">
+<div class="toolbar flex-wrap">
     <div class="date-from">
         <?php echo $this->Form->TextBox('datefrom', array('class' => 'form-control', 'placeholder' => t('Date From'), 'aria-label' => t('Date From'))); ?>
     </div>
@@ -40,15 +40,15 @@ echo $this->Form->Errors();
             <?php echo $this->Form->DropDown('sortorder', array('desc' => 'DESC', 'asc' => 'ASC'), ['class' => 'form-control']); ?>
         </div>
     </div>
-    <div class="buttons">
+    <div class="flex">
         <?php echo $this->Form->Button("Filter"); ?>
         <?php echo $this->Form->Button("Reset", array('id' => 'filter-reset', 'type' => 'reset')); ?>
     </div>
+    <?php PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard']); ?>
 </div>
 <?php echo $this->Form->Close(); ?>
-<?php PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard', 'CssClass' => 'pull-right padded-bottom']); ?>
 <div class="table-wrap">
-<table class="AltColumns table-el table-data">
+<table class="AltColumns table-el table-data js-tj">
     <thead>
         <tr>
             <th class="el-date column-lg">Date</th>

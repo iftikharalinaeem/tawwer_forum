@@ -7,7 +7,7 @@
     </div>
 </div>
 <div class="table-wrap">
-    <table id="Badges" class="table-data">
+    <table id="Badges" class="table-data js-tj">
         <thead>
             <tr>
                 <th class="BadgeNameHead column-xl"><?php echo t('Badge'); ?></th>

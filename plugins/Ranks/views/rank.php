@@ -76,9 +76,9 @@ echo $this->Form->open(), $this->Form->errors();
             </div>
         </li>
     </ul>
-    <h2>Criteria</h2>
-    <div class="padded">
-        This section determines what a user needs to get this rank. Users must satisfy <em>all</em> of the criteria.
+    <div class="subheading-block">
+        <div class="subheading-title">Criteria</div>
+        <div class="subheading-description">This section determines what a user needs to get this rank. Users must satisfy <em>all</em> of the criteria.</div>
     </div>
     <ul>
         <li class="form-group">
@@ -136,9 +136,9 @@ echo $this->Form->open(), $this->Form->errors();
             </div>
         </li>
     </ul>
-    <h2>Abilities</h2>
-    <div class="padded">
-        This section determines what abilities users with this rank get.
+    <div class="subheading-block">
+        <div class="subheading-title">Abilities</div>
+        <div class="subheading-description">This section determines what abilities users with this rank get.</div>
     </div>
     <ul>
         <li class="form-group">
