@@ -13,10 +13,10 @@
         <?php
         echo $this->form->errors();
         echo '<div class="search-wrap input-wrap">';
-        echo '<div class="icon-wrap icon-search-wrap">'.dashboardSymbol('search').'</div>';
+        echo '<div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>';
         echo $this->form->textBox('search', ['class' => 'form-control', 'placeholder' => t('Search subcommunities.', 'Search for subcommunities by the name or slug.')]);
         echo ' ', $this->form->button(t('Go'), ['class' => 'search-submit']);
-        echo '<a class="icon-wrap icon-clear-wrap" href="'.url('/subcommunities').'">'.dashboardSymbol('close').'</a>';
+        echo '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url('/subcommunities').'">'.dashboardSymbol('close').'</a>';
         echo '</div>';
         ?>
     </div>

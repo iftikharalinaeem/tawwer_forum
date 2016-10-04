@@ -12,10 +12,10 @@
         echo $this->form->open(['action' => url('/multisites')]);
         echo $this->form->errors();
         echo '<div class="search-wrap input-wrap">';
-        echo '<div class="icon-wrap icon-search-wrap">'.dashboardSymbol('search').'</div>';
+        echo '<div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>';
         echo $this->form->textBox('search', ['placeholder' => t('Search sites', 'Search for sites by the name of the site or its url'), 'class' => 'form-control']);
         echo ' ', $this->form->button(t('Go'), ['name' => 'go', 'class' => 'search-submit']);
-        echo '<a class="icon-wrap icon-clear-wrap" href="'.url('/multisites').'">'.dashboardSymbol('close').'</a>';
+        echo '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url('/multisites').'">'.dashboardSymbol('close').'</a>';
         echo '</div>';
         echo $this->form->close();
         ?>
@@ -29,7 +29,7 @@ require $this->FetchViewLocation('table');
 ?>
 </div>
 
-<div class="form-group row">
+<div class="form-group">
     <div class="label-wrap-wide">
         <div class="label"><?php echo t('The sites are synchronized with the hub roughly every 10 minutes.'); ?></div>
     </div>
