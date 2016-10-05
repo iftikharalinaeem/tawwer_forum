@@ -1,5 +1,5 @@
 <div class="table-wrap">
-    <table id="SubcommunityTable" class="Sortable table-data">
+    <table id="SubcommunityTable" class="Sortable table-data js-tj">
         <thead>
         <tr>
             <th class="column-md"><?php echo t('Name'); ?></th>

@@ -1,5 +1,5 @@
 <div class="table-wrap">
-    <table id="multisites" class="table-data">
+    <table id="multisites" class="table-data js-tj">
         <thead>
         <tr>
             <th><?php echo T('Name'); ?></th>
