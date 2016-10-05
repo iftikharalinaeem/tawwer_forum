@@ -18,7 +18,7 @@
     </div>
 </div>
 <div class="table-wrap">
-    <table id="Ranks" class="table-data">
+    <table id="Ranks" class="table-data js-tj">
         <thead>
             <tr>
                 <th class="LevelColumn column-xs"><?php echo t('Level'); ?></th>

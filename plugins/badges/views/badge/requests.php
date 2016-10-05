@@ -18,7 +18,7 @@ $Session = Gdn::session();
     <?php } ?>
 <div class="padded italic"><?php echo sprintf($AppText, $NumRequests); ?></div>
 <div class="table-wrap">
-<table class="table-data">
+<table class="table-data js-tj">
     <thead>
         <tr>
             <td class="column-checkbox" data-tj-ignore=true></td>
