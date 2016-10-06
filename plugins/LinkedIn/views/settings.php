@@ -5,7 +5,7 @@
 </div>
 <div class="padded">
    <?php echo t('Linked In social sign in allows users to sign in using their LinkedIn account.'); ?>
-   <?php echo ' '.anchor(sprintf(t('How to set up %s.'), t('LinkedIn social sign in')), 'http://docs.vanillaforums.com/addons/social/linkedin/', array('target' => '_blank')); ?>
+   <?php echo ' '.anchor(sprintf(t('How to set up %s.'), t('LinkedIn social sign in')), 'http://docs.vanillaforums.com/help/addons/social/linkedin', array('target' => '_blank')); ?>
 </div>
 <div class="Configuration">
    <div class="ConfigurationForm">
