@@ -363,7 +363,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         $Sender->setData('Data', $Data);
         $Sender->setData('EditMode', false, true);
 
-        $Sender->_setBreadcrumbs($ReactionType['Name'], $Sender->canonicalUrl());
+        $Sender->_setBreadcrumbs(t($ReactionType['Name']), $Sender->canonicalUrl());
         $Sender->setTabView('Reactions', 'DataList', '', 'plugins/Reactions');
         $this->addJs($Sender);
         $Sender->addJsFile('jquery.expander.js');
