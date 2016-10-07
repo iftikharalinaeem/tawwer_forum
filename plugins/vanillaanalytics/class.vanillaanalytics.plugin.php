@@ -61,7 +61,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $section = [
             'section' => 'Analytics',
             'title' => 'Analytics',
-            'description' => 'Eye Candy For Your Boss',
+            'description' => 'Visualize Your Community',
             'url' => '/settings/analytics/dashboard/traffic'
         ];
 
