@@ -167,8 +167,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $saml = Gdn::session()->stash('samlsso', '', false);
         if ($saml) {
             // The saml session has been retreived.
-            $id = $saml['id'];
-            $profile = $saml['profile'];
+            $id = val('id', $saml);
+            $profile = val('profile', $saml);
         } else {
             // Grab the saml session from the saml response.
             $settings = $this->getSettings($authenticationKey);
@@ -216,7 +216,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
                 $Form->setFormValue('Target', $relay_state);
         }
 
-        Logger::event('saml_profile', Logger::INFO, 'Profile Received from SAML', (array) $profile);
+        Logger::event('saml_profile', Logger::INFO, 'Profile Received from SAML', ['profile' => $profile]);
 
         $this->EventArguments['Profile'] = $profile;
         $this->EventArguments['Form'] = $Form;
