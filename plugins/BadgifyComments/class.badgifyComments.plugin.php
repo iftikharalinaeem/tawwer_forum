@@ -26,6 +26,16 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function setup() {
+        $this->structure();
+    }
+
+
+    /**
+     * Configure db and config file to create default badges and store DiscussionIDs in the Badge table.
+     *
+     * @throws Exception
+     */
+    public function structure() {
         Gdn::structure()->table('Badge')
             ->column('BadgeDiscussion', 'int', '0', ['index'])
             ->set();
@@ -36,7 +46,6 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
         touchConfig('Badgify.Default.Points', '2');
         touchConfig('Badgify.Default.BadgeClass', 'Commenter');
         touchConfig('Badgify.Default.BadgeClassLevel', '1');
-
     }
 
 
