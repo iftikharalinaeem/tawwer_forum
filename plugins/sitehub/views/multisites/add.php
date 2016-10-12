@@ -12,8 +12,4 @@ echo $this->Form->Open(['action' => Url('/multisites')]), $this->Form->Errors();
 </ul>
 
 <?php
-echo '<div class="Buttons">';
-echo $this->Form->Button('Save');
-echo '</div>';
-
-echo $this->Form->Close();
+echo $this->Form->Close('Save');
