@@ -329,8 +329,4 @@ echo $this->Form->open(), $this->Form->errors();
         </li>
     </ul>
 <?php
-echo '<div class="form-footer js-modal-footer">';
-echo $this->Form->button('Save');
-echo '</div>';
-
-echo $this->Form->close();
+echo $this->Form->close('Save');

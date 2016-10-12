@@ -483,9 +483,9 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
             if (C('Plugins.Zendesk.GlobalLogin.Enabled')) {
                 $this->disable();
-                Redirect(Url('/plugin/zendesk'));
+                Redirect('/plugin/zendesk');
             }
-            Redirect(Url('/plugin/zendesk/authorize'));
+            Redirect('/plugin/zendesk/authorize');
 
         }
     }

@@ -21,9 +21,4 @@ if ($authenticationKey) {
 echo $this->Form->open();
 echo $this->Form->errors();
 echo $this->Form->simple($this->data('FormStructure'));
-?>
-<div class="form-footer">
-    <?php echo $this->Form->button('Save'); ?>
-</div>
-<?php
-echo $this->Form->close();
+echo $this->Form->close('Save');

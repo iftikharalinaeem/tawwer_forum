@@ -1,14 +1,14 @@
-<?php if (!defined('APPLICATION')) exit; ?>
+<?php if (!defined('APPLICATION')) exit;
 
-<?php Gdn_Theme::assetBegin('Help'); ?>
-    <h2>Heads up!</h2>
-    <p>Here are the ranks that users can achieve on your site. You can customize these ranks and even add new ones. Here are some tips.</p>
-    <ol>
-        <li>You don't want to have too many ranks. We recommend starting with five. You can add more if your community is really large.</li>
-        <li>It's a good idea to have special ranks for moderators and administrators so that your community can easily see who's in charge.</li>
-        <li>Be creative! Try naming your ranks after things that the community talks about.</li>
-    </ol>
-<?php Gdn_Theme::assetEnd(); ?>
+$desc = '<p>'.t('Here are the ranks that users can achieve on your site. You can customize these ranks and even add new ones. Here are some tips.').'</p>';
+$desc .= '<ol>';
+$desc .= '<li>'.t('You don\'t want to have too many ranks. We recommend starting with five. You can add more if your community is really large.').'</li>';
+$desc .= '<li>'.t('It\'s a good idea to have special ranks for moderators and administrators so that your community can easily see who\'s in charge.').'</li>';
+$desc .= '<li>'.t('Be creative! Try naming your ranks after things that the community talks about.').'</li>';
+$desc .= '</ol>';
+
+helpAsset(t('Heads Up!'), $desc);
+?>
 <div class="header-block">
     <h1><?php echo t('Ranks'); ?></h1>
     <div class="btn-group">

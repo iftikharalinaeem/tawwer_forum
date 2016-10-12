@@ -37,10 +37,8 @@ echo $this->Form->Errors();
     </li>
 
 </ul>
+<?php echo $this->Form->Close('Save'); ?>
 
-<div class="form-footer js-modal-footer">
-    <?php echo $this->Form->Close('Save'); ?>
-</div>
 <div class="form-group">
     <div class="label-wrap-wide">
         <div class="label"><?php echo t('Global Login'); ?>

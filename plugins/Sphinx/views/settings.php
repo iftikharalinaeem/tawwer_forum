@@ -6,12 +6,9 @@
    ?>
 </div>
 <?php
-Gdn_Theme::assetBegin('Help');
-echo '<h2>', t('Need More Help?'), '</h2>';
-echo '<ul>';
-echo '<li>', anchor(t('Vanilla Sphinx Help'), 'http://vanillaforums.org/docs/sphinx'), '</li>';
-echo '</ul>';
-Gdn_Theme::assetEnd();
+
+helpAsset(t('Need More Help?'), anchor(t('Vanilla Sphinx Help'), 'http://vanillaforums.org/docs/sphinx'));
+
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
@@ -37,6 +34,4 @@ t('Enter the connection settings for your sphinx server below.'),
       </div>
    </li>
 </ul>
-<div class="form-footer js-modal-footer">
-   <?php echo $this->Form->close('Save'); ?>
-</div>
+<?php echo $this->Form->close('Save'); ?>

@@ -74,6 +74,4 @@ echo $this->Form->Errors();
     </li>
 
 </ul>
-<div class="form-footer js-modal-footer">
-    <?php echo $this->Form->Close('Save'); ?>
-</div>
+<?php echo $this->Form->Close('Save'); ?>
