@@ -1,23 +1,17 @@
-<?php
-
-if (!defined('APPLICATION')) {
-    exit();
-}
-
-?>
+<?php if (!defined('APPLICATION')){exit();} ?>
 
 <h1><?php echo t($this->title()); ?></h1>
 
-<div class="padded">
-    <p><?php echo t('CategoryExport.Description', 'Export discussions and comments for any category.') ?></p>
-    <p><?php echo sprintf(t('CategoryExport.limits', 'Data may be exported once every <b>%d</b> hours (and every <b>%d</b> hours per category), last export was <b>%s</b>.'), $this->data('cooldown'), $this->data('categorycooldown'), $this->data('lastexport')); ?></p>
+<?php helpAsset(sprintf(t('About %s'), $this->title()), t('CategoryExport.Description', 'Export discussions and comments for any category.')); ?>
+
+<div class="padded alert alert-info">
+    <?php echo sprintf(t('CategoryExport.limits', 'Data may be exported once every <b>%d</b> hours (and every <b>%d</b> hours per category), last export was <b>%s</b>.'), $this->data('cooldown'), $this->data('categorycooldown'), $this->data('lastexport')); ?>
 </div>
 
 <?php if ($this->data('canexport')): ?>
 
-<h2><?php echo t('Export Options'); ?></h2>
-
 <?php
+$this->form->setStyles('bootstrap'); // For some reason, this endpoint isn't hitting the base_render_before in dashboard hooks where this get set normally
 echo $this->form->Open();
 echo $this->form->Errors();
 ?>
@@ -63,9 +57,7 @@ echo $this->form->Errors();
 
 </ul>
 
-<div class="form-footer js-modal-footer">
-    <?php echo $this->form->close('Export'); ?>
-</div>
+<?php echo $this->form->close('Export'); ?>
 
 <?php else: ?>
 

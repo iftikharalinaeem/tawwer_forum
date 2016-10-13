@@ -23,6 +23,4 @@ foreach($this->data('Roles') as $roleID => $role) {
 <?php
 }
 ?>
-<div class="form-footer">
-    <?php echo $this->Form->close('Save'); ?>
-</div>
+<?php echo $this->Form->close('Save'); ?>

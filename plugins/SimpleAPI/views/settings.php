@@ -1,17 +1,8 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<?php Gdn_Theme::assetBegin('Help'); ?>
-<div class="Help Aside">
-   <?php
-   echo Wrap(T('Need More Help?'), 'h2');
-   echo '<ul>';
-   echo Wrap(Anchor("Vanilla API Documentation", 'https://docs.vanillaforums.com/api/'), 'li');
-   echo '</ul>';
-   ?>
-</div>
-<?php Gdn_Theme::assetEnd(); ?>
-<?php
-echo '<h1>', $this->Data('Title'), '</h1>';
+<?php if (!defined('APPLICATION')) exit();
 
+helpAsset(t('Need More Help?'), anchor("Vanilla API Documentation", 'https://docs.vanillaforums.com/api/'));
+
+echo '<h1>', $this->Data('Title'), '</h1>';
 $Form = $this->Form; //new Gdn_Form();
 echo $Form->Open();
 echo $Form->Errors();
@@ -54,9 +45,6 @@ echo $Form->Errors();
       </div>
    </li>
 </ul>
-<div class="form-footer js-modal-footer">
 <?php
-echo $Form->Button('Save');
-echo $Form->Close();
+echo $Form->Close('Save');
 ?>
-</div>

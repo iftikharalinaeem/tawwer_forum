@@ -27,8 +27,5 @@ echo $this->Form->Errors();
       </li>
 
    </ul>
-   <div class="js-modal-footer form-footer">
-      <?php echo $this->Form->Button('Save', array('Type' => 'submit', 'class' => 'Button Primary')); ?>
-   </div>
-   <?php echo $this->Form->Close(); ?>
+   <?php echo $this->Form->Close('Save'); ?>
 </div>

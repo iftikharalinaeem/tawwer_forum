@@ -32,8 +32,4 @@ if (val('IsDefault', $this->Form->formData())) {
     <?php } ?>
     </ul>
 <?php
-echo '<div class="js-modal-footer form-footer">';
-echo $this->Form->Button('Save');
-echo '</div>';
-
-echo $this->Form->Close();
+echo $this->Form->Close('Save');

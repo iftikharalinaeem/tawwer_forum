@@ -1,17 +1,18 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<?php Gdn_Theme::assetBegin('Help'); ?>
-<?php WriteRevisions($this, 'css'); ?>
-   <div class="help">
-      <h2><?php echo t('Need more help?'); ?></h2>
-      <p><?php echo sprintf(t('Check out our %s'), Anchor('Vanilla Forums Theming Guide', 'https://blog.vanillaforums.com/help/vanilla-custom-themes/', '', array('target' => '_blank'))); ?></p>
-      <p><?php echo t('If you are new to HTML and/or CSS, here are some tutorials to get you started:'); ?></p>
-      <?php
-      echo '<ul><li>'.Anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', array('target' => '_blank')).'</li>';
-      echo '<li>'.Anchor("HTML Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', array('target' => '_blank')).'</li></ul>';
-      ?>
-   </div>
-<?php Gdn_Theme::assetEnd(); ?>
-<?php
+<?php if (!defined('APPLICATION')) exit();
+
+Gdn_Theme::assetBegin('Help');
+WriteRevisions($this, 'css');
+Gdn_Theme::assetEnd();
+
+$bloglink = sprintf(t('Check out our %s'), anchor('Vanilla Forums Theming Guide', 'https://blog.vanillaforums.com/help/vanilla-custom-themes/', '', array('target' => '_blank')));
+
+$links .= '<p>'.t('If you are new to HTML and/or CSS, here are some tutorials to get you started:').'</p>';
+$links .= '<ul><li>'.anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', array('target' => '_blank')).'</li>';
+$links .= '<li>'.anchor("HTML Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', array('target' => '_blank')).'</li></ul>';
+
+helpAsset(t('Need More Help?'), $bloglink);
+helpAsset(t('Even More Help?'), $links);
+
 echo $this->Form->Open();
 $CurrentTab = $this->Form->GetFormValue('CurrentTab', GetValue(1, $this->RequestArgs, 'html'));
 if (!in_array($CurrentTab, array('html', 'css'))) {

@@ -27,7 +27,7 @@ $this->title(t('Give a Badge')); ?>
         </div>
     </div>
     <div class="js-modal-footer form-footer">
-        <?php echo $this->Form->button('Cancel', ['type' => 'button', 'class' => 'btn btn-link js-modal-close']);
+        <?php echo $this->Form->button('Cancel', ['type' => 'button', 'class' => 'btn btn-secondary js-modal-close']);
         echo $this->Form->button('Give Badge'); ?>
     </div>
 

@@ -11,6 +11,4 @@ echo $this->Form->errors();
         echo $this->Form->textboxWrap('PopularPosts.MaxAge');
         ?></li>
 </ul>
-<div class="form-footer js-modal-footer">
 <?php echo $this->Form->close('Save'); ?>
-</div>

@@ -53,7 +53,7 @@
       opacity: 0.5;
    }
 </style>
-<div class="InfoRow MailChimpSettings">
+<div class="InfoRow MailChimpSettings padded-bottom">
 
    <?php if (!defined('APPLICATION')) exit();
    echo $this->Form->open();
@@ -118,10 +118,7 @@
          </li>
       </ul>
    <?php endif; ?>
-   <div class="form-footer padded-bottom">
-      <?php echo $this->Form->button('Save'); ?>
-   </div>
-   <?php echo $this->Form->close(); ?>
+   <?php echo $this->Form->close('Save'); ?>
 </div>
 
 <?php if ($this->data('Configured')): ?>
@@ -170,7 +167,7 @@
          </li>
          <li class="form-group">
             <?php echo $this->Sync->labelWrap("User Selection"); ?>
-            <div class="input-wrap stacked">
+            <div class="input-wrap">
                <?php
                echo $this->Sync->checkBox('SyncBanned', 'Sync banned users');
                echo $this->Sync->checkBox('SyncDeleted', 'Sync deleted users');
