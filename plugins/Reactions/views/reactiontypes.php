@@ -9,7 +9,7 @@ $desc = '<p>'.t('Here are all of the reactions you can use on your site.').' '
     .'</ol>';
 
 helpAsset(t('Heads up!'), $desc);
-helpAsset(t('Need More Help?'), anchor(t("Introducing Vanilla Reactions and Badges"), 'http://vanillaforums.com/blog/news/introducing-vanilla-reactions-and-badges'));
+helpAsset(t('Need More Help?'), anchor(t("Introducing Vanilla Reactions and Badges"), 'https://blog.vanillaforums.com/news/introducing-vanilla-reactions-and-badges/'));
 ?>
 <div class="header-block">
    <h1><?php echo $this->Data('Title'); ?></h1>
