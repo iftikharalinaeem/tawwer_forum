@@ -148,7 +148,7 @@ class ModListPlugin extends Gdn_Plugin {
     * Moderator List
     * @param SettingsController $Sender
     */
-   public function SettingsController_AfterCategorySettings_Handler($Sender) {
+   public function vanillaSettingsController_AfterCategorySettings_Handler($Sender) {
 
       $CategoryID = $Sender->Data('CategoryID');
       $ExistingModerators = $this->Moderators($CategoryID, FALSE);
