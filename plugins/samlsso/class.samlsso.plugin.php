@@ -39,10 +39,11 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * Force a saml authentication to the identity provider.
      * This function is called in the Hobson plugin, do not remove.
      *
+     * @param string $authenticationKey The key in the AuthenticationProvider table
      * @param bool $passive Whether or not to make a passive request.
      * @param string $target The target url to redirect to after the signin.
      */
-    public function authenticate($passive = false, $target = false, $authenticationKey) {
+    public function authenticate($authenticationKey, $passive = false, $target = false) {
         $settings = $this->getSettings($authenticationKey);
         $request = new OneLogin_Saml_AuthRequest($settings);
         $request->isPassive = $passive;
