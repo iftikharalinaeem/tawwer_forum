@@ -249,6 +249,7 @@ li.Buried:hover:before {
    position: absolute;
    width: 160px;
    margin-bottom: 5px;
+   z-index: 1;
 }
 
 .MenuItems-Reactions a {
