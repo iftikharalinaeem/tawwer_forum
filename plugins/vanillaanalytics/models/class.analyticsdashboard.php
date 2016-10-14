@@ -56,7 +56,7 @@ class AnalyticsDashboard implements JsonSerializable {
 
         if ($title) {
             $dashboardID = strtolower(preg_replace(
-                '#[^A-Za-z0-9\-]#',
+                '#[^a-z\d\-&]#i',
                 '',
                 str_replace(' ', '-', $title)
             ));
@@ -173,7 +173,7 @@ class AnalyticsDashboard implements JsonSerializable {
             ];
 
             if (Gdn::addonManager()->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
-                $defaults['QnA'] = [
+                $defaults['Q&A'] = [
                     'widgets' => ['total-asked', 'total-answered', 'total-accepted', 'time-to-answer', 'time-to-accept',
                         'questions-asked', 'questions-answered', 'answers-accepted']
                 ];
@@ -303,7 +303,7 @@ class AnalyticsDashboard implements JsonSerializable {
      * @param AnalyticsDashboard $dashboard
      */
     public function render(Gdn_Controller $sender, AnalyticsDashboard $dashboard) {
-        
+
 
         $sender->setData('Title', sprintf(t('Analytics: %1$s'), $dashboard->getTitle()));
         $sender->setData('AnalyticsDashboard', $dashboard);

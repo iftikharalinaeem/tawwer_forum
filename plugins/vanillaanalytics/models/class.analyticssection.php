@@ -113,12 +113,12 @@ class AnalyticsSection {
     public function getDefaults() {
         if (empty(static::$defaults)) {
             $defaultSections = [
-                'Basic' => ['traffic', 'posting', 'qna']
+                'Basic' => ['traffic', 'posting', 'q&a']
             ];
 
             foreach ($defaultSections as $title => $dashboards) {
                 $sectionID = strtolower(preg_replace(
-                    '#[^A-Za-z0-9\-]#',
+                    '#[^a-z\d\-&]#i',
                     '',
                     str_replace(' ', '-', $title)
                 ));
