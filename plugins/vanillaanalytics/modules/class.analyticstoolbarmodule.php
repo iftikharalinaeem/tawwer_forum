@@ -30,7 +30,7 @@ class AnalyticsToolbarModule extends Gdn_Module {
 
     private function getData() {
         // Get the data for the 1st level of categories.
-        $categories = CategoryModel::$Categories;
+        $categories = CategoryModel::categories();
         $categoryData = [];
         foreach($categories as $category) {
             if (val('Depth', $category) == 1) {
