@@ -56,7 +56,7 @@ class AnalyticsDashboard implements JsonSerializable {
 
         if ($title) {
             $dashboardID = strtolower(preg_replace(
-                '#[^a-z\d-&]#i',
+                '#[^a-z\d\-&]#i',
                 '',
                 str_replace(' ', '-', $title)
             ));
