@@ -46,7 +46,7 @@ Try embedding a forum with [automatic SSO](http://blog.vanillaforums.com/jsconne
 Requirements
 ------------
 
-1. Uh, PDO, PDO_MySQL and PHP 5.3 or something.
+1. Uh, pdo_mysql and PHP 5.3 or something.
 2. A suppressed urge to puke at terrible code.
 
 That's pretty much it. _So_ terribly sorry.
