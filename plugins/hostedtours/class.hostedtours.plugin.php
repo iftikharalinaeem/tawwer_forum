@@ -34,6 +34,7 @@ $PluginInfo['hostedtours'] = [
         'WalkThrough' => '0.2'
     ],
     'SettingsUrl' => false,
+    'Icon' => 'hosted_tours.png',
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/tim'

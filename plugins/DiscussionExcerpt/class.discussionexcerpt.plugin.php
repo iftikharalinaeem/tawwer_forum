@@ -7,6 +7,7 @@ $PluginInfo['DiscussionExcerpt'] = array(
    'RequiredTheme' => FALSE,
    'RequiredPlugins' => FALSE,
    'HasLocale' => FALSE,
+   'Icon' => 'discussion_excerpt.png',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.com/profile/mark'

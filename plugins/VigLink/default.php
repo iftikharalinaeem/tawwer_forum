@@ -21,6 +21,7 @@ $PluginInfo['VigLink'] = array(
    'HasLocale' => TRUE,
    'MobileFriendly' => TRUE,
    'SettingsUrl' => '/settings/VigLink',
+   'Icon' => 'viglink.png',
    'Author' => "VigLink",
    'AuthorEmail' => 'support@VigLink.com',
    'AuthorUrl' => 'http://www.VigLink.com'

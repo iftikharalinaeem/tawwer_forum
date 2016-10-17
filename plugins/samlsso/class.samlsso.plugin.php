@@ -14,6 +14,7 @@ $PluginInfo['samlsso'] = [
     'RequiredApplications' => ['Vanilla' => '2.1'],
     'SettingsUrl' => '/settings/samlsso',
     'SettingsPermission' => 'Garden.Settings.Manage',
+    'Icon' => 'saml.png',
     'MobileFriendly' => true,
     'UsePopupSettings' => false,
 ];

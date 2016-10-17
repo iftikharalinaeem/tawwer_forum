@@ -13,6 +13,7 @@ $PluginInfo['CustomProfileFields'] = array(
 	'Name' => 'Custom Profile Fields',
    'Description' => 'Allows users to add custom values to their profile, like: GamerTag, Skype ID, Relationship Status, etc. Anything goes.',
    'Version' => '1.1',
+   'Icon' => 'custom_profile_fields.png',
    'Author' => "Mark O'Sullivan",
    'AuthorEmail' => 'mark@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.com'

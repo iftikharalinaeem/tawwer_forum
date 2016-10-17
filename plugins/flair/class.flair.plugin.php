@@ -8,6 +8,7 @@ $PluginInfo['flair'] = array(
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
+   'Icon' => 'flair.png',
    'MobileFriendly' => true,
    'RequiredPlugins' => array('badges' => '1.4')
 );

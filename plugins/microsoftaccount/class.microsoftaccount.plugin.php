@@ -14,6 +14,7 @@ $PluginInfo['microsoftaccount'] = array(
     'RequiredTheme'        => false,
     'HasLocale'            => false,
     'SocialConnect'        => true,
+    'Icon'                 => 'microsoft_account.png',
     'SettingsUrl'          => '/settings/microsoftaccount',
     'SettingsPermission'   => 'Garden.Settings.Manage',
     'MobileFriendly'       => true

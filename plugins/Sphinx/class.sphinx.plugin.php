@@ -15,6 +15,7 @@ $PluginInfo['Sphinx'] = [
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'Icon' => 'sphinx.png',
     'SettingsUrl' => '/settings/sphinx',
 ];
 
