@@ -156,7 +156,7 @@ class ReactionsController extends DashboardController {
 
         if ($this->Form->authenticatedPostBack()) {
             $ReactionData = $this->Form->FormValues();
-            $ReactionData = array_merge($Reaction, $ReactionData);
+            $ReactionData = array_merge($Reaction, $ReactionData, ['Custom' => 1]);
             $ReactionID = $reactionModel->defineReactionType($ReactionData);
 
             if ($ReactionID) {
