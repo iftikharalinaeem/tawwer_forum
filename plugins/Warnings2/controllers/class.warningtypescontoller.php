@@ -5,14 +5,14 @@
  */
 class WarningTypesController extends PluginController {
     /**
-     * Add endpoint
+     * Add endpoint.
      */
     public function add() {
         $this->edit(false);
     }
 
     /**
-     * Edit endpoint
+     * Edit endpoint.
      *
      * @param string $warningTypeID WarningType ID
      */
@@ -46,7 +46,7 @@ class WarningTypesController extends PluginController {
     }
 
     /**
-     * Delete endpoint
+     * Delete endpoint.
      *
      * @param string $warningTypeID WarningType ID
      * @param string $action Either nothing or delete (which confirm the delete)

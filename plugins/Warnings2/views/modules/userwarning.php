@@ -1,7 +1,7 @@
 <div class="Hero Hero-WarningLevel">
    <h2>
    <?php
-   echo sprintf(T('Warning Level %s'), $this->Data('WarningLevel')).
+   echo sprintf(t('Warning Level %s'), $this->Data('WarningLevel')).
       ' '.
       '<span class="Gloss">'.
       Bullet(' ').
@@ -14,9 +14,9 @@
    <div class="Message">
       <?php 
       if ($this->UserID == Gdn::Session()->UserID)
-         echo T('You are jailed.');
+         echo t('You are jailed.');
       else
-         echo sprintf(T('%s is jailed.'), htmlspecialchars($this->Data('Name')));
+         echo sprintf(t('%s is jailed.'), htmlspecialchars($this->Data('Name')));
       
       ?>
       <ul>

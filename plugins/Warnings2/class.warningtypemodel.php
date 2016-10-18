@@ -18,7 +18,7 @@ class WarningTypeModel extends Gdn_Model {
     }
 
     /**
-     * Return an instance of WarningTypeModel
+     * Return an instance of WarningTypeModel.
      *
      * @return WarningTypeModel WarningTypeModel
      */
@@ -33,7 +33,7 @@ class WarningTypeModel extends Gdn_Model {
     }
 
     /**
-     * Return all WarningTypes
+     * Return all WarningTypes.
      *
      * @return array The form data.
      */
