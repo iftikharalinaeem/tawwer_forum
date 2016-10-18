@@ -32,17 +32,17 @@ endif;
 
 if (!function_exists('WriteUserNoteWarning')):
 function WriteUserNoteWarning($Row) {
-  $Reversed = GetValue('Reversed', $Row);
-  $IsPrivileged = GetValue('Privileged', $Row, FALSE);
+  $Reversed = val('Reversed', $Row);
+  $IsPrivileged = val('Privileged', $Row, false);
 
   ?>
       <div class="Meta">
          <div class="Options">
             <?php
             Gdn_Theme::BulletRow(Bullet(' '));
-            if (GetValue('ConversationID', $Row)) {
+            if (val('ConversationID', $Row)) {
                echo Gdn_Theme::BulletItem('Conversation').
-                  Anchor(T('message'), '/messages/'.GetValue('ConversationID', $Row).'#latest', 'OptionsLink', array('title' => T('The private message between the user and moderator.')));
+                  Anchor(T('message'), '/messages/'.val('ConversationID', $Row).'#latest', 'OptionsLink', array('title' => T('The private message between the user and moderator.')));
             }
 
             if (!$Reversed && $IsPrivileged) {
@@ -62,7 +62,7 @@ function WriteUserNoteWarning($Row) {
          if ($Reversed)
             echo '<del>';
 
-         echo Plural(GetValue('Points', $Row, 0), '%s point', '%s points');
+         echo Plural(val('Points', $Row, 0), '%s point', '%s points');
 
          if (isset($Row['ExpiresString'])) {
             echo Bullet(' ').
@@ -72,7 +72,7 @@ function WriteUserNoteWarning($Row) {
          if ($Reversed)
             echo '</del>';
 
-         if (GetValue('Reversed', $Row)) {
+         if (val('Reversed', $Row)) {
             echo Bullet(' ').
                T('reversed');
          }
@@ -82,7 +82,7 @@ function WriteUserNoteWarning($Row) {
       <div class="Warning-Body">
          <?php
 
-        if (GetValue('Record', $Row)) {
+        if (val('Record', $Row)) {
             $Record = $Row['Record'];
             echo '<div class="P">'.
                 '<b>'.T('Warned for').'</b>: '.
@@ -90,9 +90,9 @@ function WriteUserNoteWarning($Row) {
                 '</div>';
         }
 
-        if (GetValue('RecordBody', $Row)) {
+        if (val('RecordBody', $Row)) {
             echo '<blockquote class="Quote">' . Gdn_Format::Text($Row['RecordBody']) . '</blockquote>';
-        } elseif (GetValue('Record', $Row)) {
+        } elseif (val('Record', $Row)) {
             echo '<blockquote class="Quote">' . Gdn_Format::Text($Record['Body']) . '</blockquote>';
         }
 
@@ -101,7 +101,7 @@ function WriteUserNoteWarning($Row) {
 
         echo $Row['Body'];
 
-        if (GetValue('ModeratorNote', $Row)) {
+        if (val('ModeratorNote', $Row)) {
             echo '<div class="P">'.
                 '<b>'.T('Private note for moderators').'</b>: '.
                 Gdn_Format::Text($Row['ModeratorNote']).

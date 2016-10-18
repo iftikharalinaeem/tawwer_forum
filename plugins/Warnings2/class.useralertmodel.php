@@ -21,7 +21,7 @@ class UserAlertModel extends Gdn_Model {
         return $Row;
     }
 
-    public function GetWhere($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+    public function GetWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
         $Data = parent::GetWhere($Where, $OrderFields, $OrderDirection, $Limit, $Offset);
         $Data->DatasetType(DATASET_TYPE_ARRAY);
         $Data->ExpandAttributes();
@@ -37,14 +37,14 @@ class UserAlertModel extends Gdn_Model {
                 $TimeExpires = $Value;
         }
         if (!$TimeExpires)
-            $Alert['TimeExpires'] = NULL;
+            $Alert['TimeExpires'] = null;
         else
             $Alert['TimeExpires'] = $TimeExpires;
 
         return $Alert['TimeExpires'];
     }
 
-    public function Save($FormPostValues, $Settings = FALSE) {
+    public function Save($FormPostValues, $Settings = false) {
         $Row = $this->CollapseAttributes($FormPostValues);
 
         $CurrentRow = $this->GetID($Row['UserID']);
@@ -54,12 +54,12 @@ class UserAlertModel extends Gdn_Model {
             if ($this->Update($Row, array('UserID' => $UserID)))
                 return $UserID;
             else
-                return FALSE;
+                return false;
         } else {
             if ($this->Insert($Row))
                 return $Row['UserID'];
             else
-                return FALSE;
+                return false;
         }
     }
 }

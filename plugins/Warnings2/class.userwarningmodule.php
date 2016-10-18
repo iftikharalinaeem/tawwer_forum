@@ -4,7 +4,7 @@ class UserWarningModule extends Gdn_Module {
 
     public $UserID;
 
-    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
+    public function __construct($Sender = '', $ApplicationFolder = false) {
         $this->_ApplicationFolder = 'plugins/Warnings2';
     }
 
@@ -13,7 +13,7 @@ class UserWarningModule extends Gdn_Module {
             $this->UserID = Gdn::Controller()->Data('Profile.UserID');
         }
 
-        if ($this->UserID != Gdn::Session()->UserID && !Gdn::Session()->CheckPermission(array('Garden.PersonalInfo.View', 'Moderation.Warnings.View'), FALSE)) {
+        if ($this->UserID != Gdn::Session()->UserID && !Gdn::Session()->CheckPermission(array('Garden.PersonalInfo.View', 'Moderation.Warnings.View'), false)) {
             return '';
         }
 
@@ -25,9 +25,9 @@ class UserWarningModule extends Gdn_Module {
             return '';
 
         $User = Gdn::UserModel()->GetID($this->UserID);
-        $this->SetData('Punished', GetValue('Punished', $User));
-        $this->SetData('Banned', GetValue('Banned', $User));
-        $this->SetData('Name', GetValue('Name', $User));
+        $this->SetData('Punished', val('Punished', $User));
+        $this->SetData('Banned', val('Banned', $User));
+        $this->SetData('Name', val('Name', $User));
 
         return parent::ToString();
     }

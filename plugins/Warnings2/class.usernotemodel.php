@@ -35,24 +35,24 @@ class UserNoteModel extends Gdn_Model {
         $Row = parent::GetID($ID, DATASET_TYPE_ARRAY);
         $Row = $this->ExpandAttributes($Row);
         $this->CalculateRow($Row);
-
+    
         return $Row;
     }
 
-    public function GetWhere($Where = FALSE, $OrderFields = '', $OrderDirection = 'asc', $Limit = FALSE, $Offset = FALSE) {
+    public function GetWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
         $Data = parent::GetWhere($Where, $OrderFields, $OrderDirection, $Limit, $Offset);
         $Data->DatasetType(DATASET_TYPE_ARRAY);
         $Data->ExpandAttributes();
         return $Data;
     }
 
-    public function Save($FormPostValues, $Settings = FALSE) {
+    public function Save($FormPostValues, $Settings = false) {
         $Row = $this->CollapseAttributes($FormPostValues);
 
         return parent::Save($Row, $Settings);
     }
 
-    public function SetField($RowID, $Name, $Value = NULL) {
+    public function SetField($RowID, $Name, $Value = null) {
         if (!is_array($Name))
             $Name = array($Name => $Value);
 
