@@ -11,12 +11,15 @@
  */
 class ReactionsController extends DashboardController {
 
+    /* @var Gdn_Form */
+    public $Form;
+
     /**
      *
      */
     public function initialize() {
         parent::initialize();
-        $this->Form = new Gdn_Form;
+        $this->Form = new Gdn_Form();
         $this->Application = 'dashboard';
     }
 
@@ -145,23 +148,24 @@ class ReactionsController extends DashboardController {
         $this->title('Edit Reaction');
         $this->addSideMenu('reactions');
 
-        $reactionModel = new ReactionModel();
         $Reaction = ReactionModel::reactionTypes($UrlCode);
         if (!$Reaction) {
             throw NotFoundException('reaction');
         }
 
         $this->setData('Reaction', $Reaction);
+
+        $reactionModel = new ReactionModel();
+        $this->Form->setModel($reactionModel);
         $this->Form->setData($Reaction);
 
         if ($this->Form->authenticatedPostBack()) {
-            $ReactionData = $this->Form->FormValues();
-            $ReactionData = array_merge($Reaction, $ReactionData, ['Custom' => 1]);
-            $ReactionID = $reactionModel->defineReactionType($ReactionData);
 
-            if ($ReactionID) {
-                $Reaction['ReactionID'] = $ReactionID;
-                $this->setData('Reaction', $ReactionData);
+            $this->Form->setFormValue('UrlCode', $UrlCode);
+
+            if ($this->Form->save() !== false) {
+                $Reaction = ReactionModel::reactionTypes($UrlCode);
+                $this->setData('Reaction', $Reaction);
 
                 $this->informMessage(t('Reaction saved.'));
                 if ($this->_DeliveryType !== DELIVERY_TYPE_ALL) {
@@ -170,7 +174,6 @@ class ReactionsController extends DashboardController {
                     redirect('/reactions');
                 }
             }
-
         }
 
         $this->render('addedit', '', 'plugins/Reactions');
