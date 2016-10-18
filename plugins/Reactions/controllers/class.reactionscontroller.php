@@ -99,10 +99,15 @@ class ReactionsController extends DashboardController {
     public function undo($Type, $ID, $Reaction, $UserID) {
         $this->permission(['Garden.Moderation.Manage'], false);
 
+        if (!$this->Form->authenticatedPostBack()) {
+            throw ForbiddenException('GET');
+        }
+
         $ReactionModel = new ReactionModel();
         $ReactionModel->react($Type, $ID, 'Undo-'.$Reaction, $UserID);
 
         $this->jsonTarget('!parent', '', 'SlideUp');
+
         include_once $this->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
         $this->render('Blank', 'Utility', 'Dashboard');
     }
@@ -170,7 +175,6 @@ class ReactionsController extends DashboardController {
                     redirect('/reactions');
                 }
             }
-
         }
 
         $this->render('addedit', '', 'plugins/Reactions');
