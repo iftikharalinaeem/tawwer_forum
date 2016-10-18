@@ -7,6 +7,7 @@ $PluginInfo['featured'] = array(
    'Author' => "Dane MacMillan",
    'AuthorEmail' => 'dane@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
+   'Icon' => 'featured_discussions.png',
    'RequiredApplications' => array(
        'Vanilla' => '2.2'
    ),

@@ -18,6 +18,7 @@ $PluginInfo['MailChimpPush'] = array(
     'Author' => 'Tim Gunter',
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://about.me/timgunter',
+    'Icon' => 'mailchimp_push.png',
     'SettingsUrl' => '/plugin/mailchimp'
 );
 

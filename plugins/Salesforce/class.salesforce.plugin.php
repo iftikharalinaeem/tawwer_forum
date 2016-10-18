@@ -16,6 +16,7 @@ $PluginInfo['Salesforce'] = array(
    'Author' => 'John Ashton',
    'AuthorEmail' => 'john@vanillaforums.com',
    'AuthorUrl' => 'http://www.github.com/John0x00',
+   'Icon' => 'salesforce.png',
    'UsePopupSettings' => false,
 );
 

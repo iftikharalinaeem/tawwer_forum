@@ -23,7 +23,7 @@ $PluginInfo['github'] = array(
     'AuthorEmail' => 'john@vanillaforums.com',
     'AuthorUrl' => 'http://www.github.com/John0x00',
     'SocialConnect' => FALSE,
-    'Icon' => 'github.svg'
+    'Icon' => 'github.png'
 );
 
 /**
@@ -1077,4 +1077,3 @@ class GithubPlugin extends Gdn_Plugin {
 
 
 }
-

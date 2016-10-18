@@ -13,6 +13,7 @@ $PluginInfo['AutoRoleByEmail'] = array(
    'Name' => 'Auto-Role By Email',
    'Description' => 'Adds new users to roles based on their email domain (in addition to default role). Not compatible with Approval registration method.',
    'Version' => '1.0',
+   'Icon' => 'auto_role_by_email.png',
    'Author' => "Lincoln Russell",
    'AuthorEmail' => 'lincoln@vanillaforums.com',
    'AuthorUrl' => 'http://lincolnwebs.com'

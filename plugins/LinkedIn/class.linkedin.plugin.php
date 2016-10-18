@@ -16,7 +16,7 @@ $PluginInfo['LinkedIn'] = array(
    'MobileFriendly' => TRUE,
    'SettingsUrl' => '/social/linkedin',
    'SocialConnect' => TRUE,
-   'Icon' => 'linkedin.svg'
+   'Icon' => 'linkedin_social_connect.png'
 );
 
 class LinkedInPlugin extends Gdn_Plugin {
