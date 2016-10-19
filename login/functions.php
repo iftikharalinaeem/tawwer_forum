@@ -1,8 +1,11 @@
 <?php
 session_start();
 global $DB;
-$DB = mysqli_connect($C['DB.Host'], $C['DB.User'], $C['DB.Pass'], $C['DB.Name']);
-mysqli_set_charset($DB, 'utf8');
+$DB = new PDO(
+    "mysql:host={$C['DB.Host']};dbname={$C['DB.Name']};charset=utf8",
+    $C['DB.User'],
+    $C['DB.Pass']
+);
 
 
 /**
@@ -32,14 +35,17 @@ function PageFooter() {
  * Query the database.
  *
  * @param string $Query
- * @return bool|mysqli_result
+ * @return PDOStatement|bool
  */
 function Query($Query = '') {
    global $DB, $C;
-   $Result = mysqli_query($DB, $Query);
+   $Result = $DB->query($Query);
    if (isset($C['Debug']) && $C['Debug']) {
-      echo "<p><pre>".$Query."</pre></p>";
-      echo "<p><pre>".mysqli_error($DB)."</pre></p>";
+      echo "<pre>".$Query."</pre>";
+
+       if ($DB->errorCode() !== PDO::ERR_NONE) {
+           echo "<pre>" . print_r($DB->errorInfo(), true) . "</pre>";
+       }
    }
    return $Result;
 }
@@ -48,16 +54,18 @@ function Query($Query = '') {
  * Get a user from the DB.
  *
  * @param int|string $UserID
+ * @return array|bool
  */
 function GetUser($UserID) {
    global $DB;
    if (is_numeric($UserID)) {
       $Result = Query("select * from users where UserID = $UserID");
-      $User = mysqli_fetch_array($Result);
    } else {
-      $Result = Query("select * from users where Name = '".mysqli_escape_string($DB, $UserID)."'");
-      $User = mysqli_fetch_array($Result);
+      $Result = Query("select * from users where Name = ".$DB->quote($UserID));
    }
+
+   $User = $Result instanceof PDOStatement ? $Result->fetch(PDO::FETCH_ASSOC) : false;
+
    return $User;
 }
 
@@ -77,7 +85,7 @@ function WriteUser($User = array()) {
             $UserID = $Val;
             continue;
          }
-         $Query .= " $Col = '".mysqli_escape_string($DB, $Val)."',";
+         $Query .= " $Col = ".$DB->quote($Val).",";
       }
       $Query = rtrim($Query, ',')." where UserID = ".$Exists['UserID'];
 
@@ -91,7 +99,7 @@ function WriteUser($User = array()) {
       $Cols = implode(',', array_keys($User));
       $Vals = array_values($User);
       foreach ($Vals as &$Val) {
-         $Val = "'".mysqli_escape_string($DB, $Val)."'";
+         $Val = $DB->quote($Val);
       }
       $Vals = implode(',', $Vals);
 
