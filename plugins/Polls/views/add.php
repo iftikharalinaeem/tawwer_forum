@@ -21,10 +21,15 @@ if (!$CancelUrl) {
     echo $this->Form->errors();
 
     if ($this->ShowCategorySelector === true) {
+        $options = [
+            'Value' => val('CategoryID', $this->Category),
+            'IncludeNull' => true,
+            'PermFilter' => array('AllowedDiscussionTypes' => 'Poll'),
+        ];
         echo '<div class="P">';
         echo '<div class="Category">';
         echo $this->Form->label('Category', 'CategoryID'), ' ';
-        echo $this->Form->categoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'PermFilter' => ['AllowedDiscussionTypes' => 'Poll']));
+        echo $this->Form->categoryDropDown('CategoryID', $options);
         echo '</div>';
         echo '</div>';
     }
