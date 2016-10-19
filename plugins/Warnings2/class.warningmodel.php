@@ -57,12 +57,12 @@ class WarningModel extends UserNoteModel {
         $WarnerIdentity = $Session->UserID;
 
         // Use plugin icon as photo.
-        $Warnings2IconPath = preg_replace('/https?\:/i', '', Asset('/plugins/Warnings2/icon.png', true));
+        $Warnings2IconPath = preg_replace('/https?\:/i', '', asset('/plugins/Warnings2/icon.png', true));
 
         $Activity = array(
             'ActivityType' => 'Warning',
             'ActivityUserID' => $WarnerIdentity,
-            'HeadlineFormat' => T('HeadlineFormat.Warning.ToUser', 'You\'ve been <a href="{Url,html}" class="Popup">warned</a>.'),
+            'HeadlineFormat' => t('HeadlineFormat.Warning.ToUser', 'You\'ve been <a href="{Url,html}" class="Popup">warned</a>.'),
             'RecordType' => $warning['RecordType'],
             'RecordID' => $warning['RecordID'],
             'Story' => $warning['Body'],
@@ -107,7 +107,7 @@ class WarningModel extends UserNoteModel {
 
         $warningID = $warning['WarningID'];
         $row = array(
-            'Subject' => T('HeadlineFormat.Warning.ToUser', "You've been warned."),
+            'Subject' => t('HeadlineFormat.Warning.ToUser', "You've been warned."),
             'Type' => 'warning',
             'ForeignID' => "warning-{$warningID}",
             'Body' => $warning['Body'],

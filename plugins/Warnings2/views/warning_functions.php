@@ -7,7 +7,7 @@ if (!function_exists('WriteUserNoteWarningUser')):
  * @param array user note
  */
 function writeUserNoteWarningUser($Row) {
-  $ViewNoteUrl = Url("/profile/viewnote/{$Row['UserNoteID']}");
+  $ViewNoteUrl = url("/profile/viewnote/{$Row['UserNoteID']}");
   ?>
    <div class="Item-Col item-col-fullwidth">
 
@@ -18,7 +18,7 @@ function writeUserNoteWarningUser($Row) {
            <div class="Media-Body">
                <?php
                if (!isset($Row['HideWarnerIdentity']) || !$Row['HideWarnerIdentity']) {
-                   echo '<div>'.UserAnchor($Row, '', array('Px' => 'Insert')).'</div> ';
+                   echo '<div>'.userAnchor($Row, '', array('Px' => 'Insert')).'</div> ';
                }
                echo '<div class="Meta"><a href="' . $ViewNoteUrl . '">'.Gdn_Format::date($Row['DateInserted'], 'html').'</a></div>';
                ?>
@@ -55,7 +55,7 @@ function writeUserNoteWarning($Row) {
             }
 
             if (!$Reversed && $IsPrivileged) {
-               echo Gdn_Theme::BulletItem('Reverse').
+               echo Gdn_Theme::bulletItem('Reverse').
                   anchor(t('reverse'), '/profile/reversewarning?id='.$Row['UserNoteID'], 'Popup OptionsLink', array('title' => t('Reverse this warning')));
             }
             ?>
@@ -71,7 +71,7 @@ function writeUserNoteWarning($Row) {
          if ($Reversed)
             echo '<del>';
 
-         echo Plural(val('Points', $Row, 0), '%s point', '%s points');
+         echo plural(val('Points', $Row, 0), '%s point', '%s points');
 
          if (isset($Row['ExpiresString'])) {
             echo bullet(' ').
@@ -112,7 +112,7 @@ function writeUserNoteWarning($Row) {
 
         if (val('ModeratorNote', $Row)) {
             echo '<div class="P">'.
-                '<b>'.T('Private note for moderators').'</b>: '.
+                '<b>'.t('Private note for moderators').'</b>: '.
                 Gdn_Format::text($Row['ModeratorNote']).
                '</div>';
          }

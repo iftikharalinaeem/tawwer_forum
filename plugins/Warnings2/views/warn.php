@@ -21,7 +21,7 @@ if (count($this->data('WarningTypes', array())) <= 1) {
     echo $this->Form->label('Severity', 'WarningTypeID', array('class' => 'B'));
 
     foreach ($this->data('WarningTypes', array()) as $Row) {
-       $Points = Plural($Row['Points'], '%s point', '%s points');
+       $Points = plural($Row['Points'], '%s point', '%s points');
        if ($Row['ExpireNumber'])
           $Expires = sprintf(t('lasts %s'), plural($Row['ExpireNumber'], '%s '.rtrim($Row['ExpireType'], 's'), '%s '.$Row['ExpireType']));
        else
@@ -49,31 +49,31 @@ if (count($this->data('WarningTypes', array())) <= 1) {
 
 <div class="P">
 <?php
-echo $this->Form->Label("Message to User", 'Body', array('class' => 'B'));
-echo $this->Form->BodyBox('Body');
+echo $this->Form->label("Message to User", 'Body', array('class' => 'B'));
+echo $this->Form->bodyBox('Body');
 ?>
 </div>
 
 <div class="P">
 <?php
-echo $this->Form->Label("Private Note for Moderators", 'ModeratorNote', array('class' => 'B'));
-echo $this->Form->TextBox('ModeratorNote', array('Wrap' => TRUE));
+echo $this->Form->label("Private Note for Moderators", 'ModeratorNote', array('class' => 'B'));
+echo $this->Form->textBox('ModeratorNote', array('Wrap' => true));
 ?>
 </div>
 
-<?php if ($this->Data('Record')): ?>
+<?php if ($this->data('Record')): ?>
 <div class="P">
 <?php
-echo $this->Form->CheckBox('AttachRecord', '@'.sprintf(T('Attach this warning to the %s.'), T(strtolower($this->Data('RecordType')))));
+echo $this->Form->checkBox('AttachRecord', '@'.sprintf(t('Attach this warning to the %s.'), t(strtolower($this->data('RecordType')))));
 ?>
 <?php endif; ?>
 
 </div>
 <?php
 echo '<div class="Buttons Buttons-Confirm">',
-   $this->Form->Button('OK'), ' ',
-   $this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
+   $this->Form->button('OK'), ' ',
+   $this->Form->button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
    '</div>';
-echo $this->Form->Close();
+echo $this->Form->close();
 ?>
 </div>

@@ -225,7 +225,7 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $WordWarn = 'warned';
                 if (!empty($Row->Attributes['WarningID'])) {
                     $WarningID = $Row->Attributes['WarningID'];
-                    $WordWarn = '<a href="'.Url("profile/viewnote/$WarningID").'" class="Popup">'.$WordWarn.'</a>';
+                    $WordWarn = '<a href="'.url("profile/viewnote/$WarningID").'" class="Popup">'.$WordWarn.'</a>';
                 }
                 echo '<div class="DismissMessage Warning">'.
                     sprintf(t('%s was %s for this.'), htmlspecialchars(val('InsertName', $Row)), $WordWarn).
@@ -390,7 +390,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
             if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.UserNotes.Add'], false)) {
                 $sender->EventArguments['ProfileOptions'][] = array(
-                    'Text' => T('Add Note'),
+                    'Text' => t('Add Note'),
                     'Url' => '/profile/note?userid='.$args['UserID'],
                     'CssClass' => 'Popup UserNoteButton'
                 );
@@ -448,7 +448,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         if (Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false)) {
             $UserAlertModel = new UserAlertModel();
             $Alert = $UserAlertModel->getID($UserID, DATASET_TYPE_ARRAY);
-            $sender->SetData('Alert', $Alert);
+            $sender->setData('Alert', $Alert);
         }
     }
 
@@ -472,7 +472,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             $sender->jsonTarget("#UserNote_{$noteID}", '', 'SlideUp');
         }
 
-        $sender->title(sprintf(t('Delete %s'), T('Note')));
+        $sender->title(sprintf(t('Delete %s'), t('Note')));
         $sender->render('deletenote', '', 'plugins/Warnings2');
     }
 
@@ -584,7 +584,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         $sender->setData('Profile', $User);
-        $sender->setData('Title', $noteID ? T('Edit Note') : T('Add Note'));
+        $sender->setData('Title', $noteID ? t('Edit Note') : t('Add Note'));
         $sender->render('note', '', 'plugins/Warnings2');
     }
 
@@ -831,7 +831,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         // Get the warning types.
-        $WarningTypes = Gdn::SQL()->getWhere('WarningType', array(), 'Points')->resultArray();
+        $WarningTypes = Gdn::sql()->getWhere('WarningType', array(), 'Points')->resultArray();
         $Sender->setData('WarningTypes', $WarningTypes);
 
         // Get the record.
