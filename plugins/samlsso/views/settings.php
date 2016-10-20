@@ -1,16 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="header-block">
-    <h1><?php echo $this->Data('Title'); ?></h1>
-    <?php echo anchor(t('Add Connection'), '/samlsso/add', 'btn btn-primary'); ?>
-</div>
-
-<div class="full-border alert alert-warning">
-<?php
-    echo 'Warning: These settings are for advanced users. Make sure you have some knowledge of SAML before proceeding.';
-?>
+<?php echo heading($this->data('Title'), t('Add Connection'), '/samlsso/add'); ?>
+<div class="alert alert-warning padded">
+<?php echo t('These settings are for advanced users. Make sure you have some knowledge of SAML before proceeding.'); ?>
 </div>
 <div class="table-wrap">
-    <table border="0" cellpadding="0" cellspacing="0" class="table-data">
+    <table class="table-data">
         <thead>
         <tr>
             <th><?php echo t('Client ID'); ?></th>

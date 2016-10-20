@@ -1,8 +1,5 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-
-<h1><?php echo $this->data('Title'); ?></h1>
-
-<?php
+<?php if (!defined('APPLICATION')) exit();
+echo header($this->data('Title'));
 // Setup our roles list.
 $Roles = RoleModel::roles();
 $RoleNames[] = '';
@@ -17,69 +14,67 @@ $takeOptions = ['no' => 'take away', '' => 'default'];
 // Begin form.
 echo $this->Form->open(), $this->Form->errors();
 ?>
-    <ul>
-        <li class="form-group">
-            <div class="label-wrap">
-                <?php echo $this->Form->label('Name', 'Name'); ?>
-            </div>
-            <div class="input-wrap">
-                <?php echo $this->Form->textBox('Name'); ?>
-            </div>
-        </li>
-        <li class="form-group">
-            <div class="label-wrap">
-                <?php echo $this->Form->label('Label', 'Label'),
-                    '<div class="info">'."This label will display beside the user. It can be the same as the rank's name or have a more visual appearance. HTML is allowed.".'</div>'; ?>
-            </div>
-            <div class="input-wrap">
-                <?php echo $this->Form->textBox('Label'); ?>
-            </div>
-        </li>
-        <li class="form-group">
-            <div class="label-wrap">
-                <?php
-                echo $this->Form->label('Level', 'Level'),
-                    '<div class="info">'."The level of the rank determines it's sort order. Users will always be given the highest level that they qualify for.".'</div>'; ?>
-            </div>
-            <div class="input-wrap">
-                <?php echo $this->Form->textBox('Level'); ?>
-            </div>
-        </li>
-        <li class="form-group">
-            <div class="label-wrap">
-                <?php
-                echo $this->Form->label('CssClass', 'CssClass'),
-                    '<div class="info">'."You can enter a css class here and it will be added to certain elements on the page. You can combine this with custom theming to add some great effects to your community.".'</div>'; ?>
-            </div>
-            <div class="input-wrap">
-                <?php echo $this->Form->textBox('CssClass'); ?>
-            </div>
-        </li>
-        <li class="form-group">
-            <div class="label-wrap">
-                <?php
-                echo $this->Form->label('Body', 'Body'),
-                    '<div class="info">'."Enter a message for the users when they earn this rank. This will be put in an email so keep it to plain text.".'</div>'; ?>
-            </div>
-            <div class="input-wrap">
-                <?php echo $this->Form->textBox('Body', ['Multiline' => true]); ?>
-            </div>
-        </li>
-        <li class="form-group">
-            <div class="label-wrap">
-                <?php
-                echo $this->Form->label('Message', 'Message'),
-                    '<div class="info">'."Enter a message for the users that will display at the top of the page.".'</div>'; ?>
-            </div>
-            <div class="input-wrap">
-                <?php echo $this->Form->textBox('Message', ['Multiline' => true]); ?>
-            </div>
-        </li>
-    </ul>
-    <div class="subheading-block">
-        <div class="subheading-title">Criteria</div>
-        <div class="subheading-description">This section determines what a user needs to get this rank. Users must satisfy <em>all</em> of the criteria.</div>
-    </div>
+<ul>
+    <li class="form-group">
+        <div class="label-wrap">
+            <?php echo $this->Form->label('Name', 'Name'); ?>
+        </div>
+        <div class="input-wrap">
+            <?php echo $this->Form->textBox('Name'); ?>
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
+            <?php echo $this->Form->label('Label', 'Label'),
+                '<div class="info">'."This label will display beside the user. It can be the same as the rank's name or have a more visual appearance. HTML is allowed.".'</div>'; ?>
+        </div>
+        <div class="input-wrap">
+            <?php echo $this->Form->textBox('Label'); ?>
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
+            <?php
+            echo $this->Form->label('Level', 'Level'),
+                '<div class="info">'."The level of the rank determines it's sort order. Users will always be given the highest level that they qualify for.".'</div>'; ?>
+        </div>
+        <div class="input-wrap">
+            <?php echo $this->Form->textBox('Level'); ?>
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
+            <?php
+            echo $this->Form->label('CssClass', 'CssClass'),
+                '<div class="info">'."You can enter a css class here and it will be added to certain elements on the page. You can combine this with custom theming to add some great effects to your community.".'</div>'; ?>
+        </div>
+        <div class="input-wrap">
+            <?php echo $this->Form->textBox('CssClass'); ?>
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
+            <?php
+            echo $this->Form->label('Body', 'Body'),
+                '<div class="info">'."Enter a message for the users when they earn this rank. This will be put in an email so keep it to plain text.".'</div>'; ?>
+        </div>
+        <div class="input-wrap">
+            <?php echo $this->Form->textBox('Body', ['Multiline' => true]); ?>
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
+            <?php
+            echo $this->Form->label('Message', 'Message'),
+                '<div class="info">'."Enter a message for the users that will display at the top of the page.".'</div>'; ?>
+        </div>
+        <div class="input-wrap">
+            <?php echo $this->Form->textBox('Message', ['Multiline' => true]); ?>
+        </div>
+    </li>
+</ul>
+<section>
+    <?php echo subheading(t('Criteria'), t('This section determines what a user needs to get this rank. Users must satisfy <em>all</em> of the criteria.')); ?>
     <ul>
         <li class="form-group">
             <div class="label-wrap">
@@ -136,10 +131,9 @@ echo $this->Form->open(), $this->Form->errors();
             </div>
         </li>
     </ul>
-    <div class="subheading-block">
-        <div class="subheading-title">Abilities</div>
-        <div class="subheading-description">This section determines what abilities users with this rank get.</div>
-    </div>
+</section>
+<section>
+    <?php echo subheading(t('Abilities'), t('This section determines what abilities users with this rank get.')); ?>
     <ul>
         <li class="form-group">
             <div class="label-wrap">
@@ -328,5 +322,6 @@ echo $this->Form->open(), $this->Form->errors();
             </div>
         </li>
     </ul>
+</section>
 <?php
 echo $this->Form->close('Save');

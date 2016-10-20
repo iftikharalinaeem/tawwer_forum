@@ -8,15 +8,8 @@ $desc .= '<li>'.t('Be creative! Try naming your ranks after things that the comm
 $desc .= '</ol>';
 
 helpAsset(t('Heads Up!'), $desc);
+echo heading(t('Ranks'), sprintf(t('Add %s'), t('Rank')), '/settings/addrank');
 ?>
-<div class="header-block">
-    <h1><?php echo t('Ranks'); ?></h1>
-    <div class="btn-group">
-        <?php
-        echo anchor(sprintf(t('Add %s'), t('Rank')), '/settings/addrank', 'btn btn-primary');
-        ?>
-    </div>
-</div>
 <div class="table-wrap">
     <table id="Ranks" class="table-data js-tj">
         <thead>

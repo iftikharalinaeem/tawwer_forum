@@ -1,13 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="header-block">
-    <h1><?php echo $this->data('Title'); ?></h1>
-    <?php echo anchor(t('Return to settings'), '/settings/samlsso', 'btn btn-primary'); ?>
-</div>
 <?php
+echo heading($this->data('Title'), '', '', [], '/settings/samlsso');
 $authenticationKey = $this->data('AuthenticationKey');
 if ($authenticationKey) {
     ?>
-    <div class="full-border alert alert-info">
+    <div class="alert alert-info padded">
     <?php
         echo $this->Form->label('Metadata');
     ?>

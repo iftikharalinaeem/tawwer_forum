@@ -1,27 +1,5 @@
 <?php if (!defined('APPLICATION')) exit; ?>
-<div class="header-block">
-    <h1><?php echo $this->data('Title'); ?></h1>
-    <div class="btn-group">
-        <?php echo anchor(sprintf(t('Add %s'), t('Status')), '/settings/addstatus', 'btn btn-primary js-modal'); ?>
-    </div>
-</div>
-<!--<div class="Info PageInfo">-->
-<!--    <p><b>Heads up!</b> Here are the ranks that users can achieve on your site.-->
-<!--        You can customize these ranks and even add new ones.-->
-<!--        Here are some tips.-->
-<!--    </p>-->
-<!--    <ol>-->
-<!--        <li>-->
-<!--            You don't want to have too many ranks. We recommend starting with five. You can add more if your community is really large.-->
-<!--        </li>-->
-<!--        <li>-->
-<!--            It's a good idea to have special ranks for moderators and administrators so that your community can easily see who's in charge.-->
-<!--        </li>-->
-<!--        <li>-->
-<!--            Be creative! Try naming your ranks after things that the community talks about.-->
-<!--        </li>-->
-<!--    </ol>-->
-<!--</div>-->
+<?php echo heading($this->data('Title'), sprintf(t('Add %s'), t('Status')), '/settings/addstatus', 'btn btn-primary js-modal'); ?>
 <div class="table-wrap">
     <table id="statuses" class="table-data js-tj">
         <thead>
