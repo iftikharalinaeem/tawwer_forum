@@ -1,11 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="header-block">
-    <h1><?php echo $this->Data('Title'); ?></h1>
-    <div class="buttons">
-        <?php echo anchor(t('Add Site'), '/multisites/add', 'btn btn-primary js-modal'); ?>
-    </div>
-</div>
-
+<?php echo heading($this->data('Title'), t('Add Site'), '/multisites/add', 'btn btn-primary js-modal'); ?>
 <div class="toolbar">
     <div class="toolbar-main">
         <?php
