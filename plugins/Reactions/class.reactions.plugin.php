@@ -429,7 +429,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         include_once $Sender->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
 
-        if (!$Sender->Request->isPostBack()) {
+        if (!$Sender->Request->isAuthenticatedPostBack(true)) {
             throw PermissionException('Javascript');
         }
 
