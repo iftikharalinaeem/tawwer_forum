@@ -19,10 +19,27 @@ if (!in_array($CurrentTab, array('html', 'css'))) {
    $CurrentTab = 'html';
 }
 $this->Form->AddHidden('CurrentTab', $CurrentTab);
+
+$htmlAttr = [
+    'aria-selected' => ($CurrentTab == 'html') ? 'true' : 'false',
+    'class' => ($CurrentTab == 'html') ? 'js-custom-html active' : 'js-custom-html',
+    'aria-controls' => 'customHtmlContainer',
+    'role' => 'tab',
+    'href' => '#'
+];
+
+$cssAttr = [
+    'aria-selected' => ($CurrentTab == 'html') ? 'false' : 'true',
+    'class' => ($CurrentTab == 'html') ? 'js-custom-css' : 'js-custom-css active',
+    'aria-controls' => 'customCssContainer',
+    'role' => 'tab',
+    'href' => '#'
+];
+
 ?>
-<div class="header-menu js-custom-theme-menu">
-      <a href="<?php echo url('settings/customtheme/#'); ?>" class="js-custom-html <?php echo $CurrentTab == 'html' ? 'active' : ''; ?>"><?php echo t('Edit HTML'); ?></a>
-      <a href="<?php echo url('settings/customtheme/#'); ?>" class="js-custom-css <?php echo $CurrentTab == 'html' ? '' : 'active'; ?>"><?php echo t('Edit CSS'); ?></a>
+   <div role="tablist" class="header-menu js-custom-theme-menu">
+      <a <?php echo attribute($htmlAttr); ?>><?php echo t('Edit HTML'); ?></a>
+      <a <?php echo attribute($cssAttr); ?>><?php echo t('Edit CSS'); ?></a>
    </div>
    <?php echo $this->Form->Errors(); ?>
    <div class="toolbar">
@@ -40,7 +57,8 @@ $this->Form->AddHidden('CurrentTab', $CurrentTab);
          <?php echo $this->Form->Button('Preview', array('class' => 'btn btn-secondary btn-preview')); ?>
       </div>
    </div>
-   <div class="padded CustomCSSContainer<?php echo $CurrentTab == 'html' ? ' hidden' : ''; ?>">
+   <section id="customCssContainer" class="padded <?php echo $CurrentTab == 'html' ? ' hidden' : ''; ?>">
+      <h1 class="hidden"><?php echo t('Edit CSS'); ?></h1>
       <ul>
          <li>
             <div class="CustomThemeForm">
@@ -50,9 +68,10 @@ $this->Form->AddHidden('CurrentTab', $CurrentTab);
             </div>
          </li>
       </ul>
-   </div>
-   <div class="padded CustomHtmlContainer<?php echo $CurrentTab == 'html' ? '' : ' hidden'; ?>">
+   </section>
+   <section id="customHtmlContainer" class="padded <?php echo $CurrentTab == 'html' ? '' : ' hidden'; ?>">
       <ul>
+         <h1 class="hidden"><?php echo t('Edit HTML'); ?></h1>
          <li>
             <div class="CustomThemeForm">
                <?php
@@ -60,7 +79,7 @@ $this->Form->AddHidden('CurrentTab', $CurrentTab);
                ?>
          </li>
       </ul>
-   </div>
+   </section>
 <?php WriteRevisions($this, 'html'); ?>
 <?php
 echo $this->Form->Close();
@@ -71,7 +90,7 @@ function WriteRevisions($Sender, $Tab = '') {
    if (!$Data || $Data->NumRows() == 0)
       return;
    ?>
-   <div class="control-panel">
+   <section class="control-panel">
       <div class="control-panel-heading">Recent Revisions</div>
       <div class="control-panel-body">
          <?php
@@ -103,6 +122,6 @@ function WriteRevisions($Sender, $Tab = '') {
       <div class="control-panel-footer">
          <?php echo anchor(t('Revert to Original Version'), 'settings/customtheme/revision/'.$Tab.'/0', 'btn btn-control-panel'); ?>
       </div>
-   </div>
+   </section>
    <?php
 }
