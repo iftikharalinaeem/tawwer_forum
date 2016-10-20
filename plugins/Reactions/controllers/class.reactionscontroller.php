@@ -99,7 +99,7 @@ class ReactionsController extends DashboardController {
     public function undo($Type, $ID, $Reaction, $UserID) {
         $this->permission(['Garden.Moderation.Manage'], false);
 
-        if (!$this->Form->authenticatedPostBack()) {
+        if (!$this->Form->authenticatedPostBack(true)) {
             throw ForbiddenException('GET');
         }
 
@@ -218,7 +218,7 @@ class ReactionsController extends DashboardController {
     public function recalculateRecordCache($Day = false) {
         $this->permission('Garden.Settings.Manage');
 
-        if (!$this->Request->isAuthenticatedPostBack()) {
+        if (!$this->Request->isAuthenticatedPostBack(true)) {
             throw ForbiddenException('GET');
         }
 
@@ -238,7 +238,7 @@ class ReactionsController extends DashboardController {
     public function toggle($UrlCode, $Active) {
         $this->permission('Garden.Community.Manage');
 
-        if (!$this->Form->authenticatedPostBack()) {
+        if (!$this->Form->authenticatedPostBack(true)) {
             throw PermissionException('PostBack');
         }
 
