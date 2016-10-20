@@ -26,8 +26,9 @@ class UserWarningModule extends Gdn_Module {
         $UserAlertModel = new UserAlertModel();
         $Alert = $UserAlertModel->getID($this->UserID);
         $this->Data = $Alert;
-        if (!$this->data('WarningLevel'))
+        if (!$this->data('WarningLevel')) {
             return '';
+        }
 
         $User = Gdn::userModel()->getID($this->UserID);
         $this->setData('Punished', val('Punished', $User));

@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) return;
 
 if (!function_exists('WriteUserNoteWarningUser')):
-/***
+/**
  * Write note for a user.
  *
  * @param array user note
@@ -35,7 +35,7 @@ endif;
 
 
 if (!function_exists('WriteUserNoteWarning')):
-/***
+/**
  * Write note for a user message.
  *
  * @param array user note

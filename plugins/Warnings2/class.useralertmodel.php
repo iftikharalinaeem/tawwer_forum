@@ -21,7 +21,7 @@ class UserAlertModel extends Gdn_Model {
         return $Row;
     }
 
-    /***
+    /**
      * Get a dataset for the user alert model with a where filter.
      *
      * @param bool $Where
@@ -38,7 +38,7 @@ class UserAlertModel extends Gdn_Model {
         return $Data;
     }
 
-    /***
+    /**
      * Set expiring time.
      *
      * @param array $Alert
@@ -60,7 +60,7 @@ class UserAlertModel extends Gdn_Model {
         return $Alert['TimeExpires'];
     }
 
-    /***
+    /**
      *
      * @param array $FormPostValues
      * @param bool $Settings

@@ -6,7 +6,7 @@ class UserNoteModel extends Gdn_Model {
         parent::__construct('UserNote');
     }
 
-    /***
+    /**
      * Calculating notes row.
      *
      * @param array $Data
@@ -19,7 +19,7 @@ class UserNoteModel extends Gdn_Model {
         }
     }
 
-    /***
+    /**
      * Counting row, unsetting Moderator Note is user is not moderator.
      *
      * @param array $Row
@@ -49,7 +49,7 @@ class UserNoteModel extends Gdn_Model {
         return $Row;
     }
 
-    /***
+    /**
      * Get a dataset for the model with a where filter.
      *
      * @param bool $Where
@@ -66,7 +66,7 @@ class UserNoteModel extends Gdn_Model {
         return $Data;
     }
 
-    /***
+    /**
      *
      * @param array $FormPostValues
      * @param bool $Settings
@@ -79,7 +79,7 @@ class UserNoteModel extends Gdn_Model {
         return parent::save($Row, $Settings);
     }
 
-    /***
+    /**
      * Update a row in the database.
      *
      * @param int $RowID
