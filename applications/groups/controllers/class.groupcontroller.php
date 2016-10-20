@@ -98,6 +98,10 @@ class GroupController extends Gdn_Controller {
         $Events = $EventModel
             ->getWhere(['GroupID' => $GroupID, 'DateStarts >=' => gmdate('Y-m-d H:i:s')], 'DateStarts', 'asc', $MaxEvents)
             ->resultArray();
+
+        $this->EventArguments['Events'] = &$Events;
+        $this->fireEvent('GroupEventsLoaded');
+
         $this->setData('Events', $Events);
 
         // Get applicants.

@@ -237,10 +237,18 @@ class EventController extends Gdn_Controller {
 
         // Lookup group, if there is one
         $GroupID = val('GroupID', $Event, false);
+        $Group = false;
         if ($GroupID) {
             $GroupModel = new GroupModel();
             $Group = $GroupModel->getID($GroupID, DATASET_TYPE_ARRAY);
             if (!$Group) throw NotFoundException('Group');
+        }
+
+        $this->EventArguments['Event'] = &$Event;
+        $this->EventArguments['Group'] = &$Group;
+        $this->fireEvent('EventLoaded');
+
+        if ($Group) {
             $this->setData('Group', $Group);
 
             // Check if this person is a member of the group or a moderator
