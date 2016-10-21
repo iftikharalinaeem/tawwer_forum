@@ -1,12 +1,6 @@
 <?php if (!defined('APPLICATION')) { exit(); } ?>
-
-<div class="header-block">
-    <h1><?php echo $this->data('Title'); ?></h1>
-    <div class="btn-group">
-        <?php echo anchor(sprintf(t('Add %s'), t('Subcommunity')), '/subcommunities/add', 'js-modal btn btn-primary'); ?>
-    </div>
-</div>
-
+<?php echo heading($this->data('Title'), sprintf(t('Add %s'), t('Subcommunity')), '/subcommunities/add', 'js-modal btn btn-primary'); ?>
+<?php echo $this->form->open(array('action' => url('/subcommunities'))); ?>
 <div class="toolbar">
     <div class="toolbar-main">
         <?php
