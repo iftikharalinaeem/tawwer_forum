@@ -202,8 +202,8 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         if (!$this->PublicPostWarnings) {
             // Only show warnings to moderators
-            $PermissionCheck = !Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
-            if (val('InsertUserID', $Row) != Gdn::session()->UserID && $PermissionCheck) {
+            $permissionCheck = !checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
+            if (val('InsertUserID', $Row) != Gdn::session()->UserID && $permissionCheck) {
                 return;
             }
         }
