@@ -269,9 +269,14 @@ class PollsPlugin extends Gdn_Plugin {
      * Create the new poll method on post controller.
      */
     public function postController_poll_create($Sender) {
+        $CategoryUrlCode = val(0, $Sender->RequestArgs);
+        // Override CategoryID if categories are disabled
+        $UseCategories = $this->ShowCategorySelector = (bool)c('Vanilla.Categories.Use');
+        if (!$UseCategories) {
+            $CategoryUrlCode = '';
+        }
+
         $PollModel = new PollModel();
-        $UseCategories = $Sender->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
-        $CategoryUrlCode = GetValue(0, $Sender->RequestArgs);
         $Category = false;
         if ($CategoryUrlCode != '') {
             $CategoryModel = new CategoryModel();
@@ -279,8 +284,16 @@ class PollsPlugin extends Gdn_Plugin {
             $Sender->CategoryID = $Category->CategoryID;
         }
 
-        if ($Category && $UseCategories) {
+        if ($Category) {
             $Sender->Category = (object)$Category;
+            $Sender->setData('Category', $Category);
+            $Sender->Form->addHidden('CategoryID', $Sender->Category->CategoryID);
+            if (val('DisplayAs', $Sender->Category) == 'Discussions') {
+                $Sender->ShowCategorySelector = false;
+            } else {
+                // Get all our subcategories to add to the category if we are in a Header or Categories category.
+                $Sender->Context = CategoryModel::getSubtree($this->CategoryID);
+            }
         } else {
             $Sender->CategoryID = 0;
             $Sender->Category = null;
