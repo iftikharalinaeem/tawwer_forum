@@ -10,17 +10,12 @@ $desc = '<p>'.t('Here are all of the reactions you can use on your site.').' '
 
 helpAsset(t('Heads up!'), $desc);
 helpAsset(t('Need More Help?'), anchor(t("Introducing Vanilla Reactions and Badges"), 'https://blog.vanillaforums.com/news/introducing-vanilla-reactions-and-badges/'));
+if (checkPermission('Garden.Settings.Manage')) {
+   echo heading($this->data('Title'), t('Advanced Settings', '/reactions/advanced', 'js-modal btn btn-primary'));
+} else {
+   echo heading($this->data('Title'));
+}
 ?>
-<div class="header-block">
-   <h1><?php echo $this->Data('Title'); ?></h1>
-   <?php if (CheckPermission('Garden.Settings.Manage')) { ?>
-      <div class="Wrap">
-         <?php
-         echo Anchor(T('Advanced Settings'), '/reactions/advanced', 'js-modal btn btn-primary');
-         ?>
-      </div>
-   <?php } ?>
-</div>
 <div class="table-wrap">
 <table class="table-data js-tj">
    <thead>

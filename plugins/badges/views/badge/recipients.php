@@ -1,11 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-
-<div class="header-block">
-    <div class="title-block">
-        <?php echo anchor(dashboardSymbol('chevron-left'), "/badge/all", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
-        <h1><?php echo $this->data('Badge.Name'); ?></h1>
-    </div>
-</div>
+<?php echo heading($this->data('Badge.Name'), '', '', [], '/badge/all')?>
 <div class="toolbar">
     <?php PagerModule::write(['View' => 'pager-dashboard']); ?>
 </div>
