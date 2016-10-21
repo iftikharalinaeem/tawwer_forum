@@ -1,6 +1,5 @@
 <?php if (!defined('APPLICATION')) { exit(); } ?>
 <?php echo heading($this->data('Title'), sprintf(t('Add %s'), t('Subcommunity')), '/subcommunities/add', 'js-modal btn btn-primary'); ?>
-<?php echo $this->form->open(array('action' => url('/subcommunities'))); ?>
 <div class="toolbar">
     <div class="toolbar-main">
         <?php
