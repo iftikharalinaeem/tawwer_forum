@@ -1,22 +1,15 @@
 <?php if (!defined('APPLICATION')) { exit(); } ?>
 <?php echo heading($this->data('Title'), sprintf(t('Add %s'), t('Subcommunity')), '/subcommunities/add', 'js-modal btn btn-primary'); ?>
-<?php echo $this->form->open(array('action' => url('/subcommunities'))); ?>
 <div class="toolbar">
     <div class="toolbar-main">
         <?php
-        echo $this->form->errors();
-        echo '<div class="search-wrap input-wrap">';
-        echo '<div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>';
-        echo $this->form->textBox('search', ['class' => 'form-control', 'placeholder' => t('Search subcommunities.', 'Search for subcommunities by the name or slug.')]);
-        echo ' ', $this->form->button(t('Go'), ['class' => 'search-submit']);
-        echo '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url('/subcommunities').'">'.dashboardSymbol('close').'</a>';
-        echo '</div>';
+        $placeholder = t('Search subcommunities.', 'Search for subcommunities by the name or slug.');
+        echo $this->form->searchForm('search', '/subcommunities', ['placeholder' => $placeholder]);
         ?>
     </div>
     <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
 </div>
 
-<?php echo $this->form->close(); ?>
 
 <div id="sites-wrap">
     <?php
