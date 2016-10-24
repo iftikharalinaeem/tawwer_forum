@@ -14,7 +14,7 @@ $PluginInfo['vanillaanalytics'] = [
     'RequiredApplications' => array('Vanilla' => '2.2.103'),
     'Author' => 'Ryan Perry',
     'AuthorEmail' => 'ryan.p@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.org/profile/initvector',
+    'AuthorUrl' => 'http://vanillaforums.org/profile/initvector'
 ];
 
 /**
