@@ -20,26 +20,28 @@ if (!in_array($CurrentTab, array('html', 'css'))) {
 }
 $this->Form->AddHidden('CurrentTab', $CurrentTab);
 
+$cssClass = 'header-menu-item js-custom-html';
+
 $htmlAttr = [
     'aria-selected' => ($CurrentTab == 'html') ? 'true' : 'false',
-    'class' => ($CurrentTab == 'html') ? 'js-custom-html active' : 'js-custom-html',
+    'class' => ($CurrentTab == 'html') ? $cssClass.' active' : $cssClass,
     'aria-controls' => 'customHtmlContainer',
     'role' => 'tab',
-    'href' => '#'
 ];
+
+$cssClass = 'header-menu-item js-custom-css';
 
 $cssAttr = [
     'aria-selected' => ($CurrentTab == 'html') ? 'false' : 'true',
-    'class' => ($CurrentTab == 'html') ? 'js-custom-css' : 'js-custom-css active',
+    'class' => ($CurrentTab == 'html') ? $cssClass : $cssClass.' active',
     'aria-controls' => 'customCssContainer',
     'role' => 'tab',
-    'href' => '#'
 ];
 
 ?>
    <div role="tablist" class="header-menu js-custom-theme-menu">
-      <a <?php echo attribute($htmlAttr); ?>><?php echo t('Edit HTML'); ?></a>
-      <a <?php echo attribute($cssAttr); ?>><?php echo t('Edit CSS'); ?></a>
+      <div <?php echo attribute($htmlAttr); ?>><?php echo t('Edit HTML'); ?></div>
+      <div <?php echo attribute($cssAttr); ?>><?php echo t('Edit CSS'); ?></div>
    </div>
    <?php echo $this->Form->Errors(); ?>
    <div class="toolbar">
@@ -91,7 +93,7 @@ function WriteRevisions($Sender, $Tab = '') {
       return;
    ?>
    <section class="control-panel">
-      <div class="control-panel-heading">Recent Revisions</div>
+      <h2 class="control-panel-heading">Recent Revisions</h2>
       <div class="control-panel-body">
          <?php
          $LastDay = '';
