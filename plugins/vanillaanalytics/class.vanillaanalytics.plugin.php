@@ -7,15 +7,15 @@
  * @package vanillaanalytics
  */
 
-$PluginInfo['vanillaanalytics'] = array(
+$PluginInfo['vanillaanalytics'] = [
     'Name' => 'Vanilla Analytics',
     'Description' => 'Track important trends on your forum and chart them in a customizable dashboard.',
     'Version' => '1.0.4',
     'RequiredApplications' => array('Vanilla' => '2.2.103'),
     'Author' => 'Ryan Perry',
     'AuthorEmail' => 'ryan.p@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.org/profile/initvector'
-);
+    'AuthorUrl' => 'http://vanillaforums.org/profile/initvector',
+];
 
 /**
  * Facilitate the tracking of events from Vanilla to one (or more) analytics services.
@@ -62,7 +62,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
             'section' => 'Analytics',
             'title' => 'Analytics',
             'description' => 'Visualize Your Community',
-            'url' => '/settings/analytics/dashboard/traffic'
+            'url' => '/analytics/dashboard/traffic'
         ];
 
         $nav->registerSection($section);
@@ -79,7 +79,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
                 'Garden.Settings.Manage',
                 'Analytics',
                 t('My Dashboard'),
-                'settings/analytics/dashboard/'.AnalyticsDashboard::DASHBOARD_PERSONAL,
+                'analytics/dashboard/'.AnalyticsDashboard::DASHBOARD_PERSONAL,
                 'analytics.my-dashboard'
             );
         }
@@ -90,7 +90,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
                     'Garden.Settings.Manage',
                     'Analytics',
                     t($dashboard->getTitle()),
-                    "settings/analytics/dashboard/{$dashboard->dashboardID}",
+                    "analytics/dashboard/{$dashboard->dashboardID}",
                     "analytics.{$dashboard->dashboardID}"
                 );
             }
@@ -138,198 +138,6 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $data = AnalyticsData::getComment(val('CommentID', $args));
 
         AnalyticsTracker::getInstance()->trackEvent('post_modify', 'comment_delete', $data);
-    }
-
-    /**
-     * Save a widget to the current user's personal dashboard.
-     *
-     * @param Gdn_Controller $sender
-     * @param array $requestArgs
-     */
-    public function controller_bookmarkWidget($sender, $requestArgs) {
-        list($widgetID, $dashboardID) = $requestArgs;
-
-        $dashboardModel = new AnalyticsDashboard();
-        $widgetModel = new AnalyticsWidget();
-        $widget = $widgetModel->getID($widgetID);
-        $userID = Gdn::session()->UserID;
-
-        if ($widget) {
-            if ($widget->isBookmarked()) {
-                $dashboardModel->removeWidget(
-                    $widgetID,
-                    AnalyticsDashboard::DASHBOARD_PERSONAL,
-                    $userID
-                );
-                $bookmarked = false;
-
-                $sender->jsonTarget(
-                    "#analytics_widget_{$widgetID}",
-                    'removeAnalyticsWidget',
-                    'Callback'
-                );
-                $sender->informMessage(t('Unpinned widget'));
-            } else {
-                $dashboardModel->addWidget(
-                    $widgetID,
-                    AnalyticsDashboard::DASHBOARD_PERSONAL,
-                    $userID
-                );
-                $bookmarked = true;
-
-                $sender->informMessage(t('Pinned widget'));
-            }
-
-            $html = anchor(
-                dashboardSymbol('pin'),
-                "/settings/analytics/bookmarkwidget/{$widgetID}",
-                'Hijack bookmark'.($bookmarked ? ' bookmarked' : '')
-//                array('title' => $widget->getTitle())
-            );
-            $sender->jsonTarget('!element', $html, 'ReplaceWith');
-        } else {
-            $sender->informMessage(t('Invalid widget ID'));
-        }
-
-        $sender->deliveryMethod(DELIVERY_METHOD_JSON);
-        $sender->deliveryTYpe(DELIVERY_TYPE_MESSAGE);
-        $sender->render('Blank', 'Utility');
-    }
-
-    /**
-     * Handle requests for the analytics index in Vanilla's dashboard.
-     *
-     * @param Gdn_Controller $sender
-     */
-    public function controller_index($sender) {
-        redirect('settings');
-    }
-
-    /**
-     * Generate data for leaderboards.
-     */
-    public function controller_leaderboard($sender, $requestArgs) {
-        // Pull data from the request arguments and verify they're usable.
-        list($widget, $size) = $requestArgs;
-
-        if (empty($widget)) {
-            throw new Gdn_UserException('Leaderboard widget required.');
-        }
-
-        // Verify the slug is a valid leaderboard widget.
-        $defaultWidgets = AnalyticsTracker::getInstance()->getDefaultWidgets();
-        $widget = val($widget, $defaultWidgets);
-        if (!$widget || $widget->getType() !== 'leaderboard') {
-            throw new Gdn_UserException('Invalid leaderboard widget.');
-        }
-        $leaderboard = new AnalyticsLeaderboard();
-
-        // Verify we have a query to run.
-        $sender->title($widget->getTitle());
-        $query = val('query', $widget->getData());
-        if (!$query) {
-            throw new Gdn_UserException('No query available.');
-        }
-        $leaderboard->setQuery($query);
-        $leaderboard->setPreviousQuery(clone $query);
-
-        $sender->setData(
-            'Leaderboard',
-            $leaderboard->lookupData(
-                @strtotime(Gdn::request()->get('Start')),
-                @strtotime(Gdn::request()->get('End'))
-            )
-        );
-        $sender->render($sender->fetchViewLocation('leaderboard', '', 'plugins/vanillaanalytics'));
-    }
-
-    /**
-     * Handle requests for an analytics dashboard.
-     *
-     * @param Gdn_Controller $sender
-     * @param $requestArgs
-     */
-    public function controller_dashboard($sender, $requestArgs) {
-        list($dashboardID) = $requestArgs;
-
-        if (empty($dashboardID)) {
-            redirect('settings');
-        }
-        $sender->addCssFile('vendors.min.css', 'plugins/vanillaanalytics');
-
-        $sender->addJsFile('vendors/d3.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('vendors/c3.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('dashboard.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('analyticsdashboard.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('analyticswidget.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('analyticstoolbar.min.js', 'plugins/vanillaanalytics');
-        $sender->addJsFile('vendors/jquery-ui.min.js', 'plugins/vanillaanalytics');
-
-
-        // Translations
-        $sender->addDefinition('Unpin from your dashboard', t('Unpin from your dashboard'));
-        $sender->addDefinition('Pin to your dashboard', t('Pin to your dashboard'));
-
-        $dashboardModel = new AnalyticsDashboard();
-        $dashboard = $dashboardModel->getID($dashboardID);
-
-        if ($dashboard) {
-            Gdn_Theme::section('Analytics');
-            $dashboardModel->render($sender, $dashboard);
-        } else {
-            redirect('settings');
-        }
-    }
-
-    /**
-     * Sort the widgets in a custom dashboard.
-     *
-     * @param Gdn_Controller $sender
-     * @param array $requestArgs
-     * @throws
-     */
-    public function controller_dashboardSort($sender, $requestArgs) {
-        if (!Gdn::request()->isPostBack()) {
-            throw new Gdn_UserException('POST required.', 403);
-        }
-
-        $transientKey = Gdn::request()->getValueFrom(Gdn_Request::INPUT_POST, 'TransientKey', false);
-
-        // If this isn't a postback then return false if there isn't a transient key.
-        if (!$transientKey) {
-            throw new Gdn_UserException('No CSRF token provided.', 403);
-        }
-
-        if (!Gdn::session()->validateTransientKey($transientKey)) {
-            throw new Gdn_UserException('The CSRF token is invalid.', 403);
-        }
-
-        list($dashboardID) = $requestArgs;
-        $success = true;
-        $widgets = Gdn::request()->getValueFrom(Gdn_Request::INPUT_POST, 'Widgets', []);
-
-        foreach ($widgets as $widgetID => $position) {
-            try {
-                Gdn::sql()->update(
-                    'AnalyticsDashboardWidget',
-                    ['Sort' => $position],
-                    [
-                        'DashboardID' => $dashboardID,
-                        'WidgetID' => $widgetID
-                    ]
-                )->put();
-            } catch (Exception $e) {
-                $success = false;
-            }
-        }
-
-        $sender->setData('DashboardID', $dashboardID);
-        $sender->setData('Widgets', $widgets);
-        $sender->setData('Success', $success);
-
-        $sender->deliveryType(DELIVERY_TYPE_DATA);
-        $sender->deliveryMethod(DELIVERY_METHOD_JSON);
-        $sender->render();
     }
 
     /**
@@ -512,19 +320,6 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $event = val('Total', $reactionData) > 0 ? 'reaction_add' : 'reaction_delete';
 
         AnalyticsTracker::getInstance()->trackEvent('reaction', $event, $data);
-    }
-
-    /**
-     * Add our primary analytics pages.
-     *
-     * @param Gdn_Controller $sender An instance of the settings controller.
-     * @param string $entityType The resource type (e.g. dashboard)
-     * @param string $entityID The unique identifier for the resource
-     */
-    public function settingsController_analytics_create($sender, $entityType = false, $entityID = false) {
-        $sender->permission('Garden.Settings.Manage');
-
-        $this->dispatch($sender, $sender->RequestArgs);
     }
 
     /**

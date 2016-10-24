@@ -679,7 +679,7 @@ KeenIOWidget.prototype.writeContents = function(container, forceNewElement) {
                     Start: range.start,
                     End: range.end
                 };
-                var url = gdn.url("/settings/analytics/leaderboard/" + widgetID);
+                var url = gdn.url("/analytics/leaderboard/" + widgetID);
                 AnalyticsWidget.popin(container, url, parameters);
                 break;
             default:
