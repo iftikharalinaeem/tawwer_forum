@@ -112,7 +112,7 @@ function AnalyticsWidget(config) {
         } else {
             newElements.bookmark.setAttribute('class', 'Hijack bookmark');
         }
-        newElements.bookmark.setAttribute('href', gdn.url('/settings/analytics/bookmarkwidget/' + this.getWidgetID()));
+        newElements.bookmark.setAttribute('href', gdn.url('/analytics/bookmarkwidget/' + this.getWidgetID()));
         newElements.bookmark.innerHTML = dashboardSymbol('pin');
 
         // Metrics are a special case where a title is redundant.  Otherwise, we need a title element.

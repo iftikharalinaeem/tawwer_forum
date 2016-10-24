@@ -297,22 +297,6 @@ class AnalyticsDashboard implements JsonSerializable {
     }
 
     /**
-     * Render an analytics dashboard page.
-     *
-     * @param Gdn_Controller $sender
-     * @param AnalyticsDashboard $dashboard
-     */
-    public function render(Gdn_Controller $sender, AnalyticsDashboard $dashboard) {
-
-
-        $sender->setData('Title', sprintf(t('Analytics: %1$s'), $dashboard->getTitle()));
-        $sender->setData('AnalyticsDashboard', $dashboard);
-        $sender->addDefinition('analyticsDashboard', $dashboard);
-
-        $sender->render('analytics', false, 'plugins/vanillaanalytics');
-    }
-
-    /**
      * Set this dashboard's unique identifier.
      *
      * @param string $dashboardID A unique identifier for this instance.

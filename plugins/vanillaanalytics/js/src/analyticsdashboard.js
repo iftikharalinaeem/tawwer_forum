@@ -431,7 +431,7 @@ AnalyticsDashboard.prototype.writeDashboard = function() {
         this.emptyPanelContainer(panelID);
         this.writePanel(panelID);
     }
-    
+
     this.setUpPinTooltips();
 
     if (this.isPersonal()) {
