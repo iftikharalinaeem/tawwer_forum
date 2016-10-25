@@ -8,6 +8,7 @@ $PluginInfo['dblogger'] = array(
     'Name' => 'Db Logger',
     'Description' => 'Enable database logging.',
     'Version' => '1.3.0',
+    'Icon' => 'db_logger.png',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',

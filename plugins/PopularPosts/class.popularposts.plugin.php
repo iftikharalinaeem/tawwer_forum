@@ -11,6 +11,7 @@ $PluginInfo['PopularPosts'] = array(
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'HasLocale' => false,
     'License' => 'GNU GPL2',
+    'Icon' => 'popular_posts.png',
     'SettingsUrl' => '/settings/popularPosts',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => 'Alexandre (DaazKu) Chouinard',

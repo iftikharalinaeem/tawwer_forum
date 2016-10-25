@@ -11,6 +11,7 @@ $PluginInfo['DisqusImporter'] = array(
    'Version' => '1.0.1a',
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'MobileFriendly' => FALSE,
+   'Icon' => 'disqus_importer.png',
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
