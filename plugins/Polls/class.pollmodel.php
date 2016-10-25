@@ -27,8 +27,8 @@ class PollModel extends Gdn_Model {
      * @param int $DiscussionID
      * @return array
      */
-    public function getByDiscussionID($DiscussionID) {
-        return $this->getWhere(array('DiscussionID' => $DiscussionID))->firstRow();
+    public function getByDiscussionID($discussionID) {
+        return $this->getWhere(array('DiscussionID' => $discussionID))->firstRow();
     }
 
     /**
@@ -39,29 +39,29 @@ class PollModel extends Gdn_Model {
      * @param array $UserIDs
      * @return array array of UserID => PollVote/PollOptions.
      */
-    public function getVotesByUserID($PollID, $UserIDs) {
-        if (empty($UserIDs)) {
+    public function getVotesByUserID($pollID, $userIDs) {
+        if (empty($userIDs)) {
             return [];
         }
 
-        $Data = $this->SQL
+        $data = $this->SQL
             ->select('pv.UserID, po.*')
             ->from('PollVote pv')
             ->join('PollOption po', 'po.PollOptionID = pv.PollOptionID')
-            ->whereIn('pv.UserID', $UserIDs)
-            ->where('po.PollID', $PollID)
+            ->whereIn('pv.UserID', $userIDs)
+            ->where('po.PollID', $pollID)
             ->get();
 
-        $Return = [];
-        foreach ($Data as $Row) {
-            $Return[val('UserID', $Row)] = [
-                 'PollOptionID' => val('PollOptionID', $Row),
-                 'Body' => val('Body', $Row),
-                 'Format' => val('Format', $Row),
-                 'Sort' => val('Sort', $Row)
+        $return = [];
+        foreach ($data as $row) {
+            $return[val('UserID', $row)] = [
+                 'PollOptionID' => val('PollOptionID', $row),
+                 'Body' => val('Body', $row),
+                 'Format' => val('Format', $row),
+                 'Sort' => val('Sort', $row)
             ];
         }
-        return $Return;
+        return $return;
     }
 
     /**
@@ -79,10 +79,10 @@ class PollModel extends Gdn_Model {
         if (c('Plugins.Polls.AnonymousPolls')) {
             $formPostValues['Anonymous'] = 1;
         }
-        $Session = Gdn::session();
+        $session = Gdn::session();
         $formPostValues['Type'] = 'poll'; // Force the "poll" discussion type.
-        $DiscussionID = 0;
-        $DiscussionModel = new DiscussionModel();
+        $discussionID = 0;
+        $discussionModel = new DiscussionModel();
 
         // Make the discussion body not required while creating a new poll.
         // This saves in memory, but not to the file:
@@ -94,7 +94,7 @@ class PollModel extends Gdn_Model {
         // Add & apply any extra validation rules:
 
         // New poll? Set default category ID if none is defined.
-        if (!arrayValue('DiscussionID', $formPostValues, '')) {
+        if (!val('DiscussionID', $formPostValues, '')) {
             if (!val('CategoryID', $formPostValues) && !c('Vanilla.Categories.Use')) {
                 $formPostValues['CategoryID'] = val('CategoryID', CategoryModel::defaultCategory(), -1);
             }
@@ -102,94 +102,94 @@ class PollModel extends Gdn_Model {
 
         // This should have been done in discussion model:
         // Validate category permissions.
-        $CategoryID = val('CategoryID', $formPostValues);
-        if ($CategoryID > 0) {
-            $Category = CategoryModel::categories($CategoryID);
-            if ($Category && !$Session->checkPermission('Vanilla.Discussions.Add', true, 'Category', val('PermissionCategoryID', $Category))) {
+        $categoryID = val('CategoryID', $formPostValues);
+        if ($categoryID > 0) {
+            $category = CategoryModel::categories($categoryID);
+            if ($category && !$session->checkPermission('Vanilla.Discussions.Add', true, 'Category', val('PermissionCategoryID', $category))) {
                 $this->Validation->addValidationResult('CategoryID', 'You do not have permission to create polls in this category');
             }
         }
 
         // This should have been done in discussion model:
         // Make sure that the title will not be invisible after rendering
-        $Name = trim(val('Name', $formPostValues, ''));
-        if ($Name != '' && Gdn_Format::text($Name) == '') {
+        $name = trim(val('Name', $formPostValues, ''));
+        if ($name != '' && Gdn_Format::text($name) == '') {
             $this->Validation->addValidationResult('Name', 'You have entered an invalid poll title.');
         } else {
             // Trim the name.
-            $formPostValues['Name'] = $Name;
+            $formPostValues['Name'] = $name;
         }
 
         $this->EventArguments['FormPostValues'] = &$formPostValues;
-		$this->EventArguments['DiscussionID'] = $DiscussionID;
+		$this->EventArguments['DiscussionID'] = $discussionID;
 		$this->fireAs('DiscussionModel')->fireEvent('BeforeSaveDiscussion');
 
         // Validate the discussion model's form fields
-        $DiscussionModel->validate($formPostValues, true);
+        $discussionModel->validate($formPostValues, true);
 
         // Unset the body validation results (they're not required).
-        $DiscussionValidationResults = $DiscussionModel->Validation->results();
-        if (array_key_exists('Body', $DiscussionValidationResults)) {
-            unset($DiscussionValidationResults['Body']);
+        $discussionValidationResults = $discussionModel->Validation->results();
+        if (array_key_exists('Body', $discussionValidationResults)) {
+            unset($discussionValidationResults['Body']);
         }
 
         // And add the results to this validation object so they bubble up to the form.
-        $this->Validation->addValidationResult($DiscussionValidationResults);
+        $this->Validation->addValidationResult($discussionValidationResults);
 
         // Are there enough non-empty poll options?
-        $PollOptions = val('PollOption', $formPostValues);
-        $ValidPollOptions = array();
-        if (is_array($PollOptions))
-            foreach ($PollOptions as $PollOption) {
-                $PollOption = trim(Gdn_Format::plainText($PollOption));
-                if ($PollOption != '') {
-                    $ValidPollOptions[] = $PollOption;
+        $pollOptions = val('PollOption', $formPostValues);
+        $validPollOptions = array();
+        if (is_array($pollOptions))
+            foreach ($pollOptions as $pollOption) {
+                $pollOption = trim(Gdn_Format::plainText($pollOption));
+                if ($pollOption != '') {
+                    $validPollOptions[] = $pollOption;
                 }
             }
 
-        $CountValidOptions = count($ValidPollOptions);
-        if ($CountValidOptions < 2) {
+        $countValidOptions = count($validPollOptions);
+        if ($countValidOptions < 2) {
             $this->Validation->addValidationResult('PollOption', 'You must provide at least 2 valid poll options.');
         }
-        if ($CountValidOptions > 10) {
+        if ($countValidOptions > 10) {
             $this->Validation->addValidationResult('PollOption', 'You can not specify more than 10 poll options.');
         }
-        $DiscussionModel->EventArguments['PollOptions'] = $ValidPollOptions;
+        $discussionModel->EventArguments['PollOptions'] = $validPollOptions;
 
         // If all validation passed, create the discussion with discmodel, and then insert all of the poll data.
         if (count($this->Validation->results()) == 0) {
-            $DiscussionID = $DiscussionModel->save($formPostValues);
-            if ($DiscussionID > 0) {
-                $Discussion = $DiscussionModel->getID($DiscussionID);
+            $discussionID = $discussionModel->save($formPostValues);
+            if ($discussionID > 0) {
+                $discussion = $discussionModel->getID($discussionID);
                 // Save the poll record.
-                $Poll = [
-                    'Name' => $Discussion->Name,
+                $poll = [
+                    'Name' => $discussion->Name,
                     'Anonymous' => val('Anonymous', $formPostValues),
-                    'DiscussionID' => $DiscussionID,
-                    'CountOptions' => $CountValidOptions,
+                    'DiscussionID' => $discussionID,
+                    'CountOptions' => $countValidOptions,
                     'CountVotes' => 0
                 ];
-                $Poll = $this->coerceData($Poll);
-                $PollID = $this->insert($Poll);
+                $poll = $this->coerceData($poll);
+                $pollID = $this->insert($poll);
 
                 // Save the poll options.
-                $PollOptionModel = new Gdn_Model('PollOption');
+                $pollOptionModel = new Gdn_Model('PollOption');
                 $i = 0;
-                foreach ($ValidPollOptions as $Option) {
+                foreach ($validPollOptions as $option) {
                     $i++;
-                    $PollOption = [
-                        'PollID' => $PollID,
-                        'Body' => $Option,
+                    $pollOption = [
+                        'PollID' => $pollID,
+                        'Body' => $option,
                         'Format' => 'Text',
                         'Sort' => $i
                     ];
-                    $PollOptionModel->save($PollOption);
+                    $pollOptionModel->save($pollOption);
                 }
                 // Update the discussion attributes with info
             }
         }
 
-        return $DiscussionID;
+        return $discussionID;
     }
 
     /**
@@ -199,35 +199,35 @@ class PollModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function vote($PollOptionID) {
+    public function vote($pollOptionID) {
         // Get objects from the database.
-        $Session = Gdn::session();
-        $PollOptionModel = new Gdn_Model('PollOption');
-        $PollOption = $PollOptionModel->getID($PollOptionID);
+        $session = Gdn::session();
+        $pollOptionModel = new Gdn_Model('PollOption');
+        $pollOption = $pollOptionModel->getID($pollOptionID);
 
         // If this is a valid poll option and user session, record the vote.
-        if ($PollOption && $Session->isValid()) {
+        if ($pollOption && $session->isValid()) {
             // Has this user voted on this poll before?
-            $HasVoted = ($this->SQL
+            $hasVoted = ($this->SQL
                 ->select()
                 ->from('PollVote')
-                ->where(array('UserID' => $Session->UserID, 'PollOptionID' => $PollOptionID))
+                ->where(array('UserID' => $session->UserID, 'PollOptionID' => $pollOptionID))
                 ->get()->numRows() > 0);
-            if (!$HasVoted) {
+            if (!$hasVoted) {
                 // Insert the vote
-                $PollVoteModel = new Gdn_Model('PollVote');
-                $PollVoteModel->insert(['UserID' => $Session->UserID, 'PollOptionID' => $PollOptionID]);
+                $pollVoteModel = new Gdn_Model('PollVote');
+                $pollVoteModel->insert(['UserID' => $session->UserID, 'PollOptionID' => $pollOptionID]);
 
                 // Update the vote counts
-                $PollOptionModel->update(['CountVotes' => val('CountVotes', $PollOption, 0)+1], ['PollOptionID' => $PollOptionID]);
-                $Poll = $this->getID(val('PollID', $PollOption));
-                $this->update(['CountVotes' => val('CountVotes', $Poll, 0)+1], ['PollID' => val('PollID', $PollOption)]);
+                $pollOptionModel->update(['CountVotes' => val('CountVotes', $pollOption, 0)+1], ['PollOptionID' => $pollOptionID]);
+                $poll = $this->getID(val('PollID', $pollOption));
+                $this->update(['CountVotes' => val('CountVotes', $poll, 0)+1], ['PollID' => val('PollID', $pollOption)]);
 
-                $this->EventArguments['Poll'] = (array)$Poll;
-                $this->EventArguments['PollOption'] = (array)$PollOption;
+                $this->EventArguments['Poll'] = (array)$poll;
+                $this->EventArguments['PollOption'] = (array)$pollOption;
                 $this->fireEvent('Vote');
 
-                return $PollOptionID;
+                return $pollOptionID;
             }
         }
         return false;

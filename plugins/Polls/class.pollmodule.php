@@ -41,9 +41,9 @@ class PollModule extends Gdn_Module {
         $String = '';
         ob_start();
         include(PATH_PLUGINS.'/Polls/views/poll.php');
-        $String = ob_get_contents();
+        $string = ob_get_contents();
         @ob_end_clean();
-        return $String;
+        return $string;
     }
 
     /**
@@ -52,43 +52,43 @@ class PollModule extends Gdn_Module {
      * @throws Exception
      */
     private function loadPoll() {
-        $PollModel = new PollModel();
-        $Poll = false;
-        $PollID = Gdn::controller()->data('PollID');
-        $Discussion = Gdn::controller()->data('Discussion');
+        $pollModel = new PollModel();
+        $poll = false;
+        $pollID = Gdn::controller()->data('PollID');
+        $discussion = Gdn::controller()->data('Discussion');
 
         // Look in the controller for a PollID
-        if ($PollID > 0) {
-            $Poll = $PollModel->getID($PollID);
+        if ($pollID > 0) {
+            $poll = $pollModel->getID($pollID);
         }
 
         // Failing that, look for a DiscussionID
-        if (!$Poll && $Discussion) {
-            $Poll = $PollModel->getByDiscussionID(val('DiscussionID', $Discussion));
+        if (!$poll && $discussion) {
+            $poll = $pollModel->getByDiscussionID(val('DiscussionID', $discussion));
         }
 
-        if ($Poll) {
+        if ($poll) {
             // Load the poll options
-            $PollID = val('PollID', $Poll);
-            $OptionData = $this->getPollOptions($PollID);
-            $PollOptions = $this->joinPollVotes($OptionData, $Poll, $PollModel);
+            $pollID = val('PollID', $poll);
+            $optionData = $this->getPollOptions($pollID);
+            $pollOptions = $this->joinPollVotes($optionData, $poll, $pollModel);
 
             // Has this user voted?
-            $countVotes = $PollModel->SQL
+            $countVotes = $pollModel->SQL
                 ->select()
                 ->from('PollVote pv')
-                ->where(['pv.UserID' => Gdn::session()->UserID, 'pv.PollOptionID' => array_column($OptionData, 'PollOptionID')])
+                ->where(['pv.UserID' => Gdn::session()->UserID, 'pv.PollOptionID' => array_column($optionData, 'PollOptionID')])
                 ->get()
                 ->numRows();
             $this->setData('UserHasVoted',  ($countVotes > 0));
         }
 
-        $this->EventArguments['Poll'] = &$Poll;
-        $this->EventArguments['PollOptions'] = &$PollOptions;
+        $this->EventArguments['Poll'] = &$poll;
+        $this->EventArguments['PollOptions'] = &$pollOptions;
         $this->fireEvent('AfterLoadPoll');
 
-        $this->setData('PollOptions', $PollOptions);
-        $this->setData('Poll', $Poll);
+        $this->setData('PollOptions', $pollOptions);
+        $this->setData('Poll', $poll);
     }
 
     /**
@@ -112,7 +112,7 @@ class PollModule extends Gdn_Module {
      */
     public function joinPollVotes($optionData, $poll, $pollModel = null) {
         // Load the poll votes
-        $anonymous = val('Anonymous', $poll) || C('Plugins.Polls.AnonymousPolls');
+        $anonymous = val('Anonymous', $poll) || c('Plugins.Polls.AnonymousPolls');
         if (!$anonymous) {
             if (!is_a($pollModel, 'PollModel')) {
                 $pollModel = new PollModel();
@@ -173,8 +173,8 @@ class PollModule extends Gdn_Module {
             Gdn::userModel()->joinUsers($otherVoteData, ['UserID']);
 
             $otherVoteData = Gdn_DataSet::index($otherVoteData, 'PollOptionID', ['Unique' => false]);
-            foreach ($otherVoteData as $ID => $Users) {
-                $votes[$ID] = array_slice($Users, 0, $this->MaxVoteUsers);
+            foreach ($otherVoteData as $ID => $users) {
+                $votes[$ID] = array_slice($users, 0, $this->MaxVoteUsers);
             }
         }
 
