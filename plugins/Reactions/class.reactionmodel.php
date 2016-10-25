@@ -38,9 +38,7 @@ class ReactionModel extends Gdn_Model {
         parent::__construct('Reaction');
         $this->filterFields = array_merge(
             $this->filterFields,
-            [
-                'Save' => 1
-            ]
+            ['Save' => 1]
         );
         $this->PrimaryKey = 'UrlCode';
     }
@@ -1275,7 +1273,8 @@ class ReactionModel extends Gdn_Model {
         }
 
         $reaction = self::reactionTypes($primaryKeyValue);
-        // Edit!
+        // This is an edit. Let's flag the reaction as custom if the above fields are modified.
+        // Otherwise it would be reset on utility/update
         if ($reaction) {
             $diff = false;
             $toCheckForDiff = ['Name', 'Description', 'Class', 'Points'];
