@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-$pluginInfo['Polls'] = [
+$PluginInfo['Polls'] = [
     'Name' => 'Polls',
     'Description' => "Allow users to create and vote on polls.",
     'Version' => '1.2.3',
