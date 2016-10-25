@@ -18,6 +18,7 @@ $PluginInfo['Cleanspeak'] = array(
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'SettingsUrl' => '/settings/cleanspeak',
     'SettingsPermission' => 'Garden.Settings.Manage',
+    'Icon' => 'cleanspeak.png',
     'Author' => 'John Ashton',
     'AuthorEmail' => 'john@vanillaforums.com',
     'AuthorUrl' => 'http://www.github.com/John0x00'

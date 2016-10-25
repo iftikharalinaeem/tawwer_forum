@@ -16,6 +16,7 @@ $PluginInfo['Mustache'] = array(
     'RequiredPlugins' => false,
     'HasLocale' => false,
     'RegisterPermissions' => false,
+    'Icon' => 'internal-plugin.png',
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'

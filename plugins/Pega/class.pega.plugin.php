@@ -13,6 +13,7 @@ $PluginInfo['Pega'] = array(
     'SettingsPermission' => 'Garden.Settings.Manage',
     'RegisterPermissions' => array('Garden.Staff.Allow' => 'Garden.Moderation.Manage'),
     'MobileFriendly' => TRUE,
+    'Icon' => 'pega.png',
     'Author' => 'Patrick Kelly',
     'AuthorEmail' => 'patrick.k@vanillaforums.com',
     'AuthorUrl' => 'http://www.github.com/nervoustwit',

@@ -5,6 +5,7 @@ $PluginInfo['WhosOnline'] = array(
    'Name' => 'Who&rsquo;s Online',
    'Description' => "Adds a list of users currently browsing your site to the sidebar.",
    'Version' => '1.5.1',
+   'Icon' => 'whos_online.png',
    'Author' => "Gary Mardell",
    'AuthorEmail' => 'gary@vanillaplugins.com',
    'AuthorUrl' => 'http://vanillaplugins.com',
