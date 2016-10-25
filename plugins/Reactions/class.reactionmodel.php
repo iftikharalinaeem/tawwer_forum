@@ -1267,28 +1267,12 @@ class ReactionModel extends Gdn_Model {
      */
     public function save($formPostValues, $settings = false) {
         $primaryKeyValue = val($this->PrimaryKey, $formPostValues);
-
         if (!$primaryKeyValue) {
             return false;
         }
 
         $reaction = self::reactionTypes($primaryKeyValue);
-        // This is an edit. Let's flag the reaction as custom if the above fields are modified.
-        // Otherwise it would be reset on utility/update
         if ($reaction) {
-            $diff = false;
-            $toCheckForDiff = ['Name', 'Description', 'Class', 'Points'];
-            foreach($toCheckForDiff as $field) {
-                if ($reaction[$field] !== val($field, $formPostValues)) {
-                    $diff = true;
-                    break;
-                }
-            }
-
-            if ($diff) {
-                $formPostValues['Custom'] = 1;
-            }
-
             // Preserve non modified attribute data
             unset($reaction['Attributes']);
             $formPostValues = array_merge($reaction, $formPostValues);

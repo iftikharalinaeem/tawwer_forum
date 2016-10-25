@@ -162,6 +162,22 @@ class ReactionsController extends DashboardController {
         if ($this->Form->authenticatedPostBack()) {
 
             $this->Form->setFormValue('UrlCode', $UrlCode);
+            $formPostValues = $this->Form->formValues();
+
+            // This is an edit. Let's flag the reaction as custom if the above fields are modified.
+            // Otherwise it would be reset on utility/update
+            $diff = false;
+            $toCheckForDiff = ['Name', 'Description', 'Class', 'Points'];
+            foreach($toCheckForDiff as $field) {
+                if ($Reaction[$field] !== val($field, $formPostValues)) {
+                    $diff = true;
+                    break;
+                }
+            }
+
+            if ($diff) {
+                $this->Form->setFormValue('Custom', 1);
+            }
 
             if ($this->Form->save() !== false) {
                 $Reaction = ReactionModel::reactionTypes($UrlCode);
