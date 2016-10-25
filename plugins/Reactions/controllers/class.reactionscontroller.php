@@ -11,12 +11,15 @@
  */
 class ReactionsController extends DashboardController {
 
+    /* @var Gdn_Form */
+    public $Form;
+
     /**
      *
      */
     public function initialize() {
         parent::initialize();
-        $this->Form = new Gdn_Form;
+        $this->Form = new Gdn_Form();
         $this->Application = 'dashboard';
     }
 
@@ -150,23 +153,40 @@ class ReactionsController extends DashboardController {
         $this->title('Edit Reaction');
         $this->addSideMenu('reactions');
 
-        $reactionModel = new ReactionModel();
         $Reaction = ReactionModel::reactionTypes($UrlCode);
         if (!$Reaction) {
             throw NotFoundException('reaction');
         }
 
         $this->setData('Reaction', $Reaction);
+
+        $reactionModel = new ReactionModel();
+        $this->Form->setModel($reactionModel);
         $this->Form->setData($Reaction);
 
         if ($this->Form->authenticatedPostBack()) {
-            $ReactionData = $this->Form->FormValues();
-            $ReactionData = array_merge($Reaction, $ReactionData);
-            $ReactionID = $reactionModel->defineReactionType($ReactionData);
 
-            if ($ReactionID) {
-                $Reaction['ReactionID'] = $ReactionID;
-                $this->setData('Reaction', $ReactionData);
+            $this->Form->setFormValue('UrlCode', $UrlCode);
+            $formPostValues = $this->Form->formValues();
+
+            // This is an edit. Let's flag the reaction as custom if the above fields are modified.
+            // Otherwise it would be reset on utility/update
+            $diff = false;
+            $toCheckForDiff = ['Name', 'Description', 'Class', 'Points'];
+            foreach($toCheckForDiff as $field) {
+                if ($Reaction[$field] !== val($field, $formPostValues)) {
+                    $diff = true;
+                    break;
+                }
+            }
+
+            if ($diff) {
+                $this->Form->setFormValue('Custom', 1);
+            }
+
+            if ($this->Form->save() !== false) {
+                $Reaction = ReactionModel::reactionTypes($UrlCode);
+                $this->setData('Reaction', $Reaction);
 
                 $this->informMessage(t('Reaction saved.'));
                 if ($this->_DeliveryType !== DELIVERY_TYPE_ALL) {
