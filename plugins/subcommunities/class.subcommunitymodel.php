@@ -96,7 +96,18 @@ class SubcommunityModel extends Gdn_Model {
             $altPath = '';
         }
 
-        $alternateUrl = rtrim(Gdn::request()->urlDomain('//')."/$folder/$altPath", '/');
+        $fullPath = "/$folder/$altPath";
+
+        // Are we in a node?  If so, prepend the URL we're building with its slug.
+        if (Gdn::addonManager()->isEnabled('sitenode', \Vanilla\Addon::TYPE_ADDON)) {
+            $siteNode = Gdn::pluginManager()->getPluginInstance('sitenode', Gdn_PluginManager::ACCESS_PLUGINNAME);
+            $nodeSlug = $siteNode->slug();
+            if ($nodeSlug) {
+                $fullPath = "/{$nodeSlug}/{$folder}/{$altPath}";
+            }
+        }
+
+        $alternateUrl = rtrim(Gdn::request()->urlDomain('//').$fullPath, '/');
         return $alternateUrl;
     }
 
