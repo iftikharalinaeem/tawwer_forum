@@ -15,8 +15,9 @@ class UserAlertModel extends Gdn_Model {
      */
     public function getID($ID, $DatasetType = false, $Options = array()) {
         $Row = parent::getID($ID, DATASET_TYPE_ARRAY);
-        if (empty($Row))
+        if (empty($Row)) {
             return $Row;
+        }
         $Row = $this->expandAttributes($Row);
         return $Row;
     }

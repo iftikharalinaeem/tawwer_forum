@@ -1,41 +1,41 @@
 <?php if (!defined('APPLICATION')) exit();
 
 Gdn::structure()->table('UserNote')
-   ->primaryKey('UserNoteID')
-   ->column('Type', 'varchar(10)')
+    ->primaryKey('UserNoteID')
+    ->column('Type', 'varchar(10)')
     ->column('UserID', 'int', false, 'index.userdate')
     ->column('Body', 'text', false)
-   ->column('Format', 'varchar(10)')
-   ->column('RecordType', 'varchar(20)', true)
-   ->column('RecordID', 'int', true)
-   ->column('InsertUserID', 'int', false, 'key')
-   ->column('DateInserted', 'datetime', false, 'index.userdate')
-   ->column('InsertIPAddress', 'ipaddress', false)
-   ->column('UpdateUserID', 'int', true)
-   ->column('DateUpdated', 'datetime', true)
-   ->column('UpdateIPAddress', 'ipaddress', true)
-   ->column('Attributes', 'text', true)
-   ->set();
+    ->column('Format', 'varchar(10)')
+    ->column('RecordType', 'varchar(20)', true)
+    ->column('RecordID', 'int', true)
+    ->column('InsertUserID', 'int', false, 'key')
+    ->column('DateInserted', 'datetime', false, 'index.userdate')
+    ->column('InsertIPAddress', 'ipaddress', false)
+    ->column('UpdateUserID', 'int', true)
+    ->column('DateUpdated', 'datetime', true)
+    ->column('UpdateIPAddress', 'ipaddress', true)
+    ->column('Attributes', 'text', true)
+    ->set();
 
 Gdn::structure()->table('UserAlert')
     ->column('UserID', 'int', false, 'primary')
-   ->column('WarningLevel', 'smallint', '0')
+    ->column('WarningLevel', 'smallint', '0')
     ->column('TimeWarningExpires', 'uint', true)
     ->column('TimeExpires', 'uint', true, 'index')
-   ->column('DateInserted', 'datetime')
+    ->column('DateInserted', 'datetime')
     ->column('Attributes', 'text', true)
-   ->set();
+    ->set();
 
 $WarningTypeExists = Gdn::structure()->tableExists('WarningType');
 
 Gdn::structure()->table('WarningType')
-   ->primaryKey('WarningTypeID')
+    ->primaryKey('WarningTypeID')
     ->column('Name', 'varchar(20)', false, 'unique')
     ->column('Description', 'text', true)
-   ->column('Points', 'smallint', '0')
-   ->column('ExpireNumber', 'smallint', '0')
+    ->column('Points', 'smallint', '0')
+    ->column('ExpireNumber', 'smallint', '0')
     ->column('ExpireType', array('hours', 'days', 'weeks', 'months'), true)
-   ->set();
+    ->set();
 
 if (!$WarningTypeExists) {
     Gdn::sql()->replace(
@@ -61,5 +61,5 @@ if (!$WarningTypeExists) {
 }
 
 Gdn::structure()->table('User')
-   ->column('Punished', 'tinyint', '0')
-   ->set();
+    ->column('Punished', 'tinyint', '0')
+    ->set();
