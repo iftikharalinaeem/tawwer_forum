@@ -39,7 +39,7 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      * Display a user's vote in their author info.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
     public function base_beforeCommentBody_handler($sender) {
         $comment = val('Comment', $sender->EventArguments);
@@ -59,8 +59,8 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
     public function base_discussionTypes_handler($sender, $args) {
         $args['Types']['Poll'] = [
@@ -76,7 +76,7 @@ class PollsPlugin extends Gdn_Plugin {
      * Allows users to vote on a poll. Redirects them back to poll discussion, or
      * returns the module html if ajax request.
      *
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      */
     public function discussionController_pollVote_create($sender) {
         $session = Gdn::session();
@@ -123,7 +123,7 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      * Load comment votes on discussion.
      *
-     * @param type $Sender
+     * @param type $sender
      */
     public function discussionController_render_before($sender) {
         $this->_loadVotes($sender);
@@ -132,7 +132,7 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      * Load user votes data based on the discussion in the controller data.
      *
-     * @param type $Sender
+     * @param type $sender
      * @return type
      */
     private function _loadVotes($sender) {
@@ -204,7 +204,7 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      * Display the Poll label on the discussion list.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
     public function base_beforeDiscussionMeta_handler($sender) {
         $discussion = $sender->EventArguments['Discussion'];
@@ -223,7 +223,7 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Sender
+     * @param $sender
      */
     protected function _addCss($sender) {
         $discussions = $sender->data('Discussions');
@@ -239,7 +239,7 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Sender
+     * @param $sender
      */
     public function categoriesController_render_before($sender) {
         $this->_addCss($sender);
@@ -248,7 +248,7 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      * Add our CSS.
      *
-     * @param AssetModel $Sender
+     * @param AssetModel $sender
      */
     public function assetModel_styleCss_handler($sender, $args) {
         $sender->addCssFile('polls.css', 'plugins/Polls');
@@ -257,7 +257,7 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      * Add the poll form to vanilla's post page.
      *
-     * @param PostController $Sender
+     * @param PostController $sender
      */
     public function PostController_AfterForms_Handler($sender) {
         $forms = $sender->data('Forms');
@@ -345,8 +345,8 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param PromotedContentModule $Sender
-     * @param array $Args
+     * @param PromotedContentModule $sender
+     * @param array $args
      */
     public function promotedContentModule_afterBody_handler($sender, $args) {
         $type = valr('Content.Type', $sender->EventArgs);
@@ -358,7 +358,7 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      * Display the poll on the discussion.
      *
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      */
     public function discussionController_afterDiscussionBody_handler($sender) {
         $discussion = $sender->data('Discussion');

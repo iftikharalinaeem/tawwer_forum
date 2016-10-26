@@ -24,7 +24,7 @@ class PollModel extends Gdn_Model {
     /**
      * Get the poll info based on the associated discussion id.
      * 
-     * @param int $DiscussionID
+     * @param int $discussionID
      * @return array
      */
     public function getByDiscussionID($discussionID) {
@@ -35,8 +35,8 @@ class PollModel extends Gdn_Model {
      * Returns an array of UserID => PollVote/PollOption info. Used to display a
      * users vote on their comment in a discussion.
      *
-     * @param int $PollID
-     * @param array $UserIDs
+     * @param int $pollID
+     * @param array $userIDs
      * @return array array of UserID => PollVote/PollOptions.
      */
     public function getVotesByUserID($pollID, $userIDs) {
@@ -195,7 +195,7 @@ class PollModel extends Gdn_Model {
     /**
      *
      *
-     * @param $PollOptionID
+     * @param $pollOptionID
      * @return bool
      * @throws Exception
      */
