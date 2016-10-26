@@ -416,7 +416,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         $UserID = $sender->data('Profile.UserID');
 
         if (Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false)) {
-            $sender->setData('Actions'.'Warn', [
+            $sender->setData('Actions.Warn', [
                 'Text' => sprite('SpWarn'),
                 'Title' => t('Warn'),
                 'Url' => '/profile/warn?userid='.$UserID,
@@ -425,7 +425,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         if (Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.Add'), false)) {
-            $sender->setData('Actions'.'Note', [
+            $sender->setData('Actions.Note', [
                 'Text' => sprite('SpNote'),
                 'Title' => t('Add Note'),
                 'Url' => '/profile/note?userid='.$UserID,
@@ -434,7 +434,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         if (Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false)) {
-            $sender->setData('Actions'.'Notes', [
+            $sender->setData('Actions.Notes', [
                 'Text' => '<span class="Count">notes</span>',
                 'Title' => t('Notes & Warnings'),
                 'Url' => userUrl($sender->data('Profile'), '', 'notes'),
