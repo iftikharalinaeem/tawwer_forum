@@ -210,8 +210,8 @@ class KeenIOTracker implements TrackerInterface {
             'type' => 'chart',
             'chart' => ['chartType' => 'area']
         ],
-        'posting-average-by-active-users' => [
-            'title' => 'Posting Average by Active Users',
+        'average-posts-by-active-users' => [
+            'title' => 'Average Posts by Active Users',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
             'chart' => ['chartType' => 'area'],
@@ -702,8 +702,8 @@ class KeenIOTracker implements TrackerInterface {
 
         $this->widgets['visits-by-active-users']['query'] = $visitsByActiveUsersQuery;
 
-        // Posting Average by Active Users
-        $this->widgets['posting-average-by-active-users']['query'] = [$postsQuery, $activeUsersQuery];
+        // Average Posts by Active Users
+        $this->widgets['average-posts-by-active-users']['query'] = [$postsQuery, $activeUsersQuery];
     }
 
     /**
