@@ -1,5 +1,7 @@
 var analyticsToolbar = {
 
+    inited: false,
+
     maxTicks: 200,
 
     /**
@@ -36,7 +38,7 @@ var analyticsToolbar = {
                 if (typeof(widget[method]) === 'function') {
                     valid = widget[method].apply(widget, newValue);
 
-                    if (valid !== false) {
+                    if (window.analyticsToolbar.inited && valid !== false) {
                         widget.render();
                     }
                 }
@@ -68,7 +70,6 @@ var analyticsToolbar = {
         var $cookiedInterval = $('.js-analytics-interval[data-interval="' + interval + '"]');
 
         if (interval !== 'undefined' && $cookiedInterval.length > 0 && !$cookiedInterval.hasClass('disabled')) {
-            
             $cookiedInterval.trigger('click');
         } else {
             // Choose the first good interval.
@@ -94,9 +95,15 @@ $(document).on('change', '#Form_cat01', function() {
 
 // Re-render the graphs with new intervals.
 $(document).on('click', '.js-analytics-interval:not(.disabled)', function() {
+    // Already active..
+    if ($(this).hasClass('active')) {
+        return;
+    }
+
     $('.js-analytics-interval').removeClass('active');
     $(this).addClass('active');
     Cookies.set('va-interval', $(this).data('interval'));
+
     var newInterval = $(this).data('interval');
     analyticsToolbar.setWidgets('setInterval', [newInterval]);
 });
@@ -137,6 +144,8 @@ $(document).ready(function() {
     });
 
     analyticsToolbar.updateIntervals(defaultRange);
+    analyticsToolbar.inited = true;
+
     analyticsToolbar.setWidgets('setRange', [defaultRange]);
 });
 
