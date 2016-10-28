@@ -215,6 +215,18 @@ class KeenIOTracker implements TrackerInterface {
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
             'callback' => 'divideResult'
+        ],
+        'average-comments-per-discussion' => [
+            'title' => 'Average Comments per Discussion',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart',
+            'callback' => 'divideResult'
+        ],
+        'posts-positivity-rate' => [
+            'title' => 'Posts Positivity Rate',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'metric',
+            'callback' => ['divideMetrics', 'formatPercent'],
         ]
     ];
 
@@ -474,6 +486,25 @@ class KeenIOTracker implements TrackerInterface {
 
         $this->widgets['time-to-accept']['query'] = $timeToAcceptQuery;
 
+        $postsQuery = new KeenIOQuery();
+        $postsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Posts'))
+            ->setEventCollection('post');
+
+        // Posts Positivity Rate (metric)
+        $postPositivityRateQuery = new KeenIOQuery();
+        $postPositivityRateQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t($this->widgets['posts-positivity-rate']['title']))
+            ->setEventCollection('reaction')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.reactionClass',
+                'property_value' => 'Positive'
+            ])
+            ->setTargetProperty('keen.id');
+
+        $this->widgets['posts-positivity-rate']['query'] = [$postPositivityRateQuery, $postsQuery];
+
         /**
          * Charts
          */
@@ -696,6 +727,9 @@ class KeenIOTracker implements TrackerInterface {
 
         // Average Posts per Active User
         $this->widgets['average-posts-per-active-user']['query'] = [$postsQuery, $activeUsersQuery];
+
+        // Average Comments per discussion
+        $this->widgets['average-comments-per-discussion']['query'] = [$commentsQuery, $discussionsQuery];
     }
 
     /**
