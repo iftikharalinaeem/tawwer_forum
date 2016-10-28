@@ -28,3 +28,8 @@
 - Contributors (count unique of user ID on posts collection) (M)
 - Contributors by Category
 - Contributors by Role Type
+
+## Engagement
+
+- Visits per Active User
+- Average Posts per Active User

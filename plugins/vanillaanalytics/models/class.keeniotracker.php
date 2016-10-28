@@ -203,6 +203,18 @@ class KeenIOTracker implements TrackerInterface {
             'title' => 'Accepted Answers',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart'
+        ],
+        'visits-per-active-user' => [
+            'title' => 'Visits per Active User',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart',
+            'callback' => 'divideResult'
+        ],
+        'average-posts-per-active-user' => [
+            'title' => 'Average Posts per Active User',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart',
+            'callback' => 'divideResult'
         ]
     ];
 
@@ -678,6 +690,12 @@ class KeenIOTracker implements TrackerInterface {
             ->setInterval('daily');
 
         $this->widgets['answers-accepted']['query'] = $answersAcceptedQuery;
+
+        // Visits per Active User
+        $this->widgets['visits-per-active-user']['query'] = [$visitsQuery, $activeUsersQuery];
+
+        // Average Posts per Active User
+        $this->widgets['average-posts-per-active-user']['query'] = [$postsQuery, $activeUsersQuery];
     }
 
     /**
