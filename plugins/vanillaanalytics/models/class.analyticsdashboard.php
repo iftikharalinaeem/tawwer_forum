@@ -172,8 +172,8 @@ class AnalyticsDashboard implements JsonSerializable {
                 ],
                 'Engagement' => [
                     'widgets' => [
-                        'visits-by-active-user',
-                        'average-posts-by-active-user'
+                        'visits-per-active-user',
+                        'average-posts-per-active-user'
                     ]
                 ]
             ];

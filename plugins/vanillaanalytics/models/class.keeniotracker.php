@@ -204,17 +204,16 @@ class KeenIOTracker implements TrackerInterface {
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart'
         ],
-        'visits-by-active-user' => [
-            'title' => 'Visits by Active User',
+        'visits-per-active-user' => [
+            'title' => 'Visits per Active User',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['chartType' => 'area']
+            'callback' => 'divideResult'
         ],
-        'average-posts-by-active-user' => [
-            'title' => 'Average Posts by Active User',
+        'average-posts-per-active-user' => [
+            'title' => 'Average Posts per Active User',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['chartType' => 'area'],
             'callback' => 'divideResult'
         ]
     ];
@@ -692,18 +691,11 @@ class KeenIOTracker implements TrackerInterface {
 
         $this->widgets['answers-accepted']['query'] = $answersAcceptedQuery;
 
-        // Visits by Active User
-        $visitsByActiveUsersQuery = new KeenIOQuery();
-        $visitsByActiveUsersQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
-            ->setTitle(t($this->widgets['visits-by-active-user']['title']))
-            ->setEventCollection('session')
-            ->setTargetProperty('user.sessionID')
-            ->setInterval('daily');
+        // Visits per Active User
+        $this->widgets['visits-per-active-user']['query'] = [$visitsQuery, $activeUsersQuery];
 
-        $this->widgets['visits-by-active-user']['query'] = $visitsByActiveUsersQuery;
-
-        // Average Posts by Active User
-        $this->widgets['average-posts-by-active-user']['query'] = [$postsQuery, $activeUsersQuery];
+        // Average Posts per Active User
+        $this->widgets['average-posts-per-active-user']['query'] = [$postsQuery, $activeUsersQuery];
     }
 
     /**
