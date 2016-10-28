@@ -254,15 +254,15 @@ function AnalyticsWidget(config) {
     };
 
     /**
-     * @param {string} newCallback
+     * @param {string|array} newCallback
      * @return this
      */
-    this.setCallback = function(newCallback) {
+    this.setCallbacks = function(newCallbacks) {
         if (handler !== null) {
-            handler.setCallback(newCallback);
+            handler.setCallbacks(newCallbacks);
             return this;
         } else {
-            throw 'No handler present for callback';
+            throw 'No handler present for callbacks';
         }
     };
 
@@ -395,7 +395,7 @@ AnalyticsWidget.prototype.loadConfig = function(config) {
         this.setHandler(config.handler);
 
         if (typeof config.callback !== 'undefined' && config.callback) {
-            this.setCallback(config.callback);
+            this.setCallbacks(config.callback);
         }
     }
 };

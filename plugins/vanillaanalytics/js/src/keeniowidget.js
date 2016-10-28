@@ -8,9 +8,9 @@ function KeenIOWidget(config) {
 
     /**
      *
-     * @type {null|function}
+     * @type {null|array\function}
      */
-    var callback = null;
+    var callbacks = null;
 
     /**
      * @type {object}
@@ -111,10 +111,10 @@ function KeenIOWidget(config) {
 
     /**
      *
-     * @returns {null|function}
+     * @returns {null|array|function}
      */
-    this.getCallback = function() {
-        return callback;
+    this.getCallbacks = function() {
+        return callbacks;
     };
 
     /**
@@ -233,16 +233,24 @@ function KeenIOWidget(config) {
 
     /**
      *
-     * @param {string} newCallback
+     * @param {string|array} newCallbacks
      * @returns {AnalyticsWidget}
      */
-    this.setCallback = function(newCallback) {
-        if (typeof this[newCallback] === 'function') {
-            callback = this[newCallback];
-            return this;
-        } else {
-            throw 'Invalid value for newCallback';
+    this.setCallbacks = function(newCallbacks) {
+        if (!Array.isArray(newCallbacks)) {
+            newCallbacks = [newCallbacks];
         }
+        for(var i = 0; i < newCallbacks.length; i++) {
+            if (typeof this[newCallbacks[i]] === 'function') {
+                newCallbacks[i] = this[newCallbacks[i]]
+            } else {
+                throw 'Invalid value for newCallback';
+            }
+        }
+
+        callbacks = newCallbacks;
+
+        return this;
     };
 
     this.setChartConfig= function(newChartConfig) {
@@ -392,8 +400,45 @@ KeenIOWidget.prototype.divideResult = function(result) {
             value    : value
         });
     }
-
     return revisedResult;
+};
+
+/**
+ *
+ * @param {Array} value
+ * @return {Array}
+ */
+KeenIOWidget.prototype.divideMetrics = function(metrics) {
+    var metric = {};
+
+    if (!Array.isArray(metrics)) {
+        throw 'divideMetrics requires an array';
+    }
+
+    if (metrics.length !== 2) {
+        throw 'divideMetrics requires exactly two metric';
+    }
+
+    var value = 0;
+    if (metrics[0].value > 0) {
+        value = parseFloat((metrics[0].value / metrics[1].value).toFixed(2));
+    }
+
+    metric = {
+        category: metrics[0].category,
+        value: value
+    }
+
+    return metric;
+};
+
+/**
+ *
+ * @param {Array} metric
+ * @return {Array}
+ */
+KeenIOWidget.prototype.formatPercent = function(metric) {
+    return (metric.value * 100).toFixed(1)+'%';
 };
 
 KeenIOWidget.prototype.getMetricMarkup = function() {
@@ -579,7 +624,6 @@ KeenIOWidget.prototype.runQuery = function(callback) {
             var result = widget.getQueryResult(analyses, query);
 
             widget.setData(result);
-
             if (typeof callback === 'function') {
                 var boundCallback = callback.bind(widget);
                 boundCallback();
@@ -594,34 +638,42 @@ KeenIOWidget.prototype.runQuery = function(callback) {
  * @return Array
  */
 KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
-    var callback = this.getCallback();
+    var callbacks = this.getCallbacks();
     var result = [];
 
     if (typeof analyses !== 'undefined' && typeof query !== 'undefined') {
         if (Array.isArray(analyses) && analyses.length > 0) {
-            var primaryResult = analyses.shift().result;
+            var primaryResult = analyses[0].result;
 
             if (analyses.length >= 1) {
-                for (var i = 0; i < primaryResult.length; i++) {
-                    var intervalValues = [];
-                    intervalValues.push({
-                        category: query[0].title,
-                        result  : primaryResult[i].value
-                    });
-
-                    for (var x = 0; x < analyses.length; x++) {
-                        // Compensate for popping primaryResult off the top.
-                        var offsetComp = (x + 1);
+                if (Array.isArray(primaryResult)) {
+                    for (var i = 0, j = 1; j < primaryResult.length; i++, j++) {
+                        var intervalValues = [];
                         intervalValues.push({
-                            category: query[offsetComp].title,
-                            result  : analyses[x].result[i].value
+                            category: query[0].title,
+                            result: primaryResult[i].value
+                        });
+
+                        // Compensate for popping primaryResult off the top.
+                        for (var x = 1; x < analyses.length; x++) {
+                            intervalValues.push({
+                                category: query[x].title,
+                                result: analyses[x].result[i].value
+                            });
+                        }
+
+                        result.push({
+                            timeframe: primaryResult[i].timeframe,
+                            value: intervalValues
                         });
                     }
-
-                    result.push({
-                        timeframe: primaryResult[i].timeframe,
-                        value    : intervalValues
-                    });
+                } else {
+                    for (var i = 0; i < analyses.length; i++) {
+                        result.push({
+                            category: query[i].title,
+                            value: analyses[i].result
+                        });
+                    }
                 }
             } else {
                 result = primaryResult;
@@ -639,8 +691,10 @@ KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
         }
     }
 
-    if (callback) {
-        result = callback(result);
+    if (callbacks) {
+        for(var i = 0; i < callbacks.length; i++) {
+            result = callbacks[i](result);
+        }
     }
 
     return result;
