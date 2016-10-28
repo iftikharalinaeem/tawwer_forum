@@ -38,7 +38,7 @@ var analyticsToolbar = {
                 if (typeof(widget[method]) === 'function') {
                     valid = widget[method].apply(widget, newValue);
 
-                    if (window.analyticsDashboard.inited && valid !== false) {
+                    if (window.analyticsToolbar.inited && valid !== false) {
                         widget.render();
                     }
                 }
