@@ -8,9 +8,15 @@ function KeenIOWidget(config) {
 
     /**
      *
-     * @type {null|array\function}
+     * @type {null|function}
      */
-    var callbacks = null;
+    var callback = null;
+
+    /**
+     *
+     * @type {null|object}
+     */
+    var queryProcessor = null;
 
     /**
      * @type {object}
@@ -111,10 +117,16 @@ function KeenIOWidget(config) {
 
     /**
      *
-     * @returns {null|array|function}
+     * @returns {null|function}
      */
-    this.getCallbacks = function() {
-        return callbacks;
+    this.getCallback = function() {
+        return callback;
+    };
+
+    /**
+     */
+    this.getQueryProcessor = function() {
+        return this.queryProcessor;
     };
 
     /**
@@ -233,23 +245,22 @@ function KeenIOWidget(config) {
 
     /**
      *
-     * @param {string|array} newCallbacks
+     * @param {string} newCallback
      * @returns {AnalyticsWidget}
      */
-    this.setCallbacks = function(newCallbacks) {
-        if (!Array.isArray(newCallbacks)) {
-            newCallbacks = [newCallbacks];
-        }
-        for(var i = 0; i < newCallbacks.length; i++) {
-            if (typeof this[newCallbacks[i]] === 'function') {
-                newCallbacks[i] = this[newCallbacks[i]]
-            } else {
-                throw 'Invalid value for newCallback';
-            }
+    this.setCallback = function(newCallback) {
+        if (typeof this[newCallback] !== 'function') {
+            throw 'Invalid value for newCallback';
         }
 
-        callbacks = newCallbacks;
+        callback = this[newCallback];
+        return this;
+    };
 
+    /**
+     */
+    this.setQueryProcessor = function(queryProcessor) {
+        this.queryProcessor = queryProcessor;
         return this;
     };
 
@@ -419,7 +430,7 @@ KeenIOWidget.prototype.divideMetrics = function(metrics) {
         throw 'divideMetrics requires exactly two metric';
     }
 
-    var value = 0;
+    var value = 0.00;
     if (metrics[0].value > 0) {
         value = parseFloat((metrics[0].value / metrics[1].value).toFixed(2));
     }
@@ -427,7 +438,7 @@ KeenIOWidget.prototype.divideMetrics = function(metrics) {
     metric = {
         category: metrics[0].category,
         value: value
-    }
+    };
 
     return metric;
 };
@@ -437,8 +448,8 @@ KeenIOWidget.prototype.divideMetrics = function(metrics) {
  * @param {Array} metric
  * @return {Array}
  */
-KeenIOWidget.prototype.formatPercent = function(metric) {
-    return (metric.value * 100).toFixed(1)+'%';
+KeenIOWidget.prototype.metricFormatPercent = function(metric) {
+    return (metric * 100).toFixed(1)+'%';
 };
 
 KeenIOWidget.prototype.getMetricMarkup = function() {
@@ -483,6 +494,14 @@ KeenIOWidget.prototype.loadConfig = function(config) {
 
     if (typeof config.type !== 'undefined') {
         this.setType(config.type);
+    }
+
+    if (typeof config.callback !== 'undefined') {
+        this.setCallback(config.callback);
+    }
+
+    if (typeof config.queryProcessor !== 'undefined') {
+        this.setQueryProcessor(new KeenIOQueryProcessor(config.queryProcessor));
     }
 };
 
@@ -638,63 +657,76 @@ KeenIOWidget.prototype.runQuery = function(callback) {
  * @return Array
  */
 KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
-    var callbacks = this.getCallbacks();
+    var callback = this.getCallback();
     var result = [];
 
-    if (typeof analyses !== 'undefined' && typeof query !== 'undefined') {
-        if (Array.isArray(analyses) && analyses.length > 0) {
-            var primaryResult = analyses[0].result;
+    if (this.queryProcessor) {
+        var processedResult = this.queryProcessor.getResult(analyses);
 
-            if (analyses.length >= 1) {
-                if (Array.isArray(primaryResult)) {
-                    for (var i = 0, j = 1; j < primaryResult.length; i++, j++) {
-                        var intervalValues = [];
-                        intervalValues.push({
-                            category: query[0].title,
-                            result: primaryResult[i].value
-                        });
-
-                        // Compensate for popping primaryResult off the top.
-                        for (var x = 1; x < analyses.length; x++) {
-                            intervalValues.push({
-                                category: query[x].title,
-                                result: analyses[x].result[i].value
-                            });
-                        }
-
-                        result.push({
-                            timeframe: primaryResult[i].timeframe,
-                            value: intervalValues
-                        });
-                    }
-                } else {
-                    for (var i = 0; i < analyses.length; i++) {
-                        result.push({
-                            category: query[i].title,
-                            value: analyses[i].result
-                        });
-                    }
-                }
-            } else {
-                result = primaryResult;
-                result.category = query[0].title;
-            }
-        } else if (typeof analyses === 'object') {
-            if (typeof analyses.result !== 'undefined') {
-                if (Array.isArray(analyses.result)) {
-                    result = analyses.result;
+        if (typeof processedResult === 'object') {
+            if (typeof processedResult.result !== 'undefined') {
+                if (Array.isArray(processedResult.result)) {
+                    result = processedResult.result;
                     result.category = query[0].title;
                 } else {
-                    result = analyses.result;
+                    result = processedResult.result;
+                }
+            }
+        }
+    } else {
+        if (typeof analyses !== 'undefined' && typeof query !== 'undefined') {
+            if (Array.isArray(analyses) && analyses.length > 0) {
+                var primaryResult = analyses[0].result;
+
+                if (analyses.length >= 1) {
+                    if (Array.isArray(primaryResult)) {
+                        for (var i = 0, j = 1; j < primaryResult.length; i++, j++) {
+                            var intervalValues = [];
+                            intervalValues.push({
+                                category: query[0].title,
+                                result: primaryResult[i].value
+                            });
+
+                            // Compensate for popping primaryResult off the top.
+                            for (var x = 1; x < analyses.length; x++) {
+                                intervalValues.push({
+                                    category: query[x].title,
+                                    result: analyses[x].result[i].value
+                                });
+                            }
+
+                            result.push({
+                                timeframe: primaryResult[i].timeframe,
+                                value: intervalValues
+                            });
+                        }
+                    } else {
+                        for (var i = 0; i < analyses.length; i++) {
+                            result.push({
+                                category: query[i].title,
+                                value: analyses[i].result
+                            });
+                        }
+                    }
+                } else {
+                    result = primaryResult;
+                    result.category = query[0].title;
+                }
+            } else if (typeof analyses === 'object') {
+                if (typeof analyses.result !== 'undefined') {
+                    if (Array.isArray(analyses.result)) {
+                        result = analyses.result;
+                        result.category = query[0].title;
+                    } else {
+                        result = analyses.result;
+                    }
                 }
             }
         }
     }
 
-    if (callbacks) {
-        for(var i = 0; i < callbacks.length; i++) {
-            result = callbacks[i](result);
-        }
+    if (callback) {
+        result = callback(result);
     }
 
     return result;

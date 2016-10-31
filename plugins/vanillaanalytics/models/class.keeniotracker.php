@@ -226,7 +226,7 @@ class KeenIOTracker implements TrackerInterface {
             'title' => 'Posts Positivity Rate',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'metric',
-            'callback' => ['divideMetrics', 'formatPercent'],
+            'callback' => 'metricFormatPercent'
         ]
     ];
 
@@ -258,7 +258,6 @@ class KeenIOTracker implements TrackerInterface {
         if (empty($widget) || !val('query', $widget)) {
             return null;
         }
-
         if (!$chart = val('chart', $widget, [])) {
             if (val('type', $widget) != 'metric') {
                 $chart = ['labels' => val('title', $widget)];
@@ -272,15 +271,25 @@ class KeenIOTracker implements TrackerInterface {
         // Override default chart 'Result' label in c3
         $chart['labelMapping']['Result'] = val('title', $widget);
 
+        $data = [
+            'chart' => $chart,
+            'query' => val('query', $widget)
+        ];
+        $queryProcessor = val('queryProcessor', $widget);
+        if ($queryProcessor) {
+            $data['queryProcessor'] = $queryProcessor;
+        }
+        $callback = val('callback', $widget);
+        if ($callback) {
+            $data['callback'] = $callback;
+        }
+
         $widgetObj = new AnalyticsWidget();
         $widgetObj->setID($id)
             ->setTitle(t(val('title', $widget, '')))
             ->setHandler('KeenIOWidget')
             ->setRank(val('rank', $widget, 1))
-            ->setData([
-                'chart' => $chart,
-                'query' => val('query', $widget)
-            ]);
+            ->setData($data);
 
         if ($type = val('type', $widget)) {
             $widgetObj->setType(val('type', $widget));
@@ -486,24 +495,83 @@ class KeenIOTracker implements TrackerInterface {
 
         $this->widgets['time-to-accept']['query'] = $timeToAcceptQuery;
 
-        $postsQuery = new KeenIOQuery();
-        $postsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
-            ->setTitle(t('Posts'))
-            ->setEventCollection('post');
-
-        // Posts Positivity Rate (metric)
-        $postPositivityRateQuery = new KeenIOQuery();
-        $postPositivityRateQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
-            ->setTitle(t($this->widgets['posts-positivity-rate']['title']))
+        $reactedDiscussionsQuery = new KeenIOQuery();
+        $reactedDiscussionsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Reacted Discussions'))
             ->setEventCollection('reaction')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.recordType',
+                'property_value' => 'discussion'
+            ])
+            ->setTargetProperty('reaction.recordID');
+
+        $reactedPositiveDiscussionsQuery = new KeenIOQuery();
+        $reactedPositiveDiscussionsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Reacted Positive Discussions'))
+            ->setEventCollection('reaction')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.recordType',
+                'property_value' => 'discussion'
+            ])
             ->addFilter([
                 'operator' => 'eq',
                 'property_name' => 'reaction.reactionClass',
                 'property_value' => 'Positive'
             ])
-            ->setTargetProperty('keen.id');
+            ->setTargetProperty('reaction.recordID');
 
-        $this->widgets['posts-positivity-rate']['query'] = [$postPositivityRateQuery, $postsQuery];
+        $reactedCommentsQuery = new KeenIOQuery();
+        $reactedCommentsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Reacted Comments'))
+            ->setEventCollection('reaction')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.recordType',
+                'property_value' => 'comment'
+            ])
+            ->setTargetProperty('reaction.recordID');
+
+        $reactedPositiveCommentsQuery = new KeenIOQuery();
+        $reactedPositiveCommentsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Reacted Positive Comments'))
+            ->setEventCollection('reaction')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.recordType',
+                'property_value' => 'comment'
+            ])
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.reactionClass',
+                'property_value' => 'Positive'
+            ])
+            ->setTargetProperty('reaction.recordID');
+
+        $this->widgets['posts-positivity-rate']['query'] = [
+            $reactedPositiveDiscussionsQuery,
+            $reactedPositiveCommentsQuery,
+            $reactedDiscussionsQuery,
+            $reactedCommentsQuery,
+        ];
+        $this->widgets['posts-positivity-rate']['queryProcessor'] = [
+            'process' => [
+                'reacted-positive-posts' => [
+                    'queries' => [0, 1],
+                    'processor' => 'addMetrics'
+                ],
+                'reacted-posts' => [
+                    'queries' => [2, 3],
+                    'processor' => 'addMetrics'
+                ],
+                'positive-reacted-rate' => [
+                    'queries' => ['reacted-positive-posts', 'reacted-posts'],
+                    'processor' => 'divideMetrics'
+                ],
+            ],
+            'resultQuery' => 'positive-reacted-rate'
+        ];
 
         /**
          * Charts
@@ -794,6 +862,7 @@ class KeenIOTracker implements TrackerInterface {
 
         if ($inDashboard) {
             $controller->addJsFile('keeniowidget.min.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('keenioqueryprocessor.min.js', 'plugins/vanillaanalytics');
         }
     }
 
