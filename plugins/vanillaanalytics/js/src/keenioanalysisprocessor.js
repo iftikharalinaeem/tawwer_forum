@@ -19,9 +19,21 @@ KeenIOAnalysesProcessor = function(config) {
     var finalAnalysis = null;
 
     /**
+     * Process the analyses using the provided instructions
      *
-     * @param analyses
-     * @returns {*}
+     * "instructions": {
+     *     "new-analysis-name": {
+     *         "analyses": [0, 1], // Take analyses 0 and 1
+     *         "processor": "addResults" // Give them to addResults
+     *     },
+     *     "new-analysis-name2": {
+     *         "analyses": ["new-analysis-name", 2], // Take processed "new-analysis-name" and raw analysis 2
+     *         "processor": "divideResults" // Give them to addResults
+     *     }
+     *  ],
+     *
+     * @param {array} analyses
+     * @returns {object}
      */
     this.process = function(analyses) {
         var that = this;
