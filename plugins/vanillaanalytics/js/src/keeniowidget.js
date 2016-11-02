@@ -16,7 +16,7 @@ function KeenIOWidget(config) {
      *
      * @type {null|object}
      */
-    var queryProcessor = null;
+    var analysesProcessor = null;
 
     /**
      * @type {object}
@@ -124,9 +124,11 @@ function KeenIOWidget(config) {
     };
 
     /**
+     *
+     * @returns {KeenIOAnalysesProcessor}
      */
-    this.getQueryProcessor = function() {
-        return this.queryProcessor;
+    this.getAnalysesProcessor = function() {
+        return this.analysesProcessor;
     };
 
     /**
@@ -258,9 +260,12 @@ function KeenIOWidget(config) {
     };
 
     /**
+     *
+     * @param {KeenIOAnalysesProcessor} analysesProcessor
+     * @returns {KeenIOWidget}
      */
-    this.setQueryProcessor = function(queryProcessor) {
-        this.queryProcessor = queryProcessor;
+    this.setAnalysesProcessor = function(analysesProcessor) {
+        this.analysesProcessor = analysesProcessor;
         return this;
     };
 
@@ -383,69 +388,7 @@ function KeenIOWidget(config) {
 
 /**
  *
- * @param {Array} result
- * @return {Array}
- */
-KeenIOWidget.prototype.divideResult = function(result) {
-    var revisedResult = [];
-
-    if (!Array.isArray(result)) {
-        throw 'divideResult requires an array';
-    }
-
-    if (result[0].value.length !== 2) {
-        throw 'divideResult requires exactly two results';
-    }
-
-    for (var i = 0; i < result.length; i++) {
-        var value;
-
-        if (result[i].value[1].result > 0) {
-            value = parseFloat((result[i].value[0].result / result[i].value[1].result).toFixed(2));
-        } else {
-            value = 0;
-        }
-
-        revisedResult.push({
-            timeframe: result[i].timeframe,
-            value    : value
-        });
-    }
-    return revisedResult;
-};
-
-/**
- *
- * @param {Array} value
- * @return {Array}
- */
-KeenIOWidget.prototype.divideMetrics = function(metrics) {
-    var metric = {};
-
-    if (!Array.isArray(metrics)) {
-        throw 'divideMetrics requires an array';
-    }
-
-    if (metrics.length !== 2) {
-        throw 'divideMetrics requires exactly two metric';
-    }
-
-    var value = 0.00;
-    if (metrics[0].value > 0) {
-        value = parseFloat((metrics[0].value / metrics[1].value).toFixed(2));
-    }
-
-    metric = {
-        category: metrics[0].category,
-        value: value
-    };
-
-    return metric;
-};
-
-/**
- *
- * @param {Array} metric
+ * @param {Number} metric
  * @return {Array}
  */
 KeenIOWidget.prototype.metricFormatPercent = function(metric) {
@@ -501,7 +444,7 @@ KeenIOWidget.prototype.loadConfig = function(config) {
     }
 
     if (typeof config.queryProcessor !== 'undefined') {
-        this.setQueryProcessor(new KeenIOQueryProcessor(config.queryProcessor));
+        this.setAnalysesProcessor(new KeenIOAnalysesProcessor(config.queryProcessor));
     }
 };
 
@@ -658,78 +601,53 @@ KeenIOWidget.prototype.runQuery = function(callback) {
  */
 KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
     var callback = this.getCallback();
-    var result = [];
+    var queryResult = [];
 
-    if (this.queryProcessor) {
-        var processedResult = this.queryProcessor.getResult(analyses);
+    if (typeof analyses !== 'undefined' && typeof query !== 'undefined') {
 
-        if (typeof processedResult === 'object') {
-            if (typeof processedResult.result !== 'undefined') {
-                if (Array.isArray(processedResult.result)) {
-                    result = processedResult.result;
-                    result.category = query[0].title;
-                } else {
-                    result = processedResult.result;
+        if (Array.isArray(analyses)) {
+            // Add query title to analysis
+            $.each(analyses, function(index, analysis) {
+                var title = null;
+
+                if (query[index].title !== 'undefined') {
+                    title = query[index].title;
                 }
+
+                analysis.title = title;
+            });
+        } else if (typeof analyses === 'object') {
+            var title = null;
+
+            if (query[0].title !== 'undefined') {
+                title = query[0].title;
             }
+
+            analyses.title = title;
         }
-    } else {
-        if (typeof analyses !== 'undefined' && typeof query !== 'undefined') {
-            if (Array.isArray(analyses) && analyses.length > 0) {
-                var primaryResult = analyses[0].result;
 
-                if (analyses.length >= 1) {
-                    if (Array.isArray(primaryResult)) {
-                        for (var i = 0, j = 1; j < primaryResult.length; i++, j++) {
-                            var intervalValues = [];
-                            intervalValues.push({
-                                category: query[0].title,
-                                result: primaryResult[i].value
-                            });
+        if (this.analysesProcessor) {
+            analyses = this.analysesProcessor.process(analyses);
+        }
 
-                            // Compensate for popping primaryResult off the top.
-                            for (var x = 1; x < analyses.length; x++) {
-                                intervalValues.push({
-                                    category: query[x].title,
-                                    result: analyses[x].result[i].value
-                                });
-                            }
-
-                            result.push({
-                                timeframe: primaryResult[i].timeframe,
-                                value: intervalValues
-                            });
-                        }
-                    } else {
-                        for (var i = 0; i < analyses.length; i++) {
-                            result.push({
-                                category: query[i].title,
-                                value: analyses[i].result
-                            });
-                        }
-                    }
-                } else {
-                    result = primaryResult;
-                    result.category = query[0].title;
-                }
-            } else if (typeof analyses === 'object') {
-                if (typeof analyses.result !== 'undefined') {
-                    if (Array.isArray(analyses.result)) {
-                        result = analyses.result;
-                        result.category = query[0].title;
-                    } else {
-                        result = analyses.result;
-                    }
-                }
+        var analyse = null;
+        if (Array.isArray(analyses) && !!analyses.length) { // Multiple analyses
+            if (analyses.length > 1) {
+                throw 'Multiple analyses detected. Use an AnalysesProcessor to merge them';
             }
+            analyse = analyses[0];
+        } else if (typeof analyses === 'object') {
+            analyse = analyses;
         }
+
+        queryResult = analyse.result;
     }
 
     if (callback) {
-        result = callback(result);
+        queryResult = callback(queryResult);
     }
 
-    return result;
+    return queryResult;
 };
 
 /**

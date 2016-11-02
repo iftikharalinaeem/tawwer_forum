@@ -108,7 +108,7 @@ class KeenIOTracker implements TrackerInterface {
             'title' => 'Unique Visits By Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['chartType' => 'area']
+            'chart' => ['chartType' => KeenIOChart::TYPE_AREA]
         ],
         'discussions' => [
             'title' => 'Discussions',
@@ -134,28 +134,27 @@ class KeenIOTracker implements TrackerInterface {
                     'discussion_add' => 'Discussions',
                     'comment_add' => 'Comments'
                 ],
-                'chartType' => 'area'
+                'chartType' => KeenIOChart::TYPE_AREA
             ],
             'support' => 'cat01'
         ],
         'posts-by-category' => [
             'title' => 'Posts By Category',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'chart' => ['chartType' => 'area'],
+            'chart' => ['chartType' => KeenIOChart::TYPE_AREA],
             'support' => 'cat01'
         ],
         'posts-by-role-type' => [
             'title' => 'Posts By Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'chart' => ['chartType' => 'area'],
+            'chart' => ['chartType' => KeenIOChart::TYPE_AREA],
             'support' => 'cat01'
         ],
         'posts-per-user' => [
             'title' => 'Posts Per User',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['chartType' => 'area'],
-            'callback' => 'divideResult'
+            'chart' => ['chartType' => KeenIOChart::TYPE_AREA]
         ],
         'contributors' => [
             'title' => 'Contributors',
@@ -167,22 +166,21 @@ class KeenIOTracker implements TrackerInterface {
             'title' => 'Contributors By Category',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['chartType' => 'area'],
+            'chart' => ['chartType' => KeenIOChart::TYPE_AREA],
             'support' => 'cat01'
         ],
         'contributors-by-role-type' => [
             'title' => 'Contributors By Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['chartType' => 'area'],
+            'chart' => ['chartType' => KeenIOChart::TYPE_AREA],
             'support' => 'cat01'
         ],
         'comments-per-discussion' => [
             'title' => 'Comments Per Discussion',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['chartType' => 'area'],
-            'callback' => 'divideResult'
+            'chart' => ['chartType' => KeenIOChart::TYPE_AREA]
         ],
         'registrations' => [
             'title' => 'New Users',
@@ -207,20 +205,17 @@ class KeenIOTracker implements TrackerInterface {
         'visits-per-active-user' => [
             'title' => 'Visits per Active User',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart',
-            'callback' => 'divideResult'
+            'type' => 'chart'
         ],
         'average-posts-per-active-user' => [
             'title' => 'Average Posts per Active User',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart',
-            'callback' => 'divideResult'
+            'type' => 'chart'
         ],
         'average-comments-per-discussion' => [
             'title' => 'Average Comments per Discussion',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart',
-            'callback' => 'divideResult'
+            'type' => 'chart'
         ],
         'posts-positivity-rate' => [
             'title' => 'Posts Positivity Rate',
@@ -556,21 +551,21 @@ class KeenIOTracker implements TrackerInterface {
             $reactedCommentsQuery,
         ];
         $this->widgets['posts-positivity-rate']['queryProcessor'] = [
-            'process' => [
+            'instructions' => [
                 'reacted-positive-posts' => [
-                    'queries' => [0, 1],
-                    'processor' => 'addMetrics'
+                    'analyses' => [0, 1],
+                    'processor' => 'addResults'
                 ],
                 'reacted-posts' => [
-                    'queries' => [2, 3],
-                    'processor' => 'addMetrics'
+                    'analyses' => [2, 3],
+                    'processor' => 'addResults'
                 ],
                 'positive-reacted-rate' => [
-                    'queries' => ['reacted-positive-posts', 'reacted-posts'],
-                    'processor' => 'divideMetrics'
+                    'analyses' => ['reacted-positive-posts', 'reacted-posts'],
+                    'processor' => 'divideResults'
                 ],
             ],
-            'resultQuery' => 'positive-reacted-rate'
+            'finalAnalysis' => 'positive-reacted-rate'
         ];
 
         /**
@@ -724,9 +719,27 @@ class KeenIOTracker implements TrackerInterface {
 
         // Posts per user (chart)
         $this->widgets['posts-per-user']['query'] = [$postsQuery, $activeUsersQuery];
+        $this->widgets['posts-per-user']['queryProcessor'] = [
+            'instructions' => [
+                'divided-posts-per-user' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'divideResults'
+                ],
+            ],
+            'finalAnalysis' => 'divided-posts-per-user'
+        ];
 
         // Comments per discussion (chart)
         $this->widgets['comments-per-discussion']['query'] = [$commentsQuery, $discussionsQuery];
+        $this->widgets['comments-per-discussion']['queryProcessor'] = [
+            'instructions' => [
+                'divided-comments-per-discussion' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'divideResults'
+                ],
+            ],
+            'finalAnalysis' => 'divided-comments-per-discussion'
+        ];
 
         // Registrations
         $registrationsQuery = new KeenIOQuery();
@@ -792,12 +805,39 @@ class KeenIOTracker implements TrackerInterface {
 
         // Visits per Active User
         $this->widgets['visits-per-active-user']['query'] = [$visitsQuery, $activeUsersQuery];
+        $this->widgets['visits-per-active-user']['queryProcessor'] = [
+            'instructions' => [
+                'divided-visits-per-active-user' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'divideResults'
+                ],
+            ],
+            'finalAnalysis' => 'divided-visits-per-active-user'
+        ];
 
         // Average Posts per Active User
         $this->widgets['average-posts-per-active-user']['query'] = [$postsQuery, $activeUsersQuery];
+        $this->widgets['average-posts-per-active-user']['queryProcessor'] = [
+            'instructions' => [
+                'divided-average-posts-per-active-user' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'divideResults'
+                ],
+            ],
+            'finalAnalysis' => 'divided-average-posts-per-active-user'
+        ];
 
         // Average Comments per discussion
         $this->widgets['average-comments-per-discussion']['query'] = [$commentsQuery, $discussionsQuery];
+        $this->widgets['average-comments-per-discussion']['queryProcessor'] = [
+            'instructions' => [
+                'divided-average-comments-per-discussion' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'divideResults'
+                ],
+            ],
+            'finalAnalysis' => 'divided-average-comments-per-discussion'
+        ];
     }
 
     /**
@@ -862,7 +902,7 @@ class KeenIOTracker implements TrackerInterface {
 
         if ($inDashboard) {
             $controller->addJsFile('keeniowidget.min.js', 'plugins/vanillaanalytics');
-            $controller->addJsFile('keenioqueryprocessor.min.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('keenioanalysisprocessor.min.js', 'plugins/vanillaanalytics');
         }
     }
 
