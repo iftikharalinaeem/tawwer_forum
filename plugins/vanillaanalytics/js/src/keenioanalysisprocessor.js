@@ -83,8 +83,6 @@ KeenIOAnalysesProcessor.prototype.loadConfig = function(config) {
  * @return {object}
  */
 KeenIOAnalysesProcessor.prototype.addResults = function(analyses) {
-    var revisedResult = [];
-
     if (!Array.isArray(analyses) || analyses.length < 2) {
         throw 'addResults requires an array of results';
     }
@@ -116,8 +114,6 @@ KeenIOAnalysesProcessor.prototype.addResults = function(analyses) {
  * @return {object}
  */
 KeenIOAnalysesProcessor.prototype.divideResults = function(analyses) {
-    var revisedResult = [];
-
     if (!Array.isArray(analyses) || analyses.length < 2) {
         throw 'divideResults requires an array of results';
     }

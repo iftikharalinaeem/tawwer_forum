@@ -46,7 +46,9 @@ class KeenIOTracker implements TrackerInterface {
             'title' => 'Visits',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['labels' => ['Visits']],
+            'chart' => [
+                'labels' => ['Visits']
+            ],
             'support' => 'cat01'
         ],
         'total-discussions' => [
@@ -107,8 +109,7 @@ class KeenIOTracker implements TrackerInterface {
         'visits-by-role-type' => [
             'title' => 'Unique Visits By Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart',
-            'chart' => ['chartType' => KeenIOChart::TYPE_AREA]
+            'type' => 'chart'
         ],
         'discussions' => [
             'title' => 'Discussions',
@@ -133,28 +134,24 @@ class KeenIOTracker implements TrackerInterface {
                 'labelMapping' => [
                     'discussion_add' => 'Discussions',
                     'comment_add' => 'Comments'
-                ],
-                'chartType' => KeenIOChart::TYPE_AREA
+                ]
             ],
             'support' => 'cat01'
         ],
         'posts-by-category' => [
             'title' => 'Posts By Category',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'chart' => ['chartType' => KeenIOChart::TYPE_AREA],
             'support' => 'cat01'
         ],
         'posts-by-role-type' => [
             'title' => 'Posts By Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'chart' => ['chartType' => KeenIOChart::TYPE_AREA],
             'support' => 'cat01'
         ],
         'posts-per-user' => [
             'title' => 'Posts Per User',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart',
-            'chart' => ['chartType' => KeenIOChart::TYPE_AREA]
+            'type' => 'chart'
         ],
         'contributors' => [
             'title' => 'Contributors',
@@ -166,21 +163,18 @@ class KeenIOTracker implements TrackerInterface {
             'title' => 'Contributors By Category',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['chartType' => KeenIOChart::TYPE_AREA],
             'support' => 'cat01'
         ],
         'contributors-by-role-type' => [
             'title' => 'Contributors By Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['chartType' => KeenIOChart::TYPE_AREA],
             'support' => 'cat01'
         ],
         'comments-per-discussion' => [
             'title' => 'Comments Per Discussion',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart',
-            'chart' => ['chartType' => KeenIOChart::TYPE_AREA]
+            'type' => 'chart'
         ],
         'registrations' => [
             'title' => 'New Users',
@@ -569,7 +563,7 @@ class KeenIOTracker implements TrackerInterface {
         ];
 
         /**
-         * Charts
+         * Timeframe Charts
          */
 
         // Pageviews (chart)
