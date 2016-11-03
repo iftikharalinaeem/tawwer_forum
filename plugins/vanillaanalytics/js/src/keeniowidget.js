@@ -579,11 +579,44 @@ KeenIOWidget.prototype.runQuery = function(callback) {
 
     this.updateQueryParams(updateParams);
 
-    var query  = this.getQuery();
+    var queries  = this.getQuery();
 
-    client.run(query, function(error, analyses) {
+    if (!!queries.length) {
+        /*
+            Eval filters properties with this widget as the context.
+            ie. 'eval(property_value)' => "(new Date(this.getRange()['start']).getTime() / 1000)"
+            would result in property_value => {timestamp of the start timeframe}
+        */
+        var match;
+        var that = this;
+        var evalFromContext = function(js, context) {
+            return function() { return eval(js); }.call(context);
+        }
+
+        $.each(queries, function(i, query) {
+            if (typeof query.params.filters !== 'undefined' && Array.isArray(query.params.filters) && !!query.params.filters.length) {
+                $.each(query.params.filters, function(j, filter) {
+                    $.each(filter, function(property, value) {
+                        console.log(property, value);
+                        match = /^eval\((.+)\)$/.exec(property);
+                        if (match) {
+                            delete queries[i].params.filters[j][property];
+                            try {
+                                queries[i].params.filters[j][match[1]] = evalFromContext(value, that);
+                            } catch (e) {
+                                console.debug(e);
+                                throw 'Invalid filter evaluation';
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    }
+
+    client.run(queries, function(error, analyses) {
         if (error === null) {
-            var result = widget.getQueryResult(analyses, query);
+            var result = widget.getQueryResult(analyses, queries);
 
             widget.setData(result);
             if (typeof callback === 'function') {
