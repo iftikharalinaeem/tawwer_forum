@@ -27,6 +27,11 @@ $this->title($Action . ' ' . t('a Badge')); ?>
     echo wrap($this->Form->labelwrap('Badge Class Level', 'Level').
       $this->Form->inputwrap('Level'), 'li', ['class' => 'form-group']);
 
+    if ($this->data('HasThreshold')) {
+        echo wrap($this->Form->labelwrap('Threshold', 'Threshold').
+            $this->Form->inputwrap('Threshold'), 'li', ['class' => 'form-group']);    
+    }
+
     $UploadText = $this->data('Badge.Photo') ? t('Replace Image') : T('Add Image');
     echo wrap($this->Form->labelwrap($UploadText.($this->data('Badge.Photo') ? '<div class="image-wrap">'.img(Gdn_Upload::url($this->data('Badge.Photo'))).'</div>' : ''), 'Photo').
         $this->Form->fileUploadwrap('Photo'), 'li', ['class' => 'form-group']);
