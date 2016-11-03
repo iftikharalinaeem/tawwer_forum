@@ -597,7 +597,6 @@ KeenIOWidget.prototype.runQuery = function(callback) {
             if (typeof query.params.filters !== 'undefined' && Array.isArray(query.params.filters) && !!query.params.filters.length) {
                 $.each(query.params.filters, function(j, filter) {
                     $.each(filter, function(property, value) {
-                        console.log(property, value);
                         match = /^eval\((.+)\)$/.exec(property);
                         if (match) {
                             delete queries[i].params.filters[j][property];
