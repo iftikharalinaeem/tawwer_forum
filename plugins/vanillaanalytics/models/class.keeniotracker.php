@@ -216,6 +216,12 @@ class KeenIOTracker implements TrackerInterface {
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'metric',
             'callback' => 'metricFormatPercent'
+        ],
+        'average-time-to-first-comment' => [
+            'title' => 'Average Time to First Comment',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'metric',
+            'callback' => 'formatSeconds'
         ]
     ];
 
@@ -484,6 +490,7 @@ class KeenIOTracker implements TrackerInterface {
 
         $this->widgets['time-to-accept']['query'] = $timeToAcceptQuery;
 
+         // Posts Positivity Rate (metric)
         $reactedDiscussionsQuery = new KeenIOQuery();
         $reactedDiscussionsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
             ->setTitle(t('Reacted Discussions'))
@@ -561,6 +568,26 @@ class KeenIOTracker implements TrackerInterface {
             ],
             'finalAnalysis' => 'positive-reacted-rate'
         ];
+
+        // Average Time to First Comment (Metric)
+        $timeToFirstCommentQuery = new KeenIOQuery();
+        $timeToFirstCommentQuery->setAnalysisType(KeenIOQuery::ANALYSIS_AVERAGE)
+            ->setTitle(t('Average Time to First Comment'))
+            ->setEventCollection('post')
+            ->setTargetProperty('commentMetric.time')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'commentMetric.firstComment',
+                'property_value' => true
+            ])
+            ->addFilter([
+                'operator' => 'gte',
+                'property_name' => 'discussion.dateInserted.timestamp',
+                'eval(property_value)' => "(new Date(this.getRange()['start']).getTime() / 1000)"
+            ])
+        ;
+
+        $this->widgets['average-time-to-first-comment']['query'] = $timeToFirstCommentQuery;
 
         /**
          * Timeframe Charts
