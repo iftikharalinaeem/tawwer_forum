@@ -38,7 +38,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     public function structure() {
         Gdn::structure()->table('Role')
             ->column('IsTracked', 'tinyint(1)', 0)
-            ->column('TrackerTagID', 'tinyint(1)', true)
+            ->column('TrackerTagID', 'int(11)', true)
             ->set(false, false);
     }
 
