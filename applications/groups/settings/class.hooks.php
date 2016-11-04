@@ -641,6 +641,16 @@ class GroupsHooks extends Gdn_Plugin {
 
      }
 
+    /**
+     * Add groups categories to the searchable categories
+     *
+     * @param object $sender Sending instance
+     * @param array $args Event's arguments
+     */
+     public function search_allowedCategories_handler($sender, $args) {
+        $args['CategoriesID'] = array_merge($args['CategoriesID'], GroupModel::getGroupCategoryIDs());
+     }
+
      /**
       * Hook in before VanillaSettingsController renders any output.
       *
