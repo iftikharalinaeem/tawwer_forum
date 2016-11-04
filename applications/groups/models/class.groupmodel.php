@@ -1067,4 +1067,24 @@ class GroupModel extends Gdn_Model {
 
         return $deleted;
     }
+
+    /**
+     * Retrieves group category IDs.
+     *
+     * @return array An array of category IDs.
+     */
+    public static function getGroupCategoryIDs() {
+        $GroupCategoryIDs = Gdn::Cache()->Get('GroupCategoryIDs');
+        if ($GroupCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
+            $CategoryModel = new CategoryModel();
+            $GroupCategories = $CategoryModel->GetWhere(array('AllowGroups' => 1))->ResultArray();
+            $GroupCategoryIDs = array();
+            foreach ($GroupCategories as $GroupCategory) {
+                $GroupCategoryIDs[] = $GroupCategory['CategoryID'];
+            }
+
+            Gdn::Cache()->Store('GroupCategoryIDs', $GroupCategoryIDs);
+        }
+        return $GroupCategoryIDs;
+    }
 }
