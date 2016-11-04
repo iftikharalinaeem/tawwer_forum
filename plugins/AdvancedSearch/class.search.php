@@ -73,6 +73,12 @@ class Search {
         }
         $Categories = CategoryModel::getByPermission('Discussions.View', null, $CategoryFilter);
         $Categories[0] = true; // allow uncategorized too.
+
+        // Make sure that group categories are searchable. Results are filtered later on in GroupHooks::SearchController_Render_Before.
+        if (Gdn::addonManager()->isEnabled('Groups', \Vanilla\Addon::TYPE_ADDON)) {
+            $Categories += array_flip(GroupModel::getGroupCategoryIDs());
+
+        }
         $Categories = array_keys($Categories);
         //      Trace($Categories, 'allowed cats');
 
