@@ -46,7 +46,9 @@ class KeenIOTracker implements TrackerInterface {
             'title' => 'Visits',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['labels' => ['Visits']],
+            'chart' => [
+                'labels' => ['Visits']
+            ],
             'support' => 'cat01'
         ],
         'total-discussions' => [
@@ -107,8 +109,7 @@ class KeenIOTracker implements TrackerInterface {
         'visits-by-role-type' => [
             'title' => 'Unique Visits By Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart',
-            'chart' => ['chartType' => 'area']
+            'type' => 'chart'
         ],
         'discussions' => [
             'title' => 'Discussions',
@@ -133,29 +134,24 @@ class KeenIOTracker implements TrackerInterface {
                 'labelMapping' => [
                     'discussion_add' => 'Discussions',
                     'comment_add' => 'Comments'
-                ],
-                'chartType' => 'area'
+                ]
             ],
             'support' => 'cat01'
         ],
         'posts-by-category' => [
             'title' => 'Posts By Category',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'chart' => ['chartType' => 'area'],
             'support' => 'cat01'
         ],
         'posts-by-role-type' => [
             'title' => 'Posts By Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'chart' => ['chartType' => 'area'],
             'support' => 'cat01'
         ],
         'posts-per-user' => [
             'title' => 'Posts Per User',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart',
-            'chart' => ['chartType' => 'area'],
-            'callback' => 'divideResult'
+            'type' => 'chart'
         ],
         'contributors' => [
             'title' => 'Contributors',
@@ -167,22 +163,18 @@ class KeenIOTracker implements TrackerInterface {
             'title' => 'Contributors By Category',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['chartType' => 'area'],
             'support' => 'cat01'
         ],
         'contributors-by-role-type' => [
             'title' => 'Contributors By Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'chart' => ['chartType' => 'area'],
             'support' => 'cat01'
         ],
         'comments-per-discussion' => [
             'title' => 'Comments Per Discussion',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart',
-            'chart' => ['chartType' => 'area'],
-            'callback' => 'divideResult'
+            'type' => 'chart'
         ],
         'registrations' => [
             'title' => 'New Users',
@@ -207,14 +199,29 @@ class KeenIOTracker implements TrackerInterface {
         'visits-per-active-user' => [
             'title' => 'Visits per Active User',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart',
-            'callback' => 'divideResult'
+            'type' => 'chart'
         ],
         'average-posts-per-active-user' => [
             'title' => 'Average Posts per Active User',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart',
-            'callback' => 'divideResult'
+            'type' => 'chart'
+        ],
+        'average-comments-per-discussion' => [
+            'title' => 'Average Comments per Discussion',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart'
+        ],
+        'posts-positivity-rate' => [
+            'title' => 'Posts Positivity Rate',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'metric',
+            'callback' => 'metricFormatPercent'
+        ],
+        'average-time-to-first-comment' => [
+            'title' => 'Average Time to First Comment',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'metric',
+            'callback' => 'formatSeconds'
         ]
     ];
 
@@ -246,7 +253,6 @@ class KeenIOTracker implements TrackerInterface {
         if (empty($widget) || !val('query', $widget)) {
             return null;
         }
-
         if (!$chart = val('chart', $widget, [])) {
             if (val('type', $widget) != 'metric') {
                 $chart = ['labels' => val('title', $widget)];
@@ -260,15 +266,25 @@ class KeenIOTracker implements TrackerInterface {
         // Override default chart 'Result' label in c3
         $chart['labelMapping']['Result'] = val('title', $widget);
 
+        $data = [
+            'chart' => $chart,
+            'query' => val('query', $widget)
+        ];
+        $queryProcessor = val('queryProcessor', $widget);
+        if ($queryProcessor) {
+            $data['queryProcessor'] = $queryProcessor;
+        }
+        $callback = val('callback', $widget);
+        if ($callback) {
+            $data['callback'] = $callback;
+        }
+
         $widgetObj = new AnalyticsWidget();
         $widgetObj->setID($id)
             ->setTitle(t(val('title', $widget, '')))
             ->setHandler('KeenIOWidget')
             ->setRank(val('rank', $widget, 1))
-            ->setData([
-                'chart' => $chart,
-                'query' => val('query', $widget)
-            ]);
+            ->setData($data);
 
         if ($type = val('type', $widget)) {
             $widgetObj->setType(val('type', $widget));
@@ -474,8 +490,107 @@ class KeenIOTracker implements TrackerInterface {
 
         $this->widgets['time-to-accept']['query'] = $timeToAcceptQuery;
 
+         // Posts Positivity Rate (metric)
+        $reactedDiscussionsQuery = new KeenIOQuery();
+        $reactedDiscussionsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Reacted Discussions'))
+            ->setEventCollection('reaction')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.recordType',
+                'property_value' => 'discussion'
+            ])
+            ->setTargetProperty('reaction.recordID');
+
+        $reactedPositiveDiscussionsQuery = new KeenIOQuery();
+        $reactedPositiveDiscussionsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Reacted Positive Discussions'))
+            ->setEventCollection('reaction')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.recordType',
+                'property_value' => 'discussion'
+            ])
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.reactionClass',
+                'property_value' => 'Positive'
+            ])
+            ->setTargetProperty('reaction.recordID');
+
+        $reactedCommentsQuery = new KeenIOQuery();
+        $reactedCommentsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Reacted Comments'))
+            ->setEventCollection('reaction')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.recordType',
+                'property_value' => 'comment'
+            ])
+            ->setTargetProperty('reaction.recordID');
+
+        $reactedPositiveCommentsQuery = new KeenIOQuery();
+        $reactedPositiveCommentsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Reacted Positive Comments'))
+            ->setEventCollection('reaction')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.recordType',
+                'property_value' => 'comment'
+            ])
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.reactionClass',
+                'property_value' => 'Positive'
+            ])
+            ->setTargetProperty('reaction.recordID');
+
+        $this->widgets['posts-positivity-rate']['query'] = [
+            $reactedPositiveDiscussionsQuery,
+            $reactedPositiveCommentsQuery,
+            $reactedDiscussionsQuery,
+            $reactedCommentsQuery,
+        ];
+        $this->widgets['posts-positivity-rate']['queryProcessor'] = [
+            'instructions' => [
+                'reacted-positive-posts' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'addResults'
+                ],
+                'reacted-posts' => [
+                    'analyses' => [2, 3],
+                    'processor' => 'addResults'
+                ],
+                'positive-reacted-rate' => [
+                    'analyses' => ['reacted-positive-posts', 'reacted-posts'],
+                    'processor' => 'divideResults'
+                ],
+            ],
+            'finalAnalysis' => 'positive-reacted-rate'
+        ];
+
+        // Average Time to First Comment (Metric)
+        $timeToFirstCommentQuery = new KeenIOQuery();
+        $timeToFirstCommentQuery->setAnalysisType(KeenIOQuery::ANALYSIS_MEDIAN)
+            ->setTitle(t('Average Time to First Comment'))
+            ->setEventCollection('post')
+            ->setTargetProperty('commentMetric.time')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'commentMetric.firstComment',
+                'property_value' => true
+            ])
+            ->addFilter([
+                'operator' => 'gte',
+                'property_name' => 'discussion.dateInserted.timestamp',
+                'property_callback' => 'timeframeStart',
+            ])
+        ;
+
+        $this->widgets['average-time-to-first-comment']['query'] = $timeToFirstCommentQuery;
+
         /**
-         * Charts
+         * Timeframe Charts
          */
 
         // Pageviews (chart)
@@ -625,9 +740,27 @@ class KeenIOTracker implements TrackerInterface {
 
         // Posts per user (chart)
         $this->widgets['posts-per-user']['query'] = [$postsQuery, $activeUsersQuery];
+        $this->widgets['posts-per-user']['queryProcessor'] = [
+            'instructions' => [
+                'divided-posts-per-user' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'divideResults'
+                ],
+            ],
+            'finalAnalysis' => 'divided-posts-per-user'
+        ];
 
         // Comments per discussion (chart)
         $this->widgets['comments-per-discussion']['query'] = [$commentsQuery, $discussionsQuery];
+        $this->widgets['comments-per-discussion']['queryProcessor'] = [
+            'instructions' => [
+                'divided-comments-per-discussion' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'divideResults'
+                ],
+            ],
+            'finalAnalysis' => 'divided-comments-per-discussion'
+        ];
 
         // Registrations
         $registrationsQuery = new KeenIOQuery();
@@ -693,9 +826,39 @@ class KeenIOTracker implements TrackerInterface {
 
         // Visits per Active User
         $this->widgets['visits-per-active-user']['query'] = [$visitsQuery, $activeUsersQuery];
+        $this->widgets['visits-per-active-user']['queryProcessor'] = [
+            'instructions' => [
+                'divided-visits-per-active-user' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'divideResults'
+                ],
+            ],
+            'finalAnalysis' => 'divided-visits-per-active-user'
+        ];
 
         // Average Posts per Active User
         $this->widgets['average-posts-per-active-user']['query'] = [$postsQuery, $activeUsersQuery];
+        $this->widgets['average-posts-per-active-user']['queryProcessor'] = [
+            'instructions' => [
+                'divided-average-posts-per-active-user' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'divideResults'
+                ],
+            ],
+            'finalAnalysis' => 'divided-average-posts-per-active-user'
+        ];
+
+        // Average Comments per discussion
+        $this->widgets['average-comments-per-discussion']['query'] = [$commentsQuery, $discussionsQuery];
+        $this->widgets['average-comments-per-discussion']['queryProcessor'] = [
+            'instructions' => [
+                'divided-average-comments-per-discussion' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'divideResults'
+                ],
+            ],
+            'finalAnalysis' => 'divided-average-comments-per-discussion'
+        ];
     }
 
     /**
@@ -760,6 +923,8 @@ class KeenIOTracker implements TrackerInterface {
 
         if ($inDashboard) {
             $controller->addJsFile('keeniowidget.min.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('keeniofiltercallback.min.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('keenioanalysisprocessor.min.js', 'plugins/vanillaanalytics');
         }
     }
 

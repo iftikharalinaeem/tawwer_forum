@@ -131,6 +131,9 @@ class KeenIOQuery implements JsonSerializable {
     /**
      * Add a filter to the query.
      *
+     * You can also define property_callback instead of property_value to call one of the predefined callbacks.
+     * See KeenIOFilterCallback.
+     *
      * @link https://keen.io/docs/api/#filters
      * @param array $filters
      * @return $this

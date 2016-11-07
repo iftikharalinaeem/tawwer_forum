@@ -13,6 +13,12 @@ function KeenIOWidget(config) {
     var callback = null;
 
     /**
+     *
+     * @type {null|object}
+     */
+    var analysesProcessor = null;
+
+    /**
      * @type {object}
      */
     var chartConfig = {};
@@ -115,6 +121,14 @@ function KeenIOWidget(config) {
      */
     this.getCallback = function() {
         return callback;
+    };
+
+    /**
+     *
+     * @returns {KeenIOAnalysesProcessor}
+     */
+    this.getAnalysesProcessor = function() {
+        return this.analysesProcessor;
     };
 
     /**
@@ -237,12 +251,22 @@ function KeenIOWidget(config) {
      * @returns {AnalyticsWidget}
      */
     this.setCallback = function(newCallback) {
-        if (typeof this[newCallback] === 'function') {
-            callback = this[newCallback];
-            return this;
-        } else {
+        if (typeof this[newCallback] !== 'function') {
             throw 'Invalid value for newCallback';
         }
+
+        callback = this[newCallback];
+        return this;
+    };
+
+    /**
+     *
+     * @param {KeenIOAnalysesProcessor} analysesProcessor
+     * @returns {KeenIOWidget}
+     */
+    this.setAnalysesProcessor = function(analysesProcessor) {
+        this.analysesProcessor = analysesProcessor;
+        return this;
     };
 
     this.setChartConfig= function(newChartConfig) {
@@ -364,36 +388,11 @@ function KeenIOWidget(config) {
 
 /**
  *
- * @param {Array} result
+ * @param {Number} metric
  * @return {Array}
  */
-KeenIOWidget.prototype.divideResult = function(result) {
-    var revisedResult = [];
-
-    if (!Array.isArray(result)) {
-        throw 'divideResult requires an array';
-    }
-
-    if (result[0].value.length !== 2) {
-        throw 'divideResult requires exactly two results';
-    }
-
-    for (var i = 0; i < result.length; i++) {
-        var value;
-
-        if (result[i].value[1].result > 0) {
-            value = parseFloat((result[i].value[0].result / result[i].value[1].result).toFixed(2));
-        } else {
-            value = 0;
-        }
-
-        revisedResult.push({
-            timeframe: result[i].timeframe,
-            value    : value
-        });
-    }
-
-    return revisedResult;
+KeenIOWidget.prototype.metricFormatPercent = function(metric) {
+    return (metric * 100).toFixed(1)+'%';
 };
 
 KeenIOWidget.prototype.getMetricMarkup = function() {
@@ -438,6 +437,14 @@ KeenIOWidget.prototype.loadConfig = function(config) {
 
     if (typeof config.type !== 'undefined') {
         this.setType(config.type);
+    }
+
+    if (typeof config.callback !== 'undefined') {
+        this.setCallback(config.callback);
+    }
+
+    if (typeof config.queryProcessor !== 'undefined') {
+        this.setAnalysesProcessor(new KeenIOAnalysesProcessor(config.queryProcessor));
     }
 };
 
@@ -572,14 +579,31 @@ KeenIOWidget.prototype.runQuery = function(callback) {
 
     this.updateQueryParams(updateParams);
 
-    var query  = this.getQuery();
+    var queries  = this.getQuery();
+    if (!!queries.length) {
+        // Execute filters' property_callback and assign the result to property_value
+        $.each(queries, function(i, query) {
+            if (typeof query.params.filters !== 'undefined' && Array.isArray(query.params.filters) && !!query.params.filters.length) {
+                $.each(query.params.filters, function(j, filter) {
+                    $.each(filter, function(property, value) {
+                        if (property === 'property_callback') {
+                            if (typeof KeenIOFilterCallback[value] !== 'function') {
+                                throw 'Invalid filter callback KeenIOFilterCallback.'+value;
+                            }
+                            delete queries[i].params.filters[j][property];
+                            queries[i].params.filters[j]['property_value'] = KeenIOFilterCallback[value](widget);
+                        }
+                    });
+                });
+            }
+        });
+    }
 
-    client.run(query, function(error, analyses) {
+    client.run(queries, function(error, analyses) {
         if (error === null) {
-            var result = widget.getQueryResult(analyses, query);
+            var result = widget.getQueryResult(analyses, queries);
 
             widget.setData(result);
-
             if (typeof callback === 'function') {
                 var boundCallback = callback.bind(widget);
                 boundCallback();
@@ -595,55 +619,53 @@ KeenIOWidget.prototype.runQuery = function(callback) {
  */
 KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
     var callback = this.getCallback();
-    var result = [];
+    var queryResult = [];
 
     if (typeof analyses !== 'undefined' && typeof query !== 'undefined') {
-        if (Array.isArray(analyses) && analyses.length > 0) {
-            var primaryResult = analyses.shift().result;
 
-            if (analyses.length >= 1) {
-                for (var i = 0; i < primaryResult.length; i++) {
-                    var intervalValues = [];
-                    intervalValues.push({
-                        category: query[0].title,
-                        result  : primaryResult[i].value
-                    });
+        if (Array.isArray(analyses)) {
+            // Add query title to analysis
+            $.each(analyses, function(index, analysis) {
+                var title = null;
 
-                    for (var x = 0; x < analyses.length; x++) {
-                        // Compensate for popping primaryResult off the top.
-                        var offsetComp = (x + 1);
-                        intervalValues.push({
-                            category: query[offsetComp].title,
-                            result  : analyses[x].result[i].value
-                        });
-                    }
-
-                    result.push({
-                        timeframe: primaryResult[i].timeframe,
-                        value    : intervalValues
-                    });
+                if (query[index].title !== 'undefined') {
+                    title = query[index].title;
                 }
-            } else {
-                result = primaryResult;
-                result.category = query[0].title;
-            }
+
+                analysis.title = title;
+            });
         } else if (typeof analyses === 'object') {
-            if (typeof analyses.result !== 'undefined') {
-                if (Array.isArray(analyses.result)) {
-                    result = analyses.result;
-                    result.category = query[0].title;
-                } else {
-                    result = analyses.result;
-                }
+            var title = null;
+
+            if (query[0].title !== 'undefined') {
+                title = query[0].title;
             }
+
+            analyses.title = title;
         }
+
+        if (this.analysesProcessor) {
+            analyses = this.analysesProcessor.process(analyses);
+        }
+
+        var analyse = null;
+        if (Array.isArray(analyses) && !!analyses.length) { // Multiple analyses
+            if (analyses.length > 1) {
+                throw 'Multiple analyses detected. Use an AnalysesProcessor to merge them';
+            }
+            analyse = analyses[0];
+        } else if (typeof analyses === 'object') {
+            analyse = analyses;
+        }
+
+        queryResult = analyse.result;
     }
 
     if (callback) {
-        result = callback(result);
+        queryResult = callback(queryResult);
     }
 
-    return result;
+    return queryResult;
 };
 
 /**

@@ -253,29 +253,25 @@ function AnalyticsWidget(config) {
         });
     };
 
-    /**
-     * @param {string} newCallback
-     * @return this
-     */
-    this.setCallback = function(newCallback) {
-        if (handler !== null) {
-            handler.setCallback(newCallback);
-            return this;
-        } else {
-            throw 'No handler present for callback';
-        }
-    };
-
     this.setHandler = function(newHandler) {
         if (typeof newHandler === 'string' && typeof window[newHandler] === 'function') {
             var widgetData = this.getData();
-            handler = new window[newHandler]({
+            var config = {
                 chartConfig: widgetData.chart,
                 query      : widgetData.query,
                 range      : this.getTimeframe(),
                 title      : this.getTitle(),
                 type       : this.getType()
-            });
+            };
+
+            if (typeof widgetData.queryProcessor !== 'undefined') {
+                config['queryProcessor'] = widgetData.queryProcessor;
+            }
+            if (typeof widgetData.callback !== 'undefined') {
+                config['callback'] = widgetData.callback;
+            }
+
+            handler = new window[newHandler](config);
         } else if (typeof newHandler === 'object') {
             handler = newHandler;
         } else {
@@ -393,10 +389,6 @@ AnalyticsWidget.prototype.loadConfig = function(config) {
 
     if (typeof config.handler !== 'undefined') {
         this.setHandler(config.handler);
-
-        if (typeof config.callback !== 'undefined' && config.callback) {
-            this.setCallback(config.callback);
-        }
     }
 };
 
