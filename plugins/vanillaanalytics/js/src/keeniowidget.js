@@ -453,38 +453,78 @@ KeenIOWidget.prototype.loadConfig = function(config) {
  */
 KeenIOWidget.prototype.loadDatavizConfig = function (config) {
     var dataviz = this.getDataviz();
-    var chartOptions = this.getConfig('options');
+    var chartOptions = this.getConfig('options', {});
     var labelMapping = this.getConfig('labelMapping');
-
-    if (typeof chartOptions !== "object" || chartOptions === null) {
-        chartOptions = {};
-    }
-
-    if (typeof chartOptions.axis !== "object") {
-        chartOptions.axis = {};
-    }
-    if (typeof chartOptions.axis.y !== "object") {
-        chartOptions.axis.y = {
-            tick: {
-                outer: false,
-                format: function (x) {
-                    if (typeof x === "number") {
-                        var floor = Math.floor(x);
-                        return x === floor ? x : "";
-                    } else {
-                        return x;
-                    }
-                }
-            }
-        };
-    }
 
     dataviz.library('c3');
 
     if (this.getType() == 'metric') {
         dataviz.height(this.getConfig('height', 85));
+    } else {
+        var chartType = this.getConfig('chartType', 'area');
+        dataviz.chartType(chartType);
+
+        var defaultOptions = {};
+        switch(chartType) {
+            case 'area':
+            case 'line':
+                defaultOptions = {
+                    axis: {
+                        x: {
+                            type: 'timeseries',
+                            tick: {
+                                count: 5,
+                                format: '%Y-%m-%d'
+                            }
+                        },
+                    },
+                    grid: {
+                        x: {
+                            show: true
+                        },
+                        y: {
+                            show: true
+                        }
+                    },
+                    tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+                        var text = '<div class="popover popover-analytics">' +
+                            '<div class="title">' + new Date(d[0].x).toLocaleDateString("en-US") + '</div>' +
+                            '<div class="body">';
+                        for (var i = 0; i < d.length; i++) {
+                            if (text.length === 0) {
+                            }
+
+                            if (!(d[i] && (d[i].value || d[i].value === 0))) {
+                                continue;
+                            }
+
+                            text += "<div class='flex popover-row popover-name-" + d[i].id + "'>";
+                            text += "<div class='name'>" + d[i].name + "</div>";
+                            text += "<div class='value'><span style='color:" + color(d[i].id) + "'>"
+                                        + defaultValueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index)
+                                    + "</span></div>";
+                            text += "</div>";
+                        }
+                        return text + '</div></div>';
+                    }
+                };
+                break;
+            case 'pie':
+                defaultOptions = {
+                    tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+                        return '<div class="popover popover-analytics">' +
+                                '<div class="title">' + d[0].name + '</div>' +
+                                '<div class="body">' + defaultValueFormat(d[0].value, d[0].ratio, d[0].id, d[0].index) + ' (' + d[0].value + ')</div>' +
+                            '</div>';
+                    }
+                };
+                break;
+            default:
+                throw 'Chart type '+chartType+' options not handled!';
+        }
+
+        chartOptions = $.extend(true, defaultOptions, chartOptions);
     }
-    dataviz.chartType(this.getConfig('type', 'area'));
     dataviz.chartOptions(chartOptions);
     dataviz.dateFormat('%Y-%m-%d');
     dataviz.labelMapping(labelMapping);
@@ -521,7 +561,6 @@ KeenIOWidget.prototype.formatSeconds = function (totalSeconds) {
 KeenIOWidget.prototype.renderBody = function() {
     var dataviz = this.getDataviz();
     var element = dataviz.el();
-    var stackedCharts = ['area', 'line', 'spline'];
 
     if (typeof element === 'object' && element instanceof HTMLElement) {
         $(element).parent().removeClass("data-loading");
@@ -551,11 +590,21 @@ KeenIOWidget.prototype.renderBody = function() {
                 }
                 dataviz.labels(labels);
 
+                // Workaround until https://github.com/keen/keen-js/issues/420 is fixed.
+                var chartOptions = dataviz.chartOptions();
+                var oldTooltipContents = c3.chart.internal.fn.additionalConfig.tooltip_contents;
+                if (typeof chartOptions.tooltip_contents !== 'undefined') {
+                    c3.chart.internal.fn.additionalConfig.tooltip_contents = chartOptions.tooltip_contents;
+                }
+
                 if (dataviz.view._rendered) {
                     dataviz.update();
                 } else {
                     dataviz.render();
                 }
+
+                // Restore original tooltip_contents
+                c3.chart.internal.fn.additionalConfig.tooltip_contents = oldTooltipContents;
         }
     } else {
         throw 'No valid dataviz element';
@@ -574,7 +623,9 @@ KeenIOWidget.prototype.runQuery = function(callback) {
     };
 
     if (this.getType() !== 'metric') {
-        updateParams.interval = this.getInterval();
+        if ($.inArray(this.getConfig('chartType', 'area'), ['area', 'line']) !== -1) {
+            updateParams.interval = this.getInterval();
+        }
     }
 
     this.updateQueryParams(updateParams);

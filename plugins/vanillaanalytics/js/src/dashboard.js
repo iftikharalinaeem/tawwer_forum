@@ -5,41 +5,10 @@ $(document).ready(function() {
         return;
     }
 
+    // Move this into KeenIOWidget loadDatavizConfig after https://github.com/keen/keen-js/issues/420 is fixed.
     if (typeof c3 === "object") {
         c3.chart.internal.fn.additionalConfig = {
-            axis_x_tick_count: 5,
-            grid_x_show: true,
-            grid_y_show: true,
-            axis_x_tick_format: (function(date) { return this.formatDate(date) }).bind(this),
-            axis_x_tick_type: "timeseries",
-            axis_y_tick_format: (function (d) {if (d % 1 !== 0) {return '';} return d;}),
-            tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
-                var titleFormat = defaultTitleFormat,
-                    nameFormat = function (name) { return name; },
-                    valueFormat = defaultValueFormat,
-                    text, i, title, value, name, bgcolor;
-
-                var date = new Date(d[0].x);
-
-                var text = '<div class="popover popover-analytics">' +
-                    '<div class="title">' + date.toLocaleDateString("en-US") + '</div>' +
-                    '<div class="body">';
-                for (i = 0; i < d.length; i++) {
-                    if (text.length === 0) {}
-
-                    if (! (d[i] && (d[i].value || d[i].value === 0))) { continue; }
-
-                    name = nameFormat(d[i].name);
-                    value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
-                    bgcolor = color(d[i].id);
-
-                    text += "<div class='flex popover-row popover-name-" + d[i].id + "'>";
-                    text += "<div class='name'>" + name + "</div>";
-                    text += "<div class='value'><span style='color:" + bgcolor + "'>" + value + "</span></div>";
-                    text += "</div>";
-                }
-                return text + '</div></div>';
-            }
+            axis_y_tick_format: (function (d) {if (d % 1 !== 0) {return '';} return d;})
         };
     }
 
