@@ -571,7 +571,7 @@ class KeenIOTracker implements TrackerInterface {
 
         // Average Time to First Comment (Metric)
         $timeToFirstCommentQuery = new KeenIOQuery();
-        $timeToFirstCommentQuery->setAnalysisType(KeenIOQuery::ANALYSIS_AVERAGE)
+        $timeToFirstCommentQuery->setAnalysisType(KeenIOQuery::ANALYSIS_MEDIAN)
             ->setTitle(t('Average Time to First Comment'))
             ->setEventCollection('post')
             ->setTargetProperty('commentMetric.time')
@@ -583,7 +583,7 @@ class KeenIOTracker implements TrackerInterface {
             ->addFilter([
                 'operator' => 'gte',
                 'property_name' => 'discussion.dateInserted.timestamp',
-                'eval(property_value)' => "(new Date(this.getRange()['start']).getTime() / 1000)"
+                'property_callback' => 'timeframeStartTimestamp',
             ])
         ;
 
@@ -923,6 +923,7 @@ class KeenIOTracker implements TrackerInterface {
 
         if ($inDashboard) {
             $controller->addJsFile('keeniowidget.min.js', 'plugins/vanillaanalytics');
+            $controller->addJsFile('keeniofiltercallback.min.js', 'plugins/vanillaanalytics');
             $controller->addJsFile('keenioanalysisprocessor.min.js', 'plugins/vanillaanalytics');
         }
     }

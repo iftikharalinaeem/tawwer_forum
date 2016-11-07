@@ -580,32 +580,18 @@ KeenIOWidget.prototype.runQuery = function(callback) {
     this.updateQueryParams(updateParams);
 
     var queries  = this.getQuery();
-
     if (!!queries.length) {
-        /*
-            Eval filters properties with this widget as the context.
-            ie. 'eval(property_value)' => "(new Date(this.getRange()['start']).getTime() / 1000)"
-            would result in property_value => {timestamp of the start timeframe}
-        */
-        var match;
-        var that = this;
-        var evalFromContext = function(js, context) {
-            return function() { return eval(js); }.call(context);
-        }
-
+        // Execute filters' property_callback and assign the result to property_value
         $.each(queries, function(i, query) {
             if (typeof query.params.filters !== 'undefined' && Array.isArray(query.params.filters) && !!query.params.filters.length) {
                 $.each(query.params.filters, function(j, filter) {
                     $.each(filter, function(property, value) {
-                        match = /^eval\((.+)\)$/.exec(property);
-                        if (match) {
-                            delete queries[i].params.filters[j][property];
-                            try {
-                                queries[i].params.filters[j][match[1]] = evalFromContext(value, that);
-                            } catch (e) {
-                                console.debug(e);
-                                throw 'Invalid filter evaluation';
+                        if (property === 'property_callback') {
+                            if (typeof KeenIOFilterCallback[value] !== 'function') {
+                                throw 'Invalid filter callback KeenIOFilterCallback.'+value;
                             }
+                            delete queries[i].params.filters[j][property];
+                            queries[i].params.filters[j]['property_value'] = KeenIOFilterCallback[value](widget);
                         }
                     });
                 });

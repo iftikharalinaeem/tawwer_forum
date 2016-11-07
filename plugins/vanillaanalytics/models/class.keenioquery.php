@@ -131,7 +131,8 @@ class KeenIOQuery implements JsonSerializable {
     /**
      * Add a filter to the query.
      *
-     * You can wrap a property name with eval() to make its value evaluated on the client side.
+     * You can also define property_callback instead of property_value to call one of the predefined callbacks.
+     * See KeenIOFilterCallback.
      *
      * @link https://keen.io/docs/api/#filters
      * @param array $filters
