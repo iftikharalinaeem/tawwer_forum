@@ -465,57 +465,62 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
         dataviz.chartType(chartType);
 
         var defaultOptions = {};
-        if ($.inArray(chartType, ['area', 'line']) !== -1) {
-            defaultOptions = {
-                axis: {
-                    x: {
-                        type: 'timeseries',
-                        tick: {
-                            count: 5,
-                            format: '%Y-%m-%d'
+        switch(chartType) {
+            case 'area':
+            case 'line':
+                defaultOptions = {
+                    axis: {
+                        x: {
+                            type: 'timeseries',
+                            tick: {
+                                count: 5,
+                                format: '%Y-%m-%d'
+                            }
+                        },
+                    },
+                    grid: {
+                        x: {
+                            show: true
+                        },
+                        y: {
+                            show: true
                         }
                     },
-                },
-                grid: {
-                    x: {
-                        show: true
-                    },
-                    y: {
-                        show: true
-                    }
-                },
-                tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
-                    var text = '<div class="popover popover-analytics">' +
-                        '<div class="title">' + new Date(d[0].x).toLocaleDateString("en-US") + '</div>' +
-                        '<div class="body">';
-                    for (var i = 0; i < d.length; i++) {
-                        if (text.length === 0) {
-                        }
+                    tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+                        var text = '<div class="popover popover-analytics">' +
+                            '<div class="title">' + new Date(d[0].x).toLocaleDateString("en-US") + '</div>' +
+                            '<div class="body">';
+                        for (var i = 0; i < d.length; i++) {
+                            if (text.length === 0) {
+                            }
 
-                        if (!(d[i] && (d[i].value || d[i].value === 0))) {
-                            continue;
-                        }
+                            if (!(d[i] && (d[i].value || d[i].value === 0))) {
+                                continue;
+                            }
 
-                        text += "<div class='flex popover-row popover-name-" + d[i].id + "'>";
-                        text += "<div class='name'>" + d[i].name + "</div>";
-                        text += "<div class='value'><span style='color:" + color(d[i].id) + "'>"
-                                    + defaultValueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index)
-                                + "</span></div>";
-                        text += "</div>";
+                            text += "<div class='flex popover-row popover-name-" + d[i].id + "'>";
+                            text += "<div class='name'>" + d[i].name + "</div>";
+                            text += "<div class='value'><span style='color:" + color(d[i].id) + "'>"
+                                        + defaultValueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index)
+                                    + "</span></div>";
+                            text += "</div>";
+                        }
+                        return text + '</div></div>';
                     }
-                    return text + '</div></div>';
-                }
-            };
-        } else if ($.inArray(chartType, ['pie']) !== -1) {
-            defaultOptions = {
-                tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
-                    console.log(d);
-                    return '<div class="popover popover-analytics">' +
-                            '<div class="title">' + d[0].name + '</div>' +
-                            '<div class="body">' + defaultValueFormat(d[0].value, d[0].ratio, d[0].id, d[0].index) + ' (' + d[0].value + ')</div>' +
-                        '</div>';
-                }
-            };
+                };
+                break;
+            case 'pie':
+                defaultOptions = {
+                    tooltip_contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+                        return '<div class="popover popover-analytics">' +
+                                '<div class="title">' + d[0].name + '</div>' +
+                                '<div class="body">' + defaultValueFormat(d[0].value, d[0].ratio, d[0].id, d[0].index) + ' (' + d[0].value + ')</div>' +
+                            '</div>';
+                    }
+                };
+                break;
+            default:
+                throw 'Chart type '+chartType+' options not handled!';
         }
 
         chartOptions = $.extend(true, defaultOptions, chartOptions);
