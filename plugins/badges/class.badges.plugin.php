@@ -8,7 +8,7 @@
 $PluginInfo['badges'] = [
     'Name' => 'Badges',
     'Description' => "Give badges to your users to reward them for contributing to your community.",
-    'Version' => '1.5',
+    'Version' => '1.6.0',
     'RegisterPermissions' => [
         'Reputation.Badges.View' => 1,
         'Reputation.Badges.Request',
