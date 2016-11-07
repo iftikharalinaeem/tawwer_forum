@@ -583,7 +583,7 @@ class KeenIOTracker implements TrackerInterface {
             ->addFilter([
                 'operator' => 'gte',
                 'property_name' => 'discussion.dateInserted.timestamp',
-                'property_callback' => 'timeframeStartTimestamp',
+                'property_callback' => 'timeframeStart',
             ])
         ;
 

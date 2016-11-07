@@ -11,7 +11,7 @@ KeenIOFilterCallback = {
      * @param widget
      * @returns {number}
      */
-    timeframeStartTimestamp: function(widget) {
+    timeframeStart: function(widget) {
         return (new Date(widget.getRange()['start']).getTime() / 1000);
     }
 };
