@@ -168,7 +168,7 @@ class PollsPlugin extends Gdn_Plugin {
                 // Grab all of the user fields that need to be joined.
                 $userIDs = array();
                 foreach ($comments as $row) {
-                    $usserIDs[] = val('InsertUserID', $row);
+                    $userIDs[] = val('InsertUserID', $row);
                 }
 
                 // Get the user votes.
