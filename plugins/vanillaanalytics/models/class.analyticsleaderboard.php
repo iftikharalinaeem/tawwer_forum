@@ -135,6 +135,7 @@ class AnalyticsLeaderboard {
             $position = 0;
             foreach ($result as $currentResult) {
                 $recordID = $currentResult->$typeID;
+                $count = $currentResult->result;
                 $record = $recordModel->getID($recordID, DATASET_TYPE_ARRAY);
                 $previous = array_search($recordID, $previousPositions);
 
@@ -154,7 +155,8 @@ class AnalyticsLeaderboard {
                     'PositionChange' => $positionChange,
                     'Previous' => $previous !== false ? ($previous + 1) : false,
                     'Url' => sprintf($recordUrl, $recordID),
-                    'Title' => $record[$titleAttribute]
+                    'Title' => $record[$titleAttribute],
+                    'Count' => $count
                 ];
                 $resultIndexed[$recordID] = $record;
                 $position++;

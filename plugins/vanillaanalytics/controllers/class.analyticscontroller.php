@@ -102,6 +102,7 @@ class AnalyticsController extends DashboardController {
         );
 
         $this->setData('Leaderboard', $data);
+        $this->setData('Labels', val('labels', val('chart', $widget->getData())));
         $this->render('leaderboard');
     }
 
