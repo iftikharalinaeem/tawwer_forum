@@ -1,31 +1,45 @@
-<?php if (!defined('APPLICATION')) exit();
-$leaderboard = new TableSummaryModule();
-$leaderboard->addColumn('discussions', t('Popular Discussions'))
-    ->addColumn('count-comments', t('Comments'))
-    ->addColumn('count-bookmarks', t('Follows'))
-    ->addColumn('count-views', t('Views'));
-foreach ($this->Data['DiscussionData'] as $discussion) {
-   $leaderboard->addRow([
-       'discussions' => anchor(htmlspecialchars($discussion->Name), discussionUrl($discussion)),
-       'count-comments' => number_format($discussion->CountComments),
-       'count-bookmarks' => number_format($discussion->CountBookmarks),
-       'count-views' => number_format($discussion->CountViews)
-   ]);
-}
-echo $leaderboard;
-
-$leaderboard = new TableSummaryModule();
-$leaderboard->addColumn('users', t('Active Users'))
-    ->addColumn('count-comments', t('Comments'));
-
-foreach ($this->Data['UserData'] as $user) {
-   $leaderboard->addRow([
-      'users' => anchor($user->Name, 'profile/'.$user->UserID.'/'.Gdn_Format::Url($user->Name)),
-      'count-comments' => number_format($user->CountComments)
-   ]);
-}
-echo $leaderboard;
-
+<?php if (!defined('APPLICATION')) exit(); ?>
+<div class="table-summary-wrap PopularDiscussionSummary">
+   <table class="table-summary">
+      <thead>
+         <tr>
+            <th><?php echo t('Popular Discussions'); ?></th>
+            <th><?php echo t('Comments'); ?></th>
+            <th><?php echo t('Follows'); ?></th>
+            <th><?php echo t('Views'); ?></th>
+         </tr>
+      </thead>
+      <tbody>
+         <?php foreach ($this->Data['DiscussionData'] as $Discussion) { ?>
+         <tr>
+            <td><?php echo anchor(htmlspecialchars($Discussion->Name), discussionUrl($Discussion)); ?></td>
+            <td><?php echo number_format($Discussion->CountComments); ?></td>
+            <td><?php echo number_format($Discussion->CountBookmarks); ?></td>
+            <td><?php echo number_format($Discussion->CountViews); ?></td>
+         </tr>
+         <?php } ?>
+      </tbody>
+   </table>
+</div>
+<div class="table-summary-wrap ActiveUserSummary">
+   <table class="table-summary">
+      <thead>
+         <tr>
+            <th><?php echo t('Active Users'); ?></th>
+            <th><?php echo t('Comments'); ?></th>
+         </tr>
+      </thead>
+      <tbody>
+         <?php foreach ($this->Data['UserData'] as $User) { ?>
+         <tr>
+            <td><?php echo anchor($User->Name, 'profile/'.$User->UserID.'/'.Gdn_Format::Url($User->Name)); ?></td>
+            <td><?php echo number_format($User->CountComments); ?></td>
+         </tr>
+         <?php } ?>
+      </tbody>
+   </table>
+</div>
+<?php
 /*
   TODO:
 <div class="Summary PageViewSummary">
