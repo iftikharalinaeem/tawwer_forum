@@ -116,7 +116,7 @@ class Warnings2Plugin extends Gdn_Plugin {
     /**
      * Process expired warning on sign in.
      */
-    public function entryController_afterSignIn_handler() {
+    public function base_afterSignIn_handler() {
         if (Gdn::Session()->UserID) {
             $WarningModel = new WarningModel();
             $WarningModel->ProcessWarnings(Gdn::Session()->UserID);
