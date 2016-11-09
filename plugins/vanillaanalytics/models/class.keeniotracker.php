@@ -25,7 +25,13 @@ class KeenIOTracker implements TrackerInterface {
         'top-posters' => [
             'title' => 'Top Posters',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-            'type' => 'leaderboard'
+            'type' => 'leaderboard',
+            'chart' => [
+                'labels' => [
+                    'record' => 'Name',
+                    'count' => 'Posts'
+                ]
+            ],
         ],
         'total-active-users' => [
             'title' => 'Active Users',
