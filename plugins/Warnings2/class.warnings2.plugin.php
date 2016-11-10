@@ -116,7 +116,7 @@ class Warnings2Plugin extends Gdn_Plugin {
     /**
      * Process expired warning on sign in.
      */
-    public function entryController_afterSignIn_handler() {
+    public function base_afterSignIn_handler() {
         if (Gdn::Session()->UserID) {
             $WarningModel = new WarningModel();
             $WarningModel->ProcessWarnings(Gdn::Session()->UserID);
@@ -310,12 +310,11 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         if ($quote) {
-            $content = sprintf(T('Re: %s'), "{$location}<br/>{$context}");
-
             $issuer = Gdn::userModel()->getID($warning['InsertUserID'], DATASET_TYPE_ARRAY);
-            $content .= "<br/>";
+
+            $content = sprintf(T('Re: %s'), "{$location}<br>{$context}");
             $content .= wrap(T('Moderator'), 'strong').' '.userAnchor($issuer);
-            $content .= "<br/>";
+            $content .= "<br>";
             $content .= wrap(T('Points'), 'strong').' '.$warning['Points'];
 
             echo wrap($content, 'div', array(
@@ -360,7 +359,7 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $emailTemplate = $email->getEmailTemplate();
                 $message = $emailTemplate->getMessage();
 
-                $message .= '<br>'.t('Post that triggered the warning:').'<br>'.formatQuote($record, false);
+                $message .= '<br>'.t('Post that triggered the warning:').formatQuote($record, false);
                 $emailTemplate->setMessage($message);
             }
         }

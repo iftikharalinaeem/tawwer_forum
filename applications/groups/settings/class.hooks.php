@@ -383,7 +383,7 @@ class GroupsHooks extends Gdn_Plugin {
               $discussion = val('Discussion', $args);
               $categoryID = val('CategoryID', $discussion);
               $userID = val('UserID', $args);
-              if (in_array($categoryID, $this->getGroupCategoryIDs()) && ($groupID = val('GroupID', $discussion, false))) {
+              if (in_array($categoryID, GroupModel::getGroupCategoryIDs()) && ($groupID = val('GroupID', $discussion, false))) {
                     $args['HasPermission'] = $this->canViewGroupContent($userID, $groupID);
               }
          }
@@ -587,27 +587,6 @@ class GroupsHooks extends Gdn_Plugin {
         $Sender->Preferences['Notifications']['Popup.Events'] = T('Notify me when there is event activity.');
     }
 
-
-    /**
-     * Retrieves group category IDs.
-     *
-     * @return array An array of category IDs.
-     */
-    public function getGroupCategoryIDs() {
-        $GroupCategoryIDs = Gdn::Cache()->Get('GroupCategoryIDs');
-        if ($GroupCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
-            $CategoryModel = new CategoryModel();
-            $GroupCategories = $CategoryModel->GetWhere(array('AllowGroups' => 1))->ResultArray();
-            $GroupCategoryIDs = array();
-            foreach ($GroupCategories as $GroupCategory) {
-                $GroupCategoryIDs[] = $GroupCategory['CategoryID'];
-            }
-
-            Gdn::Cache()->Store('GroupCategoryIDs', $GroupCategoryIDs);
-        }
-        return $GroupCategoryIDs;
-    }
-
      /**
       * Hide Private content.
       *
@@ -616,7 +595,7 @@ class GroupsHooks extends Gdn_Plugin {
       */
      public function SearchController_Render_Before($Sender, $Args) {
 
-          $GroupCategoryIDs = $this->getGroupCategoryIDs();
+          $GroupCategoryIDs = GroupModel::getGroupCategoryIDs();
 
           $SearchResults = $Sender->Data('SearchResults', array());
           foreach ($SearchResults as $ResultKey => &$Result) {
@@ -660,6 +639,16 @@ class GroupsHooks extends Gdn_Plugin {
                 $Sender->SetData('SearchResults', $SearchResults);
           }
 
+     }
+
+    /**
+     * Add groups categories to the searchable categories
+     *
+     * @param object $sender Sending instance
+     * @param array $args Event's arguments
+     */
+     public function search_allowedCategories_handler($sender, $args) {
+        $args['CategoriesID'] = array_merge($args['CategoriesID'], GroupModel::getGroupCategoryIDs());
      }
 
      /**

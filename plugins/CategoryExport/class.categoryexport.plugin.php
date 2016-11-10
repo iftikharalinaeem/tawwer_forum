@@ -15,6 +15,7 @@ $PluginInfo['CategoryExport'] = [
     'HasLocale' => false,
     'SettingsUrl' => '/categoryexport',
     'SettingsPermission' => 'Garden.Settings.Manage',
+    'Icon' => 'category_export.png',
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'https://vanillaforums.com'

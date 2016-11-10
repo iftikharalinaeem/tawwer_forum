@@ -5,7 +5,13 @@ $Session = Gdn::session(); ?>
 $Alt = false;
 foreach ($this->data('Badges') as $Badge) :
     $Alt = !$Alt;
-    $AjaxString = $Session->transientKey().'?Target='.urlencode($this->SelfUrl);  ?>
+    $AjaxString = $Session->transientKey().'?Target='.urlencode($this->SelfUrl);
+
+    $badgeBlock = new MediaItemModule(UserBadgeModel::badgeName((array)$Badge), 'badge/'.$Badge->BadgeID, Gdn_Format::text($Badge->Body));
+    $badgeBlock->setView('media-sm')
+        ->addCssClass('image-wrap', 'media-image-wrap-no-border')
+        ->setImageIf($Badge->Photo ? true : false, Gdn_Upload::url($Badge->Photo));
+    ?>
 
     <tr class="<?php
         if ($Alt) {
@@ -15,21 +21,7 @@ foreach ($this->data('Badges') as $Badge) :
             echo 'HiddenBadge';
         } ?>">
         <td>
-            <div class="media media-sm">
-                <div class="media-left">
-                    <div class="media-image-wrap-no-border">
-                    <?php if ($Badge->Photo) :
-                        echo img(Gdn_Upload::url($Badge->Photo), array('class' => 'BadgePhoto'));
-                    endif; ?>
-                    </div>
-                </div>
-                <div class="media-body">
-                    <div class="media-title strong">
-                        <?php echo anchor(UserBadgeModel::badgeName((array)$Badge), 'badge/'.$Badge->BadgeID, 'Title'); ?>
-                    </div>
-                    <div class="media-description"><?php echo Gdn_Format::text($Badge->Body); ?></div>
-                </div>
-            </div>
+            <?php echo $badgeBlock; ?>
         </td>
         <td><?php echo Gdn_Format::text($Badge->Class); ?></td>
         <td><?php echo Gdn_Format::text($Badge->Level); ?></td>

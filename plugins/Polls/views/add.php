@@ -54,12 +54,12 @@ if (!$CancelUrl) {
     echo $this->Form->label('Poll Options', 'PollOption[]');
     echo '<ol class="PollOptions">';
     echo '<li class="PollOption">' . $this->Form->textBox('PollOption[]', ['class' => 'InputBox BigInput NoIE']) . '</li>';
-    $PollOptions = val('PollOption', $this->Form->formValues());
-    if (is_array($PollOptions)) {
-        foreach ($PollOptions as $PollOption) {
-            $PollOption = trim(Gdn_Format::plainText($PollOption));
-            if ($PollOption != '') {
-                echo '<li class="PollOption">' . $this->Form->textBox('PollOption[]', ['value' => $PollOption, 'class' => 'InputBox BigInput']) . '</li>';
+    $pollOptions = val('PollOption', $this->Form->formValues());
+    if (is_array($pollOptions)) {
+        foreach ($pollOptions as $pollOption) {
+            $pollOption = trim(Gdn_Format::plainText($pollOption));
+            if ($pollOption != '') {
+                echo '<li class="PollOption">' . $this->Form->textBox('PollOption[]', ['value' => $pollOption, 'class' => 'InputBox BigInput']) . '</li>';
             }
         }
     }
@@ -69,7 +69,7 @@ if (!$CancelUrl) {
 
     echo '<div class="Buttons">';
     echo $this->Form->button('Save Poll', ['class' => 'Button PollButton Primary']);
-    echo ' '.anchor(t('Cancel'), $CancelUrl, 'Button Cancel');
+    echo ' '.anchor(t('Cancel'), $cancelUrl, 'Button Cancel');
     echo '</div>';
     echo $this->Form->close();
     echo '</div>';

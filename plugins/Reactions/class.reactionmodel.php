@@ -7,7 +7,7 @@
 /**
  * Class ReactionModel
  */
-class ReactionModel {
+class ReactionModel extends Gdn_Model {
 
     const USERID_SUM = 0;
 
@@ -29,11 +29,18 @@ class ReactionModel {
     /** @var Gdn_SQL */
     public $SQL;
 
+    protected static $columns = ['UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom', 'Hidden'];
+
     /**
      * ReactionModel constructor.
      */
     public function __construct() {
-        $this->SQL = Gdn::sql();
+        parent::__construct('Reaction');
+        $this->filterFields = array_merge(
+            $this->filterFields,
+            ['Save' => 1]
+        );
+        $this->PrimaryKey = 'UrlCode';
     }
 
     /**
@@ -86,8 +93,7 @@ class ReactionModel {
         $Data['TagID'] = $TagID;
 
         $Row = [];
-        $Columns = ['UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom', 'Hidden'];
-        foreach ($Columns as $Column) {
+        foreach (self::$columns as $Column) {
             if (isset($Data[$Column])) {
                 $Row[$Column] = $Data[$Column];
                 unset($Data[$Column]);
@@ -96,14 +102,14 @@ class ReactionModel {
 
         // Check to see if the reaction type has been customized.
         if (!isset($Row['Custom'])) {
+
+            // Get the cached result
             $Current = self::reactionTypes($UrlCode);
             if ($Current && val('Custom', $Current)) {
                 return;
             }
-        }
 
-        // Check to see if the reaction type has been customized.
-        if (!isset($Row['Custom'])) {
+            // Get the result from the DB
             $CurrentCustom = $this->SQL->getWhere('ReactionType', ['UrlCode' => $UrlCode])->value('Custom');
             if ($CurrentCustom) {
                 return;
@@ -1250,5 +1256,33 @@ class ReactionModel {
         } else {
             return $Result;
         }
+    }
+
+    /**
+     * Save a reaction.
+     *
+     * @param array $formPostValues
+     * @param bool $settings Unused
+     * @return bool
+     */
+    public function save($formPostValues, $settings = false) {
+        $primaryKeyValue = val($this->PrimaryKey, $formPostValues);
+        if (!$primaryKeyValue) {
+            return false;
+        }
+
+        $reaction = self::reactionTypes($primaryKeyValue);
+        if ($reaction) {
+            // Preserve non modified attribute data
+            unset($reaction['Attributes']);
+            $formPostValues = array_merge($reaction, $formPostValues);
+        }
+
+        $this->defineReactionType($formPostValues);
+
+        // Destroy the cache.
+        Gdn::cache()->remove('ReactionTypes');
+
+        return true;
     }
 }

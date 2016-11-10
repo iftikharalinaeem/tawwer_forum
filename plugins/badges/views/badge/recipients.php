@@ -1,11 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-
-<div class="header-block">
-    <div class="title-block">
-        <?php echo anchor(dashboardSymbol('chevron-left'), "/badge/all", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
-        <h1><?php echo $this->data('Badge.Name'); ?></h1>
-    </div>
-</div>
+<?php echo heading($this->data('Badge.Name'), '', '', [], '/badge/all')?>
 <div class="toolbar">
     <?php PagerModule::write(['View' => 'pager-dashboard']); ?>
 </div>
@@ -21,22 +15,15 @@
         <tbody>
         <?php
         if (count($this->data('Recipients'))) :
-            foreach($this->data('Recipients') as $recipient) : ?>
+            foreach($this->data('Recipients') as $recipient) :
+                $userBlock = new MediaItemModule(val('Name', $recipient), userUrl($recipient));
+                $userBlock->setView('media-sm')
+                    ->setImage(userPhotoUrl($recipient))
+                    ->addMeta(htmlspecialchars(val('Reason', $recipient)));
+                ?>
             <tr>
                 <td>
-                    <div class="media media-sm">
-                        <div class="media-left">
-                            <div class="media-image-wrap-no-border">
-                            <?php echo userPhoto($recipient); ?>
-                            </div>
-                        </div>
-                        <div class="media-body">
-                            <div class="media-title strong">
-                                <?php echo userAnchor($recipient); ?>
-                            </div>
-                            <div class="media-description"><?php echo htmlspecialchars(val('Reason', $recipient)); ?></div>
-                        </div>
-                    </div>
+                    <?php echo $userBlock; ?>
                 </td>
                 <td><?php echo Gdn_Format::date(val('DateCompleted', $recipient), 'html'); ?></td>
                 <td><?php

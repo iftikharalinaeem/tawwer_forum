@@ -39,19 +39,19 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      * Display a user's vote in their author info.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_beforeCommentBody_handler($Sender) {
-        $Comment = val('Comment', $Sender->EventArguments);
-        $PollVote = val('PollVote', $Comment);
-        if ($PollVote) {
-            $this->EventArguments['String'] = &$PollVote;
+    public function base_beforeCommentBody_handler($sender) {
+        $comment = val('Comment', $sender->EventArguments);
+        $pollVote = val('PollVote', $comment);
+        if ($pollVote) {
+            $this->EventArguments['String'] = &$pollVote;
             $this->fireEvent('FilterContent');
 
             echo '<div class="PollVote">';
             // Use the sort as the color indicator (it should match up)
-            echo '<span class="PollColor PollColor'.val('Sort', $PollVote).'"></span>';
-            echo '<span class="PollVoteAnswer">'.Gdn_Format::to(val('Body', $PollVote), val('Format', $PollVote)).'</span>';
+            echo '<span class="PollColor PollColor'.val('Sort', $pollVote).'"></span>';
+            echo '<span class="PollVoteAnswer">'.Gdn_Format::to(val('Body', $pollVote), val('Format', $pollVote)).'</span>';
             echo '</div>';
         }
     }
@@ -59,11 +59,11 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function base_discussionTypes_handler($Sender, $Args) {
-        $Args['Types']['Poll'] = [
+    public function base_discussionTypes_handler($sender, $args) {
+        $args['Types']['Poll'] = [
             'Singular' => 'Poll',
             'Plural' => 'Polls',
             'AddUrl' => '/post/poll',
@@ -76,108 +76,108 @@ class PollsPlugin extends Gdn_Plugin {
      * Allows users to vote on a poll. Redirects them back to poll discussion, or
      * returns the module html if ajax request.
      *
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      */
-    public function discussionController_pollVote_create($Sender) {
-        $Session = Gdn::session();
-        $Form = new Gdn_Form();
-        $PollModel = new PollModel();
-        $PollOptionModel = new Gdn_Model('PollOption');
+    public function discussionController_pollVote_create($sender) {
+        $session = Gdn::session();
+        $form = new Gdn_Form();
+        $pollModel = new PollModel();
+        $pollOptionModel = new Gdn_Model('PollOption');
 
         // Get values from the form
-        $PollID = $Form->getFormValue('PollID', 0);
-        $PollOptionID = $Form->getFormValue('PollOptionID', 0);
-        $PollOption = $PollOptionModel->getID($PollOptionID);
-        $VotedForPollOptionID = 0;
+        $pollID = $form->getFormValue('PollID', 0);
+        $pollOptionID = $form->getFormValue('PollOptionID', 0);
+        $pollOption = $pollOptionModel->getID($pollOptionID);
+        $votedForPollOptionID = 0;
 
         // If this is a valid form postback, poll, poll option, and user session, record the vote.
-        if ($Form->authenticatedPostback() && $PollOption && $Session->isValid()) {
-            $VotedForPollOptionID = $PollModel->vote($PollOptionID);
+        if ($form->authenticatedPostback() && $pollOption && $session->isValid()) {
+            $votedForPollOptionID = $pollModel->vote($pollOptionID);
         }
 
-        if ($VotedForPollOptionID == 0) {
-            $Sender->informMessage(t("You didn't select an option to vote for!"));
+        if ($votedForPollOptionID == 0) {
+            $sender->informMessage(t("You didn't select an option to vote for!"));
         }
 
         // What should we return?
-        $Return = '/';
-        if ($PollID > 0) {
-            $Poll = $PollModel->getID($PollID);
-            $Discussion = $Sender->DiscussionModel->getID(GetValue('DiscussionID', $Poll));
-            if ($Discussion) {
-                $Return = discussionUrl($Discussion);
+        $return = '/';
+        if ($pollID > 0) {
+            $poll = $pollModel->getID($pollID);
+            $discussion = $sender->DiscussionModel->getID(val('DiscussionID', $poll));
+            if ($discussion) {
+                $return = discussionUrl($discussion);
             }
         }
 
-        if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
-            redirect($Return);
+        if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
+            redirect($return);
         }
 
         // Otherwise get the poll html & return it.
-        $PollModule = new PollModule();
-        $Sender->setData('PollID', $PollID);
-        $Sender->setJson('PollHtml', $PollModule->toString());
-        $Sender->render('Blank', 'Utility', 'Dashboard');
+        $pollModule = new PollModule();
+        $sender->setData('PollID', $pollID);
+        $sender->setJson('PollHtml', $pollModule->toString());
+        $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
      * Load comment votes on discussion.
      *
-     * @param type $Sender
+     * @param type $sender
      */
-    public function discussionController_render_before($Sender) {
-        $this->_loadVotes($Sender);
+    public function discussionController_render_before($sender) {
+        $this->_loadVotes($sender);
     }
 
     /**
      * Load user votes data based on the discussion in the controller data.
      *
-     * @param type $Sender
+     * @param type $sender
      * @return type
      */
-    private function _loadVotes($Sender) {
+    private function _loadVotes($sender) {
         // Does this discussion have an associated poll?
-        $Discussion = $Sender->data('Discussion');
-        if (!$Discussion) {
-            $Discussion = val('Discussion', $Sender->EventArguments);
+        $discussion = $sender->data('Discussion');
+        if (!$discussion) {
+            $discussion = val('Discussion', $sender->EventArguments);
         }
-        if (!$Discussion) {
-            $Discussion = val('Discussion', $Sender);
+        if (!$discussion) {
+            $discussion = val('Discussion', $sender);
         }
 
-        if (strtolower(GetValue('Type', $Discussion)) == 'poll') {
+        if (strtolower(val('Type', $discussion)) == 'poll') {
             // Load css/js files
-            $Sender->addJsFile('polls.js', 'plugins/Polls');
+            $sender->addJsFile('polls.js', 'plugins/Polls');
 
             // Load the poll based on the discussion id.
-            $PollModel = new PollModel();
-            $Poll = $PollModel->getByDiscussionID(val('DiscussionID', $Discussion));
-            if (!$Poll) {
+            $pollModel = new PollModel();
+            $poll = $pollModel->getByDiscussionID(val('DiscussionID', $discussion));
+            if (!$poll) {
                 return;
             }
 
             // Don't get user votes if this poll is anonymous.
-            if (val('Anonymous', $Poll) || c('Plugins.Polls.AnonymousPolls')) {
+            if (val('Anonymous', $poll) || c('Plugins.Polls.AnonymousPolls')) {
                 return;
             }
 
             // Look at all of the users in the comments, and load their associated
             // poll vote for displaying on their comments.
-            $Comments = $Sender->data('Comments');
-            if ($Comments) {
+            $comments = $sender->data('Comments');
+            if ($comments) {
                 // Grab all of the user fields that need to be joined.
-                $UserIDs = array();
-                foreach ($Comments as $Row) {
-                    $UserIDs[] = val('InsertUserID', $Row);
+                $userIDs = array();
+                foreach ($comments as $row) {
+                    $userIDs[] = val('InsertUserID', $row);
                 }
 
                 // Get the user votes.
-                $Votes = $PollModel->getVotesByUserID($Poll->PollID, $UserIDs);
+                $votes = $pollModel->getVotesByUserID($poll->PollID, $userIDs);
 
                 // Place the user votes on the comment data.
-                foreach ($Comments as &$Row) {
-                    $UserID = val('InsertUserID', $Row);
-                    setValue('PollVote', $Row, val($UserID, $Votes));
+                foreach ($comments as &$row) {
+                    $userID = val('InsertUserID', $row);
+                    setValue('PollVote', $row, val($userID, $votes));
                 }
             }
         }
@@ -204,33 +204,33 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      * Display the Poll label on the discussion list.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_beforeDiscussionMeta_handler($Sender) {
-        $Discussion = $Sender->EventArguments['Discussion'];
-        if (strcasecmp(val('Type', $Discussion), 'Poll') == 0) {
-            echo tag($Discussion, 'Type', 'Poll');
+    public function base_beforeDiscussionMeta_handler($sender) {
+        $discussion = $sender->EventArguments['Discussion'];
+        if (strcasecmp(val('Type', $discussion), 'Poll') == 0) {
+            echo tag($discussion, 'Type', 'Poll');
         }
     }
 
     /**
      * Add a css class to discussions in the discussion list if they have polls attached.
      */
-    public function discussionsController_render_before($Sender) {
-        $this->_addCss($Sender);
+    public function discussionsController_render_before($sender) {
+        $this->_addCss($sender);
     }
 
     /**
      *
      *
-     * @param $Sender
+     * @param $sender
      */
-    protected function _addCss($Sender) {
-        $Discussions = $Sender->data('Discussions');
-        if ($Discussions) {
-            foreach ($Discussions as &$Row) {
-                if (strtolower(val('Type', $Row)) == 'poll') {
-                    setValue('_CssClass', $Row, trim(val('_CssClass', $Row).' ItemPoll'));
+    protected function _addCss($sender) {
+        $discussions = $sender->data('Discussions');
+        if ($discussions) {
+            foreach ($discussions as &$row) {
+                if (strtolower(val('Type', $row)) == 'poll') {
+                    setValue('_CssClass', $row, trim(val('_CssClass', $row).' ItemPoll'));
                 }
             }
         }
@@ -239,56 +239,69 @@ class PollsPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function categoriesController_render_before($Sender) {
-        $this->_addCss($Sender);
+    public function categoriesController_render_before($sender) {
+        $this->_addCss($sender);
     }
 
     /**
      * Add our CSS.
      *
-     * @param AssetModel $Sender
+     * @param AssetModel $sender
      */
-    public function assetModel_styleCss_handler($Sender, $Args) {
-        $Sender->addCssFile('polls.css', 'plugins/Polls');
+    public function assetModel_styleCss_handler($sender, $args) {
+        $sender->addCssFile('polls.css', 'plugins/Polls');
     }
 
     /**
      * Add the poll form to vanilla's post page.
      *
-     * @param PostController $Sender
+     * @param PostController $sender
      */
-    public function PostController_AfterForms_Handler($Sender) {
-        $Forms = $Sender->data('Forms');
-        $Forms[] = ['Name' => 'Poll', 'Label' => sprite('SpPoll').t('New Poll'), 'Url' => 'post/poll'];
-        $Sender->setData('Forms', $Forms);
+    public function PostController_AfterForms_Handler($sender) {
+        $forms = $sender->data('Forms');
+        $forms[] = ['Name' => 'Poll', 'Label' => sprite('SpPoll').t('New Poll'), 'Url' => 'post/poll'];
+        $sender->setData('Forms', $forms);
     }
 
     /**
      * Create the new poll method on post controller.
      */
-    public function postController_poll_create($Sender) {
-        $PollModel = new PollModel();
-        $UseCategories = $Sender->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
-        $CategoryUrlCode = GetValue(0, $Sender->RequestArgs);
-        $Category = false;
-        if ($CategoryUrlCode != '') {
-            $CategoryModel = new CategoryModel();
-            $Category = $CategoryModel->getByCode($CategoryUrlCode);
-            $Sender->CategoryID = $Category->CategoryID;
+    public function postController_poll_create($sender) {
+        $categoryUrlCode = val(0, $sender->RequestArgs);
+        // Override CategoryID if categories are disabled
+        $useCategories = $this->ShowCategorySelector = (bool)c('Vanilla.Categories.Use');
+        if (!$useCategories) {
+            $categoryUrlCode = '';
         }
 
-        if ($Category && $UseCategories) {
-            $Sender->Category = (object)$Category;
+        $pollModel = new PollModel();
+        $category = false;
+        if ($categoryUrlCode != '') {
+            $categoryModel = new CategoryModel();
+            $category = $categoryModel->getByCode($categoryUrlCode);
+            $sender->CategoryID = $category->CategoryID;
+        }
+
+        if ($category) {
+            $sender->Category = (object)$category;
+            $sender->setData('Category', $category);
+            $sender->Form->addHidden('CategoryID', $sender->Category->CategoryID);
+            if (val('DisplayAs', $sender->Category) == 'Discussions') {
+                $sender->ShowCategorySelector = false;
+            } else {
+                // Get all our subcategories to add to the category if we are in a Header or Categories category.
+                $sender->Context = CategoryModel::getSubtree($this->CategoryID);
+            }
         } else {
-            $Sender->CategoryID = 0;
-            $Sender->Category = null;
+            $sender->CategoryID = 0;
+            $sender->Category = null;
         }
 
         // Check permission
-        $Sender->permission('Vanilla.Discussions.Add');
-        $Sender->permission('Plugins.Polls.Add');
+        $sender->permission('Vanilla.Discussions.Add');
+        $sender->permission('Plugins.Polls.Add');
 
         // Polls are not compatible with pre-moderation
         if (checkRestriction('Vanilla.Approval.Require') && !val('Verified', Gdn::session()->User)) {
@@ -296,60 +309,60 @@ class PollsPlugin extends Gdn_Plugin {
         }
 
         // Set the model on the form
-        $Sender->Form->setModel($PollModel);
-        if ($Sender->Form->authenticatedPostBack() === false) {
-            if ($Sender->Category !== null) {
-                $Sender->Form->setData(['CategoryID' => $Sender->Category->CategoryID]);
+        $sender->Form->setModel($pollModel);
+        if ($sender->Form->authenticatedPostBack() === false) {
+            if ($sender->Category !== null) {
+                $sender->Form->setData(['CategoryID' => $sender->Category->CategoryID]);
             }
         } else { // Form was submitted
-            $FormValues = $Sender->Form->formValues();
-            $DiscussionID = $PollModel->save($FormValues, $Sender->CommentModel);
-            $Sender->Form->setValidationResults($PollModel->validationResults());
-            if ($Sender->Form->errorCount() == 0) {
-                $Discussion = $Sender->DiscussionModel->getID($DiscussionID);
-                redirect(discussionUrl($Discussion));
+            $formValues = $sender->Form->formValues();
+            $discussionID = $pollModel->save($formValues, $sender->CommentModel);
+            $sender->Form->setValidationResults($pollModel->validationResults());
+            if ($sender->Form->errorCount() == 0) {
+                $discussion = $sender->DiscussionModel->getID($discussionID);
+                redirect(discussionUrl($discussion));
             }
         }
 
         // Set up the page and render
-        $Sender->title(t('New Poll'));
+        $sender->title(t('New Poll'));
 
         // New poll page should show category in breadcrumb, just like new discussion form.
         $crumb = [];
-        if ($Sender->Category) {
-            $crumb[] = ['Name' => $Sender->Category->Name, 'Url' => categoryUrl($Sender->Category)];
+        if ($sender->Category) {
+            $crumb[] = ['Name' => $sender->Category->Name, 'Url' => categoryUrl($sender->Category)];
         }
-        $crumb[] = ['Name' => $Sender->data('Title'), 'Url' => '/post/poll'];
+        $crumb[] = ['Name' => $sender->data('Title'), 'Url' => '/post/poll'];
 
-        $Sender->setData('Breadcrumbs', $crumb);
-        $Sender->setData('_AnonymousPolls', c('Plugins.Polls.AnonymousPolls'));
-        $Sender->addJsFile('jquery.duplicate.js');
-        $Sender->addJsFile('polls.js', 'plugins/Polls');
-        $this->_addCss($Sender);
-        $Sender->render('add', '', 'plugins/Polls');
+        $sender->setData('Breadcrumbs', $crumb);
+        $sender->setData('_AnonymousPolls', c('Plugins.Polls.AnonymousPolls'));
+        $sender->addJsFile('jquery.duplicate.js');
+        $sender->addJsFile('polls.js', 'plugins/Polls');
+        $this->_addCss($sender);
+        $sender->render('add', '', 'plugins/Polls');
     }
 
     /**
      *
      *
-     * @param PromotedContentModule $Sender
-     * @param array $Args
+     * @param PromotedContentModule $sender
+     * @param array $args
      */
-    public function promotedContentModule_afterBody_handler($Sender, $Args) {
-        $Type = valr('Content.Type', $Sender->EventArgs);
-        if (strcasecmp($Type, 'poll') === 0 && strlen(valr('Content.Body', $Sender->EventArgs)) === 0) {
-            echo ' '.anchor(t('Click here to vote.'), $Sender->EventArgs['ContentUrl']).' ';
+    public function promotedContentModule_afterBody_handler($sender, $args) {
+        $type = valr('Content.Type', $sender->EventArgs);
+        if (strcasecmp($type, 'poll') === 0 && strlen(valr('Content.Body', $sender->EventArgs)) === 0) {
+            echo ' '.anchor(t('Click here to vote.'), $sender->EventArgs['ContentUrl']).' ';
         }
     }
 
     /**
      * Display the poll on the discussion.
      *
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      */
-    public function discussionController_afterDiscussionBody_handler($Sender) {
-        $Discussion = $Sender->data('Discussion');
-        if (strtolower(val('Type', $Discussion)) == 'poll') {
+    public function discussionController_afterDiscussionBody_handler($sender) {
+        $discussion = $sender->data('Discussion');
+        if (strtolower(val('Type', $discussion)) == 'poll') {
             echo Gdn_Theme::module('PollModule');
         }
     }

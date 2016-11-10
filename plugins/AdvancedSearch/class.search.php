@@ -74,7 +74,8 @@ class Search {
         $Categories = CategoryModel::getByPermission('Discussions.View', null, $CategoryFilter);
         $Categories[0] = true; // allow uncategorized too.
         $Categories = array_keys($Categories);
-        //      Trace($Categories, 'allowed cats');
+
+        Gdn::pluginManager()->fireAs('Search')->fireEvent('AllowedCategories', ['CategoriesID' => &$Categories]);
 
         if ($CategoryID) {
             touchValue('subcats', $search, 0);

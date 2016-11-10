@@ -17,6 +17,7 @@ $PluginInfo['Eventi'] = array(
    'RequiredTheme' => false, 
    'RequiredPlugins' => false,
    'HasLocale' => false,
+   'Icon' => 'internal-plugin.png',
    'SettingsUrl' => false,
    'SettingsPermission' => 'Garden.AdminUser.Only',
    'Author' => "Dane MacMillan",

@@ -7,9 +7,6 @@
 </div>
 
 <?php
-$groups = $this->data('Groups');
-$groupModel = new GroupModel();
-$groupModel->JoinRecentPosts($groups);
 // Let plugins and themes set the layout of a group list.
 $layout = c('Vanilla.Discussions.Layout', 'modern');
 $showMore = false;
@@ -18,6 +15,10 @@ $this->EventArguments['layout'] = &$layout;
 $this->EventArguments['showMore'] = &$showMore;
 $this->EventArguments['cssClass'] = &$cssClass;
 $this->fireEvent('beforeBrowseGroupList');
+
+$groups = $this->data('Groups');
+$groupModel = new GroupModel();
+$groupModel->JoinRecentPosts($groups);
 $list = new GroupListModule($groups, 'groups', $this->Title(), t("No groups to display yet."), $cssClass, $showMore, $layout);
 echo $list;
 ?>

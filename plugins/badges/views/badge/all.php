@@ -1,11 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-
-<div class="header-block">
-    <h1><?php echo t('Manage Badges'); ?></h1>
-    <div class="btn-group">
-        <?php echo anchor(t('Add Badge'), '/badge/manage', 'js-modal btn btn-primary'); ?>
-    </div>
-</div>
+<?php echo heading(t('Manage Badges'), t('Add Badge'), '/badge/manage', 'js-modal btn btn-primary')?>
 <div class="table-wrap">
     <table id="Badges" class="table-data js-tj">
         <thead>

@@ -8,6 +8,7 @@ $PluginInfo['googleadsense'] = array(
    'Name' => 'Skimlinks',
    'Description' => 'Puts Skimlinks into vanilla pages.',
    'Version' => '1.0',
+   'Icon' => 'skimlinks.png',
    'RequiredApplications' => FALSE,
    'RequiredTheme' => FALSE, 
    'RequiredPlugins' => FALSE,

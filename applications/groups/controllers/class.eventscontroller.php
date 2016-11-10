@@ -68,6 +68,10 @@ class EventsController extends Gdn_Controller {
                 if (!$Group) {
                     throw NotFoundException('Group');
                 }
+
+                $this->EventArguments['Group'] = &$Group;
+                $this->fireEvent('GroupLoaded');
+
                 $this->setData('Group', $Group);
                 $this->setData('NewButtonId', val('GroupID', $Group));
 
@@ -96,13 +100,18 @@ class EventsController extends Gdn_Controller {
 
         // Upcoming events
         $UpcomingRange = c('Groups.Events.UpcomingRange', '+365 days');
-        $Events = $EventModel->getUpcoming($UpcomingRange, $EventCriteria);
-        $this->setData('UpcomingEvents', $Events);
+        $UpcomingEvents = $EventModel->getUpcoming($UpcomingRange, $EventCriteria);
 
         // Recent events
         $RecentRange = c('Groups.Events.RecentRange', '-365 days');
-        $Events = $EventModel->getUpcoming($RecentRange, $EventCriteria, true);
-        $this->setData('RecentEvents', $Events);
+        $RecentEvents = $EventModel->getUpcoming($RecentRange, $EventCriteria, true);
+
+        $this->EventArguments['UpcomingEvents'] = &$UpcomingEvents;
+        $this->EventArguments['RecentEvents'] = &$RecentEvents;
+        $this->fireEvent('EventsLoaded');
+
+        $this->setData('UpcomingEvents', $UpcomingEvents);
+        $this->setData('RecentEvents', $RecentEvents);
 
         $this->fetchView('event_functions', 'event', 'groups');
         $this->fetchView('group_functions', 'group', 'groups');

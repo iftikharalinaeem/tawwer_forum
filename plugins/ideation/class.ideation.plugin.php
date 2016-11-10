@@ -1486,8 +1486,9 @@ if (!function_exists('getStatusTagHtml')) {
      */
     function getStatusTagHtml($statusName, $statusCode = '') {
         if (empty($statusCode)) {
-            $statusCode = urlencode($statusName);
+            $statusCode = htmlspecialchars($statusName);
         }
-        return ' <a href="'.url('/discussions/tagged/'.$statusCode).'"><span class="Tag Status-Tag-'.$statusCode.'"">'.$statusName.'</span></a> ';
+        $statusCssClass = slugify($statusName);
+        return ' <a href="'.url('/discussions/tagged/'.$statusCode).'"><span class="Tag Status-Tag-'.$statusCssClass.'"">'.$statusName.'</span></a> ';
     }
 }

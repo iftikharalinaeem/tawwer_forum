@@ -10,17 +10,12 @@ $desc = '<p>'.t('Here are all of the reactions you can use on your site.').' '
 
 helpAsset(t('Heads up!'), $desc);
 helpAsset(t('Need More Help?'), anchor(t("Introducing Vanilla Reactions and Badges"), 'https://blog.vanillaforums.com/news/introducing-vanilla-reactions-and-badges/'));
+if (checkPermission('Garden.Settings.Manage')) {
+   echo heading($this->data('Title'), t('Advanced Settings'), '/reactions/advanced', 'js-modal btn btn-primary');
+} else {
+   echo heading($this->data('Title'));
+}
 ?>
-<div class="header-block">
-   <h1><?php echo $this->Data('Title'); ?></h1>
-   <?php if (CheckPermission('Garden.Settings.Manage')) { ?>
-      <div class="Wrap">
-         <?php
-         echo Anchor(T('Advanced Settings'), '/reactions/advanced', 'js-modal btn btn-primary');
-         ?>
-      </div>
-   <?php } ?>
-</div>
 <div class="table-wrap">
 <table class="table-data js-tj">
    <thead>
@@ -36,26 +31,16 @@ helpAsset(t('Need More Help?'), anchor(t("Introducing Vanilla Reactions and Badg
       if (GetValue('Hidden', $ReactionType)) continue;
       $UrlCode = $ReactionType['UrlCode'];
       $State = $ReactionType['Active'] ? 'Active' : 'InActive';
+
+      $reactionBlock = new MediaItemModule(t($ReactionType['Name']), '', $ReactionType['Description']);
+      $reactionBlock->setView('media-sm')
+         ->addCssClass('image-wrap', 'media-image-wrap-no-border')
+         ->setImage('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png');
+
       ?>
       <tr id="ReactionType_<?php echo $ReactionType['UrlCode']; ?>" class="<?php echo $State; ?>">
          <td class="NameColumn">
-            <div class="media media-sm">
-               <div class="media-left">
-                  <div class="media-image-wrap-no-border">
-                     <?php
-                     echo Img('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png', array('ReactionImage')), ' ';
-                     ?>
-                  </div>
-               </div>
-               <div class="media-body">
-                  <div class="media-title strong">
-                     <?php echo t($ReactionType['Name']); ?>
-                  </div>
-                  <div class="media-description">
-                     <?php echo $ReactionType['Description']; ?>
-                  </div>
-               </div>
-            </div>
+            <?php echo $reactionBlock; ?>
          </td>
          <td class="AutoDescription">
             <?php

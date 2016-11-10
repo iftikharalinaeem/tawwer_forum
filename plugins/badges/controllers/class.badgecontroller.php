@@ -373,6 +373,8 @@ class BadgeController extends BadgesAppController {
             // Editing an badge.
             $this->setData('Badge', $Badge);
             $this->Form->setData($this->data('Badge'));
+
+            $this->setData('HasThreshold', in_array(strtolower(val('Type', $Badge)), ['reaction', 'usercount']));
         }
 
         $this->fireEvent('ManageBadgeForm');
