@@ -37,8 +37,9 @@ class SamlSSOPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Force a saml authentication to the identity provider.
-     * This function is called in the Hobson plugin, do not remove.
+     * Force a SAML authentication to the identity provider.
+     *
+     * Required by some customizations; do not remove.
      *
      * @param string $authenticationKey The key in the AuthenticationProvider table
      * @param bool $passive Whether or not to make a passive request.
@@ -192,7 +193,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
             $id = val('id', $saml);
             $profile = val('profile', $saml);
         } else {
-            // Grab the saml session from the saml response.
+            // Grab the SAML session from the SAML response.
             $settings = $this->getSettings($authenticationKey);
             $response = new OneLogin_Saml_Response($settings, $Sender->Request->post('SAMLResponse'));
 
@@ -373,7 +374,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $signature = $data['Signature'];
         $signature = base64_decode($signature);
 
-        // Get the id from the saml.
+        // Get the id from the SAML.
         $saml = gzinflate(base64_decode($data[$name]));
         $xml = new SimpleXMLElement($saml);
         $id = (string)$xml['ID'];
@@ -466,10 +467,10 @@ class SamlSSOPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Return a specific or all saml provider.
+     * Return a specific or all SAML provider.
      *
      * @param string $authenticationKey SAML authentication key
-     * @return array A specific or all saml provider.
+     * @return array A specific or all SAML provider.
      */
     private function getProvider($authenticationKey = null) {
         if ($authenticationKey !== null) {
