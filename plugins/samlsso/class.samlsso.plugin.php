@@ -45,7 +45,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @param bool $passive Whether or not to make a passive request.
      * @param string $target The target url to redirect to after the signin.
      */
-    public function authenticate($authenticationKey, $passive = false, $target = false) {
+    public function authenticate($authenticationKey = null, $passive = false, $target = false) {
         $settings = $this->getSettings($authenticationKey);
         $request = new OneLogin_Saml_AuthRequest($settings);
         $request->isPassive = $passive;
