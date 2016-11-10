@@ -31,26 +31,16 @@ if (checkPermission('Garden.Settings.Manage')) {
       if (GetValue('Hidden', $ReactionType)) continue;
       $UrlCode = $ReactionType['UrlCode'];
       $State = $ReactionType['Active'] ? 'Active' : 'InActive';
+
+      $reactionBlock = new MediaItemModule(t($ReactionType['Name']), '', $ReactionType['Description']);
+      $reactionBlock->setView('media-sm')
+         ->addCssClass('image-wrap', 'media-image-wrap-no-border')
+         ->setImage('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png');
+
       ?>
       <tr id="ReactionType_<?php echo $ReactionType['UrlCode']; ?>" class="<?php echo $State; ?>">
          <td class="NameColumn">
-            <div class="media media-sm">
-               <div class="media-left">
-                  <div class="media-image-wrap-no-border">
-                     <?php
-                     echo Img('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png', array('ReactionImage')), ' ';
-                     ?>
-                  </div>
-               </div>
-               <div class="media-body">
-                  <div class="media-title strong">
-                     <?php echo t($ReactionType['Name']); ?>
-                  </div>
-                  <div class="media-description">
-                     <?php echo $ReactionType['Description']; ?>
-                  </div>
-               </div>
-            </div>
+            <?php echo $reactionBlock; ?>
          </td>
          <td class="AutoDescription">
             <?php
