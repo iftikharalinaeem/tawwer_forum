@@ -2,6 +2,7 @@ var analyticsToolbar = {
 
     inited: false,
 
+    minTicks: 2,
     maxTicks: 200,
 
     /**
@@ -56,11 +57,12 @@ var analyticsToolbar = {
         if (!rangeSeconds) {
             rangeSeconds = 86400; // default to one day
         }
-        var threshold = rangeSeconds / analyticsToolbar.maxTicks;
+        var maxThreshold = rangeSeconds / analyticsToolbar.maxTicks;
+        var minThreshold = rangeSeconds / analyticsToolbar.minTicks;
 
         // Set bad intervals to disabled.
         $('.js-analytics-interval').each(function() {
-            if ($(this).data('seconds') < threshold) {
+            if ($(this).data('seconds') <= maxThreshold || $(this).data('seconds') >= minThreshold) {
                 $(this).addClass('disabled');
             } else {
                 $(this).removeClass('disabled');
