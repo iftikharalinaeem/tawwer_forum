@@ -165,9 +165,10 @@ class SamlSSOPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Handle the SSO connection.
      *
-     * @param $Sender
-     * @param $Args
+     * @param Gdn_Controller $Sender
+     * @param array $Args
      * @throws Exception
      */
     public function base_connectData_handler($Sender, $Args) {
@@ -187,7 +188,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
         $saml = Gdn::session()->stash('samlsso', '', false);
         if ($saml) {
-            // The saml session has been retreived.
+            // The SAML session has been retrieved.
             $id = val('id', $saml);
             $profile = val('profile', $saml);
         } else {
@@ -199,7 +200,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
             try {
                 if (!$response->isValid()) {
-                    throw new Gdn_UserException('The saml response was not valid.');
+                    throw new Gdn_UserException('The SAML response was not valid.');
                 }
             } catch (Exception $ex) {
                 Logger::event('saml_response_invalid', Logger::ERROR, $ex->getMessage(), ['code' => $ex->getCode()]);
@@ -232,9 +233,10 @@ class SamlSSOPlugin extends Gdn_Plugin {
         }
 
         // Set the target from common items.
-        if ($relay_state = $Sender->Request->Post('RelayState')) {
-            if (IsUrl($relay_state) || preg_match('`^[/a-z]`i', $relay_state))
+        if ($relay_state = $Sender->Request->post('RelayState')) {
+            if (isUrl($relay_state) || preg_match('`^[/a-z]`i', $relay_state)) {
                 $Form->setFormValue('Target', $relay_state);
+            }
         }
 
         Logger::event('saml_profile', Logger::INFO, 'Profile Received from SAML', ['profile' => $profile]);
