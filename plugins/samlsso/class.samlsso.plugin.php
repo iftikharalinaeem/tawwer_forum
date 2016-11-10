@@ -401,7 +401,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @param string $authenticationKey SAML authentication key
      * @return OneLogin_Saml_Settings
      */
-    public function getSettings($authenticationKey) {
+    public function getSettings($authenticationKey = null) {
         self::requireFiles();
         $settings = new OneLogin_Saml_Settings();
         $provider = $this->getProvider($authenticationKey);
@@ -410,7 +410,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $settings->idpPublicCertificate = $provider['AssociationSecret'];
         $settings->requestedNameIdFormat = $provider['IdentifierFormat'];
         $settings->spIssuer = val('EntityID', $provider, $provider['Name']);
-        $settings->spReturnUrl = url('/entry/connect/saml?authKey='.urlencode($authenticationKey), true);
+        $settings->spReturnUrl = url('/entry/connect/saml?authKey='.urlencode($provider['AuthenticationKey']), true);
         $settings->spSignoutReturnUrl = url('/entry/signout', true);
         $settings->spPrivateKey = val('SpPrivateKey', $provider);
         $settings->spCertificate = val('SpCertificate', $provider);
