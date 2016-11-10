@@ -59,9 +59,12 @@ class ReactionModel extends Gdn_Model {
         }
 
         if (!$Row) {
+            // Add FullName column if it doesn't exist.
+            Gdn::structure()->table('Tag')->column('FullName', 'varchar(100)', false, 'index')->set();
             $TagID = Gdn::sql()->insert('Tag',
                 [
                     'Name' => $Name,
+                    'FullName' => $Name,
                     'Type' => 'Reaction',
                     'InsertUserID' => Gdn::session()->UserID,
                     'DateInserted' => Gdn_Format::toDateTime()
