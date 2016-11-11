@@ -62,6 +62,7 @@ class ReactionModel extends Gdn_Model {
             $TagID = Gdn::sql()->insert('Tag',
                 [
                     'Name' => $Name,
+                    'FullName' => $Name,
                     'Type' => 'Reaction',
                     'InsertUserID' => Gdn::session()->UserID,
                     'DateInserted' => Gdn_Format::toDateTime()
