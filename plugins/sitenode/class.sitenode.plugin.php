@@ -499,6 +499,14 @@ class SiteNodePlugin extends Gdn_Plugin {
                     $categoryMap[$hubID] = $categoryID;
                 }
                 $categoryModel->Validation->results(true);
+            } elseif (!empty($category['Permissions'])) {
+                $permissions = $category['Permissions'];
+                foreach ($permissions as &$perm) {
+                    $perm['JunctionTable'] = 'Category';
+                    $perm['JunctionColumn'] = 'PermissionCategoryID';
+                    $perm['JunctionID'] = -1;
+                }
+                $permissionModel->saveAll($permissions, ['JunctionID' => -1, 'JunctionTable' => 'Category']);
             }
 
         }
