@@ -19,6 +19,7 @@ $PluginInfo['MailChimpPush'] = array(
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://about.me/timgunter',
     'Icon' => 'mailchimp_push.png',
+    'UsePopupSettings' => 'false',
     'SettingsUrl' => '/plugin/mailchimp'
 );
 
@@ -69,6 +70,14 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         }
 
         return $this->MCAPI;
+    }
+
+    /**
+     * @param DashboardNavModule $nav
+     */
+    public function dashboardNavModule_init_handler($nav) {
+        // Add MailChimp settings menu option.
+        $nav->addLinkIf('Garden.Settings.Manage', 'MailChimp', '/plugin/mailchimp', 'site-settings.mailchimp');
     }
 
     /**
@@ -220,6 +229,39 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         $this->dispatch($sender);
     }
 
+    /**
+     * Config page in the dashboard.
+     *
+     * @param PluginController $sender
+     */
+    public function controller_massSync($sender) {
+        $sender->permission('Garden.Settings.Manage');
+        $sender->Form = new Gdn_Form();
+        $sender->Form->setData(array(
+            'SyncBanned'      => false,
+            'SyncDeleted'     => false,
+            'SyncUnconfirmed' => false
+        ));
+
+        // Get additional settings
+        $settingValues = array();
+        $provider = $this->provider();
+        foreach (self::$settings as $setting) {
+            $settingValues[$setting] = val($setting, $provider);
+            $sender->Form->setValue($setting, $settingValues[$setting]);
+        }
+        extract($settingValues);
+        $this->setListData($sender);
+
+        $sender->addDefinition('MailChimpUploadSuccessMessage', t('MailChimp will now process the list you have uploaded. Check your MailChimp Dashboard later.'));
+        $syncURL = gdn::request()->url('plugin/mailchimp/sync', true);
+        $sender->Form->addHidden('SyncURL', $syncURL);
+        $trackBatchesURL = gdn::request()->url('plugin/mailchimp/trackbatches', true);
+        $sender->Form->addHidden('TrackBatchesURL', $trackBatchesURL);
+        $sender->setHighlightRoute('plugin/mailchimp');
+        $sender->render('masssync', '', 'plugins/MailChimpPush');
+    }
+
 
     /**
      * Add mailchimp js to dashboard
@@ -230,7 +272,33 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     public function base_render_before($sender, $args) {
         if ($sender->MasterView == 'admin') {
             $sender->addJsFile('mailchimp.js', 'plugins/MailChimpPush');
+            $sender->addCssFile('mailchimp.css', 'plugins/MailChimpPush');
         }
+    }
+
+
+    private function setListData($sender) {
+        $allLists = $this->MCAPI()->lists();
+        $sender->setData('Lists', $allLists);
+
+        // Get all the interest categories (Groups) attached to each list from MailChimp
+        $listIDs = array_keys($allLists);
+        $interests = [];
+        foreach ($listIDs as $list) {
+
+            // All interests are nested in interest categories, first get all the categories associated with a list.
+            $interestCategories = $this->MCAPI()->listInterestCategories($list);
+            $interestList = [];
+            if ($interestCategories) {
+
+                // Loop through the interests and assign them to an array using the ListID as a unique key.
+                foreach ($interestCategories as $categoryID) {
+                    $interestList = array_merge($interestList, $this->MCAPI()->listInterest($list, $categoryID));
+                }
+                $interests[$list] = $interestList;
+            }
+        }
+        $sender->setData('Interests', $interests);
     }
 
     /**
@@ -248,7 +316,6 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         $sender->addDefinition('MailChimpUploadSuccessMessage', t('MailChimp will now process the list you have uploaded. Check your MailChimp Dashboard later.'));
 
         $provider = $this->provider();
-
         $apiKey = val('AssociationSecret', $provider);
         $sender->Form->setValue('ApiKey', $apiKey);
 
@@ -276,28 +343,9 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         if (!empty($apiKey)) {
             $ping = $this->MCAPI()->ping();
             if ($ping === true) {
+                $configured = true;
                 $sender->setData('Configured', true);
-                $allLists = $this->MCAPI()->lists();
-                $sender->setData('Lists', $allLists);
-
-                // Get all the interest categories (Groups) attached to each list from MailChimp
-                $listIDs = array_keys($allLists);
-                $interests = [];
-                foreach ($listIDs as $list) {
-
-                    // All interests are nested in interest categories, first get all the categories associated with a list.
-                    $interestCategories = $this->MCAPI()->listInterestCategories($list);
-                    $interestList = [];
-                    if ($interestCategories) {
-
-                        // Loop through the interests and assign them to an array using the ListID as a unique key.
-                        foreach ($interestCategories as $categoryID) {
-                            $interestList = array_merge($interestList, $this->MCAPI()->listInterest($list, $categoryID));
-                        }
-                        $interests[$list] = $interestList;
-                    }
-                }
-                $sender->setData('Interests', $interests);
+                $this->setListData($sender);
             } else {
                 $sender->Form->addError('Bad API Key');
             }
@@ -315,7 +363,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
             // Update API Key?
             $suppliedApiKey = $sender->Form->getvalue('ApiKey');
-            if ($suppliedApiKey && $suppliedApiKey != $apiKey) {
+            if ($suppliedApiKey != $apiKey) {
                 $modified = true;
                 $ProviderModel = new Gdn_AuthenticationProviderModel();
 
@@ -325,46 +373,47 @@ class MailChimpPushPlugin extends Gdn_Plugin {
                         'AuthenticationSchemeAlias'   => self::PROVIDER_ALIAS,
                         'AssociationSecret'           => $suppliedApiKey
                     ));
-
-                    $this->provider = null;
+                    $provider = null;
                     $provider = $this->provider();
                 } else {
                     $provider['AssociationSecret'] = $suppliedApiKey;
                     $ProviderModel->save($provider);
-                    $this->provider = $provider;
                 }
             }
 
-            // Update settings
-            foreach (self::$settings as $setting) {
+            if ($configured) {
+                // Update settings
+                foreach (self::$settings as $setting) {
 
-                // Get values from the form that correspond to settings.
-                $suppliedSettingValue = $sender->Form->getValue($setting);
+                    // Get values from the form that correspond to settings.
+                    $suppliedSettingValue = $sender->Form->getValue($setting);
 
-                // If the setting is an array...
-                // InterestID is an array since there can be more than one per form (name='interestID[uniqueId]').
-                if (is_array($suppliedSettingValue)) {
-                    $suppliedSettingValues = array_values($suppliedSettingValue);
+                    // If the setting is an array...
+                    // InterestID is an array since there can be more than one per form (name='interestID[uniqueId]').
+                    if (is_array($suppliedSettingValue)) {
+                        $suppliedSettingValues = array_values($suppliedSettingValue);
 
-                    // loop through the values and save the the changed value to UserMeta and the provider.
-                    foreach ($suppliedSettingValues as $value) {
-                        if ($value != $settingValues[$setting]) {
-                            $modified = true;
-                            $this->setUserMeta(0, $setting, $value);
-                            $provider[$setting] = $value;
+                        // loop through the values and save the the changed value to UserMeta and the provider.
+                        foreach ($suppliedSettingValues as $value) {
+                            if ($value != $settingValues[$setting]) {
+                                $modified = true;
+                                $this->setUserMeta(0, $setting, $value);
+                                $provider[$setting] = $value;
+                            }
                         }
-                    }
 
-                // If it is not an array, extract the value and save it to UserMeta and the provider.
-                } elseif ($suppliedSettingValue != $settingValues[$setting]) {
-                    $modified = true;
-                    $this->setUserMeta(0, $setting, $suppliedSettingValue);
-                    $provider[$setting] = $suppliedSettingValue;
+                    // If it is not an array, extract the value and save it to UserMeta and the provider.
+                    } elseif ($suppliedSettingValue != $settingValues[$setting]) {
+                        $modified = true;
+                        $this->setUserMeta(0, $setting, $suppliedSettingValue);
+                        $provider[$setting] = $suppliedSettingValue;
+                    }
                 }
             }
 
             if ($modified) {
                 $sender->informMessage(t('Changes saved'));
+                redirect('/plugin/mailchimp');
             }
         }
 

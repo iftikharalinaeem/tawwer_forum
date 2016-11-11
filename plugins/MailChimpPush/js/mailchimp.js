@@ -1,5 +1,9 @@
 $(document).on('contentLoad', function(e) {
 
+   // Don't show until we're ready.
+   $('.Synchronization').hide();
+   $('#SynchronizationMessages').hide();
+
    /**
     * InterestDropdowns are select elements of "interests" that have been
     * created created on MailChimp. Each list of interests is associated with a list.
@@ -39,23 +43,24 @@ $(document).on('contentLoad', function(e) {
    $('#Form_SyncListID').on('change', this, function(e){
       showSyncInterestOptions();
    });
-   
+
    $('.MailChimpSync').on('click', '#MailChimp-Synchronize', function(e) {
+      $('#SynchronizationMessages').hide();
       // Start processing users
       process(0);
    });
-   
+
    /**
     * Reveal progress bar
     */
    var progressBar = function() {
-      $('.Synchronization').css('display', 'block');
+      $('.Synchronization').show();
       $('.Synchronization').removeClass('Finished');
    }
-   
+
    /**
     * Update progress bar
-    * 
+    *
     * @param {object} data - Data object returned from ajax call
     * @returns {bool}
     */
@@ -73,46 +78,45 @@ $(document).on('contentLoad', function(e) {
          }
          if (isNaN(data.Progress))
             data.Progress = 0;
-         
+
          auto = false;
       }
 
       var isError = data.hasOwnProperty('Error');
       var isError = (isError || isNaN(data.Progress));
-      
+
       if (isError) {
-         
          var error = data.hasOwnProperty('Error') ? data.Error : data.Progress;
          var fatal = data.hasOwnProperty('Fatal') ? data.Fatal : false;
-         
-         $('.Synchronization').addClass('Error');
+
+         $('.Synchronization').addClass('alert-danger');
          $('.Synchronization .SyncProgress').css('width', '100%');
          $('.Synchronization .SyncProgress').html(error);
-         
+
          var cErrors = $('.Synchronization .SyncProgress').data('errors');
          if (isNaN(cErrors)) cErrors = 0;
          cErrors++;
          $('.Synchronization .SyncProgress').data('errors', cErrors);
-         
+
          if (cErrors > 3)
             rerun = false;
          else
             rerun = true;
-         
+
          if (fatal)
             rerun = false;
-         
+
       } else {
-         
+
          $('.Synchronization .SyncProgress').data('progress', data.Progress);
-         
+
          if (!isNaN(data.Offset) && data.Offset != null)
             $('.Synchronization .SyncProgress').data('offset', data.Offset);
-         
+
          // Upgrade progress bar width
          $('.Synchronization .SyncProgress').css('width', data.Progress+'%');
          $('.Synchronization .SyncProgress').html('<span>'+data.Progress+'%</span>');
-         $('.Synchronization').removeClass('Error');
+         $('.Synchronization').removeClass('alert-danger');
 
          // Check for rerun
          if (auto) {
@@ -121,14 +125,14 @@ $(document).on('contentLoad', function(e) {
             } else {
                finish(true);
             }
-         
+
             // Reset errors on success
             if (reseterrors)
                $('.Synchronization .SyncProgress').data('errors', 0);
          }
       }
-      
-      
+
+
       // Schedule rerun
       if (rerun && auto) {
          var waitTime = isError ? 5000 : 50;
@@ -144,7 +148,7 @@ $(document).on('contentLoad', function(e) {
     */
    var process = function() {
       $('.MailChimpSync #MailChimp-Synchronize').prop('disabled', 'disabled');
-      
+
       // Start at 0
       var offset = $('.Synchronization .SyncProgress').data('offset') || 0;
       var url = $('#Form_SyncURL').val();
@@ -154,9 +158,9 @@ $(document).on('contentLoad', function(e) {
       var syncDeleted = $('.MailChimpSync #Form_SyncDeleted').prop('checked') ? 1 : 0;
       var syncUnconfirmed = $('.MailChimpSync #Form_SyncUnconfirmed').prop('checked') ? 1 : 0;
       var syncInterestID = $('.MailChimpSync #Form_SyncInterestID'+syncListID).val();
-      
+
       var send = {
-            Postback: true, 
+            Postback: true,
             TransientKey: gdn.definition('TransientKey', ''),
             Offset: offset,
             SyncListID: syncListID,
@@ -165,7 +169,7 @@ $(document).on('contentLoad', function(e) {
             SyncDeleted: syncDeleted,
             SyncInterestID: syncInterestID
          };
-         
+
       if (syncUnconfirmed != undefined) {
          send.SyncUnconfirmed = syncUnconfirmed;
       }
@@ -187,8 +191,7 @@ $(document).on('contentLoad', function(e) {
                      Fatal: false
                   };
                }
-            } else {
-               if (isNaN(syncprogress))
+            } else if (isNaN(syncprogress)) {
                   data.Error = syncprogress;
             }
 
@@ -202,7 +205,7 @@ $(document).on('contentLoad', function(e) {
             progress(data);
          }
       });
-      
+
    };
 
    /**
@@ -213,7 +216,7 @@ $(document).on('contentLoad', function(e) {
       $('.Synchronization').addClass('Finished');
       if (success) {
          $('.Synchronization .SyncProgress').css('width', '100%');
-         $('.Synchronization').removeClass('Error');
+         $('.Synchronization').removeClass('alert-danger');
          $('.Synchronization .SyncProgress').html('Completed');
          setTimeout(reset, 3000);
       }
@@ -225,8 +228,9 @@ $(document).on('contentLoad', function(e) {
     * has not necessarily been processed on MailChimp
     */
    var reset = function() {
-      $('.Synchronization').css('display', 'none');
-      var successMessage = gdn.getMeta('MailChimpUploadSuccessMessage', 'MailChimp will now process the list you have uploaded. Check your MailChimp Dashboard later.');
-      $('#SychronizationMessages').removeClass('alert-info').addClass('alert-warning').html(successMessage);
+      $('.Synchronization').hide();
+      var message = 'Success! MailChimp will now process the list you have uploaded. Check your MailChimp Dashboard later.';
+      var successMessage = gdn.getMeta('MailChimpUploadSuccessMessage', message);
+      $('#SynchronizationMessages').show().html(successMessage);
    }
 });
