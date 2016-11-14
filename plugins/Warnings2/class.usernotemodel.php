@@ -87,8 +87,9 @@ class UserNoteModel extends Gdn_Model {
      * @param null $Value
      */
     public function setField($RowID, $Name, $Value = null) {
-        if (!is_array($Name))
+        if (!is_array($Name)) {
             $Name = array($Name => $Value);
+        }
 
         $this->defineSchema();
         $Fields = $this->Schema->fields();
@@ -101,8 +102,9 @@ class UserNoteModel extends Gdn_Model {
             $Row = $this->SQL->select('Attributes')->getWhere('UserNote', array('UserNoteID' => $RowID))->firstRow(DATASET_TYPE_ARRAY);
             if (isset($Row['Attributes'])) {
                 $Attributes = dbdecode($Row['Attributes']);
-                if (is_array($Attributes))
+                if (is_array($Attributes)) {
                     $Attributes = array_merge($Attributes, $NotInSchema);
+                }
                 else
                     $Attributes = $NotInSchema;
             } else {

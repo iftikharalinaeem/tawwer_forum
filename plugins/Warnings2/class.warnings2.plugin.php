@@ -392,11 +392,9 @@ class Warnings2Plugin extends Gdn_Plugin {
                     'CssClass' => 'Popup UserNoteButton'
                 );
             }
+            $checkPermission = Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
-            if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)
-                && Gdn::session()->UserID != $sender->EventArguments['UserID']
-            ) {
-
+            if ($checkPermission && Gdn::session()->UserID != $sender->EventArguments['UserID']) {
                 $sender->EventArguments['ProfileOptions'][] = array(
                     'Text' => sprite('SpWarn').' '.t('Warn'),
                     'Url' => '/profile/warn?userid='.$args['UserID'],

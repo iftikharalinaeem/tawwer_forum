@@ -13,11 +13,12 @@
    <?php if ($this->data('Punished')): ?>
    <div class="Message">
       <?php 
-      if ($this->UserID == Gdn::session()->UserID)
+      if ($this->UserID == Gdn::session()->UserID) {
          echo t('You are jailed.');
-      else
+      } else {
          echo sprintf(t('%s is jailed.'), htmlspecialchars($this->data('Name')));
-      
+      }
+
       ?>
       <ul>
          <li>Can't post discussions.</li>

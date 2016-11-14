@@ -68,8 +68,9 @@ function writeUserNoteWarning($Row) {
             echo '<span class="NoteType NoteType-ban">'.t('Ban').'</span> '.bullet(' ');
          }
 
-         if ($Reversed)
-            echo '<del>';
+         if ($Reversed) {
+             echo '<del>';
+         }
 
          echo plural(val('Points', $Row, 0), '%s point', '%s points');
 
@@ -78,8 +79,9 @@ function writeUserNoteWarning($Row) {
             sprintf(t('lasts %s'), $Row['ExpiresString']);
          }
 
-         if ($Reversed)
-            echo '</del>';
+         if ($Reversed) {
+             echo '</del>';
+         }
 
          if (val('Reversed', $Row)) {
             echo bullet(' ').

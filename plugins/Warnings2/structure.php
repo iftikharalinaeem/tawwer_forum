@@ -40,21 +40,21 @@ Gdn::structure()->table('WarningType')
 if (!$WarningTypeExists) {
     Gdn::sql()->replace(
         'WarningType',
-      array('Description' => '', 'Points' => '0'),
+        array('Description' => '', 'Points' => '0'),
         array('Name' => 'Notice'),
         true
     );
 
     Gdn::sql()->replace(
         'WarningType',
-      array('Description' => '', 'Points' => '2', 'ExpireNumber' => '1', 'ExpireType' => 'weeks'),
+        array('Description' => '', 'Points' => '2', 'ExpireNumber' => '1', 'ExpireType' => 'weeks'),
         array('Name' => 'Minor'),
         true
     );
 
     Gdn::sql()->replace(
         'WarningType',
-      array('Description' => '', 'Points' => '3', 'ExpireNumber' => '2', 'ExpireType' => 'weeks'),
+        array('Description' => '', 'Points' => '3', 'ExpireNumber' => '2', 'ExpireType' => 'weeks'),
         array('Name' => 'Major'),
         true
     );

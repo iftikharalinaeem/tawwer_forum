@@ -48,15 +48,18 @@ class UserAlertModel extends Gdn_Model {
     public function setTimeExpires(&$Alert) {
         $TimeExpires = 0;
         foreach ($Alert as $Name => $Value) {
-            if ($Name == 'TimeExpires' || !stringEndsWith($Name, 'Expires'))
+            if ($Name == 'TimeExpires' || !stringEndsWith($Name, 'Expires')) {
                 continue;
-            if (!$TimeExpires || ($Value && $Value < $TimeExpires))
+            }
+            if (!$TimeExpires || ($Value && $Value < $TimeExpires)) {
                 $TimeExpires = $Value;
+            }
         }
-        if (!$TimeExpires)
+        if (!$TimeExpires) {
             $Alert['TimeExpires'] = null;
-        else
+        } else {
             $Alert['TimeExpires'] = $TimeExpires;
+        }
 
         return $Alert['TimeExpires'];
     }
@@ -74,15 +77,17 @@ class UserAlertModel extends Gdn_Model {
         if ($CurrentRow) {
             $UserID = $Row['UserID'];
             unset($Row['UserID']);
-            if ($this->update($Row, array('UserID' => $UserID)))
+            if ($this->update($Row, array('UserID' => $UserID))) {
                 return $UserID;
-            else
+            } else {
                 return false;
+            }
         } else {
-            if ($this->insert($Row))
+            if ($this->insert($Row)) {
                 return $Row['UserID'];
-            else
+            } else {
                 return false;
+            }
         }
     }
 }

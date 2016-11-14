@@ -22,10 +22,11 @@ if (count($this->data('WarningTypes', array())) <= 1) {
 
     foreach ($this->data('WarningTypes', array()) as $Row) {
        $Points = plural($Row['Points'], '%s point', '%s points');
-       if ($Row['ExpireNumber'])
-          $Expires = sprintf(t('lasts %s'), plural($Row['ExpireNumber'], '%s '.rtrim($Row['ExpireType'], 's'), '%s '.$Row['ExpireType']));
-       else
-          $Expires = '';
+       if ($Row['ExpireNumber']) {
+           $Expires = sprintf(t('lasts %s'), plural($Row['ExpireNumber'], '%s '.rtrim($Row['ExpireType'], 's'), '%s '.$Row['ExpireType']));
+       } else {
+           $Expires = '';
+       }
 
        echo '<div class="WarningType">'.
           $this->Form->radio('WarningTypeID', $Row['Name'], array('value' => $Row['WarningTypeID'])).
