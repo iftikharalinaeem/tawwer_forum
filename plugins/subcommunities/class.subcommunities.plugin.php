@@ -253,10 +253,13 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         // Look the root up in the mini sites.
         $site = SubcommunityModel::getSite($root);
-        $defaultSite = SubcommunityModel::getDefaultSite();
+        $defaultSite = null;
 
-        if (!$site && !$defaultSite) {
-            return;
+        if (!$site) {
+            $defaultSite = SubcommunityModel::getDefaultSite();
+            if (!$defaultSite) {
+                return;
+            }
         }
 
         saveToConfig(
