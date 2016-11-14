@@ -75,8 +75,7 @@ function writeUserNoteWarning($Row) {
          echo plural(val('Points', $Row, 0), '%s point', '%s points');
 
          if (isset($Row['ExpiresString'])) {
-            echo bullet(' ').
-            sprintf(t('lasts %s'), $Row['ExpiresString']);
+            echo bullet(' ').sprintf(t('lasts %s'), $Row['ExpiresString']);
          }
 
          if ($Reversed) {
@@ -84,8 +83,7 @@ function writeUserNoteWarning($Row) {
          }
 
          if (val('Reversed', $Row)) {
-            echo bullet(' ').
-               t('reversed');
+            echo bullet(' ').t('reversed');
          }
          ?>
       </div>
