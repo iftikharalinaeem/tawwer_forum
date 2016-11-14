@@ -32,7 +32,7 @@ else : // Display the poll
                     <div class="VoteOption"><?php echo Gdn_Format::to(val('Body', $option, ''), val('Format', $option, 'Text')); ?></div>
                     <div class="VoteBar">
                         <div class="VoteBarBG"></div>
-                        <span class="VoteBarWidth PollColor PollColor<?php echo $item; ?>" style="width: <?php echo $Percent; ?>%"></span>
+                        <span class="VoteBarWidth PollColor PollColor<?php echo $item; ?>" style="width: <?php echo $percent; ?>%"></span>
                         <span class="VotePercent"><?php echo $percent; ?>%</span>
                         <?php
                         if ($anonymous) {
