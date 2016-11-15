@@ -249,14 +249,21 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         $parts = explode('/', trim(Gdn::request()->path(), '/'), 2);
         $root = $parts[0];
+        $isUtility = in_array($root, ['api', 'utility', 'sso', 'entry']);
         $path = val(1, $parts, '');
 
         // Look the root up in the mini sites.
         $site = SubcommunityModel::getSite($root);
-        $defaultSite = SubcommunityModel::getDefaultSite();
+        $defaultSite = null;
 
-        if (!$site && !$defaultSite) {
-            return;
+        if (!$site) {
+            if ($isUtility) {
+                return;
+            }
+            $defaultSite = SubcommunityModel::getDefaultSite();
+            if (!$defaultSite) {
+                return;
+            }
         }
 
         saveToConfig(
@@ -274,7 +281,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             Gdn::request()->webRoot(trim("$webroot/$root", '/'));
 
             $this->initializeSite($site);
-        } elseif (!in_array($root, ['utility', 'sso', 'entry']) && !$this->api) {
+        } elseif (!$isUtility && !$this->api) {
             if ($defaultSite) {
                 $url = Gdn::request()->assetRoot().'/'.$defaultSite['Folder'].rtrim('/'.Gdn::request()->path(), '/');
                 $get = Gdn::request()->get();
