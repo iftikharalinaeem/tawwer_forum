@@ -14,7 +14,7 @@ var analyticsToolbar = {
         var dateRange = Cookies.getJSON('va-dateRange');
         if (typeof dateRange !== "object" || typeof dateRange.start !== "string" || typeof dateRange.end !== "string") {
             dateRange = {
-                start: moment().subtract("month", 1).toDate(),
+                start: moment().subtract(1, "month").toDate(),
                 end: moment().toDate()
             };
         } else {
