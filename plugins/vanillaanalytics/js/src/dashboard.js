@@ -5,13 +5,6 @@ $(document).ready(function() {
         return;
     }
 
-    // Move this into KeenIOWidget loadDatavizConfig after https://github.com/keen/keen-js/issues/420 is fixed.
-    if (typeof c3 === "object") {
-        c3.chart.internal.fn.additionalConfig = {
-            axis_y_tick_format: (function (d) {if (d % 1 !== 0) {return '';} return d;})
-        };
-    }
-
     var dateRange = analyticsToolbar.getDefaultRange();
     var dashboard = new AnalyticsDashboard(dashboardConfig, dateRange.start, dateRange.end);
     dashboard.writeDashboard();
