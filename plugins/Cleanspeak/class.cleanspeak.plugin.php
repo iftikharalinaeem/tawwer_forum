@@ -373,7 +373,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
      *  [InsertUserID] int  InsertUserID in the queue.
      * @throws Gdn_UserException
      */
-    public function queueModel_checkpremoderation_handler($sender, &$args) {
+    public function queueModel_checkpremoderation_handler($sender, $args) {
         Logger::event('cleanspeak_checkpremoderation', Logger::DEBUG, 'Cleanspeak queueModel_checkpremoderation.');
         $MediaIDs = valr('Options.MediaIDs', $args);
 
