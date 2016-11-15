@@ -144,17 +144,34 @@ class SubcommunityModel extends Gdn_Model {
         return self::$available;
     }
 
+    /**
+     * Get the default site's record.
+     *
+     * @return array|null
+     */
     public static function getDefaultSite() {
-        foreach (self::all() as $site) {
-            if ($site['IsDefault']) {
-                return $site;
-            }
+        $default = null;
+        $row = Gdn::sql()->getWhere('Subcommunity', ['IsDefault' => 1], '', '', 1)->resultArray();
+        if (is_array($row) && count($row) === 1) {
+            $default = current($row);
         }
-        return null;
+
+        return $default;
     }
 
+    /**
+     * Get a site record.
+     *
+     * @param string $folder The unique identifier, used to lookup a site.
+     * @return array|null
+     */
     public static function getSite($folder) {
-        $site = val($folder, static::all(), null);
+        $site = null;
+        $row = Gdn::sql()->getWhere('Subcommunity', ['Folder' => $folder], '', '', 1)->resultArray();
+        if (is_array($row) && count($row) === 1) {
+            $site = current($row);
+        }
+
         return $site;
     }
 
