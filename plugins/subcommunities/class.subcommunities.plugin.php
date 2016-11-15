@@ -257,7 +257,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $defaultSite = null;
 
         if (!$site) {
-            if (!$isUtility) {
+            if ($isUtility) {
                 return;
             }
             $defaultSite = SubcommunityModel::getDefaultSite();
