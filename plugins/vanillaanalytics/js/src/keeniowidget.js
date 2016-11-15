@@ -457,7 +457,7 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
     var labelMapping = this.getConfig('labelMapping');
 
     dataviz.library('c3');
-    // Move this into KeenIOWidget loadDatavizConfig after https://github.com/keen/keen-js/issues/420 is fixed.
+    // Move this into defaultOptions after https://github.com/keen/keen-js/issues/420 is fixed.
     c3.chart.internal.fn.additionalConfig = {
         axis_y_tick_format: function (n) { return (n % 1 === 0) ? n : parseFloat(n).toFixed(2); }
     };
