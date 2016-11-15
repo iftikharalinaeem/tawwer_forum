@@ -1,4 +1,4 @@
-<div class="toolbar-analytics toolbar" id="analytics_toolbar">
+<div class="toolbar-analytics toolbar flex-wrap" id="analytics_toolbar">
     <?php
     $form = new Gdn_Form('', 'bootstrap');
 

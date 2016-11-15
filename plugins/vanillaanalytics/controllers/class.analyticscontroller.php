@@ -139,8 +139,10 @@ class AnalyticsController extends DashboardController {
             redirect('settings');
         }
 
-        $this->setData('Title', sprintf(t('Analytics: %1$s'), $dashboard->getTitle()));
+        $this->setData('Title', $dashboard->getTitle());
         $this->setData('AnalyticsDashboard', $dashboard);
+        $this->setData('IsPersonal', $dashboard->isPersonal());
+        $this->setData('HasWidgets', $dashboard->hasWidgets());
         $this->addDefinition('analyticsDashboard', $dashboard);
 
         $this->render('dashboard');
