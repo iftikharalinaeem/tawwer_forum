@@ -82,6 +82,20 @@ class AnalyticsDashboard implements JsonSerializable {
     }
 
     /**
+     * Checks whether this dashboard has widgets or not.
+     *
+     * @return bool Whether this dashboard has widgets or not.
+     */
+    public function hasWidgets() {
+        foreach ($this->getPanels() as $panel) {
+            if (count($panel->getWidgets()) > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Save a widget to a custom dashboard.
      *
      * @param string $widgetID
@@ -128,7 +142,7 @@ class AnalyticsDashboard implements JsonSerializable {
 
         if ($dashboardID == self::DASHBOARD_PERSONAL) {
             $result = new AnalyticsDashboard(
-                'Personal Dashboard',
+                'My Analytics',
                 $this->getUserDashboardWidgets(self::DASHBOARD_PERSONAL)
             );
             $result->setPersonal(true);

@@ -59,6 +59,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $nav = $sender;
 
         $section = [
+            'permission' => 'Garden.Settings.Manage',
             'section' => 'Analytics',
             'title' => 'Analytics',
             'description' => 'Visualize Your Community',
@@ -73,16 +74,14 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         Logger::event('analytics_menu', Logger::INFO, 'Sections', $sectionModel->getDefaults());
         $nav->addGroupToSection('Analytics', t('Analytics'), 'analytics');
 
-        $personalDashboard = $analyticsDashboardModel->getUserDashboardWidgets(AnalyticsDashboard::DASHBOARD_PERSONAL);
-        if (count($personalDashboard) > 0) {
-            $nav->addLinkToSectionIf(
-                'Garden.Settings.Manage',
-                'Analytics',
-                t('My Dashboard'),
-                'analytics/dashboard/'.AnalyticsDashboard::DASHBOARD_PERSONAL,
-                'analytics.my-dashboard'
-            );
-        }
+        $nav->addLinkToSectionIf(
+            'Garden.Settings.Manage',
+            'Analytics',
+            t('My Analytics'),
+            'analytics/dashboard/'.AnalyticsDashboard::DASHBOARD_PERSONAL,
+            'analytics.my-analytics'
+        );
+
 
         foreach ($sectionModel->getDefaults() as $section) {
             foreach ($section->getDashboards() as $dashboard) {
