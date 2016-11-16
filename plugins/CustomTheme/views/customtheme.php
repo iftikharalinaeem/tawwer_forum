@@ -111,9 +111,9 @@ function WriteRevisions($Sender, $Tab = '') {
                   echo anchor('&rarr; '.date("g:ia", Gdn_Format::ToTimeStamp($Row->DateInserted)), 'settings/customtheme/revision/'.$Tab.'/'.$Row->RevisionID);
                   echo ($Row->Label ? ' <span class="italic truncate control-panel-list-item-label">'.htmlspecialchars($Row->Label).'</span> ' : '');
                   if ($Row->Live == 1) {
-                     echo dashboardSymbol('star-empty', t('Live'), 'icon-text');
+                     echo dashboardSymbol('star-empty', 'icon-text', ['alt' => t('Live')]);
                   } elseif ($Row->Live == 2) {
-                     echo dashboardSymbol('eye', t('Previewing'), 'icon-text');
+                     echo dashboardSymbol('eye', 'icon-text', ['alt' => t('Previewing')]);
                   } ?>
                </li>
             </ul>
