@@ -156,7 +156,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param AnalyticsTracker $sender
      * @param array $args
      */
-    public function analyticsTracker_GetDefaultData_handler($sender, &$args) {
+    public function analyticsTracker_GetDefaultData_handler($sender, $args) {
         $subcommunity = SubcommunityModel::getCurrent();
 
         if (!is_array($subcommunity)) {
