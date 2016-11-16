@@ -141,14 +141,12 @@ class JWTSSOPlugin extends Gdn_Plugin {
             }
         }
 
-        $audience = gebetterRandomString(24);
-
         // Set up the form.
         $formFields = [
             'Algorithm' => ['LabelCode' => 'Algorithm', 'Control' => 'RadioList', 'Items' => ['HS256', 'RS256']],
             'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Enter the shared secret used to encrypt and decrypt the JWT.'],
             'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
-            'Audience' =>  ['LabelCode' => 'Intended Audience','Options' => ['Value' => $audience, 'readonly' => true], 'Description' => 'This is similar to an application ID. Please supply this to your Authentication Provider to passed as "aud" in the payload.']
+            'Audience' =>  ['LabelCode' => 'Intended Audience','Options' => ['Value' => $form->getValue('Audience', betterRandomString(24)), 'readonly' => true], 'Description' => 'This is similar to an application ID. Please supply this to your Authentication Provider to passed as "aud" in the payload.']
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();
@@ -161,6 +159,10 @@ class JWTSSOPlugin extends Gdn_Plugin {
         if (!$sender->data('Title')) {
             $sender->setData('Title', sprintf(T('%s Settings'), 'JSON Web Token SSO'));
         }
+
+        $sampleJwt = $this->generatejwt($this->provider());
+
+        $sender->setData('jwt', $sampleJwt);
 
         $view = ($this->settingsView) ? $this->settingsView : 'plugins/jwtsso';
 
@@ -176,14 +178,26 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /** ------------------- Token Parsing Methods ---------------- */
 
 
+
+    /**
+     * Special encoding function strings for JWT
+     *
+     * @param $data
+     * @return mixed
+     */
+    protected function base64url_encode($data) {
+        return str_replace('=', '', strtr(base64_encode($data), '+/', '-_'));
+    }
+
+
     /**
      * Generate a Java Web Token signed with the client's secret
      *
      * @param array $provider Row from GDN_AuthenticationProvider table
-     * @param array $profile Unserialised array from GDN_User Attributes
+     * @param array $profile Unserialized array from GDN_User Attributes
      * @return string JWT
      */
-    public function generateJwt($provider, $profile) {
+    public function generateJwt($provider) {
         $baseUrl = val('BaseUrl', $provider);
         $baseUrl = (substr($baseUrl, -1) !== '/') ? $baseUrl.'/' : $baseUrl;
         $secret = val('AssociationSecret', $provider);
@@ -194,7 +208,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
         $jwtBody = [
             'iss' => $baseUrl,
-            'sub' => val('sub', $profile),
+            'sub' => val('Audience', $provider),
             'aud' => val('AssociationKey', $provider),
             'exp' => time() + 1000,
             'iat' => time()

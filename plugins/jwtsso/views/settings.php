@@ -21,3 +21,8 @@ echo $this->Form->button('Save');
 echo $this->Form->close();
 echo '</div>';
 
+echo '<div style="border:solid 1px #ccc;background-color: #eee;padding:10px;margin: 10px; max-width: 550px;float: left;clear: left;border-radius: 3px">';
+
+echo wordwrap($this->data('jwt'), 55, "\n<br>", true);
+
+echo '</div>';
