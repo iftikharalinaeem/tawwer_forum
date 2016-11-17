@@ -279,6 +279,11 @@ class ReactionsController extends DashboardController {
             include_once $this->fetchViewLocation('settings_functions', '', 'plugins/Reactions');
             $this->deliveryMethod(DELIVERY_METHOD_JSON);
             $this->jsonTarget("#ReactionType_{$ReactionType['UrlCode']} #reactions-toggle", activateButton($ReactionType), 'ReplaceWith');
+            if ($Active == '1') {
+                $this->informMessage(sprintf(t('Enabled %1$s'), val('Name', $ReactionType)));
+            } else {
+                $this->informMessage(sprintf(t('Disabled %1$s'), val('Name', $ReactionType)));
+            }
         }
 
         $this->render('blank', 'utility', 'dashboard');
