@@ -10,7 +10,7 @@ foreach ($this->data('Badges') as $Badge) :
     $badgeBlock = new MediaItemModule(UserBadgeModel::badgeName((array)$Badge), 'badge/'.$Badge->BadgeID, Gdn_Format::text($Badge->Body));
     $badgeBlock->setView('media-sm')
         ->addCssClass('image-wrap', 'media-image-wrap-no-border')
-        ->setImageIf($Badge->Photo ? true : false, Gdn_Upload::url($Badge->Photo));
+        ->setImageIf($Badge->Photo ? true : false, Gdn_Upload::url($Badge->Photo), '', '', $Badge->Name);
     ?>
 
     <tr class="<?php
