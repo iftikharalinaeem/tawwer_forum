@@ -2,7 +2,7 @@
 echo heading($this->data('Title'));
 helpAsset(sprintf(t('About %s'), t('Pinning')),
     t('Quickly access only the info that you need by pinning metrics.').' '.
-    sprintf(t('Simply click on a pin (&nbsp;%s&nbsp;) to showcase that metric in your "My Analytics" section.'), dashboardSymbol('pin', '', 'icon icon-text'))
+    sprintf(t('Simply click on a pin (&nbsp;%s&nbsp;) to showcase that metric in your "My Analytics" section.'), dashboardSymbol('pin', 'icon icon-text'))
 );
 if (!$this->data('HasWidgets') && $this->data('IsPersonal')) : ?>
     <div class="hero">
