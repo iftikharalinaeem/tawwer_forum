@@ -13,7 +13,7 @@ if (!$this->data('HasWidgets') && $this->data('IsPersonal')) : ?>
             <div class="hero-body">
                 <?php echo t('You can tailor this section to see at a glance the metrics that matter to you.'); ?>
                 <?php echo sprintf(t('Look for little pins on your other analytics pages that look like this: %s'),
-                    dashboardSymbol('pin', '', 'icon icon-text')).' '.
+                    dashboardSymbol('pin', 'icon icon-text')).' '.
                     t('Simply click on the pin and that metric will start appearing on this page.'); ?>
             </div>
         </div>
