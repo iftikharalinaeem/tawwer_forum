@@ -268,13 +268,11 @@ class ReactionsController extends DashboardController {
         }
 
         $ReactionModel = new ReactionModel();
-        $Reaction = ReactionModel::reactionTypes($UrlCode);
         $ReactionType['Active'] = $Active;
-        $Set = arrayTranslate($ReactionType, ['UrlCode', 'Active']);
-        $ReactionModel->defineReactionType($Set);
+        $ReactionModel->update(['Active' => $Active], ['UrlCode' => $UrlCode]);
+        Gdn::cache()->remove('ReactionTypes');
 
-        $Reaction = array_merge($Reaction, $Set);
-        $this->setData('Reaction', $Reaction);
+        $this->setData('Reaction', $ReactionType);
 
         if ($this->deliveryType() != DELIVERY_TYPE_DATA) {
             // Send back the new button.
