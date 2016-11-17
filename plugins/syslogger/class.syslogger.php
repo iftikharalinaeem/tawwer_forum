@@ -67,7 +67,7 @@ class Syslogger implements LoggerInterface {
         $row = array_merge([
             'msg' => $message,
             'fullmsg' => $fullmsg,
-            'priority' => Logger::levelPriority($priority)
+            'priority' => Logger::priorityLabel($priority)
         ], $context);
 
         $tags = array_merge((array)val('tags', $context, []), explode('_', $row['event']));
