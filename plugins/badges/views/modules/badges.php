@@ -15,10 +15,14 @@ $Title = t($Title);
 
     foreach ($this->Badges as $Badge) {
         if (val('Photo', $Badge, false)) {
+            $name = val('Name', $Badge);
             echo anchor(
-                img(Gdn_Upload::url(changeBasename(val('Photo', $Badge), '%s')), ['class' => $CssClass]),
+                img(
+                    Gdn_Upload::url(changeBasename(val('Photo', $Badge), '%s')),
+                    ['alt' => $name, 'class' => $CssClass]
+                ),
                 url('/badge/'.val('Slug', $Badge), true),
-                ['title' => val('Name', $Badge)]
+                ['title' => $name]
             );
         }
     }

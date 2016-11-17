@@ -33,8 +33,10 @@ $this->title($Action . ' ' . t('a Badge')); ?>
     }
 
     $UploadText = $this->data('Badge.Photo') ? t('Replace Image') : T('Add Image');
-    echo wrap($this->Form->labelwrap($UploadText.($this->data('Badge.Photo') ? '<div class="image-wrap">'.img(Gdn_Upload::url($this->data('Badge.Photo'))).'</div>' : ''), 'Photo').
-        $this->Form->fileUploadwrap('Photo'), 'li', ['class' => 'form-group']);
+    echo wrap($this->Form->labelwrap($UploadText.($this->data('Badge.Photo') ? '<div class="image-wrap">'.img(
+        Gdn_Upload::url($this->data('Badge.Photo')),
+        ['alt' => $this->data('Badge.Name')]
+    ).'</div>' : ''), 'Photo').$this->Form->fileUploadwrap('Photo'), 'li', ['class' => 'form-group']);
 
     echo '</ul>';
 

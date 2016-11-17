@@ -19,7 +19,10 @@ if ($this->BadgeData && $this->BadgeData->numRows() > 0) : ?>
             <?php endif; ?>
 
             <div class="ItemContent Badge">
-                <?php echo img(Gdn_Upload::Url(changeBasename(val('Photo', $Badge), 'n%s')), ['class' => 'BadgePhotoDisplay']); ?>
+                <?php echo img(
+                    Gdn_Upload::url(changeBasename(val('Photo', $Badge), 'n%s')),
+                    ['alt' => val('Name', $Badge), 'class' => 'BadgePhotoDisplay']
+                ); ?>
                 <?php echo anchor(val('Name', $Badge), 'badge/'.val('Slug', $Badge), 'Title'); ?>
                 <div class="Meta">
                     <span class="DateInserted"><?php echo t('Earned') . ' ' . Gdn_Format::date(val('DateCompleted', $Badge)); ?></span>

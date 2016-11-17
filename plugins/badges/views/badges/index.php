@@ -13,7 +13,10 @@ foreach ($this->data('Badges') as $Badge) :
     <li class="Item ItemBadge<?php if (!$GivenByUser) echo ' Read'; ?>">
         <?php
         if ($Badge['Photo']) {
-            echo img(Gdn_Upload::url($Badge['Photo']), ['height' => '40px', 'width' => '40px', 'class' => 'BadgePhoto']);
+            echo img(
+                Gdn_Upload::url($Badge['Photo']),
+                ['alt' => $Badge['Name'], 'height' => '40px', 'width' => '40px', 'class' => 'BadgePhoto']
+            );
         }
         ?>
         <span class="Options">
