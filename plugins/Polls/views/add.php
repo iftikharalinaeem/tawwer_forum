@@ -1,11 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$Session = Gdn::session();
-$CancelUrl = $this->data('_CancelUrl');
-if (!$CancelUrl) {
-    $CancelUrl = '/discussions';
+$cancelUrl = $this->data('_CancelUrl');
+if (!$cancelUrl) {
+    $cancelUrl = '/discussions';
     if (c('Vanilla.Categories.Use') && is_object($this->Category)) {
-        $CancelUrl = '/categories/'.urlencode($this->Category->UrlCode);
+        $cancelUrl = '/categories/'.urlencode($this->Category->UrlCode);
     }
 }
 ?>
