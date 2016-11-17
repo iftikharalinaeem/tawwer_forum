@@ -35,7 +35,7 @@ class ReactionModel extends Gdn_Model {
      * ReactionModel constructor.
      */
     public function __construct() {
-        parent::__construct('Reaction');
+        parent::__construct('ReactionType');
         $this->filterFields = array_merge(
             $this->filterFields,
             ['Save' => 1]

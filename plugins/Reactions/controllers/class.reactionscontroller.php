@@ -270,8 +270,7 @@ class ReactionsController extends DashboardController {
         $ReactionModel = new ReactionModel();
         $Reaction = ReactionModel::reactionTypes($UrlCode);
         $ReactionType['Active'] = $Active;
-        $Set = arrayTranslate($ReactionType, ['UrlCode', 'Active']);
-        $ReactionModel->defineReactionType($Set);
+        $ReactionModel->update(['Active' => $Active], ['UrlCode' => $UrlCode]);
 
         $Reaction = array_merge($Reaction, $Set);
         $this->setData('Reaction', $Reaction);
