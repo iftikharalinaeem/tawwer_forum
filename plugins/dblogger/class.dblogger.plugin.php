@@ -12,7 +12,8 @@ $PluginInfo['dblogger'] = array(
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
-    'Hidden' => false
+    'Hidden' => false,
+    'Icon' => 'internal-plugin.png'
 );
 
 class DbLoggerPlugin extends Gdn_Plugin {
