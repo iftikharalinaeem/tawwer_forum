@@ -217,11 +217,27 @@ class KeenIOTracker implements TrackerInterface {
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart'
         ],
+        'participation-rate' => [
+            'title' => 'Participation Rate',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart',
+            'chart' => [
+                'chartType' => 'pie'
+            ]
+        ],
+        'sentiment-ratio' => [
+            'title' => 'Sentiment Ratio',
+            'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
+            'type' => 'chart',
+            'chart' => [
+                'chartType' => 'bar'
+            ]
+        ],
         'posts-positivity-rate' => [
             'title' => 'Posts Positivity Rate',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'metric',
-            'callback' => 'metricFormatPercent'
+            'callback' => 'formatPercent'
         ],
         'average-time-to-first-comment' => [
             'title' => 'Average Time to First Comment',
@@ -594,6 +610,36 @@ class KeenIOTracker implements TrackerInterface {
         ;
 
         $this->widgets['average-time-to-first-comment']['query'] = $timeToFirstCommentQuery;
+
+        /**
+         * Pie Charts
+         */
+        $this->widgets['participation-rate']['query'] = [$totalVisitsQuery, $totalContributorsQuery];
+        $this->widgets['participation-rate']['queryProcessor'] = [
+            'instructions' => [
+                'merged-participation-rate' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'mergeResults'
+                ],
+            ],
+            'finalAnalysis' => 'merged-participation-rate'
+        ];
+
+        /**
+         * Bar Charts
+         */
+        $sentimentRatioQuery = new KeenIOQuery();
+        $sentimentRatioQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection('reaction')
+            ->setGroupBy('reaction.reactionClass')
+            ->addFilter([
+                'operator' => 'in',
+                'property_name' => 'reaction.reactionClass',
+                'property_value' => ['Positive', 'Negative']
+            ])
+            ->setInterval('daily');
+
+        $this->widgets['sentiment-ratio']['query'] = $sentimentRatioQuery;
 
         /**
          * Timeframe Charts

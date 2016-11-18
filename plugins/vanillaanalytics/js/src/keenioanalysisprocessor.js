@@ -157,3 +157,25 @@ KeenIOAnalysesProcessor.prototype.divideResults = function(analyses) {
 
     return mergedResults;
 };
+
+/**
+ * Merge results together
+ *
+ * @param {array} analyses
+ * @return {object}
+ */
+KeenIOAnalysesProcessor.prototype.mergeResults = function(analyses) {
+    if (!Array.isArray(analyses) || analyses.length < 2) {
+        throw 'mergeResults requires an array of results';
+    }
+
+    var mergedAnalyses = {
+        'result': []
+    };
+
+    $.each(analyses, function(index, element) {
+        mergedAnalyses.result.push(element)
+    });
+
+    return mergedAnalyses;
+};

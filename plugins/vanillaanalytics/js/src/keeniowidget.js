@@ -386,15 +386,6 @@ function KeenIOWidget(config) {
     this.loadConfig(config);
 }
 
-/**
- *
- * @param {Number} metric
- * @return {Array}
- */
-KeenIOWidget.prototype.metricFormatPercent = function(metric) {
-    return (metric * 100).toFixed(1)+'%';
-};
-
 KeenIOWidget.prototype.getMetricMarkup = function() {
     var markup = "<div class=\"metric-value\">{data}</div><div class=\"metric-title\">{title}</div>";
     var data = this.getData();
@@ -470,6 +461,7 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
 
         var defaultOptions = {};
         switch(chartType) {
+            case 'bar':
             case 'area':
             case 'line':
                 defaultOptions = {
@@ -512,6 +504,10 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
                         return text + '</div></div>';
                     }
                 };
+
+                if (chartType === 'bar') {
+                    delete defaultOptions.axis.x.tick.count;
+                }
                 break;
             case 'pie':
                 defaultOptions = {
@@ -532,6 +528,15 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
     dataviz.chartOptions(chartOptions);
     dataviz.dateFormat('%Y-%m-%d');
     dataviz.labelMapping(labelMapping);
+};
+
+/**
+ *
+ * @param {Number} value
+ * @return {Array}
+ */
+KeenIOWidget.prototype.formatPercent = function(value) {
+    return ((value * 100).toFixed(1))+'%';
 };
 
 /**
@@ -627,7 +632,8 @@ KeenIOWidget.prototype.runQuery = function(callback) {
     };
 
     if (this.getType() !== 'metric') {
-        if ($.inArray(this.getConfig('chartType', 'area'), ['area', 'line']) !== -1) {
+        // TODO: We should probably check the query instead of the chart type.
+        if ($.inArray(this.getConfig('chartType', 'area'), ['area', 'line', 'bar']) !== -1) {
             updateParams.interval = this.getInterval();
         }
     }

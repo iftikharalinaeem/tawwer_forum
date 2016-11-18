@@ -186,7 +186,8 @@ class AnalyticsDashboard implements JsonSerializable {
                 ],
                 'Engagement' => [
                     'widgets' => [
-                        'posts-positivity-rate', 'average-time-to-first-comment', 'visits-per-active-user',
+                        'posts-positivity-rate', 'average-time-to-first-comment',
+                        'participation-rate', 'sentiment-ratio',  'visits-per-active-user',
                         'average-posts-per-active-user', 'average-comments-per-discussion'
                     ]
                 ]
