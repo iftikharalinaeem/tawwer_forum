@@ -363,6 +363,7 @@ class KeenIOTracker implements TrackerInterface {
         if (empty($widget) || !val('query', $widget)) {
             return null;
         }
+
         if (!$chart = val('chart', $widget, [])) {
             if (val('type', $widget) != 'metric') {
                 $chart = ['labels' => val('title', $widget)];
@@ -376,6 +377,10 @@ class KeenIOTracker implements TrackerInterface {
         // Override default chart 'Result' label in c3
         $chart['labelMapping']['Result'] = val('title', $widget);
 
+        // TODO: refactor this to be closer to the definition
+        // Lets declare what needs to be under data under data and what is a real attribute as such.
+        // Let's not do this kind of gymnastic
+        // We are also restraining ourselves from adding new data without modifying this function......
         $data = [
             'chart' => $chart,
             'query' => val('query', $widget)
