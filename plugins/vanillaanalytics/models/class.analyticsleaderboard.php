@@ -91,7 +91,8 @@ class AnalyticsLeaderboard {
         if ((is_array($result) && !empty($result)) && is_array($previousResult)) {
             $detectTypes = [
                 'user.userID',
-                'discussion.discussionID'
+                'discussion.discussionID',
+                'reaction.recordID',
             ];
             $typeID = false;
 
@@ -100,6 +101,17 @@ class AnalyticsLeaderboard {
             foreach ($detectTypes as $currentType) {
                 if ($firstResult->$currentType) {
                     $typeID = $currentType;
+                    $emulatedTypeID = $typeID;
+                    if ($typeID === 'reaction.recordID') {
+                        if (!isset($firstResult->{'reaction.recordType'})) {
+                            throw new Gdn_UserException('You need to group by that query with reaction.recordType');
+                        }
+                        if ($firstResult->{'reaction.recordType'} === 'discussion') {
+                            $emulatedTypeID = 'discussion.discussionID';
+                        } else {
+                            throw new Gdn_UserException('Comments are not supported yet!');
+                        }
+                    }
                     break;
                 }
             }
@@ -111,7 +123,7 @@ class AnalyticsLeaderboard {
             usort($result, [$this, 'sortResults']);
 
             // Prepare to build out the values we need for the leaderboard.
-            switch ($typeID) {
+            switch ($emulatedTypeID) {
                 case 'discussion.discussionID':
                     $recordModel = new DiscussionModel();
                     $recordUrl = '/discussion/%d';
@@ -162,7 +174,6 @@ class AnalyticsLeaderboard {
                 $position++;
             }
         }
-
         return array_slice($resultIndexed, 0, $this->size, true);
     }
 

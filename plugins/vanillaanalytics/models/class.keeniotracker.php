@@ -97,7 +97,29 @@ class KeenIOTracker implements TrackerInterface {
                     'record' => 'Discussions',
                     'count' => 'Comments'
                 ]
-            ],
+            ]
+        ],
+        'top-positive-discussions' => [
+            'title' => 'Top 100 Positive Discussions',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'leaderboard',
+            'chart' => [
+                'labels' => [
+                    'record' => 'Discussions',
+                    'count' => 'Positive Score'
+                ]
+            ]
+        ],
+        'top-negative-discussions' => [
+            'title' => 'Top 100 Negative Discussions',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'leaderboard',
+            'chart' => [
+                'labels' => [
+                    'record' => 'Discussions',
+                    'count' => 'Negative Score'
+                ]
+            ]
         ],
         'total-active-users' => [
             'title' => 'Active Users',
@@ -498,6 +520,59 @@ class KeenIOTracker implements TrackerInterface {
             ->setGroupBy('discussion.discussionID');
 
         $this->widgets['top-viewed-qna-discussions']['query'] = $topViewedQnADiscussions;
+
+        // Top Commented Discussions (leaderboard)
+        $topCommentedDiscussions = new KeenIOQuery();
+        $topCommentedDiscussions->setAnalysisType(KeenIOQuery::ANALYSIS_MAXIMUM)
+            ->setEventCollection('page')
+            ->setTargetProperty('discussion.countComments')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'type',
+                'property_value' => 'discussion_view'
+            ])
+            ->setGroupBy('discussion.discussionID');
+
+        $this->widgets['top-commented-discussions']['query'] = $topCommentedDiscussions;
+
+
+        // Top Positive Discussions (leaderboard)
+        $topPositiveDiscussions = new KeenIOQuery();
+        $topPositiveDiscussions->setAnalysisType(KeenIOQuery::ANALYSIS_SUM)
+            ->setEventCollection('reaction')
+            ->setTargetProperty('reaction.total')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.reactionClass',
+                'property_value' => 'Positive'
+            ])
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.recordType',
+                'property_value' => 'discussion'
+            ])
+            ->setGroupBy(['reaction.recordID', 'reaction.recordType']);
+
+        $this->widgets['top-positive-discussions']['query'] = $topPositiveDiscussions;
+
+        // Top Negative Discussions (leaderboard)
+        $topNegativeDiscussions = new KeenIOQuery();
+        $topNegativeDiscussions->setAnalysisType(KeenIOQuery::ANALYSIS_SUM)
+            ->setEventCollection('reaction')
+            ->setTargetProperty('reaction.total')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.reactionClass',
+                'property_value' => 'Negative'
+            ])
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'reaction.recordType',
+                'property_value' => 'discussion'
+            ])
+            ->setGroupBy(['reaction.recordID', 'reaction.recordType']);
+
+        $this->widgets['top-negative-discussions']['query'] = $topNegativeDiscussions;
 
         /**
          * Metrics

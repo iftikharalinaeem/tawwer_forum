@@ -310,7 +310,7 @@ class KeenIOQuery implements JsonSerializable {
      * Define the grouping parameters for this query.
      *
      * @link https://keen.io/docs/api/#group-by
-     * @param string $groupBy A property of the current event collection to group by.
+     * @param string|array $groupBy A (or an array of) property of the current event collection to group by
      * @return $this
      */
     public function setGroupBy($groupBy) {

@@ -19,7 +19,8 @@ foreach ($this->data('Leaderboard') as $currentRow) {
             ->addMeta(Gdn_Format::date(val('DateLastActive', $user), 'html'));
 
     } elseif (val('DiscussionID', $currentRow)) {
-        $discussion = Gdn::userModel()->getID(val('UserID', $currentRow));
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID(val('DiscussionID', $currentRow));
         $recordBlock = new MediaItemModule(val('Name', $discussion), discussionUrl($discussion));
         $recordBlock->setView('media-sm')
             ->addMeta(Gdn_Format::date(val('DateInserted', $discussion), 'html'));
