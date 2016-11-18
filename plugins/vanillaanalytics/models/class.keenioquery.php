@@ -164,7 +164,7 @@ class KeenIOQuery implements JsonSerializable {
             $data['event_collection'] = $this->eventCollection;
         }
         if ($this->filters) {
-            $data['filters'] = json_encode($this->filters);
+            $data['filters'] = $this->filters;
         }
         if ($this->groupBy) {
             $data['group_by'] = $this->groupBy;

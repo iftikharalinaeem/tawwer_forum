@@ -113,7 +113,7 @@ class AnalyticsSection {
     public function getDefaults() {
         if (empty(static::$defaults)) {
             $defaultSections = [
-                'Basic' => ['traffic', 'posting', 'engagement', 'q&a']
+                'Basic' => ['traffic', 'posting', 'engagement', 'leaderboard', 'q&a']
             ];
 
             foreach ($defaultSections as $title => $dashboards) {

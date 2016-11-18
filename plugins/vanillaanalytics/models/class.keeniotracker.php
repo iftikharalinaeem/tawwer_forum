@@ -23,13 +23,79 @@ class KeenIOTracker implements TrackerInterface {
      */
     protected $widgets = [
         'top-posters' => [
-            'title' => 'Top Posters',
+            'title' => 'Top 10 Poster',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'leaderboard',
             'chart' => [
                 'labels' => [
                     'record' => 'Name',
                     'count' => 'Posts'
+                ]
+            ],
+        ],
+        'top-discussion-starters' => [
+            'title' => 'Top 10 Discussion Starters',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'leaderboard',
+            'chart' => [
+                'labels' => [
+                    'record' => 'Name',
+                    'count' => 'Discussions'
+                ]
+            ],
+        ],
+        'top-question-answerers' => [
+            'title' => 'Top 10 Question Answerers',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'leaderboard',
+            'chart' => [
+                'labels' => [
+                    'record' => 'Name',
+                    'count' => 'Questions Answered'
+                ]
+            ],
+        ],
+        'top-best-answerers' => [
+            'title' => 'Top 10 Best Question Answerers',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'leaderboard',
+            'chart' => [
+                'labels' => [
+                    'record' => 'Name',
+                    'count' => 'Best Answers Given'
+                ]
+            ],
+        ],
+        'top-viewed-discussions' => [
+            'title' => 'Top 100 Viewed Discussions',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'leaderboard',
+            'chart' => [
+                'labels' => [
+                    'record' => 'Discussion',
+                    'count' => 'Views'
+                ]
+            ],
+        ],
+        'top-viewed-qna-discussions' => [
+            'title' => 'Top 100 Viewed Questions',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'leaderboard',
+            'chart' => [
+                'labels' => [
+                    'record' => 'Questions',
+                    'count' => 'Views'
+                ]
+            ],
+        ],
+        'top-commented-discussions' => [
+            'title' => 'Top 100 Commented Discussions',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'leaderboard',
+            'chart' => [
+                'labels' => [
+                    'record' => 'Discussions',
+                    'count' => 'Comments'
                 ]
             ],
         ],
@@ -346,17 +412,92 @@ class KeenIOTracker implements TrackerInterface {
      * This builds the KeenIOQueries and adds them to the widgets array.
      */
     protected function registerQueries() {
-        /**
+        /*
          * Leaderboards
          */
 
         // Top Posters (leaderboard)
         $topPostersQuery = new KeenIOQuery();
         $topPostersQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
-            ->setTitle(t('Top Posters'))
             ->setEventCollection('post')
             ->setGroupBy('user.userID');
+
         $this->widgets['top-posters']['query'] = $topPostersQuery;
+
+        // Top Discussion Starters (leaderboard)
+        $topDiscussionStartersQuery = new KeenIOQuery();
+        $topDiscussionStartersQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection('post')
+            ->addFilter([
+                'operator' => 'gt',
+                'property_name' => 'commentID',
+                'property_value' => 0
+            ])
+            ->setGroupBy('user.userID');
+
+        $this->widgets['top-discussion-starters']['query'] = $topDiscussionStartersQuery;
+
+        // Top Question Answerers (leaderboard)
+        $topQuestionAnswerers = new KeenIOQuery();
+        $topQuestionAnswerers->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection('post')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'discussion.discussionType',
+                'property_value' => 'Question'
+            ])
+            ->addFilter([
+                'operator' => 'gt',
+                'property_name' => 'commentID',
+                'property_value' => 0
+            ])
+            ->setGroupBy('user.userID');
+
+        $this->widgets['top-question-answerers']['query'] = $topQuestionAnswerers;
+
+        // Top Best Answerers (leaderboard)
+        $topBestAnswerers = new KeenIOQuery();
+        $topBestAnswerers->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection('qna')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'type',
+                'property_value' => 'answer_accepted'
+            ])
+            ->setGroupBy('user.userID');
+
+        $this->widgets['top-best-answerers']['query'] = $topBestAnswerers;
+
+        // Top Viewed Discussions (leaderboard)
+        $topViewedDiscussions = new KeenIOQuery();
+        $topViewedDiscussions->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection('page')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'type',
+                'property_value' => 'discussion_view'
+            ])
+            ->setGroupBy('discussion.discussionID');
+
+        $this->widgets['top-viewed-discussions']['query'] = $topViewedDiscussions;
+
+        // Top Viewed QnA Discussions (leaderboard)
+        $topViewedQnADiscussions = new KeenIOQuery();
+        $topViewedQnADiscussions->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection('page')
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'type',
+                'property_value' => 'discussion_view'
+            ])
+            ->addFilter([
+                'operator' => 'eq',
+                'property_name' => 'discussion.discussionType',
+                'property_value' => 'Question'
+            ])
+            ->setGroupBy('discussion.discussionID');
+
+        $this->widgets['top-viewed-qna-discussions']['query'] = $topViewedQnADiscussions;
 
         /**
          * Metrics
@@ -474,8 +615,7 @@ class KeenIOTracker implements TrackerInterface {
                 'operator' => 'eq',
                 'property_name' => 'type',
                 'property_value' => 'answer_accepted'
-            ])
-            ->setTargetProperty('user.userID');
+            ]);
 
         $this->widgets['total-accepted']['query'] = $totalAcceptedQuery;
 
@@ -644,7 +784,6 @@ class KeenIOTracker implements TrackerInterface {
         /**
          * Timeframe Charts
          */
-
         // Pageviews (chart)
         $pageViewQuery = new KeenIOQuery();
         $pageViewQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)

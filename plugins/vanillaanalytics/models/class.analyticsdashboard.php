@@ -190,6 +190,17 @@ class AnalyticsDashboard implements JsonSerializable {
                         'participation-rate', 'sentiment-ratio',  'visits-per-active-user',
                         'average-posts-per-active-user', 'average-comments-per-discussion'
                     ]
+                ],
+                'Leaderboard' => [
+                    'widgets' => [
+                        'top-posters',
+                        'top-discussion-starters',
+                        'top-question-answerers',
+                        'top-best-answerers',
+//                        'top-viewed-discussions', // Disabled for performance reason.
+//                        'top-viewed-qna-discussions', // Disabled for performance reason.
+//                        'top-commented-discussions', // Disabled for performance reason.
+                    ]
                 ]
             ];
 

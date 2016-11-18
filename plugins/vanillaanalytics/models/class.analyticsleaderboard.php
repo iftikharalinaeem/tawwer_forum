@@ -128,8 +128,8 @@ class AnalyticsLeaderboard {
 
             $previousPositions = [];
             usort($previousResult, [$this, 'sortResults']);
-            foreach ($previousResult as $previousStanding) {
-                $previousPositions[] = $previousStanding->$typeID;
+            foreach ($previousResult as $index => $previousStanding) {
+                $previousPositions[$previousStanding->$typeID] = $index;
             }
 
             $position = 0;
@@ -137,7 +137,7 @@ class AnalyticsLeaderboard {
                 $recordID = $currentResult->$typeID;
                 $count = $currentResult->result;
                 $record = $recordModel->getID($recordID, DATASET_TYPE_ARRAY);
-                $previous = array_search($recordID, $previousPositions);
+                $previous = $previousPositions[$recordID];
 
                 if ($previous === false) {
                     $positionChange = "New";
