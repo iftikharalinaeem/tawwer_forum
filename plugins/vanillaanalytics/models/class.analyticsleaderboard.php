@@ -193,10 +193,10 @@ class AnalyticsLeaderboard {
      */
     public function setSize($size) {
         if ($size < 1) {
-            $this->size = 10;
-        } elseif ($size > self::MAX_SIZE) {
-            $size = self::MAX_SIZE;
+            $size = 10;
         }
+
+        $this->size = max(min(self::MAX_SIZE, $size), 1);
 
         return $this;
     }

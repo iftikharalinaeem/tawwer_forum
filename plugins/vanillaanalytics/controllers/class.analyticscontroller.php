@@ -88,7 +88,8 @@ class AnalyticsController extends DashboardController {
         }
         $leaderboard = new AnalyticsLeaderboard();
 
-        $size = val('size', $widget->getData());
+        $data = $widget->getData();
+        $size = val('size', $data);
         if ($size) {
             $leaderboard->setSize($size);
         }

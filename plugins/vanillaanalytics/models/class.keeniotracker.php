@@ -388,6 +388,10 @@ class KeenIOTracker implements TrackerInterface {
         if ($callback) {
             $data['callback'] = $callback;
         }
+        $size = val('size', $widget);
+        if ($size) {
+            $data['size'] = $size;
+        }
 
         $widgetObj = new AnalyticsWidget();
         $widgetObj->setID($id)
