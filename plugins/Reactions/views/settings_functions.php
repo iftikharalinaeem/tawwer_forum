@@ -5,25 +5,25 @@ function AutoDescription($ReactionType) {
 
    if ($IncrementColumn = GetValue('IncrementColumn', $ReactionType)) {
       $IncrementValue = GetValue('IncrementValue', $ReactionType, 1);
-      $IncrementString = $IncrementValue > 0 ? "<b>Adds $IncrementValue</b> to" : "<b>Subtracts ".abs($IncrementValue)."</b> from";
+      $IncrementString = $IncrementValue > 0 ? "Adds $IncrementValue to" : "Subtracts ".abs($IncrementValue)." from";
 
-      $Result[] = sprintf("%s a <b>post</b>'s %s.", $IncrementString, strtolower($IncrementColumn));
+      $Result[] = sprintf("%s a post's %s.", $IncrementString, strtolower($IncrementColumn));
    }
 
    if ($Points = GetValue('Points', $ReactionType)) {
       if ($Points > 0)
-         $IncrementString = "<b>Gives $Points</b> ".Plural($Points,'point','points')." to";
+         $IncrementString = "Gives $Points ".Plural($Points,'point','points')." to";
       else
-         $IncrementString = "<b>Removes ".abs($Points)."</b> ".Plural($Points,'point','points')." from";
+         $IncrementString = "Removes ".abs($Points)." ".Plural($Points,'point','points')." from";
 
-      $Result[] = sprintf("%s the <b>user</b>.", $IncrementString);
+      $Result[] = sprintf("%s the user.", $IncrementString);
    }
 
    if ($LogThreshold = GetValue('LogThreshold', $ReactionType)) {
       $Log = GetValue('Log', $ReactionType, 'Moderate');
       $LogString = $Log == 'Spam' ? 'spam queue' : 'moderation queue';
 
-      $Result[] = sprintf("Posts with %s reactions will be placed in the <b>%s</b>.", $LogThreshold, $LogString);
+      $Result[] = sprintf("Posts with %s reactions will be placed in the %s.", $LogThreshold, $LogString);
    }
 
    if ($RemoveThreshold = GetValue('RemoveThreshold', $ReactionType)) {
@@ -37,7 +37,7 @@ function AutoDescription($ReactionType) {
    }
 
    if ($Permission = GetValue('Permission', $ReactionType)) {
-      $Result[] = sprintf(T('ReactionPermissionRestriction', '<b>Special restriction:</b> Only users with permission %s may use this reaction.'),$Permission);
+      $Result[] = sprintf(T('ReactionPermissionRestriction', 'Special restriction: Only users with permission %s may use this reaction.'),$Permission);
    }
 
    return $Result;

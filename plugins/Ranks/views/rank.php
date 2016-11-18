@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-echo header($this->data('Title'));
+echo heading($this->data('Title'), '', '', [], '/settings/ranks');
 // Setup our roles list.
 $Roles = RoleModel::roles();
 $RoleNames[] = '';
@@ -118,17 +118,12 @@ echo $this->Form->open(), $this->Form->errors();
                     '<div class="info">'."Users will need this permission to gain this rank.".'</div>'; ?>
             </div>
             <div class="input-wrap">
-                <?php $this->Form->dropDown('Criteria_Permission', ['' => '', 'Garden.Moderation.Manage' => 'Moderator', 'Garden.Settings.Manage' => 'Administrator']); ?>
+                <?php echo $this->Form->dropDown('Criteria_Permission', ['' => '', 'Garden.Moderation.Manage' => 'Moderator', 'Garden.Settings.Manage' => 'Administrator']); ?>
             </div>
         </li>
         <li class="form-group">
-            <div class="label-wrap">
-                <?php echo
-                    '<div class="info">'."You can have administrators manually apply ranks. This is useful if only a few people will have the rank and its criteria is subjective.".'</div>'; ?>
-            </div>
-            <div class="input-wrap">
-                <?php echo $this->Form->checkBox('Criteria_Manual', 'Applied Manually'); ?>
-            </div>
+            <?php $description = "You can have administrators manually apply ranks. This is useful if only a few people will have the rank and its criteria is subjective.";
+            echo $this->Form->toggle('Criteria_Manual', 'Enable Applying Manually', [], $description); ?>
         </li>
     </ul>
 </section>
