@@ -373,8 +373,8 @@ class CleanspeakPlugin extends Gdn_Plugin {
      *  [InsertUserID] int  InsertUserID in the queue.
      * @throws Gdn_UserException
      */
-    public function queueModel_checkpremoderation_handler($sender, &$args) {
-
+    public function queueModel_checkpremoderation_handler($sender, $args) {
+        Logger::event('cleanspeak_checkpremoderation', Logger::DEBUG, 'Cleanspeak queueModel_checkpremoderation.');
         $MediaIDs = valr('Options.MediaIDs', $args);
 
         // Moderators don't go through cleanspeak.
@@ -390,6 +390,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
             // Content will go into premoderation queue
             // InsertUserID will not be updated.
             $args['Premoderate'] = true;
+            Logger::event('cleanspeak_checkpremoderation', Logger::DEBUG, 'Cleanspeak premoderate.');
             return;
         }
 
@@ -415,8 +416,8 @@ class CleanspeakPlugin extends Gdn_Plugin {
         }
 
         // Content is in Pre Moderation Queue
-        if (GetValue('requiresApproval', $result) == 'requiresApproval'
-            || GetValue('contentAction', $result) == 'queuedForApproval'
+        if (val('requiresApproval', $result) == 'requiresApproval'
+            || val('contentAction', $result) == 'queuedForApproval'
         ) {
             $args['Premoderate'] = true;
             $args['Queue']['CleanspeakID'] = $result['content']['id'];
@@ -425,11 +426,13 @@ class CleanspeakPlugin extends Gdn_Plugin {
             }
 
             $args['InsertUserID'] = $this->getUserID();
+            Logger::event('cleanspeak_checkpremoderation', Logger::DEBUG, 'Cleanspeak premoderate.');
             return;
         }
 
         //if not handled by above; then add to queue for premoderation.
         $args['Premoderate'] = true;
+        Logger::event('cleanspeak_checkpremoderation', Logger::DEBUG, 'Cleanspeak premoderate.');
         return;
 
     }
@@ -527,7 +530,9 @@ class CleanspeakPlugin extends Gdn_Plugin {
         try {
             $result = $cleanSpeak->moderation($UUID, $content, C('Plugins.Cleanspeak.ForceModeration'));
 
-            if (val('contentAction', $result) == 'reject') {
+            if (!is_array($result)) {
+                Logger::warning("Cleanspeak API did not return an array.");
+            } elseif (val('contentAction', $result) == 'reject') {
 
                 /** @var $Validation Gdn_Validation */
                 $Validation = $sender->Validation;
