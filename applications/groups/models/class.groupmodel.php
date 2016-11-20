@@ -146,12 +146,23 @@ class GroupModel extends Gdn_Model {
             }
 
             // Moderators can view and edit all groups.
-            if ($UserID == Gdn::session()->UserID && Gdn::session()->checkPermission('Groups.Moderation.Manage')) {
-                $Perms['Edit'] = true;
-                $Perms['Delete'] = true;
-                $Perms['View'] = true;
+            $canManage = Gdn::session()->checkPermission([
+                'Garden.Settings.Manage',
+                'Garden.Community.Manage',
+                'Groups.Moderation.Manage'
+            ], false);
+
+            if ($UserID == Gdn::session()->UserID && $canManage) {
+                $managerOverrides = [
+                    'Delete' => true,
+                    'Edit' => true,
+                    'Leader' => true,
+                    'Moderate' => true,
+                    'View' => true,
+                ];
+
                 unset($Perms['View.Reason']);
-                $Perms['Moderate'] = true;
+                $Perms = array_merge($Perms, $managerOverrides);
             }
 
             $Permissions[$Key] = $Perms;

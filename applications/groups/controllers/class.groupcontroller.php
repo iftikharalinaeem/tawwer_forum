@@ -431,7 +431,7 @@ class GroupController extends Gdn_Controller {
         }
         $this->setData('Group', $Group);
 
-        if (!groupPermission('Edit')) {
+        if (!groupPermission('Leader')) {
             throw ForbiddenException('@'.groupPermission('Edit.Reason'));
         }
 

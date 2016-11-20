@@ -34,7 +34,7 @@ function getGroupOptions($group, $sectionId = 'home') {
      if (GroupPermission('Leave', $group)) {
           $options['Leave'] = array('Text' => t('Leave Group'), 'Url' => GroupUrl($group, 'leave'), 'CssClass' => 'Popup');
      }
-     if (GroupPermission('Delete', $group)) {
+     if (GroupPermission('Leader', $group)) {
           $options['Delete'] = array('Text' => sprintf(t('Delete %s'), t('Group')), 'Url' => GroupUrl($group, 'delete'), 'CssClass' => 'Popup');
      }
      if (GroupPermission('Leader', $group)) {
@@ -224,7 +224,7 @@ function WriteGroupButtons($Group = null) {
         $Options['Leave'] = array('Text' => T('Leave Group'), 'Url' => GroupUrl($Group, 'leave'), 'CssClass' => 'Popup');
     }
 
-    if (GroupPermission('Delete', $Group)) {
+    if (GroupPermission('Leader', $Group)) {
         $Options['Delete'] = array('Text' => sprintf(T('Delete %s'), T('Group')), 'Url' => GroupUrl($Group, 'delete'), 'CssClass' => 'Popup');
     }
 
