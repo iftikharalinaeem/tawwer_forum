@@ -122,6 +122,9 @@ class AnalyticsLeaderboard {
             // Sort results based on their count total, descending.
             usort($result, [$this, 'sortResults']);
 
+            // Cut to the desired number of results
+            $result = array_slice($result, 0, $this->size);
+
             // Prepare to build out the values we need for the leaderboard.
             switch ($emulatedTypeID) {
                 case 'discussion.discussionID':
@@ -143,6 +146,7 @@ class AnalyticsLeaderboard {
             foreach ($previousResult as $index => $previousStanding) {
                 $previousPositions[$previousStanding->$typeID] = $index;
             }
+
 
             $position = 0;
             foreach ($result as $currentResult) {
@@ -174,7 +178,8 @@ class AnalyticsLeaderboard {
                 $position++;
             }
         }
-        return array_slice($resultIndexed, 0, $this->size, true);
+
+        return $resultIndexed;
     }
 
     public function setPreviousQuery($previousQuery) {
