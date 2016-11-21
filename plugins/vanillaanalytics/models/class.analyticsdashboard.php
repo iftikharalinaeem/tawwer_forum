@@ -196,11 +196,10 @@ class AnalyticsDashboard implements JsonSerializable {
                         'top-posters',
                         'top-discussion-starters',
                         'top-question-answerers',
-                        'top-best-answerers',
-//                        'top-viewed-discussions', // Disabled for performance reason.
-//                        'top-viewed-qna-discussions', // Disabled for performance reason.
-//                        'top-commented-discussions', // Disabled for performance reason.
-//                        'top-commented-discussions' // Disabled for performance reason.
+                        'top-best-answerersers',
+                        'top-viewed-discussions',
+                        'top-viewed-qna-discussions',
+                        'top-commented-discussions',
                         'top-positive-discussions',
                         'top-negative-discussions',
                     ]
