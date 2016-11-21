@@ -23,7 +23,7 @@ class KeenIOTracker implements TrackerInterface {
      */
     protected $widgets = [
         'top-posters' => [
-            'title' => 'Top 10 Poster',
+            'title' => 'Top 10 Posters',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'leaderboard',
             'chart' => [
