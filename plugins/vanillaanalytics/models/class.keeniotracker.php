@@ -67,7 +67,7 @@ class KeenIOTracker implements TrackerInterface {
             ],
         ],
         'top-viewed-discussions' => [
-            'title' => 'Top 100 Viewed Discussions',
+            'title' => 'Top 10 Viewed Discussions',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'leaderboard',
             'chart' => [
@@ -78,7 +78,7 @@ class KeenIOTracker implements TrackerInterface {
             ],
         ],
         'top-viewed-qna-discussions' => [
-            'title' => 'Top 100 Viewed Questions',
+            'title' => 'Top 10 Viewed Questions',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'leaderboard',
             'chart' => [
@@ -89,7 +89,7 @@ class KeenIOTracker implements TrackerInterface {
             ],
         ],
         'top-commented-discussions' => [
-            'title' => 'Top 100 Commented Discussions',
+            'title' => 'Top 10 Commented Discussions',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'leaderboard',
             'chart' => [
@@ -100,7 +100,7 @@ class KeenIOTracker implements TrackerInterface {
             ]
         ],
         'top-positive-discussions' => [
-            'title' => 'Top 100 Positive Discussions',
+            'title' => 'Top 10 Positive Discussions',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'leaderboard',
             'chart' => [
@@ -111,7 +111,7 @@ class KeenIOTracker implements TrackerInterface {
             ]
         ],
         'top-negative-discussions' => [
-            'title' => 'Top 100 Negative Discussions',
+            'title' => 'Top 10 Negative Discussions',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'leaderboard',
             'chart' => [
