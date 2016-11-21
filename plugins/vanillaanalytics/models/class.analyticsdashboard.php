@@ -193,16 +193,16 @@ class AnalyticsDashboard implements JsonSerializable {
                 ],
                 'Leaderboard' => [
                     'widgets' => [
-//                        'top-posters',
-//                        'top-discussion-starters',
-//                        'top-question-answerers',
-//                        'top-best-answerers',
+                        'top-posters',
+                        'top-discussion-starters',
+                        'top-question-answerers',
+                        'top-best-answerers',
 //                        'top-viewed-discussions', // Disabled for performance reason.
 //                        'top-viewed-qna-discussions', // Disabled for performance reason.
 //                        'top-commented-discussions', // Disabled for performance reason.
 //                        'top-commented-discussions' // Disabled for performance reason.
                         'top-positive-discussions',
-//                        'top-negative-discussions',
+                        'top-negative-discussions',
                     ]
                 ]
             ];
