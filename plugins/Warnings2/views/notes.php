@@ -1,13 +1,13 @@
 <?php if (!defined('APPLICATION')) return;
-require_once $this->FetchViewLocation('warning_functions', '', 'plugins/Warnings2');
-$IsPrivileged = $this->Data('IsPrivileged');
+require_once $this->fetchViewLocation('warning_functions', '', 'plugins/Warnings2');
+$IsPrivileged = $this->data('IsPrivileged');
 ?>
 <div class="DataListWrap DataListWrap-UserNotes">
-<h2 class="H"><?php echo T('Notes'); ?></h2>
+<h2 class="H"><?php echo t('Notes'); ?></h2>
 
 <ul class="DataList DataList-Notes">
    <?php
-   foreach ($this->Data('Notes', array()) as $Row):
+   foreach ($this->data('Notes', array()) as $Row):
       $Row['Privileged'] = $IsPrivileged;
    ?>
    <li id="UserNote_<?php echo $Row['UserNoteID']; ?>" class="Item Item-Row <?php echo 'UserNote-'.$Row['Type'] ?>">
@@ -22,14 +22,14 @@ $IsPrivileged = $this->Data('IsPrivileged');
                 <div class="Options">
                    <?php
                    if ($IsPrivileged):
-                      echo Anchor(T('edit'), '/profile/note?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => T('Edit'))).
-                         Bullet(' ').
-                         Anchor(T('delete'), '/profile/deletenote?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => T('Delete')));
+                      echo anchor(t('edit'), '/profile/note?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => t('Edit'))).
+                         bullet(' ').
+                         anchor(t('delete'), '/profile/deletenote?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => t('Delete')));
                    endif;
                    ?>
                 </div>
                 <?php
-                echo '<span class="NoteType NoteType-'.$Row['Type'].'">'.T(ucfirst($Row['Type'])).'</span> ';
+                echo '<span class="NoteType NoteType-'.$Row['Type'].'">'.t(ucfirst($Row['Type'])).'</span> ';
                 ?>
              </div>
              <div class="Note-Body">
@@ -41,11 +41,11 @@ $IsPrivileged = $this->Data('IsPrivileged');
       </div>
       <div class="Item-Col Item-Col3 User-Col">
          <div class="Media">
-            <?php echo UserPhoto($Row, array('LinkClass' => 'Img', 'Px' => 'Insert')); ?>
+            <?php echo userPhoto($Row, array('LinkClass' => 'Img', 'Px' => 'Insert')); ?>
             <div class="Media-Body">
                <?php
-               echo '<div>'.UserAnchor($Row, '', array('Px' => 'Insert')).'</div> ';
-               echo '<div class="Meta">'.Gdn_Format::Date($Row['DateInserted'], 'html').'</div>';
+               echo '<div>'.userAnchor($Row, '', array('Px' => 'Insert')).'</div> ';
+               echo '<div class="Meta">'.Gdn_Format::date($Row['DateInserted'], 'html').'</div>';
                ?>
             </div>
          </div>
@@ -54,16 +54,16 @@ $IsPrivileged = $this->Data('IsPrivileged');
    <?php
    endforeach;
    ?>
-   <?php if (count($this->Data('Notes')) == 0 && $IsPrivileged): ?>
+   <?php if (count($this->data('Notes')) == 0 && $IsPrivileged): ?>
    <li>
       <div class="Empty">
-         <?php echo T('Notes description', 'You can add notes to a user which are only visible to moderators.'); ?>
+         <?php echo t('Notes description', 'You can add notes to a user which are only visible to moderators.'); ?>
       </div>
    </li>
    <?php endif; ?>
 </ul>
 
 <?php
-   PagerModule::Write(array('CurrentRecords' => count($this->Data('Notes', array()))));
+   PagerModule::write(array('CurrentRecords' => count($this->data('Notes', array()))));
 ?>
 </div>

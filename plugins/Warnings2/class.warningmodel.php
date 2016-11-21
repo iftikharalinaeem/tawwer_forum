@@ -37,32 +37,32 @@ class WarningModel extends UserNoteModel {
      */
     public function __construct() {
         parent::__construct();
-
-        $this->FireEvent('Init');
+        $this->fireEvent('Init');
     }
 
     /**
      * Notify a user of a warning with an activity.
      *
      * @param array|int $warning The warning to notify the user about.
+     * @return int
      */
     protected function notifyWithActivity($warning) {
         if (!is_array($warning)) {
             $warning = $this->getID($warning);
         }
 
-        $Session = Gdn::Session();
+        $Session = Gdn::session();
 
         // Let the warned user know who warned them, or not.
         $WarnerIdentity = $Session->UserID;
 
         // Use plugin icon as photo.
-        $Warnings2IconPath = preg_replace('/https?\:/i', '', Asset('/plugins/Warnings2/icon.png', true));
+        $Warnings2IconPath = preg_replace('/https?\:/i', '', asset('/plugins/Warnings2/icon.png', true));
 
         $Activity = array(
             'ActivityType' => 'Warning',
             'ActivityUserID' => $WarnerIdentity,
-            'HeadlineFormat' => T('HeadlineFormat.Warning.ToUser', 'You\'ve been <a href="{Url,html}" class="Popup">warned</a>.'),
+            'HeadlineFormat' => t('HeadlineFormat.Warning.ToUser', 'You\'ve been <a href="{Url,html}" class="Popup">warned</a>.'),
             'RecordType' => $warning['RecordType'],
             'RecordID' => $warning['RecordID'],
             'Story' => $warning['Body'],
@@ -74,7 +74,7 @@ class WarningModel extends UserNoteModel {
         );
 
         $ActivityModel = new ActivityModel();
-        $Result = $ActivityModel->Save($Activity, false, array('Force' => true));
+        $Result = $ActivityModel->save($Activity, false, array('Force' => true));
 
         $SavedActivityID = null;
         if (isset($Result['ActivityID'])) {
@@ -88,6 +88,7 @@ class WarningModel extends UserNoteModel {
      * Notify a warned user with a private message.
      *
      * @param array|int $warning The warning to notify the user about.
+     *
      * @return bool|int
      * @throws Gdn_UserException Throws an exception when there was an error creating the private conversation.
      */
@@ -106,7 +107,7 @@ class WarningModel extends UserNoteModel {
 
         $warningID = $warning['WarningID'];
         $row = array(
-            'Subject' => T('HeadlineFormat.Warning.ToUser', "You've been warned."),
+            'Subject' => t('HeadlineFormat.Warning.ToUser', "You've been warned."),
             'Type' => 'warning',
             'ForeignID' => "warning-{$warningID}",
             'Body' => $warning['Body'],
@@ -128,7 +129,7 @@ class WarningModel extends UserNoteModel {
      * @return array Returns an array about the process actions.
      */
     public function processAllWarnings() {
-        $alerts = $this->SQL->GetWhere('UserAlert', array('TimeExpires <' => time()))->resultArray();
+        $alerts = $this->SQL->getWhere('UserAlert', array('TimeExpires <' => time()))->resultArray();
 
         $result = array();
         foreach ($alerts as $alert) {
@@ -143,6 +144,7 @@ class WarningModel extends UserNoteModel {
      * Process all of the warnings for a single user.
      *
      * @param array|int $userID The user to process the warnings for.
+     *
      * @return array Returns an array of processing information.
      */
     public function processWarnings($userID) {
@@ -214,6 +216,7 @@ class WarningModel extends UserNoteModel {
      * Returns false if RecordType is not discussion or comment.
      *
      * @param string $recordType The type of record to get the model for.
+     *
      * @return Gdn_Model Returns the model that handles {@link $recordType}.
      */
     public function getModel($recordType) {
@@ -229,6 +232,7 @@ class WarningModel extends UserNoteModel {
      * Reverse a warning.
      *
      * @param array|int $warning The warning to reverse.
+     *
      * @return boolean Whether the warning was reversed.
      */
     public function reverse($warning) {
@@ -237,7 +241,7 @@ class WarningModel extends UserNoteModel {
         }
 
         if (!$warning) {
-            throw NotFoundException('Warning');
+            throw notFoundException('Warning');
         }
 
         if (val('Reversed', $warning)) {
@@ -248,7 +252,7 @@ class WarningModel extends UserNoteModel {
         // First, reverse the warning.
         $this->setField($warning['UserNoteID'], 'Reversed', true);
 
-        $model = $this->GetModel($warning['RecordType']);
+        $model = $this->getModel($warning['RecordType']);
         if ($model instanceof Gdn_Model) {
             $record = $model->getID($warning['RecordID']);
 
@@ -421,13 +425,13 @@ class WarningModel extends UserNoteModel {
             $alertModel->save($alert);
         } else {
             $set['UserID'] = $data['UserID'];
-            $alertModel->Insert($set);
+            $alertModel->insert($set);
         }
 
         $event['Alert'] = $alert;
 
         // Process this user's warnings.
-        $processed = $this->ProcessWarnings($userID);
+        $processed = $this->processWarnings($userID);
 
         if (BanModel::isBanned(valr('Set.Banned', $processed), BanModel::BAN_WARNING)) {
             // Update the user note to indicate the ban.
@@ -452,8 +456,8 @@ class WarningModel extends UserNoteModel {
     public static function special() {
         if (self::$special === null) {
             self::$special = array(
-                3 => array('Label' => T('Jail'), 'Title' => T('Jailed users have reduced abilities.')),
-                5 => array('Label' => T('Ban'), 'Title' => T("Banned users can no longer access the site."))
+                3 => array('Label' => t('Jail'), 'Title' => t('Jailed users have reduced abilities.')),
+                5 => array('Label' => t('Ban'), 'Title' => t('Banned users can no longer access the site.'))
             );
         }
         return self::$special;

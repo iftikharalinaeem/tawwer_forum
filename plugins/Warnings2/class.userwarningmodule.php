@@ -4,31 +4,37 @@ class UserWarningModule extends Gdn_Module {
 
     public $UserID;
 
-    public function __construct($Sender = '', $ApplicationFolder = FALSE) {
+    public function __construct($Sender = '', $ApplicationFolder = false) {
         $this->_ApplicationFolder = 'plugins/Warnings2';
     }
 
-    public function ToString() {
+    /**
+     * Returns the component as a string to be rendered to the screen.
+     *
+     * @return string|empty string
+     */
+    public function toString() {
         if (!$this->UserID) {
-            $this->UserID = Gdn::Controller()->Data('Profile.UserID');
+            $this->UserID = Gdn::controller()->data('Profile.UserID');
         }
 
-        if ($this->UserID != Gdn::Session()->UserID && !Gdn::Session()->CheckPermission(array('Garden.PersonalInfo.View', 'Moderation.Warnings.View'), FALSE)) {
+        if ($this->UserID != Gdn::session()->UserID && !Gdn::session()->checkPermission(array('Garden.PersonalInfo.View', 'Moderation.Warnings.View'), false)) {
             return '';
         }
 
         // Grab the data.
         $UserAlertModel = new UserAlertModel();
-        $Alert = $UserAlertModel->GetID($this->UserID);
+        $Alert = $UserAlertModel->getID($this->UserID);
         $this->Data = $Alert;
-        if (!$this->Data('WarningLevel'))
+        if (!$this->data('WarningLevel')) {
             return '';
+        }
 
-        $User = Gdn::UserModel()->GetID($this->UserID);
-        $this->SetData('Punished', GetValue('Punished', $User));
-        $this->SetData('Banned', GetValue('Banned', $User));
-        $this->SetData('Name', GetValue('Name', $User));
+        $User = Gdn::userModel()->getID($this->UserID);
+        $this->setData('Punished', val('Punished', $User));
+        $this->setData('Banned', val('Banned', $User));
+        $this->setData('Name', val('Name', $User));
 
-        return parent::ToString();
+        return parent::toString();
     }
 }

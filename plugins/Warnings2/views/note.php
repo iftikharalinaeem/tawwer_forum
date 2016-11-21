@@ -1,27 +1,27 @@
 <?php if (!defined('APPLICATION')) return; ?>
 
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 <div class="Wrap FormWrapper NoteForm">
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 
 <div class="P">
 <?php
-echo $this->Form->BodyBox('Body');
+echo $this->Form->bodyBox('Body');
 ?>
 </div>
 
 <div class="P Gloss">
-   <?php echo T('These notes can only be seen by moderators.'); ?>
+   <?php echo t('These notes can only be seen by moderators.'); ?>
 </div>
 
 <?php
 echo '<div class="Buttons Buttons-Confirm">',
-   $this->Form->Button('OK'), ' ',
-   $this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
+   $this->Form->button('OK'), ' ',
+   $this->Form->button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
    '</div>';
-echo $this->Form->Close();
+echo $this->Form->close();
 ?>
 </div>

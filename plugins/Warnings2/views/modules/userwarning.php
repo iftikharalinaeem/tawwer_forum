@@ -1,23 +1,24 @@
 <div class="Hero Hero-WarningLevel">
    <h2>
    <?php
-   echo sprintf(T('Warning Level %s'), $this->Data('WarningLevel')).
+   echo sprintf(t('Warning Level %s'), $this->data('WarningLevel')).
       ' '.
       '<span class="Gloss">'.
-      Bullet(' ').
-      sprintf(T('expires %s'), Gdn_Format::Date($this->Data('TimeWarningExpires'), 'html')).
+      bullet(' ').
+      sprintf(t('expires %s'), Gdn_Format::date($this->data('TimeWarningExpires'), 'html')).
       '</span>';
    ?>
    </h2>
    
-   <?php if ($this->Data('Punished')): ?>
+   <?php if ($this->data('Punished')): ?>
    <div class="Message">
       <?php 
-      if ($this->UserID == Gdn::Session()->UserID)
-         echo T('You are jailed.');
-      else
-         echo sprintf(T('%s is jailed.'), htmlspecialchars($this->Data('Name')));
-      
+      if ($this->UserID == Gdn::session()->UserID) {
+         echo t('You are jailed.');
+      } else {
+         echo sprintf(t('%s is jailed.'), htmlspecialchars($this->data('Name')));
+      }
+
       ?>
       <ul>
          <li>Can't post discussions.</li>
