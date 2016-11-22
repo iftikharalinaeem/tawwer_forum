@@ -52,7 +52,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /** @var int the nbf (not before time) from the payload of the token*/
     protected $nbfClaim = 0;
 
-
+    /** @var array supported alorithms */
     public  $supportedAlgs = [
         'HS256' => 'sha256',
         'HS512' => 'sha512',
@@ -88,10 +88,8 @@ class JWTSSOPlugin extends Gdn_Plugin {
                 'ProfileKeyFullName' => 'name',
                 'ProfileKeyUniqueID' => 'sub'
             ];
-
             $model->save($provider);
         }
-
         saveToConfig('Garden.SignIn.Popup', false);
     }
 
