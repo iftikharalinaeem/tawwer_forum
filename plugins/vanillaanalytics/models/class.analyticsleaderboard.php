@@ -91,6 +91,7 @@ class AnalyticsLeaderboard {
         if ((is_array($result) && !empty($result)) && is_array($previousResult)) {
             $detectTypes = [
                 'user.userID',
+                'insertUser.userID',
                 'discussion.discussionID',
                 'reaction.recordID',
             ];
@@ -133,6 +134,7 @@ class AnalyticsLeaderboard {
                     $titleAttribute = 'Name';
                     break;
                 case 'user.userID':
+                case 'insertUser.userID':
                     $recordModel = Gdn::userModel();
                     $recordUrl = '/profile?UserID=%d';
                     $titleAttribute = 'Name';

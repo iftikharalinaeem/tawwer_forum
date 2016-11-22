@@ -486,7 +486,7 @@ class KeenIOTracker implements TrackerInterface {
 
         $this->widgets['top-question-answerers']['query'] = $topQuestionAnswerers;
 
-        // Top Best Answerers (leaderboard)
+        // Top Best Question Answerers (leaderboard)
         $topBestAnswerers = new KeenIOQuery();
         $topBestAnswerers->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
             ->setEventCollection('qna')
@@ -495,7 +495,7 @@ class KeenIOTracker implements TrackerInterface {
                 'property_name' => 'type',
                 'property_value' => 'answer_accepted'
             ])
-            ->setGroupBy('user.userID');
+            ->setGroupBy('insertUser.userID');
 
         $this->widgets['top-best-answerers']['query'] = $topBestAnswerers;
 
