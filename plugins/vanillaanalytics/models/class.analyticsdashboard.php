@@ -196,7 +196,7 @@ class AnalyticsDashboard implements JsonSerializable {
                         'top-posters',
                         'top-discussion-starters',
                         'top-question-answerers',
-                        'top-best-answerersers',
+                        'top-best-answerers',
                         'top-viewed-discussions',
                         'top-viewed-qna-discussions',
                         'top-commented-discussions',
