@@ -322,6 +322,41 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Track when a user receive points.
+     *
+     * @param UserModel $sender Sending instance
+     * @param array $args Event's arguments
+     */
+    public function userModel_givePoints_handler($sender, $args) {
+
+        $timestamp = val('Timestamp', $args, false);
+        if (!$timestamp) {
+            $time = 'now';
+        } else {
+            $tmp = new DateTime();
+            $tmp->setTimestamp($timestamp);
+            $time = $tmp->format('Y-m-d H:i:s');
+        }
+
+        $givenPoints = (int)val('GivenPoints', $args, 0);
+        $data = [
+            'point' => [
+                'categoryID' => val('CategoryID', $args, 0),
+                'source' => val('Source', $args, null),
+                'user' => AnalyticsData::getUser($args['UserID']),
+                'given' => [
+                    'points' => $givenPoints,
+                    'date' => AnalyticsData::getDateTime($time),
+                ],
+            ]
+        ];
+
+        $event = $givenPoints > 0 ? 'user_point_add' : 'user_point_remove';
+
+        AnalyticsTracker::getInstance()->trackEvent('point', $event, $data);
+    }
+
+    /**
      * Setup routine to run when the plug-in is enabled.
      *
      * @throws Gdn_UserException
