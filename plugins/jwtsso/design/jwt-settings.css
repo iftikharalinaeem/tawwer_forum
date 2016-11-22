@@ -1,0 +1,11 @@
+.JWT-sample {
+    border:solid 1px #ccc;
+    background-color: #eee;
+    padding:10px;
+    margin: 10px;
+    float: left;
+    clear: left;
+    border-radius: 3px;
+    max-width: 550px;
+    overflow-x: scroll;
+}
