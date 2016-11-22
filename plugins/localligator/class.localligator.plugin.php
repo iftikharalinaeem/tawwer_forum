@@ -8,8 +8,7 @@ $PluginInfo['localligator'] = [
     'Author'           => 'Becky Van Bussel',
     'AuthorEmail'      => 'becky@vanillaforums.com',
     'Icon'             => 'internal-plugin.png',
-    'UsePopupSettings' => false,
-    'License'          => 'MIT'
+    'UsePopupSettings' => false
 ];
 
 /**
@@ -39,6 +38,9 @@ class LocalligatorPlugin extends Gdn_Plugin {
         'Ignore' => PATH_ROOT."/conf/localligator/ignore.php"
     ];
 
+    /** @var boolean var Whether the tx-source translations are reachable. */
+    private static $canLoadResources = false;
+
     private static $informUser = true;
 
     /** @var Storage of untranslated codes */
@@ -62,8 +64,11 @@ class LocalligatorPlugin extends Gdn_Plugin {
      */
     private function loadSiteCore() {
         $Definition = [];
-        foreach($this->translationFiles as $file) {
+        foreach($this->translationFiles as $key => $file) {
             if (file_exists($file)) {
+                if ($key === 'Vanilla') {
+                    self::$canLoadResources = true;
+                }
                 include_once($file);
             }
         }
@@ -111,7 +116,7 @@ class LocalligatorPlugin extends Gdn_Plugin {
             return;
         }
 
-        if (!array_key_exists($code, $this->getTranslations())) {
+        if (!array_key_exists($code, $this->getTranslations()) && self::$canLoadResources) {
             trace('Translation does not exist: '.$code);
             $exists = $this->getUntranslatedList()->get($code, false);
 
@@ -176,6 +181,11 @@ class LocalligatorPlugin extends Gdn_Plugin {
      * @param SettingsController $sender
      */
     public function settingsController_localligator_create($sender) {
+        $sender->setData('CanLoadResources', self::$canLoadResources);
+        if (!self::$canLoadResources) {
+            $sender->render('localligator', '', 'plugins/localligator');
+        }
+
         $sender->form = new Gdn_Form('', 'bootstrap');
         $localeStrings = val('Data', $this->getUntranslatedList());
 

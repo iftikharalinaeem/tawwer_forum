@@ -7,6 +7,15 @@ helpAsset(sprintf(t('About %s'), 'Localligator'), $helpDescription);
 
 /** @var Gdn_Form $form */
 $form = $this->form;
+
+if (!$this->data('CanLoadResources')) : ?>
+    <div class="alert alert-danger padded">
+        Cannot locate tx-source files. Maybe you're missing some symlinks. Make sure the tx-source directory is
+        symlinked into your locales directory. Or alternatively, symlink the entire locales repo into your webroot.
+    </div>
+    <?php return;
+endif;
+
 $strings = $this->data('StringsToAddField');
 
 if (empty($strings)) : ?>
