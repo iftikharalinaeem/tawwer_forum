@@ -209,9 +209,9 @@ class JWTSSOPlugin extends Gdn_Plugin {
             'iss' => $baseUrl,
             'sub' => val('AssociationKey', $provider),
             'aud' => val('Audience', $provider),
-            'email' => val('Email', Gdn::session()->User, 'user@myforum.com'),
-            'displayname' => val('Name', Gdn::session()->User, 'HappyUser'),
-            'exp' => time() + 1000,
+            'email' => c('JWTSSO.TestToken.Email', Gdn::session()->User->Email),
+            'displayname' => c('JWTSSO.TestToken.Name', Gdn::session()->User->Name),
+            'exp' => time() + c('JWTSSO.TestToken.ExpiryTime', 1000),
             'nbf' => time()
         ];
 
