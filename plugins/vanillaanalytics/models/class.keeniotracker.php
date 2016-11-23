@@ -461,8 +461,8 @@ class KeenIOTracker implements TrackerInterface {
             ->setEventCollection('post')
             ->addFilter([
                 'operator' => 'gt',
-                'property_name' => 'commentID',
-                'property_value' => 0
+                'property_name' => 'type',
+                'property_value' => 'discussion_add'
             ])
             ->setGroupBy('user.userID');
 
@@ -532,13 +532,12 @@ class KeenIOTracker implements TrackerInterface {
 
         // Top Commented Discussions (leaderboard)
         $topCommentedDiscussions = new KeenIOQuery();
-        $topCommentedDiscussions->setAnalysisType(KeenIOQuery::ANALYSIS_MAXIMUM)
-            ->setEventCollection('page')
-            ->setTargetProperty('discussion.countComments')
+        $topCommentedDiscussions->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setEventCollection('post')
             ->addFilter([
                 'operator' => 'eq',
                 'property_name' => 'type',
-                'property_value' => 'discussion_view'
+                'property_value' => 'comment_add'
             ])
             ->setGroupBy('discussion.discussionID');
 
@@ -560,7 +559,7 @@ class KeenIOTracker implements TrackerInterface {
                 'property_name' => 'reaction.recordType',
                 'property_value' => 'discussion'
             ])
-            ->setGroupBy(['reaction.recordID', 'reaction.recordType']);
+            ->setGroupBy(['reaction.recordID']);
 
         $this->widgets['top-positive-discussions']['query'] = $topPositiveDiscussions;
 
@@ -579,7 +578,7 @@ class KeenIOTracker implements TrackerInterface {
                 'property_name' => 'reaction.recordType',
                 'property_value' => 'discussion'
             ])
-            ->setGroupBy(['reaction.recordID', 'reaction.recordType']);
+            ->setGroupBy(['reaction.recordID']);
 
         $this->widgets['top-negative-discussions']['query'] = $topNegativeDiscussions;
 
