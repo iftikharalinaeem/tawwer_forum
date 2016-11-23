@@ -1,8 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
 echo heading($this->data('Title'));
-helpAsset(sprintf(t('About %s'), t('Pinning')),
-    t('Quickly access only the info that you need by pinning metrics.').' '.
-    sprintf(t('Simply click on a pin (&nbsp;%s&nbsp;) to showcase that metric in your "My Analytics" section.'), dashboardSymbol('pin', 'icon icon-text'))
+helpAsset(
+    sprintf(t('About %s'), t('Date Picking')),
+    t('When you choose a date range, the beginning date is inclusive and the ending date is exclusive. '
+        .'This means that if you wanted to do the daily analysis of a week you would have to pick a monday and the next monday to have all seven days included.')
+);
+helpAsset(
+    sprintf(t('About %s'), t('Pinning')),
+    t('Quickly access only the info that you need by pinning metrics.').' '
+    .sprintf(
+        t('Simply click on a pin (&nbsp;%s&nbsp;) to showcase that metric in your "My Analytics" section.'),
+        dashboardSymbol('pin', 'icon icon-text')
+    )
 );
 if (!$this->data('HasWidgets') && $this->data('IsPersonal')) : ?>
     <div class="hero">
