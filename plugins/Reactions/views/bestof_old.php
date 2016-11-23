@@ -11,7 +11,7 @@ include_once 'reaction_functions.php';
 function ReactionFilterButton($Name, $Code, $CurrentReactionType) {
    $LCode = strtolower($Code);
    $Url = Url("/bestof/$LCode");
-   $ImgSrc = "http://badges.vni.la/reactions/50/$LCode.png";
+   $ImgSrc = "https://badges.v-cdn.net/reactions/50/$LCode.png";
    $CssClass = '';
    if ($CurrentReactionType == $LCode)
       $CssClass .= ' Selected';

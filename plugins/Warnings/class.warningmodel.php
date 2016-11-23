@@ -62,7 +62,7 @@ class WarningModel extends Gdn_Model {
       // Add a notification to the user.
       $Activity = array(
           'ActivityType' => 'Warning',
-          'Photo' => 'http://cdn.vanillaforums.com/images/warn_50.png',
+          'Photo' => 'https://images.v-cdn.net/warn_50.png',
           'ActivityUserID' => Gdn::Session()->UserID,
           'NotifyUserID' => $Warning['WarnUserID'],
           'RegardingUserID' => $Warning['WarnUserID'],

@@ -35,7 +35,7 @@ if (checkPermission('Garden.Settings.Manage')) {
       $reactionBlock = new MediaItemModule(t($ReactionType['Name']), '', $ReactionType['Description']);
       $reactionBlock->setView('media-sm')
          ->addCssClass('image-wrap', 'media-image-wrap-no-border')
-         ->setImage('http://badges.vni.la/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png');
+         ->setImage('https://badges.v-cdn.net/reactions/50/'.strtolower($ReactionType['UrlCode']).'.png');
 
       ?>
       <tr id="ReactionType_<?php echo $ReactionType['UrlCode']; ?>" class="<?php echo $State; ?>">

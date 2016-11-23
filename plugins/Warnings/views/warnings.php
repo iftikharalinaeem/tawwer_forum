@@ -31,7 +31,7 @@ if (count($this->Data('Warnings')) > 0 ):
          <?php
          $Photo = UserPhoto($Row, array('Px' => 'Insert'));
          if (!$Photo)
-            $Photo = '<span class="PhotoWrap">'.Img('http://cdn.vanillaforums.com/images/warn_50.png', array('class' => 'ProfilePhoto')).'</span>';
+            $Photo = '<span class="PhotoWrap">'.Img('https://images.v-cdn.net/warn_50.png', array('class' => 'ProfilePhoto')).'</span>';
          echo $Photo;
          ?>
       </div>
