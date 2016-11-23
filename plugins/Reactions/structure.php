@@ -140,7 +140,7 @@ if (class_exists('BadgeModel')) {
                 'Slug' => "$ClassSlug-$Threshold",
                 'Type' => 'Reaction',
                 'Body' => "You received $Threshold $NameSuffix. $Sentence",
-                'Photo' => "http://badges.vni.la/100/$ClassSlug-$Level.png",
+                'Photo' => "https://badges.v-cdn.net/100/$ClassSlug-$Level.png",
                 'Points' => $Points,
                 'Threshold' => $Threshold,
                 'Class' => $Class,

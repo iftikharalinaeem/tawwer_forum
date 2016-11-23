@@ -92,7 +92,7 @@ class RankModel extends Gdn_Model {
                 'Route' => "/profile",
                 'Emailed' => ActivityModel::SENT_PENDING,
                 'Notified' => ActivityModel::SENT_PENDING,
-                'Photo' => 'https://c3409409.ssl.cf0.rackcdn.com/images/ranks_100.png',
+                'Photo' => 'https://images.v-cdn.net/ranks_100.png',
                 'Data' => ['Name' => $Rank['Name'], 'Label' => $Rank['Label']]
         ];
 
