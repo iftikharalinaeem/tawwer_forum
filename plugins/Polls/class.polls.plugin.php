@@ -276,6 +276,9 @@ class PollsPlugin extends Gdn_Plugin {
             $categoryUrlCode = '';
         }
 
+        Gdn_Theme::section('PostDiscussion');
+        Gdn_Theme::section('PostPoll');
+
         $pollModel = new PollModel();
         $category = false;
         if ($categoryUrlCode != '') {
