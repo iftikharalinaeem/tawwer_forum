@@ -156,7 +156,7 @@ $(document).ready(function() {
 
     $(".js-date-range").on('apply.daterangepicker', function (ev, picker) {
         /*
-            Get the real timezone withtout DTS shennanigans.
+            Fix DST shenanigans.
 
             Timezone: US/Eastern
             var date1 = moment('2016-11-06T00:00:00.000');
@@ -174,7 +174,7 @@ $(document).ready(function() {
         if (picker.startDate.format('Z') === picker.endDate.format('Z')) {
             unifiedTimeZone = picker.startDate.format('Z')
         } else {
-            unifiedTimeZone = moment('2016-01-01').format('Z'); // Take timezone with no DTS
+            unifiedTimeZone = moment('2016-01-01').format('Z'); // Take timezone with no DST
         }
 
         // Preformat date into valid ISO-8601 dates
