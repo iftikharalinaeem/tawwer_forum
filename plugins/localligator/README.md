@@ -25,6 +25,7 @@ It's up to the developer to make a PR to add their strings to the locale repo tx
 Future improvements to this plugin could include:
 * Giving the dev the ability to manually add a definition.
 * Giving the dev the ability to change a definition/default translation before adding.
+* Adding pagination, as the settings page gets pretty laggy after 200 entries.
 
 ---
 Copyright &copy; 2016 Vanilla Forums. Licensed under the terms of the [MIT License](LICENSE.md).
