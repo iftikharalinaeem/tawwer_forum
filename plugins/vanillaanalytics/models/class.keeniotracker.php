@@ -614,7 +614,7 @@ class KeenIOTracker implements TrackerInterface {
         /**
          * Pie Charts
          */
-        $this->widgets['participation-rate']['query'] = [$totalVisitsQuery, $totalContributorsQuery];
+        $this->widgets['participation-rate']['query'] = [$totalActiveUsersQuery, $totalContributorsQuery];
         $this->widgets['participation-rate']['queryProcessor'] = [
             'instructions' => [
                 'merged-participation-rate' => [
