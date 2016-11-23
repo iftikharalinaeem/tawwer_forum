@@ -12,15 +12,19 @@ var analyticsToolbar = {
     getDefaultRange: function() {
         // Grab the date range from a cookie.  If we don't have one, build the default starting from a month ago.
         var dateRange = Cookies.getJSON('va-dateRange');
-        if (typeof dateRange !== "object" || typeof dateRange.start !== "string" || typeof dateRange.end !== "string") {
+
+        var utcIso8601DateRegex = /\d{4}-\d\d-\d\dT(\d\d:){2}\d\d.\d{3}(\+|-)\d\d:\d\d/;
+
+        if (typeof dateRange !== "object" || typeof dateRange.start !== "string" || typeof dateRange.end !== "string"
+            || !utcIso8601DateRegex.test(dateRange.start)) {
             dateRange = {
-                start: moment().subtract(1, "month").toDate(),
-                end: moment().toDate()
+                start: moment().startOf('day').subtract(1, "month").format('YYYY-MM-DDTHH:mm:ss.SSSZ'),
+                end: moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss.SSSZ')
             };
         } else {
             dateRange = {
-                start: new Date(dateRange.start),
-                end: new Date(dateRange.end)
+                start: dateRange.start,
+                end: dateRange.end
             }
         }
 
@@ -111,30 +115,72 @@ $(document).on('click', '.js-analytics-interval:not(.disabled)', function() {
 });
 
 $(document).ready(function() {
+    // Keen.io has range with start date inclusiv and end date exclusive so,
+    // for simplicity, let's use the datepicker like so.
+
     var defaultRange = analyticsToolbar.getDefaultRange();
+    var todayInclusive = moment().startOf('day').add(1, 'day');
 
     $(".js-date-range").daterangepicker({
         alwaysShowCalendars: true,
-        startDate: defaultRange.start,
-        endDate: defaultRange.end,
+        startDate: moment(defaultRange.start),
+        endDate: moment(defaultRange.end),
         opens: 'left',
         buttonClasses: "btn",
         applyClass: "btn-primary",
         cancelClass: "btn-secondary",
-        maxDate: moment(),
+        maxDate: todayInclusive,
         ranges: {
-            'Past 30 Days': [moment().subtract(30, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-            'Past Year': [moment().subtract(1, 'year'), moment()],
-            'Year to Date': [moment().startOf('year'), moment()]
-        }
+            'Past 30 Days': [
+                moment().startOf('day').subtract(29, 'days'), // Today will be included so go back only 29 days
+                todayInclusive
+            ],
+            'This Month': [
+                moment().startOf('month'),
+                todayInclusive // Doesn't do us any good to check passed today
+            ],
+            'Last Month': [
+                moment().startOf('month').subtract(1, 'month'),
+                moment().startOf('month')
+            ],
+            'Past Year': [
+                moment().startOf('day').subtract(1, 'year'),
+                todayInclusive
+            ],
+            'Year to Date': [
+                moment().startOf('year'),
+                todayInclusive
+            ]
+        },
     });
 
     $(".js-date-range").on('apply.daterangepicker', function (ev, picker) {
+        /*
+            Get the real timezone withtout DTS shennanigans.
+
+            Timezone: US/Eastern
+            var date1 = moment('2016-11-06T00:00:00.000');
+            var date2 = moment('2016-11-07T00:00:00.000')
+
+            // date1.format('Z'); -> -04:00
+            // date2.format('Z'); -> -05:00
+
+            console.debug(date1.utc().format('YYYY-MM-DDTHH:mm:ss.SSSZ')); // 2016-11-06T04:00:00.000+00:00
+            console.debug(date2.utc().format('YYYY-MM-DDTHH:mm:ss.SSSZ')); // 2016-11-07T05:00:00.000+00:00
+
+            You end up with 1 hour difference and this is messing up intervals real bad
+         */
+        var unifiedTimeZone;
+        if (picker.startDate.format('Z') === picker.endDate.format('Z')) {
+            unifiedTimeZone = picker.startDate.format('Z')
+        } else {
+            unifiedTimeZone = moment('2016-01-01').format('Z'); // Take timezone with no DTS
+        }
+
+        // Preformat date into valid ISO-8601 dates
         var range = {
-            start: picker.startDate.toDate(),
-            end: picker.endDate.toDate()
+            start: picker.startDate.format('YYYY-MM-DDT00:00:00.000')+unifiedTimeZone,
+            end: picker.endDate.format('YYYY-MM-DDT00:00:00.000')+unifiedTimeZone
         };
         Cookies.set('va-dateRange', range);
         analyticsToolbar.updateIntervals(range);
