@@ -229,9 +229,9 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
         $jwtPayload = [
             'iss' => $baseUrl,
-            'sub' => c('JWTSSO.TestToken.ForeignKey'),
+            'sub' => c('JWTSSO.TestToken.ForeignKey', '12345'),
             'aud' => val('Audience', $provider),
-            'email' => c('JWTSSO.TestToken.Email'),
+            'email' => c('JWTSSO.TestToken.Email', Gdn::session()->User->Email),
             'displayname' => c('JWTSSO.TestToken.Name'),
             'exp' => time() + c('JWTSSO.TestToken.ExpiryTime', 600),
             'nbf' => time()
