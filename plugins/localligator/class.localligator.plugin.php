@@ -55,10 +55,9 @@ class LocalligatorPlugin extends Gdn_Plugin {
      * @return array The site core translations.
      */
     public function getTranslations() {
-        if (!empty($this->translations)) {
-            return $this->translations;
+        if (empty($this->translations)) {
+            $this->loadSiteCore();
         }
-        $this->loadSiteCore();
         return $this->translations;
     }
 
@@ -84,10 +83,9 @@ class LocalligatorPlugin extends Gdn_Plugin {
      * @return Gdn_Configuration|null Configuration or null if there's an issue creating the untranslated file.
      */
     public function getUntranslatedList() {
-        if ($this->untranslatedList !== null) {
-            return $this->untranslatedList;
+        if ($this->untranslatedList === null) {
+            $this->loadUntranslatedList();
         }
-        $this->loadUntranslatedList();
         return $this->untranslatedList;
     }
 
