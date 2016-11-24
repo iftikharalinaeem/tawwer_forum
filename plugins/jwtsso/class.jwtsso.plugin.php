@@ -8,7 +8,7 @@ $PluginInfo['jwtsso'] = [
     'Name' => 'JSON Web Token SSO',
     'ClassName' => "JWTSSOPlugin",
     'Description' => 'Connect users to a forum using SSO by passing a JSON Web Token.',
-    'Version' => '1.0.0',
+    'Version' => '1.0.2',
     'RequiredApplications' => ['Vanilla' => '2.2'],
     'SettingsUrl' => '/settings/jwtsso',
     'SettingsPermission' => 'Garden.Settings.Manage',
@@ -52,6 +52,18 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /** @var int the nbf (not before time) from the payload of the token*/
     protected $nbfClaim = 0;
 
+    /** @var int the iat (issued at time) from the payload of the token*/
+    protected $iatClaim = 0;
+
+    /** @var string the sub (clientID) from the payload of the token*/
+    protected $subClaim = null;
+
+    /** @var string or URL the aud (intended audience, usually web address) from the payload of the token*/
+    protected $audClaim = null;
+
+    /** @var string or URL the aud (issuer, usually web address) from the payload of the token*/
+    protected $issClaim = null;
+
     /** @var array supported alorithms */
     public  $supportedAlgs = [
         'HS256' => 'sha256',
@@ -59,8 +71,18 @@ class JWTSSOPlugin extends Gdn_Plugin {
         'HS384' => 'sha384'
     ];
 
+    public $translatedKeys = [];
+
     public function __construct() {
         $this->setProviderKey('JWTSSO');
+        $provider = $this->provider();
+        $this->translatedKeys = [
+            val('ProfileKeyEmail', $provider, 'email') => 'Email',
+            val('ProfileKeyPhoto', $provider, 'picture') => 'Photo',
+            val('ProfileKeyName', $provider, 'displayname') => 'Name',
+            val('ProfileKeyFullName', $provider, 'name') => 'FullName',
+            'sub' => 'UniqueID'
+        ];
     }
 
     /**
@@ -85,8 +107,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
                 'ProfileKeyEmail' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
                 'ProfileKeyPhoto' => 'picture',
                 'ProfileKeyName' => 'displayname',
-                'ProfileKeyFullName' => 'name',
-                'ProfileKeyUniqueID' => 'sub'
+                'ProfileKeyFullName' => 'name'
             ];
             $model->save($provider);
         }
@@ -95,7 +116,6 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
 
     /** ------------------- Settings Related Methods --------------------- */
-
 
     /**
      * Create a controller to deal with plugin settings in dashboard.
@@ -116,21 +136,20 @@ class JWTSSOPlugin extends Gdn_Plugin {
             $provider = $this->provider();
             $form->setData($provider);
         } else {
+            if ($form->getFormValue('Generate') || $sender->Request->post('Generate')) {
+                $generate = true;
+                $secret = md5(mt_rand());
+                $sender->setFormSaved(false);
+            } else {
+                $form->setFormValue('AuthenticationKey', $this->getProviderKey());
 
-            $form->setFormValue('AuthenticationKey', $this->getProviderKey());
+                $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
+                $sender->Form->validateRule('SignInUrl', 'isUrl', 'You must provide a complete URL in the Sign In  URL field.');
+                $sender->Form->validateRule('BaseUrl', 'isUrl', 'You must provide a complete URL in the Issuer URL field.');
 
-            $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
-            $sender->Form->validateRule('AuthorizeUrl', 'isUrl', 'You must provide a complete URL in the Authorize Url field.');
-
-            // To satisfy the AuthenticationProviderModel, create a BaseUrl.
-            $baseUrlParts = parse_url($form->getValue('AuthorizeUrl'));
-            $baseUrl = (val('scheme', $baseUrlParts) && val('host', $baseUrlParts)) ? val('scheme', $baseUrlParts).'://'.val('host', $baseUrlParts) : null;
-            if ($baseUrl) {
-                $form->setFormValue('BaseUrl', $baseUrl);
-                $form->setFormValue('SignInUrl', $baseUrl); // kludge for default provider
-            }
-            if ($form->save()) {
-                $sender->informMessage(t('Saved'));
+                if ($form->save()) {
+                    $sender->informMessage(t('Saved'));
+                }
             }
         }
 
@@ -143,24 +162,21 @@ class JWTSSOPlugin extends Gdn_Plugin {
         // Set up the form.
         $formFields = [
             'Algorithm' => ['LabelCode' => 'Algorithm', 'Control' => 'RadioList', 'Items' => $algsItems, 'Options' => ['Default' => 'HS256']],
-            'AssociationKey' => ['LabelCode' => 'Client ID', 'Options' => ['Value' => $form->getValue('AssociationKey', betterRandomString(24)), 'readonly' => true], 'Description' => 'This is similar to an application ID. Please supply this to your Authentication Provider. It <b>must</b> be passed as the <code>sub</code> value in the payload of the token.'],
-            'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'Enter the endpoint to where users will be sent to sign in. This address <b>must</b> be passed as the <code>iss</code> value in the payload of the token.'],
-            'Audience' =>  ['LabelCode' => 'Intended Audience','Options' => ['Value' => url('/', true), 'readonly' => true], 'Description' => 'This is a valid URL to this forum. Please supply this to your Authentication Provider. It <b>must</b> be passed as the <code>aud</code> value in the payload of the token.'],
-            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Enter the shared secret used to encrypt and decrypt the JWT.'],
-            'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
-            'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
+            'SignInUrl' =>  ['LabelCode' => 'Sign In URL', 'Description' => 'Enter the endpoint to where users will be sent to sign in. This address <b>must</b> be passed as the <code>iss</code> value in the payload of the token.'],
+            'BaseUrl' =>  ['LabelCode' => 'Issuer', 'Description' => 'Enter the domain name of the server that is issuing this token.'],
+            'Audience' =>  ['LabelCode' => 'Intended Audience','Options' => ['Value' => $form->getValue('Audience', url('/', true)),], 'Description' => 'This is a valid URL to this forum. Please supply this to your Authentication Provider. It <b>must</b> be passed as the <code>aud</code> value in the payload of the token.'],
+            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Enter the shared secret, either supplied by your authentication provider or create one and share it with your authentication provider. You can click on "<b>Generate Secret</b>" below.'],
+            'RegisterUrl' => ['LabelCode' => 'Register URL', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
+            'SignOutUrl' => ['LabelCode' => 'Sign Out URL', 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
             'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Description' => 'The Key in the JSON payload to designate Emails'],
             'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON payload to designate Photo.'],
             'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON payload to designate Display Name.'],
-            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON payload to designate Full Name.'],
-            'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON payload to designate UserID.']
+            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON payload to designate Full Name.']
         ];
 
         // Allow a client to hook in and add fields that might be relevent to their set up.
-        $sender->EventArguments['FormFields'] = $formFields;
+        $sender->EventArguments['FormFields'] = &$formFields;
         $sender->fireEvent('JWTSettingsFields');
-
-        $formFields = $formFields;
 
         $formFields['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox'];
 
@@ -185,7 +201,13 @@ class JWTSSOPlugin extends Gdn_Plugin {
         $connectURL = Gdn::request()->url('/entry/connect/'. $this->getProviderKey(), true, true);
         $sender->setData('ConnectURL', $connectURL);
 
-        $sender->render('settings', '', 'plugins/plugins/jwtsso');
+        // For auto generating a secret for the client.
+        if ($generate && $sender->deliveryType() === DELIVERY_TYPE_VIEW) {
+            $sender->setJson('AssociationSecret', $secret);
+            $sender->render('Blank', 'Utility', 'Dashboard');
+        } else {
+            $sender->render('settings', '', 'plugins/plugins/jwtsso');
+        }
     }
 
 
@@ -207,11 +229,11 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
         $jwtPayload = [
             'iss' => $baseUrl,
-            'sub' => val('AssociationKey', $provider),
+            'sub' => c('JWTSSO.TestToken.ForeignKey'),
             'aud' => val('Audience', $provider),
-            'email' => c('JWTSSO.TestToken.Email', Gdn::session()->User->Email),
-            'displayname' => c('JWTSSO.TestToken.Name', Gdn::session()->User->Name),
-            'exp' => time() + c('JWTSSO.TestToken.ExpiryTime', 1000),
+            'email' => c('JWTSSO.TestToken.Email'),
+            'displayname' => c('JWTSSO.TestToken.Name'),
+            'exp' => time() + c('JWTSSO.TestToken.ExpiryTime', 600),
             'nbf' => time()
         ];
 
@@ -220,47 +242,17 @@ class JWTSSOPlugin extends Gdn_Plugin {
         return $jwt;
     }
 
-    /** ------------------- Connection Related Methods --------------------- */
-
-
     /**
-     * Before rendering any page, do a quick check if the user has a viable bearer token, redirect to connect if so.
+     * Inject Javascript file into dashboard to a allow adding auto-generated secret and clientID;
      *
-     * @param Gdn_Controller $sender
+     * @param $sender SettingsController
      */
-    public function base_render_before($sender) {
-        // Return quietly if...
-        // ...we are in the entry controller
-        if ($sender->ControllerName === 'entrycontroller') {
-            return;
-        }
-
-        // ...user is logged in
-        if (Gdn::session()->UserID) {
-            return;
-        }
-
-        list($token, $tokenType) = $this->getBearerToken();
-
-        // ...there isn't a bearer token in the HTTP Header
-        if ($tokenType !== 'bearer' || !$tokenType) {
-            return;
-        }
-
-        $this->extractToken($token);
-
-        // ...the token is expired.
-        if (!$this->validateTime()) {
-            return;
-        }
-
-        // If there is a valid, signed token, redirect to the entry connect script.
-        if ($this->validatSignature()) {
-            safeRedirect('/entry/connect/'.$this->providerKey.'/?Target='.urlencode(Gdn::request()->url()));
-        }
-        return;
+    public function settingsController_render_before($sender) {
+        $sender->addJsFile('jwt-settings.js', 'plugins/jwtsso/js');
     }
 
+
+    /** ------------------- Connection Related Methods --------------------- */
 
     /**
      * Inject into the process of the base connection.
@@ -276,31 +268,46 @@ class JWTSSOPlugin extends Gdn_Plugin {
         /* @var Gdn_Form $form */
         $form = $sender->Form; //new Gdn_Form();
 
+        if (!$this->isConfigured()) {
+            $this->log('not_configured', ['provider' => $this->provider()]);
+            throw new Gdn_UserException('JWT authentication is not configured.', 400);
+        }
+
         // get the Bearer token from the Authorization header
         list($token, $tokenType) = $this->getBearerToken();
         // if there isn't one, do not advance
         if ($tokenType !== 'bearer' || !$tokenType) {
-            $form->addError('Unable to proceed, no JSON Web Token found in header.');
-            $sender->render('connecterror');
             $this->log('no_bearer', ['tokentype' => $tokenType]);
-            return;
+            throw new Gdn_UserException('Unable to proceed, no JSON Web Token found in header.', 400);
         }
 
         $this->extractToken($token);
 
         if (!$this->validateTime()) {
-            $form->addError('Unable to proceed, JSON Web Token is probably expired.');
-            $sender->render('connecterror');
-            $this->log('invalid_time', ['notbeforetime' => $this->nbfClaim, 'notaftertime' => $this->expClaim, 'now' => time(), 'payload' => $this->jwtPayload]);
-            return;
+            $this->log('invalid_time', ['notbeforetime' => $this->nbfClaim, 'issuedattime' => $this->iatClaim, 'notaftertime' => $this->expClaim, 'now' => time(), 'payload' => $this->jwtPayload]);
+            throw new Gdn_UserException('Unable to proceed, JSON Web Token is probably expired.', 400);
         }
 
-        if (!$this->validatSignature()) {
-            $form->addError('Unable to proceed, invalid JSON Web Token.');
-            $sender->render('connecterror');
-            $this->log('invalid_signature', ['secret' => val('AssociationSecret', $this->provider), 'segments' => $this->jwtJSONSegments]);
-            return;
+        if (!$this->validateAudience()) {
+            $this->log('invalid_audience', ['aud' => $this->audClaim, 'payload' => $this->jwtPayload, 'provider' => $this->provider()]);
+            throw new Gdn_UserException('Unable to proceed, verify that your JSON Web Token has the correct "aud" value.', 400);
         }
+
+        if (!$this->validateIssuer()) {
+            $this->log('invalid_issuer', ['iss' => $this->issClaim, 'payload' => $this->jwtPayload, 'provider' => $this->provider()]);
+            throw new Gdn_UserException('Unable to proceed, verify that your JSON Web Token has the correct "iss" value.', 400);
+        }
+
+        if (!$this->validateSignature()) {
+            $this->log('invalid_signature', ['secret' => val('AssociationSecret', $this->provider), 'segments' => $this->jwtJSONSegments]);
+            throw new Gdn_UserException('Unable to proceed, verify the signature on your JSON Web Token.', 400);
+        }
+
+        // Allow custom plugins to translate custom keys being passed in SSO
+        $translatedKeys = [];
+        $sender->EventArguments['translatedKeys'] = &$translatedKeys;
+        $sender->fireEvent('BeforeExtractProfile');
+        $this->translatedKeys = array_merge($this->translatedKeys, $translatedKeys);
 
         $profile = $this->getProfileFromToken();
         $this->log('Profile', $profile);
@@ -347,22 +354,13 @@ class JWTSSOPlugin extends Gdn_Plugin {
      */
     public function translateProfileResults($rawProfile = []) {
         $provider = $this->provider();
-        $translatedKeys = [
-            val('ProfileKeyEmail', $provider, 'email') => 'Email',
-            val('ProfileKeyPhoto', $provider, 'picture') => 'Photo',
-            val('ProfileKeyName', $provider, 'displayname') => 'Name',
-            val('ProfileKeyFullName', $provider, 'name') => 'FullName',
-            'sub' => 'UniqueID'
-        ];
-        $profile = arrayTranslate($rawProfile, $translatedKeys, true);
+        $profile = arrayTranslate($rawProfile, $this->translatedKeys, true);
         $profile['Provider'] = $this->providerKey;
         return $profile;
     }
 
 
     /** ------------------- Token Parsing Methods ---------------- */
-
-
 
     /**
      * Parse the HTTP headers to get a bearer token if one exists.
@@ -401,7 +399,6 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * Parse out the segements of the JWT, assign the values as properties of this object.
      *
      * @param $token
-     * @return array
      */
     public function extractToken($token) {
         $this->jwtRawToken = $token;
@@ -413,53 +410,13 @@ class JWTSSOPlugin extends Gdn_Plugin {
         $this->setJWTHeader(json_decode($decodedSegment[0], true));
         $this->setJWTPayload(json_decode($decodedSegment[1], true));
         $this->jwtJSONSegments = $decodedSegment;
+        $this->subClaim = val('sub', $this->jwtPayload);
+        $this->issClaim = val('iss', $this->jwtPayload);
+        $this->audClaim = val('aud', $this->jwtPayload);
         $this->expClaim = val('exp', $this->jwtPayload);
         $this->nbfClaim = val('nbf', $this->jwtPayload);
+        $this->iatClaim = val('ait', $this->jwtHeader);
         $this->algClaim = val('alg', $this->jwtHeader);
-    }
-
-
-    /**
-     * Check if the token time stamp is valid.
-     *
-     * @return bool
-     */
-    private function validateTime() {
-        if ($this->nbfClaim > time()) {
-            return false;
-        }
-        if ($this->expClaim < time()) {
-            return false;
-        }
-        return true;
-    }
-
-
-    /**
-     * Create a Web Token with the received payload, sign it with the shared secret and compare the strings.
-     *
-     * @return bool
-     */
-    private function validatSignature() {
-        $decodedSegments = $this->jwtJSONSegments;
-        $algorithm = val($this->algClaim, $this->supportedAlgs);
-        $compare = $this->signJWT($decodedSegments[0], $decodedSegments[1], val('AssociationSecret', $this->provider()), $algorithm);
-        if ($this->jwtRawToken !== $compare) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-
-    /**
-     * Special encoding function strings for JWT
-     *
-     * @param $data
-     * @return mixed
-     */
-    protected function base64url_decode($data) {
-        return base64_decode($data);
     }
 
 
@@ -471,6 +428,17 @@ class JWTSSOPlugin extends Gdn_Plugin {
      */
     protected function base64url_encode($data) {
         return str_replace('=', '', strtr(base64_encode($data), '+/', '-_'));
+    }
+
+
+    /**
+     * Special encoding function strings for JWT
+     *
+     * @param $data
+     * @return mixed
+     */
+    protected function base64url_decode($data) {
+        return base64_decode(strtr($data, '-_', '+/'));
     }
 
 
@@ -543,6 +511,72 @@ class JWTSSOPlugin extends Gdn_Plugin {
     }
 
 
+    /** ------------------- Validation Methods --------------------- */
+
+    private function isConfigured() {
+        $provider = $this->provider();
+        return (val('AssociationSecret', $provider, false));
+    }
+
+
+    /**
+     * Check if the token time stamp is valid.
+     *
+     * @return bool
+     */
+    private function validateTime() {
+        $leeway = c('JWTSSO.leewaytime', 300);
+        // If the token arrives before the Not Before claim or when it was claimed to be issued...
+        // Allow 5 minutes +/- to account for inaccurate server times.
+        if ($this->nbfClaim - $leeway > time() + $leeway || $this->iatClaim - $leeway > time() + $leeway) {
+            return false;
+        }
+        if ($this->expClaim + $leeway < time() - $leeway) {
+            return false;
+        }
+        return true;
+    }
+
+
+    /**
+     * Check if the 'aud' passed is the same as the Audience stored in the provider.
+     *
+     * @return bool
+     */
+    private function validateAudience() {
+        $provider = $this->provider();
+        return trim($this->audClaim, '/') === trim(val('Audience', $provider), '/');
+    }
+
+
+    /**
+     * Check if the 'iss' passed is the same as the Issuer (baseURL) stored in the provider
+     *
+     * @return bool
+     */
+    private function validateIssuer() {
+        $provider = $this->provider();
+        return trim($this->issClaim, '/') === trim(val('BaseUrl', $provider), '/');
+    }
+
+
+    /**
+     * Create a Web Token with the received payload, sign it with the shared secret and compare the strings.
+     *
+     * @return bool
+     */
+    private function validateSignature() {
+        $decodedSegments = $this->jwtJSONSegments;
+        $algorithm = val($this->algClaim, $this->supportedAlgs);
+        $compare = $this->signJWT($decodedSegments[0], $decodedSegments[1], val('AssociationSecret', $this->provider()), $algorithm);
+        if ($this->jwtRawToken !== $compare) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
     /** ------------------- Provider Methods --------------------- */
 
 
@@ -573,7 +607,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
      *
      * @return array Stored provider data (secret, client_id, etc.).
      */
-    public function provider() {
+    protected function provider() {
         if (!$this->provider) {
             $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->providerKey);
         }
@@ -587,7 +621,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
      *
      * @return bool Return the value of the IsDefault row of GDN_UserAuthenticationProvider .
      */
-    public function isDefault() {
+    protected function isDefault() {
         $provider = $this->provider();
         return val('IsDefault', $provider);
     }

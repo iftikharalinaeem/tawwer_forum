@@ -16,10 +16,6 @@ $this->Form->errors();
 
 echo $this->Form->simple($this->data('_Form'));
 
-echo '<div class="Buttons">';
-echo $this->Form->button('Save');
-echo $this->Form->close();
-echo '</div>';
 
 if ($this->data('jwt')) :
 echo '<div class="alert alert-info padded">Below is a sample JWT for test purposes. To check the validity of your Secret and see the payload go to <a href="https://jwt.io">jwt.io</a></div>';
@@ -27,3 +23,11 @@ echo '<div class="JWT-sample">';
     echo $this->data('jwt');
 echo '</div>';
 endif;
+
+echo '<div class="js-modal-footer form-footer buttons">';
+echo $this->Form->button('Generate Secret', ['Name' => 'Generate', 'class' => 'btn btn-secondary js-generate']);
+echo $this->Form->button('Save');
+echo '</div>';
+
+
+echo $this->Form->close();
