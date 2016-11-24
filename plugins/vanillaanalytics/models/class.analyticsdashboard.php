@@ -172,21 +172,23 @@ class AnalyticsDashboard implements JsonSerializable {
      */
     public function getDefaults() {
         if (empty(static::$defaults)) {
+
+
             $defaults = [
                 'Engagement' => [
                     'widgets' => [
                         // Metrics
                         'posts-positivity-rate',
                         'average-time-to-first-comment',
+                        // Charts & Leaderboards
                         'participation-rate',
                         'sentiment-ratio',
-                        // Charts & Leaderboards
                         'top-commented-discussions',
-                        'top-positive-discussions',
-                        'top-negative-discussions',
                         'visits-per-active-user',
                         'average-posts-per-active-user',
+                        'top-positive-discussions',
                         'average-comments-per-discussion',
+                        'top-negative-discussions',
                     ]
                 ],
                 'Posting' => [
@@ -196,17 +198,17 @@ class AnalyticsDashboard implements JsonSerializable {
                         'total-comments',
                         'total-contributors',
                         // Charts & Leaderboards
-                        'top-posters',
-                        'top-discussion-starters',
                         'discussions',
                         'comments',
                         'posts',
                         'posts-by-type',
                         'posts-by-category',
                         'posts-by-role-type',
+                        'top-posters',
                         'contributors',
                         'contributors-by-category',
                         'contributors-by-role-type',
+                        'top-discussion-starters',
                     ]
                 ],
                 'Traffic' => [
@@ -216,12 +218,12 @@ class AnalyticsDashboard implements JsonSerializable {
                         'total-active-users',
                         'total-visits',
                         // Charts & Leaderboards
-                        'top-viewed-discussions',
                         'active-users',
                         'visits',
                         'visits-by-role-type',
                         'pageviews',
                         'registrations',
+                        'top-viewed-discussions',
                     ]
                 ],
             ];
@@ -236,12 +238,12 @@ class AnalyticsDashboard implements JsonSerializable {
                         'time-to-answer',
                         'time-to-accept',
                         // Charts & Leaderboards
-                        'top-viewed-qna-discussions',
-                        'top-question-answerers',
-                        'top-best-answerers',
                         'questions-asked',
+                        'top-viewed-qna-discussions',
                         'questions-answered',
+                        'top-question-answerers',
                         'answers-accepted',
+                        'top-best-answerers',
                     ]
                 ];
             }
