@@ -46,6 +46,9 @@ class LocalligatorPlugin extends Gdn_Plugin {
     /** @var Storage of untranslated codes */
     const UNTRANSLATED_FILE_NAME = PATH_ROOT."/conf/localligator/untranslated.php";
 
+    /** @var Gitignore path */
+    const GIT_IGNORE_PATH = PATH_ROOT."/conf/localligator/.gitignore";
+
     /**
      * Fetch the site core translation strings.
      *
@@ -93,7 +96,18 @@ class LocalligatorPlugin extends Gdn_Plugin {
      */
     private function loadUntranslatedList() {
         $this->touchNestedFile(self::UNTRANSLATED_FILE_NAME);
+        $this->addGitIgnore();
         $this->untranslatedList = $this->getConfig(self::UNTRANSLATED_FILE_NAME);
+    }
+
+    /**
+     * If it doesn't exist, adds a gitignore to our localligator directory.
+     */
+    private function addGitIgnore() {
+        if (!file_exists(self::GIT_IGNORE_PATH)) {
+            $this->touchNestedFile(self::GIT_IGNORE_PATH);
+            file_put_contents(self::GIT_IGNORE_PATH, '/.*');
+        }
     }
 
     /**
@@ -116,7 +130,8 @@ class LocalligatorPlugin extends Gdn_Plugin {
             return;
         }
 
-        if (!array_key_exists($code, $this->getTranslations()) && self::$canLoadResources) {
+        $translations = $this->getTranslations();
+        if (!array_key_exists($code, $translations) && self::$canLoadResources) {
             trace('Translation does not exist: '.$code);
             $exists = $this->getUntranslatedList()->get($code, false);
 
@@ -150,7 +165,7 @@ class LocalligatorPlugin extends Gdn_Plugin {
      */
     private function touchNestedFile($path) {
         if (!file_exists(dirname($path))) {
-            mkdir(dirname($path), 0777, true);
+            mkdir(dirname($path), 0755, true);
         }
         touch($path);
     }
@@ -181,6 +196,7 @@ class LocalligatorPlugin extends Gdn_Plugin {
      * @param SettingsController $sender
      */
     public function settingsController_localligator_create($sender) {
+        $this->getTranslations(); // Just in case we haven't tried loading our source yet...
         $sender->setData('CanLoadResources', self::$canLoadResources);
         if (!self::$canLoadResources) {
             $sender->render('localligator', '', 'plugins/localligator');
@@ -217,6 +233,7 @@ class LocalligatorPlugin extends Gdn_Plugin {
             // Make sure we have a place to store our ignored translation codes.
             if ($application === 'Ignore') {
                 $this->touchNestedFile($path);
+                $this->addGitIgnore();
             }
 
             $translationsList = $this->getConfig($path);

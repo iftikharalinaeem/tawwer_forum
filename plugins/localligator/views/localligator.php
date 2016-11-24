@@ -5,9 +5,6 @@ $helpDescription = t('Localligator helps developers take a bite out of missing t
     .t('This plugin should only ever be used locally.');
 helpAsset(sprintf(t('About %s'), 'Localligator'), $helpDescription);
 
-/** @var Gdn_Form $form */
-$form = $this->form;
-
 if (!$this->data('CanLoadResources')) : ?>
     <div class="alert alert-danger padded">
         Cannot locate tx-source files. Maybe you're missing some symlinks. Make sure the tx-source directory is
@@ -16,6 +13,9 @@ if (!$this->data('CanLoadResources')) : ?>
     <?php return;
 endif;
 
+/** @var Gdn_Form $form */
+$form = $this->form;
+/** @var array $strings */
 $strings = $this->data('StringsToAddField');
 
 if (empty($strings)) : ?>
