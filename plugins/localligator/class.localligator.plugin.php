@@ -184,6 +184,7 @@ class LocalligatorPlugin extends Gdn_Plugin {
         $sender->setData('CanLoadResources', self::$canLoadResources);
         if (!self::$canLoadResources) {
             $sender->render('localligator', '', 'plugins/localligator');
+            return;
         }
 
         $sender->form = new Gdn_Form('', 'bootstrap');
