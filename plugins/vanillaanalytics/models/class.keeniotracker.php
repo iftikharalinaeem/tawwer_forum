@@ -559,7 +559,8 @@ class KeenIOTracker implements TrackerInterface {
                 'property_name' => 'reaction.recordType',
                 'property_value' => 'discussion'
             ])
-            ->setGroupBy(['reaction.recordID']);
+            // You need to group by reaction.recordType. This is a requirement of leaderboard
+            ->setGroupBy(['reaction.recordID', 'reaction.recordType']);
 
         $this->widgets['top-positive-discussions']['query'] = $topPositiveDiscussions;
 
@@ -578,7 +579,8 @@ class KeenIOTracker implements TrackerInterface {
                 'property_name' => 'reaction.recordType',
                 'property_value' => 'discussion'
             ])
-            ->setGroupBy(['reaction.recordID']);
+            // You need to group by reaction.recordType. This is a requirement of leaderboard
+            ->setGroupBy(['reaction.recordID', 'reaction.recordType']);
 
         $this->widgets['top-negative-discussions']['query'] = $topNegativeDiscussions;
 
