@@ -137,6 +137,6 @@ On the settings page of the dashboard a sample JWT is generated when the miniumu
  - JWTSSO.TestToken.Name (`displayname`)
  - JWTSSO.TestToken.ExpiryTime (`exp`)
  
- To test the validity of the secret and to see the payload, go to [JWT.io]('https://jwt.io'). To test the token, use a browser plugin to set the HTTP request headers to Authorization Bearer: [the token] and navigate to the forum address `/entry/connect/JWTSSO`
+ To test the validity of the secret and to see the payload, go to [JWT.io]('https://jwt.io'). To test the token, use a browser plugin to set the HTTP request headers to Authorization Bearer: [the token] and navigate to the forum address `/entry/connect/JWTSSO`. If your token is expired, regenerate it in the dashboard.
  
  One other problem that can arise in the production environment is if the time on the server that is righting the token is skewed in relation to the server that is reading the token. There is a built in leeway of 5 minutes +/- for such an occassion. This value can be adjusted in the config by changing the value of `JWTSSO.leewaytime`.
