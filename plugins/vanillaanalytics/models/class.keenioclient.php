@@ -203,6 +203,9 @@ class KeenIOClient extends Garden\Http\HttpClient {
 
             return json_decode($result);
         } catch (Exception $e) {
+            if (DEBUG) {
+                print_r('DEBUG:'. $e->getMessage());
+            }
             Logger::event('vanilla_analytics', Logger::ERROR, $e->getMessage());
         }
 
