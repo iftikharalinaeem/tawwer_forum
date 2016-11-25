@@ -172,31 +172,79 @@ class AnalyticsDashboard implements JsonSerializable {
      */
     public function getDefaults() {
         if (empty(static::$defaults)) {
+
+
             $defaults = [
+                'Engagement' => [
+                    'widgets' => [
+                        // Metrics
+                        'posts-positivity-rate',
+                        'average-time-to-first-comment',
+                        // Charts & Leaderboards
+                        'participation-rate',
+                        'sentiment-ratio',
+                        'top-commented-discussions',
+                        'visits-per-active-user',
+                        'average-posts-per-active-user',
+                        'top-positive-discussions',
+                        'average-comments-per-discussion',
+                        'top-negative-discussions',
+                    ]
+                ],
                 'Posting' => [
-                    'widgets' => ['total-discussions', 'total-comments', 'total-contributors', 'discussions',
-                        'comments', 'posts', 'posts-by-type', 'posts-by-category', 'posts-by-role-type', 'contributors',
-                        'contributors-by-category', 'contributors-by-role-type'
+                    'widgets' => [
+                        // Metrics
+                        'total-discussions',
+                        'total-comments',
+                        'total-contributors',
+                        // Charts & Leaderboards
+                        'discussions',
+                        'comments',
+                        'posts',
+                        'posts-by-type',
+                        'posts-by-category',
+                        'posts-by-role-type',
+                        'top-posters',
+                        'contributors',
+                        'contributors-by-category',
+                        'contributors-by-role-type',
+                        'top-discussion-starters',
                     ]
                 ],
                 'Traffic' => [
-                    'widgets' => ['total-pageviews', 'total-active-users', 'total-visits', 'active-users', 'visits',
-                        'visits-by-role-type', 'pageviews', 'registrations'
+                    'widgets' => [
+                        // Metrics
+                        'total-pageviews',
+                        'total-active-users',
+                        'total-visits',
+                        // Charts & Leaderboards
+                        'active-users',
+                        'visits',
+                        'visits-by-role-type',
+                        'pageviews',
+                        'registrations',
+                        'top-viewed-discussions',
                     ]
                 ],
-                'Engagement' => [
-                    'widgets' => [
-                        'posts-positivity-rate', 'average-time-to-first-comment',
-                        'participation-rate', 'sentiment-ratio',  'visits-per-active-user',
-                        'average-posts-per-active-user', 'average-comments-per-discussion'
-                    ]
-                ]
             ];
 
             if (Gdn::addonManager()->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
                 $defaults['Q&A'] = [
-                    'widgets' => ['total-asked', 'total-answered', 'total-accepted', 'time-to-answer', 'time-to-accept',
-                        'questions-asked', 'questions-answered', 'answers-accepted']
+                    'widgets' => [
+                        // Metrics
+                        'total-asked',
+                        'total-answered',
+                        'total-accepted',
+                        'time-to-answer',
+                        'time-to-accept',
+                        // Charts & Leaderboards
+                        'questions-asked',
+                        'top-viewed-qna-discussions',
+                        'questions-answered',
+                        'top-question-answerers',
+                        'answers-accepted',
+                        'top-best-answerers',
+                    ]
                 ];
             }
 

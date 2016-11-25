@@ -91,7 +91,9 @@ class AnalyticsLeaderboard {
         if ((is_array($result) && !empty($result)) && is_array($previousResult)) {
             $detectTypes = [
                 'user.userID',
-                'discussion.discussionID'
+                'insertUser.userID',
+                'discussion.discussionID',
+                'reaction.recordID',
             ];
             $typeID = false;
 
@@ -100,6 +102,17 @@ class AnalyticsLeaderboard {
             foreach ($detectTypes as $currentType) {
                 if ($firstResult->$currentType) {
                     $typeID = $currentType;
+                    $emulatedTypeID = $typeID;
+                    if ($typeID === 'reaction.recordID') {
+                        if (!isset($firstResult->{'reaction.recordType'})) {
+                            throw new Gdn_UserException('You need to group by that query with reaction.recordType');
+                        }
+                        if ($firstResult->{'reaction.recordType'} === 'discussion') {
+                            $emulatedTypeID = 'discussion.discussionID';
+                        } else {
+                            throw new Gdn_UserException('Comments are not supported yet!');
+                        }
+                    }
                     break;
                 }
             }
@@ -110,14 +123,18 @@ class AnalyticsLeaderboard {
             // Sort results based on their count total, descending.
             usort($result, [$this, 'sortResults']);
 
+            // Cut to the desired number of results
+            $result = array_slice($result, 0, $this->size);
+
             // Prepare to build out the values we need for the leaderboard.
-            switch ($typeID) {
+            switch ($emulatedTypeID) {
                 case 'discussion.discussionID':
                     $recordModel = new DiscussionModel();
                     $recordUrl = '/discussion/%d';
                     $titleAttribute = 'Name';
                     break;
                 case 'user.userID':
+                case 'insertUser.userID':
                     $recordModel = Gdn::userModel();
                     $recordUrl = '/profile?UserID=%d';
                     $titleAttribute = 'Name';
@@ -128,16 +145,17 @@ class AnalyticsLeaderboard {
 
             $previousPositions = [];
             usort($previousResult, [$this, 'sortResults']);
-            foreach ($previousResult as $previousStanding) {
-                $previousPositions[] = $previousStanding->$typeID;
+            foreach ($previousResult as $index => $previousStanding) {
+                $previousPositions[$previousStanding->$typeID] = $index;
             }
+
 
             $position = 0;
             foreach ($result as $currentResult) {
                 $recordID = $currentResult->$typeID;
                 $count = $currentResult->result;
                 $record = $recordModel->getID($recordID, DATASET_TYPE_ARRAY);
-                $previous = array_search($recordID, $previousPositions);
+                $previous = $previousPositions[$recordID];
 
                 if ($previous === false) {
                     $positionChange = "New";
@@ -163,7 +181,7 @@ class AnalyticsLeaderboard {
             }
         }
 
-        return array_slice($resultIndexed, 0, $this->size, true);
+        return $resultIndexed;
     }
 
     public function setPreviousQuery($previousQuery) {
@@ -182,10 +200,10 @@ class AnalyticsLeaderboard {
      */
     public function setSize($size) {
         if ($size < 1) {
-            $this->size = 10;
-        } elseif ($size > self::MAX_SIZE) {
-            $size = self::MAX_SIZE;
+            $size = 10;
         }
+
+        $this->size = max(min(self::MAX_SIZE, $size), 1);
 
         return $this;
     }

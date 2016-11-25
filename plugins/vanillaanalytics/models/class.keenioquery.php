@@ -164,7 +164,7 @@ class KeenIOQuery implements JsonSerializable {
             $data['event_collection'] = $this->eventCollection;
         }
         if ($this->filters) {
-            $data['filters'] = json_encode($this->filters);
+            $data['filters'] = $this->filters;
         }
         if ($this->groupBy) {
             $data['group_by'] = $this->groupBy;
@@ -310,7 +310,7 @@ class KeenIOQuery implements JsonSerializable {
      * Define the grouping parameters for this query.
      *
      * @link https://keen.io/docs/api/#group-by
-     * @param string $groupBy A property of the current event collection to group by.
+     * @param string|array $groupBy A (or an array of) property of the current event collection to group by
      * @return $this
      */
     public function setGroupBy($groupBy) {

@@ -88,6 +88,12 @@ class AnalyticsController extends DashboardController {
         }
         $leaderboard = new AnalyticsLeaderboard();
 
+        $data = $widget->getData();
+        $size = val('size', $data);
+        if ($size) {
+            $leaderboard->setSize($size);
+        }
+
         // Verify we have a query to run.
         $this->title($widget->getTitle());
         $query = val('query', $widget->getData());
