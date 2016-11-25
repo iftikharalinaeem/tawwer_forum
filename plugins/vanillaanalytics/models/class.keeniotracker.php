@@ -121,6 +121,28 @@ class KeenIOTracker implements TrackerInterface {
                 ]
             ]
         ],
+        'top-member-by-total-reputation' => [
+            'title' => 'Members by Total Reputation',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'leaderboard',
+            'chart' => [
+                'labels' => [
+                    'record' => 'Members',
+                    'count' => 'Reputation Score'
+                ]
+            ]
+        ],
+        'top-member-by-accumulated-reputation' => [
+            'title' => 'Members by Accumulated Reputation',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'leaderboard',
+            'chart' => [
+                'labels' => [
+                    'record' => 'Members',
+                    'count' => 'Reputation Score'
+                ]
+            ]
+        ],
         'total-active-users' => [
             'title' => 'Active Users',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
@@ -583,6 +605,30 @@ class KeenIOTracker implements TrackerInterface {
             ->setGroupBy(['reaction.recordID', 'reaction.recordType']);
 
         $this->widgets['top-negative-discussions']['query'] = $topNegativeDiscussions;
+
+        // Top Members by Accumulated Reputation (leaderboard)
+        $topMembersByAccumulatedReputation = new KeenIOQuery();
+        $topMembersByAccumulatedReputation->setAnalysisType(KeenIOQuery::ANALYSIS_SUM)
+            ->setEventCollection('point')
+            ->setTargetProperty('point.given.points')
+            // This should not be required normally but it is because of a deploy bug
+            ->addFilter([
+                'operator' => 'ne',
+                'property_name' => 'point.given.points',
+                'property_value' => 0
+            ])
+            ->setGroupBy('point.user.userID');
+
+        $this->widgets['top-member-by-accumulated-reputation']['query'] = $topMembersByAccumulatedReputation;
+
+        // Top Members by Total Reputation (leaderboard)
+        $topMembersByTotalReputation = new KeenIOQuery();
+        $topMembersByTotalReputation->setAnalysisType(KeenIOQuery::ANALYSIS_MAXIMUM)
+            ->setEventCollection('point')
+            ->setTargetProperty('point.user.points')
+            ->setGroupBy('point.user.userID');
+
+        $this->widgets['top-member-by-total-reputation']['query'] = $topMembersByTotalReputation;
 
         /**
          * Metrics
