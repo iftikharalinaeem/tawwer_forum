@@ -231,7 +231,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
             'iss' => $baseUrl,
             'sub' => c('JWTSSO.TestToken.ForeignKey', '12345'),
             'aud' => val('Audience', $provider),
-            'email' => c('JWTSSO.TestToken.Email', Gdn::session()->User->Email),
+            'email' => c('JWTSSO.TestToken.Email', '+++'.Gdn::session()->User->Email),
             'displayname' => c('JWTSSO.TestToken.Name'),
             'exp' => time() + c('JWTSSO.TestToken.ExpiryTime', 600),
             'nbf' => time()
@@ -371,7 +371,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
         // First look for a header.
         $matches = [];
         $token = '';
-        if ($auth = val('HTTP_AUTHORIZATION', $_SERVER, '')) {
+        if ($auth = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_AUTHORIZATION', null)) {
             if (preg_match("/(.*)\s?:\s?(.*)/", $auth, $matches)) {
                 $tokenType = trim(strtolower($matches[1]));
                 $token = $matches[2];
@@ -379,6 +379,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
             }
         }
 
+        // If it wasn't in HTTP_AUTHORIZATION
         if (empty($token)) {
             $allHeaders = getallheaders();
             if (val('Authorization', $allHeaders)) {
