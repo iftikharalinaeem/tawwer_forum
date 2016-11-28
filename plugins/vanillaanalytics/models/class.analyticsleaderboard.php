@@ -22,8 +22,10 @@ class AnalyticsLeaderboard {
      */
     const MAX_SIZE = 100;
 
+    /** @var $query KeenIOQuery */
     private $previousQuery;
 
+    /** @var $query KeenIOQuery */
     private $query;
 
     /**
@@ -80,17 +82,18 @@ class AnalyticsLeaderboard {
 
     /**
      * @param array $result
-     * @param array $previousResult
+     * @param array $ptfResult Previous Time Frame result
      * @return array
      * @throws Gdn_UserException
      */
-    private function processResponse($result, $previousResult) {
+    private function processResponse($result, $ptfResult) {
         $resultIndexed = [];
 
         // Have results? Process them.
-        if ((is_array($result) && !empty($result)) && is_array($previousResult)) {
+        if ((is_array($result) && !empty($result)) && is_array($ptfResult)) {
             $detectTypes = [
                 'user.userID',
+                'point.user.userID',
                 'insertUser.userID',
                 'discussion.discussionID',
                 'reaction.recordID',
@@ -102,7 +105,6 @@ class AnalyticsLeaderboard {
             foreach ($detectTypes as $currentType) {
                 if ($firstResult->$currentType) {
                     $typeID = $currentType;
-                    $emulatedTypeID = $typeID;
                     if ($typeID === 'reaction.recordID') {
                         if (!isset($firstResult->{'reaction.recordType'})) {
                             throw new Gdn_UserException('You need to group by that query with reaction.recordType');
@@ -112,6 +114,10 @@ class AnalyticsLeaderboard {
                         } else {
                             throw new Gdn_UserException('Comments are not supported yet!');
                         }
+                    } else if (substr($currentType, -strlen('.userID')) === '.userID') {
+                        $emulatedTypeID = 'user.userID';
+                    } else {
+                        $emulatedTypeID = $typeID;
                     }
                     break;
                 }
@@ -134,7 +140,6 @@ class AnalyticsLeaderboard {
                     $titleAttribute = 'Name';
                     break;
                 case 'user.userID':
-                case 'insertUser.userID':
                     $recordModel = Gdn::userModel();
                     $recordUrl = '/profile?UserID=%d';
                     $titleAttribute = 'Name';
@@ -143,25 +148,40 @@ class AnalyticsLeaderboard {
                     throw new Gdn_UserException('Invalid type ID.');
             }
 
-            $previousPositions = [];
-            usort($previousResult, [$this, 'sortResults']);
-            foreach ($previousResult as $index => $previousStanding) {
-                $previousPositions[$previousStanding->$typeID] = $index;
+            // Previous time frame results
+            $ptfPositionByResult = [];
+            $ptfResultIndexed = [];
+            usort($ptfResult, [$this, 'sortResults']);
+
+            $position = 1;
+            foreach ($ptfResult as $index => $ptfStanding) {
+                $ptfResultIndexed[$ptfStanding->$typeID] = $ptfStanding->result;
+
+                if (!isset($ptfPositionByResult[$ptfStanding->result])) {
+                    $ptfPositionByResult[$ptfStanding->result] = $position++;
+                }
             }
 
-
-            $position = 0;
+            $i = 0;
+            $position = 1;
+            $previousRecordCount = null;
+            $previousCount = null;
             foreach ($result as $currentResult) {
+                $i++;
                 $recordID = $currentResult->$typeID;
                 $count = $currentResult->result;
                 $record = $recordModel->getID($recordID, DATASET_TYPE_ARRAY);
-                $previous = $previousPositions[$recordID];
+                $previousPosition = val($ptfResultIndexed[$recordID], $ptfPositionByResult);
 
-                if ($previous === false) {
+                if ($previousRecordCount && $previousRecordCount != $count) {
+                    $position = $i;
+                }
+
+                if ($previousPosition === false) {
                     $positionChange = "New";
-                } elseif ($position === $previous) {
+                } elseif ($position === $previousPosition) {
                     $positionChange = "Same";
-                } elseif ($position < $previous) {
+                } elseif ($position < $previousPosition) {
                     $positionChange = "Rise";
                 } else {
                     $positionChange = "Fall";
@@ -169,15 +189,16 @@ class AnalyticsLeaderboard {
 
                 $record['LeaderRecord'] = [
                     'ID' => $recordID,
-                    'Position' => ($position + 1),
+                    'Position' => $position,
                     'PositionChange' => $positionChange,
-                    'Previous' => $previous !== false ? ($previous + 1) : false,
+                    'Previous' => $previousPosition !== false ? $previousPosition : '-',
                     'Url' => sprintf($recordUrl, $recordID),
                     'Title' => $record[$titleAttribute],
                     'Count' => $count
                 ];
                 $resultIndexed[$recordID] = $record;
-                $position++;
+
+                $previousRecordCount = $count;
             }
         }
 
