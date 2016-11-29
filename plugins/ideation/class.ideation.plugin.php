@@ -374,6 +374,8 @@ EOT
         $sender->Form->setFormValue('Type', 'Idea');
         $sender->Form->setFormValue('Tags', val('TagID', StatusModel::instance()->getDefaultStatus()));
         $sender->View = 'discussion';
+        $ideaTitle = t('Idea Title');
+        Gdn::locale()->setTranslation('Discussion Title', $ideaTitle, false);
         $sender->discussion($categoryCode);
     }
 
