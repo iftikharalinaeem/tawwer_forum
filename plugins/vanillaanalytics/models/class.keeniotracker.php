@@ -238,7 +238,7 @@ class KeenIOTracker implements TrackerInterface {
             'support' => 'cat01'
         ],
         'posts' => [
-            'title' => 'Post',
+            'title' => 'Posts',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
             'support' => 'cat01'
