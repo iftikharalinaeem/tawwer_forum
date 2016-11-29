@@ -482,7 +482,7 @@ class KeenIOTracker implements TrackerInterface {
         $topDiscussionStartersQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
             ->setEventCollection('post')
             ->addFilter([
-                'operator' => 'gt',
+                'operator' => 'eq',
                 'property_name' => 'type',
                 'property_value' => 'discussion_add'
             ])
