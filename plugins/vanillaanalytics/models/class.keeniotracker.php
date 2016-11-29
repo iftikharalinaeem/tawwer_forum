@@ -1000,7 +1000,7 @@ class KeenIOTracker implements TrackerInterface {
         // Posts by type
         $postsByTypeQuery = new KeenIOQuery();
         $postsByTypeQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
-            ->setTitle(t('Posts By Type'))
+            ->setTitle(t('Posts by Type'))
             ->setEventCollection('post')
             ->setInterval('daily')
             ->setGroupBy('type');
@@ -1010,7 +1010,7 @@ class KeenIOTracker implements TrackerInterface {
         // Posts by category
         $postsByCategoryQuery = new KeenIOQuery();
         $postsByCategoryQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
-            ->setTitle(t('Posts By Category'))
+            ->setTitle(t('Posts by Category'))
             ->setEventCollection('post')
             ->setInterval('daily')
             ->setGroupBy('categoryAncestors.cat01.name');
@@ -1021,7 +1021,7 @@ class KeenIOTracker implements TrackerInterface {
         // Posts by role type
         $postsByRoleTypeQuery = new KeenIOQuery();
         $postsByRoleTypeQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
-            ->setTitle(t('Posts By Role Type'))
+            ->setTitle(t('Posts by Role Type'))
             ->setEventCollection('post')
             ->setInterval('daily')
             ->setGroupBy('user.roleType');
