@@ -223,7 +223,7 @@ class KeenIOTracker implements TrackerInterface {
             'type' => 'chart'
         ],
         'visits-by-role-type' => [
-            'title' => 'Unique Visits By Role Type',
+            'title' => 'Unique Visits by Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart'
         ],
@@ -244,7 +244,7 @@ class KeenIOTracker implements TrackerInterface {
             'support' => 'cat01'
         ],
         'posts-by-type' => [
-            'title' => 'Posts By Type',
+            'title' => 'Posts by Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'chart' => [
                 'labelMapping' => [
@@ -255,17 +255,17 @@ class KeenIOTracker implements TrackerInterface {
             'support' => 'cat01'
         ],
         'posts-by-category' => [
-            'title' => 'Posts By Category',
+            'title' => 'Posts by Category',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'support' => 'cat01'
         ],
         'posts-by-role-type' => [
-            'title' => 'Posts By Role Type',
+            'title' => 'Posts by Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'support' => 'cat01'
         ],
         'posts-per-user' => [
-            'title' => 'Posts Per User',
+            'title' => 'Posts per User',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart'
         ],
@@ -276,19 +276,19 @@ class KeenIOTracker implements TrackerInterface {
             'support' => 'cat01'
         ],
         'contributors-by-category' => [
-            'title' => 'Contributors By Category',
+            'title' => 'Contributors by Category',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
             'support' => 'cat01'
         ],
         'contributors-by-role-type' => [
-            'title' => 'Contributors By Role Type',
+            'title' => 'Contributors by Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
             'support' => 'cat01'
         ],
         'comments-per-discussion' => [
-            'title' => 'Comments Per Discussion',
+            'title' => 'Comments per Discussion',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart'
         ],
