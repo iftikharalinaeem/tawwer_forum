@@ -311,6 +311,14 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $UseCategories = c('Vanilla.Categories.Use');
         $Breadcrumbs = array();
 
+        // Find out of there are some categories designated as "ideas" categories.
+        $hasIdeaCategories = in_array('IdeationType', Gdn::sql()->fetchColumns('Category'));
+        if ($hasIdeaCategories) {
+            // Get an array of which categoryIDs are for "ideas" categories.
+            $ideaCategories = Gdn::sql()->select('CategoryID')->from('Category')->where('CategoryID > 0 AND IdeationType IS NOT NULL')->get()->resultArray();
+            $ideaCategories = Gdn_DataSet::index($ideaCategories, 'CategoryID');
+        }
+
         foreach ($Data as &$Row) {
             $Row['Title'] = markString($SearchTerms, Gdn_Format::text($Row['Title'], false));
             $Row['Url'] = url($Row['Url'], true);
@@ -344,6 +352,18 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
                     $Type = 'link';
                 }
             }
+
+            // if the discussion or comment being returned in the search is in an "ideas" category...
+            if (array_key_exists($Row['CategoryID'], $ideaCategories)) {
+                if (val('RecordType', $Row) === 'Discussion') {
+                    // label it an "idea" if it is an OP,
+                    $Type = 'idea';
+                } else {
+                    // label it a "comment" if it is a comment on an idea.
+                    $Type = 'comment';
+                }
+            }
+
             $Row['Type'] = $Type;
 
             // Add breadcrumbs for discussions.
