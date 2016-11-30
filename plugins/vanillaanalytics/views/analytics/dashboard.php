@@ -5,6 +5,18 @@ helpAsset(
     t('When you choose a date range, the beginning date is inclusive and the ending date is exclusive. '
         .'This means that if you wanted to do the daily analysis of a week you would have to pick a monday and the next monday to have all seven days included.')
 );
+$widgetDescription = <<<WIDGETDESC
+There are 3 different type of widgets:
+<ol>
+    <li><b>Metrics</b> - A single result compiled from all the data available in the selected time range.</li>
+    <li><b>Graphs</b> - Multiple results compiled from all the data available in the selected time range and most of the time split by the selected interval.</li>
+    <li><b>Leaderboards</b> - Ranking of some results taken from the last 30 days. Leaderboards are not affected by the selected time range.</li>
+</ol>
+WIDGETDESC;
+helpAsset(
+    sprintf(t('About %s'), t('Widgets')),
+    t('About widget description', $widgetDescription)
+);
 helpAsset(
     sprintf(t('About %s'), t('Pinning')),
     t('Quickly access only the info that you need by pinning widgets.').' '
