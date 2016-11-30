@@ -10,7 +10,7 @@ There are 3 different types of widgets:
 <ol>
     <li><b>Metrics</b> - A single result compiled from all the data available in the selected time range.</li>
     <li><b>Graphs</b> - Multiple results compiled from all the data available in the selected time range and most of the time split by the selected interval.</li>
-    <li><b>Leaderboards</b> - Ranking of some results taken from the last 30 days. Leaderboards are not affected by the selected time range.</li>
+    <li><b>Leaderboards</b> - Ranking of some results, ordered from best to worst, taken from all the data available in the selected time range.</li>
 </ol>
 WIDGETDESC;
 helpAsset(
