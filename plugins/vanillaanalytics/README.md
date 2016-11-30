@@ -39,14 +39,14 @@ If `VanillaAnalytics.KeenIO.ProjectID` is set, no attempt will be made to create
 
 # Widgets
 
-When reading widgets descriptions, but for leaderboards, you can always add "during/for the selected time range" at the end of the sentence.
+When reading widgets descriptions you can always add "during/for the selected time range" at the end of the sentence.
 
 There are 3 types of widgets:
 - **Metric**
   - Metrics are a single information quantifying something for the selected time range.
 - **Leaderboard**
-  - Leaderboards are a table showing the ranking of specific items. Leaderboards are not affected by the selected time range.
-  Instead, they represent the ranking of some items calculated using the last 30 days. The "previous" rankings are calculated using the rankings going from the last 30 to 60 days.
+  - Leaderboards are tables showing the ranking of specific items for the selected time range.
+  The "previous" rankings are calculated using the rankings of the previous time range.
 - **Graph**
   - Graphs can come in multiple forms! They are always information fetched using the selected time range.
     - Line, Area, Bar: Use the selected interval to group the fetched information.
