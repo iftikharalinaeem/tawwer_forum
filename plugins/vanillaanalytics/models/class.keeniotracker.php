@@ -223,7 +223,7 @@ class KeenIOTracker implements TrackerInterface {
             'type' => 'chart'
         ],
         'visits-by-role-type' => [
-            'title' => 'Unique Visits By Role Type',
+            'title' => 'Unique Visits by Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart'
         ],
@@ -238,13 +238,13 @@ class KeenIOTracker implements TrackerInterface {
             'support' => 'cat01'
         ],
         'posts' => [
-            'title' => 'Post',
+            'title' => 'Posts',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
             'support' => 'cat01'
         ],
         'posts-by-type' => [
-            'title' => 'Posts By Type',
+            'title' => 'Posts by Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'chart' => [
                 'labelMapping' => [
@@ -255,17 +255,17 @@ class KeenIOTracker implements TrackerInterface {
             'support' => 'cat01'
         ],
         'posts-by-category' => [
-            'title' => 'Posts By Category',
+            'title' => 'Posts by Category',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'support' => 'cat01'
         ],
         'posts-by-role-type' => [
-            'title' => 'Posts By Role Type',
+            'title' => 'Posts by Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'support' => 'cat01'
         ],
         'posts-per-user' => [
-            'title' => 'Posts Per User',
+            'title' => 'Posts per User',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart'
         ],
@@ -276,19 +276,19 @@ class KeenIOTracker implements TrackerInterface {
             'support' => 'cat01'
         ],
         'contributors-by-category' => [
-            'title' => 'Contributors By Category',
+            'title' => 'Contributors by Category',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
             'support' => 'cat01'
         ],
         'contributors-by-role-type' => [
-            'title' => 'Contributors By Role Type',
+            'title' => 'Contributors by Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
             'support' => 'cat01'
         ],
         'comments-per-discussion' => [
-            'title' => 'Comments Per Discussion',
+            'title' => 'Comments per Discussion',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart'
         ],
@@ -1000,7 +1000,7 @@ class KeenIOTracker implements TrackerInterface {
         // Posts by type
         $postsByTypeQuery = new KeenIOQuery();
         $postsByTypeQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
-            ->setTitle(t('Posts By Type'))
+            ->setTitle(t('Posts by Type'))
             ->setEventCollection('post')
             ->setInterval('daily')
             ->setGroupBy('type');
@@ -1010,7 +1010,7 @@ class KeenIOTracker implements TrackerInterface {
         // Posts by category
         $postsByCategoryQuery = new KeenIOQuery();
         $postsByCategoryQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
-            ->setTitle(t('Posts By Category'))
+            ->setTitle(t('Posts by Category'))
             ->setEventCollection('post')
             ->setInterval('daily')
             ->setGroupBy('categoryAncestors.cat01.name');
@@ -1021,7 +1021,7 @@ class KeenIOTracker implements TrackerInterface {
         // Posts by role type
         $postsByRoleTypeQuery = new KeenIOQuery();
         $postsByRoleTypeQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
-            ->setTitle(t('Posts By Role Type'))
+            ->setTitle(t('Posts by Role Type'))
             ->setEventCollection('post')
             ->setInterval('daily')
             ->setGroupBy('user.roleType');
