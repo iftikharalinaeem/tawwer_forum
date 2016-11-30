@@ -25,7 +25,9 @@ You'll need to make sure your forum configuration has some values set before you
 * `VanillaAnalytics.KeenIO.ReadKey` Scoped read API key for the configured project. *Required for keen.io charts and reporting.*
 * `VanillaAnalytics.KeenIO.WriteKey` Scoped write key for the configured project. *Required for keen.io event tracking.*
 
-If `VanillaAnalytics.KeenIO.ProjectID` is not set when the plug-in is enabled, it will attempt to automatically provision one.  This will only be possible with the project provisioning requirements cited above.  If `VanillaAnalytics.KeenIO.ProjectID` is set, no attempt will be made to create a new project and the project provisioning requirements are not necessary for the site.
+If `VanillaAnalytics.KeenIO.ProjectID` is not set when the plug-in is enabled, it will attempt to automatically provision one.
+This will only be possible with the project provisioning requirements cited above.
+If `VanillaAnalytics.KeenIO.ProjectID` is set, no attempt will be made to create a new project and the project provisioning requirements are not necessary for the site.
 
 ## Optional settings
 
@@ -37,35 +39,138 @@ If `VanillaAnalytics.KeenIO.ProjectID` is not set when the plug-in is enabled, i
 
 # Widgets
 
-## Counters
+When reading widgets descriptions, but for leaderboards, you can always add "during/for the selected time range" at the end of the sentence.
 
-* total-active-users
-* total-pageviews
-* total-unique-pageviews
-* total-discussions
-* total-comments
-* total-contributors
+There are 3 types of widgets:
+- **Metric**
+  - Metrics are a single information quantifying something for the selected time range.
+- **Leaderboard**
+  - Leaderboards are a table showing the ranking of specific items. Leaderboards are not affected by the selected time range.
+  Instead, they represent the ranking of some items calculated using the last 30 days. The "previous" rankings are calculated using the rankings going from the last 30 to 60 days.
+- **Graph**
+  - Graphs can come in multiple forms! They are always information fetched using the selected time range.
+    - Line, Area, Bar: Use the selected interval to group the fetched information.
+    - Pie chart: Represent multiple values for the whole selected time range.
 
-## Graphs 
+## Engagement
 
-* pageviews
-* active-users
-* unique-pageviews
-* unique-visits-by-role-type
-* discussions
-* comments
-* posts
-* posts-by-type
-* posts-by-category
-* posts-by-role-type
-* contributors
-* contributors-by-category
-* contributors-by-role-type
-* posts-per-user
+- Metrics
+  - Posts Positivity Rate *(posts-positivity-rate)*
+    - Number of posts having a positive reaction divided by the number of posts having a negative reaction.
+  - Average Time to First Comment *(average-time-to-first-comment)*
+    - Average amount of time it took for discussions to have their first comment.
+- Leaderboards
+  - Members by Accumulated Reputation *(top-member-by-accumulated-reputation)*
+    - Members ordered by the highest sum of reputation point accumulated.
+  - Discussions with Most Comments *(top-commented-discussions)*
+    - Discussions ordered by highest number of comments made in it.
+  - Discussions with Most Positive Reactions *(top-positive-discussions)*
+    - Discussions ordered by highest sum of positive reactions given to them.
+  - Discussions with Most Negative Reactions *(top-negative-discussions)*
+    - Discussions ordered by highest sum of negative reactions given to them.
+- Graphs
+  - Participation Rate *(participation-rate)*
+    - Number of distinct members that viewed a page on the forum vs the number of visits by distinct users.
+  - Sentiment Ratio *(sentiment-ratio)*
+    - Number of posts having a positive reaction vs the number of posts having a bad reaction.
+  - Visits per Active User *(visits-per-active-user)*
+    - See "[visists](#visits)" divided by "[active-users](#active-users)".
+  - Average Posts per Active User *(average-posts-per-active-user)*
+    - Average number of created posts grouped by "[active-users](#active-users)".
+  - Average Comments per Discussion *(average-comments-per-discussion)*
+    - Average number of created comments grouped by "[discussions](#discussions)".
 
+## Posting
+
+- Metrics
+  - Discussions *(total-discussions)*
+    - Number of discussions created.
+  - Comments *(total-comments)*
+    - Number of comments created.
+  - Contributors *(total-contributors)*
+    - Number of distinct members who created a post.
+- Leaderboards
+  - Users with Most Posts *(top-posters)*
+    - Members ordered by the highest number of post created.
+  - Users with Most Discussions *(top-discussion-starters)*
+    - Members ordered by the highest number of discussions created.
+- Graphs
+  - Discussions *(<a name="discussions">discussions</a>)*
+    - Number of discussions created.
+  - Comments *(comments)*
+    - Number of comments created.
+  - Posts *(posts)*
+    - Number of posts created.
+  - Posts by Type *(posts-by-type)*
+    - Number of created posts grouped by posts type.
+  - Posts by Category *(posts-by-category)*
+    - Number of created posts grouped by categories.
+  - Posts by Role Type *(posts-by-role-type)*
+    - Number of created posts grouped by vanilla's predefined role types.
+  - Contributors *(contributors)*
+    - Number of distinct members having created a post.
+  - Contributors by Category *(contributors-by-category)*
+    - Number of distinct members, having created a post, grouped by categories.
+  - Contributors by Role Type *(contributors-by-role-type)*
+    - Number of distinct members, having created a post, grouped by vanilla's predefined role types.
+
+## Q&A
+
+- Metrics
+  - Questions Asked *(total-asked)*
+    - Number of questions asked.
+  - Questions Answered *(total-answered)*
+    - Number of questions having at least one answer.
+  - Answers Accepted *(total-accepted)*
+    - Number of answers accepted.
+  - Average Time to Answer *(time-to-answer)*
+    - Average amount of time it took for questions to have their first answer.
+  - Average Time to Accept *(time-to-accept)*
+    - Average amount of time it took for questions to have an accepted answer.
+- Leaderboards
+  - Questions with Most Views *(top-viewed-qna-discussions)*
+    - Questions ordered by the highest number of accumulated views.
+  - Users with Most Answers *(top-question-answerers)*
+    - Members ordered by the highest number of answers created.
+  - Users with Most Accepted Answers *(top-best-answerers)*
+    - Members ordered by the highest number of answers created and then accepted as the best answer.
+- Graphs
+  - Questions Asked *(questions-asked)*
+    - Number of questions created.
+  - Questions Answered *(questions-answered)*
+    - Number of questions having at least one answer.
+  - Accepted Answers *(answers-accepted)*
+    - Number of answers accepted.
+
+## Traffic
+
+- Metrics
+  - Page views *(total-pageviews)*
+    - Number of pages viewed.
+  - Active Users *(total-active-users)*
+    - See [active-users](#active-users).
+  - Visits *(total-visits)*
+    - See [visits](#visits).
+- Leaderboards
+  - Discussions with Most Views *(top-viewed-discussions)*
+    - Discussions ordered by the highest number of accumulated views.
+- Graphs
+  - Active Users *(<a name="active-users">active-users</a>)*
+    - Number of distinct members that viewed a page on the forum.
+  - Visits *(<a name="visits">visits</a>)*
+    - Number of distinct users that viewed a page on the forum.
+  - Unique Visits by Role Type *(visits-by-role-type)*
+    - Number of visits, from users, grouped by vanilla's predefined role types.
+  - Page Views *(pageviews)*
+    - Number of pages viewed.
+  - New Users *(registrations)*
+    - Number of new users.
 
 # Notes
 
 ## Data collection mechanism
 
-Pageviews rely on the `gdn.stats` JavaScript function being triggered and an [event listener](https://github.com/vanilla/vanilla/pull/3503) being utilized by a service tracker's JavaScript. `gdn.stats` is fired if `gdn.meta.AnalyticsTask` is set to `tick`.  This should happen by default, unless you're testing from a local environment.  **If testing locally**, you'll need to enable `Garden.Analytics.AllowLocal` in your config.  If you have `Garden.Analytics.Enabled` disabled in your config, this will also block `gdn.stats` from firing.
+Pageviews rely on the `gdn.stats` JavaScript function being triggered and an [event listener](https://github.com/vanilla/vanilla/pull/3503) being utilized by a service tracker's JavaScript.
+`gdn.stats` is fired if `gdn.meta.AnalyticsTask` is set to `tick`.  This should happen by default, unless you're testing from a local environment.
+
+**If testing locally**, you'll need to enable `Garden.Analytics.AllowLocal` in your config.  If you have `Garden.Analytics.Enabled` disabled in your config, this will also block `gdn.stats` from firing.
