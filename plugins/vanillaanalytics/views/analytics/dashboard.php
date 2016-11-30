@@ -7,9 +7,9 @@ helpAsset(
 );
 helpAsset(
     sprintf(t('About %s'), t('Pinning')),
-    t('Quickly access only the info that you need by pinning metrics.').' '
+    t('Quickly access only the info that you need by pinning widgets.').' '
     .sprintf(
-        t('Simply click on a pin (&nbsp;%s&nbsp;) to showcase that metric in your "My Analytics" section.'),
+        t('Simply click on a pin (&nbsp;%s&nbsp;) to showcase that widget in your "My Analytics" section.'),
         dashboardSymbol('pin', 'icon icon-text')
     )
 );
