@@ -10,19 +10,19 @@ class AnalyticsToolbarModule extends Gdn_Module {
 
     private $intervals = [
         'hourly' => [
-            'Text' => 'Hourly',
+            'text' => 'Hourly',
             'data-seconds' => 3600
         ],
         'daily' => [
-            'Text' => 'Daily',
+            'text' => 'Daily',
             'data-seconds' => 86400
         ],
         'weekly' => [
-            'Text' => 'Weekly',
+            'text' => 'Weekly',
             'data-seconds' => 604800
         ],
         'monthly' => [
-            'Text' => 'Monthly',
+            'text' => 'Monthly',
             'data-seconds' => 2620800
 
         ]
@@ -41,7 +41,7 @@ class AnalyticsToolbarModule extends Gdn_Module {
 
         // Translate the interval titles
         foreach($this->intervals as &$interval) {
-            $interval['Text'] = t($interval['Text']);
+            $interval['text'] = t($interval['text']);
         }
 
         // Set the data for the intervals.
