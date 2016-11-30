@@ -157,7 +157,7 @@ There are 3 types of widgets:
 - Graphs
   - Active Users *(<a name="active-users">active-users</a>)*
     - Number of distinct members that viewed a page on the forum.
-  - Visits *(<a name="visists">visits</a>)*
+  - Visits *(<a name="visits">visits</a>)*
     - Number of distinct users that viewed a page on the forum.
   - Unique Visits by Role Type *(visits-by-role-type)*
     - Number of visits, from users, grouped by vanilla's predefined role types.
@@ -172,4 +172,5 @@ There are 3 types of widgets:
 
 Pageviews rely on the `gdn.stats` JavaScript function being triggered and an [event listener](https://github.com/vanilla/vanilla/pull/3503) being utilized by a service tracker's JavaScript.
 `gdn.stats` is fired if `gdn.meta.AnalyticsTask` is set to `tick`.  This should happen by default, unless you're testing from a local environment.
+
 **If testing locally**, you'll need to enable `Garden.Analytics.AllowLocal` in your config.  If you have `Garden.Analytics.Enabled` disabled in your config, this will also block `gdn.stats` from firing.
