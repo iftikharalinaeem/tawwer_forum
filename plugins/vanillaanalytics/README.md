@@ -39,13 +39,13 @@ If `VanillaAnalytics.KeenIO.ProjectID` is set, no attempt will be made to create
 
 # Widgets
 
-When reading widgets descriptions, but for leader boards, you can always add "during/for the selected time range" at the end of the sentence.
+When reading widgets descriptions, but for leaderboards, you can always add "during/for the selected time range" at the end of the sentence.
 
 There are 3 types of widgets:
 - **Metric**
   - Metrics are a single information quantifying something for the selected time range.
-- **Leader board**
-  - Leader boards are a table showing the ranking of specific items. Leader boards are not affected by the selected time range.
+- **Leaderboard**
+  - Leaderboards are a table showing the ranking of specific items. Leaderboards are not affected by the selected time range.
   Instead, they represent the ranking of some items calculated using the last 30 days. The "previous" rankings are calculated using the rankings going from the last 30 to 60 days.
 - **Graph**
   - Graphs can come in multiple forms! They are always information fetched using the selected time range.
@@ -59,7 +59,7 @@ There are 3 types of widgets:
     - Number of posts having a positive reaction divided by the number of posts having a negative reaction.
   - Average Time to First Comment *(average-time-to-first-comment)*
     - Average amount of time it took for discussions to have their first comment.
-- Leader boards
+- Leaderboards
   - Members by Accumulated Reputation *(top-member-by-accumulated-reputation)*
     - Members ordered by the highest sum of reputation point accumulated.
   - Discussions with Most Comments *(top-commented-discussions)*
@@ -89,7 +89,7 @@ There are 3 types of widgets:
     - Number of comments created.
   - Contributors *(total-contributors)*
     - Number of distinct members who created a post.
-- Leader boards
+- Leaderboards
   - Users with Most Posts *(top-posters)*
     - Members ordered by the highest number of post created.
   - Users with Most Discussions *(top-discussion-starters)*
@@ -127,7 +127,7 @@ There are 3 types of widgets:
     - Average amount of time it took for questions to have their first answer.
   - Average Time to Accept *(time-to-accept)*
     - Average amount of time it took for questions to have an accepted answer.
-- Leader boards
+- Leaderboards
   - Questions with Most Views *(top-viewed-qna-discussions)*
     - Questions ordered by the highest number of accumulated views.
   - Users with Most Answers *(top-question-answerers)*
@@ -151,7 +151,7 @@ There are 3 types of widgets:
     - See [active-users](#active-users).
   - Visits *(total-visits)*
     - See [visits](#visits).
-- Leader boards
+- Leaderboards
   - Discussions with Most Views *(top-viewed-discussions)*
     - Discussions ordered by the highest number of accumulated views.
 - Graphs
