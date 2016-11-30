@@ -46,7 +46,7 @@ There are 3 types of widgets:
   - Metrics are a single information quantifying something for the selected time range.
 - **Leader board**
   - Leader boards are a table showing the ranking of specific items. Leader boards are not affected by the selected time range.
-  Instead, they represent the ranking of some items calculated using the last 30 days. The "previous" rankings are calculed using the rankings going from the last 30 to 60 days.
+  Instead, they represent the ranking of some items calculated using the last 30 days. The "previous" rankings are calculated using the rankings going from the last 30 to 60 days.
 - **Graph**
   - Graphs can come in multiple forms! They are always information fetched using the selected time range.
     - Line, Area, Bar: Use the selected interval to group the fetched information.
