@@ -11,7 +11,7 @@
     ?>
     <div class="KeywordsWrap InputAndButton">
         <?php
-        echo $Form->textBox('search', array('class' => 'InputBox BigInput', 'placeholder' => t('Search'), 'autocomplete' => 'off', 'aria-label' => t('Enter your search term.'))).
+        echo $Form->textBox('search', array('class' => 'InputBox BigInput', 'placeholder' => t('SearchBoxPlaceHolder', 'Search'), 'autocomplete' => 'off', 'aria-label' => t('Enter your search term.'))).
             ' <a href="#" class="Handle" title="'.t('Advanced Search').'"><span class="Arrow"></span></a> '.
             '<span class="bwrap"><button type="submit" class="Button" title="'.t('Search').'">'.sprite('SpSearch').'</button></span>';
         ?>
