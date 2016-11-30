@@ -68,7 +68,11 @@
     </li>
 <?php endforeach; ?>
 </ol>
+
 <?php
+
+$this->fireEvent('AfterSearchResults');
+
 echo '<div class="PageControls Bottom">';
 
 $RecordCount = $this->data('RecordCount');
