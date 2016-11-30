@@ -6,7 +6,7 @@ helpAsset(
         .'This means that if you wanted to do the daily analysis of a week you would have to pick a monday and the next monday to have all seven days included.')
 );
 $widgetDescription = <<<WIDGETDESC
-There are 3 different type of widgets:
+There are 3 different types of widgets:
 <ol>
     <li><b>Metrics</b> - A single result compiled from all the data available in the selected time range.</li>
     <li><b>Graphs</b> - Multiple results compiled from all the data available in the selected time range and most of the time split by the selected interval.</li>
