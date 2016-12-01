@@ -1,12 +1,15 @@
 <?php
 
 $form = new Gdn_Form('', 'bootstrap');
+$categories = $this->data('cat01');
+$catAttr = $this->data('catAttr');
+$heading = $this->data('heading');
 
 Gdn_Theme::assetBegin('Help'); ?>
     <section class="control-panel">
         <h2 class="control-panel-heading"><?php echo t('Filter By...'); ?></h2>
         <div class="control-panel-body js-filter-content">
-            <?php echo getCategoryFilterHTML($form, $this->data('cat01'), $this->data('catAttr')); ?>
+            <?php echo getCategoryFilterHTML($form, $categories, $catAttr, $heading); ?>
         </div>
     </section>
 <?php Gdn_Theme::assetEnd(); ?>
@@ -44,7 +47,7 @@ Gdn_Theme::assetBegin('Help'); ?>
     <div class="card card-category-filter">
         <section class="control-panel padded-left padded-right padded">
             <div class="control-panel-body js-filter-content">
-                <?php echo getCategoryFilterHTML($form, $this->data('cat01'), $this->data('dropdownAttr')); ?>
+                <?php echo getCategoryFilterHTML($form, $categories, $catAttr, $heading); ?>
             </div>
         </section>
     </div>

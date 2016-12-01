@@ -37,9 +37,17 @@ class AnalyticsToolbarModule extends Gdn_Module {
             $categoryData[val('CategoryID', $category)] = val('Name', $category);
         }
         $attr = ['IncludeNull' => t('All Categories')];
+        $heading = t('Category');
+
+        $this->EventArguments['Attributes'] = &$attr;
+        $this->EventArguments['Heading'] = &$heading;
+        $this->EventArguments['Categories'] = &$categoryData;
+        $this->fireAs('AnalyticsController');
+        $this->fireEvent('AnalyticsCategoryFilter');
 
         $this->setData('catAttr', $attr);
         $this->setData('cat01', $categoryData);
+        $this->setData('heading', $heading);
     }
 
     private function getData() {

@@ -216,6 +216,7 @@ class AnalyticsController extends DashboardController {
         }
 
         $parentCategoryID = Gdn::request()->post('ParentCategoryID');
+        $parentDepth = Gdn::request()->post('ParentDepth');
 
         if (!$parentCategoryID) {
             throw new Exception(t('Missing parameter: ParentCategoryID'), 403);
@@ -237,8 +238,7 @@ class AnalyticsController extends DashboardController {
         ];
 
         $form = new Gdn_Form('', 'bootstrap');
-
         include_once $this->fetchViewLocation('helper_functions', 'modules', 'plugins/vanillaanalytics');
-        echo getCategoryFilterHTML($form, $categoryData, $attr, t('Subcategory'));
+        echo getCategoryFilterHTML($form, $categoryData, $attr, t('Subcategory'), $parentDepth + 1);
     }
 }

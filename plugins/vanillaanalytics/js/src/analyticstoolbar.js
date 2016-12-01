@@ -192,18 +192,38 @@ $(document).ready(function() {
 
 
     $('.Section-Analytics').on('change', '.js-category-telescope', function() {
-        
+
         var $self = $(this);
-        var newCat01 = $self.val();
-        analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat01.categoryID', newCat01, 'cat01']);
+        var newCat = $self.val();
+        var depth = $self.data('depth');
+        var fetchChildren = true;
+
+        while (newCat === '') {
+            // we've selected all. Value is parent's category ID.
+            newCat = $('.js-category-telescope[data-depth=' + (depth - 1) + ']').val();
+            fetchChildren = false;
+        }
+
+        if (newCat === undefined) {
+            // we're back to the root category, clear the category field to fetch all categories
+            newCat = '';
+        }
+
+        console.log(newCat);
 
         // Clear every dropdown below the selected filter
         $self.parent().nextAll('.js-category-telescope-wrapper').remove();
+        analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat01.categoryID', newCat, 'cat01']);
+
+        if (!fetchChildren) {
+            return;
+        }
 
         var ajaxData = {
             'DeliveryType': 'VIEW',
             'DeliveryMethod': 'JSON',
-            'ParentCategoryID': $self.val(),
+            'ParentCategoryID': newCat,
+            'ParentDepth': depth,
             'TransientKey': gdn.definition('TransientKey')
         };
 
