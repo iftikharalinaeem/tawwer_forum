@@ -188,40 +188,36 @@ $(document).ready(function() {
     analyticsToolbar.inited = true;
 
     analyticsToolbar.setWidgets('setRange', [defaultRange]);
-});
 
 
 
-$(document).on('contentLoad', function(e) {
-    $('.js-category-telescope', e.target).each(function() {
-        $(this).on('change', function() {
-            var $self = $(this);
+    $('.Section-Analytics').on('change', '.js-category-telescope', function() {
+        
+        var $self = $(this);
+        var newCat01 = $self.val();
+        analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat01.categoryID', newCat01, 'cat01']);
 
-            var newCat01 = $self.val();
-            analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat01.categoryID', newCat01, 'cat01']);
+        // Clear every dropdown below the selected filter
+        $self.parent().nextAll('.js-category-telescope-wrapper').remove();
 
-            // Clear every dropdown below the selected filter
-            $self.parent().nextAll('.js-category-telescope-wrapper').remove();
+        var ajaxData = {
+            'DeliveryType': 'VIEW',
+            'DeliveryMethod': 'JSON',
+            'ParentCategoryID': $self.val(),
+            'TransientKey': gdn.definition('TransientKey')
+        };
 
-            var ajaxData = {
-                'DeliveryType': 'VIEW',
-                'DeliveryMethod': 'JSON',
-                'ParentCategoryID': $self.val(),
-                'TransientKey': gdn.definition('TransientKey')
-            };
-
-            $.ajax({
-                type: "POST",
-                data: ajaxData,
-                url: gdn.url('/analytics/getcategorydropdown'),
-                dataType: 'html',
-                error: function(XMLHttpRequest) {
-                    console.log(XMLHttpRequest.responseText);
-                },
-                success: function(data) {
-                    $self.parents('.js-filter-content').appendTrigger(data);
-                }
-            });
+        $.ajax({
+            type: "POST",
+            data: ajaxData,
+            url: gdn.url('/analytics/getcategorydropdown'),
+            dataType: 'html',
+            error: function(XMLHttpRequest) {
+                console.log(XMLHttpRequest.responseText);
+            },
+            success: function(data) {
+                $self.parents('.js-filter-content').appendTrigger(data);
+            }
         });
     });
 });
