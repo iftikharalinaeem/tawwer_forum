@@ -16,11 +16,7 @@ $(document).on('click', '.js-generate', function(e) {
       },
       success: function(json) {
          $('#Form_AssociationSecret', $parent).val(json.AssociationSecret);
-         if ($('.modal-body').length) {
-            $('.modal-body').scrollTop(0);
-         } else {
-            $(window).scrollTop(0);
-         }
+         $('#Form_AssociationSecret').focus();
       }
    });
 });

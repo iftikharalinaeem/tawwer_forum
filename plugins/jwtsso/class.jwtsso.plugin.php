@@ -19,6 +19,10 @@ $PluginInfo['jwtsso'] = [
     'AuthorUrl' => 'http://www.vanillaforums.com'
 ];
 
+const DEFAULT_PROVIDER_KEY = "JWTSSODefault";
+
+const PROVIDER_SCHEME_ALIAS = "JWTSSO";
+
 /**
  * Class JWTSSOPlugin
  *
@@ -26,7 +30,7 @@ $PluginInfo['jwtsso'] = [
  */
 class JWTSSOPlugin extends Gdn_Plugin {
 
-    /** @var string key for GDN_UserAuthenticationProvider table  */
+    /** @var string unique key for a JWTSSO setup stored in GDN_UserAuthenticationProvider table  */
     protected $providerKey = null;
 
     /** @var array stored information to connect with provider (secret, etc.) */
@@ -75,7 +79,6 @@ class JWTSSOPlugin extends Gdn_Plugin {
     public $translatedKeys = [];
 
     public function __construct() {
-        $this->setProviderKey('JWTSSO');
         $provider = $this->provider();
         $this->translatedKeys = [
             val('ProfileKeyEmail', $provider, 'email') => 'Email',
@@ -102,9 +105,9 @@ class JWTSSOPlugin extends Gdn_Plugin {
         if (!val('AuthenticationKey', $provider)) {
             $model = new Gdn_AuthenticationProviderModel();
             $provider = [
-                'AuthenticationKey' => $this->providerKey,
-                'AuthenticationSchemeAlias' => $this->providerKey,
-                'Name' => $this->providerKey,
+                'AuthenticationKey' => DEFAULT_PROVIDER_KEY,
+                'AuthenticationSchemeAlias' => PROVIDER_SCHEME_ALIAS,
+                'Name' => DEFAULT_PROVIDER_KEY,
                 'ProfileKeyEmail' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
                 'ProfileKeyPhoto' => 'picture',
                 'ProfileKeyName' => 'displayname',
@@ -264,7 +267,10 @@ class JWTSSOPlugin extends Gdn_Plugin {
      */
     public function base_connectData_handler($sender, $args) {
         if (val(0, $args) != $this->getProviderKey()) {
-            return;
+            if (val(0, $args) != PROVIDER_SCHEME_ALIAS) {
+                $this->log('not_configured', ['provider' => $this->provider(), 'passedArg' => val(0, $args)]);
+                throw new Gdn_UserException('JWT authentication is not configured properly. Unknown provider: "'.val(0, $args).'"', 400);
+            }
         }
 
         /* @var Gdn_Form $form */
@@ -355,9 +361,8 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * @return array Profile array transformed by child class or as is.
      */
     public function translateProfileResults($rawProfile = []) {
-        $provider = $this->provider();
         $profile = arrayTranslate($rawProfile, $this->translatedKeys, true);
-        $profile['Provider'] = $this->providerKey;
+        $profile['Provider'] = $this->getProviderKey();
         return $profile;
     }
 
@@ -602,6 +607,10 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * @return string Provider key.
      */
     public function getProviderKey() {
+        if (!$this->providerKey) {
+            $this->provider();
+            $this->setProviderKey(val('AuthenticationKey', $this->provider, DEFAULT_PROVIDER_KEY));
+        }
         return $this->providerKey;
     }
 
@@ -612,8 +621,10 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * @return array Stored provider data (secret, client_id, etc.).
      */
     protected function provider() {
-        if (!$this->provider) {
+        if (!$this->provider && $this->providerKey) {
             $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->providerKey);
+        } else {
+            $this->provider = Gdn_AuthenticationProviderModel::getProviderByScheme(PROVIDER_SCHEME_ALIAS);
         }
 
         return $this->provider;
@@ -638,16 +649,14 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * @param $data
      */
     public function log($message, $data) {
-        if (c('Vanilla.SSO.Debug')) {
-            if (!is_array($data)) {
-                $data = (array) $data;
-            }
-            Logger::event(
-                'jwt_logging',
-                Logger::INFO,
-                $message,
-                $data
-            );
+        if (!is_array($data)) {
+            $data = (array) $data;
         }
+        Logger::event(
+            'jwt_logging',
+            Logger::INFO,
+            $message,
+            $data
+        );
     }
 }
