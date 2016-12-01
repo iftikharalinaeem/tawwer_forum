@@ -28,16 +28,23 @@ class AnalyticsToolbarModule extends Gdn_Module {
         ]
     ];
 
-    private function getData() {
+    private function getCategoryFilter() {
         // Get the data for the 1st level of categories.
-        $categories = CategoryModel::categories();
+        $categories = CategoryModel::getChildren(-1);
         $categoryData = [];
+
         foreach($categories as $category) {
-            if (val('Depth', $category) == 1) {
-                $categoryData[val('CategoryID', $category)] = val('Name', $category);
-            }
+            $categoryData[val('CategoryID', $category)] = val('Name', $category);
         }
+        $attr = ['IncludeNull' => t('All Categories')];
+
+        $this->setData('catAttr', $attr);
         $this->setData('cat01', $categoryData);
+    }
+
+    private function getData() {
+
+        $this->getCategoryFilter();
 
         // Translate the interval titles
         foreach($this->intervals as &$interval) {
@@ -50,6 +57,7 @@ class AnalyticsToolbarModule extends Gdn_Module {
 
     public function toString() {
         $this->getData();
+        include_once $this->fetchViewLocation('helper_functions', 'modules');
         return parent::toString();
     }
 }

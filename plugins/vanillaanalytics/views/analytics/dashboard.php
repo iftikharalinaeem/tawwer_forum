@@ -1,30 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 echo heading($this->data('Title'));
-helpAsset(
-    sprintf(t('About %s'), t('Date Picking')),
-    t('When you choose a date range, the beginning date is inclusive and the ending date is exclusive. '
-        .'This means that if you wanted to do the daily analysis of a week you would have to pick a monday and the next monday to have all seven days included.')
-);
-$widgetDescription = <<<WIDGETDESC
-There are 3 different types of widgets:
-<ol>
-    <li><b>Metrics</b> - A single result compiled from all the data available in the selected time range.</li>
-    <li><b>Graphs</b> - Multiple results compiled from all the data available in the selected time range and most of the time split by the selected interval.</li>
-    <li><b>Leaderboards</b> - Ranking of some results, ordered from best to worst, taken from all the data available in the selected time range.</li>
-</ol>
-WIDGETDESC;
-helpAsset(
-    sprintf(t('About %s'), t('Widgets')),
-    t('About widget description', $widgetDescription)
-);
-helpAsset(
-    sprintf(t('About %s'), t('Pinning')),
-    t('Quickly access only the info that you need by pinning widgets.').' '
-    .sprintf(
-        t('Simply click on a pin (&nbsp;%s&nbsp;) to showcase that widget in your "My Analytics" section.'),
-        dashboardSymbol('pin', 'icon icon-text')
-    )
-);
 if (!$this->data('HasWidgets') && $this->data('IsPersonal')) : ?>
     <div class="hero">
         <div class="hero-content">
@@ -50,4 +25,33 @@ if (!$this->data('HasWidgets') && $this->data('IsPersonal')) : ?>
         <?php endforeach; ?>
     </div>
 </div>
-<?php endif; ?>
+<?php endif;
+
+// Render the helpAssets after the analytics toolbar module has been rendered, as they should appear after the
+// category filter module (which is rendered by the toolbar module).
+
+helpAsset(
+    sprintf(t('About %s'), t('Date Picking')),
+    t('When you choose a date range, the beginning date is inclusive and the ending date is exclusive. '
+        .'This means that if you wanted to do the daily analysis of a week you would have to pick a Monday and the next Monday to have all seven days included.')
+);
+$widgetDescription = <<<WIDGETDESC
+<p>There are 3 different types of widgets:</p>
+<ol>
+    <li><b>Metrics</b> - A single result compiled from all the data available in the selected time range.</li>
+    <li><b>Graphs</b> - Multiple results compiled from all the data available in the selected time range and most of the time split by the selected interval.</li>
+    <li><b>Leaderboards</b> - Ranking of some results, ordered from best to worst, taken from all the data available in the selected time range.</li>
+</ol>
+WIDGETDESC;
+helpAsset(
+    sprintf(t('About %s'), t('Widgets')),
+    t('About widget description', $widgetDescription)
+);
+helpAsset(
+    sprintf(t('About %s'), t('Pinning')),
+    t('Quickly access only the info that you need by pinning widgets.').' '
+    .sprintf(
+        t('Simply click on a pin (&nbsp;%s&nbsp;) to showcase that widget in your "My Analytics" section.'),
+        dashboardSymbol('pin', 'icon icon-text')
+    )
+);

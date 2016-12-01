@@ -92,13 +92,6 @@ var analyticsToolbar = {
     }
 };
 
-
-$(document).on('change', '#Form_cat01', function() {
-    var newCat01 = $(this).val();
-    analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat01.categoryID', newCat01, 'cat01']);
-});
-
-
 // Re-render the graphs with new intervals.
 $(document).on('click', '.js-analytics-interval:not(.disabled)', function() {
     // Already active..
@@ -198,3 +191,37 @@ $(document).ready(function() {
 });
 
 
+
+$(document).on('contentLoad', function(e) {
+    $('.js-category-telescope', e.target).each(function() {
+        $(this).on('change', function() {
+            var $self = $(this);
+
+            var newCat01 = $self.val();
+            analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat01.categoryID', newCat01, 'cat01']);
+
+            // Clear every dropdown below the selected filter
+            $self.parent().nextAll('.js-category-telescope-wrapper').remove();
+
+            var ajaxData = {
+                'DeliveryType': 'VIEW',
+                'DeliveryMethod': 'JSON',
+                'ParentCategoryID': $self.val(),
+                'TransientKey': gdn.definition('TransientKey')
+            };
+
+            $.ajax({
+                type: "POST",
+                data: ajaxData,
+                url: gdn.url('/analytics/getcategorydropdown'),
+                dataType: 'html',
+                error: function(XMLHttpRequest) {
+                    console.log(XMLHttpRequest.responseText);
+                },
+                success: function(data) {
+                    $self.parents('.js-filter-content').appendTrigger(data);
+                }
+            });
+        });
+    });
+});
