@@ -121,8 +121,8 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /**
      * Create a controller to deal with plugin settings in dashboard.
      *
-     * @param Gdn_Controller $sender.
-     * @param Gdn_Controller $args.
+     * @param SettingsController $sender.
+     * @param SettingsController $args.
      */
     public function settingsController_jwtsso_create($sender, $args) {
         $sender->permission('Garden.Settings.Manage');
@@ -132,7 +132,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
         $form = new Gdn_Form();
         $form->setModel($model);
         $sender->Form = $form;
-
+        $generate = false;
         if (!$form->AuthenticatedPostBack()) {
             $provider = $this->provider();
             $form->setData($provider);
@@ -163,16 +163,16 @@ class JWTSSOPlugin extends Gdn_Plugin {
         // Set up the form.
         $formFields = [
             'Algorithm' => ['LabelCode' => 'Algorithm', 'Control' => 'RadioList', 'Items' => $algsItems, 'Options' => ['Default' => 'HS256']],
-            'SignInUrl' =>  ['LabelCode' => 'Sign In URL', 'Description' => 'Enter the endpoint to where users will be sent to sign in. This address <b>must</b> be passed as the <code>iss</code> value in the payload of the token.'],
-            'BaseUrl' =>  ['LabelCode' => 'Issuer', 'Description' => 'Enter the URL of the server that is issuing this token.'],
-            'Audience' =>  ['LabelCode' => 'Intended Audience','Options' => ['Value' => $form->getValue('Audience', url('/', true)),], 'Description' => 'This is a valid URL to this forum. Please supply this to your Authentication Provider. It <b>must</b> be passed as the <code>aud</code> value in the payload of the token.'],
-            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Enter the shared secret, either supplied by your authentication provider or create one and share it with your authentication provider. You can click on "<b>Generate Secret</b>" below.'],
-            'RegisterUrl' => ['LabelCode' => 'Register URL', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
-            'SignOutUrl' => ['LabelCode' => 'Sign Out URL', 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
-            'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Description' => 'The Key in the JSON payload to designate Emails'],
-            'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON payload to designate Photo.'],
-            'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON payload to designate Display Name.'],
-            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON payload to designate Full Name.']
+            'SignInUrl' =>  ['LabelCode' => 'Sign In URL', 'Control' => 'TextBox', 'Description' => 'Enter the endpoint to where users will be sent to sign in. This address <b>must</b> be passed as the <code>iss</code> value in the payload of the token.'],
+            'BaseUrl' =>  ['LabelCode' => 'Issuer', 'Control' => 'TextBox', 'Description' => 'Enter the URL of the server that is issuing this token.'],
+            'Audience' =>  ['LabelCode' => 'Intended Audience', 'Control' => 'TextBox', 'Options' => ['Value' => $form->getValue('Audience', url('/', true)),], 'Description' => 'This is a valid URL to this forum. Please supply this to your Authentication Provider. It <b>must</b> be passed as the <code>aud</code> value in the payload of the token.'],
+            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Control' => 'TextBox', 'Description' => 'Enter the shared secret, either supplied by your authentication provider or create one and share it with your authentication provider. You can click on "<b>Generate Secret</b>" below.'],
+            'RegisterUrl' => ['LabelCode' => 'Register URL', 'Control' => 'TextBox', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
+            'SignOutUrl' => ['LabelCode' => 'Sign Out URL', 'Control' => 'TextBox', 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
+            'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate Emails'],
+            'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate Photo.'],
+            'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate Display Name.'],
+            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate Full Name.']
         ];
 
         // Allow a client to hook in and add fields that might be relevent to their set up.
@@ -183,7 +183,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
         $sender->setData('_Form', $formFields);
 
-        $sender->addSideMenu();
+        $sender->setHighlightRoute();
         if (!$sender->data('Title')) {
             $sender->setData('Title', sprintf(t('%s Settings'), 'JSON Web Token SSO'));
         }
