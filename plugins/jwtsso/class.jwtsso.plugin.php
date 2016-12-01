@@ -164,7 +164,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
         $formFields = [
             'Algorithm' => ['LabelCode' => 'Algorithm', 'Control' => 'RadioList', 'Items' => $algsItems, 'Options' => ['Default' => 'HS256']],
             'SignInUrl' =>  ['LabelCode' => 'Sign In URL', 'Description' => 'Enter the endpoint to where users will be sent to sign in. This address <b>must</b> be passed as the <code>iss</code> value in the payload of the token.'],
-            'BaseUrl' =>  ['LabelCode' => 'Issuer', 'Description' => 'Enter the domain name of the server that is issuing this token.'],
+            'BaseUrl' =>  ['LabelCode' => 'Issuer', 'Description' => 'Enter the URL of the server that is issuing this token.'],
             'Audience' =>  ['LabelCode' => 'Intended Audience','Options' => ['Value' => $form->getValue('Audience', url('/', true)),], 'Description' => 'This is a valid URL to this forum. Please supply this to your Authentication Provider. It <b>must</b> be passed as the <code>aud</code> value in the payload of the token.'],
             'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Enter the shared secret, either supplied by your authentication provider or create one and share it with your authentication provider. You can click on "<b>Generate Secret</b>" below.'],
             'RegisterUrl' => ['LabelCode' => 'Register URL', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
@@ -250,6 +250,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
      */
     public function settingsController_render_before($sender) {
         $sender->addJsFile('jwt-settings.js', 'plugins/jwtsso');
+        $sender->addCssFile('jwt-settings.css', 'plugins/jwtsso');
     }
 
 
@@ -372,8 +373,9 @@ class JWTSSOPlugin extends Gdn_Plugin {
         // First look for a header.
         $matches = [];
         $token = '';
+        $authFieldRegex = '/^(bearer)\s?(?::\s?)?((?:[a-z\d_-]+\.){2}[a-z\d_-]+)$/i';
         if ($auth = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_AUTHORIZATION', null)) {
-            if (preg_match("/(.*)\s?:\s?(.*)/", $auth, $matches)) {
+            if (preg_match($authFieldRegex, $auth, $matches)) {
                 $tokenType = trim(strtolower($matches[1]));
                 $token = $matches[2];
                 return [$token, $tokenType];
@@ -384,7 +386,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
         if (empty($token)) {
             $allHeaders = getallheaders();
             if (val('Authorization', $allHeaders)) {
-                if (preg_match("/(.*)\s?:\s?(.*)/", $allHeaders['Authorization'], $matches)) {
+                if (preg_match($authFieldRegex, $allHeaders['Authorization'], $matches)) {
                     $tokenType = trim(strtolower($matches[1]));
                     $token = $matches[2];
                     return [$token, $tokenType];

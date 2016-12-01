@@ -19,9 +19,9 @@ echo $this->Form->simple($this->data('_Form'));
 
 if ($this->data('jwt')) :
 echo '<div class="alert alert-info padded">Below is a sample JWT for test purposes. To check the validity of your Secret and see the payload go to <a href="https://jwt.io">jwt.io</a></div>';
-echo '<div class="JWT-sample">';
+echo '<div class="JWT-sample"><textarea readonly="true">';
     echo $this->data('jwt');
-echo '</div>';
+echo '</textarea></div>';
 endif;
 
 echo '<div class="js-modal-footer form-footer buttons">';

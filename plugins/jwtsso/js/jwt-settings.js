@@ -15,7 +15,6 @@ $(document).on('click', '.js-generate', function(e) {
          gdn.informError(xhr);
       },
       success: function(json) {
-         console.log(json);
          $('#Form_AssociationSecret', $parent).val(json.AssociationSecret);
          if ($('.modal-body').length) {
             $('.modal-body').scrollTop(0);
