@@ -266,11 +266,15 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $args.
      */
     public function base_connectData_handler($sender, $args) {
-        if (val(0, $args) != $this->getProviderKey()) {
-            if (val(0, $args) != PROVIDER_SCHEME_ALIAS) {
-                $this->log('not_configured', ['provider' => $this->provider(), 'passedArg' => val(0, $args)]);
-                throw new Gdn_UserException('JWT authentication is not configured properly. Unknown provider: "'.val(0, $args).'"', 400);
-            }
+        $authenticationKey = $sender->Request->get('authKey');
+        if (!$authenticationKey) {
+            $this->log('not_configured', ['provider' => $this->provider()]);
+            throw new Gdn_UserException('JWT authentication is not configured properly. Missing provider key', 400);
+        }
+
+        if (val(0, $args) != PROVIDER_SCHEME_ALIAS || $this->getProviderKey() != $authenticationKey) {
+            $this->log('not_configured', ['provider' => $this->provider(), 'passedArg' => val(0, $args)]);
+            throw new Gdn_UserException('JWT authentication is not configured properly. Unknown provider: "'.val(0, $args).'/'.$authenticationKey.'"', 400);
         }
 
         /* @var Gdn_Form $form */
