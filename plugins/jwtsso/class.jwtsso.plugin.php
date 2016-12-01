@@ -12,6 +12,7 @@ $PluginInfo['jwtsso'] = [
     'RequiredApplications' => ['Vanilla' => '2.2'],
     'SettingsUrl' => '/settings/jwtsso',
     'SettingsPermission' => 'Garden.Settings.Manage',
+    'UsePopupSettings' => false,
     'MobileFriendly' => true,
     'Author' => 'Patrick Kelly',
     'AuthorEmail' => 'patrick.k@vanillaforums.com',
@@ -248,7 +249,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * @param $sender SettingsController
      */
     public function settingsController_render_before($sender) {
-        $sender->addJsFile('jwt-settings.js', 'plugins/jwtsso/js');
+        $sender->addJsFile('jwt-settings.js', 'plugins/jwtsso');
     }
 
 
