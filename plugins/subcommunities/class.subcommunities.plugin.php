@@ -515,9 +515,9 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      *
      * @param SiteNavModule $sender Sending controller instance.
      */
-    public function siteNavModule_default_handler($sender) {
+    public function siteNavModule_init_handler($sender) {
         $subName = val('Name', SubcommunityModel::getCurrent());
-        $sender->addLink('etc.subcommuntyselect', array('text' => $subName.'<span class="pull-right icon icon-arrow-right"></span>', 'url' => 'categories/subcommunityselect', false, 'sort' => 99, 'icon' => icon('globe')));
+        $sender->addLink($subName.'<span class="pull-right icon icon-arrow-right"></span>', 'categories/subcommunityselect', 'etc.subcommuntyselect', '', [], ['icon' => 'globe']);
     }
 
     /**
