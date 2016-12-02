@@ -655,15 +655,14 @@ class Warnings2Plugin extends Gdn_Plugin {
      *
      * @param SiteNavModule $sender The event sender.
      */
-    public function siteNavModule_profile_handler($sender) {
+    public function siteNavModule_init_handler($sender) {
         $IsPrivileged = Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false);
         // We can choose to allow regular users to see warnings or not. Default not.
         if (!$IsPrivileged && Gdn::session()->UserID != valr('User.UserID', $sender)) {
             return;
         }
         $user = Gdn::controller()->data('Profile');
-        $user_id = val('UserID', $user);
-        $sender->addLink('moderation.notes', array('text' => t('Notes'), 'url' => userUrl($user, '', 'notes'), 'icon' => icon('edit')));
+        $sender->addLinkToSection('Profile', t('Notes'), userUrl($user, '', 'notes'), 'main.notes', '', ['sort' => 100], ['icon' => 'edit']);
     }
 
     /**
