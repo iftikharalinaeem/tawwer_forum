@@ -202,7 +202,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
         // Create the URL to display to the forum connect endpoint.
         // Use Gdn::request instead of convience function so that we can return http and https.
-        $connectURL = Gdn::request()->url('/entry/connect/'. PROVIDER_SCHEME_ALIAS.'/?authKey'.$this->getProviderKey(), true, true);
+        $connectURL = Gdn::request()->url('/entry/connect/'. PROVIDER_SCHEME_ALIAS.'/?authKey='.$this->getProviderKey(), true, true);
         $sender->setData('ConnectURL', $connectURL);
 
         // For auto generating a secret for the client.
