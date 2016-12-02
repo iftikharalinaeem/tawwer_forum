@@ -498,7 +498,7 @@ class MultisitesController extends DashboardController {
         }
 
         try {
-            $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $post);
+            $response = $this->siteModel->nodeApi($site['Slug'], 'mod/cleanspeakpostback.json', 'POST', $post);
         } catch (Gdn_UserException $e) {
             Logger::log(Logger::ERROR, 'Error communicating with node.', array($e->getMessage()));
         }
@@ -542,7 +542,7 @@ class MultisitesController extends DashboardController {
             $sitePost['moderatorExternalId'] = GetValue('moderatorExternalId', $post, NULL);
 
             try {
-                $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $sitePost);
+                $response = $this->siteModel->nodeApi($site['Slug'], 'mod/cleanspeakpostback.json', 'POST', $sitePost);
             } catch (Gdn_UserException $e) {
                 $errors[$siteID] = 'Error communicating with node.';
                 Logger::log(Logger::ERROR, 'Error communicating with node.', array($e->getMessage()));
@@ -574,7 +574,7 @@ class MultisitesController extends DashboardController {
         }
 
         try {
-            $response = $this->siteModel->nodeApi($site['Slug'], 'mod.json/cleanspeakpostback', 'POST', $post);
+            $response = $this->siteModel->nodeApi($site['Slug'], 'mod/cleanspeakpostback.json', 'POST', $post);
         } catch (Gdn_UserException $e) {
             Logger::log(Logger::ERROR, 'Error communicating with node.', array($e->getMessage()));
         }
