@@ -57,7 +57,7 @@ class MultisitesController extends DashboardController {
         }
         $pageSize = 20;
         list($offset, $limit) = OffsetLimit($page, $pageSize);
-        $this->form = new Gdn_Form();
+        $this->form = new Gdn_Form('', 'bootstrap');
         $this->form->Method = 'get';
 
         if (!in_array(strtolower($sort), ['url', 'dateinserted'])) {
