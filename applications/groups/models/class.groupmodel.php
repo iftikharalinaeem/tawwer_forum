@@ -859,7 +859,7 @@ class GroupModel extends Gdn_Model {
      * @throws Gdn_UserException
      */
     public function save($Data, $Settings = false) {
-        $this->EventArguments['Fields'] =& $Data;
+        $this->EventArguments['Fields'] = &$Data;
         $this->fireEvent('BeforeSave');
 
         if ($this->MaxUserGroups && !val('GroupID', $Data)) {
@@ -880,6 +880,27 @@ class GroupModel extends Gdn_Model {
                 $Data['Visibility'] = 'Public';
                 $Data['Registration'] = 'Public';
                 break;
+        }
+
+        // Define the primary key in this model's table.
+        $this->defineSchema();
+
+        // See if a primary key value was posted and decide how to save
+        $PrimaryKeyVal = val($this->PrimaryKey, $Data, false);
+        $Insert = $PrimaryKeyVal == false ? true : false;
+        if ($Insert) {
+            $this->addInsertFields($Data);
+        } else {
+            $this->addUpdateFields($Data);
+        }
+
+        // Validate the form posted values
+        $isValid = $this->validate($Data, $Insert) === true;
+        $this->EventArguments['IsValid'] = &$isValid;
+        $this->fireEvent('AfterValidateGroup');
+
+        if (!$isValid) {
+            return false;
         }
 
         $GroupID = parent::save($Data, $Settings);

@@ -377,6 +377,28 @@ class EventModel extends Gdn_Model {
         $this->Validation->applyRule('DateStarts', 'ValidateDate');
         $this->Validation->applyRule('DateEnds', 'ValidateDate');
 
+        // Define the primary key in this model's table.
+        $this->defineSchema();
+
+        // See if a primary key value was posted and decide how to save
+        $PrimaryKeyVal = val($this->PrimaryKey, $Event, false);
+        $Insert = $PrimaryKeyVal == false ? true : false;
+        if ($Insert) {
+            $this->addInsertFields($Event);
+        } else {
+            $this->addUpdateFields($Event);
+        }
+
+        // Validate the form posted values
+        $isValid = $this->validate($Event, $Insert) === true;
+        $this->EventArguments['IsValid'] = &$isValid;
+        $this->EventArguments['Fields'] = &$Event;
+        $this->fireEvent('AfterValidateEvent');
+
+        if (!$isValid) {
+            return false;
+        }
+
         return parent::save($Event);
     }
 
