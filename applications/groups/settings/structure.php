@@ -86,7 +86,11 @@ if ($St->TableExists('Category')) {
         $Model = new CategoryModel();
         $Row = CategoryModel::Categories('social-groups');
         if ($Row) {
-            $Model->SetField($Row['CategoryID'], 'AllowGroups', 1);
+            $Model->setField($Row['CategoryID'], 'AllowGroups', 1);
+            // Backwards compat for a new column.
+            if ($St->columnExists('CanDelete')) {
+                $Model->setField($Row['CategoryID'], 'CanDelete', 0);
+            }
         } else {
             $Row = [
                 'Name' => 'Social Groups',
