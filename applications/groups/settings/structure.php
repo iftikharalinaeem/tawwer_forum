@@ -96,6 +96,10 @@ if ($St->TableExists('Category')) {
                 'AllowDiscussions' => 1,
                 'AllowGroups' => 1,
                 'Sort' => 1000);
+            // Backwards compat for a new column.
+            if ($St->columnExists('CanDelete')) {
+                $Row['CanDelete'] = 0;
+            }
             $Model->Save($Row);
         }
     }
