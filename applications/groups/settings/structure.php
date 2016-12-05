@@ -86,17 +86,34 @@ if ($St->TableExists('Category')) {
         $Model = new CategoryModel();
         $Row = CategoryModel::Categories('social-groups');
         if ($Row) {
-            $Model->SetField($Row['CategoryID'], 'AllowGroups', 1);
+            $Model->setField($Row['CategoryID'], 'AllowGroups', 1);
+            // Backwards compat for a new column.
+            if ($St->columnExists('CanDelete')) {
+                $Model->setField($Row['CategoryID'], 'CanDelete', 0);
+            }
         } else {
-            $Row = array(
+            $Row = [
                 'Name' => 'Social Groups',
                 'UrlCode' => 'social-groups',
                 'HideAllDiscussions' => 1,
                 'DisplayAs' => 'Discussions',
                 'AllowDiscussions' => 1,
                 'AllowGroups' => 1,
-                'Sort' => 1000);
-            $Model->Save($Row);
+                'Sort' => 1000
+            ];
+            // Backwards compat for a new column.
+            if ($St->columnExists('CanDelete')) {
+                $Row['CanDelete'] = 0;
+            }
+            $categoryID = $Model->save($Row);
+
+            // Disable view permissions for the new category by default.
+            Gdn::permissionModel()->addDefault(RoleModel::TYPE_GUEST, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            Gdn::permissionModel()->addDefault(RoleModel::TYPE_APPLICANT, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            Gdn::permissionModel()->addDefault(RoleModel::TYPE_UNCONFIRMED, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            Gdn::permissionModel()->addDefault(RoleModel::TYPE_MEMBER, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            Gdn::permissionModel()->addDefault(RoleModel::TYPE_MODERATOR, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            Gdn::permissionModel()->addDefault(RoleModel::TYPE_ADMINISTRATOR, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
         }
     }
 }

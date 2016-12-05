@@ -647,27 +647,39 @@ class GroupsHooks extends Gdn_Plugin {
      * @param object $sender Sending instance
      * @param array $args Event's arguments
      */
-     public function search_allowedCategories_handler($sender, $args) {
+    public function search_allowedCategories_handler($sender, $args) {
         $args['CategoriesID'] = array_merge($args['CategoriesID'], GroupModel::getGroupCategoryIDs());
-     }
+    }
 
-     /**
-      * Hook in before VanillaSettingsController renders any output.
-      *
-      * @param VanillaSettingsController $sender
-      * @param array $args
-      */
-     public function vanillaSettingsController_render_before($sender, $args) {
-          $requestMethod = strtolower(val('RequestMethod', $sender));
+    /**
+     * Add backwards compatibility for making undeletable categories.
+     *
+     * @param VanillaSettingsController $sender
+     * @param array $args
+     */
+    public function vanillaSettingsController_render_before($sender, $args) {
+        $categories = $sender->data('Categories');
+        if (is_array($categories)) {
+            $this->setCategoryCanDelete($categories);
+            $sender->setData('Categories', $categories);
+        }
+    }
 
-          switch ($requestMethod) {
-                case 'index':
-                case 'managecategories':
-                     foreach ($sender->Data['CategoryData'] as &$category) {
-                          if (val('AllowGroups', $category)) {
-                                setValue('CanDelete', $category, 0);
-                          }
-                     }
-          }
-     }
+    /**
+     * Disable deletion for Social Groups created before the CanDelete flag existed.
+     *
+     * @param array $categories
+     */
+    protected function setCategoryCanDelete(array &$categories) {
+        foreach ($categories as &$category) {
+            if (val('AllowGroups', $category)) {
+                setValue('CanDelete', $category, 0);
+            }
+
+            // Descend into tree.
+            if (!empty($category['Children'])) {
+                $this->setCategoryCanDelete($category['Children']);
+            }
+        }
+    }
 }
