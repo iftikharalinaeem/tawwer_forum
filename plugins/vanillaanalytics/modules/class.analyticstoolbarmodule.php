@@ -8,6 +8,20 @@
 
 class AnalyticsToolbarModule extends Gdn_Module {
 
+    /**
+     * @var bool Whether to show the category filter.
+     */
+    private $showCategoryFilter = true;
+
+    /**
+     * AnalyticsToolbarModule constructor.
+     * @param bool $showCategoryFilter Whether to show the category filter.
+     */
+    public function __construct($showCategoryFilter = true) {
+        $this->showCategoryFilter = $showCategoryFilter;
+        parent::__construct();
+    }
+
     private $intervals = [
         'hourly' => [
             'text' => 'Hourly',
@@ -28,6 +42,11 @@ class AnalyticsToolbarModule extends Gdn_Module {
         ]
     ];
 
+    /**
+     * Gets the data for the category filter.
+     *
+     * @throws Exception
+     */
     private function getCategoryFilter() {
         // Get the data for the 1st level of categories.
         $categories = CategoryModel::getChildren(-1);
@@ -52,7 +71,10 @@ class AnalyticsToolbarModule extends Gdn_Module {
 
     private function getData() {
 
-        $this->getCategoryFilter();
+        $this->setData('showCategoryFilter', $this->showCategoryFilter);
+        if ($this->showCategoryFilter) {
+            $this->getCategoryFilter();
+        }
 
         // Translate the interval titles
         foreach($this->intervals as &$interval) {
@@ -65,7 +87,7 @@ class AnalyticsToolbarModule extends Gdn_Module {
 
     public function toString() {
         $this->getData();
-        include_once $this->fetchViewLocation('helper_functions', 'modules');
+        include_once $this->fetchViewLocation('helper_functions', 'plugins/vanillaanalytics');
         return parent::toString();
     }
 }

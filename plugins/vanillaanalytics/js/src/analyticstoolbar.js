@@ -197,6 +197,7 @@ $(document).ready(function() {
         var newCat = $self.val();
         var depth = $self.data('depth');
         var fetchChildren = true;
+        $self.prop('disabled', true);
 
         while (newCat === '') {
             // we've selected all. Value is parent's category ID.
@@ -214,6 +215,7 @@ $(document).ready(function() {
         analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat01.categoryID', newCat, 'cat01']);
 
         if (!fetchChildren) {
+            $self.prop('disabled', false);
             return;
         }
 
@@ -235,6 +237,9 @@ $(document).ready(function() {
             },
             success: function(data) {
                 $self.parents('.js-filter-content').appendTrigger(data);
+            },
+            complete: function() {
+                $self.prop('disabled', false);
             }
         });
     });

@@ -4,15 +4,19 @@ $form = new Gdn_Form('', 'bootstrap');
 $categories = $this->data('cat01');
 $catAttr = $this->data('catAttr');
 $heading = $this->data('heading');
+$showCategoryFilter = $this->data('showCategoryFilter');
 
-Gdn_Theme::assetBegin('Help'); ?>
-    <section class="control-panel">
-        <h2 class="control-panel-heading"><?php echo t('Filter By...'); ?></h2>
-        <div class="control-panel-body js-filter-content">
-            <?php echo getCategoryFilterHTML($form, $categories, $catAttr, $heading); ?>
-        </div>
-    </section>
-<?php Gdn_Theme::assetEnd(); ?>
+if ($showCategoryFilter) :
+    Gdn_Theme::assetBegin('Help'); ?>
+        <section class="control-panel">
+            <h2 class="control-panel-heading"><?php echo t('Filter By...'); ?></h2>
+            <div class="control-panel-body js-filter-content">
+                <?php echo getCategoryFilterHTML($form, $categories, $catAttr, $heading); ?>
+            </div>
+        </section>
+    <?php Gdn_Theme::assetEnd();
+endif;
+?>
 
 <div class="toolbar-analytics toolbar flex-wrap" id="analytics_toolbar">
     <div class="btn-group">
@@ -42,7 +46,7 @@ Gdn_Theme::assetBegin('Help'); ?>
         </div>
     </div>
 </div>
-
+<?php if ($showCategoryFilter) : ?>
 <aside id="categoryFilterContent" aria-hidden="true" class="hidden">
     <div class="card card-category-filter">
         <section class="control-panel padded-left padded-right padded">
@@ -52,5 +56,5 @@ Gdn_Theme::assetBegin('Help'); ?>
         </section>
     </div>
 </aside>
-
+<?php endif;
 

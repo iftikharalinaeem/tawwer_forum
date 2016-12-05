@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+/** @var AnalyticsToolbarModule $this */
 echo heading($this->data('Title'));
 if (!$this->data('HasWidgets') && $this->data('IsPersonal')) : ?>
     <div class="hero">
@@ -17,7 +18,8 @@ if (!$this->data('HasWidgets') && $this->data('IsPersonal')) : ?>
 <?php else : ?>
 <div class="analytics-dashboard-content">
     <?php
-    echo Gdn_Theme::module('AnalyticsToolbarModule');
+    $toolbar = new AnalyticsToolbarModule($this->data('AnalyticsDashboard')->showCategoryFilter());
+    echo $toolbar->toString();
     ?>
     <div id="analytics_panels">
         <?php foreach ($this->data('AnalyticsDashboard')->getPanels() as $panel): ?>
