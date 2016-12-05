@@ -202,4 +202,43 @@ class AnalyticsController extends DashboardController {
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->render();
     }
+
+    /**
+     * Prints out HTML for a select input for direct child categories (one level down) of the passed parent category ID.
+     *
+     * Expects the following POST params:
+     * ParentCategoryID: The category ID whose children to fetch.
+     * TransientKey: The session's transient key.
+     */
+    public function getCategoryDropdown() {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            return;
+        }
+
+        $parentCategoryID = Gdn::request()->post('ParentCategoryID');
+        $parentDepth = Gdn::request()->post('ParentDepth');
+
+        if (!$parentCategoryID) {
+            throw new Exception(t('Missing parameter: ParentCategoryID'), 403);
+        }
+
+        $categories = CategoryModel::getChildren($parentCategoryID);
+        $categoryData = [];
+
+        foreach($categories as $category) {
+            $categoryData[val('CategoryID', $category)] = val('Name', $category);
+        }
+
+        if (empty($categoryData)) {
+            return;
+        }
+
+        $attr = [
+            'IncludeNull' => t('All')
+        ];
+
+        $form = new Gdn_Form('', 'bootstrap');
+        include_once $this->fetchViewLocation('helper_functions', 'modules', 'plugins/vanillaanalytics');
+        echo getCategoryFilterHTML($form, $categoryData, $attr, t('Subcategory'), $parentDepth + 1);
+    }
 }

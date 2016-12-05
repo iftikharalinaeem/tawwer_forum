@@ -8,6 +8,20 @@
 
 class AnalyticsToolbarModule extends Gdn_Module {
 
+    /**
+     * @var bool Whether to show the category filter.
+     */
+    private $showCategoryFilter = true;
+
+    /**
+     * AnalyticsToolbarModule constructor.
+     * @param bool $showCategoryFilter Whether to show the category filter.
+     */
+    public function __construct($showCategoryFilter = true) {
+        $this->showCategoryFilter = $showCategoryFilter;
+        parent::__construct();
+    }
+
     private $intervals = [
         'hourly' => [
             'text' => 'Hourly',
@@ -28,16 +42,39 @@ class AnalyticsToolbarModule extends Gdn_Module {
         ]
     ];
 
-    private function getData() {
+    /**
+     * Gets the data for the category filter.
+     *
+     * @throws Exception
+     */
+    private function getCategoryFilter() {
         // Get the data for the 1st level of categories.
-        $categories = CategoryModel::categories();
+        $categories = CategoryModel::getChildren(-1);
         $categoryData = [];
+
         foreach($categories as $category) {
-            if (val('Depth', $category) == 1) {
-                $categoryData[val('CategoryID', $category)] = val('Name', $category);
-            }
+            $categoryData[val('CategoryID', $category)] = val('Name', $category);
         }
+        $attr = ['IncludeNull' => t('All Categories')];
+        $heading = t('Category');
+
+        $this->EventArguments['Attributes'] = &$attr;
+        $this->EventArguments['Heading'] = &$heading;
+        $this->EventArguments['Categories'] = &$categoryData;
+        $this->fireAs('AnalyticsController');
+        $this->fireEvent('AnalyticsCategoryFilter');
+
+        $this->setData('catAttr', $attr);
         $this->setData('cat01', $categoryData);
+        $this->setData('heading', $heading);
+    }
+
+    private function getData() {
+
+        $this->setData('showCategoryFilter', $this->showCategoryFilter);
+        if ($this->showCategoryFilter) {
+            $this->getCategoryFilter();
+        }
 
         // Translate the interval titles
         foreach($this->intervals as &$interval) {
@@ -50,6 +87,7 @@ class AnalyticsToolbarModule extends Gdn_Module {
 
     public function toString() {
         $this->getData();
+        include_once $this->fetchViewLocation('helper_functions', 'plugins/vanillaanalytics');
         return parent::toString();
     }
 }

@@ -92,13 +92,6 @@ var analyticsToolbar = {
     }
 };
 
-
-$(document).on('change', '#Form_cat01', function() {
-    var newCat01 = $(this).val();
-    analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat01.categoryID', newCat01, 'cat01']);
-});
-
-
 // Re-render the graphs with new intervals.
 $(document).on('click', '.js-analytics-interval:not(.disabled)', function() {
     // Already active..
@@ -195,6 +188,59 @@ $(document).ready(function() {
     analyticsToolbar.inited = true;
 
     analyticsToolbar.setWidgets('setRange', [defaultRange]);
+
+
+
+    $('.Section-Analytics').on('change', '.js-category-telescope', function() {
+
+        var $self = $(this);
+        var newCat = $self.val();
+        var depth = $self.data('depth');
+        var fetchChildren = true;
+        $self.prop('disabled', true);
+
+        while (newCat === '') {
+            // we've selected all. Value is parent's category ID.
+            newCat = $('.js-category-telescope[data-depth=' + (depth - 1) + ']').val();
+            fetchChildren = false;
+        }
+
+        if (newCat === undefined) {
+            // we're back to the root category, clear the category field to fetch all categories
+            newCat = '';
+        }
+
+        // Clear every dropdown below the selected filter
+        $self.parent().nextAll('.js-category-telescope-wrapper').remove();
+        analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat01.categoryID', newCat, 'cat01']);
+
+        if (!fetchChildren) {
+            $self.prop('disabled', false);
+            return;
+        }
+
+        var ajaxData = {
+            'DeliveryType': 'VIEW',
+            'DeliveryMethod': 'JSON',
+            'ParentCategoryID': newCat,
+            'ParentDepth': depth,
+            'TransientKey': gdn.definition('TransientKey')
+        };
+
+        $.ajax({
+            type: "POST",
+            data: ajaxData,
+            url: gdn.url('/analytics/getcategorydropdown'),
+            dataType: 'html',
+            error: function(XMLHttpRequest) {
+                console.error(XMLHttpRequest.responseText);
+            },
+            success: function(data) {
+                $self.parents('.js-filter-content').appendTrigger(data);
+            },
+            complete: function() {
+                $self.prop('disabled', false);
+            }
+        });
+    });
 });
-
-
