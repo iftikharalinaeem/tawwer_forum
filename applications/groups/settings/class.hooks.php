@@ -658,8 +658,10 @@ class GroupsHooks extends Gdn_Plugin {
      * @param array $args
      */
     public function vanillaSettingsController_render_before($sender, $args) {
-        if ($sender->data('Categories')) {
-            $this->setCategoryCanDelete($sender->Data['Categories']);
+        $categories = $sender->data('Categories');
+        if (is_array($categories)) {
+            $this->setCategoryCanDelete($categories);
+            $sender->setData('Categories', $categories);
         }
     }
 
