@@ -215,7 +215,7 @@ body.Conversations #Panel .BigButton {
   padding: 0;
 }
 .MeBox .Sprite16 {
-  background-image: url("http://cdn.vanillaforums.com/images/sprites-14-ffffff.png");
+  background-image: url("https://images.v-cdn.net/sprites-14-ffffff.png");
 }
 .MeBox .Open .FlyoutButton:after {
   border: 1px solid #999;
