@@ -209,8 +209,6 @@ $(document).ready(function() {
             newCat = '';
         }
 
-        console.log(newCat);
-
         // Clear every dropdown below the selected filter
         $self.parent().nextAll('.js-category-telescope-wrapper').remove();
         analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat01.categoryID', newCat, 'cat01']);
@@ -233,7 +231,7 @@ $(document).ready(function() {
             url: gdn.url('/analytics/getcategorydropdown'),
             dataType: 'html',
             error: function(XMLHttpRequest) {
-                console.log(XMLHttpRequest.responseText);
+                console.error(XMLHttpRequest.responseText);
             },
             success: function(data) {
                 $self.parents('.js-filter-content').appendTrigger(data);
