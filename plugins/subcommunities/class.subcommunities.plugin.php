@@ -258,7 +258,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         $parts = explode('/', trim(Gdn::request()->path(), '/'), 2);
         $root = $parts[0];
-        $isUtility = in_array($root, ['api', 'utility', 'sso', 'entry']);
+        $isUtility = SubcommunityModel::isReservedSlug($root);
         $path = val(1, $parts, '');
 
         // Look the root up in the mini sites.

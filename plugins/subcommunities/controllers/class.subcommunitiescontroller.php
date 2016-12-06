@@ -97,11 +97,11 @@ class SubcommunitiesController extends DashboardController {
                 $siteID = $this->siteModel->insert($postData);
             }
 
+            $this->form->setValidationResults($this->siteModel->Validation->results());
+
             if ($siteID) {
                 $site = $this->siteModel->getID($siteID);
                 $this->setData('Site', $site);
-            } else {
-                $this->form->setValidationResults($this->siteModel->Validation->results());
             }
 
             if ($this->form->errorCount() == 0) {

@@ -23,6 +23,9 @@ class SubcommunityModel extends Gdn_Model {
         'ru__PETR1708' => 'ru'
     ];
 
+    /** @var array Reserved slugs, not allowed for subcommunities. */
+    protected static $reservedSlugs = ['api', 'entry', 'sso', 'utility'];
+
     /// Methods ///
 
     public function __construct($name = '') {
@@ -183,6 +186,16 @@ class SubcommunityModel extends Gdn_Model {
     }
 
     /**
+     * Determine if slug is reserved for internal use.
+     *
+     * @param string $slug
+     * @return bool
+     */
+    public static function isReservedSlug($slug) {
+        return in_array(strtolower($slug), self::$reservedSlugs);
+    }
+
+    /**
      * @param mixed $current
      */
     public static function setCurrent($current) {
@@ -339,6 +352,22 @@ class SubcommunityModel extends Gdn_Model {
             ->endWhereGroup();
 
         return $this->getWhere(false, $orderFields, $orderDirection, $limit, $offset);
+    }
+
+    /**
+     * @param array $formPostValues
+     * @param bool $insert
+     * @return bool
+     */
+    public function validate($formPostValues, $insert = false) {
+        $this->defineSchema();
+
+        $slug = val('Folder', $formPostValues);
+        if (self::isReservedSlug($slug)) {
+            $this->Validation->addValidationResult('Folder', 'Folder is reserved for system use.');
+        }
+
+        return $this->Validation->validate($formPostValues, $insert);
     }
 }
 
