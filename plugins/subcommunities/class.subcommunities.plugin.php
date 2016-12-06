@@ -171,6 +171,17 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         ];
     }
 
+    /**
+     * Change the heading of the top-level categories for 'Category' to 'Subcommunity/Category'
+     *
+     * @param AnalyticsController $sender
+     * @param array $args
+     */
+    public function analyticsController_analyticsCategoryFilter_handler($sender, $args) {
+        $args['Heading'] = t('Subcommunity/Category');
+        $args['Attributes']['IncludeNull'] = t('All');
+    }
+
     public function base_getAppSettingsMenuItems_handler($sender) {
         /* @var SideMenuModule */
         $menu = $sender->EventArguments['SideMenu'];
