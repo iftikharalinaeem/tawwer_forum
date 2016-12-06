@@ -399,10 +399,14 @@ AnalyticsWidget.popin = function(element, url, parameters) {
         url: url,
         data: data,
         success: function(response) {
-            $elem.html($.parseHTML(response + "")).trigger("contentLoad");
+            $elem.html($.parseHTML(response + "")).trigger('contentLoad');
+            $elem.parent().show();
+        },
+        error: function() {
+            $elem.parent().hide()
         },
         complete: function() {
-            $elem.parent().removeClass("data-loading");
+            $elem.parent().removeClass('data-loading');
         }
     });
 };

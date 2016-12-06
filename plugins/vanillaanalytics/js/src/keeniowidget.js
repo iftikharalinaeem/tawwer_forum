@@ -664,10 +664,15 @@ KeenIOWidget.prototype.runQuery = function(callback) {
         if (error === null) {
             var result = widget.getQueryResult(analyses, queries);
 
-            widget.setData(result);
-            if (typeof callback === 'function') {
-                var boundCallback = callback.bind(widget);
-                boundCallback();
+            if (result !== null) {
+                $(widget.getDataviz().el()).parent().show();
+                widget.setData(result);
+                if (typeof callback === 'function') {
+                    var boundCallback = callback.bind(widget);
+                    boundCallback();
+                }
+            } else {
+                $(widget.getDataviz().el()).parent().hide();
             }
         }
     });
@@ -676,11 +681,11 @@ KeenIOWidget.prototype.runQuery = function(callback) {
 /**
  * @param {object} analyses
  * @param {Array|object} query
- * @return Array
+ * @return Array|null
  */
 KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
     var callback = this.getCallback();
-    var queryResult = [];
+    var queryResult = null;
 
     if (typeof analyses !== 'undefined' && typeof query !== 'undefined') {
 
@@ -709,6 +714,51 @@ KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
             analyses = this.analysesProcessor.process(analyses);
         }
 
+        function isAnalysisEmptyish(analyse) {
+            var emptyish = true,
+                structureFound;
+            if (Array.isArray(analyse.result)) {
+                $.each(analyse.result, function() {
+                    structureFound = false;
+                    try {
+                        if (typeof this.result !== 'undefined') {
+                            if (this.result !== 0) {
+                                emptyish = false;
+                            }
+                            structureFound = true;
+                        } else if (typeof this.value !== 'undefined') {
+                            if (Array.isArray(this.value)) {
+                                $.each(this.value, function() {
+                                    if (this.result !== 0) {
+                                        emptyish = false;
+                                    }
+                                    return emptyish; // Break the loop if emptyish = false;
+                                });
+                                structureFound = true;
+                            } else {
+                                if (this.value !== 0) {
+                                    emptyish = false;
+                                }
+                                structureFound = true;
+                            }
+                        }
+                    } catch(e) {}
+
+                    if (!structureFound) {
+                        console.debug(analyse)
+                        emptyish = true;
+                        throw 'Unknown analyse structure';
+                    }
+                    return emptyish; // Break the loop if emptyish = false;
+                });
+            } else {
+                // Metric! Display all metrics.
+                emptyish = false;
+            }
+
+            return emptyish;
+        }
+
         var analyse = null;
         if (Array.isArray(analyses) && !!analyses.length) { // Multiple analyses
             if (analyses.length > 1) {
@@ -719,11 +769,13 @@ KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
             analyse = analyses;
         }
 
-        queryResult = analyse.result;
-    }
+        if (!isAnalysisEmptyish(analyse)) {
+            queryResult = analyse.result;
+        }
 
-    if (callback) {
-        queryResult = callback(queryResult);
+        if (callback) {
+            queryResult = callback(queryResult);
+        }
     }
 
     return queryResult;
