@@ -572,15 +572,20 @@ KeenIOWidget.prototype.renderBody = function() {
     var element = dataviz.el();
 
     if (typeof element === 'object' && element instanceof HTMLElement) {
-        $(element).parent().removeClass("data-loading");
+        $(element).parent().removeClass('data-loading');
 
         switch (this.getType()) {
             case 'metric':
+                if (!this.getData()) {
+                    this.setData('N/A');
+                }
                 element.innerHTML = this.getMetricMarkup();
                 $(element).trigger('contentLoad');
                 break;
             default:
-                dataviz.parseRawData({result: this.getData()});
+                if (this.getData()) {
+                    dataviz.parseRawData({result: this.getData()});
+                }
 
                 var labels = dataviz.labels();
 
@@ -664,7 +669,7 @@ KeenIOWidget.prototype.runQuery = function(callback) {
         if (error === null) {
             var result = widget.getQueryResult(analyses, queries);
 
-            if (result !== null) {
+            if (result !== null || window.analyticsDashboard.isPersonal()) {
                 $(widget.getDataviz().el()).parent().show();
                 widget.setData(result);
                 if (typeof callback === 'function') {
