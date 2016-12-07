@@ -6,7 +6,7 @@
 $PluginInfo['categoryroles'] = [
     'Name' => 'Category Roles',
     'Description' => 'Grant user permissions from select roles, per-category.',
-    'Version' => '1.0.0',
+    'Version' => '1.0',
     'RequiredApplications' => ['Vanilla' => '2.3'],
     'Author' => 'Ryan Perry',
     'AuthorEmail' => 'ryan.p@vanillaforums.com',
@@ -87,7 +87,7 @@ class CategoryRolesPlugin extends Gdn_Plugin {
 
         // Incoming permissions have to be an object instance.  Otherwise, log the anomaly and bail.
         if (!is_a($permissions, 'Vanilla\Permissions')) {
-            Logger::notice('$permissions not an instance of Vanilla\Permissions');
+            Logger::error('$permissions not an instance of Vanilla\Permissions');
             return;
         }
 
