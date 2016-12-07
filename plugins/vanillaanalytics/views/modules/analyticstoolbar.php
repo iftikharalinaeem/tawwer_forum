@@ -33,17 +33,19 @@ endif;
         <div class="filter-date">
             <?php echo $form->textBox('dates', ['class' => 'js-date-range date-range form-control']); ?>
         </div>
-        <div class="filter-category">
-            <?php
-            $attr = [
-                'id' => 'categoryFilterId',
-                'class' => 'btn btn-icon-border js-drop',
-                'data-content-id' => 'categoryFilterContent'
-            ];
+        <?php if ($showCategoryFilter) : ?>
+            <div class="filter-category">
+                <?php
+                $attr = [
+                    'id' => 'categoryFilterId',
+                    'class' => 'btn btn-icon-border js-drop',
+                    'data-content-id' => 'categoryFilterContent'
+                ];
 
-            echo wrap(dashboardSymbol('filter'), 'div', $attr);
-            ?>
-        </div>
+                echo wrap(dashboardSymbol('filter'), 'div', $attr);
+                ?>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 <?php if ($showCategoryFilter) : ?>
