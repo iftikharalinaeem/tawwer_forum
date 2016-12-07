@@ -708,73 +708,29 @@ KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
             }
 
             analyses.title = title;
+            analyses = [analyses];
         }
 
         if (this.analysesProcessor) {
             analyses = this.analysesProcessor.process(analyses);
         }
 
-        function isAnalysisEmptyish(analyse) {
-            var emptyish = true,
-                structureFound;
-            if (Array.isArray(analyse.result)) {
-                $.each(analyse.result, function() {
-                    structureFound = false;
-                    try {
-                        if (typeof this.result !== 'undefined') {
-                            if (this.result !== 0) {
-                                emptyish = false;
-                            }
-                            structureFound = true;
-                        } else if (typeof this.value !== 'undefined') {
-                            if (Array.isArray(this.value)) {
-                                $.each(this.value, function() {
-                                    if (this.result !== 0) {
-                                        emptyish = false;
-                                    }
-                                    return emptyish; // Break the loop if emptyish = false;
-                                });
-                                structureFound = true;
-                            } else {
-                                if (this.value !== 0) {
-                                    emptyish = false;
-                                }
-                                structureFound = true;
-                            }
-                        }
-                    } catch(e) {}
-
-                    if (!structureFound) {
-                        console.debug(analyse)
-                        emptyish = true;
-                        throw 'Unknown analyse structure';
-                    }
-                    return emptyish; // Break the loop if emptyish = false;
-                });
-            } else {
-                // Metric! Display all metrics.
-                emptyish = false;
+        if (analyses !== false) {
+            var analyse = null;
+            if (Array.isArray(analyses) && !!analyses.length) { // Multiple analyses
+                if (analyses.length > 1) {
+                    throw 'Multiple analyses detected. Use an AnalysesProcessor to merge them';
+                }
+                analyse = analyses[0];
+            } else if (typeof analyses === 'object') {
+                analyse = analyses;
             }
 
-            return emptyish;
-        }
-
-        var analyse = null;
-        if (Array.isArray(analyses) && !!analyses.length) { // Multiple analyses
-            if (analyses.length > 1) {
-                throw 'Multiple analyses detected. Use an AnalysesProcessor to merge them';
-            }
-            analyse = analyses[0];
-        } else if (typeof analyses === 'object') {
-            analyse = analyses;
-        }
-
-        if (!isAnalysisEmptyish(analyse)) {
             queryResult = analyse.result;
-        }
 
-        if (callback) {
-            queryResult = callback(queryResult);
+            if (callback) {
+                queryResult = callback(queryResult);
+            }
         }
     }
 

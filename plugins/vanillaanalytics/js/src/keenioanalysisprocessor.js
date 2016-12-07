@@ -8,23 +8,32 @@ KeenIOAnalysesProcessor = function(config) {
 
     /**
      *
-     * @type {null|object}
+     * @type {object}
      */
-    var processInstructions = null;
+    this.processInstructions = {};
 
     /**
      *
      * @type {null|string}
      */
-    var finalAnalysis = null;
+    this.finalAnalysis = null;
 
     /**
-     * Process the analyses using the provided instructions
+     * Process the analyses using the provided instructions.
+     *
+     * Validators: You can apply validators on the processed analysis.
+     *      As soon as a validator fails the whole process will return false.
      *
      * "instructions": {
      *     "new-analysis-name": {
      *         "analyses": [0, 1], // Take analyses 0 and 1
-     *         "processor": "addResults" // Give them to addResults
+     *         "processor": "addResults", // Give them to addResults
+     *         "validators": {
+     *             "validatorName": [
+     *                 ['arg1', 'arg2'], // Call "validatorName" with 'arg1' and 'arg2' as its arguments
+     *                 ['arg1v2', 'arg2v2']  // Call "validatorName" with 'arg1v2' and 'arg2v2' as its arguments
+     *             ]
+     *         }
      *     },
      *     "new-analysis-name2": {
      *         "analyses": ["new-analysis-name", 2], // Take processed "new-analysis-name" and raw analysis 2
@@ -39,14 +48,15 @@ KeenIOAnalysesProcessor = function(config) {
         var that = this;
         var processedAnalyses = {};
 
-        $.each(this.processInstructions, function(name, properties) {
+        var success = true;
+        $.each(this.processInstructions, function(queryName, properties) {
             var analysesToProcess = [];
 
             $.each(properties.analyses, function(index, analysisIdentifier) {
                 // Raw analysis index number
                 if (Number.isInteger(analysisIdentifier)) {
                     analysesToProcess.push(analyses[analysisIdentifier]);
-                // Processed query name
+                    // Processed query name
                 } else {
                     if (typeof processedAnalyses[analysisIdentifier] === 'undefined') {
                         throw 'Invalid processed query name';
@@ -55,13 +65,32 @@ KeenIOAnalysesProcessor = function(config) {
                 }
             });
 
-            processedAnalyses[name] = that[properties.processor](analysesToProcess);
+            processedAnalyses[queryName] = that[properties.processor](analysesToProcess);
             if (typeof properties.title !== 'undefined') {
-                processedAnalyses[name]['title'] = properties.title;
+                processedAnalyses[queryName]['title'] = properties.title;
             }
+
+            if (typeof properties.validators !== 'undefined') {
+                $.each(properties.validators, function(callbackName, callbacksArgs) {
+                    if (typeof that[callbackName] !== 'function') {
+                        throw 'Invalid validation callback "'+callbackName+'"';
+                    }
+                    $.each(callbacksArgs, function(i, args) {
+                        var validationArgs = [processedAnalyses[queryName]];
+                        if (Array.isArray(args)) {
+                            validationArgs = validationArgs.concat(args);
+                        }
+                        success = that[callbackName].apply(that, validationArgs);
+                        return success;
+                    });
+
+                    return success;
+                });
+            }
+            return success;
         });
 
-        return processedAnalyses[this.finalAnalysis];
+        return success ? processedAnalyses[this.finalAnalysis] : false;
     };
 
     this.loadConfig(config);
@@ -86,6 +115,89 @@ KeenIOAnalysesProcessor.prototype.loadConfig = function(config) {
 
     this.processInstructions = config.instructions;
     this.finalAnalysis = config.finalAnalysis;
+};
+
+/**
+ * Walk through an analysis object and call "Callback" with the current property's name and value.
+ * To be used mostly internally by the validator functions.
+ *
+ * @param analysis
+ * @param callback
+ */
+KeenIOAnalysesProcessor.prototype.walkAnalysis = function(analysis, callback) {
+    var that = this;
+
+    // Self executing function
+    ~function walk(propertyName, propertyValue, callback) {
+        var continueRecursion = true;
+        if (propertyName !== null) {
+            continueRecursion = callback.call(that, propertyName, propertyValue);
+        }
+        if (!!continueRecursion && Array.isArray(propertyValue) || $.isPlainObject(propertyValue)) {
+            $.each(propertyValue, function(property, value) {
+                continueRecursion = walk(property, value, callback);
+                return continueRecursion !== false;
+            });
+        }
+        return continueRecursion !== false;
+    }(null, (analysis.result || analysis), callback);
+}
+
+/**
+ * Check the result(s) property of an analysis to make sure that we have something else than 0.
+ *
+ * @param analysis
+ * @returns {boolean}
+ */
+KeenIOAnalysesProcessor.prototype.validateResultsNotEmptyish = function(analysis) {
+    var emptyish = true;
+
+    function checkResultEmptynessCallback(propertyName, propertyValue) {
+        if (propertyName !== 'result') {
+            return;
+        }
+
+        if (typeof propertyValue === 'number' && propertyValue !== 0) {
+            emptyish = false;
+        } else {
+            throw 'Unhandled case!';
+        }
+        return emptyish;
+    }
+    this.walkAnalysis(analysis, checkResultEmptynessCallback);
+
+    return !emptyish;
+}
+
+/**
+ * Check that an analysis contains propertyName with propertyValue.
+ *
+ * @param analysis
+ * @param propertyName
+ * @param propertyValue
+ * @returns {boolean}
+ */
+KeenIOAnalysesProcessor.prototype.validatePropertyValueExisting = function(analysis, propertyName, propertyValue) {
+    var existing = false;
+    function checkProperyValueExisting(propName, propValue) {
+        if (propName === propertyName && propValue === propertyValue) {
+            existing = true;
+        }
+        return !existing;
+    }
+    this.walkAnalysis(analysis, checkProperyValueExisting);
+
+    return existing;
+}
+
+/**
+ * Do nothing and return the analyses
+ *
+ * @param {array} analyses
+ * @return {object}
+ */
+KeenIOAnalysesProcessor.prototype.noop = function(analyses) {
+    return analyses;
 };
 
 /**
