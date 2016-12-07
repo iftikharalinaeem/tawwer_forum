@@ -200,7 +200,7 @@ class SubcommunityModel extends Gdn_Model {
         $locale = val('Locale', $row);
         $canonicalLocale = Gdn_Locale::canonicalize($locale);
         if (class_exists('Locale')) {
-            $displayLocale = val($canonicalLocale, self::localeNameTranslations, $canonicalLocale);
+            $displayLocale = val($canonicalLocale, self::$localeNameTranslations, $canonicalLocale);
             $row['LocaleDisplayName'] = static::mb_ucfirst(Locale::getDisplayName($displayLocale, $canonicalLocale));
         } else {
             $row['LocaleDisplayName'] = $row['Name'];
