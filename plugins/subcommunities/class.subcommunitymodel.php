@@ -19,7 +19,7 @@ class SubcommunityModel extends Gdn_Model {
 
     protected static $current;
 
-    protected $localeNameTranslations = [
+    protected static $localeNameTranslations = [
         'ru__PETR1708' => 'ru'
     ];
 
@@ -154,6 +154,7 @@ class SubcommunityModel extends Gdn_Model {
         $row = Gdn::sql()->getWhere('Subcommunity', ['IsDefault' => 1], '', '', 1)->resultArray();
         if (is_array($row) && count($row) === 1) {
             $default = current($row);
+            self::calculateRow($default);
         }
 
         return $default;
@@ -170,6 +171,7 @@ class SubcommunityModel extends Gdn_Model {
         $row = Gdn::sql()->getWhere('Subcommunity', ['Folder' => $folder], '', '', 1)->resultArray();
         if (is_array($row) && count($row) === 1) {
             $site = current($row);
+            self::calculateRow($site);
         }
 
         return $site;
@@ -189,11 +191,16 @@ class SubcommunityModel extends Gdn_Model {
         self::$current = $current;
     }
 
-    public function calculateRow(&$row) {
+    /**
+     * Unpack and calculate data for a single subcommunity record.
+     *
+     * @param array $row
+     */
+    public static function calculateRow(&$row) {
         $locale = val('Locale', $row);
         $canonicalLocale = Gdn_Locale::canonicalize($locale);
         if (class_exists('Locale')) {
-            $displayLocale = val($canonicalLocale, $this->localeNameTranslations, $canonicalLocale);
+            $displayLocale = val($canonicalLocale, self::localeNameTranslations, $canonicalLocale);
             $row['LocaleDisplayName'] = static::mb_ucfirst(Locale::getDisplayName($displayLocale, $canonicalLocale));
         } else {
             $row['LocaleDisplayName'] = $row['Name'];
@@ -242,7 +249,7 @@ class SubcommunityModel extends Gdn_Model {
     public function getID($id, $datasetType = null, $Options = null) {
         $row = parent::getID($id, DATASET_TYPE_ARRAY);
         if ($row) {
-            $this->calculateRow($row);
+            self::calculateRow($row);
         }
         return $row;
     }
