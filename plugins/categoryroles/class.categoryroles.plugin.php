@@ -57,7 +57,7 @@ class CategoryRolesPlugin extends Gdn_Plugin {
     public function structure() {
         Gdn::structure()
             ->table('CategoryRole')
-            ->column('UserID', 'int', false, ['index', 'primary'])
+            ->column('UserID', 'int', false, 'primary')
             ->column('RoleID', 'int', false, 'primary')
             ->column('CategoryID', 'int', false, 'primary')
             ->set();
