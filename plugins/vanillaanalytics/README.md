@@ -12,6 +12,17 @@ Facilitate the capture of user access and usage data, interpret it and display t
 4. Rationing widgets by cloud plan level.
 5. Toolbar for drilling down by date range, interval (monthly/daily/hourly), and meta data (e.g. category or role).
 
+# Glossary
+
+1. **Page view**: Opening a single page / one click on a site.
+1. **Visit**: Multiple page views and actions between periods of inactivity.
+1. **Post**: A discussion or comment.
+1. **User**: An individual signed in to their forum account.
+1. **Active User**: A user who has visited & viewed posts (within the timeframe).
+1. **Participant**: A user who has made a post (within the timeframe).
+1. **Role Type**: Some roles are assigned default role types, including: Administrator, Moderator, Default, and others.
+
+
 # Setup
 
 You'll need to make sure your forum configuration has some values set before you enable the plug-in.  If you don't have them, you won't be able to track the data.
@@ -61,7 +72,7 @@ There are 3 types of widgets:
     - Average amount of time it took for discussions to have their first comment.
 - Leaderboards
   - Members by Accumulated Reputation *(top-member-by-accumulated-reputation)*
-    - Members ordered by the highest sum of reputation point accumulated.
+    - Users ordered by the highest sum of points accumulated.
   - Discussions with Most Comments *(top-commented-discussions)*
     - Discussions ordered by highest number of comments made in it.
   - Discussions with Most Positive Reactions *(top-positive-discussions)*
@@ -70,15 +81,15 @@ There are 3 types of widgets:
     - Discussions ordered by highest sum of negative reactions given to them.
 - Graphs
   - Participation Rate *(participation-rate)*
-    - Number of distinct members that viewed a page on the forum vs the number of visits by distinct users.
+    - Number of active (visiting) users compared to participating (posting) users. 
   - Sentiment Ratio *(sentiment-ratio)*
-    - Number of posts having a positive reaction vs the number of posts having a bad reaction.
+    - Number of posts having a positive reaction vs the number of posts having a negative reaction.
   - Visits per Active User *(visits-per-active-user)*
-    - See "[visists](#visits)" divided by "[active-users](#active-users)".
+    - See "[visists](#visits)" divided by [active-users](#active-users).
   - Average Posts per Active User *(average-posts-per-active-user)*
-    - Average number of created posts grouped by "[active-users](#active-users)".
+    - Average number of new posts grouped by [active-users](#active-users).
   - Average Comments per Discussion *(average-comments-per-discussion)*
-    - Average number of created comments grouped by "[discussions](#discussions)".
+    - Average number of new comments grouped by [discussions](#discussions).
 
 ## Posting
 
@@ -88,12 +99,12 @@ There are 3 types of widgets:
   - Comments *(total-comments)*
     - Number of comments created.
   - Contributors *(total-contributors)*
-    - Number of distinct members who created a post.
+    - Number of distinct users who created a post.
 - Leaderboards
   - Users with Most Posts *(top-posters)*
-    - Members ordered by the highest number of post created.
+    - Users ordered by the highest number of post created.
   - Users with Most Discussions *(top-discussion-starters)*
-    - Members ordered by the highest number of discussions created.
+    - Users ordered by the highest number of discussions created.
 - Graphs
   - Discussions *(<a name="discussions">discussions</a>)*
     - Number of discussions created.
@@ -108,11 +119,11 @@ There are 3 types of widgets:
   - Posts by Role Type *(posts-by-role-type)*
     - Number of created posts grouped by vanilla's predefined role types.
   - Contributors *(contributors)*
-    - Number of distinct members having created a post.
+    - Number of distinct users having created a post.
   - Contributors by Category *(contributors-by-category)*
-    - Number of distinct members, having created a post, grouped by categories.
+    - Number of distinct users, having created a post, grouped by categories.
   - Contributors by Role Type *(contributors-by-role-type)*
-    - Number of distinct members, having created a post, grouped by vanilla's predefined role types.
+    - Number of distinct users, having created a post, grouped by vanilla's predefined role types.
 
 ## Q&A
 
@@ -131,9 +142,9 @@ There are 3 types of widgets:
   - Questions with Most Views *(top-viewed-qna-discussions)*
     - Questions ordered by the highest number of accumulated views.
   - Users with Most Answers *(top-question-answerers)*
-    - Members ordered by the highest number of answers created.
+    - Users ordered by the highest number of answers created.
   - Users with Most Accepted Answers *(top-best-answerers)*
-    - Members ordered by the highest number of answers created and then accepted as the best answer.
+    - Users ordered by the highest number of answers created and then accepted as the best answer.
 - Graphs
   - Questions Asked *(questions-asked)*
     - Number of questions created.
@@ -156,7 +167,7 @@ There are 3 types of widgets:
     - Discussions ordered by the highest number of accumulated views.
 - Graphs
   - Active Users *(<a name="active-users">active-users</a>)*
-    - Number of distinct members that viewed a page on the forum.
+    - Number of distinct users that viewed a page on the forum.
   - Visits *(<a name="visits">visits</a>)*
     - Number of distinct users that viewed a page on the forum.
   - Unique Visits by Role Type *(visits-by-role-type)*
