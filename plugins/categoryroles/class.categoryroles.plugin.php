@@ -102,6 +102,17 @@ class CategoryRolesPlugin extends Gdn_Plugin {
 
         // Iterate through our per-category role permissions.
         foreach ($categoryRoles as $row) {
+            // Ideally, the category ID and its PermissionCategoryID are the same.  Trigger a notice if they aren't.
+            $categoryID = $row['CategoryID'];
+            $category = CategoryModel::categories($categoryID);
+            $permissionCategoryID = val('PermissionCategoryID', $category);
+            if ($permissionCategoryID !== $categoryID) {
+                trigger_error(
+                    "PermissionCategoryID ({$permissionCategoryID}) does not match CategoryID ({$categoryID}).",
+                    E_USER_NOTICE
+                );
+            }
+
             // Fetch the default (JunctionID = -1) permissions for the current role.
             $categoryPermissions = $this->getDefaultCategoryPermissions($row['RoleID']);
 
@@ -111,7 +122,7 @@ class CategoryRolesPlugin extends Gdn_Plugin {
             }
 
             // Revise the permission row to indicate the target category as the junction ID.
-            $categoryPermissions['JunctionID'] = $row['CategoryID'];
+            $categoryPermissions['JunctionID'] = $categoryID;
 
             // We can easily merge Permission objects.  New up an instance and load the current permissions.
             $newPermissions = new Vanilla\Permissions();

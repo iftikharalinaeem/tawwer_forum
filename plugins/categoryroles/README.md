@@ -3,4 +3,6 @@ This plug-in allows users to be granted the default category permissions of a ro
 
 These additional permissions are assigned per-user and per-category.
 
+_Important: This plug-in currently only works for categories where the row's PermissionCategoryID is its CategoryID.  Categories with a different PermissionCategoryID may not have the custom application of permissions._
+
 _Please Note: Only a role's default category permissions are granted.  __A role's global and per-category permissions will not be granted by this plug-in.___
