@@ -624,7 +624,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
      *
      * Postback URL:
      *
-     * http://localhost/api/v1/mod.json/cleanspeakPostback/?access_token=d7db8b7f0034c13228e4761bf1bfd434
+     * http://localhost/api/v1/mod/cleanspeakPostback.json?access_token=d7db8b7f0034c13228e4761bf1bfd434
      *
      *    {
      *     "type" : "contentApproval",
