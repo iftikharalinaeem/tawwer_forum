@@ -669,12 +669,13 @@ KeenIOWidget.prototype.runQuery = function(callback) {
         if (error === null) {
             var result = widget.getQueryResult(analyses, queries);
 
+            // We want to display widgets no matter what in the personnal dashboard.
+            // That we we can unpin them.
             if (result !== null || window.analyticsDashboard.isPersonal()) {
                 $(widget.getDataviz().el()).parent().show();
                 widget.setData(result);
                 if (typeof callback === 'function') {
-                    var boundCallback = callback.bind(widget);
-                    boundCallback();
+                    callback.call(widget);
                 }
             } else {
                 $(widget.getDataviz().el()).parent().hide();

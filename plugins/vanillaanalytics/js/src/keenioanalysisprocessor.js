@@ -56,7 +56,7 @@ KeenIOAnalysesProcessor = function(config) {
                 // Raw analysis index number
                 if (Number.isInteger(analysisIdentifier)) {
                     analysesToProcess.push(analyses[analysisIdentifier]);
-                    // Processed query name
+                // Processed query name
                 } else {
                     if (typeof processedAnalyses[analysisIdentifier] === 'undefined') {
                         throw 'Invalid processed query name';
@@ -81,6 +81,7 @@ KeenIOAnalysesProcessor = function(config) {
                             validationArgs = validationArgs.concat(args);
                         }
                         success = that[callbackName].apply(that, validationArgs);
+                        // Break the loop as soon as there is a failure.
                         return success;
                     });
 
@@ -129,11 +130,13 @@ KeenIOAnalysesProcessor.prototype.walkAnalysis = function(analysis, callback) {
 
     // Self executing function
     ~function walk(propertyName, propertyValue, callback) {
+        // We will stop the execution as soon as the callback return false.
         var continueRecursion = true;
         if (propertyName !== null) {
             continueRecursion = callback.call(that, propertyName, propertyValue);
         }
-        if (!!continueRecursion && Array.isArray(propertyValue) || $.isPlainObject(propertyValue)) {
+        // Make sure that the value is something that we can iterate on.
+        if (continueRecursion !== false && Array.isArray(propertyValue) || $.isPlainObject(propertyValue)) {
             $.each(propertyValue, function(property, value) {
                 continueRecursion = walk(property, value, callback);
                 return continueRecursion !== false;
@@ -152,7 +155,7 @@ KeenIOAnalysesProcessor.prototype.walkAnalysis = function(analysis, callback) {
 KeenIOAnalysesProcessor.prototype.validateResultsNotEmptyish = function(analysis) {
     var emptyish = true;
 
-    function checkResultEmptynessCallback(propertyName, propertyValue) {
+    this.walkAnalysis(analysis, function/*checkResultEmptyness*/(propertyName, propertyValue) {
         if (propertyName !== 'result') {
             return;
         }
@@ -163,8 +166,7 @@ KeenIOAnalysesProcessor.prototype.validateResultsNotEmptyish = function(analysis
             throw 'Unhandled case!';
         }
         return emptyish;
-    }
-    this.walkAnalysis(analysis, checkResultEmptynessCallback);
+    });
 
     return !emptyish;
 }
@@ -179,13 +181,13 @@ KeenIOAnalysesProcessor.prototype.validateResultsNotEmptyish = function(analysis
  */
 KeenIOAnalysesProcessor.prototype.validatePropertyValueExisting = function(analysis, propertyName, propertyValue) {
     var existing = false;
-    function checkProperyValueExisting(propName, propValue) {
+
+    this.walkAnalysis(analysis, function/*checkProperyValueExisting*/(propName, propValue) {
         if (propName === propertyName && propValue === propertyValue) {
             existing = true;
         }
         return !existing;
-    }
-    this.walkAnalysis(analysis, checkProperyValueExisting);
+    });
 
     return existing;
 }
