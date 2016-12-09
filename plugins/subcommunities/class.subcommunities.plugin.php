@@ -253,12 +253,14 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param Gdn_Dispatcher $sender
      */
     public function gdn_dispatcher_appStartup_handler($sender) {
-
-        $this->api = $this->isAPI($sender);
-
         $parts = explode('/', trim(Gdn::request()->path(), '/'), 2);
         $root = $parts[0];
-        $isUtility = SubcommunityModel::isReservedSlug($root);
+
+        if (SubcommunityModel::isReservedSlug($root)) {
+            return;
+        }
+
+        $this->api = $this->isAPI($sender);
         $path = val(1, $parts, '');
 
         // Look the root up in the mini sites.
@@ -266,9 +268,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $defaultSite = null;
 
         if (!$site) {
-            if ($isUtility) {
-                return;
-            }
             $defaultSite = SubcommunityModel::getDefaultSite();
             if (!$defaultSite) {
                 return;
@@ -290,7 +289,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             Gdn::request()->webRoot(trim("$webroot/$root", '/'));
 
             $this->initializeSite($site);
-        } elseif (!$isUtility && !$this->api) {
+        } elseif (!$this->api) {
             if ($defaultSite) {
                 $url = Gdn::request()->assetRoot().'/'.$defaultSite['Folder'].rtrim('/'.Gdn::request()->path(), '/');
                 $get = Gdn::request()->get();
