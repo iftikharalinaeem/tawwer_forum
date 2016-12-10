@@ -439,6 +439,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         if ($dsearch) {
             $sql = $vanillaSearch->discussionSql($searchModel, false);
+            $sql->select('Type');
 
             if ($terms) {
                 $sql->beginWhereGroup();
@@ -462,6 +463,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         if ($csearch) {
             $sql = $vanillaSearch->commentSql($searchModel, false);
+            $sql->select('Type as null');
 
             if ($terms) {
                 foreach ((array)$cfields as $field) {
