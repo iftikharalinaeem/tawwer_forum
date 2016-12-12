@@ -668,7 +668,7 @@ class GroupsHooks extends Gdn_Plugin {
     /**
      * Format groups and events logs
      *
-     * @param Gdn_PluginManager $sender
+     * @param LogModel $sender
      * @param array $args
      */
     public function logModel_formatContent_handler($sender, $args) {
@@ -678,18 +678,17 @@ class GroupsHooks extends Gdn_Plugin {
         }
 
         $data = $log['Data'];
-        $logModel = new LogModel();
         switch ($log['RecordType']) {
             case 'Group':
                 $args['Result'] =
-                    '<b>'.$logModel->formatKey('Name', $data).'</b><br />'.
-                    $logModel->formatKey('Description', $data);
+                    '<b>'.$sender->formatKey('Name', $data).'</b><br />'.
+                    $sender->formatKey('Description', $data);
                 break;
             case 'Event':
                 $args['Result'] =
-                    '<b>'.$logModel->formatKey('Name', $data).'</b><br />'.
-                    $logModel->formatKey('Body', $data).'<br />'.
-                    t('Location').': '.$logModel->formatKey('Location', $data);
+                    '<b>'.$sender->formatKey('Name', $data).'</b><br />'.
+                    $sender->formatKey('Body', $data).'<br />'.
+                    t('Location').': '.$sender->formatKey('Location', $data);
                 break;
         }
     }
