@@ -838,14 +838,37 @@ class KeenIOTracker implements TrackerInterface {
             ])
             ->setTargetProperty('reaction.recordID');
 
+        $validationReactedPostsQuery = new KeenIOQuery();
+        $validationReactedPostsQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
+            ->setTitle(t('Reacted Discussions'))
+            ->setEventCollection('reaction')
+            ->setGroupBy('reaction.reactionClass')
+            ->addFilter([
+                'operator' => 'in',
+                'property_name' => 'reaction.reactionClass',
+                'property_value' => ['Positive', 'Negative']
+            ])
+            ->setTargetProperty('reaction.reactionClass');
+
         $this->widgets['posts-positivity-rate']['query'] = [
             $reactedPositiveDiscussionsQuery,
             $reactedPositiveCommentsQuery,
             $reactedDiscussionsQuery,
             $reactedCommentsQuery,
+            $validationReactedPostsQuery,
         ];
         $this->widgets['posts-positivity-rate']['queryProcessor'] = [
             'instructions' => [
+                'validatedReactedPosts' => [
+                    'analyses' => [4],
+                    'processor' => 'noop',
+                    'validators' => [
+                        'validatePropertyValueExisting' => [
+                            ['reaction.reactionClass', 'Positive'],
+                            ['reaction.reactionClass', 'Negative'],
+                        ],
+                    ],
+                ],
                 'reacted-positive-posts' => [
                     'analyses' => [0, 1],
                     'processor' => 'addResults'
@@ -893,7 +916,7 @@ class KeenIOTracker implements TrackerInterface {
                     'processor' => 'mergeResults'
                 ],
             ],
-            'finalAnalysis' => 'merged-participation-rate'
+            'finalAnalysis' => 'merged-participation-rate',
         ];
 
         /**
@@ -911,6 +934,21 @@ class KeenIOTracker implements TrackerInterface {
             ->setInterval('daily');
 
         $this->widgets['sentiment-ratio']['query'] = $sentimentRatioQuery;
+        $this->widgets['sentiment-ratio']['queryProcessor'] = [
+            'instructions' => [
+                'validated-sentiment-ratio' => [
+                    'analyses' => [0],
+                    'processor' => 'noop',
+                    'validators' => [
+                        'validatePropertyValueExisting' => [
+                            ['reaction.reactionClass', 'Positive'],
+                            ['reaction.reactionClass', 'Negative'],
+                        ],
+                    ],
+                ],
+            ],
+            'finalAnalysis' => 'validated-sentiment-ratio',
+        ];
 
         /**
          * Timeframe Charts

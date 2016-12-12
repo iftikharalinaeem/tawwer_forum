@@ -572,15 +572,20 @@ KeenIOWidget.prototype.renderBody = function() {
     var element = dataviz.el();
 
     if (typeof element === 'object' && element instanceof HTMLElement) {
-        $(element).parent().removeClass("data-loading");
+        $(element).parent().removeClass('data-loading');
 
         switch (this.getType()) {
             case 'metric':
+                if (!this.getData()) {
+                    this.setData('N/A');
+                }
                 element.innerHTML = this.getMetricMarkup();
                 $(element).trigger('contentLoad');
                 break;
             default:
-                dataviz.parseRawData({result: this.getData()});
+                if (this.getData()) {
+                    dataviz.parseRawData({result: this.getData()});
+                }
 
                 var labels = dataviz.labels();
 
@@ -664,10 +669,16 @@ KeenIOWidget.prototype.runQuery = function(callback) {
         if (error === null) {
             var result = widget.getQueryResult(analyses, queries);
 
-            widget.setData(result);
-            if (typeof callback === 'function') {
-                var boundCallback = callback.bind(widget);
-                boundCallback();
+            // We want to display widgets no matter what in the personnal dashboard.
+            // That way we can un-pin them!
+            if (result !== null || window.analyticsDashboard.isPersonal()) {
+                $(widget.getDataviz().el()).parent().show();
+                widget.setData(result);
+                if (typeof callback === 'function') {
+                    callback.call(widget);
+                }
+            } else {
+                $(widget.getDataviz().el()).parent().hide();
             }
         }
     });
@@ -676,11 +687,11 @@ KeenIOWidget.prototype.runQuery = function(callback) {
 /**
  * @param {object} analyses
  * @param {Array|object} query
- * @return Array
+ * @return Array|null
  */
 KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
     var callback = this.getCallback();
-    var queryResult = [];
+    var queryResult = null;
 
     if (typeof analyses !== 'undefined' && typeof query !== 'undefined') {
 
@@ -703,27 +714,30 @@ KeenIOWidget.prototype.getQueryResult = function(analyses, query) {
             }
 
             analyses.title = title;
+            analyses = [analyses];
         }
 
         if (this.analysesProcessor) {
             analyses = this.analysesProcessor.process(analyses);
         }
 
-        var analyse = null;
-        if (Array.isArray(analyses) && !!analyses.length) { // Multiple analyses
-            if (analyses.length > 1) {
-                throw 'Multiple analyses detected. Use an AnalysesProcessor to merge them';
+        if (analyses !== false) {
+            var analyse = null;
+            if (Array.isArray(analyses) && !!analyses.length) { // Multiple analyses
+                if (analyses.length > 1) {
+                    throw 'Multiple analyses detected. Use an AnalysesProcessor to merge them';
+                }
+                analyse = analyses[0];
+            } else if (typeof analyses === 'object') {
+                analyse = analyses;
             }
-            analyse = analyses[0];
-        } else if (typeof analyses === 'object') {
-            analyse = analyses;
+
+            queryResult = analyse.result;
+
+            if (callback) {
+                queryResult = callback(queryResult);
+            }
         }
-
-        queryResult = analyse.result;
-    }
-
-    if (callback) {
-        queryResult = callback(queryResult);
     }
 
     return queryResult;

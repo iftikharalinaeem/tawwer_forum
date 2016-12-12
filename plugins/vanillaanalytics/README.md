@@ -51,6 +51,7 @@ If `VanillaAnalytics.KeenIO.ProjectID` is set, no attempt will be made to create
 # Widgets
 
 When reading widgets descriptions you can always add "during/for the selected time range" at the end of the sentence.
+Widgets hide themselves if they have no data to show.
 
 There are 3 types of widgets:
 - **Metric**

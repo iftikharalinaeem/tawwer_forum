@@ -74,10 +74,16 @@ class AnalyticsLeaderboard {
             throw new Gdn_UserException('An error was encountered while querying data.');
         }
 
-        return $this->processResponse(
+        $processedResult = $this->processResponse(
             $response->result,
             $responsePrevious->result
         );
+
+        if (empty($processedResult)) {
+            throw new Gdn_UserException('No data was returned.');
+        }
+
+        return $processedResult;
     }
 
     /**
