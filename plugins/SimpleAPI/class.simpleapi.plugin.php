@@ -265,8 +265,11 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                 if ($LookupKey == 'User.ForeignID')
                     $LookupMethod = 'custom';
 
-                // If we already have an array of values, don't bother with casting or exploding.
-                if (!is_array($Value)) {
+                // Only bother with exploding or casting if $Value isn't already an array.
+                if (is_array($Value)) {
+                    // Since our $Value is an array, it should be handled as if it were multiple values.
+                    $Multi = true;
+                } else {
                     if ($Multi) {
                         $Value = explode(',', $Value);
                     } else {
