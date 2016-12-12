@@ -202,10 +202,24 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                     $TableAllowed = false;
 
                     // First check if this is a Multi request
-                    if ($SingularTableName = StringEndsWith($TableName, 's', false, true)) {
+                    if (stringEndsWith($TableName, 'ies')) {
+                        // Swap out that IES with Y in $TableName (e.g. Categories becomes Category).
+                        $SingularTableName = stringEndsWith($TableName, 'ies', false, true).'y';
+                    } else {
+                        // Fallback to assuming its a plural if it ends in an S.
+                        $SingularTableName = stringEndsWith($TableName, 's', false, true);
+                    }
+
+                    if ($SingularTableName) {
                         if (in_array($SingularTableName, $SupportedTables)) {
+                            // De-pluralize $FieldPrefix, now that we've confirmed the table is supported.
+                            if (stringEndsWith($FieldPrefix, 'ies')) {
+                                $FieldPrefix = stringEndsWith($FieldPrefix, 'ies', false, true).'y';
+                            } else {
+                                $FieldPrefix = stringEndsWith($FieldPrefix, 's', false, true);
+                            }
+
                             $TableName = $SingularTableName;
-                            $FieldPrefix = StringEndsWith($FieldPrefix, 's', false, true);
                             $TableAllowed = true;
                             $Multi = true;
                         }
@@ -251,9 +265,14 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                 if ($LookupKey == 'User.ForeignID')
                     $LookupMethod = 'custom';
 
-                if ($Multi)
-                    $Value = explode(',', $Value);
-                $Value = (array)$Value;
+                // If we already have an array of values, don't bother with casting or exploding.
+                if (!is_array($Value)) {
+                    if ($Multi) {
+                        $Value = explode(',', $Value);
+                    } else {
+                        $Value = (array)$Value;
+                    }
+                }
 
                 foreach ($Value as $MultiValue) {
                     switch ($LookupMethod) {
