@@ -20,6 +20,29 @@ $PluginInfo['categoryroles'] = [
 class CategoryRolesPlugin extends Gdn_Plugin {
 
     /**
+     * Hook in after a user signs in via SSO.
+     *
+     * @param EntryController $sender
+     * @param array $args
+     */
+    public function entryController_afterConnectSave_handler($sender, $args) {
+        $userID = val('UserID', $args);
+        $form = val('Form', $args);
+        if (empty($userID) || !($form instanceof Gdn_Form)) {
+            return;
+        }
+
+        $categoryRoles = $form->getFormValue('CategoryRoles');
+        if (empty($categoryRoles) || !is_array($categoryRoles)) {
+            return;
+        }
+
+        $categoryRoleModel = new CategoryRoleModel();
+        $incoming = $categoryRoleModel->formatFormField($categoryRoles);
+        $categoryRoleModel->syncRecords($userID, $incoming);
+    }
+
+    /**
      * Get the default category permissions for a role.
      *
      * @param int $roleID
