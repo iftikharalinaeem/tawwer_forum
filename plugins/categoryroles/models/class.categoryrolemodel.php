@@ -125,6 +125,9 @@ class CategoryRoleModel extends Gdn_Model {
      * @param array $incoming
      */
     public function syncRecords($userID, $incoming) {
+        // How many database operations have been performed?
+        $transactions = 0;
+
         // Remove any existing records that are no longer relevant.
         $existing = $this->getByUser($userID);
         foreach ($existing as $roleID => $categories) {
@@ -134,6 +137,7 @@ class CategoryRoleModel extends Gdn_Model {
                     'UserID' => $userID,
                     'RoleID' => $roleID
                 ]);
+                $transactions++;
                 continue;
             }
 
@@ -145,6 +149,7 @@ class CategoryRoleModel extends Gdn_Model {
                         'RoleID' => $roleID,
                         'CategoryID' => $categoryID
                     ]);
+                    $transactions++;
                 }
             }
         }
@@ -160,8 +165,14 @@ class CategoryRoleModel extends Gdn_Model {
                         'RoleID' => $roleID,
                         'CategoryID' => $categoryID
                     ]);
+                    $transactions++;
                 }
             }
+        }
+
+        // If we had to perform any updates, make sure we purge any cached permissions data.
+        if ($transactions > 0) {
+            Gdn::userModel()->clearCache($userID, ['permissions']);
         }
     }
 }
