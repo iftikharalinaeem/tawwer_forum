@@ -666,6 +666,35 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
+     * Format groups and events logs
+     *
+     * @param Gdn_PluginManager $sender
+     * @param array $args
+     */
+    public function logModel_formatContent_handler($sender, $args) {
+        $log = $args['Log'];
+        if (!in_array($log['RecordType'], ['Group', 'Event'])) {
+            return;
+        }
+
+        $data = $log['Data'];
+        $logModel = new LogModel();
+        switch ($log['RecordType']) {
+            case 'Group':
+                $args['Result'] =
+                    '<b>'.$logModel->formatKey('Name', $data).'</b><br />'.
+                    $logModel->formatKey('Description', $data);
+                break;
+            case 'Event':
+                $args['Result'] =
+                    '<b>'.$logModel->formatKey('Name', $data).'</b><br />'.
+                    $logModel->formatKey('Body', $data).'<br />'.
+                    t('Location').': '.$logModel->formatKey('Location', $data);
+                break;
+        }
+    }
+
+    /**
      * Disable deletion for Social Groups created before the CanDelete flag existed.
      *
      * @param array $categories
