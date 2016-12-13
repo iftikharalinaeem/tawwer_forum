@@ -7,6 +7,8 @@ module.exports = function (grunt) {
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
+  grunt.file.mkdir('bower_components');
+
   // Load Bower dependencies
   var dependencies = require('wiredep')();
 
@@ -44,11 +46,11 @@ module.exports = function (grunt) {
     },
 
     sass: {
+      options: {
+        sourceMap: true
+      },
       dist: {
-        options: {
-          sourceComments: 'map'
-        }
-      , files: {
+        files: {
           'design/groups.css': 'scss/custom.scss'
        }
       }
@@ -57,6 +59,7 @@ module.exports = function (grunt) {
     scsslint: {
       options: {
         config: 'scss/.scss-lint.yml'
+        , force: true
       }
     , all: ['scss/**/*.scss']
     },
@@ -64,6 +67,9 @@ module.exports = function (grunt) {
     autoprefixer: {
       dist: {
         src: ['design/**/*.css']
+      }
+      , options: {
+        map: true
       }
     },
 
