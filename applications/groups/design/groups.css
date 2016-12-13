@@ -10,7 +10,7 @@
  */
 .ui-datepicker {
   width: 17em;
-  padding: 0.2em 0.3em 0;
+  padding: .2em .3em 0;
   display: none;
   background: #fff;
   background: rgba(255, 255, 255, 0.95);
@@ -21,15 +21,17 @@
 
 .ui-datepicker .ui-datepicker-header {
   position: relative;
-  padding: 0.2em 0; }
+  padding: .2em 0; }
 
-.ui-datepicker .ui-datepicker-prev, .ui-datepicker .ui-datepicker-next {
+.ui-datepicker .ui-datepicker-prev,
+.ui-datepicker .ui-datepicker-next {
   position: absolute;
   top: 2px;
   width: 1.8em;
   height: 1.8em; }
 
-.ui-datepicker .ui-datepicker-prev-hover, .ui-datepicker .ui-datepicker-next-hover {
+.ui-datepicker .ui-datepicker-prev-hover,
+.ui-datepicker .ui-datepicker-next-hover {
   top: 1px; }
 
 .ui-datepicker .ui-datepicker-prev {
@@ -44,7 +46,8 @@
 .ui-datepicker .ui-datepicker-next-hover {
   right: 9px; }
 
-.ui-datepicker .ui-datepicker-prev span, .ui-datepicker .ui-datepicker-next span {
+.ui-datepicker .ui-datepicker-prev span,
+.ui-datepicker .ui-datepicker-next span {
   display: block;
   position: absolute;
   left: 50%;
@@ -64,17 +67,18 @@
 .ui-datepicker select.ui-datepicker-month-year {
   width: 100%; }
 
-.ui-datepicker select.ui-datepicker-month, .ui-datepicker select.ui-datepicker-year {
+.ui-datepicker select.ui-datepicker-month,
+.ui-datepicker select.ui-datepicker-year {
   width: 49%; }
 
 .ui-datepicker table {
   width: 100%;
-  font-size: 0.9em;
+  font-size: .9em;
   border-collapse: collapse;
-  margin: 0 0 0.4em; }
+  margin: 0 0 .4em; }
 
 .ui-datepicker th {
-  padding: 0.7em 0.3em;
+  padding: .7em .3em;
   text-align: center;
   font-weight: bold;
   border: 0; }
@@ -83,25 +87,26 @@
   border: 0;
   padding: 1px; }
 
-.ui-datepicker td span, .ui-datepicker td a {
+.ui-datepicker td span,
+.ui-datepicker td a {
   display: block;
-  padding: 0.2em;
+  padding: .2em;
   text-align: right;
   text-decoration: none; }
 
 .ui-datepicker .ui-datepicker-buttonpane {
   background-image: none;
-  margin: 0.7em 0 0 0;
-  padding: 0 0.2em;
+  margin: .7em 0 0 0;
+  padding: 0 .2em;
   border-left: 0;
   border-right: 0;
   border-bottom: 0; }
 
 .ui-datepicker .ui-datepicker-buttonpane button {
   float: right;
-  margin: 0.5em 0.2em 0.4em;
+  margin: .5em .2em .4em;
   cursor: pointer;
-  padding: 0.2em 0.6em 0.3em 0.6em;
+  padding: .2em .6em .3em .6em;
   width: auto;
   overflow: visible; }
 
@@ -117,7 +122,7 @@
 
 .ui-datepicker-multi .ui-datepicker-group table {
   width: 95%;
-  margin: 0 auto 0.4em; }
+  margin: 0 auto .4em; }
 
 .ui-datepicker-multi-2 .ui-datepicker-group {
   width: 50%; }
@@ -128,7 +133,8 @@
 .ui-datepicker-multi-4 .ui-datepicker-group {
   width: 25%; }
 
-.ui-datepicker-multi .ui-datepicker-group-last .ui-datepicker-header, .ui-datepicker-multi .ui-datepicker-group-middle .ui-datepicker-header {
+.ui-datepicker-multi .ui-datepicker-group-last .ui-datepicker-header,
+.ui-datepicker-multi .ui-datepicker-group-middle .ui-datepicker-header {
   border-left-width: 0; }
 
 .ui-datepicker-multi .ui-datepicker-buttonpane {
@@ -165,10 +171,12 @@
 .ui-datepicker-rtl .ui-datepicker-buttonpane button {
   float: left; }
 
-.ui-datepicker-rtl .ui-datepicker-buttonpane button.ui-datepicker-current, .ui-datepicker-rtl .ui-datepicker-group {
+.ui-datepicker-rtl .ui-datepicker-buttonpane button.ui-datepicker-current,
+.ui-datepicker-rtl .ui-datepicker-group {
   float: right; }
 
-.ui-datepicker-rtl .ui-datepicker-group-last .ui-datepicker-header, .ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header {
+.ui-datepicker-rtl .ui-datepicker-group-last .ui-datepicker-header,
+.ui-datepicker-rtl .ui-datepicker-group-middle .ui-datepicker-header {
   border-right-width: 0;
   border-left-width: 1px; }
 
@@ -199,73 +207,99 @@
 .Event.add .DatePicker, .Event.edit .DatePicker {
   display: inline-block;
   width: 120px; }
+
 .Event.add .TimePicker, .Event.edit .TimePicker {
   display: inline-block;
   width: 120px; }
+
 .Event.add .Group.Card h3, .Event.edit .Group.Card h3 {
   margin: 0px; }
+
 .Event.add .Group.Card .Group-Description, .Event.edit .Group.Card .Group-Description {
   display: none; }
+
 .Event.add .Group.Card .Card-Icon, .Event.edit .Group.Card .Card-Icon {
   width: 48px;
   height: 48px;
   margin-bottom: 0px; }
+
 .Event.add .EventTime .P > div, .Event.edit .EventTime .P > div {
   display: inline-block; }
+
 .Event.add .EventTime .To, .Event.edit .EventTime .To {
   display: none; }
+
 .Event.add .EventTime .Timezone, .Event.edit .EventTime .Timezone {
   display: inline-block; }
+
 .Event.add .EventTime .EndTime, .Event.edit .EventTime .EndTime {
   margin-left: 20px; }
+
 .Event.add .EventTime label, .Event.edit .EventTime label {
   display: none;
   width: 50px; }
+
 .Event.add .EventTime label.When, .Event.edit .EventTime label.When {
   display: inline-block; }
+
 .Event.add .EventTime .Timebased, .Event.edit .EventTime .Timebased {
   display: none !important; }
+
 .Event.add .EventTime .Timezone select, .Event.edit .EventTime .Timezone select {
   position: absolute;
   visibility: hidden;
   top: 16px; }
+
 .Event.add .EventTime .Timezone .EventTimezoneDisplay, .Event.edit .EventTime .Timezone .EventTimezoneDisplay {
   cursor: pointer; }
+
 .Event.add .EventTime .Timezone .EventTimezoneDisplay:hover, .Event.edit .EventTime .Timezone .EventTimezoneDisplay:hover {
   text-decoration: underline; }
+
 .Event.add .EventTime.Times .Timebased, .Event.edit .EventTime.Times .Timebased {
   display: inline-block !important; }
+
 .Event.add .EventTime.Both .To, .Event.edit .EventTime.Both .To {
   display: block; }
+
 .Event.add .EventTime.Both label, .Event.edit .EventTime.Both label {
   display: inline-block; }
+
 .Event.add .EventTime.Both label.When, .Event.edit .EventTime.Both label.When {
   display: none; }
+
 .Event.add .EventTime.Both .EndTime, .Event.edit .EventTime.Both .EndTime {
   display: none !important; }
 
 .Event.event .EventInfo li {
   line-height: 1.5em; }
+
 .Event.event .EventInfo li span.Label {
   display: inline-block;
   font-weight: bold;
   width: 150px; }
+
 .Event.event .EventInfo span.Tag {
   margin-left: 10px;
   background: #979797;
   color: white;
   font-size: 11px;
   text-transform: uppercase; }
+
 .Event.event .EventInfo span.Tip {
   color: #979797;
   font-size: 11px; }
+
 .Event.event .EventInfo span.Tip .Timezone {
   border-bottom: 1px dotted;
   cursor: pointer; }
+
 .Event.event .EventInfo .Body {
   margin: 20px 0px; }
+
 .Event.event .Attending {
   margin: 0px; }
+
 .Event.event .Attendees .AttendeeList {
   display: block;
   padding: 2px; }
@@ -285,6 +319,7 @@
 
 .Events.events .Cards {
   margin: 0px; }
+
 .Events.events .UpcomingEvents {
   margin-top: 20px; }
   .Events.events .UpcomingEvents .Event {
@@ -304,6 +339,7 @@
     margin-top: 0px; }
   .Box-Events .DataList-Events :last-child {
     margin-bottom: 0px; }
+
 .Box-Events .Event {
   margin: 12px 0px; }
   .Box-Events .Event .Event-Title {
@@ -352,27 +388,35 @@
   background: #fff;
   color: #000; }
 
-li.ui-timepicker-selected, .ui-timepicker-list li:hover, .ui-timepicker-list:hover .ui-timepicker-selected:hover {
+li.ui-timepicker-selected,
+.ui-timepicker-list li:hover,
+.ui-timepicker-list:hover .ui-timepicker-selected:hover {
   background: #1980EC;
   color: #fff; }
 
-li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover .ui-timepicker-duration {
+li.ui-timepicker-selected .ui-timepicker-duration,
+.ui-timepicker-list li:hover .ui-timepicker-duration {
   color: #ccc; }
 
 .Groups .PageControls:after {
   content: "";
   display: table;
   clear: both; }
+
 .Groups .DataList .ItemContent {
   padding-left: 48px; }
-.Groups .Item .OptionsMenu, .Groups .Item .ButtonGroup {
+
+.Groups .Item .OptionsMenu,
+.Groups .Item .ButtonGroup {
   display: inline-block;
   vertical-align: top; }
+
 .Groups .Item .Buttons {
   padding-top: 0;
   margin-top: 0;
   margin-right: 5px;
   display: inline-block; }
+
 .Groups .DataTableWrap {
   margin-top: 10px;
   margin-bottom: 10px; }
@@ -380,20 +424,28 @@ li.ui-timepicker-selected .ui-timepicker-duration, .ui-timepicker-list li:hover 
     font-size: 12px; }
   .Groups .DataTableWrap .Title-Wrapper {
     margin: 0; }
-  .Groups .DataTableWrap .EventLocation, .Groups .DataTableWrap .EventDate {
+  .Groups .DataTableWrap .EventLocation,
+  .Groups .DataTableWrap .EventDate {
     width: 25%; }
-.Groups .Group-Discussions .MItem.Category, .Groups .Group-Announcements .MItem.Category {
+
+.Groups .Group-Discussions .MItem.Category,
+.Groups .Group-Announcements .MItem.Category {
   display: none; }
 
 .Group-Box .Button-Controls {
   float: right; }
+
 .Group-Box .H {
   float: left; }
+
 .Group-Box .DataList .PhotoWrap {
   float: left; }
+
 .Group-Box .PhotoWrap {
   display: block; }
-.Group-Box .PhotoGrid .PhotoWrap, .Group-Box .Group-Member.UserTile .PhotoWrap {
+
+.Group-Box .PhotoGrid .PhotoWrap,
+.Group-Box .Group-Member.UserTile .PhotoWrap {
   display: inline; }
 
 .Group-Header {
