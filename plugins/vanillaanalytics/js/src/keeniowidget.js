@@ -116,6 +116,37 @@ function KeenIOWidget(config) {
     };
 
     /**
+     * Make sure site ID is part of all queries' filters.
+     */
+    this.ensureSiteID = function() {
+        var siteID = gdn.definition('siteID');
+
+        // If a site ID is available, add it to the query parameters for filtering.
+        if (siteID !== false) {
+            // Iterate through all queries in this widget.
+            loopQueries: for (var i = 0; i < query.length; i++) {
+                var filters = query[i].get('filters');
+
+                // If we already have filters, make sure we aren't doubling up the site ID criteria.
+                if (Array.isArray(filters)) {
+                    for (var x = 0; x < filters.length; x++) {
+                        // Make doubly sure this is a valid filter...
+                        if (typeof filters[x] === 'object' && typeof filters[x].property_name === 'string') {
+                            if (filters[x].property_name === 'site.siteID') {
+                                // We've already got a site ID filter.  Move onto the next query.
+                                continue loopQueries;
+                            }
+                        }
+                    }
+                }
+
+                // We haven't had to bail, so it should be safe to add the site ID filter.
+                query[i].addFilter('site.siteID', 'eq', siteID);
+            }
+        }
+    };
+
+    /**
      *
      * @returns {null|function}
      */
@@ -644,6 +675,7 @@ KeenIOWidget.prototype.runQuery = function(callback) {
     }
 
     this.updateQueryParams(updateParams);
+    this.ensureSiteID();
 
     var queries  = this.getQuery();
     if (!!queries.length) {
