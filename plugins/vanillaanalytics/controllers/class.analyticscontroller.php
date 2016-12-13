@@ -155,7 +155,7 @@ class AnalyticsController extends DashboardController {
         if (class_exists('\Infrastructure')) {
             $siteID = \Infrastructure::site('siteid');
         } else {
-            $siteID = c('Vanilla.VanillaForums.SiteID', false);
+            $siteID = c('Vanilla.VanillaForums.SiteID');
         }
         $this->addDefinition('siteID', $siteID);
 
