@@ -959,6 +959,8 @@ class GroupController extends Gdn_Controller {
      *
      * @param string $ID
      * @param string $Page
+     * @param string $Filter
+     * @param string $memberFilter
      */
     public function members($ID, $Page = false, $Filter = '') {
         Gdn_Theme::section('Group');
@@ -975,6 +977,7 @@ class GroupController extends Gdn_Controller {
             throw PermissionException();
         }
 
+        $this->Form = new Gdn_Form();
         $this->setData('Group', $Group);
         $this->addBreadcrumb($Group['Name'], groupUrl($Group));
         $this->addBreadcrumb(t('GroupMembers', 'Members'));
@@ -987,15 +990,21 @@ class GroupController extends Gdn_Controller {
         $this->setData('_Limit', $Limit);
         $this->setData('_Offset', $Limit);
 
+        $where = [];
+        $memberFilter = $this->Request->post('memberFilter');
+        if ($memberFilter) {
+            $where['u.Name like'] = $memberFilter.'%';
+        }
+
         // Get Leaders
         if (in_array($Filter, array('', 'leaders'))) {
-            $Users = $this->GroupModel->getMembers($Group['GroupID'], array('Role' => 'Leader'), $Limit, $Offset);
+            $Users = $this->GroupModel->getMembers($Group['GroupID'], array_merge(['Role' => 'Leader'], $where), $Limit, $Offset);
             $this->setData('Leaders', $Users);
         }
 
         // Get Members
         if (in_array($Filter, array('', 'members'))) {
-            $Users = $this->GroupModel->getMembers($Group['GroupID'], array('Role' => 'Member'), $Limit, $Offset);
+            $Users = $this->GroupModel->getMembers($Group['GroupID'], array_merge(['Role' => 'Member'], $where), $Limit, $Offset);
             $this->setData('Members', $Users);
         }
 

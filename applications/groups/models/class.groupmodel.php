@@ -395,8 +395,10 @@ class GroupModel extends Gdn_Model {
     public function getMembers($GroupID, $Where = [], $Limit = false, $Offset = false) {
         // First grab the members.
         $Users = $this->SQL
-            ->from('UserGroup')
-            ->where('GroupID', $GroupID)
+            ->select('ug.*')
+            ->from('UserGroup ug')
+                ->join('User u', 'ug.UserID = u.UserID')
+            ->where('ug.GroupID', $GroupID)
             ->where($Where)
             ->orderBy('DateInserted')
             ->limit($Limit, $Offset)
