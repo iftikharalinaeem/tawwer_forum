@@ -987,15 +987,19 @@ class GroupController extends Gdn_Controller {
             $Filter = '';
         }
 
-        $this->setData('_Limit', $Limit);
-        $this->setData('_Offset', $Limit);
-
         $where = [];
         $memberFilter = $this->Request->post('memberFilter');
         $this->setData('DisplayPager', !$memberFilter);
         if ($memberFilter) {
+            $Offset = 0;
+            $Limit = $this->GroupModel->MemberPageSize;
             $where['u.Name like'] = $memberFilter.'%';
         }
+
+        $this->setData('_Limit', $Limit);
+        $this->setData('_Offset', $Limit);
+
+
 
         // Get Leaders
         if (in_array($Filter, array('', 'leaders'))) {
