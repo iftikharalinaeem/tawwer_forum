@@ -205,7 +205,16 @@
     display: none !important;
   }
 }
- 
+
 .Section-Group #Content .BoxNewDiscussion {
    display: inline-block;
 }
+
+.group-members-filter-box > .InputBox {
+  display: inline-block;
+  min-width: 200px;
+  width: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+

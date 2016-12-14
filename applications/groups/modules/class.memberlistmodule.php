@@ -47,7 +47,15 @@ class MemberListModule extends Gdn_Module {
    * @param string $layout The layout type, either 'modern' or 'table'.
    * @param bool $withButtons Whether to add the 'leader', 'member' and 'remove' buttons to member items.
    */
-    public function __construct($members = array(), $group = array(), $title = '', $emptyMessage = '', $cssClass = 'MemberList', $showMore = false, $layout = '', $withButtons = true) {
+    public function __construct($members = null, $group = null, $title = '', $emptyMessage = '', $cssClass = 'MemberList',
+                                $showMore = false, $layout = '', $withButtons = true) {
+        if ($members === null) {
+            deprecated('Instantiating '.__CLASS__.' without members');
+        }
+        if ($group === null) {
+            deprecated('Instantiating '.__CLASS__.' without group');
+        }
+
         $this->members = $members;
         $this->group = $group;
         $this->title = $title;
@@ -198,14 +206,6 @@ class MemberListModule extends Gdn_Module {
      */
     public function toString() {
         if (!$this->group) {
-            $controller = Gdn::controller();
-            $this->group = val('Group', $controller->Data);
-        }
-        if (!$this->members) {
-            $controller = Gdn::controller();
-            $this->members = val('Members', $controller->Data);
-        }
-        if (!$this->group || !$this->members) {
             return '';
         }
         $this->members = $this->getMembersInfo($this->layout, $this->members, $this->group, $this->title, $this->emptyMessage, $this->cssClass, $this->withButtons);

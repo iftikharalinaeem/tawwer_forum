@@ -548,4 +548,11 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 
 .Section-Group #Content .BoxNewDiscussion {
   display: inline-block; }
+
+.group-members-filter-box > .InputBox {
+  display: inline-block;
+  min-width: 200px;
+  width: 50%;
+  margin-right: 5px;
+  vertical-align: middle; }
 /*# sourceMappingURL=groups.css.map */
