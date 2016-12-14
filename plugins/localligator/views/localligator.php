@@ -71,8 +71,8 @@ if (empty($strings)) : ?>
                         echo wrap($form->checkBox('StringsToAdd[]', val('title', $string), $attr), 'div', ['class' => $class]);
                         ?>
                     </td>
-                    <td><?php echo val('title', $string); ?></td>
-                    <td><?php echo val('description', $string) ?></td>
+                    <td><?php echo htmlspecialchars(val('title', $string)); ?></td>
+                    <td><?php echo htmlspecialchars(val('description', $string)); ?></td>
                 </tr>
             <?php endforeach;?>
             </tbody>

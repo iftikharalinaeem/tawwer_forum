@@ -176,6 +176,7 @@ class LocalligatorPlugin extends Gdn_Plugin {
      */
     private function getConfig($path) {
         $config = new Gdn_Configuration();
+        $config->setFormatOption('SafePHP', false);
         $config->splitting(false);
         $config->caching(false);
         $config->setSortFlag(SORT_STRING|SORT_FLAG_CASE);
@@ -218,8 +219,8 @@ class LocalligatorPlugin extends Gdn_Plugin {
             $localeField[$key] = [
                 'value' => $key,
                 'class' => 'js-check-me',
-                'title' => htmlspecialchars($key),
-                'description' => htmlspecialchars($value)
+                'title' => $key,
+                'description' => $value
             ];
         }
 
@@ -241,7 +242,7 @@ class LocalligatorPlugin extends Gdn_Plugin {
 
             if ($sender->form->errorCount() == 0) {
                 foreach(val('StringsToAdd', $sender->form->formValues()) as $code) {
-                    $translationsList->saveToConfig($code, val($code, $localeStrings));
+                    $translationsList->saveToConfig($code, val($code, $localeStrings), ['SafePHP' => false]);
                     unset($localeField[$code]);
                     $this->getUntranslatedList()->removeFromConfig($code);
                 }
@@ -250,6 +251,7 @@ class LocalligatorPlugin extends Gdn_Plugin {
                 } else {
                     $sender->informMessage(t('Locale source files updated.').' '.t('Don\'t forget to make a pull request!'));
                 }
+                $this->loadSiteCore();
             }
         }
 
