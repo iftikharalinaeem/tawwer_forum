@@ -29,12 +29,20 @@ foreach ($this->data('Leaderboard') as $currentRow) {
         $recordBlock = $leaderRecord['Title'];
     }
 
+    $icon = '';
+
+    if ($leaderRecord['PositionChange'] === 'Rise') {
+        $icon = dashboardSymbol('arrow-up', 'icon-text');
+    } elseif ($leaderRecord['PositionChange'] === 'Fall') {
+        $icon = dashboardSymbol('arrow-down', 'icon-text');
+    }
+
     $leaderboard->addRow([
             'record' => $recordBlock,
             'count' => $leaderRecord['Count'],
             'position' => $leaderRecord['Position'],
             'position-previous' => $leaderRecord['Previous'],
-            'position-change' => $leaderRecord['PositionChange'],
+            'position-change' => $leaderRecord['PositionChange'].' '.$icon,
         ],
         '',
         ['class' => slugify($this->title()).' '.slugify($leaderRecord['PositionChange'])]
