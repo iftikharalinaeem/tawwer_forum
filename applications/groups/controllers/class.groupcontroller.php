@@ -992,6 +992,7 @@ class GroupController extends Gdn_Controller {
 
         $where = [];
         $memberFilter = $this->Request->post('memberFilter');
+        $this->setData('DisplayPager', !$memberFilter);
         if ($memberFilter) {
             $where['u.Name like'] = $memberFilter.'%';
         }
@@ -1007,17 +1008,6 @@ class GroupController extends Gdn_Controller {
             $Users = $this->GroupModel->getMembers($Group['GroupID'], array_merge(['Role' => 'Member'], $where), $Limit, $Offset);
             $this->setData('Members', $Users);
         }
-
-        // Build a pager
-        $this->Pager = new MorePagerModule($this);
-        $this->Pager->ClientID = 'Pager';
-        $this->Pager->configure(
-            $Offset,
-            $Limit,
-            $NumResults = val('CountMembers', $this->data('Group')) - count($this->data('Leaders')),
-            groupUrl($this->data('Group'), 'members', '/').'/{Page}?filter=members',
-            true
-        );
 
         $this->Data['_properties']['newdiscussionmodule'] = array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$Group['GroupID']);
         $this->setData('Filter', $Filter);

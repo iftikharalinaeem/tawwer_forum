@@ -40,7 +40,9 @@ if (in_array($this->data('Filter'), ['', 'members'])) {
     echo $memberList;
 }
 
-PagerModule::write([
-    'Url' => groupUrl($this->data('Group'), 'members', '/').'/{Page}?filter=members',
-    'CurrentRecords' => count($this->data('Members'))
-]);
+if ($this->data('DisplayPager')) {
+    PagerModule::write([
+        'Url' => groupUrl($this->data('Group'), 'members', '/').'/{Page}?filter=members',
+        'CurrentRecords' => count($this->data('Members'))
+    ]);
+}
