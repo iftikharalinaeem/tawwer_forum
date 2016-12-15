@@ -123,48 +123,56 @@ class CategoryRoleModel extends Gdn_Model {
      * @param int $userID
      * @param array $incoming
      */
-    public function syncRecords($userID, $incoming) {
+    public function syncRecords($userID, array $incoming) {
         // How many database operations have been performed?
         $transactions = 0;
 
-        // Remove any existing records that are no longer relevant.
-        $existing = $this->getByUser($userID);
-        foreach ($existing as $roleID => $categories) {
-            if (!array_key_exists($roleID, $incoming)) {
-                // New data has no records for this role, so get rid of them all.
-                $this->delete([
-                    'UserID' => $userID,
-                    'RoleID' => $roleID
-                ]);
-                $transactions++;
-                continue;
-            }
-
-            // Wipe out any per-category role entries that are no longer valid.
-            foreach ($categories as $categoryID) {
-                if (!in_array($categoryID, $incoming[$roleID])) {
+        if (empty($incoming)) {
+            // If the user's new permissions include no values, wipe out all of their existing records.
+            $this->delete([
+                'UserID' => $userID
+            ]);
+            $transactions++;
+        } else {
+            // Remove any existing records that are no longer relevant.
+            $existing = $this->getByUser($userID);
+            foreach ($existing as $roleID => $categories) {
+                if (!array_key_exists($roleID, $incoming)) {
+                    // New data has no records for this role, so get rid of them all.
                     $this->delete([
                         'UserID' => $userID,
-                        'RoleID' => $roleID,
-                        'CategoryID' => $categoryID
+                        'RoleID' => $roleID
                     ]);
                     $transactions++;
+                    continue;
+                }
+
+                // Wipe out any per-category role entries that are no longer valid.
+                foreach ($categories as $categoryID) {
+                    if (!in_array($categoryID, $incoming[$roleID])) {
+                        $this->delete([
+                            'UserID' => $userID,
+                            'RoleID' => $roleID,
+                            'CategoryID' => $categoryID
+                        ]);
+                        $transactions++;
+                    }
                 }
             }
-        }
-        unset($currentRow, $roleID, $categoryID);
+            unset($currentRow, $roleID, $categoryID);
 
-        // Add the newbies.
-        foreach ($incoming as $roleID => $categories) {
-            // Insert any per-category role entries that don't already exist.
-            foreach ($categories as $categoryID) {
-                if (!array_key_exists($roleID, $existing) || !in_array($categoryID, $existing[$roleID])) {
-                    $this->insert([
-                        'UserID' => $userID,
-                        'RoleID' => $roleID,
-                        'CategoryID' => $categoryID
-                    ]);
-                    $transactions++;
+            // Add the newbies.
+            foreach ($incoming as $roleID => $categories) {
+                // Insert any per-category role entries that don't already exist.
+                foreach ($categories as $categoryID) {
+                    if (!array_key_exists($roleID, $existing) || !in_array($categoryID, $existing[$roleID])) {
+                        $this->insert([
+                            'UserID' => $userID,
+                            'RoleID' => $roleID,
+                            'CategoryID' => $categoryID
+                        ]);
+                        $transactions++;
+                    }
                 }
             }
         }
