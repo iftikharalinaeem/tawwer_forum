@@ -35,8 +35,7 @@ class CategoryRolesPlugin extends Gdn_Plugin {
 
         // CategoryRoles should've been added as a value to the form by the SSO addon.
         $categoryRoles = $form->getFormValue('CategoryRoles');
-        if (empty($categoryRoles) || !is_array($categoryRoles)) {
-            //  Not a valid, populated array? Nothing to do here.
+        if (!is_array($categoryRoles)) {
             return;
         }
 

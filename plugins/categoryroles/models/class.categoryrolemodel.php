@@ -50,7 +50,6 @@ class CategoryRoleModel extends Gdn_Model {
             $roleID = val('RoleID', $mapping);
             $categoryID = val('CategoryID', $mapping);
 
-            // We need both of these to continue.
             if (empty($roleID) || empty($categoryID)) {
                 continue;
             }
