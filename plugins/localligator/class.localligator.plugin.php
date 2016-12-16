@@ -251,7 +251,6 @@ class LocalligatorPlugin extends Gdn_Plugin {
                 } else {
                     $sender->informMessage(t('Locale source files updated.').' '.t('Don\'t forget to make a pull request!'));
                 }
-                $this->loadSiteCore();
             }
         }
 
