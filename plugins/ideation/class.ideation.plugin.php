@@ -197,7 +197,8 @@ EOT
     public function base_allowedDiscussionTypes_handler($sender, $args) {
         $category = val('Category', $args);
         if (empty($category)) {
-            $category = val('PermissionCategory', $args);
+            // We're on Recent Discussions. Hitting post/idea from here is fine; it'll default to your Idea category.
+            return;
         }
         if ($this->isIdeaCategory($category)) {
             $args['AllowedDiscussionTypes'] = ['Idea' => $this->getIdeaDiscussionType()];
