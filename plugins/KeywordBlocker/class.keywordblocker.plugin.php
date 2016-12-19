@@ -242,7 +242,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
                 // Show diff on post review.
                 $recordData['_New'] = array();
 
-                 if (in_array($recordType, ['Discussion', 'Group', 'Event'])) {
+                if (in_array($recordType, ['Discussion', 'Group', 'Event'])) {
                     $recordData['_New']['Name'] = $recordData['Name'];
                     $recordData['Name'] = $oldData['Name'];
                 }
