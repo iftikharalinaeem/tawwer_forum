@@ -83,6 +83,13 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
     public function __construct() {
         $provider = $this->provider();
+        $this->translatedKeys = [
+            val('ProfileKeyEmail', $provider, 'email') => 'Email',
+            val('ProfileKeyPhoto', $provider, 'picture') => 'Photo',
+            val('ProfileKeyName', $provider, 'displayname') => 'Name',
+            val('ProfileKeyFullName', $provider, 'name') => 'FullName',
+            val('ProfileKeyUniqueID', $provider, 'sub')  => 'UniqueID'
+        ];
     }
 
     /**
@@ -104,11 +111,11 @@ class JWTSSOPlugin extends Gdn_Plugin {
                 'AuthenticationKey' => DEFAULT_PROVIDER_KEY,
                 'AuthenticationSchemeAlias' => PROVIDER_SCHEME_ALIAS,
                 'Name' => DEFAULT_PROVIDER_KEY,
-                'ProfileKeysUniqueID' => 'sub',
-                'ProfileKeysEmail' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
-                'ProfileKeysPhoto' => 'picture',
-                'ProfileKeysName' => 'displayname',
-                'ProfileKeysFullName' => 'name'
+                'ProfileKeyEmail' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
+                'ProfileKeyPhoto' => 'picture',
+                'ProfileKeyName' => 'displayname',
+                'ProfileKeyFullName' => 'name',
+                'ProfileKeyUniqueID' => 'sub'
             ];
             $model->save($provider);
         }
@@ -169,11 +176,11 @@ class JWTSSOPlugin extends Gdn_Plugin {
             'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Control' => 'TextBox', 'Description' => 'Enter the shared secret, either supplied by your authentication provider or create one and share it with your authentication provider. You can click on "<b>Generate Secret</b>" below.'],
             'RegisterUrl' => ['LabelCode' => 'Register URL', 'Control' => 'TextBox', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
             'SignOutUrl' => ['LabelCode' => 'Sign Out URL', 'Control' => 'TextBox', 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
-            'ProfileKeysUniqueID' => ['LabelCode' => 'UniqueID', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate the unique identifier for a user.'],
-            'ProfileKeysEmail' => ['LabelCode' => 'Email', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate Emails.'],
-            'ProfileKeysPhoto' => ['LabelCode' => 'Photo', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate Photo.'],
-            'ProfileKeysName' => ['LabelCode' => 'Display Name', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate Display Name.'],
-            'ProfileKeysFullName' => ['LabelCode' => 'Full Name', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate Full Name.']
+            'ProfileKeyUniqueID' => ['LabelCode' => 'UniqueID', 'Description' => 'The Key in the JSON payload to designate the User\'s UniqueID'],
+            'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Description' => 'The Key in the JSON payload to designate Emails'],
+            'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON payload to designate Photo.'],
+            'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON payload to designate Display Name.'],
+            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON payload to designate Full Name.']
         ];
 
         // Allow a client to hook in and add fields that might be relevent to their set up.
@@ -639,7 +646,6 @@ class JWTSSOPlugin extends Gdn_Plugin {
         } else {
             $this->provider = Gdn_AuthenticationProviderModel::getProviderByScheme(PROVIDER_SCHEME_ALIAS);
         }
-        $this->translatedKeys = $this->provider['KeyMap'];
         return $this->provider;
     }
 
