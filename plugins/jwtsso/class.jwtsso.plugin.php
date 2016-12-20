@@ -412,7 +412,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
         // If there was no token passed in the header, look in the get.
         // We can do this because we also only accept tokens for a limited time, if we change that we should disable this.
         if (empty($token)) {
-            if ($authToken = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'authorize', null)) {
+            if ($authToken = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'jwt', null)) {
                 return [$authToken, 'bearer'];
             }
         }
