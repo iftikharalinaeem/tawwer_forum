@@ -6,18 +6,18 @@ echo $header;
 /** @var Gdn_Form $form */
 $form = $this->Form;
 
-echo $form->open();
-echo $form->errors();
-
-?>
-<div class="group-members-filter-box">
-    <?php echo $form->label('Members Name Filter', 'memberFilter'); ?>
-    <?php echo $form->textBox('memberFilter', ['class' => 'InputBox']); ?>
-    <button type="submit" class="Button search" title="<?php echo t('Search');?>"><?php echo sprite('SpSearch');?></button>
-</div>
-<?php
-
-echo $form->close();
+if ($this->data('DisplayMemberFilter')) {
+    echo $form->open(['action' => url(Gdn::request()->path()), 'method' => 'get']);
+    ?>
+    <div class="group-members-filter-box">
+        <?php echo $form->label('Members Name Filter', 'memberFilter'); ?>
+        <?php echo $form->textBox('memberFilter', ['class' => 'InputBox', 'value' => Gdn::request()->get('memberFilter')]); ?>
+        <button type="submit" class="Button search" title="<?php echo t('Filter'); ?>"><?php echo t('Filter'); ?></button>
+        <button type="submit" class="Button clearfilter" title="<?php echo t('Clear'); ?>"><?php echo t('Clear'); ?></button>
+    </div>
+    <?php
+    echo $form->close();
+}
 
 if (in_array($this->data('Filter'), ['', 'leaders'])) {
     $leaderList = new MemberListModule(

@@ -32,11 +32,15 @@ var userTokens = {
   }
 }
 
-jQuery(document).ready(function($) {
+jQuery(function($) {
   userTokens.start();
 
   $('.js-invite-members').popup({
     afterLoad: userTokens.start
   });
+
+  $('button.clearfilter', '.group-members-filter-box').click(function() {
+    $(this).parent().find('input[name="memberFilter"]').val('');
+  })
 });
 

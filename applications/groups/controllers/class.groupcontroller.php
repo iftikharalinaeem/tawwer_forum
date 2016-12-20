@@ -983,23 +983,26 @@ class GroupController extends Gdn_Controller {
         $this->addBreadcrumb(t('GroupMembers', 'Members'));
 
         list($Offset, $Limit) = offsetLimit($Page, $this->GroupModel->MemberPageSize);
+        $allowMemberFilter = $Offset === 0;
+        $this->setData('DisplayPager', true);
+        $this->setData('DisplayMemberFilter', $allowMemberFilter);
+
+        $where = [];
+        if ($allowMemberFilter) {
+            $memberFilter = Gdn::request()->get('memberFilter');
+            if ($memberFilter) {
+                $this->setData('DisplayPager', false);
+                $Limit = $this->GroupModel->MemberPageSize;
+                $where['u.Name like'] = $memberFilter.'%';
+            }
+        }
+
         if ($Offset === 0) {
             $Filter = '';
         }
 
-        $where = [];
-        $memberFilter = $this->Request->post('memberFilter');
-        $this->setData('DisplayPager', !$memberFilter);
-        if ($memberFilter) {
-            $Offset = 0;
-            $Limit = $this->GroupModel->MemberPageSize;
-            $where['u.Name like'] = $memberFilter.'%';
-        }
-
         $this->setData('_Limit', $Limit);
         $this->setData('_Offset', $Limit);
-
-
 
         // Get Leaders
         if (in_array($Filter, array('', 'leaders'))) {
