@@ -83,20 +83,40 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
      * Checks discussion cleanliness and send it for review if it is dirty.
      *
      * @param $sender Sending controller instance.
-     * @param $args Event arguments.
+     * @param $args Event's arguments.
      */
     public function discussionModel_afterValidateDiscussion_handler($sender, $args) {
-        $this->reviewPostCleanliness($sender, 'Discussion', $args['DiscussionData']);
+        $this->reviewRecordCleanliness($sender, 'Discussion', $args['DiscussionData']);
     }
 
     /**
      * Hook on AfterValidateComment event.
      *
      * @param $sender Sending controller instance.
-     * @param $args Event arguments.
+     * @param $args Event's arguments.
      */
     public function commentModel_afterValidateComment_handler($sender, $args) {
-        $this->reviewPostCleanliness($sender, 'Comment', $args['CommentData']);
+        $this->reviewRecordCleanliness($sender, 'Comment', $args['CommentData']);
+    }
+
+    /**
+     * Hook on AfterValidateGroup event.
+     *
+     * @param $sender Sending controller instance.
+     * @param $args Event's arguments.
+     */
+    public function groupModel_afterValidateGroup_handler($sender, $args) {
+        $this->reviewRecordCleanliness($sender, 'Group', $args['Fields']);
+    }
+
+    /**
+     * Hook on AfterValidateGroup event.
+     *
+     * @param $sender Sending controller instance.
+     * @param $args Event's arguments.
+     */
+    public function eventModel_afterValidateEvent_handler($sender, $args) {
+        $this->reviewRecordCleanliness($sender, 'Event', $args['Fields']);
     }
 
     /**
@@ -130,7 +150,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
 
 
         if (!empty($log['RecordID'])) {
-            $oldData = $this->getOldPostData($tableName, $postData[$tableName.'ID']);
+            $oldData = $this->getRecordData($tableName, $postData[$tableName.'ID']);
 
             // Do not update if the post was deleted or if the log was done before the last valid update of the post.
             if (!$oldData || strtotime($oldData['DateUpdated']) > strtotime($log['DateInserted'])) {
@@ -161,49 +181,48 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
             }
         }
 
-        Gdn::sql()->Options('Replace', true)->insert($tableName, $set);
+        Gdn::sql()->options('Replace', true)->insert($tableName, $set);
     }
 
     /**
-     * Checks post cleanliness and send it for review if it is dirty.
+     * Checks record cleanliness and send it for review if it is dirty.
      *
-     * @param $sender Sending controller instance.
-     * @param $postType Type of post being inspected. (Comment, Discussion...)
-     * @param $postData Content of the post.
+     * @param Gdn_Model $sender Sending model instance.
+     * @param $recordType Type of post being inspected. (Comment, Discussion...)
+     * @param $recordData Content of the post.
      */
-    protected function reviewPostCleanliness($sender, $postType, $postData) {
+    protected function reviewRecordCleanliness($sender, $recordType, $recordData) {
 
         // If the post is already flagged as invalid let's abort :D
         if (!$sender->EventArguments['IsValid']) {
             return;
         }
 
-        $isPostClean = $this->isPostClean($postType, $postData);
-        if (!$isPostClean) {
+        $isRecordClean = $this->isRecordClean($recordType, $recordData);
+        if (!$isRecordClean) {
             $sender->EventArguments['IsValid'] = false;
-            $sender->EventArguments['InvalidReturnType'] = UNAPPROVED;
 
             // Set some information about the user in the data.
-            touchValue('InsertUserID', $postData, Gdn::session()->UserID);
+            touchValue('InsertUserID', $recordData, Gdn::session()->UserID);
 
-            $user = Gdn::userModel()->getID(val('InsertUserID', $postData), DATASET_TYPE_ARRAY);
+            $user = Gdn::userModel()->getID(val('InsertUserID', $recordData), DATASET_TYPE_ARRAY);
             if ($user) {
-                touchValue('Username', $postData, $user['Name']);
-                touchValue('Email', $postData, $user['Email']);
-                touchValue('IPAddress', $postData, $user['LastIPAddress']);
+                touchValue('Username', $recordData, $user['Name']);
+                touchValue('Email', $recordData, $user['Email']);
+                touchValue('IPAddress', $recordData, $user['LastIPAddress']);
             }
 
             // Set custom flag to handle log restoration later on
-            $postData['KeywordBlocker'] = true;
+            $recordData['KeywordBlocker'] = true;
 
             // Update :D
-            if (isset($postData[$postType.'ID'])) {
+            if (isset($recordData[$recordType.'ID'])) {
                 // Clean up logs in case a user edit the post multiple times
                 $logModel = new LogModel();
                 $rows = $logModel->getWhere(array(
                     'Operation' => self::MODERATION_QUEUE,
-                    'RecordType' => $postType,
-                    'RecordID' => $postData[$postType.'ID'],
+                    'RecordType' => $recordType,
+                    'RecordID' => $recordData[$recordType.'ID'],
                     'RecordUserID' => Gdn::session()->UserID,
                 ));
 
@@ -215,42 +234,73 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
                     Gdn::sql()->whereIn('LogID', $logIDs)->delete('Log');
                 }
 
-                $oldData = $this->getOldPostData($postType, $postData[$postType.'ID']);
+                $oldData = $this->getRecordData($recordType, $recordData[$recordType.'ID']);
 
                 // Preserve fields for restoration.
-                $postData = array_merge($oldData, $postData);
+                $recordData = array_merge($oldData, $recordData);
 
                 // Show diff on post review.
-                $postData['_New'] = array();
+                $recordData['_New'] = array();
 
-                if ($postType === 'Discussion') {
-                    $postData['_New']['Name'] = $postData['Name'];
-                    $postData['Name'] = $oldData['Name'];
+                if (in_array($recordType, ['Discussion', 'Group', 'Event'])) {
+                    $recordData['_New']['Name'] = $recordData['Name'];
+                    $recordData['Name'] = $oldData['Name'];
                 }
 
-                $postData['_New']['Body'] = $postData['Body'];
-                $postData['Body'] = $oldData['Body'];
+                if (in_array($recordType, ['Discussion', 'Comment', 'Event'])) {
+                    $recordContentField = 'Body';
+                } else {
+                    $recordContentField = 'Description';
+                }
+                $recordData['_New'][$recordContentField] = $recordData[$recordContentField];
+                $recordData[$recordContentField] = $oldData[$recordContentField];
+
+                if ($recordType === 'Event') {
+                    $recordData['_New']['Location'] = $recordData['Location'];
+                    $recordData['Location'] = $oldData['Location'];
+                }
             }
 
-            LogModel::insert(self::MODERATION_QUEUE, $postType, $postData);
+            LogModel::insert(self::MODERATION_QUEUE, $recordType, $recordData);
+
+            if (in_array($recordType, ['Discussion', 'Comment'])) {
+                $sender->EventArguments['InvalidReturnType'] = UNAPPROVED;
+            } else {
+                $controller = Gdn::controller();
+                if ($recordType === 'Event') {
+                    $group = $this->getRecordData('Group', $recordData['GroupID']);
+                    $controller->setData('GroupUrl', groupUrl($group));
+                }
+                $controller->render('moderation', '', 'plugins/KeywordBlocker');
+                exit();
+            }
         }
     }
 
     /**
-     * Check if a post is clean from those nasty blocked words.
+     * Check if a record is clean from those nasty blocked words.
      *
      * @param $recordType Type of record being checked. (Comment, Discussion...)
      * @param $recordData Content of the record.
      * @return bool True if clean, false otherwise.
      */
-    protected function isPostClean($recordType, $recordData) {
+    protected function isRecordClean($recordType, $recordData) {
         $words = $this->getBlockedWords();
+
+        if ($recordType === 'Group') {
+            $redordContentField = 'Description';
+        } else {
+            $redordContentField = 'Body';
+        }
 
         foreach($words as $word) {
 
-            $toTest = $recordData['Body'];
-            if ($recordType === 'Discussion') {
+            $toTest = $recordData[$redordContentField];
+            if (in_array($recordType, ['Discussion', 'Group', 'Event'])) {
                 $toTest = $recordData['Name']."\n".$toTest;
+            }
+            if ($recordType === 'Event') {
+                $toTest = $recordData['Location']."\n".$toTest;
             }
 
             if (preg_match('#\b'.preg_quote($word, '#').'\b#iu', $toTest) === 1) {
@@ -296,17 +346,31 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
     /**
      * Retrieve the data of the post that will be updated.
      *
-     * @param $postType Type of record (Comment, Discussion...)
-     * @param $postID Record ID
+     * @param $recordType Type of record (Comment, Discussion...)
+     * @param $recordID Record ID
+     *
+     * @throws Gdn_ErrorException
+     *
      * @return array Post data
      */
-    protected function getOldPostData($postType, $postID) {
-        if ($postType === 'Comment') {
-            $model = new CommentModel();
-        } else {
-            $model = new DiscussionModel();
+    protected function getRecordData($recordType, $recordID) {
+        switch($recordType) {
+            case 'Comment':
+                $model = new CommentModel();
+                break;
+            case 'Discussion':
+                $model = new DiscussionModel();
+                break;
+            case 'Group':
+                $model = new GroupModel();
+                break;
+            case 'Event':
+                $model = new EventModel();
+                break;
+            default:
+                throw new Gdn_ErrorException('Unsupported record type.');
         }
 
-        return $model->getID($postID, DATASET_TYPE_ARRAY);
+        return $model->getID($recordID, DATASET_TYPE_ARRAY);
     }
 }
