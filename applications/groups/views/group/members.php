@@ -13,7 +13,7 @@ if ($this->data('DisplayMemberFilter')) {
         <?php echo $form->label('Members Name Filter', 'memberFilter'); ?>
         <?php echo $form->textBox('memberFilter', ['class' => 'InputBox', 'value' => Gdn::request()->get('memberFilter')]); ?>
         <button type="submit" class="Button search" title="<?php echo t('Filter'); ?>"><?php echo t('Filter'); ?></button>
-        <button type="submit" class="Button clearfilter" title="<?php echo t('Clear'); ?>"><?php echo t('Clear'); ?></button>
+        <button type="submit" class="Button js-clearfilter" title="<?php echo t('Clear'); ?>"><?php echo t('Clear'); ?></button>
     </div>
     <?php
     echo $form->close();

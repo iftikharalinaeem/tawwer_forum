@@ -39,7 +39,7 @@ jQuery(function($) {
     afterLoad: userTokens.start
   });
 
-  $('button.clearfilter', '.group-members-filter-box').click(function() {
+  $('button.js-clearfilter', '.group-members-filter-box').click(function() {
     $(this).parent().find('input[name="memberFilter"]').val('');
   })
 });
