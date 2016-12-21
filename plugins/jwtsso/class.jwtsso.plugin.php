@@ -305,7 +305,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
             } else {
                 // If there was no token in the header or GET
                 $this->log('no_bearer', ['tokentype' => $tokenType]);
-                throw new Gdn_UserException('Unable to proceed, no JSON Web Token found in header.', 400);
+                throw new Gdn_UserException('Unable to proceed, no JSON Web Token found.', 400);
             }
         } else {
             // If a token was found in the header extract it.
