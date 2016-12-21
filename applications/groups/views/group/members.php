@@ -5,19 +5,22 @@ echo $header;
 
 /** @var Gdn_Form $form */
 $form = $this->Form;
+$pageUrl = groupUrl($this->data('Group'), 'members');
+$memberFilter = Gdn::request()->get('memberFilter');
 
-if ($this->data('DisplayMemberFilter')) {
-    echo $form->open(['action' => url(Gdn::request()->path()), 'method' => 'get']);
-    ?>
-    <div class="group-members-filter-box">
-        <?php echo $form->label('Members Name Filter', 'memberFilter'); ?>
-        <?php echo $form->textBox('memberFilter', ['class' => 'InputBox', 'value' => Gdn::request()->get('memberFilter')]); ?>
-        <button type="submit" class="Button search" title="<?php echo t('Filter'); ?>"><?php echo t('Filter'); ?></button>
-        <button type="submit" class="Button js-clearfilter" title="<?php echo t('Clear'); ?>"><?php echo t('Clear'); ?></button>
-    </div>
-    <?php
-    echo $form->close();
-}
+echo $form->open(['action' => $pageUrl, 'method' => 'get']);
+?>
+<div class="group-members-filter-box">
+    <?php echo $form->textBox('memberFilter', [
+        'class' => 'InputBox',
+        'value' => $memberFilter,
+        'placeholder' => t('Members Name Filter')
+    ]); ?>
+    <button type="submit" class="Button search" title="<?php echo t('Filter'); ?>"><?php echo t('Filter'); ?></button>
+    <a href="<?php echo $pageUrl; ?>" class="Button" title="<?php echo t('Clear'); ?>"><?php echo t('Clear'); ?></a>
+</div>
+<?php
+echo $form->close();
 
 if (in_array($this->data('Filter'), ['', 'leaders'])) {
     $leaderList = new MemberListModule(
@@ -40,9 +43,7 @@ if (in_array($this->data('Filter'), ['', 'members'])) {
     echo $memberList;
 }
 
-if ($this->data('DisplayPager')) {
-    PagerModule::write([
-        'Url' => groupUrl($this->data('Group'), 'members', '/').'/{Page}?filter=members',
-        'CurrentRecords' => count($this->data('Members'))
-    ]);
-}
+PagerModule::write([
+    'Url' => groupUrl($this->data('Group'), 'members', '/').'/{Page}?filter=members'.($memberFilter ? '&memberFilter='.$memberFilter : ''),
+    'CurrentRecords' => count($this->data('Members'))
+]);

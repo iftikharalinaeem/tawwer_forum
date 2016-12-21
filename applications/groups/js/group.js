@@ -38,9 +38,5 @@ jQuery(function($) {
   $('.js-invite-members').popup({
     afterLoad: userTokens.start
   });
-
-  $('button.js-clearfilter', '.group-members-filter-box').click(function() {
-    $(this).parent().find('input[name="memberFilter"]').val('');
-  })
 });
 

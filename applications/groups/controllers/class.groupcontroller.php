@@ -962,7 +962,7 @@ class GroupController extends Gdn_Controller {
      * @param string $Filter
      * @param string $memberFilter
      */
-    public function members($ID, $Page = false, $Filter = '') {
+    public function members($ID, $Page = false, $Filter = '', $memberFilter = '') {
         Gdn_Theme::section('Group');
         Gdn_Theme::section('Members');
 
@@ -980,24 +980,14 @@ class GroupController extends Gdn_Controller {
         $this->Form = new Gdn_Form();
         $this->setData('Group', $Group);
         $this->addBreadcrumb($Group['Name'], groupUrl($Group));
-        $this->addBreadcrumb(t('GroupMembers', 'Members'));
+        $this->addBreadcrumb(t('GroupMembers', 'Members'), groupUrl($Group, 'members'));
 
         list($Offset, $Limit) = offsetLimit($Page, $this->GroupModel->MemberPageSize);
-        $allowMemberFilter = $Offset === 0;
-        $this->setData('DisplayPager', true);
-        $this->setData('DisplayMemberFilter', $allowMemberFilter);
 
-        $where = [];
-        if ($allowMemberFilter) {
-            $memberFilter = Gdn::request()->get('memberFilter');
-            if ($memberFilter) {
-                $this->setData('DisplayPager', false);
-                $Limit = $this->GroupModel->MemberPageSize;
-                $where['u.Name like'] = $memberFilter.'%';
-            }
-        }
-
-        if ($Offset === 0) {
+        // Don't show the leaders module when filtering.
+        if ($memberFilter) {
+            $Filter = 'members';
+        } elseif ($Offset === 0) {
             $Filter = '';
         }
 
@@ -1006,13 +996,19 @@ class GroupController extends Gdn_Controller {
 
         // Get Leaders
         if (in_array($Filter, array('', 'leaders'))) {
-            $Users = $this->GroupModel->getMembers($Group['GroupID'], array_merge(['Role' => 'Leader'], $where), $Limit, $Offset);
+            $Users = $this->GroupModel->getMembers($Group['GroupID'], ['Role' => 'Leader'], $Limit, $Offset);
             $this->setData('Leaders', $Users);
         }
 
         // Get Members
         if (in_array($Filter, array('', 'members'))) {
-            $Users = $this->GroupModel->getMembers($Group['GroupID'], array_merge(['Role' => 'Member'], $where), $Limit, $Offset);
+            // Filter only by name (not by roles) when filtering
+            if ($memberFilter) {
+                $where = ['u.Name like' => $memberFilter.'%'];
+            } else {
+                $where = ['Role' => 'Member'];
+            }
+            $Users = $this->GroupModel->getMembers($Group['GroupID'], $where, $Limit, $Offset);
             $this->setData('Members', $Users);
         }
 
