@@ -1203,13 +1203,11 @@ EOT
         if (sizeof($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
-        $headline = sprintf(t('The status for "%s" has changed to %s.'),
-            anchor($discussionName, '/discussion/'.$discussionID, '', [], true),
-            '<strong>'.val('Name', $newStatus).'</strong>'
+        $headline = sprintf(t('The status has changed for %s.'),
+            anchor($discussionName, '/discussion/'.$discussionID, '', [], true)
         );
 
-        $story = ($statusNotes) ? sprintf(t('%s: %s'), t('Notes'), $statusNotes).'<br/><br/>' : '';
-        $story .= sprintf(t("Voting for the idea is now %s."), strtolower(val('State', $newStatus)));
+        $story = sprintf(t("Voting for the idea is %s."), strtolower(val('State', $newStatus)));
 
         $activity = [
             'ActivityType' => 'AuthorStatus',
@@ -1243,13 +1241,11 @@ EOT
         }
 
         $voters = $this->getVoterIDs($discussionID);
-        $headline = sprintf(t('The status for "%s" has changed to %s.'),
-            anchor($discussionName, '/discussion/'.$discussionID, '', [], true),
-            '<strong>'.val('Name', $newStatus).'</strong>'
+        $headline = sprintf(t('The status has changed for %s.'),
+            anchor($discussionName, '/discussion/'.$discussionID, '', [], true)
         );
 
-        $story = ($statusNotes) ? sprintf(t('%s: %s'), t('Notes'), $statusNotes).'<br/><br/>' : '';
-        $story .= sprintf(t("Voting for the idea is %s."), strtolower(val('State', $newStatus)));
+        $story = sprintf(t("Voting for the idea is %s."), strtolower(val('State', $newStatus)));
 
         foreach($voters as $voter) {
             $activity = [
