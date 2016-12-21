@@ -269,6 +269,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $sender.
      * @param Gdn_Controller $args.
+     * @throws Gdn_UserException.
      */
     public function base_connectData_handler($sender, $args) {
         $authenticationKey = $sender->Request->get('authKey');
@@ -292,18 +293,29 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
         // get the Bearer token from the Authorization header
         list($token, $tokenType) = $this->getBearerToken();
-        // if there isn't one, do not advance
+        // if there isn't one, try to get it from GET
         if ($tokenType !== 'bearer' || !$tokenType) {
-            $this->log('no_bearer', ['tokentype' => $tokenType]);
-            throw new Gdn_UserException('Unable to proceed, no JSON Web Token found in header.', 400);
-        }
+            if ($token = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'jwt', null)) {
+                // if a token was passed in GET, extract it to make sure it isn't expired.
+                $this->extractToken($token);
+                if (!$this->validateTime()) {
+                    $this->log('invalid_time', ['notbeforetime' => $this->nbfClaim, 'issuedattime' => $this->iatClaim, 'notaftertime' => $this->expClaim, 'now' => time(), 'payload' => $this->jwtPayload]);
+                    throw new Gdn_UserException('Unable to proceed, JSON Web Token is probably expired.', 400);
+                }
+            } else {
+                // If there was no token in the header or GET
+                $this->log('no_bearer', ['tokentype' => $tokenType]);
+                throw new Gdn_UserException('Unable to proceed, no JSON Web Token found in header.', 400);
+            }
+        } else {
+            // If a token was found in the header extract it.
+            $this->extractToken($token);
+            // If we ever remove time validation, we should also disable passing the token in GET as per best practices.
+            if (!$this->validateTime()) {
+                $this->log('invalid_time', ['notbeforetime' => $this->nbfClaim, 'issuedattime' => $this->iatClaim, 'notaftertime' => $this->expClaim, 'now' => time(), 'payload' => $this->jwtPayload]);
+                throw new Gdn_UserException('Unable to proceed, JSON Web Token is probably expired.', 400);
+            }
 
-        $this->extractToken($token);
-
-        // If we ever remove time validation, we should also disable passing the token in GET as per best practices.
-        if (!$this->validateTime()) {
-            $this->log('invalid_time', ['notbeforetime' => $this->nbfClaim, 'issuedattime' => $this->iatClaim, 'notaftertime' => $this->expClaim, 'now' => time(), 'payload' => $this->jwtPayload]);
-            throw new Gdn_UserException('Unable to proceed, JSON Web Token is probably expired.', 400);
         }
 
         if (!$this->validateAudience()) {
@@ -408,16 +420,6 @@ class JWTSSOPlugin extends Gdn_Plugin {
                 }
             }
         }
-
-        // If there was no token passed in the header, look in the get.
-        // We can do this because we also only accept tokens for a limited time, if we change that we should disable this.
-        if (empty($token)) {
-            if ($authToken = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'jwt', null)) {
-                return [$authToken, 'bearer'];
-            }
-        }
-
-
         // if no token is found return false.
         return [false, false];
     }
