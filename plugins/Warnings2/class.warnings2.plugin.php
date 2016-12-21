@@ -358,7 +358,22 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $emailTemplate = $email->getEmailTemplate();
                 $message = $emailTemplate->getMessage();
 
-                $message .= '<br>'.t('Post that triggered the warning:').formatQuote($record, false);
+                $quotedRecord = formatQuote($record, false);
+                // Transform the HTML to Markdown
+                $quotedRecord = strip_tags($quotedRecord, '<blockquote>');
+
+                $i = 0;
+                // Replace all blockquotes with no other blockquote as a child, one at the time (starting by the last one)!
+                while (preg_match('/<blockquote[^>]*>(?!.*<blockquote[^>]*>)(.+?)<\/blockquote>/is', $quotedRecord, $matches)) {
+                    $indented = implode("\n> ", explode("\n", trim($matches[1])));
+                    $quotedRecord = str_replace($matches[0], $indented, $quotedRecord);
+                    if ($i++ > 1000) {
+                        break; // The parsing went wrong :)
+                    }
+                }
+                $quotedRecord = "\n> ".implode("\n> ", explode("\n", trim($quotedRecord)));
+
+                $message .= '<br>'.t('Post that triggered the warning:').$quotedRecord;
                 $emailTemplate->setMessage($message);
             }
         }
