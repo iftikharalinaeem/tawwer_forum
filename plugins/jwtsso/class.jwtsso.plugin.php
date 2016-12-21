@@ -482,12 +482,18 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * @return string JSON Web Token
      */
     public function signJWT($rawJWTHeader, $rawJWTPayload, $secret, $alg) {
+        $decodeSecret = c('JWTSSO.DecodeSecret', true);
         $segments = [];
         // Strip the slashes from json encoded arrays, when base64 encoded they come out completely different.
         $segments[] = $this->base64url_encode(stripslashes($rawJWTHeader));
         $segments[] = $this->base64url_encode(stripslashes($rawJWTPayload));
         $JWTString = implode('.', $segments);
-        $key = base64_decode(strtr($secret, '-_', '+/'));
+        if ($decodeSecret) {
+            $key = base64_decode(strtr($secret, '-_', '+/'));
+        } else {
+            $key = strtr($secret, '-_', '+/');
+        }
+
         $segments[] = trim($this->base64url_encode(hash_hmac($alg, $JWTString, $key, true)));
         $jwt = implode('.', $segments);
         return $jwt;
