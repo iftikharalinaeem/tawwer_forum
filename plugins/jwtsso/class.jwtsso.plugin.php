@@ -69,6 +69,9 @@ class JWTSSOPlugin extends Gdn_Plugin {
     /** @var string or URL the aud (issuer, usually web address) from the payload of the token*/
     protected $issClaim = null;
 
+    /** @var string (unique hash) from the payload of the token*/
+    protected $jtiClaim = null;
+
     /** @var array supported alorithms */
     public  $supportedAlgs = [
         'HS256' => 'sha256',
@@ -85,7 +88,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
             val('ProfileKeyPhoto', $provider, 'picture') => 'Photo',
             val('ProfileKeyName', $provider, 'displayname') => 'Name',
             val('ProfileKeyFullName', $provider, 'name') => 'FullName',
-            'sub' => 'UniqueID'
+            val('ProfileKeyUniqueID', $provider, 'sub')  => 'UniqueID'
         ];
     }
 
@@ -111,7 +114,8 @@ class JWTSSOPlugin extends Gdn_Plugin {
                 'ProfileKeyEmail' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
                 'ProfileKeyPhoto' => 'picture',
                 'ProfileKeyName' => 'displayname',
-                'ProfileKeyFullName' => 'name'
+                'ProfileKeyFullName' => 'name',
+                'ProfileKeyUniqueID' => 'sub'
             ];
             $model->save($provider);
         }
@@ -172,10 +176,11 @@ class JWTSSOPlugin extends Gdn_Plugin {
             'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Control' => 'TextBox', 'Description' => 'Enter the shared secret, either supplied by your authentication provider or create one and share it with your authentication provider. You can click on "<b>Generate Secret</b>" below.'],
             'RegisterUrl' => ['LabelCode' => 'Register URL', 'Control' => 'TextBox', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
             'SignOutUrl' => ['LabelCode' => 'Sign Out URL', 'Control' => 'TextBox', 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
-            'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate Emails'],
-            'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate Photo.'],
-            'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate Display Name.'],
-            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Control' => 'TextBox', 'Description' => 'The Key in the JSON payload to designate Full Name.']
+            'ProfileKeyUniqueID' => ['LabelCode' => 'UniqueID', 'Description' => 'The Key in the JSON payload to designate the User\'s UniqueID'],
+            'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Description' => 'The Key in the JSON payload to designate Emails'],
+            'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON payload to designate Photo.'],
+            'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON payload to designate Display Name.'],
+            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON payload to designate Full Name.']
         ];
 
         // Allow a client to hook in and add fields that might be relevent to their set up.
@@ -210,7 +215,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
             $sender->setJson('AssociationSecret', $secret);
             $sender->render('Blank', 'Utility', 'Dashboard');
         } else {
-            $sender->render('settings', '', 'plugins/plugins/jwtsso');
+            $sender->render('settings', '', 'plugins/jwtsso');
         }
     }
 
@@ -264,6 +269,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $sender.
      * @param Gdn_Controller $args.
+     * @throws Gdn_UserException.
      */
     public function base_connectData_handler($sender, $args) {
         $authenticationKey = $sender->Request->get('authKey');
@@ -287,17 +293,29 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
         // get the Bearer token from the Authorization header
         list($token, $tokenType) = $this->getBearerToken();
-        // if there isn't one, do not advance
+        // if there isn't one, try to get it from GET
         if ($tokenType !== 'bearer' || !$tokenType) {
-            $this->log('no_bearer', ['tokentype' => $tokenType]);
-            throw new Gdn_UserException('Unable to proceed, no JSON Web Token found in header.', 400);
-        }
+            if ($token = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'jwt', null)) {
+                // if a token was passed in GET, extract it to make sure it isn't expired.
+                $this->extractToken($token);
+                if (!$this->validateTime()) {
+                    $this->log('invalid_time', ['notbeforetime' => $this->nbfClaim, 'issuedattime' => $this->iatClaim, 'notaftertime' => $this->expClaim, 'now' => time(), 'payload' => $this->jwtPayload]);
+                    throw new Gdn_UserException('Unable to proceed, JSON Web Token is probably expired.', 400);
+                }
+            } else {
+                // If there was no token in the header or GET
+                $this->log('no_bearer', ['tokentype' => $tokenType]);
+                throw new Gdn_UserException('Unable to proceed, no JSON Web Token found.', 400);
+            }
+        } else {
+            // If a token was found in the header extract it.
+            $this->extractToken($token);
+            // If we ever remove time validation, we should also disable passing the token in GET as per best practices.
+            if (!$this->validateTime()) {
+                $this->log('invalid_time', ['notbeforetime' => $this->nbfClaim, 'issuedattime' => $this->iatClaim, 'notaftertime' => $this->expClaim, 'now' => time(), 'payload' => $this->jwtPayload]);
+                throw new Gdn_UserException('Unable to proceed, JSON Web Token is probably expired.', 400);
+            }
 
-        $this->extractToken($token);
-
-        if (!$this->validateTime()) {
-            $this->log('invalid_time', ['notbeforetime' => $this->nbfClaim, 'issuedattime' => $this->iatClaim, 'notaftertime' => $this->expClaim, 'now' => time(), 'payload' => $this->jwtPayload]);
-            throw new Gdn_UserException('Unable to proceed, JSON Web Token is probably expired.', 400);
         }
 
         if (!$this->validateAudience()) {
@@ -402,7 +420,6 @@ class JWTSSOPlugin extends Gdn_Plugin {
                 }
             }
         }
-
         // if no token is found return false.
         return [false, false];
     }
@@ -428,6 +445,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
         $this->audClaim = val('aud', $this->jwtPayload);
         $this->expClaim = val('exp', $this->jwtPayload);
         $this->nbfClaim = val('nbf', $this->jwtPayload);
+        $this->jtiClaim = val('jti', $this->jwtPayload);
         $this->iatClaim = val('ait', $this->jwtHeader);
         $this->algClaim = val('alg', $this->jwtHeader);
     }
@@ -630,7 +648,6 @@ class JWTSSOPlugin extends Gdn_Plugin {
         } else {
             $this->provider = Gdn_AuthenticationProviderModel::getProviderByScheme(PROVIDER_SCHEME_ALIAS);
         }
-
         return $this->provider;
     }
 
