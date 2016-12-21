@@ -488,10 +488,10 @@ class JWTSSOPlugin extends Gdn_Plugin {
         $segments[] = $this->base64url_encode(stripslashes($rawJWTHeader));
         $segments[] = $this->base64url_encode(stripslashes($rawJWTPayload));
         $JWTString = implode('.', $segments);
+
+        $key = strtr($secret, '-_', '+/');
         if ($decodeSecret) {
-            $key = base64_decode(strtr($secret, '-_', '+/'));
-        } else {
-            $key = strtr($secret, '-_', '+/');
+            $key = base64_decode($key);
         }
 
         $segments[] = trim($this->base64url_encode(hash_hmac($alg, $JWTString, $key, true)));
