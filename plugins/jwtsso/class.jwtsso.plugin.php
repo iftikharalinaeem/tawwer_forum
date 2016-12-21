@@ -575,6 +575,10 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * @return bool
      */
     private function validateAudience() {
+        // This is an optional claim.
+        if (!$this->audClaim) {
+            return true;
+        }
         $provider = $this->provider();
         return trim($this->audClaim, '/') === trim(val('Audience', $provider), '/');
     }
@@ -586,6 +590,10 @@ class JWTSSOPlugin extends Gdn_Plugin {
      * @return bool
      */
     private function validateIssuer() {
+        // This is an optional claim.
+        if (!$this->issClaim) {
+            return true;
+        }
         $provider = $this->provider();
         return trim($this->issClaim, '/') === trim(val('BaseUrl', $provider), '/');
     }
