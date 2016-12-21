@@ -11,8 +11,8 @@ Category Role permissions can be synced with SSO connections.  This is done by p
 {
   ...
   "CategoryRoles": [
-    { "RoleID": 16, "CategoryID": "5,8,12" },
-    { "RoleID": 32, "CategoryID": "6,7,9" }
+    { "RoleID": 16, "CategoryID": [5,8,12] },
+    { "RoleID": 32, "CategoryID": [6,7,9] }
   ],
   ...
 }
@@ -24,8 +24,8 @@ Smart IDs may also be used, instead of numeric IDs.
 {
   ...
   "CategoryRoles": [
-    { "Role.Name": "Administrator", "Category.UrlCode": "special-admins" },
-    { "Role.Name": "Moderator", "Category.UrlCode": "special-moderators" }
+    { "Role.Name": "Administrator", "Category.UrlCode": ["special-admins"] },
+    { "Role.Name": "Moderator", "Category.UrlCode": ["special-moderators"] }
   ],
   ...
 }
