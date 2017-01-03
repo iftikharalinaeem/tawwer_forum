@@ -14,7 +14,7 @@ echo $form->open(['action' => $pageUrl, 'method' => 'get']);
     <?php echo $form->textBox('memberFilter', [
         'class' => 'InputBox',
         'value' => $memberFilter,
-        'placeholder' => t('Members Name Filter')
+        'placeholder' => t('Search groups members')
     ]); ?>
     <button type="submit" class="Button search" title="<?php echo t('Filter'); ?>"><?php echo t('Filter'); ?></button>
     <a href="<?php echo $pageUrl; ?>" class="Button" title="<?php echo t('Clear'); ?>"><?php echo t('Clear'); ?></a>
