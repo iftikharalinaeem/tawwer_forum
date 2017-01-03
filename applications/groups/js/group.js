@@ -32,7 +32,7 @@ var userTokens = {
   }
 }
 
-jQuery(document).ready(function($) {
+jQuery(function($) {
   userTokens.start();
 
   $('.js-invite-members').popup({

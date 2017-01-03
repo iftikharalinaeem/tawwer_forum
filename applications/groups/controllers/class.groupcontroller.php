@@ -959,8 +959,10 @@ class GroupController extends Gdn_Controller {
      *
      * @param string $ID
      * @param string $Page
+     * @param string $Filter
+     * @param string $memberFilter
      */
-    public function members($ID, $Page = false, $Filter = '') {
+    public function members($ID, $Page = false, $Filter = '', $memberFilter = '') {
         Gdn_Theme::section('Group');
         Gdn_Theme::section('Members');
 
@@ -975,12 +977,17 @@ class GroupController extends Gdn_Controller {
             throw PermissionException();
         }
 
+        $this->Form = new Gdn_Form();
         $this->setData('Group', $Group);
         $this->addBreadcrumb($Group['Name'], groupUrl($Group));
-        $this->addBreadcrumb(t('GroupMembers', 'Members'));
+        $this->addBreadcrumb(t('GroupMembers', 'Members'), groupUrl($Group, 'members'));
 
         list($Offset, $Limit) = offsetLimit($Page, $this->GroupModel->MemberPageSize);
-        if ($Offset === 0) {
+
+        // Don't show the leaders module when filtering.
+        if ($memberFilter) {
+            $Filter = 'members';
+        } elseif ($Offset === 0) {
             $Filter = '';
         }
 
@@ -989,26 +996,21 @@ class GroupController extends Gdn_Controller {
 
         // Get Leaders
         if (in_array($Filter, array('', 'leaders'))) {
-            $Users = $this->GroupModel->getMembers($Group['GroupID'], array('Role' => 'Leader'), $Limit, $Offset);
+            $Users = $this->GroupModel->getMembers($Group['GroupID'], ['Role' => 'Leader'], $Limit, $Offset);
             $this->setData('Leaders', $Users);
         }
 
         // Get Members
         if (in_array($Filter, array('', 'members'))) {
-            $Users = $this->GroupModel->getMembers($Group['GroupID'], array('Role' => 'Member'), $Limit, $Offset);
+            // Filter only by name (not by roles) when filtering
+            if ($memberFilter) {
+                $where = ['u.Name like' => $memberFilter.'%'];
+            } else {
+                $where = ['Role' => 'Member'];
+            }
+            $Users = $this->GroupModel->getMembers($Group['GroupID'], $where, $Limit, $Offset);
             $this->setData('Members', $Users);
         }
-
-        // Build a pager
-        $this->Pager = new MorePagerModule($this);
-        $this->Pager->ClientID = 'Pager';
-        $this->Pager->configure(
-            $Offset,
-            $Limit,
-            $NumResults = val('CountMembers', $this->data('Group')) - count($this->data('Leaders')),
-            groupUrl($this->data('Group'), 'members', '/').'/{Page}?filter=members',
-            true
-        );
 
         $this->Data['_properties']['newdiscussionmodule'] = array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$Group['GroupID']);
         $this->setData('Filter', $Filter);

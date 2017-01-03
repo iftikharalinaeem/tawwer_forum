@@ -393,10 +393,21 @@ class GroupModel extends Gdn_Model {
      * @throws Exception
      */
     public function getMembers($GroupID, $Where = [], $Limit = false, $Offset = false) {
+        // Little fix since UserID is now ambiguous
+        $duplicatedColumns = ['UserID', 'DateInserted'];
+        foreach($duplicatedColumns as $columnName) {
+            if (isset($Where[$columnName])) {
+                $Where['ug.'.$columnName] = $Where[$columnName];
+                unset($Where[$columnName]);
+            }
+        }
+
         // First grab the members.
         $Users = $this->SQL
-            ->from('UserGroup')
-            ->where('GroupID', $GroupID)
+            ->select('ug.*')
+            ->from('UserGroup ug')
+                ->join('User u', 'ug.UserID = u.UserID')
+            ->where('ug.GroupID', $GroupID)
             ->where($Where)
             ->orderBy('DateInserted')
             ->limit($Limit, $Offset)
