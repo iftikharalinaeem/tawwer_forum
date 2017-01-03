@@ -1203,20 +1203,17 @@ EOT
         if (sizeof($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
-        $headline = t("Progress on your idea!");
-        $lead = sprintf(t('The status for "%s" has changed to %s.'),
-            $discussionName,
-            '<strong>'.val('Name', $newStatus).'</strong>'
+        $headline = sprintf(t('The status has changed for %s.'),
+            anchor($discussionName, '/discussion/'.$discussionID, '', [], true)
         );
 
-        $story = ($statusNotes) ? '<br/><br/>'.sprintf(t('%s: %s'), t('Notes'), $statusNotes) : '';
-        $story .= '<br/><br/>'.sprintf(t("Voting for the idea is now %s."), strtolower(val('State', $newStatus)));
+        $story = sprintf(t("Voting for the idea is %s."), strtolower(val('State', $newStatus)));
 
         $activity = [
             'ActivityType' => 'AuthorStatus',
             'NotifyUserID' => $authorID,
             'HeadlineFormat' => $headline,
-            'Story' => $lead.' '.$story,
+            'Story' => $story,
             'RecordType' => 'Discussion',
             'RecordID' => $discussionID,
             'Route' => '/discussion/'.$discussionID,
@@ -1244,21 +1241,18 @@ EOT
         }
 
         $voters = $this->getVoterIDs($discussionID);
-        $headline = t('Progress on an idea you voted on!');
-        $lead = sprintf(t('The status for "%s" has changed to %s.'),
-            $discussionName,
-            '<strong>'.val('Name', $newStatus).'</strong>'
+        $headline = sprintf(t('The status has changed for %s.'),
+            anchor($discussionName, '/discussion/'.$discussionID, '', [], true)
         );
 
-        $story = ($statusNotes) ? '<br/><br/>'.sprintf(t('%s: %s'), t('Notes'), $statusNotes) : '';
-        $story .= '<br/><br/>'.sprintf(t("Voting for the idea is %s."), strtolower(val('State', $newStatus)));
+        $story = sprintf(t("Voting for the idea is %s."), strtolower(val('State', $newStatus)));
 
         foreach($voters as $voter) {
             $activity = [
                 'ActivityType' => 'VoterStatus',
                 'NotifyUserID' => $voter,
                 'HeadlineFormat' => $headline,
-                'Story' => $lead.' '.$story,
+                'Story' => $story,
                 'RecordType' => 'Discussion',
                 'RecordID' => $discussionID,
                 'Route' => '/discussion/'.$discussionID,
