@@ -364,14 +364,14 @@ class Warnings2Plugin extends Gdn_Plugin {
 
                 $i = 0;
                 // Replace all blockquotes with no other blockquote as a child, one at the time (starting by the last one)!
-                while (preg_match('/<blockquote[^>]*>(?!.*<blockquote[^>]*>)(.+?)<\/blockquote>/is', $quotedRecord, $matches)) {
-                    $indented = implode("\n> ", explode("\n", trim($matches[1])));
+                while (preg_match('/\n?<blockquote[^>]*>(?!.*<blockquote[^>]*>)(.+?)<\/blockquote>/is', $quotedRecord, $matches)) {
+                    $indented = "\n> ".implode("\n> ", explode("\n", trim($matches[1])));
                     $quotedRecord = str_replace($matches[0], $indented, $quotedRecord);
                     if ($i++ > 1000) {
                         break; // The parsing went wrong :)
                     }
                 }
-                $quotedRecord = "\n> ".implode("\n> ", explode("\n", trim($quotedRecord)));
+                $quotedRecord = implode("\n", explode("\n", trim($quotedRecord)));
 
                 $message .= '<br>'.t('Post that triggered the warning:').$quotedRecord;
                 $emailTemplate->setMessage($message);
