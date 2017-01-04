@@ -371,7 +371,7 @@ class Warnings2Plugin extends Gdn_Plugin {
                         break; // The parsing went wrong :)
                     }
                 }
-                $quotedRecord = implode("\n", explode("\n", trim($quotedRecord)));
+                $quotedRecord = trim($quotedRecord);
 
                 $message .= '<br>'.t('Post that triggered the warning:').$quotedRecord;
                 $emailTemplate->setMessage($message);
