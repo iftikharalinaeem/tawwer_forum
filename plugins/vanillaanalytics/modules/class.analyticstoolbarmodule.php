@@ -87,7 +87,7 @@ class AnalyticsToolbarModule extends Gdn_Module {
 
     public function toString() {
         $this->getData();
-        include_once $this->fetchViewLocation('helper_functions', 'plugins/vanillaanalytics');
+        include_once $this->fetchViewLocation('analyticsmodules_helper_functions', 'plugins/vanillaanalytics');
         return parent::toString();
     }
 }

@@ -246,7 +246,7 @@ class AnalyticsController extends DashboardController {
         ];
 
         $form = new Gdn_Form('', 'bootstrap');
-        include_once $this->fetchViewLocation('helper_functions', 'modules', 'plugins/vanillaanalytics');
+        include_once $this->fetchViewLocation('analyticsmodules_helper_functions', 'modules', 'plugins/vanillaanalytics');
         echo getCategoryFilterHTML($form, $categoryData, $attr, t('Subcategory'), $parentDepth + 1);
     }
 }
