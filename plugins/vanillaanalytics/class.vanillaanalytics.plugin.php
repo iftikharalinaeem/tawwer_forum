@@ -89,7 +89,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
                     'Garden.Settings.Manage',
                     'Analytics',
                     t($dashboard->getTitle()),
-                    "analytics/dashboard/{$dashboard->dashboardID}",
+                    'analytics/dashboard/'.urlencode($dashboard->dashboardID),
                     "analytics.{$dashboard->dashboardID}"
                 );
             }
