@@ -190,6 +190,27 @@ class BadgeModel extends Gdn_Model {
     }
 
     /**
+     * Detect whether a given badge is requestable.
+     *
+     * @param $data array|object Badge.
+     * @return bool Whether it is requestable.
+     */
+    public static function isRequestable($data) {
+        // Disabled badges cannot be requested.
+        if (!val('Active', $data)) {
+            return false;
+        }
+
+        // Non-manual badge types cannot be requested.
+        $type = val('Type', $data);
+        if ($type == 'Manual' || is_null($type)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Insert or update badge data.
      *
      * @param array $data The badge we're creating or updating.

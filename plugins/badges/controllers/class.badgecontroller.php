@@ -344,7 +344,8 @@ class BadgeController extends BadgesAppController {
         // Get recipients
         $this->setData('Recipients', $this->UserBadgeModel->getUsers($BadgeID, array('Limit' => 15))->resultArray());
         $this->setData('BadgeID', $BadgeID, true);
-        if (val('_New', $this->UserBadge) && val('Type', $this->Badge) == 'Manual') {
+
+        if (val('_New', $this->UserBadge) &&  BadgeModel::isRequestable($this->Badge)) {
             $this->addModule('RequestBadgeModule');
         }
         $this->addModule('BadgesModule');
@@ -495,7 +496,7 @@ class BadgeController extends BadgesAppController {
         // Get info & confirm enabled
         $Badge = $this->BadgeModel->getID($BadgeID);
         $this->setData('Badge', $Badge);
-        if (!$Badge['Active']) {
+        if (!BadgeModel::isRequestable($Badge)) {
             $this->Form->addError('Badge is not available.');
         }
 
