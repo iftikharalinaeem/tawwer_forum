@@ -485,8 +485,8 @@ class JWTSSOPlugin extends Gdn_Plugin {
         $decodeSecret = c('JWTSSO.DecodeSecret', true);
         $segments = [];
         // Strip the slashes from json encoded arrays, when base64 encoded they come out completely different.
-        $segments[] = $this->base64url_encode(stripslashes($rawJWTHeader));
-        $segments[] = $this->base64url_encode(stripslashes($rawJWTPayload));
+        $segments[] = $this->base64url_encode($rawJWTHeader);
+        $segments[] = $this->base64url_encode($rawJWTPayload);
         $JWTString = implode('.', $segments);
 
         $key = strtr($secret, '-_', '+/');
