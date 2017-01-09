@@ -329,7 +329,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
         }
 
         if (!$this->validateSignature()) {
-            $this->log('invalid_signature', ['secret' => val('AssociationSecret', $this->provider), 'segments' => $this->jwtJSONSegments]);
+            $this->log('invalid_signature', ['secret' => val('AssociationSecret', $this->provider), 'token' => $token]);
             throw new Gdn_UserException('Unable to proceed, verify the signature on your JSON Web Token.', 400);
         }
 
@@ -484,9 +484,8 @@ class JWTSSOPlugin extends Gdn_Plugin {
     public function signJWT($rawJWTHeader, $rawJWTPayload, $secret, $alg) {
         $decodeSecret = c('JWTSSO.DecodeSecret', true);
         $segments = [];
-        // Strip the slashes from json encoded arrays, when base64 encoded they come out completely different.
-        $segments[] = $this->base64url_encode(stripslashes($rawJWTHeader));
-        $segments[] = $this->base64url_encode(stripslashes($rawJWTPayload));
+        $segments[] = $this->base64url_encode($rawJWTHeader);
+        $segments[] = $this->base64url_encode($rawJWTPayload);
         $JWTString = implode('.', $segments);
 
         $key = strtr($secret, '-_', '+/');
