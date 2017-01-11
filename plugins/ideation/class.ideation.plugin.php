@@ -998,16 +998,23 @@ EOT
      * @param Gdn_DataSet $discussions
      */
     protected function addUserVotesToDiscussions($discussions) {
-        $userVotes = $this->getUserVotes();
+        // We need to extract the discussion IDs to only query relevant user votes.
+        $discussionIDs = [];
+        foreach ($discussions as $discussion) {
+            $discussionIDs[] = val('DiscussionID', $discussion);
+        }
+
+        // Only query the votes for the current discussions.
+        $userVotes = $this->getUserVotes($discussionIDs);
 
         if (!$userVotes) {
             return;
         }
 
         foreach ($discussions as &$discussion) {
-            $discussionID = val('DiscussionID', $discussion);
-            if (val($discussionID, $userVotes)) {
-                $discussion->UserVote = $userVotes[$discussionID];
+            $discussionID = $discussion->DiscussionID;
+            if ($userVote = val($discussionID, $userVotes)) {
+                $discussion->UserVote = $userVote;
             }
         }
     }
@@ -1044,15 +1051,19 @@ EOT
     /**
      * Returns an array of the sessioned user's votes where the key is the discussion ID and the value is the reaction's tag ID.
      *
-     * @param int $discussionID A discussion ID to filter the results by.
+     * @param int|array $discussionID Discussion ID(s) to filter the results by.
      * @return array The sessioned user's votes
      */
-    public function getUserVotes($discussionID = 0) {
+    public function getUserVotes($discussionID = []) {
         $userVotes = [];
         $tagIDs = [$this->getUpTagID(), $this->getDownTagID()];
 
         $user = Gdn::session();
         $userID = val('UserID', $user);
+
+        if (!is_array($discussionID)) {
+            $discussionID = [$discussionID];
+        }
 
         if ($userID) {
             $userTag = new UserTag();
@@ -1063,7 +1074,7 @@ EOT
                 'Total >' => 0
             ];
 
-            if ($discussionID > 0) {
+            if (count($discussionID)) {
                 $where['RecordID'] = $discussionID;
             }
 
