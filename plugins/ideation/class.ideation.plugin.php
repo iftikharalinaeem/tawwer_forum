@@ -999,9 +999,11 @@ EOT
      */
     protected function addUserVotesToDiscussions($discussions) {
         $userVotes = $this->getUserVotes();
+
         if (!$userVotes) {
             return;
         }
+
         foreach ($discussions as &$discussion) {
             $discussionID = val('DiscussionID', $discussion);
             if (val($discussionID, $userVotes)) {
@@ -1042,10 +1044,10 @@ EOT
     /**
      * Returns an array of the sessioned user's votes where the key is the discussion ID and the value is the reaction's tag ID.
      *
+     * @param int $discussionID A discussion ID to filter the results by.
      * @return array The sessioned user's votes
      */
-    public function getUserVotes() {
-
+    public function getUserVotes($discussionID = 0) {
         $userVotes = [];
         $tagIDs = [$this->getUpTagID(), $this->getDownTagID()];
 
@@ -1053,18 +1055,30 @@ EOT
         $userID = val('UserID', $user);
 
         if ($userID) {
-            $reactionModel = new ReactionModel();
+            $userTag = new UserTag();
+            $where = [
+                'RecordType' => 'Discussion',
+                'TagID' => $tagIDs,
+                'UserID' => $userID,
+                'Total >' => 0
+            ];
+
+            if ($discussionID > 0) {
+                $where['RecordID'] = $discussionID;
+            }
 
             // TODO: Cache this thing.
-            $data = $reactionModel->GetRecordsWhere(
-                ['TagID' => $tagIDs, 'RecordType' => ['Discussion'], 'UserID' => $userID, 'Total >' => 0],
+            $data = $userTag->getWhere(
+                $where,
                 'DateInserted',
-                'desc',
-                1000 // This is affecting the up arrow being toggled so let fetch a lot of them!
-            );
+                'desc'
+            )->resultArray();
 
             foreach ($data as $discussion) {
-                $userVotes[val('RecordID', $discussion)] = val('TagID', $discussion);
+                $discussionID = $discussion['RecordID'];
+                $tagID = $discussion['TagID'];
+
+                $userVotes[$discussionID] = $tagID;
             }
         }
 
@@ -1090,18 +1104,18 @@ EOT
             return '';
         }
 
-        $votes = $this->getUserVotes();
         $discussionID = val('DiscussionID', $discussion);
+        $votes = $this->getUserVotes($discussionID);
+        $tagID = val($discussionID, $votes);
 
-        if (val($discussionID, $votes) == self::getUpTagID()) {
-            return self::REACTION_UP;
+        switch ($tagID) {
+            case self::getUpTagID():
+                return self::REACTION_UP;
+            case self::getDownTagID():
+                return self::REACTION_DOWN;
+            default:
+                return '';
         }
-
-        if (val($discussionID, $votes) == self::getDownTagID()) {
-            return self::REACTION_DOWN;
-        }
-
-        return '';
     }
 
     /**
