@@ -1051,7 +1051,7 @@ EOT
     /**
      * Returns an array of the sessioned user's votes where the key is the discussion ID and the value is the reaction's tag ID.
      *
-     * @param int|array $discussionID Discussion ID(s) to filter the results by.
+     * @param int|array $discussionIDs Discussion ID(s) to filter the results by.
      * @return array The sessioned user's votes
      */
     public function getUserVotes($discussionIDs = []) {
