@@ -1,1 +1,4 @@
 /* Override default advanced-search.css */
+.AdvancedSearch .AdvancedWrap {
+  display: none;
+}
