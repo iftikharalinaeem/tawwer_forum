@@ -1054,15 +1054,15 @@ EOT
      * @param int|array $discussionID Discussion ID(s) to filter the results by.
      * @return array The sessioned user's votes
      */
-    public function getUserVotes($discussionID = []) {
+    public function getUserVotes($discussionIDs = []) {
         $userVotes = [];
         $tagIDs = [$this->getUpTagID(), $this->getDownTagID()];
 
         $user = Gdn::session();
         $userID = val('UserID', $user);
 
-        if (!is_array($discussionID)) {
-            $discussionID = [$discussionID];
+        if (!is_array($discussionIDs)) {
+            $discussionIDs = [$discussionIDs];
         }
 
         if ($userID) {
@@ -1074,8 +1074,8 @@ EOT
                 'Total >' => 0
             ];
 
-            if (count($discussionID)) {
-                $where['RecordID'] = $discussionID;
+            if (count($discussionIDs)) {
+                $where['RecordID'] = $discussionIDs;
             }
 
             // TODO: Cache this thing.
