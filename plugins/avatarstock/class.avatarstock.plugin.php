@@ -332,7 +332,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
             );
 
             // Create n thumbnail (cropped)
-            $crop_dimensions = c('Garden.Thumbnail.Size', 120);
+            $crop_dimensions = c('Garden.Thumbnail.Size');
             $crop_parsed = $upload_image->SaveImageAs(
                 $tmp_file,
                 $path_thumb_n,
@@ -492,7 +492,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
                 $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
 
                 // Save the uploaded image in thumbnail size
-                $ThumbSize = c('Garden.Thumbnail.Size', 120);
+                $ThumbSize = c('Garden.Thumbnail.Size');
                 $UploadImage->SaveImageAs(
                     $TmpImage,
                     "userpics/$Subdir/n$Basename",
