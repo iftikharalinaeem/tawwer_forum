@@ -485,8 +485,8 @@ class AvatarStockPlugin extends Gdn_Plugin {
                 $Props = $UploadImage->SaveImageAs(
                     $TmpImage,
                     "userpics/$Subdir/p$Basename",
-                    C('Garden.Profile.MaxHeight', 1000),
-                    C('Garden.Profile.MaxWidth', 250),
+                    C('Garden.Profile.MaxHeight'),
+                    C('Garden.Profile.MaxWidth'),
                     array('SaveGif' => C('Garden.Thumbnail.SaveGif'))
                 );
                 $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
