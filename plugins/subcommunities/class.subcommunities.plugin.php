@@ -597,7 +597,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     private function getCanonicalUrl($category, $path = null) {
         $canonicalUrl = false;
-        $webroot = null;
+        $webroot = '';
 
         if (is_numeric($category) || is_string($category)) {
             $category = CategoryModel::categories($category);
@@ -629,13 +629,11 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             }
         }
 
-        if ($webroot) {
-            // Temporarily swap out the current web root for the modified one, before generating the URL.
-            $currentWebRoot = Gdn::request()->webRoot();
-            Gdn::request()->webRoot($webroot);
-            $canonicalUrl = url($path, true);
-            Gdn::request()->webRoot($currentWebRoot);
-        }
+        // Temporarily swap out the current web root for the modified one, before generating the URL.
+        $currentWebRoot = Gdn::request()->webRoot();
+        Gdn::request()->webRoot($webroot);
+        $canonicalUrl = url($path, true);
+        Gdn::request()->webRoot($currentWebRoot);
 
         return $canonicalUrl;
     }
