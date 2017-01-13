@@ -20,7 +20,11 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     protected $api = false;
 
+    /** @var string The unmodified web root for the current request. */
+    protected $originalWebRoot = '';
+
     protected $savedDefaultRoute = '';
+
     protected $savedDoHeadings = '';
 
     protected $categories;
@@ -222,6 +226,11 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param CategoriesController $sender
      */
     public function categoriesController_render_before($sender) {
+        $canonicalUrl = $this->getCanonicalUrl($sender->data('Category'));
+        if ($canonicalUrl) {
+            $sender->canonicalUrl($canonicalUrl);
+        }
+
         if (!SubcommunityModel::getCurrent()) {
             return;
         }
@@ -285,6 +294,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         if ($site) {
             Gdn::request()->path($path);
             $webroot = Gdn::request()->webRoot();
+            $this->originalWebRoot = $webroot;
+
             Gdn::request()->assetRoot($webroot);
             Gdn::request()->webRoot(trim("$webroot/$root", '/'));
 
@@ -562,5 +573,70 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         // Pass number of questions back to sender.
         $args['questionCount'] = $questionCount;
+    }
+
+    /**
+     * @param DiscussionController $sender
+     * @param array $args
+     */
+    public function discussionController_render_before($sender, $args) {
+        $category = $sender->data('Category');
+        $canonical = $this->getCanonicalUrl($category);
+
+        if ($canonical) {
+            $sender->canonicalUrl($canonical);
+        }
+    }
+
+    /**
+     * Get the canonical URL for a resource, based on a category ID.
+     *
+     * @param int|array|object $category A category row.
+     * @param string|null $path
+     * @return string|bool
+     */
+    private function getCanonicalUrl($category, $path = null) {
+        $canonicalUrl = false;
+        $webroot = null;
+
+        if (is_numeric($category) || is_string($category)) {
+            $category = CategoryModel::categories($category);
+        }
+
+        if ($path === null) {
+            $path = Gdn::request()->path();
+        }
+
+        if ($category) {
+            // Grab this category's ancestors...
+            $parents = CategoryModel::getAncestors(val('CategoryID', $category));
+            // ...and pull the one from the top. This should be the highest, non-root parent.
+            $topParent = reset($parents);
+
+            if ($topParent) {
+                foreach (SubcommunityModel::all() as $subcommunity) {
+                    if ($subcommunity['CategoryID'] == $topParent['CategoryID']) {
+                        // If viewing a category URL, reset the path to home when viewing the subcommunity's category.
+                        if (stringBeginsWith($path, 'categories/') && $topParent['CategoryID'] == val('CategoryID', $category)) {
+                            $path = '/';
+                        }
+
+                        // OriginalWebRoot is the un-modified web root, used in case we are already in a subcommunity.
+                        $webroot = trim("{$this->originalWebRoot}/{$subcommunity['Folder']}", '/');
+                        break;
+                    }
+                }
+            }
+        }
+
+        if ($webroot) {
+            // Temporarily swap out the current web root for the modified one, before generating the URL.
+            $currentWebRoot = Gdn::request()->webRoot();
+            Gdn::request()->webRoot($webroot);
+            $canonicalUrl = url($path, true);
+            Gdn::request()->webRoot($currentWebRoot);
+        }
+
+        return $canonicalUrl;
     }
 }
