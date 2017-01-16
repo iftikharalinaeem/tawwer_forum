@@ -17,9 +17,9 @@
 }
 
 #WhosOnline .Invisible {
-   opacity: 0.3;
+    opacity: 0.3;
 }
 
 #WhosOnline .Invisible:hover {
-   opacity: 1;
+    opacity: 1;
 }
