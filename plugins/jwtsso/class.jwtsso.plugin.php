@@ -173,7 +173,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
             'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Control' => 'TextBox', 'Description' => 'Enter the shared secret, either supplied by your authentication provider or create one and share it with your authentication provider. You can click on "<b>Generate Secret</b>" below.'],
             'RegisterUrl' => ['LabelCode' => 'Register URL', 'Control' => 'TextBox', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
             'SignOutUrl' => ['LabelCode' => 'Sign Out URL', 'Control' => 'TextBox', 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
-            'KeyMap[UniqueID]' => ['LabelCode' => 'UniqueID', 'Options' => ['Value' => val('UniqueID', $form->getValue('KeyMap'))], 'Description' => 'The Key in the JSON payload to designate the User\'s UniqueID', 'Attrubutes' => ['value' => 'this is the default']],
+            'KeyMap[UniqueID]' => ['LabelCode' => 'UniqueID', 'Options' => ['Value' => val('UniqueID', $form->getValue('KeyMap'))], 'Description' => 'The Key in the JSON payload to designate the User\'s UniqueID'],
             'KeyMap[Email]' => ['LabelCode' => 'Email', 'Options' => ['Value' => val('Email', $form->getValue('KeyMap'))], 'Description' => 'The Key in the JSON payload to designate Emails'],
             'KeyMap[Photo]' => ['LabelCode' => 'Photo', 'Options' => ['Value' => val('Photo', $form->getValue('KeyMap'))], 'Description' => 'The Key in the JSON payload to designate Photo.'],
             'KeyMap[Name]' => ['LabelCode' => 'Display Name', 'Options' => ['Value' => val('Name', $form->getValue('KeyMap'))], 'Description' => 'The Key in the JSON payload to designate Display Name.'],
