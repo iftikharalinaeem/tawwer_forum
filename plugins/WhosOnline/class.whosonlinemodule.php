@@ -5,8 +5,6 @@
  */
 class WhosOnlineModule extends Gdn_Module {
 
-    protected $_OnlineUsers;
-
     /**
      * WhosOnlineModule constructor.
      *
@@ -14,6 +12,7 @@ class WhosOnlineModule extends Gdn_Module {
      */
     public function __construct($sender = '') {
         parent::__construct($sender);
+        $this->_ApplicationFolder = 'plugins/WhosOnline';
     }
 
     /**
@@ -63,11 +62,12 @@ class WhosOnlineModule extends Gdn_Module {
         }
 
         ksort($OnlineUsers);
-        $this->_OnlineUsers = $OnlineUsers;
-        $CountUsers = count($this->_OnlineUsers);
+        $CountUsers = count($OnlineUsers);
         $GuestCount = WhosOnlinePlugin::guestCount();
-        $this->_Count = $CountUsers + $GuestCount;
-        $this->_GuestCount = $GuestCount;
+
+        $this->setData('OnlineUsers', $OnlineUsers);
+        $this->setData('GuestCount', $GuestCount);
+        $this->setData('TotalCount', $CountUsers + $GuestCount);
     }
 
     /**
@@ -81,71 +81,10 @@ class WhosOnlineModule extends Gdn_Module {
      * @return string
      */
     public function toString() {
-        if (!$this->_OnlineUsers) {
+        if (!$this->data('OnlineUsers')) {
             $this->getData();
         }
 
-        $Data = $this->_OnlineUsers;
-        $Count = $this->_Count;
-
-        ob_start();
-        $DisplayStyle = c('WhosOnline.DisplayStyle', 'list');
-        ?>
-        <div id="WhosOnline" class="Box">
-            <h4><?php echo t("Who's Online"); ?>
-                <span class="Count"><?php echo Gdn_Format::bigNumber($Count, 'html') ?></span>
-            </h4>
-            <?php
-            if ($Count > 0) {
-                if ($DisplayStyle == 'pictures') {
-                    if (count($Data) > 10) {
-                        $ListClass = 'PhotoGrid PhotoGridSmall';
-                    } else {
-                        $ListClass = 'PhotoGrid';
-                    }
-
-                    echo '<div class="'.$ListClass.'">';
-
-                    foreach ($Data as $User) {
-                        if (!$User['Photo'] && !function_exists('UserPhotoDefaultUrl')) {
-                            $User['Photo'] = asset('/applications/dashboard/design/images/usericon.gif', true);
-                        }
-
-                        echo userPhoto($User, [
-                            'LinkClass' => (($User['Invisible']) ? 'Invisible' : '')
-                        ]);
-                    }
-
-                    if ($this->_GuestCount) {
-                        $GuestCount = Gdn_Format::bigNumber($this->_GuestCount, 'html');
-                        $GuestsText = plural($this->_GuestCount, 'guest', 'guests');
-                        $Plus = $Count == $GuestCount ? '' : '+';
-                        echo <<<EOT
-        <span class="GuestCountBox"><span class="GuestCount">{$Plus}$GuestCount</span> <span class="GuestLabel">$GuestsText</span></span>
-EOT;
-                    }
-
-                    echo '</div>';
-                } else {
-                    echo '<ul class="PanelInfo">';
-
-                    foreach ($Data as $User) {
-                        echo '<li>'.userAnchor($User, ($User['Invisible']) ? 'Invisible' : '').'</li>';
-                    }
-
-                    if ($this->_GuestCount) {
-                        echo '<li><strong>'.sprintf(t('+%s Guests'), Gdn_Format::bigNumber($this->_GuestCount, 'html')).'</strong></li>';
-                    }
-
-                    echo '</ul>';
-                }
-            }
-            ?>
-        </div>
-        <?php
-
-        $String = ob_get_contents();
-        @ob_end_clean();
-        return $String;
+        return parent::toString();
     }
 }
