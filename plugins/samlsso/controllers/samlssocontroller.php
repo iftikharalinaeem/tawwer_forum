@@ -56,6 +56,26 @@ class SAMLSSOController extends PluginController {
                 'LabelCode' => 'Registration URL',
                 'Description' => t('The url that users use to register for a new account.')
             ],
+            'KeyMap[mail]' => [
+                'LabelCode' => 'Email',
+                'Description' => 'The Key in the XML payload to designate Emails',
+                'Options' => ['Value' => val('mail', $form->getValue('KeyMap'), 'mail')]
+            ],
+            'KeyMap[photo]' => [
+                'LabelCode' => 'Photo',
+                'Description' => 'The Key in the XML payload to designate Photo.',
+                'Options' => ['Value' => val('photo', $form->getValue('KeyMap'), 'photo')]
+            ],
+            'KeyMap[uid]' => [
+                'LabelCode' => 'Display Name',
+                'Description' => 'The Key in the XML payload to designate Display Name.',
+                'Options' => ['Value' => val('uid', $form->getValue('KeyMap'), 'uid')]
+            ],
+            'KeyMap[cn]' => [
+                'LabelCode' => 'Full Name',
+                'Description' => 'The Key in the XML payload to designate Full Name.',
+                'Options' => ['Value' => val('cn', $form->getValue('KeyMap'), 'cn')]
+            ],
             'AssociationSecret' => [
                 'LabelCode' => 'IDP Certificate',
                 'Options' => ['Multiline' => true, 'Class' => 'TextBox BigInput']

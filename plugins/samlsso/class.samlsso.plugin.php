@@ -335,7 +335,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Extract the profile values from the response, translating the keys to match our keys.
      *
      * @param string $name
      * @param array $array
@@ -343,6 +343,13 @@ class SamlSSOPlugin extends Gdn_Plugin {
      * @return array|bool|mixed
      */
     public function rval($name, $array, $default = false) {
+        $authenticationKey = Gdn::request()->get('authKey');
+        // Backward compatibility
+        if (!$authenticationKey) {
+            $authenticationKey = 'saml';
+        }
+        $provider = $this->getProvider($authenticationKey);
+        $name = val($name, $provider['KeyMap'], $name);
         if (isset($array[$name])) {
             $val = $array[$name];
 
