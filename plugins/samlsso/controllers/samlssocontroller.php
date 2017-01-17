@@ -58,22 +58,22 @@ class SAMLSSOController extends PluginController {
             ],
             'KeyMap[mail]' => [
                 'LabelCode' => 'Email',
-                'Description' => 'The Key in the XML payload to designate Emails',
+                'Description' => t('The Key in the XML payload to designate Emails'),
                 'Options' => ['Value' => val('mail', $form->getValue('KeyMap'), 'mail')]
             ],
             'KeyMap[photo]' => [
                 'LabelCode' => 'Photo',
-                'Description' => 'The Key in the XML payload to designate Photo.',
+                'Description' => t('The Key in the XML payload to designate Photo.'),
                 'Options' => ['Value' => val('photo', $form->getValue('KeyMap'), 'photo')]
             ],
             'KeyMap[uid]' => [
                 'LabelCode' => 'Display Name',
-                'Description' => 'The Key in the XML payload to designate Display Name.',
+                'Description' => t('The Key in the XML payload to designate Display Name.'),
                 'Options' => ['Value' => val('uid', $form->getValue('KeyMap'), 'uid')]
             ],
             'KeyMap[cn]' => [
                 'LabelCode' => 'Full Name',
-                'Description' => 'The Key in the XML payload to designate Full Name.',
+                'Description' => t('The Key in the XML payload to designate Full Name.'),
                 'Options' => ['Value' => val('cn', $form->getValue('KeyMap'), 'cn')]
             ],
             'AssociationSecret' => [
