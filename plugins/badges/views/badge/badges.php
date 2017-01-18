@@ -50,7 +50,7 @@ foreach ($this->data('Badges') as $Badge) :
                 echo anchor(dashboardSymbol('edit'), '/badge/manage/'.$Badge->BadgeID, 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
             }
             if (checkPermission('Reputation.Badges.Manage') && $Badge->CanDelete) {
-                echo anchor(dashboardSymbol('delete'), '/badge/delete/'.$Badge->BadgeID.'/?Target='.urlencode($this->SelfUrl), 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-body' => t('Are you sure you want to delete this badge?')]);
+                echo anchor(dashboardSymbol('delete'), '/badge/delete/'.$Badge->BadgeID.'/?Target='.urlencode($this->SelfUrl), 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-body' => t('Are you sure you want to delete this badge?')]);
             }
             if (checkPermission('Reputation.Badges.Give') && $Badge->Active) {
                 echo anchor(dashboardSymbol('give-badge'), '/badge/give/'.$Badge->BadgeID, 'js-modal btn btn-icon', ['title' => t('Give Badge'), 'aria-label' => t('Give Badge')]);

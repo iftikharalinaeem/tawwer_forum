@@ -49,7 +49,7 @@
                     <div class="btn-group">
                     <?php
                         echo anchor(dashboardSymbol('edit'), "/samlsso/edit/{$provider['AuthenticationKey']}", 'btn btn-icon', ['aria-label' => t('Edit')]);
-                        echo anchor(dashboardSymbol('delete'), "/samlsso/delete/{$provider['AuthenticationKey']}", 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete')]);
+                        echo anchor(dashboardSymbol('delete'), "/samlsso/delete/{$provider['AuthenticationKey']}", 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete')]);
                     ?>
                     </div>
                 </td>
