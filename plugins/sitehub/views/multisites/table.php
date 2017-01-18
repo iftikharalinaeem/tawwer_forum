@@ -34,7 +34,7 @@
                 <td class="js-status"><?php echo strtolower($Row['Status']); ?></td>
                 <td class="options">
                     <?php
-                    echo anchor(dashboardSymbol('delete'), "/multisites/{$Row['MultisiteID']}/delete", 'btn btn-icon js-modal-confirm js-hijack',
+                    echo anchor(dashboardSymbol('delete'), "/multisites/{$Row['MultisiteID']}/delete", 'btn btn-icon js-modal-confirm',
                         ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-body' => sprintf(t('Are you sure you want to delete this %s?'), t('site'))]);
                     ?>
                 </td>
