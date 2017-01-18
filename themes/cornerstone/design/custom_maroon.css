@@ -514,9 +514,6 @@ textarea.TextBox:focus {
 .ButtonGroup.Big > .Button.Handle {
   width: 20%;
 }
-.BoxButtons {
-  margin-bottom: 20px;
-}
 .Sprite,
 .Sprite16,
 .ReactSprite,
@@ -1076,6 +1073,11 @@ a.Bookmarked:hover:before {
 }
 .PageControls:empty {
   display: none;
+}
+.PageControls::after {
+  content: "";
+  display: table;
+  clear: both;
 }
 .MeBox {
   float: right;
