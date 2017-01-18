@@ -514,6 +514,9 @@ textarea.TextBox:focus {
 .ButtonGroup.Big > .Button.Handle {
   width: 20%;
 }
+.site-sidebar .BoxButtons {
+  margin-bottom: 20px;
+}
 .Sprite,
 .Sprite16,
 .ReactSprite,
