@@ -1,4 +1,4 @@
-<h2><?php echo $this->data('Title'); ?></h2>
+<h1><?php echo $this->data('Title'); ?></h1>
 
 <?php
 

@@ -55,6 +55,14 @@ class TermsManagerPlugin extends Gdn_Plugin {
             ->set();
     }
 
+
+    /**
+     * Settings form in dashboard to save the Terms, activate and disactivate.
+     *
+     * @param SettingsController $sender
+     * @param SettingsController $args
+     * @throws Gdn_UserException
+     */
     public function settingsController_termsManager_create($sender, $args) {
         $sender->permission('Garden.Settings.Manage');
 
@@ -84,12 +92,11 @@ class TermsManagerPlugin extends Gdn_Plugin {
     }
 
 
-
     /**
      * Insert checkbox and messaging into entry/connect view to agree to the Terms and Conditions on sign up.
      *
      * @param EntryController $sender
-     * @param array $args
+     * @param EntryController array $args
      */
     public function entryController_afterPassword_handler($sender, $args) {
         $validationResults = $sender->Form->validationResults();
@@ -98,12 +105,18 @@ class TermsManagerPlugin extends Gdn_Plugin {
         }
     }
 
+
+    /**
+     * @param EntryController $sender
+     * @param EntryController $args
+     */
     public function entryController_registerBeforePassword_handler($sender, $args) {
         // The register page has two events, use the 'RegisterFormBeforeTerms', use this for the connect page in SSO
         if ($sender->Request->path() === 'entry/register') {
             return;
         }
 
+        // Set these values so that Connect view will show the checkbox.
         $sender->setData("AllowConnect", true);
         $sender->setData('NoConnectName', false);
         $sender->Form->setFormValue('Connect', true);
@@ -113,15 +126,23 @@ class TermsManagerPlugin extends Gdn_Plugin {
         $this->addTermsCheckBox($sender);
     }
 
+
+    /**
+     * Inject the Terms checkbox at the bottom of the Register form.
+     *
+     * @param EntryController $sender
+     * @param EntryController $args
+     */
     public function entryController_registerFormBeforeTerms_handler($sender, $args) {
         $this->addTermsCheckBox($sender);
     }
 
+
     /**
-     * Add validation for the Terms and Conditions opt-in on sign up.
+     * If the Terms have changed, add validation for opt-in on Sign In and update the user's record.
      *
-     * @param Gdn_Controller $sender
-     * @param array $args
+     * @param EntryController $sender
+     * @param EntryController $args
      */
     public function entryController_signIn_handler($sender, $args) {
         $this->addTermsValidation($sender);
@@ -139,8 +160,8 @@ class TermsManagerPlugin extends Gdn_Plugin {
     /**
      * Add validation for the Terms when connecting over SSO.
      *
-     * @param $sender
-     * @param $args
+     * @param EntryController $sender
+     * @param EntryController $args
      */
     public function entryController_AfterConnectData_handler($sender, $args) {
         $sender->setData("AllowConnect", true);
@@ -156,16 +177,18 @@ class TermsManagerPlugin extends Gdn_Plugin {
     /**
      * Check if a user has agreed to the terms and validate accordingly.
      *
-     * @param $sender
+     * @param $sender Sender object passed where ever it is called.
      * @param bool|false $sso
      */
     private function addTermsValidation($sender, $sso = false) {
         $terms = $this->getTerms();
 
+        // If disabled abort.
         if (!val('Active', $terms)) {
             return;
         }
 
+        // If Admin wants users to opt in again, if the Terms have changed.
         if (val('ForceRenew', $terms)) {
             $email = $sender->Form->getFormValue('Email');
             $user = Gdn::userModel()->getByEmail($email);
@@ -173,11 +196,13 @@ class TermsManagerPlugin extends Gdn_Plugin {
                 $user = Gdn::userModel()->getByUsername($email);
             }
 
+            // If the user has already opted-in
             if (val('Terms', $user) === val('TermsOfUseID', $terms)) {
                 return;
             }
         }
 
+        // "Manually" flag SSO connections because the form is not being posted back.
         if ($sender->Form->isPostBack() || $sso) {
             $sender->Form->validateRule('Terms', 'ValidateRequired', t('You must agree to the code of conduct'));
         }
@@ -192,10 +217,13 @@ class TermsManagerPlugin extends Gdn_Plugin {
      */
     private function addTermsCheckBox($sender, $wrapTag = 'li') {
         $terms = $this->getTerms();
+
+        // If disabled abort.
         if (!val('Active', $terms)) {
             return;
         }
 
+        // If Admin wants users to opt in again, if the Terms have changed.
         if (val('ForceRenew', $terms)) {
             $email = $sender->Form->getFormValue('Email');
             $user = Gdn::userModel()->getByEmail($email);
@@ -224,10 +252,9 @@ class TermsManagerPlugin extends Gdn_Plugin {
     /**
      * Create a page for displaying the Terms in a modal popup.
      *
-     * @param VanillaControler $sender
-     * @param $args
+     * @param VanillaController $sender
+     * @param VanillaController $args
      */
-
     public function vanillaController_terms_create($sender, $args) {
         $terms = $this->getTerms();
         $sender->setData('Body', val('Body', $terms));
