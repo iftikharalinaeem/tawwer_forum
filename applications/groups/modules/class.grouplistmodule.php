@@ -235,6 +235,7 @@ class GroupListModule extends Gdn_Module {
           $groupList = $this->getGroupsInfo($this->layout, $this->groups, $this->title, $this->emptyMessage, $this->cssClass, $this->id);
           $controller = new Gdn_Controller();
           $controller->setData('list', $groupList);
+          $controller->fireEvent('groupList');
           return $controller->fetchView($this->getView(), 'modules', 'groups');
      }
 
