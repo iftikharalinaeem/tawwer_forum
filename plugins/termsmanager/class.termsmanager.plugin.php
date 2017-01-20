@@ -71,9 +71,9 @@ class TermsManagerPlugin extends Gdn_Plugin {
         $sender->Form = $form;
 
         if ($form->AuthenticatedPostBack()) {
-            $form->validateRule('Link', 'function:ValidateWebAddress', 'Please include a valid URL as a link, or leave it blank to use the supplied text.');
+            $form->validateRule('Link', 'function:ValidateWebAddress', t('Please include a valid URL as a link, or leave it blank to use the supplied text.'));
             if (!$form->getValue('Body') && !$form->getValue('Link')) {
-                $form->validateRule('Link', 'function:ValidateRequired', 'You must include either an external link to a Terms of Use document or include your Terms of Use in the form below.');
+                $form->validateRule('Link', 'function:ValidateRequired', t('You must include either an external link to a Terms of Use document or include your Terms of Use in the form below.'));
             }
             if ($this->save($sender->Form)) {
                 $sender->informMessage(t('Saved'));
@@ -82,12 +82,12 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
         $form->setData($this->getTerms());
         // Set up the form.
-        $formFields['Link'] = ['LabelCode' => 'Link to Terms of Use', 'Description' => 'External link to a \'Terms\' document.', 'Control' => 'TextBox'];
-        $formFields['Body'] = ['LabelCode' => 'Terms of Use Text', 'Description' => 'If you have a link to internal document in \'Link to Terms of User\' above, this will be ignored. Remove the link if you want to use this text.', 'Control' => 'TextBox', 'Options' => ['MultiLine' => true, 'rows' => 10, 'columns' => 100]];
-        $formFields['Active'] = ['LabelCode' => 'Enable Terms of Use', 'Control' => 'CheckBox'];
-        $formFields['ForceRenew'] = ['LabelCode' => 'Force Review', 'Description' => 'If you have updated your \'Terms\' you can force users to agree to the new terms when logging in.', 'Control' => 'CheckBox'];
+        $formFields['Link'] = ['LabelCode' => t('Link to Terms of Use'), 'Description' => t('External link to a \'Terms\' document.'), 'Control' => 'TextBox'];
+        $formFields['Body'] = ['LabelCode' => t('Terms of Use Text'), 'Description' => 'If you have a link to internal document in \'Link to Terms of User\' above, \'Terms of Use Text\' will be ignored. Remove the link if you want to use this text.', 'Control' => 'TextBox', 'Options' => ['MultiLine' => true, 'rows' => 10, 'columns' => 100]];
+        $formFields['Active'] = ['LabelCode' => t('Enable Terms of Use'), 'Control' => 'CheckBox'];
+        $formFields['ForceRenew'] = ['LabelCode' => t('Force Review'), 'Description' => t('If you have updated your \'Terms\' you can force users to agree to the new terms when logging in.'), 'Control' => 'CheckBox'];
         $sender->setData('_Form', $formFields);
-        $sender->setData('Title', sprintf(t('%s Settings'), 'Terms of Use Management'));
+        $sender->setData('Title', sprintf(t('%s Settings'), t('Terms of Use Management')));
         $sender->render('settings', '', 'plugins/termsmanager');
     }
 
@@ -257,7 +257,8 @@ class TermsManagerPlugin extends Gdn_Plugin {
      */
     public function vanillaController_terms_create($sender, $args) {
         $terms = $this->getTerms();
-        $sender->setData('Body', val('Body', $terms));
+        $body = Gdn_Format::text(val('Body', $terms));
+        $sender->setData('Body', $body);
         $sender->render('terms', '', 'plugins/termsmanager');
     }
 
