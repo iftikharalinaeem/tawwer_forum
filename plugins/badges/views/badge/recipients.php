@@ -29,7 +29,7 @@
                 <td><?php
                     echo anchor(t('Revoke'),
                         '/badge/revoke/'.val('UserID', $recipient).'/'.$this->data('Badge.BadgeID'),
-                        'js-modal-confirm js-hijack btn btn-primary revoke-badge',
+                        'js-modal-confirm btn btn-primary revoke-badge',
                         ['aria-label' => t('Revoke'), 'title' => t('Revoke')]
                     ); ?></td>
             </tr>

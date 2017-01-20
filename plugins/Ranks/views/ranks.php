@@ -36,7 +36,7 @@ echo heading(t('Ranks'), sprintf(t('Add %s'), t('Rank')), '/settings/addrank');
                     <div class="btn-group">
                     <?php
                     echo anchor(dashboardSymbol('edit'), '/settings/editrank?rankid='.$Row['RankID'], 'btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
-                    echo anchor(dashboardSymbol('delete'), '/settings/deleterank?rankid='.$Row['RankID'], 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
+                    echo anchor(dashboardSymbol('delete'), '/settings/deleterank?rankid='.$Row['RankID'], 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                     ?>
                     </div>
                 </td>
