@@ -16,6 +16,6 @@
 </ul>
 <?php
    echo $this->Form->Close("Save",'',array(
-      'class' => 'SliceSubmit Button'
+      'class' => 'Button'
    ));
 ?>
