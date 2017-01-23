@@ -83,13 +83,8 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
     public function __construct() {
         $provider = $this->provider();
-        $this->translatedKeys = [
-            val('ProfileKeyEmail', $provider, 'email') => 'Email',
-            val('ProfileKeyPhoto', $provider, 'picture') => 'Photo',
-            val('ProfileKeyName', $provider, 'displayname') => 'Name',
-            val('ProfileKeyFullName', $provider, 'name') => 'FullName',
-            val('ProfileKeyUniqueID', $provider, 'sub')  => 'UniqueID'
-        ];
+        // Use the values of the KeyMap as keys and keys as values
+        $this->translatedKeys = array_flip(val('KeyMap', $provider));
     }
 
     /**
@@ -111,11 +106,13 @@ class JWTSSOPlugin extends Gdn_Plugin {
                 'AuthenticationKey' => DEFAULT_PROVIDER_KEY,
                 'AuthenticationSchemeAlias' => PROVIDER_SCHEME_ALIAS,
                 'Name' => DEFAULT_PROVIDER_KEY,
-                'ProfileKeyEmail' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
-                'ProfileKeyPhoto' => 'picture',
-                'ProfileKeyName' => 'displayname',
-                'ProfileKeyFullName' => 'name',
-                'ProfileKeyUniqueID' => 'sub'
+                'KeyMap' => [
+                    'Email' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
+                    'Photo' => 'picture',
+                    'Name' => 'displayname',
+                    'FullName' => 'name',
+                    'UniqueID' => 'sub'
+                ]
             ];
             $model->save($provider);
         }
@@ -176,11 +173,11 @@ class JWTSSOPlugin extends Gdn_Plugin {
             'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Control' => 'TextBox', 'Description' => 'Enter the shared secret, either supplied by your authentication provider or create one and share it with your authentication provider. You can click on "<b>Generate Secret</b>" below.'],
             'RegisterUrl' => ['LabelCode' => 'Register URL', 'Control' => 'TextBox', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
             'SignOutUrl' => ['LabelCode' => 'Sign Out URL', 'Control' => 'TextBox', 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
-            'ProfileKeyUniqueID' => ['LabelCode' => 'UniqueID', 'Description' => 'The Key in the JSON payload to designate the User\'s UniqueID'],
-            'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Description' => 'The Key in the JSON payload to designate Emails'],
-            'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON payload to designate Photo.'],
-            'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON payload to designate Display Name.'],
-            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON payload to designate Full Name.']
+            'KeyMap[UniqueID]' => ['LabelCode' => 'UniqueID', 'Options' => ['Value' => val('UniqueID', $form->getValue('KeyMap'))], 'Description' => 'The Key in the JSON payload to designate the User\'s UniqueID'],
+            'KeyMap[Email]' => ['LabelCode' => 'Email', 'Options' => ['Value' => val('Email', $form->getValue('KeyMap'))], 'Description' => 'The Key in the JSON payload to designate Emails'],
+            'KeyMap[Photo]' => ['LabelCode' => 'Photo', 'Options' => ['Value' => val('Photo', $form->getValue('KeyMap'))], 'Description' => 'The Key in the JSON payload to designate Photo.'],
+            'KeyMap[Name]' => ['LabelCode' => 'Display Name', 'Options' => ['Value' => val('Name', $form->getValue('KeyMap'))], 'Description' => 'The Key in the JSON payload to designate Display Name.'],
+            'KeyMap[FullName]' => ['LabelCode' => 'Full Name', 'Options' => ['Value' => val('FullName', $form->getValue('KeyMap'))], 'Description' => 'The Key in the JSON payload to designate Full Name.']
         ];
 
         // Allow a client to hook in and add fields that might be relevent to their set up.
