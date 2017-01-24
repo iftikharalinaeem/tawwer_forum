@@ -14,6 +14,7 @@ $PluginInfo['WalkThrough'] = [
     'Author' => 'Eric Vachaviolos',
     'AuthorEmail' => 'eric.v@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/evach',
+    'Icon' => 'walk_through.png',
     'MobileFriendly' => false
 ];
 
