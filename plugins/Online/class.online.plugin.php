@@ -107,10 +107,10 @@ class OnlinePlugin extends Gdn_Plugin {
      * Cache rendered html for selector queries for a few seconds to reduce load.
      * @const string
      */
-    const CACHE_ONLINE_MODULE_KEY = 'plugin.online.%s.%s.module';
+    const CACHE_ONLINE_MODULE_KEY = 'plugin.online.%s.%s.%s.module';
 
     /**
-     * Cache list of online users temporarily to aleviate database
+     * Cache list of online users temporarily to alleviate database
      * @const string
      */
     const CACHE_ONLINE_LIST_KEY = 'plugin.online.users.list';

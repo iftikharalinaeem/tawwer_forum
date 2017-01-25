@@ -174,8 +174,13 @@ class OnlineModule extends Gdn_Module {
                 break;
         }
 
+        $locale = Gdn::locale()->current();
+        if (!$locale) {
+            $locale = 'en';
+        }
+
         // Check cache for matching pre-built data
-        $renderedCacheKey = sprintf(OnlinePlugin::CACHE_ONLINE_MODULE_KEY, $this->selector, $selectorStub);
+        $renderedCacheKey = sprintf(OnlinePlugin::CACHE_ONLINE_MODULE_KEY, $locale, $this->selector, $selectorStub);
         $preRender = Gdn::cache()->get($renderedCacheKey);
         if ($preRender !== Gdn_Cache::CACHEOP_FAILURE) {
             return $preRender;
