@@ -212,7 +212,8 @@ class AnalyticsDashboard implements JsonSerializable {
                         'top-positive-discussions',
                         'average-comments-per-discussion',
                         'top-negative-discussions',
-                    ]
+                    ],
+                    'showCategoryFilter' => false
                 ],
                 'Posting' => [
                     'widgets' => [
@@ -268,7 +269,8 @@ class AnalyticsDashboard implements JsonSerializable {
                         'top-question-answerers',
                         'answers-accepted',
                         'top-best-answerers',
-                    ]
+                    ],
+                    'showCategoryFilter' => false
                 ];
             }
 
