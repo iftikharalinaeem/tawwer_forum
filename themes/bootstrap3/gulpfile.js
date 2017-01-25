@@ -3,28 +3,37 @@
 
 var gulp = require('gulp')
   , $ = require('gulp-load-plugins')()
+  , del = require('del');
 
-gulp.task('styles', function () {
-  var themes = $.filter('themes/*.css', {
-    restore: true
-  });
+gulp.task('compile', function () {
 
   return gulp.src([
     'less/style.less'
   , 'less/themes/*.less'
-  ], {base: 'less'})
+  ], { base: 'less' })
     .pipe($.plumber())
     .pipe($.less())
     .pipe($.autoprefixer())
     .pipe($.csso())
-    .pipe(themes)
-    .pipe($.rename({
-      dirname: '/'
-    , prefix: 'custom_'
-    }))
-    .pipe(themes.restore)
     .pipe(gulp.dest('design'))
     .pipe($.size({showFiles: true}));
+});
+
+gulp.task('rename', ['compile'], function() {
+  return gulp.src([
+      'design/themes/*.css'
+    ])
+    .pipe($.rename({
+      dirname: '/'
+      , prefix: 'custom_'
+    }))
+    .pipe(gulp.dest('design'));
+});
+
+gulp.task('styles', ['rename'], function() {
+  return del([
+    'design/themes'
+  ]);
 });
 
 gulp.task('scripts', function () {
