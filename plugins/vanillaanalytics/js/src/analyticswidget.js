@@ -248,8 +248,17 @@ function AnalyticsWidget(config) {
         }
 
         var groupBy = this.getHandler().getQueryParam('groupBy');
+        var fixedGroupBy;
+        if (Array.isArray(groupBy)) {
+            fixedGroupBy = [];
+            $.each(groupBy, function(index, element) {
+                fixedGroupBy.push(element.replace(find, replace));
+            });
+        } else {
+            fixedGroupBy = groupBy.replace(find, replace)
+        }
         this.getHandler().updateQueryParams({
-            groupBy: groupBy.replace(find, replace)
+            groupBy: fixedGroupBy
         });
     };
 
