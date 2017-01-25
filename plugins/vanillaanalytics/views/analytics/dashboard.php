@@ -18,7 +18,7 @@ if (!$this->data('HasWidgets') && $this->data('IsPersonal')) : ?>
 <?php else : ?>
 <div class="analytics-dashboard-content">
     <?php
-    $toolbar = new AnalyticsToolbarModule($this->data('AnalyticsDashboard')->showCategoryFilter());
+    $toolbar = new AnalyticsToolbarModule();
     echo $toolbar->toString();
     ?>
     <div id="analytics_panels">
