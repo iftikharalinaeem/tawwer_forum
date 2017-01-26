@@ -1,50 +1,24 @@
-#avatarstock .display-avatars {
-  overflow: hidden;
-  padding: 5px;
+#avatarstock .label-selector-item {
+  flex: 0 0 8.33333333%;
+  padding: .5rem .5rem .25rem;
 }
-#avatarstock .display-avatars .avatar-wrap {
-  margin: 5px;
-  float: left;
-  position: relative;
-  overflow: hidden;
-  display: block;
-  cursor: pointer;
+#avatarstock .label-selector-item img {
+  width: 90px;
+  height: 90px;
 }
-#avatarstock .display-avatars .avatar-wrap img {
-  display: block;
-  height: auto;
+#avatarstock .label-selector-item .btn {
+  min-width: 60px;
+  color: #fff;
 }
-#avatarstock .display-avatars .avatar-wrap input {
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  transition: opacity 0.2s ease;
+#avatarstock .label-selector {
+  margin-left: -.5rem;
+  margin-right: -.5rem;
 }
-#avatarstock .display-avatars .avatar-wrap input.avatar-delete-input:hover, #avatarstock .display-avatars .avatar-wrap input.avatar-delete-input:checked {
-  opacity: 1;
-}
-#avatarstock .display-avatars .upload-new-avatar {
-  display: table;
-  width: 40px;
-  height: 40px;
-  border: 1px dashed #aaa;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-#avatarstock .display-avatars .upload-new-avatar input {
-  cursor: pointer;
-  opacity: 0;
-}
-#avatarstock .display-avatars .upload-new-avatar.has-progress {
-  background: url("/applications/dashboard/design/images/progress_sm.gif") no-repeat center center transparent !important;
-}
-#avatarstock .delete-selected-avatars {
-  clear: both;
-  margin: 5px;
+
+.delete-selected-avatars {
   display: none;
 }
-#avatarstock .delete-selected-avatars.show-delete-button {
+.delete-selected-avatars.show-delete-button {
   display: block !important;
 }
 

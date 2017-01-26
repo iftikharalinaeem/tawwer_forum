@@ -1,20 +1,12 @@
 $(document).on('contentLoad', function(e) {
-
    var element = e.target;
 
-   // Upload new photos without needing to press anything.
-   var $avatar_upload = $('.avatar-upload-input', element);
-   $avatar_upload.on('change', function(e) {
-      var filename = e.target.value.toLowerCase();
-      if (filename != '') {
-         var extension = filename.split('.').pop();
-
+   $(".js-new-avatar-pool", element).click(function () {
+      $(".js-new-avatar-pool-upload").trigger("click");
+      $(".js-new-avatar-pool-upload").change(function() {
          var $form = $(this).closest('form');
          $form.submit();
-
-         // Add tiny progress animation
-         $(this).closest('.upload-new-avatar').addClass('has-progress');
-      }
+      });
    });
 
    // Showing the delete selected avatars button.
@@ -28,7 +20,6 @@ $(document).on('contentLoad', function(e) {
       });
 
       var $delete_selected_avatars = $('.delete-selected-avatars', element);
-      console.log($delete_selected_avatars);
       if (total_checked) {
          $delete_selected_avatars.addClass('show-delete-button');
       } else {

@@ -16,7 +16,7 @@ $PluginInfo['avatarstock'] = array(
     'RegisterPermissions' => array(
         'AvatarPool.CustomUpload.Allow' => 0
     ),
-    'SettingsUrl' => '/settings/avatarstock',
+    'SettingsUrl' => '/settings/avatars',
     'UsePopupSettings' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true,
@@ -71,67 +71,34 @@ class AvatarStockPlugin extends Gdn_Plugin {
     /**
      * Create settings page in the dashboard.
      *
-     * @param settingsController $sender The settings controller.
+     * @param SettingsController $sender The settings controller.
      * @param array $args Arguments passed to method.
      */
     public function settingsController_avatarStock_create($sender, $args) {
-        $sender->Permission('Garden.Settings.Manage');
+        $sender->permission('Garden.Settings.Manage');
 
         // Load some assets
-        $sender->AddCssFile('avatarstock.css', 'plugins/avatarstock');
-        $sender->AddJsFile('avatarstock.js', 'plugins/avatarstock');
+        $sender->addCssFile('avatarstock.css', 'plugins/avatarstock');
+        $sender->addJsFile('avatarstock.js', 'plugins/avatarstock');
 
-        // Render components pertinent to all views.
-        $sender->SetData('Title', T('Avatar Pool'));
-        $sender->AddSideMenu();
-
-        // Render specific component views.
-        switch (true) {
-            case in_array('upload', $args):
-                // Handle upload and quickly parse file into DB.
-                $results = $this->handleUploadInsert($sender);
-                if ($results) {
-                    // This might interfere with API endpoint. Keep for now, adjust
-                    // when becomes a real concern.
-                    Redirect('/settings/avatarstock');
-                } else {
-                    $sender->Render('upload', '', 'plugins/avatarstock');
-                }
-                break;
-
-            case in_array('modify', $args):
-                $results = $this->deleteSelectedAvatars($sender);
-                if ($results) {
-                    Redirect('/settings/avatarstock');
-                } else {
-                    $sender->Render('upload', '', 'plugins/avatarstock');
-                }
-                break;
-
-            default:
-                $sender->SetData('_file_input_name', $this->file_input_name);
-                $stock_avatar_payload = $this->getStockAvatarPayload();
-                $sender->SetData('_payload', $stock_avatar_payload);
-                $sender->Render('settings', '', 'plugins/avatarstock');
-                break;
+        if (in_array('upload', $args)) {
+            // Handle upload and quickly parse file into DB.
+            $results = $this->handleUploadInsert($sender);
+            if ($results) {
+                // This might interfere with API endpoint. Keep for now, adjust
+                // when becomes a real concern.
+                redirect('/settings/avatars');
+            } else {
+                $sender->render('upload', '', 'plugins/avatarstock');
+            }
+        } else if (in_array('modify', $args)) {
+            $results = $this->deleteSelectedAvatars($sender);
+            if ($results) {
+                redirect('/settings/avatars');
+            } else {
+                $sender->render('upload', '', 'plugins/avatarstock');
+            }
         }
-    }
-
-    /**
-     * Adds menu option to the left in dashboard.
-     *
-     * @param Base &$sender The base controller.
-     */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        $menu = $sender->EventArguments['SideMenu'];
-        $menu->AddItem('Users', T('Users'));
-        $menu->AddLink(
-            'Users',
-            T('Avatar Pool'),
-            '/settings/avatarstock',
-            'Garden.Settings.Manage',
-            array('class' => 'nav-avatars')
-        );
     }
 
     /**
@@ -569,6 +536,21 @@ class AvatarStockPlugin extends Gdn_Plugin {
             UserUrl($sender->User, '', 'picture')
         );
         $sender->Render('picture', '', 'plugins/avatarstock');
+    }
+
+    /**
+     * Overrides allowing admins to set the default avatar, since it has no effect when Vanillicon is on.
+     *
+     * @param SettingsController $sender
+     */
+    public function settingsController_avatarSettings_handler($sender) {
+        $sender->addCssFile('avatarstock.css', 'plugins/avatarstock');
+        $sender->addJsFile('avatarstock.js', 'plugins/avatarstock');
+        $sender->setData('Title', t('Avatar Pool'));
+        $sender->setData('_file_input_name', $this->file_input_name);
+        $stock_avatar_payload = $this->getStockAvatarPayload();
+        $sender->setData('_payload', $stock_avatar_payload);
+        $sender->setData('AvatarSelectionOptions', $sender->fetchView('settings', '', 'plugins/avatarstock'));
     }
 
     /**
