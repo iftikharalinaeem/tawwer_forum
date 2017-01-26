@@ -546,7 +546,6 @@ class AvatarStockPlugin extends Gdn_Plugin {
     public function settingsController_avatarSettings_handler($sender) {
         $sender->addCssFile('avatarstock.css', 'plugins/avatarstock');
         $sender->addJsFile('avatarstock.js', 'plugins/avatarstock');
-        $sender->setData('Title', t('Avatar Pool'));
         $sender->setData('_file_input_name', $this->file_input_name);
         $stock_avatar_payload = $this->getStockAvatarPayload();
         $sender->setData('_payload', $stock_avatar_payload);
