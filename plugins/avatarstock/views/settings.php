@@ -7,7 +7,7 @@ $total_stock_avatars = count($stock_avatar_payload);
 $crop_dimension_px = c('Garden.Thumbnail.Size') . 'px';
 
 $permissions = ['AvatarPool.CustomUpload.Allow', 'Garden.Settings.Manage'];
-$permissions = implode(' or ', $permissions);
+$permissions = implode(t('permissions or', ' or '), $permissions);
 $desc = sprintf(t('Users with  the %s permission will be able to upload their own avatars.'), $permissions);
 $desc .= ' '.t('Other users will only be able to select from only the following images when changing their profile photo from within Vanilla.');
 
