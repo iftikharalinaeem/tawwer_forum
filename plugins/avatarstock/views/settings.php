@@ -11,7 +11,7 @@ $permissions = implode(t('permissions or', ' or '), $permissions);
 $desc = sprintf(t('Users with  the %s permission will be able to upload their own avatars.'), $permissions);
 $desc .= ' '.t('Other users will only be able to select from only the following images when changing their profile photo from within Vanilla.');
 
-echo subheading($this->data('Title'), $desc);
+echo subheading(t('Avatar Pool'), $desc);
 echo $form->open([
 'enctype' => 'multipart/form-data',
 'action' => url('/settings/avatarstock/upload'),
