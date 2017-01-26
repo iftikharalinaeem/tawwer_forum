@@ -8,7 +8,7 @@ $crop_dimension_px = c('Garden.Thumbnail.Size') . 'px';
 
 $permissions = ['AvatarPool.CustomUpload.Allow', 'Garden.Settings.Manage'];
 $permissions = implode(' or ', $permissions);
-$desc = t('Users with  the '.$permissions.' permission will be able to upload their own avatars.');
+$desc = sprintf(t('Users with  the %s permission will be able to upload their own avatars.'), $permissions);
 $desc .= ' '.t('Other users will only be able to select from only the following images when changing their profile photo from within Vanilla.');
 
 echo subheading($this->data('Title'), $desc);
