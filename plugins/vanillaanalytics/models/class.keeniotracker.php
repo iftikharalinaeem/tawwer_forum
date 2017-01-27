@@ -165,52 +165,55 @@ class KeenIOTracker implements TrackerInterface {
             'chart' => [
                 'labels' => ['Visits']
             ],
-            'support' => 'cat01'
         ],
         'total-discussions' => [
             'title' => 'Discussions',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'metric',
-            'support' => 'cat01'
+            'supportCategoryFilter' => true,
         ],
         'total-comments' => [
             'title' => 'Comments',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'metric',
-            'support' => 'cat01'
+            'supportCategoryFilter' => true,
         ],
         'total-contributors' => [
             'title' => 'Contributors',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'metric',
-            'support' => 'cat01'
         ],
         'total-asked' => [
             'title' => 'Questions Asked',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-            'type' => 'metric'
+            'type' => 'metric',
+            'supportCategoryFilter' => true,
         ],
         'total-answered' => [
             'title' => 'Questions Answered',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-            'type' => 'metric'
+            'type' => 'metric',
+            'supportCategoryFilter' => true,
         ],
         'total-accepted' => [
             'title' => 'Answers Accepted',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-            'type' => 'metric'
+            'type' => 'metric',
+            'supportCategoryFilter' => true,
         ],
         'time-to-answer' => [
             'title' => 'Average Time to Answer',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'metric',
-            'callback' => 'formatSeconds'
+            'callback' => 'formatSeconds',
+            'supportCategoryFilter' => true,
         ],
         'time-to-accept' => [
             'title' => 'Average Time to Accept',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'metric',
-            'callback' => 'formatSeconds'
+            'callback' => 'formatSeconds',
+            'supportCategoryFilter' => true,
         ],
         'pageviews' => [
             'title' => 'Page Views',
@@ -230,18 +233,17 @@ class KeenIOTracker implements TrackerInterface {
         'discussions' => [
             'title' => 'Discussions',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-            'support' => 'cat01'
+            'supportCategoryFilter' => true,
         ],
         'comments' => [
             'title' => 'Comments',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
-            'support' => 'cat01'
+            'supportCategoryFilter' => true,
         ],
         'posts' => [
             'title' => 'Posts',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'support' => 'cat01'
         ],
         'posts-by-type' => [
             'title' => 'Posts by Type',
@@ -252,17 +254,14 @@ class KeenIOTracker implements TrackerInterface {
                     'comment_add' => 'Comments'
                 ]
             ],
-            'support' => 'cat01'
         ],
         'posts-by-category' => [
             'title' => 'Posts by Category',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'support' => 'cat01'
         ],
         'posts-by-role-type' => [
             'title' => 'Posts by Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'support' => 'cat01'
         ],
         'posts-per-user' => [
             'title' => 'Posts per User',
@@ -273,19 +272,16 @@ class KeenIOTracker implements TrackerInterface {
             'title' => 'Contributors',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'support' => 'cat01'
         ],
         'contributors-by-category' => [
             'title' => 'Contributors by Category',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'support' => 'cat01'
         ],
         'contributors-by-role-type' => [
             'title' => 'Contributors by Role Type',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'chart',
-            'support' => 'cat01'
         ],
         'comments-per-discussion' => [
             'title' => 'Comments per Discussion',
@@ -300,17 +296,20 @@ class KeenIOTracker implements TrackerInterface {
         'questions-asked' => [
             'title' => 'Questions Asked',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart'
+            'type' => 'chart',
+            'supportCategoryFilter' => true,
         ],
         'questions-answered' => [
             'title' => 'Questions Answered',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart'
+            'type' => 'chart',
+            'supportCategoryFilter' => true,
         ],
         'answers-accepted' => [
             'title' => 'Accepted Answers',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
-            'type' => 'chart'
+            'type' => 'chart',
+            'supportCategoryFilter' => true,
         ],
         'visits-per-active-user' => [
             'title' => 'Visits per Active User',
@@ -341,19 +340,20 @@ class KeenIOTracker implements TrackerInterface {
             'type' => 'chart',
             'chart' => [
                 'chartType' => 'bar'
-            ]
+            ],
         ],
         'posts-positivity-rate' => [
             'title' => 'Posts Positivity Rate',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'metric',
-            'callback' => 'formatPercent'
+            'callback' => 'formatPercent',
         ],
         'average-time-to-first-comment' => [
             'title' => 'Average Time to First Comment',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
             'type' => 'metric',
-            'callback' => 'formatSeconds'
+            'callback' => 'formatSeconds',
+            'supportCategoryFilter' => true,
         ]
     ];
 
@@ -431,8 +431,8 @@ class KeenIOTracker implements TrackerInterface {
             $widgetObj->setType(val('type', $widget));
         }
 
-        if ($support = val('support', $widget)) {
-            $widgetObj->addSupport($support);
+        if (val('supportCategoryFilter', $widget, false)) {
+            $widgetObj->addSupport('cat01');
         }
 
         if ($callback = val('callback', $widget)) {

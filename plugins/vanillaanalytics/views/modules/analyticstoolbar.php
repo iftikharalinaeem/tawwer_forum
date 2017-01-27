@@ -4,20 +4,17 @@ $form = new Gdn_Form('', 'bootstrap');
 $categories = $this->data('cat01');
 $catAttr = $this->data('catAttr');
 $heading = $this->data('heading');
-$showCategoryFilter = $this->data('showCategoryFilter');
 
-if ($showCategoryFilter) :
-    Gdn_Theme::assetBegin('Help'); ?>
-        <section class="control-panel">
-            <h2 class="control-panel-heading"><?php echo t('Filter By...'); ?></h2>
-            <div class="control-panel-body js-filter-content">
-                <?php echo getCategoryFilterHTML($form, $categories, $catAttr, $heading); ?>
-            </div>
-        </section>
-    <?php Gdn_Theme::assetEnd();
-endif;
+Gdn_Theme::assetBegin('Help'); ?>
+<section class="control-panel">
+    <h2 class="control-panel-heading"><?php echo t('Filter By...'); ?></h2>
+    <div class="control-panel-body js-filter-content">
+        <?php echo getCategoryFilterHTML($form, $categories, $catAttr, $heading); ?>
+    </div>
+</section>
+<?php
+Gdn_Theme::assetEnd();
 ?>
-
 <div class="toolbar-analytics toolbar flex-wrap" id="analytics_toolbar">
     <div class="btn-group">
         <?php foreach($this->data('Intervals') as $interval):
@@ -33,22 +30,19 @@ endif;
         <div class="filter-date">
             <?php echo $form->textBox('dates', ['class' => 'js-date-range date-range form-control']); ?>
         </div>
-        <?php if ($showCategoryFilter) : ?>
-            <div class="filter-category">
-                <?php
-                $attr = [
-                    'id' => 'categoryFilterId',
-                    'class' => 'btn btn-icon-border js-drop',
-                    'data-content-id' => 'categoryFilterContent'
-                ];
+        <div class="filter-category">
+            <?php
+            $attr = [
+                'id' => 'categoryFilterId',
+                'class' => 'btn btn-icon-border js-drop',
+                'data-content-id' => 'categoryFilterContent'
+            ];
 
-                echo wrap(dashboardSymbol('filter'), 'div', $attr);
-                ?>
-            </div>
-        <?php endif; ?>
+            echo wrap(dashboardSymbol('filter'), 'div', $attr);
+            ?>
+        </div>
     </div>
 </div>
-<?php if ($showCategoryFilter) : ?>
 <aside id="categoryFilterContent" aria-hidden="true" class="hidden">
     <div class="card card-category-filter">
         <section class="control-panel padded-left padded-right padded">
@@ -58,5 +52,4 @@ endif;
         </section>
     </div>
 </aside>
-<?php endif;
 

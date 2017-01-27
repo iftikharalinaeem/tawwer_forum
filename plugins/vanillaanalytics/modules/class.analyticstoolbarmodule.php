@@ -9,16 +9,9 @@
 class AnalyticsToolbarModule extends Gdn_Module {
 
     /**
-     * @var bool Whether to show the category filter.
-     */
-    private $showCategoryFilter = true;
-
-    /**
      * AnalyticsToolbarModule constructor.
-     * @param bool $showCategoryFilter Whether to show the category filter.
      */
-    public function __construct($showCategoryFilter = true) {
-        $this->showCategoryFilter = $showCategoryFilter;
+    public function __construct() {
         parent::__construct();
     }
 
@@ -71,10 +64,7 @@ class AnalyticsToolbarModule extends Gdn_Module {
 
     private function getData() {
 
-        $this->setData('showCategoryFilter', $this->showCategoryFilter);
-        if ($this->showCategoryFilter) {
-            $this->getCategoryFilter();
-        }
+        $this->getCategoryFilter();
 
         // Translate the interval titles
         foreach($this->intervals as &$interval) {

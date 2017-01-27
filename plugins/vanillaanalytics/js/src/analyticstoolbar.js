@@ -33,6 +33,7 @@ var analyticsToolbar = {
 
     setWidgets: function(method, newValue) {
         var panels = [window.analyticsDashboard.getPanel('metrics'), window.analyticsDashboard.getPanel('charts')];
+        var valid;
 
         for (var i in panels) {
             panel = panels[i];
@@ -189,8 +190,7 @@ $(document).ready(function() {
 
     analyticsToolbar.setWidgets('setRange', [defaultRange]);
 
-
-
+    $('#analytics_filter_warning').hide();
     $('.Section-Analytics').on('change', '.js-category-telescope', function() {
 
         var $self = $(this);
@@ -212,6 +212,11 @@ $(document).ready(function() {
 
         // Clear every dropdown below the selected filter
         $self.parent().nextAll('.js-category-telescope-wrapper').remove();
+        if (newCat) {
+            $('#analytics_filter_warning').show();
+        } else {
+            $('#analytics_filter_warning').hide();
+        }
         analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat01.categoryID', newCat, 'cat01']);
 
         if (!fetchChildren) {

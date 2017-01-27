@@ -46,11 +46,6 @@ class AnalyticsDashboard implements JsonSerializable {
     protected $title = '';
 
     /**
-     * @var bool Whether to show the category filters for this dashboard.
-     */
-    private $showCategoryFilter = true;
-
-    /**
      * AnalyticsDashboard constructor.
      *
      * @param bool|integer|string $dashboardID Unique identifier for this dashboard.  False if none.
@@ -84,22 +79,6 @@ class AnalyticsDashboard implements JsonSerializable {
                 }
             }
         }
-    }
-
-    /**
-     * @return boolean Whether to show the category filters for this dashboard.
-     */
-    public function showCategoryFilter() {
-        return $this->showCategoryFilter;
-    }
-
-    /**
-     * @param boolean $showCategoryFilter Whether to show the category filters for this dashboard.
-     * @return AnalyticsDashboard $this The calling object.
-     */
-    public function setShowCategoryFilter($showCategoryFilter) {
-        $this->showCategoryFilter = $showCategoryFilter;
-        return $this;
     }
 
     /**
@@ -212,7 +191,7 @@ class AnalyticsDashboard implements JsonSerializable {
                         'top-positive-discussions',
                         'average-comments-per-discussion',
                         'top-negative-discussions',
-                    ]
+                    ],
                 ],
                 'Posting' => [
                     'widgets' => [
@@ -248,7 +227,6 @@ class AnalyticsDashboard implements JsonSerializable {
                         'registrations',
                         'top-viewed-discussions',
                     ],
-                    'showCategoryFilter' => false
                 ],
             ];
 
@@ -268,14 +246,13 @@ class AnalyticsDashboard implements JsonSerializable {
                         'top-question-answerers',
                         'answers-accepted',
                         'top-best-answerers',
-                    ]
+                    ],
                 ];
             }
 
             foreach ($defaults as $title => $dashboardConfig) {
                 $widgets = val('widgets', $dashboardConfig, []);
                 $dashboard = new AnalyticsDashboard($title, $widgets);
-                $dashboard->setShowCategoryFilter(val('showCategoryFilter', $dashboardConfig, true));
                 $dashboardID = $dashboard->getDashboardID();
                 static::$defaults[$dashboardID] = $dashboard;
             }

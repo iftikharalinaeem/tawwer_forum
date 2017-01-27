@@ -18,9 +18,12 @@ if (!$this->data('HasWidgets') && $this->data('IsPersonal')) : ?>
 <?php else : ?>
 <div class="analytics-dashboard-content">
     <?php
-    $toolbar = new AnalyticsToolbarModule($this->data('AnalyticsDashboard')->showCategoryFilter());
+    $toolbar = new AnalyticsToolbarModule();
     echo $toolbar->toString();
     ?>
+    <div id="analytics_filter_warning" class="alert alert-warning padded">
+        <?php echo t('Only showing charts affected by the category filter.'); ?>
+    </div>
     <div id="analytics_panels">
         <?php foreach ($this->data('AnalyticsDashboard')->getPanels() as $panel): ?>
         <ul class="analytics-panel analytics-panel-<?php echo htmlspecialchars($panel->panelID);?> " id="analytics_panel_<?php echo htmlspecialchars($panel->panelID); ?>"></ul>

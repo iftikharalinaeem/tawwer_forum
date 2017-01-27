@@ -65,6 +65,29 @@ function AnalyticsWidget(config) {
 
     /**
      *
+     * @type {boolean}
+     */
+    var disabled = false;
+
+    /**
+     *
+     *
+     */
+    this.isDisabled = function() {
+        return disabled
+    }
+
+        /**
+     *
+     *
+     */
+    this.setDisabled = function(disable) {
+        disabled = disable;
+        return this;
+    }
+
+    /**
+     *
      * @param {Array|string} eventProperty
      */
     this.addSupport = function(eventProperty) {
@@ -201,7 +224,10 @@ function AnalyticsWidget(config) {
 
     this.setFilter = function(name, value, support) {
         if (support && !this.supports(support)) {
-            return false;
+            this.setDisabled(!!value);
+            return true;
+        } else {
+            this.setDisabled(false);
         }
 
         var filters = data['query']['filters'] = data['query']['filters'] || [];
@@ -248,8 +274,17 @@ function AnalyticsWidget(config) {
         }
 
         var groupBy = this.getHandler().getQueryParam('groupBy');
+        var fixedGroupBy;
+        if (Array.isArray(groupBy)) {
+            fixedGroupBy = [];
+            $.each(groupBy, function(index, element) {
+                fixedGroupBy.push(element.replace(find, replace));
+            });
+        } else {
+            fixedGroupBy = groupBy.replace(find, replace)
+        }
         this.getHandler().updateQueryParams({
-            groupBy: groupBy.replace(find, replace)
+            groupBy: fixedGroupBy
         });
     };
 
@@ -416,11 +451,20 @@ AnalyticsWidget.popin = function(element, url, parameters) {
  * @throws Throw an error if unable to find a compatible handler for this widget.
  */
 AnalyticsWidget.prototype.render = function() {
+    var container = this.getElements('body');
+
+    if (this.isDisabled()) {
+        $(container).parent().hide();
+        return;
+    }
+
+    $(container).parent().show();
+
     // We need a class available to handle the widget.  Verify we have one available on the page.
     var handler = this.getHandler();
 
     if (handler !== null) {
-        handler.writeContents(this.getElements('body'));
+        handler.writeContents(container);
     } else {
         throw 'No data handler configured for widget';
     }
