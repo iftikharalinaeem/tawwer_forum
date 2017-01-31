@@ -55,7 +55,13 @@ class PollModule extends Gdn_Module {
         $pollModel = new PollModel();
         $poll = false;
         $pollID = Gdn::controller()->data('PollID');
+        $categoryID = Gdn::controller()->data('CategoryID');
         $discussion = Gdn::controller()->data('Discussion');
+
+        if (!$categoryID) {
+            $categoryID = val('CategoryID', $discussion);
+        }
+        $this->setData('CategoryID', $categoryID);
 
         // Look in the controller for a PollID
         if ($pollID > 0) {
@@ -188,6 +194,7 @@ class PollModule extends Gdn_Module {
      * @return bool
      */
     public function showForm() {
-        return Gdn::session()->checkPermission('Vanilla.Comments.Add') && !$this->data('UserHasVoted');
+        $canVote = Gdn::session()->checkPermission('Vanilla.Comments.Add', true, 'Category', $this->data('CategoryID'));
+        return $canVote && !$this->data('UserHasVoted');
     }
 }

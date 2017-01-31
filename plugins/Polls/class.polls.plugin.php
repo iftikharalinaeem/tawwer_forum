@@ -79,16 +79,32 @@ class PollsPlugin extends Gdn_Plugin {
      * @param DiscussionController $sender
      */
     public function discussionController_pollVote_create($sender) {
-        $sender->permission('Vanilla.Comments.Add');
-
         $form = new Gdn_Form();
-        $pollModel = new PollModel();
-        $pollOptionModel = new Gdn_Model('PollOption');
 
-        // Get values from the form
-        $pollID = $form->getFormValue('PollID', 0);
-        $pollOptionID = $form->getFormValue('PollOptionID', 0);
+        // Lookup the poll option, based on form values.
+        $pollOptionModel = new Gdn_Model('PollOption');
+        $pollOptionID = $form->getFormValue('PollOptionID');
         $pollOption = $pollOptionModel->getID($pollOptionID);
+        if (!$pollOption) {
+            throw notFoundException('Poll Option');
+        }
+
+        // Lookup the poll, based on the resolved poll option.
+        $pollModel = new PollModel();
+        $pollID = val('PollID', $pollOption);
+        $poll = $pollModel->getID($pollID);
+        if (!$poll) {
+            throw notFoundException('Poll');
+        }
+
+        // Resolve the category ID from the poll's discussion.
+        $discussion = $sender->DiscussionModel->getID(val('DiscussionID', $poll));
+        $categoryID = val('CategoryID', $discussion);
+        $category = CategoryModel::categories($categoryID);
+
+        // Verify the user has permission to add comments in this poll's category.
+        $sender->permission('Vanilla.Comments.Add', true, 'Category', val('PermissionCategoryID', $category));
+
         $votedForPollOptionID = 0;
 
         // Record the vote.
