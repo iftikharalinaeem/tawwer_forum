@@ -372,7 +372,7 @@ class ZendeskPlugin extends Gdn_Plugin {
                 $LoginUrl = Url('/plugin/zendesk#global-login');
             }
             $Sender->SetData('LoginUrl', $LoginUrl);
-            $Sender->Render('login', '', 'plugins/Zendesk');
+            $Sender->Render('userlogin', '', 'plugins/Zendesk');
             return;
         }
 
