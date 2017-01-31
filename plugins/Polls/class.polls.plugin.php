@@ -79,7 +79,8 @@ class PollsPlugin extends Gdn_Plugin {
      * @param DiscussionController $sender
      */
     public function discussionController_pollVote_create($sender) {
-        $session = Gdn::session();
+        $sender->permission('Vanilla.Comments.Add');
+
         $form = new Gdn_Form();
         $pollModel = new PollModel();
         $pollOptionModel = new Gdn_Model('PollOption');
@@ -90,8 +91,8 @@ class PollsPlugin extends Gdn_Plugin {
         $pollOption = $pollOptionModel->getID($pollOptionID);
         $votedForPollOptionID = 0;
 
-        // If this is a valid form postback, poll, poll option, and user session, record the vote.
-        if ($form->authenticatedPostback() && $pollOption && $session->isValid()) {
+        // Record the vote.
+        if ($form->authenticatedPostback() && $pollOption) {
             $votedForPollOptionID = $pollModel->vote($pollOptionID);
         }
 

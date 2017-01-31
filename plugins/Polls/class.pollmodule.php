@@ -76,10 +76,11 @@ class PollModule extends Gdn_Module {
             // Has this user voted?
             $countVotes = $pollModel->SQL
                 ->select()
-                ->from('PollVote pv')
-                ->where(['pv.UserID' => Gdn::session()->UserID, 'pv.PollOptionID' => array_column($optionData, 'PollOptionID')])
-                ->get()
-                ->numRows();
+                ->from('PollVote')
+                ->where([
+                    'UserID' => Gdn::session()->UserID,
+                    'PollOptionID' => array_column($optionData, 'PollOptionID')
+                ])->get()->numRows();
             $this->setData('UserHasVoted',  ($countVotes > 0));
         }
 
@@ -179,5 +180,14 @@ class PollModule extends Gdn_Module {
         }
 
         return $votes;
+    }
+
+    /*
+     * Should the voting form be shown?
+     *
+     * @return bool
+     */
+    public function showForm() {
+        return Gdn::session()->checkPermission('Vanilla.Comments.Add') && !$this->data('UserHasVoted');
     }
 }
