@@ -4,7 +4,7 @@
  * Handles the status of a tour.
  *
  * @author Eric Vachaviolos <eric.v@vanillaforums.com>
- * @copyright 2010-2015 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license Proprietary
  * @package internal
  * @subpackage WalkThrough

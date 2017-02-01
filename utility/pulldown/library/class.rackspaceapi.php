@@ -18,7 +18,7 @@ if (!defined('APPLICATION'))
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @version 1.1
- * @copyright 2010-2014 Vanilla Forums Inc
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license Proprietary
  * @package Api
  * @since 1.0
