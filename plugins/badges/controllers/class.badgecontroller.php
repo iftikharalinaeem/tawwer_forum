@@ -195,31 +195,20 @@ class BadgeController extends BadgesAppController {
             $RecipientUserIDs = array();
             $To = explode(',', $this->Form->getFormValue('To', ''));
             $UserModel = new UserModel();
-            $Result = true;
             foreach ($To as $Name) {
                 if (trim($Name) != '') {
                     $User = $UserModel->getByUsername(trim($Name));
                     if (is_object($User)) {
                         $this->Form->setFormValue('UserID', $User->UserID);
-                        $Saved = $this->UserBadgeModel->give($User->UserID, $BadgeID, $Reason);
-                        $Result = $Result && $Saved;
-                        $this->Form->setValidationResults($this->UserBadgeModel->Validation->results());
-                        $this->UserBadgeModel->Validation->results(true);
+                        $this->UserBadgeModel->give($User->UserID, $BadgeID, $Reason);
                     }
                 }
             }
             $this->Form->setFormValue('DateCompleted', date('Y-m-d H:i:s'));
 
             // Give to named users.
-            if ($Result) {
-                $this->informMessage(t('Gave badge to users.'));
-            } else {
-                // Not everyone got their badge.
-
-            }
-
-            // Regenerate the page we came from.
-            $this->View = 'all';
+            $this->informMessage(t('Gave badge to users.'));
+            $this->RedirectUrl = '/badge/all';
         }
 
         $this->render();
