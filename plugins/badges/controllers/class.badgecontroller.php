@@ -192,23 +192,31 @@ class BadgeController extends BadgesAppController {
             $Reason = $this->Form->getFormValue('Reason');
 
             // Set recipients
-            $RecipientUserIDs = array();
             $To = explode(',', $this->Form->getFormValue('To', ''));
             $UserModel = new UserModel();
+            $result = true;
             foreach ($To as $Name) {
                 if (trim($Name) != '') {
                     $User = $UserModel->getByUsername(trim($Name));
                     if (is_object($User)) {
-                        $this->Form->setFormValue('UserID', $User->UserID);
-                        $this->UserBadgeModel->give($User->UserID, $BadgeID, $Reason);
+                        $userBadge = $this->UserBadgeModel->getID($User->UserID, val('BadgeID', $Badge));
+                        if (val('DateCompleted', $userBadge, null) !== null) {
+                            // User already has this badge.
+                            continue;
+                        }
+
+                        $saved = $this->UserBadgeModel->give($User->UserID, $BadgeID, $Reason);
+                        $result = $result && $saved;
                     }
                 }
             }
-            $this->Form->setFormValue('DateCompleted', date('Y-m-d H:i:s'));
 
-            // Give to named users.
-            $this->informMessage(t('Gave badge to users.'));
-            $this->RedirectUrl = '/badge/all';
+            if ($result) {
+                $this->informMessage(t('Gave badge to users.'));
+                $this->RedirectUrl = '/badge/all';
+            } else {
+                $this->Form->addError(t('An unknown error has occurred.'));
+            }
         }
 
         $this->render();
