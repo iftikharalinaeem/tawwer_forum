@@ -1087,6 +1087,18 @@ class GroupModel extends Gdn_Model {
             $groupIDs[] = val('GroupID', $event);
         }
 
+        // Start by deleting the content! If the query times out the groups will be intact and the user will be
+        // able to try again! This is the "best" we can do until we have a Queue for tasks.
+        $discussionIDs = $this->SQL
+                ->select('DiscussionID')
+                ->getWhere('Discussion', ['GroupID' => $groupIDs])
+                ->resultArray();
+
+        $discussionModel = new DiscussionModel();
+        foreach ($discussionIDs as $discussionID) {
+            $discussionModel->deleteID($discussionID);
+        }
+
         // Add Logging on deletion of groups
         LogModel::beginTransaction();
         // Get the row(s) of the group(s) being deleted to save to the log.
