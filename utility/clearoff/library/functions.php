@@ -5,7 +5,7 @@
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @license Proprietary
- * @copyright 2010-2014 Vanilla Forums Inc
+ * @copyright 2009-2017 Vanilla Forums Inc.
  */
 
 /**

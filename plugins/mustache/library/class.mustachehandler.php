@@ -6,7 +6,7 @@
  * Vanilla PHP wrapper for Mustache templating engine.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2010-2014 Vanilla Forums Inc
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license Proprietary
  * @package internal
  * @subpackage Mustache

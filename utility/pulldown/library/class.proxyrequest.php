@@ -9,7 +9,7 @@ if (!defined('APPLICATION'))
  * This class abstracts the work of doing external requests.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2010-2014 Vanilla Forums Inc
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Garden
  * @since 2.0.18

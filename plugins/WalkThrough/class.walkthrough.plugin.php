@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright Copyright 2010-2015 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license Proprietary
  */
 

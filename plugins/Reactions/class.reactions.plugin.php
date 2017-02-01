@@ -10,7 +10,7 @@
  *  1.2.15  Add section 508 fixes.
  *  1.4.0   Add support for merging users' reactions.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license Proprietary
  */
 
