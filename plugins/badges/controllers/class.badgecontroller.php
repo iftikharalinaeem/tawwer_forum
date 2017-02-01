@@ -215,7 +215,7 @@ class BadgeController extends BadgesAppController {
                 $this->informMessage(t('Gave badge to users.'));
                 $this->RedirectUrl = '/badge/all';
             } else {
-                $this->Form->addError(t('An unknown error has occurred.'));
+                $this->Form->addError(t('Failed to give badge to users.'));
             }
         }
 
