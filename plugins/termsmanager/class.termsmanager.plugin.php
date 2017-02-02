@@ -9,12 +9,12 @@
  */
 
 // Define the plugin:
-$PluginInfo['TermsManager'] = [
+$PluginInfo['termsmanager'] = [
     'Name' => 'Terms of Use Manager',
     'Description' => 'Stop user from creating accounts until they have agreed to your terms. Record which terms they have agreed to.',
     'Version' => '1.0',
     'MobileFriendly' => true,
-    'RequiredApplications' => array('Vanilla' => '2.1'),
+    'RequiredApplications' => ['Vanilla' => '2.3'],
     'SettingsUrl' => '/settings/termsmanager',
     'Author' => 'Patrick Kelly',
     'AuthorEmail' => 'patrick.k@vanillaforums.com',
@@ -27,25 +27,24 @@ $PluginInfo['TermsManager'] = [
  */
 class TermsManagerPlugin extends Gdn_Plugin {
 
-    public $databasePrefix;
-    public $tablePrefix;
-
-    public function __construct() {
-        $this->databasePrefix = Gdn::database()->DatabasePrefix;
-        $importModel = new ImportModel();
-        $this->tableName = $importModel::TABLE_PREFIX.'TermsOfUse';
-    }
-
+    /**
+     * Execute the structure() whenever the plugin is turned on.
+     */
     public function setup() {
         $this->structure();
     }
 
+
+    /**
+     * Create a table to store Terms of Use data.
+     * @throws Exception
+     */
     public function structure() {
         // Add the Terms column to Users to record which version of the Terms were agreed to.
         Gdn::structure()->table('User')->column('Terms', 'int(11)', true)->set();
 
         // Create the TermsOfUse Table.
-        gdn::structure()->table($this->tableName)
+        Gdn::structure()->table('TermsOfUse')
             ->primaryKey('TermsOfUseID')
             ->column('Body', 'text', false)
             ->column('Link', 'text', false)
@@ -107,6 +106,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
+     *
      * @param EntryController $sender
      * @param EntryController $args
      */
@@ -204,7 +204,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
         // "Manually" flag SSO connections because the form is not being posted back.
         if ($sender->Form->isPostBack() || $sso) {
-            $sender->Form->validateRule('Terms', 'ValidateRequired', t('You must agree to the code of conduct'));
+            $sender->Form->validateRule('Terms', 'ValidateRequired', t('You must agree to the terms of service.'));
         }
     }
 
@@ -240,11 +240,16 @@ class TermsManagerPlugin extends Gdn_Plugin {
         if ($sender->Form->isPostBack() && !$sender->Form->getValue('Terms')) {
             $messageClass = 'AlertMessage';
         }
+
         $validationMessage = (val('Terms', $user) && val('ForceRenew', $terms)) ? t('<h2>We have recently updated our Terms of Use. You must agree to the code of conduct.</h2>') : '';
         $link = val('Link', $terms) ? val('Link', $terms) : '/vanilla/terms';
-        $linkAttribute = ($link === '/vanilla/terms') ? ' class=\'Popup\'' : ' target=\'_blank\'';
-        $message = sprintf(t('TermsMessage', 'YOU MUST READ AND UNDERSTAND THE <a href="%1$s" %2$s>PROVISIONS OF THE FORUMS CODE OF CONDUCT</a> BEFORE PARTICIPATING IN THE FORUMS.'), $link, $linkAttribute);
-        echo wrap("<div class='DismissMessage {$messageClass}'>".$validationMessage.$message."</div>", $wrapTag);
+
+        $linkAttribute = ($link === '/vanilla/terms') ? ['class' =>'Popup'] : ['target' => '_blank'];
+        $anchor = anchor('Click here to read.', $link, $linkAttribute);
+        $message = t('YOU MUST READ AND UNDERSTAND THE PROVISIONS OF THE FORUMS CODE OF CONDUCT BEFORE PARTICIPATING IN THE FORUMS.');
+
+
+        echo wrap("<div class='DismissMessage {$messageClass}'>".$validationMessage.$message.' '.$anchor."</div>", $wrapTag);
         echo wrap($sender->Form->CheckBox('Terms', t('TermsLabel', 'BY CHECKING THIS BOX, I ACKNOWLEDGE I HAVE READ AND UNDERSTAND, AND AGREE TO THE FORUMS CODE OF CONDUCT.'), array('value' => val('TermsOfUseID', $terms))), $wrapTag);
     }
 
@@ -279,17 +284,17 @@ class TermsManagerPlugin extends Gdn_Plugin {
             'Active' => (int)$form->getValue('Active'),
             'DateInserted' => date('Y-m-j H:i:s')
         ];
+
         if (val('Body', $latestTerms) === val('Body', $formValues) && val('Link', $latestTerms) === val('Link', $formValues)) {
             Gdn::sql()
-                ->update($this->tableName)
+                ->update('TermsOfUse')
                 ->set($updateFields)
                 ->where('TermsOfUseID', val('TermsOfUseID', $latestTerms))
                 ->put();
         } else {
-            Gdn::sql()
-                ->insert($this->tableName, $updateFields);
+            return Gdn::sql()
+                ->insert('TermsOfUse', $updateFields);
         }
-        return true;
     }
 
 
@@ -299,9 +304,8 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * @return array
      */
     private function getTerms() {
-        $latestTerms = Gdn::sql()
-            ->get($this->tableName, 'TermsOfUseID', 'DESC', 1)
-            ->resultArray();
-        return $latestTerms[0];
+        return $latestTerms = Gdn::sql()
+            ->get('TermsOfUse', 'TermsOfUseID', 'DESC', 1)
+            ->firstRow();
     }
 }
