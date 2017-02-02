@@ -30,6 +30,11 @@ class SAMLSSOController extends PluginController {
         $form = $this->Form;
         $form->setModel($model);
 
+        if ($authenticationKey !== null) {
+            $provider = Gdn_AuthenticationProviderModel::getProviderByKey($authenticationKey);
+            $form->setData($provider);
+        }
+
         // Set up the form.
         $formStructure = [
             'AuthenticationKey' => [
@@ -141,9 +146,6 @@ class SAMLSSOController extends PluginController {
                     redirect('/samlsso/edit/'.$form->getFormValue('AuthenticationKey'));
                 }
             }
-        } elseif ($authenticationKey !== null) {
-            $provider = Gdn_AuthenticationProviderModel::getProviderByKey($authenticationKey);
-            $form->setData($provider);
         }
 
         $this->setData('FormStructure', $formStructure);
