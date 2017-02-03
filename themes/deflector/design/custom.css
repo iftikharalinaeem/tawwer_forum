@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /*!
  * Prospect - A minimal Vanilla theme focused on customer support communities
  *
@@ -48,14 +49,29 @@ body {
  * and Firefox.
  * Correct `block` display not defined for `main` in IE 11.
  */
-article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section,
+summary {
   display: block; }
 
 /**
  * 1. Correct `inline-block` display not defined in IE 6/7/8/9 and Firefox 3.
  * 2. Normalize vertical alignment of `progress` in Chrome, Firefox, and Opera.
  */
-audio, canvas, progress, video {
+audio,
+canvas,
+progress,
+video {
   display: inline-block;
   /* 1 */
   vertical-align: baseline;
@@ -73,7 +89,8 @@ audio:not([controls]) {
  * Address `[hidden]` styling not present in IE 8/9/10.
  * Hide the `template` element in IE 8/9/10/11, Safari, and Firefox < 22.
  */
-[hidden], template {
+[hidden],
+template {
   display: none; }
 
 /* Links
@@ -102,7 +119,8 @@ abbr[title] {
 /**
  * Address style set to `bolder` in Firefox 4+, Safari, and Chrome.
  */
-b, strong {
+b,
+strong {
   font-weight: bold; }
 
 /**
@@ -135,7 +153,8 @@ small {
 /**
  * Prevent `sub` and `sup` affecting `line-height` in all browsers.
  */
-sub, sup {
+sub,
+sup {
   font-size: 75%;
   line-height: 0;
   position: relative;
@@ -188,7 +207,10 @@ pre {
  * Address odd `em`-unit font size rendering in all browsers.
  * Correct font family set oddly in IE 6, Safari 4/5, and Chrome.
  */
-code, kbd, pre, samp {
+code,
+kbd,
+pre,
+samp {
   font-family: monospace, monospace;
   font-size: 1em; }
 
@@ -205,7 +227,11 @@ code, kbd, pre, samp {
  * 3. Address margins set differently in Firefox 4+, Safari, and Chrome.
  * 4. Improves appearance and consistency in all browsers.
  */
-button, input, optgroup, select, textarea {
+button,
+input,
+optgroup,
+select,
+textarea {
   color: inherit;
   /* 1 */
   font: inherit;
@@ -225,7 +251,8 @@ button {
  * Correct `button` style inheritance in Firefox, IE 8/9/10/11, and Opera.
  * Correct `select` style inheritance in Firefox.
  */
-button, select {
+button,
+select {
   text-transform: none; }
 
 /**
@@ -237,7 +264,10 @@ button, select {
  * 4. Removes inner spacing in IE 7 without affecting normal text inputs.
  *  Known issue: inner spacing remains in IE 6.
  */
-button, html input[type="button"], input[type="reset"], input[type="submit"] {
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"] {
   -webkit-appearance: button;
   /* 2 */
   cursor: pointer;
@@ -246,13 +276,15 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
 /**
  * Re-set default cursor for disabled elements.
  */
-button[disabled], html input[disabled] {
+button[disabled],
+html input[disabled] {
   cursor: default; }
 
 /**
  * Remove inner padding and border in Firefox 4+.
  */
-button::-moz-focus-inner, input::-moz-focus-inner {
+button::-moz-focus-inner,
+input::-moz-focus-inner {
   border: 0;
   padding: 0; }
 
@@ -268,7 +300,8 @@ input {
  * 2. Remove excess padding in IE 8/9/10.
  *  Known issue: excess padding remains in IE 6.
  */
-input[type="checkbox"], input[type="radio"] {
+input[type="checkbox"],
+input[type="radio"] {
   -moz-box-sizing: border-box;
        box-sizing: border-box;
   /* 1 */
@@ -280,7 +313,8 @@ input[type="checkbox"], input[type="radio"] {
  * `font-size` values of the `input`, it causes the cursor style of the
  * decrement button to change from `default` to `text`.
  */
-input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button {
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
   height: auto; }
 
 /**
@@ -299,7 +333,8 @@ input[type="search"] {
  * Safari (but not Chrome) clips the cancel button when the search input has
  * padding (and `textfield` appearance).
  */
-input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webkit-search-decoration {
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none; }
 
 /**
@@ -344,7 +379,8 @@ table {
   border-collapse: collapse;
   border-spacing: 0; }
 
-td, th {
+td,
+th {
   padding: 0; }
 
 body {
@@ -359,22 +395,31 @@ a {
   text-decoration: none;
   transition: color 150ms; }
   a:hover, a:focus {
-    color: #087ad1;
+    color: #0877d1;
     text-decoration: none; }
 
 img {
   vertical-align: middle; }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: inherit;
   font-weight: 700;
   color: #222; }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   margin-top: 22px;
   margin-bottom: 11px; }
 
-h4, h5, h6 {
+h4,
+h5,
+h6 {
   margin-top: 11px;
   margin-bottom: 11px; }
 
@@ -384,7 +429,10 @@ p {
 .text-center {
   text-align: center; }
 
-.InputBox, .SmallInput, .TextBox, .token-input-list {
+.InputBox,
+.SmallInput,
+.TextBox,
+.token-input-list {
   display: block;
   width: 100% !important;
   padding: 6px 12px;
@@ -395,16 +443,20 @@ p {
 .DateBox {
   display: inline-block; }
 
-.CommentForm .FormWrapper {
+.CommentForm
+.FormWrapper {
   padding-left: 90px; }
-  .CommentForm .FormWrapper .Buttons {
+  .CommentForm
+.FormWrapper .Buttons {
     margin-left: -90px; }
 
-.icheckbox, .iradio {
+.icheckbox,
+.iradio {
   display: inline-block;
   line-height: 22px;
   cursor: pointer; }
-  .icheckbox:before, .iradio:before {
+  .icheckbox:before,
+  .iradio:before {
     display: inline-block;
     min-width: 1em;
     font-family: "vanillicon";
@@ -419,26 +471,32 @@ p {
     min-width: 1em;
     font-size: 22px;
     color: #848484;
-    content: "\f128";
+    content: "";
     vertical-align: middle; }
-  .icheckbox.checked:before, .iradio.checked:before {
+  .icheckbox.checked:before,
+  .iradio.checked:before {
     color: #2e9df7; }
 
 .icheckbox.checked:before {
-  content: "\f172"; }
+  content: ""; }
 
 .iradio.checked:before {
-  content: "\f138"; }
+  content: ""; }
 
 .PostOptions .ReactSprite {
   margin: 5px;
   width: 14px;
   height: 14px; }
 
-.Flyout *, .MenuItems * {
+.Flyout *,
+.MenuItems * {
   font-size: 15px;
   line-height: 22px; }
-.Flyout .Conversations a, .Flyout .Popin a, .MenuItems .Conversations a, .MenuItems .Popin a {
+
+.Flyout .Conversations a,
+.Flyout .Popin a,
+.MenuItems .Conversations a,
+.MenuItems .Popin a {
   color: #2e9df7; }
 
 .MenuItems a:hover {
@@ -450,7 +508,8 @@ p {
 .Popup.SignInPopup {
   margin-top: 30px; }
 
-.button, .Button {
+.button,
+.Button {
   display: inline-block;
   padding: 6px 12px;
   vertical-align: middle;
@@ -465,17 +524,24 @@ p {
   color: #fff;
   background-color: #2e9df7;
   background-repeat: repeat-x;
-  background-color: #38a4f7;
-  background-image: linear-gradient(#38a4f7, #249bf7); }
-  .button, .button:hover, .button:focus, .Button, .Button:hover, .Button:focus {
+  background-color: #38a2f7;
+  background-image: linear-gradient(#38a2f7, #2498f7); }
+  .button, .button:hover, .button:focus,
+  .Button,
+  .Button:hover,
+  .Button:focus {
     text-decoration: none; }
-  .button:active, .Button:active {
+  .button:active,
+  .Button:active {
     border-top-color: #d9d9d9;
     border-top-color: rgba(0, 0, 0, 0.15);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) inset; }
-  .button:hover, .button:focus, .button:active, .Button:hover, .Button:focus, .Button:active {
+  .button:hover, .button:focus, .button:active,
+  .Button:hover,
+  .Button:focus,
+  .Button:active {
     color: #fff;
-    background-color: #249bf7;
+    background-color: #2498f7;
     background-position: 0 -15px; }
 
 .Button {
@@ -513,11 +579,17 @@ p {
   .column-content:last-child {
     margin-right: 0; }
 
-.Sprite, .Sprite16, .ReactSprite, .SpFlyoutHandle {
+.Sprite,
+.Sprite16,
+.ReactSprite,
+.SpFlyoutHandle {
   width: auto;
   height: auto;
   background-image: none !important; }
-  .Sprite:before, .Sprite16:before, .ReactSprite:before, .SpFlyoutHandle:before {
+  .Sprite:before,
+  .Sprite16:before,
+  .ReactSprite:before,
+  .SpFlyoutHandle:before {
     display: inline-block;
     min-width: 1em;
     font-family: "vanillicon";
@@ -539,109 +611,109 @@ p {
   cursor: pointer; }
 
 .SpEditProfile:before {
-  content: "\f1b3"; }
+  content: ""; }
 
 .SpDropdownHandle:before {
-  content: "\f117"; }
+  content: ""; }
 
 .SpDiscussions:before {
-  content: "\f137"; }
+  content: ""; }
 
 .SpActivity:before {
-  content: "\f1a9"; }
+  content: ""; }
 
 .SpNotifications:before {
-  content: "\f14f"; }
+  content: ""; }
 
 .SpDelete:before {
-  content: "\f184"; }
+  content: ""; }
 
 .SpFlyoutHandle:before {
-  content: "\f12d"; }
+  content: ""; }
 
 .SpOptions:before {
-  content: "\f12d"; }
+  content: ""; }
 
 .SpPreferences:before {
-  content: "\f12d"; }
+  content: ""; }
 
 .SpBookmarks:before {
-  content: "\f199"; }
+  content: ""; }
 
 .SpPassword:before {
-  content: "\f166"; }
+  content: ""; }
 
 .SpSearch:before {
-  content: "\f18e"; }
+  content: ""; }
 
 .SpInbox:before {
-  content: "\f159"; }
+  content: ""; }
 
 .ReactPromote:before {
-  content: "\f156"; }
+  content: ""; }
 
 .ReactOffTopic:before {
-  content: "\f16b"; }
+  content: ""; }
 
 .ReactInsightful:before {
-  content: "\f160"; }
+  content: ""; }
 
 .ReactDisagree:before {
-  content: "\f14c"; }
+  content: ""; }
 
 .ReactAgree:before {
-  content: "\f196"; }
+  content: ""; }
 
 .ReactDislike:before {
-  content: "\f1a6"; }
+  content: ""; }
 
 .ReactLike:before {
-  content: "\f1a7"; }
+  content: ""; }
 
 .ReactDown:before {
-  content: "\f108"; }
+  content: ""; }
 
 .ReactUp:before {
-  content: "\f10b"; }
+  content: ""; }
 
 .ReactWTF:before {
-  content: "\f1b8"; }
+  content: ""; }
 
 .ReactAwesome:before {
-  content: "\f157"; }
+  content: ""; }
 
 .ReactLOL:before {
-  content: "\f167"; }
+  content: ""; }
 
 .ReactFlag:before {
-  content: "\f147"; }
+  content: ""; }
 
 .ReactAbuse:before {
-  content: "\f13d"; }
+  content: ""; }
 
 .ReactSpam:before {
-  content: "\f198"; }
+  content: ""; }
 
 .ReactQuote:before {
-  content: "\f182"; }
+  content: ""; }
 
 .ReactWarn:before {
-  content: "\f1b6"; }
+  content: ""; }
 
 .ReactFacebook:before {
-  content: "\f143"; }
+  content: ""; }
 
 .ReactFacebook:hover:before {
   color: #3a5795; }
 
 .ReactTwitter:before {
-  content: "\f1ad"; }
+  content: ""; }
 
 .ReactTwitter:hover:before {
   color: #55acee; }
 
 .ReactGooglePlus:before {
-  content: "\f151"; }
+  content: ""; }
 
 .ReactGooglePlus:hover:before {
   color: #dd4b39; }
@@ -649,25 +721,32 @@ p {
 .ReactButton.PopupWindow:hover .Sprite:before {
   color: #444; }
 
-.Button.Handle .Sprite, .NavButton.Handle .Sprite {
+.Button.Handle .Sprite,
+.NavButton.Handle .Sprite {
   position: static;
   border: 0;
   vertical-align: baseline; }
 
-.Handle > .SpEditProfile, .NavButton > .SpEditProfile {
+.Handle > .SpEditProfile,
+.NavButton > .SpEditProfile {
   width: auto;
   height: auto;
   vertical-align: baseline;
   line-height: inherit; }
 
-.Options .Bookmark, .Options .SpFlyoutHandle {
+.Options .Bookmark,
+.Options .SpFlyoutHandle {
   display: inline-block;
   padding: 2px; }
-  .Options .Bookmark, .Options .Bookmark:before, .Options .SpFlyoutHandle, .Options .SpFlyoutHandle:before {
+  .Options .Bookmark, .Options .Bookmark:before,
+  .Options .SpFlyoutHandle,
+  .Options .SpFlyoutHandle:before {
     vertical-align: top;
     line-height: 18px; }
-  .Options .Bookmark:before, .Options .SpFlyoutHandle:before {
+  .Options .Bookmark:before,
+  .Options .SpFlyoutHandle:before {
     font-size: 22px; }
+
 .Options .AdminCheck .icheckbox:before {
   vertical-align: top; }
 
@@ -709,11 +788,11 @@ a.Bookmark {
     color: #2b2b2b; }
 
 a.Bookmark:before {
-  content: "\f19a"; }
+  content: ""; }
 
 a.Bookmarked:before, a.Bookmarked:hover:before {
   color: #e5b951 !important;
-  content: "\f199"; }
+  content: ""; }
 
 .navbar {
   margin-bottom: 0;
@@ -755,7 +834,12 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   background-color: #2e9df7;
   box-shadow: 0 15px 15px -15px rgba(0, 0, 0, 0.25) inset, 0 -15px 15px -15px rgba(0, 0, 0, 0.25) inset; }
-  .masthead h1, .masthead h2, .masthead h3, .masthead h4, .masthead h5, .masthead h6 {
+  .masthead h1,
+  .masthead h2,
+  .masthead h3,
+  .masthead h4,
+  .masthead h5,
+  .masthead h6 {
     color: #fff; }
   .masthead form {
     position: relative;
@@ -819,7 +903,8 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
     font-size: 15px;
     font-weight: 700;
     color: #444; }
-  .Item-Header .Author, .Item-Header .AuthorInfo {
+  .Item-Header .Author,
+  .Item-Header .AuthorInfo {
     font-size: 15px;
     line-height: 22px; }
   .Item-Header .AuthorInfo {
@@ -888,6 +973,7 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
     border-width: 11px; }
   .MessageList .Item + .Item {
     margin-top: 11px; }
+
 .MessageList .Item-Header .PhotoWrap {
   margin-left: -86px; }
 
@@ -952,6 +1038,13 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
 .CategoryFilterOptions {
   margin-top: -5px;
   font-size: 14px; }
+
+.Overlay {
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 1001; }
+
+.change-picture-new {
+  margin-bottom: 0 !important; }
 
 .Profile > .BoxFilter {
   display: none; }
