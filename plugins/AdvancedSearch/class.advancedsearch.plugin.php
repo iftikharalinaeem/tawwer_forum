@@ -310,12 +310,27 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         $UseCategories = c('Vanilla.Categories.Use');
         $Breadcrumbs = array();
+        $commentModel = new CommentModel();
+        $discussionModel = new DiscussionModel();
 
         foreach ($Data as &$Row) {
             $Row['Title'] = markString($SearchTerms, Gdn_Format::text($Row['Title'], false));
-            $Row['Url'] = url($Row['Url'], true);
             $Row['Score'] = (int)$Row['Score'];
-//         $Row['Body'] = $Row['Summary'];
+
+            // Generate record URLs based on their type.
+            switch (val('RecordType', $Row)) {
+                case 'Comment':
+                    $record = $commentModel->getID(val('PrimaryID', $Row));
+                    $Row['Url'] = commentUrl($record);
+                    break;
+                case 'Discussion':
+                    $record = $discussionModel->getID(val('PrimaryID', $Row));
+                    $Row['Url'] = discussionUrl($record);
+                    break;
+                default:
+                    $Row['Url'] = url($Row['Url'], true);
+            }
+            unset($record);
 
             $Summary = Gdn_Format::to($Row['Summary'], $Row['Format']);
             $media = Search::extractMedia($Summary);
