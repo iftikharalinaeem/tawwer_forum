@@ -710,4 +710,18 @@ class GroupsHooks extends Gdn_Plugin {
             }
         }
     }
+
+    /**
+     * Clear the GroupID field form a discussion that is moved.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    public function discussionModel_afterSetField_handler($sender, $args) {
+        $newCategoryID = valr('SetField.CategoryID', $args, false);
+        // Make sure we are moving a discussion into a non group category!
+        if ($newCategoryID && !in_array($newCategoryID, GroupModel::getGroupCategoryIDs())) {
+            $sender->setField($args['DiscussionID'], 'GroupID', null);
+        }
+    }
 }
