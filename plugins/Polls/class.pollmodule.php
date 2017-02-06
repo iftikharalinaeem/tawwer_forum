@@ -187,7 +187,7 @@ class PollModule extends Gdn_Module {
      *
      * @return bool
      */
-    public function showForm() {
+    private function showForm() {
         $categoryID = Gdn::controller()->data('CategoryID');
 
         if (!$categoryID) {
