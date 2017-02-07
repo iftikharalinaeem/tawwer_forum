@@ -38,7 +38,7 @@ class PollModule extends Gdn_Module {
      */
     public function toString() {
         $this->loadPoll();
-        $String = '';
+        $this->setData('ShowForm', $this->showForm());
         ob_start();
         include(PATH_PLUGINS.'/Polls/views/poll.php');
         $string = ob_get_contents();

@@ -1,5 +1,5 @@
 <?php
-if ($this->showForm()) {
+if ($this->data('ShowForm')) {
     include('form.php');
 }
 
