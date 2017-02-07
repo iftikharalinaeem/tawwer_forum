@@ -38,7 +38,7 @@ class PollModule extends Gdn_Module {
      */
     public function toString() {
         $this->loadPoll();
-        $String = '';
+        $this->setData('ShowForm', $this->showForm());
         ob_start();
         include(PATH_PLUGINS.'/Polls/views/poll.php');
         $string = ob_get_contents();
@@ -76,10 +76,11 @@ class PollModule extends Gdn_Module {
             // Has this user voted?
             $countVotes = $pollModel->SQL
                 ->select()
-                ->from('PollVote pv')
-                ->where(['pv.UserID' => Gdn::session()->UserID, 'pv.PollOptionID' => array_column($optionData, 'PollOptionID')])
-                ->get()
-                ->numRows();
+                ->from('PollVote')
+                ->where([
+                    'UserID' => Gdn::session()->UserID,
+                    'PollOptionID' => array_column($optionData, 'PollOptionID')
+                ])->get()->numRows();
             $this->setData('UserHasVoted',  ($countVotes > 0));
         }
 
@@ -179,5 +180,22 @@ class PollModule extends Gdn_Module {
         }
 
         return $votes;
+    }
+
+    /*
+     * Should the voting form be shown?
+     *
+     * @return bool
+     */
+    private function showForm() {
+        $categoryID = Gdn::controller()->data('CategoryID');
+
+        if (!$categoryID) {
+            $discussion = Gdn::controller()->data('Discussion');
+            $categoryID = val('CategoryID', $discussion);
+        }
+
+        $canVote = Gdn::session()->checkPermission('Vanilla.Comments.Add', true, 'Category', $categoryID);
+        return $canVote && !$this->data('UserHasVoted');
     }
 }

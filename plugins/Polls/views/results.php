@@ -5,10 +5,7 @@ $anonymous = val('Anonymous', $poll) || c('Plugins.Polls.AnonymousPolls');
 $countPollVotes = val('CountVotes', $poll);
 $pollOptions = $this->data('PollOptions');
 
-$cssResultDisplay = 'style="display: none"';
-if ($this->Data['UserHasVoted']) {
-    $cssResultDisplay = '';
-}
+$cssResultDisplay = $this->data('ShowForm') ? 'style="display: none"' : '';
 
 if (!$poll) :
     echo wrap(t('Failed to load the poll.'), 'div class="Poll PollNotFound"');
@@ -64,7 +61,7 @@ else : // Display the poll
             ?>
         </div>
         <?php
-        if (!$this->Data['UserHasVoted']) {
+        if ($this->data('ShowForm')) {
             echo anchor(t('Hide Results'), '#', 'js-poll-result-btn');
         }
         ?>

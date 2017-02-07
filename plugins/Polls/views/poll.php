@@ -1,5 +1,6 @@
 <?php
-if (!$this->Data['UserHasVoted']) {
+if ($this->data('ShowForm')) {
     include('form.php');
 }
+
 include('results.php');

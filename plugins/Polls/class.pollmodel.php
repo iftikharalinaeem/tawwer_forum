@@ -201,22 +201,22 @@ class PollModel extends Gdn_Model {
      */
     public function vote($pollOptionID) {
         // Get objects from the database.
-        $session = Gdn::session();
+        $userID = Gdn::session()->UserID;
         $pollOptionModel = new Gdn_Model('PollOption');
         $pollOption = $pollOptionModel->getID($pollOptionID);
 
         // If this is a valid poll option and user session, record the vote.
-        if ($pollOption && $session->isValid()) {
+        if ($userID && $pollOption) {
             // Has this user voted on this poll before?
             $hasVoted = ($this->SQL
                 ->select()
                 ->from('PollVote')
-                ->where(array('UserID' => $session->UserID, 'PollOptionID' => $pollOptionID))
+                ->where(array('UserID' => $userID, 'PollOptionID' => $pollOptionID))
                 ->get()->numRows() > 0);
             if (!$hasVoted) {
                 // Insert the vote
                 $pollVoteModel = new Gdn_Model('PollVote');
-                $pollVoteModel->insert(['UserID' => $session->UserID, 'PollOptionID' => $pollOptionID]);
+                $pollVoteModel->insert(['UserID' => $userID, 'PollOptionID' => $pollOptionID]);
 
                 // Update the vote counts
                 $pollOptionModel->update(['CountVotes' => val('CountVotes', $pollOption, 0)+1], ['PollOptionID' => $pollOptionID]);
