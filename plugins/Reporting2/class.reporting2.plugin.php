@@ -206,14 +206,21 @@ class Reporting2Plugin extends Gdn_Plugin {
 
    /**
     * Adds "Reported Posts" to MeModule menu.
+    *
+    * @param MeModule $sender
+    * @param array $args
     */
-   public function MeModule_FlyoutMenu_Handler($Sender) {
-      if (CheckPermission('Garden.Moderation.Manage')) {
-         $Category = ReportModel::GetReportCategory();
-         $ReportCount = ReportModel::GetUnreadReportCount();
-         $CReport = $ReportCount > 0 ? ' '.Wrap($ReportCount, 'span class="Alert"') : '';
-         echo Wrap(Anchor(Sprite('SpReport').' '.htmlspecialchars(T($Category['Name'])).$CReport, CategoryUrl($Category)), 'li', array('class' => 'ReportCategory'));
+   public function meModule_flyoutMenu_handler($sender, $args) {
+      if (!val('Dropdown', $args, false) || !checkPermission('Garden.Moderation.Manage')) {
+         return;
       }
+      /** @var DropdownModule $dropdown */
+      $category = ReportModel::getReportCategory();
+      $reportCount = ReportModel::getUnreadReportCount();
+      $reportModifiers = $reportCount > 0 ? ['badge' => $reportCount] : [];
+      $reportModifiers['listItemCssClasses'] = ['ReportCategory', 'link-report-category'];
+      $dropdown = $args['Dropdown'];
+      $dropdown->addLink(htmlspecialchars(t($category['Name'])), categoryUrl($category), 'moderation.report-category', '', [], $reportModifiers);
    }
 
    /**

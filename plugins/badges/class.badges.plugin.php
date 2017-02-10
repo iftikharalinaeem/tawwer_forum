@@ -113,6 +113,45 @@ class BadgesHooks extends Gdn_Plugin {
         $Menu->addLink('Reputation', t('Badge Requests'), '/badge/requests', 'Reputation.Badges.Give', array('class' => 'nav-badge-requests'));
     }
 
+
+    /**
+     * Adds "Badge Requests" to MeModule menu.
+     *
+     * @param MeModule $sender
+     * @param array $args
+     */
+    public function meModule_flyoutMenu_handler($sender, $args) {
+        if (!val('Dropdown', $args, false) || !checkPermission('Reputation.Badges.Give')) {
+            return;
+        }
+        if (!$sender->data('BadgeRequestCount', '')) {
+            $ubm = new UserBadgeModel();
+            $sender->setData('BadgeRequestCount', $ubm->getBadgeRequestCount());
+        }
+
+        /** @var DropdownModule $dropdown */
+        $badgeModifiers['listItemCssClasses'] = ['BadgeRequests', 'link-badge-requests'];
+        $badgeModifiers['badge'] = $sender->data('BadgeRequestCount', 0);
+        $dropdown = $args['Dropdown'];
+        $dropdown->addLink(t('Badge Requests'), '/badge/requests', 'moderation.badge-requests', '', [], $badgeModifiers);
+    }
+
+    /**
+     * Adds count for badge requests to MeModule's dashboard notification count.
+     *
+     * @param MeModule $sender
+     * @param array $args
+     */
+    public function meModule_beforeFlyoutMenu_handler($sender, $args) {
+        if (checkPermission('Reputation.Badges.Give')) {
+            if (!$sender->data('BadgeRequestCount', '')) {
+                $ubm = new UserBadgeModel();
+                $sender->setData('BadgeRequestCount', $ubm->getBadgeRequestCount());
+            }
+            $args['DashboardCount'] = $args['DashboardCount'] + $sender->data('BadgeRequestCount', 0);
+        }
+    }
+
     /**
      * Trigger NameDropper.
      *

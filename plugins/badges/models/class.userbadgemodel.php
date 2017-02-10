@@ -322,6 +322,19 @@ class UserBadgeModel extends Gdn_Model {
     }
 
     /**
+     * Returns badge request count.
+     *
+     * @return Gdn_Dataset
+     */
+    public function getBadgeRequestCount() {
+        return $this->getCount([
+            'Declined' => 0,
+            'DateCompleted is null' => null,
+            'DateRequested is not null' => null
+        ]);
+    }
+
+    /**
      * Get users who have an badge.
      *
      * @since 1.0.0
