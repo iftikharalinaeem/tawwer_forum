@@ -608,7 +608,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         if ($category) {
             // Grab this category's ancestors...
-            $parents = CategoryModel::getAncestors(val('CategoryID', $category));
+            $parents = CategoryModel::getAncestors(val('CategoryID', $category), true, true);
             // ...and pull the one from the top. This should be the highest, non-root parent.
             $topParent = reset($parents);
 
