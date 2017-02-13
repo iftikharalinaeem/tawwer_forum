@@ -21,7 +21,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     protected $api = false;
 
     /** @var string The unmodified web root for the current request. */
-    protected $originalWebRoot = '';
+    protected static $originalWebRoot = '';
 
     protected $savedDefaultRoute = '';
 
@@ -294,7 +294,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         if ($site) {
             Gdn::request()->path($path);
             $webroot = Gdn::request()->webRoot();
-            $this->originalWebRoot = $webroot;
+            self::$originalWebRoot = $webroot;
 
             Gdn::request()->assetRoot($webroot);
             Gdn::request()->webRoot(trim("$webroot/$root", '/'));
@@ -595,9 +595,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param string|null $path
      * @return string|bool
      */
-    private function getCanonicalUrl($category, $path = null) {
-        $canonicalUrl = false;
-        $webroot = '';
+    public static function getCanonicalUrl($category, $path = null) {
+        $webRoot = '';
 
         if (is_numeric($category) || is_string($category)) {
             $category = CategoryModel::categories($category);
@@ -609,7 +608,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         if ($category) {
             // Grab this category's ancestors...
-            $parents = CategoryModel::getAncestors(val('CategoryID', $category));
+            $parents = CategoryModel::getAncestors(val('CategoryID', $category), true, true);
             // ...and pull the one from the top. This should be the highest, non-root parent.
             $topParent = reset($parents);
 
@@ -622,7 +621,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
                         }
 
                         // OriginalWebRoot is the un-modified web root, used in case we are already in a subcommunity.
-                        $webroot = trim("{$this->originalWebRoot}/{$subcommunity['Folder']}", '/');
+                        $webRoot = trim(self::$originalWebRoot."/{$subcommunity['Folder']}", '/');
                         break;
                     }
                 }
@@ -631,10 +630,83 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         // Temporarily swap out the current web root for the modified one, before generating the URL.
         $currentWebRoot = Gdn::request()->webRoot();
-        Gdn::request()->webRoot($webroot);
+        Gdn::request()->webRoot($webRoot);
         $canonicalUrl = url($path, true);
         Gdn::request()->webRoot($currentWebRoot);
 
         return $canonicalUrl;
+    }
+}
+
+if (!function_exists('commentUrl')) {
+    /**
+     * Return a URL for a comment.
+     *
+     * @param object $comment
+     * @param bool $withDomain
+     * @return string
+     */
+    function commentUrl($comment, $withDomain = true) {
+        $comment = (object)$comment;
+        $commentID = val('CommentID', $comment);
+
+        // This isn't normally on the comment record, but may come across as part of a search result.
+        $categoryID = val('CategoryID', $comment);
+
+        if ($categoryID === false) {
+            // This would normally be on the comment record, but may not come across as part of a search result.
+            $discussionID = val('DiscussionID', $comment);
+
+            // Try to dig up the discussion ID by looking up the comment.
+            if ($discussionID === false) {
+                $commentModel = new CommentModel();
+                $comment = $commentModel->getID($comment->CommentID);
+                if ($comment) {
+                    $discussionID = val('DiscussionID', $comment);
+                }
+            }
+
+            // Try to dig up the category ID by looking up the discussion.
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->getID($discussionID);
+            if ($discussion) {
+                $categoryID = val('CategoryID', $discussion);
+            }
+        }
+
+        $path = "/discussion/comment/{$commentID}#Comment_{$commentID}";
+        return SubcommunitiesPlugin::getCanonicalUrl($categoryID, $path);
+    }
+}
+
+if (!function_exists('discussionUrl')) {
+    /**
+     * Return a URL for a discussion.
+     *
+     * @param object $discussion
+     * @param int|string $page
+     * @param bool $withDomain
+     * @return string
+     */
+    function discussionUrl($discussion, $page = '', $withDomain = true) {
+        $discussion = (object)$discussion;
+        $name = Gdn_Format::url(val('Name', $discussion));
+        $categoryID = val('CategoryID', $discussion);
+        $discussionID = $discussion->DiscussionID;
+
+        // Disallow an empty name slug in discussion URLs.
+        if (empty($name)) {
+            $name = 'x';
+        }
+
+        $path = "/discussion/{$discussionID}/{$name}";
+
+        if ($page) {
+            if ($page > 1 || Gdn::session()->UserID) {
+                $path .= "/p{$page}";
+            }
+        }
+
+        return SubcommunitiesPlugin::getCanonicalUrl($categoryID, $path);
     }
 }
