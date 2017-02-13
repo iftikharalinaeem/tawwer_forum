@@ -1,17 +1,22 @@
 <h1><?php echo t($this->Data['Title']); ?></h1>
 <?php
+if (c('Whitelist.BlockMode', false) === 'HARDCORE') {
+    $msg = t('Be sure that you are whitelisted before updating the config or you could end up blocking yourself out of the forum.');
+} else {
+    $msg = t('This plugin will not block any request needed to serve the login page.');
+}
+?>
+<div class="alert alert-warning padded">
+    <strong><?php echo $msg.'<br/>'.t('This plugin does not block any request to assets (Images, Scripts, Stylesheets, etc...)'); ?></strong>
+</div>
+<?php
 echo $this->Form->open();
 echo $this->Form->errors();
-$themingNotices = '<br/>'.t('This plugin does not block any request to assets (Images, Scripts, Stylesheets, etc...)');
 ?>
     <ul>
         <li><?php
             echo wrap(t('Warning'), 'h2');
-            if (c('Whitelist.BlockMode', false) === 'HARDCORE') {
-                echo wrap(wrap(t('Be sure that you are whitelisted before updating the config or you could end up blocking yourself out of the forum.').$themingNotices, 'strong'), 'span', ['class' => 'WarningMessage']);
-            } else {
-                echo wrap(wrap(t('This plugin will not block any request needed to serve the login page.').$themingNotices, 'strong'), 'span', ['class' => 'WarningMessage']);
-            }
+
             ?><hr></li>
         <li><?php
             echo $this->Form->label('Enabled', 'Whitelist.Active');
