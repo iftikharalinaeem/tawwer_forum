@@ -14,7 +14,7 @@ $PluginInfo['CustomTheme'] = array(
 );
 
 class CustomThemePlugin implements Gdn_IPlugin {
-   
+
 	private function _ApplyColorPicker($Sender, $NewCSS) {
 		// Find existing CTCache and remove it.
 		$NewCSSLines = explode("\n", $NewCSS);
@@ -23,18 +23,18 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		for ($i = 0; $i < count($NewCSSLines); $i++) {
 			if (strpos($NewCSSLines[$i], '/* CTCache:') === FALSE)
 				$InCache = TRUE;
-				
+
 			if (strpos($NewCSSLines[$i], '/* End CTCache */') === FALSE)
 				$InCache = FALSE;
-				
+
 			if (!$InCache)
 				$CleanCSSLines[] = $NewCSSLines[$i];
 		}
-		
+
 		// Return if color picker shouldn't be used
 		if (C('Garden.Theme') != 'defaultsmarty')
 			return implode("\n", $CleanCSSLines);
-		
+
 		// Retrieve colors from the form
 		$ColorBanner = $Sender->Form->GetValue('ColorBanner');
 		$ColorBackground = $Sender->Form->GetValue('ColorBackground');
@@ -42,7 +42,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$ColorBannerLinks = $Sender->Form->GetValue('ColorBannerLinks');
 		$ColorBodyLinks = $Sender->Form->GetValue('ColorBodyLinks');
 		$ColorBodyText = $Sender->Form->GetValue('ColorBodyText');
-		
+
 		// Create a cache comment to aid in loading colors into the form.
 		$CleanCSSLines[] = "/* CTCache:{$ColorBanner}{$ColorBackground}{$ColorTabs}{$ColorBannerLinks}{$ColorBodyLinks}{$ColorBodyText} */";
 		// Define css definitions
@@ -61,14 +61,14 @@ class CustomThemePlugin implements Gdn_IPlugin {
             $('.TabLink:hover').css('backgroundColor', '#' + diffHex(buttonBackgroundHover, diff));
             $('.Active .TabLink').css('backgroundColor', '#' + diffHex(buttonActiveBackground, diff));
             $('.Active .TabLink').css('color', '#' + diffHex(buttonActiveText, diff));
-		*/	  
+		*/
 		return implode("\n", $CleanCSSLines);
 	}
 
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
 		if (!$this->_CanCustomizeTheme())
 			return;
-		
+
 		$Menu = &$Sender->EventArguments['SideMenu'];
       $Menu->AddLink('Appearance', 'Customize Theme', 'settings/customtheme', 'Garden.Settings.Manage');
 	}
@@ -76,12 +76,12 @@ class CustomThemePlugin implements Gdn_IPlugin {
    public function Base_Render_Before($Sender) {
 		if (IsMobile() || C('Plugins.CustomTheme.Name') != C('Garden.Theme'))
 			return;
-		
+
 		// If we are in preview mode...
 		if (Gdn::Session()->GetPreference('PreviewCustomTheme')) {
 			// Add the css file that styles the preview inform message buttons
 			$Sender->AddCssFile('previewtheme.css', 'dashboard');
-			
+
 			// Inform the user of the preview status
 		   $Form = new Gdn_Form();
 			$Message = 'You are previewing your custom theme revisions.'
@@ -89,32 +89,32 @@ class CustomThemePlugin implements Gdn_IPlugin {
 				.'<div><strong>Options:</strong> ';
 			if (C('Plugins.CustomTheme.Enabled'))
 				$Message .= $Form->Button('Apply Changes', array('class' => 'PreviewThemeButton'));
-			
+
 			$Message .=  $Form->Button('Exit Preview', array('class' => 'PreviewThemeButton'))
 				.'</div>'
 				.$Form->Close();
-				
+
 			$Sender->InformMessage($Message, 'NoDismiss');
 		}
 	}
-	
+
 	/**
 	 * Can the current theme be customized?
 	 */
 	private function _CanCustomizeTheme() {
-		$ThemeManager = new Gdn_ThemeManager();
+		$ThemeManager = Gdn::factory('ThemeManager');
 		$ThemeInfo = $ThemeManager->EnabledThemeInfo();
 		// Make sure the current theme uses a smarty master template instead of php
 		return file_exists(PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '').'/views/default.master.tpl');
 	}
-	
+
 	/**
 	 * Add the theme CSS customizations.
 	 */
    public function Base_BeforeAddCss_Handler($Sender) {
 		if (IsMobile() || C('Plugins.CustomTheme.Name') != C('Garden.Theme'))
 			return;
-		
+
 		// If we are using the default master view, and in preview mode, use custom css & html files
 		$DoPreview = Gdn::Session()->GetPreference('PreviewCustomTheme', FALSE);
 		$IsDefaultMaster = $Sender->MasterView == 'default' || $Sender->MasterView == '';
@@ -122,11 +122,11 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$LiveRevisionID = C('Plugins.CustomTheme.LiveRevisionID', 0);
 		$WorkingIncludeThemeCSS = C('Plugins.CustomTheme.WorkingIncludeThemeCSS', 'Yes') == 'Yes' ? TRUE : FALSE;
 		$LiveIncludeThemeCSS = C('Plugins.CustomTheme.LiveIncludeThemeCSS', 'Yes') == 'Yes' ? TRUE : FALSE;
-		
+
 		// Wipe out master css?
 		if ($IsDefaultMaster && (!$LiveIncludeThemeCSS || ($DoPreview && !$WorkingIncludeThemeCSS)))
 			$Sender->ClearCSSFiles();
-		
+
 		if ($IsDefaultMaster && $WorkingRevisionID == 0 && $LiveRevisionID == 0) {
 			// Fallbacks to old method
 			$CssFiles = GetValue('CssFiles', $Sender->EventArguments);
@@ -139,7 +139,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			$Sender->EventArguments['CssFiles'] = $CssFiles;
 		}
 	}
-	
+
 	/**
 	 * New method of adding css to page (from database).
 	 * And handle changing the master view.
@@ -147,7 +147,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
    public function Base_BeforeFetchMaster_Handler($Sender) {
 		if (IsMobile() || C('Plugins.CustomTheme.Name') != C('Garden.Theme'))
 			return;
-		
+
 		$this->_Construct();
 
 		// If we are using the default master view, and in preview mode, use custom css & html files
@@ -156,7 +156,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$IsHead = property_exists($Sender, 'Head') && is_object($Sender->Head);
 		$WorkingRevisionID = C('Plugins.CustomTheme.WorkingRevisionID', 0);
 		$LiveRevisionID = C('Plugins.CustomTheme.LiveRevisionID', 0);
-		
+
 		if ($IsHead && $IsDefaultMaster) {
 			// New method
 			if ($DoPreview && $WorkingRevisionID > 0) {
@@ -172,7 +172,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$Smarty = Gdn::Factory('Smarty');
 		// register the resource name "customtheme"
 		$Smarty->register_resource("customtheme", array(
-			"customtheme_smarty_get_template", 
+			"customtheme_smarty_get_template",
 			"customtheme_smarty_get_timestamp",
 			"customtheme_smarty_get_secure",
 			"customtheme_smarty_get_trusted"
@@ -184,7 +184,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$HtmlFile = PATH_THEMES . DS . $Theme . DS . 'views' . DS . $PreviewHtml;
 		if ($PreviewHtml == '' || !file_exists($HtmlFile))
 			$HtmlFile = '';
-			
+
 		if ($LiveRevisionID > 0)
 			$HtmlFile = 'customtheme:default_master_'.$LiveRevisionID.'.tpl';
 
@@ -196,22 +196,22 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			$Sender->EventArguments['MasterViewPath'] = $HtmlFile;
 		}
 	}
-	
+
 	public static function GetRevisionFromFileName($FileName, $Default = 0) {
 		if ($FileName === FALSE)
 			return $Default;
-		
+
 		// Note: the _css and _tpl is because PHP replaces url dots with underscores automatically.
 		$Revision = str_replace(array('default_master_', 'rev_', 'custom_', '.css', '.tpl', '_css', '_tpl'), array('', '', '', '', '', '', ''), $FileName);
 		return is_numeric($Revision) ? $Revision : $Default;
 	}
-	
+
 	/**
 	 * Renders the requested css from the db.
 	 */
 	public function PluginController_CustomCSS_Create($Sender) {
 		$this->_Construct();
-		
+
 		header('Content-Type: text/css', TRUE); // Force browsers to agree that this is css
 		$Sender->MasterView = 'none';
 		$FileToLoad = GetValue(1, $Sender->RequestArgs);
@@ -222,21 +222,21 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			->Where('RevisionID', $RevisionID)
 			->Get()
 			->FirstRow();
-				
+
 		if ($ThemeData)
 			echo $ThemeData->CSS;
 
 		// Cleanup
 		Gdn::Database()->CloseConnection();
 	}
-	
+
 	/**
 	 * Set the current values for the color picker.
 	 */
 	private function _SetColorPickerValues($Sender) {
 		// Grab the values from the custom css definition. If they are not
 		// defined, use the known values from the default theme.
-		
+
 		// Defaults
 		$ColorBanner = '38ABE3';
 		$ColorBackground = 'FFFFFF';
@@ -244,7 +244,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$ColorBannerLinks = 'FFFFFF';
 		$ColorBodyLinks = '1E79A7';
 		$ColorBodyText = '70727C';
-		
+
 		// Look in the custom css definitions for cached values
 		$CustomCSS = $Sender->Form->GetValue('CustomCSS');
 		// Matching: /* CTCache:aaaaaabbbbbbccccccddddddeeeeeeffffff */
@@ -261,7 +261,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 				$ColorBodyText = substr($CTCache, 38, 6);
 			}
 		}
-	
+
 		// Assign to the form
 		$Sender->Form->SetFormValue('ColorBanner', $ColorBanner);
 		$Sender->Form->SetFormValue('ColorBackground', $ColorBackground);
@@ -282,7 +282,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			echo Wrap(sprintf(T('You can customize the HTML and CSS for this theme on the %s page.'), Anchor('Customize Theme', 'settings/customtheme')), 'div', array('class' => 'CustomThemeOptions'));
 
 	}
-	
+
 	/**
 	 * Create the theme customization page.
 	 */
@@ -292,25 +292,25 @@ class CustomThemePlugin implements Gdn_IPlugin {
       $Sender->Permission('Garden.Settings.Manage');
       $Sender->Title('Customize Theme');
       $Sender->AddSideMenu('settings/customtheme');
-		
+
       $Sender->Form = new Gdn_Form();
 		if ($Sender->Form->GetFormValue('Exit_Preview') ? TRUE : FALSE) {
 			$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', FALSE);
 			Redirect('/settings/customtheme');
-		}		
-		
+		}
+
       $Sender->AddJsFile('customtheme.js', 'plugins/CustomTheme');
       $Sender->AddJsFile('jquery.textarea.js', 'plugins/CustomTheme');
 		$Sender->AddCssFile('customtheme.css', 'plugins/CustomTheme');
-      
+
 		$Sender->AddJsFile('colorpicker/js/colorpicker.js', 'plugins/CustomTheme');
 		$Sender->AddCssFile('colorpicker/css/colorpicker.css', 'plugins/CustomTheme');
-		
-		$ThemeManager = new Gdn_ThemeManager();
+
+		$ThemeManager = Gdn::factory('ThemeManager');
 		$CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
 		$CurrentThemeFolder = basename(GetValue('ThemeRoot', $CurrentThemeInfo));
 		$Folder = PATH_THEMES . DS . $CurrentThemeFolder;
-		
+
 		// Keep these for backwards compatibility:
 		$PreviewCSSFile = C('Plugins.CustomTheme.PreviewCSS', 'custom_0.css');
 		$PreviewHtmlFile = C('Plugins.CustomTheme.PreviewHtml', 'custom_0.tpl');
@@ -321,7 +321,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			$LiveRevisionID = 0;
 			$WorkingRevisionID = 0;
 		}
-		
+
 		// Are we switching back to a previous revision (css OR html)?
 		if (!$Sender->Form->AuthenticatedPostBack()) {
 			$RequestedRevisionID = GetValue(2, $Sender->RequestArgs);
@@ -337,7 +337,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			->Where('RevisionID', $WorkingRevisionID)
 			->Get()
 			->FirstRow();
-			
+
 		if ($ThemeData) {
 			$HtmlContents = $ThemeData->Html;
 			$CSSContents = $ThemeData->CSS;
@@ -347,7 +347,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 			$CSSContents = '';
 			if (file_exists($Folder . DS . 'design' . DS . 'customtheme.css'))
 				$CSSContents = file_get_contents ($Folder . DS . 'design' . DS . 'customtheme.css');
-				
+
 			if ($CSSContents == '')
 				$CSSContents = '/* ---- Edit CSS ----
 
@@ -377,7 +377,7 @@ Here are some things you should know before you begin:
 			if (file_exists($Folder . DS . 'views' . DS . 'default.master.tpl'))
 				$HtmlContents = file_get_contents ($Folder . DS . 'views' . DS . 'default.master.tpl');
 		}
-			
+
 		// If viewing the form for the first time
 		if (!$Sender->Form->AuthenticatedPostBack()) {
 			$Sender->Form->SetFormValue('CustomCSS', $CSSContents);
@@ -397,7 +397,7 @@ Here are some things you should know before you begin:
 				$Sender->Form->SetFormValue('IncludeThemeCSS', $IncludeThemeCSS);
 				$this->_SetColorPickerValues($Sender);
 			}
-			
+
 			// Save the changes (if there are changes to save):
 			$NewCSS = $Sender->Form->GetFormValue('CustomCSS', '');
 			$NewCSS = $this->_ApplyColorPicker($Sender, $NewCSS);
@@ -434,30 +434,30 @@ Here are some things you should know before you begin:
 				SaveToConfig('Plugins.CustomTheme.LiveRevisionID', $LiveRevisionID);
 				SaveToConfig('Plugins.CustomTheme.LiveTime', time());
 				SaveToConfig('Plugins.CustomTheme.LiveIncludeThemeCSS', $NewIncludeThemeCSS);
-				
+
 				// Update out old live revision row(s)
 				Gdn::SQL()->Update('CustomThemeRevision')
 					->Set('Live', 0)
 					->Where('ThemeName', C('Garden.Theme'))
 					->Put();
-					
+
 				// Update new live revision row
 				Gdn::SQL()->Update('CustomThemeRevision')
 					->Set('Live', 1)
 					->Where('RevisionID', $LiveRevisionID)
 					->Put();
 			}
-			
+
 			if ($IsPreview && !$SmartyCompileError) {
 				$UserModel->SavePreference($Session->UserID, 'PreviewCustomTheme', TRUE);
 				Redirect('/');
 			}
-			
+
 			if ($SmartyCompileError)
 				$Sender->Form->AddError('There was a templating error in your HTML customizations. Make sure that any javascript or inline CSS definitions are wrapped in {literal} tags, and all {if} statements have a closing {/if} tag.');
-			else 
+			else
 				$Sender->StatusMessage = "Your changes have been applied.";
-				
+
 		}
 		$Sender->SetData('LiveRevisionID', $LiveRevisionID);
 		// Load revision history
@@ -469,10 +469,10 @@ Here are some things you should know before you begin:
 			->Limit(10)
 			->Get()
 		);
-		
+
       $Sender->Render(PATH_PLUGINS . DS . 'CustomTheme' . DS . 'views' . DS . 'customtheme.php');
    }
-	
+
 	/**
 	 * After a theme has been enabled, reset it's related revisions based on
 	 * what's in the db.
@@ -480,7 +480,7 @@ Here are some things you should know before you begin:
 	public function SettingsController_AfterEnableTheme_Handler($Sender) {
 		$this->SetRevisionsByTheme(C('Garden.Theme'));
 	}
-	
+
 	/**
 	 * Look at what's in the database for the specified theme and set it as the
 	 * working & live customisations.
@@ -495,7 +495,7 @@ Here are some things you should know before you begin:
 			->Limit(1, 0)
 			->Get()
 			->FirstRow();
-			
+
 		SaveToConfig('Plugins.CustomTheme.Name', $ThemeName);
 		if ($Live) {
 			SaveToConfig('Plugins.CustomTheme.LiveRevisionID', GetValue('RevisionID', $Live));
@@ -506,7 +506,7 @@ Here are some things you should know before you begin:
 			SaveToConfig('Plugins.CustomTheme.LiveTime', time());
 			SaveToConfig('Plugins.CustomTheme.LiveIncludeThemeCSS', 0);
 		}
-		
+
 		$Working = Gdn::SQL()->Select()
 			->From('CustomThemeRevision')
 			->Where('ThemeName', $ThemeName)
@@ -523,11 +523,11 @@ Here are some things you should know before you begin:
 			SaveToConfig('Plugins.CustomTheme.WorkingIncludeThemeCSS', 0);
 		}
 	}
-	
+
    public function SettingsController_CustomThemeUpgrade_Create($Sender) {
 		$Sender->Render(PATH_PLUGINS . DS . 'CustomTheme' . DS . 'views' . DS . 'upgrade.php');
 	}
-	
+
    public function Setup() {
 		$this->Structure();
 	}
@@ -545,7 +545,7 @@ Here are some things you should know before you begin:
 			->Column('DateInserted', 'datetime')
          ->Set();
    }
-	
+
 	/**
 	 * Lazy-Ensure that the database table exists for saving theme changes.
 	 */
@@ -559,7 +559,7 @@ Here are some things you should know before you begin:
 			SaveToConfig('Plugins.CustomTheme.Constructed', TRUE);
 		}
 	}
-	
+
 }
 
 /* Smarty functions to allow reading the template from the db as a resource */
@@ -573,7 +573,7 @@ function customtheme_smarty_get_template($tpl_name, &$tpl_source, $smarty_obj) {
 		$tpl_source = $Data->Html;
 	else
 		return FALSE;
-	
+
    // return true on success, false to generate failure notification
 	return TRUE;
 }
@@ -585,7 +585,7 @@ function customtheme_smarty_get_timestamp($tpl_name, &$tpl_timestamp, $smarty_ob
     $tpl_timestamp = C('Plugins.CustomTheme.LiveTime');
 	 if ($tpl_timestamp)
 		$tpl_timestamp = time(); // this will always recompile!
-		
+
     // return true on success, false to generate failure notification
     return true;
 }
