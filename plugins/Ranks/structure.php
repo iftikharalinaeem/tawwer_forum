@@ -1,7 +1,5 @@
 <?php if (!defined('APPLICATION')) exit;
 
-
-
 Gdn::Structure()->Table('Rank');
 $RankExists = Gdn::Structure()->TableExists();
 

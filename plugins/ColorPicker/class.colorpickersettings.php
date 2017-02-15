@@ -15,7 +15,7 @@ class ColorPickerSettings {
    const COMMENT_KEY = 'comment';
    const RULES_KEY = 'rules';
    const SELECTOR_KEY = 'selector';
-   
+
    /// PROPERTIES ///
    protected $_CssFiles = array();
 
@@ -51,7 +51,7 @@ class ColorPickerSettings {
                if (in_array($Filename, $this->Excluded))
                   continue;
                $Result[] = $Path;
-               
+
                if ($Override) {
                   $Basename = basename($Path);
                   foreach ($Result as $Index => $ResultPath) {
@@ -81,7 +81,7 @@ class ColorPickerSettings {
       $Sender->AddCssFile('colorpicker.css', $AppFolder);
 //      $Sender->AddCssFile('layout.css', $AppFolder);
       $Sender->AddCssFile('colorpicker.plugin.css', $AppFolder);
-      
+
       // Add the js.
       $Sender->AddJsFile('colorpicker.js', $AppFolder);
 //      $Sender->AddJsFile('eye.js', $AppFolder);
@@ -123,7 +123,7 @@ class ColorPickerSettings {
 
       $Sender->SetData('ColorPicker', $Data);
       $Sender->ColorPicker = $this;
-      
+
       // Add the view.
       $ColorPickerView = $Sender->FetchView('ColorPicker', '', $AppFolder);
       $Sender->AddAsset('Content', $ColorPickerView, 'ColorPicker');
@@ -149,8 +149,8 @@ class ColorPickerSettings {
                   $Rule = $Key;
                } elseif (StringBeginsWith($Key, 'background')) {
                   // Check for gradients.
-                  
-                  
+
+
                   $Rule = $Key.'-color';
                } elseif (StringBeginsWith($Key, 'border')) {
                   $Rule = $Key.'-color';
@@ -253,7 +253,7 @@ class ColorPickerSettings {
       $this->_AddCssFiles($Folders, $Result);
 
       // 3. Current Theme.
-      $ThemeManager = new Gdn_ThemeManager();
+      $ThemeManager = Gdn::themeManager();
       $CurrentTheme = $ThemeManager->EnabledThemeInfo();
       if ($CurrentTheme) {
          $ThemePath = $CurrentTheme['ThemeRoot'].'/design';

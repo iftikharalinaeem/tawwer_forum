@@ -11,7 +11,7 @@ $PluginInfo['CustomCSS'] = array(
 );
 
 class CustomCSSPlugin implements Gdn_IPlugin {
-   
+
    /**
     * Adds "Custom CSS" menu option to the dashboard.
    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
@@ -20,7 +20,7 @@ class CustomCSSPlugin implements Gdn_IPlugin {
       $Menu->AddLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
    }
     */
-	
+
    public function Base_Render_Before($Sender) {
 		// If we are using the default master view, and in preview mode, add the custom css file
 		$Session = Gdn::Session();
@@ -37,7 +37,7 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 					$Sender->ClearCssFiles();
 				}
 			}
-			
+
 			if ($PreviewFile != '' && $Preview)
 				$Sender->AddCssFile('/cache/CustomCSS/'.$CurrentTheme.'/'.$PreviewFile);
 			else if ($CustomFile != '' && $Live)
@@ -48,7 +48,7 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 			$Sender->AddCssFile('previewtheme.css', 'dashboard');
 		}
 	}
-	
+
    public function PluginController_CustomCSS_Create($Sender, $EventArguments = array()) {
 		require_once('kses.php');
 		$Session = Gdn::Session();
@@ -59,16 +59,16 @@ class CustomCSSPlugin implements Gdn_IPlugin {
       $Sender->Form = new Gdn_Form();
 		$Sender->AddJsFile('jquery.autogrow.js');
 		$Sender->AddCssFile('customcss.css', 'plugins/CustomCSS');
-		
+
 		$CurrentTheme = Gdn::Config('Garden.Theme', '');
-		$ThemeManager = new Gdn_ThemeManager();
+		$ThemeManager = Gdn::themeManager();
 		$Sender->CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
 		$Folder = PATH_CACHE . DS . 'CustomCSS';
 
 		// Create the CustomCSS cache folder
 		if (!file_exists($Folder))
 			@mkdir($Folder);
-			
+
 		$Folder .= DS . $CurrentTheme;
 		if (!file_exists($Folder))
 			@mkdir($Folder);
@@ -82,10 +82,10 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 					$FileName = $LoadFile;
 			}
 		}
-			
+
 		if (!file_exists($Folder . DS . $FileName))
 			$FileName = 'rev_0.css';
-			
+
 		$CurrentRevision = str_replace(array('rev_', '.css'), array('', ''), $FileName);
 		$CurrentRevision = is_numeric($CurrentRevision) ? $CurrentRevision : 1;
 		$Contents = $FileName == 'rev_0.css' ? '/* ---- Custom CSS ----
@@ -123,17 +123,17 @@ Have fun!!
 			$IsPreview = $Sender->Form->GetFormValue('Preview') ? TRUE : FALSE;
 			$IsExitPreview = $Sender->Form->GetFormValue('ExitPreview') ? TRUE : FALSE;
 			$IncludeTheme = $Sender->Form->GetFormValue('IncludeTheme');
-			
+
 			if ($IsApply || $IsSave)
 				$Sender->InformMessage("Your changes have been applied.");
-			
+
 			if ($IsApply) {
 				SaveToConfig('Plugins.CustomCSS.File', $FileName);
 				$Sender->Form->SetFormValue('CustomCSS', $Contents);
 				$UserModel->SavePreference($Session->UserID, 'PreviewCustomCSS', FALSE);
 			} else if ($IsPreview || $IsSave) {
 				$NewCSS = $Sender->Form->GetFormValue('CustomCSS', '');
-				
+
 				// Clean the css
 				safecss_class();
 				$csstidy = new csstidy();
@@ -143,12 +143,12 @@ Have fun!!
 				$csstidy->set_cfg('compress_font-weight', FALSE);
 				$csstidy->set_cfg('discard_invalid_properties', TRUE);
 				$csstidy->set_cfg('merge_selectors', TRUE);
-		
+
 				$NewCSS = stripslashes($NewCSS);
 				$NewCSS = preg_replace('/\\\\([0-9a-fA-F]{4})/', '\\\\\\\\$1', $Prev = $NewCSS);
-	
+
 				// if ($NewCSS != $Prev) $warnings[] = 'preg_replace found stuff';
-		
+
 				// Some people put weird stuff in their CSS, KSES tends to be greedy
 				$NewCSS = str_replace('<=', '&lt;=', $NewCSS);
 				// Why KSES instead of strip_tags?  Who knows?
@@ -156,13 +156,13 @@ Have fun!!
 				$NewCSS = str_replace( '&gt;', '>', $NewCSS); // kses replaces lone '>' with &gt;
 				// Why both KSES and strip_tags?  Because we just added some '>'.
 				$NewCSS = strip_tags($NewCSS);
-		
+
 				// if ($NewCSS != $Prev) $warnings[] = 'kses found stuff';
-	
+
 				$csstidy->parse($NewCSS);
 				$NewCSS = $csstidy->print->plain();
-				
-				if (in_array($IncludeTheme, array('Yes', 'No'))) 
+
+				if (in_array($IncludeTheme, array('Yes', 'No')))
 					SaveToConfig('Plugins.CustomCSS.IncludeTheme', $IncludeTheme);
 
 				if ($Contents != $NewCSS) {
@@ -170,7 +170,7 @@ Have fun!!
 
 					file_put_contents($Folder . DS . $FileName, $NewCSS);
 					SaveToConfig('Plugins.CustomCSS.PreviewFile', $FileName);
-				
+
 					// Only keep the last 20 revs
 					$ActiveRevision = str_replace(array('rev_', '.css'), '', Gdn::Config('Plugins.CustomCSS.File', ''));
 					$ActiveRevision = is_numeric($ActiveRevision) ? $ActiveRevision : 0;
@@ -179,7 +179,7 @@ Have fun!!
                      if (substr($File, 0, 4) == 'rev_') {
 								$Revision = str_replace(array('rev_', '.css'), '', $File);
 								if (is_numeric($Revision) && $Revision != $ActiveRevision && $Revision < $CurrentRevision - 19) {
-									@unlink(PATH_CACHE . DS . 'CustomCSS' . DS . $CurrentTheme. DS . 'rev_' . $Revision . '.css');	
+									@unlink(PATH_CACHE . DS . 'CustomCSS' . DS . $CurrentTheme. DS . 'rev_' . $Revision . '.css');
 								}
 							}
 						}
@@ -188,7 +188,7 @@ Have fun!!
 
 				if ($IsSave)
 					SaveToConfig('Plugins.CustomCSS.File', $FileName); // <-- Update the name of the file that will be included.
-				
+
 				$Sender->Form->SetFormValue('CustomCSS', $NewCSS);
 				$Sender->Form->SetFormValue('IncludeTheme', $IncludeTheme);
 			}
@@ -203,7 +203,7 @@ Have fun!!
 		}
       $Sender->Render(PATH_PLUGINS . DS . 'CustomCSS' . DS . 'views' . DS . 'customcss.php');
    }
-	
+
    public function Setup() {
       // No setup required.
    }
@@ -216,17 +216,17 @@ if (!function_exists('safecss_class')) {
 		// Wrapped so we don't need the parent class just to load the plugin
 		if (class_exists('safecss'))
 			return;
-	
+
 		require_once('csstidy/class.csstidy.php');
 		class safecss extends csstidy_optimise {
 			var $tales = array();
 			var $props_w_urls = array('background', 'background-image', 'list-style', 'list-style-image');
 			var $allowed_protocols = array('http');
-	
+
 			function __construct(&$css) {
 				return $this->csstidy_optimise($css);
 			}
-	
+
 			function postparse() {
 				if ( !empty($this->parser->import) ) {
 					$this->tattle("Import attempt:\n".print_r($this->parser->import,1));
@@ -238,47 +238,47 @@ if (!function_exists('safecss_class')) {
 				}
 				return parent::postparse();
 			}
-	
+
 			function subvalue() {
 				$this->sub_value = trim($this->sub_value);
-	
+
 				// Send any urls through our filter
 				if ( preg_match('!^\\s*url\\s*(?:\\(|\\\\0028)(.*)(?:\\)|\\\\0029).*$!Dis', $this->sub_value, $matches) )
 					$this->sub_value = $this->clean_url($matches[1]);
-	
+
 				// Strip any expressions
 				if ( preg_match('!^\\s*expression!Dis', $this->sub_value) ) {
 					$this->tattle("Expression attempt: $this->sub_value");
 					$this->sub_value = '';
 				}
-	
+
 				return parent::subvalue();
 			}
-	
+
 			function clean_url($url) {
 				// Clean up the string
 				$url = trim($url, "' \" \r \n");
-	
+
 				// Check against whitelist for properties allowed to have URL values
 				if ( ! in_array($this->property, $this->props_w_urls) ) {
 					$this->tattle('URL in illegal property ' . $this->property . ":\n$url");
 					return '';
 				}
-	
+
 				$url = wp_kses_bad_protocol_once($url, $this->allowed_protocols);
-	
+
 				if ( empty($url) ) {
 					$this->tattle('URL empty');
 					return '';
 				}
-	
+
 				return "url('$url')";
 			}
-	
+
 			function tattle($msg, $send=false) {
 				if ( $msg )
 					$this->tales [] = $msg;
-	
+
 				if ( $send && $this->tales ) {
 					try {
 						$SiteID = Gdn::Config('VanillaForums.SiteID', '');
