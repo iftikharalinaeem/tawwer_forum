@@ -118,11 +118,11 @@ function KeenIOWidget(config) {
     /**
      * Make sure site ID is part of all queries' filters.
      */
-    this.ensureSiteID = function() {
-        var siteID = gdn.definition('siteID');
+    this.addSiteIDFilter = function() {
+        var siteID = gdn.definition('SiteIDFilter', false);
 
         // If a site ID is available, add it to the query parameters for filtering.
-        if (siteID !== false) {
+        if (siteID) {
             // Iterate through all queries in this widget.
             loopQueries: for (var i = 0; i < query.length; i++) {
                 var filters = query[i].get('filters');
@@ -675,7 +675,7 @@ KeenIOWidget.prototype.runQuery = function(callback) {
     }
 
     this.updateQueryParams(updateParams);
-    this.ensureSiteID();
+    this.addSiteIDFilter();
 
     var queries  = this.getQuery();
     if (!!queries.length) {

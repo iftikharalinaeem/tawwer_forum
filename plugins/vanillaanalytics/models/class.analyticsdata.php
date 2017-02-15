@@ -266,9 +266,9 @@ class AnalyticsData extends Gdn_Model {
             ];
         } else {
             $site = [
-                'accountID' => c('Vanilla.VanillaForums.AccountID', null),
-                'name'  => c('Garden.Domain', null),
-                'siteID' => c('Vanilla.VanillaForums.SiteID', null)
+                'accountID' => c('VanillaAnalytics.Vanilla.AccountID', null),
+                'name'  => c('VanillaAnalytics.Vanilla.Domain', null),
+                'siteID' => c('VanillaAnalytics.Vanilla.SiteID', null)
             ];
         }
 
