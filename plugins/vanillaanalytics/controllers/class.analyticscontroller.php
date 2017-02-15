@@ -151,13 +151,16 @@ class AnalyticsController extends DashboardController {
         $this->setData('HasWidgets', $dashboard->hasWidgets());
         $this->addDefinition('analyticsDashboard', $dashboard);
 
+
         // Site ID is beneficial for differentiating sites on hub/node setups that may be reporting to one collection.
-        if (class_exists('\Infrastructure')) {
-            $siteID = \Infrastructure::site('siteid');
-        } else {
-            $siteID = c('Vanilla.VanillaForums.SiteID');
+        if (c('VanillaAnalytics.FilterBySiteID', true)) {
+            if (class_exists('\Infrastructure')) {
+                $siteID = \Infrastructure::site('siteid');
+            } else {
+                $siteID = c('VanillaAnalytics.Vanilla.SiteID');
+            }
+            $this->addDefinition('VanillaAnalytics.Vanilla.SiteID', $siteID);
         }
-        $this->addDefinition('siteID', $siteID);
 
         $this->render('dashboard');
     }

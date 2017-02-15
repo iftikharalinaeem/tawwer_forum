@@ -119,12 +119,7 @@ function KeenIOWidget(config) {
      * Make sure site ID is part of all queries' filters.
      */
     this.ensureSiteID = function() {
-        var siteID;
-        if (typeof gdn.definition('eventData') !== undefined
-            && typeof gdn.definition('eventData')['site'] !== undefined
-            && typeof gdn.definition('eventData')['site']['siteID'] !== undefined) {
-            siteID = gdn.definition('eventData')['site']['siteID'];
-        };
+        var siteID = gdn.definition('VanillaAnalytics.Vanilla.SiteID', false);
 
         // If a site ID is available, add it to the query parameters for filtering.
         if (siteID) {
