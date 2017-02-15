@@ -203,8 +203,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
         }
 
         // Create the URL to display to the forum connect endpoint.
-        // Use Gdn::request instead of convience function so that we can return http and https.
-        $connectURL = Gdn::request()->url('/entry/connect/'. PROVIDER_SCHEME_ALIAS.'/?authKey='.$this->getProviderKey(), true, true);
+        $connectURL = url('/entry/connect/'.PROVIDER_SCHEME_ALIAS.'/?authKey='.$this->getProviderKey(), true);
         $sender->setData('ConnectURL', $connectURL);
 
         // For auto generating a secret for the client.
@@ -237,7 +236,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
             'iss' => $baseUrl,
             'sub' => c('JWTSSO.TestToken.ForeignKey', '12345'),
             'aud' => val('Audience', $provider),
-            'email' => c('JWTSSO.TestToken.Email', '+++'.Gdn::session()->User->Email),
+            'email' => c('JWTSSO.TestToken.Email', Gdn::session()->User->Email),
             'displayname' => c('JWTSSO.TestToken.Name'),
             'exp' => time() + c('JWTSSO.TestToken.ExpiryTime', 600),
             'nbf' => time()
@@ -398,12 +397,11 @@ class JWTSSOPlugin extends Gdn_Plugin {
         $matches = [];
         $token = '';
         $authFieldRegex = '/^(bearer)\s?(?::\s?)?((?:[a-z\d_-]+\.){2}[a-z\d_-]+)$/i';
-        if ($auth = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_AUTHORIZATION', null)) {
-            if (preg_match($authFieldRegex, $auth, $matches)) {
-                $tokenType = trim(strtolower($matches[1]));
-                $token = $matches[2];
-                return [$token, $tokenType];
-            }
+        $auth = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_AUTHORIZATION', null);
+        if ($auth && preg_match($authFieldRegex, $auth, $matches)) {
+            $tokenType = trim(strtolower($matches[1]));
+            $token = $matches[2];
+            return [$token, $tokenType];
         }
 
         // If it wasn't in HTTP_AUTHORIZATION

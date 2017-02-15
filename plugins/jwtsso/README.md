@@ -29,9 +29,11 @@ Also on the settings page of the dashboard is an expamle of a signed token that 
 
 ## Workflow
 
-When a visitor to a forum clicks to log into the forum he/she is sent to the log in form of the Authentication Provider, with a "target" variable. The "target" variable is the URL of the page from which they originated the request, the URL they are to be returned to when logged in. 
-
-Once the Authentication provider determines that the user is legitimate, he/she is redirected to [forum addresss]/entry/connect/JWTSSO?Target=[the passed target] with an HTTP Authorization header set to `Bearer: [signed JSON Web Token]` .
+- The user clicks on the Sign In button and is redirected to the Authentication Provider.
+- The Authentication Provider then makes a request back to https://[Your Forum]/entry/connect/JWTSSO?authKey=[ProviderKey] with an HTTP Authorization header set to `Bearer: [Signed JSON Web Token]`.
+  - [ProviderKey] is almost always `JWTSSODefault`.
+  - Optionally you can add a `target` parameter to redirect the user after the authentication.
+    - If you want your users to land on `/discussions` after the authentication you would add `&target=/discussions` to the URL.
 
 `/entry/connect/JWTSSO` determines if there is a valid Bearer token and then checks that :
 
