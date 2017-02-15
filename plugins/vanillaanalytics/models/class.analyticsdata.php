@@ -273,7 +273,7 @@ class AnalyticsData extends Gdn_Model {
         }
 
         if (c('VanillaAnalytics.DisableSiteIDFiltering', false)) {
-            setvalr('site.siteID', $site, null);
+            setValue('siteID', $site, null);
         }
 
         return $site;
