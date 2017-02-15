@@ -158,7 +158,7 @@ class AnalyticsController extends DashboardController {
             } else {
                 $siteID = c('VanillaAnalytics.Vanilla.SiteID');
             }
-            $this->addDefinition('VanillaAnalytics.Vanilla.SiteID', $siteID);
+            $this->addDefinition('SiteIDFilter', $siteID);
         }
 
         $this->render('dashboard');

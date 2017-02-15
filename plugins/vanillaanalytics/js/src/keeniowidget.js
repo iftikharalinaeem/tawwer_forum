@@ -118,8 +118,8 @@ function KeenIOWidget(config) {
     /**
      * Make sure site ID is part of all queries' filters.
      */
-    this.ensureSiteID = function() {
-        var siteID = gdn.definition('VanillaAnalytics.Vanilla.SiteID', false);
+    this.addSiteIDFilter = function() {
+        var siteID = gdn.definition('SiteIDFilter', false);
 
         // If a site ID is available, add it to the query parameters for filtering.
         if (siteID) {
@@ -675,7 +675,7 @@ KeenIOWidget.prototype.runQuery = function(callback) {
     }
 
     this.updateQueryParams(updateParams);
-    this.ensureSiteID();
+    this.addSiteIDFilter();
 
     var queries  = this.getQuery();
     if (!!queries.length) {
