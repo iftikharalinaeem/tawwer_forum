@@ -253,7 +253,7 @@ class ColorPickerSettings {
       $this->_AddCssFiles($Folders, $Result);
 
       // 3. Current Theme.
-      $ThemeManager = Gdn::factory('ThemeManager');
+      $ThemeManager = Gdn::themeManager();
       $CurrentTheme = $ThemeManager->EnabledThemeInfo();
       if ($CurrentTheme) {
          $ThemePath = $CurrentTheme['ThemeRoot'].'/design';

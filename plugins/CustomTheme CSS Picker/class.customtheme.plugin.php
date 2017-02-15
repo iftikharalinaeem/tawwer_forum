@@ -102,7 +102,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 	 * Can the current theme be customized?
 	 */
 	private function _CanCustomizeTheme() {
-		$ThemeManager = Gdn::factory('ThemeManager');
+		$ThemeManager = Gdn::themeManager();
 		$ThemeInfo = $ThemeManager->EnabledThemeInfo();
 		// Make sure the current theme uses a smarty master template instead of php
 		return file_exists(PATH_THEMES.'/'.GetValue('Folder', $ThemeInfo, '').'/views/default.master.tpl');
@@ -306,7 +306,7 @@ class CustomThemePlugin implements Gdn_IPlugin {
 		$Sender->AddJsFile('colorpicker/js/colorpicker.js', 'plugins/CustomTheme');
 		$Sender->AddCssFile('colorpicker/css/colorpicker.css', 'plugins/CustomTheme');
 
-		$ThemeManager = Gdn::factory('ThemeManager');
+		$ThemeManager = Gdn::themeManager();
 		$CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
 		$CurrentThemeFolder = basename(GetValue('ThemeRoot', $CurrentThemeInfo));
 		$Folder = PATH_THEMES . DS . $CurrentThemeFolder;

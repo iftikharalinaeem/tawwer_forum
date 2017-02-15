@@ -61,7 +61,7 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 		$Sender->AddCssFile('customcss.css', 'plugins/CustomCSS');
 
 		$CurrentTheme = Gdn::Config('Garden.Theme', '');
-		$ThemeManager = Gdn::factory('ThemeManager');
+		$ThemeManager = Gdn::themeManager();
 		$Sender->CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
 		$Folder = PATH_CACHE . DS . 'CustomCSS';
 
