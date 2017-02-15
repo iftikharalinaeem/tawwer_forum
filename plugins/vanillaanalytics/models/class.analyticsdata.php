@@ -253,16 +253,16 @@ class AnalyticsData extends Gdn_Model {
     }
 
     /**
-     * Retrieve site information.  Use Infrastructure class, if available.  If not, try to load config values.
+     * Retrieve site information.  Load config values and fallback to Infrastructure class, if available.
      *
      * @return array Basic information related to the current site.
      */
     public static function getSite() {
         if (class_exists('\Infrastructure')) {
             $site = [
-                'accountID' => \Infrastructure::site('accountid'),
-                'name' => \Infrastructure::site('name'),
-                'siteID' => \Infrastructure::site('siteid')
+                'accountID' => c('Vanilla.VanillaForums.AccountID', \Infrastructure::site('accountid')),
+                'name' => c('Garden.Domain', \Infrastructure::site('name')),
+                'siteID' => c('Vanilla.VanillaForums.SiteID', \Infrastructure::site('siteid')),
             ];
         } else {
             $site = [
