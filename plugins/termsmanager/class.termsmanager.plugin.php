@@ -36,7 +36,8 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
-     * Create a table to store Terms of Use data.
+     * Create a table to store custom terms data.
+     *
      * @throws Exception
      */
     public function structure() {
@@ -56,7 +57,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
-     * Settings form in dashboard to save the Terms, activate and disactivate.
+     * Settings form in dashboard to save the custom terms, activate and disactivate.
      *
      * @param SettingsController $sender
      * @param SettingsController $args
@@ -92,13 +93,16 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
-     * Insert checkbox and messaging into entry/connect view to agree to the Terms and Conditions on sign up.
+     * Insert checkbox and messaging into entry/connect view to agree to the custom terms on sign in.
      *
      * @param EntryController $sender
      * @param EntryController array $args
      */
     public function entryController_afterPassword_handler($sender, $args) {
         $validationResults = $sender->Form->validationResults();
+
+        // This only shows the custom terms after the form has been submitted because you don't know
+        // until then if the user has previously agreed to the custom terms on an earlier login.
         if ($sender->Form->isPostBack() && val('Terms', $validationResults)) {
             $this->addTermsCheckBox($sender, 'div');
         }
@@ -106,6 +110,28 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
+     * Validate custom terms and optionally remove validation for default terms when registering.
+     *
+     * @param EntryController $sender
+     * @param EntryController array $args
+     */
+    public function entryController_registerValidation_handler($sender, $args) {
+        $terms = $this->getTerms();
+        // If disabled abort.
+        if (!val('Active', $terms)) {
+            return;
+        }
+        $this->addTermsValidation($sender, false);
+        // If the custom terms are active and the client has not specified showing both
+        // custom and default, do not validate default because it has been hidden in $this->addTermsCheckBox()
+        if (!c('TermsManager.ShowDefault')) {
+            $sender->UserModel->Validation->unapplyRule('TermsOfService', true);
+        }
+    }
+
+
+    /**
+     * Inject the custom terms in the connect page when connecting over SSO
      *
      * @param EntryController $sender
      * @param EntryController $args
@@ -128,7 +154,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
-     * Inject the Terms checkbox at the bottom of the Register form.
+     * Inject the custom terms checkbox at the bottom of the Register form.
      *
      * @param EntryController $sender
      * @param EntryController $args
@@ -139,7 +165,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
-     * If the Terms have changed, add validation for opt-in on Sign In and update the user's record.
+     * Add validation for custom terms on Sign In and update the user's record if they agree.
      *
      * @param EntryController $sender
      * @param EntryController $args
@@ -158,7 +184,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
-     * Add validation for the Terms when connecting over SSO.
+     * Add validation for the custom terms when connecting over SSO.
      *
      * @param EntryController $sender
      * @param EntryController $args
@@ -175,7 +201,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
-     * Check if a user has agreed to the terms and validate accordingly.
+     * Check if a user has agreed to custom terms and validate accordingly.
      *
      * @param $sender Sender object passed where ever it is called.
      * @param bool|false $sso
@@ -188,7 +214,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
             return;
         }
 
-        // If Admin wants users to opt in again, if the Terms have changed.
+        // If Admin wants users to opt in again when the custom terms have changed.
         if (val('ForceRenew', $terms)) {
             $email = $sender->Form->getFormValue('Email');
             $user = Gdn::userModel()->getByEmail($email);
@@ -210,7 +236,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
-     * Insert the link to read the Terms and the checkbox to agree to terms.
+     * Insert the link to read the custom terms and the checkbox to agree.
      *
      * @param $sender
      * @param string $wrapTag
@@ -221,6 +247,11 @@ class TermsManagerPlugin extends Gdn_Plugin {
         // If disabled abort.
         if (!val('Active', $terms)) {
             return;
+        }
+
+        // If client has not specified that they would like to show both default and custom terms, hide custom terms with CSS
+        if (!c('TermsManager.ShowDefault')) {
+            $sender->Head->addString('<style type="text/css">.DefaultTermsLabel{display: none}</style>');
         }
 
         // If Admin wants users to opt in again, if the Terms have changed.
@@ -255,7 +286,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
-     * Create a page for displaying the Terms in a modal popup.
+     * Create a page for displaying the custom terms in a modal popup.
      *
      * @param VanillaController $sender
      * @param VanillaController $args
@@ -269,7 +300,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
-     * Save the Terms to the db, do not increment unless either the link or the body has changed.
+     * Save the custom terms to the db, do not increment unless either the link or the body has changed.
      *
      * @param Gdn_Form $form
      * @return bool
@@ -299,7 +330,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
-     * Get the most recent Terms from the db.
+     * Get the most recent custom terms from the db.
      *
      * @return array
      */
