@@ -193,9 +193,12 @@ class PollModule extends Gdn_Module {
         if (!$categoryID) {
             $discussion = Gdn::controller()->data('Discussion');
             $categoryID = val('CategoryID', $discussion);
+
         }
 
-        $canVote = Gdn::session()->checkPermission('Vanilla.Comments.Add', true, 'Category', $categoryID);
+        $category = CategoryModel::categories($categoryID);
+
+        $canVote = Gdn::session()->checkPermission('Vanilla.Comments.Add', true, 'Category', val('PermissionCategoryID', $category));
         return $canVote && !$this->data('UserHasVoted');
     }
 }
