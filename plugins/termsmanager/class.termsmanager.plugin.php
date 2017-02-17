@@ -42,15 +42,15 @@ class TermsManagerPlugin extends Gdn_Plugin {
      */
     public function structure() {
         // Add the Terms column to Users to record which version of the Terms were agreed to.
-        Gdn::structure()->table('User')->column('Terms', 'int(11)', true)->set();
+        Gdn::structure()->table('User')->column('Terms', 'int', true)->set();
 
         // Create the TermsOfUse Table.
         Gdn::structure()->table('TermsOfUse')
             ->primaryKey('TermsOfUseID')
             ->column('Body', 'text', false)
             ->column('Link', 'text', false)
-            ->column('Active', 'tinyint(4)', 0)
-            ->column('ForceRenew', 'tinyint(4)', 0)
+            ->column('Active', 'tinyint', 0)
+            ->column('ForceRenew', 'tinyint', 0)
             ->column('DateInserted', 'datetime', true)
             ->set();
     }
@@ -60,17 +60,16 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * Settings form in dashboard to save the custom terms, activate and disactivate.
      *
      * @param SettingsController $sender
-     * @param SettingsController $args
+     * @param array $args
      * @throws Gdn_UserException
      */
     public function settingsController_termsManager_create($sender, $args) {
         $sender->permission('Garden.Settings.Manage');
 
-        /* @var Gdn_Form $form */
         $form = new Gdn_Form();
         $sender->Form = $form;
 
-        if ($form->AuthenticatedPostBack()) {
+        if ($form->authenticatedPostBack()) {
             $form->validateRule('Link', 'function:ValidateWebAddress', t('Please include a valid URL as a link, or leave it blank to use the supplied text.'));
             if (!$form->getValue('Body') && !$form->getValue('Link')) {
                 $form->validateRule('Link', 'function:ValidateRequired', t('You must include either an external link to a Terms of Use document or include your Terms of Use in the form below.'));
@@ -96,7 +95,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * Insert checkbox and messaging into entry/connect view to agree to the custom terms on sign in.
      *
      * @param EntryController $sender
-     * @param EntryController array $args
+     * @param array $args
      */
     public function entryController_afterPassword_handler($sender, $args) {
         $validationResults = $sender->Form->validationResults();
@@ -113,7 +112,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * Validate custom terms and optionally remove validation for default terms when registering.
      *
      * @param EntryController $sender
-     * @param EntryController array $args
+     * @param array $args
      */
     public function entryController_registerValidation_handler($sender, $args) {
         $terms = $this->getTerms();
@@ -134,30 +133,29 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * Inject the custom terms in the connect page when connecting over SSO
      *
      * @param EntryController $sender
-     * @param EntryController $args
+     * @param array $args
      */
-    public function entryController_registerBeforePassword_handler($sender, $args) {
+    public function entryController_RegisterBeforePassword_handler($sender, $args) {
         // The register page has two events, use the 'RegisterFormBeforeTerms', use this for the connect page in SSO
         if ($sender->Request->path() === 'entry/register') {
             return;
         }
 
-        // Set these values so that Connect view will show the checkbox.
+//        // Set these values so that Connect view will show the checkbox.
         $sender->setData("AllowConnect", true);
-        $sender->setData('NoConnectName', false);
-        $sender->Form->setFormValue('Connect', true);
+//        $sender->setData('NoConnectName', false);
+//        $sender->Form->setFormValue('Connect', true);
         if ($sender->Form->isPostBack()) {
-            $sender->Form->setFormValue('ConnectName', true);
+//            $sender->Form->setFormValue('ConnectName', true);
         }
         $this->addTermsCheckBox($sender);
     }
-
 
     /**
      * Inject the custom terms checkbox at the bottom of the Register form.
      *
      * @param EntryController $sender
-     * @param EntryController $args
+     * @param array $args
      */
     public function entryController_registerFormBeforeTerms_handler($sender, $args) {
         $this->addTermsCheckBox($sender);
@@ -168,7 +166,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * Add validation for custom terms on Sign In and update the user's record if they agree.
      *
      * @param EntryController $sender
-     * @param EntryController $args
+     * @param array $args
      */
     public function entryController_signIn_handler($sender, $args) {
         $this->addTermsValidation($sender);
@@ -184,19 +182,27 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
     /**
-     * Add validation for the custom terms when connecting over SSO.
+     * Add validation for the custom terms after connecting over SSO.
      *
      * @param EntryController $sender
-     * @param EntryController $args
+     * @param array $args
      */
-    public function entryController_AfterConnectData_handler($sender, $args) {
-        $sender->setData("AllowConnect", true);
+    public function entryController_afterConnectData_handler($sender, $args) {
+        // After we have connected through SSO successfully we need to show the connect form
+        // again, this time to ask the user to validate if the user needs to re-opt in to the custom terms.
+        $this->addTermsValidation($sender, true);
+
+        // Since the user has already successfully connected:
+        // AllowConnect is true
+        $sender->setData('AllowConnect', true);
+        // The user is not missing a connect name.
         $sender->setData('NoConnectName', false);
+        // We are still acting like we want to connect
         $sender->Form->setFormValue('Connect', true);
         if (!$sender->Form->isPostBack()) {
+            // We are not updating Gdn_User with the connect name, set it to true just to pass validation.
             $sender->Form->setFormValue('ConnectName', true);
         }
-        $this->addTermsValidation($sender, true);
     }
 
 
@@ -204,7 +210,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * Check if a user has agreed to custom terms and validate accordingly.
      *
      * @param $sender Sender object passed where ever it is called.
-     * @param bool|false $sso
+     * @param bool $sso
      */
     private function addTermsValidation($sender, $sso = false) {
         $terms = $this->getTerms();
@@ -277,11 +283,11 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
         $linkAttribute = ($link === '/vanilla/terms') ? ['class' =>'Popup'] : ['target' => '_blank'];
         $anchor = anchor('Click here to read.', $link, $linkAttribute);
-        $message = t('YOU MUST READ AND UNDERSTAND THE PROVISIONS OF THE FORUMS CODE OF CONDUCT BEFORE PARTICIPATING IN THE FORUMS.');
+        $message = t('You must read and understand the provisions of the forums code of conduct before participating in the forums.');
 
 
-        echo wrap("<div class='DismissMessage {$messageClass}'>".$validationMessage.$message.' '.$anchor."</div>", $wrapTag);
-        echo wrap($sender->Form->CheckBox('Terms', t('TermsLabel', 'BY CHECKING THIS BOX, I ACKNOWLEDGE I HAVE READ AND UNDERSTAND, AND AGREE TO THE FORUMS CODE OF CONDUCT.'), array('value' => val('TermsOfUseID', $terms))), $wrapTag);
+        echo wrap('<div class="DismissMessage '.$messageClass.'">'.$validationMessage.$message.' '.$anchor.'</div>', $wrapTag);
+        echo wrap($sender->Form->CheckBox('Terms', t('TermsLabel', 'By checking this box, I acknowledge I have read and understand, and agree to the forums code of conduct.'), ['value' => val('TermsOfUseID', $terms)]), $wrapTag);
     }
 
 
@@ -289,7 +295,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * Create a page for displaying the custom terms in a modal popup.
      *
      * @param VanillaController $sender
-     * @param VanillaController $args
+     * @param array $args
      */
     public function vanillaController_terms_create($sender, $args) {
         $terms = $this->getTerms();
@@ -317,14 +323,13 @@ class TermsManagerPlugin extends Gdn_Plugin {
         ];
 
         if (val('Body', $latestTerms) === val('Body', $formValues) && val('Link', $latestTerms) === val('Link', $formValues)) {
-            Gdn::sql()
+            return Gdn::sql()
                 ->update('TermsOfUse')
                 ->set($updateFields)
                 ->where('TermsOfUseID', val('TermsOfUseID', $latestTerms))
                 ->put();
         } else {
-            return Gdn::sql()
-                ->insert('TermsOfUse', $updateFields);
+            return Gdn::sql()->insert('TermsOfUse', $updateFields);
         }
     }
 
@@ -335,7 +340,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * @return array
      */
     private function getTerms() {
-        return $latestTerms = Gdn::sql()
+        return Gdn::sql()
             ->get('TermsOfUse', 'TermsOfUseID', 'DESC', 1)
             ->firstRow();
     }
