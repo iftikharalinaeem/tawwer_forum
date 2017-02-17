@@ -193,7 +193,6 @@ class PollModule extends Gdn_Module {
         if (!$categoryID) {
             $discussion = Gdn::controller()->data('Discussion');
             $categoryID = val('CategoryID', $discussion);
-
         }
 
         $category = CategoryModel::categories($categoryID);
