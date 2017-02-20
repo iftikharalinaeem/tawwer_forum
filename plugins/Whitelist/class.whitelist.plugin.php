@@ -97,30 +97,31 @@ class WhitelistPlugin extends Gdn_Plugin {
         }
     }
 
-    public function gdn_dispatcher_afterAnalyzeRequest_handler($sender, $args) {
+    /**
+     * Block the request if you are not whitelisted!
+     *
+     * @param Gdn_Dispatcher $sender
+     * @param $args
+     */
+    public function gdn_dispatcher_beforeAnalyzeRequest_handler($sender, $args) {
         // The plugin is not active
         if (!c('Whitelist.Active', false)) {
             return;
         }
 
-        $isBlockModeHardcore = (c('Whitelist.BlockMode', false) === 'HARDCORE');
-        $request = $args['Request'];
+        // HARDCORE BLOCK MODE! (don't make a whitelisting error lolz)
+        $isBlockModeHardcore = (c('Whitelist.BlockMode', true) === 'HARDCORE');
+
+        // We create our own request object to be sure to have the unaltered request data.
+        $request = new Gdn_Request();
+        $request->fromEnvironment();
 
         if (!$isBlockModeHardcore) {
             // If you are an admin we should not block you even if you are not whitelisted
-            // unless... HARDCORE BLOCK MODE! (don't make a whitelisting error lolz)
-            if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-                return;
-            }
-
-            $blockExceptions = $args['BlockExceptions'];
-            $pathRequested = $request->path();
-
             // Lets use block exceptions as a whitelist of URLs that must not be blocked (ex. entry/*)
-            foreach ($blockExceptions as $blockException => $blockLevel) {
-                if (preg_match($blockException, $pathRequested)) {
-                    return;
-                }
+            $canBlock = Gdn::dispatcher()->getCanBlock($request);
+            if ($canBlock <= Gdn_Dispatcher::BLOCK_PERMISSION) {
+                return;
             }
         }
 
@@ -138,19 +139,18 @@ class WhitelistPlugin extends Gdn_Plugin {
             return;
         }
 
-        // Check your privileges son :P
         if ($isBlockModeHardcore || Gdn::session()->isValid()) {
-            safeHeader('HTTP/1.0 403 Unauthorized', true, 403);
+            safeHeader('HTTP/1.1 403 Forbidden', true, 403);
             if (Gdn::request()->get('DeliveryType') === DELIVERY_TYPE_DATA) {
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
             }
         // Lets redirect you to the signin page in case you are an admin.
         } else {
             if (Gdn::request()->get('DeliveryType') === DELIVERY_TYPE_DATA) {
-                safeHeader('HTTP/1.0 401 Unauthorized', true, 401);
+                safeHeader('HTTP/1.1 403 Forbidden', true, 403);
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
                 echo json_encode([
-                    'Code' => '401',
+                    'Code' => '403',
                     'Exception' => t('You must sign in.'),
                 ]);
             } else {
