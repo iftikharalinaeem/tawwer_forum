@@ -292,11 +292,22 @@ class ReactionsController extends DashboardController {
     /**
      * Settings page.
      */
-    public function advanced() {
+    public function settings() {
         $this->permission('Garden.Settings.Manage');
+        $trackPointsDesc = 'If you\'d like to have leaderboards that track points for a specific category, enable '
+            .'this setting. Then edit the category you\'d like to track points separately for and enable its '
+            .'"Track points for this category separately" option. To add a category-specific leaderboard module '
+            .'to your  theme template, add <code>{module name="LeaderboardModule" CategoryID="7"}</code>, '
+            .'replacing the CategoryID value with the ID of the category with separate tracking enabled. '
+            .'Tracking points for a category separately will not be retroactive.';
 
-        $Conf = new ConfigurationModule($this);
-        $Conf->initialize(array(
+        $cf = new ConfigurationModule($this);
+        $cf->initialize([
+            'Plugins.Reactions.TrackPointsSeparately' => [
+                'LabelCode' => 'Track points separately for specified categories',
+                'Control' => 'Toggle',
+                'Description' => $trackPointsDesc
+            ],
             'Plugins.Reactions.ShowUserReactions' => [
                 'LabelCode' => 'Show Who Reacted to Posts',
                 'Control' => 'RadioList',
@@ -338,11 +349,11 @@ class ReactionsController extends DashboardController {
                 'Control' => 'DropDown',
                 'Items' => [-3 => -3, -5 => -5, -10 => -10, -20 => -20],
                 'Default' => c('Reactions.BuryValue', -5)
-            ],
-        ));
+            ]
+        ]);
 
-        $this->title(sprintf(t('%s Settings'), 'Reaction'));
-        $this->addSideMenu('reactions');
-        $Conf->renderAll();
+        $this->setData('Title', sprintf(t('%s Settings'), t('Reactions')));
+        $cf->renderAll();
+    }
     }
 }
