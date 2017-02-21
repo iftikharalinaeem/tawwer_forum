@@ -355,5 +355,4 @@ class ReactionsController extends DashboardController {
         $this->setData('Title', sprintf(t('%s Settings'), t('Reactions')));
         $cf->renderAll();
     }
-    }
 }
