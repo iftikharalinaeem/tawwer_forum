@@ -187,7 +187,7 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
 //         } else
 //            $Url = $AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version;
 
-        $Url = $AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$this->getPluginKey('Version');
+        $Url = $AnalyticsServer.'/applications/vanillastatsapp/js/track'.(Debug() ? '' : '.min').'.js?v='.$this->getPluginKey('Version');
 
         $Sender->AddJsFile($Url, '', array('defer' => 'defer'));
         $Sender->AddDefinition('StatsUrl', self::StatsUrl('{p}'));
