@@ -135,19 +135,12 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * @param EntryController $sender
      * @param array $args
      */
-    public function entryController_RegisterBeforePassword_handler($sender, $args) {
+    public function entryController_registerBeforePassword_handler($sender, $args) {
         // The register page has two events, use the 'RegisterFormBeforeTerms', use this for the connect page in SSO
         if ($sender->Request->path() === 'entry/register') {
             return;
         }
 
-//        // Set these values so that Connect view will show the checkbox.
-        $sender->setData("AllowConnect", true);
-//        $sender->setData('NoConnectName', false);
-//        $sender->Form->setFormValue('Connect', true);
-        if ($sender->Form->isPostBack()) {
-//            $sender->Form->setFormValue('ConnectName', true);
-        }
         $this->addTermsCheckBox($sender);
     }
 
@@ -187,24 +180,23 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * @param EntryController $sender
      * @param array $args
      */
-    public function entryController_afterConnectData_handler($sender, $args) {
-        // After we have connected through SSO successfully we need to show the connect form
-        // again, this time to ask the user to validate if the user needs to re-opt in to the custom terms.
+    public function entryController_AfterConnectData_handler($sender, $args) {
+        // After we have connected through SSO successfully we need to show the connect form again
+        // to ask the user to validate if the user needs to re-opt in to the custom terms.
+
+//        if (!$sender->Form->isPostBack()) {
+//            // Since the user has already successfully connected:
+//            // AllowConnect is true
+//            $sender->setData('AllowConnect', true);
+//            // The user is not missing a connect name.
+//            $sender->setData('NoConnectName', false);
+//            // We are still acting like we want to connect
+//            $sender->Form->setFormValue('Connect', true);
+//        } else {
+//            $sender->setData('AllowConnect', false);
+//        }
         $this->addTermsValidation($sender, true);
-
-        // Since the user has already successfully connected:
-        // AllowConnect is true
-        $sender->setData('AllowConnect', true);
-        // The user is not missing a connect name.
-        $sender->setData('NoConnectName', false);
-        // We are still acting like we want to connect
-        $sender->Form->setFormValue('Connect', true);
-        if (!$sender->Form->isPostBack()) {
-            // We are not updating Gdn_User with the connect name, set it to true just to pass validation.
-            $sender->Form->setFormValue('ConnectName', true);
-        }
     }
-
 
     /**
      * Check if a user has agreed to custom terms and validate accordingly.
@@ -228,6 +220,9 @@ class TermsManagerPlugin extends Gdn_Plugin {
                 $user = Gdn::userModel()->getByUsername($email);
             }
 
+
+            $sender->Form->setFormValue('ConnectName', val('Name', $user));
+            $sender->setData('AllowConnect', true);
             // If the user has already opted-in
             if (val('Terms', $user) === val('TermsOfUseID', $terms)) {
                 return;
@@ -257,7 +252,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
         // If client has not specified that they would like to show both default and custom terms, hide custom terms with CSS
         if (!c('TermsManager.ShowDefault')) {
-            $sender->Head->addString('<style type="text/css">.DefaultTermsLabel{display: none}</style>');
+            $sender->Head->addString('<style type="text/css">.DefaultTermsLabel {display: none !important}</style>');
         }
 
         // If Admin wants users to opt in again, if the Terms have changed.
