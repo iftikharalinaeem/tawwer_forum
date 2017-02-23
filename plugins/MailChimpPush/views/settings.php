@@ -57,7 +57,7 @@ endif; ?>
          // by javascript unless the list is selected.
          foreach ($interests as $list => $interest) {
             echo "<li id='InterestDropdown{$list}' class='InterestDropdowns form-group'>";
-            echo $this->Form->labelWrap("Interest", "InterestID");
+            echo $this->Form->labelWrap("Group", "InterestID");
             echo '<div class="input-wrap">';
             // Disable the interest dropdown by default. Will be activated by javascript if needed.
             echo $this->Form->dropDown('InterestID['.$list.']', $interest, array('IncludeNull' => true,

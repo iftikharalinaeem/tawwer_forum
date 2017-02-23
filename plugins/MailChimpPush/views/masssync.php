@@ -35,7 +35,7 @@ helpAsset(sprintf(t('About %s'), t('Mass Synchronization')),
         // by javascript unless the list is selected.
         foreach ($interests as $list => $interest) {
             echo "<li id='SyncInterestDropdown{$list}' class='SyncInterestDropdowns form-group'>";
-            echo $this->Form->labelWrap('Interest', 'SyncInterestID'.$list);
+            echo $this->Form->labelWrap('Group', 'SyncInterestID'.$list);
             echo '<div class="input-wrap">';
             // Disable the sync interest dropdown by default. Will be activated by javascript if needed.
             echo $this->Form->dropDown('SyncInterestID['.$list.']', $interest, array('IncludeNull' => true, 'disabled' => true));
