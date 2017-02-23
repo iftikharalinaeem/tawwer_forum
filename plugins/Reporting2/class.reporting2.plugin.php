@@ -15,7 +15,11 @@ $PluginInfo['Reporting2'] = [
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com',
     'MobileFriendly' => true,
-    'Icon' => 'reporting.png'
+    'Icon' => 'reporting.png',
+    'RegisterPermissions' => [
+        // Reactions is going in vanilla/vanilla soon™
+        'Reactions.Flag.Add' => 'Garden.SignIn.Allow'
+    ],
 ];
 
 class Reporting2Plugin extends Gdn_Plugin {
@@ -151,9 +155,7 @@ class Reporting2Plugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function rootController_report_create($Sender, $RecordType, $ID) {
-        if (!Gdn::session()->isValid()) {
-            throw new Gdn_UserException(t('You need to sign in before you can do this.'), 403);
-        }
+        $Sender->permission('Reactions.Flag.Add');
 
         $Sender->Form = new Gdn_Form();
         $ReportModel = new ReportModel();
@@ -202,7 +204,7 @@ class Reporting2Plugin extends Gdn_Plugin {
      * Make sure Reactions' flags are triggered.
      */
     public function base_beforeFlag_handler($Sender, $Args) {
-        if (Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
+        if (Gdn::session()->checkPermission('Reactions.Flag.Add')) {
             $Args['Flags']['Report'] = [$this, 'ReportButton'];
         }
     }
