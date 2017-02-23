@@ -1,6 +1,4 @@
-<?php if (!defined('APPLICATION')) {
-    exit();
-}
+<?php
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  */
@@ -242,7 +240,7 @@ class Reporting2Plugin extends Gdn_Plugin {
 if (!function_exists('FormatQuote')):
 
     /**
-     * Build our flagged content quote for the new Discussion.
+     * Build our flagged content quote for the new discussion.
      *
      * @param $Body
      * @return string

@@ -1,9 +1,4 @@
 <?php
-
-if (!defined('APPLICATION')) {
-    exit();
-}
-
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  */
@@ -51,7 +46,7 @@ class ReportModel extends Gdn_Model {
     }
 
     /**
-     * Saves a new Content report.
+     * Saves a new content report.
      *
      * @param array $data The data to save. This takes the following fields.
      *  - RecordType: The type of record being reported on.
@@ -131,7 +126,7 @@ class ReportModel extends Gdn_Model {
 
             // Build discussion record
             $discussion = [
-                // Limit new Name to 100 char (db column size)
+                // Limit new name to 100 char (db column size)
                 'Name' => sliceString($reportName, 100),
                 'Body' => sprintf(t('Report Body Format', "%s\n\n%s"),
                     formatQuote($reportedRecord),

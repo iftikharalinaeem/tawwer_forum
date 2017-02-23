@@ -1,3 +1,4 @@
+<?php if (!defined('APPLICATION')) { exit(); } ?>
 <h2><?php echo t($this->data('Title')); ?></h2>
 <?php
 $Row = $this->data('Row');
