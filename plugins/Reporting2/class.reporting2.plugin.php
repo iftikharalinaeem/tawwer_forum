@@ -22,28 +22,28 @@ $PluginInfo['Reporting2'] = [
 
 class Reporting2Plugin extends Gdn_Plugin {
     /// Methods ///
-    public function Setup() {
-        $this->Structure();
+    public function setup() {
+        $this->structure();
     }
 
     /**
      * Add a category 'Type' and a special category for reports.
      */
-    public function Structure() {
-        Gdn::Structure()->Table('Category')
-            ->Column('Type', 'varchar(20)', true)
-            ->Set();
+    public function structure() {
+        Gdn::structure()->table('Category')
+            ->column('Type', 'varchar(20)', true)
+            ->set();
 
         // Try and find the category by type.
         $CategoryModel = new CategoryModel();
-        $Category = $CategoryModel->GetWhere(['Type' => 'Reporting'])->firstRow(DATASET_TYPE_ARRAY);
+        $Category = $CategoryModel->getWhere(['Type' => 'Reporting'])->firstRow(DATASET_TYPE_ARRAY);
 
         if (empty($Category)) {
             // Try and get the category by slug.
-            $Category = CategoryModel::Categories('reported-posts');
+            $Category = CategoryModel::categories('reported-posts');
             if (!empty($Category)) {
                 // Set the reporting type on the category.
-                $CategoryModel->SetField($Category['CategoryID'], ['Type' => 'Reporting']);
+                $CategoryModel->setField($Category['CategoryID'], ['Type' => 'Reporting']);
             }
         }
 
@@ -58,27 +58,27 @@ class Reporting2Plugin extends Gdn_Plugin {
                 'AllowDiscussions' => 1,
                 'Sort' => 1000
             ];
-            $CategoryID = $CategoryModel->Save($Row);
+            $CategoryID = $CategoryModel->save($Row);
 
             // Get RoleIDs for moderator-empowered roles
             $RoleModel = new RoleModel();
-            $ModeratorRoles = $RoleModel->GetByPermission('Garden.Moderation.Manage');
-            $ModeratorRoleIDs = array_column($ModeratorRoles->Result(DATASET_TYPE_ARRAY), 'RoleID');
+            $ModeratorRoles = $RoleModel->getByPermission('Garden.Moderation.Manage');
+            $ModeratorRoleIDs = array_column($ModeratorRoles->result(DATASET_TYPE_ARRAY), 'RoleID');
 
             // Get RoleIDs for roles that can flag
-            $AllowedRoles = $RoleModel->GetByPermission('Garden.SignIn.Allow');
-            $AllowedRoleIDs = array_column($AllowedRoles->Result(DATASET_TYPE_ARRAY), 'RoleID');
+            $AllowedRoles = $RoleModel->getByPermission('Garden.SignIn.Allow');
+            $AllowedRoleIDs = array_column($AllowedRoles->result(DATASET_TYPE_ARRAY), 'RoleID');
             // Disallow applicants & unconfirmed by default
-            if (($Key = array_search(C('Garden.Registration.ApplicantRoleID'), $AllowedRoleIDs)) !== false) {
+            if (($Key = array_search(c('Garden.Registration.ApplicantRoleID'), $AllowedRoleIDs)) !== false) {
                 unset($AllowedRoleIDs[$Key]);
             }
-            if (($Key = array_search(C('Garden.Registration.ConfirmEmailRole'), $AllowedRoleIDs)) !== false) {
+            if (($Key = array_search(c('Garden.Registration.ConfirmEmailRole'), $AllowedRoleIDs)) !== false) {
                 unset($AllowedRoleIDs[$Key]);
             }
 
-            // Build permissions for the new category
+            // Build permissions for the new Category
             $Permissions = [];
-            $AllRoles = array_column(RoleModel::Roles(), 'RoleID');
+            $AllRoles = array_column(RoleModel::roles(), 'RoleID');
             foreach ($AllRoles as $RoleID) {
                 $IsModerator = (in_array($RoleID, $ModeratorRoleIDs)) ? 1 : 0;
                 $IsAllowed = (in_array($RoleID, $AllowedRoleIDs)) ? 1 : 0;
@@ -94,13 +94,13 @@ class Reporting2Plugin extends Gdn_Plugin {
             }
 
             // Set category permission & mark it custom
-            Gdn::PermissionModel()->SaveAll($Permissions, ['JunctionID' => $CategoryID, 'JunctionTable' => 'Category']);
-            $CategoryModel->SetField($CategoryID, 'PermissionCategoryID', $CategoryID);
+            Gdn::permissionModel()->saveAll($Permissions, ['JunctionID' => $CategoryID, 'JunctionTable' => 'Category']);
+            $CategoryModel->setField($CategoryID, 'PermissionCategoryID', $CategoryID);
         }
 
         // Turn off Flagging & Reporting plugins (upgrade)
-        RemoveFromConfig('EnabledPlugins.Flagging');
-        RemoveFromConfig('EnabledPlugins.Reporting');
+        removeFromConfig('EnabledPlugins.Flagging');
+        removeFromConfig('EnabledPlugins.Reporting');
     }
 
     /**
@@ -111,9 +111,9 @@ class Reporting2Plugin extends Gdn_Plugin {
      * @param $RecordID
      * @return string
      */
-    public function ReportButton($Row, $RecordType, $RecordID) {
-        $Result = Anchor(
-            '<span class="ReactSprite ReactFlag"></span> '.T('Report'),
+    public function reportButton($Row, $RecordType, $RecordID) {
+        $Result = anchor(
+            '<span class="ReactSprite ReactFlag"></span> '.t('Report'),
             '/report/'.$RecordType.'/'.$RecordID,
             'ReactButton ReactButton-Report Popup',
             ['title' => t('Report'), 'rel' => "nofollow"]
@@ -126,8 +126,8 @@ class Reporting2Plugin extends Gdn_Plugin {
     /**
      * Set up optional default reasons.
      */
-    public function SettingsController_Reporting_Create($Sender) {
-        $Sender->Permission('Garden.Settings.Manage');
+    public function settingsController_Reporting_Create($Sender) {
+        $Sender->permission('Garden.Settings.Manage');
 
         $Conf = new ConfigurationModule($Sender);
         $ConfItems = [
@@ -136,12 +136,12 @@ class Reporting2Plugin extends Gdn_Plugin {
                 'Options' => ['MultiLine' => true]
             ]
         ];
-        $Conf->Initialize($ConfItems);
+        $Conf->initialize($ConfItems);
 
-        $Sender->AddSideMenu();
-        $Sender->SetData('Title', 'Reporting Settings');
+        $Sender->addSideMenu();
+        $Sender->setData('Title', 'Reporting Settings');
         $Sender->ConfigurationModule = $Conf;
-        $Conf->RenderAll();
+        $Conf->renderAll();
     }
 
     /**
@@ -152,50 +152,50 @@ class Reporting2Plugin extends Gdn_Plugin {
      * @param $ID
      * @throws Gdn_UserException
      */
-    public function RootController_Report_Create($Sender, $RecordType, $ID) {
-        if (!Gdn::Session()->IsValid()) {
-            throw new Gdn_UserException(T('You need to sign in before you can do this.'), 403);
+    public function rootController_Report_Create($Sender, $RecordType, $ID) {
+        if (!Gdn::session()->isValid()) {
+            throw new Gdn_UserException(t('You need to sign in before you can do this.'), 403);
         }
 
         $Sender->Form = new Gdn_Form();
         $ReportModel = new ReportModel();
-        $Sender->Form->SetModel($ReportModel);
+        $Sender->Form->setModel($ReportModel);
 
-        $Sender->Form->SetFormValue('RecordID', $ID);
-        $Sender->Form->SetFormValue('RecordType', $RecordType);
-        $Sender->Form->SetFormValue('Format', 'TextEx');
+        $Sender->Form->setFormValue('RecordID', $ID);
+        $Sender->Form->setFormValue('RecordType', $RecordType);
+        $Sender->Form->setFormValue('Format', 'TextEx');
 
-        $Sender->SetData('Title', sprintf(T('Report %s'), T($RecordType), 'Report'));
+        $Sender->setData('Title', sprintf(t('Report %s'), t($RecordType), 'Report'));
 
         // Set up data for Reason dropdown
-        $Sender->SetData('Reasons', false);
-        if ($Reasons = C('Plugins.Reporting2.Reasons', false)) {
+        $Sender->setData('Reasons', false);
+        if ($Reasons = c('Plugins.Reporting2.Reasons', false)) {
             $Reasons = explode("\n", $Reasons);
-            $Sender->SetData('Reasons', array_combine($Reasons, $Reasons));
+            $Sender->setData('Reasons', array_combine($Reasons, $Reasons));
         }
 
         // Handle form submission / setup
-        if ($Sender->Form->AuthenticatedPostBack()) {
+        if ($Sender->Form->authenticatedPostBack()) {
             // Temporarily disable length limit on comments
-            SaveToConfig('Vanilla.Comment.MaxLength', 0, false);
+            saveToConfig('Vanilla.Comment.MaxLength', 0, false);
 
             // If optional Reason field is set, prepend it to the Body with labels
-            if ($Reason = $Sender->Form->GetFormValue('Reason')) {
-                $Body = 'Reason: '.$Reason."\n".'Notes: '.$Sender->Form->GetFormValue('Body');
-                $Sender->Form->SetFormValue('Body', $Body);
+            if ($Reason = $Sender->Form->getFormValue('Reason')) {
+                $Body = 'Reason: '.$Reason."\n".'Notes: '.$Sender->Form->getFormValue('Body');
+                $Sender->Form->setFormValue('Body', $Body);
             }
 
-            if ($Sender->Form->Save()) {
-                $Sender->InformMessage(T('FlagSent', "Your complaint has been registered."));
+            if ($Sender->Form->save()) {
+                $Sender->informMessage(t('FlagSent', "Your complaint has been registered."));
             }
         } else {
             // Create excerpt to show in form popup
-            $Row = GetRecord($RecordType, $ID);
-            $Row['Body'] = SliceString(Gdn_Format::PlainText($Row['Body'], $Row['Format']), 150);
-            $Sender->SetData('Row', $Row);
+            $Row = getRecord($RecordType, $ID);
+            $Row['Body'] = sliceString(Gdn_Format::plainText($Row['Body'], $Row['Format']), 150);
+            $Sender->setData('Row', $Row);
         }
 
-        $Sender->Render('report', '', 'plugins/Reporting2');
+        $Sender->render('report', '', 'plugins/Reporting2');
     }
 
     /// Event Handlers ///
@@ -203,8 +203,8 @@ class Reporting2Plugin extends Gdn_Plugin {
     /**
      * Make sure Reactions' flags are triggered.
      */
-    public function Base_BeforeFlag_Handler($Sender, $Args) {
-        if (Gdn::Session()->CheckPermission('Garden.SignIn.Allow')) {
+    public function base_BeforeFlag_Handler($Sender, $Args) {
+        if (Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
             $Args['Flags']['Report'] = [$this, 'ReportButton'];
         }
     }
@@ -231,9 +231,9 @@ class Reporting2Plugin extends Gdn_Plugin {
     /**
      * Adds counter for Reported Posts to MeModule's Dashboard menu.
      */
-    public function MeModule_BeforeFlyoutMenu_Handler($Sender, $Args) {
-        if (CheckPermission('Garden.Moderation.Manage')) {
-            $Args['DashboardCount'] = $Args['DashboardCount'] + ReportModel::GetUnreadReportCount();
+    public function meModule_BeforeFlyoutMenu_Handler($Sender, $Args) {
+        if (checkPermission('Garden.Moderation.Manage')) {
+            $Args['DashboardCount'] = $Args['DashboardCount'] + ReportModel::getUnreadReportCount();
         }
     }
 
@@ -242,30 +242,30 @@ class Reporting2Plugin extends Gdn_Plugin {
 if (!function_exists('FormatQuote')):
 
     /**
-     * Build our flagged content quote for the new discussion.
+     * Build our flagged content quote for the new Discussion.
      *
      * @param $Body
      * @return string
      */
-    function FormatQuote($Body) {
+    function formatQuote($Body) {
         if (is_object($Body)) {
             $Body = (array)$Body;
         } elseif (is_string($Body)) {
             return $Body;
         }
 
-        $User = Gdn::UserModel()->GetID(val('InsertUserID', $Body));
+        $User = Gdn::userModel()->getID(val('InsertUserID', $Body));
         if ($User) {
             $Result = '<blockquote class="Quote UserQuote Media">'.
-                '<div class="Img QuoteAuthor">'.UserPhoto($User).'</div>'.
+                '<div class="Img QuoteAuthor">'.userPhoto($User).'</div>'.
                 '<div class="Media-Body QuoteText">'.
-                '<div>'.UserAnchor($User).' - '.Gdn_Format::DateFull($Body['DateInserted'], 'html').'</div>'.
-                Gdn_Format::To($Body['Body'], $Body['Format']).
+                '<div>'.userAnchor($User).' - '.Gdn_Format::dateFull($Body['DateInserted'], 'html').'</div>'.
+                Gdn_Format::to($Body['Body'], $Body['Format']).
                 '</div>'.
                 '</blockquote>';
         } else {
             $Result = '<blockquote class="Quote">'.
-                Gdn_Format::To($Body['Body'], $Body['Format']).
+                Gdn_Format::to($Body['Body'], $Body['Format']).
                 '</blockquote>';
         }
 
@@ -276,8 +276,8 @@ endif;
 
 if (!function_exists('Quote')):
 
-    function Quote($Body) {
-        return FormatQuote($Body);
+    function quote($Body) {
+        return formatQuote($Body);
     }
 
 endif;
@@ -289,7 +289,7 @@ if (!function_exists('ReportContext')):
      * @param $Context array or object being reported.
      * @return string Html message to direct moderators to the content.
      */
-    function ReportContext($Context) {
+    function reportContext($Context) {
         if (is_object($Context)) {
             $Context = (array)$Context;
         }
@@ -299,46 +299,46 @@ if (!function_exists('ReportContext')):
             $Type = val('ActivityType', $Context);
             if ($Type == 'Status') {
                 // Link to author's wall
-                $ContextHtml = sprintf(T('Report Status Context', '%1$s by <a href="%2$s">%3$s</a>'),
-                    T('Activity Status', 'Status'),
-                    UserUrl($Context, 'Activity').'#Activity_'.$ActivityID,
-                    Gdn_Format::Text($Context['ActivityName'])
+                $ContextHtml = sprintf(t('Report Status Context', '%1$s by <a href="%2$s">%3$s</a>'),
+                    t('Activity Status', 'Status'),
+                    userUrl($Context, 'Activity').'#Activity_'.$ActivityID,
+                    Gdn_Format::text($Context['ActivityName'])
                 );
             } elseif ($Type == 'WallPost') {
                 // Link to recipient's wall
-                $ContextHtml = sprintf(T('Report WallPost Context', '<a href="%1$s">%2$s</a> from <a href="%3$s">%4$s</a> to <a href="%5$s">%6$s</a>'),
-                    UserUrl($Context, 'Regarding').'#Activity_'.$ActivityID, // Post on recipient's wall
-                    T('Activity WallPost', 'Wall Post'),
-                    UserUrl($Context, 'Activity'), // Author's profile
-                    Gdn_Format::Text($Context['ActivityName']),
-                    UserUrl($Context, 'Regarding'), // Recipient's profile
-                    Gdn_Format::Text($Context['RegardingName'])
+                $ContextHtml = sprintf(t('Report WallPost Context', '<a href="%1$s">%2$s</a> from <a href="%3$s">%4$s</a> to <a href="%5$s">%6$s</a>'),
+                    userUrl($Context, 'Regarding').'#Activity_'.$ActivityID, // Post on recipient's wall
+                    t('Activity WallPost', 'Wall Post'),
+                    userUrl($Context, 'Activity'), // Author's profile
+                    Gdn_Format::text($Context['ActivityName']),
+                    userUrl($Context, 'Regarding'), // Recipient's profile
+                    Gdn_Format::text($Context['RegardingName'])
                 );
             }
         } elseif (val('CommentID', $Context)) {
             // Point to comment & its discussion
             $DiscussionModel = new DiscussionModel();
-            $Discussion = (array)$DiscussionModel->GetID(val('DiscussionID', $Context));
-            $ContextHtml = sprintf(T('Report Comment Context', '<a href="%1$s">%2$s</a> in %3$s <a href="%4$s">%5$s</a>'),
-                CommentUrl($Context),
-                T('Comment'),
-                strtolower(T('Discussion')),
-                DiscussionUrl($Discussion),
-                Gdn_Format::Text($Discussion['Name'])
+            $Discussion = (array)$DiscussionModel->getID(val('DiscussionID', $Context));
+            $ContextHtml = sprintf(t('Report Comment Context', '<a href="%1$s">%2$s</a> in %3$s <a href="%4$s">%5$s</a>'),
+                commentUrl($Context),
+                t('Comment'),
+                strtolower(t('Discussion')),
+                discussionUrl($Discussion),
+                Gdn_Format::text($Discussion['Name'])
             );
         } elseif (val('DiscussionID', $Context)) {
             // Point to discussion & its category
-            $Category = CategoryModel::Categories($Context['CategoryID']);
-            $ContextHtml = sprintf(T('Report Discussion Context', '<a href="%1$s">%2$s</a> in %3$s <a href="%4$s">%5$s</a>'),
-                DiscussionUrl($Context),
-                T('Discussion'),
-                strtolower(T('Category')),
-                CategoryUrl($Category),
-                Gdn_Format::Text($Category['Name']),
-                Gdn_Format::Text($Context['Name']) // In case folks want the full discussion name
+            $Category = CategoryModel::categories($Context['CategoryID']);
+            $ContextHtml = sprintf(t('Report Discussion Context', '<a href="%1$s">%2$s</a> in %3$s <a href="%4$s">%5$s</a>'),
+                discussionUrl($Context),
+                t('Discussion'),
+                strtolower(t('Category')),
+                categoryUrl($Category),
+                Gdn_Format::text($Category['Name']),
+                Gdn_Format::text($Context['Name']) // In case folks want the full discussion name
             );
         } else {
-            throw new Exception(T("You cannot report this content."));
+            throw new Exception(t("You cannot report this content."));
         }
 
         return $ContextHtml;
