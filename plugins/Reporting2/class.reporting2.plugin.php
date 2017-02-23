@@ -126,7 +126,7 @@ class Reporting2Plugin extends Gdn_Plugin {
     /**
      * Set up optional default reasons.
      */
-    public function settingsController_Reporting_Create($Sender) {
+    public function settingsController_reporting_create($Sender) {
         $Sender->permission('Garden.Settings.Manage');
 
         $Conf = new ConfigurationModule($Sender);
@@ -152,7 +152,7 @@ class Reporting2Plugin extends Gdn_Plugin {
      * @param $ID
      * @throws Gdn_UserException
      */
-    public function rootController_Report_Create($Sender, $RecordType, $ID) {
+    public function rootController_report_create($Sender, $RecordType, $ID) {
         if (!Gdn::session()->isValid()) {
             throw new Gdn_UserException(t('You need to sign in before you can do this.'), 403);
         }
@@ -203,7 +203,7 @@ class Reporting2Plugin extends Gdn_Plugin {
     /**
      * Make sure Reactions' flags are triggered.
      */
-    public function base_BeforeFlag_Handler($Sender, $Args) {
+    public function base_beforeFlag_handler($Sender, $Args) {
         if (Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
             $Args['Flags']['Report'] = [$this, 'ReportButton'];
         }
@@ -231,7 +231,7 @@ class Reporting2Plugin extends Gdn_Plugin {
     /**
      * Adds counter for Reported Posts to MeModule's Dashboard menu.
      */
-    public function meModule_BeforeFlyoutMenu_Handler($Sender, $Args) {
+    public function meModule_beforeFlyoutMenu_handler($Sender, $Args) {
         if (checkPermission('Garden.Moderation.Manage')) {
             $Args['DashboardCount'] = $Args['DashboardCount'] + ReportModel::getUnreadReportCount();
         }
