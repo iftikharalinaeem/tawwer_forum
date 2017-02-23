@@ -76,7 +76,7 @@ class Reporting2Plugin extends Gdn_Plugin {
                 unset($AllowedRoleIDs[$Key]);
             }
 
-            // Build permissions for the new Category
+            // Build permissions for the new category
             $Permissions = [];
             $AllRoles = array_column(RoleModel::roles(), 'RoleID');
             foreach ($AllRoles as $RoleID) {
