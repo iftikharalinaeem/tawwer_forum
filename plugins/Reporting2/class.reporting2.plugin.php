@@ -254,7 +254,7 @@ if (!function_exists('FormatQuote')):
             return $Body;
         }
 
-        $User = Gdn::UserModel()->GetID(GetValue('InsertUserID', $Body));
+        $User = Gdn::UserModel()->GetID(val('InsertUserID', $Body));
         if ($User) {
             $Result = '<blockquote class="Quote UserQuote Media">'.
                 '<div class="Img QuoteAuthor">'.UserPhoto($User).'</div>'.
@@ -294,9 +294,9 @@ if (!function_exists('ReportContext')):
             $Context = (array)$Context;
         }
 
-        if ($ActivityID = GetValue('ActivityID', $Context)) {
+        if ($ActivityID = val('ActivityID', $Context)) {
             // Point to an activity
-            $Type = GetValue('ActivityType', $Context);
+            $Type = val('ActivityType', $Context);
             if ($Type == 'Status') {
                 // Link to author's wall
                 $ContextHtml = sprintf(T('Report Status Context', '%1$s by <a href="%2$s">%3$s</a>'),
@@ -315,10 +315,10 @@ if (!function_exists('ReportContext')):
                     Gdn_Format::Text($Context['RegardingName'])
                 );
             }
-        } elseif (GetValue('CommentID', $Context)) {
+        } elseif (val('CommentID', $Context)) {
             // Point to comment & its discussion
             $DiscussionModel = new DiscussionModel();
-            $Discussion = (array)$DiscussionModel->GetID(GetValue('DiscussionID', $Context));
+            $Discussion = (array)$DiscussionModel->GetID(val('DiscussionID', $Context));
             $ContextHtml = sprintf(T('Report Comment Context', '<a href="%1$s">%2$s</a> in %3$s <a href="%4$s">%5$s</a>'),
                 CommentUrl($Context),
                 T('Comment'),
@@ -326,7 +326,7 @@ if (!function_exists('ReportContext')):
                 DiscussionUrl($Discussion),
                 Gdn_Format::Text($Discussion['Name'])
             );
-        } elseif (GetValue('DiscussionID', $Context)) {
+        } elseif (val('DiscussionID', $Context)) {
             // Point to discussion & its category
             $Category = CategoryModel::Categories($Context['CategoryID']);
             $ContextHtml = sprintf(T('Report Discussion Context', '<a href="%1$s">%2$s</a> in %3$s <a href="%4$s">%5$s</a>'),
