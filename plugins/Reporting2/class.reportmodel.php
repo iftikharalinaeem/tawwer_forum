@@ -1,7 +1,8 @@
 <?php
 
-if (!defined('APPLICATION'))
+if (!defined('APPLICATION')) {
     exit();
+}
 
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
@@ -21,7 +22,7 @@ class ReportModel extends Gdn_Model {
         $category = Gdn::cache()->get('reporting.category');
         if ($category === Gdn_Cache::CACHEOP_FAILURE) {
             $categoryModel = new CategoryModel();
-            $category = $categoryModel->GetWhere(array('Type' => 'Reporting'))->firstRow(DATASET_TYPE_ARRAY);
+            $category = $categoryModel->GetWhere(['Type' => 'Reporting'])->firstRow(DATASET_TYPE_ARRAY);
             Gdn::cache()->store('reporting.category', $category, [Gdn_Cache::FEATURE_EXPIRY => 300]);
         }
 
@@ -43,7 +44,7 @@ class ReportModel extends Gdn_Model {
             $category = self::GetReportCategory();
             $discussionModel = new DiscussionModel();
             // Add DiscussionID to shamelessly bypass the faulty cache code
-            $count = $discussionModel->getUnreadCount(array('d.CategoryID' => $category['CategoryID'], 'd.DiscussionID >' => 0));
+            $count = $discussionModel->getUnreadCount(['d.CategoryID' => $category['CategoryID'], 'd.DiscussionID >' => 0]);
         }
 
         return $count;
@@ -109,7 +110,7 @@ class ReportModel extends Gdn_Model {
             }
 
             // Set attributes
-            $reportAttributes = array();
+            $reportAttributes = [];
             $contextCategoryID = val('CategoryID', $contextDiscussion);
             if ($contextCategoryID) {
                 $reportAttributes['CategoryID'] = $contextDiscussion['CategoryID'];
@@ -118,20 +119,20 @@ class ReportModel extends Gdn_Model {
             // All users should be able to report posts.
             Gdn::session()->setPermission(
                 'Vanilla.Discussions.Add',
-                array($category['CategoryID'])
+                [$category['CategoryID']]
             );
 
             // Build report name
             $reportName = sprintf(T('[Reported] %s', "%s"),
-               $contextDiscussion['Name'],
-               $reportedRecord['InsertName'], // Author Name
-               $contextDiscussion['Category']
+                $contextDiscussion['Name'],
+                $reportedRecord['InsertName'], // Author Name
+                $contextDiscussion['Category']
             );
 
             // Build discussion record
-            $discussion = array(
+            $discussion = [
                 // Limit new name to 100 char (db column size)
-                'Name' => SliceString($reportName , 100),
+                'Name' => SliceString($reportName, 100),
                 'Body' => sprintf(T('Report Body Format', "%s\n\n%s"),
                     formatQuote($reportedRecord),
                     reportContext($reportedRecord)
@@ -140,8 +141,8 @@ class ReportModel extends Gdn_Model {
                 'ForeignID' => $foreignID,
                 'Format' => 'Quote',
                 'CategoryID' => $category['CategoryID'],
-                'Attributes' => array('Report' => $reportAttributes)
-            );
+                'Attributes' => ['Report' => $reportAttributes]
+            ];
 
             $this->EventArguments['ReportedRecordType'] = strtolower($data['RecordType']);
             $this->EventArguments['ReportedRecord'] = $reportedRecord;
@@ -162,12 +163,12 @@ class ReportModel extends Gdn_Model {
 
         if ($discussionID) {
             // Now that we have the discussion add the report.
-            $newComment = array(
+            $newComment = [
                 'DiscussionID' => $discussionID,
                 'Body' => $data['Body'],
                 'Format' => $data['Format'],
-                'Attributes' => array('Type' => 'Report')
-            );
+                'Attributes' => ['Type' => 'Report']
+            ];
             $commentModel = new CommentModel();
             $commentID = $commentModel->save($newComment);
             $this->Validation->AddValidationResult($commentModel->ValidationResults());
