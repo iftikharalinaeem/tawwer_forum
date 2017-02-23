@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 helpAsset(sprintf(t('About %s'), t('Mass Synchronization')),
-    t('About MailChimpPush Synchronization', "By default, Vanilla only sends <b>changes</b> to MailChimp. 
-    Synchronization is a one-time action that allows an entire forum's worth of users email addresses to be pushed to 
-    MailChimp to populate a list.")
+    t('About MailChimpPush Synchronization', "Synchronization allows an entire forum's worth of users email addresses to be pushed to 
+    MailChimp to populate a list. This tool will never update existing users on MailChimp. It will only add users with emails that do 
+    not already exist on the user's MailChimp account.")
 );
 ?>
 <div class="header-menu">
