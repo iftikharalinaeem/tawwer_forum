@@ -3,7 +3,7 @@
 $PluginInfo['subcommunities'] = array(
     'Name'        => "Subcommunities",
     'Description' => "Allows you to use top level categories as virtual mini forums for multilingual or multi-product communities.",
-    'Version'     => '1.0.2',
+    'Version'     => '1.0.3',
     'Author'      => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl'   => 'https://vanillaforums.com',
