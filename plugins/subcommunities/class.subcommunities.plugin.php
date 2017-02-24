@@ -110,6 +110,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         return $this->categories;
     }
+
     /**
      * Initialize the environment on a mini site.
      * @param array $site The site to set.
@@ -226,10 +227,9 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param CategoriesController $sender
      */
     public function categoriesController_render_before($sender) {
-        $canonicalUrl = $this->getCanonicalUrl($sender->data('Category'));
-        if ($canonicalUrl) {
-            $sender->canonicalUrl($canonicalUrl);
-        }
+        $categoryID = val('CategoryID', $sender->data('Category'));
+        $subcommunity = self::getSubcommunityFromCategoryID($categoryID);
+        $sender->canonicalUrl(self::getCanonicalUrl(Gdn::request()->path(), $subcommunity));
 
         if (!SubcommunityModel::getCurrent()) {
             return;
@@ -242,6 +242,16 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         // We add the Depth of the root Category to the MaxDisplayDepth before rendering the categories page.
         // This resets it so the rendering respects the MaxDisplayDepth.
         $sender->setData('Category.Depth', 0);
+    }
+
+    /**
+     * @param DiscussionController $sender
+     * @param array $args
+     */
+    public function discussionController_render_before($sender, $args) {
+        $categoryID = val('CategoryID', $sender->data('Category'));
+        $subcommunity = self::getSubcommunityFromCategoryID($categoryID);
+        $sender->canonicalUrl(self::getCanonicalUrl(Gdn::request()->path(), $subcommunity));
     }
 
     /**
@@ -302,13 +312,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $this->initializeSite($site);
         } elseif (!$this->api) {
             if ($defaultSite) {
-                $url = Gdn::request()->assetRoot().'/'.$defaultSite['Folder'].rtrim('/'.Gdn::request()->path(), '/');
-                $get = Gdn::request()->get();
-                if (!empty($get)) {
-                    $url .= '?'.http_build_query($get);
-                }
-
-                redirectUrl($url, debug() ? 302 : 301);
+                // Redirect to the canonicalURL
+                redirectURL(self::getCanonicalUrl(Gdn::request()->pathAndQuery(), $defaultSite));
             }
         }
 
@@ -576,65 +581,66 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @param DiscussionController $sender
-     * @param array $args
+     * Get the canonical URL of a path.
+     *
+     * @param string $path The path we want te canonical of.
+     * @param array|null $subcommunity The subcommunity to which belong that path.
+     *
+     * @return string
      */
-    public function discussionController_render_before($sender, $args) {
-        $category = $sender->data('Category');
-        $canonical = $this->getCanonicalUrl($category);
-
-        if ($canonical) {
-            $sender->canonicalUrl($canonical);
+    public static function getCanonicalUrl($path, $subcommunity) {
+        if ($subcommunity !== null) {
+            // OriginalWebRoot is the un-modified web root, used in case we are already in a subcommunity.
+            $targetWebRoot = trim(self::$originalWebRoot."/{$subcommunity['Folder']}", '/');
+            // Temporarily swap out the current web root for the modified one, before generating the URL.
+            $currentWebRoot = Gdn::request()->webRoot();
+            Gdn::request()->webRoot($targetWebRoot);
         }
+
+        $canonicalUrl = url($path, true);
+
+        if ($subcommunity !== null) {
+            Gdn::request()->webRoot($currentWebRoot);
+
+            // If viewing a category URL, reset the path to home when viewing the subcommunity's category.
+            $canonicalUrl = trim($canonicalUrl, '/');
+            if (stringEndsWith($canonicalUrl, "categories/$subcommunity[Folder]")) {
+                $canonicalUrl = substr($canonicalUrl, 0, -strlen('/'.$subcommunity['Folder']));
+            }
+        }
+
+
+        return $canonicalUrl;
     }
 
     /**
-     * Get the canonical URL for a resource, based on a category ID.
+     * Get a category's subcommunity.
      *
-     * @param int|array|object $category A category row.
-     * @param string|null $path
-     * @return string|bool
+     * @param $categoryID
+     * @return array|null The found subcommunity or the default subcommunity is any.
      */
-    public static function getCanonicalUrl($category, $path = null) {
-        $webRoot = '';
+    public static function getSubcommunityFromCategoryID($categoryID) {
+        $targetSubcommunity = null;
 
-        if (is_numeric($category) || is_string($category)) {
-            $category = CategoryModel::categories($category);
-        }
-
-        if ($path === null) {
-            $path = Gdn::request()->path();
-        }
-
-        if ($category) {
+        if ($categoryID) {
             // Grab this category's ancestors...
-            $parents = CategoryModel::getAncestors(val('CategoryID', $category), true, true);
+            $parents = CategoryModel::getAncestors($categoryID, true, true);
             // ...and pull the one from the top. This should be the highest, non-root parent.
             $topParent = reset($parents);
 
             if ($topParent) {
                 foreach (SubcommunityModel::all() as $subcommunity) {
                     if ($subcommunity['CategoryID'] == $topParent['CategoryID']) {
-                        // If viewing a category URL, reset the path to home when viewing the subcommunity's category.
-                        if (stringBeginsWith($path, 'categories/') && $topParent['CategoryID'] == val('CategoryID', $category)) {
-                            $path = '/';
-                        }
-
-                        // OriginalWebRoot is the un-modified web root, used in case we are already in a subcommunity.
-                        $webRoot = trim(self::$originalWebRoot."/{$subcommunity['Folder']}", '/');
+                        $targetSubcommunity = $subcommunity;
                         break;
                     }
                 }
+            } else {
+                trigger_error("Could not find top parent of categoryID $categoryID.", E_USER_NOTICE);
             }
         }
 
-        // Temporarily swap out the current web root for the modified one, before generating the URL.
-        $currentWebRoot = Gdn::request()->webRoot();
-        Gdn::request()->webRoot($webRoot);
-        $canonicalUrl = url($path, true);
-        Gdn::request()->webRoot($currentWebRoot);
-
-        return $canonicalUrl;
+        return $targetSubcommunity ?: SubcommunityModel::getDefaultSite();
     }
 }
 
@@ -675,7 +681,9 @@ if (!function_exists('commentUrl')) {
         }
 
         $path = "/discussion/comment/{$commentID}#Comment_{$commentID}";
-        return SubcommunitiesPlugin::getCanonicalUrl($categoryID, $path);
+        $subcommunity = SubcommunitiesPlugin::getSubcommunityFromCategoryID($categoryID);
+
+        return SubcommunitiesPlugin::getCanonicalUrl($path, $subcommunity);
     }
 }
 
@@ -707,6 +715,8 @@ if (!function_exists('discussionUrl')) {
             }
         }
 
-        return SubcommunitiesPlugin::getCanonicalUrl($categoryID, $path);
+        $subcommunity = SubcommunitiesPlugin::getSubcommunityFromCategoryID($categoryID);
+
+        return SubcommunitiesPlugin::getCanonicalUrl($path, $subcommunity);
     }
 }
