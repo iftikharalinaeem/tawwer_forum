@@ -170,7 +170,7 @@ class MailChimpWrapper {
             if ($interestFields) {
                 $interestValues = ['interests' => [val('InterestID', $userInfo) => true]];
             }
-            $bodyValues = ['email_address' => $email, 'status' => 'subscribed'] + $interestValues;
+            $bodyValues = ['email_address' => $email, 'status' => ($userInfo['DoubleOptIn']) ? 'pending' : 'subscribed'] + $interestValues;
             $body['operations'][] = [
                 'method' => 'PUT',
                 'path' => "lists/{$id}/members/".md5(strtolower($email)),
@@ -211,7 +211,6 @@ class MailChimpWrapper {
         Logger::event('mailchimp_api', Logger::INFO, 'Remove Address', $this->toArray($removedResponse));
 
         $removed = $this->toArray($removedResponse);
-
         if (val('id', $removed) === $emailID && val('status', $removed) === 'unsubscribed') {
             $emailType = val('EMAIL_TYPE', $email, 'html');
             $mergeFields = ['EMAIL_TYPE' => $emailType];
