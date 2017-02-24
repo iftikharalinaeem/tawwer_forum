@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @copyright 2016-2017 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
 $PluginInfo['Auth0'] = array(
     'Name' => 'Auth0 SSO',
@@ -9,15 +12,21 @@ $PluginInfo['Auth0'] = array(
     'RequiredApplications' => array('Vanilla' => '1.0'),
     'RequiredTheme' => false,
     'HasLocale' => false,
-    'SettingsUrl' => '/settings/Auth0',
+    'SettingsUrl' => '/settings/auth0',
     'SettingsPermission' => 'Garden.Settings.Manage',
-    'MobileFriendly' => TRUE
+    'MobileFriendly' => true
 );
 
 require_once('class.oauth2pluginbase.php');
 
+/**
+ * Class Auth0Plugin
+ */
 class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
 
+    /**
+     * Auth0Plugin constructor.
+     */
     public function __construct() {
         $this
             ->setProviderKey('Auth0')
@@ -45,7 +54,7 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     /**
      * Setup
      */
-    public function setUp() {
+    public function setup() {
         $this->structure();
     }
 
@@ -155,5 +164,4 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
     public function assetModel_styleCss_handler($sender) {
         $sender->addCssFile('auth0.css', 'plugins/Auth0');
     }
-
 }

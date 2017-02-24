@@ -1,12 +1,13 @@
 <?php
 /**
  * @copyright 2009-2017 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
+ * @license Proprietary
  */
-
 
 /**
  * Class OAuth2PluginBase
+ *
+ * @deprecated
  *
  * Base class to be extended by any plugin that wants to use Oauth2 protocol for SSO.
  * Will eventually be moved to a library that will be included by composer.
