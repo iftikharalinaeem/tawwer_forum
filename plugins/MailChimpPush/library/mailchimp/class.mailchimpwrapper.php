@@ -12,7 +12,7 @@ class MailChimpWrapper {
 
 
     /**
-     * @var bool We to append a timestamp to emails in this list to get around MailChimp's Invalid Resource error:
+     * @var string We to append a timestamp to emails in this list to get around MailChimp's Invalid Resource error:
      * "* has signed up to a lot of lists very recently; we're not allowing more signups for now"
      */
     public $testEmail = '';
