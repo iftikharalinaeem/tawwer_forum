@@ -9,6 +9,14 @@ use Garden\Http;
  */
 
 class MailChimpWrapper {
+
+
+    /**
+     * @var bool We to append a timestamp to emails in this list to get around MailChimp's Invalid Resource error:
+     * "* has signed up to a lot of lists very recently; we're not allowing more signups for now"
+     */
+    public $testEmail = '';
+
     /**
      * @var string MailChimp's API version
      */
@@ -32,6 +40,7 @@ class MailChimpWrapper {
     public function __construct($apikey) {
         $this->apiUrl = parse_url('https://api.mailchimp.com/' . $this->version . '/');
         $this->api_key = $apikey;
+        $this->testEmail = c('Plugins.MailChimp.TestEmail', '');
     }
 
     /**
@@ -137,13 +146,31 @@ class MailChimpWrapper {
         foreach ($batch as $userInfo) {
             $emailType = val('EMAIL_TYPE', $userInfo, 'html');
             $email = val('EMAIL', $userInfo);
+
+            if (!empty($this->testEmail)) {
+                // if there's a '+', put the timestamp before the '+', otherwise before the '@'
+                $pos = strpos($email, '@');
+
+                if (strpos($email, '+') !== false) {
+                    $pos = strpos($email, '+');
+                }
+                $emailWithoutPlus = substr($email, 0, $pos) . substr($email, strpos($email, '@'));
+
+                if (strtolower($emailWithoutPlus) === strtolower($this->testEmail)) {
+                    $domain = substr($email, $pos);
+                    $email = substr($email, 0, $pos);
+                    $email .= time();
+                    $email .= $domain;
+                }
+            }
+
             $mergeFields = json_encode(['EMAIL_TYPE' => $emailType]);
             $interestFields = val('InterestID', $userInfo);
             $interestValues = [];
             if ($interestFields) {
                 $interestValues = ['interests' => [val('InterestID', $userInfo) => true]];
             }
-            $bodyValues = ['email_address' => $email, 'status' => ($userInfo['DoubleOptIn']) ? 'pending' : 'subscribed'] + $interestValues;
+            $bodyValues = ['email_address' => $email, 'status' => 'subscribed'] + $interestValues;
             $body['operations'][] = [
                 'method' => 'PUT',
                 'path' => "lists/{$id}/members/".md5(strtolower($email)),
@@ -184,6 +211,7 @@ class MailChimpWrapper {
         Logger::event('mailchimp_api', Logger::INFO, 'Remove Address', $this->toArray($removedResponse));
 
         $removed = $this->toArray($removedResponse);
+
         if (val('id', $removed) === $emailID && val('status', $removed) === 'unsubscribed') {
             $emailType = val('EMAIL_TYPE', $email, 'html');
             $mergeFields = ['EMAIL_TYPE' => $emailType];
