@@ -142,7 +142,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
         }
 
         // Set these values so that Connect view will show the checkbox.
-        $sender->setData("AllowConnect", true);
+        $sender->setData('AllowConnect', true);
         $sender->setData('NoConnectName', false);
         $sender->Form->setFormValue('Connect', true);
         if ($sender->Form->isPostBack()) {
