@@ -141,8 +141,16 @@ class TermsManagerPlugin extends Gdn_Plugin {
             return;
         }
 
+        // Set these values so that Connect view will show the checkbox.
+        $sender->setData("AllowConnect", true);
+        $sender->setData('NoConnectName', false);
+        $sender->Form->setFormValue('Connect', true);
+        if ($sender->Form->isPostBack()) {
+            $sender->Form->setFormValue('ConnectName', true);
+        }
         $this->addTermsCheckBox($sender);
     }
+
 
     /**
      * Inject the custom terms checkbox at the bottom of the Register form.
@@ -176,25 +184,47 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
     /**
      * Add validation for the custom terms after connecting over SSO.
+     * If the admin wants to force users to agree to custom terms on registration or when signing back in
+     * we still need to check if there is a connect name or provide a way for users to create them.
      *
      * @param EntryController $sender
      * @param array $args
      */
-    public function entryController_AfterConnectData_handler($sender, $args) {
-        // After we have connected through SSO successfully we need to show the connect form again
-        // to ask the user to validate if the user needs to re-opt in to the custom terms.
+    public function entryController_afterConnectData_handler($sender, $args) {
+        // Check if the user already exists
+        $userModel = Gdn::userModel();
+        $auth = $userModel->getAuthentication($sender->Form->getFormValue('UniqueID'), $sender->Form->getFormValue('Provider'));
+        $userID = val('UserID', $auth);
+        $user = $userModel->getID($userID, 'array');
 
-//        if (!$sender->Form->isPostBack()) {
-//            // Since the user has already successfully connected:
-//            // AllowConnect is true
-//            $sender->setData('AllowConnect', true);
-//            // The user is not missing a connect name.
-//            $sender->setData('NoConnectName', false);
-//            // We are still acting like we want to connect
-//            $sender->Form->setFormValue('Connect', true);
-//        } else {
-//            $sender->setData('AllowConnect', false);
-//        }
+        if (!$sender->Form->getFormValue('Terms')) {
+
+            if (!val('Name', $user) && !$sender->Form->getFormValue('Name')) {
+                // If no name is being passed over SSO and this user does not already exist, pass data to
+                // the connect view to display a "ConnectName" form field.
+                $sender->setData('NoConnectName', false);
+                $sender->setData('AllowConnect', true);
+                $connectName = $sender->Form->getFormValue('ConnectName');
+            } else {
+                // If a name has been passed over SSO or this user already exists set the conditions in the
+                // in the connect view to not show the strings telling the user he already exists etc.
+                $sender->setData('NoConnectName', true);
+                $sender->setData('AllowConnect', true);
+                $sender->setData('ExistingUsers', [$user]);
+                Gdn::locale()->setTranslation('ConnectAccountExists', ' ');
+                Gdn::locale()->setTranslation('ConnectRegisteredName', ' ');
+            }
+
+            $sender->Form->setFormValue('ConnectName', $connectName);
+        }
+
+        // If there is no name, exiting user or connectname created, show the ConnectName form field in connect view.
+        if (!$sender->Form->getFormValue('Name') && !$sender->Form->getFormValue('ConnectName') && !val('Name', $user)) {
+            $sender->setData('AllowConnect', false);
+            $sender->setData('NoConnectName', false);
+            $sender->Form->setFormValue('ConnectName');
+        }
+
         $this->addTermsValidation($sender, true);
     }
 
@@ -220,9 +250,6 @@ class TermsManagerPlugin extends Gdn_Plugin {
                 $user = Gdn::userModel()->getByUsername($email);
             }
 
-
-            $sender->Form->setFormValue('ConnectName', val('Name', $user));
-            $sender->setData('AllowConnect', true);
             // If the user has already opted-in
             if (val('Terms', $user) === val('TermsOfUseID', $terms)) {
                 return;
