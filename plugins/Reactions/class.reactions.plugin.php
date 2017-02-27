@@ -28,6 +28,7 @@ $PluginInfo['Reactions'] = [
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
     'MobileFriendly' => true,
+    'SettingsUrl' => '/reactions/settings',
     'Icon' => 'reactions.png'
 ];
 
@@ -700,12 +701,21 @@ class ReactionsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Adds track points separately option to category options in edit/add category page.
      *
-     *
-     * @param $sender
+     * @param SettingsController $sender
      */
-    public function settingsController_addEditCategory_handler($sender) {
-        $sender->ShowCustomPoints = true;
+    public function vanillaSettingsController_afterCategorySettings_handler($sender) {
+        $showCustomPoints = c('Plugins.Reactions.TrackPointsSeparately', false);
+        if ($showCustomPoints) {
+            $desc = 'This allows you to create separate leaderboards for this category. Tracking points for this '
+                .'category separately will not be retroactive. To add a category-specific leaderboard module to your '
+                .'theme template, add <code>{module name="LeaderboardModule" CategoryID="7"}</code>, replacing the '
+                .'CategoryID value with the ID of the category with separate tracking enabled.';
+            $label = 'Track leaderboard points for this category separately.';
+            $toggle = $sender->Form->toggle('CustomPoints', $label, [], $desc);
+            echo wrap($toggle, 'li', ['class' => 'form-group']);
+        }
     }
 
     /**
