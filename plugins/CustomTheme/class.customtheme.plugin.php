@@ -166,7 +166,7 @@ class CustomThemePlugin extends Gdn_Plugin {
      * Can the current theme be customized?
      */
     private function canCustomizeTheme() {
-        $themeInfo = Gdn::addonManager()->getTheme()->getInfo();
+        $themeInfo = Gdn::addonManager()->lookupTheme(self::getCurrentThemeKey());
         if (empty($themeInfo)) {
             return false;
         }
@@ -183,9 +183,9 @@ class CustomThemePlugin extends Gdn_Plugin {
      */
     public static function getThemeRoot($subfolder = '') {
         if ($subfolder) {
-            $path = paths(PATH_THEMES, Gdn::addonManager()->getTheme()->getKey(), ltrim($subfolder, '/'));
+            $path = paths(PATH_THEMES, self::getCurrentThemeKey(), ltrim($subfolder, '/'));
         } else {
-            $path = paths(PATH_THEMES, Gdn::addonManager()->getTheme()->getKey());
+            $path = paths(PATH_THEMES, self::getCurrentThemeKey());
         }
 
         return $path;
@@ -220,6 +220,15 @@ class CustomThemePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Gets the current theme's key.
+     *
+     * @return string
+     */
+    private static function getCurrentThemeKey() {
+        return Gdn::themeManager()->getEnabledDesktopThemeKey();
+    }
+
+    /**
      * New method of adding css to page (from database). And handle changing the master view.
      *
      * @param $sender
@@ -248,7 +257,7 @@ class CustomThemePlugin extends Gdn_Plugin {
         }
 
         // Backwards compatibility
-        $theme = c('Garden.Theme');
+        $theme = self::getCurrentThemeKey();
         $previewHtml = c('Plugins.CustomTheme.PreviewHtml', '');
         $htmlFile = paths(PATH_THEMES, $theme, 'views', $previewHtml);
         if ($previewHtml == '' || !file_exists($htmlFile)) {
@@ -362,7 +371,7 @@ class CustomThemePlugin extends Gdn_Plugin {
         $sender->addCssFile('customtheme.css', 'plugins/CustomTheme');
 
         // Get our folder, which must match our key.
-        $themeKey = Gdn::addonManager()->getTheme()->getKey();
+        $themeKey = self::getCurrentThemeKey();
         $folder = paths(PATH_THEMES, $themeKey);
 
         // This is the new method:
@@ -447,7 +456,7 @@ Here are some things you should know before you begin:
 
             if ($cssContents != $newCSS || $htmlContents != $newHtml) {
                 $set = array(
-                    'ThemeName' => c('Garden.Theme'),
+                    'ThemeName' => self::getCurrentThemeKey(),
                     'Html' => $newHtml,
                     'CSS' => $newCSS,
                     'Label' => $newLabel,
@@ -458,7 +467,7 @@ Here are some things you should know before you begin:
                 );
 
                 // Look for an existing working revision.
-                $workingRow = Gdn::sql()->getWhere('CustomThemeRevision', array('ThemeName' => c('Garden.Theme'), 'Live' => 2))->firstRow(DATASET_TYPE_ARRAY);
+                $workingRow = Gdn::sql()->getWhere('CustomThemeRevision', array('ThemeName' => self::getCurrentThemeKey(), 'Live' => 2))->firstRow(DATASET_TYPE_ARRAY);
 
                 if ($workingRow) {
                     $workingRevisionID = $workingRow['RevisionID'];
@@ -497,7 +506,7 @@ Here are some things you should know before you begin:
                 // Update out old live revision row(s)
                 Gdn::sql()->update('CustomThemeRevision')
                         ->set('Live', 0)
-                        ->where('ThemeName', c('Garden.Theme'))
+                        ->where('ThemeName', self::getCurrentThemeKey())
                         ->put();
 
                 // Update new live revision row
@@ -526,7 +535,7 @@ Here are some things you should know before you begin:
         $sender->setData('RevisionData', Gdn::sql()
                 ->select()
                 ->from('CustomThemeRevision')
-                ->where('ThemeName', c('Garden.Theme'))
+                ->where('ThemeName', self::getCurrentThemeKey())
                 ->orderBy('RevisionID', 'desc')
                 ->limit(10)
                 ->get()
@@ -539,7 +548,7 @@ Here are some things you should know before you begin:
      * After a theme has been enabled, reset its related revisions based on what's in the db.
      */
     public function settingsController_afterEnableTheme_handler($sender) {
-        $this->setRevisionsByTheme(c('Garden.Theme'));
+        $this->setRevisionsByTheme(self::getCurrentThemeKey());
     }
 
     /**
@@ -623,7 +632,7 @@ Here are some things you should know before you begin:
         } else {
             $isApply = $sender->Form->getFormValue('Apply') ? true : false;
             $set = array(
-                'ThemeName' => c('Garden.Theme'),
+                'ThemeName' => self::getCurrentThemeKey(),
                 'Html' => '',
                 'CSS' => $sender->Form->getFormValue('CSS', ''),
                 'Label' => '',
@@ -634,7 +643,7 @@ Here are some things you should know before you begin:
             );
 
             // Look for an existing working revision.
-            $workingData = Gdn::sql()->getWhere('CustomThemeRevision', array('ThemeName' => c('Garden.Theme'), 'Live' => 2))->firstRow(DATASET_TYPE_ARRAY);
+            $workingData = Gdn::sql()->getWhere('CustomThemeRevision', array('ThemeName' => self::getCurrentThemeKey(), 'Live' => 2))->firstRow(DATASET_TYPE_ARRAY);
 
             if ($workingData) {
                 // If there is a working revision, update it.
@@ -671,7 +680,7 @@ Here are some things you should know before you begin:
                 // Update out old live revision row(s)
                 Gdn::sql()->update('CustomThemeRevision')
                         ->set('Live', 0)
-                        ->where('ThemeName', c('Garden.Theme'))
+                        ->where('ThemeName', self::getCurrentThemeKey())
                         ->put();
 
                 // Update new live revision row
