@@ -45,7 +45,7 @@ if (CheckPermission('Garden.Settings.Manage')
       <?php foreach ($stock_avatar_payload as $avatar): ?>
          <li class="avatar-option">
             <input class="avatar-option-radio" type="radio" name="AvatarID" id="<?php echo $avatar['AvatarID']; ?>" value="<?php echo $avatar['AvatarID']; ?>" <?php if($current_stockavatar_id===$avatar['AvatarID']) {echo "checked";}?>/>
-            <label for="<?php echo $avatar['AvatarID']; ?>"><?php echo Img($avatar['_path_crop'], array('style' => $style_dimensions)); ?></label>
+            <label for="<?php echo $avatar['AvatarID']; ?>" title="<?php echo Gdn_Format::plainText($avatar['Name']); ?>"><?php echo Img($avatar['_path_crop'], array('style' => $style_dimensions)); ?></label>
          </li>
 
       <?php endforeach; ?>

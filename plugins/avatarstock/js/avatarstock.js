@@ -4,8 +4,19 @@ $(document).on('contentLoad', function(e) {
    $(".js-new-avatar-pool", element).click(function () {
       $(".js-new-avatar-pool-upload").trigger("click");
       $(".js-new-avatar-pool-upload").change(function() {
-         var $form = $(this).closest('form');
-         $form.submit();
+         // Once an image has been selected for upload, hide the upload button, show the naming form.
+         $(".js-new-avatar-pool-name-group").removeClass("hidden");
+         $(".js-new-avatar-pool").addClass("hidden");
+         var $filename = $(".js-new-avatar-pool-upload").val();
+         $(".js-new-avatar-pool-filename").html($filename);
+         $(".js-new-avatar-pool-save").on('click', function () {
+            // Transfer the name from the visible input field into the active form that will be submitted.
+            var $name = $("#Form_Upload_Name").val();
+            $("#Form_name").val($name);
+            var $form = $(".js-new-avatar-pool-upload").closest("form");
+            $form.submit();
+         });
+
       });
    });
 
