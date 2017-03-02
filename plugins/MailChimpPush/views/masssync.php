@@ -1,8 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 helpAsset(sprintf(t('About %s'), t('Mass Synchronization')),
-    t('About MailChimpPush Synchronization', "By default, Vanilla only sends <b>changes</b> to MailChimp. 
-    Synchronization is a one-time action that allows an entire forum's worth of users email addresses to be pushed to 
-    MailChimp to populate a list.")
+    t('About MailChimpPush Synchronization', "Synchronization allows an entire forum's worth of users email addresses to be pushed to 
+    MailChimp to populate a list. This tool will never delete users already existing on MailChimp. It will only add new email addresses 
+    that do not already exist in the list. If you edit the group and then re-sync, it will add users to the new group if they're not 
+    already in it, but it won't remove them from the old group.")
 );
 ?>
 <div class="header-menu">
@@ -35,7 +36,7 @@ helpAsset(sprintf(t('About %s'), t('Mass Synchronization')),
         // by javascript unless the list is selected.
         foreach ($interests as $list => $interest) {
             echo "<li id='SyncInterestDropdown{$list}' class='SyncInterestDropdowns form-group'>";
-            echo $this->Form->labelWrap('Interest', 'SyncInterestID'.$list);
+            echo $this->Form->labelWrap('Group', 'SyncInterestID'.$list);
             echo '<div class="input-wrap">';
             // Disable the sync interest dropdown by default. Will be activated by javascript if needed.
             echo $this->Form->dropDown('SyncInterestID['.$list.']', $interest, array('IncludeNull' => true, 'disabled' => true));
