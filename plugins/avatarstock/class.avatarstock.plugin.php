@@ -60,7 +60,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
         Gdn::Structure()
             ->Table($this->table_name)
             ->PrimaryKey('AvatarID')
-            ->Column('Name', 'varchar(255)', true)
+            ->Column('Name', 'varchar(100)', true)
             ->Column('OriginalFileName', 'varchar(255)', true)
             ->Column('Path', 'varchar(255)', false, 'index')
             ->Column('InsertUserID', 'int', true)
