@@ -192,6 +192,16 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
         $Sender->AddJsFile($Url, '', array('defer' => 'defer'));
         $Sender->AddDefinition('StatsUrl', self::StatsUrl('{p}'));
 //      }
+
+        $statURL = url('/dashboard/settings/statistics');
+        if (Gdn_Theme::inSection('Dashboard')
+            && checkPermission('Garden.Setting.Manage')
+            && Gdn::request()->url() != $statURL) {
+            $Sender->informMessage(
+                sprintf(t('<a href="%s">The Advanced Stats addon will be removed on June 1, 2017.</a>'), $statURL)
+            );
+        }
+
     }
 
     /**
