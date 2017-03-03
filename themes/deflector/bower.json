@@ -7,7 +7,7 @@
     "normalize-scss": "3.0.x",
     "geopattern": "btmills/geopattern",
     "noisy": "danielrapp/noisy",
-    "iCheck": "1.0.2",
+    "iCheck": "2.x",
     "ScrollToFixed": "~1.0.6"
   },
   "overrides": {
