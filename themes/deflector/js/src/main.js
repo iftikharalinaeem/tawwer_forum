@@ -24,7 +24,7 @@
   $(function () {
 
     // Initialize iCheck
-    $('input').iCheck();
+    $('input').icheck();
 
     $('[data-geopattern]').each(function () {
       var $this = $(this)
