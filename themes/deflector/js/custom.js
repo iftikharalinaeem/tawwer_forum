@@ -4,1042 +4,22 @@ b.height=a.size;for(var l=b.getContext("2d"),d=l.createImageData(b.width,b.heigh
 Math.random())):(c=m(a.color),d.data[e]=c.r,d.data[e+1]=c.g,d.data[e+2]=c.b);d.data[e+3]=~~(Math.random()*n)}l.putImageData(d,0,0);g=b.toDataURL("image/png");0!=g.indexOf("data:image/png")&&(g=a.fallback)}else g=a.fallback;if(window.JSON&&k&&!a.disableCache)try{localStorage.setItem(window.JSON.stringify(a),g)}catch(p){console.warn(p.message)}}return this.each(function(){f(this).css("background-image","url('"+g+"'),"+f(this).css("background-image"))})};f.fn.noisy.defaults={intensity:0.9,size:200,opacity:0.08,
 fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(jQuery);
 
-/*!
- * iCheck v2.0.0, http://git.io/arlzeA
- * ===================================
- * Cross-platform checkboxes and radio buttons customization
- *
- * (c) Damir Sultanov - http://fronteed.com
- * MIT Licensed
- */
-
-(function(win, doc, $) {
-
-  // prevent multiple includes
-  if (!win.ichecked) {
-    win.ichecked = function() {
-      $ = win.jQuery || win.Zepto;
-
-      // default options
-      var defaults = {
-
-        // auto init on domready
-        autoInit: true,
-
-        // auto handle ajax loaded inputs
-        autoAjax: true,
-
-        // remove 300ms click delay on touch devices
-        tap: true,
-
-        // customization class names
-        checkboxClass: 'icheckbox',
-        radioClass: 'iradio',
-
-        checkedClass: 'checked',
-        disabledClass: 'disabled',
-        indeterminateClass: 'indeterminate',
-
-        hoverClass: 'hover',
-        // focusClass: 'focus',
-        // activeClass: 'active',
-
-        // default callbacks
-        callbacks: {
-          ifCreated: false
-        },
-
-        // appended class names
-        classes: {
-          base: 'icheck',
-          div: '#-item', // {base}-item
-          area: '#-area-', // {base}-area-{value}
-          input: '#-input', // {base}-input
-          label: '#-label' // {base}-label
-        }
-      };
-
-      // extend default options
-      win.icheck = $.extend(defaults, win.icheck);
-
-      // useragent sniffing
-      var ua = win.navigator.userAgent;
-      var ie = /MSIE [5-8]/.test(ua) || doc.documentMode < 9;
-      var operaMini = /Opera Mini/.test(ua);
-
-      // classes cache
-      var baseClass = defaults.classes.base;
-      var divClass = defaults.classes.div.replace('#', baseClass);
-      var areaClass = defaults.classes.area.replace('#', baseClass);
-      var nodeClass = defaults.classes.input.replace('#', baseClass);
-      var labelClass = defaults.classes.label.replace('#', baseClass);
-
-      // unset init classes
-      delete defaults.classes;
-
-      // default filter
-      var filter = 'input[type=checkbox],input[type=radio]';
-
-      // clickable areas container
-      var areas = {};
-
-      // hashes container
-      var hashes = {};
-
-      // hash recognizer
-      var recognizer = new RegExp(baseClass + '\\[(.*?)\\]');
-
-      // hash extractor
-      var extract = function(className, matches, value) {
-        if (!!className) {
-          matches = recognizer.exec(className);
-
-          if (matches && hashes[matches[1]]) {
-            value = matches[1];
-          }
-        }
-
-        return value;
-      };
-
-      // detect computed style support
-      var computed = win.getComputedStyle;
-
-      // detect pointer events support
-      var isPointer = win.PointerEvent || win.MSPointerEvent;
-
-      // detect touch events support
-      var isTouch = 'ontouchend' in win;
-
-      // detect mobile users
-      var isMobile = /mobile|tablet|phone|ip(ad|od)|android|silk|webos/i.test(ua);
-
-      // setup events
-      var mouse = ['mouse', 'down', 'up', 'over', 'out']; // bubbling hover
-      var pointer = win.PointerEvent ? ['pointer', mouse[1], mouse[2], mouse[3], mouse[4]] : ['MSPointer', 'Down', 'Up', 'Over', 'Out'];
-      var touch = ['touch', 'start', 'end'];
-      var noMouse = (isTouch && isMobile) || isPointer;
-
-      // choose events
-      var hoverStart = noMouse ? (isTouch ? touch[0] + touch[1] : pointer[0] + pointer[3]) : mouse[0] + mouse[3];
-      var hoverEnd = noMouse ? (isTouch ? touch[0] + touch[2] : pointer[0] + pointer[4]) : mouse[0] + mouse[4];
-      var tapStart = noMouse ? (isTouch ? false : pointer[0] + pointer[1]) : mouse[0] + mouse[1];
-      var tapEnd = noMouse ? (isTouch ? false : pointer[0] + pointer[2]) : mouse[0] + mouse[2];
-      var hover = !operaMini ? hoverStart + '.i ' + hoverEnd + '.i ' : '';
-      var tap = !operaMini && tapStart ? tapStart + '.i ' + tapEnd + '.i' : '';
-
-      // styles options
-      var styleTag;
-      var styleList;
-      var styleArea = defaults.areaStyle !== false ? 'position:absolute;display:block;content:"";top:#;bottom:#;left:#;right:#;' : 0;
-      var styleInput = 'position:absolute!;display:block!;outline:none!;' + (defaults.debug ? '' : 'opacity:0!;z-index:-99!;clip:rect(0 0 0 0)!;');
-
-      // styles addition
-      var style = function(rules, selector, area) {
-        if (!styleTag) {
-
-          // create container
-          styleTag = doc.createElement('style');
-
-          // append to header
-          (doc.head || doc.getElementsByTagName('head')[0]).appendChild(styleTag);
-
-          // webkit hack
-          if (!win.createPopup) {
-            styleTag.appendChild(doc.createTextNode(''));
-          }
-
-          styleList = styleTag.sheet || styleTag.styleSheet;
-        }
-
-        // choose selector
-        if (!selector) {
-          selector = 'div.' + (area ? areaClass + area + ':after' : divClass + ' input.' + nodeClass);
-        }
-
-        // replace shorthand rules
-        rules = rules.replace(/!/g, ' !important');
-
-        // append styles
-        if (styleList.addRule) {
-          styleList.addRule(selector, rules, 0);
-        } else {
-          styleList.insertRule(selector + '{' + rules + '}', 0);
-        }
-      };
-
-      // append input's styles
-      style(styleInput);
-
-      // append styler's styles
-      if ((isTouch && isMobile) || operaMini) {
-
-        // force custor:pointer for mobile devices
-        style('cursor:pointer!;', 'label.' + labelClass + ',div.' + divClass);
-      }
-
-      // append iframe's styles
-      style('display:none!', 'iframe.icheck-frame'); // used to handle ajax-loaded inputs
-
-      // class toggler
-      var toggle = function(node, className, status, currentClass, updatedClass, addClass, removeClass) {
-        currentClass = node.className;
-
-        if (!!currentClass) {
-          updatedClass = ' ' + currentClass + ' ';
-
-          // add class
-          if (status === 1) {
-            addClass = className;
-
-          // remove class
-          } else if (status === 0) {
-            removeClass = className;
-
-          // add and remove class
-          } else {
-            addClass = className[0];
-            removeClass = className[1];
-          }
-
-          // add class
-          if (!!addClass && updatedClass.indexOf(' ' + addClass + ' ') < 0) {
-            updatedClass += addClass + ' ';
-          }
-
-          // remove class
-          if (!!removeClass && ~updatedClass.indexOf(' ' + removeClass + ' ')) {
-            updatedClass = updatedClass.replace(' ' + removeClass + ' ', ' ');
-          }
-
-          // trim class
-          updatedClass = updatedClass.replace(/^\s+|\s+$/g, '');
-
-          // update class
-          if (updatedClass !== currentClass) {
-            node.className = updatedClass;
-          }
-
-          // return updated class
-          return updatedClass;
-        }
-      };
-
-      // traces remover
-      var tidy = function(node, key, trigger, settings, className, parent) {
-        if (hashes[key]) {
-          settings = hashes[key];
-          className = settings.className;
-          parent = $(closest(node, 'div', className));
-
-          // prevent overlapping
-          if (parent.length) {
-
-            // input
-            $(node).removeClass(nodeClass + ' ' + className).attr('style', settings.style);
-
-            // label
-            $('label.' + settings.esc).removeClass(labelClass + ' ' + className);
-
-            // parent
-            $(parent).replaceWith($(node));
-
-            // callback
-            if (trigger) {
-              callback(node, key, trigger);
-            }
-          }
-
-          // unset current key
-          hashes[key] = false;
-        }
-      };
-
-      // nodes inspector
-      var inspect = function(object, node, stack, direct, indirect) {
-        stack = [];
-        direct = object.length;
-
-        // inspect object
-        while (direct--) {
-          node = object[direct];
-
-          // direct input
-          if (node.type) {
-
-            // checkbox or radio button
-            if (~filter.indexOf(node.type)) {
-              stack.push(node);
-            }
-
-          // indirect input
-          } else {
-            node = $(node).find(filter);
-            indirect = node.length;
-
-            while (indirect--) {
-              stack.push(node[indirect]);
-            }
-          }
-        }
-
-        return stack;
-      };
-
-      // parent searcher
-      var closest = function(node, tag, className, parent) {
-        while (node && node.nodeType !== 9) {
-          node = node.parentNode;
-
-          if (node && node.tagName == tag.toUpperCase() && ~node.className.indexOf(className)) {
-            parent = node;
-            break;
-          }
-        }
-
-        return parent;
-      };
-
-      // callbacks farm
-      var callback = function(node, key, name) {
-        name = 'if' + name;
-
-        // callbacks are allowed
-        if (hashes[key].callbacks !== false) {
-
-          // direct callback
-          if (typeof hashes[key].callbacks[name] == 'function') {
-            hashes[key].callbacks[name](node, hashes[key]);
-          }
-
-          // indirect callback
-          if (hashes[key].callbacks[name] !== false) {
-            $(node).trigger(name);
-          }
-        }
-      };
-
-      // selection processor
-      var process = function(data, options, ajax, silent) {
-
-        // get inputs
-        var elements = inspect(data);
-        var element = elements.length;
-
-        // loop through inputs
-        while (element--) {
-          var node = elements[element];
-          var nodeAttr = node.attributes;
-          var nodeAttrCache = {};
-          var nodeAttrLength = nodeAttr.length;
-          var nodeAttrName;
-          var nodeAttrValue;
-          var nodeData = {};
-          var nodeDataCache = {}; // merged data
-          var nodeDataProperty;
-          var nodeId = node.id;
-          var nodeInherit;
-          var nodeInheritItem;
-          var nodeInheritLength;
-          var nodeString = node.className;
-          var nodeStyle;
-          var nodeType = node.type;
-          var queryData = $.cache ? $.cache[node[$.expando]] : 0; // cached data
-          var settings;
-          var key = extract(nodeString);
-          var keyClass;
-          var handle;
-          var styler;
-          var stylerClass = '';
-          var stylerStyle;
-          var area = false;
-          var label;
-          var labelDirect;
-          var labelIndirect;
-          var labelKey;
-          var labelString;
-          var labels = [];
-          var labelsLength;
-          var fastClass = win.FastClick ? ' needsclick' : '';
-
-          // parse options from HTML attributes
-          while (nodeAttrLength--) {
-            nodeAttrName = nodeAttr[nodeAttrLength].name;
-            nodeAttrValue = nodeAttr[nodeAttrLength].value;
-
-            if (~nodeAttrName.indexOf('data-')) {
-              nodeData[nodeAttrName.substr(5)] = nodeAttrValue;
-            }
-
-            if (nodeAttrName == 'style') {
-              nodeStyle = nodeAttrValue;
-            }
-
-            nodeAttrCache[nodeAttrName] = nodeAttrValue;
-          }
-
-          // parse options from jQuery or Zepto cache
-          if (queryData && queryData.data) {
-            nodeData = $.extend(nodeData, queryData.data);
-          }
-
-          // parse merged options
-          for (nodeDataProperty in nodeData) {
-            nodeAttrValue = nodeData[nodeDataProperty];
-
-            if (nodeAttrValue == 'true' || nodeAttrValue == 'false') {
-              nodeAttrValue = nodeAttrValue == 'true';
-            }
-
-            nodeDataCache[nodeDataProperty.replace(/checkbox|radio|class|id|label/g, function(string, position) {
-              return position === 0 ? string : string.charAt(0).toUpperCase() + string.slice(1);
-            })] = nodeAttrValue;
-          }
-
-          // merge options
-          settings = $.extend({}, defaults, win.icheck, nodeDataCache, options);
-
-          // input type filter
-          handle = settings.handle;
-
-          if (handle !== 'checkbox' && handle !== 'radio') {
-            handle = filter;
-          }
-
-          // prevent unwanted init
-          if (settings.init !== false && ~handle.indexOf(nodeType)) {
-
-            // tidy before processing
-            if (key) {
-              tidy(node, key);
-            }
-
-            // generate random key
-            while(!hashes[key]) {
-              key = Math.random().toString(36).substr(2, 5); // 5 symbols
-
-              if (!hashes[key]) {
-                keyClass = baseClass + '[' + key + ']';
-                break;
-              }
-            }
-
-            // prevent unwanted duplicates
-            delete settings.autoInit;
-            delete settings.autoAjax;
-
-            // save settings
-            settings.style = nodeStyle || '';
-            settings.className = keyClass;
-            settings.esc = keyClass.replace(/(\[|\])/g, '\\$1');
-            hashes[key] = settings;
-
-            // find direct label
-            labelDirect = closest(node, 'label', '');
-
-            if (labelDirect) {
-
-              // normalize "for" attribute
-              if (!!!labelDirect.htmlFor && !!nodeId) {
-                labelDirect.htmlFor = nodeId;
-              }
-
-              labels.push(labelDirect);
-            }
-
-            // find indirect label
-            if (!!nodeId) {
-              labelIndirect = $('label[for="' + nodeId + '"]');
-
-              // merge labels
-              while (labelIndirect.length--) {
-                label = labelIndirect[labelIndirect.length];
-
-                if (label !== labelDirect) {
-                  labels.push(label);
-                }
-              }
-            }
-
-            // loop through labels
-            labelsLength = labels.length;
-
-            while (labelsLength--) {
-              label = labels[labelsLength];
-              labelString = label.className;
-              labelKey = extract(labelString);
-
-              // remove previous key
-              if (labelKey) {
-                labelString = toggle(label, baseClass + '[' + labelKey + ']', 0);
-              } else {
-                labelString = (!!labelString ? labelString + ' ' : '') + labelClass;
-              }
-
-              // update label's class
-              label.className = labelString + ' ' + keyClass + fastClass;
-            }
-
-            // prepare styler
-            styler = doc.createElement('div');
-
-            // parse inherited options
-            if (!!settings.inherit) {
-              nodeInherit = settings.inherit.split(/\s*,\s*/);
-              nodeInheritLength = nodeInherit.length;
-
-              while (nodeInheritLength--) {
-                nodeInheritItem = nodeInherit[nodeInheritLength];
-
-                if (nodeAttrCache[nodeInheritItem] !== undefined) {
-                  if (nodeInheritItem == 'class') {
-                    stylerClass += nodeAttrCache[nodeInheritItem] + ' ';
-                  } else {
-                    styler.setAttribute(nodeInheritItem, nodeInheritItem == 'id' ? baseClass + '-' + nodeAttrCache[nodeInheritItem] : nodeAttrCache[nodeInheritItem]);
-                  }
-                }
-              }
-            }
-
-            // set input's type class
-            stylerClass += settings[nodeType + 'Class'];
-
-            // set styler's key
-            stylerClass += ' ' + divClass + ' ' + keyClass;
-
-            // append area styles
-            if (settings.area && styleArea) {
-              area = ('' + settings.area).replace(/%|px|em|\+|-/g, '') | 0;
-
-              if (area) {
-
-                // append area's styles
-                if (!areas[area]) {
-                  style(styleArea.replace(/#/g, '-' + area + '%'), false, area);
-                  areas[area] = true;
-                }
-
-                stylerClass += ' ' + areaClass + area;
-              }
-            }
-
-            // update styler's class
-            styler.className = stylerClass + fastClass;
-
-            // update node's class
-            node.className = (!!nodeString ? nodeString + ' ' : '') + nodeClass + ' ' + keyClass;
-
-            // replace node
-            node.parentNode.replaceChild(styler, node);
-
-            // append node
-            styler.appendChild(node);
-
-            // append additions
-            if (!!settings.insert) {
-              $(styler).append(settings.insert);
-            }
-
-            // set relative position
-            if (area) {
-
-              // get styler's position
-              if (computed) {
-                stylerStyle = computed(styler, null).getPropertyValue('position');
-              } else {
-                stylerStyle = styler.currentStyle.position;
-              }
-
-              // update styler's position
-              if (stylerStyle == 'static') {
-                styler.style.position = 'relative';
-              }
-            }
-
-            // operate
-            operate(node, styler, key, 'updated', true, false, ajax);
-            hashes[key].done = true;
-
-            // ifCreated callback
-            if (!silent) {
-              callback(node, key, 'Created');
-            }
-          }
-        }
-      };
-
-      // operations center
-      var operate = function(node, parent, key, method, silent, before, ajax) {
-        var settings = hashes[key];
-        var states = {};
-        var changes = {};
-
-        // current states
-        states.checked = [node.checked, 'Checked', 'Unchecked'];
-
-        if ((!before || ajax) && method !== 'click') {
-          states.disabled = [node.disabled, 'Disabled', 'Enabled'];
-          states.indeterminate = [node.getAttribute('indeterminate') == 'true' || !!node.indeterminate, 'Indeterminate', 'Determinate'];
-        }
-
-        // methods
-        if (method == 'updated' || method == 'click') {
-          changes.checked = before ? !states.checked[0] : states.checked[0];
-
-          if ((!before || ajax) && method !== 'click') {
-            changes.disabled = states.disabled[0];
-            changes.indeterminate = states.indeterminate[0];
-          }
-
-        } else if (method == 'checked' || method == 'unchecked') {
-          changes.checked = method == 'checked';
-
-        } else if (method == 'disabled' || method == 'enabled') {
-          changes.disabled = method == 'disabled';
-
-        } else if (method == 'indeterminate' || method == 'determinate') {
-          changes.indeterminate = method !== 'determinate';
-
-        // "toggle" method
-        } else {
-          changes.checked = !states.checked[0];
-        }
-
-        // apply changes
-        change(node, parent, states, changes, key, settings, method, silent, before, ajax);
-      };
-
-      // state changer
-      var change = function(node, parent, states, changes, key, settings, method, silent, before, ajax, loop) {
-        var type = node.type;
-        var typeCapital = type == 'radio' ? 'Radio' : 'Checkbox';
-        var property;
-        var value;
-        var classes;
-        var inputClass;
-        var label;
-        var labelClass = 'LabelClass';
-        var form;
-        var radios;
-        var radiosLength;
-        var radio;
-        var radioKey;
-        var radioStates;
-        var radioChanges;
-        var changed;
-        var toggled;
-
-        // check parent
-        if (!parent) {
-          parent = closest(node, 'div', settings.className);
-        }
-
-        // continue if parent exists
-        if (parent) {
-
-          // detect changes
-          for (property in changes) {
-            value = changes[property];
-
-            // update node's property
-            if (states[property][0] !== value && method !== 'updated' && method !== 'click') {
-              node[property] = value;
-            }
-
-            // update ajax attributes
-            if (ajax) {
-              if (value) {
-                node.setAttribute(property, property);
-              } else {
-                node.removeAttribute(property);
-              }
-            }
-
-            // update key's property
-            if (settings[property] !== value) {
-              settings[property] = value;
-              changed = true;
-
-              if (property == 'checked') {
-                toggled = true;
-
-                // find assigned radios
-                if (!loop && value && (!!hashes[key].done || ajax) && type == 'radio' && !!node.name) {
-                  form = closest(node, 'form', '');
-                  radios = 'input[name="' + node.name + '"]';
-                  radios = form && !ajax ? $(form).find(radios) : $(radios);
-                  radiosLength = radios.length;
-
-                  while (radiosLength--) {
-                    radio = radios[radiosLength];
-                    radioKey = extract(radio.className);
-
-                    // toggle radios
-                    if (node !== radio && hashes[radioKey] && hashes[radioKey].checked) {
-                      radioStates = {checked: [true, 'Checked', 'Unchecked']};
-                      radioChanges = {checked: false};
-
-                      change(radio, false, radioStates, radioChanges, radioKey, hashes[radioKey], 'updated', silent, before, ajax, true);
-                    }
-                  }
-                }
-              }
-
-              // cache classes
-              classes = [
-                settings[property + 'Class'], // 0, example: checkedClass
-                settings[property + typeCapital + 'Class'], // 1, example: checkedCheckboxClass
-                settings[states[property][1] + 'Class'], // 2, example: uncheckedClass
-                settings[states[property][1] + typeCapital + 'Class'], // 3, example: uncheckedCheckboxClass
-                settings[property + labelClass] // 4, example: checkedLabelClass
-              ];
-
-              // value == false
-              inputClass = [classes[3] || classes[2], classes[1] || classes[0]];
-
-              // value == true
-              if (value) {
-                inputClass.reverse();
-              }
-
-              // update parent's class
-              toggle(parent, inputClass);
-
-              // update labels's class
-              if (!!settings.mirror && !!classes[4]) {
-                label = $('label.' + settings.esc);
-
-                while (label.length--) {
-                  toggle(label[label.length], classes[4], value ? 1 : 0);
-                }
-              }
-
-              // callback
-              if (!silent || loop) {
-                callback(node, key, states[property][value ? 1 : 2]); // ifChecked or ifUnchecked
-              }
-            }
-          }
-
-          // additional callbacks
-          if (!silent || loop) {
-            if (changed) {
-              callback(node, key, 'Changed'); // ifChanged
-            }
-
-            if (toggled) {
-              callback(node, key, 'Toggled'); // ifToggled
-            }
-          }
-
-          // cursor addition
-          if (!!settings.cursor && !isMobile) {
-
-            // 'pointer' for enabled
-            if (!settings.disabled && !settings.pointer) {
-              parent.style.cursor = 'pointer';
-              settings.pointer = true;
-
-            // 'default' for disabled
-            } else if (settings.disabled && settings.pointer) {
-              parent.style.cursor = 'default';
-              settings.pointer = false;
-            }
-          }
-
-          // update settings
-          hashes[key] = settings;
-        }
-      };
-
-      // plugin definition
-      $.fn.icheck = function(options, fire) {
-
-        // detect methods
-        if (/^(checked|unchecked|indeterminate|determinate|disabled|enabled|updated|toggle|destroy|data|styler)$/.test(options)) {
-          var items = inspect(this);
-          var itemsLength = items.length;
-
-          // loop through inputs
-          while (itemsLength--) {
-            var item = items[itemsLength];
-            var key = extract(item.className);
-
-            if (key) {
-
-              // 'data' method
-              if (options == 'data') {
-                return hashes[key];
-
-              // 'styler' method
-              } else if (options == 'styler') {
-                return closest(item, 'div', hashes[key].className);
-
-              } else {
-                if (options == 'destroy') {
-                  tidy(item, key, 'Destroyed');
-                } else {
-                  operate(item, false, key, options);
-                }
-
-                // callback
-                if (typeof fire == 'function') {
-                  fire(item);
-                }
-              }
-            }
-          }
-
-        // basic setup
-        } else if (typeof options == 'object' || !options) {
-          process(this, options || {});
-        }
-
-        // chain
-        return this;
-      };
-
-      // cached last key
-      var lastKey;
-
-      // bind label and styler
-      $(doc).on('click.i ' + hover + tap, 'label.' + labelClass + ',div.' + divClass, function(event) {
-        var self = this;
-        var key = extract(self.className);
-
-        if (key) {
-          var emitter = event.type;
-          var settings = hashes[key];
-          var className = settings.esc; // escaped class name
-          var div = self.tagName == 'DIV';
-          var input;
-          var target;
-          var partner;
-          var activate;
-          var states = [
-            ['label', settings.activeLabelClass, settings.hoverLabelClass],
-            ['div', settings.activeClass, settings.hoverClass]
-          ];
-
-          // reverse array
-          if (div) {
-            states.reverse();
-          }
-
-          // active state
-          if (emitter == tapStart || emitter == tapEnd) {
-
-            // toggle self's active class
-            if (!!states[0][1]) {
-              toggle(self, states[0][1], emitter == tapStart ? 1 : 0);
-            }
-
-            // toggle partner's active class
-            if (!!settings.mirror && !!states[1][1]) {
-              partner = $(states[1][0] + '.' + className);
-
-              while (partner.length--) {
-                toggle(partner[partner.length], states[1][1], emitter == tapStart ? 1 : 0);
-              }
-            }
-
-            // fast click
-            if (div && emitter == tapEnd && !!settings.tap && isMobile && isPointer && !operaMini) {
-              activate = true;
-            }
-
-          // hover state
-          } else if (emitter == hoverStart || emitter == hoverEnd) {
-
-            // toggle self's hover class
-            if (!!states[0][2]) {
-              toggle(self, states[0][2], emitter == hoverStart ? 1 : 0);
-            }
-
-            // toggle partner's hover class
-            if (!!settings.mirror && !!states[1][2]) {
-              partner = $(states[1][0] + '.' + className);
-
-              while (partner.length--) {
-                toggle(partner[partner.length], states[1][2], emitter == hoverStart ? 1 : 0);
-              }
-            }
-
-            // fast click
-            if (div && emitter == hoverEnd && !!settings.tap && isMobile && isTouch && !operaMini) {
-              activate = true;
-            }
-
-          // click
-          } else if (div) {
-            if (!(isMobile && (isTouch || isPointer)) || !!!settings.tap || operaMini) {
-              activate = true;
-            }
-          }
-
-          // trigger input's click
-          if (activate) {
-
-            // currentTarget hack
-            setTimeout(function() {
-              target = event.currentTarget || {};
-
-              if (target.tagName !== 'LABEL') {
-                if (!settings.change || (+new Date() - settings.change > 100)) {
-                  input = $(self).find('input.' + className).click();
-
-                  if (ie || operaMini) {
-                    input.change();
-                  }
-                }
-              }
-            }, 2);
-          }
-        }
-
-      // bind input
-      }).on('click.i change.i focusin.i focusout.i keyup.i keydown.i', 'input.' + nodeClass, function(event) {
-        var self = this;
-        var key = extract(self.className);
-
-        if (key) {
-          var emitter = event.type;
-          var settings = hashes[key];
-          var className = settings.esc; // escaped class name
-          var parent = emitter == 'click' ? false : closest(self, 'div', settings.className);
-          var label;
-          var states;
-
-          // click
-          if (emitter == 'click') {
-            hashes[key].change = +new Date();
-
-            // prevent event bubbling to parent
-            event.stopPropagation();
-
-          // change
-          } else if (emitter == 'change') {
-
-            if (parent && !self.disabled) {
-              operate(self, parent, key, 'click'); // 'click' method
-            }
-
-          // focus state
-          } else if (~emitter.indexOf('focus')) {
-            states = [settings.focusClass, settings.focusLabelClass];
-
-            // toggle parent's focus class
-            if (!!states[0] && parent) {
-              toggle(parent, states[0], emitter == 'focusin' ? 1 : 0);
-            }
-
-            // toggle label's focus class
-            if (!!settings.mirror && !!states[1]) {
-              label = $('label.' + className);
-
-              while (label.length--) {
-                toggle(label[label.length], states[1], emitter == 'focusin' ? 1 : 0);
-              }
-            }
-
-          // keyup or keydown (event fired before state is changed, except Opera 9-12)
-          } else if (parent && !self.disabled) {
-
-            // keyup
-            if (emitter == 'keyup') {
-
-              // spacebar or arrow
-              if (self.type == 'checkbox' && event.keyCode == 32 && settings.keydown || self.type == 'radio' && !self.checked) {
-                operate(self, parent, key, 'click', false, true); // 'toggle' method
-              }
-
-              hashes[key].keydown = hashes[lastKey].keydown = false;
-
-            // keydown
-            } else {
-              lastKey = key;
-              hashes[key].keydown = true;
-            }
-          }
-        }
-
-      // domready
-      }).ready(function() {
-
-        // auto init
-        if (win.icheck.autoInit) {
-          $('.' + baseClass).icheck();
-        }
-
-        // auto ajax
-        if (win.jQuery) {
-
-          // body selector cache
-          var body = doc.body || doc.getElementsByTagName('body')[0];
-
-          // apply converter
-          $.ajaxSetup({
-            converters: {
-              'text html': function(data) {
-                if (win.icheck.autoAjax && body) {
-                  var frame = doc.createElement('iframe'); // create container
-                  var frameData;
-
-                  // set attributes
-                  if (!ie) {
-                    frame.style = 'display:none';
-                  }
-
-                  frame.className = 'iframe.icheck-frame';
-                  frame.src ='about:blank';
-
-                  // append container to document
-                  body.appendChild(frame);
-
-                  // save container's content
-                  frameData = frame.contentDocument ? frame.contentDocument : frame.contentWindow.document;
-
-                  // append data to content
-                  frameData.open();
-                  frameData.write(data);
-                  frameData.close();
-
-                  // remove container from document
-                  body.removeChild(frame);
-
-                  // setup object
-                  frameData = $(frameData);
-
-                  // customize inputs
-                  process(frameData.find('.' + baseClass), {}, true);
-
-                  // extract HTML
-                  frameData = frameData[0];
-                  data = (frameData.body || frameData.getElementsByTagName('body')[0]).innerHTML;
-                  frameData = null; // prevent memory leaks
-                }
-
-                return data;
-              }
-            }
-          });
-        }
-      });
-    };
-
-    // expose iCheck as an AMD module
-    if (typeof define == 'function' && define.amd) {
-      define('icheck', [win.jQuery ? 'jquery' : 'zepto'], win.ichecked);
-    } else {
-      win.ichecked();
-    }
-  }
-}(window, document));
+/*! iCheck v1.0.2 by Damir Sultanov, http://git.io/arlzeA, MIT Licensed */
+(function(f){function A(a,b,d){var c=a[0],g=/er/.test(d)?_indeterminate:/bl/.test(d)?n:k,e=d==_update?{checked:c[k],disabled:c[n],indeterminate:"true"==a.attr(_indeterminate)||"false"==a.attr(_determinate)}:c[g];if(/^(ch|di|in)/.test(d)&&!e)x(a,g);else if(/^(un|en|de)/.test(d)&&e)q(a,g);else if(d==_update)for(var f in e)e[f]?x(a,f,!0):q(a,f,!0);else if(!b||"toggle"==d){if(!b)a[_callback]("ifClicked");e?c[_type]!==r&&q(a,g):x(a,g)}}function x(a,b,d){var c=a[0],g=a.parent(),e=b==k,u=b==_indeterminate,
+v=b==n,s=u?_determinate:e?y:"enabled",F=l(a,s+t(c[_type])),B=l(a,b+t(c[_type]));if(!0!==c[b]){if(!d&&b==k&&c[_type]==r&&c.name){var w=a.closest("form"),p='input[name="'+c.name+'"]',p=w.length?w.find(p):f(p);p.each(function(){this!==c&&f(this).data(m)&&q(f(this),b)})}u?(c[b]=!0,c[k]&&q(a,k,"force")):(d||(c[b]=!0),e&&c[_indeterminate]&&q(a,_indeterminate,!1));D(a,e,b,d)}c[n]&&l(a,_cursor,!0)&&g.find("."+C).css(_cursor,"default");g[_add](B||l(a,b)||"");g.attr("role")&&!u&&g.attr("aria-"+(v?n:k),"true");
+g[_remove](F||l(a,s)||"")}function q(a,b,d){var c=a[0],g=a.parent(),e=b==k,f=b==_indeterminate,m=b==n,s=f?_determinate:e?y:"enabled",q=l(a,s+t(c[_type])),r=l(a,b+t(c[_type]));if(!1!==c[b]){if(f||!d||"force"==d)c[b]=!1;D(a,e,s,d)}!c[n]&&l(a,_cursor,!0)&&g.find("."+C).css(_cursor,"pointer");g[_remove](r||l(a,b)||"");g.attr("role")&&!f&&g.attr("aria-"+(m?n:k),"false");g[_add](q||l(a,s)||"")}function E(a,b){if(a.data(m)){a.parent().html(a.attr("style",a.data(m).s||""));if(b)a[_callback](b);a.off(".i").unwrap();
+f(_label+'[for="'+a[0].id+'"]').add(a.closest(_label)).off(".i")}}function l(a,b,f){if(a.data(m))return a.data(m).o[b+(f?"":"Class")]}function t(a){return a.charAt(0).toUpperCase()+a.slice(1)}function D(a,b,f,c){if(!c){if(b)a[_callback]("ifToggled");a[_callback]("ifChanged")[_callback]("if"+t(f))}}var m="iCheck",C=m+"-helper",r="radio",k="checked",y="un"+k,n="disabled";_determinate="determinate";_indeterminate="in"+_determinate;_update="update";_type="type";_click="click";_touch="touchbegin.i touchend.i";
+_add="addClass";_remove="removeClass";_callback="trigger";_label="label";_cursor="cursor";_mobile=/ipad|iphone|ipod|android|blackberry|windows phone|opera mini|silk/i.test(navigator.userAgent);f.fn[m]=function(a,b){var d='input[type="checkbox"], input[type="'+r+'"]',c=f(),g=function(a){a.each(function(){var a=f(this);c=a.is(d)?c.add(a):c.add(a.find(d))})};if(/^(check|uncheck|toggle|indeterminate|determinate|disable|enable|update|destroy)$/i.test(a))return a=a.toLowerCase(),g(this),c.each(function(){var c=
+f(this);"destroy"==a?E(c,"ifDestroyed"):A(c,!0,a);f.isFunction(b)&&b()});if("object"!=typeof a&&a)return this;var e=f.extend({checkedClass:k,disabledClass:n,indeterminateClass:_indeterminate,labelHover:!0},a),l=e.handle,v=e.hoverClass||"hover",s=e.focusClass||"focus",t=e.activeClass||"active",B=!!e.labelHover,w=e.labelHoverClass||"hover",p=(""+e.increaseArea).replace("%","")|0;if("checkbox"==l||l==r)d='input[type="'+l+'"]';-50>p&&(p=-50);g(this);return c.each(function(){var a=f(this);E(a);var c=this,
+b=c.id,g=-p+"%",d=100+2*p+"%",d={position:"absolute",top:g,left:g,display:"block",width:d,height:d,margin:0,padding:0,background:"#fff",border:0,opacity:0},g=_mobile?{position:"absolute",visibility:"hidden"}:p?d:{position:"absolute",opacity:0},l="checkbox"==c[_type]?e.checkboxClass||"icheckbox":e.radioClass||"i"+r,z=f(_label+'[for="'+b+'"]').add(a.closest(_label)),u=!!e.aria,y=m+"-"+Math.random().toString(36).substr(2,6),h='<div class="'+l+'" '+(u?'role="'+c[_type]+'" ':"");u&&z.each(function(){h+=
+'aria-labelledby="';this.id?h+=this.id:(this.id=y,h+=y);h+='"'});h=a.wrap(h+"/>")[_callback]("ifCreated").parent().append(e.insert);d=f('<ins class="'+C+'"/>').css(d).appendTo(h);a.data(m,{o:e,s:a.attr("style")}).css(g);e.inheritClass&&h[_add](c.className||"");e.inheritID&&b&&h.attr("id",m+"-"+b);"static"==h.css("position")&&h.css("position","relative");A(a,!0,_update);if(z.length)z.on(_click+".i mouseover.i mouseout.i "+_touch,function(b){var d=b[_type],e=f(this);if(!c[n]){if(d==_click){if(f(b.target).is("a"))return;
+A(a,!1,!0)}else B&&(/ut|nd/.test(d)?(h[_remove](v),e[_remove](w)):(h[_add](v),e[_add](w)));if(_mobile)b.stopPropagation();else return!1}});a.on(_click+".i focus.i blur.i keyup.i keydown.i keypress.i",function(b){var d=b[_type];b=b.keyCode;if(d==_click)return!1;if("keydown"==d&&32==b)return c[_type]==r&&c[k]||(c[k]?q(a,k):x(a,k)),!1;if("keyup"==d&&c[_type]==r)!c[k]&&x(a,k);else if(/us|ur/.test(d))h["blur"==d?_remove:_add](s)});d.on(_click+" mousedown mouseup mouseover mouseout "+_touch,function(b){var d=
+b[_type],e=/wn|up/.test(d)?t:v;if(!c[n]){if(d==_click)A(a,!1,!0);else{if(/wn|er|in/.test(d))h[_add](e);else h[_remove](e+" "+t);if(z.length&&B&&e==v)z[/ut|nd/.test(d)?_remove:_add](w)}if(_mobile)b.stopPropagation();else return!1}})})}})(window.jQuery||window.Zepto);
 
 /*
  * ScrollToFixed
  * https://github.com/bigspotteddog/ScrollToFixed
- * 
+ *
  * Copyright (c) 2011 Joseph Cava-Lynch
  * MIT license
  */
@@ -1069,6 +49,7 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
 
         var position;
         var originalPosition;
+        var originalFloat;
         var originalOffsetTop;
         var originalZIndex;
 
@@ -1165,12 +146,16 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
         function setFixed() {
             // Only fix the target element and the spacer if we need to.
             if (!isFixed()) {
+                //get REAL dimensions (decimal fix)
+                //Ref. http://stackoverflow.com/questions/3603065/how-to-make-jquery-to-not-round-value-returned-by-width
+                var dimensions = target[0].getBoundingClientRect();
+
                 // Set the spacer to fill the height and width of the target
                 // element, then display it.
                 spacer.css({
                     'display' : target.css('display'),
-                    'width' : target.outerWidth(true),
-                    'height' : target.outerHeight(true),
+                    'width' : dimensions.width,
+                    'height' : dimensions.height,
                     'float' : target.css('float')
                 });
 
@@ -1185,12 +170,12 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
                     'bottom' : base.options.bottom == -1?'':base.options.bottom,
                     'margin-left' : '0px'
                 }
-                if (!base.options.dontSetWidth){ cssOptions['width']=target.width(); };
+                if (!base.options.dontSetWidth){ cssOptions['width']=target.css('width'); };
 
                 target.css(cssOptions);
-                
+
                 target.addClass(base.options.baseClassName);
-                
+
                 if (base.options.className) {
                     target.addClass(base.options.className);
                 }
@@ -1216,7 +201,7 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
               'margin-left' : '0px',
               'bottom' : ''
             }
-            if (!base.options.dontSetWidth){ cssOptions['width']=target.width(); };
+            if (!base.options.dontSetWidth){ cssOptions['width']=target.css('width'); };
 
             target.css(cssOptions);
 
@@ -1281,8 +266,9 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
         // Checks to see if we need to do something based on new scroll position
         // of the page.
         function checkScroll() {
-            if (!$.isScrollToFixed(target)) return;
+            if (!$.isScrollToFixed(target) || target.is(':hidden')) return;
             var wasReset = isReset;
+            var wasUnfixed = isUnfixed();
 
             // If resetScroll has not yet been called, call it. This only
             // happens once.
@@ -1330,7 +316,7 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
                 // put the target element at the specified limit, set the target
                 // element to absolute.
                 if (limit > 0 && y >= limit - getMarginTop()) {
-                    if (!isAbsolute() || !wasReset) {
+                    if (!wasUnfixed && (!isAbsolute() || !wasReset)) {
                         postPosition();
                         target.trigger('preAbsolute.ScrollToFixed');
                         setAbsolute();
@@ -1418,6 +404,9 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
             if(target.is(':visible')) {
                 isReset = false;
                 checkScroll();
+            } else {
+              // Ensure the spacer is hidden
+              setUnfixed();
             }
         }
 
@@ -1491,7 +480,7 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
 
             position = target.css('position');
             originalPosition = target.css('position');
-
+            originalFloat = target.css('float');
             originalOffsetTop = target.css('top');
 
             // Place the spacer right after the target element.
@@ -1595,7 +584,9 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
     };
 })(jQuery);
 
+/* jshint ignore:start */
 (function(a){a.isScrollToFixed=function(b){return !!a(b).data("ScrollToFixed")};a.ScrollToFixed=function(d,i){var l=this;l.$el=a(d);l.el=d;l.$el.data("ScrollToFixed",l);var c=false;var G=l.$el;var H;var E;var e;var y;var D=0;var q=0;var j=-1;var f=-1;var t=null;var z;var g;function u(){G.trigger("preUnfixed.ScrollToFixed");k();G.trigger("unfixed.ScrollToFixed");f=-1;D=G.offset().top;q=G.offset().left;if(l.options.offsets){q+=(G.offset().left-G.position().left)}if(j==-1){j=q}H=G.css("position");c=true;if(l.options.bottom!=-1){G.trigger("preFixed.ScrollToFixed");w();G.trigger("fixed.ScrollToFixed")}}function n(){var I=l.options.limit;if(!I){return 0}if(typeof(I)==="function"){return I.apply(G)}return I}function p(){return H==="fixed"}function x(){return H==="absolute"}function h(){return !(p()||x())}function w(){if(!p()){t.css({display:G.css("display"),width:G.outerWidth(true),height:G.outerHeight(true),"float":G.css("float")});cssOptions={"z-index":l.options.zIndex,position:"fixed",top:l.options.bottom==-1?s():"",bottom:l.options.bottom==-1?"":l.options.bottom,"margin-left":"0px"};if(!l.options.dontSetWidth){cssOptions.width=G.width()}G.css(cssOptions);G.addClass(l.options.baseClassName);if(l.options.className){G.addClass(l.options.className)}H="fixed"}}function b(){var J=n();var I=q;if(l.options.removeOffsets){I="";J=J-D}cssOptions={position:"absolute",top:J,left:I,"margin-left":"0px",bottom:""};if(!l.options.dontSetWidth){cssOptions.width=G.width()}G.css(cssOptions);H="absolute"}function k(){if(!h()){f=-1;t.css("display","none");G.css({"z-index":y,width:"",position:E,left:"",top:e,"margin-left":""});G.removeClass("scroll-to-fixed-fixed");if(l.options.className){G.removeClass(l.options.className)}H=null}}function v(I){if(I!=f){G.css("left",q-I);f=I}}function s(){var I=l.options.marginTop;if(!I){return 0}if(typeof(I)==="function"){return I.apply(G)}return I}function A(){if(!a.isScrollToFixed(G)){return}var K=c;if(!c){u()}else{if(h()){D=G.offset().top;q=G.offset().left}}var I=a(window).scrollLeft();var L=a(window).scrollTop();var J=n();if(l.options.minWidth&&a(window).width()<l.options.minWidth){if(!h()||!K){o();G.trigger("preUnfixed.ScrollToFixed");k();G.trigger("unfixed.ScrollToFixed")}}else{if(l.options.maxWidth&&a(window).width()>l.options.maxWidth){if(!h()||!K){o();G.trigger("preUnfixed.ScrollToFixed");k();G.trigger("unfixed.ScrollToFixed")}}else{if(l.options.bottom==-1){if(J>0&&L>=J-s()){if(!x()||!K){o();G.trigger("preAbsolute.ScrollToFixed");b();G.trigger("unfixed.ScrollToFixed")}}else{if(L>=D-s()){if(!p()||!K){o();G.trigger("preFixed.ScrollToFixed");w();f=-1;G.trigger("fixed.ScrollToFixed")}v(I)}else{if(!h()||!K){o();G.trigger("preUnfixed.ScrollToFixed");k();G.trigger("unfixed.ScrollToFixed")}}}}else{if(J>0){if(L+a(window).height()-G.outerHeight(true)>=J-(s()||-m())){if(p()){o();G.trigger("preUnfixed.ScrollToFixed");if(E==="absolute"){b()}else{k()}G.trigger("unfixed.ScrollToFixed")}}else{if(!p()){o();G.trigger("preFixed.ScrollToFixed");w()}v(I);G.trigger("fixed.ScrollToFixed")}}else{v(I)}}}}}function m(){if(!l.options.bottom){return 0}return l.options.bottom}function o(){var I=G.css("position");if(I=="absolute"){G.trigger("postAbsolute.ScrollToFixed")}else{if(I=="fixed"){G.trigger("postFixed.ScrollToFixed")}else{G.trigger("postUnfixed.ScrollToFixed")}}}var C=function(I){if(G.is(":visible")){c=false;A()}};var F=function(I){(!!window.requestAnimationFrame)?requestAnimationFrame(A):A()};var B=function(){var J=document.body;if(document.createElement&&J&&J.appendChild&&J.removeChild){var L=document.createElement("div");if(!L.getBoundingClientRect){return null}L.innerHTML="x";L.style.cssText="position:fixed;top:100px;";J.appendChild(L);var M=J.style.height,N=J.scrollTop;J.style.height="3000px";J.scrollTop=500;var I=L.getBoundingClientRect().top;J.style.height=M;var K=(I===100);J.removeChild(L);J.scrollTop=N;return K}return null};var r=function(I){I=I||window.event;if(I.preventDefault){I.preventDefault()}I.returnValue=false};l.init=function(){l.options=a.extend({},a.ScrollToFixed.defaultOptions,i);y=G.css("z-index");l.$el.css("z-index",l.options.zIndex);t=a("<div />");H=G.css("position");E=G.css("position");e=G.css("top");if(h()){l.$el.after(t)}a(window).bind("resize.ScrollToFixed",C);a(window).bind("scroll.ScrollToFixed",F);if("ontouchmove" in window){a(window).bind("touchmove.ScrollToFixed",A)}if(l.options.preFixed){G.bind("preFixed.ScrollToFixed",l.options.preFixed)}if(l.options.postFixed){G.bind("postFixed.ScrollToFixed",l.options.postFixed)}if(l.options.preUnfixed){G.bind("preUnfixed.ScrollToFixed",l.options.preUnfixed)}if(l.options.postUnfixed){G.bind("postUnfixed.ScrollToFixed",l.options.postUnfixed)}if(l.options.preAbsolute){G.bind("preAbsolute.ScrollToFixed",l.options.preAbsolute)}if(l.options.postAbsolute){G.bind("postAbsolute.ScrollToFixed",l.options.postAbsolute)}if(l.options.fixed){G.bind("fixed.ScrollToFixed",l.options.fixed)}if(l.options.unfixed){G.bind("unfixed.ScrollToFixed",l.options.unfixed)}if(l.options.spacerClass){t.addClass(l.options.spacerClass)}G.bind("resize.ScrollToFixed",function(){t.height(G.height())});G.bind("scroll.ScrollToFixed",function(){G.trigger("preUnfixed.ScrollToFixed");k();G.trigger("unfixed.ScrollToFixed");A()});G.bind("detach.ScrollToFixed",function(I){r(I);G.trigger("preUnfixed.ScrollToFixed");k();G.trigger("unfixed.ScrollToFixed");a(window).unbind("resize.ScrollToFixed",C);a(window).unbind("scroll.ScrollToFixed",F);G.unbind(".ScrollToFixed");t.remove();l.$el.removeData("ScrollToFixed")});C()};l.init()};a.ScrollToFixed.defaultOptions={marginTop:0,limit:0,bottom:-1,zIndex:1000,baseClassName:"scroll-to-fixed-fixed"};a.fn.scrollToFixed=function(b){return this.each(function(){(new a.ScrollToFixed(this,b))})}})(jQuery);
+/* jshint ignore:end */
 /*!
  * Prospect - A minimal Vanilla theme focused on customer support communities
  *
@@ -1603,6 +594,12 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
  * @copyright 2014 (c) Vanilla Forums Inc.
  * @license   GPLv3
  */
+
+/* globals $ */
+/* globals jQuery */
+/* globals GeoPattern */
+'use strict'
+
 
 ;(function ($, window, document, undefined) {
 
@@ -1613,7 +610,7 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
   $(function () {
 
     // Initialize iCheck
-    $('input').icheck();
+    $('input').iCheck();
 
     $('[data-geopattern]').each(function () {
       var $this = $(this)
@@ -1623,7 +620,7 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
       $this.noisy({
         intensity  : 0.5
       , opacity    : 0.05
-      })
+      });
     });
 
   });
