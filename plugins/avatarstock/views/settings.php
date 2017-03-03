@@ -19,6 +19,7 @@ echo $form->open([
 ]);
 echo $form->errors();
 echo $form->input($this->data('_file_input_name'), 'file', ['class' => 'js-new-avatar-pool-upload hidden']);
+echo $form->input($this->data('_input_name'), 'text', ['class' => 'js-new-avatar-pool-name hidden', 'value' => '']);
 echo $form->close();
 ?>
       <div id="avatarstock" class="input-wrap">
@@ -47,9 +48,9 @@ echo $form->close();
                          'id' => $avatarDeleteLabelFor
                      ];
                      echo $form->input('avatar_delete[]', 'checkbox', $attr); ?>
-                     <label class="avatar-wrap" for="<?php echo $avatarDeleteLabelFor; ?>">
+                     <label class="avatar-wrap" for="<?php echo $avatarDeleteLabelFor; ?>" title="<?php echo Gdn_Format::plainText($avatar['Name']); ?>">
                         <div class="image-wrap">
-                           <img src="<?php echo $avatar['_path_crop']; ?>" alt="" <?php echo $style_dimensions; ?> class="label-selector-image"/>
+                           <img src="<?php echo $avatar['_path_crop']; ?>" <?php echo $style_dimensions; ?> class="label-selector-image"/>
                            <div class="overlay">
                               <div class="buttons">
                                  <a class="btn btn-link"><?php echo t('Select'); ?></a>
@@ -65,6 +66,17 @@ echo $form->close();
          echo $form->close(); ?>
       </div>
 <div class="buttons form-footer">
+   <div class="flex flex-wrap js-new-avatar-pool-name-group hidden">
+      <div class="label-wrap">
+         <div class="js-new-avatar-pool-filename padded-bottom"></div>
+         <label for="Form_Label"><?php echo t('Name the Avatar'); ?>:</label>
+         <div class="info"><b>Optional</b>. The name populates the title tag where users choose avatars. </div>
+      </div>
+      <?php echo $form->input('Upload_Name', 'text', ['class' => 'form-control padded-bottom']); ?>
+      <div class="btn btn-primary flex-grow js-new-avatar-pool-save">
+         <?php echo(t('Upload & Save')); ?>
+      </div>
+   </div>
    <div class="btn btn-primary delete-selected-avatars padded-left"><?php echo(t('Delete Selected')); ?></div>
    <div class="btn btn-primary js-new-avatar-pool flex-grow"><?php echo t('Upload New Avatar'); ?></div>
 </div>

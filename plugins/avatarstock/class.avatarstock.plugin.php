@@ -60,6 +60,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
         Gdn::Structure()
             ->Table($this->table_name)
             ->PrimaryKey('AvatarID')
+            ->Column('Name', 'varchar(100)', true)
             ->Column('OriginalFileName', 'varchar(255)', true)
             ->Column('Path', 'varchar(255)', false, 'index')
             ->Column('InsertUserID', 'int', true)
@@ -313,11 +314,13 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
             // Generate correct save path for db
             $path_thumb_db = sprintf($thumb_parsed['SaveFormat'], $path_thumb);
+            $post = Gdn::request()->post();
 
             // Insert into DB
             $avatarstock_model = new Gdn_Model('AvatarStock');
             $avatar_id = $avatarstock_model->Save(
                 array(
+                    'Name' => val('name', $post, NULL),
                     'OriginalFileName' => $original_filename,
                     'Path' => $path_thumb_db,
                     'InsertUserID' => Gdn::Session()->UserID,
@@ -547,6 +550,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
         $sender->addCssFile('avatarstock.css', 'plugins/avatarstock');
         $sender->addJsFile('avatarstock.js', 'plugins/avatarstock');
         $sender->setData('_file_input_name', $this->file_input_name);
+        $sender->setData('_input_name', 'name');
         $stock_avatar_payload = $this->getStockAvatarPayload();
         $sender->setData('_payload', $stock_avatar_payload);
         $sender->setData('AvatarSelectionOptions', $sender->fetchView('settings', '', 'plugins/avatarstock'));
