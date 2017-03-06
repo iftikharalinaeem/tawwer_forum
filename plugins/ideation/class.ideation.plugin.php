@@ -1,17 +1,15 @@
 <?php if (!defined('APPLICATION')) exit;
 
 $PluginInfo['ideation'] = [
-    'Name'            => "Ideation",
-    'Description'     => "Let users vote on discussions in a Idea category",
-    'Version'         => '1.0.1',
-    'RequiredPlugins' => array(
-        'Reactions'   => '1.4.0',
-        'Tagging'     => '1.8.12'
-    ),
-    'Author'          => "Becky Van Bussel",
-    'AuthorEmail'     => 'becky@vanillaforums.com',
-    'License'         => 'Proprietary',
-    'Icon'            => 'ideation.png'
+    'Name'                  => 'Ideation',
+    'Description'           => 'Let users vote on discussions in a Idea category',
+    'Version'               => '1.1',
+    'RequiredApplications'  => ['Vanilla' => '2.4.2'],
+    'RequiredPlugins'       => ['Reactions'   => '1.4.0'],
+    'Author'                => 'Becky Van Bussel',
+    'AuthorEmail'           => 'becky@vanillaforums.com',
+    'License'               => 'Proprietary',
+    'Icon'                  => 'ideation.png'
 ];
 
 /**
@@ -554,12 +552,10 @@ EOT
     public function discussionController_render_before($sender) {
         $discussion = val('Discussion', $sender);
 
-        if ($this->isIdea($discussion)) {
-            // Don't display tags on a idea discussion.
-            saveToConfig('Plugins.Tagging.DisableInline', true, true);
-        } else {
-            // Display tags otherwise and return.
-            saveToConfig('Plugins.Tagging.DisableInline', false, true);
+        $isAnIdea = $this->isIdea($discussion);
+        // Don't display tags on a idea discussion.
+        saveToConfig('Vanilla.Tagging.DisableInline', $isAnIdea, true);
+        if (!$isAnIdea) {
             return;
         }
 

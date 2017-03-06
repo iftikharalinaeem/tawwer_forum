@@ -178,7 +178,7 @@ jQuery(document).ready(function($) {
         tags = [];
     }
 
-    $tags.tokenInput(gdn.url('/plugin/tagsearch?id=0&type=0'), {
+    $tags.tokenInput(gdn.url('/tags/search?id=0&type=0'), {
       hintText: gdn.definition("TagHint", "Start to type..."),
 //      tokenValue: 'name',
       searchingText: '',
