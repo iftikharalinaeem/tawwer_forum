@@ -12,6 +12,12 @@ Facilitate the capture of user access and usage data, interpret it and display t
 4. Rationing widgets by cloud plan level.
 5. Toolbar for drilling down by date range, interval (monthly/daily/hourly), and meta data (e.g. category or role).
 
+## Plan Levels
+
+There is a config named `VanillaAnalytics.Level` to determine which widgets are available to a customer. The default is `basic` if this isn't set. Other valid values are, in order of ascendance: `corporate`, `enterprise`, & `vip`. All tiers are a superset of their widgets plus all the tiers below.
+
+As of spring 2017, half of the widgets are available at `basic` (in code: `SMALL_WIDGET_RANK`) and all widgets are available at the `corporate` (`MEDIUM_WIDGET_RANK`) level. The `enterprise` and `vip` both evaluate to the same tier (`LARGE_WIDGET_RANK`) and have no widgets assigned yet.
+
 # Glossary
 
 1. **Page view**: Opening a single page / one click on a site.
