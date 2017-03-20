@@ -934,22 +934,3 @@ function validate_slug($value) {
     }
     return preg_match('`^[a-z0-9-]+$`', $value);
 }
-
-
-/**
- *
- *
- * Filter down categories to current node or hub.
- *
- * @param DiscussionsController $sender Sending controller instance.
- * @param array $args Event arguments.
- */
-public function sitemapsPlugin_siteMapCategories_handler($sender, $args) {
-    if (!SubCommunityModel::getCurrent()) {
-        return;
-    }
-
-    $subcommunityCategoryIDs = $this->getCategoryIDs();
-
-    $args['Categories'] = array_intersect_key($args['Categories'], array_flip($subcommunityCategoryIDs));
-}

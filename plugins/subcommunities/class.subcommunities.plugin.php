@@ -642,6 +642,26 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         return $targetSubcommunity ?: SubcommunityModel::getDefaultSite();
     }
+
+
+
+    /**
+     *
+     *
+     * Filter down categories for SiteMapPlugin
+     *
+     * @param SiteMapPlugin $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function sitemapsPlugin_siteMapCategories_handler($sender, $args) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
+        $args['Categories'] = array_intersect_key($args['Categories'], array_flip($this->getCategoryIDs()));
+    }
+
+
 }
 
 if (!function_exists('commentUrl')) {
