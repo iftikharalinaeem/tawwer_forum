@@ -265,7 +265,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             return;
         }
 
-        $sender->setCategoryIDs($this->getCategoryIDs());
+        $sender->setCategoryIDs( $sender->getCategoryIDs() );
     }
 
     /**
@@ -657,11 +657,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         if (!SubCommunityModel::getCurrent()) {
             return;
         }
-
         $args['Categories'] = array_intersect_key($args['Categories'], array_flip($this->getCategoryIDs()));
     }
-
-
 }
 
 if (!function_exists('commentUrl')) {
