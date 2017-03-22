@@ -4,21 +4,21 @@ Gdn_Theme::assetBegin('Help');
 WriteRevisions($this, 'css');
 Gdn_Theme::assetEnd();
 
-$bloglink = sprintf(t('Check out our %s'), anchor('Vanilla Forums Theming Guide', 'https://blog.vanillaforums.com/help/vanilla-custom-themes/', '', array('target' => '_blank')));
+$bloglink = sprintf(t('Check out our %s'), anchor('Vanilla Forums Theming Guide', 'https://blog.vanillaforums.com/help/vanilla-custom-themes/', '', ['target' => '_blank']));
 
 $links .= '<p>'.t('If you are new to HTML and/or CSS, here are some tutorials to get you started:').'</p>';
-$links .= '<ul><li>'.anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', array('target' => '_blank')).'</li>';
-$links .= '<li>'.anchor("HTML Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', array('target' => '_blank')).'</li></ul>';
+$links .= '<ul><li>'.anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', ['target' => '_blank']).'</li>';
+$links .= '<li>'.anchor("HTML Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', ['target' => '_blank']).'</li></ul>';
 
 helpAsset(t('Need More Help?'), $bloglink);
 helpAsset(t('Even More Help?'), $links);
 
-echo $this->Form->Open();
-$CurrentTab = $this->Form->GetFormValue('CurrentTab', GetValue(1, $this->RequestArgs, 'html'));
-if (!in_array($CurrentTab, array('html', 'css'))) {
+echo $this->Form->open();
+$CurrentTab = $this->Form->getFormValue('CurrentTab', val(1, $this->RequestArgs, 'html'));
+if (!in_array($CurrentTab, ['html', 'css'])) {
    $CurrentTab = 'html';
 }
-$this->Form->AddHidden('CurrentTab', $CurrentTab);
+$this->Form->addHidden('CurrentTab', $CurrentTab);
 
 $cssClass = 'header-menu-item js-custom-html';
 
@@ -43,20 +43,20 @@ $cssAttr = [
       <div <?php echo attribute($htmlAttr); ?>><?php echo t('Edit HTML'); ?></div>
       <div <?php echo attribute($cssAttr); ?>><?php echo t('Edit CSS'); ?></div>
    </div>
-   <?php echo $this->Form->Errors(); ?>
+   <?php echo $this->Form->errors(); ?>
    <div class="toolbar">
       <div class="text-input-button toolbar-main">
          <?php
-         echo wrap($this->Form->Label('Revision Label:', 'Label'), 'div', ['class' => 'label-wrap']);
-         echo $this->Form->TextBox('Label');
-         if (C('Plugins.CustomTheme.Enabled')) {
-            echo $this->Form->Button('Apply', array('class' => 'btn btn-primary btn-apply'));
+         echo wrap($this->Form->label('Revision Label:', 'Label'), 'div', ['class' => 'label-wrap']);
+         echo $this->Form->textBox('Label');
+         if (c('Plugins.CustomTheme.Enabled')) {
+            echo $this->Form->button('Apply', ['class' => 'btn btn-primary btn-apply']);
          } else {
             echo anchor('Apply', 'settings/customthemeupgrade/', 'btn btn-primary js-modal');
          } ?>
       </div>
       <div class="buttons">
-         <?php echo $this->Form->Button('Preview', array('class' => 'btn btn-secondary btn-preview')); ?>
+         <?php echo $this->Form->button('Preview', ['class' => 'btn btn-secondary btn-preview']); ?>
       </div>
    </div>
    <section id="customCssContainer" class="padded <?php echo $CurrentTab == 'html' ? ' hidden' : ''; ?>">
@@ -65,7 +65,7 @@ $cssAttr = [
          <li>
             <div class="CustomThemeForm">
                <?php
-               echo $this->Form->TextBox('CustomCSS', array('MultiLine' => TRUE, 'class' => 'TextBox CustomThemeBox Autogrow'));
+               echo $this->Form->textBox('CustomCSS', ['MultiLine' => true, 'class' => 'TextBox CustomThemeBox Autogrow']);
                ?>
             </div>
          </li>
@@ -77,19 +77,19 @@ $cssAttr = [
          <li>
             <div class="CustomThemeForm">
                <?php
-               echo $this->Form->TextBox('CustomHtml', array('MultiLine' => TRUE, 'class' => 'TextBox CustomThemeBox Autogrow'));
+               echo $this->Form->textBox('CustomHtml', ['MultiLine' => true, 'class' => 'TextBox CustomThemeBox Autogrow']);
                ?>
          </li>
       </ul>
    </section>
-<?php WriteRevisions($this, 'html'); ?>
+<?php writeRevisions($this, 'html'); ?>
 <?php
-echo $this->Form->Close();
+echo $this->Form->close();
 
-function WriteRevisions($Sender, $Tab = '') {
-   $Data = GetValue('RevisionData', $Sender->Data);
-   $LiveRevisionID = GetValue('LiveRevisionID', $Sender->Data);
-   if (!$Data || $Data->NumRows() == 0)
+function writeRevisions($Sender, $Tab = '') {
+   $Data = val('RevisionData', $Sender->Data);
+   $LiveRevisionID = val('LiveRevisionID', $Sender->Data);
+   if (!$Data || $Data->numRows() == 0)
       return;
    ?>
    <section class="control-panel">
@@ -97,9 +97,9 @@ function WriteRevisions($Sender, $Tab = '') {
       <div class="control-panel-body">
          <?php
          $LastDay = '';
-         foreach ($Data->Result() as $Row) { ?>
+         foreach ($Data->result() as $Row) { ?>
             <?php
-            $Day = date('M jS, Y', Gdn_Format::ToTimeStamp($Row->DateInserted));
+            $Day = date('M jS, Y', Gdn_Format::toTimeStamp($Row->DateInserted));
             if ($Day != $LastDay) {
                echo "<div class=\"NewDay control-panel-subheading\">$Day</div>";
                $LastDay = $Day;
@@ -108,7 +108,7 @@ function WriteRevisions($Sender, $Tab = '') {
             <ul class="control-panel-list">
                <li class="control-panel-list-item <?php echo 'Revision'.($Row->RevisionID == $LiveRevisionID ? ' LiveRevision' : ''); ?>">
                   <?php
-                  echo anchor('&rarr; '.date("g:ia", Gdn_Format::ToTimeStamp($Row->DateInserted)), 'settings/customtheme/revision/'.$Tab.'/'.$Row->RevisionID);
+                  echo anchor('&rarr; '.date("g:ia", Gdn_Format::toTimeStamp($Row->DateInserted)), 'settings/customtheme/revision/'.$Tab.'/'.$Row->RevisionID);
                   echo ($Row->Label ? ' <span class="italic truncate control-panel-list-item-label">'.htmlspecialchars($Row->Label).'</span> ' : '');
                   if ($Row->Live == 1) {
                      echo dashboardSymbol('star-empty', 'icon-text', ['alt' => t('Live')]);

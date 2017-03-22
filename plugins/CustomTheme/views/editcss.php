@@ -62,23 +62,23 @@ jQuery(document).ready(function($) {
 </script>
 <div id="sidebar">
     <div id="dragbar"></div>
-    <label class="heading">Edit CSS for <?php echo Wrap(str_replace('http://', '', Url('/', TRUE)), 'strong'); ?>:</label>
+    <label class="heading">Edit CSS for <?php echo wrap(str_replace('http://', '', url('/', true)), 'strong'); ?>:</label>
     <?php
-    echo $this->Form->Open();
-    echo $this->Form->TextBox('CSS', array('MultiLine' => TRUE, 'class' => 'TextBox'));
+    echo $this->Form->open();
+    echo $this->Form->textBox('CSS', ['MultiLine' => true, 'class' => 'TextBox']);
     ?>
     <div id="controls">
        <label for="livepreview"><input type="checkbox" name="livepreview" id="livepreview" checked="checked"> Live Preview Changes</label>
        <div id="buttons">
           <?php
-          echo $this->Form->Button('Save');
-          echo $this->Form->Button('Apply');
+          echo $this->Form->button('Save');
+          echo $this->Form->button('Apply');
           ?>
        </div>
     </div>
-    <?php echo $this->Form->Close(); ?>
+    <?php echo $this->Form->close(); ?>
 </div>
 <div id="framecover"></div>
 <div id="main">
-   <iframe name="vframe" id="vframe" src="<?php echo Url('/'); ?>" scrolling="auto" frameborder="no" border="0" width="100%" height="100%"></iframe>
+   <iframe name="vframe" id="vframe" src="<?php echo url('/'); ?>" scrolling="auto" frameborder="no" border="0" width="100%" height="100%"></iframe>
 </div>
