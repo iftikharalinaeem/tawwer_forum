@@ -4,18 +4,18 @@ Gdn_Theme::assetBegin('Help');
 WriteRevisions($this, 'css');
 Gdn_Theme::assetEnd();
 
-$bloglink = sprintf(t('Check out our %s'), anchor('Vanilla Forums Theming Guide', 'https://blog.vanillaforums.com/help/vanilla-custom-themes/', '', array('target' => '_blank')));
+$bloglink = sprintf(t('Check out our %s'), anchor('Vanilla Forums Theming Guide', 'https://blog.vanillaforums.com/help/vanilla-custom-themes/', '', ['target' => '_blank']));
 
 $links .= '<p>'.t('If you are new to HTML and/or CSS, here are some tutorials to get you started:').'</p>';
-$links .= '<ul><li>'.anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', array('target' => '_blank')).'</li>';
-$links .= '<li>'.anchor("HTML Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', array('target' => '_blank')).'</li></ul>';
+$links .= '<ul><li>'.anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', ['target' => '_blank']).'</li>';
+$links .= '<li>'.anchor("HTML Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', ['target' => '_blank']).'</li></ul>';
 
 helpAsset(t('Need More Help?'), $bloglink);
 helpAsset(t('Even More Help?'), $links);
 
 echo $this->Form->open();
 $CurrentTab = $this->Form->getFormValue('CurrentTab', val(1, $this->RequestArgs, 'html'));
-if (!in_array($CurrentTab, array('html', 'css'))) {
+if (!in_array($CurrentTab, ['html', 'css'])) {
    $CurrentTab = 'html';
 }
 $this->Form->addHidden('CurrentTab', $CurrentTab);
@@ -50,13 +50,13 @@ $cssAttr = [
          echo wrap($this->Form->label('Revision Label:', 'Label'), 'div', ['class' => 'label-wrap']);
          echo $this->Form->textBox('Label');
          if (c('Plugins.CustomTheme.Enabled')) {
-            echo $this->Form->button('Apply', array('class' => 'btn btn-primary btn-apply'));
+            echo $this->Form->button('Apply', ['class' => 'btn btn-primary btn-apply']);
          } else {
             echo anchor('Apply', 'settings/customthemeupgrade/', 'btn btn-primary js-modal');
          } ?>
       </div>
       <div class="buttons">
-         <?php echo $this->Form->button('Preview', array('class' => 'btn btn-secondary btn-preview')); ?>
+         <?php echo $this->Form->button('Preview', ['class' => 'btn btn-secondary btn-preview']); ?>
       </div>
    </div>
    <section id="customCssContainer" class="padded <?php echo $CurrentTab == 'html' ? ' hidden' : ''; ?>">
@@ -65,7 +65,7 @@ $cssAttr = [
          <li>
             <div class="CustomThemeForm">
                <?php
-               echo $this->Form->textBox('CustomCSS', array('MultiLine' => true, 'class' => 'TextBox CustomThemeBox Autogrow'));
+               echo $this->Form->textBox('CustomCSS', ['MultiLine' => true, 'class' => 'TextBox CustomThemeBox Autogrow']);
                ?>
             </div>
          </li>
@@ -77,7 +77,7 @@ $cssAttr = [
          <li>
             <div class="CustomThemeForm">
                <?php
-               echo $this->Form->textBox('CustomHtml', array('MultiLine' => true, 'class' => 'TextBox CustomThemeBox Autogrow'));
+               echo $this->Form->textBox('CustomHtml', ['MultiLine' => true, 'class' => 'TextBox CustomThemeBox Autogrow']);
                ?>
          </li>
       </ul>
