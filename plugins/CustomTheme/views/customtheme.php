@@ -65,7 +65,7 @@ $cssAttr = [
          <li>
             <div class="CustomThemeForm">
                <?php
-               echo $this->Form->textBox('CustomCSS', array('MultiLine' => TRUE, 'class' => 'TextBox CustomThemeBox Autogrow'));
+               echo $this->Form->textBox('CustomCSS', array('MultiLine' => true, 'class' => 'TextBox CustomThemeBox Autogrow'));
                ?>
             </div>
          </li>
@@ -77,7 +77,7 @@ $cssAttr = [
          <li>
             <div class="CustomThemeForm">
                <?php
-               echo $this->Form->textBox('CustomHtml', array('MultiLine' => TRUE, 'class' => 'TextBox CustomThemeBox Autogrow'));
+               echo $this->Form->textBox('CustomHtml', array('MultiLine' => true, 'class' => 'TextBox CustomThemeBox Autogrow'));
                ?>
          </li>
       </ul>

@@ -62,10 +62,10 @@ jQuery(document).ready(function($) {
 </script>
 <div id="sidebar">
     <div id="dragbar"></div>
-    <label class="heading">Edit CSS for <?php echo wrap(str_replace('http://', '', url('/', TRUE)), 'strong'); ?>:</label>
+    <label class="heading">Edit CSS for <?php echo wrap(str_replace('http://', '', url('/', true)), 'strong'); ?>:</label>
     <?php
     echo $this->Form->open();
-    echo $this->Form->textBox('CSS', array('MultiLine' => TRUE, 'class' => 'TextBox'));
+    echo $this->Form->textBox('CSS', array('MultiLine' => true, 'class' => 'TextBox'));
     ?>
     <div id="controls">
        <label for="livepreview"><input type="checkbox" name="livepreview" id="livepreview" checked="checked"> Live Preview Changes</label>
