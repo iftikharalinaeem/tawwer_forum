@@ -14,7 +14,7 @@ helpAsset(t('Need More Help?'), $bloglink);
 helpAsset(t('Even More Help?'), $links);
 
 echo $this->Form->open();
-$CurrentTab = $this->Form->getFormValue('CurrentTab', getValue(1, $this->RequestArgs, 'html'));
+$CurrentTab = $this->Form->getFormValue('CurrentTab', val(1, $this->RequestArgs, 'html'));
 if (!in_array($CurrentTab, array('html', 'css'))) {
    $CurrentTab = 'html';
 }
@@ -87,8 +87,8 @@ $cssAttr = [
 echo $this->Form->close();
 
 function writeRevisions($Sender, $Tab = '') {
-   $Data = getValue('RevisionData', $Sender->Data);
-   $LiveRevisionID = getValue('LiveRevisionID', $Sender->Data);
+   $Data = val('RevisionData', $Sender->Data);
+   $LiveRevisionID = val('LiveRevisionID', $Sender->Data);
    if (!$Data || $Data->numRows() == 0)
       return;
    ?>
