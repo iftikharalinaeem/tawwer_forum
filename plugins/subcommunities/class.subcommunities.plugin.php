@@ -265,7 +265,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             return;
         }
 
-        $sender->setCategoryIDs( $sender->getCategoryIDs() );
+        $sender->setCategoryIDs($this->getCategoryIDs());
     }
 
     /**
