@@ -9,5 +9,5 @@ $ThemeInfo['triple-a'] = [
   'AuthorEmail' => 'hi@funktionel.co',
   'AuthorUrl'   => 'https://funktionel.co',
   'License'     => 'GPLv2',
-  'Hidden'      => false
+  'Hidden'      => false,
 ];

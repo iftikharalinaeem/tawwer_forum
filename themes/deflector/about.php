@@ -9,5 +9,5 @@ $ThemeInfo['deflector'] = array(
     'AuthorEmail' => 'kasper@vanillaforums.com',
     'AuthorUrl'   => 'https://github.com/kasperisager',
     'License'     => 'GPLv3',
-    'Hidden'      => false
+    'Hidden'      => false,
 );

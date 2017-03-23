@@ -18,5 +18,5 @@ $ThemeInfo['BasicDark'] = array(
    'Author'      => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
    'AuthorUrl'   => 'http://timgunter.ca',
-   'Hidden'      => false
+   'Hidden'      => false,
 );

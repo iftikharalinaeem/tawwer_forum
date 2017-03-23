@@ -8,5 +8,5 @@ $ThemeInfo['vanillabulletin'] = array(
    'AuthorEmail'  => 'todd@vanillaforums.com',
    'AuthorUrl'    => 'http://vanillaforums.com',
    'Site'         => 'iphonedevsdk.vanillaforums.com',
-   'Hidden'       => false
+   'Hidden'       => false,
 );
