@@ -8,5 +8,6 @@ $ThemeInfo['triple-a'] = [
   'Author'      => "Funktionél",
   'AuthorEmail' => 'hi@funktionel.co',
   'AuthorUrl'   => 'https://funktionel.co',
-  'License'     => 'GPLv2'
+  'License'     => 'GPLv2',
+  'Hidden'      => false
 ];

@@ -7,5 +7,6 @@ $ThemeInfo['vanillabulletin'] = array(
    'Author'       => "Todd Burry (and Mark O'Sullivan)",
    'AuthorEmail'  => 'todd@vanillaforums.com',
    'AuthorUrl'    => 'http://vanillaforums.com',
-   'Site'         => 'iphonedevsdk.vanillaforums.com'
+   'Site'         => 'iphonedevsdk.vanillaforums.com',
+   'Hidden'       => false
 );
