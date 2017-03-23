@@ -12,13 +12,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['Bootstrap'] = array(
-   'Name' => 'Bootstrap',
+   'Name'        => 'Bootstrap',
    'Description' => "A theme based on the popular Twitter Bootstrap framework.",
-   'Version' => '1.0.13',
-   'Author' => "Todd Burry",
+   'Version'     => '1.0.13',
+   'Author'      => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
-   'Options' => array(
+   'AuthorUrl'   => 'http://vanillaforums.org/profile/todd',
+   'Hidden'      => false,
+   'Options'     => array(
       'Description' => 'This theme has an alternative colour scheme.',
       'Styles' => array(
          'Default' => '%s_default',

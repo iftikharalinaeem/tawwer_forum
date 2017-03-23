@@ -9,8 +9,8 @@ $ThemeInfo['cornerstone'] = array(
     'AuthorEmail' => 'kasper@vanillaforums.com',
     'AuthorUrl'   => 'https://github.com/kasperisager',
     'License'     => 'GPLv3',
-
-    'Options' => array(
+    'Hidden'      => false,
+    'Options'     => array(
         'Styles' => array(
             'Default' => '%s_default',
             'Navy' => '%s_navy',

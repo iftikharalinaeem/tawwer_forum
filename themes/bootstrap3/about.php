@@ -10,8 +10,8 @@ $ThemeInfo['bootstrap3'] = array(
   'AuthorUrl'   => 'https://github.com/kasperisager',
   'License'     => 'MIT',
   'RequiredApplications' => array('Vanilla' => '2.1.x'),
-
-  'Options' => array(
+  'Hidden'      => false,
+  'Options'     => array(
     'Styles' => array(
       'Default'   => '%s_default',
       'Bootstrap' => '%s_bootstrap',
