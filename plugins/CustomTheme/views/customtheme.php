@@ -1,5 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
 
+$htmlEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
+$cssEnabled = c('Plugins.CustomTheme.CSS.Enabled', false);
+
+// For retrocompatibility with old config
+$oldPluginEnabled = c('Plugins.CustomTheme.Enabled', false); // old config
+if ($oldPluginEnabled) {
+   $htmlEnabled = true;
+   $cssEnabled = true;
+}
+
+
 Gdn_Theme::assetBegin('Help');
 WriteRevisions($this, 'css');
 Gdn_Theme::assetEnd();
@@ -14,10 +25,21 @@ helpAsset(t('Need More Help?'), $bloglink);
 helpAsset(t('Even More Help?'), $links);
 
 echo $this->Form->open();
-$CurrentTab = $this->Form->getFormValue('CurrentTab', val(1, $this->RequestArgs, 'html'));
-if (!in_array($CurrentTab, ['html', 'css'])) {
+
+
+if($htmlEnabled && $cssEnabled) {
+   $CurrentTab = $this->Form->getFormValue('CurrentTab', val(1, $this->RequestArgs, 'html'));
+
+   if (!in_array($CurrentTab, ['html', 'css'])) {
+      $CurrentTab = 'html';
+   }
+
+} else if($htmlEnabled) {
    $CurrentTab = 'html';
+} else if($cssEnabled) {
+   $CurrentTab = 'css';
 }
+
 $this->Form->addHidden('CurrentTab', $CurrentTab);
 
 $cssClass = 'header-menu-item js-custom-html';
@@ -43,24 +65,15 @@ $cssAttr = [
       <div <?php echo attribute($htmlAttr); ?>><?php echo t('Edit HTML'); ?></div>
       <div <?php echo attribute($cssAttr); ?>><?php echo t('Edit CSS'); ?></div>
    </div>
-   <?php echo $this->Form->errors(); ?>
+   <?php
+      echo $this->Form->errors();
+      echo $this->Form->HiddenInputs();
+   ?>
    <div class="toolbar">
       <div class="text-input-button toolbar-main">
          <?php
          echo wrap($this->Form->label('Revision Label:', 'Label'), 'div', ['class' => 'label-wrap']);
          echo $this->Form->textBox('Label');
-
-
-         $htmlEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
-         $cssEnabled = c('Plugins.CustomTheme.CSS.Enabled', false);
-
-         // For retrocompatibility with old config
-         $oldPluginEnabled = c('Plugins.CustomTheme.Enabled', false); // old config
-         if ($oldPluginEnabled) {
-            $htmlEnabled = true;
-            $cssEnabled = true;
-         }
-
 
 
          if ($htmlEnabled || $cssEnabled) {
