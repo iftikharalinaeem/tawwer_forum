@@ -723,6 +723,17 @@ Here are some things you should know before you begin:
                 ->column('DateInserted', 'datetime')
                 ->set();
 
+        // Check if old config is used and replace with new variables if set
+        if (c('Plugins.CustomTheme.Enabled', false)) {
+            removeFromConfig('Plugins.CustomTheme.Enabled');
+            saveToConfig('Plugins.CustomTheme.CSS.Enabled', true);
+            saveToConfig('Plugins.CustomTheme.HTML.Enabled', true);
+        }
+
+        $cssEnabled = c('Plugins.CustomTheme.CSS.Enabled', false);
+        $cssEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
+
+
         // Make sure the theme revision exists in the database.
         $revisionID = c('Plugins.CustomTheme.LiveRevisionID');
         if ($revisionID) {

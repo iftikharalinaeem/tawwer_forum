@@ -49,7 +49,21 @@ $cssAttr = [
          <?php
          echo wrap($this->Form->label('Revision Label:', 'Label'), 'div', ['class' => 'label-wrap']);
          echo $this->Form->textBox('Label');
-         if (c('Plugins.CustomTheme.Enabled')) {
+
+
+         $htmlEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
+         $cssEnabled = c('Plugins.CustomTheme.CSS.Enabled', false);
+
+         // For retrocompatibility with old config
+         $oldPluginEnabled = c('Plugins.CustomTheme.Enabled', false); // old config
+         if ($oldPluginEnabled) {
+            $htmlEnabled = true;
+            $cssEnabled = true;
+         }
+
+
+
+         if ($htmlEnabled || $cssEnabled) {
             echo $this->Form->button('Apply', ['class' => 'btn btn-primary btn-apply']);
          } else {
             echo anchor('Apply', 'settings/customthemeupgrade/', 'btn btn-primary js-modal');
