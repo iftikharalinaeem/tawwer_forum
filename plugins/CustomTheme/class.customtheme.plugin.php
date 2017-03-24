@@ -6,7 +6,7 @@
 $PluginInfo['CustomTheme'] = [
     'Name' => 'Custom Theme',
     'Description' => 'Allows administrators to customize the CSS & master HTML template of the currently enabled theme.',
-    'Version' => '2.2.2',
+    'Version' => '2.3.0',
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
