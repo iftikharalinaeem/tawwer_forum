@@ -67,15 +67,13 @@ $cssAttr = [
    </div>
    <?php
       echo $this->Form->errors();
-      echo $this->Form->HiddenInputs();
+
    ?>
    <div class="toolbar">
       <div class="text-input-button toolbar-main">
          <?php
          echo wrap($this->Form->label('Revision Label:', 'Label'), 'div', ['class' => 'label-wrap']);
          echo $this->Form->textBox('Label');
-
-
          if ($htmlEnabled || $cssEnabled) {
             echo $this->Form->button('Apply', ['class' => 'btn btn-primary btn-apply']);
          } else {
