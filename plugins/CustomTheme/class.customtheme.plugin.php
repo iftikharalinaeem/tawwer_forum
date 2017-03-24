@@ -770,10 +770,13 @@ class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
      * @return void
      */
     protected function fetch($name, &$source, &$mtime) {
+        $htmlEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
+        $oldPluginEnabled = c('Plugins.CustomTheme.Enabled', false); // old config
+
         // Do database call here to fetch your template, populating $tpl_source with actual template contents.
         $revisionID = CustomThemePlugin::getRevisionFromFileName($name);
         $data = Gdn::sql()->select('Html,DateInserted')->from('CustomThemeRevision')->where('RevisionID', $revisionID)->get()->firstRow();
-        if ($data) {
+        if ($data && ($htmlEnabled || $oldPluginEnabled)) {
             $dir = CustomThemePlugin::getThemeRoot('/views');
             if ($dir) {
                 $this->smarty->template_dir = $dir;
