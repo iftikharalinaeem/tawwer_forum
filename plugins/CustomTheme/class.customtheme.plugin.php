@@ -526,7 +526,7 @@ Here are some things you should know before you begin:
             } elseif ($assetError) {
                 $sender->Form->addError('There was a templating error in your HTML customizations. You have removed one or more required templating tags: {asset name="Head"}, {asset name="Content"}, {asset name="Foot"}, and {event name="AfterBody"}.');
             } else {
-                $sender->StatusMessage = "Your changes have been applied.";
+                $sender->InformMessage = "Your changes have been applied.";
             }
         }
         $sender->setData('LiveRevisionID', $liveRevisionID);
