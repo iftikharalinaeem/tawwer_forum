@@ -60,8 +60,8 @@ class TrustedContentPlugin extends Gdn_Plugin {
                 }
             }
 
-            // If the host of the image source is a trusted domain and not from the CDN, strip this image
-            if (!in_array(val('host', $imageUrl), c('Garden.HTML.FilterContentSources'))) {
+            // If the host of the image source is a trusted domain and not from the CDN, strip this image.
+            if (!in_array(val('host', $imageUrl), explodeTrim("\n", c('Garden.TrustedContentSources')))) {
                 $imageName = trim(substr(val('path', $imageUrl), strrpos(val('path', $imageUrl), '/')), '/');
                 $filtered = str_replace($image[0], '<a href="'.$image[1].'">'.$imageName.'</a>', $filtered);
             }
