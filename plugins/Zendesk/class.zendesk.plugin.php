@@ -611,11 +611,12 @@ class ZendeskPlugin extends Gdn_Plugin {
             'client_secret' => C('Plugins.Zendesk.Secret'),
             'code' => $Code,
             'redirect_uri' => $RedirectUri,
+            'scope' => 'read'
         );
         $Proxy = new ProxyRequest();
         $Response = $Proxy->Request(
             array(
-                'URL' => C('Plugins.Zendesk.Url') . '/oauth/tokens',
+                'URL' => C('Plugins.Zendesk.Url') . '/oauth/tokens.json',
                 'Method' => 'POST',
             ),
             $Post
@@ -687,7 +688,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         Trace($Sf);
         $Profile = GetValueR('User.Attributes.' . self::PROVIDER_KEY . '.Profile', $Args);
         $Sender->Data["Connections"][self::PROVIDER_KEY] = array(
-            'Icon' => $this->GetWebResource('zendesk.svg', '/'),
+            'Icon' => $this->GetWebResource('zendesk.png', '/'),
             'Name' => self::PROVIDER_KEY,
             'ProviderKey' => self::PROVIDER_KEY,
             'ConnectUrl' => self::authorizeUri(self::profileConnectUrl()),
