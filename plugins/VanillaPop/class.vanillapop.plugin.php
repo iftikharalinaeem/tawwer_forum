@@ -901,7 +901,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $Comment = $CommentModel->GetID($ID, DATASET_TYPE_ARRAY);
 
                     if ($Comment) {
-                        $Comment['Body'] = Gdn_Format::PlainText($Comment['Body'], $Comment['Format']);
+                        $Comment['Body'] = Gdn_Format::plainText($Comment['Body'], $Comment['Format'], true);
                         $Comment['Url'] = ExternalUrl(GetValue('Route', $Args));
                         $Comment = array($Comment);
                         Gdn::UserModel()->JoinUsers($Comment, array('InsertUserID', 'UpdateUserID'));
