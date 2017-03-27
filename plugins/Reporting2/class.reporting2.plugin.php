@@ -221,8 +221,6 @@ class Reporting2Plugin extends Gdn_Plugin {
         }
         /** @var DropdownModule $dropdown */
         $category = ReportModel::getReportCategory();
-        $reportCount = ReportModel::getUnreadReportCount();
-        $reportModifiers = $reportCount > 0 ? ['badge' => $reportCount] : [];
         $reportModifiers['listItemCssClasses'] = ['ReportCategory', 'link-report-category'];
         $dropdown = $args['Dropdown'];
         $dropdown->addLink(htmlspecialchars(t($category['Name'])), categoryUrl($category), 'moderation.report-category', '', [], $reportModifiers);
@@ -233,7 +231,7 @@ class Reporting2Plugin extends Gdn_Plugin {
      */
     public function meModule_beforeFlyoutMenu_handler($Sender, $Args) {
         if (checkPermission('Garden.Moderation.Manage')) {
-            $Args['DashboardCount'] = $Args['DashboardCount'] + ReportModel::getUnreadReportCount();
+            $Args['DashboardCount'] = $Args['DashboardCount'];
         }
     }
 
