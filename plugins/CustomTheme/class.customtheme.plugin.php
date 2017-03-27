@@ -317,12 +317,19 @@ class CustomThemePlugin extends Gdn_Plugin {
         $sender->MasterView = 'none';
         $fileToLoad = $filename;
         $revisionID = CustomThemePlugin::getRevisionFromFileName($fileToLoad);
-        $themeData = Gdn::sql()
-                ->select()
-                ->from('CustomThemeRevision')
-                ->where('RevisionID', $revisionID)
-                ->get()
-                ->firstRow();
+
+
+        $cssEnabled = c('Plugins.CustomTheme.CSS.Enabled', false);
+        $themeData = false;
+
+        if ($cssEnabled) {
+            $themeData = Gdn::sql()
+                    ->select()
+                    ->from('CustomThemeRevision')
+                    ->where('RevisionID', $revisionID)
+                    ->get()
+                    ->firstRow();
+        }
 
         if ($themeData) {
             echo $themeData->CSS;
@@ -348,6 +355,26 @@ class CustomThemePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Fetch content of default master
+     * @return String
+     */
+    private function customTheme_getDefaultMasterView() {
+        $htmlContents = '';
+        $themeKey = self::getCurrentThemeKey();
+        $folder = paths(PATH_THEMES, $themeKey);
+        $themeMasterView = paths($folder, 'views/default.master.tpl');
+        if (file_exists($themeMasterView)) {
+            $htmlContents = file_get_contents($themeMasterView);
+        } else {
+            $htmlContents = file_get_contents(PATH_APPLICATIONS . '/dashboard/views/default.master.tpl');
+        }
+
+        return $htmlContents;
+    }
+
+
+
+    /**
      * Settings page.
      *
      * @param Gdn_Controller $sender
@@ -359,17 +386,14 @@ class CustomThemePlugin extends Gdn_Plugin {
         $sender->title('Customize Theme');
         $sender->addSideMenu('settings/customtheme');
 
+
         $htmlEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
         $cssEnabled = c('Plugins.CustomTheme.CSS.Enabled', false);
 
-        // For retrocompatibility with old config
-        $oldPluginEnabled = c('Plugins.CustomTheme.Enabled', false); // old config
-        if ($oldPluginEnabled) {
-            $htmlEnabled = true;
-            $cssEnabled = true;
+        if(!$htmlEnabled && !$cssEnabled) {
+            $sender->render(paths(PATH_PLUGINS, 'CustomTheme/views/disabled.php'));
+            die();
         }
-
-
 
         $sender->Form = new Gdn_Form();
         if ($sender->Form->getFormValue('Exit_Preview') ? true : false || val(0, $sender->RequestArgs, '1') == 'exiteditcss') {
@@ -406,8 +430,15 @@ class CustomThemePlugin extends Gdn_Plugin {
                 ->get()
                 ->firstRow();
 
+
+
         if ($themeData) {
             $htmlContents = $themeData->Html;
+
+            if (stringIsNullOrEmpty($htmlContents)) {
+               $htmlContents = self::customTheme_getDefaultMasterView();
+            }
+
             $cssContents = $themeData->CSS;
             $label = $themeData->Label;
             $saveWorkingRevisionID = self::setRevisionID($workingRevisionID, $themeData->DateInserted);
@@ -433,13 +464,14 @@ Here are some things you should know before you begin:
 4. Feel free to delete these comments!
 
 */';
+            $htmlContents = self::customTheme_getDefaultMasterView();
 
-            $themeMasterView = paths($folder, 'views/default.master.tpl');
-            if (file_exists($themeMasterView)) {
-                $htmlContents = file_get_contents($themeMasterView);
-            } else {
-                $htmlContents = file_get_contents(PATH_APPLICATIONS . '/dashboard/views/default.master.tpl');
-            }
+//            $themeMasterView = paths($folder, 'views/default.master.tpl');
+//            if (file_exists($themeMasterView)) {
+//                $htmlContents = file_get_contents($themeMasterView);
+//            } else {
+//                $htmlContents = file_get_contents(PATH_APPLICATIONS . '/dashboard/views/default.master.tpl');
+//            }
         }
 
         // If viewing the form for the first time
@@ -463,10 +495,17 @@ Here are some things you should know before you begin:
 
             // Save the changes (if there are changes to save):
             $newCSS = $sender->Form->getFormValue('CustomCSS', '');
+
             $newHtml = $sender->Form->getFormValue('CustomHtml', '');
+            $defaultMasterHtml = self::customTheme_getDefaultMasterView();
+
+            if (preg_replace('/\s+/', '', $newHtml) == preg_replace('/\s+/', '', $defaultMasterHtml)) { // No use in saving if it matches default master
+                $newHtml = '';
+            }
+
             $newLabel = $sender->Form->getFormValue('Label', null);
 
-            if ($cssContents != $newCSS || $htmlContents != $newHtml) {
+            if ($cssContents != $newCSS || ($htmlContents != $newHtml && $newHtml)) {
                 $set = [
                     'ThemeName' => self::getCurrentThemeKey(),
                     'Html' => $newHtml,
@@ -494,15 +533,21 @@ Here are some things you should know before you begin:
             }
 
             // Check to see if there are any fatal errors in the smarty template
-            $smarty = new Gdn_Smarty();
-            $smartyCompileError = !$smarty->testTemplate("customtheme:default_master_{$workingRevisionID}.tpl");
 
             // Check for required assets
-            $noHeadAsset = (stripos($newHtml, '{asset name="Head"}') === false) && (stripos($newHtml, "{asset name='Head'}") === false);
-            $noContentAsset = (stripos($newHtml, '{asset name="Content"}') === false) && (stripos($newHtml, "{asset name='Content'}") === false);
-            $noFootAsset = (stripos($newHtml, '{asset name="Foot"}') === false) && (stripos($newHtml, "{asset name='Foot'}") === false);
-            $noAfterEvent = (stripos($newHtml, '{event name="AfterBody"}') === false) && (stripos($newHtml, "{event name='AfterBody'}") === false);
-            $assetError = $noHeadAsset || $noContentAsset || $noFootAsset || $noAfterEvent;
+            if($newHtml != "") {
+                $smarty = new Gdn_Smarty();
+                $smartyCompileError = !$smarty->testTemplate("customtheme:default_master_{$workingRevisionID}.tpl");
+                $noHeadAsset = (stripos($newHtml, '{asset name="Head"}') === false) && (stripos($newHtml, "{asset name='Head'}") === false);
+                $noContentAsset = (stripos($newHtml, '{asset name="Content"}') === false) && (stripos($newHtml, "{asset name='Content'}") === false);
+                $noFootAsset = (stripos($newHtml, '{asset name="Foot"}') === false) && (stripos($newHtml, "{asset name='Foot'}") === false);
+                $noAfterEvent = (stripos($newHtml, '{event name="AfterBody"}') === false) && (stripos($newHtml, "{event name='AfterBody'}") === false);
+                $assetError = $noHeadAsset || $noContentAsset || $noFootAsset || $noAfterEvent;
+            } else {
+                // If no changes were made to template, bypass error checking
+                $assetError = false;
+                $smartyCompileError = false;
+            }
 
             // If we are applying the changes, and the changes didn't cause crashes save the live revision number.
             if (!$assetError && !$smartyCompileError && ($isApply || $isApplyPreview)) {
@@ -553,11 +598,7 @@ Here are some things you should know before you begin:
                 ->get()
         );
 
-        if ($htmlEnabled || $cssEnabled) {
-            $sender->render(paths(PATH_PLUGINS, 'CustomTheme/views/customtheme.php'));
-        } else {
-            $sender->render(paths(PATH_PLUGINS, 'CustomTheme/views/disabled.php'));
-        }
+        $sender->render(paths(PATH_PLUGINS, 'CustomTheme/views/customtheme.php'));
     }
 
     /**
@@ -746,10 +787,6 @@ Here are some things you should know before you begin:
             saveToConfig('Plugins.CustomTheme.HTML.Enabled', true);
         }
 
-        $cssEnabled = c('Plugins.CustomTheme.CSS.Enabled', false);
-        $cssEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
-
-
         // Make sure the theme revision exists in the database.
         $revisionID = c('Plugins.CustomTheme.LiveRevisionID');
         if ($revisionID) {
@@ -759,7 +796,6 @@ Here are some things you should know before you begin:
             }
         }
     }
-
 }
 
 /**
@@ -786,24 +822,24 @@ class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
      * @return void
      */
     protected function fetch($name, &$source, &$mtime) {
-        $htmlEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
-        $oldPluginEnabled = c('Plugins.CustomTheme.Enabled', false); // old config
-
         // Do database call here to fetch your template, populating $tpl_source with actual template contents.
         $revisionID = CustomThemePlugin::getRevisionFromFileName($name);
-        $data = Gdn::sql()->select('Html,DateInserted')->from('CustomThemeRevision')->where('RevisionID', $revisionID)->get()->firstRow();
-        if ($data && ($htmlEnabled || $oldPluginEnabled)) {
-            $dir = CustomThemePlugin::getThemeRoot('/views');
-            if ($dir) {
-                $this->smarty->template_dir = $dir;
-            }
+        $htmlEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
+        if ($htmlEnabled) {
+            $data = Gdn::sql()->select('Html,DateInserted')->from('CustomThemeRevision')->where('RevisionID', $revisionID)->get()->firstRow();
+            if ($data) {
+                $dir = CustomThemePlugin::getThemeRoot('/views');
+                if ($dir) {
+                    $this->smarty->template_dir = $dir;
+                }
 
-            $mtime = strtotime($data->DateInserted);
-            if (!$mtime) {
-                $mtime = time();
+                $mtime = strtotime($data->DateInserted);
+                if (!$mtime) {
+                    $mtime = time();
+                }
+                $source = $data->Html;
+                return true;
             }
-            $source = $data->Html;
-            return true;
         }
         return false;
     }
