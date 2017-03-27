@@ -499,13 +499,14 @@ Here are some things you should know before you begin:
             $newHtml = $sender->Form->getFormValue('CustomHtml', '');
             $defaultMasterHtml = self::customTheme_getDefaultMasterView();
 
+            // Replace multiline spacing with a single space for comparing changes. Any meaningfull changes to a theme's template should be more than a space change.
             if (preg_replace('/\s+/', ' ', $newHtml) == preg_replace('/\s+/', ' ', $defaultMasterHtml)) { // No use in saving if it matches default master
                 $newHtml = '';
             }
 
             $newLabel = $sender->Form->getFormValue('Label', null);
 
-            if ($cssContents != $newCSS || ($htmlContents != $newHtml && $newHtml)) {
+            if ($cssContents != $newCSS || ($htmlContents != $newHtml)) {
                 $set = [
                     'ThemeName' => self::getCurrentThemeKey(),
                     'Html' => $newHtml,
