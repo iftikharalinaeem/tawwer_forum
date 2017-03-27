@@ -359,6 +359,18 @@ class CustomThemePlugin extends Gdn_Plugin {
         $sender->title('Customize Theme');
         $sender->addSideMenu('settings/customtheme');
 
+        $htmlEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
+        $cssEnabled = c('Plugins.CustomTheme.CSS.Enabled', false);
+
+        // For retrocompatibility with old config
+        $oldPluginEnabled = c('Plugins.CustomTheme.Enabled', false); // old config
+        if ($oldPluginEnabled) {
+            $htmlEnabled = true;
+            $cssEnabled = true;
+        }
+
+
+
         $sender->Form = new Gdn_Form();
         if ($sender->Form->getFormValue('Exit_Preview') ? true : false || val(0, $sender->RequestArgs, '1') == 'exiteditcss') {
             $userModel->savePreference($session->UserID, 'PreviewCustomTheme', false);
@@ -541,7 +553,11 @@ Here are some things you should know before you begin:
                 ->get()
         );
 
-        $sender->render(paths(PATH_PLUGINS, 'CustomTheme/views/customtheme.php'));
+        if ($htmlEnabled || $cssEnabled) {
+            $sender->render(paths(PATH_PLUGINS, 'CustomTheme/views/customtheme.php'));
+        } else {
+            $sender->render(paths(PATH_PLUGINS, 'CustomTheme/views/disabled.php'));
+        }
     }
 
     /**
