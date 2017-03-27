@@ -27,20 +27,23 @@ helpAsset(t('Even More Help?'), $links);
 echo $this->Form->open();
 
 
-if($htmlEnabled && $cssEnabled) {
+if ($htmlEnabled && $cssEnabled) {
    $CurrentTab = $this->Form->getFormValue('CurrentTab', val(1, $this->RequestArgs, 'html'));
 
    if (!in_array($CurrentTab, ['html', 'css'])) {
       $CurrentTab = 'html';
    }
 
-} else if($htmlEnabled) {
-   $CurrentTab = 'html';
-} else if($cssEnabled) {
-   $CurrentTab = 'css';
+} else {
+   if ($htmlEnabled) {
+      $CurrentTab = 'html';
+   } else {
+      if ($cssEnabled) {
+         $CurrentTab = 'css';
+      }
+   }
 }
 
-$this->Form->addHidden('CurrentTab', $CurrentTab);
 
 $cssClass = 'header-menu-item js-custom-html';
 
@@ -61,61 +64,67 @@ $cssAttr = [
 ];
 
 ?>
-   <div role="tablist" class="header-menu js-custom-theme-menu">
-      <div <?php echo attribute($htmlAttr); ?>><?php echo t('Edit HTML'); ?></div>
-      <div <?php echo attribute($cssAttr); ?>><?php echo t('Edit CSS'); ?></div>
-   </div>
-   <?php
-      echo $this->Form->errors();
+<div role="tablist" class="header-menu js-custom-theme-menu">
 
-   ?>
-   <div class="toolbar">
-      <div class="text-input-button toolbar-main">
-         <?php
-         echo wrap($this->Form->label('Revision Label:', 'Label'), 'div', ['class' => 'label-wrap']);
-         echo $this->Form->textBox('Label');
-         if ($htmlEnabled || $cssEnabled) {
-            echo $this->Form->button('Apply', ['class' => 'btn btn-primary btn-apply']);
-         } else {
-            echo anchor('Apply', 'settings/customthemeupgrade/', 'btn btn-primary js-modal');
-         } ?>
-      </div>
-      <div class="buttons">
-         <?php echo $this->Form->button('Preview', ['class' => 'btn btn-secondary btn-preview']); ?>
-      </div>
-   </div>
-   <section id="customCssContainer" class="padded <?php echo $CurrentTab == 'html' ? ' hidden' : ''; ?>">
-      <h1 class="hidden"><?php echo t('Edit CSS'); ?></h1>
-      <ul>
-         <li>
-            <div class="CustomThemeForm">
-               <?php
-               echo $this->Form->textBox('CustomCSS', ['MultiLine' => true, 'class' => 'TextBox CustomThemeBox Autogrow']);
-               ?>
-            </div>
-         </li>
-      </ul>
-   </section>
-   <section id="customHtmlContainer" class="padded <?php echo $CurrentTab == 'html' ? '' : ' hidden'; ?>">
-      <ul>
-         <h1 class="hidden"><?php echo t('Edit HTML'); ?></h1>
-         <li>
-            <div class="CustomThemeForm">
-               <?php
-               echo $this->Form->textBox('CustomHtml', ['MultiLine' => true, 'class' => 'TextBox CustomThemeBox Autogrow']);
-               ?>
-         </li>
-      </ul>
-   </section>
-<?php writeRevisions($this, 'html'); ?>
+   <?php if ($htmlEnabled) { ?>
+      <div <?php echo attribute($htmlAttr); ?>><?php echo t('Edit HTML'); ?></div>
+   <?php } ?>
+
+   <?php if ($cssEnabled) { ?>
+      <div <?php echo attribute($cssAttr); ?>><?php echo t('Edit CSS'); ?></div>
+   <?php } ?>
+</div>
 <?php
+echo $this->Form->errors();
+echo $this->Form->hidden('CurrentTab', $CurrentTab);
+?>
+<div class="toolbar">
+   <div class="text-input-button toolbar-main">
+      <?php
+      echo wrap($this->Form->label('Revision Label:', 'Label'), 'div', ['class' => 'label-wrap']);
+      echo $this->Form->textBox('Label');
+      if ($htmlEnabled || $cssEnabled) {
+         echo $this->Form->button('Apply', ['class' => 'btn btn-primary btn-apply']);
+      } else {
+         echo anchor('Apply', 'settings/customthemeupgrade/', 'btn btn-primary js-modal');
+      } ?>
+   </div>
+   <div class="buttons">
+      <?php echo $this->Form->button('Preview', ['class' => 'btn btn-secondary btn-preview']); ?>
+   </div>
+</div>
+<section id="customCssContainer" class="padded <?php echo $CurrentTab == 'html' ? ' hidden' : ''; ?>">
+   <h1 class="hidden"><?php echo t('Edit CSS'); ?></h1>
+   <ul>
+      <li>
+         <div class="CustomThemeForm">
+            <?php
+            echo $this->Form->textBox('CustomCSS', ['MultiLine' => true, 'class' => 'TextBox CustomThemeBox Autogrow']);
+            ?>
+         </div>
+      </li>
+   </ul>
+</section>
+<section id="customHtmlContainer" class="padded <?php echo $CurrentTab == 'html' ? '' : ' hidden'; ?>">
+   <ul>
+      <h1 class="hidden"><?php echo t('Edit HTML'); ?></h1>
+      <li>
+         <div class="CustomThemeForm">
+            <?php
+            echo $this->Form->textBox('CustomHtml', ['MultiLine' => true, 'class' => 'TextBox CustomThemeBox Autogrow']);
+            ?>
+      </li>
+   </ul>
+</section>
+<?php writeRevisions($this, 'html');
 echo $this->Form->close();
 
 function writeRevisions($Sender, $Tab = '') {
    $Data = val('RevisionData', $Sender->Data);
    $LiveRevisionID = val('LiveRevisionID', $Sender->Data);
-   if (!$Data || $Data->numRows() == 0)
+   if (!$Data || $Data->numRows() == 0) {
       return;
+   }
    ?>
    <section class="control-panel">
       <h2 class="control-panel-heading">Recent Revisions</h2>
@@ -134,7 +143,7 @@ function writeRevisions($Sender, $Tab = '') {
                <li class="control-panel-list-item <?php echo 'Revision'.($Row->RevisionID == $LiveRevisionID ? ' LiveRevision' : ''); ?>">
                   <?php
                   echo anchor('&rarr; '.date("g:ia", Gdn_Format::toTimeStamp($Row->DateInserted)), 'settings/customtheme/revision/'.$Tab.'/'.$Row->RevisionID);
-                  echo ($Row->Label ? ' <span class="italic truncate control-panel-list-item-label">'.htmlspecialchars($Row->Label).'</span> ' : '');
+                  echo($Row->Label ? ' <span class="italic truncate control-panel-list-item-label">'.htmlspecialchars($Row->Label).'</span> ' : '');
                   if ($Row->Live == 1) {
                      echo dashboardSymbol('star-empty', 'icon-text', ['alt' => t('Live')]);
                   } elseif ($Row->Live == 2) {
