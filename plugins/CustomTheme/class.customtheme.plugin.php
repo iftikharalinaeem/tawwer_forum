@@ -499,7 +499,7 @@ Here are some things you should know before you begin:
             $newHtml = $sender->Form->getFormValue('CustomHtml', '');
             $defaultMasterHtml = self::customTheme_getDefaultMasterView();
 
-            if (preg_replace('/\s+/', '', $newHtml) == preg_replace('/\s+/', '', $defaultMasterHtml)) { // No use in saving if it matches default master
+            if (preg_replace('/\s+/', ' ', $newHtml) == preg_replace('/\s+/', ' ', $defaultMasterHtml)) { // No use in saving if it matches default master
                 $newHtml = '';
             }
 
