@@ -284,7 +284,7 @@ class CustomThemePlugin extends Gdn_Plugin {
      */
     public function gdn_smarty_init_handler($smarty) {
         // Register the resource name "customtheme"
-        $smarty->registerResource("customtheme", new Smarty_Resource_CustomTheme($smarty));
+        $smarty->registerResource("customtheme", new Smarty_Resource_CustomTheme($smarty, self::customTheme_getDefaultMasterView()));
     }
 
     /**
@@ -358,7 +358,7 @@ class CustomThemePlugin extends Gdn_Plugin {
      * Fetch content of default master
      * @return String
      */
-    private function customTheme_getDefaultMasterView() {
+    public function customTheme_getDefaultMasterView() {
         $htmlContents = '';
         $themeKey = self::getCurrentThemeKey();
         $folder = paths(PATH_THEMES, $themeKey);
@@ -499,8 +499,8 @@ Here are some things you should know before you begin:
             $newHtml = $sender->Form->getFormValue('CustomHtml', '');
             $defaultMasterHtml = self::customTheme_getDefaultMasterView();
 
-            // Replace multiline spacing with a single space for comparing changes. Any meaningfull changes to a theme's template should be more than a space change.
-            if (preg_replace('/\s+/', ' ', $newHtml) == preg_replace('/\s+/', ' ', $defaultMasterHtml)) { // No use in saving if it matches default master
+            // The js plugin changes the new line characters, we need to strip them
+            if (preg_replace('/\r/', '', $newHtml) == $defaultMasterHtml) { // No use in saving if it matches default master
                 $newHtml = '';
             }
 
@@ -809,9 +809,11 @@ Here are some things you should know before you begin:
 class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
 
     protected $smarty;
+    protected $defaultMasterTemplate;
 
-    public function __construct($smarty) {
+    public function __construct($smarty, $defaultMasterTemplate) {
         $this->smarty = $smarty;
+        $this->defaultMasterTemplate = $defaultMasterTemplate;
     }
 
     /**
@@ -828,7 +830,12 @@ class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
         $htmlEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
         if ($htmlEnabled) {
             $data = Gdn::sql()->select('Html,DateInserted')->from('CustomThemeRevision')->where('RevisionID', $revisionID)->get()->firstRow();
+
             if ($data) {
+                if (stringIsNullOrEmpty($data->Html)) {
+                    $data->Html = $this->defaultMasterTemplate;
+                }
+
                 $dir = CustomThemePlugin::getThemeRoot('/views');
                 if ($dir) {
                     $this->smarty->template_dir = $dir;
