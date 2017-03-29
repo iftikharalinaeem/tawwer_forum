@@ -443,12 +443,12 @@ p {
 .DateBox {
   display: inline-block; }
 
-.CommentForm
-.FormWrapper {
+.CommentForm .FormWrapper {
   padding-left: 90px; }
-  .CommentForm
-.FormWrapper .Buttons {
+  .CommentForm .FormWrapper .Buttons {
     margin-left: -90px; }
+    .CommentForm .FormWrapper .Buttons .Back {
+      display: none; }
 
 .icheckbox,
 .iradio {
