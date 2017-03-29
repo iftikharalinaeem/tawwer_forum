@@ -318,8 +318,8 @@ class CustomThemePlugin extends Gdn_Plugin {
         $fileToLoad = $filename;
         $revisionID = CustomThemePlugin::getRevisionFromFileName($fileToLoad);
 
-
-        $cssEnabled = c('Plugins.CustomTheme.CSS.Enabled', false);
+        $pluginEnabled = c('Plugins.CustomTheme.Enabled', false);
+        $cssEnabled = $pluginEnabled;
         $themeData = false;
 
         if ($cssEnabled) {
@@ -382,17 +382,15 @@ class CustomThemePlugin extends Gdn_Plugin {
     public function settingsController_customTheme_create($sender) {
         $session = Gdn::session();
         $userModel = Gdn::userModel();
+        $pluginEnabled = c('Plugins.CustomTheme.Enabled', false);
         $sender->permission('Garden.Settings.Manage');
         $sender->title('Customize Theme');
         $sender->addSideMenu('settings/customtheme');
+        
 
-
-        $htmlEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
-        $cssEnabled = c('Plugins.CustomTheme.CSS.Enabled', false);
-
-        if(!$htmlEnabled && !$cssEnabled) {
+        if( !$pluginEnabled) {
             $sender->render(paths(PATH_PLUGINS, 'CustomTheme/views/disabled.php'));
-            die();
+            return;
         }
 
         $sender->Form = new Gdn_Form();
@@ -782,11 +780,6 @@ Here are some things you should know before you begin:
                 ->set();
 
         // Check if old config is used and replace with new variables if set
-        if (c('Plugins.CustomTheme.Enabled', false)) {
-            removeFromConfig('Plugins.CustomTheme.Enabled');
-            saveToConfig('Plugins.CustomTheme.CSS.Enabled', true);
-            saveToConfig('Plugins.CustomTheme.HTML.Enabled', true);
-        }
 
         // Make sure the theme revision exists in the database.
         $revisionID = c('Plugins.CustomTheme.LiveRevisionID');
@@ -827,7 +820,10 @@ class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
     protected function fetch($name, &$source, &$mtime) {
         // Do database call here to fetch your template, populating $tpl_source with actual template contents.
         $revisionID = CustomThemePlugin::getRevisionFromFileName($name);
-        $htmlEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
+
+        $pluginEnabled = c('Plugins.CustomTheme.Enabled', false);
+        $htmlEnabled = $pluginEnabled && !c('Plugins.CustomTheme.DisableHtml', false);
+
         if ($htmlEnabled) {
             $data = Gdn::sql()->select('Html,DateInserted')->from('CustomThemeRevision')->where('RevisionID', $revisionID)->get()->firstRow();
 

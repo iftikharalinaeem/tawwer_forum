@@ -1,15 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$htmlEnabled = c('Plugins.CustomTheme.HTML.Enabled', false);
-$cssEnabled = c('Plugins.CustomTheme.CSS.Enabled', false);
-
-// For retrocompatibility with old config
-$oldPluginEnabled = c('Plugins.CustomTheme.Enabled', false); // old config
-if ($oldPluginEnabled) {
-   $htmlEnabled = true;
-   $cssEnabled = true;
-}
-
+$pluginEnabled = c('Plugins.CustomTheme.Enabled', false);
+$cssEnabled = $pluginEnabled;
+$htmlEnabled = $pluginEnabled && !c('Plugins.CustomTheme.DisableHtml', false);
 
 Gdn_Theme::assetBegin('Help');
 WriteRevisions($this, 'css');
