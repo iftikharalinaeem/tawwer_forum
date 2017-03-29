@@ -27,12 +27,15 @@
 //
 // Styleguide Forms.textarea
 
-.CommentForm
-.FormWrapper {
+.CommentForm .FormWrapper {
   padding-left: 90px;
 
   .Buttons {
     margin-left: -90px;
+
+    .Back {
+      display: none;
+    }
   }
 }
 
