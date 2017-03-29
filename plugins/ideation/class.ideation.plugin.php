@@ -749,7 +749,7 @@ EOT
      * @param string $notes The status notes
      */
     public function updateDiscussionStatus($discussion, $statusID, $notes) {
-        if (!$this->isIdea($discussion) || !is_numeric($statusID)) {
+        if (!$this->isIdea($discussion) || filter_var($statusID, FILTER_VALIDATE_INT) === false) {
             return;
         }
         $discussionID = val('DiscussionID', $discussion);
@@ -822,12 +822,45 @@ EOT
      * @param array $args
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
-        if ($this->isIdea($discussionID = val('DiscussionID', $args))) {
+        $this->addAttachment(val('DiscussionID', $args));
+    }
+
+    /**
+     * Initialize an idea properly if it comes from the moderation queue.
+     *
+     * @param LogModel $sender
+     * @param array $args Event's arguments
+     */
+    public function logModel_afterRestore_handler($sender, $args) {
+        $log = val('Log', $args);
+        $discussionID = val('RecordType', $log) === 'Discussion' ? val('InsertID', $args) : false;
+        if ($discussionID && val('Operation', $log) === 'Pending' && $this->isIdea($discussionID)) {
+            $this->addAttachment($discussionID);
+
+            $statusModel = new StatusModel();
+            $discussionModel = new DiscussionModel();
+            $defaultStatus = $statusModel->getDefaultStatus();
+            $defaultStatusID = null;
+            if ($defaultStatus) {
+                $defaultStatusID = val('StatusID', $defaultStatus);
+            }
+            $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+            $this->updateDiscussionStatus($discussion, $defaultStatusID, '');
+        }
+    }
+
+    /**
+     * Add the necessary attachment to a discussion.
+     *
+     * @param int $discussionID
+     */
+    protected function addAttachment($discussionID) {
+        if ($this->isIdea($discussionID)) {
             $attachmentModel = AttachmentModel::instance();
             $attachment = $attachmentModel->getWhere(['ForeignID' => 'd-'.$discussionID])->resultArray();
             if (empty($attachment)) {
                 // We've got a new idea, add an attachment.
-                $this->updateAttachment(val('DiscussionID', $args), val('StatusID', StatusModel::instance()->getDefaultStatus()), '');
+                $this->updateAttachment($discussionID, val('StatusID', StatusModel::instance()->getDefaultStatus()), '');
             }
         }
     }
@@ -1382,7 +1415,7 @@ EOT
      * @return bool Whether a discussion is an Idea-type.
      */
     public function isIdea($discussion) {
-        if (is_numeric($discussion)) {
+        if (filter_var($discussion, FILTER_VALIDATE_INT) !== false) {
             $discussionModel = new DiscussionModel();
             $discussion = $discussionModel->getID($discussion);
         }
