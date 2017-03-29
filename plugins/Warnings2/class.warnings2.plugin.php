@@ -107,7 +107,8 @@ class Warnings2Plugin extends Gdn_Plugin {
         $Result = anchor(
             '<span class="ReactSprite ReactWarn"></span> '.t('Warn'),
             '/profile/warn?'.http_build_query($args),
-            'ReactButton ReactButton-Warn Popup'
+            'ReactButton ReactButton-Warn Popup',
+            ['title' => T('Warn')]
         );
         return $Result;
     }
