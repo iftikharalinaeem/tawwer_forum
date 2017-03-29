@@ -833,8 +833,8 @@ EOT
      */
     public function logModel_afterRestore_handler($sender, $args) {
         $log = val('Log', $args);
-        if ($log && val('RecordType', $log) === 'Discussion' && val('Operation', $log) === 'Pending') {
-            $discussionID = val('InsertID', $args);
+        $discussionID = val('RecordType', $log) === 'Discussion' ? val('InsertID', $args) : false;
+        if ($discussionID && val('Operation', $log) === 'Pending' && $this->isIdea($discussionID)) {
             $this->addAttachment($discussionID);
 
             $statusModel = new StatusModel();
