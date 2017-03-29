@@ -27,22 +27,13 @@ class ReportModel extends Gdn_Model {
     /**
      * How many unread Reported Posts user has.
      *
+     * @deprecated since 2.4, reason: doesn't scale
+     *
      * @return int
      */
     public static function getUnreadReportCount() {
-        // This methods needs to be optimized.
-        return null;
-
-        static $count = null;
-
-        if ($count === null) {
-            $category = self::getReportCategory();
-            $discussionModel = new DiscussionModel();
-            // Add DiscussionID to shamelessly bypass the faulty cache code
-            $count = $discussionModel->getUnreadCount(['d.CategoryID' => $category['CategoryID'], 'd.DiscussionID >' => 0]);
-        }
-
-        return $count;
+        deprecated(__METHOD__);
+        return 0;
     }
 
     /**
