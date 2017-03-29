@@ -76,7 +76,7 @@ echo $this->Form->hidden('CurrentTab', $CurrentTab);
       <?php
       echo wrap($this->Form->label('Revision Label:', 'Label'), 'div', ['class' => 'label-wrap']);
       echo $this->Form->textBox('Label');
-      if ($htmlEnabled || $cssEnabled) {
+      if ($cssEnabled) {
          echo $this->Form->button('Apply', ['class' => 'btn btn-primary btn-apply']);
       } else {
          echo anchor('Apply', 'settings/customthemeupgrade/', 'btn btn-primary js-modal');

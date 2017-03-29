@@ -463,13 +463,6 @@ Here are some things you should know before you begin:
 
 */';
             $htmlContents = self::customTheme_getDefaultMasterView();
-
-//            $themeMasterView = paths($folder, 'views/default.master.tpl');
-//            if (file_exists($themeMasterView)) {
-//                $htmlContents = file_get_contents($themeMasterView);
-//            } else {
-//                $htmlContents = file_get_contents(PATH_APPLICATIONS . '/dashboard/views/default.master.tpl');
-//            }
         }
 
         // If viewing the form for the first time
@@ -534,7 +527,7 @@ Here are some things you should know before you begin:
             // Check to see if there are any fatal errors in the smarty template
 
             // Check for required assets
-            if($newHtml != "") {
+            if (!stringIsNullOrEmpty($newHtml)) {
                 $smarty = new Gdn_Smarty();
                 $smartyCompileError = !$smarty->testTemplate("customtheme:default_master_{$workingRevisionID}.tpl");
                 $noHeadAsset = (stripos($newHtml, '{asset name="Head"}') === false) && (stripos($newHtml, "{asset name='Head'}") === false);
@@ -542,8 +535,7 @@ Here are some things you should know before you begin:
                 $noFootAsset = (stripos($newHtml, '{asset name="Foot"}') === false) && (stripos($newHtml, "{asset name='Foot'}") === false);
                 $noAfterEvent = (stripos($newHtml, '{event name="AfterBody"}') === false) && (stripos($newHtml, "{event name='AfterBody'}") === false);
                 $assetError = $noHeadAsset || $noContentAsset || $noFootAsset || $noAfterEvent;
-            } else {
-                // If no changes were made to template, bypass error checking
+            } else { // If no changes were made to template, bypass error checking
                 $assetError = false;
                 $smartyCompileError = false;
             }
@@ -596,6 +588,11 @@ Here are some things you should know before you begin:
                 ->limit(10)
                 ->get()
         );
+
+        // If nothing was saved, still load defautl master, so the page isn't empty
+        if (stringIsNullOrEmpty($newHtml)) {
+            $sender->Form->setFormValue('CustomHtml', $defaultMasterHtml);
+        }
 
         $sender->render(paths(PATH_PLUGINS, 'CustomTheme/views/customtheme.php'));
     }
