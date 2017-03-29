@@ -12,11 +12,11 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['BasicDark'] = array(
-   'Name'        => 'Basic Dark',
+   'Name' => 'Basic Dark',
    'Description' => "A dark version of Vanilla's basic theme.",
-   'Version'     => '1.0.1',
-   'Author'      => "Tim Gunter",
+   'Version' => '1.0.1',
+   'Author' => "Tim Gunter",
    'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl'   => 'http://timgunter.ca',
-   'Hidden'      => false,
+   'AuthorUrl' => 'http://timgunter.ca',
+   'Hidden' => false,
 );
