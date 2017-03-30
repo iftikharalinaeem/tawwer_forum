@@ -6,7 +6,7 @@
 
 $PluginInfo['TrustedContent'] = [
     'Name' => 'Trusted Embeded Content',
-    'ClassName' => "TrustedContentPlugin",
+    'ClassName' => 'TrustedContentPlugin',
     'Description' => 'Stop images from being shown on the forum unless it comes from a source that you trust. Removed images will be shown as a link.',
     'Version' => '1.0.0',
     'RequiredApplications' => ['Vanilla' => '2.2'],
@@ -27,7 +27,12 @@ $PluginInfo['TrustedContent'] = [
  */
 class TrustedContentPlugin extends Gdn_Plugin {
 
-
+    /**
+     * Takes a block of user generated text and removes untrusted embedded content.
+     *
+     * @param $html
+     * @return mixed
+     */
     public function format_filterHTML_handler($html) {
         $filtered = $html;
         // If the config does not have a SanitizeImages entry or it is set to false, pass the HTML to the renderer as is.
@@ -71,9 +76,17 @@ class TrustedContentPlugin extends Gdn_Plugin {
     }
 
 
+    /**
+     * Create a page in the dashboard to configure a white-list of trusted domains.
+     *
+     * @param SettingsController $sender
+     * @param array $handler
+     */
     public function settingsController_trustedContent_create($sender, $handler) {
         // Check permission
         $sender->permission('Garden.Settings.Manage');
+
+        $form = $sender->Form;
 
         // Load up config options we'll be setting
         $validation = new Gdn_Validation();
@@ -81,10 +94,10 @@ class TrustedContentPlugin extends Gdn_Plugin {
         $configurationModel->setField(['Garden.TrustedContentSources', 'Garden.HTML.FilterContentSources']);
 
         // Set the model on the form.
-        $sender->Form->setModel($configurationModel);
+        $form->setModel($configurationModel);
 
         // If seeing the form for the first time...
-        if ($sender->Form->authenticatedPostBack() === false) {
+        if ($form->authenticatedPostBack() === false) {
             // Format trusted domains as a string
             $trustedContentSources = val('Garden.TrustedContentSources', $configurationModel->Data);
             if (is_array($trustedContentSources)) {
@@ -92,17 +105,17 @@ class TrustedContentPlugin extends Gdn_Plugin {
             }
 
             // Apply the config settings to the form.
-            $sender->Form->setData($configurationModel->Data);
+            $form->setData($configurationModel->Data);
         } else {
             // Format the embeddable domains as an array based on newlines & spaces
-            $trustedContentSources = $sender->Form->getValue('Garden.TrustedContentSources');
+            $trustedContentSources = $form->getValue('Garden.TrustedContentSources');
             $trustedContentSources = explodeTrim("\n", $trustedContentSources);
-            $trustedContentSources = array_unique(array_filter($trustedContentSources));
+            $trustedContentSources = array_unique($trustedContentSources);
             $trustedContentSources = implode("\n", $trustedContentSources);
-            $sender->Form->setFormValue('Garden.TrustedContentSources', $trustedContentSources);
+            $form->setFormValue('Garden.TrustedContentSources', $trustedContentSources);
 
             // Save new settings
-            $Saved = $sender->Form->save();
+            $Saved = $form->save();
             if ($Saved !== false) {
                 $sender->informMessage(t("Your changes have been saved."));
             }

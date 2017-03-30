@@ -8,11 +8,11 @@ echo $form->errors();
 ?>
 </li>
 <li class="form-group">
-    <?php echo $this->Form->toggle('Garden.HTML.FilterContentSources', 'Allow Embedded Content From Approved Domains Only.'); ?>
+    <?php echo $form->toggle('Garden.HTML.FilterContentSources', 'Allow Embedded Content From Approved Domains Only.', ['id' => 'filterContentSource']); ?>
 </li>
-<li class="form-group hidden" id="trustedContentSources">
+<li class="form-group foggy" id="trustedContentSources">
     <div class="label-wrap">
-        <?php echo $this->Form->label('Approved Domains', 'Garden.TrustedContentSources'); ?>
+        <?php echo $form->label('Approved Domains', 'Garden.TrustedContentSources'); ?>
         <div class="info">
             <p>
                 <?php
@@ -26,7 +26,7 @@ echo $form->errors();
         </div>
     </div>
     <div class="input-wrap">
-        <?php echo $this->Form->textBox('Garden.TrustedContentSources', ['MultiLine' => true]); ?>
+        <?php echo $form->textBox('Garden.TrustedContentSources', ['MultiLine' => true]); ?>
     </div>
 </li>
 <?php echo $form->close('Save'); ?>
