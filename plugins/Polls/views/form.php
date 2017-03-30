@@ -21,7 +21,7 @@ else : // Display the poll
                 echo '</div>';
             }
             if (Gdn::session()->isValid()) {
-                echo $form->button('vote-verb', ['class' => 'Button Primary', 'value' => 'Vote']);
+                echo $form->button('Vote (action)', ['class' => 'Button Primary', 'value' => 'Vote']);
             } else {
                 $returnUrl = Gdn::request()->pathAndQuery();
                 $authenticationUrl = signInUrl($returnUrl);
