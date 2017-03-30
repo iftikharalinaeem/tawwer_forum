@@ -22,7 +22,7 @@ class Zendesk {
      */
     public function __construct(IZendeskHttpRequest $curlRequest, $Url, $AccessToken) {
         $this->curl = $curlRequest;
-        $this->apiUrl = $Url . '/api/v2';
+        $this->apiUrl = trim($Url, '/') . '/api/v2';
         $this->AccessToken = $AccessToken;
     }
 
@@ -225,14 +225,25 @@ class Zendesk {
         if (!$userId) {
             $profileURL = "/users/me/oauth/clients.json";
         } else {
-            $profileURL = "/oauth/clients/{$userId}.json";
+            $profileURL = "/users/{$userId}.json";
         }
         $fullProfile = $this->zendeskRequest($profileURL);
-        return array(
-            'id' => $fullProfile['clients'][0]['id'],
-            'email' => $fullProfile['clients'][0]['email'],
-            'fullname' => $fullProfile['clients'][0]['name'],
-            'photo' => $fullProfile['clients'][0]['photo'],
-        );
+
+        if (!$userId) {
+            return [
+                'id' => $fullProfile['clients'][0]['id'],
+                'email' => $fullProfile['clients'][0]['email'],
+                'fullname' => $fullProfile['clients'][0]['name'],
+                'photo' => $fullProfile['clients'][0]['photo']
+            ];
+        } else {
+            return [
+                'id' => $fullProfile['user']['id'],
+                'email' => $fullProfile['user']['email'],
+                'fullname' => $fullProfile['user']['name'],
+                'photo' => $fullProfile['user']['photo']
+            ];
+        }
+
     }
 }
