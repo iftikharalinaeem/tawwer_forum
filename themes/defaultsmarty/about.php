@@ -12,14 +12,14 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
  * An associative array of information about this application.
  */
 $ThemeInfo['defaultsmarty'] = array(
-   'Name'        => 'Compatibility 2011',
+   'Name' => 'Compatibility 2011',
    'Description' => "An older version of the default theme for backwards-compatibility.",
-   'Version'     => '2.0a',
-   'Author'      => "Todd Burry",
+   'Version' => '2.0a',
+   'Author' => "Todd Burry",
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl'   => 'http://vanillaforums.org/profile/todd',
-   'Hidden'      => false,
-   'Options'     => array(
+   'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
+   'Hidden' => false,
+   'Options' => array(
    'Description' => 'This theme has <font color="red">7 color</font> options. Find out more on <a href="http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options">Theme Options</a>.',
       'Styles' => array(
          'Vanilla Terminal' => '%s_terminal',
