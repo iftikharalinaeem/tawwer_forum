@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-$PluginInfo['TrustedContent'] = [
+$PluginInfo['trustedcontent'] = [
     'Name' => 'Trusted Embeded Content',
     'ClassName' => 'TrustedContentPlugin',
     'Description' => 'Stop images from being shown on the forum unless it comes from a source that you trust. Removed images will be shown as a link.',
