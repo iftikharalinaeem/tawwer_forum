@@ -627,6 +627,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         $Sender->addJsFile('jquery.js');
         $Sender->addJsFile('jquery.livequery.js');
         $Sender->addJsFile('global.js');
+        $Sender->addJsFile('jquery.popup.js');
 
         if (c('Plugins.Reactions.BestOfStyle', 'Tiles') == 'Tiles') {
             $Sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions'); // I customized this to get proper callbacks.
