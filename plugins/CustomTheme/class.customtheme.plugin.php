@@ -386,10 +386,10 @@ class CustomThemePlugin extends Gdn_Plugin {
         $sender->permission('Garden.Settings.Manage');
         $sender->title('Customize Theme');
         $sender->addSideMenu('settings/customtheme');
-        
+
 
         if (!$pluginEnabled) {
-            $sender->render(paths(PATH_PLUGINS, 'CustomTheme/views/disabled.php'));
+            $sender->render($sender->fetchViewLocation('disabled', '', 'plugins/CustomTheme'));
             return;
         }
 
