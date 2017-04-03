@@ -284,7 +284,7 @@ class CustomThemePlugin extends Gdn_Plugin {
      */
     public function gdn_smarty_init_handler($smarty) {
         // Register the resource name "customtheme"
-        $smarty->registerResource("customtheme", new Smarty_Resource_CustomTheme($smarty, self::customTheme_getDefaultMasterView()));
+        $smarty->registerResource("customtheme", new Smarty_Resource_CustomTheme($smarty, self::getDefaultMasterView()));
     }
 
     /**
@@ -358,7 +358,7 @@ class CustomThemePlugin extends Gdn_Plugin {
      * Fetch content of default master
      * @return String
      */
-    public function customTheme_getDefaultMasterView() {
+    public function getDefaultMasterView() {
         $htmlContents = '';
         $themeKey = self::getCurrentThemeKey();
         $folder = paths(PATH_THEMES, $themeKey);
@@ -388,7 +388,7 @@ class CustomThemePlugin extends Gdn_Plugin {
         $sender->addSideMenu('settings/customtheme');
         
 
-        if( !$pluginEnabled) {
+        if (!$pluginEnabled) {
             $sender->render(paths(PATH_PLUGINS, 'CustomTheme/views/disabled.php'));
             return;
         }
@@ -434,7 +434,7 @@ class CustomThemePlugin extends Gdn_Plugin {
             $htmlContents = $themeData->Html;
 
             if (stringIsNullOrEmpty($htmlContents)) {
-               $htmlContents = self::customTheme_getDefaultMasterView();
+               $htmlContents = self::customTheme_getDefaugetDefaultMasterViewltMasterView();
             }
 
             $cssContents = $themeData->CSS;
@@ -462,7 +462,7 @@ Here are some things you should know before you begin:
 4. Feel free to delete these comments!
 
 */';
-            $htmlContents = self::customTheme_getDefaultMasterView();
+            $htmlContents = self::getDefaultMasterView();
         }
 
         // If viewing the form for the first time
@@ -488,7 +488,7 @@ Here are some things you should know before you begin:
             $newCSS = $sender->Form->getFormValue('CustomCSS', '');
 
             $newHtml = $sender->Form->getFormValue('CustomHtml', '');
-            $defaultMasterHtml = self::customTheme_getDefaultMasterView();
+            $defaultMasterHtml = self::getDefaultMasterView();
 
             // The js plugin changes the new line characters, we need to strip them
             if (preg_replace('/\r/', '', $newHtml) == $defaultMasterHtml) { // No use in saving if it matches default master
