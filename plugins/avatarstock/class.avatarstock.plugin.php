@@ -62,7 +62,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
             ->PrimaryKey('AvatarID')
             ->Column('Name', 'varchar(100)', true)
             ->Column('OriginalFileName', 'varchar(255)', true)
-            ->Column('Path', 'varchar(255)', false, 'index')
+            ->Column('Path', 'varchar(191)', false, 'index')
             ->Column('InsertUserID', 'int', true)
             ->Column('TimestampAdded', 'int(10)', true)
             ->Column('Deleted', 'tinyint(1)', 1, 'index')

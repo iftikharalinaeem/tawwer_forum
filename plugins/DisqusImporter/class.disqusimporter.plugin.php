@@ -229,7 +229,7 @@ class DisqusImporter extends Gdn_Plugin {
       Gdn::Structure()->Table('zDisqusDiscussion')
          ->Column('DisqusID', 'int', FALSE, 'primary')
          ->Column('DiscussionID', 'int', TRUE)
-         ->Column('ForeignID', 'varchar(200)', FALSE, 'index')
+         ->Column('ForeignID', 'varchar(191)', FALSE, 'index')
          ->Column('DisqusCategoryID', 'int', FALSE)
          ->Column('CategoryID', 'int', TRUE)
          ->Column('Name', 'varchar(100)')

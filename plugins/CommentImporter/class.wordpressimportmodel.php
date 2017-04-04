@@ -49,7 +49,7 @@ class WordpressImportModel extends CommentImportModel {
 
       $St->Table('zWordpressCategory')
          ->Column('ForeignID', 'int', FALSE, 'primary')
-         ->Column('UrlCode', 'varchar(255)', FALSE, 'index')
+         ->Column('UrlCode', 'varchar(191)', FALSE, 'index')
          ->Column('Name', 'varchar(255)', FALSE)
          ->Column('ParentUrlCode', 'varchar(255)', TRUE)
          ->Column('CategoryID', 'int', TRUE)

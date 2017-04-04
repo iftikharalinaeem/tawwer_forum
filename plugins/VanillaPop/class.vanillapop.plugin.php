@@ -625,25 +625,25 @@ class VanillaPopPlugin extends Gdn_Plugin {
         Gdn::Structure()
             ->Table('User')
             ->Column('Source', 'varchar(20)', NULL)
-            ->Column('SourceID', 'varchar(255)', NULL, 'index')
+            ->Column('SourceID', 'varchar(191)', NULL, 'index')
             ->Set();
 
         Gdn::Structure()
             ->Table('Discussion')
             ->Column('Source', 'varchar(20)', NULL)
-            ->Column('SourceID', 'varchar(255)', NULL, 'index')
+            ->Column('SourceID', 'varchar(191)', NULL, 'index')
             ->Set();
 
         Gdn::Structure()
             ->Table('Comment')
             ->Column('Source', 'varchar(20)', NULL)
-            ->Column('SourceID', 'varchar(255)', NULL, 'index')
+            ->Column('SourceID', 'varchar(191)', NULL, 'index')
             ->Set();
 
         Gdn::Structure()
             ->Table('ConversationMessage')
             ->Column('Source', 'varchar(20)', NULL)
-            ->Column('SourceID', 'varchar(255)', NULL, 'index')
+            ->Column('SourceID', 'varchar(191)', NULL, 'index')
             ->Set();
 
         Gdn::Structure()
