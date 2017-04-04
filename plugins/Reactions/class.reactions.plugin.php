@@ -634,6 +634,7 @@ class ReactionsPlugin extends Gdn_Plugin {
             $Sender->addJsFile('library/jQuery-Wookmark/jquery.imagesloaded.js', 'plugins/Reactions');
             $Sender->addJsFile('library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js', 'plugins/Reactions');
             $Sender->addJsFile('tile.js', 'plugins/Reactions');
+            $Sender->AddJsFile('jquery.popup.js');
             $Sender->CssClass .= ' NoPanel';
             $View = $Sender->deliveryType() == DELIVERY_TYPE_VIEW ? 'tile_items' : 'tiles';
         } else {
