@@ -39,7 +39,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
     public function structure() {
         Gdn::structure()
-            ->table('Subcommunity', 'utf8')
+            ->table('Subcommunity')
             ->primaryKey('SubcommunityID')
             ->column('Name', 'varchar(255)')
             ->column('Folder', 'varchar(191)', false, 'unique.Folder')
