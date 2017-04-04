@@ -1,0 +1,19 @@
+{
+	"key": "swagger",
+	"name": "Swagger",
+	"description": "Dynamic APIv2 documentation.",
+	"version": "1.0-alpha",
+	"license": "Proprietary",
+	"type": "addon",
+	"oldType": "plugin",
+	"require": {
+		"Vanilla": "^2.4"
+	},
+	"authors": [
+		{
+			"name": "Todd Burry",
+			"email": "todd@vanillaforums.com"
+		}
+	],
+	"icon": "swagger.png"
+}
