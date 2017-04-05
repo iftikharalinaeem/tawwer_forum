@@ -40,15 +40,15 @@ function writeGithubIssueAttachment($attachment) {
 
                             <dt><?php echo t('Last Updated'); ?></dt>
                             <dd><?php echo Gdn_Format::date($attachment['LastModifiedDate'], 'html') ?></dd>
-                            <?php if (getValue('Assignee', $attachment)) { ?>
+                            <?php if (val('Assignee', $attachment)) { ?>
                                 <dt><?php echo t('Assignee'); ?></dt>
                                 <dd><?php echo Gdn_Format::text($attachment['Assignee']); ?></dd>
                             <?php } ?>
-                            <?php if (getValue('Milestone', $attachment)) { ?>
+                            <?php if (val('Milestone', $attachment)) { ?>
                                 <dt><?php echo t('Milestone'); ?></dt>
                                 <dd><?php echo Gdn_Format::text($attachment['Milestone']); ?></dd>
                             <?php } ?>
-                            <?php if (getValue('ClosedBy', $attachment)) { ?>
+                            <?php if (val('ClosedBy', $attachment)) { ?>
                                 <dt><?php echo t('Closed By'); ?></dt>
                                 <dd><?php echo anchor(
                                         $attachment['ClosedBy'],

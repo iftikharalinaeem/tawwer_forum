@@ -221,8 +221,8 @@ class GithubPlugin extends Gdn_Plugin {
             'ProviderKey' => self::PROVIDER_KEY,
             'ConnectUrl' => self::authorizeUri(self::profileConnectUrl()),
             'Profile' => [
-                'Name' => getValue('fullname', $Profile),
-                'Photo' => getValue('photo', $Profile),
+                'Name' => val('fullname', $Profile),
+                'Photo' => val('photo', $Profile),
             ]
         ];
     }
@@ -266,7 +266,7 @@ class GithubPlugin extends Gdn_Plugin {
                 ->dispatch('home/error');
             return;
         }
-        $AccessToken = getValue('access_token', $Tokens);
+        $AccessToken = val('access_token', $Tokens);
         $this->setAccessToken($AccessToken);
         $profile = $this->getProfile();
 
@@ -304,7 +304,7 @@ class GithubPlugin extends Gdn_Plugin {
     public function controller_connect() {
         $Code = Gdn::request()->get('code');
         $Tokens = $this->getTokens($Code, self::globalConnectUrl());
-        $AccessToken = getValue('access_token', $Tokens);
+        $AccessToken = val('access_token', $Tokens);
 
         if ($AccessToken) {
             $this->setAccessToken($AccessToken);
@@ -344,7 +344,7 @@ class GithubPlugin extends Gdn_Plugin {
     public function controller_toggle($Sender) {
         $Sender->permission('Garden.Settings.Manage');
         // Enable/Disable
-        if (Gdn::session()->validateTransientKey(getValue(1, $Sender->RequestArgs))) {
+        if (Gdn::session()->validateTransientKey(val(1, $Sender->RequestArgs))) {
             if (c('Plugins.Github.GlobalLogin.Enabled')) {
                 removeFromConfig('Plugins.Github.GlobalLogin.Enabled');
                 removeFromConfig('Plugins.Github.GlobalLogin.AccessToken');
@@ -455,7 +455,7 @@ class GithubPlugin extends Gdn_Plugin {
         if (!Gdn::session()->checkPermission('Garden.Staff.Allow')) {
             return;
         }
-        $Attachments = getValue('Attachments', $Args[$Content]);
+        $Attachments = val('Attachments', $Args[$Content]);
         if ($Attachments) {
             foreach ($Args[$Content]->Attachments as $Attachment) {
                 if ($Attachment['Type'] == 'github-issue') {
@@ -476,7 +476,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @return bool
      */
     protected function isToBeUpdated($Attachment) {
-        if (getValue('State', $Attachment) == $this->closedIssueString) {
+        if (val('State', $Attachment) == $this->closedIssueString) {
             trace("Issue {$this->closedIssueString}.  Not checking for update.");
             return false;
         }
@@ -772,7 +772,7 @@ class GithubPlugin extends Gdn_Plugin {
         $DiscussionID = $Args['Discussion']->DiscussionID;
 
         // Don not add option if attachment already created.
-        $Attachments = getValue('Attachments', $Args['Discussion'], []);
+        $Attachments = val('Attachments', $Args['Discussion'], []);
         foreach ($Attachments as $Attachment) {
             if ($Attachment['Type'] == 'github-issue') {
                 return;
@@ -806,7 +806,7 @@ class GithubPlugin extends Gdn_Plugin {
         $UserID = $Args['Comment']->InsertUserID;
         $CommentID = $Args['Comment']->CommentID;
         // Don not add option if attachment already created.
-        $Attachments = getValue('Attachments', $Args['Comment'], []);
+        $Attachments = val('Attachments', $Args['Comment'], []);
         foreach ($Attachments as $Attachment) {
             if ($Attachment['Type'] == 'github-issue') {
                 return;
@@ -941,7 +941,7 @@ class GithubPlugin extends Gdn_Plugin {
             throw new Gdn_UserException('Invalid issue number: '.$issueNumber);
         }
         $issue = $this->apiRequest('/repos/'.$repo.'/issues/'.$issueNumber);
-        if (!GetValue('id', $issue)) {
+        if (!val('id', $issue)) {
             return false;
         }
         return $issue;
@@ -961,7 +961,7 @@ class GithubPlugin extends Gdn_Plugin {
             throw new Gdn_UserException('Invalid repo name: '.$repo);
         }
         $response = $this->apiRequest('/repos/'.$repo);
-        if (getValue('id', $response, 0) > 0) {
+        if (val('id', $response, 0) > 0) {
             return true;
         }
         return false;
@@ -1036,7 +1036,7 @@ class GithubPlugin extends Gdn_Plugin {
                     ]
                 );
 
-                if (getValue('errors', $issue)) {
+                if (val('errors', $issue)) {
                     $errorMessage = '';
                     var_dump($issue['errors']);
                     foreach ($issue['errors'] as $error) {
