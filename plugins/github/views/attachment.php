@@ -9,7 +9,7 @@
  *
  * @param array $attachment
  */
-function WriteGithubIssueAttachment($attachment) {
+function writeGithubIssueAttachment($attachment) {
     ?>
     <div class="item-attachment">
         <div class="alert">
@@ -22,10 +22,10 @@ function WriteGithubIssueAttachment($attachment) {
                 <div class="media-body">
 
                     <div class="item-header">
-                        <h4 class="media-heading item-heading"><?php echo T('Issue') ?> ·
+                        <h4 class="media-heading item-heading"><?php echo t('Issue') ?> ·
                                 <a href="<?php echo $attachment['SourceURL']; ?>" target="_blank"><?php echo ucfirst($attachment['Source']); ?></a>
                             <div class="item-meta">
-                        <span><?php echo Gdn_Format::Date($attachment['DateInserted'], 'html') ?> <?php echo T('by'); ?>
+                        <span><?php echo Gdn_Format::date($attachment['DateInserted'], 'html') ?> <?php echo t('by'); ?>
                             <?php echo $attachment['InsertUser']['ProfileLink']; ?></span>
                             </div>
                         </h4></div>
@@ -33,24 +33,24 @@ function WriteGithubIssueAttachment($attachment) {
                     <div class="item-body">
 
                         <dl class="dl-columns">
-                            <dt><?php echo T('Issue Number'); ?></dt>
+                            <dt><?php echo t('Issue Number'); ?></dt>
                             <dd><a href="<?php echo $attachment['SourceURL']; ?>" target="_blank"><?php echo $attachment['SourceID']; ?></a></dd>
-                            <dt><?php echo T('State'); ?></dt>
+                            <dt><?php echo t('State'); ?></dt>
                             <dd><?php echo $attachment['State']; ?></dd>
 
-                            <dt><?php echo T('Last Updated'); ?></dt>
-                            <dd><?php echo Gdn_Format::Date($attachment['LastModifiedDate'], 'html') ?></dd>
-                            <?php if (GetValue('Assignee', $attachment)) { ?>
-                                <dt><?php echo T('Assignee'); ?></dt>
-                                <dd><?php echo Gdn_Format::Text($attachment['Assignee']); ?></dd>
+                            <dt><?php echo t('Last Updated'); ?></dt>
+                            <dd><?php echo Gdn_Format::date($attachment['LastModifiedDate'], 'html') ?></dd>
+                            <?php if (getValue('Assignee', $attachment)) { ?>
+                                <dt><?php echo t('Assignee'); ?></dt>
+                                <dd><?php echo Gdn_Format::text($attachment['Assignee']); ?></dd>
                             <?php } ?>
-                            <?php if (GetValue('Milestone', $attachment)) { ?>
-                                <dt><?php echo T('Milestone'); ?></dt>
-                                <dd><?php echo Gdn_Format::Text($attachment['Milestone']); ?></dd>
+                            <?php if (getValue('Milestone', $attachment)) { ?>
+                                <dt><?php echo t('Milestone'); ?></dt>
+                                <dd><?php echo Gdn_Format::text($attachment['Milestone']); ?></dd>
                             <?php } ?>
-                            <?php if (GetValue('ClosedBy', $attachment)) { ?>
-                                <dt><?php echo T('Closed By'); ?></dt>
-                                <dd><?php echo Anchor(
+                            <?php if (getValue('ClosedBy', $attachment)) { ?>
+                                <dt><?php echo t('Closed By'); ?></dt>
+                                <dd><?php echo anchor(
                                         $attachment['ClosedBy'],
                                         'http://github.com/' . $attachment['ClosedBy'],
                                         array('Target' => '_blank')

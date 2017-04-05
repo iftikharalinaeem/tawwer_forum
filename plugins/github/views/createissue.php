@@ -1,8 +1,8 @@
-<h1><?php echo T('GitHub Create Issue'); ?></h1>
+<h1><?php echo t('GitHub Create Issue'); ?></h1>
 
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 
 <ul>
@@ -14,16 +14,16 @@ echo $this->Form->Errors();
     </li>
 
     <li>
-        <?php echo $this->Form->Label('Title', 'Title');  ?>
-        <?php echo $this->Form->TextBox('Title'); ?>
+        <?php echo $this->Form->label('Title', 'Title');  ?>
+        <?php echo $this->Form->textBox('Title'); ?>
     </li>
 
     <li>
-        <?php echo $this->Form->Label('Body', 'Body');  ?>
-        <?php echo $this->Form->TextBox('Body', array('MultiLine' => true)); ?>
+        <?php echo $this->Form->label('Body', 'Body');  ?>
+        <?php echo $this->Form->textBox('Body', array('MultiLine' => true)); ?>
     </li>
 
 
 </ul>
 
-<?php echo $this->Form->Close('Create Issue', '', array('class' => 'Button BigButton'));
+<?php echo $this->Form->close('Create Issue', '', array('class' => 'Button BigButton'));
