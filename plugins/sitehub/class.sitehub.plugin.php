@@ -56,7 +56,7 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->primaryKey('MultisiteID')
             ->column('Name', 'varchar(255)', false)
             ->column('Slug', 'varchar(50)', false, 'unique.slug')
-            ->column('Url', 'varchar(255)', false, 'unique.url')
+            ->column('Url', 'varchar(191)', false, 'unique.url')
             ->column('Locale', 'varchar(20)', true, 'index')
             ->column('SiteID', 'int', true)
             ->column('Status', ['pending', 'building', 'active', 'error', 'deleting'], 'pending')
@@ -94,7 +94,7 @@ class SiteHubPlugin extends Gdn_Plugin {
             ->column('MultisiteID', 'int', false, 'key')
             ->column('CategoryID', 'int', false)
             ->column('Name', 'varchar(255)')
-            ->column('UrlCode', 'varchar(255)', true)
+            ->column('UrlCode', 'varchar(191)', true)
             ->column('HubID', 'int', true)
             ->column('DateLastSync', 'datetime', false, 'index')
             ->set();
@@ -199,7 +199,7 @@ class SiteHubPlugin extends Gdn_Plugin {
 
         $sites = MultisiteModel::instance()->getNodeSites($locale);
         $sender->setData('Sites', $sites);
-        
+
         $sender->title(t(c('Garden.SitesTitle', c('Garden.Title', 'Communities'))), '');
         $sender->render('Sites', 'Categories', 'plugins/sitehub');
     }

@@ -42,7 +42,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->table('Subcommunity')
             ->primaryKey('SubcommunityID')
             ->column('Name', 'varchar(255)')
-            ->column('Folder', 'varchar(255)', false, 'unique.Folder')
+            ->column('Folder', 'varchar(191)', false, 'unique.Folder')
             ->column('CategoryID', 'int', true)
             ->column('Locale', 'varchar(20)')
             ->column('DateInserted', 'datetime')
