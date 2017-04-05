@@ -37,6 +37,7 @@ class SwaggerApiController extends Controller {
             'out'
         );
 
+        $this->getSession()->getPermissions()->setAdmin(true);
         return $this->swaggerModel->getSwaggerObject();
     }
 

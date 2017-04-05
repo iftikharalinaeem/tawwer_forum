@@ -124,6 +124,28 @@ class SwaggerModel {
 
             $instance = $this->container->get($controller);
             $actions = iterator_to_array($this->getControllerActions($class, $instance));
+
+            usort($actions, function (ReflectionAction $a, ReflectionAction $b) {
+                $cmp1 = strcasecmp($a->getPath(), $b->getPath());
+                if ($cmp1 !== 0) {
+                    return $cmp1;
+                }
+
+                $cmpa = array_search(strtolower($a->getHttpMethod()), static::$httpMethods);
+                $cmpb = array_search(strtolower($b->getHttpMethod()), static::$httpMethods);
+
+                if ($cmpa !== false && $cmpb !== false) {
+                    return strnatcmp($cmpa, $cmpb);
+                } elseif ($cmpa !== false) {
+                    return -1;
+                } elseif ($cmpb !== false) {
+                    return 1;
+                } else {
+                    return strcmp($a->getHttpMethod(), $b->getHttpMethod());
+                }
+
+            });
+
             foreach ($actions as $action) {
                 yield $action;
             }

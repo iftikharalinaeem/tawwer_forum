@@ -98,7 +98,7 @@ class ReflectionAction {
             $method->getName(),
             $m
         )) {
-            $controller = $m['class'] ?: $method->getDeclaringClass()->getName();
+            $controller = $m['class'] ?: get_class($this->instance);
             $httpMethod = $m['method'];
             $subpath = isset($m['path']) ? $m['path'] : '';
         } else {
@@ -111,7 +111,7 @@ class ReflectionAction {
         }
 
         // Check against the controller pattern.
-        if (preg_match("`^$resourceRegex$`i", $controller, $m)) {
+        if (preg_match("`(?:^|\\\\)$resourceRegex$`i", $controller, $m)) {
             $resource = $m[1];
         } else {
             throw new \InvalidArgumentException("The controller is not an API controller.", 500);
@@ -285,5 +285,14 @@ class ReflectionAction {
         }
 
         return $r;
+    }
+
+    /**
+     * Get the subpath.
+     *
+     * @return string Returns the subpath.
+     */
+    public function getSubpath() {
+        return $this->subpath;
     }
 }
