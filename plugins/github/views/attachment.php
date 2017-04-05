@@ -53,7 +53,7 @@ function writeGithubIssueAttachment($attachment) {
                                 <dd><?php echo anchor(
                                         $attachment['ClosedBy'],
                                         'http://github.com/' . $attachment['ClosedBy'],
-                                        array('Target' => '_blank')
+                                        ['Target' => '_blank']
                                     );
                                     ?>
                                 </dd>

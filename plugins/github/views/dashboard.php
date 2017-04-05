@@ -4,7 +4,7 @@
 </div>
 <div class="padded">
     <?php echo t('This plugin allows you to submit user discussion and comments as GitHub issues.'); ?>
-    <?php echo ' '.anchor(sprintf(t('How to set up %s.'), t('GitHub Connect')), 'http://docs.vanillaforums.com/help/addons/social/github/', array('target' => '_blank')); ?>
+    <?php echo ' '.anchor(sprintf(t('How to set up %s.'), t('GitHub Connect')), 'http://docs.vanillaforums.com/help/addons/social/github/', ['target' => '_blank']); ?>
 </div>
 
 <?php
@@ -33,7 +33,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->label('Repositories', 'Repositories'); ?>
             <div class="info"><?php echo t('List of Repositories separted by newline.  Enter the GitHub username and repo, E.g. \'username/reponame\''); ?></div>
         </div>
-        <?php echo $this->Form->textBoxWrap('Repositories', array('MultiLine' => true)); ?>
+        <?php echo $this->Form->textBoxWrap('Repositories', ['MultiLine' => true]); ?>
     </li>
 
 </ul>

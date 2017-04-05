@@ -20,10 +20,10 @@ echo $this->Form->errors();
 
     <li>
         <?php echo $this->Form->label('Body', 'Body');  ?>
-        <?php echo $this->Form->textBox('Body', array('MultiLine' => true)); ?>
+        <?php echo $this->Form->textBox('Body', ['MultiLine' => true]); ?>
     </li>
 
 
 </ul>
 
-<?php echo $this->Form->close('Create Issue', '', array('class' => 'Button BigButton'));
+<?php echo $this->Form->close('Create Issue', '', ['class' => 'Button BigButton']);
