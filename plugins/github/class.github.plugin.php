@@ -45,6 +45,7 @@ class GithubPlugin extends Gdn_Plugin {
 
     /**
      * If time since last update from Github is less then this; we wont check for update - saving api calls.
+     *
      * @var int
      */
     protected $minimumTimeForUpdate = 600;
@@ -100,7 +101,7 @@ class GithubPlugin extends Gdn_Plugin {
             'scope' => 'repo',
 
         );
-        return self::OAUTH_BASE_URL . '/login/oauth/authorize?' . http_build_query($Query);
+        return self::OAUTH_BASE_URL.'/login/oauth/authorize?'.http_build_query($Query);
     }
 
     /**
@@ -211,9 +212,9 @@ class GithubPlugin extends Gdn_Plugin {
         if (!Gdn::session()->checkPermission('Garden.Staff.Allow')) {
             return;
         }
-        $Sf = getValueR('User.Attributes.' . self::PROVIDER_KEY, $Args);
+        $Sf = getValueR('User.Attributes.'.self::PROVIDER_KEY, $Args);
         trace($Sf);
-        $Profile = getValueR('User.Attributes.' . self::PROVIDER_KEY . '.Profile', $Args);
+        $Profile = getValueR('User.Attributes.'.self::PROVIDER_KEY.'.Profile', $Args);
         $Sender->Data["Connections"][self::PROVIDER_KEY] = array(
             'Icon' => $this->getWebResource('icon.png', '/'),
             'Name' => ucfirst(self::PROVIDER_KEY),
@@ -246,7 +247,7 @@ class GithubPlugin extends Gdn_Plugin {
         }
 
         if (stristr(Gdn::request()->url(), 'globallogin') !== false) {
-            redirect(url('/plugin/github/connect?code=' . Gdn::request()->get('code')));
+            redirect(url('/plugin/github/connect?code='.Gdn::request()->get('code')));
         }
         $Sender->permission('Garden.SignIn.Allow');
         $Sender->getUserInfo($UserReference, $Username, '', true);
@@ -341,7 +342,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @param Controller $Sender Sending controller.
      */
     public function controller_toggle($Sender) {
-	$Sender->permission('Garden.Settings.Manage');
+        $Sender->permission('Garden.Settings.Manage');
         // Enable/Disable
         if (Gdn::session()->validateTransientKey(getValue(1, $Sender->RequestArgs))) {
             if (c('Plugins.Github.GlobalLogin.Enabled')) {
@@ -403,8 +404,8 @@ class GithubPlugin extends Gdn_Plugin {
         );
         //prevents resetting any previous values
         foreach ($ConfigSettings as $ConfigSetting) {
-            if (!C('Plugins.Github.' . $ConfigSetting)) {
-                saveToConfig('Plugins.Github.' . $ConfigSetting, '');
+            if (!C('Plugins.Github.'.$ConfigSetting)) {
+                saveToConfig('Plugins.Github.'.$ConfigSetting, '');
             }
         }
     }
@@ -513,7 +514,7 @@ class GithubPlugin extends Gdn_Plugin {
 
             if (!$issue) {
                 trace(
-                    'getIssue returned false for: ' .  $Attachment['Repository'] . ' Issue: ' . $Attachment['SourceID']
+                    'getIssue returned false for: '.$Attachment['Repository'].' Issue: '.$Attachment['SourceID']
                 );
                 return false;
             }
@@ -563,7 +564,7 @@ class GithubPlugin extends Gdn_Plugin {
      */
     public function controller_index($Sender) {
 
-	    $Sender->permission('Garden.Settings.Manage');
+        $Sender->permission('Garden.Settings.Manage');
         $Sender->addCssFile('admin.css');
 
         $Validation = new Gdn_Validation();
@@ -593,11 +594,10 @@ class GithubPlugin extends Gdn_Plugin {
                 } else {
                     foreach ($repos as $repo) {
                         if (!$this->isValidRepoName($repo)) {
-                            $Sender->Form->addError('Invalid Repository: ' . $repo, 'Repositories');
+                            $Sender->Form->addError('Invalid Repository: '.$repo, 'Repositories');
                         }
                     }
                 }
-
 
 
                 $Sender->Form->validateRule('Secret', 'function:ValidateRequired', 'Secret is required');
@@ -605,7 +605,7 @@ class GithubPlugin extends Gdn_Plugin {
 
                 if ($Sender->Form->errorCount() == 0) {
                     foreach ($repos as $repo) {
-                        saveToConfig('Plugins.Github.Repos.' . trim($repo), true);
+                        saveToConfig('Plugins.Github.Repos.'.trim($repo), true);
                     }
                     saveToConfig('Plugins.Github.ApplicationID', trim($FormValues['ApplicationID']));
                     saveToConfig('Plugins.Github.Secret', trim($FormValues['Secret']));
@@ -623,17 +623,17 @@ class GithubPlugin extends Gdn_Plugin {
         $Repositories = c('Plugins.Github.Repos', array());
         $ReposForForm = '';
         foreach (array_keys($Repositories) as $Repo) {
-            $ReposForForm .= $Repo . "\n";
+            $ReposForForm .= $Repo."\n";
         }
         $ReposForForm = trim($ReposForForm);
         $Sender->Form->setValue('Repositories', $ReposForForm);
 
 
         $Sender->setData(array(
-                'GlobalLoginEnabled' => c('Plugins.Github.GlobalLogin.Enabled'),
-                'GlobalLoginConnected' => c('Plugins.Github.GlobalLogin.AccessToken'),
-                'ToggleUrl' => url('/plugin/github/toggle/' . Gdn::session()->transientKey())
-            ));
+            'GlobalLoginEnabled' => c('Plugins.Github.GlobalLogin.Enabled'),
+            'GlobalLoginConnected' => c('Plugins.Github.GlobalLogin.AccessToken'),
+            'ToggleUrl' => url('/plugin/github/toggle/'.Gdn::session()->transientKey())
+        ));
         if (c('Plugins.Github.GlobalLogin.Enabled')) {
             $globalLoginProfile = $this->getProfile();
             $Sender->setData('GlobalLoginProfile', $globalLoginProfile);
@@ -690,7 +690,7 @@ class GithubPlugin extends Gdn_Plugin {
         $Repositories = c('Plugins.Github.Repos', array());
         $RepositoryOptions = '';
         foreach (array_keys($Repositories) as $Repo) {
-            $RepositoryOptions .= '<option>' . Gdn_Format::text($Repo) . '</option>';
+            $RepositoryOptions .= '<option>'.Gdn_Format::text($Repo).'</option>';
         }
 
         // If form is being submitted
@@ -703,14 +703,14 @@ class GithubPlugin extends Gdn_Plugin {
             if ($Sender->Form->errorCount() == 0) {
                 $FormValues = $Sender->Form->formValues();
 
-                $bodyAppend = "\n\n" . t("This Issue was generated from your [forums] \n");
+                $bodyAppend = "\n\n".t("This Issue was generated from your [forums] \n");
                 $bodyAppend .= "[forums]: $Url\n";
 
                 $issue = $this->createIssue(
                     $FormValues['Repository'],
                     array(
                         'title' => $FormValues['Title'],
-                        'body' => $FormValues['Body'] . $bodyAppend,
+                        'body' => $FormValues['Body'].$bodyAppend,
                         'labels' => array('Vanilla')
                     )
                 );
@@ -722,14 +722,13 @@ class GithubPlugin extends Gdn_Plugin {
                         'ForeignUserID' => $Content->InsertUserID,
                         'Source' => 'github',
                         'SourceID' => $issue['number'],
-                        'SourceURL' => 'https://github.com/' . $FormValues['Repository'] . '/issues/' . $issue['number'],
+                        'SourceURL' => 'https://github.com/'.$FormValues['Repository'].'/issues/'.$issue['number'],
                         'LastModifiedDate' => Gdn_Format::toDateTime(),
                         'State' => $issue['state'],
                         'Assignee' => $issue['assignee'],
                         'MileStone' => $issue['milestone'],
                         'Repository' => $FormValues['Repository']
                     ));
-
 
 
                     $Sender->jsonTarget('', $Url, 'Redirect');
@@ -839,7 +838,7 @@ class GithubPlugin extends Gdn_Plugin {
         $additionalHeaders = [];
 
         if ($authenticate) {
-            $additionalHeaders['Authorization'] = 'token ' . $this->getAccessToken();
+            $additionalHeaders['Authorization'] = 'token '.$this->getAccessToken();
         }
 
         try {
@@ -913,10 +912,10 @@ class GithubPlugin extends Gdn_Plugin {
      * @return array|bool
      */
     protected function createIssue($repo, $issue) {
-        $response = $this->apiRequest('/repos/' . $repo . '/issues', $issue);
+        $response = $this->apiRequest('/repos/'.$repo.'/issues', $issue);
 
         if (val('message', $response)) {
-            throw new Gdn_UserException('Error creating issue: ' . $response['message']);
+            throw new Gdn_UserException('Error creating issue: '.$response['message']);
         }
 
         return val('id', $response) ? $response : false;
@@ -936,12 +935,12 @@ class GithubPlugin extends Gdn_Plugin {
     protected function getIssue($repo, $issueNumber) {
         ///repos/:owner/:repo/issues/:number
         if (!$this->isValidRepoName($repo)) {
-            throw new Gdn_UserException('Invalid repository name: ' . $repo);
+            throw new Gdn_UserException('Invalid repository name: '.$repo);
         }
         if (!is_numeric($issueNumber)) {
-            throw new Gdn_UserException('Invalid issue number: ' . $issueNumber);
+            throw new Gdn_UserException('Invalid issue number: '.$issueNumber);
         }
-        $issue = $this->apiRequest('/repos/' . $repo . '/issues/' . $issueNumber);
+        $issue = $this->apiRequest('/repos/'.$repo.'/issues/'.$issueNumber);
         if (!GetValue('id', $issue)) {
             return false;
         }
@@ -959,9 +958,9 @@ class GithubPlugin extends Gdn_Plugin {
     public function isValidRepo($repo) {
 
         if (!$this->isValidRepoName($repo)) {
-            throw new Gdn_UserException('Invalid repo name: ' . $repo);
+            throw new Gdn_UserException('Invalid repo name: '.$repo);
         }
-        $response = $this->apiRequest('/repos/' . $repo);
+        $response = $this->apiRequest('/repos/'.$repo);
         if (getValue('id', $response, 0) > 0) {
             return true;
         }
@@ -990,7 +989,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @param PlugginController $Sender Sending controller.
      */
     public function controller_test($Sender) {
-	$Sender->permission('Garden.Settings.Manage');
+        $Sender->permission('Garden.Settings.Manage');
 
         $args = $Sender->RequestArgs;
         if (count($args) == 1) {
@@ -1020,7 +1019,7 @@ class GithubPlugin extends Gdn_Plugin {
                     'John0x00/VanillaPlugins' => true
                 );
                 foreach (array_keys($repos) as $repo) {
-                    echo "Repo $repo =====> " . var_export($this->isValidRepo($repo), true) . '<br/>';
+                    echo "Repo $repo =====> ".var_export($this->isValidRepo($repo), true).'<br/>';
                 }
                 break;
 
@@ -1041,9 +1040,9 @@ class GithubPlugin extends Gdn_Plugin {
                     $errorMessage = '';
                     var_dump($issue['errors']);
                     foreach ($issue['errors'] as $error) {
-                        $errorMessage .= $error['code'] . ' ' . $error['field'] . "<br/>";
+                        $errorMessage .= $error['code'].' '.$error['field']."<br/>";
                     }
-                    var_dump("Failed creating issue: \n" . $errorMessage);
+                    var_dump("Failed creating issue: \n".$errorMessage);
                 } else {
                     $issueID = $issue['id'];
                     var_dump("Issue created: $issueID");
@@ -1061,6 +1060,7 @@ class GithubPlugin extends Gdn_Plugin {
 
     /**
      * Used to convert text to mark down accepted by GitHub.
+     *
      * @param string $Text Text to be converted.
      * @param string $Format Format of text.
      * @return string MD Compatible text.
