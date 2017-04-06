@@ -605,7 +605,7 @@ class GithubPlugin extends Gdn_Plugin {
 
                 if ($Sender->Form->errorCount() == 0) {
                     foreach ($repos as $repo) {
-                        saveToConfig('Plugins.Github.Repos.'.trim($repo), true);
+                        saveToConfig('Plugins.Github.Repos.'.str_replace('.', '-dot-', trim($repo)), true);
                     }
                     saveToConfig('Plugins.Github.ApplicationID', trim($FormValues['ApplicationID']));
                     saveToConfig('Plugins.Github.Secret', trim($FormValues['Secret']));
@@ -620,9 +620,9 @@ class GithubPlugin extends Gdn_Plugin {
         $Sender->Form->setValue('ApplicationID', c('Plugins.Github.ApplicationID'));
         $Sender->Form->setValue('Secret', c('Plugins.Github.Secret'));
 
-        $Repositories = c('Plugins.Github.Repos', []);
+        $Repositories = $this->getRepositories();
         $ReposForForm = '';
-        foreach (array_keys($Repositories) as $Repo) {
+        foreach ($Repositories as $Repo) {
             $ReposForForm .= $Repo."\n";
         }
         $ReposForForm = trim($ReposForForm);
@@ -687,9 +687,9 @@ class GithubPlugin extends Gdn_Plugin {
             throw new Gdn_UserException('Content Type not supported');
         }
 
-        $Repositories = c('Plugins.Github.Repos', []);
+        $Repositories = $this->getRepositories();
         $RepositoryOptions = '';
-        foreach (array_keys($Repositories) as $Repo) {
+        foreach ($Repositories as $Repo) {
             $RepositoryOptions .= '<option>'.Gdn_Format::text($Repo).'</option>';
         }
 
@@ -1007,7 +1007,7 @@ class GithubPlugin extends Gdn_Plugin {
         switch ($test) {
 
             case 'getReposFromConfig':
-                $repos = array_keys(c('Plugins.Github.Repos', []));
+                $repos = $this->getRepositories();
                 var_dump('Repos from config: ');
                 var_dump($repos);
 
@@ -1075,5 +1075,17 @@ class GithubPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Return the list of configured repositories.
+     *
+     * @return array
+     */
+    public function getRepositories() {
+        $repositories = array_keys(c('Plugins.Github.Repos', []));
+        foreach($repositories as &$repo) {
+            $repo = str_replace('-dot-', '.', $repo);
+        }
+        return $repositories;
+    }
 
 }
