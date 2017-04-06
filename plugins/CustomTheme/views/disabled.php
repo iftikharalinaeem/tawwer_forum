@@ -4,6 +4,6 @@
 
 <div class="padded">
    <p>
-      <?php echo t('This feature is disabled. Contact your support for more information.'); ?>
+      <?php echo t('This feature is disabled. Contact support for more information.'); ?>
    </p>
 </div>
