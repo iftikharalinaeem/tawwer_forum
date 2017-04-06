@@ -605,7 +605,7 @@ class GithubPlugin extends Gdn_Plugin {
 
                 if ($Sender->Form->errorCount() == 0) {
                     foreach ($repos as $repo) {
-                        saveToConfig('Plugins.Github.Repos.'.str_replace('.', '-dot-', trim($repo)), true);
+                        saveToConfig('Plugins.Github.Repos.'.str_replace('.', '-{dot}-', trim($repo)), true);
                     }
                     saveToConfig('Plugins.Github.ApplicationID', trim($FormValues['ApplicationID']));
                     saveToConfig('Plugins.Github.Secret', trim($FormValues['Secret']));
@@ -1083,7 +1083,7 @@ class GithubPlugin extends Gdn_Plugin {
     public function getRepositories() {
         $repositories = array_keys(c('Plugins.Github.Repos', []));
         foreach($repositories as &$repo) {
-            $repo = str_replace('-dot-', '.', $repo);
+            $repo = str_replace('-{dot}-', '.', $repo);
         }
         return $repositories;
     }
