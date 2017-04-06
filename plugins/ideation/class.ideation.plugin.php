@@ -4,7 +4,7 @@ $PluginInfo['ideation'] = [
     'Name'                  => 'Ideation',
     'Description'           => 'Let users vote on discussions in a Idea category',
     'Version'               => '1.1',
-    'RequiredApplications'  => ['Vanilla' => '2.4.2'],
+    'RequiredApplications'  => ['Vanilla' => '2.4.200'],
     'RequiredPlugins'       => ['Reactions'   => '1.4.0'],
     'Author'                => 'Becky Van Bussel',
     'AuthorEmail'           => 'becky@vanillaforums.com',
