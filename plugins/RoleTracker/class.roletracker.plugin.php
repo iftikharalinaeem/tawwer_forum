@@ -194,7 +194,7 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         }
 
         RoleModel::setUserRoles($discussions, 'InsertUserID');
-        $sender->data('Discussions', $discussions);
+        $sender->setData('Discussions', $discussions);
     }
 
     /**
