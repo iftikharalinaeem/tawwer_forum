@@ -188,6 +188,11 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             return;
         }
 
+        if ($discussions instanceof Gdn_DataSet) {
+            /** @var Gdn_DataSet $discussions */
+            $discussions = $discussions->result();
+        }
+
         RoleModel::setUserRoles($discussions, 'InsertUserID');
         $sender->data('Discussions', $discussions);
     }
