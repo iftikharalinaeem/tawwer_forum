@@ -9,9 +9,8 @@
 $PluginInfo['RoleTracker'] = [
     'Name' => 'Role Tracker',
     'Description' => 'Tag and track posts made by users in selected roles.',
-    'Version' => '1.0',
-    'RequiredApplications' => ['Vanilla' => '2.2.111'],
-    'RequiredPlugins' => ['Tagging' => '1.9.0'],
+    'Version' => '1.1',
+    'RequiredApplications' => ['Vanilla' => '2.4.200'],
     'HasLocale' => false,
     'License' => 'GNU GPL2',
     'SettingsUrl' => '/settings/roletracker',
