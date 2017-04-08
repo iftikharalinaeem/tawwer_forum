@@ -4,6 +4,6 @@
 
 <div class="padded">
    <p>
-      <?php echo t('This feature is temporarily disabled until your custom theme work is completed and approved.'); ?>
+      <?php echo t('This feature is disabled. Contact support for more information.'); ?>
    </p>
 </div>
