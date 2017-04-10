@@ -77,7 +77,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
      */
     public function dashboardNavModule_init_handler($nav) {
         // Add MailChimp settings menu option.
-        $nav->addLinkIf('Garden.Settings.Manage', 'MailChimp', '/plugin/mailchimp', 'site-settings.mailchimp');
+        $nav->addLinkIf('Garden.Settings.Manage', 'MailChimp', '/plugin/mailchimp', 'users.mailchimp');
     }
 
     /**
