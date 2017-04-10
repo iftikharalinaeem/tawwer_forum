@@ -115,7 +115,7 @@ class RanksPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($Sender) {
         $Menu = $Sender->EventArguments['SideMenu'];
-        $Menu->addLink('Reputation', T('Ranks'), 'settings/ranks', 'Garden.Settings.Manage', ['class' => 'nav-ranks']);
+        $Menu->addLink('Users', T('Ranks'), 'settings/ranks', 'Garden.Settings.Manage', ['class' => 'nav-ranks']);
     }
 
     /**
