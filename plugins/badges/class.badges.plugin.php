@@ -104,15 +104,12 @@ class BadgesHooks extends Gdn_Plugin {
      * Adds items to Dashboard menu.
      *
      * @since 1.0.0
-     * @param object $Sender DashboardController.
+     * @param object $sender dashboardNavModule.
      */
-    public function base_getAppSettingsMenuItems_handler($Sender) {
-        /** @var NestedCollectionAdapter $Menu $Menu */
-        $Menu = &$Sender->EventArguments['SideMenu'];
-        $Menu->addLink('Reputation', t('Badges'), '/badge/all', 'Garden.Settings.Manage', array('class' => 'nav-badges'));
-        $Menu->addLink('Reputation', t('Badge Requests'), '/badge/requests', 'Reputation.Badges.Give', array('class' => 'nav-badge-requests'));
+    public function dashboardNavModule_init_handler($sender) {
+        $sender->addLinkToSectionIf('Garden.Settings.Manage', 'Settings', t('Badges'), '/badge/all', 'users.badges');
+        $sender->addLinkToSectionIf('Reputation.Badges.Give', 'Moderation', t('Badge Requests'), '/badge/requests', 'site.badges-give');
     }
-
 
     /**
      * Adds "Badge Requests" to MeModule menu.
