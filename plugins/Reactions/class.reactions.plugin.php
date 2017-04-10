@@ -216,7 +216,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $Menu = $sender->EventArguments['SideMenu'];
-        $Menu->addLink('Reputation', t('Reactions'), 'reactions', 'Garden.Community.Manage', array('class' => 'nav-reactions'));
+        $Menu->addLink('Forum', t('Reactions'), 'reactions', 'Garden.Community.Manage', array('class' => 'nav-reactions'));
     }
 
     /**
