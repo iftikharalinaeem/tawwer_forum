@@ -434,7 +434,7 @@ class CustomThemePlugin extends Gdn_Plugin {
             $htmlContents = $themeData->Html;
 
             if (stringIsNullOrEmpty($htmlContents)) {
-               $htmlContents = self::customTheme_getDefaugetDefaultMasterViewltMasterView();
+               $htmlContents = self::getDefaultMasterView();
             }
 
             $cssContents = $themeData->CSS;
