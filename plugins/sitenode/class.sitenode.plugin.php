@@ -483,10 +483,16 @@ class SiteNodePlugin extends Gdn_Plugin {
                         continue;
                     }
 
-                    $currentCategoryPermissions[$roleID] = array_merge(
-                        $currentCategoryPermissions[$roleID],
-                        $permissionRow
-                    );
+                    // Verify we have an existing permission row before attempting to merge in the new.
+                    if (array_key_exists($roleID, $currentCategoryPermissions) && is_array($currentCategoryPermissions[$roleID])) {
+                        $roleCategoryPermissions = array_merge(
+                            $currentCategoryPermissions[$roleID],
+                            $permissionRow
+                        );
+                    } else {
+                        $roleCategoryPermissions = $permissionRow;
+                    }
+                    $currentCategoryPermissions[$roleID] = $roleCategoryPermissions;
                 }
                 // New set of permission! CategoryModel save want them all!
                 $category['Permissions'] = $currentCategoryPermissions;
