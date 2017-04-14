@@ -301,10 +301,10 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             false
         );
 
+        self::$originalWebRoot = Gdn::request()->webRoot();
         if ($site) {
             Gdn::request()->path($path);
-            $webroot = Gdn::request()->webRoot();
-            self::$originalWebRoot = $webroot;
+            $webroot = self::$originalWebRoot;
 
             Gdn::request()->assetRoot($webroot);
             Gdn::request()->webRoot(trim("$webroot/$root", '/'));
