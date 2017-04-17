@@ -989,7 +989,12 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $CanView = TRUE;
                     $CanReply = self::CheckUserPermission($NotifyUserID, 'Email.Conversations.Add');
                     $FormatData['Signature'] = self::EmailSignature(GetValue('Route', $Args), $CanView, $CanReply);
-                    $Message = Gdn_Format::PlainText($Message['Body'], $Message['Format'])."\n\n-- \n".$FormatData['Signature'];
+
+                    $Message = Gdn_Format::to($Message['Body'], $Message['Format']);
+                    $Message = $this->transformQuotes($Message);
+                    $Message = Gdn_Format::plainText($Message, 'html', true);
+                    $Message = $this->parseQuotes($Message);
+                    $Message .= "\n\n-- \n".$FormatData['Signature'];
                     $Email->Message($Message);
 
                     break;
