@@ -511,10 +511,9 @@ class SiteNodePlugin extends Gdn_Plugin {
                     $perm['JunctionTable'] = 'Category';
                     $perm['JunctionColumn'] = 'PermissionCategoryID';
                     $perm['JunctionID'] = -1;
+                    $permissionModel->save($perm);
                 }
-                $permissionModel->saveAll($permissions, ['JunctionID' => -1, 'JunctionTable' => 'Category']);
             }
-
         }
 
         trace($categoryMap, 'categoryMap');
