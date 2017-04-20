@@ -530,7 +530,6 @@ class ReactionsPlugin extends Gdn_Plugin {
         $Sender->addJsFile('jquery.livequery.js');
         $Sender->addJsFile('global.js');
         $Sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions'); // I customized this to get proper callbacks.
-        $Sender->addJsFile('library/jQuery-Wookmark/jquery.imagesloaded.js', 'plugins/Reactions');
         $Sender->addJsFile('library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js', 'plugins/Reactions');
         $Sender->addJsFile('tile.js', 'plugins/Reactions');
         $Sender->addCssFile('style.css');
@@ -631,7 +630,6 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         if (c('Plugins.Reactions.BestOfStyle', 'Tiles') == 'Tiles') {
             $Sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions'); // I customized this to get proper callbacks.
-            $Sender->addJsFile('library/jQuery-Wookmark/jquery.imagesloaded.js', 'plugins/Reactions');
             $Sender->addJsFile('library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js', 'plugins/Reactions');
             $Sender->addJsFile('tile.js', 'plugins/Reactions');
             $Sender->CssClass .= ' NoPanel';
