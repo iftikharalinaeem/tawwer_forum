@@ -1075,7 +1075,7 @@ class GroupModel extends Gdn_Model {
      *
      * @param array|string $Where
      * @param integer|bool $Limit
-     * @param boolean $ResetData
+     * @param boolean $ResetData Unused.
      * @return Gdn_DataSet
      */
     public function delete($Where = '', $Limit = false, $ResetData = false) {
@@ -1115,7 +1115,7 @@ class GroupModel extends Gdn_Model {
         LogModel::endTransaction();
 
         // Delete groups
-        $deleted = parent::delete($Where, $Limit, $ResetData);
+        $deleted = parent::delete($Where, $Limit ? ['limit' => $Limit] : []);
 
         $this->SQL->delete('UserGroup', ['GroupID'=> $groupIDs]);
         $this->SQL->delete('GroupApplicant', ['GroupID' => $groupIDs]);

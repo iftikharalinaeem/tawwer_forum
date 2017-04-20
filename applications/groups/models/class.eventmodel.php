@@ -566,7 +566,7 @@ class EventModel extends Gdn_Model {
      *
      * @param array|string $Where
      * @param integer|bool $Limit
-     * @param boolean $ResetData
+     * @param boolean $ResetData Unused.
      * @return Gdn_DataSet
      */
     public function delete($Where = '', $Limit = false, $ResetData = false) {
@@ -574,7 +574,7 @@ class EventModel extends Gdn_Model {
         $MatchEvents = $this->getWhere($Where,'','',$Limit);
 
         // Delete events
-        $Deleted = parent::delete($Where, $Limit, $ResetData);
+        $Deleted = parent::delete($Where, $Limit ? ['limit' => $Limit] : []);
 
         // Clean up UserEvents
         $EventIDs = [];

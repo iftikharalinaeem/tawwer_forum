@@ -443,7 +443,7 @@ class GroupController extends Gdn_Controller {
             $GroupDeleted = $GroupModel->delete(array('GroupID' => $Group['GroupID']));
 
             $EventModel = new EventModel();
-            $EventModel->delete(array('GroupID' => $Group['EventID']));
+            $EventModel->delete(array('GroupID' => $Group['GroupID']));
 
             if ($GroupDeleted) {
                 $this->informMessage(formatString(t('<b>{Name}</b> deleted.'), $Group));
