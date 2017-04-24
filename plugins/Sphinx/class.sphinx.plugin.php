@@ -82,8 +82,8 @@ class SphinxPlugin extends Gdn_Plugin {
         $sender->permission();
 
         $in = $sender->schema([
-            'query:s' => '',
-            'categoryID:i?' => '',
+            'query:s' => 'Discussion search query.',
+            'categoryID:i?' => 'The numeric ID of a category.',
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
