@@ -77,7 +77,7 @@ class SphinxPlugin extends Gdn_Plugin {
      * @return array
      */
     public function discussionsApiController_get_search(DiscussionsApiController $sender, array $query) {
-        $sender->permission();
+        $sender->permission('Garden.SignIn.Allow');
 
         $in = $sender->schema([
             'query:s' => 'Discussion search query.',
@@ -97,8 +97,7 @@ class SphinxPlugin extends Gdn_Plugin {
                 'categoryID:i' => 'The category the discussion is in.',
                 'dateInserted:dt' => 'When the discussion was created.',
                 'userID:i' => 'The user that created the discussion.',
-                'user' => $sender->getUserFragmentSchema(),
-                'url:s' => 'The URL to the discussion.'
+                'user' => $sender->getUserFragmentSchema()
             ]),
             'recordCount:i' => 'The total number of discussions matching the query.'
         ], 'out');
