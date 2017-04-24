@@ -4,8 +4,6 @@
  * @license Proprietary
  */
 
-use Garden\Schema\Schema;
-
 $PluginInfo['Sphinx'] = [
     'Name' => 'Sphinx Search',
     'Description' => "Upgrades search to use the powerful Sphinx engine instead of the default search.",
@@ -92,7 +90,7 @@ class SphinxPlugin extends Gdn_Plugin {
             ]
         ], 'in');
         $out = $sender->schema([
-            'searchResults:a' => Schema::parse([
+            'searchResults:a' => $sender->schema([
                 'discussionID:i' => 'The ID of the discussion.',
                 'title:s' => 'The title of the discussion.',
                 'summary:s' => 'A summary of the discussion.',
