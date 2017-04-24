@@ -1,9 +1,10 @@
 <?php
-
 /**
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license Proprietary
  */
+
+use Garden\Schema\Schema;
 
 $PluginInfo['Sphinx'] = [
     'Name' => 'Sphinx Search',
@@ -68,6 +69,66 @@ class SphinxPlugin extends Gdn_Plugin {
             ->column('MaxID', 'uint', '0')
             ->engine('InnoDB')
             ->set();
+    }
+
+    /**
+     * Search discussions.
+     *
+     * @param DiscussionsApiController $sender
+     * @param array $query
+     * @return array
+     */
+    public function discussionsApiController_get_search(DiscussionsApiController $sender, array $query) {
+        $sender->permission();
+
+        $in = $sender->schema([
+            'query:s' => '',
+            'categoryID:i?' => '',
+            'page:i?' => [
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+                'maximum' => DiscussionModel::instance()->getMaxPages()
+            ]
+        ], 'in');
+        $out = $sender->schema([
+            'searchResults:a' => Schema::parse([
+                'discussionID:i' => 'The ID of the discussion.',
+                'title:s' => 'The title of the discussion.',
+                'summary:s' => 'A summary of the discussion.',
+                'categoryID:i' => 'The category the discussion is in.',
+                'dateInserted:dt' => 'When the discussion was created.',
+                'userID:i' => 'The user that created the discussion.',
+                'user' => $sender->getUserFragmentSchema(),
+                'url:s' => 'The URL to the discussion.'
+            ]),
+            'recordCount:i' => 'The total number of discussions matching the query.'
+        ], 'out');
+
+        $in->validate($query);
+        list($offset, $limit) = offsetLimit(
+            "p{$query['page']}",
+            DiscussionModel::instance()->getDefaultLimit()
+        );
+        $search = [
+            'group' => false,
+            'search' => $query['query'],
+            'discussion_d' => 1
+        ];
+        if (array_key_exists('categoryID', $query)) {
+            $search['cat'] = $query['categoryID'];
+        }
+
+        $searchModel = new SearchModel();
+        $userModel = new UserModel();
+        $searchResults = $searchModel->advancedSearch($search, $offset, $limit);
+        $userModel->expandUsers($searchResults['SearchResults'], ['UserID']);
+        foreach ($searchResults['SearchResults'] as &$discussion) {
+            $sender->formatField($discussion, 'Summary', $discussion['Format']);
+        }
+
+        $result = $out->validate($searchResults);
+        return $result;
     }
 
     /**
