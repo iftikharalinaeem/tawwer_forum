@@ -912,7 +912,7 @@ class OnlinePlugin extends Gdn_Plugin {
      */
     public function profileController_online_create($sender) {
         $sender->permission('Garden.SignIn.Allow');
-        $sender->title("Online Preferences");
+        $sender->title(t("Online Preferences"));
 
         $this->dispatch($sender);
     }
