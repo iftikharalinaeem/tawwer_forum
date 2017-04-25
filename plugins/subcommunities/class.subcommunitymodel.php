@@ -42,8 +42,11 @@ class SubcommunityModel extends Gdn_Model {
         if (!isset(self::$all)) {
             $all = Gdn::cache()->get(self::CACHE_KEY);
             if (!$all) {
+                $sql = clone Gdn::sql();
+                $sql->reset();
+                $result = $sql->getWhere('Subcommunity', false, 'Sort,Name')->resultArray();
                 $all = array_column(
-                    static::instance()->getWhere(false, 'Sort,Name')->resultArray(),
+                    $result,
                     null,
                     'Folder'
                 );
@@ -154,7 +157,9 @@ class SubcommunityModel extends Gdn_Model {
      */
     public static function getDefaultSite() {
         $default = null;
-        $row = Gdn::sql()->getWhere('Subcommunity', ['IsDefault' => 1], '', '', 1)->resultArray();
+        $sql = clone Gdn::sql();
+        $sql->reset();
+        $row = $sql->getWhere('Subcommunity', ['IsDefault' => 1], '', '', 1)->resultArray();
         if (is_array($row) && count($row) === 1) {
             $default = current($row);
             self::calculateRow($default);
@@ -171,7 +176,9 @@ class SubcommunityModel extends Gdn_Model {
      */
     public static function getSite($folder) {
         $site = null;
-        $row = Gdn::sql()->getWhere('Subcommunity', ['Folder' => $folder], '', '', 1)->resultArray();
+        $sql = clone Gdn::sql();
+        $sql->reset();
+        $row = $sql->getWhere('Subcommunity', ['Folder' => $folder], '', '', 1)->resultArray();
         if (is_array($row) && count($row) === 1) {
             $site = current($row);
             self::calculateRow($site);
