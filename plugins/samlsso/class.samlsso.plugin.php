@@ -412,6 +412,11 @@ class SamlSSOPlugin extends Gdn_Plugin {
         self::requireFiles();
         $settings = new OneLogin_Saml_Settings();
         $provider = $this->getProvider($authenticationKey);
+
+        if (!$provider) {
+            throw new Gdn_UserException("The SAML provider with key '$authenticationKey' could not be found.", 404);
+        }
+
         $settings->idpSingleSignOnUrl = $provider['SignInUrl'];
         $settings->idpSingleSignOutUrl = $provider['SignOutUrl'];
         $settings->idpPublicCertificate = $provider['AssociationSecret'];
