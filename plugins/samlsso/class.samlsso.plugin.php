@@ -235,7 +235,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
         // Set the target from common items.
         if ($relay_state = $Sender->Request->post('RelayState')) {
-            if (isUrl($relay_state) || preg_match('`^[/a-z]`i', $relay_state)) {
+            if ((isUrl($relay_state) || preg_match('`^[/a-z]`i', $relay_state)) && strripos($relay_state, '/entry/connect/saml') ) {
                 $Form->setFormValue('Target', $relay_state);
             }
         }
