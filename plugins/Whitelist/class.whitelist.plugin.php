@@ -117,12 +117,22 @@ class WhitelistPlugin extends Gdn_Plugin {
         $request->fromEnvironment();
 
         if (!$isBlockModeHardcore) {
-            // If you are an admin we should not block you even if you are not whitelisted
-            // Lets use block exceptions as a whitelist of URLs that must not be blocked (ex. entry/*)
-            $canBlock = Gdn::dispatcher()->getCanBlock($request);
-            if ($canBlock <= Gdn_Dispatcher::BLOCK_PERMISSION) {
+            // Don't block admins
+            if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
                 return;
             }
+
+            $path = $request->path();
+            // We cannot use canBlock because it default to BLOCK_PERMISSION if the user is logged....
+            $blockExceptions = Gdn::dispatcher()->getBlockPermissions();
+            foreach ($blockExceptions as $blockException => $blockLevel) {
+                if (preg_match($blockException, $path)) {
+                    if ($blockLevel <= Gdn_Dispatcher::BLOCK_PERMISSION) {
+                        return;
+                    }
+                }
+            }
+
         }
 
         $ip = $request->ipAddress();
@@ -140,21 +150,21 @@ class WhitelistPlugin extends Gdn_Plugin {
         }
 
         if ($isBlockModeHardcore || Gdn::session()->isValid()) {
-            safeHeader('HTTP/1.1 403 Forbidden', true, 403);
+            safeHeader('HTTP/1.1 401 Unauthorized', true, 401);
             if (Gdn::request()->get('DeliveryType') === DELIVERY_TYPE_DATA) {
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
             }
         // Lets redirect you to the signin page in case you are an admin.
         } else {
             if (Gdn::request()->get('DeliveryType') === DELIVERY_TYPE_DATA) {
-                safeHeader('HTTP/1.1 403 Forbidden', true, 403);
+                safeHeader('HTTP/1.1 401 Unauthorized', true, 401);
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
                 echo json_encode([
-                    'Code' => '403',
+                    'Code' => '401',
                     'Exception' => t('You must sign in.'),
                 ]);
             } else {
-                redirect('/entry/signin?Target='.urlencode($request->path(false)));
+                redirect('/entry/signin?Target='.urlencode($request->pathAndQuery()));
             }
         }
         exit();
