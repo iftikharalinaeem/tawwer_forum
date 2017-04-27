@@ -124,7 +124,7 @@ class WhitelistPlugin extends Gdn_Plugin {
 
             $path = $request->path();
             // We cannot use canBlock because it default to BLOCK_PERMISSION if the user is logged....
-            $blockExceptions = Gdn::dispatcher()->getBlockPermissions();
+            $blockExceptions = Gdn::dispatcher()->getBlockExceptions();
             foreach ($blockExceptions as $blockException => $blockLevel) {
                 if (preg_match($blockException, $path)) {
                     if ($blockLevel <= Gdn_Dispatcher::BLOCK_PERMISSION) {
