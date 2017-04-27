@@ -10,7 +10,7 @@
 $PluginInfo['samlsso'] = [
     'Name' => 'SAML SSO',
     'Description' => 'Allows Vanilla to SSO to SAML 2.0 compliant identity providers.',
-    'Version' => '1.4',
+    'Version' => '1.5',
     'RequiredApplications' => ['Vanilla' => '2.1'],
     'SettingsUrl' => '/settings/samlsso',
     'SettingsPermission' => 'Garden.Settings.Manage',
@@ -235,7 +235,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
         // Set the target from common items.
         if ($relay_state = $Sender->Request->post('RelayState')) {
-            if ((isUrl($relay_state) || preg_match('`^[/a-z]`i', $relay_state)) && strripos($relay_state, '/entry/connect/saml') ) {
+            if ((isUrl($relay_state) || preg_match('`^[/a-z]`i', $relay_state)) && strripos($relay_state, '/entry/connect/saml') === false) {
                 $Form->setFormValue('Target', $relay_state);
             }
         }
