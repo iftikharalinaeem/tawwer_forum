@@ -162,7 +162,12 @@ class SamlSSOPlugin extends Gdn_Plugin {
             return;
         }
 
-        redirect('/entry/saml/'.$provider['AuthenticationKey']);
+        if (val('Target', $args)) {
+            $redirectURL ='/entry/saml/'.$provider['AuthenticationKey'].'?'. http_build_query(['Target' => val('Target', $args)]);
+        } else {
+            $redirectURL = '/entry/saml/'.$provider['AuthenticationKey'];
+        }
+        redirect($redirectURL);
     }
 
     /**
