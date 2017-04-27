@@ -419,7 +419,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         $provider = $this->getProvider($authenticationKey);
 
         if (!$provider) {
-            throw new Gdn_UserException("The SAML provider with key '$authenticationKey' could not be found.", 404);
+            throw new Gdn_UserException("The SAML connection appears to be misconfigured: Connection ID of '$authenticationKey' could not be found. Please contact the forum admin.", 404);
         }
 
         $settings->idpSingleSignOnUrl = $provider['SignInUrl'];
