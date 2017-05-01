@@ -626,6 +626,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         $Sender->addJsFile('jquery.js');
         $Sender->addJsFile('jquery.livequery.js');
         $Sender->addJsFile('global.js');
+        $Sender->addJsFile('jquery.form.js');
         $Sender->addJsFile('jquery.popup.js');
 
         if (c('Plugins.Reactions.BestOfStyle', 'Tiles') == 'Tiles') {
