@@ -124,7 +124,7 @@ class SphinxPlugin extends Gdn_Plugin {
                 ->resultArray();
             if ($query['expand']) {
                 $userModel = new UserModel();
-                $userModel->expandUsers($result, ['UserID']);
+                $userModel->expandUsers($result, ['InsertUserID']);
             }
             foreach ($result as &$row) {
                 $sender->massageRow($row);
