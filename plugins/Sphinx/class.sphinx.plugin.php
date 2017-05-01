@@ -88,7 +88,7 @@ class SphinxPlugin extends Gdn_Plugin {
                 'minimum' => 1,
                 'maximum' => DiscussionModel::instance()->getMaxPages()
             ],
-            'pageSize:i?' => [
+            'limit:i?' => [
                 'description' => 'The number of items per page.',
                 'default' => DiscussionModel::instance()->getDefaultLimit(),
                 'minimum' => 1,
@@ -101,7 +101,7 @@ class SphinxPlugin extends Gdn_Plugin {
         $query = $in->validate($query);
         list($offset, $limit) = offsetLimit(
             "p{$query['page']}",
-            $query['pageSize']
+            $query['limit']
         );
         $params = [
             'group' => false,
