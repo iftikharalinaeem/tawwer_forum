@@ -87,27 +87,23 @@ class SphinxPlugin extends Gdn_Plugin {
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => DiscussionModel::instance()->getMaxPages()
-            ]
-        ], 'in');
-        $out = $sender->schema([
-            'searchResults:a' => $sender->schema([
-                'discussionID:i' => 'The ID of the discussion.',
-                'title:s' => 'The title of the discussion.',
-                'summary:s' => 'A summary of the discussion.',
-                'categoryID:i' => 'The category the discussion is in.',
-                'dateInserted:dt' => 'When the discussion was created.',
-                'userID:i' => 'The user that created the discussion.',
-                'user' => $sender->getUserFragmentSchema()
-            ]),
-            'recordCount:i' => 'The total number of discussions matching the query.'
-        ], 'out');
+            ],
+            'pageSize:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => DiscussionModel::instance()->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+            'expand:b?' => 'Expand associated records.'
+        ], 'in')->setDescription('Search discussions.');
+        $out = $sender->schema([':a' => $sender->discussionSchema()], 'out');
 
-        $in->validate($query);
+        $query = $in->validate($query);
         list($offset, $limit) = offsetLimit(
             "p{$query['page']}",
-            DiscussionModel::instance()->getDefaultLimit()
+            $query['pageSize']
         );
-        $search = [
+        $params = [
             'group' => false,
             'search' => $query['query'],
             'discussion_d' => 1
@@ -117,14 +113,25 @@ class SphinxPlugin extends Gdn_Plugin {
         }
 
         $searchModel = new SearchModel();
-        $userModel = new UserModel();
-        $searchResults = $searchModel->advancedSearch($search, $offset, $limit);
-        $userModel->expandUsers($searchResults['SearchResults'], ['UserID']);
-        foreach ($searchResults['SearchResults'] as &$discussion) {
-            $sender->formatField($discussion, 'Summary', $discussion['Format']);
+        $search = $searchModel->advancedSearch($params, $offset, $limit);
+        $rows = $search['SearchResults'];
+        $discussionIDs = array_column($rows, 'PrimaryID');
+        $result = [];
+
+        if (!empty($discussionIDs)) {
+            $result = DiscussionModel::instance()
+                ->getWhere(['DiscussionID' => $discussionIDs])
+                ->resultArray();
+            if ($query['expand']) {
+                $userModel = new UserModel();
+                $userModel->expandUsers($result, ['UserID']);
+            }
+            foreach ($result as &$row) {
+                $sender->massageRow($row);
+            }
         }
 
-        $result = $out->validate($searchResults);
+        $result = $out->validate($result);
         return $result;
     }
 
