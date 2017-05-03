@@ -313,7 +313,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         } elseif (!$this->api) {
             if ($defaultSite) {
                 // Redirect to the canonicalURL
-                redirectURL(self::getCanonicalUrl(Gdn::request()->pathAndQuery(), $defaultSite));
+                redirectURL(self::getCanonicalUrl(Gdn::request()->pathAndQuery(), $defaultSite), 301);
             }
         }
 
