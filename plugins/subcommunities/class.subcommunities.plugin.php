@@ -624,12 +624,13 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         if ($categoryID) {
             // Grab this category's ancestors...
-            $parents = CategoryModel::getAncestors($categoryID, true, true);
+            $parents = CategoryModel::getAncestors($categoryID, false, true);
             // ...and pull the one from the top. This should be the highest, non-root parent.
             $topParent = reset($parents);
 
             if ($topParent) {
-                foreach (SubcommunityModel::all() as $subcommunity) {
+                $subcommunities = SubcommunityModel::all();
+                foreach ($subcommunities as $subcommunity) {
                     if ($subcommunity['CategoryID'] == $topParent['CategoryID']) {
                         $targetSubcommunity = $subcommunity;
                         break;
