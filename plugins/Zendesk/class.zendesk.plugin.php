@@ -5,11 +5,11 @@
  */
 
 // Define the plugin:
-$PluginInfo['Zendesk'] = array(
+$PluginInfo['Zendesk'] = [
     'Name' => 'Zendesk',
     'Description' => "Allow staff users to create tickets and cases from discussions and comments.",
     'Version' => '1.0.0',
-    'RequiredApplications' => array('Vanilla' => '2.1.18'),
+    'RequiredApplications' => ['Vanilla' => '2.1.18'],
     'SettingsUrl' => '/plugin/zendesk',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true,
@@ -18,7 +18,7 @@ $PluginInfo['Zendesk'] = array(
     'AuthorUrl' => 'http://www.github.com/John0x00',
     'Icon' => 'zendesk.png',
     'SocialConnect' => false
-);
+];
 
 /**
  * Class ZendeskPlugin.
@@ -46,6 +46,7 @@ class ZendeskPlugin extends Gdn_Plugin {
 
     /**
      * If time since last update from Zendesk is less then this; we wont check for update - saving api calls.
+     *
      * @var int
      */
     protected $minimumTimeForUpdate = 600;
@@ -59,9 +60,9 @@ class ZendeskPlugin extends Gdn_Plugin {
     public function __construct() {
         parent::__construct();
 
-        $this->accessToken = GetValueR('Attributes.' . self::PROVIDER_KEY . '.AccessToken', Gdn::Session()->User);
+        $this->accessToken = getValueR('Attributes.'.self::PROVIDER_KEY.'.AccessToken', Gdn::session()->User);
         if (!$this->accessToken) {
-            $this->accessToken = C('Plugins.Zendesk.GlobalLogin.AccessToken');
+            $this->accessToken = c('Plugins.Zendesk.GlobalLogin.AccessToken');
         }
 
     }
@@ -104,18 +105,18 @@ class ZendeskPlugin extends Gdn_Plugin {
             throw new Gdn_UserException('Invalid Content');
         }
         // Signed in users only.
-        if (!Gdn::Session()->IsValid()) {
+        if (!Gdn::session()->isValid()) {
             return;
         }
 
-        if (!Gdn::Session()->CheckPermission('Garden.Settings.Manage')) {
+        if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             return;
         }
-        $Attachments = GetValue('Attachments', $Args[$Content]);
+        $Attachments = val('Attachments', $Args[$Content]);
         if ($Attachments) {
             foreach ($Args[$Content]->Attachments as $Attachment) {
                 if ($Attachment['Type'] == 'zendesk-ticket') {
-                    $this->UpdateAttachment($Attachment);
+                    $this->updateAttachment($Attachment);
                 }
             }
         }
@@ -132,19 +133,19 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @return bool
      */
     protected function isToBeUpdated($Attachment) {
-        if (GetValue('Status', $Attachment) == $this->closedCaseStatusString) {
-            Trace("Ticket {$this->closedCaseStatusString}.  Not checking for update.");
+        if (val('Status', $Attachment) == $this->closedCaseStatusString) {
+            trace("Ticket {$this->closedCaseStatusString}.  Not checking for update.");
             return false;
         }
         $TimeDiff = time() - strtotime($Attachment['DateUpdated']);
         if ($TimeDiff < $this->minimumTimeForUpdate) {
-            Trace("Not Checking For Update: $TimeDiff seconds since last update");
+            trace("Not Checking For Update: $TimeDiff seconds since last update");
             return false;
         }
         if (isset($Attachment['LastModifiedDate'])) {
             $TimeDiff = time() - strtotime($Attachment['LastModifiedDate']);
             if ($TimeDiff < $this->minimumTimeForUpdate) {
-                Trace("Not Checking For Update: $TimeDiff seconds since last update");
+                trace("Not Checking For Update: $TimeDiff seconds since last update");
                 return false;
             }
         }
@@ -164,26 +165,26 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (!$this->isConfigured() || !$this->isConnected()) {
             return;
         }
-        if ($this->IsToBeUpdated($Attachment)) {
+        if ($this->isToBeUpdated($Attachment)) {
             try {
                 $this->setZendesk();
                 $Ticket = $this->zendesk->getTicket($Attachment['SourceID']);
             } catch (Gdn_UserException $e) {
                 if ($e->getCode() == 404) {
                     $Attachment['Error'] = 'This Ticket has been deleted from Zendesk';
-                    $AttachmentModel = AttachmentModel::Instance();
-                    $Attachment['DateUpdated'] = Gdn_Format::ToDateTime();
-                    $AttachmentModel->Save($Attachment);
+                    $AttachmentModel = AttachmentModel::instance();
+                    $Attachment['DateUpdated'] = Gdn_Format::toDateTime();
+                    $AttachmentModel->save($Attachment);
                     return false;
                 }
             }
 
             $Attachment['Status'] = $Ticket['status'];
             $Attachment['LastModifiedDate'] = $Ticket['updated_at'];
-            $Attachment['DateUpdated'] = Gdn_Format::ToDateTime();
+            $Attachment['DateUpdated'] = Gdn_Format::toDateTime();
 
-            $AttachmentModel = AttachmentModel::Instance();
-            $AttachmentModel->Save($Attachment);
+            $AttachmentModel = AttachmentModel::instance();
+            $AttachmentModel->save($Attachment);
             return true;
         }
         return false;
@@ -196,11 +197,11 @@ class ZendeskPlugin extends Gdn_Plugin {
      */
     public function pluginController_zendesk_create($Sender) {
 
-        $Sender->Permission('Garden.Settings.Manage');
-        $Sender->Title('Zendesk');
-        $Sender->AddSideMenu('plugin/zendesk');
+        $Sender->permission('Garden.Settings.Manage');
+        $Sender->title('Zendesk');
+        $Sender->addSideMenu('plugin/zendesk');
         $Sender->Form = new Gdn_Form();
-        $this->Dispatch($Sender, $Sender->RequestArgs);
+        $this->dispatch($Sender, $Sender->RequestArgs);
     }
 
     /**
@@ -212,62 +213,62 @@ class ZendeskPlugin extends Gdn_Plugin {
      */
     public function controller_index($Sender) {
 
-        $Sender->AddCssFile('admin.css');
+        $Sender->addCssFile('admin.css');
 
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->SetField(array('Url', 'ApplicationID', 'Secret'));
+        $ConfigurationModel->setField(['Url', 'ApplicationID', 'Secret']);
 
         // Set the model on the form.
-        $Sender->Form->SetModel($ConfigurationModel);
+        $Sender->Form->setModel($ConfigurationModel);
 
         // If seeing the form for the first time...
-        if ($Sender->Form->AuthenticatedPostBack() === false) {
+        if ($Sender->Form->authenticatedPostBack() === false) {
             // Apply the config settings to the form.
-            $Sender->Form->SetData($ConfigurationModel->Data);
+            $Sender->Form->setData($ConfigurationModel->Data);
         } else {
-            $FormValues = $Sender->Form->FormValues();
-            if ($Sender->Form->IsPostBack()) {
-                $Sender->Form->ValidateRule(
+            $FormValues = $Sender->Form->formValues();
+            if ($Sender->Form->isPostBack()) {
+                $Sender->Form->validateRule(
                     'Url',
                     'function:ValidateRequired',
                     'Url is required'
                 );
-                $Sender->Form->ValidateRule(
+                $Sender->Form->validateRule(
                     'ApplicationID',
                     'function:ValidateRequired',
                     'Unique Identifier is required'
                 );
-                $Sender->Form->ValidateRule('Secret', 'function:ValidateRequired', 'Secret is required');
+                $Sender->Form->validateRule('Secret', 'function:ValidateRequired', 'Secret is required');
 
 
-                if ($Sender->Form->ErrorCount() == 0) {
-                    SaveToConfig('Plugins.Zendesk.ApplicationID', trim($FormValues['ApplicationID']));
-                    SaveToConfig('Plugins.Zendesk.Secret', trim($FormValues['Secret']));
-                    SaveToConfig('Plugins.Zendesk.Url', trim($FormValues['Url']));
-                    $Sender->InformMessage(T("Your changes have been saved."));
+                if ($Sender->Form->errorCount() == 0) {
+                    saveToConfig('Plugins.Zendesk.ApplicationID', trim($FormValues['ApplicationID']));
+                    saveToConfig('Plugins.Zendesk.Secret', trim($FormValues['Secret']));
+                    saveToConfig('Plugins.Zendesk.Url', trim($FormValues['Url']));
+                    $Sender->informMessage(T("Your changes have been saved."));
                 } else {
-                    $Sender->InformMessage(T("Error saving settings to config."));
+                    $Sender->informMessage(T("Error saving settings to config."));
                 }
             }
 
         }
 
-        $Sender->Form->SetValue('Url', C('Plugins.Zendesk.Url'));
-        $Sender->Form->SetValue('ApplicationID', C('Plugins.Zendesk.ApplicationID'));
-        $Sender->Form->SetValue('Secret', C('Plugins.Zendesk.Secret'));
-        $Sender->SetData(array(
-            'GlobalLoginEnabled' => C('Plugins.Zendesk.GlobalLogin.Enabled'),
-            'GlobalLoginConnected' => C('Plugins.Zendesk.GlobalLogin.AccessToken'),
-            'ToggleUrl' => Url('/plugin/zendesk/toggle/' . Gdn::Session()->TransientKey())
-        ));
-        if (C('Plugins.Zendesk.GlobalLogin.Enabled') && C('Plugins.Zendesk.GlobalLogin.AccessToken')) {
-            $this->setZendesk(C('Plugins.Zendesk.GlobalLogin.AccessToken'));
+        $Sender->Form->setValue('Url', c('Plugins.Zendesk.Url'));
+        $Sender->Form->setValue('ApplicationID', c('Plugins.Zendesk.ApplicationID'));
+        $Sender->Form->setValue('Secret', c('Plugins.Zendesk.Secret'));
+        $Sender->setData([
+            'GlobalLoginEnabled' => c('Plugins.Zendesk.GlobalLogin.Enabled'),
+            'GlobalLoginConnected' => c('Plugins.Zendesk.GlobalLogin.AccessToken'),
+            'ToggleUrl' => url('/plugin/zendesk/toggle/'.Gdn::session()->transientKey())
+        ]);
+        if (c('Plugins.Zendesk.GlobalLogin.Enabled') && c('Plugins.Zendesk.GlobalLogin.AccessToken')) {
+            $this->setZendesk(c('Plugins.Zendesk.GlobalLogin.AccessToken'));
             $globalLoginProfile = $this->zendesk->getProfile();
-            $Sender->SetData('GlobalLoginProfile', $globalLoginProfile);
+            $Sender->setData('GlobalLoginProfile', $globalLoginProfile);
         }
 
-        $Sender->Render($this->GetView('dashboard.php'));
+        $Sender->render($this->getView('dashboard.php'));
     }
 
 
@@ -311,11 +312,11 @@ class ZendeskPlugin extends Gdn_Plugin {
         }
 
         // Signed in users only. No guest reporting!
-        if (!Gdn::Session()->UserID) {
+        if (!Gdn::session()->UserID) {
             return;
         }
 
-        if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+        if (!Gdn::session()->checkPermission('Garden.Staff.Allow')) {
             return;
         }
 
@@ -331,24 +332,24 @@ class ZendeskPlugin extends Gdn_Plugin {
         $ElementAuthorID = $Args[$Content]->InsertUserID;
 
 
-        if (!C('Plugins.Zendesk.AllowTicketForSelf', false) && $ElementAuthorID == Gdn::Session()->UserID) {
+        if (!C('Plugins.Zendesk.AllowTicketForSelf', false) && $ElementAuthorID == Gdn::session()->UserID) {
             //no need to create support tickets for your self
             return;
         }
 
         $LinkText = 'Create Zendesk Ticket';
-        if (isset($Args[$Content . 'Options'])) {
-            $Args[$Content . 'Options']['Zendesk'] = array(
-                'Label' => T($LinkText),
-                'Url' => "/discussion/zendesk/" . strtolower($Content) . "/$ContentID",
+        if (isset($Args[$Content.'Options'])) {
+            $Args[$Content.'Options']['Zendesk'] = [
+                'Label' => t($LinkText),
+                'Url' => "/discussion/zendesk/".strtolower($Content)."/$ContentID",
                 'Class' => 'Popup'
-            );
+            ];
         }
         //remove create Create already created
-        $Attachments = GetValue('Attachments', $Args[$Content], array());
+        $Attachments = val('Attachments', $Args[$Content], []);
         foreach ($Attachments as $Attachment) {
             if ($Attachment['Type'] == 'zendesk-ticket') {
-                unset($Args[$Content . 'Options']['Zendesk']);
+                unset($Args[$Content.'Options']['Zendesk']);
             }
         }
     }
@@ -362,21 +363,21 @@ class ZendeskPlugin extends Gdn_Plugin {
      */
     public function discussionController_zendesk_create($Sender) {
         // Signed in users only.
-        if (!($UserID = Gdn::Session()->UserID)) {
+        if (!($UserID = Gdn::session()->UserID)) {
             return;
         }
 
         if (!$this->isConnected()) {
-            $LoginUrl = Url('/profile/connections');
-            if (C('Plugins.Zendesk.GlobalLogin.Enabled')) {
-                $LoginUrl = Url('/plugin/zendesk#global-login');
+            $LoginUrl = url('/profile/connections');
+            if (c('Plugins.Zendesk.GlobalLogin.Enabled')) {
+                $LoginUrl = url('/plugin/zendesk#global-login');
             }
-            $Sender->SetData('LoginUrl', $LoginUrl);
-            $Sender->Render('userlogin', '', 'plugins/Zendesk');
+            $Sender->setData('LoginUrl', $LoginUrl);
+            $Sender->render('userlogin', '', 'plugins/Zendesk');
             return;
         }
 
-        $UserName = Gdn::Session()->User->Name;
+        $UserName = Gdn::session()->User->Name;
 
         $Arguments = $Sender->RequestArgs;
         if (sizeof($Arguments) != 2) {
@@ -388,34 +389,34 @@ class ZendeskPlugin extends Gdn_Plugin {
 
         if ($Context == 'comment') {
             $CommentModel = new CommentModel();
-            $Content = $CommentModel->GetID($ContentID);
+            $Content = $CommentModel->getID($ContentID);
             $DiscussionID = $Content->DiscussionID;
-            $Url = CommentUrl($Content);
+            $Url = commentUrl($Content);
 
-            $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
+            $Discussion = $Sender->DiscussionModel->getID($DiscussionID);
             $TicketTitle = $Discussion->Name;
 
         } else {
             $DiscussionID = $ContentID;
-            $Content = $Sender->DiscussionModel->GetID($ContentID);
+            $Content = $Sender->DiscussionModel->getID($ContentID);
             $TicketTitle = $Content->Name;
-            $Url = DiscussionUrl($Content, 1);
+            $Url = discussionUrl($Content, 1);
 
         }
 
         // Join in attachments
-        $AttachmentModel = AttachmentModel::Instance();
-        $AttachmentModel->JoinAttachments($Content);
+        $AttachmentModel = AttachmentModel::instance();
+        $AttachmentModel->joinAttachments($Content);
 
-        if ($Sender->Form->IsPostBack() && $Sender->Form->AuthenticatedPostBack() === true) {
-            $Sender->Form->ValidateRule('Title', 'function:ValidateRequired', 'Title is required');
-            $Sender->Form->ValidateRule('Body', 'function:ValidateRequired', 'Body is required');
+        if ($Sender->Form->isPostBack() && $Sender->Form->authenticatedPostBack() === true) {
+            $Sender->Form->validateRule('Title', 'function:ValidateRequired', 'Title is required');
+            $Sender->Form->validateRule('Body', 'function:ValidateRequired', 'Body is required');
 
-            if ($Sender->Form->ErrorCount() == 0) {
-                $FormValues = $Sender->Form->FormValues();
+            if ($Sender->Form->errorCount() == 0) {
+                $FormValues = $Sender->Form->formValues();
                 $Body = $FormValues['Body'];
 
-                $Body .= "\n--\n\nThis ticket was generated from: " . $Url . "\n\n";
+                $Body .= "\n--\n\nThis ticket was generated from: ".$Url."\n\n";
                 $this->setZendesk();
                 $TicketID = $this->zendesk->createTicket(
                     $FormValues['Title'],
@@ -424,44 +425,44 @@ class ZendeskPlugin extends Gdn_Plugin {
                         $FormValues['InsertName'],
                         $FormValues['InsertEmail']
                     ),
-                    array(
-                        'custom_fields' => array(
+                    [
+                        'custom_fields' => [
                             'DiscussionID' => $DiscussionID,
                             'ForumUrl' => $Url
-                        ))
+                        ]]
                 );
 
                 if ($TicketID > 0) {
                     //Save to Attachments
-                    $AttachmentModel->Save(array(
+                    $AttachmentModel->save([
                         'Type' => 'zendesk-ticket',
-                        'ForeignID' => $AttachmentModel->RowID($Content),
+                        'ForeignID' => $AttachmentModel->rowID($Content),
                         'ForeignUserID' => $Content->InsertUserID,
                         'Source' => 'zendesk',
                         'SourceID' => $TicketID,
-                        'SourceURL' => C('Plugins.Zendesk.Url') . '/agent/#/tickets/' . $TicketID,
+                        'SourceURL' => c('Plugins.Zendesk.Url').'/agent/#/tickets/'.$TicketID,
                         'Status' => 'open',
-                        'LastModifiedDate' => Gdn_Format::ToDateTime()
-                    ));
-                    $Sender->InformMessage('Zendesk Ticket Created');
-                    $Sender->JsonTarget('', $Url, 'Redirect');
+                        'LastModifiedDate' => Gdn_Format::toDateTime()
+                    ]);
+                    $Sender->informMessage('Zendesk Ticket Created');
+                    $Sender->jsonTarget('', $Url, 'Redirect');
 
                 } else {
-                    $Sender->InformMessage(T("Error creating ticket with Zendesk"));
+                    $Sender->informMessage(T("Error creating ticket with Zendesk"));
                 }
             }
         }
 
-        $Sender->Form->AddHidden('Url', $Url);
-        $Sender->Form->AddHidden('UserId', $UserID);
-        $Sender->Form->AddHidden('UserName', $UserName);
-        $Sender->Form->AddHidden('InsertName', $Content->InsertName);
-        $Sender->Form->AddHidden('InsertEmail', $Content->InsertEmail);
+        $Sender->Form->addHidden('Url', $Url);
+        $Sender->Form->addHidden('UserId', $UserID);
+        $Sender->Form->addHidden('UserName', $UserName);
+        $Sender->Form->addHidden('InsertName', $Content->InsertName);
+        $Sender->Form->addHidden('InsertEmail', $Content->InsertEmail);
 
-        $Sender->Form->SetValue('Title', $TicketTitle);
-        $Sender->Form->SetValue('Body', Gdn_Format::TextEx($Content->Body));
+        $Sender->Form->setValue('Title', $TicketTitle);
+        $Sender->Form->setValue('Body', Gdn_Format::textEx($Content->Body));
 
-        $Sender->SetData('Data', array(
+        $Sender->setData('Data', [
             'DiscussionID' => $DiscussionID,
             'UserID' => $UserID,
             'UserName' => $UserName,
@@ -469,9 +470,9 @@ class ZendeskPlugin extends Gdn_Plugin {
             'InsertName' => $Content->InsertName,
             'InsertEmail' => $Content->InsertEmail,
             'Title' => $TicketTitle,
-        ));
+        ]);
 
-        $Sender->Render('createticket', '', 'plugins/Zendesk');
+        $Sender->render('createticket', '', 'plugins/Zendesk');
     }
 
     /**
@@ -481,12 +482,12 @@ class ZendeskPlugin extends Gdn_Plugin {
      */
     public function controller_toggle($Sender) {
         // Enable/Disable
-        if (Gdn::Session()->ValidateTransientKey(GetValue(1, $Sender->RequestArgs))) {
-            if (C('Plugins.Zendesk.GlobalLogin.Enabled')) {
+        if (Gdn::session()->validateTransientKey(val(1, $Sender->RequestArgs))) {
+            if (c('Plugins.Zendesk.GlobalLogin.Enabled')) {
                 $this->disable();
-                Redirect('/plugin/zendesk');
+                redirect('/plugin/zendesk');
             }
-            Redirect('/plugin/zendesk/authorize');
+            redirect('/plugin/zendesk/authorize');
 
         }
     }
@@ -495,8 +496,8 @@ class ZendeskPlugin extends Gdn_Plugin {
      * Disable Global Login.
      */
     protected function disable() {
-        RemoveFromConfig('Plugins.Zendesk.GlobalLogin.Enabled');
-        RemoveFromConfig('Plugins.Zendesk.GlobalLogin.AccessToken');
+        removeFromConfig('Plugins.Zendesk.GlobalLogin.Enabled');
+        removeFromConfig('Plugins.Zendesk.GlobalLogin.AccessToken');
     }
 
     /**
@@ -504,28 +505,28 @@ class ZendeskPlugin extends Gdn_Plugin {
      */
     public function setup() {
 
-        SaveToConfig('Garden.AttachmentsEnabled', true);
+        saveToConfig('Garden.AttachmentsEnabled', true);
 
         $Error = '';
         if (!function_exists('curl_init')) {
-            $Error = ConcatSep("\n", $Error, 'This plugin requires curl.');
+            $Error = concatSep("\n", $Error, 'This plugin requires curl.');
         }
         if ($Error) {
             throw new Gdn_UserException($Error, 400);
         }
         // Save the provider type.
-        Gdn::SQL()->Replace(
+        Gdn::sql()->replace(
             'UserAuthenticationProvider',
-            array(
+            [
                 'AuthenticationSchemeAlias' => 'zendesk',
                 'URL' => '...',
                 'AssociationSecret' => '...',
                 'AssociationHashMethod' => '...'
-            ),
-            array('AuthenticationKey' => self::PROVIDER_KEY),
+            ],
+            ['AuthenticationKey' => self::PROVIDER_KEY],
             true
         );
-        Gdn::PermissionModel()->Define(array('Garden.Staff.Allow' => 'Garden.Moderation.Manage'));
+        Gdn::permissionModel()->define(['Garden.Staff.Allow' => 'Garden.Moderation.Manage']);
         $this->setupConfig();
 
     }
@@ -534,16 +535,16 @@ class ZendeskPlugin extends Gdn_Plugin {
      * Setup Config Settings.
      */
     protected function setupConfig() {
-        SaveToConfig('Garden.AttachmentsEnabled', true);
-        $ConfigSettings = array(
+        saveToConfig('Garden.AttachmentsEnabled', true);
+        $ConfigSettings = [
             'Url',
             'ApplicationID',
             'Secret'
-        );
+        ];
         //prevents resetting any previous values
         foreach ($ConfigSettings as $ConfigSetting) {
-            if (!C('Plugins.Zendesk.' . $ConfigSetting)) {
-                SaveToConfig('Plugins.Zendesk.' . $ConfigSetting, '');
+            if (!C('Plugins.Zendesk.'.$ConfigSetting)) {
+                saveToConfig('Plugins.Zendesk.'.$ConfigSetting, '');
             }
         }
     }
@@ -562,18 +563,18 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (!self::isConfigured()) {
             throw new Gdn_UserException('Zendesk is not configured yet');
         }
-        $AppID = C('Plugins.Zendesk.ApplicationID');
+        $AppID = c('Plugins.Zendesk.ApplicationID');
         if (!$RedirectUri) {
             $RedirectUri = self::redirectUri();
         }
-        $Query = array(
+        $Query = [
             'redirect_uri' => $RedirectUri,
             'client_id' => $AppID,
             'response_type' => 'code',
             'scope' => 'read write',
 
-        );
-        return C('Plugins.Zendesk.Url') . '/oauth/authorizations/new?' . http_build_query($Query);
+        ];
+        return c('Plugins.Zendesk.Url').'/oauth/authorizations/new?'.http_build_query($Query);
     }
 
     /**
@@ -587,7 +588,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         if ($NewValue !== null) {
             $RedirectUri = $NewValue;
         } else {
-            $RedirectUri = Url('/profile/zendesk', true, true, true);
+            $RedirectUri = url('/profile/zendesk', true, true, true);
         }
         return $RedirectUri;
     }
@@ -605,20 +606,20 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (!self::isConfigured()) {
             throw new Gdn_UserException('Zendesk is not configured yet');
         }
-        $Post = array(
+        $Post = [
             'grant_type' => 'authorization_code',
-            'client_id' => C('Plugins.Zendesk.ApplicationID'),
-            'client_secret' => C('Plugins.Zendesk.Secret'),
+            'client_id' => c('Plugins.Zendesk.ApplicationID'),
+            'client_secret' => c('Plugins.Zendesk.Secret'),
             'code' => $Code,
             'redirect_uri' => $RedirectUri,
             'scope' => 'read'
-        );
+        ];
         $Proxy = new ProxyRequest();
-        $Response = $Proxy->Request(
-            array(
-                'URL' => C('Plugins.Zendesk.Url') . '/oauth/tokens.json',
+        $Response = $Proxy->request(
+            [
+                'URL' => c('Plugins.Zendesk.Url').'/oauth/tokens.json',
                 'Method' => 'POST',
-            ),
+            ],
             $Post
         );
 
@@ -626,7 +627,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             $Response = json_decode($Response);
         }
         if (isset($Response->error)) {
-            throw new Gdn_UserException('Error Communicating with Zendesk API: ' . $Response->error_description);
+            throw new Gdn_UserException('Error Communicating with Zendesk API: '.$Response->error_description);
         }
 
         return $Response;
@@ -639,7 +640,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @return string $Url
      */
     public static function profileConnectUrl() {
-        return Gdn::Request()->Url('/profile/zendeskconnect', true, true, true);
+        return Gdn::request()->url('/profile/zendeskconnect', true, true, true);
     }
 
     /**
@@ -648,9 +649,9 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @return bool
      */
     public static function isConfigured() {
-        $Url = C('Plugins.Zendesk.Url');
-        $AppID = C('Plugins.Zendesk.ApplicationID');
-        $Secret = C('Plugins.Zendesk.Secret');
+        $Url = c('Plugins.Zendesk.Url');
+        $AppID = c('Plugins.Zendesk.ApplicationID');
+        $Secret = c('Plugins.Zendesk.Secret');
         if (!$AppID || !$Secret || !$Url) {
             return false;
         }
@@ -681,22 +682,22 @@ class ZendeskPlugin extends Gdn_Plugin {
             return;
         }
         //Staff Only
-        if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+        if (!Gdn::session()->checkPermission('Garden.Staff.Allow')) {
             return;
         }
-        $Sf = GetValueR('User.Attributes.' . self::PROVIDER_KEY, $Args);
-        Trace($Sf);
-        $Profile = GetValueR('User.Attributes.' . self::PROVIDER_KEY . '.Profile', $Args);
-        $Sender->Data["Connections"][self::PROVIDER_KEY] = array(
-            'Icon' => $this->GetWebResource('zendesk.png', '/'),
+        $Sf = getValueR('User.Attributes.'.self::PROVIDER_KEY, $Args);
+        trace($Sf);
+        $Profile = getValueR('User.Attributes.'.self::PROVIDER_KEY.'.Profile', $Args);
+        $Sender->Data["Connections"][self::PROVIDER_KEY] = [
+            'Icon' => $this->getWebResource('zendesk.png', '/'),
             'Name' => self::PROVIDER_KEY,
             'ProviderKey' => self::PROVIDER_KEY,
             'ConnectUrl' => self::authorizeUri(self::profileConnectUrl()),
-            'Profile' => array(
-                'Name' => GetValue('fullname', $Profile),
-                'Photo' => GetValue('photo', $Profile)
-            )
-        );
+            'Profile' => [
+                'Name' => val('fullname', $Profile),
+                'Photo' => val('photo', $Profile)
+            ]
+        ];
     }
 
     /**
@@ -715,51 +716,51 @@ class ZendeskPlugin extends Gdn_Plugin {
         $Username = '',
         $Code = false
     ) {
-        $Sender->Permission('Garden.SignIn.Allow');
-        $Sender->GetUserInfo($UserReference, $Username, '', true);
-        $Sender->_SetBreadcrumbs(T('Connections'), UserUrl($Sender->User, '', 'connections'));
+        $Sender->permission('Garden.SignIn.Allow');
+        $Sender->getUserInfo($UserReference, $Username, '', true);
+        $Sender->_SetBreadcrumbs(t('Connections'), userUrl($Sender->User, '', 'connections'));
 
         try {
             $Tokens = $this->getTokens($Code, self::profileConnectUrl());
         } catch (Gdn_UserException $e) {
-            $Attributes = array(
+            $Attributes = [
                 'AccessToken' => null,
                 'Profile' => null,
-            );
-            Gdn::UserModel()->SaveAttribute($Sender->User->UserID, self::PROVIDER_KEY, $Attributes);
+            ];
+            Gdn::userModel()->saveAttribute($Sender->User->UserID, self::PROVIDER_KEY, $Attributes);
             $Message = $e->getMessage();
-            Gdn::Dispatcher()->PassData('Exception', htmlspecialchars($Message))
-                ->Dispatch('home/error');
+            Gdn::dispatcher()->passData('Exception', htmlspecialchars($Message))
+                ->dispatch('home/error');
             return;
         }
-        $this->accessToken = GetValue('access_token', $Tokens);
+        $this->accessToken = val('access_token', $Tokens);
         $this->setZendesk($this->accessToken);
         $profile = $this->zendesk->getProfile();
 
-        Gdn::UserModel()->SaveAuthentication(
-            array(
+        Gdn::userModel()->saveAuthentication(
+            [
                 'UserID' => $Sender->User->UserID,
                 'Provider' => self::PROVIDER_KEY,
                 'UniqueID' => $profile['id']
-            )
+            ]
         );
-        $Attributes = array(
+        $Attributes = [
             'AccessToken' => $this->accessToken,
             'Profile' => $profile,
-        );
-        Gdn::UserModel()->SaveAttribute($Sender->User->UserID, self::PROVIDER_KEY, $Attributes);
+        ];
+        Gdn::userModel()->saveAttribute($Sender->User->UserID, self::PROVIDER_KEY, $Attributes);
         $this->EventArguments['Provider'] = self::PROVIDER_KEY;
         $this->EventArguments['User'] = $Sender->User;
-        $this->FireEvent('AfterConnection');
+        $this->fireEvent('AfterConnection');
 
-        Redirect(UserUrl($Sender->User, '', 'connections'));
+        redirect(UserUrl($Sender->User, '', 'connections'));
     }
 
     /**
      * OAuth Method. Redirects user to request access.
      */
     public function controller_authorize() {
-        Redirect(self::authorizeUri(self::globalConnectUrl()));
+        redirect(self::authorizeUri(self::globalConnectUrl()));
     }
 
     /**
@@ -768,23 +769,23 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException If Error.
      */
     public function controller_connect() {
-        $Code = Gdn::Request()->Get('code');
+        $Code = Gdn::request()->get('code');
         $Tokens = $this->getTokens($Code, self::globalConnectUrl());
-        $AccessToken = GetValue('access_token', $Tokens);
+        $AccessToken = val('access_token', $Tokens);
 
         if ($AccessToken) {
-            SaveToConfig(array(
+            saveToConfig([
                 'Plugins.Zendesk.GlobalLogin.Enabled' => true,
                 'Plugins.Zendesk.GlobalLogin.AccessToken' => $AccessToken
-            ));
+            ]);
         } else {
-            RemoveFromConfig(array(
+            removeFromConfig([
                 'Plugins.Zendesk.GlobalLogin.Enabled' => true,
                 'Plugins.Zendesk.GlobalLogin.AccessToken' => $AccessToken
-            ));
+            ]);
             throw new Gdn_UserException('Error Connecting to Zendesk');
         }
-        Redirect(Url('/plugin/zendesk'));
+        redirect(Url('/plugin/zendesk'));
 
     }
 
@@ -794,7 +795,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @return string
      */
     public static function globalConnectUrl() {
-        return Gdn::Request()->Url('/plugin/zendesk/connect', true, true, true);
+        return Gdn::request()->url('/plugin/zendesk/connect', true, true, true);
     }
 
     //end of OAUTH
@@ -810,7 +811,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (!$this->zendesk) {
             $this->zendesk = new Zendesk(
                 new ZendeskCurlRequest(),
-                C('Plugins.Zendesk.Url'),
+                c('Plugins.Zendesk.Url'),
                 $accessToken
             );
         }
@@ -821,7 +822,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      *
      * @param DiscussionController $Sender Sending Controller.
      */
-    public function DiscussionController_FetchAttachmentViews_Handler($Sender) {
-        require_once $Sender->FetchViewLocation('attachment', '', 'plugins/Zendesk');
+    public function discussionController_fetchAttachmentViews_handler($Sender) {
+        require_once $Sender->fetchViewLocation('attachment', '', 'plugins/Zendesk');
     }
 }
