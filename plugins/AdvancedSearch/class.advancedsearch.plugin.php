@@ -7,7 +7,7 @@
 // Define the plugin:
 $PluginInfo['AdvancedSearch'] = array(
     'Name' => 'Advanced Search',
-    'Description' => 'Enables advanced search on sites.',
+    'Description' => 'Enables advanced search on sites. Replaces "{searchbox}" with "{searchbox_advanced}". For more information, see <a href="http://docs.vanillaforums.com/help/addons/advanced-search/">documentation</a>. ',
     'Version' => '1.0.8',
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
