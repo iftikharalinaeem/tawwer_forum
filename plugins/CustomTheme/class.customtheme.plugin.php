@@ -639,7 +639,7 @@ Here are some things you should know before you begin:
         if ($working) {
             saveToConfig('Plugins.CustomTheme.WorkingRevisionID', self::setRevisionID($working['RevisionID'], $working['DateInserted']));
         } else {
-            saveToConfig('Plugins.CustomTheme.WorkingRevisionID', 0);
+            saveToConfig('Plugins.CustomTheme.WorkingRevisionID', c('Plugins.CustomTheme.LiveRevisionID'));
         }
     }
 
