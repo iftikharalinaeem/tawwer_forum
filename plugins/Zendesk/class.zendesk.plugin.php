@@ -111,7 +111,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             return;
         }
-        $Attachments = getValue('Attachments', $Args[$Content]);
+        $Attachments = val('Attachments', $Args[$Content]);
         if ($Attachments) {
             foreach ($Args[$Content]->Attachments as $Attachment) {
                 if ($Attachment['Type'] == 'zendesk-ticket') {
@@ -132,7 +132,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @return bool
      */
     protected function isToBeUpdated($Attachment) {
-        if (getValue('Status', $Attachment) == $this->closedCaseStatusString) {
+        if (val('Status', $Attachment) == $this->closedCaseStatusString) {
             trace("Ticket {$this->closedCaseStatusString}.  Not checking for update.");
             return false;
         }
@@ -345,7 +345,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             ];
         }
         //remove create Create already created
-        $Attachments = getValue('Attachments', $Args[$Content], []);
+        $Attachments = val('Attachments', $Args[$Content], []);
         foreach ($Attachments as $Attachment) {
             if ($Attachment['Type'] == 'zendesk-ticket') {
                 unset($Args[$Content . 'Options']['Zendesk']);
@@ -481,7 +481,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      */
     public function controller_toggle($Sender) {
         // Enable/Disable
-        if (Gdn::session()->validateTransientKey(GetValue(1, $Sender->RequestArgs))) {
+        if (Gdn::session()->validateTransientKey(val(1, $Sender->RequestArgs))) {
             if (c('Plugins.Zendesk.GlobalLogin.Enabled')) {
                 $this->disable();
                 redirect('/plugin/zendesk');
@@ -693,8 +693,8 @@ class ZendeskPlugin extends Gdn_Plugin {
             'ProviderKey' => self::PROVIDER_KEY,
             'ConnectUrl' => self::authorizeUri(self::profileConnectUrl()),
             'Profile' => [
-                'Name' => getValue('fullname', $Profile),
-                'Photo' => getValue('photo', $Profile)
+                'Name' => val('fullname', $Profile),
+                'Photo' => val('photo', $Profile)
             ]
         ];
     }
@@ -732,7 +732,7 @@ class ZendeskPlugin extends Gdn_Plugin {
                 ->dispatch('home/error');
             return;
         }
-        $this->accessToken = getValue('access_token', $Tokens);
+        $this->accessToken = val('access_token', $Tokens);
         $this->setZendesk($this->accessToken);
         $profile = $this->zendesk->getProfile();
 
@@ -770,7 +770,7 @@ class ZendeskPlugin extends Gdn_Plugin {
     public function controller_connect() {
         $Code = Gdn::request()->get('code');
         $Tokens = $this->getTokens($Code, self::globalConnectUrl());
-        $AccessToken = getValue('access_token', $Tokens);
+        $AccessToken = val('access_token', $Tokens);
 
         if ($AccessToken) {
             saveToConfig([
