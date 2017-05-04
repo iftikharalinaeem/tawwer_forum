@@ -34,19 +34,22 @@ function writeZendeskTicketAttachment($attachment) {
 
                     <div class="item-header">
                         <h4 class="media-heading item-heading"><?php echo t('Ticket') ?> ·
-                            <a href="<?php echo $attachment['SourceURL']; ?>" target="_blank"><?php echo ucfirst($attachment['Source']); ?></a>
+                            <a href="<?php echo $attachment['SourceURL']; ?>"
+                               target="_blank"><?php echo ucfirst($attachment['Source']); ?></a>
                             <div class="item-meta">
-                        <span><?php echo Gdn_Format::date($attachment['DateInserted'], 'html') ?> <?php echo t('by'); ?>
+                        <span><?php echo Gdn_Format::date($attachment['DateInserted'], 'html') ?><?php echo t('by'); ?>
                             <?php echo $attachment['InsertUser']['ProfileLink']; ?></span>
                             </div>
-                        </h4></div>
+                        </h4>
+                    </div>
 
                     <div class="item-body">
 
                         <dl class="dl-columns">
 
                             <dt><?php echo t('Issue Number'); ?></dt>
-                            <dd><a href="<?php echo $attachment['SourceURL']; ?>" target="_blank"><?php echo $attachment['SourceID']; ?></a></dd>
+                            <dd><a href="<?php echo $attachment['SourceURL']; ?>"
+                                   target="_blank"><?php echo $attachment['SourceID']; ?></a></dd>
 
                             <?php if (val('Status', $attachment)) { ?>
                                 <dt><?php echo t('Status'); ?></dt>
@@ -64,5 +67,5 @@ function writeZendeskTicketAttachment($attachment) {
             </div>
         </div>
     </div>
-<?php
+    <?php
 }

@@ -22,7 +22,7 @@ class Zendesk {
      */
     public function __construct(IZendeskHttpRequest $curlRequest, $Url, $AccessToken) {
         $this->curl = $curlRequest;
-        $this->apiUrl = trim($Url, '/') . '/api/v2';
+        $this->apiUrl = trim($Url, '/').'/api/v2';
         $this->AccessToken = $AccessToken;
     }
 
@@ -60,7 +60,7 @@ class Zendesk {
      * @return mixed
      */
     public function getTicket($TicketID) {
-        $Response = $this->zendeskRequest('/tickets/' . $TicketID . '.json');
+        $Response = $this->zendeskRequest('/tickets/'.$TicketID.'.json');
         return $Response['ticket'];
     }
 
@@ -72,7 +72,7 @@ class Zendesk {
      * @return array
      */
     public function getLastComment($TicketID) {
-        $Response = $this->zendeskRequest('/tickets/' . $TicketID . '/comments.json');
+        $Response = $this->zendeskRequest('/tickets/'.$TicketID.'/comments.json');
         //remove the first comment (its the ticket)
         $Comments = $Response['comments'];
         if (count($Comments) > 1) {
@@ -93,7 +93,7 @@ class Zendesk {
         if (!is_int($UserID)) {
             throw new Exception('Invalid User ID');
         }
-        $Response = $this->zendeskRequest('/users/' . $UserID . '.json');
+        $Response = $this->zendeskRequest('/users/'.$UserID.'.json');
         return $Response;
     }
 
@@ -125,9 +125,9 @@ class Zendesk {
      */
     public function zendeskRequest($Url, $Json = null, $Action = 'GET', $Cache = false) {
 
-        trace($Action . ' ' . $this->apiUrl . $Url);
+        trace($Action.' '.$this->apiUrl.$Url);
 
-        $CacheKey = 'Zendesk.Request.' . md5($this->apiUrl . $Url);
+        $CacheKey = 'Zendesk.Request.'.md5($this->apiUrl.$Url);
 
         if ($Cache && $Action == 'GET') {
             $Output = Gdn::cache()->get($CacheKey, [Gdn_Cache::FEATURE_COMPRESS => true]);
@@ -137,7 +137,7 @@ class Zendesk {
             }
         }
 
-        $this->curl->setOption(CURLOPT_URL, $this->apiUrl . $Url);
+        $this->curl->setOption(CURLOPT_URL, $this->apiUrl.$Url);
         $this->curl->setOption(CURLOPT_FOLLOWLOCATION, true);
         $this->curl->setOption(CURLOPT_MAXREDIRS, 10);
         $this->curl->setOption(CURLOPT_FOLLOWLOCATION, true);
@@ -162,7 +162,7 @@ class Zendesk {
         }
         $this->curl->setOption(
             CURLOPT_HTTPHEADER,
-            ['Content-type: application/json', 'Authorization: Bearer '. $this->AccessToken]
+            ['Content-type: application/json', 'Authorization: Bearer '.$this->AccessToken]
         );
         $UserAgent = Gdn::request()->getValueFrom(INPUT_SERVER, 'HTTP_USER_AGENT', 'MozillaXYZ/1.0');
         $this->curl->setOption(CURLOPT_USERAGENT, $UserAgent);
@@ -176,14 +176,14 @@ class Zendesk {
         if ($Cache && $HttpCode == 200 && $Action == 'GET') {
             $CacheTTL = $this->CacheTTL + rand(0, 30);
             Gdn::cache()->store($CacheKey, $Output, [
-                Gdn_Cache::FEATURE_EXPIRY  => $CacheTTL,
+                Gdn_Cache::FEATURE_EXPIRY => $CacheTTL,
                 Gdn_Cache::FEATURE_COMPRESS => true
             ]);
         }
 
         if ($HttpCode == 404) {
             //throw not found
-            throw new Gdn_UserException('Invalid URL: ' . $this->apiUrl . $Url . "\n", 404);
+            throw new Gdn_UserException('Invalid URL: '.$this->apiUrl.$Url."\n", 404);
         }
 
         if ($HttpCode == 422) {
@@ -196,14 +196,14 @@ class Zendesk {
             throw new Gdn_UserException('Authentication Error. Check your settings');
         }
         if ($HttpCode != 200 && $HttpCode != 201) {
-            throw new Gdn_UserException('Error making request. Try again later -> ' . $HttpCode);
+            throw new Gdn_UserException('Error making request. Try again later -> '.$HttpCode);
         }
 
         if (!is_array($Decoded)) {
-            throw new Gdn_UserException('Errors in Request:' . $Output);
+            throw new Gdn_UserException('Errors in Request:'.$Output);
         }
         if (!empty($Decoded['errors'])) {
-            throw new Gdn_UserException('Errors in Request:' . $Output);
+            throw new Gdn_UserException('Errors in Request:'.$Output);
         }
 
         return $Decoded;

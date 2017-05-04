@@ -46,6 +46,7 @@ class ZendeskPlugin extends Gdn_Plugin {
 
     /**
      * If time since last update from Zendesk is less then this; we wont check for update - saving api calls.
+     *
      * @var int
      */
     protected $minimumTimeForUpdate = 600;
@@ -59,7 +60,7 @@ class ZendeskPlugin extends Gdn_Plugin {
     public function __construct() {
         parent::__construct();
 
-        $this->accessToken = getValueR('Attributes.' . self::PROVIDER_KEY . '.AccessToken', Gdn::session()->User);
+        $this->accessToken = getValueR('Attributes.'.self::PROVIDER_KEY.'.AccessToken', Gdn::session()->User);
         if (!$this->accessToken) {
             $this->accessToken = c('Plugins.Zendesk.GlobalLogin.AccessToken');
         }
@@ -259,7 +260,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         $Sender->setData([
             'GlobalLoginEnabled' => c('Plugins.Zendesk.GlobalLogin.Enabled'),
             'GlobalLoginConnected' => c('Plugins.Zendesk.GlobalLogin.AccessToken'),
-            'ToggleUrl' => url('/plugin/zendesk/toggle/' . Gdn::session()->transientKey())
+            'ToggleUrl' => url('/plugin/zendesk/toggle/'.Gdn::session()->transientKey())
         ]);
         if (c('Plugins.Zendesk.GlobalLogin.Enabled') && c('Plugins.Zendesk.GlobalLogin.AccessToken')) {
             $this->setZendesk(c('Plugins.Zendesk.GlobalLogin.AccessToken'));
@@ -337,10 +338,10 @@ class ZendeskPlugin extends Gdn_Plugin {
         }
 
         $LinkText = 'Create Zendesk Ticket';
-        if (isset($Args[$Content . 'Options'])) {
-            $Args[$Content . 'Options']['Zendesk'] = [
+        if (isset($Args[$Content.'Options'])) {
+            $Args[$Content.'Options']['Zendesk'] = [
                 'Label' => t($LinkText),
-                'Url' => "/discussion/zendesk/" . strtolower($Content) . "/$ContentID",
+                'Url' => "/discussion/zendesk/".strtolower($Content)."/$ContentID",
                 'Class' => 'Popup'
             ];
         }
@@ -348,7 +349,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         $Attachments = val('Attachments', $Args[$Content], []);
         foreach ($Attachments as $Attachment) {
             if ($Attachment['Type'] == 'zendesk-ticket') {
-                unset($Args[$Content . 'Options']['Zendesk']);
+                unset($Args[$Content.'Options']['Zendesk']);
             }
         }
     }
@@ -415,7 +416,7 @@ class ZendeskPlugin extends Gdn_Plugin {
                 $FormValues = $Sender->Form->formValues();
                 $Body = $FormValues['Body'];
 
-                $Body .= "\n--\n\nThis ticket was generated from: " . $Url . "\n\n";
+                $Body .= "\n--\n\nThis ticket was generated from: ".$Url."\n\n";
                 $this->setZendesk();
                 $TicketID = $this->zendesk->createTicket(
                     $FormValues['Title'],
@@ -439,7 +440,7 @@ class ZendeskPlugin extends Gdn_Plugin {
                         'ForeignUserID' => $Content->InsertUserID,
                         'Source' => 'zendesk',
                         'SourceID' => $TicketID,
-                        'SourceURL' => c('Plugins.Zendesk.Url') . '/agent/#/tickets/' . $TicketID,
+                        'SourceURL' => c('Plugins.Zendesk.Url').'/agent/#/tickets/'.$TicketID,
                         'Status' => 'open',
                         'LastModifiedDate' => Gdn_Format::toDateTime()
                     ]);
@@ -542,8 +543,8 @@ class ZendeskPlugin extends Gdn_Plugin {
         ];
         //prevents resetting any previous values
         foreach ($ConfigSettings as $ConfigSetting) {
-            if (!C('Plugins.Zendesk.' . $ConfigSetting)) {
-                saveToConfig('Plugins.Zendesk.' . $ConfigSetting, '');
+            if (!C('Plugins.Zendesk.'.$ConfigSetting)) {
+                saveToConfig('Plugins.Zendesk.'.$ConfigSetting, '');
             }
         }
     }
@@ -573,7 +574,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             'scope' => 'read write',
 
         ];
-        return c('Plugins.Zendesk.Url') . '/oauth/authorizations/new?' . http_build_query($Query);
+        return c('Plugins.Zendesk.Url').'/oauth/authorizations/new?'.http_build_query($Query);
     }
 
     /**
@@ -616,7 +617,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         $Proxy = new ProxyRequest();
         $Response = $Proxy->request(
             [
-                'URL' => c('Plugins.Zendesk.Url') . '/oauth/tokens.json',
+                'URL' => c('Plugins.Zendesk.Url').'/oauth/tokens.json',
                 'Method' => 'POST',
             ],
             $Post
@@ -626,7 +627,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             $Response = json_decode($Response);
         }
         if (isset($Response->error)) {
-            throw new Gdn_UserException('Error Communicating with Zendesk API: ' . $Response->error_description);
+            throw new Gdn_UserException('Error Communicating with Zendesk API: '.$Response->error_description);
         }
 
         return $Response;
@@ -684,9 +685,9 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (!Gdn::session()->checkPermission('Garden.Staff.Allow')) {
             return;
         }
-        $Sf = getValueR('User.Attributes.' . self::PROVIDER_KEY, $Args);
+        $Sf = getValueR('User.Attributes.'.self::PROVIDER_KEY, $Args);
         trace($Sf);
-        $Profile = getValueR('User.Attributes.' . self::PROVIDER_KEY . '.Profile', $Args);
+        $Profile = getValueR('User.Attributes.'.self::PROVIDER_KEY.'.Profile', $Args);
         $Sender->Data["Connections"][self::PROVIDER_KEY] = [
             'Icon' => $this->getWebResource('zendesk.png', '/'),
             'Name' => self::PROVIDER_KEY,
