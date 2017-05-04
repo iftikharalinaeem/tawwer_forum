@@ -568,9 +568,9 @@ class ZendeskPlugin extends Gdn_Plugin {
             $RedirectUri = self::redirectUri();
         }
         $Query = [
+            'response_type' => 'code',
             'redirect_uri' => $RedirectUri,
             'client_id' => $AppID,
-            'response_type' => 'code',
             'scope' => 'read write',
 
         ];
@@ -588,7 +588,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         if ($NewValue !== null) {
             $RedirectUri = $NewValue;
         } else {
-            $RedirectUri = url('/profile/zendesk', true, true, true);
+            $RedirectUri = Gdn::request()->url('/profile/zendeskconnect', true, true);
         }
         return $RedirectUri;
     }
@@ -615,18 +615,30 @@ class ZendeskPlugin extends Gdn_Plugin {
             'scope' => 'read'
         ];
         $Proxy = new ProxyRequest();
-        $Response = $Proxy->request(
-            [
-                'URL' => c('Plugins.Zendesk.Url').'/oauth/tokens.json',
-                'Method' => 'POST',
-            ],
-            $Post
-        );
+        $RequestOptions = [
+            'URL' => c('Plugins.Zendesk.Url').'/oauth/tokens.json',
+            'Method' => 'POST',
+        ];
+        $Response = $Proxy->request($RequestOptions, $Post);
 
         if (strpos($Proxy->ContentType, 'application/json') !== false) {
             $Response = json_decode($Response);
         }
+        if (!$Response) {
+            Logger::log(Logger::DEBUG, 'zendesk_token_error', [
+                'error' => 'Could not parse Zendesk API response',
+                'request_options' => $RequestOptions,
+                'request_data' => $Post,
+            ]);
+            throw new Gdn_UserException('Could not parse Zendesk API response');
+        }
         if (isset($Response->error)) {
+            Logger::log(Logger::DEBUG, 'zendesk_token_error', [
+                'error' => 'Error Communicating with Zendesk API',
+                'request_options' => $RequestOptions,
+                'request_data' => $Post,
+                'response' => $Response,
+            ]);
             throw new Gdn_UserException('Error Communicating with Zendesk API: '.$Response->error_description);
         }
 
@@ -640,7 +652,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @return string $Url
      */
     public static function profileConnectUrl() {
-        return Gdn::request()->url('/profile/zendeskconnect', true, true, true);
+        return Gdn::request()->url('/profile/zendeskconnect', true, true);
     }
 
     /**
@@ -795,7 +807,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @return string
      */
     public static function globalConnectUrl() {
-        return Gdn::request()->url('/plugin/zendesk/connect', true, true, true);
+        return Gdn::request()->url('/plugin/zendesk/connect', true, true);
     }
 
     //end of OAUTH
