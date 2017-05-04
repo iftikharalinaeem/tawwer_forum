@@ -125,14 +125,14 @@ class Zendesk {
      */
     public function zendeskRequest($Url, $Json = null, $Action = 'GET', $Cache = false) {
 
-        Trace($Action . ' ' . $this->apiUrl . $Url);
+        trace($Action . ' ' . $this->apiUrl . $Url);
 
         $CacheKey = 'Zendesk.Request.' . md5($this->apiUrl . $Url);
 
         if ($Cache && $Action == 'GET') {
-            $Output = Gdn::Cache()->Get($CacheKey, [Gdn_Cache::FEATURE_COMPRESS => true]);
+            $Output = Gdn::cache()->get($CacheKey, [Gdn_Cache::FEATURE_COMPRESS => true]);
             if ($Output) {
-                Trace('Cached Response');
+                trace('Cached Response');
                 return json_decode($Output, true);
             }
         }
@@ -164,7 +164,7 @@ class Zendesk {
             CURLOPT_HTTPHEADER,
             ['Content-type: application/json', 'Authorization: Bearer '. $this->AccessToken]
         );
-        $UserAgent = Gdn::Request()->GetValueFrom(INPUT_SERVER, 'HTTP_USER_AGENT', 'MozillaXYZ/1.0');
+        $UserAgent = Gdn::request()->getValueFrom(INPUT_SERVER, 'HTTP_USER_AGENT', 'MozillaXYZ/1.0');
         $this->curl->setOption(CURLOPT_USERAGENT, $UserAgent);
         $this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
         $this->curl->setOption(CURLOPT_TIMEOUT, 10);
@@ -175,7 +175,7 @@ class Zendesk {
 
         if ($Cache && $HttpCode == 200 && $Action == 'GET') {
             $CacheTTL = $this->CacheTTL + rand(0, 30);
-            Gdn::Cache()->Store($CacheKey, $Output, [
+            Gdn::cache()->store($CacheKey, $Output, [
                 Gdn_Cache::FEATURE_EXPIRY  => $CacheTTL,
                 Gdn_Cache::FEATURE_COMPRESS => true
             ]);

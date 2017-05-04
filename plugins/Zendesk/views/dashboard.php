@@ -9,8 +9,8 @@
 
 <?php
 // Settings
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 <ul>
 
@@ -39,15 +39,15 @@ echo $this->Form->Errors();
     </li>
 </ul>
 
-<?php echo $this->Form->Close('Save'); ?>
+<?php echo $this->Form->close('Save'); ?>
 
 <div class="form-group">
     <div class="label-wrap-wide">
         <div class="label"><?php echo t('Global Login'); ?>
             <span class="text-success">
                 <?php if ($this->Data['GlobalLoginConnected']) { ?>
-                    <?php echo T('You are connected as'); ?>
-                    <strong><?php echo Gdn_Format::Html($this->Data['GlobalLoginProfile']['fullname']); ?></strong>
+                    <?php echo t('You are connected as'); ?>
+                    <strong><?php echo Gdn_Format::html($this->Data['GlobalLoginProfile']['fullname']); ?></strong>
                 <?php } ?>
             </span></div>
         <div class="info">
@@ -57,14 +57,14 @@ echo $this->Form->Errors();
     </div>
     <?php if (!$this->Data['GlobalLoginEnabled']) { ?>
         <div class="input-wrap-right">
-            <a class="btn btn-primary" href="<?php echo $this->Data['ToggleUrl']; ?>"><?php echo T('Enable'); ?></a>
+            <a class="btn btn-primary" href="<?php echo $this->Data['ToggleUrl']; ?>"><?php echo t('Enable'); ?></a>
         </div>
     <?php } else { ?>
         <div class="input-wrap-right">
             <?php if (!$this->Data['GlobalLoginConnected']) { ?>
-                <a class="btn btn-primary" href="<?php echo url('/plugin/zendesk/authorize'); ?>"><?php echo T('Connect'); ?></a>
+                <a class="btn btn-primary" href="<?php echo url('/plugin/zendesk/authorize'); ?>"><?php echo t('Connect'); ?></a>
             <?php } ?>
-            <a class="btn btn-primary" href="<?php echo $this->Data['ToggleUrl']; ?>"><?php echo T('Disable'); ?></a>
+            <a class="btn btn-primary" href="<?php echo $this->Data['ToggleUrl']; ?>"><?php echo t('Disable'); ?></a>
         </div>
     <?php } ?>
 </div>

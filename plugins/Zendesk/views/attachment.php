@@ -9,15 +9,15 @@
  *
  * @param array $attachment
  */
-function WriteZendeskTicketAttachment($attachment) {
+function writeZendeskTicketAttachment($attachment) {
 
     // Don't display anything for guest.
-    if (!Gdn::Session()->IsValid()) {
+    if (!Gdn::session()->isValid()) {
         return;
     }
 
     // Only display to Staff
-    if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+    if (!Gdn::session()->checkPermission('Garden.Staff.Allow')) {
         return;
     }
 
@@ -33,10 +33,10 @@ function WriteZendeskTicketAttachment($attachment) {
                 <div class="media-body">
 
                     <div class="item-header">
-                        <h4 class="media-heading item-heading"><?php echo T('Ticket') ?> ·
+                        <h4 class="media-heading item-heading"><?php echo t('Ticket') ?> ·
                             <a href="<?php echo $attachment['SourceURL']; ?>" target="_blank"><?php echo ucfirst($attachment['Source']); ?></a>
                             <div class="item-meta">
-                        <span><?php echo Gdn_Format::Date($attachment['DateInserted'], 'html') ?> <?php echo T('by'); ?>
+                        <span><?php echo Gdn_Format::date($attachment['DateInserted'], 'html') ?> <?php echo t('by'); ?>
                             <?php echo $attachment['InsertUser']['ProfileLink']; ?></span>
                             </div>
                         </h4></div>
@@ -45,17 +45,17 @@ function WriteZendeskTicketAttachment($attachment) {
 
                         <dl class="dl-columns">
 
-                            <dt><?php echo T('Issue Number'); ?></dt>
+                            <dt><?php echo t('Issue Number'); ?></dt>
                             <dd><a href="<?php echo $attachment['SourceURL']; ?>" target="_blank"><?php echo $attachment['SourceID']; ?></a></dd>
 
-                            <?php if (GetValue('Status', $attachment)) { ?>
-                                <dt><?php echo T('Status'); ?></dt>
+                            <?php if (getValue('Status', $attachment)) { ?>
+                                <dt><?php echo t('Status'); ?></dt>
                                 <dd><?php echo $attachment['Status']; ?></dd>
                             <?php } ?>
 
-                            <?php if (GetValue('Last_Updated', $attachment)) { ?>
-                                <dt><?php echo T('Last Updated'); ?></dt>
-                                <dd><?php echo Gdn_Format::Date($attachment['LastModifiedDate'], 'html') ?></dd>
+                            <?php if (getValue('Last_Updated', $attachment)) { ?>
+                                <dt><?php echo t('Last Updated'); ?></dt>
+                                <dd><?php echo Gdn_Format::date($attachment['LastModifiedDate'], 'html') ?></dd>
                             <?php } ?>
                         </dl>
                     </div>
