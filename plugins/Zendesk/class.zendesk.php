@@ -181,29 +181,39 @@ class Zendesk {
             ]);
         }
 
-        if ($HttpCode == 404) {
-            //throw not found
-            throw new Gdn_UserException('Invalid URL: '.$this->apiUrl.$Url."\n", 404);
-        }
+        try {
+            if ($HttpCode == 404) {
+                //throw not found
+                throw new Gdn_UserException('Invalid URL: '.$this->apiUrl.$Url."\n", 404);
+            }
 
-        if ($HttpCode == 422) {
-            //throw not found
-            throw new Gdn_UserException('Error: Zendesk Account is expired.', 422);
-        }
+            if ($HttpCode == 422) {
+                //throw not found
+                throw new Gdn_UserException('Error: Zendesk Account is expired.', 422);
+            }
 
-        if ($HttpCode == 401 || $HttpCode == 429) {
-            //429 - auth error; repeated...
-            throw new Gdn_UserException('Authentication Error. Check your settings');
-        }
-        if ($HttpCode != 200 && $HttpCode != 201) {
-            throw new Gdn_UserException('Error making request. Try again later -> '.$HttpCode);
-        }
+            if ($HttpCode == 401 || $HttpCode == 429) {
+                //429 - auth error; repeated...
+                throw new Gdn_UserException('Authentication Error. Check your settings');
+            }
+            if ($HttpCode != 200 && $HttpCode != 201) {
+                throw new Gdn_UserException('Error making request. Try again later -> '.$HttpCode);
+            }
 
-        if (!is_array($Decoded)) {
-            throw new Gdn_UserException('Errors in Request:'.$Output);
-        }
-        if (!empty($Decoded['errors'])) {
-            throw new Gdn_UserException('Errors in Request:'.$Output);
+            if (!is_array($Decoded)) {
+                throw new Gdn_UserException('Errors in Request:'.$Output);
+            }
+            if (!empty($Decoded['errors'])) {
+                throw new Gdn_UserException('Errors in Request:'.$Output);
+            }
+        } catch (Gdn_UserException $e) {
+            Logger::log(Logger::DEBUG, 'zendesk_request_error', [
+                'error' => $e->getMessage(),
+                'access_token' => $this->AccessToken,
+                'request' => $Action.' '.$this->apiUrl.$Url,
+                'repsonse' => $Output,
+            ]);
+            throw $e;
         }
 
         return $Decoded;
