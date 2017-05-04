@@ -4,7 +4,7 @@
 </div>
 <div class="padded">
     <?php echo t('This plugin allows you to submit user discussion and comments to your hosted Zendesk.'); ?>
-    <?php echo ' '.anchor(sprintf(t('How to set up %s.'), t('Zendesk')), 'http://docs.vanillaforums.com/help/integrations/zendesk/', array('target' => '_blank')); ?>
+    <?php echo ' '.anchor(sprintf(t('How to set up %s.'), t('Zendesk')), 'http://docs.vanillaforums.com/help/integrations/zendesk/', ['target' => '_blank']); ?>
 </div>
 
 <?php

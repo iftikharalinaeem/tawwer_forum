@@ -37,16 +37,16 @@ class Zendesk {
      *
      * @return int
      */
-    public function createTicket($Subject, $Body, $Requester, $AdditionalTicketFields = array()) {
-        $TicketFields = array(
+    public function createTicket($Subject, $Body, $Requester, $AdditionalTicketFields = []) {
+        $TicketFields = [
             'requester' => $Requester,
             'subject' => $Subject,
-            'comment' => array('body' => $Body)
-        );
+            'comment' => ['body' => $Body]
+        ];
         $Ticket = array_merge($TicketFields, $AdditionalTicketFields);
         $Response = $this->zendeskRequest(
             "/tickets.json",
-            json_encode(array('ticket' => $Ticket)),
+            json_encode(['ticket' => $Ticket]),
             "POST"
         );
         return $Response['ticket']['id'];
@@ -78,7 +78,7 @@ class Zendesk {
         if (count($Comments) > 1) {
             return array_pop($Comments);
         }
-        return array();
+        return [];
     }
 
     /**
@@ -106,10 +106,10 @@ class Zendesk {
      * @return array
      */
     public function createRequester($name, $email) {
-        return array(
+        return [
             'name' => $name,
             'email' => $email
-        );
+        ];
     }
 
     /**
@@ -130,7 +130,7 @@ class Zendesk {
         $CacheKey = 'Zendesk.Request.' . md5($this->apiUrl . $Url);
 
         if ($Cache && $Action == 'GET') {
-            $Output = Gdn::Cache()->Get($CacheKey, array(Gdn_Cache::FEATURE_COMPRESS => true));
+            $Output = Gdn::Cache()->Get($CacheKey, [Gdn_Cache::FEATURE_COMPRESS => true]);
             if ($Output) {
                 Trace('Cached Response');
                 return json_decode($Output, true);
@@ -162,7 +162,7 @@ class Zendesk {
         }
         $this->curl->setOption(
             CURLOPT_HTTPHEADER,
-            array('Content-type: application/json', 'Authorization: Bearer '. $this->AccessToken)
+            ['Content-type: application/json', 'Authorization: Bearer '. $this->AccessToken]
         );
         $UserAgent = Gdn::Request()->GetValueFrom(INPUT_SERVER, 'HTTP_USER_AGENT', 'MozillaXYZ/1.0');
         $this->curl->setOption(CURLOPT_USERAGENT, $UserAgent);
@@ -175,10 +175,10 @@ class Zendesk {
 
         if ($Cache && $HttpCode == 200 && $Action == 'GET') {
             $CacheTTL = $this->CacheTTL + rand(0, 30);
-            Gdn::Cache()->Store($CacheKey, $Output, array(
+            Gdn::Cache()->Store($CacheKey, $Output, [
                 Gdn_Cache::FEATURE_EXPIRY  => $CacheTTL,
                 Gdn_Cache::FEATURE_COMPRESS => true
-            ));
+            ]);
         }
 
         if ($HttpCode == 404) {

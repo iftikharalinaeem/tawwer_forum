@@ -25,10 +25,10 @@ echo $this->Form->Errors();
         <li>
             <?php
             echo $this->Form->Label('Body', 'Body');
-            echo $this->Form->TextBox('Body', array('MultiLine' => true));
+            echo $this->Form->TextBox('Body', ['MultiLine' => true]);
             ?>
         </li>
     </ul>
 
     <div style="width: 400px"></div>
-<?php echo $this->Form->Close('Create Ticket', '', array('class' => 'Button BigButton'));
+<?php echo $this->Form->Close('Create Ticket', '', ['class' => 'Button BigButton']);
