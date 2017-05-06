@@ -1,7 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-require_once dirname(__FILE__).'/models/class.badgemodel.php';
-
 if (!function_exists('DefaultPoints')) {
     /**
      *
