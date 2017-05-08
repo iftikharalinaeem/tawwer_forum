@@ -1,18 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PluginInfo['DiscussionExcerpt'] = [
-   'Description' => 'Adds an excerpt from the first comment in a discussion to the discussion list.',
-   'Version' => '1.1',
-   'RequiredApplications' => null,
-   'RequiredTheme' => false,
-   'RequiredPlugins' => false,
-   'HasLocale' => false,
-   'Icon' => 'discussion_excerpt.png',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com/profile/mark'
-];
-
 class DiscussionExcerptPlugin extends Gdn_Plugin {
 
 	/**

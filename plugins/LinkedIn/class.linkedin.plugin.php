@@ -4,21 +4,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['LinkedIn'] = array(
-   'Name' => 'Linked In Social Connect',
-   'Description' => "Allow users to sign in via linked in.",
-   'Version' => '1.2.0',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
-   'Author' => "Todd Burry",
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com',
-   'MobileFriendly' => TRUE,
-   'SettingsUrl' => '/social/linkedin',
-   'SocialConnect' => TRUE,
-   'Icon' => 'linkedin_social_connect.png'
-);
-
 class LinkedInPlugin extends Gdn_Plugin {
    const ProviderKey = 'LinkedIn';
 

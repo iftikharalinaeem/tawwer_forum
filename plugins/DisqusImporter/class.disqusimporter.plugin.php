@@ -4,19 +4,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['DisqusImporter'] = array(
-   'Name' => 'Disqus Importer',
-   'Description' => 'Imports commments from Disqus into Vanilla.',
-   'Version' => '1.0.1a',
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'MobileFriendly' => FALSE,
-   'Icon' => 'disqus_importer.png',
-   'Author' => 'Todd Burry',
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
-);
-
 class DisqusImporter extends Gdn_Plugin {
    /// Properties ///
 

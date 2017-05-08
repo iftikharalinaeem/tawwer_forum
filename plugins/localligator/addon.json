@@ -1,0 +1,15 @@
+{
+    "name": "Localligator",
+    "description": "Chomps into missing locale codes by finding strings that do not exist in site_core or dash_core. \n                           Only meant to be run during local development.",
+    "version": "1.0.0",
+    "icon": "internal-plugin.png",
+    "usePopupSettings": false,
+    "key": "localligator",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Becky Van Bussel",
+            "email": "becky@vanillaforums.com"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "name": "Google Translate Comments",
+    "description": "Adds a Google Translate widget to discussion pages so comments can be translated from other languages.",
+    "version": "1",
+    "key": "googletranslatecomments",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ]
+}

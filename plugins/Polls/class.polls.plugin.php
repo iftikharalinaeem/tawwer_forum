@@ -4,19 +4,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['Polls'] = [
-    'Name' => 'Polls',
-    'Description' => "Allow users to create and vote on polls.",
-    'Version' => '1.2.3',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'Author' => "Mark O'Sullivan",
-    'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl' => 'http://markosullivan.ca',
-    'MobileFriendly' => true,
-    'RegisterPermissions' => ['Plugins.Polls.Add' => 'Garden.Profiles.Edit'],
-    'Icon' => 'polls.png'
-];
-
 /**
  * Class PollsPlugin
  */

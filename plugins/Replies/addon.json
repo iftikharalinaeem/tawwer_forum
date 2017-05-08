@@ -1,0 +1,18 @@
+{
+    "name": "Inline Replies",
+    "description": "Adds one level of inline replies to comments.",
+    "version": "1.0b1.2",
+    "mobileFriendly": true,
+    "key": "replies",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1a"
+    }
+}

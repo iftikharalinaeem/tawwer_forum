@@ -4,19 +4,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['Auth0'] = array(
-    'Name' => 'Auth0 SSO',
-    'ClassName' => "Auth0Plugin",
-    'Description' => 'Allows user login to be authenticated on Auth0 SSO.',
-    'Version' => '1.0.0',
-    'RequiredApplications' => array('Vanilla' => '1.0'),
-    'RequiredTheme' => false,
-    'HasLocale' => false,
-    'SettingsUrl' => '/settings/auth0',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'MobileFriendly' => true
-);
-
 require_once('class.oauth2pluginbase.php');
 
 /**

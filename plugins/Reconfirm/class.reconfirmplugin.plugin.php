@@ -5,20 +5,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
-$PluginInfo['Reconfirm'] = array(
-    'Name' => 'Reconfirm',
-    'Description' => 'Force users to reset their password and reconfirm the terms of use.',
-    'Version' => '1.0.0',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
-    'RequiredTheme' => false,
-    'HasLocale' => true,
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'MobileFriendly' => true,
-    'Author' => "Patrick Kelly",
-    'AuthorEmail' => 'patrick.k@vanillaforums.com'
-);
-
-
 /**
  * The ReconfirmPlugin class forces users to reconfirm the terms of use.
  *

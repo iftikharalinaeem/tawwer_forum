@@ -1,0 +1,15 @@
+{
+    "name": "Badgify Comments",
+    "className": "BadgifyCommentsPlugin",
+    "description": "It's gamification with badges. Assign badges to discussions to incentivize users to comment.",
+    "version": "1.0.0",
+    "settingsUrl": "/settings/BadgifyComments",
+    "settingsPermission": "Garden.Settings.Manage",
+    "mobileFriendly": true,
+    "key": "badgifycomments",
+    "type": "addon",
+    "require": {
+        "badges": ">=1.5",
+        "vanilla": ">=2.0"
+    }
+}

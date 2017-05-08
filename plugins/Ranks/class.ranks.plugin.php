@@ -4,19 +4,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['Ranks'] = array(
-    'Name' => 'Ranks',
-    'Description' => "Adds user ranks to the application.",
-    'Version' => '1.3.1',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'MobileFriendly' => true,
-    'Icon' => 'ranks.png'
-);
-
 class RanksPlugin extends Gdn_Plugin {
 
     /** @var null|array  */

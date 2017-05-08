@@ -1,0 +1,22 @@
+{
+    "name": "Hosted Tours",
+    "description": "Provides new user walkthrough tours for hosted customers",
+    "version": "1.1.1",
+    "mobileFriendly": false,
+    "requiredTheme": false,
+    "settingsUrl": false,
+    "icon": "hosted_tours.png",
+    "key": "hostedtours",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/tim"
+        }
+    ],
+    "require": {
+        "walkthrough": ">=0.2",
+        "vanilla": ">=2.2"
+    }
+}

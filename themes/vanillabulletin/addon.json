@@ -1,0 +1,17 @@
+{
+    "name": "Vanilla Bulletin",
+    "description": "Vanilla, all dressed up like vBulletin.",
+    "version": "1.1",
+    "site": "iphonedevsdk.vanillaforums.com",
+    "hidden": false,
+    "key": "vanillabulletin",
+    "type": "theme",
+    "priority": 1000,
+    "authors": [
+        {
+            "name": "Todd Burry (and Mark O'Sullivan)",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ]
+}

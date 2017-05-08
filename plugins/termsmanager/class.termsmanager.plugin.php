@@ -8,19 +8,6 @@
  * @package TermsManager
  */
 
-// Define the plugin:
-$PluginInfo['termsmanager'] = [
-    'Name' => 'Terms of Use Manager',
-    'Description' => 'Stop user from creating accounts until they have agreed to your terms. Record which terms they have agreed to.',
-    'Version' => '1.0',
-    'MobileFriendly' => true,
-    'RequiredApplications' => ['Vanilla' => '2.3'],
-    'SettingsUrl' => '/settings/termsmanager',
-    'Author' => 'Patrick Kelly',
-    'AuthorEmail' => 'patrick.k@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
-];
-
 /**
  * This plugin allows Admins to create a Terms of Service (or Code of Conduct, or Privacy Policy) that
  * users are required to agree to before connecting over SSO or creating an account.

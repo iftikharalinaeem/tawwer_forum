@@ -1,0 +1,14 @@
+{
+    "name": "No Admin",
+    "description": "Disable all admin permissions.",
+    "version": "1.0.0",
+    "license": "Proprietary",
+    "key": "noadmin",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com"
+        }
+    ]
+}

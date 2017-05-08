@@ -6,20 +6,6 @@ if (!defined('APPLICATION'))
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary
  */
-// Define the plugin:
-$PluginInfo['SEOLinks'] = array(
-    'Name' => 'HTML Links',
-    'Description' => "Changes the links to discussions and categories for backwards compatibility purposes.",
-    'Version' => '1.1',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
-    'MobileFriendly' => TRUE,
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'SettingsUrl' => '/settings/seolinks',
-    'SettingsPermission' => 'Garden.Settings.Manage'
-);
-
 class SEOLinksPlugin extends Gdn_Plugin {
 
 

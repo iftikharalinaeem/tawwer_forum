@@ -3,16 +3,6 @@
  * @copyright 2015 Vanilla Forums, Inc.
  */
 
-$PluginInfo['burnerblocker'] = array(
-    'Name' => 'Burner Blocker',
-    'Description' => 'Blocks all known "burner" email domains from registering.',
-    'Version' => '1.0',
-    'Author' => "Lincoln Russell",
-    'AuthorEmail' => 'lincoln@vanillaforums.com',
-    'MobileFriendly' => true,
-    'License' => 'Proprietary'
-);
-
 /**
  * Class BurnerBlockerPlugin
  *

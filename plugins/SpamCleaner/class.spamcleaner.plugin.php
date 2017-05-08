@@ -4,18 +4,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['SpamCleaner'] = array(
-   'Name' => 'Spam Cleaner',
-   'Description' => "Gives the functionality to go through an entire forum to clean it of spam.",
-   'Version' => '1.0a',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
-   'SettingsUrl' => '/log/cleanspam',
-   'Author' => 'Todd Burry',
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
-);
-
 /**
  * Adds Question & Answer format to Vanilla.
  * 

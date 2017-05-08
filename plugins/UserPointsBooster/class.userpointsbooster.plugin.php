@@ -8,19 +8,6 @@
  * This plugin was originally done for Xamarin
  * https://vanillaforums.teamwork.com/tasks/3448780
  */
-$PluginInfo['UserPointsBooster'] = array(
-    'Name' => 'User Points Booster',
-    'Description' => 'Allow giving more points to users for certain actions',
-    'Version' => '1.0',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
-    'HasLocale' => false,
-    'License' => 'GNU GPL2',
-    'SettingsUrl' => '/settings/userpointsbooster',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Author' => 'Alexandre (DaazKu) Chouinard',
-    'AuthorEmail' => 'alexandre.c@vanillaforums.com'
-);
-
 /**
  * Class UserPointsBoosterPlugin
  */

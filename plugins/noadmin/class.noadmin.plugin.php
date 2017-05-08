@@ -1,14 +1,5 @@
 <?php if (!defined('APPLICATION')) exit;
 
-$PluginInfo['noadmin'] = array(
-    'Name'        => "No Admin",
-    'Description' => "Disable all admin permissions.",
-    'Version'     => '1.0.0',
-    'Author'      => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'License'     => 'Proprietary'
-);
-
 /**
  * noadmin Plugin
  *

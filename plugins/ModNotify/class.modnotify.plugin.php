@@ -1,14 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-// Define the plugin:
-$PluginInfo['ModNotify'] = array(
-   'Name' => 'Mod Queue Notifier',
-   'Description' => 'Allows moderators to receive notification when items are added to the Moderation Queue.',
-   'Version' => '1.0',
-   'Author' => "Lincoln Russell",
-   'AuthorEmail' => 'lincoln@vanillaforums.com'
-);
-
 class ModNotifyPlugin extends Gdn_Plugin {   
    /**
     * Let users with permission choose to receive notifications.

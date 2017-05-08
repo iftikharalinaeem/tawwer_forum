@@ -4,20 +4,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-$PluginInfo['premoderatedcategory'] = [
-    'Name' => 'Pre-Moderated Category',
-    'Description' => 'Send chosen category\'s discussions directly to moderation and warn users about it.',
-    'Version' => '1.0',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'HasLocale' => false,
-    'License' => 'GNU GPL2',
-    'SettingsUrl' => 'settings/premoderatedcategory',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Author' => 'Alexandre (DaazKu) Chouinard',
-    'AuthorEmail' => 'alexandre.c@vanillaforums.com',
-    'AuthorUrl' => 'https://github.com/DaazKu',
-];
-
 /**
  * Class PreModeratedCategoryPlugin
  */

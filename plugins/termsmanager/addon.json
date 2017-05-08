@@ -1,0 +1,19 @@
+{
+    "name": "Terms of Use Manager",
+    "description": "Stop user from creating accounts until they have agreed to your terms. Record which terms they have agreed to.",
+    "version": "1.0",
+    "mobileFriendly": true,
+    "settingsUrl": "/settings/termsmanager",
+    "key": "termsmanager",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Patrick Kelly",
+            "email": "patrick.k@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.3"
+    }
+}

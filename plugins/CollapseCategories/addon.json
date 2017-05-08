@@ -1,0 +1,18 @@
+{
+    "name": "Collapse Categories",
+    "description": "Adds +/- icons beside category names so that they can be collapsed/expanded.",
+    "version": "1.0.1",
+    "mobileFriendly": false,
+    "key": "collapsecategories",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

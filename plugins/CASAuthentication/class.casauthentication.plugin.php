@@ -4,20 +4,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['CASAuthentication'] = array(
-    'Name' => 'CAS Authentication for Vanilla',
-    'Description' => 'Allows Vanilla to authenticate against a <a href="http://en.wikipedia.org/wiki/Central_Authentication_Service">CAS</a> authentication server.',
-    'Version' => '1.1',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
-    'MobileFriendly' => true,
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'SettingsUrl' => '/settings/cas',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-);
-
 /**
  * Class CASAuthenticationPlugin
  */

@@ -4,21 +4,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['jwtsso'] = [
-    'Name' => 'JSON Web Token SSO',
-    'ClassName' => "JWTSSOPlugin",
-    'Description' => 'Connect users to a forum using SSO by passing a JSON Web Token.',
-    'Version' => '1.0.2',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'SettingsUrl' => '/settings/jwtsso',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'UsePopupSettings' => false,
-    'MobileFriendly' => true,
-    'Author' => 'Patrick Kelly',
-    'AuthorEmail' => 'patrick.k@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
-];
-
 const DEFAULT_PROVIDER_KEY = "JWTSSODefault";
 
 const PROVIDER_SCHEME_ALIAS = "JWTSSO";

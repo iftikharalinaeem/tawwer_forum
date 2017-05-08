@@ -1,0 +1,18 @@
+{
+    "name": "Triple-A",
+    "description": "A dark theme for Vanilla Forums with sharp accent colors and a promoted content slider. Geared towards gaming communities and the likes. Built with Bootstrap.",
+    "version": "1.0.9",
+    "url": "http://vanillaforums.com",
+    "license": "GPLv2",
+    "hidden": false,
+    "key": "triple-a",
+    "type": "theme",
+    "priority": 1000,
+    "authors": [
+        {
+            "name": "Funktion\u00e9l",
+            "email": "hi@funktionel.co",
+            "homepage": "https://funktionel.co"
+        }
+    ]
+}

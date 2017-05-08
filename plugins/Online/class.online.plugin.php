@@ -26,21 +26,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @package Misc
  */
-$PluginInfo['Online'] = [
-    'Name' => 'Online',
-    'Description' => 'Tracks who is online, and provides a panel module for displaying a list of online people.',
-    'Version' => '1.7.1',
-    'MobileFriendly' => false,
-    'RequiredApplications' => ['Vanilla' => '2.1a20'],
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'SettingsUrl' => '/plugin/online',
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/tim',
-    'Icon' => 'online.png'
-];
-
 class OnlinePlugin extends Gdn_Plugin {
 
     /**

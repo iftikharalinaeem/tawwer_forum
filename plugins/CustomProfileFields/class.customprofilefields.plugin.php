@@ -8,17 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['CustomProfileFields'] = array(
-	'Name' => 'Custom Profile Fields',
-   'Description' => 'Allows users to add custom values to their profile, like: GamerTag, Skype ID, Relationship Status, etc. Anything goes.',
-   'Version' => '1.1',
-   'Icon' => 'custom_profile_fields.png',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 class CustomProfileFieldsPlugin extends Gdn_Plugin {
 
 	/**

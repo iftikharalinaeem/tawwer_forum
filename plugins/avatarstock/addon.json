@@ -1,0 +1,27 @@
+{
+    "name": "Avatar Pool",
+    "description": "Create a limited stock of default avatars that members can choose between.",
+    "version": "1.2.2",
+    "requiredTheme": false,
+    "hasLocale": false,
+    "registerPermissions": {
+        "AvatarPool.CustomUpload.Allow": 0
+    },
+    "settingsUrl": "/settings/avatars",
+    "usePopupSettings": false,
+    "settingsPermission": "Garden.Settings.Manage",
+    "mobileFriendly": true,
+    "icon": "avatar-pool.png",
+    "key": "avatarstock",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Dane MacMillan",
+            "email": "dane@vanillaforums.com",
+            "homepage": "http://vanillaforums.org/profile/dane"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    }
+}

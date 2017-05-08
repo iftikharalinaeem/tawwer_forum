@@ -4,20 +4,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-$PluginInfo['PopularPosts'] = array(
-    'Name' => 'Popular posts',
-    'Description' => 'Shows popular posts (most viewed) for the selected timeframe. This plugin is meant for small sites only.',
-    'Version' => '1.0.2',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
-    'HasLocale' => false,
-    'License' => 'GNU GPL2',
-    'Icon' => 'popular_posts.png',
-    'SettingsUrl' => '/settings/popularPosts',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Author' => 'Alexandre (DaazKu) Chouinard',
-    'AuthorEmail' => 'alexandre.c@vanillaforums.com'
-);
-
 /**
  * THIS PLUGIN DOES NOT CURRENTLY SCALE. THIS PLUGIN SHOULD NOT BE DEPLOYED TO NEW SITES. DO NOT SUGGEST THIS PLUGIN FOR CUSTOMER SITES.
  */

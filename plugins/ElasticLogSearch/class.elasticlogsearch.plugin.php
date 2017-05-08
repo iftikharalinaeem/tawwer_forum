@@ -4,18 +4,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['ElasticLogSearch'] = array(
-    'Name' => 'Elastic Log Search',
-    'Description' => 'Use elastic search to display log data.',
-    'Version' => '1.2alpha',
-    'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'MobileFriendly' => FALSE,
-    'Author' => 'John Ashton',
-    'AuthorEmail' => 'john@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/'
-);
-
 class ElasticLogSearch extends Gdn_Plugin {
 
     /**

@@ -1,0 +1,21 @@
+{
+    "name": "Pre-Moderated Category",
+    "description": "Send chosen category's discussions directly to moderation and warn users about it.",
+    "version": "1.0",
+    "hasLocale": false,
+    "license": "GNU GPL2",
+    "settingsUrl": "settings/premoderatedcategory",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "premoderatedcategory",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com",
+            "homepage": "https://github.com/DaazKu"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    }
+}

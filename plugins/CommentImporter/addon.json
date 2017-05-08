@@ -1,0 +1,19 @@
+{
+    "name": "Comment Importer",
+    "description": "Import Comments from Wordpress or Disqus into Vanilla.",
+    "version": "1.0.1a",
+    "mobileFriendly": false,
+    "requiredTheme": false,
+    "key": "commentimporter",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1a"
+    }
+}

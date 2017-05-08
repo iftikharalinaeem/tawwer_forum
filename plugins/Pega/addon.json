@@ -1,0 +1,25 @@
+{
+    "name": "Pega",
+    "description": "Allow staff users to create cases from discussions and comments.",
+    "version": "1.0",
+    "settingsUrl": "/settings/pega",
+    "settingsPermission": "Garden.Settings.Manage",
+    "registerPermissions": {
+        "Garden.Staff.Allow": "Garden.Moderation.Manage"
+    },
+    "mobileFriendly": true,
+    "icon": "pega.png",
+    "socialConnect": true,
+    "key": "pega",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Patrick Kelly",
+            "email": "patrick.k@vanillaforums.com",
+            "homepage": "http://www.github.com/nervoustwit"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1.18"
+    }
+}

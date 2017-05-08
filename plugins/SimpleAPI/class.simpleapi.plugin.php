@@ -18,20 +18,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['SimpleAPI'] = array(
-    'Name' => 'Simple API',
-    'Description' => "Provides simple access_token API access to the forum.",
-    'Version' => '1.3.0',
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
-    'Author' => 'Tim Gunter',
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://about.me/timgunter',
-    'SettingsUrl' => '/settings/api',
-    'Icon' => 'simple-api.png',
-    'Priority' => Vanilla\Addon::PRIORITY_HIGH,
-);
-
 class SimpleAPIPlugin extends Gdn_Plugin {
 
     /**

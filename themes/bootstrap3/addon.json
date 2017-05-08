@@ -1,0 +1,43 @@
+{
+    "name": "Bootstrap 3",
+    "description": "Bootstrap for Vanilla has been rewritten from scratch on top of <a href='http://getbootstrap.com'>Bootstrap 3</a> in this second installation of the most popular theme for Vanilla Forums. Kickstart your community with a fresh and solid theme that is ready to be customized to your heart's desires.",
+    "version": "2.5.7",
+    "url": "https://github.com/kasperisager/vanilla-bootstrap",
+    "license": "MIT",
+    "hidden": false,
+    "options": {
+        "styles": {
+            "default": "%s_default",
+            "bootstrap": "%s_bootstrap",
+            "cerulean": "%s_cerulean",
+            "cosmo": "%s_cosmo",
+            "cyborg": "%s_cyborg",
+            "darkly": "%s_darkly",
+            "flatly": "%s_flatly",
+            "journal": "%s_journal",
+            "lumen": "%s_lumen",
+            "paper": "%s_paper",
+            "readable": "%s_readable",
+            "sandstone": "%s_sandstone",
+            "simplex": "%s_simplex",
+            "slate": "%s_slate",
+            "spacelab": "%s_spacelab",
+            "superhero": "%s_superhero",
+            "united": "%s_united",
+            "yeti": "%s_yeti"
+        }
+    },
+    "key": "bootstrap3",
+    "type": "theme",
+    "priority": 1000,
+    "authors": [
+        {
+            "name": "Kasper Kronborg Isager",
+            "email": "kasperisager@gmail.com",
+            "homepage": "https://github.com/kasperisager"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1.x"
+    }
+}

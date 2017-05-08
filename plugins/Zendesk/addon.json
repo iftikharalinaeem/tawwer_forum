@@ -1,0 +1,22 @@
+{
+    "name": "Zendesk",
+    "description": "Allow staff users to create tickets and cases from discussions and comments.",
+    "version": "1.0.0",
+    "settingsUrl": "/plugin/zendesk",
+    "settingsPermission": "Garden.Settings.Manage",
+    "mobileFriendly": true,
+    "icon": "zendesk.png",
+    "socialConnect": false,
+    "key": "zendesk",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "John Ashton",
+            "email": "john@vanillaforums.com",
+            "homepage": "http://www.github.com/John0x00"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1.18"
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "name": "Online",
+    "description": "Tracks who is online, and provides a panel module for displaying a list of online people.",
+    "version": "1.7.1",
+    "mobileFriendly": false,
+    "requiredTheme": false,
+    "settingsUrl": "/plugin/online",
+    "icon": "online.png",
+    "key": "online",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/tim"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1a20"
+    }
+}

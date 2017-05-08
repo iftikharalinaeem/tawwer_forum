@@ -3,19 +3,6 @@
 // 2.1 - Added a fix so that css files are in a more unique url so it works with autostatic (which is not forum-specific).
 // 2.2 - Allow mobile style override.
 
-$PluginInfo['CustomTheme'] = [
-    'Name' => 'Custom Theme',
-    'Description' => 'Allows administrators to customize the CSS & master HTML template of the currently enabled theme.',
-    'Version' => '2.3.0',
-    'Author' => "Mark O'Sullivan",
-    'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com',
-    'SettingsUrl' => '/settings/customtheme',
-    'Icon' => 'custom_theme.png',
-    'UsePopupSettings' => false,
-    'MobileFriendly' => true
-];
-
 /**
  * Class CustomThemePlugin
  */

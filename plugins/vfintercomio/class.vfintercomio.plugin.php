@@ -1,15 +1,5 @@
 <?php if (!defined('APPLICATION')) exit;
 
-$PluginInfo['vfintercomio'] = array(
-    'Name'        => "Intercom.io",
-    'Description' => "Integrate with the Intercom.io API to track visitor and user behavior",
-    'Version'     => '1.0.0',
-    'Author'      => "Patrick Kelly",
-    'AuthorEmail' => 'patrick.k@vanillaforums.com',
-    'License'     => 'GPLv3',
-    'SettingsUrl' => '/settings/vfintercomio'
-);
-
 /**
  * Intercomio Plugin
  *

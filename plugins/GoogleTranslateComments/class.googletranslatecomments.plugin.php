@@ -1,14 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PluginInfo['GoogleTranslateComments'] = array(
-   'Name' => 'Google Translate Comments',
-   'Description' => 'Adds a Google Translate widget to discussion pages so comments can be translated from other languages.',
-   'Version' => '1',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
-);
-
 class GoogleTranslateCommentsPlugin implements Gdn_IPlugin {
 
    public function Base_Render_Before($Sender) {

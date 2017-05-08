@@ -1,0 +1,15 @@
+{
+    "name": "Google Analytics",
+    "description": "Adds google analytics tracking script to the forum.",
+    "version": "2.0",
+    "settingsUrl": "settings/ga",
+    "key": "googleanalytics",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ]
+}

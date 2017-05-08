@@ -21,25 +21,6 @@
  * @package internal
  */
 
-$PluginInfo['hostedtours'] = [
-    'Name' => 'Hosted Tours',
-    'Description' => 'Provides new user walkthrough tours for hosted customers',
-    'Version' => '1.1.1',
-    'MobileFriendly' => false,
-    'RequiredApplications' => [
-        'Vanilla' => '2.2'
-    ],
-    'RequiredTheme' => false,
-    'RequiredPlugins' => [
-        'WalkThrough' => '0.2'
-    ],
-    'SettingsUrl' => false,
-    'Icon' => 'hosted_tours.png',
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/tim'
-];
-
 class HostedToursPlugin extends Gdn_Plugin {
 
     /**

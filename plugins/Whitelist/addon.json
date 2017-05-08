@@ -1,0 +1,20 @@
+{
+    "name": "Whitelist",
+    "description": "Block any requests that does not come from a whitelisted source.",
+    "version": "1.0",
+    "hasLocale": false,
+    "license": "GNU GPL2",
+    "settingsUrl": "/settings/whitelist",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "whitelist",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    }
+}

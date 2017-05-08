@@ -8,23 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['TwitterForUserGroup'] = array(
-   'Name' => 'Twitter Box',
-   'Description' => 'This plugin provides the capability to deploy a twitter feed box to the forum panel.',
-   'Version' => '1.1',
-   'RequiredApplications' => FALSE,
-   'RequiredTheme' => FALSE, 
-   'RequiredPlugins' => FALSE,
-   'SettingsUrl' => '/plugin/twitter',
-   'SettingsPermission' => 'Garden.AdminUser.Only',
-   'HasLocale' => TRUE,
-   'RegisterPermissions' => FALSE,
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 class TwitterForUserGroupPlugin extends Gdn_Plugin {
 
    public function Base_Render_Before($Sender) {

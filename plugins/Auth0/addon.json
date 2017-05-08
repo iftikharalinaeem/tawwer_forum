@@ -1,0 +1,16 @@
+{
+    "name": "Auth0 SSO",
+    "className": "Auth0Plugin",
+    "description": "Allows user login to be authenticated on Auth0 SSO.",
+    "version": "1.0.0",
+    "requiredTheme": false,
+    "hasLocale": false,
+    "settingsUrl": "/settings/auth0",
+    "settingsPermission": "Garden.Settings.Manage",
+    "mobileFriendly": true,
+    "key": "auth0",
+    "type": "addon",
+    "require": {
+        "vanilla": ">=1.0"
+    }
+}

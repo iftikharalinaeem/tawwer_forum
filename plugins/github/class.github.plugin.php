@@ -10,22 +10,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
-// Define the plugin:
-$PluginInfo['github'] = [
-    'Name' => 'GitHub',
-    'Description' => 'Allow staff users to create issues from discussions and comments.',
-    'Version' => '1.1.1',
-    'RequiredApplications' => ['Vanilla' => '2.1.18'],
-    'SettingsUrl' => '/plugin/github',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'MobileFriendly' => true,
-    'Author' => 'John Ashton',
-    'AuthorEmail' => 'john@vanillaforums.com',
-    'AuthorUrl' => 'http://www.github.com/John0x00',
-    'SocialConnect' => false,
-    'Icon' => 'github.png',
-];
-
 /**
  * Github plugin.
  */

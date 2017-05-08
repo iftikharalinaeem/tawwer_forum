@@ -4,18 +4,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['Watermark'] = array(
-    'Name' => 'Watermark Image',
-    'Description' => 'Allow for configured categories to watermark the images attached to discussions.',
-    'Version' => '1.0.0',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
-    'MobileFriendly' => true,
-    'Author' => 'Patrick Kelly',
-    'AuthorEmail' => 'patrick.k@vanillaforums.com',
-    'SettingsUrl' => '/settings/watermark'
-);
-
-
 /**
  * Class WatermarkPlugin
  *

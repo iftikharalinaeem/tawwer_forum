@@ -3,24 +3,7 @@
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
- // Define the plugin:
-$PluginInfo['Salesforce'] = array(
-   'Name' => 'Salesforce',
-   'Description' => "Allow staff users to create leads and cases from discussions and comments.",
-   'Version' => '0.1',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'SettingsUrl' => '/plugin/Salesforce',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'RegisterPermissions' => array('Garden.Staff.Allow' => 'Garden.Moderation.Manage'),
-   'MobileFriendly' => TRUE,
-   'Author' => 'John Ashton',
-   'AuthorEmail' => 'john@vanillaforums.com',
-   'AuthorUrl' => 'http://www.github.com/John0x00',
-   'Icon' => 'salesforce.png',
-   'UsePopupSettings' => false,
-);
-
-/**
+ /**
  * Salesforce Plugin
  *
  * This plugin connects the forums to a salesforce account; Once connected Staff users will

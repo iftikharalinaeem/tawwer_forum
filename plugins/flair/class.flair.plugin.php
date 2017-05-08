@@ -1,18 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PluginInfo['flair'] = array(
-   'Name' => 'Flair',
-   'Description' => 'Displays badges on user posts.',
-   'Version' => '1.1.2',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'Author' => "Dane MacMillan",
-   'AuthorEmail' => 'dane@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
-   'Icon' => 'flair.png',
-   'MobileFriendly' => true,
-   'RequiredPlugins' => array('badges' => '1.4')
-);
-
 class FlairPlugin extends Gdn_Plugin {
 
    /**

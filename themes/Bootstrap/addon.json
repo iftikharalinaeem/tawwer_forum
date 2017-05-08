@@ -1,0 +1,26 @@
+{
+    "name": "Bootstrap",
+    "description": "A theme based on the popular Twitter Bootstrap framework.",
+    "version": "1.0.13",
+    "hidden": false,
+    "options": {
+        "description": "This theme has an alternative colour scheme.",
+        "styles": {
+            "default": "%s_default",
+            "dark": "%s_dark",
+            "darkBlue": "%s_darkblue",
+            "green": "%s_green",
+            "pink": "%s_pink"
+        }
+    },
+    "key": "Bootstrap",
+    "type": "theme",
+    "priority": 1000,
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.org/profile/todd"
+        }
+    ]
+}

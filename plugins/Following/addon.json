@@ -1,0 +1,17 @@
+{
+    "name": "Following",
+    "description": "This plugin allows users to follow others.",
+    "version": "1.1.1",
+    "requiredTheme": false,
+    "hasLocale": true,
+    "registerPermissions": false,
+    "key": "following",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}

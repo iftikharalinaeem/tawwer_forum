@@ -4,19 +4,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-$PluginInfo['Whitelist'] = array(
-    'Name' => 'Whitelist',
-    'Description' => 'Block any requests that does not come from a whitelisted source.',
-    'Version' => '1.0',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
-    'HasLocale' => false,
-    'License' => 'GNU GPL2',
-    'SettingsUrl' => '/settings/whitelist',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Author' => 'Alexandre (DaazKu) Chouinard',
-    'AuthorEmail' => 'alexandre.c@vanillaforums.com'
-);
-
 /**
  * Class WhitelistPlugin
  *

@@ -5,20 +5,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['Sphinx'] = [
-    'Name' => 'Sphinx Search',
-    'Description' => "Upgrades search to use the powerful Sphinx engine instead of the default search.",
-    'Version' => '1.1.3',
-    'RequiredApplications' => [
-        'Vanilla' => '2.0.17'
-    ],
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'Icon' => 'sphinx.png',
-    'SettingsUrl' => '/settings/sphinx',
-];
-
 // Force require our sphinx so that an incomplete autoloader doesn't miss it.
 if (!class_exists('SearchModel', false)) {
     require_once __DIR__ . '/class.searchmodel.php';

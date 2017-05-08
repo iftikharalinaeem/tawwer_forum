@@ -5,23 +5,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['Mustache'] = array(
-    'Name' => 'Mustache view renderer',
-    'Description' => "This plugin adds Mustache rendering ability to Vanilla.",
-    'Version' => '1.0a',
-    'MobileFriendly' => true,
-    'RequiredApplications' => false,
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'HasLocale' => false,
-    'RegisterPermissions' => false,
-    'Icon' => 'internal-plugin.png',
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 /**
  * Mustache Renderer
  *

@@ -1,0 +1,21 @@
+{
+    "name": "Warnings & Notes",
+    "description": "Allows moderators to warn users and add private notes to profiles to help police the community.",
+    "version": "2.5",
+    "mobileFriendly": true,
+    "settingsUrl": "/settings/warnings",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "warnings.png",
+    "key": "warnings2",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

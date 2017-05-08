@@ -1,0 +1,13 @@
+{
+    "name": "Mod Queue Notifier",
+    "description": "Allows moderators to receive notification when items are added to the Moderation Queue.",
+    "version": "1.0",
+    "key": "modnotify",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com"
+        }
+    ]
+}

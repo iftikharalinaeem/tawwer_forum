@@ -1,0 +1,19 @@
+{
+    "name": "Ideation",
+    "description": "Let users vote on discussions in a Idea category",
+    "version": "1.1",
+    "license": "Proprietary",
+    "icon": "ideation.png",
+    "key": "ideation",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Becky Van Bussel",
+            "email": "becky@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "reactions": ">=1.4.0",
+        "vanilla": ">=2.4.200"
+    }
+}

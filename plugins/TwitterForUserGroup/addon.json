@@ -1,0 +1,19 @@
+{
+    "name": "Twitter Box",
+    "description": "This plugin provides the capability to deploy a twitter feed box to the forum panel.",
+    "version": "1.1",
+    "requiredTheme": false,
+    "settingsUrl": "/plugin/twitter",
+    "settingsPermission": "Garden.AdminUser.Only",
+    "hasLocale": true,
+    "registerPermissions": false,
+    "key": "twitterforusergroup",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}

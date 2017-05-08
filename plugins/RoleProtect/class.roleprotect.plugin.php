@@ -8,22 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['RoleProtect'] = array(
-   'Name' => 'Role Protection',
-   'Description' => 'Prevents certain privileged roles from escalating their permissions or deleting other privileged users.',
-   'Version' => '1.0',
-   'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('Vanilla' => '2.0.18b'),
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => TRUE,
-   'RegisterPermissions' => array('Garden.Roles.Selective' => 0),
-   'Author' => "Tim Gunter",
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 class RoleProtectPlugin extends Gdn_Plugin {
 
    protected $Roles;

@@ -1,0 +1,24 @@
+{
+    "name": "Badges",
+    "description": "Give badges to your users to reward them for contributing to your community.",
+    "version": "1.6.0",
+    "registerPermissions": {
+        "Reputation.Badges.View": 1,
+        "0": "Reputation.Badges.Request",
+        "Reputation.Badges.Give": "Garden.Settings.Manage",
+        "Reputation.Badges.Manage": "Garden.Settings.Manage"
+    },
+    "license": "Proprietary",
+    "settingsUrl": "/settings/badges",
+    "icon": "badges.png",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "badges",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ]
+}

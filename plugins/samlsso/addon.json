@@ -1,0 +1,15 @@
+{
+    "name": "SAML SSO",
+    "description": "Allows Vanilla to SSO to SAML 2.0 compliant identity providers.",
+    "version": "1.4",
+    "settingsUrl": "/settings/samlsso",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "saml.png",
+    "mobileFriendly": true,
+    "usePopupSettings": false,
+    "key": "samlsso",
+    "type": "addon",
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

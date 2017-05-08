@@ -1,0 +1,19 @@
+{
+    "name": "Ranks",
+    "description": "Adds user ranks to the application.",
+    "version": "1.3.1",
+    "mobileFriendly": true,
+    "icon": "ranks.png",
+    "key": "ranks",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

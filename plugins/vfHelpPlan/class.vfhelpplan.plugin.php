@@ -1,16 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PluginInfo['vfHelpPlan'] = array(
-   'Name' => 'Help Plan',
-   'Description' => "Shows each user's VanillaForums.com plan level.",
-   'Version' => '1.0',
-   'MobileFriendly' => TRUE,
-   'RequiredApplications' => array('VFCom' => '3.0.0'),
-   'Author' => "Lincoln Russell",
-   'AuthorEmail' => 'lincoln@vanillaforums.com',
-   'AuthorUrl' => 'http://lincolnwebs.com'
-);
-
 class vfHelpPlanPlugin extends Gdn_Plugin {
 
    public function DiscussionController_AfterDiscussionMeta_Handler($Sender, $Args) {

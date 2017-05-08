@@ -5,20 +5,6 @@
  */
 if (!defined('APPLICATION')) exit();
 
-// Define the plugin:
-$PluginInfo['IpsumInserter'] = array(
-   'Name' => 'IpsumInserter',
-   'Description' => "IpsumInserter",
-   'Version' => '0.0.1',
-   'RequiredApplications' => array('Vanilla' => '2.1.18'),
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'SettingsUrl' => '/plugin/IpsumInserter',
-   'Author' => 'John Ashton',
-   'AuthorEmail' => 'john@vanillaforums.com',
-   'AuthorUrl' => 'http://www.github.com/John0x00'
-);
-
-
 class IpsumInserterPlugin extends Gdn_Plugin {
 
    /**

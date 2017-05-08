@@ -6,17 +6,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-$PluginInfo['ningredirector'] = [
-    'Name' => 'Ning Redirector',
-    'Description' => 'Redirect Ning\'s URLs',
-    'Version' => '1.0',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'License' => 'GNU GPL2',
-    'Author' => 'Alexandre (DaazKu) Chouinard',
-    'AuthorEmail' => 'alexandre.c@vanillaforums.com',
-    'AuthorUrl' => 'https://github.com/DaazKu',
-];
-
 /**
  * Class NingRedirectorPlugin
  */

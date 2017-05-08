@@ -4,20 +4,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-$PluginInfo['KeywordBlocker'] = [
-    'Name' => 'Keyword Blocker',
-    'Description' => 'Block posts containing certain words and send them for review.',
-    'Version' => '1.1',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'HasLocale' => false,
-    'License' => 'GNU GPL2',
-    'SettingsUrl' => '/settings/keywordBlocker',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Author' => 'Alexandre (DaazKu) Chouinard',
-    'AuthorEmail' => 'alexandre.c@vanillaforums.com',
-    'AuthorUrl' => 'https://github.com/DaazKu',
-];
-
 /**
  * Class KeywordBlocker
  */

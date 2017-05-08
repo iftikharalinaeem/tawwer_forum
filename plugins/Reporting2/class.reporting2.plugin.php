@@ -3,25 +3,6 @@
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  */
 
-// Define the plugin:
-$PluginInfo['Reporting2'] = [
-    'Name' => 'Reporting',
-    'Description' => 'Allows users to report posts to moderators for abuse, terms of service violations etc.',
-    'Version' => '2.0.1',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'SettingsUrl' => '/settings/reporting',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Author' => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com',
-    'MobileFriendly' => true,
-    'Icon' => 'reporting.png',
-    'RegisterPermissions' => [
-        // Reactions is going in vanilla/vanilla soon™
-        'Reactions.Flag.Add' => 'Garden.SignIn.Allow'
-    ],
-];
-
 class Reporting2Plugin extends Gdn_Plugin {
     /// Methods ///
     public function setup() {

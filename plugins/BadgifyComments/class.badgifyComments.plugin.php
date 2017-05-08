@@ -1,17 +1,5 @@
 <?php
 
-$PluginInfo['BadgifyComments'] = [
-    'Name' => 'Badgify Comments',
-    'ClassName' => 'BadgifyCommentsPlugin',
-    'Description' => 'It\'s gamification with badges. Assign badges to discussions to incentivize users to comment.',
-    'Version' => '1.0.0',
-    'RequiredApplications' => ['Vanilla' => '2.0'],
-    'RequiredPlugins' => ['badges' => '1.5'],
-    'SettingsUrl' => '/settings/BadgifyComments',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'MobileFriendly' => true
-];
-
 /**
  * This plugin will allow admins to designate certain discussions so that whenver
  * users comment in the discussion they receive a badge.

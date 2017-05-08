@@ -1,18 +1,5 @@
 <?php
 
-$PluginInfo['AgeGate'] = array(
-    'Name' => 'Age Gate',
-    'Description' => '<strong>DEPRECATED</strong>. The US FTC has explicitly stated that age gates do not aid compliance with COPPA,'
-            .' and adding one may actually add liability where none existed previously. Age Gate should be deactivated.'
-            .' <a href="https://www.ftc.gov/tips-advice/business-center/guidance/complying-coppa-frequently-asked-questions">Read more.</a>',
-    'Version' => '1.2.0',
-    'Author' => "Becky Van Bussel",
-    'AuthorEmail' => 'becky@vanillaforums.com',
-    'SettingsUrl' => '/settings/agegate', // Url of the plugin's settings page.
-    'Icon' => 'age-gate.png'
-
-);
-
 /**
  * Class AgeGatePlugin
  *

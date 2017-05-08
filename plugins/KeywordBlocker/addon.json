@@ -1,0 +1,21 @@
+{
+    "name": "Keyword Blocker",
+    "description": "Block posts containing certain words and send them for review.",
+    "version": "1.1",
+    "hasLocale": false,
+    "license": "GNU GPL2",
+    "settingsUrl": "/settings/keywordBlocker",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "keywordblocker",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com",
+            "homepage": "https://github.com/DaazKu"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    }
+}

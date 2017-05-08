@@ -10,20 +10,6 @@
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
-// Define the plugin:
-$PluginInfo['Cleanspeak'] = array(
-    'Name' => 'Cleanspeak',
-    'Description' => 'Cleanspeak integration for Vanilla.',
-    'Version' => '1.2.1',
-    'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'SettingsUrl' => '/settings/cleanspeak',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Icon' => 'cleanspeak.png',
-    'Author' => 'John Ashton',
-    'AuthorEmail' => 'john@vanillaforums.com',
-    'AuthorUrl' => 'http://www.github.com/John0x00'
-);
-
 class CleanspeakPlugin extends Gdn_Plugin {
 
     // Methods.

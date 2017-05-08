@@ -9,18 +9,6 @@
  * @package Misc
  */
 
-// Define the plugin:
-$PluginInfo['ModList'] = array(
-   'Name' => 'Mod List',
-   'Description' => "Adds a list of moderators to categories.",
-   'Version' => '1.2.2',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
-   'Author' => 'Tim Gunter',
-   'AuthorEmail' => 'tim@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/tim',
-   'Icon' => 'moderator-list.png'
-);
-
 class ModListPlugin extends Gdn_Plugin {
 
    /**

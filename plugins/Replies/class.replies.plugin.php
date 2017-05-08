@@ -10,17 +10,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['Replies'] = array(
-   'Name' => 'Inline Replies',
-   'Description' => "Adds one level of inline replies to comments.",
-   'Version' => '1.0b1.2',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
-   'Author' => 'Todd Burry',
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'MobileFriendly' => TRUE
-);
-
 class RepliesPlugin extends Gdn_Plugin {
    /// Methods
    

@@ -7,18 +7,6 @@
  * @package samlsso
  */
 
-$PluginInfo['samlsso'] = [
-    'Name' => 'SAML SSO',
-    'Description' => 'Allows Vanilla to SSO to SAML 2.0 compliant identity providers.',
-    'Version' => '1.4',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'SettingsUrl' => '/settings/samlsso',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Icon' => 'saml.png',
-    'MobileFriendly' => true,
-    'UsePopupSettings' => false,
-];
-
 /**
  * Class SamlSSOPlugin
  */

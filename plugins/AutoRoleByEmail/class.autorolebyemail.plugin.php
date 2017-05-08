@@ -8,17 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['AutoRoleByEmail'] = array(
-   'Name' => 'Auto-Role By Email',
-   'Description' => 'Adds new users to roles based on their email domain (in addition to default role). Not compatible with Approval registration method.',
-   'Version' => '1.0',
-   'Icon' => 'auto_role_by_email.png',
-   'Author' => "Lincoln Russell",
-   'AuthorEmail' => 'lincoln@vanillaforums.com',
-   'AuthorUrl' => 'http://lincolnwebs.com'
-);
-
 class AutoRoleByEmailPlugin extends Gdn_Plugin {
 	/**
     * Add 'Domains' box to Edit Role page.
@@ -32,7 +21,7 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
                 $sender->Form->textBoxWrap('Domains', ['MultiLine' => true]).
             '</li>';
 	}
-   
+
    /**
     * If new user's email is @domain, add to special role.
     */
@@ -40,7 +29,7 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
       // Get new user's email domain
       $Email = $Sender->EventArguments['InsertFields']['Email'];
       list($Junk, $Domain) = explode('@', $Email);
-      
+
       // Any roles assigned?
       $RoleModel = new RoleModel();
       $RoleData = $RoleModel->SQL->GetWhereLike('Role', array('Domains' => $Domain));
@@ -54,31 +43,31 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
          }
       }
    }
-   
+
    /**
     * One time on enable.
     */
-   public function Setup() {      
+   public function Setup() {
       $this->Structure();
-         
+
       // Backwards compatibility with 0.1
       if (C('Plugins.AutoRoleByEmail.Domain', FALSE)) {
          $RoleModel = new RoleModel();
          $RoleModel->Update(
-            array('Domains' => C('Plugins.AutoRoleByEmail.Domain')), 
+            array('Domains' => C('Plugins.AutoRoleByEmail.Domain')),
             array('Name' => C('Plugins.AutoRoleByEmail.Role'))
          );
          RemoveFromConfig('Plugins.AutoRoleByEmail.Domain');
          RemoveFromConfig('Plugins.AutoRoleByEmail.Role');
       }
    }
-   
+
    /**
     * Add 'Domains' column to Role table.
     */
    public function Structure() {
       Gdn::Structure()->Table('Role')
          ->Column('Domains', 'text', NULL)
-         ->Set();  
+         ->Set();
    }
 }

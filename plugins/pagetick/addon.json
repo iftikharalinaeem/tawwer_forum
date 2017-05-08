@@ -1,0 +1,13 @@
+{
+    "name": "Pagetick",
+    "description": "Testing alternate pageview tracking.",
+    "version": "1.0.0-beta3",
+    "requiredTheme": false,
+    "hasLocale": false,
+    "mobileFriendly": true,
+    "key": "pagetick",
+    "type": "addon",
+    "require": {
+        "vanilla": ">=2.1a"
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "name": "Vanilla Pop",
+    "description": "Users may start discussions, make comments, and even automatically register for your site via email.",
+    "version": "1.3.1",
+    "settingsUrl": "/settings/vanillapop",
+    "settingsPermission": "Garden.Settings.Manage",
+    "registerPermissions": {
+        "Email.Discussions.Add": "Garden.Profiles.Edit",
+        "Email.Comments.Add": "Garden.Profiles.Edit",
+        "Email.Conversations.Add": "Garden.Profiles.Edit"
+    },
+    "icon": "vanillapop.png",
+    "key": "vanillapop",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18b3"
+    }
+}

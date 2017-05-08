@@ -3,19 +3,6 @@
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
-// Define the plugin:
-$PluginInfo['dblogger'] = array(
-    'Name' => 'Db Logger',
-    'Description' => 'Enable database logging.',
-    'Version' => '1.3.0',
-    'Icon' => 'db_logger.png',
-    'Author' => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com',
-    'Hidden' => false,
-    'Icon' => 'internal-plugin.png'
-);
-
 class DbLoggerPlugin extends Gdn_Plugin {
     private $level;
 

@@ -1,22 +1,5 @@
 <?php if(!defined('APPLICATION')) die();
 
-$PluginInfo['bulkusersimporter'] = array(
-   'Name' => 'Bulk User Import',
-   'Description' => 'Bulk user import with standardized CSV files. Send invites or directly insert new members.',
-   'Version' => '1.2.3',
-   'Author' => 'Dane MacMillan',
-   'AuthorEmail' => 'dane@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
-   'RequiredApplications' => array('Vanilla' => '>=2.2'),
-   'RequiredTheme' => false,
-   'RequiredPlugins' => false,
-   'HasLocale' => false,
-   'RegisterPermissions' => false,
-   'SettingsUrl' => '/settings/bulkusersimporter',
-   'SettingsPermission' => 'Garden.Setttings.Manage',
-   'Icon' => 'bulk-user-import.png'
-);
-
 /**
  * TODO:
  * - Allow downloading the full error dump from table.

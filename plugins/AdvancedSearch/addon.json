@@ -1,0 +1,16 @@
+{
+    "name": "Advanced Search",
+    "description": "Enables advanced search on sites. Replaces \"{searchbox}\" with \"{searchbox_advanced}\". For more information, see <a href=\"http://docs.vanillaforums.com/help/addons/advanced-search/\">documentation</a>. ",
+    "version": "1.0.8",
+    "mobileFriendly": true,
+    "icon": "advanced-search.png",
+    "key": "advancedsearch",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}

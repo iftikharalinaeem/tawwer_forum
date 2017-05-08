@@ -1,0 +1,17 @@
+{
+    "name": "Security Words",
+    "description": "When anyone posts a discussion, comment, or activity that contains one of the security words, that post will be added to the moderation queue.",
+    "version": "1.0.0",
+    "mobileFriendly": true,
+    "settingsUrl": "/settings/securitywords",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "securitywords",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Dane MacMillan",
+            "email": "work@danemacmillan.com",
+            "homepage": "https://danemacmillan.com/vanilla-forums"
+        }
+    ]
+}

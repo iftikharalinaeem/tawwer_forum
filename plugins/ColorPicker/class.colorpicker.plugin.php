@@ -8,22 +8,6 @@ You should have received a copy of the GNU General Public License along with Gar
 Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 */
 
-// Define the plugin:
-$PluginInfo['ColorPicker'] = array(
-   'Name' => 'Color Picker',
-   'Description' => 'This plugin allows users to edit the css colors on their sites.',
-   'Version' => '1.0a',
-   'RequiredApplications' => array('Vanilla' => '2.0.2a'),
-   'RequiredTheme' => FALSE,
-   'RequiredPlugins' => FALSE,
-   'HasLocale' => FALSE,
-   'SettingsUrl' => '/plugin/colorpicker',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'Author' => 'Todd Burry',
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
-);
-
 class ColorPickerPlugin extends Gdn_Plugin {
    /// PROPERTIES ///
 

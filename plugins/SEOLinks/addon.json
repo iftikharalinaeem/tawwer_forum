@@ -1,0 +1,20 @@
+{
+    "name": "HTML Links",
+    "description": "Changes the links to discussions and categories for backwards compatibility purposes.",
+    "version": "1.1",
+    "mobileFriendly": true,
+    "settingsUrl": "/settings/seolinks",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "seolinks",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

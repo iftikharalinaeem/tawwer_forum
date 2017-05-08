@@ -4,20 +4,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['ImageRequired'] = array(
-    'Name' => 'Discussion Image Required',
-    'Description' => 'Force users to upload images when creating discussions on selected categories.',
-    'Version' => '1.0.0',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
-    'RequiredPlugins' => array(
-        'FileUpload' => '1.8.4'
-    ),
-    'MobileFriendly' => true,
-    'Author' => "Patrick Kelly",
-    'AuthorEmail' => 'patrick.k@vanillaforums.com'
-);
-
-
 /**
  * Class ImageRequiredplugin
  *

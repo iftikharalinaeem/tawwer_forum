@@ -1,0 +1,20 @@
+{
+    "name": "MailChimp Push",
+    "description": "Updates MailChimp when users adjust their email address.",
+    "version": "2.0.3",
+    "icon": "mailchimp_push.png",
+    "usePopupSettings": "false",
+    "settingsUrl": "/plugin/mailchimp",
+    "key": "mailchimppush",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://about.me/timgunter"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1a"
+    }
+}

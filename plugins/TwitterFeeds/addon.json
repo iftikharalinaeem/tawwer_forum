@@ -1,0 +1,18 @@
+{
+    "name": "Twitter Feeds",
+    "description": "Allows Users to add their Twitter Feed to their Profile.",
+    "version": "1.0.1",
+    "hasLocale": false,
+    "registerPermissions": false,
+    "settingsUrl": false,
+    "settingsPermission": false,
+    "key": "twitterfeeds",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Oliver Raduner",
+            "email": "vanilla@raduner.ch",
+            "homepage": "http://raduner.ch/"
+        }
+    ]
+}
