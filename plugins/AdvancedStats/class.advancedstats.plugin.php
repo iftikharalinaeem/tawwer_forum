@@ -197,9 +197,17 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
         if (Gdn_Theme::inSection('Dashboard')
             && checkPermission('Garden.Setting.Manage')
             && Gdn::request()->url() != $statURL) {
-            $Sender->informMessage(
-                sprintf(t('<a href="%s">The Advanced Stats addon will be removed on June 1, 2017.</a>'), $statURL)
-            );
+
+            $now = time();
+            $expiration = 60 * 60 * 24;
+            $lastShown = Gdn::session()->getCookie('-'.__CLASS__.'-notificationtime', 0);
+            if ($now - $lastShown > $expiration) {
+                $Sender->informMessage(
+                    sprintf(t('<a href="%s">The Advanced Stats addon will be removed on June 1, 2017.</a>'), $statURL)
+                );
+                Gdn::session()->setCookie('-'.__CLASS__.'-notificationtime', $now, $expiration);
+            }
+
         }
 
     }
