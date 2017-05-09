@@ -1,0 +1,15 @@
+{
+    "name": "Infrastructure Stub",
+    "description": "Provides some basic mock infrastructure functionality to aid in localhost development.",
+    "version": "1.0.0-alpha",
+    "icon": "internal-plugin.png",
+    "license": "Proprietary",
+    "key": "infstub",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com"
+        }
+    ]
+}
