@@ -48,7 +48,7 @@ $.fn.searchAutocomplete = function(options) {
         var $this = $(this);
 
         var settings = $.extend({
-            source: '/search/autocomplete.json',
+            source: gdn.url('/search/autocomplete.json'),
             position: { collision: "flip" },
             focus: function() {
               // prevent value inserted on focus
