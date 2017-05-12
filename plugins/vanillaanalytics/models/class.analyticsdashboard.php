@@ -130,6 +130,23 @@ class AnalyticsDashboard implements JsonSerializable {
     }
 
     /**
+     * Get the dashboard widgets.
+     *
+     * @return array The widgets.
+     */
+    public function getWidgets() {
+        $widgets = [];
+
+        foreach ($this->getPanels() as $panel) {
+            if (count($panel->getWidgets()) > 0) {
+                $widgets = array_merge($widgets, $panel->getWidgets());
+            }
+        }
+
+        return $widgets;
+    }
+
+    /**
      * Attempt to fetch an existing dashboard (default or personal).
      *
      * @todo Add database lookups.
@@ -172,8 +189,6 @@ class AnalyticsDashboard implements JsonSerializable {
      */
     public function getDefaults() {
         if (empty(static::$defaults)) {
-
-
             $defaults = [
                 'Engagement' => [
                     'widgets' => [

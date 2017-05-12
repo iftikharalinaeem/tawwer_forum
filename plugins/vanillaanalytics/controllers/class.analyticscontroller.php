@@ -145,10 +145,21 @@ class AnalyticsController extends DashboardController {
             redirect('settings');
         }
 
+
+        $widgets = $dashboard->getWidgets();
+        $useCategoryFilter = false;
+        foreach($widgets as $widget) {
+            if (in_array('cat01', $widget->getSupports())) {
+                $useCategoryFilter = true;
+                break;
+            }
+        }
+
         $this->setData('Title', $dashboard->getTitle());
         $this->setData('AnalyticsDashboard', $dashboard);
         $this->setData('IsPersonal', $dashboard->isPersonal());
-        $this->setData('HasWidgets', $dashboard->hasWidgets());
+        $this->setData('HasWidgets', count($widgets));
+        $this->setData('ShowCategoryFilter', $useCategoryFilter);
         $this->addDefinition('analyticsDashboard', $dashboard);
 
         // Site ID is beneficial for differentiating sites on hub/node setups that may be reporting to one collection.
@@ -160,6 +171,8 @@ class AnalyticsController extends DashboardController {
             }
             $this->addDefinition('SiteIDFilter', $siteID);
         }
+
+
 
         $this->render('dashboard');
     }
