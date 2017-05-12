@@ -7,16 +7,6 @@
  * @package vanillaanalytics
  */
 
-$PluginInfo['vanillaanalytics'] = [
-    'Name' => 'Vanilla Analytics',
-    'Description' => 'Track important trends on your forum and chart them in a customizable dashboard.',
-    'Version' => '1.0.4',
-    'RequiredApplications' => array('Vanilla' => '2.2.103'),
-    'Author' => 'Ryan Perry',
-    'AuthorEmail' => 'ryan.p@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.org/profile/initvector'
-];
-
 /**
  * Facilitate the tracking of events from Vanilla to one (or more) analytics services.
  */
