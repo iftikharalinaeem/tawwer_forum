@@ -361,6 +361,8 @@ class BadgeController extends BadgesAppController {
 
         // Form setup
         $this->Form->setModel($this->BadgeModel);
+        $this->BadgeModel->Validation->applyRule('Name', 'Required');
+        $this->BadgeModel->Validation->applyRule('Slug', 'Required');
         $this->Form->showErrors();
 
         $Insert = (is_numeric($BadgeID)) ? false : true;
@@ -386,7 +388,11 @@ class BadgeController extends BadgesAppController {
                 $this->Form->setFormValue('Type', 'Manual');
             }
 
-            if ($this->Form->formValues('Photo') == '') {
+            /**
+             * If a Photo is added, the file details won't appear in the form values. If the field is present but empty,
+             * the field was not populated. Remove it from the form to prevent wiping out an existing image.
+             */
+            if ($this->Form->getFormValue('Photo', false) === '') {
                 $this->Form->removeFormValue('Photo');
             }
 
