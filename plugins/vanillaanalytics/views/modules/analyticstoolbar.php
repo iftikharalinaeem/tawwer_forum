@@ -5,15 +5,17 @@ $categories = $this->data('cat01');
 $catAttr = $this->data('catAttr');
 $heading = $this->data('heading');
 
-Gdn_Theme::assetBegin('Help'); ?>
-<section class="control-panel">
-    <h2 class="control-panel-heading"><?php echo t('Filter By...'); ?></h2>
-    <div class="control-panel-body js-filter-content">
-        <?php echo getCategoryFilterHTML($form, $categories, $catAttr, $heading); ?>
-    </div>
-</section>
-<?php
-Gdn_Theme::assetEnd();
+if ($this->data('DisplayCategoryFilter')) {
+    Gdn_Theme::assetBegin('Help'); ?>
+    <section class="control-panel">
+        <h2 class="control-panel-heading"><?php echo t('Filter By...'); ?></h2>
+        <div class="control-panel-body js-filter-content">
+            <?php echo getCategoryFilterHTML($form, $categories, $catAttr, $heading); ?>
+        </div>
+    </section>
+    <?php
+    Gdn_Theme::assetEnd();
+}
 ?>
 <div class="toolbar-analytics toolbar flex-wrap" id="analytics_toolbar">
     <div class="btn-group">

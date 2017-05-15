@@ -7,12 +7,15 @@
 
 
 class AnalyticsToolbarModule extends Gdn_Module {
-
     /**
      * AnalyticsToolbarModule constructor.
+     *
+     * @param bool $displayCategoryFilter
      */
-    public function __construct() {
+    public function __construct($displayCategoryFilter) {
         parent::__construct();
+
+        $this->setData('DisplayCategoryFilter', $displayCategoryFilter);
     }
 
     private $intervals = [
@@ -63,8 +66,9 @@ class AnalyticsToolbarModule extends Gdn_Module {
     }
 
     private function getData() {
-
-        $this->getCategoryFilter();
+        if ($this->data('DisplayCategoryFilter')) {
+            $this->getCategoryFilter();
+        }
 
         // Translate the interval titles
         foreach($this->intervals as &$interval) {
