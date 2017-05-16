@@ -20,10 +20,17 @@ echo $Form->Errors();
    <li class="form-group">
       <div class="label-wrap">
          <?php echo $Form->Label('Access Token', 'AccessToken');
-         echo '<div class="info">This is the access token for api calls. It\'s like a password for the API. <b>Do not give this access token out to anyone.</b></div>'; ?>
+         echo '<div class="info">This is the access token for api calls. It\'s like a password for the API. <b>Do not give this access token out to anyone. Treat it like a password, do not display it in the page source code.</b></div>'; ?>
       </div>
       <div class="input-wrap">
-         <?php echo $Form->TextBox('AccessToken'); ?>
+         <div class="spoiler">
+            <button class="btn btn-primary spoiler-trigger">
+               Click here to show Access Token.
+            </button>
+            <div class="spoiler-content">
+               <?php echo $Form->TextBox('AccessToken'); ?>
+            </div>
+         </div>
       </div>
    </li>
    <li class="form-group">
