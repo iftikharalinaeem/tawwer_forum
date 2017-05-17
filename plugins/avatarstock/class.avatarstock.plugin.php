@@ -2,27 +2,6 @@
     die();
 }
 
-$PluginInfo['avatarstock'] = array(
-    'Name' => 'Avatar Pool',
-    'Description' => 'Create a limited stock of default avatars that members can choose between.',
-    'Version' => '1.2.2',
-    'Author' => 'Dane MacMillan',
-    'AuthorEmail' => 'dane@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.org/profile/dane',
-    'RequiredApplications' => array('Vanilla' => '>=2.2'),
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'HasLocale' => false,
-    'RegisterPermissions' => array(
-        'AvatarPool.CustomUpload.Allow' => 0
-    ),
-    'SettingsUrl' => '/settings/avatars',
-    'UsePopupSettings' => false,
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'MobileFriendly' => true,
-    'Icon' => 'avatar-pool.png'
-);
-
 /**
  * Class AvatarStockPlugin.
  *

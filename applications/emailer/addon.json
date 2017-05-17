@@ -1,0 +1,18 @@
+{
+    "description": "Routes email to individual sites.",
+    "version": "1.2.0",
+    "registerPermissions": false,
+    "url": "http://vanillaforums.com",
+    "license": "Proprietary",
+    "key": "emailer",
+    "type": "addon",
+    "priority": 10,
+    "name": "Emailer",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.org/profile/todd"
+        }
+    ]
+}

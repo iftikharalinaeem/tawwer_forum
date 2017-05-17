@@ -1,16 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-// Define the plugin:
-$PluginInfo['GettingStartedHosting'] = array(
-   'Name' => 'VanillaForums.com Getting Started',
-   'Description' => 'Adds a welcome message to the dashboard showing new administrators things they can do to get started using their forum. Checks off each item as it is completed.',
-   'Version' => '1.1',
-   'Author' => "Mark O'Sullivan",
-   'Icon' => 'vanilla_forums_getting_started.png',
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
-);
-
 class GettingStartedHostingPlugin implements Gdn_IPlugin {
 
 /*

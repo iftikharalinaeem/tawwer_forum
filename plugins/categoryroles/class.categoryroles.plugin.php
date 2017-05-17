@@ -3,17 +3,6 @@
  * @copyright 2009-2017 Vanilla Forums Inc.
  */
 
-$PluginInfo['categoryroles'] = [
-    'Name' => 'Category Roles',
-    'Description' => 'Grant user permissions from select roles, per-category.',
-    'Version' => '1.0',
-    'RequiredApplications' => ['Vanilla' => '2.3'],
-    'Author' => 'Ryan Perry',
-    'AuthorEmail' => 'ryan.p@vanillaforums.com',
-    'MobileFriendly' => true,
-    'License' => 'Proprietary'
-];
-
 /**
  * Facilitate the assignment of role permissions, per-category, for users.
  */

@@ -1,0 +1,24 @@
+{
+    "name": "Featured Discussions",
+    "description": "Feature discussions.",
+    "version": "1.0.1",
+    "icon": "featured_discussions.png",
+    "requiredTheme": false,
+    "hasLocale": false,
+    "registerPermissions": false,
+    "mobileFriendly": true,
+    "settingsPermission": "Garden.Setttings.Manage",
+    "key": "featured",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Dane MacMillan",
+            "email": "dane@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/dane"
+        }
+    ],
+    "require": {
+        "reactions": ">=1.0",
+        "vanilla": ">=2.2"
+    }
+}

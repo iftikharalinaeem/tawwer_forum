@@ -1,0 +1,15 @@
+{
+    "name": "Intercom.io",
+    "description": "Integrate with the Intercom.io API to track visitor and user behavior",
+    "version": "1.0.0",
+    "license": "GPLv3",
+    "settingsUrl": "/settings/vfintercomio",
+    "key": "vfintercomio",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Patrick Kelly",
+            "email": "patrick.k@vanillaforums.com"
+        }
+    ]
+}

@@ -1,16 +1,5 @@
 <?php if (!defined('APPLICATION')) exit;
 
-$PluginInfo['syslogger'] = array(
-    'Name'        => "Syslogger",
-    'Description' => "Logs events from the Logger object to the syslog.",
-    'Version'     => '1.1.1',
-    'Author'      => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl'   => 'http://vanillaforums.com',
-    'License'     => 'Proprietary',
-    'Icon'        => 'internal-plugin.png'
-);
-
 /**
  * Syslogger Plugin
  *

@@ -1,0 +1,25 @@
+{
+    "name": "Salesforce",
+    "description": "Allow staff users to create leads and cases from discussions and comments.",
+    "version": "0.1",
+    "settingsUrl": "/plugin/Salesforce",
+    "settingsPermission": "Garden.Settings.Manage",
+    "registerPermissions": {
+        "Garden.Staff.Allow": "Garden.Moderation.Manage"
+    },
+    "mobileFriendly": true,
+    "icon": "salesforce.png",
+    "usePopupSettings": false,
+    "key": "salesforce",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "John Ashton",
+            "email": "john@vanillaforums.com",
+            "homepage": "http://www.github.com/John0x00"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

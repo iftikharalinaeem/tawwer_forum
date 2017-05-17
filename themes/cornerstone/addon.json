@@ -1,0 +1,31 @@
+{
+    "name": "Cornerstone",
+    "description": "A fresh theme for Vanilla centered around a simple and soft color scheme.",
+    "version": "1.0.3",
+    "url": "https://vanillaforums.com",
+    "license": "GPLv3",
+    "hidden": false,
+    "options": {
+        "styles": {
+            "default": "%s_default",
+            "navy": "%s_navy",
+            "teal": "%s_teal",
+            "olive": "%s_olive",
+            "green": "%s_green",
+            "yellow": "%s_yellow",
+            "orange": "%s_orange",
+            "red": "%s_red",
+            "maroon": "%s_maroon"
+        }
+    },
+    "key": "cornerstone",
+    "type": "theme",
+    "priority": 1000,
+    "authors": [
+        {
+            "name": "Kasper Kronborg Isager",
+            "email": "kasper@vanillaforums.com",
+            "homepage": "https://github.com/kasperisager"
+        }
+    ]
+}

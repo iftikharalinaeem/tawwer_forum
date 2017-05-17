@@ -1,0 +1,19 @@
+{
+    "description": "The Vanilla Programming Interface provides global api functionality for downloaded applications to connect to vpi.vanillaforums.com.",
+    "version": "1.0a",
+    "registerPermissions": false,
+    "key": "api",
+    "type": "addon",
+    "priority": 10,
+    "name": "API",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.10a"
+    }
+}

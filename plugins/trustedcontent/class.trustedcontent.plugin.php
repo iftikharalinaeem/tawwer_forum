@@ -4,22 +4,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['trustedcontent'] = [
-    'Name' => 'Trusted Embeded Content',
-    'ClassName' => 'TrustedContentPlugin',
-    'Description' => 'Stop images from being shown on the forum unless it comes from a source that you trust. Removed images will be shown as a link.',
-    'Version' => '1.0.0',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'SettingsUrl' => '/settings/trustedcontent',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'UsePopupSettings' => false,
-    'MobileFriendly' => true,
-    'Author' => 'Patrick Kelly',
-    'AuthorEmail' => 'patrick.k@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
-];
-
-
 /**
  * Class TrustedContentPlugin
  *

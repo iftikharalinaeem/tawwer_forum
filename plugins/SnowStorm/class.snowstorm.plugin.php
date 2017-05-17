@@ -2,18 +2,6 @@
 /**
  * Define the plugin:
  */
-$PluginInfo['SnowStorm'] = array(
-	'Name'			=> 'SnowStorm',
-	'Description'	=> 'Adds falling snowflakes to the discussions & categories lists.',
-	'Version'		=> '1.1',
-	'Author'		=> 'Francis Fontaine',
-	'AuthorEmail'	=> 'francisfontaine@gmail.com',
-	'AuthorUrl'		=> 'http://francisfontaine.com/',
-	'License'		=> 'Free',
-	'RequiredApplications' => array('Vanilla' => '>=2.0.18'),
-	'MobileFriendly' => true
-);
-
 /**
  * Vanilla SnowStorm-Plugin
  *

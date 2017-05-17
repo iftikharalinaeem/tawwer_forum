@@ -4,24 +4,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['VanillaPop'] = array(
-    'Name' => 'Vanilla Pop',
-    'Description' => "Users may start discussions, make comments, and even automatically register for your site via email.",
-    'Version' => '1.3.1',
-    'RequiredApplications' => array('Vanilla' => '2.0.18b3'),
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'SettingsUrl' => '/settings/vanillapop',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'RegisterPermissions' => array(
-        'Email.Discussions.Add' => 'Garden.Profiles.Edit',
-        'Email.Comments.Add' => 'Garden.Profiles.Edit',
-        'Email.Conversations.Add' => 'Garden.Profiles.Edit'),
-    'Icon' => 'vanillapop.png'
-);
-
 // 1.0.6 - Lincoln, Apr 2013
 // -- Adds 'Force Notify' feature for roles
 

@@ -1,16 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PluginInfo['pagetick'] = array(
-    'Name' => 'Pagetick',
-    'Description' => 'Testing alternate pageview tracking.',
-    'Version' => '1.0.0-beta3',
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
-    'RequiredTheme' => FALSE,
-    'RequiredPlugins' => FALSE,
-    'HasLocale' => FALSE,
-    'MobileFriendly' => TRUE
-);
-
 class PageTickPlugin extends Gdn_Plugin {
    /// Methods ///
 

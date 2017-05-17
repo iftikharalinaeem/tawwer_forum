@@ -1,15 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PluginInfo['GoogleAnalytics'] = array(
-   'Name' => 'Google Analytics',
-   'Description' => 'Adds google analytics tracking script to the forum.',
-   'Version' => '2.0',
-   'SettingsUrl' => 'settings/ga',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
-);
-
 class GoogleAnalyticsPlugin implements Gdn_IPlugin {
 
    /**

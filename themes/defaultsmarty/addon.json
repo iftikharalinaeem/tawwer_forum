@@ -1,0 +1,27 @@
+{
+    "name": "Compatibility 2011",
+    "description": "An older version of the default theme for backwards-compatibility.",
+    "version": "2.0a",
+    "hidden": false,
+    "options": {
+        "description": "This theme has <font color=\"red\">7 color</font> options. Find out more on <a href=\"http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options\">Theme Options</a>.",
+        "styles": {
+            "vanilla Terminal": "%s_terminal",
+            "vanilla Grey": "%s_grey",
+            "vanilla Big City": "%s_bigcity",
+            "vanilla Poppy": "%s_poppy",
+            "vanilla Lemon Sea": "%s_lemonsea",
+            "vanilla Blue": "%s"
+        }
+    },
+    "key": "defaultsmarty",
+    "type": "theme",
+    "priority": 1000,
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.org/profile/todd"
+        }
+    ]
+}

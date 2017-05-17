@@ -4,17 +4,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['Warnings'] = array(
-   'Name' => 'Warnings',
-   'Description' => "Allows moderators to warn users to help police the community.",
-   'Version' => '1.0.5',
-   'RequiredApplications' => array('Vanilla' => '2.1a'),
-   'Author' => 'Todd Burry',
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
-);
-
 class WarningsPlugin extends Gdn_Plugin {
    /// Propeties ///
 

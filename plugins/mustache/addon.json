@@ -1,0 +1,19 @@
+{
+    "name": "Mustache view renderer",
+    "description": "This plugin adds Mustache rendering ability to Vanilla.",
+    "version": "1.0a",
+    "mobileFriendly": true,
+    "requiredTheme": false,
+    "hasLocale": false,
+    "registerPermissions": false,
+    "icon": "internal-plugin.png",
+    "key": "mustache",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}

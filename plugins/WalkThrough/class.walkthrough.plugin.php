@@ -5,19 +5,6 @@
  * @license Proprietary
  */
 
-// Defines the plugin:
-$PluginInfo['WalkThrough'] = [
-    'Name' => 'Walk Through',
-    'Description' => "Allow other plugins to display custom tours to users.",
-    'Version' => '1.0',
-    'RequiredApplications' => ['Vanilla' => '2.1a'],
-    'Author' => 'Eric Vachaviolos',
-    'AuthorEmail' => 'eric.v@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/evach',
-    'Icon' => 'walk_through.png',
-    'MobileFriendly' => false
-];
-
 /**
  * WalkThrough Plugin
  *

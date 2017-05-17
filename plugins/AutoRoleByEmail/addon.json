@@ -1,0 +1,15 @@
+{
+    "name": "Auto-Role By Email",
+    "description": "Adds new users to roles based on their email domain (in addition to default role). Not compatible with Approval registration method.",
+    "version": "1.0",
+    "icon": "auto_role_by_email.png",
+    "key": "autorolebyemail",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ]
+}

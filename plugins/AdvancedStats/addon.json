@@ -1,0 +1,16 @@
+{
+    "name": "Advanced Stats",
+    "description": "Track and access advanced statistics to better monitor the health of your site.",
+    "version": "1.0.3",
+    "mobileFriendly": true,
+    "icon": "analytics.png",
+    "key": "advancedstats",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ]
+}

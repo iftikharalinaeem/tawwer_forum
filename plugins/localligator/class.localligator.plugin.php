@@ -1,16 +1,5 @@
 <?php
 
-$PluginInfo['localligator'] = [
-    'Name'             => 'Localligator',
-    'Description'      => 'Chomps into missing locale codes by finding strings that do not exist in site_core or dash_core. 
-                           Only meant to be run during local development.',
-    'Version'          => '1.0.0',
-    'Author'           => 'Becky Van Bussel',
-    'AuthorEmail'      => 'becky@vanillaforums.com',
-    'Icon'             => 'internal-plugin.png',
-    'UsePopupSettings' => false
-];
-
 /**
  * Localligator Plugin
  *

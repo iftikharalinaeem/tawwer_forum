@@ -1,0 +1,22 @@
+{
+    "name": "Whispers",
+    "description": "Users may 'whisper' private comments to each other in the middle of normal discussions. Caution: this can be a confusing feature for some people.",
+    "version": "1.1.2",
+    "icon": "whispers.png",
+    "registerPermissions": {
+        "Plugins.Whispers.Allow": "Garden.Moderation.Manage"
+    },
+    "key": "whispers",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18a3",
+        "conversations": ">=2.0.18a3"
+    }
+}

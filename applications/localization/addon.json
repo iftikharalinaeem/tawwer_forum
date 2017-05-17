@@ -1,0 +1,16 @@
+{
+    "description": "Provides a way for the community to translate Vanilla.",
+    "version": "1.0a",
+    "license": "Proprietary",
+    "key": "localization",
+    "type": "addon",
+    "priority": 10,
+    "name": "Localization",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.org/profile/todd"
+        }
+    ]
+}

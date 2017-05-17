@@ -14,24 +14,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['Reactions'] = [
-    'Name' => 'Reactions',
-    'Description' => "Adds reaction options to discussions & comments.",
-    'Version' => '1.4.4',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'RegisterPermissions' => [
-        'Reactions.Positive.Add' => 'Garden.SignIn.Allow',
-        'Reactions.Negative.Add' => 'Garden.SignIn.Allow',
-        'Reactions.Flag.Add' => 'Garden.SignIn.Allow'
-    ],
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'MobileFriendly' => true,
-    'SettingsUrl' => '/reactions/settings',
-    'Icon' => 'reactions.png'
-];
-
 /**
  * Class ReactionsPlugin
  */

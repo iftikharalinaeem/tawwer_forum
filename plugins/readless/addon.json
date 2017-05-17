@@ -1,0 +1,22 @@
+{
+    "name": "Read Less",
+    "description": "Truncate posts in a discussion to a given max pixel height, but allow the full text to be read by clicking the Read More button.",
+    "version": "1.0.0",
+    "requiredTheme": false,
+    "hasLocale": false,
+    "registerPermissions": false,
+    "settingsUrl": "/settings/readless",
+    "settingsPermission": "Garden.Setttings.Manage",
+    "key": "readless",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Dane MacMillan",
+            "email": "dane@vanillaforums.com",
+            "homepage": "http://vanillaforums.org/profile/dane"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    }
+}

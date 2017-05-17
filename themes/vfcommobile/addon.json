@@ -1,0 +1,16 @@
+{
+    "name": "VanillaForums.com Mobile Theme",
+    "description": "Make the site readable on mobile devices. Copied vfcom theme and made changes at bottom of custom.css",
+    "version": "1",
+    "site": "www.vanillaforums.com",
+    "key": "vfcommobile",
+    "type": "theme",
+    "priority": 1000,
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://markosullivan.ca"
+        }
+    ]
+}

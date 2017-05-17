@@ -6,20 +6,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
-$PluginInfo['RoleTracker'] = [
-    'Name' => 'Role Tracker',
-    'Description' => 'Tag and track posts made by users in selected roles.',
-    'Version' => '1.1',
-    'RequiredApplications' => ['Vanilla' => '2.4.200'],
-    'HasLocale' => false,
-    'License' => 'GNU GPL2',
-    'SettingsUrl' => '/settings/roletracker',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Author' => 'Alexandre (DaazKu) Chouinard',
-    'AuthorEmail' => 'alexandre.c@vanillaforums.com',
-    'Icon' => 'role-tracker.png'
-];
-
 /**
  * Class RoleTrackerPlugin
  */

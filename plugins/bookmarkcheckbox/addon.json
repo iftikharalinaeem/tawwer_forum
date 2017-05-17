@@ -1,0 +1,16 @@
+{
+    "name": "Bookmark Checkbox",
+    "description": "Easily bookmark an open discussion from the comment reply form by ticking a 'bookmark' checkbox.",
+    "version": "1.0.0",
+    "mobileFriendly": true,
+    "hidden": false,
+    "key": "bookmarkcheckbox",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Dane MacMillan",
+            "email": "dane@vanillaforums.com",
+            "homepage": "https://vanillaforums.com/profile/dane"
+        }
+    ]
+}

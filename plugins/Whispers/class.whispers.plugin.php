@@ -4,19 +4,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
-// Define the plugin:
-$PluginInfo['Whispers'] = array(
-   'Name' => 'Whispers',
-   'Description' => "Users may 'whisper' private comments to each other in the middle of normal discussions. Caution: this can be a confusing feature for some people.",
-   'Version' => '1.1.2',
-   'RequiredApplications' => array('Vanilla' => '2.0.18a3', 'Conversations' => '2.0.18a3'),
-   'Icon' => 'whispers.png',
-   'Author' => 'Todd Burry',
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'RegisterPermissions' => array('Plugins.Whispers.Allow' => 'Garden.Moderation.Manage')
-);
-
 class WhispersPlugin extends Gdn_Plugin {
    /// Properties ///
    public $Conversations = NULL;

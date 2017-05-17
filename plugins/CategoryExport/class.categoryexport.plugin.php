@@ -5,22 +5,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
-$PluginInfo['CategoryExport'] = [
-    'Name' => 'Category Export',
-    'Description' => "Export discussions for given category.",
-    'Version' => '1.0.0',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'HasLocale' => false,
-    'SettingsUrl' => '/categoryexport',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Icon' => 'category_export.png',
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'https://vanillaforums.com'
-];
-
 /**
  * Category Export
  * 

@@ -1,21 +1,5 @@
 <?php if(!defined('APPLICATION')) die();
 
-$PluginInfo['colors'] = array(
-   'Name' => 'Colors',
-   'Description' => 'Colors color picker using spectrum.',
-   'Version' => '1.0.0',
-   'Author' => "Dane MacMillan",
-   'AuthorEmail' => 'dane@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
-   'RequiredApplications' => array('Vanilla' => '>=2.2'),
-   'RequiredTheme' => false, 
-   'RequiredPlugins' => false,
-   'HasLocale' => false,
-   'RegisterPermissions' => false,
-   'SettingsUrl' => '/settings/colors',
-   'SettingsPermission' => 'Garden.Setttings.Manage'
-);
-
 class Colors extends Gdn_Plugin {
    
    /**

@@ -1,0 +1,18 @@
+{
+    "name": "Spam Cleaner",
+    "description": "Gives the functionality to go through an entire forum to clean it of spam.",
+    "version": "1.0a",
+    "settingsUrl": "/log/cleanspam",
+    "key": "spamcleaner",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1a"
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "name": "Reporting",
+    "description": "Allows users to report posts to moderators for abuse, terms of service violations etc.",
+    "version": "2.0.1",
+    "settingsUrl": "/settings/reporting",
+    "settingsPermission": "Garden.Settings.Manage",
+    "mobileFriendly": true,
+    "icon": "reporting.png",
+    "registerPermissions": {
+        "Reactions.Flag.Add": "Garden.SignIn.Allow"
+    },
+    "key": "reporting2",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

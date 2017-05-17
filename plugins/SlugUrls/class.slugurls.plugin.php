@@ -4,18 +4,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['SlugUrls'] = array(
-   'Name' => 'Slug Url Redirector',
-   'Description' => "Redirects discussion urls that don't have an ID, just a slug.",
-   'Version' => '1.0.2',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-   'Author' => 'Todd Burry',
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-   'MobileFriendly' => TRUE
-);
-
 class SlugUrlsPlugin extends Gdn_Plugin {
    /// Methods ///
 

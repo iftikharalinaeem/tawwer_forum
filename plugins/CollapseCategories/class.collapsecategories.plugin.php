@@ -4,18 +4,6 @@
  * @license Proprietary
  */
 
-// Define the plugin:
-$PluginInfo['CollapseCategories'] = array(
-   'Name' => 'Collapse Categories',
-   'Description' => 'Adds +/- icons beside category names so that they can be collapsed/expanded.',
-   'Version' => '1.0.1',
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'MobileFriendly' => FALSE,
-   'Author' => 'Todd Burry',
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
-);
-
 class CollapseCategoriesPlugin extends Gdn_Plugin {
    
    /// Event handlers.

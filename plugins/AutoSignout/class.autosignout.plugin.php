@@ -4,21 +4,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['AutoSignout'] = array(
-	'Name' => 'Auto Signout Timer',
-   'Description' => 'Automatically signs people out if they have not been active for a period of time',
-   'Version' => '1.1',
-   'RequiredApplications' => array('Vanilla' => '2.1'),
-	'MobileFriendly' => TRUE,
-   'SettingsUrl' => '/settings/autosignout',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'Author' => "Todd Burry",
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.com',
-   'MobileFriendly' => TRUE,
-   'Icon' => 'auto-signout-timer.png'
-);
-
 // v1.1 2015-05-04 Lincoln
 //   * Block RememberMe function to prevent session renewal.
 

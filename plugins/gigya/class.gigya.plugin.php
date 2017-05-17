@@ -1,16 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$PluginInfo['gigya'] = array(
-   'Name' => 'Gigya Sign In',
-   'Description' => 'Adds single sign-on (SSO) to Gigya connect platform.',
-   'Version' => '1.0',
-   'SettingsUrl' => '/settings/gigya',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'Author' => "Todd Burry",
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
-);
-
 class GigyaPlugin extends Gdn_Plugin {
    /// Constants ///
    const PROVIDER_KEY = 'gigya';

@@ -3,23 +3,6 @@
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
-// Define the plugin:
-$PluginInfo['Pega'] = array(
-    'Name' => 'Pega',
-    'Description' => "Allow staff users to create cases from discussions and comments.",
-    'Version' => '1.0',
-    'RequiredApplications' => array('Vanilla' => '2.1.18'),
-    'SettingsUrl' => '/settings/pega',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'RegisterPermissions' => array('Garden.Staff.Allow' => 'Garden.Moderation.Manage'),
-    'MobileFriendly' => TRUE,
-    'Icon' => 'pega.png',
-    'Author' => 'Patrick Kelly',
-    'AuthorEmail' => 'patrick.k@vanillaforums.com',
-    'AuthorUrl' => 'http://www.github.com/nervoustwit',
-    'SocialConnect' => true
-);
-
 /**
  * Pega Plugin
  *

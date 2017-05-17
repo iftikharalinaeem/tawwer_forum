@@ -1,0 +1,22 @@
+{
+    "name": "JSON Web Token SSO",
+    "className": "JWTSSOPlugin",
+    "description": "Connect users to a forum using SSO by passing a JSON Web Token.",
+    "version": "1.0.2",
+    "settingsUrl": "/settings/jwtsso",
+    "settingsPermission": "Garden.Settings.Manage",
+    "usePopupSettings": false,
+    "mobileFriendly": true,
+    "key": "jwtsso",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Patrick Kelly",
+            "email": "patrick.k@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    }
+}

@@ -9,20 +9,6 @@
  * @package Misc
  */
 
-// Define the plugin:
-$PluginInfo['MailChimpPush'] = array(
-    'Name' => 'MailChimp Push',
-    'Description' => 'Updates MailChimp when users adjust their email address.',
-    'Version' => '2.0.3',
-    'RequiredApplications' => array('Vanilla' => '2.1a'),
-    'Author' => 'Tim Gunter',
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://about.me/timgunter',
-    'Icon' => 'mailchimp_push.png',
-    'UsePopupSettings' => 'false',
-    'SettingsUrl' => '/plugin/mailchimp'
-);
-
 class MailChimpPushPlugin extends Gdn_Plugin {
 
     protected $MCAPI = null;

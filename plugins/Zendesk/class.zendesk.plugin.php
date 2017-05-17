@@ -4,22 +4,6 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
-// Define the plugin:
-$PluginInfo['Zendesk'] = [
-    'Name' => 'Zendesk',
-    'Description' => "Allow staff users to create tickets and cases from discussions and comments.",
-    'Version' => '1.0.0',
-    'RequiredApplications' => ['Vanilla' => '2.1.18'],
-    'SettingsUrl' => '/plugin/zendesk',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'MobileFriendly' => true,
-    'Author' => 'John Ashton',
-    'AuthorEmail' => 'john@vanillaforums.com',
-    'AuthorUrl' => 'http://www.github.com/John0x00',
-    'Icon' => 'zendesk.png',
-    'SocialConnect' => false
-];
-
 /**
  * Class ZendeskPlugin.
  */

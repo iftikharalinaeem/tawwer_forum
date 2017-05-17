@@ -1,0 +1,22 @@
+{
+    "name": "Colors",
+    "description": "Colors color picker using spectrum.",
+    "version": "1.0.0",
+    "requiredTheme": false,
+    "hasLocale": false,
+    "registerPermissions": false,
+    "settingsUrl": "/settings/colors",
+    "settingsPermission": "Garden.Setttings.Manage",
+    "key": "colors",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Dane MacMillan",
+            "email": "dane@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/dane"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    }
+}

@@ -1,15 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 
-// Define the plugin:
-$PluginInfo['CustomCSS'] = array(
-   'Name' => 'Custom CSS',
-   'Description' => 'Allows administrators to add custom CSS definitions.',
-   'Version' => '1',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com'
-);
-
 class CustomCSSPlugin implements Gdn_IPlugin {
 
    /**

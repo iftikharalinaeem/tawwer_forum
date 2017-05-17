@@ -1,0 +1,16 @@
+{
+    "name": "Basic Dark",
+    "description": "A dark version of Vanilla's basic theme.",
+    "version": "1.0.1",
+    "hidden": false,
+    "key": "BasicDark",
+    "type": "theme",
+    "priority": 1000,
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://timgunter.ca"
+        }
+    ]
+}

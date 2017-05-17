@@ -5,21 +5,6 @@
  * @package microsoftaccount
  */
 
-$PluginInfo['microsoftaccount'] = array(
-    'Name'                 => 'Microsoft Account',
-    'ClassName'            => 'MicrosoftAccountPlugin',
-    'Description'          => 'Allows users to sign-in with their Microsoft Account credentials.',
-    'Version'              => '1.0.0',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
-    'RequiredTheme'        => false,
-    'HasLocale'            => false,
-    'SocialConnect'        => true,
-    'Icon'                 => 'microsoft_account.png',
-    'SettingsUrl'          => '/settings/microsoftaccount',
-    'SettingsPermission'   => 'Garden.Settings.Manage',
-    'MobileFriendly'       => true
-);
-
 require_once('class.oauth2pluginbase.php');
 
 /**

@@ -5,18 +5,6 @@
 /**
  * Plugin definition.
  */
-$PluginInfo['securitywords'] = array(
-    'Name' => 'Security Words',
-    'Description' => 'When anyone posts a discussion, comment, or activity that contains one of the security words, that post will be added to the moderation queue.',
-    'Version' => '1.0.0',
-    'MobileFriendly' => true,
-    'Author' => 'Dane MacMillan',
-    'AuthorEmail' => 'work@danemacmillan.com',
-    'AuthorUrl' => 'https://danemacmillan.com/vanilla-forums',
-    'SettingsUrl' => '/settings/securitywords',
-    'SettingsPermission' => 'Garden.Settings.Manage'
-);
-
 /**
  * Class SecurityWordsPlugin.
  *

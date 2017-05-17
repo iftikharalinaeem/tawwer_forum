@@ -1,0 +1,22 @@
+{
+    "name": "GitHub",
+    "description": "Allow staff users to create issues from discussions and comments.",
+    "version": "1.1.1",
+    "settingsUrl": "/plugin/github",
+    "settingsPermission": "Garden.Settings.Manage",
+    "mobileFriendly": true,
+    "socialConnect": false,
+    "icon": "github.png",
+    "key": "github",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "John Ashton",
+            "email": "john@vanillaforums.com",
+            "homepage": "http://www.github.com/John0x00"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1.18"
+    }
+}

@@ -4,16 +4,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['Images'] = array(
-   'Name' => 'Images',
-   'Description' => "Upload images as discussions, comments, and activities.",
-   'Version' => '1.0.3a',
-   'Author' => "Mark O'Sullivan",
-   'AuthorEmail' => 'mark@vanillaforums.com',
-   'AuthorUrl' => 'http://vanillaforums.com',
-   'RegisterPermissions' => array('Plugins.Images.Add' => 'Garden.Profiles.Edit')
-);
-
 class ImagesPlugin extends Gdn_Plugin {
    /// Methods ///
    

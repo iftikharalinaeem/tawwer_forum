@@ -3,21 +3,6 @@
 /**
  * Define the plugin
  */
-$PluginInfo['TwitterFeeds'] = array(
-	'Name' =>		'Twitter Feeds',
-	'Description' => 'Allows Users to add their Twitter Feed to their Profile.',
-	'Version' =>	'1.0.1',
-	'Author' =>		'Oliver Raduner',
-	'AuthorEmail' => 'vanilla@raduner.ch',
-	'AuthorUrl' =>	'http://raduner.ch/',
-	'RequiredPlugins' => FALSE,
-	'HasLocale' => FALSE,
-	'RegisterPermissions' => FALSE,
-	'SettingsUrl' => FALSE,
-	'SettingsPermission' => FALSE
-);
-
-
 /**
  * Twitter Feeds Plugin
  *

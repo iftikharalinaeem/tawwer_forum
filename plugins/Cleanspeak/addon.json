@@ -1,0 +1,20 @@
+{
+    "name": "Cleanspeak",
+    "description": "Cleanspeak integration for Vanilla.",
+    "version": "1.2.1",
+    "settingsUrl": "/settings/cleanspeak",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "cleanspeak.png",
+    "key": "cleanspeak",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "John Ashton",
+            "email": "john@vanillaforums.com",
+            "homepage": "http://www.github.com/John0x00"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

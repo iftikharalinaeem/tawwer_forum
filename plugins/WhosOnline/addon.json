@@ -1,0 +1,22 @@
+{
+    "name": "Who&rsquo;s Online",
+    "description": "Adds a list of users currently browsing your site to the sidebar.",
+    "version": "1.5.1",
+    "icon": "whos_online.png",
+    "registerPermissions": [
+        "Plugins.WhosOnline.ViewHidden"
+    ],
+    "settingsUrl": "/plugin/whosonline",
+    "settingsPermission": [
+        "Garden.Settings.Manage"
+    ],
+    "key": "whosonline",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Gary Mardell",
+            "email": "gary@vanillaplugins.com",
+            "homepage": "http://vanillaplugins.com"
+        }
+    ]
+}
