@@ -1,4 +1,10 @@
 $(document).on('contentLoad', function(e) {
+   $('#stockavatar-picker label').click(function(e) {
+      e.preventDefault();
+      var For = $(this).attr('for');
+      $('#' + For).trigger('click');
+   });
+
    var element = e.target;
 
    $(".js-new-avatar-pool", element).click(function () {
