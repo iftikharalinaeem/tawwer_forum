@@ -150,7 +150,12 @@ class SamlSSOPlugin extends Gdn_Plugin {
             return;
         }
 
-        redirect('/entry/saml/'.$provider['AuthenticationKey']);
+        if (val('Target', $args)) {
+            $redirectURL ='/entry/saml/'.$provider['AuthenticationKey'].'?'. http_build_query(['Target' => val('Target', $args)]);
+        } else {
+            $redirectURL = '/entry/saml/'.$provider['AuthenticationKey'];
+        }
+        redirect($redirectURL);
     }
 
     /**
@@ -223,7 +228,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
         // Set the target from common items.
         if ($relay_state = $Sender->Request->post('RelayState')) {
-            if (isUrl($relay_state) || preg_match('`^[/a-z]`i', $relay_state)) {
+            if ((isUrl($relay_state) || preg_match('`^[/a-z]`i', $relay_state)) && strripos($relay_state, '/entry/connect/saml') === false) {
                 $Form->setFormValue('Target', $relay_state);
             }
         }
@@ -400,6 +405,11 @@ class SamlSSOPlugin extends Gdn_Plugin {
         self::requireFiles();
         $settings = new OneLogin_Saml_Settings();
         $provider = $this->getProvider($authenticationKey);
+
+        if (!$provider) {
+            throw new Gdn_UserException("The SAML connection appears to be misconfigured: Connection ID of '$authenticationKey' could not be found. Please contact the forum admin.", 404);
+        }
+
         $settings->idpSingleSignOnUrl = $provider['SignInUrl'];
         $settings->idpSingleSignOutUrl = $provider['SignOutUrl'];
         $settings->idpPublicCertificate = $provider['AssociationSecret'];
