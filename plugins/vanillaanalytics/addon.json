@@ -1,0 +1,17 @@
+{
+    "name": "Vanilla Analytics",
+    "description": "Track important trends on your forum and chart them in a customizable dashboard.",
+    "key": "vanillaanalytics",
+    "type": "addon",
+    "version": "1.0.4",
+    "authors": [
+        {
+            "name": "Ryan Perry",
+            "email": "ryan.p@vanillaforums.com",
+            "homepage": "http://vanillaforums.org/profile/initvector"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2.103"
+    }
+}
