@@ -1,19 +1,5 @@
 <?php if (!defined('APPLICATION')) exit;
 
-$PluginInfo['sitehub'] = array(
-    'Name'        => "Multisite Hub",
-    'Description' => 'The Multi-site Hub plugin provides functionality to manage a multi-site cluster.',
-    'Version'     => '1.2.0',
-    'Author'      => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl'   => 'http://vanillaforums.com',
-    'License'     => 'Proprietary',
-    'RequiredPlugins' => array(
-        'SimpleAPI' => '1.0',
-    ),
-    'Icon' => 'hub.png'
-);
-
 /**
  * The Multisite Hub plugin provides functionality to manage a multi-site cluster.
  *

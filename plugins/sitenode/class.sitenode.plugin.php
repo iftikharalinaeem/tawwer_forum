@@ -1,16 +1,6 @@
 <?php
 use Vanilla\Addon;
 
-$PluginInfo['sitenode'] = array(
-    'Name'        => "Multisite Node",
-    'Version'     => '1.2.0',
-    'Author'      => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl'   => 'http://vanillaforums.com',
-    'License'     => 'Proprietary',
-    'Icon'        => 'node.png'
-);
-
 /**
  * Multisite Node Plugin
  *
