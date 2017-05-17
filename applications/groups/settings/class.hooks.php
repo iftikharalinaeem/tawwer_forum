@@ -203,7 +203,7 @@ class GroupsHooks extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function discussionsController_bookmarkedPopin_render($sender, $args, $discussions) {
+    public function discussionsController_bookmarkedPopin_render($sender, $args) {
 
         // Ensure that there are discussions.
 
