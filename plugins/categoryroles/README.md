@@ -35,4 +35,12 @@ _Important: Because of the way Vanilla builds permissions, the event handler the
 
 _Important: This plug-in currently only works for categories where the row's PermissionCategoryID is its CategoryID.  Categories with a different PermissionCategoryID may not have the custom application of permissions._
 
-_Please Note: Only a role's default category permissions are granted.  __A role's global and per-category permissions will not be granted by this plug-in.___
+_Please Note: Only a role's default category permissions are granted.  __A role's global and per-category permissions will not be granted by this plug-in.___ This plugin also can interact weirdly with certain modules such as the CategoriesModule and the CategoryModeratorModule. Please refer to the [`vanillaforums/iearn`](http://github.com/vanillaforums/iearn) repo to see these have been handled.
+
+## How to set up this plugin for local development
+1. Enable the plugin.
+2. Verify that every category yogu wish to assign a role has PermissionCategoryID set. If you have subcommunities enabled verify that this is not root (-1). Otherwise this plugin may not work properly.
+3. Insert necessary rows into the Gdn_CategoryRole table. 
+4. Clear cached permissions.
+    * Delete the Permissions column of the User records that had changes in the Gdn_CategoryRole table.
+    * Restart or flush cache of memcached if you are running it locally.
