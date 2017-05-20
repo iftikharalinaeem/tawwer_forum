@@ -5,7 +5,7 @@ $list = $this->data('list');
 <div class="DataTableContainer Group-Box <?php echo val('cssClass', $list); ?>">
     <div class="PageControls">
         <?php
-        if (val('title', $list)) { ?><h2 class="Groups H"><?php echo val('title', $list); ?></h2><?php }
+        if (val('title', $list)) { ?><h2 class="Groups H"><?php echo htmlspecialchars(val('title', $list)); ?></h2><?php }
         if (val('buttons', $list)) {
         echo '<div class="BoxButtons">';
         foreach (val('buttons', $list) as $button) { ?>
@@ -75,13 +75,13 @@ if (val('items', $list)) {
                                             <?php if (val('url', $item)) { ?>
                                             <a class="Title <?php echo val('headingCssClass', $item); ?>" href="<?php echo val('url', $item); ?>">
                                                 <?php } ?>
-                                                <?php echo val('heading', $item); ?>
+                                                <?php echo htmlspecialchars(val('heading', $item)); ?>
                                                 <?php if (val('url', $item)) { ?>
                                             </a>
                                         <?php } ?>
                                         </h3>
                                     <?php } ?>
-                                    <div class="Description Excerpt <?php echo val('textCssClass', $item); ?>"><?php echo val('text', $item); ?></div>
+                                    <div class="Description Excerpt <?php echo val('textCssClass', $item); ?>"><?php echo htmlspecialchars(val('text', $item)); ?></div>
                                     <div class="Meta <?php echo val('metaCssClass', $item); ?>">
                                         <?php
                                         if (val('meta', $item) && val('showMeta', $list)) {
