@@ -17,7 +17,17 @@ class CategoryRolesPlugin extends Gdn_Plugin {
     public function entryController_afterConnectSave_handler($sender, $args) {
         // Grab our values and make some basic checks to verify they're usable.
         $userID = val('UserID', $args);
+
+        /** @var Gdn_Form $form */
         $form = val('Form', $args);
+
+        if (debug()) {
+            Logger::event('categoryroles_sso', Logger::INFO, 'Update CategoryRoles', [
+                'UserID' => $userID,
+                'Form' => $form->formValues()
+            ]);
+        }
+
         if (empty($userID) || !($form instanceof Gdn_Form)) {
             return;
         }
