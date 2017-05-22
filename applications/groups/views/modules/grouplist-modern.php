@@ -4,7 +4,7 @@ $list = $this->data('list');
 ?>
 <div class="media-list-container Group-Box <?php echo val('cssClass', $list); ?>">
     <div class="PageControls">
-        <h2 class="H media-list-heading"><?php echo val('title', $list); ?></h2> <?php
+        <h2 class="H media-list-heading"><?php echo htmlspecialchars(val('title', $list)); ?></h2> <?php
         if (val('buttons', $list)) {
             foreach (val('buttons', $list) as $button) { ?>
                 <div class="Button-Controls <?php echo val('buttonsCssClass', $list); ?>">
@@ -51,7 +51,7 @@ $list = $this->data('list');
                 <div class="ItemContent">
                     <div class="Title">
                         <a href="<?php echo val('url', $item); ?>">
-                            <?php echo val('heading', $item); ?>
+                            <?php echo htmlspecialchars(val('heading', $item)); ?>
                         </a>
                     </div>
                     <div class="Excerpt <?php echo val('textCssClass', $item); ?>"><?php echo val('text', $item); ?></div>
