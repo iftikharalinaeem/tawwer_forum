@@ -11,7 +11,6 @@ $PluginInfo['subcommunities'] = array(
     'Icon'        => 'subcommunities.png'
 );
 
-
 class SubcommunitiesPlugin extends Gdn_Plugin {
     /// Properties ///
 

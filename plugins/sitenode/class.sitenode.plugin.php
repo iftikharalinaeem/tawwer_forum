@@ -1,16 +1,6 @@
 <?php
 use Vanilla\Addon;
 
-$PluginInfo['sitenode'] = array(
-    'Name'        => "Multisite Node",
-    'Version'     => '1.2.0',
-    'Author'      => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl'   => 'http://vanillaforums.com',
-    'License'     => 'Proprietary',
-    'Icon'        => 'node.png'
-);
-
 /**
  * Multisite Node Plugin
  *
@@ -63,9 +53,12 @@ class SiteNodePlugin extends Gdn_Plugin {
             array('AuthenticationKey' => self::PROVIDER_KEY), TRUE);
 
         // Add foreign ID columns specifically for the hub sync. These must not be unique.
-        Gdn::Structure()
-            ->table('Category')
-            ->column('HubID', 'varchar(20)', true, 'unique.hubid')
+        Gdn::Structure()->table('Category');
+        $hasCatType = Gdn::structure()
+            ->Table('Category')
+            ->columnExists('Type');
+
+        Gdn::Structure()->column('HubID', 'varchar(20)', true, 'unique.hubid')
             ->column('OverrideHub', 'tinyint', '0')
             ->set();
 
@@ -80,18 +73,20 @@ class SiteNodePlugin extends Gdn_Plugin {
             ->Column('SyncWithHub', 'tinyint(1)', '1')
             ->Set();
 
-        // Reporting categories should be managed locally. Set them to override hub, if they aren't already.
-        $hubReporting = Gdn::sql()->getWhere([
-            'Category',
-            ['Type' => 'Reporting', 'OverrideHub' => 0]
-        ])->count();
-
-        if ($hubReporting > 0) {
-            Gdn::sql()->update(
+        if ($hasCatType) {
+            // Reporting categories should be managed locally. Set them to override hub, if they aren't already.
+            $hubReporting = Gdn::sql()->getWhere(
                 'Category',
-                ['OverrideHub' => 1],
                 ['Type' => 'Reporting', 'OverrideHub' => 0]
-            );
+            )->count();
+
+            if ($hubReporting > 0) {
+                Gdn::sql()->update(
+                    'Category',
+                    ['OverrideHub' => 1],
+                    ['Type' => 'Reporting', 'OverrideHub' => 0]
+                );
+            }
         }
     }
 

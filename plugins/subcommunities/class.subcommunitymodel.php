@@ -139,6 +139,7 @@ class SubcommunityModel extends Gdn_Model {
                     );
 
                     if ($canView) {
+                        self::calculateRow($row);
                         $available[$folder] = $row;
                     }
                 }
