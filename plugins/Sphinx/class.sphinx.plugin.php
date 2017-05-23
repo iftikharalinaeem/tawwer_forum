@@ -98,6 +98,7 @@ class SphinxPlugin extends Gdn_Plugin {
         ], 'in')->setDescription('Search discussions.');
         $out = $sender->schema([':a' => $sender->discussionSchema()], 'out');
 
+        $query = $sender->filterValues($query);
         $query = $in->validate($query);
         list($offset, $limit) = offsetLimit(
             "p{$query['page']}",
