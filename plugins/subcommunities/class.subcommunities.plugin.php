@@ -1,5 +1,16 @@
 <?php if (!defined('APPLICATION')) { exit; }
 
+$PluginInfo['subcommunities'] = array(
+    'Name'        => "Subcommunities",
+    'Description' => "Allows you to use top level categories as virtual mini forums for multilingual or multi-product communities.",
+    'Version'     => '1.0.4',
+    'Author'      => "Todd Burry",
+    'AuthorEmail' => 'todd@vanillaforums.com',
+    'AuthorUrl'   => 'https://vanillaforums.com',
+    'License'     => 'Proprietary',
+    'Icon'        => 'subcommunities.png'
+);
+
 class SubcommunitiesPlugin extends Gdn_Plugin {
     /// Properties ///
 
@@ -192,19 +203,27 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         if (!$site) {
             return;
         }
-
         $categoryID = val('CategoryID', $site);
 
-        // Get the child categories
-        $categories = CategoryModel::getSubtree($categoryID, false, true);
+        // Just set the root if the property exists.
+        if (property_exists($sender, 'root') && !$sender->root) {
+            $sender->root = $categoryID;
+            return;
+        }
+
+
+        $categoryModel = new CategoryModel();
+        $categories = $categoryModel
+            ->setJoinUserCategory(true)
+            ->getChildTree($categoryID, ['collapseCategories' => val('collapseCategories', $sender)]);
+        $categories = CategoryModel::flattenTree($categories);
 
         // Remove categories I can't view.
         $categories = array_filter($categories, function($category) {
-           return (bool)val('PermsDiscussionsView', $category);
+           return val('PermsDiscussionsView', $category) && val('Following', $category);
         });
 
-        $data = new Gdn_DataSet($categories);
-        $data->datasetType(DATASET_TYPE_ARRAY);
+        $data = new Gdn_DataSet($categories, DATASET_TYPE_ARRAY);
         $data->datasetType(DATASET_TYPE_OBJECT);
         $sender->Data = $data;
     }
