@@ -8,6 +8,7 @@
     "icon": "linkedin_social_connect.png",
     "key": "linkedin",
     "type": "addon",
+    "documentationUrl": "http://docs.vanillaforums.com/help/addons/social/linkedin",
     "authors": [
         {
             "name": "Todd Burry",

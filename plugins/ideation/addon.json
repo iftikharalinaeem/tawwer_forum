@@ -6,6 +6,7 @@
     "icon": "ideation.png",
     "key": "ideation",
     "type": "addon",
+    "documentationUrl": "http://docs.vanillaforums.com/help/ideation/",
     "authors": [
         {
             "name": "Becky Van Bussel",

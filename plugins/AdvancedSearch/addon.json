@@ -6,6 +6,7 @@
     "icon": "advanced-search.png",
     "key": "advancedsearch",
     "type": "addon",
+    "documentationUrl": "http://docs.vanillaforums.com/help/addons/advanced-search",
     "authors": [
         {
             "name": "Todd Burry",
