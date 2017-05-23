@@ -8,7 +8,7 @@
     "mobileFriendly": true,
     "key": "customtheme",
     "type": "addon",
-    "DocumentationUrl": "hhttp://docs.vanillaforums.com/help/appearance/custom-theme/",
+    "DocumentationUrl": "http://docs.vanillaforums.com/help/appearance/custom-theme/",
     "authors": [
         {
             "name": "Mark O'Sullivan",
