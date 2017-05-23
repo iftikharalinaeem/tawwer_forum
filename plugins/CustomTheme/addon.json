@@ -8,6 +8,7 @@
     "mobileFriendly": true,
     "key": "customtheme",
     "type": "addon",
+    "DocumentationUrl": "http://docs.vanillaforums.com/developer/theming/quickstart/",
     "authors": [
         {
             "name": "Mark O'Sullivan",
