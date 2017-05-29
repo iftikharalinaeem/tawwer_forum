@@ -1,66 +1,128 @@
 <html>
 <head>
-   <style>
-      body { width: 960px; }
-      h1 { background: black; color: white; }
-      .Sidebar { float: left; width: 200px; }
-      .Main { width: 760px; }
-      .Footer { clear: both; width: 960px; background: black; color: white; }
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+        }
+        #container {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-around;
+        }
+        #container > * {
+            padding: 5px;
+            margin: 0;
+        }
+        #header {
+            font-size: 50px;
+            flex: 1 100%;
+            background-color: #FAFAFA;
+        }
+        #sidebar {
+            width: 200px;
+            order: 2;
+        }
+        #main {
+            order: 3;
+            flex: 1 auto;
+        }
+        #footer {
+            order: 4;
+            flex: 1 100%;
+            background-color: #FAFAFA;
+            text-align: center;
+        }
    </style>
 </head>
 <body>
-<h1>Terrible Banner</h1>
+    <div id="container">
+        <div id="header">
+            <h1>Terrible Banner</h1>
+        </div>
 
-<div class="Sidebar">
-   <h3>Terrible Sidebar</h3>
-   <ul>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-   </ul>
+        <div id="main">
 
-   <h3>Terrible Sidebar</h3>
-   <ul>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-   </ul>
+           Put embed code here
 
-   <h3>Terrible Sidebar</h3>
-   <ul>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-      <li>Terrible</li>
-   </ul>
-</div>
-<div class="Main">
-   <h2>Terrible Content</h2>
-   <p>This is a terrible website with an amazing forum.</p>
+        </div>
 
-   <!-- Maybe you could embed a forum here, eh? -->
+        <div id="sidebar">
+            <h3>Terrible Sidebar</h3>
+            <ul>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+            </ul>
 
-</div>
-<div class="Footer">Copyright forever by Terrible, Inc.</div>
+            <h3>Terrible Sidebar</h3>
+            <ul>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+            </ul>
+
+            <h3>Terrible Sidebar</h3>
+            <ul>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+            </ul>
+
+            <h3>Terrible Sidebar</h3>
+            <ul>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+            </ul>
+
+            <h3>Terrible Sidebar</h3>
+            <ul>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+                <li>Terrible</li>
+            </ul>
+        </div>
+
+        <div id="footer">
+            <span>Copyright forever by Terrible, Inc.</span>
+        </div>
+    </div>
 </body>
 </html>
