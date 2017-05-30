@@ -1,0 +1,98 @@
+// Reactions
+
+.ReactSprite {
+    width: auto;
+    height: auto;
+    background-image: none !important;
+
+    &:before {
+        .icon();
+        min-width: 1em;
+        text-align: center;
+    }
+}
+
+.ReactSprite {
+    &:before {
+        font-size: 14px;
+    }
+}
+
+//Reactions
+.ReactPromote:before {
+    content: @icon-hand-up;
+}
+.ReactOffTopic:before {
+    content: @icon-meh;
+}
+.ReactInsightful:before {
+    content: @icon-lightbulb;
+}
+.ReactDisagree:before {
+    content: @icon-frown;
+}
+.ReactAgree:before {
+    content: @icon-smile;
+}
+.ReactDislike:before {
+    content: @icon-thumbs-down;
+}
+.ReactLike:before {
+    content: @icon-thumbs-up;
+}
+.ReactDown:before {
+    content: @icon-arrow-down;
+}
+.ReactUp:before {
+    content: @icon-arrow-up;
+}
+.ReactWTF:before {
+    content: @icon-wtf;
+}
+.ReactAwesome:before {
+    content: @icon-heart;
+}
+.ReactLOL:before {
+    content: @icon-lol;
+}
+.ReactFlag:before {
+    content: @icon-flag;
+}
+.ReactAbuse:before {
+    content: @icon-exclamation-sign;
+}
+.ReactSpam:before {
+    content: @icon-spam;
+}
+.ReactQuote:before {
+    content: @icon-quote;
+}
+.ReactWarn:before {
+    content: @icon-warn;
+}
+.ReactFacebook:before {
+    content: @icon-facebook-alt;
+}
+.ReactFacebook:hover {
+    &:before {
+        color: #3a5795;
+    }
+}
+.ReactTwitter:before {
+    content: @icon-twitter;
+}
+.ReactTwitter:hover {
+    &:before {
+        color: #55acee;
+    }
+}
+.ReactGooglePlus:before {
+    content: @icon-google-plus-alt;
+}
+.ReactGooglePlus:hover {
+    &:before {
+        color: #dd4b39;
+    }
+}
+
+// -----------------------------------------------------------------------------

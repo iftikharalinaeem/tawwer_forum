@@ -6275,7 +6275,6 @@ button.token-input-delete-token {
 .modal.fade .modal-dialog,
 .Overlay > .Popup {
   -webkit-transform: translate(0, -25%);
-  -ms-transform: translate(0, -25%);
   transform: translate(0, -25%);
   transition: -webkit-transform 0.3s ease-out;
   transition: transform 0.3s ease-out;
@@ -6283,7 +6282,6 @@ button.token-input-delete-token {
 .modal.in .modal-dialog,
 .Overlay > .Popup.in {
   -webkit-transform: translate(0, 0);
-  -ms-transform: translate(0, 0);
   transform: translate(0, 0);
 }
 .modal-open .modal {
@@ -7309,31 +7307,26 @@ button.token-input-delete-token {
 .fa-rotate-90 {
   filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
   -webkit-transform: rotate(90deg);
-  -ms-transform: rotate(90deg);
   transform: rotate(90deg);
 }
 .fa-rotate-180 {
   filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2);
   -webkit-transform: rotate(180deg);
-  -ms-transform: rotate(180deg);
   transform: rotate(180deg);
 }
 .fa-rotate-270 {
   filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
   -webkit-transform: rotate(270deg);
-  -ms-transform: rotate(270deg);
   transform: rotate(270deg);
 }
 .fa-flip-horizontal {
   filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1);
   -webkit-transform: scale(-1, 1);
-  -ms-transform: scale(-1, 1);
   transform: scale(-1, 1);
 }
 .fa-flip-vertical {
   filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1);
   -webkit-transform: scale(1, -1);
-  -ms-transform: scale(1, -1);
   transform: scale(1, -1);
 }
 :root .fa-rotate-90,
@@ -11919,6 +11912,96 @@ h1.H,
 .token-input-dropdown,
 .ac_results {
   z-index: 1060 !important;
+}
+.ReactSprite {
+  width: auto;
+  height: auto;
+  background-image: none !important;
+}
+.ReactSprite:before {
+  display: inline-block;
+  font-family: "vanillicon";
+  font-variant: normal;
+  font-weight: normal;
+  font-style: normal;
+  text-decoration: inherit;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  min-width: 1em;
+  text-align: center;
+}
+.ReactSprite:before {
+  font-size: 14px;
+}
+.ReactPromote:before {
+  content: "\f156";
+}
+.ReactOffTopic:before {
+  content: "\f16b";
+}
+.ReactInsightful:before {
+  content: "\f160";
+}
+.ReactDisagree:before {
+  content: "\f14c";
+}
+.ReactAgree:before {
+  content: "\f196";
+}
+.ReactDislike:before {
+  content: "\f1a6";
+}
+.ReactLike:before {
+  content: "\f1a7";
+}
+.ReactDown:before {
+  content: "\f108";
+}
+.ReactUp:before {
+  content: "\f10b";
+}
+.ReactWTF:before {
+  content: "\f1b8";
+}
+.ReactAwesome:before {
+  content: "\f157";
+}
+.ReactLOL:before {
+  content: "\f167";
+}
+.ReactFlag:before {
+  content: "\f147";
+}
+.ReactAbuse:before {
+  content: "\f13d";
+}
+.ReactSpam:before {
+  content: "\f198";
+}
+.ReactQuote:before {
+  content: "\f182";
+}
+.ReactWarn:before {
+  content: "\f1b6";
+}
+.ReactFacebook:before {
+  content: "\f143";
+}
+.ReactFacebook:hover:before {
+  color: #3a5795;
+}
+.ReactTwitter:before {
+  content: "\f1ad";
+}
+.ReactTwitter:hover:before {
+  color: #55acee;
+}
+.ReactGooglePlus:before {
+  content: "\f151";
+}
+.ReactGooglePlus:hover:before {
+  color: #dd4b39;
 }
 .Section-BestOf .page-content,
 .Section-Group .page-content,
