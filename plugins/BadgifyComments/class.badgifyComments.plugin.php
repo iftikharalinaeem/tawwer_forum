@@ -28,7 +28,6 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
     public function structure() {
         Gdn::structure()->table('Badge')
             ->column('BadgeDiscussion', 'int', '0', ['index'])
-            ->column('AwardManually', 'tinyint', '0')
             ->set();
 
         touchConfig('Badgify.Default.Name', 'Commented in Discussion');
@@ -68,25 +67,34 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function badgeController_manageBadgeForm_handler($sender, $args) {
-        $formArray = (array) $sender->Form->formData();
-        // check for lowercase discussionID because Garden Request lowercases all get vars.
-        $discussionID = Gdn::request()->get('discussionid');
-        $discussion = DiscussionModel::instance();
-        $discussions = $discussion->getID($discussionID);
-        if ($discussionID) {
-            $defaultValues = [
-                'Name' => c('Badgify.Default.Name'),
-                'Slug' => c('Badgify.Default.Slug').'-'.$discussionID,
-                'Body' => sprintf(c('Badgify.Default.Description'), val('Name', $discussions)),
-                'Points' => c('Badgify.Default.Points'),
-                'Class' => c('Badgify.Default.BadgeClass'),
-                'Level' => c('Badgify.Default.BadgeClassLevel')
-            ];
-            $defaults = array_merge($defaultValues, $formArray);
+        if ($sender->Form->authenticatedPostBack()) {
+            $formArray = $sender->Form->formValues();
+            $awardManually = $sender->Form->getFormValue('AwardManually');
+            if ($awardManually) {
+                $sender->BadgeModel->removeFilterField('Attributes');
+                $sender->Form->formValues($formArray + ['Attributes' => ['AwardManually' => true]]);
+            }
+        } else {
+            $formArray = (array) $sender->Form->formData();
+            // check for lowercase discussionID because Garden Request lowercases all get vars.
+            $discussionID = Gdn::request()->get('discussionid');
+            $discussion = DiscussionModel::instance();
+            $discussions = $discussion->getID($discussionID);
+            if ($discussionID) {
+                $defaultValues = [
+                    'Name' => c('Badgify.Default.Name'),
+                    'Slug' => c('Badgify.Default.Slug').'-'.$discussionID,
+                    'Body' => sprintf(c('Badgify.Default.Description'), val('Name', $discussions)),
+                    'Points' => c('Badgify.Default.Points'),
+                    'Class' => c('Badgify.Default.BadgeClass'),
+                    'Level' => c('Badgify.Default.BadgeClassLevel')
+                ];
+                $defaults = array_merge($defaultValues, $formArray);
 
-            // Add a hidden field to save the DiscussionId to the badge.
-            $sender->Form->addHidden('BadgeDiscussion', $discussionID);
-            $sender->Form->setData($defaults);
+                // Add a hidden field to save the DiscussionId to the badge.
+                $sender->Form->addHidden('BadgeDiscussion', $discussionID);
+                $sender->Form->setData($defaults);
+            }
         }
     }
 
@@ -157,8 +165,9 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
         $badge = $this->getDiscussionBadge($discussionID);
         // When the user saves a comment check if there is a badge associated with it.
         if ($badge && $userID) {
+            $attributes = dbdecode(val('Attributes', $badge));
             $userBadgeModel = new UserBadgeModel();
-            if (!val('AwardManually', $badge)) {
+            if (!val('AwardManually', $attributes)) {
                 // If the badge is not flagged as AwardManually, give the badge.
                 $userBadgeModel->give($userID, val('BadgeID', $badge), val('Body', $badge));
             } else {
