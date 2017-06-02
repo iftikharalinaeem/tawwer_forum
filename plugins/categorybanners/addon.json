@@ -1,0 +1,14 @@
+{
+    "key": "categorybanners",
+    "name": "Category Banners",
+    "description": "A plugin to add a banner image upload per category",
+    "version": "1.0.0",
+    "author": [
+        {
+            "name": "Adam Charron",
+            "email": "adam.c@vanillaforums.com"
+        }
+    ],
+    "license": "",
+    "type": "addon"
+}
