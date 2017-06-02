@@ -372,7 +372,7 @@ class CustomThemePlugin extends Gdn_Plugin {
         $pluginEnabled = c('Plugins.CustomTheme.Enabled', false);
         $sender->permission('Garden.Settings.Manage');
         $sender->title('Customize Theme');
-        $sender->addSideMenu('settings/customtheme');
+        $sender->setHighlightRoute('settings/customtheme');
 
 
         if (!$pluginEnabled) {
