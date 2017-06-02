@@ -32,11 +32,15 @@
                 return;
             }
             var formattedProxyURL = proxyURL.substr(-1) === '/' ? proxyURL.substr(0, proxyURL.length - 1) : proxyURL;
+            var schemePaddedProxyUrl = formattedProxyURL;
+            if (schemePaddedProxyUrl.substr(0, 2) === '//') {
+                schemePaddedProxyUrl = window.location.protocol + formattedProxyURL;
+            }
 
             $currentRequest =
                 $.ajax({
                     dataType: 'jsonp',
-                    url: formattedProxyURL+$form.data('proxyValidatePath'),
+                    url: schemePaddedProxyUrl+$form.data('proxyValidatePath'),
                     data: {"expectedProxyFor": formattedProxyURL},
                     timeout: 2000
                 })

@@ -19,7 +19,7 @@ class ReverseProxySupportController extends Gdn_Controller {
 
         $expectedProxyFor = Gdn::request()->get('expectedProxyFor', false);
         $wasProperlyProxied = true;
-        if ($proxied && $expectedProxyFor !== false && $expectedProxyFor !== $_SERVER['HTTP_X_PROXY_FOR']) {
+        if ($proxied && $expectedProxyFor !== false && rtrim($expectedProxyFor, '/') !== rtrim($_SERVER['HTTP_X_PROXY_FOR'], '/')) {
             $wasProperlyProxied = false;
         }
 

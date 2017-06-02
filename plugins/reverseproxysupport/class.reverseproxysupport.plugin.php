@@ -50,7 +50,13 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
             'ReverseProxySupport.URL' => [
                 'LabelCode' => 'Proxy URL',
                 'Options' => ['id' => 'reverse-proxy-url'],
-                'Description' => t('The URL must be comprised of the scheme, the hostname (and port if other than the default) and optionally a path. ie: https://example.com/community/')
+                'Description' => t(
+                    "The URL must be comprised of:\n"
+                    ."<br>- Scheme: Either 'http://'(force http) or 'https://'(force https) or '//'(won't force anything)\n"
+                    ."<br>- Host: Hostname or ip of the proxy.\n"
+                    ."<br>- Port (optional): Need to be specified if different than the defaults 80 and 443.\n"
+                    ."<br>- Path (optional): Subdirectory from which the forum will be served.\n"
+                ),
             ],
             'ReverseProxySupport.Redirect.Enabled' => [
                 'Control' => 'toggle',
@@ -135,7 +141,7 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
         /** @var Gdn_Request $oldRequest */
         $oldRequest = $dic->get('Request');
         $path = $oldRequest->getPath();
-        $isRequestValidation = preg_match('#/reverseproxysupport/validate?#', $path) === 1;
+        $isRequestValidation = preg_match('#/reverseproxysupport/validate/?#', $path) === 1;
 
         if ($isRequestValidation) {
             $filteredProxyFor = $this->filterProxyFor($xProxyFor);
@@ -151,16 +157,17 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
                 return;
             }
 
-            $isValidProxyFor = $xProxyFor && $proxyURL === $xProxyFor;
+            $isValidProxyFor = $xProxyFor && $xProxyFor === $proxyURL;
 
             $proxyHost = parse_url($proxyURL, PHP_URL_HOST);
             $proxyPort = parse_url($proxyURL, PHP_URL_PORT);
-            $proxyPath = rtrim(parse_url($proxyURL, PHP_URL_PATH), '/');
+            $proxyPath = trim(parse_url($proxyURL, PHP_URL_PATH), '/');
             $newHTTPHost = $proxyHost.($proxyPort ? ':'.$proxyPort : '');
 
             if (!$isValidProxyFor) {
                 // 301 redirect to the reverse proxy
                 if (c('ReverseProxySupport.Redirect.Enabled') && $currentHTTPHost !== $newHTTPHost
+                        && preg_match('#/settings/reverseproxysupport/?#', $path) !== 1
                         && !$this->isExcludedIP($oldRequest->ipAddress())) {
                     $query = $oldRequest->getQuery();
                     $pathAndQuery = $path.($query ? '?'.$query : '');
@@ -202,16 +209,22 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $port = parse_url($url, PHP_URL_PORT);
+        if (preg_match('#^(?:https?:)?//#', $url) !== 1) {
+            return false;
+        }
 
-        $sanitizedURL = parse_url($url, PHP_URL_SCHEME).'://'
+        $port = parse_url($url, PHP_URL_PORT);
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+        $paddeScheme = !$scheme ? 'http'.(val('HTTPS', $_SERVER) ? 's' : '').':' : '';
+
+        $sanitizedURL =
+            ($scheme ? $scheme.'://' : '//')
             .parse_url($url, PHP_URL_HOST)
             .($port ? ':'.$port : '')
             .rtrim(parse_url($url, PHP_URL_PATH), '/')
         ;
 
-        if (filter_var($sanitizedURL, FILTER_VALIDATE_URL, ['flags' => FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED])
-                && preg_match('#^https?://#', $sanitizedURL) === 1) {
+        if (filter_var($paddeScheme.$sanitizedURL, FILTER_VALIDATE_URL, ['flags' => FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED])) {
             return $sanitizedURL;
         } else {
             return false;
