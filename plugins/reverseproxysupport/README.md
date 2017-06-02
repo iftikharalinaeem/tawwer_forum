@@ -36,8 +36,10 @@ Proxy setup:
     listen 80;
 
     location /community/ {
-        proxy_set_header X-Forwarded-For $remote_addr; # Forward the IP address 
-        proxy_set_header X-Proxy-For http://proxy.exampe.com/community; # Must match "Proxy URL" in the Settings. 
+        # Forward the IP address
+        proxy_set_header X-Forwarded-For $remote_addr;
+        # Must match "Proxy URL" in the Settings. 
+        proxy_set_header X-Proxy-For http://proxy.exampe.com/community;
         proxy_pass http://vanillaforum.example.com/;
     }
 ```
