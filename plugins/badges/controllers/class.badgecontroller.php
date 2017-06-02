@@ -524,6 +524,7 @@ class BadgeController extends BadgesAppController {
      * @since 1.1
      */
     public function requests() {
+        Gdn_Theme::section('Moderation');
         $this->permission('Reputation.Badges.Give');
 
         if ($this->Form->authenticatedPostBack() === true) {
