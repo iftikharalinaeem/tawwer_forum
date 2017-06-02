@@ -33,6 +33,14 @@ Smart IDs may also be used, instead of numeric IDs.
 
 _Important: Because of the way Vanilla builds permissions, the event handler the plug-in uses may not be triggered if the user already has their permissions cached.  This includes caching with a service like memcached or in the Permissions column of the user record.  If permissions aren't applying, make sure all cached permissions for the user are cleared._
 
-_Important: This plug-in currently only works for categories where the row's PermissionCategoryID is its CategoryID.  Categories with a different PermissionCategoryID may not have the custom application of permissions._
+_Important: In order for this plugin to work for a particular category, that category must have its PermissionCategoryID field in the database set to its own category ID. If you set a child categories PermissionCategoryID to its parent's CategoryID it will receive the same roles as its parent._
 
-_Please Note: Only a role's default category permissions are granted.  __A role's global and per-category permissions will not be granted by this plug-in.___
+_Please Note: Only a role's default category permissions are granted.  __A role's global and per-category permissions will not be granted by this plug-in.___ This plugin also can interact weirdly with certain modules such as the CategoriesModule and the CategoryModeratorModule. If you are doing any estimate with this plugin __budget extra time for it, and verify any expectations you have about its interactions with other plugin.__ For an example of implementations of these modules that work with this plugin please view the IearnCustomizations plugin at [`vanillaforums/iearn`](http://github.com/vanillaforums/iearn).
+
+## How to set up this plugin for local development
+1. Enable the plugin.
+2. Verify that every category you wish to assign a role has its PermissionCategoryID set to its own PermissionCategoryID or one of its parents PermissionCategoryID. If you have subcommunities enabled verify that this is not root the root categoryID (-1). Otherwise this plugin may not work properly.
+3. Insert necessary rows into the Gdn_CategoryRole table. 
+4. Clear cached permissions.
+    * Clear the Permissions column for User records associated with entries in your Gdn_CategoryRole table.
+    * Restart or flush cache of memcached if you are running it locally.
