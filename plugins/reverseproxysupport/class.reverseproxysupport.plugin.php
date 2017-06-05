@@ -131,10 +131,10 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
 
     /**
      * Hook as early as possible sine we are modifying the Request object.
-     *
-     * @param Garden\Container\Container $dic
      */
-    public function container_init_handler($dic) {
+    public function gdn_pluginManager_afterStart() {
+        $dic = Gdn::getContainer();
+
         $xProxyFor = val('HTTP_X_PROXY_FOR', $_SERVER);
         $currentHTTPHost = $_SERVER['HTTP_HOST'];
 
