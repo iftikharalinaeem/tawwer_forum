@@ -16,6 +16,8 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
     public function setup() {
         // Let's make sure that we do not kill a site because we are activating this plugin with old configurations.
         saveToConfig('ReverseProxySupport.Redirect.Enabled', false);
+
+        saveToConfig('ReverseProxySupport.ValidationID', uniqid());
     }
 
     /**
@@ -33,8 +35,6 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
         $sender->addJsFile('reverseproxysupport.js', 'plugins/reverseproxysupport');
         $sender->title(sprintf(t('%s Settings'), t('Reverse Proxy Support')));
         $sender->Form = new Gdn_Form();
-
-        $savedProxyURL = c('ReverseProxySupport.URL');
 
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);

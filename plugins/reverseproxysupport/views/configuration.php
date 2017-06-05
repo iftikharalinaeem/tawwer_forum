@@ -7,7 +7,11 @@
 <?php
 /** @var Gdn_Form $form */
 $form = $this->Form;
-echo $form->open(['id' => 'reverse-proxy-settings-form', 'data-proxy-validate-path' => '/reverseproxysupport/validate']);
+echo $form->open([
+        'id' => 'reverse-proxy-settings-form',
+        'data-proxy-validate-path' => '/reverseproxysupport/validate',
+        'data-validation-id' => c('ReverseProxySupport.ValidationID'),
+]);
 echo $form->errors();
 echo $form->simple($this->data('_FormInputDefinition'));
 ?>

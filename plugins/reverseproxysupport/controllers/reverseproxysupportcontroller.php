@@ -16,6 +16,9 @@ class ReverseProxySupportController extends Gdn_Controller {
     public function validate() {
         $proxied = !empty($_SERVER['REVERSE_PROXY_SUPPORT_HTTP_HOST_ORIGINAL']);
         $forwardedIP = val('HTTP_X_FORWARDED_FOR', $_SERVER);
+        $validationID = Gdn::request()->get('validationID', false);
+
+        $isIDValid = $validationID && $validationID === c('ReverseProxySupport.ValidationID', null);
 
         $expectedProxyFor = Gdn::request()->get('expectedProxyFor', false);
         $wasProperlyProxied = true;
@@ -24,7 +27,7 @@ class ReverseProxySupportController extends Gdn_Controller {
         }
 
         $response = [
-            'Valid' => $proxied && $forwardedIP && $wasProperlyProxied,
+            'Valid' => $isIDValid && $proxied && $forwardedIP && $wasProperlyProxied,
         ];
         if ($response['Valid']) {
             $response += [
@@ -34,6 +37,9 @@ class ReverseProxySupportController extends Gdn_Controller {
             ];
         } else {
             $response['ErrorMessages'] = [];
+            if (!$isIDValid) {
+                $response['ErrorMessages'][] = t('ValidationID did not match. Are you sure your proxy point to the correct host?');
+            }
             if (!$wasProperlyProxied) {
                 $response['ErrorMessages'][] =  sprintf(
                     t("X-Proxy-For is not set properly:<br>Expected '%s'<br>Received '%s'"),

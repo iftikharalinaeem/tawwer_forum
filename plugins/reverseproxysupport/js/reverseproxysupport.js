@@ -41,7 +41,10 @@
                 $.ajax({
                     dataType: 'jsonp',
                     url: schemePaddedProxyUrl+$form.data('proxyValidatePath'),
-                    data: {"expectedProxyFor": formattedProxyURL},
+                    data: {
+                        "expectedProxyFor": formattedProxyURL,
+                        "validationID": $form.data('validationId')
+                    },
                     timeout: 2000
                 })
                 .always(function(data, status) {
