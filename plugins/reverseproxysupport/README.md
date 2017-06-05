@@ -35,6 +35,13 @@ Proxy setup:
     server_name proxy.example.com;
     listen 80;
 
+    # Make sure that we can handle big responses.
+    # Provided as an example only. This might not be needed and the values might be bigger than needed.
+    # Fixes "upstream sent too big header while reading response header from upstream" error.
+    proxy_buffer_size   128k;
+    proxy_buffers   4 256k;
+    proxy_busy_buffers_size   256k;
+
     location ~* ^/community/(.*) {
         proxy_read_timeout 600s;
 
@@ -54,3 +61,8 @@ Plugin setup:
 Test the configuration and voila!
 
 Note: You will probably want to enable the redirects too.
+
+## Gotchas
+
+If you are using the Hub/Node plugins you might need to increase your proxy buffer sizes like we did in the example setup.
+Otherwise you will get 500 errors when manually syncing your nodes.
