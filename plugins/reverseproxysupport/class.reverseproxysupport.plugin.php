@@ -140,8 +140,8 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
 
         /** @var Gdn_Request $oldRequest */
         $oldRequest = $dic->get('Request');
-        $path = $oldRequest->getPath();
-        $isRequestValidation = preg_match('#/reverseproxysupport/validate/?#', $path) === 1;
+        $path = $oldRequest->path();
+        $isRequestValidation = preg_match('#^reverseproxysupport/validate/?#', $path) === 1;
 
         if ($isRequestValidation) {
             $filteredProxyFor = $this->filterProxyFor($xProxyFor);
@@ -164,17 +164,25 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
             $proxyPath = trim(parse_url($proxyURL, PHP_URL_PATH), '/');
             $newHTTPHost = $proxyHost.($proxyPort ? ':'.$proxyPort : '');
 
-            if (!$isValidProxyFor) {
-                // 301 redirect to the reverse proxy
-                if (c('ReverseProxySupport.Redirect.Enabled') && $currentHTTPHost !== $newHTTPHost
-                        && preg_match('#/settings/reverseproxysupport/?#', $path) !== 1
-                        && !$this->isExcludedIP($oldRequest->ipAddress())) {
-                    $query = $oldRequest->getQuery();
-                    $pathAndQuery = $path.($query ? '?'.$query : '');
-                    redirect($proxyURL.$pathAndQuery, 301);
-                } else {
+            // 301 redirect to the reverse proxy
+            if (!$isValidProxyFor && c('ReverseProxySupport.Redirect.Enabled')) {
+                $skipRedirect = $currentHTTPHost === $newHTTPHost || $this->isExcludedIP($oldRequest->ipAddress());
+
+                if ($skipRedirect) {
                     return;
                 }
+
+                // Do not redirect block exceptions.
+                $blockExceptions = Gdn::dispatcher()->getBlockExceptions();
+                foreach ($blockExceptions as $blockException => $blockLevel) {
+                    if ($blockLevel <= Gdn_Dispatcher::BLOCK_PERMISSION && preg_match($blockException, $path)) {
+                        return;
+                    }
+                }
+
+                $pathAndQuery = $oldRequest->pathAndQuery();
+                redirect($proxyURL.'/'.$pathAndQuery, 301);
+
             }
         }
 
@@ -196,6 +204,11 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
         // Assign the new request object to the container.
         $dic->setInstance('Request', $request);
     }
+
+    public function base_beforeBlockDetect_handler($sender, $args) {
+        $args['BlockExceptions']['#^/settings/reverseproxysupport/?#'] = Gdn_Dispatcher::BLOCK_NEVER;
+    }
+
 
     /**
      * Filter a proxyFor url and returns it.
