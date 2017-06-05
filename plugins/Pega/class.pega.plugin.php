@@ -57,12 +57,6 @@ class PegaPlugin extends Gdn_Plugin {
         Gdn::PermissionModel()->Define(array('Garden.Staff.Allow' => 'Garden.Moderation.Manage'));
 
         SaveToConfig('Plugins.Pega.CreateCases', true);
-
-        $this->Structure();
-    }
-
-    public function Structure() {
-        require('structure.php');
     }
 
     /**

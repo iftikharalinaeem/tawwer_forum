@@ -55,13 +55,8 @@ class SalesforcePlugin extends Gdn_Plugin {
          array('AuthenticationKey' => self::ProviderKey), TRUE
       );
       Gdn::PermissionModel()->Define(array('Garden.Staff.Allow' => 'Garden.Moderation.Manage'));
-      $this->Structure();
    }
-
-   public function Structure() {
-      require('structure.php');
-   }
-
+    
    /**
     * @param Controller $Sender
     * @param array $Args
