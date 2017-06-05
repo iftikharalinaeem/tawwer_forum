@@ -203,6 +203,9 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
 
         // Assign the new request object to the container.
         $dic->setInstance('Request', $request);
+
+        // Clear the cache of the Gdn object.
+        Gdn::setContainer($dic);
     }
 
     public function base_beforeBlockDetect_handler($sender, $args) {
