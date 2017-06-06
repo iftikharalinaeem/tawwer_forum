@@ -44,14 +44,9 @@ class CategoryBannersPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add plugin config to category edit page.
+     * Handle the postback for the additional form field
      *
-     * Adds ideation options to the categories setting page -> enabling ideation on a category and enabling downvotes.
-     * Also manipulates the allowed discussion types options when ideation is enabled on a category.
-     * Ideas are the only discussion type allowed in an ideation category. Existing idea categories cannot be changed
-     * into normal categories and existing normal categories cannot be changed into ideation categories.
-     *
-     * @param SettingsController $sender
+     * @param SettingsController $sender The settings controller
      *
      * @return void
      */
