@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit;
 
 /**
- * Category Banners Plugin
+ * Category Banners Plugin.
  *
  * @author    Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2017 Vanilla Forums Inc.
@@ -11,6 +11,8 @@
 class CategoryBannersPlugin extends Gdn_Plugin {
 
     const CATEGORY_CATEGORY_BANNERS_COLUMN_NAME = "BannerImage";
+    const DEFAULT_BANNER_IMAGE = "Garden.BannerImage";
+    const SETTINGS_URL = 'settings/bannerimage';
 
     /**
      * This will run when you "Enable" the plugin.
@@ -36,11 +38,34 @@ class CategoryBannersPlugin extends Gdn_Plugin {
     /**
      * Get the slug of the banner image for a category
      *
-     * @param Category $category
+     * Categories will inherit their parents CategoryBanner if they don't have
+     * their own set.
+
+     *
      * @return void
      */
-    public function getCategoryBannerImageSlug($category) {
-        val(self::CATEGORY_CATEGORY_BANNERS_COLUMN_NAME, $category);
+    public static function getCategoryBannerImageSlug($category = false) {
+        if (!$category) {
+            // The controller on Gdn doesn't have the key we need. So fetch it again.
+            $categoryID = valr('Category.CategoryID', Gdn::controller());
+            $category = CategoryModel::instance()->getID($categoryID);
+        }
+
+        $slug = val(self::CATEGORY_CATEGORY_BANNERS_COLUMN_NAME, $category);
+
+        if (!$slug) {
+            $parentID = val('ParentCategoryID', $category);
+
+            if ($parentID === -1) {
+                // This is a top level category with no banner set. Return the default
+                $slug = c(self::DEFAULT_BANNER_IMAGE);
+            } else {
+                $parentCategory = CategoryModel::instance()->getID($parentID);
+                $slug = self::getCategoryBannerImageSlug($parentCategory);
+            }
+        }
+
+        return $slug;
     }
 
     /**
@@ -91,7 +116,8 @@ class CategoryBannersPlugin extends Gdn_Plugin {
     /**
      * Endpoints for deleting the extra category image from the category
      *
-     * @param VanillaSettingsController $sender The controller for the settings page.
+     * @param VanillaSettingsController $sender    The controller for the settings page.
+     * @param string                    $categoryID The id of the category being loaded (comes from url param)
      *
      * @return void
      */
@@ -108,5 +134,54 @@ class CategoryBannersPlugin extends Gdn_Plugin {
 
         $sender->RedirectUrl = '/vanilla/settings/categories';
         $sender->render('blank', 'utility', 'dashboard');
+    }
+
+    /**
+     * Create the configuration page for the plugin
+     *
+     * @param VanillaSettingsController $sender The settings controller
+     *
+     * @return void
+     */
+    public function settingsController_bannerImage_create($sender) {
+        $sender->permission('Garden.Community.Manage');
+        $sender->setHighlightRoute(self::SETTINGS_URL);
+        $sender->title(t('Banner Image'));
+        $configurationModule = new ConfigurationModule($sender);
+        $configurationModule->initialize([
+            self::DEFAULT_BANNER_IMAGE => [
+                'LabelCode' => t('Default Banner Image'),
+                'Control' => 'imageupload',
+                'Description' => t('LogoDescription', 'The default banner image across the site. This can be overriden on a per category basis.'),
+                'Options' => [
+                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('banner image'))
+                ]
+            ]
+        ]);
+        $sender->setData('ConfigurationModule', $configurationModule);
+        $configurationModule->renderAll();
+    }
+
+    /**
+     * Adds "Media" menu option to the Forum menu on the dashboard.
+     *
+     * @param Gdn_Controller $sender Any Gdn Controller - targettings Settings and VanillaSettings
+     *
+     * @return void
+     */
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        $menu = $sender->EventArguments['SideMenu'];
+        $menu->addLink('Appearance', t('Banner Images'), self::SETTINGS_URL, 'Garden.Settings.Manage');
+    }
+
+    /**
+     * Hook the Smarty init to add our directory containing our custom Smarty functions
+     *
+     * @param object $sender Smarty object.
+     *
+     * @return void
+     */
+    public function gdn_smarty_init_handler($sender) {
+        $sender->addPluginsDir(paths('plugins', $this->getPluginIndex(), 'SmartyPlugins'));
     }
 }

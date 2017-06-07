@@ -3,6 +3,7 @@
     "name": "Category Banners",
     "description": "A plugin to add a banner image upload per category",
     "version": "1.0.0",
+    "icon": "category_banner.png",
     "author": [
         {
             "name": "Adam Charron",
