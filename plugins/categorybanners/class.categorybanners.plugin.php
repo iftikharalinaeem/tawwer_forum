@@ -40,7 +40,8 @@ class CategoryBannersPlugin extends Gdn_Plugin {
      *
      * Categories will inherit their parents CategoryBanner if they don't have
      * their own set.
-
+     *
+     * @param Category $category Set an explicit category. Defaults to the current category of the request.
      *
      * @return void
      */
