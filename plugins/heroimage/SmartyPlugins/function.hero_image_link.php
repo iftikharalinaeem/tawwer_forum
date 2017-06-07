@@ -9,8 +9,8 @@
  *
  * @return string
  */
-function smarty_function_banner_image_link($params, &$smarty) {
-    $imageSlug = CategoryBannersPlugin::getCategoryBannerImageSlug();
+function smarty_function_hero_image_link($params, &$smarty) {
+    $imageSlug = HeroImagePlugin::getHeroImageSlug();
     $url = $imageSlug ? Gdn_Upload::url($imageSlug) : '';
     return $url;
 }

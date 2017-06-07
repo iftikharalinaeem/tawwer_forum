@@ -1,18 +1,18 @@
 <?php if (!defined('APPLICATION')) exit;
 
 /**
- * Category Banners Plugin.
+ * Hero Image Plugin.
  *
  * @author    Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license   Proprietary
  * @since     1.0.0
  */
-class CategoryBannersPlugin extends Gdn_Plugin {
+class HeroImagePlugin extends Gdn_Plugin {
 
-    const CATEGORY_CATEGORY_BANNERS_COLUMN_NAME = "BannerImage";
-    const DEFAULT_BANNER_IMAGE = "Garden.BannerImage";
-    const SETTINGS_URL = 'settings/bannerimage';
+    const DB_COLUMN_NAME = "HeroImage";
+    const DEFAULT_CONFIG_KEY = "Garden.HeroImage";
+    const SETTINGS_URL = 'settings/heroimage';
 
     /**
      * This will run when you "Enable" the plugin.
@@ -31,7 +31,7 @@ class CategoryBannersPlugin extends Gdn_Plugin {
     public function structure() {
         Gdn::structure()
             ->table('Category')
-            ->column(self::CATEGORY_CATEGORY_BANNERS_COLUMN_NAME, 'varchar(255)', true)
+            ->column(self::DB_COLUMN_NAME, 'varchar(255)', true)
             ->set();
     }
 
@@ -45,24 +45,24 @@ class CategoryBannersPlugin extends Gdn_Plugin {
      *
      * @return void
      */
-    public static function getCategoryBannerImageSlug($category = false) {
+    public static function getHeroImageSlug($category = false) {
         if (!$category) {
             // The controller on Gdn doesn't have the key we need. So fetch it again.
             $categoryID = valr('Category.CategoryID', Gdn::controller());
             $category = CategoryModel::instance()->getID($categoryID);
         }
 
-        $slug = val(self::CATEGORY_CATEGORY_BANNERS_COLUMN_NAME, $category);
+        $slug = val(self::DB_COLUMN_NAME, $category);
 
         if (!$slug) {
             $parentID = val('ParentCategoryID', $category);
 
             if ($parentID === -1) {
                 // This is a top level category with no banner set. Return the default
-                $slug = c(self::DEFAULT_BANNER_IMAGE);
+                $slug = c(self::DEFAULT_CONFIG_KEY);
             } else {
                 $parentCategory = CategoryModel::instance()->getID($parentID);
-                $slug = self::getCategoryBannerImageSlug($parentCategory);
+                $slug = self::getHeroImageSlug($parentCategory);
             }
         }
 
@@ -80,7 +80,7 @@ class CategoryBannersPlugin extends Gdn_Plugin {
         $categoryID = val('CategoryID', $sender->Data);
         if ($sender->Form->authenticatedPostBack()) {
             $upload = new Gdn_Upload();
-            $tmpImage = $upload->validateUpload('BannerImage_New', false);
+            $tmpImage = $upload->validateUpload('HeroImage_New', false);
             if ($tmpImage) {
                 // Generate the target image name
                 $targetImage = $upload->generateTargetName(PATH_UPLOADS);
@@ -91,7 +91,7 @@ class CategoryBannersPlugin extends Gdn_Plugin {
                     $tmpImage,
                     $imageBaseName
                 );
-                $sender->Form->setFormValue('BannerImage', $parts['SaveName']);
+                $sender->Form->setFormValue(self::DB_COLUMN_NAME, $parts['SaveName']);
             }
         }
     }
@@ -106,10 +106,10 @@ class CategoryBannersPlugin extends Gdn_Plugin {
      */
     public function vanillaSettingsController_afterCategorySettings_handler($sender) {
         echo $sender->Form->imageUploadPreview(
-            'BannerImage',
-            t('Banner Image'),
-            t('The banner displayed at the top of each page.'),
-            'vanilla/settings/deletecategorybannerimage/'.$sender->Category->CategoryID
+            self::DB_COLUMN_NAME,
+            t('Hero Image'),
+            t('The hero image displayed at the top of each page.'),
+            'vanilla/settings/deleteheroimage/'.$sender->Category->CategoryID
         );
     }
 
@@ -122,15 +122,15 @@ class CategoryBannersPlugin extends Gdn_Plugin {
      *
      * @return void
      */
-    public function vanillaSettingsController_deleteCategoryBannerImage_create($sender, $categoryID = '') {
+    public function vanillaSettingsController_deleteHeroImage_create($sender, $categoryID = '') {
         // Check permission
         $sender->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         if ($categoryID && Gdn::request()->isAuthenticatedPostBack(true)) {
             // Do removal, set message
             $categoryModel = CategoryModel::instance();
-            $categoryModel->setField($categoryID, self::CATEGORY_CATEGORY_BANNERS_COLUMN_NAME, null);
-            $sender->informMessage(t('Category banner image was successfully deleted.'));
+            $categoryModel->setField($categoryID, self::DB_COLUMN_NAME, null);
+            $sender->informMessage(t('Hero image was successfully deleted.'));
         }
 
         $sender->RedirectUrl = '/vanilla/settings/categories';
@@ -144,18 +144,18 @@ class CategoryBannersPlugin extends Gdn_Plugin {
      *
      * @return void
      */
-    public function settingsController_bannerImage_create($sender) {
+    public function settingsController_heroImage_create($sender) {
         $sender->permission('Garden.Community.Manage');
         $sender->setHighlightRoute(self::SETTINGS_URL);
-        $sender->title(t('Banner Image'));
+        $sender->title(t('Hero Image'));
         $configurationModule = new ConfigurationModule($sender);
         $configurationModule->initialize([
-            self::DEFAULT_BANNER_IMAGE => [
-                'LabelCode' => t('Default Banner Image'),
+            self::DEFAULT_CONFIG_KEY => [
+                'LabelCode' => t('Default Hero Image'),
                 'Control' => 'imageupload',
-                'Description' => t('LogoDescription', 'The default banner image across the site. This can be overriden on a per category basis.'),
+                'Description' => t('LogoDescription', 'The default hero image across the site. This can be overriden on a per category basis.'),
                 'Options' => [
-                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('banner image'))
+                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('hero image'))
                 ]
             ]
         ]);
@@ -172,7 +172,7 @@ class CategoryBannersPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
-        $menu->addLink('Appearance', t('Banner Images'), self::SETTINGS_URL, 'Garden.Settings.Manage');
+        $menu->addLink('Appearance', t('Hero Images'), self::SETTINGS_URL, 'Garden.Settings.Manage');
     }
 
     /**
