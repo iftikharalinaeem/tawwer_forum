@@ -2,7 +2,7 @@
     "name": "Reverse Proxy Support",
     "description": "Rewrite urls so that they appear to come from another scheme://host/path",
     "version": "1.0",
-    "license": "GNU GPL2",
+    "license": "Proprietary",
     "settingsUrl": "/settings/reverseproxysupport",
     "usePopupSettings": false,
     "settingsPermission": "Garden.Settings.Manage",
