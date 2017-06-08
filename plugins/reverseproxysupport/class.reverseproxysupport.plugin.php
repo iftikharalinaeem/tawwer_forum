@@ -182,7 +182,7 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
                     }
 
                     $pathAndQuery = $oldRequest->pathAndQuery();
-                    redirect($proxyURL.'/'.$pathAndQuery, 301);
+                    redirect($proxyURL.'/'.$pathAndQuery, debug() ? 302 : 301);
                 } else {
                     return;
                 }
