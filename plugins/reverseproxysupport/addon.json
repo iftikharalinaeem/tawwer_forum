@@ -1,0 +1,21 @@
+{
+    "name": "Reverse Proxy Support",
+    "description": "Rewrite urls so that they appear to come from another scheme://host/path",
+    "version": "1.0",
+    "license": "Proprietary",
+    "settingsUrl": "/settings/reverseproxysupport",
+    "usePopupSettings": false,
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "reverseproxysupport",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4.200"
+    },
+    "priority": 1100
+}
