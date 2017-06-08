@@ -32,6 +32,8 @@ $this->title($Action . ' ' . t('a Badge')); ?>
             $this->Form->inputwrap('Threshold'), 'li', ['class' => 'form-group']);    
     }
 
+    $this->fireEvent('BadgeFormFields');
+
     $UploadText = $this->data('Badge.Photo') ? t('Replace Image') : T('Add Image');
     echo wrap($this->Form->labelwrap($UploadText.($this->data('Badge.Photo') ? '<div class="image-wrap">'.img(
         Gdn_Upload::url($this->data('Badge.Photo')),

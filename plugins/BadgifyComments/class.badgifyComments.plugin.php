@@ -20,6 +20,8 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
 
     /**
      * Configure db and config file to create default badges and store DiscussionIDs in the Badge table.
+     * Add a column to the Badge table to flag badges so that instead of being awarded automatically they
+     * generate a request for badge.
      *
      * @throws Exception
      */
@@ -30,10 +32,11 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
 
         touchConfig('Badgify.Default.Name', 'Commented in Discussion');
         touchConfig('Badgify.Default.Slug', 'commented-in-discussion');
-        touchConfig('Badgify.Default.Description', 'Commented in a discussion flagged by admin to give badges.');
+        touchConfig('Badgify.Default.Description', 'Commented in a discussion flagged by admin to give badges. "%s"');
         touchConfig('Badgify.Default.Points', '2');
         touchConfig('Badgify.Default.BadgeClass', 'Commenter');
         touchConfig('Badgify.Default.BadgeClassLevel', '1');
+        touchConfig('Badgify.Default.AwardManually', 'checked');
     }
 
 
@@ -64,24 +67,45 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function badgeController_manageBadgeForm_handler($sender, $args) {
-        $formArray = (array) $sender->Form->formData();
-        // check for lowercase discussionID because Garden Request lowercases all get vars.
-        $discussionID = Gdn::request()->get('discussionid');
-        if ($discussionID) {
-            $defaultValues = [
-                'Name' => c('Badgify.Default.Name'),
-                'Slug' => c('Badgify.Default.Slug').'-'.$discussionID,
-                'Body' => c('Badgify.Default.Description'),
-                'Points' => c('Badgify.Default.Points'),
-                'Class' => c('Badgify.Default.BadgeClass'),
-                'Level' => c('Badgify.Default.BadgeClassLevel')
-            ];
-            $defaults = array_merge($defaultValues, $formArray);
+        if ($sender->Form->authenticatedPostBack()) {
+            $formArray = $sender->Form->formValues();
+            $awardManually = $sender->Form->getFormValue('AwardManually');
+            if ($awardManually) {
+                $sender->BadgeModel->removeFilterField('Attributes');
+                $sender->Form->formValues($formArray + ['Attributes' => ['AwardManually' => true]]);
+            }
+        } else {
+            $formArray = (array) $sender->Form->formData();
+            // check for lowercase discussionID because Garden Request lowercases all get vars.
+            $discussionID = Gdn::request()->get('discussionid');
+            $discussion = DiscussionModel::instance();
+            $discussions = $discussion->getID($discussionID);
+            if ($discussionID) {
+                $defaultValues = [
+                    'Name' => c('Badgify.Default.Name'),
+                    'Slug' => c('Badgify.Default.Slug').'-'.$discussionID,
+                    'Body' => sprintf(c('Badgify.Default.Description'), val('Name', $discussions)),
+                    'Points' => c('Badgify.Default.Points'),
+                    'Class' => c('Badgify.Default.BadgeClass'),
+                    'Level' => c('Badgify.Default.BadgeClassLevel')
+                ];
+                $defaults = array_merge($defaultValues, $formArray);
 
-            // Add a hidden field to save the DiscussionId to the badge.
-            $sender->Form->addHidden('BadgeDiscussion', $discussionID);
-            $sender->Form->setData($defaults);
+                // Add a hidden field to save the DiscussionId to the badge.
+                $sender->Form->addHidden('BadgeDiscussion', $discussionID);
+                $sender->Form->setData($defaults);
+            }
         }
+    }
+
+    /**
+     * Add a checkbox to the Badge Creation form to mark if the badge should be given out automatically or generate a request for a badge.
+     *
+     * @param BadgeController $sender
+     */
+    public function badgeController_badgeFormFields_handler($sender) {
+            echo wrap($sender->Form->labelwrap('Award Manually', 'AwardManually').
+                $sender->Form->inputwrap('AwardManually', 'Checkbox', ['value' => 1, 'checked' => c('Badgify.Default.AwardManually')]), 'li', ['class' => 'form-group']);
     }
 
 
@@ -139,9 +163,17 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
         // pass the insertUserID, if it doesn't exist pass the updateUserID and allow the UserBadgeModel()->give() decide to give it or not.
         $userID = valr('FormPostValues.InsertUserID', $args, valr('FormPostValues.UpdateUserID', $args));
         $badge = $this->getDiscussionBadge($discussionID);
+        // When the user saves a comment check if there is a badge associated with it.
         if ($badge && $userID) {
+            $attributes = dbdecode(val('Attributes', $badge));
             $userBadgeModel = new UserBadgeModel();
-            $userBadgeModel->give($userID, val('BadgeID', $badge), val('Body', $badge));
+            if (!val('AwardManually', $attributes)) {
+                // If the badge is not flagged as AwardManually, give the badge.
+                $userBadgeModel->give($userID, val('BadgeID', $badge), val('Body', $badge));
+            } else {
+                // Otherwise generate a request for a badge.
+                $userBadgeModel->request($userID, val('BadgeID', $badge), val('Body', $badge));
+            }
         }
     }
 
@@ -153,8 +185,12 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function base_beforeDiscussionName_handler($sender, $args) {
-        if ($this->getDiscussionBadge(valr('Discussion.DiscussionID', $args))) {
+        $discussionBadge = $this->getDiscussionBadge(valr('Discussion.DiscussionID', $args));
+        if ($discussionBadge) {
             $args['CssClass'] .= ' Badgified';
+            if (val('AwardManually', $discussionBadge)) {
+                $args['CssClass'] .= ' ManualBadge';
+            }
         }
     }
 }
