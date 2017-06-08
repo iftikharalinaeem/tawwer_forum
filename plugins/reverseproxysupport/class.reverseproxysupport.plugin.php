@@ -165,23 +165,27 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
             $newHTTPHost = $proxyHost.($proxyPort ? ':'.$proxyPort : '');
 
             // 301 redirect to the reverse proxy
-            if (!$isValidProxyFor && c('ReverseProxySupport.Redirect.Enabled')) {
-                $skipRedirect = $currentHTTPHost === $newHTTPHost || $this->isExcludedIP($oldRequest->ipAddress());
+            if (!$isValidProxyFor) {
+                if (c('ReverseProxySupport.Redirect.Enabled')) {
+                    $skipRedirect = $currentHTTPHost === $newHTTPHost || $this->isExcludedIP($oldRequest->ipAddress());
 
-                if ($skipRedirect) {
-                    return;
-                }
-
-                // Do not redirect block exceptions.
-                $blockExceptions = Gdn::dispatcher()->getBlockExceptions();
-                foreach ($blockExceptions as $blockException => $blockLevel) {
-                    if ($blockLevel <= Gdn_Dispatcher::BLOCK_PERMISSION && preg_match($blockException, $path)) {
+                    if ($skipRedirect) {
                         return;
                     }
-                }
 
-                $pathAndQuery = $oldRequest->pathAndQuery();
-                redirect($proxyURL.'/'.$pathAndQuery, 301);
+                    // Do not redirect block exceptions.
+                    $blockExceptions = Gdn::dispatcher()->getBlockExceptions();
+                    foreach ($blockExceptions as $blockException => $blockLevel) {
+                        if ($blockLevel <= Gdn_Dispatcher::BLOCK_PERMISSION && preg_match($blockException, $path)) {
+                            return;
+                        }
+                    }
+
+                    $pathAndQuery = $oldRequest->pathAndQuery();
+                    redirect($proxyURL.'/'.$pathAndQuery, 301);
+                } else {
+                    return;
+                }
 
             }
         }
