@@ -212,8 +212,11 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
         Gdn::setContainer($dic);
     }
 
+    /**
+     * Prevent the reverseproxysupport setting page from being blocked/redirected.
+     */
     public function base_beforeBlockDetect_handler($sender, $args) {
-        $args['BlockExceptions']['#^/settings/reverseproxysupport/?#'] = Gdn_Dispatcher::BLOCK_NEVER;
+        $args['BlockExceptions']['#^settings/reverseproxysupport/?#'] = Gdn_Dispatcher::BLOCK_NEVER;
     }
 
 
