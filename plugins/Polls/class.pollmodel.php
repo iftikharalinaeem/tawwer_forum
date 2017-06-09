@@ -186,6 +186,11 @@ class PollModel extends Gdn_Model {
                     $pollOptionModel->save($pollOption);
                 }
                 // Update the discussion attributes with info
+            } else {
+                // Add the results to this validation object so they bubble up to the form.
+                // The validate method of the discussion model is bubbled into the poll model earlier
+                // but the save method may also trigger errors i.e. spam check.
+                $this->Validation->addValidationResult($discussionModel->Validation->results());
             }
         }
 
