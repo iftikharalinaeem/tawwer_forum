@@ -225,7 +225,7 @@ KeenIOAnalysesProcessor.prototype.addResults = function(analyses) {
             mergedResults['result'] += element.result;
         } else {
             $.each(element.result, function(index, result) {
-                mergedResults['result'][index]['value'] /= result.value;
+                mergedResults['result'][index]['value'] += result.value;
             });
         }
     });
