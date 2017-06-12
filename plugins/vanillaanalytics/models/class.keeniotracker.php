@@ -911,8 +911,12 @@ class KeenIOTracker implements TrackerInterface {
         $this->widgets['participation-rate']['query'] = [$totalActiveUsersQuery, $totalContributorsQuery];
         $this->widgets['participation-rate']['queryProcessor'] = [
             'instructions' => [
-                'merged-participation-rate' => [
+                'relative-active-users' => [
                     'analyses' => [0, 1],
+                    'processor' => 'substractResults'
+                ],
+                'merged-participation-rate' => [
+                    'analyses' => ['relative-active-users', 1],
                     'processor' => 'mergeResults'
                 ],
             ],
