@@ -10,6 +10,8 @@
  */
 class ReverseProxySupportPlugin extends Gdn_Plugin {
 
+    private $proxyRoot;
+
     /**
      * Run on plugin activation.
      */
@@ -201,9 +203,12 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
         $request = Gdn_Request::create()->fromEnvironment();
 
         if ($proxyPath !== '') {
+            $this->proxyRoot = $proxyPath;
             $request->assetRoot($proxyPath);
             $request->webRoot($proxyPath);
         }
+
+        $this->rewrittenRequest = $request;
 
         // Assign the new request object to the container.
         $dic->setInstance('Request', $request);
@@ -217,6 +222,20 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
      */
     public function base_beforeBlockDetect_handler($sender, $args) {
         $args['BlockExceptions']['#^settings/reverseproxysupport/?#'] = Gdn_Dispatcher::BLOCK_NEVER;
+    }
+
+    /**
+     * Enforce asset and web root if the request was rewritten.
+     */
+    public function gdn_dispatcher_beforeControllerMethod_handler() {
+        if (!isset($_SERVER['REVERSE_PROXY_SUPPORT_HTTP_HOST_ORIGINAL']) || !$this->proxyRoot) {
+            return;
+        }
+        $request = Gdn::request();
+        if ($request->assetRoot() !== $this->proxyRoot) {
+            $request->assetRoot($this->proxyRoot);
+            $request->webRoot($this->proxyRoot);
+        }
     }
 
 
