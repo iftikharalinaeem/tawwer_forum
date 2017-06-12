@@ -234,6 +234,37 @@ KeenIOAnalysesProcessor.prototype.addResults = function(analyses) {
 };
 
 /**
+ * Substract results from the first one.
+ *
+ * @param {array} analyses
+ * @return {object}
+ */
+KeenIOAnalysesProcessor.prototype.substractResults = function(analyses) {
+    if (!Array.isArray(analyses) || analyses.length < 2) {
+        throw 'substractResults requires an array of results';
+    }
+
+    var resultType = 'singleValue';
+    if (Array.isArray(analyses[0].result)) {
+        resultType = 'multipleValue';
+    }
+
+    var mergedResults = analyses.shift();
+
+    $.each(analyses, function(index, element) {
+        if (resultType === 'singleValue') {
+            mergedResults['result'] -= element.result;
+        } else {
+            $.each(element.result, function(index, result) {
+                mergedResults['result'][index]['value'] -= result.value;
+            });
+        }
+    });
+
+    return mergedResults;
+};
+
+/**
  * Divide the first result by the other results
  *
  * @param {array} analyses
