@@ -9,6 +9,8 @@
  */
 class Zendesk {
 
+    CONST REST_API_URL = 'https://developer.zendesk.com/rest_api/docs';
+
     protected $apiUrl;
     protected $apiUser;
     protected $apiToken;
@@ -115,44 +117,46 @@ class Zendesk {
     /**
      * Send request to zendesk API.
      *
-     * @param string $Url URL ie /tickets.json.
-     * @param null|string $Json JSON encoded data to be used Required for POST and PUT actions.
-     * @param string $Action POST, GET, PUT, DELETE.
-     * @param bool $Cache Cache result. Only if http code 200 and method GET.
+     * @param string $url URL ie /tickets.json.
+     * @param null|string $json JSON encoded data to be used Required for POST and PUT actions.
+     * @param string $action POST, GET, PUT, DELETE.
+     * @param bool $cache Cache result. Only if http code 200 and method GET.
      *
      * @throws Exception If errors.
      * @return mixed json
      */
-    public function zendeskRequest($Url, $Json = null, $Action = 'GET', $Cache = false) {
+    public function zendeskRequest($url, $json = null, $action = 'GET', $cache = false) {
 
-        trace($Action.' '.$this->apiUrl.$Url);
+        $apiURL = $this->apiUrl.$url;
 
-        $CacheKey = 'Zendesk.Request.'.md5($this->apiUrl.$Url);
+        trace($action.' '.$apiURL);
 
-        if ($Cache && $Action == 'GET') {
-            $Output = Gdn::cache()->get($CacheKey, [Gdn_Cache::FEATURE_COMPRESS => true]);
-            if ($Output) {
-                trace('Cached Response');
-                return json_decode($Output, true);
+        $cacheKey = 'Zendesk.Request.'.md5($apiURL);
+
+        if ($cache && $action == 'GET') {
+            $responseBody = Gdn::cache()->get($cacheKey, [Gdn_Cache::FEATURE_COMPRESS => true]);
+            if ($responseBody) {
+                trace('Cached Response Body');
+                return json_decode($responseBody, true);
             }
         }
 
-        $this->curl->setOption(CURLOPT_URL, $this->apiUrl.$Url);
+        $this->curl->setOption(CURLOPT_URL, $apiURL);
         $this->curl->setOption(CURLOPT_FOLLOWLOCATION, true);
         $this->curl->setOption(CURLOPT_MAXREDIRS, 10);
         $this->curl->setOption(CURLOPT_FOLLOWLOCATION, true);
 
-        switch ($Action) {
+        switch ($action) {
             case "POST":
                 $this->curl->setOption(CURLOPT_CUSTOMREQUEST, "POST");
-                $this->curl->setOption(CURLOPT_POSTFIELDS, $Json);
+                $this->curl->setOption(CURLOPT_POSTFIELDS, $json);
                 break;
             case "GET":
                 $this->curl->setOption(CURLOPT_CUSTOMREQUEST, "GET");
                 break;
             case "PUT":
                 $this->curl->setOption(CURLOPT_CUSTOMREQUEST, "PUT");
-                $this->curl->setOption(CURLOPT_POSTFIELDS, $Json);
+                $this->curl->setOption(CURLOPT_POSTFIELDS, $json);
                 break;
             case "DELETE":
                 $this->curl->setOption(CURLOPT_CUSTOMREQUEST, "DELETE");
@@ -164,59 +168,78 @@ class Zendesk {
             CURLOPT_HTTPHEADER,
             ['Content-type: application/json', 'Authorization: Bearer '.$this->AccessToken]
         );
-        $UserAgent = Gdn::request()->getValueFrom(INPUT_SERVER, 'HTTP_USER_AGENT', 'MozillaXYZ/1.0');
-        $this->curl->setOption(CURLOPT_USERAGENT, $UserAgent);
-        $this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
+        $userAgent = Gdn::request()->getValueFrom(INPUT_SERVER, 'HTTP_USER_AGENT', 'MozillaXYZ/1.0');
+        $this->curl->setOption(CURLOPT_USERAGENT, $userAgent);
+        $this->curl->setOption(CURLOPT_RETURNTRANSFER, 1);
+        $this->curl->setOption(CURLOPT_HEADER, 1);
         $this->curl->setOption(CURLOPT_TIMEOUT, 10);
 
-        $Output = $this->curl->execute();
-        $HttpCode = $this->curl->getInfo(CURLINFO_HTTP_CODE);
-        $Decoded = json_decode($Output, true);
+        $response = $this->curl->execute();
+        $headerSize = $this->curl->getInfo(CURLINFO_HEADER_SIZE);
+        $responseHeader = substr($response, 0, $headerSize);
+        $responseBody = substr($response, $headerSize);
 
-        if ($Cache && $HttpCode == 200 && $Action == 'GET') {
-            $CacheTTL = $this->CacheTTL + rand(0, 30);
-            Gdn::cache()->store($CacheKey, $Output, [
-                Gdn_Cache::FEATURE_EXPIRY => $CacheTTL,
+        $httpCode = $this->curl->getInfo(CURLINFO_HTTP_CODE);
+        $decoded = json_decode($responseBody, true);
+
+        if ($cache && $httpCode == 200 && $action == 'GET') {
+            $cacheTTL = $this->CacheTTL + rand(0, 30);
+            Gdn::cache()->store($cacheKey, $responseBody, [
+                Gdn_Cache::FEATURE_EXPIRY => $cacheTTL,
                 Gdn_Cache::FEATURE_COMPRESS => true
             ]);
         }
 
-        try {
-            if ($HttpCode == 404) {
-                //throw not found
-                throw new Gdn_UserException('Invalid URL: '.$this->apiUrl.$Url."\n", 404);
-            }
+        $errorMessage = false;
 
-            if ($HttpCode == 422) {
-                //throw not found
-                throw new Gdn_UserException('Error: Zendesk Account is expired.', 422);
-            }
-
-            if ($HttpCode == 401 || $HttpCode == 429) {
-                //429 - auth error; repeated...
-                throw new Gdn_UserException('Authentication Error. Check your settings');
-            }
-            if ($HttpCode != 200 && $HttpCode != 201) {
-                throw new Gdn_UserException('Error making request. Try again later -> '.$HttpCode);
-            }
-
-            if (!is_array($Decoded)) {
-                throw new Gdn_UserException('Errors in Request:'.$Output);
-            }
-            if (!empty($Decoded['errors'])) {
-                throw new Gdn_UserException('Errors in Request:'.$Output);
-            }
-        } catch (Gdn_UserException $e) {
-            Logger::log(Logger::DEBUG, 'zendesk_request_error', [
-                'error' => $e->getMessage(),
-                'access_token' => $this->AccessToken,
-                'request' => $Action.' '.$this->apiUrl.$Url,
-                'repsonse' => $Output,
-            ]);
-            throw $e;
+        $requestID = 'N/A';
+        if (preg_match('/X-Request-Id: (.+)?\r\n/', $responseHeader, $requestIDMatch)) {
+            $requestID = $requestIDMatch[1];
         }
 
-        return $Decoded;
+        if ($httpCode == 404) {
+            $errorMessage = 'URL not found: '.$this->apiUrl.$url;
+        }
+
+        if ($httpCode == 409) {
+            $errorMessage = 'Concurrency issue. Try again. See '.self::REST_API_URL.'/core/introduction#409';
+        }
+
+        if ($httpCode == 422) {
+            $errorMessage = 'Unprocessable Entity. See '.self::REST_API_URL.'/core/introduction#422-unprocessable-entity';
+        }
+
+        if ($httpCode == 429) {
+            $errorMessage = 'Rate Limits exceeded. See '.self::REST_API_URL.'/core/introduction#429';
+        }
+
+        if ($httpCode >= 500) {
+            $retryAfter = null;
+            if (preg_match('/Retry-After: (.+)?\r\n/', $responseHeader, $retryAfterMatches)) {
+                $retryAfter = $retryAfterMatches[1];
+            }
+            $errorMessage = 'Unknown error. Try again '.($retryAfter ? "in $retryAfter seconds." : 'later.');
+            $errorMessage .= "\nIf the error persist contact Zendesk with the provided Request ID";
+        }
+
+        if ($httpCode < 200 || $httpCode >= 300) {
+            $errorMessage = 'Unknown error.';
+        }
+
+        if ($errorMessage) {
+            $errorMessage .= "\nZendesk Request ID: $requestID\nAPI call: $apiURL\nResponse: $responseBody\n";
+
+            Logger::log(Logger::DEBUG, 'zendesk_request_error', [
+                'error' => $errorMessage,
+                'access_token' => $this->AccessToken,
+                'request' => $action.' '.$apiURL,
+                'response' => $response,
+            ]);
+
+            throw new Gdn_UserException($errorMessage, $httpCode);
+        }
+
+        return $decoded;
 
     }
 
@@ -233,27 +256,16 @@ class Zendesk {
      */
     public function getProfile($userId = false) {
         if (!$userId) {
-            $profileURL = "/users/me/oauth/clients.json";
-        } else {
-            $profileURL = "/users/{$userId}.json";
+            $userId = 'me';
         }
-        $fullProfile = $this->zendeskRequest($profileURL);
+        $fullProfile = $this->zendeskRequest("/users/$userId.json");
 
-        if (!$userId) {
-            return [
-                'id' => $fullProfile['clients'][0]['id'],
-                'email' => $fullProfile['clients'][0]['email'],
-                'fullname' => $fullProfile['clients'][0]['name'],
-                'photo' => $fullProfile['clients'][0]['photo']
-            ];
-        } else {
-            return [
-                'id' => $fullProfile['user']['id'],
-                'email' => $fullProfile['user']['email'],
-                'fullname' => $fullProfile['user']['name'],
-                'photo' => $fullProfile['user']['photo']
-            ];
-        }
+        return [
+            'id' => $fullProfile['user']['id'],
+            'email' => $fullProfile['user']['email'],
+            'fullname' => $fullProfile['user']['name'],
+            'photo' => valr('user.photo.content_url', $fullProfile)
+        ];
 
     }
 }
