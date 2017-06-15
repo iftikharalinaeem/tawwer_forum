@@ -256,11 +256,9 @@ class Zendesk {
      */
     public function getProfile($userId = false) {
         if (!$userId) {
-            $profileURL = "/users/me.json";
-        } else {
-            $profileURL = "/users/{$userId}.json";
+            $userId = 'me';
         }
-        $fullProfile = $this->zendeskRequest($profileURL);
+        $fullProfile = $this->zendeskRequest("/users/$userId.json");
 
         return [
             'id' => $fullProfile['user']['id'],
