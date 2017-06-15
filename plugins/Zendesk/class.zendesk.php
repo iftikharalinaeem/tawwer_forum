@@ -256,27 +256,18 @@ class Zendesk {
      */
     public function getProfile($userId = false) {
         if (!$userId) {
-            $profileURL = "/users/me/oauth/clients.json";
+            $profileURL = "/users/me.json";
         } else {
             $profileURL = "/users/{$userId}.json";
         }
         $fullProfile = $this->zendeskRequest($profileURL);
 
-        if (!$userId) {
-            return [
-                'id' => $fullProfile['clients'][0]['id'],
-                'email' => $fullProfile['clients'][0]['email'],
-                'fullname' => $fullProfile['clients'][0]['name'],
-                'photo' => $fullProfile['clients'][0]['photo']
-            ];
-        } else {
-            return [
-                'id' => $fullProfile['user']['id'],
-                'email' => $fullProfile['user']['email'],
-                'fullname' => $fullProfile['user']['name'],
-                'photo' => $fullProfile['user']['photo']
-            ];
-        }
+        return [
+            'id' => $fullProfile['user']['id'],
+            'email' => $fullProfile['user']['email'],
+            'fullname' => $fullProfile['user']['name'],
+            'photo' => valr('user.photo.content_url', $fullProfile)
+        ];
 
     }
 }
