@@ -185,6 +185,11 @@ class EventModel extends Gdn_Model {
 
             }
 
+            // Allow Admins to restrict event creation to leaders only.
+            if (c('Events.Create.LeadersOnly', false) && !groupPermission('Leader', $EventGroupID)) {
+                $Perms['Create'] = false;
+            }
+
             // Moderators can view and edit all events.
             if ($UserID == Gdn::session()->UserID && checkPermission('Garden.Moderation.Manage')) {
                 $Perms['Edit'] = true;

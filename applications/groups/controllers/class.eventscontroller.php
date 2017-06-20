@@ -73,7 +73,11 @@ class EventsController extends Gdn_Controller {
                 $this->fireEvent('GroupLoaded');
 
                 $this->setData('Group', $Group);
-                $this->setData('NewButtonId', val('GroupID', $Group));
+
+                // Only pass  NewButtonId to the view if the user has permissions to create an event.
+                if ($EventModel->checkPermission('Create', $Group)) {
+                    $this->setData('NewButtonId', val('GroupID', $Group));
+                }
 
                 // Check if this person is a member of the group or a moderator
                 $ViewGroupEvents = groupPermission('View', $Group);
