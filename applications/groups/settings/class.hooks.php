@@ -770,4 +770,28 @@ class GroupsHooks extends Gdn_Plugin {
             }
         }
     }
+
+
+    /**
+     * Create a settings page for Groups.
+     *
+     * @param settingsController $sender
+     * @param settingsController $args
+     */
+    public function settingsController_groups_create($sender, $args) {
+        $sender->permission('Garden.Settings.Manage');
+        $cf = new ConfigurationModule($sender);
+        $cf->initialize([
+            'Groups.Leaders.AdminPrivileges' => [
+                'LabelCode' => 'Allow Leaders of a Group to edit or delete comments and discussions in the groups they lead.',
+                'Control' => 'toggle'
+            ],
+            'Events.Create.LeadersOnly' => [
+            'LabelCode' => 'Restrict the creation of Events in a Group to Leaders only.',
+            'Control' => 'toggle'
+        ]
+        ]);
+        $sender->setData('Title', t('Group Settings'));
+        $cf->renderAll();
+    }
 }
