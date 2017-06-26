@@ -277,7 +277,7 @@ class WhispersPlugin extends Gdn_Plugin {
             $Sender->DiscussionModel->SetProperty($Discussion['DiscussionID'], 'Attributes', dbencode($Discussion['Attributes']));
 
             if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
-               Redirect($Discussion['Url'].'#Form_Comment', 302);
+               redirectTo($Discussion['Url'].'#Form_Comment', 302, false);
             }
          }
       } else {
@@ -309,7 +309,7 @@ class WhispersPlugin extends Gdn_Plugin {
          );
 
       $Sender->DiscussionModel->SetProperty($DiscussionID, 'Attributes', dbencode($Discussion['Attributes']));
-      Redirect($Discussion['Url'].'#Form_Comment', 302);
+      redirectTo($Discussion['Url'].'#Form_Comment', 302, false);
    }
 
    /**

@@ -67,14 +67,14 @@ class AvatarStockPlugin extends Gdn_Plugin {
             if ($results) {
                 // This might interfere with API endpoint. Keep for now, adjust
                 // when becomes a real concern.
-                redirect('/settings/avatars');
+                redirectTo('/settings/avatars', 302, false);
             } else {
                 $sender->render('upload', '', 'plugins/avatarstock');
             }
         } else if (in_array('modify', $args)) {
             $results = $this->deleteSelectedAvatars($sender);
             if ($results) {
-                redirect('/settings/avatars');
+                redirectTo('/settings/avatars', 302, false);
             } else {
                 $sender->render('upload', '', 'plugins/avatarstock');
             }
@@ -160,7 +160,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
         }
 
         if (Gdn::Controller()->DeliveryType() == DELIVERY_TYPE_ALL) {
-            Redirect($RedirectUrl);
+            redirectTo($RedirectUrl, 302, false);
         } else {
             $Sender->ControllerName = 'Home';
             $Sender->View = 'FileNotFound';

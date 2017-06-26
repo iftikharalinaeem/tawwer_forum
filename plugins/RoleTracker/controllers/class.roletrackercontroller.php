@@ -74,7 +74,7 @@ class RoleTrackerController extends Gdn_Controller {
         if ($url) {
             $this->RedirectUrl = $url;
             if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-                redirect($url);
+                redirectTo($url, 302, false);
             }
         } else {
             throw new Gdn_UserException(t('Error fetching next tracked comment.'), 400);

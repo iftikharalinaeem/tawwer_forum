@@ -39,7 +39,7 @@ class Oauth2Controller extends Gdn_Controller {
       $ApplicationModel = new ApplicationModel();
       $Application = $ApplicationModel->GetID($ClientID, DATASET_TYPE_ARRAY);
       if (!$Application) {
-         Redirect($this->Request->Get('redirect_uri').'&error=invalid_client');
+         redirectTo($this->Request->Get('redirect_uri').'&error=invalid_client', 302, false);
       }
 
       if ($this->Request->GetValue('display'))
@@ -71,7 +71,7 @@ class Oauth2Controller extends Gdn_Controller {
       } catch (Exception $Ex) {
          // There was an error with the connection. Redirect back to the destination with that information.
          $Url = $this->Request->Get('redirect_uri').'&error=invalid_request&error_description='.urlencode($Ex->getMessage());
-         Redirect($Url);
+        redirectTo($Url, 302, false);
       }
 
       // Make sure the data has been verified.
@@ -132,7 +132,7 @@ class Oauth2Controller extends Gdn_Controller {
           'code' => $Token,
           'expires_in' => $ExpiresIn);
       $Url .= (strpos($Url, '?') === FALSE ? '?' : '&').  http_build_query($Args);
-      Redirect($Url);
+     redirectTo($Url, 302, false);
 
       $FormData = $this->Form->FormValues(); // debug
    }
@@ -157,7 +157,7 @@ class Oauth2Controller extends Gdn_Controller {
       $this->DeliveryMethod(DELIVERY_METHOD_JSON);
       $this->DeliveryType(DELIVERY_TYPE_DATA);
       $this->SetHeader('Cache-Control', 'no-store');
-      
+
       $Get = $this->Request->Get();
 
       // Make sure the required fields have been supplied.
@@ -210,6 +210,6 @@ class Oauth2Controller extends Gdn_Controller {
    protected function _RedirectError($Error) {
       $Url = $this->Request->Get('redirect_uri');
       $Url .= (strpos($Url, '?') !== FALSE ? '&' : '?').http_build_query($Error);
-      Redirect($Url);
+      redirectTo($Url, 302, false);
    }
 }

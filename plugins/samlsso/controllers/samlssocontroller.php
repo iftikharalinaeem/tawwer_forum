@@ -143,7 +143,7 @@ class SAMLSSOController extends PluginController {
                 $this->informMessage(t('Saved'));
 
                 if (!$authenticationKey) {
-                    redirect('/samlsso/edit/'.$form->getFormValue('AuthenticationKey'));
+                    redirectTo('/samlsso/edit/'.$form->getFormValue('AuthenticationKey'), 302, false);
                 }
             }
         }

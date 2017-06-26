@@ -58,6 +58,6 @@ class SlugUrlsPlugin extends Gdn_Plugin {
          throw NotFoundException('Discussion');
 
       $Url = DiscussionUrl($Discussion, $Page);
-      Redirect($Url, 301);
+      redirectTo($Url, 301, false);
    }
 }

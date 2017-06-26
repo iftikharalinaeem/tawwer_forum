@@ -81,7 +81,7 @@ class ReactionsController extends DashboardController {
                 $this->setData('Reaction', $reaction);
                 if ($this->deliveryType() != DELIVERY_TYPE_DATA) {
                     $this->informMessage(formatString(t("New reaction created"), $reaction));
-                    redirect('/reactions');
+                    redirectTo('/reactions', 302, false);
                 }
             }
         }
@@ -192,7 +192,7 @@ class ReactionsController extends DashboardController {
                 if ($this->_DeliveryType !== DELIVERY_TYPE_ALL) {
                     $this->render('blank', 'utility', 'dashboard');
                 } else {
-                    redirect('/reactions');
+                    redirectTo('/reactions', 302, false);
                 }
             }
         }

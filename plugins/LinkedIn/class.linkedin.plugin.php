@@ -337,7 +337,7 @@ class LinkedInPlugin extends Gdn_Plugin {
       $this->EventArguments['User'] = $Sender->User;
       $this->FireEvent('AfterConnection');
 
-      Redirect(UserUrl($Sender->User, '', 'connections'));
+      redirectTo(UserUrl($Sender->User, '', 'connections'), 302, false);
    }
 
    public function SocialController_LinkedIn_Create($Sender, $Args) {
