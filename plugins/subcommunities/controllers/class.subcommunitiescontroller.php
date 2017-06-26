@@ -108,7 +108,7 @@ class SubcommunitiesController extends DashboardController {
                 if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
                     $this->jsonTarget('', '', 'Refresh');
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-                    redirect('/subcommunities');
+                    redirectTo('/subcommunities', 302, false);
                 }
             }
         } elseif ($this->site) {
@@ -151,7 +151,7 @@ class SubcommunitiesController extends DashboardController {
                 if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
                     $this->jsonTarget('', '', 'Refresh');
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-                    redirect('/subcommunities');
+                    redirectTo('/subcommunities', 302, false);
                 }
             }
         }
@@ -265,7 +265,7 @@ class SubcommunitiesController extends DashboardController {
             if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
                 $this->jsonTarget('', '', 'Refresh');
             } elseif ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-                redirect('/subcommunities');
+                redirectTo('/subcommunities', 302, false);
             }
         }
 
