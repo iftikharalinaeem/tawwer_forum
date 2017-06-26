@@ -69,7 +69,7 @@ class AnalyticsController extends DashboardController {
      *
      */
     public function index() {
-        redirect('/analytics/dashboard/traffic');
+        redirectTo('/analytics/dashboard/traffic', 302, false);
     }
 
     /**
@@ -119,7 +119,7 @@ class AnalyticsController extends DashboardController {
      */
     public function dashboard($dashboardID) {
         if (empty($dashboardID)) {
-            redirect('analytics');
+            redirectTo('analytics', 302, false);
         }
         $this->addCssFile('vendors.min.css', 'plugins/vanillaanalytics');
 
@@ -142,7 +142,7 @@ class AnalyticsController extends DashboardController {
         if ($dashboard) {
             Gdn_Theme::section('Analytics');
         } else {
-            redirect('settings');
+            redirectTo('settings', 302, false);
         }
 
 
