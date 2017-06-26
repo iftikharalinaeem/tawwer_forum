@@ -1,6 +1,6 @@
 {
     "name": "Multisite Node",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "license": "Proprietary",
     "icon": "node.png",
     "key": "sitenode",
@@ -11,5 +11,8 @@
             "email": "todd@vanillaforums.com",
             "homepage": "http://vanillaforums.com"
         }
-    ]
+    ],
+    "require": {
+        "vanilla": ">=2.4.202"
+    }
 }

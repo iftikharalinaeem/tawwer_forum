@@ -1,7 +1,7 @@
 {
     "name": "Subcommunities",
     "description": "Allows you to use top level categories as virtual mini forums for multilingual or multi-product communities.",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "license": "Proprietary",
     "icon": "subcommunities.png",
     "key": "subcommunities",
@@ -12,5 +12,8 @@
             "email": "todd@vanillaforums.com",
             "homepage": "https://vanillaforums.com"
         }
-    ]
+    ],
+    "require": {
+        "vanilla": ">=2.4.202"
+    }
 }
