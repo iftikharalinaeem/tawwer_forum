@@ -1,7 +1,7 @@
 {
     "name": "Reconfirm",
     "description": "Force users to reset their password and reconfirm the terms of use.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "requiredTheme": false,
     "hasLocale": true,
     "settingsPermission": "Garden.Settings.Manage",
@@ -15,6 +15,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.1"
+        "vanilla": ">=2.4.202"
     }
 }

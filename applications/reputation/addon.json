@@ -1,7 +1,7 @@
 {
     "name": "Badges",
     "description": "Give badges to your users to reward them for contributing to your community.",
-    "version": "1.3.3",
+    "version": "1.3.4",
     "setupController": "setup",
     "license": "GNU GPL2",
     "key": "reputation",
@@ -13,5 +13,8 @@
             "email": "lincoln@vanillaforums.com",
             "homepage": "http://lincolnwebs.com"
         }
-    ]
+    ],
+    "require": {
+        "vanilla": ">=2.4.202"
+    }
 }

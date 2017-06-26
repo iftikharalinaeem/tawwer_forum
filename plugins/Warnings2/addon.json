@@ -1,7 +1,7 @@
 {
     "name": "Warnings & Notes",
     "description": "Allows moderators to warn users and add private notes to profiles to help police the community.",
-    "version": "2.5",
+    "version": "2.5.1",
     "mobileFriendly": true,
     "settingsUrl": "/settings/warnings",
     "settingsPermission": "Garden.Settings.Manage",
@@ -16,6 +16,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.1"
+        "vanilla": ">=2.4.202"
     }
 }

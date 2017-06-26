@@ -1,7 +1,7 @@
 {
     "name": "Linked In Social Connect",
     "description": "Allow users to sign in via linked in.",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "mobileFriendly": true,
     "settingsUrl": "/social/linkedin",
     "socialConnect": true,
@@ -17,6 +17,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.1a"
+        "vanilla": ">=2.4.202"
     }
 }

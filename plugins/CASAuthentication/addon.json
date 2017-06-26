@@ -1,7 +1,7 @@
 {
     "name": "CAS Authentication for Vanilla",
     "description": "Allows Vanilla to authenticate against a <a href=\"http://en.wikipedia.org/wiki/Central_Authentication_Service\">CAS</a> authentication server.",
-    "version": "1.1",
+    "version": "1.1.1",
     "mobileFriendly": true,
     "settingsUrl": "/settings/cas",
     "settingsPermission": "Garden.Settings.Manage",
@@ -15,6 +15,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.1"
+        "vanilla": ">=2.4.202"
     }
 }
