@@ -847,6 +847,12 @@ class GroupModel extends Gdn_Model {
             Gdn::session()->setPermission('Vanilla.Discussions.Close', [$CategoryID]);
             Gdn::session()->setPermission('Vanilla.Discussions.Edit', [$CategoryID]);
             Gdn::session()->setPermission('Vanilla.Discussions.Delete', [$CategoryID]);
+            if (c('Groups.Leaders.AdminPrivileges')) {
+                Gdn::session()->setPermission('Vanilla.Comments.Announce', [$CategoryID]);
+                Gdn::session()->setPermission('Vanilla.Comments.Close', [$CategoryID]);
+                Gdn::session()->setPermission('Vanilla.Comments.Edit', [$CategoryID]);
+                Gdn::session()->setPermission('Vanilla.Comments.Delete', [$CategoryID]);
+            }
         }
 
         if ($this->checkPermission('View', $Group)) {

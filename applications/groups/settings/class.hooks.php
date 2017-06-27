@@ -727,52 +727,6 @@ class GroupsHooks extends Gdn_Plugin {
 
 
     /**
-    * Give permission to Group Leaders to edit or remove discussions.
-    *
-    * @param DiscussionController $sender
-    * @param DiscussionController $args
-    */
-    public function discussionController_beforeDiscussionRender_handler($sender, $args) {
-        $groupID = valr("Discussion.GroupID", $sender->Data);
-        $this->givePermissionsToLeaders($groupID);
-    }
-
-
-    /**
-     * Give permissions to Group Leader to edit or remove comments.
-     *
-     * @param DiscussionController $sender
-     * @param DiscussionController $args
-     */
-    public function discussionController_beforeCommentDisplay_handler($sender, $args) {
-        $groupID = valr("Discussion.GroupID", $sender->Data);
-        $this->givePermissionsToLeaders($groupID);
-    }
-
-
-    /**
-     * Pass permissions to Group Leaders to edit or delete discussions and comments in a group.
-     *
-     * @param $groupID
-     */
-    public function givePermissionsToLeaders($groupID = null) {
-        if (!c('Groups.Leaders.AdminPrivileges')) {
-            return;
-        }
-        if ($groupID) {
-            $groupModel = new GroupModel();
-            $leader = $groupModel->checkPermission('Leader', $groupID);
-            if ($leader) {
-                Gdn::session()->setPermission('Vanilla.Comments.Edit', true);
-                Gdn::session()->setPermission('Vanilla.Comments.Delete', true);
-                Gdn::session()->setPermission('Vanilla.Discussion.Edit', true);
-                Gdn::session()->setPermission('Vanilla.Discussion.Delete', true);
-            }
-        }
-    }
-
-
-    /**
      * Create a settings page for Groups.
      *
      * @param settingsController $sender
