@@ -75,7 +75,7 @@ class GroupController extends Gdn_Controller {
 
         // Force the canonical url.
         if (rawurlencode($ID) != groupSlug($Group)) {
-            redirect(GroupUrl($Group), 301);
+            redirectTo(GroupUrl($Group), 301, false);
         }
         $this->canonicalUrl(url(groupUrl($Group), '//'));
 
@@ -697,7 +697,7 @@ class GroupController extends Gdn_Controller {
             }
             if ($GroupID) {
                 $Group = $this->GroupModel->getID($GroupID);
-                redirect(GroupUrl($Group));
+                redirectTo(GroupUrl($Group), 302, false);
             } else {
                 trace($Form->formValues());
             }
@@ -815,7 +815,7 @@ class GroupController extends Gdn_Controller {
                 }
 
                 $this->informMessage(t("Your settings have been saved."));
-                redirect(groupUrl($group, $target));
+                redirectTo(groupUrl($group, $target), 302, false);
             }
         }
         $this->Form = $form;
@@ -837,7 +837,7 @@ class GroupController extends Gdn_Controller {
             $this->GroupModel->setField($id, 'Icon', null);
             $this->deleteGroupIcons($icon);
         }
-        redirectUrl(groupUrl($group, $target));
+        redirectTo(groupUrl($group, $target), 302, false);
     }
 
     /**

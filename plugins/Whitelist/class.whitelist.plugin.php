@@ -151,7 +151,7 @@ class WhitelistPlugin extends Gdn_Plugin {
                     'Exception' => t('You must sign in.'),
                 ]);
             } else {
-                redirect('/entry/signin?Target='.urlencode($request->pathAndQuery()));
+                redirectTo('/entry/signin?Target='.urlencode($request->pathAndQuery()), 302, false);
             }
         }
         exit();

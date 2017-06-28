@@ -56,7 +56,7 @@ class SalesforcePlugin extends Gdn_Plugin {
       );
       Gdn::PermissionModel()->Define(array('Garden.Staff.Allow' => 'Garden.Moderation.Manage'));
    }
-    
+
    /**
     * @param Controller $Sender
     * @param array $Args
@@ -106,7 +106,7 @@ class SalesforcePlugin extends Gdn_Plugin {
                ->Dispatch('home/error');
             return;
          }
-         Redirect(Url('/plugin/Salesforce/?DashboardConnection=1&' . http_build_query($Tokens)));
+         redirectTo(Url('/plugin/Salesforce/?DashboardConnection=1&' . http_build_query($Tokens)), 302, false);
       }
       try {
          $Tokens = Salesforce::GetTokens($Code, Salesforce::ProfileConnecUrl());
@@ -147,7 +147,7 @@ class SalesforcePlugin extends Gdn_Plugin {
 
       $RedirectUrl = UserUrl($Sender->User, '', 'connections');
 
-      Redirect($RedirectUrl);
+      redirectTo($RedirectUrl, 302, false);
    }
 
    /**
@@ -168,7 +168,7 @@ class SalesforcePlugin extends Gdn_Plugin {
     */
    public function Controller_Connect() {
       $AuthorizeUrl = Salesforce::AuthorizeUri(FALSE, 'DashboardConnection');
-      Redirect($AuthorizeUrl);
+      redirectTo($AuthorizeUrl, 302, false);
    }
 
    /**
@@ -187,7 +187,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             'Plugins.Salesforce.DashboardConnection.InstanceUrl' => FALSE
          ));
       }
-      Redirect(Url('/plugin/Salesforce'));
+      redirectTo(Url('/plugin/Salesforce'), 302, false);
    }
 
    /**
@@ -208,18 +208,18 @@ class SalesforcePlugin extends Gdn_Plugin {
          ));
          $Salesforce->SetAccessToken($AccessToken);
          $Salesforce->SetInstanceUrl($InstanceUrl);
-         Redirect(Url('/plugin/Salesforce'));
+         redirectTo(Url('/plugin/Salesforce'), 302, false);
       }
    }
 
    public function Controller_Enable() {
       SaveToConfig('Plugins.Salesforce.DashboardConnection.Enabled', TRUE);
-      Redirect(Url('/plugin/Salesforce'));
+      redirectTo(Url('/plugin/Salesforce'), 302, false);
    }
 
    public function Controller_Disable() {
       RemoveFromConfig('Plugins.Salesforce.DashboardConnection.Enabled');
-      Redirect(Url('/plugin/Salesforce'));
+      redirectTo(Url('/plugin/Salesforce'), 302, false);
    }
 
    /**
@@ -241,7 +241,7 @@ class SalesforcePlugin extends Gdn_Plugin {
          ));
 
          $Sender->InformMessage('Changes Saved to Config');
-         Redirect(Url('/plugin/Salesforce'));
+         redirectTo(Url('/plugin/Salesforce'), 302, false);
       }
       $Sender->SetData(array(
          'DashboardConnection' => C('Plugins.Salesforce.DashboardConnection.Enabled'),

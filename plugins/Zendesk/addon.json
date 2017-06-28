@@ -1,7 +1,7 @@
 {
     "name": "Zendesk",
     "description": "Allow staff users to create tickets and cases from discussions and comments.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "settingsUrl": "/plugin/zendesk",
     "settingsPermission": "Garden.Settings.Manage",
     "mobileFriendly": true,
@@ -17,6 +17,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.1.18"
+        "vanilla": ">=2.4"
     }
 }

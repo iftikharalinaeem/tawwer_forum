@@ -95,7 +95,7 @@ class PegaPlugin extends Gdn_Plugin {
                     ->Dispatch('home/error');
                 return;
             }
-            Redirect(Url('/plugin/Pega/?DashboardConnection=1&'.http_build_query($Tokens)));
+            redirectTo(Url('/plugin/Pega/?DashboardConnection=1&'.http_build_query($Tokens)), 302, false);
         }
         try {
             $Tokens = Pega::GetTokens($Code, Pega::ProfileConnecUrl());
@@ -136,7 +136,7 @@ class PegaPlugin extends Gdn_Plugin {
 
         $RedirectUrl = UserUrl($Sender->User, '', 'connections');
 
-        Redirect($RedirectUrl);
+        redirectTo($RedirectUrl, 302, false);
     }
 
     /**
@@ -157,7 +157,7 @@ class PegaPlugin extends Gdn_Plugin {
      */
     public function Controller_Connect() {
         $AuthorizeUrl = Pega::AuthorizeUri(FALSE, 'DashboardConnection');
-        Redirect($AuthorizeUrl);
+        redirectTo($AuthorizeUrl, 302, false);
     }
 
     /**
@@ -176,18 +176,18 @@ class PegaPlugin extends Gdn_Plugin {
                 'Plugins.Pega.DashboardConnection.InstanceUrl' => FALSE
             ));
         }
-        Redirect(Url('/plugin/Pega'));
+        redirectTo(Url('/plugin/Pega'), 302, false);
     }
 
 
     public function Controller_Enable() {
         SaveToConfig('Plugins.Pega.DashboardConnection.Enabled', TRUE);
-        Redirect(Url('/plugin/Pega'));
+        redirectTo(Url('/plugin/Pega'), 302, false);
     }
 
     public function Controller_Disable() {
         RemoveFromConfig('Plugins.Pega.DashboardConnection.Enabled');
-        Redirect(Url('/plugin/Pega'));
+        redirectTo(Url('/plugin/Pega'), 302, false);
     }
 
     /**
@@ -209,7 +209,7 @@ class PegaPlugin extends Gdn_Plugin {
             ));
 
             $Sender->InformMessage('Changes Saved to Config');
-            Redirect(Url('/plugin/Pega'));
+            redirectTo(Url('/plugin/Pega'), 302, false);
         }
         $Sender->SetData(array(
             'DashboardConnection' => C('Plugins.Pega.DashboardConnection.Enabled'),

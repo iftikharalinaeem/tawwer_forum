@@ -1,7 +1,7 @@
 {
     "name": "Salesforce",
     "description": "Allow staff users to create leads and cases from discussions and comments.",
-    "version": "0.1",
+    "version": "1.1",
     "settingsUrl": "/plugin/Salesforce",
     "settingsPermission": "Garden.Settings.Manage",
     "registerPermissions": {
@@ -20,6 +20,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.1"
+        "vanilla": ">=2.4"
     }
 }

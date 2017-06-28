@@ -2,7 +2,7 @@
     "name": "Microsoft Account",
     "className": "MicrosoftAccountPlugin",
     "description": "Allows users to sign-in with their Microsoft Account credentials.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "requiredTheme": false,
     "hasLocale": false,
     "socialConnect": true,
@@ -13,6 +13,6 @@
     "key": "microsoftaccount",
     "type": "addon",
     "require": {
-        "vanilla": ">=2.2"
+        "vanilla": ">=2.4"
     }
 }

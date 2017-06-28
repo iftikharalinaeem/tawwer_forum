@@ -6,22 +6,22 @@
 
 class ImagesPlugin extends Gdn_Plugin {
    /// Methods ///
-   
+
    public function Setup() {
       $this->Structure();
    }
-   
+
    public function Structure() {
       include dirname(__FILE__).'/structure.php';
    }
-   
+
    /**
     * @param Gdn_Controller $Sender
     */
    public function AddJsFiles($Sender = NULL) {
       if (!$Sender)
          $Sender = Gdn::Controller();
-      
+
       // Include JS necessary in the page.
       $Sender->AddJsFile('library/jQuery-FileUpload/js/vendor/jquery.ui.widget.js', 'plugins/Images');
       // The Templates plugin is included to render the upload/download listings.
@@ -45,23 +45,23 @@ class ImagesPlugin extends Gdn_Plugin {
       // The XDomainRequest Transport is included for cross-domain file deletion for IE8+.
       $Sender->Head->AddString('<!--[if gte IE 8]><script src="'.Url('plugins/Images/library/jQuery-FileUpload/js/cors/jquery.xdr-transport.js').'"></script><![endif]-->');
    }
-   
+
    /// Event Handlers ///
-   
+
    public function AssetModel_StyleCss_Handler($Sender, $Args) {
       $Sender->AddCssFile('images.css', 'plugins/Images');
    }
-   
-   /** 
-    * Add the "new image" button after the new discussion button. 
+
+   /**
+    * Add the "new image" button after the new discussion button.
     */
    public function Base_BeforeNewDiscussionButton_Handler($Sender) {
       $NewDiscussionModule = &$Sender->EventArguments['NewDiscussionModule'];
       if (Gdn::Session()->CheckPermission('Plugins.Images.Add'))
          $NewDiscussionModule->AddButton(T('New Image'), 'post/image');
    }
-   
-   /** 
+
+   /**
     * Display the Image label on the discussion list.
     */
    public function Base_BeforeDiscussionMeta_Handler($Sender) {
@@ -69,40 +69,40 @@ class ImagesPlugin extends Gdn_Plugin {
       if (strcasecmp(GetValue('Type', $Discussion), 'Image') == 0)
          echo Tag($Discussion, 'Type', 'Image');
    }
-   
-   /** 
+
+   /**
     * Add the image form to vanilla's post page.
     */
    public function PostController_AfterForms_Handler($Sender) {
       $Forms = $Sender->Data('Forms');
       if (!is_array($Forms))
          $Forms = array();
-      
+
       $Forms[] = array('Name' => 'Image', 'Label' => Sprite('SpImage').T('New Image'), 'Url' => 'post/image');
 		$Sender->SetData('Forms', $Forms);
 
    }
-   
-   /** 
+
+   /**
     * Create the new image method on post controller.
     */
    public function PostController_Image_Create($Sender) {
-      // Check permission 
+      // Check permission
       $Sender->Permission('Vanilla.Discussions.Add');
       $Sender->Permission('Plugins.Images.Add');
 
       $ImageModel = new ImageModel();
-      
+
       // Override CategoryID if categories are disabled
       $Sender->CategoryID = GetValue(0, $Sender->RequestArgs);
       $UseCategories = $Sender->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
-      if (!$UseCategories) 
+      if (!$UseCategories)
          $Sender->CategoryID = 0;
 
       $Sender->Category = CategoryModel::Categories($Sender->CategoryID);
       if (!is_object($Sender->Category))
          $Sender->Category = NULL;
-      
+
       if ($UseCategories)
 			$CategoryData = CategoryModel::Categories();
 
@@ -123,7 +123,7 @@ class ImagesPlugin extends Gdn_Plugin {
             $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
             if ($NewDiscussion) {
                // Redirect to the new discussion
-               Redirect(DiscussionUrl($Discussion).'#latest');
+               redirectTo(DiscussionUrl($Discussion).'#latest', 302, false);
             } elseif (count($CommentIDs) > 0) {
                // Load/return the newly added comments.
                sort($CommentIDs);
@@ -135,7 +135,7 @@ class ImagesPlugin extends Gdn_Plugin {
                // $Sender->ClassName = 'DiscussionController';
                // $Sender->ControllerName = 'discussion';
                // $Sender->View = 'discussionitems';
-               
+
                // Make sure to set the user's discussion watch records
                $CountComments = $Sender->CommentModel->GetCount($DiscussionID);
                $Limit = count($CommentIDs);
@@ -151,11 +151,11 @@ class ImagesPlugin extends Gdn_Plugin {
 		$Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/image')));
       $this->AddJsFiles();
       $Sender->AddJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugin/Reactions');
-      
+
       $Sender->Render('discussionform', '', 'plugins/Images');
    }
-   
-   /** 
+
+   /**
     * If the discussion type is "image", use the images view (if available)
     * @param type $Sender
     */
@@ -168,17 +168,17 @@ class ImagesPlugin extends Gdn_Plugin {
          $this->ApplicationFolder = 'plugins/Images';
       }
    }
-   
+
    public function PostController_UploadImage_Create($Sender) {
       error_reporting(E_ALL | E_STRICT);
-      
+
       $Paths = array(
           'Upload' => PATH_UPLOADS.'/image-tmp/',
           'Thumb' => PATH_UPLOADS.'/image-tmp/thumbnails/');
       foreach ($Paths as $Path) {
          TouchFolder($Path);
       }
-      
+
       $upload_handler = new VanillaUploadHandler(array(
           'script_url' => Url('post/uploadimage', TRUE),
           'upload_dir' => $Paths['Upload'],
@@ -187,7 +187,7 @@ class ImagesPlugin extends Gdn_Plugin {
                  'upload_dir' => $Paths['Thumb']
                 ))
          ));
-      
+
       header('Pragma: no-cache');
       header('Cache-Control: no-store, no-cache, must-revalidate');
       header('Content-Disposition: inline; filename="files.json"');
@@ -220,9 +220,9 @@ class ImagesPlugin extends Gdn_Plugin {
             header('HTTP/1.1 405 Method Not Allowed');
       }
       die();
-   }   
-   
-   /** 
+   }
+
+   /**
     * Add the js to the discussion form for file uploads.
     * @param Gdn_Controller $Sender
     */
@@ -233,22 +233,22 @@ class ImagesPlugin extends Gdn_Plugin {
 
       // Include JS necessary in the page.
 //      $this->AddJsFiles();
-      
+
       // If the current discussion is of type "Image", switch to the images view
       $this->AddJsFiles();
       $Sender->AddJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions');
-      
+
       $Sender->View = PATH_PLUGINS.'/Images/views/discussion.php';
-      
+
       $Sender->CssClass .= ' NoPanel';
    }
-   
+
    public function RootController_Render_Before($Sender) {
       if (InArrayI($Sender->RequestMethod, array('bestof', 'bestof2'))) {
          $Sender->AddJsFile('tile.js', 'plugins/Images');
       }
    }
-   
+
    /* Add a toggle item to the form menu. */
    public function DiscussionController_BeforeCommentForm_Handler($Sender) {
       return;
@@ -256,9 +256,9 @@ class ImagesPlugin extends Gdn_Plugin {
       $FormToggleMenu->AddLabel(Sprite('SpImage').' '.T('Image'), 'NewImageForm');
       // Is this discussion an image-type? If so, make the default response to post another image.
       if (GetValue('Type', $Sender->Data('Discussion')) == 'Image')
-         $FormToggleMenu->CurrentLabelCode('NewImageForm'); 
+         $FormToggleMenu->CurrentLabelCode('NewImageForm');
    }
-   
+
    /* Render the comment file upload form. */
    public function DiscussionController_AfterCommentFormMenu_Handler($Sender) {
       $OldAction = $Sender->Form->Action;

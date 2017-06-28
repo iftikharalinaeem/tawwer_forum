@@ -1,6 +1,6 @@
 {
     "description": "The Vanilla Programming Interface provides global api functionality for downloaded applications to connect to vpi.vanillaforums.com.",
-    "version": "1.0a",
+    "version": "1.1",
     "registerPermissions": false,
     "key": "api",
     "type": "addon",
@@ -14,6 +14,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.0.10a"
+        "vanilla": ">=2.4"
     }
 }

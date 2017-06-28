@@ -1,7 +1,7 @@
 {
     "name": "Whitelist",
     "description": "Block any requests that does not come from a whitelisted source.",
-    "version": "1.0",
+    "version": "1.0.1",
     "hasLocale": false,
     "license": "GNU GPL2",
     "settingsUrl": "/settings/whitelist",
@@ -15,6 +15,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.2"
+        "vanilla": ">=2.4"
     }
 }

@@ -1,7 +1,7 @@
 {
     "name": "Images",
     "description": "Upload images as discussions, comments, and activities.",
-    "version": "1.0.3a",
+    "version": "1.0.4",
     "registerPermissions": {
         "Plugins.Images.Add": "Garden.Profiles.Edit"
     },
@@ -13,5 +13,8 @@
             "email": "mark@vanillaforums.com",
             "homepage": "http://vanillaforums.com"
         }
-    ]
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    }
 }
