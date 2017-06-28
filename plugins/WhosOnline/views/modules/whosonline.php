@@ -32,7 +32,7 @@ $displayStyle = c('WhosOnline.DisplayStyle', 'list');
 
             if ($guestCount) {
                 $formattedGuestCount = Gdn_Format::bigNumber($guestCount, 'html');
-                $guestsText = plural($guestCount, 'guest', 'guests');
+                $guestsText = pluralTranslate($guestCount, 'Guest', 'Guests');
                 $plus =  $guestCount != $totalCount ? '+' : '';
                 echo <<<EOT
         <span class="GuestCountBox"><span class="GuestCount">{$plus}$formattedGuestCount</span> <span class="GuestLabel">$guestsText</span></span>
