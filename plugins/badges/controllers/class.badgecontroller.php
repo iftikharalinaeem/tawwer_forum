@@ -114,11 +114,11 @@ class BadgeController extends BadgesAppController {
 
                 // Success & redirect
                 $this->informMessage(t('Badge deleted.'));
-                $this->RedirectUrl = url('/badge/all');
+                $this->redirectTo('/badge/all', false);
             } else {
                 // Failure & redirect
                 $this->informMessage(t('Badge cannot be deleted.'));
-                $this->RedirectUrl = url('/badge/all');
+                $this->redirectTo('/badge/all', false);
             }
         } else {
             // Get info for confirmation
@@ -213,7 +213,7 @@ class BadgeController extends BadgesAppController {
 
             if ($result) {
                 $this->informMessage(t('Gave badge to users.'));
-                $this->RedirectUrl = '/badge/all';
+                $this->redirectTo('/badge/all', false);
             } else {
                 $this->Form->addError(t('Failed to give badge to users.'));
             }
@@ -273,7 +273,7 @@ class BadgeController extends BadgesAppController {
                     $this->setData('Badge', $OutputBadge);
 
                     $this->informMessage(t('Gave badge to user.'));
-                    $this->RedirectUrl = url('profile/'.$UserID.'/'.val('Name', $this->User));
+                    $this->redirectTo(url('profile/'.$UserID.'/'.val('Name', $this->User)), false);
                 }
             } else {
                 throw NotFoundException('Badge');
@@ -439,7 +439,7 @@ class BadgeController extends BadgesAppController {
                 $Message = ($Insert) ? t('Created new badge') : t('Updated badge');
                 $Message .= ' &ldquo;' . $BadgeName. '&rdquo;';
                 $this->informMessage($Message);
-                $this->RedirectUrl = url('/badge/all');
+                $this->redirectTo('/badge/all', false);
             }
         }
 

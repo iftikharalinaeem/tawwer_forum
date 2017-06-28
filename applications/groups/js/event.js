@@ -278,8 +278,8 @@ jQuery(document).ready(function($) {
                   gdn.processTargets(json.Targets);
 
                // If there is a redirect url, go to it
-               if (json.RedirectUrl != null && jQuery.trim(json.RedirectUrl) != '') {
-                  window.location.replace(json.RedirectUrl);
+               if (json.RedirectTo != null && jQuery.trim(json.RedirectTo) != '') {
+                  window.location.replace(json.RedirectTo);
                   return false;
                }
 

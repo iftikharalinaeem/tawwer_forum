@@ -29,9 +29,9 @@
                     var informed = gdn.inform(json);
                     gdn.processTargets(json.Targets);
                     // If there is a redirect url, go to it.
-                    if (json.RedirectUrl) {
+                    if (json.RedirectTo) {
                         setTimeout(function() {
-                            window.location = json.RedirectUrl;
+                            window.location = json.RedirectTo;
                         }, informed ? 3000 : 0);
                     }
                 }
