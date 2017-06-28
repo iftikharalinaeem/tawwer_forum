@@ -21,9 +21,9 @@
 
       ?>
       <ul>
-         <li>Can't post discussions.</li>
-         <li>Can't post as often.</li>
-         <li>Signature hidden.</li>
+         <li><?php echo t("Can't post discussions."); ?></li>
+         <li><?php echo t("Can't post as often."); ?></li>
+         <li><?php echo t('Signature hidden.'); ?></li>
       </ul>
    </div>
    <?php endif; ?>
