@@ -241,7 +241,7 @@ class MultisitesController extends DashboardController {
         if ($this->DeliveryType() === DELIVERY_TYPE_VIEW) {
             $this->JsonTarget('', '', 'Refresh');
         } elseif ($this->DeliveryType() === DELIVERY_TYPE_ALL) {
-            Redirect('/multisites');
+            redirectTo('/multisites', 302, false);
         }
 
         $this->Render('api');
