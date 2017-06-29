@@ -184,6 +184,10 @@ class RepliesPlugin extends Gdn_Plugin {
       }
    }
 
+    /**
+     * @param DiscussionController $Sender
+     * @param int $CommentID
+     */
    public function DiscussionController_CommentToReply_Create($Sender, $CommentID) {
       $ReplyModel = new ReplyModel();
       $CommentModel = new CommentModel();
@@ -212,9 +216,9 @@ class RepliesPlugin extends Gdn_Plugin {
                // Redirect to the comment or the discussion to show the new reply.
                $Row = $ReplyModel->GetRecord($ReplyID);
                if ($ReplyToCommentID < 0)
-                  $Sender->redirectTo(DiscussionUrl($Row), false);
+                  $Sender->setRedirectTo(DiscussionUrl($Row), false);
                else
-                  $Sender->redirectTo(CommentUrl($Row), false);
+                  $Sender->setRedirectTo(CommentUrl($Row), false);
                $Sender->Render('Blank', 'Utility', 'Dashboard');
             } else {
                $Sender->Form->SetValidationResults($ReplyModel->ValidationResults());
@@ -277,6 +281,10 @@ class RepliesPlugin extends Gdn_Plugin {
      }
    }
 
+    /**
+     * @param DiscussionController $Sender
+     * @param int $ReplyID
+     */
    public function DiscussionController_ReplyToComment_Create($Sender, $ReplyID) {
       $Model = new ReplyModel();
       $Reply = $Model->GetID($ReplyID, DATASET_TYPE_ARRAY);
@@ -290,7 +298,7 @@ class RepliesPlugin extends Gdn_Plugin {
          if ($CommentID) {
             $CommentModel = new CommentModel();
             $Comment = $CommentModel->GetID($CommentID);
-            $Sender->redirectTo(CommentUrl($Comment), false);
+            $Sender->setRedirectTo(CommentUrl($Comment), false);
          } else {
             $Sender->Form->SetValidationResults($Model->ValidationResults());
          }

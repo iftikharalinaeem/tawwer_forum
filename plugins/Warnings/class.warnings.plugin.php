@@ -156,6 +156,11 @@ class WarningsPlugin extends Gdn_Plugin {
       }
    }
 
+    /**
+     * @param ProfileController $Sender
+     * @param mixed $WarningID
+     * @param string|bool $Target
+     */
    public function ProfileController_RemoveWarning_Create($Sender, $WarningID, $Target = FALSE) {
       $Sender->Permission('Garden.Moderation.Manage');
 
@@ -189,7 +194,7 @@ class WarningsPlugin extends Gdn_Plugin {
          $WarningModel->ProcessWarnings($Warning['WarnUserID']);
          if ($Form->ErrorCount() == 0) {
             if ($Target)
-               $Sender->redirectTo($Target, false);
+               $Sender->setRedirectTo($Target, false);
             else
                $Sender->JsonTarget('', '', 'Refresh');
          }
