@@ -97,7 +97,7 @@ class BadgeController extends ReputationController {
 
       // Validate BadgeID
       if (!is_numeric($BadgeID))
-         redirectTo('reputation/badge/all', 302, false);
+         redirectTo('reputation/badge/all');
 
       $Badge = $this->BadgeModel->GetID($BadgeID);
       if (!$Badge)
@@ -153,7 +153,7 @@ class BadgeController extends ReputationController {
       }
 
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         redirectTo(GetIncomingValue('Target', $this->SelfUrl), 302, false);
+         redirectTo(GetIncomingValue('Target', $this->SelfUrl));
 
       $this->SetView404();
       $this->Render();
@@ -170,7 +170,7 @@ class BadgeController extends ReputationController {
 
       // Validate BadgeID
       if (!is_numeric($BadgeID))
-         redirectTo('reputation/badge/all', 302, false);
+         redirectTo('reputation/badge/all');
 
       // Get info & confirm enabled
       $Badge = $this->BadgeModel->GetID($BadgeID);
@@ -300,7 +300,7 @@ class BadgeController extends ReputationController {
       }
 
       if ($this->_DeliveryType === DELIVERY_TYPE_ALL)
-         redirectTo(GetIncomingValue('Target', $this->SelfUrl), 302, false);
+         redirectTo(GetIncomingValue('Target', $this->SelfUrl));
 
       $this->SetView404();
       $this->Render();
@@ -501,7 +501,7 @@ class BadgeController extends ReputationController {
       if ($this->Form->IsPostBack() && is_numeric($UserID) && is_numeric($BadgeID)) {
          $UserID = $this->UserBadgeModel->Revoke($UserID, $BadgeID);
          $this->InformMessage(T('Revoked badge.'));
-         redirectTo('profile/badges/'.$UserID.'/x', 302, false);
+         redirectTo('profile/badges/'.$UserID.'/x');
       }
 
       $this->SetView404();

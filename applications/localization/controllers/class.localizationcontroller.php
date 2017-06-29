@@ -120,7 +120,7 @@ class LocalizationController extends VanillaController {
          if ($Row)
             Gdn::SQL()->Put('LocaleUser', array('Deleted' => 1), array('Locale' => $Locale, 'UserID' => $UserID));
       }
-      redirectTo("/localization/locale/$Locale", 302, false);
+      redirectTo("/localization/locale/$Locale");
    }
 
    public function Locale($Locale) {
@@ -182,7 +182,7 @@ class LocalizationController extends VanillaController {
       if ($this->Form->IsPostBack()) {
          $Filter = $this->Form->FormValues();
          Gdn::Session()->SetPreference('Localization.Filter', $Filter);
-         redirectTo($Target, 302, false);
+         redirectTo($Target);
       }
    }
 

@@ -198,7 +198,7 @@ class NingRedirectorPlugin extends Gdn_Plugin {
                 echo '<pre>'.print_r($destinationURL, true);
                 die();
             } else {
-                redirectTo($destinationURL, 301, false);
+                redirectTo($destinationURL, 301);
             }
         }
     }

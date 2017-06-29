@@ -231,7 +231,7 @@ class GithubPlugin extends Gdn_Plugin {
         }
 
         if (stristr(Gdn::request()->url(), 'globallogin') !== false) {
-            redirectTo(url('/plugin/github/connect?code='.Gdn::request()->get('code')), 302, false);
+            redirectTo('/plugin/github/connect?code='.Gdn::request()->get('code'));
         }
         $Sender->permission('Garden.SignIn.Allow');
         $Sender->getUserInfo($UserReference, $Username, '', true);
@@ -270,7 +270,7 @@ class GithubPlugin extends Gdn_Plugin {
         $this->EventArguments['User'] = $Sender->User;
         $this->fireEvent('AfterConnection');
 
-        redirectTo(userUrl($Sender->User, '', 'connections'), 302, false);
+        redirectTo(userUrl($Sender->User, '', 'connections'));
     }
 
     /**
@@ -307,7 +307,7 @@ class GithubPlugin extends Gdn_Plugin {
             );
             throw new Gdn_UserException('Error Connecting to GitHub');
         }
-        redirectTo(url('/plugin/github'), 302, false);
+        redirectTo('/plugin/github');
 
     }
 
@@ -332,9 +332,9 @@ class GithubPlugin extends Gdn_Plugin {
             if (c('Plugins.Github.GlobalLogin.Enabled')) {
                 removeFromConfig('Plugins.Github.GlobalLogin.Enabled');
                 removeFromConfig('Plugins.Github.GlobalLogin.AccessToken');
-                redirectTo(url('/plugin/github'), 302, false);
+                redirectTo('/plugin/github');
             }
-            redirectTo(url('/plugin/github/authorize'), 302, false);
+            redirectTo('/plugin/github/authorize');
 
         }
     }

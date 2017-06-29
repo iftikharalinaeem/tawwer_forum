@@ -117,7 +117,7 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
             $Get = $Sender->Request->get();
             unset($Get['ticket']);
             $Url = '/entry/connect/cas?'.http_build_query($Get);
-            redirectTo($Url, 302, false);
+            redirectTo($Url);
         }
     }
 
@@ -140,7 +140,7 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
         if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
             $Get = $Sender->Request->get();
             $Url = '/entry/cas?'.http_build_query($Get);
-            redirectTo($Url, 302, false);
+            redirectTo($Url);
         }
     }
 

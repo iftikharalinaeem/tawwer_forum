@@ -185,10 +185,10 @@ Have fun!!
 
 			if ($IsPreview) {
 				$UserModel->SavePreference($Session->UserID, 'PreviewCustomCSS', TRUE);
-				redirectTo('/', 302, false);
+				redirectTo('/');
 			} else if ($IsExitPreview) {
 				$UserModel->SavePreference($Session->UserID, 'PreviewCustomCSS', FALSE);
-				redirectTo('/plugin/customcss', 302, false);
+				redirectTo('/plugin/customcss');
 			}
 		}
       $Sender->Render(PATH_PLUGINS . DS . 'CustomCSS' . DS . 'views' . DS . 'customcss.php');

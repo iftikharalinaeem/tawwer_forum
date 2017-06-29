@@ -123,7 +123,7 @@ class ImagesPlugin extends Gdn_Plugin {
             $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
             if ($NewDiscussion) {
                // Redirect to the new discussion
-               redirectTo(DiscussionUrl($Discussion).'#latest', 302, false);
+               redirectTo(DiscussionUrl($Discussion).'#latest');
             } elseif (count($CommentIDs) > 0) {
                // Load/return the newly added comments.
                sort($CommentIDs);

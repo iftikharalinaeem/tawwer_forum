@@ -67,7 +67,7 @@ class WarningTypesController extends PluginController {
                 $warningTypeModel->deleteID($warningTypeID);
             }
 
-            redirectTo('settings/warnings', 302, false);
+            redirectTo('settings/warnings');
         } else {
             $this->Form = new Gdn_Form();
             $this->render();

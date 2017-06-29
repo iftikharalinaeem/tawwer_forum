@@ -106,7 +106,7 @@ class SalesforcePlugin extends Gdn_Plugin {
                ->Dispatch('home/error');
             return;
          }
-         redirectTo(Url('/plugin/Salesforce/?DashboardConnection=1&' . http_build_query($Tokens)), 302, false);
+         redirectTo('/plugin/Salesforce/?DashboardConnection=1&'.http_build_query($Tokens));
       }
       try {
          $Tokens = Salesforce::GetTokens($Code, Salesforce::ProfileConnecUrl());
@@ -147,7 +147,7 @@ class SalesforcePlugin extends Gdn_Plugin {
 
       $RedirectUrl = UserUrl($Sender->User, '', 'connections');
 
-      redirectTo($RedirectUrl, 302, false);
+      redirectTo($RedirectUrl);
    }
 
    /**
@@ -187,7 +187,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             'Plugins.Salesforce.DashboardConnection.InstanceUrl' => FALSE
          ));
       }
-      redirectTo(Url('/plugin/Salesforce'), 302, false);
+      redirectTo('/plugin/Salesforce');
    }
 
    /**
@@ -208,18 +208,18 @@ class SalesforcePlugin extends Gdn_Plugin {
          ));
          $Salesforce->SetAccessToken($AccessToken);
          $Salesforce->SetInstanceUrl($InstanceUrl);
-         redirectTo(Url('/plugin/Salesforce'), 302, false);
+         redirectTo('/plugin/Salesforce');
       }
    }
 
    public function Controller_Enable() {
       SaveToConfig('Plugins.Salesforce.DashboardConnection.Enabled', TRUE);
-      redirectTo(Url('/plugin/Salesforce'), 302, false);
+      redirectTo('/plugin/Salesforce');
    }
 
    public function Controller_Disable() {
       RemoveFromConfig('Plugins.Salesforce.DashboardConnection.Enabled');
-      redirectTo(Url('/plugin/Salesforce'), 302, false);
+      redirectTo('/plugin/Salesforce');
    }
 
    /**
@@ -241,7 +241,7 @@ class SalesforcePlugin extends Gdn_Plugin {
          ));
 
          $Sender->InformMessage('Changes Saved to Config');
-         redirectTo(Url('/plugin/Salesforce'), 302, false);
+         redirectTo('/plugin/Salesforce');
       }
       $Sender->SetData(array(
          'DashboardConnection' => C('Plugins.Salesforce.DashboardConnection.Enabled'),

@@ -384,7 +384,7 @@ class CustomThemePlugin extends Gdn_Plugin {
         if ($sender->Form->getFormValue('Exit_Preview') ? true : false || val(0, $sender->RequestArgs, '1') == 'exiteditcss') {
             $userModel->savePreference($session->UserID, 'PreviewCustomTheme', false);
             $userModel->savePreference($session->UserID, 'LiveEditCSS', false);
-            redirectTo('/settings/customtheme', 302, false);
+            redirectTo('/settings/customtheme');
         }
 
         $sender->addJsFile('customtheme.js', 'plugins/CustomTheme');
@@ -553,7 +553,7 @@ Here are some things you should know before you begin:
 
             if ($isPreview && !$smartyCompileError && !$assetError) {
                 $userModel->savePreference($session->UserID, 'PreviewCustomTheme', true);
-                redirectTo('/', 302, false);
+                redirectTo('/');
             }
 
             if ($smartyCompileError) {
