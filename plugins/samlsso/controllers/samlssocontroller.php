@@ -174,7 +174,7 @@ class SAMLSSOController extends PluginController {
             ]);
         }
 
-        $this->redirectTo('/settings/samlsso', false);
+        $this->setRedirectTo('/settings/samlsso', false);
         $this->render('blank', 'utility', 'dashboard');
     }
 

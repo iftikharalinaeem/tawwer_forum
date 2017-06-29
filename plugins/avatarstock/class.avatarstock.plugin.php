@@ -164,7 +164,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
         } else {
             $Sender->ControllerName = 'Home';
             $Sender->View = 'FileNotFound';
-            $Sender->redirectTo($RedirectUrl, false);
+            $Sender->setRedirectTo($RedirectUrl, false);
             $Sender->Render();
         }
     }
@@ -469,9 +469,9 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
                 // If there were no problems, redirect back to the user account
                 if ($sender->deliveryType() === DELIVERY_TYPE_VIEW) {
-                    $sender->redirectTo(userUrl($sender->User), false);
+                    $sender->setRedirectTo(userUrl($sender->User), false);
                 } else {
-                    $sender->redirectTo(userUrl($sender->User, '', 'picture'), false);
+                    $sender->setRedirectTo(userUrl($sender->User, '', 'picture'), false);
                 }
             }
         }

@@ -493,7 +493,7 @@ class WhispersPlugin extends Gdn_Plugin {
                // Link to the discussion.
                $Hash = $MessageID ? "Comment_w$MessageID" : 'Item_1';
                $Name = rawurlencode(GetValue('Name', $Discussion, 'x'));
-               $Sender->redirectTo(Url("discussion/$DiscussionID/$Name?rand=$Rand#$Hash", TRUE), false);
+               $Sender->setRedirectTo(Url("discussion/$DiscussionID/$Name?rand=$Rand#$Hash", TRUE), false);
             }
          }
          require_once $Sender->FetchViewLocation('helper_functions', 'Discussion');

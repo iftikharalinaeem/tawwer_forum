@@ -270,7 +270,7 @@ EOT
             $sender->Form->setValidationResults($statusModel->validationResults());
             if ($result) {
                 $sender->informMessage(t('Your changes have been saved.'));
-                $sender->redirectTo('/settings/statuses', false);
+                $sender->setRedirectTo('/settings/statuses', false);
                 $sender->setData('Status', StatusModel::instance()->getStatus($result));
             }
         } elseif ($statusID) {
