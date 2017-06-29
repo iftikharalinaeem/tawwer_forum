@@ -363,16 +363,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             if ($defaultRoute) {
                 $routes['DefaultController'] = $defaultRoute;
             }
-
-//            Gdn::Router()->SetRoute('categories$', ltrim(CategoryUrl($category, '', '/'), '/'), 'Internal', false);
-//
-//            $defaultRoute = Gdn::Router()->GetRoute('DefaultController');
-//            if ($defaultRoute['Destination'] === 'categories') {
-//                Gdn::Router()->SetRoute('DefaultController', ltrim(CategoryUrl($category, '', '/'), '/'), 'Temporary', false);
-//            }
-//
-//            $sender->EventArguments['Routes']['DefaultForumRoot'] = 'account';
-//            $sender->EventArguments['Routes']['DefaultController'] = 'account';
         }
     }
 
@@ -629,9 +619,21 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     public static function getSubcommunityFromCategoryID($categoryID) {
         $targetSubcommunity = null;
 
+        // Use our own category collection to circumvent a possible recursive call stack because of CategoryModel->calculate()
+        // calling categoryURL() which we redefine here.
+        static $categoryCollection = null;
+        if ($categoryCollection === null) {
+            $noop = function(){};
+            $categoryCollection = CategoryModel::instance()->createCollection();
+            $categoryCollection
+                ->setStaticCalculator($noop)
+                ->setUserCalculator($noop)
+            ;
+        }
+
         if ($categoryID) {
             // Grab this category's ancestors...
-            $parents = CategoryModel::getAncestors($categoryID, false, true);
+            $parents = $categoryCollection->getAncestors($categoryID, true);
             // ...and pull the one from the top. This should be the highest, non-root parent.
             $topParent = reset($parents);
 
@@ -667,6 +669,43 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         }
         $args['Categories'] = array_intersect_key($args['Categories'], array_flip($this->getCategoryIDs()));
     }
+
+    /**
+     * Generate a subcommunity URL as the url() would.
+     *
+     * if $withDomain === '/' then the path is returned as is.
+     *
+     * @param $categoryID The categoryID of which the path belongs to.
+     * @param $path A relative path.
+     * @param bool $withDomain See Gdn_Request->url() option.
+     * @param bool $page (optional) Current page.
+     * @return string The URL.
+     */
+    public static function subcommunityURL($categoryID, $path, $withDomain = true, $page = false) {
+        if ($withDomain === '/') {
+            // Skip webroot / return as is
+            $url = $path;
+        } else {
+            $subcommunity = self::getSubcommunityFromCategoryID($categoryID);
+            $cannonicalURL = self::getCanonicalUrl($path, $subcommunity);
+
+            // The url is supposed to be relative.
+            if (!$withDomain) {
+                $parsedURL = parse_url($cannonicalURL);
+                $url = $parsedURL['path'].$parsedURL['query'].$parsedURL['fragment'];
+            } else if ($withDomain === '//') {
+                $url = url($cannonicalURL, '//');
+            } else {
+                $url = $cannonicalURL;
+            }
+        }
+
+        if ($page && ($page > 1 || Gdn::session()->UserID)) {
+            $url .= "/p{$page}";
+        }
+
+        return $url;
+    }
 }
 
 if (!function_exists('commentUrl')) {
@@ -678,37 +717,39 @@ if (!function_exists('commentUrl')) {
      * @return string
      */
     function commentUrl($comment, $withDomain = true) {
-        $comment = (object)$comment;
-        $commentID = val('CommentID', $comment);
+        $comment = (array)$comment;
+        $commentID = $comment['CommentID'];
+        $path = "/discussion/comment/{$commentID}#Comment_{$commentID}";
 
         // This isn't normally on the comment record, but may come across as part of a search result.
         $categoryID = val('CategoryID', $comment);
 
-        if ($categoryID === false) {
+        if (!$categoryID) {
             // This would normally be on the comment record, but may not come across as part of a search result.
             $discussionID = val('DiscussionID', $comment);
 
             // Try to dig up the discussion ID by looking up the comment.
             if ($discussionID === false) {
                 $commentModel = new CommentModel();
-                $comment = $commentModel->getID($comment->CommentID);
+                $comment = $commentModel->getID($commentID, DATASET_TYPE_ARRAY);
                 if ($comment) {
-                    $discussionID = val('DiscussionID', $comment);
+                    $discussionID = $comment['DiscussionID'];
                 }
             }
 
             // Try to dig up the category ID by looking up the discussion.
             $discussionModel = new DiscussionModel();
-            $discussion = $discussionModel->getID($discussionID);
+            $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
             if ($discussion) {
-                $categoryID = val('CategoryID', $discussion);
+                $categoryID = $discussion['CategoryID'];
             }
         }
 
-        $path = "/discussion/comment/{$commentID}#Comment_{$commentID}";
-        $subcommunity = SubcommunitiesPlugin::getSubcommunityFromCategoryID($categoryID);
+        if (!$categoryID) {
+            return '/home/notfound';
+        }
 
-        return SubcommunitiesPlugin::getCanonicalUrl($path, $subcommunity);
+        return SubcommunitiesPlugin::subcommunityURL($categoryID, $path, $withDomain);
     }
 }
 
@@ -722,26 +763,39 @@ if (!function_exists('discussionUrl')) {
      * @return string
      */
     function discussionUrl($discussion, $page = '', $withDomain = true) {
-        $discussion = (object)$discussion;
-        $name = Gdn_Format::url(val('Name', $discussion));
-        $categoryID = val('CategoryID', $discussion);
-        $discussionID = $discussion->DiscussionID;
+        $discussion = (array)$discussion;
+        $name = Gdn_Format::url($discussion['Name']);
+        $categoryID = $discussion['CategoryID'];
+        $discussionID = $discussion['DiscussionID'];
 
         // Disallow an empty name slug in discussion URLs.
         if (empty($name)) {
             $name = 'x';
         }
 
-        $path = "/discussion/{$discussionID}/{$name}";
+        $path = "/discussion/$discussionID/$name";
 
-        if ($page) {
-            if ($page > 1 || Gdn::session()->UserID) {
-                $path .= "/p{$page}";
-            }
+        return SubcommunitiesPlugin::subcommunityURL($categoryID, $path, $withDomain, $page);
+    }
+}
+
+if (!function_exists('categoryUrl')) {
+    /**
+     * Return a URL for a category.
+     *
+     * @param object $category
+     * @param int|string $page
+     * @param bool $withDomain
+     * @return string
+     */
+    function categoryUrl($category, $page = '', $withDomain = true) {
+        if (is_string($category)) {
+            $category = CategoryModel::categories($category);
         }
+        $category = (array)$category;
+        $categoryID = $category['CategoryID'];
+        $path = '/categories/'.rawurlencode($category['UrlCode']);
 
-        $subcommunity = SubcommunitiesPlugin::getSubcommunityFromCategoryID($categoryID);
-
-        return SubcommunitiesPlugin::getCanonicalUrl($path, $subcommunity);
+        return SubcommunitiesPlugin::subcommunityURL($categoryID, $path, $withDomain, $page);
     }
 }
