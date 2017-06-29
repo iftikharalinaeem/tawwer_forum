@@ -72,7 +72,7 @@ class RoleTrackerController extends Gdn_Controller {
         }
 
         if ($url) {
-            $this->RedirectUrl = $url;
+            $this->setRedirectTo($url, false);
             if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
                 redirectTo($url, 302, false);
             }

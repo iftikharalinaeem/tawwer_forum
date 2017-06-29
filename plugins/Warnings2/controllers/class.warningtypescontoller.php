@@ -38,7 +38,7 @@ class WarningTypesController extends PluginController {
         if ($this->Form->authenticatedPostBack() !== false) {
             if ($this->Form->save() !== false) {
                 $this->informMessage(t('Your changes have been saved.'));
-                $this->RedirectUrl = url('settings/warnings');
+                $this->setRedirectTo('settings/warnings', false);
             }
         }
 

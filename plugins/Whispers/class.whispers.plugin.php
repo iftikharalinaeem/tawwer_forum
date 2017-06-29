@@ -488,12 +488,12 @@ class WhispersPlugin extends Gdn_Plugin {
                // Link to the last comment.
                $HashID = $MessageID ? 'w'.$MessageID : $LastCommentID;
 
-               $Sender->RedirectUrl = Url("discussion/comment/$LastCommentID?rand=$Rand#Comment_$HashID", TRUE);
+               $Sender->redirecTo(Url("discussion/comment/$LastCommentID?rand=$Rand#Comment_$HashID", TRUE), false);
             } else {
                // Link to the discussion.
                $Hash = $MessageID ? "Comment_w$MessageID" : 'Item_1';
                $Name = rawurlencode(GetValue('Name', $Discussion, 'x'));
-               $Sender->RedirectUrl = Url("discussion/$DiscussionID/$Name?rand=$Rand#$Hash", TRUE);
+               $Sender->setRedirectTo(Url("discussion/$DiscussionID/$Name?rand=$Rand#$Hash", TRUE), false);
             }
          }
          require_once $Sender->FetchViewLocation('helper_functions', 'Discussion');
