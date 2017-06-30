@@ -830,7 +830,7 @@ class SiteNodePlugin extends Gdn_Plugin {
                 'RoleID' => $roleID,
                 'OverrideHub' => $overrideHub
             ]);
-            $sender->setRedirectTo('/role', false);
+            $sender->setRedirectTo('/role');
         } else {
             $form->SetData($role);
         }
