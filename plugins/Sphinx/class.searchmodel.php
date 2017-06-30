@@ -11,10 +11,9 @@
 if (!class_exists('SphinxClient') && c('Plugins.Sphinx.SphinxAPIDir')) {
     $sphinxClientPath = rtrim(c('Plugins.Sphinx.SphinxAPIDir'), '/').'/sphinxapi.php';
     if (!is_readable($sphinxClientPath)) {
-        die("'$sphinxClientPath' is not readable is not readable!");
-    } else {
-        require_once($sphinxClientPath);
+        die("'$sphinxClientPath' is not readable!");
     }
+    require_once($sphinxClientPath);
 }
 
 if (!defined('SPH_RANK_SPH04')) {
