@@ -627,8 +627,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $categoryCollection = CategoryModel::instance()->createCollection();
             $categoryCollection
                 ->setStaticCalculator($noop)
-                ->setUserCalculator($noop)
-            ;
+                ->setUserCalculator($noop);
         }
 
         if ($categoryID) {
