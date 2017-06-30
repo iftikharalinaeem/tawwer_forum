@@ -37,8 +37,7 @@ class SphinxPlugin extends Gdn_Plugin {
         if (!class_exists('SphinxClient')) {
             throw new Exception(
                 'Sphinx requires the sphinx client to be installed (See http://www.php.net/manual/en/book.sphinx.php). '
-                ."\n".
-                'Alternatively you can set "Plugins.Sphinx.SphinxAPIDir" to the location of sphinxapi.php before enabling the plugin (See https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php).'
+                .'Alternatively you can set "Plugins.Sphinx.SphinxAPIDir" to the location of sphinxapi.php before enabling the plugin (See https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php).'
             );
         }
 
