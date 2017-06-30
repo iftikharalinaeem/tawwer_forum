@@ -5,6 +5,17 @@
  * @license Proprietary
  */
 
+// Kludge that allows to use the correct version (the version must match the sphinx deamon version)
+// of https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php as SphinxClient.
+// Must do on php7 if you want to use a SphinxClient without compiling the php extension yourself.
+if (!class_exists('SphinxClient') && c('Plugins.Sphinx.SphinxAPIDir')) {
+    $sphinxClientPath = rtrim(c('Plugins.Sphinx.SphinxAPIDir'), '/').'/sphinxapi.php';
+    if (!is_readable($sphinxClientPath)) {
+        die("'$sphinxClientPath' is not readable!");
+    }
+    require_once($sphinxClientPath);
+}
+
 if (!defined('SPH_RANK_SPH04')) {
     define('SPH_RANK_SPH04', 7);
 }
@@ -559,7 +570,7 @@ class SearchModel extends Gdn_Model {
 
     /**
      * Get SphinxClient object
-     * 
+     *
      * @return SphinxClient
      */
     public function sphinxClient() {
