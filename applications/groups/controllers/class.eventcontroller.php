@@ -326,9 +326,9 @@ class EventController extends Gdn_Controller {
             if ($Deleted) {
                 $this->informMessage(formatString(t('<b>{Name}</b> deleted.'), $Event));
                 if ($Group) {
-                    $this->setRedirectTo(groupUrl($Group), false);
+                    $this->setRedirectTo(groupUrl($Group));
                 } else {
-                    $this->setRedirectTo('/groups', false);
+                    $this->setRedirectTo('/groups');
                 }
             } else {
                 $this->informMessage(t('Failed to delete event.'));

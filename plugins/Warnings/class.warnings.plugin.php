@@ -194,7 +194,7 @@ class WarningsPlugin extends Gdn_Plugin {
          $WarningModel->ProcessWarnings($Warning['WarnUserID']);
          if ($Form->ErrorCount() == 0) {
             if ($Target)
-               $Sender->setRedirectTo($Target, false);
+               $Sender->setRedirectTo($Target);
             else
                $Sender->JsonTarget('', '', 'Refresh');
          }

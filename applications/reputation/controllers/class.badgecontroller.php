@@ -116,12 +116,12 @@ class BadgeController extends ReputationController {
 
             // Success & redirect
             $this->InformMessage(T('Badge deleted.'));
-            $this->setRedirectTo('reputation/badge/all', false);
+            $this->setRedirectTo('reputation/badge/all');
          }
          else {
             // Failure & redirect
             $this->InformMessage(T('Badge cannot be deleted.'));
-            $this->setRedirectTo('reputation/badge/all', false);
+            $this->setRedirectTo('reputation/badge/all');
          }
       }
       else {
@@ -211,7 +211,7 @@ class BadgeController extends ReputationController {
          // Give to named users
          if ($Result) {
             $this->InformMessage(T('Gave badge to users.'));
-            $this->setRedirectTo('reputation/badge/all', false);
+            $this->setRedirectTo('reputation/badge/all');
          }
       }
 
@@ -269,7 +269,7 @@ class BadgeController extends ReputationController {
                $this->SetData('Badge', $OutputBadge);
 
                $this->InformMessage(T('Gave badge to user.'));
-               $this->setRedirectTo('profile/'.$UserID.'/'.GetValue('Name', $this->User), false);
+               $this->setRedirectTo('profile/'.$UserID.'/'.GetValue('Name', $this->User));
             }
          } else {
             throw NotFoundException('Badge');
@@ -413,7 +413,7 @@ class BadgeController extends ReputationController {
             $Message = ($Insert) ? T('Created new badge') : T('Updated badge');
             $Message .= ' &ldquo;' . $BadgeName. '&rdquo;';
             $this->InformMessage($Message);
-            $this->setRedirectTo('reputation/badge/all', false);
+            $this->setRedirectTo('reputation/badge/all');
          }
       }
 

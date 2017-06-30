@@ -75,7 +75,7 @@ class SettingsController extends DashboardController {
                $this->CreateFile($this->Form->GetFormValue('LocaleToCreate'));
 
             }
-            $this->setRedirectTo('/localization/settings', false);
+            $this->setRedirectTo('/localization/settings');
          } catch (Exception $Ex) {
             $this->Form->AddError($Ex);
          }
@@ -122,7 +122,7 @@ class SettingsController extends DashboardController {
       $Count = $this->LocalizationModel->DownloadLocaleList();
       $this->InformMessage('The locale list was successfully downloaded.');
 
-      $this->setRedirectTo('/localization/settings', false);
+      $this->setRedirectTo('/localization/settings');
       $this->AddSideMenu();
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
@@ -133,7 +133,7 @@ class SettingsController extends DashboardController {
       $this->LocalizationModel->DownloadLocale($AddonKey);
       $this->InformMessage('The locale pack was successfully downloaded.');
 
-      $this->setRedirectTo('/localization/settings', false);
+      $this->setRedirectTo('/localization/settings');
       $this->AddSideMenu();
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
@@ -184,7 +184,7 @@ class SettingsController extends DashboardController {
       }
       LocalizationModel::RefreshCalculatedFields();
 
-      $this->setRedirectTo('/localization/settings', false);
+      $this->setRedirectTo('/localization/settings');
       $this->AddSideMenu();
       $this->Render('Blank', 'Utility', 'Dashboard');
    }
