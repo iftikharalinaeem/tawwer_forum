@@ -491,6 +491,37 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
+     * Override permissions for editing comments.
+     *
+     * @param PostController $sender
+     */
+    public function postController_editComment_before($sender) {
+        $commentID = val('CommentID', $sender->ReflectArgs);
+        if (!$commentID) {
+            return;
+        }
+
+        // Get the groupID of this comment.
+        $comment = $sender->CommentModel->getID($commentID);
+        $discussion = $sender->DiscussionModel->getID(val('DiscussionID', $comment));
+        $groupID = val('GroupID', $discussion);
+
+        if (!$groupID) {
+            return;
+        }
+
+        $model = new GroupModel();
+        $group = $model->getID($groupID);
+        if (!$group) {
+            return;
+        }
+
+        $sender->setData('Group', $group);
+
+        $model->overridePermissions($group);
+    }
+
+    /**
      * @param PostController $Sender
      */
     public function PostController_Discussion_Before($Sender) {
