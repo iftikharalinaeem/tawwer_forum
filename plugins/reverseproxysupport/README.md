@@ -56,7 +56,7 @@ Proxy setup:
 
 Plugin setup:
 
-- Proxy URL: //proxy.exampe.com/community (This will allow both http:// and https:// urls)
+- Proxy URL: //proxy.example.com/community (This will allow both http:// and https:// urls)
 
 Test the configuration and voila!
 
