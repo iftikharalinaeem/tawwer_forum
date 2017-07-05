@@ -1,12 +1,12 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php
 /**
  * @copyright Copyright 2008, 2009 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-// 1.0.6 - Lincoln, Apr 2013
-// -- Adds 'Force Notify' feature for roles
-
+/**
+ * Class VanillaPopPlugin
+ */
 class VanillaPopPlugin extends Gdn_Plugin {
     /// Properties ///
     static $FormatDefaults = array(
@@ -29,8 +29,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
     /// Methods ///
 
     public static function AddIDToEmail($Email, $ID) {
-        if (!C('Plugins.VanillaPop.AugmentFrom', TRUE))
+        if (!C('Plugins.VanillaPop.AugmentFrom', TRUE)) {
             return;
+        }
 
         // Encode the message ID in the from.
         $FromParts = explode('@', $Email, 2);
@@ -66,8 +67,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         if ($Quote) {
-            if (is_array($Quote))
+            if (is_array($Quote)) {
                 $Quote = Gdn_Format::PlainText($Quote['Body'], GetValue('Format', $Quote, 'Text'));
+            }
 
             $Quote = "\n\n".T('You wrote:')."\n\n".self::FormatQuoteText($Quote);
         }
@@ -77,8 +79,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
     }
 
     public static function EmailSignature($Route = '', $CanView = TRUE, $CanReply = TRUE) {
-        if (!$Route)
+        if (!$Route) {
             $CanView = FALSE;
+        }
 
         if ($CanView && $CanReply) {
             $Signature = FormatString(T('ReplyOrFollow'))."\n".ExternalUrl($Route);
@@ -98,12 +101,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
     }
 
     public static function LabelCode($SchemaRow) {
-        if (isset($SchemaRow['LabelCode']))
+        if (isset($SchemaRow['LabelCode'])) {
             return $SchemaRow['LabelCode'];
+        }
 
         $LabelCode = $SchemaRow['Name'];
-        if (strpos($LabelCode, '.') !== FALSE)
+        if (strpos($LabelCode, '.') !== FALSE) {
             $LabelCode = trim(strrchr($LabelCode, '.'), '.');
+        }
 
         // Split camel case labels into seperate words.
         $LabelCode = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $LabelCode);
@@ -143,8 +148,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         $i = NULL;
         foreach ($Parts as $Part) {
-            if (!$Part)
+            if (!$Part) {
                 continue;
+            }
             if (preg_match('`^\s`', $Part)) {
                 if (isset($Result[$i])) {
                     $Result[$i] .= "\n".$Part;
@@ -222,10 +228,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
         } else {
             // This might be a category.
             $Category = CategoryModel::Categories($UID);
-            if ($Category)
+            if ($Category) {
                 return array('Category', $Category['CategoryID']);
-            else
+            } else {
                 return array(NULL, NULL);
+            }
         }
     }
 
@@ -260,8 +267,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $Data['Attributes'] = dbencode(ArrayTranslate($Data, array('Headers', 'Source')));
 
         $Data['Body'] = self::StripEmail($Data['Body']);
-        if (!$Data['Body'])
+        if (!$Data['Body']) {
             $Data['Body'] = T('(empty message)');
+        }
 
         list($FromName, $FromEmail) = self::ParseEmailAddress($Data['From']);
 
@@ -271,8 +279,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
         } else {
             $CategoryID = C('Plugins.VanillaPop.DefaultCategoryID', -1);
         }
-        if (!$CategoryID)
+        if (!$CategoryID) {
             $CategoryID = -1;
+        }
         TouchValue('CategoryID', $Data, $CategoryID);
 
         // See if there is a user at the given email.
@@ -488,8 +497,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
             'ConversationMessage' => array('Message', 'ConversationID'));
 
         $ReplyTo = trim(GetValue('ReplyTo', $Data));
-        if (!$ReplyTo)
+        if (!$ReplyTo) {
             return NULL;
+        }
 
         foreach ($Tables as $Name => $Info) {
             $Row = Gdn::SQL()->GetWhere($Name, array('Source' => 'Email', 'SourceID' => $ReplyTo))->FirstRow(DATASET_TYPE_ARRAY);
@@ -533,21 +543,25 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
     /**
      * Set the from address to the name of the user that sent the notification.
+     *
      * @param Gdn_Email $PhpMailer
      * @param int|array
      */
     public function SetFrom($Email, $User) {
-        if (!C('Plugins.VanillaPop.OverrideFrom', TRUE))
+        if (!C('Plugins.VanillaPop.OverrideFrom', TRUE)) {
             return;
+        }
 
-        if (is_numeric($User))
+        if (is_numeric($User)) {
             $User = Gdn::UserModel()->GetID($User);
+        }
 
         $Email->PhpMailer->FromName = GetValue('Name', $User);
     }
 
     /**
      * Send the initial confirmation email when a discussion is first started through email.
+     *
      * @param type $Discussion
      * @param type $User
      */
@@ -589,8 +603,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $Email->Send();
         } catch (Exception $Ex) {
             // Do nothing for now...
-            if (Debug())
+            if (Debug()) {
                 throw $Ex;
+            }
         }
     }
 
@@ -637,21 +652,25 @@ class VanillaPopPlugin extends Gdn_Plugin {
     public static function SimpleForm($Form, $Schema) {
         echo '<ul>';
         foreach ($Schema as $Index => $Row) {
-            if (is_string($Row))
+            if (is_string($Row)) {
                 $Row = array('Name' => $Index, 'Control' => $Row);
+            }
 
-            if (!isset($Row['Name']))
+            if (!isset($Row['Name'])) {
                 $Row['Name'] = $Index;
-            if (!isset($Row['Options']))
+            }
+            if (!isset($Row['Options'])) {
                 $Row['Options'] = array();
+            }
 
             echo "<li>\n  ";
 
             $LabelCode = self::LabelCode($Row);
 
             $Description = GetValue('Description', $Row, '');
-            if ($Description)
+            if ($Description) {
                 $Description = '<div class="Info">'.$Description.'</div>';
+            }
 
             TouchValue('Control', $Row, 'TextBox');
 
@@ -690,11 +709,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
     public static function StripSignature($Body) {
         $i = strrpos($Body, "\n--");
-        if ($i === FALSE)
+        if ($i === FALSE) {
             return $Body;
+        }
         $j = strpos($Body, "\n", $i + 1);
-        if ($j === FALSE)
+        if ($j === FALSE) {
             return $Body;
+        }
 
         $Delim = trim(substr($Body, $i, $j - $i + 1));
         if (preg_match('`^-+$`', $Delim)) {
@@ -718,6 +739,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
     /**
      * Get the current site hostname.
+     *
      * @return string Returns the current site hostname.
      */
     public function getSiteHostname() {
@@ -930,10 +952,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
                             $Email->Subject($Subject);
 
                             $Source = GetValue('Source', $Discussion);
-                            if ($Source == 'Email')
-                                $ReplyTo = GetValue('SourceID', $Discussion); // replying to an email...
-                            else
+                            if ($Source == 'Email') {
+                                 // replying to an email...
+                                $ReplyTo = GetValue('SourceID', $Discussion);
+                            }
+                            else {
                                 $ReplyTo = self::uid('Discussion', GetValue('DiscussionID', $Discussion), 'email');
+                            }
 
                             $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::uid('Discussion', GetValue('DiscussionID', $Discussion)));
                         }
@@ -958,10 +983,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
                             ->Get()->FirstRow(DATASET_TYPE_ARRAY);
 
                         if ($Message2) {
-                            if ($Message2['Source'] == 'Email')
+                            if ($Message2['Source'] == 'Email') {
                                 $ReplyTo = $Message2['SourceID'];
-                            else
+                            } else {
                                 $ReplyTo = self::uid('Message', $Message2['MessageID'], 'email');
+                            }
                         }
 
                         $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::uid('Message', GetValue('MessageID', $Message)));
@@ -1165,8 +1191,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         foreach (self::$FormatDefaults as $Name => $Default) {
             $Options = val('Options', $ConfSettings['EmailFormat.'.$Name], array());
-            if (StringEndsWith($Name, 'Body'))
+            if (StringEndsWith($Name, 'Body')) {
                 $Options['Multiline'] = TRUE;
+            }
             $ConfSettings['EmailFormat.'.$Name] = array('Control' => 'TextBox', 'Default' => $Default, 'Options' => $Options);
         }
 
@@ -1201,8 +1228,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * Allow roles to be configured to force email notifications.
      */
     public function Base_BeforeRolePermissions_Handler($Sender) {
-        if (!C('Plugins.VanillaPop.AllowForceNotify'))
+        if (!C('Plugins.VanillaPop.AllowForceNotify')) {
             return;
+        }
 
         $NotifyOptions = array(
             0 => 'Notify these users normally using their preferences (recommended)',
@@ -1222,8 +1250,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * Send forced email notifications.
      */
     public function ForceNotify($Sender, $Args) {
-        if (!C('Plugins.VanillaPop.AllowForceNotify'))
+        if (!C('Plugins.VanillaPop.AllowForceNotify')) {
             return;
+        }
 
         $Activity = $Args['Activity'];
         $ActivityModel = $Args['ActivityModel'];
@@ -1256,6 +1285,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             ->From('UserRole')
             ->WhereIn('RoleID', $RoleIDs)
             ->Get()->ResultArray();
+
 
         // Add an activity for each person and pray we don't melt the wibbles.
         foreach ($UserRoles as $UserRole) {

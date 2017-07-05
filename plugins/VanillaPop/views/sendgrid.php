@@ -4,14 +4,14 @@
     <?php
     echo $this->Form->Open(), $this->Form->Errors();
 
-    VanillaPopPlugin::SimpleForm($this->Form, array(
+    VanillaPopPlugin::SimpleForm($this->Form, [
         'from' => 'TextBox',
         'to' => 'TextBox',
         'subject' => 'TextBox',
-        'text' => array('Control' => 'TextBox', 'Options' => array('Multiline' => TRUE)),
-        'html' => array('Control' => 'TextBox', 'Options' => array('Multiline' => TRUE)),
-        'headers' => array('Control' => 'TextBox', 'Options' => array('Multiline' => TRUE))
-    ));
+        'text' => ['Control' => 'TextBox', 'Options' => ['Multiline' => TRUE]],
+        'html' => ['Control' => 'TextBox', 'Options' => ['Multiline' => TRUE]],
+        'headers' => ['Control' => 'TextBox', 'Options' => ['Multiline' => TRUE]]
+    ]);
 
     echo $this->Form->Close('Post');
     ?>

@@ -4,15 +4,15 @@
     <?php
     echo $this->Form->Open(), $this->Form->Errors();
 
-    VanillaPopPlugin::SimpleForm($this->Form, array(
+    VanillaPopPlugin::SimpleForm($this->Form, [
         'From' => 'TextBox',
         'To' => 'TextBox',
         'Subject' => 'TextBox',
-        'Body' => array('Control' => 'TextBox', 'Options' => array('Multiline' => TRUE)),
-        'Format' => array('Control' => 'RadioList', 'Items' => array('Html' => 'Html', 'Text' => 'Text'), 'Options' => array('Default' => 'Html')),
+        'Body' => ['Control' => 'TextBox', 'Options' => ['Multiline' => TRUE]],
+        'Format' => ['Control' => 'RadioList', 'Items' => ['Html' => 'Html', 'Text' => 'Text'], 'Options' => ['Default' => 'Html']],
         'MessageID' => 'TextBox',
         'ReplyTo' => 'TextBox'
-    ));
+    ]);
 
     echo '<div class="Buttons">'.$this->Form->Close('Post').'</div>';
     ?>
