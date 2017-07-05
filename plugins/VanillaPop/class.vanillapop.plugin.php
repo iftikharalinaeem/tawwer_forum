@@ -59,11 +59,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
     public static function formatEmailBody($Body, $Route = '', $Quote = '', $Options = false) {
         // Construct the signature.
         if ($Route) {
-            $Signature = formatString(T('ReplyOrFollow'))."\n".externalUrl($Route);
+            $Signature = formatString(t('ReplyOrFollow'))."\n".externalUrl($Route);
         } elseif ($Route === false) {
             $Signature = externalUrl('/');
         } else {
-            $Signature = formatString(T('ReplyOnly'));
+            $Signature = formatString(t('ReplyOnly'));
         }
 
         if ($Quote) {
@@ -74,7 +74,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $Quote = "\n\n".t('You wrote:')."\n\n".self::formatQuoteText($Quote);
         }
 
-        $Result = formatString(T('EmailTemplate'), ['Body' => $Body, 'Signature' => $Signature, 'Quote' => $Quote]);
+        $Result = formatString(t('EmailTemplate'), ['Body' => $Body, 'Signature' => $Signature, 'Quote' => $Quote]);
         return $Result;
     }
 
@@ -84,11 +84,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         if ($CanView && $CanReply) {
-            $Signature = formatString(T('ReplyOrFollow'))."\n".externalUrl($Route);
+            $Signature = formatString(t('ReplyOrFollow'))."\n".externalUrl($Route);
         } elseif ($CanView) {
-            $Signature = formatString(T('FollowOnly'))."\n".externalUrl($Route);
+            $Signature = formatString(t('FollowOnly'))."\n".externalUrl($Route);
         } elseif ($CanReply) {
-            $Signature = formatString(T('ReplyOnly'));
+            $Signature = formatString(t('ReplyOnly'));
         } else {
             $Signature = externalUrl('/');
         }
@@ -437,7 +437,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 if (!$CommentID) {
                     throw new Exception($CommentModel->Validation->resultsText().print_r($Data, true), 400);
                 } else {
-                    $CommentModel->Save2($CommentID, true);
+                    $CommentModel->save2($CommentID, true);
                 }
                 trace("Saved comment $CommentID");
                 return $CommentID;
@@ -581,11 +581,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         $Email = new Gdn_Email();
 
-        $Message = formatString(C('EmailFormat.ConfirmationBody', self::$FormatDefaults['ConfirmationBody']), $FormatData);
+        $Message = formatString(c('EmailFormat.ConfirmationBody', self::$FormatDefaults['ConfirmationBody']), $FormatData);
         $Email->message($Message);
 
         // We are using the standard confirmation subject because some email clients won't group emails unless their subject are the exact same.
-        $Subject = formatString(C('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
+        $Subject = formatString(c('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
         $Email->subject($Subject);
 
         $Email->PhpMailer->MessageID = self::uid('Discussion', $Discussion['DiscussionID'], 'email');
@@ -896,10 +896,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
                         $Discussion['Url'] = externalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::url($Discussion['Name']));
                         $FormatData = array_merge($FormatData, $Discussion);
 
-                        $Message = formatString(C('EmailFormat.DiscussionBody', self::$FormatDefaults['DiscussionBody']), $FormatData);
+                        $Message = formatString(c('EmailFormat.DiscussionBody', self::$FormatDefaults['DiscussionBody']), $FormatData);
                         $Email->message($Message);
 
-                        $Subject = formatString(C('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
+                        $Subject = formatString(c('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
                         $Email->subject($Subject);
 
                         $this->setFrom($Email, $Discussion['InsertUserID']);
@@ -945,10 +945,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
                             $FormatData['Discussion'] = $Discussion;
                             $FormatData['Category'] = CategoryModel::categories($Discussion['CategoryID']);
 
-                            $Message = formatString(C('EmailFormat.CommentBody', self::$FormatDefaults['CommentBody']), $FormatData);
+                            $Message = formatString(c('EmailFormat.CommentBody', self::$FormatDefaults['CommentBody']), $FormatData);
                             $Email->message($Message);
 
-                            $Subject = formatString(C('EmailFormat.CommentSubject', self::$FormatDefaults['CommentSubject']), $FormatData);
+                            $Subject = formatString(c('EmailFormat.CommentSubject', self::$FormatDefaults['CommentSubject']), $FormatData);
                             $Email->subject($Subject);
 
                             $Source = val('Source', $Discussion);
