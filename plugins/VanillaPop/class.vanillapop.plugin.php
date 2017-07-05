@@ -9,21 +9,21 @@
  */
 class VanillaPopPlugin extends Gdn_Plugin {
     /// Properties ///
-    static $FormatDefaults = array(
+    static $FormatDefaults = [
         'DiscussionSubject' => '[{Title}] {Name}',
         'DiscussionBody' => "{Body}\n\n-- \n{Signature}",
         'CommentSubject' => 'Re: [{Title}] {Discussion.Name}',
         'CommentBody' => "{Body}\n\n-- \n{Signature}",
-        'ConfirmationBody' => "Your request has been received (ticket #{ID}).\n\nThis is just a confirmation email, but you can reply directly to follow up.\n\nYou wrote:\n{Quote}\n\n-- \n{Signature}");
+        'ConfirmationBody' => "Your request has been received (ticket #{ID}).\n\nThis is just a confirmation email, but you can reply directly to follow up.\n\nYou wrote:\n{Quote}\n\n-- \n{Signature}"];
 
     /**
      * @var array A list of email domains for receiving email.
      */
-    protected $emailDomains = array(
+    protected $emailDomains = [
         'vanillaforums.com' => 'vanillaforums.email',
         'vanillacommunity.com' => 'vanillacommunity.email',
         'vanillacommunities.com' => 'vanillacommunities.email'
-    );
+    ];
 
 
     /// Methods ///
@@ -74,7 +74,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $Quote = "\n\n".T('You wrote:')."\n\n".self::FormatQuoteText($Quote);
         }
 
-        $Result = FormatString(T('EmailTemplate'), array('Body' => $Body, 'Signature' => $Signature, 'Quote' => $Quote));
+        $Result = FormatString(T('EmailTemplate'), ['Body' => $Body, 'Signature' => $Signature, 'Quote' => $Quote]);
         return $Result;
     }
 
@@ -138,12 +138,12 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $Name = implode(' ', $NameParts);
         }
 
-        $Result = array($Name, $Email);
+        $Result = [$Name, $Email];
         return $Result;
     }
 
     public static function ParseEmailHeader($Header) {
-        $Result = array();
+        $Result = [];
         $Parts = explode("\n", $Header);
 
         $i = NULL;
@@ -177,10 +177,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $Type = 'Message';
             $ID = $Matches[1];
         } else {
-            return array(NULL, NULL);
+            return [NULL, NULL];
         }
 
-        return array($Type, $ID);
+        return [$Type, $ID];
     }
 
     public static function ParseType($Email) {
@@ -204,10 +204,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 }
             }
         }
-        return array($Type, $ID);
+        return [$Type, $ID];
     }
 
-    public static $Types = array('d' => 'Discussion', 'c' => 'Comment', 'u' => 'User', 'cv' => 'Conversation', 'm' => 'Message');
+    public static $Types = ['d' => 'Discussion', 'c' => 'Comment', 'u' => 'User', 'cv' => 'Conversation', 'm' => 'Message'];
 
     public static function ParseUID($UID) {
         // Strip off email stuff.
@@ -216,22 +216,22 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         if (strcasecmp($UID, 'noreply') == 0) {
-            return array('noreply', NULL);
+            return ['noreply', NULL];
         }
 
         if (preg_match('`([a-z]+)-?([0-9]+)`i', $UID, $Matches)) {
             $Type = GetValue($Matches[1], self::$Types, NULL);
             if ($Type) {
                 $ID = $Matches[2];
-                return array($Type, $ID);
+                return [$Type, $ID];
             }
         } else {
             // This might be a category.
             $Category = CategoryModel::Categories($UID);
             if ($Category) {
-                return array('Category', $Category['CategoryID']);
+                return ['Category', $Category['CategoryID']];
             } else {
-                return array(NULL, NULL);
+                return [NULL, NULL];
             }
         }
     }
@@ -264,7 +264,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         // Save the full post for debugging.
-        $Data['Attributes'] = dbencode(ArrayTranslate($Data, array('Headers', 'Source')));
+        $Data['Attributes'] = dbencode(ArrayTranslate($Data, ['Headers', 'Source']));
 
         $Data['Body'] = self::StripEmail($Data['Body']);
         if (!$Data['Body']) {
@@ -291,16 +291,16 @@ class VanillaPopPlugin extends Gdn_Plugin {
             if (C('Plugins.VanillaPop.AllowUserRegistration')) {
                 SaveToConfig('Garden.Registration.NameUnique', FALSE, FALSE);
                 $Sender->Data['_Status'][] = 'Creating user.';
-                $User = array(
+                $User = [
                     'Name' => $FromName,
                     'Email' => $FromEmail,
                     'Password' => RandomString(10),
                     'HashMethod' => 'Random',
                     'Source' => 'Email',
                     'SourceID' => $FromEmail
-                );
+                ];
 
-                $UserID = $UserModel->InsertForBasic($User, FALSE, array('NoConfirmEmail' => 'NoConfirmEmail'));
+                $UserID = $UserModel->InsertForBasic($User, FALSE, ['NoConfirmEmail' => 'NoConfirmEmail']);
 
                 if (!$UserID) {
                     throw new Exception(T('Error creating user.').' '.$UserModel->Validation->ResultsText(), 400);
@@ -426,7 +426,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
                 // Make sure there isn't already a comment saved from this email.
                 if ($Data['SourceID']) {
-                    $ExistingComment = $CommentModel->GetWhere(array('Source' => 'Email', 'SourceID' => $Data['SourceID']))->FirstRow();
+                    $ExistingComment = $CommentModel->GetWhere(['Source' => 'Email', 'SourceID' => $Data['SourceID']])->FirstRow();
                     if ($ExistingComment) {
                         Trace("This email has already been saved.");
                         return TRUE;
@@ -491,10 +491,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
     }
 
     public function SaveTypeFromRepyTo(&$Data) {
-        $Tables = array(
-            'Discussion' => array('Comment', 'DiscussionID'),
-            'Comment' => array('Comment', 'DiscussionID'),
-            'ConversationMessage' => array('Message', 'ConversationID'));
+        $Tables = [
+            'Discussion' => ['Comment', 'DiscussionID'],
+            'Comment' => ['Comment', 'DiscussionID'],
+            'ConversationMessage' => ['Message', 'ConversationID']];
 
         $ReplyTo = trim(GetValue('ReplyTo', $Data));
         if (!$ReplyTo) {
@@ -502,7 +502,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         foreach ($Tables as $Name => $Info) {
-            $Row = Gdn::SQL()->GetWhere($Name, array('Source' => 'Email', 'SourceID' => $ReplyTo))->FirstRow(DATASET_TYPE_ARRAY);
+            $Row = Gdn::SQL()->GetWhere($Name, ['Source' => 'Email', 'SourceID' => $ReplyTo])->FirstRow(DATASET_TYPE_ARRAY);
             if ($Row) {
                 $Result = $Info[0];
                 $Data[$Info[1]] = $Row[$Info[1]];
@@ -614,10 +614,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
     }
 
     public function Structure() {
-        Gdn::PermissionModel()->Define(array(
+        Gdn::PermissionModel()->Define([
             'Email.Discussions.Add' => 'Garden.Profiles.Edit',
             'Email.Comments.Add' => 'Garden.Profiles.Edit',
-            'Email.Conversations.Add' => 'Garden.Profiles.Edit'));
+            'Email.Conversations.Add' => 'Garden.Profiles.Edit']);
 
         Gdn::Structure()
             ->Table('User')
@@ -653,14 +653,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
         echo '<ul>';
         foreach ($Schema as $Index => $Row) {
             if (is_string($Row)) {
-                $Row = array('Name' => $Index, 'Control' => $Row);
+                $Row = ['Name' => $Index, 'Control' => $Row];
             }
 
             if (!isset($Row['Name'])) {
                 $Row['Name'] = $Index;
             }
             if (!isset($Row['Options'])) {
-                $Row['Options'] = array();
+                $Row['Options'] = [];
             }
 
             echo "<li>\n  ";
@@ -759,12 +759,12 @@ class VanillaPopPlugin extends Gdn_Plugin {
     protected function splitHostname($hostname) {
         $parts = explode('.', $hostname);
         if (count($parts) <= 2) {
-            return array('', $hostname);
+            return ['', $hostname];
         } else {
-            return array(
+            return [
                 implode('.', array_slice($parts, 0, -2)),
                 implode('.', array_slice($parts, -2))
-            );
+            ];
         }
     }
 
@@ -866,10 +866,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
             list($Type, $ID) = self::ParseRoute(GetValue('Route', $Args));
         }
 
-        $FormatData = array('Title' => C('Garden.Title'), 'Signature' => self::EmailSignature(GetValue('Route', $Args)));
+        $FormatData = ['Title' => C('Garden.Title'), 'Signature' => self::EmailSignature(GetValue('Route', $Args))];
         $NotifyUserID = GetValueR('Activity.NotifyUserID', $Args);
 
-        if (in_array($Type, array('Discussion', 'Comment', 'Conversation', 'Message'))) {
+        if (in_array($Type, ['Discussion', 'Comment', 'Conversation', 'Message'])) {
             $Email = $Args['Email']; //new Gdn_Email(); //
             $Story = GetValue('Story', $Args);
 
@@ -918,11 +918,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
                         $Comment['Body'] = $Body;
                         $Comment['Url'] = ExternalUrl(GetValue('Route', $Args));
-                        $Comment = array($Comment);
-                        Gdn::UserModel()->JoinUsers($Comment, array('InsertUserID', 'UpdateUserID'));
+                        $Comment = [$Comment];
+                        Gdn::UserModel()->JoinUsers($Comment, ['InsertUserID', 'UpdateUserID']);
                         $Comment = $Comment[0];
 
-                        if (in_array(GetValueR('Activity.ActivityType', $Args), array('AnswerAccepted'))) {
+                        if (in_array(GetValueR('Activity.ActivityType', $Args), ['AnswerAccepted'])) {
                             $Comment['Body'] = Gdn_Format::PlainText($Args['Headline'], 'Html')."\n\n".$Comment['Body'];
                         }
 
@@ -967,7 +967,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     break;
                 case 'Message':
                     // Get this message.
-                    $Message = Gdn::SQL()->GetWhere('ConversationMessage', array('MessageID' => $ID))->FirstRow(DATASET_TYPE_ARRAY);
+                    $Message = Gdn::SQL()->GetWhere('ConversationMessage', ['MessageID' => $ID])->FirstRow(DATASET_TYPE_ARRAY);
                     if ($Message) {
                         $ConversationID = $Message['ConversationID'];
                         $this->SetFrom($Email, $Message['InsertUserID']);
@@ -1031,7 +1031,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $CommentID = $Comment['CommentID'];
             $HeadlineFormat = T('HeadlineFormat.Comment', '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>');
 
-            $Activity = array(
+            $Activity = [
                 'ActivityType' => 'Comment',
                 'ActivityUserID' => $Comment['InsertUserID'],
                 'NotifyUserID' => $InsertUserID,
@@ -1039,12 +1039,12 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 'RecordType' => 'Comment',
                 'RecordID' => $CommentID,
                 'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
-                'Data' => array('Name' => GetValue('Name', $Args['Discussion'])),
+                'Data' => ['Name' => GetValue('Name', $Args['Discussion'])],
                 'Notified' => ActivityModel::SENT_OK,
                 'Emailed' => ActivityModel::SENT_PENDING
-            );
+            ];
 
-            $ActivityModel->Queue($Activity, FALSE, array('Force' => TRUE));
+            $ActivityModel->Queue($Activity, FALSE, ['Force' => TRUE]);
         }
 
         // Notify anyone in a ForceNotify role
@@ -1078,11 +1078,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $Args['BlockExceptions']['`post/sendgrid(\/.*)?$`'] = Gdn_Dispatcher::BLOCK_NEVER;
     }
 
-    public function PostController_Email_Create($Sender, $Args = array()) {
+    public function PostController_Email_Create($Sender, $Args = []) {
         $this->UtilityController_Email_Create($Sender, $Args);
     }
 
-    public function UtilityController_Email_Create($Sender, $Args = array()) {
+    public function UtilityController_Email_Create($Sender, $Args = []) {
         if (Gdn::Session()->UserID == 0) {
             Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE);
             Gdn::Session()->User->Admin = FALSE;
@@ -1102,7 +1102,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $Sender->Render('Email', '', 'plugins/VanillaPop');
     }
 
-    public function PostController_Sendgrid_Create($Sender, $Args = array()) {
+    public function PostController_Sendgrid_Create($Sender, $Args = []) {
         $this->UtilityController_Sendgrid_Create($Sender, $Args);
     }
 
@@ -1111,7 +1111,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * @param PostController $Sender
      * @param array $Args
      */
-    public function UtilityController_Sendgrid_Create($Sender, $Args = array()) {
+    public function UtilityController_Sendgrid_Create($Sender, $Args = []) {
         try {
             Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE);
             Gdn::Session()->User->Admin = FALSE;
@@ -1122,17 +1122,17 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 self::Log("Getting post...");
                 $Post = $Sender->Form->FormValues();
                 self::Log("Post got...");
-                $Data = ArrayTranslate($Post, array(
+                $Data = ArrayTranslate($Post, [
                     'from' => 'From',
                     'to' => 'To',
                     'subject' => 'Subject'
-                ));
+                ]);
 
                 //         self::Log('Parsing headers.'.GetValue('headers', $Post, ''));
                 $Headers = self::ParseEmailHeader(GetValue('headers', $Post, ''));
                 //         self::Log('Headers: '.print_r($Headers, TRUE));
                 $Headers = array_change_key_case($Headers);
-                $HeaderData = ArrayTranslate($Headers, array('message-id' => 'MessageID', 'references' => 'References', 'in-reply-to' => 'ReplyTo'));
+                $HeaderData = ArrayTranslate($Headers, ['message-id' => 'MessageID', 'references' => 'References', 'in-reply-to' => 'ReplyTo']);
                 $Data = array_merge($Data, $HeaderData);
 
                 if (FALSE && GetValue('html', $Post)) {
@@ -1171,30 +1171,30 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * @param SettingsController $sender
      * @param array $args
      */
-    public function SettingsController_VanillaPop_Create($sender, $args = array()) {
+    public function SettingsController_VanillaPop_Create($sender, $args = []) {
         $sender->Permission('Garden.Settings.Manage');
 
-        $ConfSettings = array(
-            'Plugins.VanillaPop.DefaultCategoryID' => array('Control' => 'CategoryDropDown', 'Description' => 'Place discussions started through email in the following category.'),
-            'Plugins.VanillaPop.AllowUserRegistration' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow new users to be registered through email.'),
-            'Plugins.VanillaPop.AugmentFrom' => array('Control' => 'CheckBox', 'LabelCode' => 'Add information into the from field in email addresses to help with replies (recommended).', 'Default' => TRUE),
-            'Garden.Email.SupportAddress' => array('Control' => 'TextBox', 'LabelCode' => 'Outgoing Email Address', 'Description' => 'This is the address that will show up in the from field of emails sent from the application.'),
-            'EmailFormat.DiscussionSubject' => array('Control' => 'TextBox'),
-            'EmailFormat.DiscussionBody' => array(),
+        $ConfSettings = [
+            'Plugins.VanillaPop.DefaultCategoryID' => ['Control' => 'CategoryDropDown', 'Description' => 'Place discussions started through email in the following category.'],
+            'Plugins.VanillaPop.AllowUserRegistration' => ['Control' => 'CheckBox', 'LabelCode' => 'Allow new users to be registered through email.'],
+            'Plugins.VanillaPop.AugmentFrom' => ['Control' => 'CheckBox', 'LabelCode' => 'Add information into the from field in email addresses to help with replies (recommended).', 'Default' => TRUE],
+            'Garden.Email.SupportAddress' => ['Control' => 'TextBox', 'LabelCode' => 'Outgoing Email Address', 'Description' => 'This is the address that will show up in the from field of emails sent from the application.'],
+            'EmailFormat.DiscussionSubject' => ['Control' => 'TextBox'],
+            'EmailFormat.DiscussionBody' => [],
             'EmailFormat.CommentSubject' => [],
-            'EmailFormat.CommentBody' => array(),
-            'Plugins.VanillaPop.SendConfirmationEmail' => array('Control' => 'CheckBox', 'LabelCode' => 'Send a confirmation email when people ask a question or start a discussion over email.'),
-            'EmailFormat.ConfirmationBody' => array(),
-            'Plugins.VanillaPop.AllowForceNotify' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow roles to be configured to force email notifications to users.'),
+            'EmailFormat.CommentBody' => [],
+            'Plugins.VanillaPop.SendConfirmationEmail' => ['Control' => 'CheckBox', 'LabelCode' => 'Send a confirmation email when people ask a question or start a discussion over email.'],
+            'EmailFormat.ConfirmationBody' => [],
+            'Plugins.VanillaPop.AllowForceNotify' => ['Control' => 'CheckBox', 'LabelCode' => 'Allow roles to be configured to force email notifications to users.'],
 
-        );
+        ];
 
         foreach (self::$FormatDefaults as $Name => $Default) {
-            $Options = val('Options', $ConfSettings['EmailFormat.'.$Name], array());
+            $Options = val('Options', $ConfSettings['EmailFormat.'.$Name], []);
             if (StringEndsWith($Name, 'Body')) {
                 $Options['Multiline'] = TRUE;
             }
-            $ConfSettings['EmailFormat.'.$Name] = array('Control' => 'TextBox', 'Default' => $Default, 'Options' => $Options);
+            $ConfSettings['EmailFormat.'.$Name] = ['Control' => 'TextBox', 'Default' => $Default, 'Options' => $Options];
         }
 
         $Conf = new ConfigurationModule($sender);
@@ -1232,17 +1232,17 @@ class VanillaPopPlugin extends Gdn_Plugin {
             return;
         }
 
-        $NotifyOptions = array(
+        $NotifyOptions = [
             0 => 'Notify these users normally using their preferences (recommended)',
             1 => 'Notify these users for every new comment and discussion',
             2 => 'Notify these users for new announcements'
-        );
+        ];
 
-        $Sender->Data['_ExtendedFields']['ForceNotify'] = array(
+        $Sender->Data['_ExtendedFields']['ForceNotify'] = [
             'LabelCode' => 'Notifications Override',
             'Control' => 'DropDown',
             'Items' => $NotifyOptions
-        );
+        ];
 
     }
 
@@ -1264,13 +1264,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         // Get effected roles.
         $RoleModel = new RoleModel();
-        $RoleIDs = array();
+        $RoleIDs = [];
         if ($ActivityType == 'Discussion' && GetValue('Announce', $Args['Discussion'])) {
             // Add everyone with force notify all OR announcement-only option.
-            $Wheres = array('ForceNotify >' => 0);
+            $Wheres = ['ForceNotify >' => 0];
         } else {
             // Only get users with force notify all.
-            $Wheres = array('ForceNotify' => 1);
+            $Wheres = ['ForceNotify' => 1];
         }
 
         $Roles = $RoleModel->GetWhere($Wheres)->ResultArray();
@@ -1290,7 +1290,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         // Add an activity for each person and pray we don't melt the wibbles.
         foreach ($UserRoles as $UserRole) {
             $Activity['NotifyUserID'] = $UserRole['UserID'];
-            $ActivityModel->Queue($Activity, FALSE, array('Force' => TRUE));
+            $ActivityModel->Queue($Activity, FALSE, ['Force' => TRUE]);
         }
     }
 
