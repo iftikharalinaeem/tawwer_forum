@@ -29,7 +29,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
     /// Methods ///
 
     public static function addIDToEmail($Email, $ID) {
-        if (!C('Plugins.VanillaPop.AugmentFrom', TRUE)) {
+        if (!C('Plugins.VanillaPop.AugmentFrom', true)) {
             return;
         }
 
@@ -42,7 +42,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
     }
 
     public static function checkUserPermission($UserID, $Permission) {
-        $Permissions = Gdn::userModel()->definePermissions($UserID, FALSE);
+        $Permissions = Gdn::userModel()->definePermissions($UserID, false);
         $Result = in_array($Permission, $Permissions) || array_key_exists($Permission, $Permissions);
         return $Result;
     }
@@ -51,16 +51,16 @@ class VanillaPopPlugin extends Gdn_Plugin {
 //      $Result = Gdn_Format::to($Body, $Format);
 //
 //      if ($Format != 'Text')
-//         $Result = Gdn_Format::text($Result, FALSE);
+//         $Result = Gdn_Format::text($Result, false);
 //      $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
 //      return $Result;
 //   }
 
-    public static function formatEmailBody($Body, $Route = '', $Quote = '', $Options = FALSE) {
+    public static function formatEmailBody($Body, $Route = '', $Quote = '', $Options = false) {
         // Construct the signature.
         if ($Route) {
             $Signature = formatString(T('ReplyOrFollow'))."\n".externalUrl($Route);
-        } elseif ($Route === FALSE) {
+        } elseif ($Route === false) {
             $Signature = externalUrl('/');
         } else {
             $Signature = formatString(T('ReplyOnly'));
@@ -78,9 +78,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
         return $Result;
     }
 
-    public static function emailSignature($Route = '', $CanView = TRUE, $CanReply = TRUE) {
+    public static function emailSignature($Route = '', $CanView = true, $CanReply = true) {
         if (!$Route) {
-            $CanView = FALSE;
+            $CanView = false;
         }
 
         if ($CanView && $CanReply) {
@@ -106,7 +106,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         $LabelCode = $SchemaRow['Name'];
-        if (strpos($LabelCode, '.') !== FALSE) {
+        if (strpos($LabelCode, '.') !== false) {
             $LabelCode = trim(strrchr($LabelCode, '.'), '.');
         }
 
@@ -146,7 +146,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $Result = [];
         $Parts = explode("\n", $Header);
 
-        $i = NULL;
+        $i = null;
         foreach ($Parts as $Part) {
             if (!$Part) {
                 continue;
@@ -177,20 +177,20 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $Type = 'Message';
             $ID = $Matches[1];
         } else {
-            return [NULL, NULL];
+            return [null, null];
         }
 
         return [$Type, $ID];
     }
 
     public static function parseType($Email) {
-        $Type = NULL;
-        $ID = NULL;
+        $Type = null;
+        $ID = null;
         if (preg_match('`\+([a-z]+-?[0-9]+)@`', $Email, $Matches)) {
             list($Type, $ID) = self::parseUID($Matches[1]);
         } elseif (preg_match('`\+noreply@`i', $Email, $Matches)) {
             $Type = 'noreply';
-            $ID = NULL;
+            $ID = null;
         } else {
             // See if there is a category in the email address.
             $Parts = explode('@', $Email);
@@ -216,11 +216,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         if (strcasecmp($UID, 'noreply') == 0) {
-            return ['noreply', NULL];
+            return ['noreply', null];
         }
 
         if (preg_match('`([a-z]+)-?([0-9]+)`i', $UID, $Matches)) {
-            $Type = getValue($Matches[1], self::$Types, NULL);
+            $Type = getValue($Matches[1], self::$Types, null);
             if ($Type) {
                 $ID = $Matches[2];
                 return [$Type, $ID];
@@ -231,14 +231,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
             if ($Category) {
                 return ['Category', $Category['CategoryID']];
             } else {
-                return [NULL, NULL];
+                return [null, null];
             }
         }
     }
 
     protected function save($Data, $Sender) {
-        $ReplyType = NULL;
-        $ReplyID = NULL;
+        $ReplyType = null;
+        $ReplyID = null;
 
         if (getValue('ReplyTo', $Data)) {
             trace("ReplyTo: {$Data['ReplyTo']}");
@@ -260,7 +260,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         trace("Reply type: $ReplyType, Reply id: $ReplyID");
 
         if (strcasecmp($ReplyType, 'noreply') == 0) {
-            return TRUE;
+            return true;
         }
 
         // Save the full post for debugging.
@@ -289,7 +289,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $User = $UserModel->getByEmail($FromEmail);
         if (!$User) {
             if (c('Plugins.VanillaPop.AllowUserRegistration')) {
-                saveToConfig('Garden.Registration.NameUnique', FALSE, FALSE);
+                saveToConfig('Garden.Registration.NameUnique', false, false);
                 $Sender->Data['_Status'][] = 'Creating user.';
                 $User = [
                     'Name' => $FromName,
@@ -300,7 +300,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     'SourceID' => $FromEmail
                 ];
 
-                $UserID = $UserModel->insertForBasic($User, FALSE, ['NoConfirmEmail' => 'NoConfirmEmail']);
+                $UserID = $UserModel->insertForBasic($User, false, ['NoConfirmEmail' => 'NoConfirmEmail']);
 
                 if (!$UserID) {
                     throw new Exception(T('Error creating user.').' '.$UserModel->Validation->resultsText(), 400);
@@ -310,13 +310,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
             } else {
                 $this->sendEmail($FromEmail, '',
                     t("Whoops! You'll need to register before you can email our site."), $Data);
-                return TRUE;
+                return true;
             }
         } else {
             $Sender->Data['_Status'][] = 'User exists';
             $User = (array)$User;
         }
-        Gdn::session()->start($User['UserID'], FALSE);
+        Gdn::session()->start($User['UserID'], false);
         $Data['InsertUserID'] = $User['UserID'];
 
         // Get the parent record and make sure the post is going in the right place.
@@ -327,7 +327,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $DiscussionModel = new DiscussionModel();
                     $Discussion = $DiscussionModel->getID($ReplyID);
                     if (!$Discussion) {
-                        $InvalidReply = TRUE;
+                        $InvalidReply = true;
                         $SaveType = 'Discussion';
                     } else {
                         $SaveType = 'Comment';
@@ -340,7 +340,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $CommentModel = new CommentModel();
                     $Comment = $CommentModel->getID($ReplyID, DATASET_TYPE_ARRAY);
                     if (!$Comment) {
-                        $InvalidReply = TRUE;
+                        $InvalidReply = true;
                         $SaveType = 'Discussion';
                     } else {
                         // Grab the discussion so we can see its category.
@@ -356,7 +356,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $ConversationModel = new ConversationModel();
                     $Conversation = $ConversationModel->getID($ReplyID);
                     if (!$Conversation) {
-                        $InvalidReply = TRUE;
+                        $InvalidReply = true;
                         $SaveType = 'Discussion';
                     } else {
                         // TODO: Check permission.
@@ -370,7 +370,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $MessageModel = new ConversationMessageModel();
                     $Message = $MessageModel->getID($ReplyID, DATASET_TYPE_ARRAY);
                     if (!$Message) {
-                        $InvalidReply = TRUE;
+                        $InvalidReply = true;
                         $SaveType = 'Discussion';
                     } else {
                         // TODO: Check permission.
@@ -390,7 +390,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         // Set the source of the post.
         $Data['Source'] = 'Email';
-        $Data['SourceID'] = getValue('MessageID', $Data, NULL);
+        $Data['SourceID'] = getValue('MessageID', $Data, null);
         unset($Data['MessageID']);
 
         $Category = CategoryModel::categories(GetValue('CategoryID', $Data));
@@ -409,17 +409,17 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
                     $this->sendEmail($FromEmail, '',
                         t("Sorry! You don't have permission to comment through email."), $Data);
-                    return TRUE;
-                } elseif (!Gdn::session()->checkPermission('Vanilla.Comments.Add', TRUE, 'Category', $PermissionCategoryID)) {
+                    return true;
+                } elseif (!Gdn::session()->checkPermission('Vanilla.Comments.Add', true, 'Category', $PermissionCategoryID)) {
                     trace("Doesn't have Vanilla.Comments.Add for category", TRACE_WARNING);
 
                     $this->sendEmail($FromEmail, '',
                         t("Sorry! You don't have permission to post right now."), $Data);
-                    return TRUE;
+                    return true;
                 } elseif (val('Closed', $Discussion)) {
                     $this->sendEmail($FromEmail, '',
                         t("Sorry! This discussion has been closed."), $Data);
-                    return TRUE;
+                    return true;
                 }
 
                 $CommentModel = new CommentModel();
@@ -429,15 +429,15 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $ExistingComment = $CommentModel->getWhere(['Source' => 'Email', 'SourceID' => $Data['SourceID']])->firstRow();
                     if ($ExistingComment) {
                         trace("This email has already been saved.");
-                        return TRUE;
+                        return true;
                     }
                 }
 
                 $CommentID = $CommentModel->save($Data);
                 if (!$CommentID) {
-                    throw new Exception($CommentModel->Validation->resultsText().print_r($Data, TRUE), 400);
+                    throw new Exception($CommentModel->Validation->resultsText().print_r($Data, true), 400);
                 } else {
-                    $CommentModel->Save2($CommentID, TRUE);
+                    $CommentModel->Save2($CommentID, true);
                 }
                 trace("Saved comment $CommentID");
                 return $CommentID;
@@ -445,13 +445,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 if (!Gdn::session()->checkPermission('Email.Conversations.Add')) {
                     $this->sendEmail($FromEmail, '',
                         t("Sorry! You don't have permission to send messages through email."), $Data);
-                    return TRUE;
+                    return true;
                 }
 
                 $MessageModel = new ConversationMessageModel();
                 $MessageID = $MessageModel->save($Data);
                 if (!$MessageID) {
-                    throw new Exception($MessageModel->Validation->resultsText().print_r($Data, TRUE), 400);
+                    throw new Exception($MessageModel->Validation->resultsText().print_r($Data, true), 400);
                 }
                 return $MessageID;
             case 'Discussion':
@@ -462,13 +462,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
                     $this->sendEmail($FromEmail, '',
                         t("Sorry! You don't have permission to post discussions/questions through email."), $Data);
-                    return TRUE;
-                } elseif (!Gdn::session()->checkPermission('Vanilla.Discussions.Add', TRUE, 'Category', $PermissionCategoryID)) {
+                    return true;
+                } elseif (!Gdn::session()->checkPermission('Vanilla.Discussions.Add', true, 'Category', $PermissionCategoryID)) {
                     trace("Sorry! You don't have permission to post right now.", TRACE_WARNING);
 
                     $this->sendEmail($FromEmail, '',
                         t("Sorry! You don't have permission to post right now."), $Data);
-                    return TRUE;
+                    return true;
                 }
 
                 $Data['Name'] = $Data['Subject'];
@@ -476,7 +476,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 $DiscussionModel = new DiscussionModel();
                 $DiscussionID = $DiscussionModel->save($Data);
                 if (!$DiscussionID) {
-                    throw new Exception($DiscussionModel->Validation->resultsText().print_r($Data, TRUE), 400);
+                    throw new Exception($DiscussionModel->Validation->resultsText().print_r($Data, true), 400);
                 }
                 trace("Saved discussion $DiscussionID");
 
@@ -498,7 +498,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         $ReplyTo = trim(getValue('ReplyTo', $Data));
         if (!$ReplyTo) {
-            return NULL;
+            return null;
         }
 
         foreach ($Tables as $Name => $Info) {
@@ -510,10 +510,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 return $Result;
             }
         }
-        return NULL;
+        return null;
     }
 
-    public function sendEmail($To, $Subject, $Body, $Quote = FALSE) {
+    public function sendEmail($To, $Subject, $Body, $Quote = false) {
         trace("Email: $Body");
 
         $Email = new Gdn_Email();
@@ -531,11 +531,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
             $Subject = getValue('Subject', $Quote);
             if ($Subject) {
-                $Email->subject(sprintf('Re: [%s] %s', c('Garden.Title'), ltrim(stringBeginsWith($Subject, 'Re:', TRUE, TRUE))));
+                $Email->subject(sprintf('Re: [%s] %s', c('Garden.Title'), ltrim(stringBeginsWith($Subject, 'Re:', true, true))));
             }
         }
 
-        $Message = self::formatEmailBody($Body, FALSE, $Quote);
+        $Message = self::formatEmailBody($Body, false, $Quote);
 
         $Email->message($Message);
         @$Email->send();
@@ -548,7 +548,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * @param int|array
      */
     public function setFrom($Email, $User) {
-        if (!C('Plugins.VanillaPop.OverrideFrom', TRUE)) {
+        if (!C('Plugins.VanillaPop.OverrideFrom', true)) {
             return;
         }
 
@@ -621,26 +621,26 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         Gdn::structure()
             ->table('User')
-            ->column('Source', 'varchar(20)', NULL)
-            ->column('SourceID', 'varchar(191)', NULL, 'index')
+            ->column('Source', 'varchar(20)', null)
+            ->column('SourceID', 'varchar(191)', null, 'index')
             ->set();
 
         Gdn::structure()
             ->table('Discussion')
-            ->column('Source', 'varchar(20)', NULL)
-            ->column('SourceID', 'varchar(191)', NULL, 'index')
+            ->column('Source', 'varchar(20)', null)
+            ->column('SourceID', 'varchar(191)', null, 'index')
             ->set();
 
         Gdn::structure()
             ->table('Comment')
-            ->column('Source', 'varchar(20)', NULL)
-            ->column('SourceID', 'varchar(191)', NULL, 'index')
+            ->column('Source', 'varchar(20)', null)
+            ->column('SourceID', 'varchar(191)', null, 'index')
             ->set();
 
         Gdn::structure()
             ->table('ConversationMessage')
-            ->column('Source', 'varchar(20)', NULL)
-            ->column('SourceID', 'varchar(191)', NULL, 'index')
+            ->column('Source', 'varchar(20)', null)
+            ->column('SourceID', 'varchar(191)', null, 'index')
             ->set();
 
         Gdn::structure()
@@ -691,7 +691,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 case 'checkboxlist':
                     echo $Form->label($LabelCode, $Row['Name']);
                     echo $Description;
-                    echo $Form->checkBoxList($Row['Name'], $Row['Items'], NULL, $Row['Options']);
+                    echo $Form->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']);
                     break;
                 case 'textbox':
                     echo $Form->label($LabelCode, $Row['Name']);
@@ -709,11 +709,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
     public static function stripSignature($Body) {
         $i = strrpos($Body, "\n--");
-        if ($i === FALSE) {
+        if ($i === false) {
             return $Body;
         }
         $j = strpos($Body, "\n", $i + 1);
-        if ($j === FALSE) {
+        if ($j === false) {
             return $Body;
         }
 
@@ -769,7 +769,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
     }
 
     public static function stripEmail($Body) {
-        $SigFound = FALSE;
+        $SigFound = false;
         $InQuotes = 0;
 
         $Body = str_replace("\r\n", "\n", $Body);
@@ -786,16 +786,16 @@ class VanillaPopPlugin extends Gdn_Plugin {
             } elseif (!$SigFound && preg_match('`^\s*--`', $Line)) {
                 // -- Signature delimiter.
                 $LastLine = $i;
-                $SigFound = TRUE;
+                $SigFound = true;
             } elseif (preg_match('`^\s*---.+---\s*$`', $Line)) {
                 // This will catch an ------Original Message------ heade
                 $LastLine = $i;
-                $InQuotes = FALSE;
+                $InQuotes = false;
             } elseif ($InQuotes === 0) {
                 if (preg_match('`wrote:\s*$`i', $Line)) {
                     // This is the quote line...
                     $LastLine = $i;
-                    $InQuotes = FALSE;
+                    $InQuotes = false;
 
                     $PrevLine = val($i - 1, $Lines);
                     $OnRegex = '`^On\s+`i';
@@ -806,7 +806,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 } elseif (preg_match('`^\s*$`', $Line)) {
                     $LastLine = $i;
                 } else {
-                    $InQuotes = FALSE;
+                    $InQuotes = false;
                 }
             }
         }
@@ -937,7 +937,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                             // See if the user has permission to view this discussion on the site.
                             $CanView = Gdn::userModel()->getCategoryViewPermission($NotifyUserID, getValue('CategoryID', $Discussion));
                             $CanReply = self::checkUserPermission($NotifyUserID, 'Email.Comments.Add');
-                            $FormatData['Signature'] = self::emailSignature(GetValue('Route', $Args), $CanView, $CanReply); //.print_r(array('CanView' => $CanView, 'CanReply' => $CanReply), TRUE);
+                            $FormatData['Signature'] = self::emailSignature(GetValue('Route', $Args), $CanView, $CanReply); //.print_r(array('CanView' => $CanView, 'CanReply' => $CanReply), true);
 
                             $Discussion['Name'] = Gdn_Format::plainText($Discussion['Name'], 'Text');
                             $Discussion['Body'] = Gdn_Format::plainText($Discussion['Body'], $Discussion['Format']);
@@ -994,7 +994,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     }
 
                     // See if the user has permission to view this discussion on the site.
-                    $CanView = TRUE;
+                    $CanView = true;
                     $CanReply = self::checkUserPermission($NotifyUserID, 'Email.Conversations.Add');
                     $FormatData['Signature'] = self::emailSignature(GetValue('Route', $Args), $CanView, $CanReply);
 
@@ -1044,7 +1044,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 'Emailed' => ActivityModel::SENT_PENDING
             ];
 
-            $ActivityModel->queue($Activity, FALSE, ['Force' => TRUE]);
+            $ActivityModel->queue($Activity, false, ['Force' => true]);
         }
 
         // Notify anyone in a ForceNotify role
@@ -1069,7 +1069,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 //      $Format = getValueR('Object.Format', $Args);
 //      $Text = self::formatPlainText($Body, $Format);
 //
-//      $Source = getValue('Source', $Attributes, FALSE);
+//      $Source = getValue('Source', $Attributes, false);
 //      if (is_array($Source))
 //         echo '<pre>'.htmlspecialchars(getValue("Headers", $Attributes), $Source).'</pre>';
 //   }
@@ -1084,8 +1084,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
     public function utilityController_email_create($Sender, $Args = []) {
         if (Gdn::session()->UserID == 0) {
-            Gdn::session()->start(Gdn::userModel()->getSystemUserID(), FALSE);
-            Gdn::session()->User->Admin = FALSE;
+            Gdn::session()->start(Gdn::userModel()->getSystemUserID(), false);
+            Gdn::session()->User->Admin = false;
         }
 
         if ($Sender->Form->isPostBack()) {
@@ -1113,8 +1113,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
      */
     public function utilityController_sendgrid_create($Sender, $Args = []) {
         try {
-            Gdn::session()->start(Gdn::userModel()->getSystemUserID(), FALSE);
-            Gdn::session()->User->Admin = FALSE;
+            Gdn::session()->start(Gdn::userModel()->getSystemUserID(), false);
+            Gdn::session()->User->Admin = false;
 
             if ($Sender->Form->isPostBack()) {
                 self::log("Postback");
@@ -1130,12 +1130,12 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
                 //         self::log('Parsing headers.'.getValue('headers', $Post, ''));
                 $Headers = self::parseEmailHeader(GetValue('headers', $Post, ''));
-                //         self::log('Headers: '.print_r($Headers, TRUE));
+                //         self::log('Headers: '.print_r($Headers, true));
                 $Headers = array_change_key_case($Headers);
                 $HeaderData = arrayTranslate($Headers, ['message-id' => 'MessageID', 'references' => 'References', 'in-reply-to' => 'ReplyTo']);
                 $Data = array_merge($Data, $HeaderData);
 
-                if (FALSE && getValue('html', $Post)) {
+                if (false && getValue('html', $Post)) {
                     $Data['Body'] = $Post['html'];
                     $Data['Format'] = 'Html';
                 } else {
@@ -1159,7 +1159,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         } catch (Exception $Ex) {
             $Contents = $Ex->getMessage()."\n"
                 .$Ex->getTraceAsString()."\n"
-                .print_r($_POST, TRUE);
+                .print_r($_POST, true);
             file_put_contents(PATH_UPLOADS.'/email/error_'.time().'.txt', $Contents);
 
             throw $Ex;
@@ -1177,7 +1177,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $ConfSettings = [
             'Plugins.VanillaPop.DefaultCategoryID' => ['Control' => 'CategoryDropDown', 'Description' => 'Place discussions started through email in the following category.'],
             'Plugins.VanillaPop.AllowUserRegistration' => ['Control' => 'CheckBox', 'LabelCode' => 'Allow new users to be registered through email.'],
-            'Plugins.VanillaPop.AugmentFrom' => ['Control' => 'CheckBox', 'LabelCode' => 'Add information into the from field in email addresses to help with replies (recommended).', 'Default' => TRUE],
+            'Plugins.VanillaPop.AugmentFrom' => ['Control' => 'CheckBox', 'LabelCode' => 'Add information into the from field in email addresses to help with replies (recommended).', 'Default' => true],
             'Garden.Email.SupportAddress' => ['Control' => 'TextBox', 'LabelCode' => 'Outgoing Email Address', 'Description' => 'This is the address that will show up in the from field of emails sent from the application.'],
             'EmailFormat.DiscussionSubject' => ['Control' => 'TextBox'],
             'EmailFormat.DiscussionBody' => [],
@@ -1192,7 +1192,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         foreach (self::$FormatDefaults as $Name => $Default) {
             $Options = val('Options', $ConfSettings['EmailFormat.'.$Name], []);
             if (stringEndsWith($Name, 'Body')) {
-                $Options['Multiline'] = TRUE;
+                $Options['Multiline'] = true;
             }
             $ConfSettings['EmailFormat.'.$Name] = ['Control' => 'TextBox', 'Default' => $Default, 'Options' => $Options];
         }
@@ -1290,7 +1290,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         // Add an activity for each person and pray we don't melt the wibbles.
         foreach ($UserRoles as $UserRole) {
             $Activity['NotifyUserID'] = $UserRole['UserID'];
-            $ActivityModel->queue($Activity, FALSE, ['Force' => TRUE]);
+            $ActivityModel->queue($Activity, false, ['Force' => true]);
         }
     }
 

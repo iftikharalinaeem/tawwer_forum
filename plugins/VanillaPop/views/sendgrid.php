@@ -8,9 +8,9 @@
         'from' => 'TextBox',
         'to' => 'TextBox',
         'subject' => 'TextBox',
-        'text' => ['Control' => 'TextBox', 'Options' => ['Multiline' => TRUE]],
-        'html' => ['Control' => 'TextBox', 'Options' => ['Multiline' => TRUE]],
-        'headers' => ['Control' => 'TextBox', 'Options' => ['Multiline' => TRUE]]
+        'text' => ['Control' => 'TextBox', 'Options' => ['Multiline' => true]],
+        'html' => ['Control' => 'TextBox', 'Options' => ['Multiline' => true]],
+        'headers' => ['Control' => 'TextBox', 'Options' => ['Multiline' => true]]
     ]);
 
     echo $this->Form->close('Post');

@@ -8,7 +8,7 @@
         'From' => 'TextBox',
         'To' => 'TextBox',
         'Subject' => 'TextBox',
-        'Body' => ['Control' => 'TextBox', 'Options' => ['Multiline' => TRUE]],
+        'Body' => ['Control' => 'TextBox', 'Options' => ['Multiline' => true]],
         'Format' => ['Control' => 'RadioList', 'Items' => ['Html' => 'Html', 'Text' => 'Text'], 'Options' => ['Default' => 'Html']],
         'MessageID' => 'TextBox',
         'ReplyTo' => 'TextBox'
