@@ -1,10 +1,10 @@
 <?php if (!defined('APPLICATION')) exit; ?>
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 <div id="DiscussionForm">
     <?php
-    echo $this->Form->Open(), $this->Form->Errors();
+    echo $this->Form->open(), $this->Form->errors();
 
-    VanillaPopPlugin::SimpleForm($this->Form, [
+    VanillaPopPlugin::simpleForm($this->Form, [
         'from' => 'TextBox',
         'to' => 'TextBox',
         'subject' => 'TextBox',
@@ -13,6 +13,6 @@
         'headers' => ['Control' => 'TextBox', 'Options' => ['Multiline' => TRUE]]
     ]);
 
-    echo $this->Form->Close('Post');
+    echo $this->Form->close('Post');
     ?>
 </div>

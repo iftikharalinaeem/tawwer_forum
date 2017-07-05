@@ -28,7 +28,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
     /// Methods ///
 
-    public static function AddIDToEmail($Email, $ID) {
+    public static function addIDToEmail($Email, $ID) {
         if (!C('Plugins.VanillaPop.AugmentFrom', TRUE)) {
             return;
         }
@@ -41,66 +41,66 @@ class VanillaPopPlugin extends Gdn_Plugin {
         return $Email;
     }
 
-    public static function CheckUserPermission($UserID, $Permission) {
-        $Permissions = Gdn::UserModel()->DefinePermissions($UserID, FALSE);
+    public static function checkUserPermission($UserID, $Permission) {
+        $Permissions = Gdn::userModel()->definePermissions($UserID, FALSE);
         $Result = in_array($Permission, $Permissions) || array_key_exists($Permission, $Permissions);
         return $Result;
     }
 
-//   public static function FormatPlainText($Body, $Format) {
-//      $Result = Gdn_Format::To($Body, $Format);
+//   public static function formatPlainText($Body, $Format) {
+//      $Result = Gdn_Format::to($Body, $Format);
 //
 //      if ($Format != 'Text')
-//         $Result = Gdn_Format::Text($Result, FALSE);
+//         $Result = Gdn_Format::text($Result, FALSE);
 //      $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
 //      return $Result;
 //   }
 
-    public static function FormatEmailBody($Body, $Route = '', $Quote = '', $Options = FALSE) {
+    public static function formatEmailBody($Body, $Route = '', $Quote = '', $Options = FALSE) {
         // Construct the signature.
         if ($Route) {
-            $Signature = FormatString(T('ReplyOrFollow'))."\n".ExternalUrl($Route);
+            $Signature = formatString(T('ReplyOrFollow'))."\n".externalUrl($Route);
         } elseif ($Route === FALSE) {
-            $Signature = ExternalUrl('/');
+            $Signature = externalUrl('/');
         } else {
-            $Signature = FormatString(T('ReplyOnly'));
+            $Signature = formatString(T('ReplyOnly'));
         }
 
         if ($Quote) {
             if (is_array($Quote)) {
-                $Quote = Gdn_Format::PlainText($Quote['Body'], GetValue('Format', $Quote, 'Text'));
+                $Quote = Gdn_Format::plainText($Quote['Body'], getValue('Format', $Quote, 'Text'));
             }
 
-            $Quote = "\n\n".T('You wrote:')."\n\n".self::FormatQuoteText($Quote);
+            $Quote = "\n\n".t('You wrote:')."\n\n".self::formatQuoteText($Quote);
         }
 
-        $Result = FormatString(T('EmailTemplate'), ['Body' => $Body, 'Signature' => $Signature, 'Quote' => $Quote]);
+        $Result = formatString(T('EmailTemplate'), ['Body' => $Body, 'Signature' => $Signature, 'Quote' => $Quote]);
         return $Result;
     }
 
-    public static function EmailSignature($Route = '', $CanView = TRUE, $CanReply = TRUE) {
+    public static function emailSignature($Route = '', $CanView = TRUE, $CanReply = TRUE) {
         if (!$Route) {
             $CanView = FALSE;
         }
 
         if ($CanView && $CanReply) {
-            $Signature = FormatString(T('ReplyOrFollow'))."\n".ExternalUrl($Route);
+            $Signature = formatString(T('ReplyOrFollow'))."\n".externalUrl($Route);
         } elseif ($CanView) {
-            $Signature = FormatString(T('FollowOnly'))."\n".ExternalUrl($Route);
+            $Signature = formatString(T('FollowOnly'))."\n".externalUrl($Route);
         } elseif ($CanReply) {
-            $Signature = FormatString(T('ReplyOnly'));
+            $Signature = formatString(T('ReplyOnly'));
         } else {
-            $Signature = ExternalUrl('/');
+            $Signature = externalUrl('/');
         }
         return $Signature;
     }
 
-    public static function FormatQuoteText($Text) {
+    public static function formatQuoteText($Text) {
         $Result = '> '.str_replace("\n", "\n> ", $Text);
         return $Result;
     }
 
-    public static function LabelCode($SchemaRow) {
+    public static function labelCode($SchemaRow) {
         if (isset($SchemaRow['LabelCode'])) {
             return $SchemaRow['LabelCode'];
         }
@@ -118,12 +118,12 @@ class VanillaPopPlugin extends Gdn_Plugin {
         return $LabelCode;
     }
 
-    public static function Log($Message) {
-//      $Line = Gdn_Format::ToDateTime().' '.$Message."\n";
+    public static function log($Message) {
+//      $Line = Gdn_Format::toDateTime().' '.$Message."\n";
 //      file_put_contents(PATH_UPLOADS.'/email/log.txt', $Line, FILE_APPEND);
     }
 
-    public static function ParseEmailAddress($Email) {
+    public static function parseEmailAddress($Email) {
         $Name = '';
         if (preg_match('`([^<]*)<([^>]+)>`', $Email, $Matches)) {
             $Name = trim(trim($Matches[1]), '"');
@@ -142,7 +142,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         return $Result;
     }
 
-    public static function ParseEmailHeader($Header) {
+    public static function parseEmailHeader($Header) {
         $Result = [];
         $Parts = explode("\n", $Header);
 
@@ -156,7 +156,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $Result[$i] .= "\n".$Part;
                 }
             } else {
-                self::Log("Headerline: $Part");
+                self::log("Headerline: $Part");
                 list($Name, $Value) = explode(':', $Part, 2);
                 $i = trim($Name);
                 $Result[$i] = ltrim($Value);
@@ -166,7 +166,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         return $Result;
     }
 
-    public static function ParseRoute($Route) {
+    public static function parseRoute($Route) {
         if (preg_match('`/?(?:vanilla/)?discussion/(\d+)`i', $Route, $Matches)) {
             $Type = 'Discussion';
             $ID = $Matches[1];
@@ -183,11 +183,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
         return [$Type, $ID];
     }
 
-    public static function ParseType($Email) {
+    public static function parseType($Email) {
         $Type = NULL;
         $ID = NULL;
         if (preg_match('`\+([a-z]+-?[0-9]+)@`', $Email, $Matches)) {
-            list($Type, $ID) = self::ParseUID($Matches[1]);
+            list($Type, $ID) = self::parseUID($Matches[1]);
         } elseif (preg_match('`\+noreply@`i', $Email, $Matches)) {
             $Type = 'noreply';
             $ID = NULL;
@@ -197,7 +197,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $Codes = explode('.', $Parts[0]);
 
             if (count($Codes) > 0) {
-                $Category = CategoryModel::Categories($Codes[0]);
+                $Category = CategoryModel::categories($Codes[0]);
                 if ($Category) {
                     $Type = 'Category';
                     $ID = $Category['CategoryID'];
@@ -209,7 +209,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
     public static $Types = ['d' => 'Discussion', 'c' => 'Comment', 'u' => 'User', 'cv' => 'Conversation', 'm' => 'Message'];
 
-    public static function ParseUID($UID) {
+    public static function parseUID($UID) {
         // Strip off email stuff.
         if (preg_match('`<([^@]+)@`', $UID, $Matches)) {
             $UID = trim(trim($Matches[1]), '"');
@@ -220,14 +220,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         if (preg_match('`([a-z]+)-?([0-9]+)`i', $UID, $Matches)) {
-            $Type = GetValue($Matches[1], self::$Types, NULL);
+            $Type = getValue($Matches[1], self::$Types, NULL);
             if ($Type) {
                 $ID = $Matches[2];
                 return [$Type, $ID];
             }
         } else {
             // This might be a category.
-            $Category = CategoryModel::Categories($UID);
+            $Category = CategoryModel::categories($UID);
             if ($Category) {
                 return ['Category', $Category['CategoryID']];
             } else {
@@ -236,87 +236,87 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
     }
 
-    protected function Save($Data, $Sender) {
+    protected function save($Data, $Sender) {
         $ReplyType = NULL;
         $ReplyID = NULL;
 
-        if (GetValue('ReplyTo', $Data)) {
-            Trace("ReplyTo: {$Data['ReplyTo']}");
+        if (getValue('ReplyTo', $Data)) {
+            trace("ReplyTo: {$Data['ReplyTo']}");
             // See if we are replying to something specifically.
-            list($ReplyType, $ReplyID) = self::ParseUID($Data['ReplyTo']);
+            list($ReplyType, $ReplyID) = self::parseUID($Data['ReplyTo']);
         }
 
         if (!$ReplyType) {
             // Grab the reply from the to.
-            list($ToName, $ToEmail) = self::ParseEmailAddress(GetValue('To', $Data));
-            list($ReplyType, $ReplyID) = self::ParseType($ToEmail);
+            list($ToName, $ToEmail) = self::parseEmailAddress(GetValue('To', $Data));
+            list($ReplyType, $ReplyID) = self::parseType($ToEmail);
         }
 
-        if ((!$ReplyType || $ReplyType == 'Category') && GetValue('ReplyTo', $Data)) {
+        if ((!$ReplyType || $ReplyType == 'Category') && getValue('ReplyTo', $Data)) {
             // This may be replying to the SourceID rather than the UID.
-            $SaveType = $this->SaveTypeFromRepyTo($Data);
+            $SaveType = $this->saveTypeFromRepyTo($Data);
         }
 
-        Trace("Reply type: $ReplyType, Reply id: $ReplyID");
+        trace("Reply type: $ReplyType, Reply id: $ReplyID");
 
         if (strcasecmp($ReplyType, 'noreply') == 0) {
             return TRUE;
         }
 
         // Save the full post for debugging.
-        $Data['Attributes'] = dbencode(ArrayTranslate($Data, ['Headers', 'Source']));
+        $Data['Attributes'] = dbencode(arrayTranslate($Data, ['Headers', 'Source']));
 
-        $Data['Body'] = self::StripEmail($Data['Body']);
+        $Data['Body'] = self::stripEmail($Data['Body']);
         if (!$Data['Body']) {
-            $Data['Body'] = T('(empty message)');
+            $Data['Body'] = t('(empty message)');
         }
 
-        list($FromName, $FromEmail) = self::ParseEmailAddress($Data['From']);
+        list($FromName, $FromEmail) = self::parseEmailAddress($Data['From']);
 
         // Check for a category.
         if ($ReplyType == 'Category') {
             $CategoryID = $ReplyID;
         } else {
-            $CategoryID = C('Plugins.VanillaPop.DefaultCategoryID', -1);
+            $CategoryID = c('Plugins.VanillaPop.DefaultCategoryID', -1);
         }
         if (!$CategoryID) {
             $CategoryID = -1;
         }
-        TouchValue('CategoryID', $Data, $CategoryID);
+        touchValue('CategoryID', $Data, $CategoryID);
 
         // See if there is a user at the given email.
         $UserModel = new UserModel();
-        $User = $UserModel->GetByEmail($FromEmail);
+        $User = $UserModel->getByEmail($FromEmail);
         if (!$User) {
-            if (C('Plugins.VanillaPop.AllowUserRegistration')) {
-                SaveToConfig('Garden.Registration.NameUnique', FALSE, FALSE);
+            if (c('Plugins.VanillaPop.AllowUserRegistration')) {
+                saveToConfig('Garden.Registration.NameUnique', FALSE, FALSE);
                 $Sender->Data['_Status'][] = 'Creating user.';
                 $User = [
                     'Name' => $FromName,
                     'Email' => $FromEmail,
-                    'Password' => RandomString(10),
+                    'Password' => randomString(10),
                     'HashMethod' => 'Random',
                     'Source' => 'Email',
                     'SourceID' => $FromEmail
                 ];
 
-                $UserID = $UserModel->InsertForBasic($User, FALSE, ['NoConfirmEmail' => 'NoConfirmEmail']);
+                $UserID = $UserModel->insertForBasic($User, FALSE, ['NoConfirmEmail' => 'NoConfirmEmail']);
 
                 if (!$UserID) {
-                    throw new Exception(T('Error creating user.').' '.$UserModel->Validation->ResultsText(), 400);
+                    throw new Exception(T('Error creating user.').' '.$UserModel->Validation->resultsText(), 400);
                 }
 
                 $User['UserID'] = $UserID;
             } else {
-                $this->SendEmail($FromEmail, '',
-                    T("Whoops! You'll need to register before you can email our site."), $Data);
+                $this->sendEmail($FromEmail, '',
+                    t("Whoops! You'll need to register before you can email our site."), $Data);
                 return TRUE;
             }
         } else {
             $Sender->Data['_Status'][] = 'User exists';
             $User = (array)$User;
         }
-        Gdn::Session()->Start($User['UserID'], FALSE);
+        Gdn::session()->start($User['UserID'], FALSE);
         $Data['InsertUserID'] = $User['UserID'];
 
         // Get the parent record and make sure the post is going in the right place.
@@ -325,7 +325,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 case 'Discussion':
                     // Grab the discussion.
                     $DiscussionModel = new DiscussionModel();
-                    $Discussion = $DiscussionModel->GetID($ReplyID);
+                    $Discussion = $DiscussionModel->getID($ReplyID);
                     if (!$Discussion) {
                         $InvalidReply = TRUE;
                         $SaveType = 'Discussion';
@@ -338,15 +338,15 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     break;
                 case 'Comment':
                     $CommentModel = new CommentModel();
-                    $Comment = $CommentModel->GetID($ReplyID, DATASET_TYPE_ARRAY);
+                    $Comment = $CommentModel->getID($ReplyID, DATASET_TYPE_ARRAY);
                     if (!$Comment) {
                         $InvalidReply = TRUE;
                         $SaveType = 'Discussion';
                     } else {
                         // Grab the discussion so we can see its category.
                         $DiscussionModel = new DiscussionModel();
-                        $Discussion = $DiscussionModel->GetID($Comment['DiscussionID'], DATASET_TYPE_ARRAY);
-                        $Data['CategoryID'] = GetValue('CategoryID', $Discussion);
+                        $Discussion = $DiscussionModel->getID($Comment['DiscussionID'], DATASET_TYPE_ARRAY);
+                        $Data['CategoryID'] = getValue('CategoryID', $Discussion);
 
                         $SaveType = 'Comment';
                         $Data['DiscussionID'] = $Comment['DiscussionID'];
@@ -354,7 +354,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     break;
                 case 'Conversation':
                     $ConversationModel = new ConversationModel();
-                    $Conversation = $ConversationModel->GetID($ReplyID);
+                    $Conversation = $ConversationModel->getID($ReplyID);
                     if (!$Conversation) {
                         $InvalidReply = TRUE;
                         $SaveType = 'Discussion';
@@ -368,7 +368,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     break;
                 case 'Message':
                     $MessageModel = new ConversationMessageModel();
-                    $Message = $MessageModel->GetID($ReplyID, DATASET_TYPE_ARRAY);
+                    $Message = $MessageModel->getID($ReplyID, DATASET_TYPE_ARRAY);
                     if (!$Message) {
                         $InvalidReply = TRUE;
                         $SaveType = 'Discussion';
@@ -385,15 +385,15 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         if (isset($InvalidReply)) {
-            $Data['Body'] .= "\n\n".sprintf(T('Note: The email was trying to reply to an invalid %s.'), "$ReplyType ($ReplyID)");
+            $Data['Body'] .= "\n\n".sprintf(t('Note: The email was trying to reply to an invalid %s.'), "$ReplyType ($ReplyID)");
         }
 
         // Set the source of the post.
         $Data['Source'] = 'Email';
-        $Data['SourceID'] = GetValue('MessageID', $Data, NULL);
+        $Data['SourceID'] = getValue('MessageID', $Data, NULL);
         unset($Data['MessageID']);
 
-        $Category = CategoryModel::Categories(GetValue('CategoryID', $Data));
+        $Category = CategoryModel::categories(GetValue('CategoryID', $Data));
         if ($Category) {
             $PermissionCategoryID = $Category['PermissionCategoryID'];
         } else {
@@ -404,21 +404,21 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         switch ($SaveType) {
             case 'Comment':
-                if (!Gdn::Session()->CheckPermission('Email.Comments.Add')) {
+                if (!Gdn::session()->checkPermission('Email.Comments.Add')) {
                     trace("Doesn't have Email.Comments.Add");
 
-                    $this->SendEmail($FromEmail, '',
-                        T("Sorry! You don't have permission to comment through email."), $Data);
+                    $this->sendEmail($FromEmail, '',
+                        t("Sorry! You don't have permission to comment through email."), $Data);
                     return TRUE;
-                } elseif (!Gdn::Session()->CheckPermission('Vanilla.Comments.Add', TRUE, 'Category', $PermissionCategoryID)) {
+                } elseif (!Gdn::session()->checkPermission('Vanilla.Comments.Add', TRUE, 'Category', $PermissionCategoryID)) {
                     trace("Doesn't have Vanilla.Comments.Add for category", TRACE_WARNING);
 
-                    $this->SendEmail($FromEmail, '',
-                        T("Sorry! You don't have permission to post right now."), $Data);
+                    $this->sendEmail($FromEmail, '',
+                        t("Sorry! You don't have permission to post right now."), $Data);
                     return TRUE;
                 } elseif (val('Closed', $Discussion)) {
-                    $this->SendEmail($FromEmail, '',
-                        T("Sorry! This discussion has been closed."), $Data);
+                    $this->sendEmail($FromEmail, '',
+                        t("Sorry! This discussion has been closed."), $Data);
                     return TRUE;
                 }
 
@@ -426,83 +426,83 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
                 // Make sure there isn't already a comment saved from this email.
                 if ($Data['SourceID']) {
-                    $ExistingComment = $CommentModel->GetWhere(['Source' => 'Email', 'SourceID' => $Data['SourceID']])->FirstRow();
+                    $ExistingComment = $CommentModel->getWhere(['Source' => 'Email', 'SourceID' => $Data['SourceID']])->firstRow();
                     if ($ExistingComment) {
-                        Trace("This email has already been saved.");
+                        trace("This email has already been saved.");
                         return TRUE;
                     }
                 }
 
-                $CommentID = $CommentModel->Save($Data);
+                $CommentID = $CommentModel->save($Data);
                 if (!$CommentID) {
-                    throw new Exception($CommentModel->Validation->ResultsText().print_r($Data, TRUE), 400);
+                    throw new Exception($CommentModel->Validation->resultsText().print_r($Data, TRUE), 400);
                 } else {
                     $CommentModel->Save2($CommentID, TRUE);
                 }
-                Trace("Saved comment $CommentID");
+                trace("Saved comment $CommentID");
                 return $CommentID;
             case 'Message':
-                if (!Gdn::Session()->CheckPermission('Email.Conversations.Add')) {
-                    $this->SendEmail($FromEmail, '',
-                        T("Sorry! You don't have permission to send messages through email."), $Data);
+                if (!Gdn::session()->checkPermission('Email.Conversations.Add')) {
+                    $this->sendEmail($FromEmail, '',
+                        t("Sorry! You don't have permission to send messages through email."), $Data);
                     return TRUE;
                 }
 
                 $MessageModel = new ConversationMessageModel();
-                $MessageID = $MessageModel->Save($Data);
+                $MessageID = $MessageModel->save($Data);
                 if (!$MessageID) {
-                    throw new Exception($MessageModel->Validation->ResultsText().print_r($Data, TRUE), 400);
+                    throw new Exception($MessageModel->Validation->resultsText().print_r($Data, TRUE), 400);
                 }
                 return $MessageID;
             case 'Discussion':
             default:
                 // Check the permission on the discussion.
-                if (!Gdn::Session()->CheckPermission('Email.Discussions.Add')) {
-                    Trace("Doesn't have Email.Discussions.Add");
+                if (!Gdn::session()->checkPermission('Email.Discussions.Add')) {
+                    trace("Doesn't have Email.Discussions.Add");
 
-                    $this->SendEmail($FromEmail, '',
-                        T("Sorry! You don't have permission to post discussions/questions through email."), $Data);
+                    $this->sendEmail($FromEmail, '',
+                        t("Sorry! You don't have permission to post discussions/questions through email."), $Data);
                     return TRUE;
-                } elseif (!Gdn::Session()->CheckPermission('Vanilla.Discussions.Add', TRUE, 'Category', $PermissionCategoryID)) {
-                    Trace("Sorry! You don't have permission to post right now.", TRACE_WARNING);
+                } elseif (!Gdn::session()->checkPermission('Vanilla.Discussions.Add', TRUE, 'Category', $PermissionCategoryID)) {
+                    trace("Sorry! You don't have permission to post right now.", TRACE_WARNING);
 
-                    $this->SendEmail($FromEmail, '',
-                        T("Sorry! You don't have permission to post right now."), $Data);
+                    $this->sendEmail($FromEmail, '',
+                        t("Sorry! You don't have permission to post right now."), $Data);
                     return TRUE;
                 }
 
                 $Data['Name'] = $Data['Subject'];
                 $Data['UpdateUserID'] = $Data['InsertUserID'];
                 $DiscussionModel = new DiscussionModel();
-                $DiscussionID = $DiscussionModel->Save($Data);
+                $DiscussionID = $DiscussionModel->save($Data);
                 if (!$DiscussionID) {
-                    throw new Exception($DiscussionModel->Validation->ResultsText().print_r($Data, TRUE), 400);
+                    throw new Exception($DiscussionModel->Validation->resultsText().print_r($Data, TRUE), 400);
                 }
-                Trace("Saved discussion $DiscussionID");
+                trace("Saved discussion $DiscussionID");
 
                 // Send a confirmation email.
-                if (C('Plugins.VanillaPop.SendConfirmationEmail')) {
+                if (c('Plugins.VanillaPop.SendConfirmationEmail')) {
                     $Data['DiscussionID'] = $DiscussionID;
-                    $this->SendConfirmationEmail($Data, $User);
+                    $this->sendConfirmationEmail($Data, $User);
                 }
 
                 return $DiscussionID;
         }
     }
 
-    public function SaveTypeFromRepyTo(&$Data) {
+    public function saveTypeFromRepyTo(&$Data) {
         $Tables = [
             'Discussion' => ['Comment', 'DiscussionID'],
             'Comment' => ['Comment', 'DiscussionID'],
             'ConversationMessage' => ['Message', 'ConversationID']];
 
-        $ReplyTo = trim(GetValue('ReplyTo', $Data));
+        $ReplyTo = trim(getValue('ReplyTo', $Data));
         if (!$ReplyTo) {
             return NULL;
         }
 
         foreach ($Tables as $Name => $Info) {
-            $Row = Gdn::SQL()->GetWhere($Name, ['Source' => 'Email', 'SourceID' => $ReplyTo])->FirstRow(DATASET_TYPE_ARRAY);
+            $Row = Gdn::sql()->getWhere($Name, ['Source' => 'Email', 'SourceID' => $ReplyTo])->firstRow(DATASET_TYPE_ARRAY);
             if ($Row) {
                 $Result = $Info[0];
                 $Data[$Info[1]] = $Row[$Info[1]];
@@ -513,32 +513,32 @@ class VanillaPopPlugin extends Gdn_Plugin {
         return NULL;
     }
 
-    public function SendEmail($To, $Subject, $Body, $Quote = FALSE) {
-        Trace("Email: $Body");
+    public function sendEmail($To, $Subject, $Body, $Quote = FALSE) {
+        trace("Email: $Body");
 
         $Email = new Gdn_Email();
-        $Email->To($To);
-        $Email->Subject(sprintf('[%s] %s', C('Garden.Title'), $Subject));
+        $Email->to($To);
+        $Email->subject(sprintf('[%s] %s', c('Garden.Title'), $Subject));
         $From = $Email->PhpMailer->From;
-        $Email->PhpMailer->From = self::AddIDToEmail($From, 'noreply');
+        $Email->PhpMailer->From = self::addIDToEmail($From, 'noreply');
 
         if (is_array($Quote)) {
-            $MessageID = GetValue('MessageID', $Quote);
+            $MessageID = getValue('MessageID', $Quote);
             if ($MessageID) {
-                $Email->PhpMailer->AddCustomHeader("In-Reply-To:$MessageID");
-                $Email->PhpMailer->AddCustomHeader("References:$MessageID");
+                $Email->PhpMailer->addCustomHeader("In-Reply-To:$MessageID");
+                $Email->PhpMailer->addCustomHeader("References:$MessageID");
             }
 
-            $Subject = GetValue('Subject', $Quote);
+            $Subject = getValue('Subject', $Quote);
             if ($Subject) {
-                $Email->Subject(sprintf('Re: [%s] %s', C('Garden.Title'), ltrim(StringBeginsWith($Subject, 'Re:', TRUE, TRUE))));
+                $Email->subject(sprintf('Re: [%s] %s', c('Garden.Title'), ltrim(stringBeginsWith($Subject, 'Re:', TRUE, TRUE))));
             }
         }
 
-        $Message = self::FormatEmailBody($Body, FALSE, $Quote);
+        $Message = self::formatEmailBody($Body, FALSE, $Quote);
 
-        $Email->Message($Message);
-        @$Email->Send();
+        $Email->message($Message);
+        @$Email->send();
     }
 
     /**
@@ -547,16 +547,16 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * @param Gdn_Email $PhpMailer
      * @param int|array
      */
-    public function SetFrom($Email, $User) {
+    public function setFrom($Email, $User) {
         if (!C('Plugins.VanillaPop.OverrideFrom', TRUE)) {
             return;
         }
 
         if (is_numeric($User)) {
-            $User = Gdn::UserModel()->GetID($User);
+            $User = Gdn::userModel()->getID($User);
         }
 
-        $Email->PhpMailer->FromName = GetValue('Name', $User);
+        $Email->PhpMailer->FromName = getValue('Name', $User);
     }
 
     /**
@@ -565,91 +565,91 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * @param type $Discussion
      * @param type $User
      */
-    public function SendConfirmationEmail($Discussion, $User) {
+    public function sendConfirmationEmail($Discussion, $User) {
         $FormatData = $Discussion;
-        $FormatData['Title'] = C('Garden.Title');
+        $FormatData['Title'] = c('Garden.Title');
         $FormatData['ID'] = $Discussion['DiscussionID'];
-        $FormatData['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
-        $FormatData['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
+        $FormatData['Category'] = CategoryModel::categories($Discussion['CategoryID']);
+        $FormatData['Url'] = externalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::url($Discussion['Name']));
 
-        $FormatData['Quote'] = self::FormatQuoteText($FormatData['Body']);
+        $FormatData['Quote'] = self::formatQuoteText($FormatData['Body']);
 
-        $CanView = Gdn::UserModel()->GetCategoryViewPermission($User['UserID'], GetValue('CategoryID', $Discussion));
-        $CanReply = self::CheckUserPermission($User['UserID'], 'Email.Comments.Add');
-        $Route = '/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']);
-        $FormatData['Signature'] = self::EmailSignature($Route, $CanView, $CanReply);
+        $CanView = Gdn::userModel()->getCategoryViewPermission($User['UserID'], getValue('CategoryID', $Discussion));
+        $CanReply = self::checkUserPermission($User['UserID'], 'Email.Comments.Add');
+        $Route = '/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::url($Discussion['Name']);
+        $FormatData['Signature'] = self::emailSignature($Route, $CanView, $CanReply);
 
         $Email = new Gdn_Email();
 
-        $Message = FormatString(C('EmailFormat.ConfirmationBody', self::$FormatDefaults['ConfirmationBody']), $FormatData);
-        $Email->Message($Message);
+        $Message = formatString(C('EmailFormat.ConfirmationBody', self::$FormatDefaults['ConfirmationBody']), $FormatData);
+        $Email->message($Message);
 
         // We are using the standard confirmation subject because some email clients won't group emails unless their subject are the exact same.
-        $Subject = FormatString(C('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
-        $Email->Subject($Subject);
+        $Subject = formatString(C('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
+        $Email->subject($Subject);
 
         $Email->PhpMailer->MessageID = self::uid('Discussion', $Discussion['DiscussionID'], 'email');
-        $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::uid('Discussion', $Discussion['DiscussionID']));
-        $Email->To($User['Email'], $User['Name']);
+        $Email->PhpMailer->From = self::addIDToEmail($Email->PhpMailer->From, self::uid('Discussion', $Discussion['DiscussionID']));
+        $Email->to($User['Email'], $User['Name']);
 
-        $ReplyTo = GetValue('SourceID', $Discussion);
+        $ReplyTo = getValue('SourceID', $Discussion);
         if (isset($ReplyTo)) {
-            $Email->PhpMailer->AddCustomHeader("In-Reply-To:$ReplyTo");
-            $Email->PhpMailer->AddCustomHeader("References:$ReplyTo");
+            $Email->PhpMailer->addCustomHeader("In-Reply-To:$ReplyTo");
+            $Email->PhpMailer->addCustomHeader("References:$ReplyTo");
         }
 
 
         try {
-            $Email->Send();
+            $Email->send();
         } catch (Exception $Ex) {
             // Do nothing for now...
-            if (Debug()) {
+            if (debug()) {
                 throw $Ex;
             }
         }
     }
 
-    public function Setup() {
-        $this->Structure();
+    public function setup() {
+        $this->structure();
     }
 
-    public function Structure() {
-        Gdn::PermissionModel()->Define([
+    public function structure() {
+        Gdn::permissionModel()->define([
             'Email.Discussions.Add' => 'Garden.Profiles.Edit',
             'Email.Comments.Add' => 'Garden.Profiles.Edit',
             'Email.Conversations.Add' => 'Garden.Profiles.Edit']);
 
-        Gdn::Structure()
-            ->Table('User')
-            ->Column('Source', 'varchar(20)', NULL)
-            ->Column('SourceID', 'varchar(191)', NULL, 'index')
-            ->Set();
+        Gdn::structure()
+            ->table('User')
+            ->column('Source', 'varchar(20)', NULL)
+            ->column('SourceID', 'varchar(191)', NULL, 'index')
+            ->set();
 
-        Gdn::Structure()
-            ->Table('Discussion')
-            ->Column('Source', 'varchar(20)', NULL)
-            ->Column('SourceID', 'varchar(191)', NULL, 'index')
-            ->Set();
+        Gdn::structure()
+            ->table('Discussion')
+            ->column('Source', 'varchar(20)', NULL)
+            ->column('SourceID', 'varchar(191)', NULL, 'index')
+            ->set();
 
-        Gdn::Structure()
-            ->Table('Comment')
-            ->Column('Source', 'varchar(20)', NULL)
-            ->Column('SourceID', 'varchar(191)', NULL, 'index')
-            ->Set();
+        Gdn::structure()
+            ->table('Comment')
+            ->column('Source', 'varchar(20)', NULL)
+            ->column('SourceID', 'varchar(191)', NULL, 'index')
+            ->set();
 
-        Gdn::Structure()
-            ->Table('ConversationMessage')
-            ->Column('Source', 'varchar(20)', NULL)
-            ->Column('SourceID', 'varchar(191)', NULL, 'index')
-            ->Set();
+        Gdn::structure()
+            ->table('ConversationMessage')
+            ->column('Source', 'varchar(20)', NULL)
+            ->column('SourceID', 'varchar(191)', NULL, 'index')
+            ->set();
 
-        Gdn::Structure()
-            ->Table('Role')
-            ->Column('ForceNotify', 'tinyint(1)', '0')
-            ->Set();
+        Gdn::structure()
+            ->table('Role')
+            ->column('ForceNotify', 'tinyint(1)', '0')
+            ->set();
     }
 
-    public static function SimpleForm($Form, $Schema) {
+    public static function simpleForm($Form, $Schema) {
         echo '<ul>';
         foreach ($Schema as $Index => $Row) {
             if (is_string($Row)) {
@@ -665,38 +665,38 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
             echo "<li>\n  ";
 
-            $LabelCode = self::LabelCode($Row);
+            $LabelCode = self::labelCode($Row);
 
-            $Description = GetValue('Description', $Row, '');
+            $Description = getValue('Description', $Row, '');
             if ($Description) {
                 $Description = '<div class="Info">'.$Description.'</div>';
             }
 
-            TouchValue('Control', $Row, 'TextBox');
+            touchValue('Control', $Row, 'TextBox');
 
             switch (strtolower($Row['Control'])) {
                 case 'checkbox':
                     echo $Description;
-                    echo $Form->CheckBox($Row['Name'], T($LabelCode));
+                    echo $Form->checkBox($Row['Name'], t($LabelCode));
                     break;
                 case 'dropdown':
-                    echo $Form->Label($LabelCode, $Row['Name']);
+                    echo $Form->label($LabelCode, $Row['Name']);
                     echo $Description;
-                    echo $Form->DropDown($Row['Name'], $Row['Items'], $Row['Options']);
+                    echo $Form->dropDown($Row['Name'], $Row['Items'], $Row['Options']);
                     break;
                 case 'radiolist':
                     echo $Description;
-                    echo $Form->RadioList($Row['Name'], $Row['Items'], $Row['Options']);
+                    echo $Form->radioList($Row['Name'], $Row['Items'], $Row['Options']);
                     break;
                 case 'checkboxlist':
-                    echo $Form->Label($LabelCode, $Row['Name']);
+                    echo $Form->label($LabelCode, $Row['Name']);
                     echo $Description;
-                    echo $Form->CheckBoxList($Row['Name'], $Row['Items'], NULL, $Row['Options']);
+                    echo $Form->checkBoxList($Row['Name'], $Row['Items'], NULL, $Row['Options']);
                     break;
                 case 'textbox':
-                    echo $Form->Label($LabelCode, $Row['Name']);
+                    echo $Form->label($LabelCode, $Row['Name']);
                     echo $Description;
-                    echo $Form->TextBox($Row['Name'], $Row['Options']);
+                    echo $Form->textBox($Row['Name'], $Row['Options']);
                     break;
                 default:
                     echo "Error a control type of {$Row['Control']} is not supported.";
@@ -707,7 +707,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         echo '</ul>';
     }
 
-    public static function StripSignature($Body) {
+    public static function stripSignature($Body) {
         $i = strrpos($Body, "\n--");
         if ($i === FALSE) {
             return $Body;
@@ -768,7 +768,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
     }
 
-    public static function StripEmail($Body) {
+    public static function stripEmail($Body) {
         $SigFound = FALSE;
         $InQuotes = 0;
 
@@ -834,7 +834,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * @return null|string Returns a UID as a string or **null** of {@link $type} is unknown.
      */
     public static function uid($type, $id, $format = '') {
-        $typeKey = GetValue($type, array_flip(self::$Types), null);
+        $typeKey = getValue($type, array_flip(self::$Types), null);
         if (!$typeKey) {
             return null;
         }
@@ -847,7 +847,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         switch (strtolower($format)) {
             case 'email':
-                $uid = '<'.$uid.'@'.Gdn::Request()->Host().'>';
+                $uid = '<'.$uid.'@'.Gdn::request()->host().'>';
         }
         return $uid;
     }
@@ -858,33 +858,33 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * @param ActivityModel $Sender
      * @param type $Args
      */
-    public function ActivityModel_BeforeSendNotification_Handler($Sender, $Args) {
+    public function activityModel_beforeSendNotification_handler($Sender, $Args) {
         if (isset($Args['RecordType']) && isset($Args['RecordID'])) {
             $Type = $Args['RecordType'];
             $ID = $Args['RecordID'];
         } else {
-            list($Type, $ID) = self::ParseRoute(GetValue('Route', $Args));
+            list($Type, $ID) = self::parseRoute(GetValue('Route', $Args));
         }
 
-        $FormatData = ['Title' => C('Garden.Title'), 'Signature' => self::EmailSignature(GetValue('Route', $Args))];
-        $NotifyUserID = GetValueR('Activity.NotifyUserID', $Args);
+        $FormatData = ['Title' => c('Garden.Title'), 'Signature' => self::emailSignature(GetValue('Route', $Args))];
+        $NotifyUserID = getValueR('Activity.NotifyUserID', $Args);
 
         if (in_array($Type, ['Discussion', 'Comment', 'Conversation', 'Message'])) {
             $Email = $Args['Email']; //new Gdn_Email(); //
-            $Story = GetValue('Story', $Args);
+            $Story = getValue('Story', $Args);
 
             switch ($Type) {
                 case 'Discussion':
                     $DiscussionModel = new DiscussionModel();
-                    $Discussion = $DiscussionModel->GetID($ID);
+                    $Discussion = $DiscussionModel->getID($ID);
                     if ($Discussion) {
                         // See if the user has permission to view this discussion on the site.
-                        $CanView = Gdn::UserModel()->GetCategoryViewPermission($NotifyUserID, GetValue('CategoryID', $Discussion));
-                        $CanReply = self::CheckUserPermission($NotifyUserID, 'Email.Comments.Add');
-                        $FormatData['Signature'] = self::EmailSignature(GetValue('Route', $Args), $CanView, $CanReply);
+                        $CanView = Gdn::userModel()->getCategoryViewPermission($NotifyUserID, getValue('CategoryID', $Discussion));
+                        $CanReply = self::checkUserPermission($NotifyUserID, 'Email.Comments.Add');
+                        $FormatData['Signature'] = self::emailSignature(GetValue('Route', $Args), $CanView, $CanReply);
 
                         $Discussion = (array)$Discussion;
-                        $Discussion['Name'] = Gdn_Format::PlainText($Discussion['Name'], 'Text');
+                        $Discussion['Name'] = Gdn_Format::plainText($Discussion['Name'], 'Text');
 
                         $Body = Gdn_Format::to($Discussion['Body'], $Discussion['Format']);
                         $Body = $this->transformQuotes($Body);
@@ -892,23 +892,23 @@ class VanillaPopPlugin extends Gdn_Plugin {
                         $Body = $this->parseQuotes($Body);
 
                         $Discussion['Body'] = $Body;
-                        $Discussion['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
-                        $Discussion['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
+                        $Discussion['Category'] = CategoryModel::categories($Discussion['CategoryID']);
+                        $Discussion['Url'] = externalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::url($Discussion['Name']));
                         $FormatData = array_merge($FormatData, $Discussion);
 
-                        $Message = FormatString(C('EmailFormat.DiscussionBody', self::$FormatDefaults['DiscussionBody']), $FormatData);
-                        $Email->Message($Message);
+                        $Message = formatString(C('EmailFormat.DiscussionBody', self::$FormatDefaults['DiscussionBody']), $FormatData);
+                        $Email->message($Message);
 
-                        $Subject = FormatString(C('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
-                        $Email->Subject($Subject);
+                        $Subject = formatString(C('EmailFormat.DiscussionSubject', self::$FormatDefaults['DiscussionSubject']), $FormatData);
+                        $Email->subject($Subject);
 
-                        $this->SetFrom($Email, $Discussion['InsertUserID']);
-                        $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::uid('Discussion', GetValue('DiscussionID', $Discussion)));
+                        $this->setFrom($Email, $Discussion['InsertUserID']);
+                        $Email->PhpMailer->From = self::addIDToEmail($Email->PhpMailer->From, self::uid('Discussion', getValue('DiscussionID', $Discussion)));
                     }
                     break;
                 case 'Comment':
                     $CommentModel = new CommentModel();
-                    $Comment = $CommentModel->GetID($ID, DATASET_TYPE_ARRAY);
+                    $Comment = $CommentModel->getID($ID, DATASET_TYPE_ARRAY);
 
                     if ($Comment) {
                         $Body = Gdn_Format::to($Comment['Body'], $Comment['Format']);
@@ -917,70 +917,70 @@ class VanillaPopPlugin extends Gdn_Plugin {
                         $Body = $this->parseQuotes($Body);
 
                         $Comment['Body'] = $Body;
-                        $Comment['Url'] = ExternalUrl(GetValue('Route', $Args));
+                        $Comment['Url'] = externalUrl(GetValue('Route', $Args));
                         $Comment = [$Comment];
-                        Gdn::UserModel()->JoinUsers($Comment, ['InsertUserID', 'UpdateUserID']);
+                        Gdn::userModel()->joinUsers($Comment, ['InsertUserID', 'UpdateUserID']);
                         $Comment = $Comment[0];
 
-                        if (in_array(GetValueR('Activity.ActivityType', $Args), ['AnswerAccepted'])) {
-                            $Comment['Body'] = Gdn_Format::PlainText($Args['Headline'], 'Html')."\n\n".$Comment['Body'];
+                        if (in_array(getValueR('Activity.ActivityType', $Args), ['AnswerAccepted'])) {
+                            $Comment['Body'] = Gdn_Format::plainText($Args['Headline'], 'Html')."\n\n".$Comment['Body'];
                         }
 
                         $FormatData = array_merge($FormatData, $Comment);
 
-                        $this->SetFrom($Email, $Comment['InsertUserID']);
+                        $this->setFrom($Email, $Comment['InsertUserID']);
 
                         $DiscussionModel = new DiscussionModel();
-                        $Discussion = (array)$DiscussionModel->GetID($Comment['DiscussionID']);
+                        $Discussion = (array)$DiscussionModel->getID($Comment['DiscussionID']);
 
                         if ($Discussion) {
                             // See if the user has permission to view this discussion on the site.
-                            $CanView = Gdn::UserModel()->GetCategoryViewPermission($NotifyUserID, GetValue('CategoryID', $Discussion));
-                            $CanReply = self::CheckUserPermission($NotifyUserID, 'Email.Comments.Add');
-                            $FormatData['Signature'] = self::EmailSignature(GetValue('Route', $Args), $CanView, $CanReply); //.print_r(array('CanView' => $CanView, 'CanReply' => $CanReply), TRUE);
+                            $CanView = Gdn::userModel()->getCategoryViewPermission($NotifyUserID, getValue('CategoryID', $Discussion));
+                            $CanReply = self::checkUserPermission($NotifyUserID, 'Email.Comments.Add');
+                            $FormatData['Signature'] = self::emailSignature(GetValue('Route', $Args), $CanView, $CanReply); //.print_r(array('CanView' => $CanView, 'CanReply' => $CanReply), TRUE);
 
-                            $Discussion['Name'] = Gdn_Format::PlainText($Discussion['Name'], 'Text');
-                            $Discussion['Body'] = Gdn_Format::PlainText($Discussion['Body'], $Discussion['Format']);
-                            $Discussion['Url'] = ExternalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::Url($Discussion['Name']));
+                            $Discussion['Name'] = Gdn_Format::plainText($Discussion['Name'], 'Text');
+                            $Discussion['Body'] = Gdn_Format::plainText($Discussion['Body'], $Discussion['Format']);
+                            $Discussion['Url'] = externalUrl('/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::url($Discussion['Name']));
                             $FormatData['Discussion'] = $Discussion;
-                            $FormatData['Category'] = CategoryModel::Categories($Discussion['CategoryID']);
+                            $FormatData['Category'] = CategoryModel::categories($Discussion['CategoryID']);
 
-                            $Message = FormatString(C('EmailFormat.CommentBody', self::$FormatDefaults['CommentBody']), $FormatData);
-                            $Email->Message($Message);
+                            $Message = formatString(C('EmailFormat.CommentBody', self::$FormatDefaults['CommentBody']), $FormatData);
+                            $Email->message($Message);
 
-                            $Subject = FormatString(C('EmailFormat.CommentSubject', self::$FormatDefaults['CommentSubject']), $FormatData);
-                            $Email->Subject($Subject);
+                            $Subject = formatString(C('EmailFormat.CommentSubject', self::$FormatDefaults['CommentSubject']), $FormatData);
+                            $Email->subject($Subject);
 
-                            $Source = GetValue('Source', $Discussion);
+                            $Source = getValue('Source', $Discussion);
                             if ($Source == 'Email') {
                                  // replying to an email...
-                                $ReplyTo = GetValue('SourceID', $Discussion);
+                                $ReplyTo = getValue('SourceID', $Discussion);
                             }
                             else {
-                                $ReplyTo = self::uid('Discussion', GetValue('DiscussionID', $Discussion), 'email');
+                                $ReplyTo = self::uid('Discussion', getValue('DiscussionID', $Discussion), 'email');
                             }
 
-                            $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::uid('Discussion', GetValue('DiscussionID', $Discussion)));
+                            $Email->PhpMailer->From = self::addIDToEmail($Email->PhpMailer->From, self::uid('Discussion', getValue('DiscussionID', $Discussion)));
                         }
                     }
 
                     break;
                 case 'Message':
                     // Get this message.
-                    $Message = Gdn::SQL()->GetWhere('ConversationMessage', ['MessageID' => $ID])->FirstRow(DATASET_TYPE_ARRAY);
+                    $Message = Gdn::sql()->getWhere('ConversationMessage', ['MessageID' => $ID])->firstRow(DATASET_TYPE_ARRAY);
                     if ($Message) {
                         $ConversationID = $Message['ConversationID'];
-                        $this->SetFrom($Email, $Message['InsertUserID']);
+                        $this->setFrom($Email, $Message['InsertUserID']);
 
                         // Get the message before this one.
-                        $Message2 = Gdn::SQL()
-                            ->Select('*')
-                            ->From('ConversationMessage')
-                            ->Where('ConversationID', $ConversationID)
-                            ->Where('MessageID <', $ID)
-                            ->OrderBy('MessageID', 'desc')
-                            ->Limit(1)
-                            ->Get()->FirstRow(DATASET_TYPE_ARRAY);
+                        $Message2 = Gdn::sql()
+                            ->select('*')
+                            ->from('ConversationMessage')
+                            ->where('ConversationID', $ConversationID)
+                            ->where('MessageID <', $ID)
+                            ->orderBy('MessageID', 'desc')
+                            ->limit(1)
+                            ->get()->firstRow(DATASET_TYPE_ARRAY);
 
                         if ($Message2) {
                             if ($Message2['Source'] == 'Email') {
@@ -990,26 +990,26 @@ class VanillaPopPlugin extends Gdn_Plugin {
                             }
                         }
 
-                        $Email->PhpMailer->From = self::AddIDToEmail($Email->PhpMailer->From, self::uid('Message', GetValue('MessageID', $Message)));
+                        $Email->PhpMailer->From = self::addIDToEmail($Email->PhpMailer->From, self::uid('Message', getValue('MessageID', $Message)));
                     }
 
                     // See if the user has permission to view this discussion on the site.
                     $CanView = TRUE;
-                    $CanReply = self::CheckUserPermission($NotifyUserID, 'Email.Conversations.Add');
-                    $FormatData['Signature'] = self::EmailSignature(GetValue('Route', $Args), $CanView, $CanReply);
+                    $CanReply = self::checkUserPermission($NotifyUserID, 'Email.Conversations.Add');
+                    $FormatData['Signature'] = self::emailSignature(GetValue('Route', $Args), $CanView, $CanReply);
 
                     $Message = Gdn_Format::to($Message['Body'], $Message['Format']);
                     $Message = $this->transformQuotes($Message);
                     $Message = Gdn_Format::plainText($Message, 'html', true);
                     $Message = $this->parseQuotes($Message);
                     $Message .= "\n\n-- \n".$FormatData['Signature'];
-                    $Email->Message($Message);
+                    $Email->message($Message);
 
                     break;
             }
             if (isset($ReplyTo)) {
-                $Email->PhpMailer->AddCustomHeader("In-Reply-To:$ReplyTo");
-                $Email->PhpMailer->AddCustomHeader("References:$ReplyTo");
+                $Email->PhpMailer->addCustomHeader("In-Reply-To:$ReplyTo");
+                $Email->PhpMailer->addCustomHeader("References:$ReplyTo");
             }
             $Email->PhpMailer->MessageID = self::uid($Type, $ID, 'email');
         }
@@ -1018,18 +1018,18 @@ class VanillaPopPlugin extends Gdn_Plugin {
     /**
      * Add notifications.
      */
-    public function CommentModel_BeforeNotification_Handler($Sender, $Args) {
+    public function commentModel_beforeNotification_handler($Sender, $Args) {
         // Make sure the discussion's user is notified if they started the discussion by email.
-        if (GetValueR('Discussion.Source', $Args) == 'Email') {
+        if (getValueR('Discussion.Source', $Args) == 'Email') {
             $NotifiedUsers = (array)GetValue('NotifiedUsers', $Args);
-            $InsertUserID = GetValueR('Discussion.InsertUserID', $Args);
+            $InsertUserID = getValueR('Discussion.InsertUserID', $Args);
 
             // Construct an activity and send it.
             $ActivityModel = $Args['ActivityModel'];
 
             $Comment = $Args['Comment'];
             $CommentID = $Comment['CommentID'];
-            $HeadlineFormat = T('HeadlineFormat.Comment', '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>');
+            $HeadlineFormat = t('HeadlineFormat.Comment', '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>');
 
             $Activity = [
                 'ActivityType' => 'Comment',
@@ -1039,71 +1039,71 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 'RecordType' => 'Comment',
                 'RecordID' => $CommentID,
                 'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
-                'Data' => ['Name' => GetValue('Name', $Args['Discussion'])],
+                'Data' => ['Name' => getValue('Name', $Args['Discussion'])],
                 'Notified' => ActivityModel::SENT_OK,
                 'Emailed' => ActivityModel::SENT_PENDING
             ];
 
-            $ActivityModel->Queue($Activity, FALSE, ['Force' => TRUE]);
+            $ActivityModel->queue($Activity, FALSE, ['Force' => TRUE]);
         }
 
         // Notify anyone in a ForceNotify role
-        $this->ForceNotify($Sender, $Args);
+        $this->forceNotify($Sender, $Args);
     }
 
     /**
      * Add notifications.
      */
-    public function DiscussionModel_BeforeNotification_Handler($Sender, $Args) {
+    public function discussionModel_beforeNotification_handler($Sender, $Args) {
         // Notify anyone in a ForceNotify role
-        $this->ForceNotify($Sender, $Args);
+        $this->forceNotify($Sender, $Args);
     }
 
-//   public function DiscussionController_AfterCommentBody_Handler($Sender, $Args) {
-//      $Attributes = GetValueR('Object.Attributes', $Args);
+//   public function discussionController_afterCommentBody_handler($Sender, $Args) {
+//      $Attributes = getValueR('Object.Attributes', $Args);
 //      if (is_string($Attributes)) {
 //         $Attributes = @unserialize($Attributes);
 //      }
 //
-//      $Body = GetValueR('Object.Body', $Args);
-//      $Format = GetValueR('Object.Format', $Args);
-//      $Text = self::FormatPlainText($Body, $Format);
+//      $Body = getValueR('Object.Body', $Args);
+//      $Format = getValueR('Object.Format', $Args);
+//      $Text = self::formatPlainText($Body, $Format);
 //
-//      $Source = GetValue('Source', $Attributes, FALSE);
+//      $Source = getValue('Source', $Attributes, FALSE);
 //      if (is_array($Source))
-//         echo '<pre>'.htmlspecialchars(GetValue("Headers", $Attributes), $Source).'</pre>';
+//         echo '<pre>'.htmlspecialchars(getValue("Headers", $Attributes), $Source).'</pre>';
 //   }
 
-    public function Gdn_Dispatcher_BeforeBlockDetect_Handler($Sender, $Args) {
+    public function gdn_Dispatcher_BeforeBlockDetect_Handler($Sender, $Args) {
         $Args['BlockExceptions']['`post/sendgrid(\/.*)?$`'] = Gdn_Dispatcher::BLOCK_NEVER;
     }
 
-    public function PostController_Email_Create($Sender, $Args = []) {
-        $this->UtilityController_Email_Create($Sender, $Args);
+    public function postController_email_create($Sender, $Args = []) {
+        $this->utilityController_Email_Create($Sender, $Args);
     }
 
-    public function UtilityController_Email_Create($Sender, $Args = []) {
-        if (Gdn::Session()->UserID == 0) {
-            Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE);
-            Gdn::Session()->User->Admin = FALSE;
+    public function utilityController_email_create($Sender, $Args = []) {
+        if (Gdn::session()->UserID == 0) {
+            Gdn::session()->start(Gdn::userModel()->getSystemUserID(), FALSE);
+            Gdn::session()->User->Admin = FALSE;
         }
 
-        if ($Sender->Form->IsPostBack()) {
-            $Data = $Sender->Form->FormValues();
-            Trace('Saving data.');
-            if ($this->Save($Data, $Sender)) {
-                $Sender->StatusMessage = T('Saved');
-                $Sender->SetData('Saved', true);
-                $Sender->SetData('Trace', Trace());
+        if ($Sender->Form->isPostBack()) {
+            $Data = $Sender->Form->formValues();
+            trace('Saving data.');
+            if ($this->save($Data, $Sender)) {
+                $Sender->StatusMessage = t('Saved');
+                $Sender->setData('Saved', true);
+                $Sender->setData('Trace', trace());
             }
         }
 
-        $Sender->SetData('Title', T('Post an Email'));
-        $Sender->Render('Email', '', 'plugins/VanillaPop');
+        $Sender->setData('Title', t('Post an Email'));
+        $Sender->render('Email', '', 'plugins/VanillaPop');
     }
 
-    public function PostController_Sendgrid_Create($Sender, $Args = []) {
-        $this->UtilityController_Sendgrid_Create($Sender, $Args);
+    public function postController_sendgrid_create($Sender, $Args = []) {
+        $this->utilityController_Sendgrid_Create($Sender, $Args);
     }
 
     /**
@@ -1111,31 +1111,31 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * @param PostController $Sender
      * @param array $Args
      */
-    public function UtilityController_Sendgrid_Create($Sender, $Args = []) {
+    public function utilityController_sendgrid_create($Sender, $Args = []) {
         try {
-            Gdn::Session()->Start(Gdn::UserModel()->GetSystemUserID(), FALSE);
-            Gdn::Session()->User->Admin = FALSE;
+            Gdn::session()->start(Gdn::userModel()->getSystemUserID(), FALSE);
+            Gdn::session()->User->Admin = FALSE;
 
-            if ($Sender->Form->IsPostBack()) {
-                self::Log("Postback");
+            if ($Sender->Form->isPostBack()) {
+                self::log("Postback");
 
-                self::Log("Getting post...");
-                $Post = $Sender->Form->FormValues();
-                self::Log("Post got...");
-                $Data = ArrayTranslate($Post, [
+                self::log("Getting post...");
+                $Post = $Sender->Form->formValues();
+                self::log("Post got...");
+                $Data = arrayTranslate($Post, [
                     'from' => 'From',
                     'to' => 'To',
                     'subject' => 'Subject'
                 ]);
 
-                //         self::Log('Parsing headers.'.GetValue('headers', $Post, ''));
-                $Headers = self::ParseEmailHeader(GetValue('headers', $Post, ''));
-                //         self::Log('Headers: '.print_r($Headers, TRUE));
+                //         self::log('Parsing headers.'.getValue('headers', $Post, ''));
+                $Headers = self::parseEmailHeader(GetValue('headers', $Post, ''));
+                //         self::log('Headers: '.print_r($Headers, TRUE));
                 $Headers = array_change_key_case($Headers);
-                $HeaderData = ArrayTranslate($Headers, ['message-id' => 'MessageID', 'references' => 'References', 'in-reply-to' => 'ReplyTo']);
+                $HeaderData = arrayTranslate($Headers, ['message-id' => 'MessageID', 'references' => 'References', 'in-reply-to' => 'ReplyTo']);
                 $Data = array_merge($Data, $HeaderData);
 
-                if (FALSE && GetValue('html', $Post)) {
+                if (FALSE && getValue('html', $Post)) {
                     $Data['Body'] = $Post['html'];
                     $Data['Format'] = 'Html';
                 } else {
@@ -1143,19 +1143,19 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $Data['Format'] = 'Html';
                 }
 
-                self::Log("Saving data...");
+                self::log("Saving data...");
                 $Sender->Data['_Status'][] = 'Saving data.';
 
 
-                if ($this->Save($Data, $Sender)) {
-                    $Sender->StatusMessage = T('Saved');
+                if ($this->save($Data, $Sender)) {
+                    $Sender->StatusMessage = t('Saved');
                 } else {
                     throw new Exception('Could not save...', 400);
                 }
             }
 
-            $Sender->SetData('Title', T('Sendgrid Proxy'));
-            $Sender->Render('Sendgrid', '', 'plugins/VanillaPop');
+            $Sender->setData('Title', t('Sendgrid Proxy'));
+            $Sender->render('Sendgrid', '', 'plugins/VanillaPop');
         } catch (Exception $Ex) {
             $Contents = $Ex->getMessage()."\n"
                 .$Ex->getTraceAsString()."\n"
@@ -1171,8 +1171,8 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * @param SettingsController $sender
      * @param array $args
      */
-    public function SettingsController_VanillaPop_Create($sender, $args = []) {
-        $sender->Permission('Garden.Settings.Manage');
+    public function settingsController_vanillaPop_create($sender, $args = []) {
+        $sender->permission('Garden.Settings.Manage');
 
         $ConfSettings = [
             'Plugins.VanillaPop.DefaultCategoryID' => ['Control' => 'CategoryDropDown', 'Description' => 'Place discussions started through email in the following category.'],
@@ -1191,14 +1191,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         foreach (self::$FormatDefaults as $Name => $Default) {
             $Options = val('Options', $ConfSettings['EmailFormat.'.$Name], []);
-            if (StringEndsWith($Name, 'Body')) {
+            if (stringEndsWith($Name, 'Body')) {
                 $Options['Multiline'] = TRUE;
             }
             $ConfSettings['EmailFormat.'.$Name] = ['Control' => 'TextBox', 'Default' => $Default, 'Options' => $Options];
         }
 
         $Conf = new ConfigurationModule($sender);
-        $Conf->Initialize($ConfSettings);
+        $Conf->initialize($ConfSettings);
 
         $emailDomain = $this->getEmailDomain();
         list($slug, $tld) = $this->splitHostname($this->getSiteHostname());
@@ -1209,25 +1209,25 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         if ($emailDomain && $slug) {
-            $sender->SetData('IncomingAddress', "$slug@$emailDomain");
+            $sender->setData('IncomingAddress', "$slug@$emailDomain");
             if (!empty($nodeSlug) || strpos($slug, '.') === false) {
-                $sender->SetData('CategoryAddress', "categorycode.$slug@$emailDomain");
+                $sender->setData('CategoryAddress', "categorycode.$slug@$emailDomain");
             } else {
-                $sender->SetData('CategoryAddress', "$slug+categorycode@$emailDomain");
+                $sender->setData('CategoryAddress', "$slug+categorycode@$emailDomain");
             }
         }
 
-        $sender->AddSideMenu();
-        $sender->SetData('Title', T('Incoming Email'));
+        $sender->addSideMenu();
+        $sender->setData('Title', t('Incoming Email'));
         $sender->ConfigurationModule = $Conf;
-//      $Conf->RenderAll();
-        $sender->Render('Settings', '', 'plugins/VanillaPop');
+//      $Conf->renderAll();
+        $sender->render('Settings', '', 'plugins/VanillaPop');
     }
 
     /**
      * Allow roles to be configured to force email notifications.
      */
-    public function Base_BeforeRolePermissions_Handler($Sender) {
+    public function base_beforeRolePermissions_handler($Sender) {
         if (!C('Plugins.VanillaPop.AllowForceNotify')) {
             return;
         }
@@ -1249,7 +1249,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
     /**
      * Send forced email notifications.
      */
-    public function ForceNotify($Sender, $Args) {
+    public function forceNotify($Sender, $Args) {
         if (!C('Plugins.VanillaPop.AllowForceNotify')) {
             return;
         }
@@ -1265,7 +1265,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         // Get effected roles.
         $RoleModel = new RoleModel();
         $RoleIDs = [];
-        if ($ActivityType == 'Discussion' && GetValue('Announce', $Args['Discussion'])) {
+        if ($ActivityType == 'Discussion' && getValue('Announce', $Args['Discussion'])) {
             // Add everyone with force notify all OR announcement-only option.
             $Wheres = ['ForceNotify >' => 0];
         } else {
@@ -1273,24 +1273,24 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $Wheres = ['ForceNotify' => 1];
         }
 
-        $Roles = $RoleModel->GetWhere($Wheres)->ResultArray();
+        $Roles = $RoleModel->getWhere($Wheres)->resultArray();
         foreach ($Roles as $Role) {
-            $RoleIDs[] = GetValue('RoleID', $Role);
+            $RoleIDs[] = getValue('RoleID', $Role);
         }
 
         // Get users in those roles.
         $UserRoles = $Sender->SQL
-            ->Select('UserID')
-            ->Distinct()
-            ->From('UserRole')
-            ->WhereIn('RoleID', $RoleIDs)
-            ->Get()->ResultArray();
+            ->select('UserID')
+            ->distinct()
+            ->from('UserRole')
+            ->whereIn('RoleID', $RoleIDs)
+            ->get()->resultArray();
 
 
         // Add an activity for each person and pray we don't melt the wibbles.
         foreach ($UserRoles as $UserRole) {
             $Activity['NotifyUserID'] = $UserRole['UserID'];
-            $ActivityModel->Queue($Activity, FALSE, ['Force' => TRUE]);
+            $ActivityModel->queue($Activity, FALSE, ['Force' => TRUE]);
         }
     }
 
