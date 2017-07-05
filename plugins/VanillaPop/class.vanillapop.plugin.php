@@ -68,7 +68,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         if ($Quote) {
             if (is_array($Quote)) {
-                $Quote = Gdn_Format::plainText($Quote['Body'], getValue('Format', $Quote, 'Text'));
+                $Quote = Gdn_Format::plainText($Quote['Body'], val('Format', $Quote, 'Text'));
             }
 
             $Quote = "\n\n".t('You wrote:')."\n\n".self::formatQuoteText($Quote);
@@ -220,7 +220,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         if (preg_match('`([a-z]+)-?([0-9]+)`i', $UID, $Matches)) {
-            $Type = getValue($Matches[1], self::$Types, null);
+            $Type = val($Matches[1], self::$Types, null);
             if ($Type) {
                 $ID = $Matches[2];
                 return [$Type, $ID];
@@ -240,7 +240,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $ReplyType = null;
         $ReplyID = null;
 
-        if (getValue('ReplyTo', $Data)) {
+        if (val('ReplyTo', $Data)) {
             trace("ReplyTo: {$Data['ReplyTo']}");
             // See if we are replying to something specifically.
             list($ReplyType, $ReplyID) = self::parseUID($Data['ReplyTo']);
@@ -248,11 +248,11 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         if (!$ReplyType) {
             // Grab the reply from the to.
-            list($ToName, $ToEmail) = self::parseEmailAddress(GetValue('To', $Data));
+            list($ToName, $ToEmail) = self::parseEmailAddress(val('To', $Data));
             list($ReplyType, $ReplyID) = self::parseType($ToEmail);
         }
 
-        if ((!$ReplyType || $ReplyType == 'Category') && getValue('ReplyTo', $Data)) {
+        if ((!$ReplyType || $ReplyType == 'Category') && val('ReplyTo', $Data)) {
             // This may be replying to the SourceID rather than the UID.
             $SaveType = $this->saveTypeFromRepyTo($Data);
         }
@@ -346,7 +346,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                         // Grab the discussion so we can see its category.
                         $DiscussionModel = new DiscussionModel();
                         $Discussion = $DiscussionModel->getID($Comment['DiscussionID'], DATASET_TYPE_ARRAY);
-                        $Data['CategoryID'] = getValue('CategoryID', $Discussion);
+                        $Data['CategoryID'] = val('CategoryID', $Discussion);
 
                         $SaveType = 'Comment';
                         $Data['DiscussionID'] = $Comment['DiscussionID'];
@@ -390,10 +390,10 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         // Set the source of the post.
         $Data['Source'] = 'Email';
-        $Data['SourceID'] = getValue('MessageID', $Data, null);
+        $Data['SourceID'] = val('MessageID', $Data, null);
         unset($Data['MessageID']);
 
-        $Category = CategoryModel::categories(GetValue('CategoryID', $Data));
+        $Category = CategoryModel::categories(val('CategoryID', $Data));
         if ($Category) {
             $PermissionCategoryID = $Category['PermissionCategoryID'];
         } else {
@@ -496,7 +496,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             'Comment' => ['Comment', 'DiscussionID'],
             'ConversationMessage' => ['Message', 'ConversationID']];
 
-        $ReplyTo = trim(getValue('ReplyTo', $Data));
+        $ReplyTo = trim(val('ReplyTo', $Data));
         if (!$ReplyTo) {
             return null;
         }
@@ -523,13 +523,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $Email->PhpMailer->From = self::addIDToEmail($From, 'noreply');
 
         if (is_array($Quote)) {
-            $MessageID = getValue('MessageID', $Quote);
+            $MessageID = val('MessageID', $Quote);
             if ($MessageID) {
                 $Email->PhpMailer->addCustomHeader("In-Reply-To:$MessageID");
                 $Email->PhpMailer->addCustomHeader("References:$MessageID");
             }
 
-            $Subject = getValue('Subject', $Quote);
+            $Subject = val('Subject', $Quote);
             if ($Subject) {
                 $Email->subject(sprintf('Re: [%s] %s', c('Garden.Title'), ltrim(stringBeginsWith($Subject, 'Re:', true, true))));
             }
@@ -556,7 +556,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $User = Gdn::userModel()->getID($User);
         }
 
-        $Email->PhpMailer->FromName = getValue('Name', $User);
+        $Email->PhpMailer->FromName = val('Name', $User);
     }
 
     /**
@@ -574,7 +574,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         $FormatData['Quote'] = self::formatQuoteText($FormatData['Body']);
 
-        $CanView = Gdn::userModel()->getCategoryViewPermission($User['UserID'], getValue('CategoryID', $Discussion));
+        $CanView = Gdn::userModel()->getCategoryViewPermission($User['UserID'], val('CategoryID', $Discussion));
         $CanReply = self::checkUserPermission($User['UserID'], 'Email.Comments.Add');
         $Route = '/discussion/'.$Discussion['DiscussionID'].'/'.Gdn_Format::url($Discussion['Name']);
         $FormatData['Signature'] = self::emailSignature($Route, $CanView, $CanReply);
@@ -592,7 +592,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $Email->PhpMailer->From = self::addIDToEmail($Email->PhpMailer->From, self::uid('Discussion', $Discussion['DiscussionID']));
         $Email->to($User['Email'], $User['Name']);
 
-        $ReplyTo = getValue('SourceID', $Discussion);
+        $ReplyTo = val('SourceID', $Discussion);
         if (isset($ReplyTo)) {
             $Email->PhpMailer->addCustomHeader("In-Reply-To:$ReplyTo");
             $Email->PhpMailer->addCustomHeader("References:$ReplyTo");
@@ -667,7 +667,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
             $LabelCode = self::labelCode($Row);
 
-            $Description = getValue('Description', $Row, '');
+            $Description = val('Description', $Row, '');
             if ($Description) {
                 $Description = '<div class="Info">'.$Description.'</div>';
             }
@@ -834,7 +834,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * @return null|string Returns a UID as a string or **null** of {@link $type} is unknown.
      */
     public static function uid($type, $id, $format = '') {
-        $typeKey = getValue($type, array_flip(self::$Types), null);
+        $typeKey = val($type, array_flip(self::$Types), null);
         if (!$typeKey) {
             return null;
         }
@@ -863,15 +863,15 @@ class VanillaPopPlugin extends Gdn_Plugin {
             $Type = $Args['RecordType'];
             $ID = $Args['RecordID'];
         } else {
-            list($Type, $ID) = self::parseRoute(GetValue('Route', $Args));
+            list($Type, $ID) = self::parseRoute(val('Route', $Args));
         }
 
-        $FormatData = ['Title' => c('Garden.Title'), 'Signature' => self::emailSignature(GetValue('Route', $Args))];
+        $FormatData = ['Title' => c('Garden.Title'), 'Signature' => self::emailSignature(val('Route', $Args))];
         $NotifyUserID = getValueR('Activity.NotifyUserID', $Args);
 
         if (in_array($Type, ['Discussion', 'Comment', 'Conversation', 'Message'])) {
             $Email = $Args['Email']; //new Gdn_Email(); //
-            $Story = getValue('Story', $Args);
+            $Story = val('Story', $Args);
 
             switch ($Type) {
                 case 'Discussion':
@@ -879,9 +879,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     $Discussion = $DiscussionModel->getID($ID);
                     if ($Discussion) {
                         // See if the user has permission to view this discussion on the site.
-                        $CanView = Gdn::userModel()->getCategoryViewPermission($NotifyUserID, getValue('CategoryID', $Discussion));
+                        $CanView = Gdn::userModel()->getCategoryViewPermission($NotifyUserID, val('CategoryID', $Discussion));
                         $CanReply = self::checkUserPermission($NotifyUserID, 'Email.Comments.Add');
-                        $FormatData['Signature'] = self::emailSignature(GetValue('Route', $Args), $CanView, $CanReply);
+                        $FormatData['Signature'] = self::emailSignature(val('Route', $Args), $CanView, $CanReply);
 
                         $Discussion = (array)$Discussion;
                         $Discussion['Name'] = Gdn_Format::plainText($Discussion['Name'], 'Text');
@@ -903,7 +903,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                         $Email->subject($Subject);
 
                         $this->setFrom($Email, $Discussion['InsertUserID']);
-                        $Email->PhpMailer->From = self::addIDToEmail($Email->PhpMailer->From, self::uid('Discussion', getValue('DiscussionID', $Discussion)));
+                        $Email->PhpMailer->From = self::addIDToEmail($Email->PhpMailer->From, self::uid('Discussion', val('DiscussionID', $Discussion)));
                     }
                     break;
                 case 'Comment':
@@ -917,7 +917,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                         $Body = $this->parseQuotes($Body);
 
                         $Comment['Body'] = $Body;
-                        $Comment['Url'] = externalUrl(GetValue('Route', $Args));
+                        $Comment['Url'] = externalUrl(val('Route', $Args));
                         $Comment = [$Comment];
                         Gdn::userModel()->joinUsers($Comment, ['InsertUserID', 'UpdateUserID']);
                         $Comment = $Comment[0];
@@ -935,9 +935,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
                         if ($Discussion) {
                             // See if the user has permission to view this discussion on the site.
-                            $CanView = Gdn::userModel()->getCategoryViewPermission($NotifyUserID, getValue('CategoryID', $Discussion));
+                            $CanView = Gdn::userModel()->getCategoryViewPermission($NotifyUserID, val('CategoryID', $Discussion));
                             $CanReply = self::checkUserPermission($NotifyUserID, 'Email.Comments.Add');
-                            $FormatData['Signature'] = self::emailSignature(GetValue('Route', $Args), $CanView, $CanReply); //.print_r(array('CanView' => $CanView, 'CanReply' => $CanReply), true);
+                            $FormatData['Signature'] = self::emailSignature(val('Route', $Args), $CanView, $CanReply); //.print_r(array('CanView' => $CanView, 'CanReply' => $CanReply), true);
 
                             $Discussion['Name'] = Gdn_Format::plainText($Discussion['Name'], 'Text');
                             $Discussion['Body'] = Gdn_Format::plainText($Discussion['Body'], $Discussion['Format']);
@@ -951,16 +951,16 @@ class VanillaPopPlugin extends Gdn_Plugin {
                             $Subject = formatString(C('EmailFormat.CommentSubject', self::$FormatDefaults['CommentSubject']), $FormatData);
                             $Email->subject($Subject);
 
-                            $Source = getValue('Source', $Discussion);
+                            $Source = val('Source', $Discussion);
                             if ($Source == 'Email') {
                                  // replying to an email...
-                                $ReplyTo = getValue('SourceID', $Discussion);
+                                $ReplyTo = val('SourceID', $Discussion);
                             }
                             else {
-                                $ReplyTo = self::uid('Discussion', getValue('DiscussionID', $Discussion), 'email');
+                                $ReplyTo = self::uid('Discussion', val('DiscussionID', $Discussion), 'email');
                             }
 
-                            $Email->PhpMailer->From = self::addIDToEmail($Email->PhpMailer->From, self::uid('Discussion', getValue('DiscussionID', $Discussion)));
+                            $Email->PhpMailer->From = self::addIDToEmail($Email->PhpMailer->From, self::uid('Discussion', val('DiscussionID', $Discussion)));
                         }
                     }
 
@@ -990,13 +990,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
                             }
                         }
 
-                        $Email->PhpMailer->From = self::addIDToEmail($Email->PhpMailer->From, self::uid('Message', getValue('MessageID', $Message)));
+                        $Email->PhpMailer->From = self::addIDToEmail($Email->PhpMailer->From, self::uid('Message', val('MessageID', $Message)));
                     }
 
                     // See if the user has permission to view this discussion on the site.
                     $CanView = true;
                     $CanReply = self::checkUserPermission($NotifyUserID, 'Email.Conversations.Add');
-                    $FormatData['Signature'] = self::emailSignature(GetValue('Route', $Args), $CanView, $CanReply);
+                    $FormatData['Signature'] = self::emailSignature(val('Route', $Args), $CanView, $CanReply);
 
                     $Message = Gdn_Format::to($Message['Body'], $Message['Format']);
                     $Message = $this->transformQuotes($Message);
@@ -1021,7 +1021,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
     public function commentModel_beforeNotification_handler($Sender, $Args) {
         // Make sure the discussion's user is notified if they started the discussion by email.
         if (getValueR('Discussion.Source', $Args) == 'Email') {
-            $NotifiedUsers = (array)GetValue('NotifiedUsers', $Args);
+            $NotifiedUsers = (array)val('NotifiedUsers', $Args);
             $InsertUserID = getValueR('Discussion.InsertUserID', $Args);
 
             // Construct an activity and send it.
@@ -1039,7 +1039,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 'RecordType' => 'Comment',
                 'RecordID' => $CommentID,
                 'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
-                'Data' => ['Name' => getValue('Name', $Args['Discussion'])],
+                'Data' => ['Name' => val('Name', $Args['Discussion'])],
                 'Notified' => ActivityModel::SENT_OK,
                 'Emailed' => ActivityModel::SENT_PENDING
             ];
@@ -1069,9 +1069,9 @@ class VanillaPopPlugin extends Gdn_Plugin {
 //      $Format = getValueR('Object.Format', $Args);
 //      $Text = self::formatPlainText($Body, $Format);
 //
-//      $Source = getValue('Source', $Attributes, false);
+//      $Source = val('Source', $Attributes, false);
 //      if (is_array($Source))
-//         echo '<pre>'.htmlspecialchars(getValue("Headers", $Attributes), $Source).'</pre>';
+//         echo '<pre>'.htmlspecialchars(val("Headers", $Attributes), $Source).'</pre>';
 //   }
 
     public function gdn_Dispatcher_BeforeBlockDetect_Handler($Sender, $Args) {
@@ -1128,14 +1128,14 @@ class VanillaPopPlugin extends Gdn_Plugin {
                     'subject' => 'Subject'
                 ]);
 
-                //         self::log('Parsing headers.'.getValue('headers', $Post, ''));
-                $Headers = self::parseEmailHeader(GetValue('headers', $Post, ''));
+                //         self::log('Parsing headers.'.val('headers', $Post, ''));
+                $Headers = self::parseEmailHeader(val('headers', $Post, ''));
                 //         self::log('Headers: '.print_r($Headers, true));
                 $Headers = array_change_key_case($Headers);
                 $HeaderData = arrayTranslate($Headers, ['message-id' => 'MessageID', 'references' => 'References', 'in-reply-to' => 'ReplyTo']);
                 $Data = array_merge($Data, $HeaderData);
 
-                if (false && getValue('html', $Post)) {
+                if (false && val('html', $Post)) {
                     $Data['Body'] = $Post['html'];
                     $Data['Format'] = 'Html';
                 } else {
@@ -1265,7 +1265,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         // Get effected roles.
         $RoleModel = new RoleModel();
         $RoleIDs = [];
-        if ($ActivityType == 'Discussion' && getValue('Announce', $Args['Discussion'])) {
+        if ($ActivityType == 'Discussion' && val('Announce', $Args['Discussion'])) {
             // Add everyone with force notify all OR announcement-only option.
             $Wheres = ['ForceNotify >' => 0];
         } else {
@@ -1275,7 +1275,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         $Roles = $RoleModel->getWhere($Wheres)->resultArray();
         foreach ($Roles as $Role) {
-            $RoleIDs[] = getValue('RoleID', $Role);
+            $RoleIDs[] = val('RoleID', $Role);
         }
 
         // Get users in those roles.
