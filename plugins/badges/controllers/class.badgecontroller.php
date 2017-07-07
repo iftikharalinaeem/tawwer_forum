@@ -273,7 +273,7 @@ class BadgeController extends BadgesAppController {
                     $this->setData('Badge', $OutputBadge);
 
                     $this->informMessage(t('Gave badge to user.'));
-                    $this->setRedirectTo(url('profile/'.$UserID.'/'.val('Name', $this->User)));
+                    $this->setRedirectTo('profile/'.$UserID.'/'.val('Name', $this->User));
                 }
             } else {
                 throw NotFoundException('Badge');
