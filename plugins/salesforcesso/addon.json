@@ -1,0 +1,20 @@
+{
+    "name": "Salesforce Single Sign-on",
+    "description": "Allow users to signin through a Salesforce App.",
+    "version": "1.0",
+    "settingsUrl": "/settings/salesforcesso",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "salesforce.png",
+    "key": "salesforcesso",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Patrick Kelly",
+            "email": "patrick.k@vanillaforums.com",
+            "homepage": "https://vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0"
+    }
+}
