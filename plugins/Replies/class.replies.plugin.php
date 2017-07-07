@@ -216,9 +216,9 @@ class RepliesPlugin extends Gdn_Plugin {
                // Redirect to the comment or the discussion to show the new reply.
                $Row = $ReplyModel->GetRecord($ReplyID);
                if ($ReplyToCommentID < 0)
-                  $Sender->setRedirectTo(DiscussionUrl($Row), false);
+                  $Sender->setRedirectTo(DiscussionUrl($Row));
                else
-                  $Sender->setRedirectTo(CommentUrl($Row), false);
+                  $Sender->setRedirectTo(CommentUrl($Row));
                $Sender->Render('Blank', 'Utility', 'Dashboard');
             } else {
                $Sender->Form->SetValidationResults($ReplyModel->ValidationResults());
@@ -298,7 +298,7 @@ class RepliesPlugin extends Gdn_Plugin {
          if ($CommentID) {
             $CommentModel = new CommentModel();
             $Comment = $CommentModel->GetID($CommentID);
-            $Sender->setRedirectTo(CommentUrl($Comment), false);
+            $Sender->setRedirectTo(CommentUrl($Comment));
          } else {
             $Sender->Form->SetValidationResults($Model->ValidationResults());
          }

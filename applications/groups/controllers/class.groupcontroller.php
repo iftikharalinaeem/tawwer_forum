@@ -195,7 +195,7 @@ class GroupController extends Gdn_Controller {
             $Form->setModel($Model);
 
             if ($Form->save()) {
-                $this->setRedirectTo(groupUrl($Group), false);
+                $this->setRedirectTo(groupUrl($Group));
             } else {
                 $Form->setValidationResults($Model->validationResults());
             }
@@ -312,7 +312,7 @@ class GroupController extends Gdn_Controller {
 
         $Result = $this->GroupModel->joinInvite($Group['GroupID'], Gdn::session()->UserID, true);
         $this->setData('Result', $Result);
-        $this->setRedirectTo(groupUrl($Group), false);
+        $this->setRedirectTo(groupUrl($Group));
         $this->render('Blank', 'Utility', 'Dashboard');
     }
 
@@ -334,7 +334,7 @@ class GroupController extends Gdn_Controller {
         $this->SetData('Result', $Result);
 
         $this->jsonTarget('.GroupUserHeaderModule', '', 'SlideUp');
-        $this->setRedirectTo(groupUrl($Group), false);
+        $this->setRedirectTo(groupUrl($Group));
         $this->informMessage(t('Invitation declined.'));
         $this->render('Blank', 'Utility', 'Dashboard');
     }
@@ -371,7 +371,7 @@ class GroupController extends Gdn_Controller {
             $Form->setValidationResults($this->GroupModel->validationResults());
 
             if ($Saved) {
-                $this->setRedirectTo(groupUrl($Group), false);
+                $this->setRedirectTo(groupUrl($Group));
             }
         }
 
@@ -447,7 +447,7 @@ class GroupController extends Gdn_Controller {
 
             if ($GroupDeleted) {
                 $this->informMessage(formatString(t('<b>{Name}</b> deleted.'), $Group));
-                $this->setRedirectTo('/groups', false);
+                $this->setRedirectTo('/groups');
             } else {
                 $this->informMessage(t('Failed to delete group.'));
             }
