@@ -114,7 +114,7 @@ class PollsPlugin extends Gdn_Plugin {
         }
 
         if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
-            redirectTo($return, 302, false);
+            redirectTo($return);
         }
 
         // Otherwise get the poll html & return it.
@@ -327,7 +327,7 @@ class PollsPlugin extends Gdn_Plugin {
             $sender->Form->setValidationResults($pollModel->validationResults());
             if ($sender->Form->errorCount() == 0) {
                 $discussion = $sender->DiscussionModel->getID($discussionID);
-                redirectTo(discussionUrl($discussion), 302, false);
+                redirectTo(discussionUrl($discussion));
             }
         }
 

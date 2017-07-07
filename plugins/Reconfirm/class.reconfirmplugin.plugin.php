@@ -62,7 +62,7 @@ class ReconfirmPlugin extends Gdn_Plugin {
         $disallowUrls = array('/discussion/', '/messages', '/profile', '/activity');
         if ($this->disallowUrl($disallowUrls)) {
             // All authenticated users who have not confirmed are redirected to the confirm page.
-            redirectTo('/entry/confirm', 302, false);
+            redirectTo('/entry/confirm');
         }
 
         return;
@@ -154,7 +154,7 @@ class ReconfirmPlugin extends Gdn_Plugin {
                 //save the password, confirmed terms, etc.
                 $sender->UserModel->passwordReset(gdn::session()->UserID, gdn::request()->post('Password'));
                 $sender->UserModel->setField(gdn::session()->UserID, "ConfirmedTerms", 1);
-                redirectTo('/', 302, false);
+                redirectTo('/');
             }
         }
         $sender->render("confirm", "", "plugins/Reconfirm");

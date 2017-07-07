@@ -126,7 +126,7 @@ class WatermarkPlugin extends Gdn_Plugin {
             if (gdn::request()->post('delete_watermark')) {
                 // Remove the existing watermark in form. Redirect back to form.
                 $this->removeWatermark();
-                redirectTo('/settings/watermark', 302, false);
+                redirectTo('/settings/watermark');
             }
 
             if ($sender->Form->save() !== false) {

@@ -93,7 +93,7 @@ class BadgeController extends BadgesAppController {
 
         // Validate BadgeID
         if (!is_numeric($BadgeID)) {
-            redirectTo('/badge/all', 302, false);
+            redirectTo('/badge/all');
         }
 
         $Badge = $this->BadgeModel->getID($BadgeID);
@@ -151,7 +151,7 @@ class BadgeController extends BadgesAppController {
         }
 
         if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-            redirectTo('badge/all', 302, false);
+            redirectTo('badge/all');
         }
 
         // Regenerate the view we take this action from.
@@ -170,7 +170,7 @@ class BadgeController extends BadgesAppController {
 
         // Validate BadgeID
         if (!is_numeric($BadgeID)) {
-            redirectTo('/badge/all', 302, false);
+            redirectTo('/badge/all');
         }
 
         // Get info & confirm enabled

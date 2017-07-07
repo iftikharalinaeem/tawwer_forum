@@ -155,7 +155,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         } else {
             $redirectURL = '/entry/saml/'.$provider['AuthenticationKey'];
         }
-        redirectTo($redirectURL, 302, false);
+        redirectTo($redirectURL);
     }
 
     /**
@@ -286,7 +286,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
             if ($valid) {
                 Gdn::session()->end();
-                redirectTo('/', 302, false);
+                redirectTo('/');
             }
         } else {
             $saml = Gdn::session()->stash('samlsso', '', false);

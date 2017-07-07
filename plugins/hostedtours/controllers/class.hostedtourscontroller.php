@@ -48,7 +48,7 @@ class HostedToursController extends Gdn_Controller {
                 ->message("{$userSlug} wants to take the {$tourSlug} again on {$siteName}")
                 ->send();
 
-        redirectTo('/', 302, false);
+        redirectTo('/');
     }
 
 }

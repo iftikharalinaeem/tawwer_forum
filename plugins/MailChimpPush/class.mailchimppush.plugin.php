@@ -399,7 +399,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
             if ($modified) {
                 $sender->informMessage(t('Changes saved'));
-                redirectTo('/plugin/mailchimp', 302, false);
+                redirectTo('/plugin/mailchimp');
             }
         }
 

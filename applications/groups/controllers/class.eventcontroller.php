@@ -154,7 +154,7 @@ class EventController extends Gdn_Controller {
                 }
 
                 $this->informMessage(formatString(t("New event created for <b>'{Name}'</b>"), $EventData));
-                redirectTo(eventUrl($EventData), 302, false);
+                redirectTo(eventUrl($EventData));
             }
 
         }
@@ -203,7 +203,7 @@ class EventController extends Gdn_Controller {
                 }
 
                 $this->informMessage(formatString(t("<b>'{Name}'</b> has been updated"), $EventData));
-                redirectTo(eventUrl($Event), 302, false);
+                redirectTo(eventUrl($Event));
             }
         }
 

@@ -469,9 +469,9 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (Gdn::session()->validateTransientKey(val(1, $Sender->RequestArgs))) {
             if (c('Plugins.Zendesk.GlobalLogin.Enabled')) {
                 $this->disable();
-                redirectTo('/plugin/zendesk', 302, false);
+                redirectTo('/plugin/zendesk');
             }
-            redirectTo('/plugin/zendesk/authorize', 302, false);
+            redirectTo('/plugin/zendesk/authorize');
 
         }
     }
@@ -749,7 +749,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         $this->EventArguments['User'] = $Sender->User;
         $this->fireEvent('AfterConnection');
 
-        redirectTo(UserUrl($Sender->User, '', 'connections'), 302, false);
+        redirectTo(UserUrl($Sender->User, '', 'connections'));
     }
 
     /**
@@ -781,7 +781,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             ]);
             throw new Gdn_UserException('Error Connecting to Zendesk');
         }
-        redirectTo(Url('/plugin/zendesk'), 302, false);
+        redirectTo('/plugin/zendesk');
 
     }
 

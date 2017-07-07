@@ -599,7 +599,7 @@ abstract class OAuth2PluginBase {
                 $this->EventArguments['User'] = $sender->User;
                 $this->fireEvent('AfterConnection');
 
-                redirectTo(userUrl($user, '', 'connections'), 302, false);
+                redirectTo(userUrl($user, '', 'connections'));
                 break;
             case 'entry':
             default:
@@ -612,7 +612,7 @@ abstract class OAuth2PluginBase {
                 if ($target = val('target', $state)) {
                     $url .= '?Target='.urlencode($target);
                 }
-                redirectTo($url, 302, false);
+                redirectTo($url);
                 break;
         }
     }
