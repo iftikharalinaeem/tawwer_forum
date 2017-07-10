@@ -253,8 +253,11 @@ class SubcommunityModel extends Gdn_Model {
         self::$all = null;
     }
 
-    public function delete($where = '', $Limit = false, $ResetData = false) {
-        $result = parent::delete($where, $Limit, $ResetData);
+    /**
+     * @inheritdoc
+     */
+    public function delete($where = [], $options = []) {
+        $result = parent::delete($where, $options);
         static::clearCache();
         return $result;
     }
