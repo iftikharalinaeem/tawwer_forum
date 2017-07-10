@@ -14,7 +14,7 @@ class SubcommunityToggleModule extends Gdn_Module {
             return '';
         }
         $style = strtolower($this->Style);
-        if (in_array($style, array('select'))) {
+        if (in_array($style, ['select'])) {
             $this->setView("subcommunitytoggle_$style");
         }
         $this->setData('Subcommunities', SubcommunityModel::getAvailable());

@@ -318,7 +318,7 @@ class SiteHubPlugin extends Gdn_Plugin {
         if (!Gdn::Session()->User) {
             throw NotFoundException('User');
         }
-        $ssoUser = arrayTranslate((array)Gdn::Session()->User, array('UserID' => 'UniqueID', 'Name', 'Email', 'Banned', 'Photo', 'PhotoUrl'));
+        $ssoUser = arrayTranslate((array)Gdn::Session()->User, ['UserID' => 'UniqueID', 'Name', 'Email', 'Banned', 'Photo', 'PhotoUrl']);
         $ssoUser['Photo'] = $ssoUser['PhotoUrl'];
 
         // Get the user's role.
@@ -340,7 +340,7 @@ class SiteHubPlugin extends Gdn_Plugin {
         $sender->EventArguments['Session'] =& Gdn::Session();
         $sender->FireEvent('hubSSO');
 
-        $sender->Data = array('User' => $ssoUser);
+        $sender->Data = ['User' => $ssoUser];
         SaveToConfig('Api.Clean', false, false);
         $sender->Render('Blank', 'Utility', 'Dashboard');
     }
