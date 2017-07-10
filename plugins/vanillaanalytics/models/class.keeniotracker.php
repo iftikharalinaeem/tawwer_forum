@@ -1299,7 +1299,7 @@ class KeenIOTracker implements TrackerInterface {
      * @param array $defaults List of default data pairs for all events.
      * @return array
      */
-    public function addDefaults(array $defaults = array()) {
+    public function addDefaults(array $defaults = []) {
         $additionalDefaults = [
             'keen' => [
                 'addons' => [

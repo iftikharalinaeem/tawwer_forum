@@ -72,7 +72,7 @@ class KeenIOClient extends Garden\Http\HttpClient {
      * @param array $config Configuration values for API communication.
      */
     public function __construct($baseUrl, $config) {
-        $default = array(
+        $default = [
             'baseUrl' => 'https://api.keen.io/{version}',
             'version' => self::API_VERSION,
             'masterKey' => null,
@@ -81,7 +81,7 @@ class KeenIOClient extends Garden\Http\HttpClient {
             'writeKey' => null,
             'readKey' => null,
             'projectID' => null
-        );
+        ];
 
         $config = array_merge($default, $config);
         $baseUrl = str_replace(
