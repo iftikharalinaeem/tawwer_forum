@@ -5,7 +5,7 @@ $IsPrivileged = $this->data('IsPrivileged');
 <div class="DataListWrap">
 <h2 class="H"><?php echo t('Note'); ?></h2>
 <ul class="DataList DataList-Notes">
-    <?php foreach ($this->data('Notes', array()) as $Row): ?>
+    <?php foreach ($this->data('Notes', []) as $Row): ?>
     <li id="UserNote_<?php echo $Row['UserNoteID']; ?>" class="Item Item-Row <?php echo 'UserNote-'.$Row['Type'] ?>">
       <?php
       $Func = "WriteUserNote{$Row['Type']}";
@@ -19,9 +19,9 @@ $IsPrivileged = $this->data('IsPrivileged');
             <div class="Options">
                <?php
                if ($IsPrivileged):
-                  echo anchor(t('edit'), '/profile/note?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => t('Edit'))).
+                  echo anchor(t('edit'), '/profile/note?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', ['title' => t('Edit')]).
                      bullet(' ').
-                     anchor(t('delete'), '/profile/deletenote?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => t('Delete')));
+                     anchor(t('delete'), '/profile/deletenote?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', ['title' => t('Delete')]);
                endif;
                ?>
             </div>
@@ -36,12 +36,12 @@ $IsPrivileged = $this->data('IsPrivileged');
       <div class="Item-Col Item-Col3 User-Col">
          <div class="Media">
              <?php if (!isset($Row['HideWarnerIdentity']) || !$Row['HideWarnerIdentity']): ?>
-                <?php echo userPhoto($Row, array('LinkClass' => 'Img', 'Px' => 'Insert')); ?>
+                <?php echo userPhoto($Row, ['LinkClass' => 'Img', 'Px' => 'Insert']); ?>
              <?php endif; ?>
             <div class="Media-Body">
                <?php
                if (!isset($Row['HideWarnerIdentity']) || !$Row['HideWarnerIdentity']) {
-                  echo '<div>'.userAnchor($Row, '', array('Px' => 'Insert')).'</div> ';
+                  echo '<div>'.userAnchor($Row, '', ['Px' => 'Insert']).'</div> ';
                }
                echo '<div class="Meta">'.Gdn_Format::date($Row['DateInserted'], 'html').'</div>';
                ?>

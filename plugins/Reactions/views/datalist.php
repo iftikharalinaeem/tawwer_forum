@@ -2,7 +2,7 @@
 
 <ul class="DataList Compact BlogList">
    <?php 
-   foreach ($this->Data('Data', array()) as $Row): 
+   foreach ($this->Data('Data', []) as $Row): 
       $this->SetData('Record', $Row);
    ?>
    <li id="<?php echo "{$Row['RecordType']}_{$Row['RecordID']}" ?>" class="Item">
@@ -10,15 +10,15 @@
       if ($Name = GetValue('Name', $Row)) {
          echo Wrap(
             Anchor(Gdn_Format::Text($Name), $Row['Url']),
-            'h3', array('class' => 'Title'));
+            'h3', ['class' => 'Title']);
       }
       ?>
       <div class="Item-Header">
          <div class="AuthorWrap">
             <span class="Author">
                <?php
-               echo UserPhoto($Row, array('Px' => 'Insert'));
-               echo UserAnchor($Row, array('Px' => 'Insert'));
+               echo UserPhoto($Row, ['Px' => 'Insert']);
+               echo UserAnchor($Row, ['Px' => 'Insert']);
                ?>
             </span>
 <!--            <span class="AuthorInfo">

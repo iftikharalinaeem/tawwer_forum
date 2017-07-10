@@ -53,7 +53,7 @@ class EventListModule extends Gdn_Module {
       * @internal param bool $showMore Whether to provide a link to see all of the events.
       * @internal param bool $withNewButton Whether to show the 'New Event' button.
       */
-     public function __construct($events = array(), $title = '', $emptyMessage = '', $layout = '', $withJoinButtons = true, $withOptions = true) {
+     public function __construct($events = [], $title = '', $emptyMessage = '', $layout = '', $withJoinButtons = true, $withOptions = true) {
           $this->events = $events;
           $this->title = $title;
           $this->emptyMessage = $emptyMessage;
@@ -71,10 +71,10 @@ class EventListModule extends Gdn_Module {
       * @return array The event options.
       */
      protected function getEventOptions($event) {
-          $options = array();
+          $options = [];
           if (EventPermission('Edit', $event)) {
-                $options[] = array('Text' => sprintf(t('Edit %s'), t('Event')), 'Url' => EventUrl($event, 'edit'));
-                $options[] = array('Text' => sprintf(t('Delete %s'), t('Event')), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup');
+                $options[] = ['Text' => sprintf(t('Edit %s'), t('Event')), 'Url' => EventUrl($event, 'edit')];
+                $options[] = ['Text' => sprintf(t('Delete %s'), t('Event')), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup'];
           }
           return $options;
      }
@@ -89,7 +89,7 @@ class EventListModule extends Gdn_Module {
           if (EventPermission('Member', $event) && !EventModel::isEnded($event)) {
                 $eventModel = new EventModel();
                 $status = $eventModel->isInvited(Gdn::session()->UserID, val('EventID', $event));
-                $statuses = array('Yes' => t('Attending'), 'No' => t('Not Attending'), 'Maybe' => t('Maybe'));
+                $statuses = ['Yes' => t('Attending'), 'No' => t('Not Attending'), 'Maybe' => t('Maybe')];
                 if (!$status || !array_key_exists($status, $statuses)) {
                      $realStatus = t('RSVP');
                      $status = 'rsvp';
@@ -97,7 +97,7 @@ class EventListModule extends Gdn_Module {
                      $realStatus = val($status, $statuses);
                      unset($statuses[$status]);
                 }
-                $dropdown = array();
+                $dropdown = [];
                 $trigger['text'] = '<span class="js-status" data-name="'.$status.'">'.$realStatus.'</span>';
                 $trigger['cssClass'] = '';
                 $dropdown['trigger'] = $trigger;
@@ -108,7 +108,7 @@ class EventListModule extends Gdn_Module {
                 }
                 return $dropdown;
           }
-          return array();
+          return [];
      }
 
      /**
@@ -118,7 +118,7 @@ class EventListModule extends Gdn_Module {
       * @return array The buttons' data.
       */
      protected function getEventListButtons($url) {
-          $buttons = array();
+          $buttons = [];
           $newEventButton['text'] = t('New Event');
           $newEventButton['url'] = $url;
           $newEventButton['cssClass'] = 'Button Primary NewEventButton';

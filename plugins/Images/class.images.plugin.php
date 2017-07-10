@@ -76,9 +76,9 @@ class ImagesPlugin extends Gdn_Plugin {
    public function PostController_AfterForms_Handler($Sender) {
       $Forms = $Sender->Data('Forms');
       if (!is_array($Forms))
-         $Forms = array();
+         $Forms = [];
 
-      $Forms[] = array('Name' => 'Image', 'Label' => Sprite('SpImage').T('New Image'), 'Url' => 'post/image');
+      $Forms[] = ['Name' => 'Image', 'Label' => Sprite('SpImage').T('New Image'), 'Url' => 'post/image'];
 		$Sender->SetData('Forms', $Forms);
 
    }
@@ -110,12 +110,12 @@ class ImagesPlugin extends Gdn_Plugin {
       $Sender->Form->SetModel($ImageModel);
       if (!$Sender->Form->IsPostBack()) {
          if ($Sender->Category !== NULL)
-            $Sender->Form->SetData(array('CategoryID' => $Sender->Category->CategoryID));
+            $Sender->Form->SetData(['CategoryID' => $Sender->Category->CategoryID]);
       } else { // Form was submitted
          $FormValues = $Sender->Form->FormValues();
          $DiscussionID = GetValue('DiscussionID', $FormValues);
          $NewDiscussion = $DiscussionID == 0;
-         $CommentIDs = array();
+         $CommentIDs = [];
          $DiscussionID = $ImageModel->Save($FormValues);
          $CommentIDs = $ImageModel->CommentIDs;
          $Sender->Form->SetValidationResults($ImageModel->ValidationResults());
@@ -148,7 +148,7 @@ class ImagesPlugin extends Gdn_Plugin {
       }
       // Set up the page and render
       $Sender->Title(T('New Image'));
-		$Sender->SetData('Breadcrumbs', array(array('Name' => $Sender->Data('Title'), 'Url' => '/post/image')));
+		$Sender->SetData('Breadcrumbs', [['Name' => $Sender->Data('Title'), 'Url' => '/post/image']]);
       $this->AddJsFiles();
       $Sender->AddJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugin/Reactions');
 
@@ -172,21 +172,21 @@ class ImagesPlugin extends Gdn_Plugin {
    public function PostController_UploadImage_Create($Sender) {
       error_reporting(E_ALL | E_STRICT);
 
-      $Paths = array(
+      $Paths = [
           'Upload' => PATH_UPLOADS.'/image-tmp/',
-          'Thumb' => PATH_UPLOADS.'/image-tmp/thumbnails/');
+          'Thumb' => PATH_UPLOADS.'/image-tmp/thumbnails/'];
       foreach ($Paths as $Path) {
          TouchFolder($Path);
       }
 
-      $upload_handler = new VanillaUploadHandler(array(
+      $upload_handler = new VanillaUploadHandler([
           'script_url' => Url('post/uploadimage', TRUE),
           'upload_dir' => $Paths['Upload'],
-          'image_versions' => array(
-            'thumbnail' => array(
+          'image_versions' => [
+            'thumbnail' => [
                  'upload_dir' => $Paths['Thumb']
-                ))
-         ));
+                ]]
+         ]);
 
       header('Pragma: no-cache');
       header('Cache-Control: no-store, no-cache, must-revalidate');
@@ -244,7 +244,7 @@ class ImagesPlugin extends Gdn_Plugin {
    }
 
    public function RootController_Render_Before($Sender) {
-      if (InArrayI($Sender->RequestMethod, array('bestof', 'bestof2'))) {
+      if (InArrayI($Sender->RequestMethod, ['bestof', 'bestof2'])) {
          $Sender->AddJsFile('tile.js', 'plugins/Images');
       }
    }

@@ -10,7 +10,7 @@
 class LeaderBoardModule extends Gdn_Module {
 
     /** @var array */
-    public $Leaders = array();
+    public $Leaders = [];
 
     /** @var string  */
     public $SlotType = 'w';

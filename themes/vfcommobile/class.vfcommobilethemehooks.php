@@ -23,7 +23,7 @@ class VFComMobileThemeHooks implements Gdn_IPlugin {
     */
    public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
       // Remove plugins so they don't mess up layout or functionality.
-      if (in_array($Sender->Application(), array('vanilla', 'conversations')) || ($Sender->Application() == 'dashboard' && in_array($Sender->Controller(), array('Activity', 'Profile', 'Search')))) {
+      if (in_array($Sender->Application(), ['vanilla', 'conversations']) || ($Sender->Application() == 'dashboard' && in_array($Sender->Controller(), ['Activity', 'Profile', 'Search']))) {
          Gdn::PluginManager()->RemoveMobileUnfriendlyPlugins();
       }
       SaveToConfig('Garden.Format.EmbedSize', '240x135', FALSE);
@@ -34,7 +34,7 @@ class VFComMobileThemeHooks implements Gdn_IPlugin {
     */
    public function Base_Render_Before($Sender) {
       if (IsMobile() && is_object($Sender->Head)) {
-         $Sender->Head->AddTag('meta', array('name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"));
+         $Sender->Head->AddTag('meta', ['name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"]);
          
          $Sender->Head->AddString('<script type="text/javascript">
 // If not looking for a specific comment, hide the address bar in iphone

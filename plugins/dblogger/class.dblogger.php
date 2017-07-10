@@ -46,8 +46,8 @@ class DbLogger implements LoggerInterface {
      * @param array $context
      * @return null|void
      */
-    public function log($level, $message, array $context = array()) {
-        $columns = array(
+    public function log($level, $message, array $context = []) {
+        $columns = [
             'id' => true,
             'userid' => true,
             'username' => true,
@@ -60,7 +60,7 @@ class DbLogger implements LoggerInterface {
             'method' => true,
             'domain' => true,
             'path' => true
-        );
+        ];
 
         $attributes = array_diff_key($context, $columns);
         $insert = array_diff_key($context, $attributes);

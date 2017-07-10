@@ -17,11 +17,11 @@ class FollowingPlugin extends Gdn_Plugin {
 
       $IsFollowing = $this->CheckIfFollowing($ViewingUserID, $Sender->User->UserID);
       $FollowText = ($IsFollowing) ? "Unfollow" : "Follow";
-      $Sender->EventArguments['ProfileOptions'][] = array(
+      $Sender->EventArguments['ProfileOptions'][] = [
          'Text' => sprintf(T($FollowText),$Sender->User->Name),
          'Url' => UserUrl($Sender->User, '', 'following'),
          'CssClass' => 'Hijack UserFollowButton'
-      );
+      ];
    }
 
    /**
@@ -42,19 +42,19 @@ class FollowingPlugin extends Gdn_Plugin {
       $IsFollowing = $this->CheckIfFollowing($ViewingUserID, $FollowedUserID);
       if ($IsFollowing) {
          // Unfollow
-         Gdn::SQL()->Delete('Following',array(
+         Gdn::SQL()->Delete('Following',[
             'UserID' => $ViewingUserID,
             'FollowedUserID' => $FollowedUserID
-         ));
+         ]);
 
          $Sender->InformMessage(sprintf(T("No longer following %s"), $ValidUser['Name']));
          $Sender->JsonTarget('.ProfileOptions .Dropdown .UserFollowButton', sprintf(T('Follow'), $ValidUser['Name']), 'Text');
       } else {
          // Follow
-         Gdn::SQL()->Insert('Following',array(
+         Gdn::SQL()->Insert('Following',[
             'UserID' => $ViewingUserID,
             'FollowedUserID' => $FollowedUserID
-         ));
+         ]);
          $Sender->InformMessage(sprintf(T("Following %s"), $ValidUser['Name']));
          $Sender->JsonTarget('.ProfileOptions .Dropdown .UserFollowButton', sprintf(T('Unfollow'), $ValidUser['Name']), 'Text');
       }

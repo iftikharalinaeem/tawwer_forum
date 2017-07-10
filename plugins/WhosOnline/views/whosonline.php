@@ -16,13 +16,13 @@ echo $this->Form->Errors();
         <tbody>
         <tr>
             <th><?php
-                echo $this->Form->Radio('WhosOnline.Location.Show', "Every", array('value' => 'every', 'selected' => 'selected'));
+                echo $this->Form->Radio('WhosOnline.Location.Show', "Every", ['value' => 'every', 'selected' => 'selected']);
                 ?></th>
             <td class="Alt"><?php echo T("This will show the panel on every page."); ?></td>
         </tr>
         <tr>
             <th><?php
-                echo $this->Form->Radio('WhosOnline.Location.Show', "Discussion", array('value' => "discussion"));
+                echo $this->Form->Radio('WhosOnline.Location.Show', "Discussion", ['value' => "discussion"]);
                 ?></th>
             <td class="Alt"><?php echo T("This show the plugin on only selected discussion pages"); ?></td>
         </tr>

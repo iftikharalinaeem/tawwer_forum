@@ -123,7 +123,7 @@ class IdeationPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = &$sender->EventArguments['SideMenu'];
-        $menu->addLink('Forum', t('Idea Statuses'), '/dashboard/settings/statuses', 'Garden.Settings.Manage', array('class' => 'nav-statuses'));
+        $menu->addLink('Forum', t('Idea Statuses'), '/dashboard/settings/statuses', 'Garden.Settings.Manage', ['class' => 'nav-statuses']);
     }
 
     /**
@@ -209,8 +209,8 @@ EOT
         $categoryData = CategoryModel::GetByPermission(
             'Discussions.View',
             $Value,
-            val('Filter', $Options, array('Archived' => 0)),
-            val('PermFilter', $Options, array())
+            val('Filter', $Options, ['Archived' => 0]),
+            val('PermFilter', $Options, [])
         );
         $ideaCategoryIDs = $this->getIdeaCategoryIDs();
         $ideaCategories = [];
@@ -584,7 +584,7 @@ EOT
         }
 
         if (isset($args['DiscussionOptions'])) {
-            $args['DiscussionOptions']['Ideation'] = array('Label' => t('Ideation').'...', 'Url' => '/discussion/ideationoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup');
+            $args['DiscussionOptions']['Ideation'] = ['Label' => t('Ideation').'...', 'Url' => '/discussion/ideationoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup'];
         } elseif (isset($sender->Options)) {
             $sender->Options .= '<li>'.anchor(t('Ideation').'...', '/discussion/ideationoptions?discussionid='.$discussion->DiscussionID, 'Popup IdeationOptions') . '</li>';
         }
@@ -669,7 +669,7 @@ EOT
         }
 
         $sender->setData('Discussion', $Discussion);
-        $sender->setData('_Types', array('Idea' => '@'.t('Ideation Type', 'Idea'), 'Discussion' => '@'.t('Discussion Type', 'Discussion')));
+        $sender->setData('_Types', ['Idea' => '@'.t('Ideation Type', 'Idea'), 'Discussion' => '@'.t('Discussion Type', 'Discussion')]);
         $sender->setData('Title', t('Ideation Options'));
         $sender->render('DiscussionOptions', '', 'plugins/ideation');
     }

@@ -27,9 +27,9 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
          $TrackerAccount = $TrackerCode;
       
       if ($TrackerAccount != '' && !is_array($TrackerAccount))
-         $TrackerAccount = array($TrackerAccount);
+         $TrackerAccount = [$TrackerAccount];
       if (!is_array($TrackerDomain))
-         $TrackerDomain = array($TrackerDomain);
+         $TrackerDomain = [$TrackerDomain];
       
       // If an account was specified, build the tracking command to send
       if (is_array($TrackerAccount) && $Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
@@ -82,7 +82,7 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
       $Sender->Form = new Gdn_Form();
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array('Plugins.GoogleAnalytics.TrackerDomain', 'Plugins.GoogleAnalytics.Account'));
+      $ConfigurationModel->SetField(['Plugins.GoogleAnalytics.TrackerDomain', 'Plugins.GoogleAnalytics.Account']);
       
       $Sender->Form->SetModel($ConfigurationModel);
       if ($Sender->Form->AuthenticatedPostBack() === FALSE) {

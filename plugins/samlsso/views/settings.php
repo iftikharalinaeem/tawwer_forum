@@ -41,7 +41,7 @@
                 echo wrap(
                     anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', $url, 'Hijack'),
                     'span',
-                    array('class' => "toggle-wrap toggle-wrap-$state")
+                    ['class' => "toggle-wrap toggle-wrap-$state"]
                 );
                 ?>
                 </td>

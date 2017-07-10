@@ -72,7 +72,7 @@ class ImageRequiredPlugin extends Gdn_Plugin {
     public function settingsController_afterCategorySettings_handler($sender, $args) {
         $imageRequiredCategory = c("ImageRequired.ImageRequiredCategory");
         if (!$imageRequiredCategory) {
-            $imageRequiredCategory = array();
+            $imageRequiredCategory = [];
         }
         $isChecked = in_array($sender->data('CategoryID'), $imageRequiredCategory) ? 1 : 0;
         $sender->Form->setValue("RequireImage", $isChecked);
@@ -88,7 +88,7 @@ class ImageRequiredPlugin extends Gdn_Plugin {
     public function categoryModel_beforeSaveCategory_handler ($sender, $args) {
         $imageRequiredCategory = c("ImageRequired.ImageRequiredCategory");
         if (!$imageRequiredCategory) {
-            $imageRequiredCategory = array();
+            $imageRequiredCategory = [];
         }
         $category = $args['FormPostValues'];
 

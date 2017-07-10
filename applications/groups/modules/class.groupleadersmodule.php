@@ -38,7 +38,7 @@ class GroupLeadersModule extends Gdn_Module {
           $GroupID = Gdn::controller()->data('Group.GroupID');
           $GroupModel = new GroupModel();
           $Group = $GroupModel->getID($GroupID);
-          $Leaders = $GroupModel->getMembers($GroupID, array('Role' => 'Leader'), 10);
+          $Leaders = $GroupModel->getMembers($GroupID, ['Role' => 'Leader'], 10);
 
           ob_start();
           ?>

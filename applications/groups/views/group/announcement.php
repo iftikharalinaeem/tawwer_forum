@@ -9,8 +9,8 @@
         ?>
         <div class="P P-Name">
             <?php
-            echo $this->Form->Label('Name', 'Name', array('class' => 'B'));
-            echo $this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput'));
+            echo $this->Form->Label('Name', 'Name', ['class' => 'B']);
+            echo $this->Form->TextBox('Name', ['maxlength' => 100, 'class' => 'InputBox BigInput']);
             ?>
         </div>
         <div class="P P-Body">
@@ -26,7 +26,7 @@
             else
                 echo Anchor(T('Cancel'), '/groups', 'Button');
 
-            echo ' '.$this->Form->Button('Save', array('class' => 'Button Primary'));
+            echo ' '.$this->Form->Button('Save', ['class' => 'Button Primary']);
             ?>
         </div>
         <?php echo $this->Form->Close(); ?>

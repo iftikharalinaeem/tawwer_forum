@@ -71,7 +71,7 @@ class ApplicantListModule extends Gdn_Module {
       * @return array The applicant buttons.
       */
      protected function getApplicantButtons($applicant, $group) {
-          $buttons = array();
+          $buttons = [];
           if (strtolower(val('Type', $applicant)) == 'application') {
                 $approve['text'] = t('Approve');
                 $approve['url'] = GroupUrl($group, 'approve')."?id={$applicant['GroupApplicantID']}";

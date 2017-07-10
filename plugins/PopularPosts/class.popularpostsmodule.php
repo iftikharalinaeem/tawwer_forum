@@ -152,10 +152,10 @@ class PopularPostsModule extends Gdn_Module {
             }
 
             $discussionModel = new DiscussionModel();
-            array_walk($filteredDiscussions, array($discussionModel, 'calculate'));
+            array_walk($filteredDiscussions, [$discussionModel, 'calculate']);
 
             // Join user data
-            Gdn::userModel()->joinUsers($filteredDiscussions, array('FirstUserID', 'LastUserID'));
+            Gdn::userModel()->joinUsers($filteredDiscussions, ['FirstUserID', 'LastUserID']);
             // Join categories
             CategoryModel::joinCategories($filteredDiscussions);
 

@@ -39,18 +39,18 @@ class AgeGatePlugin extends Gdn_Plugin {
     public function entryController_registerFormBeforeTerms_handler($sender, $args) {
 
         $days = array_merge(
-            array(0 => T('Day')),
+            [0 => T('Day')],
             array_combine(range(1, 31), range(1, 31))
         );
         $months = array_merge(
-            array(0 => T('Month')),
+            [0 => T('Month')],
             array_combine(range(1, 12), range(1, 12))
         );
         $years = array_combine(
             range(C('Plugins.AgeGate.StartYear', date('Y')), C('Plugins.AgeGate.StartYear', date('Y') - 100)),
             range(C('Plugins.AgeGate.StartYear', date('Y')), C('Plugins.AgeGate.StartYear', date('Y') - 100))
         );
-        $years = array(0 => T('Year')) + $years;
+        $years = [0 => T('Year')] + $years;
 
         $minimumAge = C('Plugins.AgeGate.MinimumAge', 0);
         $minimumAgeWithConsent = C('Plugins.AgeGate.MinimumAgeWithConsent', false);
@@ -58,7 +58,7 @@ class AgeGatePlugin extends Gdn_Plugin {
 
         echo '<li class="agegate-dob">';
         echo $sender->Form->label('Birthday', 'DateOfBirth');
-        echo $sender->Form->date('DateOfBirth', array('class' => 'AgeGate'));
+        echo $sender->Form->date('DateOfBirth', ['class' => 'AgeGate']);
         echo '</li>';
 
         if ($addConfirmation) {
@@ -158,10 +158,10 @@ class AgeGatePlugin extends Gdn_Plugin {
                 $sender->informMessage(T('Saved'));
             }
         } else {
-            $sender->Form->setData(array(
+            $sender->Form->setData([
                'MinimumAge' => C('Plugins.AgeGate.MinimumAge'),
                'AddConfirmation' => C('Plugins.AgeGate.AddConfirmation')
-            ));
+            ]);
         }
 
         $sender->render($sender->fetchViewLocation('settings', '', 'plugins/AgeGate'));

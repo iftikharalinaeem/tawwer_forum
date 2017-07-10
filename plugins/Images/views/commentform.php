@@ -25,7 +25,7 @@ $Session = Gdn::Session();
             <div class="FormWrapper FormWrapper-Condensed">
                <?php
                
-               echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'id' => 'UploadForm', 'action' => Url('/post/imagecomment')));
+               echo $this->Form->Open(['enctype' => 'multipart/form-data', 'id' => 'UploadForm', 'action' => Url('/post/imagecomment')]);
                WriteImageUpload(TRUE);
                echo $this->Form->Close();
                
@@ -36,7 +36,7 @@ $Session = Gdn::Session();
 //               $CommentOptions = array('MultiLine' => TRUE, 'format' => GetValueR('Comment.Format', $this));
                $this->FireEvent('BeforeBodyField');
                
-               echo $this->Form->BodyBox('Body', array('Table' => 'Comment', 'tabindex' => 1));
+               echo $this->Form->BodyBox('Body', ['Table' => 'Comment', 'tabindex' => 1]);
                
                echo '<div class="CommentOptions List Inline">';
 //               $this->FireEvent('AfterBodyField');
@@ -63,7 +63,7 @@ $Session = Gdn::Session();
 
                echo '</span>';
 
-               $ButtonOptions = array('class' => 'Button Primary CommentButton');
+               $ButtonOptions = ['class' => 'Button Primary CommentButton'];
                $ButtonOptions['tabindex'] = 2;
                /*
                Caused non-root users to not be able to add comments. Must take categories
@@ -82,7 +82,7 @@ $Session = Gdn::Session();
                   echo $this->Form->Button('Post Comment', $ButtonOptions);
                else {
                   $AllowSigninPopup = C('Garden.SignIn.Popup');
-                  $Attributes = array('tabindex' => '-1');
+                  $Attributes = ['tabindex' => '-1'];
                   if (!$AllowSigninPopup)
                      $Attributes['target'] = '_parent';
 

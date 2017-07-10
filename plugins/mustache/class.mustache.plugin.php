@@ -79,8 +79,8 @@ class MustachePlugin extends Gdn_Plugin {
 
         // Build a relative uri from the absolute file path found
         $templateRelativeUri = str_replace(
-           array(PATH_ROOT, DS),
-           array('', '/'),
+           [PATH_ROOT, DS],
+           ['', '/'],
            $viewLocation
         );
 

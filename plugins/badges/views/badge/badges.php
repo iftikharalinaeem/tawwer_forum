@@ -77,9 +77,9 @@ function activateBadge($badge, $ajaxString) {
 
     $return = '<span id="badges-toggle">';
     if ($State === 'Active') {
-        $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/badge/disable/'.$badge->BadgeID.'/'.$ajaxString), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+        $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/badge/disable/'.$badge->BadgeID.'/'.$ajaxString), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
     } else {
-        $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/badge/disable/'.$badge->BadgeID.'/'.$ajaxString), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+        $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/badge/disable/'.$badge->BadgeID.'/'.$ajaxString), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
     }
 
     $return .= '</span>';

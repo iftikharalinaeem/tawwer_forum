@@ -21,7 +21,7 @@ class BadgesAppController extends Gdn_Controller {
      * @access public
      * @var array
      */
-    public $Uses = array('Database', 'Form', 'BadgeModel', 'UserBadgeModel');
+    public $Uses = ['Database', 'Form', 'BadgeModel', 'UserBadgeModel'];
 
     /**
      * This is a good place to include JS, CSS, and modules used by all methods of this controller.

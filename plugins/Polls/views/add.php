@@ -23,7 +23,7 @@ if (!$cancelUrl) {
         $options = [
             'Value' => val('CategoryID', $this->Category),
             'IncludeNull' => true,
-            'PermFilter' => array('AllowedDiscussionTypes' => 'Poll'),
+            'PermFilter' => ['AllowedDiscussionTypes' => 'Poll'],
         ];
         echo '<div class="P">';
         echo '<div class="Category">';

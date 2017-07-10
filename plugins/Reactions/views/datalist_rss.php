@@ -3,7 +3,7 @@
 <language><?php echo Gdn::Config('Garden.Locale', 'en-US'); ?></language>
 <atom:link href="<?php echo htmlspecialchars(Url($this->SelfUrl, TRUE)); ?>" rel="self" type="application/rss+xml" />
 
-<?php foreach ($this->Data('Data', array()) as $Row): ?>
+<?php foreach ($this->Data('Data', []) as $Row): ?>
    <item>
       <title><?php echo Gdn_Format::Text(GetValue('Name', $Row)); ?></title>
       <link><?php echo $Row['Url']; ?></link>

@@ -50,7 +50,7 @@ abstract class Mustache_Template
      *
      * @return string Rendered template
      */
-    public function __invoke($context = array())
+    public function __invoke($context = [])
     {
         return $this->render($context);
     }
@@ -62,7 +62,7 @@ abstract class Mustache_Template
      *
      * @return string Rendered template
      */
-    public function render($context = array())
+    public function render($context = [])
     {
         return $this->renderInternal($this->prepareContextStack($context));
     }

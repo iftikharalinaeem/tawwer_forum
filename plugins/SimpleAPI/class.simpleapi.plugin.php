@@ -40,7 +40,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      */
     protected static function createException($errors) {
         $max_code = 0;
-        $messages = array();
+        $messages = [];
 
         foreach ($errors as $row) {
             list($code, $message) = $row;
@@ -69,9 +69,9 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      */
     public static function translatePost(&$Post, $ThrowError = true) {
 
-        $Errors = array();
+        $Errors = [];
         $PostData = $Post;
-        $Post = array();
+        $Post = [];
 
         // Loop over every KVP in the POST data
         foreach ($PostData as $Key => $Value) {
@@ -120,9 +120,9 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public static function translateGet(&$Get, $ThrowError = true) {
-        $Errors = array();
+        $Errors = [];
         $GetData = $Get;
-        $Get = array();
+        $Get = [];
 
         // Loop over every KVP in the POST data
         foreach ($GetData as $Key => $Value) {
@@ -162,8 +162,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      * @param string $Value
      */
     protected static function translateField(&$Data, $Field, $Value) {
-        $Errors = array();
-        $SupportedTables = array('Badge', 'Category', 'Rank', 'Role', 'User', 'Discussion');
+        $Errors = [];
+        $SupportedTables = ['Badge', 'Category', 'Rank', 'Role', 'User', 'Discussion'];
 
         try {
 
@@ -212,7 +212,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                     }
 
                     // Only allow the ForeignID of the discussion table.
-                    if ($SingularTableName === 'Discussion' && !in_array($ColumnLookup, array('DiscussionID', 'ForeignID')))
+                    if ($SingularTableName === 'Discussion' && !in_array($ColumnLookup, ['DiscussionID', 'ForeignID']))
                         $TableAllowed = false;
                 }
 
@@ -273,9 +273,9 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
                         // Simple table.field lookup types
                         case 'simple':
-                            $MatchRecords = Gdn::SQL()->GetWhere($TableName, array(
+                            $MatchRecords = Gdn::SQL()->GetWhere($TableName, [
                                 $ColumnLookup => $MultiValue
-                            ));
+                            ]);
                             if (!$MatchRecords->NumRows()) {
                                 $Code = (Gdn::Request()->Get('callback', false) && C('Garden.AllowJSONP')) ? 200 : 404;
                                 throw new Exception(self::notFoundString($FieldPrefix, $MultiValue), $Code);
@@ -319,8 +319,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
                     if (!is_null($LookupFieldValue)) {
                         if ($Multi) {
-                            if (!isset($Data[$OutputField])) $Data[$OutputField] = array();
-                            if (!is_array($Data[$OutputField])) $Data[$OutputField] = array($Data[$OutputField]);
+                            if (!isset($Data[$OutputField])) $Data[$OutputField] = [];
+                            if (!is_array($Data[$OutputField])) $Data[$OutputField] = [$Data[$OutputField]];
                             $Data[$OutputField][] = $LookupFieldValue;
                         } else {
                             $Data[$OutputField] = $LookupFieldValue;
@@ -343,7 +343,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             }
 
         } catch (Exception $Ex) {
-            $Errors[] = array($Ex->getCode(), $Ex->getMessage());
+            $Errors[] = [$Ex->getCode(), $Ex->getMessage()];
         }
 
         return $Errors;
@@ -386,7 +386,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             $ClassFile = "class.api.{$APIVersion}.php";
             $PluginInfo = Gdn::PluginManager()->GetPluginInfo('SimpleAPI');
             $PluginPath = $PluginInfo['PluginRoot'];
-            $MapperFile = CombinePaths(array($PluginPath, 'library', $ClassFile));
+            $MapperFile = CombinePaths([$PluginPath, 'library', $ClassFile]);
 
             if (!file_exists($MapperFile)) throw new Exception('No such API Mapper');
 
@@ -422,13 +422,13 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             header("Status: {$HTTPCode} {$Message}", true, $HTTPCode);
 
             // Set up data rray
-            $Data = array('Code' => $Code, 'Exception' => $Ex->getMessage(), 'Class' => get_class($Ex));
+            $Data = ['Code' => $Code, 'Exception' => $Ex->getMessage(), 'Class' => get_class($Ex)];
 
             if (Debug()) {
                 if ($Trace = Trace()) {
                     // Clear passwords from the trace.
                     array_walk_recursive($Trace, function (&$Value, $Key) {
-                        if (in_array(strtolower($Key), array('password'))) {
+                        if (in_array(strtolower($Key), ['password'])) {
                             $Value = '***';
                         }
                     });
@@ -504,7 +504,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             if ($Post)
                 $Post = json_decode($Post, true);
             else
-                $Post = array();
+                $Post = [];
         } else {
             $Post = Gdn::Request()->Post();
         }
@@ -554,11 +554,11 @@ class SimpleAPIPlugin extends Gdn_Plugin {
         $Sender->Permission('Garden.Settings.Manage');
 
         if ($Sender->Form->AuthenticatedPostBack()) {
-            $Save = array(
+            $Save = [
                 'Plugins.SimpleAPI.AccessToken' => $Sender->Form->GetFormValue('AccessToken'),
                 'Plugins.SimpleAPI.UserID' => NULL,
                 'Plugins.SimpleAPI.OnlyHttps' => (bool)$Sender->Form->GetFormValue('OnlyHttps')
-            );
+            ];
 
 
             // Validate the settings.
@@ -586,10 +586,10 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             }
         } else {
             // Get the data.
-            $Data = array(
+            $Data = [
                 'AccessToken' => C('Plugins.SimpleAPI.AccessToken'),
                 'UserID' => C('Plugins.SimpleAPI.UserID', Gdn::UserModel()->GetSystemUserID()),
-                'OnlyHttps' => C('Plugins.SimpleAPI.OnlyHttps'));
+                'OnlyHttps' => C('Plugins.SimpleAPI.OnlyHttps')];
 
             $User = Gdn::UserModel()->GetID($Data['UserID'], DATASET_TYPE_ARRAY);
             if ($User) {
@@ -615,7 +615,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($Sender) {
         $Menu = $Sender->EventArguments['SideMenu'];
-        $Menu->AddLink('Site Settings', T('API'), 'settings/api', 'Garden.Settings.Manage', array('class' => 'nav-api'));
+        $Menu->AddLink('Site Settings', T('API'), 'settings/api', 'Garden.Settings.Manage', ['class' => 'nav-api']);
     }
 
     /**
@@ -642,10 +642,10 @@ class SimpleAPIPlugin extends Gdn_Plugin {
         if (!$AccessToken)
             $AccessToken = md5(microtime());
 
-        SaveToConfig(array(
+        SaveToConfig([
             'Plugins.SimpleAPI.UserID' => $UserID,
             'Plugins.SimpleAPI.AccessToken' => $AccessToken
-        ));
+        ]);
     }
 
 }

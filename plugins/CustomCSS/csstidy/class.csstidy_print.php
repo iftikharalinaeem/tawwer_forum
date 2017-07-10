@@ -135,7 +135,7 @@ class csstidy_print
         }
 
         if ($this->parser->get_cfg('timestamp')) {
-            array_unshift($this->tokens, array(COMMENT, ' CSSTidy ' . $this->parser->version . ': ' . date('r') . ' '));
+            array_unshift($this->tokens, [COMMENT, ' CSSTidy ' . $this->parser->version . ': ' . date('r') . ' ']);
         }
 
         if (!empty($this->charset)) {
@@ -243,7 +243,7 @@ class csstidy_print
      */
     function _convert_raw_css()
     {
-        $this->tokens = array();
+        $this->tokens = [];
 
         foreach ($this->css as $medium => $val)
         {

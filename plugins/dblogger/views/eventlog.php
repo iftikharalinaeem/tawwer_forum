@@ -14,19 +14,19 @@
     });
 </script>
 <?php
-echo $this->Form->Open(array('action' => URL('/settings/eventlog'), 'Method' => 'GET', 'id' => 'filter-form'));
+echo $this->Form->Open(['action' => URL('/settings/eventlog'), 'Method' => 'GET', 'id' => 'filter-form']);
 echo $this->Form->Errors();
 //$this->Form = new Gdn_Form();
 ?>
 <div class="toolbar flex-wrap">
     <div class="date-from">
-        <?php echo $this->Form->TextBox('datefrom', array('class' => 'form-control', 'placeholder' => t('Date From'), 'aria-label' => t('Date From'))); ?>
+        <?php echo $this->Form->TextBox('datefrom', ['class' => 'form-control', 'placeholder' => t('Date From'), 'aria-label' => t('Date From')]); ?>
     </div>
     <div class="date-to">
-        <?php echo $this->Form->TextBox('dateto', array('class' => 'form-control', 'placeholder' => t('Date To'), 'aria-label' => t('Date To'))); ?>
+        <?php echo $this->Form->TextBox('dateto', ['class' => 'form-control', 'placeholder' => t('Date To'), 'aria-label' => t('Date To')]); ?>
     </div>
     <div class="event-name">
-        <?php echo $this->Form->TextBox('event', array('class' => 'form-control', 'placeholder' => t('Event Name'), 'aria-label' => t('Event Name'))); ?>
+        <?php echo $this->Form->TextBox('event', ['class' => 'form-control', 'placeholder' => t('Event Name'), 'aria-label' => t('Event Name')]); ?>
     </div>
     <div class="flex severity">
         <?php echo $this->Form->labelWrap('Severity', 'severity');  ?>
@@ -37,12 +37,12 @@ echo $this->Form->Errors();
     <div class="flex sort-order">
         <?php echo $this->Form->labelWrap('Sort Order', 'sortorder');  ?>
         <div class="input-wrap">
-            <?php echo $this->Form->DropDown('sortorder', array('desc' => 'DESC', 'asc' => 'ASC'), ['class' => 'form-control']); ?>
+            <?php echo $this->Form->DropDown('sortorder', ['desc' => 'DESC', 'asc' => 'ASC'], ['class' => 'form-control']); ?>
         </div>
     </div>
     <div class="flex">
         <?php echo $this->Form->Button("Filter"); ?>
-        <?php echo $this->Form->Button("Reset", array('id' => 'filter-reset', 'type' => 'reset')); ?>
+        <?php echo $this->Form->Button("Reset", ['id' => 'filter-reset', 'type' => 'reset']); ?>
     </div>
     <?php PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard']); ?>
 </div>

@@ -28,7 +28,7 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
 {
     private $baseDir;
     private $extension = '.mustache';
-    private $templates = array();
+    private $templates = [];
 
     /**
      * Mustache filesystem Loader constructor.
@@ -45,7 +45,7 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
      * @param string $baseDir Base directory containing Mustache template files.
      * @param array  $options Array of Loader options (default: array())
      */
-    public function __construct($baseDir, array $options = array())
+    public function __construct($baseDir, array $options = [])
     {
         $this->baseDir = $baseDir;
 

@@ -10,12 +10,12 @@ echo $this->Form->errors();
             <?php echo $this->Form->label("Where should the Online list be displayed?", "Plugins.Online.Location"); ?>
         </div>
         <div class="input-wrap">
-            <?php echo $this->Form->dropDown('Plugins.Online.Location', array(
+            <?php echo $this->Form->dropDown('Plugins.Online.Location', [
                 'every'           => "On every page",
                 'discussionlists' => "Only on Discussion and Category lists",
                 'discussions'     => "On all discussion pages",
                 'custom'          => "I'll place it manually with my theme"
-            ));
+            ]);
             ?>
         </div>
     </li>
@@ -24,10 +24,10 @@ echo $this->Form->errors();
             <?php echo $this->Form->label("How should the list be rendered?", "Plugins.Online.Style"); ?>
         </div>
         <div class="input-wrap">
-            <?php echo $this->Form->dropDown('Plugins.Online.Style', array(
+            <?php echo $this->Form->dropDown('Plugins.Online.Style', [
                 'pictures'        => "User Icons",
                 'links'           => "User Links"
-            ));
+            ]);
             ?>
         </div>
     </li>
@@ -36,10 +36,10 @@ echo $this->Form->errors();
             <?php echo $this->Form->label("Hide the Online list from guests?", "Plugins.Online.HideForGuests"); ?>
         </div>
         <div class="input-wrap">
-            <?php echo $this->Form->dropDown('Plugins.Online.HideForGuests', array(
+            <?php echo $this->Form->dropDown('Plugins.Online.HideForGuests', [
                 'true'            => "Yes, only show to logged-in members",
                 'false'           => "No, anyone may view the list"
-            ));
+            ]);
             ?>
         </div>
     </li>
@@ -52,12 +52,12 @@ echo $this->Form->errors();
             <?php echo $this->Form->label("How long are you 'online' for after you visit a page?", "Plugins.Online.PruneDelay"); ?>
         </div>
         <div class="input-wrap">
-            <?php echo $this->Form->dropDown('Plugins.Online.PruneDelay', array(
+            <?php echo $this->Form->dropDown('Plugins.Online.PruneDelay', [
                 '5'               => '5 minutes',
                 '10'              => '10 minutes',
                 '15'              => '15 minutes',
                 '20'              => '20 minutes'
-            ));
+            ]);
             ?>
         </div>
     </li>

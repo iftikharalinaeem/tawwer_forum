@@ -15,9 +15,9 @@ if (!isset($Explicit)) {
 $Sql = Gdn::SQL();
 $St = Gdn::Structure();
 
-Gdn::PermissionModel()->Define(array(
+Gdn::PermissionModel()->Define([
     'Groups.Group.Add' => 'Garden.Profiles.Edit',
-    'Groups.Moderation.Manage' => 'Garden.Moderation.Manage'));
+    'Groups.Moderation.Manage' => 'Garden.Moderation.Manage']);
 
 // Define the groups table.
 $St->Table('Group');
@@ -33,9 +33,9 @@ $St
     ->Column('CategoryID', 'int', false, 'key')
     ->Column('Icon', 'varchar(255)', true)
     ->Column('Banner', 'varchar(255)', true)
-    ->Column('Privacy', array('Public', 'Private'), 'Public') // add secret later.
-    ->Column('Registration', array('Public', 'Approval', 'Invite'), true) // deprecated
-    ->Column('Visibility', array('Public', 'Members'), true) // deprecated
+    ->Column('Privacy', ['Public', 'Private'], 'Public') // add secret later.
+    ->Column('Registration', ['Public', 'Approval', 'Invite'], true) // deprecated
+    ->Column('Visibility', ['Public', 'Members'], true) // deprecated
     ->Column('CountMembers', 'uint', '0')
     ->Column('CountDiscussions', 'uint', '0')
     ->Column('DateLastComment', 'datetime', true)
@@ -49,24 +49,24 @@ $St
     ->Set($Explicit, $Drop);
 
 if ($GroupExists && !$GroupPrivacyExists) {
-    $Sql->Put('Group', array('Privacy' => 'Private'));
-    $Sql->Put('Group', array('Privacy' => 'Public'), array('Registration' => 'Public', 'Visibility' => 'Public'));
+    $Sql->Put('Group', ['Privacy' => 'Private']);
+    $Sql->Put('Group', ['Privacy' => 'Public'], ['Registration' => 'Public', 'Visibility' => 'Public']);
 }
 
 $St->Table('UserGroup')
     ->PrimaryKey('UserGroupID')
     ->Column('GroupID', 'int', false, 'unique')
-    ->Column('UserID', 'int', false, array('unique', 'key'))
+    ->Column('UserID', 'int', false, ['unique', 'key'])
     ->Column('DateInserted', 'datetime')
     ->Column('InsertUserID', 'int')
-    ->Column('Role', array('Leader', 'Member'))
+    ->Column('Role', ['Leader', 'Member'])
     ->Set($Explicit, $Drop);
 
 $St->Table('GroupApplicant')
     ->PrimaryKey('GroupApplicantID')
     ->Column('GroupID', 'int', false, 'unique')
-    ->Column('UserID', 'int', false, array('unique', 'key'))
-    ->Column('Type', array('Application', 'Invitation', 'Denied', 'Banned'))
+    ->Column('UserID', 'int', false, ['unique', 'key'])
+    ->Column('Type', ['Application', 'Invitation', 'Denied', 'Banned'])
     ->Column('Reason', 'varchar(200)', true) // reason for wanting to join.
     ->Column('DateInserted', 'datetime')
     ->Column('InsertUserID', 'int')
@@ -154,9 +154,9 @@ if ($timeZoneExists) {
 
 $St->Table('UserEvent')
     ->Column('EventID', 'int', false, 'primary')
-    ->Column('UserID', 'int', false, array('primary', 'key'))
+    ->Column('UserID', 'int', false, ['primary', 'key'])
     ->Column('DateInserted', 'datetime')
-    ->Column('Attending', array('Yes', 'No', 'Maybe', 'Invited'), 'Invited')
+    ->Column('Attending', ['Yes', 'No', 'Maybe', 'Invited'], 'Invited')
     ->Set($Explicit, $Drop);
 
 // Make sure the activity table has an index that the event wall can use.

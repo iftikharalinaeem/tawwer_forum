@@ -40,13 +40,13 @@ class GigyaPlugin extends Gdn_Plugin {
 
       if (!$Provider) {
          $Model = new Gdn_AuthenticationProviderModel();
-         $Provider = array(
+         $Provider = [
             'AuthenticationKey' => self::PROVIDER_KEY,
             'AuthenticationSchemeAlias' => self::PROVIDER_KEY,
             'Name' => C('Garden.Title'),
             'AuthenticateUrl' => 'https://socialize.gigya.com/socialize.login',
 
-         );
+         ];
 
          $Model->Save($Provider);
       }
@@ -97,7 +97,7 @@ class GigyaPlugin extends Gdn_Plugin {
       self::validateUserSignature($User['UID'], $User['signatureTimestamp'], $secret, $User['UIDSignature'], true);
 
       // Map all of the standard jsConnect data.
-      $Map = array('UID' => 'UniqueID', 'email' => 'Email', 'photoURL' => 'Photo');
+      $Map = ['UID' => 'UniqueID', 'email' => 'Email', 'photoURL' => 'Photo'];
       foreach ($Map as $Key => $Value) {
          $Form->SetFormValue($Value, GetValue($Key, $User, ''));
       }
@@ -157,9 +157,9 @@ class GigyaPlugin extends Gdn_Plugin {
 
          // Add the gigya signin code.
          if ($Template) {
-            $Method = array(
+            $Method = [
                'Name' => self::PROVIDER_KEY,
-               'SignInHtml' => $Template);
+               'SignInHtml' => $Template];
 
             $Sender->Data['Methods'][] = $Method;
          }
@@ -180,7 +180,7 @@ class GigyaPlugin extends Gdn_Plugin {
       }
 
       if ($Sender->Form->AuthenticatedPostBack()) {
-         $Data = ArrayTranslate($Sender->Form->FormValues(), array('ClientID', 'AssociationSecret', 'HeadTemplate', 'BodyTemplate', 'IsDefault'));
+         $Data = ArrayTranslate($Sender->Form->FormValues(), ['ClientID', 'AssociationSecret', 'HeadTemplate', 'BodyTemplate', 'IsDefault']);
          $Data['AuthenticationKey'] = self::PROVIDER_KEY;
          $Model = new Gdn_AuthenticationProviderModel();
          if ($Model->Save($Data)) {

@@ -43,7 +43,7 @@
 class CAS_ProxyChain_AllowedList
 {
 
-    private $_chains = array();
+    private $_chains = [];
 
     /**
      * Check whether proxies are allowed by configuration

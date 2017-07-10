@@ -50,12 +50,12 @@ class GSRequest {
 	private $host;
   	private $domain;
 	private $path;
-	private $traceLog = array();
+	private $traceLog = [];
 	protected $method;
 	private $proxy;
 	private $proxyType = CURLPROXY_HTTP;
 	private $proxyUserPass = ":";
-	private $curlArray = array();
+	private $curlArray = [];
 
 	private $apiKey;
 	private $userKey;
@@ -283,12 +283,12 @@ class GSRequest {
 		$this->traceField("postData",$qs);
 
 		/* POST */
-		$defaults = array(
+		$defaults = [
 			CURLOPT_URL => $url,
 			CURLOPT_POST=>1,
 			CURLOPT_HEADER => 1,
 			CURLOPT_POSTFIELDS=>$qs,
-			CURLOPT_HTTPHEADER => array( 'Expect:'),
+			CURLOPT_HTTPHEADER => [ 'Expect:'],
 			CURLOPT_RETURNTRANSFER => TRUE,			
 			CURLOPT_SSL_VERIFYPEER => TRUE, 
 			CURLOPT_SSL_VERIFYHOST => 2,
@@ -297,7 +297,7 @@ class GSRequest {
 			CURLOPT_PROXYTYPE => $this->proxyType,
 			CURLOPT_PROXYUSERPWD => $this->proxyUserPass,
 			CURLOPT_TIMEOUT_MS => $timeout
-		);
+		];
 		
 		$ch = curl_init();
 		$mergedCurlArray = ($this->curlArray + $defaults);
@@ -556,7 +556,7 @@ class GSResponse
 			}
 			else
 	        {   
-	            $matches= array();
+	            $matches= [];
 	            preg_match("~<errorCode\s*>([^<]+)~", $this->rawData, $matches);     
 				if(sizeof($matches)>0)
 				{				
@@ -565,7 +565,7 @@ class GSResponse
 		            {
 						$this->errorCode = (int)$errCodeStr;
 						
-						$matches= array();
+						$matches= [];
 		            	preg_match("~<errorMessage\s*>([^<]+)~", $this->rawData, $matches);     
 						if(sizeof($matches)>0){
 							$this->errorMessage = $matches[1];
@@ -591,13 +591,13 @@ class GSResponse
         }
         else
         {
-        	$sb = array(
+        	$sb = [
         		"<?xml version=\"1.0\" encoding=\"utf-8\"?>"
         		,"<".$this->method."Response xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:com:gigya:api http://socialize-api.gigya.com/schema\" xmlns=\"urn:com:gigya:api\">"
         		,"<errorCode>".$this->errorCode."</errorCode>"
         		,"<errorMessage>".$this->errorMessage."</errorMessager>"
         		,"</".$this->method."Response>"
-        	);
+        	];
  
 
         	$this->rawData = implode("\r\n",$sb);
@@ -642,7 +642,7 @@ class GSObject {
   */
   public function __construct($json=null)  
   {
-    $this->map =  array();   
+    $this->map =  [];   
 	if(!empty($json)){
 		
 		//parse json string.
@@ -666,7 +666,7 @@ class GSObject {
   
   public function serialize()
   {
-    $arr = Array();
+    $arr = [];
     if(empty($this->map))return $arr;
     
     $arr = $this->serializeGSObject($this);
@@ -676,7 +676,7 @@ class GSObject {
   
   public static function serializeGSObject($gsd)
   {
-	$arr = Array();
+	$arr = [];
 	foreach ($gsd->map as $name=>$value) {
 			
 		$val = GSObject::serializeValue($value);
@@ -812,7 +812,7 @@ class GSObject {
 	public function clear()
 	{
 		unset($this->map);
-		$this->map = array();
+		$this->map = [];
 	}
 	
 	public function getKeys(){
@@ -877,7 +877,7 @@ class GSArray{
 	
   public function __construct($value=null)  
   {
-	$this->map = array();
+	$this->map = [];
 	if(!empty($value)){
 		$obj  = $value;
 		
@@ -1024,7 +1024,7 @@ class GSArray{
 	}
    public function serialize()
    {	
-    $arr = Array();
+    $arr = [];
     if(empty($this->map))return $arr;
     
     $arr = GSArray::serializeGSArray($this);
@@ -1033,7 +1033,7 @@ class GSArray{
    }
    
   public static function serializeGSArray($gsarr){
-	$arr = Array();
+	$arr = [];
 	for($i=0; $i < $gsarr->length(); $i++) {
 			
 		$val = $gsarr->getObject($i);

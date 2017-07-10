@@ -29,7 +29,7 @@ class Mustache_Engine
     const PRAGMA_FILTERS = 'FILTERS';
 
     // Template cache
-    private $templates = array();
+    private $templates = [];
 
     // Environment
     private $templateClassPrefix = '__Mustache_';
@@ -105,7 +105,7 @@ class Mustache_Engine
      *
      * @param array $options (default: array())
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         if (isset($options['template_class_prefix'])) {
             $this->templateClassPrefix = $options['template_class_prefix'];
@@ -173,7 +173,7 @@ class Mustache_Engine
      *
      * @return string Rendered template
      */
-    public function render($template, $context = array())
+    public function render($template, $context = [])
     {
         return $this->loadTemplate($template)->render($context);
     }
@@ -269,7 +269,7 @@ class Mustache_Engine
      *
      * @param array $partials (default: array())
      */
-    public function setPartials(array $partials = array())
+    public function setPartials(array $partials = [])
     {
         if (!isset($this->partialsLoader)) {
             $this->partialsLoader = new Mustache_Loader_ArrayLoader;
@@ -538,7 +538,7 @@ class Mustache_Engine
             $this->log(
                 Mustache_Logger::WARNING,
                 'Partial not found: "{name}"',
-                array('name' => $e->getTemplateName())
+                ['name' => $e->getTemplateName()]
             );
         }
     }
@@ -585,7 +585,7 @@ class Mustache_Engine
                         $this->log(
                             Mustache_Logger::DEBUG,
                             'Writing "{className}" class to template cache: "{fileName}"',
-                            array('className' => $className, 'fileName' => $fileName)
+                            ['className' => $className, 'fileName' => $fileName]
                         );
 
                         $this->writeCacheFile($fileName, $this->compile($source));
@@ -596,7 +596,7 @@ class Mustache_Engine
                     $this->log(
                         Mustache_Logger::WARNING,
                         'Template cache disabled, evaluating "{className}" class at runtime',
-                        array('className' => $className)
+                        ['className' => $className]
                     );
 
                     eval('?>'.$this->compile($source));
@@ -606,7 +606,7 @@ class Mustache_Engine
             $this->log(
                 Mustache_Logger::DEBUG,
                 'Instantiating template: "{className}"',
-                array('className' => $className)
+                ['className' => $className]
             );
 
             $this->templates[$className] = new $className($this);
@@ -660,7 +660,7 @@ class Mustache_Engine
         $this->log(
             Mustache_Logger::INFO,
             'Compiling template to "{className}" class',
-            array('className' => $name)
+            ['className' => $name]
         );
 
         return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags);
@@ -697,7 +697,7 @@ class Mustache_Engine
             $this->log(
                 Mustache_Logger::INFO,
                 'Creating Mustache template cache directory: "{dirName}"',
-                array('dirName' => $dirName)
+                ['dirName' => $dirName]
             );
 
             @mkdir($dirName, 0777, true);
@@ -710,7 +710,7 @@ class Mustache_Engine
         $this->log(
             Mustache_Logger::DEBUG,
             'Caching compiled template to "{fileName}"',
-            array('fileName' => $fileName)
+            ['fileName' => $fileName]
         );
 
         $tempFile = tempnam($dirName, basename($fileName));
@@ -725,7 +725,7 @@ class Mustache_Engine
             $this->log(
                 Mustache_Logger::ERROR,
                 'Unable to rename Mustache temp cache file: "{tempName}" -> "{fileName}"',
-                array('tempName' => $tempFile, 'fileName' => $fileName)
+                ['tempName' => $tempFile, 'fileName' => $fileName]
             );
         }
 
@@ -739,7 +739,7 @@ class Mustache_Engine
      * @param  string  $message The log message
      * @param  array   $context The log context
      */
-    private function log($level, $message, array $context = array())
+    private function log($level, $message, array $context = [])
     {
         if (isset($this->logger)) {
             $this->logger->log($level, $message, $context);

@@ -12,7 +12,7 @@ class ApiMapper extends SimpleApiMapper {
 
     public function __construct() {
 
-        $this->URIMap = array(
+        $this->URIMap = [
             // Categories
             'categories/add'        => 'vanilla/settings/addcategory',
             'categories/edit'       => 'vanilla/settings/editcategory',
@@ -61,12 +61,12 @@ class ApiMapper extends SimpleApiMapper {
             // Configuration
             'configuration'         => 'dashboard/settings/configuration'
 
-        );
+        ];
 
-        $this->Filter = array(
-            'users/multi' => array('Users'),
-            'users/notifications' => array('Profile', 'Preferences', 'PreferenceList')
-        );
+        $this->Filter = [
+            'users/multi' => ['Users'],
+            'users/notifications' => ['Profile', 'Preferences', 'PreferenceList']
+        ];
 
     }
 

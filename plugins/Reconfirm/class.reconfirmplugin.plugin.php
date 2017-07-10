@@ -28,7 +28,7 @@ class ReconfirmPlugin extends Gdn_Plugin {
      */
     public function structure() {
         gdn::structure()->table('User')
-            ->column('ConfirmedTerms', 'tinyint', 0, array('index'))
+            ->column('ConfirmedTerms', 'tinyint', 0, ['index'])
             ->set();
         return;
     }
@@ -53,13 +53,13 @@ class ReconfirmPlugin extends Gdn_Plugin {
         }
 
         // Override some URLs that will be banned by disallowUrl.
-        $allowUrls = array('/entry/confirm', '/profile/notificationspopin', '/messages/popin');
+        $allowUrls = ['/entry/confirm', '/profile/notificationspopin', '/messages/popin'];
         if ($this->allowUrl($allowUrls)) {
             return;
         }
 
         // Redirect any url that has a query that begins the following string.
-        $disallowUrls = array('/discussion/', '/messages', '/profile', '/activity');
+        $disallowUrls = ['/discussion/', '/messages', '/profile', '/activity'];
         if ($this->disallowUrl($disallowUrls)) {
             // All authenticated users who have not confirmed are redirected to the confirm page.
             redirectTo('/entry/confirm');

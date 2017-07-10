@@ -13,7 +13,7 @@ class UserAlertModel extends Gdn_Model {
      * @param array $Options Unused
      * @return array
      */
-    public function getID($ID, $DatasetType = false, $Options = array()) {
+    public function getID($ID, $DatasetType = false, $Options = []) {
         $Row = parent::getID($ID, DATASET_TYPE_ARRAY);
         if (empty($Row)) {
             return $Row;
@@ -77,7 +77,7 @@ class UserAlertModel extends Gdn_Model {
         if ($CurrentRow) {
             $UserID = $Row['UserID'];
             unset($Row['UserID']);
-            if ($this->update($Row, array('UserID' => $UserID))) {
+            if ($this->update($Row, ['UserID' => $UserID])) {
                 return $UserID;
             } else {
                 return false;

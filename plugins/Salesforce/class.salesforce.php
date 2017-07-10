@@ -140,7 +140,7 @@ class Salesforce {
     * @return array|bool FALSE if not found or All the details returned from Salesforce
     */
    public function FindLead($Email) {
-      $Result = $this->Select(array('id'), 'Lead', array('Email' => $Email), 1);
+      $Result = $this->Select(['id'], 'Lead', ['Email' => $Email], 1);
       if ($Result['totalSize'] != 1) {
          return FALSE;
       }
@@ -152,7 +152,7 @@ class Salesforce {
     * @return array|bool FALSE if not found or All the details returned from Salesforce
     */
    public function FindUser($Email) {
-      $Result = $this->Select(array('id'), 'User', array('Email' => $Email), 1);
+      $Result = $this->Select(['id'], 'User', ['Email' => $Email], 1);
       if ($Result['totalSize'] != 1) {
          return FALSE;
       }
@@ -164,7 +164,7 @@ class Salesforce {
     * @return array|bool FALSE if not found or All the details returned from Salesforce
     */
    public function FindContact($Email) {
-      $Result = $this->Select(array('id'), 'Contact', array('Email' => $Email), 1);
+      $Result = $this->Select(['id'], 'Contact', ['Email' => $Email], 1);
       if ($Result['totalSize'] != 1) {
          return FALSE;
       }
@@ -201,13 +201,13 @@ class Salesforce {
     * @return array|bool True or array of missing required fields
     */
    public function ValidateLead(array $Lead) {
-      $RequiredFields = array(
+      $RequiredFields = [
          'LastName' => TRUE,
          'FirstName' => TRUE,
          'Email' => TRUE,
          'LeadSource' => TRUE,
          'Company' => TRUE,
-      );
+      ];
       $MissingFields = array_diff_key($RequiredFields, $Lead);
       if (!empty($MissingFields)) {
          Logger::event(
@@ -243,11 +243,11 @@ class Salesforce {
     * @return array|bool True or array of missing required fields
     */
    public function ValidateContact(array $Contact) {
-      $RequiredFields = array(
+      $RequiredFields = [
          'LastName' => TRUE,
          'FirstName' => TRUE,
          'Email' => TRUE,
-      );
+      ];
       $MissingFields = array_diff_key($RequiredFields, $Contact);
       if (!empty($MissingFields)) {
          Logger::event(
@@ -284,14 +284,14 @@ class Salesforce {
     * @return array|bool True or array of missing required fields
     */
    public function ValidateCase(array $Case) {
-      $RequiredFields = array(
+      $RequiredFields = [
          'ContactId' => TRUE,
          'Status' => TRUE,
          'Origin' => TRUE,
          'Subject' => TRUE,
          'Priority' => TRUE,
          'Description' => TRUE
-      );
+      ];
       $MissingFields = array_diff_key($RequiredFields, $Case);
       if (!empty($MissingFields)) {
          Logger::event(
@@ -367,12 +367,12 @@ class Salesforce {
          return FALSE;
       }
       $FullProfile = json_decode($HttpResponse['Response']);
-      $Profile = array(
+      $Profile = [
          'id' => $FullProfile->user_id,
          'email' => $FullProfile->email,
          'fullname' => $FullProfile->display_name,
          'photo' => $FullProfile->photos->thumbnail,
-      );
+      ];
       return $Profile;
    }
 
@@ -472,7 +472,7 @@ class Salesforce {
       $CacheKey = 'Salesforce.Request' . md5($Url);
 
       if ($Cache && !$Post) {
-         $HttpResponse = Gdn::Cache()->Get($CacheKey, array(Gdn_Cache::FEATURE_COMPRESS => TRUE));
+         $HttpResponse = Gdn::Cache()->Get($CacheKey, [Gdn_Cache::FEATURE_COMPRESS => TRUE]);
          if ($HttpResponse) {
             Trace('Cached Response');
             return $HttpResponse;
@@ -493,10 +493,10 @@ class Salesforce {
       }
       if ($Cache && $HttpResponse['HttpCode'] == 200 && !$Post) {
          $CacheTTL = $this->CacheTTL + rand(0, 30);
-         Gdn::Cache()->Store($CacheKey, $HttpResponse, array(
+         Gdn::Cache()->Store($CacheKey, $HttpResponse, [
             Gdn_Cache::FEATURE_EXPIRY  => $CacheTTL,
             Gdn_Cache::FEATURE_COMPRESS => TRUE
-         ));
+         ]);
       }
       return $HttpResponse;
    }
@@ -545,19 +545,19 @@ class Salesforce {
          NULL,
          $Headers
       );
-      $FailureCodes = array(
+      $FailureCodes = [
          500 => TRUE,
-      );
+      ];
       if (isset($FailureCodes[$Proxy->ResponseStatus])) {
          throw new Gdn_UserException('HTTP Error communicating with Salesforce.  Code: ' . $Proxy->ResponseStatus);
       }
 
-      return array(
+      return [
          'HttpCode' => $Proxy->ResponseStatus,
          'Header' => $Proxy->RequestHeaders,
          'Response' => $Response,
          'ContentType' => $Proxy->ContentType
-      );
+      ];
 
    }
 
@@ -587,10 +587,10 @@ class Salesforce {
          // Update global connection.
          $InstanceUrl = $Response['instance_url'];
          $AccessToken = $Response['access_token'];
-         SaveToConfig(array(
+         SaveToConfig([
             'Plugins.Salesforce.DashboardConnection.InstanceUrl' => $InstanceUrl,
             'Plugins.Salesforce.DashboardConnection.Token' => $AccessToken,
-         ));
+         ]);
          $this->SetAccessToken($AccessToken);
          $this->SetInstanceUrl($InstanceUrl);
       } else {
@@ -601,12 +601,12 @@ class Salesforce {
 
          // Update user connection.
          $Profile = valr('Attributes.' . self::ProviderKey . '.Profile', Gdn::Session()->User);
-         $Attributes = array(
+         $Attributes = [
             'RefreshToken' => $this->RefreshToken,
             'AccessToken' => $Response['access_token'],
             'InstanceUrl' => $Response['instance_url'],
             'Profile' => $Profile,
-         );
+         ];
 
          Gdn::UserModel()->SaveAttribute(Gdn::Session()->UserID, self::ProviderKey, $Attributes);
          $this->SetAccessToken($Response['access_token']);
@@ -640,12 +640,12 @@ class Salesforce {
    public function Refresh($Token) {
       $Response = $this->HttpRequest(
          C('Plugins.Salesforce.AuthenticationUrl') . '/services/oauth2/token',
-         array(
+         [
             'grant_type' => 'refresh_token',
             'client_id' => C('Plugins.Salesforce.ApplicationID'),
             'client_secret' => C('Plugins.Salesforce.Secret'),
             'refresh_token' => $Token
-         )
+         ]
       );
       Trace($Response);
       if ($Response['HttpCode'] == 400) {
@@ -672,12 +672,12 @@ class Salesforce {
       if (!$RedirectUri) {
          $RedirectUri = self::RedirectUri();
       }
-      $Query = array(
+      $Query = [
          'redirect_uri' => $RedirectUri,
          'client_id' => $AppID,
          'response_type' => 'code',
          'scope' => 'full refresh_token'
-      );
+      ];
       if ($State) {
          $Query['state'] = $State;
       }
@@ -716,20 +716,20 @@ class Salesforce {
     * @throws Gdn_UserException
     */
    public static function GetTokens($Code, $RedirectUri) {
-      $Post = array(
+      $Post = [
          'grant_type' => 'authorization_code',
          'client_id' => C('Plugins.Salesforce.ApplicationID'),
          'client_secret' => C('Plugins.Salesforce.Secret'),
          'code' => $Code,
          'redirect_uri' => $RedirectUri,
-      );
+      ];
       $Url = C('Plugins.Salesforce.AuthenticationUrl') . '/services/oauth2/token';
       $Proxy = new ProxyRequest();
       $Response = $Proxy->Request(
-         array(
+         [
             'URL' => $Url,
             'Method' => 'POST',
-         ),
+         ],
          $Post
       );
 

@@ -308,7 +308,7 @@ class RanksPlugin extends Gdn_Plugin {
 
         if ($Sender->Form->authenticatedPostBack()) {
             $RankModel = new RankModel();
-            $RankModel->delete(array('RankID' => $RankID));
+            $RankModel->delete(['RankID' => $RankID]);
             $Sender->jsonTarget("#Rank_$RankID", null, 'SlideUp');
         }
 
@@ -427,7 +427,7 @@ class RanksPlugin extends Gdn_Plugin {
             $Ranks = $RankModel->getWhere(false, 'Level')->resultArray();
         } else {
             $Rank = $RankModel->getID($RankID);
-            $Ranks = array($Rank);
+            $Ranks = [$Rank];
         }
 
         $Sender->setData('Ranks', $Ranks);

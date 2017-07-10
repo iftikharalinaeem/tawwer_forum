@@ -17,10 +17,10 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     public function __construct() {
         parent::__construct();
 
-        self::$Types = array(
-            'discussion' => array('d' => 'discussions'),
-            'comment' => array('c' => 'comments')
-        );
+        self::$Types = [
+            'discussion' => ['d' => 'discussions'],
+            'comment' => ['c' => 'comments']
+        ];
 
         if (Gdn::addonManager()->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON)) {
             if (Gdn::addonManager()->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
@@ -44,7 +44,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $this->fireEvent('Init');
     }
 
-    public function quickSearch($title, $get = array()) {
+    public function quickSearch($title, $get = []) {
         $Form = new Gdn_Form();
         $Form->Method = 'get';
 
@@ -56,9 +56,9 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             anchor(sprite('SpSearch'), '#', 'QuickSearchButton').
             '<div class="QuickSearchWrap MenuItems">';
 
-        $result .= $Form->open(array('action' => url('/search'))).
+        $result .= $Form->open(['action' => url('/search')]).
 //         $Form->Label('@'.$title, 'search').
-            ' '.$Form->textBox('search', array('placeholder' => $title)).
+            ' '.$Form->textBox('search', ['placeholder' => $title]).
             ' <div class="bwrap"><button type="submit" class="Button" title="'.t('Search').'">'.t('Go').'</button></div>'.
             $Form->close();
 
@@ -96,7 +96,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
      */
     public function discussionsController_pagerInit_handler($Sender, $Args) {
         $name = t('SearchBoxPlaceHolder', 'Search');
-        $args = array();
+        $args = [];
 
         // See if there are any tags on the page.
         $tags = $Sender->data('Tags');
@@ -124,7 +124,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
                 $name = t('category');
             }
 
-            $quickserch = $this->quickSearch(sprintf(t('Search %s'), $name), array('cat' => $categoryid, 'adv' => 1));
+            $quickserch = $this->quickSearch(sprintf(t('Search %s'), $name), ['cat' => $categoryid, 'adv' => 1]);
 
             $Pager = $Args['Pager'];
             $Pager->HtmlAfter = $quickserch;
@@ -132,7 +132,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     }
 
     public function discussionController_pagerInit_handler($Sender, $Args) {
-        $quickserch = $this->quickSearch(sprintf(t('Search %s'), t('discussion')), array('discussionid' => $Sender->data('Discussion.DiscussionID')));
+        $quickserch = $this->quickSearch(sprintf(t('Search %s'), t('discussion')), ['discussionid' => $Sender->data('Discussion.DiscussionID')]);
 
         $Pager = $Args['Pager'];
         $Pager->HtmlAfter = $quickserch;
@@ -166,7 +166,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         if (isset($get['discussionid'])) {
             // This is searching a discussion so make the user the title.
-            Gdn::userModel()->joinUsers($results['SearchResults'], array('UserID'));
+            Gdn::userModel()->joinUsers($results['SearchResults'], ['UserID']);
             foreach ($results['SearchResults'] as &$row) {
                 $row['Title'] = htmlspecialchars($row['Name']);
             }
@@ -199,8 +199,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $this->Sender = $Sender;
         if ($Sender->Head) {
             // Don't index search results pages.
-            $Sender->Head->addTag('meta', array('name' => 'robots', 'content' => 'noindex'));
-            $Sender->Head->addTag('meta', array('name' => 'googlebot', 'content' => 'noindex'));
+            $Sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex']);
+            $Sender->Head->addTag('meta', ['name' => 'googlebot', 'content' => 'noindex']);
         }
 
         list($Offset, $Limit) = offsetLimit($Page, c('Garden.Search.PerPage', 10));
@@ -209,7 +209,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         // Do the search.
         $SearchModel = new SearchModel();
-        $Sender->setData('SearchResults', array());
+        $Sender->setData('SearchResults', []);
         $SearchTerms = Gdn_Format::text($Search);
 
         if (method_exists($SearchModel, 'advancedSearch')) {
@@ -234,10 +234,10 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             if ($SearchTerms) {
                 $SearchTerms = explode(' ', $SearchTerms);
             } else {
-                $SearchTerms = array();
+                $SearchTerms = [];
             }
         }
-        Gdn::userModel()->joinUsers($Sender->Data['SearchResults'], array('UserID'));
+        Gdn::userModel()->joinUsers($Sender->Data['SearchResults'], ['UserID']);
         $this->calculateResults($Sender->Data['SearchResults'], $SearchTerms, !$Sender->Request->get('nomark'));
 
         if (isset($Sender->Data['ChildResults'])) {
@@ -270,11 +270,11 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
     protected function joinResults(&$parentResults, $childResults, $searchTerms) {
         // Calculate the results.
-        Gdn::userModel()->joinUsers($childResults, array('UserID'));
+        Gdn::userModel()->joinUsers($childResults, ['UserID']);
         $this->calculateResults($childResults, $searchTerms, !Gdn::request()->get('nomark'));
-        $childResults = Gdn_DataSet::index($childResults, array('DiscussionID'), array('Unique' => false));
+        $childResults = Gdn_DataSet::index($childResults, ['DiscussionID'], ['Unique' => false]);
         foreach ($parentResults as &$row) {
-            $row['Children'] = getValue($row['DiscussionID'], $childResults, array());
+            $row['Children'] = getValue($row['DiscussionID'], $childResults, []);
         }
     }
 
@@ -297,7 +297,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         }
 
         $UseCategories = c('Vanilla.Categories.Use');
-        $Breadcrumbs = array();
+        $Breadcrumbs = [];
 
         foreach ($Data as &$Row) {
             $Row['Title'] = markString($SearchTerms, Gdn_Format::text($Row['Title'], false));
@@ -354,12 +354,12 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
                     $Row['Breadcrumbs'] = $Breadcrumbs[$CategoryID];
                 } else {
                     $Categories = CategoryModel::getAncestors($CategoryID);
-                    $R = array();
+                    $R = [];
                     foreach ($Categories as $Cat) {
-                        $R[] = array(
+                        $R[] = [
                             'Name' => $Cat['Name'],
                             'Url' => categoryUrl($Cat)
-                        );
+                        ];
                     }
                     $Row['Breadcrumbs'] = $R;
                     $Breadcrumbs[$CategoryID] = $R;
@@ -375,29 +375,29 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $csearch = true;
         $dsearch = true;
 
-        $cwhere = array();
-        $dwhere = array();
+        $cwhere = [];
+        $dwhere = [];
 
-        $dfields = array('d.Name', 'd.Body');
+        $dfields = ['d.Name', 'd.Body'];
         $cfields = 'c.Body';
 
         /// Search query ///
 
         $terms = getValue('search', $search);
         if ($terms) {
-            $terms = $pdo->quote('%'.str_replace(array('%', '_'), array('\%', '\_'), $terms).'%');
+            $terms = $pdo->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $terms).'%');
         }
 
         // Only search if we have term, user, date, or title to search
         if (!$terms && !isset($search['users']) && !isset($search['date-from']) && !isset($search['date-to']) && !isset($search['title'])) {
-            return array();
+            return [];
         }
 
         /// Title ///
 
         if (isset($search['title'])) {
             $csearch = false;
-            $dwhere['d.Name like'] = $pdo->quote('%'.str_replace(array('%', '_'), array('\%', '\_'), $search['title']).'%');
+            $dwhere['d.Name like'] = $pdo->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $search['title']).'%');
         }
 
         /// Author ///
@@ -436,7 +436,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         // Now that we have the wheres, lets do the search.
         $vanillaSearch = new VanillaSearchModel();
-        $searches = array();
+        $searches = [];
 
         if ($dsearch) {
             $sql = $vanillaSearch->discussionSql($searchModel, false);
@@ -494,7 +494,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         Gdn::SQL()->reset();
 
         $Sql = str_replace(Gdn::database()->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $searches)."\n)", $Sql);
-        trace(array($Sql), 'SearchSQL');
+        trace([$Sql], 'SearchSQL');
         $Result = Gdn::database()->query($Sql)->resultArray();
 
         return $Result;
@@ -503,13 +503,13 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
 if (!function_exists('searchBoxAdvanced')):
 
-    function searchBoxAdvanced($options = array()) {
-        $options = array_merge(array(
+    function searchBoxAdvanced($options = []) {
+        $options = array_merge([
             'placeholder' => t('SearchBoxPlaceHolder', 'Search'),
             'value' => null,
-        ), $options);
+        ], $options);
 
-        echo Gdn_Theme::module('AdvancedSearchModule', array('value' => $options['value']));
+        echo Gdn_Theme::module('AdvancedSearchModule', ['value' => $options['value']]);
     }
 
 endif;

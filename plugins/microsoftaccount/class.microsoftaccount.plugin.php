@@ -178,11 +178,11 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
 
         if (!$provider['AuthenticationKey']) {
             $model = new Gdn_AuthenticationProviderModel();
-            $provider = array(
+            $provider = [
                 'AuthenticationKey'         => $this->providerKey,
                 'AuthenticationSchemeAlias' => $this->providerKey,
                 'Name'                      => $this->providerKey
-            );
+            ];
 
             $model->save($provider);
         }
@@ -195,7 +195,7 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
      * @param array $rawProfile Retrieved from authentication provider.
      * @return array Profile with Vanilla keys.
      */
-    public function translateProfileResults($rawProfile = array()) {
+    public function translateProfileResults($rawProfile = []) {
         $profile = arrayTranslate(
             $rawProfile,
             [

@@ -30,9 +30,9 @@ class RepliesPlugin extends Gdn_Plugin {
          ->Column('OldCommentID', 'int', TRUE)
          ->Set();
 
-      Gdn::PermissionModel()->Define(array(
+      Gdn::PermissionModel()->Define([
          'Vanilla.Replies.Add' => 'Garden.Profiles.Edit'
-      ));
+      ]);
    }
 
    /// Event Handlers.
@@ -60,7 +60,7 @@ class RepliesPlugin extends Gdn_Plugin {
 
       if (isset($Options['EditComment'])) {
          $ID = GetValueR('Comment.CommentID', $Args);
-         $Options['CommentToReply'] = array('Label' => T('Make Reply...'), 'Url' => "/discussion/commenttoreply?commentid=$ID", 'Class' => 'Popup');
+         $Options['CommentToReply'] = ['Label' => T('Make Reply...'), 'Url' => "/discussion/commenttoreply?commentid=$ID", 'Class' => 'Popup'];
       }
    }
 
@@ -157,7 +157,7 @@ class RepliesPlugin extends Gdn_Plugin {
       $Form = new Gdn_Form();
       if ($Form->AuthenticatedPostBack()) {
          // Delete the reply.
-         $Deleted = $Model->Delete(array('ReplyID' => $ReplyID));
+         $Deleted = $Model->Delete(['ReplyID' => $ReplyID]);
          if ($Deleted) {
             $Sender->JsonTarget('#'.ReplyElementID($ReplyID), '', 'SlideUp');
          }
@@ -175,7 +175,7 @@ class RepliesPlugin extends Gdn_Plugin {
     */
    public function DiscussionController_Replies_Handler($Sender, $Args) {
       $Sender->ReplyForm = new Gdn_Form();
-      $this->ClearForm($Sender->ReplyForm, array('reply', 'editreply'));
+      $this->ClearForm($Sender->ReplyForm, ['reply', 'editreply']);
 
       if (isset($Args['Comment'])) {
          WriteReplies($Args['Comment']);
@@ -230,9 +230,9 @@ class RepliesPlugin extends Gdn_Plugin {
       // We'll select a window of comments around when the comment is.
       $Date = $Comment['DateInserted'];
       $CommentModel = new CommentModel();
-      $CommentsBefore = $CommentModel->GetWhere(array('DiscussionID' => $Discussion['DiscussionID'], 'DateInserted <' => $Date), 'DateInserted', 'desc', 10)->ResultArray();
+      $CommentsBefore = $CommentModel->GetWhere(['DiscussionID' => $Discussion['DiscussionID'], 'DateInserted <' => $Date], 'DateInserted', 'desc', 10)->ResultArray();
       $CommentsBefore = array_reverse($CommentsBefore);
-      $CommentsAfter = $CommentModel->GetWhere(array('DiscussionID' => $Discussion['DiscussionID'], 'DateInserted >' => $Date), 'DateInserted', 'asc', 10)->ResultArray();
+      $CommentsAfter = $CommentModel->GetWhere(['DiscussionID' => $Discussion['DiscussionID'], 'DateInserted >' => $Date], 'DateInserted', 'asc', 10)->ResultArray();
 
       $Comments = array_merge($CommentsBefore, $CommentsAfter);
 
@@ -249,7 +249,7 @@ class RepliesPlugin extends Gdn_Plugin {
       $Discussion['Summary'] = $Discussion['Name'];
       array_unshift($Comments, $Discussion);
 
-      Gdn::UserModel()->JoinUsers($Comments, array('InsertUserID'));
+      Gdn::UserModel()->JoinUsers($Comments, ['InsertUserID']);
       $Sender->SetData('Comments', $Comments);
 
 
@@ -276,8 +276,8 @@ class RepliesPlugin extends Gdn_Plugin {
    protected function ClearForm($Form, $AllowedMethods) {
      $AllowedMethods = (array)$AllowedMethods;
      if (!in_array(Gdn::Controller()->RequestMethod, $AllowedMethods)) {
-        $Form->SetData(array());
-        $Form->FormValues(array());
+        $Form->SetData([]);
+        $Form->FormValues([]);
      }
    }
 
@@ -383,7 +383,7 @@ class RepliesPlugin extends Gdn_Plugin {
          }
 
          ob_start();
-         WriteReplyForm(array('CommentID' => $CommentID));
+         WriteReplyForm(['CommentID' => $CommentID]);
          $FormHtml = ob_get_clean();
          $Sender->JsonTarget("$Container .Item-ReplyForm", $FormHtml, 'ReplaceWith');
       } else {
@@ -417,29 +417,29 @@ function GetReplyOptions($Reply) {
    if (!isset($Permissions)) {
       $Category = Gdn::Controller()->Data('Category');
       if ($Category) {
-         $Permissions = array(
+         $Permissions = [
                'Delete' => Gdn::Session()->CheckPermission('Vanilla.Comments.Delete', TRUE, 'Category', $Category['PermissionCategoryID']),
                'Edit' => Gdn::Session()->CheckPermission('Vanilla.Comments.Edit', TRUE, 'Category', $Category['PermissionCategoryID'])
-            );
+            ];
       } else {
-         $Permissions = array(
+         $Permissions = [
             'Delete' => FALSE,
             'Edit' => FALSE
-            );
+            ];
       }
    }
 
    $ID = GetValue('ReplyID', $Reply);
 
-   $Result = array();
+   $Result = [];
 
    if ($Permissions['Edit']) {
-      $Result['EditReply'] = array('Label' => T('Edit'), 'Url' => "/discussion/editreply?replyid=$ID");
+      $Result['EditReply'] = ['Label' => T('Edit'), 'Url' => "/discussion/editreply?replyid=$ID"];
    }
    if ($Permissions['Delete'])
-      $Result['DeleteReply'] = array('Label' => T('Delete'), 'Url' => "/discussion/deletereply?replyid=$ID", 'Class' => 'Popup');
+      $Result['DeleteReply'] = ['Label' => T('Delete'), 'Url' => "/discussion/deletereply?replyid=$ID", 'Class' => 'Popup'];
    if ($Permissions['Edit']) {
-      $Result['ReplyToComment'] = array('Label' => T('Make Comment'), 'Url' => "/discussion/replytocomment?replyid=$ID", 'Class' => 'Popup');
+      $Result['ReplyToComment'] = ['Label' => T('Make Comment'), 'Url' => "/discussion/replytocomment?replyid=$ID", 'Class' => 'Popup'];
    }
 
 

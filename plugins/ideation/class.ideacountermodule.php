@@ -112,7 +112,7 @@ class IdeaCounterModule extends Gdn_Module {
             $discussionID = val('DiscussionID', $this->discussion);
             $status = StatusModel::instance()->getStatusByDiscussion($discussionID);
             $this->isOpen = (val('State', $status) == 'Open');
-            $counter = array();
+            $counter = [];
             $counter['upUrl'] = url('/react/discussion/'.$this->ideaUpReactionSlug.'?id='.$discussionID.'&selfreact=true');
             $counter['score'] = $score;
             $counter['numberVotes'] = $score;

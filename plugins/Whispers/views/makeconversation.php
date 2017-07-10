@@ -17,9 +17,9 @@ echo '<div class="P Info2">'.
 
 echo '<ul class="CheckBoxList">';
 
-$CheckedIDs = $this->Form->GetValue('UserID', array());
+$CheckedIDs = $this->Form->GetValue('UserID', []);
 if (!is_array($CheckedIDs))
-   $CheckedIDs = array();
+   $CheckedIDs = [];
 
 foreach ($this->Data('Users') as $User) {
    $Label = htmlspecialchars($User['Name']);
@@ -35,7 +35,7 @@ foreach ($this->Data('Users') as $User) {
       $Label .= ' ('.T("started the $Type", 'Started the discussion').')';
    }
    
-   $Attributes = array('Value' => $User['UserID']);
+   $Attributes = ['Value' => $User['UserID']];
    $Checked = in_array($User['UserID'], $CheckedIDs);
    if ($Checked)
       $Attributes['checked'] = 'checked';

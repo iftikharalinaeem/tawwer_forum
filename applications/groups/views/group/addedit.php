@@ -15,18 +15,18 @@
 
     <div class="FormWrapper StructuredForm">
         <?php
-        echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
+        echo $this->Form->Open(['enctype' => 'multipart/form-data']);
         echo $this->Form->Errors();
         ?>
         <div class="P P-Name">
             <?php
-            echo $this->Form->Label('Name the Group', 'Name', array('class' => 'B'));
-            echo $this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput'));
+            echo $this->Form->Label('Name the Group', 'Name', ['class' => 'B']);
+            echo $this->Form->TextBox('Name', ['maxlength' => 100, 'class' => 'InputBox BigInput']);
             ?>
         </div>
         <div class="P P-Description">
             <?php
-            echo $this->Form->Label('Description', 'Description', array('class' => 'B'));
+            echo $this->Form->Label('Description', 'Description', ['class' => 'B']);
             echo $this->Form->BodyBox('Description');
             ?>
         </div>
@@ -37,8 +37,8 @@
             echo $this->Form->Hidden('CategoryID');
         } else {
             echo '<div class="P P-Category">';
-            echo $this->Form->Label('Category', 'CategoryID', array('class' => 'B'));
-            echo ' '.$this->Form->DropDown('CategoryID', $Categories, array('IncludeNull' => true));
+            echo $this->Form->Label('Category', 'CategoryID', ['class' => 'B']);
+            echo ' '.$this->Form->DropDown('CategoryID', $Categories, ['IncludeNull' => true]);
             echo '</div>';
         }
         ?>
@@ -47,29 +47,29 @@
             $thumbnailSize = $this->data('thumbnailSize');
             $icon = $crop = false;
             if (($crop = $this->data('crop')) && !isMobile()) {
-                 echo $this->Form->Label('Icon', 'Icon', array('class' => 'B'));
+                 echo $this->Form->Label('Icon', 'Icon', ['class' => 'B']);
                  echo $crop;
             } elseif ($icon = $this->data('icon')) {
-                 echo $this->Form->Label('Icon', 'Icon_New', array('class' => 'B'));  ?>
+                 echo $this->Form->Label('Icon', 'Icon_New', ['class' => 'B']);  ?>
                  <div class="icons">
                       <div class="Padded current-icon">
-                            <?php echo img($this->data('icon'), array('style' => 'width: '.$thumbnailSize.'px; height: '.$thumbnailSize.'px;')); ?>
+                            <?php echo img($this->data('icon'), ['style' => 'width: '.$thumbnailSize.'px; height: '.$thumbnailSize.'px;']); ?>
                       </div>
                  </div>
             <?php } ?>
              <?php
              if ($icon || $crop) {
                   echo wrap(anchor(t('Remove Icon'), '/group/removegroupicon/'.val('GroupID', $this->data('Group')).'/'.Gdn::session()->transientKey().'/edit', 'Button StructuredForm P'), 'div');
-                  echo $this->Form->Label('New Icon', 'Icon_New', array('class' => 'B'));
+                  echo $this->Form->Label('New Icon', 'Icon_New', ['class' => 'B']);
              } else {
-                  echo $this->Form->Label('Icon', 'Icon_New', array('class' => 'B'));
+                  echo $this->Form->Label('Icon', 'Icon_New', ['class' => 'B']);
              }
              echo $this->Form->input('Icon_New', 'file');
             ?>
         </div>
         <div class="P P-Banner">
             <?php
-            echo $this->Form->Label('Banner', 'Banner_New', array('class' => 'B'));
+            echo $this->Form->Label('Banner', 'Banner_New', ['class' => 'B']);
             echo $this->Form->ImageUpload('Banner');
             ?>
         </div>
@@ -77,11 +77,11 @@
         <div class="P P-Privacy">
             <?php
             echo '<div><b>'.T('Privacy').'</b></div>';
-            echo $this->Form->RadioList('Privacy', array(
+            echo $this->Form->RadioList('Privacy', [
                 'Public' => '@'.T('Public').'. <span class="Gloss">'.T('Public group.', 'Anyone can see the group and its content. Anyone can join.').'</span>',
                 'Private' => '@'.T('Private').'. <span class="Gloss">'.T('Private group.', 'Anyone can see the group, but only members can see its content. People must apply or be invited to join.').'</span>',
-                ),
-                array('list' => true));
+                ],
+                ['list' => true]);
             ?>
         </div>
         <div class="Buttons">
@@ -92,7 +92,7 @@
             else
                 echo Anchor(T('Cancel'), '/groups', 'Button');
 
-            echo ' '.$this->Form->Button('Save', array('class' => 'Button Primary'));
+            echo ' '.$this->Form->Button('Save', ['class' => 'Button Primary']);
             ?>
         </div>
         <?php echo $this->Form->Close(); ?>

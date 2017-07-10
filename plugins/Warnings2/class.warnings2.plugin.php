@@ -83,11 +83,11 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @return string Returns a string of HTML that represents the warning button.
      */
     public function warnButton($row, $recordType, $recordID) {
-        $args = array(
+        $args = [
             'userid' => val('InsertUserID', $row),
             'recordtype' => $recordType,
             'recordid' => $recordID
-        );
+        ];
 
         $Result = anchor(
             '<span class="ReactSprite ReactWarn"></span> '.t('Warn'),
@@ -160,13 +160,13 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         $model = new UserNoteModel();
-        $row = array(
+        $row = [
             'Type' => $type,
             'UserID' => val('ActivityUserID', $Activity),
             'Body' => $body,
             'Format' => val('Format', $Activity, 'text'),
             'InsertUserID' => val('RegardingUserID', $Activity, Gdn::session()->UserID),
-        );
+        ];
         $model->save($row);
 
         // Don't save the activity.
@@ -302,9 +302,9 @@ class Warnings2Plugin extends Gdn_Plugin {
             $content .= wrap(t('Points'), 'strong').' '.$warning['Points'];
 
 
-            echo wrap($content, 'div', array(
+            echo wrap($content, 'div', [
                 'class' => 'WarningContext'
-            ));
+            ]);
         }
     }
 
@@ -372,8 +372,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param array $args The event arguments.
      */
     public function base_flags_handler($sender, $args) {
-        if (Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false)) {
-            $args['Flags']['warn'] = array($this, 'WarnButton');
+        if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)) {
+            $args['Flags']['warn'] = [$this, 'WarnButton'];
         }
     }
 
@@ -387,20 +387,20 @@ class Warnings2Plugin extends Gdn_Plugin {
         if (!val('EditMode', Gdn::controller())) {
 
             if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.UserNotes.Add'], false)) {
-                $sender->EventArguments['ProfileOptions'][] = array(
+                $sender->EventArguments['ProfileOptions'][] = [
                     'Text' => t('Add Note'),
                     'Url' => '/profile/note?userid='.$args['UserID'],
                     'CssClass' => 'Popup UserNoteButton'
-                );
+                ];
             }
             $checkPermission = Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
             if ($checkPermission && Gdn::session()->UserID != $sender->EventArguments['UserID']) {
-                $sender->EventArguments['ProfileOptions'][] = array(
+                $sender->EventArguments['ProfileOptions'][] = [
                     'Text' => sprite('SpWarn').' '.t('Warn'),
                     'Url' => '/profile/warn?userid='.$args['UserID'],
                     'CssClass' => 'Popup WarnButton'
-                );
+                ];
             }
         }
     }
@@ -414,7 +414,7 @@ class Warnings2Plugin extends Gdn_Plugin {
     public function profileController_card_render($sender, $args) {
         $UserID = $sender->data('Profile.UserID');
 
-        if (Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false)) {
+        if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)) {
             $sender->setData('Actions.Warn', [
                 'Text' => sprite('SpWarn'),
                 'Title' => t('Warn'),
@@ -423,7 +423,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             ]);
         }
 
-        if (Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.Add'), false)) {
+        if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.UserNotes.Add'], false)) {
             $sender->setData('Actions.Note', [
                 'Text' => sprite('SpNote'),
                 'Title' => t('Add Note'),
@@ -432,7 +432,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             ]);
         }
 
-        if (Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false)) {
+        if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.UserNotes.View'], false)) {
             $sender->setData('Actions.Notes', [
                 'Text' => '<span class="Count">notes</span>',
                 'Title' => t('Notes & Warnings'),
@@ -441,7 +441,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             ]);
         }
 
-        if (Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false)) {
+        if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.UserNotes.View'], false)) {
             $UserAlertModel = new UserAlertModel();
             $Alert = $UserAlertModel->getID($UserID, DATASET_TYPE_ARRAY);
             $sender->setData('Alert', $Alert);
@@ -455,7 +455,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param int $noteID The ID of the note to delete.
      */
     public function profileController_deleteNote_create($sender, $noteID) {
-        $sender->permission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.Add'), false);
+        $sender->permission(['Garden.Moderation.Manage', 'Moderation.UserNotes.Add'], false);
 
         $Form = new Gdn_Form();
 
@@ -463,7 +463,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
             // Delete the note.
             $NoteModel = new UserNoteModel();
-            $NoteModel->delete(array('UserNoteID' => $noteID));
+            $NoteModel->delete(['UserNoteID' => $noteID]);
 
             $sender->jsonTarget("#UserNote_{$noteID}", '', 'SlideUp');
         }
@@ -531,7 +531,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param int ? $noteID The ID of the note to edit.
      */
     public function profileController_note_create($sender, $userID = null, $noteID = null) {
-        $sender->permission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.Add'), false);
+        $sender->permission(['Garden.Moderation.Manage', 'Moderation.UserNotes.Add'], false);
 
         $Model = new UserNoteModel();
 
@@ -591,7 +591,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param int $id The ID of the warning to reverse.
      */
     public function profileController_reverseWarning_create($sender, $id) {
-        $sender->permission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false);
+        $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         $Form = new Gdn_Form();
 
@@ -626,14 +626,14 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         // The user has been punished so strip some abilities.
-        Gdn::session()->setPermission('Vanilla.Discussions.Add', array());
+        Gdn::session()->setPermission('Vanilla.Discussions.Add', []);
 
         // Reduce posting speed to 1 per 150 sec
-        saveToConfig(array(
+        saveToConfig([
             'Vanilla.Comment.SpamCount' => 0,
             'Vanilla.Comment.SpamTime' => 150,
             'Vanilla.Comment.SpamLock' => 150
-        ), null, false);
+        ], null, false);
     }
 
     /**
@@ -642,7 +642,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ProfileController $sender The event sender.
      */
     public function profileController_addProfileTabs_handler($sender) {
-        $IsPrivileged = Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false);
+        $IsPrivileged = Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         // We can choose to allow regular users to see warnings or not. Default not.
         if (!$IsPrivileged && Gdn::session()->UserID != valr('User.UserID', $sender)) {
@@ -657,7 +657,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param SiteNavModule $sender The event sender.
      */
     public function siteNavModule_init_handler($sender) {
-        $IsPrivileged = Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false);
+        $IsPrivileged = Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
         // We can choose to allow regular users to see warnings or not. Default not.
         if (!$IsPrivileged && Gdn::session()->UserID != valr('User.UserID', $sender)) {
             return;
@@ -677,7 +677,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         $Sender->editMode(false);
         $Sender->getUserInfo($UserReference, $Username);
 
-        $IsPrivileged = Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.UserNotes.View'), false);
+        $IsPrivileged = Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.UserNotes.View'], false);
 
         $Sender->setData('IsPrivileged', $IsPrivileged);
 
@@ -692,7 +692,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         list($Offset, $Limit) = offsetLimit($Page, $this->pageSize);
 
         $UserNoteModel = new UserNoteModel();
-        $Where = array('UserID' => $Sender->User->UserID);
+        $Where = ['UserID' => $Sender->User->UserID];
         if (!$IsPrivileged) {
             $Where['Type'] = 'warning';
         }
@@ -745,7 +745,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         $Sender->getUserInfo($UserID, '', $UserID);
 
         $IsPrivileged = Gdn::session()->checkPermission(
-            array( 'Garden.Moderation.Manage', 'Moderation.UserNotes.View'),
+            [ 'Garden.Moderation.Manage', 'Moderation.UserNotes.View'],
             false
         );
 
@@ -761,10 +761,10 @@ class Warnings2Plugin extends Gdn_Plugin {
         $Breadcrumbs = $Sender->data('Breadcrumbs');
         $NotesUrl = userUrl($Sender->User, '', 'notes');
         $NoteUrl = url("/profile/viewnote/{$Sender->User->UserID}/$NoteID");
-        $Breadcrumbs = array_merge($Breadcrumbs, array(
-            array('Name' => 'Notes', 'Url' => $NotesUrl),
-            array('Name' => 'Note', 'Url' => $NoteUrl)
-        ));
+        $Breadcrumbs = array_merge($Breadcrumbs, [
+            ['Name' => 'Notes', 'Url' => $NotesUrl],
+            ['Name' => 'Note', 'Url' => $NoteUrl]
+        ]);
         $Sender->setData('Breadcrumbs', $Breadcrumbs);
 
         // Add side menu.
@@ -775,7 +775,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         $Note['HideWarnerIdentity'] = $WarningModel->HideWarnerIdentity;
 
         // Join record in question with note.
-        $Notes = array();
+        $Notes = [];
         $Notes[] = $Note;
         joinRecords($Notes, 'Record');
 
@@ -805,7 +805,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             }
         }
 
-        $Sender->permission(array('Garden.Moderation.Manage', 'Moderation.Warnings.Add'), false);
+        $Sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
         if (!$User) {
@@ -826,7 +826,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         // Get the warning types.
-        $WarningTypes = Gdn::sql()->getWhere('WarningType', array(), 'Points')->resultArray();
+        $WarningTypes = Gdn::sql()->getWhere('WarningType', [], 'Points')->resultArray();
         $Sender->setData('WarningTypes', $WarningTypes);
 
         // Get the record.

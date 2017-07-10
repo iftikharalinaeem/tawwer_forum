@@ -47,10 +47,10 @@ class StatusModel extends Gdn_Model {
         $this->defineSchema();
         $this->Validation->setSchema($this->Schema);
 
-        $saveData = array(
+        $saveData = [
             'Name' => $name,
             'State' => $state
-        );
+        ];
 
         if ($statusID) {
             $saveData['StatusID'] = $statusID;
@@ -58,7 +58,7 @@ class StatusModel extends Gdn_Model {
 
         if ($isDefault == 1) {
             $isDefault = '1';
-            $this->update(array('IsDefault' => '0'), array('IsDefault' => '1'));
+            $this->update(['IsDefault' => '0'], ['IsDefault' => '1']);
         } else {
             $isDefault = '0';
         }
@@ -70,7 +70,7 @@ class StatusModel extends Gdn_Model {
         // Grab the current status.
         if (isset($saveData['StatusID'])) {
             $primaryKeyVal = $saveData['StatusID'];
-            $status = $this->SQL->getWhere('Status', array('StatusID' => $primaryKeyVal))->firstRow(DATASET_TYPE_ARRAY);
+            $status = $this->SQL->getWhere('Status', ['StatusID' => $primaryKeyVal])->firstRow(DATASET_TYPE_ARRAY);
             if ($status) {
                 $insert = false;
                 $oldStatus = StatusModel::instance()->getStatus($saveData['StatusID']);
@@ -85,7 +85,7 @@ class StatusModel extends Gdn_Model {
 
             if ($insert === false) {
                 unset($fields[$this->PrimaryKey]); // Don't try to update the primary key
-                $this->update($fields, array($this->PrimaryKey => $primaryKeyVal));
+                $this->update($fields, [$this->PrimaryKey => $primaryKeyVal]);
                 $this->defineTag($name, 'Status', val('Name', $oldStatus));
             } else {
                 $tagID = $this->defineTag($name);
@@ -124,7 +124,7 @@ class StatusModel extends Gdn_Model {
             // Fetch statuses
             $statusModel = new StatusModel();
             $statuses = $statusModel->getWhere()->resultArray();
-            $this->statuses = Gdn_DataSet::index($statuses, array('StatusID'));
+            $this->statuses = Gdn_DataSet::index($statuses, ['StatusID']);
         }
 
         if ($statusID) {
@@ -173,7 +173,7 @@ class StatusModel extends Gdn_Model {
      */
     public function getClosedStatuses() {
         $statuses = $this->statuses();
-        $closedStatuses = array();
+        $closedStatuses = [];
         foreach($statuses as $status) {
             if (val('State', $status) == 'Closed') {
                 $closedStatuses[] = $status;
@@ -210,28 +210,28 @@ class StatusModel extends Gdn_Model {
      * @return int The ID of the tag updated or inserted.
      */
     protected function defineTag($name, $type = 'Status', $oldName = false) {
-        $row = Gdn::sql()->getWhere('Tag', array('Name' => $name))->firstRow(DATASET_TYPE_ARRAY);
+        $row = Gdn::sql()->getWhere('Tag', ['Name' => $name])->firstRow(DATASET_TYPE_ARRAY);
 
         if (!$row && $oldName) {
-            $row = Gdn::sql()->getWhere('Tag', array('Name' => $oldName))->firstRow(DATASET_TYPE_ARRAY);
+            $row = Gdn::sql()->getWhere('Tag', ['Name' => $oldName])->firstRow(DATASET_TYPE_ARRAY);
         }
 
         if (!$row) {
-            $tagID = Gdn::sql()->insert('Tag', array(
+            $tagID = Gdn::sql()->insert('Tag', [
                     'Name' => $name,
                     'FullName' => $name,
                     'Type' => 'Status',
                     'InsertUserID' => Gdn::session()->UserID,
-                    'DateInserted' => Gdn_Format::toDateTime())
+                    'DateInserted' => Gdn_Format::toDateTime()]
             );
         } else {
             $tagID = $row['TagID'];
             if ($row['Type'] != $type || $row['Name'] != $name) {
-                Gdn::sql()->put('Tag', array(
+                Gdn::sql()->put('Tag', [
                     'Name' => $name,
                     'FullName' => $name,
                     'Type' => $type
-                ), array('TagID' => $tagID));
+                ], ['TagID' => $tagID]);
             }
         }
         return $tagID;

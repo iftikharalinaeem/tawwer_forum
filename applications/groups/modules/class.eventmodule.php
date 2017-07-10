@@ -85,7 +85,7 @@ class EventModule extends Gdn_Module {
         // Callable multiple times
         if (!is_null($this->Data('Events', null))) return;
 
-        $EventCriteria = array();
+        $EventCriteria = [];
         switch ($this->FilterBy) {
             case 'group':
                 $GroupModel = new GroupModel();

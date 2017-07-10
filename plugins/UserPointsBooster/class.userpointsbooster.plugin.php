@@ -37,9 +37,9 @@ class UserPointsBoosterPlugin extends Gdn_Plugin {
 
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
-        $configurationModel->setField(array(
+        $configurationModel->setField([
             'UserPointsBooster.PostPoints' => c('UserPointsBooster.PostPoints', 1),
-        ));
+        ]);
         $sender->Form->setModel($configurationModel);
 
         // If seeing the form for the first time...

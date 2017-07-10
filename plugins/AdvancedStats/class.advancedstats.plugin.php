@@ -48,16 +48,16 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
      * @param type $Params
      * @return string
      */
-    public static function StatsUrl($Path, $Params = array()) {
+    public static function StatsUrl($Path, $Params = []) {
         $AnalyticsServer = C('Garden.Analytics.Remote', '//analytics.vanillaforums.com');
 
         $Path = '/'.trim($Path, '/');
 
         $Timestamp = time();
-        $DefaultParams = array(
+        $DefaultParams = [
             'vid' => Gdn::InstallationID(),
             't' => $Timestamp,
-            's' => md5($Timestamp.Gdn::InstallationSecret()));
+            's' => md5($Timestamp.Gdn::InstallationSecret())];
 
         $Params = array_merge($DefaultParams, $Params);
 
@@ -110,21 +110,21 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
         $Result = NULL;
         switch ($Slot) {
             case 'd':
-                $Result = array(Gdn_Format::ToDateTime($Timestamp), Gdn_Format::ToDateTime(strtotime('+1 day', $Timestamp)));
+                $Result = [Gdn_Format::ToDateTime($Timestamp), Gdn_Format::ToDateTime(strtotime('+1 day', $Timestamp))];
                 break;
             case 'w':
                 $Sub = gmdate('N', $Timestamp) - 1;
                 $Add = 7 - $Sub;
-                $Result = array(Gdn_Format::ToDateTime(strtotime("-$Sub days", $Timestamp)), Gdn_Format::ToDateTime(strtotime("+$Add days", $Timestamp)));
+                $Result = [Gdn_Format::ToDateTime(strtotime("-$Sub days", $Timestamp)), Gdn_Format::ToDateTime(strtotime("+$Add days", $Timestamp))];
                 break;
             case 'm':
                 $Sub = gmdate('j', $Timestamp) - 1;
                 $Timestamp = strtotime("-$Sub days", $Timestamp);
-                $Result = array(Gdn_Format::ToDateTime($Timestamp), Gdn_Format::ToDateTime(strtotime("+1 month", $Timestamp)));
+                $Result = [Gdn_Format::ToDateTime($Timestamp), Gdn_Format::ToDateTime(strtotime("+1 month", $Timestamp))];
                 break;
             case 'y':
                 $Timestamp = strtotime(date('Y-01-01', $Timestamp));
-                $Result = array(Gdn_Format::ToDate($Timestamp), Gdn_Format::ToDateTime(strtotime("+1 year", $Timestamp)));
+                $Result = [Gdn_Format::ToDate($Timestamp), Gdn_Format::ToDateTime(strtotime("+1 year", $Timestamp))];
                 break;
         }
 
@@ -132,17 +132,17 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
     }
 
     protected static function RangeWhere($Range, $FieldName = 'DateInserted') {
-        return array("$FieldName >=" => $Range[0], "$FieldName <" => $Range[1]);
+        return ["$FieldName >=" => $Range[0], "$FieldName <" => $Range[1]];
     }
 
     public function UtilityController_BasicStats_Create($Sender, $Date = FALSE, $Slot = 'w') {
         $SlotRange = self::SlotDateRange($Slot, $Date);
 
-        $Result = array(
+        $Result = [
             'SlotType' => $Slot,
             'DateFrom' => $SlotRange[0],
             'DateTo' => $SlotRange[1],
-        );
+        ];
 
         $Result['CountUsers'] = Gdn::SQL()->GetCount('User', self::RangeWhere($SlotRange));
         $Result['CountDiscussions'] = Gdn::SQL()->GetCount('Discussion', self::RangeWhere($SlotRange));
@@ -177,7 +177,7 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
 
         $Url = $AnalyticsServer.'/applications/vanillastatsapp/js/track'.(Debug() ? '' : '.min').'.js?v='.$this->getPluginKey('Version');
 
-        $Sender->AddJsFile($Url, '', array('defer' => 'defer'));
+        $Sender->AddJsFile($Url, '', ['defer' => 'defer']);
         $Sender->AddDefinition('StatsUrl', self::StatsUrl('{p}'));
 //      }
 

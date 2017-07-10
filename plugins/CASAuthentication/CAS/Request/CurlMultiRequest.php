@@ -42,7 +42,7 @@
 class CAS_Request_CurlMultiRequest
 implements CAS_Request_MultiRequestInterface
 {
-    private $_requests = array();
+    private $_requests = [];
     private $_sent = false;
 
     /*********************************************************
@@ -119,7 +119,7 @@ implements CAS_Request_MultiRequestInterface
         $this->_sent = true;
 
         // Initialize our handles and configure all requests.
-        $handles = array();
+        $handles = [];
         $multiHandle = curl_multi_init();
         foreach ($this->_requests as $i => $request) {
             $handle = $request->_initAndConfigure();

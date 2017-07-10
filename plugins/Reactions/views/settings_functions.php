@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit;
 
 function AutoDescription($ReactionType) {
-   $Result = array();
+   $Result = [];
 
    if ($IncrementColumn = GetValue('IncrementColumn', $ReactionType)) {
       $IncrementValue = GetValue('IncrementValue', $ReactionType, 1);
@@ -44,17 +44,17 @@ function AutoDescription($ReactionType) {
 }
 
 function ActivateButton($ReactionType) {
-   $Qs = array(
+   $Qs = [
        'urlcode' => $ReactionType['UrlCode'],
-       'active' => !$ReactionType['Active']);
+       'active' => !$ReactionType['Active']];
 
    $State = ($ReactionType['Active'] ? 'Active' : 'InActive');
 
    $return = '<span id="reactions-toggle">';
    if ($State === 'Active') {
-      $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/reactions/toggle?'.http_build_query($Qs), 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+      $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/reactions/toggle?'.http_build_query($Qs), 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
    } else {
-      $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/reactions/toggle?'.http_build_query($Qs), 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+      $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/reactions/toggle?'.http_build_query($Qs), 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
    }
 
    $return .= '</span>';

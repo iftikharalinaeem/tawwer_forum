@@ -25,7 +25,7 @@ t('Enter the connection settings for your sphinx server below.'),
    <li class="form-group">
       <?php
          echo $this->Form->labelWrap('Port', 'Plugins.Sphinx.Port');
-         echo $this->Form->textBoxWrap('Plugins.Sphinx.Port', array('class' => 'InputBox SmallInput'));
+         echo $this->Form->textBoxWrap('Plugins.Sphinx.Port', ['class' => 'InputBox SmallInput']);
       ?>
    </li>
    <li class="form-group">

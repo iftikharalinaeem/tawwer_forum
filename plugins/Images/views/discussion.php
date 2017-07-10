@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 // Set the video embed size for this page explicitly (in memory only).
-SaveToConfig('Garden.Format.EmbedSize', '594x335', array('Save' => FALSE));
+SaveToConfig('Garden.Format.EmbedSize', '594x335', ['Save' => FALSE]);
 
 if (!function_exists('WriteCommentForm'))
    include $this->FetchViewLocation('helper_functions', 'discussion', 'vanilla');

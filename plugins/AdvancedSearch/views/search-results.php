@@ -9,7 +9,7 @@
         <h3><?php echo anchor($Row['Title'], $Row['Url']); ?></h3>
         <div class="Item-Body Media">
             <?php
-            $Photo = userPhoto($Row, array('LinkClass' => 'Img'));
+            $Photo = userPhoto($Row, ['LinkClass' => 'Img']);
             if ($Photo) {
                 echo $Photo;
             }
@@ -82,6 +82,6 @@ if ($RecordCount >= 1000) {
     echo '<span class="Gloss">'.plural($RecordCount, '%s result', '%s results').'</span>';
 }
 
-PagerModule::write(array('Wrapper' => '<div %1$s>%2$s</div>'));
+PagerModule::write(['Wrapper' => '<div %1$s>%2$s</div>']);
 
 echo '</div>';

@@ -37,9 +37,9 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
 
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
-        $configurationModel->setField(array(
+        $configurationModel->setField([
             'KeywordBlocker.Words',
-        ));
+        ]);
 
         $sender->Form->setModel($configurationModel);
 
@@ -205,14 +205,14 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
             if (isset($recordData[$recordType.'ID'])) {
                 // Clean up logs in case a user edit the post multiple times
                 $logModel = new LogModel();
-                $rows = $logModel->getWhere(array(
+                $rows = $logModel->getWhere([
                     'Operation' => self::MODERATION_QUEUE,
                     'RecordType' => $recordType,
                     'RecordID' => $recordData[$recordType.'ID'],
                     'RecordUserID' => Gdn::session()->UserID,
-                ));
+                ]);
 
-                $logIDs = array();
+                $logIDs = [];
                 foreach($rows as $row) {
                     $logIDs[] = $row['LogID'];
                 }
@@ -226,7 +226,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
                 $recordData = array_merge($oldData, $recordData);
 
                 // Show diff on post review.
-                $recordData['_New'] = array();
+                $recordData['_New'] = [];
 
                 if (in_array($recordType, ['Discussion', 'Group', 'Event'])) {
                     $recordData['_New']['Name'] = $recordData['Name'];
@@ -306,7 +306,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
         static $words = null;
 
         if ($words === null) {
-            $words = array();
+            $words = [];
 
             $wordsString = c('KeywordBlocker.Words', '');
             if (strlen($wordsString)) {

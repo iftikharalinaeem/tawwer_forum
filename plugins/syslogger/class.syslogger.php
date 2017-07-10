@@ -35,7 +35,7 @@ class Syslogger implements LoggerInterface {
      * @param array $context
      * @return null|void
      */
-    public function log($level, $message, array $context = array()) {
+    public function log($level, $message, array $context = []) {
         $priority = Logger::levelPriority($level);
 
         if ($this->format === 'json') {
@@ -45,7 +45,7 @@ class Syslogger implements LoggerInterface {
         }
     }
 
-    protected function logMessage($priority, $message, array $context = array()) {
+    protected function logMessage($priority, $message, array $context = []) {
         $realMessage = FormatString($message, $context);
 
         if ($event = val('event', $context, '!')) {
@@ -60,7 +60,7 @@ class Syslogger implements LoggerInterface {
         syslog($priority, $realMessage);
     }
 
-    protected function logJson($priority, $message, array $context = array()) {
+    protected function logJson($priority, $message, array $context = []) {
         $fullmsg = FormatString($message, $context);
 
         // Add the standard fields to the row.

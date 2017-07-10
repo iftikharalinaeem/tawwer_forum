@@ -3,7 +3,7 @@
 if (!function_exists('WriteReplies')):
    
 function WriteReplies($Comment) {
-   $Replies = GetValue('Replies', $Comment, array());
+   $Replies = GetValue('Replies', $Comment, []);
    
    $Hidden = count($Replies) == 0 ? ' Hidden' : '';
    
@@ -40,7 +40,7 @@ function WriteReply($Reply) {
 
    echo '<div class="Reply-Header">';
       echo UserAnchor($User, 'Username');
-      echo ' '.Wrap(Gdn_Format::Date($Reply['DateInserted'], 'html'), 'span', array('class' => 'Meta DateInserted'));
+      echo ' '.Wrap(Gdn_Format::Date($Reply['DateInserted'], 'html'), 'span', ['class' => 'Meta DateInserted']);
    echo '</div>';
 
    echo '<div class="Reply-Body Message">';
@@ -84,18 +84,18 @@ function WriteReplyEdit($Reply) {
 
    echo '<div class="Reply-Header">';
       echo UserAnchor($User, 'Username');
-      echo ' '.Wrap(Gdn_Format::Date($Reply['DateInserted'], 'html'), 'span', array('class' => 'Meta DateInserted'));
+      echo ' '.Wrap(Gdn_Format::Date($Reply['DateInserted'], 'html'), 'span', ['class' => 'Meta DateInserted']);
    echo '</div>';
 
    echo '<div class="Reply-Body Message">';
    
    echo $Form->Errors();
-   echo $Form->TextBox('Body', array('Multiline' => TRUE, 'Wrap' => TRUE, 'rows' => 4));
+   echo $Form->TextBox('Body', ['Multiline' => TRUE, 'Wrap' => TRUE, 'rows' => 4]);
 
    echo '<div class="Buttons">';
-   echo $Form->Button('Cancel', array('class' => 'Button Cancel', 'tabindex' => '-1'));
+   echo $Form->Button('Cancel', ['class' => 'Button Cancel', 'tabindex' => '-1']);
    echo ' ';
-   echo $Form->Button('Save', array('class' => 'Button Primary'));
+   echo $Form->Button('Save', ['class' => 'Button Primary']);
    echo '</div>';
 
    echo '</div>';
@@ -126,7 +126,7 @@ function WriteReplyForm($Comment) {
       $Form = Gdn::Controller()->ReplyForm;
          
       // Write the regular link.
-      echo Anchor(T('Reply here...'), '#', 'FormPlaceholder InputBox', array('style' => $Form->ErrorCount() ? 'display: none' : ''));
+      echo Anchor(T('Reply here...'), '#', 'FormPlaceholder InputBox', ['style' => $Form->ErrorCount() ? 'display: none' : '']);
       
       $ID = GetValue('CommentID', $Comment);
       if (!$ID)
@@ -134,14 +134,14 @@ function WriteReplyForm($Comment) {
       
       // Write the form.
       $Form->IDPrefix = 'Reply_';
-      echo $Form->Open(array('action' => Url('/post/reply?commentid='.$ID), 'class' => $Form->ErrorCount() ? '' : 'Hidden'));
+      echo $Form->Open(['action' => Url('/post/reply?commentid='.$ID), 'class' => $Form->ErrorCount() ? '' : 'Hidden']);
       echo $Form->Errors();
-      echo $Form->TextBox('Body', array('Multiline' => TRUE, 'Wrap' => TRUE, 'rows' => 4));
+      echo $Form->TextBox('Body', ['Multiline' => TRUE, 'Wrap' => TRUE, 'rows' => 4]);
       
       echo '<div class="Buttons">';
-      echo $Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Cancel', 'tabindex' => '-1'));
+      echo $Form->Button('Cancel', ['type' => 'button', 'class' => 'Button Cancel', 'tabindex' => '-1']);
       echo ' ';
-      echo $Form->Button('Reply', array('class' => 'Button Primary'));
+      echo $Form->Button('Reply', ['class' => 'Button Primary']);
       echo '</div>';
       
       echo $Form->Close();

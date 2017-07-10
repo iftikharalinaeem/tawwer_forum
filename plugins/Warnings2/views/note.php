@@ -20,7 +20,7 @@ echo $this->Form->bodyBox('Body');
 <?php
 echo '<div class="Buttons Buttons-Confirm">',
    $this->Form->button('OK'), ' ',
-   $this->Form->button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
+   $this->Form->button('Cancel', ['type' => 'button', 'class' => 'Button Close']),
    '</div>';
 echo $this->Form->close();
 ?>

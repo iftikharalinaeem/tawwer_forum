@@ -7,7 +7,7 @@ if(isset($_GET['lang'])) {
 }
 $l = ($l == 'de' || $l == 'fr' || $l == 'zh') ? $l : 'en';
 
-$lang = array();
+$lang = [];
 $lang['en'][0] = 'CSS Formatter and Optimiser/Optimizer (based on CSSTidy ';
 $lang['de'][0] = 'CSS Formatierer und Optimierer (basierend auf CSSTidy ';
 $lang['en'][1] = 'CSS Formatter and Optimiser';

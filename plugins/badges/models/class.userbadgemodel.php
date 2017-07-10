@@ -50,7 +50,7 @@ class UserBadgeModel extends Gdn_Model {
         $Threshold = val('Threshold', $Badge, false);
 
         // Get new timestamp and add to events
-        $Events = val('Events', $UserBadge['Attributes'], array());
+        $Events = val('Events', $UserBadge['Attributes'], []);
         $NewTimestamp = (is_numeric($NewTimestamp)) ? $NewTimestamp : strtotime($NewTimestamp);
         $Events[] = $NewTimestamp;
 
@@ -80,7 +80,7 @@ class UserBadgeModel extends Gdn_Model {
      * @access public
      */
     public function badgeCount($UserID = '') {
-        return $this->getCount(array('UserID' => $UserID, 'DateCompleted is not null' => null));
+        return $this->getCount(['UserID' => $UserID, 'DateCompleted is not null' => null]);
     }
 
     /**
@@ -119,10 +119,10 @@ class UserBadgeModel extends Gdn_Model {
      */
     public function bombAnniversary($Limit = 100) {
         // Make sure no one gets a notification.
-        saveToConfig(array(
+        saveToConfig([
             'Preferences.Email.Badge' => false,
             'Preferences.Popup.Badge' => false
-            ), '', false);
+            ], '', false);
 
         $BadgeModel = new BadgeModel();
 
@@ -146,7 +146,7 @@ class UserBadgeModel extends Gdn_Model {
         foreach ($Data as $Row) {
 //            $Args = array('UserID' => $Row['UserID'], 'Fields' => array('CountComments' => $Row['CountComments']));
             Gdn::session()->User = $Row;
-            $Hooks->anniversaries($this, array());
+            $Hooks->anniversaries($this, []);
 
             $Count++;
         }
@@ -162,10 +162,10 @@ class UserBadgeModel extends Gdn_Model {
      */
     public function bombComment($Limit = 100) {
         // Make sure no one gets a notification.
-        saveToConfig(array(
+        saveToConfig([
             'Preferences.Email.Badge' => false,
             'Preferences.Popup.Badge' => false
-            ), '', false);
+            ], '', false);
 
         $BadgeModel = new BadgeModel();
 
@@ -186,7 +186,7 @@ class UserBadgeModel extends Gdn_Model {
 
         $Count = 0;
         foreach ($Data as $Row) {
-            $Args = array('UserID' => $Row['UserID'], 'Fields' => array('CountComments' => $Row['CountComments']));
+            $Args = ['UserID' => $Row['UserID'], 'Fields' => ['CountComments' => $Row['CountComments']]];
             $Hooks->userModel_afterSetField_handler($this, $Args);
             $Count++;
         }
@@ -243,10 +243,10 @@ class UserBadgeModel extends Gdn_Model {
     public function getByUser($UserID, $BadgeID) {
         $BadgeID = $this->getBadgeID($BadgeID);
 
-        $Result = $this->SQL->getWhere('UserBadge', array('UserID' => $UserID, 'BadgeID' => $BadgeID))->firstRow(DATASET_TYPE_ARRAY);
+        $Result = $this->SQL->getWhere('UserBadge', ['UserID' => $UserID, 'BadgeID' => $BadgeID])->firstRow(DATASET_TYPE_ARRAY);
 
         if (!$Result) {
-            $Result = array('UserID' => $UserID, 'BadgeID' => $BadgeID, '_New' => true);
+            $Result = ['UserID' => $UserID, 'BadgeID' => $BadgeID, '_New' => true];
         } else {
             $Result['_New'] = false;
         }
@@ -255,7 +255,7 @@ class UserBadgeModel extends Gdn_Model {
         if ($Attributes) {
             $Attributes = dbdecode($Attributes);
         } else {
-            $Attributes = array();
+            $Attributes = [];
         }
         setValue('Attributes', $Result, $Attributes);
 
@@ -428,7 +428,7 @@ class UserBadgeModel extends Gdn_Model {
                 $BadgeBody = '';
             }
 
-            $Activity = array(
+            $Activity = [
                  'ActivityType' => 'Badge',
                  'ActivityUserID' => $UserID,
                  'NotifyUserID' => $UserID,
@@ -437,8 +437,8 @@ class UserBadgeModel extends Gdn_Model {
                  'RecordType' => 'Badge',
                  'RecordID' => $BadgeID,
                  'Route' => "/badge/{$Badge['Slug']}",
-                 'Data' => array('Name' => self::badgeName($Badge))
-            );
+                 'Data' => ['Name' => self::badgeName($Badge)]
+            ];
 
             // Photo optional
             if ($Photo = val('Photo', $Badge)) {
@@ -449,13 +449,13 @@ class UserBadgeModel extends Gdn_Model {
 
             if (!$this->NoSpam || !$BadgeGiven) {
                 // Notify the user of their badge.
-                $ActivityModel->queue($Activity, 'Badge', array('Force' => true));
+                $ActivityModel->queue($Activity, 'Badge', ['Force' => true]);
             }
 
             // Notify everyone else of your badge.
             $Activity['NotifyUserID'] = ActivityModel::NOTIFY_PUBLIC;
             $Activity['Story'] = $Badge['Body'];
-            $ActivityModel->queue($Activity, false, array('GroupBy' => array('ActivityTypeID', 'RecordID', 'RecordType')));
+            $ActivityModel->queue($Activity, false, ['GroupBy' => ['ActivityTypeID', 'RecordID', 'RecordType']]);
 
             $ActivityModel->saveQueue();
             $BadgeGiven = true;
@@ -513,7 +513,7 @@ class UserBadgeModel extends Gdn_Model {
      */
     public function recipientCount($BadgeID = '') {
         $BadgeID = $this->getBadgeID($BadgeID);
-        return $this->getCount(array('BadgeID' => $BadgeID, 'DateCompleted is not null' => null));
+        return $this->getCount(['BadgeID' => $BadgeID, 'DateCompleted is not null' => null]);
     }
 
     /**
@@ -556,7 +556,7 @@ class UserBadgeModel extends Gdn_Model {
             // Prep activity
             $ActivityModel = new ActivityModel();
             $HeadlineFormat = t('HeadlineFormat.BadgeRequest', '{ActivityUserID,You} requested the <a href="{Url,html}">{Data.Name,text}</a> badge.');
-            $Activity = array(
+            $Activity = [
                  'ActivityType' => 'BadgeRequest',
                  'ActivityUserID' => $UserID,
                  'HeadlineFormat' => $HeadlineFormat,
@@ -564,8 +564,8 @@ class UserBadgeModel extends Gdn_Model {
                  'RecordType' => 'BadgeRequest',
                  'RecordID' => $BadgeID,
                  'Route' => "/badge/requests",
-                 'Data' => array('Name' => $Badge['Name'])
-            );
+                 'Data' => ['Name' => $Badge['Name']]
+            ];
 
             // Optional photo
             if ($Photo = val('Photo', $Badge)) {
@@ -574,11 +574,11 @@ class UserBadgeModel extends Gdn_Model {
 
             // Grab all of the users that need to be notified.
             $Data = $this->SQL
-                ->whereIn('Name', array('Preferences.Email.BadgeRequest', 'Preferences.Popup.BadgeRequest'))
+                ->whereIn('Name', ['Preferences.Email.BadgeRequest', 'Preferences.Popup.BadgeRequest'])
                 ->get('UserMeta')->resultArray();
 
             // Build our notification queue
-            $NotifyUsers = array();
+            $NotifyUsers = [];
             foreach ($Data as $Row) {
                 $UserID = val('UserID', $Row);
                 $Name = val('Name', $Row);
@@ -618,7 +618,7 @@ class UserBadgeModel extends Gdn_Model {
         }
 
         // Delete it.
-        $this->delete(array('UserID' => $UserID, 'BadgeID' => $BadgeID));
+        $this->delete(['UserID' => $UserID, 'BadgeID' => $BadgeID]);
 
         // Adjust user's badge count
         $BadgeCount = $this->badgeCount($UserID);
@@ -679,9 +679,9 @@ class UserBadgeModel extends Gdn_Model {
                 $this->addInsertFields($Fields);
                 $this->SQL->insert($this->Name, $Fields);
             } else {
-                $Where = array(
+                $Where = [
                     'UserID' => $Fields['UserID'],
-                    'BadgeID' => $Fields['BadgeID']);
+                    'BadgeID' => $Fields['BadgeID']];
                 $this->SQL->put($this->Name, $Fields, $Where);
             }
 

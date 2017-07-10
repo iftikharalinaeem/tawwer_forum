@@ -109,8 +109,8 @@ class BadgeController extends BadgesAppController {
             $Badge = $this->BadgeModel->getID($BadgeID);
             if (val('CanDelete', $Badge, false)) {
                 // Delete & revoke
-                $this->BadgeModel->delete(array('BadgeID' => $BadgeID));
-                $this->UserBadgeModel->delete(array('BadgeID' => $BadgeID));
+                $this->BadgeModel->delete(['BadgeID' => $BadgeID]);
+                $this->UserBadgeModel->delete(['BadgeID' => $BadgeID]);
 
                 // Success & redirect
                 $this->informMessage(t('Badge deleted.'));
@@ -339,7 +339,7 @@ class BadgeController extends BadgesAppController {
         $this->SetData('UserBadge', $this->UserBadge);
 
         // Get recipients
-        $this->setData('Recipients', $this->UserBadgeModel->getUsers($BadgeID, array('Limit' => 15))->resultArray());
+        $this->setData('Recipients', $this->UserBadgeModel->getUsers($BadgeID, ['Limit' => 15])->resultArray());
         $this->setData('BadgeID', $BadgeID, true);
 
         if (val('_New', $this->UserBadge) &&  BadgeModel::isRequestable($this->Badge)) {
@@ -419,7 +419,7 @@ class BadgeController extends BadgesAppController {
                         "badges/$Basename",
                         C('Reputation.Badges.Height', 100),
                         C('Reputation.Badges.Width', 100),
-                        array('SaveGif' => C('Reputation.Badges.SaveGif'))
+                        ['SaveGif' => C('Reputation.Badges.SaveGif')]
                     );
                     $this->Form->setFormValue('Photo', sprintf($Props['SaveFormat'], "badges/$Basename"));
                 }
@@ -531,7 +531,7 @@ class BadgeController extends BadgesAppController {
             $Action = $this->Form->getValue('Submit');
             $Requests = $this->Form->getValue('Requests');
             $RequestCount = is_array($Requests) ? count($Requests) : 0;
-            if ($RequestCount > 0 && in_array($Action, array('Approve', 'Decline'))) {
+            if ($RequestCount > 0 && in_array($Action, ['Approve', 'Decline'])) {
                 for ($i = 0; $i < $RequestCount; ++$i) {
                     $Data = explode('-', $Requests[$i]);
                     if (count($Data) != 2) {
@@ -547,7 +547,7 @@ class BadgeController extends BadgesAppController {
         }
 
         $this->RequestData = $this->UserBadgeModel->getRequests();
-        Gdn::userModel()->joinUsers($this->RequestData, array('UserID'));
+        Gdn::userModel()->joinUsers($this->RequestData, ['UserID']);
         $this->render('requests', 'badge');
     }
 

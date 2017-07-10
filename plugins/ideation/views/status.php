@@ -18,8 +18,8 @@ if (val('IsDefault', $this->Form->formData())) {
         </li>
         <li class="form-group">
             <div class="input-wrap no-label">
-                <?php echo $this->Form->radio('State', '<strong>Open</strong> '.t("An idea in this status is open to be voted on."), array('Value' => 'Open', 'Default' => 'Open')); ?>
-                <?php echo $this->Form->radio('State', '<strong>Closed</strong> '.t("An idea in this status is closed for voting."), array('Value' => 'Closed', 'Default' => 'Open')); ?>
+                <?php echo $this->Form->radio('State', '<strong>Open</strong> '.t("An idea in this status is open to be voted on."), ['Value' => 'Open', 'Default' => 'Open']); ?>
+                <?php echo $this->Form->radio('State', '<strong>Closed</strong> '.t("An idea in this status is closed for voting."), ['Value' => 'Closed', 'Default' => 'Open']); ?>
             </div>
         </li>
 

@@ -13,7 +13,7 @@ class GroupController extends Gdn_Controller {
     const GROUP_ICON_FOLDER = 'groups/icons';
 
     /** @var array  */
-    public $Uses = array('GroupModel', 'EventModel');
+    public $Uses = ['GroupModel', 'EventModel'];
 
     /** @var GroupModel */
     public $GroupModel;
@@ -227,10 +227,10 @@ class GroupController extends Gdn_Controller {
 
         $Value = ucfirst($Value);
 
-        $this->GroupModel->joinApprove(array(
+        $this->GroupModel->joinApprove([
             'GroupApplicantID' => $ID,
             'Type' => $Value
-        ));
+        ]);
 
         $this->jsonTarget("#GroupApplicant_$ID", "", 'SlideUp');
         $this->informMessage(t('Applicant '.$Value));
@@ -440,10 +440,10 @@ class GroupController extends Gdn_Controller {
 
         if ($this->Form->authenticatedPostBack()) {
             $GroupModel = new GroupModel();
-            $GroupDeleted = $GroupModel->delete(array('GroupID' => $Group['GroupID']));
+            $GroupDeleted = $GroupModel->delete(['GroupID' => $Group['GroupID']]);
 
             $EventModel = new EventModel();
-            $EventModel->delete(array('GroupID' => $Group['GroupID']));
+            $EventModel->delete(['GroupID' => $Group['GroupID']]);
 
             if ($GroupDeleted) {
                 $this->informMessage(formatString(t('<b>{Name}</b> deleted.'), $Group));
@@ -466,7 +466,7 @@ class GroupController extends Gdn_Controller {
      * @param string $Field The name of the field. The image will be uploaded with the _New extension while the current image will be just the field name.
      * @param array $Options
      */
-    protected static function saveImage($Form, $Field, $Options = array()) {
+    protected static function saveImage($Form, $Field, $Options = []) {
         $Upload = new Gdn_UploadImage();
 
         if (!valr("{$Field}_New.name", $_FILES)) {
@@ -555,7 +555,7 @@ class GroupController extends Gdn_Controller {
                 self::GROUP_ICON_FOLDER."/p$imageBaseName",
                 c('Groups.Profile.MaxHeight', 1000),
                 c('Groups.Profile.MaxWidth', 550),
-                array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
+                ['SaveGif' => c('Garden.Thumbnail.SaveGif')]
             );
 
             // Save the thumbnail size image.
@@ -652,21 +652,21 @@ class GroupController extends Gdn_Controller {
 
         if ($Form->authenticatedPostBack()) {
             // We need to save the images before saving to the database.
-            self::saveImage($Form, 'Banner', array('Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => true, 'OutputType' => 'jpeg'));
+            self::saveImage($Form, 'Banner', ['Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => true, 'OutputType' => 'jpeg']);
 
             if ($tmpIcon = $upload->validateUpload('Icon_New', false)) {
                 // New upload
-                $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
+                $thumbOptions = ['Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif')];
                 $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
                 $Form->setFormValue('Icon', $newIcon);
             } else if ($icon && $crop && $crop->isCropped()) {
                 // New thumbnail
                 $tmpIcon = $source;
-                $thumbOptions = array('Crop' => true,
+                $thumbOptions = ['Crop' => true,
                     'SourceX' => $crop->getCropXValue(),
                     'SourceY' => $crop->getCropYValue(),
                     'SourceWidth' => $crop->getCropWidth(),
-                    'SourceHeight' => $crop->getCropHeight());
+                    'SourceHeight' => $crop->getCropHeight()];
                 $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
                 $Form->setFormValue('Icon', $newIcon);
             }
@@ -781,24 +781,24 @@ class GroupController extends Gdn_Controller {
             $newIcon = false;
             if ($tmpIcon = $upload->validateUpload('Icon', false)) {
                  // New upload
-                 $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
+                 $thumbOptions = ['Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif')];
                  $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
                  $form->setFormValue('Icon', $newIcon);
                  $target = 'groupicon'; // redirect to groupicon page so user can set thumbnail
             } elseif ($icon && $crop && $crop->isCropped()) {
                  // New thumbnail
                  $tmpIcon = $source;
-                 $thumbOptions = array('Crop' => true,
+                 $thumbOptions = ['Crop' => true,
                       'SourceX' => $crop->getCropXValue(),
                       'SourceY' => $crop->getCropYValue(),
                       'SourceWidth' => $crop->getCropWidth(),
-                      'SourceHeight' => $crop->getCropHeight());
+                      'SourceHeight' => $crop->getCropHeight()];
                  $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
                  $form->setFormValue('Icon', $newIcon);
             }
 
             if ($form->errorCount() == 0 && $newIcon) {
-                if (!$this->GroupModel->save(array('GroupID' => val('GroupID', $group), 'Icon' => $newIcon))) {
+                if (!$this->GroupModel->save(['GroupID' => val('GroupID', $group), 'Icon' => $newIcon])) {
                     $form->setValidationResults($this->GroupModel->validationResults());
                 } else {
                     $this->deleteGroupIcons($icon);
@@ -883,7 +883,7 @@ class GroupController extends Gdn_Controller {
 
         list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
         $DiscussionModel = new DiscussionModel();
-        $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent(array('GroupID' => $Group['GroupID']), $Limit, $Offset));
+        $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent(['GroupID' => $Group['GroupID']], $Limit, $Offset));
         $this->CountCommentsPerPage = c('Vanilla.Comments.PerPage', 30);
         $this->setData('_ShowCategoryLink', false);
 
@@ -895,8 +895,8 @@ class GroupController extends Gdn_Controller {
         $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
 
-        $this->setData('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary', 'QueryString' => $NewDiscussionModule->QueryString));
-        $this->Data['_properties']['newdiscussionmodule'] = array('CssClass' => 'Button Action Primary', 'QueryString' => $NewDiscussionModule->QueryString);
+        $this->setData('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary', 'QueryString' => $NewDiscussionModule->QueryString]);
+        $this->Data['_properties']['newdiscussionmodule'] = ['CssClass' => 'Button Action Primary', 'QueryString' => $NewDiscussionModule->QueryString];
 
         $this->addBreadcrumb($Group['Name'], groupUrl($Group));
         $this->addBreadcrumb(t('Discussions'));
@@ -995,13 +995,13 @@ class GroupController extends Gdn_Controller {
         $this->setData('_Offset', $Limit);
 
         // Get Leaders
-        if (in_array($Filter, array('', 'leaders'))) {
+        if (in_array($Filter, ['', 'leaders'])) {
             $Users = $this->GroupModel->getMembers($Group['GroupID'], ['Role' => 'Leader'], $Limit, $Offset);
             $this->setData('Leaders', $Users);
         }
 
         // Get Members
-        if (in_array($Filter, array('', 'members'))) {
+        if (in_array($Filter, ['', 'members'])) {
             // Filter only by name (not by roles) when filtering
             if ($memberFilter) {
                 $where = ['u.Name like' => $memberFilter.'%'];
@@ -1012,7 +1012,7 @@ class GroupController extends Gdn_Controller {
             $this->setData('Members', $Users);
         }
 
-        $this->Data['_properties']['newdiscussionmodule'] = array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$Group['GroupID']);
+        $this->Data['_properties']['newdiscussionmodule'] = ['CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$Group['GroupID']];
         $this->setData('Filter', $Filter);
         $this->title(t('Members').' - '.htmlspecialchars($Group['Name']));
         require_once $this->fetchViewLocation('group_functions');
@@ -1045,7 +1045,7 @@ class GroupController extends Gdn_Controller {
 
         $GroupID = $Group['GroupID'];
 
-        $Member = $this->GroupModel->getMembers($Group['GroupID'], array('UserID' => $UserID));
+        $Member = $this->GroupModel->getMembers($Group['GroupID'], ['UserID' => $UserID]);
         $Member = array_pop($Member);
         if (!$Member) {
             throw NotFoundException('Member');
@@ -1098,7 +1098,7 @@ class GroupController extends Gdn_Controller {
 
         $GroupID = $Group['GroupID'];
 
-        $Member = $this->GroupModel->getMembers($Group['GroupID'], array('UserID' => $UserID));
+        $Member = $this->GroupModel->getMembers($Group['GroupID'], ['UserID' => $UserID]);
         $Member = array_pop($Member);
         if (!$Member) {
             throw NotFoundException('Member');

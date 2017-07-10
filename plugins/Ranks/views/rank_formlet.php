@@ -5,6 +5,6 @@
         <?php echo $Sender->Form->label('Rank', 'RankID'); ?>
     </div>
     <div class="input-wrap">
-        <?php echo $Sender->Form->dropDown('RankID', $Sender->Data('_Ranks'), array('IncludeNull' => true)); ?>
+        <?php echo $Sender->Form->dropDown('RankID', $Sender->Data('_Ranks'), ['IncludeNull' => true]); ?>
     </div>
 </li>

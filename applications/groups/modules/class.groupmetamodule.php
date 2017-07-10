@@ -21,7 +21,7 @@ class GroupMetaModule extends Gdn_Module {
      * @param array $group The group the meta is associated with.
      * @param string $cssClass The css class for the meta container.
      */
-    public function __construct($group = array(), $cssClass = '') {
+    public function __construct($group = [], $cssClass = '') {
         $this->meta['cssClass'] = $cssClass;
         $this->group = $group;
     }
@@ -38,8 +38,8 @@ class GroupMetaModule extends Gdn_Module {
         $metaItems['owner']['value'] = userAnchor($owner);
 
         $groupModel = new GroupModel();
-        $leaders = $groupModel->getMembers(val('GroupID', $group), array('Role' => 'Leader'), 10);
-        $leaderString = array();
+        $leaders = $groupModel->getMembers(val('GroupID', $group), ['Role' => 'Leader'], 10);
+        $leaderString = [];
         foreach ($leaders as $leader) {
             $leaderString[] = userAnchor($leader);
         }

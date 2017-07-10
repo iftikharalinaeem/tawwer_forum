@@ -31,12 +31,12 @@ class Colors extends Gdn_Plugin {
 
       //$Formats = array_combine($this->Formats, $this->Formats);
       
-      $Cf->Initialize(array(
-          'Plugins.colors.header' => array('LabelCode' => 'Header', 'Control' => 'Textbox', 'Description' => 'Select a color for the dashboard header.'),
-          'Plugins.colors.body' => array('LabelCode' => 'Body', 'Control' => 'Textbox', 'Description' => 'Select a color for the dashboard body.'),
-          'Plugins.colors.panel' => array('LabelCode' => 'Panel', 'Control' => 'Textbox', 'Description' => 'Select a color for the dashboard panel.'),
-          'Plugins.colors.footer' => array('LabelCode' => 'Footer', 'Control' => 'Textbox', 'Description' => 'Select a color for the dashboard footer.')
-      ));
+      $Cf->Initialize([
+          'Plugins.colors.header' => ['LabelCode' => 'Header', 'Control' => 'Textbox', 'Description' => 'Select a color for the dashboard header.'],
+          'Plugins.colors.body' => ['LabelCode' => 'Body', 'Control' => 'Textbox', 'Description' => 'Select a color for the dashboard body.'],
+          'Plugins.colors.panel' => ['LabelCode' => 'Panel', 'Control' => 'Textbox', 'Description' => 'Select a color for the dashboard panel.'],
+          'Plugins.colors.footer' => ['LabelCode' => 'Footer', 'Control' => 'Textbox', 'Description' => 'Select a color for the dashboard footer.']
+      ]);
       
       // Add some JS and CSS to blur out option when Wysiwyg not chosen.
       $c = Gdn::Controller();

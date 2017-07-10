@@ -29,10 +29,10 @@ class EventModel extends Gdn_Model {
      * @return type
      */
     public function getByUser($UserID) {
-        $UserGroups = $this->SQL->getWhere('UserGroup', array('UserID' => $UserID))->resultArray();
+        $UserGroups = $this->SQL->getWhere('UserGroup', ['UserID' => $UserID])->resultArray();
         $IDs = array_column($UserGroups, 'GroupID');
 
-        $Result = $this->getWhere(array('GroupID' => $IDs), 'Name')->resultArray();
+        $Result = $this->getWhere(['GroupID' => $IDs], 'Name')->resultArray();
         return $Result;
     }
 
@@ -125,7 +125,7 @@ class EventModel extends Gdn_Model {
      * @return boolean
      */
     public function checkPermission($Permission, $EventID) {
-        static $Permissions = array();
+        static $Permissions = [];
 
         $UserID = Gdn::session()->UserID;
 
@@ -144,7 +144,7 @@ class EventModel extends Gdn_Model {
             $UserEvent = false;
             if ($UserID) {
                 $UserEvent = Gdn::sql()
-                    ->getWhere('UserEvent', array('EventID' => $EventID, 'UserID' => $UserID))
+                    ->getWhere('UserEvent', ['EventID' => $EventID, 'UserID' => $UserID])
                     ->firstRow(DATASET_TYPE_ARRAY);
             }
 
@@ -412,7 +412,7 @@ class EventModel extends Gdn_Model {
     public static function timezones($LookupTimezone = null) {
         static $Built = null;
 
-        static $Timezones = array(
+        static $Timezones = [
             'Pacific/Midway'         => "Midway Island",
             'US/Samoa'                 => "Samoa",
             'US/Hawaii'                => "Hawaii",
@@ -525,11 +525,11 @@ class EventModel extends Gdn_Model {
             'Asia/Magadan'            => "Magadan",
             'Pacific/Auckland'      => "Auckland",
             'Pacific/Fiji'            => "Fiji",
-        );
+        ];
 
         // Build TZ list
         if (is_null($Built)) {
-            $Builder = array(); $Now = new DateTime('now');
+            $Builder = []; $Now = new DateTime('now');
             foreach ($Timezones as $TimezoneID => $LocationName) {
                 try {
                     $Timezone = new DateTimeZone($TimezoneID);

@@ -121,7 +121,7 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 	public function ProfileController_EditMyAccountAfter_Handler($Sender) {
 		echo '<li>';
 		echo $Sender->Form->Label('Twitter Name', 'TwitterName');
-		echo $Sender->Form->Input('TwitterName', 'text', array('maxlength' => 15));
+		echo $Sender->Form->Input('TwitterName', 'text', ['maxlength' => 15]);
 		echo '</li>';
 	}
 	

@@ -12,7 +12,7 @@
 class GroupsController extends Gdn_Controller {
 
     /** @var array  */
-    public $Uses = array('GroupModel');
+    public $Uses = ['GroupModel'];
 
     /** @var GroupModel */
     public $GroupModel;

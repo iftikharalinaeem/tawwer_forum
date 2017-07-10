@@ -18,7 +18,7 @@
 
             <div class="P Details">
                 <?php echo $this->Form->Label('Event Details', 'EventDetails'); ?>
-                <div><?php echo $this->Form->BodyBox('Body', array('Table' => 'Event')); ?></div>
+                <div><?php echo $this->Form->BodyBox('Body', ['Table' => 'Event']); ?></div>
             </div>
 
             <div class="P Where">
@@ -32,7 +32,7 @@
             <div class="EventTime Times <?php echo $Both; ?>">
 
                 <div class="P From">
-                    <?php echo $this->Form->Label('When', 'RawDateStarts', array('class' => 'When')); ?>
+                    <?php echo $this->Form->Label('When', 'RawDateStarts', ['class' => 'When']); ?>
                     <?php echo $this->Form->Label('From', 'RawDateStarts'); ?>
                     <?php echo $this->dateTimePicker('Starts', '12:00am'); ?>
                     <span class="Timebased EndTime"><?php echo Anchor(T('End time?'), '#'); ?></span>
@@ -46,8 +46,8 @@
             </div>
 
             <div class="Buttons">
-                <?php echo $this->Form->Button('Save', array('Type' => 'submit', 'class' => 'Button Primary')); ?>
-                <?php echo $this->Form->Button('Cancel', array('Type' => 'button', 'class' => 'Button CancelButton')); ?>
+                <?php echo $this->Form->Button('Save', ['Type' => 'submit', 'class' => 'Button Primary']); ?>
+                <?php echo $this->Form->Button('Cancel', ['Type' => 'button', 'class' => 'Button CancelButton']); ?>
             </div>
         </div>
         <?php echo $this->Form->Close(); ?>

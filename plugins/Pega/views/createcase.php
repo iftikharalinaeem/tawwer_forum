@@ -20,12 +20,12 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php echo $this->Form->Label('Body', 'Body');  ?>
-      <?php echo $this->Form->TextBox('Body', array('MultiLine' => true)); ?>
+      <?php echo $this->Form->TextBox('Body', ['MultiLine' => true]); ?>
    </li>
 
 </ul>
 
 
 <div style="width: 400px"></div>
-<?php echo $this->Form->Close('Create Case', '', array('class' => 'Button BigButton'));
+<?php echo $this->Form->Close('Create Case', '', ['class' => 'Button BigButton']);
 

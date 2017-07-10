@@ -429,7 +429,7 @@ class SearchModel extends Gdn_Model {
 //            $Results['ChildResults'] = $ChildResults['SearchResults'];
 //         }
         } else {
-            $results = array('SearchResults' => [], 'RecordCount' => 0, 'SearchTerms' => $terms);
+            $results = ['SearchResults' => [], 'RecordCount' => 0, 'SearchTerms' => $terms];
         }
         $results['CalculatedSearch'] = $search;
         return $results;
@@ -449,7 +449,7 @@ class SearchModel extends Gdn_Model {
             $sphinx->setFilter('CategoryID', (array) $search['cat']);
         }
         if (isset($search['discussionid'])) {
-            $indexes = $this->Indexes(array('Discussion', 'Comment'));
+            $indexes = $this->Indexes(['Discussion', 'Comment']);
             $sphinx->setFilter('DiscussionID', (array) $search['discussionid']);
         }
         if (isset($search['tags'])) {
@@ -595,7 +595,7 @@ class SearchModel extends Gdn_Model {
     }
 
     public function search($terms, $offset = 0, $limit = 20) {
-        $search = array('search' => $terms, 'group' => false);
+        $search = ['search' => $terms, 'group' => false];
         if ($categoryID = Gdn::controller()->Request->get('CategoryID')) {
             $search['cat'] = $categoryID;
         }
@@ -827,7 +827,7 @@ class SearchModel extends Gdn_Model {
             if ($query[2] || ($query[1] && !$inquote && !$inword)) {
                 $queries[] = $query[0] . $sphinx->escapeString($query[1]) . $query[2];
                 $terms[] = $query[1];
-                $query = array('', '', '');
+                $query = ['', '', ''];
             }
         }
         // Account for someone missing their last quote.
