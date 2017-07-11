@@ -1,13 +1,27 @@
 jQuery(document).ready(function($) {
 
-    // Composing a new poll, let poll options duplicate. This used to be inline,
-    // which generated a race condition between jQuery being defined, and this
-    // code running.
-    if ($.fn.duplicate) {
-        $('.PollOption').duplicate({
-            addButton: '.AddPollOption'
+    $('.NewPollForm').each(function(){
+        var $form = $(this);
+        var $template = $form.find('.PollOption:first').clone(false);
+        $template.find('.InputBox').val(''); // Reset value just in case it's not empty
+        var $pollOptions = $form.find('.PollOptions');
+
+        $form.find('.AddPollOption').on('click', function(e){
+            e.stopPropagation();
+            e.preventDefault();
+            $pollOptions.append($template.clone());
+            $pollOptions.find('.PollOption:last .InputBox').focus();
         });
-    }
+
+        // Block new lines if current line is empty
+        $form.on('keypress', '.InputBox', function(e){
+            var isEnterKey = (e.keyCode || e.which) == 13;
+            if (isEnterKey && $(this).val() == "") {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        });
+    });
 
    $(document).on('click', '.PollForm form :submit', function() {
       var btn = this,

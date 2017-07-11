@@ -63,7 +63,7 @@ if (!$cancelUrl) {
         }
     }
     echo '</ol>';
-    echo anchor(t('Add another poll option ...'), '#', ['class' => 'AddPollOption']);
+    echo '<button class="Button AddPollOption">' . t('Add another poll option ...') . '</button>';
     echo '</div>';
 
     echo '<div class="Buttons">';
