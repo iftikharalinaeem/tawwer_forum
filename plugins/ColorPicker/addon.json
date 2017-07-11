@@ -17,5 +17,6 @@
     ],
     "require": {
         "vanilla": ">=2.0.2a"
-    }
+    },
+    "icon": "color_picker.png"
 }

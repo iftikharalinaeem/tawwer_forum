@@ -17,5 +17,6 @@
     ],
     "require": {
         "vanilla": ">=2.2"
-    }
+    },
+    "icon": "pre-moderated_category.png"
 }

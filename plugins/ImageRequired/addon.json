@@ -14,5 +14,6 @@
     "require": {
         "fileupload": ">=1.8.4",
         "vanilla": ">=2.2"
-    }
+    },
+    "icon": "image_required.png"
 }
