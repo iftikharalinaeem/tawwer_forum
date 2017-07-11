@@ -63,7 +63,9 @@ if (!$cancelUrl) {
         }
     }
     echo '</ol>';
-    echo '<button class="Button AddPollOption">' . t('Add another poll option ...') . '</button>';
+
+    echo $this->Form->button('Add another poll option ...', ['class' => 'Button AddPollOption']);
+
     echo '</div>';
 
     echo '<div class="Buttons">';
