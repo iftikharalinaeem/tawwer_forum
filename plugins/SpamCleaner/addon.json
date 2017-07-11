@@ -15,5 +15,5 @@
     "require": {
         "vanilla": ">=2.1a"
     },
-    "icon": "span_cleaner.png"
+    "icon": "spam_cleaner.png"
 }

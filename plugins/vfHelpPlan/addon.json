@@ -15,5 +15,5 @@
     "require": {
         "vfcom": ">=3.0.0"
     },
-    "icon": "vfHelpPlan.png"
+    "icon": "vf_help_plan.png"
 }
