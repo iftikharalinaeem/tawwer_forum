@@ -518,8 +518,11 @@ class SearchModel extends Gdn_Model {
 
         $results = $this->getDocuments($search);
         $total = val('total', $search);
-        Gdn::controller()->setData('RecordCount', $total);
+        $controller = Gdn::controller();
         $searchTerms = val('words', $search);
+        if ($controller) {
+            $controller->setData('RecordCount', $total);
+        }
         if (is_array($searchTerms)) {
             $searchTerms = array_keys($searchTerms);
         } else {
@@ -596,7 +599,8 @@ class SearchModel extends Gdn_Model {
 
     public function search($terms, $offset = 0, $limit = 20) {
         $search = array('search' => $terms, 'group' => false);
-        if ($categoryID = Gdn::controller()->Request->get('CategoryID')) {
+        $controller = Gdn::controller();
+        if ($controller && $categoryID = $controller->Request->get('CategoryID')) {
             $search['cat'] = $categoryID;
         }
 
