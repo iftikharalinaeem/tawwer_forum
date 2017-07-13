@@ -60,7 +60,7 @@ class GroupModel extends Gdn_Model {
      * @return boolean
      */
     public function checkPermission($Permission, $GroupID) {
-        static $Permissions = array();
+        static $Permissions = [];
 
         $UserID = Gdn::session()->UserID;
 
@@ -78,15 +78,15 @@ class GroupModel extends Gdn_Model {
             }
 
             if ($UserID) {
-                $UserGroup = Gdn::sql()->getWhere('UserGroup', array('GroupID' => $GroupID, 'UserID' => Gdn::session()->UserID))->firstRow(DATASET_TYPE_ARRAY);
-                $GroupApplicant = Gdn::sql()->getWhere('GroupApplicant', array('GroupID' => $GroupID, 'UserID' => Gdn::session()->UserID))->firstRow(DATASET_TYPE_ARRAY);
+                $UserGroup = Gdn::sql()->getWhere('UserGroup', ['GroupID' => $GroupID, 'UserID' => Gdn::session()->UserID])->firstRow(DATASET_TYPE_ARRAY);
+                $GroupApplicant = Gdn::sql()->getWhere('GroupApplicant', ['GroupID' => $GroupID, 'UserID' => Gdn::session()->UserID])->firstRow(DATASET_TYPE_ARRAY);
             } else {
                 $UserGroup = false;
                 $GroupApplicant = false;
             }
 
             // Set the default permissions.
-            $Perms = array(
+            $Perms = [
                 'Member' => false,
                 'Leader' => false,
                 'Join' => Gdn::session()->isValid(),
@@ -94,14 +94,14 @@ class GroupModel extends Gdn_Model {
                 'Edit' => false,
                 'Delete' => false,
                 'Moderate' => false,
-                'View' => true);
+                'View' => true];
 
             // The group creator is always a member and leader.
             if ($UserID == $Group['InsertUserID']) {
                 $Perms['Delete'] = true;
 
                 if (!$UserGroup) {
-                    $UserGroup = array('Role' => 'Leader');
+                    $UserGroup = ['Role' => 'Leader'];
                 }
             }
 
@@ -184,7 +184,7 @@ class GroupModel extends Gdn_Model {
                     return '';
                 }
 
-                if (in_array($Permission, array('Member', 'Leader'))) {
+                if (in_array($Permission, ['Member', 'Leader'])) {
                     $Message = t(sprintf("You aren't a %s of this group.", strtolower($Permission)));
                 } else {
                     $Message = sprintf(t("You aren't allowed to %s this group."), t(strtolower($Permission)));
@@ -258,10 +258,10 @@ class GroupModel extends Gdn_Model {
      * @return array
      */
     public function getByUser($UserID, $OrderFields = '', $OrderDirection = 'desc', $Limit = 9, $Offset = false) {
-        $UserGroups = $this->SQL->getWhere('UserGroup', array('UserID' => $UserID))->resultArray();
+        $UserGroups = $this->SQL->getWhere('UserGroup', ['UserID' => $UserID])->resultArray();
         $IDs = array_column($UserGroups, 'GroupID');
 
-        $Result = $this->getWhere(array('GroupID' => $IDs), $OrderFields, $OrderDirection, $Limit, $Offset)->resultArray();
+        $Result = $this->getWhere(['GroupID' => $IDs], $OrderFields, $OrderDirection, $Limit, $Offset)->resultArray();
         $this->calc($Result);
         return $Result;
     }
@@ -560,11 +560,11 @@ class GroupModel extends Gdn_Model {
                     continue;
                 } else {
                     $this->SQL->put('GroupApplicant',
-                        array('Type' => 'Invitation'),
-                        array(
+                        ['Type' => 'Invitation'],
+                        [
                             'GroupID' => $Group['GroupID'],
                             'UserID' => $UserID
-                        ));
+                        ]);
                 }
             } else {
                 $Data['Type'] = 'Invitation';
@@ -579,7 +579,7 @@ class GroupModel extends Gdn_Model {
         // If Conversations are disabled; Improve notification with a link to group.
         if (!class_exists('ConversationModel') && count($ValidUserIDs) > 0) {
             foreach ($ValidUserIDs as $UserID) {
-                $Activity = array(
+                $Activity = [
                     'ActivityType' => 'Group',
                     'ActivityUserID' => Gdn::session()->UserID,
                     'HeadlineFormat' => t('HeadlineFormat.GroupInvite', 'Please join my <a href="{Url,html}">group</a>.'),
@@ -589,7 +589,7 @@ class GroupModel extends Gdn_Model {
                     'Story' => formatString(t("You've been invited to join {Name}."), ['Name' => htmlspecialchars($Group['Name'])]),
                     'NotifyUserID' => $UserID,
                     'Data' => ['Name' => $Group['Name']]
-                );
+                ];
                 $ActivityModel = new ActivityModel();
                 $ActivityModel->save($Activity, 'Groups');
             }
@@ -808,7 +808,7 @@ class GroupModel extends Gdn_Model {
 
         // Now join the users.
         if ($JoinUsers) {
-            Gdn::userModel()->joinUsers($Data, array('LastCommentUserID', 'LastDiscussionUserID'));
+            Gdn::userModel()->joinUsers($Data, ['LastCommentUserID', 'LastDiscussionUserID']);
         }
     }
 
@@ -819,9 +819,9 @@ class GroupModel extends Gdn_Model {
      * @throws Gdn_UserException
      */
     public function leave($Data) {
-        $this->SQL->delete('UserGroup', array(
+        $this->SQL->delete('UserGroup', [
             'UserID' => val('UserID', $Data),
-            'GroupID' => val('GroupID', $Data)));
+            'GroupID' => val('GroupID', $Data)]);
 
         $this->updateCount($Data['GroupID'], 'CountMembers');
     }
@@ -1010,7 +1010,7 @@ class GroupModel extends Gdn_Model {
 
         // Check to see if there is another group with the same name.
         if (trim(GetValue('Name', $FormPostValues))) {
-            $Rows = $this->SQL->getWhere('Group', array('Name' => $FormPostValues['Name']))->resultArray();
+            $Rows = $this->SQL->getWhere('Group', ['Name' => $FormPostValues['Name']])->resultArray();
 
             $GroupID = GetValue('GroupID', $FormPostValues);
             foreach ($Rows as $Row) {
@@ -1082,7 +1082,7 @@ class GroupModel extends Gdn_Model {
         // Get list of matching groups
         $matchGroups = $this->getWhere($Where,'','',$Limit);
         // Clean up UserGroups
-        $groupIDs = array();
+        $groupIDs = [];
         foreach ($matchGroups as $event) {
             $groupIDs[] = val('GroupID', $event);
         }
@@ -1132,8 +1132,8 @@ class GroupModel extends Gdn_Model {
         $GroupCategoryIDs = Gdn::Cache()->Get('GroupCategoryIDs');
         if ($GroupCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
             $CategoryModel = new CategoryModel();
-            $GroupCategories = $CategoryModel->GetWhere(array('AllowGroups' => 1))->ResultArray();
-            $GroupCategoryIDs = array();
+            $GroupCategories = $CategoryModel->GetWhere(['AllowGroups' => 1])->ResultArray();
+            $GroupCategoryIDs = [];
             foreach ($GroupCategories as $GroupCategory) {
                 $GroupCategoryIDs[] = $GroupCategory['CategoryID'];
             }

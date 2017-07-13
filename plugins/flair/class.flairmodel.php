@@ -3,7 +3,7 @@
 class FlairModel extends Gdn_Pluggable {
    /// Properties ///
 
-   protected $currentFlair = array();
+   protected $currentFlair = [];
 
    /// Methods ///
 
@@ -22,13 +22,13 @@ class FlairModel extends Gdn_Pluggable {
             $badge['Level'] = 1;
          }
 
-         $this->addFlair($badge['Slug'], array(
+         $this->addFlair($badge['Slug'], [
             'title' => $badge['Name'],
             'url' => Gdn_Upload::Url($badge['Photo']),
             'class' => strtolower($badge['Class']),
             'slug' => $badge['Slug'],
             'sort' => $badge['Level']
-         ));
+         ]);
       }
    }
 
@@ -46,7 +46,7 @@ class FlairModel extends Gdn_Pluggable {
       if (!is_array($data)) {
          return;
       }
-      $user_ids = array();
+      $user_ids = [];
 
       foreach ($data as $row) {
          $user_id = GetValue($column, $row);
@@ -77,7 +77,7 @@ class FlairModel extends Gdn_Pluggable {
       if ($flair === Gdn_Cache::CACHEOP_FAILURE) {
          // Make sure to clear on every call, as singleton instance will carry
          // old values.
-         $this->currentFlair = array();
+         $this->currentFlair = [];
 
          // Fire event
          $this->EventArguments['user_id'] = $user_id;
@@ -89,12 +89,12 @@ class FlairModel extends Gdn_Pluggable {
 
          // Append any flair that was added by plugin, then sort and filter below.
          $flair = $this->currentFlair;
-         $this->currentFlair = array();
+         $this->currentFlair = [];
 
          // Sort and filter up only highest achievements for each badge class
          $flair = $this->filterRedundantBadgeClasses($flair);
 
-         Gdn::Cache()->Store($cache_key, $flair, array(Gdn_Cache::FEATURE_EXPIRY => $cache_expire));
+         Gdn::Cache()->Store($cache_key, $flair, [Gdn_Cache::FEATURE_EXPIRY => $cache_expire]);
       }
 
       return $flair;
@@ -110,7 +110,7 @@ class FlairModel extends Gdn_Pluggable {
     */
    public function filterRedundantBadgeClasses($flair_array) {
 
-      $badge_groups = array();
+      $badge_groups = [];
       foreach ($flair_array as $badge_slug => $badge_info) {
          // Not all badges have classes, so just use slug, as that is unique
          if (empty($badge_info['class'])) {
@@ -122,7 +122,7 @@ class FlairModel extends Gdn_Pluggable {
 
       // Sort all the badges in each class, and return the highest from each,
       // add to new array with only the highest badge from each class.
-      $badge_groups_classes_filtered = array();
+      $badge_groups_classes_filtered = [];
       foreach($badge_groups as $badge_group) {
          $this->sortBadgesHighestToLowest($badge_group);
 
@@ -147,10 +147,10 @@ class FlairModel extends Gdn_Pluggable {
     * Like getIds, except provide an array of user ids, and retrieve their
     * individual badges.
     */
-   public function getIds($user_ids = array()) {
+   public function getIds($user_ids = []) {
       $keys = array_map('FlairModel::cacheKey', $user_ids);
       $cache_flair = Gdn::Cache()->Get($keys);
-      $result = array();
+      $result = [];
 
       $db_keys = array_diff(array_keys($cache_flair), $keys);
       foreach ($db_keys as $key) {

@@ -346,12 +346,12 @@ class phpCAS
 
         // store where the initializer is called from
         $dbg = debug_backtrace();
-        self::$_PHPCAS_INIT_CALL = array (
+        self::$_PHPCAS_INIT_CALL = [
             'done' => true,
             'file' => $dbg[0]['file'],
             'line' => $dbg[0]['line'],
             'method' => __CLASS__ . '::' . __FUNCTION__
-        );
+        ];
 
         // initialize the object $_PHPCAS_CLIENT
         try {
@@ -390,12 +390,12 @@ class phpCAS
 
         // store where the initialzer is called from
         $dbg = debug_backtrace();
-        self::$_PHPCAS_INIT_CALL = array (
+        self::$_PHPCAS_INIT_CALL = [
             'done' => true,
             'file' => $dbg[0]['file'],
             'line' => $dbg[0]['line'],
             'method' => __CLASS__ . '::' . __FUNCTION__
-        );
+        ];
 
         // initialize the object $_PHPCAS_CLIENT
         try {
@@ -605,7 +605,7 @@ class phpCAS
                 if (is_object($arg)) {
                     $str .= get_class($arg);
                 } else {
-                    $str .= str_replace(array("\r\n", "\n", "\r"), "", var_export($arg, true));
+                    $str .= str_replace(["\r\n", "\n", "\r"], "", var_export($arg, true));
                 }
             }
         }
@@ -648,7 +648,7 @@ class phpCAS
         if (is_object($res)) {
             $str .= '<= ' . get_class($res);
         } else {
-            $str .= '<= ' . str_replace(array("\r\n", "\n", "\r"), "", var_export($res, true));
+            $str .= '<= ' . str_replace(["\r\n", "\n", "\r"], "", var_export($res, true));
         }
 
         phpCAS :: log($str);
@@ -1014,7 +1014,7 @@ class phpCAS
      *
      * @return void
      */
-    public static function setPostAuthenticateCallback ($function, array $additionalArgs = array())
+    public static function setPostAuthenticateCallback ($function, array $additionalArgs = [])
     {
         phpCAS::_validateClientExists();
 
@@ -1035,7 +1035,7 @@ class phpCAS
      *
      * @return void
      */
-    public static function setSingleSignoutCallback ($function, array $additionalArgs = array())
+    public static function setSingleSignoutCallback ($function, array $additionalArgs = [])
     {
         phpCAS::_validateClientExists();
 
@@ -1406,7 +1406,7 @@ class phpCAS
         phpCAS :: traceBegin();
         phpCAS::_validateClientExists();
 
-        $parsedParams = array ();
+        $parsedParams = [];
         if ($params != "") {
             if (is_string($params)) {
                 phpCAS :: error('method `phpCAS::logout($url)\' is now deprecated, use `phpCAS::logoutWithUrl($url)\' instead');
@@ -1442,7 +1442,7 @@ class phpCAS
         if (!is_string($service)) {
             phpCAS :: error('type mismatched for parameter $service (should be `string\')');
         }
-        self::$_PHPCAS_CLIENT->logout(array ( "service" => $service ));
+        self::$_PHPCAS_CLIENT->logout([ "service" => $service ]);
         // never reached
         phpCAS :: traceEnd();
     }
@@ -1467,7 +1467,7 @@ class phpCAS
         if (!is_string($url)) {
             phpCAS :: error('type mismatched for parameter $url (should be `string\')');
         }
-        self::$_PHPCAS_CLIENT->logout(array ( "url" => $url ));
+        self::$_PHPCAS_CLIENT->logout([ "url" => $url ]);
         // never reached
         phpCAS :: traceEnd();
     }
@@ -1497,10 +1497,10 @@ class phpCAS
             phpCAS :: error('type mismatched for parameter $url (should be `string\')');
         }
         self::$_PHPCAS_CLIENT->logout(
-            array (
+            [
                 "service" => $service,
                 "url" => $url
-            )
+            ]
         );
         // never reached
         phpCAS :: traceEnd();

@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <style>
    .CountItemWrap {
-      width: <?php echo round(100 / (2 + count($this->Data('ReactionTypes', array())))).'%'; ?>
+      width: <?php echo round(100 / (2 + count($this->Data('ReactionTypes', [])))).'%'; ?>
    }
 </style>
 

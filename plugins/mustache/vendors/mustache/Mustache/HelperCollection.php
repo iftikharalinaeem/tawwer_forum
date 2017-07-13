@@ -14,7 +14,7 @@
  */
 class Mustache_HelperCollection
 {
-    private $helpers = array();
+    private $helpers = [];
 
     /**
      * Helper Collection constructor.
@@ -155,7 +155,7 @@ class Mustache_HelperCollection
      */
     public function clear()
     {
-        $this->helpers = array();
+        $this->helpers = [];
     }
 
     /**

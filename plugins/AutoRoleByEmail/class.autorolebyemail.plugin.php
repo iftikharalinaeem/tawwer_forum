@@ -32,7 +32,7 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
 
       // Any roles assigned?
       $RoleModel = new RoleModel();
-      $RoleData = $RoleModel->SQL->GetWhereLike('Role', array('Domains' => $Domain));
+      $RoleData = $RoleModel->SQL->GetWhereLike('Role', ['Domains' => $Domain]);
       foreach ($RoleData->Result() as $Result) {
          // Confirm it wasn't a sloppy match
          //print_r($Result);
@@ -54,8 +54,8 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
       if (C('Plugins.AutoRoleByEmail.Domain', FALSE)) {
          $RoleModel = new RoleModel();
          $RoleModel->Update(
-            array('Domains' => C('Plugins.AutoRoleByEmail.Domain')),
-            array('Name' => C('Plugins.AutoRoleByEmail.Role'))
+            ['Domains' => C('Plugins.AutoRoleByEmail.Domain')],
+            ['Name' => C('Plugins.AutoRoleByEmail.Role')]
          );
          RemoveFromConfig('Plugins.AutoRoleByEmail.Domain');
          RemoveFromConfig('Plugins.AutoRoleByEmail.Role');

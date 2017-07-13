@@ -14,11 +14,11 @@ if (!function_exists('WriteEventButtons')) :
 
         echo '<div class="Event-Buttons">';
 
-        $Options = array();
+        $Options = [];
 
         if (EventPermission('Edit', $Event)) {
-            $Options['Edit'] = array('Text' => T('Edit'), 'Url' => EventUrl($Event, 'edit'));
-            $Options['Delete'] = array('Text' => T('Delete'), 'Url' => EventUrl($Event, 'delete'), 'CssClass' => 'Popup');
+            $Options['Edit'] = ['Text' => T('Edit'), 'Url' => EventUrl($Event, 'edit')];
+            $Options['Delete'] = ['Text' => T('Delete'), 'Url' => EventUrl($Event, 'delete'), 'CssClass' => 'Popup'];
         }
 
         if (count($Options))
@@ -41,11 +41,11 @@ function writeEventOptions($event = null) {
     if (!$event) {
         return;
     }
-    $options = array();
+    $options = [];
 
     if (EventPermission('Edit', $event)) {
-        $options['Edit'] = array('Text' => t('Edit'), 'Url' => EventUrl($event, 'edit'));
-        $options['Delete'] = array('Text' => t('Delete'), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup');
+        $options['Edit'] = ['Text' => t('Edit'), 'Url' => EventUrl($event, 'edit')];
+        $options['Delete'] = ['Text' => t('Delete'), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup'];
     }
 
     if (count($options)) {

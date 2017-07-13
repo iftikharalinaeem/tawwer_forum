@@ -175,7 +175,7 @@ CAS_ProxiedService_Abstract implements CAS_ProxiedService_Http
      *
      * @var array $_responseHeaders;
      */
-    private $_responseHeaders = array();
+    private $_responseHeaders = [];
 
     /**
      * The response status code.

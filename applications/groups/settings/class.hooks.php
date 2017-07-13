@@ -34,7 +34,7 @@ class GroupsHooks extends Gdn_Plugin {
 
         if ($Group) {
             $Sender = Gdn::Controller();
-            $Sender->SetData('Breadcrumbs', array());
+            $Sender->SetData('Breadcrumbs', []);
             $Sender->AddBreadcrumb(T('Groups'), '/groups');
             $Sender->AddBreadcrumb($Group['Name'], GroupUrl($Group));
 
@@ -61,7 +61,7 @@ class GroupsHooks extends Gdn_Plugin {
      */
     public function Base_Render_Before($Sender) {
         if (is_object($Menu = GetValue('Menu', $Sender))) {
-            $Menu->AddLink('Groups', T('Groups'), '/groups/', false, array('class' => 'Groups'));
+            $Menu->AddLink('Groups', T('Groups'), '/groups/', false, ['class' => 'Groups']);
         }
     }
 
@@ -90,7 +90,7 @@ class GroupsHooks extends Gdn_Plugin {
     public function Base_ConversationGInvite_Handler($Sender, $Args) {
         $GroupID = $Sender->Data('Conversation.RegardingID');
         if ($GroupID) {
-            echo Gdn_Theme::Module('GroupUserHeaderModule', array('GroupID' => $GroupID));
+            echo Gdn_Theme::Module('GroupUserHeaderModule', ['GroupID' => $GroupID]);
         }
     }
 
@@ -99,14 +99,14 @@ class GroupsHooks extends Gdn_Plugin {
      * @param DbaController $Sender
      */
     public function DbaController_CountJobs_Handler($Sender) {
-        $Counts = array(
-             'Group' => array('CountDiscussions', 'CountMembers', 'DateLastComment', 'LastDiscussionID')
-        );
+        $Counts = [
+             'Group' => ['CountDiscussions', 'CountMembers', 'DateLastComment', 'LastDiscussionID']
+        ];
 
         foreach ($Counts as $Table => $Columns) {
             foreach ($Columns as $Column) {
                 $Name = "Recalculate $Table.$Column";
-                $Url = "/dba/counts.json?".http_build_query(array('table' => $Table, 'column' => $Column));
+                $Url = "/dba/counts.json?".http_build_query(['table' => $Table, 'column' => $Column]);
 
                 $Sender->Data['Jobs'][$Name] = $Url;
             }
@@ -273,10 +273,10 @@ class GroupsHooks extends Gdn_Plugin {
             $model = new GroupModel();
             $group = $model->getID($groupID);
 
-            $params = array('group' => $group,
+            $params = ['group' => $group,
                 'showButtons' => true,
                 'showOptions' => true,
-            );
+            ];
 
             echo Gdn_Theme::module('GroupHeaderModule', $params);
         }
@@ -326,14 +326,14 @@ class GroupsHooks extends Gdn_Plugin {
         if ($Args['Insert']) {
             $CommentID = $Args['CommentID'];
             $DiscussionID = valr('FormPostValues.DiscussionID', $Args);
-            $GroupID = Gdn::SQL()->GetWhere('Discussion', array('DiscussionID' => $DiscussionID))->Value('GroupID');
+            $GroupID = Gdn::SQL()->GetWhere('Discussion', ['DiscussionID' => $DiscussionID])->Value('GroupID');
             if ($GroupID) {
                 $Model = new GroupModel();
-                $Model->SetField($GroupID, array(
+                $Model->SetField($GroupID, [
                     'DateLastComment' => valr('FormPostValues.DateInserted', $Args),
                     'LastDiscussionID' => $DiscussionID,
                     'LastCommentID' => $CommentID
-                ));
+                ]);
             }
         }
     }
@@ -362,10 +362,10 @@ class GroupsHooks extends Gdn_Plugin {
                     return;
 
                 // Override redirect with GroupUrl instead of CategoryUrl.
-                $Args['DiscussionOptions']['DeleteDiscussion'] = array(
+                $Args['DiscussionOptions']['DeleteDiscussion'] = [
                     'Label' => T('Delete Discussion'),
                     'Url' => '/discussion/delete?discussionid='.$Args['Discussion']->DiscussionID.'&target='.urlencode(GroupUrl($Group)),
-                    'Class' => 'Popup');
+                    'Class' => 'Popup'];
             }
         }
     }
@@ -403,7 +403,7 @@ class GroupsHooks extends Gdn_Plugin {
             return true;
         }
         if ($userID) {
-            $userGroup = Gdn::SQL()->GetWhere('UserGroup', array('GroupID' => $groupID, 'UserID' => $userID))->FirstRow(DATASET_TYPE_ARRAY);
+            $userGroup = Gdn::SQL()->GetWhere('UserGroup', ['GroupID' => $groupID, 'UserID' => $userID])->FirstRow(DATASET_TYPE_ARRAY);
         }
         if ($userGroup) {
             return true;
@@ -477,7 +477,7 @@ class GroupsHooks extends Gdn_Plugin {
             $Model = new GroupModel();
             $Group = $Model->GetID($GroupID);
             if ($Group) {
-                $Sender->SetData('Breadcrumbs', array());
+                $Sender->SetData('Breadcrumbs', []);
                 $Sender->AddBreadcrumb(T('Groups'), '/groups');
                 $Sender->AddBreadcrumb($Group['Name'], GroupUrl($Group));
             }
@@ -565,9 +565,9 @@ class GroupsHooks extends Gdn_Plugin {
             $Sender->ShowCategorySelector = false;
 
             // Reduce the announce options.
-            $Options = array(
+            $Options = [
                 2 => '@'.T('Announce'),
-                0 => '@'.T("Don't announce."));
+                0 => '@'.T("Don't announce.")];
             $Sender->SetData('_AnnounceOptions', $Options);
         }
 
@@ -597,7 +597,7 @@ class GroupsHooks extends Gdn_Plugin {
 
           $GroupCategoryIDs = GroupModel::getGroupCategoryIDs();
 
-          $SearchResults = $Sender->Data('SearchResults', array());
+          $SearchResults = $Sender->Data('SearchResults', []);
           foreach ($SearchResults as $ResultKey => &$Result) {
                 $GroupID = val('GroupID', $Result, false);
 
@@ -626,7 +626,7 @@ class GroupsHooks extends Gdn_Plugin {
                      $Group = Gdn::Cache()->Get(sprintf('Group.%s', $GroupID));
                      if ($Group === Gdn_Cache::CACHEOP_FAILURE) {
                           $Group = $GroupModel->GetID($GroupID);
-                          Gdn::Cache()->Store(sprintf('Group.%s', $GroupID), $Group, array(Gdn_Cache::FEATURE_EXPIRY => 15 * 60));
+                          Gdn::Cache()->Store(sprintf('Group.%s', $GroupID), $Group, [Gdn_Cache::FEATURE_EXPIRY => 15 * 60]);
                      }
 
                      if ($Group['Privacy'] == 'Private' && !$GroupModel->CheckPermission('View', $Group['GroupID'])) {

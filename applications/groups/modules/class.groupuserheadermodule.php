@@ -32,7 +32,7 @@ class GroupUserHeaderModule extends Gdn_Module {
         if ($this->GroupID) {
             $this->SetData('Group', $Model->GetID($this->GroupID));
 
-            $Rows = $Model->GetApplicants($this->GroupID, array('UserID' => $this->UserID));
+            $Rows = $Model->GetApplicants($this->GroupID, ['UserID' => $this->UserID]);
             $this->SetData('Application', array_pop($Rows));
         }
     }

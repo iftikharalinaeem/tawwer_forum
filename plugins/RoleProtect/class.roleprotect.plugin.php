@@ -23,10 +23,10 @@ class RoleProtectPlugin extends Gdn_Plugin {
    public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender) {
 
       // Roles the logged-in user can modify
-      $EditableRoleData = $this->EditableRoles = array();
+      $EditableRoleData = $this->EditableRoles = [];
 
       // Roles that, if present in the target user, protect him from  being edited
-      $ProtectedRoleData = $this->ProtectedRoles = array();
+      $ProtectedRoleData = $this->ProtectedRoles = [];
 
       if (!Gdn::Session()->IsValid()) return;
 
@@ -53,14 +53,14 @@ class RoleProtectPlugin extends Gdn_Plugin {
 
       // Format EditableRoleData into a nice ASSOC array
       $EditableRoleData = array_flip($EditableRoleData);
-      $EditableRoles = array();
+      $EditableRoles = [];
       foreach ($EditableRoleData as $EditableRoleID => $Trash)
          $EditableRoles[$EditableRoleID] = GetValue($EditableRoleID, $this->Roles);
       $this->EditableRoles = $EditableRoles;
 
       // Format ProtectedRoleData into a nice ASSOC array
       $ProtectedRoleData = array_flip($ProtectedRoleData);
-      $ProtectedRoles = array();
+      $ProtectedRoles = [];
       foreach ($ProtectedRoleData as $ProtectedRoleID => $Trash)
          $ProtectedRoles[$ProtectedRoleID] = GetValue($ProtectedRoleID, $this->Role);
       $this->ProtectedRoles = $ProtectedRoles;

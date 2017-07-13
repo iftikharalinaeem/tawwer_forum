@@ -205,7 +205,7 @@ class WordpressImportModel extends CommentImportModel {
 
 
       // Insert any missing users.
-      $this->_InsertUsers('zWordpressComment', array('Email', 'Name'), 'zWordpressUser');
+      $this->_InsertUsers('zWordpressComment', ['Email', 'Name'], 'zWordpressUser');
 
       $Sql = "
          insert GDN_Comment (
@@ -314,9 +314,9 @@ class WordpressImportModel extends CommentImportModel {
 //      die();
       $Xml->open($this->Path);
 
-      $Counts = array('Categories' => 0, 'Discussions' => 0, 'Comments' => 0);
+      $Counts = ['Categories' => 0, 'Discussions' => 0, 'Comments' => 0];
 
-      $Names = array();
+      $Names = [];
 
       while ($Xml->read()) {
          if ($Xml->nodeType != XMLReader::ELEMENT)
@@ -371,11 +371,11 @@ class WordpressImportModel extends CommentImportModel {
       $Xml = new SimpleXMLElement($Str);
       $Wp = $Xml->children('wp', TRUE);
 
-      $Row = array(
+      $Row = [
           'ForeignID' => (int)$Wp->term_id,
           'UrlCode' => (string)$Wp->category_nicename,
           'Name' => (string)$Wp->cat_name,
-          'ParentUrlCode' => (string)$Wp->category_parent);
+          'ParentUrlCode' => (string)$Wp->category_parent];
 
       $this->Insert('zWordpressCategory', $Row);
    }
@@ -390,7 +390,7 @@ class WordpressImportModel extends CommentImportModel {
          return;
 
 //      $Xml = new SimpleXMLElement($Str);
-      $Row = array(
+      $Row = [
           'ForeignID' => (int)$Xml->comment_id,
           'DiscussionForeignID' => (int)$ParentXml->post_id,
           'Body' => $Xml->comment_content,
@@ -400,7 +400,7 @@ class WordpressImportModel extends CommentImportModel {
           'UserName' => $Xml->comment_author,
           'UserEmail' => $Xml->comment_author_email
 //          'Approved' => (int)$Xml->comment_approved
-      );
+      ];
 
       $this->Insert('zWordpressComment', $Row);
    }
@@ -439,15 +439,15 @@ class WordpressImportModel extends CommentImportModel {
          $Excerpt = SliceParagraph(Gdn_Format::PlainText($Content, 'Html'));
       $Image = '';
       if ($ImgSrc) {
-         $Image = Img($ImgSrc, array('class' => 'LeftAlign'));
+         $Image = Img($ImgSrc, ['class' => 'LeftAlign']);
       }
 
-      $Body = FormatString(T('EmbeddedDiscussionFormat'), array(
+      $Body = FormatString(T('EmbeddedDiscussionFormat'), [
           'Title' => (string)$Xml->title,
           'Excerpt' => $Excerpt,
           'Image' => $Image,
           'Url' => $Url
-      ));
+      ]);
 
       // There are lots of category records. Find one with 'category' domain.
       foreach ($Xml->category as $XmlCategory) {
@@ -458,7 +458,7 @@ class WordpressImportModel extends CommentImportModel {
       }
 
       // Set up the discussion row.
-      $Row = array(
+      $Row = [
           'ForeignID' => (int)$Wp->post_id,
           'Name' => (string)$Xml->title,
 //          'Body' => SliceParagraph(Gdn_Format::PlainText($Xml->children('content')->encoded). 200),
@@ -469,9 +469,9 @@ class WordpressImportModel extends CommentImportModel {
           'Announce' => (int)$Wp->is_sticky,
           'CategoryUrlCode' => (string)$CategoryUrlCode,
           'UserName' => (string)$Xml->children('dc', TRUE)->creator,
-          'Attributes' => array(
+          'Attributes' => [
               'ForeignUrl' => (string)$Xml->link
-          ));
+          ]];
 
       $HasComments = FALSE;
       foreach ($Wp->comment as $CommentXml) {
@@ -491,10 +491,10 @@ class WordpressImportModel extends CommentImportModel {
       $Xml = new SimpleXMLElement($Str);
       $Wp = $Xml->children('wp', TRUE);
 
-      $Row = array(
+      $Row = [
           'ForeignID' => (int)$Wp->author_id,
           'Name' => (string)$Wp->author_display_name,
-          'Email' => (string)$Wp->author_email);
+          'Email' => (string)$Wp->author_email];
 
       $this->Insert('zWordpressUser', $Row);
    }

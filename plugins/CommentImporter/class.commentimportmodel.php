@@ -48,7 +48,7 @@ class CommentImportModel {
    
    public function Insert($Table, $Row = NULL) {
       static $LastTable = NULL;
-      static $Rows = array();
+      static $Rows = [];
       
       if (isset($Row['Attributes']) && is_array($Row['Attributes']))
          $Row['Attributes'] = dbencode($Row['Attributes']);
@@ -57,14 +57,14 @@ class CommentImportModel {
       if ($Table === NULL) {
          $this->InsertMulti($LastTable, $Rows);
          $LastTable = NULL;
-         $Rows = array();
+         $Rows = [];
          
          return;
       }
       
       if ($LastTable && $LastTable != $Table || count($Rows) >= $this->BufferSize) {
          $this->InsertMulti($LastTable, $Rows);
-         $Rows = array();
+         $Rows = [];
       }
       
       $LastTable = $Table;
@@ -83,7 +83,7 @@ class CommentImportModel {
          if ($Sql)
             $Sql .= ",\n";
          
-         $Values = array_map(array($PDO, 'quote'), $Row);
+         $Values = array_map([$PDO, 'quote'], $Row);
          $Sql .= '('.implode(',', $Values).')';
       }
       
@@ -107,7 +107,7 @@ class CommentImportModel {
    public function InsertTables() {
    }
    
-   protected function _InsertUsers($Table, $Columns = array('Email', 'Name'), $UserTable = FALSE) {
+   protected function _InsertUsers($Table, $Columns = ['Email', 'Name'], $UserTable = FALSE) {
       // First join the users based on our own table
       if ($UserTable) {
          $Sql = "update GDN_{$Table} z

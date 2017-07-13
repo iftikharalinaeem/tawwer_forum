@@ -14,7 +14,7 @@
 class EventController extends Gdn_Controller {
 
     /** @var array  */
-    protected $Uses = array('Form');
+    protected $Uses = ['Form'];
 
     /** @var Gdn_Form */
     protected $Form;
@@ -110,7 +110,7 @@ class EventController extends Gdn_Controller {
             $this->addBreadcrumb($Event['Name'], eventUrl($Event));
         }
 
-        return array($Event, $Group);
+        return [$Event, $Group];
     }
 
     /**
@@ -321,7 +321,7 @@ class EventController extends Gdn_Controller {
 
         if ($this->Form->authenticatedPostBack()) {
             $EventModel = new EventModel();
-            $Deleted = $EventModel->delete(array('EventID' => $EventID));
+            $Deleted = $EventModel->delete(['EventID' => $EventID]);
 
             if ($Deleted) {
                 $this->informMessage(formatString(t('<b>{Name}</b> deleted.'), $Event));

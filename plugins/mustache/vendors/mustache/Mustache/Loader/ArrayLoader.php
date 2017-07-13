@@ -32,7 +32,7 @@ class Mustache_Loader_ArrayLoader implements Mustache_Loader, Mustache_Loader_Mu
      *
      * @param array $templates Associative array of Template source (default: array())
      */
-    public function __construct(array $templates = array())
+    public function __construct(array $templates = [])
     {
         $this->templates = $templates;
     }

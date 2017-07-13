@@ -16,11 +16,11 @@ class SpamCleanerPlugin extends Gdn_Plugin {
    const PAGE_LIMIT = 50;
    const MAX_TIME = 30;
    
-   static $Types = array(
-       'Discussion' => array(),
-       'Comment' => array(),
-       'Activity' => array('Label' => 'Activities'),
-       'ActivityComment' => array());
+   static $Types = [
+       'Discussion' => [],
+       'Comment' => [],
+       'Activity' => ['Label' => 'Activities'],
+       'ActivityComment' => []];
    
    /// Properties ///
    
@@ -43,7 +43,7 @@ class SpamCleanerPlugin extends Gdn_Plugin {
       if ($Type == NULL)
          $Result = self::$Types;
       else
-         $Result = array($Type => self::$Types[$Type]);
+         $Result = [$Type => self::$Types[$Type]];
       
       
       foreach ($Result as $T => &$Info) {
@@ -95,7 +95,7 @@ class SpamCleanerPlugin extends Gdn_Plugin {
          $Sender->Form->SetValue('VerifyModerators', 1);
       }
       
-      $Sender->AddJsFile('spamcleaner.js', 'plugins/SpamCleaner', array('_Hint' => 'Inline'));
+      $Sender->AddJsFile('spamcleaner.js', 'plugins/SpamCleaner', ['_Hint' => 'Inline']);
       $Sender->SetData('Types', self::TypeInfo());
       $Sender->AddSideMenu();
       $Sender->Render('CleanSpam', '', 'plugins/SpamCleaner');
@@ -113,14 +113,14 @@ class SpamCleanerPlugin extends Gdn_Plugin {
       $TypeInfo = self::TypeInfo($Type);
       
       // Grab some records to work on.
-      $Where = array('Verified' => 0);
+      $Where = ['Verified' => 0];
       
       switch ($Type) {
          case 'Activity':
-            $Types = array(
+            $Types = [
                 GetValue('ActivityTypeID', ActivityModel::GetActivityType('WallPost')),
                 GetValue('ActivityTypeID', ActivityModel::GetActivityType('WallStatus'))
-                );
+                ];
             $Where['ActivityTypeID'] = $Types;
             break;
       }
@@ -141,9 +141,9 @@ class SpamCleanerPlugin extends Gdn_Plugin {
          $Spam = SpamModel::IsSpam($Type, $Row);
          if ($Spam) {
             $CountSpam++;
-            Gdn::SQL()->Delete($Type, array($PK => $ID));
+            Gdn::SQL()->Delete($Type, [$PK => $ID]);
          } else {
-            Gdn::SQL()->Put($Type, array('Verified' => 1), array($PK => $ID));
+            Gdn::SQL()->Put($Type, ['Verified' => 1], [$PK => $ID]);
          }
          
          $CurrentTime = time();

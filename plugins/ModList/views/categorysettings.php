@@ -23,7 +23,7 @@
    $CategoryModerators = Gdn_DataSet::Index($CategoryModerators, 'UserID');
 ?>
 <li>
-   <?php echo $this->Form->CheckBox('CategoryModerators', 'This category has a moderator list.', array('class' => 'CategoryModeratorsCheck')); ?>
+   <?php echo $this->Form->CheckBox('CategoryModerators', 'This category has a moderator list.', ['class' => 'CategoryModeratorsCheck']); ?>
 </li>
 <li class="CategoryModerators"><?php
    echo $this->Form->TextBox('Moderators');

@@ -6,7 +6,7 @@
 </style>
 <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
-echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->Open(['enctype' => 'multipart/form-data']);
 echo $this->Form->Errors();
 ?>
 <ul>
@@ -20,14 +20,14 @@ echo $this->Form->Errors();
       <?php
       echo $this->Form->Label('Upload your comments or give enter their url.');
       echo '<div class="RadioDiv">',
-         $this->Form->Radio('IsUpload', T('If your file is small then just upload it here.'), array('Value' => TRUE)),
+         $this->Form->Radio('IsUpload', T('If your file is small then just upload it here.'), ['Value' => TRUE]),
          '</div>';
       echo $this->Form->Input('FileUpload', 'file');
       
       echo '<div class="RadioDiv">',
-         $this->Form->Radio('IsUpload', T('If your file is bigger than 20M then you must upload it to a public url.'), array('Value' => FALSE)),
+         $this->Form->Radio('IsUpload', T('If your file is bigger than 20M then you must upload it to a public url.'), ['Value' => FALSE]),
          '</div>';
-      echo $this->Form->TextBox('FileUrl', array('class' => 'InputBox BigInput'));
+      echo $this->Form->TextBox('FileUrl', ['class' => 'InputBox BigInput']);
       ?>
    </li>
 </ul>

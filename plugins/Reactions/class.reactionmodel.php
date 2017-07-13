@@ -52,10 +52,10 @@ class ReactionModel extends Gdn_Model {
      * @return bool|Gdn_DataSet|object|string
      */
     public function defineTag($Name, $Type, $OldName = false) {
-        $Row = Gdn::sql()->getWhere('Tag', array('Name' => $Name))->firstRow(DATASET_TYPE_ARRAY);
+        $Row = Gdn::sql()->getWhere('Tag', ['Name' => $Name])->firstRow(DATASET_TYPE_ARRAY);
 
         if (!$Row && $OldName) {
-            $Row = Gdn::sql()->getWhere('Tag', array('Name' => $OldName))->firstRow(DATASET_TYPE_ARRAY);
+            $Row = Gdn::sql()->getWhere('Tag', ['Name' => $OldName])->firstRow(DATASET_TYPE_ARRAY);
         }
 
         if (!$Row) {
@@ -188,7 +188,7 @@ class ReactionModel extends Gdn_Model {
     public static function fromTagID($TagID) {
         if (self::$TagIDs === null) {
             $Types = self::reactionTypes();
-            self::$TagIDs = Gdn_DataSet::index($Types, array('TagID'));
+            self::$TagIDs = Gdn_DataSet::index($Types, ['TagID']);
 
         }
         return val($TagID, self::$TagIDs);
@@ -354,7 +354,7 @@ class ReactionModel extends Gdn_Model {
                 ->get()->resultArray();
         }
 
-        $Tags = array();
+        $Tags = [];
         foreach ($TagsData as $RT => $Rows) {
             foreach ($Rows as $Row) {
                 $UserIDs[$Row['UserID']] = 1;
@@ -466,7 +466,7 @@ class ReactionModel extends Gdn_Model {
         }
 
         // Fetch all of the data in turn.
-        $JoinData = array();
+        $JoinData = [];
         foreach ($IDs as $RecordType => $RecordIDs) {
             if ($RecordType == 'Comment') {
                 Gdn::sql()
@@ -479,7 +479,7 @@ class ReactionModel extends Gdn_Model {
                 ->whereIn($RecordType.'ID', array_values($RecordIDs))
                 ->get($RecordType.' r')->resultArray();
 
-            $JoinData[$RecordType] = Gdn_DataSet::index($Rows, array($RecordType.'ID'));
+            $JoinData[$RecordType] = Gdn_DataSet::index($Rows, [$RecordType.'ID']);
         }
 
         // Join the rows.
@@ -737,7 +737,7 @@ class ReactionModel extends Gdn_Model {
                     $CategoryID = $Record['CategoryID'];
                 } elseif (isset($Record['DiscussionID'])) {
                     $CategoryID = $this->SQL
-                        ->getWhere('Discussion', array('DiscussionID' => $Record['DiscussionID']))
+                        ->getWhere('Discussion', ['DiscussionID' => $Record['DiscussionID']])
                         ->value('CategoryID');
                 }
 
@@ -895,7 +895,7 @@ class ReactionModel extends Gdn_Model {
             Gdn::controller()->informMessage($Message[0], $Message[1]);
         }
 
-        ReactionsPlugin::instance()->EventArguments = array(
+        ReactionsPlugin::instance()->EventArguments = [
             'RecordType' => $RecordType,
             'RecordID' => $ID,
             'Record' => $Row,
@@ -903,7 +903,7 @@ class ReactionModel extends Gdn_Model {
             'ReactionData' => $Data,
             'Insert' => $Inserted,
             'UserID' => $UserID
-        );
+        ];
         ReactionsPlugin::instance()->fireEvent('Reaction');
     }
 
@@ -932,7 +932,7 @@ class ReactionModel extends Gdn_Model {
         $UserBadgeModel = new UserBadgeModel();
 
         $Badges = $BadgeModel
-            ->getWhere(array('Type' => 'Reaction', 'Class' => $ReactionType['UrlCode']), 'Threshold', 'desc')
+            ->getWhere(['Type' => 'Reaction', 'Class' => $ReactionType['UrlCode']], 'Threshold', 'desc')
             ->resultArray();
         foreach ($Badges as $Badge) {
             if ($Score >= $Badge['Threshold']) {
@@ -1054,7 +1054,7 @@ class ReactionModel extends Gdn_Model {
      * @return int
      */
     public function recalculateRecordCache($Day = FALSE) {
-        $Where = array('RecordType' => array('Discussion-Total', 'Comment-Total'));
+        $Where = ['RecordType' => ['Discussion-Total', 'Comment-Total']];
 
         if ($Day) {
             $Day = Gdn_Format::toTimestamp($Day);
@@ -1110,7 +1110,7 @@ class ReactionModel extends Gdn_Model {
      * @param $React
      */
     protected function _saveRecordReact($RecordType, $RecordID, $React) {
-        $Set = array();
+        $Set = [];
         $AttrColumn = $RecordType == 'Activity' ? 'Data' : 'Attributes';
 
         $Row = $this->SQL->getWhere($RecordType, [$RecordType.'ID' => $RecordID])->firstRow(DATASET_TYPE_ARRAY);
@@ -1253,7 +1253,7 @@ class ReactionModel extends Gdn_Model {
         }
 
         if ($All) {
-            return array($Result, 'Promoted Buried Un-Buried');
+            return [$Result, 'Promoted Buried Un-Buried'];
         } else {
             return $Result;
         }

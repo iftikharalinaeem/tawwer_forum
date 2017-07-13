@@ -6,10 +6,10 @@
       echo '<div class="Info">';
 
       if (Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
-         $Query = array(
+         $Query = [
              'tk' => Gdn::Session()->TransientKey(),
-             'discussionid' => Gdn::Controller()->Data('Discussion.DiscussionID'));
-         echo '<span style="float: right">'.Anchor(T('Continue in Public...'), '/discussion/makepublic?'.http_build_query($Query), '', array('title' => T('Continue this discussion in public.'))).'</span>';
+             'discussionid' => Gdn::Controller()->Data('Discussion.DiscussionID')];
+         echo '<span style="float: right">'.Anchor(T('Continue in Public...'), '/discussion/makepublic?'.http_build_query($Query), '', ['title' => T('Continue this discussion in public.')]).'</span>';
       }
    
       echo T('New comments will be in private between:');
@@ -17,7 +17,7 @@
       echo '<div class="P">';
       foreach (Gdn::Controller()->Data('WhisperUsers') as $User) {
          echo '<span>',
-            UserPhoto($User, array('ImageClass' => 'ProfilePhotoSmall')),
+            UserPhoto($User, ['ImageClass' => 'ProfilePhotoSmall']),
             ' '.UserAnchor($User),
             '</span> ';
       }
@@ -33,7 +33,7 @@
       echo '<div class="P">';
 
       if (Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
-         echo '<span style="float: right">'.Anchor(T('Continue in Private...'), '/discussion/makeconversation?discussionid='.Gdn::Controller()->Data('Discussion.DiscussionID'), '', array('title' => T('Continue this discussion in private.'))).'</span>';
+         echo '<span style="float: right">'.Anchor(T('Continue in Private...'), '/discussion/makeconversation?discussionid='.Gdn::Controller()->Data('Discussion.DiscussionID'), '', ['title' => T('Continue this discussion in private.')]).'</span>';
       }
 
       if ($HasPermission)
@@ -59,14 +59,14 @@
                   $ConversationName = ConcatSep(', ', $ConversationName, htmlspecialchars(GetValue('Name', $User)));
                }
 
-               echo '<li>'.$this->Form->Radio('ConversationID', $ConversationName, array('Value' => GetValue('ConversationID', $Conversation))).'</li>';
+               echo '<li>'.$this->Form->Radio('ConversationID', $ConversationName, ['Value' => GetValue('ConversationID', $Conversation)]).'</li>';
             }
-            echo '<li>'.$this->Form->Radio('ConversationID', T('New Whisper'), array('Value' => '')).'</li>';
+            echo '<li>'.$this->Form->Radio('ConversationID', T('New Whisper'), ['Value' => '']).'</li>';
 
             echo '</ul>';
          }
 
-         echo Wrap($this->Form->TextBox('To', array('MultiLine' => TRUE, 'class' => 'MultiComplete')), 'div', array('class' => 'TextBoxWrapper'));
+         echo Wrap($this->Form->TextBox('To', ['MultiLine' => TRUE, 'class' => 'MultiComplete']), 'div', ['class' => 'TextBoxWrapper']);
 
          echo '</div>';
       }

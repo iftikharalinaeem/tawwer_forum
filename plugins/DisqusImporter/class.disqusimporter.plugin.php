@@ -19,7 +19,7 @@ class DisqusImporter extends Gdn_Plugin {
 
    public function Insert($Table, $Row = NULL) {
       static $LastTable = NULL;
-      static $Rows = array();
+      static $Rows = [];
 
       if (isset($Row['Attributes']) && is_array($Row['Attributes']))
          $Row['Attributes'] = dbencode($Row['Attributes']);
@@ -28,14 +28,14 @@ class DisqusImporter extends Gdn_Plugin {
       if ($Table === NULL) {
          $this->InsertMulti($LastTable, $Rows);
          $LastTable = NULL;
-         $Rows = array();
+         $Rows = [];
 
          return;
       }
 
       if ($LastTable && $LastTable != $Table || count($Rows) >= $this->BufferSize) {
          $this->InsertMulti($LastTable, $Rows);
-         $Rows = array();
+         $Rows = [];
       }
 
       $LastTable = $Table;
@@ -54,7 +54,7 @@ class DisqusImporter extends Gdn_Plugin {
          if ($Sql)
             $Sql .= ",\n";
 
-         $Values = array_map(array($PDO, 'quote'), $Row);
+         $Values = array_map([$PDO, 'quote'], $Row);
          $Sql .= '('.implode(',', $Values).')';
       }
 
@@ -70,11 +70,11 @@ class DisqusImporter extends Gdn_Plugin {
    public function ParseCategory($Str) {
       $Xml = new SimpleXMLElement($Str);
       $Name = html_entity_decode($Xml->title, ENT_COMPAT, 'UTF-8');
-      $Row = array(
+      $Row = [
           'DisqusID' => (int)$Xml->attributes('dsq', TRUE)->id,
           'Name' => $Name,
           'UrlCode' => Gdn_Format::Url($Name)
-      );
+      ];
       $this->Insert('zDisqusCategory', $Row);
 
 //      <category xmlns="http://disqus.com" xmlns:dsq="http://disqus.com/disqus-internals" dsq:id="684542">
@@ -87,7 +87,7 @@ class DisqusImporter extends Gdn_Plugin {
    public function ParseComment($Str) {
       $Xml = new SimpleXMLElement($Str);
       $Name = html_entity_decode($Xml->title, ENT_COMPAT, 'UTF-8');
-      $Row = array(
+      $Row = [
           'ForeignID' => (int)$Xml->attributes('dsq', TRUE)->id,
           'DisqusDiscussionID' => (int)$Xml->thread->attributes('dsq', TRUE)->id,
           'ParentForeignID' => NULL,
@@ -106,13 +106,13 @@ class DisqusImporter extends Gdn_Plugin {
           'Highlighted' => (int)$Xml->isHighlighted,
           'UniqueType' => NULL,
           'UniqueID' => NULL
-      );
+      ];
 
       if (!$Row['UserName'])
          $Row['UserName'] = $Row['UserFullName'];
 
       if (preg_match('`^([a-zA-Z]+)-(.+)$`', $Row['UserName'], $Matches)) {
-         if (in_array($Matches[1], array('google', 'facebook', 'yahoo', 'twitter', 'openid'))) {
+         if (in_array($Matches[1], ['google', 'facebook', 'yahoo', 'twitter', 'openid'])) {
             $Row['UserName'] = $Row['UserFullName'];
             $Row['UniqueType'] = $Matches[1];
             $Row['UniqueID'] = $Matches[2];
@@ -144,7 +144,7 @@ class DisqusImporter extends Gdn_Plugin {
    public function ParseDiscussion($Str) {
       $Xml = new SimpleXMLElement($Str);
       $Name = html_entity_decode($Xml->title, ENT_COMPAT, 'UTF-8');
-      $Row = array(
+      $Row = [
           'DisqusID' => (int)$Xml->attributes('dsq', TRUE)->id,
           'ForeignID' => substr($Xml->id, 0, 200),
           'DisqusCategoryID' => $Xml->category->attributes('dsq', TRUE)->id,
@@ -161,7 +161,7 @@ class DisqusImporter extends Gdn_Plugin {
           'UserAnonymous' => $Xml->author->anonymous,
           'UniqueType' => NULL,
           'UniqueID' => NULL
-      );
+      ];
 
       if (!$Row['UserName'])
          $Row['UserName'] = $Row['UserFullName'];
@@ -174,11 +174,11 @@ class DisqusImporter extends Gdn_Plugin {
          $Row['UserEmail'] = $Row['UniqueID'].'@noreply.com';
       }
 
-      $Attributes = array(
+      $Attributes = [
           'DisqusID' => $Row['DisqusID'],
           'ForeignUrl' => (string)$Xml->link,
           'RegenerateBody' => TRUE
-          );
+          ];
       $Row['Attributes'] = dbencode($Attributes);
 
       $this->Insert('zDisqusDiscussion', $Row);
@@ -499,7 +499,7 @@ class DisqusImporter extends Gdn_Plugin {
       $Xml = new XmlReader();
       $Xml->open($this->Path);
 
-      $Counts = array('Categories' => 0, 'Discussions' => 0, 'Comments' => 0);
+      $Counts = ['Categories' => 0, 'Discussions' => 0, 'Comments' => 0];
 
       while ($Xml->read()) {
          if ($Xml->nodeType != XMLReader::ELEMENT)
@@ -534,7 +534,7 @@ class DisqusImporter extends Gdn_Plugin {
    }
 
    public function UpdateCounts() {
-      $Sqls = array();
+      $Sqls = [];
       $Im = new ImportModel();
 
       $Sqls[] = $Im->GetCountSQL('min', 'Discussion', 'Comment', 'FirstCommentID');

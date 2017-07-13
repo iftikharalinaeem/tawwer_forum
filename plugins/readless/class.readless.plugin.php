@@ -30,9 +30,9 @@ class ReadLess extends Gdn_Plugin {
       $sender->Permission('Garden.Settings.Manage');
       $cf = new ConfigurationModule($sender);
 
-      $cf->Initialize(array(
-          'Plugins.readless.maxheight' => array('LabelCode' => 'Max Height', 'Control' => 'TextBox', 'Description' => 'Set the max pixel height of each post in a discusion. When text goes beyond this limit, a "Read More" button will b displayed to allow the text to be expanded.')
-      ));
+      $cf->Initialize([
+          'Plugins.readless.maxheight' => ['LabelCode' => 'Max Height', 'Control' => 'TextBox', 'Description' => 'Set the max pixel height of each post in a discusion. When text goes beyond this limit, a "Read More" button will b displayed to allow the text to be expanded.']
+      ]);
 
       $sender->AddSideMenu();
       $sender->SetData('Title', T('Read Less Settings'));

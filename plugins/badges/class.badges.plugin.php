@@ -28,7 +28,7 @@ class BadgesHooks extends Gdn_Plugin {
     public function simpleApiPlugin_mapper_handler($Sender) {
         switch ($Sender->Mapper->Version) {
             case '1.0':
-                $Sender->Mapper->addMap(array(
+                $Sender->Mapper->addMap([
                     'badges/give'              => 'badge/giveuser',
                     'badges/revoke'            => 'badge/revoke',
                     'badges/user'              => 'badges/user',
@@ -37,7 +37,7 @@ class BadgesHooks extends Gdn_Plugin {
                     'badges/add'               => 'badge/manage',
                     'badges/edit'              => 'badge/manage',
                     'badges/delete'            => 'badge/delete',
-                ));
+                ]);
                 break;
         }
     }
@@ -78,7 +78,7 @@ class BadgesHooks extends Gdn_Plugin {
      * @param $Args
      */
     public function base_beforeDeleteUser_handler($Sender, $Args) {
-        Gdn::userModel()->getDelete('UserPoints', array('UserID' => $Args['UserID']), $Args['Content']);
+        Gdn::userModel()->getDelete('UserPoints', ['UserID' => $Args['UserID']], $Args['Content']);
     }
 
     /**
@@ -167,7 +167,7 @@ class BadgesHooks extends Gdn_Plugin {
     public function base_beforeProfileOptions_handler($Sender, $Args) {
         // Add 'Give Badge' to profiles
         if (checkPermission('Reputation.Badges.Give')) {
-            $Args['ProfileOptions'][] = array('Text' => t('Give Badge'), 'Url' => '/badge/giveuser/'.$Args['UserID'].'/', 'CssClass' => 'Popup');
+            $Args['ProfileOptions'][] = ['Text' => t('Give Badge'), 'Url' => '/badge/giveuser/'.$Args['UserID'].'/', 'CssClass' => 'Popup'];
         }
     }
 
@@ -188,8 +188,8 @@ class BadgesHooks extends Gdn_Plugin {
 
             // Save to list of users for notifications
             if ($Sender->Form->authenticatedPostBack()) {
-                $Set = array();
-                $Prefixes = array('Email.BadgeRequest', 'Popup.BadgeRequest');
+                $Set = [];
+                $Prefixes = ['Email.BadgeRequest', 'Popup.BadgeRequest'];
                 foreach ($Prefixes as $Prefix) {
                     $Value = $Sender->Form->getFormValue($Prefix, null);
                     $Set[$Prefix] = ($Value) ? $Value : null;
@@ -305,8 +305,8 @@ class BadgesHooks extends Gdn_Plugin {
      * @todo Put in a view.
      */
     public function userInfoModule_onBasicInfo_handler($Sender) {
-        echo ' '.wrap(t('Badges'), 'dt', array('class' => 'Badges'));
-        echo ' '.wrap(valr('User.CountBadges', $Sender, 0), 'dd', array('class' => 'Badges'));
+        echo ' '.wrap(t('Badges'), 'dt', ['class' => 'Badges']);
+        echo ' '.wrap(valr('User.CountBadges', $Sender, 0), 'dd', ['class' => 'Badges']);
     }
 
     /**
@@ -329,9 +329,9 @@ class BadgesHooks extends Gdn_Plugin {
         }
 
         // Collect all of the count fields.
-        $Counts = array();
+        $Counts = [];
         foreach ($Fields as $Name => $Value) {
-            if (StringBeginsWith($Name, 'Count') || in_array($Name, array('Likes'))) {
+            if (StringBeginsWith($Name, 'Count') || in_array($Name, ['Likes'])) {
                 $Counts[$Name] = $Value;
             }
         }
@@ -501,8 +501,8 @@ class BadgesHooks extends Gdn_Plugin {
      */
     public function lightningReflexes($Sender, $Args) {
         // Get Comment & its Discussion
-        $Comment = $Sender->SQL->getWhere('Comment', array('CommentID' => val('CommentID', $Args)))->firstRow();
-        $Discussion = $Sender->SQL->getWhere('Discussion', array('DiscussionID' => val('DiscussionID', $Comment)))->firstRow();
+        $Comment = $Sender->SQL->getWhere('Comment', ['CommentID' => val('CommentID', $Args)])->firstRow();
+        $Discussion = $Sender->SQL->getWhere('Discussion', ['DiscussionID' => val('DiscussionID', $Comment)])->firstRow();
 
         // Did less than 60 seconds elapse between Discussion & Comment insertion?
         $ElapsedSeconds = strtotime(val('DateInserted', $Comment)) - strtotime(val('DateInserted', $Discussion));
@@ -519,7 +519,7 @@ class BadgesHooks extends Gdn_Plugin {
      * @param $Args
      */
     public function nameDropper($Sender, $Args) {
-        $Mentions = val('MentionedUsers', $Args, array());
+        $Mentions = val('MentionedUsers', $Args, []);
         if (count($Mentions)) {
             $Comment = val('Comment', $Args, val('Discussion', $Args));
             $UserBadgeModel = new UserBadgeModel();
@@ -557,7 +557,7 @@ class BadgesHooks extends Gdn_Plugin {
         $Discussion = $DiscussionModel->getID($DiscussionID);
 
         // Is it discussion starter's first?
-        $FirstDiscussion = $DiscussionModel->getWhere(array('InsertUserID' => val('InsertUserID', $Discussion)), 'DateInserted', 'asc', 1);
+        $FirstDiscussion = $DiscussionModel->getWhere(['InsertUserID' => val('InsertUserID', $Discussion)], 'DateInserted', 'asc', 1);
         if ($DiscussionID == val('DiscussionID', $FirstDiscussion)) {
             $UserBadgeModel = new UserBadgeModel();
             $UserBadgeModel->give(Gdn::session()->UserID, 'welcome');

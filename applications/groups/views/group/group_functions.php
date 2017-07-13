@@ -27,21 +27,21 @@ if (!function_exists('getGroupOptions')):
  * @return array The options for the group that the user can access.
  */
 function getGroupOptions($group, $sectionId = 'home') {
-     $options = array();
+     $options = [];
      if (GroupPermission('Edit', $group)) {
-          $options['Edit'] = array('Text' => sprintf(t('Edit %s'), t('Group')), 'Url' => GroupUrl($group, 'edit'));
+          $options['Edit'] = ['Text' => sprintf(t('Edit %s'), t('Group')), 'Url' => GroupUrl($group, 'edit')];
      }
      if (GroupPermission('Leave', $group)) {
-          $options['Leave'] = array('Text' => t('Leave Group'), 'Url' => GroupUrl($group, 'leave'), 'CssClass' => 'Popup');
+          $options['Leave'] = ['Text' => t('Leave Group'), 'Url' => GroupUrl($group, 'leave'), 'CssClass' => 'Popup'];
      }
      if (GroupPermission('Leader', $group)) {
-          $options['Delete'] = array('Text' => sprintf(t('Delete %s'), t('Group')), 'Url' => GroupUrl($group, 'delete'), 'CssClass' => 'Popup');
+          $options['Delete'] = ['Text' => sprintf(t('Delete %s'), t('Group')), 'Url' => GroupUrl($group, 'delete'), 'CssClass' => 'Popup'];
      }
      if (GroupPermission('Leader', $group)) {
-          $options['Invite'] = array('Text' => t('Invite Members'), 'Url' => GroupUrl($group, 'invite'), 'CssClass' => 'js-invite-members');
+          $options['Invite'] = ['Text' => t('Invite Members'), 'Url' => GroupUrl($group, 'invite'), 'CssClass' => 'js-invite-members'];
      }
      if (GroupPermission('Leader', $group)) {
-          $options['Members'] = array('Text' => t('Manage Members'), 'Url' => GroupUrl($group, 'members'));
+          $options['Members'] = ['Text' => t('Manage Members'), 'Url' => GroupUrl($group, 'members')];
      }
      return $options;
 }
@@ -56,7 +56,7 @@ if (!function_exists('getGroupButtons')):
  */
 function getGroupButtons($group) {
      $groupModel = new GroupModel();
-     $buttons = array();
+     $buttons = [];
      if (Gdn::session()->isValid() && !GroupPermission('Member', $group) && GroupPermission('Join', $group) && !$groupModel->getApplicantType(val('GroupID', $group))) {
           $joinButton['text'] = t('Join');
           $joinButton['url'] = GroupUrl($group, 'join');
@@ -92,7 +92,7 @@ function writeDiscussionList($sender, $type = 'discussions', $emptyMessage = '',
           $layout = c('Vanilla.Discussions.Layout', 'modern');
      }
      // Force discussions if bad type is sent
-     if (!in_array($type, array('announcements', 'discussions'))) {
+     if (!in_array($type, ['announcements', 'discussions'])) {
           trace('Wrong type argument sent.');
           $type = 'discussions';
      }
@@ -107,7 +107,7 @@ function writeDiscussionList($sender, $type = 'discussions', $emptyMessage = '',
                      echo '</div>';
                 } else if ($type == 'discussions' && (GroupPermission('Member') || GroupPermission('Moderate'))) {
                      echo '<div class="Button-Controls">';
-                     echo Gdn_Theme::module('NewDiscussionModule', array('CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$sender->data('Group.GroupID')));
+                     echo Gdn_Theme::module('NewDiscussionModule', ['CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$sender->data('Group.GroupID')]);
                      echo '</div>';
                 }
                 echo '</div>';
@@ -165,7 +165,7 @@ if (!function_exists('WriteEmptyState')):
  */
 function WriteEmptyState($Message) {
     if ($Message)
-        echo Wrap($Message, 'p', array('class' => 'EmptyMessage'));
+        echo Wrap($Message, 'p', ['class' => 'EmptyMessage']);
 }
 endif;
 
@@ -173,15 +173,15 @@ if (!function_exists('WriteGroupBanner')) :
 /**
  * Output optional group banner as a div background image to allow dynamic page resizing.
  */
-function WriteGroupBanner($group = array()) {
+function WriteGroupBanner($group = []) {
     if (!$group) {
       $group = Gdn::controller()->data('Group');
     }
 
     if (val('Banner', $group)) {
-        echo wrap('', 'div', array(
+        echo wrap('', 'div', [
             'class' => 'Group-Banner',
-            'style' => 'background-image: url("'.Gdn_Upload::url(val('Banner', $group)).'");')
+            'style' => 'background-image: url("'.Gdn_Upload::url(val('Banner', $group)).'");']
         );
     }
 }
@@ -204,7 +204,7 @@ function WriteGroupButtons($Group = null) {
         if (GroupPermission('Join', $Group)) {
             echo ' '.Anchor(T('Join this Group'), GroupUrl($Group, 'join'), 'Button Primary Group-JoinButton Popup').' ';
         } else {
-            echo ' '.Wrap(T('Join this Group'), 'span', array('class' => 'Button Primary Group-JoinButton Disabled', 'title' => GroupPermission('Join.Reason', $Group))).' ';
+            echo ' '.Wrap(T('Join this Group'), 'span', ['class' => 'Button Primary Group-JoinButton Disabled', 'title' => GroupPermission('Join.Reason', $Group)]).' ';
         }
     }
 
@@ -212,20 +212,20 @@ function WriteGroupButtons($Group = null) {
         echo ' '.Anchor(T('Invite'), GroupUrl($Group, 'invite'), 'Button Primary Group-InviteButton Popup').' ';
     }
 
-    $Options = array();
+    $Options = [];
 
     if (GroupPermission('Edit', $Group)) {
-        $Options['Edit'] = array('Text' => T('Edit'), 'Url' => GroupUrl($Group, 'edit'));
+        $Options['Edit'] = ['Text' => T('Edit'), 'Url' => GroupUrl($Group, 'edit')];
     }
 //    if (GroupPermission('Delete')) {
 //        $Options['Delete'] = array('Text' => T('Delete'), 'Url' => GroupUrl($Group, 'delete'));
 //    }
     if (GroupPermission('Leave', $Group)) {
-        $Options['Leave'] = array('Text' => T('Leave Group'), 'Url' => GroupUrl($Group, 'leave'), 'CssClass' => 'Popup');
+        $Options['Leave'] = ['Text' => T('Leave Group'), 'Url' => GroupUrl($Group, 'leave'), 'CssClass' => 'Popup'];
     }
 
     if (GroupPermission('Leader', $Group)) {
-        $Options['Delete'] = array('Text' => sprintf(T('Delete %s'), T('Group')), 'Url' => GroupUrl($Group, 'delete'), 'CssClass' => 'Popup');
+        $Options['Delete'] = ['Text' => sprintf(T('Delete %s'), T('Group')), 'Url' => GroupUrl($Group, 'delete'), 'CssClass' => 'Popup'];
     }
 
     if (count($Options))
@@ -241,7 +241,7 @@ if (!function_exists('writeGroupOptions')):
  *
  * @param array $options The options to render.
  */
-function writeGroupOptions($options = array()) {
+function writeGroupOptions($options = []) {
      if (empty($options)) {
           return;
      }
@@ -263,7 +263,7 @@ if (!function_exists('writeGroupOptionsButton')):
  *
  * @param array $options The options to render.
  */
-function writeGroupOptionsButton($options = array()) {
+function writeGroupOptionsButton($options = []) {
      if (empty($options)) {
           return;
      }
@@ -350,9 +350,9 @@ function WriteGroupIcon($group = false, $class = 'Group-Icon', $addChangeIconLin
               $output .= '';
               $output .= anchor('<span class="icon icon-camera"></span>'.t('Change Icon'), GroupUrl($group, 'groupicon'), 'ChangePicture');
          }
-         $output .= img(Gdn_Upload::Url($icon), array('class' => $class));
+         $output .= img(Gdn_Upload::Url($icon), ['class' => $class]);
 
-         echo wrap($output, 'div', array('class' => 'Photo PhotoWrap PhotoWrapLarge Group-Icon-Big-Wrap'));
+         echo wrap($output, 'div', ['class' => 'Photo PhotoWrap PhotoWrapLarge Group-Icon-Big-Wrap']);
     }
 }
 endif;

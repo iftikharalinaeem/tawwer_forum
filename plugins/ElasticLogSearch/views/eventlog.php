@@ -17,26 +17,26 @@
 
 <h1>Application Log</h1>
 <?php
-echo $this->Form->Open(array('action' => URL('/settings/applog'), 'Method' => 'GET', 'id' => 'filter-form'));
+echo $this->Form->Open(['action' => URL('/settings/applog'), 'Method' => 'GET', 'id' => 'filter-form']);
 echo $this->Form->Errors();
 ?>
 <div class="floatfix">
     <ul class="cf blockgrid">
         <li class="float-left">
             <?php echo $this->Form->Label('Date From', 'datefrom');  ?>
-            <?php echo $this->Form->TextBox('datefrom', array('class' => 'InputBox Short')); ?>
+            <?php echo $this->Form->TextBox('datefrom', ['class' => 'InputBox Short']); ?>
         </li>
         <li class="float-left">
             <?php echo $this->Form->Label('Date To', 'dateto');  ?>
-            <?php echo $this->Form->TextBox('dateto', array('class' => 'InputBox Short')); ?>
+            <?php echo $this->Form->TextBox('dateto', ['class' => 'InputBox Short']); ?>
         </li>
         <li class="float-left">
             <?php echo $this->Form->Label('Event Name', 'event');  ?>
-            <?php echo $this->Form->TextBox('event', array('class' => 'InputBox Short')); ?>
+            <?php echo $this->Form->TextBox('event', ['class' => 'InputBox Short']); ?>
         </li>
         <li class="float-left">
             <?php echo $this->Form->Label('IP', 'ipaddress');  ?>
-            <?php echo $this->Form->TextBox('ipaddress', array('class' => 'InputBox Short')); ?>
+            <?php echo $this->Form->TextBox('ipaddress', ['class' => 'InputBox Short']); ?>
         </li>
         <li class="float-left">
             <?php echo $this->Form->Label('Priority', 'priority');  ?>
@@ -44,17 +44,17 @@ echo $this->Form->Errors();
         </li>
         <li class="float-left">
             <?php echo $this->Form->Label('Sort Order', 'sortorder');  ?>
-            <?php echo $this->Form->DropDown('sortorder', array('desc' => 'DESC', 'asc' => 'ASC')); ?>
+            <?php echo $this->Form->DropDown('sortorder', ['desc' => 'DESC', 'asc' => 'ASC']); ?>
         </li>
         <li class="float-left buttons">
             <?php echo $this->Form->Button("Filter"); ?>
-            <?php echo $this->Form->Button("Reset", array('id' => 'filter-reset', 'type' => 'reset')); ?>
+            <?php echo $this->Form->Button("Reset", ['id' => 'filter-reset', 'type' => 'reset']); ?>
             <?php echo $this->Form->Close(); ?>
 
         </li>
     </ul>
 </div>
-<?php PagerModule::Write(array('Sender' => $this)); ?>
+<?php PagerModule::Write(['Sender' => $this]); ?>
 
 <table class="AltColumns table-el">
     <thead>

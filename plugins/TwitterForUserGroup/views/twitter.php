@@ -15,7 +15,7 @@
    </li>
 </ul>
 <?php
-   echo $this->Form->Close("Save",'',array(
+   echo $this->Form->Close("Save",'',[
       'class' => 'Button'
-   ));
+   ]);
 ?>

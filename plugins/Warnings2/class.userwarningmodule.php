@@ -18,7 +18,7 @@ class UserWarningModule extends Gdn_Module {
             $this->UserID = Gdn::controller()->data('Profile.UserID');
         }
 
-        if ($this->UserID != Gdn::session()->UserID && !Gdn::session()->checkPermission(array('Garden.PersonalInfo.View', 'Moderation.Warnings.View'), false)) {
+        if ($this->UserID != Gdn::session()->UserID && !Gdn::session()->checkPermission(['Garden.PersonalInfo.View', 'Moderation.Warnings.View'], false)) {
             return '';
         }
 

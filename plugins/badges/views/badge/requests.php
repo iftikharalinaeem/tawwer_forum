@@ -4,7 +4,7 @@ $Session = Gdn::session();
 ?>
 <h1><?php echo t('Manage Badge Requests'); ?></h1>
 <?php
-    echo $this->Form->open(array('action' => url('/badge/requests')));
+    echo $this->Form->open(['action' => url('/badge/requests')]);
     echo $this->Form->errors();
     $NumRequests = $this->RequestData->numRows();
     if ($NumRequests == 0) { ?>
@@ -12,8 +12,8 @@ $Session = Gdn::session();
     <?php } else {
         $AppText = plural($NumRequests, 'There is currently %s request.', 'There are currently %s requests.'); ?>
         <div>
-            <?php echo $this->Form->button('Approve', array('type' => 'submit', 'name' => 'Submit', 'value' => 'Approve', 'class' => 'btn btn-primary')); ?>
-            <?php echo $this->Form->button('Decline', array('type' => 'submit', 'name' => 'Submit', 'value' => 'Decline', 'class' => 'btn btn-primary')); ?>
+            <?php echo $this->Form->button('Approve', ['type' => 'submit', 'name' => 'Submit', 'value' => 'Approve', 'class' => 'btn btn-primary']); ?>
+            <?php echo $this->Form->button('Decline', ['type' => 'submit', 'name' => 'Submit', 'value' => 'Decline', 'class' => 'btn btn-primary']); ?>
         </div>
     <?php } ?>
 <div class="padded italic"><?php echo sprintf($AppText, $NumRequests); ?></div>
@@ -32,7 +32,7 @@ $Session = Gdn::session();
     <?php
     foreach ($this->RequestData->format('Text')->result() as $Request) { ?>
         <tr>
-            <td><?php echo $this->Form->checkBox('Requests[]', '', array('value' => $Request->UserID.'-'.$Request->BadgeID)); ?></td>
+            <td><?php echo $this->Form->checkBox('Requests[]', '', ['value' => $Request->UserID.'-'.$Request->BadgeID]); ?></td>
             <td><?php echo userAnchor($Request); ?></td>
             <td><?php echo wrap(anchor($Request->BadgeName, 'badge/'.$Request->Slug), 'strong'), '<br />&ldquo;', $Request->RequestReason, '&rdquo;'; ?></td>
             <td><?php echo Gdn_Format::date($Request->DateRequested); ?></td>

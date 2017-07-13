@@ -10,7 +10,7 @@
     </p>
 </div>
 <?php
-echo $this->Form->open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->open(['enctype' => 'multipart/form-data']);
 echo $this->Form->errors();
 ?>
 
@@ -23,15 +23,15 @@ echo $this->Form->errors();
 $watermark = $this->data('watermark');
 if ($watermark) {
     echo wrap(
-        img(Gdn_Upload::url($watermark), array('style' =>"max-width: 200px")),
+        img(Gdn_Upload::url($watermark), ['style' =>"max-width: 200px"]),
         'div'
     );
 
-    echo $this->Form->button('Remove Watermark', array('name' => 'delete_watermark', 'type' => 'submit'));
+    echo $this->Form->button('Remove Watermark', ['name' => 'delete_watermark', 'type' => 'submit']);
     echo wrap(
         t('Watermark Browse', 'Browse for a new watermark if you would like to change it:'),
         'div',
-        array('class' => 'Info')
+        ['class' => 'Info']
     );
 }
 

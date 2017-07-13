@@ -29,11 +29,11 @@ class WatermarkPlugin extends Gdn_Plugin {
             $fileExtension = $args['FileExtension'];
 
             // these params are passed to the image and the thumbnail, theoretically, if a client wants we could create param arrays, one for each.
-            $watermarkParams = array(
+            $watermarkParams = [
                 'filename' => c('Watermark.WatermarkPath'),
-                'position' => c('Watermark.Position', array(0, 0, 0, 0)),
+                'position' => c('Watermark.Position', [0, 0, 0, 0]),
                 'resize' => c('Watermark.Resize', 70)
-            );
+            ];
 
             $quality = c('Watermark.Quality', 70);
 
@@ -53,7 +53,7 @@ class WatermarkPlugin extends Gdn_Plugin {
     public function settingsController_afterCategorySettings_handler($sender, $args) {
         $watermarkImageCategory = c("Watermark.WatermarkCategories");
         if (!$watermarkImageCategory) {
-            $watermarkImageCategory = array();
+            $watermarkImageCategory = [];
         }
         $isChecked = in_array($sender->data('CategoryID'), $watermarkImageCategory) ? 1 : 0;
         $sender->Form->setValue("Watermark", $isChecked);
@@ -69,7 +69,7 @@ class WatermarkPlugin extends Gdn_Plugin {
     public function categoryModel_beforeSaveCategory_handler($sender, $args) {
         $watermarkImageCategory = c("Watermark.WatermarkCategories");
         if (!$watermarkImageCategory) {
-            $watermarkImageCategory = array();
+            $watermarkImageCategory = [];
         }
         $category = $args['FormPostValues'];
 
@@ -186,13 +186,13 @@ class WatermarkPlugin extends Gdn_Plugin {
      *
      * @return true for chaining purposes.
     */
-    static function watermark($sourceFile, $watermarkParams = array(), $extension = null, $quality = 90) {
+    static function watermark($sourceFile, $watermarkParams = [], $extension = null, $quality = 90) {
         $destination = $sourceFile;
         Logger::event(
             'watermarking_image',
             Logger::INFO,
             'Destination chosen',
-            array('SourceFile' => $sourceFile, 'CopiedSourceFile' => $sourceFile, 'WatermarkParams' => $watermarkParams)
+            ['SourceFile' => $sourceFile, 'CopiedSourceFile' => $sourceFile, 'WatermarkParams' => $watermarkParams]
         );
 
         if ($extension === 'png') {
@@ -214,7 +214,7 @@ class WatermarkPlugin extends Gdn_Plugin {
             'watermarking_image',
             Logger::INFO,
             'SourceImage made',
-            array('Sourcefile ID' => $sourceFileID, 'SourceFile' => $sourceFile, 'CopiedSourceFile' => $sourceFile, 'WatermarkParams' => $watermarkParams)
+            ['Sourcefile ID' => $sourceFileID, 'SourceFile' => $sourceFile, 'CopiedSourceFile' => $sourceFile, 'WatermarkParams' => $watermarkParams]
         );
 
         // Get the source file size
@@ -225,7 +225,7 @@ class WatermarkPlugin extends Gdn_Plugin {
             'watermarking_image',
             Logger::INFO,
             'SourceImage measured',
-            array('\$sourcefile_height ID' => $sourcefileHeight, '\$sourcefile_width' => $sourcefileWidth)
+            ['\$sourcefile_height ID' => $sourcefileHeight, '\$sourcefile_width' => $sourcefileWidth]
         );
 
         // Create the watermark image from the path supplied in params
@@ -246,7 +246,7 @@ class WatermarkPlugin extends Gdn_Plugin {
             'watermarking_image',
             Logger::INFO,
             'WatermarkImage made',
-            array('WaterMarkFile Copied Source' => $copiedWatermarkSource, '\$watermarkfile_height' => $watermarkFileHeight, '\$watermarkfile_width' => $watermarkFileWidth, 'WatermarkParams' => $watermarkParams)
+            ['WaterMarkFile Copied Source' => $copiedWatermarkSource, '\$watermarkfile_height' => $watermarkFileHeight, '\$watermarkfile_width' => $watermarkFileWidth, 'WatermarkParams' => $watermarkParams]
         );
 
         /**
@@ -304,7 +304,7 @@ class WatermarkPlugin extends Gdn_Plugin {
             'watermarking_image',
             Logger::INFO,
             'Before Save',
-            array('\$destination ID' => $destination)
+            ['\$destination ID' => $destination]
         );
 
         imagedestroy($sourceFileID);
@@ -336,23 +336,23 @@ class WatermarkPlugin extends Gdn_Plugin {
         if ($watermarkParams['position'][0] && $watermarkParams['position'][1]) { // top left
             $destinationY = $watermarkParams['position'][0];
             $destinationX = $watermarkParams['position'][1];
-            return array($destinationY, $destinationX);
+            return [$destinationY, $destinationX];
         } elseif ($watermarkParams['position'][1] && $watermarkParams['position'][2]) { // top right
             $destinationY = $watermarkParams['position'][1];
             $destinationX = $sourcefileWidth - ($watermarkParams['position'][2] + $watermarkFileWidth);
-            return array($destinationY, $destinationX);
+            return [$destinationY, $destinationX];
         } elseif ($watermarkParams['position'][2] && $watermarkParams['position'][3]) { // bottom right
             $destinationY = $sourcefileHeight - ($watermarkParams['position'][2] + $watermarkFileHeight);
             $destinationX = $sourcefileWidth - ($watermarkParams['position'][3] + $watermarkFileWidth);
-            return array($destinationY, $destinationX);
+            return [$destinationY, $destinationX];
         } elseif ($watermarkParams['position'][0] && $watermarkParams['position'][3]) { // bottom left
             $destinationY = $sourcefileHeight - ($watermarkParams['position'][0] + $watermarkFileHeight);
             $destinationX = $watermarkParams['position'][3];
-            return array($destinationY, $destinationX);
+            return [$destinationY, $destinationX];
         } else { // center
             $destinationX = ($sourcefileWidth / 2) - ($watermarkFileWidth / 2); // centered
             $destinationY = ($sourcefileHeight / 2) - ($watermarkFileHeight / 2);
-            return array($destinationY, $destinationX); // centered
+            return [$destinationY, $destinationX]; // centered
         }
     }
 }

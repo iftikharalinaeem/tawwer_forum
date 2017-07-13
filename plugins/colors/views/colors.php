@@ -46,7 +46,7 @@
                          <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="Cancel"/>
                          </div>
                       </div>'
-                   , 'div', array('class' => 'editor-dropdown'));
+                   , 'div', ['class' => 'editor-dropdown']);
                   break;
 
                case 'image':
@@ -67,15 +67,15 @@
                         <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="Cancel"/>
                         </div>
                      </div>'
-                   , 'div', array('class' => 'editor-dropdown'));
+                   , 'div', ['class' => 'editor-dropdown']);
                   break;
                
                // All other dropdowns (color, format, emoji)
                default:
                   $html_toolbar .= Wrap(
                      Wrap($html_arrow_down, 'span', $button['attr']) .''. 
-                     Wrap($html_button_dropdown_options, 'div', array('class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''))
-                  , 'div', array('class' => 'editor-dropdown'));
+                     Wrap($html_button_dropdown_options, 'div', ['class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''])
+                  , 'div', ['class' => 'editor-dropdown']);
                   break;  
             }
          }

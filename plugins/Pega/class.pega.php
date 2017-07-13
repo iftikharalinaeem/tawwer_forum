@@ -101,14 +101,14 @@ class Pega {
     */
     public function ValidateCase(array $Case) {
         return true;
-        $RequiredFields = array(
+        $RequiredFields = [
             'ContactId' => TRUE,
             'Status' => TRUE,
             'Origin' => TRUE,
             'Subject' => TRUE,
             'Priority' => TRUE,
             'Description' => TRUE
-        );
+        ];
         $MissingFields = array_diff_key($RequiredFields, $Case);
         if (!empty($MissingFields)) {
             return $MissingFields;
@@ -225,9 +225,9 @@ class Pega {
             $Headers
         );
 
-        $FailureCodes = array(
+        $FailureCodes = [
             500 => TRUE,
-        );
+        ];
 
         if (isset($FailureCodes[$Proxy->ResponseStatus])) {
             throw new Gdn_UserException('HTTP Error communicating with Pega.  Code: ' . $Proxy->ResponseStatus);
@@ -247,12 +247,12 @@ class Pega {
         }
 
 
-        return array(
+        return [
             'HttpCode' => $Proxy->ResponseStatus,
             'Header' => $Proxy->RequestHeaders,
             'Response' => $ResponseArray,
             'ContentType' => $Proxy->ContentType
-        );
+        ];
    }
 
     function isConfigured() {

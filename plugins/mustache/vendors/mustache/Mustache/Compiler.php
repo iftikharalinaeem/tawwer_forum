@@ -41,8 +41,8 @@ class Mustache_Compiler
      */
     public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8', $strictCallables = false, $entityFlags = ENT_COMPAT)
     {
-        $this->pragmas         = array();
-        $this->sections        = array();
+        $this->pragmas         = [];
+        $this->sections        = [];
         $this->source          = $source;
         $this->indentNextLine  = true;
         $this->customEscape    = $customEscape;
@@ -326,7 +326,7 @@ class Mustache_Compiler
         $filters = array_map('trim', explode('|', $id));
         $id      = array_shift($filters);
 
-        return array($id, $this->getFilter($filters, $level));
+        return [$id, $this->getFilter($filters, $level)];
     }
 
     const FILTER = '

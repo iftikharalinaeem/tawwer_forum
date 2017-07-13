@@ -259,11 +259,11 @@ class CAS_Client
      *
      * @hideinitializer
      */
-    private $_server = array(
+    private $_server = [
         'version' => -1,
         'hostname' => 'none',
         'port' => -1,
-        'uri' => 'none');
+        'uri' => 'none'];
 
     /**
      * This method is used to retrieve the version of the CAS server.
@@ -566,7 +566,7 @@ class CAS_Client
     /**
      * An array to store extra curl options.
      */
-    private $_curl_options = array();
+    private $_curl_options = [];
 
     /**
      * This method is used to set additional user curl options.
@@ -648,7 +648,7 @@ class CAS_Client
     /**
      * @var array $_postAuthenticateCallbackArgs;
      */
-    private $_postAuthenticateCallbackArgs = array();
+    private $_postAuthenticateCallbackArgs = [];
 
     /**
      * Set a callback function to be run when a user authenticates.
@@ -669,7 +669,7 @@ class CAS_Client
      *
      * @return void
      */
-    public function setPostAuthenticateCallback ($function, array $additionalArgs = array())
+    public function setPostAuthenticateCallback ($function, array $additionalArgs = [])
     {
         $this->_postAuthenticateCallbackFunction = $function;
         $this->_postAuthenticateCallbackArgs = $additionalArgs;
@@ -683,7 +683,7 @@ class CAS_Client
     /**
      * @var array $_signoutCallbackArgs;
      */
-    private $_signoutCallbackArgs = array();
+    private $_signoutCallbackArgs = [];
 
     /**
      * Set a callback function to be run when a single-signout request is received.
@@ -699,7 +699,7 @@ class CAS_Client
      *
      * @return void
      */
-    public function setSingleSignoutCallback ($function, array $additionalArgs = array())
+    public function setSingleSignoutCallback ($function, array $additionalArgs = [])
     {
         $this->_signoutCallbackFunction = $function;
         $this->_signoutCallbackArgs = $additionalArgs;
@@ -736,12 +736,12 @@ class CAS_Client
     {
         // store where the authentication has been checked and the result
         $dbg = debug_backtrace();
-        $this->_authentication_caller = array (
+        $this->_authentication_caller = [
             'file' => $dbg[1]['file'],
             'line' => $dbg[1]['line'],
             'method' => $dbg[1]['class'] . '::' . $dbg[1]['function'],
             'result' => (boolean)$auth
-        );
+        ];
     }
     private $_authentication_caller;
 
@@ -912,10 +912,10 @@ class CAS_Client
         // Make cookie handling available.
         if ($this->isProxy()) {
             if (!isset($_SESSION['phpCAS'])) {
-                $_SESSION['phpCAS'] = array();
+                $_SESSION['phpCAS'] = [];
             }
             if (!isset($_SESSION['phpCAS']['service_cookies'])) {
-                $_SESSION['phpCAS']['service_cookies'] = array();
+                $_SESSION['phpCAS']['service_cookies'] = [];
             }
             $this->_serviceCookieJar = new CAS_CookieJar(
                 $_SESSION['phpCAS']['service_cookies']
@@ -1119,7 +1119,7 @@ class CAS_Client
      *
      * @hideinitializer
      */
-    private $_attributes = array();
+    private $_attributes = [];
 
     /**
      * Set an array of attributes
@@ -1715,7 +1715,7 @@ class CAS_Client
         $allowed = false;
         if ($check_client) {
             if (!$allowed_clients) {
-                $allowed_clients = array( $this->_getServerHostname() );
+                $allowed_clients = [ $this->_getServerHostname() ];
             }
             $client_ip = $_SERVER['REMOTE_ADDR'];
             $client = gethostbyaddr($client_ip);
@@ -2123,7 +2123,7 @@ class CAS_Client
 
         $result = false;
 
-        $attr_array = array();
+        $attr_array = [];
 
         // create new DOMDocument Object
         $dom = new DOMDocument();
@@ -2139,7 +2139,7 @@ class CAS_Client
                 foreach ($nodelist as $node) {
                     $xres = $xPath->query("saml:AttributeValue", $node);
                     $name = $node->getAttribute("AttributeName");
-                    $value_array = array();
+                    $value_array = [];
                     foreach ($xres as $node2) {
                         $value_array[] = $node2->nodeValue;
                     }
@@ -3041,7 +3041,7 @@ class CAS_Client
      *
      * @access private
      */
-    private $_proxies = array();
+    private $_proxies = [];
 
     /**
      * Answer an array of proxies that are sitting in front of this application.
@@ -3206,7 +3206,7 @@ class CAS_Client
                 );
                 $this->_readExtraAttributesCas20($success_elements);
                 // Store the proxies we are sitting behind for authorization checking
-                $proxyList = array();
+                $proxyList = [];
                 if ( sizeof($arr = $success_elements->item(0)->getElementsByTagName("proxy")) > 0) {
                     foreach ($arr as $proxyElem) {
                         phpCAS::trace("Found Proxy: ".$proxyElem->nodeValue);
@@ -3270,7 +3270,7 @@ class CAS_Client
     {
         phpCAS::traceBegin();
 
-        $extra_attributes = array();
+        $extra_attributes = [];
 
         // "Jasig Style" Attributes:
         //
@@ -3414,7 +3414,7 @@ class CAS_Client
             // Initialize the array with the existing value
             if (!is_array($attributeArray[$name])) {
                 $existingValue = $attributeArray[$name];
-                $attributeArray[$name] = array($existingValue);
+                $attributeArray[$name] = [$existingValue];
             }
 
             $attributeArray[$name][] = trim($value);
@@ -3709,7 +3709,7 @@ class CAS_Client
      * array of the nodes.
      */
     private $_rebroadcast = false;
-    private $_rebroadcast_nodes = array();
+    private $_rebroadcast_nodes = [];
 
     /**
      * Constants used for determining rebroadcast node type.
@@ -3758,7 +3758,7 @@ class CAS_Client
     /**
      * An array to store extra rebroadcast curl options.
      */
-    private $_rebroadcast_headers = array();
+    private $_rebroadcast_headers = [];
 
     /**
      * This method is used to add header parameters when rebroadcasting
@@ -3793,12 +3793,12 @@ class CAS_Client
     {
         phpCAS::traceBegin();
 
-        $rebroadcast_curl_options = array(
+        $rebroadcast_curl_options = [
         CURLOPT_FAILONERROR => 1,
         CURLOPT_FOLLOWLOCATION => 1,
         CURLOPT_RETURNTRANSFER => 1,
         CURLOPT_CONNECTTIMEOUT => 1,
-        CURLOPT_TIMEOUT => 4);
+        CURLOPT_TIMEOUT => 4];
 
         // Try to determine the IP address of the server
         if (!empty($_SERVER['SERVER_ADDR'])) {

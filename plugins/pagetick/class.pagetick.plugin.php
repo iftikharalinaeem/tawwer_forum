@@ -25,12 +25,12 @@ class PageTickPlugin extends Gdn_Plugin {
 
       $mobile_views = $mobile ? 1 : 0;
 
-      Gdn::Database()->Query($sql, array(
+      Gdn::Database()->Query($sql, [
           ':TickID' => $date->format(DateTime::W3C),
           ':CountViews' => 1,
           ':CountMobileViews' => $mobile_views,
           ':CountViews1' => 1,
-          ':CountMobileViews1' => $mobile_views));
+          ':CountMobileViews1' => $mobile_views]);
    }
 
    public function tickColumn($column = 'CountViews') {
@@ -39,10 +39,10 @@ class PageTickPlugin extends Gdn_Plugin {
          values (:TickID, :CountViews)
          on duplicate key update $column = $column + :CountViews1";
 
-      Gdn::Database()->Query($sql, array(
+      Gdn::Database()->Query($sql, [
           ':TickID' => $date->format(DateTime::W3C),
           ':CountViews' => 1,
-          ':CountViews1' => 1));
+          ':CountViews1' => 1]);
    }
 
 
@@ -70,7 +70,7 @@ EOT;
     * @param Gdn_Controller $sender
     */
    public function Base_render_before($sender) {
-      $sender->AddJsFile('pagetick.js', 'plugins/pagetick', array('hint' => 'inline', 'sort' => 1000));
+      $sender->AddJsFile('pagetick.js', 'plugins/pagetick', ['hint' => 'inline', 'sort' => 1000]);
    }
 
    /**

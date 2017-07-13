@@ -221,7 +221,7 @@ class OnlineModule extends Gdn_Module {
                 echo '<div class="' . $listClass . '">' . "\n";
                 if ($this->onlineCount) {
                     foreach ($this->onlineUsers as $user) {
-                        $wrapClass = array('OnlineUserWrap', 'UserPicture');
+                        $wrapClass = ['OnlineUserWrap', 'UserPicture'];
                         $wrapClass[] = ((!array_key_exists('Visible', $user) || !$user['Visible']) ? 'Invisible' : '');
 
                         if (!$user['Photo'] && !function_exists('UserPhotoDefaultUrl')) {
@@ -240,7 +240,7 @@ class OnlineModule extends Gdn_Module {
 
                         $userName = val('Name', $user, false);
                         if ($userName) {
-                            echo wrap(htmlspecialchars($userName), 'div', array('class' => 'OnlineUserName'));
+                            echo wrap(htmlspecialchars($userName), 'div', ['class' => 'OnlineUserName']);
                         }
                         echo '</div>';
                     }
@@ -260,7 +260,7 @@ EOT;
                 echo '<ul class="PanelInfo">' . "\n";
                 if ($this->onlineCount) {
                     foreach ($this->onlineUsers as $user) {
-                        $wrapClass = array('OnlineUserWrap', 'UserLink');
+                        $wrapClass = ['OnlineUserWrap', 'UserLink'];
                         $wrapClass[] = ((!array_key_exists('Visible', $user) || !$user['Visible']) ? 'Invisible' : '');
                         if ($this->selector == 'category' && $this->contextField) {
                             if (val($this->contextField, $user, null) == $this->contextID) {

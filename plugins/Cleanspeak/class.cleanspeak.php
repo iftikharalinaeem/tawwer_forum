@@ -13,7 +13,7 @@ class Cleanspeak extends Gdn_Pluggable {
      *    First Item reserved for SITE ID
      * @var array
      */
-    public $uuidSeed = array(0, 0, 0, 0);
+    public $uuidSeed = [0, 0, 0, 0];
 
     /**
      * @var Cleanspeak
@@ -84,12 +84,12 @@ class Cleanspeak extends Gdn_Pluggable {
     }
 
     public function getUserUUID($userID) {
-        $userAuth = Gdn::SQL()->GetWhere('UserAuthentication', array('UserID' => $userID, 'ProviderKey' => 'cleanspeak'))
+        $userAuth = Gdn::SQL()->GetWhere('UserAuthentication', ['UserID' => $userID, 'ProviderKey' => 'cleanspeak'])
             ->FirstRow(DATASET_TYPE_ARRAY);
         if (GetValue('ForeignUserKey', $userAuth)) {
             return $userAuth['ForeignUserKey'];
         }
-        return $this->generateUUIDFromInts(array($this->uuidSeed[0], 0, 0, $userID));
+        return $this->generateUUIDFromInts([$this->uuidSeed[0], 0, 0, $userID]);
     }
 
     public static function getUserIDFromUUID($UUID) {
@@ -138,10 +138,10 @@ class Cleanspeak extends Gdn_Pluggable {
     public function apiRequest($url, $post) {
 
         $proxyRequest = new ProxyRequest();
-        $options = array(
+        $options = [
             'Url' => rtrim(C('Plugins.Cleanspeak.ApiUrl'), '/').'/'.ltrim($url, '/')
-        );
-        $queryParams = array();
+        ];
+        $queryParams = [];
         if ($post != null) {
             $options['Method'] = 'POST';
             $options['PreEncodePost'] = false;
@@ -153,25 +153,25 @@ class Cleanspeak extends Gdn_Pluggable {
         if (!empty($apiKey)) {
             $headers['Authentication'] = $apiKey;
         }
-        Logger::log(Logger::DEBUG, 'Cleanspeak API Request.', array(
+        Logger::log(Logger::DEBUG, 'Cleanspeak API Request.', [
               'Options' => $options,
               'QueryParams' => $queryParams,
               'Header' => $headers
-           ));
+           ]);
 
         $response = $proxyRequest->Request($options, $queryParams, null, $headers);
 
         if ($proxyRequest->ResponseStatus == 400) {
-            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', array('Response' => json_decode($response, true)));
+            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', ['Response' => json_decode($response, true)]);
             throw new CleanspeakException('Error in cleanspeak request.');
         } elseif ($proxyRequest->ResponseStatus == 0) {
             Logger::log(Logger::ERROR, 'Cleanspeak Error in API. No Response.');
             throw new CleanspeakException('Error communicating with the cleanspeak server.', 500);
         } elseif ($proxyRequest->ResponseStatus != 200) {
-            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', array('Response' => json_decode($response, true)));
+            Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', ['Response' => json_decode($response, true)]);
             throw new CleanspeakException('Error communicating with the cleanspeak server.');
         } else {
-            Logger::log(Logger::DEBUG, 'Cleanspeak API Response.', array('Response' => $response));
+            Logger::log(Logger::DEBUG, 'Cleanspeak API Response.', ['Response' => $response]);
         }
 
         if (stristr($proxyRequest->ResponseHeaders['Content-Type'], 'application/json') != false) {
@@ -195,31 +195,31 @@ class Cleanspeak extends Gdn_Pluggable {
         if (GetValue('Name', $data)) {
             $text = Gdn_Format::Text($data['Name'], false);
             if (!empty($text) && trim($text) != '') {
-                $parts[] = array(
+                $parts[] = [
                     'content' => $text,
                     'name' => 'Name',
                     'type' => 'text'
-                );
+                ];
             }
         }
         if (GetValue('Body', $data)) {
             $text = Gdn_Format::Text($data['Body'], false);
             if (!empty($text) && trim($text) != '') {
-                $parts[] = array(
+                $parts[] = [
                     'content' => $text,
                     'name' => 'Body',
                     'type' => 'text'
-                );
+                ];
             }
         }
         if (GetValue('Story', $data)) {
             $text = Gdn_Format::Text($data['Story'], false);
             if (!empty($text) && trim($text) != '') {
-                $parts[] = array(
+                $parts[] = [
                     'content' => $text,
                     'name' => 'WallPost',
                     'type' => 'text'
-                );
+                ];
             }
         }
 
@@ -242,11 +242,11 @@ class Cleanspeak extends Gdn_Pluggable {
                     $Type = 'image';
                 }
 
-                $parts[] = array(
+                $parts[] = [
                     'content' => Gdn_Upload::Url($Path),
                     'name' => $Name,
                     'type' => $Type
-                );
+                ];
             }
 
         }

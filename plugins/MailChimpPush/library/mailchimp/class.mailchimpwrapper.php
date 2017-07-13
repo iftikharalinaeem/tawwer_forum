@@ -53,7 +53,7 @@ class MailChimpWrapper {
      * @return Http\HttpResponse
      * @throws Exception
      */
-    public function callServer($endpoint = null, $method = 'GET', $body = array(), $returnBody = false) {
+    public function callServer($endpoint = null, $method = 'GET', $body = [], $returnBody = false) {
         // parse out which data center the request should be sent to from the API key
         $dataCenter = 'us1';
         if (strstr($this->api_key,'-')) {
@@ -199,7 +199,7 @@ class MailChimpWrapper {
      * @return Http\HttpResponse
      * @throws Exception
      */
-    public function listUpdateAddress($listID, $email = array()) {
+    public function listUpdateAddress($listID, $email = []) {
         $emailID = md5(strtolower(val('EMAIL', $email)));
         $removeBody = ['status' => 'unsubscribed'];
 

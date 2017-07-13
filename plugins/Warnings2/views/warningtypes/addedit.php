@@ -24,7 +24,7 @@
 </h1>
 
 <?php
-echo $form->open(array('class' => 'WarningType'));
+echo $form->open(['class' => 'WarningType']);
 echo $form->errors();
 ?>
     <ul>

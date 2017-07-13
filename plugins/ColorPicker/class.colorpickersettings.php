@@ -17,9 +17,9 @@ class ColorPickerSettings {
    const SELECTOR_KEY = 'selector';
 
    /// PROPERTIES ///
-   protected $_CssFiles = array();
+   protected $_CssFiles = [];
 
-   public $Excluded = array('admin.css', 'deverror.css', 'error.css', 'previewtheme.css', 'setup.css');
+   public $Excluded = ['admin.css', 'deverror.css', 'error.css', 'previewtheme.css', 'setup.css'];
 
    /** @var ColorPickerPlugin */
    public $Parent;
@@ -90,22 +90,22 @@ class ColorPickerSettings {
       $Sender->AddJsFile('colorpicker.plugin.js', $AppFolder);
 
       // Get all of the data for the view.
-      $Data = array();
+      $Data = [];
       $Path = PATH_UPLOADS."/ColorPicker/custom.css";
       if (!file_exists($Path))
          $this->Parent->Setup();
       $Css = $this->ParseCssFile($Path);
       $Colors = $this->SortCssByColor($Css);
-      uasort($Colors, array($this, 'CompareHSV'));
+      uasort($Colors, [$this, 'CompareHSV']);
       $Data['Colors'] = $Colors;
 
       // Figure out the average color in the groups.
-      $Groups = array();
+      $Groups = [];
       foreach($Colors as $Color => $Options) {
          list($R, $G, $B) = self::RGB($Color);
          $ColorGroup = $this->ColorGroup($Color);
          if (!isset($Groups[$ColorGroup])) {
-            $Groups[$ColorGroup] = array('R' => $R, 'G' => $G, 'B' => $B, 'Count' => 1);
+            $Groups[$ColorGroup] = ['R' => $R, 'G' => $G, 'B' => $B, 'Count' => 1];
          } else {
             $Groups[$ColorGroup]['R'] += $R;
             $Groups[$ColorGroup]['G'] += $G;
@@ -134,11 +134,11 @@ class ColorPickerSettings {
     * @return array An array in the same format as $CssArray, but only with rules that contain colors.
     */
    public function FilterCssColors($CssArray) {
-      $Result = array();
+      $Result = [];
       foreach($CssArray as $RuleArray) {
          $Selector = $RuleArray[self::SELECTOR_KEY];
          $Rules = $RuleArray[self::RULES_KEY];
-         $FilteredRules = array();
+         $FilteredRules = [];
 
          // Loop through the rules looking for colors.
          foreach ($Rules as $Key => $Value) {
@@ -172,9 +172,9 @@ class ColorPickerSettings {
          }
 
          if (count($FilteredRules) > 0) {
-            $Result[] = array(
+            $Result[] = [
                self::SELECTOR_KEY => $Selector,
-               self::RULES_KEY => $FilteredRules);
+               self::RULES_KEY => $FilteredRules];
          }
       }
       return $Result;
@@ -202,7 +202,7 @@ class ColorPickerSettings {
          $this->_CssFiles = $CssFiles;
       }
 
-      $AllColorCss = array();
+      $AllColorCss = [];
 
       // Collect all of the css rules that contain colors.
       foreach ($this->_CssFiles as $CssPath) {
@@ -215,7 +215,7 @@ class ColorPickerSettings {
                $VirtualPath = substr($CssPath, strlen(PATH_ROOT));
             else
                $VirtualPath = $CssPath;
-            $AllColorCss[] = array(self::COMMENT_KEY => $VirtualPath);
+            $AllColorCss[] = [self::COMMENT_KEY => $VirtualPath];
             $AllColorCss = array_merge($AllColorCss, $ColorCss);
          }
       }
@@ -230,7 +230,7 @@ class ColorPickerSettings {
    }
 
    public function GetCssFiles() {
-      $Result = array();
+      $Result = [];
 
       // Loop through the appropriate folders and grab the paths to the css files in the application.
 
@@ -279,7 +279,7 @@ class ColorPickerSettings {
       }
 
       // Grab all of the rules.
-      $Result = array();
+      $Result = [];
       if (preg_match_all('`([^{]*?){([^}]*?)}`', $Contents, $Matches, PREG_SET_ORDER)) {
          foreach ($Matches as $Match) {
             $SelectorString = $Match[1];
@@ -287,7 +287,7 @@ class ColorPickerSettings {
 
             // Parse the rules into an array.
             $RulesArray = explode(';', $RulesString);
-            $Rules = array();
+            $Rules = [];
             foreach ($RulesArray as $RuleString) {
                $Rule = explode(':', $RuleString, 2);
                if (count($Rule) >= 2)
@@ -295,9 +295,9 @@ class ColorPickerSettings {
             }
 
             // Add the rule to the result.
-            $Result[] = array(
+            $Result[] = [
                self::SELECTOR_KEY => trim($SelectorString),
-               self::RULES_KEY => $Rules);
+               self::RULES_KEY => $Rules];
          }
       }
 
@@ -306,7 +306,7 @@ class ColorPickerSettings {
 
    public static function RGB($Color) {
       if (preg_match('`#([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})`i', $Color, $Matches)) {
-         return array(hexdec($Matches[1]), hexdec($Matches[2]), hexdec($Matches[3]));
+         return [hexdec($Matches[1]), hexdec($Matches[2]), hexdec($Matches[3])];
       }
    }
 
@@ -377,7 +377,7 @@ class ColorPickerSettings {
             $H -= 1;
       }
 
-      return array($H, $S, $V);
+      return [$H, $S, $V];
    }
 
    public function ColorGroup($H) {
@@ -398,7 +398,7 @@ class ColorPickerSettings {
     * ...
     */
    public function SortCssByColor($CssArray) {
-      $Result = array();
+      $Result = [];
 
       foreach ($CssArray as $Rule) {
          if (!isset($Rule[self::RULES_KEY]) || !isset($Rule[self::SELECTOR_KEY]))

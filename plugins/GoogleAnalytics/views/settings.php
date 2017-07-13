@@ -27,12 +27,12 @@
    echo $this->Form->Open();
    echo $this->Form->Errors();
    echo '<div class="Col"><strong>Account</strong>';
-      echo $this->Form->TextBox('Plugins.GoogleAnalytics.Account', array('MultiLine' => TRUE));
+      echo $this->Form->TextBox('Plugins.GoogleAnalytics.Account', ['MultiLine' => TRUE]);
    echo '</div>';
    echo '<div class="Col">-&gt;</div>';
    echo '<div class="Col"><strong>Domain</strong>';
-      echo $this->Form->TextBox('Plugins.GoogleAnalytics.TrackerDomain', array('MultiLine' => TRUE));
+      echo $this->Form->TextBox('Plugins.GoogleAnalytics.TrackerDomain', ['MultiLine' => TRUE]);
    echo '</div>';
-   echo $this->Form->Close('Save', '', array('style' => 'margin: 0;')); 
+   echo $this->Form->Close('Save', '', ['style' => 'margin: 0;']); 
    ?>
 </div>

@@ -46,11 +46,11 @@ class GroupInfoModule extends Gdn_Module {
     public function writeGroupInfo() {
         $c = Gdn::controller();
         $Owner = Gdn::userModel()->getID($c->data('Group.InsertUserID'));
-        $Info = array(
+        $Info = [
             'Created' => Gdn_Format::date($c->data('Group.DateInserted'), 'html'),
             'Owner' => UserAnchor($Owner),
-            'Member Count' => array('Members', $c->data('Group.CountMembers'))
-        );
+            'Member Count' => ['Members', $c->data('Group.CountMembers')]
+        ];
         echo '<dl class="Group-Info">';
         foreach ($Info as $Code => $Row) {
             if (is_array($Row)) {

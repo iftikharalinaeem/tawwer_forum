@@ -29,7 +29,7 @@ $BadgeModel = new BadgeModel();
  */
 
 // Getting Started
-$BadgeModel->define(array(
+$BadgeModel->define([
      'Name' => 'Photogenic',
      'Slug' => 'photogenic',
      'Type' => 'Custom',
@@ -37,8 +37,8 @@ $BadgeModel->define(array(
      'Photo' => 'https://badges.v-cdn.net/100/user.png',
      'Points' => 10,
      'CanDelete' => 0
-));
-$BadgeModel->define(array(
+]);
+$BadgeModel->define([
      'Name' => 'Name Dropper',
      'Slug' => 'name-dropper',
      'Type' => 'Custom',
@@ -46,7 +46,7 @@ $BadgeModel->define(array(
      'Photo' => 'https://badges.v-cdn.net/100/address-book.png',
      'Points' => 5,
      'CanDelete' => 0
-));
+]);
 
 // Helper
 //$BadgeModel->define(array(
@@ -87,17 +87,17 @@ $BadgeModel->define(array(
      'Attributes' => array('Timeout' => 86400), // 24 hours
      'Threshold' => 42,
 )); */
-$BadgeModel->define(array(
+$BadgeModel->define([
      'Name' => 'Combo Breaker',
      'Slug' => 'combo',
      'Type' => 'Timeout',
      'Body' => 'Earned badges for 5 different things in one day (now you can say it was 6!).', // 1 per class
      'Photo' => 'https://badges.v-cdn.net/100/meal-deal.png',
      'Points' => 5,
-     'Attributes' => array('Timeout' => 86400), // 24 hours
+     'Attributes' => ['Timeout' => 86400], // 24 hours
      'Threshold' => 5,
      'CanDelete' => 0
-));
+]);
 
 // Speed
 /*$BadgeModel->define(array(
@@ -110,136 +110,136 @@ $BadgeModel->define(array(
 ));*/
 
 // Comment Counts
-$BadgeModel->define(array(
+$BadgeModel->define([
      'Name' => 'First Comment',
      'Slug' => 'comment',
      'Type' => 'UserCount',
      'Body' => 'Commenting is the best way to get involved. Jump in the fray!',
      'Photo' => 'https://badges.v-cdn.net/100/comment.png',
      'Points' => 2,
-     'Attributes' => array('Column' => 'CountComments'),
+     'Attributes' => ['Column' => 'CountComments'],
      'Threshold' => 1,
      'Class' => 'Commenter',
      'Level' => 1,
      'CanDelete' => 0
-));
-$BadgeModel->define(array(
+]);
+$BadgeModel->define([
      'Name' => '10 Comments',
      'Slug' => 'comment-10',
      'Type' => 'UserCount',
      'Body' => 'No longer a one-hit wonder! It looks like you&rsquo;re going places.',
      'Photo' => 'https://badges.v-cdn.net/100/comment-2.png',
      'Points' => 5,
-     'Attributes' => array('Column' => 'CountComments'),
+     'Attributes' => ['Column' => 'CountComments'],
      'Threshold' => 10,
      'Class' => 'Commenter',
      'Level' => 2,
      'CanDelete' => 0
-));
-$BadgeModel->define(array(
+]);
+$BadgeModel->define([
      'Name' => '100 Comments',
      'Slug' => 'comment-100',
      'Type' => 'UserCount',
      'Body' => 'Getting this far requires gumption, something you have in spades.',
      'Photo' => 'https://badges.v-cdn.net/100/comment-3.png',
      'Points' => 10,
-     'Attributes' => array('Column' => 'CountComments'),
+     'Attributes' => ['Column' => 'CountComments'],
      'Threshold' => 100,
      'Class' => 'Commenter',
      'Level' => 3,
      'CanDelete' => 0
-));
-$BadgeModel->define(array(
+]);
+$BadgeModel->define([
      'Name' => '500 Comments',
      'Slug' => 'comment-500',
      'Type' => 'UserCount',
      'Body' => 'Settled in, saw the sights, learned the territory, and most importantly: gave back.',
      'Photo' => 'https://badges.v-cdn.net/100/comment-4.png',
      'Points' => 15,
-     'Attributes' => array('Column' => 'CountComments'),
+     'Attributes' => ['Column' => 'CountComments'],
      'Threshold' => 500,
      'Class' => 'Commenter',
      'Level' => 4,
      'CanDelete' => 0
-));
-$BadgeModel->define(array(
+]);
+$BadgeModel->define([
      'Name' => '1000 Comments',
      'Slug' => 'comment-1000',
      'Type' => 'UserCount',
      'Body' => 'You&rsquo;re practically family.',
      'Photo' => 'https://badges.v-cdn.net/100/comment-5.png',
      'Points' => 20,
-     'Attributes' => array('Column' => 'CountComments'),
+     'Attributes' => ['Column' => 'CountComments'],
      'Threshold' => 1000,
      'Class' => 'Commenter',
      'Level' => 5,
      'CanDelete' => 0
-));
-$BadgeModel->define(array(
+]);
+$BadgeModel->define([
      'Name' => '2500 Comments',
      'Slug' => 'comment-2500',
      'Type' => 'UserCount',
      'Body' => 'Another day, another comment, another badge.',
      'Photo' => 'https://badges.v-cdn.net/100/comment-6.png',
      'Points' => 20,
-     'Attributes' => array('Column' => 'CountComments'),
+     'Attributes' => ['Column' => 'CountComments'],
      'Threshold' => 2500,
      'Class' => 'Commenter',
      'Level' => 6,
      'CanDelete' => 0
-));
-$BadgeModel->define(array(
+]);
+$BadgeModel->define([
      'Name' => '5000 Comments',
      'Slug' => 'comment-5000',
      'Type' => 'UserCount',
      'Body' => 'Eat, sleep, comment. We like your style.',
      'Photo' => 'https://badges.v-cdn.net/100/comment-7.png',
      'Points' => 20,
-     'Attributes' => array('Column' => 'CountComments'),
+     'Attributes' => ['Column' => 'CountComments'],
      'Threshold' => 5000,
      'Class' => 'Commenter',
      'Level' => 7,
      'CanDelete' => 0
-));
-$BadgeModel->define(array(
+]);
+$BadgeModel->define([
      'Name' => '10000 Comments',
      'Slug' => 'comment-10000',
      'Type' => 'UserCount',
      'Body' => 'You are a comment-making machine.',
      'Photo' => 'https://badges.v-cdn.net/100/comment-8.png',
      'Points' => 20,
-     'Attributes' => array('Column' => 'CountComments'),
+     'Attributes' => ['Column' => 'CountComments'],
      'Threshold' => 10000,
      'Class' => 'Commenter',
      'Level' => 8,
      'CanDelete' => 0
-));
-$BadgeModel->define(array(
+]);
+$BadgeModel->define([
      'Name' => '25000 Comments',
      'Slug' => 'comment-25000',
      'Type' => 'UserCount',
      'Body' => 'Who&rsquo;s house? Your house.',
      'Photo' => 'https://badges.v-cdn.net/100/comment-9.png',
      'Points' => 20,
-     'Attributes' => array('Column' => 'CountComments'),
+     'Attributes' => ['Column' => 'CountComments'],
      'Threshold' => 25000,
      'Class' => 'Commenter',
      'Level' => 9,
      'CanDelete' => 0
-));
-$BadgeModel->define(array(
+]);
+$BadgeModel->define([
      'Name' => '50000 Comments',
      'Slug' => 'comment-50000',
      'Type' => 'UserCount',
      'Body' => 'Some people are beginning to wonder if you&rsquo;re the owner.',
      'Photo' => 'https://badges.v-cdn.net/100/comment-10.png',
      'Points' => 20,
-     'Attributes' => array('Column' => 'CountComments'),
+     'Attributes' => ['Column' => 'CountComments'],
      'Threshold' => 50000,
      'Class' => 'Commenter',
      'Level' => 10,
      'CanDelete' => 0
-));
+]);
 
 // Likes
 //$Likes = array(
@@ -330,61 +330,61 @@ $BadgeModel->define(array(
 //));
 
 // Anniversary
-$Order = array(1 => 'First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth');
+$Order = [1 => 'First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
 for ($i = 1; $i < 11; $i++) {
-    $BadgeModel->define(array(
+    $BadgeModel->define([
         'Name' => $Order[$i].' Anniversary',
         'Slug' => 'anniversary'.(($i > 1) ? '-'.$i : ''),
         'Type' => 'Custom',
         'Body' => 'Thanks for sticking with us for '.Plural($i, 'a full year.', '%s years.'),
         'Photo' => "https://badges.v-cdn.net/100/anniversary-$i.png",
         'Points' => 5,
-        'Attributes' => array(),
+        'Attributes' => [],
         'Threshold' => $i,
         'Class' => 'Anniversary',
         'Level' => $i,
         'CanDelete' => 0
-    ));
+    ]);
 }
-$BadgeModel->define(array(
+$BadgeModel->define([
      'Name' => 'Ancient Membership',
      'Slug' => 'anniversary-old',
      'Type' => 'Custom',
      'Body' => 'Nobody remembers a time when this person wasn&rsquo;t a member here.',
      'Photo' => 'https://badges.v-cdn.net/100/anniversary-wow.png',
      'Points' => 5,
-     'Attributes' => array(),
+     'Attributes' => [],
      'Threshold' => 11,
      'Class' => 'Anniversary',
      'Level' => 11,
      'CanDelete' => 0
-));
+]);
 
 // Social badges.
 
-$BadgeModel->define(array(
+$BadgeModel->define([
      'Name' => 'Facebook Connector',
      'Slug' => 'facebook-connect',
      'Type' => 'Connect',
      'Body' => "Let's get social!",
      'Photo' => 'https://badges.v-cdn.net/100/facebook_badge.png',
      'Points' => 10,
-     'Attributes' => array('Provider' => 'Facebook'),
+     'Attributes' => ['Provider' => 'Facebook'],
      'Level' => 1,
      'CanDelete' => 0
-));
+]);
 
-$BadgeModel->define(array(
+$BadgeModel->define([
      'Name' => 'Twitter Connector',
      'Slug' => 'twitter-connect',
      'Type' => 'Connect',
      'Body' => "Let's get social!",
      'Photo' => 'https://badges.v-cdn.net/100/twitter_badge.png',
      'Points' => 10,
-     'Attributes' => array('Provider' => 'Twitter'),
+     'Attributes' => ['Provider' => 'Twitter'],
      'Level' => 1,
      'CanDelete' => 0
-));
+]);
 
 // Silly
 //$BadgeModel->define(array(

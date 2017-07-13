@@ -59,7 +59,7 @@ class WarningModel extends UserNoteModel {
         // Use plugin icon as photo.
         $Warnings2IconPath = preg_replace('/https?\:/i', '', asset('/plugins/Warnings2/icon.png', true));
 
-        $Activity = array(
+        $Activity = [
             'ActivityType' => 'Warning',
             'ActivityUserID' => $WarnerIdentity,
             'HeadlineFormat' => t('HeadlineFormat.Warning.ToUser', 'You\'ve been <a href="{Url,html}" class="Popup">warned</a>.'),
@@ -71,10 +71,10 @@ class WarningModel extends UserNoteModel {
             'NotifyUserID' => $warning['UserID'],
             'Notified' => true,
             'Photo' => $Warnings2IconPath
-        );
+        ];
 
         $ActivityModel = new ActivityModel();
-        $Result = $ActivityModel->save($Activity, false, array('Force' => true));
+        $Result = $ActivityModel->save($Activity, false, ['Force' => true]);
 
         $SavedActivityID = null;
         if (isset($Result['ActivityID'])) {
@@ -106,14 +106,14 @@ class WarningModel extends UserNoteModel {
         $messageModel = new ConversationMessageModel();
 
         $warningID = $warning['WarningID'];
-        $row = array(
+        $row = [
             'Subject' => t('HeadlineFormat.Warning.ToUser', "You've been warned."),
             'Type' => 'warning',
             'ForeignID' => "warning-{$warningID}",
             'Body' => $warning['Body'],
             'Format' => $warning['Format'],
             'RecipientUserID' => (array)$warning['UserID']
-        );
+        ];
 
         $conversationID = $model->save($row, $messageModel);
 
@@ -129,9 +129,9 @@ class WarningModel extends UserNoteModel {
      * @return array Returns an array about the process actions.
      */
     public function processAllWarnings() {
-        $alerts = $this->SQL->getWhere('UserAlert', array('TimeExpires <' => time()))->resultArray();
+        $alerts = $this->SQL->getWhere('UserAlert', ['TimeExpires <' => time()])->resultArray();
 
-        $result = array();
+        $result = [];
         foreach ($alerts as $alert) {
             $userID = $alert['UserID'];
             $processed = $this->processWarnings($alert);
@@ -195,7 +195,7 @@ class WarningModel extends UserNoteModel {
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
 
-        $set = array();
+        $set = [];
         if (BanModel::isBanned($user['Banned'], BanModel::BAN_WARNING) !== $banned) {
             $set['Banned'] = BanModel::setBanned($user['Banned'], $banned, BanModel::BAN_WARNING);
         }
@@ -207,7 +207,7 @@ class WarningModel extends UserNoteModel {
             Gdn::userModel()->setField($userID, $set);
         }
 
-        return array('WarnLevel' => $warningLevel, 'Set' => $set);
+        return ['WarnLevel' => $warningLevel, 'Set' => $set];
     }
 
     /**
@@ -317,7 +317,7 @@ class WarningModel extends UserNoteModel {
         // Coerce the data.
         $data['Type'] = 'warning';
         if (isset($data['WarningTypeID'])) {
-            $warningType = $this->SQL->getWhere('WarningType', array('WarningTypeID' => $data['WarningTypeID']))->firstRow(DATASET_TYPE_ARRAY);
+            $warningType = $this->SQL->getWhere('WarningType', ['WarningTypeID' => $data['WarningTypeID']])->firstRow(DATASET_TYPE_ARRAY);
             if (!$warningType) {
                 $this->Validation->addValidationResult('WarningTypeID', 'Invalid warning type');
             } else {
@@ -360,24 +360,24 @@ class WarningModel extends UserNoteModel {
         }
         $data['WarningID'] = $ID;
 
-        $event = array(
+        $event = [
             'Warning' => $data,
             'WarningID' => $ID
-        );
+        ];
 
         // Attach the warning to the source record.
         $recordType = ucfirst(val('RecordType', $data));
         $recordID = val('RecordID', $data);
-        if (in_array($recordType, array('Discussion', 'Comment', 'Activity')) && $recordID) {
+        if (in_array($recordType, ['Discussion', 'Comment', 'Activity']) && $recordID) {
             $modelClass = $recordType.'Model';
             /* @var Gdn_Model $model */
             $model = new $modelClass;
             $model->saveToSerializedColumn('Attributes', $recordID, 'WarningID', $ID);
 
-            $event = array_merge($event, array(
+            $event = array_merge($event, [
                 'RecordType' => $recordType,
                 'RecordID' => $recordID
-            ));
+            ]);
         }
 
         if ($this->NotifyWithMessage && class_exists('ConversationModel')) {
@@ -385,13 +385,13 @@ class WarningModel extends UserNoteModel {
             $conversationID = $this->notifyWithMessage($data);
             if ($conversationID) {
                 // Save the conversation link back to the warning.
-                $this->setField($ID, array('ConversationID' => $conversationID));
+                $this->setField($ID, ['ConversationID' => $conversationID]);
                 $event['ConversationID'] = $conversationID;
             }
         } else {
             $activityID = $this->notifyWithActivity($data);
             if ($activityID) {
-                $this->setField($ID, array('ActivityID' => $activityID));
+                $this->setField($ID, ['ActivityID' => $activityID]);
                 $event['ActivityID'] = $activityID;
             }
         }
@@ -400,7 +400,7 @@ class WarningModel extends UserNoteModel {
         $alertModel = new UserAlertModel();
         $alert = $alertModel->getID($userID);
         if (!$alert) {
-            $alert = array('UserID' => $userID);
+            $alert = ['UserID' => $userID];
         } else {
             unset($alert['DateInserted']);
         }
@@ -455,10 +455,10 @@ class WarningModel extends UserNoteModel {
      */
     public static function special() {
         if (self::$special === null) {
-            self::$special = array(
-                3 => array('Label' => t('Jail'), 'Title' => t('Jailed users have reduced abilities.')),
-                5 => array('Label' => t('Ban'), 'Title' => t('Banned users can no longer access the site.'))
-            );
+            self::$special = [
+                3 => ['Label' => t('Jail'), 'Title' => t('Jailed users have reduced abilities.')],
+                5 => ['Label' => t('Ban'), 'Title' => t('Banned users can no longer access the site.')]
+            ];
         }
         return self::$special;
     }

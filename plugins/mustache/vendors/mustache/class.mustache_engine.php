@@ -13,7 +13,7 @@ class Mustache_Engine
     const VERSION        = '2.4.1';
     const SPEC_VERSION   = '1.1.2';
     const PRAGMA_FILTERS = 'FILTERS';
-        private $templates = array();
+        private $templates = [];
         private $templateClassPrefix = '__Mustache_';
     private $cache = null;
     private $cacheFileMode = null;
@@ -25,7 +25,7 @@ class Mustache_Engine
     private $charset = 'UTF-8';
     private $logger;
     private $strictCallables = false;
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         if (isset($options['template_class_prefix'])) {
             $this->templateClassPrefix = $options['template_class_prefix'];
@@ -67,7 +67,7 @@ class Mustache_Engine
             $this->strictCallables = $options['strict_callables'];
         }
     }
-    public function render($template, $context = array())
+    public function render($template, $context = [])
     {
         return $this->loadTemplate($template)->render($context);
     }
@@ -105,7 +105,7 @@ class Mustache_Engine
         }
         return $this->partialsLoader;
     }
-    public function setPartials(array $partials = array())
+    public function setPartials(array $partials = [])
     {
         if (!isset($this->partialsLoader)) {
             $this->partialsLoader = new Mustache_Loader_ArrayLoader;
@@ -223,7 +223,7 @@ class Mustache_Engine
                         $this->log(
                 Mustache_Logger::WARNING,
                 'Partial not found: "{name}"',
-                array('name' => $e->getTemplateName())
+                ['name' => $e->getTemplateName()]
             );
         }
     }
@@ -244,7 +244,7 @@ class Mustache_Engine
                         $this->log(
                             Mustache_Logger::DEBUG,
                             'Writing "{className}" class to template cache: "{fileName}"',
-                            array('className' => $className, 'fileName' => $fileName)
+                            ['className' => $className, 'fileName' => $fileName]
                         );
                         $this->writeCacheFile($fileName, $this->compile($source));
                     }
@@ -253,7 +253,7 @@ class Mustache_Engine
                     $this->log(
                         Mustache_Logger::WARNING,
                         'Template cache disabled, evaluating "{className}" class at runtime',
-                        array('className' => $className)
+                        ['className' => $className]
                     );
                     eval('?>'.$this->compile($source));
                 }
@@ -261,7 +261,7 @@ class Mustache_Engine
             $this->log(
                 Mustache_Logger::DEBUG,
                 'Instantiating template: "{className}"',
-                array('className' => $className)
+                ['className' => $className]
             );
             $this->templates[$className] = new $className($this);
         }
@@ -282,7 +282,7 @@ class Mustache_Engine
         $this->log(
             Mustache_Logger::INFO,
             'Compiling template to "{className}" class',
-            array('className' => $name)
+            ['className' => $name]
         );
         return $this->getCompiler()->compile($source, $tree, $name, isset($this->escape), $this->charset, $this->strictCallables, $this->entityFlags);
     }
@@ -299,7 +299,7 @@ class Mustache_Engine
             $this->log(
                 Mustache_Logger::INFO,
                 'Creating Mustache template cache directory: "{dirName}"',
-                array('dirName' => $dirName)
+                ['dirName' => $dirName]
             );
             @mkdir($dirName, 0777, true);
             if (!is_dir($dirName)) {
@@ -309,7 +309,7 @@ class Mustache_Engine
         $this->log(
             Mustache_Logger::DEBUG,
             'Caching compiled template to "{fileName}"',
-            array('fileName' => $fileName)
+            ['fileName' => $fileName]
         );
         $tempFile = tempnam($dirName, basename($fileName));
         if (false !== @file_put_contents($tempFile, $source)) {
@@ -321,12 +321,12 @@ class Mustache_Engine
             $this->log(
                 Mustache_Logger::ERROR,
                 'Unable to rename Mustache temp cache file: "{tempName}" -> "{fileName}"',
-                array('tempName' => $tempFile, 'fileName' => $fileName)
+                ['tempName' => $tempFile, 'fileName' => $fileName]
             );
         }
         throw new Mustache_Exception_RuntimeException(sprintf('Failed to write cache file "%s".', $fileName));
     }
-    private function log($level, $message, array $context = array())
+    private function log($level, $message, array $context = [])
     {
         if (isset($this->logger)) {
             $this->logger->log($level, $message, $context);
@@ -345,8 +345,8 @@ class Mustache_Compiler
     private $pragmas;
     public function compile($source, array $tree, $name, $customEscape = false, $charset = 'UTF-8', $strictCallables = false, $entityFlags = ENT_COMPAT)
     {
-        $this->pragmas         = array();
-        $this->sections        = array();
+        $this->pragmas         = [];
+        $this->sections        = [];
         $this->source          = $source;
         $this->indentNextLine  = true;
         $this->customEscape    = $customEscape;
@@ -523,7 +523,7 @@ class Mustache_Compiler
     {
         $filters = array_map('trim', explode('|', $id));
         $id      = array_shift($filters);
-        return array($id, $this->getFilter($filters, $level));
+        return [$id, $this->getFilter($filters, $level)];
     }
     const FILTER = '
         $filter = $context->%s(%s);
@@ -603,11 +603,11 @@ class Mustache_Compiler
 }
 class Mustache_Context
 {
-    private $stack = array();
+    private $stack = [];
     public function __construct($context = null)
     {
         if ($context !== null) {
-            $this->stack = array($context);
+            $this->stack = [$context];
         }
     }
     public function push($value)
@@ -635,7 +635,7 @@ class Mustache_Context
             if ($value === '') {
                 return $value;
             }
-            $value = $this->findVariableInStack($chunk, array($value));
+            $value = $this->findVariableInStack($chunk, [$value]);
         }
         return $value;
     }
@@ -721,7 +721,7 @@ class Mustache_Exception_UnknownTemplateException extends InvalidArgumentExcepti
 }
 class Mustache_HelperCollection
 {
-    private $helpers = array();
+    private $helpers = [];
     public function __construct($helpers = null)
     {
         if ($helpers !== null) {
@@ -773,7 +773,7 @@ class Mustache_HelperCollection
     }
     public function clear()
     {
-        $this->helpers = array();
+        $this->helpers = [];
     }
     public function isEmpty()
     {
@@ -802,7 +802,7 @@ interface Mustache_Loader
 }
 class Mustache_Loader_ArrayLoader implements Mustache_Loader, Mustache_Loader_MutableLoader
 {
-    public function __construct(array $templates = array())
+    public function __construct(array $templates = [])
     {
         $this->templates = $templates;
     }
@@ -825,9 +825,9 @@ class Mustache_Loader_ArrayLoader implements Mustache_Loader, Mustache_Loader_Mu
 class Mustache_Loader_CascadingLoader implements Mustache_Loader
 {
     private $loaders;
-    public function __construct(array $loaders = array())
+    public function __construct(array $loaders = [])
     {
-        $this->loaders = array();
+        $this->loaders = [];
         foreach ($loaders as $loader) {
             $this->addLoader($loader);
         }
@@ -851,8 +851,8 @@ class Mustache_Loader_FilesystemLoader implements Mustache_Loader
 {
     private $baseDir;
     private $extension = '.mustache';
-    private $templates = array();
-    public function __construct($baseDir, array $options = array())
+    private $templates = [];
+    public function __construct($baseDir, array $options = [])
     {
         $this->baseDir = $baseDir;
         if (strpos($this->baseDir, '://') === -1) {
@@ -920,7 +920,7 @@ class Mustache_Loader_InlineLoader implements Mustache_Loader
     protected function loadTemplates()
     {
         if ($this->templates === null) {
-            $this->templates = array();
+            $this->templates = [];
             $data = file_get_contents($this->fileName, false, null, $this->offset);
             foreach (preg_split("/^@@(?= [\w\d\.]+$)/m", $data, -1) as $chunk) {
                 if (trim($chunk)) {
@@ -953,54 +953,54 @@ interface Mustache_Logger
     const NOTICE    = 'notice';
     const INFO      = 'info';
     const DEBUG     = 'debug';
-    public function emergency($message, array $context = array());
-    public function alert($message, array $context = array());
-    public function critical($message, array $context = array());
-    public function error($message, array $context = array());
-    public function warning($message, array $context = array());
-    public function notice($message, array $context = array());
-    public function info($message, array $context = array());
-    public function debug($message, array $context = array());
-    public function log($level, $message, array $context = array());
+    public function emergency($message, array $context = []);
+    public function alert($message, array $context = []);
+    public function critical($message, array $context = []);
+    public function error($message, array $context = []);
+    public function warning($message, array $context = []);
+    public function notice($message, array $context = []);
+    public function info($message, array $context = []);
+    public function debug($message, array $context = []);
+    public function log($level, $message, array $context = []);
 }
 abstract class Mustache_Logger_AbstractLogger implements Mustache_Logger
 {
-    public function emergency($message, array $context = array())
+    public function emergency($message, array $context = [])
     {
         $this->log(Mustache_Logger::EMERGENCY, $message, $context);
     }
-    public function alert($message, array $context = array())
+    public function alert($message, array $context = [])
     {
         $this->log(Mustache_Logger::ALERT, $message, $context);
     }
-    public function critical($message, array $context = array())
+    public function critical($message, array $context = [])
     {
         $this->log(Mustache_Logger::CRITICAL, $message, $context);
     }
-    public function error($message, array $context = array())
+    public function error($message, array $context = [])
     {
         $this->log(Mustache_Logger::ERROR, $message, $context);
     }
-    public function warning($message, array $context = array())
+    public function warning($message, array $context = [])
     {
         $this->log(Mustache_Logger::WARNING, $message, $context);
     }
-    public function notice($message, array $context = array())
+    public function notice($message, array $context = [])
     {
         $this->log(Mustache_Logger::NOTICE, $message, $context);
     }
-    public function info($message, array $context = array())
+    public function info($message, array $context = [])
     {
         $this->log(Mustache_Logger::INFO, $message, $context);
     }
-    public function debug($message, array $context = array())
+    public function debug($message, array $context = [])
     {
         $this->log(Mustache_Logger::DEBUG, $message, $context);
     }
 }
 class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
 {
-    protected static $levels = array(
+    protected static $levels = [
         self::DEBUG     => 100,
         self::INFO      => 200,
         self::NOTICE    => 250,
@@ -1009,7 +1009,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
         self::CRITICAL  => 500,
         self::ALERT     => 550,
         self::EMERGENCY => 600,
-    );
+    ];
     protected $stream = null;
     protected $url    = null;
     public function __construct($stream, $level = Mustache_Logger::ERROR)
@@ -1038,7 +1038,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
     {
         return $this->level;
     }
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
         if (!array_key_exists($level, self::$levels)) {
             throw new Mustache_Exception_InvalidArgumentException(sprintf('Unexpected logging level: %s', $level));
@@ -1047,7 +1047,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
             $this->writeLog($level, $message, $context);
         }
     }
-    protected function writeLog($level, $message, array $context = array())
+    protected function writeLog($level, $message, array $context = [])
     {
         if (!is_resource($this->stream)) {
             if (!isset($this->url)) {
@@ -1064,7 +1064,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
     {
         return strtoupper($level);
     }
-    protected static function formatLine($level, $message, array $context = array())
+    protected static function formatLine($level, $message, array $context = [])
     {
         return sprintf(
             "%s: %s\n",
@@ -1072,12 +1072,12 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
             self::interpolateMessage($message, $context)
         );
     }
-    protected static function interpolateMessage($message, array $context = array())
+    protected static function interpolateMessage($message, array $context = [])
     {
         if (strpos($message, '{') === false) {
             return $message;
         }
-                $replace = array();
+                $replace = [];
         foreach ($context as $key => $val) {
             $replace['{' . $key . '}'] = $val;
         }
@@ -1088,7 +1088,7 @@ class Mustache_Parser
 {
     private $lineNum;
     private $lineTokens;
-    public function parse(array $tokens = array())
+    public function parse(array $tokens = [])
     {
         $this->lineNum    = -1;
         $this->lineTokens = 0;
@@ -1096,7 +1096,7 @@ class Mustache_Parser
     }
     private function buildTree(array &$tokens, array $parent = null)
     {
-        $nodes = array();
+        $nodes = [];
         while (!empty($tokens)) {
             $token = array_shift($tokens);
             if ($token[Mustache_Tokenizer::LINE] === $this->lineNum) {
@@ -1199,11 +1199,11 @@ abstract class Mustache_Template
     {
         $this->mustache = $mustache;
     }
-    public function __invoke($context = array())
+    public function __invoke($context = [])
     {
         return $this->render($context);
     }
-    public function render($context = array())
+    public function render($context = [])
     {
         return $this->renderInternal($this->prepareContextStack($context));
     }
@@ -1263,7 +1263,7 @@ class Mustache_Tokenizer
     const T_UNESCAPED_2  = '&';
     const T_TEXT         = '_t';
     const T_PRAGMA       = '%';
-        private static $tagTypes = array(
+        private static $tagTypes = [
         self::T_SECTION      => true,
         self::T_INVERTED     => true,
         self::T_END_SECTION  => true,
@@ -1275,12 +1275,12 @@ class Mustache_Tokenizer
         self::T_UNESCAPED    => true,
         self::T_UNESCAPED_2  => true,
         self::T_PRAGMA       => true,
-    );
-        private static $interpolatedTags = array(
+    ];
+        private static $interpolatedTags = [
         self::T_ESCAPED      => true,
         self::T_UNESCAPED    => true,
         self::T_UNESCAPED_2  => true,
-    );
+    ];
         const TYPE   = 'type';
     const NAME   = 'name';
     const OTAG   = 'otag';
@@ -1351,14 +1351,14 @@ class Mustache_Tokenizer
                     break;
                 default:
                     if ($this->tagChange($this->ctag, $text, $i)) {
-                        $this->tokens[] = array(
+                        $this->tokens[] = [
                             self::TYPE  => $this->tagType,
                             self::NAME  => trim($this->buffer),
                             self::OTAG  => $this->otag,
                             self::CTAG  => $this->ctag,
                             self::LINE  => $this->line,
                             self::INDEX => ($this->tagType == self::T_END_SECTION) ? $this->seenTag - strlen($this->otag) : $i + strlen($this->ctag)
-                        );
+                        ];
                         $this->buffer = '';
                         $i += strlen($this->ctag) - 1;
                         $this->state = self::IN_TEXT;
@@ -1387,7 +1387,7 @@ class Mustache_Tokenizer
         $this->tagType   = null;
         $this->tag       = null;
         $this->buffer    = '';
-        $this->tokens    = array();
+        $this->tokens    = [];
         $this->seenTag   = false;
         $this->line      = 0;
         $this->otag      = '{{';
@@ -1396,11 +1396,11 @@ class Mustache_Tokenizer
     private function flushBuffer()
     {
         if (!empty($this->buffer)) {
-            $this->tokens[] = array(
+            $this->tokens[] = [
                 self::TYPE  => self::T_TEXT,
                 self::LINE  => $this->line,
                 self::VALUE => $this->buffer
-            );
+            ];
             $this->buffer   = '';
         }
     }
@@ -1412,21 +1412,21 @@ class Mustache_Tokenizer
         list($otag, $ctag) = explode(' ', trim(substr($text, $startIndex, $closeIndex - $startIndex)));
         $this->otag = $otag;
         $this->ctag = $ctag;
-        $this->tokens[] = array(
+        $this->tokens[] = [
             self::TYPE => self::T_DELIM_CHANGE,
             self::LINE => $this->line,
-        );
+        ];
         return $closeIndex + strlen($close) - 1;
     }
     private function addPragma($text, $index)
     {
         $end    = strpos($text, $this->ctag, $index);
         $pragma = trim(substr($text, $index + 2, $end - $index - 2));
-                array_unshift($this->tokens, array(
+                array_unshift($this->tokens, [
             self::TYPE => self::T_PRAGMA,
             self::NAME => $pragma,
             self::LINE => 0,
-        ));
+        ]);
         return $end + strlen($this->ctag) - 1;
     }
     private function tagChange($tag, $text, $index)

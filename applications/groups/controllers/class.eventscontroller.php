@@ -57,7 +57,7 @@ class EventsController extends Gdn_Controller {
      */
     public function events($Context = null, $ContextID = null) {
         $EventModel = new EventModel();
-        $EventCriteria = array();
+        $EventCriteria = [];
 
         // Determine context
         switch ($Context) {

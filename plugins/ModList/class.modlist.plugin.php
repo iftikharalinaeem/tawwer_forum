@@ -15,7 +15,7 @@ class ModListPlugin extends Gdn_Plugin {
     * Cached list of moderators per category
     * @var array
     */
-   protected static $CategoryModerators = array();
+   protected static $CategoryModerators = [];
 
    /**
     * Length of time to cache per-category moderator lists
@@ -66,13 +66,13 @@ class ModListPlugin extends Gdn_Plugin {
 
       // Search for moderators
       $Query = GetIncomingValue('q');
-      $Data = array();
+      $Data = [];
       $Database = Gdn::Database();
       if ($Query) {
          $Test = Gdn::SQL()->Limit(1)->Get('User')->FirstRow(DATASET_TYPE_ARRAY);
          $UserData = Gdn::SQL()->Select('UserID, Name')->From('User')->Like('Name', $Query, 'right')->Limit(20)->Get();
          foreach ($UserData as $User) {
-            $Data[] = array('id' => $User->UserID, 'name' => $User->Name);
+            $Data[] = ['id' => $User->UserID, 'name' => $User->Name];
          }
       }
 
@@ -106,7 +106,7 @@ class ModListPlugin extends Gdn_Plugin {
 
       // Check database
 
-      $CategoryIDs = array($CategoryID);
+      $CategoryIDs = [$CategoryID];
 
       // Walk category ancestors
       if ($Cascade) {
@@ -121,13 +121,13 @@ class ModListPlugin extends Gdn_Plugin {
          ->WhereIn('CategoryID', $CategoryIDs)
          ->Get()->ResultArray();
 
-      Gdn::UserModel()->JoinUsers($Moderators, array('UserID'));
+      Gdn::UserModel()->JoinUsers($Moderators, ['UserID']);
 
       // Cache it
       self::$CategoryModerators[$LocalKey] = $Moderators;
-      Gdn::Cache()->Store($ModeratorCacheKey, $Moderators, array(
+      Gdn::Cache()->Store($ModeratorCacheKey, $Moderators, [
          Gdn_Cache::FEATURE_EXPIRY  => $this->CacheDelay
-      ));
+      ]);
 
       return $Moderators;
    }
@@ -140,9 +140,9 @@ class ModListPlugin extends Gdn_Plugin {
 
       $CategoryID = $Sender->Data('CategoryID');
       $ExistingModerators = $this->Moderators($CategoryID, FALSE);
-      $PrePopulate = array();
+      $PrePopulate = [];
       foreach ($ExistingModerators as $ExistingModerator)
-         $PrePopulate[] = array('id' => $ExistingModerator['UserID'], 'name' => $ExistingModerator['Name']);
+         $PrePopulate[] = ['id' => $ExistingModerator['UserID'], 'name' => $ExistingModerator['Name']];
       $PrePopulate = json_encode($PrePopulate);
 
       $Sender->AddCssFile('token-input.css', 'plugins/ModList');
@@ -183,21 +183,21 @@ class ModListPlugin extends Gdn_Plugin {
       $ModeratorListEnabled = $Sender->Form->GetValue('CategoryModerators');
 
       // Clear db
-      Gdn::SQL()->Delete('CategoryModerator', array(
+      Gdn::SQL()->Delete('CategoryModerator', [
          'CategoryID'   => $CategoryID
-      ));
+      ]);
 
       // Wipe all mods for category
       if ($ModeratorListEnabled) {
 
          $Moderators = $Sender->Form->GetValue('Moderators');
          $Moderators = explode(',', $Moderators);
-         $InsertModerators = array();
+         $InsertModerators = [];
          foreach ($Moderators as $ModeratorID) {
-            $InsertModerators[] = array(
+            $InsertModerators[] = [
                'UserID'       => $ModeratorID,
                'CategoryID'   => $CategoryID
-            );
+            ];
          }
          Gdn::SQL()->Insert('CategoryModerator', $InsertModerators);
 

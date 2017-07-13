@@ -10,17 +10,17 @@ if ($post) {
     echo formatQuote($post);
 }
 
-if (count($this->data('WarningTypes', array())) <= 1) {
-    foreach ($this->data('WarningTypes', array()) as $Row) {
-        echo $this->Form->hidden('WarningTypeID', array('value' => $Row['WarningTypeID']));
+if (count($this->data('WarningTypes', [])) <= 1) {
+    foreach ($this->data('WarningTypes', []) as $Row) {
+        echo $this->Form->hidden('WarningTypeID', ['value' => $Row['WarningTypeID']]);
     }
 } else {
 ?>
     <div class="P">
     <?php
-    echo $this->Form->label('Severity', 'WarningTypeID', array('class' => 'B'));
+    echo $this->Form->label('Severity', 'WarningTypeID', ['class' => 'B']);
 
-    foreach ($this->data('WarningTypes', array()) as $Row) {
+    foreach ($this->data('WarningTypes', []) as $Row) {
        $Points = plural($Row['Points'], '%s point', '%s points');
        if ($Row['ExpireNumber']) {
            $Expires = sprintf(t('lasts %s'), plural($Row['ExpireNumber'], '%s '.rtrim($Row['ExpireType'], 's'), '%s '.$Row['ExpireType']));
@@ -29,7 +29,7 @@ if (count($this->data('WarningTypes', array())) <= 1) {
        }
 
        echo '<div class="WarningType">'.
-          $this->Form->radio('WarningTypeID', $Row['Name'], array('value' => $Row['WarningTypeID'])).
+          $this->Form->radio('WarningTypeID', $Row['Name'], ['value' => $Row['WarningTypeID']]).
 
           ' <span class="Gloss">'.
           $Points;
@@ -50,15 +50,15 @@ if (count($this->data('WarningTypes', array())) <= 1) {
 
 <div class="P">
 <?php
-echo $this->Form->label("Message to User", 'Body', array('class' => 'B'));
+echo $this->Form->label("Message to User", 'Body', ['class' => 'B']);
 echo $this->Form->bodyBox('Body');
 ?>
 </div>
 
 <div class="P">
 <?php
-echo $this->Form->label("Private Note for Moderators", 'ModeratorNote', array('class' => 'B'));
-echo $this->Form->textBox('ModeratorNote', array('Wrap' => true));
+echo $this->Form->label("Private Note for Moderators", 'ModeratorNote', ['class' => 'B']);
+echo $this->Form->textBox('ModeratorNote', ['Wrap' => true]);
 ?>
 </div>
 
@@ -73,7 +73,7 @@ echo $this->Form->checkBox('AttachRecord', '@'.sprintf(t('Attach this warning to
 <?php
 echo '<div class="Buttons Buttons-Confirm">',
    $this->Form->button('OK'), ' ',
-   $this->Form->button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
+   $this->Form->button('Cancel', ['type' => 'button', 'class' => 'Button Close']),
    '</div>';
 echo $this->Form->close();
 ?>

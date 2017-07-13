@@ -11,18 +11,18 @@
 
          echo '<div class="'.$ListClass.'">'."\n";
          foreach ($this->Data('Moderators') as $User) {
-            $WrapClass = array('CategoryModeratorWrap', 'UserPicture');
+            $WrapClass = ['CategoryModeratorWrap', 'UserPicture'];
 
             if (!$User['Photo'] && !function_exists('UserPhotoDefaultUrl'))
                $User['Photo'] = Asset('/applications/dashboard/design/images/usericon.gif', TRUE);
 
             $WrapClass = implode(' ', $WrapClass);
             echo " <span class=\"{$WrapClass}\">";
-            echo UserPhoto($User, array('Size' => 'Small'));
+            echo UserPhoto($User, ['Size' => 'Small']);
 
             $UserName = GetValue('Name', $User, FALSE);
             if ($UserName)
-               echo ' '.UserAnchor($User, 'Username CategoryModeratorName', array('title' => $UserName));
+               echo ' '.UserAnchor($User, 'Username CategoryModeratorName', ['title' => $UserName]);
             echo '</span> ';
          }
          echo '</div>'."\n";
@@ -31,7 +31,7 @@
 
          echo '<ul class="PanelInfo">'."\n";
          foreach ($this->Data('Moderators') as $User) {
-            $WrapClass = array('CategoryModeratorWrap', 'UserLink');
+            $WrapClass = ['CategoryModeratorWrap', 'UserLink'];
 
             $WrapClass = implode(' ', $WrapClass);
             echo "<li class=\"{$WrapClass}\">".UserAnchor($User)."</li>\n";

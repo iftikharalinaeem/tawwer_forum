@@ -6,7 +6,7 @@ $statusExists = Gdn::Structure()->TableExists();
 Gdn::structure()
     ->table('Status')
     ->primaryKey('StatusID')
-    ->column('Name', 'varchar(100)', false, array('unique'))
+    ->column('Name', 'varchar(100)', false, ['unique'])
     ->column('State', ['Open', 'Closed'])
     ->column('TagID', 'int', true)
     ->column('IsDefault', 'tinyint')

@@ -9,16 +9,16 @@
     <div class="P">
         <?php
 //        $this->Form = new Gdn_Form();
-        echo '<div>'.$this->Form->dropDown('Status', $this->data('Statuses'), array('Default' => $this->data('CurrentStatusID'), 'list' => true)).'</div>';
+        echo '<div>'.$this->Form->dropDown('Status', $this->data('Statuses'), ['Default' => $this->data('CurrentStatusID'), 'list' => true]).'</div>';
         echo '<div>'.t('Add an explanation.').'</div>';
-        echo $this->Form->textbox('StatusNotes', array('Multiline' => true, 'value' => $this->data('StatusNotes')));
+        echo $this->Form->textbox('StatusNotes', ['Multiline' => true, 'value' => $this->data('StatusNotes')]);
         ?>
     </div>
 
     <?php
     echo '<div class="Buttons Buttons-Confirm">',
     $this->Form->button(t('OK')), ' ',
-    $this->Form->button(t('Cancel'), array('type' => 'button', 'class' => 'Button Close')),
+    $this->Form->button(t('Cancel'), ['type' => 'button', 'class' => 'Button Close']),
     '</div>';
     echo $this->Form->close();
     ?>

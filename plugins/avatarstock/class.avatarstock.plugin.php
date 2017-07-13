@@ -104,12 +104,12 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
         Gdn::SQL()->Put(
             'AvatarStock',
-            array(
+            [
                 'Deleted' => 1
-            ),
-            array(
+            ],
+            [
                 'AvatarID' => $avatar_ids
-            )
+            ]
         );
 
         return count($avatar_ids);
@@ -173,13 +173,13 @@ class AvatarStockPlugin extends Gdn_Plugin {
      * Get payload of avatar stock photos for view.
      */
     public function getStockAvatarPayload() {
-        $stock_avatar_payload = array();
+        $stock_avatar_payload = [];
         $avatarstock_model = new Gdn_Model('AvatarStock');
 
         $payload = $avatarstock_model->GetWhere(
-            array(
+            [
                 'Deleted' => 0
-            )
+            ]
         )->ResultArray();
 
         $total_stock_images = count($payload);
@@ -273,9 +273,9 @@ class AvatarStockPlugin extends Gdn_Plugin {
                 $path_thumb_p,
                 C('Garden.Profile.MaxHeight'),
                 C('Garden.Profile.MaxWidth'),
-                array(
+                [
                     'SaveGif' => C('Garden.Thumbnail.SaveGif')
-                )
+                ]
             );
 
             // Create n thumbnail (cropped)
@@ -285,10 +285,10 @@ class AvatarStockPlugin extends Gdn_Plugin {
                 $path_thumb_n,
                 $crop_dimensions,
                 $crop_dimensions,
-                array(
+                [
                     'Crop' => true,
                     'SaveGif' => C('Garden.Thumbnail.SaveGif')
-                )
+                ]
             );
 
             // Generate correct save path for db
@@ -298,14 +298,14 @@ class AvatarStockPlugin extends Gdn_Plugin {
             // Insert into DB
             $avatarstock_model = new Gdn_Model('AvatarStock');
             $avatar_id = $avatarstock_model->Save(
-                array(
+                [
                     'Name' => val('name', $post, NULL),
                     'OriginalFileName' => $original_filename,
                     'Path' => $path_thumb_db,
                     'InsertUserID' => Gdn::Session()->UserID,
                     'TimestampAdded' => time(),
                     'Deleted' => 0 // Change default to 0 to make active.
-                )
+                ]
             );
 
             if ($avatar_id) {
@@ -346,11 +346,11 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
         // Permission checks
         $sender->Permission(
-            array(
+            [
                 'Garden.Profiles.Edit',
                 'Moderation.Profiles.Edit',
                 'Garden.ProfilePicture.Edit'
-            ),
+            ],
             false
         );
         $session = Gdn::Session();
@@ -390,17 +390,17 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
                         // Get avatar stock data
                         $avatarstock_row = $avatarstock_model->GetWhere(
-                            array(
+                            [
                                 'AvatarID' => $avatar_id
-                            )
+                            ]
                         )->FirstRow(DATASET_TYPE_ARRAY);
 
                         $user_photo = $avatarstock_row['Path'];
 
                         // Save it to User table
                         if (!$user_model->Save(
-                            array('UserID' => $user_id, 'Photo' => $user_photo),
-                            array('CheckExisting' => true)
+                            ['UserID' => $user_id, 'Photo' => $user_photo],
+                            ['CheckExisting' => true]
                         )
                         ) {
                             $sender->Form->SetValidationResults(
@@ -417,10 +417,10 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
                 // Only admins and users with the custom permission can upload
                 // their own avatars.
-                $sender->Permission(array(
+                $sender->Permission([
                     'Garden.Settings.Manage',
                     'AvatarPool.CustomUpload.Allow'
-                ), false);
+                ], false);
 
                 // Generate the target image name.
                 $TargetImage = $UploadImage->GenerateTargetName(PATH_UPLOADS, '', TRUE);
@@ -436,7 +436,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
                     "userpics/$Subdir/p$Basename",
                     C('Garden.Profile.MaxHeight'),
                     C('Garden.Profile.MaxWidth'),
-                    array('SaveGif' => C('Garden.Thumbnail.SaveGif'))
+                    ['SaveGif' => C('Garden.Thumbnail.SaveGif')]
                 );
                 $UserPhoto = sprintf($Props['SaveFormat'], "userpics/$Subdir/$Basename");
 
@@ -447,12 +447,12 @@ class AvatarStockPlugin extends Gdn_Plugin {
                     "userpics/$Subdir/n$Basename",
                     $ThumbSize,
                     $ThumbSize,
-                    array('Crop' => TRUE, 'SaveGif' => C('Garden.Thumbnail.SaveGif'))
+                    ['Crop' => TRUE, 'SaveGif' => C('Garden.Thumbnail.SaveGif')]
                 );
 
                 // If there were no errors, associate the image with the user
                 if ($sender->Form->ErrorCount() == 0) {
-                    if (!$user_model->Save(array('UserID' => $sender->User->UserID, 'Photo' => $UserPhoto), array('CheckExisting' => TRUE))) {
+                    if (!$user_model->Save(['UserID' => $sender->User->UserID, 'Photo' => $UserPhoto], ['CheckExisting' => TRUE])) {
                         $sender->Form->SetValidationResults($user_model->ValidationResults());
                     } else {
                         $sender->User->Photo = $UserPhoto;
@@ -496,9 +496,9 @@ class AvatarStockPlugin extends Gdn_Plugin {
                 // there really won't be a lot of stock photos to choose from,
                 // it's probably okay to do where against the path.
                 $relevant_stockavatar_row = $avatarstock_model->GetWhere(
-                    array(
+                    [
                         'Path' => $current_user_photo
-                    )
+                    ]
                 )->FirstRow(DATASET_TYPE_ARRAY);
 
                 if (!empty($relevant_stockavatar_row['AvatarID'])) {

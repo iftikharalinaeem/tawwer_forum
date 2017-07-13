@@ -26,12 +26,12 @@ class BuzzModel {
 
         $ModIn = '('.implode(',', $ModUserIDs).')';
 
-        $Result = array(
+        $Result = [
             'SlotType' => $Slot,
             'DateFrom' => $SlotRange[0],
             'DateTo' => $SlotRange[1],
             'Slot' => $SlotString
-        );
+        ];
 
         // New Users.
         $Result['CountUsers'] = Gdn::SQL()->GetCount('User', self::RangeWhere($SlotRange));
@@ -127,7 +127,7 @@ class BuzzModel {
             $Tags = explode(',', $Tags);
         }
 
-        $CustomConfig = array();
+        $CustomConfig = [];
         $i = 1;
         foreach ($Tags as $Tag) {
             $CustomConfig['Custom'.$i] = $Tag;
@@ -136,7 +136,7 @@ class BuzzModel {
 
         $SlotRange = $this->SlotRange;
         $TagRows = Gdn::SQL()->WhereIn('Name', $Tags)->Get('Tag')->ResultArray();
-        $TagRows = Gdn_DataSet::Index($TagRows, array('Name'));
+        $TagRows = Gdn_DataSet::Index($TagRows, ['Name']);
         $TagIDs = array_column($TagRows, 'TagID');
 
         // Get all of the tag stats.
@@ -148,7 +148,7 @@ class BuzzModel {
             ->Where(self::RangeWhere($SlotRange))
             ->GroupBy('TagID')
             ->Get()->ResultArray();
-        $TagCounts = Gdn_DataSet::Index($TagCounts, array('TagID'));
+        $TagCounts = Gdn_DataSet::Index($TagCounts, ['TagID']);
 
         array_change_key_case($TagRows);
         foreach ($CustomConfig as $Field => $Tag) {
@@ -222,7 +222,7 @@ class BuzzModel {
     }
 
     protected static function RangeWhere($Range, $FieldName = 'DateInserted') {
-        return array("$FieldName >=" => $Range[0], "$FieldName <" => $Range[1]);
+        return ["$FieldName >=" => $Range[0], "$FieldName <" => $Range[1]];
     }
 
     /**
@@ -247,21 +247,21 @@ class BuzzModel {
         $Result = NULL;
         switch ($Slot) {
             case 'd':
-                $Result = array(Gdn_Format::ToDateTime($Timestamp), Gdn_Format::ToDateTime(strtotime('+1 day', $Timestamp)));
+                $Result = [Gdn_Format::ToDateTime($Timestamp), Gdn_Format::ToDateTime(strtotime('+1 day', $Timestamp))];
                 break;
             case 'w':
                 $Sub = gmdate('N', $Timestamp) - 1;
                 $Add = 7 - $Sub;
-                $Result = array(Gdn_Format::ToDateTime(strtotime("-$Sub days", $Timestamp)), Gdn_Format::ToDateTime(strtotime("+$Add days", $Timestamp)));
+                $Result = [Gdn_Format::ToDateTime(strtotime("-$Sub days", $Timestamp)), Gdn_Format::ToDateTime(strtotime("+$Add days", $Timestamp))];
                 break;
             case 'm':
                 $Sub = gmdate('j', $Timestamp) - 1;
                 $Timestamp = strtotime("-$Sub days", $Timestamp);
-                $Result = array(Gdn_Format::ToDateTime($Timestamp), Gdn_Format::ToDateTime(strtotime("+1 month", $Timestamp)));
+                $Result = [Gdn_Format::ToDateTime($Timestamp), Gdn_Format::ToDateTime(strtotime("+1 month", $Timestamp))];
                 break;
             case 'y':
                 $Timestamp = strtotime(date('Y-01-01', $Timestamp));
-                $Result = array(Gdn_Format::ToDate($Timestamp), Gdn_Format::ToDateTime(strtotime("+1 year", $Timestamp)));
+                $Result = [Gdn_Format::ToDate($Timestamp), Gdn_Format::ToDateTime(strtotime("+1 year", $Timestamp))];
                 break;
         }
 

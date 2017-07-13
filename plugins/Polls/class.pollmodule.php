@@ -100,7 +100,7 @@ class PollModule extends Gdn_Module {
      */
     public function getPollOptions($pollID) {
         $pollOptionModel = new Gdn_Model('PollOption');
-        return $pollOptionModel->getWhere(array('PollID' => $pollID), 'Sort', 'asc')->resultArray();
+        return $pollOptionModel->getWhere(['PollID' => $pollID], 'Sort', 'asc')->resultArray();
     }
 
     /**
@@ -122,7 +122,7 @@ class PollModule extends Gdn_Module {
         }
 
         // Build the result set to deliver to the page
-        $pollOptions = array();
+        $pollOptions = [];
         foreach ($optionData as $option) {
             if (!$anonymous) {
                 $votes = val($option['PollOptionID'], $voteData, []);
@@ -154,12 +154,12 @@ class PollModule extends Gdn_Module {
                 $ID = $option['PollOptionID'];
                 $optionVotes = Gdn::sql()->getWhere(
                     'PollVote',
-                    array('PollOptionID' => $ID),
+                    ['PollOptionID' => $ID],
                     '', '',
                     $this->MaxVoteUsers)->resultArray();
 
                 // Join the users.
-                Gdn::userModel()->joinUsers($optionVotes, array('UserID'));
+                Gdn::userModel()->joinUsers($optionVotes, ['UserID']);
                 $votes[$ID] = $optionVotes;
             }
         }

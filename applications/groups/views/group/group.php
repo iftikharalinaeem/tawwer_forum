@@ -14,7 +14,7 @@ if (GroupPermission('View')) {
     $eventList = new EventListModule($this->data('Events'), t('Upcoming Events'), t('GroupEmptyEvents', "Aw snap, no events are coming up."));
     if (GroupPermission('Member', $this->data('Group')) || GroupPermission('Moderate', $this->data('Group'))) {
         $eventList->addNewEventButton(val('GroupID', $this->data('Group')));
-        $eventList->showMore(url(combinePaths(array("/events/group/", GroupSlug($this->data('Group'))))));
+        $eventList->showMore(url(combinePaths(["/events/group/", GroupSlug($this->data('Group'))])));
     }
     echo $eventList;
     echo '<div class="Group-Info ClearFix clearfix">';

@@ -21,7 +21,7 @@ class CommentImporterPlugin extends Gdn_Plugin {
     public function ImportController_Comments_Create($Sender) {
         $Sender->Permission('Garden.Settings.Manage');
 
-        $AllowedTypes = array('wordpres' => T('Wordpress'), 'disqus' => T('Disqus'));
+        $AllowedTypes = ['wordpres' => T('Wordpress'), 'disqus' => T('Disqus')];
         $Form = new Gdn_Form();
         $Form->InputPrefix = '';
 

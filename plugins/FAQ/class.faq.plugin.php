@@ -21,7 +21,7 @@ class FAQPlugin extends Gdn_Plugin {
       $CategoryModel = new CategoryModel();
       $CategoryData = $CategoryModel->GetSubTree($FAQCategoryID);
       $Sender->SetData('CategoryData', $CategoryData);
-      $CategoryIDs = array();
+      $CategoryIDs = [];
       foreach ($CategoryData as $Category) {
          $CategoryIDs[] = GetValue('CategoryID', $Category);
       }

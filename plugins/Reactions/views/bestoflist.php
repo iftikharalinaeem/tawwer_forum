@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 require_once Gdn::Controller()->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
-foreach ($this->Data('Data', array()) as $Row): 
+foreach ($this->Data('Data', []) as $Row): 
    $this->SetData('Record', $Row);
    $Body = Gdn_Format::To($Row['Body'], $Row['Format']);
    $CssClass = 'Item';
@@ -13,7 +13,7 @@ foreach ($this->Data('Data', array()) as $Row):
             if ($Name = GetValue('Name', $Row)) {
                echo Wrap(
                   Anchor(Gdn_Format::Text($Name), $Row['Url']),
-                  'h3', array('class' => 'Title'));
+                  'h3', ['class' => 'Title']);
             }
             ?>
             <div class="Body Message">
@@ -29,8 +29,8 @@ foreach ($this->Data('Data', array()) as $Row):
             <div class="AuthorWrap">
                <span class="Author">
                   <?php
-                  echo UserPhoto($Row, array('Px' => 'Insert'));
-                  echo UserAnchor($Row, array('Px' => 'Insert'));
+                  echo UserPhoto($Row, ['Px' => 'Insert']);
+                  echo UserAnchor($Row, ['Px' => 'Insert']);
                   ?>
                </span>
             </div>

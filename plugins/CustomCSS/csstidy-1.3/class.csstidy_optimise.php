@@ -380,7 +380,7 @@ class csstidy_optimise
         }
         else
         {
-            $temp = array($subvalue);
+            $temp = [$subvalue];
         }
         for ($l = 0; $l < count($temp); $l++)
         {
@@ -454,7 +454,7 @@ class csstidy_optimise
             $newsel = '';
 
             // Check if properties also exist in another selector
-            $keys = array();
+            $keys = [];
             // PHP bug (?) without $css = $array; here
             foreach($css as $selector => $vali)
             {
@@ -510,7 +510,7 @@ class csstidy_optimise
         $values = explode(' ',$value);
 
 
-        $return = array();
+        $return = [];
         if(count($values) == 4)
         {
             for($i=0;$i<4;$i++)
@@ -555,7 +555,7 @@ class csstidy_optimise
         $status = 'st';
         $to = '';
 
-        $output = array();
+        $output = [];
         $num = 0;
         for($i = 0, $len = strlen($string);$i < $len; $i++)
         {
@@ -594,7 +594,7 @@ class csstidy_optimise
         }
         else
         {
-            return array($output);
+            return [$output];
         }
     }
 
@@ -649,13 +649,13 @@ class csstidy_optimise
     function dissolve_short_bg($str_value)
     {
         $background_prop_default =& $GLOBALS['csstidy']['background_prop_default'];
-        $repeat = array('repeat','repeat-x','repeat-y','no-repeat','space');
-        $attachment = array('scroll','fixed','local');
-        $clip = array('border','padding');
-        $origin = array('border','padding','content');
-        $pos = array('top','center','bottom','left','right');
+        $repeat = ['repeat','repeat-x','repeat-y','no-repeat','space'];
+        $attachment = ['scroll','fixed','local'];
+        $clip = ['border','padding'];
+        $origin = ['border','padding','content'];
+        $pos = ['top','center','bottom','left','right'];
         $important = '';
-        $return = array('background-image' => NULL,'background-size' => NULL,'background-repeat' => NULL,'background-position' => NULL,'background-attachment'=>NULL,'background-clip' => NULL,'background-origin' => NULL,'background-color' => NULL);
+        $return = ['background-image' => NULL,'background-size' => NULL,'background-repeat' => NULL,'background-position' => NULL,'background-attachment'=>NULL,'background-clip' => NULL,'background-origin' => NULL,'background-color' => NULL];
 
         if(csstidy::is_important($str_value))
         {

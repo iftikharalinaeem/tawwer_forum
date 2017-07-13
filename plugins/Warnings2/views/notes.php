@@ -7,7 +7,7 @@ $IsPrivileged = $this->data('IsPrivileged');
 
 <ul class="DataList DataList-Notes">
    <?php
-   foreach ($this->data('Notes', array()) as $Row):
+   foreach ($this->data('Notes', []) as $Row):
       $Row['Privileged'] = $IsPrivileged;
    ?>
    <li id="UserNote_<?php echo $Row['UserNoteID']; ?>" class="Item Item-Row <?php echo 'UserNote-'.$Row['Type'] ?>">
@@ -22,9 +22,9 @@ $IsPrivileged = $this->data('IsPrivileged');
                 <div class="Options">
                    <?php
                    if ($IsPrivileged):
-                      echo anchor(t('edit'), '/profile/note?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => t('Edit'))).
+                      echo anchor(t('edit'), '/profile/note?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', ['title' => t('Edit')]).
                          bullet(' ').
-                         anchor(t('delete'), '/profile/deletenote?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', array('title' => t('Delete')));
+                         anchor(t('delete'), '/profile/deletenote?noteid='.$Row['UserNoteID'], 'OptionsLink Popup', ['title' => t('Delete')]);
                    endif;
                    ?>
                 </div>
@@ -41,10 +41,10 @@ $IsPrivileged = $this->data('IsPrivileged');
       </div>
       <div class="Item-Col Item-Col3 User-Col">
          <div class="Media">
-            <?php echo userPhoto($Row, array('LinkClass' => 'Img', 'Px' => 'Insert')); ?>
+            <?php echo userPhoto($Row, ['LinkClass' => 'Img', 'Px' => 'Insert']); ?>
             <div class="Media-Body">
                <?php
-               echo '<div>'.userAnchor($Row, '', array('Px' => 'Insert')).'</div> ';
+               echo '<div>'.userAnchor($Row, '', ['Px' => 'Insert']).'</div> ';
                echo '<div class="Meta">'.Gdn_Format::date($Row['DateInserted'], 'html').'</div>';
                ?>
             </div>
@@ -64,6 +64,6 @@ $IsPrivileged = $this->data('IsPrivileged');
 </ul>
 
 <?php
-   PagerModule::write(array('CurrentRecords' => count($this->data('Notes', array()))));
+   PagerModule::write(['CurrentRecords' => count($this->data('Notes', []))]);
 ?>
 </div>

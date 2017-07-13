@@ -10,7 +10,7 @@ echo $this->Form->errors();
         <li><?php
             echo $this->Form->label(t('Forbidden words'), 'KeywordBlocker.Words');
             echo wrap(t('Separate each word with a semi-colon ";"'), 'p');
-            echo $this->Form->textBox('KeywordBlocker.Words', array('MultiLine' => true));
+            echo $this->Form->textBox('KeywordBlocker.Words', ['MultiLine' => true]);
             ?></li>
     </ul>
 <?php echo $this->Form->close('Save');

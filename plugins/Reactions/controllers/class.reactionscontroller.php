@@ -208,7 +208,7 @@ class ReactionsController extends DashboardController {
      * @throws Exception
      */
     public function log($Type, $ID) {
-        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Reactions.Edit'), false);
+        $this->permission(['Garden.Moderation.Manage', 'Moderation.Reactions.Edit'], false);
         $Type = ucfirst($Type);
 
         $ReactionModel = new ReactionModel();

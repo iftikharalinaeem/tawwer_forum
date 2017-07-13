@@ -13,7 +13,7 @@ echo $this->Form->Errors();
 
       <li class="Description row form-group">
          <?php echo $this->Form->labelWrap('Description'); ?>
-         <?php echo $this->Form->textBoxWrap('Description', array('Table' => 'Reaction', 'MultiLine' => true)); ?>
+         <?php echo $this->Form->textBoxWrap('Description', ['Table' => 'Reaction', 'MultiLine' => true]); ?>
       </li>
 
       <li class="Class row form-group">

@@ -14,7 +14,7 @@
  */
 class Mustache_Context
 {
-    private $stack = array();
+    private $stack = [];
 
     /**
      * Mustache rendering Context constructor.
@@ -24,7 +24,7 @@ class Mustache_Context
     public function __construct($context = null)
     {
         if ($context !== null) {
-            $this->stack = array($context);
+            $this->stack = [$context];
         }
     }
 
@@ -114,7 +114,7 @@ class Mustache_Context
                 return $value;
             }
 
-            $value = $this->findVariableInStack($chunk, array($value));
+            $value = $this->findVariableInStack($chunk, [$value]);
         }
 
         return $value;

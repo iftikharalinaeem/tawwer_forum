@@ -42,7 +42,7 @@ class BadgeModel extends Gdn_Model {
         if (isset($Badge['Attributes']) && !empty($Badge['Attributes'])) {
             $Badge['Attributes'] = dbdecode($Badge['Attributes']);
         } else {
-            $Badge['Attributes'] = array();
+            $Badge['Attributes'] = [];
         }
 
         if ($Badge['Photo'] != '') {
@@ -70,7 +70,7 @@ class BadgeModel extends Gdn_Model {
      * @return array Filtered badge list.
      */
     public static function filterByClass($Badges) {
-        $FilteredBadges = array();
+        $FilteredBadges = [];
 
         foreach ($Badges as $Badge) {
             $Class = val('Class', $Badge);
@@ -99,7 +99,7 @@ class BadgeModel extends Gdn_Model {
      * @return Dataset
      */
     public function getByType($Type) {
-        $Result = $this->getWhere(array('Type' => $Type), 'Threshold', 'desc')->resultArray();
+        $Result = $this->getWhere(['Type' => $Type], 'Threshold', 'desc')->resultArray();
         $this->calculate($Result);
         return $Result;
     }
@@ -118,7 +118,7 @@ class BadgeModel extends Gdn_Model {
         if (is_numeric($Badge)) {
             $Result = parent::getID($Badge, DATASET_TYPE_ARRAY);
         } elseif (is_string($Badge)) {
-            $Result = $this->getWhere(array('Slug' => $Badge))->firstRow(DATASET_TYPE_ARRAY);
+            $Result = $this->getWhere(['Slug' => $Badge])->firstRow(DATASET_TYPE_ARRAY);
         } elseif (is_array($Badge)) {
             $Result = $Badge;
         } else {

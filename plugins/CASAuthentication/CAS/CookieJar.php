@@ -102,18 +102,18 @@ class CAS_CookieJar
     public function getCookies ($request_url)
     {
         if (!count($this->_cookies)) {
-            return array();
+            return [];
         }
 
         // If our request URL can't be parsed, no cookies apply.
         $target = parse_url($request_url);
         if ($target === false) {
-            return array();
+            return [];
         }
 
         $this->expireCookies();
 
-        $matching_cookies = array();
+        $matching_cookies = [];
         foreach ($this->_cookies as $key => $cookie) {
             if ($this->cookieMatchesTarget($cookie, $target)) {
                 $matching_cookies[$cookie['name']] = $cookie['value'];
@@ -136,7 +136,7 @@ class CAS_CookieJar
     protected function parseCookieHeaders( $header, $defaultDomain )
     {
         phpCAS::traceBegin();
-        $cookies = array();
+        $cookies = [];
         foreach ( $header as $line ) {
             if ( preg_match('/^Set-Cookie2?: /i', $line)) {
                 $cookies[] = $this->parseCookieHeader($line, $defaultDomain);
@@ -167,11 +167,11 @@ class CAS_CookieJar
         }
 
         // Set our default values
-        $cookie = array(
+        $cookie = [
             'domain' => $defaultDomain,
             'path' => '/',
             'secure' => false,
-        );
+        ];
 
         $line = preg_replace('/^Set-Cookie2?: /i', '', trim($line));
 

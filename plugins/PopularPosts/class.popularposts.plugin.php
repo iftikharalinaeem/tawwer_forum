@@ -36,9 +36,9 @@ class PopularPostsPlugin extends Gdn_Plugin {
 
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
-        $configurationModel->setField(array(
+        $configurationModel->setField([
             'PopularPosts.MaxAge' => '30',
-        ));
+        ]);
 
         $sender->Form->setModel($configurationModel);
 

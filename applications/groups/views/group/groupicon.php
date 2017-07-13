@@ -4,7 +4,7 @@
 <?php
 $thumbnailSize = $this->data('thumbnailSize');
 $icon = $crop = '';
-echo $this->Form->open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->open(['enctype' => 'multipart/form-data']);
 echo $this->Form->errors();
 ?>
 <?php
@@ -14,14 +14,14 @@ if ($crop = $this->data('crop')) {
 elseif ($icon = $this->data('icon')) { ?>
     <div class="icons">
         <div class="Padded current-icon">
-            <?php echo img($this->data('icon'), array('style' => 'width: '.$thumbnailSize.'px; height: '.$thumbnailSize.'px;')); ?>
+            <?php echo img($this->data('icon'), ['style' => 'width: '.$thumbnailSize.'px; height: '.$thumbnailSize.'px;']); ?>
         </div>
     </div>
 <?php } ?>
 <div class="ButtonGroup">
 <div class="js-new-group-icon Button ButtonGroup"><?php echo t('Upload New Icon'); ?></div>
 <?php
-echo $this->Form->input('Icon', 'file', array('class' => 'js-new-group-icon-upload Hidden'));
+echo $this->Form->input('Icon', 'file', ['class' => 'js-new-group-icon-upload Hidden']);
 if ($icon || $crop) {
     echo anchor(t('Remove Icon'), '/group/removegroupicon/'.val('GroupID', $this->data('Group')).'/'.Gdn::session()->transientKey(), 'Button ButtonGroup');
 }

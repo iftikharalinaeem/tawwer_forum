@@ -73,10 +73,10 @@ class EventiPlugin extends Gdn_Plugin {
       // the site properly, essentially requiring user to enable then disable it
       // the moment they find the information they want.
       // There may be others.
-      $ajaxBreakEvents = array(
+      $ajaxBreakEvents = [
           'Gdn_Controller_Finalize_Handler',
           'Gdn_Dispatcher_Cleanup_Handler'
-      );
+      ];
 
       if (in_array($Key, $ajaxBreakEvents)) {
          return;
@@ -95,7 +95,7 @@ class EventiPlugin extends Gdn_Plugin {
          $Object .= "::";
       }
 
-      $ArgList = array();
+      $ArgList = [];
 
       foreach ($Caller['args'] as $Arg) {
          if (is_object($Arg)) {

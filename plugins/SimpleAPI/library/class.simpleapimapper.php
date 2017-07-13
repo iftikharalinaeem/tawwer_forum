@@ -38,9 +38,9 @@ abstract class SimpleApiMapper {
 
     public function addMap($Map, $To = NULL, $Filter = NULL) {
         if (!is_array($Map)) {
-            $Map = array($Map => $To);
+            $Map = [$Map => $To];
             if (!is_null($Filter) && !is_array($Filter))
-                $Filter = array($Map => $Filter);
+                $Filter = [$Map => $Filter];
         }
 
         $this->URIMap = array_merge($this->URIMap, $Map);

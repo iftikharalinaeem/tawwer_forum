@@ -62,7 +62,7 @@ class vfIntercomioPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function base_render_before($sender, $args) {
-        $intercomio = array(
+        $intercomio = [
             'siteID' => Infrastructure::siteID(),
             'events' => $this->events,
             'starttime' => strtotime(gdn::session()->User->DateInserted),
@@ -71,7 +71,7 @@ class vfIntercomioPlugin extends Gdn_Plugin {
             'userID' => gdn::session()->User->UserID,
             'trackingPages' => 'Banner,Themes,Users,Roles & Permissions,Social,Categories,Plugins',
             'app_id' => C('Plugins.Intercomio.App_id', 0)
-        );
+        ];
 
         $sender->AddJsFile('intercomio.js', 'plugins/vfintercomio/js');
         $sender->addDefinition('intercomIO', $intercomio);
@@ -83,9 +83,9 @@ class vfIntercomioPlugin extends Gdn_Plugin {
         $cf = new ConfigurationModule($sender);
 
         $cf->Initialize(
-            array(
+            [
                 'Plugins.Intercomio.App_id' => []
-            )
+            ]
         );
 
         $sender->AddSideMenu();

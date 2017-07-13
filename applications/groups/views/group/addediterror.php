@@ -5,7 +5,7 @@
 
     <div class="FormWrapper StructuredForm">
         <?php
-        echo $this->Form->Open(array('enctype' => 'multipart/form-data'));
+        echo $this->Form->Open(['enctype' => 'multipart/form-data']);
         echo $this->Form->Errors();
 
         echo $this->Form->Close();

@@ -25,13 +25,13 @@ class SEOLinksPlugin extends Gdn_Plugin {
       $PxEsc = preg_quote($Px);
 
       $Route = '/?'.$PxEsc.'[^/]+/(\d+)-(.*?)(?:-(p\d+))?.html';
-      Gdn::Router()->Routes[$Route] = array(
+      Gdn::Router()->Routes[$Route] = [
           'Route' => $Route,
           'Key' => base64_encode($Route),
           'Destination' => '/discussion/$1/$2/$3',
           'Reserved' => FALSE,
           'Type' => 'Internal'
-      );
+      ];
 
       $Path = trim(Gdn::Request()->Path(), '/');
 
@@ -42,13 +42,13 @@ class SEOLinksPlugin extends Gdn_Plugin {
          $Category = CategoryModel::Categories($UrlCode);
          if ($Category) {
             $Route = '/?'.$PxEsc.'(' . preg_quote($Category['UrlCode']) . ')(?:/(p\d+))?/?(\?.*)?$';
-            Gdn::Router()->Routes[$Route] = array(
+            Gdn::Router()->Routes[$Route] = [
                 'Route' => $Route,
                 'Key' => base64_encode($Route),
                 'Destination' => '/categories/$1/$2',
                 'Reserved' => FALSE,
                 'Type' => 'Internal'
-            );
+            ];
          }
       }
    }
@@ -58,9 +58,9 @@ class SEOLinksPlugin extends Gdn_Plugin {
       $Sender->SetData('Title', sprintf(T('%s Settings'), 'SEO Links'));
 
       $Cf = new ConfigurationModule($Sender);
-      $Cf->Initialize(array(
-          'Plugins.SEOLinks.Prefix' => array('Description' => 'A prefix to put before every link (ex. forum/). The prefix should almost always be empty.'),
-          ));
+      $Cf->Initialize([
+          'Plugins.SEOLinks.Prefix' => ['Description' => 'A prefix to put before every link (ex. forum/). The prefix should almost always be empty.'],
+          ]);
 
       if (Gdn::Request()->IsPostBack()) {
          CategoryModel::ClearCache();
