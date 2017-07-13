@@ -250,7 +250,7 @@ class AnalyticsTracker {
      * @param string $event Name of the event
      * @param array $data Specific details about the event
      */
-    public function trackEvent($collection, $event, $data = array()) {
+    public function trackEvent($collection, $event, $data = []) {
         if ($this->trackingDisabled()) {
             return;
         }
