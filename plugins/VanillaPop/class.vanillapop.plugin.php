@@ -1228,7 +1228,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * Allow roles to be configured to force email notifications.
      */
     public function base_beforeRolePermissions_handler($Sender) {
-        if (!C('Plugins.VanillaPop.AllowForceNotify')) {
+        if (!c('Plugins.VanillaPop.AllowForceNotify')) {
             return;
         }
 
@@ -1248,49 +1248,64 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
     /**
      * Send forced email notifications.
+     *
+     * @param Gdn_Controller $sender Sending controller.
+     * @param array $args Event's arguments.
      */
-    public function forceNotify($Sender, $Args) {
-        if (!C('Plugins.VanillaPop.AllowForceNotify')) {
+    public function forceNotify($sender, $args) {
+        if (!c('Plugins.VanillaPop.AllowForceNotify')) {
             return;
         }
 
-        $Activity = $Args['Activity'];
-        $ActivityModel = $Args['ActivityModel'];
-        $ActivityType = (isset($Args['Comment'])) ? 'Comment' : 'Discussion';
-        $Fields = $Args[$ActivityType];
+        $activity = $args['Activity'];
+        $activityModel = $args['ActivityModel'];
+        $activityType = (isset($args['Comment'])) ? 'Comment' : 'Discussion';
 
         // Email them.
-        $Activity['Emailed'] = ActivityModel::SENT_PENDING;
+        $activity['Emailed'] = ActivityModel::SENT_PENDING;
 
         // Get effected roles.
-        $RoleModel = new RoleModel();
-        $RoleIDs = [];
-        if ($ActivityType == 'Discussion' && val('Announce', $Args['Discussion'])) {
+        $roleModel = new RoleModel();
+        if ($activityType === 'Discussion' && val('Announce', $args['Discussion'])) {
             // Add everyone with force notify all OR announcement-only option.
-            $Wheres = ['ForceNotify >' => 0];
+            $wheres = ['ForceNotify >' => 0];
         } else {
             // Only get users with force notify all.
-            $Wheres = ['ForceNotify' => 1];
+            $wheres = ['ForceNotify' => 1];
+        }
+        $roles = $roleModel->getWhere($wheres)->resultArray();
+
+        // Filter roles by the category's permissions.
+        $categoryID = valr('Discussion.CategoryID', $args, '-1');
+        $categoryModel = new CategoryModel();
+        $categoryPermissions = $categoryModel->getRolePermissions($categoryID);
+        $categoryPermissions = Gdn_DataSet::index($categoryPermissions, 'RoleID');
+
+        $roleIDs = [];
+        foreach ($roles as $role) {
+            $roleId = $role['RoleID'];
+            $roleCategoryPermission = val($roleId, $categoryPermissions, []);
+            $viewPermission = val('Vanilla.Discussions.View', $roleCategoryPermission, 0);
+            if ($viewPermission) {
+                $roleIDs[] = $roleId;
+            }
         }
 
-        $Roles = $RoleModel->getWhere($Wheres)->resultArray();
-        foreach ($Roles as $Role) {
-            $RoleIDs[] = val('RoleID', $Role);
-        }
-
-        // Get users in those roles.
-        $UserRoles = $Sender->SQL
-            ->select('UserID')
-            ->distinct()
-            ->from('UserRole')
-            ->whereIn('RoleID', $RoleIDs)
-            ->get()->resultArray();
+        if ($roleIDs) {
+            // Get users in those roles.
+            $userRoles = $sender->SQL
+                ->select('UserID')
+                ->distinct()
+                ->from('UserRole')
+                ->whereIn('RoleID', $roleIDs)
+                ->get()->resultArray();
 
 
-        // Add an activity for each person and pray we don't melt the wibbles.
-        foreach ($UserRoles as $UserRole) {
-            $Activity['NotifyUserID'] = $UserRole['UserID'];
-            $ActivityModel->queue($Activity, false, ['Force' => true]);
+            // Add an activity for each person and pray we don't melt the wibbles.
+            foreach ($userRoles as $userRole) {
+                $activity['NotifyUserID'] = $userRole['UserID'];
+                $activityModel->queue($activity, false, ['Force' => true]);
+            }
         }
     }
 
