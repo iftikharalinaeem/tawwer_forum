@@ -773,7 +773,8 @@ class GroupsHooks extends Gdn_Plugin {
             ],
             'Groups.Members.CanAddEvents' => [
                 'LabelCode' => 'Allow members to add events. Leaders will always be able to add events.',
-                'Control' => 'toggle'
+                'Control' => 'toggle',
+                'Default' => true
             ]
         ]);
         $sender->setData('Title', t('Group Settings'));
