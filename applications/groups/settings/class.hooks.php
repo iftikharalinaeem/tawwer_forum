@@ -760,8 +760,8 @@ class GroupsHooks extends Gdn_Plugin {
     /**
      * Create a settings page for Groups.
      *
-     * @param settingsController $sender
-     * @param settingsController $args
+     * @param SettingsController $sender
+     * @param array $args
      */
     public function settingsController_groups_create($sender, $args) {
         $sender->permission('Garden.Settings.Manage');
@@ -772,9 +772,9 @@ class GroupsHooks extends Gdn_Plugin {
                 'Control' => 'toggle'
             ],
             'Groups.Members.CanAddEvents' => [
-            'LabelCode' => 'Allow members to add events. Leaders will always be able to add events.',
-            'Control' => 'toggle'
-        ]
+                'LabelCode' => 'Allow members to add events. Leaders will always be able to add events.',
+                'Control' => 'toggle'
+            ]
         ]);
         $sender->setData('Title', t('Group Settings'));
         $cf->renderAll();
