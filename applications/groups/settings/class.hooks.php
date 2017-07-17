@@ -491,6 +491,37 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
+     * Override permissions for editing comments.
+     *
+     * @param PostController $sender
+     */
+    public function postController_editComment_before($sender) {
+        $commentID = val('CommentID', $sender->ReflectArgs);
+        if (!$commentID) {
+            return;
+        }
+
+        // Get the groupID of this comment.
+        $comment = $sender->CommentModel->getID($commentID);
+        $discussion = $sender->DiscussionModel->getID(val('DiscussionID', $comment));
+        $groupID = val('GroupID', $discussion);
+
+        if (!$groupID) {
+            return;
+        }
+
+        $model = new GroupModel();
+        $group = $model->getID($groupID);
+        if (!$group) {
+            return;
+        }
+
+        $sender->setData('Group', $group);
+
+        $model->overridePermissions($group);
+    }
+
+    /**
      * @param PostController $Sender
      */
     public function PostController_Discussion_Before($Sender) {
@@ -723,5 +754,30 @@ class GroupsHooks extends Gdn_Plugin {
         if ($newCategoryID && !in_array($newCategoryID, GroupModel::getGroupCategoryIDs())) {
             $sender->setField($args['DiscussionID'], 'GroupID', null);
         }
+    }
+
+
+    /**
+     * Create a settings page for Groups.
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_groups_create($sender, $args) {
+        $sender->permission('Garden.Settings.Manage');
+        $cf = new ConfigurationModule($sender);
+        $cf->initialize([
+            'Groups.Leaders.CanModerate' => [
+                'LabelCode' => 'Allow Leaders of a Group to edit or delete comments and discussions in the groups they lead.',
+                'Control' => 'toggle'
+            ],
+            'Groups.Members.CanAddEvents' => [
+                'LabelCode' => 'Allow members to add events. Leaders will always be able to add events.',
+                'Control' => 'toggle',
+                'Default' => true
+            ]
+        ]);
+        $sender->setData('Title', t('Group Settings'));
+        $cf->renderAll();
     }
 }

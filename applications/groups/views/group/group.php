@@ -11,10 +11,13 @@ if (GroupPermission('View')) {
     }
     writeAnnouncementList($this, t('GroupEmptyAnnouncements', "Important stuff will go here one day."));
     writeDiscussionList($this, 'discussions', t('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"), t('Discussions'));
+    $groupID = val('GroupID', $this->data('Group'));
     $eventList = new EventListModule($this->data('Events'), t('Upcoming Events'), t('GroupEmptyEvents', "Aw snap, no events are coming up."));
     if (GroupPermission('Member', $this->data('Group')) || GroupPermission('Moderate', $this->data('Group'))) {
-        $eventList->addNewEventButton(val('GroupID', $this->data('Group')));
-        $eventList->showMore(url(combinePaths(["/events/group/", GroupSlug($this->data('Group'))])));
+        if (c('Groups.Members.CanAddEvents', true) || groupPermission('Leader', $groupID)) {
+            $eventList->addNewEventButton($groupID);
+            $eventList->showMore(url(combinePaths(["/events/group/", GroupSlug($this->data('Group'))])));
+        }
     }
     echo $eventList;
     echo '<div class="Group-Info ClearFix clearfix">';

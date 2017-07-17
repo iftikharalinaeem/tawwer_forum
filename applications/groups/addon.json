@@ -7,6 +7,7 @@
     "type": "addon",
     "priority": 10,
     "name": "Groups",
+    "settingsUrl": "/settings/groups",
     "authors": [
         {
             "name": "Todd Burry",
