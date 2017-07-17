@@ -53,11 +53,11 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $provider = $this->provider();
         if (!$provider['AuthenticationKey']) {
             $model = new Gdn_AuthenticationProviderModel();
-            $provider = array(
+            $provider = [
                 'AuthenticationKey' => $this->providerKey,
                 'AuthenticationSchemeAlias' => $this->providerKey,
                 'Name' => $this->providerKey
-            );
+            ];
 
             $model->save($provider);
         }
@@ -114,7 +114,7 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
      *
      * @return array Profile with Vanilla keys.
      */
-    public function translateProfileResults($rawProfile = array()) {
+    public function translateProfileResults($rawProfile = []) {
         $profile = arrayTranslate($rawProfile, [
             'email' => 'Email',
             'provider' => 'Provider',
@@ -138,8 +138,8 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
      */
     public function signInButton($type = 'button') {
         $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
-        $url = $this->authorizeUri(array('target' => $target));
-        $result = socialSignInButton('Auth0', $url, $type, array('rel' => 'nofollow', 'class' => 'default', 'title' => 'Sign in with Auth0'));
+        $url = $this->authorizeUri(['target' => $target]);
+        $result = socialSignInButton('Auth0', $url, $type, ['rel' => 'nofollow', 'class' => 'default', 'title' => 'Sign in with Auth0']);
         return $result;
     }
 

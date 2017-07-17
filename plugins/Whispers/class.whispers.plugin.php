@@ -29,7 +29,7 @@ class WhispersPlugin extends Gdn_Plugin {
             $LastCommentID = GetValue('CommentID', $LastComment);
 
             // We need to grab the comment that is one after the last comment.
-            $LastComment = Gdn::SQL()->Limit(1)->GetWhere('Comment', array('DiscussionID' => $DiscussionID, 'CommentID >' => $LastCommentID))->FirstRow();
+            $LastComment = Gdn::SQL()->Limit(1)->GetWhere('Comment', ['DiscussionID' => $DiscussionID, 'CommentID >' => $LastCommentID])->FirstRow();
             if ($LastComment)
                $LastDate = GetValue('DateInserted', $LastComment);
          }
@@ -72,7 +72,7 @@ class WhispersPlugin extends Gdn_Plugin {
 
       $Whispers = $Sql->Get();
 
-      Gdn::UserModel()->JoinUsers($Whispers->Result(), array('InsertUserID'));
+      Gdn::UserModel()->JoinUsers($Whispers->Result(), ['InsertUserID']);
 
       // Add dummy comment fields to the whispers.
       $WhispersResult =& $Whispers->Result();
@@ -91,7 +91,7 @@ class WhispersPlugin extends Gdn_Plugin {
 
    public function MergeWhispers($Comments, $Whispers) {
       $Result = array_merge($Comments, $Whispers);
-      usort($Result, array('WhispersPlugin', '_MergeWhispersSort'));
+      usort($Result, ['WhispersPlugin', '_MergeWhispersSort']);
       return $Result;
    }
 
@@ -237,7 +237,7 @@ class WhispersPlugin extends Gdn_Plugin {
 
       $Discussion = (array)$Discussion;
       if (!is_array($Discussion['Attributes']))
-         $Discussion['Attributes'] = array();
+         $Discussion['Attributes'] = [];
 
       $InsertUserID = $Discussion['InsertUserID'];
 
@@ -253,19 +253,19 @@ class WhispersPlugin extends Gdn_Plugin {
 
       // Make sure the current and discussion users are added.
       if (!isset($Users[$InsertUserID]))
-         $Users[$InsertUserID] = array('UserID' => $InsertUserID);
+         $Users[$InsertUserID] = ['UserID' => $InsertUserID];
 
       if (!isset($Users[Gdn::Session()->UserID]))
-         $Users[Gdn::Session()->UserID] = array('UserID' => Gdn::Session()->UserID);
+         $Users[Gdn::Session()->UserID] = ['UserID' => Gdn::Session()->UserID];
 
-      Gdn::UserModel()->JoinUsers($Users, array('UserID'));
-      uasort($Users, array($this, 'UserRowCompare'));
+      Gdn::UserModel()->JoinUsers($Users, ['UserID']);
+      uasort($Users, [$this, 'UserRowCompare']);
 
       $Sender->SetData('Users', $Users);
       $Sender->SetData('Discussion', $Discussion);
 
       if ($Sender->Form->IsPostBack()) {
-         $CheckedIDs = $Sender->Form->GetValue('UserID', array());
+         $CheckedIDs = $Sender->Form->GetValue('UserID', []);
 
          if (empty($CheckedIDs)) {
             $Sender->Form->AddError('ValidateOneOrMoreArrayItemRequired', 'RecipientUserID');
@@ -277,7 +277,7 @@ class WhispersPlugin extends Gdn_Plugin {
             $Sender->DiscussionModel->SetProperty($Discussion['DiscussionID'], 'Attributes', dbencode($Discussion['Attributes']));
 
             if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
-               Redirect($Discussion['Url'].'#Form_Comment', 302);
+               redirectTo($Discussion['Url'].'#Form_Comment');
             }
          }
       } else {
@@ -309,7 +309,7 @@ class WhispersPlugin extends Gdn_Plugin {
          );
 
       $Sender->DiscussionModel->SetProperty($DiscussionID, 'Attributes', dbencode($Discussion['Attributes']));
-      Redirect($Discussion['Url'].'#Form_Comment', 302);
+      redirectTo($Discussion['Url'].'#Form_Comment');
    }
 
    /**
@@ -323,9 +323,9 @@ class WhispersPlugin extends Gdn_Plugin {
       if ($ConversationID === TRUE) {
          $UserIDs = $Sender->Data('Discussion.Attributes.WhisperUserIDs');
          // Grab the users that are in the conversaton.
-         $WhisperUsers = array();
+         $WhisperUsers = [];
          foreach ($UserIDs as $UserID) {
-            $WhisperUsers[] = array('UserID' => $UserID);
+            $WhisperUsers[] = ['UserID' => $UserID];
          }
       } else {
          // There is already a conversation so grab its users.
@@ -343,7 +343,7 @@ class WhispersPlugin extends Gdn_Plugin {
          return;
       }
 
-      Gdn::UserModel()->JoinUsers($WhisperUsers, array('UserID'));
+      Gdn::UserModel()->JoinUsers($WhisperUsers, ['UserID']);
       $Sender->SetData('WhisperUsers', $WhisperUsers);
    }
 
@@ -360,7 +360,7 @@ class WhispersPlugin extends Gdn_Plugin {
       $Result =& $Data->Result();
 
       // Gather the discussion IDs.
-      $DiscusisonIDs = array();
+      $DiscusisonIDs = [];
 
       foreach ($Result as $Row) {
          $DiscusisonIDs[] = GetValue('DiscussionID', $Row);
@@ -422,7 +422,7 @@ class WhispersPlugin extends Gdn_Plugin {
     * @param array $Args
     * @return mixed
     */
-   public function PostController_Comment_Create($Sender, $Args = array()) {
+   public function PostController_Comment_Create($Sender, $Args = []) {
       if ($Sender->Form->IsPostBack()) {
          $Sender->Form->SetModel($Sender->CommentModel);
 
@@ -450,7 +450,7 @@ class WhispersPlugin extends Gdn_Plugin {
 
          // If this isn't a whisper then post as normal.
          if (!$Whisper)
-            return call_user_func_array(array($Sender, 'Comment'), $Args);
+            return call_user_func_array([$Sender, 'Comment'], $Args);
 
          $ConversationModel = new ConversationModel();
          $ConversationMessageModel = new ConversationMessageModel();
@@ -488,18 +488,18 @@ class WhispersPlugin extends Gdn_Plugin {
                // Link to the last comment.
                $HashID = $MessageID ? 'w'.$MessageID : $LastCommentID;
 
-               $Sender->RedirectUrl = Url("discussion/comment/$LastCommentID?rand=$Rand#Comment_$HashID", TRUE);
+               $Sender->redirecTo(Url("discussion/comment/$LastCommentID?rand=$Rand#Comment_$HashID", TRUE), false);
             } else {
                // Link to the discussion.
                $Hash = $MessageID ? "Comment_w$MessageID" : 'Item_1';
                $Name = rawurlencode(GetValue('Name', $Discussion, 'x'));
-               $Sender->RedirectUrl = Url("discussion/$DiscussionID/$Name?rand=$Rand#$Hash", TRUE);
+               $Sender->setRedirectTo(Url("discussion/$DiscussionID/$Name?rand=$Rand#$Hash", TRUE));
             }
          }
          require_once $Sender->FetchViewLocation('helper_functions', 'Discussion');
          $Sender->Render();
       } else {
-         return call_user_func_array(array($Sender, 'Comment'), $Args);
+         return call_user_func_array([$Sender, 'Comment'], $Args);
       }
    }
 }

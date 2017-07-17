@@ -14,7 +14,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     protected $MCAPI = null;
     protected $provider = null;
 
-    protected static $settings = array('ListID', 'ConfirmJoin', 'InterestID');
+    protected static $settings = ['ListID', 'ConfirmJoin', 'InterestID'];
 
     const PROVIDER_KEY = 'MailChimpAPI';
     const PROVIDER_ALIAS = 'mcapi';
@@ -134,22 +134,22 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         }
 
         // Configure subscription
-        $defaults = array(
+        $defaults = [
             'ConfirmJoin'     => val('ConfirmJoin', $this->provider(), false),
             'InterestID'     => val('InterestID', $this->provider(), false),
             'Format'          => 'html'
-        );
+        ];
         $options = (array)$options;
         $options = array_merge($defaults, $options);
 
         // Subscribe user to list
         if (!is_array($email)) {
-            $email = array($email);
+            $email = [$email];
         }
 
-        $emails = array();
+        $emails = [];
         foreach ($email as $emailAddress) {
-            $emails[] = array('EMAIL' => $emailAddress, 'EMAIL_TYPE' => $options['Format'], 'DoubleOptIn' => $options['ConfirmJoin'], 'InterestID' => $options['InterestID']);
+            $emails[] = ['EMAIL' => $emailAddress, 'EMAIL_TYPE' => $options['Format'], 'DoubleOptIn' => $options['ConfirmJoin'], 'InterestID' => $options['InterestID']];
         }
 
         // Send request
@@ -171,28 +171,28 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         $allLists = array_keys($lists);
 
         // Configure subscription
-        $defaults = array(
+        $defaults = [
             'ConfirmJoin'     => false,
             'Format'          => 'html'
-        );
+        ];
         $options = (array)$options;
         $options = array_merge($defaults, $options);
 
         $updated = false;
         foreach ($allLists as $listID) {
             // Lookup member
-            $memberInfo = $this->MCAPI()->listMemberInfo($listID, array($email));
+            $memberInfo = $this->MCAPI()->listMemberInfo($listID, [$email]);
             $memberInfo = $this->MCAPI()->toArray($memberInfo);
 
             if ($memberInfo['status'] === 'subscribed') {
                 // Update existing user
                 $this->MCAPI()->listUpdateAddress(
                     $listID,
-                    array(
+                    [
                         'EMAIL'  => $email,
                         'NEW_EMAIL' => $newEmail,
                         'EMAIL_TYPE' => $options['Format']
-                    )
+                    ]
                 );
 
                 $updated = true;
@@ -223,14 +223,14 @@ class MailChimpPushPlugin extends Gdn_Plugin {
     public function controller_massSync($sender) {
         $sender->permission('Garden.Settings.Manage');
         $sender->Form = new Gdn_Form();
-        $sender->Form->setData(array(
+        $sender->Form->setData([
             'SyncBanned'      => false,
             'SyncDeleted'     => false,
             'SyncUnconfirmed' => false
-        ));
+        ]);
 
         // Get additional settings
-        $settingValues = array();
+        $settingValues = [];
         $provider = $this->provider();
         foreach (self::$settings as $setting) {
             $settingValues[$setting] = val($setting, $provider);
@@ -306,7 +306,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         $sender->Form->setValue('ApiKey', $apiKey);
 
         // Get additional settings
-        $settingValues = array();
+        $settingValues = [];
         foreach (self::$settings as $setting) {
             $settingValues[$setting] = val($setting, $provider);
             $sender->Form->setValue($setting, $settingValues[$setting]);
@@ -315,11 +315,11 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
         // Prepare sync data
         $sender->setData('ConfirmEmail', c('Garden.Registration.ConfirmEmail', false));
-        $sender->Sync->setData(array(
+        $sender->Sync->setData([
             'SyncBanned'      => false,
             'SyncDeleted'     => false,
             'SyncUnconfirmed' => false
-        ));
+        ]);
 
         /*
          * Check to see if we are connected to MailChimp.
@@ -354,11 +354,11 @@ class MailChimpPushPlugin extends Gdn_Plugin {
                 $ProviderModel = new Gdn_AuthenticationProviderModel();
 
                 if (!$provider) {
-                    $ProviderModel->insert(array(
+                    $ProviderModel->insert([
                         'AuthenticationKey'           => self::PROVIDER_KEY,
                         'AuthenticationSchemeAlias'   => self::PROVIDER_ALIAS,
                         'AssociationSecret'           => $suppliedApiKey
-                    ));
+                    ]);
                     $provider = null;
                     $provider = $this->provider();
                 } else {
@@ -399,7 +399,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
             if ($modified) {
                 $sender->informMessage(t('Changes saved'));
-                redirect('/plugin/mailchimp');
+                redirectTo('/plugin/mailchimp');
             }
         }
 
@@ -418,17 +418,17 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
         try {
 
-            $opts = array(
+            $opts = [
                 'Offset'          => 0,
                 'SyncListID'      => false,
                 'SyncConfirmJoin' => 0,
                 'SyncBanned'      => 0,
                 'SyncDeleted'     => 0,
                 'SyncUnconfirmed' => null
-            );
-            $requiredOpts = array('SyncListID', 'SyncBanned', 'SyncDeleted');
+            ];
+            $requiredOpts = ['SyncListID', 'SyncBanned', 'SyncDeleted'];
 
-            $options = array();
+            $options = [];
             foreach ($opts as $opt => $default) {
                 $val = Gdn::request()->getValue($opt, null);
                 if ((!isset($val) || $val == '') && in_array($opt, $requiredOpts)) {
@@ -442,7 +442,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
             // Chunk size depends on whether we're sending confirmation emails
             $chunkSize = $SyncConfirmJoin ?  300 : 2000;
 
-            $criteria = array();
+            $criteria = [];
 
             /* @var $SyncBanned passed in $options array */
             // Only if true do we care
@@ -469,7 +469,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
                 $processUsers = Gdn::userModel()->getWhere($criteria, 'UserID', 'desc', $chunkSize, $Offset);
 
                 // Extract email addresses
-                $emails = array();
+                $emails = [];
                 while ($processUser = $processUsers->NextRow(DATASET_TYPE_ARRAY)) {
                     if (!empty($processUser['Email'])) {
                         $emails[] = $processUser['Email'];

@@ -33,13 +33,13 @@ class SlugUrlsPlugin extends Gdn_Plugin {
             continue;
 
          $Route = '/?'.$PxEsc.'(' . preg_quote($Category['UrlCode']) . ')/([^/.]+)/?(?:page-(\d+)/?)?$';
-         $Sender->Routes[$Route] = array(
+         $Sender->Routes[$Route] = [
              'Route' => $Route,
              'Key' => base64_encode($Route),
              'Destination' => '/discussion/slug/$2?page=$3&category=$1',
              'Reserved' => FALSE,
              'Type' => 'Internal'
-         );
+         ];
       }
    }
 
@@ -52,12 +52,12 @@ class SlugUrlsPlugin extends Gdn_Plugin {
       // Grab the discussion.
       $Discussion = Gdn::SQL()->GetWhere(
          'Discussion',
-         array('Slug' => $Slug))->FirstRow(DATASET_TYPE_ARRAY);
+         ['Slug' => $Slug])->FirstRow(DATASET_TYPE_ARRAY);
 
       if (!$Discussion)
          throw NotFoundException('Discussion');
 
       $Url = DiscussionUrl($Discussion, $Page);
-      Redirect($Url, 301);
+      redirectTo($Url, 301);
    }
 }

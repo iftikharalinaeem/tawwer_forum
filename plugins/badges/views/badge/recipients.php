@@ -1,5 +1,8 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<?php echo heading($this->data('Badge.Name'), '', '', [], '/badge/all')?>
+<?php if (!defined('APPLICATION')) exit();
+
+echo heading($this->data('Badge.Name'), '', '', [], '/badge/all');
+$this->fireEvent('BeforeRecipientsTable');
+?>
 <div class="toolbar">
     <?php PagerModule::write(['View' => 'pager-dashboard']); ?>
 </div>

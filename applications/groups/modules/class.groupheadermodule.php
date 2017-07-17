@@ -33,7 +33,7 @@ class GroupHeaderModule extends Gdn_Module {
       * @param bool $showMeta Whether to include the group meta.
       * @param bool $showDescription Whether to include the group description.
       */
-     function __construct($group = array(), $showOptions = true, $showButtons = true, $showMeta = false, $showDescription = false) {
+     function __construct($group = [], $showOptions = true, $showButtons = true, $showMeta = false, $showDescription = false) {
           $this->group = $group;
           $this->showOptions = $showOptions;
           $this->showButtons = $showButtons;

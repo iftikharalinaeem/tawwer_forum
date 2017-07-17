@@ -85,7 +85,7 @@ class OAuth2PluginBase {
      *
      * @return string Endpoint of the provider.
      */
-    public function authorizeUri($state = array()) {
+    public function authorizeUri($state = []) {
         $provider = $this->provider();
 
         $uri = $provider['AuthorizeUrl'];
@@ -148,7 +148,7 @@ class OAuth2PluginBase {
         $proxyOptions['URL'] = $uri;
         $proxyOptions['Method'] = $method;
 
-        $this->log('Proxy Request Sent in API', array('headers' => $headers, 'proxyOptions' => $proxyOptions, 'params' => $params));
+        $this->log('Proxy Request Sent in API', ['headers' => $headers, 'proxyOptions' => $proxyOptions, 'params' => $params]);
         $response = $proxy->request(
             $proxyOptions,
             $params,
@@ -158,7 +158,7 @@ class OAuth2PluginBase {
 
         // Extract response only if it arrives as JSON
         if (stripos($proxy->ContentType, 'application/json') !== false) {
-            $this->log('API JSON Response', array('response' => $response));
+            $this->log('API JSON Response', ['response' => $response]);
             $response = json_decode($proxy->ResponseBody, true);
         }
 
@@ -169,7 +169,7 @@ class OAuth2PluginBase {
             } else {
                 $message = 'HTTP Error communicating Code: '.$proxy->ResponseStatus;
             }
-            $this->log('API Response Error Thrown', array('response' => json_decode($response)));
+            $this->log('API Response Error Thrown', ['response' => json_decode($response)]);
             throw new Gdn_UserException($message, $proxy->ResponseStatus);
         }
 
@@ -223,18 +223,18 @@ class OAuth2PluginBase {
         $provider = $this->provider();
         $uri = $provider['TokenUrl'];
 
-        $defaultParams = array(
+        $defaultParams = [
             'code' => $code,
             'client_id' => $provider['AssociationKey'],
             'redirect_uri' => url('/entry/'. $this->getProviderKey(), true),
             'client_secret' => $provider['AssociationSecret'],
             'grant_type' => 'authorization_code',
             'scope' => $this->scope
-        );
+        ];
 
         $post = array_merge($defaultParams, $this->requestAccessTokenParams);
 
-        $this->log('Before calling API to request access token', array('requestAccessToken' => array('targetURI' => $uri, 'post' => $post)));
+        $this->log('Before calling API to request access token', ['requestAccessToken' => ['targetURI' => $uri, 'post' => $post]]);
 
         return $this->api($uri, 'POST', $post);
     }
@@ -377,11 +377,11 @@ class OAuth2PluginBase {
      * @return array Form fields to appear in settings dashboard.
      */
     protected function getSettingsFormFields() {
-        $formFields = array(
+        $formFields = [
             'AssociationKey' => ['LabelCode' => 'Client ID', 'Description' => ''],
             'AssociationSecret' => ['LabelCode' => 'Secret', 'Description' => ''],
             'SignOutRedirect' => ['LabelCode' => t('Sign Out URL'), 'Description' => t('Enter the <b><i>full</i></b> URL (i.e. with "https://") to where you want users to be redirected wherever they click on the logout button.')]
-        );
+        ];
         return $formFields;
     }
 
@@ -399,7 +399,7 @@ class OAuth2PluginBase {
         // Retrieve the profile that was saved to the session in the entry controller.
         $savedProfile = Gdn::Session()->stash($this->getProviderKey(), '', false);
         if(Gdn::session()->stash($this->getProviderKey(), '', false)) {
-            $this->log('Base Connect Data Profile Saved in Session', array('profile' => $savedProfile));
+            $this->log('Base Connect Data Profile Saved in Session', ['profile' => $savedProfile]);
         }
         $profile = val('Profile', $savedProfile);
         $accessToken = val('AccessToken', $savedProfile);
@@ -414,17 +414,17 @@ class OAuth2PluginBase {
         $form->formValues($formValues);
         trace($formValues, "Form Values");
         // Save some original data in the attributes of the connection for later API calls.
-        $attributes = array();
-        $attributes[$this->getProviderKey()] = array(
+        $attributes = [];
+        $attributes[$this->getProviderKey()] = [
             'AccessToken' => $accessToken,
             'Profile' => $profile
-        );
+        ];
         $form->setFormValue('Attributes', $attributes);
 
         $sender->EventArguments['Profile'] = $profile;
         $sender->EventArguments['Form'] = $form;
 
-        $this->log('Base Connect Data Before OAuth Event', array('profile' => $profile, 'form' => $form));
+        $this->log('Base Connect Data Before OAuth Event', ['profile' => $profile, 'form' => $form]);
         // Throw an event so that other plugins can add/remove stuff from the basic sso.
         $sender->fireEvent('OAuth');
 
@@ -472,10 +472,10 @@ class OAuth2PluginBase {
 
         if (isset($sender->Data['Methods'])) {
             // Add the sign in button method to the controller.
-            $method = array(
+            $method = [
                 'Name' => $this->getProviderKey(),
                 'SignInHtml' => $this->signInButton()
-            );
+            ];
 
             $sender->Data['Methods'][] = $method;
         }
@@ -495,7 +495,7 @@ class OAuth2PluginBase {
             return;
         }
 
-        $url = $this->authorizeUri(array('target' => $args['Target']));
+        $url = $this->authorizeUri(['target' => $args['Target']]);
         $args['DefaultProvider']['SignInUrl'] = $url;
     }
 
@@ -545,7 +545,7 @@ class OAuth2PluginBase {
             return;
         }
 
-        $url = $this->authorizeUri(array('target' => $args['Target']));
+        $url = $this->authorizeUri(['target' => $args['Target']]);
         $args['DefaultProvider']['RegisterUrl'] = $url;
     }
 
@@ -560,7 +560,7 @@ class OAuth2PluginBase {
      * @throws Gdn_UserException.
      */
     public function entryController_oAuth2_create($sender, $code, $state) {
-        $this->log('entryController_oAuth2_create', array());
+        $this->log('entryController_oAuth2_create', []);
         if ($error = $sender->Request->get('error')) {
             throw new Gdn_UserException($error);
         }
@@ -580,14 +580,14 @@ class OAuth2PluginBase {
             $this->accessToken($response['access_token']);
         }
 
-        $this->log('Getting Profile', array());
+        $this->log('Getting Profile', []);
         $profile = $this->getProfile();
         $this->log('Profile', $profile);
 
         if ($state) {
             parse_str($state, $state);
         } else {
-            $state = array('r' => 'entry', 'uid' => null, 'd' => 'none');
+            $state = ['r' => 'entry', 'uid' => null, 'd' => 'none'];
         }
         switch ($state['r']) {
             case 'profile':
@@ -597,16 +597,16 @@ class OAuth2PluginBase {
                     throw notFoundException('User');
                 }
                 // Save the authentication.
-                Gdn::userModel()->saveAuthentication(array(
+                Gdn::userModel()->saveAuthentication([
                     'UserID' => $user->UserID,
                     'Provider' => $this->getProviderKey(),
-                    'UniqueID' => $profile['id']));
+                    'UniqueID' => $profile['id']]);
 
                 // Save the information as attributes.
-                $attributes = array(
+                $attributes = [
                     'AccessToken' => $response['access_token'],
                     'Profile' => $profile
-                );
+                ];
 
                 Gdn::userModel()->saveAttribute($user->UserID, $this->getProviderKey(), $attributes);
 
@@ -614,20 +614,20 @@ class OAuth2PluginBase {
                 $this->EventArguments['User'] = $sender->User;
                 $this->fireEvent('AfterConnection');
 
-                redirect(userUrl($user, '', 'connections'));
+                redirectTo(userUrl($user, '', 'connections'));
                 break;
             case 'entry':
             default:
 
                 // This is an sso request, we need to redispatch to /entry/connect/[providerKey] which is Base_ConnectData_Handler() in this class.
-                Gdn::session()->stash($this->getProviderKey(), array('AccessToken' => $response['access_token'], 'Profile' => $profile));
+                Gdn::session()->stash($this->getProviderKey(), ['AccessToken' => $response['access_token'], 'Profile' => $profile]);
                 $url = '/entry/connect/'.$this->getProviderKey();
 
                 //pass the target if there is one so that the user will be redirected to where the request originated.
                 if ($target = val('target', $state)) {
                     $url .= '?Target='.urlencode($target);
                 }
-                redirect($url);
+                redirectTo($url);
                 break;
         }
     }
@@ -639,7 +639,7 @@ class OAuth2PluginBase {
      *
      * @return array Profile array transformed by child class or as is.
      */
-    public function translateProfileResults($rawProfile = array()) {
+    public function translateProfileResults($rawProfile = []) {
         return $rawProfile;
     }
 
@@ -653,9 +653,9 @@ class OAuth2PluginBase {
 
         $uri = $this->requireVal('ProfileUrl', $provider, "provider");
 
-        $defaultParams = array(
+        $defaultParams = [
             'access_token' => $this->accessToken()
-        );
+        ];
 
         $get = array_merge($defaultParams, $this->getProfileParams);
 
@@ -663,7 +663,7 @@ class OAuth2PluginBase {
 
         $profile = $this->translateProfileResults($rawProfile);
 
-        $this->log('getProfile API call', array('ProfileUrl' => $uri, 'Params' => $get, 'RawProfile' => $rawProfile, 'Profile' => $profile));
+        $this->log('getProfile API call', ['ProfileUrl' => $uri, 'Params' => $get, 'RawProfile' => $rawProfile, 'Profile' => $profile]);
 
         return $profile;
     }

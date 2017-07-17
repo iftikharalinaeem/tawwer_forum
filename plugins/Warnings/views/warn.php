@@ -67,15 +67,15 @@ $CurrentLevel = $this->Data('CurrentLevel');
 
       echo '<div class="WarnLevel">';
       if ($Points >= 0) {
-         echo $this->Form->Radio('Level', '@'.$i, array('value' => $i));
+         echo $this->Form->Radio('Level', '@'.$i, ['value' => $i]);
       } else {
-         echo Wrap($i, 'div', array('class' => 'Disabled', 'title' => T('If you want to decrease the warning level then remove a warning.')));
+         echo Wrap($i, 'div', ['class' => 'Disabled', 'title' => T('If you want to decrease the warning level then remove a warning.')]);
       }
       echo '</div>';
 
       if (isset($Special[$i])) {
          $Sp = $Special[$i];
-         echo Wrap($Sp['Label'], 'div', array('class' => 'Special', 'title' => $Sp['Title']));
+         echo Wrap($Sp['Label'], 'div', ['class' => 'Special', 'title' => $Sp['Title']]);
       }
 
       echo '</div>';
@@ -87,7 +87,7 @@ $CurrentLevel = $this->Data('CurrentLevel');
 <?php
 echo $this->Form->Label('How long do you want this warning to last?');
 echo ' ';
-echo $this->Form->DropDown('ExpireNumber', array(
+echo $this->Form->DropDown('ExpireNumber', [
     '1' => '1',
     '2' => '2',
     '3' => '3',
@@ -101,38 +101,38 @@ echo $this->Form->DropDown('ExpireNumber', array(
     '20' => '20',
     '30' => '30',
     'never' => T('never')
-));
+]);
 
 echo ' ';
 
-echo $this->Form->DropDown('ExpireUnit', array(
+echo $this->Form->DropDown('ExpireUnit', [
     'minutes' => T('minutes'),
     'hours' => T('hours'),
     'days' => T('days'),
     'weeks' => T('weeks'),
     'months' => T('months')
-));
+]);
 ?>
 </div>
 
 <div class="P">
 <?php
 echo $this->Form->Label("Tell the user why you're warning them", 'Body');
-echo $this->Form->TextBox('Body', array('Multiline' => TRUE, 'Wrap' => TRUE));
+echo $this->Form->TextBox('Body', ['Multiline' => TRUE, 'Wrap' => TRUE]);
 ?>
 </div>
 
 <div class="P">
 <?php
 echo $this->Form->Label("Private Note for Moderators", 'ModeratorNote');
-echo $this->Form->TextBox('ModeratorNote', array('Wrap' => TRUE));
+echo $this->Form->TextBox('ModeratorNote', ['Wrap' => TRUE]);
 ?>
 </div>
 
 <?php
 echo '<div class="Buttons Buttons-Confirm">',
    $this->Form->Button('OK'), ' ',
-   $this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close')),
+   $this->Form->Button('Cancel', ['type' => 'button', 'class' => 'Button Close']),
    '</div>';
 echo $this->Form->Close();
 ?>

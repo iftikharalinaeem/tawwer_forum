@@ -148,7 +148,7 @@ class CAS_PGTStorage_Db extends CAS_PGTStorage_AbstractStorage
             $table = CAS_PGT_STORAGE_DB_DEFAULT_TABLE;
         }
         if ( !is_array($driver_options) ) {
-            $driver_options = array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
+            $driver_options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
         }
 
         // store the specified parameters

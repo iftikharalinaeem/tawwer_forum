@@ -39,7 +39,7 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 		}
 	}
 
-   public function PluginController_CustomCSS_Create($Sender, $EventArguments = array()) {
+   public function PluginController_CustomCSS_Create($Sender, $EventArguments = []) {
 		require_once('kses.php');
 		$Session = Gdn::Session();
 		$UserModel = Gdn::UserModel();
@@ -76,7 +76,7 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 		if (!file_exists($Folder . DS . $FileName))
 			$FileName = 'rev_0.css';
 
-		$CurrentRevision = str_replace(array('rev_', '.css'), array('', ''), $FileName);
+		$CurrentRevision = str_replace(['rev_', '.css'], ['', ''], $FileName);
 		$CurrentRevision = is_numeric($CurrentRevision) ? $CurrentRevision : 1;
 		$Contents = $FileName == 'rev_0.css' ? '/* ---- Custom CSS ----
 
@@ -142,7 +142,7 @@ Have fun!!
 				// Some people put weird stuff in their CSS, KSES tends to be greedy
 				$NewCSS = str_replace('<=', '&lt;=', $NewCSS);
 				// Why KSES instead of strip_tags?  Who knows?
-				$NewCSS = wp_kses_split($Prev = $NewCSS, array(), array());
+				$NewCSS = wp_kses_split($Prev = $NewCSS, [], []);
 				$NewCSS = str_replace( '&gt;', '>', $NewCSS); // kses replaces lone '>' with &gt;
 				// Why both KSES and strip_tags?  Because we just added some '>'.
 				$NewCSS = strip_tags($NewCSS);
@@ -152,7 +152,7 @@ Have fun!!
 				$csstidy->parse($NewCSS);
 				$NewCSS = $csstidy->print->plain();
 
-				if (in_array($IncludeTheme, array('Yes', 'No')))
+				if (in_array($IncludeTheme, ['Yes', 'No']))
 					SaveToConfig('Plugins.CustomCSS.IncludeTheme', $IncludeTheme);
 
 				if ($Contents != $NewCSS) {
@@ -162,12 +162,12 @@ Have fun!!
 					SaveToConfig('Plugins.CustomCSS.PreviewFile', $FileName);
 
 					// Only keep the last 20 revs
-					$ActiveRevision = str_replace(array('rev_', '.css'), '', Gdn::Config('Plugins.CustomCSS.File', ''));
+					$ActiveRevision = str_replace(['rev_', '.css'], '', Gdn::Config('Plugins.CustomCSS.File', ''));
 					$ActiveRevision = is_numeric($ActiveRevision) ? $ActiveRevision : 0;
 					if ($Handle = opendir($Folder)) {
                   while (FALSE !== ($File = readdir($Handle))) {
                      if (substr($File, 0, 4) == 'rev_') {
-								$Revision = str_replace(array('rev_', '.css'), '', $File);
+								$Revision = str_replace(['rev_', '.css'], '', $File);
 								if (is_numeric($Revision) && $Revision != $ActiveRevision && $Revision < $CurrentRevision - 19) {
 									@unlink(PATH_CACHE . DS . 'CustomCSS' . DS . $CurrentTheme. DS . 'rev_' . $Revision . '.css');
 								}
@@ -185,10 +185,10 @@ Have fun!!
 
 			if ($IsPreview) {
 				$UserModel->SavePreference($Session->UserID, 'PreviewCustomCSS', TRUE);
-				Redirect('/');
+				redirectTo('/');
 			} else if ($IsExitPreview) {
 				$UserModel->SavePreference($Session->UserID, 'PreviewCustomCSS', FALSE);
-				Redirect('/plugin/customcss');
+				redirectTo('/plugin/customcss');
 			}
 		}
       $Sender->Render(PATH_PLUGINS . DS . 'CustomCSS' . DS . 'views' . DS . 'customcss.php');
@@ -209,9 +209,9 @@ if (!function_exists('safecss_class')) {
 
 		require_once('csstidy/class.csstidy.php');
 		class safecss extends csstidy_optimise {
-			var $tales = array();
-			var $props_w_urls = array('background', 'background-image', 'list-style', 'list-style-image');
-			var $allowed_protocols = array('http');
+			var $tales = [];
+			var $props_w_urls = ['background', 'background-image', 'list-style', 'list-style-image'];
+			var $allowed_protocols = ['http'];
 
 			function __construct(&$css) {
 				return $this->csstidy_optimise($css);
@@ -220,11 +220,11 @@ if (!function_exists('safecss_class')) {
 			function postparse() {
 				if ( !empty($this->parser->import) ) {
 					$this->tattle("Import attempt:\n".print_r($this->parser->import,1));
-					$this->parser->import = array();
+					$this->parser->import = [];
 				}
 				if ( !empty($this->parser->charset) ) {
 					$this->tattle("Charset attempt:\n".print_r($this->parser->charset,1));
-					$this->parser->charset = array();
+					$this->parser->charset = [];
 				}
 				return parent::postparse();
 			}

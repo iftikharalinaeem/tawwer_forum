@@ -46,17 +46,17 @@ class SalesforcePlugin extends Gdn_Plugin {
       }
       // Save the provider type.
       Gdn::SQL()->Replace('UserAuthenticationProvider',
-         array(
+         [
             'AuthenticationSchemeAlias' => 'salesforce',
             'URL' => '...',
             'AssociationSecret' => '...',
             'AssociationHashMethod' => '...'
-         ),
-         array('AuthenticationKey' => self::ProviderKey), TRUE
+         ],
+         ['AuthenticationKey' => self::ProviderKey], TRUE
       );
-      Gdn::PermissionModel()->Define(array('Garden.Staff.Allow' => 'Garden.Moderation.Manage'));
+      Gdn::PermissionModel()->Define(['Garden.Staff.Allow' => 'Garden.Moderation.Manage']);
    }
-    
+
    /**
     * @param Controller $Sender
     * @param array $Args
@@ -72,16 +72,16 @@ class SalesforcePlugin extends Gdn_Plugin {
       $Sf = GetValueR('User.Attributes.' . Salesforce::ProviderKey, $Args);
       Trace($Sf);
       $Profile = GetValueR('User.Attributes.' . Salesforce::ProviderKey . '.Profile', $Args);
-      $Sender->Data["Connections"][Salesforce::ProviderKey] = array(
+      $Sender->Data["Connections"][Salesforce::ProviderKey] = [
          'Icon' => $this->GetWebResource('icon.svg', '/'),
          'Name' => Salesforce::ProviderKey,
          'ProviderKey' => Salesforce::ProviderKey,
          'ConnectUrl' => Salesforce::AuthorizeUri(Salesforce::ProfileConnecUrl()),
-         'Profile' => array(
+         'Profile' => [
             'Name' => GetValue('fullname', $Profile),
             'Photo' => null
-         )
-      );
+         ]
+      ];
    }
 
    /**
@@ -106,17 +106,17 @@ class SalesforcePlugin extends Gdn_Plugin {
                ->Dispatch('home/error');
             return;
          }
-         Redirect(Url('/plugin/Salesforce/?DashboardConnection=1&' . http_build_query($Tokens)));
+         redirectTo('/plugin/Salesforce/?DashboardConnection=1&'.http_build_query($Tokens));
       }
       try {
          $Tokens = Salesforce::GetTokens($Code, Salesforce::ProfileConnecUrl());
       } catch (Gdn_UserException $e) {
-         $Attributes = array(
+         $Attributes = [
             'RefreshToken' => NULL,
             'AccessToken' => NULL,
             'InstanceUrl' => NULL,
             'Profile' => NULL,
-         );
+         ];
          Gdn::UserModel()->SaveAttribute($Sender->User->UserID, Salesforce::ProviderKey, $Attributes);
          $Message = $e->getMessage();
          Gdn::Dispatcher()->PassData('Exception', htmlspecialchars($Message))
@@ -129,17 +129,17 @@ class SalesforcePlugin extends Gdn_Plugin {
       $RefreshToken = GetValue('refresh_token', $Tokens);
       $Salesforce = new Salesforce($AccessToken, $InstanceUrl);
       $Profile = $Salesforce->GetLoginProfile($LoginID);
-      Gdn::UserModel()->SaveAuthentication(array(
+      Gdn::UserModel()->SaveAuthentication([
          'UserID' => $Sender->User->UserID,
          'Provider' => Salesforce::ProviderKey,
          'UniqueID' => $Profile['id']
-      ));
-      $Attributes = array(
+      ]);
+      $Attributes = [
          'RefreshToken' => $RefreshToken,
          'AccessToken' => $AccessToken,
          'InstanceUrl' => $InstanceUrl,
          'Profile' => $Profile,
-      );
+      ];
       Gdn::UserModel()->SaveAttribute($Sender->User->UserID, Salesforce::ProviderKey, $Attributes);
       $this->EventArguments['Provider'] = Salesforce::ProviderKey;
       $this->EventArguments['User'] = $Sender->User;
@@ -147,7 +147,7 @@ class SalesforcePlugin extends Gdn_Plugin {
 
       $RedirectUrl = UserUrl($Sender->User, '', 'connections');
 
-      Redirect($RedirectUrl);
+      redirectTo($RedirectUrl);
    }
 
    /**
@@ -168,7 +168,7 @@ class SalesforcePlugin extends Gdn_Plugin {
     */
    public function Controller_Connect() {
       $AuthorizeUrl = Salesforce::AuthorizeUri(FALSE, 'DashboardConnection');
-      Redirect($AuthorizeUrl);
+      redirectTo($AuthorizeUrl, 302, false);
    }
 
    /**
@@ -180,14 +180,14 @@ class SalesforcePlugin extends Gdn_Plugin {
       $Token = GetValue('token', $_GET, FALSE);
       if ($Token) {
          $Salesforce->Revoke($Token);
-         RemoveFromConfig(array(
+         RemoveFromConfig([
             'Plugins.Salesforce.DashboardConnection.Token' => FALSE,
             'Plugins.Salesforce.DashboardConnection.RefreshToken' => FALSE,
             'Plugins.Salesforce.DashboardConnection.Token' => FALSE,
             'Plugins.Salesforce.DashboardConnection.InstanceUrl' => FALSE
-         ));
+         ]);
       }
-      Redirect(Url('/plugin/Salesforce'));
+      redirectTo('/plugin/Salesforce');
    }
 
    /**
@@ -202,24 +202,24 @@ class SalesforcePlugin extends Gdn_Plugin {
          $RefreshResponse = $Salesforce->Refresh($Token);
          $AccessToken = GetValue('access_token', $RefreshResponse);
          $InstanceUrl = GetValue('instance_url', $RefreshResponse);
-         SaveToConfig(array(
+         SaveToConfig([
             'Plugins.Salesforce.DashboardConnection.InstanceUrl' => $InstanceUrl,
             'Plugins.Salesforce.DashboardConnection.Token' => $AccessToken
-         ));
+         ]);
          $Salesforce->SetAccessToken($AccessToken);
          $Salesforce->SetInstanceUrl($InstanceUrl);
-         Redirect(Url('/plugin/Salesforce'));
+         redirectTo('/plugin/Salesforce');
       }
    }
 
    public function Controller_Enable() {
       SaveToConfig('Plugins.Salesforce.DashboardConnection.Enabled', TRUE);
-      Redirect(Url('/plugin/Salesforce'));
+      redirectTo('/plugin/Salesforce');
    }
 
    public function Controller_Disable() {
       RemoveFromConfig('Plugins.Salesforce.DashboardConnection.Enabled');
-      Redirect(Url('/plugin/Salesforce'));
+      redirectTo('/plugin/Salesforce');
    }
 
    /**
@@ -232,23 +232,23 @@ class SalesforcePlugin extends Gdn_Plugin {
       $Salesforce = Salesforce::Instance();
       if (GetValue('DashboardConnection', $_GET, FALSE)) {
          $Sender->SetData('DashboardConnection', TRUE);
-         SaveToConfig(array(
+         SaveToConfig([
             'Plugins.Salesforce.DashboardConnection.Enabled' => TRUE,
             'Plugins.Salesforce.DashboardConnection.LoginId' => GetValue('id', $_GET),
             'Plugins.Salesforce.DashboardConnection.InstanceUrl' => GetValue('instance_url', $_GET),
             'Plugins.Salesforce.DashboardConnection.Token' => GetValue('access_token', $_GET),
             'Plugins.Salesforce.DashboardConnection.RefreshToken' => GetValue('refresh_token', $_GET),
-         ));
+         ]);
 
          $Sender->InformMessage('Changes Saved to Config');
-         Redirect(Url('/plugin/Salesforce'));
+         redirectTo('/plugin/Salesforce');
       }
-      $Sender->SetData(array(
+      $Sender->SetData([
          'DashboardConnection' => C('Plugins.Salesforce.DashboardConnection.Enabled'),
          'DashboardConnectionProfile'=> FALSE,
          'DashboardConnectionToken' => C('Plugins.Salesforce.DashboardConnection.Token', FALSE),
          'DashboardConnectionRefreshToken' => C('Plugins.Salesforce.DashboardConnection.RefreshToken', FALSE)
-      ));
+      ]);
       if (C('Plugins.Salesforce.DashboardConnection.LoginId') && C('Plugins.Salesforce.DashboardConnection.Enabled')) {
 //         $Salesforce->UseDashboardConnection();
          $DashboardConnectionProfile = $Salesforce->GetLoginProfile(C('Plugins.Salesforce.DashboardConnection.LoginId'));
@@ -257,11 +257,11 @@ class SalesforcePlugin extends Gdn_Plugin {
       }
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(array(
+      $ConfigurationModel->SetField([
          'Plugins.Salesforce.ApplicationID',
          'Plugins.Salesforce.Secret',
          'Plugins.Salesforce.AuthenticationUrl',
-      ));
+      ]);
       // Set the model on the form.
       $Sender->Form->SetModel($ConfigurationModel);
       // If seeing the form for the first time...
@@ -304,18 +304,18 @@ class SalesforcePlugin extends Gdn_Plugin {
       $UserID = $Args['Discussion']->InsertUserID;
       $DiscussionID = $Args['Discussion']->DiscussionID;
       if (isset($Args['DiscussionOptions'])) {
-         $Args['DiscussionOptions']['SalesforceLead'] = array(
+         $Args['DiscussionOptions']['SalesforceLead'] = [
             'Label' => T('Salesforce - Add Lead'),
             'Url' => "/discussion/SalesforceLead/Discussion/$DiscussionID/$UserID",
             'Class' => 'Popup'
-         );
-         $Args['DiscussionOptions']['SalesforceCase'] = array(
+         ];
+         $Args['DiscussionOptions']['SalesforceCase'] = [
             'Label' => T('Salesforce - Create Case'),
             'Url' => "/discussion/SalesforceCase/Discussion/$DiscussionID/$UserID",
             'Class' => 'Popup'
-         );
+         ];
          //remove create Create already created
-         $Attachments = GetValue('Attachments', $Args['Discussion'], array());
+         $Attachments = GetValue('Attachments', $Args['Discussion'], []);
          foreach ($Attachments as $Attachment) {
             if ($Attachment['Type'] == 'salesforce-case') {
                unset($Args['DiscussionOptions']['SalesforceCase']);
@@ -340,18 +340,18 @@ class SalesforcePlugin extends Gdn_Plugin {
       }
       $UserID = $Args['Comment']->InsertUserID;
       $CommentID = $Args['Comment']->CommentID;
-      $Args['CommentOptions']['SalesforceLead'] = array(
+      $Args['CommentOptions']['SalesforceLead'] = [
          'Label' => T('Salesforce - Add Lead'),
          'Url' => "/discussion/SalesforceLead/Comment/$CommentID/$UserID",
          'Class' => 'Popup'
-      );
-      $Args['CommentOptions']['SalesforceCase'] = array(
+      ];
+      $Args['CommentOptions']['SalesforceCase'] = [
          'Label' => T('Salesforce - Create Case'),
          'Url' => "/discussion/SalesforceCase/Comment/$CommentID/$UserID",
          'Class' => 'Popup'
-      );
+      ];
       //remove create Create already created
-      $Attachments = GetValue('Attachments', $Args['Comment'], array());
+      $Attachments = GetValue('Attachments', $Args['Comment'], []);
       foreach ($Attachments as $Attachment) {
          if ($Attachment['Type'] == 'salesforce-case') {
             unset($Args['CommentOptions']['SalesforceCase']);
@@ -439,7 +439,7 @@ class SalesforcePlugin extends Gdn_Plugin {
          if ($Sender->Form->ErrorCount() == 0) {
             $FormValues = $Sender->Form->FormValues();
             // Create Lead in salesforce
-            $LeadID = $Salesforce->CreateLead(array(
+            $LeadID = $Salesforce->CreateLead([
                'FirstName' => $FormValues['FirstName'],
                'LastName' => $FormValues['LastName'],
                'Email' => $FormValues['Email'],
@@ -449,9 +449,9 @@ class SalesforcePlugin extends Gdn_Plugin {
                'Status' => $FormValues['Status'],
                'Vanilla__ForumUrl__c' => $FormValues['ForumUrl'],
                'Description' => $FormValues['Description']
-            ));
+            ]);
             // Save Lead information in our Attachment Table
-            $ID = $AttachmentModel->Save(array(
+            $ID = $AttachmentModel->Save([
                'Type' => 'salesforce-lead',
                'ForeignID' => $AttachmentModel->RowID($Content),
                'ForeignUserID' => $Content->InsertUserID,
@@ -464,7 +464,7 @@ class SalesforcePlugin extends Gdn_Plugin {
                'Title' => $FormValues['Title'],
                'Status' => $FormValues['Status'],
                'LastModifiedDate' => Gdn_Format::ToDateTime(),
-            ));
+            ]);
 
             if (!$ID) {
                $Sender->Form->SetValidationResults($AttachmentModel->ValidationResults());
@@ -477,7 +477,7 @@ class SalesforcePlugin extends Gdn_Plugin {
       }
       list($FirstName, $LastName) = $this->GetFirstNameLastName($User->Name);
       try {
-         $Data = array(
+         $Data = [
             'DiscussionID' => $Content->DiscussionID,
             'FirstName' => $FirstName,
             'LastName' => $LastName,
@@ -486,7 +486,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             'Title' => $User->Title,
             'LeadSource' => 'Vanilla',
             'Options' => $Salesforce->GetLeadStatusOptions(),
-         );
+         ];
       } catch (Gdn_UserException $e) {
          $Salesforce->Reconnect();
       }
@@ -561,15 +561,15 @@ class SalesforcePlugin extends Gdn_Plugin {
             $Contact = $Salesforce->FindContact($FormValues['Email']);
             if (!$Contact['Id']) {
                //If not a contact then add contact
-               $Contact['Id'] = $Salesforce->CreateContact(array(
+               $Contact['Id'] = $Salesforce->CreateContact([
                   'FirstName' => $FormValues['FirstName'],
                   'LastName' => $FormValues['LastName'],
                   'Email' => $FormValues['Email'],
                   'LeadSource' => $FormValues['LeadSource'],
-               ));
+               ]);
             }
             //Create Case using salesforce API
-            $CaseID = $Salesforce->CreateCase(array(
+            $CaseID = $Salesforce->CreateCase([
                'ContactId' => $Contact['Id'],
                'Status' => $FormValues['Status'],
                'Origin' => $FormValues['Origin'],
@@ -577,9 +577,9 @@ class SalesforcePlugin extends Gdn_Plugin {
                'Subject' => $Sender->DiscussionModel->GetID($Content->DiscussionID)->Name,
                'Description' => $FormValues['Body'],
                'Vanilla__ForumUrl__c' => $FormValues['SourceUri']
-            ));
+            ]);
             //Save information to our Attachment Table
-            $ID = $AttachmentModel->Save(array(
+            $ID = $AttachmentModel->Save([
                'Type' => 'salesforce-case',
                'ForeignID' => $AttachmentModel->RowID($Content),
                'ForeignUserID' => $Content->InsertUserID,
@@ -589,7 +589,7 @@ class SalesforcePlugin extends Gdn_Plugin {
                'Status' => $FormValues['Status'],
                'Priority' => $FormValues['Priority'],
 
-            ));
+            ]);
             if (!$ID) {
                $Sender->Form->SetValidationResults($AttachmentModel->ValidationResults());
             }
@@ -604,7 +604,7 @@ class SalesforcePlugin extends Gdn_Plugin {
       list($FirstName, $LastName) = $this->GetFirstNameLastName($User->Name);
 
       try {
-            $Data = array(
+            $Data = [
                'DiscussionID' => $Content->DiscussionID,
                'FirstName' => $FirstName,
                'LastName' => $LastName,
@@ -614,7 +614,7 @@ class SalesforcePlugin extends Gdn_Plugin {
                'Options' => $Salesforce->GetCaseStatusOptions(),
                'Priorities' => $Salesforce->GetCasePriorityOptions(),
                'Body' => Gdn_Format::TextEx($Content->Body)
-            );
+            ];
       } catch (Gdn_UserException $e) {
          $Salesforce->Reconnect();
       }
@@ -660,19 +660,19 @@ class SalesforcePlugin extends Gdn_Plugin {
          foreach ($Args[$Content]->Attachments as $Attachment) {
             if ($Attachment['Type'] == 'salesforce-case') {
                if ($Attachment['ForeignUserID'] == $Session->UserID) {
-                  WriteGenericAttachment(array(
+                  WriteGenericAttachment([
                      'Icon' => 'ticket',
                      'Body' => Wrap(T('A ticket has been generated from this post.'), 'p'),
-                     'Fields' => array(
+                     'Fields' => [
                         'one' => 'two'
-                     )
-                  ));
+                     ]
+                  ]);
 
                } else {
-                  WriteGenericAttachment(array(
+                  WriteGenericAttachment([
                      'Icon' => 'ticket',
                      'Body' => Wrap(T('A ticket has been generated from this post.'), 'p')
-                  ));
+                  ]);
                }
             }
          }
@@ -772,7 +772,7 @@ class SalesforcePlugin extends Gdn_Plugin {
     */
    public function ProfileController_Render_Before($Sender, $Args) {
       $AttachmentModel = AttachmentModel::Instance();
-      $AttachmentModel->JoinAttachmentsToUser($Sender, $Args, array('Type' => 'salesforce-lead'), 1);
+      $AttachmentModel->JoinAttachmentsToUser($Sender, $Args, ['Type' => 'salesforce-lead'], 1);
    }
 
    /**
@@ -820,7 +820,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             $LastName = '';
             break;
       }
-      return array($FirstName, $LastName);
+      return [$FirstName, $LastName];
    }
 
    /**

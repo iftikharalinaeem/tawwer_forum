@@ -18,7 +18,7 @@ echo $this->Form->Errors();
             ?>
          </div>
          <?php
-         echo $this->Form->TextBox('CustomCSS', array('MultiLine' => TRUE, 'class' => 'TextBox CustomCSSBox Autogrow'));
+         echo $this->Form->TextBox('CustomCSS', ['MultiLine' => TRUE, 'class' => 'TextBox CustomCSSBox Autogrow']);
          ?>
       </div>
       <div class="CustomCSSOptions">
@@ -29,30 +29,30 @@ echo $this->Form->Errors();
                   <strong>How to include your Custom CSS:</strong>
                   <?php
                   $Default = Gdn::Config('Plugins.CustomCSS.IncludeTheme', 'Yes');
-                  echo $this->Form->Radio('IncludeTheme', 'Add my css after the '.$ThemeName.' theme css.', array('value' => 'Yes', 'default' => $Default));
-                  echo $this->Form->Radio('IncludeTheme', "Don't use any theme css, ONLY use mine.", array('value' => 'No', 'default' => $Default));
+                  echo $this->Form->Radio('IncludeTheme', 'Add my css after the '.$ThemeName.' theme css.', ['value' => 'Yes', 'default' => $Default]);
+                  echo $this->Form->Radio('IncludeTheme', "Don't use any theme css, ONLY use mine.", ['value' => 'No', 'default' => $Default]);
                   ?>
                </li>
             </ul>
             <?php
             if (Gdn::Config('Plugins.CustomCSS.Enabled'))
-               echo $this->Form->Button('Apply ⇥', array('Name' => 'Form/Apply'));
+               echo $this->Form->Button('Apply ⇥', ['Name' => 'Form/Apply']);
 
-            echo $this->Form->Button('Preview ⇡', array('Name' => 'Form/Preview'));
+            echo $this->Form->Button('Preview ⇡', ['Name' => 'Form/Preview']);
             ?>
          </div>
          <strong>Help</strong>
          <div class="Info">
             <div>If you are new to CSS, here are some links you should check out:</div>
             <?php
-            echo '→ '.Anchor('Our Custom CSS Documentation', 'http://vanillaforums.com/help/customcss', '', array('target' => '_blank'));
-            echo '<br />→ '.Anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', array('target' => '_blank'));
-            echo '<br />→ '.Anchor("Html Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', array('target' => '_blank'));
+            echo '→ '.Anchor('Our Custom CSS Documentation', 'http://vanillaforums.com/help/customcss', '', ['target' => '_blank']);
+            echo '<br />→ '.Anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', ['target' => '_blank']);
+            echo '<br />→ '.Anchor("Html Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', ['target' => '_blank']);
             ?>            
          </div>
          <?php
             $Folder = PATH_CACHE . DS . 'CustomCSS' . DS . Gdn::Config('Garden.Theme', '');
-            $FileArray = array();
+            $FileArray = [];
             $Files = '';
             if (file_exists($Folder)) {
                if ($Handle = opendir($Folder)) {

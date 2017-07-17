@@ -19,7 +19,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    private $plugin_title = 'Bulk User Import';
 
    // Will contain whitelist of allowed roles.
-   private $allowed_roles = array();
+   private $allowed_roles = [];
 
    /*
     * Grab maximum of 1000 rows, or timeout after 10 seconds--whichever
@@ -64,10 +64,10 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
     *
     * @var array $username_limits
     */
-   public $username_limits = array(
+   public $username_limits = [
        'min' => 3,
        'max' => 40
-   );
+   ];
 
    public function __construct() {
       $this->database_prefix = Gdn::Database()->DatabasePrefix;
@@ -185,10 +185,10 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       }
 
       // Returned by function
-      $results = array(
-         'success' => array(),
-         'fail' => array()
-      );
+      $results = [
+         'success' => [],
+         'fail' => []
+      ];
 
       // Create destination path
       $destination_dir = PATH_UPLOADS . '/csv';
@@ -199,8 +199,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $post = Gdn::Request()->Post();
 
       // Validate files
-      $allowed_files = array('csv');
-      $files = array();
+      $allowed_files = ['csv'];
+      $files = [];
 
       // File that is included by URL, so download.
       if (!count(array_filter($import_files['size']))) {
@@ -332,7 +332,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       //exit;
 
       // Collect error messages, concatenate them at end.
-      $error_messages = array();
+      $error_messages = [];
 
       // Get POST 'debug' value, because if it's
       // in debug, it will not send emails. Called it 'debug' in case in future
@@ -347,7 +347,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       // Determine if user will be sent an invitation, or inserted directly.
       // If no value provided, default is to send an invite.
       // Values: invite (default), insert
-      $userin_modes = array('invite', 'insert', 'update');
+      $userin_modes = ['invite', 'insert', 'update'];
       $userin_mode = $sender->Request->Post('userin');
       $userin_mode = (isset($userin_mode) && in_array($userin_mode, $userin_modes))
          ? $userin_mode
@@ -370,7 +370,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       }
 
       $bulk_user_importer_model = new Gdn_Model($this->table_name);
-      $imported_users = $bulk_user_importer_model->GetWhere(array('ThreadID' => $thread_id, 'Completed' => 0), '', 'asc', $this->limit)->ResultArray();
+      $imported_users = $bulk_user_importer_model->GetWhere(['ThreadID' => $thread_id, 'Completed' => 0], '', 'asc', $this->limit)->ResultArray();
 
       // Immediately block off the selection
 
@@ -398,8 +398,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          $user['Email'] = trim($user['Email']);
 
          // Make sure these are reset on every iteration.
-         $status = array();
-         $role_ids = array();
+         $status = [];
+         $role_ids = [];
          $banned = 0;
 
          // Grab first import id in job.
@@ -457,14 +457,14 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             if (count($status['invalid_roles'])) {
                $status_list = implode(', ', $status['invalid_roles']);
             } else {
-               $status['invalid_roles'] = array();
+               $status['invalid_roles'] = [];
                $show_role_error = false;
             }
 
             // If invalid roles provided alongside valid roles, clear the
             // valid roles just to be safe.
             if (!empty($status['role_ids']) && count($status['role_ids'])) {
-               $role_ids = $status['role_ids'] = array();
+               $role_ids = $status['role_ids'] = [];
             }
 
             // If userin_mode is update--roles are required, so do not suppress
@@ -505,9 +505,9 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                if (!isset($error_messages[$processed]['username'])
                && !isset($error_messages[$processed]['role'])) {
                   // Check if username in use.
-                  $check_name = $user_model->GetWhere(array(
+                  $check_name = $user_model->GetWhere([
                       'Name' => $user['Username']
-                  ))->FirstRow('array');
+                  ])->FirstRow('array');
 
                   // Username controls, so if it exists, update the info, including
                   // email, otherwise create new user.
@@ -534,36 +534,36 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
                      // Update the user.
                      $user_id = $user_model->Save(
-                        array(
+                        [
                          'UserID' => $check_name['UserID'],
                          'Name' => $check_name['Name'],
                          'Email' => $user['Email'],
                          'RoleID' => $role_ids,
                          'Banned' => $banned
-                     ), array(
+                     ], [
                          'SaveRoles' => true,
                          'FixUnique' => false // No, do not create a new user.
-                     ));
+                     ]);
                   } else {
                      $send_email = true;
                      // Create new user. The method seems to rely on Captcha keys, so
                      // this may error out due to none being passed to it.
                      $temp_password = sha1($user['Email'] . time());
 
-                     $form_post_values = array(
+                     $form_post_values = [
                         'Name' => $user['Username'],
                         'Password' => $temp_password, // This will get reset
                         'Email' => $user['Email'],
                         'RoleID' => $role_ids,
                         'Banned' => $banned,
                         'DateInserted' => Gdn_Format::ToDateTime()
-                     );
+                     ];
 
-                     $form_post_options = array(
+                     $form_post_options = [
                         'SaveRoles' => true,
                         'CheckCaptcha' => false,
                         'ValidateSpam' => false
-                     );
+                     ];
 
                      // This additional check is here to check if forum is in
                      // a registration mode that would require additional information
@@ -596,7 +596,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                   array_filter($error_messages[$processed]);
                }
 
-               $user_row = array();
+               $user_row = [];
                // Check if email exists in user table.
                if (!isset($error_messages[$processed]['email'])) {
                   $user_row = (array) $user_model->GetByEmail($user['Email']);
@@ -617,18 +617,18 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                // If there is a valid email and role(s), continue processing.
                if (!isset($error_messages[$processed]['email'])
                && !isset($error_messages[$processed]['role'])) {
-                  $form_post_values = array(
+                  $form_post_values = [
                      'UserID' => $user_row['UserID'],
                      'Name' => $username,
                      'RoleID' => $role_ids,
                      'Banned' => $banned
-                  );
+                  ];
 
-                  $form_post_options = array(
+                  $form_post_options = [
                      'SaveRoles' => true,
                      'CheckCaptcha' => false,
                      'ValidateSpam' => false
-                  );
+                  ];
 
                   $user_model->Validation->UnapplyRule('Email', 'Required');
                   $user_model->Validation->UnapplyRule('Password', 'Required');
@@ -662,7 +662,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                      ? true
                      : false;
 
-                  $form_post_values = array(
+                  $form_post_values = [
                      'Name' => $username,
                      'Email' => $user['Email'],
                      'RoleIDs' => dbencode($role_ids),
@@ -672,14 +672,14 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                      'DateExpires' => ($invitation_expiration === 0)
                         ? null
                         : Gdn_Format::ToDateTime($invitation_expiration)
-                  );
+                  ];
 
                   // No point saving banned users to invitation table.
                   if (!$banned) {
-                     $invite_success = $invitation_model->Save($form_post_values, $user_model, array(
+                     $invite_success = $invitation_model->Save($form_post_values, $user_model, [
                          'SendEmail' => $send_invite_email,
                          'Resend' => true
-                     ));
+                     ]);
                   }
                }
 
@@ -688,7 +688,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          // Handle both insert and invite $userin_mode
          // This is so error handling is the same.
-         $userin_model = (in_array($userin_mode, array('insert', 'update')))
+         $userin_model = (in_array($userin_mode, ['insert', 'update']))
             ? $user_model
             : $invitation_model;
 
@@ -729,13 +729,13 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          // Log errors in DB--will be cleared on next import.
          $bulk_user_importer_model->Update(
-            array(
+            [
                'Completed' => $complete_code,
                'Error' => $error_string
-            ),
-            array(
+            ],
+            [
                'ImportID' => $user['ImportID']
-            )
+            ]
          );
 
          // Email successfully added users, but not users who already had an
@@ -780,20 +780,20 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       $sender->SetJson('job_rows_processed', $processed);
 
       // Send total rows processed so far.
-      $total_rows_completed = $bulk_user_importer_model->GetCount(array(
+      $total_rows_completed = $bulk_user_importer_model->GetCount([
           'Completed >' => 0
-      ));
+      ]);
       $sender->SetJson('total_rows_completed', $total_rows_completed);
 
       // Send error dumps.
       if ($total_fail) {
          // Get dumps from DB relevant to this job.
          $bulk_error_dump = $bulk_user_importer_model->GetWhere(
-            array(
+            [
              'ThreadID' => $thread_id,
              'ImportID >=' => $first_import_id,
              'Completed' => 2
-            ),
+            ],
             '',
             'asc',
             $this->limit
@@ -805,7 +805,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          // I do let them know invalid emails, usernames, and roles, so they
          // could insert some nonsense strings, but even so, it would
          // only affect themselves.
-         $errors = array_map(array('Gdn_Format', 'PlainText'), $errors);
+         $errors = array_map(['Gdn_Format', 'PlainText'], $errors);
 
          $sender->SetJson('bulk_error_dump', json_encode($errors));
       }
@@ -822,10 +822,10 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
       $user_model = Gdn::UserModel();
 
-      $Users = $user_model->GetWhere(array('Email' => $Email))->ResultObject();
+      $Users = $user_model->GetWhere(['Email' => $Email])->ResultObject();
       if (count($Users) == 0) {
          // Check for the username.
-         $Users = $user_model->GetWhere(array('Name' => $Email))->ResultObject();
+         $Users = $user_model->GetWhere(['Name' => $Email])->ResultObject();
       }
 
       if (count($Users) == 0) {
@@ -932,16 +932,16 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       // Whitelist from DB.
       $allowed_roles = array_map('strtolower', $this->allowed_roles);
 
-      $status = array(
-          'role_ids' => array(),
-          'invalid_roles' => array(),
+      $status = [
+          'role_ids' => [],
+          'invalid_roles' => [],
           'banned' => 0,
           // These are not coded yet.
           'confirmed' => 1,
           'verified' => 1
-      );
+      ];
 
-      $role_ids = array();
+      $role_ids = [];
 
       if (is_string($role_names) && !is_numeric($role_names)) {
          // The $role_names are a colon-delimited list of role names.

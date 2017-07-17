@@ -27,7 +27,7 @@ helpAsset(sprintf(t('About %s'), t('Mass Synchronization')),
         <li class="form-group">
             <?php echo $this->Form->labelWrap("Sync to List", "SyncListID"); ?>
             <div class="input-wrap">
-                <?php echo $this->Form->dropDown('SyncListID', $this->data('Lists'), array('IncludeNull' => true)); ?>
+                <?php echo $this->Form->dropDown('SyncListID', $this->data('Lists'), ['IncludeNull' => true]); ?>
             </div>
         </li>
         <?php
@@ -39,7 +39,7 @@ helpAsset(sprintf(t('About %s'), t('Mass Synchronization')),
             echo $this->Form->labelWrap('Group', 'SyncInterestID'.$list);
             echo '<div class="input-wrap">';
             // Disable the sync interest dropdown by default. Will be activated by javascript if needed.
-            echo $this->Form->dropDown('SyncInterestID['.$list.']', $interest, array('IncludeNull' => true, 'disabled' => true));
+            echo $this->Form->dropDown('SyncInterestID['.$list.']', $interest, ['IncludeNull' => true, 'disabled' => true]);
             echo '</div>';
             echo "</li>";
         }

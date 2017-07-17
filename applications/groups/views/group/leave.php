@@ -12,8 +12,8 @@ echo $this->Form->Errors();
 
 <div class="Buttons Buttons-Confirm">
     <?php
-    echo $this->Form->Button('OK', array('class' => 'Button Primary'));
-    echo ' '.$this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close'));
+    echo $this->Form->Button('OK', ['class' => 'Button Primary']);
+    echo ' '.$this->Form->Button('Cancel', ['type' => 'button', 'class' => 'Button Close']);
     ?>
 </div>
 <?php

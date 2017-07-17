@@ -14,5 +14,6 @@
     ],
     "require": {
         "vanilla": ">=2.3"
-    }
+    },
+    "icon": "category_roles.png"
 }

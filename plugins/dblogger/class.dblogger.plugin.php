@@ -15,12 +15,12 @@ class DbLoggerPlugin extends Gdn_Plugin {
         $this->setLevel(c('Plugins.dblogger.Level', Logger::INFO));
     }
 
-    public $severityOptions = array(
+    public $severityOptions = [
         'info' => true,
         'notice' => true,
         'warning' => true,
         'error' => true,
-    );
+    ];
 
     public function setup() {
         $this->structure();
@@ -162,12 +162,12 @@ class DbLoggerPlugin extends Gdn_Plugin {
         $CurrentFilter = http_build_query($filter);
 
         $Sender->SetData(
-            array(
+            [
                 'Events' => $events,
                 'SeverityOptions' => $SeverityOptions,
                 'SortOrder' => $sortOrder,
                 'CurrentFilter' => $CurrentFilter
-            )
+            ]
         );
 
         $Sender->Render('eventlog', '', 'plugins/dblogger');

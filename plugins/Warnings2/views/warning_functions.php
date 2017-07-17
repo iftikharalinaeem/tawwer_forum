@@ -13,12 +13,12 @@ function writeUserNoteWarningUser($Row) {
 
        <div class="Media">
            <?php if (!isset($Row['HideWarnerIdentity']) || !$Row['HideWarnerIdentity']): ?>
-               <?php echo userPhoto($Row, array('LinkClass' => 'Img', 'Px' => 'Insert')); ?>
+               <?php echo userPhoto($Row, ['LinkClass' => 'Img', 'Px' => 'Insert']); ?>
            <?php endif; ?>
            <div class="Media-Body">
                <?php
                if (!isset($Row['HideWarnerIdentity']) || !$Row['HideWarnerIdentity']) {
-                   echo '<div>'.userAnchor($Row, '', array('Px' => 'Insert')).'</div> ';
+                   echo '<div>'.userAnchor($Row, '', ['Px' => 'Insert']).'</div> ';
                }
                echo '<div class="Meta"><a href="' . $ViewNoteUrl . '">'.Gdn_Format::date($Row['DateInserted'], 'html').'</a></div>';
                ?>
@@ -51,12 +51,12 @@ function writeUserNoteWarning($Row) {
             Gdn_Theme::bulletRow(bullet(' '));
             if (val('ConversationID', $Row)) {
                echo Gdn_Theme::bulletItem('Conversation').
-                  anchor(t('message'), '/messages/'.val('ConversationID', $Row).'#latest', 'OptionsLink', array('title' => t('The private message between the user and moderator.')));
+                  anchor(t('message'), '/messages/'.val('ConversationID', $Row).'#latest', 'OptionsLink', ['title' => t('The private message between the user and moderator.')]);
             }
 
             if (!$Reversed && $IsPrivileged) {
                echo Gdn_Theme::bulletItem('Reverse').
-                  anchor(t('reverse'), '/profile/reversewarning?id='.$Row['UserNoteID'], 'Popup OptionsLink', array('title' => t('Reverse this warning')));
+                  anchor(t('reverse'), '/profile/reversewarning?id='.$Row['UserNoteID'], 'Popup OptionsLink', ['title' => t('Reverse this warning')]);
             }
             ?>
          </div>

@@ -1,7 +1,7 @@
 {
     "name": "Reverse Proxy Support",
     "description": "Rewrite urls so that they appear to come from another scheme://host/path",
-    "version": "1.0",
+    "version": "1.0.1",
     "license": "Proprietary",
     "settingsUrl": "/settings/reverseproxysupport",
     "usePopupSettings": false,
@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.4.200"
+        "vanilla": ">=2.4"
     },
     "priority": 1100,
     "icon": "reverse-proxy-support.png"

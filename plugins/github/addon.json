@@ -1,7 +1,7 @@
 {
     "name": "GitHub",
     "description": "Allow staff users to create issues from discussions and comments.",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "settingsUrl": "/plugin/github",
     "settingsPermission": "Garden.Settings.Manage",
     "mobileFriendly": true,
@@ -18,6 +18,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.1.18"
+        "vanilla": ">=2.4"
     }
 }

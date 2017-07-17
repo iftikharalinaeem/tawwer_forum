@@ -30,7 +30,7 @@ echo $this->Form->Errors();
 <div class="Wrap">
    <div class="P">
       <?php
-      echo $this->Form->CheckBox('VerifyModerators', 'Mark moderators verified before cleaning. (recommended)', array('Default' => TRUE));
+      echo $this->Form->CheckBox('VerifyModerators', 'Mark moderators verified before cleaning. (recommended)', ['Default' => TRUE]);
       ?>
    </div>
 
@@ -43,7 +43,7 @@ echo $this->Form->Errors();
 <?php foreach ($this->Data('Types') as $Type => $Info): ?>
    <div class="P">
       <?php
-      echo $this->Form->CheckBox('Type_'.$Type, $Info['Label'], array('value' => $Type));
+      echo $this->Form->CheckBox('Type_'.$Type, $Info['Label'], ['value' => $Type]);
       if ($this->Data('StartCleanSpam') && $this->Form->GetFormValue('Type_'.$Type)) {
          echo ' <span class="Count"><span class="CountSpam">0</span> / <span class="CountAll">0</span> Found</span>';
       }

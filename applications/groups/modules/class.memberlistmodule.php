@@ -77,7 +77,7 @@ class MemberListModule extends Gdn_Module {
      */
     protected function getMemberButtons($member, $group) {
         $userId = val('UserID', $member);
-        $buttons = array();
+        $buttons = [];
         if (GroupPermission('Moderate') && (val('InsertUserID', $group) != $userId)) {
             if (GroupPermission('Edit')) {
                 if (val('Role', $member) == 'Leader') {

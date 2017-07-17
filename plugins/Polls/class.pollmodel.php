@@ -28,7 +28,7 @@ class PollModel extends Gdn_Model {
      * @return array
      */
     public function getByDiscussionID($discussionID) {
-        return $this->getWhere(array('DiscussionID' => $discussionID))->firstRow();
+        return $this->getWhere(['DiscussionID' => $discussionID])->firstRow();
     }
 
     /**
@@ -138,7 +138,7 @@ class PollModel extends Gdn_Model {
 
         // Are there enough non-empty poll options?
         $pollOptions = val('PollOption', $formPostValues);
-        $validPollOptions = array();
+        $validPollOptions = [];
         if (is_array($pollOptions))
             foreach ($pollOptions as $pollOption) {
                 $pollOption = trim(Gdn_Format::plainText($pollOption));
@@ -186,6 +186,11 @@ class PollModel extends Gdn_Model {
                     $pollOptionModel->save($pollOption);
                 }
                 // Update the discussion attributes with info
+            } else {
+                // Add the results to this validation object so they bubble up to the form.
+                // The validate method of the discussion model is bubbled into the poll model earlier
+                // but the save method may also trigger errors i.e. spam check.
+                $this->Validation->addValidationResult($discussionModel->Validation->results());
             }
         }
 
@@ -211,7 +216,7 @@ class PollModel extends Gdn_Model {
             $hasVoted = ($this->SQL
                 ->select()
                 ->from('PollVote')
-                ->where(array('UserID' => $userID, 'PollOptionID' => $pollOptionID))
+                ->where(['UserID' => $userID, 'PollOptionID' => $pollOptionID])
                 ->get()->numRows() > 0);
             if (!$hasVoted) {
                 // Insert the vote

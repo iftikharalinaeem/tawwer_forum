@@ -151,7 +151,7 @@ if(isset($_REQUEST['timestamp'])) $css->set_cfg('timestamp',true);
             id="template" name="template" style="margin-bottom:1em;">
               <?php
                 $num = ($_REQUEST['template']) ? intval($_REQUEST['template']) : 1;
-                echo options(array(3 => $lang[$l][13], 2 => $lang[$l][14], 1 => $lang[$l][15], 0 => $lang[$l][16], 4 => $lang[$l][17]), $num);
+                echo options([3 => $lang[$l][13], 2 => $lang[$l][14], 1 => $lang[$l][15], 0 => $lang[$l][16], 4 => $lang[$l][17]], $num);
               ?>
             </select><br />
             <label for="custom" class="block">
@@ -184,12 +184,12 @@ if(isset($_REQUEST['timestamp'])) $css->set_cfg('timestamp',true);
 
             <label for="merge_selectors"><?php echo $lang[$l][22]; ?></label>
             <select style="width:15em;" name="merge_selectors" id="merge_selectors">
-              <?php echo options(array('0' => $lang[$l][47], '1' => $lang[$l][48], '2' => $lang[$l][49]), $css->get_cfg('merge_selectors')); ?>
+              <?php echo options(['0' => $lang[$l][47], '1' => $lang[$l][48], '2' => $lang[$l][49]], $css->get_cfg('merge_selectors')); ?>
             </select><br />
 
             <label for="optimise_shorthands"><?php echo $lang[$l][23]; ?></label>
             <select name="optimise_shorthands" id="optimise_shorthands">
-            <?php echo options(array($lang[$l][54], $lang[$l][55], $lang[$l][56]), $css->get_cfg('optimise_shorthands')); ?>
+            <?php echo options([$lang[$l][54], $lang[$l][55], $lang[$l][56]], $css->get_cfg('optimise_shorthands')); ?>
             </select><br />
 
 
@@ -232,7 +232,7 @@ if(isset($_REQUEST['timestamp'])) $css->set_cfg('timestamp',true);
             <input type="checkbox" id="discard" name="discard"
                    <?php if($css->get_cfg('discard_invalid_properties')) echo 'checked="checked"'; ?> />
             <label for="discard"><?php echo $lang[$l][43]; ?></label>
-            <select name="css_level"><?php echo options(array('CSS2.1','CSS2.0','CSS1.0'),$css->get_cfg('css_level'), true); ?></select><br />
+            <select name="css_level"><?php echo options(['CSS2.1','CSS2.0','CSS1.0'],$css->get_cfg('css_level'), true); ?></select><br />
 
 
             <input type="checkbox" id="timestamp" name="timestamp"

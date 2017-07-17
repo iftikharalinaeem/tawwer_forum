@@ -16,7 +16,7 @@ foreach ($this->Data('Comments') as $Row) {
    
    $Name = htmlspecialchars($Row['InsertName']);
    
-   echo $this->Form->Radio('CommentID', "<b>$Name</b> ".htmlspecialchars($Row['Summary']), array('id' => $ElemID, 'value' => ReplyRecordID($Row)));
+   echo $this->Form->Radio('CommentID', "<b>$Name</b> ".htmlspecialchars($Row['Summary']), ['id' => $ElemID, 'value' => ReplyRecordID($Row)]);
    echo '</div>';
    
    $ID++;
@@ -24,8 +24,8 @@ foreach ($this->Data('Comments') as $Row) {
 echo '</div>';
 
 echo '<div class="Buttons Buttons-Confirm">';
-echo $this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close'));
-echo $this->Form->Button('OK', array('class' => 'Button Primary'));
+echo $this->Form->Button('Cancel', ['type' => 'button', 'class' => 'Button Close']);
+echo $this->Form->Button('OK', ['class' => 'Button Primary']);
 echo '<div>';
 echo $this->Form->Close();
 ?>

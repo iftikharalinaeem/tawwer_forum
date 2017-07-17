@@ -19,7 +19,7 @@ class FeaturedModule extends Gdn_Module {
 
    public function GetData() {
       $DiscussionModel = new DiscussionModel();
-      $Discussions = new Gdn_DataSet(array(), DATASET_TYPE_ARRAY);
+      $Discussions = new Gdn_DataSet([], DATASET_TYPE_ARRAY);
 
       if (class_exists('ReactionModel')) {
          $ReactionType = ReactionModel::ReactionTypes($this->reactionType);;
@@ -27,18 +27,18 @@ class FeaturedModule extends Gdn_Module {
             $TagID = $ReactionType['TagID'];
 
             // Get the IDs of the discussions that have been featured.
-            $DiscussionIDs = Gdn::SQL()->GetWhere('UserTag', array(
+            $DiscussionIDs = Gdn::SQL()->GetWhere('UserTag', [
                'RecordType' => 'Discussion-Total',
                'TagID' => $TagID,
                'Total >' => 0
-               ), 'DateInserted', 'desc', $this->count)->ResultArray();
+               ], 'DateInserted', 'desc', $this->count)->ResultArray();
             $DiscussionIDs = array_column($DiscussionIDs, 'RecordID');
             if (!empty($DiscussionIDs)) {
-               $DiscussionData = $DiscussionModel->GetWhere(array('d.DiscussionID' => $DiscussionIDs, 'Announce' => 'all'))->ResultArray();
+               $DiscussionData = $DiscussionModel->GetWhere(['d.DiscussionID' => $DiscussionIDs, 'Announce' => 'all'])->ResultArray();
                $DiscussionData = Gdn_DataSet::Index($DiscussionData, 'DiscussionID');
 
                // Make sure the result is ordered by the date they were featured.
-               $Result = array();
+               $Result = [];
                foreach ($DiscussionIDs as $ID) {
                   if (isset($DiscussionData[$ID]))
                      $Result[] = $DiscussionData[$ID];
@@ -47,7 +47,7 @@ class FeaturedModule extends Gdn_Module {
             }
          }
       } else {
-         $Discussions = $DiscussionModel->GetWhere(array(), 0, $this->count);
+         $Discussions = $DiscussionModel->GetWhere([], 0, $this->count);
       }
       $this->SetData('Discussions', $Discussions);
    }

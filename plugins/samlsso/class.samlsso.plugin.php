@@ -42,7 +42,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         Gdn::session()->stash('samlsso', null, true);
         Logger::event('saml_authrequest_sent', Logger::INFO, 'SAML request {requetid} sent to {requesthost}.',
              ['requestid' => $request->lastID, 'requesthost' => parse_url($url, PHP_URL_HOST), 'requesturl' => $url]);
-        redirect($url);
+        redirectTo($url, 302, false);
     }
 
     /**
@@ -135,7 +135,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         Logger::event('saml_authrequest_sent', Logger::INFO, 'SAML request {requestid} sent to {requesthost}.',
              ['requestid' => $request->lastID, 'requesthost' => parse_url(''), 'requesturl' => $url]
         );
-        redirect($url);
+        redirectTo($url, 302, false);
     }
 
     /**
@@ -155,7 +155,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         } else {
             $redirectURL = '/entry/saml/'.$provider['AuthenticationKey'];
         }
-        redirect($redirectURL);
+        redirectTo($redirectURL);
     }
 
     /**
@@ -276,7 +276,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
                 $response = new OneLogin_Saml_LogoutResponse($settings, $id, ['RelayState' => Gdn::request()->get('RelayState')]);
                 $url = $response->getRedirectUrl();
-                redirect($url);
+                redirectTo($url, 302, false);
             } else {
                 throw new Gdn_UserException('The SAMLRequest signature was not valid.');
             }
@@ -286,7 +286,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
             if ($valid) {
                 Gdn::session()->end();
-                redirect('/');
+                redirectTo('/');
             }
         } else {
             $saml = Gdn::session()->stash('samlsso', '', false);
@@ -300,7 +300,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
             if (val('idpSingleSignOutUrl', $settings)) {
                  $request = new OneLogin_Saml_LogoutRequest($settings);
                  $url = $request->getRedirectUrl($saml['id']);
-                 redirect($url);
+                 redirectTo($url, 302, false);
             }
         }
     }

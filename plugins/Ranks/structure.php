@@ -27,52 +27,52 @@ $RankModel = new RankModel();
 
 if (!$RankExists) {
     $RankModel->Save(
-        array('RankID' => 1,
+        ['RankID' => 1,
             'Name' => 'Level 1',
             'Label' => '✭',
-            'Level' => 1));
+            'Level' => 1]);
 
     $RankModel->Save(
-        array('RankID' => 2,
+        ['RankID' => 2,
             'Name' => 'Level 2',
             'Label' => '✭✭',
             'Level' => 2,
-            'Criteria' => array('Points' => '50')));
+            'Criteria' => ['Points' => '50']]);
 
     $RankModel->Save(
-        array('RankID' => 3,
+        ['RankID' => 3,
             'Name' => 'Level 3',
             'Label' => '✭✭✭',
             'Level' => 3,
-            'Criteria' => array('Points' => '100')));
+            'Criteria' => ['Points' => '100']]);
 
     $RankModel->Save(
-        array('RankID' => 4,
+        ['RankID' => 4,
             'Name' => 'Level 4',
             'Label' => '✭✭✭✭',
             'Level' => 4,
-            'Criteria' => array('Points' => '500')));
+            'Criteria' => ['Points' => '500']]);
 
     $RankModel->Save(
-        array('RankID' => 5,
+        ['RankID' => 5,
             'Name' => 'Level 5',
             'Label' => '✭✭✭✭✭',
             'Level' => 5,
-            'Criteria' => array('Points' => '1000')));
+            'Criteria' => ['Points' => '1000']]);
 
     $RankModel->Save(
-        array('RankID' => 100,
+        ['RankID' => 100,
             'Name' => 'Moderator',
             'Label' => 'mod',
             'CssClass' => 'Rank-Mod',
             'Level' => 100,
-            'Criteria' => array('Permission' => 'Garden.Moderation.Manage')));
+            'Criteria' => ['Permission' => 'Garden.Moderation.Manage']]);
 
     $RankModel->Save(
-        array('RankID' => 110,
+        ['RankID' => 110,
             'Name' => 'Administrator',
             'Label' => 'admin',
             'CssClass' => 'Rank-Admin',
             'Level' => 110,
-            'Criteria' => array('Permission' => 'Garden.Settings.Manage')));
+            'Criteria' => ['Permission' => 'Garden.Settings.Manage']]);
 }

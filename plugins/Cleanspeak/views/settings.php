@@ -33,9 +33,9 @@ been configured will force all new content to go into the premoderation queue.')
         <div id="cstoggle">
             <?php
             if($this->Data['Enabled']) {
-                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/cleanspeaktoggle', 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/cleanspeaktoggle', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
             } else {
-                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/cleanspeaktoggle', 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/cleanspeaktoggle', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
             }
             ?>
         </div>

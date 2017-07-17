@@ -29,9 +29,9 @@ if (count($this->Data('Warnings')) > 0 ):
       
       <div class="Author Photo">
          <?php
-         $Photo = UserPhoto($Row, array('Px' => 'Insert'));
+         $Photo = UserPhoto($Row, ['Px' => 'Insert']);
          if (!$Photo)
-            $Photo = '<span class="PhotoWrap">'.Img('https://images.v-cdn.net/warn_50.png', array('class' => 'ProfilePhoto')).'</span>';
+            $Photo = '<span class="PhotoWrap">'.Img('https://images.v-cdn.net/warn_50.png', ['class' => 'ProfilePhoto']).'</span>';
          echo $Photo;
          ?>
       </div>

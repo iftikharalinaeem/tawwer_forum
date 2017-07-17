@@ -18,9 +18,9 @@ $style_dimensions = 'width:' . $crop_dimension_px .'; height:' . $crop_dimension
 $Picture = '';
 if ($this->User->Photo != '') {
     if (IsUrl($this->User->Photo))
-        $Picture = Img($this->User->Photo, array('class' => 'ProfilePhotoLarge'));
+        $Picture = Img($this->User->Photo, ['class' => 'ProfilePhotoLarge']);
     else
-        $Picture = Img(Gdn_Upload::Url(ChangeBasename($this->User->Photo, 'p%s')), array('class' => 'ProfilePhotoLarge'));
+        $Picture = Img(Gdn_Upload::Url(ChangeBasename($this->User->Photo, 'p%s')), ['class' => 'ProfilePhotoLarge']);
 }
 
 // Only admins and users with the custom permission can upload their own avatar.
@@ -35,7 +35,7 @@ if (CheckPermission('Garden.Settings.Manage')
 <h1 class="H"><?php echo $this->Data('Title'); ?></h1>
 
    <?php
-      echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'id' => 'avatarstock-pick-form'));
+      echo $this->Form->Open(['enctype' => 'multipart/form-data', 'id' => 'avatarstock-pick-form']);
       echo $this->Form->Errors();
    ?>
 
@@ -45,7 +45,7 @@ if (CheckPermission('Garden.Settings.Manage')
       <?php foreach ($stock_avatar_payload as $avatar): ?>
          <li class="avatar-option">
             <input class="avatar-option-radio" type="radio" name="AvatarID" id="<?php echo $avatar['AvatarID']; ?>" value="<?php echo $avatar['AvatarID']; ?>" <?php if($current_stockavatar_id===$avatar['AvatarID']) {echo "checked";}?>/>
-            <label for="<?php echo $avatar['AvatarID']; ?>" title="<?php echo Gdn_Format::plainText($avatar['Name']); ?>"><?php echo Img($avatar['_path_crop'], array('style' => $style_dimensions)); ?></label>
+            <label for="<?php echo $avatar['AvatarID']; ?>" title="<?php echo Gdn_Format::plainText($avatar['Name']); ?>"><?php echo Img($avatar['_path_crop'], ['style' => $style_dimensions]); ?></label>
          </li>
 
       <?php endforeach; ?>
@@ -75,12 +75,12 @@ if (CheckPermission('Garden.Settings.Manage')
     <?php endif; ?>
 
    <?php
-      echo $this->Form->Close('Save Avatar', '', array('class' => 'Button Primary'));
+      echo $this->Form->Close('Save Avatar', '', ['class' => 'Button Primary']);
    ?>
 
     <?php
     if ($this->User->Photo != '' && $AllowImages && !$RemotePhoto) {
-        echo wrap(Anchor(t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->TransientKey(), 'Button Danger PopConfirm'), 'p', array('class' => 'remove-picture'));
+        echo wrap(Anchor(t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.$Session->TransientKey(), 'Button Danger PopConfirm'), 'p', ['class' => 'remove-picture']);
     }
     ?>
 

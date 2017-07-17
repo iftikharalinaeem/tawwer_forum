@@ -27,9 +27,9 @@ class Mustache_Loader_CascadingLoader implements Mustache_Loader
      *
      * @param array $loaders An array of Mustache Loader instances
      */
-    public function __construct(array $loaders = array())
+    public function __construct(array $loaders = [])
     {
-        $this->loaders = array();
+        $this->loaders = [];
         foreach ($loaders as $loader) {
             $this->addLoader($loader);
         }

@@ -308,7 +308,7 @@ class RanksPlugin extends Gdn_Plugin {
 
         if ($Sender->Form->authenticatedPostBack()) {
             $RankModel = new RankModel();
-            $RankModel->delete(array('RankID' => $RankID));
+            $RankModel->delete(['RankID' => $RankID]);
             $Sender->jsonTarget("#Rank_$RankID", null, 'SlideUp');
         }
 
@@ -372,7 +372,7 @@ class RanksPlugin extends Gdn_Plugin {
             $Sender->Form->setValidationResults($RankModel->validationResults());
             if ($Result) {
                 $Sender->informMessage(t('Your changes have been saved.'));
-                $Sender->RedirectUrl = url('/settings/ranks');
+                $Sender->setRedirectTo('/settings/ranks');
                 $Sender->setData('Rank', RankModel::ranks($Result));
             }
         } else {
@@ -427,7 +427,7 @@ class RanksPlugin extends Gdn_Plugin {
             $Ranks = $RankModel->getWhere(false, 'Level')->resultArray();
         } else {
             $Rank = $RankModel->getID($RankID);
-            $Ranks = array($Rank);
+            $Ranks = [$Rank];
         }
 
         $Sender->setData('Ranks', $Ranks);

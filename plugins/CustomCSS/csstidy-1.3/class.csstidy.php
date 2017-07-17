@@ -65,14 +65,14 @@ class csstidy {
  * @var array
  * @access public
  */
-var $css = array();
+var $css = [];
 
 /**
  * Saves the parsed CSS (raw)
  * @var array
  * @access private
  */
-var $tokens = array();
+var $tokens = [];
 
 /**
  * Printer class
@@ -102,7 +102,7 @@ var $charset = '';
  * @var array
  * @access private
  */
-var $import = array();
+var $import = [];
 
 /**
  * Saves the namespace
@@ -123,7 +123,7 @@ var $version = '1.3';
  * @var array
  * @access private
  */
-var $settings = array();
+var $settings = [];
 
 /**
  * Saves the parser-status.
@@ -168,7 +168,7 @@ var $property = '';
  * @var array
  * @access private
  */
-var $sel_separate = array();
+var $sel_separate = [];
 
 /**
  * Saves the current value
@@ -195,7 +195,7 @@ var $sub_value = '';
  * @see sub_value
  * @access private
  */
-var $sub_value_arr = array();
+var $sub_value_arr = [];
 
 /**
  * Saves the char which opened the last string
@@ -238,7 +238,7 @@ var $added = false;
  * @var array
  * @access private
  */
-var $log = array();
+var $log = [];
 
 /**
  * Saves the line number
@@ -318,7 +318,7 @@ function set_cfg($setting,$value)
  */
 function _add_token($type, $data, $do = false) {
     if($this->get_cfg('preserve_css') || $do) {
-        $this->tokens[] = array($type, ($type == COMMENT) ? $data : trim($data));
+        $this->tokens[] = [$type, ($type == COMMENT) ? $data : trim($data)];
     }
 }
 
@@ -337,7 +337,7 @@ function log($message,$type,$line = -1)
 		$line = $this->line;
 	}
 	$line = intval($line);
-	$add = array('m' => $message, 't' => $type);
+	$add = ['m' => $message, 't' => $type];
 	if(!isset($this->log[$line]) || !in_array($add,$this->log[$line]))
 	{
 		$this->log[$line][] = $add;
@@ -464,7 +464,7 @@ function parse($string) {
     $all_properties =& $GLOBALS['csstidy']['all_properties'];
     $at_rules =& $GLOBALS['csstidy']['at_rules'];
 
-    $this->css = array();
+    $this->css = [];
     $this->print->input_css = $string;
     $string = str_replace("\r\n","\n",$string) . ' ';
     $cur_comment = '';
@@ -573,7 +573,7 @@ function parse($string) {
                     $this->_add_token(AT_END, $this->at);
                     $this->at = '';
                     $this->selector = '';
-                    $this->sel_separate = array();
+                    $this->sel_separate = [];
                 }
                 elseif($string{$i} == ',')
                 {
@@ -585,7 +585,7 @@ function parse($string) {
                     $this->selector .= $this->_unicode($string,$i);
                 }
                 // remove unnecessary universal selector,  FS#147
-                else if(!($string{$i} == '*' && @in_array($string{$i+1}, array('.', '#', '[', ':')))) {
+                else if(!($string{$i} == '*' && @in_array($string{$i+1}, ['.', '#', '[', ':']))) {
                     $this->selector .= $string{$i};
                 }
             }
@@ -679,10 +679,10 @@ function parse($string) {
                             case '@import': $this->import[] = implode(' ',$this->sub_value_arr); break;
                         }
 
-                        $this->sub_value_arr = array();
+                        $this->sub_value_arr = [];
                         $this->sub_value = '';
                         $this->selector = '';
-                        $this->sel_separate = array();
+                        $this->sel_separate = [];
                     }
                     else
                     {
@@ -739,7 +739,7 @@ function parse($string) {
                     }
 
                     $this->property = '';
-                    $this->sub_value_arr = array();
+                    $this->sub_value_arr = [];
                     $this->value = '';
                 }
                 if($string{$i} == '}')
@@ -840,7 +840,7 @@ function explode_selectors()
     // Explode multiple selectors
     if($this->get_cfg('merge_selectors') == 1)
     {
-        $new_sels = array();
+        $new_sels = [];
         $lastpos = 0;
         $this->sel_separate[] = strlen($this->selector);
         foreach($this->sel_separate as $num => $pos)
@@ -862,7 +862,7 @@ function explode_selectors()
             unset($this->css[$this->at][$this->selector]);
         }
     }
-    $this->sel_separate = array();
+    $this->sel_separate = [];
 }
 
 /**

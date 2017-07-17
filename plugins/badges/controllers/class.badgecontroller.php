@@ -93,7 +93,7 @@ class BadgeController extends BadgesAppController {
 
         // Validate BadgeID
         if (!is_numeric($BadgeID)) {
-            redirect('/badge/all');
+            redirectTo('/badge/all');
         }
 
         $Badge = $this->BadgeModel->getID($BadgeID);
@@ -109,16 +109,16 @@ class BadgeController extends BadgesAppController {
             $Badge = $this->BadgeModel->getID($BadgeID);
             if (val('CanDelete', $Badge, false)) {
                 // Delete & revoke
-                $this->BadgeModel->delete(array('BadgeID' => $BadgeID));
-                $this->UserBadgeModel->delete(array('BadgeID' => $BadgeID));
+                $this->BadgeModel->delete(['BadgeID' => $BadgeID]);
+                $this->UserBadgeModel->delete(['BadgeID' => $BadgeID]);
 
                 // Success & redirect
                 $this->informMessage(t('Badge deleted.'));
-                $this->RedirectUrl = url('/badge/all');
+                $this->setRedirectTo('/badge/all');
             } else {
                 // Failure & redirect
                 $this->informMessage(t('Badge cannot be deleted.'));
-                $this->RedirectUrl = url('/badge/all');
+                $this->setRedirectTo('/badge/all');
             }
         } else {
             // Get info for confirmation
@@ -151,7 +151,7 @@ class BadgeController extends BadgesAppController {
         }
 
         if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-            redirect('badge/all');
+            redirectTo('badge/all');
         }
 
         // Regenerate the view we take this action from.
@@ -170,7 +170,7 @@ class BadgeController extends BadgesAppController {
 
         // Validate BadgeID
         if (!is_numeric($BadgeID)) {
-            redirect('/badge/all');
+            redirectTo('/badge/all');
         }
 
         // Get info & confirm enabled
@@ -213,7 +213,7 @@ class BadgeController extends BadgesAppController {
 
             if ($result) {
                 $this->informMessage(t('Gave badge to users.'));
-                $this->RedirectUrl = '/badge/all';
+                $this->setRedirectTo('/badge/all');
             } else {
                 $this->Form->addError(t('Failed to give badge to users.'));
             }
@@ -273,7 +273,7 @@ class BadgeController extends BadgesAppController {
                     $this->setData('Badge', $OutputBadge);
 
                     $this->informMessage(t('Gave badge to user.'));
-                    $this->RedirectUrl = url('profile/'.$UserID.'/'.val('Name', $this->User));
+                    $this->setRedirectTo('profile/'.$UserID.'/'.val('Name', $this->User));
                 }
             } else {
                 throw NotFoundException('Badge');
@@ -305,7 +305,7 @@ class BadgeController extends BadgesAppController {
         }
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            safeRedirect(getIncomingValue('Target', $this->SelfUrl));
+            redirectTo(getIncomingValue('Target', $this->SelfUrl));
         }
 
         $this->setView404();
@@ -339,7 +339,7 @@ class BadgeController extends BadgesAppController {
         $this->SetData('UserBadge', $this->UserBadge);
 
         // Get recipients
-        $this->setData('Recipients', $this->UserBadgeModel->getUsers($BadgeID, array('Limit' => 15))->resultArray());
+        $this->setData('Recipients', $this->UserBadgeModel->getUsers($BadgeID, ['Limit' => 15])->resultArray());
         $this->setData('BadgeID', $BadgeID, true);
 
         if (val('_New', $this->UserBadge) &&  BadgeModel::isRequestable($this->Badge)) {
@@ -419,7 +419,7 @@ class BadgeController extends BadgesAppController {
                         "badges/$Basename",
                         C('Reputation.Badges.Height', 100),
                         C('Reputation.Badges.Width', 100),
-                        array('SaveGif' => C('Reputation.Badges.SaveGif'))
+                        ['SaveGif' => C('Reputation.Badges.SaveGif')]
                     );
                     $this->Form->setFormValue('Photo', sprintf($Props['SaveFormat'], "badges/$Basename"));
                 }
@@ -439,7 +439,7 @@ class BadgeController extends BadgesAppController {
                 $Message = ($Insert) ? t('Created new badge') : t('Updated badge');
                 $Message .= ' &ldquo;' . $BadgeName. '&rdquo;';
                 $this->informMessage($Message);
-                $this->RedirectUrl = url('/badge/all');
+                $this->setRedirectTo('/badge/all');
             }
         }
 
@@ -531,7 +531,7 @@ class BadgeController extends BadgesAppController {
             $Action = $this->Form->getValue('Submit');
             $Requests = $this->Form->getValue('Requests');
             $RequestCount = is_array($Requests) ? count($Requests) : 0;
-            if ($RequestCount > 0 && in_array($Action, array('Approve', 'Decline'))) {
+            if ($RequestCount > 0 && in_array($Action, ['Approve', 'Decline'])) {
                 for ($i = 0; $i < $RequestCount; ++$i) {
                     $Data = explode('-', $Requests[$i]);
                     if (count($Data) != 2) {
@@ -547,7 +547,7 @@ class BadgeController extends BadgesAppController {
         }
 
         $this->RequestData = $this->UserBadgeModel->getRequests();
-        Gdn::userModel()->joinUsers($this->RequestData, array('UserID'));
+        Gdn::userModel()->joinUsers($this->RequestData, ['UserID']);
         $this->render('requests', 'badge');
     }
 
@@ -566,7 +566,7 @@ class BadgeController extends BadgesAppController {
         }
 
         if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-            safeRedirect('badge/recipients/'.$BadgeID);
+            redirectTo('badge/recipients/'.$BadgeID);
         }
 
         // Regenerate the page we take this action from.

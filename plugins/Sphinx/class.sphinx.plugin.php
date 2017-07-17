@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license Proprietary
@@ -35,7 +34,10 @@ class SphinxPlugin extends Gdn_Plugin {
      */
     public function setup() {
         if (!class_exists('SphinxClient')) {
-            throw new Exception('Sphinx requires the sphinx client to be installed. See http://www.php.net/manual/en/book.sphinx.php');
+            throw new Exception(
+                'Sphinx requires the sphinx client to be installed (See http://www.php.net/manual/en/book.sphinx.php). '
+                .'Alternatively you can set "Plugins.Sphinx.SphinxAPIDir" to the location of sphinxapi.php before enabling the plugin (See https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php).'
+            );
         }
 
         // Remove the current library map so that the core file won't be grabbed.
@@ -54,6 +56,73 @@ class SphinxPlugin extends Gdn_Plugin {
             ->column('MaxID', 'uint', '0')
             ->engine('InnoDB')
             ->set();
+    }
+
+    /**
+     * Search discussions.
+     *
+     * @param DiscussionsApiController $sender
+     * @param array $query
+     * @return array
+     */
+    public function discussionsApiController_get_search(DiscussionsApiController $sender, array $query) {
+        $sender->permission('Garden.SignIn.Allow');
+
+        $in = $sender->schema([
+            'query:s' => 'Discussion search query.',
+            'categoryID:i?' => 'The numeric ID of a category.',
+            'page:i?' => [
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+                'maximum' => DiscussionModel::instance()->getMaxPages()
+            ],
+            'limit:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => DiscussionModel::instance()->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+            'expand:b?' => 'Expand associated records.'
+        ], 'in')->setDescription('Search discussions.');
+        $out = $sender->schema([':a' => $sender->discussionSchema()], 'out');
+
+        $query = $sender->filterValues($query);
+        $query = $in->validate($query);
+        list($offset, $limit) = offsetLimit(
+            "p{$query['page']}",
+            $query['limit']
+        );
+        $params = [
+            'group' => false,
+            'search' => $query['query'],
+            'discussion_d' => 1
+        ];
+        if (array_key_exists('categoryID', $query)) {
+            $search['cat'] = $query['categoryID'];
+        }
+
+        $searchModel = new SearchModel();
+        $search = $searchModel->advancedSearch($params, $offset, $limit);
+        $rows = $search['SearchResults'];
+        $discussionIDs = array_column($rows, 'PrimaryID');
+        $result = [];
+
+        if (!empty($discussionIDs)) {
+            $result = DiscussionModel::instance()
+                ->getWhere(['DiscussionID' => $discussionIDs])
+                ->resultArray();
+            if ($query['expand']) {
+                $userModel = new UserModel();
+                $userModel->expandUsers($result, ['InsertUserID']);
+            }
+            foreach ($result as &$row) {
+                $sender->massageRow($row);
+            }
+        }
+
+        $result = $out->validate($result);
+        return $result;
     }
 
     /**

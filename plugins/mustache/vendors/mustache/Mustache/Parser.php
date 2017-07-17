@@ -26,7 +26,7 @@ class Mustache_Parser
      *
      * @return array Mustache token parse tree
      */
-    public function parse(array $tokens = array())
+    public function parse(array $tokens = [])
     {
         $this->lineNum    = -1;
         $this->lineTokens = 0;
@@ -46,7 +46,7 @@ class Mustache_Parser
      */
     private function buildTree(array &$tokens, array $parent = null)
     {
-        $nodes = array();
+        $nodes = [];
 
         while (!empty($tokens)) {
             $token = array_shift($tokens);

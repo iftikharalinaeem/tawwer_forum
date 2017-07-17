@@ -12,7 +12,7 @@
     <?php echo t('Delete warning type message', 'Deleting this warning will have no effect on existing users.') ?>
 </div>
 <?php
-echo $form->open(array('class' => 'WarningTypeDelete'));
+echo $form->open(['class' => 'WarningTypeDelete']);
 echo '<div class="Buttons Buttons-Confirm">';
 echo anchor(t('Cancel'), '/settings/warnings', 'Button CancelButton');
 echo anchor(t('Confirm'), '/warningtypes/delete/'.$this->data('WarningTypeID').'/delete', 'Button ConfirmButton');

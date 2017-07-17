@@ -81,7 +81,7 @@ class ReactionsController extends DashboardController {
                 $this->setData('Reaction', $reaction);
                 if ($this->deliveryType() != DELIVERY_TYPE_DATA) {
                     $this->informMessage(formatString(t("New reaction created"), $reaction));
-                    redirect('/reactions');
+                    redirectTo('/reactions');
                 }
             }
         }
@@ -192,7 +192,7 @@ class ReactionsController extends DashboardController {
                 if ($this->_DeliveryType !== DELIVERY_TYPE_ALL) {
                     $this->render('blank', 'utility', 'dashboard');
                 } else {
-                    redirect('/reactions');
+                    redirectTo('/reactions');
                 }
             }
         }
@@ -208,7 +208,7 @@ class ReactionsController extends DashboardController {
      * @throws Exception
      */
     public function log($Type, $ID) {
-        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Reactions.Edit'), false);
+        $this->permission(['Garden.Moderation.Manage', 'Moderation.Reactions.Edit'], false);
         $Type = ucfirst($Type);
 
         $ReactionModel = new ReactionModel();

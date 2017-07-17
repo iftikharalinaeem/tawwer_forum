@@ -12,7 +12,7 @@ class UserNoteModel extends Gdn_Model {
      * @param array $Data
      */
     public function calculate(&$Data) {
-        Gdn::userModel()->joinUsers($Data, array('InsertUserID'));
+        Gdn::userModel()->joinUsers($Data, ['InsertUserID']);
         $IsModerator = Gdn::session()->checkPermission('Garden.Moderation.Manage');
         foreach ($Data as &$Row) {
             $this->calculateRow($Row);
@@ -88,7 +88,7 @@ class UserNoteModel extends Gdn_Model {
      */
     public function setField($RowID, $Name, $Value = null) {
         if (!is_array($Name)) {
-            $Name = array($Name => $Value);
+            $Name = [$Name => $Value];
         }
 
         $this->defineSchema();
@@ -99,7 +99,7 @@ class UserNoteModel extends Gdn_Model {
         if (empty($NotInSchema)) {
             return parent::setField($RowID, $Name);
         } else {
-            $Row = $this->SQL->select('Attributes')->getWhere('UserNote', array('UserNoteID' => $RowID))->firstRow(DATASET_TYPE_ARRAY);
+            $Row = $this->SQL->select('Attributes')->getWhere('UserNote', ['UserNoteID' => $RowID])->firstRow(DATASET_TYPE_ARRAY);
             if (isset($Row['Attributes'])) {
                 $Attributes = dbdecode($Row['Attributes']);
                 if (is_array($Attributes)) {

@@ -94,7 +94,7 @@ class SecurityWordsPlugin extends Gdn_Plugin {
      * @return array
      */
     public function getSecurityWords() {
-        $securityWords = array();
+        $securityWords = [];
 
         if (!count($this->securityWords)) {
             $securityWordsString = C('Plugins.securitywords.words');
@@ -127,7 +127,7 @@ class SecurityWordsPlugin extends Gdn_Plugin {
      * @return array
      */
     public function getSecurityWordsRegexPatterns() {
-        $securityWordsRegexPatterns = array();
+        $securityWordsRegexPatterns = [];
 
         if (!count($this->securityWordsRegexPatterns)) {
 
@@ -190,10 +190,10 @@ class SecurityWordsPlugin extends Gdn_Plugin {
         if ($this->notifyUserOfRequiredModeration) {
             Gdn::Controller()->InformMessage(
                 T('Post queued for moderation due to the use of security words.'),
-                array(
+                [
                     'CssClass' => 'Dismissable',
                     'id' => 'mod'
-                )
+                ]
             );
         }
     }
@@ -236,30 +236,30 @@ class SecurityWordsPlugin extends Gdn_Plugin {
      * @param settingsController $sender The controller.
      * @param array $args Optional arguments to pass.
      */
-    public function settingsController_securitywords_create($sender, $args = array()) {
+    public function settingsController_securitywords_create($sender, $args = []) {
         $sender->Permission('Garden.Settings.Manage');
 
         $cf = new ConfigurationModule($sender);
 
-        $cf->Initialize(array(
-            'Plugins.securitywords.words' => array(
+        $cf->Initialize([
+            'Plugins.securitywords.words' => [
                 'LabelCode' => 'Security Words',
                 'Control' => 'TextBox',
                 'Description' => 'Provide a semicolon-separated list of words
                                   that will trigger the need for moderation
                                   against a post with those security words.',
-                'Options' => array(
+                'Options' => [
                     'MultiLine' => true
-                )
-            ),
-            'Plugins.securitywords.notifyuser' => array(
+                ]
+            ],
+            'Plugins.securitywords.notifyuser' => [
                 'LabelCode' => 'Notify user that post is in moderation queue.',
                 'Control' => 'CheckBox',
                 'Description' => 'Notify users when their posts are sent to the
                                   moderation queue due to the use of "security
                                   words."'
-            )
-        ));
+            ]
+        ]);
 
         $sender->AddSideMenu();
         $sender->SetData('Title', T('Security Words'));
@@ -271,9 +271,9 @@ class SecurityWordsPlugin extends Gdn_Plugin {
      */
     public function setup() {
         // If no previous config, populate it with example security words.
-        TouchConfig(array(
+        TouchConfig([
             'Plugins.securitywords.words' => 'area51;mkultra;911',
             'Plugins.securitywords.notifyuser' => false
-        ));
+        ]);
     }
 }

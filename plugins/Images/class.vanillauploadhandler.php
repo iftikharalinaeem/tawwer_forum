@@ -100,7 +100,7 @@ class VanillaUploadHandler extends UploadHandler {
       $this->SaveComment($file);
       
       ob_clean();
-      echo json_encode(array($file));
+      echo json_encode([$file]);
    }
    
    public function SaveComment($File) {
@@ -114,7 +114,7 @@ class VanillaUploadHandler extends UploadHandler {
          return;
          
          
-      $Image = ArrayTranslate((array)$File, array('url' => 'Image', 'thumbnail_url' => 'Thumbnail', 'size' => 'Size'));
+      $Image = ArrayTranslate((array)$File, ['url' => 'Image', 'thumbnail_url' => 'Thumbnail', 'size' => 'Size']);
       $Image['DiscussionID'] = $DiscussionID;
       
       $ImageModel = new ImageModel();

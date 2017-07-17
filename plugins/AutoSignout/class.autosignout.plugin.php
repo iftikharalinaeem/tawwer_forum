@@ -75,9 +75,9 @@ class AutoSignoutPlugin extends Gdn_Plugin {
       $Sender->Permission('Garden.Settings.Manage');
 
       $Conf = new ConfigurationModule($Sender);
-      $Conf->Initialize(array(
-          'Plugins.AutoSignout.Minutes' => array('Description' => "Enter the number of minutes to wait before signing users out.", 'Default' => 30)
-      ));
+      $Conf->Initialize([
+          'Plugins.AutoSignout.Minutes' => ['Description' => "Enter the number of minutes to wait before signing users out.", 'Default' => 30]
+      ]);
 
       $Sender->AddSideMenu();
       $Sender->SetData('Title', 'Auto Signout Settings');

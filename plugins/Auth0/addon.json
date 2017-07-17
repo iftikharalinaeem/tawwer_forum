@@ -2,7 +2,7 @@
     "name": "Auth0 SSO",
     "className": "Auth0Plugin",
     "description": "Allows user login to be authenticated on Auth0 SSO.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "requiredTheme": false,
     "hasLocale": false,
     "settingsUrl": "/settings/auth0",
@@ -11,6 +11,6 @@
     "key": "auth0",
     "type": "addon",
     "require": {
-        "vanilla": ">=1.0"
+        "vanilla": ">=2.4"
     }
 }

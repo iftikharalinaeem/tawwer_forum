@@ -49,7 +49,7 @@ class Search {
         }
 
         /// Category ///
-        $CategoryFilter = array();
+        $CategoryFilter = [];
         $Archived = getValue('archived', $search, 0);
         $CategoryID = getValue('cat', $search);
         if (strcasecmp($CategoryID, 'all') === 0) {
@@ -150,7 +150,7 @@ class Search {
         }
 
         /// Types ///
-        $types = array();
+        $types = [];
         $typecount = 0;
         $selectedcount = 0;
 
@@ -228,15 +228,15 @@ EOT;
     }
 
     public static function extractMedia($html) {
-        $result = array();
+        $result = [];
         if (preg_match_all('`src="([^"]+)"`', $html, $matches)) {
             foreach ($matches[1] as $src) {
-                $row = array(
+                $row = [
                     'type' => 'img',
                     'src' => $src,
                     'href' => $src,
                     'preview' => img($src)
-                );
+                ];
 
                 $parts = parse_url($src);
 
@@ -303,10 +303,10 @@ EOT;
      */
     public static function types() {
         if (!isset(self::$types)) {
-            $types = array(
-                'discussion' => array('d' => 'discussions'),
-                'comment' => array('c' => 'comments')
-            );
+            $types = [
+                'discussion' => ['d' => 'discussions'],
+                'comment' => ['c' => 'comments']
+            ];
 
             if (Gdn::addonManager()->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
                 $types['discussion']['question'] = 'questions';

@@ -39,36 +39,28 @@ class HeroImagePlugin extends Gdn_Plugin {
     }
 
     /**
-     * Get the slug of the banner image for a category
+     * Get the slug of the banner image for a given category
      *
      * Categories will inherit their parents CategoryBanner if they don't have
-     * their own set.
+     * their own set. If no BannerImage can be found the default from the config will be returned
      *
-     * @param Category $category Set an explicit category. Defaults to the current category of the request.
+     * @param int $categoryID Set an explicit category.
      *
-     * @return void
+     * @return string The category's slug on success, the default otherwise.
      */
-    public static function getHeroImageSlug($category = false) {
-        if (!$category) {
-            // The controller on Gdn doesn't have the key we need. So fetch it again.
-            $categoryID = valr('Category.CategoryID', Gdn::controller());
-            $category = CategoryModel::instance()->getID($categoryID);
+    public static function getHeroImageSlug($categoryID) {
+        $categoryID = filter_var($categoryID, FILTER_VALIDATE_INT);
+        if (!$categoryID || $categoryID < 1) {
+            return c(self::DEFAULT_CONFIG_KEY);
         }
 
+        $category = CategoryModel::instance()->getID($categoryID);
         $slug = val("HeroImage", $category);
 
         if (!$slug) {
             $parentID = val('ParentCategoryID', $category);
-
-            if ($parentID === -1) {
-                // This is a top level category with no banner set. Return the default
-                $slug = c(self::DEFAULT_CONFIG_KEY);
-            } else {
-                $parentCategory = CategoryModel::instance()->getID($parentID);
-                $slug = self::getHeroImageSlug($parentCategory);
-            }
+            $slug = self::getHeroImageSlug($parentID);
         }
-
         return $slug;
     }
 

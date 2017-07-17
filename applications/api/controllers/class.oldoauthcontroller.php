@@ -27,7 +27,7 @@ class OldoauthController extends VpiController {
          $Ex->SetData($this);
          $this->Render();
       }
-      
+
       // Make sure the application is registered.
       $Application = $this->ApplicationModel()->GetID(GetValue('client_id', $Params, 0), DATASET_TYPE_ARRAY);
       if (!is_array($Application)) {
@@ -53,17 +53,17 @@ class OldoauthController extends VpiController {
          case 'facebook':
             $FbClientID = C('Facebook.ApplicationID');
             $Url = "https://graph.facebook.com/oauth/authorize2?client_id=$FbClientID&redirect_uri={$RedirectUri}&state=$State";
-            Redirect($Url);
+            redirectTo($Url, 302, false);
             break;
          case 'twitter':
-            
+
             break;
          default:
             // Set the state to the correct format because this version will not necessarily redirect.
             $_GET['state'] = $State;
             return $this->AuthorizeVanilla();
       }
-      
+
    }
 
    public function Authorize2($Type) {
@@ -82,7 +82,7 @@ class OldoauthController extends VpiController {
 
       // Make sure the authorization code was returned.
       if (!isset($Params['code'])) {
-         
+
       }
 
       $RedirectUri = "{$this->BaseUrl}/authorize2/$Type";
@@ -119,7 +119,7 @@ class OldoauthController extends VpiController {
       if (count($StateParts) > 1) {
          $Url .= '&state='.urlencode($StateParts[1]);
       }
-      Redirect($Url);
+      redirectTo($Url, 302, false);
    }
 
    /**

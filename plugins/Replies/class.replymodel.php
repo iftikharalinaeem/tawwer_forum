@@ -48,14 +48,14 @@ class ReplyModel extends Gdn_Model {
          $CommentIDs[] = -$DiscussionID;
       }
       
-      $Replies = $this->GetWhere(array('CommentID' => $CommentIDs), 'DateInserted')->ResultArray();
-      $Replies = Gdn_DataSet::Index($Replies, array('CommentID'), array('Unique' => false));
+      $Replies = $this->GetWhere(['CommentID' => $CommentIDs], 'DateInserted')->ResultArray();
+      $Replies = Gdn_DataSet::Index($Replies, ['CommentID'], ['Unique' => false]);
       
       if ($Discussion) {
          if (isset($Replies[-$DiscussionID]))
             SetValue('Replies', $Discussion, $Replies[-$DiscussionID]);
          else
-            SetValue('Replies', $Discussion, array());
+            SetValue('Replies', $Discussion, []);
       }
       
       // Join to the comments.
@@ -64,7 +64,7 @@ class ReplyModel extends Gdn_Model {
          if (isset($Replies[$CommentID])) {
             SetValue('Replies', $Row, $Replies[$CommentID]);
          } else {
-            SetValue('Replies', $Row, array());
+            SetValue('Replies', $Row, []);
          }
       }
    }
@@ -95,10 +95,10 @@ class ReplyModel extends Gdn_Model {
       if ($ReplyID) {
          // Move any replies that belonged to this comment.
          $this->SQL->Put('Reply', 
-            array('CommentID' => $ReplyToCommentID),
-            array('CommentID' => GetValue('CommentID', $Comment)));
+            ['CommentID' => $ReplyToCommentID],
+            ['CommentID' => GetValue('CommentID', $Comment)]);
          
-         $CommentModel->DeleteID(GetValue('CommentID', $Comment), array('Log' => FALSE));
+         $CommentModel->DeleteID(GetValue('CommentID', $Comment), ['Log' => FALSE]);
       }
       return $ReplyID;
    }
@@ -116,7 +116,7 @@ class ReplyModel extends Gdn_Model {
       $NewComment = $Reply;
       unset($NewComment['CommentID']);
       $NewComment['Format'] = 'Text';
-      $NewComment['Attributes'] = array('OldReplyID' => $Reply['ReplyID']);
+      $NewComment['Attributes'] = ['OldReplyID' => $Reply['ReplyID']];
       $NewComment['DiscussionID'] = GetValue('DiscussionID', $Discussion);
       
       // See if this reply had already been made into a comment.
@@ -131,7 +131,7 @@ class ReplyModel extends Gdn_Model {
       
       $CommentID = $CommentModel->Insert($NewComment);
       if ($CommentID) {
-         $this->Delete(array('ReplyID' => $Reply['ReplyID']));
+         $this->Delete(['ReplyID' => $Reply['ReplyID']]);
          $CommentModel->Save2($CommentID, TRUE);
       } else {
          $this->Validation->AddValidationResult($CommentModel->ValidationResults());

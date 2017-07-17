@@ -37,7 +37,7 @@ class Mustache_Tokenizer
     const T_PRAGMA       = '%';
 
     // Valid token types
-    private static $tagTypes = array(
+    private static $tagTypes = [
         self::T_SECTION      => true,
         self::T_INVERTED     => true,
         self::T_END_SECTION  => true,
@@ -49,14 +49,14 @@ class Mustache_Tokenizer
         self::T_UNESCAPED    => true,
         self::T_UNESCAPED_2  => true,
         self::T_PRAGMA       => true,
-    );
+    ];
 
     // Interpolated tags
-    private static $interpolatedTags = array(
+    private static $interpolatedTags = [
         self::T_ESCAPED      => true,
         self::T_UNESCAPED    => true,
         self::T_UNESCAPED_2  => true,
-    );
+    ];
 
     // Token properties
     const TYPE   = 'type';
@@ -144,14 +144,14 @@ class Mustache_Tokenizer
 
                 default:
                     if ($this->tagChange($this->ctag, $text, $i)) {
-                        $this->tokens[] = array(
+                        $this->tokens[] = [
                             self::TYPE  => $this->tagType,
                             self::NAME  => trim($this->buffer),
                             self::OTAG  => $this->otag,
                             self::CTAG  => $this->ctag,
                             self::LINE  => $this->line,
                             self::INDEX => ($this->tagType == self::T_END_SECTION) ? $this->seenTag - strlen($this->otag) : $i + strlen($this->ctag)
-                        );
+                        ];
 
                         $this->buffer = '';
                         $i += strlen($this->ctag) - 1;
@@ -188,7 +188,7 @@ class Mustache_Tokenizer
         $this->tagType   = null;
         $this->tag       = null;
         $this->buffer    = '';
-        $this->tokens    = array();
+        $this->tokens    = [];
         $this->seenTag   = false;
         $this->line      = 0;
         $this->otag      = '{{';
@@ -201,11 +201,11 @@ class Mustache_Tokenizer
     private function flushBuffer()
     {
         if (!empty($this->buffer)) {
-            $this->tokens[] = array(
+            $this->tokens[] = [
                 self::TYPE  => self::T_TEXT,
                 self::LINE  => $this->line,
                 self::VALUE => $this->buffer
-            );
+            ];
             $this->buffer   = '';
         }
     }
@@ -228,10 +228,10 @@ class Mustache_Tokenizer
         $this->otag = $otag;
         $this->ctag = $ctag;
 
-        $this->tokens[] = array(
+        $this->tokens[] = [
             self::TYPE => self::T_DELIM_CHANGE,
             self::LINE => $this->line,
-        );
+        ];
 
         return $closeIndex + strlen($close) - 1;
     }
@@ -253,11 +253,11 @@ class Mustache_Tokenizer
         $pragma = trim(substr($text, $index + 2, $end - $index - 2));
 
         // Pragmas are hoisted to the front of the template.
-        array_unshift($this->tokens, array(
+        array_unshift($this->tokens, [
             self::TYPE => self::T_PRAGMA,
             self::NAME => $pragma,
             self::LINE => 0,
-        ));
+        ]);
 
         return $end + strlen($this->ctag) - 1;
     }

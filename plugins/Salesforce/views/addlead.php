@@ -23,7 +23,7 @@ echo $this->Form->Errors();
    </li>
    <li>
       <?php echo $this->Form->Label('Title', 'Title');  ?>
-      <?php echo $this->Form->TextBox('Title', array('class' => '')); ?>
+      <?php echo $this->Form->TextBox('Title', ['class' => '']); ?>
    </li>
    <li>
       <?php echo $this->Form->Label('Company', 'Company');  ?>
@@ -35,5 +35,5 @@ echo $this->Form->Errors();
 
 
 <div style="width: 400px"></div>
-<?php echo $this->Form->Close('Add Lead', '', array('class' => 'Button BigButton'));
+<?php echo $this->Form->Close('Add Lead', '', ['class' => 'Button BigButton']);
 

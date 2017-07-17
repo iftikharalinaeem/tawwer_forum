@@ -10,13 +10,13 @@
     <div class="P">
         <?php
         echo $this->Form->Label('Invite one or more people to join this group.', 'To');
-        echo Wrap($this->Form->TextBox('Recipients', array('MultiLine' => true, 'class' => 'Tokens-User MultiComplete')), 'div', array('class' => 'TextBoxWrapper'));
+        echo Wrap($this->Form->TextBox('Recipients', ['MultiLine' => true, 'class' => 'Tokens-User MultiComplete']), 'div', ['class' => 'TextBoxWrapper']);
         ?>
     </div>
     <div class="Buttons Buttons-Confirm">
         <?php
-        echo $this->Form->Button('OK', array('class' => 'Button Primary'));
-        echo ' '.$this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close'));
+        echo $this->Form->Button('OK', ['class' => 'Button Primary']);
+        echo ' '.$this->Form->Button('Cancel', ['type' => 'button', 'class' => 'Button Close']);
         ?>
     </div>
     <?php

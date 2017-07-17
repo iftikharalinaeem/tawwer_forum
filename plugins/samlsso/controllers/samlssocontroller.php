@@ -143,7 +143,7 @@ class SAMLSSOController extends PluginController {
                 $this->informMessage(t('Saved'));
 
                 if (!$authenticationKey) {
-                    redirect('/samlsso/edit/'.$form->getFormValue('AuthenticationKey'));
+                    redirectTo('/samlsso/edit/'.$form->getFormValue('AuthenticationKey'));
                 }
             }
         }
@@ -174,7 +174,7 @@ class SAMLSSOController extends PluginController {
             ]);
         }
 
-        $this->RedirectUrl = url('/settings/samlsso');
+        $this->setRedirectTo('/settings/samlsso');
         $this->render('blank', 'utility', 'dashboard');
     }
 
@@ -223,7 +223,7 @@ class SAMLSSOController extends PluginController {
         $newToggle = wrap(
             anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', $url, 'Hijack'),
             'span',
-            array('class' => "toggle-wrap toggle-wrap-$state")
+            ['class' => "toggle-wrap toggle-wrap-$state"]
         );
 
         $this->jsonTarget("#provider_$authenticationKey .toggle-container", $newToggle);

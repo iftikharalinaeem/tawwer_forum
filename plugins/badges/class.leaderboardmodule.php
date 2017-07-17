@@ -10,7 +10,7 @@
 class LeaderBoardModule extends Gdn_Module {
 
     /** @var array */
-    public $Leaders = array();
+    public $Leaders = [];
 
     /** @var string  */
     public $SlotType = 'w';
@@ -53,7 +53,7 @@ class LeaderBoardModule extends Gdn_Module {
         }
 
         $excludePermission = c('Badges.ExcludePermission');
-        $moderatorRoleIDs = [];
+        $moderatorIDs = [];
         $rankedPermissions = [
             'Garden.Settings.Manage',
             'Garden.Community.Manage',
@@ -61,6 +61,7 @@ class LeaderBoardModule extends Gdn_Module {
         ];
 
         if ($excludePermission && in_array($excludePermission, $rankedPermissions)) {
+            $moderatorRoleIDs = [];
             $roleModel = new RoleModel();
             $roles = $roleModel->getWithRankPermissions()->resultArray();
 
@@ -74,7 +75,15 @@ class LeaderBoardModule extends Gdn_Module {
                     }
                 }
             }
+
+            if ($moderatorRoleIDs) {
+                $userModel = new UserModel();
+                $moderators = $userModel->getByRole($moderatorRoleIDs)->resultArray();
+                $moderatorIDs = array_column($moderators, 'UserID');
+            }
         }
+
+
 
         $leadersSql = Gdn::sql()
             ->select([
@@ -93,10 +102,8 @@ class LeaderBoardModule extends Gdn_Module {
                 'CategoryID' => $categoryID
             ]);
 
-        if (!empty($moderatorRoleIDs)) {
-            $leadersSql->join('UserRole ur', 'up.UserID = ur.UserID', 'left')
-                ->whereNotIn('ur.RoleID', $moderatorRoleIDs)
-            ->distinct(true);
+        if ($moderatorIDs) {
+            $leadersSql->whereNotIn('UserID', $moderatorIDs);
         }
 
         $data = $leadersSql

@@ -48,7 +48,7 @@ endif; ?>
                </div>
             </div>
             <div class="input-wrap">
-               <?php echo $this->Form->dropDown('ListID', $this->data('Lists'), array('IncludeNull' => TRUE)); ?>
+               <?php echo $this->Form->dropDown('ListID', $this->data('Lists'), ['IncludeNull' => TRUE]); ?>
             </div>
          </li>
          <?php
@@ -60,8 +60,8 @@ endif; ?>
             echo $this->Form->labelWrap("Group", "InterestID");
             echo '<div class="input-wrap">';
             // Disable the interest dropdown by default. Will be activated by javascript if needed.
-            echo $this->Form->dropDown('InterestID['.$list.']', $interest, array('IncludeNull' => true,
-                'disabled' => true, 'Value' => $this->Form->getValue('InterestID')));
+            echo $this->Form->dropDown('InterestID['.$list.']', $interest, ['IncludeNull' => true,
+                'disabled' => true, 'Value' => $this->Form->getValue('InterestID')]);
             echo '</div>';
             echo "</li>";
          }

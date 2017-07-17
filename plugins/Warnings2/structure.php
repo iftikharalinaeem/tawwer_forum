@@ -34,28 +34,28 @@ Gdn::structure()->table('WarningType')
     ->column('Description', 'text', true)
     ->column('Points', 'smallint', '0')
     ->column('ExpireNumber', 'smallint', '0')
-    ->column('ExpireType', array('hours', 'days', 'weeks', 'months'), true)
+    ->column('ExpireType', ['hours', 'days', 'weeks', 'months'], true)
     ->set();
 
 if (!$WarningTypeExists) {
     Gdn::sql()->replace(
         'WarningType',
-        array('Description' => '', 'Points' => '0'),
-        array('Name' => 'Notice'),
+        ['Description' => '', 'Points' => '0'],
+        ['Name' => 'Notice'],
         true
     );
 
     Gdn::sql()->replace(
         'WarningType',
-        array('Description' => '', 'Points' => '2', 'ExpireNumber' => '1', 'ExpireType' => 'weeks'),
-        array('Name' => 'Minor'),
+        ['Description' => '', 'Points' => '2', 'ExpireNumber' => '1', 'ExpireType' => 'weeks'],
+        ['Name' => 'Minor'],
         true
     );
 
     Gdn::sql()->replace(
         'WarningType',
-        array('Description' => '', 'Points' => '3', 'ExpireNumber' => '2', 'ExpireType' => 'weeks'),
-        array('Name' => 'Major'),
+        ['Description' => '', 'Points' => '3', 'ExpireNumber' => '2', 'ExpireType' => 'weeks'],
+        ['Name' => 'Major'],
         true
     );
 }

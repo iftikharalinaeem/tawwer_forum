@@ -16,7 +16,7 @@ class UploadHandler {
    protected $options;
 
    function __construct($options = null) {
-      $this->options = array(
+      $this->options = [
           'script_url' => $this->getFullUrl() . '/',
           'upload_dir' => dirname($_SERVER['SCRIPT_FILENAME']) . '/uploads/',
           'upload_url' => $this->getFullUrl() . '/uploads/',
@@ -40,7 +40,7 @@ class UploadHandler {
           'discard_aborted_uploads' => true,
           // Set to true to rotate images based on EXIF meta data, if available:
           'orient_image' => false,
-          'image_versions' => array(
+          'image_versions' => [
               // Uncomment the following version to restrict the size of
               // uploaded images. You can also add additional versions with
               // their own upload directories:
@@ -53,14 +53,14 @@ class UploadHandler {
                 'jpeg_quality' => 95
                 ),
                */
-              'thumbnail' => array(
+              'thumbnail' => [
                   'upload_dir' => dirname($_SERVER['SCRIPT_FILENAME']) . '/uploads/thumbnails/',
                   'upload_url' => $this->getFullUrl() . '/uploads/thumbnails/',
                   'max_width' => 300,
                   'max_height' => 300
-              )
-          )
-      );
+              ]
+          ]
+      ];
       if ($options) {
          $this->options = array_replace_recursive($this->options, $options);
       }
@@ -107,7 +107,7 @@ class UploadHandler {
 
    protected function get_file_objects() {
       return array_values(array_filter(array_map(
-                                      array($this, 'get_file_object'), scandir($this->options['upload_dir'])
+                                      [$this, 'get_file_object'], scandir($this->options['upload_dir'])
                               )));
    }
 
@@ -225,7 +225,7 @@ class UploadHandler {
 
    protected function upcount_name($name) {
       return preg_replace_callback(
-                      '/(?:(?: \(([\d]+)\))?(\.[^.]+))?$/', array($this, 'upcount_name_callback'), $name, 1
+                      '/(?:(?: \(([\d]+)\))?(\.[^.]+))?$/', [$this, 'upcount_name_callback'], $name, 1
       );
    }
 
@@ -257,7 +257,7 @@ class UploadHandler {
          return false;
       }
       $orientation = intval(@$exif['Orientation']);
-      if (!in_array($orientation, array(3, 6, 8))) {
+      if (!in_array($orientation, [3, 6, 8])) {
          return false;
       }
       $image = @imagecreatefromjpeg($file_path);
@@ -339,7 +339,7 @@ class UploadHandler {
       $file->url = Url($this->options['upload_url'].$filename, TRUE);
       $this->make_image_versions($file);
       $this->set_file_delete_url($file);
-      echo json_encode(array($file));
+      echo json_encode([$file]);
    }
 
    public function make_image_versions(&$file) {
@@ -375,7 +375,7 @@ class UploadHandler {
       }
       $upload = isset($_FILES[$this->options['param_name']]) ?
               $_FILES[$this->options['param_name']] : null;
-      $info = array();
+      $info = [];
       if ($upload && is_array($upload['tmp_name'])) {
          // param_name is an array identifier like "files[]",
          // $_FILES is a multi-dimensional array:

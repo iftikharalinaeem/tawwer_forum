@@ -3,7 +3,7 @@
 $isEnded = EventModel::isEnded($this->Data('Event'));
 ?>
 <div class="AttendeeList YesAttending"><?php
-    $Yes = sizeof($this->Data('Invited.Yes', array()));
+    $Yes = sizeof($this->Data('Invited.Yes', []));
     if ($isEnded && $Yes) {
         echo Wrap(sprintf(T('Attended (%s)'), $Yes), 'h3');
     }
@@ -22,7 +22,7 @@ $isEnded = EventModel::isEnded($this->Data('Event'));
 
 <div class="Negatives">
     <div class="AttendeeList NotAttending"><?php
-        $No = sizeof($this->Data('Invited.No', array()));
+        $No = sizeof($this->Data('Invited.No', []));
         if ($isEnded && $No) {
             echo Wrap(sprintf(T('Did not attend (%s)'), $No), 'h3');
         }
@@ -41,7 +41,7 @@ $isEnded = EventModel::isEnded($this->Data('Event'));
     </div>
     <div class="AttendeeList MaybeAttending">
         <?php
-        $Maybe = sizeof($this->Data('Invited.Maybe', array()));
+        $Maybe = sizeof($this->Data('Invited.Maybe', []));
         if ($isEnded && $Maybe) {
             echo Wrap(sprintf(T('Maybe (%s)'), $Maybe), 'h3');
         }
@@ -61,7 +61,7 @@ $isEnded = EventModel::isEnded($this->Data('Event'));
 </div>
 
 <?php
-$Invited = sizeof($this->Data('Invited.Invited', array()));
+$Invited = sizeof($this->Data('Invited.Invited', []));
 if ($Invited): ?>
 <div class="InvitedAttending"><?php echo sprintf(Plural($Invited, '%s unanswered invitation.', '%s unanswered invitations.'), $Invited); ?></div>
 <?php endif; ?>

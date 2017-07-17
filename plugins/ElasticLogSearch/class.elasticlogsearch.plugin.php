@@ -34,9 +34,9 @@ class ElasticLogSearch extends Gdn_Plugin {
         list($offset, $limit) = OffsetLimit($Page, $pageSize);
 
         $get = array_change_key_case($Sender->Request->Get());
-        $params = array(
+        $params = [
             'index' => 'log_vanilla*'
-        );
+        ];
         //$params['body']['query']['filtered']['query'] = array('match_all' => array());
 
         // Look for query parameters to filter the data.
@@ -61,26 +61,26 @@ class ElasticLogSearch extends Gdn_Plugin {
         }
 
         if (isset($from) && isset($to)) {
-            $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.timestamp'] = array(
+            $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.timestamp'] = [
                 'from' => $from,
                 'to' => $to,
-            );
+            ];
         } elseif (isset($to)) {
-            $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.timestamp'] = array(
+            $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.timestamp'] = [
                 'to' => $to,
-            );
+            ];
         } elseif (isset($from)) {
-            $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.timestamp'] = array(
+            $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.timestamp'] = [
                 'from' => $from,
-            );
+            ];
         }
 
         $Sender->Form->SetFormValue('priority', 'All');
         if (($v = val('priority', $get)) && $v != 'All') {
 
-            $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.priority'] = array(
+            $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.priority'] = [
                 'to' => $v,
-            );
+            ];
 
             $Sender->Form->SetFormValue('priority', $v);
 
@@ -110,7 +110,7 @@ class ElasticLogSearch extends Gdn_Plugin {
             }
         }
 
-        $params['sort'] = array('@timestamp:' . $sortOrder);
+        $params['sort'] = ['@timestamp:' . $sortOrder];
         $Sender->Form->SetFormValue('sortorder', $sortOrder);
 
         $params['from'] = $offset;
@@ -126,8 +126,8 @@ class ElasticLogSearch extends Gdn_Plugin {
             // Query Error
             $searchMessage = json_decode($e->getMessage());
             Trace($searchMessage, TRACE_ERROR);
-            $events = array();
-            $results = array();
+            $events = [];
+            $results = [];
         }
 
         // Application calculation.
@@ -139,7 +139,7 @@ class ElasticLogSearch extends Gdn_Plugin {
         }
 
         $Sender->AddSideMenu();
-        $PriorityOptions = array(
+        $PriorityOptions = [
             Logger::DEBUG => LOG_DEBUG,
             Logger::INFO => LOG_INFO,
             Logger::NOTICE => LOG_NOTICE,
@@ -148,7 +148,7 @@ class ElasticLogSearch extends Gdn_Plugin {
             Logger::CRITICAL => LOG_CRIT,
             Logger::ALERT => LOG_ALERT,
             Logger::EMERGENCY => LOG_EMERG
-        );
+        ];
         $PriorityOptions = array_flip($PriorityOptions);
         $PriorityOptions['All'] = 'All';
 
@@ -159,12 +159,12 @@ class ElasticLogSearch extends Gdn_Plugin {
         $CurrentFilter = http_build_query($filter);
 
         $Sender->SetData(
-            array(
+            [
                 'Events' => $events,
                 'PriorityOptions' => $PriorityOptions,
                 'SortOrder' => $sortOrder,
                 'CurrentFilter' => $CurrentFilter
-            )
+            ]
         );
 
         $Pager = PagerModule::Current();
@@ -180,8 +180,8 @@ class ElasticLogSearch extends Gdn_Plugin {
 
 
     public function convertHitsToRows($hits) {
-        $rows = array();
-        $siteIDs = array();
+        $rows = [];
+        $siteIDs = [];
         foreach ($hits as $hit) {
             $siteID = valr('_source.message.siteid', $hit, 0);
             if ($siteID > 0) {
@@ -198,7 +198,7 @@ class ElasticLogSearch extends Gdn_Plugin {
             if ($message == '') {
                 continue;
             }
-            $rows[$i] = array(
+            $rows[$i] = [
                 'ID' => $hit['_id'],
                 'Timestamp' => valr('_source.message.timestamp', $hit),
                 'Event' => valr('_source.message.event', $hit),
@@ -212,7 +212,7 @@ class ElasticLogSearch extends Gdn_Plugin {
                 'SiteID' => valr('_source.message.siteid', $hit),
                 'SiteName' => val(valr('_source.message.siteid', $hit), $Sites, 'unknown'),
                 'Source' => ''
-            );
+            ];
             if (C('Debug')) {
                 $rows[$i]['Source'] = $hit;
             }
@@ -244,17 +244,17 @@ class ElasticLogSearch extends Gdn_Plugin {
 
         $es = Elastic::connection('log');
 
-        $params = array();
+        $params = [];
 
-        $params['body']['query']['filtered']['query'] = array('match_all' => array());
+        $params['body']['query']['filtered']['query'] = ['match_all' => []];
 
         $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.event'] = 'security_access';
         $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.siteid'] = 6021894;
 
-        $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.timestamp'] = array(
+        $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.timestamp'] = [
             'from' => 1413931530,
             'to' => 1413931550,
-        );
+        ];
 
 //        $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.priority'] = array(
 //            'to' => 7,
@@ -285,7 +285,7 @@ class ElasticLogSearch extends Gdn_Plugin {
         // Pagination params.
         $params['from'] = 0;
         $params['size'] = 30;
-        $params['sort'] = array('@timestamp:desc');
+        $params['sort'] = ['@timestamp:desc'];
 
         $results = $es->search($params);
 
@@ -294,11 +294,11 @@ class ElasticLogSearch extends Gdn_Plugin {
 
         $events = $this->convertHitsToRows($results['hits']['hits']);
         echo json_encode(
-            array(
+            [
                 'params' => $params,
                 'results' => $results,
                 'events' => $events
-            ),
+            ],
             JSON_PRETTY_PRINT
         );
         echo '</pre>';

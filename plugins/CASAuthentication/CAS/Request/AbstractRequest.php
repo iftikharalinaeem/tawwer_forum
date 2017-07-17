@@ -42,14 +42,14 @@ implements CAS_Request_RequestInterface
 {
 
     protected $url = null;
-    protected $cookies = array();
-    protected $headers = array();
+    protected $cookies = [];
+    protected $headers = [];
     protected $isPost = false;
     protected $postBody = null;
     protected $caCertPath = null;
     protected $validateCN = true;
     private $_sent = false;
-    private $_responseHeaders = array();
+    private $_responseHeaders = [];
     private $_responseBody = null;
     private $_errorMessage = '';
 

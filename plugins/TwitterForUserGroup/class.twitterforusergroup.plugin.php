@@ -13,7 +13,7 @@ class TwitterForUserGroupPlugin extends Gdn_Plugin {
    public function Base_Render_Before($Sender) {
       
       // Only display this in panels loaded from the default master view... prevent loading in admin panel
-      if (!in_array($Sender->MasterView, array('','default.master.php'))) return;
+      if (!in_array($Sender->MasterView, ['','default.master.php'])) return;
       
       // Attach Twitter script library to the HeadModule on the $Sender (calling controller)
       $Sender->Head->AddScript("http://widgets.twimg.com/j/2/widget.js");
@@ -78,7 +78,7 @@ TWITCODE;
       
       $Validation = new Gdn_Validation();
       $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigArray = array('Plugin.Twitter.Username');
+      $ConfigArray = ['Plugin.Twitter.Username'];
       if ($Sender->Form->AuthenticatedPostBack() === FALSE)
          $ConfigArray['Plugin.Twitter.Username'] = $TwitterUsername;
       

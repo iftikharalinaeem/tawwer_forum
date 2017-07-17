@@ -14,7 +14,7 @@ require_once dirname(__FILE__).'/helper_functions.php';
    if ($this->DeliveryType() == DELIVERY_TYPE_ALL)
       echo Wrap($this->Data('Title'), 'h1 class="H"');
 
-   echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'id' => 'UploadForm'));
+   echo $this->Form->Open(['enctype' => 'multipart/form-data', 'id' => 'UploadForm']);
    echo $this->Form->Errors();
 
    echo '<div class="FormWrapper">';
@@ -23,14 +23,14 @@ require_once dirname(__FILE__).'/helper_functions.php';
       echo '<div class="P">';
          echo '<div class="Category">';
          echo $this->Form->Label('Category', 'CategoryID'), ' ';
-         echo $this->Form->CategoryDropDown('CategoryID', array('Value' => GetValue('CategoryID', $this->Category)));
+         echo $this->Form->CategoryDropDown('CategoryID', ['Value' => GetValue('CategoryID', $this->Category)]);
          echo '</div>';
       echo '</div>';
    }
 
    echo '<div class="P">';
       echo $this->Form->Label('Name', 'Name');
-      echo Wrap($this->Form->TextBox('Name', array('maxlength' => 100, 'class' => 'InputBox BigInput')), 'div', array('class' => 'TextBoxWrapper'));
+      echo Wrap($this->Form->TextBox('Name', ['maxlength' => 100, 'class' => 'InputBox BigInput']), 'div', ['class' => 'TextBoxWrapper']);
    echo '</div>';
 
    WriteImageUpload();
@@ -41,7 +41,7 @@ require_once dirname(__FILE__).'/helper_functions.php';
    echo '<div id="filetable" class="Tiles UploadFiles files" role="presentation"></div>';
 
    echo '<div class="Buttons">';
-      echo $this->Form->Button('Post', array('class' => 'Button ImageButton Primary'));
+      echo $this->Form->Button('Post', ['class' => 'Button ImageButton Primary']);
       echo Anchor(T('Cancel'), $CancelUrl, 'Cancel');
    echo '</div>';
 
@@ -54,8 +54,8 @@ require_once dirname(__FILE__).'/helper_functions.php';
 $PostedImages = $this->Form->GetFormValue('Image');
 $PostedSizes = $this->Form->GetFormValue('Size');
 $PostedCaptions = $this->Form->GetFormValue('Caption');
-$Thumbnails = $this->Form->GetFormValue('Thumbnail', array());
-$Files = array();
+$Thumbnails = $this->Form->GetFormValue('Thumbnail', []);
+$Files = [];
 
 if (is_array($PostedImages)) {
    foreach ($PostedImages as $Key => $PostedImage) {

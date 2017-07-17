@@ -38,7 +38,7 @@ define('DEFAULT_AT', 41);
  * @global array $GLOBALS['csstidy']['whitespace']
  * @version 1.0
  */
-$GLOBALS['csstidy']['whitespace'] = array(' ',"\n","\t","\r","\x0B");
+$GLOBALS['csstidy']['whitespace'] = [' ',"\n","\t","\r","\x0B"];
 
 /**
  * All CSS tokens used by csstidy
@@ -55,7 +55,7 @@ $GLOBALS['csstidy']['tokens'] = '/@}{;:=\'"(,\\!$%&)*+.<>?[]^`|~';
  * @global array $GLOBALS['csstidy']['units']
  * @version 1.0
  */
-$GLOBALS['csstidy']['units'] = array('in','cm','mm','pt','pc','px','rem','em','%','ex','gd','vw','vh','vm','deg','grad','rad','ms','s','khz','hz');
+$GLOBALS['csstidy']['units'] = ['in','cm','mm','pt','pc','px','rem','em','%','ex','gd','vw','vh','vm','deg','grad','rad','ms','s','khz','hz'];
 
 /**
  * Available at-rules
@@ -63,7 +63,7 @@ $GLOBALS['csstidy']['units'] = array('in','cm','mm','pt','pc','px','rem','em','%
  * @global array $GLOBALS['csstidy']['at_rules']
  * @version 1.0
  */
-$GLOBALS['csstidy']['at_rules'] = array('page' => 'is','font-face' => 'is','charset' => 'iv', 'import' => 'iv','namespace' => 'iv','media' => 'at');
+$GLOBALS['csstidy']['at_rules'] = ['page' => 'is','font-face' => 'is','charset' => 'iv', 'import' => 'iv','namespace' => 'iv','media' => 'at'];
 
  /**
  * Properties that need a value with unit
@@ -73,11 +73,11 @@ $GLOBALS['csstidy']['at_rules'] = array('page' => 'is','font-face' => 'is','char
  * @global array $GLOBALS['csstidy']['unit_values']
  * @version 1.2
  */
-$GLOBALS['csstidy']['unit_values'] = array ('background', 'background-position', 'border', 'border-top', 'border-right', 'border-bottom', 'border-left', 'border-width',
+$GLOBALS['csstidy']['unit_values'] = ['background', 'background-position', 'border', 'border-top', 'border-right', 'border-bottom', 'border-left', 'border-width',
                                             'border-top-width', 'border-right-width', 'border-left-width', 'border-bottom-width', 'bottom', 'border-spacing', 'font-size',
                                             'height', 'left', 'margin', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'max-height', 'max-width',
                                             'min-height', 'min-width', 'outline-width', 'padding', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
-                                            'position', 'right', 'top', 'text-indent', 'letter-spacing', 'word-spacing', 'width');
+                                            'position', 'right', 'top', 'text-indent', 'letter-spacing', 'word-spacing', 'width'];
 
 /**
  * Properties that allow <color> as value
@@ -87,7 +87,7 @@ $GLOBALS['csstidy']['unit_values'] = array ('background', 'background-position',
  * @global array $GLOBALS['csstidy']['color_values']
  * @version 1.0
  */
-$GLOBALS['csstidy']['color_values'] = array();
+$GLOBALS['csstidy']['color_values'] = [];
 $GLOBALS['csstidy']['color_values'][] = 'background-color';
 $GLOBALS['csstidy']['color_values'][] = 'border-color';
 $GLOBALS['csstidy']['color_values'][] = 'border-top-color';
@@ -107,7 +107,7 @@ $GLOBALS['csstidy']['color_values'][] = 'outline-color';
  * @see merge_bg()
  * @version 1.0
  */
-$GLOBALS['csstidy']['background_prop_default'] = array();
+$GLOBALS['csstidy']['background_prop_default'] = [];
 $GLOBALS['csstidy']['background_prop_default']['background-image'] = 'none';
 $GLOBALS['csstidy']['background_prop_default']['background-size'] = 'auto';
 $GLOBALS['csstidy']['background_prop_default']['background-repeat'] = 'repeat';
@@ -124,7 +124,7 @@ $GLOBALS['csstidy']['background_prop_default']['background-color'] = 'transparen
  * @see cut_color()
  * @version 1.0
  */
-$GLOBALS['csstidy']['replace_colors'] = array();
+$GLOBALS['csstidy']['replace_colors'] = [];
 $GLOBALS['csstidy']['replace_colors']['aliceblue'] = '#F0F8FF';
 $GLOBALS['csstidy']['replace_colors']['antiquewhite'] = '#FAEBD7';
 $GLOBALS['csstidy']['replace_colors']['aquamarine'] = '#7FFFD4';
@@ -262,12 +262,12 @@ $GLOBALS['csstidy']['replace_colors']['yellowgreen'] = '#9ACD32';
  * @see merge_4value_shorthands()
  * @version 1.0
  */
-$GLOBALS['csstidy']['shorthands'] = array();
-$GLOBALS['csstidy']['shorthands']['border-color'] = array('border-top-color','border-right-color','border-bottom-color','border-left-color');
-$GLOBALS['csstidy']['shorthands']['border-style'] = array('border-top-style','border-right-style','border-bottom-style','border-left-style');
-$GLOBALS['csstidy']['shorthands']['border-width'] = array('border-top-width','border-right-width','border-bottom-width','border-left-width');
-$GLOBALS['csstidy']['shorthands']['margin'] = array('margin-top','margin-right','margin-bottom','margin-left');
-$GLOBALS['csstidy']['shorthands']['padding'] = array('padding-top','padding-right','padding-bottom','padding-left');
+$GLOBALS['csstidy']['shorthands'] = [];
+$GLOBALS['csstidy']['shorthands']['border-color'] = ['border-top-color','border-right-color','border-bottom-color','border-left-color'];
+$GLOBALS['csstidy']['shorthands']['border-style'] = ['border-top-style','border-right-style','border-bottom-style','border-left-style'];
+$GLOBALS['csstidy']['shorthands']['border-width'] = ['border-top-width','border-right-width','border-bottom-width','border-left-width'];
+$GLOBALS['csstidy']['shorthands']['margin'] = ['margin-top','margin-right','margin-bottom','margin-left'];
+$GLOBALS['csstidy']['shorthands']['padding'] = ['padding-top','padding-right','padding-bottom','padding-left'];
 $GLOBALS['csstidy']['shorthands']['-moz-border-radius'] = 0;
 
 /**
@@ -278,7 +278,7 @@ $GLOBALS['csstidy']['shorthands']['-moz-border-radius'] = 0;
  * @version 1.0
  * @see csstidy::property_is_next()
  */
-$GLOBALS['csstidy']['all_properties'] = array();
+$GLOBALS['csstidy']['all_properties'] = [];
 $GLOBALS['csstidy']['all_properties']['background'] = 'CSS1.0,CSS2.0,CSS2.1';
 $GLOBALS['csstidy']['all_properties']['background-color'] = 'CSS1.0,CSS2.0,CSS2.1';
 $GLOBALS['csstidy']['all_properties']['background-image'] = 'CSS1.0,CSS2.0,CSS2.1';

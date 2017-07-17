@@ -16,10 +16,10 @@ class BookmarkCheckboxPlugin extends Gdn_Plugin {
    private function addCheckBox($Sender) {
       if (Gdn::Session()->IsValid()) {
          // Is this discussion currently bookmarked?
-         $Attributes = array(
+         $Attributes = [
              'value' => '1', 
              'checked' => 'checked'
-         );
+         ];
 
          echo $Sender->Form->CheckBox('Bookmarked', T('Bookmark this discussion'), $Attributes).'</li>';
       }

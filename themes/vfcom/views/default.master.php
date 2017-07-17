@@ -10,7 +10,7 @@ $Session = Gdn::Session();
    <meta name="google-site-verification" content="XNPgCc6RnVDN47M9vJPLpCr0wQDt2eOj1xf6QZsya7g" />
    <?php
    if (class_exists('PocketsPlugin')) {
-      echo PocketsPlugin::PocketString('google-analytics', array('track_page' => $this->Data('AnalyticsFunnelPage')));
+      echo PocketsPlugin::PocketString('google-analytics', ['track_page' => $this->Data('AnalyticsFunnelPage')]);
    }
    ?>
 </head>
@@ -22,7 +22,7 @@ $Session = Gdn::Session();
             <h1 class="Logo">
                <?php 
                $Text = 'Community Forums Evolved, VanillaForums.com';
-               echo Anchor($Text, '/', array('title' => $Text));
+               echo Anchor($Text, '/', ['title' => $Text]);
                ?>
             </h1>
             <div class="Menus">
@@ -37,19 +37,19 @@ $Session = Gdn::Session();
                         echo Anchor('Account', '/account', 'Account');
 
                      echo Gdn_Theme::Link('profile', 'Profile', '<a href="%url" class="Profile">%text</a>');
-                     echo Anchor('Sign Out', SignOutUrl(), 'SignOut', array('SSL' => TRUE));
+                     echo Anchor('Sign Out', SignOutUrl(), 'SignOut', ['SSL' => TRUE]);
                   } else {
-                     echo Anchor('Sign In', SignInUrl(), 'SignIn', array('SSL' => TRUE));
+                     echo Anchor('Sign In', SignInUrl(), 'SignIn', ['SSL' => TRUE]);
                   }
                   ?>
                </div>
                <div class="VFMenu">
                   <?php
                   // echo Anchor(Sprite('SpHome').'Home', '/', 'Home', array('SSL' => FALSE));
-                  echo Anchor(Sprite('SpTour').'Tour', '/tour', 'Product Tour', array('SSL' => FALSE));
-                  echo Anchor(Sprite('SpResources').'Solutions', '/solutions', 'Solutions', array('SSL' => FALSE));
-                  echo Anchor(Sprite('SpPlans').'Plans &amp; Pricing', '/plans', 'Plans', array('SSL' => FALSE));
-                  echo Anchor(Sprite('SpBlog').'Blog', '/blog', 'Blog', array('SSL' => FALSE));
+                  echo Anchor(Sprite('SpTour').'Tour', '/tour', 'Product Tour', ['SSL' => FALSE]);
+                  echo Anchor(Sprite('SpResources').'Solutions', '/solutions', 'Solutions', ['SSL' => FALSE]);
+                  echo Anchor(Sprite('SpPlans').'Plans &amp; Pricing', '/plans', 'Plans', ['SSL' => FALSE]);
+                  echo Anchor(Sprite('SpBlog').'Blog', '/blog', 'Blog', ['SSL' => FALSE]);
                   // echo Anchor(Sprite('SpShowcase').'Showcase', '/showcase', 'Showcase', array('SSL' => FALSE));
                   ?>
                </div>
@@ -77,14 +77,14 @@ $Session = Gdn::Session();
                <?php $this->AddModule('MeModule'); $this->RenderAsset('Panel'); ?>
             </div>
             <div id="Content" class="Column ContentColumn"><?php
-            if (in_array(strtolower($this->ControllerName), array('discussionscontroller', 'categoriescontroller'))) {
+            if (in_array(strtolower($this->ControllerName), ['discussionscontroller', 'categoriescontroller'])) {
                echo '<div class="SearchForm">';
                $Form = Gdn::Factory('Form');
                $Form->InputPrefix = '';
                echo 
-                  $Form->Open(array('action' => Url('/search'), 'method' => 'get')),
+                  $Form->Open(['action' => Url('/search'), 'method' => 'get']),
                   $Form->TextBox('Search'),
-                  $Form->Button('Search', array('Name' => '')),
+                  $Form->Button('Search', ['Name' => '']),
                   $Form->Close()
                   .'</div>';
             }
@@ -100,27 +100,27 @@ $Session = Gdn::Session();
          <div class="Columns">
             <div class="Column3">
                <?php
-               echo Anchor('About Us', 'info/aboutus', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Contact Us', '/info/contact', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Resources', '/resources', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor("Jobs", '/info/hiring', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Blog', '/blog', '', array('SSL' => FALSE));
+               echo Anchor('About Us', 'info/aboutus', '', ['SSL' => FALSE]);
+               echo '<br />'.Anchor('Contact Us', '/info/contact', '', ['SSL' => FALSE]);
+               echo '<br />'.Anchor('Resources', '/resources', '', ['SSL' => FALSE]);
+               echo '<br />'.Anchor("Jobs", '/info/hiring', '', ['SSL' => FALSE]);
+               echo '<br />'.Anchor('Blog', '/blog', '', ['SSL' => FALSE]);
                echo '<br /><a href="https://plus.google.com/114911737178548458245" rel="publisher">Google+</a>';
                ?>
             </div>
             <div class="Column3">
                <?php
-               echo Anchor('Tour', '/tour', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Solutions', '/solutions', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Service Offerings', '/solutions#services', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Forum Migration', '/solutions#migration', '', array('SSL' => FALSE));
+               echo Anchor('Tour', '/tour', '', ['SSL' => FALSE]);
+               echo '<br />'.Anchor('Solutions', '/solutions', '', ['SSL' => FALSE]);
+               echo '<br />'.Anchor('Service Offerings', '/solutions#services', '', ['SSL' => FALSE]);
+               echo '<br />'.Anchor('Forum Migration', '/solutions#migration', '', ['SSL' => FALSE]);
                ?>
             </div>
             <div class="Column3">
                <?php
-               echo Anchor('Terms of Service', '/info/termsofservice', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Privacy Policy', '/info/privacy', '', array('SSL' => FALSE));
-               echo '<br />'.Anchor('Refund Policy', '/info/refund', '', array('SSL' => FALSE));
+               echo Anchor('Terms of Service', '/info/termsofservice', '', ['SSL' => FALSE]);
+               echo '<br />'.Anchor('Privacy Policy', '/info/privacy', '', ['SSL' => FALSE]);
+               echo '<br />'.Anchor('Refund Policy', '/info/refund', '', ['SSL' => FALSE]);
                ?>
             </div>
          </div>

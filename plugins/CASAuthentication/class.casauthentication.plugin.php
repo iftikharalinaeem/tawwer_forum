@@ -65,18 +65,18 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
         $Form->setFormValue('FullName', $User['FirstName'].' '.$User['LastName']);
         $Form->setFormValue('Email', $User['Email']);
 
-        saveToConfig(array(
+        saveToConfig([
             'Garden.User.ValidationRegex' => UserModel::USERNAME_REGEX_MIN,
             'Garden.User.ValidationLength' => '{3,50}',
             'Garden.Registration.NameUnique' => false,
             'Garden.Registration.AutoConnect' => true
-        ), '', false);
+        ], '', false);
 
         // Save some original data in the attributes of the connection for later API calls.
-        $Attributes = array(
+        $Attributes = [
             'FirstName' => $User['FirstName'],
             'LastName' => $User['LastName']
-        );
+        ];
         $Form->setFormValue('Attributes', $Attributes);
 
         $Sender->setData('Verified', true);
@@ -109,7 +109,7 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
 
             $Xml = (array)simplexml_load_string($Data);
 
-            $User = ArrayTranslate($Xml, array('email' => 'Email', 'nickname' => 'Name', 'firstName' => 'FirstName', 'lastName' => 'LastName'));
+            $User = ArrayTranslate($Xml, ['email' => 'Email', 'nickname' => 'Name', 'firstName' => 'FirstName', 'lastName' => 'LastName']);
             $User['UniqueID'] = $User['Email'];
             Gdn::session()->stash('CASUser', $User);
 
@@ -117,7 +117,7 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
             $Get = $Sender->Request->get();
             unset($Get['ticket']);
             $Url = '/entry/connect/cas?'.http_build_query($Get);
-            redirect($Url);
+            redirectTo($Url);
         }
     }
 
@@ -128,7 +128,7 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
     */
     public function entryController_register_handler($Sender) {
         $Url = c('Plugins.CASAuthentication.RegisterUrl');
-        redirect($Url);
+        redirectTo($Url, 302, false);
     }
 
     /**
@@ -140,7 +140,7 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
         if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
             $Get = $Sender->Request->get();
             $Url = '/entry/cas?'.http_build_query($Get);
-            Redirect($Url);
+            redirectTo($Url);
         }
     }
 

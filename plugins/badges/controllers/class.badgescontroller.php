@@ -66,11 +66,11 @@ class BadgesController extends BadgesAppController {
         /* @var SiteNodePlugin $nodePlugin */
         $nodePlugin = SiteNodePlugin::instance();
 
-        $result = $nodePlugin->hubApi('/badges/all.json', 'GET', array(), true);
+        $result = $nodePlugin->hubApi('/badges/all.json', 'GET', [], true);
 
         $badges = $result['Badges'];
         foreach ($badges as $badge) {
-            $set = arrayTranslate($badge, array('Slug', 'Name', 'Photo', 'Body', 'Points', 'Active', 'Visible', 'Class', 'Threshold', 'Level'));
+            $set = arrayTranslate($badge, ['Slug', 'Name', 'Photo', 'Body', 'Points', 'Active', 'Visible', 'Class', 'Threshold', 'Level']);
             $this->BadgeModel->save($set);
             $this->BadgeModel->Validation->results(true);
         }

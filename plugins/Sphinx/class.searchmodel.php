@@ -5,6 +5,17 @@
  * @license Proprietary
  */
 
+// Kludge that allows to use the correct version (the version must match the sphinx deamon version)
+// of https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php as SphinxClient.
+// Must do on php7 if you want to use a SphinxClient without compiling the php extension yourself.
+if (!class_exists('SphinxClient') && c('Plugins.Sphinx.SphinxAPIDir')) {
+    $sphinxClientPath = rtrim(c('Plugins.Sphinx.SphinxAPIDir'), '/').'/sphinxapi.php';
+    if (!is_readable($sphinxClientPath)) {
+        die("'$sphinxClientPath' is not readable!");
+    }
+    require_once($sphinxClientPath);
+}
+
 if (!defined('SPH_RANK_SPH04')) {
     define('SPH_RANK_SPH04', 7);
 }
@@ -418,7 +429,7 @@ class SearchModel extends Gdn_Model {
 //            $Results['ChildResults'] = $ChildResults['SearchResults'];
 //         }
         } else {
-            $results = array('SearchResults' => [], 'RecordCount' => 0, 'SearchTerms' => $terms);
+            $results = ['SearchResults' => [], 'RecordCount' => 0, 'SearchTerms' => $terms];
         }
         $results['CalculatedSearch'] = $search;
         return $results;
@@ -438,7 +449,7 @@ class SearchModel extends Gdn_Model {
             $sphinx->setFilter('CategoryID', (array) $search['cat']);
         }
         if (isset($search['discussionid'])) {
-            $indexes = $this->Indexes(array('Discussion', 'Comment'));
+            $indexes = $this->Indexes(['Discussion', 'Comment']);
             $sphinx->setFilter('DiscussionID', (array) $search['discussionid']);
         }
         if (isset($search['tags'])) {
@@ -507,8 +518,11 @@ class SearchModel extends Gdn_Model {
 
         $results = $this->getDocuments($search);
         $total = val('total', $search);
-        Gdn::controller()->setData('RecordCount', $total);
+        $controller = Gdn::controller();
         $searchTerms = val('words', $search);
+        if ($controller) {
+            $controller->setData('RecordCount', $total);
+        }
         if (is_array($searchTerms)) {
             $searchTerms = array_keys($searchTerms);
         } else {
@@ -559,7 +573,7 @@ class SearchModel extends Gdn_Model {
 
     /**
      * Get SphinxClient object
-     * 
+     *
      * @return SphinxClient
      */
     public function sphinxClient() {
@@ -584,8 +598,9 @@ class SearchModel extends Gdn_Model {
     }
 
     public function search($terms, $offset = 0, $limit = 20) {
-        $search = array('search' => $terms, 'group' => false);
-        if ($categoryID = Gdn::controller()->Request->get('CategoryID')) {
+        $search = ['search' => $terms, 'group' => false];
+        $controller = Gdn::controller();
+        if ($controller && $categoryID = $controller->Request->get('CategoryID')) {
             $search['cat'] = $categoryID;
         }
 
@@ -816,7 +831,7 @@ class SearchModel extends Gdn_Model {
             if ($query[2] || ($query[1] && !$inquote && !$inword)) {
                 $queries[] = $query[0] . $sphinx->escapeString($query[1]) . $query[2];
                 $terms[] = $query[1];
-                $query = array('', '', '');
+                $query = ['', '', ''];
             }
         }
         // Account for someone missing their last quote.

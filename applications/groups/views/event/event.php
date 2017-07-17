@@ -41,11 +41,11 @@ echo $header;
 <div class="FormWrapper StructuredForm Attending">
   <div class="P Attending">
      <?php echo $this->Form->Label('Are you attending this event?'); ?>
-     <div><?php echo $this->Form->RadioList('Attending', array(
+     <div><?php echo $this->Form->RadioList('Attending', [
           'Yes'         => 'Yes',
           'No'          => 'No',
           'Maybe'      => 'Maybe'
-        ), array('class' => 'EventAttending')); ?></div>
+        ], ['class' => 'EventAttending']); ?></div>
   </div>
 </div>
 <div class="FormTitleWrapper">

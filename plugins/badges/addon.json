@@ -1,7 +1,7 @@
 {
     "name": "Badges",
     "description": "Give badges to your users to reward them for contributing to your community.",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "registerPermissions": {
         "Reputation.Badges.View": 1,
         "0": "Reputation.Badges.Request",
@@ -21,5 +21,8 @@
             "email": "lincoln@vanillaforums.com",
             "homepage": "http://lincolnwebs.com"
         }
-    ]
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    }
 }

@@ -20,14 +20,14 @@ class AdvancedSearchModule extends Gdn_Module {
 
     public $Results = false; // whether or not to show results in the form.
 
-    public $Types = array();
+    public $Types = [];
 
     public $value = null;
 
     public function __construct($Sender = '', $ApplicationFolder = false) {
         $this->_ApplicationFolder = 'plugins/AdvancedSearch';
 
-        $this->DateWithinOptions = array(
+        $this->DateWithinOptions = [
             '1 day' => plural(1, '%s day', '%s days'),
             '3 days' => plural(3, '%s day', '%s days'),
             '1 week' => plural(1, '%s week', '%s weeks'),
@@ -36,7 +36,7 @@ class AdvancedSearchModule extends Gdn_Module {
             '2 months' => plural(2, '%s month', '%s months'),
             '6 months' => plural(6, '%s month', '%s months'),
             '1 year' => plural(1, '%s year', '%s years')
-        );
+        ];
 
         // Set the initial types.
         foreach (AdvancedSearchPlugin::$Types as $table => $types) {
@@ -77,7 +77,7 @@ class AdvancedSearchModule extends Gdn_Module {
         if (isset($Get['tags'])) {
             $tags = explode(',', $Get['tags']);
             $tags = array_filter($tags);
-            $tags = Gdn::SQL()->getWhere('Tag', array('Name' => $tags))->resultArray();
+            $tags = Gdn::SQL()->getWhere('Tag', ['Name' => $tags])->resultArray();
             if (count($tags) > 0 && isset($tags[0]['FullName'])) {
                 $this->setData('Tags', array_column($tags, 'FullName', 'Name'));
             }

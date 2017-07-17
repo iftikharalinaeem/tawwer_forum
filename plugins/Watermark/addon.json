@@ -1,7 +1,7 @@
 {
     "name": "Watermark Image",
     "description": "Allow for configured categories to watermark the images attached to discussions.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "mobileFriendly": true,
     "settingsUrl": "/settings/watermark",
     "key": "watermark",
@@ -13,6 +13,7 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.2"
-    }
+        "vanilla": ">=2.4"
+    },
+    "icon": "watermark_image.png"
 }

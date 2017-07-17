@@ -14,7 +14,7 @@ echo $this->Form->Errors();
 <div class="P">
     <?php
         echo $this->Form->Label('Why do you want to join?', 'Reason');
-        echo $this->Form->TextBox('Reason', array('MultiLine' => true, 'Wrap' => true));
+        echo $this->Form->TextBox('Reason', ['MultiLine' => true, 'Wrap' => true]);
     ?>
 </div>
 <?php else: ?>
@@ -25,8 +25,8 @@ echo $this->Form->Errors();
 
 <div class="Buttons Buttons-Confirm">
     <?php
-    echo $this->Form->Button('OK', array('class' => 'Button Primary'));
-    echo ' '.$this->Form->Button('Cancel', array('type' => 'button', 'class' => 'Button Close'));
+    echo $this->Form->Button('OK', ['class' => 'Button Primary']);
+    echo ' '.$this->Form->Button('Cancel', ['type' => 'button', 'class' => 'Button Close']);
     ?>
 </div>
 <?php

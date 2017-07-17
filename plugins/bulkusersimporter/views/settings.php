@@ -116,7 +116,7 @@
    <h3>Upload CSV file or link to CSV file:</h3>
 
    <?php
-      echo $this->Form->Open(array('enctype' => 'multipart/form-data', 'action' => Url('/settings/bulkusersimporter/upload'), 'id' => 'bulk-importer-form'));
+      echo $this->Form->Open(['enctype' => 'multipart/form-data', 'action' => Url('/settings/bulkusersimporter/upload'), 'id' => 'bulk-importer-form']);
       echo $this->Form->Errors();
    ?>
 
@@ -133,7 +133,7 @@
       <li id="bulk-importer-file-download">
          <?php
             echo $this->Form->Label('Upload CSV:', 'import_files');
-            echo $this->Form->Input('import_files[]', 'file', array('multiple' => 'multiple'));
+            echo $this->Form->Input('import_files[]', 'file', ['multiple' => 'multiple']);
          ?>
       </li>
 
@@ -146,7 +146,7 @@
 
       <li>
          <?php
-            echo $this->Form->CheckBox('has_headers', "First line has headers.", array('class' => 'bulk-note'));
+            echo $this->Form->CheckBox('has_headers', "First line has headers.", ['class' => 'bulk-note']);
          ?>
       </li>
    </ul>

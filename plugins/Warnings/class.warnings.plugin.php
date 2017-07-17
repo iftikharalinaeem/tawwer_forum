@@ -17,7 +17,7 @@ class WarningsPlugin extends Gdn_Plugin {
    public function Structure() {
       Gdn::Structure()->Table('Warning')
          ->PrimaryKey('WarningID')
-         ->Column('Type', array('Warning', 'Ban', 'Punish'))
+         ->Column('Type', ['Warning', 'Ban', 'Punish'])
          ->Column('WarnUserID', 'int') // who we're warning
          ->Column('Points', 'smallint')
          ->Column('DateInserted', 'datetime')
@@ -55,11 +55,11 @@ class WarningsPlugin extends Gdn_Plugin {
          return;
 
       if (!GetValue('EditMode', Gdn::Controller())) {
-         $Sender->EventArguments['ProfileOptions'][] = array(
+         $Sender->EventArguments['ProfileOptions'][] = [
              'Text' => Sprite('SpWarn').' '.T('Warn'),
              'Url' => '/profile/warn?userid='.$Args['UserID'],
              'CssClass' => 'Popup WarnButton'
-         );
+         ];
       }
    }
 
@@ -67,21 +67,21 @@ class WarningsPlugin extends Gdn_Plugin {
       if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
          $UserID = $Sender->Data('Profile.UserID');
 
-         $Sender->Data['Actions']['Warn'] = array(
+         $Sender->Data['Actions']['Warn'] = [
             'Text' => Sprite('SpWarn'),
             'Title' => T('Warn'),
             'Url' => '/profile/warn?userid='.$UserID,
             'CssClass' => 'Popup'
-            );
+            ];
 
          $Level = Gdn::UserMetaModel()->GetUserMeta($UserID, 'Warnings.Level');
          $Level = GetValue('Warnings.Level', $Level);
-         $Sender->Data['Actions']['Warnings'] = array(
+         $Sender->Data['Actions']['Warnings'] = [
             'Text' => '<span class="Count">'.(int)$Level.'</span>',
             'Title' => T('Warnings'),
             'Url' => UserUrl($Sender->Data('Profile'), '', 'warnings'),
             'CssClass' => 'Popup'
-            );
+            ];
       }
    }
 
@@ -126,14 +126,14 @@ class WarningsPlugin extends Gdn_Plugin {
          return;
 
       // The user has been punished so strip some abilities.
-      Gdn::Session()->SetPermission('Vanilla.Discussions.Add', array());
+      Gdn::Session()->SetPermission('Vanilla.Discussions.Add', []);
 
       // Reduce posting speed to 1 per 150 sec
-       SaveToConfig(array(
+       SaveToConfig([
           'Vanilla.Comment.SpamCount' => 0,
           'Vanilla.Comment.SpamTime'  => 150,
           'Vanilla.Comment.SpamLock'  => 150
-       ),NULL,FALSE);
+       ],NULL,FALSE);
    }
 
    public function ProfileController_AddProfileTabs_Handler($Sender) {
@@ -156,6 +156,11 @@ class WarningsPlugin extends Gdn_Plugin {
       }
    }
 
+    /**
+     * @param ProfileController $Sender
+     * @param mixed $WarningID
+     * @param string|bool $Target
+     */
    public function ProfileController_RemoveWarning_Create($Sender, $WarningID, $Target = FALSE) {
       $Sender->Permission('Garden.Moderation.Manage');
 
@@ -172,14 +177,14 @@ class WarningsPlugin extends Gdn_Plugin {
 //         decho($WarningModel->ValidationResults());
          switch ($Form->GetFormValue('RemoveType')) {
             case 'expire':
-               $Set = ArrayTranslate($Warning, array('Expired', 'DateExpired', 'Attributes'));
+               $Set = ArrayTranslate($Warning, ['Expired', 'DateExpired', 'Attributes']);
                $Set['Expired'] = 1;
                $Set['DateExpires'] = Gdn_Format::ToDateTime();
                $Set['Attributes']['RemovedByUserID'] = Gdn::Session()->UserID;
                $WarningModel->SetField($WarningID, $Set);
                break;
             case 'delete':
-               $WarningModel->Delete(array('WarningID' => $WarningID));
+               $WarningModel->Delete(['WarningID' => $WarningID]);
                break;
             default:
                $Form->AddError(T("Do you want to expire or delete?"));
@@ -189,7 +194,7 @@ class WarningsPlugin extends Gdn_Plugin {
          $WarningModel->ProcessWarnings($Warning['WarnUserID']);
          if ($Form->ErrorCount() == 0) {
             if ($Target)
-               $Sender->RedirectUrl = Url($Target);
+               $Sender->setRedirectTo($Target);
             else
                $Sender->JsonTarget('', '', 'Refresh');
          }
@@ -256,7 +261,7 @@ class WarningsPlugin extends Gdn_Plugin {
       $Sender->EditMode = FALSE;
 
       $WarningModel = new WarningModel();
-      $Warnings = $WarningModel->GetWhere(array('WarnUserID' => $Sender->User->UserID))->ResultArray();
+      $Warnings = $WarningModel->GetWhere(['WarnUserID' => $Sender->User->UserID])->ResultArray();
       $Sender->SetData('Warnings', $Warnings);
 
       $Sender->Render();

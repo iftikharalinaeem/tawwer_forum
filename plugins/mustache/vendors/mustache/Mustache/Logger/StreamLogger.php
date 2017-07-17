@@ -20,7 +20,7 @@
  */
 class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
 {
-    protected static $levels = array(
+    protected static $levels = [
         self::DEBUG     => 100,
         self::INFO      => 200,
         self::NOTICE    => 250,
@@ -29,7 +29,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
         self::CRITICAL  => 500,
         self::ALERT     => 550,
         self::EMERGENCY => 600,
-    );
+    ];
 
     protected $stream = null;
     protected $url    = null;
@@ -96,7 +96,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      * @param string $message
      * @param array $context
      */
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
         if (!array_key_exists($level, self::$levels)) {
             throw new Mustache_Exception_InvalidArgumentException(sprintf('Unexpected logging level: %s', $level));
@@ -117,7 +117,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      * @param  string  $message The log message
      * @param  array   $context The log context
      */
-    protected function writeLog($level, $message, array $context = array())
+    protected function writeLog($level, $message, array $context = [])
     {
         if (!is_resource($this->stream)) {
             if (!isset($this->url)) {
@@ -158,7 +158,7 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      *
      * @return string
      */
-    protected static function formatLine($level, $message, array $context = array())
+    protected static function formatLine($level, $message, array $context = [])
     {
         return sprintf(
             "%s: %s\n",
@@ -175,14 +175,14 @@ class Mustache_Logger_StreamLogger extends Mustache_Logger_AbstractLogger
      *
      * @return string
      */
-    protected static function interpolateMessage($message, array $context = array())
+    protected static function interpolateMessage($message, array $context = [])
     {
         if (strpos($message, '{') === false) {
             return $message;
         }
 
         // build a replacement array with braces around the context keys
-        $replace = array();
+        $replace = [];
         foreach ($context as $key => $val) {
             $replace['{' . $key . '}'] = $val;
         }

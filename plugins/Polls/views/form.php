@@ -17,7 +17,7 @@ else : // Display the poll
             echo $form->open();
             foreach ($pollOptions as $option) {
                 echo '<div class="PollOption">';
-                echo $form->radio('PollOptionID', '@'.Gdn_Format::to($option['Body'], $option['Format']), array('Value' => $option['PollOptionID']));
+                echo $form->radio('PollOptionID', '@'.Gdn_Format::to($option['Body'], $option['Format']), ['Value' => $option['PollOptionID']]);
                 echo '</div>';
             }
             if (Gdn::session()->isValid()) {

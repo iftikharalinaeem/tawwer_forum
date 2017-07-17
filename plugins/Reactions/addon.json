@@ -1,7 +1,7 @@
 {
     "name": "Reactions",
     "description": "Adds reaction options to discussions & comments.",
-    "version": "1.4.4",
+    "version": "1.4.5",
     "registerPermissions": {
         "Reactions.Positive.Add": "Garden.SignIn.Allow",
         "Reactions.Negative.Add": "Garden.SignIn.Allow",
@@ -21,6 +21,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.1"
+        "vanilla": ">=2.4"
     }
 }

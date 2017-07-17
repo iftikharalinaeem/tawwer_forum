@@ -102,13 +102,13 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param TagModel $sender Sending controller instance
      */
     public function tagModel_types_handler($sender) {
-        $sender->addType('Tracker', array(
+        $sender->addType('Tracker', [
             'key' => 'Tracker',
             'name' => 'Tracker',
             'plural' => 'Trackers',
             'addtag' => false,
             'default' => false
-        ));
+        ]);
     }
 
     /**

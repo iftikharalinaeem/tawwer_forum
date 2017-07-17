@@ -15,13 +15,13 @@ echo $this->Form->Open(), $this->Form->Errors();
 $DashboardUrl = 'https://platform.gigya.com/Site/partners/dashboard.aspx';
 $LoginUrl = 'https://platform.gigya.com/Site/partners/Plugins.aspx#cmd%3DPlugins.LoginPlugin';
 
-echo $this->Form->Simple(array(
-   'ClientID' => array('LabelCode' => 'API Key', 'Options' => array('Class' => 'InputBox BigInput'), 'Description' => sprintf('Enter the api key from your <a href="%s">Gigya dashboard</a>.', $DashboardUrl)),
-   'AssociationSecret' => array('LabelCode' => 'Secret', 'Options' => array('Class' => 'InputBox BigInput'), 'Description' => sprintf('Enter your Gigya secret key from your <a href="%s">Gigya dashboard</a>. Hint: look for <i>Show Secret Key</i>.', $DashboardUrl)),
-   'HeadTemplate' => array('Options' => array('Multiline' => TRUE), 'Description' => sprintf('Configure your social login on the <a href="%s">Gigya login setup page</a> and paste the head code here.', $LoginUrl)),
-   'BodyTemplate' => array('Options' => array('Multiline' => TRUE), 'Description' => 'Paste the body of your social login html here.'),
-   'IsDefault' => array('Control' => 'Checkbox', 'LabelCode' => 'Make this connection your default signin method.'),
-));
+echo $this->Form->Simple([
+   'ClientID' => ['LabelCode' => 'API Key', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => sprintf('Enter the api key from your <a href="%s">Gigya dashboard</a>.', $DashboardUrl)],
+   'AssociationSecret' => ['LabelCode' => 'Secret', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => sprintf('Enter your Gigya secret key from your <a href="%s">Gigya dashboard</a>. Hint: look for <i>Show Secret Key</i>.', $DashboardUrl)],
+   'HeadTemplate' => ['Options' => ['Multiline' => TRUE], 'Description' => sprintf('Configure your social login on the <a href="%s">Gigya login setup page</a> and paste the head code here.', $LoginUrl)],
+   'BodyTemplate' => ['Options' => ['Multiline' => TRUE], 'Description' => 'Paste the body of your social login html here.'],
+   'IsDefault' => ['Control' => 'Checkbox', 'LabelCode' => 'Make this connection your default signin method.'],
+]);
 
 echo '<div class="Buttons">'.
    $this->Form->Button('Save').

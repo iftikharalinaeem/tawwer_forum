@@ -41,258 +41,258 @@ if (!CUSTOM_TAGS) {
 	 * @global array $allowedposttags
 	 * @since 2.0.0
 	 */
-	$allowedposttags = array(
-		'address' => array(),
-		'a' => array(
-			'class' => array (),
-			'href' => array (),
-			'id' => array (),
-			'title' => array (),
-			'rel' => array (),
-			'rev' => array (),
-			'name' => array (),
-			'target' => array()),
-		'abbr' => array(
-			'class' => array (),
-			'title' => array ()),
-		'acronym' => array(
-			'title' => array ()),
-		'b' => array(),
-		'big' => array(),
-		'blockquote' => array(
-			'id' => array (),
-			'cite' => array (),
-			'class' => array(),
-			'lang' => array(),
-			'xml:lang' => array()),
-		'br' => array (
-			'class' => array ()),
-		'button' => array(
-			'disabled' => array (),
-			'name' => array (),
-			'type' => array (),
-			'value' => array ()),
-		'caption' => array(
-			'align' => array (),
-			'class' => array ()),
-		'cite' => array (
-			'class' => array(),
-			'dir' => array(),
-			'lang' => array(),
-			'title' => array ()),
-		'code' => array (
-			'style' => array()),
-		'col' => array(
-			'align' => array (),
-			'char' => array (),
-			'charoff' => array (),
-			'span' => array (),
-			'dir' => array(),
-			'style' => array (),
-			'valign' => array (),
-			'width' => array ()),
-		'del' => array(
-			'datetime' => array ()),
-		'dd' => array(),
-		'div' => array(
-			'align' => array (),
-			'class' => array (),
-			'dir' => array (),
-			'lang' => array(),
-			'style' => array (),
-			'xml:lang' => array()),
-		'dl' => array(),
-		'dt' => array(),
-		'em' => array(),
-		'fieldset' => array(),
-		'font' => array(
-			'color' => array (),
-			'face' => array (),
-			'size' => array ()),
-		'form' => array(
-			'action' => array (),
-			'accept' => array (),
-			'accept-charset' => array (),
-			'enctype' => array (),
-			'method' => array (),
-			'name' => array (),
-			'target' => array ()),
-		'h1' => array(
-			'align' => array (),
-			'class' => array (),
-			'id'    => array (),
-			'style' => array ()),
-		'h2' => array (
-			'align' => array (),
-			'class' => array (),
-			'id'    => array (),
-			'style' => array ()),
-		'h3' => array (
-			'align' => array (),
-			'class' => array (),
-			'id'    => array (),
-			'style' => array ()),
-		'h4' => array (
-			'align' => array (),
-			'class' => array (),
-			'id'    => array (),
-			'style' => array ()),
-		'h5' => array (
-			'align' => array (),
-			'class' => array (),
-			'id'    => array (),
-			'style' => array ()),
-		'h6' => array (
-			'align' => array (),
-			'class' => array (),
-			'id'    => array (),
-			'style' => array ()),
-		'hr' => array (
-			'align' => array (),
-			'class' => array (),
-			'noshade' => array (),
-			'size' => array (),
-			'width' => array ()),
-		'i' => array(),
-		'img' => array(
-			'alt' => array (),
-			'align' => array (),
-			'border' => array (),
-			'class' => array (),
-			'height' => array (),
-			'hspace' => array (),
-			'longdesc' => array (),
-			'vspace' => array (),
-			'src' => array (),
-			'style' => array (),
-			'width' => array ()),
-		'ins' => array(
-			'datetime' => array (),
-			'cite' => array ()),
-		'kbd' => array(),
-		'label' => array(
-			'for' => array ()),
-		'legend' => array(
-			'align' => array ()),
-		'li' => array (
-			'align' => array (),
-			'class' => array ()),
-		'p' => array(
-			'class' => array (),
-			'align' => array (),
-			'dir' => array(),
-			'lang' => array(),
-			'style' => array (),
-			'xml:lang' => array()),
-		'pre' => array(
-			'style' => array(),
-			'width' => array ()),
-		'q' => array(
-			'cite' => array ()),
-		's' => array(),
-		'span' => array (
-			'class' => array (),
-			'dir' => array (),
-			'align' => array (),
-			'lang' => array (),
-			'style' => array (),
-			'title' => array (),
-			'xml:lang' => array()),
-		'strike' => array(),
-		'strong' => array(),
-		'sub' => array(),
-		'sup' => array(),
-		'table' => array(
-			'align' => array (),
-			'bgcolor' => array (),
-			'border' => array (),
-			'cellpadding' => array (),
-			'cellspacing' => array (),
-			'class' => array (),
-			'dir' => array(),
-			'id' => array(),
-			'rules' => array (),
-			'style' => array (),
-			'summary' => array (),
-			'width' => array ()),
-		'tbody' => array(
-			'align' => array (),
-			'char' => array (),
-			'charoff' => array (),
-			'valign' => array ()),
-		'td' => array(
-			'abbr' => array (),
-			'align' => array (),
-			'axis' => array (),
-			'bgcolor' => array (),
-			'char' => array (),
-			'charoff' => array (),
-			'class' => array (),
-			'colspan' => array (),
-			'dir' => array(),
-			'headers' => array (),
-			'height' => array (),
-			'nowrap' => array (),
-			'rowspan' => array (),
-			'scope' => array (),
-			'style' => array (),
-			'valign' => array (),
-			'width' => array ()),
-		'textarea' => array(
-			'cols' => array (),
-			'rows' => array (),
-			'disabled' => array (),
-			'name' => array (),
-			'readonly' => array ()),
-		'tfoot' => array(
-			'align' => array (),
-			'char' => array (),
-			'class' => array (),
-			'charoff' => array (),
-			'valign' => array ()),
-		'th' => array(
-			'abbr' => array (),
-			'align' => array (),
-			'axis' => array (),
-			'bgcolor' => array (),
-			'char' => array (),
-			'charoff' => array (),
-			'class' => array (),
-			'colspan' => array (),
-			'headers' => array (),
-			'height' => array (),
-			'nowrap' => array (),
-			'rowspan' => array (),
-			'scope' => array (),
-			'valign' => array (),
-			'width' => array ()),
-		'thead' => array(
-			'align' => array (),
-			'char' => array (),
-			'charoff' => array (),
-			'class' => array (),
-			'valign' => array ()),
-		'title' => array(),
-		'tr' => array(
-			'align' => array (),
-			'bgcolor' => array (),
-			'char' => array (),
-			'charoff' => array (),
-			'class' => array (),
-			'style' => array (),
-			'valign' => array ()),
-		'tt' => array(),
-		'u' => array(),
-		'ul' => array (
-			'class' => array (),
-			'style' => array (),
-			'type' => array ()),
-		'ol' => array (
-			'class' => array (),
-			'start' => array (),
-			'style' => array (),
-			'type' => array ()),
-		'var' => array ());
+	$allowedposttags = [
+		'address' => [],
+		'a' => [
+			'class' => [],
+			'href' => [],
+			'id' => [],
+			'title' => [],
+			'rel' => [],
+			'rev' => [],
+			'name' => [],
+			'target' => []],
+		'abbr' => [
+			'class' => [],
+			'title' => []],
+		'acronym' => [
+			'title' => []],
+		'b' => [],
+		'big' => [],
+		'blockquote' => [
+			'id' => [],
+			'cite' => [],
+			'class' => [],
+			'lang' => [],
+			'xml:lang' => []],
+		'br' => [
+			'class' => []],
+		'button' => [
+			'disabled' => [],
+			'name' => [],
+			'type' => [],
+			'value' => []],
+		'caption' => [
+			'align' => [],
+			'class' => []],
+		'cite' => [
+			'class' => [],
+			'dir' => [],
+			'lang' => [],
+			'title' => []],
+		'code' => [
+			'style' => []],
+		'col' => [
+			'align' => [],
+			'char' => [],
+			'charoff' => [],
+			'span' => [],
+			'dir' => [],
+			'style' => [],
+			'valign' => [],
+			'width' => []],
+		'del' => [
+			'datetime' => []],
+		'dd' => [],
+		'div' => [
+			'align' => [],
+			'class' => [],
+			'dir' => [],
+			'lang' => [],
+			'style' => [],
+			'xml:lang' => []],
+		'dl' => [],
+		'dt' => [],
+		'em' => [],
+		'fieldset' => [],
+		'font' => [
+			'color' => [],
+			'face' => [],
+			'size' => []],
+		'form' => [
+			'action' => [],
+			'accept' => [],
+			'accept-charset' => [],
+			'enctype' => [],
+			'method' => [],
+			'name' => [],
+			'target' => []],
+		'h1' => [
+			'align' => [],
+			'class' => [],
+			'id'    => [],
+			'style' => []],
+		'h2' => [
+			'align' => [],
+			'class' => [],
+			'id'    => [],
+			'style' => []],
+		'h3' => [
+			'align' => [],
+			'class' => [],
+			'id'    => [],
+			'style' => []],
+		'h4' => [
+			'align' => [],
+			'class' => [],
+			'id'    => [],
+			'style' => []],
+		'h5' => [
+			'align' => [],
+			'class' => [],
+			'id'    => [],
+			'style' => []],
+		'h6' => [
+			'align' => [],
+			'class' => [],
+			'id'    => [],
+			'style' => []],
+		'hr' => [
+			'align' => [],
+			'class' => [],
+			'noshade' => [],
+			'size' => [],
+			'width' => []],
+		'i' => [],
+		'img' => [
+			'alt' => [],
+			'align' => [],
+			'border' => [],
+			'class' => [],
+			'height' => [],
+			'hspace' => [],
+			'longdesc' => [],
+			'vspace' => [],
+			'src' => [],
+			'style' => [],
+			'width' => []],
+		'ins' => [
+			'datetime' => [],
+			'cite' => []],
+		'kbd' => [],
+		'label' => [
+			'for' => []],
+		'legend' => [
+			'align' => []],
+		'li' => [
+			'align' => [],
+			'class' => []],
+		'p' => [
+			'class' => [],
+			'align' => [],
+			'dir' => [],
+			'lang' => [],
+			'style' => [],
+			'xml:lang' => []],
+		'pre' => [
+			'style' => [],
+			'width' => []],
+		'q' => [
+			'cite' => []],
+		's' => [],
+		'span' => [
+			'class' => [],
+			'dir' => [],
+			'align' => [],
+			'lang' => [],
+			'style' => [],
+			'title' => [],
+			'xml:lang' => []],
+		'strike' => [],
+		'strong' => [],
+		'sub' => [],
+		'sup' => [],
+		'table' => [
+			'align' => [],
+			'bgcolor' => [],
+			'border' => [],
+			'cellpadding' => [],
+			'cellspacing' => [],
+			'class' => [],
+			'dir' => [],
+			'id' => [],
+			'rules' => [],
+			'style' => [],
+			'summary' => [],
+			'width' => []],
+		'tbody' => [
+			'align' => [],
+			'char' => [],
+			'charoff' => [],
+			'valign' => []],
+		'td' => [
+			'abbr' => [],
+			'align' => [],
+			'axis' => [],
+			'bgcolor' => [],
+			'char' => [],
+			'charoff' => [],
+			'class' => [],
+			'colspan' => [],
+			'dir' => [],
+			'headers' => [],
+			'height' => [],
+			'nowrap' => [],
+			'rowspan' => [],
+			'scope' => [],
+			'style' => [],
+			'valign' => [],
+			'width' => []],
+		'textarea' => [
+			'cols' => [],
+			'rows' => [],
+			'disabled' => [],
+			'name' => [],
+			'readonly' => []],
+		'tfoot' => [
+			'align' => [],
+			'char' => [],
+			'class' => [],
+			'charoff' => [],
+			'valign' => []],
+		'th' => [
+			'abbr' => [],
+			'align' => [],
+			'axis' => [],
+			'bgcolor' => [],
+			'char' => [],
+			'charoff' => [],
+			'class' => [],
+			'colspan' => [],
+			'headers' => [],
+			'height' => [],
+			'nowrap' => [],
+			'rowspan' => [],
+			'scope' => [],
+			'valign' => [],
+			'width' => []],
+		'thead' => [
+			'align' => [],
+			'char' => [],
+			'charoff' => [],
+			'class' => [],
+			'valign' => []],
+		'title' => [],
+		'tr' => [
+			'align' => [],
+			'bgcolor' => [],
+			'char' => [],
+			'charoff' => [],
+			'class' => [],
+			'style' => [],
+			'valign' => []],
+		'tt' => [],
+		'u' => [],
+		'ul' => [
+			'class' => [],
+			'style' => [],
+			'type' => []],
+		'ol' => [
+			'class' => [],
+			'start' => [],
+			'style' => [],
+			'type' => []],
+		'var' => []];
 
 	/**
 	 * Kses allowed HTML elements.
@@ -300,39 +300,39 @@ if (!CUSTOM_TAGS) {
 	 * @global array $allowedtags
 	 * @since 1.0.0
 	 */
-	$allowedtags = array(
-		'a' => array(
-			'href' => array (),
-			'title' => array ()),
-		'abbr' => array(
-			'title' => array ()),
-		'acronym' => array(
-			'title' => array ()),
-		'b' => array(),
-		'blockquote' => array(
-			'cite' => array ()),
+	$allowedtags = [
+		'a' => [
+			'href' => [],
+			'title' => []],
+		'abbr' => [
+			'title' => []],
+		'acronym' => [
+			'title' => []],
+		'b' => [],
+		'blockquote' => [
+			'cite' => []],
 		//	'br' => array(),
-		'cite' => array (),
-		'code' => array(),
-		'del' => array(
-			'datetime' => array ()),
+		'cite' => [],
+		'code' => [],
+		'del' => [
+			'datetime' => []],
 		//	'dd' => array(),
 		//	'dl' => array(),
 		//	'dt' => array(),
-		'em' => array (), 'i' => array (),
+		'em' => [], 'i' => [],
 		//	'ins' => array('datetime' => array(), 'cite' => array()),
 		//	'li' => array(),
 		//	'ol' => array(),
 		//	'p' => array(),
-		'q' => array(
-			'cite' => array ()),
-		'strike' => array(),
-		'strong' => array(),
+		'q' => [
+			'cite' => []],
+		'strike' => [],
+		'strong' => [],
 		//	'sub' => array(),
 		//	'sup' => array(),
 		//	'u' => array(),
 		//	'ul' => array(),
-	);
+	];
 }
 
 /**
@@ -355,7 +355,7 @@ if (!CUSTOM_TAGS) {
  * @param array $allowed_protocols Optional. Allowed protocol in links.
  * @return string Filtered content with only allowed HTML elements
  */
-function wp_kses($string, $allowed_html, $allowed_protocols = array ('http', 'https', 'ftp', 'ftps', 'mailto', 'news', 'irc', 'gopher', 'nntp', 'feed', 'telnet')) {
+function wp_kses($string, $allowed_html, $allowed_protocols = ['http', 'https', 'ftp', 'ftps', 'mailto', 'news', 'irc', 'gopher', 'nntp', 'feed', 'telnet']) {
 	$string = wp_kses_no_null($string);
 	$string = wp_kses_js_entities($string);
 	$string = wp_kses_normalize_entities($string);
@@ -442,7 +442,7 @@ function wp_kses_split2($string, $allowed_html, $allowed_protocols) {
 	# It matched a ">" character
 
 	if (preg_match('%^<!--(.*?)(-->)?$%', $string, $matches)) {
-		$string = str_replace(array('<!--', '-->'), '', $matches[1]);
+		$string = str_replace(['<!--', '-->'], '', $matches[1]);
 		while ( $string != $newstring = wp_kses($string, $allowed_html, $allowed_protocols) )
 			$string = $newstring;
 		if ( $string == '' )
@@ -576,10 +576,10 @@ function wp_kses_attr($element, $attr, $allowed_html, $allowed_protocols) {
  * @return array List of attributes after parsing
  */
 function wp_kses_hair($attr, $allowed_protocols) {
-	$attrarr = array ();
+	$attrarr = [];
 	$mode = 0;
 	$attrname = '';
-	$uris = array('xmlns', 'profile', 'href', 'src', 'cite', 'classid', 'codebase', 'data', 'usemap', 'longdesc', 'action');
+	$uris = ['xmlns', 'profile', 'href', 'src', 'cite', 'classid', 'codebase', 'data', 'usemap', 'longdesc', 'action'];
 
 	# Loop through the whole attribute list
 
@@ -612,7 +612,7 @@ function wp_kses_hair($attr, $allowed_protocols) {
 					$working = 1;
 					$mode = 0;
 					if(FALSE === array_key_exists($attrname, $attrarr)) {
-						$attrarr[$attrname] = array ('name' => $attrname, 'value' => '', 'whole' => $attrname, 'vless' => 'y');
+						$attrarr[$attrname] = ['name' => $attrname, 'value' => '', 'whole' => $attrname, 'vless' => 'y'];
 					}
 					$attr = preg_replace('/^\s+/', '', $attr);
 				}
@@ -629,7 +629,7 @@ function wp_kses_hair($attr, $allowed_protocols) {
 						$thisval = wp_kses_bad_protocol($thisval, $allowed_protocols);
 
 					if(FALSE === array_key_exists($attrname, $attrarr)) {
-						$attrarr[$attrname] = array ('name' => $attrname, 'value' => $thisval, 'whole' => "$attrname=\"$thisval\"", 'vless' => 'n');
+						$attrarr[$attrname] = ['name' => $attrname, 'value' => $thisval, 'whole' => "$attrname=\"$thisval\"", 'vless' => 'n'];
 					}
 					$working = 1;
 					$mode = 0;
@@ -645,7 +645,7 @@ function wp_kses_hair($attr, $allowed_protocols) {
 						$thisval = wp_kses_bad_protocol($thisval, $allowed_protocols);
 
 					if(FALSE === array_key_exists($attrname, $attrarr)) {
-						$attrarr[$attrname] = array ('name' => $attrname, 'value' => $thisval, 'whole' => "$attrname='$thisval'", 'vless' => 'n');
+						$attrarr[$attrname] = ['name' => $attrname, 'value' => $thisval, 'whole' => "$attrname='$thisval'", 'vless' => 'n'];
 					}
 					$working = 1;
 					$mode = 0;
@@ -661,7 +661,7 @@ function wp_kses_hair($attr, $allowed_protocols) {
 						$thisval = wp_kses_bad_protocol($thisval, $allowed_protocols);
 
 					if(FALSE === array_key_exists($attrname, $attrarr)) {
-						$attrarr[$attrname] = array ('name' => $attrname, 'value' => $thisval, 'whole' => "$attrname=\"$thisval\"", 'vless' => 'n');
+						$attrarr[$attrname] = ['name' => $attrname, 'value' => $thisval, 'whole' => "$attrname=\"$thisval\"", 'vless' => 'n'];
 					}
 					# We add quotes to conform to W3C's HTML spec.
 					$working = 1;
@@ -682,7 +682,7 @@ function wp_kses_hair($attr, $allowed_protocols) {
 	if ($mode == 1 && FALSE === array_key_exists($attrname, $attrarr))
 		# special case, for when the attribute list ends with a valueless
 		# attribute like "selected"
-		$attrarr[$attrname] = array ('name' => $attrname, 'value' => '', 'whole' => $attrname, 'vless' => 'y');
+		$attrarr[$attrname] = ['name' => $attrname, 'value' => '', 'whole' => $attrname, 'vless' => 'y'];
 
 	return $attrarr;
 }
@@ -826,11 +826,11 @@ function wp_kses_stripslashes($string) {
  * @return array Fixed array with all lowercase keys
  */
 function wp_kses_array_lc($inarray) {
-	$outarray = array ();
+	$outarray = [];
 
 	foreach ( (array) $inarray as $inkey => $inval) {
 		$outkey = strtolower($inkey);
-		$outarray[$outkey] = array ();
+		$outarray[$outkey] = [];
 
 		foreach ( (array) $inval as $inkey2 => $inval2) {
 			$outkey2 = strtolower($inkey2);
@@ -1073,7 +1073,7 @@ function wp_filter_post_kses($data) {
  * @return string Filtered content without any HTML
  */
 function wp_filter_nohtml_kses($data) {
-	return addslashes ( wp_kses(stripslashes( $data ), array()) );
+	return addslashes ( wp_kses(stripslashes( $data ), []) );
 }
 
 /**
@@ -1149,14 +1149,14 @@ function kses_init() {
 
 function safecss_filter_attr( $css, $deprecated = '' ) {
 	$css = wp_kses_no_null($css);
-	$css = str_replace(array("\n","\r","\t"), '', $css);
+	$css = str_replace(["\n","\r","\t"], '', $css);
 
 	if ( preg_match( '%[\\(&]|/\*%', $css ) ) // remove any inline css containing \ ( & or comments
 		return '';
 
 	$css_array = split( ';', trim( $css ) );
 	$allowed_attr = // apply_filters( 'safe_style_css',
-		array( 'text-align', 'margin', 'color', 'float', 
+		[ 'text-align', 'margin', 'color', 'float', 
 	'border', 'background', 'background-color', 'border-bottom', 'border-bottom-color', 
 	'border-bottom-style', 'border-bottom-width', 'border-collapse', 'border-color', 'border-left',
 	'border-left-color', 'border-left-style', 'border-left-width', 'border-right', 'border-right-color', 
@@ -1166,7 +1166,7 @@ function safecss_filter_attr( $css, $deprecated = '' ) {
 	'font-variant', 'font-weight', 'height', 'letter-spacing', 'line-height', 'margin-bottom', 
 	'margin-left', 'margin-right', 'margin-top', 'overflow', 'padding', 'padding-bottom', 
 	'padding-left', 'padding-right', 'padding-top', 'text-decoration', 'text-indent', 'vertical-align', 
-	'width' ); // );
+	'width' ]; // );
 
 	if ( empty($allowed_attr) )
 		return $css;

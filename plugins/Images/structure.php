@@ -31,7 +31,7 @@ $PermissionModel->Database = $Database;
 $PermissionModel->SQL = $Sql;
 
 // Define some permissions for the Polls categories.
-$PermissionModel->Define(array(
+$PermissionModel->Define([
 	'Plugins.Images.Add' => 'Garden.Profiles.Edit'
-));
+]);
    

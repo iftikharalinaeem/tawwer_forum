@@ -44,19 +44,19 @@ class IpsumInserterPlugin extends Gdn_Plugin {
 
             for ($i=0; $i < $FormValues['DiscussionNumber']; $i++) {
                $Ipsum = $this->GetIpsum(700, $FormValues['IpsumType']);
-               $Fields = array(
+               $Fields = [
                   'Name' => substr($Ipsum, 0, rand(25, 100)),
                   'Body' => substr($Ipsum, 0, rand(100, 700)),
                   'CategoryID' => 1
-               );
+               ];
                $DiscussionID = $DiscussionModel->Save($Fields);
 
                for ($b=0; $b < $FormValues['CommentNumber']; $b++) {
                   $Ipsum = $this->GetIpsum(500, $FormValues['IpsumType']);
-                  $Fields = array(
+                  $Fields = [
                      'DiscussionID' => $DiscussionID,
                      'Body' => substr($Ipsum, 0, rand(100, 700))
-                  );
+                  ];
                   $CommentModel->Save($Fields);
                }
             }

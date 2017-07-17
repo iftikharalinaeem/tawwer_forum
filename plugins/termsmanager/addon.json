@@ -15,5 +15,6 @@
     ],
     "require": {
         "vanilla": ">=2.3"
-    }
+    },
+    "icon": "terms_manager.png"
 }

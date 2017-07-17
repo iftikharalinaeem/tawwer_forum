@@ -11,7 +11,7 @@ class ModNotifyPlugin extends Gdn_Plugin {
          
          // Set preferences in UserMeta
          if ($Sender->Form->AuthenticatedPostBack()) {
-            $Set = array();
+            $Set = [];
             $Set['Email.ModQueue'] = ($Sender->Form->GetFormValue('Email.ModQueue', NULL)) ? 1 : NULL;
             $Set['Popup.ModQueue'] = ($Sender->Form->GetFormValue('Popup.ModQueue', NULL)) ? 1 : NULL;
             UserModel::SetMeta($Sender->User->UserID, $Set, 'Preferences.');
@@ -34,11 +34,11 @@ class ModNotifyPlugin extends Gdn_Plugin {
       
       // Grab all of the users that need to be notified.
       $Data = Gdn::Database()->SQL()
-         ->WhereIn('Name', array('Preferences.Email.ModQueue', 'Preferences.Popup.ModQueue'))
+         ->WhereIn('Name', ['Preferences.Email.ModQueue', 'Preferences.Popup.ModQueue'])
          ->Get('UserMeta')->ResultArray();
       
       // Prep notification list
-      $NotifyUsers = array();
+      $NotifyUsers = [];
       foreach ($Data as $Row) {
          if (!$Row['Value'])
             continue;
@@ -64,19 +64,19 @@ class ModNotifyPlugin extends Gdn_Plugin {
                'A {Data.RecordType,text} by {Data.RecordUserID, user} has been moved to the <a href="{Url,html}">Moderation Queue</a>');
             break;
       }
-      $Activity = array(
+      $Activity = [
          'ActivityType' => 'ModQueue',
          //'ActivityUserID' => $Fields['InsertUserID'],
          'HeadlineFormat' => $HeadlineFormat,
          'RecordType' => 'Log',
          'RecordID' => $LogID,
          'Route' => Url('/log/moderation'),
-         'Data' => array(
+         'Data' => [
             'Operation' => $Log['Operation'],
             'RecordType' => strtolower($Log['RecordType']),
             'RecordUserID' => $Log['RecordUserID']
-         )
-      );
+         ]
+      ];
       
        // Queue the notifications
       foreach ($NotifyUsers as $UserID => $Prefs) {         
@@ -93,8 +93,8 @@ class ModNotifyPlugin extends Gdn_Plugin {
    public function Setup() {
       // Create activity type
       $SQL = Gdn::Database()->SQL();
-      if ($SQL->GetWhere('ActivityType', array('Name' => 'ModQueue'))->NumRows() == 0)
-         $SQL->Insert('ActivityType', array('AllowComments' => 0, 'Name' => 'ModQueue', 'Public' => 0));
+      if ($SQL->GetWhere('ActivityType', ['Name' => 'ModQueue'])->NumRows() == 0)
+         $SQL->Insert('ActivityType', ['AllowComments' => 0, 'Name' => 'ModQueue', 'Public' => 0]);
    }
    
 }

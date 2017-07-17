@@ -43,7 +43,7 @@ class CAS_ProxyChain
 implements CAS_ProxyChain_Interface
 {
 
-    protected $chain = array();
+    protected $chain = [];
 
     /**
      * A chain is an array of strings or regexp strings that will be matched

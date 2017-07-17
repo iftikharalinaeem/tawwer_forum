@@ -53,7 +53,7 @@ implements CAS_Request_RequestInterface
     {
         $this->_curlOptions = $options;
     }
-    private $_curlOptions = array();
+    private $_curlOptions = [];
 
     /**
      * Send the request and store the results.
@@ -139,13 +139,13 @@ implements CAS_Request_RequestInterface
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
         // get the HTTP header with a callback
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, array($this, '_curlReadHeaders'));
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, [$this, '_curlReadHeaders']);
 
         /*********************************************************
          * Add cookie headers to our request.
         *********************************************************/
         if (count($this->cookies)) {
-            $cookieStrings = array();
+            $cookieStrings = [];
             foreach ($this->cookies as $name => $val) {
                 $cookieStrings[] = $name.'='.$val;
             }

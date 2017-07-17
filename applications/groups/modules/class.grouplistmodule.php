@@ -49,7 +49,7 @@ class GroupListModule extends Gdn_Module {
       * @param bool $showMore Whether to provide a link to see all of the group list's contents.
       * @param string $layout The layout type, either 'modern' or 'table'.
       */
-     public function __construct($groups = array(), $id = 'groups', $title = '', $emptyMessage = '', $cssClass = 'GroupList', $showMore = true, $layout = '') {
+     public function __construct($groups = [], $id = 'groups', $title = '', $emptyMessage = '', $cssClass = 'GroupList', $showMore = true, $layout = '') {
           $this->groups = $groups;
           $this->id = $id;
           $this->title = $title;

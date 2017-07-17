@@ -114,7 +114,7 @@ class PollsPlugin extends Gdn_Plugin {
         }
 
         if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
-            redirect($return);
+            redirectTo($return);
         }
 
         // Otherwise get the poll html & return it.
@@ -170,7 +170,7 @@ class PollsPlugin extends Gdn_Plugin {
             $comments = $sender->data('Comments');
             if ($comments) {
                 // Grab all of the user fields that need to be joined.
-                $userIDs = array();
+                $userIDs = [];
                 foreach ($comments as $row) {
                     $userIDs[] = val('InsertUserID', $row);
                 }
@@ -199,7 +199,7 @@ class PollsPlugin extends Gdn_Plugin {
         }
 
         $model = new PollModel();
-        $poll = $model->getWhere(array('DiscussionID' => $args['DiscussionID']))->firstRow(DATASET_TYPE_ARRAY);
+        $poll = $model->getWhere(['DiscussionID' => $args['DiscussionID']])->firstRow(DATASET_TYPE_ARRAY);
         if ($poll) {
             $model->setField($poll['PollID'], ['Name' => valr('Fields.Name', $args)]);
         }
@@ -327,7 +327,7 @@ class PollsPlugin extends Gdn_Plugin {
             $sender->Form->setValidationResults($pollModel->validationResults());
             if ($sender->Form->errorCount() == 0) {
                 $discussion = $sender->DiscussionModel->getID($discussionID);
-                redirect(discussionUrl($discussion));
+                redirectTo(discussionUrl($discussion));
             }
         }
 

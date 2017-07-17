@@ -58,15 +58,15 @@ class ImageModel extends Gdn_Model {
       $Thumbnail = GetValue('Thumbnail', $FormPostValues);
       $Caption = GetValue('Caption', $FormPostValues);
       $Size = GetValue('Size', $FormPostValues);
-      $Images = array();
+      $Images = [];
       foreach ($Image as $Key => $Val) {
          $Capt = trim($Caption[$Key]);
-         $Images[] = array(
+         $Images[] = [
              'Image' => $Val, 
              'Thumbnail' => $Thumbnail[$Key], 
              'Caption' => $Capt, 
              'Size' => $Size[$Key]
-         );
+         ];
       }
       
       if (count($Images) == 0)
@@ -82,14 +82,14 @@ class ImageModel extends Gdn_Model {
          $Image = array_shift($Images);
          $SerializedImage = dbencode($Image);
          // Build the discussion data to be saved
-         $DiscussionFormValues = array(
+         $DiscussionFormValues = [
              'Type' => 'Image',
              'Format' => 'Image',
              'CategoryID' => GetValue('CategoryID', $FormPostValues),
              'Name' => GetValue('Name', $FormPostValues),
              'Body' => Gdn_Format::Image($SerializedImage),
              'Attributes' => $SerializedImage
-         );
+         ];
 
          // Save the discussion
          $DiscussionModel = new DiscussionModel();
@@ -101,7 +101,7 @@ class ImageModel extends Gdn_Model {
       }
 
       // Build & save the comments (if there is more than one image being uploaded)
-      $CommentIDs = array();
+      $CommentIDs = [];
       for($i = 0; $i < count($Images); $i++) {
          $Image = $Images[$i];
          $Image['DiscussionID'] = $DiscussionID;
@@ -120,14 +120,14 @@ class ImageModel extends Gdn_Model {
          $Timestamp = time();
       
       $S = dbencode($Image);
-      $Row = array(
+      $Row = [
             'Type' => 'Image',
             'Format' => 'Image',
             'DiscussionID' => $Image['DiscussionID'],
             'Body' => Gdn_Format::Image($Image),
             'DateInserted' => Gdn_Format::ToDateTime($Timestamp++),
             'Attributes' => $S
-        );
+        ];
       
       $CommentID = $CommentModel->Save($Row);
       $ValidationResults = $CommentModel->Validation->Results();

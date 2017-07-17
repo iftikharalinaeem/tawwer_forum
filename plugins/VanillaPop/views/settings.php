@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <div class="alert alert-info padded">
 <?php echo t('Need More Help?').' '.sprintf(
                 t('Read our docs on %s'),
@@ -7,8 +7,8 @@
             ); ?>
 </div>
 <?php
-$IncomingAddress = $this->Data('IncomingAddress');
-//$OutgoingAddress = C();
+$IncomingAddress = $this->data('IncomingAddress');
+//$OutgoingAddress = c();
 if ($IncomingAddress):
     ?>
     <div class="padded">
@@ -19,7 +19,7 @@ if ($IncomingAddress):
 
         <p>
             <b>New!</b> You can also set up additional email addresses to forward to individual categories.
-            To do this forward email to <code><?php echo $this->Data('CategoryAddress'); ?></code>.
+            To do this forward email to <code><?php echo $this->data('CategoryAddress'); ?></code>.
         </p>
     </div>
 <?php endif; ?>
@@ -27,4 +27,4 @@ if ($IncomingAddress):
 <?php
 $Cf = $this->ConfigurationModule;
 
-$Cf->Render();
+$Cf->render();

@@ -18,5 +18,6 @@
     ],
     "require": {
         "vanilla": ">=2.2"
-    }
+    },
+    "icon": "colors.png"
 }

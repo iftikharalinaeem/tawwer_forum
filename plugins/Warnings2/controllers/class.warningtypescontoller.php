@@ -38,7 +38,7 @@ class WarningTypesController extends PluginController {
         if ($this->Form->authenticatedPostBack() !== false) {
             if ($this->Form->save() !== false) {
                 $this->informMessage(t('Your changes have been saved.'));
-                $this->RedirectUrl = url('settings/warnings');
+                $this->setRedirectTo('settings/warnings');
             }
         }
 
@@ -67,7 +67,7 @@ class WarningTypesController extends PluginController {
                 $warningTypeModel->deleteID($warningTypeID);
             }
 
-            redirect('settings/warnings');
+            redirectTo('settings/warnings');
         } else {
             $this->Form = new Gdn_Form();
             $this->render();

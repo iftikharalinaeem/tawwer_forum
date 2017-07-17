@@ -62,7 +62,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         }
 
         $data = $model->getRecordsWhere(
-            array('TagID' => $reactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'Total >=' => 1),
+            ['TagID' => $reactionType['TagID'], 'RecordType' => ['Discussion-Total', 'Comment-Total'], 'Total >=' => 1],
             'DateInserted', 'desc',
             $sender->Limit, 0);
 
@@ -83,13 +83,13 @@ class ReactionsPlugin extends Gdn_Plugin {
     public function simpleApiPlugin_mapper_handler($sender) {
         switch ($sender->Mapper->Version) {
             case '1.0':
-                $sender->Mapper->addMap(array(
+                $sender->Mapper->addMap([
                     'reactions/list' => 'reactions',
                     'reactions/get' => 'reactions/get',
                     'reactions/add' => 'reactions/add',
                     'reactions/edit' => 'reactions/edit',
                     'reactions/toggle' => 'reactions/toggle'
-                ));
+                ]);
                 break;
         }
     }
@@ -120,7 +120,7 @@ class ReactionsPlugin extends Gdn_Plugin {
                     $OrderColumn = c('Plugins.Reactions.DefaultOrderBy', 'DateInserted');
                 }
             } else {
-                $DefaultOrderParts = array('DateInserted', 'asc');
+                $DefaultOrderParts = ['DateInserted', 'asc'];
 
                 $OrderBy = Gdn::request()->get('orderby', '');
                 if ($OrderBy) {
@@ -132,7 +132,7 @@ class ReactionsPlugin extends Gdn_Plugin {
                 $OrderColumn = GetValue(0, $OrderParts, $DefaultOrderParts[0]);
 
                 // Make sure the order is correct.
-                if (!in_array($OrderColumn, array('DateInserted', 'Score')))
+                if (!in_array($OrderColumn, ['DateInserted', 'Score']))
                     $OrderColumn = 'DateInserted';
 
 
@@ -142,10 +142,10 @@ class ReactionsPlugin extends Gdn_Plugin {
             }
             $OrderDirection = $OrderColumn == 'Score' ? 'desc' : 'asc';
 
-            $CommentOrder = array('c.'.$OrderColumn.' '.$OrderDirection);
+            $CommentOrder = ['c.'.$OrderColumn.' '.$OrderDirection];
 
             // Add a unique order if we aren't ordering by a unique column.
-            if (!in_array($OrderColumn, array('DateInserted', 'CommentID'))) {
+            if (!in_array($OrderColumn, ['DateInserted', 'CommentID'])) {
                 $CommentOrder[] = 'c.DateInserted asc';
             }
 
@@ -198,7 +198,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $Menu = $sender->EventArguments['SideMenu'];
-        $Menu->addLink('Forum', t('Reactions'), 'reactions', 'Garden.Community.Manage', array('class' => 'nav-reactions'));
+        $Menu->addLink('Forum', t('Reactions'), 'reactions', 'Garden.Community.Manage', ['class' => 'nav-reactions']);
     }
 
     /**
@@ -224,7 +224,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         // Send back comment order for non-api calls.
         if ($Sender->deliveryType() !== DELIVERY_TYPE_DATA) {
-            $Sender->setData('CommentOrder', array('Column' => $OrderColumn, 'Direction' => $OrderDirection));
+            $Sender->setData('CommentOrder', ['Column' => $OrderColumn, 'Direction' => $OrderDirection]);
         }
 
         if ($Sender->ReactionsVersion != 1) {
@@ -448,7 +448,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      */
     public function base_render_before($Sender) {
         if (is_object($Menu = val('Menu', $Sender))) {
-            $Menu->addLink('BestOf', t('Best Of...'), '/bestof/everything', false, array('class' => 'BestOf'));
+            $Menu->addLink('BestOf', t('Best Of...'), '/bestof/everything', false, ['class' => 'BestOf']);
         }
         if (!isMobile()) {
             $Sender->addDefinition('ShowUserReactions', c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT));
@@ -486,13 +486,13 @@ class ReactionsPlugin extends Gdn_Plugin {
         if ($Reaction == 'everything') {
             $PromotedTagID = $ReactionModel->defineTag('Promoted', 'BestOf');
             $Data = $ReactionModel->detRecordsWhere(
-                array('TagID' => $PromotedTagID, 'RecordType' => array('Discussion', 'Comment')),
+                ['TagID' => $PromotedTagID, 'RecordType' => ['Discussion', 'Comment']],
                 'DateInserted', 'desc',
                 $Limit + 1, $Offset);
         } else {
             $ReactionType = $ReactionTypes[$Reaction];
             $Data = $ReactionModel->getRecordsWhere(
-                array('TagID' => $ReactionType['TagID'], 'RecordType' => array('Discussion-Total', 'Comment-Total'), 'Total >=' => 1),
+                ['TagID' => $ReactionType['TagID'], 'RecordType' => ['Discussion-Total', 'Comment-Total'], 'Total >=' => 1],
                 'DateInserted', 'desc',
                 $Limit + 1, $Offset);
         }
@@ -554,11 +554,11 @@ class ReactionsPlugin extends Gdn_Plugin {
         Gdn_Theme::section('BestOf');
         // Load all of the reaction types.
         try {
-            $ReactionTypes = ReactionModel::getReactionTypes(array('Class' => 'Positive', 'Active' => 1));
+            $ReactionTypes = ReactionModel::getReactionTypes(['Class' => 'Positive', 'Active' => 1]);
 
             $Sender->setData('ReactionTypes', $ReactionTypes);
         } catch (Exception $ex) {
-            $Sender->setData('ReactionTypes', array());
+            $Sender->setData('ReactionTypes', []);
         }
 
         if (!isset($ReactionTypes[$Reaction])) {
@@ -725,7 +725,7 @@ class ReactionsPlugin extends Gdn_Plugin {
             }
         }
 
-        if (!in_array($Sort, array('score', 'date'))) {
+        if (!in_array($Sort, ['score', 'date'])) {
             $Sort = 'date';
         }
 
@@ -830,7 +830,7 @@ if (!function_exists('writeReactions')) {
 
         static $Types = null;
         if ($Types === null) {
-            $Types = ReactionModel::getReactionTypes(array('Class' => array('Positive', 'Negative'), 'Active' => 1));
+            $Types = ReactionModel::getReactionTypes(['Class' => ['Positive', 'Negative'], 'Active' => 1]);
         }
         Gdn::controller()->EventArguments['ReactionTypes'] = &$Types;
 
@@ -855,8 +855,8 @@ if (!function_exists('writeReactions')) {
         // Write the flags.
         static $Flags = null;
         if ($Flags === null && checkPermission('Reactions.Flag.Add')) {
-            $Flags = ReactionModel::getReactionTypes(array('Class' => 'Flag', 'Active' => 1));
-            $FlagCodes = array();
+            $Flags = ReactionModel::getReactionTypes(['Class' => 'Flag', 'Active' => 1]);
+            $FlagCodes = [];
             foreach ($Flags as $Flag) {
                 $FlagCodes[] = $Flag['UrlCode'];
             }
@@ -873,7 +873,7 @@ if (!function_exists('writeReactions')) {
 
             echo ' <span class="FlagMenu ToggleFlyout">';
             // Write the handle.
-            echo reactionButton($Row, 'Flag', array('LinkClass' => 'FlyoutButton', 'IsHeading' => true));
+            echo reactionButton($Row, 'Flag', ['LinkClass' => 'FlyoutButton', 'IsHeading' => true]);
             echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
 
             foreach ($Flags as $Flag) {
