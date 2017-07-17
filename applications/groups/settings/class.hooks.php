@@ -767,12 +767,12 @@ class GroupsHooks extends Gdn_Plugin {
         $sender->permission('Garden.Settings.Manage');
         $cf = new ConfigurationModule($sender);
         $cf->initialize([
-            'Groups.Leaders.AdminPrivileges' => [
+            'Groups.Leaders.CanModerate' => [
                 'LabelCode' => 'Allow Leaders of a Group to edit or delete comments and discussions in the groups they lead.',
                 'Control' => 'toggle'
             ],
-            'Events.Create.LeadersOnly' => [
-            'LabelCode' => 'Restrict the creation of Events in a Group to Leaders only.',
+            'Groups.Members.CanAddEvents' => [
+            'LabelCode' => 'Allow members to add events. Leaders will always be able to add events.',
             'Control' => 'toggle'
         ]
         ]);

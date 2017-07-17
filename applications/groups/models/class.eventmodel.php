@@ -186,7 +186,7 @@ class EventModel extends Gdn_Model {
             }
 
             // Allow Admins to restrict event creation to leaders only.
-            if (c('Events.Create.LeadersOnly', false) && !groupPermission('Leader', $EventGroupID)) {
+            if (!c('Groups.Members.CanAddEvents', true) && !groupPermission('Leader', $EventGroupID)) {
                 $Perms['Create'] = false;
             }
 
