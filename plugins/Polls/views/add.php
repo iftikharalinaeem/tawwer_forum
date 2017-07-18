@@ -52,8 +52,9 @@ if (!$cancelUrl) {
     echo '<div class="P">';
     echo $this->Form->label('Poll Options', 'PollOption[]');
     echo '<ol class="PollOptions">';
-    echo '<li class="PollOption">' . $this->Form->textBox('PollOption[]', ['class' => 'InputBox BigInput NoIE']) . '</li>';
     $pollOptions = val('PollOption', $this->Form->formValues());
+
+
     if (is_array($pollOptions)) {
         foreach ($pollOptions as $pollOption) {
             $pollOption = trim(Gdn_Format::plainText($pollOption));
@@ -62,6 +63,9 @@ if (!$cancelUrl) {
             }
         }
     }
+
+    echo '<li class="PollOption">' . $this->Form->textBox('PollOption[]', ['class' => 'InputBox BigInput NoIE']) . '</li>';
+
     echo '</ol>';
 
     echo $this->Form->button('Add another poll option ...', ['class' => 'Button AddPollOption', 'type'=>'button']);
