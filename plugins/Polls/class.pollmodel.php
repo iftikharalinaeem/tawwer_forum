@@ -142,7 +142,7 @@ class PollModel extends Gdn_Model {
         if (is_array($pollOptions))
             foreach ($pollOptions as $pollOption) {
                 $pollOption = trim(Gdn_Format::plainText($pollOption));
-                if ($pollOption != '') {
+                if (!empty($pollOption)) {
                     $validPollOptions[] = $pollOption;
                 }
             }
