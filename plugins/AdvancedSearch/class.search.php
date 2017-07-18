@@ -229,8 +229,13 @@ EOT;
 
     public static function extractMedia($html) {
         $result = [];
-        if (preg_match_all('`src="([^"]+)"`', $html, $matches)) {
-            foreach ($matches[1] as $src) {
+        if (preg_match_all('/<[^>]+src="([^"]+)"[^>]*?>/', $html, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                // Skip emojis
+                if (preg_match('/class="[^"]*?\bemoji\b[^"]*"/', $match[0])) {
+                    continue;
+                }
+                $src = $match[1];
                 $row = [
                     'type' => 'img',
                     'src' => $src,
