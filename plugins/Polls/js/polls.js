@@ -39,7 +39,6 @@ jQuery(document).ready(function($) {
             gdn.informError(xhr);
          },
          success: function(json) {
-             console.log("json: ", json);
             $('.PollForm').replaceWith(json.PollHtml);
             gdn.inform(json);
             return false;
@@ -62,6 +61,4 @@ jQuery(document).ready(function($) {
         }
         return false;
     });
-
-
 });
