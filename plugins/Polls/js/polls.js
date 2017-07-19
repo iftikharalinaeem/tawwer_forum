@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
         var $form = $(this);
         var $pollOptions = $form.find('.PollOptions');
 
-        $form.on('keypress', '.InputBox', function(e){
+        $form.on('input', '.InputBox', function(e){
             if ($(this).val() != "" && $pollOptions.find('.PollOption:last-child .InputBox').val() != "") {
                 $pollOptions.append($template.clone());
             }
