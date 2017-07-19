@@ -45,8 +45,6 @@ jQuery(document).ready(function($) {
             return false;
          },
          complete: function(XMLHttpRequest, textStatus) {
-             console.log("XMLHttpRequest: ", XMLHttpRequest);
-             console.log("textStatus: ", textStatus);
             $('.InProgress').removeClass('InProgress'); // just in case
          }
       });
