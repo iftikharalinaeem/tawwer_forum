@@ -235,7 +235,7 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
 
     public function setup() {
         // Disallow enabling.
-        throw new Gdn_UserException('Deprecated. Read the description.');
+        throw new Gdn_UserException('Deprecated. Use VanillaAnalytics instead.');
     }
 
     /**
