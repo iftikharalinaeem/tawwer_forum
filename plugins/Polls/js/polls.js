@@ -1,13 +1,26 @@
 jQuery(document).ready(function($) {
+    var emptySpace = /^\s*$/g;
+    var $template = $('.NewPollForm:first .PollOption:last-child').clone();
+    $template.find('.InputBox').val(''); // Reset value just in case it's not empty
 
-    // Composing a new poll, let poll options duplicate. This used to be inline,
-    // which generated a race condition between jQuery being defined, and this
-    // code running.
-    if ($.fn.duplicate) {
-        $('.PollOption').duplicate({
-            addButton: '.AddPollOption'
+
+    $('.AddPollOption').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).closest('.NewPollForm').find('.PollOptions').append($template.clone()).find('.InputBox').focus();
+
+    });
+
+    $('.NewPollForm').each(function(){
+        var $form = $(this);
+        var $pollOptions = $form.find('.PollOptions');
+
+        $form.on('input', '.InputBox', function(e){
+            if ($(this).val() != "" && $pollOptions.find('.PollOption:last-child .InputBox').val() != "") {
+                $pollOptions.append($template.clone());
+            }
         });
-    }
+    });
 
    $(document).on('click', '.PollForm form :submit', function() {
       var btn = this,
@@ -48,6 +61,4 @@ jQuery(document).ready(function($) {
         }
         return false;
     });
-
-
 });
