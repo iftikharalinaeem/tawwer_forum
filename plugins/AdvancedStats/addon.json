@@ -1,6 +1,7 @@
 {
     "name": "Advanced Stats",
     "description": "Track and access advanced statistics to better monitor the health of your site.",
+    "hidden": true,
     "version": "1.0.3",
     "mobileFriendly": true,
     "icon": "analytics.png",

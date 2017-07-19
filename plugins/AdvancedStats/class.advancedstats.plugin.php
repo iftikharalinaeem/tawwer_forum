@@ -232,4 +232,17 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
         $Sender->SetData('DateFirstStats', self::FirstDate());
         $Sender->Render();
     }
+
+    public function setup() {
+        // Disallow enabling.
+        throw new Gdn_UserException('Deprecated. Read the description.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function structure() {
+        Gdn::pluginManager()->disablePlugin('AdvancedStats');
+        saveToConfig('EnabledPlugins.AdvancedStats', null, ['RemoveEmpty' => true]);
+    }
 }
