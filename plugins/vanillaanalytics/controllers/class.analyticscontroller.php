@@ -142,7 +142,7 @@ class AnalyticsController extends DashboardController {
         if ($dashboard) {
             Gdn_Theme::section('Analytics');
         } else {
-            redirectTo('settings');
+            redirectTo('analytics');
         }
 
 
