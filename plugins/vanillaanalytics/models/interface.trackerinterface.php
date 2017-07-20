@@ -43,7 +43,7 @@ interface TrackerInterface {
      * @param array $defaults
      * @return array
      */
-    public function addDefaults(array $defaults = array());
+    public function addDefaults(array $defaults = []);
 
     /**
      * Add wiget configurations to the ongoing list.
