@@ -19,10 +19,10 @@ class NewAnnouncementModule extends Gdn_Module {
      */
     public function toString() {
         if (!$this->GroupID) {
-            $GroupID = Gdn::controller()->data('Group.GroupID');
+            $groupID = Gdn::controller()->data('Group.GroupID');
         }
 
-        if (groupPermission('Moderate', $GroupID)) {
+        if (groupPermission('Moderate', $groupID)) {
             return ' '.anchor(t('New Announcement'), groupUrl(Gdn::controller()->data('Group'), 'announcement'), 'Button').' ';
         }
         return '';

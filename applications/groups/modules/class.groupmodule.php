@@ -32,13 +32,13 @@ class GroupModule extends Gdn_Module {
     /**
      * Set the GroupID
      *
-     * @param string $Name
-     * @param mixed $Value
+     * @param string $name
+     * @param mixed $value
      */
-    public function __set($Name, $Value) {
-        switch ($Name) {
+    public function __set($name, $value) {
+        switch ($name) {
             case 'GroupID':
-                $this->GroupID = $Value;
+                $this->GroupID = $value;
                 break;
         }
     }
@@ -48,17 +48,17 @@ class GroupModule extends Gdn_Module {
      *
      * @return void
      */
-    public function GetData($GroupID = null) {
+    public function GetData($groupID = null) {
 
-        if (is_null($GroupID))
-            $GroupID = $this->GroupID;
+        if (is_null($groupID))
+            $groupID = $this->GroupID;
 
         // Callable multiple times
-        if (!is_null($this->Group) && $this->Group['GroupID'] == $GroupID) return;
+        if (!is_null($this->Group) && $this->Group['GroupID'] == $groupID) return;
 
         // Load the group
-        $GroupModel = new GroupModel();
-        $this->Group = $GroupModel->GetID($GroupID, DATASET_TYPE_ARRAY);
+        $groupModel = new GroupModel();
+        $this->Group = $groupModel->GetID($groupID, DATASET_TYPE_ARRAY);
 
     }
 

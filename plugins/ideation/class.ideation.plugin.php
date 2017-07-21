@@ -205,12 +205,12 @@ EOT
         if ($type !== 'Idea') {
             return;
         }
-        $Value = arrayValueI('Value', $Options = $args['Options']); // The selected category id
+        $value = arrayValueI('Value', $options = $args['Options']); // The selected category id
         $categoryData = CategoryModel::GetByPermission(
             'Discussions.View',
-            $Value,
-            val('Filter', $Options, ['Archived' => 0]),
-            val('PermFilter', $Options, [])
+            $value,
+            val('Filter', $options, ['Archived' => 0]),
+            val('PermFilter', $options, [])
         );
         $ideaCategoryIDs = $this->getIdeaCategoryIDs();
         $ideaCategories = [];
@@ -618,17 +618,17 @@ EOT
     public function discussionController_ideationOptions_create($sender, $discussionID = '') {
         $sender->Form = new Gdn_Form();
 
-        $Discussion = $sender->DiscussionModel->getID($discussionID);
+        $discussion = $sender->DiscussionModel->getID($discussionID);
 
-        if (!$Discussion) {
+        if (!$discussion) {
             throw notFoundException('Discussion');
         }
 
-        $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $Discussion));
+        $sender->permission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion));
 
         // We're only allowing conversion between idea and discussion.  If it isn't an idea, make it a discussion.
-        if (val('Type', $Discussion) !== 'Idea') {
-            setValue('Type', $Discussion, 'Discussion');
+        if (val('Type', $discussion) !== 'Idea') {
+            setValue('Type', $discussion, 'Discussion');
         }
 
         if ($sender->Form->isPostBack()) {
@@ -665,10 +665,10 @@ EOT
             $sender->Form->setValidationResults($sender->DiscussionModel->validationResults());
             Gdn::controller()->jsonTarget('', '', 'Refresh');
         } else {
-            $sender->Form->setData($Discussion);
+            $sender->Form->setData($discussion);
         }
 
-        $sender->setData('Discussion', $Discussion);
+        $sender->setData('Discussion', $discussion);
         $sender->setData('_Types', ['Idea' => '@'.t('Ideation Type', 'Idea'), 'Discussion' => '@'.t('Discussion Type', 'Discussion')]);
         $sender->setData('Title', t('Ideation Options'));
         $sender->render('DiscussionOptions', '', 'plugins/ideation');

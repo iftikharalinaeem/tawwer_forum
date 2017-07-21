@@ -38,8 +38,8 @@ class WarningsPlugin extends Gdn_Plugin {
          ->Column('Punished', 'tinyint', '0')
          ->Set();
 
-      $ActivityModel = new ActivityModel();
-      $ActivityModel->DefineType('Warning');
+      $activityModel = new ActivityModel();
+      $activityModel->DefineType('Warning');
    }
 
    /// Event Handlers ///
@@ -47,54 +47,54 @@ class WarningsPlugin extends Gdn_Plugin {
    /**
     * Add Warn option to profile options.
     */
-   public function ProfileController_BeforeProfileOptions_Handler($Sender, $Args) {
+   public function ProfileController_BeforeProfileOptions_Handler($sender, $args) {
       if (!Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
          return;
 
-      if (Gdn::Session()->UserID == $Sender->EventArguments['UserID'])
+      if (Gdn::Session()->UserID == $sender->EventArguments['UserID'])
          return;
 
       if (!GetValue('EditMode', Gdn::Controller())) {
-         $Sender->EventArguments['ProfileOptions'][] = [
+         $sender->EventArguments['ProfileOptions'][] = [
              'Text' => Sprite('SpWarn').' '.T('Warn'),
-             'Url' => '/profile/warn?userid='.$Args['UserID'],
+             'Url' => '/profile/warn?userid='.$args['UserID'],
              'CssClass' => 'Popup WarnButton'
          ];
       }
    }
 
-   public function ProfileController_Card_Render($Sender, $Args) {
+   public function ProfileController_Card_Render($sender, $args) {
       if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-         $UserID = $Sender->Data('Profile.UserID');
+         $userID = $sender->Data('Profile.UserID');
 
-         $Sender->Data['Actions']['Warn'] = [
+         $sender->Data['Actions']['Warn'] = [
             'Text' => Sprite('SpWarn'),
             'Title' => T('Warn'),
-            'Url' => '/profile/warn?userid='.$UserID,
+            'Url' => '/profile/warn?userid='.$userID,
             'CssClass' => 'Popup'
             ];
 
-         $Level = Gdn::UserMetaModel()->GetUserMeta($UserID, 'Warnings.Level');
-         $Level = GetValue('Warnings.Level', $Level);
-         $Sender->Data['Actions']['Warnings'] = [
-            'Text' => '<span class="Count">'.(int)$Level.'</span>',
+         $level = Gdn::UserMetaModel()->GetUserMeta($userID, 'Warnings.Level');
+         $level = GetValue('Warnings.Level', $level);
+         $sender->Data['Actions']['Warnings'] = [
+            'Text' => '<span class="Count">'.(int)$level.'</span>',
             'Title' => T('Warnings'),
-            'Url' => UserUrl($Sender->Data('Profile'), '', 'warnings'),
+            'Url' => UserUrl($sender->Data('Profile'), '', 'warnings'),
             'CssClass' => 'Popup'
             ];
       }
    }
 
-   public function UserModel_SetCalculatedFields_Handler($Sender, $Args) {
-      $Punished = GetValue('Punished', $Args['User']);
-      if ($Punished) {
-         $CssClass = GetValue('_CssClass', $Args['User']);
-         $CssClass .= ' Jailed';
-         SetValue('_CssClass', $Args['User'], trim($CssClass));
+   public function UserModel_SetCalculatedFields_Handler($sender, $args) {
+      $punished = GetValue('Punished', $args['User']);
+      if ($punished) {
+         $cssClass = GetValue('_CssClass', $args['User']);
+         $cssClass .= ' Jailed';
+         SetValue('_CssClass', $args['User'], trim($cssClass));
       }
    }
 
-   public function ProfileController_BeforeUserInfo_Handler($Sender, $Args) {
+   public function ProfileController_BeforeUserInfo_Handler($sender, $args) {
       if (!Gdn::Controller()->Data('Profile.Punished'))
          return;
 
@@ -117,11 +117,11 @@ class WarningsPlugin extends Gdn_Plugin {
       echo '</div>';
    }
 
-   public function AssetModel_StyleCss_Handler($Sender, $Args) {
-      $Sender->AddCssFile('warnings.css', 'plugins/Warnings');
+   public function AssetModel_StyleCss_Handler($sender, $args) {
+      $sender->AddCssFile('warnings.css', 'plugins/Warnings');
    }
 
-   public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
+   public function Gdn_Dispatcher_AppStartup_Handler($sender) {
       if (!Gdn::Session()->UserID || !GetValue('Punished', Gdn::Session()->User))
          return;
 
@@ -136,165 +136,165 @@ class WarningsPlugin extends Gdn_Plugin {
        ],NULL,FALSE);
    }
 
-   public function ProfileController_AddProfileTabs_Handler($Sender) {
-      if (is_object($Sender->User) && $Sender->User->UserID > 0) {
-         $UserID = $Sender->User->UserID;
+   public function ProfileController_AddProfileTabs_Handler($sender) {
+      if (is_object($sender->User) && $sender->User->UserID > 0) {
+         $userID = $sender->User->UserID;
 
 //         $WarningsLabel = Sprite('SpWarn').T('Warnings');
-         $WarningsLabel = Sprite('SpWarn').' '.T('Warnings');
+         $warningsLabel = Sprite('SpWarn').' '.T('Warnings');
 
-         $Count = '';
-         $Level = Gdn::UserMetaModel()->GetUserMeta($UserID, 'Warnings.Level');
-         $Level = GetValue('Warnings.Level', $Level);
-         if ($Level) {
-            $Count = '<span class="Aside"><span class="Count">'.sprintf(T('Level %s'), $Level).'</span></span>';
+         $count = '';
+         $level = Gdn::UserMetaModel()->GetUserMeta($userID, 'Warnings.Level');
+         $level = GetValue('Warnings.Level', $level);
+         if ($level) {
+            $count = '<span class="Aside"><span class="Count">'.sprintf(T('Level %s'), $level).'</span></span>';
          }
 
-         $Sender->AddProfileTab(T('Warnings'), UserUrl($Sender->User, '', 'warnings'), 'Warnings', $WarningsLabel.$Count);
+         $sender->AddProfileTab(T('Warnings'), UserUrl($sender->User, '', 'warnings'), 'Warnings', $warningsLabel.$count);
 
 
       }
    }
 
     /**
-     * @param ProfileController $Sender
-     * @param mixed $WarningID
-     * @param string|bool $Target
+     * @param ProfileController $sender
+     * @param mixed $warningID
+     * @param string|bool $target
      */
-   public function ProfileController_RemoveWarning_Create($Sender, $WarningID, $Target = FALSE) {
-      $Sender->Permission('Garden.Moderation.Manage');
+   public function ProfileController_RemoveWarning_Create($sender, $warningID, $target = FALSE) {
+      $sender->Permission('Garden.Moderation.Manage');
 
-      $WarningModel = new WarningModel();
-      $Warning = $WarningModel->GetID($WarningID, DATASET_TYPE_ARRAY);
-      if (!$WarningID)
+      $warningModel = new WarningModel();
+      $warning = $warningModel->GetID($warningID, DATASET_TYPE_ARRAY);
+      if (!$warningID)
          throw NotFoundException('Warning');
 
-      $Form = new Gdn_Form();
-      $Sender->Form = $Form;
+      $form = new Gdn_Form();
+      $sender->Form = $form;
 
-      if ($Form->AuthenticatedPostBack()) {
+      if ($form->AuthenticatedPostBack()) {
 //         die($Form->GetFormValue('RemoveType'));
 //         decho($WarningModel->ValidationResults());
-         switch ($Form->GetFormValue('RemoveType')) {
+         switch ($form->GetFormValue('RemoveType')) {
             case 'expire':
-               $Set = ArrayTranslate($Warning, ['Expired', 'DateExpired', 'Attributes']);
-               $Set['Expired'] = 1;
-               $Set['DateExpires'] = Gdn_Format::ToDateTime();
-               $Set['Attributes']['RemovedByUserID'] = Gdn::Session()->UserID;
-               $WarningModel->SetField($WarningID, $Set);
+               $set = ArrayTranslate($warning, ['Expired', 'DateExpired', 'Attributes']);
+               $set['Expired'] = 1;
+               $set['DateExpires'] = Gdn_Format::ToDateTime();
+               $set['Attributes']['RemovedByUserID'] = Gdn::Session()->UserID;
+               $warningModel->SetField($warningID, $set);
                break;
             case 'delete':
-               $WarningModel->Delete(['WarningID' => $WarningID]);
+               $warningModel->Delete(['WarningID' => $warningID]);
                break;
             default:
-               $Form->AddError(T("Do you want to expire or delete?"));
+               $form->AddError(T("Do you want to expire or delete?"));
          }
-         $Form->SetValidationResults($WarningModel->ValidationResults());
+         $form->SetValidationResults($warningModel->ValidationResults());
 
-         $WarningModel->ProcessWarnings($Warning['WarnUserID']);
-         if ($Form->ErrorCount() == 0) {
-            if ($Target)
-               $Sender->setRedirectTo($Target);
+         $warningModel->ProcessWarnings($warning['WarnUserID']);
+         if ($form->ErrorCount() == 0) {
+            if ($target)
+               $sender->setRedirectTo($target);
             else
-               $Sender->JsonTarget('', '', 'Refresh');
+               $sender->JsonTarget('', '', 'Refresh');
          }
       } else {
-         $Form->SetValue('RemoveType', 'expire');
+         $form->SetValue('RemoveType', 'expire');
       }
 
-      $Sender->SetData('Warning', $Warning);
-      $Sender->SetData('Title', T('Remove Warning'));
-      $Sender->Render('RemoveWarning', '', 'plugins/Warnings');
+      $sender->SetData('Warning', $warning);
+      $sender->SetData('Title', T('Remove Warning'));
+      $sender->Render('RemoveWarning', '', 'plugins/Warnings');
    }
 
    /**
     *
-    * @param ModerationController $Sender
-    * @param int $UserID
+    * @param ModerationController $sender
+    * @param int $userID
     */
-   public function ProfileController_Warn_Create($Sender, $UserID) {
-      $Sender->Permission('Garden.Moderation.Manage');
-      $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-      $Meta = Gdn::UserMetaModel()->GetUserMeta($UserID, 'Warnings.%');
+   public function ProfileController_Warn_Create($sender, $userID) {
+      $sender->Permission('Garden.Moderation.Manage');
+      $user = Gdn::UserModel()->GetID($userID, DATASET_TYPE_ARRAY);
+      $meta = Gdn::UserMetaModel()->GetUserMeta($userID, 'Warnings.%');
 
-      $CurrentLevel = GetValue('Warnings.Level', $Meta, 0);
+      $currentLevel = GetValue('Warnings.Level', $meta, 0);
 
-      $Form = new Gdn_Form();
-      $Sender->Form = $Form;
+      $form = new Gdn_Form();
+      $sender->Form = $form;
 
-      if (!$UserID)
+      if (!$userID)
          throw NotFoundException('User');
 
-      if ($Form->AuthenticatedPostBack()) {
-         $Model = new WarningModel();
-         $Form->SetModel($Model);
+      if ($form->AuthenticatedPostBack()) {
+         $model = new WarningModel();
+         $form->SetModel($model);
 
-         $Form->SetFormValue('WarnUserID', $UserID);
+         $form->SetFormValue('WarnUserID', $userID);
 
-         if ($Form->Save()) {
-            $Sender->InformMessage(T('Your warning was added.'));
+         if ($form->Save()) {
+            $sender->InformMessage(T('Your warning was added.'));
          }
       } else {
-         $Form->SetValue('ExpireNumber', 7);
-         $Form->SetValue('ExpireUnit', 'days');
-         $Form->SetValue('Level', $CurrentLevel);
+         $form->SetValue('ExpireNumber', 7);
+         $form->SetValue('ExpireUnit', 'days');
+         $form->SetValue('Level', $currentLevel);
       }
 
-      $Sender->SetData('Profile', $User);
-      $Sender->SetData('CurrentLevel', $CurrentLevel);
-      $Sender->SetData('MaxLevel', 5);
-      $Sender->SetData('Title', T('Add a Warning'));
-      $Sender->Render('Warn', '', 'plugins/Warnings');
+      $sender->SetData('Profile', $user);
+      $sender->SetData('CurrentLevel', $currentLevel);
+      $sender->SetData('MaxLevel', 5);
+      $sender->SetData('Title', T('Add a Warning'));
+      $sender->Render('Warn', '', 'plugins/Warnings');
    }
 
    /**
     *
-    * @param ProfileController $Sender
-    * @param string|int $UserReference
-    * @param string $Username
+    * @param ProfileController $sender
+    * @param string|int $userReference
+    * @param string $username
     */
-   public function ProfileController_Warnings_Create($Sender, $UserReference, $Username = '') {
-      $Sender->EditMode(FALSE);
-      $Sender->GetUserInfo($UserReference, $Username);
-      $Sender->_SetBreadcrumbs(T('Warnings'), UserUrl($Sender->User, '', 'warnings'));
-      $Sender->SetTabView('Warnings', 'Warnings', '', 'plugins/Warnings');
-      $Sender->EditMode = FALSE;
+   public function ProfileController_Warnings_Create($sender, $userReference, $username = '') {
+      $sender->EditMode(FALSE);
+      $sender->GetUserInfo($userReference, $username);
+      $sender->_SetBreadcrumbs(T('Warnings'), UserUrl($sender->User, '', 'warnings'));
+      $sender->SetTabView('Warnings', 'Warnings', '', 'plugins/Warnings');
+      $sender->EditMode = FALSE;
 
-      $WarningModel = new WarningModel();
-      $Warnings = $WarningModel->GetWhere(['WarnUserID' => $Sender->User->UserID])->ResultArray();
-      $Sender->SetData('Warnings', $Warnings);
+      $warningModel = new WarningModel();
+      $warnings = $warningModel->GetWhere(['WarnUserID' => $sender->User->UserID])->ResultArray();
+      $sender->SetData('Warnings', $warnings);
 
-      $Sender->Render();
+      $sender->Render();
    }
 
    /**
     * Hide signatures for people in the pokey
     *
-    * @param SignaturesPlugin $Sender
+    * @param SignaturesPlugin $sender
     */
-   public function SignaturesPlugin_BeforeDrawSignature_Handler($Sender) {
-      $UserID = $Sender->EventArguments['UserID'];
-      $User = Gdn::UserModel()->GetID($UserID);
-      if (!GetValue('Punished', $InfractionsCache)) return;
-      $Sender->EventArguments['Signature'] = NULL;
+   public function SignaturesPlugin_BeforeDrawSignature_Handler($sender) {
+      $userID = $sender->EventArguments['UserID'];
+      $user = Gdn::UserModel()->GetID($userID);
+      if (!GetValue('Punished', $infractionsCache)) return;
+      $sender->EventArguments['Signature'] = NULL;
    }
 
    /**
     *
-    * @param UserModel $Sender
+    * @param UserModel $sender
     */
-   public function UserModel_Visit_Handler($Sender, $Args) {
+   public function UserModel_Visit_Handler($sender, $args) {
       if (Gdn::Session()->UserID) {
-         $WarningModel = new WarningModel();
-         $WarningModel->ProcessWarnings(Gdn::Session()->UserID);
+         $warningModel = new WarningModel();
+         $warningModel->ProcessWarnings(Gdn::Session()->UserID);
       }
    }
 
-   public function UtilityController_ProcessWarnings_Create($Sender) {
-      $WarningModel = new WarningModel();
-      $Result = $WarningModel->ProcessAllWarnings();
+   public function UtilityController_ProcessWarnings_Create($sender) {
+      $warningModel = new WarningModel();
+      $result = $warningModel->ProcessAllWarnings();
 
-      $Sender->SetData('Result', $Result);
-      $Sender->Render('Blank');
+      $sender->SetData('Result', $result);
+      $sender->Render('Blank');
    }
 }

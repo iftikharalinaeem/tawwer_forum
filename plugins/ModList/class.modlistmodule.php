@@ -20,8 +20,8 @@ class ModListModule extends Gdn_Module {
     */
    public $CategoryID;
    
-   public function __construct($Sender = '') {
-      parent::__construct($Sender);
+   public function __construct($sender = '') {
+      parent::__construct($sender);
       
       $this->_ApplicationFolder = 'plugins/ModList';
       $this->CategoryModerators = NULL;
@@ -42,25 +42,25 @@ class ModListModule extends Gdn_Module {
             // Manually assigned CategoryID?
             if (!is_null($this->CategoryID)) {
 
-               $Category = CategoryModel::Categories($this->CategoryID);
+               $category = CategoryModel::Categories($this->CategoryID);
 
             // Lookup CategoryID
             } else {
 
-               $Category = Gdn::Controller()->Data('Category');
-               if (!$Category) {
-                  $CategoryID = Gdn::Controller()->Data('CategoryID');
-                  if ($CategoryID)
-                     $Category = CategoryModel::Categories($CategoryID);
+               $category = Gdn::Controller()->Data('Category');
+               if (!$category) {
+                  $categoryID = Gdn::Controller()->Data('CategoryID');
+                  if ($categoryID)
+                     $category = CategoryModel::Categories($categoryID);
                }
 
             }
 
             // No way to get the category? Leave.
-            if (!$Category)
+            if (!$category)
                return;
 
-            $this->CategoryID = GetValue('CategoryID', $Category);
+            $this->CategoryID = GetValue('CategoryID', $category);
          }
          
          // Grab the moderator list.

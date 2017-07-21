@@ -603,7 +603,7 @@ class OnlinePlugin extends Gdn_Plugin {
             case 'limbo':
 
                 $selectorSubset = [];
-                foreach ($allOnlineUsers as $UserID => $onlineData) {
+                foreach ($allOnlineUsers as $userID => $onlineData) {
 
                     // Searching by SelectorField+SelectorID
                     if (!is_null($selectorID) && !is_null($selectorField) && (!array_key_exists($selectorField, $onlineData) || $onlineData[$selectorField] != $selectorID)) {
@@ -615,7 +615,7 @@ class OnlinePlugin extends Gdn_Plugin {
                         continue;
                     }
 
-                    $selectorSubset[$UserID] = $onlineData;
+                    $selectorSubset[$userID] = $onlineData;
                 }
                 return $selectorSubset;
                 break;

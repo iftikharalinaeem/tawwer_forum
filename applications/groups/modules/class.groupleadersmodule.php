@@ -12,10 +12,10 @@ class GroupLeadersModule extends Gdn_Module {
      /**
       * GroupLeadersModule constructor.
       *
-      * @param object|string $Sender
+      * @param object|string $sender
       */
-     public function __construct($Sender) {
-          parent::__construct($Sender, 'Vanilla');
+     public function __construct($sender) {
+          parent::__construct($sender, 'Vanilla');
      }
 
      /**

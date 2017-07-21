@@ -24,10 +24,10 @@ class BadgesController extends BadgesAppController {
         $this->permission('Reputation.Badges.View');
         $this->setData('Badges', $this->BadgeModel->getFilteredList(Gdn::session()->UserID));
 
-        $Module = new LeaderBoardModule();
-        $Module->SlotType = 'a';
-        $Module->getData(c('Reputation.Badges.LeaderboardLimit', 25));
-        $this->addModule($Module);
+        $module = new LeaderBoardModule();
+        $module->SlotType = 'a';
+        $module->getData(c('Reputation.Badges.LeaderboardLimit', 25));
+        $this->addModule($module);
 
         $this->MasterView = 'default';
         $this->render();
@@ -38,18 +38,18 @@ class BadgesController extends BadgesAppController {
      */
     public function all() {
         $this->permission('Reputation.Badges.View');
-        $Badges = $this->BadgeModel->getList()->resultArray();
+        $badges = $this->BadgeModel->getList()->resultArray();
 
-        if ($Badges) {
-            $this->BadgeModel->calculate($Badges);
+        if ($badges) {
+            $this->BadgeModel->calculate($badges);
         }
-        $this->setData('Badges', $Badges);
-        unset($Badges);
+        $this->setData('Badges', $badges);
+        unset($badges);
 
-        $Module = new LeaderBoardModule();
-        $Module->SlotType = 'a';
-        $Module->getData(c('Reputation.Badges.LeaderboardLimit', 25));
-        $this->addModule($Module);
+        $module = new LeaderBoardModule();
+        $module->SlotType = 'a';
+        $module->getData(c('Reputation.Badges.LeaderboardLimit', 25));
+        $this->addModule($module);
 
         $this->MasterView = 'default';
         $this->render('index');
@@ -82,13 +82,13 @@ class BadgesController extends BadgesAppController {
     public function user() {
         $this->permission('Reputation.Badges.View');
 
-        $UserID = Gdn::request()->getValue('UserID', false);
-        $this->setData('Badges', $this->BadgeModel->getFilteredList($UserID, true));
+        $userID = Gdn::request()->getValue('UserID', false);
+        $this->setData('Badges', $this->BadgeModel->getFilteredList($userID, true));
 
-        $Module = new LeaderBoardModule();
-        $Module->SlotType = 'a';
-        $Module->getData(c('Reputation.Badges.LeaderboardLimit', 25));
-        $this->addModule($Module);
+        $module = new LeaderBoardModule();
+        $module->SlotType = 'a';
+        $module->getData(c('Reputation.Badges.LeaderboardLimit', 25));
+        $this->addModule($module);
 
         $this->MasterView = 'default';
         $this->render('index');

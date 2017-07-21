@@ -10,104 +10,104 @@ class IpsumInserterPlugin extends Gdn_Plugin {
    /**
     * Creates the Virtual Controller
     *
-    * @param Controller $Sender
+    * @param Controller $sender
     */
-   public function PluginController_IpsumInserter_Create($Sender) {
+   public function PluginController_IpsumInserter_Create($sender) {
 
-      $Sender->Permission('Garden.Settings.Manage');
-      $Sender->Title('IpsumInserter');
-      $Sender->AddSideMenu('plugin/IpsumInserter');
-      $Sender->Form = new Gdn_Form();
-      $this->Dispatch($Sender, $Sender->RequestArgs);
+      $sender->Permission('Garden.Settings.Manage');
+      $sender->Title('IpsumInserter');
+      $sender->AddSideMenu('plugin/IpsumInserter');
+      $sender->Form = new Gdn_Form();
+      $this->Dispatch($sender, $sender->RequestArgs);
    }
 
-   public function Controller_Index($Sender) {
+   public function Controller_Index($sender) {
 
-      $Sender->Form = new Gdn_Form();
+      $sender->Form = new Gdn_Form();
 
       // If form is being submitted
-      if ($Sender->Form->IsPostBack() && $Sender->Form->AuthenticatedPostBack() === TRUE) {
+      if ($sender->Form->IsPostBack() && $sender->Form->AuthenticatedPostBack() === TRUE) {
 
          // Form Validation
-         $Sender->Form->ValidateRule('DiscussionNumber', 'function:ValidateRequired', 'DiscussionNumber is required');
-         $Sender->Form->ValidateRule('DiscussionNumber', 'function:ValidateInteger', 'DiscussionNumber must be numeric');
-         $Sender->Form->ValidateRule('CommentNumber', 'function:ValidateRequired', 'CommentNumber is required');
-         $Sender->Form->ValidateRule('CommentNumber', 'function:ValidateInteger', 'CommentNumber must be numeric');
+         $sender->Form->ValidateRule('DiscussionNumber', 'function:ValidateRequired', 'DiscussionNumber is required');
+         $sender->Form->ValidateRule('DiscussionNumber', 'function:ValidateInteger', 'DiscussionNumber must be numeric');
+         $sender->Form->ValidateRule('CommentNumber', 'function:ValidateRequired', 'CommentNumber is required');
+         $sender->Form->ValidateRule('CommentNumber', 'function:ValidateInteger', 'CommentNumber must be numeric');
 
          // If no errors
-         if ($Sender->Form->ErrorCount() == 0) {
-            $FormValues = $Sender->Form->FormValues();
+         if ($sender->Form->ErrorCount() == 0) {
+            $formValues = $sender->Form->FormValues();
 
 
-            $DiscussionModel = new DiscussionModel();
-            $CommentModel = new CommentModel();
+            $discussionModel = new DiscussionModel();
+            $commentModel = new CommentModel();
 
-            for ($i=0; $i < $FormValues['DiscussionNumber']; $i++) {
-               $Ipsum = $this->GetIpsum(700, $FormValues['IpsumType']);
-               $Fields = [
-                  'Name' => substr($Ipsum, 0, rand(25, 100)),
-                  'Body' => substr($Ipsum, 0, rand(100, 700)),
+            for ($i=0; $i < $formValues['DiscussionNumber']; $i++) {
+               $ipsum = $this->GetIpsum(700, $formValues['IpsumType']);
+               $fields = [
+                  'Name' => substr($ipsum, 0, rand(25, 100)),
+                  'Body' => substr($ipsum, 0, rand(100, 700)),
                   'CategoryID' => 1
                ];
-               $DiscussionID = $DiscussionModel->Save($Fields);
+               $discussionID = $discussionModel->Save($fields);
 
-               for ($b=0; $b < $FormValues['CommentNumber']; $b++) {
-                  $Ipsum = $this->GetIpsum(500, $FormValues['IpsumType']);
-                  $Fields = [
-                     'DiscussionID' => $DiscussionID,
-                     'Body' => substr($Ipsum, 0, rand(100, 700))
+               for ($b=0; $b < $formValues['CommentNumber']; $b++) {
+                  $ipsum = $this->GetIpsum(500, $formValues['IpsumType']);
+                  $fields = [
+                     'DiscussionID' => $discussionID,
+                     'Body' => substr($ipsum, 0, rand(100, 700))
                   ];
-                  $CommentModel->Save($Fields);
+                  $commentModel->Save($fields);
                }
             }
-            $Sender->SetData('Message', 'Discussions and Comments Created');
-            $Sender->InformMessage('Discussions and Comments Created.');
+            $sender->SetData('Message', 'Discussions and Comments Created');
+            $sender->InformMessage('Discussions and Comments Created.');
 
          }
       }
 
-      $Sender->Render($this->GetView('form.php'));
+      $sender->Render($this->GetView('form.php'));
       return;
 
 
    }
 
-   public function GetIpsum($MaxLength = 500, $IpsumType = 'lorem') {
-      if ($IpsumType == 'gangsta') {
-         $Ipsum = $this->GetGanstaIpsum();
+   public function GetIpsum($maxLength = 500, $ipsumType = 'lorem') {
+      if ($ipsumType == 'gangsta') {
+         $ipsum = $this->GetGanstaIpsum();
       } else {
-         $Ipsum = $this->GetLoremIpsum();
+         $ipsum = $this->GetLoremIpsum();
       }
 
-      return substr($Ipsum, 0, $MaxLength);
+      return substr($ipsum, 0, $maxLength);
    }
 
    public function GetLoremIpsum() {
-      $Proxy = new ProxyRequest();
+      $proxy = new ProxyRequest();
 
-      $Options['URL'] = 'http://www.lipsum.com/feed/html';
-      $Response = $Proxy->Request($Options);
+      $options['URL'] = 'http://www.lipsum.com/feed/html';
+      $response = $proxy->Request($options);
 
-      $Ipsum = stristr($Response, "<div id=\"lipsum\">\n<p>\n");
-      $Ipsum = str_replace("<div id=\"lipsum\">\n<p>\n", '', $Ipsum);
-      $Ipsum = stristr($Ipsum, "\n</p></div>\n<div id=\"generated\">", TRUE);
-      $Ipsum = str_replace("</p>\n", '', $Ipsum);
-      $Ipsum = str_replace("<p>", '', $Ipsum);
+      $ipsum = stristr($response, "<div id=\"lipsum\">\n<p>\n");
+      $ipsum = str_replace("<div id=\"lipsum\">\n<p>\n", '', $ipsum);
+      $ipsum = stristr($ipsum, "\n</p></div>\n<div id=\"generated\">", TRUE);
+      $ipsum = str_replace("</p>\n", '', $ipsum);
+      $ipsum = str_replace("<p>", '', $ipsum);
 
-      return $Ipsum;
+      return $ipsum;
    }
 
    public function GetGanstaIpsum() {
-      $Proxy = new ProxyRequest();
+      $proxy = new ProxyRequest();
 
-      $Options['URL'] = 'http://lorizzle.nl/?feed=1';
-      $Response = $Proxy->Request($Options);
+      $options['URL'] = 'http://lorizzle.nl/?feed=1';
+      $response = $proxy->Request($options);
 
-      $Ipsum = stristr($Response, '<div class="lipsum"><p>');
-      $Ipsum = str_replace('<div class="lipsum"><p>', '' , $Ipsum);
-      $Ipsum = stristr($Ipsum, '</p></div>', TRUE);
+      $ipsum = stristr($response, '<div class="lipsum"><p>');
+      $ipsum = str_replace('<div class="lipsum"><p>', '' , $ipsum);
+      $ipsum = stristr($ipsum, '</p></div>', TRUE);
 
-      return $Ipsum;
+      return $ipsum;
    }
 }
 

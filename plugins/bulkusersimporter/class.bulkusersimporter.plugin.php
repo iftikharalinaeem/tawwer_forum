@@ -815,55 +815,55 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
    // Send custom email reset, copied from method in usermodel, with slight
    // mod--changing the email message.
-   public function PasswordRequest($Email) {
-      if (!$Email) {
+   public function PasswordRequest($email) {
+      if (!$email) {
          return FALSE;
       }
 
       $user_model = Gdn::UserModel();
 
-      $Users = $user_model->GetWhere(['Email' => $Email])->ResultObject();
-      if (count($Users) == 0) {
+      $users = $user_model->GetWhere(['Email' => $email])->ResultObject();
+      if (count($users) == 0) {
          // Check for the username.
-         $Users = $user_model->GetWhere(['Name' => $Email])->ResultObject();
+         $users = $user_model->GetWhere(['Name' => $email])->ResultObject();
       }
 
-      if (count($Users) == 0) {
+      if (count($users) == 0) {
          $user_model->Validation->AddValidationResult('Name', "Couldn't find an account associated with that email/username.");
          return FALSE;
       }
 
-      $NoEmail = TRUE;
+      $noEmail = TRUE;
 
-      foreach ($Users as $User) {
-         if (!$User->Email) {
+      foreach ($users as $user) {
+         if (!$user->Email) {
             continue;
          }
-         $Email = new Gdn_Email(); // Instantiate in loop to clear previous settings
-         $PasswordResetKey = BetterRandomString(20, 'Aa0');
-         $PasswordResetExpires = strtotime('+1 hour');
-         $user_model->SaveAttribute($User->UserID, 'PasswordResetKey', $PasswordResetKey);
-         $user_model->SaveAttribute($User->UserID, 'PasswordResetExpires', $PasswordResetExpires);
-         $AppTitle = C('Garden.Title');
-         $Email->Subject(sprintf(T('[%s] Forum Account Creation'), $AppTitle));
-         $Email->To($User->Email);
+         $email = new Gdn_Email(); // Instantiate in loop to clear previous settings
+         $passwordResetKey = BetterRandomString(20, 'Aa0');
+         $passwordResetExpires = strtotime('+1 hour');
+         $user_model->SaveAttribute($user->UserID, 'PasswordResetKey', $passwordResetKey);
+         $user_model->SaveAttribute($user->UserID, 'PasswordResetExpires', $passwordResetExpires);
+         $appTitle = C('Garden.Title');
+         $email->Subject(sprintf(T('[%s] Forum Account Creation'), $appTitle));
+         $email->To($user->Email);
 
          // Custom mesage for bulk importer.
          $message = '';
          $message .= "Hello,\n\n";
-         $message .= "An account has been created for you at the $AppTitle forum.\n\n";
+         $message .= "An account has been created for you at the $appTitle forum.\n\n";
          $message .= "To activate your account, please follow this link:\n";
-         $message .= ExternalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey) . "\n\n";
+         $message .= ExternalUrl('/entry/passwordreset/'.$user->UserID.'/'.$passwordResetKey) . "\n\n";
          $message .= "Please contact us if you have questions regarding this email.\n\n";
          $message .= "Sincerely,\n";
-         $message .= $AppTitle;
+         $message .= $appTitle;
 
-         $Email->Message($message);
-         $Email->Send();
-         $NoEmail = FALSE;
+         $email->Message($message);
+         $email->Send();
+         $noEmail = FALSE;
       }
 
-      if ($NoEmail) {
+      if ($noEmail) {
          $this->Validation->AddValidationResult('Name', 'There is no email address associated with that account.');
          return FALSE;
       }

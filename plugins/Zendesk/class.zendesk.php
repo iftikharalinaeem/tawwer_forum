@@ -19,66 +19,66 @@ class Zendesk {
      * Setup Properties.
      *
      * @param IZendeskHttpRequest $curlRequest Curl Request Object.
-     * @param string $Url Url to API.
-     * @param string $AccessToken OAuth AccessToken.
+     * @param string $url Url to API.
+     * @param string $accessToken OAuth AccessToken.
      */
-    public function __construct(IZendeskHttpRequest $curlRequest, $Url, $AccessToken) {
+    public function __construct(IZendeskHttpRequest $curlRequest, $url, $accessToken) {
         $this->curl = $curlRequest;
-        $this->apiUrl = trim($Url, '/').'/api/v2';
-        $this->AccessToken = $AccessToken;
+        $this->apiUrl = trim($url, '/').'/api/v2';
+        $this->AccessToken = $accessToken;
     }
 
 
     /**
      * Create Ticket using the Zendesk API.
      *
-     * @param string $Subject Subject Line.
-     * @param string $Body Message Body.
-     * @param array $Requester Requester Array.
-     * @param array $AdditionalTicketFields Additional fields to the json.
+     * @param string $subject Subject Line.
+     * @param string $body Message Body.
+     * @param array $requester Requester Array.
+     * @param array $additionalTicketFields Additional fields to the json.
      *
      * @return int
      */
-    public function createTicket($Subject, $Body, $Requester, $AdditionalTicketFields = []) {
-        $TicketFields = [
-            'requester' => $Requester,
-            'subject' => $Subject,
-            'comment' => ['body' => $Body]
+    public function createTicket($subject, $body, $requester, $additionalTicketFields = []) {
+        $ticketFields = [
+            'requester' => $requester,
+            'subject' => $subject,
+            'comment' => ['body' => $body]
         ];
-        $Ticket = array_merge($TicketFields, $AdditionalTicketFields);
-        $Response = $this->zendeskRequest(
+        $ticket = array_merge($ticketFields, $additionalTicketFields);
+        $response = $this->zendeskRequest(
             "/tickets.json",
-            json_encode(['ticket' => $Ticket]),
+            json_encode(['ticket' => $ticket]),
             "POST"
         );
-        return $Response['ticket']['id'];
+        return $response['ticket']['id'];
     }
 
     /**
      * Get Ticket.
      *
-     * @param string $TicketID Ticket Identified.
+     * @param string $ticketID Ticket Identified.
      *
      * @return mixed
      */
-    public function getTicket($TicketID) {
-        $Response = $this->zendeskRequest('/tickets/'.$TicketID.'.json');
-        return $Response['ticket'];
+    public function getTicket($ticketID) {
+        $response = $this->zendeskRequest('/tickets/'.$ticketID.'.json');
+        return $response['ticket'];
     }
 
     /**
      * Get last comment made on ticket.
      *
-     * @param string $TicketID Ticket ID.
+     * @param string $ticketID Ticket ID.
      *
      * @return array
      */
-    public function getLastComment($TicketID) {
-        $Response = $this->zendeskRequest('/tickets/'.$TicketID.'/comments.json');
+    public function getLastComment($ticketID) {
+        $response = $this->zendeskRequest('/tickets/'.$ticketID.'/comments.json');
         //remove the first comment (its the ticket)
-        $Comments = $Response['comments'];
-        if (count($Comments) > 1) {
-            return array_pop($Comments);
+        $comments = $response['comments'];
+        if (count($comments) > 1) {
+            return array_pop($comments);
         }
         return [];
     }
@@ -86,17 +86,17 @@ class Zendesk {
     /**
      * Get user details.
      *
-     * @param string $UserID User ID.
+     * @param string $userID User ID.
      *
      * @return mixed
      * @throws Exception If errors.
      */
-    public function getUser($UserID) {
-        if (!is_int($UserID)) {
+    public function getUser($userID) {
+        if (!is_int($userID)) {
             throw new Exception('Invalid User ID');
         }
-        $Response = $this->zendeskRequest('/users/'.$UserID.'.json');
-        return $Response;
+        $response = $this->zendeskRequest('/users/'.$userID.'.json');
+        return $response;
     }
 
     /**

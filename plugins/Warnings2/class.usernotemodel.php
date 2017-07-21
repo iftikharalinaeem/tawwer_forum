@@ -9,109 +9,109 @@ class UserNoteModel extends Gdn_Model {
     /**
      * Calculating notes row.
      *
-     * @param array $Data
+     * @param array $data
      */
-    public function calculate(&$Data) {
-        Gdn::userModel()->joinUsers($Data, ['InsertUserID']);
-        $IsModerator = Gdn::session()->checkPermission('Garden.Moderation.Manage');
-        foreach ($Data as &$Row) {
-            $this->calculateRow($Row);
+    public function calculate(&$data) {
+        Gdn::userModel()->joinUsers($data, ['InsertUserID']);
+        $isModerator = Gdn::session()->checkPermission('Garden.Moderation.Manage');
+        foreach ($data as &$row) {
+            $this->calculateRow($row);
         }
     }
 
     /**
      * Counting row, unsetting Moderator Note is user is not moderator.
      *
-     * @param array $Row
+     * @param array $row
      */
-    protected function calculateRow(&$Row) {
-        $IsModerator = Gdn::session()->checkPermission('Garden.Moderation.Manage');
-        $Row['Body'] = Gdn_Format::to($Row['Body'], $Row['Format']);
+    protected function calculateRow(&$row) {
+        $isModerator = Gdn::session()->checkPermission('Garden.Moderation.Manage');
+        $row['Body'] = Gdn_Format::to($row['Body'], $row['Format']);
 
-        if (!$IsModerator) {
-            unset($Row['ModeratorNote']);
+        if (!$isModerator) {
+            unset($row['ModeratorNote']);
         }
     }
 
     /**
      * Get a UserNote by ID.
      *
-     * @param mixed $ID
-     * @param bool|false $DatasetType Unused
-     * @param array $Options Unused
+     * @param mixed $iD
+     * @param bool|false $datasetType Unused
+     * @param array $options Unused
      * @return array|object
      */
-    public function getID($ID, $DatasetType = false, $Options = []) {
-        $Row = parent::getID($ID, DATASET_TYPE_ARRAY);
-        $Row = $this->expandAttributes($Row);
-        $this->calculateRow($Row);
+    public function getID($iD, $datasetType = false, $options = []) {
+        $row = parent::getID($iD, DATASET_TYPE_ARRAY);
+        $row = $this->expandAttributes($row);
+        $this->calculateRow($row);
     
-        return $Row;
+        return $row;
     }
 
     /**
      * Get a dataset for the model with a where filter.
      *
-     * @param bool $Where
-     * @param string $OrderFields
-     * @param string $OrderDirection
-     * @param bool $Limit
-     * @param bool $Offset
+     * @param bool $where
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param bool $limit
+     * @param bool $offset
      * @return Gdn_DataSet
      */
-    public function getWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
-        $Data = parent::getWhere($Where, $OrderFields, $OrderDirection, $Limit, $Offset);
-        $Data->datasetType(DATASET_TYPE_ARRAY);
-        $Data->expandAttributes();
-        return $Data;
+    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
+        $data = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
+        $data->datasetType(DATASET_TYPE_ARRAY);
+        $data->expandAttributes();
+        return $data;
     }
 
     /**
      *
-     * @param array $FormPostValues
-     * @param bool $Settings
+     * @param array $formPostValues
+     * @param bool $settings
      *
      * @return unknown
      */
-    public function save($FormPostValues, $Settings = false) {
-        $Row = $this->collapseAttributes($FormPostValues);
+    public function save($formPostValues, $settings = false) {
+        $row = $this->collapseAttributes($formPostValues);
 
-        return parent::save($Row, $Settings);
+        return parent::save($row, $settings);
     }
 
     /**
      * Update a row in the database.
      *
-     * @param int $RowID
-     * @param array|string $Name
-     * @param null $Value
+     * @param int $rowID
+     * @param array|string $name
+     * @param null $value
      */
-    public function setField($RowID, $Name, $Value = null) {
-        if (!is_array($Name)) {
-            $Name = [$Name => $Value];
+    public function setField($rowID, $name, $value = null) {
+        if (!is_array($name)) {
+            $name = [$name => $value];
         }
 
         $this->defineSchema();
-        $Fields = $this->Schema->fields();
-        $InSchema = array_intersect_key($Name, $Fields);
-        $NotInSchema = array_diff_key($Name, $InSchema);
+        $fields = $this->Schema->fields();
+        $inSchema = array_intersect_key($name, $fields);
+        $notInSchema = array_diff_key($name, $inSchema);
 
-        if (empty($NotInSchema)) {
-            return parent::setField($RowID, $Name);
+        if (empty($notInSchema)) {
+            return parent::setField($rowID, $name);
         } else {
-            $Row = $this->SQL->select('Attributes')->getWhere('UserNote', ['UserNoteID' => $RowID])->firstRow(DATASET_TYPE_ARRAY);
-            if (isset($Row['Attributes'])) {
-                $Attributes = dbdecode($Row['Attributes']);
-                if (is_array($Attributes)) {
-                    $Attributes = array_merge($Attributes, $NotInSchema);
+            $row = $this->SQL->select('Attributes')->getWhere('UserNote', ['UserNoteID' => $rowID])->firstRow(DATASET_TYPE_ARRAY);
+            if (isset($row['Attributes'])) {
+                $attributes = dbdecode($row['Attributes']);
+                if (is_array($attributes)) {
+                    $attributes = array_merge($attributes, $notInSchema);
                 }
                 else
-                    $Attributes = $NotInSchema;
+                    $attributes = $notInSchema;
             } else {
-                $Attributes = $NotInSchema;
+                $attributes = $notInSchema;
             }
-            $InSchema['Attributes'] = $Attributes;
-            return parent::setField($RowID, $InSchema);
+            $inSchema['Attributes'] = $attributes;
+            return parent::setField($rowID, $inSchema);
         }
     }
 }

@@ -25,131 +25,131 @@ class EventModel extends Gdn_Model {
     /**
      * Get events that this user is invited to.
      *
-     * @param integer $UserID
+     * @param integer $userID
      * @return type
      */
-    public function getByUser($UserID) {
-        $UserGroups = $this->SQL->getWhere('UserGroup', ['UserID' => $UserID])->resultArray();
-        $IDs = array_column($UserGroups, 'GroupID');
+    public function getByUser($userID) {
+        $userGroups = $this->SQL->getWhere('UserGroup', ['UserID' => $userID])->resultArray();
+        $iDs = array_column($userGroups, 'GroupID');
 
-        $Result = $this->getWhere(['GroupID' => $IDs], 'Name')->resultArray();
-        return $Result;
+        $result = $this->getWhere(['GroupID' => $iDs], 'Name')->resultArray();
+        return $result;
     }
 
     /**
      * Get an event by ID.
      *
-     * @param integer $EventID
-     * @param integer $DatasetType
+     * @param integer $eventID
+     * @param integer $datasetType
      * @param array $options Base class compatibility.
      * @return type
      */
-    public function getID($EventID, $DatasetType = DATASET_TYPE_ARRAY, $options = []) {
-        $EventID = self::parseID($EventID);
+    public function getID($eventID, $datasetType = DATASET_TYPE_ARRAY, $options = []) {
+        $eventID = self::parseID($eventID);
 
-        $Row = parent::getID($EventID, $DatasetType);
-        return $Row;
+        $row = parent::getID($eventID, $datasetType);
+        return $row;
     }
 
     /**
      * Get events by date.
      *
-     * @param strtotime $Future Relative time offset. Like "+30 days"
-     * @param array $Where
-     * @param boolean $Ended Optional. Only events that have due to their end date?
+     * @param strtotime $future Relative time offset. Like "+30 days"
+     * @param array $where
+     * @param boolean $ended Optional. Only events that have due to their end date?
      *      (End date is optional so setting this will exclude events with no end date.)
      * @return type
      */
-    public function getUpcoming($Future, $Where = null, $Ended = null) {
-        $UTC = new DateTimeZone('UTC');
-        $StartDate = new DateTime('now', $UTC);
-        if ($Future) {
-            $LimitDate = new DateTime('now', $UTC);
-            $LimitDate->modify($Future);
+    public function getUpcoming($future, $where = null, $ended = null) {
+        $uTC = new DateTimeZone('UTC');
+        $startDate = new DateTime('now', $uTC);
+        if ($future) {
+            $limitDate = new DateTime('now', $uTC);
+            $limitDate->modify($future);
         }
 
         // Handle 'invited' state manually
-        if ($InvitedUserID = val('Invited', $Where)) {
-            unset($Where['Invited']);
+        if ($invitedUserID = val('Invited', $where)) {
+            unset($where['Invited']);
         }
 
         // Limit to a future date, but after right now
-        if ($LimitDate > $StartDate) {
-            if ($Ended === false) {
-                $Where['DateEnds >='] = $StartDate->format('Y-m-d H:i:s');
+        if ($limitDate > $startDate) {
+            if ($ended === false) {
+                $where['DateEnds >='] = $startDate->format('Y-m-d H:i:s');
             } else {
-                $Where['DateStarts >='] = $StartDate->format('Y-m-d H:i:s');
+                $where['DateStarts >='] = $startDate->format('Y-m-d H:i:s');
             }
 
-            if ($Future) {
-                $Where['DateStarts <='] = $LimitDate->format('Y-m-d H:i:s');
+            if ($future) {
+                $where['DateStarts <='] = $limitDate->format('Y-m-d H:i:s');
             }
         } else {
-            $Where['DateStarts <'] = $StartDate->format('Y-m-d H:i:s');
-            if ($Future) {
-                $Where['DateStarts >='] = $LimitDate->format('Y-m-d H:i:s');
+            $where['DateStarts <'] = $startDate->format('Y-m-d H:i:s');
+            if ($future) {
+                $where['DateStarts >='] = $limitDate->format('Y-m-d H:i:s');
             }
         }
 
         // Only events that are over
-        if ($Ended) {
-            $Where['DateEnds <='] = $StartDate->format('Y-m-d H:i:s');
+        if ($ended) {
+            $where['DateEnds <='] = $startDate->format('Y-m-d H:i:s');
         }
 
-        $EventsQuery = $this->SQL
+        $eventsQuery = $this->SQL
             ->select('e.*')
-            ->where($Where)
+            ->where($where)
             ->orderBy('DateStarts', 'asc');
 
-        if ($InvitedUserID) {
-            $EventsQuery
+        if ($invitedUserID) {
+            $eventsQuery
                 ->from('UserEvent ue')
                 ->join('Event e', 'ue.EventID = e.EventID');
         } else {
-            $EventsQuery->from('Event e');
+            $eventsQuery->from('Event e');
         }
 
-        return $EventsQuery->get()->resultArray();
+        return $eventsQuery->get()->resultArray();
     }
 
     /**
      * Check permission on a event.
      *
-     * @param string $Permission The permission to check. Valid values are:
+     * @param string $permission The permission to check. Valid values are:
      *  - Organizer: User is a leader of the event.
      *  - Member: User is a member of the event.
      *  - Create: User can create events.
      *  - Edit: User can edit the event.
      *  - View: The user may view the event's contents.
-     * @param int $EventID
+     * @param int $eventID
      * @return boolean
      */
-    public function checkPermission($Permission, $EventID) {
-        static $Permissions = [];
+    public function checkPermission($permission, $eventID) {
+        static $permissions = [];
 
-        $UserID = Gdn::session()->UserID;
+        $userID = Gdn::session()->UserID;
 
-        if (is_array($EventID)) {
-            $Event = $EventID;
-            $EventID = $Event['EventID'];
+        if (is_array($eventID)) {
+            $event = $eventID;
+            $eventID = $event['EventID'];
         }
 
-        $Key = "{$UserID}-{$EventID}";
-        if (!isset($Permissions[$Key])) {
+        $key = "{$userID}-{$eventID}";
+        if (!isset($permissions[$key])) {
             // Get the data for the group.
-            if (!isset($Event)) {
-                $Event = $this->getID($EventID);
+            if (!isset($event)) {
+                $event = $this->getID($eventID);
             }
 
-            $UserEvent = false;
-            if ($UserID) {
-                $UserEvent = Gdn::sql()
-                    ->getWhere('UserEvent', ['EventID' => $EventID, 'UserID' => $UserID])
+            $userEvent = false;
+            if ($userID) {
+                $userEvent = Gdn::sql()
+                    ->getWhere('UserEvent', ['EventID' => $eventID, 'UserID' => $userID])
                     ->firstRow(DATASET_TYPE_ARRAY);
             }
 
             // Set the default permissions.
-            $Perms = [
+            $perms = [
                 'Organizer' => false,
                 'Create' => true,
                 'Edit' => false,
@@ -158,97 +158,97 @@ class EventModel extends Gdn_Model {
             ];
 
             // The group creator is always a member and leader.
-            if ($UserID == $Event['InsertUserID']) {
-                $Perms['Organizer'] = true;
-                $Perms['Edit'] = true;
-                $Perms['Member'] = true;
-                $Perms['View'] = true;
+            if ($userID == $event['InsertUserID']) {
+                $perms['Organizer'] = true;
+                $perms['Edit'] = true;
+                $perms['Member'] = true;
+                $perms['View'] = true;
             }
 
-            if ($UserEvent) {
-                $Perms['Member'] = true;
-                $Perms['View'] = true;
+            if ($userEvent) {
+                $perms['Member'] = true;
+                $perms['View'] = true;
             } else {
                 // Check if we're in a group
-                $EventGroupID = val('GroupID', $Event, null);
-                if ($EventGroupID) {
-                    $GroupModel = new GroupModel();
-                    $EventGroup = $GroupModel->getID($EventGroupID);
+                $eventGroupID = val('GroupID', $event, null);
+                if ($eventGroupID) {
+                    $groupModel = new GroupModel();
+                    $eventGroup = $groupModel->getID($eventGroupID);
 
-                    if (groupPermission('Member', $EventGroupID)) {
-                        $Perms['Member'] = true;
-                        $Perms['View'] = true;
+                    if (groupPermission('Member', $eventGroupID)) {
+                        $perms['Member'] = true;
+                        $perms['View'] = true;
                     } else {
-                        $Perms['Create'] = false;
+                        $perms['Create'] = false;
                     }
                 }
 
             }
 
             // Allow Admins to restrict event creation to leaders only.
-            if (!c('Groups.Members.CanAddEvents', true) && !groupPermission('Leader', $EventGroupID)) {
-                $Perms['Create'] = false;
+            if (!c('Groups.Members.CanAddEvents', true) && !groupPermission('Leader', $eventGroupID)) {
+                $perms['Create'] = false;
             }
 
             // Moderators can view and edit all events.
-            if ($UserID == Gdn::session()->UserID && checkPermission('Garden.Moderation.Manage')) {
-                $Perms['Edit'] = true;
-                $Perms['View'] = true;
+            if ($userID == Gdn::session()->UserID && checkPermission('Garden.Moderation.Manage')) {
+                $perms['Edit'] = true;
+                $perms['View'] = true;
             }
-            $Permissions[$Key] = $Perms;
+            $permissions[$key] = $perms;
         }
 
-        $Perms = $Permissions[$Key];
+        $perms = $permissions[$key];
 
-        if (!$Permission) {
-            return $Perms;
+        if (!$permission) {
+            return $perms;
         }
 
-        if (!isset($Perms[$Permission])) {
-            if (strpos($Permission, '.Reason') === false) {
-                trigger_error("Invalid group permission $Permission.");
+        if (!isset($perms[$permission])) {
+            if (strpos($permission, '.Reason') === false) {
+                trigger_error("Invalid group permission $permission.");
                 return false;
             } else {
-                $Permission = StringEndsWith($Permission, '.Reason', true, true);
-                if ($Perms[$Permission]) {
+                $permission = StringEndsWith($permission, '.Reason', true, true);
+                if ($perms[$permission]) {
                     return '';
                 }
 
-                if (in_array($Permission, ['Member', 'Leader'])) {
-                    $Message = t(sprintf("You aren't a %s of this event.", strtolower($Permission)));
+                if (in_array($permission, ['Member', 'Leader'])) {
+                    $message = t(sprintf("You aren't a %s of this event.", strtolower($permission)));
                 } else {
-                    $Message = sprintf(t("You aren't allowed to %s this event."), t(strtolower($Permission)));
+                    $message = sprintf(t("You aren't allowed to %s this event."), t(strtolower($permission)));
                 }
 
-                return $Message;
+                return $message;
             }
         } else {
-            return $Perms[$Permission];
+            return $perms[$permission];
         }
     }
 
     /**
      * Parse the ID out of a slug.
      *
-     * @param type $ID
+     * @param type $iD
      * @return type
      */
-    public static function parseID($ID) {
-        $Parts = explode('-', $ID, 2);
-        return $Parts[0];
+    public static function parseID($iD) {
+        $parts = explode('-', $iD, 2);
+        return $parts[0];
     }
 
     /**
      * Invite someone to an event.
      *
-     * @param integer $UserID
-     * @param integer $EventID
+     * @param integer $userID
+     * @param integer $eventID
      * @return int
      */
-    public function invite($UserID, $EventID) {
+    public function invite($userID, $eventID) {
         return $this->SQL->insert('UserEvent', [
-            'EventID' => $EventID,
-            'UserID' => $UserID,
+            'EventID' => $eventID,
+            'UserID' => $userID,
             'Attending' => 'Invited'
         ]);
     }
@@ -256,30 +256,30 @@ class EventModel extends Gdn_Model {
     /**
      * Invite an entire group to this event.
      *
-     * @param integer $EventID
-     * @param integer $GroupID
+     * @param integer $eventID
+     * @param integer $groupID
      */
-    public function inviteGroup($EventID, $GroupID) {
+    public function inviteGroup($eventID, $groupID) {
         return;
-        $Event = $this->getID($EventID, DATASET_TYPE_ARRAY);
-        $GroupModel = new GroupModel();
-        $GroupMembers = $GroupModel->getMembers($GroupID);
+        $event = $this->getID($eventID, DATASET_TYPE_ARRAY);
+        $groupModel = new GroupModel();
+        $groupMembers = $groupModel->getMembers($groupID);
 
         // Notify the users of the invitation
-        $ActivityModel = new ActivityModel();
-        $Activity = [
+        $activityModel = new ActivityModel();
+        $activity = [
             'ActivityType' => 'Events',
-            'ActivityUserID' => $Event['InsertUserID'],
+            'ActivityUserID' => $event['InsertUserID'],
             'HeadlineFormat' => t('Activity.NewEvent', '{ActivityUserID,User} added a new event: <a href="{Url,html}">{Data.Name,text}</a>.'),
             'RecordType' => 'Event',
             'RecordID' => 'EventID',
-            'Route' => eventUrl($Event),
-            'Data' => ['Name' => $Event['Name']]
+            'Route' => eventUrl($event),
+            'Data' => ['Name' => $event['Name']]
         ];
 
-        foreach ($GroupMembers as $GroupMember) {
-            $Activity['NotifyUserID'] = $GroupMember['UserID'];
-            $ActivityID = $ActivityModel->Queue($Activity);
+        foreach ($groupMembers as $groupMember) {
+            $activity['NotifyUserID'] = $groupMember['UserID'];
+            $activityID = $activityModel->Queue($activity);
         }
     }
 
@@ -301,54 +301,54 @@ class EventModel extends Gdn_Model {
 
     /**
      * Get list of invited
-     * @param type $EventID
+     * @param type $eventID
      * @return type
      */
-    public function invited($EventID) {
-        $CollapsedInvited = $this->SQL->getWhere('UserEvent', ['EventID' => $EventID])->resultArray();
-        Gdn::userModel()->joinUsers($CollapsedInvited, ['UserID']);
-        $Invited = [];
-        foreach ($CollapsedInvited as $Invitee) {
-            $Invited[$Invitee['Attending']][] = $Invitee;
+    public function invited($eventID) {
+        $collapsedInvited = $this->SQL->getWhere('UserEvent', ['EventID' => $eventID])->resultArray();
+        Gdn::userModel()->joinUsers($collapsedInvited, ['UserID']);
+        $invited = [];
+        foreach ($collapsedInvited as $invitee) {
+            $invited[$invitee['Attending']][] = $invitee;
         }
-        return $Invited;
+        return $invited;
     }
 
     /**
      * Check if a User is invited to an Event.
      *
-     * @param integer $UserID
-     * @param integer $EventID
+     * @param integer $userID
+     * @param integer $eventID
      * @return bool
      */
-    public function isInvited($UserID, $EventID) {
-        $IsInvited = $this->SQL
-            ->getWhere('UserEvent', ['UserID' => $UserID, 'EventID' => $EventID])
+    public function isInvited($userID, $eventID) {
+        $isInvited = $this->SQL
+            ->getWhere('UserEvent', ['UserID' => $userID, 'EventID' => $eventID])
             ->firstRow(DATASET_TYPE_ARRAY);
-        $IsInvited = val('Attending', $IsInvited, false);
+        $isInvited = val('Attending', $isInvited, false);
 
-        return $IsInvited;
+        return $isInvited;
     }
 
     /**
      * Change user attending status for event.
      *
-     * @param integer $UserID
-     * @param integer $EventID
-     * @param enum $Attending [Yes, No, Maybe, Invited]
+     * @param integer $userID
+     * @param integer $eventID
+     * @param enum $attending [Yes, No, Maybe, Invited]
      */
-    public function attend($UserID, $EventID, $Attending) {
-        $Px = Gdn::database()->DatabasePrefix;
-        $Sql = "insert into {$Px}UserEvent (EventID, UserID, DateInserted, Attending)
+    public function attend($userID, $eventID, $attending) {
+        $px = Gdn::database()->DatabasePrefix;
+        $sql = "insert into {$px}UserEvent (EventID, UserID, DateInserted, Attending)
             values (:EventID, :UserID, :DateInserted, :Attending)
             on duplicate key update Attending = :Attending1";
 
-        $this->Database->query($Sql, [
-            ':EventID' => $EventID,
-            ':UserID' => $UserID,
+        $this->Database->query($sql, [
+            ':EventID' => $eventID,
+            ':UserID' => $userID,
             ':DateInserted' => date('Y-m-d H:i:s'),
-            ':Attending' => $Attending,
-            ':Attending1' => $Attending
+            ':Attending' => $attending,
+            ':Attending1' => $attending
         ]);
     }
 
@@ -357,27 +357,27 @@ class EventModel extends Gdn_Model {
      *
      * Set 'Fix' = false to bypass date munging
      *
-     * @param array $Event
+     * @param array $event
      * @param array $settings Base class compatibility.
      * @return array
      */
-    public function save($Event, $settings = []) {
+    public function save($event, $settings = []) {
         // Fix the dates.
-        if (!empty($Event['DateStarts'])) {
-            $ts = strtotime($Event['DateStarts']);
+        if (!empty($event['DateStarts'])) {
+            $ts = strtotime($event['DateStarts']);
             if ($ts !== false) {
-                $Event['DateStarts'] = Gdn_Format::toDateTime($ts);
+                $event['DateStarts'] = Gdn_Format::toDateTime($ts);
             }
         }
-        if (!empty($Event['DateEnds'])) {
-            $ts = strtotime($Event['DateEnds']);
+        if (!empty($event['DateEnds'])) {
+            $ts = strtotime($event['DateEnds']);
             if ($ts !== false) {
-                $Event['DateEnds'] = Gdn_Format::toDateTime($ts);
+                $event['DateEnds'] = Gdn_Format::toDateTime($ts);
             }
         }
 
         // Add a timezone in case the database wasn't updated.
-        touchValue('Timezone', $Event, Gdn::session()->getTimeZone()->getName());
+        touchValue('Timezone', $event, Gdn::session()->getTimeZone()->getName());
 
         $this->Validation->applyRule('DateStarts', 'ValidateDate');
         $this->Validation->applyRule('DateEnds', 'ValidateDate');
@@ -386,38 +386,38 @@ class EventModel extends Gdn_Model {
         $this->defineSchema();
 
         // See if a primary key value was posted and decide how to save
-        $PrimaryKeyVal = val($this->PrimaryKey, $Event, false);
-        $Insert = $PrimaryKeyVal == false ? true : false;
-        if ($Insert) {
-            $this->addInsertFields($Event);
+        $primaryKeyVal = val($this->PrimaryKey, $event, false);
+        $insert = $primaryKeyVal == false ? true : false;
+        if ($insert) {
+            $this->addInsertFields($event);
         } else {
-            $this->addUpdateFields($Event);
+            $this->addUpdateFields($event);
         }
 
         // Validate the form posted values
-        $isValid = $this->validate($Event, $Insert) === true;
+        $isValid = $this->validate($event, $insert) === true;
         $this->EventArguments['IsValid'] = &$isValid;
-        $this->EventArguments['Fields'] = &$Event;
+        $this->EventArguments['Fields'] = &$event;
         $this->fireEvent('AfterValidateEvent');
 
         if (!$isValid) {
             return false;
         }
 
-        return parent::save($Event);
+        return parent::save($event);
     }
 
     /**
      * Get precompiled timezone list.
      *
-     * @staticvar array $Built
-     * @staticvar array $Timezones
+     * @staticvar array $built
+     * @staticvar array $timezones
      * @return array
      */
-    public static function timezones($LookupTimezone = null) {
-        static $Built = null;
+    public static function timezones($lookupTimezone = null) {
+        static $built = null;
 
-        static $Timezones = [
+        static $timezones = [
             'Pacific/Midway'         => "Midway Island",
             'US/Samoa'                 => "Samoa",
             'US/Hawaii'                => "Hawaii",
@@ -533,62 +533,62 @@ class EventModel extends Gdn_Model {
         ];
 
         // Build TZ list
-        if (is_null($Built)) {
-            $Builder = []; $Now = new DateTime('now');
-            foreach ($Timezones as $TimezoneID => $LocationName) {
+        if (is_null($built)) {
+            $builder = []; $now = new DateTime('now');
+            foreach ($timezones as $timezoneID => $locationName) {
                 try {
-                    $Timezone = new DateTimeZone($TimezoneID);
-                    $Offset = $Timezone->getOffset($Now);
-                    $Location = $Timezone->getLocation();
-                    $Transition = array_shift($T = $Timezone->getTransitions($Now->getTimestamp(), $Now->getTimestamp()));
-                    $OffsetHours = ($Offset / 3600);
+                    $timezone = new DateTimeZone($timezoneID);
+                    $offset = $timezone->getOffset($now);
+                    $location = $timezone->getLocation();
+                    $transition = array_shift($t = $timezone->getTransitions($now->getTimestamp(), $now->getTimestamp()));
+                    $offsetHours = ($offset / 3600);
 
-                    $BuilderLabel = $OffsetHours.'-'.$Location['longitude'];
-                    $Builder[$BuilderLabel] = [
-                        'Timezone' => $TimezoneID,
+                    $builderLabel = $offsetHours.'-'.$location['longitude'];
+                    $builder[$builderLabel] = [
+                        'Timezone' => $timezoneID,
                         'Label' => formatString("({Label}) {Location} {Abbreviation}", [
-                            'Label' => 'GMT '.(($OffsetHours >= 0) ? "+{$OffsetHours}" : $OffsetHours),
-                            'Location' => $LocationName,
-                            'Abbreviation' => $Transition['abbr']
+                            'Label' => 'GMT '.(($offsetHours >= 0) ? "+{$offsetHours}" : $offsetHours),
+                            'Location' => $locationName,
+                            'Abbreviation' => $transition['abbr']
                         ])
                     ];
-                } catch (Exception $Ex) {}
+                } catch (Exception $ex) {}
             }
-            ksort($Builder, SORT_NUMERIC);
-            foreach ($Builder as $BuildTimezone) {
-                $Built[$BuildTimezone['Timezone']] = trim($BuildTimezone['Label']);
+            ksort($builder, SORT_NUMERIC);
+            foreach ($builder as $buildTimezone) {
+                $built[$buildTimezone['Timezone']] = trim($buildTimezone['Label']);
             }
         }
 
-        if (is_null($LookupTimezone)) {
-            return $Built;
+        if (is_null($lookupTimezone)) {
+            return $built;
         }
-        return GetValue($LookupTimezone, $Built);
+        return GetValue($lookupTimezone, $built);
     }
 
     /**
      * Delete an event.
      *
-     * @param array|string $Where
-     * @param integer|bool $Limit
-     * @param boolean $ResetData Unused.
+     * @param array|string $where
+     * @param integer|bool $limit
+     * @param boolean $resetData Unused.
      * @return Gdn_DataSet
      */
-    public function delete($Where = '', $Limit = false, $ResetData = false) {
+    public function delete($where = '', $limit = false, $resetData = false) {
         // Get list of matching events
-        $MatchEvents = $this->getWhere($Where,'','',$Limit);
+        $matchEvents = $this->getWhere($where,'','',$limit);
 
         // Delete events
-        $Deleted = parent::delete($Where, $Limit ? ['limit' => $Limit] : []);
+        $deleted = parent::delete($where, $limit ? ['limit' => $limit] : []);
 
         // Clean up UserEvents
-        $EventIDs = [];
-        foreach ($MatchEvents as $Event) {
-            $EventIDs[] = val('EventID', $Event);
+        $eventIDs = [];
+        foreach ($matchEvents as $event) {
+            $eventIDs[] = val('EventID', $event);
         }
-        $this->SQL->delete('UserEvent', ['EventID' => $EventIDs]);
+        $this->SQL->delete('UserEvent', ['EventID' => $eventIDs]);
 
-        return $Deleted;
+        return $deleted;
     }
 
 }

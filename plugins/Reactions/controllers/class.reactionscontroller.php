@@ -42,18 +42,18 @@ class ReactionsController extends DashboardController {
     /**
      * Get a reaction.
      *
-     * @param string $UrlCode
+     * @param string $urlCode
      * @throws
      */
-    public function get($UrlCode) {
+    public function get($urlCode) {
         $this->permission('Garden.Community.Manage');
 
-        $Reaction = ReactionModel::reactionTypes($UrlCode);
-        if (!$Reaction) {
+        $reaction = ReactionModel::reactionTypes($urlCode);
+        if (!$reaction) {
             throw NotFoundException('reaction');
         }
 
-        $this->setData('Reaction', $Reaction);
+        $this->setData('Reaction', $reaction);
         $this->render('blank', 'utility', 'dashboard');
     }
 
@@ -118,20 +118,20 @@ class ReactionsController extends DashboardController {
     /**
      * List users who reacted.
      *
-     * @param $Type
-     * @param $ID
-     * @param $Reaction
-     * @param null $Page
+     * @param $type
+     * @param $iD
+     * @param $reaction
+     * @param null $page
      * @throws Exception
      */
-    public function users($Type, $ID, $Reaction, $Page = null) {
+    public function users($type, $iD, $reaction, $page = null) {
         if (!c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT)) {
             throw PermissionException();
         }
 
-        $ReactionModel = new ReactionModel();
-        list($Offset, $Limit) = OffsetLimit($Page, 10);
-        $this->setData('Users', $ReactionModel->getUsers($Type, $ID, $Reaction, $Offset, $Limit));
+        $reactionModel = new ReactionModel();
+        list($offset, $limit) = OffsetLimit($page, 10);
+        $this->setData('Users', $reactionModel->getUsers($type, $iD, $reaction, $offset, $limit));
         $this->render('', 'reactions', 'plugins/Reactions');
     }
 
@@ -145,28 +145,28 @@ class ReactionsController extends DashboardController {
      *  Class
      *  Points
      *
-     * @param string $UrlCode
+     * @param string $urlCode
      * @throws type
      */
-    public function edit($UrlCode) {
+    public function edit($urlCode) {
         $this->permission('Garden.Community.Manage');
         $this->title('Edit Reaction');
         $this->addSideMenu('reactions');
 
-        $Reaction = ReactionModel::reactionTypes($UrlCode);
-        if (!$Reaction) {
+        $reaction = ReactionModel::reactionTypes($urlCode);
+        if (!$reaction) {
             throw NotFoundException('reaction');
         }
 
-        $this->setData('Reaction', $Reaction);
+        $this->setData('Reaction', $reaction);
 
         $reactionModel = new ReactionModel();
         $this->Form->setModel($reactionModel);
-        $this->Form->setData($Reaction);
+        $this->Form->setData($reaction);
 
         if ($this->Form->authenticatedPostBack()) {
 
-            $this->Form->setFormValue('UrlCode', $UrlCode);
+            $this->Form->setFormValue('UrlCode', $urlCode);
             $formPostValues = $this->Form->formValues();
 
             // This is an edit. Let's flag the reaction as custom if the above fields are modified.
@@ -174,7 +174,7 @@ class ReactionsController extends DashboardController {
             $diff = false;
             $toCheckForDiff = ['Name', 'Description', 'Class', 'Points'];
             foreach($toCheckForDiff as $field) {
-                if ($Reaction[$field] !== val($field, $formPostValues)) {
+                if ($reaction[$field] !== val($field, $formPostValues)) {
                     $diff = true;
                     break;
                 }
@@ -185,8 +185,8 @@ class ReactionsController extends DashboardController {
             }
 
             if ($this->Form->save() !== false) {
-                $Reaction = ReactionModel::reactionTypes($UrlCode);
-                $this->setData('Reaction', $Reaction);
+                $reaction = ReactionModel::reactionTypes($urlCode);
+                $this->setData('Reaction', $reaction);
 
                 $this->informMessage(t('Reaction saved.'));
                 if ($this->_DeliveryType !== DELIVERY_TYPE_ALL) {
@@ -203,27 +203,27 @@ class ReactionsController extends DashboardController {
     /**
      * Generate the reaction logs.
      *
-     * @param $Type
-     * @param $ID
+     * @param $type
+     * @param $iD
      * @throws Exception
      */
-    public function log($Type, $ID) {
+    public function log($type, $iD) {
         $this->permission(['Garden.Moderation.Manage', 'Moderation.Reactions.Edit'], false);
-        $Type = ucfirst($Type);
+        $type = ucfirst($type);
 
-        $ReactionModel = new ReactionModel();
-        list($Row, $Model) = $ReactionModel->getRow($Type, $ID);
-        if (!$Row) {
-            throw NotFoundException(ucfirst($Type));
+        $reactionModel = new ReactionModel();
+        list($row, $model) = $reactionModel->getRow($type, $iD);
+        if (!$row) {
+            throw NotFoundException(ucfirst($type));
         }
 
-        $ReactionModel->joinUserTags($Row, $Type);
-        touchValue('UserTags', $Row, []);
-        Gdn::userModel()->joinUsers($Row['UserTags'], ['UserID']);
+        $reactionModel->joinUserTags($row, $type);
+        touchValue('UserTags', $row, []);
+        Gdn::userModel()->joinUsers($row['UserTags'], ['UserID']);
 
-        $this->Data = $Row;
-        $this->setData('RecordType', $Type);
-        $this->setData('RecordID', $ID);
+        $this->Data = $row;
+        $this->setData('RecordType', $type);
+        $this->setData('RecordID', $iD);
 
         $this->render('log', 'reactions', 'plugins/Reactions');
     }
@@ -231,20 +231,20 @@ class ReactionsController extends DashboardController {
     /**
      *
      *
-     * @param bool $Day
+     * @param bool $day
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function recalculateRecordCache($Day = false) {
+    public function recalculateRecordCache($day = false) {
         $this->permission('Garden.Settings.Manage');
 
         if (!$this->Request->isAuthenticatedPostBack(true)) {
             throw ForbiddenException('GET');
         }
 
-        $ReactionModel = new ReactionModel();
-        $Count = $ReactionModel->recalculateRecordCache($Day);
-        $this->setData('Count', $Count);
+        $reactionModel = new ReactionModel();
+        $count = $reactionModel->recalculateRecordCache($day);
+        $this->setData('Count', $count);
         $this->setData('Success', true);
         $this->render();
     }

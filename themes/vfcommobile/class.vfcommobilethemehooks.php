@@ -21,9 +21,9 @@ class VFComMobileThemeHooks implements Gdn_IPlugin {
    /**
     * Remove plugins that are not mobile friendly!
     */
-   public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($Sender) {
+   public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($sender) {
       // Remove plugins so they don't mess up layout or functionality.
-      if (in_array($Sender->Application(), ['vanilla', 'conversations']) || ($Sender->Application() == 'dashboard' && in_array($Sender->Controller(), ['Activity', 'Profile', 'Search']))) {
+      if (in_array($sender->Application(), ['vanilla', 'conversations']) || ($sender->Application() == 'dashboard' && in_array($sender->Controller(), ['Activity', 'Profile', 'Search']))) {
          Gdn::PluginManager()->RemoveMobileUnfriendlyPlugins();
       }
       SaveToConfig('Garden.Format.EmbedSize', '240x135', FALSE);
@@ -32,11 +32,11 @@ class VFComMobileThemeHooks implements Gdn_IPlugin {
    /**
     * Add mobile meta info. Add script to hide iphone browser bar on pageload.
     */
-   public function Base_Render_Before($Sender) {
-      if (IsMobile() && is_object($Sender->Head)) {
-         $Sender->Head->AddTag('meta', ['name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"]);
+   public function Base_Render_Before($sender) {
+      if (IsMobile() && is_object($sender->Head)) {
+         $sender->Head->AddTag('meta', ['name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"]);
          
-         $Sender->Head->AddString('<script type="text/javascript">
+         $sender->Head->AddString('<script type="text/javascript">
 // If not looking for a specific comment, hide the address bar in iphone
 var hash = window.location.href.split("#")[1];
 if (typeof(hash) == "undefined") {

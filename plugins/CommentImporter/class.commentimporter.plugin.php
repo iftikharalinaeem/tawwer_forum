@@ -8,48 +8,48 @@ class CommentImporterPlugin extends Gdn_Plugin {
     /**
      * Add menu item.
      */
-    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-        $Menu = $Sender->EventArguments['SideMenu'];
-        $Menu->AddLink('Import', T('Import Comments'), '/import/comments', 'Garden.Settings.Manage');
+    public function Base_GetAppSettingsMenuItems_Handler($sender) {
+        $menu = $sender->EventArguments['SideMenu'];
+        $menu->AddLink('Import', T('Import Comments'), '/import/comments', 'Garden.Settings.Manage');
     }
 
     /**
      *
-     * @param Gdn_Controller $Sender
-     * @param string $Type
+     * @param Gdn_Controller $sender
+     * @param string $type
      */
-    public function ImportController_Comments_Create($Sender) {
-        $Sender->Permission('Garden.Settings.Manage');
+    public function ImportController_Comments_Create($sender) {
+        $sender->Permission('Garden.Settings.Manage');
 
-        $AllowedTypes = ['wordpres' => T('Wordpress'), 'disqus' => T('Disqus')];
-        $Form = new Gdn_Form();
-        $Form->InputPrefix = '';
+        $allowedTypes = ['wordpres' => T('Wordpress'), 'disqus' => T('Disqus')];
+        $form = new Gdn_Form();
+        $form->InputPrefix = '';
 
-        $Sender->Form = $Form;
+        $sender->Form = $form;
 
-        if ($Sender->Form->IsPostBack()) {
+        if ($sender->Form->IsPostBack()) {
             // Validate the form.
-            $Type = $Form->GetFormValue('Type');
-            if (isset($AllowedTypes[$Type])) {
-                $Form->AddError(T("Please select an import type."));
+            $type = $form->GetFormValue('Type');
+            if (isset($allowedTypes[$type])) {
+                $form->AddError(T("Please select an import type."));
             }
 
-            $LocalPath = PATH_UPLOADS.'/commentimport/'.md5(microtime());
-            if (!file_exists(dirname($LocalPath)))
-            mkdir(dirname($LocalPath), 0777, TRUE);
+            $localPath = PATH_UPLOADS.'/commentimport/'.md5(microtime());
+            if (!file_exists(dirname($localPath)))
+            mkdir(dirname($localPath), 0777, TRUE);
 
-            if ($Form->GetFormValue('IsUpload')) {
+            if ($form->GetFormValue('IsUpload')) {
                 // Save the uploaded file into the temporary folder.
 
             } else {
                 // Grab a copy of the file.
-                if (!($FileUrl = $Form->GetFormValue('FileUrl'))) {
-                    $Form->AddError(T("Please specify the url of your comments file."));
+                if (!($fileUrl = $form->GetFormValue('FileUrl'))) {
+                    $form->AddError(T("Please specify the url of your comments file."));
                 } else {
-                    if (!preg_match('`^https?:///`', $FileUrl)) {
-                        $Form->AddError(T('We only accept urls that begin with http:// or https://'));
+                    if (!preg_match('`^https?:///`', $fileUrl)) {
+                        $form->AddError(T('We only accept urls that begin with http:// or https://'));
                     } else {
-                        copy($FileUrl, $LocalPath);
+                        copy($fileUrl, $localPath);
                     }
                 }
             }
@@ -80,18 +80,18 @@ class CommentImporterPlugin extends Gdn_Plugin {
                 };
             $increaseMaxExecutionTime(60 * 30);
 
-            $Model = new WordpressImportModel();
-            $Model->Path = '/www/techwhirl2/uploads/techwhirl.wordpress.xml';
-            $Model->Import();
+            $model = new WordpressImportModel();
+            $model->Path = '/www/techwhirl2/uploads/techwhirl.wordpress.xml';
+            $model->Import();
             die('Done');
 
-            $Form->SetValue('Type', 'wordpress');
-            $Sender->View = 'ImportForm';
+            $form->SetValue('Type', 'wordpress');
+            $sender->View = 'ImportForm';
         }
 
-        $Sender->SetData('AllowedTypes', $AllowedTypes);
-        $Sender->SetData('Title', T('Import Comments'));
-        $Sender->AddSideMenu();
-        $Sender->Render('', '', 'plugins/CommentImporter');
+        $sender->SetData('AllowedTypes', $allowedTypes);
+        $sender->SetData('Title', T('Import Comments'));
+        $sender->AddSideMenu();
+        $sender->Render('', '', 'plugins/CommentImporter');
     }
 }

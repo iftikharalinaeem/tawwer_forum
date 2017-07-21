@@ -19,11 +19,11 @@ class NewEventModule extends Gdn_Module {
      */
     public function ToString() {
         if (!$this->GroupID) {
-            $GroupID = Gdn::controller()->data('Group.GroupID');
+            $groupID = Gdn::controller()->data('Group.GroupID');
         }
 
-        if (groupPermission('Member', $GroupID)) {
-            return ' '.anchor(t('New Event'), "/event/add/{$GroupID}", 'Button Primary Group-NewEventButton').' ';
+        if (groupPermission('Member', $groupID)) {
+            return ' '.anchor(t('New Event'), "/event/add/{$groupID}", 'Button Primary Group-NewEventButton').' ';
         }
         return '';
     }

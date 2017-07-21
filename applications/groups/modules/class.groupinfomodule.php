@@ -45,23 +45,23 @@ class GroupInfoModule extends Gdn_Module {
      */
     public function writeGroupInfo() {
         $c = Gdn::controller();
-        $Owner = Gdn::userModel()->getID($c->data('Group.InsertUserID'));
-        $Info = [
+        $owner = Gdn::userModel()->getID($c->data('Group.InsertUserID'));
+        $info = [
             'Created' => Gdn_Format::date($c->data('Group.DateInserted'), 'html'),
-            'Owner' => UserAnchor($Owner),
+            'Owner' => UserAnchor($owner),
             'Member Count' => ['Members', $c->data('Group.CountMembers')]
         ];
         echo '<dl class="Group-Info">';
-        foreach ($Info as $Code => $Row) {
-            if (is_array($Row)) {
-                $Label = t($Code, $Row[0]);
-                $Value = $Row[1];
+        foreach ($info as $code => $row) {
+            if (is_array($row)) {
+                $label = t($code, $row[0]);
+                $value = $row[1];
             } else {
-                $Label = t($Code);
-                $Value = $Row;
+                $label = t($code);
+                $value = $row;
             }
-            echo '<dt>'.$Label.'</dt>';
-            echo '<dd>'.$Value.'</dd>';
+            echo '<dt>'.$label.'</dt>';
+            echo '<dd>'.$value.'</dd>';
         }
         echo '</dl>';
      }

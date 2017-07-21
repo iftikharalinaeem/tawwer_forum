@@ -11,9 +11,9 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
 */    
     
    // Save various steps, and render the getting started message.
-   public function SettingsController_Render_Before($Sender) {
+   public function SettingsController_Render_Before($sender) {
       // Save the action if editing registration settings
-      if (strtolower($Sender->RequestMethod) != 'index')
+      if (strtolower($sender->RequestMethod) != 'index')
          $this->SaveStep('Plugins.GettingStartedHosting.Dashboard');
 
       // Save the action if they reviewed plugins
@@ -21,14 +21,14 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
       //    $this->SaveStep('Plugins.GettingStarted.Plugins');
 
       // Save the action if they reviewed plugins
-      if (strcasecmp($Sender->RequestMethod, 'managecategories') == 0)
+      if (strcasecmp($sender->RequestMethod, 'managecategories') == 0)
          $this->SaveStep('Plugins.GettingStartedHosting.Categories');
 
       // Add messages & their css on dashboard
-      if (strcasecmp($Sender->RequestMethod, 'index') == 0) {
-         $Session = Gdn::Session();
-         $WelcomeMessage = '<div class="GettingStartedHosting">'
-            .Anchor('×', '/plugin/dismissgettingstarted/'.$Session->TransientKey(), 'Dismiss')
+      if (strcasecmp($sender->RequestMethod, 'index') == 0) {
+         $session = Gdn::Session();
+         $welcomeMessage = '<div class="GettingStartedHosting">'
+            .Anchor('×', '/plugin/dismissgettingstarted/'.$session->TransientKey(), 'Dismiss')
    ."<h1>Tips on how to get started</h1>"
    .'<ul>
       <li class="One'.(C('Plugins.GettingStartedHosting.Dashboard', '0') == '1' ? ' Done' : '').'">
@@ -71,15 +71,15 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
       </li>
    </ul>
 </div>';
-         $Sender->AddAsset('Messages', $WelcomeMessage, 'WelcomeMessage');
+         $sender->AddAsset('Messages', $welcomeMessage, 'WelcomeMessage');
       }
    }
    
    // Record when the various actions are taken
    // 1. If the user edits the registration settings
-   public function SaveStep($Step) {
-      if (Gdn::Config($Step, '') != '1')
-         SaveToConfig($Step, '1');
+   public function SaveStep($step) {
+      if (Gdn::Config($step, '') != '1')
+         SaveToConfig($step, '1');
 
       /*
       // If all of the steps are now completed, disable this plugin
@@ -96,24 +96,24 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
    }
    
    // If the user posts back any forms to their profile, they've completed step 4: profile customization
-   public function ProfileController_Render_Before($Sender) {
-      if (property_exists($Sender, 'Form') && $Sender->Form->AuthenticatedPostBack() === TRUE)
+   public function ProfileController_Render_Before($sender) {
+      if (property_exists($sender, 'Form') && $sender->Form->AuthenticatedPostBack() === TRUE)
          $this->SaveStep('Plugins.GettingStartedHosting.Profile');
    }
 
    // If the user starts a discussion
-   public function PostController_Render_Before($Sender) {
-      if (strcasecmp($Sender->RequestMethod, 'discussion') == 0 && $Sender->Form->AuthenticatedPostBack() === TRUE)
+   public function PostController_Render_Before($sender) {
+      if (strcasecmp($sender->RequestMethod, 'discussion') == 0 && $sender->Form->AuthenticatedPostBack() === TRUE)
          $this->SaveStep('Plugins.GettingStartedHosting.Discussion');
    }
 
-   public function DiscussionsController_Render_Before($Sender) {
+   public function DiscussionsController_Render_Before($sender) {
       $this->SaveStep('Plugins.GettingStartedHosting.Discussions');
    }
    
-   public function PluginController_DismissGettingStarted_Create($Sender) {
-      $PluginManager = Gdn::Factory('PluginManager');
-      $PluginManager->DisablePlugin('GettingStartedHosting');
+   public function PluginController_DismissGettingStarted_Create($sender) {
+      $pluginManager = Gdn::Factory('PluginManager');
+      $pluginManager->DisablePlugin('GettingStartedHosting');
       echo 'TRUE';
    }
    

@@ -15,58 +15,58 @@ class RoleProtectPlugin extends Gdn_Plugin {
    protected $ProtectedRoles;
 
    public function __construct() {
-      $RoleModel = new RoleModel();
-      $this->Roles = $RoleModel->GetArray();
-      $RoleModel = NULL;
+      $roleModel = new RoleModel();
+      $this->Roles = $roleModel->GetArray();
+      $roleModel = NULL;
    }
 
-   public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender) {
+   public function Gdn_Dispatcher_BeforeDispatch_Handler($sender) {
 
       // Roles the logged-in user can modify
-      $EditableRoleData = $this->EditableRoles = [];
+      $editableRoleData = $this->EditableRoles = [];
 
       // Roles that, if present in the target user, protect him from  being edited
-      $ProtectedRoleData = $this->ProtectedRoles = [];
+      $protectedRoleData = $this->ProtectedRoles = [];
 
       if (!Gdn::Session()->IsValid()) return;
 
       // Loop over the logged-in user's roles
-      $MyRoleData = Gdn::UserModel()->GetRoles(Gdn::Session()->UserID)->Result();
-      $RoleIDs = array_column($MyRoleData, 'RoleID');
-      $RoleNames = array_column($MyRoleData, 'Name');
-      $MyRoles = ArrayCombine($RoleIDs, $RoleNames);
-      foreach ($MyRoles as $RoleID => $RoleName) {
-         $EditableRolesList = C("Plugins.RoleProtect.{$RoleID}.CanAffect", NULL);
-         if (!is_null($EditableRolesList)) {
-            $EditableRolesList = explode(',', $EditableRolesList);
-            if (is_array($EditableRolesList) && sizeof($EditableRolesList))
-               $EditableRoleData = array_merge($EditableRoleData, $EditableRolesList);
+      $myRoleData = Gdn::UserModel()->GetRoles(Gdn::Session()->UserID)->Result();
+      $roleIDs = array_column($myRoleData, 'RoleID');
+      $roleNames = array_column($myRoleData, 'Name');
+      $myRoles = ArrayCombine($roleIDs, $roleNames);
+      foreach ($myRoles as $roleID => $roleName) {
+         $editableRolesList = C("Plugins.RoleProtect.{$roleID}.CanAffect", NULL);
+         if (!is_null($editableRolesList)) {
+            $editableRolesList = explode(',', $editableRolesList);
+            if (is_array($editableRolesList) && sizeof($editableRolesList))
+               $editableRoleData = array_merge($editableRoleData, $editableRolesList);
          }
 
-         $ProtectedRolesList = C("Plugins.RoleProtect.{$RoleID}.Protected", NULL);
-         if (!is_null($ProtectedRolesList)) {
-            $ProtectedRolesList = explode(',', $ProtectedRolesList);
-            if (is_array($ProtectedRolesList) && sizeof($ProtectedRolesList))
-               $ProtectedRoleData = array_merge($ProtectedRoleData, $ProtectedRolesList);
+         $protectedRolesList = C("Plugins.RoleProtect.{$roleID}.Protected", NULL);
+         if (!is_null($protectedRolesList)) {
+            $protectedRolesList = explode(',', $protectedRolesList);
+            if (is_array($protectedRolesList) && sizeof($protectedRolesList))
+               $protectedRoleData = array_merge($protectedRoleData, $protectedRolesList);
          }
       }
 
       // Format EditableRoleData into a nice ASSOC array
-      $EditableRoleData = array_flip($EditableRoleData);
-      $EditableRoles = [];
-      foreach ($EditableRoleData as $EditableRoleID => $Trash)
-         $EditableRoles[$EditableRoleID] = GetValue($EditableRoleID, $this->Roles);
-      $this->EditableRoles = $EditableRoles;
+      $editableRoleData = array_flip($editableRoleData);
+      $editableRoles = [];
+      foreach ($editableRoleData as $editableRoleID => $trash)
+         $editableRoles[$editableRoleID] = GetValue($editableRoleID, $this->Roles);
+      $this->EditableRoles = $editableRoles;
 
       // Format ProtectedRoleData into a nice ASSOC array
-      $ProtectedRoleData = array_flip($ProtectedRoleData);
-      $ProtectedRoles = [];
-      foreach ($ProtectedRoleData as $ProtectedRoleID => $Trash)
-         $ProtectedRoles[$ProtectedRoleID] = GetValue($ProtectedRoleID, $this->Role);
-      $this->ProtectedRoles = $ProtectedRoles;
+      $protectedRoleData = array_flip($protectedRoleData);
+      $protectedRoles = [];
+      foreach ($protectedRoleData as $protectedRoleID => $trash)
+         $protectedRoles[$protectedRoleID] = GetValue($protectedRoleID, $this->Role);
+      $this->ProtectedRoles = $protectedRoles;
    }
 
-   public function UserController_BeforeUserAdd_Handler($Sender) {
+   public function UserController_BeforeUserAdd_Handler($sender) {
 
       // If this user is here, they have Account Edit. If they also haver 'Moderator'
       // then we have to take special care, otherwise just proceed as normal without
@@ -78,10 +78,10 @@ class RoleProtectPlugin extends Gdn_Plugin {
       if (!sizeof($this->EditableRoles)) return;
 
       // We might only have a subset of roles available. Apply that subset
-      $Sender->EventArguments['RoleData'] = $this->EditableRoles;
+      $sender->EventArguments['RoleData'] = $this->EditableRoles;
    }
 
-   public function UserController_BeforeUserEdit_Handler($Sender) {
+   public function UserController_BeforeUserEdit_Handler($sender) {
 
       // If this user is here, they have Account Edit. If they also haver 'Moderator'
       // then we have to take special care, otherwise just proceed as normal without
@@ -93,9 +93,9 @@ class RoleProtectPlugin extends Gdn_Plugin {
       if (!sizeof($this->EditableRoles) && !sizeof($this->ProtectedRoles)) return;
 
       // Get all the roles of the user we're trying to edit
-      $TheirRoles = $Sender->EventArguments['UserRoleData'];
-      foreach ($TheirRoles as $TheirRoleID => $TheirRoleName) {
-         if (array_key_exists($TheirRoleID, $this->ProtectedRoles)) {
+      $theirRoles = $sender->EventArguments['UserRoleData'];
+      foreach ($theirRoles as $theirRoleID => $theirRoleName) {
+         if (array_key_exists($theirRoleID, $this->ProtectedRoles)) {
             // Short circuit rendering, we can't edit this person
             throw new Exception("You do not have permission to edit this user.");
          }
@@ -104,10 +104,10 @@ class RoleProtectPlugin extends Gdn_Plugin {
       // If we get here, we're not prevented from modifying this user, but we might
       // still only have a subset of their roles. Apply that subset
 
-      $Sender->EventArguments['RoleData'] = $this->EditableRoles;
+      $sender->EventArguments['RoleData'] = $this->EditableRoles;
    }
 
-   public function UserController_BeforeUserDelete_Handler($Sender) {
+   public function UserController_BeforeUserDelete_Handler($sender) {
 
       // If this user is here, they have Account Edit. If they also haver 'Moderator'
       // then we have to take special care, otherwise just proceed as normal without
@@ -119,9 +119,9 @@ class RoleProtectPlugin extends Gdn_Plugin {
       if (!sizeof($this->ProtectedRoles)) return;
 
       // Get all the roles of the user we're trying to edit
-      $TheirRoles = $Sender->EventArguments['UserRoleData'];
-      foreach ($TheirRoles as $TheirRoleID => $TheirRoleName) {
-         if (array_key_exists($TheirRoleID, $this->ProtectedRoles)) {
+      $theirRoles = $sender->EventArguments['UserRoleData'];
+      foreach ($theirRoles as $theirRoleID => $theirRoleName) {
+         if (array_key_exists($theirRoleID, $this->ProtectedRoles)) {
             // Short circuit rendering, we can't edit this person
             throw new Exception("You do not have permission to delete this user.");
          }
@@ -129,16 +129,16 @@ class RoleProtectPlugin extends Gdn_Plugin {
 
    }
 
-   public function CheckRolePermission($TargetUserID) {
+   public function CheckRolePermission($targetUserID) {
 
       // Get all the roles of the user we're trying to edit
-      $TheirRoleData = Gdn::UserModel()->GetRoles($TargetUserID)->Result();
-      $TheirRoleIDs = array_column($TheirRoleData, 'RoleID');
-      $TheirRoleNames = array_column($TheirRoleData, 'Name');
-      $TheirRoles = ArrayCombine($TheirRoleIDs, $TheirRoleNames);
+      $theirRoleData = Gdn::UserModel()->GetRoles($targetUserID)->Result();
+      $theirRoleIDs = array_column($theirRoleData, 'RoleID');
+      $theirRoleNames = array_column($theirRoleData, 'Name');
+      $theirRoles = ArrayCombine($theirRoleIDs, $theirRoleNames);
 
-      foreach ($TheirRoles as $TheirRoleID => $TheirRoleName) {
-         if (array_key_exists($TheirRoleID, $this->ProtectedRoles)) {
+      foreach ($theirRoles as $theirRoleID => $theirRoleName) {
+         if (array_key_exists($theirRoleID, $this->ProtectedRoles)) {
             // Short circuit rendering, we can't edit this person
             return FALSE;
          }

@@ -77,7 +77,7 @@ class vfIntercomioPlugin extends Gdn_Plugin {
         $sender->addDefinition('intercomIO', $intercomio);
     }
 
-    public function settingsController_vfintercomio_create($sender, $Args) {
+    public function settingsController_vfintercomio_create($sender, $args) {
         $sender->Permission('Garden.Settings.Manage');
 
         $cf = new ConfigurationModule($sender);

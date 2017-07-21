@@ -27,13 +27,13 @@ class GroupUserHeaderModule extends Gdn_Module {
      *
      */
     protected function GetData() {
-        $Model = new GroupModel();
+        $model = new GroupModel();
 
         if ($this->GroupID) {
-            $this->SetData('Group', $Model->GetID($this->GroupID));
+            $this->SetData('Group', $model->GetID($this->GroupID));
 
-            $Rows = $Model->GetApplicants($this->GroupID, ['UserID' => $this->UserID]);
-            $this->SetData('Application', array_pop($Rows));
+            $rows = $model->GetApplicants($this->GroupID, ['UserID' => $this->UserID]);
+            $this->SetData('Application', array_pop($rows));
         }
     }
 

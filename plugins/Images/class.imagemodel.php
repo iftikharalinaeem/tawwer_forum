@@ -39,100 +39,100 @@ class ImageModel extends Gdn_Model {
    
    /**
     * Inserts new image(s) and returns the discussion id. If no DiscussionID is
-    * present in $FormPostValues, it will create a new discussion, using the 
+    * present in $formPostValues, it will create a new discussion, using the 
     * first image as the content. Subsequent images will be treated as comments.
     * If DiscussionID is present, it will just create a new comment within that
     * discussion for each image.
     * 
-    * @var array $FormPostValues The values posted by the form for saving.
-    * @var array $CommentIDs Array of comment id's created by the save (available by reference).
+    * @var array $formPostValues The values posted by the form for saving.
+    * @var array $commentIDs Array of comment id's created by the save (available by reference).
     */
-   public function Save($FormPostValues, $Settings = FALSE) {
+   public function Save($formPostValues, $settings = FALSE) {
       // Loop through all of the incoming values and validate them      
-      $FormPostValues = $this->FilterForm($FormPostValues);
-      $FormPostValues['Type'] = 'image'; // Force the "image" discussion type.
+      $formPostValues = $this->FilterForm($formPostValues);
+      $formPostValues['Type'] = 'image'; // Force the "image" discussion type.
       
       
-      $DiscussionID = GetValue('DiscussionID', $FormPostValues);
-      $Image = GetValue('Image', $FormPostValues);
-      $Thumbnail = GetValue('Thumbnail', $FormPostValues);
-      $Caption = GetValue('Caption', $FormPostValues);
-      $Size = GetValue('Size', $FormPostValues);
-      $Images = [];
-      foreach ($Image as $Key => $Val) {
-         $Capt = trim($Caption[$Key]);
-         $Images[] = [
-             'Image' => $Val, 
-             'Thumbnail' => $Thumbnail[$Key], 
-             'Caption' => $Capt, 
-             'Size' => $Size[$Key]
+      $discussionID = GetValue('DiscussionID', $formPostValues);
+      $image = GetValue('Image', $formPostValues);
+      $thumbnail = GetValue('Thumbnail', $formPostValues);
+      $caption = GetValue('Caption', $formPostValues);
+      $size = GetValue('Size', $formPostValues);
+      $images = [];
+      foreach ($image as $key => $val) {
+         $capt = trim($caption[$key]);
+         $images[] = [
+             'Image' => $val, 
+             'Thumbnail' => $thumbnail[$key], 
+             'Caption' => $capt, 
+             'Size' => $size[$key]
          ];
       }
       
-      if (count($Images) == 0)
+      if (count($images) == 0)
          $this->Validation->AddValidationResult('Image', 'You must provide at least one image.');
       
       if (count($this->Validation->Results()) > 0)
          return 0;
       
       // We need to space the post time of the comments out so the caching won't break.
-      $Timestamp = time();
+      $timestamp = time();
 
-      if (!$DiscussionID) {
-         $Image = array_shift($Images);
-         $SerializedImage = dbencode($Image);
+      if (!$discussionID) {
+         $image = array_shift($images);
+         $serializedImage = dbencode($image);
          // Build the discussion data to be saved
-         $DiscussionFormValues = [
+         $discussionFormValues = [
              'Type' => 'Image',
              'Format' => 'Image',
-             'CategoryID' => GetValue('CategoryID', $FormPostValues),
-             'Name' => GetValue('Name', $FormPostValues),
-             'Body' => Gdn_Format::Image($SerializedImage),
-             'Attributes' => $SerializedImage
+             'CategoryID' => GetValue('CategoryID', $formPostValues),
+             'Name' => GetValue('Name', $formPostValues),
+             'Body' => Gdn_Format::Image($serializedImage),
+             'Attributes' => $serializedImage
          ];
 
          // Save the discussion
-         $DiscussionModel = new DiscussionModel();
-         $DiscussionID = $DiscussionModel->Save($DiscussionFormValues);
-         $ValidationResults = $DiscussionModel->Validation->Results();
-         $this->Validation->AddValidationResult($ValidationResults);
+         $discussionModel = new DiscussionModel();
+         $discussionID = $discussionModel->Save($discussionFormValues);
+         $validationResults = $discussionModel->Validation->Results();
+         $this->Validation->AddValidationResult($validationResults);
          if (count($this->Validation->Results()) > 0)
             return 0;
       }
 
       // Build & save the comments (if there is more than one image being uploaded)
-      $CommentIDs = [];
-      for($i = 0; $i < count($Images); $i++) {
-         $Image = $Images[$i];
-         $Image['DiscussionID'] = $DiscussionID;
-         $CommentID = $this->SaveComment($Image);
-         $CommentIDs[] = $CommentID;
+      $commentIDs = [];
+      for($i = 0; $i < count($images); $i++) {
+         $image = $images[$i];
+         $image['DiscussionID'] = $discussionID;
+         $commentID = $this->SaveComment($image);
+         $commentIDs[] = $commentID;
       }
-      $this->CommentIDs = $CommentIDs;
+      $this->CommentIDs = $commentIDs;
          
       // Return the discussion id
-      return $DiscussionID;
+      return $discussionID;
    }
    
-   public function SaveComment($Image, &$Timestamp = NULL) {
-      $CommentModel = $this->CommentModel();
-      if ($Timestamp === NULL)
-         $Timestamp = time();
+   public function SaveComment($image, &$timestamp = NULL) {
+      $commentModel = $this->CommentModel();
+      if ($timestamp === NULL)
+         $timestamp = time();
       
-      $S = dbencode($Image);
-      $Row = [
+      $s = dbencode($image);
+      $row = [
             'Type' => 'Image',
             'Format' => 'Image',
-            'DiscussionID' => $Image['DiscussionID'],
-            'Body' => Gdn_Format::Image($Image),
-            'DateInserted' => Gdn_Format::ToDateTime($Timestamp++),
-            'Attributes' => $S
+            'DiscussionID' => $image['DiscussionID'],
+            'Body' => Gdn_Format::Image($image),
+            'DateInserted' => Gdn_Format::ToDateTime($timestamp++),
+            'Attributes' => $s
         ];
       
-      $CommentID = $CommentModel->Save($Row);
-      $ValidationResults = $CommentModel->Validation->Results();
-      $this->Validation->AddValidationResult($ValidationResults);
+      $commentID = $commentModel->Save($row);
+      $validationResults = $commentModel->Validation->Results();
+      $this->Validation->AddValidationResult($validationResults);
       
-      return $CommentID;
+      return $commentID;
    }
 }

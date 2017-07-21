@@ -35,7 +35,7 @@ class Pega {
 
    public $DashboardConnection = FALSE;
 
-   public function __construct($AccessToken = FALSE, $InstanceUrl = FALSE) {
+   public function __construct($accessToken = FALSE, $instanceUrl = FALSE) {
 
    }
 
@@ -51,32 +51,32 @@ class Pega {
    }
 
    /**
-    * @param string $Object Case, Contact, Lead
-    * @param string $ObjectID CaseId, ContactID, LeadID
-    * @param bool|array $FullHttpResponse if true will return array with
+    * @param string $object Case, Contact, Lead
+    * @param string $objectID CaseId, ContactID, LeadID
+    * @param bool|array $fullHttpResponse if true will return array with
     *    [ContentType]
     *    [Response]
     *    [HttpCode]
     *    [Headers]
     * @return array All the details returned from Pega
     */
-   public function GetObject($Object, $ObjectID, $FullHttpResponse = FALSE) {
-      $Result = $this->Request($Object . $ObjectID);
+   public function GetObject($object, $objectID, $fullHttpResponse = FALSE) {
+      $result = $this->Request($object . $objectID);
 
-      if ($FullHttpResponse) {
-         return $Result;
+      if ($fullHttpResponse) {
+         return $result;
       }
-      return $Result['Response'];
+      return $result['Response'];
    }
 
 
    /**
-    * @param string $CaseID
+    * @param string $caseID
     * @return array All the details returned from Pega
     */
-    public function GetCase($CaseID) {
-        $Result = $this->GetObject('forum/interaction/get/', $CaseID, TRUE);
-        return $Result;
+    public function GetCase($caseID) {
+        $result = $this->GetObject('forum/interaction/get/', $caseID, TRUE);
+        return $result;
     }
 
    /**
@@ -84,24 +84,24 @@ class Pega {
     *
     * @link http://www.Pega.com/us/developer/docs/api/Content/sforce_api_objects_case.htm
     * @see Pega::ValidateCase
-    * @param array $Case
+    * @param array $case
     * @return string CaseID
     * @throws Gdn_UserException
     */
-    public function CreateCase(array $Case) {
-        if ($this->ValidateCase($Case) === TRUE) {
-            return $this->CreateObject('forum/interaction', $Case);
+    public function CreateCase(array $case) {
+        if ($this->ValidateCase($case) === TRUE) {
+            return $this->CreateObject('forum/interaction', $case);
         }
-        throw new Gdn_UserException('Create Case: Required Fields Missing: ' . print_r($this->ValidateContact($Case)));
+        throw new Gdn_UserException('Create Case: Required Fields Missing: ' . print_r($this->ValidateContact($case)));
     }
 
     /**
-    * @param array $Case
+    * @param array $case
     * @return array|bool True or array of missing required fields
     */
-    public function ValidateCase(array $Case) {
+    public function ValidateCase(array $case) {
         return true;
-        $RequiredFields = [
+        $requiredFields = [
             'ContactId' => TRUE,
             'Status' => TRUE,
             'Origin' => TRUE,
@@ -109,35 +109,35 @@ class Pega {
             'Priority' => TRUE,
             'Description' => TRUE
         ];
-        $MissingFields = array_diff_key($RequiredFields, $Case);
-        if (!empty($MissingFields)) {
-            return $MissingFields;
+        $missingFields = array_diff_key($requiredFields, $case);
+        if (!empty($missingFields)) {
+            return $missingFields;
         }
         return TRUE;
     }
 
     /**
-    * @param $Object
-    * @param array $Fields
+    * @param $object
+    * @param array $fields
     * @return mixed
     * @throws Gdn_UserException
     */
-    public function CreateObject($Object, array $Fields) {
-        $Response = $this->Request($Object . '/', json_encode($Fields));
-        if ($Response['Response']['pzStatus'] == 'valid') {
-            return $Response['Response']['pyID'];
+    public function CreateObject($object, array $fields) {
+        $response = $this->Request($object . '/', json_encode($fields));
+        if ($response['Response']['pzStatus'] == 'valid') {
+            return $response['Response']['pyID'];
         }
-        throw new Gdn_UserException("Response: " . $Response['Response']);
+        throw new Gdn_UserException("Response: " . $response['Response']);
     }
 
    /**
     *
     * Sends Request to the Pegas REST API
     *
-    * @param $Path
-    * @param bool|array $Post false or array of values to be sent as json POST
-    * @param bool $Cache
-    * @return array $HttpResponse with the following keys
+    * @param $path
+    * @param bool|array $post false or array of values to be sent as json POST
+    * @param bool $cache
+    * @return array $httpResponse with the following keys
     *    [HttpCode] - HTTP Status Code
     *    [Response] - JSON Decoded Values if Content Type == Json
     *    [Header] - HTTP Header
@@ -145,8 +145,8 @@ class Pega {
     * @throws Gdn_UserException
     *
     */
-   public function Request($Path, $Post = FALSE, $Cache = TRUE) {
-      $Url = C("Plugins.Pega.BaseUrl") . '/' . ltrim($Path, '/');
+   public function Request($path, $post = FALSE, $cache = TRUE) {
+      $url = C("Plugins.Pega.BaseUrl") . '/' . ltrim($path, '/');
 
 //      $CacheKey = 'Pega.Request' . md5($Url);
 //       if ($Cache && !$Post) {
@@ -161,15 +161,15 @@ class Pega {
 //         throw new Gdn_UserException("You don't have a valid Pega connection.");
 //      }
 
-      $HttpResponse = $this->HttpRequest($Url, $Post, 'application/json');
-      $ContentType = $HttpResponse['ContentType'];
+      $httpResponse = $this->HttpRequest($url, $post, 'application/json');
+      $contentType = $httpResponse['ContentType'];
 
-      Gdn::Controller()->SetJson('Type', $ContentType);
-      if (strpos($ContentType, 'application/json') !== FALSE) {
-         $HttpResponse['Response'] = json_decode($HttpResponse['Response'], TRUE);
-         if (isset($Result['error'])) {
-            Gdn::Dispatcher()->PassData('PegaResponse', $Result);
-            throw new Gdn_UserException($Result['error']['message']);
+      Gdn::Controller()->SetJson('Type', $contentType);
+      if (strpos($contentType, 'application/json') !== FALSE) {
+         $httpResponse['Response'] = json_decode($httpResponse['Response'], TRUE);
+         if (isset($result['error'])) {
+            Gdn::Dispatcher()->PassData('PegaResponse', $result);
+            throw new Gdn_UserException($result['error']['message']);
          }
       }
 //      if ($Cache && $HttpResponse['HttpCode'] == 200 && !$Post) {
@@ -180,12 +180,12 @@ class Pega {
 //         ));
 //      }
 
-      return $HttpResponse;
+      return $httpResponse;
    }
 
    /**
-    * @param string $Url -
-    * @param bool|array $Post
+    * @param string $url -
+    * @param bool|array $post
     * @param string|bull AccessToken
     * @return array $HttpResponse with the following keys
     *    [HttpCode] - HTTP Status Code
@@ -194,43 +194,43 @@ class Pega {
     *    [ContentType] - HTTP Content Type
     * @throws Exception
     */
-    public function HttpRequest($Url, $Post = FALSE, $RequestContentType = NULL) {
-        $Proxy = new ProxyRequest();
-        $Options['URL'] =  $Url;
-        $Options['Method'] = 'POST';
-        $Options['ConnectTimeout'] = 60;
-        $Options['Timeout'] = 60;
-        $Options['Debug'] = false;
-        $QueryParams = NULL;
-        if (!empty($RequestContentType)) {
-            $Headers['Content-Type'] = $RequestContentType;
+    public function HttpRequest($url, $post = FALSE, $requestContentType = NULL) {
+        $proxy = new ProxyRequest();
+        $options['URL'] =  $url;
+        $options['Method'] = 'POST';
+        $options['ConnectTimeout'] = 60;
+        $options['Timeout'] = 60;
+        $options['Debug'] = false;
+        $queryParams = NULL;
+        if (!empty($requestContentType)) {
+            $headers['Content-Type'] = $requestContentType;
         }
 
-        if ($Post)  {
-            $Options['Method'] = 'POST';
-            $QueryParams = $Post;
+        if ($post)  {
+            $options['Method'] = 'POST';
+            $queryParams = $post;
         }
 
-        $Headers['Authorization'] = 'Basic ' . base64_encode(C('Plugins.Pega.Username') . ":" . C('Plugins.Pega.Password'));
-        $Headers['email'] = 'realsaraconnor@gmail.com';
+        $headers['Authorization'] = 'Basic ' . base64_encode(C('Plugins.Pega.Username') . ":" . C('Plugins.Pega.Password'));
+        $headers['email'] = 'realsaraconnor@gmail.com';
 
 //        error_log(json_encode($Headers) . "\n", 3, "/Users/patrick/my-errors.log");
 //        error_log(json_encode($QueryParams) . "\n\n", 3, "/Users/patrick/my-errors.log");
 //        error_log(json_encode($Options) . "\n\n\n", 3, "/Users/patrick/my-errors.log");
 
-        $Response = $Proxy->Request(
-            $Options,
-            $QueryParams,
+        $response = $proxy->Request(
+            $options,
+            $queryParams,
             NULL,
-            $Headers
+            $headers
         );
 
-        $FailureCodes = [
+        $failureCodes = [
             500 => TRUE,
         ];
 
-        if (isset($FailureCodes[$Proxy->ResponseStatus])) {
-            throw new Gdn_UserException('HTTP Error communicating with Pega.  Code: ' . $Proxy->ResponseStatus);
+        if (isset($failureCodes[$proxy->ResponseStatus])) {
+            throw new Gdn_UserException('HTTP Error communicating with Pega.  Code: ' . $proxy->ResponseStatus);
         }
 
         /*
@@ -238,20 +238,20 @@ class Pega {
          */
 
 
-        $result = simplexml_load_string ($Response, 'SimpleXmlElement', LIBXML_NOERROR+LIBXML_ERR_FATAL+LIBXML_ERR_NONE);
+        $result = simplexml_load_string ($response, 'SimpleXmlElement', LIBXML_NOERROR+LIBXML_ERR_FATAL+LIBXML_ERR_NONE);
 
         if(false != $result) {
-            $xmlElement = new SimpleXMLElement($Response);
-            $ResponseJSON = json_encode($xmlElement);
-            $ResponseArray = json_decode($ResponseJSON, true);
+            $xmlElement = new SimpleXMLElement($response);
+            $responseJSON = json_encode($xmlElement);
+            $responseArray = json_decode($responseJSON, true);
         }
 
 
         return [
-            'HttpCode' => $Proxy->ResponseStatus,
-            'Header' => $Proxy->RequestHeaders,
-            'Response' => $ResponseArray,
-            'ContentType' => $Proxy->ContentType
+            'HttpCode' => $proxy->ResponseStatus,
+            'Header' => $proxy->RequestHeaders,
+            'Response' => $responseArray,
+            'ContentType' => $proxy->ContentType
         ];
    }
 

@@ -12,10 +12,10 @@ class RequestBadgeModule extends Gdn_Module {
     /**
      * Create our instance of the module.
      *
-     * @param string $Sender
+     * @param string $sender
      */
-    public function __construct($Sender = '') {
-        parent::__construct($Sender, 'plugins/badges');
+    public function __construct($sender = '') {
+        parent::__construct($sender, 'plugins/badges');
     }
 
     /**

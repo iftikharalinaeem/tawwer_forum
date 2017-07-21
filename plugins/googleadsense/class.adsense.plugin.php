@@ -4,13 +4,13 @@ Copyright 2008, 2009 Mark O'Sullivan
 */
 
 class Gdn_AdSensePlugin implements Gdn_IPlugin {
-   public function DiscussionController_Render_Before($Sender) {
+   public function DiscussionController_Render_Before($sender) {
 		// Only serve the ads if we are delvering the entire page.
-		if($Sender->DeliveryType() != DELIVERY_TYPE_ALL)
+		if($sender->DeliveryType() != DELIVERY_TYPE_ALL)
 			return;
 
       // Add skimlinks script at bottom of page.
-		$Sender->AddAsset('Foot', '<script type="text/javascript" src="http://s.skimresources.com/js/7631X665150.skimlinks.js"></script>');
+		$sender->AddAsset('Foot', '<script type="text/javascript" src="http://s.skimresources.com/js/7631X665150.skimlinks.js"></script>');
 
 		// Get the add content.
 		// $Config = Gdn::Config('Plugins.GoogleAdSense', FALSE);

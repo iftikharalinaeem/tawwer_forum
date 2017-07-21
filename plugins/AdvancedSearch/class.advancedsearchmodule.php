@@ -24,7 +24,7 @@ class AdvancedSearchModule extends Gdn_Module {
 
     public $value = null;
 
-    public function __construct($Sender = '', $ApplicationFolder = false) {
+    public function __construct($sender = '', $applicationFolder = false) {
         $this->_ApplicationFolder = 'plugins/AdvancedSearch';
 
         $this->DateWithinOptions = [
@@ -61,21 +61,21 @@ class AdvancedSearchModule extends Gdn_Module {
         }
 
         // We want the advanced search form to populate from the get and have lowercase fields.
-        $Form = $this->Form = new Gdn_Form();
-        $Form->Method = 'get';
-        $Get = array_change_key_case(Gdn::request()->get());
+        $form = $this->Form = new Gdn_Form();
+        $form->Method = 'get';
+        $get = array_change_key_case(Gdn::request()->get());
 
         if ($this->Results) {
-            $Form->formValues($Get);
+            $form->formValues($get);
         } else {
-            if ($this->value !== null && !isset($Get['search'])) {
-                $Form->setFormValue('search', $value);
+            if ($this->value !== null && !isset($get['search'])) {
+                $form->setFormValue('search', $value);
             }
         }
 
         // Add the tags as data.
-        if (isset($Get['tags'])) {
-            $tags = explode(',', $Get['tags']);
+        if (isset($get['tags'])) {
+            $tags = explode(',', $get['tags']);
             $tags = array_filter($tags);
             $tags = Gdn::SQL()->getWhere('Tag', ['Name' => $tags])->resultArray();
             if (count($tags) > 0 && isset($tags[0]['FullName'])) {
@@ -86,14 +86,14 @@ class AdvancedSearchModule extends Gdn_Module {
         // See whether or not to check all of the  types.
         $onechecked = false;
         foreach ($this->Types as $name => $label) {
-            if ($Form->getFormValue($name)) {
+            if ($form->getFormValue($name)) {
                 $onechecked = true;
                 break;
             }
         }
         if (!$onechecked) {
             foreach ($this->Types as $name => $label) {
-                $Form->setFormValue($name, true);
+                $form->setFormValue($name, true);
             }
         }
 

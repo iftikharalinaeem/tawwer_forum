@@ -73,10 +73,10 @@ foreach ($this->data('Badges') as $Badge) :
  * @return string
  */
 function activateBadge($badge, $ajaxString) {
-    $State = ($badge->Active ? 'Active' : 'InActive');
+    $state = ($badge->Active ? 'Active' : 'InActive');
 
     $return = '<span id="badges-toggle">';
-    if ($State === 'Active') {
+    if ($state === 'Active') {
         $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/badge/disable/'.$badge->BadgeID.'/'.$ajaxString), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
     } else {
         $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/badge/disable/'.$badge->BadgeID.'/'.$ajaxString), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);

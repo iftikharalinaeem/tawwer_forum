@@ -2,131 +2,131 @@
 
 if (!function_exists('FormatScore')):
 
-function FormatScore($Score) {
-   return (int)$Score;
+function FormatScore($score) {
+   return (int)$score;
 }
 
 endif;
 
-function OrderByButton($Column, $Label = FALSE, $DefaultOrder = '', $CssClass = '') {
-   $QSParams = $_GET;
-   $QSParams['orderby'] = urlencode($Column);
-   $Url = Gdn::Controller()->SelfUrl.'?'.http_build_query($QSParams);
-   if (!$Label)
-      $Label = T('by '.$Column);
+function OrderByButton($column, $label = FALSE, $defaultOrder = '', $cssClass = '') {
+   $qSParams = $_GET;
+   $qSParams['orderby'] = urlencode($column);
+   $url = Gdn::Controller()->SelfUrl.'?'.http_build_query($qSParams);
+   if (!$label)
+      $label = T('by '.$column);
 
-   $CssClass = ' '.$CssClass;
-   $CurrentColumn = Gdn::Controller()->Data('CommentOrder.Column');
-   if ($Column == $CurrentColumn) {
-      $CssClass .= ' OrderBy-'.ucfirst(Gdn::Controller()->Data('CommentOrder.Direction')).' Selected';
+   $cssClass = ' '.$cssClass;
+   $currentColumn = Gdn::Controller()->Data('CommentOrder.Column');
+   if ($column == $currentColumn) {
+      $cssClass .= ' OrderBy-'.ucfirst(Gdn::Controller()->Data('CommentOrder.Direction')).' Selected';
    }
 
-   return Anchor($Label, $Url, 'FilterButton OrderByButton OrderBy-'.$Column.$CssClass, ['rel' => 'nofollow']);
+   return Anchor($label, $url, 'FilterButton OrderByButton OrderBy-'.$column.$cssClass, ['rel' => 'nofollow']);
 }
 
-function ReactionCount($Row, $UrlCodes) {
-   if ($ID = GetValue('CommentID', $Row)) {
-      $RecordType = 'comment';
-   } elseif ($ID = GetValue('ActivityID', $Row)) {
-      $RecordType = 'activity';
+function ReactionCount($row, $urlCodes) {
+   if ($iD = GetValue('CommentID', $row)) {
+      $recordType = 'comment';
+   } elseif ($iD = GetValue('ActivityID', $row)) {
+      $recordType = 'activity';
    } else {
-      $RecordType = 'discussion';
-      $ID = GetValue('DiscussionID', $Row);
+      $recordType = 'discussion';
+      $iD = GetValue('DiscussionID', $row);
    }
 
-   if ($RecordType == 'activity')
-      $Data = GetValueR('Data.React', $Row, []);
+   if ($recordType == 'activity')
+      $data = GetValueR('Data.React', $row, []);
    else
-      $Data = GetValueR("Attributes.React", $Row, []);
+      $data = GetValueR("Attributes.React", $row, []);
 
-   if (!is_array($Data)) {
+   if (!is_array($data)) {
       return 0;
    }
 
-   $UrlCodes = (array)$UrlCodes;
+   $urlCodes = (array)$urlCodes;
 
-   $Count = 0;
-   foreach ($UrlCodes as $UrlCode) {
-      if (is_array($UrlCode))
-         $Count += GetValue($UrlCode['UrlCode'], $Data, 0);
+   $count = 0;
+   foreach ($urlCodes as $urlCode) {
+      if (is_array($urlCode))
+         $count += GetValue($urlCode['UrlCode'], $data, 0);
       else
-         $Count += GetValue($UrlCode, $Data, 0);
+         $count += GetValue($urlCode, $data, 0);
    }
-   return $Count;
+   return $count;
 }
 
 if (!function_exists('ReactionButton')):
 
-function ReactionButton($Row, $UrlCode, $Options = []) {
-   $ReactionType = ReactionModel::ReactionTypes($UrlCode);
+function ReactionButton($row, $urlCode, $options = []) {
+   $reactionType = ReactionModel::ReactionTypes($urlCode);
 
-   $IsHeading = val('IsHeading', $Options, FALSE);
-   if (!$ReactionType) {
-      $ReactionType = ['UrlCode' => $UrlCode, 'Name' => $UrlCode];
-      $IsHeading = TRUE;
+   $isHeading = val('IsHeading', $options, FALSE);
+   if (!$reactionType) {
+      $reactionType = ['UrlCode' => $urlCode, 'Name' => $urlCode];
+      $isHeading = TRUE;
    }
 
-   if (val('Hidden', $ReactionType)) {
+   if (val('Hidden', $reactionType)) {
        return '';
    }
 
    // Check reaction's permissions
-   if ($PermissionClass = GetValue('Class', $ReactionType)) {
-      if (!Gdn::Session()->CheckPermission('Reactions.'.$PermissionClass.'.Add'))
+   if ($permissionClass = GetValue('Class', $reactionType)) {
+      if (!Gdn::Session()->CheckPermission('Reactions.'.$permissionClass.'.Add'))
          return '';
    }
-   if ($Permission = GetValue('Permission', $ReactionType)) {
-      if (!Gdn::Session()->CheckPermission($Permission))
+   if ($permission = GetValue('Permission', $reactionType)) {
+      if (!Gdn::Session()->CheckPermission($permission))
          return '';
    }
 
-   $Name = $ReactionType['Name'];
-   $Label = T($Name);
-   $SpriteClass = GetValue('SpriteClass', $ReactionType, "React$UrlCode");
+   $name = $reactionType['Name'];
+   $label = T($name);
+   $spriteClass = GetValue('SpriteClass', $reactionType, "React$urlCode");
 
-   if ($ID = GetValue('CommentID', $Row)) {
-      $RecordType = 'comment';
-   } elseif ($ID = GetValue('ActivityID', $Row)) {
-      $RecordType = 'activity';
+   if ($iD = GetValue('CommentID', $row)) {
+      $recordType = 'comment';
+   } elseif ($iD = GetValue('ActivityID', $row)) {
+      $recordType = 'activity';
    } else {
-      $RecordType = 'discussion';
-      $ID = GetValue('DiscussionID', $Row);
+      $recordType = 'discussion';
+      $iD = GetValue('DiscussionID', $row);
    }
 
-   if ($IsHeading) {
-      static $Types = [];
-      if (!isset($Types[$UrlCode]))
-         $Types[$UrlCode] = ReactionModel::GetReactionTypes(['Class' => $UrlCode, 'Active' => 1]);
+   if ($isHeading) {
+      static $types = [];
+      if (!isset($types[$urlCode]))
+         $types[$urlCode] = ReactionModel::GetReactionTypes(['Class' => $urlCode, 'Active' => 1]);
 
-      $Count = ReactionCount($Row, $Types[$UrlCode]);
+      $count = ReactionCount($row, $types[$urlCode]);
    } else {
-      if ($RecordType == 'activity')
-         $Count = GetValueR("Data.React.$UrlCode", $Row, 0);
+      if ($recordType == 'activity')
+         $count = GetValueR("Data.React.$urlCode", $row, 0);
       else
-         $Count = GetValueR("Attributes.React.$UrlCode", $Row, 0);
+         $count = GetValueR("Attributes.React.$urlCode", $row, 0);
    }
-   $CountHtml = '';
-   $LinkClass = "ReactButton-$UrlCode";
-   if ($Count) {
-      $CountHtml = ' <span class="Count">'.$Count.'</span>';
-      $LinkClass .= ' HasCount';
+   $countHtml = '';
+   $linkClass = "ReactButton-$urlCode";
+   if ($count) {
+      $countHtml = ' <span class="Count">'.$count.'</span>';
+      $linkClass .= ' HasCount';
    }
-   $LinkClass = ConcatSep(' ', $LinkClass, GetValue('LinkClass', $Options));
+   $linkClass = ConcatSep(' ', $linkClass, GetValue('LinkClass', $options));
 
-   $UrlCode2 = strtolower($UrlCode);
-   if ($IsHeading) {
-      $Url = '#';
-      $DataAttr = '';
+   $urlCode2 = strtolower($urlCode);
+   if ($isHeading) {
+      $url = '#';
+      $dataAttr = '';
    } else {
-      $Url = Url("/react/$RecordType/$UrlCode2?id=$ID");
-      $DataAttr = "data-reaction=\"$UrlCode2\"";
+      $url = Url("/react/$recordType/$urlCode2?id=$iD");
+      $dataAttr = "data-reaction=\"$urlCode2\"";
    }
 
-   $Result = <<<EOT
-<a class="Hijack ReactButton $LinkClass" href="$Url" title="$Label" $DataAttr rel="nofollow"><span class="ReactSprite $SpriteClass"></span> $CountHtml<span class="ReactLabel">$Label</span></a>
+   $result = <<<EOT
+<a class="Hijack ReactButton $linkClass" href="$url" title="$label" $dataAttr rel="nofollow"><span class="ReactSprite $spriteClass"></span> $countHtml<span class="ReactLabel">$label</span></a>
 EOT;
 
-   return $Result;
+   return $result;
 }
 
 endif;
@@ -134,117 +134,117 @@ endif;
 
 if (!function_exists('ScoreCssClass')):
 
-function ScoreCssClass($Row, $All = FALSE) {
-   $Score = GetValue('Score', $Row);
-   if (!$Score)
-      $Score = 0;
+function ScoreCssClass($row, $all = FALSE) {
+   $score = GetValue('Score', $row);
+   if (!$score)
+      $score = 0;
 
-   $Bury = C('Reactions.BuryValue', -5);
-   $Promote = C('Reactions.PromoteValue', 5);
+   $bury = C('Reactions.BuryValue', -5);
+   $promote = C('Reactions.PromoteValue', 5);
 
-   if ($Score <= $Bury)
-      $Result = $All ? 'Un-Buried' : 'Buried';
-   elseif ($Score >= $Promote)
-      $Result = 'Promoted';
+   if ($score <= $bury)
+      $result = $all ? 'Un-Buried' : 'Buried';
+   elseif ($score >= $promote)
+      $result = 'Promoted';
    else
-      $Result = '';
+      $result = '';
 
-   if ($All)
-      return [$Result, 'Promoted Buried Un-Buried'];
+   if ($all)
+      return [$result, 'Promoted Buried Un-Buried'];
    else
-      return $Result;
+      return $result;
 }
 
 endif;
 
 if (!function_exists('WriteImageItem')):
-   function WriteImageItem($Record, $CssClass = 'Tile ImageWrap') {
-      if (val('CategoryCssClass', $Record)) {
-         $CssClass .= " ".val('CategoryCssClass', $Record);
+   function WriteImageItem($record, $cssClass = 'Tile ImageWrap') {
+      if (val('CategoryCssClass', $record)) {
+         $cssClass .= " ".val('CategoryCssClass', $record);
       }
-      $Attributes = GetValue('Attributes', $Record);
-      if (!is_array($Attributes))
-         $Attributes = dbdecode($Attributes);
+      $attributes = GetValue('Attributes', $record);
+      if (!is_array($attributes))
+         $attributes = dbdecode($attributes);
 
-      $Image = FALSE;
-      if (GetValue('Image', $Attributes)) {
-         $Image = [
-             'Image' => GetValue('Image', $Attributes),
-             'Thumbnail' => GetValue('Thumbnail', $Attributes, ''),
-             'Caption' => GetValue('Caption', $Attributes, ''),
-             'Size' => GetValue('Size', $Attributes, '')
+      $image = FALSE;
+      if (GetValue('Image', $attributes)) {
+         $image = [
+             'Image' => GetValue('Image', $attributes),
+             'Thumbnail' => GetValue('Thumbnail', $attributes, ''),
+             'Caption' => GetValue('Caption', $attributes, ''),
+             'Size' => GetValue('Size', $attributes, '')
          ];
       }
-      $Type = FALSE;
-      $Title = FALSE;
-      $Body = GetValue('Body', $Record, '');
+      $type = FALSE;
+      $title = FALSE;
+      $body = GetValue('Body', $record, '');
 
       // A little kludge for my test data where the serialized array was put
       // directly inside the body.
-      if (!$Image && is_array(dbdecode($Body)))
-         $Image = dbdecode($Body);
+      if (!$image && is_array(dbdecode($body)))
+         $image = dbdecode($body);
 
-      $RecordID = GetValue('RecordID', $Record); // Explicitly defined?
-      if ($RecordID) {
-         $Type = $Record['RecordType'];
-         $Name = GetValue('Name', $Record);
-         $Url = GetValue('Url', $Record);
-         if ($Name && $Url)
-            $Title = Wrap(Anchor(Gdn_Format::Text($Name), $Url), 'h3', ['class' => 'Title']);
+      $recordID = GetValue('RecordID', $record); // Explicitly defined?
+      if ($recordID) {
+         $type = $record['RecordType'];
+         $name = GetValue('Name', $record);
+         $url = GetValue('Url', $record);
+         if ($name && $url)
+            $title = Wrap(Anchor(Gdn_Format::Text($name), $url), 'h3', ['class' => 'Title']);
       } else {
-         $RecordID = GetValue('CommentID', $Record); // Is it a comment?
-         if ($RecordID)
-            $Type = 'Comment';
+         $recordID = GetValue('CommentID', $record); // Is it a comment?
+         if ($recordID)
+            $type = 'Comment';
       }
-      if (!$RecordID) {
-         $RecordID = GetValue('DiscussionID', $Record); // Is it a discussion?
-         if ($RecordID)
-            $Type = 'Discussion';
+      if (!$recordID) {
+         $recordID = GetValue('DiscussionID', $record); // Is it a discussion?
+         if ($recordID)
+            $type = 'Discussion';
       }
 
-      $Wide = FALSE;
-      $FormattedBody = Gdn_Format::To($Body, $Record['Format']);
-      if (stripos($FormattedBody, '<div class="Video') !== FALSE) {
-         $Wide = TRUE; // Video?
-      } else if (InArrayI($Record['Format'], ['Html', 'Text', 'Display']) && strlen($Body) > 800) {
-         $Wide = TRUE; // Lots of text?
+      $wide = FALSE;
+      $formattedBody = Gdn_Format::To($body, $record['Format']);
+      if (stripos($formattedBody, '<div class="Video') !== FALSE) {
+         $wide = TRUE; // Video?
+      } else if (InArrayI($record['Format'], ['Html', 'Text', 'Display']) && strlen($body) > 800) {
+         $wide = TRUE; // Lots of text?
       }
-      if ($Wide)
-         $CssClass .= ' Wide';
+      if ($wide)
+         $cssClass .= ' Wide';
       ?>
-      <div id="<?php echo "{$Type}_{$RecordID}" ?>" class="<?php echo $CssClass; ?>">
+      <div id="<?php echo "{$type}_{$recordID}" ?>" class="<?php echo $cssClass; ?>">
          <?php
-         if ($Type == 'Discussion' && function_exists('WriteDiscussionOptions'))
+         if ($type == 'Discussion' && function_exists('WriteDiscussionOptions'))
             WriteDiscussionOptions();
-         elseif ($Type == 'Comment' && function_exists('WriteCommentOptions')) {
-            $Comment = (object)$Record;
-            WriteCommentOptions($Comment);
+         elseif ($type == 'Comment' && function_exists('WriteCommentOptions')) {
+            $comment = (object)$record;
+            WriteCommentOptions($comment);
          }
 
-         if ($Title)
-            echo $Title;
+         if ($title)
+            echo $title;
 
-         if ($Image) {
+         if ($image) {
             echo '<div class="Image">';
-               echo Anchor(Img($Image['Thumbnail'], ['alt' => $Image['Caption'], 'title' => $Image['Caption']]), $Image['Image'], ['target' => '_blank']);
+               echo Anchor(Img($image['Thumbnail'], ['alt' => $image['Caption'], 'title' => $image['Caption']]), $image['Image'], ['target' => '_blank']);
             echo '</div>';
             echo '<div class="Caption">';
-               echo Gdn_Format::PlainText($Image['Caption']);
+               echo Gdn_Format::PlainText($image['Caption']);
             echo '</div>';
          } else {
             echo '<div class="Body Message">';
-               echo $FormattedBody;
+               echo $formattedBody;
             echo '</div>';
          }
          ?>
          <div class="AuthorWrap">
             <span class="Author">
                <?php
-               echo UserPhoto($Record, ['Px' => 'Insert']);
-               echo UserAnchor($Record, ['Px' => 'Insert']);
+               echo UserPhoto($record, ['Px' => 'Insert']);
+               echo UserAnchor($record, ['Px' => 'Insert']);
                ?>
             </span>
-            <?php WriteReactions($Record); ?>
+            <?php WriteReactions($record); ?>
          </div>
       </div>
       <?php
@@ -266,24 +266,24 @@ function WriteOrderByButtons() {
 if (!function_exists('WriteProfileCounts')):
 
 function WriteProfileCounts() {
-   $CurrentUrl = Url('', TRUE);
+   $currentUrl = Url('', TRUE);
 
    echo '<div class="DataCounts">';
 
-   foreach (Gdn::Controller()->Data('Counts', []) as $Key => $Row) {
-      $ItemClass = 'CountItem';
-      if (StringBeginsWith($CurrentUrl, $Row['Url']))
-         $ItemClass .= ' Selected';
+   foreach (Gdn::Controller()->Data('Counts', []) as $key => $row) {
+      $itemClass = 'CountItem';
+      if (StringBeginsWith($currentUrl, $row['Url']))
+         $itemClass .= ' Selected';
 
-      echo ' <span class="CountItemWrap CountItemWrap-'.$Key.'"><span class="'.$ItemClass.'">';
+      echo ' <span class="CountItemWrap CountItemWrap-'.$key.'"><span class="'.$itemClass.'">';
 
-      if ($Row['Url'])
-         echo '<a href="'.htmlspecialchars($Row['Url']).'" class="TextColor">';
+      if ($row['Url'])
+         echo '<a href="'.htmlspecialchars($row['Url']).'" class="TextColor">';
 
-      echo ' <span class="CountTotal">'.Gdn_Format::BigNumber($Row['Total'], 'html').'</span> ';
-      echo ' <span class="CountLabel">'.T($Row['Name']).'</span>';
+      echo ' <span class="CountTotal">'.Gdn_Format::BigNumber($row['Total'], 'html').'</span> ';
+      echo ' <span class="CountLabel">'.T($row['Name']).'</span>';
 
-      if ($Row['Url'])
+      if ($row['Url'])
          echo '</a>';
 
       echo '</span></span> ';
@@ -298,36 +298,36 @@ endif;
 
 if (!function_exists('WriteRecordReactions')):
 
-function WriteRecordReactions($Row) {
-   $UserTags = GetValue('UserTags', $Row, []);
-   if (empty($UserTags))
+function WriteRecordReactions($row) {
+   $userTags = GetValue('UserTags', $row, []);
+   if (empty($userTags))
       return;
 
-   $RecordReactions = '';
-   foreach ($UserTags as $Tag) {
-      $User = Gdn::UserModel()->GetID($Tag['UserID'], DATASET_TYPE_ARRAY);
-      if (!$User)
+   $recordReactions = '';
+   foreach ($userTags as $tag) {
+      $user = Gdn::UserModel()->GetID($tag['UserID'], DATASET_TYPE_ARRAY);
+      if (!$user)
          continue;
 
-      $ReactionType = ReactionModel::FromTagID($Tag['TagID']);
-      if (!$ReactionType || $ReactionType['Hidden'])
+      $reactionType = ReactionModel::FromTagID($tag['TagID']);
+      if (!$reactionType || $reactionType['Hidden'])
          continue;
-      $UrlCode = $ReactionType['UrlCode'];
-      $SpriteClass = GetValue('SpriteClass', $ReactionType, "React$UrlCode");
-      $Title = sprintf('%s - %s on %s', $User['Name'], T($ReactionType['Name']), Gdn_Format::DateFull($Tag['DateInserted']));
+      $urlCode = $reactionType['UrlCode'];
+      $spriteClass = GetValue('SpriteClass', $reactionType, "React$urlCode");
+      $title = sprintf('%s - %s on %s', $user['Name'], T($reactionType['Name']), Gdn_Format::DateFull($tag['DateInserted']));
 
-      $UserPhoto = UserPhoto($User, ['Size' => 'Small', 'Title' => $Title]);
-      if ($UserPhoto == '')
+      $userPhoto = UserPhoto($user, ['Size' => 'Small', 'Title' => $title]);
+      if ($userPhoto == '')
          continue;
 
-      $RecordReactions .= '<span class="UserReactionWrap" title="'.htmlspecialchars($Title).'" data-userid="'.GetValue('UserID', $User).'">'
-         .$UserPhoto
-         ."<span class=\"ReactSprite $SpriteClass\"></span>"
+      $recordReactions .= '<span class="UserReactionWrap" title="'.htmlspecialchars($title).'" data-userid="'.GetValue('UserID', $user).'">'
+         .$userPhoto
+         ."<span class=\"ReactSprite $spriteClass\"></span>"
       .'</span>';
    }
 
-   if ($RecordReactions != '')
-      echo '<div class="RecordReactions">'.$RecordReactions.'</div>';
+   if ($recordReactions != '')
+      echo '<div class="RecordReactions">'.$recordReactions.'</div>';
 }
 
 endif;

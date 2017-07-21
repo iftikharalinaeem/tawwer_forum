@@ -22,9 +22,9 @@ abstract class SimpleApiMapper {
      * different versions of the API to expose different URLs that point to the
      * same internals
      *
-     * @param string $APIRequest
+     * @param string $aPIRequest
      */
-    abstract public function map($APIRequest);
+    abstract public function map($aPIRequest);
 
     /**
      * Output Filtering method
@@ -34,18 +34,18 @@ abstract class SimpleApiMapper {
      *
      * @param array $Data
      */
-    abstract public function filter(&$Data);
+    abstract public function filter(&$data);
 
-    public function addMap($Map, $To = NULL, $Filter = NULL) {
-        if (!is_array($Map)) {
-            $Map = [$Map => $To];
-            if (!is_null($Filter) && !is_array($Filter))
-                $Filter = [$Map => $Filter];
+    public function addMap($map, $to = NULL, $filter = NULL) {
+        if (!is_array($map)) {
+            $map = [$map => $to];
+            if (!is_null($filter) && !is_array($filter))
+                $filter = [$map => $filter];
         }
 
-        $this->URIMap = array_merge($this->URIMap, $Map);
-        if (is_array($Filter))
-            $this->Filter = array_merge($this->Filter, $Filter);
+        $this->URIMap = array_merge($this->URIMap, $map);
+        if (is_array($filter))
+            $this->Filter = array_merge($this->Filter, $filter);
     }
 
 }

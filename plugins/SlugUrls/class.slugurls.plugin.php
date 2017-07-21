@@ -21,21 +21,21 @@ class SlugUrlsPlugin extends Gdn_Plugin {
 //      Gdn::Router()->SetRoute('/?([^/]+)/([^/]+)/?(?:page-(\d+))?', '/discussion/slug/$2?category=$1&page=$3', 'Test');
    }
 
-   public function Gdn_Router_AfterLoadRoutes_Handler($Sender, $Args) {
+   public function Gdn_Router_AfterLoadRoutes_Handler($sender, $args) {
 //      $Px = self::Prefix();
 //      $PxEsc = preg_quote($Px);
-      $PxEsc = '';
+      $pxEsc = '';
 
       // Add all of the category routes.
-      $Categories = CategoryModel::Categories();
-      foreach ($Categories as $Category) {
-         if (!$Category['UrlCode'])
+      $categories = CategoryModel::Categories();
+      foreach ($categories as $category) {
+         if (!$category['UrlCode'])
             continue;
 
-         $Route = '/?'.$PxEsc.'(' . preg_quote($Category['UrlCode']) . ')/([^/.]+)/?(?:page-(\d+)/?)?$';
-         $Sender->Routes[$Route] = [
-             'Route' => $Route,
-             'Key' => base64_encode($Route),
+         $route = '/?'.$pxEsc.'(' . preg_quote($category['UrlCode']) . ')/([^/.]+)/?(?:page-(\d+)/?)?$';
+         $sender->Routes[$route] = [
+             'Route' => $route,
+             'Key' => base64_encode($route),
              'Destination' => '/discussion/slug/$2?page=$3&category=$1',
              'Reserved' => FALSE,
              'Type' => 'Internal'
@@ -45,19 +45,19 @@ class SlugUrlsPlugin extends Gdn_Plugin {
 
    /// Event Handlers ///
 
-   public function DiscussionController_Slug_Create($Sender, $Slug, $Page = FALSE, $Category = FALSE) {
-      if (!$Slug)
+   public function DiscussionController_Slug_Create($sender, $slug, $page = FALSE, $category = FALSE) {
+      if (!$slug)
          throw NotFoundException('Discussion');
 
       // Grab the discussion.
-      $Discussion = Gdn::SQL()->GetWhere(
+      $discussion = Gdn::SQL()->GetWhere(
          'Discussion',
-         ['Slug' => $Slug])->FirstRow(DATASET_TYPE_ARRAY);
+         ['Slug' => $slug])->FirstRow(DATASET_TYPE_ARRAY);
 
-      if (!$Discussion)
+      if (!$discussion)
          throw NotFoundException('Discussion');
 
-      $Url = DiscussionUrl($Discussion, $Page);
-      redirectTo($Url, 301);
+      $url = DiscussionUrl($discussion, $page);
+      redirectTo($url, 301);
    }
 }

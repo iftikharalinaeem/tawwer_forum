@@ -12,28 +12,28 @@ class ElasticLogSearch extends Gdn_Plugin {
      */
     public $localHostDev = false;
 
-    public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-        $Menu = &$Sender->EventArguments['SideMenu'];
-        $Menu->AddLink('Dashboard', T('Application Log'), '/settings/applog', 'Garden.Settings.Manage');
+    public function Base_GetAppSettingsMenuItems_Handler($sender) {
+        $menu = &$sender->EventArguments['SideMenu'];
+        $menu->AddLink('Dashboard', T('Application Log'), '/settings/applog', 'Garden.Settings.Manage');
     }
 
     /**
-     * @param SettingsController $Sender
-     * @param string $Page
+     * @param SettingsController $sender
+     * @param string $page
      */
-    public function SettingsController_Applog_Create($Sender, $Page = '') {
-        $Sender->Permission('Garden.Settings.Manage');
+    public function SettingsController_Applog_Create($sender, $page = '') {
+        $sender->Permission('Garden.Settings.Manage');
 
-        $Sender->AddJsFile('eventlog.js', 'plugins/ElasticLogSearch');
-        $Sender->AddCssFile('eventlog.css', 'plugins/ElasticLogSearch');
+        $sender->AddJsFile('eventlog.js', 'plugins/ElasticLogSearch');
+        $sender->AddCssFile('eventlog.css', 'plugins/ElasticLogSearch');
 
         $elasticSearch = Elastic::connection('log');
 
-        $Sender->Form = new Gdn_Form();
+        $sender->Form = new Gdn_Form();
         $pageSize = 30;
-        list($offset, $limit) = OffsetLimit($Page, $pageSize);
+        list($offset, $limit) = OffsetLimit($page, $pageSize);
 
-        $get = array_change_key_case($Sender->Request->Get());
+        $get = array_change_key_case($sender->Request->Get());
         $params = [
             'index' => 'log_vanilla*'
         ];
@@ -43,21 +43,21 @@ class ElasticLogSearch extends Gdn_Plugin {
         if ($v = val('datefrom', $get)) {
             $v = strtotime($v);
             if (!$v) {
-                $Sender->Form->AddError('Invalid Date format for From Date.');
+                $sender->Form->AddError('Invalid Date format for From Date.');
             } else {
                 $from = $v;
             }
-            $Sender->Form->SetFormValue('datefrom', $get['datefrom']);
+            $sender->Form->SetFormValue('datefrom', $get['datefrom']);
         }
 
         if ($v = val('dateto', $get)) {
             $v = strtotime($v);
             if (!$v) {
-                $Sender->Form->AddError('Invalid Date format for To Date.');
+                $sender->Form->AddError('Invalid Date format for To Date.');
             } else {
                 $to = $v;
             }
-            $Sender->Form->SetFormValue('dateto', $get['dateto']);
+            $sender->Form->SetFormValue('dateto', $get['dateto']);
         }
 
         if (isset($from) && isset($to)) {
@@ -75,30 +75,30 @@ class ElasticLogSearch extends Gdn_Plugin {
             ];
         }
 
-        $Sender->Form->SetFormValue('priority', 'All');
+        $sender->Form->SetFormValue('priority', 'All');
         if (($v = val('priority', $get)) && $v != 'All') {
 
             $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.priority'] = [
                 'to' => $v,
             ];
 
-            $Sender->Form->SetFormValue('priority', $v);
+            $sender->Form->SetFormValue('priority', $v);
 
         }
 
         if ($v = val('event', $get)) {
             $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.event'] = $v;
-            $Sender->Form->SetFormValue('event', $v);
+            $sender->Form->SetFormValue('event', $v);
         }
 
         if ($v = val('siteid', $get)) {
             $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.siteid'] = $v;
-            $Sender->Form->SetFormValue('siteid ', $v);
+            $sender->Form->SetFormValue('siteid ', $v);
         }
 
         if ($v = val('ipaddress', $get)) {
             $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.ip'] = $v;
-            $Sender->Form->SetFormValue('ipaddress', $v);
+            $sender->Form->SetFormValue('ipaddress', $v);
         }
 
         $sortOrder = 'desc';
@@ -111,7 +111,7 @@ class ElasticLogSearch extends Gdn_Plugin {
         }
 
         $params['sort'] = ['@timestamp:' . $sortOrder];
-        $Sender->Form->SetFormValue('sortorder', $sortOrder);
+        $sender->Form->SetFormValue('sortorder', $sortOrder);
 
         $params['from'] = $offset;
         $params['size'] = $limit;
@@ -138,8 +138,8 @@ class ElasticLogSearch extends Gdn_Plugin {
             unset($event['Domain'], $event['Path']);
         }
 
-        $Sender->AddSideMenu();
-        $PriorityOptions = [
+        $sender->AddSideMenu();
+        $priorityOptions = [
             Logger::DEBUG => LOG_DEBUG,
             Logger::INFO => LOG_INFO,
             Logger::NOTICE => LOG_NOTICE,
@@ -149,32 +149,32 @@ class ElasticLogSearch extends Gdn_Plugin {
             Logger::ALERT => LOG_ALERT,
             Logger::EMERGENCY => LOG_EMERG
         ];
-        $PriorityOptions = array_flip($PriorityOptions);
-        $PriorityOptions['All'] = 'All';
+        $priorityOptions = array_flip($priorityOptions);
+        $priorityOptions['All'] = 'All';
 
         $filter = Gdn::Request()->Get();
         unset($filter['TransientKey']);
         unset($filter['hpt']);
         unset($filter['Filter']);
-        $CurrentFilter = http_build_query($filter);
+        $currentFilter = http_build_query($filter);
 
-        $Sender->SetData(
+        $sender->SetData(
             [
                 'Events' => $events,
-                'PriorityOptions' => $PriorityOptions,
+                'PriorityOptions' => $priorityOptions,
                 'SortOrder' => $sortOrder,
-                'CurrentFilter' => $CurrentFilter
+                'CurrentFilter' => $currentFilter
             ]
         );
 
-        $Pager = PagerModule::Current();
+        $pager = PagerModule::Current();
         $totalRecords = valr('hits.total', $results, 0);
         unset($filter['Page']);
-        $CurrentFilter = http_build_query($filter);
-        $Pager->Configure($offset, $limit, $totalRecords, '/settings/applog?' . $CurrentFilter . '&Page={Page}');
+        $currentFilter = http_build_query($filter);
+        $pager->Configure($offset, $limit, $totalRecords, '/settings/applog?' . $currentFilter . '&Page={Page}');
 
 
-        $Sender->Render('eventlog', '', 'plugins/ElasticLogSearch');
+        $sender->Render('eventlog', '', 'plugins/ElasticLogSearch');
     }
 
 
@@ -188,9 +188,9 @@ class ElasticLogSearch extends Gdn_Plugin {
                 $siteIDs[$siteID] = true;
             }
         }
-        $SQL = GDN::SQL();
-        $Sites = $SQL->Select('SiteID, Name')->From('Multisite')->WhereIn('SiteID', array_keys($siteIDs))->Get()->ResultArray();
-        $Sites = array_column($Sites, 'Name', 'SiteID');
+        $sQL = GDN::SQL();
+        $sites = $sQL->Select('SiteID, Name')->From('Multisite')->WhereIn('SiteID', array_keys($siteIDs))->Get()->ResultArray();
+        $sites = array_column($sites, 'Name', 'SiteID');
         $i = 0;
         foreach ($hits as $hit) {
 
@@ -210,7 +210,7 @@ class ElasticLogSearch extends Gdn_Plugin {
                 'Username' => valr('_source.message.username', $hit),
                 'IP' => valr('_source.message.ip', $hit),
                 'SiteID' => valr('_source.message.siteid', $hit),
-                'SiteName' => val(valr('_source.message.siteid', $hit), $Sites, 'unknown'),
+                'SiteName' => val(valr('_source.message.siteid', $hit), $sites, 'unknown'),
                 'Source' => ''
             ];
             if (C('Debug')) {

@@ -30,47 +30,47 @@ class UserBadgeModel extends Gdn_Model {
      * @since 1.0.0
      * @access public
      *
-     * @param int $UserID
-     * @param mixed $BadgeID int or string identifier.
-     * @param mixed $NewTimestamp Unix timestamp or date string.
-     * @return int Number of timestamps stored within $Timeout seconds.
+     * @param int $userID
+     * @param mixed $badgeID int or string identifier.
+     * @param mixed $newTimestamp Unix timestamp or date string.
+     * @return int Number of timestamps stored within $timeout seconds.
      */
-    public function addTimeoutEvent($UserID, $BadgeID, $NewTimestamp) {
+    public function addTimeoutEvent($userID, $badgeID, $newTimestamp) {
         // Get badge
-        $Badge = $this->getBadgeID($BadgeID, DATASET_TYPE_ARRAY);
-        if (!$Badge) {
+        $badge = $this->getBadgeID($badgeID, DATASET_TYPE_ARRAY);
+        if (!$badge) {
             return false;
         }
 
         // Get user progress
-        $UserBadge = $this->getID($UserID, GetValue('BadgeID', $Badge));
+        $userBadge = $this->getID($userID, GetValue('BadgeID', $badge));
 
         // Grab relevant parameters
-        $Timeout = val('Timeout', $UserBadge['Attributes'], 0);
-        $Threshold = val('Threshold', $Badge, false);
+        $timeout = val('Timeout', $userBadge['Attributes'], 0);
+        $threshold = val('Threshold', $badge, false);
 
         // Get new timestamp and add to events
-        $Events = val('Events', $UserBadge['Attributes'], []);
-        $NewTimestamp = (is_numeric($NewTimestamp)) ? $NewTimestamp : strtotime($NewTimestamp);
-        $Events[] = $NewTimestamp;
+        $events = val('Events', $userBadge['Attributes'], []);
+        $newTimestamp = (is_numeric($newTimestamp)) ? $newTimestamp : strtotime($newTimestamp);
+        $events[] = $newTimestamp;
 
         // Only keep events that happened within last $MaxSeconds from $NewTimestamp
-        foreach ($Events as $Key => $Timestamp) {
-            if ($Timestamp + $Timeout < $NewTimestamp) {
-                unset($Events[$Key]);
+        foreach ($events as $key => $timestamp) {
+            if ($timestamp + $timeout < $newTimestamp) {
+                unset($events[$key]);
             }
         }
 
         // Save new event list
-        setValue('Events', $UserBadge['Attributes'], $Events);
-        $this->Save($UserBadge);
+        setValue('Events', $userBadge['Attributes'], $events);
+        $this->Save($userBadge);
 
         // If we've achieved threshold, give badge to user
-        if ($Threshold && count($Events) >= $Threshold) {
-            $this->give($UserID, $BadgeID);
+        if ($threshold && count($events) >= $threshold) {
+            $this->give($userID, $badgeID);
         }
 
-        return count($Events);
+        return count($events);
     }
 
     /**
@@ -79,118 +79,118 @@ class UserBadgeModel extends Gdn_Model {
      * @since 1.0.0
      * @access public
      */
-    public function badgeCount($UserID = '') {
-        return $this->getCount(['UserID' => $UserID, 'DateCompleted is not null' => null]);
+    public function badgeCount($userID = '') {
+        return $this->getCount(['UserID' => $userID, 'DateCompleted is not null' => null]);
     }
 
     /**
      *
      *
-     * @param $Badge
+     * @param $badge
      * @return string
      */
-    public static function badgeName($Badge) {
-        $Name = $Badge['Name'];
-        $Threshold = $Badge['Threshold'];
+    public static function badgeName($badge) {
+        $name = $badge['Name'];
+        $threshold = $badge['Threshold'];
 
-        if (!$Threshold) {
-            return t($Name);
+        if (!$threshold) {
+            return t($name);
         }
 
-        if (strpos($Name, $Threshold) !== false) {
-            $Code = str_replace($Threshold, '%s', $Name);
+        if (strpos($name, $threshold) !== false) {
+            $code = str_replace($threshold, '%s', $name);
 
-            if ($Threshold == 1) {
-                return plural($Threshold, $Code, $Code.'s');
+            if ($threshold == 1) {
+                return plural($threshold, $code, $code.'s');
             } else {
-                return plural($Threshold, rtrim($Code, 's'), $Code);
+                return plural($threshold, rtrim($code, 's'), $code);
             }
         } else {
-            return t($Name);
+            return t($name);
         }
     }
 
     /**
      *
      *
-     * @param int $Limit
+     * @param int $limit
      * @return int
      * @throws Exception
      */
-    public function bombAnniversary($Limit = 100) {
+    public function bombAnniversary($limit = 100) {
         // Make sure no one gets a notification.
         saveToConfig([
             'Preferences.Email.Badge' => false,
             'Preferences.Popup.Badge' => false
             ], '', false);
 
-        $BadgeModel = new BadgeModel();
+        $badgeModel = new BadgeModel();
 
         // Grab the first comment badge.
-        $Badge = $BadgeModel->getID('anniversary');
-        $BadgeID = $Badge['BadgeID'];
+        $badge = $badgeModel->getID('anniversary');
+        $badgeID = $badge['BadgeID'];
 
         // Grab all of the users that have been around for at least a year.
         $this->SQL->select('u.*')
             ->from('User u')
-            ->join('UserBadge ub', "u.UserID = ub.UserID and ub.BadgeID = $BadgeID", 'left')
+            ->join('UserBadge ub', "u.UserID = ub.UserID and ub.BadgeID = $badgeID", 'left')
             ->where('u.DateFirstVisit <=', Gdn_Format::toDateTime(strtotime('-1 year')))
             ->where('ub.BadgeID is null')
-            ->limit($Limit);
+            ->limit($limit);
 
-        $Data = $this->SQL->get()->resultArray();
+        $data = $this->SQL->get()->resultArray();
 
-        $Hooks = new BadgesHooks();
+        $hooks = new BadgesHooks();
 
-        $Count = 0;
-        foreach ($Data as $Row) {
+        $count = 0;
+        foreach ($data as $row) {
 //            $Args = array('UserID' => $Row['UserID'], 'Fields' => array('CountComments' => $Row['CountComments']));
-            Gdn::session()->User = $Row;
-            $Hooks->anniversaries($this, []);
+            Gdn::session()->User = $row;
+            $hooks->anniversaries($this, []);
 
-            $Count++;
+            $count++;
         }
-        return $Count;
+        return $count;
     }
 
     /**
      *
      *
-     * @param int $Limit
+     * @param int $limit
      * @return int
      * @throws Exception
      */
-    public function bombComment($Limit = 100) {
+    public function bombComment($limit = 100) {
         // Make sure no one gets a notification.
         saveToConfig([
             'Preferences.Email.Badge' => false,
             'Preferences.Popup.Badge' => false
             ], '', false);
 
-        $BadgeModel = new BadgeModel();
+        $badgeModel = new BadgeModel();
 
         // Grab the first comment badge.
-        $Badge = $BadgeModel->getID('comment');
-        $BadgeID = $Badge['BadgeID'];
+        $badge = $badgeModel->getID('comment');
+        $badgeID = $badge['BadgeID'];
 
         // Grab all of the users that have at least one comment, but don't have this badge.
-        $Data = $this->SQL->select('u.*')
+        $data = $this->SQL->select('u.*')
             ->from('User u')
-            ->join('UserBadge ub', "u.UserID = ub.UserID and ub.BadgeID = $BadgeID", 'left')
+            ->join('UserBadge ub', "u.UserID = ub.UserID and ub.BadgeID = $badgeID", 'left')
             ->where('u.CountComments >=', 1)
             ->where('ub.BadgeID is null')
-            ->limit($Limit)
+            ->limit($limit)
             ->get()->resultArray();
 
-        $Hooks = new BadgesHooks();
+        $hooks = new BadgesHooks();
 
-        $Count = 0;
-        foreach ($Data as $Row) {
-            $Args = ['UserID' => $Row['UserID'], 'Fields' => ['CountComments' => $Row['CountComments']]];
-            $Hooks->userModel_afterSetField_handler($this, $Args);
-            $Count++;
+        $count = 0;
+        foreach ($data as $row) {
+            $args = ['UserID' => $row['UserID'], 'Fields' => ['CountComments' => $row['CountComments']]];
+            $hooks->userModel_afterSetField_handler($this, $args);
+            $count++;
         }
-        return $Count;
+        return $count;
     }
 
     /**
@@ -199,10 +199,10 @@ class UserBadgeModel extends Gdn_Model {
      * @since 1.1
      * @access public
      */
-    public function declineRequest($UserID, $BadgeID) {
-        $UserBadge = $this->getID($UserID, $BadgeID);
-        setValue('Declined', $UserBadge, 1);
-        $this->save($UserBadge);
+    public function declineRequest($userID, $badgeID) {
+        $userBadge = $this->getID($userID, $badgeID);
+        setValue('Declined', $userBadge, 1);
+        $this->save($userBadge);
     }
 
     /**
@@ -211,7 +211,7 @@ class UserBadgeModel extends Gdn_Model {
      * @since 1.0.0
      * @access public
      */
-    public function getBadges($UserID = '') {
+    public function getBadges($userID = '') {
         return $this->SQL
             ->select('b.*')
             ->select('ub.Reason')
@@ -219,7 +219,7 @@ class UserBadgeModel extends Gdn_Model {
             ->select('ub.DateCompleted')
             ->from('UserBadge ub')
             ->join('Badge b', 'b.BadgeID = ub.BadgeID', 'left')
-            ->where('ub.UserID', $UserID)
+            ->where('ub.UserID', $userID)
             ->where('ub.DateCompleted is not null')
             ->orderBy('ub.DateCompleted', 'desc')
             ->get();
@@ -240,26 +240,26 @@ class UserBadgeModel extends Gdn_Model {
      * Get badge data for single user/badge association.
      *
      */
-    public function getByUser($UserID, $BadgeID) {
-        $BadgeID = $this->getBadgeID($BadgeID);
+    public function getByUser($userID, $badgeID) {
+        $badgeID = $this->getBadgeID($badgeID);
 
-        $Result = $this->SQL->getWhere('UserBadge', ['UserID' => $UserID, 'BadgeID' => $BadgeID])->firstRow(DATASET_TYPE_ARRAY);
+        $result = $this->SQL->getWhere('UserBadge', ['UserID' => $userID, 'BadgeID' => $badgeID])->firstRow(DATASET_TYPE_ARRAY);
 
-        if (!$Result) {
-            $Result = ['UserID' => $UserID, 'BadgeID' => $BadgeID, '_New' => true];
+        if (!$result) {
+            $result = ['UserID' => $userID, 'BadgeID' => $badgeID, '_New' => true];
         } else {
-            $Result['_New'] = false;
+            $result['_New'] = false;
         }
 
-        $Attributes = val('Attributes', $Result);
-        if ($Attributes) {
-            $Attributes = dbdecode($Attributes);
+        $attributes = val('Attributes', $result);
+        if ($attributes) {
+            $attributes = dbdecode($attributes);
         } else {
-            $Attributes = [];
+            $attributes = [];
         }
-        setValue('Attributes', $Result, $Attributes);
+        setValue('Attributes', $result, $attributes);
 
-        return $Result;
+        return $result;
     }
 
     /**
@@ -271,31 +271,31 @@ class UserBadgeModel extends Gdn_Model {
      * @since 1.0.0
      * @access protected
      *
-     * @param mixed $BadgeID string (slug) or int (id).
-     * @param string $Send What data to return. Valid options: 'Object'.
-     * @return mixed BadgeID (default) or Badge dataset if $Send == 'Object'.
+     * @param mixed $badgeID string (slug) or int (id).
+     * @param string $send What data to return. Valid options: 'Object'.
+     * @return mixed BadgeID (default) or Badge dataset if $send == 'Object'.
      */
-    protected function getBadgeID($BadgeID, $Send = false) {
-        if ($Send) {
-            $BadgeModel = new BadgeModel();
-            $Badge = $BadgeModel->getID($BadgeID);
+    protected function getBadgeID($badgeID, $send = false) {
+        if ($send) {
+            $badgeModel = new BadgeModel();
+            $badge = $badgeModel->getID($badgeID);
 
-            if ($Send == DATASET_TYPE_OBJECT) {
-                $Badge = (object)$Badge;
+            if ($send == DATASET_TYPE_OBJECT) {
+                $badge = (object)$badge;
             }
 
-            return $Badge;
+            return $badge;
         }
 
-        if (is_numeric($BadgeID)) {
-            return $BadgeID;
-        } elseif (is_array($BadgeID))
-            return $BadgeID['BadgeID'];
+        if (is_numeric($badgeID)) {
+            return $badgeID;
+        } elseif (is_array($badgeID))
+            return $badgeID['BadgeID'];
         else {
-            $BadgeModel = new BadgeModel();
-            $Badge = $BadgeModel->getID($BadgeID);
+            $badgeModel = new BadgeModel();
+            $badge = $badgeModel->getID($badgeID);
 
-            return $Badge['BadgeID'];
+            return $badge['BadgeID'];
         }
     }
 
@@ -340,26 +340,26 @@ class UserBadgeModel extends Gdn_Model {
      * @since 1.0.0
      * @access public
      */
-    public function getUsers($BadgeID, $Options = []) {
+    public function getUsers($badgeID, $options = []) {
         // Get numeric ID
-        $BadgeID = $this->getBadgeID($BadgeID);
-        if (!$BadgeID) {
+        $badgeID = $this->getBadgeID($badgeID);
+        if (!$badgeID) {
             return false;
         }
 
         // Get query options
-        $Limit = val('Limit', $Options, 5);
-        $Offset = val('Offset', $Options, 0);
+        $limit = val('Limit', $options, 5);
+        $offset = val('Offset', $options, 0);
 
         return $this->SQL
             ->select('u.*')
             ->select('ub.DateCompleted')
             ->from('UserBadge ub')
             ->join('User u', 'u.UserID = ub.UserID', 'left')
-            ->where('ub.BadgeID', $BadgeID)
+            ->where('ub.BadgeID', $badgeID)
             ->where('ub.DateCompleted is not null')
             ->orderBy('ub.DateCompleted', 'desc')
-            ->limit($Limit, $Offset)
+            ->limit($limit, $offset)
             ->get();
     }
 
@@ -369,103 +369,103 @@ class UserBadgeModel extends Gdn_Model {
      * @since 1.0.0
      * @access public
      *
-     * @param int $UserID.
-     * @param mixed $BadgeID Int (id) or string (slug).
-     * @param string $Reason Optional explanation of why they received the badge.
+     * @param int $userID.
+     * @param mixed $badgeID Int (id) or string (slug).
+     * @param string $reason Optional explanation of why they received the badge.
      */
-    public function give($UserID, $BadgeID, $Reason = '') {
+    public function give($userID, $badgeID, $reason = '') {
         if (c('Badges.Disabled')) {
             return false;
         }
 
-        static $BadgeGiven = false;
+        static $badgeGiven = false;
 
-        $Badge = $this->getBadgeID($BadgeID, DATASET_TYPE_ARRAY);
-        $BadgeID = $Badge['BadgeID'];
+        $badge = $this->getBadgeID($badgeID, DATASET_TYPE_ARRAY);
+        $badgeID = $badge['BadgeID'];
 
-        $UserBadge = $this->getID($UserID, val('BadgeID', $Badge));
+        $userBadge = $this->getID($userID, val('BadgeID', $badge));
 
         // Allow badges to be disabled
-        if (!val('Active', $Badge)) {
+        if (!val('Active', $badge)) {
             return false;
         }
 
-        if (val('DateCompleted', $UserBadge, null) != null) {
-            $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
-            $this->Validation->addValidationResult('BadgeID', '@'.sprintf(t('The %s badge has already been given to %s.'), $Badge['Name'], $User['Name']));
+        if (val('DateCompleted', $userBadge, null) != null) {
+            $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+            $this->Validation->addValidationResult('BadgeID', '@'.sprintf(t('The %s badge has already been given to %s.'), $badge['Name'], $user['Name']));
 
             return false;
         }
 
-        $UserBadge['Reason'] = $Reason;
-        $UserBadge['DateCompleted'] = Gdn_Format::toDateTime();
+        $userBadge['Reason'] = $reason;
+        $userBadge['DateCompleted'] = Gdn_Format::toDateTime();
 
-        $PointsText = '';
-        $Saved = $this->save($UserBadge);
-        if ($Saved) {
-            $Points = $Badge['Points'];
-            if ($Points != 0) {
-                $PointsText = ' '.Plural($Points, '%+d point', '%+d points');
-                self::givePoints($UserID, $Points, 'Badges');
+        $pointsText = '';
+        $saved = $this->save($userBadge);
+        if ($saved) {
+            $points = $badge['Points'];
+            if ($points != 0) {
+                $pointsText = ' '.Plural($points, '%+d point', '%+d points');
+                self::givePoints($userID, $points, 'Badges');
             }
 
             // Update the user's count.
-            $CountBadges = $this->badgeCount($UserID);
-            Gdn::userModel()->setField($UserID, 'CountBadges', $CountBadges);
+            $countBadges = $this->badgeCount($userID);
+            Gdn::userModel()->setField($userID, 'CountBadges', $countBadges);
 
             // Update the badge's count.
-            $RecipientCount = $this->recipientCount($Badge['BadgeID']);
+            $recipientCount = $this->recipientCount($badge['BadgeID']);
             $this->SQL->update('Badge')
-                ->set('CountRecipients', $RecipientCount)
-                ->where('BadgeID', $Badge['BadgeID'])
+                ->set('CountRecipients', $recipientCount)
+                ->where('BadgeID', $badge['BadgeID'])
                 ->put();
 
             // Notify people of the badge.
-            $HeadlineFormat = t('HeadlineFormat.Badge', '{ActivityUserID,You} earned the <a href="{Url,html}">{Data.Name,text}</a> badge.');
+            $headlineFormat = t('HeadlineFormat.Badge', '{ActivityUserID,You} earned the <a href="{Url,html}">{Data.Name,text}</a> badge.');
             if (StringBeginsWith(Gdn::locale()->Locale, 'en', true)) {
-                $BadgeBody = val('Body', $Badge);
+                $badgeBody = val('Body', $badge);
             } else {
-                $BadgeBody = '';
+                $badgeBody = '';
             }
 
-            $Activity = [
+            $activity = [
                  'ActivityType' => 'Badge',
-                 'ActivityUserID' => $UserID,
-                 'NotifyUserID' => $UserID,
-                 'HeadlineFormat' => $HeadlineFormat,
-                 'Story' => $BadgeBody.$PointsText,
+                 'ActivityUserID' => $userID,
+                 'NotifyUserID' => $userID,
+                 'HeadlineFormat' => $headlineFormat,
+                 'Story' => $badgeBody.$pointsText,
                  'RecordType' => 'Badge',
-                 'RecordID' => $BadgeID,
-                 'Route' => "/badge/{$Badge['Slug']}",
-                 'Data' => ['Name' => self::badgeName($Badge)]
+                 'RecordID' => $badgeID,
+                 'Route' => "/badge/{$badge['Slug']}",
+                 'Data' => ['Name' => self::badgeName($badge)]
             ];
 
             // Photo optional
-            if ($Photo = val('Photo', $Badge)) {
-                setValue('Photo', $Activity, Gdn_Upload::url($Photo));
+            if ($photo = val('Photo', $badge)) {
+                setValue('Photo', $activity, Gdn_Upload::url($photo));
             }
 
-            $ActivityModel = new ActivityModel();
+            $activityModel = new ActivityModel();
 
-            if (!$this->NoSpam || !$BadgeGiven) {
+            if (!$this->NoSpam || !$badgeGiven) {
                 // Notify the user of their badge.
-                $ActivityModel->queue($Activity, 'Badge', ['Force' => true]);
+                $activityModel->queue($activity, 'Badge', ['Force' => true]);
             }
 
             // Notify everyone else of your badge.
-            $Activity['NotifyUserID'] = ActivityModel::NOTIFY_PUBLIC;
-            $Activity['Story'] = $Badge['Body'];
-            $ActivityModel->queue($Activity, false, ['GroupBy' => ['ActivityTypeID', 'RecordID', 'RecordType']]);
+            $activity['NotifyUserID'] = ActivityModel::NOTIFY_PUBLIC;
+            $activity['Story'] = $badge['Body'];
+            $activityModel->queue($activity, false, ['GroupBy' => ['ActivityTypeID', 'RecordID', 'RecordType']]);
 
-            $ActivityModel->saveQueue();
-            $BadgeGiven = true;
+            $activityModel->saveQueue();
+            $badgeGiven = true;
 
             // Hook
-            $this->EventArguments['UserBadge'] = $UserBadge;
+            $this->EventArguments['UserBadge'] = $userBadge;
             $this->fireEvent('AfterGive');
         }
 
-        return $Saved;
+        return $saved;
     }
 
     /**
@@ -474,8 +474,8 @@ class UserBadgeModel extends Gdn_Model {
      * @since 1.0.0
      * @access public
      */
-    public static function givePoints($UserID, $Points, $Source = 'Other', $Timestamp = false) {
-        UserModel::givePoints($UserID, $Points, $Source, $Timestamp);
+    public static function givePoints($userID, $points, $source = 'Other', $timestamp = false) {
+        UserModel::givePoints($userID, $points, $source, $timestamp);
     }
 
     /**
@@ -484,21 +484,21 @@ class UserBadgeModel extends Gdn_Model {
      * @since 1.0.0
      * @access public
      *
-     * @param int $UserID
-     * @param mixed $BadgeID Int (id) or string (slug).
-     * @param string $ColumnName Key in attributes array to increment.
-     * @param int $Inc
+     * @param int $userID
+     * @param mixed $badgeID Int (id) or string (slug).
+     * @param string $columnName Key in attributes array to increment.
+     * @param int $inc
      * @return array
      */
-    public function increment($UserID, $BadgeID, $ColumnName, $Inc = 1) {
-        $BadgeID = $this->getBadgeID($BadgeID);
-        $UserBadge = $this->getID($UserID, $BadgeID);
-        $Curr = val($ColumnName, $UserBadge['Attributes'], 0);
-        $Curr += $Inc;
-        setValue($ColumnName, $UserBadge['Attributes'], $Curr);
-        $this->save($UserBadge);
+    public function increment($userID, $badgeID, $columnName, $inc = 1) {
+        $badgeID = $this->getBadgeID($badgeID);
+        $userBadge = $this->getID($userID, $badgeID);
+        $curr = val($columnName, $userBadge['Attributes'], 0);
+        $curr += $inc;
+        setValue($columnName, $userBadge['Attributes'], $curr);
+        $this->save($userBadge);
 
-        return $UserBadge;
+        return $userBadge;
     }
 
     /**
@@ -508,12 +508,12 @@ class UserBadgeModel extends Gdn_Model {
      * @access public
      * @todo Only count unique UserIDs
      *
-     * @param mixed $BadgeID Int (id) or string (slug).
+     * @param mixed $badgeID Int (id) or string (slug).
      * @return int
      */
-    public function recipientCount($BadgeID = '') {
-        $BadgeID = $this->getBadgeID($BadgeID);
-        return $this->getCount(['BadgeID' => $BadgeID, 'DateCompleted is not null' => null]);
+    public function recipientCount($badgeID = '') {
+        $badgeID = $this->getBadgeID($badgeID);
+        return $this->getCount(['BadgeID' => $badgeID, 'DateCompleted is not null' => null]);
     }
 
     /**
@@ -524,82 +524,82 @@ class UserBadgeModel extends Gdn_Model {
      *
      * @since 1.1
      * @access public
-     * @param int $UserID Unique.
-     * @param int $BadgeID Unique.
-     * @param string $Reason
+     * @param int $userID Unique.
+     * @param int $badgeID Unique.
+     * @param string $reason
      * @return bool Whether this is a new, valid request.
      */
-    public function request($UserID, $BadgeID, $Reason = '') {
-        $UserBadge = $this->getID($UserID, $BadgeID);
-        $Badge = $this->getBadgeID($BadgeID, DATASET_TYPE_ARRAY);
-        $New = true;
+    public function request($userID, $badgeID, $reason = '') {
+        $userBadge = $this->getID($userID, $badgeID);
+        $badge = $this->getBadgeID($badgeID, DATASET_TYPE_ARRAY);
+        $new = true;
 
         // Check if request is already pending
-        if (val('DateRequested', $UserBadge) && !val('Declined', $UserBadge)) {
-            $New = false;
+        if (val('DateRequested', $userBadge) && !val('Declined', $userBadge)) {
+            $new = false;
         }
 
         // Check for declined requests in cooldown period
-        $CoolDownDays = c('Reputation.Badges.RequestCoolDownDays', 30);
-        $CooledDown = (strtotime(val('DateRequested', $UserBadge)) > strtotime($CoolDownDays.' days ago'));
-        if (!$CooledDown && val('Declined', $UserBadge)) {
-            $New = false;
+        $coolDownDays = c('Reputation.Badges.RequestCoolDownDays', 30);
+        $cooledDown = (strtotime(val('DateRequested', $userBadge)) > strtotime($coolDownDays.' days ago'));
+        if (!$cooledDown && val('Declined', $userBadge)) {
+            $new = false;
         }
 
-        if ($New) {
+        if ($new) {
             // Create the request
-            setValue('DateRequested', $UserBadge, Gdn_Format::toDateTime());
-            setValue('RequestReason', $UserBadge, $Reason);
-            setValue('Declined', $UserBadge, 0);
-            $this->save($UserBadge);
+            setValue('DateRequested', $userBadge, Gdn_Format::toDateTime());
+            setValue('RequestReason', $userBadge, $reason);
+            setValue('Declined', $userBadge, 0);
+            $this->save($userBadge);
 
             // Prep activity
-            $ActivityModel = new ActivityModel();
-            $HeadlineFormat = t('HeadlineFormat.BadgeRequest', '{ActivityUserID,You} requested the <a href="{Url,html}">{Data.Name,text}</a> badge.');
-            $Activity = [
+            $activityModel = new ActivityModel();
+            $headlineFormat = t('HeadlineFormat.BadgeRequest', '{ActivityUserID,You} requested the <a href="{Url,html}">{Data.Name,text}</a> badge.');
+            $activity = [
                  'ActivityType' => 'BadgeRequest',
-                 'ActivityUserID' => $UserID,
-                 'HeadlineFormat' => $HeadlineFormat,
-                 'Story' => val('Body', $Badge),
+                 'ActivityUserID' => $userID,
+                 'HeadlineFormat' => $headlineFormat,
+                 'Story' => val('Body', $badge),
                  'RecordType' => 'BadgeRequest',
-                 'RecordID' => $BadgeID,
+                 'RecordID' => $badgeID,
                  'Route' => "/badge/requests",
-                 'Data' => ['Name' => $Badge['Name']]
+                 'Data' => ['Name' => $badge['Name']]
             ];
 
             // Optional photo
-            if ($Photo = val('Photo', $Badge)) {
-                setValue('Photo', $Activity, Gdn_Upload::url($Photo));
+            if ($photo = val('Photo', $badge)) {
+                setValue('Photo', $activity, Gdn_Upload::url($photo));
             }
 
             // Grab all of the users that need to be notified.
-            $Data = $this->SQL
+            $data = $this->SQL
                 ->whereIn('Name', ['Preferences.Email.BadgeRequest', 'Preferences.Popup.BadgeRequest'])
                 ->get('UserMeta')->resultArray();
 
             // Build our notification queue
-            $NotifyUsers = [];
-            foreach ($Data as $Row) {
-                $UserID = val('UserID', $Row);
-                $Name = val('Name', $Row);
-                if (strpos($Name, '.Email.') !== false) {
-                    $NotifyUsers[$UserID]['Emailed'] = ActivityModel::SENT_PENDING;
-                } elseif (strpos($Name, '.Popup.') !== false) {
-                    $NotifyUsers[$UserID]['Notified'] = ActivityModel::SENT_PENDING;
+            $notifyUsers = [];
+            foreach ($data as $row) {
+                $userID = val('UserID', $row);
+                $name = val('Name', $row);
+                if (strpos($name, '.Email.') !== false) {
+                    $notifyUsers[$userID]['Emailed'] = ActivityModel::SENT_PENDING;
+                } elseif (strpos($name, '.Popup.') !== false) {
+                    $notifyUsers[$userID]['Notified'] = ActivityModel::SENT_PENDING;
                 }
             }
 
             // Dispatch notifications
-            foreach ($NotifyUsers as $UserID => $Prefs) {
-                $Activity['NotifyUserID'] = $UserID;
-                $Activity['Emailed'] = val('Emailed', $Prefs, false);
-                $Activity['Notified'] = val('Notified', $Prefs, false);
-                $ActivityModel->queue($Activity);
+            foreach ($notifyUsers as $userID => $prefs) {
+                $activity['NotifyUserID'] = $userID;
+                $activity['Emailed'] = val('Emailed', $prefs, false);
+                $activity['Notified'] = val('Notified', $prefs, false);
+                $activityModel->queue($activity);
             }
-            $ActivityModel->saveQueue();
+            $activityModel->saveQueue();
         }
 
-        return $New;
+        return $new;
     }
 
     /**
@@ -608,46 +608,46 @@ class UserBadgeModel extends Gdn_Model {
      * @since 1.0.0
      * @access public
      *
-     * @param int $UserID
-     * @param mixed $BadgeID Int (id) or string (slug).
+     * @param int $userID
+     * @param mixed $badgeID Int (id) or string (slug).
      */
-    public function revoke($UserID, $BadgeID) {
-        $Badge = $this->getBadgeID($BadgeID, DATASET_TYPE_ARRAY);
-        if (!$Badge) {
+    public function revoke($userID, $badgeID) {
+        $badge = $this->getBadgeID($badgeID, DATASET_TYPE_ARRAY);
+        if (!$badge) {
             return false;
         }
 
         // Delete it.
-        $this->delete(['UserID' => $UserID, 'BadgeID' => $BadgeID]);
+        $this->delete(['UserID' => $userID, 'BadgeID' => $badgeID]);
 
         // Adjust user's badge count
-        $BadgeCount = $this->badgeCount($UserID);
-        Gdn::userModel()->setField($UserID, 'CountBadges', $BadgeCount);
+        $badgeCount = $this->badgeCount($userID);
+        Gdn::userModel()->setField($userID, 'CountBadges', $badgeCount);
 
         // Adjust's badge's recipient count
-        $RecipientCount = $this->recipientCount($BadgeID);
+        $recipientCount = $this->recipientCount($badgeID);
         $this->SQL->update('Badge')
-            ->set('CountRecipients', $RecipientCount)
-            ->where('BadgeID', $BadgeID)
+            ->set('CountRecipients', $recipientCount)
+            ->where('BadgeID', $badgeID)
             ->put();
 
-        $Points = $Badge['Points'];
-        if ($Points != 0) {
-            self::givePoints($UserID, -$Points, 'Badges');
+        $points = $badge['Points'];
+        if ($points != 0) {
+            self::givePoints($userID, -$points, 'Badges');
         }
 
-        return $UserID;
+        return $userID;
     }
 
     /**
      * Save given user badge.
      *
-     * @param array $FormPostValues Values submitted via form.
-     * @param array $Settings Not used.
+     * @param array $formPostValues Values submitted via form.
+     * @param array $settings Not used.
      * @return bool Whether save was successful.
      */
-    public function save($FormPostValues, $Settings = []) {
-        $Session = Gdn::session();
+    public function save($formPostValues, $settings = []) {
+        $session = Gdn::session();
 
         // Define the primary key in this model's table.
         $this->defineSchema();
@@ -666,34 +666,34 @@ class UserBadgeModel extends Gdn_Model {
         // Validate the form posted values.
         $this->Validation->results(true);
 
-        if ($this->validate($FormPostValues)) {
+        if ($this->validate($formPostValues)) {
             // Get the form field values.
-            $Fields = $this->Validation->validationFields();
-            $Current = $this->getID($Fields['UserID'], $Fields['BadgeID']);
+            $fields = $this->Validation->validationFields();
+            $current = $this->getID($fields['UserID'], $fields['BadgeID']);
 
-            if (isset($Fields['Attributes']) && is_array($Fields['Attributes'])) {
-                $Fields['Attributes'] = dbencode($Fields['Attributes']);
+            if (isset($fields['Attributes']) && is_array($fields['Attributes'])) {
+                $fields['Attributes'] = dbencode($fields['Attributes']);
             }
 
-            if ($Current['_New']) {
-                $this->addInsertFields($Fields);
-                $this->SQL->insert($this->Name, $Fields);
+            if ($current['_New']) {
+                $this->addInsertFields($fields);
+                $this->SQL->insert($this->Name, $fields);
             } else {
-                $Where = [
-                    'UserID' => $Fields['UserID'],
-                    'BadgeID' => $Fields['BadgeID']];
-                $this->SQL->put($this->Name, $Fields, $Where);
+                $where = [
+                    'UserID' => $fields['UserID'],
+                    'BadgeID' => $fields['BadgeID']];
+                $this->SQL->put($this->Name, $fields, $where);
             }
 
             // Update the cached recipient count on the badge
-            $RecipientCount = $this->recipientCount($Fields['BadgeID']);
+            $recipientCount = $this->recipientCount($fields['BadgeID']);
             $this->SQL->update('Badge')
-                ->set('CountRecipients', $RecipientCount)
-                ->where('BadgeID', $Fields['BadgeID'])
+                ->set('CountRecipients', $recipientCount)
+                ->where('BadgeID', $fields['BadgeID'])
                 ->put();
         } else {
-            $Message = "Couldn't save UserBadge ".print_r($FormPostValues, true).' '.$this->Validation->resultsText();
-            LogException(new Exception($Message));
+            $message = "Couldn't save UserBadge ".print_r($formPostValues, true).' '.$this->Validation->resultsText();
+            LogException(new Exception($message));
 
             return false;
         }

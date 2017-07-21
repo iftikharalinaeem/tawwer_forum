@@ -11,10 +11,10 @@ class AutoSignoutPlugin extends Gdn_Plugin {
    /**
     * Add styles.
     *
-    * @param AssetModel $Sender
+    * @param AssetModel $sender
     */
-   public function AssetModel_StyleCss_Handler($Sender) {
-      $Sender->AddCssFile('autosignout.css', 'plugins/AutoSignout');
+   public function AssetModel_StyleCss_Handler($sender) {
+      $sender->AddCssFile('autosignout.css', 'plugins/AutoSignout');
    }
 
    /**
@@ -39,49 +39,49 @@ class AutoSignoutPlugin extends Gdn_Plugin {
    /**
     * Block the "Remember Me" function on Sign In.
     *
-    * @param $Sender
+    * @param $sender
     */
-   public function EntryController_SignIn_Handler($Sender) {
-      $Sender->Form->SetFormValue('RememberMe', FALSE);
+   public function EntryController_SignIn_Handler($sender) {
+      $sender->Form->SetFormValue('RememberMe', FALSE);
    }
 
    /**
     * Block the "Remember Me" function on Register.
     *
-    * @param $Sender
+    * @param $sender
     */
-   public function EntryController_RegisterValidation_Handler($Sender) {
-      $Sender->Form->SetFormValue('RememberMe', FALSE);
+   public function EntryController_RegisterValidation_Handler($sender) {
+      $sender->Form->SetFormValue('RememberMe', FALSE);
    }
 
    /**
     * Signout notification page.
     *
-    * @param $Sender
+    * @param $sender
     */
-   public function EntryController_AutoSignedOut_Create($Sender) {
-      $Sender->SetData('Title', T("You've Been Signed Out"));
-      $Sender->CssClass = 'SplashMessage NoPanel';
-      $Sender->SetData('_NoMessages', TRUE);
-      $Sender->Render('autosignedout', '', 'plugins/AutoSignout');
+   public function EntryController_AutoSignedOut_Create($sender) {
+      $sender->SetData('Title', T("You've Been Signed Out"));
+      $sender->CssClass = 'SplashMessage NoPanel';
+      $sender->SetData('_NoMessages', TRUE);
+      $sender->Render('autosignedout', '', 'plugins/AutoSignout');
    }
 
    /**
     * Settings page.
     *
-    * @param $Sender
+    * @param $sender
     */
-   public function SettingsController_AutoSignout_Create($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
+   public function SettingsController_AutoSignout_Create($sender) {
+      $sender->Permission('Garden.Settings.Manage');
 
-      $Conf = new ConfigurationModule($Sender);
-      $Conf->Initialize([
+      $conf = new ConfigurationModule($sender);
+      $conf->Initialize([
           'Plugins.AutoSignout.Minutes' => ['Description' => "Enter the number of minutes to wait before signing users out.", 'Default' => 30]
       ]);
 
-      $Sender->AddSideMenu();
-      $Sender->SetData('Title', 'Auto Signout Settings');
-      $Sender->ConfigurationModule = $Conf;
-      $Conf->RenderAll();
+      $sender->AddSideMenu();
+      $sender->SetData('Title', 'Auto Signout Settings');
+      $sender->ConfigurationModule = $conf;
+      $conf->RenderAll();
    }
 }

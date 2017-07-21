@@ -149,10 +149,10 @@ class GroupController extends Gdn_Controller {
         if ($this->GroupModel->MaxUserGroups > 0 && Gdn::session()->isValid()) {
             $this->setData('MaxUserGroups', $this->GroupModel->MaxUserGroups);
             $this->setData('CountUserGroups', $this->GroupModel->getUserCount(Gdn::session()->UserID));
-            $CountRemaining = max(0, $this->data('MaxUserGroups') - $this->data('CountUserGroups'));
-            $this->setData('CountRemainingGroups', $CountRemaining);
+            $countRemaining = max(0, $this->data('MaxUserGroups') - $this->data('CountUserGroups'));
+            $this->setData('CountRemainingGroups', $countRemaining);
 
-            if ($CountRemaining <= 0) {
+            if ($countRemaining <= 0) {
                 $this->Form = new Gdn_Form();
                 $this->Form->addError("You've already created the maximum number of groups.");
                 $this->render('AddEditError');
@@ -165,43 +165,43 @@ class GroupController extends Gdn_Controller {
     /**
      *
      *
-     * @param $Group
+     * @param $group
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function announcement($Group) {
-        $Group = $this->GroupModel->getID($Group);
-        if (!$Group) {
+    public function announcement($group) {
+        $group = $this->GroupModel->getID($group);
+        if (!$group) {
             throw NotFoundException('Group');
         }
 
         // Check leader permission.
-        if (!$this->GroupModel->checkPermission('Moderate', $Group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Moderate.Reason', $Group));
+        if (!$this->GroupModel->checkPermission('Moderate', $group)) {
+            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Moderate.Reason', $group));
         }
 
-        $this->setData('Group', $Group);
+        $this->setData('Group', $group);
 
-        $Form = new Gdn_Form();
-        $this->Form = $Form;
+        $form = new Gdn_Form();
+        $this->Form = $form;
 
-        if ($Form->authenticatedPostBack()) {
+        if ($form->authenticatedPostBack()) {
             // Let's save the announcement.
-            $Form->setFormValue('CategoryID', $Group['CategoryID']);
-            $Form->setFormValue('GroupID', $Group['GroupID']);
-            $Form->setFormValue('Announce', 2); // Announce within group.
+            $form->setFormValue('CategoryID', $group['CategoryID']);
+            $form->setFormValue('GroupID', $group['GroupID']);
+            $form->setFormValue('Announce', 2); // Announce within group.
 
-            $Model = new DiscussionModel();
-            $Form->setModel($Model);
+            $model = new DiscussionModel();
+            $form->setModel($model);
 
-            if ($Form->save()) {
-                $this->setRedirectTo(groupUrl($Group));
+            if ($form->save()) {
+                $this->setRedirectTo(groupUrl($group));
             } else {
-                $Form->setValidationResults($Model->validationResults());
+                $form->setValidationResults($model->validationResults());
             }
         }
 
-        $this->addBreadcrumb($Group['Name'], groupUrl($Group));
+        $this->addBreadcrumb($group['Name'], groupUrl($group));
         $this->title(t('New Announcement'));
         $this->render();
     }
@@ -209,31 +209,31 @@ class GroupController extends Gdn_Controller {
     /**
      *
      *
-     * @param $Group
-     * @param $ID
-     * @param string $Value
+     * @param $group
+     * @param $iD
+     * @param string $value
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function approve($Group, $ID, $Value = 'approved') {
-        $Group = $this->GroupModel->getID($Group);
-        if (!$Group)
+    public function approve($group, $iD, $value = 'approved') {
+        $group = $this->GroupModel->getID($group);
+        if (!$group)
             throw NotFoundException('Group');
 
         // Check leader permission.
-        if (!$this->GroupModel->checkPermission('Leader', $Group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Leader.Reason', $Group));
+        if (!$this->GroupModel->checkPermission('Leader', $group)) {
+            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Leader.Reason', $group));
         }
 
-        $Value = ucfirst($Value);
+        $value = ucfirst($value);
 
         $this->GroupModel->joinApprove([
-            'GroupApplicantID' => $ID,
-            'Type' => $Value
+            'GroupApplicantID' => $iD,
+            'Type' => $value
         ]);
 
-        $this->jsonTarget("#GroupApplicant_$ID", "", 'SlideUp');
-        $this->informMessage(t('Applicant '.$Value));
+        $this->jsonTarget("#GroupApplicant_$iD", "", 'SlideUp');
+        $this->informMessage(t('Applicant '.$value));
 
         $this->render('Blank', 'Utility', 'Dashboard');
     }
@@ -241,68 +241,68 @@ class GroupController extends Gdn_Controller {
     /**
      *
      *
-     * @param $ID
+     * @param $iD
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function invite($ID) {
-        $Group = $this->GroupModel->getID($ID);
-        if (!$Group) {
+    public function invite($iD) {
+        $group = $this->GroupModel->getID($iD);
+        if (!$group) {
             throw NotFoundException('Group');
         }
 
         // Check invite permission.
-        if (!$this->GroupModel->checkPermission('Leader', $Group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Join.Reason', $Group));
+        if (!$this->GroupModel->checkPermission('Leader', $group)) {
+            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Join.Reason', $group));
         }
 
         $this->title(t('Invite'));
 
-        $Form = new Gdn_Form();
-        $this->Form = $Form;
+        $form = new Gdn_Form();
+        $this->Form = $form;
 
-        if ($Form->authenticatedPostBack()) {
+        if ($form->authenticatedPostBack()) {
             // If the user posted back then we are going to add them.
-            $Data = $Form->formValues();
-            $Data['GroupID'] = $Group['GroupID'];
-            $Recipients = explode(',', $Data['Recipients']);
-            $UserIDs = [];
-            $memberIds = $this->GroupModel->getMemberIds(val('GroupID', $Group));
-            $applicantIds = $this->GroupModel->getApplicantIds(val('GroupID', $Group), ['Type' => ['Application', 'Invitation']]);
-            foreach ($Recipients as $Recipient) {
-                $userId = GetValue('UserID', Gdn::userModel()->getByUsername($Recipient));
+            $data = $form->formValues();
+            $data['GroupID'] = $group['GroupID'];
+            $recipients = explode(',', $data['Recipients']);
+            $userIDs = [];
+            $memberIds = $this->GroupModel->getMemberIds(val('GroupID', $group));
+            $applicantIds = $this->GroupModel->getApplicantIds(val('GroupID', $group), ['Type' => ['Application', 'Invitation']]);
+            foreach ($recipients as $recipient) {
+                $userId = GetValue('UserID', Gdn::userModel()->getByUsername($recipient));
                 if (in_array($userId, $memberIds)) {
-                    $this->informMessage(t(sprintf("%s is already a member.", $Recipient)));
+                    $this->informMessage(t(sprintf("%s is already a member.", $recipient)));
                 } elseif (in_array($userId, $applicantIds)) {
-                  $this->informMessage(t(sprintf("%s is already an applicant.", $Recipient)));
+                  $this->informMessage(t(sprintf("%s is already an applicant.", $recipient)));
                 } else {
-                    $UserIDs[] = $userId;
+                    $userIDs[] = $userId;
                 }
             }
-            if ($UserIDs) {
-                $Data['UserID'] = $UserIDs;
-                $Saved = $this->GroupModel->invite($Data);
-                if ($Saved) {
+            if ($userIDs) {
+                $data['UserID'] = $userIDs;
+                $saved = $this->GroupModel->invite($data);
+                if ($saved) {
                     $this->informMessage(t('Invitation sent.'));
-                    $Form->setValidationResults($this->GroupModel->validationResults());
+                    $form->setValidationResults($this->GroupModel->validationResults());
                 }
             }
         }
 
-        $this->setData('Group', $Group);
-        $this->addBreadcrumb($Group['Name'], GroupUrl($Group));
+        $this->setData('Group', $group);
+        $this->addBreadcrumb($group['Name'], GroupUrl($group));
         $this->render();
     }
 
     /**
      *
      *
-     * @param $ID
+     * @param $iD
      * @throws Exception
      */
-    public function inviteAccept($ID) {
-        $Group = $this->GroupModel->getID($ID);
-        if (!$Group) {
+    public function inviteAccept($iD) {
+        $group = $this->GroupModel->getID($iD);
+        if (!$group) {
             throw NotFoundException('Group');
         }
 
@@ -310,31 +310,31 @@ class GroupController extends Gdn_Controller {
             throw ForbiddenException('GET');
         }
 
-        $Result = $this->GroupModel->joinInvite($Group['GroupID'], Gdn::session()->UserID, true);
-        $this->setData('Result', $Result);
-        $this->setRedirectTo(groupUrl($Group));
+        $result = $this->GroupModel->joinInvite($group['GroupID'], Gdn::session()->UserID, true);
+        $this->setData('Result', $result);
+        $this->setRedirectTo(groupUrl($group));
         $this->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
      *
      *
-     * @param $ID
+     * @param $iD
      * @throws Exception
      */
-    public function inviteDecline($ID) {
-        $Group = $this->GroupModel->getID($ID);
-        if (!$Group) {
+    public function inviteDecline($iD) {
+        $group = $this->GroupModel->getID($iD);
+        if (!$group) {
             throw NotFoundException('Group');
         }
         if (!$this->Request->IsPostBack()) {
             throw ForbiddenException('GET');
         }
-        $Result = $this->GroupModel->joinInvite($Group['GroupID'], Gdn::session()->UserID, false);
-        $this->SetData('Result', $Result);
+        $result = $this->GroupModel->joinInvite($group['GroupID'], Gdn::session()->UserID, false);
+        $this->SetData('Result', $result);
 
         $this->jsonTarget('.GroupUserHeaderModule', '', 'SlideUp');
-        $this->setRedirectTo(groupUrl($Group));
+        $this->setRedirectTo(groupUrl($group));
         $this->informMessage(t('Invitation declined.'));
         $this->render('Blank', 'Utility', 'Dashboard');
     }
@@ -342,111 +342,111 @@ class GroupController extends Gdn_Controller {
     /**
      *
      *
-     * @param $ID
+     * @param $iD
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function join($ID) {
-        $Group = $this->GroupModel->getID($ID);
-        if (!$Group) {
+    public function join($iD) {
+        $group = $this->GroupModel->getID($iD);
+        if (!$group) {
             throw NotFoundException('Group');
         }
 
         // Check join permission.
-        if (!$this->GroupModel->checkPermission('Join', $Group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Join.Reason', $Group));
+        if (!$this->GroupModel->checkPermission('Join', $group)) {
+            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Join.Reason', $group));
         }
 
-        $this->setData('Title', sprintf(T('Join %s'), htmlspecialchars($Group['Name'])));
+        $this->setData('Title', sprintf(T('Join %s'), htmlspecialchars($group['Name'])));
 
-        $Form = new Gdn_Form();
-        $this->Form = $Form;
+        $form = new Gdn_Form();
+        $this->Form = $form;
 
-        if ($Form->authenticatedPostBack()) {
+        if ($form->authenticatedPostBack()) {
             // If the user posted back then we are going to add them.
-            $Data = $Form->formValues();
-            $Data['UserID'] = Gdn::session()->UserID;
-            $Data['GroupID'] = $Group['GroupID'];
-            $Saved = $this->GroupModel->join($Data);
-            $Form->setValidationResults($this->GroupModel->validationResults());
+            $data = $form->formValues();
+            $data['UserID'] = Gdn::session()->UserID;
+            $data['GroupID'] = $group['GroupID'];
+            $saved = $this->GroupModel->join($data);
+            $form->setValidationResults($this->GroupModel->validationResults());
 
-            if ($Saved) {
-                $this->setRedirectTo(groupUrl($Group));
+            if ($saved) {
+                $this->setRedirectTo(groupUrl($group));
             }
         }
 
-        $this->setData('Group', $Group);
-        $this->addBreadcrumb($Group['Name'], groupUrl($Group));
+        $this->setData('Group', $group);
+        $this->addBreadcrumb($group['Name'], groupUrl($group));
         $this->render();
     }
 
     /**
      *
      *
-     * @param $ID
+     * @param $iD
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function leave($ID) {
-        $Group = $this->GroupModel->getID($ID);
-        if (!$Group) {
+    public function leave($iD) {
+        $group = $this->GroupModel->getID($iD);
+        if (!$group) {
             throw NotFoundException('Group');
         }
 
         // Check join permission.
-        if (!$this->GroupModel->checkPermission('Leave', $Group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Leave.Reason', $Group));
+        if (!$this->GroupModel->checkPermission('Leave', $group)) {
+            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Leave.Reason', $group));
         }
 
-        $this->setData('Title', sprintf(t('Leave %s'), htmlspecialchars($Group['Name'])));
+        $this->setData('Title', sprintf(t('Leave %s'), htmlspecialchars($group['Name'])));
 
-        $Form = new Gdn_Form();
-        $this->Form = $Form;
+        $form = new Gdn_Form();
+        $this->Form = $form;
 
-        if ($Form->authenticatedPostBack()) {
-            $Data = [
+        if ($form->authenticatedPostBack()) {
+            $data = [
                 'UserID' => Gdn::session()->UserID,
-                'GroupID' => $Group['GroupID']
+                'GroupID' => $group['GroupID']
             ];
-            $this->GroupModel->leave($Data);
+            $this->GroupModel->leave($data);
             $this->jsonTarget('', '', 'Refresh');
         }
 
-        $this->setData('Group', $Group);
-        $this->addBreadcrumb($Group['Name'], groupUrl($Group));
+        $this->setData('Group', $group);
+        $this->addBreadcrumb($group['Name'], groupUrl($group));
         $this->render();
     }
 
     /**
      *
      *
-     * @param $ID
+     * @param $iD
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function delete($ID) {
-        $Group = $this->GroupModel->getID($ID);
-        if (!$Group) {
+    public function delete($iD) {
+        $group = $this->GroupModel->getID($iD);
+        if (!$group) {
             throw NotFoundException('Group');
         }
-        $this->setData('Group', $Group);
+        $this->setData('Group', $group);
 
         if (!groupPermission('Leader')) {
             throw ForbiddenException('@'.groupPermission('Edit.Reason'));
         }
 
-        $Form = new Gdn_Form();
-        $this->Form = $Form;
+        $form = new Gdn_Form();
+        $this->Form = $form;
 
         if ($this->Form->authenticatedPostBack()) {
-            $GroupModel = new GroupModel();
-            $GroupDeleted = $GroupModel->delete(['GroupID' => $Group['GroupID']]);
+            $groupModel = new GroupModel();
+            $groupDeleted = $groupModel->delete(['GroupID' => $group['GroupID']]);
 
-            $EventModel = new EventModel();
-            $EventModel->delete(['GroupID' => $Group['GroupID']]);
+            $eventModel = new EventModel();
+            $eventModel->delete(['GroupID' => $group['GroupID']]);
 
-            if ($GroupDeleted) {
-                $this->informMessage(formatString(t('<b>{Name}</b> deleted.'), $Group));
+            if ($groupDeleted) {
+                $this->informMessage(formatString(t('<b>{Name}</b> deleted.'), $group));
                 $this->setRedirectTo('/groups');
             } else {
                 $this->informMessage(t('Failed to delete group.'));
@@ -462,74 +462,74 @@ class GroupController extends Gdn_Controller {
      *
      * This method is a canditate for putting on the form object.
      *
-     * @param Gdn_Form $Form
-     * @param string $Field The name of the field. The image will be uploaded with the _New extension while the current image will be just the field name.
-     * @param array $Options
+     * @param Gdn_Form $form
+     * @param string $field The name of the field. The image will be uploaded with the _New extension while the current image will be just the field name.
+     * @param array $options
      */
-    protected static function saveImage($Form, $Field, $Options = []) {
-        $Upload = new Gdn_UploadImage();
+    protected static function saveImage($form, $field, $options = []) {
+        $upload = new Gdn_UploadImage();
 
-        if (!valr("{$Field}_New.name", $_FILES)) {
-            trace("$Field not uploaded, returning.");
+        if (!valr("{$field}_New.name", $_FILES)) {
+            trace("$field not uploaded, returning.");
             return false;
         }
 
         // First make sure the file is valid.
         try {
-            $TmpName = $Upload->validateUpload($Field.'_New', true);
-            if (!$TmpName) {
+            $tmpName = $upload->validateUpload($field.'_New', true);
+            if (!$tmpName) {
                 return false; // no file uploaded.
             }
-        } catch (Exception $Ex) {
-            $Form->AddError($Ex);
+        } catch (Exception $ex) {
+            $form->AddError($ex);
             return false;
         }
 
         // Get the file extension of the file.
-        $Ext = val('OutputType', $Options, trim($Upload->getUploadedFileExtension(), '.'));
-        if ($Ext == 'jpeg') {
-            $Ext = 'jpg';
+        $ext = val('OutputType', $options, trim($upload->getUploadedFileExtension(), '.'));
+        if ($ext == 'jpeg') {
+            $ext = 'jpg';
         }
-        trace($Ext, 'Ext');
+        trace($ext, 'Ext');
 
         // The file is valid so let's come up with its new name.
-        if (isset($Options['Name'])) {
-            $Name = $Options['Name'];
-        } elseif (isset($Options['Prefix'])) {
-            $Name = $Options['Prefix'].md5(microtime()).'.'.$Ext;
+        if (isset($options['Name'])) {
+            $name = $options['Name'];
+        } elseif (isset($options['Prefix'])) {
+            $name = $options['Prefix'].md5(microtime()).'.'.$ext;
         } else {
-            $Name = md5(microtime()).'.'.$Ext;
+            $name = md5(microtime()).'.'.$ext;
         }
 
         // We need to parse out the size.
-        $Size = val('Size', $Options);
-        if ($Size) {
-            if (is_numeric($Size)) {
-                touchValue('Width', $Options, $Size);
-                touchValue('Height', $Options, $Size);
-            } elseif (preg_match('`(\d+)x(\d+)`i', $Size, $M)) {
-                touchValue('Width', $Options, $M[1]);
-                touchValue('Height', $Options, $M[2]);
+        $size = val('Size', $options);
+        if ($size) {
+            if (is_numeric($size)) {
+                touchValue('Width', $options, $size);
+                touchValue('Height', $options, $size);
+            } elseif (preg_match('`(\d+)x(\d+)`i', $size, $m)) {
+                touchValue('Width', $options, $m[1]);
+                touchValue('Height', $options, $m[2]);
             }
         }
 
-        trace($Options, "Saving image $Name.");
+        trace($options, "Saving image $name.");
         try {
-            $Parsed = $Upload->saveImageAs($TmpName, $Name, val('Height', $Options, ''), val('Width', $Options, ''), $Options);
-            trace($Parsed, 'Saved Image');
+            $parsed = $upload->saveImageAs($tmpName, $name, val('Height', $options, ''), val('Width', $options, ''), $options);
+            trace($parsed, 'Saved Image');
 
-            $Current = $Form->getFormValue($Field);
-            if ($Current && val('DeleteOriginal', $Options, true)) {
+            $current = $form->getFormValue($field);
+            if ($current && val('DeleteOriginal', $options, true)) {
                 // Delete the current image.
-                trace("Deleting original image: $Current.");
-                if ($Current) {
-                    $Upload->delete($Current);
+                trace("Deleting original image: $current.");
+                if ($current) {
+                    $upload->delete($current);
                 }
             }
             // Set the current value.
-            $Form->setFormValue($Field, $Parsed['SaveName']);
-        } catch (Exception $Ex) {
-            $Form->addError($Ex);
+            $form->setFormValue($field, $parsed['SaveName']);
+        } catch (Exception $ex) {
+            $form->addError($ex);
         }
     }
 
@@ -578,32 +578,32 @@ class GroupController extends Gdn_Controller {
     /**
      *
      *
-     * @param bool $ID
+     * @param bool $iD
      * @throws Exception
      * @throws Gdn_UserException
      */
-    protected function addEdit($ID = false) {
-        $Form = new Gdn_Form();
-        $Form->setModel($this->GroupModel);
+    protected function addEdit($iD = false) {
+        $form = new Gdn_Form();
+        $form->setModel($this->GroupModel);
         Gdn_Theme::section('Post');
 
-        if ($ID) {
-            $Group = $this->GroupModel->getID($ID);
+        if ($iD) {
+            $group = $this->GroupModel->getID($iD);
 
-            if (!$Group) {
+            if (!$group) {
                 throw NotFoundException('Group');
             }
 
             // Make sure the user can edit this group.
-            if (!$this->GroupModel->checkPermission('Edit', $Group)) {
-                throw ForbiddenException('@'.$this->GroupModel->checkPermission('Edit.Reason', $Group));
+            if (!$this->GroupModel->checkPermission('Edit', $group)) {
+                throw ForbiddenException('@'.$this->GroupModel->checkPermission('Edit.Reason', $group));
             }
 
-            $this->setData('Group', $Group);
-            $this->addBreadcrumb($Group['Name'], GroupUrl($Group));
+            $this->setData('Group', $group);
+            $this->addBreadcrumb($group['Name'], GroupUrl($group));
         }
 
-        $icon = val('Icon', $Group);
+        $icon = val('Icon', $group);
 
         //Get the image source so we can manipulate it in the crop module.
         $upload = new Gdn_UploadImage();
@@ -629,7 +629,7 @@ class GroupController extends Gdn_Controller {
             $source = $upload->copyLocal($basename);
 
             //Set up cropping.
-            $crop = new CropImageModule($this, $Form, $thumbnailSize, $thumbnailSize, $source);
+            $crop = new CropImageModule($this, $form, $thumbnailSize, $thumbnailSize, $source);
             $crop->setExistingCropUrl(Gdn_UploadImage::url($icon));
             $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($icon, "p%s")));
             $this->setData('crop', $crop);
@@ -646,19 +646,19 @@ class GroupController extends Gdn_Controller {
         }
 
         // Get a list of categories suitable for the category dropdown.
-        $Categories = array_filter(CategoryModel::categories(), function($Row) { return $Row['AllowGroups']; });
-        $Categories = array_column($Categories, 'Name', 'CategoryID');
-        $this->setData('Categories', $Categories);
+        $categories = array_filter(CategoryModel::categories(), function($row) { return $row['AllowGroups']; });
+        $categories = array_column($categories, 'Name', 'CategoryID');
+        $this->setData('Categories', $categories);
 
-        if ($Form->authenticatedPostBack()) {
+        if ($form->authenticatedPostBack()) {
             // We need to save the images before saving to the database.
-            self::saveImage($Form, 'Banner', ['Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => true, 'OutputType' => 'jpeg']);
+            self::saveImage($form, 'Banner', ['Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => true, 'OutputType' => 'jpeg']);
 
             if ($tmpIcon = $upload->validateUpload('Icon_New', false)) {
                 // New upload
                 $thumbOptions = ['Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif')];
                 $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
-                $Form->setFormValue('Icon', $newIcon);
+                $form->setFormValue('Icon', $newIcon);
             } else if ($icon && $crop && $crop->isCropped()) {
                 // New thumbnail
                 $tmpIcon = $source;
@@ -668,17 +668,17 @@ class GroupController extends Gdn_Controller {
                     'SourceWidth' => $crop->getCropWidth(),
                     'SourceHeight' => $crop->getCropHeight()];
                 $newIcon = $this->saveIcons($tmpIcon, $thumbOptions);
-                $Form->setFormValue('Icon', $newIcon);
+                $form->setFormValue('Icon', $newIcon);
             }
-            if ($Form->errorCount() == 0) {
+            if ($form->errorCount() == 0) {
                 if ($newIcon) {
-                    $Form->setFormValue('Icon_New', $newIcon);
+                    $form->setFormValue('Icon_New', $newIcon);
                     $icon = $newIcon;
 
                     // Update crop properties.
                     $basename = changeBasename($icon, "p%s");
                     $source = $upload->copyLocal($basename);
-                    $crop = new CropImageModule($this, $Form, $thumbnailSize, $thumbnailSize, $source);
+                    $crop = new CropImageModule($this, $form, $thumbnailSize, $thumbnailSize, $source);
                     $crop->setExistingCropUrl(Gdn_UploadImage::url($icon));
                     $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($icon, "p%s")));
                     $this->setData('crop', $crop);
@@ -686,36 +686,36 @@ class GroupController extends Gdn_Controller {
             }
 
             // Make sure the group ID can't be spoofed.
-            if ($ID) {
-                $Form->setFormValue('GroupID', $this->data('Group.GroupID'));
+            if ($iD) {
+                $form->setFormValue('GroupID', $this->data('Group.GroupID'));
             }
 
             try {
-                $GroupID = $Form->save();
-            } catch (Exception $Ex) {
-                $Form->addError($Ex);
+                $groupID = $form->save();
+            } catch (Exception $ex) {
+                $form->addError($ex);
             }
-            if ($GroupID) {
-                $Group = $this->GroupModel->getID($GroupID);
-                redirectTo(GroupUrl($Group));
+            if ($groupID) {
+                $group = $this->GroupModel->getID($groupID);
+                redirectTo(GroupUrl($group));
             } else {
-                trace($Form->formValues());
+                trace($form->formValues());
             }
         } else {
-            if ($ID) {
+            if ($iD) {
                 // Load the group.
-                $Form->setData($Group);
+                $form->setData($group);
             } else {
                 // Set some default settings.
-                $Form->setValue('Registration', 'Public');
-                $Form->setValue('Visibility', 'Public');
+                $form->setValue('Registration', 'Public');
+                $form->setValue('Visibility', 'Public');
 
-                if (count($Categories == 1)) {
-                    $Form->setValue('CategoryID', array_pop(array_keys($Categories)));
+                if (count($categories == 1)) {
+                    $form->setValue('CategoryID', array_pop(array_keys($categories)));
                 }
             }
         }
-        $this->Form = $Form;
+        $this->Form = $form;
         $this->CssClass .= ' NoPanel NarrowForm';
         $this->render('AddEdit');
     }
@@ -866,43 +866,43 @@ class GroupController extends Gdn_Controller {
     /**
      *
      *
-     * @param $ID
-     * @param bool $Page
+     * @param $iD
+     * @param bool $page
      * @throws Exception
      */
-    public function discussions($ID, $Page = false) {
+    public function discussions($iD, $page = false) {
         Gdn_Theme::section('DiscussionList');
 
-        $Group = $this->GroupModel->getID($ID);
-        if (!$Group) {
+        $group = $this->GroupModel->getID($iD);
+        if (!$group) {
             throw NotFoundException('Group');
         }
 
-        $this->setData('Group', $Group);
-        $this->GroupModel->overridePermissions($Group);
+        $this->setData('Group', $group);
+        $this->GroupModel->overridePermissions($group);
 
-        list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
-        $DiscussionModel = new DiscussionModel();
-        $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent(['GroupID' => $Group['GroupID']], $Limit, $Offset));
+        list($offset, $limit) = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
+        $discussionModel = new DiscussionModel();
+        $this->DiscussionData = $this->setData('Discussions', $discussionModel->getWhereRecent(['GroupID' => $group['GroupID']], $limit, $offset));
         $this->CountCommentsPerPage = c('Vanilla.Comments.PerPage', 30);
         $this->setData('_ShowCategoryLink', false);
 
         // Add modules
-        $NewDiscussionModule = new NewDiscussionModule();
-        $NewDiscussionModule->QueryString = 'groupid='.$Group['GroupID'];
-        $this->addModule($NewDiscussionModule);
+        $newDiscussionModule = new NewDiscussionModule();
+        $newDiscussionModule->QueryString = 'groupid='.$group['GroupID'];
+        $this->addModule($newDiscussionModule);
         $this->addModule('DiscussionFilterModule');
         $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
 
-        $this->setData('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary', 'QueryString' => $NewDiscussionModule->QueryString]);
-        $this->Data['_properties']['newdiscussionmodule'] = ['CssClass' => 'Button Action Primary', 'QueryString' => $NewDiscussionModule->QueryString];
+        $this->setData('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary', 'QueryString' => $newDiscussionModule->QueryString]);
+        $this->Data['_properties']['newdiscussionmodule'] = ['CssClass' => 'Button Action Primary', 'QueryString' => $newDiscussionModule->QueryString];
 
-        $this->addBreadcrumb($Group['Name'], groupUrl($Group));
+        $this->addBreadcrumb($group['Name'], groupUrl($group));
         $this->addBreadcrumb(t('Discussions'));
 
-        $Layout = c('Vanilla.Discussions.Layout');
-        switch($Layout) {
+        $layout = c('Vanilla.Discussions.Layout');
+        switch($layout) {
             case 'table':
                 if ($this->SyndicationMethod == SYNDICATION_NONE)
                     $this->View = 'table';
@@ -918,27 +918,27 @@ class GroupController extends Gdn_Controller {
         }
 
         // Build a pager
-        $PagerFactory = new Gdn_PagerFactory();
+        $pagerFactory = new Gdn_PagerFactory();
         $this->EventArguments['PagerType'] = 'Pager';
         $this->fireEvent('BeforeBuildPager');
-        $this->Pager = $PagerFactory->getPager($this->EventArguments['PagerType'], $this);
+        $this->Pager = $pagerFactory->getPager($this->EventArguments['PagerType'], $this);
         $this->Pager->ClientID = 'Pager';
         $this->Pager->configure(
-            $Offset,
-            $Limit,
-            $Group['CountDiscussions'],
-            'group/discussions/'.groupSlug($Group).'/%1$s'
+            $offset,
+            $limit,
+            $group['CountDiscussions'],
+            'group/discussions/'.groupSlug($group).'/%1$s'
         );
         if (!$this->data('_PagerUrl')) {
-            $this->setData('_PagerUrl', 'group/discussions/'.groupSlug($Group).'/{Page}');
+            $this->setData('_PagerUrl', 'group/discussions/'.groupSlug($group).'/{Page}');
         }
-        $this->setData('_Page', $Page);
-        $this->setData('_Limit', $Limit);
+        $this->setData('_Page', $page);
+        $this->setData('_Limit', $limit);
         $this->fireEvent('AfterBuildPager');
 
-        $this->setData("CountDiscussions", $Group['CountDiscussions']);
+        $this->setData("CountDiscussions", $group['CountDiscussions']);
 
-        $header = new GroupHeaderModule($Group);
+        $header = new GroupHeaderModule($group);
         $this->addModule($header);
         $this->render($this->View, 'Discussions', 'Vanilla');
     }
@@ -946,12 +946,12 @@ class GroupController extends Gdn_Controller {
     /**
      *
      *
-     * @param $ID
+     * @param $iD
      * @throws Exception
      */
-    public function edit($ID) {
+    public function edit($iD) {
         $this->title(sprintf(t('Edit %s'), t('Group')));
-        return $this->addEdit($ID);
+        return $this->addEdit($iD);
     }
 
     /**
@@ -1023,48 +1023,48 @@ class GroupController extends Gdn_Controller {
     /**
      *
      *
-     * @param $ID
-     * @param $UserID
-     * @param $Role
+     * @param $iD
+     * @param $userID
+     * @param $role
      * @throws Exception
      */
-    public function setRole($ID, $UserID, $Role) {
-        $Group = $this->GroupModel->getID($ID);
-        if (!$Group) {
+    public function setRole($iD, $userID, $role) {
+        $group = $this->GroupModel->getID($iD);
+        if (!$group) {
             throw NotFoundException('Group');
         }
 
-        $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
-        if (!$User) {
+        $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+        if (!$user) {
             throw NotFoundException('User');
         }
 
-        if (!$this->GroupModel->checkPermission('Edit', $Group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Edit.Reason', $Group));
+        if (!$this->GroupModel->checkPermission('Edit', $group)) {
+            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Edit.Reason', $group));
         }
 
-        $GroupID = $Group['GroupID'];
+        $groupID = $group['GroupID'];
 
-        $Member = $this->GroupModel->getMembers($Group['GroupID'], ['UserID' => $UserID]);
-        $Member = array_pop($Member);
-        if (!$Member) {
+        $member = $this->GroupModel->getMembers($group['GroupID'], ['UserID' => $userID]);
+        $member = array_pop($member);
+        if (!$member) {
             throw NotFoundException('Member');
         }
 
         // You can't demote the user that started the group.
-        if ($UserID == $Group['InsertUserID']) {
+        if ($userID == $group['InsertUserID']) {
             throw ForbiddenException('@'.t("The user that started the group has to be a leader."));
         }
 
         if ($this->Request->isPostBack()) {
-            $Role = ucfirst($Role);
-            $this->GroupModel->setRole($GroupID, $UserID, $Role);
+            $role = ucfirst($role);
+            $this->GroupModel->setRole($groupID, $userID, $role);
 
-            $this->informMessage(sprintf(t('%s is now a %s.'), htmlspecialchars($User['Name']), $Role));
+            $this->informMessage(sprintf(t('%s is now a %s.'), htmlspecialchars($user['Name']), $role));
         }
 
-        $this->setData('Group', $Group);
-        $this->setData('User', $User);
+        $this->setData('Group', $group);
+        $this->setData('User', $user);
         $this->title(t('Group Role'));
         $this->render();
     }
@@ -1072,60 +1072,60 @@ class GroupController extends Gdn_Controller {
     /**
      *
      *
-     * @param $ID
-     * @param $UserID
+     * @param $iD
+     * @param $userID
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function removeMember($ID, $UserID) {
-        $Group = $this->GroupModel->getID($ID);
-        if (!$Group)
+    public function removeMember($iD, $userID) {
+        $group = $this->GroupModel->getID($iD);
+        if (!$group)
             throw NotFoundException('Group');
 
-        $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
-        if (!$User) {
+        $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+        if (!$user) {
             throw NotFoundException('User');
         }
 
-        if ($UserID == Gdn::session()->UserID) {
-            Gdn::dispatcher()->dispatch(groupUrl($Group, 'leave'));
+        if ($userID == Gdn::session()->UserID) {
+            Gdn::dispatcher()->dispatch(groupUrl($group, 'leave'));
             return;
         }
 
-        if (!$this->GroupModel->checkPermission('Moderate', $Group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Moderate.Reason', $Group));
+        if (!$this->GroupModel->checkPermission('Moderate', $group)) {
+            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Moderate.Reason', $group));
         }
 
-        $GroupID = $Group['GroupID'];
+        $groupID = $group['GroupID'];
 
-        $Member = $this->GroupModel->getMembers($Group['GroupID'], ['UserID' => $UserID]);
-        $Member = array_pop($Member);
-        if (!$Member) {
+        $member = $this->GroupModel->getMembers($group['GroupID'], ['UserID' => $userID]);
+        $member = array_pop($member);
+        if (!$member) {
             throw NotFoundException('Member');
         }
 
         // You can't remove the user that started the group.
-        if ($UserID == $Group['InsertUserID']) {
+        if ($userID == $group['InsertUserID']) {
             throw ForbiddenException('@'.t("You can't remove the creator of the group."));
         }
 
         // Only users that can edit the group can remove leaders.
-        if ($Member['Role'] == 'Leader' && !groupPermission('Edit')) {
+        if ($member['Role'] == 'Leader' && !groupPermission('Edit')) {
             throw forbiddenException('@'.t("You can't remove another leader of the group."));
         }
 
-        $Form = new Gdn_Form();
-        $this->Form = $Form;
+        $form = new Gdn_Form();
+        $this->Form = $form;
 
-        if ($Form->authenticatedPostBack()) {
-            $this->GroupModel->removeMember($GroupID, $UserID, $this->Form->getFormValue('Type'));
-            $this->jsonTarget("#Member_$UserID", null, "Remove");
+        if ($form->authenticatedPostBack()) {
+            $this->GroupModel->removeMember($groupID, $userID, $this->Form->getFormValue('Type'));
+            $this->jsonTarget("#Member_$userID", null, "Remove");
         } else {
-            $Form->setValue('Type', 'Removed');
+            $form->setValue('Type', 'Removed');
         }
 
-        $this->setData('Group', $Group);
-        $this->setData('User', $User);
+        $this->setData('Group', $group);
+        $this->setData('User', $user);
         $this->title(t('Remove Member'));
         $this->render();
     }

@@ -3,25 +3,25 @@
 class FlairPlugin extends Gdn_Plugin {
 
    /**
-    * @param AssetModel $Sender
+    * @param AssetModel $sender
     */
-   public function AssetModel_StyleCss_Handler($Sender, $Args) {
-      $Sender->AddCssFile('flair.css', 'plugins/flair');
+   public function AssetModel_StyleCss_Handler($sender, $args) {
+      $sender->AddCssFile('flair.css', 'plugins/flair');
    }
 
    /**
     *
-    * @param DiscussionController $Sender
-    * @param type $Args
+    * @param DiscussionController $sender
+    * @param type $args
     */
-   public function Base_AuthorInfo_Handler($Sender, $Args) {
+   public function Base_AuthorInfo_Handler($sender, $args) {
      if (!class_exists('UserBadgeModel')) {
        return;
      }
 
-     $UserID = GetValue('UserID', $Args['Author']);
-     if ($UserID) {
-         $this->writeFlair($UserID);
+     $userID = GetValue('UserID', $args['Author']);
+     if ($userID) {
+         $this->writeFlair($userID);
      }
    }
 
@@ -58,26 +58,26 @@ class FlairPlugin extends Gdn_Plugin {
 
    /**
    *
-   * @param UserBadgeModel $Sender
-   * @param type $Args
+   * @param UserBadgeModel $sender
+   * @param type $args
    */
-   public function UserBadgeModel_AfterGive_Handler($Sender, $Args) {
+   public function UserBadgeModel_AfterGive_Handler($sender, $args) {
      // I'm not sure how to test if the event is getting fired.
-     $user_id = GetValueR('UserBagde.UserID', $Args);
+     $user_id = GetValueR('UserBagde.UserID', $args);
      FlairModel::instance()->clearCache($user_id);
    }
 
-   public function DiscussionController_Render_Before($Sender, $Args) {
+   public function DiscussionController_Render_Before($sender, $args) {
      if (class_exists('FlairModel')) {
        // Pre-fetch the flair for the comments.
-       FlairModel::instance()->fetchUsers($Sender->Data('Comments'), 'InsertUserID');
+       FlairModel::instance()->fetchUsers($sender->Data('Comments'), 'InsertUserID');
      }
    }
 
-   public function PostController_EditComment_Render($Sender, $Args) {
+   public function PostController_EditComment_Render($sender, $args) {
      if (class_exists('FlairModel')) {
        // Pre-fetch the flair for the comments.
-       FlairModel::instance()->fetchUsers($Sender->Data('Comments'), 'InsertUserID');
+       FlairModel::instance()->fetchUsers($sender->Data('Comments'), 'InsertUserID');
      }
    }
  }

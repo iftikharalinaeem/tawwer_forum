@@ -6,26 +6,26 @@ if (!function_exists('WriteUserNoteWarningUser')):
  *
  * @param array user note
  */
-function writeUserNoteWarningUser($Row) {
-  $ViewNoteUrl = url("/profile/viewnote/{$Row['UserNoteID']}");
+function writeUserNoteWarningUser($row) {
+  $viewNoteUrl = url("/profile/viewnote/{$row['UserNoteID']}");
   ?>
    <div class="Item-Col item-col-fullwidth">
 
        <div class="Media">
-           <?php if (!isset($Row['HideWarnerIdentity']) || !$Row['HideWarnerIdentity']): ?>
-               <?php echo userPhoto($Row, ['LinkClass' => 'Img', 'Px' => 'Insert']); ?>
+           <?php if (!isset($row['HideWarnerIdentity']) || !$row['HideWarnerIdentity']): ?>
+               <?php echo userPhoto($row, ['LinkClass' => 'Img', 'Px' => 'Insert']); ?>
            <?php endif; ?>
            <div class="Media-Body">
                <?php
-               if (!isset($Row['HideWarnerIdentity']) || !$Row['HideWarnerIdentity']) {
-                   echo '<div>'.userAnchor($Row, '', ['Px' => 'Insert']).'</div> ';
+               if (!isset($row['HideWarnerIdentity']) || !$row['HideWarnerIdentity']) {
+                   echo '<div>'.userAnchor($row, '', ['Px' => 'Insert']).'</div> ';
                }
-               echo '<div class="Meta"><a href="' . $ViewNoteUrl . '">'.Gdn_Format::date($Row['DateInserted'], 'html').'</a></div>';
+               echo '<div class="Meta"><a href="' . $viewNoteUrl . '">'.Gdn_Format::date($row['DateInserted'], 'html').'</a></div>';
                ?>
            </div>
        </div>
 
-       <?php writeUserNoteBody($Row); ?>
+       <?php writeUserNoteBody($row); ?>
 
    </div>
    <?php
@@ -40,49 +40,49 @@ if (!function_exists('WriteUserNoteWarning')):
  *
  * @param array user note
  */
-function writeUserNoteWarning($Row) {
-  $Reversed = val('Reversed', $Row);
-  $IsPrivileged = val('Privileged', $Row, false);
+function writeUserNoteWarning($row) {
+  $reversed = val('Reversed', $row);
+  $isPrivileged = val('Privileged', $row, false);
 
   ?>
       <div class="Meta">
          <div class="Options">
             <?php
             Gdn_Theme::bulletRow(bullet(' '));
-            if (val('ConversationID', $Row)) {
+            if (val('ConversationID', $row)) {
                echo Gdn_Theme::bulletItem('Conversation').
-                  anchor(t('message'), '/messages/'.val('ConversationID', $Row).'#latest', 'OptionsLink', ['title' => t('The private message between the user and moderator.')]);
+                  anchor(t('message'), '/messages/'.val('ConversationID', $row).'#latest', 'OptionsLink', ['title' => t('The private message between the user and moderator.')]);
             }
 
-            if (!$Reversed && $IsPrivileged) {
+            if (!$reversed && $isPrivileged) {
                echo Gdn_Theme::bulletItem('Reverse').
-                  anchor(t('reverse'), '/profile/reversewarning?id='.$Row['UserNoteID'], 'Popup OptionsLink', ['title' => t('Reverse this warning')]);
+                  anchor(t('reverse'), '/profile/reversewarning?id='.$row['UserNoteID'], 'Popup OptionsLink', ['title' => t('Reverse this warning')]);
             }
             ?>
          </div>
 
          <?php
-         echo '<span class="NoteType NoteType-'.$Row['Type'].'">'.t(ucfirst($Row['Type'])).'</span> '.bullet(' ');
+         echo '<span class="NoteType NoteType-'.$row['Type'].'">'.t(ucfirst($row['Type'])).'</span> '.bullet(' ');
 
-         if (val('Banned', $Row)) {
+         if (val('Banned', $row)) {
             echo '<span class="NoteType NoteType-ban">'.t('Ban').'</span> '.bullet(' ');
          }
 
-         if ($Reversed) {
+         if ($reversed) {
              echo '<del>';
          }
 
-         echo plural(val('Points', $Row, 0), '%s point', '%s points');
+         echo plural(val('Points', $row, 0), '%s point', '%s points');
 
-         if (isset($Row['ExpiresString'])) {
-            echo bullet(' ').sprintf(t('lasts %s'), $Row['ExpiresString']);
+         if (isset($row['ExpiresString'])) {
+            echo bullet(' ').sprintf(t('lasts %s'), $row['ExpiresString']);
          }
 
-         if ($Reversed) {
+         if ($reversed) {
              echo '</del>';
          }
 
-         if (val('Reversed', $Row)) {
+         if (val('Reversed', $row)) {
             echo bullet(' ').t('reversed');
          }
          ?>
@@ -91,29 +91,29 @@ function writeUserNoteWarning($Row) {
       <div class="Warning-Body">
          <?php
 
-        if (val('Record', $Row)) {
-            $Record = $Row['Record'];
+        if (val('Record', $row)) {
+            $record = $row['Record'];
             echo '<div class="P">'.
                 '<b>'.t('Warned for').'</b>: '.
-                anchor(htmlspecialchars($Record['Name']), $Record['Url']).
+                anchor(htmlspecialchars($record['Name']), $record['Url']).
                 '</div>';
         }
 
-        if (val('RecordBody', $Row)) {
-            echo '<blockquote class="Quote">' . Gdn_Format::text($Row['RecordBody']) . '</blockquote>';
-        } elseif (val('Record', $Row)) {
-            echo '<blockquote class="Quote">' . Gdn_Format::text($Record['Body']) . '</blockquote>';
+        if (val('RecordBody', $row)) {
+            echo '<blockquote class="Quote">' . Gdn_Format::text($row['RecordBody']) . '</blockquote>';
+        } elseif (val('Record', $row)) {
+            echo '<blockquote class="Quote">' . Gdn_Format::text($record['Body']) . '</blockquote>';
         }
 
 
 
 
-        echo $Row['Body'];
+        echo $row['Body'];
 
-        if (val('ModeratorNote', $Row)) {
+        if (val('ModeratorNote', $row)) {
             echo '<div class="P">'.
                 '<b>'.t('Private note for moderators').'</b>: '.
-                Gdn_Format::text($Row['ModeratorNote']).
+                Gdn_Format::text($row['ModeratorNote']).
                '</div>';
          }
          ?>

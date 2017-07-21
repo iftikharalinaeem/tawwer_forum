@@ -71,59 +71,59 @@ class DbLoggerPlugin extends Gdn_Plugin {
     }
 
     /**
-     * @param SettingsController $Sender
-     * @param string $Page
+     * @param SettingsController $sender
+     * @param string $page
      */
-    public function SettingsController_EventLog_Create($Sender, $Page = '') {
-        $Sender->Permission('Garden.Settings.Manage');
+    public function SettingsController_EventLog_Create($sender, $page = '') {
+        $sender->Permission('Garden.Settings.Manage');
 
-        $Sender->Form = new Gdn_Form();
+        $sender->Form = new Gdn_Form();
         $pageSize = 30;
-        list($offset, $limit) = OffsetLimit($Page, $pageSize);
+        list($offset, $limit) = OffsetLimit($page, $pageSize);
         SaveToConfig('Api.Clean', false, false);
         $sql = Gdn::SQL();
 
         $sql->From('EventLog')
             ->Limit($limit + 1, $offset);
 
-        $get = array_change_key_case($Sender->Request->Get());
+        $get = array_change_key_case($sender->Request->Get());
 
         // Look for query parameters to filter the data.
         // todo: use timezone? on dateto and datefrom
         if ($v = val('datefrom', $get)) {
             $v = strtotime($v);
             if (!$v) {
-                $Sender->Form->AddError('Invalid Date format for From Date.');
+                $sender->Form->AddError('Invalid Date format for From Date.');
             }
             $sql->Where('Timestamp >=', $v);
-            $Sender->Form->SetFormValue('datefrom', $get['datefrom']);
+            $sender->Form->SetFormValue('datefrom', $get['datefrom']);
         }
 
         if ($v = val('dateto', $get)) {
             $v = strtotime($v);
             if (!$v) {
-                $Sender->Form->AddError('Invalid Date format for To Date.');
+                $sender->Form->AddError('Invalid Date format for To Date.');
             }
             $sql->Where('Timestamp <=', $v);
-            $Sender->Form->SetFormValue('dateto', $get['dateto']);
+            $sender->Form->SetFormValue('dateto', $get['dateto']);
         }
 
-        $Sender->Form->SetFormValue('severity', 'all');
+        $sender->Form->SetFormValue('severity', 'all');
         if (($v = val('severity', $get)) && $v != 'all') {
             $validLevelString = implode(', ', array_keys(array_slice($this->severityOptions, 0, -1)));
             $validLevelString .= ' and ' . end(array_keys($this->severityOptions));
 
             if (!isset($this->severityOptions[$v])) {
-                $Sender->Form->AddError('Invalid severity.  Valid options are: ' . $validLevelString);
+                $sender->Form->AddError('Invalid severity.  Valid options are: ' . $validLevelString);
             }
             $sql->Where('Level =', $v);
-            $Sender->Form->SetFormValue('severity', $v);
+            $sender->Form->SetFormValue('severity', $v);
 
         }
 
         if ($v = val('event', $get)) {
             $sql->Where('event =', $v);
-            $Sender->Form->SetFormValue('event', $v);
+            $sender->Form->SetFormValue('event', $v);
         }
 
         $sortOrder = 'desc';
@@ -135,7 +135,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
             }
         }
         $sql->OrderBy('Timestamp', $sortOrder);
-        $Sender->Form->SetFormValue('sortorder', $sortOrder);
+        $sender->Form->SetFormValue('sortorder', $sortOrder);
 
         $events = $sql->Get()->ResultArray();
         $events = array_splice($events, 0, $pageSize);
@@ -149,28 +149,28 @@ class DbLoggerPlugin extends Gdn_Plugin {
             unset($event['Domain'], $event['Path']);
         }
 
-        $Sender->SetData('_CurrentRecords', count($events));
+        $sender->SetData('_CurrentRecords', count($events));
 
-        $Sender->AddSideMenu();
-        $SeverityOptions = self::getArrayWithKeysAsValues($this->severityOptions);
-        $SeverityOptions['all'] = 'All';
+        $sender->AddSideMenu();
+        $severityOptions = self::getArrayWithKeysAsValues($this->severityOptions);
+        $severityOptions['all'] = 'All';
 
         $filter = Gdn::Request()->Get();
         unset($filter['TransientKey']);
         unset($filter['hpt']);
         unset($filter['Filter']);
-        $CurrentFilter = http_build_query($filter);
+        $currentFilter = http_build_query($filter);
 
-        $Sender->SetData(
+        $sender->SetData(
             [
                 'Events' => $events,
-                'SeverityOptions' => $SeverityOptions,
+                'SeverityOptions' => $severityOptions,
                 'SortOrder' => $sortOrder,
-                'CurrentFilter' => $CurrentFilter
+                'CurrentFilter' => $currentFilter
             ]
         );
 
-        $Sender->Render('eventlog', '', 'plugins/dblogger');
+        $sender->Render('eventlog', '', 'plugins/dblogger');
     }
 
     /**

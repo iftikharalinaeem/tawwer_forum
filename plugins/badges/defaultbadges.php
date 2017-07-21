@@ -4,17 +4,17 @@ if (!function_exists('DefaultPoints')) {
     /**
      *
      *
-     * @param $Threshold
+     * @param $threshold
      * @return int
      */
-    function DefaultPoints($Threshold) {
-        if ($Threshold < 10) {
+    function DefaultPoints($threshold) {
+        if ($threshold < 10) {
             return 2;
         }
-        if ($Threshold <= 250) {
+        if ($threshold <= 250) {
             return 5;
         }
-        if ($Threshold < 1000) {
+        if ($threshold < 1000) {
             return 10;
         }
         return 20;

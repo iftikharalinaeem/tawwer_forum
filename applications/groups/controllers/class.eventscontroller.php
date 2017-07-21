@@ -39,12 +39,12 @@ class EventsController extends Gdn_Controller {
     /**
      *
      *
-     * @param null $Context
-     * @param null $ContextID
+     * @param null $context
+     * @param null $contextID
      * @throws Exception
      */
-    public function index($Context = null, $ContextID = null) {
-        return $this->events($Context, $ContextID);
+    public function index($context = null, $contextID = null) {
+        return $this->events($context, $contextID);
     }
 
     /**
@@ -52,46 +52,46 @@ class EventsController extends Gdn_Controller {
      *
      * If the context is null, show events the current user is invited to.
      *
-     * @param string $Context
-     * @param integer $ContextID
+     * @param string $context
+     * @param integer $contextID
      */
-    public function events($Context = null, $ContextID = null) {
-        $EventModel = new EventModel();
-        $EventCriteria = [];
+    public function events($context = null, $contextID = null) {
+        $eventModel = new EventModel();
+        $eventCriteria = [];
 
         // Determine context
-        switch ($Context) {
+        switch ($context) {
             // Events for this group
             case 'group':
-                $GroupModel = new GroupModel();
-                $Group = $GroupModel->getID($ContextID, DATASET_TYPE_ARRAY);
-                if (!$Group) {
+                $groupModel = new GroupModel();
+                $group = $groupModel->getID($contextID, DATASET_TYPE_ARRAY);
+                if (!$group) {
                     throw NotFoundException('Group');
                 }
 
-                $this->EventArguments['Group'] = &$Group;
+                $this->EventArguments['Group'] = &$group;
                 $this->fireEvent('GroupLoaded');
 
-                $this->setData('Group', $Group);
-                $this->setData('NewButtonId', val('GroupID', $Group));
+                $this->setData('Group', $group);
+                $this->setData('NewButtonId', val('GroupID', $group));
 
                 // Check if this person is a member of the group or a moderator
-                $ViewGroupEvents = groupPermission('View', $Group);
-                if (!$ViewGroupEvents) {
+                $viewGroupEvents = groupPermission('View', $group);
+                if (!$viewGroupEvents) {
                     throw PermissionException();
                 }
 
                 $this->addBreadcrumb('Groups', url('/groups'));
-                $this->addBreadcrumb($Group['Name'], groupUrl($Group));
+                $this->addBreadcrumb($group['Name'], groupUrl($group));
 
                 // Register GroupID as criteria
-                $EventCriteria['GroupID'] = $Group['GroupID'];
+                $eventCriteria['GroupID'] = $group['GroupID'];
                 break;
 
             // Events this user is invited to
             default:
                 // Register logged-in user being invited as criteria
-                $EventCriteria['Invited'] = Gdn::session()->UserID;
+                $eventCriteria['Invited'] = Gdn::session()->UserID;
                 break;
         }
         $this->title(t('Events'));
@@ -99,19 +99,19 @@ class EventsController extends Gdn_Controller {
         $this->CssClass .= ' NoPanel';
 
         // Upcoming events
-        $UpcomingRange = c('Groups.Events.UpcomingRange', '+365 days');
-        $UpcomingEvents = $EventModel->getUpcoming($UpcomingRange, $EventCriteria);
+        $upcomingRange = c('Groups.Events.UpcomingRange', '+365 days');
+        $upcomingEvents = $eventModel->getUpcoming($upcomingRange, $eventCriteria);
 
         // Recent events
-        $RecentRange = c('Groups.Events.RecentRange', '-365 days');
-        $RecentEvents = $EventModel->getUpcoming($RecentRange, $EventCriteria, true);
+        $recentRange = c('Groups.Events.RecentRange', '-365 days');
+        $recentEvents = $eventModel->getUpcoming($recentRange, $eventCriteria, true);
 
-        $this->EventArguments['UpcomingEvents'] = &$UpcomingEvents;
-        $this->EventArguments['RecentEvents'] = &$RecentEvents;
+        $this->EventArguments['UpcomingEvents'] = &$upcomingEvents;
+        $this->EventArguments['RecentEvents'] = &$recentEvents;
         $this->fireEvent('EventsLoaded');
 
-        $this->setData('UpcomingEvents', $UpcomingEvents);
-        $this->setData('RecentEvents', $RecentEvents);
+        $this->setData('UpcomingEvents', $upcomingEvents);
+        $this->setData('RecentEvents', $recentEvents);
 
         $this->fetchView('event_functions', 'event', 'groups');
         $this->fetchView('group_functions', 'group', 'groups');

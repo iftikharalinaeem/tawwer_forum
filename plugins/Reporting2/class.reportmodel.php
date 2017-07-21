@@ -4,7 +4,7 @@
  */
 class ReportModel extends Gdn_Model {
 
-    public function __construct($Name = '') {
+    public function __construct($name = '') {
         parent::__construct('Comment');
     }
 

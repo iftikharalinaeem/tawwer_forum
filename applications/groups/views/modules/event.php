@@ -11,24 +11,24 @@
 /**
  * Output an HTML list of events or an empty state message.
  *
- * @param array $Events
- * @param string $EmptyMessage What to show when there's no content.
+ * @param array $events
+ * @param string $emptyMessage What to show when there's no content.
  */
-function WriteEventList($Events, $Group = null, $EmptyMessage = '', $Button = true) {
-    $GroupID = GetValue('GroupID', $Group, '');
-    if (GroupPermission('Member') && $Button) {
+function WriteEventList($events, $group = null, $emptyMessage = '', $button = true) {
+    $groupID = GetValue('GroupID', $group, '');
+    if (GroupPermission('Member') && $button) {
         echo '<div class="Button-Controls">';
-        echo ' '.Anchor(T('New Event'), "/event/add/{$GroupID}", 'Button Primary Group-NewEventButton').' ';
+        echo ' '.Anchor(T('New Event'), "/event/add/{$groupID}", 'Button Primary Group-NewEventButton').' ';
         echo '</div>';
     }
 
-    if (!$Events)
-        WriteEmptyState($EmptyMessage);
+    if (!$events)
+        WriteEmptyState($emptyMessage);
     else {
         echo '<ul class="NarrowList DataList-Events">';
-        foreach ($Events as $Event) {
+        foreach ($events as $event) {
             echo '<li>';
-            WriteEventCard($Event);
+            WriteEventCard($event);
             echo '</li>';
         }
         echo '</ul>';
@@ -40,26 +40,26 @@ function WriteEventList($Events, $Group = null, $EmptyMessage = '', $Button = tr
  *
  * Optionally write rich listing
  *
- * @param array $Event
+ * @param array $event
  */
-function WriteEventCard($Event) {
-    $DateStarts = new DateTime($Event['DateStarts'], Gdn::session()->getTimeZone());
-    if (Gdn::Session()->IsValid() && $HourOffset = Gdn::Session()->User->HourOffset)
-        $DateStarts->modify("{$HourOffset} hours");
+function WriteEventCard($event) {
+    $dateStarts = new DateTime($event['DateStarts'], Gdn::session()->getTimeZone());
+    if (Gdn::Session()->IsValid() && $hourOffset = Gdn::Session()->User->HourOffset)
+        $dateStarts->modify("{$hourOffset} hours");
 
     echo '<div class="Event">';
-    if (GetValue('Rich', $Event)) {
+    if (GetValue('Rich', $event)) {
 
     } else {
 
-        echo DateTile($DateStarts->format('Y-m-d'));
-        echo '<h3 class="Event-Title">'.Anchor(Gdn_Format::Text($Event['Name']), EventUrl($Event));
-        if ($DateStarts->format('g:ia') != '12:00am')
-            echo ' <span class="Event-Time MItem">'.$DateStarts->format('g:ia').'</span>';
+        echo DateTile($dateStarts->format('Y-m-d'));
+        echo '<h3 class="Event-Title">'.Anchor(Gdn_Format::Text($event['Name']), EventUrl($event));
+        if ($dateStarts->format('g:ia') != '12:00am')
+            echo ' <span class="Event-Time MItem">'.$dateStarts->format('g:ia').'</span>';
         echo '</h3>';
 
-        echo '<div class="Event-Location">'.Gdn_Format::Text($Event['Location']).'</div>';
-        echo '<p class="Event-Description">'.SliceParagraph(Gdn_Format::Text($Event['Body']), 100).'</p>';
+        echo '<div class="Event-Location">'.Gdn_Format::Text($event['Location']).'</div>';
+        echo '<p class="Event-Description">'.SliceParagraph(Gdn_Format::Text($event['Body']), 100).'</p>';
 
     }
     echo '</div>';

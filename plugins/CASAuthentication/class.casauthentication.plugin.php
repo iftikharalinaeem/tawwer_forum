@@ -39,31 +39,31 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
     }
 
     /**
-    * @param Gdn_Controller $Sender
-    * @param array $Args
+    * @param Gdn_Controller $sender
+    * @param array $args
     */
-    public function base_connectData_handler($Sender, $Args) {
-        if (val(0, $Args) != 'cas') {
+    public function base_connectData_handler($sender, $args) {
+        if (val(0, $args) != 'cas') {
             return;
         }
 
-        $User = Gdn::session()->stash('CASUser');
+        $user = Gdn::session()->stash('CASUser');
 
-        if (!$User) {
-            $Url = Url('/entry/cas');
-            $Message = "There was an error retrieving your user data. Click <a href='$Url'>here</a> to try again.";
-            throw new Gdn_UserException($Message);
+        if (!$user) {
+            $url = Url('/entry/cas');
+            $message = "There was an error retrieving your user data. Click <a href='$url'>here</a> to try again.";
+            throw new Gdn_UserException($message);
         }
 
         // Make sure there is a user.
 
-        $Form = $Sender->Form;
-        $Form->setFormValue('UniqueID', $User['UniqueID']);
-        $Form->setFormValue('Provider', 'cas');
-        $Form->setFormValue('ProviderName', 'CRN');
-        $Form->setFormValue('Name', $User['Name']);
-        $Form->setFormValue('FullName', $User['FirstName'].' '.$User['LastName']);
-        $Form->setFormValue('Email', $User['Email']);
+        $form = $sender->Form;
+        $form->setFormValue('UniqueID', $user['UniqueID']);
+        $form->setFormValue('Provider', 'cas');
+        $form->setFormValue('ProviderName', 'CRN');
+        $form->setFormValue('Name', $user['Name']);
+        $form->setFormValue('FullName', $user['FirstName'].' '.$user['LastName']);
+        $form->setFormValue('Email', $user['Email']);
 
         saveToConfig([
             'Garden.User.ValidationRegex' => UserModel::USERNAME_REGEX_MIN,
@@ -73,83 +73,83 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
         ], '', false);
 
         // Save some original data in the attributes of the connection for later API calls.
-        $Attributes = [
-            'FirstName' => $User['FirstName'],
-            'LastName' => $User['LastName']
+        $attributes = [
+            'FirstName' => $user['FirstName'],
+            'LastName' => $user['LastName']
         ];
-        $Form->setFormValue('Attributes', $Attributes);
+        $form->setFormValue('Attributes', $attributes);
 
-        $Sender->setData('Verified', true);
+        $sender->setData('Verified', true);
     }
 
     /**
     *
     *
-    * @param EntryController $Sender
+    * @param EntryController $sender
     */
-    public function entryController_CAS_create($Sender) {
+    public function entryController_CAS_create($sender) {
         $this->initializeCAS();
 
         // force CAS authentication
         try {
             unset($_GET['rm']);
             phpCAS::forceAuthentication();
-        } catch (Exception $Ex) {
-            decho($Ex);
+        } catch (Exception $ex) {
+            decho($ex);
             die();
         }
 
-        $Email = phpCAS::getUser();
-        if (!$Email) {
+        $email = phpCAS::getUser();
+        if (!$email) {
             die('Failed');
         } else {
             // We now have a user so we need to get some info.
-            $Url = sprintf(C('Plugins.CASAuthentication.ProfileUrl'), urlencode($Email));
-            $Data = file_get_contents($Url);
+            $url = sprintf(C('Plugins.CASAuthentication.ProfileUrl'), urlencode($email));
+            $data = file_get_contents($url);
 
-            $Xml = (array)simplexml_load_string($Data);
+            $xml = (array)simplexml_load_string($data);
 
-            $User = ArrayTranslate($Xml, ['email' => 'Email', 'nickname' => 'Name', 'firstName' => 'FirstName', 'lastName' => 'LastName']);
-            $User['UniqueID'] = $User['Email'];
-            Gdn::session()->stash('CASUser', $User);
+            $user = ArrayTranslate($xml, ['email' => 'Email', 'nickname' => 'Name', 'firstName' => 'FirstName', 'lastName' => 'LastName']);
+            $user['UniqueID'] = $user['Email'];
+            Gdn::session()->stash('CASUser', $user);
 
             // Now that we have the user we can redirect.
-            $Get = $Sender->Request->get();
-            unset($Get['ticket']);
-            $Url = '/entry/connect/cas?'.http_build_query($Get);
-            redirectTo($Url);
+            $get = $sender->Request->get();
+            unset($get['ticket']);
+            $url = '/entry/connect/cas?'.http_build_query($get);
+            redirectTo($url);
         }
     }
 
     /**
     *
     *
-    * @param $Sender
+    * @param $sender
     */
-    public function entryController_register_handler($Sender) {
-        $Url = c('Plugins.CASAuthentication.RegisterUrl');
-        redirectTo($Url, 302, false);
+    public function entryController_register_handler($sender) {
+        $url = c('Plugins.CASAuthentication.RegisterUrl');
+        redirectTo($url, 302, false);
     }
 
     /**
     *
     *
-    * @param EntryController $Sender
+    * @param EntryController $sender
     */
-    public function entryController_signIn_handler($Sender) {
-        if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
-            $Get = $Sender->Request->get();
-            $Url = '/entry/cas?'.http_build_query($Get);
-            redirectTo($Url);
+    public function entryController_signIn_handler($sender) {
+        if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
+            $get = $sender->Request->get();
+            $url = '/entry/cas?'.http_build_query($get);
+            redirectTo($url);
         }
     }
 
     /**
     *
     *
-    * @param $Sender
+    * @param $sender
     */
-    public function entryController_signOut_handler($Sender) {
+    public function entryController_signOut_handler($sender) {
         $this->initializeCAS();
         phpCAS::logout();
     }

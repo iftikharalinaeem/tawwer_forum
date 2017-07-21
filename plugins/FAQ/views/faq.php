@@ -57,92 +57,92 @@ $DiscussionData = $this->Data('DiscussionData');
 </style>
 <h1><?php echo $this->Data('Title'); ?></h1>
 <?php
-function FAQList($CategoryData, $DiscussionData) {
-   $List = '';
-   $Depth = 1;
-   foreach ($CategoryData as $CategoryRow) {
-      $Category = (object)$CategoryRow;
-      $CategoryID = GetValue('CategoryID', $Category);
+function FAQList($categoryData, $discussionData) {
+   $list = '';
+   $depth = 1;
+   foreach ($categoryData as $categoryRow) {
+      $category = (object)$categoryRow;
+      $categoryID = GetValue('CategoryID', $category);
 
-      if ($Category->Depth < $Depth) {
+      if ($category->Depth < $depth) {
          // You're less deep than before, so close some open containers. 
-         $UnWrap = $Depth - $Category->Depth;
-         while ($UnWrap > 0) {
-            $List .= '</li>';
-            $List .= "\r\n";
-            $List .= '</ul>';
-            $List .= "\r\n";
-            $UnWrap--;
+         $unWrap = $depth - $category->Depth;
+         while ($unWrap > 0) {
+            $list .= '</li>';
+            $list .= "\r\n";
+            $list .= '</ul>';
+            $list .= "\r\n";
+            $unWrap--;
          }
-         $List .= '</li>';
-      } else if ($Category->Depth > $Depth) {
+         $list .= '</li>';
+      } else if ($category->Depth > $depth) {
          // You're deeper than before, so wrap in another container.
-         $List .= "\r\n";
-         $List .= '<ul>';
+         $list .= "\r\n";
+         $list .= '<ul>';
       } else {
-         if ($List != '')
-            $List .= '</li>';
+         if ($list != '')
+            $list .= '</li>';
       }
-      $List .= "\r\n";
-      $List .= '<li>';
-      if ($Category->Depth > 1) { // Don't write out the main container info
+      $list .= "\r\n";
+      $list .= '<li>';
+      if ($category->Depth > 1) { // Don't write out the main container info
          // $List .= Wrap('['.$Category->Depth.'] '.$Category->Name, 'strong');
-         $List .= Wrap($Category->Name, 'strong');
-         if ($Category->Description != '')
-            $List .= Wrap(Gdn_Format::Text($Category->Description), 'p');
+         $list .= Wrap($category->Name, 'strong');
+         if ($category->Description != '')
+            $list .= Wrap(Gdn_Format::Text($category->Description), 'p');
       }
       
-      $Depth = $Category->Depth;
+      $depth = $category->Depth;
       
       // Write out the FAQs in this category
-      $QList = '';
-      foreach ($DiscussionData as $Discussion) {
-         if ($Discussion->CategoryID == $Category->CategoryID) {
-            $QList .= Wrap(Anchor(Gdn_Format::PlainText($Discussion->Name), '#Q'.$Discussion->DiscussionID), 'li');
+      $qList = '';
+      foreach ($discussionData as $discussion) {
+         if ($discussion->CategoryID == $category->CategoryID) {
+            $qList .= Wrap(Anchor(Gdn_Format::PlainText($discussion->Name), '#Q'.$discussion->DiscussionID), 'li');
          }
       }
-      $List .= $QList != '' ? Wrap($QList, 'ol class="QList"') : '';
+      $list .= $qList != '' ? Wrap($qList, 'ol class="QList"') : '';
       
    }
    // Unwrap if necessary
-   while ($Depth > 1) {
-      $List .= '</li>';
-      $List .= "\r\n";
-      $List .= '</ul>';
-      $List .= "\r\n";
-      $Depth--;
+   while ($depth > 1) {
+      $list .= '</li>';
+      $list .= "\r\n";
+      $list .= '</ul>';
+      $list .= "\r\n";
+      $depth--;
    }
-   $List .= '</li>';
-   return Wrap($List, 'ul class="TOC"');
+   $list .= '</li>';
+   return Wrap($list, 'ul class="TOC"');
    
 }
 
-function AnswerList($CategoryData, $DiscussionData) {
-   $List = '';
-   foreach ($CategoryData as $CategoryRow) {
-      $Category = (object)$CategoryRow;
-      $CategoryID = GetValue('CategoryID', $Category);
+function AnswerList($categoryData, $discussionData) {
+   $list = '';
+   foreach ($categoryData as $categoryRow) {
+      $category = (object)$categoryRow;
+      $categoryID = GetValue('CategoryID', $category);
       
       // Write out the FAQs in this category
-      $QList = '';
-      foreach ($DiscussionData as $Discussion) {
-         if ($Discussion->CategoryID == $Category->CategoryID) {
-            $QList .= '<div class="FAQAnswer" id="Q'.$Discussion->DiscussionID.'">';
-            $QList .= Wrap(Gdn_Format::PlainText($Discussion->Name), 'strong');
-            $QList .= Wrap(Gdn_Format::To($Discussion->Body, $Discussion->Format), 'div class="Answer Legal"');
-            $QList .= '</div>';
-            $QList .= Anchor('Back to Top', '#top', 'ToTop');
+      $qList = '';
+      foreach ($discussionData as $discussion) {
+         if ($discussion->CategoryID == $category->CategoryID) {
+            $qList .= '<div class="FAQAnswer" id="Q'.$discussion->DiscussionID.'">';
+            $qList .= Wrap(Gdn_Format::PlainText($discussion->Name), 'strong');
+            $qList .= Wrap(Gdn_Format::To($discussion->Body, $discussion->Format), 'div class="Answer Legal"');
+            $qList .= '</div>';
+            $qList .= Anchor('Back to Top', '#top', 'ToTop');
          }
       }
-      if ($QList != '') {
-         if ($Category->Depth > 1)
-            $List .= Wrap($Category->Name, 'strong');
+      if ($qList != '') {
+         if ($category->Depth > 1)
+            $list .= Wrap($category->Name, 'strong');
 
-         $List .= $QList;
+         $list .= $qList;
       }
       
    }
-   return $List;
+   return $list;
    
 }
 

@@ -5,39 +5,39 @@ class BookmarkCheckboxPlugin extends Gdn_Plugin {
    /** 
     * Add the bookmark checkbox to the comment form.
     */
-   public function DiscussionController_AfterBodyField_Handler($Sender) {
-      $this->addCheckBox($Sender);
+   public function DiscussionController_AfterBodyField_Handler($sender) {
+      $this->addCheckBox($sender);
    }
    
-   public function PostController_DiscussionFormOptions_Handler($Sender) {
-      $this->addCheckBox($Sender);
+   public function PostController_DiscussionFormOptions_Handler($sender) {
+      $this->addCheckBox($sender);
    }
    
-   private function addCheckBox($Sender) {
+   private function addCheckBox($sender) {
       if (Gdn::Session()->IsValid()) {
          // Is this discussion currently bookmarked?
-         $Attributes = [
+         $attributes = [
              'value' => '1', 
              'checked' => 'checked'
          ];
 
-         echo $Sender->Form->CheckBox('Bookmarked', T('Bookmark this discussion'), $Attributes).'</li>';
+         echo $sender->Form->CheckBox('Bookmarked', T('Bookmark this discussion'), $attributes).'</li>';
       }
    }
    
    /** 
     * Save the bookmark value on comment form postback 
     */
-   public function PostController_AfterCommentSave_Handler($Sender) {
-      $Discussion = &$Sender->EventArguments['Discussion'];
+   public function PostController_AfterCommentSave_Handler($sender) {
+      $discussion = &$sender->EventArguments['Discussion'];
       
-      if (is_object($Discussion)) {
-         $CurrentState = GetValue('Bookmarked', $Discussion);
-         $FormState = $Sender->Form->GetFormValue('Bookmarked');
+      if (is_object($discussion)) {
+         $currentState = GetValue('Bookmarked', $discussion);
+         $formState = $sender->Form->GetFormValue('Bookmarked');
          
           // Only bookmark, don't unbookmark
-         if ($FormState && $CurrentState != $FormState) {
-            $Discussion->Bookmarked = $Sender->DiscussionModel->BookmarkDiscussion($Discussion->DiscussionID, Gdn::Session()->UserID);
+         if ($formState && $currentState != $formState) {
+            $discussion->Bookmarked = $sender->DiscussionModel->BookmarkDiscussion($discussion->DiscussionID, Gdn::Session()->UserID);
          }
       }
    }

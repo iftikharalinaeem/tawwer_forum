@@ -7,60 +7,60 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
     * Plugins.GoogleAnalytics.TrackerCode and
     * Plugins.GoogleAnalytics.TrackerDomain.
     * 
-    * @param Gdn_Controller $Sender
+    * @param Gdn_Controller $sender
     */
-   public function Base_AfterRenderAsset_Handler($Sender, $Args) {
-      if ($Args['AssetName'] != 'Head')
+   public function Base_AfterRenderAsset_Handler($sender, $args) {
+      if ($args['AssetName'] != 'Head')
          return;
       
-      $Blacklist = C('Plugins.GoogleAnalytics.ControllerBlacklist', FALSE);
-      if (!$Blacklist && strtolower($Sender->MasterView) == 'admin') {
+      $blacklist = C('Plugins.GoogleAnalytics.ControllerBlacklist', FALSE);
+      if (!$blacklist && strtolower($sender->MasterView) == 'admin') {
          return;
       }
-      if (is_array($Blacklist) && InArrayI($Sender->ControllerName, $Blacklist))
+      if (is_array($blacklist) && InArrayI($sender->ControllerName, $blacklist))
          return;
       
-      $TrackerDomain = C('Plugins.GoogleAnalytics.TrackerDomain');
-      $TrackerCode = C('Plugins.GoogleAnalytics.TrackerCode'); // Old way
-      $TrackerAccount = C('Plugins.GoogleAnalytics.Account'); // New way
-      if (!$TrackerAccount)
-         $TrackerAccount = $TrackerCode;
+      $trackerDomain = C('Plugins.GoogleAnalytics.TrackerDomain');
+      $trackerCode = C('Plugins.GoogleAnalytics.TrackerCode'); // Old way
+      $trackerAccount = C('Plugins.GoogleAnalytics.Account'); // New way
+      if (!$trackerAccount)
+         $trackerAccount = $trackerCode;
       
-      if ($TrackerAccount != '' && !is_array($TrackerAccount))
-         $TrackerAccount = [$TrackerAccount];
-      if (!is_array($TrackerDomain))
-         $TrackerDomain = [$TrackerDomain];
+      if ($trackerAccount != '' && !is_array($trackerAccount))
+         $trackerAccount = [$trackerAccount];
+      if (!is_array($trackerDomain))
+         $trackerDomain = [$trackerDomain];
       
       // If an account was specified, build the tracking command to send
-      if (is_array($TrackerAccount) && $Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
+      if (is_array($trackerAccount) && $sender->DeliveryType() == DELIVERY_TYPE_ALL) {
          // Pushing multiple GA commands like this is documented here: 
          // https://developers.google.com/analytics/devguides/collection/gajs/#MultipleCommands
-         $Alpha = explode(',', ',b.,c.,d.,e.,f.,g.,h.,i.,j.,k.,l.,m.,n.,o.,p.');
-         $Script = '<script type="text/javascript">';
-         $Script .= "\nvar _gaq = _gaq || [];\n";
-         $Script .= "_gaq.push(\n";
-         $AlphaIndex = 0;
-         foreach ($TrackerAccount as $Index => $Account) {
-            if ($Account == '')
+         $alpha = explode(',', ',b.,c.,d.,e.,f.,g.,h.,i.,j.,k.,l.,m.,n.,o.,p.');
+         $script = '<script type="text/javascript">';
+         $script .= "\nvar _gaq = _gaq || [];\n";
+         $script .= "_gaq.push(\n";
+         $alphaIndex = 0;
+         foreach ($trackerAccount as $index => $account) {
+            if ($account == '')
                continue;
-            $Prefix = $Alpha[$AlphaIndex];
-            $AlphaIndex++;
-            $Domain = GetValue($Index, $TrackerDomain);
-            if ($Index > 0)
-               $Script .= ',';
+            $prefix = $alpha[$alphaIndex];
+            $alphaIndex++;
+            $domain = GetValue($index, $trackerDomain);
+            if ($index > 0)
+               $script .= ',';
             
-            $Script .= "['{$Prefix}_setAccount', '{$Account}']\n";
-            if ($Domain)
-               $Script .= ",['{$Prefix}_setDomainName', '{$Domain}']\n";
+            $script .= "['{$prefix}_setAccount', '{$account}']\n";
+            if ($domain)
+               $script .= ",['{$prefix}_setDomainName', '{$domain}']\n";
 
-            if ($Sender->Data('AnalyticsFunnelPage', FALSE)) {
-               $FunnelPageName = $Sender->Data('AnalyticsFunnelPage');
-               $Script .= ",['{$Prefix}_trackPageview','{$FunnelPageName}']\n";
+            if ($sender->Data('AnalyticsFunnelPage', FALSE)) {
+               $funnelPageName = $sender->Data('AnalyticsFunnelPage');
+               $script .= ",['{$prefix}_trackPageview','{$funnelPageName}']\n";
             } else {
-               $Script .= ",['{$Prefix}_trackPageview']\n";
+               $script .= ",['{$prefix}_trackPageview']\n";
             }
          }
-         $Script .= ");
+         $script .= ");
   (function() {
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
@@ -68,64 +68,64 @@ class GoogleAnalyticsPlugin implements Gdn_IPlugin {
   })();
 
 </script>";
-         if ($AlphaIndex > 0) {
-            echo $Script;
+         if ($alphaIndex > 0) {
+            echo $script;
          }
       }
    }
    
    /* Make a dashboard page to manage Google Analytics tracking codes */
-   public function SettingsController_GA_Create($Sender) {
-      $Sender->Permission('Garden.Settings.Manage');
-      $Sender->Title('Google Analytics Settings');
-      $Sender->AddSideMenu();
-      $Sender->Form = new Gdn_Form();
-      $Validation = new Gdn_Validation();
-      $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-      $ConfigurationModel->SetField(['Plugins.GoogleAnalytics.TrackerDomain', 'Plugins.GoogleAnalytics.Account']);
+   public function SettingsController_GA_Create($sender) {
+      $sender->Permission('Garden.Settings.Manage');
+      $sender->Title('Google Analytics Settings');
+      $sender->AddSideMenu();
+      $sender->Form = new Gdn_Form();
+      $validation = new Gdn_Validation();
+      $configurationModel = new Gdn_ConfigurationModel($validation);
+      $configurationModel->SetField(['Plugins.GoogleAnalytics.TrackerDomain', 'Plugins.GoogleAnalytics.Account']);
       
-      $Sender->Form->SetModel($ConfigurationModel);
-      if ($Sender->Form->AuthenticatedPostBack() === FALSE) {
+      $sender->Form->SetModel($configurationModel);
+      if ($sender->Form->AuthenticatedPostBack() === FALSE) {
          // Format settings as strings
-         $Domain = GetValue('Plugins.GoogleAnalytics.TrackerDomain', $ConfigurationModel->Data);
-         if (is_array($Domain))
-            $Domain = implode("\n", $Domain);
-         $ConfigurationModel->Data['Plugins.GoogleAnalytics.TrackerDomain'] = $Domain;
+         $domain = GetValue('Plugins.GoogleAnalytics.TrackerDomain', $configurationModel->Data);
+         if (is_array($domain))
+            $domain = implode("\n", $domain);
+         $configurationModel->Data['Plugins.GoogleAnalytics.TrackerDomain'] = $domain;
 
-         $Account = GetValue('Plugins.GoogleAnalytics.Account', $ConfigurationModel->Data);
-         if (is_array($Account))
-            $Account = implode("\n", $Account);
+         $account = GetValue('Plugins.GoogleAnalytics.Account', $configurationModel->Data);
+         if (is_array($account))
+            $account = implode("\n", $account);
 
          // Check for the old way of storing this info...
-         if ($Account == '')
-            $Account = C('Plugins.GoogleAnalytics.TrackerCode', '');
+         if ($account == '')
+            $account = C('Plugins.GoogleAnalytics.TrackerCode', '');
          
-         $ConfigurationModel->Data['Plugins.GoogleAnalytics.Account'] = $Account;
+         $configurationModel->Data['Plugins.GoogleAnalytics.Account'] = $account;
 
          // Apply the config settings to the form.
-         $Sender->Form->SetData($ConfigurationModel->Data);
+         $sender->Form->SetData($configurationModel->Data);
       } else {
          // Format the strings as arrays based on newlines & spaces
-         $Account = $Sender->Form->GetValue('Plugins.GoogleAnalytics.Account');
-         $Account = explode(' ', str_replace("\n", ' ', $Account));
-         $Account = array_unique(array_map('trim', $Account));
-         $Sender->Form->SetFormValue('Plugins.GoogleAnalytics.Account', $Account);
+         $account = $sender->Form->GetValue('Plugins.GoogleAnalytics.Account');
+         $account = explode(' ', str_replace("\n", ' ', $account));
+         $account = array_unique(array_map('trim', $account));
+         $sender->Form->SetFormValue('Plugins.GoogleAnalytics.Account', $account);
          
-         $Domain = $Sender->Form->GetValue('Plugins.GoogleAnalytics.TrackerDomain');
-         $Domain = explode(' ', str_replace("\n", ' ', $Domain));
-         $Domain = array_unique(array_map('trim', $Domain));
-         $Sender->Form->SetFormValue('Plugins.GoogleAnalytics.TrackerDomain', $Domain);
+         $domain = $sender->Form->GetValue('Plugins.GoogleAnalytics.TrackerDomain');
+         $domain = explode(' ', str_replace("\n", ' ', $domain));
+         $domain = array_unique(array_map('trim', $domain));
+         $sender->Form->SetFormValue('Plugins.GoogleAnalytics.TrackerDomain', $domain);
 
-         if ($Sender->Form->Save() !== FALSE)
-            $Sender->InformMessage(T("Your settings have been saved."));
+         if ($sender->Form->Save() !== FALSE)
+            $sender->InformMessage(T("Your settings have been saved."));
          
          // Reformat arrays as string so they display properly in the form
-         $Sender->Form->SetFormValue('Plugins.GoogleAnalytics.Account', implode("\n", $Account));
-         $Sender->Form->SetFormValue('Plugins.GoogleAnalytics.TrackerDomain', implode("\n", $Domain));
+         $sender->Form->SetFormValue('Plugins.GoogleAnalytics.Account', implode("\n", $account));
+         $sender->Form->SetFormValue('Plugins.GoogleAnalytics.TrackerDomain', implode("\n", $domain));
       }
       
-      $Sender->Permission('Garden.Settings.Manage');
-      $Sender->Render('settings', '', 'plugins/GoogleAnalytics');
+      $sender->Permission('Garden.Settings.Manage');
+      $sender->Render('settings', '', 'plugins/GoogleAnalytics');
    }
    
    public function Setup() {

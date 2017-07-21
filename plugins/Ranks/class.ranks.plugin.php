@@ -21,12 +21,12 @@ class RanksPlugin extends Gdn_Plugin {
     /**
      * Add mapper methods
      *
-     * @param SimpleApiPlugin $Sender
+     * @param SimpleApiPlugin $sender
      */
-    public function simpleAPIPlugin_mapper_handler($Sender) {
-        switch ($Sender->Mapper->Version) {
+    public function simpleAPIPlugin_mapper_handler($sender) {
+        switch ($sender->Mapper->Version) {
             case '1.0':
-                $Sender->Mapper->addMap([
+                $sender->Mapper->addMap([
                     'ranks/list' => 'settings/ranks',
                     'ranks/get' => 'settings/ranks'
                 ]);
@@ -51,98 +51,98 @@ class RanksPlugin extends Gdn_Plugin {
     /**
      * Conditionally block links in activity updates.
      *
-     * @param ActivityModel $Sender
-     * @param type $Args
+     * @param ActivityModel $sender
+     * @param type $args
      */
-    public function activityModel_beforeSave_handler($Sender, $Args) {
+    public function activityModel_beforeSave_handler($sender, $args) {
         if ($this->ActivityLinks !== 'no') {
             return;
         }
-        $this->checkForLinks($Sender, $Args['Activity'], 'Story');
+        $this->checkForLinks($sender, $args['Activity'], 'Story');
     }
 
     /**
      * Conditionally block links in activity comments.
      *
-     * @param ActivityModel $Sender
-     * @param $Args
+     * @param ActivityModel $sender
+     * @param $args
      */
-    public function activityModel_beforeSaveComment_handler($Sender, $Args) {
+    public function activityModel_beforeSaveComment_handler($sender, $args) {
         if ($this->ActivityLinks !== 'no') {
             return;
         }
-        $this->checkForLinks($Sender, $Args['Comment'], 'Body');
+        $this->checkForLinks($sender, $args['Comment'], 'Body');
     }
 
     /**
      * Add rank title to author info.
      *
-     * @param Gdn_Controller $Sender
-     * @param $Args
+     * @param Gdn_Controller $sender
+     * @param $args
      */
-    public function base_authorInfo_handler($Sender, $Args) {
-        if (isset($Args['Comment'])) {
-            $UserID = valr('Comment.InsertUserID', $Args);
-        } elseif (isset($Args['Discussion'])) {
-            $UserID = valr('Discussion.InsertUserID', $Args);
+    public function base_authorInfo_handler($sender, $args) {
+        if (isset($args['Comment'])) {
+            $userID = valr('Comment.InsertUserID', $args);
+        } elseif (isset($args['Discussion'])) {
+            $userID = valr('Discussion.InsertUserID', $args);
         } else {
             return;
         }
 
-        $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
-        if ($User) {
-            echo rankTag($User, 'MItem');
+        $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+        if ($user) {
+            echo rankTag($user, 'MItem');
         }
     }
 
     /**
      * Add Ranks option to Dashboard menu.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_getAppSettingsMenuItems_handler($Sender) {
-        $Menu = $Sender->EventArguments['SideMenu'];
-        $Menu->addLink('Users', T('Ranks'), 'settings/ranks', 'Garden.Settings.Manage', ['class' => 'nav-ranks']);
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        $menu = $sender->EventArguments['SideMenu'];
+        $menu->addLink('Users', T('Ranks'), 'settings/ranks', 'Garden.Settings.Manage', ['class' => 'nav-ranks']);
     }
 
     /**
      * Show rank-specific messages.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_render_before($Sender) {
+    public function base_render_before($sender) {
         if (inSection('Dashboard') || !Gdn::session()->isValid()) {
             return;
         }
 
-        $RankID = Gdn::session()->User->RankID;
-        if (!$RankID) {
+        $rankID = Gdn::session()->User->RankID;
+        if (!$rankID) {
             return;
         }
 
-        $Rank = RankModel::ranks($RankID);
-        if (!$Rank || !val('Message', $Rank)) {
+        $rank = RankModel::ranks($rankID);
+        if (!$rank || !val('Message', $rank)) {
             return;
         }
 
-        $ID = "Rank_$RankID";
+        $iD = "Rank_$rankID";
 
-        $DismissedMessages = Gdn::session()->getPreference('DismissedMessages', []);
-        if (in_array($ID, $DismissedMessages)) {
+        $dismissedMessages = Gdn::session()->getPreference('DismissedMessages', []);
+        if (in_array($iD, $dismissedMessages)) {
             return;
         }
 
-        $Message = [
-            'MessageID' => $ID,
-            'Content' => $Rank['Message'],
+        $message = [
+            'MessageID' => $iD,
+            'Content' => $rank['Message'],
             'Format' => 'Html',
             'AllowDismiss' => true,
             'Enabled' => true,
             'AssetTarget' => 'Content',
             'CssClass' => 'Info'
         ];
-        $MessageModule = new MessageModule($Sender, $Message);
-        $Sender->addModule($MessageModule);
+        $messageModule = new MessageModule($sender, $message);
+        $sender->addModule($messageModule);
     }
 
      /**
@@ -152,74 +152,74 @@ class RanksPlugin extends Gdn_Plugin {
       * in the main body of their post, and if one has, the message cannot be
       * posted, and the user is notified.
       *
-      * @param mixed $Sender The given model.
-      * @param array $FormValues The form post values.
-      * @param string $FieldName The field name in the form to check for links.
+      * @param mixed $sender The given model.
+      * @param array $formValues The form post values.
+      * @param string $fieldName The field name in the form to check for links.
       */
-     public function checkForLinks($Sender, $FormValues, $FieldName) {
-          if (preg_match('`https?://`i', $FormValues[$FieldName])) {
-                $Sender->Validation->addValidationResult($FieldName, t($this->LinksNotAllowedMessage));
+     public function checkForLinks($sender, $formValues, $fieldName) {
+          if (preg_match('`https?://`i', $formValues[$fieldName])) {
+                $sender->Validation->addValidationResult($fieldName, t($this->LinksNotAllowedMessage));
           }
      }
 
      /**
       * Prior to saving a comment, check whether the user can post links.
       *
-      * @param CommentModel $Sender The comment model.
-      * @param BeforeSaveComment $Args The event properties.
+      * @param CommentModel $sender The comment model.
+      * @param BeforeSaveComment $args The event properties.
       */
-     public function commentModel_beforeSaveComment_handler($Sender, $Args) {
+     public function commentModel_beforeSaveComment_handler($sender, $args) {
          if ($this->CommentLinks !== 'no') {
              return;
          }
-         $this->checkForLinks($Sender, $Args['FormPostValues'], 'Body');
+         $this->checkForLinks($sender, $args['FormPostValues'], 'Body');
      }
 
      /**
       * Prior to saving a discussion, check whether the user can post links.
       *
-      * @param DiscussionModel $Sender The discussion model.
-      * @param BeforeSaveDiscussion $Args The event properties.
+      * @param DiscussionModel $sender The discussion model.
+      * @param BeforeSaveDiscussion $args The event properties.
       */
-     public function discussionModel_beforeSaveDiscussion_handler($Sender, $Args) {
+     public function discussionModel_beforeSaveDiscussion_handler($sender, $args) {
          if ($this->CommentLinks !== 'no') {
              return;
          }
-         $this->checkForLinks($Sender, $Args['FormPostValues'], 'Body');
+         $this->checkForLinks($sender, $args['FormPostValues'], 'Body');
      }
 
      /**
       * Prior to saving a new private conversation, check whether the user can post links.
       *
-      * @param ConversationModel $Sender The conversation model.
-      * @param BeforeSave $Args The event properties.
+      * @param ConversationModel $sender The conversation model.
+      * @param BeforeSave $args The event properties.
       */
-     public function conversationModel_beforeSaveValidation_handler($Sender, $Args) {
+     public function conversationModel_beforeSaveValidation_handler($sender, $args) {
           if ($this->ConversationLinks !== 'no') {
                 return;
           }
-          $this->checkForLinks($Sender, $Args['FormPostValues'], 'Body');
+          $this->checkForLinks($sender, $args['FormPostValues'], 'Body');
      }
 
     /**
      * Prior to saving a response to a private conversation, check whether the user can post links.
      *
-     * @param ConversationMessageModel $Sender The conversation message model.
-     * @param array $Args The event properties.
+     * @param ConversationMessageModel $sender The conversation message model.
+     * @param array $args The event properties.
      */
-    public function conversationMessageModel_beforeSaveValidation_handler($Sender, $Args) {
+    public function conversationMessageModel_beforeSaveValidation_handler($sender, $args) {
          if ($this->ConversationLinks !== 'no') {
               return;
          }
-         $this->checkForLinks($Sender, $Args['FormPostValues'], 'Body');
+         $this->checkForLinks($sender, $args['FormPostValues'], 'Body');
     }
 
     /**
      * Set a user's abilities (perhaps too) early in the page request.
      *
-     * @param Gdn_Dispatcher $Sender
+     * @param Gdn_Dispatcher $sender
      */
-    public function gdn_dispatcher_appStartup_handler($Sender) {
+    public function gdn_dispatcher_appStartup_handler($sender) {
         if (!Gdn::session()->UserID) {
             return;
         }
@@ -229,45 +229,45 @@ class RanksPlugin extends Gdn_Plugin {
     /**
      * Set the rank of the profile owner.
      *
-     * @param ProfileController $Sender
+     * @param ProfileController $sender
      */
-    public function profileController_render_before($Sender) {
-        $RankID = $Sender->data('Profile.RankID');
-        $Rank = RankModel::ranks($RankID);
-        if ($Rank) {
-            $Rank = arrayTranslate($Rank, ['RankID', 'Level', 'Name', 'Label']);
-            $Sender->setData('Rank', $Rank);
+    public function profileController_render_before($sender) {
+        $rankID = $sender->data('Profile.RankID');
+        $rank = RankModel::ranks($rankID);
+        if ($rank) {
+            $rank = arrayTranslate($rank, ['RankID', 'Level', 'Name', 'Label']);
+            $sender->setData('Rank', $rank);
         }
     }
 
     /**
      * Add rank to user meta list on profile.
      *
-     * @param ProfileController $Sender
+     * @param ProfileController $sender
      */
-    public function profileController_usernameMeta_handler($Sender) {
-        $User = $Sender->data('Profile');
-        if ($User) {
-            echo rankTag($User, '', ' '.Gdn_Theme::bulletItem('Rank').' ');
+    public function profileController_usernameMeta_handler($sender) {
+        $user = $sender->data('Profile');
+        if ($user) {
+            echo rankTag($user, '', ' '.Gdn_Theme::bulletItem('Rank').' ');
         }
     }
 
     /**
      * Add option to change rank to profile edit.
      *
-     * @param ProfileController $Sender
+     * @param ProfileController $sender
      */
-    public function profileController_editMyAccountAfter_handler($Sender) {
-        $this->addManualRanks($Sender);
+    public function profileController_editMyAccountAfter_handler($sender) {
+        $this->addManualRanks($sender);
     }
 
     /**
      * Add option to change rank to user edit.
      *
-     * @param UserController $Sender
+     * @param UserController $sender
      */
-    public function userController_customUserFields_handler($Sender) {
-        $this->addManualRanks($Sender);
+    public function userController_customUserFields_handler($sender) {
+        $this->addManualRanks($sender);
     }
 
     /**
@@ -300,274 +300,274 @@ class RanksPlugin extends Gdn_Plugin {
     /**
      * Endpoint to delete a rank.
      *
-     * @param Gdn_Controller $Sender
-     * @param type $RankID
+     * @param Gdn_Controller $sender
+     * @param type $rankID
      */
-    public function settingsController_deleteRank_create($Sender, $RankID) {
-        $Sender->permission('Garden.Settings.Manage');
+    public function settingsController_deleteRank_create($sender, $rankID) {
+        $sender->permission('Garden.Settings.Manage');
 
-        if ($Sender->Form->authenticatedPostBack()) {
-            $RankModel = new RankModel();
-            $RankModel->delete(['RankID' => $RankID]);
-            $Sender->jsonTarget("#Rank_$RankID", null, 'SlideUp');
+        if ($sender->Form->authenticatedPostBack()) {
+            $rankModel = new RankModel();
+            $rankModel->delete(['RankID' => $rankID]);
+            $sender->jsonTarget("#Rank_$rankID", null, 'SlideUp');
         }
 
-        $Sender->render('blank', 'utility', 'dashboard');
+        $sender->render('blank', 'utility', 'dashboard');
     }
 
     /**
      * Endpoint to edit a rank.
      *
-     * @param SettingsController $Sender
-     * @param int $RankID
+     * @param SettingsController $sender
+     * @param int $rankID
      */
-    public function settingsController_editRank_create($Sender, $RankID) {
-        $Sender->title(sprintf(t('Edit %s'), t('Rank')));
-        $this->addEdit($Sender, $RankID);
+    public function settingsController_editRank_create($sender, $rankID) {
+        $sender->title(sprintf(t('Edit %s'), t('Rank')));
+        $this->addEdit($sender, $rankID);
     }
 
      /**
       * Generic add/edit form for a rank.
       *
-      * @param Gdn_Controller $Sender
-      * @param int|bool $RankID
+      * @param Gdn_Controller $sender
+      * @param int|bool $rankID
       * @throws Exception
       */
-    protected function addEdit($Sender, $RankID = false) {
-        $Sender->permission('Garden.Settings.Manage');
+    protected function addEdit($sender, $rankID = false) {
+        $sender->permission('Garden.Settings.Manage');
 
-        $RankModel = new RankModel();
+        $rankModel = new RankModel();
 
         // Load the default from the bak first because the user editing this rank may not have
-        $DefaultFormat = strtolower(c('Garden.InputFormatterBak', c('Garden.InputFormatter')));
-        if ($DefaultFormat === 'textex') {
-            $DefaultFormat = 'text, links, youtube';
+        $defaultFormat = strtolower(c('Garden.InputFormatterBak', c('Garden.InputFormatter')));
+        if ($defaultFormat === 'textex') {
+            $defaultFormat = 'text, links, youtube';
         }
 
-        $Formats = ['Text' => 'text', 'TextEx' => 'text, links, and youtube', '' => sprintf('default (%s)', $DefaultFormat)];
-        $Sender->setData('_Formats', $Formats);
+        $formats = ['Text' => 'text', 'TextEx' => 'text, links, and youtube', '' => sprintf('default (%s)', $defaultFormat)];
+        $sender->setData('_Formats', $formats);
 
         $roles = RoleModel::roles();
         $roles = array_column($roles, 'Name', 'RoleID');
-        $Sender->setData('_Roles', $roles);
+        $sender->setData('_Roles', $roles);
 
-        if ($Sender->Form->authenticatedPostBack()) {
-            $Data = $Sender->Form->formValues();
-            unset($Data['hpt'], $Data['Checkboxes'], $Data['Save']);
+        if ($sender->Form->authenticatedPostBack()) {
+            $data = $sender->Form->formValues();
+            unset($data['hpt'], $data['Checkboxes'], $data['Save']);
 
-            $SaveData = [];
-            foreach ($Data as $Key => $Value) {
-                if (strpos($Key, '_') !== false) {
-                    if ($Value === '') {
+            $saveData = [];
+            foreach ($data as $key => $value) {
+                if (strpos($key, '_') !== false) {
+                    if ($value === '') {
                         continue;
                     }
-                    $Parts = explode('_', $Key, 2);
-                    $SaveData[$Parts[0]][$Parts[1]] = $Value;
+                    $parts = explode('_', $key, 2);
+                    $saveData[$parts[0]][$parts[1]] = $value;
                 } else {
-                    $SaveData[$Key] = $Value;
+                    $saveData[$key] = $value;
                 }
             }
 
-            $Result = $RankModel->save($SaveData);
-            $Sender->Form->setValidationResults($RankModel->validationResults());
-            if ($Result) {
-                $Sender->informMessage(t('Your changes have been saved.'));
-                $Sender->setRedirectTo('/settings/ranks');
-                $Sender->setData('Rank', RankModel::ranks($Result));
+            $result = $rankModel->save($saveData);
+            $sender->Form->setValidationResults($rankModel->validationResults());
+            if ($result) {
+                $sender->informMessage(t('Your changes have been saved.'));
+                $sender->setRedirectTo('/settings/ranks');
+                $sender->setData('Rank', RankModel::ranks($result));
             }
         } else {
-            if ($RankID) {
-                $Data = $RankModel->getID($RankID);
+            if ($rankID) {
+                $data = $rankModel->getID($rankID);
 
-                if (!$Data) {
+                if (!$data) {
                     throw NotFoundException('Rank');
                 }
 
-                $SetData = [];
-                foreach ($Data as $Key => $Value) {
-                    if (is_array($Value)) {
-                        foreach ($Value as $Key2 => $Value2) {
-                            $SetData[$Key.'_'.$Key2] = $Value2;
+                $setData = [];
+                foreach ($data as $key => $value) {
+                    if (is_array($value)) {
+                        foreach ($value as $key2 => $value2) {
+                            $setData[$key.'_'.$key2] = $value2;
                         }
                     } else {
-                        $SetData[$Key] = $Value;
+                        $setData[$key] = $value;
                     }
                 }
 
-                $Sender->Form->setData($SetData);
-                $Sender->Form->addHidden('RankID', $RankID);
+                $sender->Form->setData($setData);
+                $sender->Form->addHidden('RankID', $rankID);
             }
         }
-        $Sender->addSideMenu();
-        $Sender->render('Rank', '', 'plugins/Ranks');
+        $sender->addSideMenu();
+        $sender->render('Rank', '', 'plugins/Ranks');
     }
 
     /**
      * Endpoint to add a rank.
      *
-     * @param SettingsController $Sender
+     * @param SettingsController $sender
      */
-    public function settingsController_addRank_create($Sender) {
-        $Sender->title('Add Rank');
-        $this->addEdit($Sender);
+    public function settingsController_addRank_create($sender) {
+        $sender->title('Add Rank');
+        $this->addEdit($sender);
     }
 
     /**
      * Endpoint to view all ranks.
      *
-     * @param SettingsController $Sender
-     * @param null|int $RankID
+     * @param SettingsController $sender
+     * @param null|int $rankID
      */
-    public function settingsController_ranks_create($Sender, $RankID = null) {
-        $Sender->permission('Garden.Settings.Manage');
+    public function settingsController_ranks_create($sender, $rankID = null) {
+        $sender->permission('Garden.Settings.Manage');
 
-        $RankModel = new RankModel();
+        $rankModel = new RankModel();
 
-        if (empty($RankID)) {
-            $Ranks = $RankModel->getWhere(false, 'Level')->resultArray();
+        if (empty($rankID)) {
+            $ranks = $rankModel->getWhere(false, 'Level')->resultArray();
         } else {
-            $Rank = $RankModel->getID($RankID);
-            $Ranks = [$Rank];
+            $rank = $rankModel->getID($rankID);
+            $ranks = [$rank];
         }
 
-        $Sender->setData('Ranks', $Ranks);
-        $Sender->addSideMenu();
-        $Sender->render('Ranks', '', 'plugins/Ranks');
+        $sender->setData('Ranks', $ranks);
+        $sender->addSideMenu();
+        $sender->render('Ranks', '', 'plugins/Ranks');
     }
 
     /**
      * Endpoint to apply a rank to a user.
      *
-     * @param ProfileController $Sender
+     * @param ProfileController $sender
      */
-    public function profileController_applyRank_create($Sender) {
-        $User = Gdn::session()->User;
-        if (!$User) {
+    public function profileController_applyRank_create($sender) {
+        $user = Gdn::session()->User;
+        if (!$user) {
             return;
         }
 
-        $RankModel = new RankModel();
-        $Result = $RankModel->applyRank($User);
+        $rankModel = new RankModel();
+        $result = $rankModel->applyRank($user);
 
-        $Sender->Data = $Result;
-        $Sender->render('Blank', 'Utility', 'Dashboard');
+        $sender->Data = $result;
+        $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
      * Evaluate users for new rank when registering.
      *
-     * @param UserModel $Sender
-     * @param array $Args
+     * @param UserModel $sender
+     * @param array $args
      */
-    public function userModel_afterRegister_handler($Sender, $Args) {
-        $UserID = $Args['UserID'];
-        $User = Gdn::userModel()->getID($UserID);
+    public function userModel_afterRegister_handler($sender, $args) {
+        $userID = $args['UserID'];
+        $user = Gdn::userModel()->getID($userID);
 
-        $RankModel = new RankModel();
-        $RankModel->applyRank($User);
+        $rankModel = new RankModel();
+        $rankModel->applyRank($user);
     }
 
     /**
      * Evaluate users for new rank when signing in.
      *
-     * @param UserModel $Sender
-     * @param array $Args
+     * @param UserModel $sender
+     * @param array $args
      */
-    public function userModel_afterSignIn_handler($Sender, $Args) {
+    public function userModel_afterSignIn_handler($sender, $args) {
         if (!Gdn::session()->User) {
             return;
         }
-        $RankModel = new RankModel();
-        $RankModel->applyRank(Gdn::session()->UserID);
+        $rankModel = new RankModel();
+        $rankModel->applyRank(Gdn::session()->UserID);
     }
 
     /**
      * Evaluate users for new rank when saving their state.
      *
-     * @param UserModel $Sender
-     * @param array $Args
+     * @param UserModel $sender
+     * @param array $args
      */
-    public function userModel_afterSave_handler($Sender, $Args) {
+    public function userModel_afterSave_handler($sender, $args) {
         if (!Gdn::controller()) {
             return;
         }
-        $UserID = Gdn::controller()->data('Profile.UserID');
-        if ($UserID != $Args['UserID']) {
+        $userID = Gdn::controller()->data('Profile.UserID');
+        if ($userID != $args['UserID']) {
             return;
         }
 
         // Check to make sure the rank has changed.
-        $OldRankID = Gdn::controller()->data('Profile.RankID');
-        $NewRankID = val('RankID', $Args['Fields']);
-        if ($NewRankID && $NewRankID != $OldRankID) {
+        $oldRankID = Gdn::controller()->data('Profile.RankID');
+        $newRankID = val('RankID', $args['Fields']);
+        if ($newRankID && $newRankID != $oldRankID) {
             // Send the user a notification.
-            $RankModel = new RankModel();
-            $RankModel->notify(Gdn::userModel()->getID($UserID), $RankModel->getID($NewRankID));
+            $rankModel = new RankModel();
+            $rankModel->notify(Gdn::userModel()->getID($userID), $rankModel->getID($newRankID));
         }
     }
 
     /**
      * Evaluate users for new rank when receiving points.
      *
-     * @param UserModel $Sender
-     * @param array $Args
+     * @param UserModel $sender
+     * @param array $args
      */
-    public function userModel_givePoints_handler($Sender, $Args) {
-        $UserID = $Args['UserID'];
-        $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
-        $RankModel = new RankModel();
-        $RankModel->applyRank($User);
+    public function userModel_givePoints_handler($sender, $args) {
+        $userID = $args['UserID'];
+        $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+        $rankModel = new RankModel();
+        $rankModel->applyRank($user);
     }
 
     /**
      * Evaluate users for new rank on each visit.
      *
-     * @param UserModel $Sender
-     * @param array $Args
+     * @param UserModel $sender
+     * @param array $args
      */
-    public function userModel_visit_handler($Sender, $Args) {
+    public function userModel_visit_handler($sender, $args) {
         if (!Gdn::session()->isValid()) {
             return;
         }
-        $RankModel = new RankModel();
-        $RankModel->applyRank(Gdn::session()->UserID);
+        $rankModel = new RankModel();
+        $rankModel->applyRank(Gdn::session()->UserID);
     }
 
     /**
      * Set a user's properties.
      *
-     * @param UserModel $Sender
-     * @param array $Args
+     * @param UserModel $sender
+     * @param array $args
      */
-    public function userModel_setCalculatedFields_handler($Sender, $Args) {
-        $RankID = val('RankID', $Args['User'], 0);
-        $Rank = RankModel::ranks($RankID);
+    public function userModel_setCalculatedFields_handler($sender, $args) {
+        $rankID = val('RankID', $args['User'], 0);
+        $rank = RankModel::ranks($rankID);
 
-        if ($Rank) {
-            if (isset($Rank['CssClass'])) {
-                $CssClass = val('_CssClass', $Args['User']);
-                $CssClass .= ' '.$Rank['CssClass'];
-                setValue('_CssClass', $Args['User'], trim($CssClass));
+        if ($rank) {
+            if (isset($rank['CssClass'])) {
+                $cssClass = val('_CssClass', $args['User']);
+                $cssClass .= ' '.$rank['CssClass'];
+                setValue('_CssClass', $args['User'], trim($cssClass));
             }
 
-            if (valr('Abilities.Signatures', $Rank) == 'no') {
-                setValue('HideSignature', $Args['User'], true);
+            if (valr('Abilities.Signatures', $rank) == 'no') {
+                setValue('HideSignature', $args['User'], true);
             }
 
-            if (valr('Abilities.Titles', $Rank) == 'no') {
-                setValue('Title', $Args['User'], '');
+            if (valr('Abilities.Titles', $rank) == 'no') {
+                setValue('Title', $args['User'], '');
             }
 
-            if (valr('Abilities.Locations', $Rank) == 'no') {
-                setValue('Location', $Args['User'], '');
+            if (valr('Abilities.Locations', $rank) == 'no') {
+                setValue('Location', $args['User'], '');
             }
 
-            $V = valr('Abilities.Verified', $Rank, null);
-            if (!is_null($V)) {
-                $Verified = ['yes' => 1, 'no'  => 0];
-                $Verified = val($V, $Verified, null);
-                if (is_integer($Verified)) {
-                    setValue('Verified', $Args['User'], $Verified);
+            $v = valr('Abilities.Verified', $rank, null);
+            if (!is_null($v)) {
+                $verified = ['yes' => 1, 'no'  => 0];
+                $verified = val($v, $verified, null);
+                if (is_integer($verified)) {
+                    setValue('Verified', $args['User'], $verified);
                 }
             }
         }
@@ -578,23 +578,23 @@ if (!function_exists('WriteUserRank')):
     /**
      * Output HTML for a user's rank.
      *
-     * @param array|object $User
-     * @param string $CssClass
-     * @param string $Px
+     * @param array|object $user
+     * @param string $cssClass
+     * @param string $px
      * @return string|void
      */
-    function rankTag($User, $CssClass, $Px = ' ') {
-        $RankID = val('RankID', $User);
-        if (!$RankID) {
+    function rankTag($user, $cssClass, $px = ' ') {
+        $rankID = val('RankID', $user);
+        if (!$rankID) {
             return;
         }
-        $Rank = RankModel::ranks($RankID);
-        if (!$Rank) {
+        $rank = RankModel::ranks($rankID);
+        if (!$rank) {
             return;
         }
-        $CssClass = concatSep(' ', 'Rank', $CssClass, val('CssClass', $Rank));
-        $Result = $Px.wrap($Rank['Label'], 'span', ['class' => $CssClass, 'title' => $Rank['Name']]);
-        return $Result;
+        $cssClass = concatSep(' ', 'Rank', $cssClass, val('CssClass', $rank));
+        $result = $px.wrap($rank['Label'], 'span', ['class' => $cssClass, 'title' => $rank['Name']]);
+        return $result;
     }
 
 endif;

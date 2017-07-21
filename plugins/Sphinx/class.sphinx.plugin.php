@@ -152,8 +152,8 @@ class SphinxPlugin extends Gdn_Plugin {
             $sender->Form->setData($configurationModel->Data);
         } else {
             // Save new settings
-            $Saved = $sender->Form->save();
-            if ($Saved) {
+            $saved = $sender->Form->save();
+            if ($saved) {
                 $sender->informMessage(t('Saved'));
             }
         }

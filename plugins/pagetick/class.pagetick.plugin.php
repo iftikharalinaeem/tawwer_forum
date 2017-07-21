@@ -48,8 +48,8 @@ class PageTickPlugin extends Gdn_Plugin {
 
    /// Event Handlers ///
 
-   public function Base_AfterRenderAsset_Handler($Sender, $Args) {
-      if ($Args['AssetName'] != 'Head')
+   public function Base_AfterRenderAsset_Handler($sender, $args) {
+      if ($args['AssetName'] != 'Head')
          return;
 
       $script = <<<EOT

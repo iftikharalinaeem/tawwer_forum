@@ -24,10 +24,10 @@ class LeaderBoardModule extends Gdn_Module {
     /**
      * Create the module instance.
      *
-     * @param string $Sender
+     * @param string $sender
      */
-    public function __construct($Sender = '') {
-        parent::__construct($Sender, 'plugins/badges');
+    public function __construct($sender = '') {
+        parent::__construct($sender, 'plugins/badges');
     }
 
     /**
@@ -44,10 +44,10 @@ class LeaderBoardModule extends Gdn_Module {
 
         $categoryID = $this->CategoryID;
         if ($categoryID) {
-            $Category = CategoryModel::categories($categoryID);
-            $categoryID = GetValue('PointsCategoryID', $Category, 0);
-            $Category = CategoryModel::categories($categoryID);
-            $this->setData('Category', $Category);
+            $category = CategoryModel::categories($categoryID);
+            $categoryID = GetValue('PointsCategoryID', $category, 0);
+            $category = CategoryModel::categories($categoryID);
+            $this->setData('Category', $category);
         } else {
             $categoryID = 0;
         }
@@ -134,23 +134,23 @@ class LeaderBoardModule extends Gdn_Module {
     public function title() {
         switch ($this->SlotType) {
             case 'w':
-                $Str = "This Week's Leaders";
+                $str = "This Week's Leaders";
                 break;
             case 'm':
-                $Str = "This Month's Leaders";
+                $str = "This Month's Leaders";
                 break;
             case 'a':
-                $Str = "All Time Leaders";
+                $str = "All Time Leaders";
                 break;
             default:
-                $Str = "Leaders";
+                $str = "Leaders";
                 break;
         }
 
         if ($this->data('Category')) {
-            return sprintf(T($Str.' in %s'), htmlspecialchars($this->data('Category.Name')));
+            return sprintf(T($str.' in %s'), htmlspecialchars($this->data('Category.Name')));
         } else {
-            return T($Str);
+            return T($str);
         }
     }
 

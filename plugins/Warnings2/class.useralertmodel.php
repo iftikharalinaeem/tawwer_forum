@@ -8,83 +8,83 @@ class UserAlertModel extends Gdn_Model {
     }
 
     /**
-     * @param mixed $ID
-     * @param bool $DatasetType Unused
-     * @param array $Options Unused
+     * @param mixed $iD
+     * @param bool $datasetType Unused
+     * @param array $options Unused
      * @return array
      */
-    public function getID($ID, $DatasetType = false, $Options = []) {
-        $Row = parent::getID($ID, DATASET_TYPE_ARRAY);
-        if (empty($Row)) {
-            return $Row;
+    public function getID($iD, $datasetType = false, $options = []) {
+        $row = parent::getID($iD, DATASET_TYPE_ARRAY);
+        if (empty($row)) {
+            return $row;
         }
-        $Row = $this->expandAttributes($Row);
-        return $Row;
+        $row = $this->expandAttributes($row);
+        return $row;
     }
 
     /**
      * Get a dataset for the user alert model with a where filter.
      *
-     * @param bool $Where
-     * @param string $OrderFields
-     * @param string $OrderDirection
-     * @param bool $Limit
-     * @param bool $Offset
+     * @param bool $where
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param bool $limit
+     * @param bool $offset
      * @return Gdn_DataSet
      */
-    public function getWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
-        $Data = parent::getWhere($Where, $OrderFields, $OrderDirection, $Limit, $Offset);
-        $Data->datasetType(DATASET_TYPE_ARRAY);
-        $Data->expandAttributes();
-        return $Data;
+    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
+        $data = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
+        $data->datasetType(DATASET_TYPE_ARRAY);
+        $data->expandAttributes();
+        return $data;
     }
 
     /**
      * Set expiring time.
      *
-     * @param array $Alert
+     * @param array $alert
      * @return int|null
      */
-    public function setTimeExpires(&$Alert) {
-        $TimeExpires = 0;
-        foreach ($Alert as $Name => $Value) {
-            if ($Name == 'TimeExpires' || !stringEndsWith($Name, 'Expires')) {
+    public function setTimeExpires(&$alert) {
+        $timeExpires = 0;
+        foreach ($alert as $name => $value) {
+            if ($name == 'TimeExpires' || !stringEndsWith($name, 'Expires')) {
                 continue;
             }
-            if (!$TimeExpires || ($Value && $Value < $TimeExpires)) {
-                $TimeExpires = $Value;
+            if (!$timeExpires || ($value && $value < $timeExpires)) {
+                $timeExpires = $value;
             }
         }
-        if (!$TimeExpires) {
-            $Alert['TimeExpires'] = null;
+        if (!$timeExpires) {
+            $alert['TimeExpires'] = null;
         } else {
-            $Alert['TimeExpires'] = $TimeExpires;
+            $alert['TimeExpires'] = $timeExpires;
         }
 
-        return $Alert['TimeExpires'];
+        return $alert['TimeExpires'];
     }
 
     /**
      *
-     * @param array $FormPostValues
-     * @param bool $Settings
+     * @param array $formPostValues
+     * @param bool $settings
      * @return bool
      */
-    public function save($FormPostValues, $Settings = false) {
-        $Row = $this->collapseAttributes($FormPostValues);
+    public function save($formPostValues, $settings = false) {
+        $row = $this->collapseAttributes($formPostValues);
 
-        $CurrentRow = $this->getID($Row['UserID']);
-        if ($CurrentRow) {
-            $UserID = $Row['UserID'];
-            unset($Row['UserID']);
-            if ($this->update($Row, ['UserID' => $UserID])) {
-                return $UserID;
+        $currentRow = $this->getID($row['UserID']);
+        if ($currentRow) {
+            $userID = $row['UserID'];
+            unset($row['UserID']);
+            if ($this->update($row, ['UserID' => $userID])) {
+                return $userID;
             } else {
                 return false;
             }
         } else {
-            if ($this->insert($Row)) {
-                return $Row['UserID'];
+            if ($this->insert($row)) {
+                return $row['UserID'];
             } else {
                 return false;
             }

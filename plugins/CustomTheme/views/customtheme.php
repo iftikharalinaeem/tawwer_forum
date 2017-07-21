@@ -115,10 +115,10 @@ echo $this->Form->hidden('CurrentTab', $CurrentTab);
 <?php writeRevisions($this, 'html');
 echo $this->Form->close();
 
-function writeRevisions($Sender, $Tab = '') {
-   $Data = val('RevisionData', $Sender->Data);
-   $LiveRevisionID = val('LiveRevisionID', $Sender->Data);
-   if (!$Data || $Data->numRows() == 0) {
+function writeRevisions($sender, $tab = '') {
+   $data = val('RevisionData', $sender->Data);
+   $liveRevisionID = val('LiveRevisionID', $sender->Data);
+   if (!$data || $data->numRows() == 0) {
       return;
    }
    ?>
@@ -126,23 +126,23 @@ function writeRevisions($Sender, $Tab = '') {
       <h2 class="control-panel-heading">Recent Revisions</h2>
       <div class="control-panel-body">
          <?php
-         $LastDay = '';
-         foreach ($Data->result() as $Row) { ?>
+         $lastDay = '';
+         foreach ($data->result() as $row) { ?>
             <?php
-            $Day = date('M jS, Y', Gdn_Format::toTimeStamp($Row->DateInserted));
-            if ($Day != $LastDay) {
-               echo "<div class=\"NewDay control-panel-subheading\">$Day</div>";
-               $LastDay = $Day;
+            $day = date('M jS, Y', Gdn_Format::toTimeStamp($row->DateInserted));
+            if ($day != $lastDay) {
+               echo "<div class=\"NewDay control-panel-subheading\">$day</div>";
+               $lastDay = $day;
             }
             ?>
             <ul class="control-panel-list">
-               <li class="control-panel-list-item <?php echo 'Revision'.($Row->RevisionID == $LiveRevisionID ? ' LiveRevision' : ''); ?>">
+               <li class="control-panel-list-item <?php echo 'Revision'.($row->RevisionID == $liveRevisionID ? ' LiveRevision' : ''); ?>">
                   <?php
-                  echo anchor('&rarr; '.date("g:ia", Gdn_Format::toTimeStamp($Row->DateInserted)), 'settings/customtheme/revision/'.$Tab.'/'.$Row->RevisionID);
-                  echo ($Row->Label ? ' <span class="italic truncate control-panel-list-item-label">'.htmlspecialchars($Row->Label).'</span> ' : '');
-                  if ($Row->Live == 1) {
+                  echo anchor('&rarr; '.date("g:ia", Gdn_Format::toTimeStamp($row->DateInserted)), 'settings/customtheme/revision/'.$tab.'/'.$row->RevisionID);
+                  echo ($row->Label ? ' <span class="italic truncate control-panel-list-item-label">'.htmlspecialchars($row->Label).'</span> ' : '');
+                  if ($row->Live == 1) {
                      echo dashboardSymbol('star-empty', 'icon-text', ['alt' => t('Live')]);
-                  } elseif ($Row->Live == 2) {
+                  } elseif ($row->Live == 2) {
                      echo dashboardSymbol('eye', 'icon-text', ['alt' => t('Previewing')]);
                   } ?>
                </li>
@@ -152,7 +152,7 @@ function writeRevisions($Sender, $Tab = '') {
          ?>
       </div>
       <div class="control-panel-footer">
-         <?php echo anchor(t('Revert to Original Version'), 'settings/customtheme/revision/'.$Tab.'/0', 'btn btn-control-panel'); ?>
+         <?php echo anchor(t('Revert to Original Version'), 'settings/customtheme/revision/'.$tab.'/0', 'btn btn-control-panel'); ?>
       </div>
    </section>
    <?php
