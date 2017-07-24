@@ -1,5 +1,5 @@
 {
-    "name": "Salesforce Single Sign-on",
+    "name": "Salesforce OAuth2 Single Sign-on",
     "description": "Allow users to signin through a Salesforce App.",
     "version": "1.0",
     "settingsUrl": "/settings/salesforcesso",
@@ -15,6 +15,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.0"
+        "vanilla": ">=2.3.1"
     }
 }
