@@ -37,6 +37,12 @@ class SalesForceSSOPlugin extends Gdn_OAuth2 {
         // Translate the keys of the profile sent to match the keys we are looking for.
         $profile = $this->translateProfileResults($rawProfile);
 
+        // Salesforce sends the profile pic embedded in an array called 'photos'.
+        $profile['Photo'] = valr('photos.thumbnail', $profile);
+
+        // Roles are passed as custom_attributes which can be named anything by the client on Salesforce.
+        $profile['Roles'] = valr('custom_attributes.'.c('SalesForceSSO.CustomAttributeKey.Roles', 'Roles'), $profile);
+
         // Log the results when troubleshooting.
         $this->log('getProfile API call', ['ProfileUrl' => $uri, 'Params' => $params, 'RawProfile' => $rawProfile, 'Profile' => $profile]);
         return $profile;
