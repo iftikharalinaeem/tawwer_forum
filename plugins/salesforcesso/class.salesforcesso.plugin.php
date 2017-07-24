@@ -9,7 +9,6 @@
  *
  * Expose the functionality of the core class Gdn_OAuth2 to create SSO workflow specific to Salesforce.
  */
-
 class SalesForceSSOPlugin extends Gdn_OAuth2 {
 
     protected $userProfileURL = null;
@@ -31,9 +30,7 @@ class SalesForceSSOPlugin extends Gdn_OAuth2 {
      */
     public function getProfile() {
         $uri = $this->requireVal('id', $this->accessTokenResponse, 'token request resonse');
-        $params = array(
-            'access_token' => $this->accessToken()
-        );
+        $params = ['access_token' => $this->accessToken()];
         // Request the profile from the Authentication Provider
         $rawProfile = $this->api($uri, 'GET', $params);
 
