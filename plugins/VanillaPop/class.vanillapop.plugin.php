@@ -1277,15 +1277,30 @@ class VanillaPopPlugin extends Gdn_Plugin {
 
         // Filter roles by the category's permissions.
         $categoryID = valr('Discussion.CategoryID', $args, '-1');
+        $category = CategoryModel::categories($categoryID);
+        $categoryPermissionID = $category['PermissionCategoryID'];
         $categoryModel = new CategoryModel();
-        $categoryPermissions = $categoryModel->getRolePermissions($categoryID);
+        $categoryPermissions = $categoryModel->getRolePermissions($categoryPermissionID);
         $categoryPermissions = Gdn_DataSet::index($categoryPermissions, 'RoleID');
 
         $roleIDs = [];
         foreach ($roles as $role) {
             $roleId = $role['RoleID'];
-            $roleCategoryPermission = val($roleId, $categoryPermissions, []);
-            $viewPermission = val('Vanilla.Discussions.View', $roleCategoryPermission, 0);
+
+            // Check the category's permissions that is configured on the role. This checks has to be made first.
+            $roleCategoryPermission = $roleModel->getCategoryPermissions($roleId);
+            $roleCategoryPermission = Gdn_DataSet::index($roleCategoryPermission, 'CategoryID');
+            if (isset($roleCategoryPermission[$categoryID])) {
+                $viewPermission = val('Vanilla.Discussions.View', $roleCategoryPermission[$categoryID], null);
+            }
+
+            // Check the role's permissions that is configured on the effective category.
+            // The effective category is the one that has the permissions. We fetched it using $category['PermissionCategoryID'].
+            if ($viewPermission === null) {
+                $categoryRolePermission = val($roleId, $categoryPermissions, []);
+                $viewPermission = val('Vanilla.Discussions.View', $categoryRolePermission, 0);
+            }
+
             if ($viewPermission) {
                 $roleIDs[] = $roleId;
             }
