@@ -19,55 +19,55 @@ class WhosOnlineModule extends Gdn_Module {
      *
      */
     public function getData() {
-        $SQL = Gdn::sql();
+        $sQL = Gdn::sql();
         // $this->_OnlineUsers = $SQL
         // insert or update entry into table
-        $Session = Gdn::session();
+        $session = Gdn::session();
 
-        $Frequency = c('WhosOnline.Frequency', 60);
-        $History = time() - 5 * $Frequency; // give bit of buffer
+        $frequency = c('WhosOnline.Frequency', 60);
+        $history = time() - 5 * $frequency; // give bit of buffer
 
         // Try and grab the who's online data from the cache.
-        $Data = Gdn::cache()->get('WhosOnline');
+        $data = Gdn::cache()->get('WhosOnline');
 
-        if (!$Data || !array_key_exists($Session->UserID, $Data)) {
-            $SQL
+        if (!$data || !array_key_exists($session->UserID, $data)) {
+            $sQL
                 ->select('*')
                 ->from('Whosonline w')
-                ->where('w.Timestamp >=', date('Y-m-d H:i:s', $History))
+                ->where('w.Timestamp >=', date('Y-m-d H:i:s', $history))
                 ->orderBy('Timestamp', 'desc');
 
-            if (!$Session->checkPermission('Plugins.WhosOnline.ViewHidden')) {
-                $SQL->where('w.Invisible', 0);
+            if (!$session->checkPermission('Plugins.WhosOnline.ViewHidden')) {
+                $sQL->where('w.Invisible', 0);
             }
 
-            $Data = $SQL->get()->resultArray();
-            $Data = Gdn_DataSet::index($Data, 'UserID');
-            Gdn::cache()->store('WhosOnline', $Data, [Gdn_Cache::FEATURE_EXPIRY => $Frequency]);
+            $data = $sQL->get()->resultArray();
+            $data = Gdn_DataSet::index($data, 'UserID');
+            Gdn::cache()->store('WhosOnline', $data, [Gdn_Cache::FEATURE_EXPIRY => $frequency]);
         }
 
         // Make sure the current user is shown as online.
-        if ($Session->UserID && !isset($Data[$Session->UserID])) {
-            $Data[$Session->UserID] = [
-                'UserID' => $Session->UserID,
+        if ($session->UserID && !isset($data[$session->UserID])) {
+            $data[$session->UserID] = [
+                'UserID' => $session->UserID,
                 'Timestamp' => Gdn_Format::toDateTime(),
                 'Invisible' => false
             ];
         }
 
-        Gdn::userModel()->joinUsers($Data, ['UserID']);
-        $OnlineUsers = [];
-        foreach ($Data as $User) {
-            $OnlineUsers[$User['Name']] = $User;
+        Gdn::userModel()->joinUsers($data, ['UserID']);
+        $onlineUsers = [];
+        foreach ($data as $user) {
+            $onlineUsers[$user['Name']] = $user;
         }
 
-        ksort($OnlineUsers);
-        $CountUsers = count($OnlineUsers);
-        $GuestCount = WhosOnlinePlugin::guestCount();
+        ksort($onlineUsers);
+        $countUsers = count($onlineUsers);
+        $guestCount = WhosOnlinePlugin::guestCount();
 
-        $this->setData('OnlineUsers', $OnlineUsers);
-        $this->setData('GuestCount', $GuestCount);
-        $this->setData('TotalCount', $CountUsers + $GuestCount);
+        $this->setData('OnlineUsers', $onlineUsers);
+        $this->setData('GuestCount', $guestCount);
+        $this->setData('TotalCount', $countUsers + $guestCount);
     }
 
     /**

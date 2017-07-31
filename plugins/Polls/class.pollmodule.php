@@ -151,16 +151,16 @@ class PollModule extends Gdn_Module {
                 $optionIDs[] = $option['PollOptionID'];
             } else {
                 // The option has too many votes so get the users for it separately.
-                $ID = $option['PollOptionID'];
+                $iD = $option['PollOptionID'];
                 $optionVotes = Gdn::sql()->getWhere(
                     'PollVote',
-                    ['PollOptionID' => $ID],
+                    ['PollOptionID' => $iD],
                     '', '',
                     $this->MaxVoteUsers)->resultArray();
 
                 // Join the users.
                 Gdn::userModel()->joinUsers($optionVotes, ['UserID']);
-                $votes[$ID] = $optionVotes;
+                $votes[$iD] = $optionVotes;
             }
         }
 
@@ -174,8 +174,8 @@ class PollModule extends Gdn_Module {
             Gdn::userModel()->joinUsers($otherVoteData, ['UserID']);
 
             $otherVoteData = Gdn_DataSet::index($otherVoteData, 'PollOptionID', ['Unique' => false]);
-            foreach ($otherVoteData as $ID => $users) {
-                $votes[$ID] = array_slice($users, 0, $this->MaxVoteUsers);
+            foreach ($otherVoteData as $iD => $users) {
+                $votes[$iD] = array_slice($users, 0, $this->MaxVoteUsers);
             }
         }
 

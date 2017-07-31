@@ -13,37 +13,37 @@ class FAQPlugin extends Gdn_Plugin {
       include dirname(__FILE__).'/structure.php';
    }
    
-   public function InfoController_FAQs_Create($Sender) {
+   public function InfoController_FAQs_Create($sender) {
       ForceNoSSL();
       // What is the FAQ category?
-      $FAQCategoryID = C('Plugins.FAQ.CategoryID', 0);
+      $fAQCategoryID = C('Plugins.FAQ.CategoryID', 0);
       // Load all of the discussions
-      $CategoryModel = new CategoryModel();
-      $CategoryData = $CategoryModel->GetSubTree($FAQCategoryID);
-      $Sender->SetData('CategoryData', $CategoryData);
-      $CategoryIDs = [];
-      foreach ($CategoryData as $Category) {
-         $CategoryIDs[] = GetValue('CategoryID', $Category);
+      $categoryModel = new CategoryModel();
+      $categoryData = $categoryModel->GetSubTree($fAQCategoryID);
+      $sender->SetData('CategoryData', $categoryData);
+      $categoryIDs = [];
+      foreach ($categoryData as $category) {
+         $categoryIDs[] = GetValue('CategoryID', $category);
       }
       // Get all of the discussions in these categories
-      $Limit = C('Plugins.FAQ.Limit', 200);
-      if (!is_numeric($Limit)) $Limit = 200;
-      $Sender->SetData('DiscussionData', Gdn::SQL()
+      $limit = C('Plugins.FAQ.Limit', 200);
+      if (!is_numeric($limit)) $limit = 200;
+      $sender->SetData('DiscussionData', Gdn::SQL()
          ->Select()
          ->From('Discussion')
-         ->WhereIn('CategoryID', $CategoryIDs)
-         ->Limit($Limit, 0) // Don't load too many discussions (this could be a helluva lot of data)
+         ->WhereIn('CategoryID', $categoryIDs)
+         ->Limit($limit, 0) // Don't load too many discussions (this could be a helluva lot of data)
          ->Get());
       
       // Render
-      $Sender->Title('Frequently Asked Questions');
-      $Sender->AddCssFile('style.css');      
-      $Sender->AddCssFile('vfcom.css', 'vfcom');
-      $Sender->AddAsset('Panel', $Sender->FetchView('sidemenu', 'info', 'vfcom'));
-      $Sender->Render('faq', '', 'plugins/FAQ');
+      $sender->Title('Frequently Asked Questions');
+      $sender->AddCssFile('style.css');      
+      $sender->AddCssFile('vfcom.css', 'vfcom');
+      $sender->AddAsset('Panel', $sender->FetchView('sidemenu', 'info', 'vfcom'));
+      $sender->Render('faq', '', 'plugins/FAQ');
    }
    
-   public function Base_AfterVFComSideMenu_Handler($Sender) {
+   public function Base_AfterVFComSideMenu_Handler($sender) {
       VFComWriteMenuItem('faqs', 'Frequently Asked Questions', 'info/faqs');
    }
 }

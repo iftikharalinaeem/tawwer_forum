@@ -8,23 +8,23 @@ class VanillaUploadHandler extends UploadHandler {
    /// Methods
    
    public function delete() {
-      $File = Gdn::Controller()->Request->Get('file');
+      $file = Gdn::Controller()->Request->Get('file');
 
-      $Success = TRUE;
+      $success = TRUE;
       
       // Delete the file.
-      $Upload = new Gdn_Upload();
-      $Upload->Delete($File);
+      $upload = new Gdn_Upload();
+      $upload->Delete($file);
       
       // Delete the thumbnail.
-      $Parsed = $Upload->Parse($File);
-      $ThumbName = sprintf($Parsed['SaveFormat'], "thumbnails/{$Parsed['Name']}");
-      $Upload->Delete($ThumbName);
+      $parsed = $upload->Parse($file);
+      $thumbName = sprintf($parsed['SaveFormat'], "thumbnails/{$parsed['Name']}");
+      $upload->Delete($thumbName);
       
-      $Success = $Parsed;
+      $success = $parsed;
       
       header('Content-type: application/json');
-      echo json_encode($Success);
+      echo json_encode($success);
    }
    
    public function handle_file_upload($uploaded_file, $name, $size, $type, $error, $index = null) {
@@ -64,31 +64,31 @@ class VanillaUploadHandler extends UploadHandler {
    
    public function handle_file_wget($url) {
       // Temporarily copy the file locally.
-      $Filename = basename($url);
-      $dest = $this->options['upload_dir'].$Filename;
+      $filename = basename($url);
+      $dest = $this->options['upload_dir'].$filename;
       
       TouchFolder(dirname($dest));
       copy($url, $dest);
       $size = filesize($dest);
       $file = new stdClass();
-      $file->name = $Filename;
+      $file->name = $filename;
       $file->size = intval($size);
       $file->type = mime_content_type($dest);
       $file->url = $url;
       $this->make_image_versions($file);
       
       // Move the thumbnail.
-      $Upload = new Gdn_Upload();
-      $Source = $this->options['image_versions']['thumbnail']['upload_dir'].$Filename;
+      $upload = new Gdn_Upload();
+      $source = $this->options['image_versions']['thumbnail']['upload_dir'].$filename;
       
-      if (!file_exists($Source)) {
-         die("Thumbnail doesn't exist: ".$Source);
+      if (!file_exists($source)) {
+         die("Thumbnail doesn't exist: ".$source);
       }
       
-      $Target = "thumbnails/$Filename";
-      $Parsed = $Upload->SaveAs($Source, $Target);
+      $target = "thumbnails/$filename";
+      $parsed = $upload->SaveAs($source, $target);
       
-      $file->thumbnail_url = $Parsed['Url'];
+      $file->thumbnail_url = $parsed['Url'];
       
       // Delete the temporary file.
       unlink($dest);
@@ -103,26 +103,26 @@ class VanillaUploadHandler extends UploadHandler {
       echo json_encode([$file]);
    }
    
-   public function SaveComment($File) {
-      $AutoSave = Gdn::Request()->Post('AutoSave');
-      if (!$AutoSave)
+   public function SaveComment($file) {
+      $autoSave = Gdn::Request()->Post('AutoSave');
+      if (!$autoSave)
          return;
       
       // See if we need to save a comment.
-      $DiscussionID = Gdn::Request()->Post('DiscussionID');
-      if (!$DiscussionID)
+      $discussionID = Gdn::Request()->Post('DiscussionID');
+      if (!$discussionID)
          return;
          
          
-      $Image = ArrayTranslate((array)$File, ['url' => 'Image', 'thumbnail_url' => 'Thumbnail', 'size' => 'Size']);
-      $Image['DiscussionID'] = $DiscussionID;
+      $image = ArrayTranslate((array)$file, ['url' => 'Image', 'thumbnail_url' => 'Thumbnail', 'size' => 'Size']);
+      $image['DiscussionID'] = $discussionID;
       
-      $ImageModel = new ImageModel();
-      $CommentID = $ImageModel->SaveComment($Image);
+      $imageModel = new ImageModel();
+      $commentID = $imageModel->SaveComment($image);
       
-      if ($CommentID) {
-         $File->RecordType = 'Comment';
-         $File->RecordID = $CommentID;
+      if ($commentID) {
+         $file->RecordType = 'Comment';
+         $file->RecordID = $commentID;
       }
    }
 }

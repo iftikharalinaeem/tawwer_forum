@@ -46,132 +46,132 @@ class ReactionModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Name
-     * @param $Type
-     * @param bool $OldName
+     * @param $name
+     * @param $type
+     * @param bool $oldName
      * @return bool|Gdn_DataSet|object|string
      */
-    public function defineTag($Name, $Type, $OldName = false) {
-        $Row = Gdn::sql()->getWhere('Tag', ['Name' => $Name])->firstRow(DATASET_TYPE_ARRAY);
+    public function defineTag($name, $type, $oldName = false) {
+        $row = Gdn::sql()->getWhere('Tag', ['Name' => $name])->firstRow(DATASET_TYPE_ARRAY);
 
-        if (!$Row && $OldName) {
-            $Row = Gdn::sql()->getWhere('Tag', ['Name' => $OldName])->firstRow(DATASET_TYPE_ARRAY);
+        if (!$row && $oldName) {
+            $row = Gdn::sql()->getWhere('Tag', ['Name' => $oldName])->firstRow(DATASET_TYPE_ARRAY);
         }
 
-        if (!$Row) {
-            $TagID = Gdn::sql()->insert('Tag',
+        if (!$row) {
+            $tagID = Gdn::sql()->insert('Tag',
                 [
-                    'Name' => $Name,
-                    'FullName' => $Name,
+                    'Name' => $name,
+                    'FullName' => $name,
                     'Type' => 'Reaction',
                     'InsertUserID' => Gdn::session()->UserID,
                     'DateInserted' => Gdn_Format::toDateTime()
                 ]
             );
         } else {
-            $TagID = $Row['TagID'];
-            if ($Row['Type'] != $Type || $Row['Name'] != $Name) {
+            $tagID = $row['TagID'];
+            if ($row['Type'] != $type || $row['Name'] != $name) {
                 Gdn::sql()->put('Tag',
-                    ['Name' => $Name, 'Type' => $Type],
-                    ['TagID' => $TagID]
+                    ['Name' => $name, 'Type' => $type],
+                    ['TagID' => $tagID]
                 );
             }
         }
-        return $TagID;
+        return $tagID;
     }
 
     /**
      *
      *
-     * @param $Data
-     * @param bool $OldCode
+     * @param $data
+     * @param bool $oldCode
      */
-    public function defineReactionType($Data, $OldCode = false) {
-        $UrlCode = $Data['UrlCode'];
+    public function defineReactionType($data, $oldCode = false) {
+        $urlCode = $data['UrlCode'];
 
         // Grab the tag.
-        $TagID = $this->defineTag($Data['UrlCode'], 'Reaction', $OldCode);
-        $Data['TagID'] = $TagID;
+        $tagID = $this->defineTag($data['UrlCode'], 'Reaction', $oldCode);
+        $data['TagID'] = $tagID;
 
-        $Row = [];
-        foreach (self::$columns as $Column) {
-            if (isset($Data[$Column])) {
-                $Row[$Column] = $Data[$Column];
-                unset($Data[$Column]);
+        $row = [];
+        foreach (self::$columns as $column) {
+            if (isset($data[$column])) {
+                $row[$column] = $data[$column];
+                unset($data[$column]);
             }
         }
 
         // Check to see if the reaction type has been customized.
-        if (!isset($Row['Custom'])) {
+        if (!isset($row['Custom'])) {
 
             // Get the cached result
-            $Current = self::reactionTypes($UrlCode);
-            if ($Current && val('Custom', $Current)) {
+            $current = self::reactionTypes($urlCode);
+            if ($current && val('Custom', $current)) {
                 return;
             }
 
             // Get the result from the DB
-            $CurrentCustom = $this->SQL->getWhere('ReactionType', ['UrlCode' => $UrlCode])->value('Custom');
-            if ($CurrentCustom) {
+            $currentCustom = $this->SQL->getWhere('ReactionType', ['UrlCode' => $urlCode])->value('Custom');
+            if ($currentCustom) {
                 return;
             }
         }
 
-        if (!empty($Data)) {
-            $Row['Attributes'] = dbencode($Data);
+        if (!empty($data)) {
+            $row['Attributes'] = dbencode($data);
         }
 
-        Gdn::sql()->replace('ReactionType', $Row, ['UrlCode' => $UrlCode], true);
+        Gdn::sql()->replace('ReactionType', $row, ['UrlCode' => $urlCode], true);
         Gdn::cache()->remove('ReactionTypes');
 
-        return $Data;
+        return $data;
     }
 
     /**
      *
      *
-     * @param array $Where
+     * @param array $where
      * @return array
      */
-    public static function getReactionTypes($Where = []) {
-        $Types = self::reactionTypes();
-        $Result = [];
-        foreach ($Types as $Index => $Type) {
-            if (self::filter($Type, $Where)) {
+    public static function getReactionTypes($where = []) {
+        $types = self::reactionTypes();
+        $result = [];
+        foreach ($types as $index => $type) {
+            if (self::filter($type, $where)) {
                 // Set Attributes as fields
-                $Attributes = val('Attributes', $Type);
-                if (is_string($Attributes)) {
-                    $Attributes = dbdecode($Attributes);
-                    $Attributes = (is_array($Attributes)) ? $Attributes : [];
-                    SetValue('Attributes', $Type, $Attributes);
+                $attributes = val('Attributes', $type);
+                if (is_string($attributes)) {
+                    $attributes = dbdecode($attributes);
+                    $attributes = (is_array($attributes)) ? $attributes : [];
+                    SetValue('Attributes', $type, $attributes);
                 }
                 // Add the result
-                $Result[$Index] = $Type;
+                $result[$index] = $type;
             }
         }
-        return $Result;
+        return $result;
     }
 
     /**
      *
      *
-     * @param $Row
-     * @param $Where
+     * @param $row
+     * @param $where
      * @return bool
      */
-    public static function filter($Row, $Where) {
-        foreach ($Where as $Column => $Value) {
-            if (!isset($Row[$Column]) && $Value) {
+    public static function filter($row, $where) {
+        foreach ($where as $column => $value) {
+            if (!isset($row[$column]) && $value) {
                 return false;
             }
 
-            $RowValue = $Row[$Column];
-            if (is_array($Value)) {
-                if (!in_array($RowValue, $Value)) {
+            $rowValue = $row[$column];
+            if (is_array($value)) {
+                if (!in_array($rowValue, $value)) {
                     return false;
                 }
             } else {
-                if ($RowValue != $Value) {
+                if ($rowValue != $value) {
                     return false;
                 }
             }
@@ -182,206 +182,206 @@ class ReactionModel extends Gdn_Model {
     /**
      *
      *
-     * @param $TagID
+     * @param $tagID
      * @return mixed|null
      */
-    public static function fromTagID($TagID) {
+    public static function fromTagID($tagID) {
         if (self::$TagIDs === null) {
-            $Types = self::reactionTypes();
-            self::$TagIDs = Gdn_DataSet::index($Types, ['TagID']);
+            $types = self::reactionTypes();
+            self::$TagIDs = Gdn_DataSet::index($types, ['TagID']);
 
         }
-        return val($TagID, self::$TagIDs);
+        return val($tagID, self::$TagIDs);
     }
 
     /**
      *
      *
-     * @param $Where
-     * @param string $OrderFields
-     * @param string $OrderDirection
-     * @param int $Limit
-     * @param int $Offset
+     * @param $where
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param int $limit
+     * @param int $offset
      * @return array
      * @throws Exception
      */
-    public function getRecordsWhere($Where, $OrderFields = '', $OrderDirection = '', $Limit = 30, $Offset = 0) {
+    public function getRecordsWhere($where, $orderFields = '', $orderDirection = '', $limit = 30, $offset = 0) {
         // Grab the user tags.
-        $UserTags = $this->SQL
-            ->limit($Limit, $Offset)
-            ->getWhere('UserTag', $Where, $OrderFields, $OrderDirection)
+        $userTags = $this->SQL
+            ->limit($limit, $offset)
+            ->getWhere('UserTag', $where, $orderFields, $orderDirection)
             ->resultArray();
 
-        $this->LastCount = count($UserTags);
-        self::joinRecords($UserTags);
+        $this->LastCount = count($userTags);
+        self::joinRecords($userTags);
 
-        return $UserTags;
+        return $userTags;
     }
 
     /**
      *
      *
-     * @param $Type
-     * @param $ID
-     * @param null $Operation
+     * @param $type
+     * @param $iD
+     * @param null $operation
      * @return array
      * @throws Exception
      */
-    public function getRow($Type, $ID, $Operation = null) {
-        $AttrColumn = 'Attributes';
+    public function getRow($type, $iD, $operation = null) {
+        $attrColumn = 'Attributes';
 
-        switch ($Type) {
+        switch ($type) {
             case 'Comment':
-                $Model = new CommentModel();
-                $Row = $Model->getID($ID, DATASET_TYPE_ARRAY);
+                $model = new CommentModel();
+                $row = $model->getID($iD, DATASET_TYPE_ARRAY);
                 break;
             case 'Discussion':
-                $Model = new DiscussionModel();
-                $Row = $Model->getID($ID);
+                $model = new DiscussionModel();
+                $row = $model->getID($iD);
                 break;
             case 'Activity':
-                $Model = new ActivityModel();
-                $Row = $Model->getID($ID, DATASET_TYPE_ARRAY);
-                $AttrColumn = 'Data';
+                $model = new ActivityModel();
+                $row = $model->getID($iD, DATASET_TYPE_ARRAY);
+                $attrColumn = 'Data';
                 break;
             default:
-                throw NotFoundException(ucfirst($Type));
+                throw NotFoundException(ucfirst($type));
         }
 
-        $Log = null;
-        if (!$Row && $Operation) {
+        $log = null;
+        if (!$row && $operation) {
             // The row may have been logged so try and grab it.
-            $LogModel = new LogModel();
-            $Log = $LogModel->getWhere(['RecordType' => $Type, 'RecordID' => $ID, 'Operation' => $Operation]);
+            $logModel = new LogModel();
+            $log = $logModel->getWhere(['RecordType' => $type, 'RecordID' => $iD, 'Operation' => $operation]);
 
-            if (count($Log) == 0) {
-                throw NotFoundException($Type);
+            if (count($log) == 0) {
+                throw NotFoundException($type);
             }
-            $Log = $Log[0];
-            $Row = $Log['Data'];
+            $log = $log[0];
+            $row = $log['Data'];
         }
-        $Row = (array)$Row;
+        $row = (array)$row;
 
         // Make sure the attributes are in the row and unserialized.
-        $Attributes = GetValue($AttrColumn, $Row, []);
-        if (is_string($Attributes)) {
-            $Attributes = dbdecode($Attributes);
+        $attributes = GetValue($attrColumn, $row, []);
+        if (is_string($attributes)) {
+            $attributes = dbdecode($attributes);
         }
-        if (!is_array($Attributes)) {
-            $Attributes = [];
+        if (!is_array($attributes)) {
+            $attributes = [];
         }
 
-        $Row[$AttrColumn] = $Attributes;
-        return [$Row, $Model, $Log];
+        $row[$attrColumn] = $attributes;
+        return [$row, $model, $log];
     }
 
     /**
      *
      *
-     * @param $RecordType
-     * @param $RecordID
-     * @param $Reaction
-     * @param int $Offset
-     * @param int $Limit
+     * @param $recordType
+     * @param $recordID
+     * @param $reaction
+     * @param int $offset
+     * @param int $limit
      * @return array
      */
-    public function getUsers($RecordType, $RecordID, $Reaction, $Offset = 0, $Limit = 10) {
-        $ReactionType = self::reactionTypes($Reaction);
-        if (!$ReactionType) {
+    public function getUsers($recordType, $recordID, $reaction, $offset = 0, $limit = 10) {
+        $reactionType = self::reactionTypes($reaction);
+        if (!$reactionType) {
             return [];
         }
 
-        $TagID = val('TagID', $ReactionType);
-        $UserTags = $this->SQL
+        $tagID = val('TagID', $reactionType);
+        $userTags = $this->SQL
             ->getWhere(
                 'UserTag',
-                ['RecordType' => $RecordType, 'RecordID' => $RecordID, 'TagID' => $TagID],
+                ['RecordType' => $recordType, 'RecordID' => $recordID, 'TagID' => $tagID],
                 'DateInserted',
                 'desc',
-                $Limit,
-                $Offset
+                $limit,
+                $offset
             )
             ->resultArray();
 
-        Gdn::userModel()->joinUsers($UserTags, ['UserID']);
+        Gdn::userModel()->joinUsers($userTags, ['UserID']);
 
-        return $UserTags;
+        return $userTags;
     }
 
     /**
      *
      *
-     * @param $Data
-     * @param bool $RecordType
+     * @param $data
+     * @param bool $recordType
      */
-    public function joinUserTags(&$Data, $RecordType = false) {
-        if (!$Data) {
+    public function joinUserTags(&$data, $recordType = false) {
+        if (!$data) {
             return;
         }
 
-        $IDs = [];
-        $UserIDs = [];
+        $iDs = [];
+        $userIDs = [];
 
-        if (is_a($Data, 'stdClass') || (is_array($Data) && !isset($Data[0]))) {
-            $Data2 = [&$Data];
+        if (is_a($data, 'stdClass') || (is_array($data) && !isset($data[0]))) {
+            $data2 = [&$data];
         } else {
-            $Data2 =& $Data;
+            $data2 =& $data;
         }
 
-        foreach ($Data2 as $Row) {
-            if (!$RecordType)
-                $RT = GetValue('RecordType', $Row);
+        foreach ($data2 as $row) {
+            if (!$recordType)
+                $rT = GetValue('RecordType', $row);
             else
-                $RT = $RecordType;
+                $rT = $recordType;
 
-            $ID = GetValue($RT.'ID', $Row);
+            $iD = GetValue($rT.'ID', $row);
 
-            if ($ID)
-                $IDs[$RT][$ID] = 1;
+            if ($iD)
+                $iDs[$rT][$iD] = 1;
         }
 
-        $TagsData = [];
-        foreach ($IDs as $RT => $In) {
-            $TagsData[$RT] = $this->SQL
+        $tagsData = [];
+        foreach ($iDs as $rT => $in) {
+            $tagsData[$rT] = $this->SQL
                 ->select('RecordID')
                 ->select('UserID')
                 ->select('TagID')
                 ->select('DateInserted')
                 ->from('UserTag')
-                ->where('RecordType', $RT)
-                ->whereIn('RecordID', array_keys($In))
+                ->where('RecordType', $rT)
+                ->whereIn('RecordID', array_keys($in))
                 ->orderBy('DateInserted')
                 ->get()->resultArray();
         }
 
-        $Tags = [];
-        foreach ($TagsData as $RT => $Rows) {
-            foreach ($Rows as $Row) {
-                $UserIDs[$Row['UserID']] = 1;
-                $Tags[$RT.'-'.$Row['RecordID']][] = $Row;
+        $tags = [];
+        foreach ($tagsData as $rT => $rows) {
+            foreach ($rows as $row) {
+                $userIDs[$row['UserID']] = 1;
+                $tags[$rT.'-'.$row['RecordID']][] = $row;
             }
         }
 
         // Join the tags.
-        foreach ($Data2 as &$Row) {
-            if ($RecordType) {
-                $RT = $RecordType;
+        foreach ($data2 as &$row) {
+            if ($recordType) {
+                $rT = $recordType;
             } else {
-                $RT = val('RecordType', $Row);
+                $rT = val('RecordType', $row);
             }
-            if (!$RT) {
-                $RT = 'RecordType';
+            if (!$rT) {
+                $rT = 'RecordType';
             }
-            $PK = $RT.'ID';
-            $ID = val($PK, $Row);
+            $pK = $rT.'ID';
+            $iD = val($pK, $row);
 
-            if ($ID) {
-                $TagRow = val($RT.'-'.$ID, $Tags, []);
+            if ($iD) {
+                $tagRow = val($rT.'-'.$iD, $tags, []);
             } else {
-                $TagRow = [];
+                $tagRow = [];
             }
 
-            setValue('UserTags', $Row, $TagRow);
+            setValue('UserTags', $row, $tagRow);
         }
     }
 
@@ -445,464 +445,464 @@ class ReactionModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Data
+     * @param $data
      */
-    public static function joinRecords(&$Data) {
-        $IDs = [];
-        $AllowedCats = DiscussionModel::categoryPermissions();
+    public static function joinRecords(&$data) {
+        $iDs = [];
+        $allowedCats = DiscussionModel::categoryPermissions();
 
-        if ($AllowedCats === false) {
+        if ($allowedCats === false) {
             // This user does not have permission to view anything.
-            $Data = [];
+            $data = [];
             return;
         }
 
         // Gather all of the ids to fetch.
-        foreach ($Data as &$Row) {
-            $RecordType = stringEndsWith($Row['RecordType'], '-Total', true, true);
-            $Row['RecordType'] = $RecordType;
-            $ID = $Row['RecordID'];
-            $IDs[$RecordType][$ID] = $ID;
+        foreach ($data as &$row) {
+            $recordType = stringEndsWith($row['RecordType'], '-Total', true, true);
+            $row['RecordType'] = $recordType;
+            $iD = $row['RecordID'];
+            $iDs[$recordType][$iD] = $iD;
         }
 
         // Fetch all of the data in turn.
-        $JoinData = [];
-        foreach ($IDs as $RecordType => $RecordIDs) {
-            if ($RecordType == 'Comment') {
+        $joinData = [];
+        foreach ($iDs as $recordType => $recordIDs) {
+            if ($recordType == 'Comment') {
                 Gdn::sql()
                     ->select('d.Name, d.CategoryID')
                     ->join('Discussion d', 'd.DiscussionID = r.DiscussionID');
             }
 
-            $Rows = Gdn::sql()
+            $rows = Gdn::sql()
                 ->select('r.*')
-                ->whereIn($RecordType.'ID', array_values($RecordIDs))
-                ->get($RecordType.' r')->resultArray();
+                ->whereIn($recordType.'ID', array_values($recordIDs))
+                ->get($recordType.' r')->resultArray();
 
-            $JoinData[$RecordType] = Gdn_DataSet::index($Rows, [$RecordType.'ID']);
+            $joinData[$recordType] = Gdn_DataSet::index($rows, [$recordType.'ID']);
         }
 
         // Join the rows.
-        $Unset = [];
-        foreach ($Data as $Index => &$Row) {
-            $RecordType = $Row['RecordType'];
-            $ID = $Row['RecordID'];
+        $unset = [];
+        foreach ($data as $index => &$row) {
+            $recordType = $row['RecordType'];
+            $iD = $row['RecordID'];
 
 
-            if (!isset($JoinData[$RecordType][$ID])) {
-                $Unset[] = $Index;
+            if (!isset($joinData[$recordType][$iD])) {
+                $unset[] = $index;
                 continue; // orphaned?
             }
 
-            $Record = $JoinData[$RecordType][$ID];
+            $record = $joinData[$recordType][$iD];
 
-            if ($AllowedCats !== true) {
+            if ($allowedCats !== true) {
                 // Check to see if the user has permission to view this record.
-                $CategoryID = val('CategoryID', $Record, -1);
-                if (!in_array($CategoryID, $AllowedCats)) {
-                    $Unset[] = $Index;
+                $categoryID = val('CategoryID', $record, -1);
+                if (!in_array($categoryID, $allowedCats)) {
+                    $unset[] = $index;
                     continue;
                 }
             }
 
-            $Row = array_merge($Row, $Record);
+            $row = array_merge($row, $record);
 
-            switch ($RecordType) {
+            switch ($recordType) {
                 case 'Discussion':
-                    $Url = discussionUrl($Row, '', '#latest');
+                    $url = discussionUrl($row, '', '#latest');
                     break;
                 case 'Comment':
-                    $Row['Name'] = sprintf(t('Re: %s'), $Row['Name']);
-                    $Url = commentUrl($Row, '/');
+                    $row['Name'] = sprintf(t('Re: %s'), $row['Name']);
+                    $url = commentUrl($row, '/');
                     break;
                 default:
-                    $Url = '';
+                    $url = '';
             }
-            $Row['Url'] = $Url;
+            $row['Url'] = $url;
 
             // Join the category
-            $Category = CategoryModel::categories(val('CategoryID', $Row, ''));
-            $Row['CategoryCssClass'] = val('CssClass', $Category);
+            $category = CategoryModel::categories(val('CategoryID', $row, ''));
+            $row['CategoryCssClass'] = val('CssClass', $category);
         }
 
-        foreach ($Unset as $Index) {
-            unset($Data[$Index]);
+        foreach ($unset as $index) {
+            unset($data[$index]);
         }
 
         // Join the users.
-        Gdn::userModel()->joinUsers($Data, ['InsertUserID']);
+        Gdn::userModel()->joinUsers($data, ['InsertUserID']);
 
-        if (!empty($Unset)) {
-            $Data = array_values($Data);
+        if (!empty($unset)) {
+            $data = array_values($data);
         }
     }
 
     /**
      * Toggle a reaction on a record.
      *
-     * @param array $Data The reaction data to add. This is an array with the following keys:
+     * @param array $data The reaction data to add. This is an array with the following keys:
      * - RecordType: The type of record (table name) being reacted to.
      * - RecordID: The primary key ID of the record being reacted to.
      * - TagID: The reaction tag to use.
      * - UserID: The user reacting.
      * - DateInserted: Optional. The date of the reaction.
-     * @param array $Record The record being reacted to as obtained from {@link ReactionModel::getRow()}.
-     * @param Gdn_Model $Model The model of the record being reacted to as obtained from {@link ReactionModel::getRow()}.
-     * @param bool $Delete A hint to the toggle. One of the following:
+     * @param array $record The record being reacted to as obtained from {@link ReactionModel::getRow()}.
+     * @param Gdn_Model $model The model of the record being reacted to as obtained from {@link ReactionModel::getRow()}.
+     * @param bool $delete A hint to the toggle. One of the following:
      * - ReactionModel::FORCE_ADD: Add the reaction if it does not exist. Otherwise do nothing.
      * - ReactionModel::FORCE_REMOVE: Remove the reaction if it exists. Otherwise do nothing.
      * @return mixed
      */
-    public function toggleUserTag(&$Data, &$Record, $Model, $Delete = null) {
-        $Inc = val('Total', $Data, 1);
-        touchValue('Total', $Data, $Inc);
-        touchValue('DateInserted', $Data, Gdn_Format::toDateTime());
-        $ReactionTypes = self::ReactionTypes();
-        $ReactionTypes = Gdn_DataSet::Index($ReactionTypes, ['TagID']);
+    public function toggleUserTag(&$data, &$record, $model, $delete = null) {
+        $inc = val('Total', $data, 1);
+        touchValue('Total', $data, $inc);
+        touchValue('DateInserted', $data, Gdn_Format::toDateTime());
+        $reactionTypes = self::ReactionTypes();
+        $reactionTypes = Gdn_DataSet::Index($reactionTypes, ['TagID']);
 
         // See if there is already a user tag.
-        $Where = arrayTranslate($Data, ['RecordType', 'RecordID', 'UserID']);
+        $where = arrayTranslate($data, ['RecordType', 'RecordID', 'UserID']);
 
-        $UserTags = $this->SQL->getWhere('UserTag', $Where)->resultArray();
-        $UserTags = Gdn_DataSet::index($UserTags, ['TagID']);
-        $Insert = true;
+        $userTags = $this->SQL->getWhere('UserTag', $where)->resultArray();
+        $userTags = Gdn_DataSet::index($userTags, ['TagID']);
+        $insert = true;
 
-        if (isset($UserTags[$Data['TagID']])) {
+        if (isset($userTags[$data['TagID']])) {
             // The user is toggling a tag they've already done.
-            if ($Delete === self::FORCE_ADD) {
+            if ($delete === self::FORCE_ADD) {
                 // The use is forcing a tag add so this is a no-op.
                 return;
             }
-            $Insert = false;
+            $insert = false;
 
-            $Inc = -$UserTags[$Data['TagID']]['Total'];
-            $Data['Total'] = $Inc;
+            $inc = -$userTags[$data['TagID']]['Total'];
+            $data['Total'] = $inc;
         }
 
-        if ($Insert && ($Delete === true || $Delete === self::FORCE_REMOVE)) {
+        if ($insert && ($delete === true || $delete === self::FORCE_REMOVE)) {
             return;
         }
 
-        $RecordType = $Data['RecordType'];
-        $AttrColumn = $RecordType == 'Activity' ? 'Data' : 'Attributes';
+        $recordType = $data['RecordType'];
+        $attrColumn = $recordType == 'Activity' ? 'Data' : 'Attributes';
 
         // Delete all of the tags.
-        if (count($UserTags) > 0) {
-            $DeleteWhere = $Where;
-            $DeleteWhere['TagID'] = array_keys($UserTags);
-            $this->SQL->delete('UserTag', $DeleteWhere);
+        if (count($userTags) > 0) {
+            $deleteWhere = $where;
+            $deleteWhere['TagID'] = array_keys($userTags);
+            $this->SQL->delete('UserTag', $deleteWhere);
         }
 
-        if ($Insert) {
+        if ($insert) {
             // Insert the tag.
-            $this->SQL->options('Ignore', true)->insert('UserTag', $Data);
+            $this->SQL->options('Ignore', true)->insert('UserTag', $data);
 
             // We add the row to the usertags set, but with a negative total.
-            $UserTags[$Data['TagID']] = $Data;
-            $UserTags[$Data['TagID']]['Total'] *= -1;
+            $userTags[$data['TagID']] = $data;
+            $userTags[$data['TagID']]['Total'] *= -1;
         }
 
         // Now we need to increment the totals.
-        $Px = $this->SQL->Database->DatabasePrefix;
-        $Sql = "insert {$Px}UserTag (RecordType, RecordID, TagID, UserID, DateInserted, Total)
+        $px = $this->SQL->Database->DatabasePrefix;
+        $sql = "insert {$px}UserTag (RecordType, RecordID, TagID, UserID, DateInserted, Total)
          values (:RecordType, :RecordID, :TagID, :UserID, :DateInserted, :Total)
          on duplicate key update Total = Total + :Total2";
 
 
-        $Points = 0;
+        $points = 0;
 
-        foreach ($UserTags as $Row) {
-            $Args = ArrayTranslate($Row, [
+        foreach ($userTags as $row) {
+            $args = ArrayTranslate($row, [
                 'RecordType' => ':RecordType',
                 'RecordID' => ':RecordID',
                 'TagID' => ':TagID',
                 'UserID' => ':UserID',
                 'DateInserted' => ':DateInserted']
             );
-            $Args[':Total'] = -$Row['Total'];
-            $Args[':Total2'] = $Args[':Total'];
+            $args[':Total'] = -$row['Total'];
+            $args[':Total2'] = $args[':Total'];
 
             // Increment the record total.
-            $Args[':RecordType'] = $RecordType.'-Total';
-            $Args[':UserID'] = $Record['InsertUserID'];
-            $this->SQL->Database->query($Sql, $Args);
+            $args[':RecordType'] = $recordType.'-Total';
+            $args[':UserID'] = $record['InsertUserID'];
+            $this->SQL->Database->query($sql, $args);
 
             // Increment the user total.
-            $Args[':RecordType'] = 'User';
-            $Args[':RecordID'] = $Record['InsertUserID'];
-            $Args[':UserID'] = self::USERID_OTHER;
-            $this->SQL->Database->query($Sql, $Args);
+            $args[':RecordType'] = 'User';
+            $args[':RecordID'] = $record['InsertUserID'];
+            $args[':UserID'] = self::USERID_OTHER;
+            $this->SQL->Database->query($sql, $args);
 
             // See what kind of points this reaction gives.
-            $ReactionType = $ReactionTypes[$Row['TagID']];
-            if ($ReactionPoints = GetValue('Points', $ReactionType)) {
-                if ($Row['Total'] < 1) {
-                    $Points += $ReactionPoints;
+            $reactionType = $reactionTypes[$row['TagID']];
+            if ($reactionPoints = GetValue('Points', $reactionType)) {
+                if ($row['Total'] < 1) {
+                    $points += $reactionPoints;
                 } else {
-                    $Points += -$ReactionPoints;
+                    $points += -$reactionPoints;
                 }
             }
         }
 
         // Recalculate the counts for the record.
-        $TotalTags = $this->SQL
-            ->getWhere('UserTag', ['RecordType' => $Data['RecordType'].'-Total', 'RecordID' => $Data['RecordID']])
+        $totalTags = $this->SQL
+            ->getWhere('UserTag', ['RecordType' => $data['RecordType'].'-Total', 'RecordID' => $data['RecordID']])
             ->resultArray();
-        $TotalTags = Gdn_DataSet::index($TotalTags, ['TagID']);
-        $React = [];
-        $Diffs = [];
-        $Set = [];
+        $totalTags = Gdn_DataSet::index($totalTags, ['TagID']);
+        $react = [];
+        $diffs = [];
+        $set = [];
 
-        foreach ($ReactionTypes as $TagID => $Type) {
-            if (isset($TotalTags[$TagID])) {
-                $React[$Type['UrlCode']] = $TotalTags[$TagID]['Total'];
+        foreach ($reactionTypes as $tagID => $type) {
+            if (isset($totalTags[$tagID])) {
+                $react[$type['UrlCode']] = $totalTags[$tagID]['Total'];
 
-                if ($Column = val('IncrementColumn', $Type)) {
+                if ($column = val('IncrementColumn', $type)) {
                     // This reaction type also increments a column so do that too.
-                    touchValue($Column, $Set, 0);
-                    $Set[$Column] += $TotalTags[$TagID]['Total'] * val('IncrementValue', $Type, 1);
+                    touchValue($column, $set, 0);
+                    $set[$column] += $totalTags[$tagID]['Total'] * val('IncrementValue', $type, 1);
                 }
             }
 
-            if (valr("$AttrColumn.React.{$Type['UrlCode']}", $Record) != val($Type['UrlCode'], $React)) {
-                $Diffs[] = $Type['UrlCode'];
+            if (valr("$attrColumn.React.{$type['UrlCode']}", $record) != val($type['UrlCode'], $react)) {
+                $diffs[] = $type['UrlCode'];
             }
         }
 
-        Gdn::controller()->EventArguments['ReactionTypes'] &= $ReactionTypes;
-        Gdn::controller()->EventArguments['Record'] = $Record;
-        Gdn::controller()->EventArguments['Set'] = &$Set;
+        Gdn::controller()->EventArguments['ReactionTypes'] &= $reactionTypes;
+        Gdn::controller()->EventArguments['Record'] = $record;
+        Gdn::controller()->EventArguments['Set'] = &$set;
         Gdn::controller()->fireEvent('BeforeReactionsScore');
 
         // Send back the current scores.
-        foreach ($Set as $Column => $Value) {
-            Gdn::controller()->jsonTarget("#{$RecordType}_{$Data['RecordID']} .Column-".$Column, self::formatScore($Value), 'Html');
-            $Record[$Column] = $Value;
+        foreach ($set as $column => $value) {
+            Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']} .Column-".$column, self::formatScore($value), 'Html');
+            $record[$column] = $value;
         }
         // Send back the css class.
-        list($AddCss, $RemoveCss) = self::scoreCssClass($Record, TRUE);
-        if ($RemoveCss) {
-            Gdn::controller()->jsonTarget("#{$RecordType}_{$Data['RecordID']}", $RemoveCss, 'RemoveClass');
+        list($addCss, $removeCss) = self::scoreCssClass($record, TRUE);
+        if ($removeCss) {
+            Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']}", $removeCss, 'RemoveClass');
         }
-        if ($AddCss) {
-            Gdn::controller()->jsonTarget("#{$RecordType}_{$Data['RecordID']}", $AddCss, 'AddClass');
+        if ($addCss) {
+            Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']}", $addCss, 'AddClass');
         }
 
         // Send back a delete for the user reaction.
-        if (!$Insert) {
-            Gdn::controller()->jsonTarget("#{$RecordType}_{$Data['RecordID']} .UserReactionWrap[data-userid={$Data['UserID']}]", '', 'Remove');
+        if (!$insert) {
+            Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']} .UserReactionWrap[data-userid={$data['UserID']}]", '', 'Remove');
         }
 
         // Kludge, add the promoted tag to promote content.
-        if ($AddCss == 'Promoted') {
-            $PromotedTagID = $this->defineTag($AddCss, 'BestOf');
+        if ($addCss == 'Promoted') {
+            $promotedTagID = $this->defineTag($addCss, 'BestOf');
             $this->SQL
                 ->options('Ignore', true)
                 ->insert('UserTag', [
-                    'RecordType' => $RecordType,
-                    'RecordID' => $Data['RecordID'],
+                    'RecordType' => $recordType,
+                    'RecordID' => $data['RecordID'],
                     'UserID' => self::USERID_OTHER,
-                    'TagID' => $PromotedTagID,
+                    'TagID' => $promotedTagID,
                     'DateInserted' => Gdn_Format::toDateTime()
                 ]);
         }
 
-        $Record[$AttrColumn]['React'] = $React;
-        $Set[$AttrColumn] = dbencode($Record[$AttrColumn]);
+        $record[$attrColumn]['React'] = $react;
+        $set[$attrColumn] = dbencode($record[$attrColumn]);
 
-        $Model->setField($Data['RecordID'], $Set);
+        $model->setField($data['RecordID'], $set);
 
         // Generate the new button for the reaction.
-        Gdn::controller()->setData('Diffs', $Diffs);
+        Gdn::controller()->setData('Diffs', $diffs);
         if (function_exists('ReactionButton')) {
-            $Diffs[] = 'Flag'; // always send back flag button.
-            foreach ($Diffs as $UrlCode) {
-                $Button = reactionButton($Record, $UrlCode, ['LinkClass' => 'FlyoutButton']);
+            $diffs[] = 'Flag'; // always send back flag button.
+            foreach ($diffs as $urlCode) {
+                $button = reactionButton($record, $urlCode, ['LinkClass' => 'FlyoutButton']);
                 $reactionsPlugin = ReactionsPlugin::instance();
-                $reactionsPlugin->EventArguments['UrlCode'] = $UrlCode;
-                $reactionsPlugin->EventArguments['Record'] = $Record;
-                $reactionsPlugin->EventArguments['Insert'] = $Insert;
-                $reactionsPlugin->EventArguments['TagID'] = val('TagID', $Data);
-                $reactionsPlugin->EventArguments['Button'] = &$Button;
+                $reactionsPlugin->EventArguments['UrlCode'] = $urlCode;
+                $reactionsPlugin->EventArguments['Record'] = $record;
+                $reactionsPlugin->EventArguments['Insert'] = $insert;
+                $reactionsPlugin->EventArguments['TagID'] = val('TagID', $data);
+                $reactionsPlugin->EventArguments['Button'] = &$button;
                 $reactionsPlugin->fireEvent('ReactionsButtonReplacement');
-                Gdn::controller()->jsonTarget("#{$RecordType}_{$Data['RecordID']} .ReactButton-".$UrlCode, $Button, 'ReplaceWith');
+                Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']} .ReactButton-".$urlCode, $button, 'ReplaceWith');
             }
         }
 
         // Give points for the reaction.
-        if ($Points <> 0) {
+        if ($points <> 0) {
             if (method_exists('CategoryModel', 'GivePoints')) {
-                $CategoryID = 0;
-                if (isset($Record['CategoryID'])) {
-                    $CategoryID = $Record['CategoryID'];
-                } elseif (isset($Record['DiscussionID'])) {
-                    $CategoryID = $this->SQL
-                        ->getWhere('Discussion', ['DiscussionID' => $Record['DiscussionID']])
+                $categoryID = 0;
+                if (isset($record['CategoryID'])) {
+                    $categoryID = $record['CategoryID'];
+                } elseif (isset($record['DiscussionID'])) {
+                    $categoryID = $this->SQL
+                        ->getWhere('Discussion', ['DiscussionID' => $record['DiscussionID']])
                         ->value('CategoryID');
                 }
 
-                CategoryModel::givePoints($Record['InsertUserID'], $Points, 'Reactions', $CategoryID);
+                CategoryModel::givePoints($record['InsertUserID'], $points, 'Reactions', $categoryID);
             } else {
-                UserModel::givePoints($Record['InsertUserID'], $Points, 'Reactions');
+                UserModel::givePoints($record['InsertUserID'], $points, 'Reactions');
             }
         }
 
-        return $Insert;
+        return $insert;
     }
 
     /**
      *
      *
-     * @param string $RecordType
-     * @param int $ID
-     * @param string $ReactionUrlCode
+     * @param string $recordType
+     * @param int $iD
+     * @param string $reactionUrlCode
      * @param bool $selfReact Whether a user can react to their own post
      */
-    public function react($RecordType, $ID, $ReactionUrlCode, $UserID = null, $selfReact = false) {
-        if (is_null($UserID)) {
-            $UserID = Gdn::session()->UserID;
-            $IsModerator = checkPermission('Garden.Moderation.Manage');
-            $IsCurator = checkPermission('Garden.Curation.Manage');
+    public function react($recordType, $iD, $reactionUrlCode, $userID = null, $selfReact = false) {
+        if (is_null($userID)) {
+            $userID = Gdn::session()->UserID;
+            $isModerator = checkPermission('Garden.Moderation.Manage');
+            $isCurator = checkPermission('Garden.Curation.Manage');
         } else {
-            $User = Gdn::userModel()->getID($UserID);
-            $IsModerator = Gdn::userModel()->checkPermission($User, 'Garden.Moderation.Manage');
-            $IsCurator = Gdn::userModel()->checkPermission($User, 'Garden.Curation.Manage');
+            $user = Gdn::userModel()->getID($userID);
+            $isModerator = Gdn::userModel()->checkPermission($user, 'Garden.Moderation.Manage');
+            $isCurator = Gdn::userModel()->checkPermission($user, 'Garden.Curation.Manage');
         }
 
-        $Undo = false;
-        if (stringBeginsWith($ReactionUrlCode, 'Undo-', true)) {
-            $Undo = true;
-            $ReactionUrlCode = stringBeginsWith($ReactionUrlCode, 'Undo-', true, true);
+        $undo = false;
+        if (stringBeginsWith($reactionUrlCode, 'Undo-', true)) {
+            $undo = true;
+            $reactionUrlCode = stringBeginsWith($reactionUrlCode, 'Undo-', true, true);
         }
-        $RecordType = ucfirst($RecordType);
-        $ReactionUrlCode = strtolower($ReactionUrlCode);
-        $ReactionType = self::reactionTypes($ReactionUrlCode);
-        $AttrColumn = $RecordType == 'Activity' ? 'Data' : 'Attributes';
+        $recordType = ucfirst($recordType);
+        $reactionUrlCode = strtolower($reactionUrlCode);
+        $reactionType = self::reactionTypes($reactionUrlCode);
+        $attrColumn = $recordType == 'Activity' ? 'Data' : 'Attributes';
 
-        if (!$ReactionType) {
-            throw NotFoundException($ReactionUrlCode);
+        if (!$reactionType) {
+            throw NotFoundException($reactionUrlCode);
         }
 
-        $LogOperation = val('Log', $ReactionType);
+        $logOperation = val('Log', $reactionType);
 
-        list($Row, $Model, $Log) = $this->getRow($RecordType, $ID, $LogOperation);
+        list($row, $model, $log) = $this->getRow($recordType, $iD, $logOperation);
 
-        if (!$selfReact && !$IsModerator && ($Row['InsertUserID'] == $UserID)) {
+        if (!$selfReact && !$isModerator && ($row['InsertUserID'] == $userID)) {
             throw new Gdn_UserException(T("You can't react to your own post."));
         }
 
         // Check and see if moderators are protected.
-        if (val('Protected', $ReactionType)) {
-            $InsertUser = Gdn::userModel()->getID($Row['InsertUserID']);
-            if (Gdn::userModel()->checkPermission($InsertUser, 'Garden.Moderation.Manage')) {
+        if (val('Protected', $reactionType)) {
+            $insertUser = Gdn::userModel()->getID($row['InsertUserID']);
+            if (Gdn::userModel()->checkPermission($insertUser, 'Garden.Moderation.Manage')) {
                 throw new Gdn_UserException(t("You can't flag a moderator's post."));
             }
         }
 
         // Figure out the increment.
-        if ($IsCurator) {
-            $Inc = val('ModeratorInc', $ReactionType, 1);
+        if ($isCurator) {
+            $inc = val('ModeratorInc', $reactionType, 1);
         } else {
-            $Inc = 1;
+            $inc = 1;
         }
 
         // Save the user Tag.
-        $Data = [
-            'RecordType' => $RecordType,
-            'RecordID' => $ID,
-            'TagID' => $ReactionType['TagID'],
-            'UserID' => $UserID,
-            'Total' => $Inc
+        $data = [
+            'RecordType' => $recordType,
+            'RecordID' => $iD,
+            'TagID' => $reactionType['TagID'],
+            'UserID' => $userID,
+            'Total' => $inc
         ];
-        $Inserted = $this->toggleUserTag($Data, $Row, $Model, $Undo);
+        $inserted = $this->toggleUserTag($data, $row, $model, $undo);
 
-        $Message = [t(val('InformMessage', $ReactionType, '')), 'Dismissable AutoDismiss'];
+        $message = [t(val('InformMessage', $reactionType, '')), 'Dismissable AutoDismiss'];
 
         // Now decide whether we need to log or delete the record.
-        $Score = valr($AttrColumn.'.React.'.$ReactionType['UrlCode'], $Row);
-        $LogThreshold = val('LogThreshold', $ReactionType, 10000000);
-        $RemoveThreshold = val('RemoveThreshold', $ReactionType, 10000000);
+        $score = valr($attrColumn.'.React.'.$reactionType['UrlCode'], $row);
+        $logThreshold = val('LogThreshold', $reactionType, 10000000);
+        $removeThreshold = val('RemoveThreshold', $reactionType, 10000000);
 
-        if (!valr($AttrColumn.'.RestoreUserID', $Row) || debug()) {
+        if (!valr($attrColumn.'.RestoreUserID', $row) || debug()) {
             // We are only going to remove stuff if the record has not been verified.
-            $Log = val('Log', $ReactionType, 'Moderation');
+            $log = val('Log', $reactionType, 'Moderation');
 
             // Do a sanity check to not delete too many comments.
-            $NoDelete = false;
-            if ($RecordType == 'Discussion' && $Row['CountComments'] > 3) {
-                $NoDelete = true;
+            $noDelete = false;
+            if ($recordType == 'Discussion' && $row['CountComments'] > 3) {
+                $noDelete = true;
             }
 
-            $LogOptions = ['GroupBy' => ['RecordID']];
-            $UndoButton = '';
+            $logOptions = ['GroupBy' => ['RecordID']];
+            $undoButton = '';
 
-            if ($Score >= min($LogThreshold, $RemoveThreshold)) {
+            if ($score >= min($logThreshold, $removeThreshold)) {
                 // Get all of the userIDs that flagged this.
-                $OtherUserData = $this->SQL
-                    ->getWhere('UserTag', ['RecordType' => $RecordType, 'RecordID' => $ID, 'TagID' => $ReactionType['TagID']])
+                $otherUserData = $this->SQL
+                    ->getWhere('UserTag', ['RecordType' => $recordType, 'RecordID' => $iD, 'TagID' => $reactionType['TagID']])
                     ->resultArray();
-                $OtherUserIDs = [];
-                foreach ($OtherUserData as $UserRow) {
-                    if ($UserRow['UserID'] == $UserID || !$UserRow['UserID']) {
+                $otherUserIDs = [];
+                foreach ($otherUserData as $userRow) {
+                    if ($userRow['UserID'] == $userID || !$userRow['UserID']) {
                         continue;
                     }
-                    $OtherUserIDs[] = $UserRow['UserID'];
+                    $otherUserIDs[] = $userRow['UserID'];
                 }
-                $LogOptions['OtherUserIDs'] = $OtherUserIDs;
+                $logOptions['OtherUserIDs'] = $otherUserIDs;
             }
 
-            if (!$NoDelete && $Score >= $RemoveThreshold) {
+            if (!$noDelete && $score >= $removeThreshold) {
                 // Remove the record to the log.
-                $Model->delete($ID, ['Log' => $Log, 'LogOptions' => $LogOptions]);
-                $Message = [
+                $model->delete($iD, ['Log' => $log, 'LogOptions' => $logOptions]);
+                $message = [
                     sprintf(t('The %s has been removed for moderation.'),
-                    t($RecordType)).' '.$UndoButton,
+                    t($recordType)).' '.$undoButton,
                    ['CssClass' => 'Dismissable', 'id' => 'mod']
                 ];
                 // Send back a command to remove the row in the browser.
-                if ($RecordType == 'Discussion') {
+                if ($recordType == 'Discussion') {
                     Gdn::controller()->jsonTarget('.ItemDiscussion', '', 'SlideUp');
                     Gdn::controller()->jsonTarget('#Content .Comments', '', 'SlideUp');
                     Gdn::controller()->jsonTarget('.CommentForm', '', 'SlideUp');
                 } else {
-                    Gdn::controller()->jsonTarget("#{$RecordType}_$ID", '', 'SlideUp');
+                    Gdn::controller()->jsonTarget("#{$recordType}_$iD", '', 'SlideUp');
                 }
-            } elseif ($Score >= $LogThreshold) {
-                LogModel::insert($Log, $RecordType, $Row, $LogOptions);
-                $Message = [
+            } elseif ($score >= $logThreshold) {
+                LogModel::insert($log, $recordType, $row, $logOptions);
+                $message = [
                     sprintf(t('The %s has been flagged for moderation.'),
-                    t($RecordType)).' '.$UndoButton,
+                    t($recordType)).' '.$undoButton,
                     ['CssClass' => 'Dismissable', 'id' => 'mod']
                 ];
             }
         } else {
-            if ($Score >= min($LogThreshold, $RemoveThreshold)) {
-                $RestoreUser = Gdn::userModel()->getID(GetValueR($AttrColumn.'.RestoreUserID', $Row));
-                $DateRestored = GetValueR($AttrColumn.'.DateRestored', $Row);
+            if ($score >= min($logThreshold, $removeThreshold)) {
+                $restoreUser = Gdn::userModel()->getID(GetValueR($attrColumn.'.RestoreUserID', $row));
+                $dateRestored = GetValueR($attrColumn.'.DateRestored', $row);
 
                 // The post would have been logged, but since it has been restored we won't do that again.
-                $Message = [
-                    sprintf(t('The %s was already approved by %s on %s.'), t($RecordType), userAnchor($RestoreUser), Gdn_Format::dateFull($DateRestored)),
+                $message = [
+                    sprintf(t('The %s was already approved by %s on %s.'), t($recordType), userAnchor($restoreUser), Gdn_Format::dateFull($dateRestored)),
                     ['CssClass' => 'Dismissable', 'id' => 'mod']
                 ];
             }
         }
 
         // Check to see if we need to give the user a badge.
-        $this->checkBadges($Row['InsertUserID'], $ReactionType);
+        $this->checkBadges($row['InsertUserID'], $reactionType);
 
-        if ($Message) {
-            Gdn::controller()->informMessage($Message[0], $Message[1]);
+        if ($message) {
+            Gdn::controller()->informMessage($message[0], $message[1]);
         }
 
         ReactionsPlugin::instance()->EventArguments = [
-            'RecordType' => $RecordType,
-            'RecordID' => $ID,
-            'Record' => $Row,
-            'ReactionUrlCode' => $ReactionUrlCode,
-            'ReactionData' => $Data,
-            'Insert' => $Inserted,
-            'UserID' => $UserID
+            'RecordType' => $recordType,
+            'RecordID' => $iD,
+            'Record' => $row,
+            'ReactionUrlCode' => $reactionUrlCode,
+            'ReactionData' => $data,
+            'Insert' => $inserted,
+            'UserID' => $userID
         ];
         ReactionsPlugin::instance()->fireEvent('Reaction');
     }
@@ -910,33 +910,33 @@ class ReactionModel extends Gdn_Model {
     /**
      *
      *
-     * @param $UserID
-     * @param $ReactionType
+     * @param $userID
+     * @param $reactionType
      */
-    public function checkBadges($UserID, $ReactionType) {
+    public function checkBadges($userID, $reactionType) {
         if (!class_exists('BadgeModel')) {
             return;
         }
 
         // Get the score on the user.
-        $CountRow = $this->SQL->getWhere('UserTag', [
+        $countRow = $this->SQL->getWhere('UserTag', [
             'RecordType' => 'User',
-            'RecordID' => $UserID,
+            'RecordID' => $userID,
             'UserID' => self::USERID_OTHER,
-            'TagID' => $ReactionType['TagID']
+            'TagID' => $reactionType['TagID']
         ])->firstRow(DATASET_TYPE_ARRAY);
 
-        $Score = $CountRow['Total'];
+        $score = $countRow['Total'];
 
-        $BadgeModel = new BadgeModel();
-        $UserBadgeModel = new UserBadgeModel();
+        $badgeModel = new BadgeModel();
+        $userBadgeModel = new UserBadgeModel();
 
-        $Badges = $BadgeModel
-            ->getWhere(['Type' => 'Reaction', 'Class' => $ReactionType['UrlCode']], 'Threshold', 'desc')
+        $badges = $badgeModel
+            ->getWhere(['Type' => 'Reaction', 'Class' => $reactionType['UrlCode']], 'Threshold', 'desc')
             ->resultArray();
-        foreach ($Badges as $Badge) {
-            if ($Score >= $Badge['Threshold']) {
-                $UserBadgeModel->give($UserID, $Badge);
+        foreach ($badges as $badge) {
+            if ($score >= $badge['Threshold']) {
+                $userBadgeModel->give($userID, $badge);
             }
         }
     }
@@ -944,36 +944,36 @@ class ReactionModel extends Gdn_Model {
     /**
      *
      *
-     * @param null $UrlCode
+     * @param null $urlCode
      * @return mixed|null
      */
-    public static function reactionTypes($UrlCode = null) {
+    public static function reactionTypes($urlCode = null) {
         if (self::$ReactionTypes === null) {
             // Check the cache first.
-            $ReactionTypes = Gdn::cache()->get('ReactionTypes');
+            $reactionTypes = Gdn::cache()->get('ReactionTypes');
 
-            if ($ReactionTypes === Gdn_Cache::CACHEOP_FAILURE) {
-                $ReactionTypes = Gdn::sql()->get('ReactionType', 'Sort, Name')->resultArray();
-                foreach ($ReactionTypes as $Type) {
-                    $Row = $Type;
-                    $Attributes = dbdecode($Row['Attributes']);
+            if ($reactionTypes === Gdn_Cache::CACHEOP_FAILURE) {
+                $reactionTypes = Gdn::sql()->get('ReactionType', 'Sort, Name')->resultArray();
+                foreach ($reactionTypes as $type) {
+                    $row = $type;
+                    $attributes = dbdecode($row['Attributes']);
                     //unset($Row['Attributes']); // No! Wipes field when it's re-saved.
-                    if (is_array($Attributes)) {
-                        foreach ($Attributes as $Name => $Value) {
-                            $Row[$Name] = $Value;
+                    if (is_array($attributes)) {
+                        foreach ($attributes as $name => $value) {
+                            $row[$name] = $value;
                         }
                     }
 
-                    self::$ReactionTypes[strtolower($Row['UrlCode'])] = $Row;
+                    self::$ReactionTypes[strtolower($row['UrlCode'])] = $row;
                 }
                 Gdn::cache()->store('ReactionTypes', self::$ReactionTypes);
             } else {
-                self::$ReactionTypes = $ReactionTypes;
+                self::$ReactionTypes = $reactionTypes;
             }
         }
 
-        if ($UrlCode) {
-            return val(strtolower($UrlCode), self::$ReactionTypes, NULL);
+        if ($urlCode) {
+            return val(strtolower($urlCode), self::$ReactionTypes, NULL);
         }
 
         return self::$ReactionTypes;
@@ -990,9 +990,9 @@ class ReactionModel extends Gdn_Model {
             ->whereIn('RecordType', ['Discussion-Total', 'Comment-Total'])
             ->delete('UserTag');
 
-        $RecordTypes = ['Discussion', 'Comment'];
-        foreach ($RecordTypes as $RecordType) {
-            $Sql = "insert ignore GDN_UserTag (
+        $recordTypes = ['Discussion', 'Comment'];
+        foreach ($recordTypes as $recordType) {
+            $sql = "insert ignore GDN_UserTag (
             RecordType,
             RecordID,
             TagID,
@@ -1001,27 +1001,27 @@ class ReactionModel extends Gdn_Model {
             Total
          )
          select
-            '{$RecordType}-Total',
+            '{$recordType}-Total',
             ut.RecordID,
             ut.TagID,
             t.InsertUserID,
             min(ut.DateInserted),
             sum(ut.Total) as SumTotal
          from GDN_UserTag ut
-         join GDN_{$RecordType} t
-            on ut.RecordType = '{$RecordType}' and ut.RecordID = {$RecordType}ID
+         join GDN_{$recordType} t
+            on ut.RecordType = '{$recordType}' and ut.RecordID = {$recordType}ID
          group by
             RecordType,
             RecordID,
             TagID,
             t.InsertUserID";
-            $this->SQL->query($Sql);
+            $this->SQL->query($sql);
         }
 
         // Calculate the user totals.
         $this->SQL->delete('UserTag', ['UserID' => self::USERID_OTHER]);
 
-        $Sql = "insert ignore GDN_UserTag (
+        $sql = "insert ignore GDN_UserTag (
          RecordType,
          RecordID,
          TagID,
@@ -1041,7 +1041,7 @@ class ReactionModel extends Gdn_Model {
       group by
          ut.UserID,
          ut.TagID";
-        $this->SQL->query($Sql);
+        $this->SQL->query($sql);
 
         // Now we need to update the caches on the individual discussion/comment rows.
         $this->recalculateRecordCache();
@@ -1050,163 +1050,163 @@ class ReactionModel extends Gdn_Model {
     /**
      *
      *
-     * @param bool $Day
+     * @param bool $day
      * @return int
      */
-    public function recalculateRecordCache($Day = FALSE) {
-        $Where = ['RecordType' => ['Discussion-Total', 'Comment-Total']];
+    public function recalculateRecordCache($day = FALSE) {
+        $where = ['RecordType' => ['Discussion-Total', 'Comment-Total']];
 
-        if ($Day) {
-            $Day = Gdn_Format::toTimestamp($Day);
-            $Where['DateInserted >='] = gmdate('Y-m-d', $Day);
-            $Where['DateInserted <'] = gmdate('Y-m-d', strtotime('+1 day', $Day));
+        if ($day) {
+            $day = Gdn_Format::toTimestamp($day);
+            $where['DateInserted >='] = gmdate('Y-m-d', $day);
+            $where['DateInserted <'] = gmdate('Y-m-d', strtotime('+1 day', $day));
         }
 
-        $TotalData = $this->SQL->getWhere('UserTag',
-            $Where,
+        $totalData = $this->SQL->getWhere('UserTag',
+            $where,
             'RecordType, RecordID')->resultArray();
 
-        $React = [];
-        $RecordType = null;
-        $RecordID = null;
+        $react = [];
+        $recordType = null;
+        $recordID = null;
 
-        $ReactionTagIDs = self::reactionTypes();
-        $ReactionTagIDs = Gdn_DataSet::Index($ReactionTagIDs,['TagID']);
+        $reactionTagIDs = self::reactionTypes();
+        $reactionTagIDs = Gdn_DataSet::Index($reactionTagIDs,['TagID']);
 
-        $Count = 0;
-        foreach ($TotalData as $Row) {
-            if (!isset($ReactionTagIDs[$Row['TagID']])) {
+        $count = 0;
+        foreach ($totalData as $row) {
+            if (!isset($reactionTagIDs[$row['TagID']])) {
                 continue;
             }
 
-            $Count++;
-            $StrippedRecordType = GetValue(0, explode('-', $Row['RecordType'], 2));
-            $NewRecord = $StrippedRecordType != $RecordType || $Row['RecordID'] != $RecordID;
+            $count++;
+            $strippedRecordType = GetValue(0, explode('-', $row['RecordType'], 2));
+            $newRecord = $strippedRecordType != $recordType || $row['RecordID'] != $recordID;
 
-            if ($NewRecord) {
-                if ($RecordID) {
-                    $this->_saveRecordReact($RecordType, $RecordID, $React);
+            if ($newRecord) {
+                if ($recordID) {
+                    $this->_saveRecordReact($recordType, $recordID, $react);
                 }
 
-                $RecordType = $StrippedRecordType;
-                $RecordID = $Row['RecordID'];
-                $React = [];
+                $recordType = $strippedRecordType;
+                $recordID = $row['RecordID'];
+                $react = [];
             }
-            $React[$ReactionTagIDs[$Row['TagID']]['UrlCode']] = $Row['Total'];
+            $react[$reactionTagIDs[$row['TagID']]['UrlCode']] = $row['Total'];
         }
 
-        if ($RecordID) {
-            $this->_saveRecordReact($RecordType, $RecordID, $React);
+        if ($recordID) {
+            $this->_saveRecordReact($recordType, $recordID, $react);
         }
 
-        return $Count;
+        return $count;
     }
 
     /**
      *
      *
-     * @param $RecordType
-     * @param $RecordID
-     * @param $React
+     * @param $recordType
+     * @param $recordID
+     * @param $react
      */
-    protected function _saveRecordReact($RecordType, $RecordID, $React) {
-        $Set = [];
-        $AttrColumn = $RecordType == 'Activity' ? 'Data' : 'Attributes';
+    protected function _saveRecordReact($recordType, $recordID, $react) {
+        $set = [];
+        $attrColumn = $recordType == 'Activity' ? 'Data' : 'Attributes';
 
-        $Row = $this->SQL->getWhere($RecordType, [$RecordType.'ID' => $RecordID])->firstRow(DATASET_TYPE_ARRAY);
-        $Attributes = dbdecode($Row[$AttrColumn]);
-        if (!is_array($Attributes)) {
-            $Attributes = [];
+        $row = $this->SQL->getWhere($recordType, [$recordType.'ID' => $recordID])->firstRow(DATASET_TYPE_ARRAY);
+        $attributes = dbdecode($row[$attrColumn]);
+        if (!is_array($attributes)) {
+            $attributes = [];
         }
 
-        if (empty($React)) {
-            unset($Attributes['React']);
+        if (empty($react)) {
+            unset($attributes['React']);
         } else {
-            $Attributes['React'] = $React;
+            $attributes['React'] = $react;
         }
 
-        if (empty($Attributes)) {
-            $Attributes = null;
+        if (empty($attributes)) {
+            $attributes = null;
         } else {
-            $Attributes = dbencode($Attributes);
+            $attributes = dbencode($attributes);
         }
-        $Set[$AttrColumn] = $Attributes;
+        $set[$attrColumn] = $attributes;
 
         // Calculate the record's score too.
-        foreach (self::reactionTypes() as $Type) {
-            if (($Column = val('IncrementColumn', $Type)) && isset($React[$Type['UrlCode']])) {
+        foreach (self::reactionTypes() as $type) {
+            if (($column = val('IncrementColumn', $type)) && isset($react[$type['UrlCode']])) {
                 // This reaction type also increments a column so do that too.
-                touchValue($Column, $Set, 0);
-                $Set[$Column] += $React[$Type['UrlCode']] * val('IncrementValue', $Type, 1);
+                touchValue($column, $set, 0);
+                $set[$column] += $react[$type['UrlCode']] * val('IncrementValue', $type, 1);
             }
         }
 
         // Check to see if the record is changing.
-        foreach ($Set as $Key => $Value) {
-            if ($Row[$Key] == $Value) {
-                unset($Set[$Key]);
+        foreach ($set as $key => $value) {
+            if ($row[$key] == $value) {
+                unset($set[$key]);
             }
         }
 
-        if (!empty($Set)) {
-            $this->SQL->put($RecordType, $Set, [$RecordType.'ID' => $RecordID]);
+        if (!empty($set)) {
+            $this->SQL->put($recordType, $set, [$recordType.'ID' => $recordID]);
         }
     }
 
     /**
      *
      *
-     * @param $Table
-     * @param $Set
-     * @param null $Key
-     * @param array $DontUpdate
-     * @param string $Op
+     * @param $table
+     * @param $set
+     * @param null $key
+     * @param array $dontUpdate
+     * @param string $op
      */
-    public function insertOrUpdate($Table, $Set, $Key = null, $DontUpdate = [], $Op = '=') {
-        if ($Key == null) {
-            $Key = $Table.'ID';
-        } elseif (is_numeric($Key)) {
-            $Key = array_slice(array_keys($Set), 0, $Key);
+    public function insertOrUpdate($table, $set, $key = null, $dontUpdate = [], $op = '=') {
+        if ($key == null) {
+            $key = $table.'ID';
+        } elseif (is_numeric($key)) {
+            $key = array_slice(array_keys($set), 0, $key);
         }
 
-        $Key = array_combine($Key, $Key);
-        $DontUpdate = array_fill_keys($DontUpdate, false);
+        $key = array_combine($key, $key);
+        $dontUpdate = array_fill_keys($dontUpdate, false);
 
         // Make an array of the values.
-        $Values = array_diff_key($Set, $Key, $DontUpdate);
+        $values = array_diff_key($set, $key, $dontUpdate);
 
-        $Px = $this->SQL->Database->DatabasePrefix;
-        $Sql = "insert {$Px}$Table
-            (".implode(', ', array_keys($Set)).')
-            values (:'.implode(', :', array_keys($Set)).')
+        $px = $this->SQL->Database->DatabasePrefix;
+        $sql = "insert {$px}$table
+            (".implode(', ', array_keys($set)).')
+            values (:'.implode(', :', array_keys($set)).')
             on duplicate key update ';
 
-        $Update = '';
-        foreach ($Values as $Key => $Value) {
-            if ($Update) {
-                $Update .= ', ';
+        $update = '';
+        foreach ($values as $key => $value) {
+            if ($update) {
+                $update .= ', ';
             }
-            if ($Op == '=') {
-                $Update .= "$Key = :{$Key}_Up";
+            if ($op == '=') {
+                $update .= "$key = :{$key}_Up";
             } else {
-                $Update .= "$Key = $Key $Op :{$Key}_Up";
+                $update .= "$key = $key $op :{$key}_Up";
             }
         }
-        $Sql .= $Update;
+        $sql .= $update;
 
         // Construct the arguments list.
-        $Args = [];
-        foreach ($Set as $Key => $Value) {
-            $Args[':'.$Key] = $Value;
+        $args = [];
+        foreach ($set as $key => $value) {
+            $args[':'.$key] = $value;
         }
-        foreach ($Values as $Key => $Value) {
-            $Args[':'.$Key.'_Up'] = $Value;
+        foreach ($values as $key => $value) {
+            $args[':'.$key.'_Up'] = $value;
         }
 
         // Do the final query.
         try {
-            $this->SQL->Database->query($Sql, $Args);
-        } catch (Exception $Ex) {
+            $this->SQL->Database->query($sql, $args);
+        } catch (Exception $ex) {
             die();
         }
     }
@@ -1214,48 +1214,48 @@ class ReactionModel extends Gdn_Model {
     /**
      * All the score to be formatted differently.
      *
-     * @param $Score
+     * @param $score
      * @return int
      */
-    public static function formatScore($Score) {
+    public static function formatScore($score) {
         if (function_exists('FormatScore')) {
-            return formatScore($Score);
+            return formatScore($score);
         }
-        return (int)$Score;
+        return (int)$score;
     }
 
     /**
      * Give the CSS class for the current score.
      *
-     * @param $Row
-     * @param bool $All
+     * @param $row
+     * @param bool $all
      * @return array|string
      */
-    public static function scoreCssClass($Row, $All = false) {
+    public static function scoreCssClass($row, $all = false) {
         if (function_exists('ScoreCssClass')) {
-            return scoreCssClass($Row, $All);
+            return scoreCssClass($row, $all);
         }
 
-        $Score = val('Score', $Row);
-        if (!$Score) {
-            $Score = 0;
+        $score = val('Score', $row);
+        if (!$score) {
+            $score = 0;
         }
 
-        $Bury = c('Reactions.BuryValue', -5);
-        $Promote = c('Reactions.PromoteValue', 5);
+        $bury = c('Reactions.BuryValue', -5);
+        $promote = c('Reactions.PromoteValue', 5);
 
-        if ($Score <= $Bury) {
-            $Result = $All ? 'Un-Buried' : 'Buried';
-        } elseif ($Score >= $Promote) {
-            $Result = 'Promoted';
+        if ($score <= $bury) {
+            $result = $all ? 'Un-Buried' : 'Buried';
+        } elseif ($score >= $promote) {
+            $result = 'Promoted';
         } else {
-            $Result = '';
+            $result = '';
         }
 
-        if ($All) {
-            return [$Result, 'Promoted Buried Un-Buried'];
+        if ($all) {
+            return [$result, 'Promoted Buried Un-Buried'];
         } else {
-            return $Result;
+            return $result;
         }
     }
 

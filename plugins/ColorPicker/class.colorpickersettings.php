@@ -29,34 +29,34 @@ class ColorPickerSettings {
 
    /// METHODS ///
 
-   protected function AddCssFiles($Path, $Override = FALSE) {
-      $this->_AddCssFiles($Path, $this->_CssFiles, $Override);
+   protected function AddCssFiles($path, $override = FALSE) {
+      $this->_AddCssFiles($path, $this->_CssFiles, $override);
    }
 
-   protected function _AddCssFiles($Folders, &$Result, $Override = FALSE) {
-      if (is_string($Folders) && StringEndsWith($Folders, '.css') && file_exists($Folders)) {
+   protected function _AddCssFiles($folders, &$result, $override = FALSE) {
+      if (is_string($folders) && StringEndsWith($folders, '.css') && file_exists($folders)) {
          // This is a single file, add it to the array.
-         $Result[basename($Folders)] = $Folders;
+         $result[basename($folders)] = $folders;
          return;
       }
 
-      $Folders = (array)$Folders;
+      $folders = (array)$folders;
 
-      foreach ($Folders as $Folder) {
+      foreach ($folders as $folder) {
          // Grab all of the css files.
-         $CssPaths = glob("$Folder/*.css");
-         if (is_array($CssPaths)) {
-            foreach ($CssPaths as $Path) {
-               $Filename = basename($Path);
-               if (in_array($Filename, $this->Excluded))
+         $cssPaths = glob("$folder/*.css");
+         if (is_array($cssPaths)) {
+            foreach ($cssPaths as $path) {
+               $filename = basename($path);
+               if (in_array($filename, $this->Excluded))
                   continue;
-               $Result[] = $Path;
+               $result[] = $path;
 
-               if ($Override) {
-                  $Basename = basename($Path);
-                  foreach ($Result as $Index => $ResultPath) {
-                     if ($Basename == basename($ResultPath) && $Path != $ResultPath) {
-                        unset($Result[$Index]);
+               if ($override) {
+                  $basename = basename($path);
+                  foreach ($result as $index => $resultPath) {
+                     if ($basename == basename($resultPath) && $path != $resultPath) {
+                        unset($result[$index]);
                      }
                   }
                }
@@ -64,398 +64,398 @@ class ColorPickerSettings {
          }
 
          // Traverse subdirectories.
-         $SubFolders = glob("$Folder/*", GLOB_ONLYDIR);
-         if (is_array($SubFolders))
-            $this->_AddCssFiles($SubFolders, $Result);
+         $subFolders = glob("$folder/*", GLOB_ONLYDIR);
+         if (is_array($subFolders))
+            $this->_AddCssFiles($subFolders, $result);
       }
    }
 
    /** Add the edit colors ui to the page.
     *
-    * @param Gdn_Controller $Sender
+    * @param Gdn_Controller $sender
     */
-   public function EditColors($Sender) {
-      $AppFolder = 'plugins/ColorPicker';
+   public function EditColors($sender) {
+      $appFolder = 'plugins/ColorPicker';
 
       // Add the css.
-      $Sender->AddCssFile('colorpicker.css', $AppFolder);
+      $sender->AddCssFile('colorpicker.css', $appFolder);
 //      $Sender->AddCssFile('layout.css', $AppFolder);
-      $Sender->AddCssFile('colorpicker.plugin.css', $AppFolder);
+      $sender->AddCssFile('colorpicker.plugin.css', $appFolder);
 
       // Add the js.
-      $Sender->AddJsFile('colorpicker.js', $AppFolder);
+      $sender->AddJsFile('colorpicker.js', $appFolder);
 //      $Sender->AddJsFile('eye.js', $AppFolder);
 //      $Sender->AddJsFile('layout.js', $AppFolder);
 //      $Sender->AddJsFile('utils.js', $AppFolder);
-      $Sender->AddJsFile('colorpicker.plugin.js', $AppFolder);
+      $sender->AddJsFile('colorpicker.plugin.js', $appFolder);
 
       // Get all of the data for the view.
-      $Data = [];
-      $Path = PATH_UPLOADS."/ColorPicker/custom.css";
-      if (!file_exists($Path))
+      $data = [];
+      $path = PATH_UPLOADS."/ColorPicker/custom.css";
+      if (!file_exists($path))
          $this->Parent->Setup();
-      $Css = $this->ParseCssFile($Path);
-      $Colors = $this->SortCssByColor($Css);
-      uasort($Colors, [$this, 'CompareHSV']);
-      $Data['Colors'] = $Colors;
+      $css = $this->ParseCssFile($path);
+      $colors = $this->SortCssByColor($css);
+      uasort($colors, [$this, 'CompareHSV']);
+      $data['Colors'] = $colors;
 
       // Figure out the average color in the groups.
-      $Groups = [];
-      foreach($Colors as $Color => $Options) {
-         list($R, $G, $B) = self::RGB($Color);
-         $ColorGroup = $this->ColorGroup($Color);
-         if (!isset($Groups[$ColorGroup])) {
-            $Groups[$ColorGroup] = ['R' => $R, 'G' => $G, 'B' => $B, 'Count' => 1];
+      $groups = [];
+      foreach($colors as $color => $options) {
+         list($r, $g, $b) = self::RGB($color);
+         $colorGroup = $this->ColorGroup($color);
+         if (!isset($groups[$colorGroup])) {
+            $groups[$colorGroup] = ['R' => $r, 'G' => $g, 'B' => $b, 'Count' => 1];
          } else {
-            $Groups[$ColorGroup]['R'] += $R;
-            $Groups[$ColorGroup]['G'] += $G;
-            $Groups[$ColorGroup]['B'] += $B;
-            $Groups[$ColorGroup]['Count'] += 1;
+            $groups[$colorGroup]['R'] += $r;
+            $groups[$colorGroup]['G'] += $g;
+            $groups[$colorGroup]['B'] += $b;
+            $groups[$colorGroup]['Count'] += 1;
          }
       }
-      foreach ($Groups as $Index => $Values) {
-         $R = round($Values['R'] / $Values['Count']);
-         $G = round($Values['G'] / $Values['Count']);
-         $B = round($Values['B'] / $Values['Count']);
-         $Groups[$Index] = self::RGB2Hex($R, $G, $B);
+      foreach ($groups as $index => $values) {
+         $r = round($values['R'] / $values['Count']);
+         $g = round($values['G'] / $values['Count']);
+         $b = round($values['B'] / $values['Count']);
+         $groups[$index] = self::RGB2Hex($r, $g, $b);
       }
-      $Data['Groups'] = $Groups;
+      $data['Groups'] = $groups;
 
-      $Sender->SetData('ColorPicker', $Data);
-      $Sender->ColorPicker = $this;
+      $sender->SetData('ColorPicker', $data);
+      $sender->ColorPicker = $this;
 
       // Add the view.
-      $ColorPickerView = $Sender->FetchView('ColorPicker', '', $AppFolder);
-      $Sender->AddAsset('Content', $ColorPickerView, 'ColorPicker');
+      $colorPickerView = $sender->FetchView('ColorPicker', '', $appFolder);
+      $sender->AddAsset('Content', $colorPickerView, 'ColorPicker');
    }
 
    /** Filter an array of css rules so that only rules with colors are there.
-    * @param array $CssArray An array of css rules returned from ParseCssFile().
-    * @return array An array in the same format as $CssArray, but only with rules that contain colors.
+    * @param array $cssArray An array of css rules returned from ParseCssFile().
+    * @return array An array in the same format as $cssArray, but only with rules that contain colors.
     */
-   public function FilterCssColors($CssArray) {
-      $Result = [];
-      foreach($CssArray as $RuleArray) {
-         $Selector = $RuleArray[self::SELECTOR_KEY];
-         $Rules = $RuleArray[self::RULES_KEY];
-         $FilteredRules = [];
+   public function FilterCssColors($cssArray) {
+      $result = [];
+      foreach($cssArray as $ruleArray) {
+         $selector = $ruleArray[self::SELECTOR_KEY];
+         $rules = $ruleArray[self::RULES_KEY];
+         $filteredRules = [];
 
          // Loop through the rules looking for colors.
-         foreach ($Rules as $Key => $Value) {
-            if (preg_match('`(#[0-9a-f]{3,6}).*?(!important)?`i', $Value, $Matches)) {
+         foreach ($rules as $key => $value) {
+            if (preg_match('`(#[0-9a-f]{3,6}).*?(!important)?`i', $value, $matches)) {
                // There is a color in the value. Check to see if the key is supported and transform the rule into a specific color rule.
-               if (StringEndsWith($Key, 'color')) {
+               if (StringEndsWith($key, 'color')) {
                   // This is a color rule so it can be put in directly.
-                  $Rule = $Key;
-               } elseif (StringBeginsWith($Key, 'background')) {
+                  $rule = $key;
+               } elseif (StringBeginsWith($key, 'background')) {
                   // Check for gradients.
 
 
-                  $Rule = $Key.'-color';
-               } elseif (StringBeginsWith($Key, 'border')) {
-                  $Rule = $Key.'-color';
+                  $rule = $key.'-color';
+               } elseif (StringBeginsWith($key, 'border')) {
+                  $rule = $key.'-color';
                } else {
-                  $Foo = 'bar';
+                  $foo = 'bar';
                }
 
-               if (isset($Rule)) {
-                  $Color = $Matches[1];
+               if (isset($rule)) {
+                  $color = $matches[1];
                   // Convert the color into a standard format.
-                  $Color = strtolower($Color);
-                  if (strlen($Color) == 4) {
-                     $Color = "#{$Color[1]}{$Color[1]}{$Color[2]}{$Color[2]}{$Color[3]}{$Color[3]}";
+                  $color = strtolower($color);
+                  if (strlen($color) == 4) {
+                     $color = "#{$color[1]}{$color[1]}{$color[2]}{$color[2]}{$color[3]}{$color[3]}";
                   }
 
-                  $FilteredRules[$Rule] = $Color.(isset($Matches[2]) ? ' '.$Matches[2] : '');
+                  $filteredRules[$rule] = $color.(isset($matches[2]) ? ' '.$matches[2] : '');
                }
             }
          }
 
-         if (count($FilteredRules) > 0) {
-            $Result[] = [
-               self::SELECTOR_KEY => $Selector,
-               self::RULES_KEY => $FilteredRules];
+         if (count($filteredRules) > 0) {
+            $result[] = [
+               self::SELECTOR_KEY => $selector,
+               self::RULES_KEY => $filteredRules];
          }
       }
-      return $Result;
+      return $result;
    }
 
-   public function FormatRuleArray($RuleArray) {
-      $Result = '';
+   public function FormatRuleArray($ruleArray) {
+      $result = '';
 
-      if (isset($RuleArray[self::COMMENT_KEY]))
-         $Result .= "/* {$RuleArray[self::COMMENT_KEY]} */\n";
+      if (isset($ruleArray[self::COMMENT_KEY]))
+         $result .= "/* {$ruleArray[self::COMMENT_KEY]} */\n";
 
-      if (isset($RuleArray[self::SELECTOR_KEY]) && isset($RuleArray[self::RULES_KEY])) {
-         $Result = $RuleArray[self::SELECTOR_KEY]." {\n";
-         foreach ($RuleArray[self::RULES_KEY] as $Key => $Value) {
-            $Result .= " $Key: $Value;\n";
+      if (isset($ruleArray[self::SELECTOR_KEY]) && isset($ruleArray[self::RULES_KEY])) {
+         $result = $ruleArray[self::SELECTOR_KEY]." {\n";
+         foreach ($ruleArray[self::RULES_KEY] as $key => $value) {
+            $result .= " $key: $value;\n";
          }
-         $Result .= "}\n\n";
+         $result .= "}\n\n";
       }
-      return $Result;
+      return $result;
    }
 
-   public function GenerateCustomCss($Path) {
+   public function GenerateCustomCss($path) {
       if (!$this->_CssFiles) {
-         $CssFiles = $this->GetCssFiles();
-         $this->_CssFiles = $CssFiles;
+         $cssFiles = $this->GetCssFiles();
+         $this->_CssFiles = $cssFiles;
       }
 
-      $AllColorCss = [];
+      $allColorCss = [];
 
       // Collect all of the css rules that contain colors.
-      foreach ($this->_CssFiles as $CssPath) {
-         $Css = $this->ParseCssFile($CssPath);
-         $ColorCss = $this->FilterCssColors($Css);
+      foreach ($this->_CssFiles as $cssPath) {
+         $css = $this->ParseCssFile($cssPath);
+         $colorCss = $this->FilterCssColors($css);
 
-         if (count($ColorCss) > 0) {
+         if (count($colorCss) > 0) {
             // Only collect the file if there is at least one color rule.
-            if (StringBeginsWith($CssPath, PATH_ROOT))
-               $VirtualPath = substr($CssPath, strlen(PATH_ROOT));
+            if (StringBeginsWith($cssPath, PATH_ROOT))
+               $virtualPath = substr($cssPath, strlen(PATH_ROOT));
             else
-               $VirtualPath = $CssPath;
-            $AllColorCss[] = [self::COMMENT_KEY => $VirtualPath];
-            $AllColorCss = array_merge($AllColorCss, $ColorCss);
+               $virtualPath = $cssPath;
+            $allColorCss[] = [self::COMMENT_KEY => $virtualPath];
+            $allColorCss = array_merge($allColorCss, $colorCss);
          }
       }
 
       // Write the rules to the css.
-      $fp = fopen($Path, 'wb');
+      $fp = fopen($path, 'wb');
       fwrite($fp, '/* File created '.Gdn_Format::ToDateTime()." */\n\n");
-      foreach ($AllColorCss as $Css) {
-         fwrite($fp, $this->FormatRuleArray($Css));
+      foreach ($allColorCss as $css) {
+         fwrite($fp, $this->FormatRuleArray($css));
       }
       fclose($fp);
    }
 
    public function GetCssFiles() {
-      $Result = [];
+      $result = [];
 
       // Loop through the appropriate folders and grab the paths to the css files in the application.
 
       // 1. Enabled applications.
-      $ApplicationManager = new Gdn_ApplicationManager();
-      $Folders = $ApplicationManager->EnabledApplicationFolders();
-      foreach ($Folders as $Index => $Folder) {
-         $Folders[$Index] = PATH_APPLICATIONS.'/'.$Folder;
+      $applicationManager = new Gdn_ApplicationManager();
+      $folders = $applicationManager->EnabledApplicationFolders();
+      foreach ($folders as $index => $folder) {
+         $folders[$index] = PATH_APPLICATIONS.'/'.$folder;
       }
-      $this->_AddCssFiles($Folders, $Result);
+      $this->_AddCssFiles($folders, $result);
 
       // 2. Enabled plugins.
-      $PluginManager = Gdn::PluginManager();
-      $Folders = $PluginManager->EnabledPluginFolders();
-      foreach ($Folders as $Index => $Folder) {
-         if ($Folder == 'ColorPicker')
+      $pluginManager = Gdn::PluginManager();
+      $folders = $pluginManager->EnabledPluginFolders();
+      foreach ($folders as $index => $folder) {
+         if ($folder == 'ColorPicker')
             continue;
-         $Folders[$Index] = PATH_PLUGINS.'/'.$Folder;
+         $folders[$index] = PATH_PLUGINS.'/'.$folder;
       }
-      $this->_AddCssFiles($Folders, $Result);
+      $this->_AddCssFiles($folders, $result);
 
       // 3. Current Theme.
-      $ThemeManager = Gdn::themeManager();
-      $CurrentTheme = $ThemeManager->EnabledThemeInfo();
-      if ($CurrentTheme) {
-         $ThemePath = $CurrentTheme['ThemeRoot'].'/design';
-         $this->_AddCssFiles($ThemePath, $Result, TRUE);
+      $themeManager = Gdn::themeManager();
+      $currentTheme = $themeManager->EnabledThemeInfo();
+      if ($currentTheme) {
+         $themePath = $currentTheme['ThemeRoot'].'/design';
+         $this->_AddCssFiles($themePath, $result, TRUE);
       }
 
-      return $Result;
+      return $result;
    }
 
    /** Parse a css file and pick out all of its color selectors.
     *
-    * @param string $Path The path to the css file.
+    * @param string $path The path to the css file.
     * @return array An array in the form:
     *  [0]: [selector: [property: value, property: value,...]]
     *  [1]: [selector: [property: value, property: value,...]]
     *  ...
     */
-   public function ParseCssFile($Path, $StripComments = TRUE) {
-      $Contents = file_get_contents($Path);
+   public function ParseCssFile($path, $stripComments = TRUE) {
+      $contents = file_get_contents($path);
 
-      if ($StripComments) {
-         $Contents = preg_replace('`/\*.*?\*/`s', '', $Contents);
+      if ($stripComments) {
+         $contents = preg_replace('`/\*.*?\*/`s', '', $contents);
       }
 
       // Grab all of the rules.
-      $Result = [];
-      if (preg_match_all('`([^{]*?){([^}]*?)}`', $Contents, $Matches, PREG_SET_ORDER)) {
-         foreach ($Matches as $Match) {
-            $SelectorString = $Match[1];
-            $RulesString = $Match[2];
+      $result = [];
+      if (preg_match_all('`([^{]*?){([^}]*?)}`', $contents, $matches, PREG_SET_ORDER)) {
+         foreach ($matches as $match) {
+            $selectorString = $match[1];
+            $rulesString = $match[2];
 
             // Parse the rules into an array.
-            $RulesArray = explode(';', $RulesString);
-            $Rules = [];
-            foreach ($RulesArray as $RuleString) {
-               $Rule = explode(':', $RuleString, 2);
-               if (count($Rule) >= 2)
-                  $Rules[trim($Rule[0])] = trim($Rule[1]);
+            $rulesArray = explode(';', $rulesString);
+            $rules = [];
+            foreach ($rulesArray as $ruleString) {
+               $rule = explode(':', $ruleString, 2);
+               if (count($rule) >= 2)
+                  $rules[trim($rule[0])] = trim($rule[1]);
             }
 
             // Add the rule to the result.
-            $Result[] = [
-               self::SELECTOR_KEY => trim($SelectorString),
-               self::RULES_KEY => $Rules];
+            $result[] = [
+               self::SELECTOR_KEY => trim($selectorString),
+               self::RULES_KEY => $rules];
          }
       }
 
-      return $Result;
+      return $result;
    }
 
-   public static function RGB($Color) {
-      if (preg_match('`#([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})`i', $Color, $Matches)) {
-         return [hexdec($Matches[1]), hexdec($Matches[2]), hexdec($Matches[3])];
+   public static function RGB($color) {
+      if (preg_match('`#([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})`i', $color, $matches)) {
+         return [hexdec($matches[1]), hexdec($matches[2]), hexdec($matches[3])];
       }
    }
 
-   public static function RGB2Hex($R, $G, $B) {
-      $R = dechex($R);
-      $G = dechex($G);
-      $B = dechex($B);
+   public static function RGB2Hex($r, $g, $b) {
+      $r = dechex($r);
+      $g = dechex($g);
+      $b = dechex($b);
 
-      if (strlen($R) < 2)
-         $R = '0'.$R;
-      if (strlen($G) < 2)
-         $G = '0'.$G;
-      if (strlen($B) < 2)
-         $B = '0'.$B;
+      if (strlen($r) < 2)
+         $r = '0'.$r;
+      if (strlen($g) < 2)
+         $g = '0'.$g;
+      if (strlen($b) < 2)
+         $b = '0'.$b;
 
-      return strtolower("#$R$G$B");
+      return strtolower("#$r$g$b");
    }
 
    /** Converts a color in RGB to HSV Values.
     *  This function has been adapted from a listing on stackoverflow.com
     *
-    * @param int $R The red component of the color in the range [0,255].
-    * @param int $G The green component of the color in the range [0,255].
-    * @param int $B The blue component of the color in the range [0,255].
+    * @param int $r The red component of the color in the range [0,255].
+    * @param int $g The green component of the color in the range [0,255].
+    * @param int $b The blue component of the color in the range [0,255].
     * @return array An array in the form array(H, S, V) where HSV are floats in the range [0,1].
     */
-   public static function RGB2HSV ($R, $G = NULL, $B = NULL) {
-      if (is_array($R))
-         list($R, $G, $B) = $R;
-      elseif (is_string($R) && $R[0] == '#')
-         list($R, $G, $B) = self::RGB($R);
+   public static function RGB2HSV ($r, $g = NULL, $b = NULL) {
+      if (is_array($r))
+         list($r, $g, $b) = $r;
+      elseif (is_string($r) && $r[0] == '#')
+         list($r, $g, $b) = self::RGB($r);
 
-      $R = $R / 255.0;
-      $G = $G / 255.0;
-      $B = $B / 255.0;
-      $H = 0;
-      $S = 0;
-      $V = 0;
-      $min = min(min($R, $G),$B);
-      $max = max(max($R, $G),$B);
+      $r = $r / 255.0;
+      $g = $g / 255.0;
+      $b = $b / 255.0;
+      $h = 0;
+      $s = 0;
+      $v = 0;
+      $min = min(min($r, $g),$b);
+      $max = max(max($r, $g),$b);
       $delta = $max - $min;
 
-      $V = $max;
+      $v = $max;
 
       if($delta == 0)
       {
-         $H = NULL;
-         $S = 0;
+         $h = NULL;
+         $s = 0;
       }
       else
       {
-         $S = $delta / $max;
+         $s = $delta / $max;
 
-         $dR = ((($max - $R) / 6) + ($delta / 2)) / $delta;
-         $dG = ((($max - $G) / 6) + ($delta / 2)) / $delta;
-         $dB = ((($max - $B) / 6) + ($delta / 2)) / $delta;
+         $dR = ((($max - $r) / 6) + ($delta / 2)) / $delta;
+         $dG = ((($max - $g) / 6) + ($delta / 2)) / $delta;
+         $dB = ((($max - $b) / 6) + ($delta / 2)) / $delta;
 
-         if ($R == $max)
-            $H = $dB - $dG;
-         else if($G == $max)
-            $H = (1/3) + $dR - $dB;
+         if ($r == $max)
+            $h = $dB - $dG;
+         else if($g == $max)
+            $h = (1/3) + $dR - $dB;
          else
-            $H = (2/3) + $dG - $dR;
+            $h = (2/3) + $dG - $dR;
 
-         if ($H < 0)
-            $H += 1;
-         if ($H > 1)
-            $H -= 1;
+         if ($h < 0)
+            $h += 1;
+         if ($h > 1)
+            $h -= 1;
       }
 
-      return [$H, $S, $V];
+      return [$h, $s, $v];
    }
 
-   public function ColorGroup($H) {
-      if (is_string($H) && $H[0] == '#') {
-         list($H, $S, $V) = self::RGB2HSV($H);
+   public function ColorGroup($h) {
+      if (is_string($h) && $h[0] == '#') {
+         list($h, $s, $v) = self::RGB2HSV($h);
       }
-      if ($H === NULL)
+      if ($h === NULL)
          return NULL;
-      return round($H * $this->NumHues) % $this->NumHues;
+      return round($h * $this->NumHues) % $this->NumHues;
    }
 
    /** Sort a css array by color.
     *
-    * @param array $CssArray A css array returned from ParseCssFile() or FilterCssColors().
+    * @param array $cssArray A css array returned from ParseCssFile() or FilterCssColors().
     * @return array An array in the form:
     * [#000000]: [selector: [property1: '', property2: !important, property3: '',...]]
     * [#ffffff]: [selector: [property1: '', property2: !important, property3: '',...]]
     * ...
     */
-   public function SortCssByColor($CssArray) {
-      $Result = [];
+   public function SortCssByColor($cssArray) {
+      $result = [];
 
-      foreach ($CssArray as $Rule) {
-         if (!isset($Rule[self::RULES_KEY]) || !isset($Rule[self::SELECTOR_KEY]))
+      foreach ($cssArray as $rule) {
+         if (!isset($rule[self::RULES_KEY]) || !isset($rule[self::SELECTOR_KEY]))
             continue;
 
-         $Selector = $Rule[self::SELECTOR_KEY];
-         $Rules = $Rule[self::RULES_KEY];
+         $selector = $rule[self::SELECTOR_KEY];
+         $rules = $rule[self::RULES_KEY];
 
-         foreach ($Rules as $Key => $Value) {
+         foreach ($rules as $key => $value) {
             // Get the color.
-            if (preg_match('`(#[0-9a-f]{3,6}).*?(!important)?`i', $Value, $Matches)) {
-               $Color = $Matches[1];
-               $Options = GetValue(2, $Matches, '');
-               $Result[$Color][self::SELECTOR_KEY][$Selector][$Key] = $Options;
-               $Result[$Color]['hsv'] = self::RGB2HSV(self::RGB($Color));
+            if (preg_match('`(#[0-9a-f]{3,6}).*?(!important)?`i', $value, $matches)) {
+               $color = $matches[1];
+               $options = GetValue(2, $matches, '');
+               $result[$color][self::SELECTOR_KEY][$selector][$key] = $options;
+               $result[$color]['hsv'] = self::RGB2HSV(self::RGB($color));
             }
          }
       }
-      return $Result;
+      return $result;
    }
 
-   public function CompareHSV($A, $B) {
-      $HSV_A = $A['hsv'];
-      $HSV_B = $B['hsv'];
+   public function CompareHSV($a, $b) {
+      $hSV_A = $a['hsv'];
+      $hSV_B = $b['hsv'];
 
-      $H_A = $HSV_A[0];
-      $H_B = $HSV_B[0];
+      $h_A = $hSV_A[0];
+      $h_B = $hSV_B[0];
 
-      if ($H_A === NULL && $H_B !== NULL)
+      if ($h_A === NULL && $h_B !== NULL)
          return -1;
-      elseif ($H_A !== NULL && $H_B === NULL)
+      elseif ($h_A !== NULL && $h_B === NULL)
          return 1;
-      elseif ($H_A === NULL && $H_B === NULL)
-         return self::Compare($HSV_A[2], $HSV_B[2]);
+      elseif ($h_A === NULL && $h_B === NULL)
+         return self::Compare($hSV_A[2], $hSV_B[2]);
       else {
          // Chunk the hues so they are grouped.
-         $H_A = $this->ColorGroup($H_A);
-         $H_B = $this->ColorGroup($H_B);
+         $h_A = $this->ColorGroup($h_A);
+         $h_B = $this->ColorGroup($h_B);
 
-         if ($H_A > $H_B)
+         if ($h_A > $h_B)
             return 1;
-         elseif ($H_A < $H_B)
+         elseif ($h_A < $h_B)
             return -1;
          else {
 //            if ($HSV_A[1] == $HSV_B[1])
 //               return self::Compare($HSV_A[2], $HSV_B[2]);
 //            else
 //               return ($HSV_A[2] - $HSV_B[2]) / ($HSV_A[1] - $HSV_B[1]);
-            return self::Compare($HSV_A[1], $HSV_B[1]);
+            return self::Compare($hSV_A[1], $hSV_B[1]);
          }
       }
    }
 
-   public static function Compare($A, $B) {
-      if ($A > $B)
+   public static function Compare($a, $b) {
+      if ($a > $b)
          return 1;
-      elseif ($A < $B)
+      elseif ($a < $b)
          return -1;
       else
          return 0;

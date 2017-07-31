@@ -4,25 +4,25 @@ if (!function_exists('WriteEventButtons')) :
     /**
      * Output action buttons to edit/delete an Event.
      *
-     * @param array $Event Optional. Uses data array's Event if none is provided.
+     * @param array $event Optional. Uses data array's Event if none is provided.
      */
-    function WriteEventButtons($Event = null) {
-        if (!$Event)
-            $Event = Gdn::Controller()->Data('Event');
-        if (!$Event)
+    function WriteEventButtons($event = null) {
+        if (!$event)
+            $event = Gdn::Controller()->Data('Event');
+        if (!$event)
             return;
 
         echo '<div class="Event-Buttons">';
 
-        $Options = [];
+        $options = [];
 
-        if (EventPermission('Edit', $Event)) {
-            $Options['Edit'] = ['Text' => T('Edit'), 'Url' => EventUrl($Event, 'edit')];
-            $Options['Delete'] = ['Text' => T('Delete'), 'Url' => EventUrl($Event, 'delete'), 'CssClass' => 'Popup'];
+        if (EventPermission('Edit', $event)) {
+            $options['Edit'] = ['Text' => T('Edit'), 'Url' => EventUrl($event, 'edit')];
+            $options['Delete'] = ['Text' => T('Delete'), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup'];
         }
 
-        if (count($Options))
-            echo ButtonDropDown($Options, 'Button DropRight Event-OptionsButton', Sprite('SpOptions', 'Sprite16'));
+        if (count($options))
+            echo ButtonDropDown($options, 'Button DropRight Event-OptionsButton', Sprite('SpOptions', 'Sprite16'));
 
         echo '</div>';
     }
@@ -58,12 +58,12 @@ if (!function_exists('HasEndDate')) :
 /**
  * Check whether event ends.
  *
- * @param array $Event The event.
+ * @param array $event The event.
  * @return bool Returns true if the event has an end date or false otherwise.
  */
-function HasEndDate($Event) {
+function HasEndDate($event) {
     // Event has no end date if start date equals end date.
-    return val('DateEnds', $Event) !== val('DateStarts', $Event);
+    return val('DateEnds', $event) !== val('DateStarts', $event);
 }
 
 endif;

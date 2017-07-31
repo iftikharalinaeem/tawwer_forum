@@ -17,34 +17,34 @@ class SEOLinksPlugin extends Gdn_Plugin {
 
    /**
     *
-    * @param Gdn_Router $Sender
-    * @param type $Args
+    * @param Gdn_Router $sender
+    * @param type $args
     */
-   public function Gdn_Dispatcher_BeforeDispatch_Handler($Sender, $Args) {
-      $Px = self::Prefix();
-      $PxEsc = preg_quote($Px);
+   public function Gdn_Dispatcher_BeforeDispatch_Handler($sender, $args) {
+      $px = self::Prefix();
+      $pxEsc = preg_quote($px);
 
-      $Route = '/?'.$PxEsc.'[^/]+/(\d+)-(.*?)(?:-(p\d+))?.html';
-      Gdn::Router()->Routes[$Route] = [
-          'Route' => $Route,
-          'Key' => base64_encode($Route),
+      $route = '/?'.$pxEsc.'[^/]+/(\d+)-(.*?)(?:-(p\d+))?.html';
+      Gdn::Router()->Routes[$route] = [
+          'Route' => $route,
+          'Key' => base64_encode($route),
           'Destination' => '/discussion/$1/$2/$3',
           'Reserved' => FALSE,
           'Type' => 'Internal'
       ];
 
-      $Path = trim(Gdn::Request()->Path(), '/');
+      $path = trim(Gdn::Request()->Path(), '/');
 
-      if (preg_match('`^'.$PxEsc.'([^/]+)(?:/(p\d+))?$`', $Path, $Matches)) {
-         $UrlCode = $Matches[1];
-         $Page = GetValue(2, $Matches);
+      if (preg_match('`^'.$pxEsc.'([^/]+)(?:/(p\d+))?$`', $path, $matches)) {
+         $urlCode = $matches[1];
+         $page = GetValue(2, $matches);
 
-         $Category = CategoryModel::Categories($UrlCode);
-         if ($Category) {
-            $Route = '/?'.$PxEsc.'(' . preg_quote($Category['UrlCode']) . ')(?:/(p\d+))?/?(\?.*)?$';
-            Gdn::Router()->Routes[$Route] = [
-                'Route' => $Route,
-                'Key' => base64_encode($Route),
+         $category = CategoryModel::Categories($urlCode);
+         if ($category) {
+            $route = '/?'.$pxEsc.'(' . preg_quote($category['UrlCode']) . ')(?:/(p\d+))?/?(\?.*)?$';
+            Gdn::Router()->Routes[$route] = [
+                'Route' => $route,
+                'Key' => base64_encode($route),
                 'Destination' => '/categories/$1/$2',
                 'Reserved' => FALSE,
                 'Type' => 'Internal'
@@ -53,12 +53,12 @@ class SEOLinksPlugin extends Gdn_Plugin {
       }
    }
 
-   public function SettingsController_SEOLinks_Create($Sender, $Args) {
-      $Sender->Permission('Garden.Settings.Manage');
-      $Sender->SetData('Title', sprintf(T('%s Settings'), 'SEO Links'));
+   public function SettingsController_SEOLinks_Create($sender, $args) {
+      $sender->Permission('Garden.Settings.Manage');
+      $sender->SetData('Title', sprintf(T('%s Settings'), 'SEO Links'));
 
-      $Cf = new ConfigurationModule($Sender);
-      $Cf->Initialize([
+      $cf = new ConfigurationModule($sender);
+      $cf->Initialize([
           'Plugins.SEOLinks.Prefix' => ['Description' => 'A prefix to put before every link (ex. forum/). The prefix should almost always be empty.'],
           ]);
 
@@ -66,8 +66,8 @@ class SEOLinksPlugin extends Gdn_Plugin {
          CategoryModel::ClearCache();
       }
 
-      $Sender->AddSideMenu('settings/plugins');
-      $Cf->RenderAll();
+      $sender->AddSideMenu('settings/plugins');
+      $cf->RenderAll();
   }
 
    public function Setup() {
@@ -76,8 +76,8 @@ class SEOLinksPlugin extends Gdn_Plugin {
       }
 
       // Set /members route once so it is editable
-      $Router = Gdn::Router();
-      $Router->SetRoute('/?members/([^/]+)', '/profile/$1', 'Internal');
+      $router = Gdn::Router();
+      $router->SetRoute('/?members/([^/]+)', '/profile/$1', 'Internal');
    }
 }
 
@@ -85,62 +85,62 @@ if (!function_exists('CategoryUrl')):
 
    /**
     * Return a url for a category. This function is in here and not functions.general so that plugins can override.
-    * @param array $Category
+    * @param array $category
     * @return string
     */
-   function CategoryUrl($Category, $Page = '', $WithDomain = TRUE) {
-      static $Px;
-      if (!isset($Px))
-         $Px = SEOLinksPlugin::Prefix();
+   function CategoryUrl($category, $page = '', $withDomain = TRUE) {
+      static $px;
+      if (!isset($px))
+         $px = SEOLinksPlugin::Prefix();
 
-      if (is_string($Category))
-         $Category = CategoryModel::Categories($Category);
-      $Category = (array) $Category;
+      if (is_string($category))
+         $category = CategoryModel::Categories($category);
+      $category = (array) $category;
 
-      $Result = '/' . $Px . rawurlencode($Category['UrlCode']) . '/';
-      if ($Page && $Page > 1) {
-         $Result .= 'p' . $Page . '/';
+      $result = '/' . $px . rawurlencode($category['UrlCode']) . '/';
+      if ($page && $page > 1) {
+         $result .= 'p' . $page . '/';
       }
-      return Url($Result, $WithDomain);
+      return Url($result, $withDomain);
    }
 
 endif;
 
 if (!function_exists('DiscussionUrl')):
 
-   function DiscussionUrl($Discussion, $Page = '', $WithDomain = TRUE) {
-      static $Px;
-      if (!isset($Px))
-         $Px = SEOLinksPlugin::Prefix();
+   function DiscussionUrl($discussion, $page = '', $withDomain = TRUE) {
+      static $px;
+      if (!isset($px))
+         $px = SEOLinksPlugin::Prefix();
 
-      $Discussion = (object) $Discussion;
-      $Cat = FALSE;
+      $discussion = (object) $discussion;
+      $cat = FALSE;
 
       // Some places call DiscussionUrl with a custom query that doesn't select CategoryID
-      if (GetValue('CategoryID', $Discussion))
-         $Cat = CategoryModel::Categories($Discussion->CategoryID);
+      if (GetValue('CategoryID', $discussion))
+         $cat = CategoryModel::Categories($discussion->CategoryID);
 
-      if ($Cat)
-         $Cat = rawurlencode($Cat['UrlCode']);
+      if ($cat)
+         $cat = rawurlencode($cat['UrlCode']);
       else
-         $Cat = 'x';
+         $cat = 'x';
 
-      $Name = Gdn_Format::Url(html_entity_decode($Discussion->Name, ENT_QUOTES, 'UTF-8'));
+      $name = Gdn_Format::Url(html_entity_decode($discussion->Name, ENT_QUOTES, 'UTF-8'));
       // Make sure the forum doesn't end with the page number notation.
-      if (preg_match('`(-p\d+)$`', $Name, $Matches)) {
-         $Name = substr($Name, 0, -strlen($Matches[1]));
+      if (preg_match('`(-p\d+)$`', $name, $matches)) {
+         $name = substr($name, 0, -strlen($matches[1]));
       }
 
-      if ($Page) {
-         if ($Page == 1 && !Gdn::Session()->UserID)
-            $Page = '';
+      if ($page) {
+         if ($page == 1 && !Gdn::Session()->UserID)
+            $page = '';
          else
-            $Page = '-p' . $Page;
+            $page = '-p' . $page;
       }
 
-      $Path = "/$Px$Cat/{$Discussion->DiscussionID}-$Name{$Page}.html";
+      $path = "/$px$cat/{$discussion->DiscussionID}-$name{$page}.html";
 
-      return Url($Path, $WithDomain);
+      return Url($path, $withDomain);
    }
 
 endif;

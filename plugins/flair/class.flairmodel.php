@@ -13,8 +13,8 @@ class FlairModel extends Gdn_Pluggable {
     * @param type $user_id
     */
    public function addBadgeFlair($user_id) {
-      $UserBadgeModel = new UserBadgeModel();
-      $user_badges = $UserBadgeModel->GetBadges($user_id)->ResultArray();
+      $userBadgeModel = new UserBadgeModel();
+      $user_badges = $userBadgeModel->GetBadges($user_id)->ResultArray();
 
       foreach ($user_badges as $badge) {
          // If no badge level

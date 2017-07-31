@@ -32,86 +32,86 @@ class Search {
 
         /// Author ///
         if (isset($search['author'])) {
-            $Usernames = explode(',', $search['author']);
-            $Usernames = array_map('trim', $Usernames);
-            $Usernames = array_filter($Usernames);
+            $usernames = explode(',', $search['author']);
+            $usernames = array_map('trim', $usernames);
+            $usernames = array_filter($usernames);
 
-            $Users = Gdn::SQL()->select('UserID, Name')->from('User')->where('Name', $Usernames)->get()->resultArray();
-            if (count($Usernames) == 1 && empty($Users)) {
+            $users = Gdn::SQL()->select('UserID, Name')->from('User')->where('Name', $usernames)->get()->resultArray();
+            if (count($usernames) == 1 && empty($users)) {
                 // Searching for one author that doesn't exist.
                 $search['dosearch'] = false;
             }
 
-            if (!empty($Users)) {
-                $search['users'] = $Users;
+            if (!empty($users)) {
+                $search['users'] = $users;
                 $doSearch = true;
             }
         }
 
         /// Category ///
-        $CategoryFilter = [];
-        $Archived = getValue('archived', $search, 0);
-        $CategoryID = getValue('cat', $search);
-        if (strcasecmp($CategoryID, 'all') === 0) {
-            $CategoryID = null;
+        $categoryFilter = [];
+        $archived = getValue('archived', $search, 0);
+        $categoryID = getValue('cat', $search);
+        if (strcasecmp($categoryID, 'all') === 0) {
+            $categoryID = null;
         }
 
-        if (!$CategoryID) {
-            switch ($Archived) {
+        if (!$categoryID) {
+            switch ($archived) {
                 case 1:
                     // Include both, do nothing.
                     break;
                 case 2:
                     // Only archive.
-                    $CategoryFilter['Archived'] = 1;
+                    $categoryFilter['Archived'] = 1;
                     break;
                 case 0:
                 default:
                     // Not archived.
-                    $CategoryFilter['Archived'] = 0;
+                    $categoryFilter['Archived'] = 0;
             }
         }
-        $Categories = CategoryModel::getByPermission('Discussions.View', null, $CategoryFilter);
-        $Categories[0] = true; // allow uncategorized too.
-        $Categories = array_keys($Categories);
+        $categories = CategoryModel::getByPermission('Discussions.View', null, $categoryFilter);
+        $categories[0] = true; // allow uncategorized too.
+        $categories = array_keys($categories);
 
-        Gdn::pluginManager()->fireAs('Search')->fireEvent('AllowedCategories', ['CategoriesID' => &$Categories]);
+        Gdn::pluginManager()->fireAs('Search')->fireEvent('AllowedCategories', ['CategoriesID' => &$categories]);
 
-        if ($CategoryID) {
+        if ($categoryID) {
             touchValue('subcats', $search, 0);
             if ($search['subcats']) {
-                $CategoryID = array_column(CategoryModel::getSubtree($CategoryID), 'CategoryID');
-                trace($CategoryID, 'cats');
+                $categoryID = array_column(CategoryModel::getSubtree($categoryID), 'CategoryID');
+                trace($categoryID, 'cats');
             }
 
-            $CategoryID = array_intersect((array)$CategoryID, $Categories);
+            $categoryID = array_intersect((array)$categoryID, $categories);
 
-            if (empty($CategoryID)) {
+            if (empty($categoryID)) {
                 $search['cat'] = false;
             } else {
-                $search['cat'] = $CategoryID;
+                $search['cat'] = $categoryID;
                 $doSearch = true;
             }
         } else {
-            $search['cat'] = $Categories;
+            $search['cat'] = $categories;
             unset($search['subcategories']);
         }
 
         /// Date ///
         if (isset($search['date'])) {
             // Try setting the date.
-            $Timestamp = strtotime($search['date']);
-            if ($Timestamp) {
+            $timestamp = strtotime($search['date']);
+            if ($timestamp) {
                 $search['houroffset'] = Gdn::session()->hourOffset();
-                $Timestamp += -Gdn::session()->hourOffset() * 3600;
-                $search['date'] = Gdn_Format::toDateTime($Timestamp);
+                $timestamp += -Gdn::session()->hourOffset() * 3600;
+                $search['date'] = Gdn_Format::toDateTime($timestamp);
 
                 if (isset($search['within'])) {
-                    $search['timestamp-from'] = strtotime('-'.$search['within'], $Timestamp);
-                    $search['timestamp-to'] = strtotime('+'.$search['within'], $Timestamp);
+                    $search['timestamp-from'] = strtotime('-'.$search['within'], $timestamp);
+                    $search['timestamp-to'] = strtotime('+'.$search['within'], $timestamp);
                 } else {
                     $search['timestamp-from'] = $search['date'];
-                    $search['timestamp-to'] = strtotime('+1 day', $Timestamp);
+                    $search['timestamp-to'] = strtotime('+1 day', $timestamp);
                 }
                 $search['date-from'] = Gdn_Format::toDateTime($search['timestamp-from']);
                 $search['date-to'] = Gdn_Format::toDateTime($search['timestamp-to']);
@@ -125,24 +125,24 @@ class Search {
         /// Tags ///
         if (isset($search['tags'])) {
             $doSearch = true;
-            $Tags = explode(',', $search['tags']);
-            $Tags = array_map('trim', $Tags);
-            $Tags = array_filter($Tags);
+            $tags = explode(',', $search['tags']);
+            $tags = array_map('trim', $tags);
+            $tags = array_filter($tags);
 
-            $TagData = Gdn::SQL()->select('TagID, Name')->from('Tag')->where('Name', $Tags)->get()->resultArray();
-            if (count($Tags) == 1 && empty($TagData)) {
+            $tagData = Gdn::SQL()->select('TagID, Name')->from('Tag')->where('Name', $tags)->get()->resultArray();
+            if (count($tags) == 1 && empty($tagData)) {
                 // Searching for one tag that doesn't exist.
                 $doSearch = false;
                 unset($search['tags']);
             }
 
-            if (getValue('tags-op', $Tags) === 'and' && count($Tags) > count($TagData)) {
+            if (getValue('tags-op', $tags) === 'and' && count($tags) > count($tagData)) {
                 // We are searching for all tags, but some of the tags don't exist.
                 $doSearch = false;
             }
 
-            if (!empty($TagData)) {
-                $search['tags'] = $TagData;
+            if (!empty($tagData)) {
+                $search['tags'] = $tagData;
                 touchValue('tags-op', $search, 'or');
             } else {
                 unset($search['tags'], $search['tags-op']);

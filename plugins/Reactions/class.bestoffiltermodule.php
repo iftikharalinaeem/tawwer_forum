@@ -21,20 +21,20 @@ class BestOfFilterModule extends Gdn_Module {
     /**
      *
      *
-     * @param $Name
-     * @param $Code
-     * @param $CurrentReactionType
+     * @param $name
+     * @param $code
+     * @param $currentReactionType
      * @return string
      */
-    private function button($Name, $Code, $CurrentReactionType) {
-        $LCode = strtolower($Code);
-        $Url = url("/bestof/$LCode");
-        $CssClass = $Code;
-        if ($CurrentReactionType == $LCode) {
-            $CssClass .= ' Active';
+    private function button($name, $code, $currentReactionType) {
+        $lCode = strtolower($code);
+        $url = url("/bestof/$lCode");
+        $cssClass = $code;
+        if ($currentReactionType == $lCode) {
+            $cssClass .= ' Active';
         }
 
-        return '<li class="BestOf'.$CssClass.'"><a href="'.$Url.'"><span class="ReactSprite React'.$Code.'"></span> '.$Name.'</a></li>';
+        return '<li class="BestOf'.$cssClass.'"><a href="'.$url.'"><span class="ReactSprite React'.$code.'"></span> '.$name.'</a></li>';
     }
 
     /**
@@ -43,17 +43,17 @@ class BestOfFilterModule extends Gdn_Module {
      * @return string
      */
     public function toString() {
-        $Controller = Gdn::controller();
-        $CurrentReactionType = $Controller->data('CurrentReaction');
-        $ReactionTypeData = $Controller->data('ReactionTypes');
-        $FilterMenu = '<div class="BoxFilter BoxBestOfFilter"><ul class="FilterMenu">';
+        $controller = Gdn::controller();
+        $currentReactionType = $controller->data('CurrentReaction');
+        $reactionTypeData = $controller->data('ReactionTypes');
+        $filterMenu = '<div class="BoxFilter BoxBestOfFilter"><ul class="FilterMenu">';
 
-        $FilterMenu .= $this->button(t('Everything'), 'Everything', $CurrentReactionType);
-        foreach ($ReactionTypeData as $Key => $ReactionType) {
-            $FilterMenu .= $this->button(t(val('Name', $ReactionType, '')), val('UrlCode', $ReactionType, ''), $CurrentReactionType);
+        $filterMenu .= $this->button(t('Everything'), 'Everything', $currentReactionType);
+        foreach ($reactionTypeData as $key => $reactionType) {
+            $filterMenu .= $this->button(t(val('Name', $reactionType, '')), val('UrlCode', $reactionType, ''), $currentReactionType);
         }
 
-        $FilterMenu .= '</ul></div>';
-        return $FilterMenu;
+        $filterMenu .= '</ul></div>';
+        return $filterMenu;
     }
 }

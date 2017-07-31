@@ -12,9 +12,9 @@ class BadgesModule extends Gdn_Module {
     /**
      * Create the module instance.
      *
-     * @param string $Sender
+     * @param string $sender
      */
-    public function __construct($Sender = '') {
+    public function __construct($sender = '') {
         // Default to current user if none is set
         $this->User = Gdn::controller()->data('Profile', Gdn::session()->User);
 
@@ -23,8 +23,8 @@ class BadgesModule extends Gdn_Module {
         }
 
         // Get badge list
-        $UserBadgeModel = new UserBadgeModel();
-        $this->Badges = $UserBadgeModel->getBadges(val('UserID', $this->User))->resultArray();
+        $userBadgeModel = new UserBadgeModel();
+        $this->Badges = $userBadgeModel->getBadges(val('UserID', $this->User))->resultArray();
 
         // Optionally only show highest badge in each class
         if (C('Reputation.Badges.FilterModuleByClass')) {
@@ -32,7 +32,7 @@ class BadgesModule extends Gdn_Module {
         }
 
 
-        parent::__construct($Sender, 'plugins/badges');
+        parent::__construct($sender, 'plugins/badges');
     }
 
     /**

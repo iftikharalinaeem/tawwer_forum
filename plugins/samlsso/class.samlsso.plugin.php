@@ -161,22 +161,22 @@ class SamlSSOPlugin extends Gdn_Plugin {
     /**
      * Handle the SSO connection.
      *
-     * @param Gdn_Controller $Sender
-     * @param array $Args
+     * @param Gdn_Controller $sender
+     * @param array $args
      * @throws Exception
      */
-    public function base_connectData_handler($Sender, $Args) {
-        if (val(0, $Args) != 'saml') {
+    public function base_connectData_handler($sender, $args) {
+        if (val(0, $args) != 'saml') {
             return;
         }
 
-        $authenticationKey = $Sender->Request->get('authKey');
+        $authenticationKey = $sender->Request->get('authKey');
         // Backward compatibility
         if (!$authenticationKey) {
             $authenticationKey = 'saml';
         }
 
-        if (!$Sender->Request->isPostBack()) {
+        if (!$sender->Request->isPostBack()) {
             throw ForbiddenException('GET');
         }
 
@@ -188,7 +188,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         } else {
             // Grab the SAML session from the SAML response.
             $settings = $this->getSettings($authenticationKey);
-            $response = new OneLogin_Saml_Response($settings, $Sender->Request->post('SAMLResponse'));
+            $response = new OneLogin_Saml_Response($settings, $sender->Request->post('SAMLResponse'));
 
             Logger::event('saml_response_received', Logger::INFO, "SAML response received.", (array)$response->assertion);
 
@@ -207,43 +207,43 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
         $provider = $this->getProvider($authenticationKey);
 
-        $Form = $Sender->Form; //new Gdn_Form();
-        $Form->setFormValue('UniqueID', $id);
-        $Form->setFormValue('Provider', $authenticationKey);
-        $Form->setFormValue('ProviderName', $provider['Name']);
-        $Form->setFormValue('Name', $this->rval('uid', $profile));
-        $Form->setFormValue('FullName', $this->rval('cn', $profile));
-        $Form->setFormValue('Email', $this->rval('mail', $profile));
-        $Form->setFormValue('Photo', $this->rval('photo', $profile));
+        $form = $sender->Form; //new Gdn_Form();
+        $form->setFormValue('UniqueID', $id);
+        $form->setFormValue('Provider', $authenticationKey);
+        $form->setFormValue('ProviderName', $provider['Name']);
+        $form->setFormValue('Name', $this->rval('uid', $profile));
+        $form->setFormValue('FullName', $this->rval('cn', $profile));
+        $form->setFormValue('Email', $this->rval('mail', $profile));
+        $form->setFormValue('Photo', $this->rval('photo', $profile));
 
         // Don't overwrite ConnectName if it already exists.
         if ($this->rval('uid', $profile)) {
-            $Form->setFormValue('ConnectName', $this->rval('uid', $profile));
+            $form->setFormValue('ConnectName', $this->rval('uid', $profile));
         }
 
         $roles = $this->rval('roles', $profile);
         if ($roles) {
-             $Form->setFormValue('Roles', $roles);
+             $form->setFormValue('Roles', $roles);
         }
 
         // Set the target from common items.
-        if ($relay_state = $Sender->Request->post('RelayState')) {
+        if ($relay_state = $sender->Request->post('RelayState')) {
             if ((isUrl($relay_state) || preg_match('`^[/a-z]`i', $relay_state)) && strripos($relay_state, '/entry/connect/saml') === false) {
-                $Form->setFormValue('Target', $relay_state);
+                $form->setFormValue('Target', $relay_state);
             }
         }
 
         Logger::event('saml_profile', Logger::INFO, 'Profile Received from SAML', ['profile' => $profile]);
 
         $this->EventArguments['Profile'] = $profile;
-        $this->EventArguments['Form'] = $Form;
+        $this->EventArguments['Form'] = $form;
 
         // Throw an event so that other plugins can add/remove stuff from the basic sso.
         $this->fireEvent('SamlData');
 
         SpamModel::disabled(true);
-        $Sender->setData('Trusted', true);
-        $Sender->setData('Verified', true);
+        $sender->setData('Trusted', true);
+        $sender->setData('Verified', true);
     }
 
     /**

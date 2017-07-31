@@ -30,47 +30,47 @@ class EventModule extends Gdn_Module {
     /**
      * EventModule constructor.
      *
-     * @param null $Type
-     * @param null $FilterBy
-     * @param null $Filter
-     * @param null $Button
+     * @param null $type
+     * @param null $filterBy
+     * @param null $filter
+     * @param null $button
      */
-    public function __construct($Type = null, $FilterBy = null, $Filter = null, $Button = null) {
+    public function __construct($type = null, $filterBy = null, $filter = null, $button = null) {
         parent::__construct();
         $this->_ApplicationFolder = 'groups';
 
-        if (!is_null($Type))
-            $this->Type = $Type;
+        if (!is_null($type))
+            $this->Type = $type;
 
-        if (!is_null($FilterBy))
-            $this->FilterBy = $FilterBy;
+        if (!is_null($filterBy))
+            $this->FilterBy = $filterBy;
 
-        if (!is_null($Filter))
-            $this->Filter = $Filter;
+        if (!is_null($filter))
+            $this->Filter = $filter;
 
-        if (!is_null($Button))
-            $this->Button = $Button;
+        if (!is_null($button))
+            $this->Button = $button;
     }
 
-    public function __set($Name, $Value) {
-        $Name = strtolower($Name);
-        switch ($Name) {
+    public function __set($name, $value) {
+        $name = strtolower($name);
+        switch ($name) {
             case 'groupid':
-                $this->Filter = $Value;
+                $this->Filter = $value;
                 $this->FilterBy = 'group';
                 break;
 
             case 'userid':
-                $this->Filter = $Value;
+                $this->Filter = $value;
                 $this->FilterBy = 'user';
                 break;
 
             case 'type':
-                $this->Type = $Value;
+                $this->Type = $value;
                 break;
 
             case 'button':
-                $this->Button = $Value;
+                $this->Button = $value;
                 break;
         }
 
@@ -85,38 +85,38 @@ class EventModule extends Gdn_Module {
         // Callable multiple times
         if (!is_null($this->Data('Events', null))) return;
 
-        $EventCriteria = [];
+        $eventCriteria = [];
         switch ($this->FilterBy) {
             case 'group':
-                $GroupModel = new GroupModel();
-                $Group = $GroupModel->GetID($this->Filter, DATASET_TYPE_ARRAY);
-                $this->SetData('Group', $Group);
-                $EventCriteria['GroupID'] = $Group['GroupID'];
+                $groupModel = new GroupModel();
+                $group = $groupModel->GetID($this->Filter, DATASET_TYPE_ARRAY);
+                $this->SetData('Group', $group);
+                $eventCriteria['GroupID'] = $group['GroupID'];
                 break;
 
             case 'user':
-                $User = Gdn::UserModel()->GetID($this->Filter, DATASET_TYPE_ARRAY);
-                $this->SetData('User', $User);
-                $EventCriteria['Invited'] = $User['UserID'];
+                $user = Gdn::UserModel()->GetID($this->Filter, DATASET_TYPE_ARRAY);
+                $this->SetData('User', $user);
+                $eventCriteria['Invited'] = $user['UserID'];
                 break;
         }
 
         switch ($this->Type) {
             case 'upcoming':
-                $FilterDate = C('Groups.Events.UpcomingRange', '+365 days');
-                $Ended = false;
+                $filterDate = C('Groups.Events.UpcomingRange', '+365 days');
+                $ended = false;
                 $this->SetData('Title', T('Upcoming Events'));
                 break;
 
             case 'recent':
-                $FilterDate = C('Groups.Events.RecentRange', '-365 days');
-                $Ended = true;
+                $filterDate = C('Groups.Events.RecentRange', '-365 days');
+                $ended = true;
                 $this->SetData('Title', T('Recent Events'));
                 break;
         }
 
-        $EventModel = new EventModel();
-        $this->SetData('Events', $EventModel->GetUpcoming($FilterDate, $EventCriteria, $Ended));
+        $eventModel = new EventModel();
+        $this->SetData('Events', $eventModel->GetUpcoming($filterDate, $eventCriteria, $ended));
 
     }
 

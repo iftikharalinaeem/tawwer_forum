@@ -1,60 +1,60 @@
 <?php if (!defined('APPLICATION')) exit;
 
-function AutoDescription($ReactionType) {
-   $Result = [];
+function AutoDescription($reactionType) {
+   $result = [];
 
-   if ($IncrementColumn = GetValue('IncrementColumn', $ReactionType)) {
-      $IncrementValue = GetValue('IncrementValue', $ReactionType, 1);
-      $IncrementString = $IncrementValue > 0 ? "Adds $IncrementValue to" : "Subtracts ".abs($IncrementValue)." from";
+   if ($incrementColumn = GetValue('IncrementColumn', $reactionType)) {
+      $incrementValue = GetValue('IncrementValue', $reactionType, 1);
+      $incrementString = $incrementValue > 0 ? "Adds $incrementValue to" : "Subtracts ".abs($incrementValue)." from";
 
-      $Result[] = sprintf("%s a post's %s.", $IncrementString, strtolower($IncrementColumn));
+      $result[] = sprintf("%s a post's %s.", $incrementString, strtolower($incrementColumn));
    }
 
-   if ($Points = GetValue('Points', $ReactionType)) {
-      if ($Points > 0)
-         $IncrementString = "Gives $Points ".Plural($Points,'point','points')." to";
+   if ($points = GetValue('Points', $reactionType)) {
+      if ($points > 0)
+         $incrementString = "Gives $points ".Plural($points,'point','points')." to";
       else
-         $IncrementString = "Removes ".abs($Points)." ".Plural($Points,'point','points')." from";
+         $incrementString = "Removes ".abs($points)." ".Plural($points,'point','points')." from";
 
-      $Result[] = sprintf("%s the user.", $IncrementString);
+      $result[] = sprintf("%s the user.", $incrementString);
    }
 
-   if ($LogThreshold = GetValue('LogThreshold', $ReactionType)) {
-      $Log = GetValue('Log', $ReactionType, 'Moderate');
-      $LogString = $Log == 'Spam' ? 'spam queue' : 'moderation queue';
+   if ($logThreshold = GetValue('LogThreshold', $reactionType)) {
+      $log = GetValue('Log', $reactionType, 'Moderate');
+      $logString = $log == 'Spam' ? 'spam queue' : 'moderation queue';
 
-      $Result[] = sprintf("Posts with %s reactions will be placed in the %s.", $LogThreshold, $LogString);
+      $result[] = sprintf("Posts with %s reactions will be placed in the %s.", $logThreshold, $logString);
    }
 
-   if ($RemoveThreshold = GetValue('RemoveThreshold', $ReactionType)) {
-      if ($RemoveThreshold != $LogThreshold) {
-         $Result[] = sprintf("Posts will be removed when they get %s reactions.", $RemoveThreshold);
+   if ($removeThreshold = GetValue('RemoveThreshold', $reactionType)) {
+      if ($removeThreshold != $logThreshold) {
+         $result[] = sprintf("Posts will be removed when they get %s reactions.", $removeThreshold);
       }
    }
 
-   if ($Class = GetValue('Class', $ReactionType)) {
-      $Result[] = sprintf(T('ReactionClassRestriction', 'Requires &ldquo;%s&rdquo; reaction permission.'), $Class);
+   if ($class = GetValue('Class', $reactionType)) {
+      $result[] = sprintf(T('ReactionClassRestriction', 'Requires &ldquo;%s&rdquo; reaction permission.'), $class);
    }
 
-   if ($Permission = GetValue('Permission', $ReactionType)) {
-      $Result[] = sprintf(T('ReactionPermissionRestriction', 'Special restriction: Only users with permission %s may use this reaction.'),$Permission);
+   if ($permission = GetValue('Permission', $reactionType)) {
+      $result[] = sprintf(T('ReactionPermissionRestriction', 'Special restriction: Only users with permission %s may use this reaction.'),$permission);
    }
 
-   return $Result;
+   return $result;
 }
 
-function ActivateButton($ReactionType) {
-   $Qs = [
-       'urlcode' => $ReactionType['UrlCode'],
-       'active' => !$ReactionType['Active']];
+function ActivateButton($reactionType) {
+   $qs = [
+       'urlcode' => $reactionType['UrlCode'],
+       'active' => !$reactionType['Active']];
 
-   $State = ($ReactionType['Active'] ? 'Active' : 'InActive');
+   $state = ($reactionType['Active'] ? 'Active' : 'InActive');
 
    $return = '<span id="reactions-toggle">';
-   if ($State === 'Active') {
-      $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/reactions/toggle?'.http_build_query($Qs), 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+   if ($state === 'Active') {
+      $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/reactions/toggle?'.http_build_query($qs), 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
    } else {
-      $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/reactions/toggle?'.http_build_query($Qs), 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+      $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/reactions/toggle?'.http_build_query($qs), 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
    }
 
    $return .= '</span>';

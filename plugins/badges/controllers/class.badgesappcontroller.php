@@ -33,7 +33,7 @@ class BadgesAppController extends Gdn_Controller {
     public function initialize() {
         $this->Application = 'badges';
 
-        $FrontendStyle = false;
+        $frontendStyle = false;
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
             $this->Head = new HeadModule($this);
@@ -48,9 +48,9 @@ class BadgesAppController extends Gdn_Controller {
             $this->addJsFile('jquery.autocomplete.js');
 
             // When we use front end style instead of admin style
-            $FrontendStyle = $FrontendStyle || $this->ControllerName == 'badgescontroller';
+            $frontendStyle = $frontendStyle || $this->ControllerName == 'badgescontroller';
 
-            if ($FrontendStyle) {
+            if ($frontendStyle) {
                 $this->addCssFile('style.css');
             } else {
                 $this->addCssFile('admin.css');
@@ -62,7 +62,7 @@ class BadgesAppController extends Gdn_Controller {
         }
 
         // Change master template
-        if (!$FrontendStyle) {
+        if (!$frontendStyle) {
             $this->MasterView = 'admin';
         }
 

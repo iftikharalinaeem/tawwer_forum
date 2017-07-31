@@ -1048,16 +1048,16 @@ class GSArray{
 
 class SigUtils
 {
-	 public static function validateUserSignature($UID, $timestamp, $secret, $signature) 
+	 public static function validateUserSignature($uID, $timestamp, $secret, $signature) 
 	{
-		$baseString = $timestamp."_".$UID;
+		$baseString = $timestamp."_".$uID;
 		$expectedSig = self::calcSignature($baseString, $secret); 
 		return $expectedSig == $signature;
 	}
 	
-	public static function validateFriendSignature($UID, $timestamp, $friendUID, $secret, $signature)
+	public static function validateFriendSignature($uID, $timestamp, $friendUID, $secret, $signature)
 	{
-		$baseString = $timestamp."_".$friendUID."_".$UID;
+		$baseString = $timestamp."_".$friendUID."_".$uID;
 		$expectedSig = self::calcSignature($baseString, $secret); 
 		return $expectedSig == $signature;
 	}	

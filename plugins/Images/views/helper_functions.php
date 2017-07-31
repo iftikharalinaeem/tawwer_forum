@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-function WriteImageUpload($AutoSave = FALSE) {
+function WriteImageUpload($autoSave = FALSE) {
    echo '<div class="ImageControlsWrap">';
       echo '<div class="FileInput DropZone btn btn-success fileinput-button">';
          echo Wrap(T('Drag and drop or click to upload.'));
@@ -13,7 +13,7 @@ function WriteImageUpload($AutoSave = FALSE) {
          echo '<input type="text" class="UrlInput InputBox" placeholder="'.T('Paste image url...').'" />';
          echo ' '.Anchor('Fetch', '#', 'UrlButton Button Success');
          
-      if ($AutoSave) {
+      if ($autoSave) {
          echo '<input type="hidden" name="AutoSave" value="1" />';
       }
       

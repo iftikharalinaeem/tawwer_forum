@@ -42,25 +42,25 @@ class Cleanspeak extends Gdn_Pluggable {
     /**
      * Send post to cleanspeak to see if content requires moderation.
      *
-     * @param $UUID
+     * @param $uUID
      * @param $content
      * @param bool $forceModeration
      * @return array|mixed
      */
-    public function moderation($UUID, $content, $forceModeration = false) {
+    public function moderation($uUID, $content, $forceModeration = false) {
 
         if ($forceModeration) {
             $content['moderation'] = 'requiresApproval';
         }
 
-        $response = $this->apiRequest('/content/item/moderate/' . urlencode($UUID), $content);
+        $response = $this->apiRequest('/content/item/moderate/' . urlencode($uUID), $content);
 
         return $response;
 
     }
 
-    public function flag($UUID, $flag) {
-        $response = $this->apiRequest('/content/item/flag/' . urlencode($UUID), $flag);
+    public function flag($uUID, $flag) {
+        $response = $this->apiRequest('/content/item/flag/' . urlencode($uUID), $flag);
         return $response;
     }
 
@@ -92,8 +92,8 @@ class Cleanspeak extends Gdn_Pluggable {
         return $this->generateUUIDFromInts([$this->uuidSeed[0], 0, 0, $userID]);
     }
 
-    public static function getUserIDFromUUID($UUID) {
-        $ints = self::getIntsFromUUID($UUID);
+    public static function getUserIDFromUUID($uUID) {
+        $ints = self::getIntsFromUUID($uUID);
         if ($ints[3] == 0 || !is_numeric($ints[3])) {
             return false;
         }
@@ -226,26 +226,26 @@ class Cleanspeak extends Gdn_Pluggable {
 
         // Attachments.
         if (val('MediaIDs', $data)) {
-            $MediaModel = new Gdn_Model('Media');
+            $mediaModel = new Gdn_Model('Media');
 
-            foreach ($data['MediaIDs'] as $MediaID) {
-                $Media = $MediaModel->GetID($MediaID);
-                if (!$Media) {
+            foreach ($data['MediaIDs'] as $mediaID) {
+                $media = $mediaModel->GetID($mediaID);
+                if (!$media) {
                     continue;
                 }
-                $Path = val('Path', $Media);
-                $Name = 'Attachment';
-                $Type = 'hyperlink';
+                $path = val('Path', $media);
+                $name = 'Attachment';
+                $type = 'hyperlink';
 
-                if (stristr(val('Type', $Media), 'image') !== false) {
-                    $Name = 'Image';
-                    $Type = 'image';
+                if (stristr(val('Type', $media), 'image') !== false) {
+                    $name = 'Image';
+                    $type = 'image';
                 }
 
                 $parts[] = [
-                    'content' => Gdn_Upload::Url($Path),
-                    'name' => $Name,
-                    'type' => $Type
+                    'content' => Gdn_Upload::Url($path),
+                    'name' => $name,
+                    'type' => $type
                 ];
             }
 
@@ -260,11 +260,11 @@ class Cleanspeak extends Gdn_Pluggable {
     }
 
     /**
-     * @param string $UUID Universal Unique Identifier.
+     * @param string $uUID Universal Unique Identifier.
      * @return array Containing the 4 numbers used to generate generateUUIDFromInts
      */
-    public static function getIntsFromUUID($UUID) {
-        $parts = str_split(str_replace('-', '', $UUID), 8);
+    public static function getIntsFromUUID($uUID) {
+        $parts = str_split(str_replace('-', '', $uUID), 8);
         $parts = array_map('hexdec', $parts);
         return $parts;
     }

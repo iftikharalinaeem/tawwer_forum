@@ -62,41 +62,41 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      * would result in the corresponding UserID KVP being added to the POST data:
      *    UserID = 2387
      *
-     * @param array $Post
-     * @param boolean $ThrowError
+     * @param array $post
+     * @param boolean $throwError
      * @return boolean
      * @throws Exception
      */
-    public static function translatePost(&$Post, $ThrowError = true) {
+    public static function translatePost(&$post, $throwError = true) {
 
-        $Errors = [];
-        $PostData = $Post;
-        $Post = [];
+        $errors = [];
+        $postData = $post;
+        $post = [];
 
         // Loop over every KVP in the POST data
-        foreach ($PostData as $Key => $Value) {
-            if ($Key == 'access_token') continue;
+        foreach ($postData as $key => $value) {
+            if ($key == 'access_token') continue;
 
             // Unscrew PHP encoding of periods in POST data
-            $Key = str_replace('_', '.', $Key);
-            $Post[$Key] = $Value;
+            $key = str_replace('_', '.', $key);
+            $post[$key] = $value;
 
         }
-        unset($PostData);
+        unset($postData);
 
         // Loop over every KVP in the POST data.
-        foreach ($Post as $Key => $Value) {
-            $TranslateErrors = self::translateField($Post, $Key, $Value);
-            if (is_array($TranslateErrors))
-                $Errors = array_merge($Errors, $TranslateErrors);
+        foreach ($post as $key => $value) {
+            $translateErrors = self::translateField($post, $key, $value);
+            if (is_array($translateErrors))
+                $errors = array_merge($errors, $translateErrors);
 
         }
 
-        if (count($Errors) > 0) {
-            if ($ThrowError) {
-                throw self::createException($Errors);
+        if (count($errors) > 0) {
+            if ($throwError) {
+                throw self::createException($errors);
             } else {
-                return $Errors;
+                return $errors;
             }
         }
 
@@ -114,40 +114,40 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      * would result in the corresponding UserID KVP being added to the GET data:
      *    UserID = 2387
      *
-     * @param array $Get
-     * @param boolean $ThrowError
+     * @param array $get
+     * @param boolean $throwError
      * @return boolean
      * @throws Exception
      */
-    public static function translateGet(&$Get, $ThrowError = true) {
-        $Errors = [];
-        $GetData = $Get;
-        $Get = [];
+    public static function translateGet(&$get, $throwError = true) {
+        $errors = [];
+        $getData = $get;
+        $get = [];
 
         // Loop over every KVP in the POST data
-        foreach ($GetData as $Key => $Value) {
-            if ($Key == 'access_token') continue;
+        foreach ($getData as $key => $value) {
+            if ($key == 'access_token') continue;
 
             // Unscrew PHP encoding of periods in POST data
-            $Key = str_replace('_', '.', $Key);
-            $Get[$Key] = $Value;
+            $key = str_replace('_', '.', $key);
+            $get[$key] = $value;
 
         }
-        unset($GetData);
+        unset($getData);
 
         // Loop over every KVP in the GET data
-        foreach ($Get as $Key => $Value) {
-            $TranslateErrors = self::translateField($Get, $Key, $Value);
-            if (is_array($TranslateErrors)) {
-                $Errors = array_merge($Errors, $TranslateErrors);
+        foreach ($get as $key => $value) {
+            $translateErrors = self::translateField($get, $key, $value);
+            if (is_array($translateErrors)) {
+                $errors = array_merge($errors, $translateErrors);
             }
         }
 
-        if (count($Errors) > 0) {
-            if ($ThrowError) {
-                throw self::createException($Errors);
+        if (count($errors) > 0) {
+            if ($throwError) {
+                throw self::createException($errors);
             } else {
-                return $Errors;
+                return $errors;
             }
         }
 
@@ -157,200 +157,200 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     /**
      * Translate a single field in an array
      *
-     * @param array $Data
-     * @param string $Field
-     * @param string $Value
+     * @param array $data
+     * @param string $field
+     * @param string $value
      */
-    protected static function translateField(&$Data, $Field, $Value) {
-        $Errors = [];
-        $SupportedTables = ['Badge', 'Category', 'Rank', 'Role', 'User', 'Discussion'];
+    protected static function translateField(&$data, $field, $value) {
+        $errors = [];
+        $supportedTables = ['Badge', 'Category', 'Rank', 'Role', 'User', 'Discussion'];
 
         try {
 
             // If the Key is dot-delimited, inspect it for potential munging
-            if (strpos($Field, '.') !== false) {
+            if (strpos($field, '.') !== false) {
 
-                list($FieldPrefix, $ColumnLookup) = explode('.', $Field, 2);
+                list($fieldPrefix, $columnLookup) = explode('.', $field, 2);
 
-                $FieldPrefix = ucfirst($FieldPrefix); // support some form of case-insensitivity.
-                $TableName = $FieldPrefix;
+                $fieldPrefix = ucfirst($fieldPrefix); // support some form of case-insensitivity.
+                $tableName = $fieldPrefix;
 
-                if (StringEndsWith($FieldPrefix, 'User'))
-                    $TableName = 'User';
+                if (StringEndsWith($fieldPrefix, 'User'))
+                    $tableName = 'User';
 
-                if (StringEndsWith($FieldPrefix, 'Users'))
-                    $TableName = 'Users';
+                if (StringEndsWith($fieldPrefix, 'Users'))
+                    $tableName = 'Users';
 
                 // Limit to supported tables
-                $TableAllowed = true;
-                $Multi = false;
-                if (!in_array($TableName, $SupportedTables)) {
-                    $TableAllowed = false;
+                $tableAllowed = true;
+                $multi = false;
+                if (!in_array($tableName, $supportedTables)) {
+                    $tableAllowed = false;
 
                     // First check if this is a Multi request
-                    if (stringEndsWith($TableName, 'ies')) {
+                    if (stringEndsWith($tableName, 'ies')) {
                         // Swap out that IES with Y in $TableName (e.g. Categories becomes Category).
-                        $SingularTableName = stringEndsWith($TableName, 'ies', false, true).'y';
+                        $singularTableName = stringEndsWith($tableName, 'ies', false, true).'y';
                     } else {
                         // Fallback to assuming its a plural if it ends in an S.
-                        $SingularTableName = stringEndsWith($TableName, 's', false, true);
+                        $singularTableName = stringEndsWith($tableName, 's', false, true);
                     }
 
-                    if ($SingularTableName) {
-                        if (in_array($SingularTableName, $SupportedTables)) {
+                    if ($singularTableName) {
+                        if (in_array($singularTableName, $supportedTables)) {
                             // De-pluralize $FieldPrefix, now that we've confirmed the table is supported.
-                            if (stringEndsWith($FieldPrefix, 'ies')) {
-                                $FieldPrefix = stringEndsWith($FieldPrefix, 'ies', false, true).'y';
+                            if (stringEndsWith($fieldPrefix, 'ies')) {
+                                $fieldPrefix = stringEndsWith($fieldPrefix, 'ies', false, true).'y';
                             } else {
-                                $FieldPrefix = stringEndsWith($FieldPrefix, 's', false, true);
+                                $fieldPrefix = stringEndsWith($fieldPrefix, 's', false, true);
                             }
 
-                            $TableName = $SingularTableName;
-                            $TableAllowed = true;
-                            $Multi = true;
+                            $tableName = $singularTableName;
+                            $tableAllowed = true;
+                            $multi = true;
                         }
                     }
 
                     // Only allow the ForeignID of the discussion table.
-                    if ($SingularTableName === 'Discussion' && !in_array($ColumnLookup, ['DiscussionID', 'ForeignID']))
-                        $TableAllowed = false;
+                    if ($singularTableName === 'Discussion' && !in_array($columnLookup, ['DiscussionID', 'ForeignID']))
+                        $tableAllowed = false;
                 }
 
-                if (!$TableAllowed)
+                if (!$tableAllowed)
                     return;
 
                 // We desire the 'ID' root field
-                $LookupField = "{$FieldPrefix}ID";
-                $OutputField = $LookupField;
+                $lookupField = "{$fieldPrefix}ID";
+                $outputField = $lookupField;
 
-                if (StringEndsWith($FieldPrefix, 'User'))
-                    $LookupField = "UserID";
+                if (StringEndsWith($fieldPrefix, 'User'))
+                    $lookupField = "UserID";
 
                 // Don't override an existing desired field
-                if (isset($Data[$OutputField]) && !$Multi)
+                if (isset($data[$outputField]) && !$multi)
                     return;
 
                 // Allow a lookup to set a field to null.
-                if ($Value === NULL || $Value === '') {
-                    $Data[$OutputField] = NULL;
+                if ($value === NULL || $value === '') {
+                    $data[$outputField] = NULL;
                     return;
                 }
 
-                $LookupFieldValue = NULL;
-                $LookupKey = "{$TableName}.{$ColumnLookup}";
-                $LookupMethod = 'simple';
+                $lookupFieldValue = NULL;
+                $lookupKey = "{$tableName}.{$columnLookup}";
+                $lookupMethod = 'simple';
 
-                if ($ColumnLookup == 'ID')
-                    $LookupMethod = 'noop';
+                if ($columnLookup == 'ID')
+                    $lookupMethod = 'noop';
 
                 // Sucks, but jsConnect always sends lowercase.
-                if (strtolower($ColumnLookup) == $ColumnLookup) {
-                    $ColumnLookup = ucfirst($ColumnLookup);
+                if (strtolower($columnLookup) == $columnLookup) {
+                    $columnLookup = ucfirst($columnLookup);
                 }
 
-                if ($LookupKey == 'User.ForeignID')
-                    $LookupMethod = 'custom';
+                if ($lookupKey == 'User.ForeignID')
+                    $lookupMethod = 'custom';
 
                 // Only bother with exploding or casting if $Value isn't already an array.
-                if (is_array($Value)) {
+                if (is_array($value)) {
                     // Since our $Value is an array, it should be handled as if it were multiple values.
-                    $Multi = true;
+                    $multi = true;
                 } else {
-                    if ($Multi) {
-                        $Value = explode(',', $Value);
+                    if ($multi) {
+                        $value = explode(',', $value);
                     } else {
-                        $Value = (array)$Value;
+                        $value = (array)$value;
                     }
                 }
 
-                foreach ($Value as $MultiValue) {
-                    switch ($LookupMethod) {
+                foreach ($value as $multiValue) {
+                    switch ($lookupMethod) {
 
                         // Noop lookup
                         case 'noop':
-                            $LookupFieldValue = $MultiValue;
+                            $lookupFieldValue = $multiValue;
                             break;
 
                         // Simple table.field lookup types
                         case 'simple':
-                            $MatchRecords = Gdn::SQL()->GetWhere($TableName, [
-                                $ColumnLookup => $MultiValue
+                            $matchRecords = Gdn::SQL()->GetWhere($tableName, [
+                                $columnLookup => $multiValue
                             ]);
-                            if (!$MatchRecords->NumRows()) {
-                                $Code = (Gdn::Request()->Get('callback', false) && C('Garden.AllowJSONP')) ? 200 : 404;
-                                throw new Exception(self::notFoundString($FieldPrefix, $MultiValue), $Code);
+                            if (!$matchRecords->NumRows()) {
+                                $code = (Gdn::Request()->Get('callback', false) && C('Garden.AllowJSONP')) ? 200 : 404;
+                                throw new Exception(self::notFoundString($fieldPrefix, $multiValue), $code);
                             }
 
-                            if ($MatchRecords->NumRows() > 1)
-                                throw new Exception(sprintf('Multiple %ss found by %s for "%s".', T('User'), $ColumnLookup, $MultiValue), 409);
+                            if ($matchRecords->NumRows() > 1)
+                                throw new Exception(sprintf('Multiple %ss found by %s for "%s".', T('User'), $columnLookup, $multiValue), 409);
 
-                            $Record = $MatchRecords->FirstRow(DATASET_TYPE_ARRAY);
-                            $LookupFieldValue = GetValue($LookupField, $Record);
+                            $record = $matchRecords->FirstRow(DATASET_TYPE_ARRAY);
+                            $lookupFieldValue = GetValue($lookupField, $record);
                             break;
 
                         // Custom lookup types
                         case 'custom':
 
                             // Special lookup for SSO users
-                            if ($LookupKey == 'User.ForeignID') {
-                                if (strpos($MultiValue, ':') === false)
-                                    throw new Exception("Malformed ForeignID object '{$MultiValue}'. Should be '[provider key]:[foreign id]'.", 400);
+                            if ($lookupKey == 'User.ForeignID') {
+                                if (strpos($multiValue, ':') === false)
+                                    throw new Exception("Malformed ForeignID object '{$multiValue}'. Should be '[provider key]:[foreign id]'.", 400);
 
-                                $ProviderParts = explode(':', $MultiValue, 2);
-                                $ProviderKey = $ProviderParts[0];
-                                $ForeignID = $ProviderParts[1];
+                                $providerParts = explode(':', $multiValue, 2);
+                                $providerKey = $providerParts[0];
+                                $foreignID = $providerParts[1];
 
                                 // Check if we have a provider by that key
-                                $ProviderModel = new Gdn_AuthenticationProviderModel();
-                                $Provider = $ProviderModel->GetProviderByKey($ProviderKey);
-                                if (!$Provider)
-                                    throw new Exception(self::notFoundString('Provider', $ProviderKey), 404);
+                                $providerModel = new Gdn_AuthenticationProviderModel();
+                                $provider = $providerModel->GetProviderByKey($providerKey);
+                                if (!$provider)
+                                    throw new Exception(self::notFoundString('Provider', $providerKey), 404);
 
                                 // Check if we have an associated user for that ForeignID
-                                $UserAssociation = Gdn::Authenticator()->GetAssociation($ForeignID, $ProviderKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
-                                if (!$UserAssociation)
-                                    throw new Exception(self::notFoundString('User', $MultiValue), 404);
+                                $userAssociation = Gdn::Authenticator()->GetAssociation($foreignID, $providerKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
+                                if (!$userAssociation)
+                                    throw new Exception(self::notFoundString('User', $multiValue), 404);
 
-                                $LookupFieldValue = GetValue($LookupField, $UserAssociation);
+                                $lookupFieldValue = GetValue($lookupField, $userAssociation);
                             }
 
                             break;
                     }
 
-                    if (!is_null($LookupFieldValue)) {
-                        if ($Multi) {
-                            if (!isset($Data[$OutputField])) $Data[$OutputField] = [];
-                            if (!is_array($Data[$OutputField])) $Data[$OutputField] = [$Data[$OutputField]];
-                            $Data[$OutputField][] = $LookupFieldValue;
+                    if (!is_null($lookupFieldValue)) {
+                        if ($multi) {
+                            if (!isset($data[$outputField])) $data[$outputField] = [];
+                            if (!is_array($data[$outputField])) $data[$outputField] = [$data[$outputField]];
+                            $data[$outputField][] = $lookupFieldValue;
                         } else {
-                            $Data[$OutputField] = $LookupFieldValue;
+                            $data[$outputField] = $lookupFieldValue;
                         }
                     }
                 }
 
-            } elseif (StringEndsWith($Field, 'Category')) {
+            } elseif (StringEndsWith($field, 'Category')) {
                 // Translate a category column.
-                $Px = StringEndsWith($Field, 'Category', true, true);
-                $Column = $Px.'CategoryID';
-                if (isset($Data[$Column]))
+                $px = StringEndsWith($field, 'Category', true, true);
+                $column = $px.'CategoryID';
+                if (isset($data[$column]))
                     return;
 
-                $Category = CategoryModel::Categories($MultiValue);
-                if (!$Category)
-                    throw new Exception(self::notFoundString('Category', $MultiValue), 404);
+                $category = CategoryModel::Categories($multiValue);
+                if (!$category)
+                    throw new Exception(self::notFoundString('Category', $multiValue), 404);
 
-                $Data[$Column] = (string)$Category['CategoryID'];
+                $data[$column] = (string)$category['CategoryID'];
             }
 
-        } catch (Exception $Ex) {
-            $Errors[] = [$Ex->getCode(), $Ex->getMessage()];
+        } catch (Exception $ex) {
+            $errors[] = [$ex->getCode(), $ex->getMessage()];
         }
 
-        return $Errors;
+        return $errors;
     }
 
-    protected static function notFoundString($Code, $Item) {
-        return sprintf('%1$s "%2$s" not found.', T($Code), $Item);
+    protected static function notFoundString($code, $item) {
+        return sprintf('%1$s "%2$s" not found.', T($code), $item);
     }
 
     /**
@@ -469,28 +469,28 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
     /**
      *
-     * @param type $Sender
+     * @param type $sender
      * @throws Exception
      */
-    protected function prepareAPI($Sender) {
-        $AccessToken = GetValue('access_token', $_GET, NULL);
+    protected function prepareAPI($sender) {
+        $accessToken = GetValue('access_token', $_GET, NULL);
 
-        if ($AccessToken !== NULL) {
-            if ($AccessToken === C('Plugins.SimpleAPI.AccessToken')) {
+        if ($accessToken !== NULL) {
+            if ($accessToken === C('Plugins.SimpleAPI.AccessToken')) {
                 // Check for only-https here because we don't want to check for https on json calls from javascript.
-                $OnlyHttps = C('Plugins.SimpleAPI.OnlyHttps');
-                if ($OnlyHttps && strcasecmp(Gdn::Request()->Scheme(), 'https') != 0) {
+                $onlyHttps = C('Plugins.SimpleAPI.OnlyHttps');
+                if ($onlyHttps && strcasecmp(Gdn::Request()->Scheme(), 'https') != 0) {
                     throw new Exception(T('You must access the API through https.'), 401);
                 }
 
-                $UserID = C('Plugins.SimpleAPI.UserID');
-                $User = false;
-                if ($UserID)
-                    $User = Gdn::UserModel()->GetID($UserID);
-                if (!$User)
-                    $UserID = Gdn::UserModel()->GetSystemUserID();
+                $userID = C('Plugins.SimpleAPI.UserID');
+                $user = false;
+                if ($userID)
+                    $user = Gdn::UserModel()->GetID($userID);
+                if (!$user)
+                    $userID = Gdn::UserModel()->GetSystemUserID();
 
-                Gdn::Session()->Start($UserID, false, false);
+                Gdn::Session()->Start($userID, false, false);
                 Gdn::Session()->ValidateTransientKey(true);
             } else {
                 if (!Gdn::Session()->IsValid())
@@ -499,20 +499,20 @@ class SimpleAPIPlugin extends Gdn_Plugin {
         }
 
         if (strcasecmp(GetValue('contenttype', $_GET, ''), 'json') == 0 || strpos(GetValue('CONTENT_TYPE', $_SERVER, NULL), 'json') !== false) {
-            $Post = file_get_contents('php://input');
+            $post = file_get_contents('php://input');
 
-            if ($Post)
-                $Post = json_decode($Post, true);
+            if ($post)
+                $post = json_decode($post, true);
             else
-                $Post = [];
+                $post = [];
         } else {
-            $Post = Gdn::Request()->Post();
+            $post = Gdn::Request()->Post();
         }
 
         // Translate POST data
-        self::translatePost($Post);
-        Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_POST, $Post);
-        $_POST = $Post;
+        self::translatePost($post);
+        Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_POST, $post);
+        $_POST = $post;
 
         // Translate GET data
         self::translateGet($_GET);
@@ -524,98 +524,98 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     /**
      * Add POST data to existing GET for reflection purposes
      *
-     * @param Gdn_Dispatcher $Sender
+     * @param Gdn_Dispatcher $sender
      */
-    public function gdn_dispatcher_beforeReflect_handler($Sender) {
+    public function gdn_dispatcher_beforeReflect_handler($sender) {
         if (!$this->API) return;
 
-        $Request = $Sender->EventArguments['Request'];
-        $ReflectionArguments = &$Sender->EventArguments['Arguments'];
-        $ReflectionArguments = array_merge($ReflectionArguments, $Request->Post());
+        $request = $sender->EventArguments['Request'];
+        $reflectionArguments = &$sender->EventArguments['Arguments'];
+        $reflectionArguments = array_merge($reflectionArguments, $request->Post());
     }
 
     /**
      * Apply output filter
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function Gdn_Controller_Finalize_Handler($Sender) {
+    public function Gdn_Controller_Finalize_Handler($sender) {
         if ($this->Mapper instanceof SimpleApiMapper)
-            $this->Mapper->Filter($Sender->EventArguments['Data']);
+            $this->Mapper->Filter($sender->EventArguments['Data']);
     }
 
     /**
      * API Settings
      *
-     * @param SettingsController $Sender
-     * @param array $Args
+     * @param SettingsController $sender
+     * @param array $args
      */
-    public function settingsController_api_create($Sender, $Args) {
-        $Sender->Permission('Garden.Settings.Manage');
+    public function settingsController_api_create($sender, $args) {
+        $sender->Permission('Garden.Settings.Manage');
 
-        if ($Sender->Form->AuthenticatedPostBack()) {
-            $Save = [
-                'Plugins.SimpleAPI.AccessToken' => $Sender->Form->GetFormValue('AccessToken'),
+        if ($sender->Form->AuthenticatedPostBack()) {
+            $save = [
+                'Plugins.SimpleAPI.AccessToken' => $sender->Form->GetFormValue('AccessToken'),
                 'Plugins.SimpleAPI.UserID' => NULL,
-                'Plugins.SimpleAPI.OnlyHttps' => (bool)$Sender->Form->GetFormValue('OnlyHttps')
+                'Plugins.SimpleAPI.OnlyHttps' => (bool)$sender->Form->GetFormValue('OnlyHttps')
             ];
 
 
             // Validate the settings.
-            if (!ValidateRequired($Sender->Form->GetFormValue('AccessToken'))) {
-                $Sender->Form->AddError('ValidateRequired', 'Access Token');
+            if (!ValidateRequired($sender->Form->GetFormValue('AccessToken'))) {
+                $sender->Form->AddError('ValidateRequired', 'Access Token');
             }
 
             // Make sure the user exists.
-            $Username = $Sender->Form->GetFormValue('Username');
-            if (!ValidateRequired($Username))
-                $Sender->Form->AddError('ValidateRequired', 'User');
+            $username = $sender->Form->GetFormValue('Username');
+            if (!ValidateRequired($username))
+                $sender->Form->AddError('ValidateRequired', 'User');
             else {
-                $User = Gdn::UserModel()->GetByUsername($Username);
-                if (!$User)
-                    $Sender->Form->AddError('@'.self::notFoundString('User', htmlspecialchars($Username)));
+                $user = Gdn::UserModel()->GetByUsername($username);
+                if (!$user)
+                    $sender->Form->AddError('@'.self::notFoundString('User', htmlspecialchars($username)));
                 else
-                    $Save['Plugins.SimpleAPI.UserID'] = GetValue('UserID', $User);
+                    $save['Plugins.SimpleAPI.UserID'] = GetValue('UserID', $user);
             }
 
-            if ($Sender->Form->ErrorCount() == 0) {
+            if ($sender->Form->ErrorCount() == 0) {
                 // Save the data.
-                SaveToConfig($Save);
+                SaveToConfig($save);
 
-                $Sender->InformMessage('Your changes have been saved.');
+                $sender->InformMessage('Your changes have been saved.');
             }
         } else {
             // Get the data.
-            $Data = [
+            $data = [
                 'AccessToken' => C('Plugins.SimpleAPI.AccessToken'),
                 'UserID' => C('Plugins.SimpleAPI.UserID', Gdn::UserModel()->GetSystemUserID()),
                 'OnlyHttps' => C('Plugins.SimpleAPI.OnlyHttps')];
 
-            $User = Gdn::UserModel()->GetID($Data['UserID'], DATASET_TYPE_ARRAY);
-            if ($User) {
-                $Data['Username'] = $User['Name'];
+            $user = Gdn::UserModel()->GetID($data['UserID'], DATASET_TYPE_ARRAY);
+            if ($user) {
+                $data['Username'] = $user['Name'];
             } else {
-                $User = Gdn::UserModel()->GetID(Gdn::UserModel()->GetSystemUserID(), DATASET_TYPE_ARRAY);
-                $Data['Username'] = $User['Name'];
-                $Data['UserID'] = $User['UserID'];
+                $user = Gdn::UserModel()->GetID(Gdn::UserModel()->GetSystemUserID(), DATASET_TYPE_ARRAY);
+                $data['Username'] = $user['Name'];
+                $data['UserID'] = $user['UserID'];
             }
 
-            $Sender->Form->SetData($Data);
+            $sender->Form->SetData($data);
         }
 
-        $Sender->SetData('Title', 'API Settings');
-        $Sender->AddSideMenu();
-        $Sender->Render('Settings', '', 'plugins/SimpleAPI');
+        $sender->SetData('Title', 'API Settings');
+        $sender->AddSideMenu();
+        $sender->Render('Settings', '', 'plugins/SimpleAPI');
     }
 
     /**
      * Adds "API" menu option to the Forum menu on the dashboard.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_getAppSettingsMenuItems_handler($Sender) {
-        $Menu = $Sender->EventArguments['SideMenu'];
-        $Menu->AddLink('Site Settings', T('API'), 'settings/api', 'Garden.Settings.Manage', ['class' => 'nav-api']);
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        $menu = $sender->EventArguments['SideMenu'];
+        $menu->AddLink('Site Settings', T('API'), 'settings/api', 'Garden.Settings.Manage', ['class' => 'nav-api']);
     }
 
     /**
@@ -630,21 +630,21 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      */
     public function structure() {
         // Make sure the API user is set.
-        $UserID = C('Plugins.SimpleAPI.UserID');
-        if (!$UserID)
-            $UserID = Gdn::UserModel()->GetSystemUserID();
-        $User = Gdn::UserModel()->GetID($UserID, DATASET_TYPE_ARRAY);
-        if (!$User)
-            $UserID = Gdn::UserModel()->GetSystemUserID();
+        $userID = C('Plugins.SimpleAPI.UserID');
+        if (!$userID)
+            $userID = Gdn::UserModel()->GetSystemUserID();
+        $user = Gdn::UserModel()->GetID($userID, DATASET_TYPE_ARRAY);
+        if (!$user)
+            $userID = Gdn::UserModel()->GetSystemUserID();
 
         // Make sure the access token is set.
-        $AccessToken = C('Plugins.SimpleAPI.AccessToken');
-        if (!$AccessToken)
-            $AccessToken = md5(microtime());
+        $accessToken = C('Plugins.SimpleAPI.AccessToken');
+        if (!$accessToken)
+            $accessToken = md5(microtime());
 
         SaveToConfig([
-            'Plugins.SimpleAPI.UserID' => $UserID,
-            'Plugins.SimpleAPI.AccessToken' => $AccessToken
+            'Plugins.SimpleAPI.UserID' => $userID,
+            'Plugins.SimpleAPI.AccessToken' => $accessToken
         ]);
     }
 

@@ -40,15 +40,15 @@ class BadgeController extends BadgesAppController {
      * Approve badge request.
      *
      * @since 1.1
-     * @param int $UserID
-     * @param string|int $BadgeID
-     * @param string $TransientKey
+     * @param int $userID
+     * @param string|int $badgeID
+     * @param string $transientKey
      */
-    public function approve($UserID = '', $BadgeID = '', $TransientKey = '') {
+    public function approve($userID = '', $badgeID = '', $transientKey = '') {
         $this->permission('Reputation.Badges.Give');
 
-        if (Gdn::session()->validateTransientKey($TransientKey)) {
-            $this->UserBadgeModel->give($UserID, $BadgeID); // No reason for now
+        if (Gdn::session()->validateTransientKey($transientKey)) {
+            $this->UserBadgeModel->give($userID, $badgeID); // No reason for now
             $this->informMessage(t('Badge request approved.'));
         }
 
@@ -63,15 +63,15 @@ class BadgeController extends BadgesAppController {
      * Decline badge request.
      *
      * @since 1.1
-     * @param int $UserID
-     * @param string|int $BadgeID
-     * @param string $TransientKey
+     * @param int $userID
+     * @param string|int $badgeID
+     * @param string $transientKey
      */
-    public function decline($UserID = '', $BadgeID = '', $TransientKey = '') {
+    public function decline($userID = '', $badgeID = '', $transientKey = '') {
         $this->permission('Reputation.Badges.Give');
 
-        if (Gdn::session()->validateTransientKey($TransientKey)) {
-            $this->UserBadgeModel->declineRequest($UserID, $BadgeID);
+        if (Gdn::session()->validateTransientKey($transientKey)) {
+            $this->UserBadgeModel->declineRequest($userID, $badgeID);
             $this->informMessage(t('Badge request declined.'));
         }
 
@@ -86,18 +86,18 @@ class BadgeController extends BadgesAppController {
      * Delete an badge & revoke from all users.
      *
      * @since 1.0.0
-     * param string|int $BadgeID
+     * param string|int $badgeID
      */
-    public function delete($BadgeID = '') {
+    public function delete($badgeID = '') {
         $this->permission('Garden.Settings.Manage');
 
         // Validate BadgeID
-        if (!is_numeric($BadgeID)) {
+        if (!is_numeric($badgeID)) {
             redirectTo('/badge/all');
         }
 
-        $Badge = $this->BadgeModel->getID($BadgeID);
-        if (!$Badge) {
+        $badge = $this->BadgeModel->getID($badgeID);
+        if (!$badge) {
             throw NotFoundException('badge');
         }
 
@@ -106,11 +106,11 @@ class BadgeController extends BadgesAppController {
 
         // Form submitted (confirmation)
         if ($this->Form->authenticatedPostBack()) {
-            $Badge = $this->BadgeModel->getID($BadgeID);
-            if (val('CanDelete', $Badge, false)) {
+            $badge = $this->BadgeModel->getID($badgeID);
+            if (val('CanDelete', $badge, false)) {
                 // Delete & revoke
-                $this->BadgeModel->delete(['BadgeID' => $BadgeID]);
-                $this->UserBadgeModel->delete(['BadgeID' => $BadgeID]);
+                $this->BadgeModel->delete(['BadgeID' => $badgeID]);
+                $this->UserBadgeModel->delete(['BadgeID' => $badgeID]);
 
                 // Success & redirect
                 $this->informMessage(t('Badge deleted.'));
@@ -122,7 +122,7 @@ class BadgeController extends BadgesAppController {
             }
         } else {
             // Get info for confirmation
-            $this->Badge = $this->BadgeModel->getID($BadgeID);
+            $this->Badge = $this->BadgeModel->getID($badgeID);
             if (!$this->Badge) {
                 throw new Exception(t('Badge404', 'Badge not found.'), 404);
             }
@@ -135,19 +135,19 @@ class BadgeController extends BadgesAppController {
      * Disable/enable an badge from being given. It will still show on users who have it.
      *
      * @since 1.0.0
-     * @param string|int $BadgeID
-     * @oaram string $TransientKey
+     * @param string|int $badgeID
+     * @oaram string $transientKey
      */
-    public function disable($BadgeID = '', $TransientKey = '') {
+    public function disable($badgeID = '', $transientKey = '') {
         $this->permission('Garden.Settings.Manage');
-        $Session = Gdn::session();
+        $session = Gdn::session();
 
-        if ($Session->validateTransientKey($TransientKey) && is_numeric($BadgeID)) {
+        if ($session->validateTransientKey($transientKey) && is_numeric($badgeID)) {
             // Reverse whether it's active
-            $Value = (val('Active', $this->BadgeModel->getID($BadgeID))) ? 0 : 1;
-            $this->BadgeModel->setProperty($BadgeID, 'Active', $Value);
-            $Message = ($Value) ? 'Badge disabled.' : 'Badge enabled.';
-            $this->informMessage($Message);
+            $value = (val('Active', $this->BadgeModel->getID($badgeID))) ? 0 : 1;
+            $this->BadgeModel->setProperty($badgeID, 'Active', $value);
+            $message = ($value) ? 'Badge disabled.' : 'Badge enabled.';
+            $this->informMessage($message);
         }
 
         if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
@@ -163,20 +163,20 @@ class BadgeController extends BadgesAppController {
      * Give selected badge to 1 or more users.
      *
      * @since 1.0.0
-     * @param string|int $BadgeID
+     * @param string|int $badgeID
      */
-    public function give($BadgeID = '') {
+    public function give($badgeID = '') {
         $this->permission('Reputation.Badges.Give');
 
         // Validate BadgeID
-        if (!is_numeric($BadgeID)) {
+        if (!is_numeric($badgeID)) {
             redirectTo('/badge/all');
         }
 
         // Get info & confirm enabled
-        $Badge = $this->BadgeModel->getID($BadgeID);
-        $this->setData('Badge', $Badge);
-        if (!$Badge['Active']) {
+        $badge = $this->BadgeModel->getID($badgeID);
+        $this->setData('Badge', $badge);
+        if (!$badge['Active']) {
             $this->Form->addError('Badge is not available.');
         }
 
@@ -186,26 +186,26 @@ class BadgeController extends BadgesAppController {
         // Form submitted
         if ($this->Form->authenticatedPostBack()) {
             // Set BadgeID
-            $this->Form->setFormValue('BadgeID', $BadgeID);
+            $this->Form->setFormValue('BadgeID', $badgeID);
 
             // Get reason
-            $Reason = $this->Form->getFormValue('Reason');
+            $reason = $this->Form->getFormValue('Reason');
 
             // Set recipients
-            $To = explode(',', $this->Form->getFormValue('To', ''));
-            $UserModel = new UserModel();
+            $to = explode(',', $this->Form->getFormValue('To', ''));
+            $userModel = new UserModel();
             $result = true;
-            foreach ($To as $Name) {
-                if (trim($Name) != '') {
-                    $User = $UserModel->getByUsername(trim($Name));
-                    if (is_object($User)) {
-                        $userBadge = $this->UserBadgeModel->getID($User->UserID, val('BadgeID', $Badge));
+            foreach ($to as $name) {
+                if (trim($name) != '') {
+                    $user = $userModel->getByUsername(trim($name));
+                    if (is_object($user)) {
+                        $userBadge = $this->UserBadgeModel->getID($user->UserID, val('BadgeID', $badge));
                         if (val('DateCompleted', $userBadge, null) !== null) {
                             // User already has this badge.
                             continue;
                         }
 
-                        $saved = $this->UserBadgeModel->give($User->UserID, $BadgeID, $Reason);
+                        $saved = $this->UserBadgeModel->give($user->UserID, $badgeID, $reason);
                         $result = $result && $saved;
                     }
                 }
@@ -226,24 +226,24 @@ class BadgeController extends BadgesAppController {
      * Give any badge to selected user.
      *
      * @since 1.0.0
-     * @param int $UserID
+     * @param int $userID
      */
-    public function giveUser($UserID = '') {
+    public function giveUser($userID = '') {
         $this->permission('Reputation.Badges.Give');
 
         // Validate $UserID
-        if (empty($UserID)) {
-            $PostUserID = Gdn::request()->post('UserID', false);
-            if (is_null($PostUserID)) {
+        if (empty($userID)) {
+            $postUserID = Gdn::request()->post('UserID', false);
+            if (is_null($postUserID)) {
                 throw NotFoundException('UserID');
             }
 
-            $UserID = $PostUserID;
+            $userID = $postUserID;
         }
 
         // Get user data
-        $UserModel = new UserModel();
-        $this->setData('User', $UserModel->getID($UserID), true);
+        $userModel = new UserModel();
+        $this->setData('User', $userModel->getID($userID), true);
         if (!$this->data('User')) {
             throw NotFoundException('User');
         }
@@ -254,26 +254,26 @@ class BadgeController extends BadgesAppController {
         // Form submitted
         if ($this->Form->authenticatedPostBack()) {
             // Validate badge by getting its data
-            $BadgeID = $this->Form->getFormValue('BadgeID');
-            $Badge = $this->BadgeModel->getID($BadgeID);
-            $Reason = $this->Form->getFormValue('Reason');
+            $badgeID = $this->Form->getFormValue('BadgeID');
+            $badge = $this->BadgeModel->getID($badgeID);
+            $reason = $this->Form->getFormValue('Reason');
 
-            if ($Badge) {
+            if ($badge) {
                 // Give Badge
-                $Saved = $this->UserBadgeModel->give($this->User->UserID, $BadgeID, $Reason);
-                $this->setData('Awarded', $Saved);
+                $saved = $this->UserBadgeModel->give($this->User->UserID, $badgeID, $reason);
+                $this->setData('Awarded', $saved);
 
                 $this->Form->setValidationResults($this->UserBadgeModel->Validation->Results());
                 $this->UserBadgeModel->Validation->results(true);
 
                 // Continue
-                if ($Saved) {
-                    $UserBadge = $this->UserBadgeModel->getByUser($UserID, $BadgeID);
-                    $OutputBadge = array_merge((array)$Badge, (array)$UserBadge);
-                    $this->setData('Badge', $OutputBadge);
+                if ($saved) {
+                    $userBadge = $this->UserBadgeModel->getByUser($userID, $badgeID);
+                    $outputBadge = array_merge((array)$badge, (array)$userBadge);
+                    $this->setData('Badge', $outputBadge);
 
                     $this->informMessage(t('Gave badge to user.'));
-                    $this->setRedirectTo('profile/'.$UserID.'/'.val('Name', $this->User));
+                    $this->setRedirectTo('profile/'.$userID.'/'.val('Name', $this->User));
                 }
             } else {
                 throw NotFoundException('Badge');
@@ -289,19 +289,19 @@ class BadgeController extends BadgesAppController {
      * Hide/Unhide an badge from being listed. It will still show on users who have it.
      *
      * @since 1.0.0
-     * @param string|int $BadgeID
-     * @param string $TransientKey
+     * @param string|int $badgeID
+     * @param string $transientKey
      */
-    public function hide($BadgeID = '', $TransientKey = '') {
+    public function hide($badgeID = '', $transientKey = '') {
         $this->permission('Garden.Settings.Manage');
-        $Session = Gdn::session();
+        $session = Gdn::session();
 
-        if ($Session->validateTransientKey($TransientKey) && is_numeric($BadgeID)) {
+        if ($session->validateTransientKey($transientKey) && is_numeric($badgeID)) {
             // Reverse visibility
-            $Value = ($this->BadgeModel->getID($BadgeID)->Visible) ? 0 : 1;
-            $this->BadgeModel->setProperty($BadgeID, 'Visible', $Value);
-            $Message = ($Value) ? 'Badge unhidden.' : 'Badge hidden.';
-            $this->informMessage($Message);
+            $value = ($this->BadgeModel->getID($badgeID)->Visible) ? 0 : 1;
+            $this->BadgeModel->setProperty($badgeID, 'Visible', $value);
+            $message = ($value) ? 'Badge unhidden.' : 'Badge hidden.';
+            $this->informMessage($message);
         }
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
@@ -316,16 +316,16 @@ class BadgeController extends BadgesAppController {
      * View a badge.
      *
      * @since 1.0.0
-     * @param string|int $BadgeID
-     * @param string $Name
+     * @param string|int $badgeID
+     * @param string $name
      */
-    public function index($BadgeID = '', $Name = '') {
+    public function index($badgeID = '', $name = '') {
         $this->MasterView = 'default';
         $this->addCssFile('style.css');
         $this->removeCssFile('admin.css');
 
         // Get badge data or 404
-        $this->Badge = $this->BadgeModel->getID($BadgeID);
+        $this->Badge = $this->BadgeModel->getID($badgeID);
         if (!$this->Badge) {
             throw new Exception(t('Badge404', 'Badge not found.'), 404);
         }
@@ -339,8 +339,8 @@ class BadgeController extends BadgesAppController {
         $this->SetData('UserBadge', $this->UserBadge);
 
         // Get recipients
-        $this->setData('Recipients', $this->UserBadgeModel->getUsers($BadgeID, ['Limit' => 15])->resultArray());
-        $this->setData('BadgeID', $BadgeID, true);
+        $this->setData('Recipients', $this->UserBadgeModel->getUsers($badgeID, ['Limit' => 15])->resultArray());
+        $this->setData('BadgeID', $badgeID, true);
 
         if (val('_New', $this->UserBadge) &&  BadgeModel::isRequestable($this->Badge)) {
             $this->addModule('RequestBadgeModule');
@@ -354,9 +354,9 @@ class BadgeController extends BadgesAppController {
      * Create or edit an badge.
      *
      * @since 1.0.0
-     * @param string|int $BadgeID
+     * @param string|int $badgeID
      */
-    public function manage($BadgeID = '') {
+    public function manage($badgeID = '') {
         $this->permission('Garden.Settings.Manage');
 
         // Form setup
@@ -365,16 +365,16 @@ class BadgeController extends BadgesAppController {
         $this->BadgeModel->Validation->applyRule('Slug', 'Required');
         $this->Form->showErrors();
 
-        $Insert = (is_numeric($BadgeID)) ? false : true;
+        $insert = (is_numeric($badgeID)) ? false : true;
 
-        if ($BadgeID) {
-            $Badge = $this->BadgeModel->getID($BadgeID, DATASET_TYPE_ARRAY);
+        if ($badgeID) {
+            $badge = $this->BadgeModel->getID($badgeID, DATASET_TYPE_ARRAY);
 
             // Editing an badge.
-            $this->setData('Badge', $Badge);
+            $this->setData('Badge', $badge);
             $this->Form->setData($this->data('Badge'));
 
-            $this->setData('HasThreshold', in_array(strtolower(val('Type', $Badge)), ['reaction', 'usercount']));
+            $this->setData('HasThreshold', in_array(strtolower(val('Type', $badge)), ['reaction', 'usercount']));
         }
 
         $this->fireEvent('ManageBadgeForm');
@@ -382,8 +382,8 @@ class BadgeController extends BadgesAppController {
         // Form submitted
         if ($this->Form->authenticatedPostBack()) {
             // Set BadgeID for existing or set Type = Manual for new
-            if (!$Insert) {
-                $this->Form->setFormValue('BadgeID', $BadgeID);
+            if (!$insert) {
+                $this->Form->setFormValue('BadgeID', $badgeID);
             } else {
                 $this->Form->setFormValue('Type', 'Manual');
             }
@@ -398,47 +398,47 @@ class BadgeController extends BadgesAppController {
 
             try {
                 // Upload image
-                $UploadImage = new Gdn_UploadImage();
+                $uploadImage = new Gdn_UploadImage();
 
                 // Validate the upload
-                $TmpImage = $UploadImage->validateUpload('Photo', false);
+                $tmpImage = $uploadImage->validateUpload('Photo', false);
 
-                if ($TmpImage) {
+                if ($tmpImage) {
                     // Generate the target image name.
-                    $TargetImage = $UploadImage->generateTargetName(PATH_UPLOADS.'/badges', '', true);
-                    $Basename = pathinfo($TargetImage, PATHINFO_BASENAME);
+                    $targetImage = $uploadImage->generateTargetName(PATH_UPLOADS.'/badges', '', true);
+                    $basename = pathinfo($targetImage, PATHINFO_BASENAME);
 
                     // Delete any previously uploaded image.
-                    if (isset($Badge) && $Badge['Photo']) {
-                        $UploadImage->delete($Badge['Photo']);
+                    if (isset($badge) && $badge['Photo']) {
+                        $uploadImage->delete($badge['Photo']);
                     }
 
                     // Save the uploaded image
-                    $Props = $UploadImage->saveImageAs(
-                        $TmpImage,
-                        "badges/$Basename",
+                    $props = $uploadImage->saveImageAs(
+                        $tmpImage,
+                        "badges/$basename",
                         C('Reputation.Badges.Height', 100),
                         C('Reputation.Badges.Width', 100),
                         ['SaveGif' => C('Reputation.Badges.SaveGif')]
                     );
-                    $this->Form->setFormValue('Photo', sprintf($Props['SaveFormat'], "badges/$Basename"));
+                    $this->Form->setFormValue('Photo', sprintf($props['SaveFormat'], "badges/$basename"));
                 }
-            } catch (Exception $Ex) {
+            } catch (Exception $ex) {
                 // Upload was optional so be quiet.
-                throw $Ex;
+                throw $ex;
             }
 
             // Badge successfully saved
-            $NewBadgeID = $this->Form->save();
-            if ($NewBadgeID) {
-                $Badge = $this->BadgeModel->getID($NewBadgeID);
-                $this->setData('Badge', $Badge);
+            $newBadgeID = $this->Form->save();
+            if ($newBadgeID) {
+                $badge = $this->BadgeModel->getID($newBadgeID);
+                $this->setData('Badge', $badge);
 
                 // Report success and go to list
-                $BadgeName = $this->Form->getFormValue('Name');
-                $Message = ($Insert) ? t('Created new badge') : t('Updated badge');
-                $Message .= ' &ldquo;' . $BadgeName. '&rdquo;';
-                $this->informMessage($Message);
+                $badgeName = $this->Form->getFormValue('Name');
+                $message = ($insert) ? t('Created new badge') : t('Updated badge');
+                $message .= ' &ldquo;' . $badgeName. '&rdquo;';
+                $this->informMessage($message);
                 $this->setRedirectTo('/badge/all');
             }
         }
@@ -451,10 +451,10 @@ class BadgeController extends BadgesAppController {
      * See who has received a badge.
      *
      * @since 1.5
-     * @param string|int $BadgeID Unique numeric ID or slug.
-     * @param string|int $Page Page number.
+     * @param string|int $badgeID Unique numeric ID or slug.
+     * @param string|int $page Page number.
      */
-    public function recipients($BadgeID, $Page = '') {
+    public function recipients($badgeID, $page = '') {
         $this->permission('Reputation.Badges.Give');
 
         // Page setup
@@ -462,22 +462,22 @@ class BadgeController extends BadgesAppController {
         Gdn_Theme::section('Settings');
 
         // Set badge info.
-        $Badge = $this->BadgeModel->getID($BadgeID);
-        $this->setData('Badge', $Badge);
+        $badge = $this->BadgeModel->getID($badgeID);
+        $this->setData('Badge', $badge);
 
         // Detect pagination.
-        list($Offset, $Limit) = offsetLimit($Page, 30);
+        list($offset, $limit) = offsetLimit($page, 30);
 
         // Set recipient info.
-        $recipients = $this->UserBadgeModel->getUsers($BadgeID, ['Limit' => $Limit, 'Offset' => $Offset])->resultArray();
+        $recipients = $this->UserBadgeModel->getUsers($badgeID, ['Limit' => $limit, 'Offset' => $offset])->resultArray();
         $this->setData('Recipients', $recipients);
 
         // Let us page by giving result count.
         $this->setData('_CurrentRecords', count($recipients));
         // Stop paging at the right spot.
-        $this->setData('_Limit', $Limit);
+        $this->setData('_Limit', $limit);
         // Give us "of X" pager info.
-        $this->setData('RecordCount', $this->UserBadgeModel->recipientCount($BadgeID));
+        $this->setData('RecordCount', $this->UserBadgeModel->recipientCount($badgeID));
 
         $this->render();
     }
@@ -486,20 +486,20 @@ class BadgeController extends BadgesAppController {
      * Request a badge.
      *
      * @since 1.1
-     * @param mixed $BadgeID Unique numeric ID or slug.
+     * @param mixed $badgeID Unique numeric ID or slug.
      */
-    public function request($BadgeID) {
+    public function request($badgeID) {
         $this->MasterView = 'default';
         $this->addCssFile('style.css');
         $this->removeCssFile('admin.css');
 
         $this->permission('Reputation.Badges.Request');
-        $Session = Gdn::session();
+        $session = Gdn::session();
 
         // Get info & confirm enabled
-        $Badge = $this->BadgeModel->getID($BadgeID);
-        $this->setData('Badge', $Badge);
-        if (!BadgeModel::isRequestable($Badge)) {
+        $badge = $this->BadgeModel->getID($badgeID);
+        $this->setData('Badge', $badge);
+        if (!BadgeModel::isRequestable($badge)) {
             $this->Form->addError('Badge is not available.');
         }
 
@@ -507,12 +507,12 @@ class BadgeController extends BadgesAppController {
 
         if ($this->Form->authenticatedPostBack()) {
             // Add request
-            $Reason = $this->Form->getFormValue('Reason');
-            $New = $this->UserBadgeModel->request($Session->UserID, val('BadgeID', $Badge), $Reason);
+            $reason = $this->Form->getFormValue('Reason');
+            $new = $this->UserBadgeModel->request($session->UserID, val('BadgeID', $badge), $reason);
 
             // Inform
-            $Message = ($New) ? t('Badge requested.') : t('You already requested this badge.');
-            $this->informMessage($Message);
+            $message = ($new) ? t('Badge requested.') : t('You already requested this badge.');
+            $this->informMessage($message);
         }
 
         $this->render();
@@ -528,19 +528,19 @@ class BadgeController extends BadgesAppController {
         $this->permission('Reputation.Badges.Give');
 
         if ($this->Form->authenticatedPostBack() === true) {
-            $Action = $this->Form->getValue('Submit');
-            $Requests = $this->Form->getValue('Requests');
-            $RequestCount = is_array($Requests) ? count($Requests) : 0;
-            if ($RequestCount > 0 && in_array($Action, ['Approve', 'Decline'])) {
-                for ($i = 0; $i < $RequestCount; ++$i) {
-                    $Data = explode('-', $Requests[$i]);
-                    if (count($Data) != 2) {
+            $action = $this->Form->getValue('Submit');
+            $requests = $this->Form->getValue('Requests');
+            $requestCount = is_array($requests) ? count($requests) : 0;
+            if ($requestCount > 0 && in_array($action, ['Approve', 'Decline'])) {
+                for ($i = 0; $i < $requestCount; ++$i) {
+                    $data = explode('-', $requests[$i]);
+                    if (count($data) != 2) {
                         continue;
                     }
-                    if ($Action == 'Approve') {
-                        $this->UserBadgeModel->give($Data[0], $Data[1]);
-                    } elseif ($Action == 'Decline') {
-                        $this->UserBadgeModel->declineRequest($Data[0], $Data[1]);
+                    if ($action == 'Approve') {
+                        $this->UserBadgeModel->give($data[0], $data[1]);
+                    } elseif ($action == 'Decline') {
+                        $this->UserBadgeModel->declineRequest($data[0], $data[1]);
                     }
                 }
             }
@@ -557,16 +557,16 @@ class BadgeController extends BadgesAppController {
      * @since 1.0
      * @access public
      */
-    public function revoke($UserID, $BadgeID) {
+    public function revoke($userID, $badgeID) {
         $this->permission('Reputation.Badges.Give');
 
-        if ($this->Form->authenticatedPostBack() && is_numeric($UserID) && is_numeric($BadgeID)) {
-            $this->UserBadgeModel->revoke($UserID, $BadgeID);
+        if ($this->Form->authenticatedPostBack() && is_numeric($userID) && is_numeric($badgeID)) {
+            $this->UserBadgeModel->revoke($userID, $badgeID);
             $this->informMessage(t('Revoked badge.'));
         }
 
         if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-            redirectTo('badge/recipients/'.$BadgeID);
+            redirectTo('badge/recipients/'.$badgeID);
         }
 
         // Regenerate the page we take this action from.

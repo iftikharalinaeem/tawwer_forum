@@ -49,7 +49,7 @@ class OneLogin_Saml_AuthRequest {
         $id = $this->lastID = $this->generateUniqueID();
         $issueInstant = $this->getTimestamp();
         $isPassive = $this->isPassive ? 'true' : 'false';
-        $Destination = htmlspecialchars($this->_settings->idpSingleSignOnUrl);
+        $destination = htmlspecialchars($this->_settings->idpSingleSignOnUrl);
 
         $request = <<<AUTHNREQUEST
 <samlp:AuthnRequest
@@ -58,7 +58,7 @@ class OneLogin_Saml_AuthRequest {
     ID="$id"
     Version="2.0"
     IssueInstant="$issueInstant"
-    Destination="$Destination"
+    Destination="$destination"
     IsPassive="$isPassive"
     ProtocolBinding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
     AssertionConsumerServiceURL="{$this->_settings->spReturnUrl}">

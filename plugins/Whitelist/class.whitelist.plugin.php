@@ -50,9 +50,9 @@ class WhitelistPlugin extends Gdn_Plugin {
             $sender->Form->setFormValue('Whitelist.Active', (bool)$sender->Form->getFormValue('Whitelist.Active'));
 
             // Make sure only valid characters are part of the whitelist
-            $IPList = $sender->Form->getFormValue('Whitelist.IPList');
-            $IPList = $this->cleanIPWhiteList($IPList);
-            $sender->Form->setFormValue('Whitelist.IPList', $IPList);
+            $iPList = $sender->Form->getFormValue('Whitelist.IPList');
+            $iPList = $this->cleanIPWhiteList($iPList);
+            $sender->Form->setFormValue('Whitelist.IPList', $iPList);
 
             if ($sender->Form->save() !== false) {
                 $sender->informMessage(t('Your changes have been saved.'));

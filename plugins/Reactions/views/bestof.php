@@ -8,26 +8,26 @@
 <?php
 include_once 'reaction_functions.php';
 
-function ReactionFilterButton($Name, $Code, $CurrentReactionType) {
-   $LCode = strtolower($Code);
-   $Url = Url("/bestof/$LCode");
-   $ImgSrc = "https://badges.v-cdn.net/reactions/50/$LCode.png";
-   $CssClass = '';
-   if ($CurrentReactionType == $LCode)
-      $CssClass .= ' Selected';
+function ReactionFilterButton($name, $code, $currentReactionType) {
+   $lCode = strtolower($code);
+   $url = Url("/bestof/$lCode");
+   $imgSrc = "https://badges.v-cdn.net/reactions/50/$lCode.png";
+   $cssClass = '';
+   if ($currentReactionType == $lCode)
+      $cssClass .= ' Selected';
    
-   $Result = <<<EOT
+   $result = <<<EOT
 <div class="CountItemWrap">
-<div class="CountItem$CssClass">
-   <a href="$Url">
-      <span class="CountTotal"><img src="$ImgSrc" /></span>
-      <span class="CountLabel">$Name</span>
+<div class="CountItem$cssClass">
+   <a href="$url">
+      <span class="CountTotal"><img src="$imgSrc" /></span>
+      <span class="CountLabel">$name</span>
    </a>
 </div>
 </div>
 EOT;
    
-   return $Result;
+   return $result;
 }
 
 echo Wrap($this->Data('Title'), 'h1 class="H"');

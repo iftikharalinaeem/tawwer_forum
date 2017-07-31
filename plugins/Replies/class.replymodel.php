@@ -1,141 +1,141 @@
 <?php if (!defined('APPLICATION')) exit();
 
 class ReplyModel extends Gdn_Model {
-   function __construct($Name = '') {
+   function __construct($name = '') {
       parent::__construct('Reply');
    }
    
-   function GetRecord($Reply, $GetDiscussion = FALSE) {
-      if (is_numeric($Reply))
-         $Reply = $this->GetID($Reply, DATASET_TYPE_ARRAY);
+   function GetRecord($reply, $getDiscussion = FALSE) {
+      if (is_numeric($reply))
+         $reply = $this->GetID($reply, DATASET_TYPE_ARRAY);
       
-      if (!$Reply)
+      if (!$reply)
          throw NotFoundException('Reply');
       
-      $CommentID = $Reply['CommentID'];
+      $commentID = $reply['CommentID'];
       
-      if ($CommentID > 0) {
-         $CommentModel = new CommentModel();
-         $Comment = $CommentModel->GetID($CommentID, DATASET_TYPE_ARRAY);
+      if ($commentID > 0) {
+         $commentModel = new CommentModel();
+         $comment = $commentModel->GetID($commentID, DATASET_TYPE_ARRAY);
          
-         if (!$Comment)
+         if (!$comment)
             throw NotFoundException('Comment');
          
-         if ($GetDiscussion) {
-            $DiscussionModel = new DiscussionModel();
-            $Discussion = $DiscussionModel->GetID($Comment['DiscussionID']);
+         if ($getDiscussion) {
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->GetID($comment['DiscussionID']);
             
-            if (!$Discussion)
+            if (!$discussion)
                throw NotFoundException('Discussion');
-            return (array)$Discussion;
+            return (array)$discussion;
          }
-         return $Comment;
+         return $comment;
       } else {
-         $DiscussionModel = new DiscussionModel();
-         $Discussion = $DiscussionModel->GetID(-$CommentID);
+         $discussionModel = new DiscussionModel();
+         $discussion = $discussionModel->GetID(-$commentID);
 
-         if (!$Discussion)
+         if (!$discussion)
             throw NotFoundException('Discussion');
-         return (array)$Discussion;
+         return (array)$discussion;
       }
    }
    
-   function JoinReplies(&$Discussion, &$Comments) {
-      $CommentIDs = array_column($Comments, 'CommentID');
+   function JoinReplies(&$discussion, &$comments) {
+      $commentIDs = array_column($comments, 'CommentID');
       
-      if ($Discussion) {
-         $DiscussionID = GetValue('DiscussionID', $Discussion);
-         $CommentIDs[] = -$DiscussionID;
+      if ($discussion) {
+         $discussionID = GetValue('DiscussionID', $discussion);
+         $commentIDs[] = -$discussionID;
       }
       
-      $Replies = $this->GetWhere(['CommentID' => $CommentIDs], 'DateInserted')->ResultArray();
-      $Replies = Gdn_DataSet::Index($Replies, ['CommentID'], ['Unique' => false]);
+      $replies = $this->GetWhere(['CommentID' => $commentIDs], 'DateInserted')->ResultArray();
+      $replies = Gdn_DataSet::Index($replies, ['CommentID'], ['Unique' => false]);
       
-      if ($Discussion) {
-         if (isset($Replies[-$DiscussionID]))
-            SetValue('Replies', $Discussion, $Replies[-$DiscussionID]);
+      if ($discussion) {
+         if (isset($replies[-$discussionID]))
+            SetValue('Replies', $discussion, $replies[-$discussionID]);
          else
-            SetValue('Replies', $Discussion, []);
+            SetValue('Replies', $discussion, []);
       }
       
       // Join to the comments.
-      foreach ($Comments as &$Row) {
-         $CommentID = GetValue('CommentID', $Row);
-         if (isset($Replies[$CommentID])) {
-            SetValue('Replies', $Row, $Replies[$CommentID]);
+      foreach ($comments as &$row) {
+         $commentID = GetValue('CommentID', $row);
+         if (isset($replies[$commentID])) {
+            SetValue('Replies', $row, $replies[$commentID]);
          } else {
-            SetValue('Replies', $Row, []);
+            SetValue('Replies', $row, []);
          }
       }
    }
    
-   function MoveFromComment($Comment, $ReplyToCommentID) {
-      $CommentModel = new CommentModel();
+   function MoveFromComment($comment, $replyToCommentID) {
+      $commentModel = new CommentModel();
       
-      if (is_numeric($Comment)) {
-         $Comment = $CommentModel->GetID($Comment);
+      if (is_numeric($comment)) {
+         $comment = $commentModel->GetID($comment);
       }
       
-      $NewReply = (array)$Comment;
-      $NewReply['OldCommentID'] = $NewReply['CommentID'];
-      $NewReply['CommentID'] = $ReplyToCommentID;
-      $NewReply['Body'] = Gdn_Format::PlainText($NewReply['Body'], $NewReply['Format']);
+      $newReply = (array)$comment;
+      $newReply['OldCommentID'] = $newReply['CommentID'];
+      $newReply['CommentID'] = $replyToCommentID;
+      $newReply['Body'] = Gdn_Format::PlainText($newReply['Body'], $newReply['Format']);
       
       // See if the comment had already been made into a reply.
-      $ReplyID = GetValueR('Attributes.OldReplyID', $Comment);
-      if ($ReplyID) {
-         $Reply = $this->GetID($ReplyID, DATASET_TYPE_ARRAY);
+      $replyID = GetValueR('Attributes.OldReplyID', $comment);
+      if ($replyID) {
+         $reply = $this->GetID($replyID, DATASET_TYPE_ARRAY);
          
-         if (!$Reply) {
-            $NewReply['ReplyID'] = $ReplyID;
+         if (!$reply) {
+            $newReply['ReplyID'] = $replyID;
          }
       }
       
-      $ReplyID = $this->Insert($NewReply);
-      if ($ReplyID) {
+      $replyID = $this->Insert($newReply);
+      if ($replyID) {
          // Move any replies that belonged to this comment.
          $this->SQL->Put('Reply', 
-            ['CommentID' => $ReplyToCommentID],
-            ['CommentID' => GetValue('CommentID', $Comment)]);
+            ['CommentID' => $replyToCommentID],
+            ['CommentID' => GetValue('CommentID', $comment)]);
          
-         $CommentModel->DeleteID(GetValue('CommentID', $Comment), ['Log' => FALSE]);
+         $commentModel->DeleteID(GetValue('CommentID', $comment), ['Log' => FALSE]);
       }
-      return $ReplyID;
+      return $replyID;
    }
    
-   function MoveToComment($Reply, $Discussion = NULL) {
-      if (is_numeric($Reply))
-         $Reply = $this->GetID($Reply, DATASET_TYPE_ARRAY);
+   function MoveToComment($reply, $discussion = NULL) {
+      if (is_numeric($reply))
+         $reply = $this->GetID($reply, DATASET_TYPE_ARRAY);
       
-      if (!$Discussion) {
-         $Discussion = $this->GetRecord($Reply, TRUE);
+      if (!$discussion) {
+         $discussion = $this->GetRecord($reply, TRUE);
       }
       
-      $CommentModel = new CommentModel();
+      $commentModel = new CommentModel();
       
-      $NewComment = $Reply;
-      unset($NewComment['CommentID']);
-      $NewComment['Format'] = 'Text';
-      $NewComment['Attributes'] = ['OldReplyID' => $Reply['ReplyID']];
-      $NewComment['DiscussionID'] = GetValue('DiscussionID', $Discussion);
+      $newComment = $reply;
+      unset($newComment['CommentID']);
+      $newComment['Format'] = 'Text';
+      $newComment['Attributes'] = ['OldReplyID' => $reply['ReplyID']];
+      $newComment['DiscussionID'] = GetValue('DiscussionID', $discussion);
       
       // See if this reply had already been made into a comment.
-      $CommentID = $Reply['OldCommentID'];
-      if ($CommentID) {
-         $Comment = $CommentModel->GetID($CommentID, DATASET_TYPE_ARRAY);
-         if (!$Comment) {
+      $commentID = $reply['OldCommentID'];
+      if ($commentID) {
+         $comment = $commentModel->GetID($commentID, DATASET_TYPE_ARRAY);
+         if (!$comment) {
             // We only use the comment if it doesn't exist.
-            $NewComment['CommentID'] = $CommentID;
+            $newComment['CommentID'] = $commentID;
          }
       }
       
-      $CommentID = $CommentModel->Insert($NewComment);
-      if ($CommentID) {
-         $this->Delete(['ReplyID' => $Reply['ReplyID']]);
-         $CommentModel->Save2($CommentID, TRUE);
+      $commentID = $commentModel->Insert($newComment);
+      if ($commentID) {
+         $this->Delete(['ReplyID' => $reply['ReplyID']]);
+         $commentModel->Save2($commentID, TRUE);
       } else {
-         $this->Validation->AddValidationResult($CommentModel->ValidationResults());
+         $this->Validation->AddValidationResult($commentModel->ValidationResults());
       }
-      return $CommentID;
+      return $commentID;
    }
 }

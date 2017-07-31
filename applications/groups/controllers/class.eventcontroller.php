@@ -61,56 +61,56 @@ class EventController extends Gdn_Controller {
     /**
      *
      *
-     * @param $EventID
+     * @param $eventID
      * @return type
      * @throws Exception
      */
-    public function index($EventID) {
-        return $this->event($EventID);
+    public function index($eventID) {
+        return $this->event($eventID);
     }
 
     /**
      * Common add/edit functionality
      *
-     * @param integer $EventID
+     * @param integer $eventID
      */
-    protected function addEdit($EventID = null, $GroupID = null) {
+    protected function addEdit($eventID = null, $groupID = null) {
         $this->permission('Garden.SignIn.Allow');
 
         $this->addJsFile('jquery.timepicker.min.js');
         $this->addJsFile('jquery.dropdown.js');
         $this->addCssFile('jquery.dropdown.css', 'Dashboard');
 
-        $Event = null;
-        $Group = null;
+        $event = null;
+        $group = null;
 
         // Lookup event
-        if ($EventID) {
-            $EventModel = new EventModel();
-            $Event = $EventModel->getID($EventID, DATASET_TYPE_ARRAY);
-            if (!$Event) throw NotFoundException('Event');
-            $this->setData('Event', $Event);
-            $GroupID = $Event['GroupID'];
+        if ($eventID) {
+            $eventModel = new EventModel();
+            $event = $eventModel->getID($eventID, DATASET_TYPE_ARRAY);
+            if (!$event) throw NotFoundException('Event');
+            $this->setData('Event', $event);
+            $groupID = $event['GroupID'];
         }
 
         // Lookup group, if there is one
-        if ($GroupID) {
-            $GroupModel = new GroupModel();
-            $Group = $GroupModel->getID($GroupID);
-            if (!$Group) throw NotFoundException('Group');
-            $this->setData('Group', $Group);
+        if ($groupID) {
+            $groupModel = new GroupModel();
+            $group = $groupModel->getID($groupID);
+            if (!$group) throw NotFoundException('Group');
+            $this->setData('Group', $group);
         }
 
         // Add breadcrumbs
-        if ($Group) {
-            $this->addBreadcrumb($Group['Name'], groupUrl($Group));
+        if ($group) {
+            $this->addBreadcrumb($group['Name'], groupUrl($group));
         }
 
-        if ($Event) {
-            $this->addBreadcrumb($Event['Name'], eventUrl($Event));
+        if ($event) {
+            $this->addBreadcrumb($event['Name'], eventUrl($event));
         }
 
-        return [$Event, $Group];
+        return [$event, $group];
     }
 
     /**
@@ -310,23 +310,23 @@ class EventController extends Gdn_Controller {
     /**
      * Delete an event
      *
-     * @param integer $EventID
+     * @param integer $eventID
      */
-    public function delete($EventID) {
-        list($Event, $Group) = $this->addEdit($EventID);
+    public function delete($eventID) {
+        list($event, $group) = $this->addEdit($eventID);
 
         if (!eventPermission('Edit')) {
             throw ForbiddenException('delete this event');
         }
 
         if ($this->Form->authenticatedPostBack()) {
-            $EventModel = new EventModel();
-            $Deleted = $EventModel->delete(['EventID' => $EventID]);
+            $eventModel = new EventModel();
+            $deleted = $eventModel->delete(['EventID' => $eventID]);
 
-            if ($Deleted) {
-                $this->informMessage(formatString(t('<b>{Name}</b> deleted.'), $Event));
-                if ($Group) {
-                    $this->setRedirectTo(groupUrl($Group));
+            if ($deleted) {
+                $this->informMessage(formatString(t('<b>{Name}</b> deleted.'), $event));
+                if ($group) {
+                    $this->setRedirectTo(groupUrl($group));
                 } else {
                     $this->setRedirectTo('/groups');
                 }
@@ -342,82 +342,82 @@ class EventController extends Gdn_Controller {
     /**
      * AJAX callback stating this user's state on the event.
      *
-     * @param integer $EventID
-     * @param string $Attending [Yes, No, Maybe]
+     * @param integer $eventID
+     * @param string $attending [Yes, No, Maybe]
      */
-    public function attending($EventID, $Attending) {
+    public function attending($eventID, $attending) {
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->permission('Garden.SignIn.Allow');
 
         // Lookup event
-        $EventModel = new EventModel();
-        $Event = $EventModel->getID($EventID, DATASET_TYPE_ARRAY);
-        if (!$Event) {
+        $eventModel = new EventModel();
+        $event = $eventModel->getID($eventID, DATASET_TYPE_ARRAY);
+        if (!$event) {
             throw NotFoundException('Event');
         }
-        $AttendEvent = false;
+        $attendEvent = false;
 
         // Check our invite status
-        $InvitedToEvent = $EventModel->isInvited(Gdn::session()->UserID, $EventID);
+        $invitedToEvent = $eventModel->isInvited(Gdn::session()->UserID, $eventID);
 
         // Lookup group, if there is one
-        $GroupID = val('GroupID', $Event, false);
-        if ($GroupID) {
-            $GroupModel = new GroupModel();
-            $Group = $GroupModel->getID($GroupID, DATASET_TYPE_ARRAY);
-            if (!$Group) {
+        $groupID = val('GroupID', $event, false);
+        if ($groupID) {
+            $groupModel = new GroupModel();
+            $group = $groupModel->getID($groupID, DATASET_TYPE_ARRAY);
+            if (!$group) {
                 throw NotFoundException('Group');
             }
 
             // Check if this person is a member of the group or a moderator
-            $MemberOfGroup = $GroupModel->isMember(Gdn::session()->UserID, $GroupID);
-            if ($MemberOfGroup) {
-                $AttendEvent = true;
+            $memberOfGroup = $groupModel->isMember(Gdn::session()->UserID, $groupID);
+            if ($memberOfGroup) {
+                $attendEvent = true;
             }
 
             $this->addBreadcrumb('Groups', url('/groups'));
-            $this->addBreadcrumb($Group['Name'], groupUrl($Group));
+            $this->addBreadcrumb($group['Name'], groupUrl($group));
         } else {
             // Group organizer
-            if ($Event['InsertUserID'] == Gdn::session()->UserID) {
-                $AttendEvent = true;
+            if ($event['InsertUserID'] == Gdn::session()->UserID) {
+                $attendEvent = true;
             }
 
             // No group, so user has to have been invited to view
-            if ($InvitedToEvent) {
-                $AttendEvent = true;
+            if ($invitedToEvent) {
+                $attendEvent = true;
             }
 
             $this->addBreadcrumb('Events', url('/events'));
         }
 
         // No permission
-        if (!$AttendEvent) {
+        if (!$attendEvent) {
             throw ForbiddenException('attend this event');
         }
-        $eventName = val('Name', $Event, t('this event'));
-        $EventModel->attend(Gdn::session()->UserID, $EventID, $Attending);
+        $eventName = val('Name', $event, t('this event'));
+        $eventModel->attend(Gdn::session()->UserID, $eventID, $attending);
 
-        $this->informMessage(sprintf(t('Your status for %s is now: <b>%s</b>'), $eventName, t($Attending)));
-        $this->jsonTarget('#EventAttendees', $this->attendees($EventID));
+        $this->informMessage(sprintf(t('Your status for %s is now: <b>%s</b>'), $eventName, t($attending)));
+        $this->jsonTarget('#EventAttendees', $this->attendees($eventID));
         $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
      * Generate Attendee list
      *
-     * @param integer $EventID
+     * @param integer $eventID
      * @return string
      */
-    protected function attendees($EventID) {
-        $EventModel = new EventModel();
-        $Invited = $EventModel->invited($EventID);
-        $this->setData('Invited', $Invited);
+    protected function attendees($eventID) {
+        $eventModel = new EventModel();
+        $invited = $eventModel->invited($eventID);
+        $this->setData('Invited', $invited);
 
-        $AttendeesView = $this->fetchView('attendees', 'event', 'groups');
+        $attendeesView = $this->fetchView('attendees', 'event', 'groups');
         unset($this->Data['Invited']);
 
-        return $AttendeesView;
+        return $attendeesView;
     }
 
     /**

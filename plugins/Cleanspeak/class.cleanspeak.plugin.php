@@ -54,16 +54,16 @@ class CleanspeakPlugin extends Gdn_Plugin {
         $queueModel = QueueModel::Instance();
         $this->setModerator($sender);
 
-        foreach ($post['approvals'] as $UUID => $action) {
+        foreach ($post['approvals'] as $uUID => $action) {
             switch ($action) {
                 case 'approved':
-                    $result = $queueModel->approveOrDenyWhere(['CleanspeakID' => $UUID], 'approve', $sender);
+                    $result = $queueModel->approveOrDenyWhere(['CleanspeakID' => $uUID], 'approve', $sender);
                     break;
                 case 'dismissed':
-                    $queueModel->approveOrDenyWhere(['CleanspeakID' => $UUID], 'deny', $sender);
+                    $queueModel->approveOrDenyWhere(['CleanspeakID' => $uUID], 'deny', $sender);
                     break;
                 case 'rejected':
-                    $queueModel->approveOrDenyWhere(['CleanspeakID' => $UUID], 'deny', $sender);
+                    $queueModel->approveOrDenyWhere(['CleanspeakID' => $uUID], 'deny', $sender);
                     break;
                 default:
                     throw new Gdn_UserException('Unknown action.');
@@ -105,24 +105,24 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         $this->setModerator($sender);
         $action = $post['action'];
-        $UUID = $post['userId'];
+        $uUID = $post['userId'];
         switch (strtolower($action)) {
             case 'warn':
-                $this->warnUser($UUID);
+                $this->warnUser($uUID);
                 break;
             case 'ban':
                 $sender->Permission(
                     ['Garden.Moderation.Manage', 'Garden.Users.Edit', 'Moderation.Users.Ban'],
                     false
                 );
-                $this->BanUser($UUID);
+                $this->BanUser($uUID);
                 break;
             case 'unban':
                 $sender->Permission(
                     ['Garden.Moderation.Manage', 'Garden.Users.Edit', 'Moderation.Users.Ban'],
                     false
                 );
-                $this->BanUser($UUID, true);
+                $this->BanUser($uUID, true);
                 break;
             default:
                 throw new Gdn_UserException('Unknown UserAction: ' . $action);
@@ -136,16 +136,16 @@ class CleanspeakPlugin extends Gdn_Plugin {
      *
      * Ban/Unban a user.
      *
-     * @param string $UUID Unique User ID.
+     * @param string $uUID Unique User ID.
      * @param bool $unBan Set to true to un-ban a user.
      * @return bool user was ban/unbanned.
      * @throws Exception User not found, Attempt to remove system acccount.
      */
-    protected function banUser($UUID, $unBan = false) {
+    protected function banUser($uUID, $unBan = false) {
 
         return;
 
-        $userID = Cleanspeak::getUserIDFromUUID($UUID);
+        $userID = Cleanspeak::getUserIDFromUUID($uUID);
         $restoreContent = true;
         $deleteContent = true;
 
@@ -183,19 +183,19 @@ class CleanspeakPlugin extends Gdn_Plugin {
      *
      * Warn a user.
      *
-     * @param string $UUID Unique user identification
+     * @param string $uUID Unique user identification
      * @param string $reason
      * @throws Gdn_UserException Error sending message to user.
      */
-    protected function warnUser($UUID, $reason = '') {
+    protected function warnUser($uUID, $reason = '') {
 
         return;
 
         $cleanspeak = Cleanspeak::Instance();
-        $userID = $cleanspeak->getUserIDFromUUID($UUID);
+        $userID = $cleanspeak->getUserIDFromUUID($uUID);
         $user = Gdn::UserModel()->GetID($userID);
         if (!$user) {
-            throw new Gdn_UserException('User not found: ' . $UUID);
+            throw new Gdn_UserException('User not found: ' . $uUID);
         }
 
         // Send a message to the person being warned.
@@ -331,20 +331,20 @@ class CleanspeakPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $URL = Url('/mod/cleanspeakpostback.json', true);
+        $uRL = Url('/mod/cleanspeakpostback.json', true);
 
         if ($multiSite) {
-            $URL = C('Hub.Url', Gdn::Request()->Domain() . '/hub') . '/multisites/cleanspeakproxy.json';
+            $uRL = C('Hub.Url', Gdn::Request()->Domain() . '/hub') . '/multisites/cleanspeakproxy.json';
         }
 
-        if (strstr($URL, '?')) {
-            $URL .= '&';
+        if (strstr($uRL, '?')) {
+            $uRL .= '&';
         } else {
-            $URL .= '?';
+            $uRL .= '?';
         }
-        $URL .= 'access_token=' . C('Plugins.SimpleAPI.AccessToken');
+        $uRL .= 'access_token=' . C('Plugins.SimpleAPI.AccessToken');
 
-        return $URL;
+        return $uRL;
     }
 
     // Event Handlers.
@@ -361,7 +361,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
      */
     public function queueModel_checkpremoderation_handler($sender, $args) {
         Logger::event('cleanspeak_checkpremoderation', Logger::DEBUG, 'Cleanspeak queueModel_checkpremoderation.');
-        $MediaIDs = valr('Options.MediaIDs', $args);
+        $mediaIDs = valr('Options.MediaIDs', $args);
 
         // Moderators don't go through cleanspeak.
         if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
@@ -407,8 +407,8 @@ class CleanspeakPlugin extends Gdn_Plugin {
         ) {
             $args['Premoderate'] = true;
             $args['Queue']['CleanspeakID'] = $result['content']['id'];
-            if ($MediaIDs) {
-                $args['Queue']['MediaIDs'] = $MediaIDs;
+            if ($mediaIDs) {
+                $args['Queue']['MediaIDs'] = $mediaIDs;
             }
 
             $args['InsertUserID'] = $this->getUserID();
@@ -466,10 +466,10 @@ class CleanspeakPlugin extends Gdn_Plugin {
 
         $cleanSpeak = Cleanspeak::instance();
 
-        $Body = valr('FormPostValues.Body', $args);
-        $Story = valr('FormPostValues.Story', $args);
+        $body = valr('FormPostValues.Body', $args);
+        $story = valr('FormPostValues.Story', $args);
         // No need to check if no content.
-        if (empty($Body) && empty($Story)) {
+        if (empty($body) && empty($story)) {
             return;
         }
 
@@ -506,23 +506,23 @@ class CleanspeakPlugin extends Gdn_Plugin {
             $content['content']['location'] = mt_rand();
         }
 
-        $UUID = $cleanSpeak->getRandomUUID($args['FormPostValues']);
+        $uUID = $cleanSpeak->getRandomUUID($args['FormPostValues']);
 
         // Set the CleanspeakID on the form so we can save it later using model_*Save*_Handlers.
-        $Form = Gdn::Controller()->Form;
-        $Form->SetFormValue('CleanspeakID', $UUID);
+        $form = Gdn::Controller()->Form;
+        $form->SetFormValue('CleanspeakID', $uUID);
 
         // Make an api request to cleanspeak.
         try {
-            $result = $cleanSpeak->moderation($UUID, $content, C('Plugins.Cleanspeak.ForceModeration'));
+            $result = $cleanSpeak->moderation($uUID, $content, C('Plugins.Cleanspeak.ForceModeration'));
 
             if (!is_array($result)) {
                 Logger::warning("Cleanspeak API did not return an array.");
             } elseif (val('contentAction', $result) == 'reject') {
 
                 /** @var $Validation Gdn_Validation */
-                $Validation = $sender->Validation;
-                $Validation->AddValidationResult('Body', 'Your message has been prevented from submission because of inappropriate content. '
+                $validation = $sender->Validation;
+                $validation->AddValidationResult('Body', 'Your message has been prevented from submission because of inappropriate content. '
                     . 'Please modify your message to be appropriate before attempting to submit it again.');
 
 
@@ -581,23 +581,23 @@ class CleanspeakPlugin extends Gdn_Plugin {
      * @param $args Sending arguments.
      */
     public function queueModel_AfterApproveSave_handler($sender, $args) {
-        $MediaIDs = valr('QueueItem.MediaIDs', $args, []);
-        $ForeignTable = false;
+        $mediaIDs = valr('QueueItem.MediaIDs', $args, []);
+        $foreignTable = false;
 
         if (valr('QueueItem.ForeignType', $args, false) == 'Discussion') {
-            $ForeignTable = 'discussion';
+            $foreignTable = 'discussion';
         }
         if (valr('QueueItem.ForeignType', $args, false) == 'Comment') {
-            $ForeignTable = 'comment';
+            $foreignTable = 'comment';
         }
-        if ($ForeignTable && is_array($MediaIDs)) {
-            $MediaModel = new Gdn_Model('Media');
-            $MediaModel->Update(
+        if ($foreignTable && is_array($mediaIDs)) {
+            $mediaModel = new Gdn_Model('Media');
+            $mediaModel->Update(
                 [
-                    'ForeignTable' => $ForeignTable,
+                    'ForeignTable' => $foreignTable,
                     'ForeignID' => $args['ID']
                 ],
-                ['MediaID' => $MediaIDs]
+                ['MediaID' => $mediaIDs]
             );
         }
 
@@ -719,7 +719,7 @@ class CleanspeakPlugin extends Gdn_Plugin {
             // Apply the config settings to the form.
             $sender->Form->SetData($configurationModel->Data);
         } else {
-            $FormValues = $sender->Form->FormValues();
+            $formValues = $sender->Form->FormValues();
             if ($sender->Form->IsPostBack()) {
                 $sender->Form->ValidateRule('ApplicationID', 'function:ValidateRequired', 'Application ID is required');
                 $sender->Form->ValidateRule('ApiUrl', 'function:ValidateRequired', 'Api Url is required');
@@ -727,9 +727,9 @@ class CleanspeakPlugin extends Gdn_Plugin {
                 if ($sender->Form->ErrorCount() == 0) {
                     SaveToConfig(
                         [
-                            'Plugins.Cleanspeak.ApplicationID' => $FormValues['ApplicationID'],
-                            'Plugins.Cleanspeak.ApiUrl' => $FormValues['ApiUrl'],
-                            'Plugins.Cleanspeak.AccessToken' => val('AccessToken', $FormValues, null)
+                            'Plugins.Cleanspeak.ApplicationID' => $formValues['ApplicationID'],
+                            'Plugins.Cleanspeak.ApiUrl' => $formValues['ApiUrl'],
+                            'Plugins.Cleanspeak.AccessToken' => val('AccessToken', $formValues, null)
                         ]
                     );
                     $sender->InformMessage(T('Settings updated.'));
@@ -990,9 +990,9 @@ class CleanspeakPlugin extends Gdn_Plugin {
      * @param array $args Sending arguments.
      */
     protected function addMediaIDsToOptions($args) {
-        $MediaIDs = valr('FormPostValues.MediaIDs', $args);
-        if ($MediaIDs) {
-            $args['Options']['MediaIDs'] = $MediaIDs;
+        $mediaIDs = valr('FormPostValues.MediaIDs', $args);
+        if ($mediaIDs) {
+            $args['Options']['MediaIDs'] = $mediaIDs;
         }
     }
 

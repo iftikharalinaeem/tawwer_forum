@@ -60,12 +60,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class EventiPlugin extends Gdn_Plugin {
 
-   public function Base_Render_Before($Sender) {
-      $Sender->AddCssFile('eventi.css', 'plugins/Eventi');
-      $Sender->AddJsFile('eventi.js', 'plugins/Eventi');
+   public function Base_Render_Before($sender) {
+      $sender->AddCssFile('eventi.css', 'plugins/Eventi');
+      $sender->AddJsFile('eventi.js', 'plugins/Eventi');
    }
 
-   public function Base_All_Handler($Sender, $Args, $Key) {
+   public function Base_All_Handler($sender, $args, $key) {
 
       // These events break all asynchronous functionality on the site, as
       // they insert themselves directly in a response, so do nothing with them.
@@ -78,72 +78,72 @@ class EventiPlugin extends Gdn_Plugin {
           'Gdn_Dispatcher_Cleanup_Handler'
       ];
 
-      if (in_array($Key, $ajaxBreakEvents)) {
+      if (in_array($key, $ajaxBreakEvents)) {
          return;
       }
 
-      $Caller = $Sender->EventArguments['WildEventStack'];
-      $CallerFile = str_replace(Gdn::Request()->GetValue('DOCUMENT_ROOT'), '', $Caller['file']);
+      $caller = $sender->EventArguments['WildEventStack'];
+      $callerFile = str_replace(Gdn::Request()->GetValue('DOCUMENT_ROOT'), '', $caller['file']);
 
-      $Object = GetValue('object', $Caller, '');
+      $object = GetValue('object', $caller, '');
 
-      if (is_object($Object)) {
-         $Object = get_class($Object);
+      if (is_object($object)) {
+         $object = get_class($object);
       }
 
-      if (strlen($Object)) {
-         $Object .= "::";
+      if (strlen($object)) {
+         $object .= "::";
       }
 
-      $ArgList = [];
+      $argList = [];
 
-      foreach ($Caller['args'] as $Arg) {
-         if (is_object($Arg)) {
-            $ArgList[] = get_class($Arg);
-         } elseif (is_array($Arg)) {
-            $ArgList[] = 'array{'. sizeof($Arg) .'}';
-         } elseif (is_string($Arg) || is_numeric($Arg)) {
-            $ArgList[] = "'". $Arg ."'";
-         } elseif (is_bool($Arg)) {
-            $ArgList[] = "b". (string)$Arg;
+      foreach ($caller['args'] as $arg) {
+         if (is_object($arg)) {
+            $argList[] = get_class($arg);
+         } elseif (is_array($arg)) {
+            $argList[] = 'array{'. sizeof($arg) .'}';
+         } elseif (is_string($arg) || is_numeric($arg)) {
+            $argList[] = "'". $arg ."'";
+         } elseif (is_bool($arg)) {
+            $argList[] = "b". (string)$arg;
          } else {
-            $ArgList[] = $Arg;
+            $argList[] = $arg;
          }
       }
 
       $htmlArgsList = '';
       // EventArguments List
-      if (sizeof($Sender->EventArguments) > 1) {
+      if (sizeof($sender->EventArguments) > 1) {
 
          $htmlArgsList .= '
             <strong>Arguments</strong>
             <ol>';
 
-               foreach ($Sender->EventArguments as $ArgKey => $ArgValue) {
-                  if ($ArgKey == "WildEventStack") continue;
+               foreach ($sender->EventArguments as $argKey => $argValue) {
+                  if ($argKey == "WildEventStack") continue;
 
-                  if (is_object($ArgValue)) {
-                     $ArgValue = get_class($ArgValue);
-                  } elseif (is_array($ArgValue)) {
+                  if (is_object($argValue)) {
+                     $argValue = get_class($argValue);
+                  } elseif (is_array($argValue)) {
                      // Dump the results of array to HTML title attribute
-                     $ArgValue = '<span title="'. htmlentities(print_r($ArgValue, true)) .'">array{'.sizeof($ArgValue).'}</span>';
-                  } elseif (is_string($ArgValue) || is_numeric($ArgValue)) {
+                     $argValue = '<span title="'. htmlentities(print_r($argValue, true)) .'">array{'.sizeof($argValue).'}</span>';
+                  } elseif (is_string($argValue) || is_numeric($argValue)) {
                      // Clean up strings, as some may contain HTML, which
                      // ruins the output in the toltip.
-                     $stringClean = htmlentities($ArgValue);
-                     $ArgValue = '<span title="'. $stringClean .'">\''. SliceString($stringClean, 1000) .'\'</span>';
-                  } elseif (is_bool($ArgValue)) {
-                     $ArgValue = "b".(string)$ArgValue;
+                     $stringClean = htmlentities($argValue);
+                     $argValue = '<span title="'. $stringClean .'">\''. SliceString($stringClean, 1000) .'\'</span>';
+                  } elseif (is_bool($argValue)) {
+                     $argValue = "b".(string)$argValue;
                   }
 
-                  $htmlArgsList .= '<li><em>'. $ArgKey .':</em> '. $ArgValue .'</li>';
+                  $htmlArgsList .= '<li><em>'. $argKey .':</em> '. $argValue .'</li>';
                }
 
          $htmlArgsList .= '
             </ol>';
       }
 
-      $callerFileAndLine = $CallerFile .':'. $Caller['line'];
+      $callerFileAndLine = $callerFile .':'. $caller['line'];
 
       // This is used so that Eventi events can be linked to and shared, using
       // Url fragment identifiers.
@@ -153,10 +153,10 @@ class EventiPlugin extends Gdn_Plugin {
       <div class="eventi" id="eventi-'. $eventiHtmlFragmentId .'">
          <span class="eventi-flag-hook"></span>
          <div class="eventi-tooltip">
-            <input type="text" class="eventi-event-name" value="'. $Key .'" readonly="readonly" title="&#8984;/Ctrl+C to copy event name. It\'s auto-selected on every tooltip." />
+            <input type="text" class="eventi-event-name" value="'. $key .'" readonly="readonly" title="&#8984;/Ctrl+C to copy event name. It\'s auto-selected on every tooltip." />
             <div class="eventi-tooltip-body">
                <div class="eventi-subhead">
-                  <div class="eventi-fire-event">'. $Object . $Caller['function'] .' ('. implode(',', $ArgList). ')</div>
+                  <div class="eventi-fire-event">'. $object . $caller['function'] .' ('. implode(',', $argList). ')</div>
                   <div class="eventi-file-line">'. $callerFileAndLine .'</div>
                </div>';
 

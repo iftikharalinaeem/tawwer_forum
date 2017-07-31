@@ -2,14 +2,14 @@
 
 class NoCapsPlugin extends Gdn_Plugin {
 
-	public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender) {
+	public function DiscussionModel_BeforeSaveDiscussion_Handler($sender) {
 
-		$FormPostValues = $Sender->EventArguments['FormPostValues'];
+		$formPostValues = $sender->EventArguments['FormPostValues'];
 
-		if ($FormPostValues['Name'] == mb_strtoupper($FormPostValues['Name'], 'utf-8')) {
+		if ($formPostValues['Name'] == mb_strtoupper($formPostValues['Name'], 'utf-8')) {
 
-			$FormPostValues['Name'] = ucwords(strtolower($FormPostValues['Name']));
-			$Sender->EventArguments['FormPostValues'] = $FormPostValues;
+			$formPostValues['Name'] = ucwords(strtolower($formPostValues['Name']));
+			$sender->EventArguments['FormPostValues'] = $formPostValues;
 		}
 	}
 

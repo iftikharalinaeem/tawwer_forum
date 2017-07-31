@@ -26,19 +26,19 @@ class GroupsHooks extends Gdn_Plugin {
     /**
      *
      *
-     * @param null $Group
+     * @param null $group
      */
-    protected function setBreadcrumbs($Group = null) {
-        if (!$Group)
-            $Group = Gdn::Controller()->Data('Group', null);
+    protected function setBreadcrumbs($group = null) {
+        if (!$group)
+            $group = Gdn::Controller()->Data('Group', null);
 
-        if ($Group) {
-            $Sender = Gdn::Controller();
-            $Sender->SetData('Breadcrumbs', []);
-            $Sender->AddBreadcrumb(T('Groups'), '/groups');
-            $Sender->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+        if ($group) {
+            $sender = Gdn::Controller();
+            $sender->SetData('Breadcrumbs', []);
+            $sender->AddBreadcrumb(T('Groups'), '/groups');
+            $sender->AddBreadcrumb($group['Name'], GroupUrl($group));
 
-            $Sender->SetData('_CancelUrl', GroupUrl($Group));
+            $sender->SetData('_CancelUrl', GroupUrl($group));
         }
     }
 
@@ -52,16 +52,16 @@ class GroupsHooks extends Gdn_Plugin {
         }
     }
 
-    public function AssetModel_StyleCss_Handler($Sender, $Args) {
-        $Sender->addCssFile('groups.css', 'groups');
+    public function AssetModel_StyleCss_Handler($sender, $args) {
+        $sender->addCssFile('groups.css', 'groups');
     }
 
     /**
      * Add the "Groups" link to the main menu.
      */
-    public function Base_Render_Before($Sender) {
-        if (is_object($Menu = GetValue('Menu', $Sender))) {
-            $Menu->AddLink('Groups', T('Groups'), '/groups/', false, ['class' => 'Groups']);
+    public function Base_Render_Before($sender) {
+        if (is_object($menu = GetValue('Menu', $sender))) {
+            $menu->AddLink('Groups', T('Groups'), '/groups/', false, ['class' => 'Groups']);
         }
     }
 
@@ -84,31 +84,31 @@ class GroupsHooks extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Sender
-     * @param $Args
+     * @param $sender
+     * @param $args
      */
-    public function Base_ConversationGInvite_Handler($Sender, $Args) {
-        $GroupID = $Sender->Data('Conversation.RegardingID');
-        if ($GroupID) {
-            echo Gdn_Theme::Module('GroupUserHeaderModule', ['GroupID' => $GroupID]);
+    public function Base_ConversationGInvite_Handler($sender, $args) {
+        $groupID = $sender->Data('Conversation.RegardingID');
+        if ($groupID) {
+            echo Gdn_Theme::Module('GroupUserHeaderModule', ['GroupID' => $groupID]);
         }
     }
 
     /**
      *
-     * @param DbaController $Sender
+     * @param DbaController $sender
      */
-    public function DbaController_CountJobs_Handler($Sender) {
-        $Counts = [
+    public function DbaController_CountJobs_Handler($sender) {
+        $counts = [
              'Group' => ['CountDiscussions', 'CountMembers', 'DateLastComment', 'LastDiscussionID']
         ];
 
-        foreach ($Counts as $Table => $Columns) {
-            foreach ($Columns as $Column) {
-                $Name = "Recalculate $Table.$Column";
-                $Url = "/dba/counts.json?".http_build_query(['table' => $Table, 'column' => $Column]);
+        foreach ($counts as $table => $columns) {
+            foreach ($columns as $column) {
+                $name = "Recalculate $table.$column";
+                $url = "/dba/counts.json?".http_build_query(['table' => $table, 'column' => $column]);
 
-                $Sender->Data['Jobs'][$Name] = $Url;
+                $sender->Data['Jobs'][$name] = $url;
             }
         }
     }
@@ -242,18 +242,18 @@ class GroupsHooks extends Gdn_Plugin {
 
     /**
      * Make sure the user has permission to view the group
-     * @param DiscussionController $Sender
-     * @param array $Args
+     * @param DiscussionController $sender
+     * @param array $args
      * @throws Exception Throws an exception if the user doesn't have proper access to the group.
      */
-    public function DiscussionController_Index_Render($Sender, $Args) {
-        $GroupID = $Sender->Data('Discussion.GroupID');
-        if (!$GroupID)
+    public function DiscussionController_Index_Render($sender, $args) {
+        $groupID = $sender->Data('Discussion.GroupID');
+        if (!$groupID)
             return;
 
-        $ViewPermission = GroupPermission('View', $GroupID);
-        if (!$ViewPermission) {
-            throw ForbiddenException('@'.GroupPermission('View.Reason', $GroupID));
+        $viewPermission = GroupPermission('View', $groupID);
+        if (!$viewPermission) {
+            throw ForbiddenException('@'.GroupPermission('View.Reason', $groupID));
         }
     }
 
@@ -282,22 +282,22 @@ class GroupsHooks extends Gdn_Plugin {
         }
     }
 
-    public function DiscussionController_Comment_Render($Sender, $Args) {
-        $this->DiscussionController_Index_Render($Sender, $Args);
+    public function DiscussionController_Comment_Render($sender, $args) {
+        $this->DiscussionController_Index_Render($sender, $args);
     }
 
-    public function DiscussionModel_BeforeSaveDiscussion_Handler($Sender, $Args) {
-         $GroupID = Gdn::Request()->Get('groupid');
-         if ($GroupID) {
-            $Model = new GroupModel();
-            $Group = $Model->GetID($GroupID);
+    public function DiscussionModel_BeforeSaveDiscussion_Handler($sender, $args) {
+         $groupID = Gdn::Request()->Get('groupid');
+         if ($groupID) {
+            $model = new GroupModel();
+            $group = $model->GetID($groupID);
 
-            if ($Group) {
+            if ($group) {
                 // TODO: Check permissions.
-                $Args['FormPostValues']['CategoryID'] = $Group['CategoryID'];
-                $Args['FormPostValues']['GroupID'] = $GroupID;
+                $args['FormPostValues']['CategoryID'] = $group['CategoryID'];
+                $args['FormPostValues']['GroupID'] = $groupID;
 
-                Trace($Args, 'Group set');
+                Trace($args, 'Group set');
             }
         }
     }
@@ -305,66 +305,66 @@ class GroupsHooks extends Gdn_Plugin {
     /**
      * Increment the discussion aggregates on the group.
      *
-     * @param DiscussionModel $Sender
-     * @param array $Args
+     * @param DiscussionModel $sender
+     * @param array $args
      */
-    public function DiscussionModel_AfterSaveDiscussion_Handler($Sender, $Args) {
-        $GroupID = Gdn::Request()->Get('groupid');
-        if ($GroupID && $Args['Insert']) {
-            $Model = new GroupModel();
-            $Model->IncrementDiscussionCount($GroupID, 1, val('DiscussionID', $Args), valr('Fields.DateInserted', $Args));
+    public function DiscussionModel_AfterSaveDiscussion_Handler($sender, $args) {
+        $groupID = Gdn::Request()->Get('groupid');
+        if ($groupID && $args['Insert']) {
+            $model = new GroupModel();
+            $model->IncrementDiscussionCount($groupID, 1, val('DiscussionID', $args), valr('Fields.DateInserted', $args));
         }
     }
 
     /**
      * Set the most recent comment on the group.
      *
-     * @param CommentModel $Sender
-     * @param array $Args
+     * @param CommentModel $sender
+     * @param array $args
      */
-    public function CommentModel_AfterSaveComment_Handler($Sender, $Args) {
-        if ($Args['Insert']) {
-            $CommentID = $Args['CommentID'];
-            $DiscussionID = valr('FormPostValues.DiscussionID', $Args);
-            $GroupID = Gdn::SQL()->GetWhere('Discussion', ['DiscussionID' => $DiscussionID])->Value('GroupID');
-            if ($GroupID) {
-                $Model = new GroupModel();
-                $Model->SetField($GroupID, [
-                    'DateLastComment' => valr('FormPostValues.DateInserted', $Args),
-                    'LastDiscussionID' => $DiscussionID,
-                    'LastCommentID' => $CommentID
+    public function CommentModel_AfterSaveComment_Handler($sender, $args) {
+        if ($args['Insert']) {
+            $commentID = $args['CommentID'];
+            $discussionID = valr('FormPostValues.DiscussionID', $args);
+            $groupID = Gdn::SQL()->GetWhere('Discussion', ['DiscussionID' => $discussionID])->Value('GroupID');
+            if ($groupID) {
+                $model = new GroupModel();
+                $model->SetField($groupID, [
+                    'DateLastComment' => valr('FormPostValues.DateInserted', $args),
+                    'LastDiscussionID' => $discussionID,
+                    'LastCommentID' => $commentID
                 ]);
             }
         }
     }
 
-    public function DiscussionModel_DeleteDiscussion_Handler($Sender, $Args) {
-        $GroupID = GetValueR('Discussion.GroupID', $Args);
-        if ($GroupID) {
-            $Model = new GroupModel();
-            $Model->IncrementDiscussionCount($GroupID, -1);
+    public function DiscussionModel_DeleteDiscussion_Handler($sender, $args) {
+        $groupID = GetValueR('Discussion.GroupID', $args);
+        if ($groupID) {
+            $model = new GroupModel();
+            $model->IncrementDiscussionCount($groupID, -1);
         }
     }
 
     /**
      * Delete discussion must redirect to Group instead of Category page.
      *
-     * @param $Sender
-     * @param $Args
+     * @param $sender
+     * @param $args
      */
-    public function DiscussionController_DiscussionOptions_Handler($Sender, $Args) {
-        if ($GroupID = val('GroupID', $Args['Discussion'])) {
-            if (GetValue('DeleteDiscussion', $Args['DiscussionOptions'])) {
+    public function DiscussionController_DiscussionOptions_Handler($sender, $args) {
+        if ($groupID = val('GroupID', $args['Discussion'])) {
+            if (GetValue('DeleteDiscussion', $args['DiscussionOptions'])) {
                 // Get the group
-                $Model = new GroupModel();
-                $Group = $Model->GetID($GroupID);
-                if (!$Group)
+                $model = new GroupModel();
+                $group = $model->GetID($groupID);
+                if (!$group)
                     return;
 
                 // Override redirect with GroupUrl instead of CategoryUrl.
-                $Args['DiscussionOptions']['DeleteDiscussion'] = [
+                $args['DiscussionOptions']['DeleteDiscussion'] = [
                     'Label' => T('Delete Discussion'),
-                    'Url' => '/discussion/delete?discussionid='.$Args['Discussion']->DiscussionID.'&target='.urlencode(GroupUrl($Group)),
+                    'Url' => '/discussion/delete?discussionid='.$args['Discussion']->DiscussionID.'&target='.urlencode(GroupUrl($group)),
                     'Class' => 'Popup'];
             }
         }
@@ -411,49 +411,49 @@ class GroupsHooks extends Gdn_Plugin {
         return false;
     }
 
-    protected function OverridePermissions($Sender) {
-        $DiscussionID = valr('ReflectArgs.DiscussionID', $Sender);
-        if (!$DiscussionID) {
-            $CommentID = valr('ReflectArgs.CommentID', $Sender);
-            $CommentModel = new CommentModel();
-            $Comment = $CommentModel->GetID($CommentID, DATASET_TYPE_ARRAY);
-            $DiscussionID = $Comment['DiscussionID'];
+    protected function OverridePermissions($sender) {
+        $discussionID = valr('ReflectArgs.DiscussionID', $sender);
+        if (!$discussionID) {
+            $commentID = valr('ReflectArgs.CommentID', $sender);
+            $commentModel = new CommentModel();
+            $comment = $commentModel->GetID($commentID, DATASET_TYPE_ARRAY);
+            $discussionID = $comment['DiscussionID'];
         }
-        $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
+        $discussion = $sender->DiscussionModel->GetID($discussionID);
 
-        $GroupID = GetValue('GroupID', $Discussion);
-        if (!$GroupID)
+        $groupID = GetValue('GroupID', $discussion);
+        if (!$groupID)
             return;
-        $Model = new GroupModel();
-        $Group = $Model->GetID($GroupID);
-        if (!$Group)
+        $model = new GroupModel();
+        $group = $model->GetID($groupID);
+        if (!$group)
             return;
-        $Model->OverridePermissions($Group);
+        $model->OverridePermissions($group);
     }
 
     /**
      *
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      * @return type
      */
-    public function DiscussionController_Announce_Before($Sender) {
-        $this->OverridePermissions($Sender);
+    public function DiscussionController_Announce_Before($sender) {
+        $this->OverridePermissions($sender);
     }
 
-    public function DiscussionController_Index_Before($Sender) {
-        $this->OverridePermissions($Sender);
+    public function DiscussionController_Index_Before($sender) {
+        $this->OverridePermissions($sender);
     }
 
-    public function DiscussionController_Close_Before($Sender) {
-        $this->OverridePermissions($Sender);
+    public function DiscussionController_Close_Before($sender) {
+        $this->OverridePermissions($sender);
     }
 
-    public function DiscussionController_Delete_Before($Sender) {
-        $this->OverridePermissions($Sender);
+    public function DiscussionController_Delete_Before($sender) {
+        $this->OverridePermissions($sender);
     }
 
-    public function DiscussionController_Comment_Before($Sender) {
-         $this->OverridePermissions($Sender);
+    public function DiscussionController_Comment_Before($sender) {
+         $this->OverridePermissions($sender);
     }
 
     /**
@@ -468,25 +468,25 @@ class GroupsHooks extends Gdn_Plugin {
 
     /**
      *
-     * @param DiscussionController $Sender
+     * @param DiscussionController $sender
      */
-    public function DiscussionController_Render_Before($Sender) {
-        $GroupID = $Sender->Data('Discussion.GroupID');
-        if ($GroupID) {
+    public function DiscussionController_Render_Before($sender) {
+        $groupID = $sender->Data('Discussion.GroupID');
+        if ($groupID) {
             // This is a group discussion. Modify the breadcrumbs.
-            $Model = new GroupModel();
-            $Group = $Model->GetID($GroupID);
-            if ($Group) {
-                $Sender->SetData('Breadcrumbs', []);
-                $Sender->AddBreadcrumb(T('Groups'), '/groups');
-                $Sender->AddBreadcrumb($Group['Name'], GroupUrl($Group));
+            $model = new GroupModel();
+            $group = $model->GetID($groupID);
+            if ($group) {
+                $sender->SetData('Breadcrumbs', []);
+                $sender->AddBreadcrumb(T('Groups'), '/groups');
+                $sender->AddBreadcrumb($group['Name'], GroupUrl($group));
             }
 
             Gdn_Theme::section('Group');
         }
     }
 
-    public function Base_AfterDiscussionFilters_Handler($Sender) {
+    public function Base_AfterDiscussionFilters_Handler($sender) {
         echo '<li class="Groups">'.Anchor(Sprite('SpGroups').' '.T('Groups'), '/groups').'</li> ';
     }
 
@@ -522,84 +522,84 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
-     * @param PostController $Sender
+     * @param PostController $sender
      */
-    public function PostController_Discussion_Before($Sender) {
-        $GroupID = $Sender->Request->Get('groupid');
+    public function PostController_Discussion_Before($sender) {
+        $groupID = $sender->Request->Get('groupid');
 
-        if (!$GroupID)
+        if (!$groupID)
             return;
 
-        $Model = new GroupModel();
-        $Group = $Model->GetID($GroupID);
-        if (!$Group)
+        $model = new GroupModel();
+        $group = $model->GetID($groupID);
+        if (!$group)
             return;
 
-        $Sender->SetData('Group', $Group);
+        $sender->SetData('Group', $group);
 
-        $Model->OverridePermissions($Group);
+        $model->OverridePermissions($group);
     }
 
     /**
      *
-     * @param PostController $Sender
+     * @param PostController $sender
      * @return type
      */
-    public function PostController_Comment_Before($Sender) {
-        $DiscussionID = $Sender->Request->Get('discussionid');
-        if (!$DiscussionID)
+    public function PostController_Comment_Before($sender) {
+        $discussionID = $sender->Request->Get('discussionid');
+        if (!$discussionID)
             return;
-        $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
-        $GroupID = GetValue('GroupID', $Discussion);
-        if (!$GroupID)
-            return;
-
-        $Model = new GroupModel();
-        $Group = $Model->GetID($GroupID);
-        if (!$Group)
+        $discussion = $sender->DiscussionModel->GetID($discussionID);
+        $groupID = GetValue('GroupID', $discussion);
+        if (!$groupID)
             return;
 
-        $Sender->SetData('Group', $Group);
+        $model = new GroupModel();
+        $group = $model->GetID($groupID);
+        if (!$group)
+            return;
 
-        $Model->OverridePermissions($Group);
+        $sender->SetData('Group', $group);
+
+        $model->OverridePermissions($group);
     }
 
-    public function PostController_EditDiscussion_Before($Sender) {
-        $DiscussionID = GetValue('DiscussionID', $Sender->ReflectArgs);
-        $GroupID = false;
-        if ($DiscussionID) {
-            $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
-            $GroupID = GetValue('GroupID', $Discussion);
+    public function PostController_EditDiscussion_Before($sender) {
+        $discussionID = GetValue('DiscussionID', $sender->ReflectArgs);
+        $groupID = false;
+        if ($discussionID) {
+            $discussion = $sender->DiscussionModel->GetID($discussionID);
+            $groupID = GetValue('GroupID', $discussion);
         }
 
-        if (!$GroupID)
+        if (!$groupID)
             return;
 
-        $Model = new GroupModel();
-        $Group = $Model->GetID($GroupID);
-        if (!$Group)
+        $model = new GroupModel();
+        $group = $model->GetID($groupID);
+        if (!$group)
             return;
 
-        $Sender->SetData('Group', $Group);
-        $Model->OverridePermissions($Group);
+        $sender->SetData('Group', $group);
+        $model->OverridePermissions($group);
     }
 
     /**
      *
-     * @param PostController $Sender
+     * @param PostController $sender
      */
-    public function PostController_Render_Before($Sender) {
-        $Group = $Sender->Data('Group');
+    public function PostController_Render_Before($sender) {
+        $group = $sender->Data('Group');
 
-        if ($Group) {
+        if ($group) {
             // Hide the category drop-down.
-            $Sender->ShowCategorySelector = false;
+            $sender->ShowCategorySelector = false;
 
             // Reduce the announce options.
-            $Options = [
+            $options = [
                 2 => '@'.T('Announce'),
                 0 => '@'.T("Don't announce.")];
-            $Sender->SetData('_AnnounceOptions', $Options);
+            $sender->SetData('_AnnounceOptions', $options);
         }
 
         $this->SetBreadcrumbs();
@@ -608,66 +608,66 @@ class GroupsHooks extends Gdn_Plugin {
     /**
      * Configure Groups/Events notification preferences
      *
-     * @param type $Sender
+     * @param type $sender
      */
-    public function ProfileController_AfterPreferencesDefined_Handler($Sender) {
-        $Sender->Preferences['Notifications']['Email.Groups'] = T('Notify me when there is group activity.');
-        $Sender->Preferences['Notifications']['Popup.Groups'] = T('Notify me when there is group activity.');
+    public function ProfileController_AfterPreferencesDefined_Handler($sender) {
+        $sender->Preferences['Notifications']['Email.Groups'] = T('Notify me when there is group activity.');
+        $sender->Preferences['Notifications']['Popup.Groups'] = T('Notify me when there is group activity.');
 
-        $Sender->Preferences['Notifications']['Email.Events'] = T('Notify me when there is event activity.');
-        $Sender->Preferences['Notifications']['Popup.Events'] = T('Notify me when there is event activity.');
+        $sender->Preferences['Notifications']['Email.Events'] = T('Notify me when there is event activity.');
+        $sender->Preferences['Notifications']['Popup.Events'] = T('Notify me when there is event activity.');
     }
 
      /**
       * Hide Private content.
       *
-      * @param SearchController $Sender Sending controller.
-      * @param array $Args Sending arguments.
+      * @param SearchController $sender Sending controller.
+      * @param array $args Sending arguments.
       */
-     public function SearchController_Render_Before($Sender, $Args) {
+     public function SearchController_Render_Before($sender, $args) {
 
-          $GroupCategoryIDs = GroupModel::getGroupCategoryIDs();
+          $groupCategoryIDs = GroupModel::getGroupCategoryIDs();
 
-          $SearchResults = $Sender->Data('SearchResults', []);
-          foreach ($SearchResults as $ResultKey => &$Result) {
-                $GroupID = val('GroupID', $Result, false);
+          $searchResults = $sender->Data('SearchResults', []);
+          foreach ($searchResults as $resultKey => &$result) {
+                $groupID = val('GroupID', $result, false);
 
-                if (val('RecordType', $Result) === 'Group') {
+                if (val('RecordType', $result) === 'Group') {
                     continue;
-                } elseif ($GroupID || in_array($Result['CategoryID'], $GroupCategoryIDs)) {
+                } elseif ($groupID || in_array($result['CategoryID'], $groupCategoryIDs)) {
 
-                     if (!$GroupID && val('RecordType', $Result, false) == 'Discussion') {
+                     if (!$groupID && val('RecordType', $result, false) == 'Discussion') {
 
-                          $DiscussionModel = new DiscussionModel();
-                          $Discussion = $DiscussionModel->GetID($Result['PrimaryID']);
-                          $GroupID = $Discussion->GroupID;
+                          $discussionModel = new DiscussionModel();
+                          $discussion = $discussionModel->GetID($result['PrimaryID']);
+                          $groupID = $discussion->GroupID;
 
-                     } elseif (!$GroupID && val('RecordType', $Result, false) == 'Comment') {
+                     } elseif (!$groupID && val('RecordType', $result, false) == 'Comment') {
 
-                          $CommentModel = new CommentModel();
-                          $Comment = $CommentModel->GetID($Result['PrimaryID']);
-                          $DiscussionModel = new DiscussionModel();
-                          $Discussion = $DiscussionModel->GetID($Comment->DiscussionID);
+                          $commentModel = new CommentModel();
+                          $comment = $commentModel->GetID($result['PrimaryID']);
+                          $discussionModel = new DiscussionModel();
+                          $discussion = $discussionModel->GetID($comment->DiscussionID);
 
-                          $GroupID = $Discussion->GroupID;
+                          $groupID = $discussion->GroupID;
 
                      }
 
-                     $GroupModel = new GroupModel();
-                     $Group = Gdn::Cache()->Get(sprintf('Group.%s', $GroupID));
-                     if ($Group === Gdn_Cache::CACHEOP_FAILURE) {
-                          $Group = $GroupModel->GetID($GroupID);
-                          Gdn::Cache()->Store(sprintf('Group.%s', $GroupID), $Group, [Gdn_Cache::FEATURE_EXPIRY => 15 * 60]);
+                     $groupModel = new GroupModel();
+                     $group = Gdn::Cache()->Get(sprintf('Group.%s', $groupID));
+                     if ($group === Gdn_Cache::CACHEOP_FAILURE) {
+                          $group = $groupModel->GetID($groupID);
+                          Gdn::Cache()->Store(sprintf('Group.%s', $groupID), $group, [Gdn_Cache::FEATURE_EXPIRY => 15 * 60]);
                      }
 
-                     if ($Group['Privacy'] == 'Private' && !$GroupModel->CheckPermission('View', $Group['GroupID'])) {
-                          unset($SearchResults[$ResultKey]);
-                          $Result['Title'] = '** Private **';
-                          $Result['Summary'] = '** Private **';
+                     if ($group['Privacy'] == 'Private' && !$groupModel->CheckPermission('View', $group['GroupID'])) {
+                          unset($searchResults[$resultKey]);
+                          $result['Title'] = '** Private **';
+                          $result['Summary'] = '** Private **';
                      }
 
                 }
-                $Sender->SetData('SearchResults', $SearchResults);
+                $sender->SetData('SearchResults', $searchResults);
           }
 
      }

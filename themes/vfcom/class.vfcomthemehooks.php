@@ -3,10 +3,10 @@
 
 class VfcomThemeHools extends Gdn_Plugin {
    
-   public function Base_Render_Before($Sender) {
-      if (IsMobile() && is_object($Sender->Head)) {
-         $Sender->Head->AddTag('meta', ['name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"]);
-         $Sender->Head->AddString('
+   public function Base_Render_Before($sender) {
+      if (IsMobile() && is_object($sender->Head)) {
+         $sender->Head->AddTag('meta', ['name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"]);
+         $sender->Head->AddString('
    <script type="text/javascript">
    // If not looking for a specific comment, hide the address bar in iphone
    var hash = window.location.href.split("#")[1];

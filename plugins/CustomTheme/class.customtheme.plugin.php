@@ -65,13 +65,13 @@ class CustomThemePlugin extends Gdn_Plugin {
      * @param AssetModel $sender
      * @return type
      */
-    public function assetModel_styleCss_handler($sender, $Args) {
+    public function assetModel_styleCss_handler($sender, $args) {
         if (isMobile() && !c('Plugins.CustomTheme.OverrideMobile')) {
             return;
         }
 
         // We don't want to add the custom theme when previewing.
-        $eTag = val('ETag', $Args);
+        $eTag = val('ETag', $args);
         $doPreview = strpos($eTag, '-prv') !== false;
 
         if ($doPreview) {

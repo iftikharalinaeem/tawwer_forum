@@ -25,21 +25,21 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
    /**
     * If new user's email is @domain, add to special role.
     */
-   public function UserModel_BeforeInsertUser_Handler($Sender) {
+   public function UserModel_BeforeInsertUser_Handler($sender) {
       // Get new user's email domain
-      $Email = $Sender->EventArguments['InsertFields']['Email'];
-      list($Junk, $Domain) = explode('@', $Email);
+      $email = $sender->EventArguments['InsertFields']['Email'];
+      list($junk, $domain) = explode('@', $email);
 
       // Any roles assigned?
-      $RoleModel = new RoleModel();
-      $RoleData = $RoleModel->SQL->GetWhereLike('Role', ['Domains' => $Domain]);
-      foreach ($RoleData->Result() as $Result) {
+      $roleModel = new RoleModel();
+      $roleData = $roleModel->SQL->GetWhereLike('Role', ['Domains' => $domain]);
+      foreach ($roleData->Result() as $result) {
          // Confirm it wasn't a sloppy match
          //print_r($Result);
-         $DomainList = explode(' ', $Result->Domains);
-         if (in_array($Domain, $DomainList)) {
+         $domainList = explode(' ', $result->Domains);
+         if (in_array($domain, $domainList)) {
             // Add the role to the user
-            $Sender->EventArguments['InsertFields']['Roles'][] = $Result->RoleID;
+            $sender->EventArguments['InsertFields']['Roles'][] = $result->RoleID;
          }
       }
    }
@@ -52,8 +52,8 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
 
       // Backwards compatibility with 0.1
       if (C('Plugins.AutoRoleByEmail.Domain', FALSE)) {
-         $RoleModel = new RoleModel();
-         $RoleModel->Update(
+         $roleModel = new RoleModel();
+         $roleModel->Update(
             ['Domains' => C('Plugins.AutoRoleByEmail.Domain')],
             ['Name' => C('Plugins.AutoRoleByEmail.Role')]
          );

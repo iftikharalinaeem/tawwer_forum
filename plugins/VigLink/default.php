@@ -17,35 +17,35 @@ class VigLinkPlugin implements Gdn_IPlugin {
    /**
     * Insert code.
     */
-   public function Base_AfterBody_Handler($Sender) {
+   public function Base_AfterBody_Handler($sender) {
       echo $this->GenerateVigLinkCode( C('Plugins.VigLink.ApiKey', '') );
    }
 
    /**
     * Settings page.
     */
-   public function SettingsController_VigLink_Create($Sender, $Args) {
-      $ApiKey = C('Plugins.VigLink.ApiKey', '');
+   public function SettingsController_VigLink_Create($sender, $args) {
+      $apiKey = C('Plugins.VigLink.ApiKey', '');
 
-      if ($Sender->Form->AuthenticatedPostBack()) {
-         $NewKey = trim($Sender->Form->GetFormValue('ApiKey'));
+      if ($sender->Form->AuthenticatedPostBack()) {
+         $newKey = trim($sender->Form->GetFormValue('ApiKey'));
 
-         if ($this->ValidateApiKey($NewKey)) {
-            SaveToConfig('Plugins.VigLink.ApiKey', $NewKey);
-            $Sender->StatusMessage = T("VigLink.Saved");
+         if ($this->ValidateApiKey($newKey)) {
+            SaveToConfig('Plugins.VigLink.ApiKey', $newKey);
+            $sender->StatusMessage = T("VigLink.Saved");
          }
          else {
-            $Sender->Form->AddError( T("VigLink.ErrorInvalid"), 'ApiKey' );
-            $Sender->Form->SetFormValue('ApiKey', $ApiKey);
+            $sender->Form->AddError( T("VigLink.ErrorInvalid"), 'ApiKey' );
+            $sender->Form->SetFormValue('ApiKey', $apiKey);
          }
       }
       else {
-         $Sender->Form->SetValue('ApiKey', $ApiKey);
+         $sender->Form->SetValue('ApiKey', $apiKey);
       }
 
-      $Sender->AddSideMenu();
-      $Sender->SetData('Title', T('VigLink.VigLinkSettings'));
-      $Sender->Render('Settings', '', 'plugins/VigLink');
+      $sender->AddSideMenu();
+      $sender->SetData('Title', T('VigLink.VigLinkSettings'));
+      $sender->Render('Settings', '', 'plugins/VigLink');
    }
 
    /**
@@ -54,8 +54,8 @@ class VigLinkPlugin implements Gdn_IPlugin {
     * @param   array   APY Key
     * @return  boolean TRUE if the API key follows the pattern or is blank.
     */
-   protected function ValidateApiKey( $ApiKey ) {
-      if (preg_match('/^[0-9a-f]{32}$/', $ApiKey) || $ApiKey === '')
+   protected function ValidateApiKey( $apiKey ) {
+      if (preg_match('/^[0-9a-f]{32}$/', $apiKey) || $apiKey === '')
          return true;
 
       return false;
@@ -64,18 +64,18 @@ class VigLinkPlugin implements Gdn_IPlugin {
    /**
     * Generates the VigLink code
     *
-    * @param string $VigLinkKey
+    * @param string $vigLinkKey
     * @return string   the VigLink code
     */
-   protected function GenerateVigLinkCode( $VigLinkKey ) {
-      if (empty($VigLinkKey))
+   protected function GenerateVigLinkCode( $vigLinkKey ) {
+      if (empty($vigLinkKey))
          return '';
 
       return '
    <script type="text/javascript">
       //<![CDATA[
       var vglnk = { api_url: \'//api.VigLink.com/api\',
-          key: \'' . $VigLinkKey . '\' };
+          key: \'' . $vigLinkKey . '\' };
       (function(d, t) {
       var s = d.createElement(t); s.type = \'text/javascript\'; s.async = true;
       s.src = (\'https:\' == document.location.protocol ? vglnk.api_url :

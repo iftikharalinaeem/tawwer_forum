@@ -4,38 +4,38 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 
    /**
     * Adds "Custom CSS" menu option to the dashboard.
-   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-      $Menu = &$Sender->EventArguments['SideMenu'];
+   public function Base_GetAppSettingsMenuItems_Handler($sender) {
+      $Menu = &$sender->EventArguments['SideMenu'];
 		$Menu->AddItem('Appearance', 'Appearance');
       $Menu->AddLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
    }
     */
 
-   public function Base_Render_Before($Sender) {
+   public function Base_Render_Before($sender) {
 		// If we are using the default master view, and in preview mode, add the custom css file
-		$Session = Gdn::Session();
-		$Preview = $Session->GetPreference('PreviewCustomCSS', FALSE);
-		$Live = Gdn::Config('Plugins.CustomCSS.Enabled');
-		$CurrentTheme = Gdn::Config('Garden.Theme', 'default');
-		$CustomFile = Gdn::Config('Plugins.CustomCSS.File', '');
-		$PreviewFile = Gdn::Config('Plugins.CustomCSS.PreviewFile', '');
-		if (($Sender->MasterView == 'default' || $Sender->MasterView == '')) {
-			if (($PreviewFile != '' && $Preview) || $Live) {
+		$session = Gdn::Session();
+		$preview = $session->GetPreference('PreviewCustomCSS', FALSE);
+		$live = Gdn::Config('Plugins.CustomCSS.Enabled');
+		$currentTheme = Gdn::Config('Garden.Theme', 'default');
+		$customFile = Gdn::Config('Plugins.CustomCSS.File', '');
+		$previewFile = Gdn::Config('Plugins.CustomCSS.PreviewFile', '');
+		if (($sender->MasterView == 'default' || $sender->MasterView == '')) {
+			if (($previewFile != '' && $preview) || $live) {
 				// If there is custom css, and we are not supposed to include theme-based css files...
 				if (Gdn::Config('Plugins.CustomCSS.IncludeTheme', 'Yes') == 'No') {
 					// ... remove them
-					$Sender->ClearCssFiles();
+					$sender->ClearCssFiles();
 				}
 			}
 
-			if ($PreviewFile != '' && $Preview)
-				$Sender->AddCssFile('/cache/CustomCSS/'.$CurrentTheme.'/'.$PreviewFile);
-			else if ($CustomFile != '' && $Live)
-				$Sender->AddCssFile('/cache/CustomCSS/'.$CurrentTheme.'/'.$CustomFile);
+			if ($previewFile != '' && $preview)
+				$sender->AddCssFile('/cache/CustomCSS/'.$currentTheme.'/'.$previewFile);
+			else if ($customFile != '' && $live)
+				$sender->AddCssFile('/cache/CustomCSS/'.$currentTheme.'/'.$customFile);
 		}
-		if ($Preview) {
-			$Sender->AddAsset('Content', $Sender->FetchView(PATH_PLUGINS . DS . 'CustomCSS' . DS . 'views' . DS . 'preview.php'));
-			$Sender->AddCssFile('previewtheme.css', 'dashboard');
+		if ($preview) {
+			$sender->AddAsset('Content', $sender->FetchView(PATH_PLUGINS . DS . 'CustomCSS' . DS . 'views' . DS . 'preview.php'));
+			$sender->AddCssFile('previewtheme.css', 'dashboard');
 		}
 	}
 

@@ -11,97 +11,97 @@ class WhispersPlugin extends Gdn_Plugin {
 
    /// Methods ///
 
-   public function GetWhispers($DiscussionID, $Comments, $Limit, $Offset) {
-      $FirstDate = NULL;
-      $LastDate = NULL;
+   public function GetWhispers($discussionID, $comments, $limit, $offset) {
+      $firstDate = NULL;
+      $lastDate = NULL;
 
-      if (count($Comments) > 0) {
-         if ($Offset > 0) {
-            $FirstComment = array_shift($Comments);
-            $FirstDate = GetValue('DateInserted', $FirstComment);
-            array_unshift($Comments, $FirstComment);
+      if (count($comments) > 0) {
+         if ($offset > 0) {
+            $firstComment = array_shift($comments);
+            $firstDate = GetValue('DateInserted', $firstComment);
+            array_unshift($comments, $firstComment);
          }
 
-         if (count($Comments) < $Limit) {
-            $LastComment = array_pop($Comments);
-            array_push($Comments, $LastComment);
+         if (count($comments) < $limit) {
+            $lastComment = array_pop($comments);
+            array_push($comments, $lastComment);
 
-            $LastCommentID = GetValue('CommentID', $LastComment);
+            $lastCommentID = GetValue('CommentID', $lastComment);
 
             // We need to grab the comment that is one after the last comment.
-            $LastComment = Gdn::SQL()->Limit(1)->GetWhere('Comment', ['DiscussionID' => $DiscussionID, 'CommentID >' => $LastCommentID])->FirstRow();
-            if ($LastComment)
-               $LastDate = GetValue('DateInserted', $LastComment);
+            $lastComment = Gdn::SQL()->Limit(1)->GetWhere('Comment', ['DiscussionID' => $discussionID, 'CommentID >' => $lastCommentID])->FirstRow();
+            if ($lastComment)
+               $lastDate = GetValue('DateInserted', $lastComment);
          }
       }
 
       // Grab the conversations that are associated with this discussion.
-      $Sql = Gdn::SQL()
+      $sql = Gdn::SQL()
          ->Select('c.ConversationID, c.DateUpdated')
          ->From('Conversation c')
-         ->Where('c.DiscussionID', $DiscussionID);
+         ->Where('c.DiscussionID', $discussionID);
 
       if (!Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
-         $Sql->Join('UserConversation uc', 'c.ConversationID = uc.ConversationID')
+         $sql->Join('UserConversation uc', 'c.ConversationID = uc.ConversationID')
             ->Where('uc.UserID', Gdn::Session()->UserID);
       }
 
-      $Conversations = $Sql->Get()->ResultArray();
-      $Conversations = Gdn_DataSet::Index($Conversations, 'ConversationID');
+      $conversations = $sql->Get()->ResultArray();
+      $conversations = Gdn_DataSet::Index($conversations, 'ConversationID');
 
       // Join the participants into the conversations.
-      $ConversationModel = new ConversationModel();
-      $ConversationModel->JoinParticipants($Conversations);
-      $this->Conversations = $Conversations;
+      $conversationModel = new ConversationModel();
+      $conversationModel->JoinParticipants($conversations);
+      $this->Conversations = $conversations;
 
-      $ConversationIDs = array_keys($Conversations);
+      $conversationIDs = array_keys($conversations);
 
       // Grab all messages that are between the first and last dates.
-      $Sql = Gdn::SQL()
+      $sql = Gdn::SQL()
          ->Select('cm.*')
 //         ->Select('iu.Name as InsertName, iu.Photo as InsertPhoto')
          ->From('ConversationMessage cm')
 //         ->Join('User iu', 'cm.InsertUserID = iu.UserID')
-         ->WhereIn('cm.ConversationID', $ConversationIDs)
+         ->WhereIn('cm.ConversationID', $conversationIDs)
          ->OrderBy('cm.DateInserted');
 
-      if ($FirstDate)
-         $Sql->Where('cm.DateInserted >=', $FirstDate);
-      if ($LastDate)
-         $Sql->Where('cm.DateInserted <', $LastDate);
+      if ($firstDate)
+         $sql->Where('cm.DateInserted >=', $firstDate);
+      if ($lastDate)
+         $sql->Where('cm.DateInserted <', $lastDate);
 
-      $Whispers = $Sql->Get();
+      $whispers = $sql->Get();
 
-      Gdn::UserModel()->JoinUsers($Whispers->Result(), ['InsertUserID']);
+      Gdn::UserModel()->JoinUsers($whispers->Result(), ['InsertUserID']);
 
       // Add dummy comment fields to the whispers.
-      $WhispersResult =& $Whispers->Result();
-      foreach ($WhispersResult as &$Whisper) {
-         SetValue('DiscussionID', $Whisper, $DiscussionID);
-         SetValue('CommentID', $Whisper, 'w'.GetValue('MessageID', $Whisper));
-         SetValue('Type', $Whisper, 'Whisper');
-         SetValue('Url', $Whisper, '');
+      $whispersResult =& $whispers->Result();
+      foreach ($whispersResult as &$whisper) {
+         SetValue('DiscussionID', $whisper, $discussionID);
+         SetValue('CommentID', $whisper, 'w'.GetValue('MessageID', $whisper));
+         SetValue('Type', $whisper, 'Whisper');
+         SetValue('Url', $whisper, '');
 
-         $Participants = GetValueR(GetValue('ConversationID', $Whisper).'.Participants', $Conversations);
-         SetValue('Participants', $Whisper, $Participants);
+         $participants = GetValueR(GetValue('ConversationID', $whisper).'.Participants', $conversations);
+         SetValue('Participants', $whisper, $participants);
       }
 
-      return $Whispers;
+      return $whispers;
    }
 
-   public function MergeWhispers($Comments, $Whispers) {
-      $Result = array_merge($Comments, $Whispers);
-      usort($Result, ['WhispersPlugin', '_MergeWhispersSort']);
-      return $Result;
+   public function MergeWhispers($comments, $whispers) {
+      $result = array_merge($comments, $whispers);
+      usort($result, ['WhispersPlugin', '_MergeWhispersSort']);
+      return $result;
    }
 
-   protected static function _MergeWhispersSort($A, $B) {
-      $DateA = Gdn_Format::ToTimestamp(GetValue('DateInserted', $A));
-      $DateB = Gdn_Format::ToTimestamp(GetValue('DateInserted', $B));
+   protected static function _MergeWhispersSort($a, $b) {
+      $dateA = Gdn_Format::ToTimestamp(GetValue('DateInserted', $a));
+      $dateB = Gdn_Format::ToTimestamp(GetValue('DateInserted', $b));
 
-      if ($DateA > $DateB)
+      if ($dateA > $dateB)
          return 1;
-      elseif ($DateB < $DateB)
+      elseif ($dateB < $dateB)
          return -1;
       else
          0;
@@ -119,31 +119,31 @@ class WhispersPlugin extends Gdn_Plugin {
          ->Set();
    }
 
-   public function UserRowCompare($A, $B) {
-      return strcasecmp($A['Name'], $B['Name']);
+   public function UserRowCompare($a, $b) {
+      return strcasecmp($a['Name'], $b['Name']);
    }
 
    /// Event Handlers ///
 
-   public function CommentModel_AfterGet_Handler($Sender, $Args) {
+   public function CommentModel_AfterGet_Handler($sender, $args) {
       // Grab the whispers associated with this discussion.
-      $DiscussionID = $Args['DiscussionID'];
-      $Comments =& $Args['Comments'];
-      $CommentsResult =& $Comments->Result();
-      $Whispers = $this->GetWhispers($DiscussionID, $CommentsResult, $Args['Limit'], $Args['Offset']);
-      $Whispers->DatasetType($Comments->DatasetType());
+      $discussionID = $args['DiscussionID'];
+      $comments =& $args['Comments'];
+      $commentsResult =& $comments->Result();
+      $whispers = $this->GetWhispers($discussionID, $commentsResult, $args['Limit'], $args['Offset']);
+      $whispers->DatasetType($comments->DatasetType());
 
-      $CommentsResult = $this->MergeWhispers($CommentsResult, $Whispers->Result());
+      $commentsResult = $this->MergeWhispers($commentsResult, $whispers->Result());
 
       // Check to see if the whispers are more recent than the last comment in the discussion so that the discussion will update the watch.
       if (isset(Gdn::Controller()->Discussion)) {
-         $Discussion =& Gdn::Controller()->Discussion;
-         $DateLastComment = Gdn_Format::ToTimestamp(GetValue('DateLastComment', $Discussion));
+         $discussion =& Gdn::Controller()->Discussion;
+         $dateLastComment = Gdn_Format::ToTimestamp(GetValue('DateLastComment', $discussion));
 
-         foreach ($this->Conversations as $Conversation) {
-            if (Gdn_Format::ToTimestamp($Conversation['DateUpdated']) > $DateLastComment) {
-               SetValue('DateLastComment', $Discussion, $Conversation['DateUpdated']);
-               $DateLastComment = Gdn_Format::ToTimestamp($Conversation['DateUpdated']);
+         foreach ($this->Conversations as $conversation) {
+            if (Gdn_Format::ToTimestamp($conversation['DateUpdated']) > $dateLastComment) {
+               SetValue('DateLastComment', $discussion, $conversation['DateUpdated']);
+               $dateLastComment = Gdn_Format::ToTimestamp($conversation['DateUpdated']);
             }
          }
       }
@@ -162,241 +162,241 @@ class WhispersPlugin extends Gdn_Plugin {
       include $Sender->FetchViewLocation('WhisperForm', '', 'plugins/Whispers');
    }
 
-   public function DiscussionController_CommentInfo_Handler($Sender, $Args) {
-      if (!isset($Args['Comment']))
+   public function DiscussionController_CommentInfo_Handler($sender, $args) {
+      if (!isset($args['Comment']))
          return;
-      $Comment = $Args['Comment'];
-      if (!GetValue('Type', $Comment) == 'Whisper')
+      $comment = $args['Comment'];
+      if (!GetValue('Type', $comment) == 'Whisper')
          return;
 
-      $Participants = GetValue('Participants', $Comment);
-      $ConversationID = GetValue('ConversationID', $Comment);
-      $MessageID = GetValue('MessageID', $Comment);
-      $MessageUrl = "/messages/$ConversationID#Message_$MessageID";
+      $participants = GetValue('Participants', $comment);
+      $conversationID = GetValue('ConversationID', $comment);
+      $messageID = GetValue('MessageID', $comment);
+      $messageUrl = "/messages/$conversationID#Message_$messageID";
 
-      echo '<div class="Whisper-Info"><b>'.Anchor(T('Private Between'), $MessageUrl).'</b>: ';
-      $First = TRUE;
-      foreach ($Participants as $UserID => $User) {
-         if ($First)
-            $First = FALSE;
+      echo '<div class="Whisper-Info"><b>'.Anchor(T('Private Between'), $messageUrl).'</b>: ';
+      $first = TRUE;
+      foreach ($participants as $userID => $user) {
+         if ($first)
+            $first = FALSE;
          else
             echo ', ';
 
-         echo UserAnchor($User);
+         echo UserAnchor($user);
       }
       echo '</div>';
    }
 
-   public function DiscussionController_BeforeCommentDisplay_Handler($Sender, $Args) {
-      if (!isset($Args['Comment']))
+   public function DiscussionController_BeforeCommentDisplay_Handler($sender, $args) {
+      if (!isset($args['Comment']))
          return;
-      $Comment = $Args['Comment'];
-      if (!GetValue('Type', $Comment) == 'Whisper')
+      $comment = $args['Comment'];
+      if (!GetValue('Type', $comment) == 'Whisper')
          return;
 
-      $Args['CssClass'] = ConcatSep(' ', $Args['CssClass'], 'Whisper');
+      $args['CssClass'] = ConcatSep(' ', $args['CssClass'], 'Whisper');
    }
 
-   public function DiscussionController_CommentOptions_Handler($Sender, $Args) {
-      if (!isset($Args['Comment']))
+   public function DiscussionController_CommentOptions_Handler($sender, $args) {
+      if (!isset($args['Comment']))
          return;
-      $Comment = $Args['Comment'];
-      if (!GetValue('Type', $Comment) == 'Whisper')
+      $comment = $args['Comment'];
+      if (!GetValue('Type', $comment) == 'Whisper')
          return;
 
-      $Sender->Options = '';
+      $sender->Options = '';
    }
 
-   public function DiscussionsController_AfterCountMeta_Handler($Sender, $Args) {
-      $Discussion = GetValue('Discussion', $Args);
-      if (!$Discussion)
+   public function DiscussionsController_AfterCountMeta_Handler($sender, $args) {
+      $discussion = GetValue('Discussion', $args);
+      if (!$discussion)
          return;
 
-      if ($CountWhispers = GetValue('CountWhispers', $Discussion)) {
-         $Str = ' <span class="MItem WhisperCount">'.Plural($CountWhispers, '%s whisper', '%s whispers').'</span> ';
+      if ($countWhispers = GetValue('CountWhispers', $discussion)) {
+         $str = ' <span class="MItem WhisperCount">'.Plural($countWhispers, '%s whisper', '%s whispers').'</span> ';
 
-         if (GetValue('NewWhispers', $Discussion)) {
-            $Str .= ' <strong class="HasNew HasNew-Whispers">'.T('new').'</strong> ';
+         if (GetValue('NewWhispers', $discussion)) {
+            $str .= ' <strong class="HasNew HasNew-Whispers">'.T('new').'</strong> ';
          }
-         echo $Str;
+         echo $str;
       }
    }
 
    /**
     * Give moderators the option to put a discussion into 'private' mode.
     *
-    * @param DiscussionController $Sender
-    * @param int $DiscussionID
+    * @param DiscussionController $sender
+    * @param int $discussionID
     */
-   public function DiscussionController_MakeConversation_Create($Sender, $DiscussionID) {
-      $Sender->Permission('Garden.Moderation.Manage');
+   public function DiscussionController_MakeConversation_Create($sender, $discussionID) {
+      $sender->Permission('Garden.Moderation.Manage');
 
-      $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
-      if (!$Discussion)
+      $discussion = $sender->DiscussionModel->GetID($discussionID);
+      if (!$discussion)
          throw NotFoundException('Discussion');
 
-      $Discussion = (array)$Discussion;
-      if (!is_array($Discussion['Attributes']))
-         $Discussion['Attributes'] = [];
+      $discussion = (array)$discussion;
+      if (!is_array($discussion['Attributes']))
+         $discussion['Attributes'] = [];
 
-      $InsertUserID = $Discussion['InsertUserID'];
+      $insertUserID = $discussion['InsertUserID'];
 
       // Get the IDs of everyone that has participated in this conversation.
-      $Users = Gdn::SQL()
+      $users = Gdn::SQL()
          ->Select('InsertUserID', '', 'UserID')
          ->Distinct(TRUE)
          ->From('Comment')
-         ->Where('DiscussionID', $Discussion['DiscussionID'])
+         ->Where('DiscussionID', $discussion['DiscussionID'])
          ->Get()->ResultArray();
 
-      $Users = Gdn_DataSet::Index($Users, 'UserID');
+      $users = Gdn_DataSet::Index($users, 'UserID');
 
       // Make sure the current and discussion users are added.
-      if (!isset($Users[$InsertUserID]))
-         $Users[$InsertUserID] = ['UserID' => $InsertUserID];
+      if (!isset($users[$insertUserID]))
+         $users[$insertUserID] = ['UserID' => $insertUserID];
 
-      if (!isset($Users[Gdn::Session()->UserID]))
-         $Users[Gdn::Session()->UserID] = ['UserID' => Gdn::Session()->UserID];
+      if (!isset($users[Gdn::Session()->UserID]))
+         $users[Gdn::Session()->UserID] = ['UserID' => Gdn::Session()->UserID];
 
-      Gdn::UserModel()->JoinUsers($Users, ['UserID']);
-      uasort($Users, [$this, 'UserRowCompare']);
+      Gdn::UserModel()->JoinUsers($users, ['UserID']);
+      uasort($users, [$this, 'UserRowCompare']);
 
-      $Sender->SetData('Users', $Users);
-      $Sender->SetData('Discussion', $Discussion);
+      $sender->SetData('Users', $users);
+      $sender->SetData('Discussion', $discussion);
 
-      if ($Sender->Form->IsPostBack()) {
-         $CheckedIDs = $Sender->Form->GetValue('UserID', []);
+      if ($sender->Form->IsPostBack()) {
+         $checkedIDs = $sender->Form->GetValue('UserID', []);
 
-         if (empty($CheckedIDs)) {
-            $Sender->Form->AddError('ValidateOneOrMoreArrayItemRequired', 'RecipientUserID');
+         if (empty($checkedIDs)) {
+            $sender->Form->AddError('ValidateOneOrMoreArrayItemRequired', 'RecipientUserID');
          } else {
             // Tell the discussion to start a new conversation, but don't start it just yet...
-            $Discussion['Attributes']['WhisperConversationID'] = TRUE;
-            $Discussion['Attributes']['WhisperUserIDs'] = $CheckedIDs;
+            $discussion['Attributes']['WhisperConversationID'] = TRUE;
+            $discussion['Attributes']['WhisperUserIDs'] = $checkedIDs;
 
-            $Sender->DiscussionModel->SetProperty($Discussion['DiscussionID'], 'Attributes', dbencode($Discussion['Attributes']));
+            $sender->DiscussionModel->SetProperty($discussion['DiscussionID'], 'Attributes', dbencode($discussion['Attributes']));
 
-            if ($Sender->DeliveryType() == DELIVERY_TYPE_ALL) {
-               redirectTo($Discussion['Url'].'#Form_Comment');
+            if ($sender->DeliveryType() == DELIVERY_TYPE_ALL) {
+               redirectTo($discussion['Url'].'#Form_Comment');
             }
          }
       } else {
-         $Sender->Form->SetValue('UserID', array_keys($Users));
+         $sender->Form->SetValue('UserID', array_keys($users));
       }
 
-      $Sender->SetData('Title', T('Continue in Private'));
-      $Sender->Render('MakeConversation', '', 'plugins/Whispers');
+      $sender->SetData('Title', T('Continue in Private'));
+      $sender->Render('MakeConversation', '', 'plugins/Whispers');
    }
 
    /**
     *
-    * @param DiscussionController $Sender
-    * @param int $DiscussionID
+    * @param DiscussionController $sender
+    * @param int $discussionID
     */
-   public function DiscussionController_MakePublic_Create($Sender, $TK, $DiscussionID) {
-      if (!Gdn::Session()->ValidateTransientKey($TK))
+   public function DiscussionController_MakePublic_Create($sender, $tK, $discussionID) {
+      if (!Gdn::Session()->ValidateTransientKey($tK))
          throw PermissionException();
 
-      $Discussion = $Sender->DiscussionModel->GetID($DiscussionID);
-      if (!$Discussion)
+      $discussion = $sender->DiscussionModel->GetID($discussionID);
+      if (!$discussion)
          throw NotFoundException('Discussion');
 
-      $Discussion = (array)$Discussion;
+      $discussion = (array)$discussion;
 
       unset(
-         $Discussion['Attributes']['WhisperConversationID'],
-         $Discussion['Attributes']['WhisperUserIDs']
+         $discussion['Attributes']['WhisperConversationID'],
+         $discussion['Attributes']['WhisperUserIDs']
          );
 
-      $Sender->DiscussionModel->SetProperty($DiscussionID, 'Attributes', dbencode($Discussion['Attributes']));
-      redirectTo($Discussion['Url'].'#Form_Comment');
+      $sender->DiscussionModel->SetProperty($discussionID, 'Attributes', dbencode($discussion['Attributes']));
+      redirectTo($discussion['Url'].'#Form_Comment');
    }
 
    /**
-    * @param DiscussionController $Sender
+    * @param DiscussionController $sender
     */
-   public function DiscussionController_Render_Before($Sender, $Args) {
-      $ConversationID = $Sender->Data('Discussion.Attributes.WhisperConversationID');
-      if (!$ConversationID)
+   public function DiscussionController_Render_Before($sender, $args) {
+      $conversationID = $sender->Data('Discussion.Attributes.WhisperConversationID');
+      if (!$conversationID)
          return;
 
-      if ($ConversationID === TRUE) {
-         $UserIDs = $Sender->Data('Discussion.Attributes.WhisperUserIDs');
+      if ($conversationID === TRUE) {
+         $userIDs = $sender->Data('Discussion.Attributes.WhisperUserIDs');
          // Grab the users that are in the conversaton.
-         $WhisperUsers = [];
-         foreach ($UserIDs as $UserID) {
-            $WhisperUsers[] = ['UserID' => $UserID];
+         $whisperUsers = [];
+         foreach ($userIDs as $userID) {
+            $whisperUsers[] = ['UserID' => $userID];
          }
       } else {
          // There is already a conversation so grab its users.
-         $WhisperUsers = Gdn::SQL()
+         $whisperUsers = Gdn::SQL()
             ->Select('UserID')
             ->From('UserConversation')
-            ->Where('ConversationID', $ConversationID)
+            ->Where('ConversationID', $conversationID)
             ->Where('Deleted', 0)
             ->Get()->ResultArray();
-         $UserIDs = array_column($WhisperUsers, 'UserID');
+         $userIDs = array_column($whisperUsers, 'UserID');
       }
 
-      if (!Gdn::Session()->CheckPermission('Conversations.Moderation.Manage') && !in_array(Gdn::Session()->UserID, $UserIDs)) {
-         $Sender->Data['Discussion']->Closed = TRUE;
+      if (!Gdn::Session()->CheckPermission('Conversations.Moderation.Manage') && !in_array(Gdn::Session()->UserID, $userIDs)) {
+         $sender->Data['Discussion']->Closed = TRUE;
          return;
       }
 
-      Gdn::UserModel()->JoinUsers($WhisperUsers, ['UserID']);
-      $Sender->SetData('WhisperUsers', $WhisperUsers);
+      Gdn::UserModel()->JoinUsers($whisperUsers, ['UserID']);
+      $sender->SetData('WhisperUsers', $whisperUsers);
    }
 
    /**
     * Join message counts into the discussion list.
-    * @param DiscussionModel $Sender
-    * @param array $Args
+    * @param DiscussionModel $sender
+    * @param array $args
     */
-   public function DiscussionModel_AfterAddColumns_Handler($Sender, $Args) {
+   public function DiscussionModel_AfterAddColumns_Handler($sender, $args) {
       if (!Gdn::Session()->UserID)
          return;
 
-      $Data = $Args['Data'];
-      $Result =& $Data->Result();
+      $data = $args['Data'];
+      $result =& $data->Result();
 
       // Gather the discussion IDs.
-      $DiscusisonIDs = [];
+      $discusisonIDs = [];
 
-      foreach ($Result as $Row) {
-         $DiscusisonIDs[] = GetValue('DiscussionID', $Row);
+      foreach ($result as $row) {
+         $discusisonIDs[] = GetValue('DiscussionID', $row);
       }
 
       // Grab all of the whispers associated to the discussions being looked at.
-      $Sql = Gdn::SQL()
+      $sql = Gdn::SQL()
          ->Select('c.DiscussionID')
          ->Select('c.CountMessages', 'sum', 'CountMessages')
          ->Select('c.DateUpdated', 'max', 'DateLastMessage')
          ->From('Conversation c')
-         ->WhereIn('c.DiscussionID', $DiscusisonIDs)
+         ->WhereIn('c.DiscussionID', $discusisonIDs)
          ->GroupBy('c.DiscussionID');
 
       if (!Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
-         $Sql->Join('UserConversation uc', 'c.ConversationID = uc.ConversationID')
+         $sql->Join('UserConversation uc', 'c.ConversationID = uc.ConversationID')
             ->Where('uc.UserID', Gdn::Session()->UserID);
       }
 
-      $Conversations = $Sql->Get()->ResultArray();
-      $Conversations = Gdn_DataSet::Index($Conversations, 'DiscussionID');
+      $conversations = $sql->Get()->ResultArray();
+      $conversations = Gdn_DataSet::Index($conversations, 'DiscussionID');
 
-      foreach ($Result as &$Row) {
-         $DiscusisonID = GetValue('DiscussionID', $Row);
-         $CRow = GetValue($DiscusisonID, $Conversations);
+      foreach ($result as &$row) {
+         $discusisonID = GetValue('DiscussionID', $row);
+         $cRow = GetValue($discusisonID, $conversations);
 
-         if (!$CRow)
+         if (!$cRow)
             continue;
 
-         $DateLastViewed = GetValue('DateLastViewed', $Row);
-         $DateLastMessage = $CRow['DateLastMessage'];
-         $NewWhispers = Gdn_Format::ToTimestamp($DateLastViewed) < Gdn_Format::ToTimestamp($DateLastMessage);
+         $dateLastViewed = GetValue('DateLastViewed', $row);
+         $dateLastMessage = $cRow['DateLastMessage'];
+         $newWhispers = Gdn_Format::ToTimestamp($dateLastViewed) < Gdn_Format::ToTimestamp($dateLastMessage);
 
-         SetValue('CountWhispers', $Row, $CRow['CountMessages']);
-         SetValue('DateLastWhisper', $Row, $DateLastMessage);
-         SetValue('NewWhispers', $Row, $NewWhispers);
+         SetValue('CountWhispers', $row, $cRow['CountMessages']);
+         SetValue('DateLastWhisper', $row, $dateLastMessage);
+         SetValue('NewWhispers', $row, $newWhispers);
       }
 
    }
@@ -409,11 +409,11 @@ class WhispersPlugin extends Gdn_Plugin {
       include $Sender->FetchViewLocation('BeforeConversation', '', 'plugins/Whispers');
    }
 
-   public function MessagesController_BeforeConversationMeta_Handler($Sender, $Args) {
-      $DiscussionID = GetValueR('Conversation.DiscussionID', $Args);
+   public function MessagesController_BeforeConversationMeta_Handler($sender, $args) {
+      $discussionID = GetValueR('Conversation.DiscussionID', $args);
 
-      if ($DiscussionID) {
-         echo '<span class="MetaItem Tag Whispers-Tag">'.Anchor(T('Whisper'), "/discussion/$DiscussionID/x").'</span>';
+      if ($discussionID) {
+         echo '<span class="MetaItem Tag Whispers-Tag">'.Anchor(T('Whisper'), "/discussion/$discussionID/x").'</span>';
       }
    }
 

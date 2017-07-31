@@ -134,10 +134,10 @@ class SearchModel extends Gdn_Model {
     /**
      * Get comments by ID list
      *
-     * @param array $IDs
+     * @param array $iDs
      * @return array
      */
-    public function getComments($IDs) {
+    public function getComments($iDs) {
 
         $this->fireEvent("GetComments");
 
@@ -152,7 +152,7 @@ class SearchModel extends Gdn_Model {
 
         $result = $sql->from('Comment c')
             ->join('Discussion d', 'd.DiscussionID = c.DiscussionID')
-            ->whereIn('c.CommentID', $IDs)
+            ->whereIn('c.CommentID', $iDs)
             ->get()->resultArray();
 
         foreach ($result as &$row) {
@@ -165,10 +165,10 @@ class SearchModel extends Gdn_Model {
     /**
      * Get discussions by ID list
      *
-     * @param array $IDs
+     * @param array $iDs
      * @return array
      */
-    public function getDiscussions($IDs) {
+    public function getDiscussions($iDs) {
 
         $this->fireEvent("GetDiscussions");
 
@@ -182,7 +182,7 @@ class SearchModel extends Gdn_Model {
         }
 
         $result = $sql->from('Discussion d')
-            ->whereIn('d.DiscussionID', $IDs)
+            ->whereIn('d.DiscussionID', $iDs)
             ->get()->resultArray();
 
         foreach ($result as &$row) {
@@ -197,10 +197,10 @@ class SearchModel extends Gdn_Model {
     /**
      * Get groups by ID list
      *
-     * @param array $IDs
+     * @param array $iDs
      * @return array
      */
-    public function getGroups($IDs) {
+    public function getGroups($iDs) {
 
         $this->fireEvent("GetGroups");
 
@@ -210,7 +210,7 @@ class SearchModel extends Gdn_Model {
             ->select('g.InsertUserID as UserID');
 
         $result = $sql->from('Group g')
-            ->whereIn('g.GroupID', $IDs)
+            ->whereIn('g.GroupID', $iDs)
             ->get()->resultArray();
 
         foreach ($result as &$row) {
@@ -226,16 +226,16 @@ class SearchModel extends Gdn_Model {
     /**
      * Get pages by ID list
      *
-     * @param array $IDs
+     * @param array $iDs
      * @return array
      */
-    public function getPages($IDs) {
+    public function getPages($iDs) {
         $result = Gdn::SQL()
             ->select('p.*')
             ->select('u.UserID, u.Name as Username, u.Photo')
             ->from('Page p')
             ->join('User u', 'p.InsertUserID = u.UserID', 'left')
-            ->whereIn('p.PageID', $IDs)
+            ->whereIn('p.PageID', $iDs)
             ->get()->resultArray();
 
         $pageModel = new PageModel();
@@ -269,30 +269,30 @@ class SearchModel extends Gdn_Model {
         $result = [];
 
         // Loop through the matches to figure out which IDs we have to grab.
-        $IDs = [];
+        $iDs = [];
         if (!is_array($search) || !isset($search['matches'])) {
             return [];
         }
 
         foreach ($search['matches'] as $documentID => $info) {
-            $ID = (int) ($documentID / 10);
+            $iD = (int) ($documentID / 10);
             $type = $documentID % 10;
 
-            $IDs[$type][] = $ID;
+            $iDs[$type][] = $iD;
         }
 
         // Grab all of the documents.
         $documents = [];
-        foreach ($IDs as $type => $IDin) {
+        foreach ($iDs as $type => $iDin) {
             if (!isset($this->typeInfo[$type])) {
                 continue;
             }
-            $docs = call_user_func($this->typeInfo[$type]['GetCallback'], $IDin);
+            $docs = call_user_func($this->typeInfo[$type]['GetCallback'], $iDin);
 
             // Index the document according to the type again.
             foreach ($docs as $row) {
-                $ID = $row['PrimaryID'] * 10 + $type;
-                $documents[$ID] = $row;
+                $iD = $row['PrimaryID'] * 10 + $type;
+                $documents[$iD] = $row;
             }
         }
 
@@ -358,9 +358,9 @@ class SearchModel extends Gdn_Model {
 
         if (isset($search['title'])) {
             $indexes = $this->indexes('Discussion');
-            list($TitleQuery, $TitleTerms) = $this->splitTags($search['title']);
-            $query .= ' @name ' . $TitleQuery;
-            $terms = array_merge($terms, $TitleTerms);
+            list($titleQuery, $titleTerms) = $this->splitTags($search['title']);
+            $query .= ' @name ' . $titleQuery;
+            $terms = array_merge($terms, $titleTerms);
         }
 
         if (isset($search['users'])) {

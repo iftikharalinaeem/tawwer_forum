@@ -8,20 +8,20 @@ class VanillaBulletinThemeHooks implements Gdn_IPlugin {
    
    /**
     * Add new discussion & conversation buttons to various pages.
-    * @param Gdn_Controller $Sender;
+    * @param Gdn_Controller $sender;
     */
-   public function CategoriesController_Render_Before($Sender) {
-      if ($Sender->RequestMethod != 'index')
-         $this->_MovePanel($Sender, 'Discussion');
+   public function CategoriesController_Render_Before($sender) {
+      if ($sender->RequestMethod != 'index')
+         $this->_MovePanel($sender, 'Discussion');
    }
    
-   public function DiscussionsController_Render_Before($Sender) {
-      $this->_MovePanel($Sender, 'Discussion');
+   public function DiscussionsController_Render_Before($sender) {
+      $this->_MovePanel($sender, 'Discussion');
    }
    
-   public function Gdn_Dispatcher_AppStartup_Handler($Sender) {
-      $UserID = Gdn::Session()->UserID;
-      if (!$UserID)
+   public function Gdn_Dispatcher_AppStartup_Handler($sender) {
+      $userID = Gdn::Session()->UserID;
+      if (!$userID)
          return;
       
       // Verified users can post discussions.
@@ -32,36 +32,36 @@ class VanillaBulletinThemeHooks implements Gdn_IPlugin {
       if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage'))
          return;
       
-      $CountComments = Gdn::Session()->User->CountComments;
-      if ($CountComments === NULL) {
-         $CountComments = Gdn::SQL()
+      $countComments = Gdn::Session()->User->CountComments;
+      if ($countComments === NULL) {
+         $countComments = Gdn::SQL()
             ->Select('CommentID', 'count', 'CountComments')
             ->From('Comment')
-            ->Where('InsertUserID', $UserID)
+            ->Where('InsertUserID', $userID)
             ->Get()->Value('CountComments', 0);
          
-         Gdn::UserModel()->SetField($UserID, 'CountComments', $CountComments);
+         Gdn::UserModel()->SetField($userID, 'CountComments', $countComments);
       }
    }
    
-   public function Base_Render_Before($Sender) {
-      $Sender->SetData('_SERVER_NAME', $_SERVER["SERVER_NAME"]);
-      $Sender->SetData('_REQUEST_URI', $_SERVER["REQUEST_URI"]);
+   public function Base_Render_Before($sender) {
+      $sender->SetData('_SERVER_NAME', $_SERVER["SERVER_NAME"]);
+      $sender->SetData('_REQUEST_URI', $_SERVER["REQUEST_URI"]);
    }
-   public function DraftsController_Render_Before($Sender) {
-      $this->_MovePanel($Sender, 'Discussion');
+   public function DraftsController_Render_Before($sender) {
+      $this->_MovePanel($sender, 'Discussion');
    }
   
-   public function PostController_Render_Before($Sender) {
-      $this->_MovePanel($Sender, 'Discussion');
+   public function PostController_Render_Before($sender) {
+      $this->_MovePanel($sender, 'Discussion');
    }
    
-   private function _MovePanel($Sender, $ButtonType) {
-      if ($ButtonType == 'Discussion') {
+   private function _MovePanel($sender, $buttonType) {
+      if ($buttonType == 'Discussion') {
          // $Sender->AddModule('NewDiscussionModule', 'Content');
-      } else if (isset($Sender->Assets['Panel'][$ButtonType])) {
-         $Sender->Assets['Content'][$ButtonType] = $Sender->Assets['Panel'][$ButtonType];
-         unset($Sender->Assets['Content'][$ButtonType]);
+      } else if (isset($sender->Assets['Panel'][$buttonType])) {
+         $sender->Assets['Content'][$buttonType] = $sender->Assets['Panel'][$buttonType];
+         unset($sender->Assets['Content'][$buttonType]);
       }
    }
 }

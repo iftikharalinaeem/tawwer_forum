@@ -8,8 +8,8 @@ class FeaturedPlugin extends Gdn_Plugin {
 
    public function Structure() {
       if (class_exists('ReactionModel')) {
-         $Rm = new ReactionModel();
-         $Rm->DefineReactionType(['UrlCode' => 'Feature', 'Name' => 'Feature', 'Sort' => '0', 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'Points' => 1,
+         $rm = new ReactionModel();
+         $rm->DefineReactionType(['UrlCode' => 'Feature', 'Name' => 'Feature', 'Sort' => '0', 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'Points' => 1,
          'Description' => 'Feature a discussion.', 'Permission' => 'Garden.Curation.Manage', 'RecordTypes' => ['discussion']], 'Featured');
       }
    }

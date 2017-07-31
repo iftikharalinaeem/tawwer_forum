@@ -34,24 +34,24 @@ class ColorPickerPlugin extends Gdn_Plugin {
    /** Standard plugin setup method. */
    public function Setup() {
       // Make sure the folder for uploaded files exists.
-      $UploadPath = PATH_UPLOADS.'/ColorPicker';
-      if (!file_exists($UploadPath)) {
-         mkdir($UploadPath, 0777, TRUE);
+      $uploadPath = PATH_UPLOADS.'/ColorPicker';
+      if (!file_exists($uploadPath)) {
+         mkdir($uploadPath, 0777, TRUE);
       }
 
-      $this->Settings()->GenerateCustomCss($UploadPath.'/custom.css');
+      $this->Settings()->GenerateCustomCss($uploadPath.'/custom.css');
    }
 
    /**
     *
-    * @param Gdn_Controller $Sender
+    * @param Gdn_Controller $sender
     */
-   public function Base_Render_Before($Sender) {
-      $Session = Gdn::Session();
+   public function Base_Render_Before($sender) {
+      $session = Gdn::Session();
 
       // Add the color picker.
-      if ($Session->IsValid() /* && $Session->GetPreference('Plugins.ColorPicker.EditColors') */) {
-         $this->Settings()->EditColors($Sender);
+      if ($session->IsValid() /* && $Session->GetPreference('Plugins.ColorPicker.EditColors') */) {
+         $this->Settings()->EditColors($sender);
       }
    }
 }

@@ -24,9 +24,9 @@ class NoadminPlugin extends Gdn_Plugin {
     /**
      * Disable all admin level permissions.
      *
-     * @param Gdn_Dispatcher $Sender
+     * @param Gdn_Dispatcher $sender
      */
-    public function gdn_dispatcher_appStartup_handler($Sender) {
+    public function gdn_dispatcher_appStartup_handler($sender) {
         if (!Gdn::session()->User) {
             return;
         }

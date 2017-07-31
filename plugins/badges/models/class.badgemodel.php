@@ -21,43 +21,43 @@ class BadgeModel extends Gdn_Model {
     /**
      * Prep data for single badge or array of badges.
      *
-     * @param array $Badge
+     * @param array $badge
      */
-    public function calculate(&$Badge) {
-        if (is_array($Badge) && isset($Badge[0])) {
+    public function calculate(&$badge) {
+        if (is_array($badge) && isset($badge[0])) {
             // Multiple badges
-            foreach ($Badge as &$B) {
-                $this->_calculate($B);
+            foreach ($badge as &$b) {
+                $this->_calculate($b);
             }
-        } elseif ($Badge) {
+        } elseif ($badge) {
             // One valid result
-            $this->_calculate($Badge);
+            $this->_calculate($badge);
         }
     }
 
     /**
      * Prep badge data.
      */
-    protected function _calculate(&$Badge) {
-        if (isset($Badge['Attributes']) && !empty($Badge['Attributes'])) {
-            $Badge['Attributes'] = dbdecode($Badge['Attributes']);
+    protected function _calculate(&$badge) {
+        if (isset($badge['Attributes']) && !empty($badge['Attributes'])) {
+            $badge['Attributes'] = dbdecode($badge['Attributes']);
         } else {
-            $Badge['Attributes'] = [];
+            $badge['Attributes'] = [];
         }
 
-        if ($Badge['Photo'] != '') {
-            $Badge['Photo'] = Gdn_Upload::url($Badge['Photo']);
+        if ($badge['Photo'] != '') {
+            $badge['Photo'] = Gdn_Upload::url($badge['Photo']);
         }
     }
 
     /**
      * Create a new badge. Do not modify an existing badge.
      */
-    public function define($Data) {
-        $Slug = val('Slug', $Data);
-        $ExistingBadge = $this->getID($Slug);
+    public function define($data) {
+        $slug = val('Slug', $data);
+        $existingBadge = $this->getID($slug);
 
-        return ($ExistingBadge) ? val('BadgeID', $ExistingBadge) : $this->save($Data);
+        return ($existingBadge) ? val('BadgeID', $existingBadge) : $this->save($data);
     }
 
     /**
@@ -66,73 +66,73 @@ class BadgeModel extends Gdn_Model {
      * @since 1.0.0
      * @access public
      *
-     * @param array $Badges
+     * @param array $badges
      * @return array Filtered badge list.
      */
-    public static function filterByClass($Badges) {
-        $FilteredBadges = [];
+    public static function filterByClass($badges) {
+        $filteredBadges = [];
 
-        foreach ($Badges as $Badge) {
-            $Class = val('Class', $Badge);
+        foreach ($badges as $badge) {
+            $class = val('Class', $badge);
 
             // Keep highest level badge of each class and all classless badges
-            if ($Class) {
-                if (isset($FilteredBadges[$Class])) {
-                    if (val('Level', $Badge) > val('Level', $FilteredBadges[$Class])) {
-                        $FilteredBadges[$Class] = $Badge;
+            if ($class) {
+                if (isset($filteredBadges[$class])) {
+                    if (val('Level', $badge) > val('Level', $filteredBadges[$class])) {
+                        $filteredBadges[$class] = $badge;
                     }
                 } else {
-                    $FilteredBadges[$Class] = $Badge;
+                    $filteredBadges[$class] = $badge;
                 }
             } else {
-                $FilteredBadges[] = $Badge;
+                $filteredBadges[] = $badge;
             }
         }
 
-        return $FilteredBadges;
+        return $filteredBadges;
     }
 
     /**
      * Get badges of a single type.
      *
-     * @param string $Type Valid: Custom, Manual, UserCount, Timeout, DiscussionContent.
+     * @param string $type Valid: Custom, Manual, UserCount, Timeout, DiscussionContent.
      * @return Dataset
      */
-    public function getByType($Type) {
-        $Result = $this->getWhere(['Type' => $Type], 'Threshold', 'desc')->resultArray();
-        $this->calculate($Result);
-        return $Result;
+    public function getByType($type) {
+        $result = $this->getWhere(['Type' => $type], 'Threshold', 'desc')->resultArray();
+        $this->calculate($result);
+        return $result;
     }
 
     /**
      * Get a single badge by ID, slug, or data array.
      *
-     * @param mixed $Badge Int, string, or array.
+     * @param mixed $badge Int, string, or array.
      * @param string $datasetType The format for the badge.
      * @param array $options Not used.
      * @return array|ArrayObject|false Returns the badge or **false** if it isn't found.
      */
-    public function getID($Badge, $datasetType = false, $options = []) {
+    public function getID($badge, $datasetType = false, $options = []) {
         $datasetType = $datasetType ?: DATASET_TYPE_ARRAY;
 
-        if (is_numeric($Badge)) {
-            $Result = parent::getID($Badge, DATASET_TYPE_ARRAY);
-        } elseif (is_string($Badge)) {
-            $Result = $this->getWhere(['Slug' => $Badge])->firstRow(DATASET_TYPE_ARRAY);
-        } elseif (is_array($Badge)) {
-            $Result = $Badge;
+        if (is_numeric($badge)) {
+            $result = parent::getID($badge, DATASET_TYPE_ARRAY);
+        } elseif (is_string($badge)) {
+            $result = $this->getWhere(['Slug' => $badge])->firstRow(DATASET_TYPE_ARRAY);
+        } elseif (is_array($badge)) {
+            $result = $badge;
         } else {
             return false;
         }
 
-        if ($Result) {
-            $this->calculate($Result);
+        if ($result) {
+            $this->calculate($result);
 
             if ($datasetType === DATASET_TYPE_OBJECT) {
-                $Result = new ArrayObject($Result);
+                $result = new ArrayObject($result);
             }
 
-            return $Result;
+            return $result;
         }
 
         return false;
@@ -154,8 +154,8 @@ class BadgeModel extends Gdn_Model {
     /**
      * Get badges list for public viewing.
      */
-    public function getFilteredList($UserID, $Exclusive = false) {
-        $ListQuery = $this->SQL
+    public function getFilteredList($userID, $exclusive = false) {
+        $listQuery = $this->SQL
             ->select('b.*')
             ->select('ub.DateInserted', '', 'DateGiven')
             ->select('ub.InsertUserID', '', 'GivenByUserID')
@@ -163,20 +163,20 @@ class BadgeModel extends Gdn_Model {
             ->from('Badge b');
 
         // Only badges this user has earned
-        if ($Exclusive) {
-            $ListQuery->join('UserBadge ub', 'b.BadgeID = ub.BadgeID AND ub.UserID = '.intval($UserID).' AND ub.DateCompleted is not null');
+        if ($exclusive) {
+            $listQuery->join('UserBadge ub', 'b.BadgeID = ub.BadgeID AND ub.UserID = '.intval($userID).' AND ub.DateCompleted is not null');
         } // All badges, highlighting user's earned badges
         else {
-            $ListQuery->leftJoin('UserBadge ub', 'b.BadgeID = ub.BadgeID AND ub.UserID = '.intval($UserID).' AND ub.DateCompleted is not null');
+            $listQuery->leftJoin('UserBadge ub', 'b.BadgeID = ub.BadgeID AND ub.UserID = '.intval($userID).' AND ub.DateCompleted is not null');
         }
 
-        $Badges = $ListQuery->where('Visible', 1)
+        $badges = $listQuery->where('Visible', 1)
             ->where('Active', 1)
             ->orderBy('Name', 'asc')
             ->get()->resultArray();
 
-        $this->calculate($Badges);
-        return $Badges;
+        $this->calculate($badges);
+        return $badges;
     }
 
     /**
@@ -220,19 +220,19 @@ class BadgeModel extends Gdn_Model {
     public function save($data, $settings = []) {
         // See if there is an existing badge.
         if (val('Slug', $data) && !val('BadgeID', $data)) {
-            $ExistingBadge = $this->getID($data['Slug']);
-            if ($ExistingBadge) {
-                $Different = false;
-                foreach ($data as $Key => $Value) {
-                    if (array_key_exists($Key, $ExistingBadge) && $ExistingBadge[$Key] != $Value) {
-                        $Different = true;
+            $existingBadge = $this->getID($data['Slug']);
+            if ($existingBadge) {
+                $different = false;
+                foreach ($data as $key => $value) {
+                    if (array_key_exists($key, $existingBadge) && $existingBadge[$key] != $value) {
+                        $different = true;
                         break;
                     }
                 }
-                if (!$Different) {
-                    return $ExistingBadge['BadgeID'];
+                if (!$different) {
+                    return $existingBadge['BadgeID'];
                 }
-                $data['BadgeID'] = $ExistingBadge['BadgeID'];
+                $data['BadgeID'] = $existingBadge['BadgeID'];
 
             }
         }

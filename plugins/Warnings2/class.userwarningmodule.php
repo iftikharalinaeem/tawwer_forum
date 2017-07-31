@@ -4,7 +4,7 @@ class UserWarningModule extends Gdn_Module {
 
     public $UserID;
 
-    public function __construct($Sender = '', $ApplicationFolder = false) {
+    public function __construct($sender = '', $applicationFolder = false) {
         $this->_ApplicationFolder = 'plugins/Warnings2';
     }
 
@@ -23,17 +23,17 @@ class UserWarningModule extends Gdn_Module {
         }
 
         // Grab the data.
-        $UserAlertModel = new UserAlertModel();
-        $Alert = $UserAlertModel->getID($this->UserID);
-        $this->Data = $Alert;
+        $userAlertModel = new UserAlertModel();
+        $alert = $userAlertModel->getID($this->UserID);
+        $this->Data = $alert;
         if (!$this->data('WarningLevel')) {
             return '';
         }
 
-        $User = Gdn::userModel()->getID($this->UserID);
-        $this->setData('Punished', val('Punished', $User));
-        $this->setData('Banned', val('Banned', $User));
-        $this->setData('Name', val('Name', $User));
+        $user = Gdn::userModel()->getID($this->UserID);
+        $this->setData('Punished', val('Punished', $user));
+        $this->setData('Banned', val('Banned', $user));
+        $this->setData('Name', val('Name', $user));
 
         return parent::toString();
     }

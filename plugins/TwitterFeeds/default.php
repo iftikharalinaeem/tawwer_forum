@@ -24,21 +24,21 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 	 *
 	 * @todo Make use of http://twitter.com/javascripts/blogger.js ??
 	 */
-	public function ProfileController_AddProfileTabs_Handler($Sender)
+	public function ProfileController_AddProfileTabs_Handler($sender)
 	{
 		// Get the selected User's Twitter Name
-		$TwitterName = $Sender->User->TwitterName;
+		$twitterName = $sender->User->TwitterName;
 		
-		if (!empty($TwitterName))
+		if (!empty($twitterName))
 		{
 			
 			/**
 			 * CUSTOM SETTINGS
 			 */
-			$NumberOfTweets		= 6;		// [Integer] - The number of Tweets to fetch
-			$LinkifyUsernames	= TRUE;		// [TRUE|FALSE] - Automatic linkify Twitter Usernames inside a Tweet
-			$UseHovercards		= TRUE;		// [TRUE|FALSE] - Show context-aware Tooltips when hovering a Twitter Username in a Tweet
-			$AddFollowButton	= FALSE;	// [TRUE|FALSE] - Adds also a Follow Button for that particular User
+			$numberOfTweets		= 6;		// [Integer] - The number of Tweets to fetch
+			$linkifyUsernames	= TRUE;		// [TRUE|FALSE] - Automatic linkify Twitter Usernames inside a Tweet
+			$useHovercards		= TRUE;		// [TRUE|FALSE] - Show context-aware Tooltips when hovering a Twitter Username in a Tweet
+			$addFollowButton	= FALSE;	// [TRUE|FALSE] - Adds also a Follow Button for that particular User
 			
 			
 			/**
@@ -46,64 +46,64 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 			 *
 			 * !! DO NOT MODIFY !!
 			 */
-			$TwApiKey = '0YeyyhFafvSMoGTam5OjZQ'; // Twitter API-Key to use with this Plugin
-			$NumberOfTweets = ($NumberOfTweets < 1) ? 5 : $NumberOfTweets; // Validate that no stupid Custom Settings have been made ;-)
-			$HtmlOut = '';	// HTML Content of the new Side Panel
+			$twApiKey = '0YeyyhFafvSMoGTam5OjZQ'; // Twitter API-Key to use with this Plugin
+			$numberOfTweets = ($numberOfTweets < 1) ? 5 : $numberOfTweets; // Validate that no stupid Custom Settings have been made ;-)
+			$htmlOut = '';	// HTML Content of the new Side Panel
 			
 			/**
 			 * Build the User's Twitter Feed
 			 * @link http://apiwiki.twitter.com/Twitter-REST-API-Method%3A-statuses-user_timeline
 			 */
-			$TweetsJson = 'http://api.twitter.com/1/statuses/user_timeline.json?id='.$Sender->User->TwitterName.'&count='.$NumberOfTweets;
-			$Tweets = json_decode(file_get_contents($TweetsJson), TRUE);	// Grab the Twitter Feed from the URL into an Array
+			$tweetsJson = 'http://api.twitter.com/1/statuses/user_timeline.json?id='.$sender->User->TwitterName.'&count='.$numberOfTweets;
+			$tweets = json_decode(file_get_contents($tweetsJson), TRUE);	// Grab the Twitter Feed from the URL into an Array
 			
 			/**
 			 * Initialize Twitter @Anywhere
 			 * @link http://dev.twitter.com/anywhere/begin
 			 */
-			$HtmlOut .= '<script src="http://platform.twitter.com/anywhere.js?id='.$TwApiKey.'" type="text/javascript"></script>';
-			$HtmlOut .= '<script type="text/javascript">twttr.anywhere(function (T) {';
-			$HtmlOut .= ($LinkifyUsernames === TRUE) ? 'T(".Tweet").linkifyUsers();' : '';
-			$HtmlOut .= ($UseHovercards === TRUE) ? 'T(".Tweet").hovercards();' : '';
-			$HtmlOut .= '});</script>';
+			$htmlOut .= '<script src="http://platform.twitter.com/anywhere.js?id='.$twApiKey.'" type="text/javascript"></script>';
+			$htmlOut .= '<script type="text/javascript">twttr.anywhere(function (T) {';
+			$htmlOut .= ($linkifyUsernames === TRUE) ? 'T(".Tweet").linkifyUsers();' : '';
+			$htmlOut .= ($useHovercards === TRUE) ? 'T(".Tweet").hovercards();' : '';
+			$htmlOut .= '});</script>';
 			
 			/**
 			 * Construct the Tweets Output
 			 */
-			$Sender->AddCssFile('twitterfeeds.css', 'plugins/TwitterFeeds');
-			$HtmlOut .= '<div id="TwitterFeeds" class="Box">';
-			$HtmlOut .= '<div id="TwitterFeedsTitle">';
-			  $HtmlOut .= '<div id="TwitterIcon"></div>';
-			  $HtmlOut .= '<div><h4><a href="http://twitter.com/'.$TwitterName.'" title="'.$Sender->User->Name.T(' on Twitter').'">'.$TwitterName.'</a></h4></div>';
-			$HtmlOut .= '</div>';
-			$HtmlOut .= '<ul class="PanelInfo">';
+			$sender->AddCssFile('twitterfeeds.css', 'plugins/TwitterFeeds');
+			$htmlOut .= '<div id="TwitterFeeds" class="Box">';
+			$htmlOut .= '<div id="TwitterFeedsTitle">';
+			  $htmlOut .= '<div id="TwitterIcon"></div>';
+			  $htmlOut .= '<div><h4><a href="http://twitter.com/'.$twitterName.'" title="'.$sender->User->Name.T(' on Twitter').'">'.$twitterName.'</a></h4></div>';
+			$htmlOut .= '</div>';
+			$htmlOut .= '<ul class="PanelInfo">';
 			
-			foreach ($Tweets as $Tweet)
+			foreach ($tweets as $tweet)
 			{
-				$CreatedAt = strtotime($Tweet['created_at']);
+				$createdAt = strtotime($tweet['created_at']);
 				
-				$HtmlOut .= '<li class="Tweet">';
-				$HtmlOut .= Gdn_Format::Links($Tweet['text']);
-				$HtmlOut .= ' <small><a href="http://twitter.com/'.$TwitterName.'/statuses/'.$Tweet['id'].'">'.Gdn_Format::Date($CreatedAt).'</a></small>';
-				$HtmlOut .= '</li>';
+				$htmlOut .= '<li class="Tweet">';
+				$htmlOut .= Gdn_Format::Links($tweet['text']);
+				$htmlOut .= ' <small><a href="http://twitter.com/'.$twitterName.'/statuses/'.$tweet['id'].'">'.Gdn_Format::Date($createdAt).'</a></small>';
+				$htmlOut .= '</li>';
 			}
-			$HtmlOut .= '</ul>';
+			$htmlOut .= '</ul>';
 			
 			// If enabled, add also a Follow Button to the Page
-			if ($AddFollowButton === TRUE)
+			if ($addFollowButton === TRUE)
 			{
-				$HtmlOut .= '<span id="follow-'.$TwitterName.'"></span>';
-				$HtmlOut .= '<script type="text/javascript">';
-				$HtmlOut .= 'twttr.anywhere(function (T) {';
-				$HtmlOut .= 'T("#follow-'.$TwitterName.'").followButton("'.$TwitterName.'");';
-				$HtmlOut .= '});</script>';
+				$htmlOut .= '<span id="follow-'.$twitterName.'"></span>';
+				$htmlOut .= '<script type="text/javascript">';
+				$htmlOut .= 'twttr.anywhere(function (T) {';
+				$htmlOut .= 'T("#follow-'.$twitterName.'").followButton("'.$twitterName.'");';
+				$htmlOut .= '});</script>';
 			}
-			$HtmlOut .= '</div>';
+			$htmlOut .= '</div>';
 			
 			/**
 			 * Add the new Panel
 			 */
-			$Sender->AddAsset('Panel', $HtmlOut, 'TwitterFeeds');
+			$sender->AddAsset('Panel', $htmlOut, 'TwitterFeeds');
 			
 		} else {
 			return FALSE;
@@ -118,10 +118,10 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 	 * @since 1.0
 	 * @author Oliver Raduner <vanilla@raduner.ch>
 	 */
-	public function ProfileController_EditMyAccountAfter_Handler($Sender) {
+	public function ProfileController_EditMyAccountAfter_Handler($sender) {
 		echo '<li>';
-		echo $Sender->Form->Label('Twitter Name', 'TwitterName');
-		echo $Sender->Form->Input('TwitterName', 'text', ['maxlength' => 15]);
+		echo $sender->Form->Label('Twitter Name', 'TwitterName');
+		echo $sender->Form->Input('TwitterName', 'text', ['maxlength' => 15]);
 		echo '</li>';
 	}
 	
@@ -134,10 +134,10 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 	 */
 	public function Setup()
 	{
-		$Structure = Gdn::Structure();
+		$structure = Gdn::Structure();
 		
 		// Add an additional Column to the User DB-Table
-		$Structure->Table('User')
+		$structure->Table('User')
 			->Column('TwitterName', 'varchar(15)', TRUE)
 			->Set(FALSE, FALSE);
 	}	

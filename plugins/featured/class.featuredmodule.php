@@ -12,44 +12,44 @@ class FeaturedModule extends Gdn_Module {
    public $count = 6;
    public $reactionType = 'Feature';
 
-   public function __construct($Sender = '') {
+   public function __construct($sender = '') {
       $this->_ApplicationFolder = 'plugins/featured';
       $this->ClassName = get_class();
    }
 
    public function GetData() {
-      $DiscussionModel = new DiscussionModel();
-      $Discussions = new Gdn_DataSet([], DATASET_TYPE_ARRAY);
+      $discussionModel = new DiscussionModel();
+      $discussions = new Gdn_DataSet([], DATASET_TYPE_ARRAY);
 
       if (class_exists('ReactionModel')) {
-         $ReactionType = ReactionModel::ReactionTypes($this->reactionType);;
-         if ($ReactionType) {
-            $TagID = $ReactionType['TagID'];
+         $reactionType = ReactionModel::ReactionTypes($this->reactionType);;
+         if ($reactionType) {
+            $tagID = $reactionType['TagID'];
 
             // Get the IDs of the discussions that have been featured.
-            $DiscussionIDs = Gdn::SQL()->GetWhere('UserTag', [
+            $discussionIDs = Gdn::SQL()->GetWhere('UserTag', [
                'RecordType' => 'Discussion-Total',
-               'TagID' => $TagID,
+               'TagID' => $tagID,
                'Total >' => 0
                ], 'DateInserted', 'desc', $this->count)->ResultArray();
-            $DiscussionIDs = array_column($DiscussionIDs, 'RecordID');
-            if (!empty($DiscussionIDs)) {
-               $DiscussionData = $DiscussionModel->GetWhere(['d.DiscussionID' => $DiscussionIDs, 'Announce' => 'all'])->ResultArray();
-               $DiscussionData = Gdn_DataSet::Index($DiscussionData, 'DiscussionID');
+            $discussionIDs = array_column($discussionIDs, 'RecordID');
+            if (!empty($discussionIDs)) {
+               $discussionData = $discussionModel->GetWhere(['d.DiscussionID' => $discussionIDs, 'Announce' => 'all'])->ResultArray();
+               $discussionData = Gdn_DataSet::Index($discussionData, 'DiscussionID');
 
                // Make sure the result is ordered by the date they were featured.
-               $Result = [];
-               foreach ($DiscussionIDs as $ID) {
-                  if (isset($DiscussionData[$ID]))
-                     $Result[] = $DiscussionData[$ID];
+               $result = [];
+               foreach ($discussionIDs as $iD) {
+                  if (isset($discussionData[$iD]))
+                     $result[] = $discussionData[$iD];
                }
-               $Discussions = new Gdn_DataSet($Result, DATASET_TYPE_ARRAY);
+               $discussions = new Gdn_DataSet($result, DATASET_TYPE_ARRAY);
             }
          }
       } else {
-         $Discussions = $DiscussionModel->GetWhere([], 0, $this->count);
+         $discussions = $discussionModel->GetWhere([], 0, $this->count);
       }
-      $this->SetData('Discussions', $Discussions);
+      $this->SetData('Discussions', $discussions);
    }
 
    public function AssetTarget() {

@@ -18,13 +18,13 @@ class SnowStormPlugin extends Gdn_Plugin {
 	 * @version 1.0
 	 * @since 1.0
 	 */
-	public function Base_Render_Before($Sender) {
+	public function Base_Render_Before($sender) {
 		// Show the Plugin only on the discussions page
-		$DisplayOn =  ['discussionscontroller', 'categoriescontroller'];
-		if (!InArrayI($Sender->ControllerName, $DisplayOn)) return;
+		$displayOn =  ['discussionscontroller', 'categoriescontroller'];
+		if (!InArrayI($sender->ControllerName, $displayOn)) return;
 
 		// Attach the Plugin's JavaScript to the site
-		$Sender->AddJsFile('snowstorm-min.js', 'plugins/SnowStorm');
+		$sender->AddJsFile('snowstorm-min.js', 'plugins/SnowStorm');
 
 		// Edit some config
 		// For the list of options, see http://www.schillmania.com/projects/snowstorm/
@@ -41,7 +41,7 @@ class SnowStormPlugin extends Gdn_Plugin {
 		';
 
 		// Add the script to the page
-		$Sender->Head->AddString($snowStormSettings);
+		$sender->Head->AddString($snowStormSettings);
 	}
 
 	/**

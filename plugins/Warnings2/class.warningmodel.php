@@ -51,17 +51,17 @@ class WarningModel extends UserNoteModel {
             $warning = $this->getID($warning);
         }
 
-        $Session = Gdn::session();
+        $session = Gdn::session();
 
         // Let the warned user know who warned them, or not.
-        $WarnerIdentity = $Session->UserID;
+        $warnerIdentity = $session->UserID;
 
         // Use plugin icon as photo.
-        $Warnings2IconPath = preg_replace('/https?\:/i', '', asset('/plugins/Warnings2/icon.png', true));
+        $warnings2IconPath = preg_replace('/https?\:/i', '', asset('/plugins/Warnings2/icon.png', true));
 
-        $Activity = [
+        $activity = [
             'ActivityType' => 'Warning',
-            'ActivityUserID' => $WarnerIdentity,
+            'ActivityUserID' => $warnerIdentity,
             'HeadlineFormat' => t('HeadlineFormat.Warning.ToUser', 'You\'ve been <a href="{Url,html}" class="Popup">warned</a>.'),
             'RecordType' => $warning['RecordType'],
             'RecordID' => $warning['RecordID'],
@@ -70,18 +70,18 @@ class WarningModel extends UserNoteModel {
             'Route' => "/profile/viewnote/{$warning['WarningID']}",
             'NotifyUserID' => $warning['UserID'],
             'Notified' => true,
-            'Photo' => $Warnings2IconPath
+            'Photo' => $warnings2IconPath
         ];
 
-        $ActivityModel = new ActivityModel();
-        $Result = $ActivityModel->save($Activity, false, ['Force' => true]);
+        $activityModel = new ActivityModel();
+        $result = $activityModel->save($activity, false, ['Force' => true]);
 
-        $SavedActivityID = null;
-        if (isset($Result['ActivityID'])) {
-            $SavedActivityID = $Result['ActivityID'];
+        $savedActivityID = null;
+        if (isset($result['ActivityID'])) {
+            $savedActivityID = $result['ActivityID'];
         }
 
-        return $SavedActivityID;
+        return $savedActivityID;
     }
 
     /**
@@ -354,15 +354,15 @@ class WarningModel extends UserNoteModel {
         }
 
         // First we save the warning.
-        $ID = (int)parent::save($data, $settings);
-        if (!$ID) {
+        $iD = (int)parent::save($data, $settings);
+        if (!$iD) {
             return false;
         }
-        $data['WarningID'] = $ID;
+        $data['WarningID'] = $iD;
 
         $event = [
             'Warning' => $data,
-            'WarningID' => $ID
+            'WarningID' => $iD
         ];
 
         // Attach the warning to the source record.
@@ -372,7 +372,7 @@ class WarningModel extends UserNoteModel {
             $modelClass = $recordType.'Model';
             /* @var Gdn_Model $model */
             $model = new $modelClass;
-            $model->saveToSerializedColumn('Attributes', $recordID, 'WarningID', $ID);
+            $model->saveToSerializedColumn('Attributes', $recordID, 'WarningID', $iD);
 
             $event = array_merge($event, [
                 'RecordType' => $recordType,
@@ -385,13 +385,13 @@ class WarningModel extends UserNoteModel {
             $conversationID = $this->notifyWithMessage($data);
             if ($conversationID) {
                 // Save the conversation link back to the warning.
-                $this->setField($ID, ['ConversationID' => $conversationID]);
+                $this->setField($iD, ['ConversationID' => $conversationID]);
                 $event['ConversationID'] = $conversationID;
             }
         } else {
             $activityID = $this->notifyWithActivity($data);
             if ($activityID) {
-                $this->setField($ID, ['ActivityID' => $activityID]);
+                $this->setField($iD, ['ActivityID' => $activityID]);
                 $event['ActivityID'] = $activityID;
             }
         }
@@ -435,7 +435,7 @@ class WarningModel extends UserNoteModel {
 
         if (BanModel::isBanned(valr('Set.Banned', $processed), BanModel::BAN_WARNING)) {
             // Update the user note to indicate the ban.
-            $this->saveToSerializedColumn('Attributes', $ID, 'Banned', true);
+            $this->saveToSerializedColumn('Attributes', $iD, 'Banned', true);
             $event['Banned'] = true;
         }
 
@@ -445,7 +445,7 @@ class WarningModel extends UserNoteModel {
             $this->fireEvent('WarningAdded');
         }
 
-        return $ID;
+        return $iD;
     }
 
     /**

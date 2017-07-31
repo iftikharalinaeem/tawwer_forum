@@ -5,50 +5,50 @@
  */
 
 /**
- * @param $Group
+ * @param $group
  * @return string
  */
-function GroupSlug($Group) {
-    return $Group['GroupID'].'-'.Gdn_Format::Url($Group['Name']);
+function GroupSlug($group) {
+    return $group['GroupID'].'-'.Gdn_Format::Url($group['Name']);
 }
 
-function GroupUrl($Group, $Method = null, $WithDomain = '//') {
-    if ($Method) {
-        return Url("/group/$Method/".GroupSlug($Group), $WithDomain);
+function GroupUrl($group, $method = null, $withDomain = '//') {
+    if ($method) {
+        return Url("/group/$method/".GroupSlug($group), $withDomain);
     } else {
-        return Url('/group/'.GroupSlug($Group), $WithDomain);
+        return Url('/group/'.GroupSlug($group), $withDomain);
     }
 }
-function EventSlug($Event) {
-    return $Event['EventID'].'-'.Gdn_Format::Url($Event['Name']);
+function EventSlug($event) {
+    return $event['EventID'].'-'.Gdn_Format::Url($event['Name']);
 }
 
-function EventUrl($Event, $Method = null) {
-    if ($Method) {
-        return Url("/event/$Method/".EventSlug($Event), '//');
+function EventUrl($event, $method = null) {
+    if ($method) {
+        return Url("/event/$method/".EventSlug($event), '//');
     } else {
-        return Url('/event/'.EventSlug($Event), '//');
+        return Url('/event/'.EventSlug($event), '//');
     }
 }
 
-function GroupPermission($Permission = null, $GroupID = null) {
-    if ($GroupID === null) {
-        $GroupID = Gdn::Controller()->Data('Group');
+function GroupPermission($permission = null, $groupID = null) {
+    if ($groupID === null) {
+        $groupID = Gdn::Controller()->Data('Group');
     }
 
     if (isset(Gdn::Controller()->GroupModel))
-        return Gdn::Controller()->GroupModel->CheckPermission($Permission, $GroupID);
-    $GroupModel = new GroupModel();
-    return $GroupModel->CheckPermission($Permission, $GroupID);
+        return Gdn::Controller()->GroupModel->CheckPermission($permission, $groupID);
+    $groupModel = new GroupModel();
+    return $groupModel->CheckPermission($permission, $groupID);
 }
 
-function EventPermission($Permission = null, $EventID = null) {
-    if ($EventID === null) {
-        $EventID = Gdn::Controller()->Data('Event');
+function EventPermission($permission = null, $eventID = null) {
+    if ($eventID === null) {
+        $eventID = Gdn::Controller()->Data('Event');
     }
 
     if (isset(Gdn::Controller()->EventModel))
-        return Gdn::Controller()->EventModel->CheckPermission($Permission, $EventID);
-    $EventModel = new EventModel();
-    return $EventModel->CheckPermission($Permission, $EventID);
+        return Gdn::Controller()->EventModel->CheckPermission($permission, $eventID);
+    $eventModel = new EventModel();
+    return $eventModel->CheckPermission($permission, $eventID);
 }

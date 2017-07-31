@@ -99,8 +99,8 @@ class TrustedContentPlugin extends Gdn_Plugin {
             $form->setFormValue('Garden.TrustedContentSources', $trustedContentSources);
 
             // Save new settings
-            $Saved = $form->save();
-            if ($Saved !== false) {
+            $saved = $form->save();
+            if ($saved !== false) {
                 $sender->informMessage(t("Your changes have been saved."));
             }
         }

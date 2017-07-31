@@ -45,22 +45,22 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     }
 
     public function quickSearch($title, $get = []) {
-        $Form = new Gdn_Form();
-        $Form->Method = 'get';
+        $form = new Gdn_Form();
+        $form->Method = 'get';
 
         foreach ($get as $key => $value) {
-            $Form->addHidden($key, $value);
+            $form->addHidden($key, $value);
         }
 
         $result = ' <div class="QuickSearch">'.
             anchor(sprite('SpSearch'), '#', 'QuickSearchButton').
             '<div class="QuickSearchWrap MenuItems">';
 
-        $result .= $Form->open(['action' => url('/search')]).
+        $result .= $form->open(['action' => url('/search')]).
 //         $Form->Label('@'.$title, 'search').
-            ' '.$Form->textBox('search', ['placeholder' => $title]).
+            ' '.$form->textBox('search', ['placeholder' => $title]).
             ' <div class="bwrap"><button type="submit" class="Button" title="'.t('Search').'">'.t('Go').'</button></div>'.
-            $Form->close();
+            $form->close();
 
         $result .= '</div></div>';
 
@@ -70,21 +70,21 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     /// Event Handlers ///
 
     /**
-     * @param AssetModel $Sender
+     * @param AssetModel $sender
      */
-    public function assetModel_styleCSS_handler($Sender) {
-        $Sender->addCssFile('advanced-search.css', 'plugins/AdvancedSearch');
+    public function assetModel_styleCSS_handler($sender) {
+        $sender->addCssFile('advanced-search.css', 'plugins/AdvancedSearch');
     }
 
     /**
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_render_before($Sender) {
+    public function base_render_before($sender) {
         if (!inSection('Dashboard')) {
             AdvancedSearchModule::addAssets();
 
             if (!Gdn::addonManager()->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON)) {
-                $Sender->addDefinition('searchAutocomplete', '0');
+                $sender->addDefinition('searchAutocomplete', '0');
             }
         }
     }
@@ -115,45 +115,45 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $Pager->HtmlAfter = $quickserch;
     }
 
-    public function categoriesController_pagerInit_handler($Sender, $Args) {
-        $categoryid = $Sender->data('Category.CategoryID');
+    public function categoriesController_pagerInit_handler($sender, $args) {
+        $categoryid = $sender->data('Category.CategoryID');
 
         if ($categoryid) {
-            $name = Gdn_Format::text($Sender->data('Category.Name'));
+            $name = Gdn_Format::text($sender->data('Category.Name'));
             if (mb_strwidth($name) > 20) {
                 $name = t('category');
             }
 
             $quickserch = $this->quickSearch(sprintf(t('Search %s'), $name), ['cat' => $categoryid, 'adv' => 1]);
 
-            $Pager = $Args['Pager'];
-            $Pager->HtmlAfter = $quickserch;
+            $pager = $args['Pager'];
+            $pager->HtmlAfter = $quickserch;
         }
     }
 
-    public function discussionController_pagerInit_handler($Sender, $Args) {
-        $quickserch = $this->quickSearch(sprintf(t('Search %s'), t('discussion')), ['discussionid' => $Sender->data('Discussion.DiscussionID')]);
+    public function discussionController_pagerInit_handler($sender, $args) {
+        $quickserch = $this->quickSearch(sprintf(t('Search %s'), t('discussion')), ['discussionid' => $sender->data('Discussion.DiscussionID')]);
 
-        $Pager = $Args['Pager'];
-        $Pager->HtmlAfter = $quickserch;
+        $pager = $args['Pager'];
+        $pager->HtmlAfter = $quickserch;
     }
 
     /**
-     * @param Smarty $Sender
-     * @param type $Args
+     * @param Smarty $sender
+     * @param type $args
      */
-    public function gdn_smarty_init_handler($Sender, $Args) {
-        $smartyVersion = defined('Smarty::SMARTY_VERSION') ? Smarty::SMARTY_VERSION : $Sender->_version;
+    public function gdn_smarty_init_handler($sender, $args) {
+        $smartyVersion = defined('Smarty::SMARTY_VERSION') ? Smarty::SMARTY_VERSION : $sender->_version;
 
         // registerPlugin, introduced in Smart v3, is accessed via __call, so it cannot be detected with method_exists.
         if (version_compare($smartyVersion, '3.0.0', '>=')) {
-            $Sender->registerPlugin(
+            $sender->registerPlugin(
                 'function',
                 'searchbox_advanced',
                 'searchBoxAdvanced'
             );
         } else {
-            $Sender->register_function('searchbox_advanced', 'searchBoxAdvanced');
+            $sender->register_function('searchbox_advanced', 'searchBoxAdvanced');
         }
     }
 
@@ -189,80 +189,80 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
     /**
      *
-     * @param SearchController $Sender
-     * @param type $Search
-     * @param type $Page
+     * @param SearchController $sender
+     * @param type $search
+     * @param type $page
      */
-    public function searchController_index_create($Sender, $Search = '', $Page = false) {
+    public function searchController_index_create($sender, $search = '', $page = false) {
         Gdn_Theme::section('SearchResults');
 
-        $this->Sender = $Sender;
-        if ($Sender->Head) {
+        $this->Sender = $sender;
+        if ($sender->Head) {
             // Don't index search results pages.
-            $Sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex']);
-            $Sender->Head->addTag('meta', ['name' => 'googlebot', 'content' => 'noindex']);
+            $sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex']);
+            $sender->Head->addTag('meta', ['name' => 'googlebot', 'content' => 'noindex']);
         }
 
-        list($Offset, $Limit) = offsetLimit($Page, c('Garden.Search.PerPage', 10));
-        $Sender->setData('_Offset', $Offset);
-        $Sender->setData('_Limit', $Limit);
+        list($offset, $limit) = offsetLimit($page, c('Garden.Search.PerPage', 10));
+        $sender->setData('_Offset', $offset);
+        $sender->setData('_Limit', $limit);
 
         // Do the search.
-        $SearchModel = new SearchModel();
-        $Sender->setData('SearchResults', []);
-        $SearchTerms = Gdn_Format::text($Search);
+        $searchModel = new SearchModel();
+        $sender->setData('SearchResults', []);
+        $searchTerms = Gdn_Format::text($search);
 
-        if (method_exists($SearchModel, 'advancedSearch')) {
-            $Results = $SearchModel->advancedSearch($Sender->Request->get(), $Offset, $Limit);
-            $Sender->setData($Results);
-            $SearchTerms = $Results['SearchTerms'];
+        if (method_exists($searchModel, 'advancedSearch')) {
+            $results = $searchModel->advancedSearch($sender->Request->get(), $offset, $limit);
+            $sender->setData($results);
+            $searchTerms = $results['SearchTerms'];
 
 
             // Grab the discussion if we are searching it.
-            if (isset($Results['CalculatedSearch']['discussionid'])) {
-                $DiscussionModel = new DiscussionModel();
-                $Discussion = $DiscussionModel->getID($Results['CalculatedSearch']['discussionid']);
-                if ($Discussion) {
-                    $Cat = CategoryModel::categories(getValue('CategoryID', $Discussion));
+            if (isset($results['CalculatedSearch']['discussionid'])) {
+                $discussionModel = new DiscussionModel();
+                $discussion = $discussionModel->getID($results['CalculatedSearch']['discussionid']);
+                if ($discussion) {
+                    $cat = CategoryModel::categories(getValue('CategoryID', $discussion));
 //               if (GetValue('PermsDiscussionView', $Cat))
-                    $Sender->setData('Discussion', $Discussion);
+                    $sender->setData('Discussion', $discussion);
                 }
             }
         } else {
-            $Results = $this->devancedSearch($SearchModel, $Sender->Request->get(), $Offset, $Limit);
-            $Sender->setData('SearchResults', $Results, true);
-            if ($SearchTerms) {
-                $SearchTerms = explode(' ', $SearchTerms);
+            $results = $this->devancedSearch($searchModel, $sender->Request->get(), $offset, $limit);
+            $sender->setData('SearchResults', $results, true);
+            if ($searchTerms) {
+                $searchTerms = explode(' ', $searchTerms);
             } else {
-                $SearchTerms = [];
+                $searchTerms = [];
             }
         }
-        Gdn::userModel()->joinUsers($Sender->Data['SearchResults'], ['UserID']);
-        $this->calculateResults($Sender->Data['SearchResults'], $SearchTerms, !$Sender->Request->get('nomark'));
+        Gdn::userModel()->joinUsers($sender->Data['SearchResults'], ['UserID']);
+        $this->calculateResults($sender->Data['SearchResults'], $searchTerms, !$sender->Request->get('nomark'));
 
-        if (isset($Sender->Data['ChildResults'])) {
+        if (isset($sender->Data['ChildResults'])) {
             // Join the results.
-            $ChildResults = $Sender->Data['ChildResults'];
-            unset($Sender->Data['ChildResults']);
-            $this->joinResults($Sender->Data['SearchResults'], $ChildResults, $SearchTerms);
+            $childResults = $sender->Data['ChildResults'];
+            unset($sender->Data['ChildResults']);
+            $this->joinResults($sender->Data['SearchResults'], $childResults, $searchTerms);
         }
 
-        $Sender->setData('SearchTerm', implode(' ', $SearchTerms), true);
-        $Sender->setData('SearchTerms', $SearchTerms, true);
-        $Sender->setData('From', $Offset + 1);
-        $Sender->setData('To', $Offset + count($Sender->Data['SearchResults']));
+        $sender->setData('SearchTerm', implode(' ', $searchTerms), true);
+        $sender->setData('SearchTerms', $searchTerms, true);
+        $sender->setData('From', $offset + 1);
+        $sender->setData('To', $offset + count($sender->Data['SearchResults']));
 
         // Set the title from the search terms.
-        $Sender->title(t('Search'));
+        $sender->title(t('Search'));
 
-        $Sender->CssClass = 'NoPanel';
+        $sender->CssClass = 'NoPanel';
 
         // Make a url for related search.
-        $get = array_change_key_case($Sender->Request->get());
+        $get = array_change_key_case($sender->Request->get());
         unset($get['page']);
         $get['adv'] = 1;
         $url = '/search?'.http_build_query($get);
-        $Sender->setData('SearchUrl', $url);
+        $sender->setData('SearchUrl', $url);
 
 
         $this->render('Search');

@@ -100,14 +100,14 @@ class MailChimpPushPlugin extends Gdn_Plugin {
      * functioned, but this looks like an update to core invalidated that. This
      * handler is put in place to catch users registering, then.
      *
-     * @param UserModel $Sender The User Model.
-     * @param Event $Args The arguments.
+     * @param UserModel $sender The User Model.
+     * @param Event $args The arguments.
      */
-    public function userModel_afterRegister_handler($Sender, $Args) {
-        $isValidRegistration = $Args['Valid'];
+    public function userModel_afterRegister_handler($sender, $args) {
+        $isValidRegistration = $args['Valid'];
 
         if ($isValidRegistration) {
-            $user = $Args['RegisteringUser'];
+            $user = $args['RegisteringUser'];
             $listID = val('ListID', $this->provider(), null);
             $email = val('Email', $user, null);
 

@@ -32,127 +32,127 @@ class SpamCleanerPlugin extends Gdn_Plugin {
    }
    
    public function Structure() {
-      $St = Gdn::Structure();
+      $st = Gdn::Structure();
       
-      foreach (self::$Types as $Type => $Options) {
-         $St->Table($Type)->Column('Verified', 'tinyint(1)', '0')->Set();
+      foreach (self::$Types as $type => $options) {
+         $st->Table($type)->Column('Verified', 'tinyint(1)', '0')->Set();
       }
    }
    
-   public static function TypeInfo($Type = NULL) {
-      if ($Type == NULL)
-         $Result = self::$Types;
+   public static function TypeInfo($type = NULL) {
+      if ($type == NULL)
+         $result = self::$Types;
       else
-         $Result = [$Type => self::$Types[$Type]];
+         $result = [$type => self::$Types[$type]];
       
       
-      foreach ($Result as $T => &$Info) {
-         TouchValue('Table', $Info, $T);
-         TouchValue('PrimaryKey', $Info, $T.'ID');
-         TouchValue('Label', $Info, T(Gdn_Form::LabelCode($T).'s'));
+      foreach ($result as $t => &$info) {
+         TouchValue('Table', $info, $t);
+         TouchValue('PrimaryKey', $info, $t.'ID');
+         TouchValue('Label', $info, T(Gdn_Form::LabelCode($t).'s'));
       }
       
-      if ($Type == NULL) {
-         return $Result;
+      if ($type == NULL) {
+         return $result;
       } else {
-         return array_pop($Result);
+         return array_pop($result);
       }
    }
    
    /// Event Handlers ///
    
-   public function Base_GetAppSettingsMenuItems_Handler($Sender) {
-      $Menu = &$Sender->EventArguments['SideMenu'];
+   public function Base_GetAppSettingsMenuItems_Handler($sender) {
+      $menu = &$sender->EventArguments['SideMenu'];
       
-      $Menu->AddLink('Moderation', T('Clean Spam'), '/log/cleanspam', 'Garden.Moderation.Manage');
+      $menu->AddLink('Moderation', T('Clean Spam'), '/log/cleanspam', 'Garden.Moderation.Manage');
    }
    
    /**
     *
-    * @param Gdn_Controller $Sender 
+    * @param Gdn_Controller $sender 
     */
-   public function LogController_CleanSpam_Create($Sender) {
-      $Sender->Permission('Garden.Moderation.Manage');
-      $Sender->Title(T('Clean Spam'));
+   public function LogController_CleanSpam_Create($sender) {
+      $sender->Permission('Garden.Moderation.Manage');
+      $sender->Title(T('Clean Spam'));
       
-      if ($Sender->Form->IsPostBack()) {
-         $Sender->AddDefinition('StartCleanSpam', TRUE);
-         $Sender->SetData('StartCleanSpam', TRUE);
+      if ($sender->Form->IsPostBack()) {
+         $sender->AddDefinition('StartCleanSpam', TRUE);
+         $sender->SetData('StartCleanSpam', TRUE);
          
-         if ($Sender->Form->GetFormValue('VerifyModerators')) {
-            $RoleModel = new RoleModel();
-            $RoleIDs = $RoleModel->GetByPermission('Garden.Moderation.Manage')->ResultArray();
-            $RoleIDs = array_column($RoleIDs, 'RoleID');
+         if ($sender->Form->GetFormValue('VerifyModerators')) {
+            $roleModel = new RoleModel();
+            $roleIDs = $roleModel->GetByPermission('Garden.Moderation.Manage')->ResultArray();
+            $roleIDs = array_column($roleIDs, 'RoleID');
             
             Gdn::SQL()
                ->Update('User u')
                ->Join('UserRole ur', 'u.UserID = ur.UserID')
-               ->WhereIn('ur.RoleID', $RoleIDs)
+               ->WhereIn('ur.RoleID', $roleIDs)
                ->Set('u.Verified', 1)
                ->Put();
          }
       } else {
-         $Sender->Form->SetValue('VerifyModerators', 1);
+         $sender->Form->SetValue('VerifyModerators', 1);
       }
       
-      $Sender->AddJsFile('spamcleaner.js', 'plugins/SpamCleaner', ['_Hint' => 'Inline']);
-      $Sender->SetData('Types', self::TypeInfo());
-      $Sender->AddSideMenu();
-      $Sender->Render('CleanSpam', '', 'plugins/SpamCleaner');
+      $sender->AddJsFile('spamcleaner.js', 'plugins/SpamCleaner', ['_Hint' => 'Inline']);
+      $sender->SetData('Types', self::TypeInfo());
+      $sender->AddSideMenu();
+      $sender->Render('CleanSpam', '', 'plugins/SpamCleaner');
    }
    
-   public function LogController_CleanSpamTick_Create($Sender, $Type) {
-      $Sender->Permission('Garden.Moderation.Manage');
-      $Form = new Gdn_Form();
+   public function LogController_CleanSpamTick_Create($sender, $type) {
+      $sender->Permission('Garden.Moderation.Manage');
+      $form = new Gdn_Form();
       
-      if (!$Form->IsPostBack())
+      if (!$form->IsPostBack())
          return;
       
-      $StartTime = time();
+      $startTime = time();
       
-      $TypeInfo = self::TypeInfo($Type);
+      $typeInfo = self::TypeInfo($type);
       
       // Grab some records to work on.
-      $Where = ['Verified' => 0];
+      $where = ['Verified' => 0];
       
-      switch ($Type) {
+      switch ($type) {
          case 'Activity':
-            $Types = [
+            $types = [
                 GetValue('ActivityTypeID', ActivityModel::GetActivityType('WallPost')),
                 GetValue('ActivityTypeID', ActivityModel::GetActivityType('WallStatus'))
                 ];
-            $Where['ActivityTypeID'] = $Types;
+            $where['ActivityTypeID'] = $types;
             break;
       }
       
-      $Data = Gdn::SQL()->GetWhere($Type, $Where, '', '', self::PAGE_LIMIT)->ResultArray();
-      $Sender->SetData('Type', $Type);
-      $Sender->SetData('Count', count($Data));
-      $Sender->SetData('Complete', count($Data) < self::PAGE_LIMIT);
+      $data = Gdn::SQL()->GetWhere($type, $where, '', '', self::PAGE_LIMIT)->ResultArray();
+      $sender->SetData('Type', $type);
+      $sender->SetData('Count', count($data));
+      $sender->SetData('Complete', count($data) < self::PAGE_LIMIT);
       
-      $CountSpam = 0;
-      foreach ($Data as $Row) {
-         $PK = $TypeInfo['PrimaryKey'];
-         $ID = $Row[$PK];
+      $countSpam = 0;
+      foreach ($data as $row) {
+         $pK = $typeInfo['PrimaryKey'];
+         $iD = $row[$pK];
          
          // We need to mark the row verified here so if it's restored it doesn't get put back in the spam.
-         $Row['Verified'] = TRUE;
+         $row['Verified'] = TRUE;
          
-         $Spam = SpamModel::IsSpam($Type, $Row);
-         if ($Spam) {
-            $CountSpam++;
-            Gdn::SQL()->Delete($Type, [$PK => $ID]);
+         $spam = SpamModel::IsSpam($type, $row);
+         if ($spam) {
+            $countSpam++;
+            Gdn::SQL()->Delete($type, [$pK => $iD]);
          } else {
-            Gdn::SQL()->Put($Type, ['Verified' => 1], [$PK => $ID]);
+            Gdn::SQL()->Put($type, ['Verified' => 1], [$pK => $iD]);
          }
          
-         $CurrentTime = time();
-         if ($CurrentTime > $StartTime + self::MAX_TIME)
+         $currentTime = time();
+         if ($currentTime > $startTime + self::MAX_TIME)
             break;
       }
       
-      $Sender->SetData('CountSpam', $CountSpam);
+      $sender->SetData('CountSpam', $countSpam);
       
-      $Sender->Render('Blank', 'Utility', 'Dashboard');
+      $sender->Render('Blank', 'Utility', 'Dashboard');
    }
 }

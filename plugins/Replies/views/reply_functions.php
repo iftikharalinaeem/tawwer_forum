@@ -2,19 +2,19 @@
 
 if (!function_exists('WriteReplies')):
    
-function WriteReplies($Comment) {
-   $Replies = GetValue('Replies', $Comment, []);
+function WriteReplies($comment) {
+   $replies = GetValue('Replies', $comment, []);
    
-   $Hidden = count($Replies) == 0 ? ' Hidden' : '';
+   $hidden = count($replies) == 0 ? ' Hidden' : '';
    
-   echo '<div id="'.RepliesElementID($Comment).'" class="DataList DataList-Replies'.$Hidden.'">';
+   echo '<div id="'.RepliesElementID($comment).'" class="DataList DataList-Replies'.$hidden.'">';
    
    // Write out all of the replies.
-   foreach ($Replies as $Reply) {
-      WriteReply($Reply);
+   foreach ($replies as $reply) {
+      WriteReply($reply);
    }
    
-   WriteReplyForm($Comment);
+   WriteReplyForm($comment);
    
    echo '</div>';
 }
@@ -23,28 +23,28 @@ endif;
 
 if (!function_exists('WriteReply')):
    
-function WriteReply($Reply) {
-   $User = Gdn::UserModel()->GetID($Reply['InsertUserID']);
+function WriteReply($reply) {
+   $user = Gdn::UserModel()->GetID($reply['InsertUserID']);
       
-   echo '<div id="Reply_'.$Reply['ReplyID'].'" class="Item Item-Reply HasPhoto">';
+   echo '<div id="Reply_'.$reply['ReplyID'].'" class="Item Item-Reply HasPhoto">';
    
    // Reply options.
    echo '<div class="Options">';
-   WriteReplyOptions($Reply);
+   WriteReplyOptions($reply);
    echo '</div>';
 
    // Author photo stuff.
-   echo UserPhoto($User);
+   echo UserPhoto($user);
 
    echo '<div class="ItemContent ItemContent-Reply">';
 
    echo '<div class="Reply-Header">';
-      echo UserAnchor($User, 'Username');
-      echo ' '.Wrap(Gdn_Format::Date($Reply['DateInserted'], 'html'), 'span', ['class' => 'Meta DateInserted']);
+      echo UserAnchor($user, 'Username');
+      echo ' '.Wrap(Gdn_Format::Date($reply['DateInserted'], 'html'), 'span', ['class' => 'Meta DateInserted']);
    echo '</div>';
 
    echo '<div class="Reply-Body Message">';
-      echo Gdn_Format::Text($Reply['Body']);
+      echo Gdn_Format::Text($reply['Body']);
    echo '</div>';
 
    echo '</div>';
@@ -56,60 +56,60 @@ endif;
 
 if (!function_exists('WriteReplyButton')):
 
-function WriteReplyButton($Comment) {
-   $ID = ReplyRecordID($Comment);
+function WriteReplyButton($comment) {
+   $iD = ReplyRecordID($comment);
    
-   $Path = '/post/reply?commentid='.urlencode($ID);
+   $path = '/post/reply?commentid='.urlencode($iD);
    
-   echo Anchor(Sprite('SpReply', 'ReactSprite').' '.T('Reply'), $Path, 'ReactButton Reply Visible');
+   echo Anchor(Sprite('SpReply', 'ReactSprite').' '.T('Reply'), $path, 'ReactButton Reply Visible');
 }
 
 endif;
 
 if (!function_exists('WriteReplyEdit')):
 
-function WriteReplyEdit($Reply) {
-   $Form = Gdn::Controller()->ReplyForm;
-   $Form->IDPrefix = 'EditReply_';
+function WriteReplyEdit($reply) {
+   $form = Gdn::Controller()->ReplyForm;
+   $form->IDPrefix = 'EditReply_';
    
-   $User = Gdn::UserModel()->GetID($Reply['InsertUserID']);
+   $user = Gdn::UserModel()->GetID($reply['InsertUserID']);
       
-   echo '<div id="Reply_'.$Reply['ReplyID'].'" class="Item Item-Reply Item-ReplyEdit HasPhoto">';
-   echo $Form->Open();
+   echo '<div id="Reply_'.$reply['ReplyID'].'" class="Item Item-Reply Item-ReplyEdit HasPhoto">';
+   echo $form->Open();
 
    // Author photo stuff.
-   echo UserPhoto($User);
+   echo UserPhoto($user);
 
    echo '<div class="ItemContent ItemContent-Reply">';
 
    echo '<div class="Reply-Header">';
-      echo UserAnchor($User, 'Username');
-      echo ' '.Wrap(Gdn_Format::Date($Reply['DateInserted'], 'html'), 'span', ['class' => 'Meta DateInserted']);
+      echo UserAnchor($user, 'Username');
+      echo ' '.Wrap(Gdn_Format::Date($reply['DateInserted'], 'html'), 'span', ['class' => 'Meta DateInserted']);
    echo '</div>';
 
    echo '<div class="Reply-Body Message">';
    
-   echo $Form->Errors();
-   echo $Form->TextBox('Body', ['Multiline' => TRUE, 'Wrap' => TRUE, 'rows' => 4]);
+   echo $form->Errors();
+   echo $form->TextBox('Body', ['Multiline' => TRUE, 'Wrap' => TRUE, 'rows' => 4]);
 
    echo '<div class="Buttons">';
-   echo $Form->Button('Cancel', ['class' => 'Button Cancel', 'tabindex' => '-1']);
+   echo $form->Button('Cancel', ['class' => 'Button Cancel', 'tabindex' => '-1']);
    echo ' ';
-   echo $Form->Button('Save', ['class' => 'Button Primary']);
+   echo $form->Button('Save', ['class' => 'Button Primary']);
    echo '</div>';
 
    echo '</div>';
 
    echo '</div>';
 
-   echo $Form->Close();
+   echo $form->Close();
    echo '</div>';
 }
 endif;
 
 if (!function_exists('WriteReplyForm')):
    
-function WriteReplyForm($Comment) {
+function WriteReplyForm($comment) {
    if (!Gdn::Session()->CheckPermission('Vanilla.Replies.Add'))
       return;
    
@@ -123,28 +123,28 @@ function WriteReplyForm($Comment) {
    
       echo '<div class="Reply-Body">';
       
-      $Form = Gdn::Controller()->ReplyForm;
+      $form = Gdn::Controller()->ReplyForm;
          
       // Write the regular link.
-      echo Anchor(T('Reply here...'), '#', 'FormPlaceholder InputBox', ['style' => $Form->ErrorCount() ? 'display: none' : '']);
+      echo Anchor(T('Reply here...'), '#', 'FormPlaceholder InputBox', ['style' => $form->ErrorCount() ? 'display: none' : '']);
       
-      $ID = GetValue('CommentID', $Comment);
-      if (!$ID)
-         $ID = -GetValue('DiscussionID', $Comment);
+      $iD = GetValue('CommentID', $comment);
+      if (!$iD)
+         $iD = -GetValue('DiscussionID', $comment);
       
       // Write the form.
-      $Form->IDPrefix = 'Reply_';
-      echo $Form->Open(['action' => Url('/post/reply?commentid='.$ID), 'class' => $Form->ErrorCount() ? '' : 'Hidden']);
-      echo $Form->Errors();
-      echo $Form->TextBox('Body', ['Multiline' => TRUE, 'Wrap' => TRUE, 'rows' => 4]);
+      $form->IDPrefix = 'Reply_';
+      echo $form->Open(['action' => Url('/post/reply?commentid='.$iD), 'class' => $form->ErrorCount() ? '' : 'Hidden']);
+      echo $form->Errors();
+      echo $form->TextBox('Body', ['Multiline' => TRUE, 'Wrap' => TRUE, 'rows' => 4]);
       
       echo '<div class="Buttons">';
-      echo $Form->Button('Cancel', ['type' => 'button', 'class' => 'Button Cancel', 'tabindex' => '-1']);
+      echo $form->Button('Cancel', ['type' => 'button', 'class' => 'Button Cancel', 'tabindex' => '-1']);
       echo ' ';
-      echo $Form->Button('Reply', ['class' => 'Button Primary']);
+      echo $form->Button('Reply', ['class' => 'Button Primary']);
       echo '</div>';
       
-      echo $Form->Close();
+      echo $form->Close();
       
       echo '</div>';
       
@@ -158,17 +158,17 @@ endif;
 
 if (!function_exists('WriteReplyOptions')):
    
-function WriteReplyOptions($Reply) {
-	$Options = GetReplyOptions($Reply);
-	if (empty($Options))
+function WriteReplyOptions($reply) {
+	$options = GetReplyOptions($reply);
+	if (empty($options))
 		return;
 
    echo '<span class="ToggleFlyout OptionsMenu">';
       echo '<span class="OptionsTitle" title="'.T('Options').'">'.T('Options').'</span>';
       
       echo '<ul class="Flyout MenuItems">';
-      foreach ($Options as $Code => $Option):
-         echo Wrap(Anchor($Option['Label'], $Option['Url'], GetValue('Class', $Option, 'Option-'.$Code)), 'li');
+      foreach ($options as $code => $option):
+         echo Wrap(Anchor($option['Label'], $option['Url'], GetValue('Class', $option, 'Option-'.$code)), 'li');
       endforeach;
       echo '</ul>';
    echo '</span>';
