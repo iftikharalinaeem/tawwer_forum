@@ -13,14 +13,14 @@ if (!CheckPermission('Garden.Settings.Manage')) {
 }
 /* @var Gdn_Form $Form */
 $Form = $this->Form;
-echo $Form->Open(array('action' => url('/role/overridehub/'.$this->Data('RoleID'))));
+echo $Form->Open(['action' => url('/role/overridehub/'.$this->Data('RoleID'))]);
 echo $Form->Errors();
 ?>
     <ul>
         <li>
             <?php
             echo $Form->Label('Override Hub', 'OverrideHub');
-            echo $Form->RadioList('OverrideHub', array('0' => T('No'), '1' => T('Yes')));
+            echo $Form->RadioList('OverrideHub', ['0' => T('No'), '1' => T('Yes')]);
             ?>
         </li>
     </ul>

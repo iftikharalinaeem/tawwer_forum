@@ -125,7 +125,7 @@ class SubcommunityModel extends Gdn_Model {
     public static function getAvailable() {
         if (!isset(self::$available)) {
             $all = self::all();
-            $available = array();
+            $available = [];
 
             foreach ($all as $folder => $row) {
                 $category = CategoryModel::categories($row['CategoryID']);
@@ -267,10 +267,10 @@ class SubcommunityModel extends Gdn_Model {
      *
      * @param mixed $id The value of the primary key in the database.
      * @param null $datasetType Unused
-     * @param null $Options Unused
+     * @param null $options Unused
      * @return array|object
      */
-    public function getID($id, $datasetType = null, $Options = null) {
+    public function getID($id, $datasetType = null, $options = null) {
         $row = parent::getID($id, DATASET_TYPE_ARRAY);
         if ($row) {
             self::calculateRow($row);
@@ -292,17 +292,17 @@ class SubcommunityModel extends Gdn_Model {
         return $rows;
     }
 
-    public function insert($Fields) {
-        $this->addInsertFields($Fields);
-        $Fields = $this->serialize($Fields);
-        if ($this->validate($Fields, true)) {
-            if (val('IsDefault', $Fields)) {
+    public function insert($fields) {
+        $this->addInsertFields($fields);
+        $fields = $this->serialize($fields);
+        if ($this->validate($fields, true)) {
+            if (val('IsDefault', $fields)) {
                 $this->SQL->put('Subcommunity', ['IsDefault' => null]);
             }
 
             static::clearCache();
 
-            return parent::insert($Fields);
+            return parent::insert($fields);
         }
     }
 
@@ -310,7 +310,7 @@ class SubcommunityModel extends Gdn_Model {
         // Get the columns and put the extended data in the attributes.
         $this->defineSchema();
         $columns = $this->Schema->fields();
-        $remove = array('TransientKey' => 1, 'hpt' => 1, 'Save' => 1, 'Checkboxes' => 1);
+        $remove = ['TransientKey' => 1, 'hpt' => 1, 'Save' => 1, 'Checkboxes' => 1];
         $fields = array_diff_key($fields, $remove);
         $attributes = array_diff_key($fields, $columns);
 

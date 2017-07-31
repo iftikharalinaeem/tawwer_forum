@@ -13,8 +13,8 @@ class HubLocaleChooserModule extends Gdn_Module {
     public $currentLabel = 'Language';
     public $cssClass = '';
 
-    public function __construct($Sender = '', $ApplicationFolder = false) {
-        parent::__construct($Sender, 'plugins/sitehub');
+    public function __construct($sender = '', $applicationFolder = false) {
+        parent::__construct($sender, 'plugins/sitehub');
     }
 
     public function toString() {

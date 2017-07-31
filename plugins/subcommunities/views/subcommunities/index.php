@@ -7,7 +7,7 @@
         echo $this->form->searchForm('search', '/subcommunities', ['placeholder' => $placeholder]);
         ?>
     </div>
-    <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
+    <?php PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard']); ?>
 </div>
 
 

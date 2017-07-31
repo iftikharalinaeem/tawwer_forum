@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) { exit; }
 
-$PluginInfo['subcommunities'] = array(
+$PluginInfo['subcommunities'] = [
     'Name'        => "Subcommunities",
     'Description' => "Allows you to use top level categories as virtual mini forums for multilingual or multi-product communities.",
     'Version'     => '1.0.4',
@@ -9,7 +9,7 @@ $PluginInfo['subcommunities'] = array(
     'AuthorUrl'   => 'https://vanillaforums.com',
     'License'     => 'Proprietary',
     'Icon'        => 'subcommunities.png'
-);
+];
 
 class SubcommunitiesPlugin extends Gdn_Plugin {
     /// Properties ///
@@ -570,8 +570,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $categoryIDs = $this->getCategoryIDs();
         $questionCount = Gdn::sql()
             ->whereIn('CategoryID', $categoryIDs)
-            ->whereIn('QnA', array('Unanswered', 'Rejected'))
-            ->getCount('Discussion', array('Type' => 'Question'));
+            ->whereIn('QnA', ['Unanswered', 'Rejected'])
+            ->getCount('Discussion', ['Type' => 'Question']);
 
         // Pass number of questions back to sender.
         $args['questionCount'] = $questionCount;

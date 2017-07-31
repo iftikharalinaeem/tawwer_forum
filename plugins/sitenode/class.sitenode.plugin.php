@@ -43,14 +43,14 @@ class SiteNodePlugin extends Gdn_Plugin {
     public function structure() {
         // Save the hub sso provider type.
         Gdn::SQL()->Replace('UserAuthenticationProvider',
-            array(
+            [
                 'AuthenticationSchemeAlias' => self::PROVIDER_KEY,
                 'URL' => '/hub',
                 'AssociationSecret' => '...', 'AssociationHashMethod' => '...',
                 'SignInUrl' => '/hub/entry/signin',
                 'SignOutUrl' => '/hub/entry/signout'
-            ),
-            array('AuthenticationKey' => self::PROVIDER_KEY), TRUE);
+            ],
+            ['AuthenticationKey' => self::PROVIDER_KEY], TRUE);
 
         // Add foreign ID columns specifically for the hub sync. These must not be unique.
         Gdn::Structure()->table('Category');
@@ -462,7 +462,7 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $category['CustomPermissions'] = true;
 
                 // Get all of the currently selected role/permission combinations for this junction.
-                $currentCategoryPermissions = $permissionModel->getJunctionPermissions(array('JunctionID' => val('CategoryID', $category, 0)), 'Category');
+                $currentCategoryPermissions = $permissionModel->getJunctionPermissions(['JunctionID' => val('CategoryID', $category, 0)], 'Category');
                 $currentCategoryPermissions = Gdn_DataSet::index($currentCategoryPermissions, 'RoleID');
 
                 foreach ($permissions as $i => $permissionRow) {
@@ -914,7 +914,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         if (!$siteID) {
             throw new Gdn_UserException('Error getting Site ID for cleanspeak plugin.');
         }
-        $sender->uuidSeed = array($siteID, 0, 0, 0);
+        $sender->uuidSeed = [$siteID, 0, 0, 0];
     }
 
 }
