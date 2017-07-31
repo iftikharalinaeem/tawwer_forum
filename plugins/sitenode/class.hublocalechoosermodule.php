@@ -16,8 +16,8 @@ class HubLocaleChooserModule extends Gdn_Module {
     public $currentLabel = 'Language';
     public $cssClass = '';
 
-    public function __construct($Sender = '', $ApplicationFolder = false) {
-        parent::__construct($Sender, 'plugins/sitenode');
+    public function __construct($sender = '', $applicationFolder = false) {
+        parent::__construct($sender, 'plugins/sitenode');
     }
 
     private function getLocales() {

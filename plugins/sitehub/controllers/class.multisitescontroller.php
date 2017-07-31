@@ -466,15 +466,15 @@ class MultisitesController extends DashboardController {
     /**
      * Get SiteID from a UUID.
      *
-     * @param string $UUID Unique User Identification.
+     * @param string $uuid Unique User Identification.
      * @return int mixed SiteID.
      * @throws Gdn_UserException
      */
-    protected function getSiteIDFromUUID($UUID) {
-        $ints = self::getIntsFromUUID($UUID);
+    protected function getSiteIDFromUUID($uuid) {
+        $ints = self::getIntsFromUUID($uuid);
         $siteID = $ints[0];
         if ($siteID == 0) {
-            throw new Gdn_UserException('Invalid UUID: ' . $UUID);
+            throw new Gdn_UserException('Invalid UUID: ' . $uuid);
         }
         return $siteID;
     }
@@ -520,9 +520,9 @@ class MultisitesController extends DashboardController {
      */
     protected function cleanspeakContentApproval($post) {
         $siteApprovals = [];
-        foreach ($post['approvals'] as $UUID => $action) {
-            $siteID = $this->getSiteIDFromUUID($UUID);
-            $siteApprovals[$siteID][$UUID] = $action;
+        foreach ($post['approvals'] as $uuid => $action) {
+            $siteID = $this->getSiteIDFromUUID($uuid);
+            $siteApprovals[$siteID][$uuid] = $action;
         }
         $errors = [];
         foreach ($siteApprovals as $siteID => $siteApproval) {
@@ -588,11 +588,11 @@ class MultisitesController extends DashboardController {
     }
 
     /**
-     * @param string $UUID Universal Unique Identifier.
+     * @param string $uuid Universal Unique Identifier.
      * @return array Containing the 4 numbers used to generate generateUUIDFromInts
      */
-    public static function getIntsFromUUID($UUID) {
-        $parts = str_split(str_replace('-', '', $UUID), 8);
+    public static function getIntsFromUUID($uuid) {
+        $parts = str_split(str_replace('-', '', $uuid), 8);
         $parts = array_map('hexdec', $parts);
         return $parts;
     }
