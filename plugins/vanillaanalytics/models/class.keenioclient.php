@@ -160,11 +160,14 @@ class KeenIOClient extends Garden\Http\HttpClient {
      *
      * @param string $endpoint Target endpoint, without the host.
      * @param array $data Payload for API command.
-     * @param string $authorization Value for the authorization header.
+     * @param string|bool $authorization Value for the authorization header.
      * @param string $requestMethod Method to use for the request. Should be one of the REQUEST_* constants.
+     * @param bool $responseArray Convert response to an associative array, instead of an object?
+     * @param bool $throw Throw an exception on error?
+     * @throws Exception when an error is encountered with the request and `$throw` is true.
      * @return bool|stdClass Object representing result on success, false on failure.
      */
-    public function command($endpoint, $data = [], $authorization = false, $requestMethod = self::REQUEST_POST) {
+    public function command($endpoint, $data = [], $authorization = false, $requestMethod = self::REQUEST_POST, $responseArray = false, $throw = false) {
         $validMethods = [
             self::REQUEST_DELETE,
             self::REQUEST_GET,
@@ -201,12 +204,15 @@ class KeenIOClient extends Garden\Http\HttpClient {
                 $headers
             );
 
-            return json_decode($result);
+            return json_decode($result, $responseArray);
         } catch (Exception $e) {
             if (debug()) {
                 print_r('DEBUG:'. $e->getMessage());
             }
             Logger::event('vanilla_analytics', Logger::ERROR, $e->getMessage());
+            if ($throw) {
+                throw $e;
+            }
         }
 
         return false;

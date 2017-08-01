@@ -145,8 +145,14 @@ class KeenIOQuery implements JsonSerializable {
 
     /**
      * Execute this query and return the result.
+     *
+     * @param bool $responseArray Convert response to an associative array, instead of an object?
+     * @param bool $throw Throw an exception on error?
+     * @throws Gdn_UserException if we haven't configured a type.
+     * @throws Gdn_UserException if we haven't configured a collection.
+     * @return object|array|bool
      */
-    public function exec() {
+    public function exec($responseArray = false, $throw = false) {
         if (empty($this->analysisType)) {
             throw new Gdn_UserException('Analysis type not configured.');
         }
@@ -186,7 +192,9 @@ class KeenIOQuery implements JsonSerializable {
             "projects/{$projectID}/queries/{$analysisType}",
             $data,
             KeenIOClient::COMMAND_READ,
-            KeenIOClient::REQUEST_POST
+            KeenIOClient::REQUEST_POST,
+            $responseArray,
+            $throw
         );
 
         return $response ?: false;
@@ -292,6 +300,13 @@ class KeenIOQuery implements JsonSerializable {
     public function setAnalysisType($analysisType) {
         $this->analysisType = $analysisType;
         return $this;
+    }
+
+    /**
+     * Reset any configured filters.
+     */
+    public function resetFilters() {
+        $this->filters = [];
     }
 
     /**
