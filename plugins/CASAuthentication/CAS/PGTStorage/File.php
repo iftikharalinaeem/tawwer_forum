@@ -29,7 +29,7 @@
 
 /**
  * The CAS_PGTStorage_File class is a class for PGT file storage. An instance of
- * this class is returned by CAS_Client::SetPGTStorageFile().
+ * this class is returned by CAS_Client::setPGTStorageFile().
  *
  * @class    CAS_PGTStorage_File
  * @category Authentication
@@ -51,7 +51,7 @@ class CAS_PGTStorage_File extends CAS_PGTStorage_AbstractStorage
 
     /**
      * a string telling where PGT's should be stored on the filesystem. Written by
-     * PGTStorageFile::PGTStorageFile(), read by getPath().
+     * PGTStorageFile::pGTStorageFile(), read by getPath().
      *
      * @private
      */
@@ -103,7 +103,7 @@ class CAS_PGTStorage_File extends CAS_PGTStorage_AbstractStorage
     // ########################################################################
 
     /**
-     * The class constructor, called by CAS_Client::SetPGTStorageFile().
+     * The class constructor, called by CAS_Client::setPGTStorageFile().
      *
      * @param CAS_Client $cas_parent the CAS_Client instance that creates the object.
      * @param string     $path       the path where the PGT's should be stored

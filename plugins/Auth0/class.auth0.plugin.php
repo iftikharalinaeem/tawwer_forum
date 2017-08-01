@@ -83,11 +83,11 @@ class Auth0Plugin extends OAuth2PluginBase implements Gdn_IPlugin {
      * @param SettingsController $args.
     */
     public function settingsController_auth0_create($sender, $args) {
-        $sender->setData('Title', sprintf(T('%s Settings'), 'Auth0 SSO'));
+        $sender->setData('Title', sprintf(t('%s Settings'), 'Auth0 SSO'));
 
         // Create send the possible redirect URLs that will be required by Auth0 and display them in the dashboard.
         // Use Gdn::Request instead of convience function so that we can return http and https.
-        $redirectUrls = Gdn::request()->Url('/entry/'. $this->getProviderKey(), true, false).','.Gdn::Request()->Url('/entry/'. $this->getProviderKey(), true, true);
+        $redirectUrls = Gdn::request()->url('/entry/'. $this->getProviderKey(), true, false).','.Gdn::request()->url('/entry/'. $this->getProviderKey(), true, true);
         $sender->setData('redirectUrls', $redirectUrls);
 
         $this->settingsController_oAuth2_create($sender, $args);

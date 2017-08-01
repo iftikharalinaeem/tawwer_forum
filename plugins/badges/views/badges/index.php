@@ -21,7 +21,7 @@ foreach ($this->data('Badges') as $Badge) :
         ?>
         <span class="Options">
             <?php
-            //echo OptionsList($Discussion);
+            //echo optionsList($Discussion);
             ?>
         </span>
         <div class="ItemContent Badge">

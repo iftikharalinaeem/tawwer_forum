@@ -12,8 +12,8 @@
 
 <?php
 $this->form->setStyles('bootstrap'); // For some reason, this endpoint isn't hitting the base_render_before in dashboard hooks where this get set normally
-echo $this->form->Open();
-echo $this->form->Errors();
+echo $this->form->open();
+echo $this->form->errors();
 ?>
 
 <ul>

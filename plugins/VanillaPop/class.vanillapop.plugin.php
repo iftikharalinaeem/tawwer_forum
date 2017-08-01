@@ -29,7 +29,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
     /// Methods ///
 
     public static function addIDToEmail($email, $iD) {
-        if (!C('Plugins.VanillaPop.AugmentFrom', true)) {
+        if (!c('Plugins.VanillaPop.AugmentFrom', true)) {
             return;
         }
 
@@ -303,7 +303,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                 $userID = $userModel->insertForBasic($user, false, ['NoConfirmEmail' => 'NoConfirmEmail']);
 
                 if (!$userID) {
-                    throw new Exception(T('Error creating user.').' '.$userModel->Validation->resultsText(), 400);
+                    throw new Exception(t('Error creating user.').' '.$userModel->Validation->resultsText(), 400);
                 }
 
                 $user['UserID'] = $userID;
@@ -548,7 +548,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
      * @param int|array
      */
     public function setFrom($email, $user) {
-        if (!C('Plugins.VanillaPop.OverrideFrom', true)) {
+        if (!c('Plugins.VanillaPop.OverrideFrom', true)) {
             return;
         }
 
@@ -870,7 +870,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $notifyUserID = getValueR('Activity.NotifyUserID', $args);
 
         if (in_array($type, ['Discussion', 'Comment', 'Conversation', 'Message'])) {
-            $email = $args['Email']; //new Gdn_Email(); //
+            $email = $args['Email']; //new gdn_Email(); //
             $story = val('Story', $args);
 
             switch ($type) {
@@ -1079,7 +1079,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
     }
 
     public function postController_email_create($sender, $args = []) {
-        $this->utilityController_Email_Create($sender, $args);
+        $this->utilityController_email_create($sender, $args);
     }
 
     public function utilityController_email_create($sender, $args = []) {
@@ -1103,7 +1103,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
     }
 
     public function postController_sendgrid_create($sender, $args = []) {
-        $this->utilityController_Sendgrid_Create($sender, $args);
+        $this->utilityController_sendgrid_create($sender, $args);
     }
 
     /**

@@ -7,161 +7,161 @@
 class ImagesPlugin extends Gdn_Plugin {
    /// Methods ///
 
-   public function Setup() {
-      $this->Structure();
+   public function setup() {
+      $this->structure();
    }
 
-   public function Structure() {
+   public function structure() {
       include dirname(__FILE__).'/structure.php';
    }
 
    /**
     * @param Gdn_Controller $sender
     */
-   public function AddJsFiles($sender = NULL) {
+   public function addJsFiles($sender = NULL) {
       if (!$sender)
-         $sender = Gdn::Controller();
+         $sender = Gdn::controller();
 
       // Include JS necessary in the page.
-      $sender->AddJsFile('library/jQuery-FileUpload/js/vendor/jquery.ui.widget.js', 'plugins/Images');
+      $sender->addJsFile('library/jQuery-FileUpload/js/vendor/jquery.ui.widget.js', 'plugins/Images');
       // The Templates plugin is included to render the upload/download listings.
-      $sender->AddJsFile('library/Javascript-Templates/tmpl.min.js', 'plugins/Images');
+      $sender->addJsFile('library/Javascript-Templates/tmpl.min.js', 'plugins/Images');
       // The Load Image plugin is included for the preview images and image resizing functionality.
-      $sender->AddJsFile('library/Javascript-LoadImage/load-image.min.js', 'plugins/Images');
+      $sender->addJsFile('library/Javascript-LoadImage/load-image.min.js', 'plugins/Images');
       // The Canvas to Blob plugin is included for image resizing functionality.
-      $sender->AddJsFile('library/JavaScript-Canvas-to-Blob/canvas-to-blob.min.js', 'plugins/Images');
+      $sender->addJsFile('library/JavaScript-Canvas-to-Blob/canvas-to-blob.min.js', 'plugins/Images');
       // The Iframe Transport is required for browsers without support for XHR file uploads.
-      $sender->AddJsFile('library/jQuery-FileUpload/js/jquery.iframe-transport.js', 'plugins/Images');
+      $sender->addJsFile('library/jQuery-FileUpload/js/jquery.iframe-transport.js', 'plugins/Images');
       // The basic File Upload plugin.
-      $sender->AddJsFile('library/jQuery-FileUpload/js/jquery.fileupload.js', 'plugins/Images');
+      $sender->addJsFile('library/jQuery-FileUpload/js/jquery.fileupload.js', 'plugins/Images');
       // The File Upload file processing plugin.
-      $sender->AddJsFile('library/jQuery-FileUpload/js/jquery.fileupload-fp.js', 'plugins/Images');
+      $sender->addJsFile('library/jQuery-FileUpload/js/jquery.fileupload-fp.js', 'plugins/Images');
       // The File Upload user interface plugin.
-      $sender->AddJsFile('library/jQuery-FileUpload/js/jquery.fileupload-ui.js', 'plugins/Images');
+      $sender->addJsFile('library/jQuery-FileUpload/js/jquery.fileupload-ui.js', 'plugins/Images');
       // The localization script.
-      $sender->AddJsFile('library/jQuery-FileUpload/js/locale.js', 'plugins/Images');
+      $sender->addJsFile('library/jQuery-FileUpload/js/locale.js', 'plugins/Images');
       // The main application script.
-      $sender->AddJsFile('upload.js', 'plugins/Images');
+      $sender->addJsFile('upload.js', 'plugins/Images');
       // The XDomainRequest Transport is included for cross-domain file deletion for IE8+.
-      $sender->Head->AddString('<!--[if gte IE 8]><script src="'.Url('plugins/Images/library/jQuery-FileUpload/js/cors/jquery.xdr-transport.js').'"></script><![endif]-->');
+      $sender->Head->addString('<!--[if gte IE 8]><script src="'.url('plugins/Images/library/jQuery-FileUpload/js/cors/jquery.xdr-transport.js').'"></script><![endif]-->');
    }
 
    /// Event Handlers ///
 
-   public function AssetModel_StyleCss_Handler($sender, $args) {
-      $sender->AddCssFile('images.css', 'plugins/Images');
+   public function assetModel_styleCss_handler($sender, $args) {
+      $sender->addCssFile('images.css', 'plugins/Images');
    }
 
    /**
     * Add the "new image" button after the new discussion button.
     */
-   public function Base_BeforeNewDiscussionButton_Handler($sender) {
+   public function base_beforeNewDiscussionButton_handler($sender) {
       $newDiscussionModule = &$sender->EventArguments['NewDiscussionModule'];
-      if (Gdn::Session()->CheckPermission('Plugins.Images.Add'))
-         $newDiscussionModule->AddButton(T('New Image'), 'post/image');
+      if (Gdn::session()->checkPermission('Plugins.Images.Add'))
+         $newDiscussionModule->addButton(t('New Image'), 'post/image');
    }
 
    /**
     * Display the Image label on the discussion list.
     */
-   public function Base_BeforeDiscussionMeta_Handler($sender) {
+   public function base_beforeDiscussionMeta_handler($sender) {
       $discussion = $sender->EventArguments['Discussion'];
-      if (strcasecmp(GetValue('Type', $discussion), 'Image') == 0)
-         echo Tag($discussion, 'Type', 'Image');
+      if (strcasecmp(getValue('Type', $discussion), 'Image') == 0)
+         echo tag($discussion, 'Type', 'Image');
    }
 
    /**
     * Add the image form to vanilla's post page.
     */
-   public function PostController_AfterForms_Handler($sender) {
-      $forms = $sender->Data('Forms');
+   public function postController_afterForms_handler($sender) {
+      $forms = $sender->data('Forms');
       if (!is_array($forms))
          $forms = [];
 
-      $forms[] = ['Name' => 'Image', 'Label' => Sprite('SpImage').T('New Image'), 'Url' => 'post/image'];
-		$sender->SetData('Forms', $forms);
+      $forms[] = ['Name' => 'Image', 'Label' => sprite('SpImage').t('New Image'), 'Url' => 'post/image'];
+		$sender->setData('Forms', $forms);
 
    }
 
    /**
     * Create the new image method on post controller.
     */
-   public function PostController_Image_Create($sender) {
+   public function postController_image_create($sender) {
       // Check permission
-      $sender->Permission('Vanilla.Discussions.Add');
-      $sender->Permission('Plugins.Images.Add');
+      $sender->permission('Vanilla.Discussions.Add');
+      $sender->permission('Plugins.Images.Add');
 
       $imageModel = new ImageModel();
 
       // Override CategoryID if categories are disabled
-      $sender->CategoryID = GetValue(0, $sender->RequestArgs);
-      $useCategories = $sender->ShowCategorySelector = (bool)C('Vanilla.Categories.Use');
+      $sender->CategoryID = getValue(0, $sender->RequestArgs);
+      $useCategories = $sender->ShowCategorySelector = (bool)c('Vanilla.Categories.Use');
       if (!$useCategories)
          $sender->CategoryID = 0;
 
-      $sender->Category = CategoryModel::Categories($sender->CategoryID);
+      $sender->Category = CategoryModel::categories($sender->CategoryID);
       if (!is_object($sender->Category))
          $sender->Category = NULL;
 
       if ($useCategories)
-			$categoryData = CategoryModel::Categories();
+			$categoryData = CategoryModel::categories();
 
       // Set the model on the form
-      $sender->Form->SetModel($imageModel);
-      if (!$sender->Form->IsPostBack()) {
+      $sender->Form->setModel($imageModel);
+      if (!$sender->Form->isPostBack()) {
          if ($sender->Category !== NULL)
-            $sender->Form->SetData(['CategoryID' => $sender->Category->CategoryID]);
+            $sender->Form->setData(['CategoryID' => $sender->Category->CategoryID]);
       } else { // Form was submitted
-         $formValues = $sender->Form->FormValues();
-         $discussionID = GetValue('DiscussionID', $formValues);
+         $formValues = $sender->Form->formValues();
+         $discussionID = getValue('DiscussionID', $formValues);
          $newDiscussion = $discussionID == 0;
          $commentIDs = [];
-         $discussionID = $imageModel->Save($formValues);
+         $discussionID = $imageModel->save($formValues);
          $commentIDs = $imageModel->CommentIDs;
-         $sender->Form->SetValidationResults($imageModel->ValidationResults());
-         if ($sender->Form->ErrorCount() == 0) {
-            $discussion = $sender->DiscussionModel->GetID($discussionID);
+         $sender->Form->setValidationResults($imageModel->validationResults());
+         if ($sender->Form->errorCount() == 0) {
+            $discussion = $sender->DiscussionModel->getID($discussionID);
             if ($newDiscussion) {
                // Redirect to the new discussion
-               redirectTo(DiscussionUrl($discussion).'#latest');
+               redirectTo(discussionUrl($discussion).'#latest');
             } elseif (count($commentIDs) > 0) {
                // Load/return the newly added comments.
                sort($commentIDs);
                $firstCommentID = array_shift($commentIDs);
-               $offset = $sender->CommentModel->GetOffset($firstCommentID);
-               $comments = $sender->CommentModel->Get($discussionID, 30, $offset);
-               $sender->SetData('Comments', $comments);
-               $sender->SetData('NewComments', TRUE);
+               $offset = $sender->CommentModel->getOffset($firstCommentID);
+               $comments = $sender->CommentModel->get($discussionID, 30, $offset);
+               $sender->setData('Comments', $comments);
+               $sender->setData('NewComments', TRUE);
                // $Sender->ClassName = 'DiscussionController';
                // $Sender->ControllerName = 'discussion';
                // $Sender->View = 'discussionitems';
 
                // Make sure to set the user's discussion watch records
-               $countComments = $sender->CommentModel->GetCount($discussionID);
+               $countComments = $sender->CommentModel->getCount($discussionID);
                $limit = count($commentIDs);
                $sender->Offset = $countComments - $limit;
-               $sender->CommentModel->SetWatch($discussion, $limit, $sender->Offset, $countComments);
-               $sender->Render('discussionitems', '', 'plugins/Images');
+               $sender->CommentModel->setWatch($discussion, $limit, $sender->Offset, $countComments);
+               $sender->render('discussionitems', '', 'plugins/Images');
                return;
             }
          }
       }
       // Set up the page and render
-      $sender->Title(T('New Image'));
-		$sender->SetData('Breadcrumbs', [['Name' => $sender->Data('Title'), 'Url' => '/post/image']]);
-      $this->AddJsFiles();
-      $sender->AddJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugin/Reactions');
+      $sender->title(t('New Image'));
+		$sender->setData('Breadcrumbs', [['Name' => $sender->data('Title'), 'Url' => '/post/image']]);
+      $this->addJsFiles();
+      $sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugin/Reactions');
 
-      $sender->Render('discussionform', '', 'plugins/Images');
+      $sender->render('discussionform', '', 'plugins/Images');
    }
 
    /**
     * If the discussion type is "image", use the images view (if available)
     * @param type $sender
     */
-   public function Base_BeforeCommentRender_Handler($sender) {
+   public function base_beforeCommentRender_handler($sender) {
       $discussion = $sender->EventArguments['Discussion'];
-      if (GetValue('Type', $discussion) == 'Image') {
+      if (getValue('Type', $discussion) == 'Image') {
          // $this->ClassName = 'DiscussionController';
          // $this->ControllerName = 'discussion';
          $this->View = 'discussionlist';
@@ -169,18 +169,18 @@ class ImagesPlugin extends Gdn_Plugin {
       }
    }
 
-   public function PostController_UploadImage_Create($sender) {
+   public function postController_uploadImage_create($sender) {
       error_reporting(E_ALL | E_STRICT);
 
       $paths = [
           'Upload' => PATH_UPLOADS.'/image-tmp/',
           'Thumb' => PATH_UPLOADS.'/image-tmp/thumbnails/'];
       foreach ($paths as $path) {
-         TouchFolder($path);
+         touchFolder($path);
       }
 
       $upload_handler = new VanillaUploadHandler([
-          'script_url' => Url('post/uploadimage', TRUE),
+          'script_url' => url('post/uploadimage', TRUE),
           'upload_dir' => $paths['Upload'],
           'image_versions' => [
             'thumbnail' => [
@@ -204,7 +204,7 @@ class ImagesPlugin extends Gdn_Plugin {
             break;
          case 'POST':
             // Grab the image from the specified url.
-            $url = GetIncomingValue('inputUrl');
+            $url = getIncomingValue('inputUrl');
             if ($url) {
                $upload_handler->handle_file_wget($url);
             } else if (isset($_REQUEST['_method']) && $_REQUEST['_method'] === 'DELETE') {
@@ -226,44 +226,44 @@ class ImagesPlugin extends Gdn_Plugin {
     * Add the js to the discussion form for file uploads.
     * @param Gdn_Controller $sender
     */
-   public function DiscussionController_Render_Before($sender) {
-      $discussion = $sender->Data('Discussion');
-      if (GetValue('Type', $discussion) != 'Image')
+   public function discussionController_render_before($sender) {
+      $discussion = $sender->data('Discussion');
+      if (getValue('Type', $discussion) != 'Image')
          return;
 
       // Include JS necessary in the page.
-//      $this->AddJsFiles();
+//      $this->addJsFiles();
 
       // If the current discussion is of type "Image", switch to the images view
-      $this->AddJsFiles();
-      $sender->AddJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions');
+      $this->addJsFiles();
+      $sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions');
 
       $sender->View = PATH_PLUGINS.'/Images/views/discussion.php';
 
       $sender->CssClass .= ' NoPanel';
    }
 
-   public function RootController_Render_Before($sender) {
-      if (InArrayI($sender->RequestMethod, ['bestof', 'bestof2'])) {
-         $sender->AddJsFile('tile.js', 'plugins/Images');
+   public function rootController_render_before($sender) {
+      if (inArrayI($sender->RequestMethod, ['bestof', 'bestof2'])) {
+         $sender->addJsFile('tile.js', 'plugins/Images');
       }
    }
 
    /* Add a toggle item to the form menu. */
-   public function DiscussionController_BeforeCommentForm_Handler($sender) {
+   public function discussionController_beforeCommentForm_handler($sender) {
       return;
       $formToggleMenu = $sender->EventArguments['FormToggleMenu'];
-      $formToggleMenu->AddLabel(Sprite('SpImage').' '.T('Image'), 'NewImageForm');
+      $formToggleMenu->addLabel(sprite('SpImage').' '.t('Image'), 'NewImageForm');
       // Is this discussion an image-type? If so, make the default response to post another image.
-      if (GetValue('Type', $sender->Data('Discussion')) == 'Image')
-         $formToggleMenu->CurrentLabelCode('NewImageForm');
+      if (getValue('Type', $sender->data('Discussion')) == 'Image')
+         $formToggleMenu->currentLabelCode('NewImageForm');
    }
 
    /* Render the comment file upload form. */
-   public function DiscussionController_AfterCommentFormMenu_Handler($sender) {
+   public function discussionController_afterCommentFormMenu_handler($sender) {
       $oldAction = $sender->Form->Action;
-      $sender->Form->Action = Url('post/image');
-      echo $sender->FetchView('commentform', '', 'plugins/Images');
+      $sender->Form->Action = url('post/image');
+      echo $sender->fetchView('commentform', '', 'plugins/Images');
       $sender->Form->Action = $oldAction;
    }
 }

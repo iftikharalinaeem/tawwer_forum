@@ -4,8 +4,8 @@
       <div class="Groups">
          <?php
          $PrevColorGroup = FALSE;
-         foreach ($this->Data('ColorPicker.Colors') as $Color => $Options) {
-            $ColorGroup = $this->ColorPicker->ColorGroup($Options['hsv'][0]);
+         foreach ($this->data('ColorPicker.Colors') as $Color => $Options) {
+            $ColorGroup = $this->ColorPicker->colorGroup($Options['hsv'][0]);
             $Key = $ColorGroup !== NULL ? $ColorGroup : '_';
 
             if ($ColorGroup !== $PrevColorGroup) {
@@ -16,7 +16,7 @@
                echo "\n<div class=\"ColorGroup ColorGroup$Key\" group=\"$Key\">";
 
                // Output the big swatch.
-               $GroupColor = $this->Data("ColorPicker.Groups.$ColorGroup");
+               $GroupColor = $this->data("ColorPicker.Groups.$ColorGroup");
                echo "<div class=\"BigSwatch BigSwatch$Key\" style=\"background: $GroupColor\" orig=\"$GroupColor\">&#160;</div>";
 
                // Start the swatches div.

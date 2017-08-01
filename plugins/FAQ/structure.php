@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit;
 /*      
-$St = Gdn::Structure();
-$Sql = Gdn::SQL();
-$Database = Gdn::Database();
+$St = Gdn::structure();
+$Sql = Gdn::sql();
+$Database = Gdn::database();
 */

@@ -1,20 +1,20 @@
 <?php
-$Session = Gdn::Session();
+$Session = Gdn::session();
 ?>
 <div class="MessageForm CommentForm FormTitleWrapper">
-   <h2 class="H"><?php echo T('Leave a Comment'); ?></h2>
+   <h2 class="H"><?php echo t('Leave a Comment'); ?></h2>
    
    <div class="CommentFormWrap">
       <div class="Form-HeaderWrap">
          <div class="Form-Header">
             <span class="Author">
                <?php
-               if (C('Vanilla.Comment.UserPhotoFirst', TRUE)) {
-                  echo UserPhoto($Session->User);
-                  echo UserAnchor($Session->User, 'Username');
+               if (c('Vanilla.Comment.UserPhotoFirst', TRUE)) {
+                  echo userPhoto($Session->User);
+                  echo userAnchor($Session->User, 'Username');
                } else {
-                  echo UserAnchor($Session->User, 'Username');
-                  echo UserPhoto($Session->User);
+                  echo userAnchor($Session->User, 'Username');
+                  echo userPhoto($Session->User);
                }
                ?>
             </span>
@@ -25,40 +25,40 @@ $Session = Gdn::Session();
             <div class="FormWrapper FormWrapper-Condensed">
                <?php
                
-               echo $this->Form->Open(['enctype' => 'multipart/form-data', 'id' => 'UploadForm', 'action' => Url('/post/imagecomment')]);
-               WriteImageUpload(TRUE);
-               echo $this->Form->Close();
+               echo $this->Form->open(['enctype' => 'multipart/form-data', 'id' => 'UploadForm', 'action' => url('/post/imagecomment')]);
+               writeImageUpload(TRUE);
+               echo $this->Form->close();
                
                echo '<div class="TextControlsWrap" style="display: none;">';
                
-               echo $this->Form->Open();
-               echo $this->Form->Errors();
-//               $CommentOptions = array('MultiLine' => TRUE, 'format' => GetValueR('Comment.Format', $this));
-               $this->FireEvent('BeforeBodyField');
+               echo $this->Form->open();
+               echo $this->Form->errors();
+//               $CommentOptions = array('MultiLine' => TRUE, 'format' => getValueR('Comment.Format', $this));
+               $this->fireEvent('BeforeBodyField');
                
-               echo $this->Form->BodyBox('Body', ['Table' => 'Comment', 'tabindex' => 1]);
+               echo $this->Form->bodyBox('Body', ['Table' => 'Comment', 'tabindex' => 1]);
                
                echo '<div class="CommentOptions List Inline">';
-//               $this->FireEvent('AfterBodyField');
+//               $this->fireEvent('AfterBodyField');
                echo '</div>';
                
                
                echo "<div class=\"Buttons\">\n";
-//               $this->FireEvent('BeforeFormButtons');
-               $CancelText = T('Home');
+//               $this->fireEvent('BeforeFormButtons');
+               $CancelText = t('Home');
                $CancelClass = 'Back';
 //               if (!$NewOrDraft || $Editing) {
-//                  $CancelText = T('Cancel');
+//                  $CancelText = t('Cancel');
 //                  $CancelClass = 'Cancel';
 //               }
 
                echo '<span class="'.$CancelClass.'">';
-               echo Anchor($CancelText, '/');
+               echo anchor($CancelText, '/');
 
-               if ($CategoryID = $this->Data('Discussion.CategoryID')) {
-                  $Category = CategoryModel::Categories($CategoryID);
+               if ($CategoryID = $this->data('Discussion.CategoryID')) {
+                  $Category = CategoryModel::categories($CategoryID);
                   if ($Category)
-                     echo ' <span class="Bullet">•</span> '.Anchor($Category['Name'], $Category['Url']);
+                     echo ' <span class="Bullet">•</span> '.anchor($Category['Name'], $Category['Url']);
                }
 
                echo '</span>';
@@ -68,35 +68,35 @@ $Session = Gdn::Session();
                /*
                Caused non-root users to not be able to add comments. Must take categories
                into account. Look at CheckPermission for more information.
-               if (!Gdn::Session()->CheckPermission('Vanilla.Comment.Add'))
+               if (!Gdn::session()->checkPermission('Vanilla.Comment.Add'))
                   $ButtonOptions['Disabled'] = 'disabled';
                */
 
-               if ($Session->IsValid()) {
-                  echo Anchor(T('Preview'), '#', 'PreviewButton')."\n";
-                  echo Anchor(T('Edit'), '#', 'WriteButton Hidden')."\n";
+               if ($Session->isValid()) {
+                  echo anchor(t('Preview'), '#', 'PreviewButton')."\n";
+                  echo anchor(t('Edit'), '#', 'WriteButton Hidden')."\n";
 //                  if ($NewOrDraft)
-                     echo Anchor(T('Save Draft'), '#', 'DraftButton')."\n";
+                     echo anchor(t('Save Draft'), '#', 'DraftButton')."\n";
                }
-               if ($Session->IsValid())
-                  echo $this->Form->Button('Post Comment', $ButtonOptions);
+               if ($Session->isValid())
+                  echo $this->Form->button('Post Comment', $ButtonOptions);
                else {
-                  $AllowSigninPopup = C('Garden.SignIn.Popup');
+                  $AllowSigninPopup = c('Garden.SignIn.Popup');
                   $Attributes = ['tabindex' => '-1'];
                   if (!$AllowSigninPopup)
                      $Attributes['target'] = '_parent';
 
-                  $AuthenticationUrl = SignInUrl($this->Data('ForeignUrl', '/'));
+                  $AuthenticationUrl = signInUrl($this->data('ForeignUrl', '/'));
                   $CssClass = 'Button Primary Stash';
                   if ($AllowSigninPopup)
                      $CssClass .= ' SignInPopup';
 
-                  echo Anchor(T('Comment As ...'), $AuthenticationUrl, $CssClass, $Attributes);
+                  echo anchor(t('Comment As ...'), $AuthenticationUrl, $CssClass, $Attributes);
                }
 
-               $this->FireEvent('AfterFormButtons');
+               $this->fireEvent('AfterFormButtons');
                echo "</div>\n";
-               echo $this->Form->Close();
+               echo $this->Form->close();
                
                echo '</div>';
                ?>

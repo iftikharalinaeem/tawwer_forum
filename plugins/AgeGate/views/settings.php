@@ -1,7 +1,7 @@
-<h1><?php echo T('Age Gate Settings'); ?></h1>
+<h1><?php echo t('Age Gate Settings'); ?></h1>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 
 <div class="padded">
@@ -12,18 +12,18 @@ echo $this->Form->Errors();
 <ul>
     <li class="form-group">
         <div class="label-wrap">
-            <?php echo $this->Form->Label('Minimum Age', 'MinimumAge');  ?>
+            <?php echo $this->Form->label('Minimum Age', 'MinimumAge');  ?>
         </div>
         <div class="input-wrap">
-            <?php echo $this->Form->TextBox('MinimumAge'); ?>
+            <?php echo $this->Form->textBox('MinimumAge'); ?>
         </div>
     </li>
     <li class="form-group">
         <div class="input-wrap no-label">
-            <?php echo $this->Form->CheckBox('AddConfirmation', 'Allow underage users to register with a confirmation of consent.');  ?>
+            <?php echo $this->Form->checkBox('AddConfirmation', 'Allow underage users to register with a confirmation of consent.');  ?>
         </div>
     </li>
 </ul>
 
 
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->close('Save');

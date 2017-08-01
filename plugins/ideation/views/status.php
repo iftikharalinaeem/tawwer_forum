@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
@@ -32,4 +32,4 @@ if (val('IsDefault', $this->Form->formData())) {
     <?php } ?>
     </ul>
 <?php
-echo $this->Form->Close('Save');
+echo $this->Form->close('Save');

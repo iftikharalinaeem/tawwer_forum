@@ -160,7 +160,7 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      */
     public function commentModel_afterSaveComment_handler($sender, $args) {
         $discussionID = valr('FormPostValues.DiscussionID', $args);
-        // pass the insertUserID, if it doesn't exist pass the updateUserID and allow the UserBadgeModel()->give() decide to give it or not.
+        // pass the insertUserID, if it doesn't exist pass the updateUserID and allow the userBadgeModel()->give() decide to give it or not.
         $userID = valr('FormPostValues.InsertUserID', $args, valr('FormPostValues.UpdateUserID', $args));
         $badge = $this->getDiscussionBadge($discussionID);
         // When the user saves a comment check if there is a badge associated with it.

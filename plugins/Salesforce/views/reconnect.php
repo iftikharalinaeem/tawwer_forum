@@ -7,5 +7,5 @@
 <h2>
    Salesforce
 </h2>
-<p><?php echo T('You need to login to your Salesforce Account to continue.') ?></p>
+<p><?php echo t('You need to login to your Salesforce Account to continue.') ?></p>
 <button id="SalesForceLogin" class="Button BigButton">Login</button>

@@ -68,14 +68,14 @@ class GroupController extends Gdn_Controller {
         $this->fireEvent('GroupLoaded');
 
         if (!$Group) {
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
         }
 
         $GroupID = $Group['GroupID'];
 
         // Force the canonical url.
         if (rawurlencode($ID) != groupSlug($Group)) {
-            redirectTo(GroupUrl($Group), 301);
+            redirectTo(groupUrl($Group), 301);
         }
         $this->canonicalUrl(url(groupUrl($Group), '//'));
 
@@ -172,12 +172,12 @@ class GroupController extends Gdn_Controller {
     public function announcement($group) {
         $group = $this->GroupModel->getID($group);
         if (!$group) {
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
         }
 
         // Check leader permission.
         if (!$this->GroupModel->checkPermission('Moderate', $group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Moderate.Reason', $group));
+            throw forbiddenException('@'.$this->GroupModel->checkPermission('Moderate.Reason', $group));
         }
 
         $this->setData('Group', $group);
@@ -218,11 +218,11 @@ class GroupController extends Gdn_Controller {
     public function approve($group, $iD, $value = 'approved') {
         $group = $this->GroupModel->getID($group);
         if (!$group)
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
 
         // Check leader permission.
         if (!$this->GroupModel->checkPermission('Leader', $group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Leader.Reason', $group));
+            throw forbiddenException('@'.$this->GroupModel->checkPermission('Leader.Reason', $group));
         }
 
         $value = ucfirst($value);
@@ -248,12 +248,12 @@ class GroupController extends Gdn_Controller {
     public function invite($iD) {
         $group = $this->GroupModel->getID($iD);
         if (!$group) {
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
         }
 
         // Check invite permission.
         if (!$this->GroupModel->checkPermission('Leader', $group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Join.Reason', $group));
+            throw forbiddenException('@'.$this->GroupModel->checkPermission('Join.Reason', $group));
         }
 
         $this->title(t('Invite'));
@@ -270,7 +270,7 @@ class GroupController extends Gdn_Controller {
             $memberIds = $this->GroupModel->getMemberIds(val('GroupID', $group));
             $applicantIds = $this->GroupModel->getApplicantIds(val('GroupID', $group), ['Type' => ['Application', 'Invitation']]);
             foreach ($recipients as $recipient) {
-                $userId = GetValue('UserID', Gdn::userModel()->getByUsername($recipient));
+                $userId = getValue('UserID', Gdn::userModel()->getByUsername($recipient));
                 if (in_array($userId, $memberIds)) {
                     $this->informMessage(t(sprintf("%s is already a member.", $recipient)));
                 } elseif (in_array($userId, $applicantIds)) {
@@ -290,7 +290,7 @@ class GroupController extends Gdn_Controller {
         }
 
         $this->setData('Group', $group);
-        $this->addBreadcrumb($group['Name'], GroupUrl($group));
+        $this->addBreadcrumb($group['Name'], groupUrl($group));
         $this->render();
     }
 
@@ -303,11 +303,11 @@ class GroupController extends Gdn_Controller {
     public function inviteAccept($iD) {
         $group = $this->GroupModel->getID($iD);
         if (!$group) {
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
         }
 
         if (!$this->Request->isPostBack()) {
-            throw ForbiddenException('GET');
+            throw forbiddenException('GET');
         }
 
         $result = $this->GroupModel->joinInvite($group['GroupID'], Gdn::session()->UserID, true);
@@ -325,13 +325,13 @@ class GroupController extends Gdn_Controller {
     public function inviteDecline($iD) {
         $group = $this->GroupModel->getID($iD);
         if (!$group) {
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
         }
-        if (!$this->Request->IsPostBack()) {
-            throw ForbiddenException('GET');
+        if (!$this->Request->isPostBack()) {
+            throw forbiddenException('GET');
         }
         $result = $this->GroupModel->joinInvite($group['GroupID'], Gdn::session()->UserID, false);
-        $this->SetData('Result', $result);
+        $this->setData('Result', $result);
 
         $this->jsonTarget('.GroupUserHeaderModule', '', 'SlideUp');
         $this->setRedirectTo(groupUrl($group));
@@ -349,15 +349,15 @@ class GroupController extends Gdn_Controller {
     public function join($iD) {
         $group = $this->GroupModel->getID($iD);
         if (!$group) {
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
         }
 
         // Check join permission.
         if (!$this->GroupModel->checkPermission('Join', $group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Join.Reason', $group));
+            throw forbiddenException('@'.$this->GroupModel->checkPermission('Join.Reason', $group));
         }
 
-        $this->setData('Title', sprintf(T('Join %s'), htmlspecialchars($group['Name'])));
+        $this->setData('Title', sprintf(t('Join %s'), htmlspecialchars($group['Name'])));
 
         $form = new Gdn_Form();
         $this->Form = $form;
@@ -390,12 +390,12 @@ class GroupController extends Gdn_Controller {
     public function leave($iD) {
         $group = $this->GroupModel->getID($iD);
         if (!$group) {
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
         }
 
         // Check join permission.
         if (!$this->GroupModel->checkPermission('Leave', $group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Leave.Reason', $group));
+            throw forbiddenException('@'.$this->GroupModel->checkPermission('Leave.Reason', $group));
         }
 
         $this->setData('Title', sprintf(t('Leave %s'), htmlspecialchars($group['Name'])));
@@ -427,12 +427,12 @@ class GroupController extends Gdn_Controller {
     public function delete($iD) {
         $group = $this->GroupModel->getID($iD);
         if (!$group) {
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
         }
         $this->setData('Group', $group);
 
         if (!groupPermission('Leader')) {
-            throw ForbiddenException('@'.groupPermission('Edit.Reason'));
+            throw forbiddenException('@'.groupPermission('Edit.Reason'));
         }
 
         $form = new Gdn_Form();
@@ -481,7 +481,7 @@ class GroupController extends Gdn_Controller {
                 return false; // no file uploaded.
             }
         } catch (Exception $ex) {
-            $form->AddError($ex);
+            $form->addError($ex);
             return false;
         }
 
@@ -591,16 +591,16 @@ class GroupController extends Gdn_Controller {
             $group = $this->GroupModel->getID($iD);
 
             if (!$group) {
-                throw NotFoundException('Group');
+                throw notFoundException('Group');
             }
 
             // Make sure the user can edit this group.
             if (!$this->GroupModel->checkPermission('Edit', $group)) {
-                throw ForbiddenException('@'.$this->GroupModel->checkPermission('Edit.Reason', $group));
+                throw forbiddenException('@'.$this->GroupModel->checkPermission('Edit.Reason', $group));
             }
 
             $this->setData('Group', $group);
-            $this->addBreadcrumb($group['Name'], GroupUrl($group));
+            $this->addBreadcrumb($group['Name'], groupUrl($group));
         }
 
         $icon = val('Icon', $group);
@@ -652,7 +652,7 @@ class GroupController extends Gdn_Controller {
 
         if ($form->authenticatedPostBack()) {
             // We need to save the images before saving to the database.
-            self::saveImage($form, 'Banner', ['Prefix' => 'groups/banners/banner_', 'Size' => C('Groups.BannerSize', '1000x250'), 'Crop' => true, 'OutputType' => 'jpeg']);
+            self::saveImage($form, 'Banner', ['Prefix' => 'groups/banners/banner_', 'Size' => c('Groups.BannerSize', '1000x250'), 'Crop' => true, 'OutputType' => 'jpeg']);
 
             if ($tmpIcon = $upload->validateUpload('Icon_New', false)) {
                 // New upload
@@ -697,7 +697,7 @@ class GroupController extends Gdn_Controller {
             }
             if ($groupID) {
                 $group = $this->GroupModel->getID($groupID);
-                redirectTo(GroupUrl($group));
+                redirectTo(groupUrl($group));
             } else {
                 trace($form->formValues());
             }
@@ -727,7 +727,7 @@ class GroupController extends Gdn_Controller {
      */
     public function groupIcon($id = false) {
         if(!$id) {
-            throw NotFoundException();
+            throw notFoundException();
         }
         $form = new Gdn_Form();
         $form->setModel($this->GroupModel);
@@ -736,15 +736,15 @@ class GroupController extends Gdn_Controller {
         if ($id) {
             $group = $this->GroupModel->getID($id);
             if (!$group) {
-                throw NotFoundException('Group');
+                throw notFoundException('Group');
             }
 
             // Make sure the user can edit this group.
             if (!$this->GroupModel->checkPermission('Edit', $group)) {
-                throw ForbiddenException('@' . $this->GroupModel->checkPermission('Edit.Reason', $group));
+                throw forbiddenException('@' . $this->GroupModel->checkPermission('Edit.Reason', $group));
             }
             $this->setData('Group', $group);
-            $this->addBreadcrumb($group['Name'], GroupUrl($group));
+            $this->addBreadcrumb($group['Name'], groupUrl($group));
         }
         $thumbnailSize = c('Groups.IconSize', 140);
         $this->setData('thumbnailSize', $thumbnailSize);
@@ -875,7 +875,7 @@ class GroupController extends Gdn_Controller {
 
         $group = $this->GroupModel->getID($iD);
         if (!$group) {
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
         }
 
         $this->setData('Group', $group);
@@ -968,13 +968,13 @@ class GroupController extends Gdn_Controller {
 
         $Group = $this->GroupModel->getID($ID);
         if (!$Group) {
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
         }
 
         // Check if this person is a member of the group or a moderator
-        $viewGroupEvents = GroupPermission('View', $Group);
+        $viewGroupEvents = groupPermission('View', $Group);
         if (!$viewGroupEvents) {
-            throw PermissionException();
+            throw permissionException();
         }
 
         $this->Form = new Gdn_Form();
@@ -1031,16 +1031,16 @@ class GroupController extends Gdn_Controller {
     public function setRole($iD, $userID, $role) {
         $group = $this->GroupModel->getID($iD);
         if (!$group) {
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
         }
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
         if (!$user) {
-            throw NotFoundException('User');
+            throw notFoundException('User');
         }
 
         if (!$this->GroupModel->checkPermission('Edit', $group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Edit.Reason', $group));
+            throw forbiddenException('@'.$this->GroupModel->checkPermission('Edit.Reason', $group));
         }
 
         $groupID = $group['GroupID'];
@@ -1048,12 +1048,12 @@ class GroupController extends Gdn_Controller {
         $member = $this->GroupModel->getMembers($group['GroupID'], ['UserID' => $userID]);
         $member = array_pop($member);
         if (!$member) {
-            throw NotFoundException('Member');
+            throw notFoundException('Member');
         }
 
         // You can't demote the user that started the group.
         if ($userID == $group['InsertUserID']) {
-            throw ForbiddenException('@'.t("The user that started the group has to be a leader."));
+            throw forbiddenException('@'.t("The user that started the group has to be a leader."));
         }
 
         if ($this->Request->isPostBack()) {
@@ -1080,11 +1080,11 @@ class GroupController extends Gdn_Controller {
     public function removeMember($iD, $userID) {
         $group = $this->GroupModel->getID($iD);
         if (!$group)
-            throw NotFoundException('Group');
+            throw notFoundException('Group');
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
         if (!$user) {
-            throw NotFoundException('User');
+            throw notFoundException('User');
         }
 
         if ($userID == Gdn::session()->UserID) {
@@ -1093,7 +1093,7 @@ class GroupController extends Gdn_Controller {
         }
 
         if (!$this->GroupModel->checkPermission('Moderate', $group)) {
-            throw ForbiddenException('@'.$this->GroupModel->checkPermission('Moderate.Reason', $group));
+            throw forbiddenException('@'.$this->GroupModel->checkPermission('Moderate.Reason', $group));
         }
 
         $groupID = $group['GroupID'];
@@ -1101,12 +1101,12 @@ class GroupController extends Gdn_Controller {
         $member = $this->GroupModel->getMembers($group['GroupID'], ['UserID' => $userID]);
         $member = array_pop($member);
         if (!$member) {
-            throw NotFoundException('Member');
+            throw notFoundException('Member');
         }
 
         // You can't remove the user that started the group.
         if ($userID == $group['InsertUserID']) {
-            throw ForbiddenException('@'.t("You can't remove the creator of the group."));
+            throw forbiddenException('@'.t("You can't remove the creator of the group."));
         }
 
         // Only users that can edit the group can remove leaders.

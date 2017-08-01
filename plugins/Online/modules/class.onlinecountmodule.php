@@ -79,7 +79,7 @@ class OnlineCountModule extends Gdn_Module {
         return [$count, $guestCount];
     }
 
-    public function ToString() {
+    public function toString() {
         list($count, $guestCount) = $this->getData();
         $combinedCount = $count + $guestCount;
 
@@ -89,7 +89,7 @@ class OnlineCountModule extends Gdn_Module {
         $outputString = '';
         ob_start();
         ?>
-        <div class="OnlineCount"><?php echo sprintf(T("%s viewing"), $formattedCount); ?></div>
+        <div class="OnlineCount"><?php echo sprintf(t("%s viewing"), $formattedCount); ?></div>
         <?php
         $outputString = ob_get_contents();
         @ob_end_clean();

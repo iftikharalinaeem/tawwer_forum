@@ -42,7 +42,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
      *
      * @return MCAPI
      */
-    protected function MCAPI() {
+    protected function mCAPI() {
         if (!$this->MCAPI) {
 
             // This will ensure that the class is loaded until the addon autoloader is fixed properly.
@@ -153,7 +153,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         }
 
         // Send request
-        return $this->MCAPI()->listBatchSubscribe($listID, $emails);
+        return $this->mCAPI()->listBatchSubscribe($listID, $emails);
     }
 
     /**
@@ -167,7 +167,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
      * @return null|string
      */
     public function update($defaultListID, $email, $newEmail, $options = null) {
-        $lists = $this->MCAPI()->lists();
+        $lists = $this->mCAPI()->lists();
         $allLists = array_keys($lists);
 
         // Configure subscription
@@ -181,12 +181,12 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         $updated = false;
         foreach ($allLists as $listID) {
             // Lookup member
-            $memberInfo = $this->MCAPI()->listMemberInfo($listID, [$email]);
-            $memberInfo = $this->MCAPI()->toArray($memberInfo);
+            $memberInfo = $this->mCAPI()->listMemberInfo($listID, [$email]);
+            $memberInfo = $this->mCAPI()->toArray($memberInfo);
 
             if ($memberInfo['status'] === 'subscribed') {
                 // Update existing user
-                $this->MCAPI()->listUpdateAddress(
+                $this->mCAPI()->listUpdateAddress(
                     $listID,
                     [
                         'EMAIL'  => $email,
@@ -264,7 +264,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
 
     private function setListData($sender) {
-        $allLists = $this->MCAPI()->lists();
+        $allLists = $this->mCAPI()->lists();
         $sender->setData('Lists', $allLists);
 
         // Get all the interest categories (Groups) attached to each list from MailChimp
@@ -273,13 +273,13 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         foreach ($listIDs as $list) {
 
             // All interests are nested in interest categories, first get all the categories associated with a list.
-            $interestCategories = $this->MCAPI()->listInterestCategories($list);
+            $interestCategories = $this->mCAPI()->listInterestCategories($list);
             $interestList = [];
             if ($interestCategories) {
 
                 // Loop through the interests and assign them to an array using the ListID as a unique key.
                 foreach ($interestCategories as $categoryID) {
-                    $interestList = array_merge($interestList, $this->MCAPI()->listInterest($list, $categoryID));
+                    $interestList = array_merge($interestList, $this->mCAPI()->listInterest($list, $categoryID));
                 }
                 $interests[$list] = $interestList;
             }
@@ -327,7 +327,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
          * Get all the interests and send them to the form.
          */
         if (!empty($apiKey)) {
-            $ping = $this->MCAPI()->ping();
+            $ping = $this->mCAPI()->ping();
             if ($ping === true) {
                 $configured = true;
                 $sender->setData('Configured', true);
@@ -470,7 +470,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
 
                 // Extract email addresses
                 $emails = [];
-                while ($processUser = $processUsers->NextRow(DATASET_TYPE_ARRAY)) {
+                while ($processUser = $processUsers->nextRow(DATASET_TYPE_ARRAY)) {
                     if (!empty($processUser['Email'])) {
                         $emails[] = $processUser['Email'];
                     }
@@ -485,7 +485,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
                     $response = $this->add($SyncListID, $emails, $options);
                 }
 
-                $response = $this->MCAPI()->toArray($response);
+                $response = $this->mCAPI()->toArray($response);
 
                 $sender->setData('Status', val('status', $response, 'unknown'));
                 $sender->setData('BatchID', val('id', $response));
@@ -518,7 +518,7 @@ class MailChimpPushPlugin extends Gdn_Plugin {
         $sender->deliveryMethod(DELIVERY_METHOD_JSON);
         $sender->deliveryType(DELIVERY_TYPE_DATA);
         $batchID = Gdn::request()->getValue('batchID');
-        $response = $this->MCAPI()->getBatchStatus($batchID);
+        $response = $this->mCAPI()->getBatchStatus($batchID);
         $response = $response->getBody();
         $sender->setData('response', $response);
         $sender->render();

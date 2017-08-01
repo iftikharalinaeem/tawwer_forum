@@ -4,55 +4,55 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 
    /**
     * Adds "Custom CSS" menu option to the dashboard.
-   public function Base_GetAppSettingsMenuItems_Handler($sender) {
+   public function base_GetAppSettingsMenuItems_Handler($sender) {
       $Menu = &$sender->EventArguments['SideMenu'];
-		$Menu->AddItem('Appearance', 'Appearance');
-      $Menu->AddLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
+		$Menu->addItem('Appearance', 'Appearance');
+      $Menu->addLink('Appearance', 'Custom CSS', 'plugin/customcss', 'Garden.AdminUser.Only');
    }
     */
 
-   public function Base_Render_Before($sender) {
+   public function base_render_before($sender) {
 		// If we are using the default master view, and in preview mode, add the custom css file
-		$session = Gdn::Session();
-		$preview = $session->GetPreference('PreviewCustomCSS', FALSE);
-		$live = Gdn::Config('Plugins.CustomCSS.Enabled');
-		$currentTheme = Gdn::Config('Garden.Theme', 'default');
-		$customFile = Gdn::Config('Plugins.CustomCSS.File', '');
-		$previewFile = Gdn::Config('Plugins.CustomCSS.PreviewFile', '');
+		$session = Gdn::session();
+		$preview = $session->getPreference('PreviewCustomCSS', FALSE);
+		$live = Gdn::config('Plugins.CustomCSS.Enabled');
+		$currentTheme = Gdn::config('Garden.Theme', 'default');
+		$customFile = Gdn::config('Plugins.CustomCSS.File', '');
+		$previewFile = Gdn::config('Plugins.CustomCSS.PreviewFile', '');
 		if (($sender->MasterView == 'default' || $sender->MasterView == '')) {
 			if (($previewFile != '' && $preview) || $live) {
 				// If there is custom css, and we are not supposed to include theme-based css files...
-				if (Gdn::Config('Plugins.CustomCSS.IncludeTheme', 'Yes') == 'No') {
+				if (Gdn::config('Plugins.CustomCSS.IncludeTheme', 'Yes') == 'No') {
 					// ... remove them
-					$sender->ClearCssFiles();
+					$sender->clearCssFiles();
 				}
 			}
 
 			if ($previewFile != '' && $preview)
-				$sender->AddCssFile('/cache/CustomCSS/'.$currentTheme.'/'.$previewFile);
+				$sender->addCssFile('/cache/CustomCSS/'.$currentTheme.'/'.$previewFile);
 			else if ($customFile != '' && $live)
-				$sender->AddCssFile('/cache/CustomCSS/'.$currentTheme.'/'.$customFile);
+				$sender->addCssFile('/cache/CustomCSS/'.$currentTheme.'/'.$customFile);
 		}
 		if ($preview) {
-			$sender->AddAsset('Content', $sender->FetchView(PATH_PLUGINS . DS . 'CustomCSS' . DS . 'views' . DS . 'preview.php'));
-			$sender->AddCssFile('previewtheme.css', 'dashboard');
+			$sender->addAsset('Content', $sender->fetchView(PATH_PLUGINS . DS . 'CustomCSS' . DS . 'views' . DS . 'preview.php'));
+			$sender->addCssFile('previewtheme.css', 'dashboard');
 		}
 	}
 
-   public function PluginController_CustomCSS_Create($Sender, $EventArguments = []) {
+   public function pluginController_customCSS_create($Sender, $EventArguments = []) {
 		require_once('kses.php');
-		$Session = Gdn::Session();
-		$UserModel = Gdn::UserModel();
-      $Sender->Permission('Garden.AdminUser.Only');
-      $Sender->Title('Custom CSS');
-      $Sender->AddSideMenu('plugin/customcss');
+		$Session = Gdn::session();
+		$UserModel = Gdn::userModel();
+      $Sender->permission('Garden.AdminUser.Only');
+      $Sender->title('Custom CSS');
+      $Sender->addSideMenu('plugin/customcss');
       $Sender->Form = new Gdn_Form();
-		$Sender->AddJsFile('jquery.autogrow.js');
-		$Sender->AddCssFile('customcss.css', 'plugins/CustomCSS');
+		$Sender->addJsFile('jquery.autogrow.js');
+		$Sender->addCssFile('customcss.css', 'plugins/CustomCSS');
 
-		$CurrentTheme = Gdn::Config('Garden.Theme', '');
+		$CurrentTheme = Gdn::config('Garden.Theme', '');
 		$ThemeManager = Gdn::themeManager();
-		$Sender->CurrentThemeInfo = $ThemeManager->EnabledThemeInfo();
+		$Sender->CurrentThemeInfo = $ThemeManager->enabledThemeInfo();
 		$Folder = PATH_CACHE . DS . 'CustomCSS';
 
 		// Create the CustomCSS cache folder
@@ -63,9 +63,9 @@ class CustomCSSPlugin implements Gdn_IPlugin {
 		if (!file_exists($Folder))
 			@mkdir($Folder);
 
-		$FileName = Gdn::Config('Plugins.CustomCSS.PreviewFile', 'rev_0.css');
-		if (!$Sender->Form->AuthenticatedPostBack()) {
-			$LoadFile = ArrayValue(0, $Sender->RequestArgs);
+		$FileName = Gdn::config('Plugins.CustomCSS.PreviewFile', 'rev_0.css');
+		if (!$Sender->Form->authenticatedPostBack()) {
+			$LoadFile = arrayValue(0, $Sender->RequestArgs);
 			if ($LoadFile !== FALSE && strpos($LoadFile, 'rev_') !== FALSE) {
 				$LoadFile .= '.css';
 				if (file_exists($Folder . DS . $LoadFile))
@@ -105,24 +105,24 @@ Here are some things you should know before you begin:
 	
 Have fun!!
 */' : file_get_contents($Folder . DS . $FileName);
-		if (!$Sender->Form->AuthenticatedPostBack()) {
-			$Sender->Form->SetFormValue('CustomCSS', $Contents);
+		if (!$Sender->Form->authenticatedPostBack()) {
+			$Sender->Form->setFormValue('CustomCSS', $Contents);
 		} else {
-			$IsSave = $Sender->Form->GetFormValue('Apply') ? TRUE : FALSE;
-			$IsApply = $Sender->Form->GetFormValue('ApplyChanges') ? TRUE : FALSE;
-			$IsPreview = $Sender->Form->GetFormValue('Preview') ? TRUE : FALSE;
-			$IsExitPreview = $Sender->Form->GetFormValue('ExitPreview') ? TRUE : FALSE;
-			$IncludeTheme = $Sender->Form->GetFormValue('IncludeTheme');
+			$IsSave = $Sender->Form->getFormValue('Apply') ? TRUE : FALSE;
+			$IsApply = $Sender->Form->getFormValue('ApplyChanges') ? TRUE : FALSE;
+			$IsPreview = $Sender->Form->getFormValue('Preview') ? TRUE : FALSE;
+			$IsExitPreview = $Sender->Form->getFormValue('ExitPreview') ? TRUE : FALSE;
+			$IncludeTheme = $Sender->Form->getFormValue('IncludeTheme');
 
 			if ($IsApply || $IsSave)
-				$Sender->InformMessage("Your changes have been applied.");
+				$Sender->informMessage("Your changes have been applied.");
 
 			if ($IsApply) {
-				SaveToConfig('Plugins.CustomCSS.File', $FileName);
-				$Sender->Form->SetFormValue('CustomCSS', $Contents);
-				$UserModel->SavePreference($Session->UserID, 'PreviewCustomCSS', FALSE);
+				saveToConfig('Plugins.CustomCSS.File', $FileName);
+				$Sender->Form->setFormValue('CustomCSS', $Contents);
+				$UserModel->savePreference($Session->UserID, 'PreviewCustomCSS', FALSE);
 			} else if ($IsPreview || $IsSave) {
-				$NewCSS = $Sender->Form->GetFormValue('CustomCSS', '');
+				$NewCSS = $Sender->Form->getFormValue('CustomCSS', '');
 
 				// Clean the css
 				safecss_class();
@@ -153,16 +153,16 @@ Have fun!!
 				$NewCSS = $csstidy->print->plain();
 
 				if (in_array($IncludeTheme, ['Yes', 'No']))
-					SaveToConfig('Plugins.CustomCSS.IncludeTheme', $IncludeTheme);
+					saveToConfig('Plugins.CustomCSS.IncludeTheme', $IncludeTheme);
 
 				if ($Contents != $NewCSS) {
 					$FileName = 'rev_'.($CurrentRevision + 1).'.css';
 
 					file_put_contents($Folder . DS . $FileName, $NewCSS);
-					SaveToConfig('Plugins.CustomCSS.PreviewFile', $FileName);
+					saveToConfig('Plugins.CustomCSS.PreviewFile', $FileName);
 
 					// Only keep the last 20 revs
-					$ActiveRevision = str_replace(['rev_', '.css'], '', Gdn::Config('Plugins.CustomCSS.File', ''));
+					$ActiveRevision = str_replace(['rev_', '.css'], '', Gdn::config('Plugins.CustomCSS.File', ''));
 					$ActiveRevision = is_numeric($ActiveRevision) ? $ActiveRevision : 0;
 					if ($Handle = opendir($Folder)) {
                   while (FALSE !== ($File = readdir($Handle))) {
@@ -177,24 +177,24 @@ Have fun!!
 				}
 
 				if ($IsSave)
-					SaveToConfig('Plugins.CustomCSS.File', $FileName); // <-- Update the name of the file that will be included.
+					saveToConfig('Plugins.CustomCSS.File', $FileName); // <-- Update the name of the file that will be included.
 
-				$Sender->Form->SetFormValue('CustomCSS', $NewCSS);
-				$Sender->Form->SetFormValue('IncludeTheme', $IncludeTheme);
+				$Sender->Form->setFormValue('CustomCSS', $NewCSS);
+				$Sender->Form->setFormValue('IncludeTheme', $IncludeTheme);
 			}
 
 			if ($IsPreview) {
-				$UserModel->SavePreference($Session->UserID, 'PreviewCustomCSS', TRUE);
+				$UserModel->savePreference($Session->UserID, 'PreviewCustomCSS', TRUE);
 				redirectTo('/');
 			} else if ($IsExitPreview) {
-				$UserModel->SavePreference($Session->UserID, 'PreviewCustomCSS', FALSE);
+				$UserModel->savePreference($Session->UserID, 'PreviewCustomCSS', FALSE);
 				redirectTo('/plugin/customcss');
 			}
 		}
-      $Sender->Render(PATH_PLUGINS . DS . 'CustomCSS' . DS . 'views' . DS . 'customcss.php');
+      $Sender->render(PATH_PLUGINS . DS . 'CustomCSS' . DS . 'views' . DS . 'customcss.php');
    }
 
-   public function Setup() {
+   public function setup() {
       // No setup required.
    }
 
@@ -271,14 +271,14 @@ if (!function_exists('safecss_class')) {
 
 				if ( $send && $this->tales ) {
 					try {
-						$SiteID = Gdn::Config('VanillaForums.SiteID', '');
-						$Session = Gdn::Session();
+						$SiteID = Gdn::config('VanillaForums.SiteID', '');
+						$Session = Gdn::session();
 						$E = new Gdn_Email();
 						$E->Subject = '[Custom CSS]';
 						$E->Message = 'SiteID: '.$SiteID."\nUserID: ".$Session->UserID."\n".implode("\n", $this->tales);
 						$E->To = 'support@vanillaforums.com';
-						$E->From('customcss@vanillaforums.com', 'Custom CSS Attack');
-						$E->Send();
+						$E->from('customcss@vanillaforums.com', 'Custom CSS Attack');
+						$E->send();
 					} catch(Exception $ex) {
 						// do nothing
 					}

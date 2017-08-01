@@ -162,7 +162,7 @@ class OneLogin_Saml_XmlSec
         // First decrypt the doc.
         $this->decrypt();
 
-        $xml = $this->_document->C14N();
+        $xml = $this->_document->c14N();
 //        echo $xml;
 //        die();
 

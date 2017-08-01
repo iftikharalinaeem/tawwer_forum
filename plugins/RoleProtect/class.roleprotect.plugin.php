@@ -16,11 +16,11 @@ class RoleProtectPlugin extends Gdn_Plugin {
 
    public function __construct() {
       $roleModel = new RoleModel();
-      $this->Roles = $roleModel->GetArray();
+      $this->Roles = $roleModel->getArray();
       $roleModel = NULL;
    }
 
-   public function Gdn_Dispatcher_BeforeDispatch_Handler($sender) {
+   public function gdn_Dispatcher_BeforeDispatch_Handler($sender) {
 
       // Roles the logged-in user can modify
       $editableRoleData = $this->EditableRoles = [];
@@ -28,22 +28,22 @@ class RoleProtectPlugin extends Gdn_Plugin {
       // Roles that, if present in the target user, protect him from  being edited
       $protectedRoleData = $this->ProtectedRoles = [];
 
-      if (!Gdn::Session()->IsValid()) return;
+      if (!Gdn::session()->isValid()) return;
 
       // Loop over the logged-in user's roles
-      $myRoleData = Gdn::UserModel()->GetRoles(Gdn::Session()->UserID)->Result();
+      $myRoleData = Gdn::userModel()->getRoles(Gdn::session()->UserID)->result();
       $roleIDs = array_column($myRoleData, 'RoleID');
       $roleNames = array_column($myRoleData, 'Name');
-      $myRoles = ArrayCombine($roleIDs, $roleNames);
+      $myRoles = arrayCombine($roleIDs, $roleNames);
       foreach ($myRoles as $roleID => $roleName) {
-         $editableRolesList = C("Plugins.RoleProtect.{$roleID}.CanAffect", NULL);
+         $editableRolesList = c("Plugins.RoleProtect.{$roleID}.CanAffect", NULL);
          if (!is_null($editableRolesList)) {
             $editableRolesList = explode(',', $editableRolesList);
             if (is_array($editableRolesList) && sizeof($editableRolesList))
                $editableRoleData = array_merge($editableRoleData, $editableRolesList);
          }
 
-         $protectedRolesList = C("Plugins.RoleProtect.{$roleID}.Protected", NULL);
+         $protectedRolesList = c("Plugins.RoleProtect.{$roleID}.Protected", NULL);
          if (!is_null($protectedRolesList)) {
             $protectedRolesList = explode(',', $protectedRolesList);
             if (is_array($protectedRolesList) && sizeof($protectedRolesList))
@@ -55,23 +55,23 @@ class RoleProtectPlugin extends Gdn_Plugin {
       $editableRoleData = array_flip($editableRoleData);
       $editableRoles = [];
       foreach ($editableRoleData as $editableRoleID => $trash)
-         $editableRoles[$editableRoleID] = GetValue($editableRoleID, $this->Roles);
+         $editableRoles[$editableRoleID] = getValue($editableRoleID, $this->Roles);
       $this->EditableRoles = $editableRoles;
 
       // Format ProtectedRoleData into a nice ASSOC array
       $protectedRoleData = array_flip($protectedRoleData);
       $protectedRoles = [];
       foreach ($protectedRoleData as $protectedRoleID => $trash)
-         $protectedRoles[$protectedRoleID] = GetValue($protectedRoleID, $this->Role);
+         $protectedRoles[$protectedRoleID] = getValue($protectedRoleID, $this->Role);
       $this->ProtectedRoles = $protectedRoles;
    }
 
-   public function UserController_BeforeUserAdd_Handler($sender) {
+   public function userController_beforeUserAdd_handler($sender) {
 
       // If this user is here, they have Account Edit. If they also haver 'Moderator'
       // then we have to take special care, otherwise just proceed as normal without
       // modifying anything.
-      if (!Gdn::Session()->CheckPermission('Garden.Roles.Selective'))
+      if (!Gdn::session()->checkPermission('Garden.Roles.Selective'))
          return;
 
       // Nothing configured for this role - allow all operations
@@ -81,12 +81,12 @@ class RoleProtectPlugin extends Gdn_Plugin {
       $sender->EventArguments['RoleData'] = $this->EditableRoles;
    }
 
-   public function UserController_BeforeUserEdit_Handler($sender) {
+   public function userController_beforeUserEdit_handler($sender) {
 
       // If this user is here, they have Account Edit. If they also haver 'Moderator'
       // then we have to take special care, otherwise just proceed as normal without
       // modifying anything.
-      if (!Gdn::Session()->CheckPermission('Garden.Roles.Selective'))
+      if (!Gdn::session()->checkPermission('Garden.Roles.Selective'))
          return;
 
       // Nothing configured for this role - allow all operations
@@ -107,12 +107,12 @@ class RoleProtectPlugin extends Gdn_Plugin {
       $sender->EventArguments['RoleData'] = $this->EditableRoles;
    }
 
-   public function UserController_BeforeUserDelete_Handler($sender) {
+   public function userController_beforeUserDelete_handler($sender) {
 
       // If this user is here, they have Account Edit. If they also haver 'Moderator'
       // then we have to take special care, otherwise just proceed as normal without
       // modifying anything.
-      if (!Gdn::Session()->CheckPermission('Garden.Roles.Selective'))
+      if (!Gdn::session()->checkPermission('Garden.Roles.Selective'))
          return;
 
       // Nothing configured for this role - allow all operations
@@ -129,13 +129,13 @@ class RoleProtectPlugin extends Gdn_Plugin {
 
    }
 
-   public function CheckRolePermission($targetUserID) {
+   public function checkRolePermission($targetUserID) {
 
       // Get all the roles of the user we're trying to edit
-      $theirRoleData = Gdn::UserModel()->GetRoles($targetUserID)->Result();
+      $theirRoleData = Gdn::userModel()->getRoles($targetUserID)->result();
       $theirRoleIDs = array_column($theirRoleData, 'RoleID');
       $theirRoleNames = array_column($theirRoleData, 'Name');
-      $theirRoles = ArrayCombine($theirRoleIDs, $theirRoleNames);
+      $theirRoles = arrayCombine($theirRoleIDs, $theirRoleNames);
 
       foreach ($theirRoles as $theirRoleID => $theirRoleName) {
          if (array_key_exists($theirRoleID, $this->ProtectedRoles)) {

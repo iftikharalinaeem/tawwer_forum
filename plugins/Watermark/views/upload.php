@@ -35,7 +35,7 @@ if ($watermark) {
     );
 }
 
-echo $this->Form->Input('watermark', 'file');
+echo $this->Form->input('watermark', 'file');
 
 echo '<div class="Buttons">'.$this->Form->button('Save').'</div>';
 ?>

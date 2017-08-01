@@ -39,13 +39,13 @@
          <input type="hidden" name="Image[]" value="{%=file.url%}" />
          <input type="hidden" name="Thumbnail[]" value="{%=file.thumbnail_url%}" />
          <input type="hidden" name="Size[]" value="{%=file.size%}" />
-         <input type="text" name="Caption[]" class="InputBox CaptionBox" placeholder="<?php echo htmlspecialchars(T('Enter a caption...')); ?>" value="{%=file.caption%}" />
+         <input type="text" name="Caption[]" class="InputBox CaptionBox" placeholder="<?php echo htmlspecialchars(t('Enter a caption...')); ?>" value="{%=file.caption%}" />
       </div>
     {% } %}
     <div class="Delete delete">
       <button tabindex="-1" class="Button DeleteButton btn btn-danger" data-type="{%=file.delete_type%}" data-url="{%=file.delete_url%}">
           <i class="icon-trash icon-white"></i>
-          <span><?php echo T('Remove'); ?></span>
+          <span><?php echo t('Remove'); ?></span>
       </button>
     </div>
    </div>{% } %}

@@ -21,7 +21,7 @@
  *
  * @return bool
  */
-function CAS_autoload($class)
+function cAS_autoload($class)
 {
     // Static to hold the Include Path to CAS
     static $include_path;
@@ -98,7 +98,7 @@ if (function_exists('spl_autoload_register')) {
      */
     function __autoload($class)
     {
-        return CAS_autoload($class);
+        return cAS_autoload($class);
     }
 }
 

@@ -2,14 +2,14 @@
 
 <ul class="DataList Compact BlogList">
    <?php 
-   foreach ($this->Data('Data', []) as $Row): 
-      $this->SetData('Record', $Row);
+   foreach ($this->data('Data', []) as $Row): 
+      $this->setData('Record', $Row);
    ?>
    <li id="<?php echo "{$Row['RecordType']}_{$Row['RecordID']}" ?>" class="Item">
       <?php
-      if ($Name = GetValue('Name', $Row)) {
-         echo Wrap(
-            Anchor(Gdn_Format::Text($Name), $Row['Url']),
+      if ($Name = getValue('Name', $Row)) {
+         echo wrap(
+            anchor(Gdn_Format::text($Name), $Row['Url']),
             'h3', ['class' => 'Title']);
       }
       ?>
@@ -17,22 +17,22 @@
          <div class="AuthorWrap">
             <span class="Author">
                <?php
-               echo UserPhoto($Row, ['Px' => 'Insert']);
-               echo UserAnchor($Row, ['Px' => 'Insert']);
+               echo userPhoto($Row, ['Px' => 'Insert']);
+               echo userAnchor($Row, ['Px' => 'Insert']);
                ?>
             </span>
 <!--            <span class="AuthorInfo">
                <?php
-               //echo WrapIf(GetValue('Title', $Author), 'span', array('class' => 'MItem AuthorTitle'));
-               $this->FireEvent('AuthorInfo'); 
+               //echo wrapIf(GetValue('Title', $Author), 'span', array('class' => 'MItem AuthorTitle'));
+               $this->fireEvent('AuthorInfo'); 
                ?>
             </span>-->
          </div>
          <div class="Meta">
             <span class="MItem DateCreated">
                <?php
-               echo Anchor(
-                  Gdn_Format::Date($Row['DateInserted'], 'html'),
+               echo anchor(
+                  Gdn_Format::date($Row['DateInserted'], 'html'),
                   $Row['Url'],
                   'Permalink'
                   );
@@ -45,7 +45,7 @@
          <div class="Item-Body">
             <div class="Message Expander">
                <?php
-               echo Gdn_Format::To($Row['Body'], $Row['Format']);
+               echo Gdn_Format::to($Row['Body'], $Row['Format']);
                ?>
             </div>
          </div>
@@ -53,15 +53,15 @@
       
       <?php
       $RowObject = (object)$Row;
-      Gdn::Controller()->EventArguments['Object'] = $RowObject;
-      Gdn::Controller()->EventArguments[$Row['RecordType']] = $RowObject;
-      Gdn::Controller()->FireAs('DiscussionController')->FireEvent("After{$Row['RecordType']}Body");
+      Gdn::controller()->EventArguments['Object'] = $RowObject;
+      Gdn::controller()->EventArguments[$Row['RecordType']] = $RowObject;
+      Gdn::controller()->fireAs('DiscussionController')->fireEvent("After{$Row['RecordType']}Body");
       
-      WriteReactions($Row);
+      writeReactions($Row);
       ?>
    </li>
    <?php endforeach; ?>
 </ul>
 <?php
-echo PagerModule::Write();
+echo PagerModule::write();
 ?>

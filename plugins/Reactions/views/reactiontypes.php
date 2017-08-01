@@ -16,15 +16,15 @@ echo heading($this->data('Title'));
 <table class="table-data js-tj">
    <thead>
       <tr>
-         <th class="NameColumn column-lg"><?php echo T('Reaction'); ?></th>
-         <th class="column-xl"><?php echo T("Actions and Permissions"); ?></th>
+         <th class="NameColumn column-lg"><?php echo t('Reaction'); ?></th>
+         <th class="column-xl"><?php echo t("Actions and Permissions"); ?></th>
          <th class="options"></th>
       </tr>
    </thead>
    <tbody>
-      <?php foreach ($this->Data('ReactionTypes') as $ReactionType): ?>
+      <?php foreach ($this->data('ReactionTypes') as $ReactionType): ?>
       <?php
-      if (GetValue('Hidden', $ReactionType)) continue;
+      if (getValue('Hidden', $ReactionType)) continue;
       $UrlCode = $ReactionType['UrlCode'];
       $State = $ReactionType['Active'] ? 'Active' : 'InActive';
 
@@ -40,15 +40,15 @@ echo heading($this->data('Title'));
          </td>
          <td class="AutoDescription">
             <?php
-            $AutoDescription = implode('</li><li>', AutoDescription($ReactionType));
+            $AutoDescription = implode('</li><li>', autoDescription($ReactionType));
             if ($AutoDescription)
-               echo Wrap('<li>'.$AutoDescription.'</li>', 'ul');
+               echo wrap('<li>'.$AutoDescription.'</li>', 'ul');
             ?>
          </td>
          <td class="options">
             <div class="btn-group">
                <?php echo anchor(dashboardSymbol('edit'), "/reactions/edit/{$UrlCode}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]); ?>
-               <?php echo ActivateButton($ReactionType); ?>
+               <?php echo activateButton($ReactionType); ?>
             </div>
          </td>
       </tr>

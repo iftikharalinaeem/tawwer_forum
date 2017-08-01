@@ -26,7 +26,7 @@ class DiscussionExcerptPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      */
 	private function addExcerpt($sender) {
-		$discussion = GetValue('Discussion', $sender->EventArguments);
+		$discussion = getValue('Discussion', $sender->EventArguments);
 		if (is_object($discussion)) {
 			echo '<div class="Excerpt">'
 				.sliceString(Gdn_Format::plainText($discussion->Body, $discussion->Format), c('Vanilla.DiscussionExcerpt.Length', 100))

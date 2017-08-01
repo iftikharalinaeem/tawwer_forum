@@ -9,18 +9,18 @@
  *
  * @param array $attachment
  */
-function WritePegaLeadAttachment($attachment) {
+function writePegaLeadAttachment($attachment) {
     // Don't display anything for guest.
-    if (!Gdn::Session()->IsValid()) {
+    if (!Gdn::session()->isValid()) {
         return;
     }
 
     // Only display to Staff
-    if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+    if (!Gdn::session()->checkPermission('Garden.Staff.Allow')) {
         return;
     }
 
-   $leadName = Gdn_Format::Text($attachment['FirstName'] . ' ' . $attachment['LastName']);
+   $leadName = Gdn_Format::text($attachment['FirstName'] . ' ' . $attachment['LastName']);
    ?>
    <div class="item-attachment">
       <div class="alert">
@@ -33,27 +33,27 @@ function WritePegaLeadAttachment($attachment) {
             <div class="media-body">
 
                <div class="item-header">
-                  <h4 class="media-heading item-heading"><?php echo T('Lead') ?> · <a rel="nofollow"
-                       href="<?php echo C('Plugins.Pega.AuthenticationUrl'); ?>/<?php echo $attachment['SourceID']; ?>"><?php echo ucfirst($attachment['Source']); ?></a>
+                  <h4 class="media-heading item-heading"><?php echo t('Lead') ?> · <a rel="nofollow"
+                       href="<?php echo c('Plugins.Pega.AuthenticationUrl'); ?>/<?php echo $attachment['SourceID']; ?>"><?php echo ucfirst($attachment['Source']); ?></a>
                      <div class="item-meta">
-                        <span><?php echo Gdn_Format::Date($attachment['DateInserted'], 'html') ?> <?php echo T('by'); ?>
+                        <span><?php echo Gdn_Format::date($attachment['DateInserted'], 'html') ?> <?php echo t('by'); ?>
                            <?php echo $attachment['InsertUser']['ProfileLink']; ?></span>
                      </div>
                   </h4></div>
                <div class="item-body">
 
                   <dl class="dl-columns">
-                     <dt><?php echo T('Name'); ?></dt>
-                     <dd><a rel="nofollow" href="<?php echo C('Plugins.Pega.AuthenticationUrl'); ?>/<?php echo $attachment['SourceID']; ?>"><?php echo $leadName; ?></a></dd>
-                     <dt><?php echo T('Status'); ?></dt>
+                     <dt><?php echo t('Name'); ?></dt>
+                     <dd><a rel="nofollow" href="<?php echo c('Plugins.Pega.AuthenticationUrl'); ?>/<?php echo $attachment['SourceID']; ?>"><?php echo $leadName; ?></a></dd>
+                     <dt><?php echo t('Status'); ?></dt>
                      <dd><?php echo $attachment['Status']; ?></dd>
-                     <dt><?php echo T('Last Updated'); ?></dt>
-                     <dd><?php echo Gdn_Format::Date($attachment['LastModifiedDate'], 'html') ?></dd>
-                     <dt><?php echo T('Company'); ?></dt>
-                     <dd><?php echo Gdn_Format::Text($attachment['Company']); ?></dd>
-                     <?php if (GetValue('Title', $attachment)) { ?>
-                        <dt><?php echo T('Title'); ?></dt>
-                        <dd><?php echo Gdn_Format::Text($attachment['Title']); ?></dd>
+                     <dt><?php echo t('Last Updated'); ?></dt>
+                     <dd><?php echo Gdn_Format::date($attachment['LastModifiedDate'], 'html') ?></dd>
+                     <dt><?php echo t('Company'); ?></dt>
+                     <dd><?php echo Gdn_Format::text($attachment['Company']); ?></dd>
+                     <?php if (getValue('Title', $attachment)) { ?>
+                        <dt><?php echo t('Title'); ?></dt>
+                        <dd><?php echo Gdn_Format::text($attachment['Title']); ?></dd>
                      <?php } ?>
 
                   </dl>
@@ -70,14 +70,14 @@ function WritePegaLeadAttachment($attachment) {
  * Writes attachments for Pega cases.
  * @param array $attachment
  */
-function WritePegaCaseAttachment($attachment) {
+function writePegaCaseAttachment($attachment) {
     // Don't display anything for guest.
-    if (!Gdn::Session()->IsValid()) {
+    if (!Gdn::session()->isValid()) {
         return;
     }
 
     // Only display to Staff
-    if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+    if (!Gdn::session()->checkPermission('Garden.Staff.Allow')) {
         return;
     }
 
@@ -93,9 +93,9 @@ function WritePegaCaseAttachment($attachment) {
             <div class="media-body">
 
                <div class="item-header">
-                  <h4 class="media-heading item-heading"><?php echo T('Case') ?> · <a rel="nofollow" href="<?php echo C('Plugins.Pega.BaseUrl'); ?>/<?php echo $attachment['SourceID']; ?>"><?php echo ucfirst($attachment['Source']); ?></a>
+                  <h4 class="media-heading item-heading"><?php echo t('Case') ?> · <a rel="nofollow" href="<?php echo c('Plugins.Pega.BaseUrl'); ?>/<?php echo $attachment['SourceID']; ?>"><?php echo ucfirst($attachment['Source']); ?></a>
                      <div class="item-meta">
-                        <span><?php echo Gdn_Format::Date($attachment['DateInserted'], 'html') ?> <?php echo T('by'); ?>
+                        <span><?php echo Gdn_Format::date($attachment['DateInserted'], 'html') ?> <?php echo t('by'); ?>
                            <?php echo $attachment['InsertUser']['ProfileLink']; ?></span>
                      </div>
                   </h4></div>
@@ -103,12 +103,12 @@ function WritePegaCaseAttachment($attachment) {
                <div class="item-body">
 
                   <dl class="dl-columns">
-                     <dt><?php echo T('Case Number'); ?></dt>
-                     <dd><a rel="nofollow" href="<?php echo C('Plugins.Pega.BaseUrl'); ?>/<?php echo $attachment['SourceID']; ?>"><?php echo $attachment['CaseNumber']; ?></a></dd>
-                     <dt><?php echo T('Status'); ?></dt>
+                     <dt><?php echo t('Case Number'); ?></dt>
+                     <dd><a rel="nofollow" href="<?php echo c('Plugins.Pega.BaseUrl'); ?>/<?php echo $attachment['SourceID']; ?>"><?php echo $attachment['CaseNumber']; ?></a></dd>
+                     <dt><?php echo t('Status'); ?></dt>
                      <dd><?php echo $attachment['Status']; ?></dd>
-                     <dt><?php echo T('Last Updated'); ?></dt>
-                     <dd><?php echo Gdn_Format::Date($attachment['LastModifiedDate'], 'html') ?></dd>
+                     <dt><?php echo t('Last Updated'); ?></dt>
+                     <dd><?php echo Gdn_Format::date($attachment['LastModifiedDate'], 'html') ?></dd>
                   </dl>
                </div>
 

@@ -134,20 +134,20 @@ class GroupListModule extends Gdn_Module {
      protected function getGroupInfo($group, $layout, $withOptions, $sectionId) {
           $item['text'] = htmlspecialchars(sliceString(Gdn_Format::plainText(val('Description', $group), val('Format', $group)), c('Groups.CardDescription.ExcerptLength', 150)));
           $item['textCssClass'] = 'GroupDescription';
-          $item['imageSource'] = val('Icon', $group) ? Gdn_Upload::url(val('Icon', $group)) : C('Groups.DefaultIcon', false);
+          $item['imageSource'] = val('Icon', $group) ? Gdn_Upload::url(val('Icon', $group)) : c('Groups.DefaultIcon', false);
           $item['imageCssClass'] = 'Group-Icon';
           $item['heading'] = val('Name', $group);
-          $item['url'] = GroupUrl($group);
+          $item['url'] = groupUrl($group);
           $item['id'] = 'Group_'.val('GroupID', $group);
           $item['metaCssClass'] = '';
 
           // 'LastTitle' is only added if JoinRecentPosts function is called on groups
           $attachDiscussionData = val('LastTitle', $group);
 
-          $item['meta']['countDiscussions']['text'] = Plural(val('CountDiscussions', $group), '%s discussion', '%s discussions', number_format(val('CountDiscussions', $group)));
+          $item['meta']['countDiscussions']['text'] = plural(val('CountDiscussions', $group), '%s discussion', '%s discussions', number_format(val('CountDiscussions', $group)));
           $item['meta']['countDiscussions']['count'] = val('CountDiscussions', $group);
           $item['meta']['countDiscussions']['cssClass'] = 'DiscussionCount MItem-Count';
-          $item['meta']['countMembers']['text'] = Plural(val('CountMembers', $group), '%s member', '%s members', number_format(val('CountMembers', $group)));
+          $item['meta']['countMembers']['text'] = plural(val('CountMembers', $group), '%s member', '%s members', number_format(val('CountMembers', $group)));
           $item['meta']['countMembers']['count'] = val('CountMembers', $group);
           $item['meta']['countMembers']['cssClass'] = 'MemberCount MItem-Count';
           $item['meta']['countMembersNumber']['text'] = val('CountMembers', $group);
@@ -224,7 +224,7 @@ class GroupListModule extends Gdn_Module {
       * @return string HTML view
       */
      public function toString() {
-          require_once Gdn::Controller()->fetchViewLocation('group_functions', 'Group', 'groups');
+          require_once Gdn::controller()->fetchViewLocation('group_functions', 'Group', 'groups');
           if (!$this->groups) {
                 $controller = Gdn::controller();
                 $this->groups = val('Groups', $controller->Data);

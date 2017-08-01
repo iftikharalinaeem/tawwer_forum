@@ -2,7 +2,7 @@
 
 class NoCapsPlugin extends Gdn_Plugin {
 
-	public function DiscussionModel_BeforeSaveDiscussion_Handler($sender) {
+	public function discussionModel_beforeSaveDiscussion_handler($sender) {
 
 		$formPostValues = $sender->EventArguments['FormPostValues'];
 
@@ -13,7 +13,7 @@ class NoCapsPlugin extends Gdn_Plugin {
 		}
 	}
 
-	public function Setup() { /* Nothing to setup */ }
+	public function setup() { /* Nothing to setup */ }
 }
 
 ?>

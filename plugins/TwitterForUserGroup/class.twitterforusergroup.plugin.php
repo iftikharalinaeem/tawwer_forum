@@ -10,16 +10,16 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class TwitterForUserGroupPlugin extends Gdn_Plugin {
 
-   public function Base_Render_Before($sender) {
+   public function base_render_before($sender) {
       
       // Only display this in panels loaded from the default master view... prevent loading in admin panel
       if (!in_array($sender->MasterView, ['','default.master.php'])) return;
       
       // Attach Twitter script library to the HeadModule on the $Sender (calling controller)
-      $sender->Head->AddScript("http://widgets.twimg.com/j/2/widget.js");
+      $sender->Head->addScript("http://widgets.twimg.com/j/2/widget.js");
       
       // Get the twitter username we want to use. First check the config, and if not found, use the default of 'vanilla'
-      $twitterUser = C('Plugin.Twitter.Username', 'vanilla');
+      $twitterUser = c('Plugin.Twitter.Username', 'vanilla');
       $numTweets = 4;
       
       $twitterCode = <<<TWITCODE
@@ -56,51 +56,51 @@ new TWTR.Widget({
 TWITCODE;
 
       // Add the resulting Javascript to the panel
-      $sender->AddAsset('Panel', $twitterCode, 'TwitterPlugin');
+      $sender->addAsset('Panel', $twitterCode, 'TwitterPlugin');
    }
 
-   public function Setup() {
+   public function setup() {
       // Nothing to do here!
    }
    
-   public function Structure() {
+   public function structure() {
       // Nothing to do here!
    }
    
-   public function PluginController_Twitter_Create($sender) {
-      $sender->Permission('Garden.Settings.Manage');
-      $sender->Title('Twitter Plugin Settings');
-      $sender->AddSideMenu('plugin/twitter');
+   public function pluginController_twitter_create($sender) {
+      $sender->permission('Garden.Settings.Manage');
+      $sender->title('Twitter Plugin Settings');
+      $sender->addSideMenu('plugin/twitter');
       $sender->Form = new Gdn_Form();
-      $sender->AddCssFile('admin.css');
+      $sender->addCssFile('admin.css');
       
-      $twitterUsername = C('Plugin.Twitter.Username', 'vanilla');
+      $twitterUsername = c('Plugin.Twitter.Username', 'vanilla');
       
       $validation = new Gdn_Validation();
       $configurationModel = new Gdn_ConfigurationModel($validation);
       $configArray = ['Plugin.Twitter.Username'];
-      if ($sender->Form->AuthenticatedPostBack() === FALSE)
+      if ($sender->Form->authenticatedPostBack() === FALSE)
          $configArray['Plugin.Twitter.Username'] = $twitterUsername;
       
-      $configurationModel->SetField($configArray);
+      $configurationModel->setField($configArray);
       
       // Set the model on the form.
-      $sender->Form->SetModel($configurationModel);
+      $sender->Form->setModel($configurationModel);
       
       // If seeing the form for the first time...
-      if ($sender->Form->AuthenticatedPostBack() === FALSE) {
+      if ($sender->Form->authenticatedPostBack() === FALSE) {
          // Apply the config settings to the form.
-         $sender->Form->SetData($configurationModel->Data);
+         $sender->Form->setData($configurationModel->Data);
       } else {
          // Define some validation rules for the fields being saved
-         $configurationModel->Validation->ApplyRule('Plugin.Twitter.Username', 'Required');
+         $configurationModel->Validation->applyRule('Plugin.Twitter.Username', 'Required');
          
-         if ($sender->Form->Save() !== FALSE) {
-            $sender->InformMessage(T("Your changes have been saved."));
+         if ($sender->Form->save() !== FALSE) {
+            $sender->informMessage(t("Your changes have been saved."));
          }
       }
       
-      $sender->Render($this->GetView('twitter.php'));
+      $sender->render($this->getView('twitter.php'));
    }
       
 }

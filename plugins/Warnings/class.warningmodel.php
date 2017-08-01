@@ -14,28 +14,28 @@ class WarningModel extends Gdn_Model {
       parent::__construct('Warning');
    }
    
-   public function GetWhere($where = FALSE, $orderFields = '', $orderDirection = 'asc', $limit = 30, $offset = FALSE) {
+   public function getWhere($where = FALSE, $orderFields = '', $orderDirection = 'asc', $limit = 30, $offset = FALSE) {
       $this->SQL
-         ->Select('Warning.*')
-         ->Select('Warning.DateExpires is null', '', 'NeverExpires');
+         ->select('Warning.*')
+         ->select('Warning.DateExpires is null', '', 'NeverExpires');
       
       if (!$orderFields) {
          $this->SQL
-            ->OrderBy('Warning.Expired')
-            ->OrderBy('Warning.DateExpires', 'desc')
-            ->OrderBy('Warning.DateInserted', 'desc');
+            ->orderBy('Warning.Expired')
+            ->orderBy('Warning.DateExpires', 'desc')
+            ->orderBy('Warning.DateInserted', 'desc');
       }
       
-      $result = parent::GetWhere($where, $orderFields, $orderDirection, $limit, $offset);
-      $result->Unserialize();
-      Gdn::UserModel()->JoinUsers($result->ResultArray(), ['InsertUserID', 'WarnUserID']);
+      $result = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
+      $result->unserialize();
+      Gdn::userModel()->joinUsers($result->resultArray(), ['InsertUserID', 'WarnUserID']);
       
       return $result;
    }
    
    protected function _Notify($warning) {
       if (!is_array($warning))
-         $warning = $this->GetID($warning);
+         $warning = $this->getID($warning);
       
       if (!class_exists('ConversationModel')) {
          $this->_NotifyActivity($warning);
@@ -46,13 +46,13 @@ class WarningModel extends Gdn_Model {
       $messageModel = new ConversationMessageModel();
       
       $row = [
-         'Subject' => T('HeadlineFormat.Warning.ToUser', "You've been warned."),
+         'Subject' => t('HeadlineFormat.Warning.ToUser', "You've been warned."),
          'Body' => $warning['Body'],
          'Format' => $warning['Format'],
          'RecipientUserID' => (array)$warning['WarnUserID']
          ];
-      if (!$model->Save($row, $messageModel)) {
-         throw new Gdn_UserException($model->Validation->ResultsText());
+      if (!$model->save($row, $messageModel)) {
+         throw new Gdn_UserException($model->Validation->resultsText());
       }
    }
    
@@ -63,10 +63,10 @@ class WarningModel extends Gdn_Model {
       $activity = [
           'ActivityType' => 'Warning',
           'Photo' => 'https://images.v-cdn.net/warn_50.png',
-          'ActivityUserID' => Gdn::Session()->UserID,
+          'ActivityUserID' => Gdn::session()->UserID,
           'NotifyUserID' => $warning['WarnUserID'],
           'RegardingUserID' => $warning['WarnUserID'],
-          'HeadlineFormat' => T('HeadlineFormat.Warning.ToUser', "You've been warned."),
+          'HeadlineFormat' => t('HeadlineFormat.Warning.ToUser', "You've been warned."),
           'Story' => $warning['Body'],
           'Format' => $warning['Format'],
           'RecordType' => 'Warning',
@@ -76,17 +76,17 @@ class WarningModel extends Gdn_Model {
           'Route' => '/profile/warnings?warningid='.$warning['WarningID'],
           'Data' => ['Bump' => TRUE, 'Points' => $warning['Points']]
       ];
-      $newActivity = $activityModel->Save($activity, FALSE, []);
+      $newActivity = $activityModel->save($activity, FALSE, []);
       
       // Add an activity for the moderators.
       unset($activity['Notified'], $activity['Emailed']);
       
       $activity['NotifyUserID'] = ActivityModel::NOTIFY_MODS;
-      $activity['HeadlineFormat'] = T('HeadlineFormat.Warning', '{ActivityUserID,You} warned {RegardingUserID,you}.');
+      $activity['HeadlineFormat'] = t('HeadlineFormat.Warning', '{ActivityUserID,You} warned {RegardingUserID,you}.');
       
-      if ($note = GetValue('ModeratorNote', $warning)) {
+      if ($note = getValue('ModeratorNote', $warning)) {
          $note = trim($note);
-         $title = T('Private Note for Moderators');
+         $title = t('Private Note for Moderators');
          switch ($warning['Format']) {
             case 'Html':
             case 'Markdown':
@@ -101,30 +101,30 @@ class WarningModel extends Gdn_Model {
       }
       $activity['Data']['CommentActivityID'] = $newActivity['ActivityID'];
       
-      $modActivity = $activityModel->Save($activity);
+      $modActivity = $activityModel->save($activity);
    }
    
-   public function ProcessAllWarnings() {
+   public function processAllWarnings() {
       $users = $this->SQL
-         ->Distinct()
-         ->Select('WarnUserID')
-         ->From('Warning')
-         ->Where('Expired', 0)
-         ->Where('DateExpires <=', Gdn_Format::ToDateTime())
-         ->Get()->ResultArray();
+         ->distinct()
+         ->select('WarnUserID')
+         ->from('Warning')
+         ->where('Expired', 0)
+         ->where('DateExpires <=', Gdn_Format::toDateTime())
+         ->get()->resultArray();
       
       $result = [];
       foreach ($users as $row) {
          $userID = $row['WarnUserID'];
-         $processed = $this->ProcessWarnings($userID);
+         $processed = $this->processWarnings($userID);
          $result[$userID] = $processed;
       }
       return $result;
    }
    
-   public function ProcessWarnings($userID) {
+   public function processWarnings($userID) {
       // Get all of the un-expired warnings.
-      $warnings = $this->SQL->GetWhere('Warning', ['WarnUserID' => $userID, 'Expired' => 0])->ResultArray();
+      $warnings = $this->SQL->getWhere('Warning', ['WarnUserID' => $userID, 'Expired' => 0])->resultArray();
       $warnLevel = 0;
       $banned = FALSE;
       $punished = FALSE;
@@ -138,7 +138,7 @@ class WarningModel extends Gdn_Model {
          
          if ($dateExpires = $row['DateExpires']) {
             // Check to see if the warning has expired.
-            if (Gdn_Format::ToTimestamp($dateExpires) <= $now) {
+            if (Gdn_Format::toTimestamp($dateExpires) <= $now) {
                $set['Expired'] = TRUE;
             } else {
                $warnLevel += $row['Points'];
@@ -157,12 +157,12 @@ class WarningModel extends Gdn_Model {
          }
          
          if (!empty($set)) {
-            $this->SetField($row['WarningID'], $set);
+            $this->setField($row['WarningID'], $set);
          }
       }
       
       // Save the user's current warning level.
-      Gdn::UserMetaModel()->SetUserMeta($userID, 'Warnings.Level', $warnLevel);
+      Gdn::userMetaModel()->setUserMeta($userID, 'Warnings.Level', $warnLevel);
       
       // See if there's something special to do.
       if ($warnLevel >= 3) {
@@ -174,7 +174,7 @@ class WarningModel extends Gdn_Model {
          $banned = 1;
       }
       
-      $user = Gdn::UserModel()->GetID($userID, DATASET_TYPE_ARRAY);
+      $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
      
       $set = [];
       if ($user['Banned'] != $banned)
@@ -183,35 +183,35 @@ class WarningModel extends Gdn_Model {
          $set['Punished'] = $punished;
       
       if (!empty($set)) {
-         Gdn::UserModel()->SetField($userID, $set);
-         Gdn::UserModel()->ClearCache($userID);
+         Gdn::userModel()->setField($userID, $set);
+         Gdn::userModel()->clearCache($userID);
       }
       
       return ['WarnLevel' => $warnLevel, 'Set' => $set, 'ActiveWarnings' => $warnings];
    }
    
-   public function Save($data) {
-      $userID = GetValue('WarnUserID', $data);
+   public function save($data) {
+      $userID = getValue('WarnUserID', $data);
       
-      $meta = Gdn::UserMetaModel()->GetUserMeta($userID, 'Warnings.%');
-      $currentLevel = GetValue('Warnings.Level', $meta, 0);
+      $meta = Gdn::userMetaModel()->getUserMeta($userID, 'Warnings.%');
+      $currentLevel = getValue('Warnings.Level', $meta, 0);
       
-      TouchValue('Format', $data, C('Garden.InputFormatter'));
-      TouchValue('Type', $data, 'Warning');
-      TouchValue('Expired', $data, 0);
-      TouchValue('Level', $data, $currentLevel);
-      $attributes = TouchValue('Attributes', $data, []);
+      touchValue('Format', $data, c('Garden.InputFormatter'));
+      touchValue('Type', $data, 'Warning');
+      touchValue('Expired', $data, 0);
+      touchValue('Level', $data, $currentLevel);
+      $attributes = touchValue('Attributes', $data, []);
       
       // Calculate some fields.
       if (!isset($data['Points'])) {
          $data['Points'] = $data['Level'] - $currentLevel;
          $newLevel = $data['Level'];
       } else {
-         $newLevel = $currentLevel + GetValue('Points', $data);
+         $newLevel = $currentLevel + getValue('Points', $data);
       }
 //      decho($NewLevel, 'New Level');
       
-      if (($expireNumber = GetValue('ExpireNumber', $data)) && ($expireUnit = GetValue('ExpireUnit', $data))) {
+      if (($expireNumber = getValue('ExpireNumber', $data)) && ($expireUnit = getValue('ExpireUnit', $data))) {
          // Calculate the date the warning expires.
          $attributes['ExpireNumber'] = $expireNumber;
          $attributes['ExpireUnit'] = $expireUnit;
@@ -220,19 +220,19 @@ class WarningModel extends Gdn_Model {
             unset($attributes['ExpireUnit']);
          } else {
             $timestampExpires = strtotime("+$expireNumber $expireUnit");
-            $data['DateExpires'] = Gdn_Format::ToDateTime($timestampExpires);
+            $data['DateExpires'] = Gdn_Format::toDateTime($timestampExpires);
          }
       }
       
 //      $Data['Attributes'] = dbencode($Attributes);
-      $insert = GetValue('WarningID', $data) == FALSE;
-      $iD = parent::Save($data);
+      $insert = getValue('WarningID', $data) == FALSE;
+      $iD = parent::save($data);
       
       if ($iD) {
-         Trace('Warning Saved');
+         trace('Warning Saved');
          
          $warning = $data;
-         TouchValue('WarningID', $warning, $iD);
+         touchValue('WarningID', $warning, $iD);
          
          if ($insert) {
             // Notifiy the user.
@@ -241,22 +241,22 @@ class WarningModel extends Gdn_Model {
             if ($warning['Points'] > 0 && class_exists('UserBadgeModel')) {
                // Take a few points away from the user.
                $userBadgeModel = new UserBadgeModel();
-               $userBadgeModel->GivePoints($userID, -$warning['Points'], 'Warnings');
+               $userBadgeModel->givePoints($userID, -$warning['Points'], 'Warnings');
             }
          }
          
          // Process this user's warnings.
-         $this->ProcessWarnings($userID);
+         $this->processWarnings($userID);
       }
       
       return $iD;
    }
    
-   public static function Special() {
+   public static function special() {
       if (self::$_Special === NULL) {
          self::$_Special = [
-            3 => ['Label' => T('Jail'), 'Title' => T('Jailed users have reduced abilities.')],
-            5 => ['Label' => T('Ban'), 'Title' => T("Banned users can no longer access the site.")]
+            3 => ['Label' => t('Jail'), 'Title' => t('Jailed users have reduced abilities.')],
+            5 => ['Label' => t('Ban'), 'Title' => t("Banned users can no longer access the site.")]
          ];
       }
       return self::$_Special;

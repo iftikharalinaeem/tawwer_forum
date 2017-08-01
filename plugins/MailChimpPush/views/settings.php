@@ -30,7 +30,7 @@ endif; ?>
          <div class="label-wrap">
             <?php echo $this->Form->label("API Key", "ApiKey"); ?>
             <div class="info">
-               <?php echo Anchor(t('How to find your MailChimp API key'),
+               <?php echo anchor(t('How to find your MailChimp API key'),
                    'http://kb.mailchimp.com/article/where-can-i-find-my-api-key'); ?>
             </div>
          </div>

@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 <div class="alert alert-warning padded">
    <?php
    echo t('Warning: This is for advanced users.');
@@ -30,7 +30,7 @@ t('Enter the connection settings for your sphinx server below.'),
    </li>
    <li class="form-group">
       <div class="input-wrap no-label">
-         <?php echo $this->Form->checkBox('Plugins.Sphinx.UseDeltas', T('Use delta indexes', 'Use delta indexes (recommended for massive sites)')); ?>
+         <?php echo $this->Form->checkBox('Plugins.Sphinx.UseDeltas', t('Use delta indexes', 'Use delta indexes (recommended for massive sites)')); ?>
       </div>
    </li>
 </ul>

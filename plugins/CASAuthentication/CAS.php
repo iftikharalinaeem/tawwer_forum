@@ -1674,10 +1674,10 @@ class phpCAS
      * when validating the proxy tickets. The strings are compared starting from
      * the beginning and must fully match with the proxies in the list.
      * Example:
-     * 		phpCAS::allowProxyChain(new CAS_ProxyChain(array(
+     * 		phpCAS::allowProxyChain(new cAS_ProxyChain(array(
      *				'https://app.example.com/'
      *			)));
-     * 		phpCAS::allowProxyChain(new CAS_ProxyChain(array(
+     * 		phpCAS::allowProxyChain(new cAS_ProxyChain(array(
      *				'/^https:\/\/app[0-9]\.example\.com\/rest\//',
      *				'http://client.example.com/'
      *			)));

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
-$CategoryData = $this->Data('CategoryData');
-$DiscussionData = $this->Data('DiscussionData');
+$CategoryData = $this->data('CategoryData');
+$DiscussionData = $this->data('DiscussionData');
 ?>
 <style type="text/css">
    /* Main Container */
@@ -55,14 +55,14 @@ $DiscussionData = $this->Data('DiscussionData');
       margin-top: -25px;
    }
 </style>
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 <?php
-function FAQList($categoryData, $discussionData) {
+function fAQList($categoryData, $discussionData) {
    $list = '';
    $depth = 1;
    foreach ($categoryData as $categoryRow) {
       $category = (object)$categoryRow;
-      $categoryID = GetValue('CategoryID', $category);
+      $categoryID = getValue('CategoryID', $category);
 
       if ($category->Depth < $depth) {
          // You're less deep than before, so close some open containers. 
@@ -86,10 +86,10 @@ function FAQList($categoryData, $discussionData) {
       $list .= "\r\n";
       $list .= '<li>';
       if ($category->Depth > 1) { // Don't write out the main container info
-         // $List .= Wrap('['.$Category->Depth.'] '.$Category->Name, 'strong');
-         $list .= Wrap($category->Name, 'strong');
+         // $List .= wrap('['.$Category->Depth.'] '.$Category->Name, 'strong');
+         $list .= wrap($category->Name, 'strong');
          if ($category->Description != '')
-            $list .= Wrap(Gdn_Format::Text($category->Description), 'p');
+            $list .= wrap(Gdn_Format::text($category->Description), 'p');
       }
       
       $depth = $category->Depth;
@@ -98,10 +98,10 @@ function FAQList($categoryData, $discussionData) {
       $qList = '';
       foreach ($discussionData as $discussion) {
          if ($discussion->CategoryID == $category->CategoryID) {
-            $qList .= Wrap(Anchor(Gdn_Format::PlainText($discussion->Name), '#Q'.$discussion->DiscussionID), 'li');
+            $qList .= wrap(anchor(Gdn_Format::plainText($discussion->Name), '#Q'.$discussion->DiscussionID), 'li');
          }
       }
-      $list .= $qList != '' ? Wrap($qList, 'ol class="QList"') : '';
+      $list .= $qList != '' ? wrap($qList, 'ol class="QList"') : '';
       
    }
    // Unwrap if necessary
@@ -113,30 +113,30 @@ function FAQList($categoryData, $discussionData) {
       $depth--;
    }
    $list .= '</li>';
-   return Wrap($list, 'ul class="TOC"');
+   return wrap($list, 'ul class="TOC"');
    
 }
 
-function AnswerList($categoryData, $discussionData) {
+function answerList($categoryData, $discussionData) {
    $list = '';
    foreach ($categoryData as $categoryRow) {
       $category = (object)$categoryRow;
-      $categoryID = GetValue('CategoryID', $category);
+      $categoryID = getValue('CategoryID', $category);
       
       // Write out the FAQs in this category
       $qList = '';
       foreach ($discussionData as $discussion) {
          if ($discussion->CategoryID == $category->CategoryID) {
             $qList .= '<div class="FAQAnswer" id="Q'.$discussion->DiscussionID.'">';
-            $qList .= Wrap(Gdn_Format::PlainText($discussion->Name), 'strong');
-            $qList .= Wrap(Gdn_Format::To($discussion->Body, $discussion->Format), 'div class="Answer Legal"');
+            $qList .= wrap(Gdn_Format::plainText($discussion->Name), 'strong');
+            $qList .= wrap(Gdn_Format::to($discussion->Body, $discussion->Format), 'div class="Answer Legal"');
             $qList .= '</div>';
-            $qList .= Anchor('Back to Top', '#top', 'ToTop');
+            $qList .= anchor('Back to Top', '#top', 'ToTop');
          }
       }
       if ($qList != '') {
          if ($category->Depth > 1)
-            $list .= Wrap($category->Name, 'strong');
+            $list .= wrap($category->Name, 'strong');
 
          $list .= $qList;
       }
@@ -148,8 +148,8 @@ function AnswerList($categoryData, $discussionData) {
 
 echo "\r\n";
 echo '<div class="Section">';
-   echo FAQList($CategoryData, $DiscussionData);
+   echo fAQList($CategoryData, $DiscussionData);
    echo '<div class="Answers">';
-      echo AnswerList($CategoryData, $DiscussionData);
+      echo answerList($CategoryData, $DiscussionData);
    echo '</div>';
 echo '</div>';

@@ -50,7 +50,7 @@ class ReactionsController extends DashboardController {
 
         $reaction = ReactionModel::reactionTypes($urlCode);
         if (!$reaction) {
-            throw NotFoundException('reaction');
+            throw notFoundException('reaction');
         }
 
         $this->setData('Reaction', $reaction);
@@ -103,7 +103,7 @@ class ReactionsController extends DashboardController {
         $this->permission(['Garden.Moderation.Manage'], false);
 
         if (!$this->Form->authenticatedPostBack(true)) {
-            throw ForbiddenException('GET');
+            throw forbiddenException('GET');
         }
 
         $ReactionModel = new ReactionModel();
@@ -126,11 +126,11 @@ class ReactionsController extends DashboardController {
      */
     public function users($type, $iD, $reaction, $page = null) {
         if (!c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT)) {
-            throw PermissionException();
+            throw permissionException();
         }
 
         $reactionModel = new ReactionModel();
-        list($offset, $limit) = OffsetLimit($page, 10);
+        list($offset, $limit) = offsetLimit($page, 10);
         $this->setData('Users', $reactionModel->getUsers($type, $iD, $reaction, $offset, $limit));
         $this->render('', 'reactions', 'plugins/Reactions');
     }
@@ -155,7 +155,7 @@ class ReactionsController extends DashboardController {
 
         $reaction = ReactionModel::reactionTypes($urlCode);
         if (!$reaction) {
-            throw NotFoundException('reaction');
+            throw notFoundException('reaction');
         }
 
         $this->setData('Reaction', $reaction);
@@ -214,7 +214,7 @@ class ReactionsController extends DashboardController {
         $reactionModel = new ReactionModel();
         list($row, $model) = $reactionModel->getRow($type, $iD);
         if (!$row) {
-            throw NotFoundException(ucfirst($type));
+            throw notFoundException(ucfirst($type));
         }
 
         $reactionModel->joinUserTags($row, $type);
@@ -239,7 +239,7 @@ class ReactionsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if (!$this->Request->isAuthenticatedPostBack(true)) {
-            throw ForbiddenException('GET');
+            throw forbiddenException('GET');
         }
 
         $reactionModel = new ReactionModel();
@@ -259,12 +259,12 @@ class ReactionsController extends DashboardController {
         $this->permission('Garden.Community.Manage');
 
         if (!$this->Form->authenticatedPostBack(true)) {
-            throw PermissionException('PostBack');
+            throw permissionException('PostBack');
         }
 
         $ReactionType = ReactionModel::reactionTypes($UrlCode);
         if (!$ReactionType) {
-            throw NotFoundException('Reaction Type');
+            throw notFoundException('Reaction Type');
         }
 
         $ReactionModel = new ReactionModel();

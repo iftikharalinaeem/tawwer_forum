@@ -2,7 +2,7 @@
 
 <?php
 
-   $results = $this->Data('results');
+   $results = $this->data('results');
 
    $total_success = count($results['success']);
    $total_fail = count($results['fail']);
@@ -17,10 +17,10 @@
    }
 
    // Default expiry date for invitations
-   $default_invite_expiration = C('Garden.Registration.InviteExpiration', '1 week');
+   $default_invite_expiration = c('Garden.Registration.InviteExpiration', '1 week');
 
    // Available invites
-   $available_invites = $this->Data('_available_invites');
+   $available_invites = $this->data('_available_invites');
 
    // Generate proper notice.
    $bulk_invite_notice = 'Invites available: ';
@@ -44,7 +44,7 @@
 
 <div id="bulk-importer">
    <h1>
-      <?php echo $this->Data('Title'); ?>
+      <?php echo $this->data('Title'); ?>
    </h1>
 
    <div class="Info">
@@ -52,7 +52,7 @@
       <?php if ($total_success): ?>
 
          <p class="P">
-            The following <?php echo Plural($total_success, 'file', 'files') . ' ' .  Plural($total_success, 'was', 'were'); ?>
+            The following <?php echo plural($total_success, 'file', 'files') . ' ' .  plural($total_success, 'was', 'were'); ?>
             uploaded successfully:
          </p>
 
@@ -73,7 +73,7 @@
       <?php if ($total_fail): ?>
 
          <p class="P">
-            The following <?php echo Plural($total_fail, 'file', 'files') . ' ' .  Plural($total_fail, 'was', 'were'); ?>
+            The following <?php echo plural($total_fail, 'file', 'files') . ' ' .  plural($total_fail, 'was', 'were'); ?>
             <em>not</em> uploaded:
          </p>
 
@@ -133,7 +133,7 @@
             </label>
          </p>
 
-         <a id="process-csvs" class="SmallButton" href="<?php echo Url('/settings/bulkusersimporter/process'); ?>">Begin processing</a>
+         <a id="process-csvs" class="SmallButton" href="<?php echo url('/settings/bulkusersimporter/process'); ?>">Begin processing</a>
          <span id="import-progress-container">
             <i id="progress-animation" class="TinyProgress"></i>
             <span id="import-progress-meter" data-total-rows="<?php echo $total_rows; ?>" data-completed-rows="0">0%</span>

@@ -14,7 +14,7 @@ class FlairModel extends Gdn_Pluggable {
     */
    public function addBadgeFlair($user_id) {
       $userBadgeModel = new UserBadgeModel();
-      $user_badges = $userBadgeModel->GetBadges($user_id)->ResultArray();
+      $user_badges = $userBadgeModel->getBadges($user_id)->resultArray();
 
       foreach ($user_badges as $badge) {
          // If no badge level
@@ -24,7 +24,7 @@ class FlairModel extends Gdn_Pluggable {
 
          $this->addFlair($badge['Slug'], [
             'title' => $badge['Name'],
-            'url' => Gdn_Upload::Url($badge['Photo']),
+            'url' => Gdn_Upload::url($badge['Photo']),
             'class' => strtolower($badge['Class']),
             'slug' => $badge['Slug'],
             'sort' => $badge['Level']
@@ -49,7 +49,7 @@ class FlairModel extends Gdn_Pluggable {
       $user_ids = [];
 
       foreach ($data as $row) {
-         $user_id = GetValue($column, $row);
+         $user_id = getValue($column, $row);
 
          if ($user_id) {
             $user_ids[] = $user_id;
@@ -71,7 +71,7 @@ class FlairModel extends Gdn_Pluggable {
       $cache_expire = 60 * 60;
 
       // Check the cache for the flair.
-      $flair = Gdn::Cache()->Get($cache_key);
+      $flair = Gdn::cache()->get($cache_key);
       $this->EventArguments['src'] = 'cache';
 
       if ($flair === Gdn_Cache::CACHEOP_FAILURE) {
@@ -82,7 +82,7 @@ class FlairModel extends Gdn_Pluggable {
          // Fire event
          $this->EventArguments['user_id'] = $user_id;
          $this->EventArguments['src'] = 'db';
-         $this->FireEvent('get');
+         $this->fireEvent('get');
 
          // Add flair from DB
          $this->addBadgeFlair($user_id);
@@ -94,7 +94,7 @@ class FlairModel extends Gdn_Pluggable {
          // Sort and filter up only highest achievements for each badge class
          $flair = $this->filterRedundantBadgeClasses($flair);
 
-         Gdn::Cache()->Store($cache_key, $flair, [Gdn_Cache::FEATURE_EXPIRY => $cache_expire]);
+         Gdn::cache()->store($cache_key, $flair, [Gdn_Cache::FEATURE_EXPIRY => $cache_expire]);
       }
 
       return $flair;
@@ -149,7 +149,7 @@ class FlairModel extends Gdn_Pluggable {
     */
    public function getIds($user_ids = []) {
       $keys = array_map('FlairModel::cacheKey', $user_ids);
-      $cache_flair = Gdn::Cache()->Get($keys);
+      $cache_flair = Gdn::cache()->get($keys);
       $result = [];
 
       $db_keys = array_diff(array_keys($cache_flair), $keys);
@@ -177,7 +177,7 @@ class FlairModel extends Gdn_Pluggable {
    public function clearCache($user_id) {
       if ($user_id) {
          $cache_key = self::cacheKey($user_id);
-         Gdn::Cache()->Remove($cache_key);
+         Gdn::cache()->remove($cache_key);
       }
    }
 

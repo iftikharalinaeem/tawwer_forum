@@ -13,8 +13,8 @@ class AutoSignoutPlugin extends Gdn_Plugin {
     *
     * @param AssetModel $sender
     */
-   public function AssetModel_StyleCss_Handler($sender) {
-      $sender->AddCssFile('autosignout.css', 'plugins/AutoSignout');
+   public function assetModel_styleCss_handler($sender) {
+      $sender->addCssFile('autosignout.css', 'plugins/AutoSignout');
    }
 
    /**
@@ -22,18 +22,18 @@ class AutoSignoutPlugin extends Gdn_Plugin {
     *
     * @param Gdn_Controller $Sender
     */
-   public function Base_Render_Before($Sender) {
+   public function base_render_before($Sender) {
       // Add the javascript assets.
-      $Sender->AddJsFile('jquery.idle-timer.js', 'plugins/AutoSignout');
-      $Sender->AddJsFile('autosignout.js', 'plugins/AutoSignout');
-      $Sender->AddDefinition('AutoSignoutTime', C('Plugins.AutoSignout.Minutes', 30) * 60000);
+      $Sender->addJsFile('jquery.idle-timer.js', 'plugins/AutoSignout');
+      $Sender->addJsFile('autosignout.js', 'plugins/AutoSignout');
+      $Sender->addDefinition('AutoSignoutTime', c('Plugins.AutoSignout.Minutes', 30) * 60000);
 
       $Path = dirname(__FILE__).'/views/signoutwarning.php';
       ob_start();
       include $Path;
       $WarningAsset = ob_get_clean();
 
-      $Sender->AddAsset('Content', $WarningAsset, 'SignoutWarning');
+      $Sender->addAsset('Content', $WarningAsset, 'SignoutWarning');
    }
 
    /**
@@ -41,8 +41,8 @@ class AutoSignoutPlugin extends Gdn_Plugin {
     *
     * @param $sender
     */
-   public function EntryController_SignIn_Handler($sender) {
-      $sender->Form->SetFormValue('RememberMe', FALSE);
+   public function entryController_signIn_handler($sender) {
+      $sender->Form->setFormValue('RememberMe', FALSE);
    }
 
    /**
@@ -50,8 +50,8 @@ class AutoSignoutPlugin extends Gdn_Plugin {
     *
     * @param $sender
     */
-   public function EntryController_RegisterValidation_Handler($sender) {
-      $sender->Form->SetFormValue('RememberMe', FALSE);
+   public function entryController_registerValidation_handler($sender) {
+      $sender->Form->setFormValue('RememberMe', FALSE);
    }
 
    /**
@@ -59,11 +59,11 @@ class AutoSignoutPlugin extends Gdn_Plugin {
     *
     * @param $sender
     */
-   public function EntryController_AutoSignedOut_Create($sender) {
-      $sender->SetData('Title', T("You've Been Signed Out"));
+   public function entryController_autoSignedOut_create($sender) {
+      $sender->setData('Title', t("You've Been Signed Out"));
       $sender->CssClass = 'SplashMessage NoPanel';
-      $sender->SetData('_NoMessages', TRUE);
-      $sender->Render('autosignedout', '', 'plugins/AutoSignout');
+      $sender->setData('_NoMessages', TRUE);
+      $sender->render('autosignedout', '', 'plugins/AutoSignout');
    }
 
    /**
@@ -71,17 +71,17 @@ class AutoSignoutPlugin extends Gdn_Plugin {
     *
     * @param $sender
     */
-   public function SettingsController_AutoSignout_Create($sender) {
-      $sender->Permission('Garden.Settings.Manage');
+   public function settingsController_autoSignout_create($sender) {
+      $sender->permission('Garden.Settings.Manage');
 
       $conf = new ConfigurationModule($sender);
-      $conf->Initialize([
+      $conf->initialize([
           'Plugins.AutoSignout.Minutes' => ['Description' => "Enter the number of minutes to wait before signing users out.", 'Default' => 30]
       ]);
 
-      $sender->AddSideMenu();
-      $sender->SetData('Title', 'Auto Signout Settings');
+      $sender->addSideMenu();
+      $sender->setData('Title', 'Auto Signout Settings');
       $sender->ConfigurationModule = $conf;
-      $conf->RenderAll();
+      $conf->renderAll();
    }
 }

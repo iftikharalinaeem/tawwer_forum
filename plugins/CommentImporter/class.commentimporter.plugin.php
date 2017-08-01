@@ -8,9 +8,9 @@ class CommentImporterPlugin extends Gdn_Plugin {
     /**
      * Add menu item.
      */
-    public function Base_GetAppSettingsMenuItems_Handler($sender) {
+    public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
-        $menu->AddLink('Import', T('Import Comments'), '/import/comments', 'Garden.Settings.Manage');
+        $menu->addLink('Import', t('Import Comments'), '/import/comments', 'Garden.Settings.Manage');
     }
 
     /**
@@ -18,36 +18,36 @@ class CommentImporterPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param string $type
      */
-    public function ImportController_Comments_Create($sender) {
-        $sender->Permission('Garden.Settings.Manage');
+    public function importController_comments_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
 
-        $allowedTypes = ['wordpres' => T('Wordpress'), 'disqus' => T('Disqus')];
+        $allowedTypes = ['wordpres' => t('Wordpress'), 'disqus' => t('Disqus')];
         $form = new Gdn_Form();
         $form->InputPrefix = '';
 
         $sender->Form = $form;
 
-        if ($sender->Form->IsPostBack()) {
+        if ($sender->Form->isPostBack()) {
             // Validate the form.
-            $type = $form->GetFormValue('Type');
+            $type = $form->getFormValue('Type');
             if (isset($allowedTypes[$type])) {
-                $form->AddError(T("Please select an import type."));
+                $form->addError(t("Please select an import type."));
             }
 
             $localPath = PATH_UPLOADS.'/commentimport/'.md5(microtime());
             if (!file_exists(dirname($localPath)))
             mkdir(dirname($localPath), 0777, TRUE);
 
-            if ($form->GetFormValue('IsUpload')) {
+            if ($form->getFormValue('IsUpload')) {
                 // Save the uploaded file into the temporary folder.
 
             } else {
                 // Grab a copy of the file.
-                if (!($fileUrl = $form->GetFormValue('FileUrl'))) {
-                    $form->AddError(T("Please specify the url of your comments file."));
+                if (!($fileUrl = $form->getFormValue('FileUrl'))) {
+                    $form->addError(t("Please specify the url of your comments file."));
                 } else {
                     if (!preg_match('`^https?:///`', $fileUrl)) {
-                        $form->AddError(T('We only accept urls that begin with http:// or https://'));
+                        $form->addError(t('We only accept urls that begin with http:// or https://'));
                     } else {
                         copy($fileUrl, $localPath);
                     }
@@ -82,16 +82,16 @@ class CommentImporterPlugin extends Gdn_Plugin {
 
             $model = new WordpressImportModel();
             $model->Path = '/www/techwhirl2/uploads/techwhirl.wordpress.xml';
-            $model->Import();
+            $model->import();
             die('Done');
 
-            $form->SetValue('Type', 'wordpress');
+            $form->setValue('Type', 'wordpress');
             $sender->View = 'ImportForm';
         }
 
-        $sender->SetData('AllowedTypes', $allowedTypes);
-        $sender->SetData('Title', T('Import Comments'));
-        $sender->AddSideMenu();
-        $sender->Render('', '', 'plugins/CommentImporter');
+        $sender->setData('AllowedTypes', $allowedTypes);
+        $sender->setData('Title', t('Import Comments'));
+        $sender->addSideMenu();
+        $sender->render('', '', 'plugins/CommentImporter');
     }
 }

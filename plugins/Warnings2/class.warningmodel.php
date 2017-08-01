@@ -347,7 +347,7 @@ class WarningModel extends UserNoteModel {
                 // Calculate the seconds from the string.
                 $seconds = strtotime(val('ExpiresString', $data), 0);
                 touchValue('ExpiresTimespan', $data, $seconds);
-            } elseif (!ValidateRequired(val('ExpiresString', $data))) {
+            } elseif (!validateRequired(val('ExpiresString', $data))) {
                 $days = round($data['ExpiresTimespan'] / strtotime('1 day', 0));
                 touchValue('ExpiresString', $data, plural($days, '%s day', '%s days'));
             }

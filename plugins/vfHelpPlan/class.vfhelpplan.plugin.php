@@ -2,46 +2,46 @@
 
 class vfHelpPlanPlugin extends Gdn_Plugin {
 
-   public function DiscussionController_AfterDiscussionMeta_Handler($sender, $args) {
-      $userID = GetValue('UserID', GetValue('Author', $args));
-      $this->AttachPlan($sender, $userID);
+   public function discussionController_afterDiscussionMeta_handler($sender, $args) {
+      $userID = getValue('UserID', getValue('Author', $args));
+      $this->attachPlan($sender, $userID);
    }
    
-   public function DiscussionController_CommentInfo_Handler($sender, $args) {
-      $userID = GetValue('UserID', GetValue('Author', $args));
-      $this->AttachPlan($sender, $userID);
+   public function discussionController_commentInfo_handler($sender, $args) {
+      $userID = getValue('UserID', getValue('Author', $args));
+      $this->attachPlan($sender, $userID);
    }
    
-   public function Base_BeforeDiscussionMeta_Handler($sender, $args) {
-      $userID = GetValue('UserID', GetValue('FirstUser', $args));
-      $this->AttachPlan($sender, $userID);
+   public function base_beforeDiscussionMeta_handler($sender, $args) {
+      $userID = getValue('UserID', getValue('FirstUser', $args));
+      $this->attachPlan($sender, $userID);
    }
    
-   protected function AttachPlan($sender, $userID) {
-      if (!CheckPermission('Garden.Moderation.Manage'))
+   protected function attachPlan($sender, $userID) {
+      if (!checkPermission('Garden.Moderation.Manage'))
          return;
       
-      $user = Gdn::UserModel()->GetID($userID);
-      if (GetValue('Admin', $user))
+      $user = Gdn::userModel()->getID($userID);
+      if (getValue('Admin', $user))
          return;
       $plan = 'Free';
       
-      if ($user && GetValue('AccountID', $user)) {
+      if ($user && getValue('AccountID', $user)) {
          // Get highest plan level they have a site using
-         $planData = Gdn::SQL()->Select('f.Name')
-   			->From('Site s')
-   			->Join('SiteFeature sf', 'sf.SiteID = s.SiteID', 'left')
-   			->Join('Feature f', 'f.FeatureID = sf.FeatureID', 'left')
-   			->Where('s.AccountID', GetValue('AccountID', $user))
-   			->Where('s.Deleted', 0)
-   			->OrderBy('f.Price', 'desc')
-   			->Get()
-   			->FirstRow();
+         $planData = Gdn::sql()->select('f.Name')
+   			->from('Site s')
+   			->join('SiteFeature sf', 'sf.SiteID = s.SiteID', 'left')
+   			->join('Feature f', 'f.FeatureID = sf.FeatureID', 'left')
+   			->where('s.AccountID', getValue('AccountID', $user))
+   			->where('s.Deleted', 0)
+   			->orderBy('f.Price', 'desc')
+   			->get()
+   			->firstRow();
          
-         $plan = GetValue('Name', $planData);
+         $plan = getValue('Name', $planData);
       }
       echo '<span class="MItem PlanLevel '.$plan.'">'.$plan.'</span>';
    }
 
-   public function Setup() { }
+   public function setup() { }
 }

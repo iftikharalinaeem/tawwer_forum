@@ -1,34 +1,34 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
 <div id="GroupForm" class="FormTitleWrapper">
-    <h1><?php echo $this->Data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
     <div class="FormWrapper StructuredForm">
         <?php
-        echo $this->Form->Open();
-        echo $this->Form->Errors();
+        echo $this->Form->open();
+        echo $this->Form->errors();
         ?>
         <div class="P P-Name">
             <?php
-            echo $this->Form->Label('Name', 'Name', ['class' => 'B']);
-            echo $this->Form->TextBox('Name', ['maxlength' => 100, 'class' => 'InputBox BigInput']);
+            echo $this->Form->label('Name', 'Name', ['class' => 'B']);
+            echo $this->Form->textBox('Name', ['maxlength' => 100, 'class' => 'InputBox BigInput']);
             ?>
         </div>
         <div class="P P-Body">
             <?php
-            echo $this->Form->BodyBox('Body');
+            echo $this->Form->bodyBox('Body');
             ?>
         </div>
         <div class="Buttons">
             <?php
-            $Group = $this->Data('Group');
+            $Group = $this->data('Group');
             if ($Group)
-                echo Anchor(T('Cancel'), GroupUrl($Group), 'Button');
+                echo anchor(t('Cancel'), groupUrl($Group), 'Button');
             else
-                echo Anchor(T('Cancel'), '/groups', 'Button');
+                echo anchor(t('Cancel'), '/groups', 'Button');
 
-            echo ' '.$this->Form->Button('Save', ['class' => 'Button Primary']);
+            echo ' '.$this->Form->button('Save', ['class' => 'Button Primary']);
             ?>
         </div>
-        <?php echo $this->Form->Close(); ?>
+        <?php echo $this->Form->close(); ?>
     </div>
 </div>

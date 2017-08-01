@@ -102,7 +102,7 @@ class RanksPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
-        $menu->addLink('Users', T('Ranks'), 'settings/ranks', 'Garden.Settings.Manage', ['class' => 'nav-ranks']);
+        $menu->addLink('Users', t('Ranks'), 'settings/ranks', 'Garden.Settings.Manage', ['class' => 'nav-ranks']);
     }
 
     /**
@@ -380,7 +380,7 @@ class RanksPlugin extends Gdn_Plugin {
                 $data = $rankModel->getID($rankID);
 
                 if (!$data) {
-                    throw NotFoundException('Rank');
+                    throw notFoundException('Rank');
                 }
 
                 $setData = [];

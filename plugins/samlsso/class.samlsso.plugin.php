@@ -177,7 +177,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         }
 
         if (!$sender->Request->isPostBack()) {
-            throw ForbiddenException('GET');
+            throw forbiddenException('GET');
         }
 
         $saml = Gdn::session()->stash('samlsso', '', false);
@@ -207,7 +207,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
         $provider = $this->getProvider($authenticationKey);
 
-        $form = $sender->Form; //new Gdn_Form();
+        $form = $sender->Form; //new gdn_Form();
         $form->setFormValue('UniqueID', $id);
         $form->setFormValue('Provider', $authenticationKey);
         $form->setFormValue('ProviderName', $provider['Name']);

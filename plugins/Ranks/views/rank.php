@@ -109,7 +109,7 @@ echo $this->Form->open(), $this->Form->errors();
                     '<div class="info">'."Users with the following roles will gain this rank.".'</div>'; ?>
             </div>
             <div class="input-wrap">
-                <?php echo $this->Form->DropDown('Criteria_Role', $RoleNames); ?>
+                <?php echo $this->Form->dropDown('Criteria_Role', $RoleNames); ?>
             </div>
         </li>
         <li class="form-group">
@@ -190,7 +190,7 @@ echo $this->Form->open(), $this->Form->errors();
                         <?php echo $this->Form->label('Activities', 'Abilities_ActivityLinks'); ?>
                     </div>
                     <div class="input-wrap">
-                        <?php echo $this->Form->RadioList('Abilities_ActivityLinks', $takeOptions); ?>
+                        <?php echo $this->Form->radioList('Abilities_ActivityLinks', $takeOptions); ?>
                     </div>
                 </div>
                 <div class="form-group">
@@ -236,7 +236,7 @@ echo $this->Form->open(), $this->Form->errors();
                     '<div class="info">'."You can give or take away the ability to have avatars. (Requires permission to edit profile)".'</div>'; ?>
             </div>
             <div class="input-wrap">
-                <?php echo $this->Form->RadioList('Abilities_Avatars', $takeOptions); ?>
+                <?php echo $this->Form->radioList('Abilities_Avatars', $takeOptions); ?>
             </div>
         </li>
         <li class="form-group">

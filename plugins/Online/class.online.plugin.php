@@ -11,7 +11,7 @@
  *  1.0     Official release
  *  1.1     Add WhosOnline config import
  *  1.2     Fixed breakage if no memcache support
- *  1.3     Exposes GetUser() for external querying
+ *  1.3     Exposes getUser() for external querying
  *  1.4     Fix wasteful OnlineModule rendering, store Name in Online table
  *  1.5     Add caching to the OnlineModule rending process
  *  1.5.1   Fix inconsistent timezone handling
@@ -120,11 +120,11 @@ class OnlinePlugin extends Gdn_Plugin {
     public function __construct() {
         parent::__construct();
 
-        $this->writeDelay = C('Plugins.Online.WriteDelay', self::DEFAULT_WRITE_DELAY);
-        $this->pruneDelay = C('Plugins.Online.PruneDelay', self::DEFAULT_PRUNE_DELAY) * 60;
-        $this->cleanDelay = C('Plugins.Online.CleanDelay', self::DEFAULT_CLEAN_DELAY);
-        $this->cacheCountDelay = C('Plugins.Online.CacheCountDelay', 20);
-        $this->cacheRenderDelay = C('Plugins.Online.CacheRenderDelay', 30);
+        $this->writeDelay = c('Plugins.Online.WriteDelay', self::DEFAULT_WRITE_DELAY);
+        $this->pruneDelay = c('Plugins.Online.PruneDelay', self::DEFAULT_PRUNE_DELAY) * 60;
+        $this->cleanDelay = c('Plugins.Online.CleanDelay', self::DEFAULT_CLEAN_DELAY);
+        $this->cacheCountDelay = c('Plugins.Online.CacheCountDelay', 20);
+        $this->cacheRenderDelay = c('Plugins.Online.CacheRenderDelay', 30);
 
         $utc = new DateTimeZone('UTC');
         $now = new DateTime('now', $utc);
@@ -232,10 +232,10 @@ class OnlinePlugin extends Gdn_Plugin {
 
         // If this is the first time this person is showing up, try to set a cookie and then return
         // This prevents tracking bounces, as well as weeds out clients that don't support cookies.
-        $bounceCookieName = C('Garden.Cookie.Name') . '-Vv';
+        $bounceCookieName = c('Garden.Cookie.Name') . '-Vv';
         $bounceCookie = val($bounceCookieName, $_COOKIE);
         if (!$bounceCookie) {
-            safeCookie($bounceCookieName, self::$now, self::$now + 1200, C('Garden.Cookie.Path', '/'));
+            safeCookie($bounceCookieName, self::$now, self::$now + 1200, c('Garden.Cookie.Path', '/'));
             return;
         }
 
@@ -297,7 +297,7 @@ class OnlinePlugin extends Gdn_Plugin {
      * @return array Pair of expiry times, and the index of the currently active cookie
      */
     public static function expiries($time) {
-        $timespan = (C('Plugins.Online.PruneDelay', self::DEFAULT_PRUNE_DELAY) * 60) * 2; // Double the real amount
+        $timespan = (c('Plugins.Online.PruneDelay', self::DEFAULT_PRUNE_DELAY) * 60) * 2; // Double the real amount
 
         $expiry0 = $time - ($time % $timespan) + $timespan;
 
@@ -748,12 +748,12 @@ class OnlinePlugin extends Gdn_Plugin {
      */
 
     public function categoriesController_beforeCategoriesRender_handler($sender) {
-        Gdn::statistics()->addExtra('CategoryID', $sender->Data('Category.CategoryID'));
+        Gdn::statistics()->addExtra('CategoryID', $sender->data('Category.CategoryID'));
     }
 
     public function discussionController_beforeDiscussionRender_handler($sender) {
-        Gdn::statistics()->addExtra('CategoryID', $sender->Data('Discussion.CategoryID'));
-        Gdn::statistics()->addExtra('DiscussionID', $sender->Data('Discussion.DiscussionID'));
+        Gdn::statistics()->addExtra('CategoryID', $sender->data('Discussion.CategoryID'));
+        Gdn::statistics()->addExtra('DiscussionID', $sender->data('Discussion.DiscussionID'));
     }
 
     /**
@@ -783,7 +783,7 @@ class OnlinePlugin extends Gdn_Plugin {
             $userIsOnline = false;
 
             $userLastOnline = val('Timestamp', $userInfo, null);
-            if (Gdn::session()->isValid() && $userID == Gdn::Session()->UserID) {
+            if (Gdn::session()->isValid() && $userID == Gdn::session()->UserID) {
                 $userLastOnline = $currentDate->format('Y-m-d H:i:s');
             }
 
@@ -835,13 +835,13 @@ class OnlinePlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      */
     public function base_render_before($sender) {
-        $pluginRenderLocation = C('Plugins.Online.Location', 'all');
+        $pluginRenderLocation = c('Plugins.Online.Location', 'all');
         $controller = strtolower($sender->ControllerName);
 
         $sender->addCssFile('online.css', 'plugins/Online');
 
         // Don't add the module of the plugin is hidden for guests
-        $hideForGuests = C('Plugins.Online.HideForGuests', true);
+        $hideForGuests = c('Plugins.Online.HideForGuests', true);
         if ($hideForGuests && !Gdn::session()->isValid()) {
             return;
         }
@@ -921,7 +921,7 @@ class OnlinePlugin extends Gdn_Plugin {
         list($userReference, $username) = $args;
 
         $sender->getUserInfo($userReference, $username);
-        $sender->_setBreadcrumbs(T('Online Preferences'), '/profile/online');
+        $sender->_setBreadcrumbs(t('Online Preferences'), '/profile/online');
 
         $userPrefs = dbdecode($sender->User->Preferences);
         if (!is_array($userPrefs)) {
@@ -944,7 +944,7 @@ class OnlinePlugin extends Gdn_Plugin {
             $newPrivateMode = $sender->Form->getValue('PrivateMode', false);
             if ($newPrivateMode != $privateMode) {
                 Gdn::userModel()->saveAttribute($userID, 'Online/PrivateMode', $newPrivateMode);
-                $sender->InformMessage(T("Your changes have been saved."));
+                $sender->informMessage(t("Your changes have been saved."));
             }
         }
 
@@ -1014,9 +1014,9 @@ class OnlinePlugin extends Gdn_Plugin {
         $viewingUserID = Gdn::session()->UserID;
 
         if ($sender->User->UserID == $viewingUserID) {
-            $sideMenu->addLink('Options', sprite('SpWhosOnline') . ' ' . T("Who's Online"), '/profile/online', false, ['class' => 'Popup']);
+            $sideMenu->addLink('Options', sprite('SpWhosOnline') . ' ' . t("Who's Online"), '/profile/online', false, ['class' => 'Popup']);
         } else {
-            $sideMenu->addLink('Options', sprite('SpWhosOnline') . ' ' . T("Who's Online"), userUrl($sender->User, '', 'online'), 'Garden.Users.Edit', ['class' => 'Popup']);
+            $sideMenu->addLink('Options', sprite('SpWhosOnline') . ' ' . t("Who's Online"), userUrl($sender->User, '', 'online'), 'Garden.Users.Edit', ['class' => 'Popup']);
         }
     }
 
@@ -1042,7 +1042,7 @@ class OnlinePlugin extends Gdn_Plugin {
 
         $saved = false;
         foreach ($fields as $field => $defaultValue) {
-            $currentValue = C($field, $defaultValue);
+            $currentValue = c($field, $defaultValue);
             $sender->Form->setValue($field, $currentValue);
 
             if ($sender->Form->authenticatedPostBack()) {
@@ -1060,7 +1060,7 @@ class OnlinePlugin extends Gdn_Plugin {
             $sender->informMessage("No changes");
         }
 
-        $sender->Render('settings', '', 'plugins/Online');
+        $sender->render('settings', '', 'plugins/Online');
     }
 
     public function setup() {
@@ -1077,7 +1077,7 @@ class OnlinePlugin extends Gdn_Plugin {
 
         // Import WhosOnline settings if they exist
 
-        $displayStyle = C('WhosOnline.DisplayStyle', null);
+        $displayStyle = c('WhosOnline.DisplayStyle', null);
         if (!is_null($displayStyle)) {
             switch ($displayStyle) {
                 case 'pictures':
@@ -1091,7 +1091,7 @@ class OnlinePlugin extends Gdn_Plugin {
             removeFromConfig('WhosOnline.DisplayStyle');
         }
 
-        $displayLocation = C('WhosOnline.Location.Show', null);
+        $displayLocation = c('WhosOnline.Location.Show', null);
         if (!is_null($displayLocation)) {
             switch ($displayLocation) {
                 case 'every':
@@ -1109,7 +1109,7 @@ class OnlinePlugin extends Gdn_Plugin {
             removeFromConfig('WhosOnline.Location.Show');
         }
 
-        $hideForGuests = C('WhosOnline.Hide', null);
+        $hideForGuests = c('WhosOnline.Hide', null);
         if (!is_null($hideForGuests)) {
             if ($hideForGuests) {
                 saveToConfig('Plugins.Online.HideForGuests', true);

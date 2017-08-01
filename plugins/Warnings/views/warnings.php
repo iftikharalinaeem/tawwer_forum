@@ -1,14 +1,14 @@
 <?php if (!defined('APPLICATION')) return; ?>
 <div class="DataListWrap">
-<h2 class="H"><?php echo T('Warnings'); ?></h2>
+<h2 class="H"><?php echo t('Warnings'); ?></h2>
 <ul class="DataList Activities">
 <?php 
-if (count($this->Data('Warnings')) > 0 ): 
-   $Moderator = Gdn::Session()->CheckPermission('Garden.Moderation.Manage');
+if (count($this->data('Warnings')) > 0 ): 
+   $Moderator = Gdn::session()->checkPermission('Garden.Moderation.Manage');
    $Now = time();
    $ExpiredFound = FALSE;
    
-   foreach ($this->Data('Warnings') as $Row): 
+   foreach ($this->data('Warnings') as $Row): 
       $CssClass = '';
       if ($Row['Expired']) {
          // The warning has expired.
@@ -23,15 +23,15 @@ if (count($this->Data('Warnings')) > 0 ):
    <li id="Warning_<?php echo $Row['WarningID']; ?>" class="Item HasPhoto<?php echo $CssClass; ?>">
       <?php
       if ($Moderator) {
-         echo '<div class="Options">'.Anchor('×', 'profile/removewarning?warningid='.$Row['WarningID'], 'Delete Popup').'</div>';
+         echo '<div class="Options">'.anchor('×', 'profile/removewarning?warningid='.$Row['WarningID'], 'Delete Popup').'</div>';
       }
       ?>
       
       <div class="Author Photo">
          <?php
-         $Photo = UserPhoto($Row, ['Px' => 'Insert']);
+         $Photo = userPhoto($Row, ['Px' => 'Insert']);
          if (!$Photo)
-            $Photo = '<span class="PhotoWrap">'.Img('https://images.v-cdn.net/warn_50.png', ['class' => 'ProfilePhoto']).'</span>';
+            $Photo = '<span class="PhotoWrap">'.img('https://images.v-cdn.net/warn_50.png', ['class' => 'ProfilePhoto']).'</span>';
          echo $Photo;
          ?>
       </div>
@@ -39,52 +39,52 @@ if (count($this->Data('Warnings')) > 0 ):
          <div class="Title">
             <?php
             if ($Row['Points'] == 0) {
-               $TitleFormat = T('WarningTitleFormat.Notice', '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s point} (just a notice).');
+               $TitleFormat = t('WarningTitleFormat.Notice', '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s point} (just a notice).');
             } else {
-               $TitleFormat = T('WarningTitleFormat', '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s point}.');
+               $TitleFormat = t('WarningTitleFormat', '{InsertUserID,User} warned {WarnUserID,User} for {Points,plural,%s point}.');
             }
             
-            $Title = FormatString($TitleFormat, $Row);
+            $Title = formatString($TitleFormat, $Row);
             echo $Title;
             ?>
          </div>
          <div class="Message">
             <?php
-            echo Gdn_Format::To($Row['Body'], $Row['Format']);
+            echo Gdn_Format::to($Row['Body'], $Row['Format']);
             
-            if ($Row['ModeratorNote'] && Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
+            if ($Row['ModeratorNote'] && Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
                echo '<div class="Hero ModeratorNote">';
-               echo '<div><b>'.T('Private Note for Moderators').'</b></div>';
-               echo Gdn_Format::To($Row['ModeratorNote'], $Row['Format']);
+               echo '<div><b>'.t('Private Note for Moderators').'</b></div>';
+               echo Gdn_Format::to($Row['ModeratorNote'], $Row['Format']);
                echo '</div>';
             }
             ?>
          </div>
          <div class="Meta">
-            <span class="MItem DateInserted"><?php echo Gdn_Format::Date($Row['DateInserted'], 'html'); ?></span>
+            <span class="MItem DateInserted"><?php echo Gdn_Format::date($Row['DateInserted'], 'html'); ?></span>
             <span class="MItem DateExpires">
                <?php
-               $RemoveUserID = GetValue('RemovedByUserID', $Row['Attributes']);
+               $RemoveUserID = getValue('RemovedByUserID', $Row['Attributes']);
                
                if ($Row['DateExpires']) {
                   // The warning has an expiry date.
-                  echo '<span class="MLabel">'.T($Row['Expired'] ? 'Expired' : 'Expires').'</span> ',
-                     '<span class="MValue">'.Gdn_Format::Date($Row['DateExpires'], 'html').'</span>';
+                  echo '<span class="MLabel">'.t($Row['Expired'] ? 'Expired' : 'Expires').'</span> ',
+                     '<span class="MValue">'.Gdn_Format::date($Row['DateExpires'], 'html').'</span>';
                } elseif ($Row['Expired'] == FALSE) {
                   // The warning doesn't expire.
-                  echo '<span class="MValue">'.T("Doesn't expire").'</span>';
+                  echo '<span class="MValue">'.t("Doesn't expire").'</span>';
                } elseif (!$RemoveUserID) {
                   // The warning just expired.
-                  echo '<span class="MValue">'.T("Expired").'</span>';
+                  echo '<span class="MValue">'.t("Expired").'</span>';
                }
                ?>
             </span>
             <?php
             if ($RemoveUserID) {
                // A user remove this warning.
-               $User = Gdn::UserModel()->GetID($RemoveUserID, DATASET_TYPE_ARRAY);
-               echo '<span class="MItem RemovedBy"><span class="MLabel">'.T('Removed by').'</span> ',
-                  '<span class="MValue">'.UserAnchor($User).'</span></span>';
+               $User = Gdn::userModel()->getID($RemoveUserID, DATASET_TYPE_ARRAY);
+               echo '<span class="MItem RemovedBy"><span class="MLabel">'.t('Removed by').'</span> ',
+                  '<span class="MValue">'.userAnchor($User).'</span></span>';
             }
             ?>
          </div>
@@ -93,7 +93,7 @@ if (count($this->Data('Warnings')) > 0 ):
    <?php 
    endforeach; 
 else:
-   echo '<li><div class="Empty">'.T('Not much happening here, yet.').'</div></li>';
+   echo '<li><div class="Empty">'.t('Not much happening here, yet.').'</div></li>';
 endif;
    ?>
 </ul>

@@ -9,7 +9,7 @@
  *
  * @param array $attachment
  */
-function WriteStatusAttachment($attachment) {
+function writeStatusAttachment($attachment) {
     ?>
     <div class="item-attachment">
         <div class="alert alert-info <?php echo strtolower(val('StatusState', $attachment)); ?>">
@@ -21,7 +21,7 @@ function WriteStatusAttachment($attachment) {
                 </div>
                 <div class="media-body">
                     <h4 class="media-heading status-heading"><a href="<?php echo val('StatusUrl', $attachment) ?>"><?php echo val('StatusName', $attachment); ?></a> ·
-                        <small class="status-meta"><?php echo t('Last Updated').' '.Gdn_Format::Date($attachment['DateUpdated'], 'html'); ?></small>
+                        <small class="status-meta"><?php echo t('Last Updated').' '.Gdn_Format::date($attachment['DateUpdated'], 'html'); ?></small>
                     </h4>
                     <p class="status-notes"><?php echo val('StatusNotes', $attachment); ?></p>
                 </div>

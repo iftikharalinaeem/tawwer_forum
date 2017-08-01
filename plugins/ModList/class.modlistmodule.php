@@ -26,7 +26,7 @@ class ModListModule extends Gdn_Module {
       $this->_ApplicationFolder = 'plugins/ModList';
       $this->CategoryModerators = NULL;
       $this->CategoryID = NULL;
-      $this->Style = C('Plugins.ModList.Style', ModListPlugin::DEFAULT_STYLE);
+      $this->Style = c('Plugins.ModList.Style', ModListPlugin::DEFAULT_STYLE);
    }
    
    /**
@@ -34,7 +34,7 @@ class ModListModule extends Gdn_Module {
     * 
     * @return void
     */
-   public function GetData() {
+   public function getData() {
       if (is_null($this->CategoryModerators)) {
          
          if (is_null($this->CategoryID)) {
@@ -42,16 +42,16 @@ class ModListModule extends Gdn_Module {
             // Manually assigned CategoryID?
             if (!is_null($this->CategoryID)) {
 
-               $category = CategoryModel::Categories($this->CategoryID);
+               $category = CategoryModel::categories($this->CategoryID);
 
             // Lookup CategoryID
             } else {
 
-               $category = Gdn::Controller()->Data('Category');
+               $category = Gdn::controller()->data('Category');
                if (!$category) {
-                  $categoryID = Gdn::Controller()->Data('CategoryID');
+                  $categoryID = Gdn::controller()->data('CategoryID');
                   if ($categoryID)
-                     $category = CategoryModel::Categories($categoryID);
+                     $category = CategoryModel::categories($categoryID);
                }
 
             }
@@ -60,23 +60,23 @@ class ModListModule extends Gdn_Module {
             if (!$category)
                return;
 
-            $this->CategoryID = GetValue('CategoryID', $category);
+            $this->CategoryID = getValue('CategoryID', $category);
          }
          
          // Grab the moderator list.
-         $this->CategoryModerators = ModListPlugin::Instance()->Moderators($this->CategoryID);
+         $this->CategoryModerators = ModListPlugin::instance()->moderators($this->CategoryID);
          
       }
       
-      $this->SetData('Moderators', $this->CategoryModerators);
+      $this->setData('Moderators', $this->CategoryModerators);
    }
    
-   public function ToString() {
-      $this->GetData();
+   public function toString() {
+      $this->getData();
       
-      if ($this->Data('Moderators', NULL) === NULL || !sizeof($this->Data('Moderators')))
+      if ($this->data('Moderators', NULL) === NULL || !sizeof($this->data('Moderators')))
          return '';
       
-      return parent::ToString();
+      return parent::toString();
    }
 }

@@ -16,16 +16,16 @@ class CommentImportModel {
    
    /// Methods ///
    
-   public function Counts() {
+   public function counts() {
       $discussionModel = new DiscussionModel();
       
-      $discussionModel->Counts('CountComments');
-      $discussionModel->Counts('FirstCommentID');
-      $discussionModel->Counts('LastCommentID');
-      $discussionModel->Counts('DateLastComment');
-      $discussionModel->Counts('LastCommentUserID');
+      $discussionModel->counts('CountComments');
+      $discussionModel->counts('FirstCommentID');
+      $discussionModel->counts('LastCommentID');
+      $discussionModel->counts('DateLastComment');
+      $discussionModel->counts('LastCommentUserID');
       
-      $defaultRoleIDs = C('Garden.Registration.DefaultRoles');
+      $defaultRoleIDs = c('Garden.Registration.DefaultRoles');
       if (is_array($defaultRoleIDs)) {
          $roleID = array_pop($defaultRoleIDs);
          $sql = "insert GDN_UserRole (
@@ -40,13 +40,13 @@ class CommentImportModel {
                on u.UserID = ur.UserID
             where ur.RoleID is NULL
                and u.Source = '_source_'";
-         $this->Query($sql);
+         $this->query($sql);
       }
    }
    
-   public function DefineTables() { }
+   public function defineTables() { }
    
-   public function Insert($table, $row = NULL) {
+   public function insert($table, $row = NULL) {
       static $lastTable = NULL;
       static $rows = [];
       
@@ -55,7 +55,7 @@ class CommentImportModel {
       
       
       if ($table === NULL) {
-         $this->InsertMulti($lastTable, $rows);
+         $this->insertMulti($lastTable, $rows);
          $lastTable = NULL;
          $rows = [];
          
@@ -63,7 +63,7 @@ class CommentImportModel {
       }
       
       if ($lastTable && $lastTable != $table || count($rows) >= $this->BufferSize) {
-         $this->InsertMulti($lastTable, $rows);
+         $this->insertMulti($lastTable, $rows);
          $rows = [];
       }
       
@@ -71,12 +71,12 @@ class CommentImportModel {
       $rows[] = $row;
    }
    
-   public function InsertMulti($table, $rows) {
+   public function insertMulti($table, $rows) {
       if (empty($rows))
          return;
       
-      $px = Gdn::Database()->DatabasePrefix;
-      $pDO = Gdn::Database()->Connection();
+      $px = Gdn::database()->DatabasePrefix;
+      $pDO = Gdn::database()->connection();
       
       $sql = '';
       foreach ($rows as $row) {
@@ -92,19 +92,19 @@ class CommentImportModel {
          $sql;
       
 //      echo htmlspecialchars($Sql);
-      Gdn::Database()->Query($sql);
+      Gdn::database()->query($sql);
 //      die();
    }
    
-   public function Import() {
-      $this->DefineTables();
-      $this->Parse();
+   public function import() {
+      $this->defineTables();
+      $this->parse();
       $this->RunQueries = TRUE; // Manually override whether to do import or just show SQL
-      $this->InsertTables();
-      $this->Counts();
+      $this->insertTables();
+      $this->counts();
    }
    
-   public function InsertTables() {
+   public function insertTables() {
    }
    
    protected function _InsertUsers($table, $columns = ['Email', 'Name'], $userTable = FALSE) {
@@ -115,7 +115,7 @@ class CommentImportModel {
                on zu.Name = z.UserName
             set z.InsertUserID = zu.UserID";
          
-         $this->Query($sql);
+         $this->query($sql);
       }
       
       // Next join in users based on the columns.
@@ -125,7 +125,7 @@ class CommentImportModel {
                on z.User{$column} = u.$column
             set z.InsertUserID = u.UserID";
                
-         $this->Query($sql);
+         $this->query($sql);
       }
       
       // Insert the missing users.
@@ -154,30 +154,30 @@ class CommentImportModel {
          group by
             i.UserName,
             i.UserEmail";
-      $this->Query($sql);
+      $this->query($sql);
       
       // Assign the user IDs back.
       $sql = "update GDN_{$table} i
          join GDN_User u
             on u.Name = i.UserName
          set i.InsertUserID = u.UserID";
-      $this->Query($sql);
+      $this->query($sql);
    }
    
    /**
     * @param string $type
     * @return CommentImportModel 
     */
-   public static function NewModel($type) {
+   public static function newModel($type) {
       $result = new $type.'ImportModel';
       return $result;
    }
    
-   public function Parse() {
+   public function parse() {
    }
    
-   public function Query($sql, $parameters = NULL) {
-      $px = Gdn::Database()->DatabasePrefix;
+   public function query($sql, $parameters = NULL) {
+      $px = Gdn::database()->DatabasePrefix;
       if ($px != 'GDN_')
          $sql = str_replace(' GDN_', ' '.$px, $sql);
       $sql = str_replace(':_', $px, $sql);
@@ -188,7 +188,7 @@ class CommentImportModel {
       echo '<pre>'.htmlspecialchars($sql).";\n\n</pre>";
       
       if ($this->RunQueries)
-         return Gdn::Database()->Query($sql, $parameters);
+         return Gdn::database()->query($sql, $parameters);
       else
          return TRUE;
    }

@@ -2,7 +2,7 @@
 
 <div id="avatarstock">
    <h1>
-      <?php echo $this->Data('Title'); ?>
+      <?php echo $this->data('Title'); ?>
    </h1>
 
    <div class="Info">

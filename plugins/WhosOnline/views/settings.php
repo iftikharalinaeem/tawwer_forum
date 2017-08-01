@@ -1,18 +1,18 @@
 <?php if (!defined('APPLICATION')) {
     exit();
 } ?>
-    <h2><?php echo T('Privacy Settings'); ?></h2>
+    <h2><?php echo t('Privacy Settings'); ?></h2>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
     <ul>
         <li>
             <?php
-            echo $this->Form->Label('Settings');
-            echo $this->Form->CheckBox('Plugin.WhosOnline.Invisible', 'Hide my online status from other members');
+            echo $this->Form->label('Settings');
+            echo $this->Form->checkBox('Plugin.WhosOnline.Invisible', 'Hide my online status from other members');
             ?>
         </li>
 
     </ul>
-<?php echo $this->Form->Close('Save');
+<?php echo $this->Form->close('Save');

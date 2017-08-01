@@ -17,7 +17,7 @@ class NewEventModule extends Gdn_Module {
      *
      * @return string
      */
-    public function ToString() {
+    public function toString() {
         if (!$this->GroupID) {
             $groupID = Gdn::controller()->data('Group.GroupID');
         }

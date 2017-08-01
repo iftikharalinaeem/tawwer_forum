@@ -48,7 +48,7 @@ class GroupInfoModule extends Gdn_Module {
         $owner = Gdn::userModel()->getID($c->data('Group.InsertUserID'));
         $info = [
             'Created' => Gdn_Format::date($c->data('Group.DateInserted'), 'html'),
-            'Owner' => UserAnchor($owner),
+            'Owner' => userAnchor($owner),
             'Member Count' => ['Members', $c->data('Group.CountMembers')]
         ];
         echo '<dl class="Group-Info">';

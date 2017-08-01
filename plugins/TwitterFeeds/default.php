@@ -24,7 +24,7 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 	 *
 	 * @todo Make use of http://twitter.com/javascripts/blogger.js ??
 	 */
-	public function ProfileController_AddProfileTabs_Handler($sender)
+	public function profileController_addProfileTabs_handler($sender)
 	{
 		// Get the selected User's Twitter Name
 		$twitterName = $sender->User->TwitterName;
@@ -70,11 +70,11 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 			/**
 			 * Construct the Tweets Output
 			 */
-			$sender->AddCssFile('twitterfeeds.css', 'plugins/TwitterFeeds');
+			$sender->addCssFile('twitterfeeds.css', 'plugins/TwitterFeeds');
 			$htmlOut .= '<div id="TwitterFeeds" class="Box">';
 			$htmlOut .= '<div id="TwitterFeedsTitle">';
 			  $htmlOut .= '<div id="TwitterIcon"></div>';
-			  $htmlOut .= '<div><h4><a href="http://twitter.com/'.$twitterName.'" title="'.$sender->User->Name.T(' on Twitter').'">'.$twitterName.'</a></h4></div>';
+			  $htmlOut .= '<div><h4><a href="http://twitter.com/'.$twitterName.'" title="'.$sender->User->Name.t(' on Twitter').'">'.$twitterName.'</a></h4></div>';
 			$htmlOut .= '</div>';
 			$htmlOut .= '<ul class="PanelInfo">';
 			
@@ -83,8 +83,8 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 				$createdAt = strtotime($tweet['created_at']);
 				
 				$htmlOut .= '<li class="Tweet">';
-				$htmlOut .= Gdn_Format::Links($tweet['text']);
-				$htmlOut .= ' <small><a href="http://twitter.com/'.$twitterName.'/statuses/'.$tweet['id'].'">'.Gdn_Format::Date($createdAt).'</a></small>';
+				$htmlOut .= Gdn_Format::links($tweet['text']);
+				$htmlOut .= ' <small><a href="http://twitter.com/'.$twitterName.'/statuses/'.$tweet['id'].'">'.Gdn_Format::date($createdAt).'</a></small>';
 				$htmlOut .= '</li>';
 			}
 			$htmlOut .= '</ul>';
@@ -103,7 +103,7 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 			/**
 			 * Add the new Panel
 			 */
-			$sender->AddAsset('Panel', $htmlOut, 'TwitterFeeds');
+			$sender->addAsset('Panel', $htmlOut, 'TwitterFeeds');
 			
 		} else {
 			return FALSE;
@@ -118,10 +118,10 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 	 * @since 1.0
 	 * @author Oliver Raduner <vanilla@raduner.ch>
 	 */
-	public function ProfileController_EditMyAccountAfter_Handler($sender) {
+	public function profileController_editMyAccountAfter_handler($sender) {
 		echo '<li>';
-		echo $sender->Form->Label('Twitter Name', 'TwitterName');
-		echo $sender->Form->Input('TwitterName', 'text', ['maxlength' => 15]);
+		echo $sender->Form->label('Twitter Name', 'TwitterName');
+		echo $sender->Form->input('TwitterName', 'text', ['maxlength' => 15]);
 		echo '</li>';
 	}
 	
@@ -132,14 +132,14 @@ class TwitterFeedsPlugin implements Gdn_IPlugin
 	 * @version 1.0
 	 * @since 1.0
 	 */
-	public function Setup()
+	public function setup()
 	{
-		$structure = Gdn::Structure();
+		$structure = Gdn::structure();
 		
 		// Add an additional Column to the User DB-Table
-		$structure->Table('User')
-			->Column('TwitterName', 'varchar(15)', TRUE)
-			->Set(FALSE, FALSE);
+		$structure->table('User')
+			->column('TwitterName', 'varchar(15)', TRUE)
+			->set(FALSE, FALSE);
 	}	
 		
 }

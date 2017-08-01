@@ -14,7 +14,7 @@
       width: 200px !important;
    }
 </style>
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 <div class="Info">
    <h2>Google Analytics Account IDs & Related Domains</h2>
    <p>Specify the accounts used to track pageviews on this forum. You can also (optionally) specify the domain that GA uses to track the pageview.</p>
@@ -24,15 +24,15 @@
       <br />Leaving these inputs blank will disable all tracking.
    </small></p>
    <?php
-   echo $this->Form->Open();
-   echo $this->Form->Errors();
+   echo $this->Form->open();
+   echo $this->Form->errors();
    echo '<div class="Col"><strong>Account</strong>';
-      echo $this->Form->TextBox('Plugins.GoogleAnalytics.Account', ['MultiLine' => TRUE]);
+      echo $this->Form->textBox('Plugins.GoogleAnalytics.Account', ['MultiLine' => TRUE]);
    echo '</div>';
    echo '<div class="Col">-&gt;</div>';
    echo '<div class="Col"><strong>Domain</strong>';
-      echo $this->Form->TextBox('Plugins.GoogleAnalytics.TrackerDomain', ['MultiLine' => TRUE]);
+      echo $this->Form->textBox('Plugins.GoogleAnalytics.TrackerDomain', ['MultiLine' => TRUE]);
    echo '</div>';
-   echo $this->Form->Close('Save', '', ['style' => 'margin: 0;']); 
+   echo $this->Form->close('Save', '', ['style' => 'margin: 0;']); 
    ?>
 </div>

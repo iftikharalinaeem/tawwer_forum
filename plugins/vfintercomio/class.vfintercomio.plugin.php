@@ -70,26 +70,26 @@ class vfIntercomioPlugin extends Gdn_Plugin {
             'email' => gdn::session()->User->Email,
             'userID' => gdn::session()->User->UserID,
             'trackingPages' => 'Banner,Themes,Users,Roles & Permissions,Social,Categories,Plugins',
-            'app_id' => C('Plugins.Intercomio.App_id', 0)
+            'app_id' => c('Plugins.Intercomio.App_id', 0)
         ];
 
-        $sender->AddJsFile('intercomio.js', 'plugins/vfintercomio/js');
+        $sender->addJsFile('intercomio.js', 'plugins/vfintercomio/js');
         $sender->addDefinition('intercomIO', $intercomio);
     }
 
     public function settingsController_vfintercomio_create($sender, $args) {
-        $sender->Permission('Garden.Settings.Manage');
+        $sender->permission('Garden.Settings.Manage');
 
         $cf = new ConfigurationModule($sender);
 
-        $cf->Initialize(
+        $cf->initialize(
             [
                 'Plugins.Intercomio.App_id' => []
             ]
         );
 
-        $sender->AddSideMenu();
-        $sender->SetData('Title', T('Intercom.io Settings'));
-        $cf->RenderAll();
+        $sender->addSideMenu();
+        $sender->setData('Title', t('Intercom.io Settings'));
+        $cf->renderAll();
     }
 }

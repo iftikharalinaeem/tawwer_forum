@@ -23,7 +23,7 @@ class ReactionModel extends Gdn_Model {
     /** @var null  */
     public static $TagIDs = null;
 
-    /**  @var int Contains the last count from {@link GetRecordsWhere()}. */
+    /**  @var int Contains the last count from {@link getRecordsWhere()}. */
     public $LastCount;
 
     /** @var Gdn_SQL */
@@ -143,7 +143,7 @@ class ReactionModel extends Gdn_Model {
                 if (is_string($attributes)) {
                     $attributes = dbdecode($attributes);
                     $attributes = (is_array($attributes)) ? $attributes : [];
-                    SetValue('Attributes', $type, $attributes);
+                    setValue('Attributes', $type, $attributes);
                 }
                 // Add the result
                 $result[$index] = $type;
@@ -245,7 +245,7 @@ class ReactionModel extends Gdn_Model {
                 $attrColumn = 'Data';
                 break;
             default:
-                throw NotFoundException(ucfirst($type));
+                throw notFoundException(ucfirst($type));
         }
 
         $log = null;
@@ -255,7 +255,7 @@ class ReactionModel extends Gdn_Model {
             $log = $logModel->getWhere(['RecordType' => $type, 'RecordID' => $iD, 'Operation' => $operation]);
 
             if (count($log) == 0) {
-                throw NotFoundException($type);
+                throw notFoundException($type);
             }
             $log = $log[0];
             $row = $log['Data'];
@@ -263,7 +263,7 @@ class ReactionModel extends Gdn_Model {
         $row = (array)$row;
 
         // Make sure the attributes are in the row and unserialized.
-        $attributes = GetValue($attrColumn, $row, []);
+        $attributes = getValue($attrColumn, $row, []);
         if (is_string($attributes)) {
             $attributes = dbdecode($attributes);
         }
@@ -330,11 +330,11 @@ class ReactionModel extends Gdn_Model {
 
         foreach ($data2 as $row) {
             if (!$recordType)
-                $rT = GetValue('RecordType', $row);
+                $rT = getValue('RecordType', $row);
             else
                 $rT = $recordType;
 
-            $iD = GetValue($rT.'ID', $row);
+            $iD = getValue($rT.'ID', $row);
 
             if ($iD)
                 $iDs[$rT][$iD] = 1;
@@ -557,8 +557,8 @@ class ReactionModel extends Gdn_Model {
         $inc = val('Total', $data, 1);
         touchValue('Total', $data, $inc);
         touchValue('DateInserted', $data, Gdn_Format::toDateTime());
-        $reactionTypes = self::ReactionTypes();
-        $reactionTypes = Gdn_DataSet::Index($reactionTypes, ['TagID']);
+        $reactionTypes = self::reactionTypes();
+        $reactionTypes = Gdn_DataSet::index($reactionTypes, ['TagID']);
 
         // See if there is already a user tag.
         $where = arrayTranslate($data, ['RecordType', 'RecordID', 'UserID']);
@@ -612,7 +612,7 @@ class ReactionModel extends Gdn_Model {
         $points = 0;
 
         foreach ($userTags as $row) {
-            $args = ArrayTranslate($row, [
+            $args = arrayTranslate($row, [
                 'RecordType' => ':RecordType',
                 'RecordID' => ':RecordID',
                 'TagID' => ':TagID',
@@ -635,7 +635,7 @@ class ReactionModel extends Gdn_Model {
 
             // See what kind of points this reaction gives.
             $reactionType = $reactionTypes[$row['TagID']];
-            if ($reactionPoints = GetValue('Points', $reactionType)) {
+            if ($reactionPoints = getValue('Points', $reactionType)) {
                 if ($row['Total'] < 1) {
                     $points += $reactionPoints;
                 } else {
@@ -780,7 +780,7 @@ class ReactionModel extends Gdn_Model {
         $attrColumn = $recordType == 'Activity' ? 'Data' : 'Attributes';
 
         if (!$reactionType) {
-            throw NotFoundException($reactionUrlCode);
+            throw notFoundException($reactionUrlCode);
         }
 
         $logOperation = val('Log', $reactionType);
@@ -788,7 +788,7 @@ class ReactionModel extends Gdn_Model {
         list($row, $model, $log) = $this->getRow($recordType, $iD, $logOperation);
 
         if (!$selfReact && !$isModerator && ($row['InsertUserID'] == $userID)) {
-            throw new Gdn_UserException(T("You can't react to your own post."));
+            throw new Gdn_UserException(t("You can't react to your own post."));
         }
 
         // Check and see if moderators are protected.
@@ -877,8 +877,8 @@ class ReactionModel extends Gdn_Model {
             }
         } else {
             if ($score >= min($logThreshold, $removeThreshold)) {
-                $restoreUser = Gdn::userModel()->getID(GetValueR($attrColumn.'.RestoreUserID', $row));
-                $dateRestored = GetValueR($attrColumn.'.DateRestored', $row);
+                $restoreUser = Gdn::userModel()->getID(getValueR($attrColumn.'.RestoreUserID', $row));
+                $dateRestored = getValueR($attrColumn.'.DateRestored', $row);
 
                 // The post would have been logged, but since it has been restored we won't do that again.
                 $message = [
@@ -1071,7 +1071,7 @@ class ReactionModel extends Gdn_Model {
         $recordID = null;
 
         $reactionTagIDs = self::reactionTypes();
-        $reactionTagIDs = Gdn_DataSet::Index($reactionTagIDs,['TagID']);
+        $reactionTagIDs = Gdn_DataSet::index($reactionTagIDs,['TagID']);
 
         $count = 0;
         foreach ($totalData as $row) {
@@ -1080,7 +1080,7 @@ class ReactionModel extends Gdn_Model {
             }
 
             $count++;
-            $strippedRecordType = GetValue(0, explode('-', $row['RecordType'], 2));
+            $strippedRecordType = getValue(0, explode('-', $row['RecordType'], 2));
             $newRecord = $strippedRecordType != $recordType || $row['RecordID'] != $recordID;
 
             if ($newRecord) {

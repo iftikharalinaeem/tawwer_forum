@@ -5,8 +5,8 @@ class Colors extends Gdn_Plugin {
    /**
     * Load CSS into head for editor
     */
-   public function AssetModel_StyleCss_Handler($sender) {   
-      $sender->AddCssFile('spectrum.css', 'plugins/colors');
+   public function assetModel_styleCss_handler($sender) {   
+      $sender->addCssFile('spectrum.css', 'plugins/colors');
    }
 
    
@@ -14,10 +14,10 @@ class Colors extends Gdn_Plugin {
     * Placed these components everywhere due to some Web sites loading the 
     * editor in some areas where the values were not yet injected into HTML.
     */
-   public function Base_Render_Before($sender) {
-      $c = Gdn::Controller();
+   public function base_render_before($sender) {
+      $c = Gdn::controller();
       // Load JavaScript
-      $c->AddJsFile('spectrum.js', 'plugins/colors');
+      $c->addJsFile('spectrum.js', 'plugins/colors');
    }
    
    /**
@@ -25,13 +25,13 @@ class Colors extends Gdn_Plugin {
     * @param SettingsController $sender
     * @param array $args
     */
-   public function SettingsController_Colors_Create($sender, $args) {
-      $sender->Permission('Garden.Settings.Manage');
+   public function settingsController_colors_create($sender, $args) {
+      $sender->permission('Garden.Settings.Manage');
       $cf = new ConfigurationModule($sender);
 
       //$Formats = array_combine($this->Formats, $this->Formats);
       
-      $cf->Initialize([
+      $cf->initialize([
           'Plugins.colors.header' => ['LabelCode' => 'Header', 'Control' => 'Textbox', 'Description' => 'Select a color for the dashboard header.'],
           'Plugins.colors.body' => ['LabelCode' => 'Body', 'Control' => 'Textbox', 'Description' => 'Select a color for the dashboard body.'],
           'Plugins.colors.panel' => ['LabelCode' => 'Panel', 'Control' => 'Textbox', 'Description' => 'Select a color for the dashboard panel.'],
@@ -39,31 +39,31 @@ class Colors extends Gdn_Plugin {
       ]);
       
       // Add some JS and CSS to blur out option when Wysiwyg not chosen.
-      $c = Gdn::Controller();
-      $c->AddJsFile('colors.js', 'plugins/colors');
-      $sender->AddCssFile('spectrum.css', 'plugins/colors');
+      $c = Gdn::controller();
+      $c->addJsFile('colors.js', 'plugins/colors');
+      $sender->addCssFile('spectrum.css', 'plugins/colors');
       
-      $sender->AddSideMenu();
-      $sender->SetData('Title', T('Colors Settings'));
-      $cf->RenderAll();
+      $sender->addSideMenu();
+      $sender->setData('Title', t('Colors Settings'));
+      $cf->renderAll();
       //$Sender->Cf = $Cf;
-      //$Sender->Render('settings', '', 'plugins/colors');
+      //$Sender->render('settings', '', 'plugins/colors');
    }   
    
    
-   public function Base_GetAppSettingsMenuItems_Handler($sender) {
+   public function base_getAppSettingsMenuItems_handler($sender) {
       $menu = $sender->EventArguments['SideMenu'];
-      $menu->AddItem('Appearance', T('Appearance'));
-      $menu->AddLink('Appearance', 'Colors Settings', 'settings/colors', 'Garden.Settings.Manage');
+      $menu->addItem('Appearance', t('Appearance'));
+      $menu->addLink('Appearance', 'Colors Settings', 'settings/colors', 'Garden.Settings.Manage');
    }
 
-	public function Setup() {        
+	public function setup() {        
 
 	}
    
-   public function OnDisable() {
+   public function onDisable() {
 	}
 
-   public function CleanUp() {
+   public function cleanUp() {
 	}
 }

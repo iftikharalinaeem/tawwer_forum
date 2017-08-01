@@ -296,7 +296,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
 
         echo wrap('<div class="DismissMessage '.$messageClass.'">'.$validationMessage.$message.' '.$anchor.'</div>', $wrapTag);
-        echo wrap($sender->Form->CheckBox('Terms', t('TermsLabel', 'By checking this box, I acknowledge I have read and understand, and agree to the forums code of conduct.'), ['value' => val('TermsOfUseID', $terms)]), $wrapTag);
+        echo wrap($sender->Form->checkBox('Terms', t('TermsLabel', 'By checking this box, I acknowledge I have read and understand, and agree to the forums code of conduct.'), ['value' => val('TermsOfUseID', $terms)]), $wrapTag);
     }
 
 

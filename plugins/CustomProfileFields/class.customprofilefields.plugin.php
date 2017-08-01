@@ -13,7 +13,7 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 	/**
 	 * Render the custom fields on the admin edit user form.
 	 */
-	public function UserController_AfterFormInputs_Handler($sender) {
+	public function userController_afterFormInputs_handler($sender) {
 		echo '<ul>';
 		$this->_FormFields($sender);
 		echo '</ul>';
@@ -22,7 +22,7 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 	/**
 	 * Render the custom fields on the profile edit user form.
 	 */
-	public function ProfileController_EditMyAccountAfter_Handler($sender) {
+	public function profileController_editMyAccountAfter_handler($sender) {
 		$this->_FormFields($sender);
 	}
 
@@ -31,41 +31,41 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 	 */
 	private function _FormFields($sender) {
 		// Retrieve user's existing profile fields
-		$suggestedFields = C('Plugins.CustomProfileFields.SuggestedFields', '');
+		$suggestedFields = c('Plugins.CustomProfileFields.SuggestedFields', '');
 		$suggestedFields = explode(',', $suggestedFields);
-		$isPostBack = $sender->Form->IsPostBack();
+		$isPostBack = $sender->Form->isPostBack();
 		$profileFields = [];
 		if (is_object($sender->User))
-			$profileFields = Gdn::UserModel()->GetAttribute($sender->User->UserID, 'CustomProfileFields', []);
+			$profileFields = Gdn::userModel()->getAttribute($sender->User->UserID, 'CustomProfileFields', []);
 
 		// Write out the suggested fields first
 		if (count($suggestedFields) > 0)
-			echo Wrap(Wrap(T('More Information'), 'label'), 'li');
+			echo wrap(wrap(t('More Information'), 'label'), 'li');
 
 		$countFields = 0;
 		foreach ($suggestedFields as $field) {
 			$countFields++;
-			$value = $isPostBack ? $sender->Form->GetValue($field, '') : GetValue($field, $profileFields, '');
+			$value = $isPostBack ? $sender->Form->getValue($field, '') : getValue($field, $profileFields, '');
 
          $customFieldOptions = ['value' => $value];
          $sender->EventArguments['CustomField'] = $field;
          $sender->EventArguments['CustomFieldValue'] = &$value;
          $sender->EventArguments['CustomFieldOptions'] = &$customFieldOptions;
-         $sender->FireAs('CustomProfileFieldsPlugin')->FireEvent('BeforeCustomField');
+         $sender->fireAs('CustomProfileFieldsPlugin')->fireEvent('BeforeCustomField');
 
 			echo '<li>';
-				echo $sender->Form->Hidden('CustomProfileFieldLabel[]', ['value' => $field]);
-				echo $sender->Form->Label($field, 'CustomProfileFieldValue[]');
-				echo $sender->Form->TextBox('CustomProfileFieldValue[]', $customFieldOptions);
+				echo $sender->Form->hidden('CustomProfileFieldLabel[]', ['value' => $field]);
+				echo $sender->Form->label($field, 'CustomProfileFieldValue[]');
+				echo $sender->Form->textBox('CustomProfileFieldValue[]', $customFieldOptions);
 			echo '</li>';
 		}
-		if (!C('Plugins.CustomProfileFields.Disallow')) {
+		if (!c('Plugins.CustomProfileFields.Disallow')) {
 		?>
 <li>
-	<label><?php echo T('Custom Information'); ?></label>
-	<div><?php echo T('Use these fields to create custom profile information. You can enter things like "Relationship Status", "Skype ID", "Favorite Dinosaur", etc. Be creative!'); ?></div>
-	<div class="CustomProfileFieldLabel"><?php echo T('Label'); ?></div>
-	<div class="CustomProfileFieldValue"><?php echo T('Value'); ?></div>
+	<label><?php echo t('Custom Information'); ?></label>
+	<div><?php echo t('Use these fields to create custom profile information. You can enter things like "Relationship Status", "Skype ID", "Favorite Dinosaur", etc. Be creative!'); ?></div>
+	<div class="CustomProfileFieldLabel"><?php echo t('Label'); ?></div>
+	<div class="CustomProfileFieldValue"><?php echo t('Value'); ?></div>
 	<script type="text/javascript">
 		jQuery(document).ready(function($) {
 			$(document).on('blur', "input.CustomProfileFieldLabel", function() {
@@ -99,13 +99,13 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 </li>
 <?php
             // Write out user-defined custom fields
-            $customProfileFieldLabel = GetValue('CustomProfileFieldLabel', $sender->Form->FormValues(), []);
-            $customProfileFieldValue = GetValue('CustomProfileFieldValue', $sender->Form->FormValues(), []);
+            $customProfileFieldLabel = getValue('CustomProfileFieldLabel', $sender->Form->formValues(), []);
+            $customProfileFieldValue = getValue('CustomProfileFieldValue', $sender->Form->formValues(), []);
             foreach ($profileFields as $field => $value) {
                if (!in_array($field, $suggestedFields)) {
                   if ($isPostBack) {
-                     $field = GetValue($countFields, $customProfileFieldLabel, '');
-                     $value = GetValue($countFields, $customProfileFieldValue, '');
+                     $field = getValue($countFields, $customProfileFieldLabel, '');
+                     $value = getValue($countFields, $customProfileFieldValue, '');
                   }
                   $countFields++;
 
@@ -113,18 +113,18 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
                   $sender->EventArguments['CustomField'] = $field;
                   $sender->EventArguments['CustomFieldValue'] = &$value;
                   $sender->EventArguments['CustomFieldOptions'] = &$customFieldOptions;
-                  $sender->FireAs('CustomProfileFieldsPlugin')->FireEvent('BeforeCustomField');
+                  $sender->fireAs('CustomProfileFieldsPlugin')->fireEvent('BeforeCustomField');
 
                   echo '<li>';
-                     echo $sender->Form->TextBox('CustomProfileFieldLabel[]', ['value' => $field, 'class' => 'CustomProfileFieldLabel']);
-                     echo $sender->Form->TextBox('CustomProfileFieldValue[]', $customFieldOptions);
+                     echo $sender->Form->textBox('CustomProfileFieldLabel[]', ['value' => $field, 'class' => 'CustomProfileFieldLabel']);
+                     echo $sender->Form->textBox('CustomProfileFieldValue[]', $customFieldOptions);
                   echo '</li>';
                }
             }
             // Write out one empty row
             echo '<li>';
-               echo $sender->Form->TextBox('CustomProfileFieldLabel[]', ['class' => 'CustomProfileFieldLabel']);
-               echo $sender->Form->TextBox('CustomProfileFieldValue[]', ['class' => 'CustomProfileFieldValue']);
+               echo $sender->Form->textBox('CustomProfileFieldLabel[]', ['class' => 'CustomProfileFieldLabel']);
+               echo $sender->Form->textBox('CustomProfileFieldValue[]', ['class' => 'CustomProfileFieldValue']);
             echo '</li>';
          }
 	}
@@ -132,16 +132,16 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 	/**
 	 * Save the custom profile fields when saving the user.
 	 */
-	public function UserModel_AfterSave_Handler($sender) {
-      $valueLimit = Gdn::Session()->CheckPermission('Garden.Moderation.Manage') ? 255 : C('Plugins.CustomProfileFields.ValueLength', 255);
-		$userID = GetValue('UserID', $sender->EventArguments);
-		$formPostValues = GetValue('FormPostValues', $sender->EventArguments);
+	public function userModel_afterSave_handler($sender) {
+      $valueLimit = Gdn::session()->checkPermission('Garden.Moderation.Manage') ? 255 : c('Plugins.CustomProfileFields.ValueLength', 255);
+		$userID = getValue('UserID', $sender->EventArguments);
+		$formPostValues = getValue('FormPostValues', $sender->EventArguments);
 		$customProfileFieldLabels = FALSE;
 		$customProfileFieldValues = FALSE;
 		$customProfileFields = FALSE;
 		if (is_array($formPostValues)) {
-			$customProfileFieldLabels = GetValue('CustomProfileFieldLabel', $formPostValues);
-			$customProfileFieldValues = GetValue('CustomProfileFieldValue', $formPostValues);
+			$customProfileFieldLabels = getValue('CustomProfileFieldLabel', $formPostValues);
+			$customProfileFieldValues = getValue('CustomProfileFieldValue', $formPostValues);
 			if (is_array($customProfileFieldLabels) && is_array($customProfileFieldValues)) {
 				$this->_TrimValues($customProfileFieldLabels, 50);
 				$this->_TrimValues($customProfileFieldValues, $valueLimit);
@@ -158,7 +158,7 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 		}
 
 		if ($userID > 0 && is_array($customProfileFields))
-			Gdn::UserModel()->SaveAttribute($userID, 'CustomProfileFields', $customProfileFields);
+			Gdn::userModel()->saveAttribute($userID, 'CustomProfileFields', $customProfileFields);
 	}
 
 	/**
@@ -173,20 +173,20 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 	/**
 	 * Render the values on the profile page.
 	 */
-	public function UserInfoModule_OnBasicInfo_Handler($sender) {
+	public function userInfoModule_onBasicInfo_handler($sender) {
 		// Render the custom fields
 		try {
-         $hideFields = (array)explode(',', C('Plugins.CustomProfileFields.HideFields'));
+         $hideFields = (array)explode(',', c('Plugins.CustomProfileFields.HideFields'));
 
-			$customProfileFields = GetValue('CustomProfileFields', $sender->User->Attributes, []);
+			$customProfileFields = getValue('CustomProfileFields', $sender->User->Attributes, []);
 			foreach ($customProfileFields as $label => $value) {
             if (in_array($label, $hideFields))
                continue;
 
-            $value = Gdn_Format::Links(htmlspecialchars($value));
+            $value = Gdn_Format::links(htmlspecialchars($value));
 
-				echo ' <dt class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($label).'">'.Gdn_Format::Text($label).'</dt> ';
-				echo ' <dd class="CustomProfileField CustomProfileField-'.Gdn_Format::Url($label).'">'.$value.'</dd> ';
+				echo ' <dt class="CustomProfileField CustomProfileField-'.Gdn_Format::url($label).'">'.Gdn_Format::text($label).'</dt> ';
+				echo ' <dd class="CustomProfileField CustomProfileField-'.Gdn_Format::url($label).'">'.$value.'</dd> ';
 			}
 		} catch (Exception $ex) {
 			// No errors
@@ -196,34 +196,34 @@ class CustomProfileFieldsPlugin extends Gdn_Plugin {
 	/**
 	 * Configuration screen
 	 */
-	public function PluginController_CustomProfileFields_Create($sender) {
+	public function pluginController_customProfileFields_create($sender) {
 		$conf = new ConfigurationModule($sender);
-		$conf->Initialize([
+		$conf->initialize([
 			'Plugins.CustomProfileFields.SuggestedFields' => ['Control' => 'TextBox', 'Options' => ['MultiLine' => TRUE]],
 			'Plugins.CustomProfileFields.Disallow' => ['Type' => 'bool', 'Control' => 'CheckBox', 'LabelCode' => "Don't allow custom fields."]
 		]);
 
-     $sender->AddSideMenu('plugin/customprofilefields');
-     $sender->SetData('Title', T('Custom Profile Field Settings'));
+     $sender->addSideMenu('plugin/customprofilefields');
+     $sender->setData('Title', t('Custom Profile Field Settings'));
      $sender->ConfigurationModule = $conf;
-     $conf->RenderAll();
+     $conf->renderAll();
 	}
 
 	/**
 	 * Add the admin config menu option.
 	 */
-	public function Base_GetAppSettingsMenuItems_Handler($sender) {
+	public function base_getAppSettingsMenuItems_handler($sender) {
       $menu = &$sender->EventArguments['SideMenu'];
-      $menu->AddLink('Users', T('Custom Profile Fields'), 'plugin/customprofilefields', 'Garden.User.Edit');
+      $menu->addLink('Users', t('Custom Profile Fields'), 'plugin/customprofilefields', 'Garden.User.Edit');
 	}
 
    /**
     * Add suggested fields on install. These are configurable in conf/config.php.
     */
-   public function Setup() {
-		$suggestedFields = C('Plugins.CustomProfileFields.SuggestedFields');
+   public function setup() {
+		$suggestedFields = c('Plugins.CustomProfileFields.SuggestedFields');
 		if (!$suggestedFields)
-			SaveToConfig(
+			saveToConfig(
 				'Plugins.CustomProfileFields.SuggestedFields',
 				'Facebook,Twitter,Website,Xbox Live,Playstation ID,Wii Friend Code,Steam ID,WoW'
 			);

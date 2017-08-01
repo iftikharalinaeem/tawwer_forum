@@ -3,11 +3,11 @@
    <p>You are previewing your custom CSS revisions.</p>
    <?php
    $Form = new Gdn_Form();
-   echo $Form->Open(['action' => Url('plugin/customcss')]);
-   if (Gdn::Config('Plugins.CustomCSS.Enabled'))
-      echo $Form->Button('Apply Changes', ['class' => 'PreviewButton', 'Name' => 'Form/ApplyChanges']);
+   echo $Form->open(['action' => url('plugin/customcss')]);
+   if (Gdn::config('Plugins.CustomCSS.Enabled'))
+      echo $Form->button('Apply Changes', ['class' => 'PreviewButton', 'Name' => 'Form/ApplyChanges']);
       
-   echo $Form->Button('Exit Preview', ['class' => 'PreviewButton', 'Name' => 'Form/ExitPreview']);
-   echo $Form->Close();
+   echo $Form->button('Exit Preview', ['class' => 'PreviewButton', 'Name' => 'Form/ExitPreview']);
+   echo $Form->close();
    ?>
 </div>

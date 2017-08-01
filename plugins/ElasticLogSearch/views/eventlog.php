@@ -9,7 +9,7 @@
     $( document ).ready(function() {
         $( "#filter-reset" ).click(function(e) {
             $("#filter-form")[0].reset();
-            window.location.href = '<?php echo Url('/settings/applog'); ?>';
+            window.location.href = '<?php echo url('/settings/applog'); ?>';
         });
     });
 </script>
@@ -17,44 +17,44 @@
 
 <h1>Application Log</h1>
 <?php
-echo $this->Form->Open(['action' => URL('/settings/applog'), 'Method' => 'GET', 'id' => 'filter-form']);
-echo $this->Form->Errors();
+echo $this->Form->open(['action' => uRL('/settings/applog'), 'Method' => 'GET', 'id' => 'filter-form']);
+echo $this->Form->errors();
 ?>
 <div class="floatfix">
     <ul class="cf blockgrid">
         <li class="float-left">
-            <?php echo $this->Form->Label('Date From', 'datefrom');  ?>
-            <?php echo $this->Form->TextBox('datefrom', ['class' => 'InputBox Short']); ?>
+            <?php echo $this->Form->label('Date From', 'datefrom');  ?>
+            <?php echo $this->Form->textBox('datefrom', ['class' => 'InputBox Short']); ?>
         </li>
         <li class="float-left">
-            <?php echo $this->Form->Label('Date To', 'dateto');  ?>
-            <?php echo $this->Form->TextBox('dateto', ['class' => 'InputBox Short']); ?>
+            <?php echo $this->Form->label('Date To', 'dateto');  ?>
+            <?php echo $this->Form->textBox('dateto', ['class' => 'InputBox Short']); ?>
         </li>
         <li class="float-left">
-            <?php echo $this->Form->Label('Event Name', 'event');  ?>
-            <?php echo $this->Form->TextBox('event', ['class' => 'InputBox Short']); ?>
+            <?php echo $this->Form->label('Event Name', 'event');  ?>
+            <?php echo $this->Form->textBox('event', ['class' => 'InputBox Short']); ?>
         </li>
         <li class="float-left">
-            <?php echo $this->Form->Label('IP', 'ipaddress');  ?>
-            <?php echo $this->Form->TextBox('ipaddress', ['class' => 'InputBox Short']); ?>
+            <?php echo $this->Form->label('IP', 'ipaddress');  ?>
+            <?php echo $this->Form->textBox('ipaddress', ['class' => 'InputBox Short']); ?>
         </li>
         <li class="float-left">
-            <?php echo $this->Form->Label('Priority', 'priority');  ?>
-            <?php echo $this->Form->DropDown('priority', $this->Data['PriorityOptions']); ?>
+            <?php echo $this->Form->label('Priority', 'priority');  ?>
+            <?php echo $this->Form->dropDown('priority', $this->Data['PriorityOptions']); ?>
         </li>
         <li class="float-left">
-            <?php echo $this->Form->Label('Sort Order', 'sortorder');  ?>
-            <?php echo $this->Form->DropDown('sortorder', ['desc' => 'DESC', 'asc' => 'ASC']); ?>
+            <?php echo $this->Form->label('Sort Order', 'sortorder');  ?>
+            <?php echo $this->Form->dropDown('sortorder', ['desc' => 'DESC', 'asc' => 'ASC']); ?>
         </li>
         <li class="float-left buttons">
-            <?php echo $this->Form->Button("Filter"); ?>
-            <?php echo $this->Form->Button("Reset", ['id' => 'filter-reset', 'type' => 'reset']); ?>
-            <?php echo $this->Form->Close(); ?>
+            <?php echo $this->Form->button("Filter"); ?>
+            <?php echo $this->Form->button("Reset", ['id' => 'filter-reset', 'type' => 'reset']); ?>
+            <?php echo $this->Form->close(); ?>
 
         </li>
     </ul>
 </div>
-<?php PagerModule::Write(['Sender' => $this]); ?>
+<?php PagerModule::write(['Sender' => $this]); ?>
 
 <table class="AltColumns table-el">
     <thead>
@@ -79,14 +79,14 @@ echo $this->Form->Errors();
             $class .= ' LogRow';
             ?>
             <tr class="<?php echo $class; ?>" id="Event_<?php echo $ID; ?>">
-                <td title="<?php echo Gdn_Format::DateFull($event['Timestamp']); ?>">
-                    <?php echo Gdn_Format::ToDateTime($event['Timestamp']); ?></td>
+                <td title="<?php echo Gdn_Format::dateFull($event['Timestamp']); ?>">
+                    <?php echo Gdn_Format::toDateTime($event['Timestamp']); ?></td>
                 <td><?php echo htmlspecialchars($event['Message']); ?></td>
                 <td class="UsernameCell">
                     <?php
-                    $User = Gdn::UserModel()->GetID($event['UserID']);
+                    $User = Gdn::userModel()->getID($event['UserID']);
                     if ($User) {
-                        echo UserAnchor($User);
+                        echo userAnchor($User);
                     } else {
                         echo htmlspecialchars($event['Username']);
                     }
@@ -94,7 +94,7 @@ echo $this->Form->Errors();
                 </td>
                 <td><?php echo htmlspecialchars(Logger::priorityLabel($event['Priority'])); ?></td>
                 <td><?php echo htmlspecialchars($event['Event']); ?></td>
-                <td><?php echo Anchor($event['IP'], '/settings/applog/?ipaddress='.urlencode($event['IP'])); ?></td>
+                <td><?php echo anchor($event['IP'], '/settings/applog/?ipaddress='.urlencode($event['IP'])); ?></td>
                 <td><?php echo $event['SiteName']; ?></td>
             </tr>
 
@@ -113,14 +113,14 @@ echo $this->Form->Errors();
     </tbody>
 </table>
 
-<?php PagerModule::Write(); ?>
+<?php PagerModule::write(); ?>
 
 <div class="Info">
 
 <p>This report is also available in JSON or XML</p>
 <ul>
-    <li><?php echo Anchor('JSON', '/settings/applog.json?'.$this->Data['CurrentFilter']); ?></li>
-    <li><?php echo Anchor('XML', '/settings/applog.xml?'.$this->Data['CurrentFilter']); ?></li>
+    <li><?php echo anchor('JSON', '/settings/applog.json?'.$this->Data['CurrentFilter']); ?></li>
+    <li><?php echo anchor('XML', '/settings/applog.xml?'.$this->Data['CurrentFilter']); ?></li>
 </ul>
 
 </div>

@@ -1,33 +1,33 @@
-<h2><?php echo T('Salesforce - Add Lead'); ?></h2>
+<h2><?php echo t('Salesforce - Add Lead'); ?></h2>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 
 <ul>
    <li>
-      <?php echo $this->Form->Label('First Name', 'FirstName');  ?>
-      <?php echo $this->Form->TextBox('FirstName'); ?>
+      <?php echo $this->Form->label('First Name', 'FirstName');  ?>
+      <?php echo $this->Form->textBox('FirstName'); ?>
    </li>
    <li>
-      <?php echo $this->Form->Label('Last Name', 'LastName');  ?>
-      <?php echo $this->Form->TextBox('LastName'); ?>
+      <?php echo $this->Form->label('Last Name', 'LastName');  ?>
+      <?php echo $this->Form->textBox('LastName'); ?>
    </li>
    <li>
-      <?php echo $this->Form->Label('Email', 'Email');  ?>
-      <?php echo $this->Form->TextBox('Email'); ?>
+      <?php echo $this->Form->label('Email', 'Email');  ?>
+      <?php echo $this->Form->textBox('Email'); ?>
    </li>
    <li>
-      <?php echo $this->Form->Label('Status', 'Status');  ?>
+      <?php echo $this->Form->label('Status', 'Status');  ?>
       <select name="Status"><?php echo $this->Data['Data']['Options'] ?></select>
    </li>
    <li>
-      <?php echo $this->Form->Label('Title', 'Title');  ?>
-      <?php echo $this->Form->TextBox('Title', ['class' => '']); ?>
+      <?php echo $this->Form->label('Title', 'Title');  ?>
+      <?php echo $this->Form->textBox('Title', ['class' => '']); ?>
    </li>
    <li>
-      <?php echo $this->Form->Label('Company', 'Company');  ?>
-      <?php echo $this->Form->TextBox('Company'); ?>
+      <?php echo $this->Form->label('Company', 'Company');  ?>
+      <?php echo $this->Form->textBox('Company'); ?>
    </li>
 
 
@@ -35,5 +35,5 @@ echo $this->Form->Errors();
 
 
 <div style="width: 400px"></div>
-<?php echo $this->Form->Close('Add Lead', '', ['class' => 'Button BigButton']);
+<?php echo $this->Form->close('Add Lead', '', ['class' => 'Button BigButton']);
 

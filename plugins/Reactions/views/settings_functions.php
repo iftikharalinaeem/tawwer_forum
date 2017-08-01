@@ -1,49 +1,49 @@
 <?php if (!defined('APPLICATION')) exit;
 
-function AutoDescription($reactionType) {
+function autoDescription($reactionType) {
    $result = [];
 
-   if ($incrementColumn = GetValue('IncrementColumn', $reactionType)) {
-      $incrementValue = GetValue('IncrementValue', $reactionType, 1);
+   if ($incrementColumn = getValue('IncrementColumn', $reactionType)) {
+      $incrementValue = getValue('IncrementValue', $reactionType, 1);
       $incrementString = $incrementValue > 0 ? "Adds $incrementValue to" : "Subtracts ".abs($incrementValue)." from";
 
       $result[] = sprintf("%s a post's %s.", $incrementString, strtolower($incrementColumn));
    }
 
-   if ($points = GetValue('Points', $reactionType)) {
+   if ($points = getValue('Points', $reactionType)) {
       if ($points > 0)
-         $incrementString = "Gives $points ".Plural($points,'point','points')." to";
+         $incrementString = "Gives $points ".plural($points,'point','points')." to";
       else
-         $incrementString = "Removes ".abs($points)." ".Plural($points,'point','points')." from";
+         $incrementString = "Removes ".abs($points)." ".plural($points,'point','points')." from";
 
       $result[] = sprintf("%s the user.", $incrementString);
    }
 
-   if ($logThreshold = GetValue('LogThreshold', $reactionType)) {
-      $log = GetValue('Log', $reactionType, 'Moderate');
+   if ($logThreshold = getValue('LogThreshold', $reactionType)) {
+      $log = getValue('Log', $reactionType, 'Moderate');
       $logString = $log == 'Spam' ? 'spam queue' : 'moderation queue';
 
       $result[] = sprintf("Posts with %s reactions will be placed in the %s.", $logThreshold, $logString);
    }
 
-   if ($removeThreshold = GetValue('RemoveThreshold', $reactionType)) {
+   if ($removeThreshold = getValue('RemoveThreshold', $reactionType)) {
       if ($removeThreshold != $logThreshold) {
          $result[] = sprintf("Posts will be removed when they get %s reactions.", $removeThreshold);
       }
    }
 
-   if ($class = GetValue('Class', $reactionType)) {
-      $result[] = sprintf(T('ReactionClassRestriction', 'Requires &ldquo;%s&rdquo; reaction permission.'), $class);
+   if ($class = getValue('Class', $reactionType)) {
+      $result[] = sprintf(t('ReactionClassRestriction', 'Requires &ldquo;%s&rdquo; reaction permission.'), $class);
    }
 
-   if ($permission = GetValue('Permission', $reactionType)) {
-      $result[] = sprintf(T('ReactionPermissionRestriction', 'Special restriction: Only users with permission %s may use this reaction.'),$permission);
+   if ($permission = getValue('Permission', $reactionType)) {
+      $result[] = sprintf(t('ReactionPermissionRestriction', 'Special restriction: Only users with permission %s may use this reaction.'),$permission);
    }
 
    return $result;
 }
 
-function ActivateButton($reactionType) {
+function activateButton($reactionType) {
    $qs = [
        'urlcode' => $reactionType['UrlCode'],
        'active' => !$reactionType['Active']];

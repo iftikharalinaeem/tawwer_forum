@@ -26,7 +26,7 @@ if ($this->BadgeData && $this->BadgeData->numRows() > 0) : ?>
                 <?php echo anchor(val('Name', $Badge), 'badge/'.val('Slug', $Badge), 'Title'); ?>
                 <div class="Meta">
                     <span class="DateInserted"><?php echo t('Earned') . ' ' . Gdn_Format::date(val('DateCompleted', $Badge)); ?></span>
-                    <?php if (($this->User->UserID == Gdn::session()->UserID || CheckPermission('Reputation.Badges.Manage')) && val('Reason', $Badge)) : ?>
+                    <?php if (($this->User->UserID == Gdn::session()->UserID || checkPermission('Reputation.Badges.Manage')) && val('Reason', $Badge)) : ?>
                     <span class="Reason"><?php echo t('Reason') . ': ' . Gdn_Format::text(val('Reason', $Badge)); ?></span>
                     <?php endif; ?>
                 </div>

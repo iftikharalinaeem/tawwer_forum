@@ -38,22 +38,22 @@ jQuery(document).ready(function($) {
 
 });
 </script>
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 <div class="Wrap FormWrapper WarningsForm">
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 
-$CurrentLevel = $this->Data('CurrentLevel');
+$CurrentLevel = $this->data('CurrentLevel');
 ?>
-<!--<h2><?php echo T('Set a New Warning Level'); ?></h2>-->
+<!--<h2><?php echo t('Set a New Warning Level'); ?></h2>-->
 
 <div class="WarningLevels P <?php echo "WarningLevel-$CurrentLevel"; ?>"><div class="WarningsWrap">
       <div class="WarningBar"></div>
    <?php
-   $Special = WarningModel::Special();
+   $Special = WarningModel::special();
 
-   for ($i = 0; $i <= $this->Data('MaxLevel'); $i++) {
+   for ($i = 0; $i <= $this->data('MaxLevel'); $i++) {
       $CssClass = "Warn-Level$i";
 
       if ($i == $CurrentLevel) {
@@ -67,15 +67,15 @@ $CurrentLevel = $this->Data('CurrentLevel');
 
       echo '<div class="WarnLevel">';
       if ($Points >= 0) {
-         echo $this->Form->Radio('Level', '@'.$i, ['value' => $i]);
+         echo $this->Form->radio('Level', '@'.$i, ['value' => $i]);
       } else {
-         echo Wrap($i, 'div', ['class' => 'Disabled', 'title' => T('If you want to decrease the warning level then remove a warning.')]);
+         echo wrap($i, 'div', ['class' => 'Disabled', 'title' => t('If you want to decrease the warning level then remove a warning.')]);
       }
       echo '</div>';
 
       if (isset($Special[$i])) {
          $Sp = $Special[$i];
-         echo Wrap($Sp['Label'], 'div', ['class' => 'Special', 'title' => $Sp['Title']]);
+         echo wrap($Sp['Label'], 'div', ['class' => 'Special', 'title' => $Sp['Title']]);
       }
 
       echo '</div>';
@@ -85,9 +85,9 @@ $CurrentLevel = $this->Data('CurrentLevel');
 
 <div class="WarningExpireWrap P">
 <?php
-echo $this->Form->Label('How long do you want this warning to last?');
+echo $this->Form->label('How long do you want this warning to last?');
 echo ' ';
-echo $this->Form->DropDown('ExpireNumber', [
+echo $this->Form->dropDown('ExpireNumber', [
     '1' => '1',
     '2' => '2',
     '3' => '3',
@@ -100,40 +100,40 @@ echo $this->Form->DropDown('ExpireNumber', [
     '10' => '10',
     '20' => '20',
     '30' => '30',
-    'never' => T('never')
+    'never' => t('never')
 ]);
 
 echo ' ';
 
-echo $this->Form->DropDown('ExpireUnit', [
-    'minutes' => T('minutes'),
-    'hours' => T('hours'),
-    'days' => T('days'),
-    'weeks' => T('weeks'),
-    'months' => T('months')
+echo $this->Form->dropDown('ExpireUnit', [
+    'minutes' => t('minutes'),
+    'hours' => t('hours'),
+    'days' => t('days'),
+    'weeks' => t('weeks'),
+    'months' => t('months')
 ]);
 ?>
 </div>
 
 <div class="P">
 <?php
-echo $this->Form->Label("Tell the user why you're warning them", 'Body');
-echo $this->Form->TextBox('Body', ['Multiline' => TRUE, 'Wrap' => TRUE]);
+echo $this->Form->label("Tell the user why you're warning them", 'Body');
+echo $this->Form->textBox('Body', ['Multiline' => TRUE, 'Wrap' => TRUE]);
 ?>
 </div>
 
 <div class="P">
 <?php
-echo $this->Form->Label("Private Note for Moderators", 'ModeratorNote');
-echo $this->Form->TextBox('ModeratorNote', ['Wrap' => TRUE]);
+echo $this->Form->label("Private Note for Moderators", 'ModeratorNote');
+echo $this->Form->textBox('ModeratorNote', ['Wrap' => TRUE]);
 ?>
 </div>
 
 <?php
 echo '<div class="Buttons Buttons-Confirm">',
-   $this->Form->Button('OK'), ' ',
-   $this->Form->Button('Cancel', ['type' => 'button', 'class' => 'Button Close']),
+   $this->Form->button('OK'), ' ',
+   $this->Form->button('Cancel', ['type' => 'button', 'class' => 'Button Close']),
    '</div>';
-echo $this->Form->Close();
+echo $this->Form->close();
 ?>
 </div>

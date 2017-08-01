@@ -27,7 +27,7 @@ class BadgesModule extends Gdn_Module {
         $this->Badges = $userBadgeModel->getBadges(val('UserID', $this->User))->resultArray();
 
         // Optionally only show highest badge in each class
-        if (C('Reputation.Badges.FilterModuleByClass')) {
+        if (c('Reputation.Badges.FilterModuleByClass')) {
             $this->Badges = BadgeModel::filterByClass($this->Badges);
         }
 

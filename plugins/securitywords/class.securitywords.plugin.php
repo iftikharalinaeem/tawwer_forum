@@ -44,7 +44,7 @@ class SecurityWordsPlugin extends Gdn_Plugin {
      * The constructor.
      */
     public function __construct() {
-        $this->notifyUserOfRequiredModeration = C('Plugins.securitywords.notifyuser', false);
+        $this->notifyUserOfRequiredModeration = c('Plugins.securitywords.notifyuser', false);
     }
 
     /**
@@ -84,8 +84,8 @@ class SecurityWordsPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
-        $menu->AddItem('Moderation', T('Moderation'));
-        $menu->AddLink('Moderation', T('Security Words'), '/settings/securitywords', 'Garden.Settings.Manage');
+        $menu->addItem('Moderation', t('Moderation'));
+        $menu->addLink('Moderation', t('Security Words'), '/settings/securitywords', 'Garden.Settings.Manage');
     }
 
     /**
@@ -97,7 +97,7 @@ class SecurityWordsPlugin extends Gdn_Plugin {
         $securityWords = [];
 
         if (!count($this->securityWords)) {
-            $securityWordsString = C('Plugins.securitywords.words');
+            $securityWordsString = c('Plugins.securitywords.words');
             $securityWordsSplit = explode(';', $securityWordsString);
 
             if (is_array($securityWordsSplit)) {
@@ -184,12 +184,12 @@ class SecurityWordsPlugin extends Gdn_Plugin {
         // additional _New element to tell the logger what the new data is."
         // This doesn't seem to do anything, though.
         $recordRow['_New'] = 'SecurityWords';
-        LogModel::Insert('Moderate', $recordType, $recordRow);
+        LogModel::insert('Moderate', $recordType, $recordRow);
 
         // Let user know that their post was sent to the moderation queue.
         if ($this->notifyUserOfRequiredModeration) {
-            Gdn::Controller()->InformMessage(
-                T('Post queued for moderation due to the use of security words.'),
+            Gdn::controller()->informMessage(
+                t('Post queued for moderation due to the use of security words.'),
                 [
                     'CssClass' => 'Dismissable',
                     'id' => 'mod'
@@ -237,11 +237,11 @@ class SecurityWordsPlugin extends Gdn_Plugin {
      * @param array $args Optional arguments to pass.
      */
     public function settingsController_securitywords_create($sender, $args = []) {
-        $sender->Permission('Garden.Settings.Manage');
+        $sender->permission('Garden.Settings.Manage');
 
         $cf = new ConfigurationModule($sender);
 
-        $cf->Initialize([
+        $cf->initialize([
             'Plugins.securitywords.words' => [
                 'LabelCode' => 'Security Words',
                 'Control' => 'TextBox',
@@ -261,9 +261,9 @@ class SecurityWordsPlugin extends Gdn_Plugin {
             ]
         ]);
 
-        $sender->AddSideMenu();
-        $sender->SetData('Title', T('Security Words'));
-        $cf->RenderAll();
+        $sender->addSideMenu();
+        $sender->setData('Title', t('Security Words'));
+        $cf->renderAll();
     }
 
     /**
@@ -271,7 +271,7 @@ class SecurityWordsPlugin extends Gdn_Plugin {
      */
     public function setup() {
         // If no previous config, populate it with example security words.
-        TouchConfig([
+        touchConfig([
             'Plugins.securitywords.words' => 'area51;mkultra;911',
             'Plugins.securitywords.notifyuser' => false
         ]);

@@ -70,7 +70,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    ];
 
    public function __construct() {
-      $this->database_prefix = Gdn::Database()->DatabasePrefix;
+      $this->database_prefix = Gdn::database()->DatabasePrefix;
 
       // Adjust limit for threads. From what I've seen, having threads does not
       // really speed up the processing, aside from providing more real-time
@@ -87,7 +87,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       // Will be 'Guest', 'Unconfirmed', 'Applicant', 'Member', 'Administrator',
       // 'Moderator', and any custom roles.
       $role_model = new Gdn_Model('Role');
-      $allowed_roles = $role_model->Get('Name')->ResultArray();
+      $allowed_roles = $role_model->get('Name')->resultArray();
       if ($allowed_roles) {
          $this->allowed_roles = array_column($allowed_roles, 'Name', 'RoleID');
       }
@@ -96,21 +96,21 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       array_push($this->allowed_roles, 'Banned');
    }
 
-   public function Setup() {
-      $this->Structure();
+   public function setup() {
+      $this->structure();
    }
 
-   public function Structure() {
-      Gdn::Structure()
-         ->Table($this->table_name)
-         ->PrimaryKey('ImportID')
-         ->Column('ThreadID', 'tinyint(1)', true, 'index')
-         ->Column('Email', 'varchar(200)', true)
-         ->Column('Username', 'varchar(50)', true)
-         ->Column('Status', 'varchar(50)', true)
-         ->Column('Completed', 'tinyint(1)', 0, 'index')
-         ->Column('Error', 'text', true)
-         ->Set();
+   public function structure() {
+      Gdn::structure()
+         ->table($this->table_name)
+         ->primaryKey('ImportID')
+         ->column('ThreadID', 'tinyint(1)', true, 'index')
+         ->column('Email', 'varchar(200)', true)
+         ->column('Username', 'varchar(50)', true)
+         ->column('Status', 'varchar(50)', true)
+         ->column('Completed', 'tinyint(1)', 0, 'index')
+         ->column('Error', 'text', true)
+         ->set();
    }
 
    /**
@@ -118,42 +118,42 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
     * @param SettingsController $sender
     * @param array $args
     */
-   public function SettingsController_BulkUsersImporter_Create($sender, $args) {
-      $sender->Permission('Garden.Settings.Manage');
+   public function settingsController_bulkUsersImporter_create($sender, $args) {
+      $sender->permission('Garden.Settings.Manage');
 
       // Load some assets
-      $sender->AddCssFile('bulkusersimporter.css', 'plugins/bulkusersimporter');
-      $sender->AddJsFile('bulkusersimporter.js', 'plugins/bulkusersimporter');
+      $sender->addCssFile('bulkusersimporter.css', 'plugins/bulkusersimporter');
+      $sender->addJsFile('bulkusersimporter.js', 'plugins/bulkusersimporter');
 
       // Render components pertinent to all views.
-      $sender->SetData('Title', T($this->plugin_title));
-      $sender->AddSideMenu();
+      $sender->setData('Title', t($this->plugin_title));
+      $sender->addSideMenu();
 
       // Render specific component views.
       switch (true) {
          case in_array('upload', $args):
             // Handle upload and quickly parse file into DB.
             $results = $this->handleUploadInsert($sender);
-            $sender->SetData('results', $results);
-            $sender->SetData('_available_invites', $this->calculateAvailableInvites());
-            $sender->AddDefinition('threads', $this->threads);
-            $sender->AddDefinition('retries', $this->retries);
-            $sender->AddDefinition('retries_timeout_seconds', $this->retries_timeout_seconds);
-            $sender->Render('upload', '', 'plugins/bulkusersimporter');
+            $sender->setData('results', $results);
+            $sender->setData('_available_invites', $this->calculateAvailableInvites());
+            $sender->addDefinition('threads', $this->threads);
+            $sender->addDefinition('retries', $this->retries);
+            $sender->addDefinition('retries_timeout_seconds', $this->retries_timeout_seconds);
+            $sender->render('upload', '', 'plugins/bulkusersimporter');
             break;
 
          case in_array('process', $args):
             // Process inserted CSV data and create and email new users.
-            $thread_id = Gdn::Request()->Post('thread_id', '');
+            $thread_id = Gdn::request()->post('thread_id', '');
             $this->processUploadedData($sender, $thread_id);
-            $sender->Render('process', '', 'plugins/bulkusersimporter');
+            $sender->render('process', '', 'plugins/bulkusersimporter');
             break;
 
          default:
-            $sender->AddDefinition('maxfilesizebytes', Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize')));
-            $sender->SetData('allowed_roles', $this->allowed_roles);
-            $sender->SetData('username_limits', $this->username_limits);
-            $sender->Render('settings', '', 'plugins/bulkusersimporter');
+            $sender->addDefinition('maxfilesizebytes', Gdn_Upload::unformatFileSize(c('Garden.Upload.MaxFileSize')));
+            $sender->setData('allowed_roles', $this->allowed_roles);
+            $sender->setData('username_limits', $this->username_limits);
+            $sender->render('settings', '', 'plugins/bulkusersimporter');
             break;
       }
    }
@@ -161,10 +161,10 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
    /**
     * Adds menu option to the left in dashboard.
     */
-   public function Base_GetAppSettingsMenuItems_Handler($sender) {
+   public function base_getAppSettingsMenuItems_handler($sender) {
       $menu = $sender->EventArguments['SideMenu'];
-      $menu->AddItem('Import', T('Import'));
-      $menu->AddLink('Import', T($this->plugin_title), '/settings/bulkusersimporter', 'Garden.Settings.Manage');
+      $menu->addItem('Import', t('Import'));
+      $menu->addLink('Import', t($this->plugin_title), '/settings/bulkusersimporter', 'Garden.Settings.Manage');
    }
 
    /**
@@ -173,14 +173,14 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
     * @param SettingsController $sender
     */
    public function handleUploadInsert($sender) {
-      $sender->Permission('Garden.Settings.Manage');
+      $sender->permission('Garden.Settings.Manage');
 
-      if (!$sender->Request->IsAuthenticatedPostBack()) {
-         throw ForbiddenException('GET');
+      if (!$sender->Request->isAuthenticatedPostBack()) {
+         throw forbiddenException('GET');
       }
 
       $upload = new Gdn_Upload();
-      if (!$upload->CanUpload()) {
+      if (!$upload->canUpload()) {
          return;
       }
 
@@ -192,11 +192,11 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
       // Create destination path
       $destination_dir = PATH_UPLOADS . '/csv';
-      TouchFolder($destination_dir);
+      touchFolder($destination_dir);
 
       // Get request data
-      $import_files = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_FILES, 'import_files', FALSE);
-      $post = Gdn::Request()->Post();
+      $import_files = Gdn::request()->getValueFrom(Gdn_Request::INPUT_FILES, 'import_files', FALSE);
+      $post = Gdn::request()->post();
 
       // Validate files
       $allowed_files = ['csv'];
@@ -217,7 +217,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          ? 1
          : 0;
 
-      $maxfilesize_bytes = Gdn_Upload::UnformatFileSize(C('Garden.Upload.MaxFileSize'));
+      $maxfilesize_bytes = Gdn_Upload::unformatFileSize(c('Garden.Upload.MaxFileSize'));
 
       // Clean up file array, because PHP sends multiples files in a strange
       // array, also, filter out bad files.
@@ -241,18 +241,18 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          $db_table = $this->database_prefix . $this->table_name;
 
          // We need to allow local infile so we'll create a new db connection.
-         $db_config = C('Database');
+         $db_config = c('Database');
          $db_config['ConnectionOptions'][PDO::MYSQL_ATTR_LOCAL_INFILE] = TRUE;
          $db = new Gdn_Database($db_config);
 
-         $pdo = $db->Connection();
+         $pdo = $db->connection();
 
          // Truncate table before using it.
          // TODO: In future, delete rows based on
          // current user performing import, as there could be multiple users
          // importing data simultaneously, which will cause the latest user
          // import to whipe out the previous one that is still active.
-         $db->Query("TRUNCATE TABLE $db_table;");
+         $db->query("TRUNCATE TABLE $db_table;");
 
          foreach ($files as $file) {
             // Get escaped EOL sequence to break on. No need to preg_quote, or
@@ -308,11 +308,11 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
    public function calculateAvailableInvites() {
       $available_invites = 0;
-      $user_id = Gdn::Session()->UserID;
+      $user_id = Gdn::session()->UserID;
 
       if ($user_id) {
-         $user_model = Gdn::UserModel();
-         $available_invites = $user_model->GetInvitationCount($user_id);
+         $user_model = Gdn::userModel();
+         $available_invites = $user_model->getInvitationCount($user_id);
       }
 
       return $available_invites;
@@ -325,7 +325,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
     * @param SettingsController $sender
     */
    public function processUploadedData($sender, $thread_id = '') {
-      $sender->SetData('status', 'Incomplete');
+      $sender->setData('status', 'Incomplete');
 
       // Use these to debug handling of different server responses.
       //http_response_code(500);
@@ -339,7 +339,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       // I want to expand on the functionality of debug mode. The actual
       // label for the checkbox states, "Do not send an email to successfully
       // imported users." It's either 1 or 0.
-      $debug_mode = $sender->Request->Post('debug');
+      $debug_mode = $sender->Request->post('debug');
       $debug_mode = (isset($debug_mode))
          ? (int) $debug_mode
          : 0;
@@ -348,40 +348,40 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
       // If no value provided, default is to send an invite.
       // Values: invite (default), insert
       $userin_modes = ['invite', 'insert', 'update'];
-      $userin_mode = $sender->Request->Post('userin');
+      $userin_mode = $sender->Request->post('userin');
       $userin_mode = (isset($userin_mode) && in_array($userin_mode, $userin_modes))
          ? $userin_mode
          : 'invite';
 
       // Get expiration of invite, if set.
       $invitation_expiration = 0; // No expiry
-      $invite_expires = $sender->Request->Post('expires');
+      $invite_expires = $sender->Request->post('expires');
       if (isset($invite_expires)
       && strlen(trim($invite_expires)) > 0) {
          if (($expires_timestamp = strtotime($invite_expires)) !== false) {
             $invitation_expiration = $expires_timestamp;
          } else {
             // Value was provided, but it was not parseable by strtotime.
-            $sender->SetJson('bad_expires', 1);
-            $error_messages[] = Gdn_Format::PlainText('Expiry date of "'. $invite_expires . '" is invalid. Import will not begin.');
-            $sender->SetJson('bulk_error_dump', json_encode($error_messages));
+            $sender->setJson('bad_expires', 1);
+            $error_messages[] = Gdn_Format::plainText('Expiry date of "'. $invite_expires . '" is invalid. Import will not begin.');
+            $sender->setJson('bulk_error_dump', json_encode($error_messages));
             return false;
          }
       }
 
       $bulk_user_importer_model = new Gdn_Model($this->table_name);
-      $imported_users = $bulk_user_importer_model->GetWhere(['ThreadID' => $thread_id, 'Completed' => 0], '', 'asc', $this->limit)->ResultArray();
+      $imported_users = $bulk_user_importer_model->getWhere(['ThreadID' => $thread_id, 'Completed' => 0], '', 'asc', $this->limit)->resultArray();
 
       // Immediately block off the selection
 
       // Decide what model to use based on $userin_mode
       // Options are either invite or insert
-      $user_model = Gdn::UserModel();
+      $user_model = Gdn::userModel();
       $invitation_model = new InvitationModel();
 
       // Grab default roles just in case a blank provided. Not providing any
       // roles is not the same as providing an invalid role.
-      $default_role_ids = C('Garden.Registration.DefaultRoles');
+      $default_role_ids = c('Garden.Registration.DefaultRoles');
 
       // For byte-size processing
       $start_time = time();
@@ -409,13 +409,13 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
          // Zenimax mentioned that usernames will contain all
          // variety of characters, so be very loose with the validation.
-         //$regex_length = C("Garden.User.ValidationLength","{3,20}");
+         //$regex_length = c("Garden.User.ValidationLength","{3,20}");
          $regex_length = '{'. $this->username_limits['min'] . ',' . $this->username_limits['max'] . '}';
          $regex_username = "/^(.)$regex_length$/";
 
          // Originally had ValidateUsername, but often the regex it was
          // validating with was too strict.
-         // C("Garden.User.ValidationRegex","\d\w_");
+         // c("Garden.User.ValidationRegex","\d\w_");
          if (!isset($user['Username'])
          || $user['Username'] == '' // trimming down space names
          || !preg_match($regex_username, $user['Username'])) {
@@ -432,7 +432,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             }
          }
 
-         if (!ValidateEmail($user['Email'])) {
+         if (!validateEmail($user['Email'])) {
             $error_messages[$processed]['email'] = 'Invalid email: "'. $user['Email'] .'". ';
          }
 
@@ -480,7 +480,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             && count($default_role_ids)) {
                $role_ids = $status['role_ids'] = $default_role_ids;
             } else {
-               $plural_status = PluralTranslate(count($status['invalid_roles']), 'role', 'roles');
+               $plural_status = pluralTranslate(count($status['invalid_roles']), 'role', 'roles');
                $error_messages[$processed]['role'] = "Invalid $plural_status: " . $status_list . '.';
             }
          }
@@ -505,9 +505,9 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                if (!isset($error_messages[$processed]['username'])
                && !isset($error_messages[$processed]['role'])) {
                   // Check if username in use.
-                  $check_name = $user_model->GetWhere([
+                  $check_name = $user_model->getWhere([
                       'Name' => $user['Username']
-                  ])->FirstRow('array');
+                  ])->firstRow('array');
 
                   // Username controls, so if it exists, update the info, including
                   // email, otherwise create new user.
@@ -516,7 +516,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                      // It's in this scope that the above errors happen, though
                      // inconsistently. If there happened to be a duplicate username
                      // attempting to get saved, $user_id would be false, because
-                     // of UserModel:1584 $this->Validate($FormPostValues, $Insert)
+                     // of UserModel:1584 $this->validate($FormPostValues, $Insert)
                      // check, which returns false. By makign the username column
                      // unique in the table, this will prevent that from happening.
                      // It will also clean up a lot of redundancies. Still not sure
@@ -527,13 +527,13 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                      // to handle those exceptions. Though I'm certain they won't
                      // come up again after modifying the table column. Rows are
                      // still inserted correctly, just without the check.
-                     $user_model->Validation->UnapplyRule('Password', 'Required');
-                     $user_model->Validation->UnapplyRule('DateInserted', 'Required');
+                     $user_model->Validation->unapplyRule('Password', 'Required');
+                     $user_model->Validation->unapplyRule('DateInserted', 'Required');
 
                      $send_email = false;
 
                      // Update the user.
-                     $user_id = $user_model->Save(
+                     $user_id = $user_model->save(
                         [
                          'UserID' => $check_name['UserID'],
                          'Name' => $check_name['Name'],
@@ -556,7 +556,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                         'Email' => $user['Email'],
                         'RoleID' => $role_ids,
                         'Banned' => $banned,
-                        'DateInserted' => Gdn_Format::ToDateTime()
+                        'DateInserted' => Gdn_Format::toDateTime()
                      ];
 
                      $form_post_options = [
@@ -573,12 +573,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                      // Keep the logic here for now, even though InsertForBasic
                      // will be only method called. It was causing problems with
                      // spam filters when calling Register.
-                     switch (strtolower(C('Garden.Registration.Method'))) {
+                     switch (strtolower(c('Garden.Registration.Method'))) {
                         case 'approval':
                         case 'invitation':
                         default:
-                           $user_id = $user_model->InsertForBasic($form_post_values, GetValue('CheckCaptcha', $form_post_options, FALSE), $form_post_options);
-                           //$user_id = $user_model->Register($form_post_values, $form_post_options);
+                           $user_id = $user_model->insertForBasic($form_post_values, getValue('CheckCaptcha', $form_post_options, FALSE), $form_post_options);
+                           //$user_id = $user_model->register($form_post_values, $form_post_options);
                            break;
                      }
                   }
@@ -599,7 +599,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                $user_row = [];
                // Check if email exists in user table.
                if (!isset($error_messages[$processed]['email'])) {
-                  $user_row = (array) $user_model->GetByEmail($user['Email']);
+                  $user_row = (array) $user_model->getByEmail($user['Email']);
 
                   if (!count(array_filter($user_row))) {
                      $error_messages[$processed]['email'] = 'Email does not exist: "'. $user['Email'] .'".';
@@ -630,9 +630,9 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                      'ValidateSpam' => false
                   ];
 
-                  $user_model->Validation->UnapplyRule('Email', 'Required');
-                  $user_model->Validation->UnapplyRule('Password', 'Required');
-                  $update_sucess = $user_model->Save($form_post_values, $form_post_options);
+                  $user_model->Validation->unapplyRule('Email', 'Required');
+                  $user_model->Validation->unapplyRule('Password', 'Required');
+                  $update_sucess = $user_model->save($form_post_values, $form_post_options);
                }
 
                break;
@@ -671,12 +671,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                      // first unix datetime possible (1970).
                      'DateExpires' => ($invitation_expiration === 0)
                         ? null
-                        : Gdn_Format::ToDateTime($invitation_expiration)
+                        : Gdn_Format::toDateTime($invitation_expiration)
                   ];
 
                   // No point saving banned users to invitation table.
                   if (!$banned) {
-                     $invite_success = $invitation_model->Save($form_post_values, $user_model, [
+                     $invite_success = $invitation_model->save($form_post_values, $user_model, [
                          'SendEmail' => $send_invite_email,
                          'Resend' => true
                      ]);
@@ -703,12 +703,12 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          } else {
             $complete_code = 2;
 
-            $db_error_string = $userin_model->Validation->ResultsText();
+            $db_error_string = $userin_model->Validation->resultsText();
             if (strlen($db_error_string) > 2) {
-               $error_messages[$processed]['db'] = $userin_model->Validation->ResultsText();
+               $error_messages[$processed]['db'] = $userin_model->Validation->resultsText();
             }
          }
-         $userin_model->Validation->Results(true);
+         $userin_model->Validation->results(true);
 
          // Error message to get logged in DB, if any.
          $error_string = '';
@@ -728,7 +728,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          }
 
          // Log errors in DB--will be cleared on next import.
-         $bulk_user_importer_model->Update(
+         $bulk_user_importer_model->update(
             [
                'Completed' => $complete_code,
                'Error' => $error_string
@@ -745,7 +745,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          && $send_email
          && $complete_code == 1) {
             if ($debug_mode == 0) {
-               $this->PasswordRequest($user['Email']); // Reset current temp password
+               $this->passwordRequest($user['Email']); // Reset current temp password
             }
          }
 
@@ -773,22 +773,22 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          $total_success = 0;
       }
 
-      $sender->SetJson('threadid-success-fail', $thread_id .'-'. $total_success .'-'. $total_fail);
+      $sender->setJson('threadid-success-fail', $thread_id .'-'. $total_success .'-'. $total_fail);
 
       // Optionally just query the table for the number of processed rows,
       // but this should be just as accurate. JS will keep track of the rows.
-      $sender->SetJson('job_rows_processed', $processed);
+      $sender->setJson('job_rows_processed', $processed);
 
       // Send total rows processed so far.
-      $total_rows_completed = $bulk_user_importer_model->GetCount([
+      $total_rows_completed = $bulk_user_importer_model->getCount([
           'Completed >' => 0
       ]);
-      $sender->SetJson('total_rows_completed', $total_rows_completed);
+      $sender->setJson('total_rows_completed', $total_rows_completed);
 
       // Send error dumps.
       if ($total_fail) {
          // Get dumps from DB relevant to this job.
-         $bulk_error_dump = $bulk_user_importer_model->GetWhere(
+         $bulk_error_dump = $bulk_user_importer_model->getWhere(
             [
              'ThreadID' => $thread_id,
              'ImportID >=' => $first_import_id,
@@ -797,7 +797,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             '',
             'asc',
             $this->limit
-         )->ResultArray();
+         )->resultArray();
 
          $errors = array_column($bulk_error_dump, 'Error');
 
@@ -807,29 +807,29 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          // only affect themselves.
          $errors = array_map(['Gdn_Format', 'PlainText'], $errors);
 
-         $sender->SetJson('bulk_error_dump', json_encode($errors));
+         $sender->setJson('bulk_error_dump', json_encode($errors));
       }
 
-      $sender->Render('Blank', 'Utility', 'Dashboard');
+      $sender->render('Blank', 'Utility', 'Dashboard');
    }
 
    // Send custom email reset, copied from method in usermodel, with slight
    // mod--changing the email message.
-   public function PasswordRequest($email) {
+   public function passwordRequest($email) {
       if (!$email) {
          return FALSE;
       }
 
-      $user_model = Gdn::UserModel();
+      $user_model = Gdn::userModel();
 
-      $users = $user_model->GetWhere(['Email' => $email])->ResultObject();
+      $users = $user_model->getWhere(['Email' => $email])->resultObject();
       if (count($users) == 0) {
          // Check for the username.
-         $users = $user_model->GetWhere(['Name' => $email])->ResultObject();
+         $users = $user_model->getWhere(['Name' => $email])->resultObject();
       }
 
       if (count($users) == 0) {
-         $user_model->Validation->AddValidationResult('Name', "Couldn't find an account associated with that email/username.");
+         $user_model->Validation->addValidationResult('Name', "Couldn't find an account associated with that email/username.");
          return FALSE;
       }
 
@@ -840,31 +840,31 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             continue;
          }
          $email = new Gdn_Email(); // Instantiate in loop to clear previous settings
-         $passwordResetKey = BetterRandomString(20, 'Aa0');
+         $passwordResetKey = betterRandomString(20, 'Aa0');
          $passwordResetExpires = strtotime('+1 hour');
-         $user_model->SaveAttribute($user->UserID, 'PasswordResetKey', $passwordResetKey);
-         $user_model->SaveAttribute($user->UserID, 'PasswordResetExpires', $passwordResetExpires);
-         $appTitle = C('Garden.Title');
-         $email->Subject(sprintf(T('[%s] Forum Account Creation'), $appTitle));
-         $email->To($user->Email);
+         $user_model->saveAttribute($user->UserID, 'PasswordResetKey', $passwordResetKey);
+         $user_model->saveAttribute($user->UserID, 'PasswordResetExpires', $passwordResetExpires);
+         $appTitle = c('Garden.Title');
+         $email->subject(sprintf(t('[%s] Forum Account Creation'), $appTitle));
+         $email->to($user->Email);
 
          // Custom mesage for bulk importer.
          $message = '';
          $message .= "Hello,\n\n";
          $message .= "An account has been created for you at the $appTitle forum.\n\n";
          $message .= "To activate your account, please follow this link:\n";
-         $message .= ExternalUrl('/entry/passwordreset/'.$user->UserID.'/'.$passwordResetKey) . "\n\n";
+         $message .= externalUrl('/entry/passwordreset/'.$user->UserID.'/'.$passwordResetKey) . "\n\n";
          $message .= "Please contact us if you have questions regarding this email.\n\n";
          $message .= "Sincerely,\n";
          $message .= $appTitle;
 
-         $email->Message($message);
-         $email->Send();
+         $email->message($message);
+         $email->send();
          $noEmail = FALSE;
       }
 
       if ($noEmail) {
-         $this->Validation->AddValidationResult('Name', 'There is no email address associated with that account.');
+         $this->Validation->addValidationResult('Name', 'There is no email address associated with that account.');
          return FALSE;
       }
       return TRUE;
@@ -967,10 +967,10 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          if (count($role_names)) {
             $role_model = new Gdn_Model('Role');
             $role_ids = $role_model->SQL
-               ->Select('r.RoleID')
-               ->From('Role r')
-               ->WhereIn('LOWER(r.Name)', $role_names)
-               ->Get()->ResultArray();
+               ->select('r.RoleID')
+               ->from('Role r')
+               ->whereIn('LOWER(r.Name)', $role_names)
+               ->get()->resultArray();
             $role_ids = array_column($role_ids, 'RoleID');
          }
       }

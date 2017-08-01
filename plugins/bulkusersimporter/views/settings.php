@@ -1,12 +1,12 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
 <?php
-   $username_limits = $this->Data('username_limits');
+   $username_limits = $this->data('username_limits');
 ?>
 
 <div id="bulk-importer">
    <h1>
-      <?php echo $this->Data('Title'); ?>
+      <?php echo $this->data('Title'); ?>
    </h1>
 
    <div class="Info">
@@ -79,7 +79,7 @@
       quotation marks, but this is optional; spaces in roles work just fine
       without being wrapped in quotation marks. Roles are not
       case-sensitive, so "member" and "Member" are identical. Valid
-      roles are: <em class="valid-statuses"><?php echo implode(', ', $this->Data('allowed_roles')); ?></em>.
+      roles are: <em class="valid-statuses"><?php echo implode(', ', $this->data('allowed_roles')); ?></em>.
    </div>
 
    <div class="Info">
@@ -116,14 +116,14 @@
    <h3>Upload CSV file or link to CSV file:</h3>
 
    <?php
-      echo $this->Form->Open(['enctype' => 'multipart/form-data', 'action' => Url('/settings/bulkusersimporter/upload'), 'id' => 'bulk-importer-form']);
-      echo $this->Form->Errors();
+      echo $this->Form->open(['enctype' => 'multipart/form-data', 'action' => url('/settings/bulkusersimporter/upload'), 'id' => 'bulk-importer-form']);
+      echo $this->Form->errors();
    ?>
 
    <div class="Info">
       Upload a CSV file or provide the URL to a CSV file. If both inputs are filled, the
       uploaded file takes precedence. There is a max filesize of
-      <?php echo C('Garden.Upload.MaxFileSize'); ?> for the upload component.
+      <?php echo c('Garden.Upload.MaxFileSize'); ?> for the upload component.
       The file size limit for a URL is higher.
    </div>
 
@@ -132,24 +132,24 @@
       </li>
       <li id="bulk-importer-file-download">
          <?php
-            echo $this->Form->Label('Upload CSV:', 'import_files');
-            echo $this->Form->Input('import_files[]', 'file', ['multiple' => 'multiple']);
+            echo $this->Form->label('Upload CSV:', 'import_files');
+            echo $this->Form->input('import_files[]', 'file', ['multiple' => 'multiple']);
          ?>
       </li>
 
       <li id="bulk-importer-file-url">
          <?php
-            echo $this->Form->Label('Or download CSV from URL:', 'import_url');
-            echo $this->Form->Input('import_url', 'text');
+            echo $this->Form->label('Or download CSV from URL:', 'import_url');
+            echo $this->Form->input('import_url', 'text');
          ?>
       </li>
 
       <li>
          <?php
-            echo $this->Form->CheckBox('has_headers', "First line has headers.", ['class' => 'bulk-note']);
+            echo $this->Form->checkBox('has_headers', "First line has headers.", ['class' => 'bulk-note']);
          ?>
       </li>
    </ul>
 
-   <?php echo $this->Form->Close('Start'); ?>
+   <?php echo $this->Form->close('Start'); ?>
 </div>

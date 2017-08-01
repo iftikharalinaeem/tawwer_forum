@@ -46,7 +46,7 @@ class Syslogger implements LoggerInterface {
     }
 
     protected function logMessage($priority, $message, array $context = []) {
-        $realMessage = FormatString($message, $context);
+        $realMessage = formatString($message, $context);
 
         if ($event = val('event', $context, '!')) {
             $realMessage = "<$event> $realMessage";
@@ -61,7 +61,7 @@ class Syslogger implements LoggerInterface {
     }
 
     protected function logJson($priority, $message, array $context = []) {
-        $fullmsg = FormatString($message, $context);
+        $fullmsg = formatString($message, $context);
 
         // Add the standard fields to the row.
         $row = array_merge([

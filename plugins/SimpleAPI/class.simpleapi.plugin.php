@@ -175,10 +175,10 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                 $fieldPrefix = ucfirst($fieldPrefix); // support some form of case-insensitivity.
                 $tableName = $fieldPrefix;
 
-                if (StringEndsWith($fieldPrefix, 'User'))
+                if (stringEndsWith($fieldPrefix, 'User'))
                     $tableName = 'User';
 
-                if (StringEndsWith($fieldPrefix, 'Users'))
+                if (stringEndsWith($fieldPrefix, 'Users'))
                     $tableName = 'Users';
 
                 // Limit to supported tables
@@ -223,7 +223,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                 $lookupField = "{$fieldPrefix}ID";
                 $outputField = $lookupField;
 
-                if (StringEndsWith($fieldPrefix, 'User'))
+                if (stringEndsWith($fieldPrefix, 'User'))
                     $lookupField = "UserID";
 
                 // Don't override an existing desired field
@@ -273,19 +273,19 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
                         // Simple table.field lookup types
                         case 'simple':
-                            $matchRecords = Gdn::SQL()->GetWhere($tableName, [
+                            $matchRecords = Gdn::sql()->getWhere($tableName, [
                                 $columnLookup => $multiValue
                             ]);
-                            if (!$matchRecords->NumRows()) {
-                                $code = (Gdn::Request()->Get('callback', false) && C('Garden.AllowJSONP')) ? 200 : 404;
+                            if (!$matchRecords->numRows()) {
+                                $code = (Gdn::request()->get('callback', false) && c('Garden.AllowJSONP')) ? 200 : 404;
                                 throw new Exception(self::notFoundString($fieldPrefix, $multiValue), $code);
                             }
 
-                            if ($matchRecords->NumRows() > 1)
-                                throw new Exception(sprintf('Multiple %ss found by %s for "%s".', T('User'), $columnLookup, $multiValue), 409);
+                            if ($matchRecords->numRows() > 1)
+                                throw new Exception(sprintf('Multiple %ss found by %s for "%s".', t('User'), $columnLookup, $multiValue), 409);
 
-                            $record = $matchRecords->FirstRow(DATASET_TYPE_ARRAY);
-                            $lookupFieldValue = GetValue($lookupField, $record);
+                            $record = $matchRecords->firstRow(DATASET_TYPE_ARRAY);
+                            $lookupFieldValue = getValue($lookupField, $record);
                             break;
 
                         // Custom lookup types
@@ -302,16 +302,16 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
                                 // Check if we have a provider by that key
                                 $providerModel = new Gdn_AuthenticationProviderModel();
-                                $provider = $providerModel->GetProviderByKey($providerKey);
+                                $provider = $providerModel->getProviderByKey($providerKey);
                                 if (!$provider)
                                     throw new Exception(self::notFoundString('Provider', $providerKey), 404);
 
                                 // Check if we have an associated user for that ForeignID
-                                $userAssociation = Gdn::Authenticator()->GetAssociation($foreignID, $providerKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
+                                $userAssociation = Gdn::authenticator()->getAssociation($foreignID, $providerKey, Gdn_Authenticator::KEY_TYPE_PROVIDER);
                                 if (!$userAssociation)
                                     throw new Exception(self::notFoundString('User', $multiValue), 404);
 
-                                $lookupFieldValue = GetValue($lookupField, $userAssociation);
+                                $lookupFieldValue = getValue($lookupField, $userAssociation);
                             }
 
                             break;
@@ -328,14 +328,14 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                     }
                 }
 
-            } elseif (StringEndsWith($field, 'Category')) {
+            } elseif (stringEndsWith($field, 'Category')) {
                 // Translate a category column.
-                $px = StringEndsWith($field, 'Category', true, true);
+                $px = stringEndsWith($field, 'Category', true, true);
                 $column = $px.'CategoryID';
                 if (isset($data[$column]))
                     return;
 
-                $category = CategoryModel::Categories($multiValue);
+                $category = CategoryModel::categories($multiValue);
                 if (!$category)
                     throw new Exception(self::notFoundString('Category', $multiValue), 404);
 
@@ -350,7 +350,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     }
 
     protected static function notFoundString($code, $item) {
-        return sprintf('%1$s "%2$s" not found.', T($code), $item);
+        return sprintf('%1$s "%2$s" not found.', t($code), $item);
     }
 
     /**
@@ -365,7 +365,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      * @param Gdn_Dispatcher $Sender
      */
     public function gdn_dispatcher_appStartup_handler($Sender) {
-        $IncomingRequest = Gdn::Request()->RequestURI();
+        $IncomingRequest = Gdn::request()->requestURI();
 
         // Detect a versioned API call
 
@@ -384,9 +384,9 @@ class SimpleAPIPlugin extends Gdn_Plugin {
         try {
 
             $ClassFile = "class.api.{$APIVersion}.php";
-            $PluginInfo = Gdn::PluginManager()->GetPluginInfo('SimpleAPI');
+            $PluginInfo = Gdn::pluginManager()->getPluginInfo('SimpleAPI');
             $PluginPath = $PluginInfo['PluginRoot'];
-            $MapperFile = CombinePaths([$PluginPath, 'library', $ClassFile]);
+            $MapperFile = combinePaths([$PluginPath, 'library', $ClassFile]);
 
             if (!file_exists($MapperFile)) throw new Exception('No such API Mapper');
 
@@ -396,14 +396,14 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             $this->Mapper = new ApiMapper();
 
             $this->EventArguments['Mapper'] = &$this->Mapper;
-            $this->FireEvent('Mapper');
+            $this->fireEvent('Mapper');
 
             // Lookup the mapped replacement for this request
-            $MappedURI = $this->Mapper->Map($APIRequest);
+            $MappedURI = $this->Mapper->map($APIRequest);
             if (!$MappedURI) throw new Exception('Unable to map request');
 
             // Apply the mapped replacement
-            Gdn::Request()->WithURI($MappedURI);
+            Gdn::request()->withURI($MappedURI);
 
             // Authenticate & prepare data
             $this->prepareAPI($Sender);
@@ -411,12 +411,12 @@ class SimpleAPIPlugin extends Gdn_Plugin {
         } catch (Exception $Ex) {
 
             $Code = $HTTPCode = $Ex->getCode();
-            $Message = Gdn_Controller::GetStatusMessage($HTTPCode);
+            $Message = Gdn_Controller::getStatusMessage($HTTPCode);
 
             // Send a
             if ($Message == 'Unknown') {
                 $HTTPCode = 500;
-                $Message = Gdn_Controller::GetStatusMessage($HTTPCode);
+                $Message = Gdn_Controller::getStatusMessage($HTTPCode);
             }
 
             header("Status: {$HTTPCode} {$Message}", true, $HTTPCode);
@@ -424,8 +424,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             // Set up data rray
             $Data = ['Code' => $Code, 'Exception' => $Ex->getMessage(), 'Class' => get_class($Ex)];
 
-            if (Debug()) {
-                if ($Trace = Trace()) {
+            if (debug()) {
+                if ($Trace = trace()) {
                     // Clear passwords from the trace.
                     array_walk_recursive($Trace, function (&$Value, $Key) {
                         if (in_array(strtolower($Key), ['password'])) {
@@ -440,10 +440,10 @@ class SimpleAPIPlugin extends Gdn_Plugin {
                     $Data['StackTrace'] = $Ex->getTraceAsString();
             }
 
-            switch (Gdn::Request()->OutputFormat()) {
+            switch (Gdn::request()->outputFormat()) {
                 case 'json':
                     header('Content-Type: application/json', true);
-                    if ($Callback = Gdn::Request()->GetValueFrom(Gdn_Request::INPUT_GET, 'callback', false)) {
+                    if ($Callback = Gdn::request()->getValueFrom(Gdn_Request::INPUT_GET, 'callback', false)) {
                         // This is a jsonp request.
                         exit($Callback.'('.json_encode($Data).');');
                     } else {
@@ -473,32 +473,32 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     protected function prepareAPI($sender) {
-        $accessToken = GetValue('access_token', $_GET, NULL);
+        $accessToken = getValue('access_token', $_GET, NULL);
 
         if ($accessToken !== NULL) {
-            if ($accessToken === C('Plugins.SimpleAPI.AccessToken')) {
+            if ($accessToken === c('Plugins.SimpleAPI.AccessToken')) {
                 // Check for only-https here because we don't want to check for https on json calls from javascript.
-                $onlyHttps = C('Plugins.SimpleAPI.OnlyHttps');
-                if ($onlyHttps && strcasecmp(Gdn::Request()->Scheme(), 'https') != 0) {
-                    throw new Exception(T('You must access the API through https.'), 401);
+                $onlyHttps = c('Plugins.SimpleAPI.OnlyHttps');
+                if ($onlyHttps && strcasecmp(Gdn::request()->scheme(), 'https') != 0) {
+                    throw new Exception(t('You must access the API through https.'), 401);
                 }
 
-                $userID = C('Plugins.SimpleAPI.UserID');
+                $userID = c('Plugins.SimpleAPI.UserID');
                 $user = false;
                 if ($userID)
-                    $user = Gdn::UserModel()->GetID($userID);
+                    $user = Gdn::userModel()->getID($userID);
                 if (!$user)
-                    $userID = Gdn::UserModel()->GetSystemUserID();
+                    $userID = Gdn::userModel()->getSystemUserID();
 
-                Gdn::Session()->Start($userID, false, false);
-                Gdn::Session()->ValidateTransientKey(true);
+                Gdn::session()->start($userID, false, false);
+                Gdn::session()->validateTransientKey(true);
             } else {
-                if (!Gdn::Session()->IsValid())
-                    throw new Exception(T('Invald Access Token'), 401);
+                if (!Gdn::session()->isValid())
+                    throw new Exception(t('Invald Access Token'), 401);
             }
         }
 
-        if (strcasecmp(GetValue('contenttype', $_GET, ''), 'json') == 0 || strpos(GetValue('CONTENT_TYPE', $_SERVER, NULL), 'json') !== false) {
+        if (strcasecmp(getValue('contenttype', $_GET, ''), 'json') == 0 || strpos(getValue('CONTENT_TYPE', $_SERVER, NULL), 'json') !== false) {
             $post = file_get_contents('php://input');
 
             if ($post)
@@ -506,19 +506,19 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             else
                 $post = [];
         } else {
-            $post = Gdn::Request()->Post();
+            $post = Gdn::request()->post();
         }
 
         // Translate POST data
         self::translatePost($post);
-        Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_POST, $post);
+        Gdn::request()->setRequestArguments(Gdn_Request::INPUT_POST, $post);
         $_POST = $post;
 
         // Translate GET data
         self::translateGet($_GET);
-        Gdn::Request()->SetRequestArguments(Gdn_Request::INPUT_GET, $_GET);
-        Trace(Gdn::Request()->Post(), 'post');
-        Trace(Gdn::Request()->Get(), 'get');
+        Gdn::request()->setRequestArguments(Gdn_Request::INPUT_GET, $_GET);
+        trace(Gdn::request()->post(), 'post');
+        trace(Gdn::request()->get(), 'get');
     }
 
     /**
@@ -531,7 +531,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
 
         $request = $sender->EventArguments['Request'];
         $reflectionArguments = &$sender->EventArguments['Arguments'];
-        $reflectionArguments = array_merge($reflectionArguments, $request->Post());
+        $reflectionArguments = array_merge($reflectionArguments, $request->post());
     }
 
     /**
@@ -539,9 +539,9 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $sender
      */
-    public function Gdn_Controller_Finalize_Handler($sender) {
+    public function gdn_Controller_Finalize_Handler($sender) {
         if ($this->Mapper instanceof SimpleApiMapper)
-            $this->Mapper->Filter($sender->EventArguments['Data']);
+            $this->Mapper->filter($sender->EventArguments['Data']);
     }
 
     /**
@@ -551,61 +551,61 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function settingsController_api_create($sender, $args) {
-        $sender->Permission('Garden.Settings.Manage');
+        $sender->permission('Garden.Settings.Manage');
 
-        if ($sender->Form->AuthenticatedPostBack()) {
+        if ($sender->Form->authenticatedPostBack()) {
             $save = [
-                'Plugins.SimpleAPI.AccessToken' => $sender->Form->GetFormValue('AccessToken'),
+                'Plugins.SimpleAPI.AccessToken' => $sender->Form->getFormValue('AccessToken'),
                 'Plugins.SimpleAPI.UserID' => NULL,
-                'Plugins.SimpleAPI.OnlyHttps' => (bool)$sender->Form->GetFormValue('OnlyHttps')
+                'Plugins.SimpleAPI.OnlyHttps' => (bool)$sender->Form->getFormValue('OnlyHttps')
             ];
 
 
             // Validate the settings.
-            if (!ValidateRequired($sender->Form->GetFormValue('AccessToken'))) {
-                $sender->Form->AddError('ValidateRequired', 'Access Token');
+            if (!validateRequired($sender->Form->getFormValue('AccessToken'))) {
+                $sender->Form->addError('ValidateRequired', 'Access Token');
             }
 
             // Make sure the user exists.
-            $username = $sender->Form->GetFormValue('Username');
-            if (!ValidateRequired($username))
-                $sender->Form->AddError('ValidateRequired', 'User');
+            $username = $sender->Form->getFormValue('Username');
+            if (!validateRequired($username))
+                $sender->Form->addError('ValidateRequired', 'User');
             else {
-                $user = Gdn::UserModel()->GetByUsername($username);
+                $user = Gdn::userModel()->getByUsername($username);
                 if (!$user)
-                    $sender->Form->AddError('@'.self::notFoundString('User', htmlspecialchars($username)));
+                    $sender->Form->addError('@'.self::notFoundString('User', htmlspecialchars($username)));
                 else
-                    $save['Plugins.SimpleAPI.UserID'] = GetValue('UserID', $user);
+                    $save['Plugins.SimpleAPI.UserID'] = getValue('UserID', $user);
             }
 
-            if ($sender->Form->ErrorCount() == 0) {
+            if ($sender->Form->errorCount() == 0) {
                 // Save the data.
-                SaveToConfig($save);
+                saveToConfig($save);
 
-                $sender->InformMessage('Your changes have been saved.');
+                $sender->informMessage('Your changes have been saved.');
             }
         } else {
             // Get the data.
             $data = [
-                'AccessToken' => C('Plugins.SimpleAPI.AccessToken'),
-                'UserID' => C('Plugins.SimpleAPI.UserID', Gdn::UserModel()->GetSystemUserID()),
-                'OnlyHttps' => C('Plugins.SimpleAPI.OnlyHttps')];
+                'AccessToken' => c('Plugins.SimpleAPI.AccessToken'),
+                'UserID' => c('Plugins.SimpleAPI.UserID', Gdn::userModel()->getSystemUserID()),
+                'OnlyHttps' => c('Plugins.SimpleAPI.OnlyHttps')];
 
-            $user = Gdn::UserModel()->GetID($data['UserID'], DATASET_TYPE_ARRAY);
+            $user = Gdn::userModel()->getID($data['UserID'], DATASET_TYPE_ARRAY);
             if ($user) {
                 $data['Username'] = $user['Name'];
             } else {
-                $user = Gdn::UserModel()->GetID(Gdn::UserModel()->GetSystemUserID(), DATASET_TYPE_ARRAY);
+                $user = Gdn::userModel()->getID(Gdn::userModel()->getSystemUserID(), DATASET_TYPE_ARRAY);
                 $data['Username'] = $user['Name'];
                 $data['UserID'] = $user['UserID'];
             }
 
-            $sender->Form->SetData($data);
+            $sender->Form->setData($data);
         }
 
-        $sender->SetData('Title', 'API Settings');
-        $sender->AddSideMenu();
-        $sender->Render('Settings', '', 'plugins/SimpleAPI');
+        $sender->setData('Title', 'API Settings');
+        $sender->addSideMenu();
+        $sender->render('Settings', '', 'plugins/SimpleAPI');
     }
 
     /**
@@ -615,7 +615,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
-        $menu->AddLink('Site Settings', T('API'), 'settings/api', 'Garden.Settings.Manage', ['class' => 'nav-api']);
+        $menu->addLink('Site Settings', t('API'), 'settings/api', 'Garden.Settings.Manage', ['class' => 'nav-api']);
     }
 
     /**
@@ -630,19 +630,19 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      */
     public function structure() {
         // Make sure the API user is set.
-        $userID = C('Plugins.SimpleAPI.UserID');
+        $userID = c('Plugins.SimpleAPI.UserID');
         if (!$userID)
-            $userID = Gdn::UserModel()->GetSystemUserID();
-        $user = Gdn::UserModel()->GetID($userID, DATASET_TYPE_ARRAY);
+            $userID = Gdn::userModel()->getSystemUserID();
+        $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
         if (!$user)
-            $userID = Gdn::UserModel()->GetSystemUserID();
+            $userID = Gdn::userModel()->getSystemUserID();
 
         // Make sure the access token is set.
-        $accessToken = C('Plugins.SimpleAPI.AccessToken');
+        $accessToken = c('Plugins.SimpleAPI.AccessToken');
         if (!$accessToken)
             $accessToken = md5(microtime());
 
-        SaveToConfig([
+        saveToConfig([
             'Plugins.SimpleAPI.UserID' => $userID,
             'Plugins.SimpleAPI.AccessToken' => $accessToken
         ]);

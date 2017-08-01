@@ -72,9 +72,9 @@ class EventListModule extends Gdn_Module {
       */
      protected function getEventOptions($event) {
           $options = [];
-          if (EventPermission('Edit', $event)) {
-                $options[] = ['Text' => sprintf(t('Edit %s'), t('Event')), 'Url' => EventUrl($event, 'edit')];
-                $options[] = ['Text' => sprintf(t('Delete %s'), t('Event')), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup'];
+          if (eventPermission('Edit', $event)) {
+                $options[] = ['Text' => sprintf(t('Edit %s'), t('Event')), 'Url' => eventUrl($event, 'edit')];
+                $options[] = ['Text' => sprintf(t('Delete %s'), t('Event')), 'Url' => eventUrl($event, 'delete'), 'CssClass' => 'Popup'];
           }
           return $options;
      }
@@ -86,7 +86,7 @@ class EventListModule extends Gdn_Module {
       * @return array The event's RSVP dropdown.
       */
      protected function getEventDropdown($event) {
-          if (EventPermission('Member', $event) && !EventModel::isEnded($event)) {
+          if (eventPermission('Member', $event) && !EventModel::isEnded($event)) {
                 $eventModel = new EventModel();
                 $status = $eventModel->isInvited(Gdn::session()->UserID, val('EventID', $event));
                 $statuses = ['Yes' => t('Attending'), 'No' => t('Not Attending'), 'Maybe' => t('Maybe')];
@@ -213,7 +213,7 @@ class EventListModule extends Gdn_Module {
           $item['text'] = sliceParagraph(Gdn_Format::plainText(val('Body', $event), val('Format', $event)), 100);
           $item['textCssClass'] = 'EventDescription';
           $item['heading'] = Gdn_Format::text(val('Name', $event));
-          $item['url'] = EventUrl($event);
+          $item['url'] = eventUrl($event);
           $item['metaCssClass'] = '';
           $item['cssClass'] = 'Event event js-event';
 

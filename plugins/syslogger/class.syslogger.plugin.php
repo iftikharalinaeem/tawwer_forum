@@ -25,7 +25,7 @@ class SysloggerPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Dispatcher $sender
      */
-    public function Gdn_Dispatcher_AppStartup_Handler($sender) {
+    public function gdn_Dispatcher_AppStartup_Handler($sender) {
         if (class_exists('Infrastructure')) {
             $extra = [
                 'accountid' => Infrastructure::site('accountid'),
@@ -33,11 +33,11 @@ class SysloggerPlugin extends Gdn_Plugin {
                 ];
             $ident = Infrastructure::siteID();
         } else {
-            $ident = Gdn::Request()->Host();
+            $ident = Gdn::request()->host();
             $extra = [];
         }
 
-        $logger = new Syslogger(C('Plugins.Syslogger.MessageFormat', 'json'), $ident);
+        $logger = new Syslogger(c('Plugins.Syslogger.MessageFormat', 'json'), $ident);
         $logger->extra = $extra;
 
         Logger::addLogger($logger, $this->getLevel());

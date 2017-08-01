@@ -21,7 +21,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
      * Class constructor.
      */
     public function __construct() {
-        $this->database_prefix = Gdn::Database()->DatabasePrefix;
+        $this->database_prefix = Gdn::database()->DatabasePrefix;
         $this->file_destination_dir = 'avatarstock';
     }
 
@@ -29,23 +29,23 @@ class AvatarStockPlugin extends Gdn_Plugin {
      * Setup the plugin upon first enabling it.
      */
     public function setup() {
-        $this->Structure();
+        $this->structure();
     }
 
     /**
      * Allow utility/structure calls to restructure plugin.
      */
     public function structure() {
-        Gdn::Structure()
-            ->Table($this->table_name)
-            ->PrimaryKey('AvatarID')
-            ->Column('Name', 'varchar(100)', true)
-            ->Column('OriginalFileName', 'varchar(255)', true)
-            ->Column('Path', 'varchar(191)', false, 'index')
-            ->Column('InsertUserID', 'int', true)
-            ->Column('TimestampAdded', 'int(10)', true)
-            ->Column('Deleted', 'tinyint(1)', 1, 'index')
-            ->Set();
+        Gdn::structure()
+            ->table($this->table_name)
+            ->primaryKey('AvatarID')
+            ->column('Name', 'varchar(100)', true)
+            ->column('OriginalFileName', 'varchar(255)', true)
+            ->column('Path', 'varchar(191)', false, 'index')
+            ->column('InsertUserID', 'int', true)
+            ->column('TimestampAdded', 'int(10)', true)
+            ->column('Deleted', 'tinyint(1)', 1, 'index')
+            ->set();
     }
 
     /**
@@ -90,19 +90,19 @@ class AvatarStockPlugin extends Gdn_Plugin {
      * @throws Exception No authenticated postback.
      */
     public function deleteSelectedAvatars($sender) {
-        $sender->Permission('Garden.Settings.Manage');
+        $sender->permission('Garden.Settings.Manage');
 
-        if (!$sender->Request->IsAuthenticatedPostBack()) {
-            throw ForbiddenException('GET');
+        if (!$sender->Request->isAuthenticatedPostBack()) {
+            throw forbiddenException('GET');
         }
 
-        $post = Gdn::Request()->Post();
+        $post = Gdn::request()->post();
         $avatar_ids = array_values($post['avatar_delete']);
         if (empty($avatar_ids)) {
            return 0;
         }
 
-        Gdn::SQL()->Put(
+        Gdn::sql()->put(
             'AvatarStock',
             [
                 'Deleted' => 1
@@ -130,42 +130,42 @@ class AvatarStockPlugin extends Gdn_Plugin {
      * @param string $username The user's name, if available.
      * @param string $tk The transient key.
      */
-    public function ProfileController_RemovePicture_Create($sender, $userReference = '', $username = '', $tk = '') {
-        $sender->Permission('Garden.SignIn.Allow');
-        $session = Gdn::Session();
-        if (!$session->IsValid())
-            $sender->Form->AddError('You must be authenticated in order to use this form.');
+    public function profileController_removePicture_create($sender, $userReference = '', $username = '', $tk = '') {
+        $sender->permission('Garden.SignIn.Allow');
+        $session = Gdn::session();
+        if (!$session->isValid())
+            $sender->Form->addError('You must be authenticated in order to use this form.');
 
         // Get user data & another permission check
-        $sender->GetUserInfo($userReference, $username, '', TRUE);
-        $redirectUrl = UserUrl($sender->User, '', 'picture');
-        if ($session->ValidateTransientKey($tk) && is_object($sender->User)) {
-            $hasRemovePermission = CheckPermission('Garden.Users.Edit') || CheckPermission('Moderation.Profiles.Edit');
+        $sender->getUserInfo($userReference, $username, '', TRUE);
+        $redirectUrl = userUrl($sender->User, '', 'picture');
+        if ($session->validateTransientKey($tk) && is_object($sender->User)) {
+            $hasRemovePermission = checkPermission('Garden.Users.Edit') || checkPermission('Moderation.Profiles.Edit');
             if ($sender->User->UserID == $session->UserID || $hasRemovePermission) {
                 if (strpos($sender->User->Photo, $this->file_destination_dir) === false) {
                     // Do removal, set message, redirect
-                    Gdn::UserModel()->RemovePicture($sender->User->UserID);
+                    Gdn::userModel()->removePicture($sender->User->UserID);
                 } else {
                     // "Remove" for avatarstock. This just means the column in
                     // the User table gets set to the default. The photo itself
                     // should not be removed.
-                    $userModel = Gdn::UserModel();
-                    $user = $userModel->GetID($sender->User->UserID, DATASET_TYPE_ARRAY);
+                    $userModel = Gdn::userModel();
+                    $user = $userModel->getID($sender->User->UserID, DATASET_TYPE_ARRAY);
                     if ($photo = $user['Photo']) {
-                        $userModel->SetField($sender->User->UserID, 'Photo', NULL);
+                        $userModel->setField($sender->User->UserID, 'Photo', NULL);
                     }
                 }
-                $sender->InformMessage(T('Your picture has been removed.'));
+                $sender->informMessage(t('Your picture has been removed.'));
             }
         }
 
-        if (Gdn::Controller()->DeliveryType() == DELIVERY_TYPE_ALL) {
+        if (Gdn::controller()->deliveryType() == DELIVERY_TYPE_ALL) {
             redirectTo($redirectUrl);
         } else {
             $sender->ControllerName = 'Home';
             $sender->View = 'FileNotFound';
             $sender->setRedirectTo($redirectUrl);
-            $sender->Render();
+            $sender->render();
         }
     }
 
@@ -176,11 +176,11 @@ class AvatarStockPlugin extends Gdn_Plugin {
         $stock_avatar_payload = [];
         $avatarstock_model = new Gdn_Model('AvatarStock');
 
-        $payload = $avatarstock_model->GetWhere(
+        $payload = $avatarstock_model->getWhere(
             [
                 'Deleted' => 0
             ]
-        )->ResultArray();
+        )->resultArray();
 
         $total_stock_images = count($payload);
         if ($total_stock_images) {
@@ -189,14 +189,14 @@ class AvatarStockPlugin extends Gdn_Plugin {
             for ($i = 0; $i < $total_stock_images; $i++) {
 
                 // Load array with real URL paths for each thumbnail.
-                $payload[$i]['_path'] = $upload->Url(
-                    ChangeBasename(
+                $payload[$i]['_path'] = $upload->url(
+                    changeBasename(
                         $payload[$i]['Path'],
                         $this->prefix_thumbnails . '%s'
                     )
                 );
-                $payload[$i]['_path_crop'] = $upload->Url(
-                    ChangeBasename(
+                $payload[$i]['_path_crop'] = $upload->url(
+                    changeBasename(
                         $payload[$i]['Path'],
                         $this->prefix_thumbnails_cropped . '%s'
                     )
@@ -218,23 +218,23 @@ class AvatarStockPlugin extends Gdn_Plugin {
      * @throws Exception Not authenticated postback.
      */
     public function handleUploadInsert($sender) {
-        $sender->Permission('Garden.Settings.Manage');
+        $sender->permission('Garden.Settings.Manage');
 
-        if (!$sender->Request->IsAuthenticatedPostBack()) {
-            throw ForbiddenException('GET');
+        if (!$sender->Request->isAuthenticatedPostBack()) {
+            throw forbiddenException('GET');
         }
 
         $success = false;
         $destination_dir = PATH_UPLOADS . '/' . $this->file_destination_dir;
-        TouchFolder($destination_dir);
+        touchFolder($destination_dir);
         $upload_image = new Gdn_UploadImage();
 
-        if ($upload_image->CanUploadImages()
-            && $upload_image->CanUpload($destination_dir)
+        if ($upload_image->canUploadImages()
+            && $upload_image->canUpload($destination_dir)
         ) {
 
-            $tmp_file = $upload_image->ValidateUpload($this->file_input_name);
-            $original_filename = $upload_image->GetUploadedFileName();
+            $tmp_file = $upload_image->validateUpload($this->file_input_name);
+            $original_filename = $upload_image->getUploadedFileName();
 
             // The custom seems to be that 'p' represents a large profile picture,
             // while 'n' represents a cropped thumbnail. This is not saved in
@@ -248,46 +248,46 @@ class AvatarStockPlugin extends Gdn_Plugin {
             // to random thumnail and cropped thumbnails.
 
             // Generate the target image name.
-            $target_name_thumbs = $upload_image->GenerateTargetName(
+            $target_name_thumbs = $upload_image->generateTargetName(
                 $destination_dir,
                 '',
                 false
             );
-            $target_parsed = $upload_image->Parse($target_name_thumbs);
+            $target_parsed = $upload_image->parse($target_name_thumbs);
 
             // Database and filesystem paths are not the same.
             // ChangeBasename takes care of adding prefixes.
             $path_thumb = $target_parsed['SaveName'];
-            $path_thumb_p = ChangeBasename(
+            $path_thumb_p = changeBasename(
                 $path_thumb,
                 $this->prefix_thumbnails . '%s'
             );
-            $path_thumb_n = ChangeBasename(
+            $path_thumb_n = changeBasename(
                 $path_thumb,
                 $this->prefix_thumbnails_cropped . '%s'
             );
 
             // Create p thumbnail
-            $thumb_parsed = $upload_image->SaveImageAs(
+            $thumb_parsed = $upload_image->saveImageAs(
                 $tmp_file,
                 $path_thumb_p,
-                C('Garden.Profile.MaxHeight'),
-                C('Garden.Profile.MaxWidth'),
+                c('Garden.Profile.MaxHeight'),
+                c('Garden.Profile.MaxWidth'),
                 [
-                    'SaveGif' => C('Garden.Thumbnail.SaveGif')
+                    'SaveGif' => c('Garden.Thumbnail.SaveGif')
                 ]
             );
 
             // Create n thumbnail (cropped)
             $crop_dimensions = c('Garden.Thumbnail.Size');
-            $crop_parsed = $upload_image->SaveImageAs(
+            $crop_parsed = $upload_image->saveImageAs(
                 $tmp_file,
                 $path_thumb_n,
                 $crop_dimensions,
                 $crop_dimensions,
                 [
                     'Crop' => true,
-                    'SaveGif' => C('Garden.Thumbnail.SaveGif')
+                    'SaveGif' => c('Garden.Thumbnail.SaveGif')
                 ]
             );
 
@@ -297,12 +297,12 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
             // Insert into DB
             $avatarstock_model = new Gdn_Model('AvatarStock');
-            $avatar_id = $avatarstock_model->Save(
+            $avatar_id = $avatarstock_model->save(
                 [
                     'Name' => val('name', $post, NULL),
                     'OriginalFileName' => $original_filename,
                     'Path' => $path_thumb_db,
-                    'InsertUserID' => Gdn::Session()->UserID,
+                    'InsertUserID' => Gdn::session()->UserID,
                     'TimestampAdded' => time(),
                     'Deleted' => 0 // Change default to 0 to make active.
                 ]
@@ -322,8 +322,8 @@ class AvatarStockPlugin extends Gdn_Plugin {
      * @param Base $sender The base controller.
      */
     public function base_render_before($sender) {
-        $sender->AddCssFile('avatarstock.css', 'plugins/avatarstock');
-        $sender->AddJsFile('avatarstock.js', 'plugins/avatarstock');
+        $sender->addCssFile('avatarstock.css', 'plugins/avatarstock');
+        $sender->addJsFile('avatarstock.js', 'plugins/avatarstock');
     }
 
     /**
@@ -340,12 +340,12 @@ class AvatarStockPlugin extends Gdn_Plugin {
      * @throws Exception User cannot edit photos.
      */
     public function profileController_picture_create($sender, $userReference = '', $username = '', $userID = '') {
-        if (!C('Garden.Profile.EditPhotos', true)) {
-            throw ForbiddenException('@Editing user photos has been disabled.');
+        if (!c('Garden.Profile.EditPhotos', true)) {
+            throw forbiddenException('@Editing user photos has been disabled.');
         }
 
         // Permission checks
-        $sender->Permission(
+        $sender->permission(
             [
                 'Garden.Profiles.Edit',
                 'Moderation.Profiles.Edit',
@@ -353,58 +353,58 @@ class AvatarStockPlugin extends Gdn_Plugin {
             ],
             false
         );
-        $session = Gdn::Session();
-        if (!$session->IsValid()) {
-            $sender->Form->AddError(
+        $session = Gdn::session();
+        if (!$session->isValid()) {
+            $sender->Form->addError(
                 'You must be authenticated in order to use this form.'
             );
         }
 
-        $sender->GetUserInfo($userReference, $username, $userID, true);
-        $user_model = Gdn::UserModel();
+        $sender->getUserInfo($userReference, $username, $userID, true);
+        $user_model = Gdn::userModel();
         $avatarstock_model = new Gdn_Model('AvatarStock');
         $user_id = $sender->User->UserID;
-        $sender->Form->SetModel('User');
+        $sender->Form->setModel('User');
 
         // When posted to self
-        if ($sender->Form->AuthenticatedPostBack() === true) {
-            $sender->Form->SetFormValue('UserID', $sender->User->UserID);
+        if ($sender->Form->authenticatedPostBack() === true) {
+            $sender->Form->setFormValue('UserID', $sender->User->UserID);
 
             // Determine if image being uploaded. Only privileged users can
             // do this. Otherwise, choose from avatar pool.
             $uploadImage = new Gdn_UploadImage();
-            $tmpImage = $uploadImage->ValidateUpload('Picture', false);
+            $tmpImage = $uploadImage->validateUpload('Picture', false);
 
             // Selecting from avatar pool.
             if (!$tmpImage) {
                 // If there were no errors, associate the image with the user
-                if ($sender->Form->ErrorCount() == 0) {
-                    $post = Gdn::Request()->Post();
+                if ($sender->Form->errorCount() == 0) {
+                    $post = Gdn::request()->post();
                     $avatar_id = $post['AvatarID'];
 
-                    if (!ValidateInteger($avatar_id)) {
-                        $sender->Form->AddError('Invalid Avatar ID.');
+                    if (!validateInteger($avatar_id)) {
+                        $sender->Form->addError('Invalid Avatar ID.');
                     }
 
-                    if ($sender->Form->ErrorCount() == 0) {
+                    if ($sender->Form->errorCount() == 0) {
 
                         // Get avatar stock data
-                        $avatarstock_row = $avatarstock_model->GetWhere(
+                        $avatarstock_row = $avatarstock_model->getWhere(
                             [
                                 'AvatarID' => $avatar_id
                             ]
-                        )->FirstRow(DATASET_TYPE_ARRAY);
+                        )->firstRow(DATASET_TYPE_ARRAY);
 
                         $user_photo = $avatarstock_row['Path'];
 
                         // Save it to User table
-                        if (!$user_model->Save(
+                        if (!$user_model->save(
                             ['UserID' => $user_id, 'Photo' => $user_photo],
                             ['CheckExisting' => true]
                         )
                         ) {
-                            $sender->Form->SetValidationResults(
-                                $user_model->ValidationResults()
+                            $sender->Form->setValidationResults(
+                                $user_model->validationResults()
                             );
                         } else {
                             $sender->User->Photo = $user_photo;
@@ -417,43 +417,43 @@ class AvatarStockPlugin extends Gdn_Plugin {
 
                 // Only admins and users with the custom permission can upload
                 // their own avatars.
-                $sender->Permission([
+                $sender->permission([
                     'Garden.Settings.Manage',
                     'AvatarPool.CustomUpload.Allow'
                 ], false);
 
                 // Generate the target image name.
-                $targetImage = $uploadImage->GenerateTargetName(PATH_UPLOADS, '', TRUE);
+                $targetImage = $uploadImage->generateTargetName(PATH_UPLOADS, '', TRUE);
                 $basename = pathinfo($targetImage, PATHINFO_BASENAME);
-                $subdir = StringBeginsWith(dirname($targetImage), PATH_UPLOADS.'/', FALSE, TRUE);
+                $subdir = stringBeginsWith(dirname($targetImage), PATH_UPLOADS.'/', FALSE, TRUE);
 
                 // Delete any previously uploaded image.
-                $uploadImage->Delete(ChangeBasename($sender->User->Photo, 'p%s'));
+                $uploadImage->delete(changeBasename($sender->User->Photo, 'p%s'));
 
                 // Save the uploaded image in profile size.
-                $props = $uploadImage->SaveImageAs(
+                $props = $uploadImage->saveImageAs(
                     $tmpImage,
                     "userpics/$subdir/p$basename",
-                    C('Garden.Profile.MaxHeight'),
-                    C('Garden.Profile.MaxWidth'),
-                    ['SaveGif' => C('Garden.Thumbnail.SaveGif')]
+                    c('Garden.Profile.MaxHeight'),
+                    c('Garden.Profile.MaxWidth'),
+                    ['SaveGif' => c('Garden.Thumbnail.SaveGif')]
                 );
                 $userPhoto = sprintf($props['SaveFormat'], "userpics/$subdir/$basename");
 
                 // Save the uploaded image in thumbnail size
                 $thumbSize = c('Garden.Thumbnail.Size');
-                $uploadImage->SaveImageAs(
+                $uploadImage->saveImageAs(
                     $tmpImage,
                     "userpics/$subdir/n$basename",
                     $thumbSize,
                     $thumbSize,
-                    ['Crop' => TRUE, 'SaveGif' => C('Garden.Thumbnail.SaveGif')]
+                    ['Crop' => TRUE, 'SaveGif' => c('Garden.Thumbnail.SaveGif')]
                 );
 
                 // If there were no errors, associate the image with the user
-                if ($sender->Form->ErrorCount() == 0) {
-                    if (!$user_model->Save(['UserID' => $sender->User->UserID, 'Photo' => $userPhoto], ['CheckExisting' => TRUE])) {
-                        $sender->Form->SetValidationResults($user_model->ValidationResults());
+                if ($sender->Form->errorCount() == 0) {
+                    if (!$user_model->save(['UserID' => $sender->User->UserID, 'Photo' => $userPhoto], ['CheckExisting' => TRUE])) {
+                        $sender->Form->setValidationResults($user_model->validationResults());
                     } else {
                         $sender->User->Photo = $userPhoto;
                     }
@@ -476,15 +476,15 @@ class AvatarStockPlugin extends Gdn_Plugin {
             }
         }
 
-        if ($sender->Form->ErrorCount() > 0) {
-            $sender->DeliveryType(DELIVERY_TYPE_ALL);
+        if ($sender->Form->errorCount() > 0) {
+            $sender->deliveryType(DELIVERY_TYPE_ALL);
         }
 
         // Current avatar URL
         $user_stockavatar_id = false; // none
 
-        if (ValidateInteger($user_id)) {
-            $current_user_data = $user_model->GetID(
+        if (validateInteger($user_id)) {
+            $current_user_data = $user_model->getID(
                 $user_id,
                 DATASET_TYPE_ARRAY
             );
@@ -495,11 +495,11 @@ class AvatarStockPlugin extends Gdn_Plugin {
                 // AvatarID and UserID relationships, change this. For now, because
                 // there really won't be a lot of stock photos to choose from,
                 // it's probably okay to do where against the path.
-                $relevant_stockavatar_row = $avatarstock_model->GetWhere(
+                $relevant_stockavatar_row = $avatarstock_model->getWhere(
                     [
                         'Path' => $current_user_photo
                     ]
-                )->FirstRow(DATASET_TYPE_ARRAY);
+                )->firstRow(DATASET_TYPE_ARRAY);
 
                 if (!empty($relevant_stockavatar_row['AvatarID'])) {
                     $user_stockavatar_id = $relevant_stockavatar_row['AvatarID'];
@@ -507,17 +507,17 @@ class AvatarStockPlugin extends Gdn_Plugin {
             }
         }
 
-        $sender->SetData('_current_stockavatar_id', $user_stockavatar_id);
+        $sender->setData('_current_stockavatar_id', $user_stockavatar_id);
 
         // Render
         $stock_avatar_payload = $this->getStockAvatarPayload();
-        $sender->SetData('_stock_avatar_payload', $stock_avatar_payload);
-        $sender->Title(T('Choose Avatar'));
+        $sender->setData('_stock_avatar_payload', $stock_avatar_payload);
+        $sender->title(t('Choose Avatar'));
         $sender->_SetBreadcrumbs(
-            T('Choose Avatar'),
-            UserUrl($sender->User, '', 'picture')
+            t('Choose Avatar'),
+            userUrl($sender->User, '', 'picture')
         );
-        $sender->Render('picture', '', 'plugins/avatarstock');
+        $sender->render('picture', '', 'plugins/avatarstock');
     }
 
     /**
@@ -547,7 +547,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
         $userReference = '',
         $username = ''
     ) {
-        throw ForbiddenException('@Editing user photos has been disabled.');
+        throw forbiddenException('@Editing user photos has been disabled.');
     }
 
     /**
@@ -557,6 +557,6 @@ class AvatarStockPlugin extends Gdn_Plugin {
      */
     public function profileController_afterAddSideMenu_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
-        $menu->RemoveLink('Options', '/profile/thumbnail');
+        $menu->removeLink('Options', '/profile/thumbnail');
     }
 }

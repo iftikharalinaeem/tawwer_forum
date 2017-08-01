@@ -48,7 +48,7 @@ class GroupModule extends Gdn_Module {
      *
      * @return void
      */
-    public function GetData($groupID = null) {
+    public function getData($groupID = null) {
 
         if (is_null($groupID))
             $groupID = $this->GroupID;
@@ -58,7 +58,7 @@ class GroupModule extends Gdn_Module {
 
         // Load the group
         $groupModel = new GroupModel();
-        $this->Group = $groupModel->GetID($groupID, DATASET_TYPE_ARRAY);
+        $this->Group = $groupModel->getID($groupID, DATASET_TYPE_ARRAY);
 
     }
 
@@ -67,10 +67,10 @@ class GroupModule extends Gdn_Module {
      *
      * @return type
      */
-    public function ToString() {
-        $this->GetData();
-        $this->SetData('Group', $this->Group);
-        return $this->FetchView();
+    public function toString() {
+        $this->getData();
+        $this->setData('Group', $this->Group);
+        return $this->fetchView();
     }
 
 }

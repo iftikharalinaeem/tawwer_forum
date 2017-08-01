@@ -16,21 +16,21 @@
       margin: 1em 0;
    }
 </style>
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 
 <div class="PageInfo">
    <p><b>Warning! If your forum has a lot of posts then this process will take a very long time.</b></p>
    <p>This page will go through all of your site's posts and check them for spam.</p>
 </div>
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 
 <div class="Wrap">
    <div class="P">
       <?php
-      echo $this->Form->CheckBox('VerifyModerators', 'Mark moderators verified before cleaning. (recommended)', ['Default' => TRUE]);
+      echo $this->Form->checkBox('VerifyModerators', 'Mark moderators verified before cleaning. (recommended)', ['Default' => TRUE]);
       ?>
    </div>
 
@@ -40,11 +40,11 @@ echo $this->Form->Errors();
 <div class="Info2">
    Select the types of posts you want to check for spam and click <b>Start</b>.
 </div>   
-<?php foreach ($this->Data('Types') as $Type => $Info): ?>
+<?php foreach ($this->data('Types') as $Type => $Info): ?>
    <div class="P">
       <?php
-      echo $this->Form->CheckBox('Type_'.$Type, $Info['Label'], ['value' => $Type]);
-      if ($this->Data('StartCleanSpam') && $this->Form->GetFormValue('Type_'.$Type)) {
+      echo $this->Form->checkBox('Type_'.$Type, $Info['Label'], ['value' => $Type]);
+      if ($this->data('StartCleanSpam') && $this->Form->getFormValue('Type_'.$Type)) {
          echo ' <span class="Count"><span class="CountSpam">0</span> / <span class="CountAll">0</span> Found</span>';
       }
       ?>
@@ -56,6 +56,6 @@ echo $this->Form->Errors();
 
 <?php
 echo '<div class="Buttons">';
-echo $this->Form->Button('Start');
+echo $this->Form->button('Start');
 echo '</div>';
-echo $this->Form->Close();
+echo $this->Form->close();

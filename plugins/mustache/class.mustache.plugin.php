@@ -86,7 +86,7 @@ class MustachePlugin extends Gdn_Plugin {
 
         $template = [
             'name' => $viewName,
-            'url' => Gdn::Request()->Url($templateRelativeUri, '//'),
+            'url' => Gdn::request()->url($templateRelativeUri, '//'),
             'type' => 'defer'
         ];
 

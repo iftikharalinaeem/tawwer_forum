@@ -8,13 +8,13 @@ class PageTickPlugin extends Gdn_Plugin {
    }
 
    public function structure() {
-      Gdn::Structure()
-         ->Table('Tick')
-         ->Column('TickID', 'datetime', FALSE, 'primary')
-         ->Column('CountViews', 'int', '0')
-         ->Column('CountMobileViews', 'int', '0')
-         ->Column('CountImgViews', 'int', '0')
-         ->Set();
+      Gdn::structure()
+         ->table('Tick')
+         ->column('TickID', 'datetime', FALSE, 'primary')
+         ->column('CountViews', 'int', '0')
+         ->column('CountMobileViews', 'int', '0')
+         ->column('CountImgViews', 'int', '0')
+         ->set();
    }
 
    public function tick($mobile = false) {
@@ -25,7 +25,7 @@ class PageTickPlugin extends Gdn_Plugin {
 
       $mobile_views = $mobile ? 1 : 0;
 
-      Gdn::Database()->Query($sql, [
+      Gdn::database()->query($sql, [
           ':TickID' => $date->format(DateTime::W3C),
           ':CountViews' => 1,
           ':CountMobileViews' => $mobile_views,
@@ -39,7 +39,7 @@ class PageTickPlugin extends Gdn_Plugin {
          values (:TickID, :CountViews)
          on duplicate key update $column = $column + :CountViews1";
 
-      Gdn::Database()->Query($sql, [
+      Gdn::database()->query($sql, [
           ':TickID' => $date->format(DateTime::W3C),
           ':CountViews' => 1,
           ':CountViews1' => 1]);
@@ -48,7 +48,7 @@ class PageTickPlugin extends Gdn_Plugin {
 
    /// Event Handlers ///
 
-   public function Base_AfterRenderAsset_Handler($sender, $args) {
+   public function base_afterRenderAsset_handler($sender, $args) {
       if ($args['AssetName'] != 'Head')
          return;
 
@@ -69,24 +69,24 @@ EOT;
    /**
     * @param Gdn_Controller $sender
     */
-   public function Base_render_before($sender) {
-      $sender->AddJsFile('pagetick.js', 'plugins/pagetick', ['hint' => 'inline', 'sort' => 1000]);
+   public function base_render_before($sender) {
+      $sender->addJsFile('pagetick.js', 'plugins/pagetick', ['hint' => 'inline', 'sort' => 1000]);
    }
 
    /**
     * @param Gdn_Controller $sender
     */
-   public function RootController_pagetick_create($sender) {
-      if (!$sender->Request->IsPostBack()) {
-         throw ForbiddenException('POST');
+   public function rootController_pagetick_create($sender) {
+      if (!$sender->Request->isPostBack()) {
+         throw forbiddenException('POST');
       }
 
-      $this->tick(IsMobile());
+      $this->tick(isMobile());
       $sender->setData('ok', true);
       $sender->render();
    }
 
-   public function UtilityController_bb_create($sender) {
+   public function utilityController_bb_create($sender) {
       $this->tickColumn('CountImgViews');
 
       if (!headers_sent()) {

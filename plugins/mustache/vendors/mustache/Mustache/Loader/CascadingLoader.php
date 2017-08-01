@@ -20,9 +20,9 @@ class Mustache_Loader_CascadingLoader implements Mustache_Loader
     /**
      * Construct a CascadingLoader with an array of loaders:
      *
-     *     $loader = new Mustache_Loader_CascadingLoader(array(
-     *         new Mustache_Loader_InlineLoader(__FILE__, __COMPILER_HALT_OFFSET__),
-     *         new Mustache_Loader_FilesystemLoader(__DIR__.'/templates')
+     *     $loader = new mustache_Loader_CascadingLoader(array(
+     *         new mustache_Loader_InlineLoader(__FILE__, __COMPILER_HALT_OFFSET__),
+     *         new mustache_Loader_FilesystemLoader(__DIR__.'/templates')
      *     ));
      *
      * @param array $loaders An array of Mustache Loader instances

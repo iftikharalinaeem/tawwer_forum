@@ -122,7 +122,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
         $form->setModel($model);
         $sender->Form = $form;
         $generate = false;
-        if (!$form->AuthenticatedPostBack()) {
+        if (!$form->authenticatedPostBack()) {
             $provider = $this->provider();
             $form->setData($provider);
         } else {
@@ -265,7 +265,7 @@ class JWTSSOPlugin extends Gdn_Plugin {
         }
 
         /* @var Gdn_Form $form */
-        $form = $sender->Form; //new Gdn_Form();
+        $form = $sender->Form; //new gdn_Form();
 
         if (!$this->isConfigured()) {
             $this->log('not_configured', ['provider' => $this->provider()]);

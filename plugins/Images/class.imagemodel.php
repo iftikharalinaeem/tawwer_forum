@@ -30,7 +30,7 @@ class ImageModel extends Gdn_Model {
    
    protected $_CommentModel = NULL;
    
-   public function CommentModel() {
+   public function commentModel() {
       if ($this->_CommentModel === NULL)
          $this->_CommentModel = new CommentModel();
       
@@ -47,17 +47,17 @@ class ImageModel extends Gdn_Model {
     * @var array $formPostValues The values posted by the form for saving.
     * @var array $commentIDs Array of comment id's created by the save (available by reference).
     */
-   public function Save($formPostValues, $settings = FALSE) {
+   public function save($formPostValues, $settings = FALSE) {
       // Loop through all of the incoming values and validate them      
-      $formPostValues = $this->FilterForm($formPostValues);
+      $formPostValues = $this->filterForm($formPostValues);
       $formPostValues['Type'] = 'image'; // Force the "image" discussion type.
       
       
-      $discussionID = GetValue('DiscussionID', $formPostValues);
-      $image = GetValue('Image', $formPostValues);
-      $thumbnail = GetValue('Thumbnail', $formPostValues);
-      $caption = GetValue('Caption', $formPostValues);
-      $size = GetValue('Size', $formPostValues);
+      $discussionID = getValue('DiscussionID', $formPostValues);
+      $image = getValue('Image', $formPostValues);
+      $thumbnail = getValue('Thumbnail', $formPostValues);
+      $caption = getValue('Caption', $formPostValues);
+      $size = getValue('Size', $formPostValues);
       $images = [];
       foreach ($image as $key => $val) {
          $capt = trim($caption[$key]);
@@ -70,9 +70,9 @@ class ImageModel extends Gdn_Model {
       }
       
       if (count($images) == 0)
-         $this->Validation->AddValidationResult('Image', 'You must provide at least one image.');
+         $this->Validation->addValidationResult('Image', 'You must provide at least one image.');
       
-      if (count($this->Validation->Results()) > 0)
+      if (count($this->Validation->results()) > 0)
          return 0;
       
       // We need to space the post time of the comments out so the caching won't break.
@@ -85,18 +85,18 @@ class ImageModel extends Gdn_Model {
          $discussionFormValues = [
              'Type' => 'Image',
              'Format' => 'Image',
-             'CategoryID' => GetValue('CategoryID', $formPostValues),
-             'Name' => GetValue('Name', $formPostValues),
-             'Body' => Gdn_Format::Image($serializedImage),
+             'CategoryID' => getValue('CategoryID', $formPostValues),
+             'Name' => getValue('Name', $formPostValues),
+             'Body' => Gdn_Format::image($serializedImage),
              'Attributes' => $serializedImage
          ];
 
          // Save the discussion
          $discussionModel = new DiscussionModel();
-         $discussionID = $discussionModel->Save($discussionFormValues);
-         $validationResults = $discussionModel->Validation->Results();
-         $this->Validation->AddValidationResult($validationResults);
-         if (count($this->Validation->Results()) > 0)
+         $discussionID = $discussionModel->save($discussionFormValues);
+         $validationResults = $discussionModel->Validation->results();
+         $this->Validation->addValidationResult($validationResults);
+         if (count($this->Validation->results()) > 0)
             return 0;
       }
 
@@ -105,7 +105,7 @@ class ImageModel extends Gdn_Model {
       for($i = 0; $i < count($images); $i++) {
          $image = $images[$i];
          $image['DiscussionID'] = $discussionID;
-         $commentID = $this->SaveComment($image);
+         $commentID = $this->saveComment($image);
          $commentIDs[] = $commentID;
       }
       $this->CommentIDs = $commentIDs;
@@ -114,8 +114,8 @@ class ImageModel extends Gdn_Model {
       return $discussionID;
    }
    
-   public function SaveComment($image, &$timestamp = NULL) {
-      $commentModel = $this->CommentModel();
+   public function saveComment($image, &$timestamp = NULL) {
+      $commentModel = $this->commentModel();
       if ($timestamp === NULL)
          $timestamp = time();
       
@@ -124,14 +124,14 @@ class ImageModel extends Gdn_Model {
             'Type' => 'Image',
             'Format' => 'Image',
             'DiscussionID' => $image['DiscussionID'],
-            'Body' => Gdn_Format::Image($image),
-            'DateInserted' => Gdn_Format::ToDateTime($timestamp++),
+            'Body' => Gdn_Format::image($image),
+            'DateInserted' => Gdn_Format::toDateTime($timestamp++),
             'Attributes' => $s
         ];
       
-      $commentID = $commentModel->Save($row);
-      $validationResults = $commentModel->Validation->Results();
-      $this->Validation->AddValidationResult($validationResults);
+      $commentID = $commentModel->save($row);
+      $validationResults = $commentModel->Validation->results();
+      $this->Validation->addValidationResult($validationResults);
       
       return $commentID;
    }

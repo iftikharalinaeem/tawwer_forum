@@ -12,28 +12,28 @@ class ElasticLogSearch extends Gdn_Plugin {
      */
     public $localHostDev = false;
 
-    public function Base_GetAppSettingsMenuItems_Handler($sender) {
+    public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = &$sender->EventArguments['SideMenu'];
-        $menu->AddLink('Dashboard', T('Application Log'), '/settings/applog', 'Garden.Settings.Manage');
+        $menu->addLink('Dashboard', t('Application Log'), '/settings/applog', 'Garden.Settings.Manage');
     }
 
     /**
      * @param SettingsController $sender
      * @param string $page
      */
-    public function SettingsController_Applog_Create($sender, $page = '') {
-        $sender->Permission('Garden.Settings.Manage');
+    public function settingsController_applog_create($sender, $page = '') {
+        $sender->permission('Garden.Settings.Manage');
 
-        $sender->AddJsFile('eventlog.js', 'plugins/ElasticLogSearch');
-        $sender->AddCssFile('eventlog.css', 'plugins/ElasticLogSearch');
+        $sender->addJsFile('eventlog.js', 'plugins/ElasticLogSearch');
+        $sender->addCssFile('eventlog.css', 'plugins/ElasticLogSearch');
 
         $elasticSearch = Elastic::connection('log');
 
         $sender->Form = new Gdn_Form();
         $pageSize = 30;
-        list($offset, $limit) = OffsetLimit($page, $pageSize);
+        list($offset, $limit) = offsetLimit($page, $pageSize);
 
-        $get = array_change_key_case($sender->Request->Get());
+        $get = array_change_key_case($sender->Request->get());
         $params = [
             'index' => 'log_vanilla*'
         ];
@@ -43,21 +43,21 @@ class ElasticLogSearch extends Gdn_Plugin {
         if ($v = val('datefrom', $get)) {
             $v = strtotime($v);
             if (!$v) {
-                $sender->Form->AddError('Invalid Date format for From Date.');
+                $sender->Form->addError('Invalid Date format for From Date.');
             } else {
                 $from = $v;
             }
-            $sender->Form->SetFormValue('datefrom', $get['datefrom']);
+            $sender->Form->setFormValue('datefrom', $get['datefrom']);
         }
 
         if ($v = val('dateto', $get)) {
             $v = strtotime($v);
             if (!$v) {
-                $sender->Form->AddError('Invalid Date format for To Date.');
+                $sender->Form->addError('Invalid Date format for To Date.');
             } else {
                 $to = $v;
             }
-            $sender->Form->SetFormValue('dateto', $get['dateto']);
+            $sender->Form->setFormValue('dateto', $get['dateto']);
         }
 
         if (isset($from) && isset($to)) {
@@ -75,30 +75,30 @@ class ElasticLogSearch extends Gdn_Plugin {
             ];
         }
 
-        $sender->Form->SetFormValue('priority', 'All');
+        $sender->Form->setFormValue('priority', 'All');
         if (($v = val('priority', $get)) && $v != 'All') {
 
             $params['body']['query']['filtered']['filter']['bool']['must'][]['range']['message.priority'] = [
                 'to' => $v,
             ];
 
-            $sender->Form->SetFormValue('priority', $v);
+            $sender->Form->setFormValue('priority', $v);
 
         }
 
         if ($v = val('event', $get)) {
             $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.event'] = $v;
-            $sender->Form->SetFormValue('event', $v);
+            $sender->Form->setFormValue('event', $v);
         }
 
         if ($v = val('siteid', $get)) {
             $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.siteid'] = $v;
-            $sender->Form->SetFormValue('siteid ', $v);
+            $sender->Form->setFormValue('siteid ', $v);
         }
 
         if ($v = val('ipaddress', $get)) {
             $params['body']['query']['filtered']['filter']['bool']['must'][]['term']['message.ip'] = $v;
-            $sender->Form->SetFormValue('ipaddress', $v);
+            $sender->Form->setFormValue('ipaddress', $v);
         }
 
         $sortOrder = 'desc';
@@ -111,12 +111,12 @@ class ElasticLogSearch extends Gdn_Plugin {
         }
 
         $params['sort'] = ['@timestamp:' . $sortOrder];
-        $sender->Form->SetFormValue('sortorder', $sortOrder);
+        $sender->Form->setFormValue('sortorder', $sortOrder);
 
         $params['from'] = $offset;
         $params['size'] = $limit;
 
-        Trace($params);
+        trace($params);
 
         try {
             $results = $elasticSearch->search($params);
@@ -125,7 +125,7 @@ class ElasticLogSearch extends Gdn_Plugin {
         } catch (Exception $e) {
             // Query Error
             $searchMessage = json_decode($e->getMessage());
-            Trace($searchMessage, TRACE_ERROR);
+            trace($searchMessage, TRACE_ERROR);
             $events = [];
             $results = [];
         }
@@ -133,12 +133,12 @@ class ElasticLogSearch extends Gdn_Plugin {
         // Application calculation.
         foreach ($events as &$event) {
             $event['Url'] = $event['Domain'] . ltrim($event['Path'], '/');
-//            $event['InsertProfileUrl'] = UserUrl(Gdn::UserModel()->GetID($event['InsertUserID']));
+//            $event['InsertProfileUrl'] = userUrl(Gdn::userModel()->getID($event['InsertUserID']));
 
             unset($event['Domain'], $event['Path']);
         }
 
-        $sender->AddSideMenu();
+        $sender->addSideMenu();
         $priorityOptions = [
             Logger::DEBUG => LOG_DEBUG,
             Logger::INFO => LOG_INFO,
@@ -152,13 +152,13 @@ class ElasticLogSearch extends Gdn_Plugin {
         $priorityOptions = array_flip($priorityOptions);
         $priorityOptions['All'] = 'All';
 
-        $filter = Gdn::Request()->Get();
+        $filter = Gdn::request()->get();
         unset($filter['TransientKey']);
         unset($filter['hpt']);
         unset($filter['Filter']);
         $currentFilter = http_build_query($filter);
 
-        $sender->SetData(
+        $sender->setData(
             [
                 'Events' => $events,
                 'PriorityOptions' => $priorityOptions,
@@ -167,14 +167,14 @@ class ElasticLogSearch extends Gdn_Plugin {
             ]
         );
 
-        $pager = PagerModule::Current();
+        $pager = PagerModule::current();
         $totalRecords = valr('hits.total', $results, 0);
         unset($filter['Page']);
         $currentFilter = http_build_query($filter);
-        $pager->Configure($offset, $limit, $totalRecords, '/settings/applog?' . $currentFilter . '&Page={Page}');
+        $pager->configure($offset, $limit, $totalRecords, '/settings/applog?' . $currentFilter . '&Page={Page}');
 
 
-        $sender->Render('eventlog', '', 'plugins/ElasticLogSearch');
+        $sender->render('eventlog', '', 'plugins/ElasticLogSearch');
     }
 
 
@@ -188,13 +188,13 @@ class ElasticLogSearch extends Gdn_Plugin {
                 $siteIDs[$siteID] = true;
             }
         }
-        $sQL = GDN::SQL();
-        $sites = $sQL->Select('SiteID, Name')->From('Multisite')->WhereIn('SiteID', array_keys($siteIDs))->Get()->ResultArray();
+        $sQL = GDN::sql();
+        $sites = $sQL->select('SiteID, Name')->from('Multisite')->whereIn('SiteID', array_keys($siteIDs))->get()->resultArray();
         $sites = array_column($sites, 'Name', 'SiteID');
         $i = 0;
         foreach ($hits as $hit) {
 
-            $message = FormatString(valr('_source.message.msg', $hit), valr('_source.message', $hit));
+            $message = formatString(valr('_source.message.msg', $hit), valr('_source.message', $hit));
             if ($message == '') {
                 continue;
             }
@@ -213,7 +213,7 @@ class ElasticLogSearch extends Gdn_Plugin {
                 'SiteName' => val(valr('_source.message.siteid', $hit), $sites, 'unknown'),
                 'Source' => ''
             ];
-            if (C('Debug')) {
+            if (c('Debug')) {
                 $rows[$i]['Source'] = $hit;
             }
             $i++;
@@ -236,7 +236,7 @@ class ElasticLogSearch extends Gdn_Plugin {
     /**
      * Used for localhost testing.
      */
-    public function VanillaController_TestElastic_Create() {
+    public function vanillaController_testElastic_create() {
 
         if (!$this->localHostDev) {
             return;
@@ -315,7 +315,7 @@ class ElasticLogSearch extends Gdn_Plugin {
      * @param Elastic $sender
      * @param array $args Sending arguments.
      */
-    public function Elastic_GetIdentity_Handler($sender, $args) {
+    public function elastic_getIdentity_handler($sender, $args) {
 
         if (!$this->localHostDev) {
             return;

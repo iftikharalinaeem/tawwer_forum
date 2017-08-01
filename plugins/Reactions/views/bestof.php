@@ -1,16 +1,16 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <style>
    .CountItemWrap {
-      width: <?php echo round(100 / (2 + count($this->Data('ReactionTypes', [])))).'%'; ?>
+      width: <?php echo round(100 / (2 + count($this->data('ReactionTypes', [])))).'%'; ?>
    }
 </style>
 
 <?php
 include_once 'reaction_functions.php';
 
-function ReactionFilterButton($name, $code, $currentReactionType) {
+function reactionFilterButton($name, $code, $currentReactionType) {
    $lCode = strtolower($code);
-   $url = Url("/bestof/$lCode");
+   $url = url("/bestof/$lCode");
    $imgSrc = "https://badges.v-cdn.net/reactions/50/$lCode.png";
    $cssClass = '';
    if ($currentReactionType == $lCode)
@@ -30,9 +30,9 @@ EOT;
    return $result;
 }
 
-echo Wrap($this->Data('Title'), 'h1 class="H"');
+echo wrap($this->data('Title'), 'h1 class="H"');
 
-echo Gdn_Theme::Module('BestOfFilterModule');
+echo Gdn_Theme::module('BestOfFilterModule');
    
 echo '<div class="BestOfData">';
 include_once('datalist.php');

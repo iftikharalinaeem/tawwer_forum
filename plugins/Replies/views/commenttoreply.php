@@ -1,22 +1,22 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 
 <?php
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 
-echo '<div class="P">'.$this->Data('MoveMessage').'</div>';
+echo '<div class="P">'.$this->data('MoveMessage').'</div>';
 
 echo '<div class="CommentList">';
 $ID = 0;
-foreach ($this->Data('Comments') as $Row) {
+foreach ($this->data('Comments') as $Row) {
    $ElemID = "Form_ReplyToCommentID$ID";
    echo '<div class="Item">';
    
    $Name = htmlspecialchars($Row['InsertName']);
    
-   echo $this->Form->Radio('CommentID', "<b>$Name</b> ".htmlspecialchars($Row['Summary']), ['id' => $ElemID, 'value' => ReplyRecordID($Row)]);
+   echo $this->Form->radio('CommentID', "<b>$Name</b> ".htmlspecialchars($Row['Summary']), ['id' => $ElemID, 'value' => replyRecordID($Row)]);
    echo '</div>';
    
    $ID++;
@@ -24,8 +24,8 @@ foreach ($this->Data('Comments') as $Row) {
 echo '</div>';
 
 echo '<div class="Buttons Buttons-Confirm">';
-echo $this->Form->Button('Cancel', ['type' => 'button', 'class' => 'Button Close']);
-echo $this->Form->Button('OK', ['class' => 'Button Primary']);
+echo $this->Form->button('Cancel', ['type' => 'button', 'class' => 'Button Close']);
+echo $this->Form->button('OK', ['class' => 'Button Primary']);
 echo '<div>';
-echo $this->Form->Close();
+echo $this->Form->close();
 ?>

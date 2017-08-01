@@ -27,6 +27,6 @@ if ($icon || $crop) {
 }
 ?>
 <?php echo $this->Form->close();
-echo anchor(sprintf(t('Return to %s'), t('Group')), GroupUrl($this->data('Group')), 'Button ButtonGroup');
+echo anchor(sprintf(t('Return to %s'), t('Group')), groupUrl($this->data('Group')), 'Button ButtonGroup');
 echo '</div>';
 

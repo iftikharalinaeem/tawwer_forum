@@ -2,24 +2,24 @@
 
 <?php if (!$this->Data['IsConfigured']) { ?>
 
-    <div class="alert alert-danger padded"><?php echo T('Your Cleanspeak Integration is NOT complete.  Enabling the plugin before it has
+    <div class="alert alert-danger padded"><?php echo t('Your Cleanspeak Integration is NOT complete.  Enabling the plugin before it has
 been configured will force all new content to go into the premoderation queue.'); ?>
     </div>
 
 <?php } ?>
 
 <div class="padded list-un-reset">
-    <h3><?php echo T('Setup Instructions'); ?></h3>
+    <h3><?php echo t('Setup Instructions'); ?></h3>
 
     <ol>
-        <li><?php echo T('Complete the form below.'); ?></li>
-        <li><?php echo T('Add a new notification server to Cleanspeak.'); ?>
+        <li><?php echo t('Complete the form below.'); ?></li>
+        <li><?php echo t('Add a new notification server to Cleanspeak.'); ?>
             <ul>
                 <li>URL: <?php echo $this->Data['PostBackURL']; ?></li>
-                <li><?php echo T('Select the application(s) you want notifications from.'); ?></li>
+                <li><?php echo t('Select the application(s) you want notifications from.'); ?></li>
             </ul>
         </li>
-        <li><?php echo T('Enable the plugin.'); ?></li>
+        <li><?php echo t('Enable the plugin.'); ?></li>
     </ol>
 </div>
 
@@ -44,8 +44,8 @@ been configured will force all new content to go into the premoderation queue.')
 
 <?php
 // Settings
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 
 <ul>
@@ -74,4 +74,4 @@ echo $this->Form->Errors();
     </li>
 
 </ul>
-<?php echo $this->Form->Close('Save'); ?>
+<?php echo $this->Form->close('Save'); ?>

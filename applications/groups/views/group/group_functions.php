@@ -6,7 +6,7 @@ if (!function_exists('DateTile')):
      *
      * @param string $date
      */
-    function DateTile($date) {
+    function dateTile($date) {
         if (is_string($date)) {
             $date = new DateTime($date);
         }
@@ -28,20 +28,20 @@ if (!function_exists('getGroupOptions')):
  */
 function getGroupOptions($group, $sectionId = 'home') {
      $options = [];
-     if (GroupPermission('Edit', $group)) {
-          $options['Edit'] = ['Text' => sprintf(t('Edit %s'), t('Group')), 'Url' => GroupUrl($group, 'edit')];
+     if (groupPermission('Edit', $group)) {
+          $options['Edit'] = ['Text' => sprintf(t('Edit %s'), t('Group')), 'Url' => groupUrl($group, 'edit')];
      }
-     if (GroupPermission('Leave', $group)) {
-          $options['Leave'] = ['Text' => t('Leave Group'), 'Url' => GroupUrl($group, 'leave'), 'CssClass' => 'Popup'];
+     if (groupPermission('Leave', $group)) {
+          $options['Leave'] = ['Text' => t('Leave Group'), 'Url' => groupUrl($group, 'leave'), 'CssClass' => 'Popup'];
      }
-     if (GroupPermission('Leader', $group)) {
-          $options['Delete'] = ['Text' => sprintf(t('Delete %s'), t('Group')), 'Url' => GroupUrl($group, 'delete'), 'CssClass' => 'Popup'];
+     if (groupPermission('Leader', $group)) {
+          $options['Delete'] = ['Text' => sprintf(t('Delete %s'), t('Group')), 'Url' => groupUrl($group, 'delete'), 'CssClass' => 'Popup'];
      }
-     if (GroupPermission('Leader', $group)) {
-          $options['Invite'] = ['Text' => t('Invite Members'), 'Url' => GroupUrl($group, 'invite'), 'CssClass' => 'js-invite-members'];
+     if (groupPermission('Leader', $group)) {
+          $options['Invite'] = ['Text' => t('Invite Members'), 'Url' => groupUrl($group, 'invite'), 'CssClass' => 'js-invite-members'];
      }
-     if (GroupPermission('Leader', $group)) {
-          $options['Members'] = ['Text' => t('Manage Members'), 'Url' => GroupUrl($group, 'members')];
+     if (groupPermission('Leader', $group)) {
+          $options['Members'] = ['Text' => t('Manage Members'), 'Url' => groupUrl($group, 'members')];
      }
      return $options;
 }
@@ -57,18 +57,18 @@ if (!function_exists('getGroupButtons')):
 function getGroupButtons($group) {
      $groupModel = new GroupModel();
      $buttons = [];
-     if (Gdn::session()->isValid() && !GroupPermission('Member', $group) && GroupPermission('Join', $group) && !$groupModel->getApplicantType(val('GroupID', $group))) {
+     if (Gdn::session()->isValid() && !groupPermission('Member', $group) && groupPermission('Join', $group) && !$groupModel->getApplicantType(val('GroupID', $group))) {
           $joinButton['text'] = t('Join');
-          $joinButton['url'] = GroupUrl($group, 'join');
+          $joinButton['url'] = groupUrl($group, 'join');
           $joinButton['cssClass'] = 'Popup';
           $buttons[] = $joinButton;
      }
      if (Gdn::session()->isValid() && ($groupModel->getApplicantType(val('GroupID', $group))) === 'Invitation') {
           $acceptButton['text'] = t('Join');
-          $acceptButton['url'] = GroupUrl($group, 'inviteaccept');
+          $acceptButton['url'] = groupUrl($group, 'inviteaccept');
           $acceptButton['cssClass'] = 'Hijack';
           $declineButton['text'] = t('Decline');
-          $declineButton['url'] = GroupUrl($group, 'invitedecline');
+          $declineButton['url'] = groupUrl($group, 'invitedecline');
           $declineButton['cssClass'] = 'Hijack';
           $buttons[] = $acceptButton;
           $buttons[] = $declineButton;
@@ -101,11 +101,11 @@ function writeDiscussionList($sender, $type = 'discussions', $emptyMessage = '',
           <div class="PageControls">
                 <h2 class="H"><?php echo $title; ?></h2>
                 <?php
-                if ($type == 'announcements' && GroupPermission('Moderate')) {
+                if ($type == 'announcements' && groupPermission('Moderate')) {
                      echo '<div class="Button-Controls">';
-                     echo anchor(sprintf(t('New Announcement')), GroupUrl($sender->data('Group'), 'announcement'), 'Button Primary');
+                     echo anchor(sprintf(t('New Announcement')), groupUrl($sender->data('Group'), 'announcement'), 'Button Primary');
                      echo '</div>';
-                } else if ($type == 'discussions' && (GroupPermission('Member') || GroupPermission('Moderate'))) {
+                } else if ($type == 'discussions' && (groupPermission('Member') || groupPermission('Moderate'))) {
                      echo '<div class="Button-Controls">';
                      echo Gdn_Theme::module('NewDiscussionModule', ['CssClass' => 'Button Action Primary', 'QueryString' => 'groupid='.$sender->data('Group.GroupID')]);
                      echo '</div>';
@@ -124,7 +124,7 @@ function writeDiscussionList($sender, $type = 'discussions', $emptyMessage = '',
                      } else if ($layout == 'modern') {
                           include_once($sender->fetchViewLocation('helper_functions', 'discussions', 'vanilla')); ?>
                           <ul class="DataList <?php echo $title; ?>">
-                                <?php foreach($sender->Data('Discussions') as $discussion) {
+                                <?php foreach($sender->data('Discussions') as $discussion) {
                                      writeDiscussion($discussion, $sender, Gdn::session());
                                 }?>
                           </ul> <?php
@@ -132,7 +132,7 @@ function writeDiscussionList($sender, $type = 'discussions', $emptyMessage = '',
                 }
                 if ($type == 'discussions' && $sender->data('Discussions')->result()) {
                      echo '<div class="MoreWrap">'.
-                                anchor(t('All Discussions'), GroupUrl($sender->Data('Group'), 'discussions')).
+                                anchor(t('All Discussions'), groupUrl($sender->data('Group'), 'discussions')).
                           '</div>';
                 }
                 ?>
@@ -163,9 +163,9 @@ if (!function_exists('WriteEmptyState')):
  *
  * @param string $message HTML.
  */
-function WriteEmptyState($message) {
+function writeEmptyState($message) {
     if ($message)
-        echo Wrap($message, 'p', ['class' => 'EmptyMessage']);
+        echo wrap($message, 'p', ['class' => 'EmptyMessage']);
 }
 endif;
 
@@ -173,7 +173,7 @@ if (!function_exists('WriteGroupBanner')) :
 /**
  * Output optional group banner as a div background image to allow dynamic page resizing.
  */
-function WriteGroupBanner($group = []) {
+function writeGroupBanner($group = []) {
     if (!$group) {
       $group = Gdn::controller()->data('Group');
     }
@@ -193,43 +193,43 @@ if (!function_exists('WriteGroupButtons')) :
  *
  * @param array $group Optional. Uses data array's Group if none is provided.
  */
-function WriteGroupButtons($group = null) {
+function writeGroupButtons($group = null) {
     if (!$group)
-        $group = Gdn::Controller()->Data('Group');
+        $group = Gdn::controller()->data('Group');
     if (!$group)
         return;
     echo '<div class="Group-Buttons">';
 
-    if (Gdn::Session()->IsValid() && !GroupPermission('Member', $group)) {
-        if (GroupPermission('Join', $group)) {
-            echo ' '.Anchor(T('Join this Group'), GroupUrl($group, 'join'), 'Button Primary Group-JoinButton Popup').' ';
+    if (Gdn::session()->isValid() && !groupPermission('Member', $group)) {
+        if (groupPermission('Join', $group)) {
+            echo ' '.anchor(t('Join this Group'), groupUrl($group, 'join'), 'Button Primary Group-JoinButton Popup').' ';
         } else {
-            echo ' '.Wrap(T('Join this Group'), 'span', ['class' => 'Button Primary Group-JoinButton Disabled', 'title' => GroupPermission('Join.Reason', $group)]).' ';
+            echo ' '.wrap(t('Join this Group'), 'span', ['class' => 'Button Primary Group-JoinButton Disabled', 'title' => groupPermission('Join.Reason', $group)]).' ';
         }
     }
 
-    if (GroupPermission('Leader', $group)) {
-        echo ' '.Anchor(T('Invite'), GroupUrl($group, 'invite'), 'Button Primary Group-InviteButton Popup').' ';
+    if (groupPermission('Leader', $group)) {
+        echo ' '.anchor(t('Invite'), groupUrl($group, 'invite'), 'Button Primary Group-InviteButton Popup').' ';
     }
 
     $options = [];
 
-    if (GroupPermission('Edit', $group)) {
-        $options['Edit'] = ['Text' => T('Edit'), 'Url' => GroupUrl($group, 'edit')];
+    if (groupPermission('Edit', $group)) {
+        $options['Edit'] = ['Text' => t('Edit'), 'Url' => groupUrl($group, 'edit')];
     }
-//    if (GroupPermission('Delete')) {
-//        $Options['Delete'] = array('Text' => T('Delete'), 'Url' => GroupUrl($Group, 'delete'));
+//    if (groupPermission('Delete')) {
+//        $Options['Delete'] = array('Text' => t('Delete'), 'Url' => groupUrl($Group, 'delete'));
 //    }
-    if (GroupPermission('Leave', $group)) {
-        $options['Leave'] = ['Text' => T('Leave Group'), 'Url' => GroupUrl($group, 'leave'), 'CssClass' => 'Popup'];
+    if (groupPermission('Leave', $group)) {
+        $options['Leave'] = ['Text' => t('Leave Group'), 'Url' => groupUrl($group, 'leave'), 'CssClass' => 'Popup'];
     }
 
-    if (GroupPermission('Leader', $group)) {
-        $options['Delete'] = ['Text' => sprintf(T('Delete %s'), T('Group')), 'Url' => GroupUrl($group, 'delete'), 'CssClass' => 'Popup'];
+    if (groupPermission('Leader', $group)) {
+        $options['Delete'] = ['Text' => sprintf(t('Delete %s'), t('Group')), 'Url' => groupUrl($group, 'delete'), 'CssClass' => 'Popup'];
     }
 
     if (count($options))
-        echo ButtonDropDown($options, 'Button DropRight Group-OptionsButton', Sprite('SpOptions', 'Sprite16'));
+        echo buttonDropDown($options, 'Button DropRight Group-OptionsButton', sprite('SpOptions', 'Sprite16'));
 
     echo '</div>';
 }
@@ -287,13 +287,13 @@ if (!function_exists('WriteGroupCards')) :
  * @param array $groups
  * @param string $emptyMessage
  */
-function WriteGroupCards($groups, $emptyMessage = '') {
+function writeGroupCards($groups, $emptyMessage = '') {
     if (!$groups)
-        WriteEmptyState($emptyMessage);
+        writeEmptyState($emptyMessage);
     else {
         echo '<div class="Cards Cards-Groups">';
         foreach ($groups as $group) {
-            WriteGroupCard($group);
+            writeGroupCard($group);
         }
         echo '</div>';
     }
@@ -307,24 +307,24 @@ if (!function_exists('WriteGroupCard')) :
  * @param array $group
  * @param bool $withButtons Optional. Whether to show group management option cog
  */
-function WriteGroupCard($group, $withButtons = true) {
+function writeGroupCard($group, $withButtons = true) {
     echo '<div class="CardWrap"><div class="Group Card">';
-        $url = GroupUrl($group);
+        $url = groupUrl($group);
         echo "<a href=\"$url\" class=\"TextColor\">";
-            WriteGroupIcon($group, 'Group-Icon Card-Icon');
+            writeGroupIcon($group, 'Group-Icon Card-Icon');
             echo '<h3 class="Group-Name">'.htmlspecialchars($group['Name']).'</h3>';
         echo '</a>';
 
         echo '<p class="Group-Description">'.
-             htmlspecialchars(SliceString(
-                Gdn_Format::PlainText($group['Description'], $group['Format']),
-                C('Groups.CardDescription.ExcerptLength', 150))).'</p>';
+             htmlspecialchars(sliceString(
+                Gdn_Format::plainText($group['Description'], $group['Format']),
+                c('Groups.CardDescription.ExcerptLength', 150))).'</p>';
         echo '<div class="Group-Members">'
-.                  Plural($group['CountMembers'], '%s member','%s members', number_format($group['CountMembers']))
+.                  plural($group['CountMembers'], '%s member','%s members', number_format($group['CountMembers']))
              .'</div>';
 
         if ($withButtons)
-            WriteGroupButtons($group);
+            writeGroupButtons($group);
     echo '</div></div>';
 }
 endif;
@@ -335,9 +335,9 @@ if (!function_exists('WriteGroupIcon')) :
  *
  * @param array $Group Optional. Uses data array's Group if none is provided.
  */
-function WriteGroupIcon($group = false, $class = 'Group-Icon', $addChangeIconLink = false) {
+function writeGroupIcon($group = false, $class = 'Group-Icon', $addChangeIconLink = false) {
     if (!$group) {
-         $group = Gdn::Controller()->Data('Group');
+         $group = Gdn::controller()->data('Group');
     }
     if (val('Icon', $group)) {
          $icon = val('Icon', $group);
@@ -346,11 +346,11 @@ function WriteGroupIcon($group = false, $class = 'Group-Icon', $addChangeIconLin
     }
     if ($icon) {
          $output = '';
-         if ($addChangeIconLink && GroupPermission('Edit', val('GroupID', $group))) {
+         if ($addChangeIconLink && groupPermission('Edit', val('GroupID', $group))) {
               $output .= '';
-              $output .= anchor('<span class="icon icon-camera"></span>'.t('Change Icon'), GroupUrl($group, 'groupicon'), 'ChangePicture');
+              $output .= anchor('<span class="icon icon-camera"></span>'.t('Change Icon'), groupUrl($group, 'groupicon'), 'ChangePicture');
          }
-         $output .= img(Gdn_Upload::Url($icon), ['class' => $class]);
+         $output .= img(Gdn_Upload::url($icon), ['class' => $class]);
 
          echo wrap($output, 'div', ['class' => 'Photo PhotoWrap PhotoWrapLarge Group-Icon-Big-Wrap']);
     }
@@ -363,12 +363,12 @@ if (!function_exists('WriteGroupList')) :
  *
  * @param array $groups
  */
-function WriteGroupList($groups) {
+function writeGroupList($groups) {
     if (is_array($groups)) {
         echo '<ul class="NarrowList DataList-Groups">';
         foreach ($groups as $group) {
             echo '<li class="Item Item-Group">';
-            echo Anchor(Gdn_Format::Text($group['Name']), GroupUrl($group));
+            echo anchor(Gdn_Format::text($group['Name']), groupUrl($group));
             echo '</li>';
         }
         echo '</ul>';
@@ -383,11 +383,11 @@ if (!function_exists('WriteMemberGrid')) :
  *
  * @param array $members
  */
-function WriteMemberGrid($members, $more = '') {
+function writeMemberGrid($members, $more = '') {
     if (is_array($members)) {
         echo '<div class="PhotoGrid PhotoGridSmall">';
         foreach ($members as $member) {
-             echo UserPhoto($member, val('Role', $member));
+             echo userPhoto($member, val('Role', $member));
         }
         if ($more) {
 
@@ -405,11 +405,11 @@ if (!function_exists('WriteMemberSimpleList')) :
  *
  * @param array $members
  */
-function WriteMemberSimpleList($members) {
+function writeMemberSimpleList($members) {
     if (is_array($members)) {
         echo '<ul class="Group-MemberList">';
         foreach ($members as $member) {
-            echo '<li class="Group-Member UserTile">'.UserPhoto($member).' '.UserAnchor($member)."</li>\n";
+            echo '<li class="Group-Member UserTile">'.userPhoto($member).' '.userAnchor($member)."</li>\n";
         }
         echo '</ul>';
     }

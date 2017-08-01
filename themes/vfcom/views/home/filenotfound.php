@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-   <h1><?php echo T('Page Not Found'); ?></h1>
-   <p><?php echo T('The page you were looking for could not be found.'); ?></p>
+   <h1><?php echo t('Page Not Found'); ?></h1>
+   <p><?php echo t('The page you were looking for could not be found.'); ?></p>
 
    <p>
       <strong>Need some help?</strong>

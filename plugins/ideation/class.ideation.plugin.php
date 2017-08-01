@@ -74,7 +74,7 @@ class IdeationPlugin extends Gdn_Plugin {
      */
     public static function getUpTagID() {
         if (!self::$upTagID) {
-            $reactionUp = ReactionModel::ReactionTypes(self::REACTION_UP);
+            $reactionUp = ReactionModel::reactionTypes(self::REACTION_UP);
             self::setUpTagID(val('TagID', $reactionUp));
         }
         return self::$upTagID;
@@ -96,7 +96,7 @@ class IdeationPlugin extends Gdn_Plugin {
      */
     public static function getDownTagID() {
         if (!self::$downTagID) {
-            $reactionDown = ReactionModel::ReactionTypes(self::REACTION_DOWN);
+            $reactionDown = ReactionModel::reactionTypes(self::REACTION_DOWN);
             self::setDownTagID(val('TagID', $reactionDown));
         }
         return self::$downTagID;
@@ -136,7 +136,7 @@ class IdeationPlugin extends Gdn_Plugin {
      */
     public function settingsController_addEditCategory_handler($sender) {
         $categoryID = val('CategoryID', $sender->Data);
-        $sender->Head->AddString(
+        $sender->Head->addString(
             <<<EOT
 <script>
 	jQuery(document).ready(function($) {
@@ -206,7 +206,7 @@ EOT
             return;
         }
         $value = arrayValueI('Value', $options = $args['Options']); // The selected category id
-        $categoryData = CategoryModel::GetByPermission(
+        $categoryData = CategoryModel::getByPermission(
             'Discussions.View',
             $value,
             val('Filter', $options, ['Archived' => 0]),
@@ -236,7 +236,7 @@ EOT
      */
     public function settingsController_editStatus_create($sender, $statusID) {
         if (!$statusID) {
-            throw NotFoundException('Status');
+            throw notFoundException('Status');
         }
         $sender->title(sprintf(t('Edit %s'), t('Idea Status')));
         $this->addEdit($sender, $statusID);
@@ -277,7 +277,7 @@ EOT
             // We're about to edit, set up the data from the status.
             $data = StatusModel::instance()->getStatus($statusID);
             if (!$data) {
-                throw NotFoundException('Status');
+                throw notFoundException('Status');
             }
             $sender->Form->setData($data);
             $sender->Form->addHidden('StatusID', $statusID);
@@ -375,12 +375,12 @@ EOT
      */
     public function postController_editIdea_create($sender, $args) {
         if (!sizeof($args)) {
-            throw NotFoundException('Idea');
+            throw notFoundException('Idea');
         }
         $discussionID = $args[0];
 
         if (!$this->isIdea($discussionID)) {
-            throw NotFoundException('Idea');
+            throw notFoundException('Idea');
         }
         $sender->View = 'discussion';
         $sender->editDiscussion($discussionID);
@@ -684,9 +684,9 @@ EOT
      */
     public function discussionController_statusOptions_create($sender, $discussionID = '') {
         if ($discussionID) {
-            $discussion = $sender->DiscussionModel->GetID($discussionID);
+            $discussion = $sender->DiscussionModel->getID($discussionID);
             if (!$discussion || !$this->isIdea($discussion)) {
-                throw NotFoundException('Idea');
+                throw notFoundException('Idea');
             }
 
             if (!Gdn::session()->checkPermission('Vanilla.Moderation.Manage')
@@ -873,7 +873,7 @@ EOT
         $attachment['SourceURL'] = 'none';
 
         $discussionModel = new DiscussionModel();
-        $discussion = $discussionModel->GetID($discussionID);
+        $discussion = $discussionModel->getID($discussionID);
 
         $attachment['ForeignID'] = 'd-'.$discussionID;
         $attachment['ForeignUserID'] = val('InsertUserID', $discussion); // Not used.
@@ -950,7 +950,7 @@ EOT
             $vote = self::REACTION_UP;
         }
 
-        $reaction = ReactionModel::ReactionTypes($urlCode);
+        $reaction = ReactionModel::reactionTypes($urlCode);
         $cssClass = '';
 
         // If the changed reaction is the one that was selected and if we're inserting (not removing) the reaction, then add the css class.
@@ -1043,7 +1043,7 @@ EOT
      * @param DiscussionsController $sender
      */
     public function discussionsController_render_before($sender) {
-        if ($sender->DeliveryType() == DELIVERY_TYPE_ALL) {
+        if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
             $discussionsData = $sender->data('Discussions', false);
             if ($discussionsData !== false && $discussionsData instanceof Gdn_DataSet) {
                 $discussions = $discussionsData->result();
@@ -1068,7 +1068,7 @@ EOT
     /**
      * Returns an array of the sessioned user's votes where the key is the discussion ID and the value is the reaction's tag ID.
      *
-     * @param int|array $discussionIDs Discussion ID(s) to filter the results by.
+     * @param int|array $discussionIDs Discussion iD(s) to filter the results by.
      * @return array The sessioned user's votes
      */
     public function getUserVotes($discussionIDs = []) {
@@ -1157,15 +1157,15 @@ EOT
      */
     protected function getIdeaReactionButton($discussion, $urlCode, $reaction = null, $options = []) {
         if (!$reaction) {
-            $reaction = ReactionModel::ReactionTypes($urlCode);
+            $reaction = ReactionModel::reactionTypes($urlCode);
         }
 
         $name = $reaction['Name'];
         $label = t($name);
-        $id = GetValue('DiscussionID', $discussion);
+        $id = getValue('DiscussionID', $discussion);
         $linkClass = 'ReactButton-'.$urlCode.' '.val('cssClass', $options);
         $urlCode2 = strtolower($urlCode);
-        $url = Url("/react/discussion/$urlCode2?id=$id&selfreact=true");
+        $url = url("/react/discussion/$urlCode2?id=$id&selfreact=true");
         $dataAttr = "data-reaction=\"$urlCode2\"";
 
         return getReactionButtonHtml($linkClass, $url, $label, $urlCode2, $dataAttr);

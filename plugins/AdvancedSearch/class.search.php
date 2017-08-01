@@ -36,7 +36,7 @@ class Search {
             $usernames = array_map('trim', $usernames);
             $usernames = array_filter($usernames);
 
-            $users = Gdn::SQL()->select('UserID, Name')->from('User')->where('Name', $usernames)->get()->resultArray();
+            $users = Gdn::sql()->select('UserID, Name')->from('User')->where('Name', $usernames)->get()->resultArray();
             if (count($usernames) == 1 && empty($users)) {
                 // Searching for one author that doesn't exist.
                 $search['dosearch'] = false;
@@ -129,7 +129,7 @@ class Search {
             $tags = array_map('trim', $tags);
             $tags = array_filter($tags);
 
-            $tagData = Gdn::SQL()->select('TagID, Name')->from('Tag')->where('Name', $tags)->get()->resultArray();
+            $tagData = Gdn::sql()->select('TagID, Name')->from('Tag')->where('Name', $tags)->get()->resultArray();
             if (count($tags) == 1 && empty($tagData)) {
                 // Searching for one tag that doesn't exist.
                 $doSearch = false;

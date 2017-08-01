@@ -93,7 +93,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             '<span class="ReactSprite ReactWarn"></span> '.t('Warn'),
             '/profile/warn?'.http_build_query($args),
             'ReactButton ReactButton-Warn Popup',
-            ['title' => T('Warn')]
+            ['title' => t('Warn')]
         );
         return $result;
     }
@@ -104,7 +104,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * Process expired warning on sign in.
      */
     public function base_afterSignIn_handler() {
-        if (Gdn::Session()->UserID) {
+        if (Gdn::session()->UserID) {
             $warningModel = new WarningModel();
             $warningModel->processWarnings(Gdn::session()->UserID);
         }
@@ -496,7 +496,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ProfileController $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function ProfileController_BeforeUserInfo_Handler($sender, $args) {
+    public function profileController_beforeUserInfo_handler($sender, $args) {
         echo Gdn_Theme::module('UserWarningModule');
         return;
 
@@ -815,7 +815,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $sender->_setBreadcrumbs(t('Warn'), '/profile/warn?userid='.$user['UserID']);
 
-//      $Meta = Gdn::UserMetaModel()->GetUserMeta($UserID, 'Warnings.%');
+//      $Meta = Gdn::userMetaModel()->getUserMeta($UserID, 'Warnings.%');
 //      $CurrentLevel = val('Warnings.Level', $Meta, 0);
 
         $form = new Gdn_Form();
@@ -853,7 +853,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             }
 
             if ($form->save()) {
-                $sender->informMessage(T('Your warning was added.'));
+                $sender->informMessage(t('Your warning was added.'));
                 $sender->jsonTarget('', '', 'Refresh');
             }
         } else {

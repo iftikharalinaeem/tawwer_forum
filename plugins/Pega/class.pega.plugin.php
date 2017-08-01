@@ -35,17 +35,17 @@ class PegaPlugin extends Gdn_Plugin {
      *
      * @throws Gdn_UserException
      */
-    public function Setup() {
-        SaveToConfig('Garden.AttachmentsEnabled', true);
+    public function setup() {
+        saveToConfig('Garden.AttachmentsEnabled', true);
         $error = '';
         if (!function_exists('curl_init')) {
-            $error = ConcatSep("\n", $error, 'This plugin requires curl.');
+            $error = concatSep("\n", $error, 'This plugin requires curl.');
         }
         if ($error) {
             throw new Gdn_UserException($error, 400);
         }
         // Save the provider type.
-        Gdn::SQL()->Replace('UserAuthenticationProvider',
+        Gdn::sql()->replace('UserAuthenticationProvider',
             [
                 'AuthenticationSchemeAlias' => 'Pega',
                 'URL' => '...',
@@ -54,21 +54,21 @@ class PegaPlugin extends Gdn_Plugin {
             ],
             ['AuthenticationKey' => self::ProviderKey], TRUE
         );
-        Gdn::PermissionModel()->Define(['Garden.Staff.Allow' => 'Garden.Moderation.Manage']);
+        Gdn::permissionModel()->define(['Garden.Staff.Allow' => 'Garden.Moderation.Manage']);
 
-        SaveToConfig('Plugins.Pega.CreateCases', true);
+        saveToConfig('Plugins.Pega.CreateCases', true);
     }
 
     /**
      * @param Controller $sender
      * @param array $args
      */
-    public function Base_GetConnections_Handler($sender, $args) {
-        if (!Pega::IsConfigured()) {
+    public function base_getConnections_handler($sender, $args) {
+        if (!Pega::isConfigured()) {
             return;
         }
         //Staff Only
-        if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+        if (!Gdn::session()->checkPermission('Garden.Staff.Allow')) {
             return;
         }
     }
@@ -80,25 +80,25 @@ class PegaPlugin extends Gdn_Plugin {
      * @param bool $code
      *
      */
-    public function ProfileController_PegaConnect_Create($sender, $userReference = '', $username = '', $code = FALSE) {
-        $sender->Permission('Garden.SignIn.Allow');
-        $sender->GetUserInfo($userReference, $username, '', TRUE);
-        $sender->_SetBreadcrumbs(T('Connections'), UserUrl($sender->User, '', 'connections'));
+    public function profileController_pegaConnect_create($sender, $userReference = '', $username = '', $code = FALSE) {
+        $sender->permission('Garden.SignIn.Allow');
+        $sender->getUserInfo($userReference, $username, '', TRUE);
+        $sender->_SetBreadcrumbs(t('Connections'), userUrl($sender->User, '', 'connections'));
         //check $GET state // if DashboardConnection // then do global connection.
-        $state = GetValue('state', $_GET, FALSE);
+        $state = getValue('state', $_GET, FALSE);
         if ($state == 'DashboardConnection') {
             try {
-                $tokens = Pega::GetTokens($code, Pega::ProfileConnecUrl());
+                $tokens = Pega::getTokens($code, Pega::profileConnecUrl());
             } catch (Gdn_UserException $e) {
                 $message = $e->getMessage();
-                Gdn::Dispatcher()->PassData('Exception', htmlspecialchars($message))
-                    ->Dispatch('home/error');
+                Gdn::dispatcher()->passData('Exception', htmlspecialchars($message))
+                    ->dispatch('home/error');
                 return;
             }
             redirectTo('/plugin/Pega/?DashboardConnection=1&'.http_build_query($tokens));
         }
         try {
-            $tokens = Pega::GetTokens($code, Pega::ProfileConnecUrl());
+            $tokens = Pega::getTokens($code, Pega::profileConnecUrl());
         } catch (Gdn_UserException $e) {
             $attributes = [
                 'RefreshToken' => NULL,
@@ -106,19 +106,19 @@ class PegaPlugin extends Gdn_Plugin {
                 'InstanceUrl' => NULL,
                 'Profile' => NULL,
             ];
-            Gdn::UserModel()->SaveAttribute($sender->User->UserID, Pega::ProviderKey, $attributes);
+            Gdn::userModel()->saveAttribute($sender->User->UserID, Pega::ProviderKey, $attributes);
             $message = $e->getMessage();
-            Gdn::Dispatcher()->PassData('Exception', htmlspecialchars($message))
-                ->Dispatch('home/error');
+            Gdn::dispatcher()->passData('Exception', htmlspecialchars($message))
+                ->dispatch('home/error');
             return;
         }
-        $accessToken = GetValue('access_token', $tokens);
-        $instanceUrl = GetValue('instance_url', $tokens);
-        $loginID = GetValue('id', $tokens);
-        $refreshToken = GetValue('refresh_token', $tokens);
+        $accessToken = getValue('access_token', $tokens);
+        $instanceUrl = getValue('instance_url', $tokens);
+        $loginID = getValue('id', $tokens);
+        $refreshToken = getValue('refresh_token', $tokens);
         $pega = new Pega($accessToken, $instanceUrl);
-        $profile = $pega->GetLoginProfile($loginID);
-        Gdn::UserModel()->SaveAuthentication([
+        $profile = $pega->getLoginProfile($loginID);
+        Gdn::userModel()->saveAuthentication([
             'UserID' => $sender->User->UserID,
             'Provider' => Pega::ProviderKey,
             'UniqueID' => $profile['id']
@@ -129,12 +129,12 @@ class PegaPlugin extends Gdn_Plugin {
             'InstanceUrl' => $instanceUrl,
             'Profile' => $profile,
         ];
-        Gdn::UserModel()->SaveAttribute($sender->User->UserID, Pega::ProviderKey, $attributes);
+        Gdn::userModel()->saveAttribute($sender->User->UserID, Pega::ProviderKey, $attributes);
         $this->EventArguments['Provider'] = Pega::ProviderKey;
         $this->EventArguments['User'] = $sender->User;
-        $this->FireEvent('AfterConnection');
+        $this->fireEvent('AfterConnection');
 
-        $redirectUrl = UserUrl($sender->User, '', 'connections');
+        $redirectUrl = userUrl($sender->User, '', 'connections');
 
         redirectTo($redirectUrl);
     }
@@ -144,32 +144,32 @@ class PegaPlugin extends Gdn_Plugin {
      *
      * @param DashboardController $sender
      */
-    public function PluginController_Pega_Create($sender) {
-        $sender->Permission('Garden.Settings.Manage');
-        $sender->Title('Pega');
-        $sender->AddSideMenu('plugin/Pega');
+    public function pluginController_pega_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
+        $sender->title('Pega');
+        $sender->addSideMenu('plugin/Pega');
         $sender->Form = new Gdn_Form();
-        $this->Dispatch($sender, $sender->RequestArgs);
+        $this->dispatch($sender, $sender->RequestArgs);
     }
 
     /**
      * Redirect to allow for DashboardConnection
      */
-    public function Controller_Connect() {
-        $authorizeUrl = Pega::AuthorizeUri(FALSE, 'DashboardConnection');
+    public function controller_Connect() {
+        $authorizeUrl = Pega::authorizeUri(FALSE, 'DashboardConnection');
         redirectTo($authorizeUrl, 302, false);
     }
 
     /**
      * Redirect to allow for DashboardConnection
      */
-    public function Controller_Disconnect() {
-        $pega = Pega::Instance();
-        $pega->UseDashboardConnection();
-        $token = GetValue('token', $_GET, FALSE);
+    public function controller_Disconnect() {
+        $pega = Pega::instance();
+        $pega->useDashboardConnection();
+        $token = getValue('token', $_GET, FALSE);
         if ($token) {
-            $pega->Revoke($token);
-            RemoveFromConfig([
+            $pega->revoke($token);
+            removeFromConfig([
                 'Plugins.Pega.DashboardConnection.Token' => FALSE,
                 'Plugins.Pega.DashboardConnection.RefreshToken' => FALSE,
                 'Plugins.Pega.DashboardConnection.Token' => FALSE,
@@ -180,13 +180,13 @@ class PegaPlugin extends Gdn_Plugin {
     }
 
 
-    public function Controller_Enable() {
-        SaveToConfig('Plugins.Pega.DashboardConnection.Enabled', TRUE);
+    public function controller_Enable() {
+        saveToConfig('Plugins.Pega.DashboardConnection.Enabled', TRUE);
         redirectTo('/plugin/Pega');
     }
 
-    public function Controller_Disable() {
-        RemoveFromConfig('Plugins.Pega.DashboardConnection.Enabled');
+    public function controller_Disable() {
+        removeFromConfig('Plugins.Pega.DashboardConnection.Enabled');
         redirectTo('/plugin/Pega');
     }
 
@@ -196,81 +196,81 @@ class PegaPlugin extends Gdn_Plugin {
      *
      * @param DashboardController $sender
      */
-    public function Controller_Index($sender) {
-        $pega = Pega::Instance();
-        if (GetValue('DashboardConnection', $_GET, FALSE)) {
-            $sender->SetData('DashboardConnection', TRUE);
-            SaveToConfig([
+    public function controller_Index($sender) {
+        $pega = Pega::instance();
+        if (getValue('DashboardConnection', $_GET, FALSE)) {
+            $sender->setData('DashboardConnection', TRUE);
+            saveToConfig([
                 'Plugins.Pega.DashboardConnection.Enabled' => TRUE,
-                'Plugins.Pega.DashboardConnection.LoginId' => GetValue('id', $_GET),
-                'Plugins.Pega.DashboardConnection.InstanceUrl' => GetValue('instance_url', $_GET),
-                'Plugins.Pega.DashboardConnection.Token' => GetValue('access_token', $_GET),
-                'Plugins.Pega.DashboardConnection.RefreshToken' => GetValue('refresh_token', $_GET),
+                'Plugins.Pega.DashboardConnection.LoginId' => getValue('id', $_GET),
+                'Plugins.Pega.DashboardConnection.InstanceUrl' => getValue('instance_url', $_GET),
+                'Plugins.Pega.DashboardConnection.Token' => getValue('access_token', $_GET),
+                'Plugins.Pega.DashboardConnection.RefreshToken' => getValue('refresh_token', $_GET),
             ]);
 
-            $sender->InformMessage('Changes Saved to Config');
+            $sender->informMessage('Changes Saved to Config');
             redirectTo('/plugin/Pega');
         }
-        $sender->SetData([
-            'DashboardConnection' => C('Plugins.Pega.DashboardConnection.Enabled'),
+        $sender->setData([
+            'DashboardConnection' => c('Plugins.Pega.DashboardConnection.Enabled'),
             'DashboardConnectionProfile' => FALSE,
-            'DashboardConnectionToken' => C('Plugins.Pega.DashboardConnection.Token', FALSE),
-            'DashboardConnectionRefreshToken' => C('Plugins.Pega.DashboardConnection.RefreshToken', FALSE)
+            'DashboardConnectionToken' => c('Plugins.Pega.DashboardConnection.Token', FALSE),
+            'DashboardConnectionRefreshToken' => c('Plugins.Pega.DashboardConnection.RefreshToken', FALSE)
         ]);
-        if (C('Plugins.Pega.DashboardConnection.LoginId') && C('Plugins.Pega.DashboardConnection.Enabled')) {
-//         $Pega->UseDashboardConnection();
-            $dashboardConnectionProfile = $pega->GetLoginProfile(C('Plugins.Pega.DashboardConnection.LoginId'));
-            $sender->SetData('DashboardConnectionProfile', $dashboardConnectionProfile);
-            $sender->AddCssFile('admin.css');
+        if (c('Plugins.Pega.DashboardConnection.LoginId') && c('Plugins.Pega.DashboardConnection.Enabled')) {
+//         $Pega->useDashboardConnection();
+            $dashboardConnectionProfile = $pega->getLoginProfile(c('Plugins.Pega.DashboardConnection.LoginId'));
+            $sender->setData('DashboardConnectionProfile', $dashboardConnectionProfile);
+            $sender->addCssFile('admin.css');
         }
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
-        $configurationModel->SetField([
+        $configurationModel->setField([
             'Plugins.Pega.ApplicationID',
             'Plugins.Pega.Secret',
             'Plugins.Pega.AuthenticationUrl',
         ]);
         // Set the model on the form.
-        $sender->Form->SetModel($configurationModel);
+        $sender->Form->setModel($configurationModel);
         // If seeing the form for the first time...
-        if ($sender->Form->AuthenticatedPostBack() === FALSE) {
+        if ($sender->Form->authenticatedPostBack() === FALSE) {
             // Apply the config settings to the form.
-            $sender->Form->SetData($configurationModel->Data);
+            $sender->Form->setData($configurationModel->Data);
         } else {
-            $formValues = $sender->Form->FormValues();
-            if ($sender->Form->IsPostBack()) {
-                $sender->Form->ValidateRule('Plugins.Pega.ApplicationID', 'function:ValidateRequired', 'ApplicationID is required');
-                $sender->Form->ValidateRule('Plugins.Pega.Secret', 'function:ValidateRequired', 'Secret is required');
-                $sender->Form->ValidateRule('Plugins.Pega.AuthenticationUrl', 'function:ValidateRequired', 'Authentication Url is required');
-                if ($sender->Form->ErrorCount() == 0) {
-                    SaveToConfig('Plugins.Pega.ApplicationID', trim($formValues['Plugins.Pega.ApplicationID']));
-                    SaveToConfig('Plugins.Pega.Secret', trim($formValues['Plugins.Pega.Secret']));
-                    SaveToConfig('Plugins.Pega.AuthenticationUrl', rtrim(trim($formValues['Plugins.Pega.AuthenticationUrl'])), '/');
+            $formValues = $sender->Form->formValues();
+            if ($sender->Form->isPostBack()) {
+                $sender->Form->validateRule('Plugins.Pega.ApplicationID', 'function:ValidateRequired', 'ApplicationID is required');
+                $sender->Form->validateRule('Plugins.Pega.Secret', 'function:ValidateRequired', 'Secret is required');
+                $sender->Form->validateRule('Plugins.Pega.AuthenticationUrl', 'function:ValidateRequired', 'Authentication Url is required');
+                if ($sender->Form->errorCount() == 0) {
+                    saveToConfig('Plugins.Pega.ApplicationID', trim($formValues['Plugins.Pega.ApplicationID']));
+                    saveToConfig('Plugins.Pega.Secret', trim($formValues['Plugins.Pega.Secret']));
+                    saveToConfig('Plugins.Pega.AuthenticationUrl', rtrim(trim($formValues['Plugins.Pega.AuthenticationUrl'])), '/');
 
-                    $sender->InformMessage(T("Your changes have been saved."));
+                    $sender->informMessage(t("Your changes have been saved."));
                 } else {
-                    $sender->InformMessage(T("Error saving settings to config."));
+                    $sender->informMessage(t("Error saving settings to config."));
                 }
             }
         }
-        $sender->Form->SetValue('Plugins.Pega.ApplicationID', C('Plugins.Pega.ApplicationID'));
-        $sender->Form->SetValue('Plugins.Pega.Secret', C('Plugins.Pega.Secret'));
-        $sender->Form->SetValue('Plugins.Pega.AuthenticationUrl', C('Plugins.Pega.AuthenticationUrl'));
-        $sender->Render($this->GetView('dashboard.php'));
+        $sender->Form->setValue('Plugins.Pega.ApplicationID', c('Plugins.Pega.ApplicationID'));
+        $sender->Form->setValue('Plugins.Pega.Secret', c('Plugins.Pega.Secret'));
+        $sender->Form->setValue('Plugins.Pega.AuthenticationUrl', c('Plugins.Pega.AuthenticationUrl'));
+        $sender->render($this->getView('dashboard.php'));
     }
 
     /**
      * @param DiscussionController $sender
      * @param array $args
      */
-    public function DiscussionController_DiscussionOptions_Handler($sender, $args) {
+    public function discussionController_discussionOptions_handler($sender, $args) {
         //Staff Only
-        $session = Gdn::Session();
-        if (!$session->CheckPermission('Garden.Staff.Allow')) {
+        $session = Gdn::session();
+        if (!$session->checkPermission('Garden.Staff.Allow')) {
             return;
         }
 
-        $pega = Pega::Instance();
+        $pega = Pega::instance();
 
         $userID = $args['Discussion']->InsertUserID;
         $discussionID = $args['Discussion']->DiscussionID;
@@ -279,15 +279,15 @@ class PegaPlugin extends Gdn_Plugin {
 
         if (isset($args['DiscussionOptions'])) {
 
-            if (C('Plugins.Pega.CreateCases')) {
+            if (c('Plugins.Pega.CreateCases')) {
                 $args['DiscussionOptions']['PegaCase'] = [
-                    'Label' => T('Pega - Create Case'),
+                    'Label' => t('Pega - Create Case'),
                     'Url' => "/discussion/PegaCase/Discussion/$discussionID/$userID",
                     'Class' => 'Popup'.$css_class
                 ];
             }
             //remove create Create already created
-            $attachments = GetValue('Attachments', $args['Discussion'], []);
+            $attachments = getValue('Attachments', $args['Discussion'], []);
             foreach ($attachments as $attachment) {
                 if ($attachment['Type'] == 'pega-case') {
                     unset($args['DiscussionOptions']['PegaCase']);
@@ -301,29 +301,29 @@ class PegaPlugin extends Gdn_Plugin {
      * @param CommentController $sender
      * @param $args
      */
-    public function DiscussionController_CommentOptions_Handler($sender, $args) {
+    public function discussionController_commentOptions_handler($sender, $args) {
         //Staff Only
-        $session = Gdn::Session();
-        if (!$session->CheckPermission('Garden.Staff.Allow')) {
+        $session = Gdn::session();
+        if (!$session->checkPermission('Garden.Staff.Allow')) {
             return;
         }
 
-        $pega = Pega::Instance();
+        $pega = Pega::instance();
 
         $userID = $args['Comment']->InsertUserID;
         $commentID = $args['Comment']->CommentID;
         $css_class = null;
 
 
-        if (C('Plugins.Pega.CreateCases')) {
+        if (c('Plugins.Pega.CreateCases')) {
             $args['CommentOptions']['PegaCase'] = [
-                'Label' => T('Pega - Create Case'),
+                'Label' => t('Pega - Create Case'),
                 'Url' => "/discussion/PegaCase/Comment/$commentID/$userID",
                 'Class' => 'Popup'.$css_class
             ];
         }
         //remove create Create already created
-        $attachments = GetValue('Attachments', $args['Comment'], []);
+        $attachments = getValue('Attachments', $args['Comment'], []);
         foreach ($attachments as $attachment) {
             if ($attachment['Type'] == 'pega-case') {
                 unset($args['CommentOptions']['PegaCase']);
@@ -340,16 +340,16 @@ class PegaPlugin extends Gdn_Plugin {
      * @throws Exception
      *
      */
-    public function DiscussionController_PegaCase_Create($sender, $args) {
+    public function discussionController_pegaCase_create($sender, $args) {
 
         // Signed in users only.
-        if (!(Gdn::Session()->IsValid())) {
-            throw PermissionException('Garden.Signin.Allow');
+        if (!(Gdn::session()->isValid())) {
+            throw permissionException('Garden.Signin.Allow');
         }
         //Permissions
-        $sender->Permission('Garden.Staff.Allow');
+        $sender->permission('Garden.Staff.Allow');
         // Check that we are connected to Pega
-        $pega = Pega::Instance();
+        $pega = Pega::instance();
 
         //Get Request Arguments
         $arguments = $sender->RequestArgs;
@@ -360,40 +360,40 @@ class PegaPlugin extends Gdn_Plugin {
         $elementID = $arguments[1];
         $userID = $arguments[2];
         //Get User
-        $user = Gdn::UserModel()->GetID($userID);
+        $user = Gdn::userModel()->getID($userID);
         //Setup Form
         $sender->Form = new Gdn_Form();
         //Get Content
         if ($type == 'Discussion') {
-            $content = $sender->DiscussionModel->GetID($elementID);
-            $url = DiscussionUrl($content, 1);
+            $content = $sender->DiscussionModel->getID($elementID);
+            $url = discussionUrl($content, 1);
         } elseif ($type == 'Comment') {
             $commentModel = new CommentModel();
-            $content = $commentModel->GetID($elementID);
-            $url = CommentUrl($content);
+            $content = $commentModel->getID($elementID);
+            $url = commentUrl($content);
         } else {
             throw new Gdn_UserException('Content Type not supported');
         }
-        $sender->Form->AddHidden('SourceUri', $url);
+        $sender->Form->addHidden('SourceUri', $url);
 
-        $attachmentModel = AttachmentModel::Instance();
+        $attachmentModel = AttachmentModel::instance();
 
         //If form is being submitted
-        if ($sender->Form->IsPostBack() && $sender->Form->AuthenticatedPostBack() === TRUE) {
+        if ($sender->Form->isPostBack() && $sender->Form->authenticatedPostBack() === TRUE) {
             //Form Validation
-            $sender->Form->ValidateRule('FirstName', 'function:ValidateRequired', 'First Name is required');
-            $sender->Form->ValidateRule('LastName', 'function:ValidateRequired', 'Last Name is required');
-            $sender->Form->ValidateRule('Email', 'function:ValidateRequired', 'Email is required');
+            $sender->Form->validateRule('FirstName', 'function:ValidateRequired', 'First Name is required');
+            $sender->Form->validateRule('LastName', 'function:ValidateRequired', 'Last Name is required');
+            $sender->Form->validateRule('Email', 'function:ValidateRequired', 'Email is required');
             //if no errors
-            if ($sender->Form->ErrorCount() == 0 && $attachmentModel->Validate($sender->Form->FormValues())) {
-                $formValues = $sender->Form->FormValues();
+            if ($sender->Form->errorCount() == 0 && $attachmentModel->validate($sender->Form->formValues())) {
+                $formValues = $sender->Form->formValues();
 
                 //check to see if user is a contact
-                //$Contact = $Pega->FindContact($FormValues['Email']); // presume that the user is a contact
+                //$Contact = $Pega->findContact($FormValues['Email']); // presume that the user is a contact
 //            if (!$Contact['Id']) {
-//               $this->Reconnect($Sender, $Args);
+//               $this->reconnect($Sender, $Args);
 //               //If not a contact then add contact
-//               $Contact['Id'] = $Pega->CreateContact(array(
+//               $Contact['Id'] = $Pega->createContact(array(
 //                  'FirstName' => $FormValues['FirstName'],
 //                  'LastName' => $FormValues['LastName'],
 //                  'Email' => $FormValues['Email'],
@@ -402,35 +402,35 @@ class PegaPlugin extends Gdn_Plugin {
 //            }
 
                 //Create Case using Pega API
-                $caseID = $pega->CreateCase([
+                $caseID = $pega->createCase([
                     'Status' => 1,
-                    'Subject' => $sender->DiscussionModel->GetID($content->DiscussionID)->Name,
+                    'Subject' => $sender->DiscussionModel->getID($content->DiscussionID)->Name,
                     'Description' => $formValues['Body'],
                     'Vanilla__ForumUrl__c' => $formValues['SourceUri']
                 ]);
                 //Save information to our Attachment Table
-                $iD = $attachmentModel->Save([
+                $iD = $attachmentModel->save([
                     'Type' => 'pega-case',
-                    'ForeignID' => $attachmentModel->RowID($content),
+                    'ForeignID' => $attachmentModel->rowID($content),
                     'ForeignUserID' => $content->InsertUserID,
                     'Source' => 'Pega',
                     'SourceID' => $caseID,
-                    'SourceURL' => C('Plugins.Pega.BaseUrl').'/forum/interaction/'.$caseID,
+                    'SourceURL' => c('Plugins.Pega.BaseUrl').'/forum/interaction/'.$caseID,
                     'Status' => "N/A",
                     'Priority' => "N/A", // pega does not need these
                 ]);
                 if (!$iD) {
-                    $sender->Form->SetValidationResults($attachmentModel->ValidationResults());
+                    $sender->Form->setValidationResults($attachmentModel->validationResults());
                 }
-                $sender->JsonTarget('', $url, 'Redirect');
-                $sender->InformMessage('Case Added to Pega');
+                $sender->jsonTarget('', $url, 'Redirect');
+                $sender->informMessage('Case Added to Pega');
 
             }
 
         } else {
-            $sender->Form->SetValidationResults($attachmentModel->ValidationResults());
+            $sender->Form->setValidationResults($attachmentModel->validationResults());
         }
-        list($firstName, $lastName) = $this->GetFirstNameLastName($user->Name);
+        list($firstName, $lastName) = $this->getFirstNameLastName($user->Name);
 
         try {
             $data = [
@@ -438,15 +438,15 @@ class PegaPlugin extends Gdn_Plugin {
                 'FirstName' => $firstName,
                 'LastName' => $lastName,
                 'Email' => $user->Email,
-                'Body' => Gdn_Format::TextEx($content->Body)
+                'Body' => Gdn_Format::textEx($content->Body)
             ];
         } catch (Gdn_UserException $e) {
-            $this->Reconnect($sender, $args);
+            $this->reconnect($sender, $args);
         }
 
-        $sender->Form->SetData($data);
-        $sender->SetData('Data', $data);
-        $sender->Render('createcase', '', 'plugins/Pega');
+        $sender->Form->setData($data);
+        $sender->setData('Data', $data);
+        $sender->render('createcase', '', 'plugins/Pega');
 
     }
 
@@ -454,26 +454,26 @@ class PegaPlugin extends Gdn_Plugin {
      * @param DiscussionController $sender
      * @param array $args
      */
-    public function DiscussionController_AfterDiscussionBody_Handler($sender, $args) {
-        Trace('DiscussionController_AfterDiscussionBody_Handler');
-        $this->WriteAndUpdateAttachments($sender, $args);
+    public function discussionController_afterDiscussionBody_handler($sender, $args) {
+        trace('DiscussionController_AfterDiscussionBody_Handler');
+        $this->writeAndUpdateAttachments($sender, $args);
     }
 
     /**
      * @param DiscussionController $sender
      * @param array $args
      */
-    public function DiscussionController_AfterCommentBody_Handler($sender, $args) {
-        Trace('AfterCommentBody_Handler');
-        $this->WriteAndUpdateAttachments($sender, $args);
+    public function discussionController_afterCommentBody_handler($sender, $args) {
+        trace('AfterCommentBody_Handler');
+        $this->writeAndUpdateAttachments($sender, $args);
     }
 
 
-    protected function WriteAndUpdateAttachments($sender, $args) {
+    protected function writeAndUpdateAttachments($sender, $args) {
 
 //        error_log("WriteAndUpdateAttachments\n\n\n", 3, "/Users/patrick/my-errors.log");
 
-        $type = GetValue('Type', $args);
+        $type = getValue('Type', $args);
 
         if ($type == 'Discussion') {
             $content = 'Discussion';
@@ -482,19 +482,19 @@ class PegaPlugin extends Gdn_Plugin {
         } else {
             return;
         }
-        $session = Gdn::Session();
-        if (!$session->CheckPermission('Garden.SignIn.Allow')) {
+        $session = Gdn::session();
+        if (!$session->checkPermission('Garden.SignIn.Allow')) {
             return;
         }
 
-        if (!$session->CheckPermission('Garden.Staff.Allow') && $session->IsValid() && isset($args[$content]->Attachments)) {
+        if (!$session->checkPermission('Garden.Staff.Allow') && $session->isValid() && isset($args[$content]->Attachments)) {
             foreach ($args[$content]->Attachments as $attachment) {
                 if ($attachment['Type'] == 'pega-case') {;
                     if ($attachment['ForeignUserID'] == $session->UserID) {
 //                        error_log("WriteGenericAttachment line 529\n\n\n", 3, "/Users/patrick/my-errors.log");
-                        WriteGenericAttachment([
+                        writeGenericAttachment([
                             'Icon' => 'case',
-                            'Body' => Wrap(T('A ticket has been generated from this post.'), 'p'),
+                            'Body' => wrap(t('A ticket has been generated from this post.'), 'p'),
                             'Fields' => [
                                 'one' => 'two'
                             ]
@@ -502,16 +502,16 @@ class PegaPlugin extends Gdn_Plugin {
 
                     } else {
 //                        error_log("WriteGenericAttachment line 540\n\n\n", 3, "/Users/patrick/my-errors.log");
-                        WriteGenericAttachment([
+                        writeGenericAttachment([
                             'Icon' => 'case',
-                            'Body' => Wrap(T('A case has been generated from this post.'), 'p'),
+                            'Body' => wrap(t('A case has been generated from this post.'), 'p'),
                         ]);
                     }
                 }
             }
             return;
         }
-        if (!$session->CheckPermission('Garden.Staff.Allow')) {
+        if (!$session->checkPermission('Garden.Staff.Allow')) {
 //            error_log("WriteAttachment aborted, no permissions\n\n\n", 3, "/Users/patrick/my-errors.log");
             return;
         }
@@ -519,12 +519,12 @@ class PegaPlugin extends Gdn_Plugin {
         if (isset($args[$content]->Attachments)) {
 //            error_log("Attempt to update attachments. " . json_encode($Args[$Content]->Attachments) . "\n\n\n", 3, "/Users/patrick/my-errors.log");
             try {
-                $this->UpdateAttachments($args[$content]->Attachments, $sender, $args);
+                $this->updateAttachments($args[$content]->Attachments, $sender, $args);
             } catch (Gdn_UserException $e) {
-                $sender->InformMessage('Error Reconnecting to Pega');
+                $sender->informMessage('Error Reconnecting to Pega');
             }
 //            error_log("Write attachments. " . json_encode($Args[$Content]->Attachments) . "\n\n\n", 3, "/Users/patrick/my-errors.log");
-//            WriteAttachments($Args[$Content]->Attachments);
+//            writeAttachments($Args[$Content]->Attachments);
         }
     }
 
@@ -532,11 +532,11 @@ class PegaPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      */
     public function settingsController_pega_create($sender) {
-        $sender->Permission('Garden.Settings.Manage');
+        $sender->permission('Garden.Settings.Manage');
 
         $cf = new ConfigurationModule($sender);
 
-        $cf->Initialize(
+        $cf->initialize(
             [
                 'Plugins.Pega.BaseUrl' => [],
                 'Plugins.Pega.Username' => [],
@@ -544,9 +544,9 @@ class PegaPlugin extends Gdn_Plugin {
             ]
         );
 
-        $sender->AddSideMenu();
-        $sender->SetData('Title', T('Pega Settings'));
-        $cf->RenderAll();
+        $sender->addSideMenu();
+        $sender->setData('Title', t('Pega Settings'));
+        $cf->renderAll();
     }
 
     /**
@@ -554,18 +554,18 @@ class PegaPlugin extends Gdn_Plugin {
      * @param $sender
      * @param array $args
      */
-    protected function UpdateAttachments(&$attachments, $sender, $args) {
+    protected function updateAttachments(&$attachments, $sender, $args) {
         return; //temporarily disable this functionality; response time too slow
-        $pega = Pega::Instance();
+        $pega = Pega::instance();
         $attachmentModel = new AttachmentModel();
 
         foreach ($attachments as &$attachment) {
 
-            if (!$this->IsToBeUpdated($attachment)) {
+            if (!$this->isToBeUpdated($attachment)) {
                 continue;
             }
 
-            $caseResponse = $pega->GetCase($attachment['SourceID']);
+            $caseResponse = $pega->getCase($attachment['SourceID']);
 //            $CaseResponse['HttpCode'] = 200;
 //            $CaseResponse['Status'] = 1;
 //            $CaseResponse['Priority'] = 1;
@@ -573,15 +573,15 @@ class PegaPlugin extends Gdn_Plugin {
 //            $CaseResponse['CaseNumber'] = 10;
 
 
-            $updatedAttachment = (array)$attachmentModel->GetID($attachment['AttachmentID']);
+            $updatedAttachment = (array)$attachmentModel->getID($attachment['AttachmentID']);
 
             if ($caseResponse['HttpCode'] == 401) {
-                $this->Reconnect($sender, $args);
+                $this->reconnect($sender, $args);
                 continue;
             } elseif ($caseResponse['HttpCode'] == 404) {
-                $updatedAttachment['DateUpdated'] = Gdn_Format::ToDateTime();
-                $updatedAttachment['Error'] = T('Case has been deleted from Pega');
-                $attachmentModel->Save($updatedAttachment);
+                $updatedAttachment['DateUpdated'] = Gdn_Format::toDateTime();
+                $updatedAttachment['Error'] = t('Case has been deleted from Pega');
+                $attachmentModel->save($updatedAttachment);
                 $attachment = $updatedAttachment;
                 continue;
             } elseif ($caseResponse['HttpCode'] == 200) {
@@ -589,10 +589,10 @@ class PegaPlugin extends Gdn_Plugin {
                 $case = $caseResponse['Response'];
                 $updatedAttachment['Status'] = $case['pyWorkObjectStatus'];
                 $updatedAttachment['Priority'] = 1;
-                $updatedAttachment['LastModifiedDate'] = Gdn_Format::ToDateTime();
+                $updatedAttachment['LastModifiedDate'] = Gdn_Format::toDateTime();
                 $updatedAttachment['CaseNumber'] = $case['pyID'];
-                $updatedAttachment['DateUpdated'] = Gdn_Format::ToDateTime();
-                $attachmentModel->Save($updatedAttachment);
+                $updatedAttachment['DateUpdated'] = Gdn_Format::toDateTime();
+                $attachmentModel->save($updatedAttachment);
                 $attachment = $updatedAttachment;
             }
         }
@@ -602,28 +602,28 @@ class PegaPlugin extends Gdn_Plugin {
      * @param ProfileController $sender
      * @param array $args
      */
-    public function ProfileController_Render_Before($sender, $args) {
-        $attachmentModel = AttachmentModel::Instance();
-        $attachmentModel->JoinAttachmentsToUser($sender, $args, ['Type' => 'pega-lead'], 1);
+    public function profileController_render_before($sender, $args) {
+        $attachmentModel = AttachmentModel::instance();
+        $attachmentModel->joinAttachmentsToUser($sender, $args, ['Type' => 'pega-lead'], 1);
     }
 
     /**
      * @param ProfileController $Sender
      * @param array $Args
      */
-    public function ProfileController_AfterUserInfo_Handler($Sender, $Args) {
+    public function profileController_afterUserInfo_handler($Sender, $Args) {
         //check permissions
-        if (!Gdn::Session()->CheckPermission('Garden.Staff.Allow')) {
+        if (!Gdn::session()->checkPermission('Garden.Staff.Allow')) {
             return;
         }
-        $Sender->AddCssFile('vanillicon.css', 'static');
+        $Sender->addCssFile('vanillicon.css', 'static');
         $Attachments = $Sender->Data['Attachments'];
-        if ($Sender->DeliveryMethod() === DELIVERY_METHOD_XHTML) {
-            require_once $Sender->FetchViewLocation('attachment', '', 'plugins/Pega');
+        if ($Sender->deliveryMethod() === DELIVERY_METHOD_XHTML) {
+            require_once $Sender->fetchViewLocation('attachment', '', 'plugins/Pega');
         }
         foreach ($Attachments as $Attachment) {
             if ($Attachment['Type'] == 'pega-lead') {
-                WritePegaLeadAttachment($Attachment);
+                writePegaLeadAttachment($Attachment);
             }
         }
     }
@@ -636,7 +636,7 @@ class PegaPlugin extends Gdn_Plugin {
      *    [FirstName]
      *    [LastName]
      */
-    public function GetFirstNameLastName($fullName) {
+    public function getFirstNameLastName($fullName) {
         $nameParts = explode(' ', $fullName);
         switch (count($nameParts)) {
             case 3:
@@ -658,8 +658,8 @@ class PegaPlugin extends Gdn_Plugin {
     /**
      * @param AssetModel $sender
      */
-    public function AssetModel_StyleCss_Handler($sender) {
-        $sender->AddCssFile('pega.css', 'plugins/Pega');
+    public function assetModel_styleCss_handler($sender) {
+        $sender->addCssFile('pega.css', 'plugins/Pega');
     }
 
     /**
@@ -667,20 +667,20 @@ class PegaPlugin extends Gdn_Plugin {
      * @param string $type case or lead
      * @return bool
      */
-    protected function IsToBeUpdated($attachment, $type = 'pega-case') {
-        if (GetValue('Status', $attachment) == $this->ClosedCaseStatusString) {
+    protected function isToBeUpdated($attachment, $type = 'pega-case') {
+        if (getValue('Status', $attachment) == $this->ClosedCaseStatusString) {
             return FALSE;
         }
         $timeDiff = time() - strtotime($attachment['DateUpdated']);
         if ($timeDiff < $this->MinimumTimeForUpdate) {
-            Trace("Not Checking For Update: $timeDiff seconds since last update");
+            trace("Not Checking For Update: $timeDiff seconds since last update");
             return FALSE;
         }
         if (isset($attachment['LastModifiedDate'])) {
             if ($type == 'pega-case') {
                 $timeDiff = time() - strtotime($attachment['LastModifiedDate']);
                 if ($timeDiff < $this->MinimumTimeForUpdate && $attachment['Status'] != $this->ClosedCaseStatusString) {
-                    Trace("Not Checking For Update: $timeDiff seconds since last update");
+                    trace("Not Checking For Update: $timeDiff seconds since last update");
                     return FALSE;
                 }
             }
@@ -693,13 +693,13 @@ class PegaPlugin extends Gdn_Plugin {
      *
      * @param DiscussionController $Sender Sending Controller.
      */
-    public function DiscussionController_FetchAttachmentViews_Handler($Sender) {
-        require_once $Sender->FetchViewLocation('attachment', '', 'plugins/Pega');
+    public function discussionController_fetchAttachmentViews_handler($Sender) {
+        require_once $Sender->fetchViewLocation('attachment', '', 'plugins/Pega');
     }
 
     public function isConfigured() {
-        $pega = Pega::Instance();
-        return $pega->IsConfigured();
+        $pega = Pega::instance();
+        return $pega->isConfigured();
     }
 
 }

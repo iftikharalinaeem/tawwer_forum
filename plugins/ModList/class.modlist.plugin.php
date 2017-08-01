@@ -38,47 +38,47 @@ class ModListPlugin extends Gdn_Plugin {
    public function __construct() {
       parent::__construct();
 
-      $this->CacheDelay = C('Plugins.ModList.CacheDelay', self::DEFAULT_CACHE_DELAY);
+      $this->CacheDelay = c('Plugins.ModList.CacheDelay', self::DEFAULT_CACHE_DELAY);
    }
 
    /**
     *
     * @param PluginController $sender
     */
-   public function PluginController_ModList_Create($sender) {
-      $sender->Permission('Garden.Settings.Manage');
-      $this->Dispatch($sender);
+   public function pluginController_modList_create($sender) {
+      $sender->permission('Garden.Settings.Manage');
+      $this->dispatch($sender);
    }
 
    /**
     *
     * @param PluginController $sender
     */
-   public function Controller_Search($sender) {
-      $sender->DeliveryType(DELIVERY_TYPE_DATA);
-      $sender->DeliveryMethod(DELIVERY_METHOD_JSON);
+   public function controller_Search($sender) {
+      $sender->deliveryType(DELIVERY_TYPE_DATA);
+      $sender->deliveryMethod(DELIVERY_METHOD_JSON);
 
       // Category (required)
-      $categoryID = GetIncomingValue('CategoryID');
-      $category = CategoryModel::Categories($categoryID);
+      $categoryID = getIncomingValue('CategoryID');
+      $category = CategoryModel::categories($categoryID);
       if (!$category)
-         return $sender->Render();
+         return $sender->render();
 
       // Search for moderators
-      $query = GetIncomingValue('q');
+      $query = getIncomingValue('q');
       $data = [];
-      $database = Gdn::Database();
+      $database = Gdn::database();
       if ($query) {
-         $test = Gdn::SQL()->Limit(1)->Get('User')->FirstRow(DATASET_TYPE_ARRAY);
-         $userData = Gdn::SQL()->Select('UserID, Name')->From('User')->Like('Name', $query, 'right')->Limit(20)->Get();
+         $test = Gdn::sql()->limit(1)->get('User')->firstRow(DATASET_TYPE_ARRAY);
+         $userData = Gdn::sql()->select('UserID, Name')->from('User')->like('Name', $query, 'right')->limit(20)->get();
          foreach ($userData as $user) {
             $data[] = ['id' => $user->UserID, 'name' => $user->Name];
          }
       }
 
-      $sender->SetData('Tokens', $data);
+      $sender->setData('Tokens', $data);
 
-      $sender->Render();
+      $sender->render();
    }
 
    /**
@@ -89,7 +89,7 @@ class ModListPlugin extends Gdn_Plugin {
     *
     * @param integer $categoryID
     */
-   public function Moderators($categoryID, $cascade = TRUE) {
+   public function moderators($categoryID, $cascade = TRUE) {
       $localKey = $cascade ? "{$categoryID}-cascade" : $categoryID;
 
       // Check local cache
@@ -98,7 +98,7 @@ class ModListPlugin extends Gdn_Plugin {
 
       // Check memcache
       $moderatorCacheKey = sprintf(ModListPlugin::CACHE_CATEGORY_MODERATORS, $localKey);
-      $moderatorCache = Gdn::Cache()->Get($moderatorCacheKey);
+      $moderatorCache = Gdn::cache()->get($moderatorCacheKey);
       if ($moderatorCache !== Gdn_Cache::CACHEOP_FAILURE) {
          self::$CategoryModerators[$localKey] = $moderatorCache;
          return $moderatorCache;
@@ -110,22 +110,22 @@ class ModListPlugin extends Gdn_Plugin {
 
       // Walk category ancestors
       if ($cascade) {
-         $ancestors = CategoryModel::GetAncestors($categoryID, true, true);
+         $ancestors = CategoryModel::getAncestors($categoryID, true, true);
          $categoryIDs = array_keys($ancestors);
 //         if (!in_array(-1, $CategoryIDs))
 //            $CategoryIDs[] = -1;
       }
 
-      $moderators = Gdn::SQL()->Select('*')
-         ->From('CategoryModerator')
-         ->WhereIn('CategoryID', $categoryIDs)
-         ->Get()->ResultArray();
+      $moderators = Gdn::sql()->select('*')
+         ->from('CategoryModerator')
+         ->whereIn('CategoryID', $categoryIDs)
+         ->get()->resultArray();
 
-      Gdn::UserModel()->JoinUsers($moderators, ['UserID']);
+      Gdn::userModel()->joinUsers($moderators, ['UserID']);
 
       // Cache it
       self::$CategoryModerators[$localKey] = $moderators;
-      Gdn::Cache()->Store($moderatorCacheKey, $moderators, [
+      Gdn::cache()->store($moderatorCacheKey, $moderators, [
          Gdn_Cache::FEATURE_EXPIRY  => $this->CacheDelay
       ]);
 
@@ -136,23 +136,23 @@ class ModListPlugin extends Gdn_Plugin {
     * Moderator List
     * @param SettingsController $sender
     */
-   public function vanillaSettingsController_AfterCategorySettings_Handler($sender) {
+   public function vanillaSettingsController_afterCategorySettings_handler($sender) {
 
-      $categoryID = $sender->Data('CategoryID');
-      $existingModerators = $this->Moderators($categoryID, FALSE);
+      $categoryID = $sender->data('CategoryID');
+      $existingModerators = $this->moderators($categoryID, FALSE);
       $prePopulate = [];
       foreach ($existingModerators as $existingModerator)
          $prePopulate[] = ['id' => $existingModerator['UserID'], 'name' => $existingModerator['Name']];
       $prePopulate = json_encode($prePopulate);
 
-      $sender->AddCssFile('token-input.css', 'plugins/ModList');
-      $sender->AddJsFile('jquery.tokeninput.vanilla.js', 'plugins/ModList');
-      $sender->Head->AddString('<script type="text/javascript">
+      $sender->addCssFile('token-input.css', 'plugins/ModList');
+      $sender->addJsFile('jquery.tokeninput.vanilla.js', 'plugins/ModList');
+      $sender->Head->addString('<script type="text/javascript">
    jQuery(document).ready(function($) {
       var tags = $("#Form_Moderators").val();
       if (tags && tags.length)
          tags = tags.split(",");
-      $("#Form_Moderators").tokenInput("'.Gdn::Request()->Url('plugin/modlist/search').'", {
+      $("#Form_Moderators").tokenInput("'.Gdn::request()->url('plugin/modlist/search').'", {
          hintText: "Start to type...",
          searchingText: "Searching...",
          searchDelay: 300,
@@ -167,7 +167,7 @@ class ModListPlugin extends Gdn_Plugin {
 </script>');
 
       $sender->ModList = $this;
-      echo $sender->FetchView('categorysettings', '', 'plugins/ModList');
+      echo $sender->fetchView('categorysettings', '', 'plugins/ModList');
    }
 
    /**
@@ -176,21 +176,21 @@ class ModListPlugin extends Gdn_Plugin {
     * @param type $sender
     * @return type
     */
-   public function SettingsController_AddEditCategory_Handler($sender) {
-      if (!$sender->Form->AuthenticatedPostBack()) return;
+   public function settingsController_addEditCategory_handler($sender) {
+      if (!$sender->Form->authenticatedPostBack()) return;
 
-      $categoryID = $sender->Form->GetValue('CategoryID');
-      $moderatorListEnabled = $sender->Form->GetValue('CategoryModerators');
+      $categoryID = $sender->Form->getValue('CategoryID');
+      $moderatorListEnabled = $sender->Form->getValue('CategoryModerators');
 
       // Clear db
-      Gdn::SQL()->Delete('CategoryModerator', [
+      Gdn::sql()->delete('CategoryModerator', [
          'CategoryID'   => $categoryID
       ]);
 
       // Wipe all mods for category
       if ($moderatorListEnabled) {
 
-         $moderators = $sender->Form->GetValue('Moderators');
+         $moderators = $sender->Form->getValue('Moderators');
          $moderators = explode(',', $moderators);
          $insertModerators = [];
          foreach ($moderators as $moderatorID) {
@@ -199,7 +199,7 @@ class ModListPlugin extends Gdn_Plugin {
                'CategoryID'   => $categoryID
             ];
          }
-         Gdn::SQL()->Insert('CategoryModerator', $insertModerators);
+         Gdn::sql()->insert('CategoryModerator', $insertModerators);
 
       }
 
@@ -210,20 +210,20 @@ class ModListPlugin extends Gdn_Plugin {
       $cascadeCacheKey = sprintf(ModListPlugin::CACHE_CATEGORY_MODERATORS, $cascadeKey);
       $directCacheKey = sprintf(ModListPlugin::CACHE_CATEGORY_MODERATORS, $directKey);
 
-      Gdn::Cache()->Remove($cascadeCacheKey);
-      Gdn::Cache()->Remove($directCacheKey);
+      Gdn::cache()->remove($cascadeCacheKey);
+      Gdn::cache()->remove($directCacheKey);
    }
 
-   public function Setup() {
-      $this->Structure();
+   public function setup() {
+      $this->structure();
    }
 
-   public function Structure() {
-      Gdn::Structure()
-         ->Table('CategoryModerator')
-         ->Column('CategoryID', 'int', FALSE, 'primary')
-         ->Column('UserID', 'int', FALSE, 'primary')
-         ->Set();
+   public function structure() {
+      Gdn::structure()
+         ->table('CategoryModerator')
+         ->column('CategoryID', 'int', FALSE, 'primary')
+         ->column('UserID', 'int', FALSE, 'primary')
+         ->set();
    }
 
 }

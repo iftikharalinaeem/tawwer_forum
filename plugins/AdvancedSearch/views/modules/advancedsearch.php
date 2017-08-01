@@ -6,7 +6,7 @@
     echo $Form->open(['action' => url('/search')]),
         $Form->hidden('adv');
 
-//    decho(Gdn::Controller()->Data('CalculatedSearch'), 'calc search');
+//    decho(Gdn::controller()->data('CalculatedSearch'), 'calc search');
 
     ?>
     <div class="KeywordsWrap InputAndButton">

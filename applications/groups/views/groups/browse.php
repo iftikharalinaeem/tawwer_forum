@@ -18,8 +18,8 @@ $this->fireEvent('beforeBrowseGroupList');
 
 $groups = $this->data('Groups');
 $groupModel = new GroupModel();
-$groupModel->JoinRecentPosts($groups);
-$list = new GroupListModule($groups, 'groups', $this->Title(), t("No groups to display yet."), $cssClass, $showMore, $layout);
+$groupModel->joinRecentPosts($groups);
+$list = new GroupListModule($groups, 'groups', $this->title(), t("No groups to display yet."), $cssClass, $showMore, $layout);
 echo $list;
 ?>
 

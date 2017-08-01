@@ -8,18 +8,18 @@ class VanillaUploadHandler extends UploadHandler {
    /// Methods
    
    public function delete() {
-      $file = Gdn::Controller()->Request->Get('file');
+      $file = Gdn::controller()->Request->get('file');
 
       $success = TRUE;
       
       // Delete the file.
       $upload = new Gdn_Upload();
-      $upload->Delete($file);
+      $upload->delete($file);
       
       // Delete the thumbnail.
-      $parsed = $upload->Parse($file);
+      $parsed = $upload->parse($file);
       $thumbName = sprintf($parsed['SaveFormat'], "thumbnails/{$parsed['Name']}");
-      $upload->Delete($thumbName);
+      $upload->delete($thumbName);
       
       $success = $parsed;
       
@@ -43,21 +43,21 @@ class VanillaUploadHandler extends UploadHandler {
       // Move the thumbnail.
       $Source = $this->options['image_versions']['thumbnail']['upload_dir'].$Filename;
       $Target = "thumbnails/$Name";
-      $Parsed = $Upload->SaveAs($Source, $Target);
+      $Parsed = $Upload->saveAs($Source, $Target);
       $Result->thumbnail_url = $Parsed['Url'];
       
       // Move the image.
       $Source = $this->options['upload_dir'].$Filename;
       $Target = $Name;
-      $Parsed = $Upload->SaveAs($Source, $Target);
+      $Parsed = $Upload->saveAs($Source, $Target);
       $Result->url = $Parsed['Url'];
       
-      $Result->delete_url = Url('/post/uploadimage.json?file='.urlencode($Parsed['SaveName']), TRUE);
+      $Result->delete_url = url('/post/uploadimage.json?file='.urlencode($Parsed['SaveName']), TRUE);
       $Result->parsed = $Parsed;
       
       $Result->RecordType = 'Temp';
       $Result->RecordID = time();
-      $this->SaveComment($Result);
+      $this->saveComment($Result);
       
       return $Result;
    }
@@ -67,7 +67,7 @@ class VanillaUploadHandler extends UploadHandler {
       $filename = basename($url);
       $dest = $this->options['upload_dir'].$filename;
       
-      TouchFolder(dirname($dest));
+      touchFolder(dirname($dest));
       copy($url, $dest);
       $size = filesize($dest);
       $file = new stdClass();
@@ -86,7 +86,7 @@ class VanillaUploadHandler extends UploadHandler {
       }
       
       $target = "thumbnails/$filename";
-      $parsed = $upload->SaveAs($source, $target);
+      $parsed = $upload->saveAs($source, $target);
       
       $file->thumbnail_url = $parsed['Url'];
       
@@ -97,28 +97,28 @@ class VanillaUploadHandler extends UploadHandler {
       
       $file->RecordType = 'Temp';
       $file->RecordID = time();
-      $this->SaveComment($file);
+      $this->saveComment($file);
       
       ob_clean();
       echo json_encode([$file]);
    }
    
-   public function SaveComment($file) {
-      $autoSave = Gdn::Request()->Post('AutoSave');
+   public function saveComment($file) {
+      $autoSave = Gdn::request()->post('AutoSave');
       if (!$autoSave)
          return;
       
       // See if we need to save a comment.
-      $discussionID = Gdn::Request()->Post('DiscussionID');
+      $discussionID = Gdn::request()->post('DiscussionID');
       if (!$discussionID)
          return;
          
          
-      $image = ArrayTranslate((array)$file, ['url' => 'Image', 'thumbnail_url' => 'Thumbnail', 'size' => 'Size']);
+      $image = arrayTranslate((array)$file, ['url' => 'Image', 'thumbnail_url' => 'Thumbnail', 'size' => 'Size']);
       $image['DiscussionID'] = $discussionID;
       
       $imageModel = new ImageModel();
-      $commentID = $imageModel->SaveComment($image);
+      $commentID = $imageModel->saveComment($image);
       
       if ($commentID) {
          $file->RecordType = 'Comment';

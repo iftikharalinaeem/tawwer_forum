@@ -17,7 +17,7 @@ class DisqusImporter extends Gdn_Plugin {
 
    protected $_Categories = NULL;
 
-   public function Insert($table, $row = NULL) {
+   public function insert($table, $row = NULL) {
       static $lastTable = NULL;
       static $rows = [];
 
@@ -26,7 +26,7 @@ class DisqusImporter extends Gdn_Plugin {
 
 
       if ($table === NULL) {
-         $this->InsertMulti($lastTable, $rows);
+         $this->insertMulti($lastTable, $rows);
          $lastTable = NULL;
          $rows = [];
 
@@ -34,7 +34,7 @@ class DisqusImporter extends Gdn_Plugin {
       }
 
       if ($lastTable && $lastTable != $table || count($rows) >= $this->BufferSize) {
-         $this->InsertMulti($lastTable, $rows);
+         $this->insertMulti($lastTable, $rows);
          $rows = [];
       }
 
@@ -42,12 +42,12 @@ class DisqusImporter extends Gdn_Plugin {
       $rows[] = $row;
    }
 
-   public function InsertMulti($table, $rows) {
+   public function insertMulti($table, $rows) {
       if (empty($rows))
          return;
 
-      $px = Gdn::Database()->DatabasePrefix;
-      $pDO = Gdn::Database()->Connection();
+      $px = Gdn::database()->DatabasePrefix;
+      $pDO = Gdn::database()->connection();
 
       $sql = '';
       foreach ($rows as $row) {
@@ -63,19 +63,19 @@ class DisqusImporter extends Gdn_Plugin {
          $sql;
 
 //      echo htmlspecialchars($Sql);
-      Gdn::Database()->Query($sql);
+      Gdn::database()->query($sql);
 //      die();
    }
 
-   public function ParseCategory($str) {
+   public function parseCategory($str) {
       $xml = new SimpleXMLElement($str);
       $name = html_entity_decode($xml->title, ENT_COMPAT, 'UTF-8');
       $row = [
           'DisqusID' => (int)$xml->attributes('dsq', TRUE)->id,
           'Name' => $name,
-          'UrlCode' => Gdn_Format::Url($name)
+          'UrlCode' => Gdn_Format::url($name)
       ];
-      $this->Insert('zDisqusCategory', $row);
+      $this->insert('zDisqusCategory', $row);
 
 //      <category xmlns="http://disqus.com" xmlns:dsq="http://disqus.com/disqus-internals" dsq:id="684542">
 //      <forum>cultofmac</forum>
@@ -84,7 +84,7 @@ class DisqusImporter extends Gdn_Plugin {
 //      </category>
    }
 
-   public function ParseComment($str) {
+   public function parseComment($str) {
       $xml = new SimpleXMLElement($str);
       $name = html_entity_decode($xml->title, ENT_COMPAT, 'UTF-8');
       $row = [
@@ -125,7 +125,7 @@ class DisqusImporter extends Gdn_Plugin {
       if ($xml->parent)
           $row['ParentForeignID'] = $xml->parent->attributes('dsq', TRUE)->id;
 
-      $this->Insert('zDisqusComment', $row);
+      $this->insert('zDisqusComment', $row);
 
 //      <post dsq:id="154441910">
 //         <id>wp_id=2</id>
@@ -141,7 +141,7 @@ class DisqusImporter extends Gdn_Plugin {
 //      </post>
    }
 
-   public function ParseDiscussion($str) {
+   public function parseDiscussion($str) {
       $xml = new SimpleXMLElement($str);
       $name = html_entity_decode($xml->title, ENT_COMPAT, 'UTF-8');
       $row = [
@@ -181,7 +181,7 @@ class DisqusImporter extends Gdn_Plugin {
           ];
       $row['Attributes'] = dbencode($attributes);
 
-      $this->Insert('zDisqusDiscussion', $row);
+      $this->insert('zDisqusDiscussion', $row);
 
 //      <thread xmlns="http://disqus.com" xmlns:dsq="http://disqus.com/disqus-internals" dsq:id="237937629">
 //      <id>3</id>
@@ -203,64 +203,64 @@ class DisqusImporter extends Gdn_Plugin {
 //      </thread>
    }
 
-   public function DefineTables() {
+   public function defineTables() {
       // Define the temp tables.
-      Gdn::Structure()->Table('zDisqusCategory')
-         ->Column('DisqusID', 'varchar(32)', FALSE, 'primary')
-         ->Column('CategoryID', 'int', TRUE)
-         ->Column('Name', 'varchar(255)')
-         ->Column('UrlCode', 'varchar(255)', TRUE)
-         ->Set(TRUE);
-      Gdn::SQL()->Truncate('zDisqusCategory');
+      Gdn::structure()->table('zDisqusCategory')
+         ->column('DisqusID', 'varchar(32)', FALSE, 'primary')
+         ->column('CategoryID', 'int', TRUE)
+         ->column('Name', 'varchar(255)')
+         ->column('UrlCode', 'varchar(255)', TRUE)
+         ->set(TRUE);
+      Gdn::sql()->truncate('zDisqusCategory');
 
-      Gdn::Structure()->Table('zDisqusDiscussion')
-         ->Column('DisqusID', 'int', FALSE, 'primary')
-         ->Column('DiscussionID', 'int', TRUE)
-         ->Column('ForeignID', 'varchar(191)', FALSE, 'index')
-         ->Column('DisqusCategoryID', 'int', FALSE)
-         ->Column('CategoryID', 'int', TRUE)
-         ->Column('Name', 'varchar(100)')
-         ->Column('Body', 'text')
-         ->Column('Format', 'varchar(20)')
-         ->Column('InsertUserID', 'int', TRUE)
-         ->Column('DateInserted', 'datetime', TRUE)
-         ->Column('InsertIPAddress', 'varchar(15)', TRUE)
-         ->Column('Attributes', 'text', TRUE)
-         ->Column('Closed', 'tinyint', 0)
-         ->Column('Deleted', 'tinyint', 0)
-         ->Column('UserName', 'varchar(50)', TRUE)
-         ->Column('UserEmail', 'varchar(200)', TRUE)
-         ->Column('UserFullName', 'varchar(50)', TRUE)
-         ->Column('UserAnonymous', 'tinyint', 0)
-         ->Column('UniqueType', 'varchar(32)', TRUE)
-         ->Column('UniqueID', 'varchar(32)', TRUE, 'index')
-         ->Set(TRUE);
-      Gdn::SQL()->Truncate('zDisqusDiscussion');
+      Gdn::structure()->table('zDisqusDiscussion')
+         ->column('DisqusID', 'int', FALSE, 'primary')
+         ->column('DiscussionID', 'int', TRUE)
+         ->column('ForeignID', 'varchar(191)', FALSE, 'index')
+         ->column('DisqusCategoryID', 'int', FALSE)
+         ->column('CategoryID', 'int', TRUE)
+         ->column('Name', 'varchar(100)')
+         ->column('Body', 'text')
+         ->column('Format', 'varchar(20)')
+         ->column('InsertUserID', 'int', TRUE)
+         ->column('DateInserted', 'datetime', TRUE)
+         ->column('InsertIPAddress', 'varchar(15)', TRUE)
+         ->column('Attributes', 'text', TRUE)
+         ->column('Closed', 'tinyint', 0)
+         ->column('Deleted', 'tinyint', 0)
+         ->column('UserName', 'varchar(50)', TRUE)
+         ->column('UserEmail', 'varchar(200)', TRUE)
+         ->column('UserFullName', 'varchar(50)', TRUE)
+         ->column('UserAnonymous', 'tinyint', 0)
+         ->column('UniqueType', 'varchar(32)', TRUE)
+         ->column('UniqueID', 'varchar(32)', TRUE, 'index')
+         ->set(TRUE);
+      Gdn::sql()->truncate('zDisqusDiscussion');
 
-      Gdn::Structure()->Table('zDisqusComment')
-         ->Column('ForeignID', 'int', FALSE, 'primary')
-         ->Column('CommentID', 'int', TRUE, 'index')
-         ->Column('DisqusDiscussionID', 'int', TRUE, 'index')
-         ->Column('DiscussionID', 'int', TRUE)
-         ->Column('ParentForeignID', 'int', TRUE)
-         ->Column('Body', 'text')
-         ->Column('Format', 'varchar(20)')
-         ->Column('InsertUserID', 'int', TRUE)
-         ->Column('DateInserted', 'datetime', TRUE)
-         ->Column('InsertIPAddress', 'varchar(15)', TRUE)
-         ->Column('UserName', 'varchar(50)', TRUE)
-         ->Column('UserEmail', 'varchar(200)', TRUE)
-         ->Column('UserFullName', 'varchar(50)', TRUE)
-         ->Column('UserAnonymous', 'tinyint', 0)
-         ->Column('UniqueType', 'varchar(32)', TRUE)
-         ->Column('UniqueID', 'varchar(32)', TRUE)
-         ->Column('Deleted', 'tinyint', 0)
-         ->Column('Approved', 'tinyint', 0)
-         ->Column('Flagged', 'tinyint', 0)
-         ->Column('Spam', 'tinyint', 0)
-         ->Column('Highlighted', 'tinyint', 0)
-         ->Set(TRUE);
-      Gdn::SQL()->Truncate('zDisqusComment');
+      Gdn::structure()->table('zDisqusComment')
+         ->column('ForeignID', 'int', FALSE, 'primary')
+         ->column('CommentID', 'int', TRUE, 'index')
+         ->column('DisqusDiscussionID', 'int', TRUE, 'index')
+         ->column('DiscussionID', 'int', TRUE)
+         ->column('ParentForeignID', 'int', TRUE)
+         ->column('Body', 'text')
+         ->column('Format', 'varchar(20)')
+         ->column('InsertUserID', 'int', TRUE)
+         ->column('DateInserted', 'datetime', TRUE)
+         ->column('InsertIPAddress', 'varchar(15)', TRUE)
+         ->column('UserName', 'varchar(50)', TRUE)
+         ->column('UserEmail', 'varchar(200)', TRUE)
+         ->column('UserFullName', 'varchar(50)', TRUE)
+         ->column('UserAnonymous', 'tinyint', 0)
+         ->column('UniqueType', 'varchar(32)', TRUE)
+         ->column('UniqueID', 'varchar(32)', TRUE)
+         ->column('Deleted', 'tinyint', 0)
+         ->column('Approved', 'tinyint', 0)
+         ->column('Flagged', 'tinyint', 0)
+         ->column('Spam', 'tinyint', 0)
+         ->column('Highlighted', 'tinyint', 0)
+         ->set(TRUE);
+      Gdn::sql()->truncate('zDisqusComment');
    }
 
 
@@ -269,7 +269,7 @@ class DisqusImporter extends Gdn_Plugin {
    /**
     * @return SimpleXmlElement
     */
-   public function Xml() {
+   public function xml() {
       if ($this->_Xml === NULL) {
          $this->_Xml = simplexml_load_file($this->Path);
       }
@@ -278,12 +278,12 @@ class DisqusImporter extends Gdn_Plugin {
 
 
 
-   public function InsertCategories() {
-      Gdn::Structure()
-         ->Table('Category')
-         ->Column('ForeignID', 'varchar(32)')
-         ->Column('Source', 'varchar(20)')
-         ->Set();
+   public function insertCategories() {
+      Gdn::structure()
+         ->table('Category')
+         ->column('ForeignID', 'varchar(32)')
+         ->column('Source', 'varchar(20)')
+         ->set();
 
       $sql = "insert GDN_Category (
             UrlCode,
@@ -302,29 +302,29 @@ class DisqusImporter extends Gdn_Plugin {
          left join GDN_Category t
             on i.UrlCode = t.UrlCode
          where t.CategoryID is null";
-      $this->Query($sql);
+      $this->query($sql);
 
       $sql = "update GDN_zDisqusCategory i
          join GDN_Category t
             on t.UrlCode = i.UrlCode
          set i.CategoryID = t.CategoryID";
-      $this->Query($sql);
+      $this->query($sql);
       $categoryModel = new CategoryModel();
-      $categoryModel->RebuildTree();
+      $categoryModel->rebuildTree();
 
       $sql = "update GDN_zDisqusDiscussion d
          join GDN_zDisqusCategory c
             on d.DisqusCategoryID = c.DisqusID
          set d.CategoryID = c.CategoryID";
-      $this->Query($sql);
+      $this->query($sql);
    }
 
-   public function InsertComments() {
-      Gdn::Structure()
-         ->Table('Comment')
-         ->Column('ForeignID', 'varchar(32)')
-//         ->Column('Source', 'varchar(20)')
-         ->Set();
+   public function insertComments() {
+      Gdn::structure()
+         ->table('Comment')
+         ->column('ForeignID', 'varchar(32)')
+//         ->column('Source', 'varchar(20)')
+         ->set();
 
       $this->_InsertUsers('zDisqusComment');
 
@@ -335,7 +335,7 @@ class DisqusImporter extends Gdn_Plugin {
          join GDN_zDisqusDiscussion d
             on c.DisqusDiscussionID = d.DisqusID
          set c.DiscussionID = d.DiscussionID";
-      $this->Query($sql);
+      $this->query($sql);
 
 
       // Mark all of the comments that have already been inserted.
@@ -344,7 +344,7 @@ class DisqusImporter extends Gdn_Plugin {
             on i.ForeignID = t.ForeignID
          set i.CommentID = t.CommentID";
 //                     and t.Source = 'Disqus'
-      $this->Query($sql);
+      $this->query($sql);
 
       // Insert the comments.
       $sql = "insert GDN_Comment (
@@ -366,10 +366,10 @@ class DisqusImporter extends Gdn_Plugin {
          i.InsertIPAddress
       from GDN_zDisqusComment i
       where i.CommentID is null";
-      $this->Query($sql);
+      $this->query($sql);
    }
 
-   public function InsertDiscussions() {
+   public function insertDiscussions() {
       $this->_InsertUsers('zDisqusDiscussion');
 
       $sql = "insert GDN_Discussion (
@@ -401,13 +401,13 @@ class DisqusImporter extends Gdn_Plugin {
          left join GDN_Discussion d
             on i.ForeignID = d.ForeignID
          where d.ForeignID is null";
-      $this->Query($sql);
+      $this->query($sql);
 
       $sql = "update GDN_zDisqusDiscussion i
          join GDN_Discussion d
             on i.ForeignID = d.ForeignID
          set i.DiscussionID = d.DiscussionID";
-      $this->Query($sql);
+      $this->query($sql);
    }
 
    /**
@@ -416,11 +416,11 @@ class DisqusImporter extends Gdn_Plugin {
     * @param string $table
     */
    protected function _InsertUsers($table) {
-      Gdn::Structure()
-         ->Table('User')
-         ->Column('ForeignID', 'varchar(32)', TRUE)
-         ->Column('Source', 'varchar(20)', TRUE)
-         ->Set();
+      Gdn::structure()
+         ->table('User')
+         ->column('ForeignID', 'varchar(32)', TRUE)
+         ->column('Source', 'varchar(20)', TRUE)
+         ->set();
 
       // Insert the missing users.
       $sql = "insert GDN_User (
@@ -447,10 +447,10 @@ class DisqusImporter extends Gdn_Plugin {
          group by
             i.UserName,
             i.UserEmail";
-      $this->Query($sql);
+      $this->query($sql);
 
       // Make sure the users have a role.
-      $defaultRoleIDs = C('Garden.Registration.DefaultRoles');
+      $defaultRoleIDs = c('Garden.Registration.DefaultRoles');
       if (is_array($defaultRoleIDs)) {
          $roleID = array_pop($defaultRoleIDs);
          $sql = "insert GDN_UserRole (
@@ -471,7 +471,7 @@ class DisqusImporter extends Gdn_Plugin {
          join GDN_User u
             on u.Email = i.UserEmail
          set i.InsertUserID = u.UserID";
-      $this->Query($sql);
+      $this->query($sql);
 
       // Insert authentication.
       $sql = "insert ignore GDN_UserAuthentication (
@@ -486,16 +486,16 @@ class DisqusImporter extends Gdn_Plugin {
          from GDN_{$table}
          where UniqueID <> '' and InsertUserID is not null
          group by UniqueType, UniqueID";
-      $this->Query($sql);
+      $this->query($sql);
    }
 
-   public function InsertTables() {
-      $this->InsertCategories();
-      $this->InsertDiscussions();
-      $this->InsertComments();
+   public function insertTables() {
+      $this->insertCategories();
+      $this->insertDiscussions();
+      $this->insertComments();
    }
 
-   public function Parse() {
+   public function parse() {
       $xml = new XmlReader();
       $xml->open($this->Path);
 
@@ -508,19 +508,19 @@ class DisqusImporter extends Gdn_Plugin {
          switch ($xml->name) {
             case 'category':
                $str = $xml->readOuterXml();
-               $this->ParseCategory($str);
+               $this->parseCategory($str);
                $xml->next();
                $counts['Categories']++;
                break;
             case 'thread':
                $str = $xml->readOuterXml();
-               $this->ParseDiscussion($str);
+               $this->parseDiscussion($str);
                $xml->next();
                $counts['Discussions']++;
                break;
             case 'post':
                $str = $xml->readOuterXml();
-               $this->ParseComment($str);
+               $this->parseComment($str);
                $xml->next();
                $counts['Comments']++;
                break;
@@ -529,34 +529,34 @@ class DisqusImporter extends Gdn_Plugin {
 //         if ($i++ > 100)
 //            break;
       }
-      $this->Insert(NULL);
+      $this->insert(NULL);
       return $counts;
    }
 
-   public function UpdateCounts() {
+   public function updateCounts() {
       $sqls = [];
       $im = new ImportModel();
 
-      $sqls[] = $im->GetCountSQL('min', 'Discussion', 'Comment', 'FirstCommentID');
-      $sqls[] = $im->GetCountSQL('max', 'Discussion', 'Comment', 'LastCommentID');
-      $sqls[] = $im->GetCountSQL('count', 'Discussion', 'Comment');
-//      $Sqls[] = $Im->GetCountSQL('min', 'Discussion', 'Comment', 'DateFirstComment', 'DateInserted');
-      $sqls[] = $im->GetCountSQL('max', 'Discussion', 'Comment', 'DateLastComment', 'DateInserted');
+      $sqls[] = $im->getCountSQL('min', 'Discussion', 'Comment', 'FirstCommentID');
+      $sqls[] = $im->getCountSQL('max', 'Discussion', 'Comment', 'LastCommentID');
+      $sqls[] = $im->getCountSQL('count', 'Discussion', 'Comment');
+//      $Sqls[] = $Im->getCountSQL('min', 'Discussion', 'Comment', 'DateFirstComment', 'DateInserted');
+      $sqls[] = $im->getCountSQL('max', 'Discussion', 'Comment', 'DateLastComment', 'DateInserted');
       $sqls[] = "update GDN_Discussion d
          join GDN_Comment c
             on d.LastCommentID = c.CommentID
          set d.LastCommentUserID = c.InsertUserID";
 
-      $sqls[] = $im->GetCountSQL('count', 'Category', 'Discussion', 'CountDiscussions');
-      $sqls[] = $im->GetCountSQL('sum', 'Category', 'Discussion', 'CountComments', 'CountComments');
+      $sqls[] = $im->getCountSQL('count', 'Category', 'Discussion', 'CountDiscussions');
+      $sqls[] = $im->getCountSQL('sum', 'Category', 'Discussion', 'CountComments', 'CountComments');
 
       foreach ($sqls as $sql) {
-         $this->Query($sql);
+         $this->query($sql);
       }
    }
 
-   public function Query($sql, $parameters = NULL) {
-      $px = Gdn::Database()->DatabasePrefix;
+   public function query($sql, $parameters = NULL) {
+      $px = Gdn::database()->DatabasePrefix;
       if ($px != 'GDN_')
          $sql = str_replace(' GDN_', ' '.$px, $sql);
       $sql = str_replace(':_', $px, $sql);
@@ -566,11 +566,11 @@ class DisqusImporter extends Gdn_Plugin {
 
       echo '<pre>'.htmlspecialchars($sql).";\n\n</pre>";
 
-      return Gdn::Database()->Query($sql, $parameters);
+      return Gdn::database()->query($sql, $parameters);
    }
 
    /// Event Handlers ///
-   public function ImportController_Disqus_Create($sender, $step = 'load') {
+   public function importController_disqus_create($sender, $step = 'load') {
       $start = time();
 
       // Preserve plugin RequiredApplications version.
@@ -604,16 +604,16 @@ class DisqusImporter extends Gdn_Plugin {
          case 'load':
             $this->Path = PATH_UPLOADS.'/disqusimport.xml';
 
-            $this->DefineTables();
-      //      $this->LoadDiscussions();
-            $counts = $this->Parse();
+            $this->defineTables();
+      //      $this->loadDiscussions();
+            $counts = $this->parse();
             decho($counts, 'Counts');
             break;
          case 'insert':
-            $this->InsertTables();
+            $this->insertTables();
             break;
          case 'counts':
-            $this->UpdateCounts();
+            $this->updateCounts();
             break;
       }
 

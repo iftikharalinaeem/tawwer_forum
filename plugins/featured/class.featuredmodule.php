@@ -17,25 +17,25 @@ class FeaturedModule extends Gdn_Module {
       $this->ClassName = get_class();
    }
 
-   public function GetData() {
+   public function getData() {
       $discussionModel = new DiscussionModel();
       $discussions = new Gdn_DataSet([], DATASET_TYPE_ARRAY);
 
       if (class_exists('ReactionModel')) {
-         $reactionType = ReactionModel::ReactionTypes($this->reactionType);;
+         $reactionType = ReactionModel::reactionTypes($this->reactionType);;
          if ($reactionType) {
             $tagID = $reactionType['TagID'];
 
             // Get the IDs of the discussions that have been featured.
-            $discussionIDs = Gdn::SQL()->GetWhere('UserTag', [
+            $discussionIDs = Gdn::sql()->getWhere('UserTag', [
                'RecordType' => 'Discussion-Total',
                'TagID' => $tagID,
                'Total >' => 0
-               ], 'DateInserted', 'desc', $this->count)->ResultArray();
+               ], 'DateInserted', 'desc', $this->count)->resultArray();
             $discussionIDs = array_column($discussionIDs, 'RecordID');
             if (!empty($discussionIDs)) {
-               $discussionData = $discussionModel->GetWhere(['d.DiscussionID' => $discussionIDs, 'Announce' => 'all'])->ResultArray();
-               $discussionData = Gdn_DataSet::Index($discussionData, 'DiscussionID');
+               $discussionData = $discussionModel->getWhere(['d.DiscussionID' => $discussionIDs, 'Announce' => 'all'])->resultArray();
+               $discussionData = Gdn_DataSet::index($discussionData, 'DiscussionID');
 
                // Make sure the result is ordered by the date they were featured.
                $result = [];
@@ -47,12 +47,12 @@ class FeaturedModule extends Gdn_Module {
             }
          }
       } else {
-         $discussions = $discussionModel->GetWhere([], 0, $this->count);
+         $discussions = $discussionModel->getWhere([], 0, $this->count);
       }
-      $this->SetData('Discussions', $discussions);
+      $this->setData('Discussions', $discussions);
    }
 
-   public function AssetTarget() {
+   public function assetTarget() {
       return 'Content';
    }
 
@@ -61,11 +61,11 @@ class FeaturedModule extends Gdn_Module {
     *
     * @return string
     */
-   public function FetchView($View = '') {
-      require_once Gdn::Controller()->FetchViewLocation('helper_functions', 'discussions', 'Vanilla');
+   public function fetchView($View = '') {
+      require_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussions', 'Vanilla');
       $this->CountCommentsPerPage = 50;
 
-      $ViewPath = $this->FetchViewLocation('featured_list');
+      $ViewPath = $this->fetchViewLocation('featured_list');
       $String = '';
       ob_start();
       include $ViewPath;
@@ -74,8 +74,8 @@ class FeaturedModule extends Gdn_Module {
       return $String;
    }
 
-   public function ToString() {
-      $this->GetData();
-      return parent::ToString();
+   public function toString() {
+      $this->getData();
+      return parent::toString();
    }
 }

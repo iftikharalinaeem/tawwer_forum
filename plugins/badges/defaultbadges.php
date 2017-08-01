@@ -7,7 +7,7 @@ if (!function_exists('DefaultPoints')) {
      * @param $threshold
      * @return int
      */
-    function DefaultPoints($threshold) {
+    function defaultPoints($threshold) {
         if ($threshold < 10) {
             return 2;
         }
@@ -257,7 +257,7 @@ $BadgeModel->define([
 //         'Type' => 'UserCount',
 //         'Body' => $Body,
 //         'Photo' => 'https://badges.v-cdn.net/100/like-'.$Level.'.png',
-//         'Points' => DefaultPoints($Count),
+//         'Points' => defaultPoints($Count),
 //         'Attributes' => array('Column' => 'Likes'),
 //         'Threshold' => $Count,
 //         'Class' => 'Liked',
@@ -336,7 +336,7 @@ for ($i = 1; $i < 11; $i++) {
         'Name' => $Order[$i].' Anniversary',
         'Slug' => 'anniversary'.(($i > 1) ? '-'.$i : ''),
         'Type' => 'Custom',
-        'Body' => 'Thanks for sticking with us for '.Plural($i, 'a full year.', '%s years.'),
+        'Body' => 'Thanks for sticking with us for '.plural($i, 'a full year.', '%s years.'),
         'Photo' => "https://badges.v-cdn.net/100/anniversary-$i.png",
         'Points' => 5,
         'Attributes' => [],
