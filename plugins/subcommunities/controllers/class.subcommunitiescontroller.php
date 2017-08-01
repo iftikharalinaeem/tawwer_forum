@@ -206,7 +206,7 @@ class SubcommunitiesController extends DashboardController {
 
         $this->setData('_Limit', $pageSize);
         $this->addJsFile('jquery.tablednd.js');
-//        $this->AddJsFile('subcommunities_admin.js', 'plugins/subcommunities');
+//        $this->addJsFile('subcommunities_admin.js', 'plugins/subcommunities');
 
         $this->title(t('Sites'));
         $this->render();

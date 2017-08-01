@@ -28,11 +28,11 @@ class MultisitesController extends DashboardController {
     /// Methods ///
 
     protected function getSite($siteID) {
-        $this->site = $this->siteModel->GetID($siteID);
+        $this->site = $this->siteModel->getID($siteID);
     }
 
     public function index($page = '', $sort = '') {
-        switch ($this->Request->RequestMethod()) {
+        switch ($this->Request->requestMethod()) {
             case 'GET':
                 if ($this->site) {
                     return $this->get();
@@ -53,10 +53,10 @@ class MultisitesController extends DashboardController {
         if ($this->site) {
             $this->permissionNoLog('Garden.Settings.Manage');
         } else {
-            $this->Permission('Garden.Settings.Manage');
+            $this->permission('Garden.Settings.Manage');
         }
         $pageSize = 20;
-        list($offset, $limit) = OffsetLimit($page, $pageSize);
+        list($offset, $limit) = offsetLimit($page, $pageSize);
         $this->form = new Gdn_Form('', 'bootstrap');
         $this->form->Method = 'get';
 
@@ -64,8 +64,8 @@ class MultisitesController extends DashboardController {
             $sort = 'url';
         }
 
-        if ($search = $this->Request->Get('search')) {
-            $sites = $this->siteModel->search($search, $sort, 'asc', $limit + 1, $offset)->ResultArray();
+        if ($search = $this->Request->get('search')) {
+            $sites = $this->siteModel->search($search, $sort, 'asc', $limit + 1, $offset)->resultArray();
 
             // Select 1 more than page size so we can know whether or not to display the next link.
             $this->setData('_CurrentRecords', count($sites));
@@ -76,21 +76,21 @@ class MultisitesController extends DashboardController {
             $this->setData('Sites', $sites);
         } else {
             $where = [];
-            $this->setData('Sites', $this->siteModel->GetWhere($where, $sort, 'asc', $limit, $offset)->ResultArray());
-            $this->setData('RecordCount', $this->siteModel->GetCount($where));
+            $this->setData('Sites', $this->siteModel->getWhere($where, $sort, 'asc', $limit, $offset)->resultArray());
+            $this->setData('RecordCount', $this->siteModel->getCount($where));
         }
 
         $this->setData('_Limit', $pageSize);
 
-        $this->Title('Sites');
-        $this->AddSideMenu();
-        $this->Render();
+        $this->title('Sites');
+        $this->addSideMenu();
+        $this->render();
     }
 
     public function add() {
         $this->permissionNoLog('Garden.Settings.Manage');
-        $this->Title(T('Add Site'));
-        $this->Render();
+        $this->title(t('Add Site'));
+        $this->render();
     }
 
     /**
@@ -100,59 +100,59 @@ class MultisitesController extends DashboardController {
     public function buildcallback() {
         $this->permissionNoLog('Garden.Settings.Manage');
 
-        if (Gdn::Request()->RequestMethod() !== 'POST') {
+        if (Gdn::request()->requestMethod() !== 'POST') {
             throw new Gdn_UserException("This resource only accepts POST.", 405);
         }
 
         if (!$this->site) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
         $id = $this->site['MultisiteID'];
-        $data = array_change_key_case(Gdn::Request()->Post());
+        $data = array_change_key_case(Gdn::request()->post());
 
         if (val('result', $data) === 'success') {
             MultisiteModel::instance()->status($id, 'active');
-            MultisiteModel::instance()->SetField($id, ['SiteID' => valr('site.SiteID', $data)]);
-            Trace("Status of site $id set to active.");
+            MultisiteModel::instance()->setField($id, ['SiteID' => valr('site.SiteID', $data)]);
+            trace("Status of site $id set to active.");
             MultisiteModel::instance()->syncNode($this->site);
         } else {
             MultisiteModel::instance()->status($id, 'error', val('status', $data));
-            MultisiteModel::instance()->SaveAttribute($id, 'callback', $data);
-            Trace("Status of site $id set to error.");
+            MultisiteModel::instance()->saveAttribute($id, 'callback', $data);
+            trace("Status of site $id set to error.");
         }
 
-        $this->Render('API');
+        $this->render('API');
     }
 
     protected function get() {
         if (!$this->site) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
 
-        $this->SetData('Site', $this->site);
-        $this->Render('api');
+        $this->setData('Site', $this->site);
+        $this->render('api');
     }
 
     public function nodeConfig($from) {
         $this->permissionNoLog('Garden.Settings.Manage');
         if (!$from) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
-        $this->site = $this->siteModel->getWhere(['slug' => $from])->FirstRow(DATASET_TYPE_ARRAY);
+        $this->site = $this->siteModel->getWhere(['slug' => $from])->firstRow(DATASET_TYPE_ARRAY);
         if (!$this->site) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
 
         // See if we even should sync.
-        $this->SetData('Sync', val('Sync', $this->site));
-        if (!$this->Data('Sync')) {
-            $this->Render('api');
+        $this->setData('Sync', val('Sync', $this->site));
+        if (!$this->data('Sync')) {
+            $this->render('api');
             return;
         }
-        $this->SetData('Multisite', $this->site);
+        $this->setData('Multisite', $this->site);
 
         // Get the base config.
-        $config = C('NodeConfig', []);
+        $config = c('NodeConfig', []);
 
         // Parse out the node config into a version that is
         $configSettings = val('Config', $config, []);
@@ -162,29 +162,29 @@ class MultisitesController extends DashboardController {
         }
         $config['Config'] = $realConfigSettings;
 
-        $this->SetData($config);
+        $this->setData($config);
 
         // Get the roles.
         $roles = $this->siteModel->getSyncRoles($this->site);
-        $this->SetData('Roles', $roles);
+        $this->setData('Roles', $roles);
 
         // Get the categories.
         $categories = $this->siteModel->getSyncCategories($this->site);
-        $this->SetData('Categories', $categories);
+        $this->setData('Categories', $categories);
 
-        $this->SetData('OtherCategories', $this->siteModel->getDontSyncCategories($this->site));
+        $this->setData('OtherCategories', $this->siteModel->getDontSyncCategories($this->site));
 
         // Get the authentication providers.
-        $providers = Gdn_AuthenticationProviderModel::GetWhereStatic(['SyncToNodes' => 1]);
-        $this->SetData('Authenticators', $providers);
+        $providers = Gdn_AuthenticationProviderModel::getWhereStatic(['SyncToNodes' => 1]);
+        $this->setData('Authenticators', $providers);
 
-        SaveToConfig('Api.Clean', FALSE, FALSE);
-        $this->Render('api');
+        saveToConfig('Api.Clean', FALSE, FALSE);
+        $this->render('api');
     }
 
     public function notifySync() {
         if (!$this->site) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
     }
 
@@ -197,25 +197,25 @@ class MultisitesController extends DashboardController {
         $this->permissionNoLog('Garden.Settings.Manage');
 
         if (!$this->site) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
 
-        $post = $this->Request->Post();
+        $post = $this->Request->post();
 
         $allowed = ['DateLastSync', 'Status', 'Locale', 'Name'];
-        $post = ArrayTranslate($post, $allowed);
+        $post = arrayTranslate($post, $allowed);
         if (val('Status', $post) === 'active' && $this->site['Status'] !== 'active') {
-            $post['DateStatus'] = Gdn_Format::ToDateTime();
+            $post['DateStatus'] = Gdn_Format::toDateTime();
         } else {
             unset($post['Status']);
         }
 
         if (isset($post['DateLastSync'])) {
-            $this->siteModel->SetField($this->site['MultisiteID'], $post);
-            $this->SetData('DateLastSync', true);
+            $this->siteModel->setField($this->site['MultisiteID'], $post);
+            $this->setData('DateLastSync', true);
         }
 
-        $this->Render('api');
+        $this->render('api');
     }
 
     /**
@@ -230,39 +230,39 @@ class MultisitesController extends DashboardController {
             throw new Gdn_UserException('Site invalid when creating a site.');
         }
 
-        $siteID = $this->siteModel->insert($this->Request->Post());
+        $siteID = $this->siteModel->insert($this->Request->post());
         if ($siteID) {
             $site = $this->siteModel->getID($siteID);
-            $this->SetData('Site', $site);
+            $this->setData('Site', $site);
         } else {
-            throw new Gdn_UserException($this->siteModel->Validation->ResultsText());
+            throw new Gdn_UserException($this->siteModel->Validation->resultsText());
         }
 
-        if ($this->DeliveryType() === DELIVERY_TYPE_VIEW) {
-            $this->JsonTarget('', '', 'Refresh');
-        } elseif ($this->DeliveryType() === DELIVERY_TYPE_ALL) {
+        if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
+            $this->jsonTarget('', '', 'Refresh');
+        } elseif ($this->deliveryType() === DELIVERY_TYPE_ALL) {
             redirectTo('/multisites');
         }
 
-        $this->Render('api');
+        $this->render('api');
     }
 
     public function delete() {
-        $this->Permission('Garden.Settings.Manage');
+        $this->permission('Garden.Settings.Manage');
 
         if (!$this->site) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
 
         $this->Form = new Gdn_Form();
 
-        if ($this->Form->AuthenticatedPostBack()) {
+        if ($this->Form->authenticatedPostBack()) {
             if (!$this->site['SiteID']) {
                 // There is no site associated with this role so just delete the row.
                 $this->siteModel->delete(['MultisiteID' => $this->site['MultisiteID']]);
                 $this->jsonTarget("#Multisite_{$this->site['MultisiteID']}", '', 'SlideUp');
             } elseif (!$this->siteModel->queueDelete($this->site['MultisiteID'])) {
-                $this->Form->SetValidationResults($this->siteModel->ValidationResults());
+                $this->Form->setValidationResults($this->siteModel->validationResults());
             } else {
                 $this->jsonTarget("#Multisite_{$this->site['MultisiteID']} td.js-status", t('deleting'), 'Html');
             }
@@ -278,25 +278,25 @@ class MultisitesController extends DashboardController {
     public function deletecallback() {
         $this->permissionNoLog('Garden.Settings.Manage');
 
-        if (Gdn::Request()->RequestMethod() !== 'POST') {
+        if (Gdn::request()->requestMethod() !== 'POST') {
             throw new Gdn_UserException("This resource only accepts POST.", 405);
         }
 
         if (!$this->site) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
         $id = $this->site['MultisiteID'];
-        $data = array_change_key_case(Gdn::Request()->Post());
+        $data = array_change_key_case(Gdn::request()->post());
 
         if (val('result', $data) === 'success') {
             MultisiteModel::instance()->delete(['MultisiteID' => $id]);
         } else {
             MultisiteModel::instance()->status($id, 'error', val('status', $data));
-            MultisiteModel::instance()->SaveAttribute($id, 'callback', $data);
-            Trace("Status of site $id set to error.");
+            MultisiteModel::instance()->saveAttribute($id, 'callback', $data);
+            trace("Status of site $id set to error.");
         }
 
-        $this->Render('API');
+        $this->render('API');
     }
 
     /**
@@ -305,22 +305,22 @@ class MultisitesController extends DashboardController {
     public function syncNode() {
         $this->permissionNoLog('Garden.Settings.Manage');
 
-        if (Gdn::Request()->RequestMethod() !== 'POST') {
+        if (Gdn::request()->requestMethod() !== 'POST') {
             throw new Gdn_UserException("This resource only accepts POST.", 405);
         }
 
         if ($this->site) {
             $result = MultisiteModel::instance()->syncNode($this->site);
-            $this->SetData('Result', $result);
+            $this->setData('Result', $result);
         } else {
             $result = MultisiteModel::instance()->syncNodes();
-            $this->SetData('Result', $result);
+            $this->setData('Result', $result);
 
-            if ($this->DeliveryType() !== DELIVERY_TYPE_DATA) {
-                $this->InformMessage(T('The sites are now synchronizing.'));
+            if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
+                $this->informMessage(t('The sites are now synchronizing.'));
             }
         }
-        $this->Render('api');
+        $this->render('api');
     }
 
     /**
@@ -389,12 +389,12 @@ class MultisitesController extends DashboardController {
      * @access public
      */
     public function initialize() {
-        parent::Initialize();
+        parent::initialize();
 
         $this->siteModel = MultisiteModel::instance();
 
         // Check for a site.
-        $args = Gdn::Dispatcher()->ControllerArguments();
+        $args = Gdn::dispatcher()->controllerArguments();
         if (isset($args[0]) && is_numeric($args[0])) {
             $id = array_shift($args);
             $this->getSite($id);
@@ -402,20 +402,20 @@ class MultisitesController extends DashboardController {
             // See if there is a method next.
             $method = array_shift($args);
             if ($method) {
-                if (StringEndsWith($method, '.json', TRUE)) {
-                    $method = StringEndsWith($method, '.json', TRUE, TRUE);
-                    $this->DeliveryType(DELIVERY_TYPE_DATA);
-                    $this->DeliveryMethod(DELIVERY_METHOD_JSON);
+                if (stringEndsWith($method, '.json', TRUE)) {
+                    $method = stringEndsWith($method, '.json', TRUE, TRUE);
+                    $this->deliveryType(DELIVERY_TYPE_DATA);
+                    $this->deliveryMethod(DELIVERY_METHOD_JSON);
                 }
                 if (method_exists($this, $method)) {
-                    Gdn::Dispatcher()->EventArguments['ControllerMethod'] = $method;
-                    Gdn::Dispatcher()->ControllerMethod = $method;
+                    Gdn::dispatcher()->EventArguments['ControllerMethod'] = $method;
+                    Gdn::dispatcher()->ControllerMethod = $method;
                 } else {
                     array_unshift($args, $method);
                 }
             }
 
-            Gdn::Dispatcher()->ControllerArguments($args);
+            Gdn::dispatcher()->controllerArguments($args);
         }
     }
 
@@ -427,7 +427,7 @@ class MultisitesController extends DashboardController {
     public function cleanspeakProxy() {
         $this->permissionNoLog('Garden.Settings.Manage');
 
-        $post = Gdn::Request()->Post();
+        $post = Gdn::request()->post();
         if (!$post) {
             return;
         }
@@ -451,16 +451,16 @@ class MultisitesController extends DashboardController {
 
         }
         if (is_array($errors) && !empty($errors)) {
-            $this->SetData('Errors', $errors);
+            $this->setData('Errors', $errors);
             $errorMessage = implode(PHP_EOL, $errors);
             $context['Errors'] = $errors;
             Logger::event('cleanspeak_error', Logger::ERROR, 'Error(s) approving content: ' . $errorMessage, $context);
 
         } else {
-            $this->SetData('Success', true);
+            $this->setData('Success', true);
         }
 
-        $this->Render('Blank', 'Utility', 'Dashboard');
+        $this->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
@@ -491,7 +491,7 @@ class MultisitesController extends DashboardController {
         $errors = [];
 
         $multiSiteModel = new MultisiteModel();
-        $site = $multiSiteModel->getWhere(['SiteID' => $siteID])->FirstRow(DATASET_TYPE_ARRAY);
+        $site = $multiSiteModel->getWhere(['SiteID' => $siteID])->firstRow(DATASET_TYPE_ARRAY);
         if (!$site) {
             Logger::event('cleanspeak_error', Logger::ERROR, "Site not found. UUID: {$post['id']} SiteID: $siteID");
             return [];
@@ -503,7 +503,7 @@ class MultisitesController extends DashboardController {
             Logger::log(Logger::ERROR, 'Error communicating with node.', [$e->getMessage()]);
         }
 
-        if (GetValue('Errors', $response)) {
+        if (getValue('Errors', $response)) {
             $errors[$siteID] = $response['Errors'];
         }
 
@@ -528,7 +528,7 @@ class MultisitesController extends DashboardController {
         foreach ($siteApprovals as $siteID => $siteApproval) {
 
             $multiSiteModel = new MultisiteModel();
-            $site = $multiSiteModel->getWhere(['SiteID' => $siteID])->FirstRow(DATASET_TYPE_ARRAY);
+            $site = $multiSiteModel->getWhere(['SiteID' => $siteID])->firstRow(DATASET_TYPE_ARRAY);
             if (!$site) {
                 $errors[] = 'Site not found: ' . $siteID;
                 continue;
@@ -539,7 +539,7 @@ class MultisitesController extends DashboardController {
             $sitePost['approvals'] = $siteApproval;
             $sitePost['moderatorId'] = $post['moderatorId'];
             $sitePost['moderatorEmail'] = $post['moderatorEmail'];
-            $sitePost['moderatorExternalId'] = GetValue('moderatorExternalId', $post, NULL);
+            $sitePost['moderatorExternalId'] = getValue('moderatorExternalId', $post, NULL);
 
             try {
                 $response = $this->siteModel->nodeApi($site['Slug'], 'mod/cleanspeakpostback.json', 'POST', $sitePost);
@@ -547,7 +547,7 @@ class MultisitesController extends DashboardController {
                 $errors[$siteID] = 'Error communicating with node.';
                 Logger::log(Logger::ERROR, 'Error communicating with node.', [$e->getMessage()]);
             }
-            if (GetValue('Errors', $response)) {
+            if (getValue('Errors', $response)) {
                 $errors[$siteID] = $response['Errors'];
             }
         }
@@ -567,7 +567,7 @@ class MultisitesController extends DashboardController {
         $errors = [];
 
         $multiSiteModel = new MultisiteModel();
-        $site = $multiSiteModel->getWhere(['SiteID' => $siteID])->FirstRow(DATASET_TYPE_ARRAY);
+        $site = $multiSiteModel->getWhere(['SiteID' => $siteID])->firstRow(DATASET_TYPE_ARRAY);
         if (!$site) {
             Logger::event('cleanspeak_error', Logger::ERROR, "Site not found. SiteID: $siteID");
             return;
@@ -579,7 +579,7 @@ class MultisitesController extends DashboardController {
             Logger::log(Logger::ERROR, 'Error communicating with node.', [$e->getMessage()]);
         }
 
-        if (GetValue('Errors', $response)) {
+        if (getValue('Errors', $response)) {
             $errors[$siteID] = $response['Errors'];
         }
 
@@ -604,10 +604,10 @@ class MultisitesController extends DashboardController {
      * @throws \Exception Throws an exception if the user does not have permission.
      */
     protected function permissionNoLog($permission) {
-        if (Gdn::Session()->CheckPermission($permission)) {
+        if (Gdn::session()->checkPermission($permission)) {
             return;
         }
-        throw PermissionException($permission);
+        throw permissionException($permission);
     }
 
     /**
