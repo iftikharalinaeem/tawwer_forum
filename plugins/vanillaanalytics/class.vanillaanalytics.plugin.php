@@ -245,7 +245,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
      * @param QnAPlugin $sender Instance of the QnAPlugin.
      * @param array $args Arguments for the current event.
      */
-    public function qnaPlugin_AfterAccepted_handler($sender, $args) {
+    public function qnaPlugin_afterAccepted_handler($sender, $args) {
         $activity = val('Activity', $args);
         if ($activity) {
             $data = AnalyticsData::getComment(val('RecordID', $activity), false);
