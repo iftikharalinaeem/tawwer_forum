@@ -8,7 +8,7 @@
 class AllowHTMLClassesPlugin extends Gdn_Plugin {
 
     /** @var array Hard-coded HTML class prefixes we do not want to allow users to include in input */
-    public static $restrictedPrefixes = ['js-'];
+    public static $restrictedPrefixes = ['js-', 'twitter-', 'tweet-'];
 
     /** @var array Hard-coded HTML class suffixes we do not want to allow users to include in input */
     public static $restrictedSuffixes = [];
@@ -17,7 +17,7 @@ class AllowHTMLClassesPlugin extends Gdn_Plugin {
     public static $restrictedStrings = [];
 
     /** @var array Hard-coded restricted HTML class names we do not wantto allow users to include in input */
-    public static $restrictedNames = [];
+    public static $restrictedNames = ['Popup', 'AjaxForm', 'BodyBox', 'mfp-image', 'Video', 'YouTube', 'VideoPreview'];
 
     /**
      * Constructor function that merges any hard-coded restrictions we have with ones that we can put in the config.
