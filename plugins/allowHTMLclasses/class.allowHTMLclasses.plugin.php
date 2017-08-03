@@ -66,10 +66,10 @@ class AllowHTMLClassesPlugin extends Gdn_Plugin {
             $trustedHTMLClasses = self::filterClassList($trustedHTMLClasses);
             $form->setFormValue('Garden.TrustedHTMLClasses', $trustedHTMLClasses);
 
-            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validBeginsWith', sprintf(t('One or more class names provided begins with one of the following strings "%s" which cannot be used.'), implode(',', self::$restrictedPrefixes)));
-            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validEndsWith', sprintf(t('One or more class names provided ends with one of the following strings "%s" which cannot be used.'), implode(',', self::$restrictedSuffixes)));
-            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validContains', sprintf(t('One or more class names provided contains one of the following strings "%s" which cannot be used.'), implode(',', self::$restrictedStrings)));
-            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validNames', sprintf(t('One or more class names provided is one of the following strings "%s" which cannot be used.'), implode(',', self::$restrictedNames)));
+            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validateClassBeginsWith', sprintf(t('Classes cannot begin with "%s".'), implode(',', self::$restrictedPrefixes)));
+            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validateClassEndsWith', sprintf(t('Classes cannot end with "%s".'), implode(',', self::$restrictedSuffixes)));
+            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validateClassContains', sprintf(t('Classes cannot contain "%s".'), implode(',', self::$restrictedStrings)));
+            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validateClassNameIs', sprintf(t('Classes cannot be any of the following: "%s".'), implode(',', self::$restrictedNames)));
             // Save new settings
             $saved = $form->save();
             if ($saved !== false) {
@@ -110,7 +110,7 @@ class AllowHTMLClassesPlugin extends Gdn_Plugin {
 
 //------------------- Validation Functions ---------------------------------//
 
-if (!function_exists('validBeginsWith')) {
+if (!function_exists('validateClassBeginsWith')) {
 
     /**
      * Optionally do not allow any HTML classes that have a particular prefix.
@@ -118,15 +118,15 @@ if (!function_exists('validBeginsWith')) {
      * @param string $data The list of HTML classes to be allowed.
      * @return bool
      */
-    function validBeginsWith($data) {
+    function validateClassBeginsWith($data) {
         $trustedHTMLClasses = AllowHTMLClassesPlugin::filterClassList($data);
         $trustedHTMLClasses = array_filter(explode("\n", $trustedHTMLClasses));
         $restrictedPrefix = AllowHTMLClassesPlugin::$restrictedPrefixes;
-        if (!$trustedHTMLClasses && ! $restrictedPrefix) {
+        if (!$trustedHTMLClasses && !$restrictedPrefix) {
             return true;
         }
-        foreach($trustedHTMLClasses as $HTMLClass) {
-            foreach($restrictedPrefix as $prefix) {
+        foreach ($trustedHTMLClasses as $HTMLClass) {
+            foreach ($restrictedPrefix as $prefix) {
                 if (stringBeginsWith($HTMLClass, trim($prefix), true)) {
                     return false;
                 }
@@ -136,7 +136,7 @@ if (!function_exists('validBeginsWith')) {
     }
 }
 
-if (!function_exists('validEndsWith')) {
+if (!function_exists('validateClassEndsWith')) {
 
     /**
      * Optionally do not allow any HTML classes that have a particular ending.
@@ -144,15 +144,15 @@ if (!function_exists('validEndsWith')) {
      * @param string $data The list of HTML classes to be allowed.
      * @return bool
      */
-    function validEndsWith($data) {
+    function validateClassEndsWith($data) {
         $trustedHTMLClasses = AllowHTMLClassesPlugin::filterClassList($data);
         $trustedHTMLClasses = array_filter(explode("\n", $trustedHTMLClasses));
         $restrictedSuffixes = AllowHTMLClassesPlugin::$restrictedSuffixes;
-        if (!$trustedHTMLClasses && ! $restrictedSuffixes) {
+        if (!$trustedHTMLClasses && !$restrictedSuffixes) {
             return true;
         }
-        foreach($trustedHTMLClasses as $HTMLClass) {
-            foreach($restrictedSuffixes as $suffix) {
+        foreach ($trustedHTMLClasses as $HTMLClass) {
+            foreach ($restrictedSuffixes as $suffix) {
                 if (stringEndsWith($HTMLClass, trim($suffix), true)) {
                     return false;
                 }
@@ -162,7 +162,7 @@ if (!function_exists('validEndsWith')) {
     }
 }
 
-if (!function_exists('validContains')) {
+if (!function_exists('validateClassContains')) {
 
     /**
      * Optionally do not allow any HTML classes contain a particular string.
@@ -170,12 +170,12 @@ if (!function_exists('validContains')) {
      * @param string $data The list of HTML classes to be allowed.
      * @return bool
      */
-    function validContains($data) {
+    function validateClassContains($data) {
         $trustedHTMLClasses = AllowHTMLClassesPlugin::filterClassList($data);
         $trustedHTMLClasses = explode("\n", $trustedHTMLClasses);
         $restrictedString = AllowHTMLClassesPlugin::$restrictedStrings;
-        foreach($trustedHTMLClasses as $HTMLClass) {
-            foreach($restrictedString as $string) {
+        foreach ($trustedHTMLClasses as $HTMLClass) {
+            foreach ($restrictedString as $string) {
                 if (strripos($HTMLClass, trim($string)) !== false) {
                     return false;
                 }
@@ -185,7 +185,7 @@ if (!function_exists('validContains')) {
     }
 }
 
-if (!function_exists('validNames')) {
+if (!function_exists('validateClassNameIs')) {
 
     /**
      * Optionally do not allow particular class names.
@@ -193,12 +193,12 @@ if (!function_exists('validNames')) {
      * @param string $data The list of HTML classes to be allowed.
      * @return bool
      */
-    function validNames($data) {
+    function validateClassNameIs($data) {
         $trustedHTMLClasses = AllowHTMLClassesPlugin::filterClassList($data);
         $trustedHTMLClasses = explode("\n", $trustedHTMLClasses);
         $restrictedNames = AllowHTMLClassesPlugin::$restrictedNames;
-        foreach($trustedHTMLClasses as $HTMLClass) {
-            foreach($restrictedNames as $name) {
+        foreach ($trustedHTMLClasses as $HTMLClass) {
+            foreach ($restrictedNames as $name) {
                 if (strcasecmp($HTMLClass, trim($name)) === 0) {
                     return false;
                 }
