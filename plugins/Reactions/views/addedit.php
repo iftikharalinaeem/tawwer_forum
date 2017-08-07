@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
-<h1><?php echo T($this->Title()); ?></h1>
+<h1><?php echo t($this->title()); ?></h1>
 <div class="AddReaction">
    <ul class="Reaction">
       <li class="Name row form-group">
@@ -27,5 +27,5 @@ echo $this->Form->Errors();
       </li>
 
    </ul>
-   <?php echo $this->Form->Close('Save'); ?>
+   <?php echo $this->Form->close('Save'); ?>
 </div>

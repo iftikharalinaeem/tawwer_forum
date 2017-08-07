@@ -66,7 +66,7 @@ class BadgesAppController extends Gdn_Controller {
             $this->MasterView = 'admin';
         }
 
-        // Call Gdn_Controller's Initialize() as well.
+        // Call Gdn_Controller's initialize() as well.
         parent::initialize();
     }
 

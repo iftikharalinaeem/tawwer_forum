@@ -5,7 +5,7 @@ $hasBanner = val('Banner', $this->group);
 <div class="Group-Header<?php echo $hasBanner ? ' HasBanner' : ' NoBanner'; ?>">
     <?php
     writeGroupBanner($this->group);
-    WriteGroupIcon($this->group, 'Group-Icon Group-Icon-Big', true);
+    writeGroupIcon($this->group, 'Group-Icon Group-Icon-Big', true);
     if ($this->showOptions && $options = getGroupOptions($this->group)) {
         writeGroupOptionsButton($options);
     }
@@ -21,7 +21,7 @@ $hasBanner = val('Banner', $this->group);
         </div>
     <?php } ?>
     <div class="Group-Header-Info">
-        <h1 class="Group-Title"><?php echo anchor(htmlspecialchars(val('Name', $this->group)), GroupUrl($this->group)); ?></h1>
+        <h1 class="Group-Title"><?php echo anchor(htmlspecialchars(val('Name', $this->group)), groupUrl($this->group)); ?></h1>
         <?php
         if ($this->showDescription) { ?>
             <div class="Group-Description">

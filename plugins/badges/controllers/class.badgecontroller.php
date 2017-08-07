@@ -98,7 +98,7 @@ class BadgeController extends BadgesAppController {
 
         $badge = $this->BadgeModel->getID($badgeID);
         if (!$badge) {
-            throw NotFoundException('badge');
+            throw notFoundException('badge');
         }
 
         // Form setup
@@ -235,7 +235,7 @@ class BadgeController extends BadgesAppController {
         if (empty($userID)) {
             $postUserID = Gdn::request()->post('UserID', false);
             if (is_null($postUserID)) {
-                throw NotFoundException('UserID');
+                throw notFoundException('UserID');
             }
 
             $userID = $postUserID;
@@ -245,7 +245,7 @@ class BadgeController extends BadgesAppController {
         $userModel = new UserModel();
         $this->setData('User', $userModel->getID($userID), true);
         if (!$this->data('User')) {
-            throw NotFoundException('User');
+            throw notFoundException('User');
         }
 
         // Form setup
@@ -263,7 +263,7 @@ class BadgeController extends BadgesAppController {
                 $saved = $this->UserBadgeModel->give($this->User->UserID, $badgeID, $reason);
                 $this->setData('Awarded', $saved);
 
-                $this->Form->setValidationResults($this->UserBadgeModel->Validation->Results());
+                $this->Form->setValidationResults($this->UserBadgeModel->Validation->results());
                 $this->UserBadgeModel->Validation->results(true);
 
                 // Continue
@@ -276,7 +276,7 @@ class BadgeController extends BadgesAppController {
                     $this->setRedirectTo('profile/'.$userID.'/'.val('Name', $this->User));
                 }
             } else {
-                throw NotFoundException('Badge');
+                throw notFoundException('Badge');
             }
         }
 
@@ -336,7 +336,7 @@ class BadgeController extends BadgesAppController {
         if (Gdn::session()->isValid()) {
             $this->UserBadge = $this->UserBadgeModel->getByUser(Gdn::session()->User->UserID, $this->data('Badge.BadgeID'));
         }
-        $this->SetData('UserBadge', $this->UserBadge);
+        $this->setData('UserBadge', $this->UserBadge);
 
         // Get recipients
         $this->setData('Recipients', $this->UserBadgeModel->getUsers($badgeID, ['Limit' => 15])->resultArray());
@@ -417,9 +417,9 @@ class BadgeController extends BadgesAppController {
                     $props = $uploadImage->saveImageAs(
                         $tmpImage,
                         "badges/$basename",
-                        C('Reputation.Badges.Height', 100),
-                        C('Reputation.Badges.Width', 100),
-                        ['SaveGif' => C('Reputation.Badges.SaveGif')]
+                        c('Reputation.Badges.Height', 100),
+                        c('Reputation.Badges.Width', 100),
+                        ['SaveGif' => c('Reputation.Badges.SaveGif')]
                     );
                     $this->Form->setFormValue('Photo', sprintf($props['SaveFormat'], "badges/$basename"));
                 }

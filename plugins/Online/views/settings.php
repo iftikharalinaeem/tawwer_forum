@@ -2,7 +2,7 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
-<h1><?php echo T("Online Settings"); ?></h1>
+<h1><?php echo t("Online Settings"); ?></h1>
 <h2>Placement and Visual Settings</h2>
 <ul>
     <li class="form-group">

@@ -77,54 +77,54 @@ class EventModule extends Gdn_Module {
         return $this;
     }
 
-    public function GetData() {
+    public function getData() {
 
         // Only callable if configured
         if (!$this->Type) return;
 
         // Callable multiple times
-        if (!is_null($this->Data('Events', null))) return;
+        if (!is_null($this->data('Events', null))) return;
 
         $eventCriteria = [];
         switch ($this->FilterBy) {
             case 'group':
                 $groupModel = new GroupModel();
-                $group = $groupModel->GetID($this->Filter, DATASET_TYPE_ARRAY);
-                $this->SetData('Group', $group);
+                $group = $groupModel->getID($this->Filter, DATASET_TYPE_ARRAY);
+                $this->setData('Group', $group);
                 $eventCriteria['GroupID'] = $group['GroupID'];
                 break;
 
             case 'user':
-                $user = Gdn::UserModel()->GetID($this->Filter, DATASET_TYPE_ARRAY);
-                $this->SetData('User', $user);
+                $user = Gdn::userModel()->getID($this->Filter, DATASET_TYPE_ARRAY);
+                $this->setData('User', $user);
                 $eventCriteria['Invited'] = $user['UserID'];
                 break;
         }
 
         switch ($this->Type) {
             case 'upcoming':
-                $filterDate = C('Groups.Events.UpcomingRange', '+365 days');
+                $filterDate = c('Groups.Events.UpcomingRange', '+365 days');
                 $ended = false;
-                $this->SetData('Title', T('Upcoming Events'));
+                $this->setData('Title', t('Upcoming Events'));
                 break;
 
             case 'recent':
-                $filterDate = C('Groups.Events.RecentRange', '-365 days');
+                $filterDate = c('Groups.Events.RecentRange', '-365 days');
                 $ended = true;
-                $this->SetData('Title', T('Recent Events'));
+                $this->setData('Title', t('Recent Events'));
                 break;
         }
 
         $eventModel = new EventModel();
-        $this->SetData('Events', $eventModel->GetUpcoming($filterDate, $eventCriteria, $ended));
+        $this->setData('Events', $eventModel->getUpcoming($filterDate, $eventCriteria, $ended));
 
     }
 
-    public function ToString() {
-        $this->GetData();
+    public function toString() {
+        $this->getData();
         if (!is_null($this->Button))
-            $this->SetData('Button', $this->Button);
-        return $this->FetchView();
+            $this->setData('Button', $this->Button);
+        return $this->fetchView();
     }
 
 }

@@ -2,12 +2,12 @@
 
 <?php
 
-if (Gdn::Controller()->DeliveryType() == DELIVERY_TYPE_ALL) {
-   echo '<h1>'.$this->Data('Title').'</h1>';
-   echo '<div class="Info">'.$this->Data('status').'</div>';
-   echo $this->Form->Open(),
-      $this->Form->Errors(),
-      $this->Form->Close();
+if (Gdn::controller()->deliveryType() == DELIVERY_TYPE_ALL) {
+   echo '<h1>'.$this->data('Title').'</h1>';
+   echo '<div class="Info">'.$this->data('status').'</div>';
+   echo $this->Form->open(),
+      $this->Form->errors(),
+      $this->Form->close();
 } else {
-   echo $this->Data('status');
+   echo $this->data('status');
 }

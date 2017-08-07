@@ -155,9 +155,9 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
      * @param SettingsController $args.
      */
     public function settingsController_microsoftaccount_create($sender, $args) {
-        $sender->setData('Title', sprintf(T('%s Settings'), 'Microsoft Account'));
+        $sender->setData('Title', sprintf(t('%s Settings'), 'Microsoft Account'));
 
-        $redirectUrls = Gdn::request()->Url('/entry/'. $this->getProviderKey(), true, false).','.Gdn::Request()->Url('/entry/'. $this->getProviderKey(), true, true);
+        $redirectUrls = Gdn::request()->url('/entry/'. $this->getProviderKey(), true, false).','.Gdn::request()->url('/entry/'. $this->getProviderKey(), true, true);
         $sender->setData('redirectUrls', $redirectUrls);
 
         $this->settingsController_oAuth2_create($sender, $args);

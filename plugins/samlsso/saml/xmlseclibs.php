@@ -41,8 +41,8 @@
  */
 
 /*
-Functions to generate simple cases of Exclusive Canonical XML - Callable function is C14NGeneral()
-i.e.: $canonical = C14NGeneral($domelement, true);
+Functions to generate simple cases of Exclusive Canonical XML - Callable function is c14NGeneral()
+i.e.: $canonical = c14NGeneral($domelement, true);
 */
 
 /* helper function */
@@ -149,11 +149,11 @@ $element - DOMElement for which to produce the canonical version of
 $exclusive - boolean to indicate exclusive canonicalization (must pass true)
 $withcomments - boolean indicating wether or not to include comments in canonicalized form
 */
-function C14NGeneral($element, $exclusive=false, $withcomments=false) {
+function c14NGeneral($element, $exclusive=false, $withcomments=false) {
     /* IF PHP 5.2+ then use built in canonical functionality */
     $php_version = explode('.', PHP_VERSION);
     if (($php_version[0] > 5) || ($php_version[0] == 5 && $php_version[1] >= 2) ) {
-        return $element->C14N($exclusive, $withcomments);
+        return $element->c14N($exclusive, $withcomments);
     }
 
     /* Must be element or document */
@@ -673,9 +673,9 @@ class XMLSecurityDSig {
             if (! is_null($arXPath)) {
                 throw new Exception("PHP 5.2.0 or higher is required to perform XPath Transformations");
             }
-            return C14NGeneral($node, $exclusive, $withComments);
+            return c14NGeneral($node, $exclusive, $withComments);
         }
-        return $node->C14N($exclusive, $withComments, $arXPath, $prefixList);
+        return $node->c14N($exclusive, $withComments, $arXPath, $prefixList);
     }
 
     public function canonicalizeSignedInfo() {

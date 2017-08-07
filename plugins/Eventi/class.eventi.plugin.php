@@ -60,12 +60,12 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class EventiPlugin extends Gdn_Plugin {
 
-   public function Base_Render_Before($sender) {
-      $sender->AddCssFile('eventi.css', 'plugins/Eventi');
-      $sender->AddJsFile('eventi.js', 'plugins/Eventi');
+   public function base_render_before($sender) {
+      $sender->addCssFile('eventi.css', 'plugins/Eventi');
+      $sender->addJsFile('eventi.js', 'plugins/Eventi');
    }
 
-   public function Base_All_Handler($sender, $args, $key) {
+   public function base_all_handler($sender, $args, $key) {
 
       // These events break all asynchronous functionality on the site, as
       // they insert themselves directly in a response, so do nothing with them.
@@ -83,9 +83,9 @@ class EventiPlugin extends Gdn_Plugin {
       }
 
       $caller = $sender->EventArguments['WildEventStack'];
-      $callerFile = str_replace(Gdn::Request()->GetValue('DOCUMENT_ROOT'), '', $caller['file']);
+      $callerFile = str_replace(Gdn::request()->getValue('DOCUMENT_ROOT'), '', $caller['file']);
 
-      $object = GetValue('object', $caller, '');
+      $object = getValue('object', $caller, '');
 
       if (is_object($object)) {
          $object = get_class($object);
@@ -131,7 +131,7 @@ class EventiPlugin extends Gdn_Plugin {
                      // Clean up strings, as some may contain HTML, which
                      // ruins the output in the toltip.
                      $stringClean = htmlentities($argValue);
-                     $argValue = '<span title="'. $stringClean .'">\''. SliceString($stringClean, 1000) .'\'</span>';
+                     $argValue = '<span title="'. $stringClean .'">\''. sliceString($stringClean, 1000) .'\'</span>';
                   } elseif (is_bool($argValue)) {
                      $argValue = "b".(string)$argValue;
                   }
@@ -164,7 +164,7 @@ class EventiPlugin extends Gdn_Plugin {
 
             $html .= '
             </div><!--/.eventi-tooltip-body-->
-            <input type="text" class="eventi-share-link" readonly="readonly" value="'. Gdn::Request()->Url('', true) .'#eventi-'. $eventiHtmlFragmentId .'" title="Eventi URL fragment identifier." />
+            <input type="text" class="eventi-share-link" readonly="readonly" value="'. Gdn::request()->url('', true) .'#eventi-'. $eventiHtmlFragmentId .'" title="Eventi URL fragment identifier." />
          </div><!--/.eventi-tooltip-->
       </div><!--/.eventi-->';
 

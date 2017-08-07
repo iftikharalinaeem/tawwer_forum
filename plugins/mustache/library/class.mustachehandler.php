@@ -89,7 +89,7 @@ class MustacheHandler {
         $virtualData = [];
 
         // Get an ID for the body.
-        $bodyIdentifier = strtolower($controller->ApplicationFolder . '_' . $controllerName . '_' . Gdn_Format::AlphaNumeric(strtolower($controller->RequestMethod)));
+        $bodyIdentifier = strtolower($controller->ApplicationFolder . '_' . $controllerName . '_' . Gdn_Format::alphaNumeric(strtolower($controller->RequestMethod)));
         $virtualData['BodyID'] = $bodyIdentifier;
 
         // Assign some information about the user.
@@ -110,7 +110,7 @@ class MustacheHandler {
             } else {
                 if (function_exists('UserPhotoDefaultUrl')) {
                     $photo = userPhotoDefaultUrl(Gdn::session()->User, 'ProfilePhoto');
-                } elseif ($configPhoto = C('Garden.DefaultAvatar')) {
+                } elseif ($configPhoto = c('Garden.DefaultAvatar')) {
                     $photo = Gdn_Upload::url($configPhoto);
                 } else {
                     $photo = asset('/applications/dashboard/design/images/defaulticon.png', true);

@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit;
 
 Gdn::structure()->table('Status');
-$statusExists = Gdn::Structure()->TableExists();
+$statusExists = Gdn::structure()->tableExists();
 
 Gdn::structure()
     ->table('Status')

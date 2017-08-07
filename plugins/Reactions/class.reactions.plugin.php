@@ -3,7 +3,7 @@
  *
  * Changes:
  *  1.0     Release
- *  1.2.3   Allow ReactionModel() to react from any source user.
+ *  1.2.3   Allow reactionModel() to react from any source user.
  *  1.2.4   Allow some reactions to be protected so that users can't flag moderator posts.
  *  1.2.13  Added TagModel_Types_Handler.
  *  1.3     Add class permissions; fix GetReactionTypes attributes; fix descriptions.
@@ -100,8 +100,8 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param $sender
      */
     private function addJs($sender) {
-        $sender->AddJsFile('jquery-ui.js');
-        $sender->AddJsFile('reactions.js', 'plugins/Reactions');
+        $sender->addJsFile('jquery-ui.js');
+        $sender->addJsFile('reactions.js', 'plugins/Reactions');
     }
 
     /**
@@ -129,7 +129,7 @@ class ReactionsPlugin extends Gdn_Plugin {
                     $orderBy = Gdn::session()->getPreference('Comments.OrderBy');
                 }
                 $orderParts = explode(' ', $orderBy);
-                $orderColumn = GetValue(0, $orderParts, $defaultOrderParts[0]);
+                $orderColumn = getValue(0, $orderParts, $defaultOrderParts[0]);
 
                 // Make sure the order is correct.
                 if (!in_array($orderColumn, ['DateInserted', 'Score']))
@@ -233,11 +233,11 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $ReactionModel = new ReactionModel();
         if (c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars') {
-            $ReactionModel->JoinUserTags($Sender->Data['Discussion'], 'Discussion');
-            $ReactionModel->JoinUserTags($Sender->Data['Comments'], 'Comment');
+            $ReactionModel->joinUserTags($Sender->Data['Discussion'], 'Discussion');
+            $ReactionModel->joinUserTags($Sender->Data['Comments'], 'Comment');
 
             if (isset($Sender->Data['Answers'])) {
-                $ReactionModel->JoinUserTags($Sender->Data['Answers'], 'Comment');
+                $ReactionModel->joinUserTags($Sender->Data['Answers'], 'Comment');
             }
         }
 
@@ -295,10 +295,10 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param $args
      */
     public function base_beforeCommentDisplay_handler($sender, $args) {
-        $cssClass = ScoreCssClass($args['Object']);
+        $cssClass = scoreCssClass($args['Object']);
         if ($cssClass) {
             $args['CssClass'] .= ' '.$cssClass;
-            SetValue('_CssClass', $args['Object'], $cssClass);
+            setValue('_CssClass', $args['Object'], $cssClass);
         }
     }
 
@@ -316,13 +316,13 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $reactionType = ReactionModel::reactionTypes($reaction);
         if (!$reactionType) {
-            throw NotFoundException();
+            throw notFoundException();
         }
 
         $sender->getUserInfo($userReference, $username);
         $userID = val('UserID', $sender->User);
 
-        list($offset, $limit) = OffsetLimit($page, 5);
+        list($offset, $limit) = offsetLimit($page, 5);
 
         // If this value is less-than-or-equal-to _CurrentRecords, we'll get a "next" pagination link.
         $sender->setData('_Limit', $limit + 1);
@@ -350,8 +350,8 @@ class ReactionsPlugin extends Gdn_Plugin {
         $sender->setTabView('Reactions', 'DataList', '', 'plugins/Reactions');
         $this->addJs($sender);
         $sender->addJsFile('jquery.expander.js');
-        $sender->addDefinition('ExpandText', T('(more)'));
-        $sender->addDefinition('CollapseText', T('(less)'));
+        $sender->addDefinition('ExpandText', t('(more)'));
+        $sender->addDefinition('CollapseText', t('(less)'));
 
         $sender->render();
     }
@@ -380,7 +380,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
             $row = [
                 'Name' => $type['Name'],
-                'Url' => Url(UserUrl($sender->data('Profile'), '', 'reactions').'?reaction='.urlencode($code), true),
+                'Url' => url(userUrl($sender->data('Profile'), '', 'reactions').'?reaction='.urlencode($code), true),
                 'Total' => 0
             ];
 
@@ -413,7 +413,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         include_once $Sender->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
 
         if (!$Sender->Request->isAuthenticatedPostBack(true)) {
-            throw PermissionException('Javascript');
+            throw permissionException('Javascript');
         }
 
         $ReactionType = ReactionModel::reactionTypes($Reaction);
@@ -424,7 +424,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         // Only allow enabled reactions
         if (!val('Active', $ReactionType)) {
-            throw ForbiddenException("@You may not use that Reaction.");
+            throw forbiddenException("@You may not use that Reaction.");
         }
 
         // Permission
@@ -480,7 +480,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         $page = 'p'.getIncomingValue('Page', 1);
         $limit = c('Plugins.Reactions.BestOfPerPage', 30);
         list($offset, $limit) = offsetLimit($page, $limit);
-        $sender->SetData('_Limit', $limit + 1);
+        $sender->setData('_Limit', $limit + 1);
 
         $reactionModel = new ReactionModel();
         if ($reaction == 'everything') {
@@ -901,7 +901,7 @@ if (!function_exists('writeReactions')) {
             if (isset($type['RecordTypes']) && !in_array($recordType, (array)$type['RecordTypes'])) {
                 continue;
             }
-            echo ' '.ReactionButton($row, $type['UrlCode']).' ';
+            echo ' '.reactionButton($row, $type['UrlCode']).' ';
         }
         echo '</span>';
         echo '</span>';

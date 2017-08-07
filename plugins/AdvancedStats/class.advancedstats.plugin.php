@@ -12,31 +12,31 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
      *
      * @return datetime
      */
-    public static function FirstDate() {
+    public static function firstDate() {
         $minDate = '2000-01-01';
         $minTimestamp = strtotime($minDate);
 
-        $firstUserDate = Gdn::SQL()
-            ->Select('DateInserted', 'min')
-            ->From('User')
-            ->Where('DateInserted >', '1976-01-01')
-            ->Get()->Value('DateInserted');
+        $firstUserDate = Gdn::sql()
+            ->select('DateInserted', 'min')
+            ->from('User')
+            ->where('DateInserted >', '1976-01-01')
+            ->get()->value('DateInserted');
 
-        if (Gdn_Format::ToTimestamp($firstUserDate) <= $minTimestamp) {
+        if (Gdn_Format::toTimestamp($firstUserDate) <= $minTimestamp) {
             return $minDate;
         }
 
-        $firstDiscussionDate = Gdn::SQL()
-            ->Select('DateInserted', 'min')
-            ->From('Discussion')
-            ->Where('DateInserted >', '1976-01-01')
-            ->Get()->Value('DateInserted');
+        $firstDiscussionDate = Gdn::sql()
+            ->select('DateInserted', 'min')
+            ->from('Discussion')
+            ->where('DateInserted >', '1976-01-01')
+            ->get()->value('DateInserted');
 
-        if (Gdn_Format::ToTimestamp($firstDiscussionDate) <= $minTimestamp) {
+        if (Gdn_Format::toTimestamp($firstDiscussionDate) <= $minTimestamp) {
             return $minDate;
         }
 
-        $firstDate = Gdn_Format::ToDateTime(min(Gdn_Format::ToTimestamp($firstUserDate), Gdn_Format::ToTimestamp($firstDiscussionDate)));
+        $firstDate = Gdn_Format::toDateTime(min(Gdn_Format::toTimestamp($firstUserDate), Gdn_Format::toTimestamp($firstDiscussionDate)));
 
         return $firstDate;
     }
@@ -48,16 +48,16 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
      * @param type $params
      * @return string
      */
-    public static function StatsUrl($path, $params = []) {
-        $analyticsServer = C('Garden.Analytics.Remote', '//analytics.vanillaforums.com');
+    public static function statsUrl($path, $params = []) {
+        $analyticsServer = c('Garden.Analytics.Remote', '//analytics.vanillaforums.com');
 
         $path = '/'.trim($path, '/');
 
         $timestamp = time();
         $defaultParams = [
-            'vid' => Gdn::InstallationID(),
+            'vid' => Gdn::installationID(),
             't' => $timestamp,
-            's' => md5($timestamp.Gdn::InstallationSecret())];
+            's' => md5($timestamp.Gdn::installationSecret())];
 
         $params = array_merge($defaultParams, $params);
 
@@ -73,19 +73,19 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
      * @param ActivityController $sender
      * @param array $Args
      */
-    public function ActivityController_Buzz_Create($sender, $date = FALSE, $slot = 'w') {
+    public function activityController_buzz_create($sender, $date = FALSE, $slot = 'w') {
         $buzzModel = new BuzzModel();
-        $get = array_change_key_case($sender->Request->Get());
+        $get = array_change_key_case($sender->Request->get());
 
-        $sender->AddCssFile('buzz.css', 'plugins/vfcom');
-        $sender->Data = $buzzModel->Get($slot, $date);
+        $sender->addCssFile('buzz.css', 'plugins/vfcom');
+        $sender->Data = $buzzModel->get($slot, $date);
 
-        $sender->SetData('Title', T("What's the Buzz?"));
-        $sender->Render('Buzz', 'Activity', 'plugins/AdvancedStats');
+        $sender->setData('Title', t("What's the Buzz?"));
+        $sender->render('Buzz', 'Activity', 'plugins/AdvancedStats');
     }
 
-    public function UtilityController_Buzz_Create($sender, $date = FALSE, $slot = 'w') {
-        $this->ActivityController_Buzz_Create($sender, $date, $slot);
+    public function utilityController_buzz_create($sender, $date = FALSE, $slot = 'w') {
+        $this->activityController_buzz_create($sender, $date, $slot);
     }
 
     /**
@@ -98,7 +98,7 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
      * @param string|int $date The date or timestamp in the slot.
      * @return array The dates in the form array(From, To).
      */
-    public static function SlotDateRange($slot = 'w', $date = FALSE) {
+    public static function slotDateRange($slot = 'w', $date = FALSE) {
         if (!$date) {
             $timestamp = strtotime(gmdate('Y-m-d'));
         } elseif (is_numeric($date)) {
@@ -110,33 +110,33 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
         $result = NULL;
         switch ($slot) {
             case 'd':
-                $result = [Gdn_Format::ToDateTime($timestamp), Gdn_Format::ToDateTime(strtotime('+1 day', $timestamp))];
+                $result = [Gdn_Format::toDateTime($timestamp), Gdn_Format::toDateTime(strtotime('+1 day', $timestamp))];
                 break;
             case 'w':
                 $sub = gmdate('N', $timestamp) - 1;
                 $add = 7 - $sub;
-                $result = [Gdn_Format::ToDateTime(strtotime("-$sub days", $timestamp)), Gdn_Format::ToDateTime(strtotime("+$add days", $timestamp))];
+                $result = [Gdn_Format::toDateTime(strtotime("-$sub days", $timestamp)), Gdn_Format::toDateTime(strtotime("+$add days", $timestamp))];
                 break;
             case 'm':
                 $sub = gmdate('j', $timestamp) - 1;
                 $timestamp = strtotime("-$sub days", $timestamp);
-                $result = [Gdn_Format::ToDateTime($timestamp), Gdn_Format::ToDateTime(strtotime("+1 month", $timestamp))];
+                $result = [Gdn_Format::toDateTime($timestamp), Gdn_Format::toDateTime(strtotime("+1 month", $timestamp))];
                 break;
             case 'y':
                 $timestamp = strtotime(date('Y-01-01', $timestamp));
-                $result = [Gdn_Format::ToDate($timestamp), Gdn_Format::ToDateTime(strtotime("+1 year", $timestamp))];
+                $result = [Gdn_Format::toDate($timestamp), Gdn_Format::toDateTime(strtotime("+1 year", $timestamp))];
                 break;
         }
 
         return $result;
     }
 
-    protected static function RangeWhere($range, $fieldName = 'DateInserted') {
+    protected static function rangeWhere($range, $fieldName = 'DateInserted') {
         return ["$fieldName >=" => $range[0], "$fieldName <" => $range[1]];
     }
 
-    public function UtilityController_BasicStats_Create($sender, $date = FALSE, $slot = 'w') {
-        $slotRange = self::SlotDateRange($slot, $date);
+    public function utilityController_basicStats_create($sender, $date = FALSE, $slot = 'w') {
+        $slotRange = self::slotDateRange($slot, $date);
 
         $result = [
             'SlotType' => $slot,
@@ -144,19 +144,19 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
             'DateTo' => $slotRange[1],
         ];
 
-        $result['CountUsers'] = Gdn::SQL()->GetCount('User', self::RangeWhere($slotRange));
-        $result['CountDiscussions'] = Gdn::SQL()->GetCount('Discussion', self::RangeWhere($slotRange));
-        $result['CountComments'] = Gdn::SQL()->GetCount('Comment', self::RangeWhere($slotRange));
+        $result['CountUsers'] = Gdn::sql()->getCount('User', self::rangeWhere($slotRange));
+        $result['CountDiscussions'] = Gdn::sql()->getCount('Discussion', self::rangeWhere($slotRange));
+        $result['CountComments'] = Gdn::sql()->getCount('Comment', self::rangeWhere($slotRange));
 
-        $sender->SetData('Stats', $result);
-        $sender->Render('Blank', 'Utility', 'Dashboard');
+        $sender->setData('Stats', $result);
+        $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
      * @param DashboardNavModule $nav
      */
     public function dashboardNavModule_init_handler($nav) {
-        if (C('Garden.Analytics.Advanced')) {
+        if (c('Garden.Analytics.Advanced')) {
             // Add stats menu option.
             $nav->addLinkIf('Garden.Settings.Manage', 'Statistics', '/settings/statistics', 'forum-data.statistics');
         }
@@ -166,19 +166,19 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param type $args
      */
-    public function Base_Render_Before($sender, $args) {
+    public function base_render_before($sender, $args) {
 //      if ($Sender->MasterView != 'admin') {
-        $analyticsServer = C('Garden.Analytics.Remote', '//analytics.vanillaforums.com');
+        $analyticsServer = c('Garden.Analytics.Remote', '//analytics.vanillaforums.com');
 
 //         if ($AnalyticsServer == 'http://analytics.vanillaforums.com') {
 //            $Url = "http://autostatic-cl1.vanilladev.com/analytics.vanillaforums.com/applications/vanillastats/js/track.min.js?v=$Version";
 //         } else
-//            $Url = $AnalyticsServer.'/applications/vanillastats/js/track'.(Debug() ? '' : '.min').'.js?v='.$Version;
+//            $Url = $AnalyticsServer.'/applications/vanillastats/js/track'.(debug() ? '' : '.min').'.js?v='.$Version;
 
-        $url = $analyticsServer.'/applications/vanillastatsapp/js/track'.(Debug() ? '' : '.min').'.js?v='.$this->getPluginKey('Version');
+        $url = $analyticsServer.'/applications/vanillastatsapp/js/track'.(debug() ? '' : '.min').'.js?v='.$this->getPluginKey('Version');
 
-        $sender->AddJsFile($url, '', ['defer' => 'defer']);
-        $sender->AddDefinition('StatsUrl', self::StatsUrl('{p}'));
+        $sender->addJsFile($url, '', ['defer' => 'defer']);
+        $sender->addDefinition('StatsUrl', self::statsUrl('{p}'));
 //      }
 
         $statURL = url('/dashboard/settings/statistics');
@@ -203,34 +203,34 @@ class AdvancedStatsPlugin extends Gdn_Plugin {
     /**
      * Creates an analytics page to load remote analytics data.
      */
-    public function SettingsController_Statistics_Create($sender) {
-        $sender->Permission('Garden.Settings.Manage');
-        $sender->Title('Site Statistics');
-        $sender->AddSideMenu('settings/statistics');
-        $sender->Render('stats', '', 'plugins/AdvancedStats');
+    public function settingsController_statistics_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
+        $sender->title('Site Statistics');
+        $sender->addSideMenu('settings/statistics');
+        $sender->render('stats', '', 'plugins/AdvancedStats');
     }
 
     /**
      * @param UserModel $sender
      * @param array $args
      */
-    public function UserModel_BeforeInsertUser_Handler($sender, $args) {
+    public function userModel_beforeInsertUser_handler($sender, $args) {
         // Check for the tracker cookie and save that with the user.
-        $trackerCookie = GetValue('__vna', $_COOKIE);
+        $trackerCookie = getValue('__vna', $_COOKIE);
         if ($trackerCookie) {
             $parts = explode('.', $trackerCookie);
-            $dateFirstVisit = Gdn_Format::ToDateTime($parts[0]);
-            $signedIn = GetValue(2, $parts);
+            $dateFirstVisit = Gdn_Format::toDateTime($parts[0]);
+            $signedIn = getValue(2, $parts);
             if (!$signedIn) {
                 $args['InsertFields']['DateFirstVisit'] = $dateFirstVisit;
             }
         }
     }
 
-    public function UtilityController_Ping_Create($sender) {
-        $sender->SetData('VanillaID', Gdn::InstallationID());
-        $sender->SetData('DateFirstStats', self::FirstDate());
-        $sender->Render();
+    public function utilityController_ping_create($sender) {
+        $sender->setData('VanillaID', Gdn::installationID());
+        $sender->setData('DateFirstStats', self::firstDate());
+        $sender->render();
     }
 
     public function setup() {

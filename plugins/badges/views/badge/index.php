@@ -49,7 +49,7 @@ $this->title(t('View Badge') . ': ' . $this->data('Badge.Name')); ?>
 <div class="Badge-Earned">
 <?php if ($this->data('UserBadge.DateCompleted')) : ?>
 <div class="EarnedThisBadge">
-    <?php echo UserPhoto(Gdn::session()->User); echo t('YouEarnedBadge', 'You earned this badge'); ?>
+    <?php echo userPhoto(Gdn::session()->User); echo t('YouEarnedBadge', 'You earned this badge'); ?>
     <span class="DateReceived"><?php echo Gdn_Format::date($this->data('UserBadge.DateCompleted'), 'html'); ?></span>
 </div>
 <?php endif; ?>
@@ -63,7 +63,7 @@ $this->title(t('View Badge') . ': ' . $this->data('Badge.Name')); ?>
 
     <h2><?php echo t('BadgeRecipientsHeading', "Most recent recipients"); ?></h2>
     <div class="RecentRecipients">
-        <?php foreach($this->Data('Recipients', []) as $User) : ?>
+        <?php foreach($this->data('Recipients', []) as $User) : ?>
         <div class="CellWrap"><div class="Cell"><?php
             echo userPhoto($User);
             echo userAnchor($User);

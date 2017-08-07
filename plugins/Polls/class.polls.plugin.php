@@ -263,7 +263,7 @@ class PollsPlugin extends Gdn_Plugin {
      *
      * @param PostController $sender
      */
-    public function PostController_AfterForms_Handler($sender) {
+    public function postController_afterForms_handler($sender) {
         $forms = $sender->data('Forms');
         $forms[] = ['Name' => 'Poll', 'Label' => sprite('SpPoll').t('New Poll'), 'Url' => 'post/poll'];
         $sender->setData('Forms', $forms);
@@ -312,7 +312,7 @@ class PollsPlugin extends Gdn_Plugin {
 
         // Polls are not compatible with pre-moderation
         if (checkRestriction('Vanilla.Approval.Require') && !val('Verified', Gdn::session()->User)) {
-            throw PermissionException();
+            throw permissionException();
         }
 
         // Set the model on the form

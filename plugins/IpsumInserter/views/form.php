@@ -1,7 +1,7 @@
 <?php
 // Settings
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 <?php if (!empty($this->Data['Message'])) { ?>
    <div class="Message">
@@ -12,14 +12,14 @@ echo $this->Form->Errors();
 
    <li>
       <?php
-      echo $this->Form->Label('Number Of Discussions', 'DiscussionNumber');
-      echo $this->Form->TextBox('DiscussionNumber');
+      echo $this->Form->label('Number Of Discussions', 'DiscussionNumber');
+      echo $this->Form->textBox('DiscussionNumber');
       ?>
    </li>
    <li>
       <?php
-      echo $this->Form->Label('Number Of Comments', 'CommentNumber');
-      echo $this->Form->TextBox('CommentNumber');
+      echo $this->Form->label('Number Of Comments', 'CommentNumber');
+      echo $this->Form->textBox('CommentNumber');
       ?>
    </li>
    <li>
@@ -32,5 +32,5 @@ echo $this->Form->Errors();
 </ul>
 
 <?php
-echo $this->Form->Close('Save');
+echo $this->Form->close('Save');
 ?>

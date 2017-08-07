@@ -66,7 +66,7 @@ class CAS_Client
      * - __PHPCAS_VERSION__
      * - __SERVER_BASE_URL__
      *
-     * Used by CAS_Client::PrintHTMLHeader() and CAS_Client::printHTMLFooter().
+     * Used by CAS_Client::printHTMLHeader() and CAS_Client::printHTMLFooter().
      *
      * @param string $str the string to filter and output
      *
@@ -249,7 +249,7 @@ class CAS_Client
      * - $_server['logout_url']: the logout URL of the CAS server
      *
      * $_server['version'], $_server['hostname'], $_server['port'] and
-     * $_server['uri'] are written by CAS_Client::CAS_Client(), read by
+     * $_server['uri'] are written by CAS_Client::cAS_Client(), read by
      * CAS_Client::getServerVersion(), CAS_Client::_getServerHostname(),
      * CAS_Client::_getServerPort() and CAS_Client::_getServerURI().
      *
@@ -1817,7 +1817,7 @@ class CAS_Client
 
     /**
      * The Ticket provided in the URL of the request if present
-     * (empty otherwise). Written by CAS_Client::CAS_Client(), read by
+     * (empty otherwise). Written by CAS_Client::cAS_Client(), read by
      * CAS_Client::getTicket() and CAS_Client::_hasPGT().
      *
      * @hideinitializer
@@ -2183,7 +2183,7 @@ class CAS_Client
 
     /**
      * A boolean telling if the client is a CAS proxy or not. Written by
-     * CAS_Client::CAS_Client(), read by CAS_Client::isProxy().
+     * CAS_Client::cAS_Client(), read by CAS_Client::isProxy().
      */
     private $_proxy;
 
@@ -2350,7 +2350,7 @@ class CAS_Client
     }
 
     /**
-     * This method is called by CAS_Client::CAS_Client() when running in callback
+     * This method is called by CAS_Client::cAS_Client() when running in callback
      * mode. It stores the PGT and its PGT Iou, prints its output and halts.
      *
      * @return void
@@ -2412,7 +2412,7 @@ class CAS_Client
      */
     private function _initPGTStorage()
     {
-        // if no SetPGTStorageXxx() has been used, default to file
+        // if no setPGTStorageXxx() has been used, default to file
         if ( !is_object($this->_pgt_storage) ) {
             $this->setPGTStorageFile();
         }

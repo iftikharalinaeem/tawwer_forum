@@ -1,10 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<?php echo Wrap($this->Data('Title'), 'h1 class="H"'); ?>
+<?php echo wrap($this->data('Title'), 'h1 class="H"'); ?>
 <div class="BestOfData">
-   <?php echo Gdn_Theme::Module('BestOfFilterModule'); ?>
+   <?php echo Gdn_Theme::module('BestOfFilterModule'); ?>
    <div class="DataList BestOfList">
       <?php include_once('bestoflist.php'); ?>
    </div>
-   <?php echo PagerModule::Write(['MoreCode' => 'Load More']); ?>
+   <?php echo PagerModule::write(['MoreCode' => 'Load More']); ?>
    <div class="LoadingMore"></div>
 </div>

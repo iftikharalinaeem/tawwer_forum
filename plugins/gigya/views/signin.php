@@ -1,8 +1,8 @@
 <?php
-echo '<h1>'.$this->Data('Title').'</h1>';
+echo '<h1>'.$this->data('Title').'</h1>';
 ?>
 <div class="Entry SingleEntryMethod">
 <?php
-echo $this->Data('BodyTemplate');
+echo $this->data('BodyTemplate');
 ?>
 </div>

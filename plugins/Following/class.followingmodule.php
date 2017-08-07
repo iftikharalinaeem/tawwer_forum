@@ -12,54 +12,54 @@ class FollowingModule extends Gdn_Module {
       parent::__construct($sender);
    }
    
-   public function SetUser($userID) {
-      $this->NumFollowees = Gdn::SQL()
-         ->Select('f.UserID', 'Count', 'NumUsers')
-         ->From('Following f')
-         ->Where('f.UserID', $userID)->Get()->Value('NumUsers', 0);
-      $this->Followees = Gdn::SQL()
-         ->Select('u.UserID, u.Name, u.Photo')
-         ->From('Following f')
-         ->Join('User u', 'u.UserID = f.FollowedUserID')
-         ->Where('f.UserID', $userID)
-         ->Where('u.Photo is not null')
-         ->Get();
+   public function setUser($userID) {
+      $this->NumFollowees = Gdn::sql()
+         ->select('f.UserID', 'Count', 'NumUsers')
+         ->from('Following f')
+         ->where('f.UserID', $userID)->get()->value('NumUsers', 0);
+      $this->Followees = Gdn::sql()
+         ->select('u.UserID, u.Name, u.Photo')
+         ->from('Following f')
+         ->join('User u', 'u.UserID = f.FollowedUserID')
+         ->where('f.UserID', $userID)
+         ->where('u.Photo is not null')
+         ->get();
             
-      $this->NumFollowers = Gdn::SQL()
-         ->Select('f.UserID', 'Count', 'NumUsers')
-         ->From('Following f')
-         ->Where('f.FollowedUserID', $userID)->Get()->Value('NumUsers', 0);
-      $this->Followers = Gdn::SQL()
-         ->Select('u.UserID, u.Name, u.Photo')
-         ->From('Following f')
-         ->Join('User u', 'u.UserID = f.UserID')
-         ->Where('f.FollowedUserID', $userID)
-         ->Where('u.Photo is not null')
-         ->Get();
+      $this->NumFollowers = Gdn::sql()
+         ->select('f.UserID', 'Count', 'NumUsers')
+         ->from('Following f')
+         ->where('f.FollowedUserID', $userID)->get()->value('NumUsers', 0);
+      $this->Followers = Gdn::sql()
+         ->select('u.UserID, u.Name, u.Photo')
+         ->from('Following f')
+         ->join('User u', 'u.UserID = f.UserID')
+         ->where('f.FollowedUserID', $userID)
+         ->where('u.Photo is not null')
+         ->get();
    }
 
-   public function AssetTarget() {
+   public function assetTarget() {
       return 'Panel';
    }
 
-   public function ToString() {
+   public function toString() {
       $string = '';
       ob_start();
       ?>
       <div id="FollowingPluginUsers" class="Box">
-         <h4><?php echo T("Friends"); ?></h4>
+         <h4><?php echo t("Friends"); ?></h4>
          <?php
          if ($this->NumFollowees) {
-            echo "<div class=\"\">".sprintf(Plural($this->NumFollowees, 'Following %d person', 'Following %d people'), $this->NumFollowees)."</div>\n";
-            if ($this->Followees->NumRows() > 0) {
+            echo "<div class=\"\">".sprintf(plural($this->NumFollowees, 'Following %d person', 'Following %d people'), $this->NumFollowees)."</div>\n";
+            if ($this->Followees->numRows() > 0) {
                echo '<div class="FriendsList">';
-               $followees = $this->Followees->ResultArray(); shuffle($followees);
+               $followees = $this->Followees->resultArray(); shuffle($followees);
                $followees = array_slice($followees,0,($this->NumFollowees >= 30 ? 30 : $this->NumFollowees));
                foreach ($followees as $user) {
                   ?>
                   <div>
-                     <a title="<?php echo $user['Name']; ?>" href="<?php echo Url("profile/{$user['UserID']}/{$user['Name']}", TRUE); ?>">
-                        <img src="<?php echo UserPhotoUrl($user); ?>" />
+                     <a title="<?php echo $user['Name']; ?>" href="<?php echo url("profile/{$user['UserID']}/{$user['Name']}", TRUE); ?>">
+                        <img src="<?php echo userPhotoUrl($user); ?>" />
                      </a>
                   </div>
                   <?php
@@ -70,16 +70,16 @@ class FollowingModule extends Gdn_Module {
          }
          
          if ($this->NumFollowers) {
-            echo "<div class=\"\">".sprintf(Plural($this->NumFollowers, 'Followed by %d person', 'Followed by %d people'), $this->NumFollowers)."</div>\n";
-            if ($this->Followers->NumRows() > 0) {
+            echo "<div class=\"\">".sprintf(plural($this->NumFollowers, 'Followed by %d person', 'Followed by %d people'), $this->NumFollowers)."</div>\n";
+            if ($this->Followers->numRows() > 0) {
                echo '<div class="FriendsList">';
-               $followers = $this->Followers->ResultArray(); shuffle($followers);
+               $followers = $this->Followers->resultArray(); shuffle($followers);
                $followers = array_slice($followers,0,($this->NumFollowers >= 30 ? 30 : $this->NumFollowers));
                prev($followers);
                foreach ($followers as $user) {
                   ?>
                   <div>
-                     <?php echo UserPhoto($user); ?>
+                     <?php echo userPhoto($user); ?>
                   </div>
                   <?php
                }

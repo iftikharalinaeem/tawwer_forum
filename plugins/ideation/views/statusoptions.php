@@ -8,7 +8,7 @@
 
     <div class="P">
         <?php
-//        $this->Form = new Gdn_Form();
+//        $this->Form = new gdn_Form();
         echo '<div>'.$this->Form->dropDown('Status', $this->data('Statuses'), ['Default' => $this->data('CurrentStatusID'), 'list' => true]).'</div>';
         echo '<div>'.t('Add an explanation.').'</div>';
         echo $this->Form->textbox('StatusNotes', ['Multiline' => true, 'value' => $this->data('StatusNotes')]);

@@ -57,7 +57,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             '<div class="QuickSearchWrap MenuItems">';
 
         $result .= $form->open(['action' => url('/search')]).
-//         $Form->Label('@'.$title, 'search').
+//         $Form->label('@'.$title, 'search').
             ' '.$form->textBox('search', ['placeholder' => $title]).
             ' <div class="bwrap"><button type="submit" class="Button" title="'.t('Search').'">'.t('Go').'</button></div>'.
             $form->close();
@@ -224,7 +224,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
                 $discussion = $discussionModel->getID($results['CalculatedSearch']['discussionid']);
                 if ($discussion) {
                     $cat = CategoryModel::categories(getValue('CategoryID', $discussion));
-//               if (GetValue('PermsDiscussionView', $Cat))
+//               if (getValue('PermsDiscussionView', $Cat))
                     $sender->setData('Discussion', $discussion);
                 }
             }
@@ -485,13 +485,13 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         }
 
         // Perform the search by unioning all of the sql together.
-        $Sql = Gdn::SQL()
+        $Sql = Gdn::sql()
             ->select()
             ->from('_TBL_ s')
             ->orderBy('s.DateInserted', 'desc')
             ->limit($limit, $offset)
             ->getSelect();
-        Gdn::SQL()->reset();
+        Gdn::sql()->reset();
 
         $Sql = str_replace(Gdn::database()->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $searches)."\n)", $Sql);
         trace([$Sql], 'SearchSQL');

@@ -22,7 +22,7 @@ class Cleanspeak extends Gdn_Pluggable {
 
     function __construct() {
         parent::__construct();
-        $this->FireEvent('Init');
+        $this->fireEvent('Init');
     }
 
     /**
@@ -84,9 +84,9 @@ class Cleanspeak extends Gdn_Pluggable {
     }
 
     public function getUserUUID($userID) {
-        $userAuth = Gdn::SQL()->GetWhere('UserAuthentication', ['UserID' => $userID, 'ProviderKey' => 'cleanspeak'])
-            ->FirstRow(DATASET_TYPE_ARRAY);
-        if (GetValue('ForeignUserKey', $userAuth)) {
+        $userAuth = Gdn::sql()->getWhere('UserAuthentication', ['UserID' => $userID, 'ProviderKey' => 'cleanspeak'])
+            ->firstRow(DATASET_TYPE_ARRAY);
+        if (getValue('ForeignUserKey', $userAuth)) {
             return $userAuth['ForeignUserKey'];
         }
         return $this->generateUUIDFromInts([$this->uuidSeed[0], 0, 0, $userID]);
@@ -139,7 +139,7 @@ class Cleanspeak extends Gdn_Pluggable {
 
         $proxyRequest = new ProxyRequest();
         $options = [
-            'Url' => rtrim(C('Plugins.Cleanspeak.ApiUrl'), '/').'/'.ltrim($url, '/')
+            'Url' => rtrim(c('Plugins.Cleanspeak.ApiUrl'), '/').'/'.ltrim($url, '/')
         ];
         $queryParams = [];
         if ($post != null) {
@@ -149,7 +149,7 @@ class Cleanspeak extends Gdn_Pluggable {
         }
         $headers['Content-Type'] = 'application/json';
 
-        $apiKey = C('Plugins.Cleanspeak.AccessToken', null);
+        $apiKey = c('Plugins.Cleanspeak.AccessToken', null);
         if (!empty($apiKey)) {
             $headers['Authentication'] = $apiKey;
         }
@@ -159,7 +159,7 @@ class Cleanspeak extends Gdn_Pluggable {
               'Header' => $headers
            ]);
 
-        $response = $proxyRequest->Request($options, $queryParams, null, $headers);
+        $response = $proxyRequest->request($options, $queryParams, null, $headers);
 
         if ($proxyRequest->ResponseStatus == 400) {
             Logger::log(Logger::ERROR, 'Cleanspeak Error in API request.', ['Response' => json_decode($response, true)]);
@@ -192,8 +192,8 @@ class Cleanspeak extends Gdn_Pluggable {
      */
     public function getParts($data) {
 
-        if (GetValue('Name', $data)) {
-            $text = Gdn_Format::Text($data['Name'], false);
+        if (getValue('Name', $data)) {
+            $text = Gdn_Format::text($data['Name'], false);
             if (!empty($text) && trim($text) != '') {
                 $parts[] = [
                     'content' => $text,
@@ -202,8 +202,8 @@ class Cleanspeak extends Gdn_Pluggable {
                 ];
             }
         }
-        if (GetValue('Body', $data)) {
-            $text = Gdn_Format::Text($data['Body'], false);
+        if (getValue('Body', $data)) {
+            $text = Gdn_Format::text($data['Body'], false);
             if (!empty($text) && trim($text) != '') {
                 $parts[] = [
                     'content' => $text,
@@ -212,8 +212,8 @@ class Cleanspeak extends Gdn_Pluggable {
                 ];
             }
         }
-        if (GetValue('Story', $data)) {
-            $text = Gdn_Format::Text($data['Story'], false);
+        if (getValue('Story', $data)) {
+            $text = Gdn_Format::text($data['Story'], false);
             if (!empty($text) && trim($text) != '') {
                 $parts[] = [
                     'content' => $text,
@@ -229,7 +229,7 @@ class Cleanspeak extends Gdn_Pluggable {
             $mediaModel = new Gdn_Model('Media');
 
             foreach ($data['MediaIDs'] as $mediaID) {
-                $media = $mediaModel->GetID($mediaID);
+                $media = $mediaModel->getID($mediaID);
                 if (!$media) {
                     continue;
                 }
@@ -243,7 +243,7 @@ class Cleanspeak extends Gdn_Pluggable {
                 }
 
                 $parts[] = [
-                    'content' => Gdn_Upload::Url($path),
+                    'content' => Gdn_Upload::url($path),
                     'name' => $name,
                     'type' => $type
                 ];

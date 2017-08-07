@@ -1,5 +1,5 @@
 <?php
-$InstallationID = Gdn::InstallationID();
+$InstallationID = Gdn::installationID();
 if (!$InstallationID) {
     $InstallationID = '3950-C089DA20-C9D34048';
 }
@@ -10,7 +10,7 @@ if (!$InstallationID) {
 </div>
 <div id="vanilla-comments" style="padding: 0;"></div>
 <script type="text/javascript">
-    var vanilla_forum_url = '<?php echo C('Garden.Analytics.Remote','//analytics.vanillaforums.com')?>';
+    var vanilla_forum_url = '<?php echo c('Garden.Analytics.Remote','//analytics.vanillaforums.com')?>';
     var vanilla_path = '/stats/remote/<?php echo $InstallationID; ?>';
     var vanilla_lazy_load = false;
     (function () {

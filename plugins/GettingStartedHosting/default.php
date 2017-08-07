@@ -11,113 +11,113 @@ class GettingStartedHostingPlugin implements Gdn_IPlugin {
 */    
     
    // Save various steps, and render the getting started message.
-   public function SettingsController_Render_Before($sender) {
+   public function settingsController_render_before($sender) {
       // Save the action if editing registration settings
       if (strtolower($sender->RequestMethod) != 'index')
-         $this->SaveStep('Plugins.GettingStartedHosting.Dashboard');
+         $this->saveStep('Plugins.GettingStartedHosting.Dashboard');
 
       // Save the action if they reviewed plugins
       // if (strcasecmp($Sender->RequestMethod, 'plugins') == 0)
-      //    $this->SaveStep('Plugins.GettingStarted.Plugins');
+      //    $this->saveStep('Plugins.GettingStarted.Plugins');
 
       // Save the action if they reviewed plugins
       if (strcasecmp($sender->RequestMethod, 'managecategories') == 0)
-         $this->SaveStep('Plugins.GettingStartedHosting.Categories');
+         $this->saveStep('Plugins.GettingStartedHosting.Categories');
 
       // Add messages & their css on dashboard
       if (strcasecmp($sender->RequestMethod, 'index') == 0) {
-         $session = Gdn::Session();
+         $session = Gdn::session();
          $welcomeMessage = '<div class="GettingStartedHosting">'
-            .Anchor('×', '/plugin/dismissgettingstarted/'.$session->TransientKey(), 'Dismiss')
+            .anchor('×', '/plugin/dismissgettingstarted/'.$session->transientKey(), 'Dismiss')
    ."<h1>Tips on how to get started</h1>"
    .'<ul>
-      <li class="One'.(C('Plugins.GettingStartedHosting.Dashboard', '0') == '1' ? ' Done' : '').'">
-         <strong>'.Anchor('Welcome to your Dashboard', 'settings').'</strong>
+      <li class="One'.(c('Plugins.GettingStartedHosting.Dashboard', '0') == '1' ? ' Done' : '').'">
+         <strong>'.anchor('Welcome to your Dashboard', 'settings').'</strong>
          <p>This is the administrative dashboard for your new community. Check
          out the configuration options to the left: from here you can configure
          how your community works. <b>Only users in the "Administrator" role can
          see this part of your community.</b></p>
       </li>
       <li class="Two">
-         <strong>'.Anchor('Your Account', 'http://vanillaforums.com/account').'</strong>
+         <strong>'.anchor('Your Account', 'http://vanillaforums.com/account').'</strong>
          <p>If you want to change your plan, click the '
-         .Anchor('My Account', 'http://vanillaforums.com/account').' link on the
+         .anchor('My Account', 'http://vanillaforums.com/account').' link on the
          top-right of this page. From there, you can review payments and upgrade,
          downgrade, or cancel your account at any time.</p>
       </li>
-      <li class="Three'.(C('Plugins.GettingStartedHosting.Discussions', '0') == '1' ? ' Done' : '').'">
-         <strong>'.Anchor("Where is your Community Forum?", '/').'</strong>
+      <li class="Three'.(c('Plugins.GettingStartedHosting.Discussions', '0') == '1' ? ' Done' : '').'">
+         <strong>'.anchor("Where is your Community Forum?", '/').'</strong>
          <p>Access your community forum by clicking the "Visit Site" link on the
-         top-left of this page, or by '.Anchor('clicking here', '/').'. The
+         top-left of this page, or by '.anchor('clicking here', '/').'. The
          community forum is what all of your users &amp; customers will see when
-         they visit '.Anchor(Gdn::Request()->Domain(), Gdn::Request()->Domain()).'.</p>
+         they visit '.anchor(Gdn::request()->domain(), Gdn::request()->domain()).'.</p>
       </li>
-      <li class="Four'.(C('Plugins.GettingStartedHosting.Categories', '0') == '1' ? ' Done' : '').'">
-         <strong>'.Anchor(T('Organize your Categories'), 'settings/managecategories').'</strong>
+      <li class="Four'.(c('Plugins.GettingStartedHosting.Categories', '0') == '1' ? ' Done' : '').'">
+         <strong>'.anchor(t('Organize your Categories'), 'settings/managecategories').'</strong>
          <p>Discussion categories are used to help your users organize their
          discussions in a way that is meaningful for your community.</p>
       </li>
-      <li class="Five'.(C('Plugins.GettingStartedHosting.Profile', '0') == '1' ? ' Done' : '').'">
-         <strong>'.Anchor(T('Customize your Public Profile'), 'profile').'</strong>
+      <li class="Five'.(c('Plugins.GettingStartedHosting.Profile', '0') == '1' ? ' Done' : '').'">
+         <strong>'.anchor(t('Customize your Public Profile'), 'profile').'</strong>
          <p>Everyone who signs up for your community gets a public profile page
          where they can upload a picture of themselves, manage their profile
          settings, and track cool things going on in the community. You should
-         '.Anchor('customize your profile now', 'profile').'.</p>
+         '.anchor('customize your profile now', 'profile').'.</p>
       </li>
-      <li class="Six'.(C('Plugins.GettingStartedHosting.Discussion', '0') == '1' ? ' Done' : '').'">
-         <strong>'.Anchor(T('Start your First Discussion'), 'post/discussion').'</strong>
+      <li class="Six'.(c('Plugins.GettingStartedHosting.Discussion', '0') == '1' ? ' Done' : '').'">
+         <strong>'.anchor(t('Start your First Discussion'), 'post/discussion').'</strong>
          <p>Get the ball rolling in your community by '
-         .Anchor('starting your first discussion', 'post/discussion').' now.</p>
+         .anchor('starting your first discussion', 'post/discussion').' now.</p>
       </li>
    </ul>
 </div>';
-         $sender->AddAsset('Messages', $welcomeMessage, 'WelcomeMessage');
+         $sender->addAsset('Messages', $welcomeMessage, 'WelcomeMessage');
       }
    }
    
    // Record when the various actions are taken
    // 1. If the user edits the registration settings
-   public function SaveStep($step) {
-      if (Gdn::Config($step, '') != '1')
-         SaveToConfig($step, '1');
+   public function saveStep($step) {
+      if (Gdn::config($step, '') != '1')
+         saveToConfig($step, '1');
 
       /*
       // If all of the steps are now completed, disable this plugin
       if (
-         C('Plugins.GettingStartedHosting.Categories', '0') == '1'
-         && C('Plugins.GettingStartedHosting.Profile', '0') == '1'
-         && C('Plugins.GettingStartedHosting.Discussion', '0') == '1'
-         && C('Plugins.GettingStartedHosting.Discussions', '0') == '1'
+         c('Plugins.GettingStartedHosting.Categories', '0') == '1'
+         && c('Plugins.GettingStartedHosting.Profile', '0') == '1'
+         && c('Plugins.GettingStartedHosting.Discussion', '0') == '1'
+         && c('Plugins.GettingStartedHosting.Discussions', '0') == '1'
       ) {
-         $PluginManager = Gdn::Factory('PluginManager');
-         $PluginManager->DisablePlugin('GettingStarted');
+         $PluginManager = Gdn::factory('PluginManager');
+         $PluginManager->disablePlugin('GettingStarted');
       }
      */
    }
    
    // If the user posts back any forms to their profile, they've completed step 4: profile customization
-   public function ProfileController_Render_Before($sender) {
-      if (property_exists($sender, 'Form') && $sender->Form->AuthenticatedPostBack() === TRUE)
-         $this->SaveStep('Plugins.GettingStartedHosting.Profile');
+   public function profileController_render_before($sender) {
+      if (property_exists($sender, 'Form') && $sender->Form->authenticatedPostBack() === TRUE)
+         $this->saveStep('Plugins.GettingStartedHosting.Profile');
    }
 
    // If the user starts a discussion
-   public function PostController_Render_Before($sender) {
-      if (strcasecmp($sender->RequestMethod, 'discussion') == 0 && $sender->Form->AuthenticatedPostBack() === TRUE)
-         $this->SaveStep('Plugins.GettingStartedHosting.Discussion');
+   public function postController_render_before($sender) {
+      if (strcasecmp($sender->RequestMethod, 'discussion') == 0 && $sender->Form->authenticatedPostBack() === TRUE)
+         $this->saveStep('Plugins.GettingStartedHosting.Discussion');
    }
 
-   public function DiscussionsController_Render_Before($sender) {
-      $this->SaveStep('Plugins.GettingStartedHosting.Discussions');
+   public function discussionsController_render_before($sender) {
+      $this->saveStep('Plugins.GettingStartedHosting.Discussions');
    }
    
-   public function PluginController_DismissGettingStarted_Create($sender) {
-      $pluginManager = Gdn::Factory('PluginManager');
-      $pluginManager->DisablePlugin('GettingStartedHosting');
+   public function pluginController_dismissGettingStarted_create($sender) {
+      $pluginManager = Gdn::factory('PluginManager');
+      $pluginManager->disablePlugin('GettingStartedHosting');
       echo 'TRUE';
    }
    
-   public function Setup() {
+   public function setup() {
       // No setup required.
    }
 }

@@ -1,25 +1,25 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 
 <div class="StructuredForm">
     <?php
-    echo $this->Form->Open();
-    echo $this->Form->Errors();
+    echo $this->Form->open();
+    echo $this->Form->errors();
     ?>
     <div class="P">
         <?php
-        echo $this->Form->Label('Invite one or more people to join this group.', 'To');
-        echo Wrap($this->Form->TextBox('Recipients', ['MultiLine' => true, 'class' => 'Tokens-User MultiComplete']), 'div', ['class' => 'TextBoxWrapper']);
+        echo $this->Form->label('Invite one or more people to join this group.', 'To');
+        echo wrap($this->Form->textBox('Recipients', ['MultiLine' => true, 'class' => 'Tokens-User MultiComplete']), 'div', ['class' => 'TextBoxWrapper']);
         ?>
     </div>
     <div class="Buttons Buttons-Confirm">
         <?php
-        echo $this->Form->Button('OK', ['class' => 'Button Primary']);
-        echo ' '.$this->Form->Button('Cancel', ['type' => 'button', 'class' => 'Button Close']);
+        echo $this->Form->button('OK', ['class' => 'Button Primary']);
+        echo ' '.$this->Form->button('Cancel', ['type' => 'button', 'class' => 'Button Close']);
         ?>
     </div>
     <?php
-    echo $this->Form->Close();
+    echo $this->Form->close();
     ?>
 </div>

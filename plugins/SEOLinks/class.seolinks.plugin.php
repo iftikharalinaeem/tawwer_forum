@@ -9,8 +9,8 @@ if (!defined('APPLICATION'))
 class SEOLinksPlugin extends Gdn_Plugin {
 
 
-   public static function Prefix() {
-      return C('Plugins.SEOLinks.Prefix', '');
+   public static function prefix() {
+      return c('Plugins.SEOLinks.Prefix', '');
    }
 
    /// Event Handlers ///
@@ -20,12 +20,12 @@ class SEOLinksPlugin extends Gdn_Plugin {
     * @param Gdn_Router $sender
     * @param type $args
     */
-   public function Gdn_Dispatcher_BeforeDispatch_Handler($sender, $args) {
-      $px = self::Prefix();
+   public function gdn_Dispatcher_BeforeDispatch_Handler($sender, $args) {
+      $px = self::prefix();
       $pxEsc = preg_quote($px);
 
       $route = '/?'.$pxEsc.'[^/]+/(\d+)-(.*?)(?:-(p\d+))?.html';
-      Gdn::Router()->Routes[$route] = [
+      Gdn::router()->Routes[$route] = [
           'Route' => $route,
           'Key' => base64_encode($route),
           'Destination' => '/discussion/$1/$2/$3',
@@ -33,16 +33,16 @@ class SEOLinksPlugin extends Gdn_Plugin {
           'Type' => 'Internal'
       ];
 
-      $path = trim(Gdn::Request()->Path(), '/');
+      $path = trim(Gdn::request()->path(), '/');
 
       if (preg_match('`^'.$pxEsc.'([^/]+)(?:/(p\d+))?$`', $path, $matches)) {
          $urlCode = $matches[1];
-         $page = GetValue(2, $matches);
+         $page = getValue(2, $matches);
 
-         $category = CategoryModel::Categories($urlCode);
+         $category = CategoryModel::categories($urlCode);
          if ($category) {
             $route = '/?'.$pxEsc.'(' . preg_quote($category['UrlCode']) . ')(?:/(p\d+))?/?(\?.*)?$';
-            Gdn::Router()->Routes[$route] = [
+            Gdn::router()->Routes[$route] = [
                 'Route' => $route,
                 'Key' => base64_encode($route),
                 'Destination' => '/categories/$1/$2',
@@ -53,31 +53,31 @@ class SEOLinksPlugin extends Gdn_Plugin {
       }
    }
 
-   public function SettingsController_SEOLinks_Create($sender, $args) {
-      $sender->Permission('Garden.Settings.Manage');
-      $sender->SetData('Title', sprintf(T('%s Settings'), 'SEO Links'));
+   public function settingsController_sEOLinks_create($sender, $args) {
+      $sender->permission('Garden.Settings.Manage');
+      $sender->setData('Title', sprintf(t('%s Settings'), 'SEO Links'));
 
       $cf = new ConfigurationModule($sender);
-      $cf->Initialize([
+      $cf->initialize([
           'Plugins.SEOLinks.Prefix' => ['Description' => 'A prefix to put before every link (ex. forum/). The prefix should almost always be empty.'],
           ]);
 
-      if (Gdn::Request()->IsPostBack()) {
-         CategoryModel::ClearCache();
+      if (Gdn::request()->isPostBack()) {
+         CategoryModel::clearCache();
       }
 
-      $sender->AddSideMenu('settings/plugins');
-      $cf->RenderAll();
+      $sender->addSideMenu('settings/plugins');
+      $cf->renderAll();
   }
 
-   public function Setup() {
+   public function setup() {
       if (class_exists('CategoryModel')) {
-         CategoryModel::ClearCache();
+         CategoryModel::clearCache();
       }
 
       // Set /members route once so it is editable
-      $router = Gdn::Router();
-      $router->SetRoute('/?members/([^/]+)', '/profile/$1', 'Internal');
+      $router = Gdn::router();
+      $router->setRoute('/?members/([^/]+)', '/profile/$1', 'Internal');
    }
 }
 
@@ -88,51 +88,51 @@ if (!function_exists('CategoryUrl')):
     * @param array $category
     * @return string
     */
-   function CategoryUrl($category, $page = '', $withDomain = TRUE) {
+   function categoryUrl($category, $page = '', $withDomain = TRUE) {
       static $px;
       if (!isset($px))
-         $px = SEOLinksPlugin::Prefix();
+         $px = SEOLinksPlugin::prefix();
 
       if (is_string($category))
-         $category = CategoryModel::Categories($category);
+         $category = CategoryModel::categories($category);
       $category = (array) $category;
 
       $result = '/' . $px . rawurlencode($category['UrlCode']) . '/';
       if ($page && $page > 1) {
          $result .= 'p' . $page . '/';
       }
-      return Url($result, $withDomain);
+      return url($result, $withDomain);
    }
 
 endif;
 
 if (!function_exists('DiscussionUrl')):
 
-   function DiscussionUrl($discussion, $page = '', $withDomain = TRUE) {
+   function discussionUrl($discussion, $page = '', $withDomain = TRUE) {
       static $px;
       if (!isset($px))
-         $px = SEOLinksPlugin::Prefix();
+         $px = SEOLinksPlugin::prefix();
 
       $discussion = (object) $discussion;
       $cat = FALSE;
 
       // Some places call DiscussionUrl with a custom query that doesn't select CategoryID
-      if (GetValue('CategoryID', $discussion))
-         $cat = CategoryModel::Categories($discussion->CategoryID);
+      if (getValue('CategoryID', $discussion))
+         $cat = CategoryModel::categories($discussion->CategoryID);
 
       if ($cat)
          $cat = rawurlencode($cat['UrlCode']);
       else
          $cat = 'x';
 
-      $name = Gdn_Format::Url(html_entity_decode($discussion->Name, ENT_QUOTES, 'UTF-8'));
+      $name = Gdn_Format::url(html_entity_decode($discussion->Name, ENT_QUOTES, 'UTF-8'));
       // Make sure the forum doesn't end with the page number notation.
       if (preg_match('`(-p\d+)$`', $name, $matches)) {
          $name = substr($name, 0, -strlen($matches[1]));
       }
 
       if ($page) {
-         if ($page == 1 && !Gdn::Session()->UserID)
+         if ($page == 1 && !Gdn::session()->UserID)
             $page = '';
          else
             $page = '-p' . $page;
@@ -140,7 +140,7 @@ if (!function_exists('DiscussionUrl')):
 
       $path = "/$px$cat/{$discussion->DiscussionID}-$name{$page}.html";
 
-      return Url($path, $withDomain);
+      return url($path, $withDomain);
    }
 
 endif;
@@ -151,17 +151,17 @@ endif;
 //    * Return the url for a user.
 //    * @param array|object $User The user to get the url for.
 //    * @param string $Px The prefix to apply before fieldnames. @since 2.1
-//    * @return string The url suitable to be passed into the Url() function.
+//    * @return string The url suitable to be passed into the url() function.
 //    */
-//   function UserUrl($User, $Px = '', $Method = '') {
+//   function userUrl($User, $Px = '', $Method = '') {
 //      static $NameUnique = NULL;
 //      if ($NameUnique === NULL)
-//         $NameUnique = C('Garden.Registration.NameUnique');
+//         $NameUnique = c('Garden.Registration.NameUnique');
 //
 //      if ($Method)
 //         $Method .= '/';
 //
-//      return '/members/' .$Method. ($NameUnique ? '' : GetValue($Px . 'UserID', $User, 0) . '/') . rawurlencode(GetValue($Px . 'Name', $User));
+//      return '/members/' .$Method. ($NameUnique ? '' : getValue($Px . 'UserID', $User, 0) . '/') . rawurlencode(getValue($Px . 'Name', $User));
 //   }
 //
 //

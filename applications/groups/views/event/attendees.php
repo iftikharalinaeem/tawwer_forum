@@ -1,59 +1,59 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$isEnded = EventModel::isEnded($this->Data('Event'));
+$isEnded = EventModel::isEnded($this->data('Event'));
 ?>
 <div class="AttendeeList YesAttending"><?php
-    $Yes = sizeof($this->Data('Invited.Yes', []));
+    $Yes = sizeof($this->data('Invited.Yes', []));
     if ($isEnded && $Yes) {
-        echo Wrap(sprintf(T('Attended (%s)'), $Yes), 'h3');
+        echo wrap(sprintf(t('Attended (%s)'), $Yes), 'h3');
     }
     if (!$isEnded) {
-        echo Wrap(sprintf(T('Attending (%s)'), $Yes), 'h3');
+        echo wrap(sprintf(t('Attending (%s)'), $Yes), 'h3');
         if (!$Yes) {
-            echo T("Nobody has confirmed their attendance yet.");
+            echo t("Nobody has confirmed their attendance yet.");
         }
     }
     if ($Yes) {
-        foreach ($this->Data('Invited.Yes') as $Invitee) {
-            echo UserPhoto($Invitee);
+        foreach ($this->data('Invited.Yes') as $Invitee) {
+            echo userPhoto($Invitee);
         }
     }
 ?></div>
 
 <div class="Negatives">
     <div class="AttendeeList NotAttending"><?php
-        $No = sizeof($this->Data('Invited.No', []));
+        $No = sizeof($this->data('Invited.No', []));
         if ($isEnded && $No) {
-            echo Wrap(sprintf(T('Did not attend (%s)'), $No), 'h3');
+            echo wrap(sprintf(t('Did not attend (%s)'), $No), 'h3');
         }
         if (!$isEnded) {
-            echo Wrap(sprintf(T('Not Attending (%s)'), $No),'h3');
+            echo wrap(sprintf(t('Not Attending (%s)'), $No),'h3');
             if (!$No) {
-                echo T("Nobody has declined the invitation so far.");
+                echo t("Nobody has declined the invitation so far.");
             }
         }
         if ($No) {
-            foreach ($this->Data('Invited.No') as $Invitee) {
-                echo UserPhoto($Invitee);
+            foreach ($this->data('Invited.No') as $Invitee) {
+                echo userPhoto($Invitee);
             }
         }
       ?>
     </div>
     <div class="AttendeeList MaybeAttending">
         <?php
-        $Maybe = sizeof($this->Data('Invited.Maybe', []));
+        $Maybe = sizeof($this->data('Invited.Maybe', []));
         if ($isEnded && $Maybe) {
-            echo Wrap(sprintf(T('Maybe (%s)'), $Maybe), 'h3');
+            echo wrap(sprintf(t('Maybe (%s)'), $Maybe), 'h3');
         }
         if (!$isEnded) {
-            echo Wrap(sprintf(T('Maybe (%s)'), $Maybe),'h3');
+            echo wrap(sprintf(t('Maybe (%s)'), $Maybe),'h3');
             if (!$Maybe) {
-                echo T("Nobody is on the fence right now.");
+                echo t("Nobody is on the fence right now.");
             }
         }
         if ($Maybe) {
-            foreach ($this->Data('Invited.Maybe') as $Invitee) {
-                echo UserPhoto($Invitee);
+            foreach ($this->data('Invited.Maybe') as $Invitee) {
+                echo userPhoto($Invitee);
             }
         }
         ?>
@@ -61,7 +61,7 @@ $isEnded = EventModel::isEnded($this->Data('Event'));
 </div>
 
 <?php
-$Invited = sizeof($this->Data('Invited.Invited', []));
+$Invited = sizeof($this->data('Invited.Invited', []));
 if ($Invited): ?>
-<div class="InvitedAttending"><?php echo sprintf(Plural($Invited, '%s unanswered invitation.', '%s unanswered invitations.'), $Invited); ?></div>
+<div class="InvitedAttending"><?php echo sprintf(plural($Invited, '%s unanswered invitation.', '%s unanswered invitations.'), $Invited); ?></div>
 <?php endif; ?>

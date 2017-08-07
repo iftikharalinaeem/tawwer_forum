@@ -388,7 +388,7 @@ class GithubPlugin extends Gdn_Plugin {
         ];
         //prevents resetting any previous values
         foreach ($configSettings as $configSetting) {
-            if (!C('Plugins.Github.'.$configSetting)) {
+            if (!c('Plugins.Github.'.$configSetting)) {
                 saveToConfig('Plugins.Github.'.$configSetting, '');
             }
         }

@@ -12,79 +12,79 @@ if (!isset($Explicit)) {
     $Explicit = false;
 }
 
-$Sql = Gdn::SQL();
-$St = Gdn::Structure();
+$Sql = Gdn::sql();
+$St = Gdn::structure();
 
-Gdn::PermissionModel()->Define([
+Gdn::permissionModel()->define([
     'Groups.Group.Add' => 'Garden.Profiles.Edit',
     'Groups.Moderation.Manage' => 'Garden.Moderation.Manage']);
 
 // Define the groups table.
-$St->Table('Group');
-$GroupExists = $St->TableExists();
-$CountDiscussionsExists = $St->ColumnExists('CountDiscussions');
-$GroupPrivacyExists = $St->ColumnExists('Privacy');
+$St->table('Group');
+$GroupExists = $St->tableExists();
+$CountDiscussionsExists = $St->columnExists('CountDiscussions');
+$GroupPrivacyExists = $St->columnExists('Privacy');
 
 $St
-    ->PrimaryKey('GroupID')
-    ->Column('Name', 'varchar(150)', false, 'unique')
-    ->Column('Description', 'text')
-    ->Column('Format', 'varchar(10)', true)
-    ->Column('CategoryID', 'int', false, 'key')
-    ->Column('Icon', 'varchar(255)', true)
-    ->Column('Banner', 'varchar(255)', true)
-    ->Column('Privacy', ['Public', 'Private'], 'Public') // add secret later.
-    ->Column('Registration', ['Public', 'Approval', 'Invite'], true) // deprecated
-    ->Column('Visibility', ['Public', 'Members'], true) // deprecated
-    ->Column('CountMembers', 'uint', '0')
-    ->Column('CountDiscussions', 'uint', '0')
-    ->Column('DateLastComment', 'datetime', true)
-    ->Column('LastCommentID', 'int', null)
-    ->Column('LastDiscussionID', 'int', null)
-    ->Column('DateInserted', 'datetime')
-    ->Column('InsertUserID', 'int')
-    ->Column('DateUpdated', 'datetime', true)
-    ->Column('UpdateUserID', 'int', true)
-    ->Column('Attributes', 'text', true)
-    ->Set($Explicit, $Drop);
+    ->primaryKey('GroupID')
+    ->column('Name', 'varchar(150)', false, 'unique')
+    ->column('Description', 'text')
+    ->column('Format', 'varchar(10)', true)
+    ->column('CategoryID', 'int', false, 'key')
+    ->column('Icon', 'varchar(255)', true)
+    ->column('Banner', 'varchar(255)', true)
+    ->column('Privacy', ['Public', 'Private'], 'Public') // add secret later.
+    ->column('Registration', ['Public', 'Approval', 'Invite'], true) // deprecated
+    ->column('Visibility', ['Public', 'Members'], true) // deprecated
+    ->column('CountMembers', 'uint', '0')
+    ->column('CountDiscussions', 'uint', '0')
+    ->column('DateLastComment', 'datetime', true)
+    ->column('LastCommentID', 'int', null)
+    ->column('LastDiscussionID', 'int', null)
+    ->column('DateInserted', 'datetime')
+    ->column('InsertUserID', 'int')
+    ->column('DateUpdated', 'datetime', true)
+    ->column('UpdateUserID', 'int', true)
+    ->column('Attributes', 'text', true)
+    ->set($Explicit, $Drop);
 
 if ($GroupExists && !$GroupPrivacyExists) {
-    $Sql->Put('Group', ['Privacy' => 'Private']);
-    $Sql->Put('Group', ['Privacy' => 'Public'], ['Registration' => 'Public', 'Visibility' => 'Public']);
+    $Sql->put('Group', ['Privacy' => 'Private']);
+    $Sql->put('Group', ['Privacy' => 'Public'], ['Registration' => 'Public', 'Visibility' => 'Public']);
 }
 
-$St->Table('UserGroup')
-    ->PrimaryKey('UserGroupID')
-    ->Column('GroupID', 'int', false, 'unique')
-    ->Column('UserID', 'int', false, ['unique', 'key'])
-    ->Column('DateInserted', 'datetime')
-    ->Column('InsertUserID', 'int')
-    ->Column('Role', ['Leader', 'Member'])
-    ->Set($Explicit, $Drop);
+$St->table('UserGroup')
+    ->primaryKey('UserGroupID')
+    ->column('GroupID', 'int', false, 'unique')
+    ->column('UserID', 'int', false, ['unique', 'key'])
+    ->column('DateInserted', 'datetime')
+    ->column('InsertUserID', 'int')
+    ->column('Role', ['Leader', 'Member'])
+    ->set($Explicit, $Drop);
 
-$St->Table('GroupApplicant')
-    ->PrimaryKey('GroupApplicantID')
-    ->Column('GroupID', 'int', false, 'unique')
-    ->Column('UserID', 'int', false, ['unique', 'key'])
-    ->Column('Type', ['Application', 'Invitation', 'Denied', 'Banned'])
-    ->Column('Reason', 'varchar(200)', true) // reason for wanting to join.
-    ->Column('DateInserted', 'datetime')
-    ->Column('InsertUserID', 'int')
-    ->Column('DateUpdated', 'datetime', true)
-    ->Column('UpdateUserID', 'int', true)
-    ->Set($Explicit, $Drop);
+$St->table('GroupApplicant')
+    ->primaryKey('GroupApplicantID')
+    ->column('GroupID', 'int', false, 'unique')
+    ->column('UserID', 'int', false, ['unique', 'key'])
+    ->column('Type', ['Application', 'Invitation', 'Denied', 'Banned'])
+    ->column('Reason', 'varchar(200)', true) // reason for wanting to join.
+    ->column('DateInserted', 'datetime')
+    ->column('InsertUserID', 'int')
+    ->column('DateUpdated', 'datetime', true)
+    ->column('UpdateUserID', 'int', true)
+    ->set($Explicit, $Drop);
 
-if ($St->TableExists('Category')) {
-    $St->Table('Category');
-    $AllowGroupsExists = $St->ColumnExists('AllowGroups');
-    $St->Table('Category')
-        ->Column('AllowGroups', 'tinyint', '0')
-        ->Set();
+if ($St->tableExists('Category')) {
+    $St->table('Category');
+    $AllowGroupsExists = $St->columnExists('AllowGroups');
+    $St->table('Category')
+        ->column('AllowGroups', 'tinyint', '0')
+        ->set();
 
     if (!$AllowGroupsExists) {
         // Create a category for groups.
         $Model = new CategoryModel();
-        $Row = CategoryModel::Categories('social-groups');
+        $Row = CategoryModel::categories('social-groups');
         if ($Row) {
             $Model->setField($Row['CategoryID'], 'AllowGroups', 1);
             // Backwards compat for a new column.
@@ -118,53 +118,53 @@ if ($St->TableExists('Category')) {
     }
 }
 
-if ($St->TableExists('Discussion')) {
-    $St->Table('Discussion')
-        ->Column('GroupID', 'int', true, 'key')
-        ->Set();
+if ($St->tableExists('Discussion')) {
+    $St->table('Discussion')
+        ->column('GroupID', 'int', true, 'key')
+        ->set();
 }
 
 if (!$CountDiscussionsExists) {
     $GroupModel = new GroupModel();
-    $GroupModel->Counts('CountDiscussions');
+    $GroupModel->counts('CountDiscussions');
 }
 
-$St->Table('Event');
+$St->table('Event');
 
 $timeZoneExists = $St->columnExists('Timezone');
 
-$St->PrimaryKey('EventID')
-    ->Column('Name', 'varchar(255)')
-    ->Column('Body', 'text')
-    ->Column('Format', 'varchar(10)', true)
-    ->Column('DateStarts', 'datetime')
-    ->Column('DateEnds', 'datetime', true)
-    ->Column('AllDayEvent', 'tinyint', '0')
-    ->Column('Location', 'varchar(255)', true)
-    ->Column('DateInserted', 'datetime')
-    ->Column('InsertUserID', 'int') // organizer
-    ->Column('DateUpdated', 'datetime', true)
-    ->Column('UpdateUserID', 'int', true)
-    ->Column('GroupID', 'int', true, 'key') // eventually make events stand-alone.
-    ->Set($Explicit, $Drop);
+$St->primaryKey('EventID')
+    ->column('Name', 'varchar(255)')
+    ->column('Body', 'text')
+    ->column('Format', 'varchar(10)', true)
+    ->column('DateStarts', 'datetime')
+    ->column('DateEnds', 'datetime', true)
+    ->column('AllDayEvent', 'tinyint', '0')
+    ->column('Location', 'varchar(255)', true)
+    ->column('DateInserted', 'datetime')
+    ->column('InsertUserID', 'int') // organizer
+    ->column('DateUpdated', 'datetime', true)
+    ->column('UpdateUserID', 'int', true)
+    ->column('GroupID', 'int', true, 'key') // eventually make events stand-alone.
+    ->set($Explicit, $Drop);
 
 if ($timeZoneExists) {
-    $St->Table('Event')->dropColumn('Timezone');
+    $St->table('Event')->dropColumn('Timezone');
 }
 
-$St->Table('UserEvent')
-    ->Column('EventID', 'int', false, 'primary')
-    ->Column('UserID', 'int', false, ['primary', 'key'])
-    ->Column('DateInserted', 'datetime')
-    ->Column('Attending', ['Yes', 'No', 'Maybe', 'Invited'], 'Invited')
-    ->Set($Explicit, $Drop);
+$St->table('UserEvent')
+    ->column('EventID', 'int', false, 'primary')
+    ->column('UserID', 'int', false, ['primary', 'key'])
+    ->column('DateInserted', 'datetime')
+    ->column('Attending', ['Yes', 'No', 'Maybe', 'Invited'], 'Invited')
+    ->set($Explicit, $Drop);
 
 // Make sure the activity table has an index that the event wall can use.
-$St->Table('Activity')
-    ->Column('RecordType', 'varchar(20)', true, 'index.Record')
-    ->Column('RecordID', 'int', true, 'index.Record')
-    ->Set();
+$St->table('Activity')
+    ->column('RecordType', 'varchar(20)', true, 'index.Record')
+    ->column('RecordID', 'int', true, 'index.Record')
+    ->set();
 
 $ActivityModel = new ActivityModel();
-$ActivityModel->DefineType('Groups');
-$ActivityModel->DefineType('Events');
+$ActivityModel->defineType('Groups');
+$ActivityModel->defineType('Events');

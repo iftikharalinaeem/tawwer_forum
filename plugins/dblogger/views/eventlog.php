@@ -9,44 +9,44 @@
     $( document ).ready(function() {
         $( "#filter-reset" ).click(function() {
             $("#filter-form")[0].reset();
-            window.location.href = '<?php echo Url('/settings/eventlog'); ?>';
+            window.location.href = '<?php echo url('/settings/eventlog'); ?>';
         });
     });
 </script>
 <?php
-echo $this->Form->Open(['action' => URL('/settings/eventlog'), 'Method' => 'GET', 'id' => 'filter-form']);
-echo $this->Form->Errors();
-//$this->Form = new Gdn_Form();
+echo $this->Form->open(['action' => uRL('/settings/eventlog'), 'Method' => 'GET', 'id' => 'filter-form']);
+echo $this->Form->errors();
+//$this->Form = new gdn_Form();
 ?>
 <div class="toolbar flex-wrap">
     <div class="date-from">
-        <?php echo $this->Form->TextBox('datefrom', ['class' => 'form-control', 'placeholder' => t('Date From'), 'aria-label' => t('Date From')]); ?>
+        <?php echo $this->Form->textBox('datefrom', ['class' => 'form-control', 'placeholder' => t('Date From'), 'aria-label' => t('Date From')]); ?>
     </div>
     <div class="date-to">
-        <?php echo $this->Form->TextBox('dateto', ['class' => 'form-control', 'placeholder' => t('Date To'), 'aria-label' => t('Date To')]); ?>
+        <?php echo $this->Form->textBox('dateto', ['class' => 'form-control', 'placeholder' => t('Date To'), 'aria-label' => t('Date To')]); ?>
     </div>
     <div class="event-name">
-        <?php echo $this->Form->TextBox('event', ['class' => 'form-control', 'placeholder' => t('Event Name'), 'aria-label' => t('Event Name')]); ?>
+        <?php echo $this->Form->textBox('event', ['class' => 'form-control', 'placeholder' => t('Event Name'), 'aria-label' => t('Event Name')]); ?>
     </div>
     <div class="flex severity">
         <?php echo $this->Form->labelWrap('Severity', 'severity');  ?>
         <div class="input-wrap">
-            <?php echo $this->Form->DropDown('severity', $this->Data['SeverityOptions'], ['class' => 'form-control']); ?>
+            <?php echo $this->Form->dropDown('severity', $this->Data['SeverityOptions'], ['class' => 'form-control']); ?>
         </div>
     </div>
     <div class="flex sort-order">
         <?php echo $this->Form->labelWrap('Sort Order', 'sortorder');  ?>
         <div class="input-wrap">
-            <?php echo $this->Form->DropDown('sortorder', ['desc' => 'DESC', 'asc' => 'ASC'], ['class' => 'form-control']); ?>
+            <?php echo $this->Form->dropDown('sortorder', ['desc' => 'DESC', 'asc' => 'ASC'], ['class' => 'form-control']); ?>
         </div>
     </div>
     <div class="flex">
-        <?php echo $this->Form->Button("Filter"); ?>
-        <?php echo $this->Form->Button("Reset", ['id' => 'filter-reset', 'type' => 'reset']); ?>
+        <?php echo $this->Form->button("Filter"); ?>
+        <?php echo $this->Form->button("Reset", ['id' => 'filter-reset', 'type' => 'reset']); ?>
     </div>
     <?php PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard']); ?>
 </div>
-<?php echo $this->Form->Close(); ?>
+<?php echo $this->Form->close(); ?>
 <div class="table-wrap">
 <table class="AltColumns table-el table-data js-tj">
     <thead>
@@ -68,13 +68,13 @@ echo $this->Form->Errors();
 
             ?>
             <tr class="severity-<?php echo Logger::priorityLabel($event['Level']); echo $i%2 == 0 ? ' odd' : ' even' ;?>">
-                <td><?php echo Gdn_Format::DateFull($event['Timestamp'], 'html'); ?></td>
+                <td><?php echo Gdn_Format::dateFull($event['Timestamp'], 'html'); ?></td>
                 <td><?php echo htmlspecialchars($event['Message']); ?></td>
                 <td class="UsernameCell">
                     <?php
-                    $User = Gdn::UserModel()->GetID($event['UserID']);
+                    $User = Gdn::userModel()->getID($event['UserID']);
                     if ($User) {
-                        echo UserAnchor($User);
+                        echo userAnchor($User);
                     } else {
                         echo htmlspecialchars($event['Username']);
                     }
@@ -82,7 +82,7 @@ echo $this->Form->Errors();
                 </td>
                 <td><?php echo htmlspecialchars(Logger::priorityLabel($event['Level'])); ?></td>
                 <td><?php echo htmlspecialchars($event['Event']); ?></td>
-                <td><?php echo Anchor($event['IP'], Url('/user/browse?Keywords='.urlencode($event['IP']))); ?></td>
+                <td><?php echo anchor($event['IP'], url('/user/browse?Keywords='.urlencode($event['IP']))); ?></td>
 
             </tr>
             <?php
@@ -96,8 +96,8 @@ echo $this->Form->Errors();
 
 <p>This report is also available in JSON or XML</p>
 <ul>
-    <li><?php echo Anchor('JSON', '/settings/eventlog.json?'.$this->Data['CurrentFilter']); ?></li>
-    <li><?php echo Anchor('XML', '/settings/eventlog.xml?'.$this->Data['CurrentFilter']); ?></li>
+    <li><?php echo anchor('JSON', '/settings/eventlog.json?'.$this->Data['CurrentFilter']); ?></li>
+    <li><?php echo anchor('XML', '/settings/eventlog.xml?'.$this->Data['CurrentFilter']); ?></li>
 </ul>
 
 </div>

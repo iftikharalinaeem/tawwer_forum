@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$ThemeName = ArrayValue('Name', $this->CurrentThemeInfo, 'default');
+$ThemeName = arrayValue('Name', $this->CurrentThemeInfo, 'default');
 
-echo $this->Form->Open();
-echo $this->Form->Errors();
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
 <ul>
    <li>
@@ -12,13 +12,13 @@ echo $this->Form->Errors();
          <div class="Info">
             CSS (Cascading Stylesheets) allow you to change the colors, fonts, images, and layout of your forum. If you are new to CSS, there are some help references in the panel on the right.
             <?php
-            if (!Gdn::Config('Plugins.CustomCSS.Enabled')) {
-               echo '<div class="Warning"><strong>Note:</strong> You can edit your css and preview the changes for free. If you would like to make your changes visible to the public, please purchase the '.Anchor('Custom CSS Premium Upgrade', 'plugin/upgrades').'.</div>';
+            if (!Gdn::config('Plugins.CustomCSS.Enabled')) {
+               echo '<div class="Warning"><strong>Note:</strong> You can edit your css and preview the changes for free. If you would like to make your changes visible to the public, please purchase the '.anchor('Custom CSS Premium Upgrade', 'plugin/upgrades').'.</div>';
             }
             ?>
          </div>
          <?php
-         echo $this->Form->TextBox('CustomCSS', ['MultiLine' => TRUE, 'class' => 'TextBox CustomCSSBox Autogrow']);
+         echo $this->Form->textBox('CustomCSS', ['MultiLine' => TRUE, 'class' => 'TextBox CustomCSSBox Autogrow']);
          ?>
       </div>
       <div class="CustomCSSOptions">
@@ -28,30 +28,30 @@ echo $this->Form->Errors();
                <li>
                   <strong>How to include your Custom CSS:</strong>
                   <?php
-                  $Default = Gdn::Config('Plugins.CustomCSS.IncludeTheme', 'Yes');
-                  echo $this->Form->Radio('IncludeTheme', 'Add my css after the '.$ThemeName.' theme css.', ['value' => 'Yes', 'default' => $Default]);
-                  echo $this->Form->Radio('IncludeTheme', "Don't use any theme css, ONLY use mine.", ['value' => 'No', 'default' => $Default]);
+                  $Default = Gdn::config('Plugins.CustomCSS.IncludeTheme', 'Yes');
+                  echo $this->Form->radio('IncludeTheme', 'Add my css after the '.$ThemeName.' theme css.', ['value' => 'Yes', 'default' => $Default]);
+                  echo $this->Form->radio('IncludeTheme', "Don't use any theme css, ONLY use mine.", ['value' => 'No', 'default' => $Default]);
                   ?>
                </li>
             </ul>
             <?php
-            if (Gdn::Config('Plugins.CustomCSS.Enabled'))
-               echo $this->Form->Button('Apply ⇥', ['Name' => 'Form/Apply']);
+            if (Gdn::config('Plugins.CustomCSS.Enabled'))
+               echo $this->Form->button('Apply ⇥', ['Name' => 'Form/Apply']);
 
-            echo $this->Form->Button('Preview ⇡', ['Name' => 'Form/Preview']);
+            echo $this->Form->button('Preview ⇡', ['Name' => 'Form/Preview']);
             ?>
          </div>
          <strong>Help</strong>
          <div class="Info">
             <div>If you are new to CSS, here are some links you should check out:</div>
             <?php
-            echo '→ '.Anchor('Our Custom CSS Documentation', 'http://vanillaforums.com/help/customcss', '', ['target' => '_blank']);
-            echo '<br />→ '.Anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', ['target' => '_blank']);
-            echo '<br />→ '.Anchor("Html Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', ['target' => '_blank']);
+            echo '→ '.anchor('Our Custom CSS Documentation', 'http://vanillaforums.com/help/customcss', '', ['target' => '_blank']);
+            echo '<br />→ '.anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', ['target' => '_blank']);
+            echo '<br />→ '.anchor("Html Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', ['target' => '_blank']);
             ?>            
          </div>
          <?php
-            $Folder = PATH_CACHE . DS . 'CustomCSS' . DS . Gdn::Config('Garden.Theme', '');
+            $Folder = PATH_CACHE . DS . 'CustomCSS' . DS . Gdn::config('Garden.Theme', '');
             $FileArray = [];
             $Files = '';
             if (file_exists($Folder)) {
@@ -67,7 +67,7 @@ echo $this->Form->Errors();
                   closedir($Handle);
                }
                ksort($FileArray);
-               $AppliedFile = Gdn::Config('Plugins.CustomCSS.Enabled') ? Gdn::Config('Plugins.CustomCSS.File', '') : '';
+               $AppliedFile = Gdn::config('Plugins.CustomCSS.Enabled') ? Gdn::config('Plugins.CustomCSS.File', '') : '';
                foreach ($FileArray as $MTime => $File) {
                   $Day = date("M jS, Y", $MTime);
                   if ($LastDay != $Day) {
@@ -75,7 +75,7 @@ echo $this->Form->Errors();
                      $LastDay = $Day;
                   }
                   $Files = '<div class="Revision'.($AppliedFile == $File.'.css' ? ' LiveRevision' : '').'">→'
-                     .Anchor(date("g:i:sa", $MTime), 'plugin/CustomCSS/'.$File)
+                     .anchor(date("g:i:sa", $MTime), 'plugin/CustomCSS/'.$File)
                      .($AppliedFile == $File.'.css' ? ' Live Version' : '')
                      .'</div>'.$Files;
                }
@@ -95,5 +95,5 @@ echo $this->Form->Errors();
    </li>
 </ul>
 <?php
-echo $this->Form->Close();
+echo $this->Form->close();
 

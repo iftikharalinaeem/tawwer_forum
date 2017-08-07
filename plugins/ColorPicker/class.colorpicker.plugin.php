@@ -21,7 +21,7 @@ class ColorPickerPlugin extends Gdn_Plugin {
     *
     * @return ColorPickerSettings
     */
-   public function Settings() {
+   public function settings() {
       if ($this->_Settings === NULL) {
          // Lazy load the settings.
          require_once dirname(__FILE__).'/class.colorpickersettings.php';
@@ -32,26 +32,26 @@ class ColorPickerPlugin extends Gdn_Plugin {
    }
 
    /** Standard plugin setup method. */
-   public function Setup() {
+   public function setup() {
       // Make sure the folder for uploaded files exists.
       $uploadPath = PATH_UPLOADS.'/ColorPicker';
       if (!file_exists($uploadPath)) {
          mkdir($uploadPath, 0777, TRUE);
       }
 
-      $this->Settings()->GenerateCustomCss($uploadPath.'/custom.css');
+      $this->settings()->generateCustomCss($uploadPath.'/custom.css');
    }
 
    /**
     *
     * @param Gdn_Controller $sender
     */
-   public function Base_Render_Before($sender) {
-      $session = Gdn::Session();
+   public function base_render_before($sender) {
+      $session = Gdn::session();
 
       // Add the color picker.
-      if ($session->IsValid() /* && $Session->GetPreference('Plugins.ColorPicker.EditColors') */) {
-         $this->Settings()->EditColors($sender);
+      if ($session->isValid() /* && $Session->getPreference('Plugins.ColorPicker.EditColors') */) {
+         $this->settings()->editColors($sender);
       }
    }
 }

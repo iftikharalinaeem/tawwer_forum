@@ -142,7 +142,7 @@ class BadgeModel extends Gdn_Model {
      * Get badges list for viewing.
      */
     public function getList() {
-        if (!CheckPermission('Reputation.Badges.Give') && !CheckPermission('Garden.Settings.Manage')) {
+        if (!checkPermission('Reputation.Badges.Give') && !checkPermission('Garden.Settings.Manage')) {
             $this->SQL->where('Visible', 1);
         }
 
@@ -240,7 +240,7 @@ class BadgeModel extends Gdn_Model {
             $data['Attributes'] = dbencode($data['Attributes']);
         }
         if (!isset($data['BadgeID'])) {
-            TouchValue('Threshold', $data, 0);
+            touchValue('Threshold', $data, 0);
         }
 
         // Strict-mode.

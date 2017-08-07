@@ -78,24 +78,24 @@ class MemberListModule extends Gdn_Module {
     protected function getMemberButtons($member, $group) {
         $userId = val('UserID', $member);
         $buttons = [];
-        if (GroupPermission('Moderate') && (val('InsertUserID', $group) != $userId)) {
-            if (GroupPermission('Edit')) {
+        if (groupPermission('Moderate') && (val('InsertUserID', $group) != $userId)) {
+            if (groupPermission('Edit')) {
                 if (val('Role', $member) == 'Leader') {
                     $makeMember['text'] = sprintf(t('Make %s'), t('Member'));
-                    $makeMember['url'] = GroupUrl($group, 'setrole')."?userid=$userId&role=member";
+                    $makeMember['url'] = groupUrl($group, 'setrole')."?userid=$userId&role=member";
                     $makeMember['cssClass'] = 'Group-MakeMember Hijack';
 
                     $buttons[] = $makeMember;
                 } else {
                     $makeLeader['text'] = t('Make Leader', 'Leader');
-                    $makeLeader['url'] = GroupUrl($group, 'setrole')."?userid=$userId&role=leader";
+                    $makeLeader['url'] = groupUrl($group, 'setrole')."?userid=$userId&role=leader";
                     $makeLeader['cssClass'] = 'Group-Leader Hijack';
 
                     $buttons[] = $makeLeader;
                 }
             }
             $remove['text'] = t('Remove');
-            $remove['url'] = GroupUrl($group, 'removemember')."?userid=$userId";
+            $remove['url'] = groupUrl($group, 'removemember')."?userid=$userId";
             $remove['cssClass'] = 'Group-RemoveMember Popup';
 
             $buttons[] = $remove;
@@ -124,7 +124,7 @@ class MemberListModule extends Gdn_Module {
 
         if ($this->showMore) {
             $memberList['moreLink'] = sprintf(t('All %s...'), $title);
-            $memberList['moreUrl'] = GroupUrl($group, 'members');
+            $memberList['moreUrl'] = groupUrl($group, 'members');
             $memberList['moreCssClass'] = 'More';
         }
 
@@ -162,7 +162,7 @@ class MemberListModule extends Gdn_Module {
         $item['metaCssClass'] = '';
         $item['id'] = 'Member_'.val('UserID', $member);
 
-        $item['meta']['joinDate']['text'] = sprintf(T('Joined %s', 'Joined %s'), Gdn_Format::date(val('DateInserted', $member), 'html'));
+        $item['meta']['joinDate']['text'] = sprintf(t('Joined %s', 'Joined %s'), Gdn_Format::date(val('DateInserted', $member), 'html'));
         $item['meta']['joinDate']['cssClass'] = 'JoinDate';
 
         if ($layout == 'table') {

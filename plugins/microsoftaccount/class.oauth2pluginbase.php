@@ -61,7 +61,7 @@ abstract class OAuth2PluginBase {
      */
     public function provider() {
         if (!$this->provider) {
-            $this->provider = Gdn_AuthenticationProviderModel::GetProviderByKey($this->providerKey);
+            $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->providerKey);
         }
 
         return $this->provider;
@@ -338,8 +338,8 @@ abstract class OAuth2PluginBase {
         $form->setModel($model);
         $sender->Form = $form;
 
-        if (!$form->AuthenticatedPostBack()) {
-            $provider = Gdn_AuthenticationProviderModel::GetProviderByKey($this->getProviderKey());
+        if (!$form->authenticatedPostBack()) {
+            $provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->getProviderKey());
             $form->setData($provider);
         } else {
             $form->setFormValue('AuthenticationKey', $this->getProviderKey());
@@ -350,8 +350,8 @@ abstract class OAuth2PluginBase {
                 $form->setFormValue("BaseUrl", 'https://'. str_replace("http://", "", $form->getValue("BaseUrl")));
             }
 
-            if ($form->Save()) {
-                $sender->informMessage(T('Saved'));
+            if ($form->save()) {
+                $sender->informMessage(t('Saved'));
             }
         }
 
@@ -364,7 +364,7 @@ abstract class OAuth2PluginBase {
 
         $sender->addSideMenu();
         if (!$sender->data('Title')) {
-            $sender->setData('Title', sprintf(T('%s Settings'), 'Oauth2 SSO'));
+            $sender->setData('Title', sprintf(t('%s Settings'), 'Oauth2 SSO'));
         }
         $sender->render('settings', '', 'plugins/'.$this->getProviderKey());
     }
@@ -394,7 +394,7 @@ abstract class OAuth2PluginBase {
         }
 
         // Retrieve the profile that was saved to the session in the entry controller.
-        $savedProfile = Gdn::Session()->stash($this->getProviderKey(), '', false);
+        $savedProfile = Gdn::session()->stash($this->getProviderKey(), '', false);
         if(Gdn::session()->stash($this->getProviderKey(), '', false)) {
             $this->log('Base Connect Data Profile Saved in Session', ['profile' => $savedProfile]);
         }
@@ -403,7 +403,7 @@ abstract class OAuth2PluginBase {
         trace($profile, "Profile");
         trace($accessToken, "Access Token");
         /* @var Gdn_Form $form */
-        $form = $sender->Form; //new Gdn_Form();
+        $form = $sender->Form; //new gdn_Form();
 
         // Create a form and populate it with values from the profile.
         $originaFormValues = $form->formValues();
@@ -510,7 +510,7 @@ abstract class OAuth2PluginBase {
         if ($provider['AuthenticationSchemeAlias'] != $this->getProviderKey() || !$this->isConfigured() || $provider['SignOutUrl'] === null) {
             return;
         }
-        $redirect = Gdn::Request()->Url('/', true);
+        $redirect = Gdn::request()->url('/', true);
         $url = $provider['SignOutUrl'];
         $args['DefaultProvider']['SignOutUrl'] = $url . "?returnTo=" . urlencode($redirect);
     }
@@ -604,7 +604,7 @@ abstract class OAuth2PluginBase {
             case 'entry':
             default:
 
-                // This is an sso request, we need to redispatch to /entry/connect/[providerKey] which is Base_ConnectData_Handler() in this class.
+                // This is an sso request, we need to redispatch to /entry/connect/[providerKey] which is base_ConnectData_Handler() in this class.
                 Gdn::session()->stash($this->getProviderKey(), ['AccessToken' => $response['access_token'], 'Profile' => $profile]);
                 $url = '/entry/connect/'.$this->getProviderKey();
 

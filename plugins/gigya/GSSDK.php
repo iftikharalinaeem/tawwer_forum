@@ -399,17 +399,17 @@ class GSRequest {
 			//so in order to create a valid signature we're changing false to 0 and true to 1.
 			if($value === false)$value = "0"; 
 			if($value === true)$value = "1";
-			$queryString .= $amp.$key."=".self::UrlEncode($value);
+			$queryString .= $amp.$key."=".self::urlEncode($value);
 			$amp = "&";
 		}
 		
 		// Construct the base string from the HTTP method, the URL and the parameters 
-		$baseString = strtoupper($httpMethod)."&".self::UrlEncode($normalizedUrl)."&".self::UrlEncode($queryString);
+		$baseString = strtoupper($httpMethod)."&".self::urlEncode($normalizedUrl)."&".self::urlEncode($queryString);
 		return $baseString;
 
 	}	
 	
-	public static function UrlEncode($value) 
+	public static function urlEncode($value) 
 	{
 		if ($value === false)
 		{
@@ -446,7 +446,7 @@ class GSResponse
 	private $method = null;
 	private $traceLog = null;
 	
-	public static function Init(){
+	public static function init(){
 		self::$errorMsgDic = new GSObject();
 		self::$errorMsgDic->put(400002, "Required parameter is missing");
 		self::$errorMsgDic->put(400003, "You must set a certificate for HTTPS requests");
@@ -622,7 +622,7 @@ class GSResponse
 		return $sb;
 	}
 }
-GSResponse::Init();
+GSResponse::init();
 
 
 /**
@@ -1072,7 +1072,7 @@ class SigUtils
 	public static function getDynamicSessionSignature($glt_cookie, $timeoutInSeconds, $secret)
 	{
 		// cookie format: 
-		// <expiration time in unix time format>_BASE64(HMACSHA1(secret key, <login token>_<expiration time in unix time format>))
+		// <expiration time in unix time format>_BASE64(hMACSHA1(secret key, <login token>_<expiration time in unix time format>))
 		$expirationTimeUnixMS = (SigUtils::currentTimeMillis()/1000) + $timeoutInSeconds;
 		$expirationTimeUnix = (string)floor($expirationTimeUnixMS);
 		$unsignedExpString = $glt_cookie . "_" . $expirationTimeUnix;

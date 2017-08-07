@@ -74,19 +74,19 @@ class ApplicantListModule extends Gdn_Module {
           $buttons = [];
           if (strtolower(val('Type', $applicant)) == 'application') {
                 $approve['text'] = t('Approve');
-                $approve['url'] = GroupUrl($group, 'approve')."?id={$applicant['GroupApplicantID']}";
+                $approve['url'] = groupUrl($group, 'approve')."?id={$applicant['GroupApplicantID']}";
                 $approve['cssClass'] = 'Button SmallButton Hijack Button-Approve';
 
                 $buttons[] = $approve;
 
                 $deny['text'] = t('Deny');
-                $deny['url'] = GroupUrl($group, 'approve')."?id={$applicant['GroupApplicantID']}&value=denied";
+                $deny['url'] = groupUrl($group, 'approve')."?id={$applicant['GroupApplicantID']}&value=denied";
                 $deny['cssClass'] = 'Button SmallButton Hijack Button-Deny';
 
                 $buttons[] = $deny;
           } else if(strtolower(val('Type', $applicant)) == 'invitation') {
                 $remove['text'] = t('Remove Invitation', 'Remove');
-                $remove['url'] = GroupUrl($group, 'approve')."?id={$applicant['GroupApplicantID']}&value=denied";
+                $remove['url'] = groupUrl($group, 'approve')."?id={$applicant['GroupApplicantID']}&value=denied";
                 $remove['cssClass'] = 'Button SmallButton Hijack Button-Deny';
 
                 $buttons[] = $remove;
@@ -148,7 +148,7 @@ class ApplicantListModule extends Gdn_Module {
           if (class_exists('RankModel')) {
                 $userModel = new UserModel();
                 $applicantRankId = val('RankID', $userModel->getID(val('UserID', $applicant)));
-                $rank = RankModel::Ranks($applicantRankId);
+                $rank = RankModel::ranks($applicantRankId);
                 $rankLabel = val('Label', $rank);
                 $item['meta']['rank']['text'] = t('Rank') . ': ' . $rankLabel;
           }
@@ -205,7 +205,7 @@ class ApplicantListModule extends Gdn_Module {
           $this->applicants = $this->getApplicantsInfo($this->layout, $this->applicants, $this->group, $this->title, $this->emptyMessage, $this->withButtons, $this->showMeta);
           $controller = new Gdn_Controller();
           $controller->setData('list', $this->applicants);
-          if (GroupPermission('Leader', $this->group)) {
+          if (groupPermission('Leader', $this->group)) {
                 return $controller->fetchView($this->getView(), 'modules', 'groups');
           }
           return '';

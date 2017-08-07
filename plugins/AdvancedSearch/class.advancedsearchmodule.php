@@ -77,7 +77,7 @@ class AdvancedSearchModule extends Gdn_Module {
         if (isset($get['tags'])) {
             $tags = explode(',', $get['tags']);
             $tags = array_filter($tags);
-            $tags = Gdn::SQL()->getWhere('Tag', ['Name' => $tags])->resultArray();
+            $tags = Gdn::sql()->getWhere('Tag', ['Name' => $tags])->resultArray();
             if (count($tags) > 0 && isset($tags[0]['FullName'])) {
                 $this->setData('Tags', array_column($tags, 'FullName', 'Name'));
             }

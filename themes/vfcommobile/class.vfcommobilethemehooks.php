@@ -10,33 +10,33 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 class VFComMobileThemeHooks implements Gdn_IPlugin {
    
-   public function Setup() {
+   public function setup() {
       return TRUE;
    }
 
-   public function OnDisable() {
+   public function onDisable() {
       return TRUE;
    }
    
    /**
     * Remove plugins that are not mobile friendly!
     */
-   public function Gdn_Dispatcher_AfterAnalyzeRequest_Handler($sender) {
+   public function gdn_Dispatcher_AfterAnalyzeRequest_Handler($sender) {
       // Remove plugins so they don't mess up layout or functionality.
-      if (in_array($sender->Application(), ['vanilla', 'conversations']) || ($sender->Application() == 'dashboard' && in_array($sender->Controller(), ['Activity', 'Profile', 'Search']))) {
-         Gdn::PluginManager()->RemoveMobileUnfriendlyPlugins();
+      if (in_array($sender->application(), ['vanilla', 'conversations']) || ($sender->application() == 'dashboard' && in_array($sender->controller(), ['Activity', 'Profile', 'Search']))) {
+         Gdn::pluginManager()->removeMobileUnfriendlyPlugins();
       }
-      SaveToConfig('Garden.Format.EmbedSize', '240x135', FALSE);
+      saveToConfig('Garden.Format.EmbedSize', '240x135', FALSE);
    }
    
    /**
     * Add mobile meta info. Add script to hide iphone browser bar on pageload.
     */
-   public function Base_Render_Before($sender) {
-      if (IsMobile() && is_object($sender->Head)) {
-         $sender->Head->AddTag('meta', ['name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"]);
+   public function base_render_before($sender) {
+      if (isMobile() && is_object($sender->Head)) {
+         $sender->Head->addTag('meta', ['name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"]);
          
-         $sender->Head->AddString('<script type="text/javascript">
+         $sender->Head->addString('<script type="text/javascript">
 // If not looking for a specific comment, hide the address bar in iphone
 var hash = window.location.href.split("#")[1];
 if (typeof(hash) == "undefined") {

@@ -3,7 +3,7 @@
 $header = new GroupHeaderModule($this->data('Group'), true, true, true, true);
 echo $header;
 echo Gdn_Theme::module('GroupUserHeaderModule');
-if (GroupPermission('View')) {
+if (groupPermission('View')) {
     echo '<div class="Group-Content">';
     if ($this->data('Applicants')) {
         $applicantList = new ApplicantListModule($this->data('Applicants'), $this->data('Group'), t('Applicants & Invitations'));
@@ -13,10 +13,10 @@ if (GroupPermission('View')) {
     writeDiscussionList($this, 'discussions', t('GroupEmptyDiscussions', "Awfully quiet in here, isn&rsquo;t it?"), t('Discussions'));
     $groupID = val('GroupID', $this->data('Group'));
     $eventList = new EventListModule($this->data('Events'), t('Upcoming Events'), t('GroupEmptyEvents', "Aw snap, no events are coming up."));
-    if (GroupPermission('Member', $this->data('Group')) || GroupPermission('Moderate', $this->data('Group'))) {
+    if (groupPermission('Member', $this->data('Group')) || groupPermission('Moderate', $this->data('Group'))) {
         if (c('Groups.Members.CanAddEvents', true) || groupPermission('Leader', $groupID)) {
             $eventList->addNewEventButton($groupID);
-            $eventList->showMore(url(combinePaths(["/events/group/", GroupSlug($this->data('Group'))])));
+            $eventList->showMore(url(combinePaths(["/events/group/", groupSlug($this->data('Group'))])));
         }
     }
     echo $eventList;
@@ -25,5 +25,5 @@ if (GroupPermission('View')) {
     echo '</div>';
     echo '</div>';
 } else {
-    echo '<div class="Hero">'.GroupPermission('View.Reason').'</div>';
+    echo '<div class="Hero">'.groupPermission('View.Reason').'</div>';
 }

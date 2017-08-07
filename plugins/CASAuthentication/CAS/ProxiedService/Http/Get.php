@@ -40,7 +40,7 @@
  *			return $service->getResponseBody();
  *		else
  *			// The service responded with an error code 404, 500, etc.
- *			throw new Exception('The service responded with an error.');
+ *			throw new exception('The service responded with an error.');
  *
  * 	} catch (CAS_ProxyTicketException $e) {
  *	    if ($e->getCode() == PHPCAS_SERVICE_PT_FAILURE)

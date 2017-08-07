@@ -43,7 +43,7 @@ class UserBadgeModel extends Gdn_Model {
         }
 
         // Get user progress
-        $userBadge = $this->getID($userID, GetValue('BadgeID', $badge));
+        $userBadge = $this->getID($userID, getValue('BadgeID', $badge));
 
         // Grab relevant parameters
         $timeout = val('Timeout', $userBadge['Attributes'], 0);
@@ -63,7 +63,7 @@ class UserBadgeModel extends Gdn_Model {
 
         // Save new event list
         setValue('Events', $userBadge['Attributes'], $events);
-        $this->Save($userBadge);
+        $this->save($userBadge);
 
         // If we've achieved threshold, give badge to user
         if ($threshold && count($events) >= $threshold) {
@@ -405,7 +405,7 @@ class UserBadgeModel extends Gdn_Model {
         if ($saved) {
             $points = $badge['Points'];
             if ($points != 0) {
-                $pointsText = ' '.Plural($points, '%+d point', '%+d points');
+                $pointsText = ' '.plural($points, '%+d point', '%+d points');
                 self::givePoints($userID, $points, 'Badges');
             }
 
@@ -422,7 +422,7 @@ class UserBadgeModel extends Gdn_Model {
 
             // Notify people of the badge.
             $headlineFormat = t('HeadlineFormat.Badge', '{ActivityUserID,You} earned the <a href="{Url,html}">{Data.Name,text}</a> badge.');
-            if (StringBeginsWith(Gdn::locale()->Locale, 'en', true)) {
+            if (stringBeginsWith(Gdn::locale()->Locale, 'en', true)) {
                 $badgeBody = val('Body', $badge);
             } else {
                 $badgeBody = '';
@@ -653,15 +653,15 @@ class UserBadgeModel extends Gdn_Model {
         $this->defineSchema();
 
         // Add & apply any extra validation rules
-        //$this->Validation->ApplyRule('BadgeID', 'Integer');
+        //$this->Validation->applyRule('BadgeID', 'Integer');
 
         // Make sure that there is at least one recipient
-//        $this->Validation->AddRule('OneOrMoreArrayItemRequired', 'function:ValidateOneOrMoreArrayItemRequired');
-//        $this->Validation->ApplyRule('RecipientUserID', 'OneOrMoreArrayItemRequired');
+//        $this->Validation->addRule('OneOrMoreArrayItemRequired', 'function:ValidateOneOrMoreArrayItemRequired');
+//        $this->Validation->applyRule('RecipientUserID', 'OneOrMoreArrayItemRequired');
 
         // Add insert/update fields.
 
-        //$this->AddUpdateFields($FormPostValues);
+        //$this->addUpdateFields($FormPostValues);
 
         // Validate the form posted values.
         $this->Validation->results(true);
@@ -693,7 +693,7 @@ class UserBadgeModel extends Gdn_Model {
                 ->put();
         } else {
             $message = "Couldn't save UserBadge ".print_r($formPostValues, true).' '.$this->Validation->resultsText();
-            LogException(new Exception($message));
+            logException(new Exception($message));
 
             return false;
         }

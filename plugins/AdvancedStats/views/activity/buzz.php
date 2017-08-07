@@ -1,13 +1,13 @@
 <?php
-echo '<h1>'.$this->Data('Title').'</h1>';
+echo '<h1>'.$this->data('Title').'</h1>';
 
 function _WriteBuzz($field, $data, $label = '') {
     if (!$label) {
-        $label = StringBeginsWith($field, 'Count', TRUE, TRUE);
-        $label = T(Gdn_Form::LabelCode($label));
+        $label = stringBeginsWith($field, 'Count', TRUE, TRUE);
+        $label = t(Gdn_Form::labelCode($label));
     }
 
-    $number = Gdn_Format::BigNumber(GetValue($field, $data), 'html');
+    $number = Gdn_Format::bigNumber(getValue($field, $data), 'html');
 
     echo '<span class="Buzz">',
         '<span class="Buzz-Number">'.$number.'</span>',

@@ -16,17 +16,17 @@
    }
 </style>
 <?php
-   $CategoryID = $this->Data('CategoryID');
-   $CategoryModerators = $this->ModList->Moderators($CategoryID, FALSE);
-   $this->Form->SetValue('CategoryModerators', (bool)sizeof($CategoryModerators));
+   $CategoryID = $this->data('CategoryID');
+   $CategoryModerators = $this->ModList->moderators($CategoryID, FALSE);
+   $this->Form->setValue('CategoryModerators', (bool)sizeof($CategoryModerators));
    
-   $CategoryModerators = Gdn_DataSet::Index($CategoryModerators, 'UserID');
+   $CategoryModerators = Gdn_DataSet::index($CategoryModerators, 'UserID');
 ?>
 <li>
-   <?php echo $this->Form->CheckBox('CategoryModerators', 'This category has a moderator list.', ['class' => 'CategoryModeratorsCheck']); ?>
+   <?php echo $this->Form->checkBox('CategoryModerators', 'This category has a moderator list.', ['class' => 'CategoryModeratorsCheck']); ?>
 </li>
 <li class="CategoryModerators"><?php
-   echo $this->Form->TextBox('Moderators');
+   echo $this->Form->textBox('Moderators');
 ?></li>
 <script type="text/javascript">
    $('.CategoryModeratorsCheck').change(function(event){

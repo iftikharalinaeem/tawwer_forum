@@ -8,17 +8,17 @@ class ReadLess extends Gdn_Plugin {
    public function __construct() {
       parent::__construct();
       
-      $max_height = intval(C('Plugins.readless.maxheight', $this->max_height_default));
+      $max_height = intval(c('Plugins.readless.maxheight', $this->max_height_default));
       $this->max_height = (is_int($max_height)) 
               ? $max_height
               : $this->max_height_default;
    }
    
-   public function Base_Render_Before($sender) {
-      $c = Gdn::Controller();
-      $c->AddDefinition('readlessMaxHeight', $this->max_height);
-      $sender->AddCssFile('readless.css', 'plugins/readless');
-      $c->AddJsFile('readless.js', 'plugins/readless');
+   public function base_render_before($sender) {
+      $c = Gdn::controller();
+      $c->addDefinition('readlessMaxHeight', $this->max_height);
+      $sender->addCssFile('readless.css', 'plugins/readless');
+      $c->addJsFile('readless.js', 'plugins/readless');
    }
    
    /**
@@ -26,20 +26,20 @@ class ReadLess extends Gdn_Plugin {
     * @param SettingsController $sender
     * @param array $args
     */
-   public function SettingsController_Readless_Create($sender, $args) {
-      $sender->Permission('Garden.Settings.Manage');
+   public function settingsController_readless_create($sender, $args) {
+      $sender->permission('Garden.Settings.Manage');
       $cf = new ConfigurationModule($sender);
 
-      $cf->Initialize([
+      $cf->initialize([
           'Plugins.readless.maxheight' => ['LabelCode' => 'Max Height', 'Control' => 'TextBox', 'Description' => 'Set the max pixel height of each post in a discusion. When text goes beyond this limit, a "Read More" button will b displayed to allow the text to be expanded.']
       ]);
 
-      $sender->AddSideMenu();
-      $sender->SetData('Title', T('Read Less Settings'));
-      $cf->RenderAll();
+      $sender->addSideMenu();
+      $sender->setData('Title', t('Read Less Settings'));
+      $cf->renderAll();
    }
    
-   public function Setup() {
-      TouchConfig('Plugins.readless.maxheight', $this->max_height_default); 
+   public function setup() {
+      touchConfig('Plugins.readless.maxheight', $this->max_height_default); 
    }
 }

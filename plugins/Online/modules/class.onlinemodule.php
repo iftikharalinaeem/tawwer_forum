@@ -44,7 +44,7 @@ class OnlineModule extends Gdn_Module {
         parent::__construct($sender);
         $this->onlineUsers = null;
         $this->showInvisible = Gdn::session()->checkPermission('Plugins.Online.ViewHidden');
-        $this->style = C('Plugins.Online.Style', OnlinePlugin::DEFAULT_STYLE);
+        $this->style = c('Plugins.Online.Style', OnlinePlugin::DEFAULT_STYLE);
         $this->selector = 'auto';
     }
 
@@ -153,7 +153,7 @@ class OnlineModule extends Gdn_Module {
         }
     }
 
-    public function ToString() {
+    public function toString() {
         $this->lockOn();
 
         // Check cache
@@ -196,15 +196,15 @@ class OnlineModule extends Gdn_Module {
         $trackCount = ($this->showGuests) ? $this->count : $this->onlineCount;
         switch ($this->selector) {
             case 'category':
-                $title = T("Who's Online in this Category");
+                $title = t("Who's Online in this Category");
                 break;
             case 'discussion':
             case 'comment':
-                $title = T("Who's Online in this Discussion");
+                $title = t("Who's Online in this Discussion");
             case 'limbo':
             case 'all':
             default:
-                $title = T("Who's Online");
+                $title = t("Who's Online");
         }
 
         if ($this->count > 0) {

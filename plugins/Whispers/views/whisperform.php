@@ -1,24 +1,24 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Whispers-Form">
    <?php
-   if (Gdn::Controller()->Data('Discussion.Attributes.WhisperConversationID')):
+   if (Gdn::controller()->data('Discussion.Attributes.WhisperConversationID')):
       // The form is in private conversation mode.
       echo '<div class="Info">';
 
-      if (Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
+      if (Gdn::session()->checkPermission('Conversations.Moderation.Manage')) {
          $Query = [
-             'tk' => Gdn::Session()->TransientKey(),
-             'discussionid' => Gdn::Controller()->Data('Discussion.DiscussionID')];
-         echo '<span style="float: right">'.Anchor(T('Continue in Public...'), '/discussion/makepublic?'.http_build_query($Query), '', ['title' => T('Continue this discussion in public.')]).'</span>';
+             'tk' => Gdn::session()->transientKey(),
+             'discussionid' => Gdn::controller()->data('Discussion.DiscussionID')];
+         echo '<span style="float: right">'.anchor(t('Continue in Public...'), '/discussion/makepublic?'.http_build_query($Query), '', ['title' => t('Continue this discussion in public.')]).'</span>';
       }
    
-      echo T('New comments will be in private between:');
+      echo t('New comments will be in private between:');
    
       echo '<div class="P">';
-      foreach (Gdn::Controller()->Data('WhisperUsers') as $User) {
+      foreach (Gdn::controller()->data('WhisperUsers') as $User) {
          echo '<span>',
-            UserPhoto($User, ['ImageClass' => 'ProfilePhotoSmall']),
-            ' '.UserAnchor($User),
+            userPhoto($User, ['ImageClass' => 'ProfilePhotoSmall']),
+            ' '.userAnchor($User),
             '</span> ';
       }
       echo '</div>';
@@ -28,16 +28,16 @@
    else:
       // Here is the general whisper form.
       $Conversations = $this->Conversations;
-      $HasPermission = Gdn::Session()->CheckPermission('Plugins.Whispers.Allow');
+      $HasPermission = Gdn::session()->checkPermission('Plugins.Whispers.Allow');
 
       echo '<div class="P">';
 
-      if (Gdn::Session()->CheckPermission('Conversations.Moderation.Manage')) {
-         echo '<span style="float: right">'.Anchor(T('Continue in Private...'), '/discussion/makeconversation?discussionid='.Gdn::Controller()->Data('Discussion.DiscussionID'), '', ['title' => T('Continue this discussion in private.')]).'</span>';
+      if (Gdn::session()->checkPermission('Conversations.Moderation.Manage')) {
+         echo '<span style="float: right">'.anchor(t('Continue in Private...'), '/discussion/makeconversation?discussionid='.Gdn::controller()->data('Discussion.DiscussionID'), '', ['title' => t('Continue this discussion in private.')]).'</span>';
       }
 
       if ($HasPermission)
-         echo $this->Form->CheckBox('Whisper', T('Whisper'));
+         echo $this->Form->checkBox('Whisper', t('Whisper'));
 
       echo '</div>';
 
@@ -45,7 +45,7 @@
          echo '<div id="WhisperForm">';
 
          echo '<div class="Info">',
-            T('Whispering will start a private conversation.', 'Whispering will start a private conversation associated with this discussion. You can also continue the whole discussion in private by clicking <b>Continue in Private</b> above.'),
+            t('Whispering will start a private conversation.', 'Whispering will start a private conversation associated with this discussion. You can also continue the whole discussion in private by clicking <b>Continue in Private</b> above.'),
             '</div>';
 
          if (count($Conversations) > 0) {
@@ -53,20 +53,20 @@
             echo '<ul>';
 
             foreach ($Conversations as $Conversation) {
-               $Participants = GetValue('Participants', $Conversation);
+               $Participants = getValue('Participants', $Conversation);
                $ConversationName = '';
                foreach ($Participants as $User) {
-                  $ConversationName = ConcatSep(', ', $ConversationName, htmlspecialchars(GetValue('Name', $User)));
+                  $ConversationName = concatSep(', ', $ConversationName, htmlspecialchars(getValue('Name', $User)));
                }
 
-               echo '<li>'.$this->Form->Radio('ConversationID', $ConversationName, ['Value' => GetValue('ConversationID', $Conversation)]).'</li>';
+               echo '<li>'.$this->Form->radio('ConversationID', $ConversationName, ['Value' => getValue('ConversationID', $Conversation)]).'</li>';
             }
-            echo '<li>'.$this->Form->Radio('ConversationID', T('New Whisper'), ['Value' => '']).'</li>';
+            echo '<li>'.$this->Form->radio('ConversationID', t('New Whisper'), ['Value' => '']).'</li>';
 
             echo '</ul>';
          }
 
-         echo Wrap($this->Form->TextBox('To', ['MultiLine' => TRUE, 'class' => 'MultiComplete']), 'div', ['class' => 'TextBoxWrapper']);
+         echo wrap($this->Form->textBox('To', ['MultiLine' => TRUE, 'class' => 'MultiComplete']), 'div', ['class' => 'TextBoxWrapper']);
 
          echo '</div>';
       }

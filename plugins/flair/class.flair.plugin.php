@@ -5,8 +5,8 @@ class FlairPlugin extends Gdn_Plugin {
    /**
     * @param AssetModel $sender
     */
-   public function AssetModel_StyleCss_Handler($sender, $args) {
-      $sender->AddCssFile('flair.css', 'plugins/flair');
+   public function assetModel_styleCss_handler($sender, $args) {
+      $sender->addCssFile('flair.css', 'plugins/flair');
    }
 
    /**
@@ -14,12 +14,12 @@ class FlairPlugin extends Gdn_Plugin {
     * @param DiscussionController $sender
     * @param type $args
     */
-   public function Base_AuthorInfo_Handler($sender, $args) {
+   public function base_authorInfo_handler($sender, $args) {
      if (!class_exists('UserBadgeModel')) {
        return;
      }
 
-     $userID = GetValue('UserID', $args['Author']);
+     $userID = getValue('UserID', $args['Author']);
      if ($userID) {
          $this->writeFlair($userID);
      }
@@ -61,23 +61,23 @@ class FlairPlugin extends Gdn_Plugin {
    * @param UserBadgeModel $sender
    * @param type $args
    */
-   public function UserBadgeModel_AfterGive_Handler($sender, $args) {
+   public function userBadgeModel_afterGive_handler($sender, $args) {
      // I'm not sure how to test if the event is getting fired.
-     $user_id = GetValueR('UserBagde.UserID', $args);
+     $user_id = getValueR('UserBagde.UserID', $args);
      FlairModel::instance()->clearCache($user_id);
    }
 
-   public function DiscussionController_Render_Before($sender, $args) {
+   public function discussionController_render_before($sender, $args) {
      if (class_exists('FlairModel')) {
        // Pre-fetch the flair for the comments.
-       FlairModel::instance()->fetchUsers($sender->Data('Comments'), 'InsertUserID');
+       FlairModel::instance()->fetchUsers($sender->data('Comments'), 'InsertUserID');
      }
    }
 
-   public function PostController_EditComment_Render($sender, $args) {
+   public function postController_editComment_render($sender, $args) {
      if (class_exists('FlairModel')) {
        // Pre-fetch the flair for the comments.
-       FlairModel::instance()->fetchUsers($sender->Data('Comments'), 'InsertUserID');
+       FlairModel::instance()->fetchUsers($sender->data('Comments'), 'InsertUserID');
      }
    }
  }

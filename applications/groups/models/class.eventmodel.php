@@ -209,7 +209,7 @@ class EventModel extends Gdn_Model {
                 trigger_error("Invalid group permission $permission.");
                 return false;
             } else {
-                $permission = StringEndsWith($permission, '.Reason', true, true);
+                $permission = stringEndsWith($permission, '.Reason', true, true);
                 if ($perms[$permission]) {
                     return '';
                 }
@@ -279,7 +279,7 @@ class EventModel extends Gdn_Model {
 
         foreach ($groupMembers as $groupMember) {
             $activity['NotifyUserID'] = $groupMember['UserID'];
-            $activityID = $activityModel->Queue($activity);
+            $activityID = $activityModel->queue($activity);
         }
     }
 
@@ -563,7 +563,7 @@ class EventModel extends Gdn_Model {
         if (is_null($lookupTimezone)) {
             return $built;
         }
-        return GetValue($lookupTimezone, $built);
+        return getValue($lookupTimezone, $built);
     }
 
     /**

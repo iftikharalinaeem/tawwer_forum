@@ -145,7 +145,7 @@ class WatermarkPlugin extends Gdn_Plugin {
                         }
 
                         // Save the uploaded image
-                        $parts = $upload->SaveAs(
+                        $parts = $upload->saveAs(
                             $tmpImage,
                             $imageBaseName
                         );
@@ -218,8 +218,8 @@ class WatermarkPlugin extends Gdn_Plugin {
         );
 
         // Get the source file size
-        $sourcefileWidth = imageSX($sourceFileID);
-        $sourcefileHeight = imageSY($sourceFileID);
+        $sourcefileWidth = imagesx($sourceFileID);
+        $sourcefileHeight = imagesy($sourceFileID);
 
         Logger::event(
             'watermarking_image',
@@ -237,10 +237,10 @@ class WatermarkPlugin extends Gdn_Plugin {
             die('No Watermark file was made.');
         }
 
-        imageAlphaBlending($watermarkFileID, false);
+        imagealphablending($watermarkFileID, false);
         imagesavealpha($watermarkFileID, true);
-        $watermarkFileWidth = imageSX($watermarkFileID);
-        $watermarkFileHeight = imageSY($watermarkFileID);
+        $watermarkFileWidth = imagesx($watermarkFileID);
+        $watermarkFileHeight = imagesy($watermarkFileID);
 
         Logger::event(
             'watermarking_image',

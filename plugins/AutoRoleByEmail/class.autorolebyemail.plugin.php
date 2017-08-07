@@ -12,7 +12,7 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
 	/**
     * Add 'Domains' box to Edit Role page.
     */
-   public function RoleController_BeforeRolePermissions_Handler($sender) {
+   public function roleController_beforeRolePermissions_handler($sender) {
       echo '<li class="form-group">
                 <div class="label-wrap">'.
                 $sender->Form->label('Domains', 'Domains').
@@ -25,15 +25,15 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
    /**
     * If new user's email is @domain, add to special role.
     */
-   public function UserModel_BeforeInsertUser_Handler($sender) {
+   public function userModel_beforeInsertUser_handler($sender) {
       // Get new user's email domain
       $email = $sender->EventArguments['InsertFields']['Email'];
       list($junk, $domain) = explode('@', $email);
 
       // Any roles assigned?
       $roleModel = new RoleModel();
-      $roleData = $roleModel->SQL->GetWhereLike('Role', ['Domains' => $domain]);
-      foreach ($roleData->Result() as $result) {
+      $roleData = $roleModel->SQL->getWhereLike('Role', ['Domains' => $domain]);
+      foreach ($roleData->result() as $result) {
          // Confirm it wasn't a sloppy match
          //print_r($Result);
          $domainList = explode(' ', $result->Domains);
@@ -47,27 +47,27 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
    /**
     * One time on enable.
     */
-   public function Setup() {
-      $this->Structure();
+   public function setup() {
+      $this->structure();
 
       // Backwards compatibility with 0.1
-      if (C('Plugins.AutoRoleByEmail.Domain', FALSE)) {
+      if (c('Plugins.AutoRoleByEmail.Domain', FALSE)) {
          $roleModel = new RoleModel();
-         $roleModel->Update(
-            ['Domains' => C('Plugins.AutoRoleByEmail.Domain')],
-            ['Name' => C('Plugins.AutoRoleByEmail.Role')]
+         $roleModel->update(
+            ['Domains' => c('Plugins.AutoRoleByEmail.Domain')],
+            ['Name' => c('Plugins.AutoRoleByEmail.Role')]
          );
-         RemoveFromConfig('Plugins.AutoRoleByEmail.Domain');
-         RemoveFromConfig('Plugins.AutoRoleByEmail.Role');
+         removeFromConfig('Plugins.AutoRoleByEmail.Domain');
+         removeFromConfig('Plugins.AutoRoleByEmail.Role');
       }
    }
 
    /**
     * Add 'Domains' column to Role table.
     */
-   public function Structure() {
-      Gdn::Structure()->Table('Role')
-         ->Column('Domains', 'text', NULL)
-         ->Set();
+   public function structure() {
+      Gdn::structure()->table('Role')
+         ->column('Domains', 'text', NULL)
+         ->set();
    }
 }

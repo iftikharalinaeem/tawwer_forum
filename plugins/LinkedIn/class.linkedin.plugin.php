@@ -11,15 +11,15 @@ class LinkedInPlugin extends Gdn_Plugin {
 
    protected $_AccessToken = NULL;
 
-   public function AccessToken($value = NULL) {
-      if (!$this->IsConfigured())
+   public function accessToken($value = NULL) {
+      if (!$this->isConfigured())
          return FALSE;
 
       if ($value !== NULL)
          $this->_AccessToken = $value;
       elseif ($this->_AccessToken === NULL) {
-         if (Gdn::Session()->IsValid())
-            $this->_AccessToken = GetValueR(self::ProviderKey.'.AccessToken', Gdn::Session()->User->Attributes);
+         if (Gdn::session()->isValid())
+            $this->_AccessToken = getValueR(self::ProviderKey.'.AccessToken', Gdn::session()->User->Attributes);
          else
             $this->_AccessToken = FALSE;
       }
@@ -27,11 +27,11 @@ class LinkedInPlugin extends Gdn_Plugin {
       return $this->_AccessToken;
    }
 
-   public function API($path, $post = FALSE) {
+   public function aPI($path, $post = FALSE) {
       // Build the url.
       $url = 'https://api.linkedin.com/v1/'.ltrim($path, '/');
 
-      $accessToken = $this->AccessToken();
+      $accessToken = $this->accessToken();
       if (!$accessToken)
          throw new Gdn_UserException("You don't have a valid LinkedIn connection.");
 
@@ -51,9 +51,9 @@ class LinkedInPlugin extends Gdn_Plugin {
       if ($post !== false) {
          curl_setopt($ch, CURLOPT_POST, true);
          curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-         Trace("  POST $url");
+         trace("  POST $url");
       } else {
-         Trace("  GET  $url");
+         trace("  GET  $url");
       }
 
       $response = curl_exec($ch);
@@ -62,13 +62,13 @@ class LinkedInPlugin extends Gdn_Plugin {
       $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
       curl_close($ch);
 
-      Gdn::Controller()->SetJson('Type', $contentType);
+      Gdn::controller()->setJson('Type', $contentType);
 
       if (strpos($contentType, 'application/json') !== FALSE) {
          $result = json_decode($response, TRUE);
 
          if (isset($result['error'])) {
-            Gdn::Dispatcher()->PassData('LinkedInResponse', $result);
+            Gdn::dispatcher()->passData('LinkedInResponse', $result);
             throw new Gdn_UserException($result['error']['message']);
          }
       } else
@@ -77,12 +77,12 @@ class LinkedInPlugin extends Gdn_Plugin {
       return $result;
    }
 
-   public function AuthorizeUri($redirectUri = FALSE) {
-      $appID = C('Plugins.LinkedIn.ApplicationID');
-      $scope = C('Plugins.LinkedIn.Scope', 'r_basicprofile r_emailaddress');
+   public function authorizeUri($redirectUri = FALSE) {
+      $appID = c('Plugins.LinkedIn.ApplicationID');
+      $scope = c('Plugins.LinkedIn.Scope', 'r_basicprofile r_emailaddress');
 
       if (!$redirectUri)
-         $redirectUri = $this->RedirectUri();
+         $redirectUri = $this->redirectUri();
 
       $query = [
          'client_id' => $appID,
@@ -95,11 +95,11 @@ class LinkedInPlugin extends Gdn_Plugin {
       return $signinHref;
    }
 
-   protected function GetAccessToken($code, $redirectUri, $throwError = TRUE) {
+   protected function getAccessToken($code, $redirectUri, $throwError = TRUE) {
       $get = [
           'grant_type' => 'authorization_code',
-          'client_id' => C('Plugins.LinkedIn.ApplicationID'),
-          'client_secret' => C('Plugins.LinkedIn.Secret'),
+          'client_id' => c('Plugins.LinkedIn.ApplicationID'),
+          'client_secret' => c('Plugins.LinkedIn.Secret'),
           'code' => $code,
           'redirect_uri' => $redirectUri];
 
@@ -113,53 +113,53 @@ class LinkedInPlugin extends Gdn_Plugin {
       $contents = curl_exec($c);
 
       $info = curl_getinfo($c);
-      if (strpos(GetValue('content_type', $info, ''), 'application/json') !== FALSE) {
+      if (strpos(getValue('content_type', $info, ''), 'application/json') !== FALSE) {
          $tokens = json_decode($contents, TRUE);
       } else {
          parse_str($contents, $tokens);
       }
 
-      if (GetValue('error', $tokens)) {
-         throw new Gdn_UserException('LinkedIn returned the following error: '.GetValue('error_description', $tokens, 'Unknown error.'), 400);
+      if (getValue('error', $tokens)) {
+         throw new Gdn_UserException('LinkedIn returned the following error: '.getValue('error_description', $tokens, 'Unknown error.'), 400);
       }
 
-      $accessToken = GetValue('access_token', $tokens);
-//      $Expires = GetValue('expires', $Tokens, NULL);
+      $accessToken = getValue('access_token', $tokens);
+//      $Expires = getValue('expires', $Tokens, NULL);
 
       return $accessToken;
    }
 
-   public function GetProfile() {
-      $profile = $this->API('/people/~:(id,formatted-name,picture-url,email-address)');
-      $profile = ArrayTranslate(array_change_key_case($profile), ['id', 'emailaddress' => 'email', 'formattedname' => 'fullname', 'pictureurl' => 'photo']);
+   public function getProfile() {
+      $profile = $this->aPI('/people/~:(id,formatted-name,picture-url,email-address)');
+      $profile = arrayTranslate(array_change_key_case($profile), ['id', 'emailaddress' => 'email', 'formattedname' => 'fullname', 'pictureurl' => 'photo']);
       return $profile;
    }
 
-   public function SignInButton($type = 'button') {
-      $url = $this->AuthorizeUri();
+   public function signInButton($type = 'button') {
+      $url = $this->authorizeUri();
 
-      $result = SocialSignInButton('LinkedIn', $url, $type);
+      $result = socialSignInButton('LinkedIn', $url, $type);
       return $result;
    }
 
-   public function IsConfigured() {
-      $appID = C('Plugins.LinkedIn.ApplicationID');
-      $secret = C('Plugins.LinkedIn.Secret');
+   public function isConfigured() {
+      $appID = c('Plugins.LinkedIn.ApplicationID');
+      $secret = c('Plugins.LinkedIn.Secret');
       if (!$appID || !$secret)
          return FALSE;
       return TRUE;
    }
 
-   public static function ProfileConnectUrl() {
-      return url('profile/linkedinconnect', true).'?userID='.Gdn::Session()->UserID;
+   public static function profileConnectUrl() {
+      return url('profile/linkedinconnect', true).'?userID='.Gdn::session()->UserID;
    }
 
    protected $_RedirectUri = NULL;
-   public function RedirectUri($newValue = NULL) {
+   public function redirectUri($newValue = NULL) {
       if ($newValue !== NULL)
          $this->_RedirectUri = $newValue;
       elseif ($this->_RedirectUri === NULL) {
-         $redirectUri = Url('/entry/connect/linkedin', TRUE);
+         $redirectUri = url('/entry/connect/linkedin', TRUE);
          if (strpos($redirectUri, '=') !== FALSE) {
             $p = strrchr($redirectUri, '=');
             $uri = substr($redirectUri, 0, -strlen($p));
@@ -167,9 +167,9 @@ class LinkedInPlugin extends Gdn_Plugin {
             $redirectUri = $uri.'='.$p;
          }
 
-         $path = Gdn::Request()->Path();
+         $path = Gdn::request()->path();
 
-         $target = GetValue('Target', $_GET, $path ? $path : '/');
+         $target = getValue('Target', $_GET, $path ? $path : '/');
          if (ltrim($target, '/') == 'entry/signin' || empty($target))
             $target = '/';
          $args = ['Target' => $target];
@@ -183,31 +183,31 @@ class LinkedInPlugin extends Gdn_Plugin {
       return $this->_RedirectUri;
    }
 
-   public function Setup() {
+   public function setup() {
       $error = '';
       if (!function_exists('curl_init'))
-         $error = ConcatSep("\n", $error, 'This plugin requires curl.');
+         $error = concatSep("\n", $error, 'This plugin requires curl.');
       if ($error)
          throw new Gdn_UserException($error, 400);
 
-      $this->Structure();
+      $this->structure();
    }
 
-   public function Structure() {
+   public function structure() {
       // Save the facebook provider type.
-      Gdn::SQL()->Replace('UserAuthenticationProvider',
+      Gdn::sql()->replace('UserAuthenticationProvider',
          ['AuthenticationSchemeAlias' => 'linkedin', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'],
          ['AuthenticationKey' => self::ProviderKey], TRUE);
    }
 
    /// Event Handlers ///
 
-   public function Base_SignInIcons_Handler($sender, $args) {
-		echo ' '.$this->SignInButton('icon').' ';
+   public function base_signInIcons_handler($sender, $args) {
+		echo ' '.$this->signInButton('icon').' ';
    }
 
-   public function Base_BeforeSignInButton_Handler($sender, $args) {
-      echo ' '.$this->SignInButton('icon').' ';
+   public function base_beforeSignInButton_handler($sender, $args) {
+      echo ' '.$this->signInButton('icon').' ';
 	}
 
    /**
@@ -215,41 +215,41 @@ class LinkedInPlugin extends Gdn_Plugin {
     * @param Gdn_Controller $sender
     * @param array $args
     */
-   public function Base_ConnectData_Handler($sender, $args) {
-      if (GetValue(0, $args) != 'linkedin')
+   public function base_connectData_handler($sender, $args) {
+      if (getValue(0, $args) != 'linkedin')
          return;
 
       if (isset($_GET['error'])) {
-         throw new Gdn_UserException(GetValue('error_description', $_GET, T('There was an error connecting to LinkedIn')));
+         throw new Gdn_UserException(getValue('error_description', $_GET, t('There was an error connecting to LinkedIn')));
       }
 
-//      $AppID = C('Plugins.LinkedIn.ApplicationID');
-//      $Secret = C('Plugins.LinkedIn.Secret');
-      $code = $sender->Request->Get('code');
-      $accessToken = $sender->Form->GetFormValue('AccessToken');
+//      $AppID = c('Plugins.LinkedIn.ApplicationID');
+//      $Secret = c('Plugins.LinkedIn.Secret');
+      $code = $sender->Request->get('code');
+      $accessToken = $sender->Form->getFormValue('AccessToken');
 
       // Get the access token.
       if (!$accessToken && $code) {
          // Exchange the token for an access token.
          $code = urlencode($code);
-         $accessToken = $this->GetAccessToken($code, $this->RedirectUri());
-         $this->AccessToken($accessToken);
+         $accessToken = $this->getAccessToken($code, $this->redirectUri());
+         $this->accessToken($accessToken);
          $newToken = TRUE;
       } elseif ($accessToken) {
-         $this->AccessToken($accessToken);
+         $this->accessToken($accessToken);
       }
 
-      $profile = $this->GetProfile();
+      $profile = $this->getProfile();
 
-      $form = $sender->Form; //new Gdn_Form();
-      $iD = GetValue('id', $profile);
-      $form->SetFormValue('UniqueID', $iD);
-      $form->SetFormValue('Provider', self::ProviderKey);
-      $form->SetFormValue('ProviderName', 'LinkedIn');
-      $form->SetFormValue('FullName', GetValue('fullname', $profile));
-      $form->SetFormValue('Email', GetValue('email', $profile));
-      $form->SetFormValue('Photo', GetValue('photo', $profile));
-      $form->AddHidden('AccessToken', $accessToken);
+      $form = $sender->Form; //new gdn_Form();
+      $iD = getValue('id', $profile);
+      $form->setFormValue('UniqueID', $iD);
+      $form->setFormValue('Provider', self::ProviderKey);
+      $form->setFormValue('ProviderName', 'LinkedIn');
+      $form->setFormValue('FullName', getValue('fullname', $profile));
+      $form->setFormValue('Email', getValue('email', $profile));
+      $form->setFormValue('Photo', getValue('photo', $profile));
+      $form->addHidden('AccessToken', $accessToken);
 
       // Save some original data in the attributes of the connection for later API calls.
       $attributes = [];
@@ -257,25 +257,25 @@ class LinkedInPlugin extends Gdn_Plugin {
           'AccessToken' => $accessToken,
           'Profile' => $profile
       ];
-      $form->SetFormValue('Attributes', $attributes);
+      $form->setFormValue('Attributes', $attributes);
 
-      $sender->SetData('Verified', TRUE);
+      $sender->setData('Verified', TRUE);
    }
 
-   public function Base_GetConnections_Handler($sender, $args) {
-      if (!$this->IsConfigured())
+   public function base_getConnections_handler($sender, $args) {
+      if (!$this->isConfigured())
          return;
 
-      $profile = GetValueR('User.Attributes.'.self::ProviderKey.'.Profile', $args);
+      $profile = getValueR('User.Attributes.'.self::ProviderKey.'.Profile', $args);
 
       $sender->Data["Connections"][self::ProviderKey] = [
-         'Icon' => $this->GetWebResource('icon.png', '/'),
+         'Icon' => $this->getWebResource('icon.png', '/'),
          'Name' => self::ProviderKey,
          'ProviderKey' => self::ProviderKey,
-         'ConnectUrl' => $this->AuthorizeUri(self::ProfileConnectUrl()),
+         'ConnectUrl' => $this->authorizeUri(self::profileConnectUrl()),
          'Profile' => [
-            'Name' => GetValue('fullname', $profile),
-            'Photo' => GetValue('photo', $profile)
+            'Name' => getValue('fullname', $profile),
+            'Photo' => getValue('photo', $profile)
             ]
       ];
    }
@@ -284,12 +284,12 @@ class LinkedInPlugin extends Gdn_Plugin {
     *
     * @param Gdn_Controller $sender
     */
-   public function EntryController_SignIn_Handler($sender, $args) {
+   public function entryController_signIn_handler($sender, $args) {
       if (isset($sender->Data['Methods'])) {
             // Add the facebook method to the controller.
             $method = [
                'Name' => self::ProviderKey,
-               'SignInHtml' => $this->SignInButton('button')];
+               'SignInHtml' => $this->signInButton('button')];
 //         }
 
          $sender->Data['Methods'][] = $method;
@@ -304,24 +304,24 @@ class LinkedInPlugin extends Gdn_Plugin {
     * @param type $Username
     * @param type $code
     */
-   public function ProfileController_LinkedInConnect_Create($sender, $code=false) {
-      $sender->Permission('Garden.SignIn.Allow');
+   public function profileController_linkedInConnect_create($sender, $code=false) {
+      $sender->permission('Garden.SignIn.Allow');
 
       $userID = $sender->Request->get('userID');
 
-      $sender->GetUserInfo('', '', $userID, TRUE);
-      $sender->_SetBreadcrumbs(T('Connections'), UserUrl($sender->User, '', 'connections'));
+      $sender->getUserInfo('', '', $userID, TRUE);
+      $sender->_SetBreadcrumbs(t('Connections'), userUrl($sender->User, '', 'connections'));
 
       // Get the access token.
-      $accessToken = $this->GetAccessToken($code, self::ProfileConnectUrl());
-      Trace($accessToken, 'AccessToken');
-      $this->AccessToken($accessToken);
+      $accessToken = $this->getAccessToken($code, self::profileConnectUrl());
+      trace($accessToken, 'AccessToken');
+      $this->accessToken($accessToken);
 
       // Get the profile.
-      $profile = $this->GetProfile();
+      $profile = $this->getProfile();
 
       // Save the authentication.
-      Gdn::UserModel()->SaveAuthentication([
+      Gdn::userModel()->saveAuthentication([
          'UserID' => $sender->User->UserID,
          'Provider' => self::ProviderKey,
          'UniqueID' => $profile['id']]);
@@ -331,28 +331,28 @@ class LinkedInPlugin extends Gdn_Plugin {
           'AccessToken' => $accessToken,
           'Profile' => $profile
       ];
-      Gdn::UserModel()->SaveAttribute($sender->User->UserID, self::ProviderKey, $attributes);
+      Gdn::userModel()->saveAttribute($sender->User->UserID, self::ProviderKey, $attributes);
 
       $this->EventArguments['Provider'] = self::ProviderKey;
       $this->EventArguments['User'] = $sender->User;
-      $this->FireEvent('AfterConnection');
+      $this->fireEvent('AfterConnection');
 
-      redirectTo(UserUrl($sender->User, '', 'connections'));
+      redirectTo(userUrl($sender->User, '', 'connections'));
    }
 
-   public function SocialController_LinkedIn_Create($sender, $args) {
-      $sender->Permission('Garden.Settings.Manage');
-      $sender->SetData('Title', T('Linked In Settings'));
+   public function socialController_linkedIn_create($sender, $args) {
+      $sender->permission('Garden.Settings.Manage');
+      $sender->setData('Title', t('Linked In Settings'));
 
       $cf = new ConfigurationModule($sender);
-      $cf->Initialize([
+      $cf->initialize([
           'Plugins.LinkedIn.ApplicationID' => ['LabelCode' => 'API Key'],
           'Plugins.LinkedIn.Secret' => ['LabelCode' => 'Secret Key']
           ]);
 
-      $sender->AddSideMenu('social');
-      $sender->SetData('Title', sprintf(T('%s Settings'), 'LinkedIn'));
+      $sender->addSideMenu('social');
+      $sender->setData('Title', sprintf(t('%s Settings'), 'LinkedIn'));
       $sender->ConfigurationModule = $cf;
-      $sender->Render('Settings', '', 'plugins/LinkedIn');
+      $sender->render('Settings', '', 'plugins/LinkedIn');
    }
 }

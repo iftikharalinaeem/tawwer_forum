@@ -64,7 +64,7 @@ class DbLogger implements LoggerInterface {
 
         $attributes = array_diff_key($context, $columns);
         $insert = array_diff_key($context, $attributes);
-        $insert['message'] = FormatString($message, $context);
+        $insert['message'] = formatString($message, $context);
         $insert['level'] = Logger::levelPriority($level);
         if ($attributes) {
             $insert['attributes'] = json_encode($attributes, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);

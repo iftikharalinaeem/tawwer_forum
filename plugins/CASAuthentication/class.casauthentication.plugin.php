@@ -15,16 +15,16 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
     public function initializeCAS() {
         require_once dirname(__FILE__).'/CAS.php';
 
-        $Host = C('Plugins.CASAuthentication.Host');
-        $Port = (int)C('Plugins.CASAuthentication.Port', 443);
-        $Context = C('Plugins.CASAuthentication.Context', '/cas');
+        $Host = c('Plugins.CASAuthentication.Host');
+        $Port = (int)c('Plugins.CASAuthentication.Port', 443);
+        $Context = c('Plugins.CASAuthentication.Context', '/cas');
 
         // Initialize phpCAS.
         phpCAS::client(CAS_VERSION_1_0, $Host, $Port, $Context);
         phpCAS::setNoCasServerValidation();
         phpCAS::setNoClearTicketsFromUrl(false);
 
-        $Url = Url('/entry/cas', true);
+        $Url = url('/entry/cas', true);
         if (Gdn::request()->get('Target')) {
             $Url .= '?Target='.urlencode(Gdn::request()->get('Target'));
         }
@@ -50,7 +50,7 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
         $user = Gdn::session()->stash('CASUser');
 
         if (!$user) {
-            $url = Url('/entry/cas');
+            $url = url('/entry/cas');
             $message = "There was an error retrieving your user data. Click <a href='$url'>here</a> to try again.";
             throw new Gdn_UserException($message);
         }
@@ -87,7 +87,7 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
     *
     * @param EntryController $sender
     */
-    public function entryController_CAS_create($sender) {
+    public function entryController_cAS_create($sender) {
         $this->initializeCAS();
 
         // force CAS authentication
@@ -104,12 +104,12 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
             die('Failed');
         } else {
             // We now have a user so we need to get some info.
-            $url = sprintf(C('Plugins.CASAuthentication.ProfileUrl'), urlencode($email));
+            $url = sprintf(c('Plugins.CASAuthentication.ProfileUrl'), urlencode($email));
             $data = file_get_contents($url);
 
             $xml = (array)simplexml_load_string($data);
 
-            $user = ArrayTranslate($xml, ['email' => 'Email', 'nickname' => 'Name', 'firstName' => 'FirstName', 'lastName' => 'LastName']);
+            $user = arrayTranslate($xml, ['email' => 'Email', 'nickname' => 'Name', 'firstName' => 'FirstName', 'lastName' => 'LastName']);
             $user['UniqueID'] = $user['Email'];
             Gdn::session()->stash('CASUser', $user);
 
@@ -158,7 +158,7 @@ class CASAuthenticationPlugin extends Gdn_Plugin {
     *
     * @param SettingsController $sender
     */
-    public function settingsController_CAS_create($sender) {
+    public function settingsController_cAS_create($sender) {
         $sender->addSideMenu();
         $sender->title('CAS Settings');
 

@@ -1,10 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<h1><?php echo $this->Data('Title')?></h1>
+<h1><?php echo $this->data('Title')?></h1>
 
 <?php
-if (CheckPermission('Groups.Group.Add')) {
-    echo Anchor(T('New Group'), '/group/add', 'Button Primary');
+if (checkPermission('Groups.Group.Add')) {
+    echo anchor(t('New Group'), '/group/add', 'Button Primary');
 }
 
 $layout = c('Vanilla.Discussions.Layout', 'modern');
@@ -17,7 +17,7 @@ $this->fireEvent('beforeGroupLists');
 
 if ($groups = $this->data('MyGroups')) {
     $groupModel = new GroupModel();
-    $groupModel->JoinRecentPosts($groups);
+    $groupModel->joinRecentPosts($groups);
     $cssClass = 'my-groups';
     $this->EventArguments['layout'] = &$layout;
     $this->EventArguments['showMore'] = &$showMore;
@@ -30,7 +30,7 @@ if ($groups = $this->data('MyGroups')) {
 
 if ($groups = $this->data('NewGroups')) {
     $groupModel = new GroupModel();
-    $groupModel->JoinRecentPosts($groups);
+    $groupModel->joinRecentPosts($groups);
     $cssClass = 'new-groups';
     $this->EventArguments['layout'] = &$layout;
     $this->EventArguments['showMore'] = &$showMore;
@@ -42,7 +42,7 @@ if ($groups = $this->data('NewGroups')) {
 
 if ($groups = $this->data('Groups')) {
     $groupModel = new GroupModel();
-    $groupModel->JoinRecentPosts($groups);
+    $groupModel->joinRecentPosts($groups);
     $cssClass = 'popular-groups';
     $this->EventArguments['layout'] = &$layout;
     $this->EventArguments['showMore'] = &$showMore;

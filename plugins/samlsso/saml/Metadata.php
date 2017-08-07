@@ -37,7 +37,7 @@ class OneLogin_Saml_Metadata
         // We need the idp to use this certificate to sign logout requests.
         $signoutElem = '';
         if ($this->_settings->spCertificate) {
-           $signoutUrl = Url('/entry/signout', true);
+           $signoutUrl = url('/entry/signout', true);
 
            $signoutElem = <<<EOT
 <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="{$signoutUrl}"/>

@@ -328,7 +328,7 @@ class UploadHandler {
       $filename = basename($url);
       $fileextension = substr(strrchr($filename,'.'),1);
       $filename = $this->trim_file_name($filename, $fileextension);
-      $filedata = ProxyRequest($url);
+      $filedata = proxyRequest($url);
       $filepath = $this->options['upload_dir'].$filename;
       file_put_contents($filepath, $filedata);
       $size = filesize($filepath);
@@ -336,7 +336,7 @@ class UploadHandler {
       $file->name = $filename;
       $file->size = intval($size);
       $file->type = $fileextension;
-      $file->url = Url($this->options['upload_url'].$filename, TRUE);
+      $file->url = url($this->options['upload_url'].$filename, TRUE);
       $this->make_image_versions($file);
       $this->set_file_delete_url($file);
       echo json_encode([$file]);

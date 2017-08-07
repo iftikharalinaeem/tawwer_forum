@@ -6,9 +6,9 @@ if (!function_exists('WriteEventButtons')) :
      *
      * @param array $event Optional. Uses data array's Event if none is provided.
      */
-    function WriteEventButtons($event = null) {
+    function writeEventButtons($event = null) {
         if (!$event)
-            $event = Gdn::Controller()->Data('Event');
+            $event = Gdn::controller()->data('Event');
         if (!$event)
             return;
 
@@ -16,13 +16,13 @@ if (!function_exists('WriteEventButtons')) :
 
         $options = [];
 
-        if (EventPermission('Edit', $event)) {
-            $options['Edit'] = ['Text' => T('Edit'), 'Url' => EventUrl($event, 'edit')];
-            $options['Delete'] = ['Text' => T('Delete'), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup'];
+        if (eventPermission('Edit', $event)) {
+            $options['Edit'] = ['Text' => t('Edit'), 'Url' => eventUrl($event, 'edit')];
+            $options['Delete'] = ['Text' => t('Delete'), 'Url' => eventUrl($event, 'delete'), 'CssClass' => 'Popup'];
         }
 
         if (count($options))
-            echo ButtonDropDown($options, 'Button DropRight Event-OptionsButton', Sprite('SpOptions', 'Sprite16'));
+            echo buttonDropDown($options, 'Button DropRight Event-OptionsButton', sprite('SpOptions', 'Sprite16'));
 
         echo '</div>';
     }
@@ -36,16 +36,16 @@ if (!function_exists('writeEventOptions')) :
  */
 function writeEventOptions($event = null) {
     if (!$event) {
-        $event = Gdn::Controller()->data('Event');
+        $event = Gdn::controller()->data('Event');
     }
     if (!$event) {
         return;
     }
     $options = [];
 
-    if (EventPermission('Edit', $event)) {
-        $options['Edit'] = ['Text' => t('Edit'), 'Url' => EventUrl($event, 'edit')];
-        $options['Delete'] = ['Text' => t('Delete'), 'Url' => EventUrl($event, 'delete'), 'CssClass' => 'Popup'];
+    if (eventPermission('Edit', $event)) {
+        $options['Edit'] = ['Text' => t('Edit'), 'Url' => eventUrl($event, 'edit')];
+        $options['Delete'] = ['Text' => t('Delete'), 'Url' => eventUrl($event, 'delete'), 'CssClass' => 'Popup'];
     }
 
     if (count($options)) {
@@ -61,7 +61,7 @@ if (!function_exists('HasEndDate')) :
  * @param array $event The event.
  * @return bool Returns true if the event has an end date or false otherwise.
  */
-function HasEndDate($event) {
+function hasEndDate($event) {
     // Event has no end date if start date equals end date.
     return val('DateEnds', $event) !== val('DateStarts', $event);
 }

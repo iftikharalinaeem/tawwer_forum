@@ -9,11 +9,11 @@ Copyright 2008, 2009 Mark O'Sullivan
 class AdSenseModule extends Gdn_Module {
 	public $Content = '';
    
-   public function AssetTarget() {
+   public function assetTarget() {
       return 'Panel';
    }
 
-   public function ToString() {
+   public function toString() {
 		return '<div class="Center">'.$this->Content.'</div>';
    }
 }

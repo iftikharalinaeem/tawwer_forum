@@ -26,30 +26,30 @@ class GroupUserHeaderModule extends Gdn_Module {
     /**
      *
      */
-    protected function GetData() {
+    protected function getData() {
         $model = new GroupModel();
 
         if ($this->GroupID) {
-            $this->SetData('Group', $model->GetID($this->GroupID));
+            $this->setData('Group', $model->getID($this->GroupID));
 
-            $rows = $model->GetApplicants($this->GroupID, ['UserID' => $this->UserID]);
-            $this->SetData('Application', array_pop($rows));
+            $rows = $model->getApplicants($this->GroupID, ['UserID' => $this->UserID]);
+            $this->setData('Application', array_pop($rows));
         }
     }
 
     /**
      * @return string
      */
-    public function ToString() {
+    public function toString() {
         if (!$this->GroupID)
-            $this->GroupID = Gdn::Controller()->Data('Group.GroupID');
+            $this->GroupID = Gdn::controller()->data('Group.GroupID');
         if (!$this->UserID)
-            $this->UserID = Gdn::Session()->UserID;
+            $this->UserID = Gdn::session()->UserID;
 
         if (!$this->GroupID || !$this->GroupID)
             return '';
 
-        $this->GetData();
-        return parent::ToString();
+        $this->getData();
+        return parent::toString();
     }
 }

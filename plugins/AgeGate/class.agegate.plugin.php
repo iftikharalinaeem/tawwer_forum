@@ -39,22 +39,22 @@ class AgeGatePlugin extends Gdn_Plugin {
     public function entryController_registerFormBeforeTerms_handler($sender, $args) {
 
         $days = array_merge(
-            [0 => T('Day')],
+            [0 => t('Day')],
             array_combine(range(1, 31), range(1, 31))
         );
         $months = array_merge(
-            [0 => T('Month')],
+            [0 => t('Month')],
             array_combine(range(1, 12), range(1, 12))
         );
         $years = array_combine(
-            range(C('Plugins.AgeGate.StartYear', date('Y')), C('Plugins.AgeGate.StartYear', date('Y') - 100)),
-            range(C('Plugins.AgeGate.StartYear', date('Y')), C('Plugins.AgeGate.StartYear', date('Y') - 100))
+            range(c('Plugins.AgeGate.StartYear', date('Y')), c('Plugins.AgeGate.StartYear', date('Y') - 100)),
+            range(c('Plugins.AgeGate.StartYear', date('Y')), c('Plugins.AgeGate.StartYear', date('Y') - 100))
         );
-        $years = [0 => T('Year')] + $years;
+        $years = [0 => t('Year')] + $years;
 
-        $minimumAge = C('Plugins.AgeGate.MinimumAge', 0);
-        $minimumAgeWithConsent = C('Plugins.AgeGate.MinimumAgeWithConsent', false);
-        $addConfirmation = C('Plugins.AgeGate.AddConfirmation', false);
+        $minimumAge = c('Plugins.AgeGate.MinimumAge', 0);
+        $minimumAgeWithConsent = c('Plugins.AgeGate.MinimumAgeWithConsent', false);
+        $addConfirmation = c('Plugins.AgeGate.AddConfirmation', false);
 
         echo '<li class="agegate-dob">';
         echo $sender->Form->label('Birthday', 'DateOfBirth');
@@ -68,7 +68,7 @@ class AgeGatePlugin extends Gdn_Plugin {
                 $minimumAge = $minimumAgeWithConsent;
             }
             echo '<li class="agegate-confirmation js-agegate-confirmation Hidden">';
-            echo $sender->Form->CheckBox(
+            echo $sender->Form->checkBox(
                 'AgeGateConfirmation',
                 '@'.sprintf(
                     t(
@@ -105,9 +105,9 @@ class AgeGatePlugin extends Gdn_Plugin {
 
         $interval = $datetime1->diff($datetime2);
         $age =  $interval->format('%y');
-        $minimumAge = C('Plugins.AgeGate.MinimumAge', 0);
-        $minimumAgeWithConsent = C('Plugins.AgeGate.MinimumAgeWithConsent', false);
-        $addConfirmation = C('Plugins.AgeGate.AddConfirmation', false);
+        $minimumAge = c('Plugins.AgeGate.MinimumAge', 0);
+        $minimumAgeWithConsent = c('Plugins.AgeGate.MinimumAgeWithConsent', false);
+        $addConfirmation = c('Plugins.AgeGate.AddConfirmation', false);
 
         if ($minimumAgeWithConsent) {
             if ($addConfirmation && $age < $minimumAgeWithConsent && $age >= $minimumAge) {
@@ -142,7 +142,7 @@ class AgeGatePlugin extends Gdn_Plugin {
     public function settingsController_ageGate_create($sender) {
 
         $sender->permission('Garden.Settings.Manage');
-        $sender->setData('Title', T('Age Gate Settings'));
+        $sender->setData('Title', t('Age Gate Settings'));
         $sender->addSideMenu();
 
         if ($sender->Form->authenticatedPostBack()) {
@@ -155,12 +155,12 @@ class AgeGatePlugin extends Gdn_Plugin {
             if ($sender->Form->errorCount() == 0) {
                 saveToConfig('Plugins.AgeGate.MinimumAge', $minimumAge);
                 saveToConfig('Plugins.AgeGate.AddConfirmation', $addConfirmation);
-                $sender->informMessage(T('Saved'));
+                $sender->informMessage(t('Saved'));
             }
         } else {
             $sender->Form->setData([
-               'MinimumAge' => C('Plugins.AgeGate.MinimumAge'),
-               'AddConfirmation' => C('Plugins.AgeGate.AddConfirmation')
+               'MinimumAge' => c('Plugins.AgeGate.MinimumAge'),
+               'AddConfirmation' => c('Plugins.AgeGate.AddConfirmation')
             ]);
         }
 

@@ -8,8 +8,8 @@ class CollapseCategoriesPlugin extends Gdn_Plugin {
    
    /// Event handlers.
    
-   public function CategoriesController_Render_Before($sender) {
-      Gdn::Controller()->AddJsFile('collapsecategories.js', 'plugins/CollapseCategories');
-      Gdn::Controller()->AddCssFile('collapsecategories.css', 'plugins/CollapseCategories');
+   public function categoriesController_render_before($sender) {
+      Gdn::controller()->addJsFile('collapsecategories.js', 'plugins/CollapseCategories');
+      Gdn::controller()->addCssFile('collapsecategories.css', 'plugins/CollapseCategories');
    }
 }

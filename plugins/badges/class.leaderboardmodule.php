@@ -45,7 +45,7 @@ class LeaderBoardModule extends Gdn_Module {
         $categoryID = $this->CategoryID;
         if ($categoryID) {
             $category = CategoryModel::categories($categoryID);
-            $categoryID = GetValue('PointsCategoryID', $category, 0);
+            $categoryID = getValue('PointsCategoryID', $category, 0);
             $category = CategoryModel::categories($categoryID);
             $this->setData('Category', $category);
         } else {
@@ -148,9 +148,9 @@ class LeaderBoardModule extends Gdn_Module {
         }
 
         if ($this->data('Category')) {
-            return sprintf(T($str.' in %s'), htmlspecialchars($this->data('Category.Name')));
+            return sprintf(t($str.' in %s'), htmlspecialchars($this->data('Category.Name')));
         } else {
-            return T($str);
+            return t($str);
         }
     }
 

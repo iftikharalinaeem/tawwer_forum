@@ -2,10 +2,10 @@
 
 include_once dirname(__FILE__).'/class.reactionmodel.php';
 
-$St = Gdn::Structure();
-$Sql = Gdn::SQL();
+$St = Gdn::structure();
+$Sql = Gdn::sql();
 
-Gdn::PermissionModel()->define([
+Gdn::permissionModel()->define([
     'Reactions.Positive.Add' => 'Garden.SignIn.Allow',
     'Reactions.Negative.Add' => 'Garden.SignIn.Allow',
     'Reactions.Flag.Add' => 'Garden.SignIn.Allow']);
@@ -24,7 +24,7 @@ $St
     ->column('Active', 'tinyint(1)', 0)
     ->column('Custom', 'tinyint(1)', 0)
     ->column('Hidden', 'tinyint(1)', 0)
-    ->Set();
+    ->set();
 
 $St->table('UserTag')
     ->column('RecordType', ['Discussion', 'Discussion-Total', 'Comment', 'Comment-Total', 'User', 'User-Total', 'Activity', 'Activity-Total', 'ActivityComment', 'ActivityComment-Total'], FALSE, 'primary')
@@ -33,7 +33,7 @@ $St->table('UserTag')
     ->column('UserID', 'int', FALSE, ['primary', 'key'])
     ->column('DateInserted', 'datetime')
     ->column('Total', 'int', 0)
-    ->Set();
+    ->set();
 
 $Rm = new ReactionModel();
 

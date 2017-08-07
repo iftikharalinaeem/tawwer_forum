@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
-require_once Gdn::Controller()->FetchViewLocation('reaction_functions', '', 'plugins/Reactions');
-foreach ($this->Data('Data', []) as $Row): 
-   $this->SetData('Record', $Row);
-   $Body = Gdn_Format::To($Row['Body'], $Row['Format']);
+require_once Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+foreach ($this->data('Data', []) as $Row): 
+   $this->setData('Record', $Row);
+   $Body = Gdn_Format::to($Row['Body'], $Row['Format']);
    $CssClass = 'Item';
 ?>
 <div id="<?php echo "{$Row['RecordType']}_{$Row['RecordID']}" ?>" class="<?php echo $CssClass; ?>">
@@ -10,9 +10,9 @@ foreach ($this->Data('Data', []) as $Row):
       <div class="Item-Body">
          <div class="BodyWrap">
             <?php
-            if ($Name = GetValue('Name', $Row)) {
-               echo Wrap(
-                  Anchor(Gdn_Format::Text($Name), $Row['Url']),
+            if ($Name = getValue('Name', $Row)) {
+               echo wrap(
+                  anchor(Gdn_Format::text($Name), $Row['Url']),
                   'h3', ['class' => 'Title']);
             }
             ?>
@@ -29,16 +29,16 @@ foreach ($this->Data('Data', []) as $Row):
             <div class="AuthorWrap">
                <span class="Author">
                   <?php
-                  echo UserPhoto($Row, ['Px' => 'Insert']);
-                  echo UserAnchor($Row, ['Px' => 'Insert']);
+                  echo userPhoto($Row, ['Px' => 'Insert']);
+                  echo userAnchor($Row, ['Px' => 'Insert']);
                   ?>
                </span>
             </div>
             <div class="Meta">
                <span class="MItem DateCreated">
                   <?php
-                  echo Anchor(
-                     Gdn_Format::Date($Row['DateInserted'], 'html'),
+                  echo anchor(
+                     Gdn_Format::date($Row['DateInserted'], 'html'),
                      $Row['Url'],
                      'Permalink'
                      );
@@ -47,7 +47,7 @@ foreach ($this->Data('Data', []) as $Row):
             </div>
             <?php
             $RowObject = (object)$Row;
-            WriteReactions($Row);
+            writeReactions($Row);
             ?>
          </div>
       </div>

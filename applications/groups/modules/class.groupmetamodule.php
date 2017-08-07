@@ -33,7 +33,7 @@ class GroupMetaModule extends Gdn_Module {
      * @return array A meta items data array.
      */
     protected function getMetaInfo($group) {
-        $owner = Gdn::UserModel()->getID(val('InsertUserID', $group));
+        $owner = Gdn::userModel()->getID(val('InsertUserID', $group));
         $metaItems['owner']['text'] = t('Owner').': ';
         $metaItems['owner']['value'] = userAnchor($owner);
 
@@ -51,7 +51,7 @@ class GroupMetaModule extends Gdn_Module {
         $metaItems['date']['text'] = sprintf(t('Created on %s'), $date->format('F j, Y'));
 
         $metaItems['count']['text'] = sprintf(t('%s members'), val('CountMembers', $group));
-        $metaItems['count']['url'] = GroupUrl($group, 'members');
+        $metaItems['count']['url'] = groupUrl($group, 'members');
 
         return $metaItems;
     }

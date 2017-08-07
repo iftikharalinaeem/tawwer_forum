@@ -66,7 +66,7 @@ class EventsController extends Gdn_Controller {
                 $groupModel = new GroupModel();
                 $group = $groupModel->getID($contextID, DATASET_TYPE_ARRAY);
                 if (!$group) {
-                    throw NotFoundException('Group');
+                    throw notFoundException('Group');
                 }
 
                 $this->EventArguments['Group'] = &$group;
@@ -78,7 +78,7 @@ class EventsController extends Gdn_Controller {
                 // Check if this person is a member of the group or a moderator
                 $viewGroupEvents = groupPermission('View', $group);
                 if (!$viewGroupEvents) {
-                    throw PermissionException();
+                    throw permissionException();
                 }
 
                 $this->addBreadcrumb('Groups', url('/groups'));

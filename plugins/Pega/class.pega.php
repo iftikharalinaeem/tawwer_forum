@@ -43,7 +43,7 @@ class Pega {
     * Return the singleton instance of this class.
     * @return Pega
     */
-   public static function Instance() {
+   public static function instance() {
       if (!isset(self::$Instance)) {
          self::$Instance = new Pega();
       }
@@ -60,8 +60,8 @@ class Pega {
     *    [Headers]
     * @return array All the details returned from Pega
     */
-   public function GetObject($object, $objectID, $fullHttpResponse = FALSE) {
-      $result = $this->Request($object . $objectID);
+   public function getObject($object, $objectID, $fullHttpResponse = FALSE) {
+      $result = $this->request($object . $objectID);
 
       if ($fullHttpResponse) {
          return $result;
@@ -74,8 +74,8 @@ class Pega {
     * @param string $caseID
     * @return array All the details returned from Pega
     */
-    public function GetCase($caseID) {
-        $result = $this->GetObject('forum/interaction/get/', $caseID, TRUE);
+    public function getCase($caseID) {
+        $result = $this->getObject('forum/interaction/get/', $caseID, TRUE);
         return $result;
     }
 
@@ -88,18 +88,18 @@ class Pega {
     * @return string CaseID
     * @throws Gdn_UserException
     */
-    public function CreateCase(array $case) {
-        if ($this->ValidateCase($case) === TRUE) {
-            return $this->CreateObject('forum/interaction', $case);
+    public function createCase(array $case) {
+        if ($this->validateCase($case) === TRUE) {
+            return $this->createObject('forum/interaction', $case);
         }
-        throw new Gdn_UserException('Create Case: Required Fields Missing: ' . print_r($this->ValidateContact($case)));
+        throw new Gdn_UserException('Create Case: Required Fields Missing: ' . print_r($this->validateContact($case)));
     }
 
     /**
     * @param array $case
     * @return array|bool True or array of missing required fields
     */
-    public function ValidateCase(array $case) {
+    public function validateCase(array $case) {
         return true;
         $requiredFields = [
             'ContactId' => TRUE,
@@ -122,8 +122,8 @@ class Pega {
     * @return mixed
     * @throws Gdn_UserException
     */
-    public function CreateObject($object, array $fields) {
-        $response = $this->Request($object . '/', json_encode($fields));
+    public function createObject($object, array $fields) {
+        $response = $this->request($object . '/', json_encode($fields));
         if ($response['Response']['pzStatus'] == 'valid') {
             return $response['Response']['pyID'];
         }
@@ -145,36 +145,36 @@ class Pega {
     * @throws Gdn_UserException
     *
     */
-   public function Request($path, $post = FALSE, $cache = TRUE) {
-      $url = C("Plugins.Pega.BaseUrl") . '/' . ltrim($path, '/');
+   public function request($path, $post = FALSE, $cache = TRUE) {
+      $url = c("Plugins.Pega.BaseUrl") . '/' . ltrim($path, '/');
 
 //      $CacheKey = 'Pega.Request' . md5($Url);
 //       if ($Cache && !$Post) {
-//         $HttpResponse = Gdn::Cache()->Get($CacheKey, array(Gdn_Cache::FEATURE_COMPRESS => TRUE));
+//         $HttpResponse = Gdn::cache()->get($CacheKey, array(Gdn_Cache::FEATURE_COMPRESS => TRUE));
 //         if ($HttpResponse) {
-//            Trace('Cached Response');
+//            trace('Cached Response');
 //            return $HttpResponse;
 //         }
 //      }
 //       $this->AccessToken = 'ETcRgfVog0djraMI_EURmC1z8H-n7Cl2s-NIwxGY6oxxcJHB7USF6pWPaNcKaUek*/!STANDARD?';//temporary
 //      if (!$this->AccessToken) {
-//         throw new Gdn_UserException("You don't have a valid Pega connection.");
+//         throw new gdn_UserException("You don't have a valid Pega connection.");
 //      }
 
-      $httpResponse = $this->HttpRequest($url, $post, 'application/json');
+      $httpResponse = $this->httpRequest($url, $post, 'application/json');
       $contentType = $httpResponse['ContentType'];
 
-      Gdn::Controller()->SetJson('Type', $contentType);
+      Gdn::controller()->setJson('Type', $contentType);
       if (strpos($contentType, 'application/json') !== FALSE) {
          $httpResponse['Response'] = json_decode($httpResponse['Response'], TRUE);
          if (isset($result['error'])) {
-            Gdn::Dispatcher()->PassData('PegaResponse', $result);
+            Gdn::dispatcher()->passData('PegaResponse', $result);
             throw new Gdn_UserException($result['error']['message']);
          }
       }
 //      if ($Cache && $HttpResponse['HttpCode'] == 200 && !$Post) {
 //         $CacheTTL = $this->CacheTTL + rand(0, 30);
-//         Gdn::Cache()->Store($CacheKey, $HttpResponse, array(
+//         Gdn::cache()->store($CacheKey, $HttpResponse, array(
 //            Gdn_Cache::FEATURE_EXPIRY  => $CacheTTL,
 //            Gdn_Cache::FEATURE_COMPRESS => TRUE
 //         ));
@@ -194,7 +194,7 @@ class Pega {
     *    [ContentType] - HTTP Content Type
     * @throws Exception
     */
-    public function HttpRequest($url, $post = FALSE, $requestContentType = NULL) {
+    public function httpRequest($url, $post = FALSE, $requestContentType = NULL) {
         $proxy = new ProxyRequest();
         $options['URL'] =  $url;
         $options['Method'] = 'POST';
@@ -211,14 +211,14 @@ class Pega {
             $queryParams = $post;
         }
 
-        $headers['Authorization'] = 'Basic ' . base64_encode(C('Plugins.Pega.Username') . ":" . C('Plugins.Pega.Password'));
+        $headers['Authorization'] = 'Basic ' . base64_encode(c('Plugins.Pega.Username') . ":" . c('Plugins.Pega.Password'));
         $headers['email'] = 'realsaraconnor@gmail.com';
 
 //        error_log(json_encode($Headers) . "\n", 3, "/Users/patrick/my-errors.log");
 //        error_log(json_encode($QueryParams) . "\n\n", 3, "/Users/patrick/my-errors.log");
 //        error_log(json_encode($Options) . "\n\n\n", 3, "/Users/patrick/my-errors.log");
 
-        $response = $proxy->Request(
+        $response = $proxy->request(
             $options,
             $queryParams,
             NULL,

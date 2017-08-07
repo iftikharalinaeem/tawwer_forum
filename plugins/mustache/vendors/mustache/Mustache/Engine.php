@@ -61,10 +61,10 @@ class Mustache_Engine
      *         'cache_file_mode' => 0666,
      *
      *         // A Mustache template loader instance. Uses a StringLoader if not specified.
-     *         'loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views'),
+     *         'loader' => new mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views'),
      *
      *         // A Mustache loader instance for partials.
-     *         'partials_loader' => new Mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views/partials'),
+     *         'partials_loader' => new mustache_Loader_FilesystemLoader(dirname(__FILE__).'/views/partials'),
      *
      *         // An array of Mustache partials. Useful for quick-and-dirty string template loading, but not as
      *         // efficient or lazy as a Filesystem (or database) loader.
@@ -91,7 +91,7 @@ class Mustache_Engine
      *         // A Mustache Logger instance. No logging will occur unless this is set. Using a PSR-3 compatible
      *         // logging library -- such as Monolog -- is highly recommended. A simple stream logger implementation is
      *         // available as well:
-     *         'logger' => new Mustache_Logger_StreamLogger('php://stderr'),
+     *         'logger' => new mustache_Logger_StreamLogger('php://stderr'),
      *
      *         // Only treat Closure instances and invokable classes as callable. If true, values like
      *         // `array('ClassName', 'methodName')` and `array($classInstance, 'methodName')`, which are traditionally

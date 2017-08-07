@@ -27,25 +27,25 @@ class DbLoggerPlugin extends Gdn_Plugin {
     }
 
     public function structure() {
-        Gdn::Structure()->Table('EventLog');
-        if (Gdn::Structure()->ColumnExists('EventLogID')) {
-            Gdn::Structure()->Drop();
+        Gdn::structure()->table('EventLog');
+        if (Gdn::structure()->columnExists('EventLogID')) {
+            Gdn::structure()->drop();
         }
 
-        Gdn::Structure()->Table('EventLog')
-            ->Column('ID', 'varchar(16)', false, 'primary')
-            ->Column('Timestamp', 'uint', true, 'index')
-            ->Column('Event', 'varchar(50)', true, 'index')
-            ->Column('Level', 'tinyint', true, 'index')
-            ->Column('Message', 'text')
-            ->Column('Method', 'varchar(10)', true)
-            ->Column('Domain', 'varchar(255)', true)
-            ->Column('Path', 'varchar(255)', true)
-            ->Column('UserID', 'int', true)
-            ->Column('Username', 'varchar(50)', true)
-            ->Column('IP', 'ipaddress', true)
-            ->Column('Attributes', 'text', true)
-            ->Set();
+        Gdn::structure()->table('EventLog')
+            ->column('ID', 'varchar(16)', false, 'primary')
+            ->column('Timestamp', 'uint', true, 'index')
+            ->column('Event', 'varchar(50)', true, 'index')
+            ->column('Level', 'tinyint', true, 'index')
+            ->column('Message', 'text')
+            ->column('Method', 'varchar(10)', true)
+            ->column('Domain', 'varchar(255)', true)
+            ->column('Path', 'varchar(255)', true)
+            ->column('UserID', 'int', true)
+            ->column('Username', 'varchar(50)', true)
+            ->column('IP', 'ipaddress', true)
+            ->column('Attributes', 'text', true)
+            ->set();
     }
 
     /**
@@ -74,56 +74,56 @@ class DbLoggerPlugin extends Gdn_Plugin {
      * @param SettingsController $sender
      * @param string $page
      */
-    public function SettingsController_EventLog_Create($sender, $page = '') {
-        $sender->Permission('Garden.Settings.Manage');
+    public function settingsController_eventLog_create($sender, $page = '') {
+        $sender->permission('Garden.Settings.Manage');
 
         $sender->Form = new Gdn_Form();
         $pageSize = 30;
-        list($offset, $limit) = OffsetLimit($page, $pageSize);
-        SaveToConfig('Api.Clean', false, false);
-        $sql = Gdn::SQL();
+        list($offset, $limit) = offsetLimit($page, $pageSize);
+        saveToConfig('Api.Clean', false, false);
+        $sql = Gdn::sql();
 
-        $sql->From('EventLog')
-            ->Limit($limit + 1, $offset);
+        $sql->from('EventLog')
+            ->limit($limit + 1, $offset);
 
-        $get = array_change_key_case($sender->Request->Get());
+        $get = array_change_key_case($sender->Request->get());
 
         // Look for query parameters to filter the data.
         // todo: use timezone? on dateto and datefrom
         if ($v = val('datefrom', $get)) {
             $v = strtotime($v);
             if (!$v) {
-                $sender->Form->AddError('Invalid Date format for From Date.');
+                $sender->Form->addError('Invalid Date format for From Date.');
             }
-            $sql->Where('Timestamp >=', $v);
-            $sender->Form->SetFormValue('datefrom', $get['datefrom']);
+            $sql->where('Timestamp >=', $v);
+            $sender->Form->setFormValue('datefrom', $get['datefrom']);
         }
 
         if ($v = val('dateto', $get)) {
             $v = strtotime($v);
             if (!$v) {
-                $sender->Form->AddError('Invalid Date format for To Date.');
+                $sender->Form->addError('Invalid Date format for To Date.');
             }
-            $sql->Where('Timestamp <=', $v);
-            $sender->Form->SetFormValue('dateto', $get['dateto']);
+            $sql->where('Timestamp <=', $v);
+            $sender->Form->setFormValue('dateto', $get['dateto']);
         }
 
-        $sender->Form->SetFormValue('severity', 'all');
+        $sender->Form->setFormValue('severity', 'all');
         if (($v = val('severity', $get)) && $v != 'all') {
             $validLevelString = implode(', ', array_keys(array_slice($this->severityOptions, 0, -1)));
             $validLevelString .= ' and ' . end(array_keys($this->severityOptions));
 
             if (!isset($this->severityOptions[$v])) {
-                $sender->Form->AddError('Invalid severity.  Valid options are: ' . $validLevelString);
+                $sender->Form->addError('Invalid severity.  Valid options are: ' . $validLevelString);
             }
-            $sql->Where('Level =', $v);
-            $sender->Form->SetFormValue('severity', $v);
+            $sql->where('Level =', $v);
+            $sender->Form->setFormValue('severity', $v);
 
         }
 
         if ($v = val('event', $get)) {
-            $sql->Where('event =', $v);
-            $sender->Form->SetFormValue('event', $v);
+            $sql->where('event =', $v);
+            $sender->Form->setFormValue('event', $v);
         }
 
         $sortOrder = 'desc';
@@ -134,34 +134,34 @@ class DbLoggerPlugin extends Gdn_Plugin {
                 $sortOrder = 'desc';
             }
         }
-        $sql->OrderBy('Timestamp', $sortOrder);
-        $sender->Form->SetFormValue('sortorder', $sortOrder);
+        $sql->orderBy('Timestamp', $sortOrder);
+        $sender->Form->setFormValue('sortorder', $sortOrder);
 
-        $events = $sql->Get()->ResultArray();
+        $events = $sql->get()->resultArray();
         $events = array_splice($events, 0, $pageSize);
 
 
         // Application calculation.
         foreach ($events as &$event) {
             $event['Url'] = $event['Domain'] . ltrim($event['Path'], '/');
-//            $event['InsertProfileUrl'] = UserUrl(Gdn::UserModel()->GetID($event['InsertUserID']));
+//            $event['InsertProfileUrl'] = userUrl(Gdn::userModel()->getID($event['InsertUserID']));
 
             unset($event['Domain'], $event['Path']);
         }
 
-        $sender->SetData('_CurrentRecords', count($events));
+        $sender->setData('_CurrentRecords', count($events));
 
-        $sender->AddSideMenu();
+        $sender->addSideMenu();
         $severityOptions = self::getArrayWithKeysAsValues($this->severityOptions);
         $severityOptions['all'] = 'All';
 
-        $filter = Gdn::Request()->Get();
+        $filter = Gdn::request()->get();
         unset($filter['TransientKey']);
         unset($filter['hpt']);
         unset($filter['Filter']);
         $currentFilter = http_build_query($filter);
 
-        $sender->SetData(
+        $sender->setData(
             [
                 'Events' => $events,
                 'SeverityOptions' => $severityOptions,
@@ -170,7 +170,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
             ]
         );
 
-        $sender->Render('eventlog', '', 'plugins/dblogger');
+        $sender->render('eventlog', '', 'plugins/dblogger');
     }
 
     /**

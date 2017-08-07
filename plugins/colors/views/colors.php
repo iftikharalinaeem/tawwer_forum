@@ -1,17 +1,17 @@
 <?php 
 
-   $format          = strtolower($this->Data('_EditorInputFormat'));
+   $format          = strtolower($this->data('_EditorInputFormat'));
    $html_toolbar    = ''; // for regular text
    
    if ($format != 'text') {
       $html_toolbar    = '<div class="editor editor-format-'. $format .'">';
       $html_arrow_down = '<span class="icon-caret-down"></span>';
 
-      foreach($this->Data('_EditorToolbar') as $button) {
+      foreach($this->data('_EditorToolbar') as $button) {
 
          // If the type is not an array, it's a regular button (type==button)
          if (!is_array($button['type'])) {
-            $html_toolbar .= Wrap('', 'span', $button['attr']);
+            $html_toolbar .= wrap('', 'span', $button['attr']);
          } else {
             // Else this button has dropdown options, so generate them
             $html_button_dropdown_options = '';
@@ -31,14 +31,14 @@
                    : 'span';
 
                // Concatenate child elements 
-               $html_button_dropdown_options .= Wrap($action_text, $html_tag, $button_option['attr']);
+               $html_button_dropdown_options .= wrap($action_text, $html_tag, $button_option['attr']);
             }
             
             switch ($button['action']) {             
                
                case 'link':
-                  $html_toolbar .= Wrap(
-                     Wrap($html_arrow_down, 'span', $button['attr']) .''. 
+                  $html_toolbar .= wrap(
+                     wrap($html_arrow_down, 'span', $button['attr']) .''. 
                      '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink">
                         <input class="InputBox editor-input-url" data-wysihtml5-dialog-field="href" value="http://" />
                          <div class="MenuButtons">
@@ -50,8 +50,8 @@
                   break;
 
                case 'image':
-                  $html_toolbar .= Wrap(
-                     Wrap($html_arrow_down, 'span', $button['attr']) .''. 
+                  $html_toolbar .= wrap(
+                     wrap($html_arrow_down, 'span', $button['attr']) .''. 
                      '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="insertImage">
                         <input class="InputBox editor-input-image" data-wysihtml5-dialog-field="src" value="http://">
                         <div class="MenuButtons">
@@ -72,9 +72,9 @@
                
                // All other dropdowns (color, format, emoji)
                default:
-                  $html_toolbar .= Wrap(
-                     Wrap($html_arrow_down, 'span', $button['attr']) .''. 
-                     Wrap($html_button_dropdown_options, 'div', ['class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''])
+                  $html_toolbar .= wrap(
+                     wrap($html_arrow_down, 'span', $button['attr']) .''. 
+                     wrap($html_button_dropdown_options, 'div', ['class' => 'editor-insert-dialog Flyout MenuItems', 'data-wysihtml5-dialog' => ''])
                   , 'div', ['class' => 'editor-dropdown']);
                   break;  
             }

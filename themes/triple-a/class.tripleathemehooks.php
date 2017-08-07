@@ -9,7 +9,7 @@ class TripleAThemeHooks extends Gdn_Plugin {
      * 
      * @param $sender Instance of current request controller
      */
-    public function base_Render_Before($sender) {
+    public function base_render_before($sender) {
         $sender->addDefinition('swiperAutoplay', c('Garden.ThemeOptions.SwiperAutoplay', 5000));
     }
 }

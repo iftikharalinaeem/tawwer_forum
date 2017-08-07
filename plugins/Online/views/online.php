@@ -6,7 +6,7 @@ echo $this->Form->errors();
 ?>
 <ul>
    <?php if ($this->data('ForceEditing') && $this->data('ForceEditing') != FALSE) { ?>
-      <div class="Warning"><?php echo sprintf(T("You are editing %s's Online settings"),$this->data('ForceEditing')); ?></div>
+      <div class="Warning"><?php echo sprintf(t("You are editing %s's Online settings"),$this->data('ForceEditing')); ?></div>
    <?php } ?>
    <li>
       <?php

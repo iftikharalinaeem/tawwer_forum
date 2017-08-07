@@ -230,9 +230,9 @@ class ZendeskPlugin extends Gdn_Plugin {
                     saveToConfig('Plugins.Zendesk.ApplicationID', trim($formValues['ApplicationID']));
                     saveToConfig('Plugins.Zendesk.Secret', trim($formValues['Secret']));
                     saveToConfig('Plugins.Zendesk.Url', trim($formValues['Url']));
-                    $sender->informMessage(T("Your changes have been saved."));
+                    $sender->informMessage(t("Your changes have been saved."));
                 } else {
-                    $sender->informMessage(T("Error saving settings to config."));
+                    $sender->informMessage(t("Error saving settings to config."));
                 }
             }
 
@@ -316,7 +316,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         $elementAuthorID = $args[$content]->InsertUserID;
 
 
-        if (!C('Plugins.Zendesk.AllowTicketForSelf', false) && $elementAuthorID == Gdn::session()->UserID) {
+        if (!c('Plugins.Zendesk.AllowTicketForSelf', false) && $elementAuthorID == Gdn::session()->UserID) {
             //no need to create support tickets for your self
             return;
         }
@@ -432,7 +432,7 @@ class ZendeskPlugin extends Gdn_Plugin {
                     $sender->jsonTarget('', $url, 'Redirect');
 
                 } else {
-                    $sender->informMessage(T("Error creating ticket with Zendesk"));
+                    $sender->informMessage(t("Error creating ticket with Zendesk"));
                 }
             }
         }
@@ -527,7 +527,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         ];
         //prevents resetting any previous values
         foreach ($configSettings as $configSetting) {
-            if (!C('Plugins.Zendesk.'.$configSetting)) {
+            if (!c('Plugins.Zendesk.'.$configSetting)) {
                 saveToConfig('Plugins.Zendesk.'.$configSetting, '');
             }
         }
@@ -749,7 +749,7 @@ class ZendeskPlugin extends Gdn_Plugin {
         $this->EventArguments['User'] = $sender->User;
         $this->fireEvent('AfterConnection');
 
-        redirectTo(UserUrl($sender->User, '', 'connections'));
+        redirectTo(userUrl($sender->User, '', 'connections'));
     }
 
     /**

@@ -7,27 +7,27 @@
 class SlugUrlsPlugin extends Gdn_Plugin {
    /// Methods ///
 
-   public function Setup() {
-      $this->Structure();
+   public function setup() {
+      $this->structure();
    }
 
-   public function Structure() {
-      Gdn::Structure()
-         ->Table('Discussion')
-         ->Column('Slug', 'varchar(191)', TRUE, 'index')
-         ->Set();
+   public function structure() {
+      Gdn::structure()
+         ->table('Discussion')
+         ->column('Slug', 'varchar(191)', TRUE, 'index')
+         ->set();
 
       // Add a url for SimplePress.
-//      Gdn::Router()->SetRoute('/?([^/]+)/([^/]+)/?(?:page-(\d+))?', '/discussion/slug/$2?category=$1&page=$3', 'Test');
+//      Gdn::router()->setRoute('/?([^/]+)/([^/]+)/?(?:page-(\d+))?', '/discussion/slug/$2?category=$1&page=$3', 'Test');
    }
 
-   public function Gdn_Router_AfterLoadRoutes_Handler($sender, $args) {
-//      $Px = self::Prefix();
+   public function gdn_Router_AfterLoadRoutes_Handler($sender, $args) {
+//      $Px = self::prefix();
 //      $PxEsc = preg_quote($Px);
       $pxEsc = '';
 
       // Add all of the category routes.
-      $categories = CategoryModel::Categories();
+      $categories = CategoryModel::categories();
       foreach ($categories as $category) {
          if (!$category['UrlCode'])
             continue;
@@ -45,19 +45,19 @@ class SlugUrlsPlugin extends Gdn_Plugin {
 
    /// Event Handlers ///
 
-   public function DiscussionController_Slug_Create($sender, $slug, $page = FALSE, $category = FALSE) {
+   public function discussionController_slug_create($sender, $slug, $page = FALSE, $category = FALSE) {
       if (!$slug)
-         throw NotFoundException('Discussion');
+         throw notFoundException('Discussion');
 
       // Grab the discussion.
-      $discussion = Gdn::SQL()->GetWhere(
+      $discussion = Gdn::sql()->getWhere(
          'Discussion',
-         ['Slug' => $slug])->FirstRow(DATASET_TYPE_ARRAY);
+         ['Slug' => $slug])->firstRow(DATASET_TYPE_ARRAY);
 
       if (!$discussion)
-         throw NotFoundException('Discussion');
+         throw notFoundException('Discussion');
 
-      $url = DiscussionUrl($discussion, $page);
+      $url = discussionUrl($discussion, $page);
       redirectTo($url, 301);
    }
 }

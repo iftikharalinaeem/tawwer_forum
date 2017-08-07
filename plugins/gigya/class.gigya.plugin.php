@@ -23,32 +23,32 @@ class GigyaPlugin extends Gdn_Plugin {
     * Gets the gigya provider.
     * @return array
     */
-   public function Provider() {
+   public function provider() {
       if ($this->Provider === null) {
-         $this->Provider = Gdn_AuthenticationProviderModel::GetProviderByKey(self::PROVIDER_KEY);
+         $this->Provider = Gdn_AuthenticationProviderModel::getProviderByKey(self::PROVIDER_KEY);
       }
       return $this->Provider;
    }
 
-   public function Setup() {
-      $this->Structure();
+   public function setup() {
+      $this->structure();
    }
 
-   public function Structure() {
+   public function structure() {
       // Make sure we have the saml provider.
-      $provider = Gdn_AuthenticationProviderModel::GetProviderByKey(self::PROVIDER_KEY);
+      $provider = Gdn_AuthenticationProviderModel::getProviderByKey(self::PROVIDER_KEY);
 
       if (!$provider) {
          $model = new Gdn_AuthenticationProviderModel();
          $provider = [
             'AuthenticationKey' => self::PROVIDER_KEY,
             'AuthenticationSchemeAlias' => self::PROVIDER_KEY,
-            'Name' => C('Garden.Title'),
+            'Name' => c('Garden.Title'),
             'AuthenticateUrl' => 'https://socialize.gigya.com/socialize.login',
 
          ];
 
-         $model->Save($provider);
+         $model->save($provider);
       }
    }
 
@@ -81,52 +81,52 @@ class GigyaPlugin extends Gdn_Plugin {
     * @param EntryController $sender
     * @param array $args
     */
-   public function Base_ConnectData_Handler($sender, $args) {
-      if (GetValue(0, $args) != 'gigya')
+   public function base_connectData_handler($sender, $args) {
+      if (getValue(0, $args) != 'gigya')
          return;
 
       $form = $sender->Form;
 
-      $user = json_decode($form->GetFormValue('User', $form->GetFormValue('User')), true);
+      $user = json_decode($form->getFormValue('User', $form->getFormValue('User')), true);
       if (!$user) {
          throw new Gdn_UserException('Could not parse the user.');
       }
 
       // Validate the signature.
-      $secret = val('AssociationSecret', $this->Provider());
+      $secret = val('AssociationSecret', $this->provider());
       self::validateUserSignature($user['UID'], $user['signatureTimestamp'], $secret, $user['UIDSignature'], true);
 
       // Map all of the standard jsConnect data.
       $map = ['UID' => 'UniqueID', 'email' => 'Email', 'photoURL' => 'Photo'];
       foreach ($map as $key => $value) {
-         $form->SetFormValue($value, GetValue($key, $user, ''));
+         $form->setFormValue($value, getValue($key, $user, ''));
       }
       if (isset($user['firstName']) && isset($user['lastName'])) {
-         $form->SetFormValue('FullName', $user['firstName'].' '.$user['lastName']);
+         $form->setFormValue('FullName', $user['firstName'].' '.$user['lastName']);
       }
 
-      $form->SetFormValue('Provider', self::PROVIDER_KEY);
-      $form->SetFormValue('ProviderName', 'Gigya');
-      $form->AddHidden('User', $form->GetFormValue('User'));
+      $form->setFormValue('Provider', self::PROVIDER_KEY);
+      $form->setFormValue('ProviderName', 'Gigya');
+      $form->addHidden('User', $form->getFormValue('User'));
 
-      $sender->SetData('Verified', TRUE);
-      $sender->SetData('SSOUser', $user);
+      $sender->setData('Verified', TRUE);
+      $sender->setData('SSOUser', $user);
    }
 
    /**
     * @param Gdn_Controller $sender
     */
-   public function Base_Render_Before($sender) {
-      if (!Gdn::Session()->IsValid() && $sender->Head) {
-         $js = val('HeadTemplate', $this->Provider());
-         $sender->Head->AddString($js);
+   public function base_render_before($sender) {
+      if (!Gdn::session()->isValid() && $sender->Head) {
+         $js = val('HeadTemplate', $this->provider());
+         $sender->Head->addString($js);
 
          // We need to add the gigya js file as a string so it goes after the header template.
-         $url = Asset('/plugins/gigya/js/gigya.js');
-         $v = val('Version', Gdn::PluginManager()->GetPluginInfo('gigya'));
+         $url = asset('/plugins/gigya/js/gigya.js');
+         $v = val('Version', Gdn::pluginManager()->getPluginInfo('gigya'));
          $url .= '?v='.urlencode($v);
 
-         $sender->Head->AddString("<script src='$url' type='text/javascript'></script>");
+         $sender->Head->addString("<script src='$url' type='text/javascript'></script>");
       }
    }
 
@@ -135,15 +135,15 @@ class GigyaPlugin extends Gdn_Plugin {
     * @param array $Args
     * @return mixed
     */
-   public function EntryController_SignIn_Create($sender, $method = FALSE, $arg1 = FALSE) {
-      if (!val('IsDefault', $this->Provider())) {
-         return $sender->SignIn($method, $arg1);
+   public function entryController_signIn_create($sender, $method = FALSE, $arg1 = FALSE) {
+      if (!val('IsDefault', $this->provider())) {
+         return $sender->signIn($method, $arg1);
       } else {
-         $template = val('BodyTemplate', $this->Provider());
-         $sender->SetData('BodyTemplate', $template);
+         $template = val('BodyTemplate', $this->provider());
+         $sender->setData('BodyTemplate', $template);
 
-         $sender->Title(T('Sign In'));
-         $sender->Render('SignIn', '', 'plugins/gigya');
+         $sender->title(t('Sign In'));
+         $sender->render('SignIn', '', 'plugins/gigya');
       }
    }
 
@@ -151,9 +151,9 @@ class GigyaPlugin extends Gdn_Plugin {
     *
     * @param Gdn_Controller $sender
     */
-   public function EntryController_SignIn_Handler($sender, $args) {
+   public function entryController_signIn_handler($sender, $args) {
       if (isset($sender->Data['Methods'])) {
-         $template = val('BodyTemplate', $this->Provider());
+         $template = val('BodyTemplate', $this->provider());
 
          // Add the gigya signin code.
          if ($template) {
@@ -170,30 +170,30 @@ class GigyaPlugin extends Gdn_Plugin {
     * Manage the Gigya permissions.
     * @param SettingsController $sender
     */
-   public function SettingsController_Gigya_Create($sender) {
-      $sender->Permission('Garden.Settings.Manage');
+   public function settingsController_gigya_create($sender) {
+      $sender->permission('Garden.Settings.Manage');
 
       // Grab the provider.
-      $provider = $this->Provider();
+      $provider = $this->provider();
       if (!$provider) {
-         throw NotFoundException('Provider');
+         throw notFoundException('Provider');
       }
 
-      if ($sender->Form->AuthenticatedPostBack()) {
-         $data = ArrayTranslate($sender->Form->FormValues(), ['ClientID', 'AssociationSecret', 'HeadTemplate', 'BodyTemplate', 'IsDefault']);
+      if ($sender->Form->authenticatedPostBack()) {
+         $data = arrayTranslate($sender->Form->formValues(), ['ClientID', 'AssociationSecret', 'HeadTemplate', 'BodyTemplate', 'IsDefault']);
          $data['AuthenticationKey'] = self::PROVIDER_KEY;
          $model = new Gdn_AuthenticationProviderModel();
-         if ($model->Save($data)) {
-            $sender->InformMessage(T('Saved'));
+         if ($model->save($data)) {
+            $sender->informMessage(t('Saved'));
          } else {
-            $sender->Form->SetValidationResults($model->ValidationResults());
+            $sender->Form->setValidationResults($model->validationResults());
          }
       } else {
-         $sender->Form->SetData($provider);
+         $sender->Form->setData($provider);
       }
 
-      $sender->AddSideMenu('social');
-      $sender->SetData('Title', sprintf(T('%s Settings'), 'Gigya'));
-      $sender->Render('Settings', '', 'plugins/gigya');
+      $sender->addSideMenu('social');
+      $sender->setData('Title', sprintf(t('%s Settings'), 'Gigya'));
+      $sender->render('Settings', '', 'plugins/gigya');
    }
 }

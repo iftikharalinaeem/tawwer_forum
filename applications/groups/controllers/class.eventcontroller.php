@@ -88,7 +88,7 @@ class EventController extends Gdn_Controller {
         if ($eventID) {
             $eventModel = new EventModel();
             $event = $eventModel->getID($eventID, DATASET_TYPE_ARRAY);
-            if (!$event) throw NotFoundException('Event');
+            if (!$event) throw notFoundException('Event');
             $this->setData('Event', $event);
             $groupID = $event['GroupID'];
         }
@@ -97,7 +97,7 @@ class EventController extends Gdn_Controller {
         if ($groupID) {
             $groupModel = new GroupModel();
             $group = $groupModel->getID($groupID);
-            if (!$group) throw NotFoundException('Group');
+            if (!$group) throw notFoundException('Group');
             $this->setData('Group', $group);
         }
 
@@ -123,8 +123,8 @@ class EventController extends Gdn_Controller {
     public function add($GroupID = null) {
         list($Event, $Group) = $this->addEdit(null, $GroupID);
 
-        if (!EventPermission('Create')) {
-            throw ForbiddenException('create a new event');
+        if (!eventPermission('Create')) {
+            throw forbiddenException('create a new event');
         }
 
         $this->title(t('New Event'));
@@ -176,8 +176,8 @@ class EventController extends Gdn_Controller {
     public function edit($EventID) {
         list($Event, $Group) = $this->addEdit($EventID);
 
-        if (!EventPermission('Edit')) {
-            throw ForbiddenException('edit this event');
+        if (!eventPermission('Edit')) {
+            throw forbiddenException('edit this event');
         }
         $this->title(t('Edit Event'));
         $this->addBreadcrumb($this->title());
@@ -186,7 +186,7 @@ class EventController extends Gdn_Controller {
         $EventModel = new EventModel();
         $this->Form->setModel($EventModel);
         if ($this->Form->isPostBack()) {
-            $EventData = $this->Form->FormValues();
+            $EventData = $this->Form->formValues();
 
             // Re-assign IDs
             $EventData['EventID'] = $Event['EventID'];
@@ -228,7 +228,7 @@ class EventController extends Gdn_Controller {
         $EventModel = new EventModel();
         $Event = $EventModel->getID($EventID, DATASET_TYPE_ARRAY);
         if (!$Event) {
-            throw NotFoundException('Event');
+            throw notFoundException('Event');
         }
         $ViewEvent = false;
 
@@ -241,7 +241,7 @@ class EventController extends Gdn_Controller {
         if ($GroupID) {
             $GroupModel = new GroupModel();
             $Group = $GroupModel->getID($GroupID, DATASET_TYPE_ARRAY);
-            if (!$Group) throw NotFoundException('Group');
+            if (!$Group) throw notFoundException('Group');
         }
 
         $this->EventArguments['Event'] = &$Event;
@@ -275,7 +275,7 @@ class EventController extends Gdn_Controller {
 
         // No permission
         if (!$ViewEvent) {
-            throw ForbiddenException('view this event');
+            throw forbiddenException('view this event');
         }
 
         $this->title($Event['Name']);
@@ -316,7 +316,7 @@ class EventController extends Gdn_Controller {
         list($event, $group) = $this->addEdit($eventID);
 
         if (!eventPermission('Edit')) {
-            throw ForbiddenException('delete this event');
+            throw forbiddenException('delete this event');
         }
 
         if ($this->Form->authenticatedPostBack()) {
@@ -353,7 +353,7 @@ class EventController extends Gdn_Controller {
         $eventModel = new EventModel();
         $event = $eventModel->getID($eventID, DATASET_TYPE_ARRAY);
         if (!$event) {
-            throw NotFoundException('Event');
+            throw notFoundException('Event');
         }
         $attendEvent = false;
 
@@ -366,7 +366,7 @@ class EventController extends Gdn_Controller {
             $groupModel = new GroupModel();
             $group = $groupModel->getID($groupID, DATASET_TYPE_ARRAY);
             if (!$group) {
-                throw NotFoundException('Group');
+                throw notFoundException('Group');
             }
 
             // Check if this person is a member of the group or a moderator
@@ -393,7 +393,7 @@ class EventController extends Gdn_Controller {
 
         // No permission
         if (!$attendEvent) {
-            throw ForbiddenException('attend this event');
+            throw forbiddenException('attend this event');
         }
         $eventName = val('Name', $event, t('this event'));
         $eventModel->attend(Gdn::session()->UserID, $eventID, $attending);

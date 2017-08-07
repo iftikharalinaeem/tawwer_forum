@@ -34,7 +34,7 @@ $this->title($Action . ' ' . t('a Badge')); ?>
 
     $this->fireEvent('BadgeFormFields');
 
-    $UploadText = $this->data('Badge.Photo') ? t('Replace Image') : T('Add Image');
+    $UploadText = $this->data('Badge.Photo') ? t('Replace Image') : t('Add Image');
     echo wrap($this->Form->labelwrap($UploadText.($this->data('Badge.Photo') ? '<div class="image-wrap">'.img(
         Gdn_Upload::url($this->data('Badge.Photo')),
         ['alt' => $this->data('Badge.Name')]

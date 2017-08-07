@@ -94,7 +94,7 @@ class PromotedGroupsModule extends Gdn_Module {
      */
     public function setPromoteType($promoteType) {
         if (!array_key_exists($promoteType, $this->promoteTypes)) {
-            $this->setData('ErrorMessage', T('No such groups listing.'));
+            $this->setData('ErrorMessage', t('No such groups listing.'));
         } else {
             $this->promoteType = $promoteType;
 

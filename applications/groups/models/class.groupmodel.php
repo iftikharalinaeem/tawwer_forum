@@ -32,7 +32,7 @@ class GroupModel extends Gdn_Model {
      */
     public function calc(&$result) {
         foreach ($result as &$row) {
-            $row['Url'] = GroupUrl($row, null, '//');
+            $row['Url'] = groupUrl($row, null, '//');
             $row['DescriptionHtml'] = Gdn_Format::to($row['Description'], $row['Format']);
 
             if ($row['Icon']) {
@@ -634,7 +634,7 @@ class GroupModel extends Gdn_Model {
             return false;
         }
 
-        $group = $this->getID(GetValue('GroupID', $data));
+        $group = $this->getID(getValue('GroupID', $data));
         trace($group, 'Group');
 
         switch (strtolower($group['Registration'])) {
@@ -679,7 +679,7 @@ class GroupModel extends Gdn_Model {
             ->getWhere('GroupApplicant',['GroupID' => $groupID, 'UserID' => $userID])
             ->firstRow(DATASET_TYPE_ARRAY);
         if (!$row || $row['Type'] != 'Invitation') {
-            throw NotFoundException('Invitation');
+            throw notFoundException('Invitation');
         }
 
         $data = [
@@ -701,7 +701,7 @@ class GroupModel extends Gdn_Model {
         $iD = $data['GroupApplicantID'];
         $row = $this->SQL->getWhere('GroupApplicant', ['GroupApplicantID' => $iD])->firstRow(DATASET_TYPE_ARRAY);
         if (!$row) {
-            throw NotFoundException('Applicant');
+            throw notFoundException('Applicant');
         }
 
         $value = val('Type', $data);
@@ -750,7 +750,7 @@ class GroupModel extends Gdn_Model {
      * @param array $data The groups to join to.
      * @param bool $joinUsers
      */
-    public function JoinRecentPosts(&$data, $joinUsers = true) {
+    public function joinRecentPosts(&$data, $joinUsers = true) {
         $discussionIDs = [];
         $commentIDs = [];
 
@@ -888,7 +888,7 @@ class GroupModel extends Gdn_Model {
         }
 
         // Set the visibility and registration based on the privacy.
-        switch (strtolower(GetValue('Privacy', $data))) {
+        switch (strtolower(getValue('Privacy', $data))) {
             case 'private':
                 $data['Visibility'] = 'Members';
                 $data['Registration'] = 'Approval';
@@ -1015,10 +1015,10 @@ class GroupModel extends Gdn_Model {
         $valid = parent::validate($formPostValues, $insert);
 
         // Check to see if there is another group with the same name.
-        if (trim(GetValue('Name', $formPostValues))) {
+        if (trim(getValue('Name', $formPostValues))) {
             $rows = $this->SQL->getWhere('Group', ['Name' => $formPostValues['Name']])->resultArray();
 
-            $groupID = GetValue('GroupID', $formPostValues);
+            $groupID = getValue('GroupID', $formPostValues);
             foreach ($rows as $row) {
                 if (!$groupID || $groupID != $row['GroupID']) {
                     $valid = false;
@@ -1135,16 +1135,16 @@ class GroupModel extends Gdn_Model {
      * @return array An array of category IDs.
      */
     public static function getGroupCategoryIDs() {
-        $groupCategoryIDs = Gdn::Cache()->Get('GroupCategoryIDs');
+        $groupCategoryIDs = Gdn::cache()->get('GroupCategoryIDs');
         if ($groupCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
             $categoryModel = new CategoryModel();
-            $groupCategories = $categoryModel->GetWhere(['AllowGroups' => 1])->ResultArray();
+            $groupCategories = $categoryModel->getWhere(['AllowGroups' => 1])->resultArray();
             $groupCategoryIDs = [];
             foreach ($groupCategories as $groupCategory) {
                 $groupCategoryIDs[] = $groupCategory['CategoryID'];
             }
 
-            Gdn::Cache()->Store('GroupCategoryIDs', $groupCategoryIDs);
+            Gdn::cache()->store('GroupCategoryIDs', $groupCategoryIDs);
         }
         return $groupCategoryIDs;
     }

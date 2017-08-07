@@ -153,9 +153,9 @@ class BadgesHooks extends Gdn_Plugin {
     /**
      * Calculate whether badges are awarded when a user visits.
      */
-//    public function Gdn_Session_AfterGetSession_Handler($Sender, $Args) {
-//        $this->FreshStart($Sender, $Args);
-//        $this->Attendance($Sender, $Args);
+//    public function gdn_Session_AfterGetSession_Handler($Sender, $Args) {
+//        $this->freshStart($Sender, $Args);
+//        $this->attendance($Sender, $Args);
 //    }
 
     /**
@@ -202,23 +202,23 @@ class BadgesHooks extends Gdn_Plugin {
     /**
      * Show user's badges in profile.
      */
-//    public function ProfileController_Badges_Create($Sender) {
-//        $Sender->Permission('Reputation.Badges.View');
+//    public function profileController_Badges_Create($Sender) {
+//        $Sender->permission('Reputation.Badges.View');
 //
 //        // User data
-//        $UserReference = ArrayValue(0, $Sender->RequestArgs, '');
-//        $Username = ArrayValue(1, $Sender->RequestArgs, '');
+//        $UserReference = arrayValue(0, $Sender->RequestArgs, '');
+//        $Username = arrayValue(1, $Sender->RequestArgs, '');
 //
 //        // Tell the ProfileController what tab to load
-//        $Sender->GetUserInfo($UserReference, $Username);
-//        $Sender->SetTabView('Badges', 'profile', 'Badge', 'Reputation');
+//        $Sender->getUserInfo($UserReference, $Username);
+//        $Sender->setTabView('Badges', 'profile', 'Badge', 'Reputation');
 //
 //        // Get User's badges
-//        $UserBadgeModel = new UserBadgeModel();
-//        $Sender->BadgeData = $UserBadgeModel->GetBadges($Sender->User->UserID);
-//        $Sender->SetData('Badges', $Sender->BadgeData, TRUE);
+//        $UserBadgeModel = new userBadgeModel();
+//        $Sender->BadgeData = $UserBadgeModel->getBadges($Sender->User->UserID);
+//        $Sender->setData('Badges', $Sender->BadgeData, TRUE);
 //
-//        $Sender->Render();
+//        $Sender->render();
 //    }
 
     /**
@@ -331,7 +331,7 @@ class BadgesHooks extends Gdn_Plugin {
         // Collect all of the count fields.
         $counts = [];
         foreach ($fields as $name => $value) {
-            if (StringBeginsWith($name, 'Count') || in_array($name, ['Likes'])) {
+            if (stringBeginsWith($name, 'Count') || in_array($name, ['Likes'])) {
                 $counts[$name] = $value;
             }
         }
@@ -523,7 +523,7 @@ class BadgesHooks extends Gdn_Plugin {
         if (count($mentions)) {
             $comment = val('Comment', $args, val('Discussion', $args));
             $userBadgeModel = new UserBadgeModel();
-            $userBadgeModel->Give(val('InsertUserID', $comment), 'name-dropper');
+            $userBadgeModel->give(val('InsertUserID', $comment), 'name-dropper');
         }
     }
 

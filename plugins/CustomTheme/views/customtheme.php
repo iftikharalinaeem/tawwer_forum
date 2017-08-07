@@ -5,7 +5,7 @@ $cssEnabled = $pluginEnabled;
 $htmlEnabled = $pluginEnabled && !c('Plugins.CustomTheme.DisableHtml', false);
 
 Gdn_Theme::assetBegin('Help');
-WriteRevisions($this, 'css');
+writeRevisions($this, 'css');
 Gdn_Theme::assetEnd();
 
 $bloglink = sprintf(t('Check out our %s'), anchor('Vanilla Forums Theming Guide', 'https://blog.vanillaforums.com/help/vanilla-custom-themes/', '', ['target' => '_blank']));

@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 <div class="padded alert alert-warning">
    <?php echo sprintf(t('You must register your application with %s for this plugin to work.'), t('LinkedIn')); ?>
 </div>
@@ -12,7 +12,7 @@
        <h2>Authentication Keys</h2>
       <?php
       $Cf = $this->ConfigurationModule;
-      $Cf->Render();
+      $Cf->render();
       ?>
    </div>
 </div>

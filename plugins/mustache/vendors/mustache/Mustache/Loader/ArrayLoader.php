@@ -14,7 +14,7 @@
  *
  * An ArrayLoader instance loads Mustache Template source by name from an initial array:
  *
- *     $loader = new ArrayLoader(
+ *     $loader = new arrayLoader(
  *         'foo' => '{{ bar }}',
  *         'baz' => 'Hey {{ qux }}!'
  *     );

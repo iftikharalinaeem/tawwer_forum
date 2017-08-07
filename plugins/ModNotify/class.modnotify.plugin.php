@@ -4,17 +4,17 @@ class ModNotifyPlugin extends Gdn_Plugin {
    /**
     * Let users with permission choose to receive notifications.
     */
-   public function ProfileController_AfterPreferencesDefined_Handler($sender) {
-      if (Gdn::Session()->CheckPermission('Garden.Moderation.Manage')) {
-         $sender->Preferences['Notifications']['Email.ModQueue'] = T('Notify me when an item is queued for moderation.');
-         $sender->Preferences['Notifications']['Popup.ModQueue'] = T('Notify me when an item is queued for moderation.');
+   public function profileController_afterPreferencesDefined_handler($sender) {
+      if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+         $sender->Preferences['Notifications']['Email.ModQueue'] = t('Notify me when an item is queued for moderation.');
+         $sender->Preferences['Notifications']['Popup.ModQueue'] = t('Notify me when an item is queued for moderation.');
          
          // Set preferences in UserMeta
-         if ($sender->Form->AuthenticatedPostBack()) {
+         if ($sender->Form->authenticatedPostBack()) {
             $set = [];
-            $set['Email.ModQueue'] = ($sender->Form->GetFormValue('Email.ModQueue', NULL)) ? 1 : NULL;
-            $set['Popup.ModQueue'] = ($sender->Form->GetFormValue('Popup.ModQueue', NULL)) ? 1 : NULL;
-            UserModel::SetMeta($sender->User->UserID, $set, 'Preferences.');
+            $set['Email.ModQueue'] = ($sender->Form->getFormValue('Email.ModQueue', NULL)) ? 1 : NULL;
+            $set['Popup.ModQueue'] = ($sender->Form->getFormValue('Popup.ModQueue', NULL)) ? 1 : NULL;
+            UserModel::setMeta($sender->User->UserID, $set, 'Preferences.');
          }
       }
    }
@@ -22,7 +22,7 @@ class ModNotifyPlugin extends Gdn_Plugin {
    /**
     * Detect additions to moderation queue & notify.
     */
-   public function LogModel_AfterInsert_Handler($sender, $args) {
+   public function logModel_afterInsert_handler($sender, $args) {
       $log = $args['Log'];
       $logID = $args['LogID'];
       
@@ -33,9 +33,9 @@ class ModNotifyPlugin extends Gdn_Plugin {
          return;
       
       // Grab all of the users that need to be notified.
-      $data = Gdn::Database()->SQL()
-         ->WhereIn('Name', ['Preferences.Email.ModQueue', 'Preferences.Popup.ModQueue'])
-         ->Get('UserMeta')->ResultArray();
+      $data = Gdn::database()->sql()
+         ->whereIn('Name', ['Preferences.Email.ModQueue', 'Preferences.Popup.ModQueue'])
+         ->get('UserMeta')->resultArray();
       
       // Prep notification list
       $notifyUsers = [];
@@ -56,11 +56,11 @@ class ModNotifyPlugin extends Gdn_Plugin {
       $activityModel = new ActivityModel();
       switch ($log['Operation']) {
          case 'Pending':
-            $headlineFormat = T('HeadlineFormat.ModQueuePending', 
+            $headlineFormat = t('HeadlineFormat.ModQueuePending', 
                'A new {Data.RecordType,text} by {Data.RecordUserID, user} is awaiting approval in the <a href="{Url,html}">Moderation Queue</a>');
             break;
          case 'Moderate':
-            $headlineFormat = T('HeadlineFormat.ModQueueModerate', 
+            $headlineFormat = t('HeadlineFormat.ModQueueModerate', 
                'A {Data.RecordType,text} by {Data.RecordUserID, user} has been moved to the <a href="{Url,html}">Moderation Queue</a>');
             break;
       }
@@ -70,7 +70,7 @@ class ModNotifyPlugin extends Gdn_Plugin {
          'HeadlineFormat' => $headlineFormat,
          'RecordType' => 'Log',
          'RecordID' => $logID,
-         'Route' => Url('/log/moderation'),
+         'Route' => url('/log/moderation'),
          'Data' => [
             'Operation' => $log['Operation'],
             'RecordType' => strtolower($log['RecordType']),
@@ -81,20 +81,20 @@ class ModNotifyPlugin extends Gdn_Plugin {
        // Queue the notifications
       foreach ($notifyUsers as $userID => $prefs) {         
          $activity['NotifyUserID'] = $userID;
-         $activity['Emailed'] = GetValue('Emailed', $prefs, FALSE);
-         $activity['Notified'] = GetValue('Notified', $prefs, FALSE);
-         $activityModel->Queue($activity);
+         $activity['Emailed'] = getValue('Emailed', $prefs, FALSE);
+         $activity['Notified'] = getValue('Notified', $prefs, FALSE);
+         $activityModel->queue($activity);
       }
       
       // Send all notifications.
-      $activityModel->SaveQueue();
+      $activityModel->saveQueue();
    }
 
-   public function Setup() {
+   public function setup() {
       // Create activity type
-      $sQL = Gdn::Database()->SQL();
-      if ($sQL->GetWhere('ActivityType', ['Name' => 'ModQueue'])->NumRows() == 0)
-         $sQL->Insert('ActivityType', ['AllowComments' => 0, 'Name' => 'ModQueue', 'Public' => 0]);
+      $sQL = Gdn::database()->sql();
+      if ($sQL->getWhere('ActivityType', ['Name' => 'ModQueue'])->numRows() == 0)
+         $sQL->insert('ActivityType', ['AllowComments' => 0, 'Name' => 'ModQueue', 'Public' => 0]);
    }
    
 }
