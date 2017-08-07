@@ -2,23 +2,23 @@
     <table id="multisites" class="table-data js-tj">
         <thead>
         <tr>
-            <th><?php echo T('Name'); ?></th>
-            <th class="column-xl"><?php echo T('Url'); ?></th>
-            <th class="column-sm"><?php echo T('Locale'); ?></th>
-            <th><?php echo T('Last Sync'); ?></th>
-            <th class="column-sm"><?php echo T('Status'); ?></th>
+            <th><?php echo t('Name'); ?></th>
+            <th class="column-xl"><?php echo t('Url'); ?></th>
+            <th class="column-sm"><?php echo t('Locale'); ?></th>
+            <th><?php echo t('Last Sync'); ?></th>
+            <th class="column-sm"><?php echo t('Status'); ?></th>
             <th class="column-sm"></th>
         </tr>
         </thead>
         <tbody>
         <?php
-        foreach ($this->Data('Sites') as $Row):
+        foreach ($this->data('Sites') as $Row):
             ?>
             <tr id="<?php echo "Multisite_{$Row['MultisiteID']}"; ?>">
                 <td><?php echo htmlspecialchars($Row['Name']); ?></td>
                 <td>
                     <?php
-                    echo Anchor(htmlspecialchars($Row['FullUrl']), $Row['FullUrl'], '', ['target' => '_blank']);
+                    echo anchor(htmlspecialchars($Row['FullUrl']), $Row['FullUrl'], '', ['target' => '_blank']);
                     ?>
                 </td>
                 <td>
@@ -28,7 +28,7 @@
                 </td>
                 <td>
                     <?php
-                    echo Gdn_Format::Date($Row['DateLastSync'], 'html');
+                    echo Gdn_Format::date($Row['DateLastSync'], 'html');
                     ?>
                 </td>
                 <td class="js-status"><?php echo strtolower($Row['Status']); ?></td>

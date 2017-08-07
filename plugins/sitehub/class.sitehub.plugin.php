@@ -104,7 +104,7 @@ class SiteHubPlugin extends Gdn_Plugin {
      * Check to see if a valid sso token was passed through the header.
      */
     public function checkSSO() {
-//        if (Gdn::Session()->IsValid()) {
+//        if (Gdn::session()->isValid()) {
 //            return;
 //        }
 
@@ -116,10 +116,10 @@ class SiteHubPlugin extends Gdn_Plugin {
             }
         }
         if ($token && $token === Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
-            $userID = Gdn::userModel()->GetSystemUserID();
+            $userID = Gdn::userModel()->getSystemUserID();
             if ($userID) {
-                Gdn::Session()->Start($userID, false, false);
-                Gdn::Session()->ValidateTransientKey(true);
+                Gdn::session()->start($userID, false, false);
+                Gdn::session()->validateTransientKey(true);
             }
         }
     }
@@ -166,8 +166,8 @@ class SiteHubPlugin extends Gdn_Plugin {
         /* @var SideMenuModule */
         $menu = $sender->EventArguments['SideMenu'];
 
-        $menu->AddItem('sitehub', T('Site Hub'), FALSE, ['After' => 'Forum']);
-        $menu->AddLink('sitehub', T('Sites'), '/multisites', 'Garden.Settings.Manage');
+        $menu->addItem('sitehub', t('Site Hub'), FALSE, ['After' => 'Forum']);
+        $menu->addLink('sitehub', t('Sites'), '/multisites', 'Garden.Settings.Manage');
     }
 
     /**
@@ -285,7 +285,7 @@ class SiteHubPlugin extends Gdn_Plugin {
      * @param Gdn_PluginManager $sender
      */
     public function gdn_pluginManager_afterStart_handler($sender) {
-        SaveToConfig([
+        saveToConfig([
             'Garden.Cookie.Name' => self::HUB_COOKIE,
             'Garden.Cookie.Path' => '/',
         ], '', false);
@@ -299,30 +299,30 @@ class SiteHubPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException Throws an exception when the user isn't signed in.
      */
     public function profileController_hubSSO_create($sender, $from) {
-        if (!Gdn::Session()->IsValid()) {
-            throw NotFoundException('User');
+        if (!Gdn::session()->isValid()) {
+            throw notFoundException('User');
         }
 
         // Get the site that the user is trying to sign in to.
         $site = false;
         if ($from) {
-            $site = MultisiteModel::instance()->getWhere(['slug' => $from])->FirstRow(DATASET_TYPE_ARRAY);
+            $site = MultisiteModel::instance()->getWhere(['slug' => $from])->firstRow(DATASET_TYPE_ARRAY);
             $sender->EventArguments['Site'] =& $site;
         }
         // Make sure the user is signing in to a valid site within the hub.
         if (!$site) {
-            throw NotFoundException('Site');
+            throw notFoundException('Site');
         }
 
         // Get the currently signed in user.
-        if (!Gdn::Session()->User) {
-            throw NotFoundException('User');
+        if (!Gdn::session()->User) {
+            throw notFoundException('User');
         }
-        $ssoUser = arrayTranslate((array)Gdn::Session()->User, ['UserID' => 'UniqueID', 'Name', 'Email', 'Banned', 'Photo', 'PhotoUrl']);
+        $ssoUser = arrayTranslate((array)Gdn::session()->User, ['UserID' => 'UniqueID', 'Name', 'Email', 'Banned', 'Photo', 'PhotoUrl']);
         $ssoUser['Photo'] = $ssoUser['PhotoUrl'];
 
         // Get the user's role.
-        $roles = Gdn::UserModel()->GetRoles(Gdn::Session()->UserID)->ResultArray();
+        $roles = Gdn::userModel()->getRoles(Gdn::session()->UserID)->resultArray();
         $allRoles = [];
         $ssoUser['Roles'] = [];
         foreach ($roles as $role) {
@@ -337,12 +337,12 @@ class SiteHubPlugin extends Gdn_Plugin {
         $sender->EventArguments['AllRoles'] = $allRoles;
 
         $sender->EventArguments['User'] =& $ssoUser;
-        $sender->EventArguments['Session'] =& Gdn::Session();
-        $sender->FireEvent('hubSSO');
+        $sender->EventArguments['Session'] =& Gdn::session();
+        $sender->fireEvent('hubSSO');
 
         $sender->Data = ['User' => $ssoUser];
-        SaveToConfig('Api.Clean', false, false);
-        $sender->Render('Blank', 'Utility', 'Dashboard');
+        saveToConfig('Api.Clean', false, false);
+        $sender->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**

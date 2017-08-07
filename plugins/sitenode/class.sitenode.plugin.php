@@ -27,7 +27,7 @@ class SiteNodePlugin extends Gdn_Plugin {
      */
     public function __construct() {
         parent::__construct();
-        $this->hubUrl = C('Hub.Url', Gdn::Request()->Domain().'/hub');
+        $this->hubUrl = c('Hub.Url', Gdn::request()->domain().'/hub');
     }
 
     /**
@@ -42,7 +42,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
     public function structure() {
         // Save the hub sso provider type.
-        Gdn::SQL()->Replace('UserAuthenticationProvider',
+        Gdn::sql()->replace('UserAuthenticationProvider',
             [
                 'AuthenticationSchemeAlias' => self::PROVIDER_KEY,
                 'URL' => '/hub',
@@ -53,25 +53,25 @@ class SiteNodePlugin extends Gdn_Plugin {
             ['AuthenticationKey' => self::PROVIDER_KEY], TRUE);
 
         // Add foreign ID columns specifically for the hub sync. These must not be unique.
-        Gdn::Structure()->table('Category');
+        Gdn::structure()->table('Category');
         $hasCatType = Gdn::structure()
-            ->Table('Category')
+            ->table('Category')
             ->columnExists('Type');
 
-        Gdn::Structure()->column('HubID', 'varchar(20)', true, 'unique.hubid')
+        Gdn::structure()->column('HubID', 'varchar(20)', true, 'unique.hubid')
             ->column('OverrideHub', 'tinyint', '0')
             ->set();
 
-        Gdn::Structure()
+        Gdn::structure()
             ->table('Role')
             ->column('HubID', 'varchar(20)', true, 'unique.hubid')
             ->column('OverrideHub', 'tinyint', '0')
             ->set();
 
-        Gdn::Structure()
-            ->Table('UserAuthenticationProvider')
-            ->Column('SyncWithHub', 'tinyint(1)', '1')
-            ->Set();
+        Gdn::structure()
+            ->table('UserAuthenticationProvider')
+            ->column('SyncWithHub', 'tinyint(1)', '1')
+            ->set();
 
         if ($hasCatType) {
             // Reporting categories should be managed locally. Set them to override hub, if they aren't already.
@@ -103,19 +103,19 @@ class SiteNodePlugin extends Gdn_Plugin {
             return;
         }
 
-        $category = CategoryModel::Categories($categoryID);
+        $category = CategoryModel::categories($categoryID);
         if (!val('HubID', $category)) {
             return;
         }
 
-        if ($sender->Request->IsAuthenticatedPostBack()) {
+        if ($sender->Request->isAuthenticatedPostBack()) {
             // Roles from the hub cannot be edited/deleted under any circumstance.
             throw new Gdn_UserException('This category is administered in the hub.', 400);
-        } elseif ($sender->DeliveryType() === DELIVERY_TYPE_DATA) {
+        } elseif ($sender->deliveryType() === DELIVERY_TYPE_DATA) {
             return;
         } else {
-            $sender->AddSideMenu('');
-            $sender->Render('hubcategory', 'settings', 'plugins/sitenode');
+            $sender->addSideMenu('');
+            $sender->render('hubcategory', 'settings', 'plugins/sitenode');
             die();
         }
     }
@@ -133,25 +133,25 @@ class SiteNodePlugin extends Gdn_Plugin {
             return;
         }
 
-        $role = $sender->RoleModel->GetByRoleID($roleID);
+        $role = $sender->RoleModel->getByRoleID($roleID);
         if (!val('HubID', $role)) {
             return;
         }
 
-        $sender->Form->AddHidden('HubID', val('HubID', $role));
+        $sender->Form->addHidden('HubID', val('HubID', $role));
         if (!$role || val('OverrideHub', $role)) {
             return;
         }
 
-        if ($sender->Request->IsAuthenticatedPostBack()) {
+        if ($sender->Request->isAuthenticatedPostBack()) {
             // Roles from the hub cannot be edited/deleted under any circumstance.
             throw new Gdn_UserException('This role is administered in the hub.', 400);
-        } elseif ($sender->DeliveryType() === DELIVERY_TYPE_DATA) {
+        } elseif ($sender->deliveryType() === DELIVERY_TYPE_DATA) {
             return;
         } else {
-            $sender->AddSideMenu('');
-            $sender->SetData('RoleID', $roleID);
-            $sender->Render('hubrole', 'role', 'plugins/sitenode');
+            $sender->addSideMenu('');
+            $sender->setData('RoleID', $roleID);
+            $sender->render('hubrole', 'role', 'plugins/sitenode');
             die();
         }
     }
@@ -160,7 +160,7 @@ class SiteNodePlugin extends Gdn_Plugin {
      * Check to see if a valid sso token was passed through the header.
      */
     public function checkSSO() {
-        if (Gdn::Session()->IsValid()) {
+        if (Gdn::session()->isValid()) {
             return;
         }
 
@@ -174,7 +174,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         if (empty($token)) {
             $allHeaders = getallheaders();
-            if (GetValue('Authorization', $allHeaders)) {
+            if (getValue('Authorization', $allHeaders)) {
                 if (preg_match('`^token\s+([^\s]+)`i', $allHeaders['Authorization'], $m)) {
                     $token = $m[1];
                 }
@@ -182,10 +182,10 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         if ($token && $token === Infrastructure::clusterConfig('cluster.loader.apikey', '')) {
-            $userID = Gdn::userModel()->GetSystemUserID();
+            $userID = Gdn::userModel()->getSystemUserID();
             if ($userID) {
-                Gdn::Session()->Start($userID, false, false);
-                Gdn::Session()->ValidateTransientKey(true);
+                Gdn::session()->start($userID, false, false);
+                Gdn::session()->validateTransientKey(true);
             }
         }
     }
@@ -206,7 +206,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         // Kludge for osx that doesn't allow host files.
         $urlParts = parse_url($this->hubUrl);
 
-        if ($urlParts['host'] === 'localhost' || StringEndsWith($urlParts['host'], '.lc') || stringEndsWith($urlParts['host'], '.dev')) {
+        if ($urlParts['host'] === 'localhost' || stringEndsWith($urlParts['host'], '.lc') || stringEndsWith($urlParts['host'], '.dev')) {
             $headers['Host'] = $urlParts['host'];
             $urlParts['host'] = '127.0.0.1';
         }
@@ -218,7 +218,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         $request = new ProxyRequest();
-        $response = $request->Request([
+        $response = $request->request([
             'URL' => $url,
             'Cookies' => !$system,
             'Method' => $method,
@@ -230,7 +230,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         if ($request->ResponseStatus != 200) {
-            Trace($response, "Error {$request->ResponseStatus}");
+            trace($response, "Error {$request->ResponseStatus}");
             throw new Gdn_UserException(val('Exception', $response, 'There was an error performing your request.'), $request->ResponseStatus);
         }
 
@@ -268,7 +268,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         if ($theme = val('Theme', $config)) {
             try {
-                Gdn::ThemeManager()->EnableTheme($theme);
+                Gdn::themeManager()->enableTheme($theme);
             } catch (Exception $ex) {
                 Logger::event('nodesync_error', Logger::ERROR, $ex->getMessage());
             }
@@ -276,7 +276,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         if ($mobileTheme = val('MobileTheme', $config)) {
             try {
-                Gdn::ThemeManager()->EnableTheme($mobileTheme, true);
+                Gdn::themeManager()->enableTheme($mobileTheme, true);
             } catch (Exception $ex) {
                 Logger::event('nodesync_error', Logger::ERROR, $ex->getMessage());
             }
@@ -284,18 +284,18 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         // Synchronize some config.
         $saveConfig = (array)val('Config', $config, []);
-        SaveToConfig($saveConfig);
+        saveToConfig($saveConfig);
 
         // Synchronize the roles.
-        Trace('Synchronizing roles.');
+        trace('Synchronizing roles.');
         $roleMap = $this->syncRoles(val('Roles', $config, []));
 
         // Synchronize the categories.
-        Trace('Synchronizing categories.');
+        trace('Synchronizing categories.');
         $this->syncCategories(val('Categories', $config, []), val('OtherCategories', $config, []), $roleMap);
 
         // Synchronize the authenticators.
-        Trace('Synchronizing authenticators.');
+        trace('Synchronizing authenticators.');
         $this->syncAuthenticators(val('Authenticators', $config, []));
 
         // Push the categories.
@@ -317,11 +317,11 @@ class SiteNodePlugin extends Gdn_Plugin {
             Gdn::controller()->setData('NodeSubcommunities', 'error');
         }
 
-        $this->FireEvent('AfterSync');
+        $this->fireEvent('AfterSync');
 
         // Tell the hub that we've synchronized.
-        $now = Gdn_Format::ToDateTime();
-        Gdn::UserMetaModel()->SetUserMeta(0, 'siteNode.dateLastSync', $now);
+        $now = Gdn_Format::toDateTime();
+        Gdn::userMetaModel()->setUserMeta(0, 'siteNode.dateLastSync', $now);
         $result = $this->hubApi(
             "/multisites/$siteID.json",
             'POST',
@@ -329,7 +329,7 @@ class SiteNodePlugin extends Gdn_Plugin {
             true
         );
 
-        Gdn::Config()->Shutdown();
+        Gdn::config()->shutdown();
         Logger::event('syncnode_complete', Logger::INFO, "The node has completed it's sync.");
     }
 
@@ -338,11 +338,11 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         foreach ($authenticators as $row) {
             // Look for an existing authenticator.
-            $current = $model->GetWhere(['AuthenticationKey' => $row['AuthenticationKey']])->FirstRow();
+            $current = $model->getWhere(['AuthenticationKey' => $row['AuthenticationKey']])->firstRow();
             if (!$current || val('SyncWithHub', $current)) {
                 unset($row['SyncToNodes']);
                 $row['SyncWithHub'] = true;
-                $model->Save($row);
+                $model->save($row);
             }
         }
     }
@@ -354,7 +354,7 @@ class SiteNodePlugin extends Gdn_Plugin {
      */
     public function utilityController_pushCategories_create($sender) {
         $sender->permission('Garden.Settings.Manage');
-        if (!$sender->Request->IsAuthenticatedPostBack(true)) {
+        if (!$sender->Request->isAuthenticatedPostBack(true)) {
             throw forbiddenException('GET');
         }
 
@@ -524,37 +524,37 @@ class SiteNodePlugin extends Gdn_Plugin {
         }
 
         // Find categories that have been removed from the hub.
-        $toDelete = Gdn::SQL()
-            ->Select('CategoryID')
-            ->From('Category')
-            ->WhereNotIn('CategoryID', $categoryMap)
-            ->Where('HubID is not null')
-            ->Where('OverrideHub', 0)
-            ->Get()->ResultArray();
+        $toDelete = Gdn::sql()
+            ->select('CategoryID')
+            ->from('Category')
+            ->whereNotIn('CategoryID', $categoryMap)
+            ->where('HubID is not null')
+            ->where('OverrideHub', 0)
+            ->get()->resultArray();
         $deleteIDs = array_column($toDelete, 'CategoryID');
 
         foreach ($deleteIDs as $categoryID) {
             if ($categoryID <= 0) {
                 cotinue;
             }
-            $category = (object)CategoryModel::Categories($categoryID);
-            $categoryModel->Delete($category, -1);
+            $category = (object)CategoryModel::categories($categoryID);
+            $categoryModel->delete($category, -1);
         }
 
         // Update the sort order of categories that aren't from the hub.
-        Gdn::SQL()->Update('Category')
-            ->Set('Sort', "Sort + $sort", false, false)
-            ->Where('CategoryID >', 0)
-            ->WhereNotIn('CategoryID', $categoryMap)
-            ->Put();
+        Gdn::sql()->update('Category')
+            ->set('Sort', "Sort + $sort", false, false)
+            ->where('CategoryID >', 0)
+            ->whereNotIn('CategoryID', $categoryMap)
+            ->put();
 
         // Rebuild the tree with from the new sort.
-        $categoryModel->RebuildTree(true);
+        $categoryModel->rebuildTree(true);
     }
 
     public function syncRoles(array $roles) {
         $roleModel = new RoleModel();
-        $roles = Gdn_DataSet::Index($roles, 'HubID');
+        $roles = Gdn_DataSet::index($roles, 'HubID');
         $roleMap = [];
 
         foreach ($roles as $hubID => &$role) {
@@ -567,10 +567,10 @@ class SiteNodePlugin extends Gdn_Plugin {
             }
 
             // Grab the current role.
-            $currentRole = $roleModel->GetWhere(['HubID' => $hubID])->FirstRow(DATASET_TYPE_ARRAY);
+            $currentRole = $roleModel->getWhere(['HubID' => $hubID])->firstRow(DATASET_TYPE_ARRAY);
             if (!$currentRole) {
                 // Try and grab the role by name.
-                $currentRole = $roleModel->GetWhere(['Name' => $role['Name']])->FirstRow(DATASET_TYPE_ARRAY);
+                $currentRole = $roleModel->getWhere(['Name' => $role['Name']])->firstRow(DATASET_TYPE_ARRAY);
                 if ($currentRole && $currentRole['HubID'] && isset($roles['HubID'])) {
                     $currentRole = false;
                 }
@@ -583,31 +583,31 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $roleID = $currentRole['RoleID'];
                 $fields = array_diff_assoc($role, $currentRole);
                 if (!empty($fields)) {
-                    $roleModel->Update($fields, ['RoleID' => $roleID]);
+                    $roleModel->update($fields, ['RoleID' => $roleID]);
                 }
             } else {
                 // Insert the role.
-                $roleID = $roleModel->Insert($role);
+                $roleID = $roleModel->insert($role);
             }
 
             if ($roleID) {
                 $permissions['RoleID'] = $roleID;
-                $globalPermissions = Gdn::PermissionModel()->Save($permissions, true);
-                Trace(Gdn::PermissionModel()->Validation->Results(true));
+                $globalPermissions = Gdn::permissionModel()->save($permissions, true);
+                trace(Gdn::permissionModel()->Validation->results(true));
                 $roleMap[$hubID] = $roleID;
             }
         }
 
         // Get a list of roles that need to be deleted.
-        $missingHubIDs = Gdn::SQL()
-            ->Select('RoleID')
-            ->From('Role')
-            ->WhereNotIn('HubID', array_keys($roles))
-            ->Get()->ResultArray();
+        $missingHubIDs = Gdn::sql()
+            ->select('RoleID')
+            ->from('Role')
+            ->whereNotIn('HubID', array_keys($roles))
+            ->get()->resultArray();
 
         foreach ($missingHubIDs as $missingRow) {
             $missingRoleID = $missingRow['RoleID'];
-            $roleModel->Delete($missingRoleID, 0);
+            $roleModel->delete($missingRoleID, 0);
         }
 
         return $roleMap;
@@ -623,29 +623,29 @@ class SiteNodePlugin extends Gdn_Plugin {
         $valid = new Gdn_Validation();
 
         // Try the key as a plugin first.
-        $info = Gdn::PluginManager()->GetPluginInfo($key, Gdn_PluginManager::ACCESS_PLUGINNAME);
+        $info = Gdn::pluginManager()->getPluginInfo($key, Gdn_PluginManager::ACCESS_PLUGINNAME);
         if ($info) {
             $currentEnabled = Gdn::addonManager()->isEnabled($key, Addon::TYPE_ADDON);
             if ($enabled && !$currentEnabled) {
-                Gdn::PluginManager()->EnablePlugin($key, $valid);
-                Trace("Plugin $key enabled.");
+                Gdn::pluginManager()->enablePlugin($key, $valid);
+                trace("Plugin $key enabled.");
             } elseif (!$enabled && $currentEnabled) {
-                Gdn::PluginManager()->DisablePlugin($key);
-                Trace("Plugin $key disabled.");
+                Gdn::pluginManager()->disablePlugin($key);
+                trace("Plugin $key disabled.");
             }
             return;
         }
 
         // Try the key as an application.
-        $info = Gdn::ApplicationManager()->GetApplicationInfo($key);
+        $info = Gdn::applicationManager()->getApplicationInfo($key);
         if ($info) {
-            $currentEnabled = array_key_exists($key, Gdn::ApplicationManager()->EnabledApplications());
+            $currentEnabled = array_key_exists($key, Gdn::applicationManager()->enabledApplications());
             if ($enabled && !$currentEnabled) {
-                Gdn::ApplicationManager()->EnableApplication($key, $valid);
-                Trace("Application $key enabled.");
+                Gdn::applicationManager()->enableApplication($key, $valid);
+                trace("Application $key enabled.");
             } elseif (!$enabled && $currentEnabled) {
-                Gdn::ApplicationManager()->DisableApplication($key);
-                Trace("Application $key disabled.");
+                Gdn::applicationManager()->disableApplication($key);
+                trace("Application $key disabled.");
             }
             return;
         }
@@ -669,7 +669,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 //            Logger::event('hubsso_skip', Logger::DEBUG, "Hub cookie not present. Skipping Hub SSO.");
 //        }
 
-        if (!Gdn::Session()->IsValid() && val(self::HUB_COOKIE, $_COOKIE)) {
+        if (!Gdn::session()->isValid() && val(self::HUB_COOKIE, $_COOKIE)) {
             // Check the cookie expiry here.
             $hubCookie = explode('|', val(self::HUB_COOKIE, $_COOKIE));
             $expiry = val(4, $hubCookie);
@@ -687,33 +687,33 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $user = val('User', $this->hubApi('/profile/hubsso.json', 'GET', ['from' => $this->slug()]));
 
                 // Hub SSO always synchronizes roles.
-                SaveToConfig('Garden.SSO.SyncRoles', true, false);
-                SaveToConfig('Garden.SSO.SynchRoles', true, false); // backwards compat
+                saveToConfig('Garden.SSO.SyncRoles', true, false);
+                saveToConfig('Garden.SSO.SynchRoles', true, false); // backwards compat
 
                 // Translate the roles.
                 $roles = val('Roles', $user);
                 if (is_array($roles)) {
                     $roleModel = new RoleModel();
                     $roleHubIDs = array_column($roles, 'HubID');
-                    $roles = $roleModel->GetWhere(['HubID' => $roleHubIDs])->ResultArray();
+                    $roles = $roleModel->getWhere(['HubID' => $roleHubIDs])->resultArray();
                     $user['Roles'] = array_column($roles, 'RoleID');
                     $user['RoleID'] = $user['Roles'];
                 }
 
                 // Fire an event so that plugins can determine access etc.
                 $this->EventArguments['User'] =& $user;
-                $this->FireEvent('hubSSO');
+                $this->fireEvent('hubSSO');
 
-                Trace($user, 'hubSSO');
+                trace($user, 'hubSSO');
 
                 $user_id = Gdn::userModel()->connect($user['UniqueID'], self::PROVIDER_KEY, $user);
-                Trace($user_id, 'user ID');
+                trace($user_id, 'user ID');
                 if ($user_id) {
                     // Add additional authentication.
                     $authentication = val('Authentication', $user);
                     if (is_array($authentication)) {
                         foreach ($authentication as $provider => $authKey) {
-                            Gdn::UserModel()->SaveAuthentication([
+                            Gdn::userModel()->saveAuthentication([
                                 'UserID' => $user_id,
                                 'Provider' => $provider,
                                 'UniqueID' => $authKey
@@ -721,28 +721,28 @@ class SiteNodePlugin extends Gdn_Plugin {
                         }
                     }
 
-                    Gdn::Session()->Start($user_id, true);
+                    Gdn::session()->start($user_id, true);
                 }
             } catch (Exception $ex) {
                 if ($ex->getCode() == 401) {
-                    Gdn::Dispatcher()
-                        ->PassData('Code', $ex->getCode())
-                        ->PassData('Exception', $ex->getMessage())
-                        ->PassData('Message', $ex->getMessage())
-                        ->PassData('Trace', $ex->getTraceAsString())
-                        ->PassData('Url', Url())
-                        ->Dispatch('/home/error');
+                    Gdn::dispatcher()
+                        ->passData('Code', $ex->getCode())
+                        ->passData('Exception', $ex->getMessage())
+                        ->passData('Message', $ex->getMessage())
+                        ->passData('Trace', $ex->getTraceAsString())
+                        ->passData('Url', url())
+                        ->dispatch('/home/error');
                     exit;
                 } else {
-                    Trace($ex, TRACE_ERROR);
+                    trace($ex, TRACE_ERROR);
                 }
             }
         }
 
         // Override the from email address.
-//        if ($alias = C('Plugins.VanillaPop.Alias')) {
+//        if ($alias = c('Plugins.VanillaPop.Alias')) {
 //            $supportEmail = $this->slug().".$alias@vanillaforums.email";
-//            SaveToConfig('Garden.Email.SupportAddress', $supportEmail, false);
+//            saveToConfig('Garden.Email.SupportAddress', $supportEmail, false);
 //        }
     }
 
@@ -767,9 +767,9 @@ class SiteNodePlugin extends Gdn_Plugin {
             return;
         }
 
-        $path = '/'.trim(Gdn::Request()->WebRoot(), '/');
+        $path = '/'.trim(Gdn::request()->webRoot(), '/');
 
-        SaveToConfig([
+        saveToConfig([
             'Garden.Cookie.Name' => self::NODE_COOKIE,
             'Garden.Cookie.Path' => $path,
             'Garden.Registration.AutoConnect' => true,
@@ -781,7 +781,7 @@ class SiteNodePlugin extends Gdn_Plugin {
         if (val(self::HUB_COOKIE, $_COOKIE)) {
             Logger::event('session_end_node', Logger::INFO, 'Hub session ending from node.');
 
-            Gdn_CookieIdentity::DeleteCookie(SiteNodePlugin::HUB_COOKIE, '/');
+            Gdn_CookieIdentity::deleteCookie(SiteNodePlugin::HUB_COOKIE, '/');
         }
     }
 
@@ -812,30 +812,30 @@ class SiteNodePlugin extends Gdn_Plugin {
      * @param string $roleID
      */
     public function roleController_overrideHub_create($sender, $roleID) {
-        $sender->Permission('Garden.Settings.Manage');
+        $sender->permission('Garden.Settings.Manage');
 
         $role = $sender->RoleModel->getByRoleID($roleID);
         if (!$role) {
-            throw NotFoundException('Role');
+            throw notFoundException('Role');
         }
 
         /* @var Gdn_Form $form */
         $form = $sender->Form;
 
-        if ($sender->Request->IsAuthenticatedPostBack()) {
-            $overrideHub = (bool)$form->GetFormValue('OverrideHub');
-            $sender->RoleModel->SetField($roleID, 'OverrideHub', (int)$overrideHub);
+        if ($sender->Request->isAuthenticatedPostBack()) {
+            $overrideHub = (bool)$form->getFormValue('OverrideHub');
+            $sender->RoleModel->setField($roleID, 'OverrideHub', (int)$overrideHub);
 
-            $sender->SetData([
+            $sender->setData([
                 'RoleID' => $roleID,
                 'OverrideHub' => $overrideHub
             ]);
             $sender->setRedirectTo('/role');
         } else {
-            $form->SetData($role);
+            $form->setData($role);
         }
 
-        $sender->Render('hubrole', 'Role', 'plugins/sitenode');
+        $sender->render('hubrole', 'Role', 'plugins/sitenode');
     }
 
     /**
@@ -845,7 +845,7 @@ class SiteNodePlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function roleController_beforeRolePermissions_handler($sender, $args) {
-        if ($sender->Form->GetValue('HubID')) {
+        if ($sender->Form->getValue('HubID')) {
             $sender->Data['_ExtendedFields']['OverrideHub'] = [
                 'Control' => 'Checkbox',
                 'LabelCode' => 'This role can can override settings synchronized with the hub.'
@@ -887,26 +887,26 @@ class SiteNodePlugin extends Gdn_Plugin {
      * @throws Gdn_UserException Throws an exception when any method but post is shown.
      */
     public function utilityController_syncNode_create($sender) {
-        $sender->Permission('Garden.Settings.Manage');
+        $sender->permission('Garden.Settings.Manage');
 
-        if (Gdn::Request()->RequestMethod() !== 'POST') {
+        if (Gdn::request()->requestMethod() !== 'POST') {
             throw new Gdn_UserException("This resource only accepts POST.", 405);
         }
 
         $this->syncNode();
-        $sender->Render('blank');
+        $sender->render('blank');
     }
 
     public function utilityController_syncNodeInfo_create($sender) {
-        $sender->Permission('Garden.Settings.Manage');
+        $sender->permission('Garden.Settings.Manage');
 
-        $info = Gdn::UserMetaModel()->GetUserMeta(0, 'siteNode.dateLastSync', []);
+        $info = Gdn::userMetaModel()->getUserMeta(0, 'siteNode.dateLastSync', []);
         $date = array_pop($info);
 
-        $sender->SetData('Ready', (bool)$date);
-        $sender->SetData('DateLastSync', $date);
+        $sender->setData('Ready', (bool)$date);
+        $sender->setData('DateLastSync', $date);
 
-        $sender->Render('blank');
+        $sender->render('blank');
     }
 
     public function cleanspeak_init_handler($sender) {

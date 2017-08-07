@@ -381,7 +381,7 @@ class MultisiteModel extends Gdn_Model {
         return $result;
     }
 
-    public function Update($fields, $where = FALSE, $limit = FALSE) {
+    public function update($fields, $where = FALSE, $limit = FALSE) {
         // Clean out the fields that are in the schema, but not allowed to be updated.
         unset(
 //            $fields['Name'],
@@ -691,7 +691,7 @@ class MultisiteModel extends Gdn_Model {
         $baseUrl = $this->siteUrl($node, true);
         $urlParts = parse_url($baseUrl);
 
-        if ($urlParts['host'] === 'localhost' || StringEndsWith($urlParts['host'], '.lc')) {
+        if ($urlParts['host'] === 'localhost' || stringEndsWith($urlParts['host'], '.lc')) {
             $headers['Host'] = $urlParts['host'];
             $urlParts['host'] = '127.0.0.1';
         }
@@ -726,7 +726,7 @@ class MultisiteModel extends Gdn_Model {
     /**
      * Saves a site attribute to the database.
      *
-     * This is a convenience method that uses $this->SaveToSerializedColumn().
+     * This is a convenience method that uses $this->saveToSerializedColumn().
      *
      * @param int $siteID The site ID to save.
      * @param string|array $attribute The name of the attribute being saved, or an associative array of name => value pairs to be saved.
@@ -892,7 +892,7 @@ class MultisiteModel extends Gdn_Model {
                 $query = Communication::data('/forum/callback')
                     ->method('post')
                     ->parameter('method', 'POST')
-                    ->parameter('secure', (bool)C('Garden.ForceSSL'))
+                    ->parameter('secure', (bool)c('Garden.ForceSSL'))
                     ->parameter('path', $url)
                     ->parameter('match', $match)
                     ->parameter('headers', [

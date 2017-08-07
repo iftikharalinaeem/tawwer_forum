@@ -1,10 +1,10 @@
-<h1><?php echo $this->Data('Title'); ?></h1>
+<h1><?php echo $this->data('Title'); ?></h1>
 <?php
-echo $this->Form->Open(['action' => Url('/multisites')]), $this->Form->Errors();
+echo $this->Form->open(['action' => url('/multisites')]), $this->Form->errors();
 ?>
 <ul>
     <?php
-    echo $this->Form->Simple([
+    echo $this->Form->simple([
         'Name' => ['Description' => 'Enter a friendly name for the site.'],
         'Slug' => [],
     ]);
@@ -12,4 +12,4 @@ echo $this->Form->Open(['action' => Url('/multisites')]), $this->Form->Errors();
 </ul>
 
 <?php
-echo $this->Form->Close('Save');
+echo $this->Form->close('Save');

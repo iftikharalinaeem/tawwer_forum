@@ -122,12 +122,12 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
 //        // Set the default routes.
 //        if ($site['CategoryID']) {
-//            $category = CategoryModel::Categories($site['CategoryID']);
-//            Gdn::Router()->SetRoute('categories$', ltrim(CategoryUrl($category, '', '/'), '/'), 'Internal', false);
+//            $category = CategoryModel::categories($site['CategoryID']);
+//            Gdn::router()->setRoute('categories$', ltrim(categoryUrl($category, '', '/'), '/'), 'Internal', false);
 //
-//            $defaultRoute = Gdn::Router()->GetRoute('DefaultController');
+//            $defaultRoute = Gdn::router()->getRoute('DefaultController');
 //            if ($defaultRoute['Destination'] === 'categories') {
-//                Gdn::Router()->SetRoute('DefaultController', ltrim(CategoryUrl($category, '', '/'), '/'), 'Temporary', false);
+//                Gdn::router()->setRoute('DefaultController', ltrim(categoryUrl($category, '', '/'), '/'), 'Temporary', false);
 //            }
 //        }
 
@@ -160,7 +160,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param AnalyticsTracker $sender
      * @param array $args
      */
-    public function analyticsTracker_GetDefaultData_handler($sender, $args) {
+    public function analyticsTracker_getDefaultData_handler($sender, $args) {
         $subcommunity = SubcommunityModel::getCurrent();
 
         if (!is_array($subcommunity)) {
@@ -415,7 +415,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param DiscussionsController $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function QnAPlugin_unansweredBeforeSetCategories_handler($sender, $args) {
+    public function qnAPlugin_unansweredBeforeSetCategories_handler($sender, $args) {
         if (!SubCommunityModel::getCurrent()) {
             return;
         }
@@ -561,7 +561,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param QnAPlugin $sender Sending controller instance.
      * @param array $args Event arguments.
      */
-    public function QnAPlugin_unansweredCount_handler($sender, $args) {
+    public function qnAPlugin_unansweredCount_handler($sender, $args) {
         if (!SubCommunityModel::getCurrent()) {
             return;
         }

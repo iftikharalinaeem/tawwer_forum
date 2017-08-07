@@ -12,7 +12,7 @@
 
 <div id="multisites-wrap">
 <?php
-require $this->FetchViewLocation('table');
+require $this->fetchViewLocation('table');
 ?>
 </div>
 
@@ -21,6 +21,6 @@ require $this->FetchViewLocation('table');
         <div class="label"><?php echo t('The sites are synchronized with the hub roughly every 10 minutes.'); ?></div>
     </div>
     <div class="input-wrap-right">
-        <?php echo anchor(T('Sync Now'), '/multisites/syncnode.json', 'btn btn-primary Hijack'); ?>
+        <?php echo anchor(t('Sync Now'), '/multisites/syncnode.json', 'btn btn-primary Hijack'); ?>
     </div>
 </div>
