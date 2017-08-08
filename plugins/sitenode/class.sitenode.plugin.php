@@ -665,14 +665,20 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         $this->checkSSO();
 
-//        if (!val(self::HUB_COOKIE, $_COOKIE)) {
-//            Logger::event('hubsso_skip', Logger::DEBUG, "Hub cookie not present. Skipping Hub SSO.");
-//        }
-
-        if (!Gdn::session()->isValid() && val(self::HUB_COOKIE, $_COOKIE)) {
+        if (!Gdn::session()->isValid() && $hubCookie = val(self::HUB_COOKIE, $_COOKIE)) {
             // Check the cookie expiry here.
-            $hubCookie = explode('|', val(self::HUB_COOKIE, $_COOKIE));
-            $expiry = val(4, $hubCookie);
+            $expiry = 0;
+            $hubJWT = explode('.', $hubCookie);
+            if (count($hubJWT) === 3 && isset($hubJWT[1])) {
+                $hubJWTPayload = base64_decode($hubJWT[1]);
+                if (is_string($hubJWTPayload)) {
+                    $hubJWTPayload = json_decode($hubJWTPayload, true);
+                    if (is_array($hubJWTPayload) && array_key_exists('exp', $hubJWTPayload)) {
+                        $expiry = $hubJWTPayload['exp'];
+                    }
+                }
+            }
+
             if ($expiry < time()) {
                 Logger::event(
                     'hubsso_expired',
