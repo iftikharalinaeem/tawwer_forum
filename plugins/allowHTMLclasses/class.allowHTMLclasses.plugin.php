@@ -66,10 +66,8 @@ class AllowHTMLClassesPlugin extends Gdn_Plugin {
             $trustedHTMLClasses = self::filterClassList($trustedHTMLClasses);
             $form->setFormValue('Garden.TrustedHTMLClasses', $trustedHTMLClasses);
 
-            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validateClassBeginsWith', sprintf(t('Classes cannot begin with "%s".'), implode(',', self::$restrictedPrefixes)));
-            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validateClassEndsWith', sprintf(t('Classes cannot end with "%s".'), implode(',', self::$restrictedSuffixes)));
-            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validateClassContains', sprintf(t('Classes cannot contain "%s".'), implode(',', self::$restrictedStrings)));
-            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validateClassNameIs', sprintf(t('Classes cannot be any of the following: "%s".'), implode(',', self::$restrictedNames)));
+            $form->validateRule('Garden.TrustedHTMLClasses', 'function:validateHtmlClassName');
+
             // Save new settings
             $saved = $form->save();
             if ($saved !== false) {
@@ -98,11 +96,14 @@ class AllowHTMLClassesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add trusted HTML classes from the config to VanillaHtmlFormatter.
+     *
      * @param Container $container
      */
     public function container_init_handler($container) {
         if (c('Garden.AllowTrustedClasses')) {
             $trustedHTMLClasses = explode("\n", c('Garden.TrustedHTMLClasses'));
+            // Get an instance of VanillaHtmlFormatter and add extra allowed classes.
             $container->get(VanillaHtmlFormatter::class)->addExtraAllowedClasses($trustedHTMLClasses);
         }
     }
@@ -110,97 +111,43 @@ class AllowHTMLClassesPlugin extends Gdn_Plugin {
 
 //------------------- Validation Functions ---------------------------------//
 
-if (!function_exists('validateClassBeginsWith')) {
-
+if (!function_exists('validateHtmlClassName')) {
     /**
-     * Optionally do not allow any HTML classes that have a particular prefix.
+     * In dashboard, validate the class names the admin is trying to whitelist.
+     * We can config certain prefixes, suffixes, string or names so that they cannot be whitelisted.
      *
-     * @param string $data The list of HTML classes to be allowed.
-     * @return bool
+     * @param $data The class names submitted in the form.
+     * @return bool|string
      */
-    function validateClassBeginsWith($data) {
+    function validateHtmlClassName($data) {
         $trustedHTMLClasses = AllowHTMLClassesPlugin::filterClassList($data);
         $trustedHTMLClasses = array_filter(explode("\n", $trustedHTMLClasses));
         $restrictedPrefix = AllowHTMLClassesPlugin::$restrictedPrefixes;
+        $restrictedSuffixes = AllowHTMLClassesPlugin::$restrictedSuffixes;
+        $restrictedString = AllowHTMLClassesPlugin::$restrictedStrings;
+        $restrictedNames = AllowHTMLClassesPlugin::$restrictedNames;
         if (!$trustedHTMLClasses && !$restrictedPrefix) {
             return true;
         }
         foreach ($trustedHTMLClasses as $HTMLClass) {
             foreach ($restrictedPrefix as $prefix) {
                 if (stringBeginsWith($HTMLClass, trim($prefix), true)) {
-                    return false;
+                    return sprintf(t('Classes cannot begin with "%s".'), $prefix);
                 }
             }
-        }
-        return true;
-    }
-}
-
-if (!function_exists('validateClassEndsWith')) {
-
-    /**
-     * Optionally do not allow any HTML classes that have a particular ending.
-     *
-     * @param string $data The list of HTML classes to be allowed.
-     * @return bool
-     */
-    function validateClassEndsWith($data) {
-        $trustedHTMLClasses = AllowHTMLClassesPlugin::filterClassList($data);
-        $trustedHTMLClasses = array_filter(explode("\n", $trustedHTMLClasses));
-        $restrictedSuffixes = AllowHTMLClassesPlugin::$restrictedSuffixes;
-        if (!$trustedHTMLClasses && !$restrictedSuffixes) {
-            return true;
-        }
-        foreach ($trustedHTMLClasses as $HTMLClass) {
             foreach ($restrictedSuffixes as $suffix) {
                 if (stringEndsWith($HTMLClass, trim($suffix), true)) {
-                    return false;
+                    return sprintf(t('Classes cannot end with "%s".'), $suffix);
                 }
             }
-        }
-        return true;
-    }
-}
-
-if (!function_exists('validateClassContains')) {
-
-    /**
-     * Optionally do not allow any HTML classes contain a particular string.
-     *
-     * @param string $data The list of HTML classes to be allowed.
-     * @return bool
-     */
-    function validateClassContains($data) {
-        $trustedHTMLClasses = AllowHTMLClassesPlugin::filterClassList($data);
-        $trustedHTMLClasses = explode("\n", $trustedHTMLClasses);
-        $restrictedString = AllowHTMLClassesPlugin::$restrictedStrings;
-        foreach ($trustedHTMLClasses as $HTMLClass) {
             foreach ($restrictedString as $string) {
                 if (strripos($HTMLClass, trim($string)) !== false) {
-                    return false;
+                    return sprintf(t('Classes cannot contain "%s".'), $string);
                 }
             }
-        }
-        return true;
-    }
-}
-
-if (!function_exists('validateClassNameIs')) {
-
-    /**
-     * Optionally do not allow particular class names.
-     *
-     * @param string $data The list of HTML classes to be allowed.
-     * @return bool
-     */
-    function validateClassNameIs($data) {
-        $trustedHTMLClasses = AllowHTMLClassesPlugin::filterClassList($data);
-        $trustedHTMLClasses = explode("\n", $trustedHTMLClasses);
-        $restrictedNames = AllowHTMLClassesPlugin::$restrictedNames;
-        foreach ($trustedHTMLClasses as $HTMLClass) {
             foreach ($restrictedNames as $name) {
                 if (strcasecmp($HTMLClass, trim($name)) === 0) {
-                    return false;
+                    return sprintf(t('Class name cannot be "%s".'), $name);
                 }
             }
         }
