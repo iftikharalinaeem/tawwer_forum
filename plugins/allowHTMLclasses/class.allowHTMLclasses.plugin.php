@@ -75,10 +75,10 @@ class AllowHTMLClassesPlugin extends Gdn_Plugin {
             }
         }
 
-        $sender->addJsFile('settings.js', 'plugins/allowhtmlclasses');
-        $sender->setHighlightRoute('vanilla/settings/allowhtmlclasses');
+        $sender->addJsFile('settings.js', 'plugins/allowHTMLclasses');
+        $sender->setHighlightRoute('vanilla/settings/allowHTMLclasses');
         $sender->title(t('Trusted HTML Classes'));
-        $sender->render('settings', '', 'plugins/allowhtmlclasses');
+        $sender->render('settings', '', 'plugins/allowHTMLclasses');
     }
 
 
