@@ -9,7 +9,7 @@ use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ServerException;
 
 /**
- * API Controller for the `/discussions` resource.
+ * API Controller for `/analytics` endpoints.
  */
 class AnalyticsApiController extends AbstractApiController {
 
@@ -82,6 +82,72 @@ class AnalyticsApiController extends AbstractApiController {
     }
 
     /**
+     * Get data for a leaderboard.
+     *
+     * @param array $query
+     * @return array
+     */
+    public function get_leaderboard(array $query) {
+        $this->permission('Garden.Settings.Manage');
+
+        $boards = $this->widgetsByType('leaderboard');
+
+        $in = $this->schema([
+            'board:s' => [
+                'description' => 'The user leaderboard to query.',
+                'enum' => array_keys($boards)
+            ],
+            'limit:i' => [
+                'description' => 'The number of rows to return.',
+                'default' => 1,
+                'minimum' => 1,
+                'maximum' => AnalyticsLeaderboard::MAX_SIZE
+            ],
+            'start:dt' => 'Start of the time frame.',
+            'end:dt' => 'End of the time frame.',
+        ], 'in');
+        $out = $this->schema([
+            ':a' => $this->schema([
+                'id:i' => 'ID of the record.',
+                'position:i' => 'Current leaderboard position.',
+                'positionChange:s' => [
+                    'description' => 'Progression status of the record.',
+                    'enum' => ['Fall', 'New', 'Rise', 'Same']
+                ],
+                'previous:i|s' => 'Previous position of the record',
+                'url:s' => 'Full URL to the record.',
+                'title:s|n' => 'Title for the row.',
+                'count:i' => 'Associated total for this row.'
+            ], 'Leaderboard')
+        ], 'out');
+
+        $query = $in->validate($query);
+
+        // Poll the analytics tracker for leaderboard data.
+        /** @var AnalyticsWidget $config */
+        $config = $boards[$query['board']]->getData();
+        $leaderboard = new AnalyticsLeaderboard();
+        $leaderboard->setSize($query['size']);
+        $leaderboardQuery = $config['query'];
+        $leaderboard->setQuery($leaderboardQuery);
+        $leaderboard->setPreviousQuery(clone $leaderboardQuery);
+        $rows = $leaderboard->lookupData(
+            strtotime($query['start']),
+            strtotime($query['end'])
+        );
+
+        // Prepare the data for output.
+        $result = [];
+        foreach ($rows as &$row) {
+            $this->prepareLeaderboardRow($row['LeaderRecord']);
+            $result[] = $row['LeaderRecord'];
+        }
+        $result = $out->validate($result);
+
+        return $result;
+    }
+
+    /**
      * Query tracked events from a collection.
      *
      * @param array $query The request query.
@@ -112,9 +178,9 @@ class AnalyticsApiController extends AbstractApiController {
             ->setDescription('Query tracked events.')
             ->addValidator('filters', [$this, 'validateFilters']);
 
-        $query = $in->validate($query);
         $out = $this->queryResponseSchema($query);
 
+        $query = $in->validate($query);
         $events = $this->execQuery($query);
 
         $result = $out->validate($events);
@@ -122,35 +188,14 @@ class AnalyticsApiController extends AbstractApiController {
     }
 
     /**
-     * Ensure filters array is ready for consumption by the analytics service API.
+     * Prepare a record to be displayed on the leaderboard.
      *
-     * @param array $filters An array of filters to prepare for use.
-     * @return array
+     * @param array $row A record to be displayed on a leaderboard.
      */
-    protected function translateFilters(array $filters = []) {
-        foreach ($filters as &$filter) {
-            // Translate array keys to ensure valid parameters for the service's API.
-            foreach ($filter as $key => $val) {
-                $newKey = null;
-                switch ($key) {
-                    case 'prop':
-                        $newKey = 'property_name';
-                        break;
-                    case 'op':
-                        $newKey = 'operator';
-                        break;
-                    case 'val':
-                        $newKey = 'property_value';
-                        break;
-                }
-
-                if ($newKey) {
-                    $filter[$newKey] = $filter[$key];
-                    unset($filter[$key]);
-                }
-            }
+    public function prepareLeaderboardRow(array &$row) {
+        if (array_key_exists('Url', $row)) {
+            $row['Url'] = url($row['Url'], true);
         }
-        return $filters;
     }
 
     /**
@@ -201,6 +246,38 @@ class AnalyticsApiController extends AbstractApiController {
     }
 
     /**
+     * Ensure filters array is ready for consumption by the analytics service API.
+     *
+     * @param array $filters An array of filters to prepare for use.
+     * @return array
+     */
+    protected function translateFilters(array $filters = []) {
+        foreach ($filters as &$filter) {
+            // Translate array keys to ensure valid parameters for the service's API.
+            foreach ($filter as $key => $val) {
+                $newKey = null;
+                switch ($key) {
+                    case 'prop':
+                        $newKey = 'property_name';
+                        break;
+                    case 'op':
+                        $newKey = 'operator';
+                        break;
+                    case 'val':
+                        $newKey = 'property_value';
+                        break;
+                }
+
+                if ($newKey) {
+                    $filter[$newKey] = $filter[$key];
+                    unset($filter[$key]);
+                }
+            }
+        }
+        return $filters;
+    }
+
+    /**
      * Validate the filter parameter of an incoming request.
      *
      * @param string|array $value The value to test.
@@ -225,6 +302,31 @@ class AnalyticsApiController extends AbstractApiController {
 
         // If validation fails, an exception is thrown that will bubble up.
         $result = $in->validate($value);
+        return $result;
+    }
+
+    /**
+     * Get widgets of a certain type from the configured tracker.
+     *
+     * @param string $type The type of widgets to retrieve.
+     * @param bool $idOnly Only return widget IDs?
+     * @return array
+     */
+    protected function widgetsByType($type, $idOnly = false) {
+        $result = [];
+
+        $widgets = AnalyticsTracker::getInstance()->getDefaultWidgets();
+        foreach ($widgets as $id => $config) {
+            /** @var AnalyticsWidget $config */
+            if ($config->getType() === $type) {
+                $result[$id] = $config;
+            }
+        }
+
+        if (count($result) > 0 && $idOnly) {
+            $result = array_keys($result);
+        }
+
         return $result;
     }
 }
