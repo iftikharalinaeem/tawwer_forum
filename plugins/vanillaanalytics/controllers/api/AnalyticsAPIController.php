@@ -284,7 +284,7 @@ class AnalyticsApiController extends AbstractApiController {
      * @param ValidationField $field The validation field object, passed down by the schema class.
      * @return array A validated value
      */
-    public function validateFilters(&$value, ValidationField $field) {
+    public function validateFilters($value, ValidationField $field) {
         if (is_string($value)) {
             $value = json_decode($value, true);
         }
