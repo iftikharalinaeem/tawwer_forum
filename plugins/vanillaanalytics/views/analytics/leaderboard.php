@@ -41,7 +41,7 @@ foreach ($this->data('Leaderboard') as $currentRow) {
             'record' => $recordBlock,
             'count' => $leaderRecord['Count'],
             'position' => $leaderRecord['Position'],
-            'position-previous' => $leaderRecord['Previous'],
+            'position-previous' => $leaderRecord['Previous'] ?: '-',
             'position-change' => $leaderRecord['PositionChange'].' '.$icon,
         ],
         '',
@@ -50,4 +50,3 @@ foreach ($this->data('Leaderboard') as $currentRow) {
 }
 
 echo $leaderboard;
-
