@@ -197,7 +197,7 @@ class AnalyticsLeaderboard {
                     'ID' => $recordID,
                     'Position' => $position,
                     'PositionChange' => $positionChange,
-                    'Previous' => $previousPosition !== false ? $previousPosition : '-',
+                    'Previous' => $previousPosition ? intval($previousPosition) : null,
                     'Url' => sprintf($recordUrl, $recordID),
                     'Title' => $record[$titleAttribute],
                     'Count' => $count
