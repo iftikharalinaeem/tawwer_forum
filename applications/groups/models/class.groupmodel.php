@@ -778,6 +778,8 @@ class GroupModel extends Gdn_Model {
             $discussions = Gdn_DataSet::index($discussions, ['DiscussionID']);
         }
 
+        $comments = [];
+
         if (count($commentIDs) > 0) {
             $comments = $sql->whereIn('CommentID', $commentIDs)->get('Comment')->resultArray();
             $comments = Gdn_DataSet::index($comments, ['CommentID']);
