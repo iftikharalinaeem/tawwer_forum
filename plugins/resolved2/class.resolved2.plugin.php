@@ -127,7 +127,7 @@ class Resolved2Plugin extends Gdn_Plugin {
     private function resolvedMarkup($discussion) {
         $name = val('Resolved', $discussion) ? 'resolved' : 'unresolved';
 
-        $markup = '<span class="MItem MItem-Resolved">';
+        $markup = '<span title="' . t(ucfirst($name)) . '" class="MItem MItem-Resolved">';
         $markup .= file_get_contents(PATH_PLUGINS."/resolved2/design/svgs/{$name}.svg");
         $markup .= '</span>';
 
