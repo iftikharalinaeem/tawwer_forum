@@ -185,6 +185,37 @@ class Resolved2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * Set resolved metric on discussions.
+     *
+     * @param AnalyticsTracker $sender Event's source.
+     * @param array $args Event's arguments.
+     */
+    public function analyticsTracker_beforeTrackEvent_handler($sender, $args) {
+        if (!in_array($args['Collection'], ['post', 'post_modify'])) {
+            return;
+        }
+
+        if (in_array($args['Event'], ['discussion_add', 'discussion_edit'])) {
+            $discussion = $this->discussionModel->getID($args['Data']['discussionID'], DATASET_TYPE_ARRAY);
+
+            if (!empty($discussion['CountResolved']) || in_array($discussion['CountResolved'], [0, '0'], true)) {
+                $countResolved = $discussion['CountResolved'];
+            } else {
+                $countResolved = null;
+            }
+
+            $resolvedMetric = [
+                'resolved' => $discussion['Resolved'],
+                'countResolved' => $countResolved,
+                'dateResolved' => $discussion['DateResolved'] ? AnalyticsData::getDateTime($discussion['DateResolved']) : null,
+                'resolvedUser' => $discussion['ResolvedUserID'] ? AnalyticsData::getUser($discussion['ResolvedUserID']) : null,
+            ];
+
+            $args['Data']['resolvedMetric'] = $resolvedMetric;
+        }
+    }
+
+    /**
      * Add 'Unresolved' discussions filter to menu.
      */
     public function base_afterDiscussionFilters_handler() {
