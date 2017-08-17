@@ -119,6 +119,22 @@ class Resolved2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * Get resolved/unresolved markup.
+     *
+     * @param array|object $discussion
+     * @return string
+     */
+    private function resolvedMarkup($discussion) {
+        $name = val('Resolved', $discussion) ? 'resolved' : 'unresolved';
+
+        $markup = '<span class="MItem MItem-resolved">';
+        $markup .= file_get_contents(PATH_PLUGINS."/resolved2/design/svgs/{$name}.svg");
+        $markup .= '</span>';
+
+        return $markup;
+    }
+
+    /**
      * Update the UI.
      *
      * @param $discussion
@@ -223,6 +239,25 @@ class Resolved2Plugin extends Gdn_Plugin {
             $unresolved = t('Unresolved').filterCountString($this->getUnresolvedDiscussionCount());
             echo '<li class="Unresolved">'.anchor(sprite('SpUnresolved').' '.$unresolved, '/discussions/unresolved').'</li>';
         }
+    }
+
+    /**
+     * Add additional stylesheet globally.
+     *
+     * @param AssetModel $sender Event's source.
+     */
+    public function assetModel_styleCss_handler($sender) {
+        $sender->addCssFile('resolved2.css', 'plugins/resolved2');
+    }
+
+    /**
+     * Add resolved/unresolved icon
+     *
+     * @param Gdn_Controller $sender Event's source.
+     * @param array $args Event's arguments.
+     */
+    public function base_beforeDiscussionMeta_handler($sender, $args) {
+        echo $this->resolvedMarkup($args['Discussion']);
     }
 
     /**
@@ -384,48 +419,6 @@ class Resolved2Plugin extends Gdn_Plugin {
             $args['FormPostValues']['CountResolved'] = 0;
             $args['FormPostValues'] = $this->setResolved($args['FormPostValues'], $resolved, false);
         }
-    }
-
-
-
-
-
-    /**
-     * Get resolved/unresolved markup
-     *
-     * @param $resolved
-     */
-    public function resolvedMarkup($resolved) {
-        $markup = "<span class='MItem MItem-resolved'>";
-        if($resolved) {
-            $markup .= file_get_contents(getcwd() . "/plugins/resolved2/design/svgs/resolved.svg");
-        } else {
-            $markup .= file_get_contents(getcwd() . "/plugins/resolved2/design/svgs/unresolved.svg");
-        }
-        $markup .= "</span>";
-
-        return $markup;
-    }
-
-    /**
-     * Add resolved/unresolved icon
-     *
-     * @param $sender
-     * @param $args
-     */
-    public function base_beforeDiscussionMeta_handler($sender, $args) {
-        $discussion = $args['Discussion'];
-        $resolved = val('Resolved', $discussion);
-        echo $this->resolvedMarkup($resolved);
-    }
-
-    /**
-     * Add additional stylesheet globally.
-     *
-     * @param AssetModel $Sender
-     */
-    public function assetModel_styleCss_handler($sender) {
-        $sender->addCssFile('resolved2.css', 'plugins/resolved2');
     }
 
 
