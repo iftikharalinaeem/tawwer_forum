@@ -62,7 +62,7 @@ class Resolved2Plugin extends Gdn_Plugin {
             ->column('Resolved', 'tinyint', '0')
             // Track the number of time a discussion was resolved.
             // If CountResolved is null it means that the discussion was created while the plugin
-            // was not active and the resolution won't count in analytics.
+            // was not active and the resolution count won't be tracked.
             ->column('CountResolved', 'int', null)
             ->column('DateResolved', 'datetime', true)
             ->column('ResolvedUserID', 'int', true)
@@ -75,15 +75,42 @@ class Resolved2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * Generate the option for the option menu.
+     *
+     * @param $discussion
+     * @param $format Either string or array.
+     * @return string|array Generated option.
+     */
+    private function generateOptionMenuItem($discussion, $format) {
+        $resolved = val('Resolved', $discussion);
+        $discussionID = val('DiscussionID', $discussion);
+        $toggledResolved = $resolved ? 0 : 1;
+
+        $label = t($toggledResolved ? 'Resolve' : 'Unresolve');
+        $url = "/discussion/resolve?discussionID={$discussionID}&resolve={$toggledResolved}";
+
+        if ($format === 'string') {
+            $option = anchor($label, $url, 'ResolveDiscussion Hijack');
+        } else {
+            $option = [
+                'Label' => $label,
+                'Url' => $url,
+                'Class' => 'ResolveDiscussion Hijack'
+            ];
+        }
+
+        return $option;
+    }
+
+    /**
      * Get the discussion name for the resolved state.
      * Prepend [RESOLVED] to the discussion's name if resolved.
      *
      * @param array|object $discussion The discussion.
-     * @param bool $resolved The resolved state.
      * @return string
      */
-    private function getNewDiscussionName($discussion, $resolved) {
-        if ($resolved) {
+    private function getUpdatedDiscussionName($discussion) {
+        if (val('Resolved', $discussion)) {
             $newName = '<span class="DiscussionResolved">'.t('[RESOLVED]').'</span> '.val('Name', $discussion);
         } else {
             $newName = val('Name', $discussion, '');
@@ -92,14 +119,26 @@ class Resolved2Plugin extends Gdn_Plugin {
     }
 
     /**
-     * Return the number of unresolved discussions.
+     * Update the UI.
      *
-     * @return int
+     * @param $discussion
      */
-    private function getUnresolvedDiscussionCount() {
-        return $this->discussionModel->getCount([
-            'Resolved' => 0,
-        ]);
+    private function setJSONTarget($discussion) {
+        // Discussion list
+        // TODO: Update the discussion's markup
+
+        // Update the discussion title.
+        $this->controller->jsonTarget('.Discussion #Item_0 h1', $this->getUpdatedDiscussionName($discussion));
+
+        // Highlight the discussion title.
+        $this->controller->jsonTarget('.Discussion #Item_0', null, 'Highlight');
+
+        // Update the option menu
+        $this->controller->jsonTarget(
+            '.Discussion #Item_0 .OptionsMenu .ResolveDiscussion',
+            $this->generateOptionMenuItem($discussion, 'string'),
+            'ReplaceWith'
+        );
     }
 
     /**
@@ -111,27 +150,38 @@ class Resolved2Plugin extends Gdn_Plugin {
      * @return array The resolved discussion.
      */
     private function setResolved($discussion, $resolved, $saveDiscussion) {
-        $currentCountResolved = val('CountResolved', $discussion, 0);
-
-        if ($currentCountResolved === null) {
-            $currentCountResolved = 0;
-        }
-
-        $resolvedIncrement = $resolved ? 1 : 0;
-        $countResolved = $currentCountResolved + $resolvedIncrement;
-
         $resolutionFields = [
             'Resolved' => $resolved,
-            'CountResolved' => $countResolved,
             'DateResolved' => $resolved ? Gdn_Format::toDateTime() : null,
             'ResolvedUserID' => $resolved ? Gdn::session()->UserID : null
         ];
 
-        if ($saveDiscussion) {
-            $this->discussionModel->setField($discussion['DiscussionID'], $resolutionFields);
+        // Only set CountResolved if the field is not empty.
+        $currentCountResolved = val('CountResolved', $discussion, null);
+        if (!empty($currentCountResolved) || in_array($currentCountResolved, [0, '0'], true)) {
+            $resolvedIncrement = $resolved ? 1 : 0;
+            $countResolved = $currentCountResolved + $resolvedIncrement;
+            $resolutionFields['CountResolved'] = $countResolved;
         }
 
-        return array_merge($discussion, $resolutionFields);
+        $discussion = array_merge($discussion, $resolutionFields);
+
+        if ($saveDiscussion) {
+            $this->discussionModel->save($discussion);
+        }
+
+        return $discussion;
+    }
+
+    /**
+     * Return the number of unresolved discussions.
+     *
+     * @return int
+     */
+    private function getUnresolvedDiscussionCount() {
+        return $this->discussionModel->getCount([
+            'Resolved' => 0,
+        ]);
     }
 
     /**
@@ -156,24 +206,14 @@ class Resolved2Plugin extends Gdn_Plugin {
         }
 
         $discussion = $args['Discussion'];
-        $resolved = val('Resolved', $discussion);
-        $discussionID = val('DiscussionID', $discussion);
-        $toggledResolved = $resolved ? 0 : 1;
-
-        $label = t($toggledResolved ? 'Resolve' : 'Unresolve');
-        $url = "/discussion/resolve?discussionID={$discussionID}&resolve={$toggledResolved}";
 
         // Deal with inconsistencies in how options are passed
         $options = val('Options', $this->controller);
         if ($options) {
-            $options .= wrap(anchor($label, $url, 'ResolveDiscussion Hijack'), 'li');
+            $options .= wrap($this->generateOptionMenuItem($discussion, 'string'), 'li', ['role' => 'presentation', 'class' => 'no-icon']);
             setValue('Options', $this->controller, $options);
         } else {
-            $args['DiscussionOptions']['ResolveDiscussion'] = [
-                'Label' => $label,
-                'Url' => $url,
-                'Class' => 'ResolveDiscussion Hijack'
-            ];
+            $args['DiscussionOptions']['ResolveDiscussion'] = $this->generateOptionMenuItem($discussion, 'array');
         }
     }
 
@@ -189,10 +229,9 @@ class Resolved2Plugin extends Gdn_Plugin {
 
         if ($discussion['Resolved'] XOR checkPermission('Garden.Staff.Allow')) {
             $resolved = checkPermission('Garden.Staff.Allow');
-            $this->setResolved($discussion, $resolved, true);
-            $this->controller->jsonTarget(".Discussion #Item_0 h1", $this->getNewDiscussionName($discussion, $resolved));
+            $discussion = $this->setResolved($discussion, $resolved, true);
+            $this->setJSONTarget($discussion);
         }
-
     }
 
     /**
@@ -202,7 +241,7 @@ class Resolved2Plugin extends Gdn_Plugin {
         $discussion = $this->controller->data('Discussion');
 
         if (checkPermission('Garden.Staff.Allow') && val('Resolved', $discussion)) {
-            $newName = $this->getNewDiscussionName($discussion, true);
+            $newName = $this->getUpdatedDiscussionName($discussion);
             setValue('Name', $discussion, $newName);
             $this->controller->setData('Discussion', $discussion);
         }
@@ -217,7 +256,7 @@ class Resolved2Plugin extends Gdn_Plugin {
         $this->controller->permission('Garden.Staff.Allow');
 
         $discussionID = $this->request->get('discussionID');
-        $resolved = $this->request->get('resolve');
+        $resolved = $this->request->get('resolve') ? 1 : 0;
 
         // Make sure we are posting back.
         if (!$this->request->isAuthenticatedPostBack(true)) {
@@ -234,12 +273,7 @@ class Resolved2Plugin extends Gdn_Plugin {
         $discussion = $this->setResolved($discussion, $resolved, true);
 
         $this->controller->sendOptions((object)$discussion);
-
-        $this->controller->jsonTarget(".Section-DiscussionList #Discussion_{$discussionID}", 'Unresolved', $resolved ? 'AddClass' : 'RemoveClass');
-        $this->controller->jsonTarget("#Discussion_{$discussionID}", null, 'Highlight');
-        $this->controller->jsonTarget('.Discussion #Item_0', null, 'Highlight');
-        $this->controller->jsonTarget('.Discussion #Item_0 h1', $this->getNewDiscussionName($discussion, $resolved));
-
+        $this->setJSONTarget($discussion);
         $this->controller->render('blank', 'utility', 'dashboard');
     }
 
@@ -307,11 +341,18 @@ class Resolved2Plugin extends Gdn_Plugin {
     }
 
     /**
-     * @param $sender
-     * @param $args
+     * Initialize CountResolved and add resolved fields if needed.
+     *
+     * @param DiscussionModel $sender Sending model instance.
+     * @param array $args Event's arguments.
      */
     public function discussionModel_beforeSaveDiscussion_handler($sender, $args) {
-        $resolved = checkPermission('Garden.Staff.Allow');
-        $args['FormPostValues'] = $this->setResolved($args['FormPostValues'], $resolved, false);
+        // Make sure that we don't screw with the discussionModel->save from setResolved.
+        if ($args['Insert']) {
+            $resolved = checkPermission('Garden.Staff.Allow');
+            $args['FormPostValues']['CountResolved'] = 0;
+            $args['FormPostValues'] = $this->setResolved($args['FormPostValues'], $resolved, false);
+        }
     }
+
 }
