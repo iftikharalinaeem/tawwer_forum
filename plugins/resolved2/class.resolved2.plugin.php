@@ -140,8 +140,12 @@ class Resolved2Plugin extends Gdn_Plugin {
      * @param $discussion
      */
     private function setJSONTarget($discussion) {
-        // Discussion list
-        // TODO: Update the discussion's markup
+        // Discussion list.
+        $this->controller->jsonTarget(
+            "#Discussion_{$discussion['DiscussionID']} .MItem-resolved",
+            $this->resolvedMarkup($discussion),
+            'ReplaceWith'
+        );
 
         // Update the discussion title.
         $this->controller->jsonTarget('.Discussion #Item_0 h1', $this->getUpdatedDiscussionName($discussion));
@@ -149,7 +153,7 @@ class Resolved2Plugin extends Gdn_Plugin {
         // Highlight the discussion title.
         $this->controller->jsonTarget('.Discussion #Item_0', null, 'Highlight');
 
-        // Update the option menu
+        // Update the option menu.
         $this->controller->jsonTarget(
             '.Discussion #Item_0 .OptionsMenu .ResolveDiscussion',
             $this->generateOptionMenuItem($discussion, 'string'),
