@@ -1,0 +1,22 @@
+{
+    "name": "Resolved 2",
+    "description": "",
+    "version": "1",
+    "registerPermissions": {
+        "Garden.Staff.Allow": "Garden.Moderation.Manage"
+    },
+    "mobileFriendly": true,
+    "icon": "resolved_discussions.png",
+    "key": "resolved2",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com",
+            "homepage": "https://github.com/DaazKu"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    }
+}
