@@ -5,8 +5,6 @@
  * @license GPLv2
  */
 
-use Garden\Web\RequestInterface;
-
 /**
  * Class Resolved2Plugin
  */
@@ -103,6 +101,44 @@ class Resolved2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * BoxFilterDiscussion list item that contains link to '/discussions/unresolved'.
+     *
+     * @return string
+     */
+    private function generateDiscussionFilterItem() {
+        $count = countString($this->getUnresolvedDiscussionCount());
+        $unresolved = t('Unresolved').($count ? '<span class="Aside">'.$count.'</span>' : null);
+        return '<li class="Unresolved">'.anchor(sprite('SpUnresolved').' '.$unresolved, '/discussions/unresolved').'</li>';
+    }
+
+    /**
+     * Get resolved/unresolved markup.
+     *
+     * @param array|object $discussion
+     * @return string
+     */
+    private function generateStateIndicator($discussion) {
+        $name = val('Resolved', $discussion) ? 'resolved' : 'unresolved';
+
+        $markup = '<span title="' . t(ucfirst($name)) . '" class="MItem MItem-Resolved">';
+        $markup .= file_get_contents(PATH_PLUGINS."/resolved2/design/svgs/{$name}.svg");
+        $markup .= '</span>';
+
+        return $markup;
+    }
+
+    /**
+     * Return the number of unresolved discussions.
+     *
+     * @return int
+     */
+    private function getUnresolvedDiscussionCount() {
+        return $this->discussionModel->getCount([
+            'Resolved' => 0,
+        ]);
+    }
+
+    /**
      * Get the discussion name for the resolved state.
      * Prepend [RESOLVED] to the discussion's name if resolved.
      *
@@ -119,22 +155,6 @@ class Resolved2Plugin extends Gdn_Plugin {
     }
 
     /**
-     * Get resolved/unresolved markup.
-     *
-     * @param array|object $discussion
-     * @return string
-     */
-    private function resolvedMarkup($discussion) {
-        $name = val('Resolved', $discussion) ? 'resolved' : 'unresolved';
-
-        $markup = '<span title="' . t(ucfirst($name)) . '" class="MItem MItem-Resolved">';
-        $markup .= file_get_contents(PATH_PLUGINS."/resolved2/design/svgs/{$name}.svg");
-        $markup .= '</span>';
-
-        return $markup;
-    }
-
-    /**
      * Update the UI.
      *
      * @param $discussion
@@ -143,7 +163,7 @@ class Resolved2Plugin extends Gdn_Plugin {
         // Discussion list.
         $this->controller->jsonTarget(
             "#Discussion_{$discussion['DiscussionID']} .MItem-Resolved",
-            $this->resolvedMarkup($discussion),
+            $this->generateStateIndicator($discussion),
             'ReplaceWith'
         );
 
@@ -157,6 +177,13 @@ class Resolved2Plugin extends Gdn_Plugin {
         $this->controller->jsonTarget(
             '.Discussion #Item_0 .OptionsMenu .ResolveDiscussion',
             $this->generateOptionMenuItem($discussion, 'string'),
+            'ReplaceWith'
+        );
+
+        // Update the unresolved discussion count
+        $this->controller->jsonTarget(
+            '.BoxDiscussionFilter .Unresolved',
+            $this->generateDiscussionFilterItem(),
             'ReplaceWith'
         );
     }
@@ -191,17 +218,6 @@ class Resolved2Plugin extends Gdn_Plugin {
         }
 
         return $discussion;
-    }
-
-    /**
-     * Return the number of unresolved discussions.
-     *
-     * @return int
-     */
-    private function getUnresolvedDiscussionCount() {
-        return $this->discussionModel->getCount([
-            'Resolved' => 0,
-        ]);
     }
 
     /**
@@ -240,8 +256,7 @@ class Resolved2Plugin extends Gdn_Plugin {
      */
     public function base_afterDiscussionFilters_handler() {
         if (checkPermission('Garden.Staff.Allow')) {
-            $unresolved = t('Unresolved').filterCountString($this->getUnresolvedDiscussionCount());
-            echo '<li class="Unresolved">'.anchor(sprite('SpUnresolved').' '.$unresolved, '/discussions/unresolved').'</li>';
+            echo $this->generateDiscussionFilterItem();
         }
     }
 
@@ -261,7 +276,7 @@ class Resolved2Plugin extends Gdn_Plugin {
      * @param array $args Event's arguments.
      */
     public function base_beforeDiscussionMeta_handler($sender, $args) {
-        echo $this->resolvedMarkup($args['Discussion']);
+        echo $this->generateStateIndicator($args['Discussion']);
     }
 
     /**
