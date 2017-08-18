@@ -70,6 +70,8 @@ class Resolved2Plugin extends Gdn_Plugin {
         if (Gdn::addonManager()->isEnabled('Resolved', \Vanilla\Addon::TYPE_ADDON)) {
             Gdn::pluginManager()->disablePlugin('Resolved');
         }
+
+        touchConfig('Resolved2.DiscussionTitle.DisplayResolved', true);
     }
 
     /**
@@ -167,11 +169,13 @@ class Resolved2Plugin extends Gdn_Plugin {
             'ReplaceWith'
         );
 
-        // Update the discussion title.
-        $this->controller->jsonTarget('.Discussion #Item_0 h1', $this->getUpdatedDiscussionName($discussion));
+        if (c('Resolved2.DiscussionTitle.DisplayResolved')) {
+            // Update the discussion title.
+            $this->controller->jsonTarget('.Discussion #Item_0 h1', $this->getUpdatedDiscussionName($discussion));
 
-        // Highlight the discussion title.
-        $this->controller->jsonTarget('.Discussion #Item_0', null, 'Highlight');
+            // Highlight the discussion title.
+            $this->controller->jsonTarget('.Discussion #Item_0', null, 'Highlight');
+        }
 
         // Update the option menu.
         $this->controller->jsonTarget(
@@ -323,6 +327,10 @@ class Resolved2Plugin extends Gdn_Plugin {
      * Show [RESOLVED] in discussion title when viewing single.
      */
     public function discussionController_beforeDiscussionOptions_handler() {
+        if (!c('Resolved2.DiscussionTitle.DisplayResolved')) {
+            return;
+        }
+
         $discussion = $this->controller->data('Discussion');
 
         if (checkPermission('Garden.Staff.Allow') && val('Resolved', $discussion)) {
@@ -438,6 +446,24 @@ class Resolved2Plugin extends Gdn_Plugin {
             $args['FormPostValues']['CountResolved'] = 0;
             $args['FormPostValues'] = $this->setResolved($args['FormPostValues'], $resolved, false);
         }
+    }
+
+    public function settingsController_resolved2_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
+
+        $conf = new ConfigurationModule($sender);
+        $conf->initialize([
+            'Resolved2.DiscussionTitle.DisplayResolved' => [
+                'Control' => 'Toggle',
+                'LabelCode' => t('Display resolution state in a discussion'),
+                'Description' => sprintf(t('Prefix the discussion title with %s if it is resolved.'), t('[RESOLVED]')),
+            ],
+        ]);
+
+//        $sender->addSideMenu();
+        $sender->setData('Title', sprintf(t('%s Settings'), t('Resolved Discussion')));
+        $sender->ConfigurationModule = $conf;
+        $conf->renderAll();
     }
 
 
