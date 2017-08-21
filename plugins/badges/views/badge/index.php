@@ -42,7 +42,7 @@ $this->title(t('View Badge') . ': ' . $this->data('Badge.Name')); ?>
     );
 } ?>
 
-<h1><?php echo Gdn_Format::text($this->data('Badge.Name')); ?></h1>
+<h1><?php echo Gdn_Format::text(UserBadgeModel::badgeName($this->data('Badge'))); ?></h1>
 <p><?php echo Gdn_Format::html($this->data('Badge.Body')); ?></p>
 </div>
 

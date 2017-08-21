@@ -15,7 +15,7 @@ $Title = t($Title);
 
     foreach ($this->Badges as $Badge) {
         if (val('Photo', $Badge, false)) {
-            $name = val('Name', $Badge);
+            $name = UserBadgeModel::badgeName($Badge);
             echo anchor(
                 img(
                     Gdn_Upload::url(changeBasename(val('Photo', $Badge), '%s')),

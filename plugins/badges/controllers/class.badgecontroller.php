@@ -329,6 +329,11 @@ class BadgeController extends BadgesAppController {
         if (!$this->Badge) {
             throw new Exception(t('Badge404', 'Badge not found.'), 404);
         }
+
+        if (Gdn::locale()->current() !== 'en') {
+            $this->Badge['Body'] = '';
+        }
+
         $this->setData('Badge', $this->Badge);
 
         // Current user a recipient?
