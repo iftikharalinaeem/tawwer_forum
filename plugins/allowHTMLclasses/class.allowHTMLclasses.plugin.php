@@ -23,10 +23,10 @@ class AllowHTMLClassesPlugin extends Gdn_Plugin {
      * Constructor function that merges any hard-coded restrictions we have with ones that we can put in the config.
      */
     public function __construct() {
-        self::$restrictedPrefixes = array_merge(c('TrustedHTMLClasses.RestrictedPrefixes'), self::$restrictedPrefixes);
-        self::$restrictedSuffixes = array_merge(c('TrustedHTMLClasses.RestrictedSuffixes'), self::$restrictedSuffixes);
-        self::$restrictedStrings = array_merge(c('TrustedHTMLClasses.RestrictedStrings'), self::$restrictedStrings);
-        self::$restrictedNames = array_merge(c('TrustedHTMLClasses.RestrictedNames'), self::$restrictedNames);
+        self::$restrictedPrefixes = array_merge(c('TrustedHTMLClasses.RestrictedPrefixes', []), self::$restrictedPrefixes);
+        self::$restrictedSuffixes = array_merge(c('TrustedHTMLClasses.RestrictedSuffixes', []), self::$restrictedSuffixes);
+        self::$restrictedStrings = array_merge(c('TrustedHTMLClasses.RestrictedStrings', []), self::$restrictedStrings);
+        self::$restrictedNames = array_merge(c('TrustedHTMLClasses.RestrictedNames', []), self::$restrictedNames);
     }
 
     /**
