@@ -239,8 +239,8 @@ class KeenIOTracker implements TrackerInterface {
             'callback' => 'formatSeconds',
             'supportCategoryFilter' => true,
         ],
-        'discussion-resolved' => [
-            'title' => 'Discussion Resolved',
+        'resolved-discussion' => [
+            'title' => 'Resolved Discussions',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'chart',
             'supportCategoryFilter' => true,
@@ -1383,18 +1383,18 @@ class KeenIOTracker implements TrackerInterface {
             ])
         ;
 
-        $this->widgets['discussion-resolved']['query'] = [
+        $this->widgets['resolved-discussion']['query'] = [
             $discussionResolvedOnCreationQuery,
             $discussionResolvedOnUpdateQuery
         ];
-        $this->widgets['discussion-resolved']['queryProcessor'] = [
+        $this->widgets['resolved-discussion']['queryProcessor'] = [
             'instructions' => [
-                'merged-discussion-resolved' => [
+                'merged-resolved-discussion' => [
                     'analyses' => [0, 1],
                     'processor' => 'addResults'
                 ],
             ],
-            'finalAnalysis' => 'merged-discussion-resolved'
+            'finalAnalysis' => 'merged-resolved-discussion'
         ];
     }
 

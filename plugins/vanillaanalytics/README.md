@@ -88,7 +88,7 @@ There are 3 types of widgets:
     - Discussions ordered by highest sum of negative reactions given to them.
 - Graphs
   - Participation Rate *(participation-rate)*
-    - Number of active (visiting) users compared to participating (posting) users. 
+    - Number of active (visiting) users compared to participating (posting) users.
   - Sentiment Ratio *(sentiment-ratio)*
     - Number of posts having a positive reaction vs the number of posts having a negative reaction.
   - Visits per Active User *(visits-per-active-user)*
@@ -131,6 +131,19 @@ There are 3 types of widgets:
     - Number of distinct users, having created a post, grouped by categories.
   - Contributors by Role Type *(contributors-by-role-type)*
     - Number of distinct users, having created a post, grouped by vanilla's predefined role types.
+
+## Resolved
+*Discussions created while the resolved2 plugin was inactive are not accounted in analytics.*
+- Metrics
+  - Resolved Discussions *(total-resolved-discussions)*
+    - Number of discussions resolved for the first time.
+  - Unresolved Discussions *(total-unresolved-discussions)*
+    - Number of discussions that have not been resolved at least once.
+  - Average Time to Resolve Discussion *(average-time-to-resolve-discussion)*
+    - Average amount of time it took for a discussion to have their resolution.
+- Graphs
+  - Resolved Discussions *(resolved-discussion)*
+    - Number of discussions resolved.
 
 ## Q&A
 

@@ -273,7 +273,7 @@ class AnalyticsDashboard implements JsonSerializable {
                         'total-unresolved-discussions',
                         'average-time-to-resolve-discussion',
                         // Charts & Leaderboards
-                        'discussion-resolved',
+                        'resolved-discussion',
                     ],
                 ];
             }
