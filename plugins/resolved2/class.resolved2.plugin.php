@@ -197,12 +197,11 @@ class Resolved2Plugin extends Gdn_Plugin {
      *
      * @param array $discussion
      * @param bool $resolved
-     * @param bool $saveDiscussion Whether the discussion's update will be saved or not.
      * @return array The resolved discussion.
      */
-    private function setResolved($discussion, $resolved, $saveDiscussion) {
+    private function setResolved($discussion, $resolved) {
         $resolutionFields = [
-            'Resolved' => $resolved,
+            'Resolved' => $resolved ? 1 : 0,
             'DateResolved' => $resolved ? Gdn_Format::toDateTime() : null,
             'ResolvedUserID' => $resolved ? Gdn::session()->UserID : null
         ];
@@ -210,16 +209,11 @@ class Resolved2Plugin extends Gdn_Plugin {
         // Only set CountResolved if the field is not empty.
         $currentCountResolved = val('CountResolved', $discussion, null);
         if (!empty($currentCountResolved) || in_array($currentCountResolved, [0, '0'], true)) {
-            $resolvedIncrement = $resolved ? 1 : 0;
-            $countResolved = $currentCountResolved + $resolvedIncrement;
+            $countResolved = $currentCountResolved + $resolutionFields['Resolved'];
             $resolutionFields['CountResolved'] = $countResolved;
         }
 
         $discussion = array_merge($discussion, $resolutionFields);
-
-        if ($saveDiscussion) {
-            $this->discussionModel->save($discussion);
-        }
 
         return $discussion;
     }
@@ -238,17 +232,19 @@ class Resolved2Plugin extends Gdn_Plugin {
         if (in_array($args['Event'], ['discussion_add', 'discussion_edit'])) {
             $discussion = $this->discussionModel->getID($args['Data']['discussionID'], DATASET_TYPE_ARRAY);
 
-            if (!empty($discussion['CountResolved']) || in_array($discussion['CountResolved'], [0, '0'], true)) {
-                $countResolved = $discussion['CountResolved'];
+            $dateResolved = $discussion['DateResolved'] ? AnalyticsData::getDateTime($discussion['DateResolved']) : null;
+            if ($dateResolved) {
+                $timeResolved = $dateResolved['timestamp'] - $args['Data']['dateInserted']['timestamp'];
             } else {
-                $countResolved = null;
+                $timeResolved = null;
             }
 
             $resolvedMetric = [
                 'resolved' => $discussion['Resolved'],
-                'countResolved' => $countResolved,
-                'dateResolved' => $discussion['DateResolved'] ? AnalyticsData::getDateTime($discussion['DateResolved']) : null,
+                'countResolved' => $discussion['CountResolved'],
+                'dateResolved' => $dateResolved,
                 'resolvedUser' => $discussion['ResolvedUserID'] ? AnalyticsData::getUser($discussion['ResolvedUserID']) : null,
+                'time' => $timeResolved,
             ];
 
             $args['Data']['resolvedMetric'] = $resolvedMetric;
@@ -280,6 +276,10 @@ class Resolved2Plugin extends Gdn_Plugin {
      * @param array $args Event's arguments.
      */
     public function base_beforeDiscussionMeta_handler($sender, $args) {
+        if (!checkPermission('Garden.Staff.Allow')) {
+            return;
+        }
+
         echo $this->generateStateIndicator($args['Discussion']);
     }
 
@@ -318,8 +318,12 @@ class Resolved2Plugin extends Gdn_Plugin {
 
         if ($discussion['Resolved'] XOR checkPermission('Garden.Staff.Allow')) {
             $resolved = checkPermission('Garden.Staff.Allow');
-            $discussion = $this->setResolved($discussion, $resolved, true);
-            $this->setJSONTarget($discussion);
+            $discussion = $this->setResolved($discussion, $resolved);
+            $this->discussionModel->save($discussion);
+
+            if ($resolved) {
+                $this->setJSONTarget($discussion);
+            }
         }
     }
 
@@ -363,7 +367,8 @@ class Resolved2Plugin extends Gdn_Plugin {
         }
 
         // Resolve the discussion.
-        $discussion = $this->setResolved($discussion, $resolved, true);
+        $discussion = $this->setResolved($discussion, $resolved);
+        $this->discussionModel->save($discussion);
 
         $this->controller->sendOptions((object)$discussion);
         $this->setJSONTarget($discussion);
@@ -440,18 +445,21 @@ class Resolved2Plugin extends Gdn_Plugin {
      * @param array $args Event's arguments.
      */
     public function discussionModel_beforeSaveDiscussion_handler($sender, $args) {
-        // Make sure that we don't screw with the discussionModel->save from setResolved.
         if ($args['Insert']) {
             $resolved = checkPermission('Garden.Staff.Allow');
             $args['FormPostValues']['CountResolved'] = 0;
+            // Make sure that we don't screw with the discussionModel->save from setResolved.
             $args['FormPostValues'] = $this->setResolved($args['FormPostValues'], $resolved, false);
         }
     }
 
-    public function settingsController_resolved2_create($sender) {
-        $sender->permission('Garden.Settings.Manage');
+    /**
+     * Add /settings/resolved2 endpoint.
+     */
+    public function settingsController_resolved2_create() {
+        $this->controller->permission('Garden.Settings.Manage');
 
-        $conf = new ConfigurationModule($sender);
+        $conf = new ConfigurationModule($this->controller);
         $conf->initialize([
             'Resolved2.DiscussionTitle.DisplayResolved' => [
                 'Control' => 'Toggle',
@@ -460,8 +468,7 @@ class Resolved2Plugin extends Gdn_Plugin {
             ],
         ]);
 
-//        $sender->addSideMenu();
-        $sender->setData('Title', sprintf(t('%s Settings'), t('Resolved Discussion')));
+        $this->controller->setData('Title', sprintf(t('%s Settings'), t('Resolved Discussion')));
         $sender->ConfigurationModule = $conf;
         $conf->renderAll();
     }
