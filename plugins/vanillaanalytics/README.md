@@ -140,7 +140,7 @@ There are 3 types of widgets:
   - Unresolved Discussions *(total-unresolved-discussions)*
     - Number of discussions that have not been resolved at least once.
   - Average Time to Resolve Discussion *(average-time-to-resolve-discussion)*
-    - Average amount of time it took for a discussion to have their resolution.
+    - Average amount of time it took for the discussions to have their resolution.
 - Graphs
   - Resolved Discussions *(resolved-discussion)*
     - Number of discussions resolved.
