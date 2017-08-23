@@ -2,6 +2,8 @@
 
 /**
  * This plugin allows admins to create a whitelist of HTML classes in user input.
+ * Features:
+ *  - Optionally add a comma separated list of prefixes, suffixes, classnames or partial strings to the config that cannot be whitelisted by an admin.
  *
  * Class AllowHTMLClassesPlugin
  */
@@ -23,10 +25,10 @@ class AllowHTMLClassesPlugin extends Gdn_Plugin {
      * Constructor function that merges any hard-coded restrictions we have with ones that we can put in the config.
      */
     public function __construct() {
-        self::$restrictedPrefixes = array_merge(c('TrustedHTMLClasses.RestrictedPrefixes', []), self::$restrictedPrefixes);
-        self::$restrictedSuffixes = array_merge(c('TrustedHTMLClasses.RestrictedSuffixes', []), self::$restrictedSuffixes);
-        self::$restrictedStrings = array_merge(c('TrustedHTMLClasses.RestrictedStrings', []), self::$restrictedStrings);
-        self::$restrictedNames = array_merge(c('TrustedHTMLClasses.RestrictedNames', []), self::$restrictedNames);
+        self::$restrictedPrefixes = array_merge(explodeTrim(',', c('TrustedHTMLClasses.RestrictedPrefixes')), self::$restrictedPrefixes);
+        self::$restrictedSuffixes = array_merge(explodeTrim(',', c('TrustedHTMLClasses.RestrictedSuffixes')), self::$restrictedSuffixes);
+        self::$restrictedStrings = array_merge(explodeTrim(',', c('TrustedHTMLClasses.RestrictedStrings')), self::$restrictedStrings);
+        self::$restrictedNames = array_merge(explodeTrim(',', c('TrustedHTMLClasses.RestrictedNames')), self::$restrictedNames);
     }
 
     /**
