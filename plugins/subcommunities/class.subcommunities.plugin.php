@@ -1,16 +1,12 @@
-<?php if (!defined('APPLICATION')) { exit; }
+<?php
+/**
+ * @copyright 2009-2017 Vanilla Forums Inc.
+ * @license Proprietary
+ */
 
-$PluginInfo['subcommunities'] = [
-    'Name'        => "Subcommunities",
-    'Description' => "Allows you to use top level categories as virtual mini forums for multilingual or multi-product communities.",
-    'Version'     => '1.0.4',
-    'Author'      => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl'   => 'https://vanillaforums.com',
-    'License'     => 'Proprietary',
-    'Icon'        => 'subcommunities.png'
-];
-
+/**
+ * Class SubcommunitiesPlugin
+ */
 class SubcommunitiesPlugin extends Gdn_Plugin {
     /// Properties ///
 
