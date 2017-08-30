@@ -539,6 +539,39 @@ class SearchModel extends Gdn_Model {
         ];
     }
 
+    /**
+     * Perform an advanced search and use a model to expand the records.
+     *
+     * @param Gdn_Model $model An instance of Gdn_Model or its subclasses.
+     * @param string $query The search query.
+     * @param array $params Parameters being passed to advancedSearch. $query is added in the "search" key.
+     * @param int|null $limit The maximum number of records to return.
+     * @param int|null $offset An offset to use in conjunction with $limit for pagination.
+     * @param bool $expandInsertUser Expand rows with user records associated with creating them.
+     * @return array
+     */
+    public function modelSearch(Gdn_Model $model, $query, array $params, $limit = null, $offset = null, $expandInsertUser = false) {
+        $params['search'] = $query;
+        $search = $this->advancedSearch($params, $offset, $limit);
+        $rows = $search['SearchResults'];
+        $recordIDs = array_column($rows, 'PrimaryID');
+        $primaryKey = $model->PrimaryKey;
+        $result = [];
+
+        if (!empty($recordIDs)) {
+            $result = $model
+                ->getWhere([$primaryKey => $recordIDs])
+                ->resultArray();
+        }
+
+        if ($expandUser) {
+            $userModel = new UserModel();
+            $userModel->expandUsers($result, ['InsertUserID']);
+        }
+
+        return $result;
+    }
+
     public function indexes($type = null) {
         $indexes = $this->types;
 

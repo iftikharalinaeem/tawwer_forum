@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+use Garden\Schema\Schema;
+
 // Force require our sphinx so that an incomplete autoloader doesn't miss it.
 if (!class_exists('SearchModel', false)) {
     require_once __DIR__ . '/class.searchmodel.php';
@@ -16,6 +18,15 @@ if (!class_exists('SearchModel', false)) {
  * @package internal
  */
 class SphinxPlugin extends Gdn_Plugin {
+
+    /** The highest value for "limit" in the default, generic schema. */
+    const MAX_SCHEMA_LIMIT = 100;
+
+    /** @var SearchModel */
+    private $searchModel;
+
+    /** @var Schema */
+    private $searchSchema;
 
     /**
      * Fired when plugin is disabled
@@ -59,6 +70,51 @@ class SphinxPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Search comments.
+     *
+     * @param CommentsApiController $sender
+     * @param array $query
+     * @return array
+     */
+    public function commentsApiController_get_search(CommentsApiController $sender, array $query) {
+        $sender->permission('Garden.SignIn.Allow');
+
+        $in = $sender
+            ->schema(['categoryID:i?' => 'The numeric ID of a category.'], 'in')
+            ->merge($this->searchSchema())
+            ->setDescription('Search comments.');
+        $out = $sender->schema([':a' => $sender->commentSchema()], 'out');
+
+        $params = [
+            'group' => false,
+            'comment_c' => 1
+        ];
+        if (array_key_exists('categoryID', $query)) {
+            $params['cat'] = $query['categoryID'];
+        }
+        $query = $sender->filterValues($query);
+        $query = $in->validate($query);
+        list($offset, $limit) = offsetLimit(
+            "p{$query['page']}",
+            $query['limit']
+        );
+        $result = $this->searchModel()->modelSearch(
+            CommentModel::instance(),
+            $query['query'],
+            $params,
+            $limit,
+            $offset,
+            $query['expand']
+        );
+
+        foreach ($result as &$row) {
+            $sender->prepareRow($row);
+        }
+        $result = $out->validate($result);
+        return $result;
+    }
+
+    /**
      * Search discussions.
      *
      * @param DiscussionsApiController $sender
@@ -68,23 +124,10 @@ class SphinxPlugin extends Gdn_Plugin {
     public function discussionsApiController_get_search(DiscussionsApiController $sender, array $query) {
         $sender->permission('Garden.SignIn.Allow');
 
-        $in = $sender->schema([
-            'query:s' => 'Discussion search query.',
-            'categoryID:i?' => 'The numeric ID of a category.',
-            'page:i?' => [
-                'description' => 'Page number.',
-                'default' => 1,
-                'minimum' => 1,
-                'maximum' => DiscussionModel::instance()->getMaxPages()
-            ],
-            'limit:i?' => [
-                'description' => 'The number of items per page.',
-                'default' => DiscussionModel::instance()->getDefaultLimit(),
-                'minimum' => 1,
-                'maximum' => 100
-            ],
-            'expand:b?' => 'Expand associated records.'
-        ], 'in')->setDescription('Search discussions.');
+        $in = $sender
+            ->schema(['categoryID:i?' => 'The numeric ID of a category.'], 'in')
+            ->merge($this->searchSchema())
+            ->setDescription('Search discussions.');
         $out = $sender->schema([':a' => $sender->discussionSchema()], 'out');
 
         $query = $sender->filterValues($query);
@@ -95,34 +138,70 @@ class SphinxPlugin extends Gdn_Plugin {
         );
         $params = [
             'group' => false,
-            'search' => $query['query'],
             'discussion_d' => 1
         ];
         if (array_key_exists('categoryID', $query)) {
-            $search['cat'] = $query['categoryID'];
+            $params['cat'] = $query['categoryID'];
         }
 
-        $searchModel = new SearchModel();
-        $search = $searchModel->advancedSearch($params, $offset, $limit);
-        $rows = $search['SearchResults'];
-        $discussionIDs = array_column($rows, 'PrimaryID');
-        $result = [];
+        $result = $this->searchModel()->modelSearch(
+            DiscussionModel::instance(),
+            $query['query'],
+            $params,
+            $limit,
+            $offset,
+            $query['expand']
+        );
 
-        if (!empty($discussionIDs)) {
-            $result = DiscussionModel::instance()
-                ->getWhere(['DiscussionID' => $discussionIDs])
-                ->resultArray();
-            if ($query['expand']) {
-                $userModel = new UserModel();
-                $userModel->expandUsers($result, ['InsertUserID']);
-            }
-            foreach ($result as &$row) {
-                $sender->massageRow($row);
-            }
+        foreach ($result as &$row) {
+            $sender->prepareRow($row);
         }
-
         $result = $out->validate($result);
         return $result;
+    }
+
+    /**
+     * Get the plugins copy of SearchModel.
+     *
+     * @return SearchModel
+     */
+    private function searchModel() {
+        if (!isset($this->searchModel)) {
+            $this->searchModel = new SearchModel();
+        }
+
+        return $this->searchModel;
+    }
+
+    /**
+     * Get a generic search schema.
+     *
+     * @return Schema
+     */
+    private function searchSchema() {
+        if (!isset($this->searchSchema)) {
+            $this->searchSchema = Schema::parse([
+                'query:s' => 'Search terms.',
+                'page:i?' => [
+                    'description' => 'Page number.',
+                    'default' => 1,
+                    'minimum' => 1,
+                    'maximum' => DiscussionModel::instance()->getMaxPages()
+                ],
+                'limit:i?' => [
+                    'description' => 'The number of items per page.',
+                    'default' => DiscussionModel::instance()->getDefaultLimit(),
+                    'minimum' => 1,
+                    'maximum' => self::MAX_SCHEMA_LIMIT
+                ],
+                'expand:b?' => [
+                    'default' => false,
+                    'description' => 'Expand associated records.'
+                ]
+            ]);
+        }
+
+        return $this->searchSchema;
     }
 
     /**
