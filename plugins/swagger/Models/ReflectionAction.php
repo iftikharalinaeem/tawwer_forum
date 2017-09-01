@@ -9,6 +9,7 @@ namespace Vanilla\Swagger\Models;
 
 use Garden\EventManager;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\ResourceRoute;
 use Garden\Web\Route;
 use ReflectionMethod;
@@ -90,7 +91,7 @@ class ReflectionAction {
      */
     private function reflectAction() {
         $method = $this->method;
-        $resourceRegex = str_replace('%s', '([a-z][a-z0-9]*)', $this->route->getControllerPattern());
+        $resourceRegex = str_replace(['%s', '*\\'], ['([a-z][a-z0-9]*)', '(?:^|\\\\)'], $this->route->getControllerPattern());
 
         // Regex the method name against event handler syntax or regular method syntax.
         if (preg_match(
@@ -164,6 +165,8 @@ class ReflectionAction {
         /* @var Schema $out */
         /* @var Schema $allIn */
         $in = $out = $allIn = null;
+        $summary = '';
+        $other = [];
 
         // Set up an event handler that will capture the schemas.
         $fn  = function ($controller, Schema $schema, $type) use (&$in, &$out, &$allIn) {
@@ -193,14 +196,17 @@ class ReflectionAction {
 
         } catch (ShortCircuitException $ex) {
             // We should have everything we need now.
+        } catch (\Exception $ex) {
+            $other['deprecated'] = true;
+            // We shouldn't get here, but let's allow it.
+            $summary = "Something happened before the output schema was found. The endpoint most likely didn't define its output properly.";
         } finally {
             $this->events->unbind('controller_schema', $fn);
         }
 
         // Fill in information about the parameters from the input schema.
-        $summary = '';
         if ($in instanceof Schema) {
-            $summary = $in->getDescription();
+            $summary = $summary ?: $in->getDescription();
             $inArr = $in->jsonSerialize();
             $allInArr = $allIn !== null ? $allIn->jsonSerialize() : [];
             unset($inArr['description']);
@@ -249,16 +255,17 @@ class ReflectionAction {
             'summary' => $summary,
             'parameters' => array_values($this->params),
             'responses' => $responses
-        ];
+        ] + $other;
 
         return array_filter($r);
     }
 
-    private function dashCase($class) {
-        $class = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', '-$1', $class);
-        $class = preg_replace('`([A-Z0-9])(?=[a-z])`', '-$1', $class);
-        $class = trim($class, '-');
-        return strtolower($class);
+    private function dashCase($str) {
+        $str = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', '-$1', $str);
+        $str = preg_replace('`(?<!-)([A-Z0-9])(?=[a-z])`', '-$1', $str);
+        $str = trim($str, '-');
+
+        return strtolower($str);
     }
 
     /**

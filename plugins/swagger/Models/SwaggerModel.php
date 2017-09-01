@@ -16,6 +16,7 @@ use Interop\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionMethod;
 use Vanilla\AddonManager;
+use SwaggerApiController;
 
 /**
  * Handles the swagger JSON commands.
@@ -97,7 +98,11 @@ class SwaggerModel {
         ];
 
         foreach ($this->getActions() as $action) {
-            $r['paths'][$action->getPath()][strtolower($action->getHttpMethod())] = $action->getOperation();
+            try {
+                $r['paths'][$action->getPath()][strtolower($action->getHttpMethod())] = $action->getOperation();
+            } catch (\Exception $ex) {
+                $r['paths'][$action->getPath()][strtolower($action->getHttpMethod())] = $ex->getTraceAsString();
+            }
         }
 
         $r = $this->gatherDefinitions($r);
@@ -110,10 +115,12 @@ class SwaggerModel {
      */
     private function getActions() {
         $controllers = $this->addonManager->findClasses('*\\*ApiController');
-        sort($controllers);
+        usort($controllers, function ($a, $b) {
+            return strnatcasecmp(EventManager::classBasename($a), EventManager::classBasename($b));
+        });
 
         foreach ($controllers as $controller) {
-            if ($controller === \SwaggerApiController::class) {
+            if ($controller === SwaggerApiController::class) {
                 continue;
             }
 
@@ -195,7 +202,7 @@ class SwaggerModel {
      */
     private function getControllerActions(ReflectionClass $controller, $instance) {
         foreach ($controller->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            if ($method->isAbstract() || $method->isStatic() || $method->getName()[0] === '_') {
+            if ($method->isAbstract() || $method->isStatic() || $method->getName()[0] === '_' || $method->getName() === 'options') {
                 continue;
             }
 
@@ -204,6 +211,8 @@ class SwaggerModel {
 
                 yield $action;
             } catch (\InvalidArgumentException $ex) {
+                continue;
+            } catch (\Exception $ex) {
                 continue;
             }
         }
