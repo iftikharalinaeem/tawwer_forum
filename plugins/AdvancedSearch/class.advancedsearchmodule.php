@@ -49,7 +49,7 @@ class AdvancedSearchModule extends Gdn_Module {
 
     public static function addAssets() {
         Gdn::controller()->addJsFile('jquery.tokeninput.js');
-        Gdn::controller()->addJsFile('jquery-ui.js');
+        Gdn::controller()->addJsFile('jquery-ui.min.js');
         Gdn::controller()->addJsFile('advanced-search.js', 'plugins/AdvancedSearch');
         Gdn::controller()->addDefinition('TagHint', t('TagHint', 'Start to type...'));
         Gdn::controller()->addDefinition('TagSearching', t('Searching...'));
