@@ -107,7 +107,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
          ->column('ThreadID', 'tinyint(1)', true, 'index')
          ->column('Email', 'varchar(200)', true)
          ->column('Username', 'varchar(50)', true)
-         ->column('Status', 'varchar(50)', true)
+         ->column('Status', 'varchar(100)', true)
          ->column('Completed', 'tinyint(1)', 0, 'index')
          ->column('Error', 'text', true)
          ->set();

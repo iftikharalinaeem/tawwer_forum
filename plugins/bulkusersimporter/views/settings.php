@@ -9,11 +9,11 @@
       <?php echo $this->data('Title'); ?>
    </h1>
 
-   <div class="Info">
+   <div class="">
       Use this tool to bulk import users from standardized CSV files.
    </div>
 
-   <div class="Info">The format of a CSV file must be
+   <div class="">The format of a CSV file must be
       <code>Email,Username,Role</code> per line, in that order. There must be exactly one comma
       between each, no trailing comma, with a maximum of three values. Each
       grouping of three are on their own line. If the CSV file has a header
@@ -21,8 +21,8 @@
       three parameters are required</strong>, unless indicated otherwise.
    </div>
 
-   <div class="Info userin-options-list">
-      There are two options to import users into your community:
+   <div class="userin-options-list">
+      There are three options to import users into your community:
       <ul>
          <li>
             Send an <strong>email invitation</strong> to all users. This allows them to follow
@@ -57,10 +57,14 @@
             functioning, as the roles will be interpreted as usernames, and the
             roles column will be considered empty.
          </li>
+          <li>
+              You will select the import method in the next step.
+          </li>
       </ul>
    </div>
+    <br/>
 
-   <div class="Info">The second parameter, <code>Username</code>, must be at
+   <div class="">The second parameter, <code>Username</code>, must be at
       minimum <code><?php echo $username_limits['min']; ?></code> characters and at
       most <code><?php echo $username_limits['max']; ?></code> characters. If a
       duplicate username is found, the entire row of that
@@ -73,7 +77,7 @@
       the controlling value that will determine the row that gets updated.
    </div>
 
-   <div class="Info">The third parameter, <code>Role</code>, can have
+   <div class="">The third parameter, <code>Role</code>, can have
       multiple items. These items must be separated by a colon <code>:</code>.
       Roles with spaces in them can be wrapped with single or double
       quotation marks, but this is optional; spaces in roles work just fine
@@ -82,7 +86,7 @@
       roles are: <em class="valid-statuses"><?php echo implode(', ', $this->data('allowed_roles')); ?></em>.
    </div>
 
-   <div class="Info">
+   <div class="">
       <strong>Note:</strong> If the CSV file will contain usernames with
       non-Latin characters, it is important that its default encoding
       be UTF-8. Not doing this can result in corrupted characters in usernames.
@@ -90,7 +94,7 @@
 
    <h3>Example contents of CSV file:</h3>
 
-   <div class="Info">
+   <div class="">
       This example contains nine lines. The first line has headers. Headers
       do not need to be present. If they are, check the option below so the
       importer can skip that line. The importer will fail if the syntax of the
