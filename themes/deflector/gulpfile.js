@@ -10,7 +10,9 @@ gulp.task('styles', function () {
     .pipe($.sass({
       errLogToConsole: true
     }))
-    .pipe($.autoprefixer())
+    .pipe($.autoprefixer({
+      "browsers": ["ie > 9", "last 6 iOS versions", "last 4 versions"]
+    }))
     .pipe($.csslint('design/.csslintrc'))
     .pipe($.csslint.reporter('default'))
     .pipe(gulp.dest('design'))
