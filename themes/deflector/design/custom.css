@@ -7,7 +7,7 @@
  * @license   GPLv3
  */
 * {
-  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box; }
 
 /* ==========================================================================
@@ -193,8 +193,8 @@ figure {
  * Address differences between Firefox and other browsers.
  */
 hr {
-  -moz-box-sizing: content-box;
-       box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+          box-sizing: content-box;
   height: 0; }
 
 /**
@@ -302,8 +302,8 @@ input {
  */
 input[type="checkbox"],
 input[type="radio"] {
-  -moz-box-sizing: border-box;
-       box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   /* 1 */
   padding: 0;
   /* 2 */ }
@@ -324,8 +324,8 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="search"] {
   -webkit-appearance: textfield;
   /* 1 */
-  -moz-box-sizing: content-box;
-       box-sizing: content-box;
+  -webkit-box-sizing: content-box;
+          box-sizing: content-box;
   /* 2 */ }
 
 /**
@@ -393,6 +393,8 @@ body {
 a {
   color: #2e9df7;
   text-decoration: none;
+  -webkit-transition: color 150ms;
+  -o-transition: color 150ms;
   transition: color 150ms; }
   a:hover, a:focus {
     color: #0877d1;
@@ -519,12 +521,19 @@ p {
   text-transform: uppercase;
   border: transparent solid 1px;
   border-radius: 3px;
+  -webkit-transition: -webkit-box-shadow 50ms;
+  transition: -webkit-box-shadow 50ms;
+  -o-transition: box-shadow 50ms;
   transition: box-shadow 50ms;
+  transition: box-shadow 50ms, -webkit-box-shadow 50ms;
   -webkit-font-smoothing: inherit;
   color: #fff;
   background-color: #2e9df7;
   background-repeat: repeat-x;
   background-color: #38a2f7;
+  background-image: -webkit-linear-gradient(#38a2f7, #2498f7);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#38a2f7), to(#2498f7));
+  background-image: -o-linear-gradient(#38a2f7, #2498f7);
   background-image: linear-gradient(#38a2f7, #2498f7); }
   .button, .button:hover, .button:focus,
   .Button,
@@ -535,7 +544,8 @@ p {
   .Button:active {
     border-top-color: #d9d9d9;
     border-top-color: rgba(0, 0, 0, 0.15);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) inset; }
+    -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) inset;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15) inset; }
   .button:hover, .button:focus, .button:active,
   .Button:hover,
   .Button:focus,
@@ -545,7 +555,8 @@ p {
     background-position: 0 -15px; }
 
 .Button {
-  box-shadow: none; }
+  -webkit-box-shadow: none;
+          box-shadow: none; }
   .Button, .Button:hover, .Button:focus, .Button:active {
     text-shadow: none;
     border-color: transparent; }
@@ -833,7 +844,8 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   background-color: #2e9df7;
-  box-shadow: 0 15px 15px -15px rgba(0, 0, 0, 0.25) inset, 0 -15px 15px -15px rgba(0, 0, 0, 0.25) inset; }
+  -webkit-box-shadow: 0 15px 15px -15px rgba(0, 0, 0, 0.25) inset, 0 -15px 15px -15px rgba(0, 0, 0, 0.25) inset;
+          box-shadow: 0 15px 15px -15px rgba(0, 0, 0, 0.25) inset, 0 -15px 15px -15px rgba(0, 0, 0, 0.25) inset; }
   .masthead h1,
   .masthead h2,
   .masthead h3,
@@ -951,7 +963,8 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   background-color: transparent;
   border: #eee solid 1px;
   border-radius: 3px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); }
   .MessageList .Item:nth-child(odd) {
     background-color: transparent; }
   .MessageList .Item:before, .MessageList .Item:after {
@@ -982,7 +995,8 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
 
 .PhotoWrap {
   border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); }
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); }
   .PhotoWrap:before {
     position: absolute;
     top: 0;
@@ -992,7 +1006,8 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
     z-index: 1;
     display: block;
     border-radius: 4px;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) inset;
+    -webkit-box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) inset;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) inset;
     content: " "; }
   .PhotoWrap img {
     border-radius: 4px; }
@@ -1002,7 +1017,8 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   margin-right: 5px;
   border-radius: 4px;
   border: solid 1px #333;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); }
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15); }
 
 .ProfilePhotoMedium {
   width: 64px;
