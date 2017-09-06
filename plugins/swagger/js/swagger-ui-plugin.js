@@ -1,6 +1,12 @@
-import {SwaggerUIBundle, SwaggerUIStandalonePreset} from 'swagger-ui-dist';
-
 jQuery(document).ready(function($) {
+    var HideTopbarPlugin = function () {
+        // this plugin overrides the Topbar component to return nothing
+        return {
+            components: {
+                Topbar: function() { return null }
+            }
+        }
+    }
 
     window.ui = SwaggerUIBundle({
         url: gdn.url('/api/v2/swagger'),
@@ -11,10 +17,12 @@ jQuery(document).ready(function($) {
             SwaggerUIStandalonePreset
         ],
         plugins: [
-            SwaggerUIBundle.plugins.DownloadUrl
+            SwaggerUIBundle.plugins.DownloadUrl,
+            HideTopbarPlugin
         ],
         layout: "StandaloneLayout",
         validatorUrl: null,
+        // filter: true,
         requestInterceptor: function (request) {
             request.headers['x-transient-key'] = gdn.getMeta('TransientKey');
         }

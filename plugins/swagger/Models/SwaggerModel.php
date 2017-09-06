@@ -165,10 +165,6 @@ class SwaggerModel {
         $fn = function (array $arr) use (&$definitions, &$fn) {
             $result = $arr;
 
-            if ($arr['id'] === 'DiscussionPost') {
-                $foo = 'bar';
-            }
-
             foreach ($result as $key => &$value) {
                 if (is_array($value)) {
                     $value = $fn($value);

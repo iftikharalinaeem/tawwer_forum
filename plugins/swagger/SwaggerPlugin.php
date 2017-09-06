@@ -26,13 +26,16 @@ class SwaggerPlugin extends \Gdn_Plugin {
      * @param \SettingsController $sender
      */
     public function settingsController_swagger_create(\SettingsController $sender) {
+        $sender->permission('Garden.Settings.Manage');
+
         $folder = 'plugins/'.$this->getAddon()->getKey();
 
         $sender->addJsFile('swagger-ui-bundle.js', $folder);
         $sender->addJsFile('swagger-ui-standalone-preset.js', $folder);
-        $sender->addJsFile('swagger.js', $folder);
+        $sender->addJsFile('swagger-ui-plugin.js', $folder);
         $sender->addCssFile('swagger-ui.css', $folder);
 
+        $sender->title(t('Vanilla API v2'));
         $sender->render('swagger', 'settings', $folder);
     }
 }
