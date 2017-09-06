@@ -15,5 +15,6 @@
 			"email": "todd@vanillaforums.com"
 		}
 	],
-	"icon": "swagger.png"
+	"icon": "swagger.png",
+    "buildProcessVersion": "1.0"
 }
