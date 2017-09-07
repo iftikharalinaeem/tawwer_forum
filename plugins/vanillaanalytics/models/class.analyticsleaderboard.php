@@ -109,7 +109,7 @@ class AnalyticsLeaderboard {
             // Attempt to determine the type based on the first row's attributes.
             $firstResult = current($result);
             foreach ($detectTypes as $currentType) {
-                if ($firstResult->$currentType) {
+                if (isset($firstResult->$currentType)) {
                     $typeID = $currentType;
                     if ($typeID === 'reaction.recordID') {
                         if (!isset($firstResult->{'reaction.recordType'})) {
