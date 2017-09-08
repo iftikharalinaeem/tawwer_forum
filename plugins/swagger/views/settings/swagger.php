@@ -1,5 +1,24 @@
 <?php
 echo heading($this->data('Title').' <small class="meta">'.url('/api/v2', true).'</small>');
+
+if (!function_exists('ul')) {
+    function ul(array $items) {
+        $r = '<ul><li>'.implode('</li><li>', $items).'</li></ul>';
+        return $r;
+    }
+}
+
+helpAsset(t('About the API'), t('This page lists the endpoints of your API.', 'This page lists the endpoints of your API. Click endpoints for more information. You can make live calls to the API from this page or externally using an access token.'));
+
+helpAsset(t('See Also'), ul([
+    anchor(t('Personal Access Tokens'), '/profile/tokens')
+]));
+
+helpAsset(t('Need More Help?'), ul([
+    anchor(t('API Overview'), 'http://docs.vanillaforums.com/apiv2/', '', ['target' => '_blank']),
+    anchor(t('Authentication'), 'http://docs.vanillaforums.com/apiv2/authentication', '', ['target' => '_blank'])
+]));
+
 ?>
 
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0">
@@ -36,3 +55,5 @@ echo heading($this->data('Title').' <small class="meta">'.url('/api/v2', true).'
 </svg>
 
 <div id="swagger-ui"></div>
+
+<?php
