@@ -53,6 +53,7 @@ class AdvancedSearchModule extends Gdn_Module {
         Gdn::controller()->addJsFile('advanced-search.js', 'plugins/AdvancedSearch');
         Gdn::controller()->addDefinition('TagHint', t('TagHint', 'Start to type...'));
         Gdn::controller()->addDefinition('TagSearching', t('Searching...'));
+        Gdn::controller()->addDefinition('TagNoResults', t('No results'));
     }
 
     public function toString() {
