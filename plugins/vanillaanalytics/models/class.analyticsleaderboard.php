@@ -58,7 +58,7 @@ class AnalyticsLeaderboard {
             );
         } else {
             $this->query->setTimeframeAbsolute(
-                date('c', strtotime()),
+                date('c', strtotime('now')),
                 date('c', strtotime('-'.self::DEFAULT_SPAN.' days'))
             );
             $this->previousQuery->setTimeframeAbsolute(
@@ -162,10 +162,10 @@ class AnalyticsLeaderboard {
 
             $position = 1;
             foreach ($ptfResult as $index => $ptfStanding) {
-                $ptfResultIndexed[$ptfStanding->$typeID] = $ptfStanding->result;
+                $ptfResultIndexed[$ptfStanding[$typeID]] = $ptfStanding->result;
 
-                if (!isset($ptfPositionByResult[$ptfStanding->result])) {
-                    $ptfPositionByResult[$ptfStanding->result] = $position++;
+                if (!isset($ptfPositionByResult[$ptfStanding['result']])) {
+                    $ptfPositionByResult[$ptfStanding['result']] = $position++;
                 }
             }
 
@@ -175,8 +175,8 @@ class AnalyticsLeaderboard {
             $previousCount = null;
             foreach ($result as $currentResult) {
                 $i++;
-                $recordID = $currentResult->$typeID;
-                $count = $currentResult->result;
+                $recordID = $currentResult[$typeID];
+                $count = $currentResult['result'];
                 $record = $recordModel->getID($recordID, DATASET_TYPE_ARRAY);
                 $previousPosition = val($ptfResultIndexed[$recordID], $ptfPositionByResult);
 
@@ -236,11 +236,18 @@ class AnalyticsLeaderboard {
         return $this;
     }
 
+    /**
+     * @param array $r1
+     * @param array $r2
+     * @return int
+     */
     public function sortResults($r1, $r2) {
-        if ($r1->result === $r2->result) {
-            return 0;
+        if ($r1['result'] === $r2['result']) {
+            $sortOrder = 0;
         } else {
-            return $r1->result > $r2->result ? -1 : 1;
+            $sortOrder = $r1['result'] > $r2['result'] ? -1 : 1;
         }
+
+        return $sortOrder;
     }
 }
