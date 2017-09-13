@@ -7,6 +7,8 @@
  * @package vanillaanalytics
  */
 
+use Garden\Http\HttpResponse;
+
 /**
  * keen.io client built on Garden HTTP
  */
@@ -108,15 +110,21 @@ class KeenIOClient extends Garden\Http\HttpClient {
      *
      * @link https://keen.io/docs/api/#record-a-single-event
      * @param string $eventCollection Name of the event collection to save the current event to.
-     * @param object $eventData Event data.
-     * @return bool|stdClass Object representing result on success, false on failure.
+     * @param array $eventData Event data.
+     * @return array|bool Array of result details on success, false on failure.
      */
     public function addEvent($eventCollection, $eventData) {
-        return $this->command(
-            "projects/{$this->projectID}/events/{$eventCollection}",
-            $eventData,
-            self::COMMAND_WRITE
-        );
+        try {
+            $result = $this->command(
+                "projects/{$this->projectID}/events/{$eventCollection}",
+                $eventData,
+                self::COMMAND_WRITE
+            );
+        } catch (Exception $e) {
+            $result = false;
+        }
+
+        return $result;
     }
 
     /**
@@ -124,14 +132,20 @@ class KeenIOClient extends Garden\Http\HttpClient {
      *
      * @link https://keen.io/docs/api/#record-multiple-events
      * @param array $data Data for multiple events, grouped by collection.
-     * @return bool|stdClass Object representing result on success, false on failure.
+     * @return array|bool Array of result details on success, false on failure.
      */
     public function addEvents(array $data) {
-        return $this->command(
-            "projects/{$this->projectID}/events",
-            $data,
-            self::COMMAND_WRITE
-        );
+        try {
+            $result = $this->command(
+                "projects/{$this->projectID}/events",
+                $data,
+                self::COMMAND_WRITE
+            );
+        } catch (Exception $e) {
+            $result = false;
+        }
+
+        return $result;
     }
 
     /**
@@ -140,7 +154,7 @@ class KeenIOClient extends Garden\Http\HttpClient {
      * @link https://keen.io/docs/api/#create-project
      * @param string $name Specifies the name of the project to be created.
      * @param array $users Specifies users for the project.
-     * @return bool|stdClass Object representing result on success, false on failure.
+     * @return array|bool Array of result details on success, false on failure.
      */
     public function addProject($name, array $users = []) {
         $data = [
@@ -148,11 +162,17 @@ class KeenIOClient extends Garden\Http\HttpClient {
             'users' => $users
         ];
 
-        return $this->command(
-            "organizations/{$this->orgID}/projects",
-            $data,
-            self::COMMAND_ORG
-        );
+        try {
+            $result = $this->command(
+                "organizations/{$this->orgID}/projects",
+                $data,
+                self::COMMAND_ORG
+            );
+        } catch (Exception $e) {
+            $result = false;
+        }
+
+        return $result;
     }
 
     /**
@@ -160,9 +180,10 @@ class KeenIOClient extends Garden\Http\HttpClient {
      *
      * @param string $endpoint Target endpoint, without the host.
      * @param array $data Payload for API command.
-     * @param string $authorization Value for the authorization header.
+     * @param string|bool $authorization Value for the authorization header.
      * @param string $requestMethod Method to use for the request. Should be one of the REQUEST_* constants.
-     * @return bool|stdClass Object representing result on success, false on failure.
+     * @return array|bool Array of result details on success, false on failure.
+     * @throws Exception if an error is encountered while performing the request.
      */
     public function command($endpoint, $data = [], $authorization = false, $requestMethod = self::REQUEST_POST) {
         $validMethods = [
@@ -200,16 +221,22 @@ class KeenIOClient extends Garden\Http\HttpClient {
                 $data,
                 $headers
             );
-
-            return json_decode($result);
         } catch (Exception $e) {
             if (debug()) {
                 print_r('DEBUG:'. $e->getMessage());
             }
             Logger::event('vanilla_analytics', Logger::ERROR, $e->getMessage());
+            throw $e;
         }
 
-        return false;
+        if ($result instanceof HttpResponse) {
+            $response = $result->getBody();
+            $result = is_array($response) ? $response : false;
+        } else {
+            $result = false;
+        }
+
+        return $result;
     }
 
     /**
@@ -233,14 +260,20 @@ class KeenIOClient extends Garden\Http\HttpClient {
      * returns links to sub-resources.
      *
      * @param string $eventCollection
-     * @return bool|stdClass Object representing result on success, false on failure.
+     * @return array|bool Array of result details on success, false on failure.
      */
     public function getCollection($eventCollection) {
-        return $this->command(
-            "projects/{$this->projectID}/events/{$eventCollection}",
-            [],
-            self::COMMAND_MASTER
-        );
+        try {
+            $result = $this->command(
+                "projects/{$this->projectID}/events/{$eventCollection}",
+                [],
+                self::COMMAND_MASTER
+            );
+        } catch (Exception $e) {
+            $result = false;
+        }
+
+        return $result;
     }
 
     /**
@@ -248,14 +281,20 @@ class KeenIOClient extends Garden\Http\HttpClient {
      * It also returns links to sub-resources.
      *
      * @link https://keen.io/docs/api/#inspect-all-collections
-     * @return bool|stdClass Object representing result on success, false on failure.
+     * @return array|bool Array of result details on success, false on failure.
      */
     public function getCollections() {
-        return $this->command(
-            "projects/{$this->projectID}/events",
-            [],
-            self::COMMAND_MASTER
-        );
+        try {
+            $result = $this->command(
+                "projects/{$this->projectID}/events",
+                [],
+                self::COMMAND_MASTER
+            );
+        } catch (Exception $e) {
+            $result = false;
+        }
+
+        return $result;
     }
 
     /**
@@ -299,14 +338,20 @@ class KeenIOClient extends Garden\Http\HttpClient {
      * Returns the projects accessible to the API user, as well as links to project sub-resources for discovery.
      *
      * @param string $projectID A keen.io project's unique ID.
-     * @return bool|stdClass Object representing result on success, false on failure.
+     * @return array|bool Array of result details on success, false on failure.
      */
     public function getProject($projectID) {
-        return $this->command(
-            "projects/{$projectID}",
-            [],
-            self::COMMAND_MASTER
-        );
+        try {
+            $result = $this->command(
+                "projects/{$projectID}",
+                [],
+                self::COMMAND_MASTER
+            );
+        } catch (Exception $e) {
+                $result = false;
+        }
+
+        return $result;
     }
 
     /**
@@ -321,14 +366,20 @@ class KeenIOClient extends Garden\Http\HttpClient {
     /**
      * Returns the projects accessible to the API user, as well as links to project sub-resources for discovery.
      *
-     * @return bool|stdClass Object representing result on success, false on failure.
+     * @return array|bool Array of result details on success, false on failure.
      */
     public function getProjects() {
-        return $this->command(
-            "projects",
-            [],
-            self::COMMAND_MASTER
-        );
+        try {
+            $result = $this->command(
+                "projects",
+                [],
+                self::COMMAND_MASTER
+            );
+        } catch (Exception $e) {
+            $result = false;
+        }
+
+        return $result;
     }
 
     /**
@@ -336,27 +387,39 @@ class KeenIOClient extends Garden\Http\HttpClient {
      *
      * @param $eventCollection
      * @param $propertyName
-     * @return bool|stdClass
+     * @return array|bool Array of result details on success, false on failure.
      */
     public function getProperty($eventCollection, $propertyName) {
-        return $this->command(
-            "projects/{$this->projectID}/events/{$eventCollection}/properties/{$propertyName}",
-            [],
-            self::COMMAND_MASTER
-        );
+        try {
+            $result = $this->command(
+                "projects/{$this->projectID}/events/{$eventCollection}/properties/{$propertyName}",
+                [],
+                self::COMMAND_MASTER
+            );
+        } catch (Exception $e) {
+            $result = false;
+        }
+
+        return $result;
     }
 
     /**
      * Returns the available child resources. Currently, the only child resource is the Projects Resource.
      *
-     * @return bool|stdClass Object representing result on success, false on failure.
+     * @return array|bool Array of result details on success, false on failure.
      */
     public function getResources() {
-        return $this->command(
-            "",
-            [],
-            self::COMMAND_MASTER
-        );
+        try {
+            $result = $this->command(
+                "",
+                [],
+                self::COMMAND_MASTER
+            );
+        } catch (Exception $e) {
+            $result = false;
+        }
+
+        return $result;
     }
 
     /**

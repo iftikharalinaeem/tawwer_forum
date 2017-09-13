@@ -75,8 +75,8 @@ class AnalyticsLeaderboard {
         }
 
         $processedResult = $this->processResponse(
-            $response->result,
-            $responsePrevious->result
+            $response['result'],
+            $responsePrevious['result']
         );
 
         if (empty($processedResult)) {
@@ -108,8 +108,9 @@ class AnalyticsLeaderboard {
 
             // Attempt to determine the type based on the first row's attributes.
             $firstResult = current($result);
+            $emulatedTypeID = null;
             foreach ($detectTypes as $currentType) {
-                if (isset($firstResult->$currentType)) {
+                if (array_key_exists($currentType, $firstResult)) {
                     $typeID = $currentType;
                     if ($typeID === 'reaction.recordID') {
                         if (!isset($firstResult->{'reaction.recordType'})) {

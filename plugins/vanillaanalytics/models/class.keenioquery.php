@@ -182,12 +182,16 @@ class KeenIOQuery implements JsonSerializable {
             $data['timezone'] = $this->timezone;
         }
 
-        $response = $this->client->command(
-            "projects/{$projectID}/queries/{$analysisType}",
-            $data,
-            KeenIOClient::COMMAND_READ,
-            KeenIOClient::REQUEST_POST
-        );
+        try {
+            $response = $this->client->command(
+                "projects/{$projectID}/queries/{$analysisType}",
+                $data,
+                KeenIOClient::COMMAND_READ,
+                KeenIOClient::REQUEST_POST
+            );
+        } catch (Exception $e) {
+            $response = false;
+        }
 
         return $response ?: false;
     }

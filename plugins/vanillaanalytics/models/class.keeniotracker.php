@@ -1237,7 +1237,7 @@ class KeenIOTracker implements TrackerInterface {
     /**
      * Add values to the gdn.meta JavaScript array on the page.
      *
-     * @param Gdn_Controller Instance of the current page's controller.
+     * @param Gdn_Controller $controller Instance of the current page's controller.
      * @param bool $inDashboard Is the current page a dashboard page?
      * @param array $eventData Data for the current event.
      */
@@ -1273,7 +1273,7 @@ class KeenIOTracker implements TrackerInterface {
     /**
      * Add JavaScript files to the current page.
      *
-     * @param Gdn_Controller Instance of the current page's controller.
+     * @param Gdn_Controller $controller Instance of the current page's controller.
      * @param bool $inDashboard Is the current page a dashboard page?
      */
     public function addJsFiles(Gdn_Controller $controller, $inDashboard = false) {
@@ -1406,17 +1406,15 @@ class KeenIOTracker implements TrackerInterface {
             $project = $keenIOClient->addProject(
                 $site,
                 [
-                    [
-                        'email' => $defaultProjectUser
-                    ]
+                    ['email' => $defaultProjectUser]
                 ]
             );
 
             // If we were successful, save the details.  If not, trigger an error.
             if ($project) {
-                saveToConfig('VanillaAnalytics.KeenIO.ProjectID', $project->id);
-                saveToConfig('VanillaAnalytics.KeenIO.ReadKey', $project->apiKeys->readKey);
-                saveToConfig('VanillaAnalytics.KeenIO.WriteKey', $project->apiKeys->writeKey);
+                saveToConfig('VanillaAnalytics.KeenIO.ProjectID', $project['id']);
+                saveToConfig('VanillaAnalytics.KeenIO.ReadKey', $project['apiKeys']['readKey']);
+                saveToConfig('VanillaAnalytics.KeenIO.WriteKey', $project['apiKeys']['writeKey']);
             } else {
                 throw new Gdn_UserException('Unable to create project on keen.io');
             }
