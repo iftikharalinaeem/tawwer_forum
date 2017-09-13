@@ -1,0 +1,17 @@
+.MItem-Resolved {
+    position: relative;
+    width: 11px;
+    height: 11px;
+    padding: 1px 3px;
+    line-height: 14px;
+    vertical-align: middle;
+}
+
+.resolved2-unresolved,
+.resolved2-resolved {
+    position: relative;
+    display: inline-block;
+    top: 1px;
+    width: 13px;
+    height: 13px;
+}

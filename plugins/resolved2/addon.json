@@ -1,0 +1,24 @@
+{
+    "name": "Resolved Discussions v2",
+    "description": "Allow staff users to mark discussions as resolved. Only staff users see the resolution status.",
+    "version": "1",
+    "settingsUrl": "/settings/resolved2",
+    "settingsPermission": "Garden.Settings.Manage",
+    "registerPermissions": {
+        "Garden.Staff.Allow": "Garden.Moderation.Manage"
+    },
+    "mobileFriendly": true,
+    "icon": "resolved_discussions.png",
+    "key": "resolved2",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com",
+            "homepage": "https://github.com/DaazKu"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    }
+}
