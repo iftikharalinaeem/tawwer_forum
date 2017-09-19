@@ -33,7 +33,7 @@ class SwaggerApiController extends Controller {
      * @return array Returns the swagger object as an array.
      */
     public function index() {
-        $this->permission(); //'Garden.Settings.Manage');
+        $this->permission('Garden.Settings.Manage');
 
         $this->schema(
             new Schema(['$ref' => 'https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/schemas/v2.0/schema.json']),
