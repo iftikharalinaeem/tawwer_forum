@@ -1,0 +1,8 @@
+{
+    "name": "swagger",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "GPLv2",
+    "dependencies": {},
+    "devDependencies": {}
+}
