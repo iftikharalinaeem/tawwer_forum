@@ -2,18 +2,20 @@
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2017 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPLv2
  */
 
 namespace Vanilla\Swagger\Models;
 
 use Garden\EventManager;
 use Garden\Schema\Schema;
-use Garden\Schema\ValidationException;
 use Garden\Web\ResourceRoute;
 use Garden\Web\Route;
 use ReflectionMethod;
 
+/**
+ * Maps a PHP controller method to an open API action.
+ */
 class ReflectionAction {
     /**
      * @var ReflectionMethod
@@ -75,6 +77,14 @@ class ReflectionAction {
      */
     private $operation;
 
+    /**
+     * ReflectionAction constructor.
+     *
+     * @param ReflectionMethod $method The PHP method that the action is meant to represent.
+     * @param object $instance An object instance that the method belongs to.
+     * @param ResourceRoute $route The router used to inspect and quasi-reverse route the method.
+     * @param EventManager $events An event manager for capturing events.
+     */
     public function __construct(ReflectionMethod $method, $instance, ResourceRoute $route, EventManager $events) {
         $this->method = $method;
         $this->events = $events;
@@ -87,7 +97,9 @@ class ReflectionAction {
     /**
      * Reflect a controller action from a callback.
      *
-     * @return null
+     * @throws \InvalidArgumentException Throws an exception when the method name does not follow the convention used to
+     * [map requests to methods](http://docs.vanillaforums.com/developer/framework/apiv2/resource-routing/#methods-names-actions).
+     * @throws \InvalidArgumentException Throws an exception if the object in the callback is not named with the *ApiController suffix.
      */
     private function reflectAction() {
         $method = $this->method;
@@ -150,6 +162,12 @@ class ReflectionAction {
         }
     }
 
+    /**
+     * Get the swagger operation array for this action.
+     *
+     * @return array Returns an operation array.
+     * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operationObject
+     */
     public function getOperation() {
         if ($this->operation === null) {
             $this->operation = $this->makeOperation();
@@ -158,7 +176,10 @@ class ReflectionAction {
     }
 
     /**
-     * Return the Swagger operation array.
+     * Make the Swagger operation array for this action using a combination of reflection and event trapping.
+     *
+     * @return array Returns an operation array.
+     * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operationObject
      */
     private function makeOperation() {
         /* @var Schema $in, $allIn */
@@ -260,6 +281,12 @@ class ReflectionAction {
         return array_filter($r);
     }
 
+    /**
+     * Convert a string from CapitalCase to dash-case.
+     *
+     * @param string $str The string to convert.
+     * @return string Returns a dash-case string.
+     */
     private function dashCase($str) {
         $str = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', '-$1', $str);
         $str = preg_replace('`(?<!-)([A-Z0-9])(?=[a-z])`', '-$1', $str);
@@ -269,16 +296,18 @@ class ReflectionAction {
     }
 
     /**
-     * Get the httpMethod.
+     * Get the HTTP method for this action.
      *
-     * @return string Returns the httpMethod.
+     * @return string Returns the name of an HTTP method.
      */
     public function getHttpMethod() {
         return $this->httpMethod;
     }
 
     /**
-     * @return string
+     * Get the full path of the action.
+     *
+     * @return string Returns the path as a string.
      */
     public function getPath() {
         $r = '/'.$this->resource.
@@ -295,7 +324,10 @@ class ReflectionAction {
     }
 
     /**
-     * Get the subpath.
+     * Get the subpath of the action.
+     *
+     * The subpath occurs after the resource name and the ID parameter and narrows down an action even more. A general
+     * resourceful endpoint would not have a subpath in which case this method will return an empty string.
      *
      * @return string Returns the subpath.
      */

@@ -2,7 +2,7 @@
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2017 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPLv2
  */
 
 namespace Vanilla\Swagger\Models;
@@ -58,6 +58,12 @@ class SwaggerModel {
 
     /**
      * Construct a {@link SwaggerModel}.
+     *
+     * @param RequestInterface $request The page request used to construct URLs.
+     * @param AddonManager $addonManager The addon manager dependency used to find classes.
+     * @param EventManager $events The event manager dependency used to intercept/change controller methods.
+     * @param Dispatcher $dispatcher The dispatcher used to inspect routing behavior.
+     * @param ContainerInterface $container The container used to construct controllers.
      */
     public function __construct(
         RequestInterface $request,
@@ -78,6 +84,7 @@ class SwaggerModel {
      * Get the root node of the swagger application.
      *
      * @return array Returns the root node.
+     * @throws ServerException Throws an exception when the APIv2 router cannot be found.
      */
     public function getSwaggerObject() {
         if ($this->route === null) {
@@ -111,7 +118,9 @@ class SwaggerModel {
     }
 
     /**
-     * @return \Generator|ReflectionAction[]
+     * Get all of the controller actions in the API.
+     *
+     * @return \Generator|ReflectionAction[] Yields all of the API actions in a flat list.
      */
     private function getActions() {
         $controllers = $this->addonManager->findClasses('*\\*ApiController');
@@ -159,6 +168,12 @@ class SwaggerModel {
         }
     }
 
+    /**
+     * Gather all of the named models used in the schema for the definitions element.
+     *
+     * @param array $arr The schema array.
+     * @return array Returns an array of models definitions.
+     */
     private function gatherDefinitions(array $arr) {
         $definitions = [];
 
@@ -194,6 +209,7 @@ class SwaggerModel {
      * Get all of the actions for a controller.
      *
      * @param ReflectionClass $controller The controller class to reflect.
+     * @param object $instance The controller instance used to call the action and capture events.
      * @return \Generator|ReflectionAction[] Yields the actions for the controller.
      */
     private function getControllerActions(ReflectionClass $controller, $instance) {

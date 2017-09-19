@@ -9,6 +9,9 @@ namespace Vanilla\Swagger;
 
 use Vanilla\Addon;
 
+/**
+ * Handles the swagger UI menu options.
+ */
 class SwaggerPlugin extends \Gdn_Plugin {
     /**
      * Adds "API v2" menu option to the Forum menu on the dashboard.
@@ -23,7 +26,7 @@ class SwaggerPlugin extends \Gdn_Plugin {
     /**
      * The main swagger page.
      *
-     * @param \SettingsController $sender
+     * @param \SettingsController $sender The page controller.
      */
     public function settingsController_swagger_create(\SettingsController $sender) {
         $sender->permission('Garden.Settings.Manage');

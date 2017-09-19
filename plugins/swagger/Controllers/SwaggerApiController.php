@@ -2,7 +2,7 @@
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2017 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPLv2
  */
 
 use Garden\Schema\Schema;
@@ -13,6 +13,9 @@ use Vanilla\Swagger\Models\SwaggerModel;
  * Returns the swagger spec for the APIv2.
  */
 class SwaggerApiController extends Controller {
+    /**
+     * @var SwaggerModel The swagger model dependency.
+     */
     private $swaggerModel;
 
     /**
@@ -39,9 +42,5 @@ class SwaggerApiController extends Controller {
 
         $this->getSession()->getPermissions()->setAdmin(true);
         return $this->swaggerModel->getSwaggerObject();
-    }
-
-    public function get_foo() {
-        return null;
     }
 }
