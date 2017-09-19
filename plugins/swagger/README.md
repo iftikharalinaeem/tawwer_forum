@@ -6,7 +6,7 @@ This addon gives admins a live explorer of their API v2 endpoints.
 
 All of the heavy lifting is done with the SwaggerApiController and SwaggerModel. Here is how it works.
  
- 1. The AddonManager is interrogated to get a list of classes that match the ***ApiController** pattern.
+ 1. The AddonManager is interrogated to get a list of classes that match the __*ApiController__ pattern.
  2. The methods on each controller are enumerated and reverse routed to get a list of public endpoints.
  3. Each endpoint is then called with some replacement methods to gather the input and output schemas. Once the output schema is encountered the rest of the call is cancelled via an exception.
  
