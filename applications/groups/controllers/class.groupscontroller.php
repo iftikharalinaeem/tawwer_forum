@@ -32,7 +32,7 @@ class GroupsController extends Gdn_Controller {
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
         $this->addJsFile('jquery.livequery.js');
-        $this->addJsFile('jquery-ui.js');
+        $this->addJsFile('jquery-ui.min.js');
         $this->addJsFile('jquery.tokeninput.js');
         $this->addJsFile('jquery.form.js');
         $this->addJsFile('jquery.popup.js');

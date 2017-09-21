@@ -100,7 +100,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param $sender
      */
     private function addJs($sender) {
-        $sender->addJsFile('jquery-ui.js');
+        $sender->addJsFile('jquery-ui.min.js');
         $sender->addJsFile('reactions.js', 'plugins/Reactions');
     }
 
