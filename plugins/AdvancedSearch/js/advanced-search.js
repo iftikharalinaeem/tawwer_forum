@@ -146,6 +146,7 @@ jQuery(document).ready(function($) {
 
     $author.tokenInput(gdn.url('/user/tagsearch'), {
         hintText: gdn.definition("TagHint", "Start to type..."),
+        noResultsText: gdn.definition("TagNoResults", "No results"),
         tokenValue: 'name',
         searchingText: '', // search text gives flickery ux, don't like
         searchDelay: 300,
@@ -180,6 +181,7 @@ jQuery(document).ready(function($) {
 
     $tags.tokenInput(gdn.url('/tags/search?id=0&type=0'), {
       hintText: gdn.definition("TagHint", "Start to type..."),
+      noResultsText: gdn.definition("TagNoResults", "No results"),
 //      tokenValue: 'name',
       searchingText: '',
       searchDelay: 300,
