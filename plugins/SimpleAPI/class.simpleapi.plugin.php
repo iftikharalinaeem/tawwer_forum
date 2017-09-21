@@ -603,7 +603,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             $sender->Form->setData($data);
         }
 
-        $sender->setData('Title', 'API Settings');
+        $sender->setData('Title', 'API v1 Settings');
         $sender->addSideMenu();
         $sender->render('Settings', '', 'plugins/SimpleAPI');
     }
