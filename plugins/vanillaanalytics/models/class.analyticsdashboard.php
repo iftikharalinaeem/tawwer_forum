@@ -265,6 +265,19 @@ class AnalyticsDashboard implements JsonSerializable {
                 ];
             }
 
+            if (Gdn::addonManager()->isEnabled('resolved2', \Vanilla\Addon::TYPE_ADDON)) {
+                $defaults['Resolved'] = [
+                    'widgets' => [
+                        // Metrics
+                        'total-resolved-discussions',
+                        'total-unresolved-discussions',
+                        'average-time-to-resolve-discussion',
+                        // Charts & Leaderboards
+                        'resolved-discussion',
+                    ],
+                ];
+            }
+
             foreach ($defaults as $title => $dashboardConfig) {
                 $widgets = val('widgets', $dashboardConfig, []);
                 $dashboard = new AnalyticsDashboard($title, $widgets);

@@ -220,6 +220,31 @@ class KeenIOTracker implements TrackerInterface {
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'chart'
         ],
+        'total-resolved-discussions' => [
+            'title' => 'Resolved Discussions',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric',
+            'supportCategoryFilter' => true,
+        ],
+        'total-unresolved-discussions' => [
+            'title' => 'Unresolved Discussions',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric',
+            'supportCategoryFilter' => true,
+        ],
+        'average-time-to-resolve-discussion' => [
+            'title' => 'Average Time to Resolve Discussion',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'metric',
+            'callback' => 'formatSeconds',
+            'supportCategoryFilter' => true,
+        ],
+        'resolved-discussion' => [
+            'title' => 'Resolved Discussions',
+            'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
+            'type' => 'chart',
+            'supportCategoryFilter' => true,
+        ],
         'active-users' => [
             'title' => 'Active Users',
             'rank' => AnalyticsWidget::MEDIUM_WIDGET_RANK,
@@ -354,7 +379,8 @@ class KeenIOTracker implements TrackerInterface {
             'type' => 'metric',
             'callback' => 'formatSeconds',
             'supportCategoryFilter' => true,
-        ]
+        ],
+
     ];
 
     /**
@@ -885,7 +911,7 @@ class KeenIOTracker implements TrackerInterface {
             'finalAnalysis' => 'positive-reacted-rate'
         ];
 
-        // Average Time to First Comment (Metric)
+        // Average Time to First Comment (metric)
         $timeToFirstCommentQuery = new KeenIOQuery();
         $timeToFirstCommentQuery->setAnalysisType(KeenIOQuery::ANALYSIS_MEDIAN)
             ->setTitle(t('Average Time to First Comment'))
@@ -904,6 +930,104 @@ class KeenIOTracker implements TrackerInterface {
         ;
 
         $this->widgets['average-time-to-first-comment']['query'] = $timeToFirstCommentQuery;
+
+        // Total Resolved Discussion (metric)
+        // Only count first resolution
+        $totalDiscussionsResolvedOnCreationQuery = new KeenIOQuery();
+        $totalDiscussionsResolvedOnCreationQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Total Resolved Discussions On Creation'))
+            ->setEventCollection('post')
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'resolvedMetric.resolved',
+                'property_value' => 1
+            ])
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'resolvedMetric.countResolved',
+                'property_value' => 1
+            ])
+        ;
+        $totalDiscussionsResolvedOnUpdateQuery = new KeenIOQuery();
+        $totalDiscussionsResolvedOnUpdateQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Total Resolved Discussions On Update'))
+            ->setEventCollection('post_modify')
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'resolvedMetric.resolved',
+                'property_value' => 1
+            ])
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'resolvedMetric.countResolved',
+                'property_value' => 1
+            ])
+        ;
+        $this->widgets['total-resolved-discussions']['query'] = [
+            $totalDiscussionsResolvedOnCreationQuery,
+            $totalDiscussionsResolvedOnUpdateQuery
+        ];
+        $this->widgets['total-resolved-discussions']['queryProcessor'] = [
+            'instructions' => [
+                'merged-resolved-discussions' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'addResults'
+                ],
+            ],
+            'finalAnalysis' => 'merged-resolved-discussions',
+        ];
+
+        // Total Unresolved Discussion (metrics)
+        $totalDiscussionsUnresolvedOnCreationQuery = new KeenIOQuery();
+        $totalDiscussionsUnresolvedOnCreationQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Total Discussion Unresolved On Creation'))
+            ->setEventCollection('post')
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'resolvedMetric.resolved',
+                'property_value' => 0
+            ])
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'resolvedMetric.countResolved',
+                'property_value' => 0
+            ])
+        ;
+
+        $this->widgets['total-unresolved-discussions']['query'] = [
+            $totalDiscussionsUnresolvedOnCreationQuery,
+            $totalDiscussionsResolvedOnUpdateQuery
+        ];
+        $this->widgets['total-unresolved-discussions']['queryProcessor'] = [
+            'instructions' => [
+                'merged-unresolved-discussions' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'substractResults'
+                ],
+            ],
+            'finalAnalysis' => 'merged-unresolved-discussions',
+        ];
+
+        // Average Time to Resolve Discussion (metric)
+        // Does not count discussion created as resolved.
+        $averageTimeToResolveDiscussionQuery = new KeenIOQuery();
+        $averageTimeToResolveDiscussionQuery->setAnalysisType(KeenIOQuery::ANALYSIS_AVERAGE)
+            ->setTitle(t('Average Time to Resolve Discussion'))
+            ->setEventCollection('post_modify')
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'resolvedMetric.resolved',
+                'property_value' => 1
+            ])
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'resolvedMetric.countResolved',
+                'property_value' => 1
+            ])
+            ->setTargetProperty('resolvedMetric.time')
+        ;
+
+        $this->widgets['average-time-to-resolve-discussion']['query'] = $averageTimeToResolveDiscussionQuery;
 
         /**
          * Pie Charts
@@ -1222,6 +1346,55 @@ class KeenIOTracker implements TrackerInterface {
                 ],
             ],
             'finalAnalysis' => 'divided-average-comments-per-discussion'
+        ];
+
+        // Discussion Resolved
+        $discussionResolvedOnCreationQuery = new KeenIOQuery();
+        $discussionResolvedOnCreationQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Discussion Resolved On Creation'))
+            ->setEventCollection('post')
+            ->setInterval('daily')
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'resolvedMetric.resolved',
+                'property_value' => 1
+            ])
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'resolvedMetric.countResolved',
+                'property_value' => 1
+            ])
+        ;
+
+        $discussionResolvedOnUpdateQuery = new KeenIOQuery();
+        $discussionResolvedOnUpdateQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT)
+            ->setTitle(t('Discussion Resolved On Update'))
+            ->setEventCollection('post_modify')
+            ->setInterval('daily')
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'resolvedMetric.resolved',
+                'property_value' => 1
+            ])
+            ->addFilter([
+                'operator'       => 'eq',
+                'property_name'  => 'resolvedMetric.countResolved',
+                'property_value' => 1
+            ])
+        ;
+
+        $this->widgets['resolved-discussion']['query'] = [
+            $discussionResolvedOnCreationQuery,
+            $discussionResolvedOnUpdateQuery
+        ];
+        $this->widgets['resolved-discussion']['queryProcessor'] = [
+            'instructions' => [
+                'merged-resolved-discussion' => [
+                    'analyses' => [0, 1],
+                    'processor' => 'addResults'
+                ],
+            ],
+            'finalAnalysis' => 'merged-resolved-discussion'
         ];
     }
 
