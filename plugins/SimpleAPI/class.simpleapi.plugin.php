@@ -603,7 +603,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             $sender->Form->setData($data);
         }
 
-        $sender->setData('Title', 'API Settings');
+        $sender->setData('Title', 'API v1 Settings');
         $sender->addSideMenu();
         $sender->render('Settings', '', 'plugins/SimpleAPI');
     }
@@ -615,7 +615,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      */
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
-        $menu->addLink('Site Settings', t('API'), 'settings/api', 'Garden.Settings.Manage', ['class' => 'nav-api']);
+        $menu->addLink('Site Settings', t('API', 'API v1'), 'settings/api', 'Garden.Settings.Manage', ['class' => 'nav-api']);
     }
 
     /**
