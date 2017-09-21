@@ -91,7 +91,7 @@ class UserBadgeModel extends Gdn_Model {
      */
     public static function badgeName($badge) {
         $name = $badge['Name'];
-        $threshold = $badge['Threshold'];
+        $threshold = (string)$badge['Threshold'];
 
         if (!$threshold) {
             return t($name);

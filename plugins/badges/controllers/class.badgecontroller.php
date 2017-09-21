@@ -329,6 +329,12 @@ class BadgeController extends BadgesAppController {
         if (!$this->Badge) {
             throw new Exception(t('Badge404', 'Badge not found.'), 404);
         }
+
+        // Don't show badge descriptions for the non-default locale since they can't be translated.
+        if (Gdn::locale()->current() !== c('Garden.Locale')) {
+            $this->Badge['Body'] = '';
+        }
+
         $this->setData('Badge', $this->Badge);
 
         // Current user a recipient?
