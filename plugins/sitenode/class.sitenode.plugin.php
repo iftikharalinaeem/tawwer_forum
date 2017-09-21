@@ -466,11 +466,16 @@ class SiteNodePlugin extends Gdn_Plugin {
                 $currentCategoryPermissions = Gdn_DataSet::index($currentCategoryPermissions, 'RoleID');
 
                 foreach ($permissions as $i => $permissionRow) {
-                    $roleID = $permissionRow['RoleID'];
+                    $hubRoleID = $permissionRow['RoleID'];
 
-                    if (empty($roleMap[$roleID])) {
+                    // Grab the local role ID to perform current permission lookup.
+                    $roleID = val($hubRoleID, $roleMap);
+                    if (empty($roleID)) {
                         continue; // role disconnected
                     }
+
+                    // Translate the hub's role ID to the local role ID.
+                    $permissionRow['RoleID'] = $roleID;
 
                     // Do not molest roles that respectfully requested some goddamn peace and quiet.
                     $role = val($roleID, $roles);
