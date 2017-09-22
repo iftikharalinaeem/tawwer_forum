@@ -30,6 +30,10 @@ class RoleTrackerController extends Gdn_Controller {
         } else {
             $trackedRoles = $roleTrackerModel->getTrackedRoles();
 
+            $this->EventArguments['Discussion'] = $discussion;
+            $this->EventArguments['TrackedRoles'] = &$trackedRoles;
+            $this->fireEvent('BeforeTrackUsers');
+
             $trackedUsersData = Gdn::sql()
                 ->select('UserID')
                 ->from('UserRole')
