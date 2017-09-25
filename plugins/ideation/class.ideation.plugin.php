@@ -1528,6 +1528,6 @@ if (!function_exists('getStatusTagHtml')) {
             $statusCode = htmlspecialchars($statusName);
         }
         $statusCssClass = slugify($statusName);
-        return ' <a href="'.url('/discussions/tagged/'.$statusCode).'"><span class="Tag Status-Tag-'.$statusCssClass.'"">'.$statusName.'</span></a> ';
+        return ' <a href="'.url('/discussions/tagged/'.$statusCode).'" class="MItem MItem-'.$statusCssClass.' IdeationTag"><span class="Tag Status-Tag-'.$statusCssClass.'">'.$statusName.'</span></a> ';
     }
 }
