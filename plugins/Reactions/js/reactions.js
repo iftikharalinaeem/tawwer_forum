@@ -27,8 +27,6 @@ jQuery(document).ready(function($) {
             // Construct the initial div.
             $menu = $('<div class="MenuItems MenuItems-Reactions Up"><div class="TinyProgress" /></div>')
                 .css('visibility', 'hidden')
-                .attr('aria-hidden', 'true')
-                .attr('tabindex', '-1')
                 .appendTo($button);
         
             $.ajax({
@@ -45,6 +43,8 @@ jQuery(document).ready(function($) {
        var bottom = $button.height();
        
        $menu.css({ bottom: bottom, left: left, visibility: 'visible' });
+       
+       console.log($menu);
    });
    
    $(document).on('mouseleave', '.ReactButton', function() {
