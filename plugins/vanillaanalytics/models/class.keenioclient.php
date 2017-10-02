@@ -348,7 +348,7 @@ class KeenIOClient extends Garden\Http\HttpClient {
                 self::COMMAND_MASTER
             );
         } catch (Exception $e) {
-                $result = false;
+            $result = false;
         }
 
         return $result;
