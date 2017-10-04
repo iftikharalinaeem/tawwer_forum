@@ -12,7 +12,6 @@ $bloglink = sprintf(t('Check out our %s'), anchor('Vanilla Forums Theming Guide'
 
 $links .= '<p>'.t('If you are new to HTML and/or CSS, here are some tutorials to get you started:').'</p>';
 $links .= '<ul>';
-$links .= '<li>'.anchor(t('Vanilla\'s Theming Documentation'), 'http://docs.vanillaforums.com/developer/theming/', '', ["target" => "_blank"]).'</li>';
 $links .= '<li>'.anchor("W3C School's CSS Tutorial", 'http://www.w3schools.com/Css', '', ['target' => '_blank']).'</li>';
 $links .= '<li>'.anchor("HTML Dog's CSS Beginner Tutorial", 'http://htmldog.com/guides/cssbeginner', '', ['target' => '_blank']).'</li>';
 $links .= '</ul>';
