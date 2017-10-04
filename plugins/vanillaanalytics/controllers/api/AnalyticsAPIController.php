@@ -105,7 +105,7 @@ class AnalyticsApiController extends AbstractApiController {
             ],
             'start:dt' => 'Start of the time frame.',
             'end:dt' => 'End of the time frame.',
-        ], 'in');
+        ], 'in')->setDescription('Retrieve data for a leaderboard.');
         $out = $this->schema([
             ':a' => $this->schema([
                 'id:i' => 'ID of the record.',
