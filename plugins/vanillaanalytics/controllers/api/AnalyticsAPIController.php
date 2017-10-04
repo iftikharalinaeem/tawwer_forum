@@ -114,7 +114,7 @@ class AnalyticsApiController extends AbstractApiController {
                     'description' => 'Progression status of the record.',
                     'enum' => ['Fall', 'New', 'Rise', 'Same']
                 ],
-                'previous:i|s' => 'Previous position of the record',
+                'previous:i|n' => 'Previous position of the record',
                 'url:s' => 'Full URL to the record.',
                 'title:s|n' => 'Title for the row.',
                 'count:i' => 'Associated total for this row.'
@@ -132,8 +132,8 @@ class AnalyticsApiController extends AbstractApiController {
         $leaderboard->setQuery($leaderboardQuery);
         $leaderboard->setPreviousQuery(clone $leaderboardQuery);
         $rows = $leaderboard->lookupData(
-            strtotime($query['start']),
-            strtotime($query['end'])
+            $query['start']->getTimestamp(),
+            $query['end']->getTimestamp()
         );
 
         // Prepare the data for output.
