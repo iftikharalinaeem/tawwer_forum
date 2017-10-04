@@ -7,6 +7,7 @@
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ServerException;
+use Garden\Web\Data;
 
 /**
  * API Controller for `/analytics` endpoints.
@@ -150,10 +151,10 @@ class AnalyticsApiController extends AbstractApiController {
     /**
      * Query tracked events from a collection.
      *
-     * @param array $query The request query.
-     * @return array
+     * @param array $body The body of the request.
+     * @return Data
      */
-    public function get_query(array $query) {
+    public function post_query(array $body) {
         $this->permission('Garden.Settings.Manage');
 
         $in = $this->schema([
@@ -168,23 +169,28 @@ class AnalyticsApiController extends AbstractApiController {
             'start:dt' => 'Start of the time frame.',
             'end:dt' => 'End of the time frame.',
             'property:s?' => 'An event property to perform the analysis on.',
-            'filters:s?' => 'Event property filters.',
+            'filters:a?' => [
+                'prop:s' => 'The property name.',
+                'op:s' => [
+                    'description' => 'The comparison operation for the filter.',
+                    'enum' => ['eq', 'nq', 'gt', 'gte', 'lt', 'lte', 'in']
+                ],
+                'val' => 'The target value for comparison.'
+            ],
             'interval:s?' => [
                 'description' => 'Result interval.',
                 'enum' => ['hourly', 'daily', 'weekly', 'monthly']
             ],
             'group:s?' => 'An event property to group results.'
-        ], 'in')
-            ->setDescription('Query tracked events.')
-            ->addValidator('filters', [$this, 'validateFilters']);
+        ], 'in')->setDescription('Query tracked events.');
 
-        $out = $this->queryResponseSchema($query);
+        $out = $this->queryResponseSchema($body);
 
-        $query = $in->validate($query);
+        $query = $in->validate($body);
         $events = $this->execQuery($query);
 
         $result = $out->validate($events);
-        return $result;
+        return new Data($result, 200);
     }
 
     /**
@@ -275,34 +281,6 @@ class AnalyticsApiController extends AbstractApiController {
             }
         }
         return $filters;
-    }
-
-    /**
-     * Validate the filter parameter of an incoming request.
-     *
-     * @param string|array $value The value to test.
-     * @param ValidationField $field The validation field object, passed down by the schema class.
-     * @return array A validated value
-     */
-    public function validateFilters($value, ValidationField $field) {
-        if (is_string($value)) {
-            $value = json_decode($value, true);
-        }
-
-        // Short parameter names save us some bits in the request. Keen's parameters are longer (e.g. property_name).
-        $in = $this->schema([
-            ':a' => [
-                'prop:s',
-                'op:s' => [
-                    'enum' => [ 'eq', 'nq', 'gt', 'gte', 'lt', 'lte', 'in']
-                ],
-                'val'
-            ]
-        ]);
-
-        // If validation fails, an exception is thrown that will bubble up.
-        $result = $in->validate($value);
-        return $result;
     }
 
     /**
