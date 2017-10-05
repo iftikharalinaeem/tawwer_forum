@@ -9,7 +9,7 @@ Features:
 - New comments by non-staff will make the discussion not resolved.
 - Create a list of discussions on `/discussion/unresolved` that are not resolved.
 - Display an indicator that state is a discussion is Resolved or Not.
-- There is a configuration to prevent `[RESOLVED]` from being prepended to the discussion title when viewing the title from inside the discussion.
+- There is a configuration `Resolved2.DiscussionTitle.DisplayResolved` to prevent `[RESOLVED]` from being prepended to the discussion title when viewing the title from inside the discussion.
 
 Interactions with Analytics:
 
