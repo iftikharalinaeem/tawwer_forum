@@ -43,7 +43,7 @@ class Zendesk {
         $ticketFields = [
             'requester' => $requester,
             'subject' => $subject,
-            'comment' => ['body' => $body]
+            'comment' => ['html_body' => $body]
         ];
         $ticket = array_merge($ticketFields, $additionalTicketFields);
         $response = $this->zendeskRequest(
