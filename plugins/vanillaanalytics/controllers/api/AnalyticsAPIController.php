@@ -149,7 +149,7 @@ class AnalyticsApiController extends AbstractApiController {
     }
 
     /**
-     * Query tracked events from a collection.
+     * Get the result of an analytics query.
      *
      * @param array $body The body of the request.
      * @return Data
@@ -182,7 +182,7 @@ class AnalyticsApiController extends AbstractApiController {
                 'enum' => ['hourly', 'daily', 'weekly', 'monthly']
             ],
             'group:s?' => 'An event property to group results.'
-        ], 'in')->setDescription('Query tracked events.');
+        ], 'in')->setDescription('Get the result of an analytics query.');
 
         $out = $this->queryResponseSchema($body);
 
