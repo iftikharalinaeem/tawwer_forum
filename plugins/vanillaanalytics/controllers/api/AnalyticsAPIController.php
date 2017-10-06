@@ -7,6 +7,7 @@
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ServerException;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Data;
 
 /**
@@ -33,6 +34,7 @@ class AnalyticsApiController extends AbstractApiController {
      * Perform an analytics query.
      *
      * @param array $query Details of the analytics query.
+     * @throws ClientException if the query config isn't valid.
      * @throws ServerException if there was an error performing the analytics query request.
      * @return array
      */
@@ -69,8 +71,20 @@ class AnalyticsApiController extends AbstractApiController {
             $this->query->resetFilters();
         }
 
+        // A chance to make some pre-flight checks before the query is executed.
+        switch ($this->query->getAnalysisType()) {
+            case 'count_unique':
+            case 'maximum':
+            case 'median':
+            case 'sum':
+                if ($this->query->getTargetProperty() === null) {
+                    throw new ClientException("property is required for this type of query");
+                }
+                    break;
+        }
+
         try {
-            $result = $this->query->exec(true, true);
+            $result = $this->query->exec();
         } catch (Exception $e) {
             // If there was a problem, let the user know what's up.
             throw new ServerException(
@@ -183,7 +197,6 @@ class AnalyticsApiController extends AbstractApiController {
             ],
             'group:s?' => 'An event property to group results.'
         ], 'in')->setDescription('Get the result of an analytics query.');
-
         $out = $this->queryResponseSchema($body);
 
         $query = $in->validate($body);
