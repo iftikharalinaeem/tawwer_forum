@@ -145,6 +145,10 @@ class KeenIOQuery implements JsonSerializable {
 
     /**
      * Execute this query and return the result.
+     *
+     * @throws Gdn_UserException if we haven't configured a type.
+     * @throws Gdn_UserException if we haven't configured a collection.
+     * @return object|array|bool
      */
     public function exec() {
         if (empty($this->analysisType)) {
@@ -296,6 +300,13 @@ class KeenIOQuery implements JsonSerializable {
     public function setAnalysisType($analysisType) {
         $this->analysisType = $analysisType;
         return $this;
+    }
+
+    /**
+     * Reset any configured filters.
+     */
+    public function resetFilters() {
+        $this->filters = [];
     }
 
     /**
