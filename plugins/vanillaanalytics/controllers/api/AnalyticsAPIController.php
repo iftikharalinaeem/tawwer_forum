@@ -71,18 +71,6 @@ class AnalyticsApiController extends AbstractApiController {
             $this->query->resetFilters();
         }
 
-        // A chance to make some pre-flight checks before the query is executed.
-        switch ($this->query->getAnalysisType()) {
-            case 'count_unique':
-            case 'maximum':
-            case 'median':
-            case 'sum':
-                if ($this->query->getTargetProperty() === null) {
-                    throw new ClientException("property is required for this type of query");
-                }
-                break;
-        }
-
         try {
             $result = $this->query->exec();
         } catch (Exception $e) {
@@ -196,7 +184,9 @@ class AnalyticsApiController extends AbstractApiController {
                 'enum' => ['hourly', 'daily', 'weekly', 'monthly']
             ],
             'group:s?' => 'An event property to group results.'
-        ], 'in')->setDescription('Get the result of an analytics query.');
+        ], 'in')
+            ->addValidator('', $this->queryValidator())
+            ->setDescription('Get the result of an analytics query.');
         $out = $this->queryResponseSchema($body);
 
         $query = $in->validate($body);
@@ -262,6 +252,35 @@ class AnalyticsApiController extends AbstractApiController {
 
         $schema = $this->schema($fields, $type);
         return $schema;
+    }
+
+    /**
+     * Return a garden-schema-compatible validator for a query request.
+     *
+     * @return callable
+     */
+    private function queryValidator() {
+        $result = function($value, ValidationField $field) {
+            $type = array_key_exists('type', $value) ? $value['type'] : null;
+            $property = array_key_exists('property', $value) ? $value['property'] : null;
+
+            switch ($type) {
+                case 'count_unique':
+                case 'maximum':
+                case 'median':
+                case 'sum':
+                    if (empty($property)) {
+                        $field->getValidation()->addError(
+                            'property',
+                            'missingField',
+                            ['messageCode' => "property required for {$type} queries"]
+                        );
+                    }
+                    break;
+            }
+        };
+
+        return $result;
     }
 
     /**
