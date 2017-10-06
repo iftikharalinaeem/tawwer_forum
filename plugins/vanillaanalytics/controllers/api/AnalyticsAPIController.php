@@ -80,7 +80,7 @@ class AnalyticsApiController extends AbstractApiController {
                 if ($this->query->getTargetProperty() === null) {
                     throw new ClientException("property is required for this type of query");
                 }
-                    break;
+                break;
         }
 
         try {
