@@ -260,15 +260,15 @@ class AnalyticsData extends Gdn_Model {
     public static function getSite() {
         if (class_exists('\Infrastructure')) {
             $site = [
-                'accountID' => \Infrastructure::site('accountid'),
-                'name' => \Infrastructure::site('name'),
-                'siteID' => \Infrastructure::site('siteid')
+                'accountID' => c('VanillaAnalytics.Vanilla.AccountID', \Infrastructure::site('accountid')),
+                'name' => c('VanillaAnalytics.Vanilla.Domain', \Infrastructure::site('name')),
+                'siteID' => c('VanillaAnalytics.Vanilla.SiteID', \Infrastructure::site('siteid')),
             ];
         } else {
             $site = [
                 'accountID' => c('VanillaAnalytics.Vanilla.AccountID', null),
                 'name'  => c('VanillaAnalytics.Vanilla.Domain', null),
-                'siteID' => c('VanillaAnalytics.Vanilla.SiteID', null)
+                'siteID' => c('VanillaAnalytics.Vanilla.SiteID', null),
             ];
         }
 
