@@ -384,6 +384,9 @@ class Resolved2Plugin extends Gdn_Plugin {
     public function discussionsController_unresolved_create($sender, $args) {
         $this->controller->permission('Garden.Staff.Allow');
 
+        Gdn_Theme::section('DiscussionList');
+        Gdn_Theme::section('ResolvedList');
+
         $page = val(0, $args, 0);
 
         // Determine offset from $page
