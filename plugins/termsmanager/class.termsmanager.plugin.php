@@ -36,6 +36,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
             ->primaryKey('TermsOfUseID')
             ->column('Body', 'text', false)
             ->column('Link', 'text', false)
+            ->column('ShowInPopup', 'tinyint', 1)
             ->column('Active', 'tinyint', 0)
             ->column('ForceRenew', 'tinyint', 0)
             ->column('DateInserted', 'datetime', true)
@@ -72,6 +73,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
         $formFields['Body'] = ['LabelCode' => t('Terms of Use Text'), 'Description' => 'If you have a link to internal document in \'Link to Terms of User\' above, \'Terms of Use Text\' will be ignored. Remove the link if you want to use this text.', 'Control' => 'TextBox', 'Options' => ['MultiLine' => true, 'rows' => 10, 'columns' => 100]];
         $formFields['Active'] = ['LabelCode' => t('Enable Terms of Use'), 'Control' => 'CheckBox'];
         $formFields['ForceRenew'] = ['LabelCode' => t('Force Review'), 'Description' => t('If you have updated your \'Terms\' you can force users to agree to the new terms when logging in.'), 'Control' => 'CheckBox'];
+        $formFields['ShowInPopup'] = ['LabelCode' => t('Show in Popup'), 'Description' => t('Display the terms in a popup.'), 'Control' => 'CheckBox'];
         $sender->setData('_Form', $formFields);
         $sender->setData('Title', sprintf(t('%s Settings'), t('Terms of Use Management')));
         $sender->render('settings', '', 'plugins/termsmanager');
@@ -264,6 +266,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
             return;
         }
 
+        $sender->Head->addCss('/plugins/termsmanager/design/termsmanager.css');
         // If client has not specified that they would like to show both default and custom terms, hide custom terms with CSS
         if (!c('TermsManager.ShowDefault')) {
             $sender->Head->addString('<style type="text/css">.DefaultTermsLabel {display: none !important}</style>');
@@ -291,11 +294,14 @@ class TermsManagerPlugin extends Gdn_Plugin {
         $link = val('Link', $terms) ? val('Link', $terms) : '/vanilla/terms';
 
         $linkAttribute = ($link === '/vanilla/terms') ? ['class' =>'Popup'] : ['target' => '_blank'];
-        $anchor = anchor('Click here to read.', $link, $linkAttribute);
+        $anchor = (val('ShowInPopup', $terms)) ? anchor('Click here to read.', $link, $linkAttribute) : '';
         $message = t('You must read and understand the provisions of the forums code of conduct before participating in the forums.');
-
-
         echo wrap('<div class="DismissMessage '.$messageClass.'">'.$validationMessage.$message.' '.$anchor.'</div>', $wrapTag);
+
+        if (!val('ShowInPopup', $terms)) {
+            $body = Gdn_Format::text(val('Body', $terms));
+            echo wrap('<div class="inline-terms-body">'.$body.'</div>', $wrapTag);
+        }
         echo wrap($sender->Form->checkBox('Terms', t('TermsLabel', 'By checking this box, I acknowledge I have read and understand, and agree to the forums code of conduct.'), ['value' => val('TermsOfUseID', $terms)]), $wrapTag);
     }
 
@@ -327,6 +333,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
             'Body' => $form->getValue('Body'),
             'Link' => $form->getValue('Link'),
             'ForceRenew' => (int)$form->getValue('ForceRenew'),
+            'ShowInPopup' => (int)$form->getFormValue('ShowInPopup'),
             'Active' => (int)$form->getValue('Active'),
             'DateInserted' => date('Y-m-j H:i:s')
         ];
