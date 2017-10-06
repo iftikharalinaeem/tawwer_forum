@@ -162,7 +162,7 @@ class AnalyticsApiController extends AbstractApiController {
         $in = $this->schema([
             'type:s' => [
                 'description' => 'Type of analysis to perform.',
-                'enum' => ['count', 'sum', 'maximum', 'count_unique', 'median']
+                'enum' => ['count', 'count_unique', 'maximum', 'median', 'sum']
             ],
             'collection:s' => [
                 'description' => 'Event collection.',
@@ -170,7 +170,7 @@ class AnalyticsApiController extends AbstractApiController {
             ],
             'start:dt' => 'Start of the time frame.',
             'end:dt' => 'End of the time frame.',
-            'property:s?' => 'An event property to perform the analysis on.',
+            'property:s?' => 'An event property to perform the analysis on. Required for count_unique, maximum, median and sum query types.',
             'filters:a?' => [
                 'prop:s' => 'The property name.',
                 'op:s' => [
