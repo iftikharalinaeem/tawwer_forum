@@ -273,7 +273,10 @@ class AnalyticsApiController extends AbstractApiController {
                         $field->getValidation()->addError(
                             'property',
                             'missingField',
-                            ['messageCode' => "property required for {$type} queries"]
+                            [
+                                'messageCode' => "{field} required for {queryType} queries",
+                                'queryType' => $type
+                            ]
                         );
                     }
                     break;
