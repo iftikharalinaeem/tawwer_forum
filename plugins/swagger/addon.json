@@ -1,7 +1,7 @@
 {
     "key": "swagger",
-    "name": "Swagger UI",
-    "description": "Dynamic APIv2 documentation.",
+    "name": "API v2 Docs",
+    "description": "API v2 documentation customized for your community right in your Dashboard.",
     "version": "1.0-alpha",
     "license": "Proprietary",
     "type": "addon",
