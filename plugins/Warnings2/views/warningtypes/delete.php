@@ -15,7 +15,7 @@
 echo $form->open(['class' => 'WarningTypeDelete']);
 echo '<div class="Buttons Buttons-Confirm">';
 echo anchor(t('Cancel'), '/settings/warnings', 'Button CancelButton');
-echo anchor(t('Confirm'), '/warningtypes/delete/'.$this->data('WarningTypeID').'/delete', 'Button ConfirmButton');
+echo $form->button(t('Confirm'));
 echo '</div>';
 echo $form->close();
 
