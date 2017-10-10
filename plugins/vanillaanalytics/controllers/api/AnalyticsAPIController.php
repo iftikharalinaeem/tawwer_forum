@@ -7,6 +7,7 @@
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ServerException;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Data;
 
 /**
@@ -33,6 +34,7 @@ class AnalyticsApiController extends AbstractApiController {
      * Perform an analytics query.
      *
      * @param array $query Details of the analytics query.
+     * @throws ClientException if the query config isn't valid.
      * @throws ServerException if there was an error performing the analytics query request.
      * @return array
      */
@@ -70,7 +72,7 @@ class AnalyticsApiController extends AbstractApiController {
         }
 
         try {
-            $result = $this->query->exec(true, true);
+            $result = $this->query->exec();
         } catch (Exception $e) {
             // If there was a problem, let the user know what's up.
             throw new ServerException(
@@ -160,7 +162,7 @@ class AnalyticsApiController extends AbstractApiController {
         $in = $this->schema([
             'type:s' => [
                 'description' => 'Type of analysis to perform.',
-                'enum' => ['count', 'sum', 'maximum', 'count_unique', 'median']
+                'enum' => ['count', 'count_unique', 'maximum', 'median', 'sum']
             ],
             'collection:s' => [
                 'description' => 'Event collection.',
@@ -168,7 +170,7 @@ class AnalyticsApiController extends AbstractApiController {
             ],
             'start:dt' => 'Start of the time frame.',
             'end:dt' => 'End of the time frame.',
-            'property:s?' => 'An event property to perform the analysis on.',
+            'property:s?' => 'An event property to perform the analysis on. Required for count_unique, maximum, median and sum query types.',
             'filters:a?' => [
                 'prop:s' => 'The property name.',
                 'op:s' => [
@@ -182,8 +184,9 @@ class AnalyticsApiController extends AbstractApiController {
                 'enum' => ['hourly', 'daily', 'weekly', 'monthly']
             ],
             'group:s?' => 'An event property to group results.'
-        ], 'in')->setDescription('Get the result of an analytics query.');
-
+        ], 'in')
+            ->addValidator('', $this->queryValidator())
+            ->setDescription('Get the result of an analytics query.');
         $out = $this->queryResponseSchema($body);
 
         $query = $in->validate($body);
@@ -249,6 +252,38 @@ class AnalyticsApiController extends AbstractApiController {
 
         $schema = $this->schema($fields, $type);
         return $schema;
+    }
+
+    /**
+     * Return a garden-schema-compatible validator for a query request.
+     *
+     * @return callable
+     */
+    private function queryValidator() {
+        $result = function($value, ValidationField $field) {
+            $type = array_key_exists('type', $value) ? $value['type'] : null;
+            $property = array_key_exists('property', $value) ? $value['property'] : null;
+
+            switch ($type) {
+                case 'count_unique':
+                case 'maximum':
+                case 'median':
+                case 'sum':
+                    if (empty($property)) {
+                        $field->getValidation()->addError(
+                            'property',
+                            'missingField',
+                            [
+                                'messageCode' => "{field} required for {queryType} queries",
+                                'queryType' => $type
+                            ]
+                        );
+                    }
+                    break;
+            }
+        };
+
+        return $result;
     }
 
     /**
