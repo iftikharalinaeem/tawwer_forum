@@ -3,7 +3,7 @@
 $this->title(sprintf(t('Give a Badge to %s'), val('Name', $this->User))); ?>
 
 <div id="UserBadgeForm">
-    <h1><?php echo sprintf(t('Give a Badge to %s'), val('Name', $this->User)); ?></h1>
+    <h1><?php echo sprintf(t('Give a Badge to %s'), htmlspecialchars(val('Name', $this->User))); ?></h1>
 
     <?php
     echo $this->Form->open();
