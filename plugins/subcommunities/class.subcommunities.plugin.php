@@ -703,7 +703,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Update where close when calling DiscussionModel->get() when discussion.Resolved is present.
+     * Update where clause when calling DiscussionModel->get() when discussion.Resolved is present.
      *
      * @param DiscussionModel $sender
      * @param array $args
@@ -722,7 +722,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Update where close when calling DiscussionModel->getCount() when discussion.Resolved is present.
+     * Update where clause when calling DiscussionModel->getCount() when discussion.Resolved is present.
      *
      * @param DiscussionModel $sender
      * @param array $args
