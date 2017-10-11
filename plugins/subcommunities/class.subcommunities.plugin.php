@@ -725,7 +725,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     /**
      * Add filter to discussion queries based on certain conditions.
      *
-     * @param $args
+     * @param array $args
      */
     private function dicussionQueryFiltering($args) {
         if (!SubCommunityModel::getCurrent()) {
