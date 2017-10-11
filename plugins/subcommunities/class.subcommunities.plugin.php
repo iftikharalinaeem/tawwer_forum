@@ -701,6 +701,35 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         return $url;
     }
+
+    /**
+     * Update where close when calling DiscussionModel->get() when discussion.Resolved is present.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    public function base_beforeGet_handler($sender, $args) {
+        if (!isset($args['Wheres']) || !is_array($args['Wheres'])) {
+            return;
+        }
+
+        $wheres = array_change_key_case($args['Wheres']);
+        if (!array_key_exists('resolved', $wheres) && !array_key_exists('d.resolved', $wheres)) {
+            return;
+        }
+
+        $args['Wheres']['d.CategoryID'] = $this->getCategoryIDs();
+    }
+
+    /**
+     * Update where close when calling DiscussionModel->getCount() when discussion.Resolved is present.
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    public function base_beforeGetCount_handler($sender, $args) {
+        $this->base_beforeGet_handler($sender, $args);
+    }
 }
 
 if (!function_exists('commentUrl')) {
