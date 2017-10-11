@@ -701,6 +701,50 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         return $url;
     }
+
+    /**
+     * Update where clause when calling DiscussionModel->get()
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    public function discussionModel_beforeGet_handler($sender, $args) {
+        $this->dicussionQueryFiltering($args);
+    }
+
+    /**
+     * Update where clause when calling DiscussionModel->getCount()
+     *
+     * @param DiscussionModel $sender
+     * @param array $args
+     */
+    public function discussionModel_beforeGetCount_handler($sender, $args) {
+        $this->dicussionQueryFiltering($args);
+    }
+
+    /**
+     * Add filter to discussion queries based on certain conditions.
+     *
+     * @param array $args
+     */
+    private function dicussionQueryFiltering($args) {
+        if (!SubCommunityModel::getCurrent()) {
+            return;
+        }
+
+        if (!isset($args['Wheres']) || !is_array($args['Wheres'])) {
+            return;
+        }
+
+        $wheres = array_change_key_case($args['Wheres']);
+
+        // If the query is filtered by "resolved"
+        if (!array_key_exists('resolved', $wheres) && !array_key_exists('d.resolved', $wheres)) {
+            return;
+        }
+
+        $args['Wheres']['d.CategoryID'] = $this->getCategoryIDs();
+    }
 }
 
 if (!function_exists('commentUrl')) {
