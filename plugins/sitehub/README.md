@@ -2,6 +2,13 @@
 
 Main Documentation: http://docs.vanillaforums.com/help/multisite/#the-hub
 
+## Synchronization
+
+The major part of the synchronization (read the main documentation) is done by the hub/node plugins but
+any plugins can subscribe to `multisiteModel_syncNodes_handler` to allow them to synchronize themselves.
+
+A good example of this is the [Badges plugin](https://github.com/vanilla/internal/blob/1e2da5ec5f416e58104d96f6e01491bcc69b1fcb/plugins/badges/class.badges.plugin.php#L19).
+
 ## Syncing configurations to nodes
 
 - `NodeConfig.Addons.{AddonName}` will sync `EnabledPlugins.{AddonName}`.
