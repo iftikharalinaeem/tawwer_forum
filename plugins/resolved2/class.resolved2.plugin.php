@@ -148,8 +148,8 @@ class Resolved2Plugin extends Gdn_Plugin {
      * @return string
      */
     private function getUpdatedDiscussionName($discussion) {
-        if (val('Resolved', $discussion)) {
-            $newName = '<span class="DiscussionResolved">'.t('[RESOLVED]').'</span> '.val('Name', $discussion);
+        if (c('Resolved2.DiscussionTitle.DisplayResolved')) {
+            $newName = $this->generateStateIndicator($discussion).val('Name', $discussion);
         } else {
             $newName = val('Name', $discussion, '');
         }
@@ -337,7 +337,7 @@ class Resolved2Plugin extends Gdn_Plugin {
 
         $discussion = $this->controller->data('Discussion');
 
-        if (checkPermission('Garden.Staff.Allow') && val('Resolved', $discussion)) {
+        if (checkPermission('Garden.Staff.Allow')) {
             $newName = $this->getUpdatedDiscussionName($discussion);
             setValue('Name', $discussion, $newName);
             $this->controller->setData('Discussion', $discussion);
@@ -436,7 +436,7 @@ class Resolved2Plugin extends Gdn_Plugin {
         $this->controller->addModule('CategoriesModule');
 
         // Render default view
-        $this->controller->setData('Title', t('Unresolved'));
+        $this->controller->setData('Title', t('Unresolved Discussions'));
         $this->controller->setData('Breadcrumbs', [['Name' => t('Unresolved'), 'Url' => '/discussions/unresolved']]);
         $this->controller->render('index');
     }
@@ -467,7 +467,7 @@ class Resolved2Plugin extends Gdn_Plugin {
             'Resolved2.DiscussionTitle.DisplayResolved' => [
                 'Control' => 'Toggle',
                 'LabelCode' => t('Display resolution state in a discussion'),
-                'Description' => sprintf(t('Prefix the discussion title with %s if it is resolved.'), t('[RESOLVED]')),
+                'Description' => sprintf(t('Prefix the discussion title with a resolved state indicator.')),
             ],
         ]);
 
