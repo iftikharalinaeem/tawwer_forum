@@ -457,6 +457,55 @@ class GroupController extends Gdn_Controller {
         $this->render();
     }
 
+
+    /**
+     * Add a user as a member to a group.
+     *
+     * @param Integer $userID The UserID of the user to be added.
+     * @param Integer $groupID The GroupID of the group to receive the user.
+     * @param String $role accepts either Leader or Member.
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    public function addUserToGroup($userID, $groupID, $role = 'Member') {
+        $this->permission('Garden.Settings.Manage');
+
+        $group = $this->GroupModel->getID($groupID);
+        if (!$group) {
+            throw notFoundException('Group');
+        }
+
+        $userModel = new UserModel();
+        $user = $userModel->getID($userID);
+        if (!$user) {
+            throw notFoundException('User');
+        }
+
+        $data['GroupID'] = $groupID;
+        $data['UserID'] = $userID;
+        $data['Role'] = $role;
+
+        $form = new Gdn_Form();
+        $this->Form = $form;
+        if ($form->authenticatedPostBack()) {
+            $userGroupModel = new Gdn_Model('UserGroup');
+            $userExists = $userGroupModel->getWhere(['GroupID' => $groupID, 'UserID' => $userID])->resultArray();
+            if (count($userExists)) {
+                $this->setData('Warning', sprintf('User %1$s is already part of group %2$s', $userID, $groupID));
+            } else {
+                $userGroupID = $userGroupModel->insert($data);
+                $this->GroupModel->updateCount($groupID, 'CountMembers');
+                $this->setData('UserGroupID', $userGroupID);
+                if (count($userGroupModel->validationResults()) === 0) {
+                    $this->setData('Success', true);
+                } else {
+                    $this->setData('Errors', $userGroupModel->validationResults());
+                }
+            }
+            $this->render();
+        }
+    }
+
     /**
      * Save an image from a field and delete any old image that's been uploaded.
      *
