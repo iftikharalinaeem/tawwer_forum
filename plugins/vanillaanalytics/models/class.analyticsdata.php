@@ -72,7 +72,7 @@ class AnalyticsData extends Gdn_Model {
         $ancestors = [];
 
         // Grab our category's ancestors, which include the current category.
-        $categories = CategoryModel::getAncestors($categoryID);
+        $categories = CategoryModel::getAncestors($categoryID, false, true);
 
         $categoryLevel = 0;
         foreach ($categories as $currentCategory) {
