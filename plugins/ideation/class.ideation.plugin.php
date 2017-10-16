@@ -412,8 +412,8 @@ EOT
      * @param array $args
      */
     public function postController_discussionFormOptions_handler($sender, $args) {
-        // Clear out options.
-        if (val('Options', $args)) {
+        // If this is an idea, clear out options.
+        if ($sender->data('Type') === 'Idea' && val('Options', $args)) {
             $args['Options'] = '';
         }
     }
