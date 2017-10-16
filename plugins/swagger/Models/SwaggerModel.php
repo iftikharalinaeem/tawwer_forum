@@ -138,7 +138,12 @@ class SwaggerModel {
                 continue;
             }
 
-            $instance = $this->container->get($controller);
+            try {
+                $instance = $this->container->get($controller);
+            } catch (\Exception $e) {
+                continue;
+            }
+
             $actions = iterator_to_array($this->getControllerActions($class, $instance));
 
             usort($actions, function (ReflectionAction $a, ReflectionAction $b) {
