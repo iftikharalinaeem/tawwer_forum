@@ -492,7 +492,7 @@ class OnlinePlugin extends Gdn_Plugin {
 
         // Check if we're on the categories list, or inside one, and adjust location
         if ($location == 'category') {
-            $categoryIdentifier = val('CategoryIdentifier', $resolvedArgs);
+            $categoryIdentifier = val('categoryidentifier', array_change_key_case($resolvedArgs));
             if (empty($categoryIdentifier)) {
                 $location = 'limbo';
             }
