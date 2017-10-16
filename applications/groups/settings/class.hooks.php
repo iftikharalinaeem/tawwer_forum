@@ -412,10 +412,10 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     protected function overridePermissions($sender) {
-        $relectArgs = property_exists($sender, 'ReflectArgs') ? array_change_key_case($sender->ReflectArgs) : [];
-        $discussionID = val('discussionid', $relectArgs);
+        $reflectArgs = property_exists($sender, 'ReflectArgs') ? array_change_key_case($sender->ReflectArgs) : [];
+        $discussionID = val('discussionid', $reflectArgs);
         if (!$discussionID) {
-            $commentID = val('commentid', $relectArgs);
+            $commentID = val('commentid', $reflectArgs);
             $commentModel = new CommentModel();
             $comment = $commentModel->getID($commentID, DATASET_TYPE_ARRAY);
             $discussionID = $comment['DiscussionID'];
