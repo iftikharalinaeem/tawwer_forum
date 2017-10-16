@@ -368,7 +368,9 @@ class Resolved2Plugin extends Gdn_Plugin {
 
         // Resolve the discussion.
         $discussion = $this->setResolved($discussion, $resolved);
-        $this->discussionModel->save($discussion);
+        if (!$this->discussionModel->save($discussion)) {
+            throw new Exception("Could not save discussion: \n".implode('\n', $this->discussionModel->validationResults()));
+        }
 
         $this->controller->sendOptions((object)$discussion);
         $this->setJSONTarget($discussion);
