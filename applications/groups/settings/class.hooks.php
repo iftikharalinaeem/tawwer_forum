@@ -412,16 +412,17 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     protected function overridePermissions($sender) {
-        $discussionID = valr('ReflectArgs.DiscussionID', $sender);
+        $relectArgs = property_exists($sender, 'ReflectArgs') ? array_change_key_case($sender->ReflectArgs) : [];
+        $discussionID = val('discussionid', $relectArgs);
         if (!$discussionID) {
-            $commentID = valr('ReflectArgs.CommentID', $sender);
+            $commentID = valr('commentid', $relectArgs);
             $commentModel = new CommentModel();
             $comment = $commentModel->getID($commentID, DATASET_TYPE_ARRAY);
             $discussionID = $comment['DiscussionID'];
         }
         $discussion = $sender->DiscussionModel->getID($discussionID);
 
-        $groupID = getValue('GroupID', $discussion);
+        $groupID = val('GroupID', $discussion);
         if (!$groupID)
             return;
         $model = new GroupModel();
@@ -496,7 +497,7 @@ class GroupsHooks extends Gdn_Plugin {
      * @param PostController $sender
      */
     public function postController_editComment_before($sender) {
-        $commentID = val('CommentID', $sender->ReflectArgs);
+        $commentID = val('commentid', array_change_key_case($sender->ReflectArgs));
         if (!$commentID) {
             return;
         }
@@ -565,11 +566,11 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     public function postController_editDiscussion_before($sender) {
-        $discussionID = getValue('DiscussionID', $sender->ReflectArgs);
+        $discussionID = val('discussionid', array_change_key_case($sender->ReflectArgs));
         $groupID = false;
         if ($discussionID) {
             $discussion = $sender->DiscussionModel->getID($discussionID);
-            $groupID = getValue('GroupID', $discussion);
+            $groupID = val('GroupID', $discussion);
         }
 
         if (!$groupID)
