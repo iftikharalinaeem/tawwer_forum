@@ -415,7 +415,7 @@ class GroupsHooks extends Gdn_Plugin {
         $relectArgs = property_exists($sender, 'ReflectArgs') ? array_change_key_case($sender->ReflectArgs) : [];
         $discussionID = val('discussionid', $relectArgs);
         if (!$discussionID) {
-            $commentID = valr('commentid', $relectArgs);
+            $commentID = val('commentid', $relectArgs);
             $commentModel = new CommentModel();
             $comment = $commentModel->getID($commentID, DATASET_TYPE_ARRAY);
             $discussionID = $comment['DiscussionID'];
