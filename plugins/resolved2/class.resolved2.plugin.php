@@ -218,6 +218,24 @@ class Resolved2Plugin extends Gdn_Plugin {
         return $discussion;
     }
 
+
+    /**
+     * Save a discussion's resolved field.
+     *
+     * @param array $discussion
+     * @return bool
+     */
+    private function saveDiscussionResolvedFields($discussion) {
+        $resolutionFields = [
+            'Resolved' => val('Resolved', $discussion, 0),
+            'CountResolved' => val('CountResolved', $discussion, null),
+            'DateResolved' => val('DateResolved', $discussion, null),
+            'ResolvedUserID' => val('ResolvedUserID', $discussion, null),
+        ];
+
+        return (bool)$this->discussionModel->update($resolutionFields, ['DiscussionID' => $discussion['DiscussionID']]);
+    }
+
     /**
      * Set resolved metric on discussions.
      *
@@ -319,7 +337,7 @@ class Resolved2Plugin extends Gdn_Plugin {
         if ($discussion['Resolved'] XOR checkPermission('Garden.Staff.Allow')) {
             $resolved = checkPermission('Garden.Staff.Allow');
             $discussion = $this->setResolved($discussion, $resolved);
-            $this->discussionModel->save($discussion);
+            $this->saveDiscussionResolvedFields($discussion);
 
             if ($resolved) {
                 $this->setJSONTarget($discussion);
@@ -368,14 +386,12 @@ class Resolved2Plugin extends Gdn_Plugin {
 
         // Resolve the discussion.
         $discussion = $this->setResolved($discussion, $resolved);
-        $this->discussionModel->save($discussion);
-
-        if ($this->discussionModel->validationResults()) {
-            $this->controller->errorMessage(json_encode($this->discussionModel->validationResults(), JSON_UNESCAPED_SLASHES));
-            $this->controller->informMessage("An error occurred.");
-        } else {
+        if ($this->saveDiscussionResolvedFields($discussion)) {
             $this->controller->sendOptions((object)$discussion);
             $this->setJSONTarget($discussion);
+        } else {
+            // This should never happen.
+            $this->controller->informMessage("An error occurred.");
         }
 
         $this->controller->render('blank', 'utility', 'dashboard');
