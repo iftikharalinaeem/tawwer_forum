@@ -300,7 +300,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
         if (!val('ShowInPopup', $terms)) {
             $body = Gdn_Format::text(val('Body', $terms));
-            echo wrap('<div class="inline-terms-body">'.$body.'</div>', $wrapTag);
+            echo wrap('<label class="inline-terms-label">'.t('Terms of Service').'</label><div class="inline-terms-body">'.$body.'</div>', $wrapTag);
         }
         echo wrap($sender->Form->checkBox('Terms', t('TermsLabel', 'By checking this box, I acknowledge I have read and understand, and agree to the forums code of conduct.'), ['value' => val('TermsOfUseID', $terms)]), $wrapTag);
     }
