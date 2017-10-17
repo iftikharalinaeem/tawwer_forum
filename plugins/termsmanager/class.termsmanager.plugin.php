@@ -314,7 +314,8 @@ class TermsManagerPlugin extends Gdn_Plugin {
      */
     public function vanillaController_terms_create($sender, $args) {
         $terms = $this->getTerms();
-        $body = Gdn_Format::text(val('Body', $terms));
+        $termsBody = t('Terms of service body text.', val('Body', $terms));
+        $body = Gdn_Format::text($termsBody);
         $sender->setData('Body', $body);
         $sender->render('terms', '', 'plugins/termsmanager');
     }
