@@ -461,9 +461,9 @@ class GroupController extends Gdn_Controller {
     /**
      * Add a user as a member to a group.
      *
-     * @param Integer $userID The UserID of the user to be added.
-     * @param Integer $groupID The GroupID of the group to receive the user.
-     * @param String $role accepts either Leader or Member.
+     * @param int $userID The UserID of the user to be added.
+     * @param int $groupID The GroupID of the group to receive the user.
+     * @param string $role accepts either Leader or Member.
      * @throws Exception
      * @throws Gdn_UserException
      */
