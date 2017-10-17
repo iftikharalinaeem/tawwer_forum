@@ -370,8 +370,14 @@ class Resolved2Plugin extends Gdn_Plugin {
         $discussion = $this->setResolved($discussion, $resolved);
         $this->discussionModel->save($discussion);
 
-        $this->controller->sendOptions((object)$discussion);
-        $this->setJSONTarget($discussion);
+        if ($this->discussionModel->validationResults()) {
+            $this->controller->errorMessage(json_encode($this->discussionModel->validationResults(), JSON_UNESCAPED_SLASHES));
+            $this->controller->informMessage("An error occurred.");
+        } else {
+            $this->controller->sendOptions((object)$discussion);
+            $this->setJSONTarget($discussion);
+        }
+
         $this->controller->render('blank', 'utility', 'dashboard');
     }
 
