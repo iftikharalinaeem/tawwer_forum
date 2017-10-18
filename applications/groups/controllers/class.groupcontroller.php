@@ -468,7 +468,9 @@ class GroupController extends Gdn_Controller {
      * @throws Gdn_UserException
      */
     public function addUserToGroup($userID, $groupID, $role = 'Member') {
-        $this->permission('Garden.Settings.Manage');
+        if (!Gdn::session()->checkRankedPermission('Garden.Moderation.Manage')) {
+            throw permissionException();
+        }
 
         $group = $this->GroupModel->getID($groupID);
         if (!$group) {
