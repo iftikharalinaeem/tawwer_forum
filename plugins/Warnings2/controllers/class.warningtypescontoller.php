@@ -49,9 +49,8 @@ class WarningTypesController extends PluginController {
      * Delete endpoint.
      *
      * @param string $warningTypeID WarningType ID
-     * @param string $action Either nothing or delete (which confirm the delete)
      */
-    public function delete($warningTypeID, $action = '') {
+    public function delete($warningTypeID) {
         // Prevent non-admins from accessing this page
         $this->permission('Garden.Settings.Manage');
 
@@ -61,11 +60,11 @@ class WarningTypesController extends PluginController {
 
         $this->setData('WarningTypeID', $warningTypeID);
 
-        if ($action) {
-            if ($action === 'delete') {
-                $warningTypeModel = new WarningTypeModel();
-                $warningTypeModel->deleteID($warningTypeID);
-            }
+        $this->Form = new Gdn_Form();
+        $postback = $this->Form->authenticatedPostBack();
+        if ($postback) {
+            $warningTypeModel = new WarningTypeModel();
+            $warningTypeModel->deleteID($warningTypeID);
 
             redirectTo('settings/warnings');
         } else {
