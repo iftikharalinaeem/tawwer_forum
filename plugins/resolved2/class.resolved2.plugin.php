@@ -233,7 +233,19 @@ class Resolved2Plugin extends Gdn_Plugin {
             'ResolvedUserID' => val('ResolvedUserID', $discussion, null),
         ];
 
-        return (bool)$this->discussionModel->update($resolutionFields, ['DiscussionID' => $discussion['DiscussionID']]);
+        $result = (bool)$this->discussionModel->update($resolutionFields, ['DiscussionID' => $discussion['DiscussionID']]);
+
+        // Force a trackEvent since we are calling update instead of DiscussionModel->save()
+        if ($result && class_exists('AnalyticsTracker')) {
+            $type = 'discussion_edit';
+            $collection = 'post_modify';
+
+            $data = AnalyticsData::getDiscussion(val('DiscussionID', $args));
+
+            AnalyticsTracker::getInstance()->trackEvent($collection, $type, $data);
+        }
+
+        return $result;
     }
 
     /**
