@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
 <div class="BadgeRequestForm">
-    <h1><?php echo t('Request Badge') .  ': '. $this->data('Badge.Name'); ?></h1>
+    <h1><?php echo t('Request Badge') .  ': '. htmlspecialchars($this->data('Badge.Name')); ?></h1>
     <p><?php echo t('BadgeReasonPrompt', 'Think you deserve this badge? Tell us why.'); ?></p>
     <?php
     echo $this->Form->open();

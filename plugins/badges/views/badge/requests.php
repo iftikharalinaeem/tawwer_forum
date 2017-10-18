@@ -34,7 +34,7 @@ $Session = Gdn::session();
         <tr>
             <td><?php echo $this->Form->checkBox('Requests[]', '', ['value' => $Request->UserID.'-'.$Request->BadgeID]); ?></td>
             <td><?php echo userAnchor($Request); ?></td>
-            <td><?php echo wrap(anchor($Request->BadgeName, 'badge/'.$Request->Slug), 'strong'), '<br />&ldquo;', $Request->RequestReason, '&rdquo;'; ?></td>
+            <td><?php echo wrap(anchor(htmlspecialchars($Request->BadgeName), 'badge/'.rawurlencode($Request->Slug)), 'strong').'<br />&ldquo;'.htmlspecialchars($Request->RequestReason).'&rdquo;'; ?></td>
             <td><?php echo Gdn_Format::date($Request->DateRequested); ?></td>
             <td class="options">
                 <div class="btn-group">
