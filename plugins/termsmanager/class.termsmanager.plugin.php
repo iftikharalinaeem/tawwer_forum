@@ -184,7 +184,11 @@ class TermsManagerPlugin extends Gdn_Plugin {
         $userModel = Gdn::userModel();
         $auth = $userModel->getAuthentication($sender->Form->getFormValue('UniqueID'), $sender->Form->getFormValue('Provider'));
         $userID = val('UserID', $auth);
-        $user = $userModel->getID($userID, 'array');
+        if ($userID) {
+            $user = $userModel->getID($userID, 'array');
+        } else {
+            $user = (array) $userModel->getByEmail($sender->Form->getFormValue('Email'));
+        }
 
         if (!$sender->Form->getFormValue('Terms')) {
 
