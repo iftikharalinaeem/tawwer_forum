@@ -303,7 +303,8 @@ class TermsManagerPlugin extends Gdn_Plugin {
         echo wrap('<div class="DismissMessage '.$messageClass.'">'.$validationMessage.$message.' '.$anchor.'</div>', $wrapTag);
 
         if (!val('ShowInPopup', $terms)) {
-            $body = Gdn_Format::text(val('Body', $terms));
+            $termsBody = t('Terms of service body text.', val('Body', $terms));
+            $body = Gdn_Format::text($termsBody);
             echo wrap('<label class="inline-terms-label">'.t('Terms of Service').'</label><div class="inline-terms-body">'.$body.'</div>', $wrapTag);
         }
         echo wrap($sender->Form->checkBox('Terms', t('TermsLabel', 'By checking this box, I acknowledge I have read and understand, and agree to the forums code of conduct.'), ['value' => val('TermsOfUseID', $terms)]), $wrapTag);
