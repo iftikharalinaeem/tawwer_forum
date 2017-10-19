@@ -186,7 +186,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
         $userID = val('UserID', $auth);
         if ($userID) {
             $user = $userModel->getID($userID, 'array');
-        } else {
+        } elseif (c('Garden.Registration.AutoConnect')) {
             $user = (array) $userModel->getByEmail($sender->Form->getFormValue('Email'));
         }
 
