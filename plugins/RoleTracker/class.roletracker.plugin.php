@@ -335,8 +335,9 @@ class RoleTrackerPlugin extends Gdn_Plugin {
         $linksTitle = t('Jump to first tracked post.');
         foreach ($discussionTags as $tagData) {
             if (in_array($tagData['TagID'], $tagIDs)) {
-                $tagName = htmlspecialchars(t($tagData['FullName']));
-                echo ' <a href="'.url('/roletracker/jump/'.val('DiscussionID', $discussion)).'" nofollow class="Tag tag-tracker tag-'.strtolower(t($tagData['Name'])).'-tracker" title="'.$linksTitle.'">'.$tagName.'</a> ';
+                $tagFullName = htmlspecialchars(t($tagData['FullName']));
+                $tagName = htmlspecialchars(strtolower(t($tagData['Name'])));
+                echo ' <a href="'.url('/roletracker/jump/'.val('DiscussionID', $discussion)).'" nofollow class="Tag tag-tracker tag-'.$tagName.'-tracker" title="'.$linksTitle.'">'.$tagFullName.'</a> ';
 
             }
         }
@@ -387,10 +388,11 @@ if (!function_exists('writePostTrackedTags')) {
                 continue;
             }
             $trackerTag = $tags[$tagID];
-            $tagName = htmlspecialchars($trackerTag['FullName']);
+            $tagFullName = htmlspecialchars(t($trackerTag['FullName']));
+            $tagName = htmlspecialchars(strtolower(t($tagName['Name'])));
             // Keep those spaces before and after the tag :D
-            $classes[] = 'tag-'.strtolower(t($trackerTag['Name'])).'-tracker';
-            $names[] = $tagName;
+            $classes[] = 'tag-'.$tagName.'-tracker';
+            $names[] = $tagFullName;
         }
 
         echo '<span class="MItem RoleTracker">'
