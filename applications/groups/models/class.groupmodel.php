@@ -267,6 +267,17 @@ class GroupModel extends Gdn_Model {
     }
 
     /**
+     * Get the groupIDs that a user is a member of.
+     *
+     * @param int $userID
+     * @return array An array of groupID
+     */
+    public function getUserGroupIDs($userID) {
+        $userGroups = $this->SQL->getWhere('UserGroup', ['UserID' => $userID])->resultArray();
+        return array_column($userGroups, 'GroupID');
+    }
+
+    /**
      *
      *
      * @param string $wheres
