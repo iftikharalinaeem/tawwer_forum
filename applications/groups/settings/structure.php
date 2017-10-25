@@ -17,7 +17,8 @@ $St = Gdn::structure();
 
 Gdn::permissionModel()->define([
     'Groups.Group.Add' => 'Garden.Profiles.Edit',
-    'Groups.Moderation.Manage' => 'Garden.Moderation.Manage']);
+    'Groups.Moderation.Manage' => 'Garden.Moderation.Manage',
+]);
 
 // Define the groups table.
 $St->table('Group');
@@ -99,7 +100,10 @@ if ($St->tableExists('Category')) {
                 'DisplayAs' => 'Discussions',
                 'AllowDiscussions' => 1,
                 'AllowGroups' => 1,
-                'Sort' => 1000
+                'Sort' => 1000,
+                // The model requires these 2 fields and there is nothing that guarantee that a user will be logged in.
+                'DateInserted' => date(MYSQL_DATE_FORMAT),
+                'InsertUserID' => Gdn::session()->isValid() ? Gdn::session()->UserID : 0,
             ];
             // Backwards compat for a new column.
             if ($St->columnExists('CanDelete')) {
