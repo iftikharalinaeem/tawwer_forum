@@ -301,18 +301,9 @@ class GroupModel extends Gdn_Model {
      * @param array $options Base class compatibility.
      * @return array|mixed|object
      */
-    public function getID($iD, $datasetType = DATASET_TYPE_ARRAY, $options = []) {
-        static $cache = [];
-
-        $iD = self::parseID($iD);
-        if (isset($cache[$iD])) {
-            return $cache[$iD];
-        }
-
-        $row = parent::getID($iD, $datasetType);
-        $cache[$iD] = $row;
-
-        return $row;
+    public function getID($id, $datasetType = DATASET_TYPE_ARRAY, $options = []) {
+        $id = self::parseID($id);
+        return parent::getID($id, $datasetType);
     }
 
     /**
@@ -873,7 +864,7 @@ class GroupModel extends Gdn_Model {
      *
      * @param array $data
      * @param bool $settings
-     * @return unknown
+     * @return int|false
      * @throws Exception
      * @throws Gdn_UserException
      */
