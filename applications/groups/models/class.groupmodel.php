@@ -899,6 +899,13 @@ class GroupModel extends Gdn_Model {
         $primaryKeyVal = val($this->PrimaryKey, $data, false);
         $insert = $primaryKeyVal == false ? true : false;
         if ($insert) {
+            if (!isset($data['CategoryID'])) {
+                $categories = self::getGroupCategoryIDs();
+                if (count($categories)) {
+                    $data['CategoryID'] = $categories[0];
+                }
+            }
+
             $this->addInsertFields($data);
         } else {
             $this->addUpdateFields($data);
