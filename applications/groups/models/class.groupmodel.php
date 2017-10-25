@@ -774,6 +774,7 @@ class GroupModel extends Gdn_Model {
         $sql = clone Gdn::sql();
         $sql->reset();
 
+        $discussions = [];
         // Grab the discussions.
         if (count($discussionIDs) > 0) {
             $discussions = $sql->whereIn('DiscussionID', $discussionIDs)->get('Discussion')->resultArray();
