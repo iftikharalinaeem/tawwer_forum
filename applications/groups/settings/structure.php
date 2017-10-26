@@ -101,9 +101,6 @@ if ($St->tableExists('Category')) {
                 'AllowDiscussions' => 1,
                 'AllowGroups' => 1,
                 'Sort' => 1000,
-                // The model requires these 2 fields and there is nothing that guarantee that a user will be logged in.
-                'DateInserted' => date(MYSQL_DATE_FORMAT),
-                'InsertUserID' => Gdn::session()->isValid() ? Gdn::session()->UserID : 0,
             ];
             // Backwards compat for a new column.
             if ($St->columnExists('CanDelete')) {
