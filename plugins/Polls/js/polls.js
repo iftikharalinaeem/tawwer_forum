@@ -1,4 +1,4 @@
-jQuery(document).ready(function($) {
+$(document).on("contentLoad", function() {
     var emptySpace = /^\s*$/g;
     var $template = $('.NewPollForm:first .PollOption:last-child').clone();
     $template.find('.InputBox').val(''); // Reset value just in case it's not empty
