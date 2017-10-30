@@ -35,7 +35,7 @@ if (!$cancelUrl) {
 
     echo '<div class="P">';
     echo $this->Form->label('Poll Question', 'Name');
-    echo wrap($this->Form->textBox('Name', ['maxlength' => 100, 'class' => 'InputBox BigInput']), 'div', ['class' => 'TextBoxWrapper']);
+    echo wrap($this->Form->textBox('Name', ['maxlength' => 100, 'class' => 'InputBox BigInput PollOptionInput']), 'div', ['class' => 'TextBoxWrapper']);
     echo '</div>';
 
     echo '<div class="P">';
@@ -59,12 +59,12 @@ if (!$cancelUrl) {
         foreach ($pollOptions as $pollOption) {
             $pollOption = trim(Gdn_Format::plainText($pollOption));
             if ($pollOption != '') {
-                echo '<li class="PollOption">' . $this->Form->textBox('PollOption[]', ['value' => $pollOption, 'class' => 'InputBox BigInput']) . '</li>';
+                echo '<li class="PollOption">' . $this->Form->textBox('PollOption[]', ['value' => $pollOption, 'class' => 'InputBox BigInput PollOptionInput']) . '</li>';
             }
         }
     }
 
-    echo '<li class="PollOption">' . $this->Form->textBox('PollOption[]', ['class' => 'InputBox BigInput NoIE']) . '</li>';
+    echo '<li class="PollOption">' . $this->Form->textBox('PollOption[]', ['class' => 'InputBox BigInput PollOptionInput NoIE']) . '</li>';
 
     echo '</ol>';
 
