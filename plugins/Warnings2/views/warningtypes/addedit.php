@@ -28,24 +28,24 @@ echo $form->open(['class' => 'WarningType']);
 echo $form->errors();
 ?>
     <ul class="padded">
-        <li>
+        <li class="form-group">
             <?php
-            echo $form->label('Name', 'Name');
-            echo $form->textBox('Name');
+            echo $form->labelWrap('Name', 'Name');
+            echo $form->textBoxWrap('Name');
             ?>
         </li>
-        <li>
+        <li class="form-group">
             <?php
-            echo $form->label('Description', 'Description');
-            echo $form->textBox('Description');
+            echo $form->labelWrap('Description', 'Description');
+            echo $form->textBoxWrap('Description');
             ?>
-        <li>
+        <li class="form-group">
             <?php
-            echo $form->label('Points', 'Points');
-            echo $form->textBox('Points');
+            echo $form->labelWrap('Points', 'Points');
+            echo $form->textBoxWrap('Points');
             ?>
         </li>
-        <li>
+        <li class="form-group">
             <?php
             $options = [];
             if ($warning) {
@@ -53,10 +53,11 @@ echo $form->errors();
             }
 
             echo
-                $form->label('Expiration', 'ExpireNumber')
+                $form->labelWrap('Expiration', 'ExpireNumber')
+                .' <div class="input-wrap">'
                 .$form->textBox('ExpireNumber')
-                .' '
                 .$form->dropDown('ExpireType', $durationPeriods, $options)
+                .'</div>'
             ?>
         </li>
     </ul>
