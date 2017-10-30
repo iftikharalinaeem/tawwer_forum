@@ -8,7 +8,7 @@
     $form = $this->Form;
     echo t('Are you sure?'); ?>
 </h1>
-<div class="Info">
+<div class="padded alert alert-danger">
     <?php echo t('Delete warning type message', 'Deleting this warning will have no effect on existing users.') ?>
 </div>
 <?php

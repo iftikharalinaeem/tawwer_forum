@@ -27,7 +27,7 @@
 echo $form->open(['class' => 'WarningType']);
 echo $form->errors();
 ?>
-    <ul>
+    <ul class="padded">
         <li>
             <?php
             echo $form->label('Name', 'Name');
