@@ -200,7 +200,7 @@ $(document).ready(function() {
         $self.prop('disabled', true);
 
         while (newCat === '') {
-            // we've selected all. Value is parent's category ID.
+            // We've selected all. Value is parent's category ID.
             newCat = $('.js-category-telescope[data-depth=' + (depth - 1) + ']').val();
             fetchChildren = false;
         }
@@ -217,7 +217,7 @@ $(document).ready(function() {
         } else {
             $('#analytics_filter_warning').hide();
         }
-        analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat01.categoryID', newCat, 'cat01']);
+        analyticsToolbar.setWidgets('setFilter', ['categoryAncestors.cat0'+depth+'.categoryID', newCat, 'cat01']);
 
         if (!fetchChildren) {
             $self.prop('disabled', false);
