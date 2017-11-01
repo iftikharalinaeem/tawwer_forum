@@ -384,8 +384,8 @@ class SimpleAPIPlugin extends Gdn_Plugin {
         try {
 
             $ClassFile = "class.api.{$APIVersion}.php";
-            $PluginInfo = Gdn::pluginManager()->getPluginInfo('SimpleAPI');
-            $PluginPath = $PluginInfo['PluginRoot'];
+            $pluginInfo = Gdn::pluginManager()->getPluginInfo('SimpleAPI');
+            $PluginPath = $pluginInfo['PluginRoot'];
             $MapperFile = combinePaths([$PluginPath, 'library', $ClassFile]);
 
             if (!file_exists($MapperFile)) throw new Exception('No such API Mapper');
