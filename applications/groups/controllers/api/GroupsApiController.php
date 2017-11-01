@@ -8,6 +8,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ServerException;
 use Vanilla\Utility\CapitalCaseScheme;
 use Vanilla\Utility\CamelCaseScheme;
 
@@ -29,7 +30,7 @@ class GroupsApiController extends AbstractApiController {
     private $userModel;
 
     /**
-     * GroupsApiController constructor.
+     * ConversationsApiController constructor.
      *
      * @param GroupModel $groupModel
      * @param UserModel $userModel
@@ -53,7 +54,7 @@ class GroupsApiController extends AbstractApiController {
     public function delete($id) {
         $this->permission('Garden.Group.Add');
 
-        $this->idParamSchema()->setDescription('Delete a group.');
+        $this->idParamGroupSchema()->setDescription('Delete a group.');
         $this->schema([], 'out');
 
         $row = $this->groupByID($id);
@@ -67,11 +68,139 @@ class GroupsApiController extends AbstractApiController {
     }
 
     /**
+     * Delete an invite to a user from a group.
+     *
+     * @throws ClientException
+     * @throws NotFoundException If unable to find the group.
+     * @param int $id The group ID.
+     * @param int $userID The group  member user ID.
+     */
+    public function delete_invites($id, $userID) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $this->idParamGroupMemberSchema(false)->setDescription('Delete an invite to a user from a group.');
+        $this->schema([], 'out');
+
+        $this->groupByID($id);
+
+        if ($userID !== $this->getSession()->UserID && !$this->groupModel->checkPermission('Moderate', $id)) {
+            throw new ClientException('You do not have the rights to moderate this group.');
+        }
+
+        $this->groupModel->deleteInvites($id, $userID);
+    }
+
+    /**
+     * Remove a user from a group or leave a group.
+     *
+     * @throws ClientException
+     * @throws NotFoundException If unable to find the group.
+     * @param int $id The group ID.
+     * @param int|null $userID The group  member user ID.
+     */
+    public function delete_members($id, $userID = null) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $this->idParamGroupMemberSchema(true);
+        $userIn = $this->schema([
+            'userID:i?' => 'The group member user ID.'
+        ], 'in')->setDescription('Remove a user from a group or leave a group.');
+        $this->schema([], 'out');
+
+        $filtered = $userIn->validate(['userID' => $userID]);
+        if (!empty($filtered['userID'])) {
+            $userID = $filtered['userID'];
+        } else {
+            $userID = $this->getSession()->UserID;
+        }
+
+        $this->leaveGroup($id, $userID);
+    }
+
+    /**
+     * Get a schema instance comprised of all available group application fields
+     *
+     * @return Schema
+     */
+    protected function fullGroupApplicantSchema() {
+        /** @var Schema $schema */
+        static $schema;
+
+        if ($schema === null) {
+            // Name this schema so that it can be read by swagger.
+            $schema = $this->schema([
+                'userID:i' => 'The user ID of the applicant.',
+                'user?' => $this->getUserFragmentSchema(),
+                'state:s|n' => [
+                    'enum' => ['approved', 'denied'],
+                    'description' => 'The status of the applicant.',
+                ],
+                'reason:s' => 'The reason why the applicant wants to join the group.',
+                'body:s' => 'Universal record field. Content of "reason".',
+                'format:s' => 'Universal record field. Format of "reason".',
+                'dateInserted:dt' => 'When the applicant was created.',
+            ], 'GroupApplicant');
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Get a schema instance comprised of all available group invites fields
+     *
+     * @return Schema
+     */
+    protected function fullGroupInviteSchema() {
+        /** @var Schema $schema */
+        static $schema;
+
+        if ($schema === null) {
+            // Name this schema so that it can be read by swagger.
+            $schema = $this->schema([
+                'userID:i' => 'The ID of the user that has been invited.',
+                'user?' => $this->getUserFragmentSchema(),
+                'dateInserted:dt' => 'When the invite was issued.',
+                'insertUserID:i' => 'The user that created the invite.',
+                'insertUser?' => $this->getUserFragmentSchema(),
+            ], 'GroupInvite');
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Get a schema instance comprised of all available group member fields.
+     *
+     * @return Schema
+     */
+    protected function fullGroupMemberSchema() {
+        /** @var Schema $schema */
+        static $schema;
+
+        if ($schema === null) {
+            // Name this schema so that it can be read by swagger.
+            $schema = $this->schema([
+                'userID:i' => 'The user ID of the member of the group.',
+                'user?' => $this->getUserFragmentSchema(),
+                'dateInserted:dt' => 'When the user was added to the group.',
+                'insertUserID:i' => 'The user that added this user to the group.',
+                'insertUser?' => $this->getUserFragmentSchema(),
+                'role:s' => [
+                    'enum' => ['leader', 'member'],
+                    'description' => 'The role of the user for that group.',
+                ],
+            ], 'GroupMember');
+        }
+
+        return $schema;
+    }
+
+    /**
      * Get a schema instance comprised of all available group fields.
      *
      * @return Schema Returns a schema object.
      */
-    protected function fullSchema() {
+    protected function fullGroupSchema() {
         /** @var Schema $schema */
         static $schema;
 
@@ -81,6 +210,7 @@ class GroupsApiController extends AbstractApiController {
                 'groupID:i' => 'The ID of the group.',
                 'name:s' => 'The name of the group.',
                 'description:s' => 'The description of the group.',
+                'body:s' => 'Universal record field. Content of description.',
                 'format:s' => 'The input format of the group.',
                 'iconUrl:s|n?' => 'The URL of the icon of the group.',
                 'bannerUrl:s|n?' => 'The URL of the banner of the group.',
@@ -130,16 +260,15 @@ class GroupsApiController extends AbstractApiController {
     public function get($id) {
         $this->permission();
 
-        $this->idParamSchema()->setDescription('Get a group.');
-        $out = $this->schema($this->fullSchema(), 'out');
+        $this->idParamGroupSchema()->setDescription('Get a group.');
+        $out = $this->schema($this->fullGroupSchema(), 'out');
 
         $row = $this->groupByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID', 'UpdateUserID']);
 
-        $row = $this->normalizeOutput($row);
+        $row = $this->normalizeGroupOutput($row);
         return $out->validate($row);
     }
-
 
     /**
      * Get a group for editing.
@@ -152,11 +281,11 @@ class GroupsApiController extends AbstractApiController {
     public function get_edit($id) {
         $this->permission('Garden.SignIn.Allow');
 
-        $this->idParamSchema()->setDescription('Get a group for editing.');
+        $this->idParamGroupSchema()->setDescription('Get a group for editing.');
         $out = $this->schema(
             Schema::parse([
                 'groupID', 'name', 'description', 'format', 'iconUrl', 'bannerUrl', 'privacy'
-            ])->add($this->fullSchema()),
+            ])->add($this->fullGroupSchema()),
             'out'
         );
 
@@ -166,17 +295,183 @@ class GroupsApiController extends AbstractApiController {
             throw new ClientException('You do not have the rights to edit this group.');
         }
 
-        $result = $this->normalizeOutput($row);
+        $result = $this->normalizeGroupOutput($row);
         return $out->validate($result);
     }
+
+    /**
+     * List the invites for a group.
+     *
+     * @param int $id The ID of the group.
+     * @param array $query
+     * @throws ClientException
+     * @throws NotFoundException if unable to find the group.
+     * @return array
+     */
+    public function get_invites($id, array $query) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $this->idParamGroupSchema();
+        $in = $this->schema([
+            'page:i?' => [
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->groupModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100,
+            ],
+            'expand:b?' => 'Expand associated records.',
+        ], 'in')->setDescription('List the invites for a group.');
+        $out = $this->schema([':a' => $this->fullGroupInviteSchema()], 'out');
+
+        $this->groupByID($id);
+
+        if (!$this->groupModel->checkPermission('Moderate', $id)) {
+            throw new ClientException('You do not have the rights to moderate this group.');
+        }
+
+        $query = $in->validate($query);
+
+        // Paging
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
+        $invites = $this->groupModel->getApplicants($id, ['Type' => 'Invitation'], $limit, $offset, false);
+
+        if (!empty($query['expand'])) {
+            $this->userModel->expandUsers($invites, ['UserID', 'InsertUserID']);
+        }
+
+        return $out->validate($invites);
+    }
+
+    /**
+     * List the applicants to a group.
+     *
+     * @param int $id The ID of the group.
+     * @param array $query
+     * @throws ClientException
+     * @throws NotFoundException if unable to find the group.
+     * @return array
+     */
+    public function get_applicants($id, array $query) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $this->idParamGroupSchema();
+        $in = $this->schema([
+            'page:i?' => [
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->groupModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100,
+            ],
+            'expand:b?' => 'Expand associated records.',
+        ], 'in')->setDescription('List applicants to a group.');
+        $out = $this->schema([':a' => $this->fullGroupApplicantSchema()], 'out');
+
+        $this->groupByID($id);
+
+        if (!$this->groupModel->checkPermission('Moderate', $id)) {
+            throw new ClientException('You do not have the rights to moderate this group.');
+        }
+
+        $query = $in->validate($query);
+
+        // Paging
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
+        $applicants = $this->groupModel->getApplicants($id, ['Type' => 'Application'], $limit, $offset, false);
+
+        if (!empty($query['expand'])) {
+            $this->userModel->expandUsers($applicants, ['UserID', 'InsertUserID']);
+        }
+
+        foreach ($applicants as &$applicant) {
+            $applicant = $this->normalizeGroupApplicantOutput($applicant);
+        }
+        unset($applicant);
+
+        return $out->validate($applicants);
+    }
+
+    /**
+     * List the members of a group.
+     *
+     * @param int $id The ID of the group.
+     * @throws NotFoundException if unable to find the group.
+     * @throws ClientException
+     * @return array
+     */
+    public function get_members($id, array $query) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $this->idParamGroupSchema();
+        $in = $this->schema([
+            'page:i?' => [
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->groupModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100,
+            ],
+            'expand:b?' => 'Expand associated records.',
+        ], 'in')->setDescription('List members of a group.');
+        $out = $this->schema([':a' => $this->fullGroupMemberSchema()], 'out');
+
+        $group = $this->groupByID($id);
+
+        if ($group['InsertUserID'] !== $this->getSession()->UserID && !$this->groupModel->checkPermission('View', $id)) {
+            throw new ClientException('You do not have the rights to view this group.');
+        }
+
+        $query = $in->validate($query);
+
+        // Paging
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
+        $members = $this->groupModel->getMembers($id, [], $limit, $offset, false);
+
+        if (!empty($query['expand'])) {
+            $this->userModel->expandUsers($members, ['UserID']);
+        }
+
+        $members = array_map([$this, 'normalizeGroupMemberOutput'], $members);
+        return $out->validate($members);
+    }
+
+    /**
+     * Get an IDs-only group member record schema.
+     *
+     * @param bool $isUserIDOptional
+     * @return Schema Returns a schema object.
+     */
+    public function idParamGroupMemberSchema($isUserIDOptional) {
+        return $this->schema([
+            'groupID:i' => 'The group ID.',
+            'userID:i'.($isUserIDOptional ? '?' : '') => 'The group member user ID.',
+        ], 'in');
+    }
+
 
     /**
      * Get an ID-only group record schema.
      *
      * @return Schema Returns a schema object.
      */
-    public function idParamSchema() {
-        return $this->schema(['id:i' => 'The group ID.'], 'in');
+    public function idParamGroupSchema() {
+        return $this->schema(['groupID:i' => 'The group ID.'], 'in');
     }
 
     /**
@@ -213,7 +508,7 @@ class GroupsApiController extends AbstractApiController {
             ],
             'expand:b?' => 'Expand associated records.',
         ], 'in')->setDescription('List groups.');
-        $out = $this->schema([':a' => $this->fullSchema()], 'out');
+        $out = $this->schema([':a' => $this->fullGroupSchema()], 'out');
 
         $query = $in->validate($query);
 
@@ -234,12 +529,12 @@ class GroupsApiController extends AbstractApiController {
         $where = [];
         if (array_key_exists('memberID', $query)) {
             $userGroups = $this->groupModel->SQL->getWhere('UserGroup', $query['memberID'])->resultArray();
-            $groupIDs  = array_column($userGroups, 'GroupID');
+            $ids  = array_column($userGroups, 'GroupID');
 
-            if (empty($groupIDs)) {
+            if (empty($ids)) {
                 $where = null;
             } else {
-                $where['GroupID'] = $groupIDs;
+                $where['GroupID'] = $ids;
             }
         }
 
@@ -253,7 +548,7 @@ class GroupsApiController extends AbstractApiController {
             $this->userModel->expandUsers($rows, ['InsertUserID', 'UpdateUserID']);
         }
         foreach ($rows as &$row) {
-            $row = $this->normalizeOutput($row);
+            $row = $this->normalizeGroupOutput($row);
         }
 
         $result = $out->validate($rows, true);
@@ -261,12 +556,56 @@ class GroupsApiController extends AbstractApiController {
     }
 
     /**
+     * Leave group implementation.
+     *
+     * @param int $id
+     * @param int $userID
+     * @throws ClientException
+     */
+    private function leaveGroup($id, $userID) {
+        $this->groupByID($id);
+
+        $permissions = $this->groupModel->checkPermission(false, $id, $userID);
+
+        if ($userID !== $this->getSession()->UserID && !$permissions['Moderate']) {
+            throw new ClientException('You do not have the rights to moderate this group.');
+        }
+
+        if (!$permissions['Leave']) {
+            throw new ClientException($permissions['Leave.Reason']);
+        }
+
+        $this->groupModel->removeMember($id, $userID);
+    }
+
+    /**
+     * Normalize a group applicant database record to match the Schema definition.
+     *
+     * @param $dbRecord Group Applicant database record.
+     * @return array Return a Schema record.
+     */
+    public function normalizeGroupApplicantOutput($dbRecord) {
+        if (in_array($dbRecord['Type'], ['Approved', 'Denied'])) {
+            $dbRecord['State'] = $this->camelCaseScheme->convert($dbRecord['Type']);
+        } else {
+            $dbRecord['State'] = null;
+        }
+
+        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord['body'] = $schemaRecord['reason'];
+        $schemaRecord['format'] = 'Text';
+
+        return $schemaRecord;
+
+    }
+
+    /**
      * Normalize a group Schema record to match the database definition.
      *
-     * @param array $schemaRecord Group Schema record.
+     * @param $schemaRecord Group Schema record.
      * @return array Return a database record.
      */
-    public function normalizeInput(array $schemaRecord) {
+    public function normalizeGroupInput($schemaRecord) {
         if (array_key_exists('bannerUrl', $schemaRecord)) {
             $schemaRecord['banner'] = !empty($schemaRecord['bannerUrl']) ? $schemaRecord['bannerUrl'] : null;
         }
@@ -282,12 +621,39 @@ class GroupsApiController extends AbstractApiController {
     }
 
     /**
-     * Normalize a group database record to match the schema definition.
+     * Normalize a group member Schema record to match the database definition.
      *
-     * @param array $dbRecord Group database record.
+     * @param $schemaRecord Group Member Schema record.
+     * @return array Return a database record.
+     */
+    public function normalizeGroupMemberInput($schemaRecord) {
+        $schemaRecord['role'] = $this->capitalCaseScheme->convert($schemaRecord['role']);
+
+        $dbRecord = $this->capitalCaseScheme->convertArrayKeys($schemaRecord);
+        return $dbRecord;
+    }
+
+    /**
+     * Normalize a group member database record to match the schema definition.
+     *
+     * @param $dbRecord Group database record.
      * @return array Return a schema record.
      */
-    public function normalizeOutput(array $dbRecord) {
+    public function normalizeGroupMemberOutput($dbRecord) {
+        $dbRecord['Role'] = $this->camelCaseScheme->convert($dbRecord['Role']);
+
+        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+
+        return $schemaRecord;
+    }
+
+    /**
+     * Normalize a group database record to match the schema definition.
+     *
+     * @param $dbRecord Group database record.
+     * @return array Return a schema record.
+     */
+    public function normalizeGroupOutput($dbRecord) {
         static $fieldToURL;
         if ($fieldToURL === null) {
             $fieldToURL = function(&$field) {
@@ -309,8 +675,29 @@ class GroupsApiController extends AbstractApiController {
         $dbRecord['Privacy'] = strtolower($dbRecord['Privacy']);
 
         $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord['body'] = $schemaRecord['description'];
 
         return $schemaRecord;
+    }
+
+    /**
+     * Get a member from a group.
+     * Assume that the group exists.
+     *
+     * @throws NotFoundException If the member does not exist.
+     * @param $id
+     * @param $userID
+     * @return array Member information.
+     */
+    public function memberByID($id, $userID) {
+        $row = $this->groupModel->getMember($id, $userID);
+        if (!$row) {
+            throw new NotFoundException('Group Member');
+        }
+
+        $this->userModel->expandUsers($row, ['userID']);
+
+        return $row;
     }
 
     /**
@@ -325,15 +712,15 @@ class GroupsApiController extends AbstractApiController {
     public function patch($id, array $body) {
         $this->permission('Garden.SignIn.Allow');
 
-        $this->idParamSchema();
-        $in = $this->postSchema()->setDescription('Update a group.');
-        $out = $this->schema($this->fullSchema(), 'out');
+        $this->idParamGroupSchema();
+        $in = $this->postGroupSchema()->setDescription('Update a group.');
+        $out = $this->schema($this->fullGroupSchema(), 'out');
 
         $body = $in->validate($body, true);
 
         $row = $this->groupByID($id);
 
-        $groupData = $this->normalizeInput($body);
+        $groupData = $this->normalizeGroupInput($body);
         $groupData['GroupID'] = $id;
 
         if ($row['InsertUserID'] !== $this->getSession()->UserID && !$this->groupModel->checkPermission('Edit', $id)) {
@@ -346,8 +733,99 @@ class GroupsApiController extends AbstractApiController {
         $result = $this->groupByID($id);
         $this->userModel->expandUsers($result, ['InsertUserID', 'UpdateUserID']);
 
-        $result = $this->normalizeOutput($result);
+        $result = $this->normalizeGroupOutput($result);
         return $out->validate($result);
+    }
+
+    /**
+     * Approve or deny a group applicant.
+     *
+     * @throws ClientException
+     * @throws NotFoundException If the applicant was not found.
+     * @throws ServerException
+     * @param int $id
+     * @param int $userID
+     * @param array $body
+     * @return array
+     */
+    public function patch_applicants($id, $userID, array $body) {
+        $this->permission('Garden.SignInAllow');
+
+        $this->idParamGroupMemberSchema(false);
+        $in = $this->schema([
+            'state:s|n' => [
+                'enum' => ['approved', 'denied'],
+                'description' => 'The status of the applicant.',
+            ]
+        ], 'in')->setDescription('Approve or deny a group applicant.');
+        $out = $this->schema($this->fullGroupApplicantSchema(), 'out');
+
+        $this->groupByID($id);
+
+        if (!$this->groupModel->checkPermission('Moderate', $id)) {
+            throw new ClientException('You do not have the rights to moderate this group.');
+        }
+
+        $applicants = $this->groupModel->getApplicants($id, ['Type' => 'Application', 'UserID' => $userID], false, false, false);
+        if (count($applicants) === 0) {
+            throw new NotFoundException('GroupApplicant');
+        }
+        $applicant = array_pop($applicants);
+
+        $body = $in->validate($body);
+
+        $isApproved = $body['state'] === 'approved';
+
+        if (!$this->groupModel->processApplicant($id, $userID, $isApproved)) {
+            throw new ServerException('Unable to update the applicant.', 500);
+        }
+
+        // If an applicant is approved the record is deleted so lets use the fetched record and update the state.
+        $applicant = $this->normalizeGroupApplicantOutput($applicant);
+        $applicant['state'] = $isApproved ? 'approved' : 'denied';
+        return $out->validate($applicant);
+    }
+
+    /**
+     * Update a group member.
+     *
+     * @throws ClientException
+     * @param int $id The ID of the group.
+     * @param int $userID The user ID of the member of the group.
+     * @param array $body
+     * @return array The updated group member.
+     */
+    public function patch_members($id, $userID, array $body) {
+        $this->permission('Garden.SignInAllow');
+
+        $this->idParamGroupMemberSchema(false);
+        $in = $this->schema([
+            'role:s' => [
+                'enum' => ['leader', 'member'],
+                'description' => 'The role of the user for that group.',
+            ],
+        ])->setDescription('Change a user\'s role within a group.');
+        $out = $this->schema($this->fullGroupMemberSchema(), 'out');
+
+        $this->groupByID($id);
+        $this->memberByID($id, $userID);
+
+        if (!$this->groupModel->checkPermission('Moderate', $id)) {
+            throw new ClientException('You do not have the rights to moderate this group.');
+        }
+
+        $body = $in->validate($body);
+
+        $memberData = $this->normalizeGroupMemberInput($body);
+
+        // We currently only allow role to be updated.
+        $this->groupModel->setMemberRole($id, $userID, $memberData['Role']);
+
+        $user = $this->memberByID($id, $userID);
+        $this->userModel->expandUsers($user, ['UserID', 'InsertUserID']);
+        $user = $this->normalizeGroupMemberOutput($user);
+
+        return $out->validate($user);
     }
 
     /**
@@ -360,11 +838,11 @@ class GroupsApiController extends AbstractApiController {
     public function post(array $body) {
         $this->permission('Groups.Group.Add');
 
-        $in = $this->postSchema()->setDescription('Create a group.');
-        $out = $this->schema($this->fullSchema(), 'out');
+        $in = $this->postGroupSchema()->setDescription('Create a group.');
+        $out = $this->schema($this->fullGroupSchema(), 'out');
 
         $body = $in->validate($body);
-        $groupData = $this->normalizeInput($body);
+        $groupData = $this->normalizeGroupInput($body);
 
         $id = $this->groupModel->save($groupData);
         $this->validateModel($this->groupModel);
@@ -376,7 +854,187 @@ class GroupsApiController extends AbstractApiController {
         $row = $this->groupByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID']);
 
-        $result = $this->normalizeOutput($row);
+        $result = $this->normalizeGroupOutput($row);
+        return $out->validate($result);
+    }
+
+    /**
+     * Apply to a group.
+     *
+     * @throws ServerException
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
+    public function post_applicants($id, array $body) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $this->postGroupSchema();
+        $in = $this->schema([
+            'reason:s' => [
+                'maxLength' => 200,
+                'description' => 'The reason why the user wants to apply to this group.',
+            ]
+        ])->setDescription('Apply to a private group.');
+        $out = $this->schema($this->fullGroupApplicantSchema(), 'out');
+
+        $this->groupByID($id);
+
+        $body = $in->validate($body);
+
+        $userID = $this->getSession()->UserID;
+        if (!$this->groupModel->apply($id, $userID, $body['reason'])) {
+            throw new ServerException('Unable to apply.', 500);
+        }
+
+        $applicants = $this->groupModel->getApplicants($id, ['UserID' => $userID], false, false, false);
+
+        $applicant = $this->normalizeGroupApplicantOutput(array_pop($applicants));
+        return $out->validate($applicant);
+    }
+
+    /**
+     * Apply to a group. Convenience method that points to post_applicants.
+     *
+     * @throws ServerException
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
+    public function post_apply($id, array $body) {
+        return $this->post_applicants($id, $body);
+    }
+
+    /**
+     * Invite a user to a group.
+     *
+     * @throws ClientException
+     * @throws ServerException
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
+    public function post_invites($id, array $body) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $this->idParamGroupSchema();
+        $in = $this->schema(['userID:i'], 'in')->setDescription('Invite a user to a group.');
+        $out = $this->schema($this->fullGroupInviteSchema(), 'out');
+
+        $this->groupByID($id);
+
+        if (!$this->groupModel->checkPermission('Moderate', $id)) {
+            throw new ClientException('You do not have the rights to moderate this group.');
+        }
+
+        $body = $in->validate($body);
+
+        $this->userByID($body['userID']);
+
+        $result = $this->groupModel->inviteUsers($id, [$body['userID']]);
+        $this->validateModel($this->groupModel);
+
+        $invites = $this->groupModel->getApplicants($id, ['Type' => 'Invitation', 'UserID' => $body['userID']], false, false, false);
+        if (!$result || count($invites) !== 1) {
+            throw new ServerException('An error occurred while inviting the user.', 500);
+        }
+
+        $invites = array_pop($invites);
+
+        if (!empty($query['expand'])) {
+            $this->userModel->expandUsers($invites, ['UserID', 'InsertUserID']);
+        }
+
+        return $out->validate($invites);
+    }
+
+    /**
+     * Join a public group or a group that you have been invited to.
+     *
+     * @param int $id The group ID.
+     * @throws NotFoundException If unable to find the group.
+     * @throws ServerException
+     * @return array
+     */
+    public function post_join($id) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $this->idParamGroupSchema()->setDescription('Join a public group or a group that you have been invited to.');
+        $out = $this->schema($this->fullGroupMemberSchema(), 'out');
+
+        $this->groupByID($id);
+
+        if (!$this->groupModel->join($id, $this->getSession()->UserID)) {
+            throw new ServerException('Unable to join the group.', 500);
+        }
+
+        $members = $this->groupModel->getMembers($id, ['UserID' => $this->getSession()->UserID], false, false, false);
+        $member = array_pop($members);
+
+        $this->userModel->expandUsers($member, ['UserID']);
+
+        $result = $this->normalizeGroupMemberOutput($member);
+        return $out->validate($result);
+    }
+
+    /**
+     * Leave a group. Shortcut of DELETE /group/:id/members/:userID
+     *
+     * @param int $id The group ID.
+     * @throws NotFoundException If unable to find the group.
+     * @return array
+     */
+    public function post_leave($id) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $this->idParamGroupSchema()->setDescription('Leave a group.');
+        $this->schema([], 'out');
+
+        $this->leaveGroup($id, $this->getSession()->UserID);
+    }
+
+    /**
+     * Add a user to a group.
+     *
+     * @param int $id The group ID.
+     * @param array $body The request body.
+     * @throws ClientException
+     * @throws NotFoundException If unable to find the group.
+     * @throws ServerException
+     * @return array
+     */
+    public function post_members($id, array $body) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $this->idParamGroupSchema();
+        $in = $this->schema([
+            'userID:i' => 'The ID of the user.',
+            'role:s?' => [
+                'default' => 'member',
+                'enum' => ['leader', 'member'],
+                'description' => 'The role of the user for that group.',
+            ],
+        ])->setDescription('Add a user to a group.');
+        $out = $this->schema($this->fullGroupMemberSchema(), 'out');
+
+        $this->groupByID($id);
+
+        if (!$this->groupModel->checkPermission('Moderate', $id)) {
+            throw new ClientException('You do not have the rights to moderate this group.');
+        }
+
+        $body = $in->validate($body);
+
+        if (!$this->groupModel->addUser($id, $body['userID'], $this->capitalCaseScheme->convert($body['role']))) {
+            throw new ServerException('Unable to add user to group.', 500);
+        }
+
+        $members = $this->groupModel->getMembers($id, ['UserID' => $body['userID']], false, false, false);
+        $member = array_pop($members);
+
+        $this->userModel->expandUsers($member, ['UserID']);
+
+        $result = $this->normalizeGroupMemberOutput($member);
         return $out->validate($result);
     }
 
@@ -385,18 +1043,33 @@ class GroupsApiController extends AbstractApiController {
      *
      * @return Schema Returns a schema object.
      */
-    public function postSchema() {
-        static $postSchema;
+    public function postGroupSchema() {
+        static $postGroupSchema;
 
-        if ($postSchema === null) {
-            $postSchema = $this->schema(
+        if ($postGroupSchema === null) {
+            $postGroupSchema = $this->schema(
                 Schema::parse(
                     ['name', 'description', 'format', 'iconUrl?', 'bannerUrl?', 'privacy']
-                )->add($this->fullSchema()),
+                )->add($this->fullGroupSchema()),
                 'GroupPost'
             );
         }
 
-        return $this->schema($postSchema, 'in');
+        return $this->schema($postGroupSchema, 'in');
+    }
+
+    /**
+     * Get a user by its numeric ID.
+     *
+     * @param int $id The user ID.
+     * @throws NotFoundException if the user could not be found.
+     * @return array
+     */
+    public function userByID($id) {
+        $row = $this->userModel->getID($id, DATASET_TYPE_ARRAY);
+        if (!$row || $row['Deleted'] > 0) {
+            throw new NotFoundException('User');
+        }
+        return $row;
     }
 }
