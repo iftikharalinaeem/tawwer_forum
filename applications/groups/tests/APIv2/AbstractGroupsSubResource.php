@@ -72,7 +72,7 @@ abstract class AbstractGroupsSubResource extends AbstractAPIv2Test {
 
     /**
      * Create an endpoint URL.
-     * /:groupID[/:action][/:userID]
+     * /groups/:groupID[/:action][/:userID]
      *
      * @param int $groupID
      * @param string|null $action
