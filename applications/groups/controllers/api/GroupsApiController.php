@@ -227,7 +227,7 @@ class GroupsApiController extends AbstractApiController {
                 'dateLastComment:dt|n' => 'When the last comment was posted in the group.',
                 'countMembers:i' => 'The number of user belonging to the group.',
                 'countDiscussions:i' => 'The number of discussions in the group.',
-                'url:s?' => 'The full URL to the group.',
+                'url:s' => 'The full URL to the group.',
             ], 'Group');
         }
 
@@ -459,7 +459,7 @@ class GroupsApiController extends AbstractApiController {
      */
     public function idParamGroupMemberSchema($isUserIDOptional) {
         return $this->schema([
-            'groupID:i' => 'The group ID.',
+            'id:i' => 'The group ID.',
             'userID:i'.($isUserIDOptional ? '?' : '') => 'The group member user ID.',
         ], 'in');
     }
@@ -471,7 +471,7 @@ class GroupsApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     public function idParamGroupSchema() {
-        return $this->schema(['groupID:i' => 'The group ID.'], 'in');
+        return $this->schema(['id:i' => 'The group ID.'], 'in');
     }
 
     /**
@@ -551,7 +551,7 @@ class GroupsApiController extends AbstractApiController {
             $row = $this->normalizeGroupOutput($row);
         }
 
-        $result = $out->validate($rows, true);
+        $result = $out->validate($rows);
         return $result;
     }
 
