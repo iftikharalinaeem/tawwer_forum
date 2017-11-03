@@ -248,6 +248,13 @@ class ReflectionAction {
                     } else {
                         $this->params[$name] = ['name' => $name, 'in' => 'query'] + $property;
                     }
+                    $param = &$this->params[$name];
+
+                    if (isset($property['enum']) && is_array($property['enum'])) {
+                        $enumDescription = 'Must be one of: '.implode(', ', array_map('json_encode', $property['enum'])).'.';
+
+                        $param['description'] = (empty($param['description']) ? '' : rtrim($param['description'], '.').".\n").$enumDescription;
+                    }
                 }
             }
         }
