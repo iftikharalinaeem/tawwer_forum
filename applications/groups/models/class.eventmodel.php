@@ -122,12 +122,15 @@ class EventModel extends Gdn_Model {
      *  - Edit: User can edit the event.
      *  - View: The user may view the event's contents.
      * @param int $eventID
+     * @param int|null $userID
      * @return boolean
      */
-    public function checkPermission($permission, $eventID) {
+    public function checkPermission($permission, $eventID, $userID = null) {
         static $permissions = [];
 
-        $userID = Gdn::session()->UserID;
+        if (!$userID) {
+            $userID = Gdn::session()->UserID;
+        }
 
         if (is_array($eventID)) {
             $event = $eventID;
@@ -315,6 +318,23 @@ class EventModel extends Gdn_Model {
     }
 
     /**
+     * Get list of invited users.
+     *
+     * @param int $eventID
+     * @param array $where
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param bool $limit
+     * @param int $offset
+     * @return array
+     */
+    public function getInvitedUsers($eventID, $where = [], $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = 0) {
+        $where['EventID'] = $eventID;
+
+        return $this->SQL->getWhere('UserEvent', $where, $orderFields, $orderDirection, $limit, $offset)->resultArray();
+    }
+
+    /**
      * Check if a User is invited to an Event.
      *
      * @param integer $userID
@@ -363,24 +383,33 @@ class EventModel extends Gdn_Model {
      */
     public function save($event, $settings = []) {
         // Fix the dates.
-        if (!empty($event['DateStarts'])) {
-            $ts = strtotime($event['DateStarts']);
-            if ($ts !== false) {
-                $event['DateStarts'] = Gdn_Format::toDateTime($ts);
+        if (array_key_exists('DateStarts', $event)) {
+            $this->Validation->applyRule('DateStarts', 'ValidateDate');
+
+            if ($event['DateStarts'] instanceof DateTimeInterface) {
+                $event['DateStarts'] = $event['DateStarts']->format(MYSQL_DATE_FORMAT);
+            } else {
+                $ts = strtotime($event['DateStarts']);
+                if ($ts !== false) {
+                    $event['DateStarts'] = Gdn_Format::toDateTime($ts);
+                }
             }
         }
-        if (!empty($event['DateEnds'])) {
-            $ts = strtotime($event['DateEnds']);
-            if ($ts !== false) {
-                $event['DateEnds'] = Gdn_Format::toDateTime($ts);
+        if (array_key_exists('DateEnds', $event)) {
+            $this->Validation->applyRule('DateEnds', 'ValidateDate');
+
+            if ($event['DateEnds'] instanceof DateTimeInterface) {
+                $event['DateEnds'] = $event['DateEnds']->format(MYSQL_DATE_FORMAT);
+            } else {
+                $ts = strtotime($event['DateEnds']);
+                if ($ts !== false) {
+                    $event['DateEnds'] = Gdn_Format::toDateTime($ts);
+                }
             }
         }
 
         // Add a timezone in case the database wasn't updated.
         touchValue('Timezone', $event, Gdn::session()->getTimeZone()->getName());
-
-        $this->Validation->applyRule('DateStarts', 'ValidateDate');
-        $this->Validation->applyRule('DateEnds', 'ValidateDate');
 
         // Define the primary key in this model's table.
         $this->defineSchema();
@@ -590,5 +619,4 @@ class EventModel extends Gdn_Model {
 
         return $deleted;
     }
-
 }
