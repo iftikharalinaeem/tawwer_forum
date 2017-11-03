@@ -7,8 +7,6 @@
 
 namespace VanillaTests\APIv2;
 
-require_once(__DIR__.'/AbstractGroupsSubResource.php');
-
 /**
  * Test the /api/v2/discussions with groups
  */
