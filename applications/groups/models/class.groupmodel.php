@@ -48,7 +48,9 @@ class GroupModel extends Gdn_Model {
         }
 
         $model = new Gdn_Model('GroupApplicant');
-        $this->Validation = $model->Validation;
+        foreach ($model->Validation->results() as $key => $value) {
+            $this->Validation->addValidationResult($key, $value);
+        }
 
         return (bool)$model->insert([
             'GroupID' => $groupID,
@@ -615,7 +617,9 @@ class GroupModel extends Gdn_Model {
                     'UserID' => $userID,
                     'Type' => 'Invitation',
                 ]);
-                $this->Validation = $model->Validation;
+                foreach ($model->Validation->results() as $key => $value) {
+                    $this->Validation->addValidationResult($key, $value);
+                }
             }
             $validUserIDs[] = $userID;
         }
@@ -740,7 +744,9 @@ class GroupModel extends Gdn_Model {
                 'UserID' => $userID,
                 'Role' => 'Member',
             ]);
-            $this->Validation = $model->Validation;
+            foreach ($model->Validation->results() as $key => $value) {
+                $this->Validation->addValidationResult($key, $value);
+            }
 
             if ($inserted) {
                 $this->updateCount($groupID, 'CountMembers');
@@ -818,7 +824,9 @@ class GroupModel extends Gdn_Model {
                 $data['Role'] = 'Member';
                 $model = new Gdn_Model('UserGroup');
                 $model->insert($data);
-                $this->Validation = $model->Validation;
+                foreach ($model->Validation->results() as $key => $value) {
+                    $this->Validation->addValidationResult($key, $value);
+                }
                 $this->updateCount($group['GroupID'], 'CountMembers');
                 return count($this->validationResults()) == 0;
 
@@ -827,7 +835,9 @@ class GroupModel extends Gdn_Model {
                 $data['Type'] = 'Application';
                 $model = new Gdn_Model('GroupApplicant');
                 $model->insert($data);
-                $this->Validation = $model->Validation;
+                foreach ($model->Validation->results() as $key => $value) {
+                    $this->Validation->addValidationResult($key, $value);
+                }
                 return count($this->validationResults()) == 0;
 
             case 'invite':
@@ -1068,7 +1078,9 @@ class GroupModel extends Gdn_Model {
                 'GroupID' => $row['GroupID'],
                 'Role' => 'Member',
             ]);
-            $this->Validation = $model->Validation;
+            foreach ($model->Validation->results() as $key => $value) {
+                $this->Validation->addValidationResult($key, $value);
+            }
 
             if ($inserted) {
                 $this->updateCount($row['GroupID'], 'CountMembers');
@@ -1282,7 +1294,9 @@ class GroupModel extends Gdn_Model {
                 ];
                 $model = new Gdn_Model('UserGroup');
                 $model->insert($row);
-                $this->Validation = $model->Validation;
+                foreach ($model->Validation->results() as $key => $value) {
+                    $this->Validation->addValidationResult($key, $value);
+                }
             }
             $this->updateCount($groupID, 'CountMembers');
             $this->getCount(null); // clear cache.
