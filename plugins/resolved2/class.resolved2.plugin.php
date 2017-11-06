@@ -240,7 +240,7 @@ class Resolved2Plugin extends Gdn_Plugin {
             $type = 'discussion_edit';
             $collection = 'post_modify';
 
-            $data = AnalyticsData::getDiscussion(val('DiscussionID', $args));
+            $data = AnalyticsData::getDiscussion(val('DiscussionID', $discussion));
 
             AnalyticsTracker::getInstance()->trackEvent($collection, $type, $data);
         }
