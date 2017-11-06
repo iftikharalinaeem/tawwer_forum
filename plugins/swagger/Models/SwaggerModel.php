@@ -100,8 +100,11 @@ class SwaggerModel {
             ],
             'host' => $this->request->getHost(),
             'basePath' => $this->request->getRoot().'/api/v2',
-            'paths' => [],
-
+            'consumes' => [
+                'application/x-www-form-urlencoded',
+                'multipart/form-data'
+            ],
+            'paths' => []
         ];
 
         foreach ($this->getActions() as $action) {
