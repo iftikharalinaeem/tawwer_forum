@@ -54,10 +54,10 @@ echo $form->errors();
 
             echo
                 $form->labelWrap('Expiration', 'ExpireNumber')
-                .' <div class="input-wrap">'
-                .$form->textBox('ExpireNumber')
+                .' <div class="input-wrap input-wrap-multiple input-wrap-1_3">'
+                .$form->textBox('ExpireNumber', ["type" => "number", "min" => "0"])
                 .$form->dropDown('ExpireType', $durationPeriods, $options)
-                .'</div>'
+                .'</div>';
             ?>
         </li>
     </ul>
