@@ -392,7 +392,10 @@ class UserBadgeModel extends Gdn_Model {
 
         if (val('DateCompleted', $userBadge, null) != null) {
             $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
-            $this->Validation->addValidationResult('BadgeID', '@'.sprintf(t('The %s badge has already been given to %s.'), $badge['Name'], $user['Name']));
+            $this->Validation->addValidationResult(
+                'BadgeID',
+                '@'.sprintf(t('The %s badge has already been given to %s.'), htmlspecialchars($badge['Name']), htmlspecialchars($user['Name']))
+            );
 
             return false;
         }
