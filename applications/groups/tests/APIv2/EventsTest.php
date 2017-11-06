@@ -91,8 +91,8 @@ class EventsTest extends AbstractResourceTest {
         $row = parent::modifyRow($row);
 
         // Assign the event to the other group.
-        if (isset($row['GroupID'])) {
-            $row['GroupID'] = self::$groups[1]['groupID'];
+        if (isset($row['groupID'])) {
+            $row['groupID'] = self::$groups[1]['groupID'];
         }
         return $row;
     }
