@@ -371,10 +371,10 @@ class EventsApiController extends AbstractApiController {
     /**
      * Normalize an event Schema record to match the database definition.
      *
-     * @param $schemaRecord Event Schema record.
+     * @param array $schemaRecord Event Schema record.
      * @return array Return a database record.
      */
-    public function normalizeEventInput($schemaRecord) {
+    public function normalizeEventInput(array $schemaRecord) {
         $dbRecord = $this->capitalCaseScheme->convertArrayKeys($schemaRecord);
         return $dbRecord;
     }
@@ -382,10 +382,10 @@ class EventsApiController extends AbstractApiController {
     /**
      * Normalize an event participant Schema record to match the database definition.
      *
-     * @param $schemaRecord Event participant Schema record.
+     * @param array $schemaRecord Event participant Schema record.
      * @return array Return a database record.
      */
-    public function normalizeEventParticipantInput($schemaRecord) {
+    public function normalizeEventParticipantInput(array $schemaRecord) {
         if (array_key_exists('attending', $schemaRecord)) {
             if ($schemaRecord['attending'] === null) {
                 $schemaRecord['attending'] = 'Invited';
@@ -400,10 +400,10 @@ class EventsApiController extends AbstractApiController {
     /**
      * Normalize a event database record to match the schema definition.
      *
-     * @param $dbRecord Event database record.
+     * @param array $dbRecord Event database record.
      * @return array Return a schema record.
      */
-    public function normalizeEventOutput($dbRecord) {
+    public function normalizeEventOutput(array $dbRecord) {
         $dbRecord['Body'] = Gdn_Format::to($dbRecord['Body'], $dbRecord['Format']);
 
         $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
@@ -415,10 +415,10 @@ class EventsApiController extends AbstractApiController {
     /**
      * Normalize a event participant database record to match the schema definition.
      *
-     * @param $dbRecord Event participant database record.
+     * @param array $dbRecord Event participant database record.
      * @return array Return a schema record.
      */
-    public function normalizeEventParticipantOutput($dbRecord) {
+    public function normalizeEventParticipantOutput(array $dbRecord) {
         $dbRecord['Attending'] = $this->camelCaseScheme->convert($dbRecord['Attending']);
         $dbRecord['Attending'] = $dbRecord['Attending'] === 'invited' ? null : $dbRecord['Attending'];
 
