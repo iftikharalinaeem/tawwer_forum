@@ -26,7 +26,70 @@ class GroupModel extends Gdn_Model {
     }
 
     /**
-     * Calculate the rows in a groups dataset.
+     * Add an applicant to a group.
+     *
+     * @throws Gdn_UserException
+     * @param int $groupID
+     * @param int $userID
+     * @param string $reason
+     * @return bool
+     */
+    public function apply($groupID, $userID, $reason) {
+        $group = $this->getID($groupID);
+
+        if ($group['Privacy'] !== 'Private') {
+            throw new Gdn_UserException('Cannot apply to a group that is not private.');
+        }
+
+        $permissions = $this->checkPermission(false, $groupID, $userID);
+
+        if (!$permissions['Join']) {
+            throw new GDN_UserException($permissions['Join.Reason']);
+        }
+
+        $model = new Gdn_Model('GroupApplicant');
+        foreach ($model->Validation->results() as $key => $value) {
+            $this->Validation->addValidationResult($key, $value);
+        }
+
+        return (bool)$model->insert([
+            'GroupID' => $groupID,
+            'UserID' => $userID,
+            'Type' => 'Application',
+            'Reason' => $reason,
+        ]);
+    }
+
+    /**
+     * Add a user to a group.
+     *
+     * @param int $groupID
+     * @param int $userID
+     * @param string $role Enum['Member', 'Leader']
+     * @return bool
+     */
+    public function addUser($groupID, $userID, $role) {
+        if (!in_array($role, ['Member', 'Leader'])) {
+            $this->Validation->addValidationResult('Role', 'Invalid role.');
+            return false;
+        }
+
+        $data = [
+            'GroupID' => $groupID,
+            'UserID' => $userID,
+            'Role' => $role,
+        ];
+        $this->addInsertFields($data);
+
+        $success = (bool)$this->SQL->insert('UserGroup', $data);
+
+        $this->updateCount($groupID, 'CountMembers');
+
+        return $success;
+    }
+
+    /**
+     * Calculate the rows in a groups result.
      *
      * @param Gdn_DataSet $result
      */
@@ -50,19 +113,23 @@ class GroupModel extends Gdn_Model {
      * @param string $permission The permission to check. Valid values are:
      *  - Member: User is a member of the group.
      *  - Leader: User is a leader of the group.
+     *  - Apply: User can apply to the group.
      *  - Join: User can join the group.
      *  - Leave: User can leave the group.
      *  - Edit: The user may edit the group.
      *  - Delete: User can delete the group.
      *  - View: The user may view the group's contents.
      *  - Moderate: The user may moderate the group.
-     * @param int $groupID
+     * @param int|array $groupID The groupID or group record.
+     * @param int|null $userID
      * @return boolean
      */
-    public function checkPermission($permission, $groupID) {
+    public function checkPermission($permission, $groupID, $userID = null) {
         static $permissions = [];
 
-        $userID = Gdn::session()->UserID;
+        if ($userID === null) {
+            $userID = Gdn::session()->UserID;
+        }
 
         if (is_array($groupID)) {
             $group = $groupID;
@@ -89,6 +156,7 @@ class GroupModel extends Gdn_Model {
             $perms = [
                 'Member' => false,
                 'Leader' => false,
+                'Apply' => false,
                 'Join' => Gdn::session()->isValid(),
                 'Leave' => false,
                 'Edit' => false,
@@ -121,24 +189,30 @@ class GroupModel extends Gdn_Model {
                 }
             } else {
                 if ($group['Privacy'] != 'Public') {
+                    $perms['Apply'] = true;
                     $perms['View'] = false;
                     $perms['View.Reason'] = t('Join this group to view its content.');
                 }
             }
 
             if ($groupApplicant) {
+                $perms['Apply'] = false; // Already applied or banned.
                 $perms['Join'] = false; // Already applied or banned.
                 switch (strtolower($groupApplicant['Type'])) {
                     case 'application':
                         $perms['Join.Reason'] = t("You've applied to join this group.");
+                        $perms['Apply.Reason'] = t("You've applied to join this group.");
                         break;
                     case 'denied':
-                        $perms['Join.Reason'] = t("You're application for this group was denied.");
+                        $perms['Join.Reason'] = t("You're application for this group was denied.", 'Your application for this group was denied.');
+                        $perms['Apply.Reason'] = t("You're application for this group was denied.", 'Your application for this group was denied.');
                         break;
                     case 'ban':
                         $perms['Join.Reason'] = t("You're banned from joining this group.");
+                        $perms['Apply.Reason'] = t("You're banned from joining this group.");
                         break;
                     case 'invitation':
+                        $perms['Apply.Reason'] = t('You have a pending invitation to join this group.');
                         $perms['Join'] = true;
                         unset($perms['Join.Reason']);
                         break;
@@ -198,6 +272,69 @@ class GroupModel extends Gdn_Model {
     }
 
     /**
+     * Delete a group.
+     *
+     * @param array|string $where
+     * @param integer|bool $limit
+     * @param boolean $resetData Unused.
+     * @return Gdn_DataSet
+     */
+    public function delete($where = '', $limit = false, $resetData = false) {
+        // Get list of matching groups
+        $matchGroups = $this->getWhere($where,'','',$limit);
+        // Clean up UserGroups
+        $groupIDs = [];
+        foreach ($matchGroups as $event) {
+            $groupIDs[] = val('GroupID', $event);
+        }
+
+        // Start by deleting the content! If the query times out the groups will be intact and the user will be
+        // able to try again! This is the "best" we can do until we have a Queue for tasks.
+        $discussionIDs = $this->SQL
+                ->select('DiscussionID')
+                ->getWhere('Discussion', ['GroupID' => $groupIDs])
+                ->resultArray();
+
+        $discussionModel = new DiscussionModel();
+        foreach ($discussionIDs as $discussionID) {
+            $discussionModel->deleteID($discussionID);
+        }
+
+        // Add Logging on deletion of groups
+        LogModel::beginTransaction();
+        // Get the row(s) of the group(s) being deleted to save to the log.
+        $groups = $this->SQL->getWhere('Group', ['GroupID' => $groupIDs])->resultArray();
+        // Include the first 20 applicants and users in the log
+        $groupMembers = $this->SQL->getWhere('UserGroup', ['GroupID' => $groupIDs], "", "asc", 20)->resultArray();
+        $groupApplicants = $this->SQL->getWhere('GroupApplicant', ['GroupID' => $groupIDs], "", "asc", 20)->resultArray();
+
+        $data['_Data']['Group'] = $groups;
+        $data['_Data']['GroupMembers'] = $groupMembers;
+        $data['_Data']['GroupApplicants'] = $groupApplicants;
+        LogModel::insert('Delete', 'Group', $data);
+
+        LogModel::endTransaction();
+
+        // Delete groups
+        $deleted = parent::delete($where, $limit ? ['limit' => $limit] : []);
+
+        $this->SQL->delete('UserGroup', ['GroupID'=> $groupIDs]);
+        $this->SQL->delete('GroupApplicant', ['GroupID' => $groupIDs]);
+
+        return $deleted;
+    }
+
+    /**
+     * Delete an invitation.
+     *
+     * @param int $groupID
+     * @param int $userID
+     */
+    public function deleteInvites($groupID, $userID) {
+        $this->SQL->delete('GroupApplicant', ['GroupID' => $groupID, 'UserID' => $userID, 'Type' => 'Invitation']);
+    }
+
+    /**
      *
      *
      * @param $column
@@ -231,6 +368,483 @@ class GroupModel extends Gdn_Model {
                 throw new Gdn_UserException("Unknown column $column");
         }
         return $result;
+    }
+
+    /**
+     * Get group applicants/invites.
+     *
+     * @param int $groupID
+     * @param array $where
+     * @param int|bool $limit
+     * @param int|bool $offset
+     * @param bool $joinUserData
+     * @return array
+     * @throws Exception
+     */
+    public function getApplicants($groupID, $where = [], $limit = false, $offset = false, $joinUserData = true) {
+        $applications = $this->SQL
+            ->from('GroupApplicant')
+            ->where('GroupID', $groupID)
+            ->where($where)
+            ->orderBy('DateInserted')
+            ->limit($limit, $offset)
+            ->get()->resultArray();
+
+        if ($joinUserData) {
+            Gdn::userModel()->joinUsers($applications, ['UserID']);
+        }
+
+        return $applications;
+    }
+
+    /**
+     * Get the userIDs of the applicants to a group.
+     *
+     * @param int $groupID
+     * @param array $where
+     * @param bool $limit
+     * @param bool $offset
+     * @return array
+     */
+    public function getApplicantIds($groupID, $where = [], $limit = false, $offset = false) {
+        // First grab the members.
+        $users = $this->SQL
+            ->select('UserID')
+            ->from('GroupApplicant')
+            ->where('GroupID', $groupID)
+            ->where($where)
+            ->orderBy('DateInserted')
+            ->limit($limit, $offset)
+            ->get()->resultArray();
+
+        return array_column($users, 'UserID');
+    }
+
+    /**
+     * Get a group by its ID.
+     *
+     * @param int $id The ID of the group.
+     * @param string $dataSetType The type of return.
+     * @param array $options Base class compatibility.
+     * @return array|mixed|object
+     */
+    public function getID($id, $dataSetType = DATASET_TYPE_ARRAY, $options = []) {
+        if (!ctype_digit((string)$id)) {
+            deprecated('getID($slug)', 'getID(GroupModel::idFromSlug($slug))');
+            $id = self::idFromSlug($id);
+        }
+
+        return parent::getID($id, $dataSetType, $options);
+    }
+
+    /**
+     * Get member information from a group.
+     *
+     * @param int $groupID
+     * @param int $userID
+     * @return array|false The member data on success or false otherwise.
+     */
+    public function getMember($groupID, $userID) {
+        $user = false;
+
+        $users = $this->getMembers($groupID, ['UserID' => $userID], false, false, false);
+        if (count($users)) {
+            $user = array_pop($users);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Get the userIDs of the members of a group.
+     *
+     * @param $groupID
+     * @param array $where
+     * @param bool $limit
+     * @param bool $offset
+     * @return array
+     * @throws Exception
+     */
+    public function getMemberIds($groupID, $where = [], $limit = false, $offset = false) {
+        // First grab the members.
+        $users = $this->SQL
+            ->select('UserID')
+            ->from('UserGroup')
+            ->where('GroupID', $groupID)
+            ->where($where)
+            ->orderBy('DateInserted')
+            ->limit($limit, $offset)
+            ->get()->resultArray();
+
+        return array_column($users, 'UserID');
+    }
+
+    /**
+     * Get members information from a group.
+     *
+     * @param int $groupID
+     * @param array $where
+     * @param bool $limit
+     * @param bool $offset
+     * @param bool $joinUserData
+     * @return array
+     * @throws Exception
+     */
+    public function getMembers($groupID, $where = [], $limit = false, $offset = false, $joinUserData = true) {
+        // Little fix since UserID is now ambiguous
+        $duplicatedColumns = ['UserID', 'DateInserted'];
+        foreach($duplicatedColumns as $columnName) {
+            if (isset($where[$columnName])) {
+                $where['ug.'.$columnName] = $where[$columnName];
+                unset($where[$columnName]);
+            }
+        }
+
+        // First grab the members.
+        $users = $this->SQL
+            ->select('ug.*')
+            ->from('UserGroup ug')
+                ->join('User u', 'ug.UserID = u.UserID')
+            ->where('ug.GroupID', $groupID)
+            ->where($where)
+            ->orderBy('DateInserted')
+            ->limit($limit, $offset)
+            ->get()->resultArray();
+
+        if ($joinUserData) {
+            Gdn::userModel()->joinUsers($users, ['UserID']);
+        }
+        return $users;
+    }
+
+    /**
+     * Get the groupIDs that a user is a member of.
+     *
+     * @param int $userID
+     * @return array An array of groupID
+     */
+    public function getUserGroupIDs($userID) {
+        $userGroups = $this->SQL->getWhere('UserGroup', ['UserID' => $userID])->resultArray();
+        return array_column($userGroups, 'GroupID');
+    }
+
+    /**
+     * Get the groupID from a group slug.
+     *
+     * @param string $slug
+     * @return int|false
+     */
+    public static function idFromSlug($slug) {
+        $id = false;
+        if (preg_match('/(\d+)-.+/', $slug, $matches)) {
+            $id = (int)$matches[1];
+        }
+
+        return $id;
+    }
+
+    /**
+     * Check if a User is a member of a Group.
+     *
+     * @param integer $userID
+     * @param integer $groupID
+     * @return bool
+     */
+    public function isMember($userID, $groupID) {
+        $memberCount = $this->SQL->getCount('UserGroup', [
+            'UserID' => $userID,
+            'GroupID' => $groupID
+        ]);
+        return $memberCount > 0;
+    }
+
+    /**
+     * Tells whether a user is being invited to a group or not.
+     *
+     * @param int $groupID
+     * @param int $userID
+     * @return int|false The invitationID or false.
+     */
+    public function isUserInvited($groupID, $userID) {
+        $result = $this->SQL
+            ->select('GroupApplicantID')
+            ->from('GroupApplicant')
+            ->where([
+                'GroupID' => $groupID,
+                'UserID' => $userID,
+                'Type' => 'Invitation',
+            ])
+            ->get()->firstRow(DATASET_TYPE_ARRAY);
+
+        return $result ? (int)$result['GroupApplicantID'] : false;
+    }
+
+    /**
+     * Invite users to join a group.
+     * Application from a user, if there was one, will be overridden by the invitation.
+     *
+     * @param int $groupID
+     * @param array $userIDs
+     * @throws Gdn_UserException
+     * @return bool
+     */
+    public function inviteUsers($groupID, array $userIDs) {
+        $validUserIDs = [];
+
+        foreach ($userIDs as $userID) {
+            // Make sure the user hasn't already been invited.
+            $application = $this->SQL->getWhere('GroupApplicant', [
+                'GroupID' => $groupID,
+                'UserID' => $userID
+            ])->firstRow(DATASET_TYPE_ARRAY);
+
+            if ($application) {
+                if ($application['Type'] == 'Invitation') {
+                    continue;
+                } else {
+                    $this->SQL->put('GroupApplicant',
+                        ['Type' => 'Invitation'],
+                        [
+                            'GroupID' => $groupID,
+                            'UserID' => $userID
+                        ]
+                    );
+                }
+            } else {
+                $model = new Gdn_Model('GroupApplicant');
+                $model->options('Ignore', true)->insert([
+                    'GroupID' => $groupID,
+                    'UserID' => $userID,
+                    'Type' => 'Invitation',
+                ]);
+                foreach ($model->Validation->results() as $key => $value) {
+                    $this->Validation->addValidationResult($key, $value);
+                }
+            }
+            $validUserIDs[] = $userID;
+        }
+
+        if (count($validUserIDs) > 0) {
+            $group = $this->getID($groupID);
+
+            // Send a message for the invite.
+            if (class_exists('ConversationModel')) {
+                $model = new ConversationModel();
+
+                $args = [
+                    'Name' => htmlspecialchars($group['Name']),
+                    'Url' => groupUrl($group, '/')
+                ];
+                $row = [
+                    'Subject' => formatString(t('Please join my group.'), $args),
+                    'Body' => formatString(t("You've been invited to join {Name}."), $args),
+                    'Format' => 'Html',
+                    'RecipientUserID' => $validUserIDs,
+                    'Type' => 'invite',
+                    'RegardingID' => $group['GroupID'],
+                ];
+
+                if (!$model->save($row)) {
+                    throw new Gdn_UserException($model->Validation->resultsText());
+                }
+            } else {
+                // If Conversations are disabled; Improve notification with a link to group.
+                if (!class_exists('ConversationModel')) {
+                    foreach ($validUserIDs as $userID) {
+                        $activity = [
+                            'ActivityType' => 'Group',
+                            'ActivityUserID' => Gdn::session()->UserID,
+                            'HeadlineFormat' => t('HeadlineFormat.GroupInvite', 'Please join my <a href="{Url,html}">group</a>.'),
+                            'RecordType' => 'Group',
+                            'RecordID' => $group['GroupID'],
+                            'Route' => groupUrl($group, false, '/'),
+                            'Story' => formatString(t("You've been invited to join {Name}."), ['Name' => htmlspecialchars($group['Name'])]),
+                            'NotifyUserID' => $userID,
+                            'Data' => ['Name' => $group['Name']]
+                        ];
+                        $activityModel = new ActivityModel();
+                        $activityModel->save($activity, 'Groups');
+                    }
+                }
+            }
+        }
+
+        return count($this->validationResults()) == 0;
+    }
+
+    /**
+     * Make user join a public group or a private group if he has been invited.
+     *
+     * @throws Exception
+     * @param int $groupID The group ID you want to join.
+     * @param int $userID The user that will join the group. Temporarily defaults to null until we remove deprecatedJoin();
+     * @return bool
+     */
+    public function join($groupID, $userID = null) {
+        if (is_array($groupID)) {
+            deprecated('join($data)', 'join($groupID, $userID)');
+            return $this->deprecatedJoin($groupID);
+        } else if (!filter_var($userID, FILTER_VALIDATE_INT)) {
+            throw new InvalidArgumentException('$userID must be set.');
+        }
+
+        $group = $this->getID($groupID);
+
+        if ($group['Privacy'] !== 'Public' || $group['Registration'] !== 'Public') {
+            if ($invitationID = $this->isUserInvited($groupID, $userID)) {
+                $this->deleteInvites($groupID, $userID);
+            } else {
+                throw new Gdn_UserException('A group must be public or you have to be invited to join it.');
+            }
+        }
+
+        return $this->addUser($groupID, $userID, 'Member');
+    }
+
+    /**
+     * @deprecated
+     *
+     * @param string $slug
+     * @return mixed
+     */
+    public static function parseID($slug) {
+        deprecated(__FUNCTION__, 'idFromSlug');
+        $id = self::idFromSlug($slug);
+        if (!$id) {
+            $id = explode('-', $slug, 2)[0];
+        }
+        return $id;
+    }
+
+    /**
+     * Approve or deny an application.
+     * When state === 'Approved' the user will be added to the group the application will be deleted.
+     * When state === 'Denied' the application type will be changed to denied.
+     *
+     * @throws Exception
+     * @param int $groupID
+     * @param int $userID
+     * @param bool $isApproved
+     * @return bool
+     */
+    public function processApplicant($groupID, $userID, $isApproved) {
+        $success = false;
+
+        $row = $this->SQL->getWhere('GroupApplicant', ['GroupID' => $groupID, 'UserID' => $userID])->firstRow(DATASET_TYPE_ARRAY);
+        if (!$row) {
+            throw notFoundException('Applicant');
+        }
+
+        if ($isApproved) {
+            // Add the user to the group.
+            $model = new Gdn_Model('UserGroup');
+            $inserted = $model->insert([
+                'GroupID' => $groupID,
+                'UserID' => $userID,
+                'Role' => 'Member',
+            ]);
+            foreach ($model->Validation->results() as $key => $value) {
+                $this->Validation->addValidationResult($key, $value);
+            }
+
+            if ($inserted) {
+                $this->updateCount($groupID, 'CountMembers');
+                $this->SQL->delete('GroupApplicant', ['UserID' => $groupID, 'GroupID' => $userID]);
+                $success = true;
+            }
+        } else {
+            $model = new Gdn_Model('GroupApplicant');
+            $success = (bool)$model->update(['Type' => 'Denied'], ['GroupID' => $groupID, 'UserID' => $userID]);
+        }
+
+        return $success;
+    }
+
+    /**
+     * Remove a member from a group.
+     * Optionally the user can be "Banned" or "Denied" which will prevent him from becoming an applicant to the group.
+     *
+     * @param $groupID
+     * @param $userID
+     * @param string|null $persistState Enum['Banned', 'Denied']
+     */
+    public function removeMember($groupID, $userID, $persistState = null) {
+        // Remove the member.
+        $this->SQL->delete('UserGroup', ['GroupID' => $groupID, 'UserID' => $userID]);
+
+        // If the user was banned then let's add the ban.
+        if (in_array($persistState, ['Banned', 'Denied'])) {
+            $model = new Gdn_Model('GroupApplicant');
+            $model->delete(['GroupID' => $groupID, 'UserID' => $userID]);
+            $model->insert([
+                'GroupID' => $groupID,
+                'UserID' => $userID,
+                'Type' => $persistState
+            ]);
+        }
+
+        $this->updateCount($groupID, 'CountMembers');
+    }
+
+    /**
+     * Set a user role.
+     *
+     * @param int $groupID
+     * @param int $userID
+     * @param string $role Enum['Member', 'Leader']
+     */
+    public function setMemberRole($groupID, $userID, $role) {
+        $this->SQL->put('UserGroup', ['Role' => $role], ['UserID' => $userID, 'GroupID' => $groupID]);
+    }
+
+    ####################################
+    ## Non refactored section.
+    ####################################
+
+    /**
+     * @deprecated Use join($groupID) or apply($groupID, $reason)
+     *
+     * @param $data
+     * @throws Gdn_UserException
+     * @return bool
+     */
+    private function deprecatedJoin($data) {
+        $valid = $this->validateJoin($data);
+        if (!$valid) {
+            return false;
+        }
+
+        $group = $this->getID(val('GroupID', $data));
+        trace($group, 'Group');
+
+        switch (strtolower($group['Registration'])) {
+            case 'public':
+                // This is a public group, go ahead and add the user.
+                $data['Role'] = 'Member';
+                $model = new Gdn_Model('UserGroup');
+                $model->insert($data);
+                foreach ($model->Validation->results() as $key => $value) {
+                    $this->Validation->addValidationResult($key, $value);
+                }
+                $this->updateCount($group['GroupID'], 'CountMembers');
+                return count($this->validationResults()) == 0;
+
+            case 'approval':
+                // The user must apply to this group.
+                $data['Type'] = 'Application';
+                $model = new Gdn_Model('GroupApplicant');
+                $model->insert($data);
+                foreach ($model->Validation->results() as $key => $value) {
+                    $this->Validation->addValidationResult($key, $value);
+                }
+                return count($this->validationResults()) == 0;
+
+            case 'invite':
+            default:
+                throw new Gdn_UserException("Registration type {$group['Registration']} not supported.");
+                // TODO: The user must be invited.
+                return false;
+        }
     }
 
     /**
@@ -296,28 +910,6 @@ class GroupModel extends Gdn_Model {
     /**
      *
      *
-     * @param int|string $iD The ID or slug of the group.
-     * @param bool|string $datasetType The type of return.
-     * @param array $options Base class compatibility.
-     * @return array|mixed|object
-     */
-    public function getID($iD, $datasetType = DATASET_TYPE_ARRAY, $options = []) {
-        static $cache = [];
-
-        $iD = self::parseID($iD);
-        if (isset($cache[$iD])) {
-            return $cache[$iD];
-        }
-
-        $row = parent::getID($iD, $datasetType);
-        $cache[$iD] = $row;
-
-        return $row;
-    }
-
-    /**
-     *
-     *
      * @param $groupID
      * @return bool|mixed|string
      */
@@ -334,119 +926,6 @@ class GroupModel extends Gdn_Model {
     /**
      *
      *
-     * @param $groupID
-     * @param array $where
-     * @param bool $limit
-     * @param bool $offset
-     * @return array
-     * @throws Exception
-     */
-    public function getApplicants($groupID, $where = [], $limit = false, $offset = false) {
-        // First grab the members.
-        $users = $this->SQL
-            ->from('GroupApplicant')
-            ->where('GroupID', $groupID)
-            ->where($where)
-            ->orderBy('DateInserted')
-            ->limit($limit, $offset)
-            ->get()->resultArray();
-
-        Gdn::userModel()->joinUsers($users, ['UserID']);
-        return $users;
-    }
-
-    /**
-     *
-     *
-     * @param $groupID
-     * @param array $where
-     * @param bool $limit
-     * @param bool $offset
-     * @return array
-     * @throws Exception
-     */
-    public function getApplicantIds($groupID, $where = [], $limit = false, $offset = false) {
-        // First grab the members.
-        $users = $this->SQL
-            ->from('GroupApplicant')
-            ->where('GroupID', $groupID)
-            ->where($where)
-            ->orderBy('DateInserted')
-            ->limit($limit, $offset)
-            ->get()->resultArray();
-
-        $ids = [];
-        foreach ($users as $user) {
-            $ids[] = val('UserID', $user);
-        }
-        return $ids;
-    }
-
-    /**
-     *
-     *
-     * @param $groupID
-     * @param array $where
-     * @param bool $limit
-     * @param bool $offset
-     * @return array
-     * @throws Exception
-     */
-    public function getMembers($groupID, $where = [], $limit = false, $offset = false) {
-        // Little fix since UserID is now ambiguous
-        $duplicatedColumns = ['UserID', 'DateInserted'];
-        foreach($duplicatedColumns as $columnName) {
-            if (isset($where[$columnName])) {
-                $where['ug.'.$columnName] = $where[$columnName];
-                unset($where[$columnName]);
-            }
-        }
-
-        // First grab the members.
-        $users = $this->SQL
-            ->select('ug.*')
-            ->from('UserGroup ug')
-                ->join('User u', 'ug.UserID = u.UserID')
-            ->where('ug.GroupID', $groupID)
-            ->where($where)
-            ->orderBy('DateInserted')
-            ->limit($limit, $offset)
-            ->get()->resultArray();
-
-        Gdn::userModel()->joinUsers($users, ['UserID']);
-        return $users;
-    }
-
-    /**
-     *
-     *
-     * @param $groupID
-     * @param array $where
-     * @param bool $limit
-     * @param bool $offset
-     * @return array
-     * @throws Exception
-     */
-    public function getMemberIds($groupID, $where = [], $limit = false, $offset = false) {
-        // First grab the members.
-        $users = $this->SQL
-            ->from('UserGroup')
-            ->where('GroupID', $groupID)
-            ->where($where)
-            ->orderBy('DateInserted')
-            ->limit($limit, $offset)
-            ->get()->resultArray();
-
-        $ids = [];
-        foreach ($users as $user) {
-            $ids[] = val('UserID', $user);
-        }
-        return $ids;
-    }
-
-    /**
-     *
-     *
      * @param $userID
      * @return mixed
      */
@@ -457,17 +936,6 @@ class GroupModel extends Gdn_Model {
             ->where('InsertUserID', $userID)
             ->get()->value('CountGroups');
         return $count;
-    }
-
-    /**
-     *
-     *
-     * @param $iD
-     * @return mixed
-     */
-    public static function parseID($iD) {
-        $parts = explode('-', $iD, 2);
-        return $parts[0];
     }
 
     /**
@@ -515,152 +983,40 @@ class GroupModel extends Gdn_Model {
     }
 
     /**
-     * Check if a User is a member of a Group.
+     * Invite users.
      *
-     * @param integer $userID
-     * @param integer $groupID
-     * @return bool
-     */
-    public function isMember($userID, $groupID) {
-        $isMember = $this->SQL->getCount('UserGroup', [
-            'UserID' => $userID,
-            'GroupID' => $groupID
-        ]);
-        return $isMember > 0;
-    }
-
-    /**
-     *
+     * @deprecated
      *
      * @param $data
      * @return bool
      * @throws Gdn_UserException
      */
     public function invite($data) {
+        deprecated('invite', 'inviteUsers');
         $valid = $this->validateJoin($data);
         if (!$valid) {
             return false;
         }
 
-        $group = $this->getID(val('GroupID', $data));
-        trace($group, 'Group');
+        $groupID = val('GroupID', $data);
+        $userIDs = (array)val('UserID', $data);
 
-        $userIDs = (array)$data['UserID'];
-        $validUserIDs = [];
-
-        foreach ($userIDs as $userID) {
-            // Make sure the user hasn't already been invited.
-            $application = $this->SQL->getWhere('GroupApplicant', [
-                'GroupID' => $group['GroupID'],
-                'UserID' => $userID
-            ])->firstRow(DATASET_TYPE_ARRAY);
-
-            if ($application) {
-                if ($application['Type'] == 'Invitation') {
-                    continue;
-                } else {
-                    $this->SQL->put('GroupApplicant',
-                        ['Type' => 'Invitation'],
-                        [
-                            'GroupID' => $group['GroupID'],
-                            'UserID' => $userID
-                        ]);
-                }
-            } else {
-                $data['Type'] = 'Invitation';
-                $data['UserID'] = $userID;
-                $model = new Gdn_Model('GroupApplicant');
-                $model->options('Ignore', true)->insert($data);
-                $this->Validation = $model->Validation;
-            }
-            $validUserIDs[] = $userID;
-        }
-
-        // If Conversations are disabled; Improve notification with a link to group.
-        if (!class_exists('ConversationModel') && count($validUserIDs) > 0) {
-            foreach ($validUserIDs as $userID) {
-                $activity = [
-                    'ActivityType' => 'Group',
-                    'ActivityUserID' => Gdn::session()->UserID,
-                    'HeadlineFormat' => t('HeadlineFormat.GroupInvite', 'Please join my <a href="{Url,html}">group</a>.'),
-                    'RecordType' => 'Group',
-                    'RecordID' => $group['GroupID'],
-                    'Route' => groupUrl($group, false, '/'),
-                    'Story' => formatString(t("You've been invited to join {Name}."), ['Name' => htmlspecialchars($group['Name'])]),
-                    'NotifyUserID' => $userID,
-                    'Data' => ['Name' => $group['Name']]
-                ];
-                $activityModel = new ActivityModel();
-                $activityModel->save($activity, 'Groups');
-            }
-        }
-
-        // Send a message for the invite.
-        if (class_exists('ConversationModel') && count($validUserIDs) > 0) {
-            $model = new ConversationModel();
-            $messageModel = new ConversationMessageModel();
-
-            $args = [
-                'Name' => htmlspecialchars($group['Name']),
-                'Url' => groupUrl($group, '/')
-            ];
-            $row = [
-                'Subject' => formatString(t("Please join my group."), $args),
-                'Body' => formatString(t("You've been invited to join {Name}."), $args),
-                'Format' => 'Html',
-                'RecipientUserID' => $validUserIDs,
-                'Type' => 'ginvite',
-                'RegardingID' => $group['GroupID'],
-            ];
-
-            if (!$model->save($row, $messageModel)) {
-                throw new Gdn_UserException($model->Validation->resultsText());
-            }
-        }
-
-        return count($this->validationResults()) == 0;
+        return $this->inviteUsers($groupID, $userIDs);
     }
 
     /**
+     * Make a user leave a group.
      *
+     * @deprecated
      *
-     * @param $data
-     * @return bool
-     * @throws Gdn_UserException
+     * @param array $data
      */
-    public function join($data) {
-        $valid = $this->validateJoin($data);
-        if (!$valid) {
-            return false;
-        }
+    public function leave($data) {
+        deprecated('leave($data)', 'removeMember($groupID, $userID)');
+        $groupID = val('GroupID', $data);
+        $userID = val('UserID', $data);
 
-        $group = $this->getID(getValue('GroupID', $data));
-        trace($group, 'Group');
-
-        switch (strtolower($group['Registration'])) {
-            case 'public':
-                // This is a public group, go ahead and add the user.
-                touchValue('Role', $data, 'Member');
-                $model = new Gdn_Model('UserGroup');
-                $model->insert($data);
-                $this->Validation = $model->Validation;
-                $this->updateCount($group['GroupID'], 'CountMembers');
-                return count($this->validationResults()) == 0;
-
-            case 'approval':
-                // The user must apply to this group.
-                $data['Type'] = 'Application';
-                $model = new Gdn_Model('GroupApplicant');
-                $model->insert($data);
-                $this->Validation = $model->Validation;
-                return count($this->validationResults()) == 0;
-
-            case 'invite':
-            default:
-                throw new Gdn_UserException("Registration type {$group['Registration']} not supported.");
-                // TODO: The user must be invited.
-                return false;
-        }
+        $this->removeMember($groupID, $userID);
     }
 
     /**
@@ -693,10 +1049,14 @@ class GroupModel extends Gdn_Model {
     /**
      * Approve a membership application.
      *
+     * @deprecated
+     *
      * @param array $data
      * @return bool
      */
     public function joinApprove($data) {
+        deprecated('joinApprove', 'processApplicant');
+
         // Grab the applicant row.
         $iD = $data['GroupApplicantID'];
         $row = $this->SQL->getWhere('GroupApplicant', ['GroupApplicantID' => $iD])->firstRow(DATASET_TYPE_ARRAY);
@@ -715,15 +1075,15 @@ class GroupModel extends Gdn_Model {
             $inserted = $model->insert([
                 'UserID' => $row['UserID'],
                 'GroupID' => $row['GroupID'],
-                'Role' => val('Role', $data, 'Member')
+                'Role' => 'Member',
             ]);
-            $this->Validation = $model->Validation;
+            foreach ($model->Validation->results() as $key => $value) {
+                $this->Validation->addValidationResult($key, $value);
+            }
 
             if ($inserted) {
                 $this->updateCount($row['GroupID'], 'CountMembers');
                 $this->SQL->delete('GroupApplicant', ['GroupApplicantID' => $iD]);
-
-                // TODO: Notify the user.
             }
 
             return $inserted;
@@ -736,7 +1096,7 @@ class GroupModel extends Gdn_Model {
             } else {
                 $saved = $model->save([
                     'GroupApplicantID' => $iD,
-                    'Type' => $value
+                    'Type' => $value,
                 ]);
             }
 
@@ -772,6 +1132,7 @@ class GroupModel extends Gdn_Model {
         $sql = clone Gdn::sql();
         $sql->reset();
 
+        $discussions = [];
         // Grab the discussions.
         if (count($discussionIDs) > 0) {
             $discussions = $sql->whereIn('DiscussionID', $discussionIDs)->get('Discussion')->resultArray();
@@ -812,20 +1173,6 @@ class GroupModel extends Gdn_Model {
         if ($joinUsers) {
             Gdn::userModel()->joinUsers($data, ['LastCommentUserID', 'LastDiscussionUserID']);
         }
-    }
-
-    /**
-     *
-     *
-     * @param $data
-     * @throws Gdn_UserException
-     */
-    public function leave($data) {
-        $this->SQL->delete('UserGroup', [
-            'UserID' => val('UserID', $data),
-            'GroupID' => val('GroupID', $data)]);
-
-        $this->updateCount($data['GroupID'], 'CountMembers');
     }
 
     /**
@@ -873,7 +1220,7 @@ class GroupModel extends Gdn_Model {
      *
      * @param array $data
      * @param bool $settings
-     * @return unknown
+     * @return int|false
      * @throws Exception
      * @throws Gdn_UserException
      */
@@ -890,7 +1237,7 @@ class GroupModel extends Gdn_Model {
         }
 
         // Set the visibility and registration based on the privacy.
-        switch (strtolower(getValue('Privacy', $data))) {
+        switch (strtolower(val('Privacy', $data))) {
             case 'private':
                 $data['Visibility'] = 'Members';
                 $data['Registration'] = 'Approval';
@@ -908,6 +1255,13 @@ class GroupModel extends Gdn_Model {
         $primaryKeyVal = val($this->PrimaryKey, $data, false);
         $insert = $primaryKeyVal == false ? true : false;
         if ($insert) {
+            if (!isset($data['CategoryID'])) {
+                $categories = self::getGroupCategoryIDs();
+                if (count($categories)) {
+                    $data['CategoryID'] = $categories[0];
+                }
+            }
+
             $this->addInsertFields($data);
         } else {
             $this->addUpdateFields($data);
@@ -939,7 +1293,9 @@ class GroupModel extends Gdn_Model {
                 ];
                 $model = new Gdn_Model('UserGroup');
                 $model->insert($row);
-                $this->Validation = $model->Validation;
+                foreach ($model->Validation->results() as $key => $value) {
+                    $this->Validation->addValidationResult($key, $value);
+                }
             }
             $this->updateCount($groupID, 'CountMembers');
             $this->getCount(null); // clear cache.
@@ -948,37 +1304,15 @@ class GroupModel extends Gdn_Model {
     }
 
     /**
+     * Set a user role.
      *
-     *
-     * @param $groupID
-     * @param $userID
-     * @param $role
+     * @param int $groupID
+     * @param int $userID
+     * @param string $role Enum['Member', 'Leader']
      */
     public function setRole($groupID, $userID, $role) {
-        $this->SQL->put('UserGroup', ['Role' => $role], ['UserID' => $userID, 'GroupID' => $groupID]);
-    }
-
-    /**
-     *
-     *
-     * @param $groupID
-     * @param $userID
-     * @param bool $type
-     */
-    public function removeMember($groupID, $userID, $type = false) {
-        // Remove the member.
-        $this->SQL->delete('UserGroup', ['GroupID' => $groupID, 'UserID' => $userID]);
-
-        // If the user was banned then let's add the ban.
-        if (in_array($type, ['Banned', 'Denied'])) {
-            $model = new Gdn_Model('GroupApplicant');
-            $model->delete(['GroupID' => $groupID, 'UserID' => $userID]);
-            $model->insert([
-                'GroupID' => $groupID,
-                'UserID' => $userID,
-                'Type' => $type
-            ]);
-        }
+        deprecated('setRole', 'setMemberRole');
+        $this->setMemberRole($groupID, $userID, $role);
     }
 
     /**
@@ -1017,10 +1351,10 @@ class GroupModel extends Gdn_Model {
         $valid = parent::validate($formPostValues, $insert);
 
         // Check to see if there is another group with the same name.
-        if (trim(getValue('Name', $formPostValues))) {
+        if (trim(val('Name', $formPostValues))) {
             $rows = $this->SQL->getWhere('Group', ['Name' => $formPostValues['Name']])->resultArray();
 
-            $groupID = getValue('GroupID', $formPostValues);
+            $groupID = val('GroupID', $formPostValues);
             foreach ($rows as $row) {
                 if (!$groupID || $groupID != $row['GroupID']) {
                     $valid = false;
@@ -1076,59 +1410,6 @@ class GroupModel extends Gdn_Model {
         // First validate the basic field requirements.
         $valid = $this->Validation->validate($data);
         return $valid;
-    }
-
-    /**
-     * Delete a group.
-     *
-     * @param array|string $where
-     * @param integer|bool $limit
-     * @param boolean $resetData Unused.
-     * @return Gdn_DataSet
-     */
-    public function delete($where = '', $limit = false, $resetData = false) {
-        // Get list of matching groups
-        $matchGroups = $this->getWhere($where,'','',$limit);
-        // Clean up UserGroups
-        $groupIDs = [];
-        foreach ($matchGroups as $event) {
-            $groupIDs[] = val('GroupID', $event);
-        }
-
-        // Start by deleting the content! If the query times out the groups will be intact and the user will be
-        // able to try again! This is the "best" we can do until we have a Queue for tasks.
-        $discussionIDs = $this->SQL
-                ->select('DiscussionID')
-                ->getWhere('Discussion', ['GroupID' => $groupIDs])
-                ->resultArray();
-
-        $discussionModel = new DiscussionModel();
-        foreach ($discussionIDs as $discussionID) {
-            $discussionModel->deleteID($discussionID);
-        }
-
-        // Add Logging on deletion of groups
-        LogModel::beginTransaction();
-        // Get the row(s) of the group(s) being deleted to save to the log.
-        $groups = $this->SQL->getWhere('Group', ['GroupID' => $groupIDs])->resultArray();
-        // Include the first 20 applicants and users in the log
-        $groupMembers = $this->SQL->getWhere('UserGroup', ['GroupID' => $groupIDs], "", "asc", 20)->resultArray();
-        $groupApplicants = $this->SQL->getWhere('GroupApplicant', ['GroupID' => $groupIDs], "", "asc", 20)->resultArray();
-
-        $data['_Data']['Group'] = $groups;
-        $data['_Data']['GroupMembers'] = $groupMembers;
-        $data['_Data']['GroupApplicants'] = $groupApplicants;
-        LogModel::insert('Delete', 'Group', $data);
-
-        LogModel::endTransaction();
-
-        // Delete groups
-        $deleted = parent::delete($where, $limit ? ['limit' => $limit] : []);
-
-        $this->SQL->delete('UserGroup', ['GroupID'=> $groupIDs]);
-        $this->SQL->delete('GroupApplicant', ['GroupID' => $groupIDs]);
-
-        return $deleted;
     }
 
     /**
