@@ -63,9 +63,9 @@ class EventsApiController extends AbstractApiController {
         $this->idParamEventSchema()->setDescription('Delete a group.');
         $this->schema([], 'out');
 
-        $row = $this->eventByID($id);
+        $event = $this->eventByID($id);
 
-        if ($row['InsertUserID'] !== $this->getSession()->UserID && !$this->eventModel->checkPermission('Delete', $id)) {
+        if (!$this->eventModel->checkPermission('Organizer', $event)) {
             throw new ClientException('You do not have the rights to delete this event.');
         }
 
@@ -164,16 +164,16 @@ class EventsApiController extends AbstractApiController {
         $this->idParamEventSchema()->setDescription('Get an event.');
         $out = $this->schema($this->fullEventSchema(), 'out');
 
-        $row = $this->eventByID($id);
+        $event = $this->eventByID($id);
 
-        if (!$this->eventModel->checkPermission('View', $id)) {
+        if (!$this->eventModel->checkPermission('View', $event)) {
             throw new ClientException('You do not have the rights to view this event.');
         }
 
-        $this->userModel->expandUsers($row, ['InsertUserID', 'UpdateUserID']);
+        $this->userModel->expandUsers($event, ['InsertUserID', 'UpdateUserID']);
 
-        $row = $this->normalizeEventOutput($row);
-        return $out->validate($row);
+        $result = $this->normalizeEventOutput($event);
+        return $out->validate($result);
     }
 
     /**
@@ -261,13 +261,13 @@ class EventsApiController extends AbstractApiController {
             'out'
         );
 
-        $row = $this->eventByID($id);
+        $event = $this->eventByID($id);
 
-        if (!$this->eventModel->checkPermission('View', $id)) {
+        if (!$this->eventModel->checkPermission('View', $event)) {
             throw new ClientException('You do not have the rights to view this event.');
         }
 
-        $result = $out->validate($row);
+        $result = $out->validate($event);
         return $result;
     }
 
@@ -444,12 +444,12 @@ class EventsApiController extends AbstractApiController {
 
         $body = $in->validate($body, true);
 
-        $row = $this->eventByID($id);
+        $event = $this->eventByID($id);
 
         $eventData = $this->normalizeEventInput($body);
         $eventData['EventID'] = $id;
 
-        if ($row['InsertUserID'] !== $this->getSession()->UserID && !$this->eventModel->checkPermission('Edit', $id)) {
+        if (!$this->eventModel->checkPermission('Edit', $event)) {
             throw new ClientException('You do not have the rights to edit this event.');
         }
 
@@ -528,16 +528,16 @@ class EventsApiController extends AbstractApiController {
         ])->setDescription('RSVP to an event.');
         $out = $this->schema($this->fullEventParticipantSchema(), 'out');
 
-        $this->eventByID($id);
+        $event = $this->eventByID($id);
 
-        if (!$this->eventModel->checkPermission('View', $id)) {
+        if (!$this->eventModel->checkPermission('View', $event)) {
             throw new ClientException('You do not have the rights to view that event.');
         }
 
         $body = $in->validate($body);
 
         $userID = !empty($body['userID']) ? $body['userID'] : $this->getSession()->UserID;
-        if ($this->getSession()->UserID !== $userID && !$this->eventModel->checkPermission('Organizer', $id, $this->getSession()->UserID)) {
+        if ($this->getSession()->UserID !== $userID && !$this->eventModel->checkPermission('Organizer', $event, $this->getSession()->UserID)) {
             throw new ClientException('You do not have the rights to add a participant to that event.');
         }
 

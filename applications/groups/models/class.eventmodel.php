@@ -121,7 +121,7 @@ class EventModel extends Gdn_Model {
      *  - Create: User can create events.
      *  - Edit: User can edit the event.
      *  - View: The user may view the event's contents.
-     * @param int $eventID
+     * @param int|array $eventID The event ID of the event record
      * @param int|null $userID
      * @return boolean
      */
