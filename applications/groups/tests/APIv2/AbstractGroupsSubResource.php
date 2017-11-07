@@ -19,7 +19,7 @@ abstract class AbstractGroupsSubResource extends AbstractAPIv2Test {
      */
     public static function setupBeforeClass() {
         self::$userIDs = [];
-        self::$addons = ['vanilla', 'groups'];
+        self::$addons = ['vanilla', 'conversations', 'groups'];
         parent::setupBeforeClass();
 
         /** @var \Gdn_Session $session */

@@ -38,7 +38,7 @@ class GroupsTest extends AbstractResourceTest {
      * {@inheritdoc}
      */
     public static function setupBeforeClass() {
-        self::$addons = ['vanilla', 'groups'];
+        self::$addons = ['vanilla', 'conversations', 'groups'];
         parent::setupBeforeClass();
     }
 

@@ -630,7 +630,6 @@ class GroupModel extends Gdn_Model {
             // Send a message for the invite.
             if (class_exists('ConversationModel')) {
                 $model = new ConversationModel();
-                $messageModel = new ConversationMessageModel();
 
                 $args = [
                     'Name' => htmlspecialchars($group['Name']),
@@ -645,7 +644,7 @@ class GroupModel extends Gdn_Model {
                     'RegardingID' => $group['GroupID'],
                 ];
 
-                if (!$model->save($row, $messageModel)) {
+                if (!$model->save($row)) {
                     throw new Gdn_UserException($model->Validation->resultsText());
                 }
             } else {
