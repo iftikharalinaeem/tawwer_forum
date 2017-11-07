@@ -120,7 +120,7 @@ class GroupModel extends Gdn_Model {
      *  - Delete: User can delete the group.
      *  - View: The user may view the group's contents.
      *  - Moderate: The user may moderate the group.
-     * @param int $groupID
+     * @param int|array $groupID The groupID or group record.
      * @param int|null $userID
      * @return boolean
      */

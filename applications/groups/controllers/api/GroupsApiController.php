@@ -52,18 +52,18 @@ class GroupsApiController extends AbstractApiController {
      * @throws ClientException
      */
     public function delete($id) {
-        $this->permission('Garden.Group.Add');
+        $this->permission('Groups.Group.Add');
 
         $this->idParamGroupSchema()->setDescription('Delete a group.');
         $this->schema([], 'out');
 
-        $row = $this->groupByID($id);
+        $group = $this->groupByID($id);
 
-        if ($row['InsertUserID'] !== $this->getSession()->UserID && !$this->groupModel->checkPermission('Delete', $id)) {
+        if (!$this->groupModel->checkPermission('Delete', $group)) {
             throw new ClientException('You do not have the rights to delete this group.');
         }
 
-        // GroupModel->deleteID() won't do here.
+        // GroupModel->deleteID() won't do here since it does not delete all the group's data.
         $this->groupModel->delete(['GroupID' => $id]);
     }
 
@@ -81,9 +81,9 @@ class GroupsApiController extends AbstractApiController {
         $this->idParamGroupMemberSchema(false)->setDescription('Delete an invite to a user from a group.');
         $this->schema([], 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
 
-        if ($userID !== $this->getSession()->UserID && !$this->groupModel->checkPermission('Moderate', $id)) {
+        if (!$this->groupModel->checkPermission('Moderate', $group)) {
             throw new ClientException('You do not have the rights to moderate this group.');
         }
 
@@ -289,13 +289,13 @@ class GroupsApiController extends AbstractApiController {
             'out'
         );
 
-        $row = $this->groupByID($id);
+        $group = $this->groupByID($id);
 
-        if ($row['InsertUserID'] !== $this->getSession()->UserID && !$this->groupModel->checkPermission('Edit', $id)) {
+        if (!$this->groupModel->checkPermission('Edit', $group)) {
             throw new ClientException('You do not have the rights to edit this group.');
         }
 
-        $result = $this->normalizeGroupOutput($row);
+        $result = $this->normalizeGroupOutput($group);
         return $out->validate($result);
     }
 
@@ -328,9 +328,9 @@ class GroupsApiController extends AbstractApiController {
         ], 'in')->setDescription('List the invites for a group.');
         $out = $this->schema([':a' => $this->fullGroupInviteSchema()], 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
 
-        if (!$this->groupModel->checkPermission('Moderate', $id)) {
+        if (!$this->groupModel->checkPermission('Moderate', $group)) {
             throw new ClientException('You do not have the rights to moderate this group.');
         }
 
@@ -377,9 +377,9 @@ class GroupsApiController extends AbstractApiController {
         ], 'in')->setDescription('List applicants to a group.');
         $out = $this->schema([':a' => $this->fullGroupApplicantSchema()], 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
 
-        if (!$this->groupModel->checkPermission('Moderate', $id)) {
+        if (!$this->groupModel->checkPermission('Moderate', $group)) {
             throw new ClientException('You do not have the rights to moderate this group.');
         }
 
@@ -432,7 +432,7 @@ class GroupsApiController extends AbstractApiController {
 
         $group = $this->groupByID($id);
 
-        if ($group['InsertUserID'] !== $this->getSession()->UserID && !$this->groupModel->checkPermission('View', $id)) {
+        if (!$this->groupModel->checkPermission('View', $group)) {
             throw new ClientException('You do not have the rights to view this group.');
         }
 
@@ -563,9 +563,9 @@ class GroupsApiController extends AbstractApiController {
      * @throws ClientException
      */
     private function leaveGroup($id, $userID) {
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
 
-        $permissions = $this->groupModel->checkPermission(false, $id, $userID);
+        $permissions = $this->groupModel->checkPermission(false, $group, $userID);
 
         if ($userID !== $this->getSession()->UserID && !$permissions['Moderate']) {
             throw new ClientException('You do not have the rights to moderate this group.');
@@ -581,10 +581,10 @@ class GroupsApiController extends AbstractApiController {
     /**
      * Normalize a group applicant database record to match the Schema definition.
      *
-     * @param $dbRecord Group Applicant database record.
+     * @param array $dbRecord Group Applicant database record.
      * @return array Return a Schema record.
      */
-    public function normalizeGroupApplicantOutput($dbRecord) {
+    public function normalizeGroupApplicantOutput(array $dbRecord) {
         if (in_array($dbRecord['Type'], ['Approved', 'Denied'])) {
             $dbRecord['State'] = $this->camelCaseScheme->convert($dbRecord['Type']);
         } else {
@@ -602,10 +602,10 @@ class GroupsApiController extends AbstractApiController {
     /**
      * Normalize a group Schema record to match the database definition.
      *
-     * @param $schemaRecord Group Schema record.
+     * @param array $schemaRecord Group Schema record.
      * @return array Return a database record.
      */
-    public function normalizeGroupInput($schemaRecord) {
+    public function normalizeGroupInput(array $schemaRecord) {
         if (array_key_exists('bannerUrl', $schemaRecord)) {
             $schemaRecord['banner'] = !empty($schemaRecord['bannerUrl']) ? $schemaRecord['bannerUrl'] : null;
         }
@@ -623,10 +623,10 @@ class GroupsApiController extends AbstractApiController {
     /**
      * Normalize a group member Schema record to match the database definition.
      *
-     * @param $schemaRecord Group Member Schema record.
+     * @param array $schemaRecord Group Member Schema record.
      * @return array Return a database record.
      */
-    public function normalizeGroupMemberInput($schemaRecord) {
+    public function normalizeGroupMemberInput(array $schemaRecord) {
         $schemaRecord['role'] = $this->capitalCaseScheme->convert($schemaRecord['role']);
 
         $dbRecord = $this->capitalCaseScheme->convertArrayKeys($schemaRecord);
@@ -636,10 +636,10 @@ class GroupsApiController extends AbstractApiController {
     /**
      * Normalize a group member database record to match the schema definition.
      *
-     * @param $dbRecord Group database record.
+     * @param array $dbRecord Group database record.
      * @return array Return a schema record.
      */
-    public function normalizeGroupMemberOutput($dbRecord) {
+    public function normalizeGroupMemberOutput(array $dbRecord) {
         $dbRecord['Role'] = $this->camelCaseScheme->convert($dbRecord['Role']);
 
         $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
@@ -650,10 +650,10 @@ class GroupsApiController extends AbstractApiController {
     /**
      * Normalize a group database record to match the schema definition.
      *
-     * @param $dbRecord Group database record.
+     * @param array $dbRecord Group database record.
      * @return array Return a schema record.
      */
-    public function normalizeGroupOutput($dbRecord) {
+    public function normalizeGroupOutput(array $dbRecord) {
         static $fieldToURL;
         if ($fieldToURL === null) {
             $fieldToURL = function(&$field) {
@@ -718,12 +718,12 @@ class GroupsApiController extends AbstractApiController {
 
         $body = $in->validate($body, true);
 
-        $row = $this->groupByID($id);
+        $group = $this->groupByID($id);
 
         $groupData = $this->normalizeGroupInput($body);
         $groupData['GroupID'] = $id;
 
-        if ($row['InsertUserID'] !== $this->getSession()->UserID && !$this->groupModel->checkPermission('Edit', $id)) {
+        if (!$this->groupModel->checkPermission('Edit', $group)) {
             throw new ClientException('You do not have the rights to edit this group.');
         }
 
@@ -760,9 +760,9 @@ class GroupsApiController extends AbstractApiController {
         ], 'in')->setDescription('Approve or deny a group applicant.');
         $out = $this->schema($this->fullGroupApplicantSchema(), 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
 
-        if (!$this->groupModel->checkPermission('Moderate', $id)) {
+        if (!$this->groupModel->checkPermission('Moderate', $group)) {
             throw new ClientException('You do not have the rights to moderate this group.');
         }
 
@@ -807,10 +807,10 @@ class GroupsApiController extends AbstractApiController {
         ])->setDescription('Change a user\'s role within a group.');
         $out = $this->schema($this->fullGroupMemberSchema(), 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
         $this->memberByID($id, $userID);
 
-        if (!$this->groupModel->checkPermission('Moderate', $id)) {
+        if (!$this->groupModel->checkPermission('Moderate', $group)) {
             throw new ClientException('You do not have the rights to moderate this group.');
         }
 
@@ -921,9 +921,9 @@ class GroupsApiController extends AbstractApiController {
         $in = $this->schema(['userID:i'], 'in')->setDescription('Invite a user to a group.');
         $out = $this->schema($this->fullGroupInviteSchema(), 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
 
-        if (!$this->groupModel->checkPermission('Moderate', $id)) {
+        if (!$this->groupModel->checkPermission('Moderate', $group)) {
             throw new ClientException('You do not have the rights to moderate this group.');
         }
 
@@ -1017,9 +1017,9 @@ class GroupsApiController extends AbstractApiController {
         ])->setDescription('Add a user to a group.');
         $out = $this->schema($this->fullGroupMemberSchema(), 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
 
-        if (!$this->groupModel->checkPermission('Moderate', $id)) {
+        if (!$this->groupModel->checkPermission('Moderate', $group)) {
             throw new ClientException('You do not have the rights to moderate this group.');
         }
 
