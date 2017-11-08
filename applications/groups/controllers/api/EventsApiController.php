@@ -33,7 +33,7 @@ class EventsApiController extends AbstractApiController {
     private $userModel;
 
     /**
-     * ConversationsApiController constructor.
+     * EventsApiController constructor.
      *
      * @param EventModel $eventModel
      * @param GroupModel $groupModel
