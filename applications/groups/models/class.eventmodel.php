@@ -328,7 +328,7 @@ class EventModel extends Gdn_Model {
      * @param int $offset
      * @return array
      */
-    public function getInvitedUsers($eventID, $where = [], $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = 0) {
+    public function getInvitedUsers($eventID, array $where = [], $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = 0) {
         $where['EventID'] = $eventID;
 
         return $this->SQL->getWhere('UserEvent', $where, $orderFields, $orderDirection, $limit, $offset)->resultArray();

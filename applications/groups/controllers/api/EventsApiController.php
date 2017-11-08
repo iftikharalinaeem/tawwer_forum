@@ -60,7 +60,7 @@ class EventsApiController extends AbstractApiController {
     public function delete($id) {
         $this->permission('Garden.SignIn.Allow');
 
-        $this->idParamEventSchema()->setDescription('Delete a group.');
+        $this->idParamEventSchema()->setDescription('Delete an event.');
         $this->schema([], 'out');
 
         $event = $this->eventByID($id);
@@ -69,7 +69,7 @@ class EventsApiController extends AbstractApiController {
             throw new ClientException('You do not have the rights to delete this event.');
         }
 
-        // EventModel->deleteID() won't do here.
+        // EventModel->deleteID() won't do here because it does not delete all the event's data.
         $this->eventModel->delete(['EventID' => $id]);
     }
 
@@ -132,7 +132,7 @@ class EventsApiController extends AbstractApiController {
                 'name:s' => 'The name of the event.',
                 'body:s' => 'The description of the event.',
                 'format:s' => 'The input format of the event.',
-                'location:s|null' => [
+                'location:s|n' => [
                     'maxLength' => 255,
                     'description' => 'The location of the event.'
                 ],
@@ -228,7 +228,7 @@ class EventsApiController extends AbstractApiController {
 
         // Data
         $rows = [];
-        if ($where !== null) {
+        if ($where) {
             $rows = $this->eventModel->getInvitedUsers($id, $where, '', 'asc', $limit, $offset);
         }
 
@@ -353,7 +353,7 @@ class EventsApiController extends AbstractApiController {
 
         // Data
         $rows = [];
-        if ($where !== null) {
+        if ($where) {
             $rows = $this->eventModel->getWhere($where, $sortField, $sortOrder, $limit, $offset)->resultArray();
         }
 
