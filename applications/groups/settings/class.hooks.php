@@ -4,6 +4,9 @@
  * @license Proprietary
  */
 
+use \Garden\Schema\Schema;
+use \Vanilla\Web\Controller;
+
 /**
  * Class GroupsHooks
  */
@@ -781,4 +784,84 @@ class GroupsHooks extends Gdn_Plugin {
         $sender->setData('Title', t('Group Settings'));
         $cf->renderAll();
     }
+
+    /**
+     * Hook to alter discussions's model schemas.
+     *
+     * @param Schema $schema
+     */
+    public function discussionSchema_init_handler(Schema $schema) {
+        $this->alterDiscussionSchema($schema);
+    }
+
+    /**
+     * Hook to alter discussions's endpoint schemas.
+     *
+     * @param Schema $schema
+     */
+    public function controller_schema_handler(Controller $controller, Schema $schema, $type) {
+        if (!($controller instanceof DiscussionsApiController)) {
+            return;
+        }
+
+        $this->alterDiscussionSchema($schema);
+    }
+
+    /**
+     * Alter discussion schemas
+     *
+     * @param Schema $schema
+     */
+    public function alterDiscussionSchema(Schema $schema) {
+        // We only want to alter base discussions schemas. Exclude things like Schema([:a => Schema])
+        if (!isset($schema['properties']) || !isset($schema['required'])) {
+            return;
+        }
+
+        // Let's make sure that categoryID is present in the schema.
+        if (!array_key_exists('categoryID', $schema['properties'])) {
+            return;
+        }
+
+        // Remove the required flag from categoryID.
+        $oldRequired = $schema['required'];
+        $newRequired = array_values(array_filter($schema['required'], function($value) {
+            return $value !== 'categoryID';
+        }));
+
+        // Kludge to make sure that we do not put groupID where category could have been omitted.
+        // This will skip adding groupID as a filter in /groups
+        if (count($oldRequired) === count($newRequired)) {
+            return;
+        }
+
+        $schema['required'] = $newRequired;
+
+        $groupModel = new GroupModel();
+
+        $schema
+            ->merge(Schema::parse([
+                'groupID:i|n?' => 'The group the discussion is in.',
+            ]))
+            ->requireOneOf(['categoryID', 'groupID'])
+            ->addFilter('', function($value, $field) use ($groupModel) {
+                if (!empty($value['groupID'])) {
+                    $group = $groupModel->getID($value['groupID']);
+
+                    if (!$group) {
+                        $field->addError('invalidGroup', [
+                            'messageCode' => 'The group {groupID} does not exists.',
+                            'groupID' => $value['groupID'],
+                        ]);
+                    } else {
+                        if (!array_key_exists('categoryID', $value)) {
+                            $value['categoryID'] = $groupModel::getGroupCategoryIDs()[0];
+                        }
+                    }
+                }
+                return $value;
+            })
+        ;
+    }
+
 }
