@@ -83,7 +83,7 @@ class UserPointsBoosterPlugin extends Gdn_Plugin {
             return;
         }
 
-        $this->addPostPoints();
+        $this->addPostPoints(valr('Discussion.CategoryID', $args));
     }
 
     /**
@@ -98,13 +98,19 @@ class UserPointsBoosterPlugin extends Gdn_Plugin {
             return;
         }
 
-        $this->addPostPoints();
+        $discussionID = valr('CommentData.DiscussionID', $args);
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID($discussionID);
+
+        $this->addPostPoints(val('CategoryID', $discussion));
     }
 
     /**
      * Gives point(s), according to the UserPointsBooster.PostPoints configuration, to the current user.
+     *
+     * @param int $categoryID The category ID in which the post was created.
      */
-    protected function addPostPoints() {
-        UserModel::givePoints(Gdn::session()->UserID, c('UserPointsBooster.PostPoints'), 'Posts');
+    protected function addPostPoints($categoryID) {
+        CategoryModel::givePoints(Gdn::session()->UserID, c('UserPointsBooster.PostPoints'), 'Posts', $categoryID);
     }
 }
