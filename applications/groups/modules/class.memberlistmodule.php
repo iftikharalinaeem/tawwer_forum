@@ -156,9 +156,9 @@ class MemberListModule extends Gdn_Module {
     protected function getMemberInfo($member, $group, $layout, $withButtons) {
 
         $item['heading'] = Gdn_Format::text(val('Name', $member));
-        $item['url'] = userUrl($member);
+        $item['url'] = url(userUrl($member));
         $item['imageSource'] = userPhotoUrl($member);
-        $item['imageUrl'] = userUrl($member);
+        $item['imageUrl'] = url(userUrl($member));
         $item['metaCssClass'] = '';
         $item['id'] = 'Member_'.val('UserID', $member);
 
