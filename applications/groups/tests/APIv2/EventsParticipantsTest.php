@@ -110,11 +110,11 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
     /**
      * Test POST :eventID/events.
      *
-     * @dataProvider providerRSPV
+     * @dataProvider providerRSVP
      *
      * @param string|null $attending
      */
-    public function testRSPV($attending) {
+    public function testRSVP($attending) {
         $event = $this->createEvent(__FUNCTION__." $attending");
 
         $this->api()->setUserID(self::$userIDs[0]);
@@ -139,11 +139,11 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
     /**
      * Test POST :eventID/events.
      *
-     * @dataProvider providerRSPV
+     * @dataProvider providerRSVP
      *
      * @param string|null $attending
      */
-    public function testRSPVForUser($attending) {
+    public function testRSVPForUser($attending) {
         $event = $this->createEvent(__FUNCTION__." $attending");
 
         $result = $this->api()->post(
@@ -169,7 +169,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
      * Test POST :eventID/events.
      *
      */
-    public function testRSPVMultipleTimes() {
+    public function testRSVPMultipleTimes() {
         $event = $this->createEvent(__FUNCTION__);
 
         $this->api()->setUserID(self::$userIDs[0]);
@@ -203,7 +203,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
     /**
      * Test GET :groupID/participants.
      *
-     * @depends testRSPV
+     * @depends testRSVP
      */
     public function testListParticipants() {
         $event = $this->createEvent(__FUNCTION__);
@@ -234,7 +234,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
     /**
      * Test GET :groupID/participants with '?attending=' filter.
      *
-     * @depends testRSPVMultipleTimes
+     * @depends testRSVPMultipleTimes
      * @depends testListParticipants
      */
     public function testListParticipantsWithAttendingFilter() {
@@ -290,7 +290,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
     /**
      * @return array
      */
-    public function providerRSPV() {
+    public function providerRSVP() {
         return [
             ['yes'],
             ['no'],
