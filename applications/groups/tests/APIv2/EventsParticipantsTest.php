@@ -232,6 +232,62 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test GET :groupID/participants with '?attending=' filter.
+     *
+     * @depends testRSPVMultipleTimes
+     * @depends testListParticipants
+     */
+    public function testListParticipantsWithAttendingFilter() {
+        $event = $this->createEvent(__FUNCTION__);
+
+        $attendingAnswers = ['maybe', null, 'yes', 'no'];
+        foreach ($attendingAnswers as $userID => $attending) {
+            $this->api()->setUserID($userID);
+            $result = $this->api()->post(
+                $this->createURL($event['eventID'], 'participants'),
+                [
+                    'attending' => $attending,
+                ]
+            );
+
+            $this->assertEquals(201, $result->getStatusCode());
+
+            $participant = $result->getBody();
+
+            $this->assertInternalType('array', $participant);
+            $this->assertArrayHasKey('userID', $participant);
+            $this->assertArrayHasKey('attending', $participant);
+            $this->assertEquals($userID, $participant['userID']);
+            $this->assertEquals($attending, $participant['attending']);
+
+            $this->api()->setUserID(self::$siteInfo['adminUserID']);
+            $result = $this->api()->get(
+                $this->createURL($event['eventID'], 'participants').'?attending='.($attending === null ? 'unanswered' : $attending)
+            );
+            $participants = $result->getBody();
+            $this->assertEquals(1, count($participants));
+        }
+
+        $result = $this->api()->get(
+            $this->createURL($event['eventID'], 'participants').'?attending=all'
+        );
+        $participants = $result->getBody();
+        $this->assertEquals(count($attendingAnswers), count($participants));
+
+        $result = $this->api()->get(
+            $this->createURL($event['eventID'], 'participants').'?attending=answered'
+        );
+        $participants = $result->getBody();
+        $this->assertEquals(count($attendingAnswers) - 1, count($participants));
+
+        $result = $this->api()->get(
+            $this->createURL($event['eventID'], 'participants').'?attending=unanswered'
+        );
+        $participants = $result->getBody();
+        $this->assertEquals(1, count($participants));
+    }
+
+    /**
      * @return array
      */
     public function providerRSPV() {
