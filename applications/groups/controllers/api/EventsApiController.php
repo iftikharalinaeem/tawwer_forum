@@ -220,17 +220,16 @@ class EventsApiController extends AbstractApiController {
         $where = [];
         if (array_key_exists('Attending', $participantData)) {
             if ($participantData['Attending'] === 'Answered') {
-                $where['Attending !='] = 'Invited';
+                $where['Attending<>'] = 'Invited';
             } else if ($participantData['Attending'] === 'Unanswered') {
                 $where['Attending'] = 'Invited';
+            } else if ($participantData['Attending'] !== 'All') {
+                $where['Attending'] = $participantData['Attending'];
             }
         }
 
         // Data
-        $rows = [];
-        if ($where) {
-            $rows = $this->eventModel->getInvitedUsers($id, $where, '', 'asc', $limit, $offset);
-        }
+        $rows = $this->eventModel->getInvitedUsers($id, $where, '', 'asc', $limit, $offset);
 
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($rows, ['UserID']);
