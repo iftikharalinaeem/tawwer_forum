@@ -26,7 +26,7 @@ class ReactionModel extends Gdn_Model {
     /**  @var int Contains the last count from {@link getRecordsWhere()}. */
     public $LastCount;
 
-    /** @var Gdn_SQL */
+    /** @var Gdn_SQLDriver */
     public $SQL;
 
     protected static $columns = ['UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom', 'Hidden'];
@@ -128,6 +128,85 @@ class ReactionModel extends Gdn_Model {
     }
 
     /**
+     * Get reactions on a record.
+     *
+     * @param string $recordType Type of record (e.g. Discussion, Category).
+     * @param int $id Unique ID of the record.
+     * @param bool $restricted Filter result based on the current user's permissions.
+     * @param string|null $urlCode Filter reaction results by a particular type's URL code.
+     * @param int $offset
+     * @param int $limit
+     * @return array
+     */
+    public function getByRecord($recordType, $id, $restricted = true, $urlCode = null, $offset = 0, $limit = null) {
+        if ($limit === null) {
+            $limit = $this->getDefaultLimit();
+        }
+
+        $where = [
+            'Class' => ['Negative', 'Positive'],
+            'Active' => true
+        ];
+        if ($restricted === false || Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            $where['Class'][] = 'Flag';
+        }
+        if ($urlCode !== null) {
+            $where['UrlCode'] = $urlCode;
+        }
+
+        $types = self::getReactionTypes($where);
+        $tagIDs = array_column($types, 'TagID', 'TagID');
+
+        $rows = $this->SQL->getWhere(
+            'UserTag',
+            ['RecordType' => $recordType, 'RecordID' => $id, 'TagID' => $tagIDs],
+            'DateInserted',
+            'desc',
+            $limit,
+            $offset
+        )->resultArray();
+        Gdn::userModel()->expandUsers($rows, ['UserID']);
+        array_walk($rows, function(&$row) use ($types){
+            $row['ReactionType'] = self::fromTagID($row['TagID']);
+        });
+
+        return $rows;
+    }
+
+    /**
+     * Get the user's reaction to a specific record.
+     *
+     * @param int $userID The user ID.
+     * @param string $recordType Type of record (e.g. Discussion, Comment)
+     * @param int $recordID Unique ID of the record.
+     * @return array|bool
+     */
+    public function getUserReaction($userID, $recordType, $recordID) {
+        $result = false;
+
+        $tagIDs = array_column(self::reactionTypes(), 'TagID');
+        $rows = $this->SQL
+            ->select('TagID')
+            ->from('UserTag')
+            ->where([
+                'RecordType' => $recordType,
+                'RecordID' => $recordID,
+                'UserID' => $userID,
+                'TagID' => $tagIDs
+            ])->limit(1)
+            ->get()->resultArray();
+        if (!empty($rows)) {
+            $row = array_pop($rows);
+            $reactionType = self::fromTagID($row['TagID']);
+            if ($reactionType) {
+                $result = $reactionType;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      *
      *
      * @param array $where
@@ -219,6 +298,53 @@ class ReactionModel extends Gdn_Model {
     }
 
     /**
+     * Get a list of reactions and populate each with the total number of that reaction for the provided record.
+     *
+     * @param array $row A resource record (e.g. discussion, comment)
+     * @param bool $restricted Filter result based on the current user's permissions.
+     * @return array
+     */
+    public function getRecordSummary(array $row, $restricted = true) {
+        $data = [];
+
+        // Grab the reaction breakdown from the row. Make doubly sure the attribute/data is an array.
+        if (array_key_exists('Data', $row)) {
+            $row['Data'] = dbdecode($row['Data']);
+            if (array_key_exists('React', $row['Data'])) {
+                $data = $row['Data']['React'];
+            }
+        } elseif (array_key_exists('Attributes', $row)) {
+            $row['Attributes'] = dbdecode($row['Attributes']);
+            if (array_key_exists('React', $row['Attributes'])) {
+                $data = $row['Attributes']['React'];
+            }
+        }
+
+        $classes = ['Positive', 'Negative'];
+        if ($restricted === false || Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            $classes[] = 'Flag';
+        }
+        $result = self::getReactionTypes([
+            'Class' => $classes,
+            'Active' => 1
+        ]);
+        $result = array_values($result);
+
+        if (!empty($data)) {
+            foreach ($result as &$reaction) {
+                if (array_key_exists($reaction['UrlCode'], $data)) {
+                    $count = $data[$reaction['UrlCode']];
+                } else {
+                    $count = 0;
+                }
+                $reaction['Count'] = $count;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      *
      *
      * @param $type
@@ -283,9 +409,10 @@ class ReactionModel extends Gdn_Model {
      * @param $reaction
      * @param int $offset
      * @param int $limit
+     * @param bool $joinUsers Should users be joined into the result?
      * @return array
      */
-    public function getUsers($recordType, $recordID, $reaction, $offset = 0, $limit = 10) {
+    public function getUsers($recordType, $recordID, $reaction, $offset = 0, $limit = 10, $joinUsers = true) {
         $reactionType = self::reactionTypes($reaction);
         if (!$reactionType) {
             return [];
@@ -303,7 +430,9 @@ class ReactionModel extends Gdn_Model {
             )
             ->resultArray();
 
-        Gdn::userModel()->joinUsers($userTags, ['UserID']);
+        if ($joinUsers) {
+            Gdn::userModel()->joinUsers($userTags, ['UserID']);
+        }
 
         return $userTags;
     }
@@ -559,6 +688,7 @@ class ReactionModel extends Gdn_Model {
         touchValue('DateInserted', $data, Gdn_Format::toDateTime());
         $reactionTypes = self::reactionTypes();
         $reactionTypes = Gdn_DataSet::index($reactionTypes, ['TagID']);
+        $controller = Gdn::controller();
 
         // See if there is already a user tag.
         $where = arrayTranslate($data, ['RecordType', 'RecordID', 'UserID']);
@@ -669,28 +799,35 @@ class ReactionModel extends Gdn_Model {
             }
         }
 
-        Gdn::controller()->EventArguments['ReactionTypes'] &= $reactionTypes;
-        Gdn::controller()->EventArguments['Record'] = $record;
-        Gdn::controller()->EventArguments['Set'] = &$set;
-        Gdn::controller()->fireEvent('BeforeReactionsScore');
+        if (is_a($controller, 'Gdn_Controller')) {
+            Gdn::controller()->EventArguments['ReactionTypes'] &= $reactionTypes;
+            Gdn::controller()->EventArguments['Record'] = $record;
+            Gdn::controller()->EventArguments['Set'] = &$set;
+            Gdn::controller()->fireEvent('BeforeReactionsScore');
+        }
 
         // Send back the current scores.
         foreach ($set as $column => $value) {
-            Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']} .Column-".$column, self::formatScore($value), 'Html');
+            if (is_a($controller, 'Gdn_Controller')) {
+                Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']} .Column-" . $column, self::formatScore($value), 'Html');
+            }
             $record[$column] = $value;
         }
+
         // Send back the css class.
         list($addCss, $removeCss) = self::scoreCssClass($record, TRUE);
-        if ($removeCss) {
-            Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']}", $removeCss, 'RemoveClass');
-        }
-        if ($addCss) {
-            Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']}", $addCss, 'AddClass');
-        }
 
-        // Send back a delete for the user reaction.
-        if (!$insert) {
-            Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']} .UserReactionWrap[data-userid={$data['UserID']}]", '', 'Remove');
+        if (is_a($controller, 'Gdn_Controller')) {
+            if ($removeCss) {
+                Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']}", $removeCss, 'RemoveClass');
+            }
+            if ($addCss) {
+                Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']}", $addCss, 'AddClass');
+            }
+            // Send back a delete for the user reaction.
+            if (!$insert) {
+                Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']} .UserReactionWrap[data-userid={$data['UserID']}]", '', 'Remove');
+            }
         }
 
         // Kludge, add the promoted tag to promote content.
@@ -713,7 +850,9 @@ class ReactionModel extends Gdn_Model {
         $model->setField($data['RecordID'], $set);
 
         // Generate the new button for the reaction.
-        Gdn::controller()->setData('Diffs', $diffs);
+        if (is_a($controller, 'Gdn_Controller')) {
+            Gdn::controller()->setData('Diffs', $diffs);
+        }
         if (function_exists('ReactionButton')) {
             $diffs[] = 'Flag'; // always send back flag button.
             foreach ($diffs as $urlCode) {
@@ -725,7 +864,9 @@ class ReactionModel extends Gdn_Model {
                 $reactionsPlugin->EventArguments['TagID'] = val('TagID', $data);
                 $reactionsPlugin->EventArguments['Button'] = &$button;
                 $reactionsPlugin->fireEvent('ReactionsButtonReplacement');
-                Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']} .ReactButton-".$urlCode, $button, 'ReplaceWith');
+                if (is_a($controller, 'Gdn_Controller')) {
+                    Gdn::controller()->jsonTarget("#{$recordType}_{$data['RecordID']} .ReactButton-" . $urlCode, $button, 'ReplaceWith');
+                }
             }
         }
 
@@ -768,6 +909,7 @@ class ReactionModel extends Gdn_Model {
             $isModerator = Gdn::userModel()->checkPermission($user, 'Garden.Moderation.Manage');
             $isCurator = Gdn::userModel()->checkPermission($user, 'Garden.Curation.Manage');
         }
+        $controller = Gdn::controller();
 
         $undo = false;
         if (stringBeginsWith($reactionUrlCode, 'Undo-', true)) {
@@ -860,12 +1002,14 @@ class ReactionModel extends Gdn_Model {
                    ['CssClass' => 'Dismissable', 'id' => 'mod']
                 ];
                 // Send back a command to remove the row in the browser.
-                if ($recordType == 'Discussion') {
-                    Gdn::controller()->jsonTarget('.ItemDiscussion', '', 'SlideUp');
-                    Gdn::controller()->jsonTarget('#Content .Comments', '', 'SlideUp');
-                    Gdn::controller()->jsonTarget('.CommentForm', '', 'SlideUp');
-                } else {
-                    Gdn::controller()->jsonTarget("#{$recordType}_$iD", '', 'SlideUp');
+                if (is_a($controller, 'Gdn_Controller')) {
+                    if ($recordType == 'Discussion') {
+                        Gdn::controller()->jsonTarget('.ItemDiscussion', '', 'SlideUp');
+                        Gdn::controller()->jsonTarget('#Content .Comments', '', 'SlideUp');
+                        Gdn::controller()->jsonTarget('.CommentForm', '', 'SlideUp');
+                    } else {
+                        Gdn::controller()->jsonTarget("#{$recordType}_$iD", '', 'SlideUp');
+                    }
                 }
             } elseif ($score >= $logThreshold) {
                 LogModel::insert($log, $recordType, $row, $logOptions);
@@ -891,8 +1035,10 @@ class ReactionModel extends Gdn_Model {
         // Check to see if we need to give the user a badge.
         $this->checkBadges($row['InsertUserID'], $reactionType);
 
-        if ($message) {
-            Gdn::controller()->informMessage($message[0], $message[1]);
+        if (is_a($controller, 'Gdn_Controller')) {
+            if ($message) {
+                Gdn::controller()->informMessage($message[0], $message[1]);
+            }
         }
 
         ReactionsPlugin::instance()->EventArguments = [
