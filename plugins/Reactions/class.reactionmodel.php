@@ -330,15 +330,13 @@ class ReactionModel extends Gdn_Model {
         ]);
         $result = array_values($result);
 
-        if (!empty($data)) {
-            foreach ($result as &$reaction) {
-                if (array_key_exists($reaction['UrlCode'], $data)) {
-                    $count = $data[$reaction['UrlCode']];
-                } else {
-                    $count = 0;
-                }
-                $reaction['Count'] = $count;
+        foreach ($result as &$reaction) {
+            if (array_key_exists($reaction['UrlCode'], $data)) {
+                $count = $data[$reaction['UrlCode']];
+            } else {
+                $count = 0;
             }
+            $reaction['Count'] = $count;
         }
 
         return $result;
