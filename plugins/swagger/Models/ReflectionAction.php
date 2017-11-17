@@ -103,7 +103,11 @@ class ReflectionAction {
      */
     private function reflectAction() {
         $method = $this->method;
-        $resourceRegex = str_replace(['%s', '*\\'], ['([a-z][a-z0-9]*)', '(?:^|\\\\)'], $this->route->getControllerPattern());
+        $controllerPattern = $this->route->getControllerPattern();
+        if (is_array($controllerPattern)) {
+            $controllerPattern = reset($controllerPattern);
+        }
+        $resourceRegex = str_replace(['%s', '*\\'], ['([a-z][a-z0-9]*)', '(?:^|\\\\)'], $controllerPattern);
 
         // Regex the method name against event handler syntax or regular method syntax.
         if (preg_match(
@@ -228,6 +232,9 @@ class ReflectionAction {
         // Fill in information about the parameters from the input schema.
         if ($in instanceof Schema) {
             $summary = $summary ?: $in->getDescription();
+            if (empty($summary) && $allIn instanceof Schema) {
+                $summary = $allIn->getDescription();
+            }
             $inArr = $in->jsonSerialize();
             $allInArr = $allIn !== null ? $allIn->jsonSerialize() : [];
             unset($inArr['description']);

@@ -43,4 +43,36 @@ class SwaggerApiController extends Controller {
         $this->getSession()->getPermissions()->setAdmin(true);
         return $this->swaggerModel->getSwaggerObject();
     }
+
+    /**
+     * Get summary counts for the API.
+     *
+     * @return array
+     */
+    public function get_summary() {
+        $all = $this->index();
+
+        $o = array_intersect_key($all, ['swagger' => 1, 'info' => 1, 'host' => 1, 'basePath' => 1, 'consumes' => 1]);
+
+        $pathCount = 0;
+        $endpointCount = 0;
+        $resources = [];
+
+        foreach ($all['paths'] as $path => $methods) {
+            $resource = explode('/', $path, 3)[1];
+            $resources["/$resource"] = 1;
+
+            $pathCount++;
+            foreach ($methods as $method => $endpoint) {
+                $endpointCount++;
+            }
+        }
+
+        $o['countResources'] = count($resources);
+        $o['countPaths'] = $pathCount;
+        $o['countEndpoints'] = $endpointCount;
+        $o['resources'] = array_keys($resources);
+
+        return $o;
+    }
 }
