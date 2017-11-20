@@ -648,7 +648,12 @@ class Warnings2Plugin extends Gdn_Plugin {
         if (!$isPrivileged && Gdn::session()->UserID != valr('User.UserID', $sender)) {
             return;
         }
-        $sender->addProfileTab(t('Moderation'), userUrl($sender->User, '', 'notes'), 'UserNotes');
+
+        $class = 'UserNotes';
+        if (strcasecmp($sender->RequestMethod, 'notes') === 0) {
+            $class .= ' Active';
+        }
+        $sender->addProfileTab(t('Moderation'), userUrl($sender->User, '', 'notes'), $class);
     }
 
     /**
