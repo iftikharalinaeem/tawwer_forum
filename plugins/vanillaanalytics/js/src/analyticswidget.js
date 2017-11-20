@@ -230,32 +230,44 @@ function AnalyticsWidget(config) {
             this.setDisabled(false);
         }
 
-        var filters = data['query']['filters'] = data['query']['filters'] || [];
-        var filter = undefined;
+        var updateQueryFilter = function(widget, query, name, value, support) {
+            var filters = query['filters'] = query['filters'] || [];
+            var filter = undefined;
 
-        for (var i in filters) {
-            if (filters[i]['property_name'] === name) {
-                if (!value) {
-                    filters.splice(i, 1);
+            for (var i in filters) {
+                if (filters[i]['property_name'] === name) {
+                    if (!value) {
+                        filters.splice(i, 1);
+                    }
+                    filter = filters[i];
+                    break;
                 }
-                filter = filters[i];
-                break;
             }
+            if (!value) {
+                widget.drillGroupBy(support, true);
+                return true;
+            }
+            if (filter === undefined) {
+                filters.push({
+                    'operator': 'eq',
+                    'property_name': name,
+                    'property_value': value
+                });
+            } else {
+                filter.property_value = value;
+            }
+            widget.drillGroupBy(support);
         }
-        if (!value) {
-            this.drillGroupBy(support, true);
-            return true;
-        }
-        if (filter === undefined) {
-            filters.push({
-                'operator': 'eq',
-                'property_name': name,
-                'property_value': value
-            });
+
+        var widget = this;
+        if (Array.isArray(data['query'])) {
+            $.each(data['query'], function() {
+                updateQueryFilter(widget, this, name, value, support);
+            })
         } else {
-            filter.property_value = value;
+            updateQueryFilter(widget, data['query'], name, value, support);
         }
-        this.drillGroupBy(support);
+
     };
 
     this.drillGroupBy = function(name, undo) {
