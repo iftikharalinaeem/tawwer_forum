@@ -101,6 +101,7 @@ class SwaggerModel {
             'host' => $this->request->getHost(),
             'basePath' => $this->request->getRoot().'/api/v2',
             'consumes' => [
+                'application/json',
                 'application/x-www-form-urlencoded',
                 'multipart/form-data'
             ],
