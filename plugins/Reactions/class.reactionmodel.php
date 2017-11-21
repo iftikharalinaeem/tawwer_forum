@@ -185,7 +185,7 @@ class ReactionModel extends Gdn_Model {
         $result = false;
 
         $tagIDs = array_column(self::reactionTypes(), 'TagID');
-        $rows = $this->SQL
+        $row = $this->SQL
             ->select('TagID')
             ->from('UserTag')
             ->where([
@@ -194,9 +194,8 @@ class ReactionModel extends Gdn_Model {
                 'UserID' => $userID,
                 'TagID' => $tagIDs
             ])->limit(1)
-            ->get()->resultArray();
-        if (!empty($rows)) {
-            $row = array_pop($rows);
+            ->get()->firstRow(DATASET_TYPE_ARRAY);
+        if (!empty($row)) {
             $reactionType = self::fromTagID($row['TagID']);
             if ($reactionType) {
                 $result = $reactionType;
@@ -797,11 +796,17 @@ class ReactionModel extends Gdn_Model {
             }
         }
 
+        $eventArguments = [
+            'ReactionTypes' => &$reactionTypes,
+            'Record' => $record,
+            'Set' => &$set
+        ];
         if (is_a($controller, 'Gdn_Controller')) {
-            Gdn::controller()->EventArguments['ReactionTypes'] &= $reactionTypes;
-            Gdn::controller()->EventArguments['Record'] = $record;
-            Gdn::controller()->EventArguments['Set'] = &$set;
+            $controller->EventArguments += $eventArguments;
             Gdn::controller()->fireEvent('BeforeReactionsScore');
+        } else {
+            $this->EventArguments += $eventArguments;
+            $this->fireEvent('BeforeReactionsScore');
         }
 
         // Send back the current scores.

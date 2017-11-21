@@ -54,6 +54,7 @@ class ReactionsPlugin extends Gdn_Plugin {
             CommentModel $commentModel,
             ReactionModel $reactionModel,
             UserModel $userModel) {
+
         $this->discussionModel = $discussionModel;
         $this->commentModel = $commentModel;
         $this->reactionModel = $reactionModel;
@@ -270,17 +271,7 @@ class ReactionsPlugin extends Gdn_Plugin {
                 'maximum' => 100
             ],
         ])->setDescription('Get reactions to a comment.');
-        $out = $sender->schema([
-            ':a' => [
-                'recordType:s',
-                'recordID:i',
-                'tagID:i',
-                'userID:i',
-                'dateInserted:dt',
-                'user' => $sender->getUserFragmentSchema(),
-                'reactionType' => $this->getReactionTypeFragment()
-            ]
-        ], 'out');
+        $out = $sender->schema([':a' => $this->getReactionLogFragment($sender->getUserFragmentSchema())], 'out');
 
         $comment = $sender->commentByID($id);
         $discussion = $sender->discussionByID($comment['DiscussionID']);
@@ -462,17 +453,8 @@ class ReactionsPlugin extends Gdn_Plugin {
                 'maximum' => 100
             ],
         ])->setDescription('Get reactions to a discussion.');
-        $out = $sender->schema([
-            ':a' => [
-                'recordType:s',
-                'recordID:i',
-                'tagID:i',
-                'userID:i',
-                'dateInserted:dt',
-                'user' => $sender->getUserFragmentSchema(),
-                'reactionType' => $this->getReactionTypeFragment()
-            ]
-        ], 'out');
+        $out = $sender->schema([':a' => $this->getReactionLogFragment($sender->getUserFragmentSchema())], 'out');
+
 
         $discussion = $sender->discussionByID($id);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
@@ -566,6 +548,35 @@ class ReactionsPlugin extends Gdn_Plugin {
         return $result;
     }
 
+    /**
+     * Get a schema fragment suitable for representing an instance of a user reaction.
+     *
+     * @param Garden\Schema\Schema $userFragmentSchema
+     * @return Garden\Schema\Schema
+     */
+    public function getReactionLogFragment(Garden\Schema\Schema $userFragmentSchema) {
+        static $logFragment;
+
+        if ($logFragment === null) {
+            $logFragment = Garden\Schema\Schema::parse([
+                'recordType:s',
+                'recordID:i',
+                'tagID:i',
+                'userID:i',
+                'dateInserted:dt',
+                'user' => $userFragmentSchema,
+                'reactionType' => $this->getReactionTypeFragment()
+            ]);
+        }
+
+        return $logFragment;
+    }
+
+    /**
+     * Grab a schema for use in displaying a summary of a record's user reactions.
+     *
+     * @return Garden\Schema\Schema
+     */
     public function getReactionSummaryFragment() {
         static $summaryFragment;
 
