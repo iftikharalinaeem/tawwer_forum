@@ -121,16 +121,14 @@ class AnalyticsController extends DashboardController {
         if (empty($dashboardID)) {
             redirectTo('analytics', 302, false);
         }
+
         $this->addCssFile('vendors.min.css', 'plugins/vanillaanalytics');
 
-        $this->addJsFile('vendors/d3.min.js', 'plugins/vanillaanalytics');
-        $this->addJsFile('vendors/c3.min.js', 'plugins/vanillaanalytics');
         $this->addJsFile('dashboard.min.js', 'plugins/vanillaanalytics');
         $this->addJsFile('analyticsdashboard.min.js', 'plugins/vanillaanalytics');
         $this->addJsFile('analyticswidget.min.js', 'plugins/vanillaanalytics');
         $this->addJsFile('analyticstoolbar.min.js', 'plugins/vanillaanalytics');
         $this->addJsFile('vendors/jquery-ui.min.js', 'plugins/vanillaanalytics');
-
 
         // Translations
         $this->addDefinition('Unpin from your dashboard', t('Unpin from your dashboard'));

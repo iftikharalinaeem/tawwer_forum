@@ -45,12 +45,9 @@ keenTracker.event = function(eventType, collection) {
         eventData.user = this.getUser(eventData);
 
         // Send everything off to keen.
-        client.addEvent(
+        client.recordEvent(
             collection || 'page',
-            eventData,
-            function (error, response) {
-                // If error isn't a falsy, an error was encountered.
-            }
+            eventData
         );
     }
 };

@@ -38,7 +38,7 @@ module.exports = function (grunt) {
                         flatten: true,
                         cwd: 'bower_components',
                         src: [
-                            'c3/**/*.min.css'
+                            'keen-js/dist/keen.min.css'
                         ],
                         dest: 'design/vendors'
                     }
