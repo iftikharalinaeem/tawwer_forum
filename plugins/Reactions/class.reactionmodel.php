@@ -901,8 +901,9 @@ class ReactionModel extends Gdn_Model {
      * @param int $iD
      * @param string $reactionUrlCode
      * @param bool $selfReact Whether a user can react to their own post
+     * @param string|null $force Force a reaction status. One of the FORCE_* class constants.
      */
-    public function react($recordType, $iD, $reactionUrlCode, $userID = null, $selfReact = false) {
+    public function react($recordType, $iD, $reactionUrlCode, $userID = null, $selfReact = false, $force = null) {
         if (is_null($userID)) {
             $userID = Gdn::session()->UserID;
             $isModerator = checkPermission('Garden.Moderation.Manage');
@@ -914,9 +915,8 @@ class ReactionModel extends Gdn_Model {
         }
         $controller = Gdn::controller();
 
-        $undo = false;
         if (stringBeginsWith($reactionUrlCode, 'Undo-', true)) {
-            $undo = true;
+            $force = self::FORCE_REMOVE;
             $reactionUrlCode = stringBeginsWith($reactionUrlCode, 'Undo-', true, true);
         }
         $recordType = ucfirst($recordType);
@@ -959,7 +959,7 @@ class ReactionModel extends Gdn_Model {
             'UserID' => $userID,
             'Total' => $inc
         ];
-        $inserted = $this->toggleUserTag($data, $row, $model, $undo);
+        $inserted = $this->toggleUserTag($data, $row, $model, $force);
 
         $message = [t(val('InformMessage', $reactionType, '')), 'Dismissable AutoDismiss'];
 

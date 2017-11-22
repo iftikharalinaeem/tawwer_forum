@@ -217,7 +217,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         $reaction = $this->reactionModel->getUserReaction($userID, 'Comment', $id);
         if ($reaction) {
             $urlCode = $reaction['UrlCode'];
-            $this->reactionModel->react('Comment', $id, "Undo-{$urlCode}");
+            $this->reactionModel->react('Comment', $id, $urlCode, null, false, ReactionModel::FORCE_REMOVE);
         }
     }
 
@@ -337,7 +337,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $body = $in->validate($body);
 
-        $this->reactionModel->react('Comment', $id, $body['reactionType']);
+        $this->reactionModel->react('Comment', $id, $body['reactionType'], null, false, ReactionModel::FORCE_ADD);
 
         // Refresh the comment to grab its updated attributes.
         $comment = $sender->commentByID($id);
@@ -419,7 +419,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         $reaction = $this->reactionModel->getUserReaction($userID, 'Discussion', $id);
         if ($reaction) {
             $urlCode = $reaction['UrlCode'];
-            $this->reactionModel->react('Discussion', $id, "Undo-{$urlCode}");
+            $this->reactionModel->react('Discussion', $id, $urlCode, null, false, ReactionModel::FORCE_REMOVE);
         }
     }
 
@@ -538,7 +538,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $body = $in->validate($body);
 
-        $this->reactionModel->react('Discussion', $id, $body['reactionType']);
+        $this->reactionModel->react('Discussion', $id, $body['reactionType'], null, false, ReactionModel::FORCE_ADD);
 
         // Refresh the discussion to grab its updated attributes.
         $discussion = $sender->discussionByID($id);
@@ -581,8 +581,9 @@ class ReactionsPlugin extends Gdn_Plugin {
         static $summaryFragment;
 
         if ($summaryFragment === null) {
+            $typeFragment = clone $this->getReactionTypeFragment();
             $summaryFragment = Garden\Schema\Schema::parse([
-                ':a' => $this->getReactionTypeFragment()->merge(Garden\Schema\Schema::parse([
+                ':a' => $typeFragment->merge(Garden\Schema\Schema::parse([
                     'count:i'
                 ]))
             ]);
