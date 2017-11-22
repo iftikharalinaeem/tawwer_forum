@@ -9,19 +9,11 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Utility\CapitalCaseScheme;
-use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * API Controller for the `/groups` resource.
  */
 class GroupsApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $capitalCaseScheme;
-
-    /** @var CamelCaseScheme */
-    private $camelCaseScheme;
 
     /** @var GroupModel */
     private $groupModel;
@@ -39,8 +31,8 @@ class GroupsApiController extends AbstractApiController {
         GroupModel $groupModel,
         UserModel $userModel
     ) {
-        $this->camelCaseScheme = new CamelCaseScheme();
-        $this->capitalCaseScheme = new CapitalCaseScheme();
+        parent::__construct();
+
         $this->groupModel = $groupModel;
         $this->userModel = $userModel;
     }

@@ -9,19 +9,11 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Utility\CapitalCaseScheme;
-use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * API Controller for the `/events` resource.
  */
 class EventsApiController extends AbstractApiController {
-
-    /** @var CapitalCaseScheme */
-    private $capitalCaseScheme;
-
-    /** @var CamelCaseScheme */
-    private $camelCaseScheme;
 
     /** @var EventModel */
     private $eventModel;
@@ -44,8 +36,8 @@ class EventsApiController extends AbstractApiController {
         GroupModel $groupModel,
         UserModel $userModel
     ) {
-        $this->camelCaseScheme = new CamelCaseScheme();
-        $this->capitalCaseScheme = new CapitalCaseScheme();
+        parent::__construct();
+
         $this->eventModel = $eventModel;
         $this->groupModel = $groupModel;
         $this->userModel = $userModel;
