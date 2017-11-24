@@ -19,7 +19,7 @@
     </div>
     <div class="AdvancedWrap">
         <?php if ($Discussion = Gdn::controller()->data('Discussion')): ?>
-            <div class="P">
+            <div class="P AdvancedSearch-DiscussionID">
                 <?php
                 echo
                     $Form->label('Discussion', 'discussionid', ['class' => 'Heading']).
@@ -27,7 +27,7 @@
                 ?>
             </div>
         <?php endif; ?>
-        <div class="P TitleRow<?php if ($Discussion) {
+        <div class="P TitleRow AdvancedSearch-Title<?php if ($Discussion) {
      echo ' Hidden';
 } ?>">
             <?php
@@ -35,13 +35,13 @@
                 $Form->textBox('title', ['class' => 'InputBox BigInput']);
             ?>
         </div>
-        <div class="P">
+        <div class="P AdvancedSearch-Author">
             <?php
             echo $Form->label('Author', 'author', ['class' => 'Heading']).
                 $Form->textBox('author', ['class' => 'InputBox BigInput']);
             ?>
         </div>
-        <div class="P">
+        <div class="P AdvancedSearch-Category">
             <?php
             echo $Form->label('Category', 'cat', ['class' => 'Heading']).
                 $Form->categoryDropDown('cat', ['Permission' => 'view', 'Headings' => false, 'IncludeNull' => ['all', t('(All)')], 'class' => 'BigInput']);
@@ -55,14 +55,14 @@
             </div>
         </div>
         <?php if ($this->IncludeTags): ?>
-        <div class="P">
+        <div class="P AdvancedSearch-Tags">
             <?php
             echo $Form->label('Tags', 'tags', ['class' => 'Heading']).
                 $Form->textBox('tags', ['class' => 'InputBox BigInput', 'data-tags' => json_encode($this->data('Tags', ''))]);
             ?>
         </div>
         <?php endif; ?>
-        <div class="P">
+        <div class="P AdvancedSearch-Author-WhatToSearch">
             <?php
             echo $Form->label('What to search', '', ['class' => 'Heading']);
             echo '<div class="Inline">';
@@ -72,7 +72,7 @@
             echo '</div>';
             ?>
         </div>
-        <div class="P Inline">
+        <div class="P Inline AdvancedSearch-Date">
             <?php
             echo $Form->label('Date within', 'within').' '.
                 $Form->dropDown('within', $this->DateWithinOptions).' '.
