@@ -10,9 +10,9 @@ use ReactionModel;
 use VanillaTests\SiteTestTrait;
 
 /**
- * Test {@link ReactionsPlugin}.
+ * Test {@link ReactionsPlugin} API capabilities.
  */
-class ReactionsPluginTest extends \PHPUnit_Framework_TestCase {
+class ReactionsPluginApiTest extends \PHPUnit_Framework_TestCase {
 
     use SiteTestTrait {
         setupBeforeClass as siteSetupBeforeClass;
@@ -39,6 +39,48 @@ class ReactionsPluginTest extends \PHPUnit_Framework_TestCase {
         self::$addons = ['reactions', 'stubcontent', 'vanilla'];
         self::siteSetupBeforeClass();
         parent::setUpBeforeClass();
+    }
+
+    /**
+     * Test changing a user reaction from one type to another.
+     */
+    public function testChangeReaction() {
+        $this->api()->post('/discussions/1/reactions', [
+            'reactionType' => 'Like'
+        ]);
+        $reactions = $this->api()->get('/discussions/1/reactions');
+        $this->assertTrue($this->hasUserReaction($this->api()->getUserID(), 'Like', $reactions->getBody()));
+        $this->assertFalse($this->hasUserReaction($this->api()->getUserID(), 'LOL', $reactions->getBody()));
+
+        $this->api()->post('/discussions/1/reactions', [
+            'reactionType' => 'LOL'
+        ]);
+        $reactions = $this->api()->get('/discussions/1/reactions');
+        $this->assertTrue($this->hasUserReaction($this->api()->getUserID(), 'LOL', $reactions->getBody()));
+        $this->assertFalse($this->hasUserReaction($this->api()->getUserID(), 'Like', $reactions->getBody()));
+    }
+
+    /**
+     * Test a user adding the same reaction to the same post, twice.
+     */
+    public function testDuplicateReaction() {
+        $this->api()->post('/discussions/1/reactions', [
+            'reactionType' => 'Like'
+        ]);
+        $summary = $this->api()->post('/discussions/1/reactions', [
+            'reactionType' => 'Like'
+        ]);
+
+        $this->assertEquals(1, $this->getSummaryCount('Like', $summary->getBody()));
+
+        $reactions = $this->api()->get('/discussions/1/reactions')->getBody();
+        $currentUserReactions = 0;
+        foreach ($reactions as $row) {
+            if ($row['user']['userID'] == $this->api()->getUserID()) {
+                $currentUserReactions++;
+            }
+        }
+        $this->assertEquals(1, $currentUserReactions);
     }
 
     /**
@@ -195,6 +237,26 @@ class ReactionsPluginTest extends \PHPUnit_Framework_TestCase {
      */
     public function api() {
         return $this->api;
+    }
+
+    /**
+     * Get the count for a type from a summary array.
+     *
+     * @param string $type The URL code of a type.
+     * @param array $summary A summary of reactions on a record.
+     * @return int
+     */
+    public function getSummaryCount($type, array $summary) {
+        $result = 0;
+
+        foreach ($summary as $row) {
+            if ($row['urlCode'] === $type) {
+                $result = $row['count'];
+                break;
+            }
+        }
+
+        return $result;
     }
 
     /**
