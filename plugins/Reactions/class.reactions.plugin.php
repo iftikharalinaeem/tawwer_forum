@@ -1263,16 +1263,15 @@ class ReactionsPlugin extends Gdn_Plugin {
      */
     private function updateSchemaExpand(Garden\Schema\Schema $schema, AbstractApiController $sender) {
         /** @var Garden\Schema\Schema $expand */
-        $expand = $schema->getField('properties.expand');
-        if ($expand !== null) {
-            $enum = $expand->getField('items.enum');
-            if (!in_array('reactions', $enum)) {
-                $enum[] = 'reactions';
-                $schema->setField('properties.expand.items.enum', $enum);
+        $expandEnum = $schema->getField('properties.expand.items.enum');
+        if (is_array($expandEnum)) {
+            if (!in_array('reactions', $expandEnum)) {
+                $expandEnum[] = 'reactions';
+                $schema->setField('properties.expand.items.enum', $expandEnum);
             }
         } else {
             $schema->merge(Garden\Schema\Schema::parse([
-                'expand?' => $sender->getExpandFragment(['reactions'])
+                'expand?' => $sender->getExpandDefinition(['reactions'])
             ]));
         }
     }
