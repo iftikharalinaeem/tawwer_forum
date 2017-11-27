@@ -27,4 +27,4 @@ Compiles all theme assets using Gulp. SCSS stylesheets will be compiled to [`des
 Watches the assets for changes and runs the appropriate Gulp tasks. Also starts a Livereload server that will push the changes to your Vanilla installation automatically.
 
 ---
-Copyright &copy; 2014 [Vanilla Forums Inc.](http://vanillaforums.com). Licensed under the terms of the [GPLv3 License](LICENSE.md).
+Copyright &copy; 2009-2017 [Vanilla Forums Inc.](http://vanillaforums.com).
