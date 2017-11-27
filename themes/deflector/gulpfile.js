@@ -13,8 +13,6 @@ gulp.task('styles', function () {
     .pipe($.autoprefixer({
       "browsers": ["ie > 9", "last 6 iOS versions", "last 4 versions"]
     }))
-    .pipe($.csslint('design/.csslintrc'))
-    .pipe($.csslint.reporter('default'))
     .pipe(gulp.dest('design'))
     .pipe($.size({showFiles: true}));
 });
@@ -49,14 +47,6 @@ gulp.task('images', function () {
     .pipe($.size({showFiles: true}));
 });
 
-gulp.task('fonts', function () {
-  return $.bowerFiles()
-    .pipe($.filter('**/*.{eot,svg,ttf,woff}'))
-    .pipe($.flatten())
-    .pipe(gulp.dest('design/fonts'))
-    .pipe($.size({showFiles: true}));
-});
-
 gulp.task('wiredep', function () {
   var wiredep = require('wiredep').stream;
 
@@ -66,7 +56,7 @@ gulp.task('wiredep', function () {
 });
 
 gulp.task('default', ['wiredep'], function () {
-  gulp.start('styles', 'scripts', 'images', 'fonts');
+  gulp.start('styles', 'scripts', 'images');
 });
 
 gulp.task('watch', function () {
