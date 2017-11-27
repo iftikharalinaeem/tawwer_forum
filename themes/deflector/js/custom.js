@@ -1612,8 +1612,8 @@ fallback:"",monochrome:!1,colorChannels:255,randomColors:!0,disableCache:!1}})(j
  * Prospect - A minimal Vanilla theme focused on customer support communities
  *
  * @author    Kasper Kronborg Isager <kasper@vanillaforums.com>
- * @copyright 2014 (c) Vanilla Forums Inc.
- * @license   GPLv3
+ * @copyright 2009-2017 (c) Vanilla Forums Inc.
+ * @license   Proprietary
  */
 
 /* globals $ */
