@@ -6,12 +6,16 @@
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
  * API Controller for the `/reactions` resource.
  */
 class ReactionsApiController extends AbstractApiController {
+
+    /** @var CamelCaseScheme */
+    private $camelCaseScheme;
 
     /** @var CapitalCaseScheme */
     private $capitalCaseScheme;
@@ -27,6 +31,7 @@ class ReactionsApiController extends AbstractApiController {
     public function __construct(ReactionModel $reactionModel) {
         $this->reactionModel = $reactionModel;
         $this->capitalCaseScheme = new CapitalCaseScheme();
+        $this->camelCaseScheme = new CamelCaseScheme();
     }
 
     /**
@@ -149,6 +154,7 @@ class ReactionsApiController extends AbstractApiController {
         if (!array_key_exists('Points', $row)) {
             $row['Points'] = 0;
         }
+        $row = $this->camelCaseScheme->convertArrayKeys($row);
         return $row;
     }
 
@@ -163,9 +169,7 @@ class ReactionsApiController extends AbstractApiController {
         $this->permission('Garden.Community.Manage');
 
         $this->idParamSchema();
-        $in = $this->schema(Schema::parse([
-            'name', 'description', 'class', 'points'
-        ])->add($this->fullReactionTypeSchema()), 'in')->setDescription('Update a reaction type.');
+        $in = $this->schema($this->postSchema(), 'in')->setDescription('Update a reaction type.');
         $out = $this->schema($this->fullReactionTypeSchema(), 'out');
 
         $body = $in->validate($body, true);
@@ -182,6 +186,24 @@ class ReactionsApiController extends AbstractApiController {
         $row = $this->normalizeOutput($this->reactionByUrlCode($urlCode));
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Get a schema suitable for adding or editing a resource row.
+     *
+     * @return Schema
+     */
+    public function postSchema() {
+        static $schema;
+
+        if ($schema === null) {
+            $schema = Schema::parse([
+                'name', 'description', 'class', 'points'
+            ])->add($this->fullReactionTypeSchema());
+            $schema->setField('properties.class.enum', ['Flag', 'Negative', 'Positive']);
+        }
+
+        return $schema;
     }
 
     /**
