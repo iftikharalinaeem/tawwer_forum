@@ -12,14 +12,13 @@
  */
 class AnalyticsLeaderboard {
 
-    /**
-     * Number of days for the default timespan.
-     */
+    /** Number of days for the default timespan. */
     const DEFAULT_SPAN = 30;
 
-    /**
-     * Maximum size for a leaderboard.
-     */
+    /** Default size for a leaderboard. */
+    const DEFAULT_SIZE = 10;
+
+    /** Maximum size for a leaderboard. */
     const MAX_SIZE = 100;
 
     /** @var $query KeenIOQuery */
@@ -31,7 +30,7 @@ class AnalyticsLeaderboard {
     /**
      * @var int Number of records to limit the leaderboard to.
      */
-    private $size = 10;
+    private $size = self::DEFAULT_SIZE;
 
     private $timeframe;
 
