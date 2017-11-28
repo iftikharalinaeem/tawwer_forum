@@ -198,7 +198,7 @@ class ReactionsApiController extends AbstractApiController {
 
         if ($schema === null) {
             $schema = Schema::parse([
-                'name', 'description', 'class', 'points'
+                'name', 'description', 'class', 'points', 'active'
             ])->add($this->fullReactionTypeSchema());
             $schema->setField('properties.class.enum', ['Flag', 'Negative', 'Positive']);
         }
