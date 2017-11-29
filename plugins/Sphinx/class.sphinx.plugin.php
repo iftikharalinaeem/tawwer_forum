@@ -72,18 +72,18 @@ class SphinxPlugin extends Gdn_Plugin {
     /**
      * Search comments.
      *
-     * @param CommentsApiController $commentAPI
+     * @param CommentsApiController $sender
      * @param array $query
      * @return array
      */
-    public function commentsApiController_get_search(CommentsApiController $commentAPI, array $query) {
-        $commentAPI->permission('Garden.SignIn.Allow');
+    public function commentsApiController_get_search(CommentsApiController $sender, array $query) {
+        $sender->permission('Garden.SignIn.Allow');
 
-        $in = $commentAPI
+        $in = $sender
             ->schema(['categoryID:i?' => 'The numeric ID of a category.'], 'in')
             ->merge($this->searchSchema())
             ->setDescription('Search comments.');
-        $out = $commentAPI->schema([':a' => $commentAPI->commentSchema()], 'out');
+        $out = $sender->schema([':a' => $sender->commentSchema()], 'out');
 
         $params = [
             'group' => false,
@@ -92,7 +92,7 @@ class SphinxPlugin extends Gdn_Plugin {
         if (array_key_exists('categoryID', $query)) {
             $params['cat'] = $query['categoryID'];
         }
-        $query = $commentAPI->filterValues($query);
+        $query = $sender->filterValues($query);
         $query = $in->validate($query);
         list($offset, $limit) = offsetLimit(
             "p{$query['page']}",
@@ -108,7 +108,7 @@ class SphinxPlugin extends Gdn_Plugin {
         );
 
         foreach ($result as &$row) {
-            $commentAPI->normalizeOutput($row);
+            $sender->normalizeOutput($row);
         }
         $result = $out->validate($result);
         return $result;

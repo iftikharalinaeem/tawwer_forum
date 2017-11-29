@@ -9,11 +9,20 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\ApiUtils;
+use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\CapitalCaseScheme;
 
 /**
  * API Controller for the `/events` resource.
  */
 class EventsApiController extends AbstractApiController {
+
+    /** @var CapitalCaseScheme */
+    private $capitalCaseScheme;
+
+    /** @var CamelCaseScheme */
+    private $camelCaseScheme;
 
     /** @var EventModel */
     private $eventModel;
@@ -36,11 +45,12 @@ class EventsApiController extends AbstractApiController {
         GroupModel $groupModel,
         UserModel $userModel
     ) {
-        parent::__construct();
-
         $this->eventModel = $eventModel;
         $this->groupModel = $groupModel;
         $this->userModel = $userModel;
+
+        $this->camelCaseScheme = new CamelCaseScheme();
+        $this->capitalCaseScheme = new CapitalCaseScheme();
     }
 
     /**
@@ -366,7 +376,7 @@ class EventsApiController extends AbstractApiController {
      * @return array Return a database record.
      */
     public function normalizeEventInput(array $schemaRecord) {
-        $dbRecord = $this->capitalCaseScheme->convertArrayKeys($schemaRecord);
+        $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
         return $dbRecord;
     }
 
@@ -384,7 +394,7 @@ class EventsApiController extends AbstractApiController {
             $schemaRecord['attending'] = $this->capitalCaseScheme->convert($schemaRecord['attending']);
         }
 
-        $dbRecord = $this->capitalCaseScheme->convertArrayKeys($schemaRecord);
+        $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
         return $dbRecord;
     }
 
@@ -397,7 +407,7 @@ class EventsApiController extends AbstractApiController {
     public function normalizeEventOutput(array $dbRecord) {
         $dbRecord['Body'] = Gdn_Format::to($dbRecord['Body'], $dbRecord['Format']);
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         $schemaRecord['url'] = eventUrl($dbRecord);
 
         return $schemaRecord;
@@ -413,7 +423,7 @@ class EventsApiController extends AbstractApiController {
         $dbRecord['Attending'] = $this->camelCaseScheme->convert($dbRecord['Attending']);
         $dbRecord['Attending'] = $dbRecord['Attending'] === 'invited' ? null : $dbRecord['Attending'];
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
 
