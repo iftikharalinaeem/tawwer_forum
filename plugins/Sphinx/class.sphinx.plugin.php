@@ -108,7 +108,7 @@ class SphinxPlugin extends Gdn_Plugin {
         );
 
         foreach ($result as &$row) {
-            $sender->prepareRow($row);
+            $sender->normalizeOutput($row);
         }
         $result = $out->validate($result);
         return $result;
@@ -154,7 +154,7 @@ class SphinxPlugin extends Gdn_Plugin {
         );
 
         foreach ($result as &$row) {
-            $sender->prepareRow($row);
+            $sender->normalizeOutput($row);
         }
         $result = $out->validate($result);
         return $result;

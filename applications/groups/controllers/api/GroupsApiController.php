@@ -9,8 +9,9 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\ApiUtils;
 use Vanilla\Utility\CamelCaseScheme;
+use Vanilla\Utility\CapitalCaseScheme;
 
 /**
  * API Controller for the `/groups` resource.
@@ -39,10 +40,11 @@ class GroupsApiController extends AbstractApiController {
         GroupModel $groupModel,
         UserModel $userModel
     ) {
-        $this->camelCaseScheme = new CamelCaseScheme();
-        $this->capitalCaseScheme = new CapitalCaseScheme();
         $this->groupModel = $groupModel;
         $this->userModel = $userModel;
+
+        $this->camelCaseScheme = new CamelCaseScheme();
+        $this->capitalCaseScheme = new CapitalCaseScheme();
     }
 
     /**
@@ -591,7 +593,7 @@ class GroupsApiController extends AbstractApiController {
             $dbRecord['State'] = null;
         }
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         $schemaRecord['body'] = $schemaRecord['reason'];
         $schemaRecord['format'] = 'Text';
 
@@ -616,7 +618,7 @@ class GroupsApiController extends AbstractApiController {
             $schemaRecord['privacy'] = ucfirst($schemaRecord['privacy']);
         }
 
-        $dbRecord = $this->capitalCaseScheme->convertArrayKeys($schemaRecord);
+        $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
         return $dbRecord;
     }
 
@@ -629,7 +631,7 @@ class GroupsApiController extends AbstractApiController {
     public function normalizeGroupMemberInput(array $schemaRecord) {
         $schemaRecord['role'] = $this->capitalCaseScheme->convert($schemaRecord['role']);
 
-        $dbRecord = $this->capitalCaseScheme->convertArrayKeys($schemaRecord);
+        $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
         return $dbRecord;
     }
 
@@ -642,7 +644,7 @@ class GroupsApiController extends AbstractApiController {
     public function normalizeGroupMemberOutput(array $dbRecord) {
         $dbRecord['Role'] = $this->camelCaseScheme->convert($dbRecord['Role']);
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
 
         return $schemaRecord;
     }
@@ -674,7 +676,7 @@ class GroupsApiController extends AbstractApiController {
 
         $dbRecord['Privacy'] = strtolower($dbRecord['Privacy']);
 
-        $schemaRecord = $this->camelCaseScheme->convertArrayKeys($dbRecord);
+        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         $schemaRecord['body'] = $schemaRecord['description'];
 
         return $schemaRecord;
