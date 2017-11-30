@@ -8,12 +8,13 @@ $this->title(sprintf(t('Give a Badge to %s'), val('Name', $this->User))); ?>
     <?php
     echo $this->Form->open();
     echo $this->Form->errors();
+    $this->Form->setStyles('legacy');
 
     echo '<p>', $this->Form->label('Badge', 'BadgeID');
     echo $this->Form->dropDown('BadgeID', $this->BadgeData, ['ValueField' => 'BadgeID', 'TextField' => 'Name']), '</p>';
 
     echo '<p>', $this->Form->label('Reason (optional)', 'Reason');
-    echo $this->Form->textBox('Reason', ['MultiLine' => true]), '</p>';
+    echo $this->Form->textBox('Reason', ['MultiLine' => true, 'class' => 'textarea']), '</p>';
 
     echo anchor('Cancel', 'badge/'.$this->data('Badge.BadgeID'));
 
