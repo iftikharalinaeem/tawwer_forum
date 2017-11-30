@@ -234,7 +234,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         if ($sender->isExpandField('reactions', $expand)) {
             $schema = $this->getReactionSummaryFragment();
-            $withAttributes = $row + ['Attributes' => $row['Attributes']];
+            $withAttributes = $row + ['Attributes' => $row['attributes']];
             $summary = $this->reactionModel->getRecordSummary($withAttributes);
             $summary = $schema->validate($summary);
             $result['reactions'] = $summary;
@@ -487,7 +487,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         if ($sender->isExpandField('reactions', $expand)) {
             $schema = $this->getReactionSummaryFragment();
-            $withAttributes = $row + ['Attributes' => $row['Attributes']];
+            $withAttributes = $row + ['Attributes' => $row['attributes']];
             $summary = $this->reactionModel->getRecordSummary($withAttributes);
             $summary = $schema->validate($summary);
             $result['reactions'] = $summary;
@@ -506,7 +506,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
         if ($sender->isExpandField('reactions', $expand)) {
-            $attributes = array_column($rows, 'Attributes', 'DiscussionID');
+            $attributes = array_column($rows, 'attributes', 'discussionID');
             $schema = $this->getReactionSummaryFragment();
             array_walk($result, function(&$row) use ($attributes, $schema) {
                 $withAttributes = $row + ['Attributes' => $attributes[$row['discussionID']]];
