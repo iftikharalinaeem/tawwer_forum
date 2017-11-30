@@ -22,12 +22,46 @@ class ReactionsPlugin extends Gdn_Plugin {
     const RECORD_REACTIONS_DEFAULT = 'popup';
 
     const BEST_OF_MAX_PAGES = 300;
-    /** @var array */
 
+    /** @var array */
     protected static $_CommentOrder;
 
     /** @var array Get the user's preference for comment sorting (if enabled). */
     protected static $_CommentSort;
+
+    /** @var DiscussionModel */
+    private $discussionModel;
+
+    /** @var CommentModel */
+    private $commentModel;
+
+    /** @var ReactionModel */
+    private $reactionModel;
+
+    /** @var UserModel */
+    private $userModel;
+
+    /**
+     * ReactionsPlugin constructor.
+     *
+     * @param DiscussionModel $discussionModel
+     * @param CommentModel $commentModel
+     * @param ReactionModel $reactionModel
+     * @param UserModel $userModel
+     */
+    public function __construct(
+            DiscussionModel $discussionModel,
+            CommentModel $commentModel,
+            ReactionModel $reactionModel,
+            UserModel $userModel) {
+
+        $this->discussionModel = $discussionModel;
+        $this->commentModel = $commentModel;
+        $this->reactionModel = $reactionModel;
+        $this->userModel = $userModel;
+
+        parent::__construct();
+    }
 
     /**
      * Include ReactionsController for /reactions requests
@@ -153,6 +187,429 @@ class ReactionsPlugin extends Gdn_Plugin {
         }
 
         return self::$_CommentOrder;
+    }
+
+    /**
+     * Delete a comment reaction with /api/v2/comments/:id/reactions/:userID
+     *
+     * @param int $id The comment ID.
+     * @param int|null $userID
+     * @param CommentsApiController $sender
+     * @return array
+     */
+    public function commentsApiController_delete_reactions($id, $userID = null, CommentsApiController $sender) {
+        $sender->permission('Garden.SignIn.Allow');
+
+        $in = $sender->schema(
+            $sender->idParamSchema()->merge(Garden\Schema\Schema::parse(['userID:i' => 'The target user ID.'])),
+            'in'
+        )->setDescription('Remove a user\'s reaction.');
+        $out = $sender->schema([], 'out');
+
+        $comment = $sender->commentByID($id);
+
+        if ($userID === null) {
+            $userID = $sender->getSession()->UserID;
+        } elseif ($userID !== $sender->getSession()->UserID) {
+            $sender->permission('Garden.Moderation.Manage');
+        }
+
+        $reaction = $this->reactionModel->getUserReaction($userID, 'Comment', $id);
+        if ($reaction) {
+            $urlCode = $reaction['UrlCode'];
+            $this->reactionModel->react('Comment', $id, $urlCode, null, false, ReactionModel::FORCE_REMOVE);
+        }
+    }
+
+    /**
+     * Modify the data on /api/v2/comments/:id to include reactions.
+     *
+     * @param CommentsApiController $sender
+     * @param array $result Post-validated data.
+     * @param array $query The request query.
+     * @param array $row Pre-validated data.
+     */
+    public function commentsApiController_get_data(CommentsApiController $sender, array &$result, array $query, array $row) {
+        $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
+
+        if ($sender->isExpandField('reactions', $expand)) {
+            $schema = $this->getReactionSummaryFragment();
+            $withAttributes = $row + ['Attributes' => $row['attributes']];
+            $summary = $this->reactionModel->getRecordSummary($withAttributes);
+            $summary = $schema->validate($summary);
+            $result['reactions'] = $summary;
+        }
+    }
+
+    /**
+     * Respond to /api/v2/comments/:id/reactions
+     *
+     * @param int $id The comment ID.
+     * @param array $query The request query.
+     * @param CommentsApiController $sender
+     * @return array
+     */
+    public function commentsApiController_get_reactions($id, array $query, CommentsApiController $sender) {
+        $sender->permission();
+
+        $sender->idParamSchema();
+        $in = $sender->schema([
+            'type:s|n' => [
+                'default' => null,
+                'description' => 'Filter to a specific reaction type by using its URL code.'
+            ],
+            'page:i?' => [
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+            'limit:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->reactionModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+        ])->setDescription('Get reactions to a comment.');
+        $out = $sender->schema([':a' => $this->getReactionLogFragment($sender->getUserFragmentSchema())], 'out');
+
+        $comment = $sender->commentByID($id);
+        $discussion = $sender->discussionByID($comment['DiscussionID']);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+
+        $query = $in->validate($query);
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        $rows = $this->reactionModel->getByRecord(
+            'Comment',
+            $comment['CommentID'],
+            true,
+            $query['type'],
+            $offset,
+            $limit
+        );
+
+        $result = $out->validate($rows);
+        return $result;
+    }
+
+    /**
+     * Modify the data on /api/v2/comments index to include reactions.
+     *
+     * @param CommentsApiController $sender
+     * @param array $result Post-validated data.
+     * @param array $query The request query.
+     * @param array $rows Raw result.
+     */
+    public function commentsApiController_index_data(CommentsApiController $sender, array &$result, array $query, array $rows) {
+        $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
+
+        if ($sender->isExpandField('reactions', $expand)) {
+            $attributes = array_column($rows, 'Attributes', 'CommentID');
+            $schema = $this->getReactionSummaryFragment();
+            array_walk($result, function(&$row) use ($attributes, $schema) {
+                $withAttributes = $row + ['Attributes' => $attributes[$row['commentID']]];
+                $summary = $this->reactionModel->getRecordSummary($withAttributes);
+                $summary = $schema->validate($summary);
+                $row['reactions'] = $summary;
+            });
+        }
+    }
+
+    /**
+     * React to a comment with /api/v2/comments/:id/reactions
+     *
+     * @param int $id The comment ID.
+     * @param array $body The request query.
+     * @param CommentsApiController $sender
+     * @return array
+     */
+    public function commentsApiController_post_reactions($id, array $body, CommentsApiController $sender) {
+        $sender->permission('Garden.SignIn.Allow');
+
+        $in = $sender->schema([
+            'reactionType:s' => 'URL code of a reaction type.'
+        ], 'in')->setDescription('React to a comment.');
+        $out = $sender->schema($this->getReactionSummaryFragment(), 'out');
+
+        $comment = $sender->commentByID($id);
+        $discussion = $sender->discussionByID($comment['DiscussionID']);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+
+        $body = $in->validate($body);
+
+        $this->reactionModel->react('Comment', $id, $body['reactionType'], null, false, ReactionModel::FORCE_ADD);
+
+        // Refresh the comment to grab its updated attributes.
+        $comment = $sender->commentByID($id);
+        $rows = $this->reactionModel->getRecordSummary($comment);
+
+        $result = $out->validate($rows);
+        return $result;
+    }
+
+    /**
+     * Modify the input schema where necessary.
+     *
+     * @param Vanilla\Web\Controller $sender
+     * @param Garden\Schema\Schema $schema
+     * @param string $type
+     */
+    public function controller_schema(Vanilla\Web\Controller $sender, Garden\Schema\Schema $schema, $type) {
+        // Only affect input schemas.
+        if ($type !== 'in') {
+            return;
+        }
+
+        // Make sure the API controller is one we're actually targeting.
+        $senderClass = get_class($sender);
+        $validSenders = [
+            'CommentsApiController' => ['index', 'get'],
+            'DiscussionsApiController' => ['index', 'get']
+        ];
+        if (!array_key_exists($senderClass, $validSenders)) {
+            return;
+        }
+
+        // By default, don't touch the schema.
+        $modifySchema = false;
+
+        // Figure out what API method is firing the event by checking a limited view of the stack.
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5);
+        foreach ($backtrace as $frame) {
+            if (!array_key_exists('class', $frame) || $frame['class'] !== $senderClass) {
+                continue;
+            }
+            if (!array_key_exists('function', $frame) || !in_array($frame['function'], $validSenders[$senderClass])) {
+                continue;
+            }
+            $modifySchema = true;
+            break;
+        }
+
+        if ($modifySchema) {
+            $this->updateSchemaExpand($schema, $sender);
+        }
+    }
+
+    /**
+     * Delete a discussion reaction with /api/v2/discussions/:id/reactions/:userID
+     *
+     * @param int $id The discussion ID.
+     * @param int|null $userID
+     * @param DiscussionsApiController $sender
+     * @return array
+     */
+    public function discussionsApiController_delete_reactions($id, $userID = null, DiscussionsApiController $sender) {
+        $sender->permission('Garden.SignIn.Allow');
+
+        $in = $sender->schema(
+            $sender->idParamSchema()->merge(Garden\Schema\Schema::parse(['userID:i' => 'The target user ID.'])),
+            'in'
+        )->setDescription('Remove a user\'s reaction.');
+        $out = $sender->schema([], 'out');
+
+        $discussion = $sender->discussionByID($id);
+
+        if ($userID === null) {
+            $userID = $sender->getSession()->UserID;
+        } elseif ($userID !== $sender->getSession()->UserID) {
+            $sender->permission('Garden.Moderation.Manage');
+        }
+
+        $reaction = $this->reactionModel->getUserReaction($userID, 'Discussion', $id);
+        if ($reaction) {
+            $urlCode = $reaction['UrlCode'];
+            $this->reactionModel->react('Discussion', $id, $urlCode, null, false, ReactionModel::FORCE_REMOVE);
+        }
+    }
+
+    /**
+     * Respond to /api/v2/discussions/:id/reactions
+     *
+     * @param int $id The discussion ID.
+     * @param array $query The request query.
+     * @param DiscussionsApiController $sender
+     * @return array
+     */
+    public function discussionsApiController_get_reactions($id, array $query, DiscussionsApiController $sender) {
+        $sender->permission();
+
+        $sender->idParamSchema()->setDescription('Get a summary of reactions on a discussion.');
+        $in = $sender->schema([
+            'type:s|n' => [
+                'default' => null,
+                'description' => 'Filter to a specific reaction type by using its URL code.'
+            ],
+            'page:i?' => [
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+            'limit:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->reactionModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100
+            ],
+        ])->setDescription('Get reactions to a discussion.');
+        $out = $sender->schema([':a' => $this->getReactionLogFragment($sender->getUserFragmentSchema())], 'out');
+
+
+        $discussion = $sender->discussionByID($id);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+
+        $query = $in->validate($query);
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        $rows = $this->reactionModel->getByRecord(
+            'Discussion',
+            $discussion['DiscussionID'],
+            true,
+            $query['type'],
+            $offset,
+            $limit
+        );
+
+        $result = $out->validate($rows);
+        return $result;
+    }
+
+    /**
+     * Modify the data on /api/v2/discussions/:id to include reactions.
+     *
+     * @param DiscussionsApiController $sender
+     * @param array $result Post-validated data.
+     * @param array $query The request query.
+     * @param array $row Pre-validated data.
+     */
+    public function discussionsApiController_get_data(DiscussionsApiController $sender, array &$result, array $query, array $row) {
+        $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
+
+        if ($sender->isExpandField('reactions', $expand)) {
+            $schema = $this->getReactionSummaryFragment();
+            $withAttributes = $row + ['Attributes' => $row['attributes']];
+            $summary = $this->reactionModel->getRecordSummary($withAttributes);
+            $summary = $schema->validate($summary);
+            $result['reactions'] = $summary;
+        }
+    }
+
+    /**
+     * Modify the data on /api/v2/discussions index to include reactions.
+     *
+     * @param DiscussionsApiController $sender
+     * @param array $result Post-validated data.
+     * @param array $query The request query.
+     * @param array $rows Raw result.
+     */
+    public function discussionsApiController_index_data(DiscussionsApiController $sender, array &$result, array $query, array $rows) {
+        $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
+
+        if ($sender->isExpandField('reactions', $expand)) {
+            $attributes = array_column($rows, 'attributes', 'discussionID');
+            $schema = $this->getReactionSummaryFragment();
+            array_walk($result, function(&$row) use ($attributes, $schema) {
+                $withAttributes = $row + ['Attributes' => $attributes[$row['discussionID']]];
+                $summary = $this->reactionModel->getRecordSummary($withAttributes);
+                $summary = $schema->validate($summary);
+                $row['reactions'] = $summary;
+            });
+        }
+    }
+
+    /**
+     * React to a discussion with /api/v2/discussions/:id/reactions
+     *
+     * @param int $id The discussion ID.
+     * @param array $body The request query.
+     * @param DiscussionsApiController $sender
+     * @return array
+     */
+    public function discussionsApiController_post_reactions($id, array $body, DiscussionsApiController $sender) {
+        $sender->permission('Garden.SignIn.Allow');
+
+        $in = $sender->schema([
+            'reactionType:s' => 'URL code of a reaction type.'
+        ], 'in')->setDescription('React to a discussion.');
+        $out = $sender->schema($this->getReactionSummaryFragment(), 'out');
+
+        $discussion = $sender->discussionByID($id);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+
+        $body = $in->validate($body);
+
+        $this->reactionModel->react('Discussion', $id, $body['reactionType'], null, false, ReactionModel::FORCE_ADD);
+
+        // Refresh the discussion to grab its updated attributes.
+        $discussion = $sender->discussionByID($id);
+        $rows = $this->reactionModel->getRecordSummary($discussion);
+
+        $result = $out->validate($rows);
+        return $result;
+    }
+
+    /**
+     * Get a schema fragment suitable for representing an instance of a user reaction.
+     *
+     * @param Garden\Schema\Schema $userFragmentSchema
+     * @return Garden\Schema\Schema
+     */
+    public function getReactionLogFragment(Garden\Schema\Schema $userFragmentSchema) {
+        static $logFragment;
+
+        if ($logFragment === null) {
+            $logFragment = Garden\Schema\Schema::parse([
+                'recordType:s',
+                'recordID:i',
+                'tagID:i',
+                'userID:i',
+                'dateInserted:dt',
+                'user' => $userFragmentSchema,
+                'reactionType' => $this->getReactionTypeFragment()
+            ]);
+        }
+
+        return $logFragment;
+    }
+
+    /**
+     * Grab a schema for use in displaying a summary of a record's user reactions.
+     *
+     * @return Garden\Schema\Schema
+     */
+    public function getReactionSummaryFragment() {
+        static $summaryFragment;
+
+        if ($summaryFragment === null) {
+            $typeFragment = clone $this->getReactionTypeFragment();
+            $summaryFragment = Garden\Schema\Schema::parse([
+                ':a' => $typeFragment->merge(Garden\Schema\Schema::parse([
+                    'count:i'
+                ]))
+            ]);
+        }
+
+        return $summaryFragment;
+    }
+
+    /**
+     * Get a simple schema for returning a reaction.
+     *
+     * @return Garden\Schema\Schema
+     */
+    public function getReactionTypeFragment() {
+        static $typeFragment;
+
+        if ($typeFragment === null) {
+            $typeFragment = Garden\Schema\Schema::parse([
+                'tagID:i',
+                'urlCode:s',
+                'name:s',
+                'class:s'
+            ]);
+        }
+
+        return $typeFragment;
     }
 
     /**
@@ -796,6 +1253,27 @@ class ReactionsPlugin extends Gdn_Plugin {
             'addtag' => false,
             'default' => false
         ]);
+    }
+
+    /**
+     * Alter a schema's expand parameter to include reactions.
+     *
+     * @param Garden\Schema\Schema $schema
+     * @param AbstractApiController $sender
+     */
+    private function updateSchemaExpand(Garden\Schema\Schema $schema, AbstractApiController $sender) {
+        /** @var Garden\Schema\Schema $expand */
+        $expandEnum = $schema->getField('properties.expand.items.enum');
+        if (is_array($expandEnum)) {
+            if (!in_array('reactions', $expandEnum)) {
+                $expandEnum[] = 'reactions';
+                $schema->setField('properties.expand.items.enum', $expandEnum);
+            }
+        } else {
+            $schema->merge(Garden\Schema\Schema::parse([
+                'expand?' => $sender->getExpandDefinition(['reactions'])
+            ]));
+        }
     }
 
     /**
