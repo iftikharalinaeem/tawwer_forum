@@ -50,7 +50,7 @@ Proxy setup:
         # Set X-Proxy-For to allow both http and https
         proxy_set_header X-Proxy-For //proxy-vanilla.dev/community;
         # Redirect the whole request, path and query, to vanillaforum.example.com
-        proxy_pass $scheme://vanillaforum.example.com/$2$is_args$args;
+        proxy_pass $scheme://vanillaforum.example.com/$1$is_args$args;
     }
 ```
 
