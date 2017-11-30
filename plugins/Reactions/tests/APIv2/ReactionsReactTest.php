@@ -12,7 +12,7 @@ use VanillaTests\SiteTestTrait;
 /**
  * Test {@link ReactionsPlugin} API capabilities.
  */
-class ReactionsPluginApiTest extends \PHPUnit_Framework_TestCase {
+class ReactionsReactTest extends \PHPUnit_Framework_TestCase {
 
     use SiteTestTrait {
         setupBeforeClass as siteSetupBeforeClass;
