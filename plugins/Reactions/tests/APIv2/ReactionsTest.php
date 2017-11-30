@@ -18,7 +18,7 @@ class ReactionsTest extends AbstractResourceTest {
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/reactions';
-        $this->patchFields = ['name', 'description', 'class', 'points'];
+        $this->patchFields = ['active', 'name', 'description', 'class', 'points'];
         $this->pk = 'urlCode';
 
         parent::__construct($name, $data, $dataName);
@@ -64,6 +64,7 @@ class ReactionsTest extends AbstractResourceTest {
      * {@inheritdoc}
      */
     protected function modifyRow(array $row) {
+        $row['active'] = !$row['active'];
         $row['name'] = md5($row['name']);
         $row['description'] = md5($row['name']);
         $row['points']++;
@@ -104,6 +105,23 @@ class ReactionsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
+    public function testIndex() {
+        $response = $this->api()->get($this->indexUrl());
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $rows = $response->getBody();
+        $this->assertNotEmpty($rows);
+        foreach ($rows as $reactionType) {
+            $this->assertTrue($this->isReactionType($reactionType), 'Response contains invalid reaction type objects.');
+        }
+
+        return $rows;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @depends testIndex
+     */
     public function testGet() {
         $index = $this->testIndex();
         $reactionType = reset($index);
@@ -122,25 +140,10 @@ class ReactionsTest extends AbstractResourceTest {
 
     /**
      * {@inheritdoc}
+     * @depends testGet
      */
     public function testGetEdit($record = null) {
         return parent::testGetEdit($this->testGet());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function testIndex() {
-        $response = $this->api()->get($this->indexUrl());
-        $this->assertEquals(200, $response->getStatusCode());
-
-        $rows = $response->getBody();
-        $this->assertNotEmpty($rows);
-        foreach ($rows as $reactionType) {
-            $this->assertTrue($this->isReactionType($reactionType), 'Response contains invalid reaction type objects.');
-        }
-
-        return $rows;
     }
 
     /**

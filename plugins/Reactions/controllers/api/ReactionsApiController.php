@@ -6,19 +6,12 @@
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Utility\CamelCaseScheme;
-use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\ApiUtils;
 
 /**
  * API Controller for the `/reactions` resource.
  */
 class ReactionsApiController extends AbstractApiController {
-
-    /** @var CamelCaseScheme */
-    private $camelCaseScheme;
-
-    /** @var CapitalCaseScheme */
-    private $capitalCaseScheme;
 
     /** @var ReactionModel */
     private $reactionModel;
@@ -30,8 +23,6 @@ class ReactionsApiController extends AbstractApiController {
      */
     public function __construct(ReactionModel $reactionModel) {
         $this->reactionModel = $reactionModel;
-        $this->capitalCaseScheme = new CapitalCaseScheme();
-        $this->camelCaseScheme = new CamelCaseScheme();
     }
 
     /**
@@ -89,7 +80,7 @@ class ReactionsApiController extends AbstractApiController {
 
         $in = $this->schema($this->idParamSchema(), 'in')->setDescription('Get a reaction type for editing.');
         $out = $this->schema(Schema::parse([
-            'urlCode', 'name', 'description', 'class', 'points'
+            'urlCode', 'name', 'description', 'class', 'points', 'active'
         ])->add($this->fullReactionTypeSchema()), 'out');
 
         $row = $this->normalizeOutput($this->reactionByUrlCode($urlCode));
@@ -132,7 +123,7 @@ class ReactionsApiController extends AbstractApiController {
      * @return array
      */
     public function normalizeInput(array $row) {
-        $row = $this->capitalCaseScheme->convertArrayKeys($row);
+        $row = ApiUtils::convertInputKeys($row);
         return $row;
     }
 
@@ -154,7 +145,7 @@ class ReactionsApiController extends AbstractApiController {
         if (!array_key_exists('Points', $row)) {
             $row['Points'] = 0;
         }
-        $row = $this->camelCaseScheme->convertArrayKeys($row);
+        $row = ApiUtils::convertOutputKeys($row);
         return $row;
     }
 
@@ -174,8 +165,10 @@ class ReactionsApiController extends AbstractApiController {
 
         $body = $in->validate($body, true);
 
-        // Prepare to save. Flag as custom, so future updates won't wipe out changes.
+        // Make sure the reaction exists.
         $row = $this->reactionByUrlCode($urlCode);
+
+        // Prepare to save. Flag as custom, so future updates won't wipe out changes.
         $body['urlCode'] = $row['UrlCode']; // Maintain original URL code casing.
         $body['custom'] = true;
         $data = $this->normalizeInput($body);
