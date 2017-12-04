@@ -43,7 +43,7 @@ class UserBadgeModel extends Gdn_Model {
         }
 
         // Get user progress
-        $userBadge = $this->getID($userID, getValue('BadgeID', $badge));
+        $userBadge = $this->getByUser($userID, $badgeID);
 
         // Grab relevant parameters
         $timeout = val('Timeout', $userBadge['Attributes'], 0);
@@ -302,8 +302,8 @@ class UserBadgeModel extends Gdn_Model {
     /**
      * Get all current badge requests.
      *
-     * @since 1.1
-     * @access public
+     * @parem int $offset
+     * @return Gdn_DataSet
      */
     public function getRequests() {
         return $this->SQL
@@ -353,7 +353,7 @@ class UserBadgeModel extends Gdn_Model {
 
         return $this->SQL
             ->select('u.*')
-            ->select('ub.DateCompleted')
+            ->select('ub.*')
             ->from('UserBadge ub')
             ->join('User u', 'u.UserID = ub.UserID', 'left')
             ->where('ub.BadgeID', $badgeID)
@@ -372,9 +372,12 @@ class UserBadgeModel extends Gdn_Model {
      * @param int $userID.
      * @param mixed $badgeID Int (id) or string (slug).
      * @param string $reason Optional explanation of why they received the badge.
+     * @return bool
      */
     public function give($userID, $badgeID, $reason = '') {
         if (c('Badges.Disabled')) {
+            $this->Validation->addValidationResult('BadgeID', '@'.t('Badges are globally disabled.'));
+
             return false;
         }
 
@@ -383,12 +386,14 @@ class UserBadgeModel extends Gdn_Model {
         $badge = $this->getBadgeID($badgeID, DATASET_TYPE_ARRAY);
         $badgeID = $badge['BadgeID'];
 
-        $userBadge = $this->getID($userID, val('BadgeID', $badge));
-
         // Allow badges to be disabled
         if (!val('Active', $badge)) {
+            $this->Validation->addValidationResult('BadgeID', '@'.sprintf(t('The %s badge is disabled.'), $badge['Name']));
+
             return false;
         }
+
+        $userBadge = $this->getByUser($userID, $badgeID);
 
         if (val('DateCompleted', $userBadge, null) != null) {
             $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
@@ -533,7 +538,7 @@ class UserBadgeModel extends Gdn_Model {
      * @return bool Whether this is a new, valid request.
      */
     public function request($userID, $badgeID, $reason = '') {
-        $userBadge = $this->getID($userID, $badgeID);
+        $userBadge = $this->getByUser($userID, $badgeID);
         $badge = $this->getBadgeID($badgeID, DATASET_TYPE_ARRAY);
         $new = true;
 
@@ -650,8 +655,6 @@ class UserBadgeModel extends Gdn_Model {
      * @return bool Whether save was successful.
      */
     public function save($formPostValues, $settings = []) {
-        $session = Gdn::session();
-
         // Define the primary key in this model's table.
         $this->defineSchema();
 
@@ -672,7 +675,7 @@ class UserBadgeModel extends Gdn_Model {
         if ($this->validate($formPostValues)) {
             // Get the form field values.
             $fields = $this->Validation->validationFields();
-            $current = $this->getID($fields['UserID'], $fields['BadgeID']);
+            $current = $this->getByUser($fields['UserID'], $fields['BadgeID']);
 
             if (isset($fields['Attributes']) && is_array($fields['Attributes'])) {
                 $fields['Attributes'] = dbencode($fields['Attributes']);
@@ -702,5 +705,20 @@ class UserBadgeModel extends Gdn_Model {
         }
 
         return true;
+    }
+
+    /**
+     * Delete a badge request.
+     *
+     * @param $userID
+     * @param $badgeID
+     */
+    public function deleteRequest($userID, $badgeID) {
+        $this->delete([
+            'DateCompleted is null' => null,
+            'DateRequested is not null' => null,
+            'UserID' => $userID,
+            'BadgeID' => $badgeID
+        ]);
     }
 }
