@@ -422,7 +422,7 @@ class KeenIOTracker implements TrackerInterface {
             $chart['title'] = val('title', $widget);
         }
 
-        // Override default chart 'Result' label in c3
+        // Override default chart 'Result' label
         $chart['labelMapping']['Result'] = val('title', $widget);
 
         // TODO: refactor this to be closer to the definition
@@ -1452,10 +1452,6 @@ class KeenIOTracker implements TrackerInterface {
     public function addJsFiles(Gdn_Controller $controller, $inDashboard = false) {
         if (!AnalyticsTracker::getInstance()->trackingDisabled() || $inDashboard) {
             $controller->addJsFile('vendors/keen.min.js', 'plugins/vanillaanalytics');
-        }
-
-        if (!AnalyticsTracker::getInstance()->trackingDisabled()) {
-            $controller->addJsFile('keenio.min.js', 'plugins/vanillaanalytics');
         }
 
         if ($inDashboard) {

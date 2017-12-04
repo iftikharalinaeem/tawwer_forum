@@ -182,8 +182,8 @@ function KeenIOWidget(config) {
     };
 
     /**
-     * @param {string} key
-     * @param {*} defaultValue
+     * @param {string} [key]
+     * @param {*} [defaultValue]
      * @returns {*}
      */
     this.getConfig = function(key, defaultValue) {
@@ -207,7 +207,7 @@ function KeenIOWidget(config) {
     this.getDataviz = function() {
         if (dataviz === null) {
             dataviz = new Keen.Dataviz();
-            this.loadDatavizConfig(this.getConfig());
+            this.loadDatavizConfig();
         }
 
         return dataviz;
@@ -470,21 +470,12 @@ KeenIOWidget.prototype.loadConfig = function(config) {
     }
 };
 
-/**
- * @param {object} [config]
- */
-KeenIOWidget.prototype.loadDatavizConfig = function (config) {
+KeenIOWidget.prototype.loadDatavizConfig = function () {
     var dataviz = this.getDataviz();
     var chartOptions = this.getConfig('options', {});
     var labelMapping = this.getConfig('labelMapping');
 
-    dataviz.library('c3');
-    // Move this into defaultOptions after https://github.com/keen/keen-js/issues/420 is fixed.
-    c3.chart.internal.fn.additionalConfig = {
-        axis_y_tick_format: function (n) { return (n % 1 === 0) ? n : parseFloat(n).toFixed(2); }
-    };
-
-    if (this.getType() == 'metric') {
+    if (this.getType() === 'metric') {
         dataviz.height(this.getConfig('height', 85));
     } else {
         var chartType = this.getConfig('chartType', 'area');
@@ -503,7 +494,7 @@ KeenIOWidget.prototype.loadDatavizConfig = function (config) {
                                 count: 5,
                                 format: '%Y-%m-%d'
                             }
-                        },
+                        }
                     },
                     grid: {
                         x: {
@@ -622,10 +613,6 @@ KeenIOWidget.prototype.renderBody = function() {
 
                 if (labels.length > 1) {
                     dataviz.stacked(true);
-                } else {
-                    var index = $(element).parent(".analytics-widget").index();
-                    var colors = dataviz.colors();
-                    dataviz.colors([colors[(index) % colors.length]]);
                 }
 
                 for (var x = 0; x < labels.length; x++) {
@@ -635,21 +622,11 @@ KeenIOWidget.prototype.renderBody = function() {
                 }
                 dataviz.labels(labels);
 
-                // Workaround until https://github.com/keen/keen-js/issues/420 is fixed.
-                var chartOptions = dataviz.chartOptions();
-                var oldTooltipContents = c3.chart.internal.fn.additionalConfig.tooltip_contents;
-                if (typeof chartOptions.tooltip_contents !== 'undefined') {
-                    c3.chart.internal.fn.additionalConfig.tooltip_contents = chartOptions.tooltip_contents;
-                }
-
                 if (dataviz.view._rendered) {
                     dataviz.update();
                 } else {
                     dataviz.render();
                 }
-
-                // Restore original tooltip_contents
-                c3.chart.internal.fn.additionalConfig.tooltip_contents = oldTooltipContents;
         }
     } else {
         throw 'No valid dataviz element';
