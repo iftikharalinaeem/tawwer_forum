@@ -142,7 +142,6 @@ class BadgesApiController extends AbstractApiController {
                 'key:s' => 'They key of the badge.',
                 'name:s' => 'The name of the badge.',
                 'body:s' => 'The description of the badge.',
-                'format:s' => 'The description\'s format.',
                 'photoUrl:s|n' => 'The photo of the badge.',
                 'points:i' => 'The amount of point a badge is worth.',
                 'enabled:b' => 'Tells whether the badge is enabled or not.',

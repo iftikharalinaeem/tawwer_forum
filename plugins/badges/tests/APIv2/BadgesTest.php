@@ -65,7 +65,6 @@ class BadgesTest extends AbstractResourceTest {
             'name' => $name,
             'key' => "test-badge-$count",
             'body' => "$name description",
-            'format' => 'text',
             'photoUrl' => null,
             'points' => 1,
             'class' => 'testbadge',
