@@ -102,7 +102,7 @@ class AnalyticsApiController extends AbstractApiController {
             ],
             'limit:i' => [
                 'description' => 'The number of rows to return.',
-                'default' => 1,
+                'default' => AnalyticsLeaderboard::DEFAULT_SIZE,
                 'minimum' => 1,
                 'maximum' => AnalyticsLeaderboard::MAX_SIZE
             ],
@@ -130,7 +130,7 @@ class AnalyticsApiController extends AbstractApiController {
         /** @var AnalyticsWidget $config */
         $config = $boards[$query['board']]->getData();
         $leaderboard = new AnalyticsLeaderboard();
-        $leaderboard->setSize($query['size']);
+        $leaderboard->setSize($query['limit']);
         $leaderboardQuery = $config['query'];
         $leaderboard->setQuery($leaderboardQuery);
         $leaderboard->setPreviousQuery(clone $leaderboardQuery);
@@ -174,8 +174,9 @@ class AnalyticsApiController extends AbstractApiController {
             'filters:a?' => [
                 'prop:s' => 'The property name.',
                 'op:s' => [
+                    'default' => 'eq',
                     'description' => 'The comparison operation for the filter.',
-                    'enum' => ['eq', 'nq', 'gt', 'gte', 'lt', 'lte', 'in']
+                    'enum' => ['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'in']
                 ],
                 'val' => 'The target value for comparison.'
             ],
