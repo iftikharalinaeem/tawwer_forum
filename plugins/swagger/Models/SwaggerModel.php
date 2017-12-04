@@ -186,16 +186,16 @@ class SwaggerModel {
     private function gatherDefinitions(array $arr) {
         $definitions = [];
 
-        $fn = function (array $arr) use (&$definitions, &$fn) {
+        $fn = function (array $arr, $itemKey = null) use (&$definitions, &$fn) {
             $result = $arr;
 
             foreach ($result as $key => &$value) {
                 if (is_array($value)) {
-                    $value = $fn($value);
+                    $value = $fn($value, $key);
                 }
             }
 
-            if (isset($result['type'], $result['id'])) {
+            if ($itemKey !== 'properties' && isset($result['type'], $result['id'])) {
                 $id = $result['id'];
                 unset($result['id']);
 
