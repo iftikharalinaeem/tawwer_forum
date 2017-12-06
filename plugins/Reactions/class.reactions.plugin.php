@@ -260,7 +260,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $row Pre-validated data.
      * @return array
      */
-    public function commentsApiController_get_data(array $result, CommentsApiController $sender, Schema $inSchema, array $query, array $row) {
+    public function commentsApiController_get_output(array $result, CommentsApiController $sender, Schema $inSchema, array $query, array $row) {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
         if ($sender->isExpandField('reactions', $expand)) {
@@ -334,7 +334,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $query The request query.
      * @param array $rows Raw result.
      */
-    public function commentsApiController_index_data(array $result, CommentsApiController $sender, Schema $inSchema, array $query, array $rows) {
+    public function commentsApiController_index_output(array $result, CommentsApiController $sender, Schema $inSchema, array $query, array $rows) {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
         if ($sender->isExpandField('reactions', $expand)) {
@@ -516,7 +516,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $row Pre-validated data.
      * @return array
      */
-    public function discussionsApiController_get_data(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $row) {
+    public function discussionsApiController_get_output(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $row) {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
         if ($sender->isExpandField('reactions', $expand)) {
@@ -539,7 +539,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $query The request query.
      * @param array $rows Raw result.
      */
-    public function discussionsApiController_index_data(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $rows) {
+    public function discussionsApiController_index_output(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $rows) {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
         if ($sender->isExpandField('reactions', $expand)) {
