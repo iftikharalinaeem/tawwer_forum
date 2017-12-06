@@ -78,7 +78,7 @@ class GroupsDiscussionsTest extends DiscussionsTest {
     }
 
     /**
-     *
+     * Test /discussions?groupID={ID}
      */
     public function testIndexGroupFilter() {
         $this->testIndex();
