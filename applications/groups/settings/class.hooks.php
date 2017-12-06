@@ -814,7 +814,7 @@ class GroupsHooks extends Gdn_Plugin {
      */
     public function alterDiscussionSchema(Schema $schema) {
         // We only want to alter base discussions schemas. Exclude things like Schema([:a => Schema])
-        if (!isset($schema['properties']) || !isset($schema['required'])) {
+        if (!isset($schema['properties'])) {
             return;
         }
 
@@ -823,19 +823,26 @@ class GroupsHooks extends Gdn_Plugin {
             return;
         }
 
-        // Remove the required flag from categoryID.
-        $oldRequired = $schema['required'];
-        $newRequired = array_values(array_filter($schema['required'], function($value) {
-            return $value !== 'categoryID';
-        }));
+        $requireOneOf = false;
+        if (isset($schema['required'])) {
+            $requireOneOf = true;
 
-        // Kludge to make sure that we do not put groupID where category could have been omitted.
-        // This will skip adding groupID as a filter in /groups
-        if (count($oldRequired) === count($newRequired)) {
-            return;
+            // Remove the required flag from categoryID.
+            $oldRequired = $schema['required'];
+            $newRequired = array_values(array_filter($schema['required'], function($value) {
+                return $value !== 'categoryID';
+            }));
+
+            // Kludge to make sure that we do not put groupID where category could have been omitted.
+            // This will skip adding groupID as a filter in /groups
+            if (count($oldRequired) === count($newRequired)) {
+                return;
+            }
+
+            $schema['required'] = $newRequired;
         }
 
-        $schema['required'] = $newRequired;
+
 
         $groupModel = new GroupModel();
 
@@ -843,7 +850,6 @@ class GroupsHooks extends Gdn_Plugin {
             ->merge(Schema::parse([
                 'groupID:i|n?' => 'The group the discussion is in.',
             ]))
-            ->requireOneOf(['categoryID', 'groupID'])
             ->addFilter('', function($value, $field) use ($groupModel) {
                 if (!empty($value['groupID'])) {
                     $group = $groupModel->getID($value['groupID']);
@@ -862,6 +868,29 @@ class GroupsHooks extends Gdn_Plugin {
                 return $value;
             })
         ;
+
+        if ($requireOneOf) {
+           $schema->requireOneOf(['categoryID', 'groupID']);
+        }
     }
 
+    /**
+     * Add groupID to the where clause if it is part of the query.
+     *
+     * @param DiscussionsAPIController $controller
+     * @param Schema $inSchema
+     * @param array $filteredQuery
+     * @param array $where
+     */
+    public function discussionsApiController_filter_handler(
+        DiscussionsAPIController $controller,
+        Schema $inSchema,
+        array $filteredQuery,
+        array &$where
+    ) {
+        if (!isset($filteredQuery['groupID'])) {
+            return;
+        }
+        $where['groupID'] = $filteredQuery['groupID'];
+    }
 }
