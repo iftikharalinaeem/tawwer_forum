@@ -786,59 +786,54 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
-     * Hook to alter discussions's model schemas.
+     * Add groupID to the discussionSchema
      *
+     * @param DiscussionsApiController $controller.
      * @param Schema $schema
      */
-    public function discussionSchema_init_handler(Schema $schema) {
-        $this->alterDiscussionSchema($schema);
+    public function discussionSchema_init(DiscussionsApiController $controller, Schema $schema) {
+        $schema->merge(Schema::parse([
+            'groupID:i|n?' => 'The group the discussion is in.',
+        ]));
     }
 
     /**
-     * Hook to alter discussions's endpoint schemas.
+     * Add groupID to the discussionSchema
      *
+     * @param DiscussionsApiController $controller.
      * @param Schema $schema
      */
-    public function controller_schema_handler(Controller $controller, Schema $schema, $type) {
-        if (!($controller instanceof DiscussionsApiController)) {
-            return;
-        }
-
-        $this->alterDiscussionSchema($schema);
+    public function discussionGetEditSchema_init(DiscussionsApiController $controller, Schema $schema) {
+        $schema->merge(Schema::parse([
+            'groupID:i|n?' => 'The group the discussion is in.',
+        ]));
     }
 
     /**
-     * Alter discussion schemas
+     * Add groupID to the discussionIndexSchema.
      *
+     * @param DiscussionsApiController $controller
      * @param Schema $schema
      */
-    public function alterDiscussionSchema(Schema $schema) {
-        // We only want to alter base discussions schemas. Exclude things like Schema([:a => Schema])
-        if (!isset($schema['properties']) || !isset($schema['required'])) {
-            return;
-        }
+    public function discussionIndexSchema_init(DiscussionsApiController $controller, Schema $schema) {
+        $schema->merge(Schema::parse([
+            'groupID:i|n?' => 'The group the discussion is in.',
+        ]));
+    }
 
-        // Let's make sure that categoryID is present in the schema.
-        if (!array_key_exists('categoryID', $schema['properties'])) {
-            return;
-        }
-
-        // Remove the required flag from categoryID.
-        $oldRequired = $schema['required'];
-        $newRequired = array_values(array_filter($schema['required'], function($value) {
+    /**
+     * Add groupID to the discussionPostSchema.
+     *
+     * @param DiscussionsApiController $controller
+     * @param Schema $schema
+     */
+    public function discussionPostSchema_init(DiscussionsApiController $controller, Schema $schema) {
+        // Remove the required flag from categoryID and add a requireOneOf rule below.
+        $schema['required'] = array_values(array_filter($schema['required'], function($value) {
             return $value !== 'categoryID';
         }));
 
-        // Kludge to make sure that we do not put groupID where category could have been omitted.
-        // This will skip adding groupID as a filter in /groups
-        if (count($oldRequired) === count($newRequired)) {
-            return;
-        }
-
-        $schema['required'] = $newRequired;
-
         $groupModel = new GroupModel();
-
         $schema
             ->merge(Schema::parse([
                 'groupID:i|n?' => 'The group the discussion is in.',
@@ -864,4 +859,26 @@ class GroupsHooks extends Gdn_Plugin {
         ;
     }
 
+    /**
+     * Add groupID to the discussions index's filters' where array.
+     *
+     * @param array $where Where clause as array
+     * @param DiscussionsAPIController $controller
+     * @param Schema $inSchema
+     * @param array $query
+     * @return array Where clause as array
+     */
+    public function discussionsApiController_index_filters(
+        $where,
+        DiscussionsAPIController $controller,
+        Schema $inSchema,
+        array $query
+    ) {
+        if (!isset($query['groupID'])) {
+            return $where;
+        }
+
+        $where['groupID'] = $query['groupID'];
+        return $where;
+    }
 }
