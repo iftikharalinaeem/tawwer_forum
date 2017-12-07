@@ -792,11 +792,9 @@ class GroupsHooks extends Gdn_Plugin {
      * @param Schema $schema
      */
     public function discussionSchema_init(DiscussionsApiController $controller, Schema $schema) {
-        $schema
-            ->merge(Schema::parse([
-                'groupID:i|n?' => 'The group the discussion is in.',
-            ]))
-        ;
+        $schema->merge(Schema::parse([
+            'groupID:i|n?' => 'The group the discussion is in.',
+        ]));
     }
 
     /**
@@ -806,11 +804,9 @@ class GroupsHooks extends Gdn_Plugin {
      * @param Schema $schema
      */
     public function discussionGetEditSchema_init(DiscussionsApiController $controller, Schema $schema) {
-        $schema
-            ->merge(Schema::parse([
-                'groupID:i|n?' => 'The group the discussion is in.',
-            ]))
-        ;
+        $schema->merge(Schema::parse([
+            'groupID:i|n?' => 'The group the discussion is in.',
+        ]));
     }
 
     /**
@@ -820,11 +816,9 @@ class GroupsHooks extends Gdn_Plugin {
      * @param Schema $schema
      */
     public function discussionIndexSchema_init(DiscussionsApiController $controller, Schema $schema) {
-        $schema
-            ->merge(Schema::parse([
-                'groupID:i|n?' => 'The group the discussion is in.',
-            ]))
-        ;
+        $schema->merge(Schema::parse([
+            'groupID:i|n?' => 'The group the discussion is in.',
+        ]));
     }
 
     /**
