@@ -55,6 +55,9 @@ class GroupsDiscussionsTest extends DiscussionsTest {
         $session->end();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function record() {
         $record = parent::record();
 
