@@ -262,6 +262,12 @@ class ReflectionAction {
 
                         $param['description'] = (empty($param['description']) ? '' : rtrim($param['description'], '.').".\n").$enumDescription;
                     }
+
+                    if (isset($allInArr['required']) && in_array($name, $allInArr['required'])) {
+                        $param['required'] = true;
+                    } else if (isset($param['required'])) {
+                        unset($param['required']);
+                    }
                 }
             }
         }
