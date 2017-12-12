@@ -939,7 +939,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
                             $canReply = self::checkUserPermission($notifyUserID, 'Email.Comments.Add');
                             $formatData['Signature'] = self::emailSignature(val('Route', $args), $canView, $canReply); //.print_r(array('CanView' => $CanView, 'CanReply' => $CanReply), true);
 
-                            $discussion['Name'] = Gdn_Format::plainText($discussion['Name'], 'Text');
+                            $discussion['Name'] = Gdn_Format::plainText($discussion['Name'], 'text');
                             $discussion['Body'] = Gdn_Format::plainText($discussion['Body'], $discussion['Format']);
                             $discussion['Url'] = externalUrl('/discussion/'.$discussion['DiscussionID'].'/'.Gdn_Format::url($discussion['Name']));
                             $formatData['Discussion'] = $discussion;
