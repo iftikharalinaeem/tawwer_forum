@@ -209,6 +209,14 @@ class TermsManagerPlugin extends Gdn_Plugin {
             }
 
             $sender->Form->setFormValue('ConnectName', $connectName);
+        } else {
+            $email = $sender->Form->getFormValue('Email');
+            $user = Gdn::userModel()->getByEmail($email);
+            if (!$user) {
+                $user = Gdn::userModel()->getByUsername($email);
+            }
+            Gdn::userModel()->save(['UserID' => val('UserID', $user), 'Terms' => $sender->Form->getFormValue('Terms')]);
+            return;
         }
 
         // If there is no name, exiting user or connectname created, show the ConnectName form field in connect view.
@@ -236,17 +244,15 @@ class TermsManagerPlugin extends Gdn_Plugin {
         }
 
         // If Admin wants users to opt in again when the custom terms have changed.
-        if (val('ForceRenew', $terms)) {
-            $email = $sender->Form->getFormValue('Email');
-            $user = Gdn::userModel()->getByEmail($email);
-            if (!$user) {
-                $user = Gdn::userModel()->getByUsername($email);
-            }
+        $email = $sender->Form->getFormValue('Email');
+        $user = Gdn::userModel()->getByEmail($email);
+        if (!$user) {
+            $user = Gdn::userModel()->getByUsername($email);
+        }
 
-            // If the user has already opted-in
-            if (val('Terms', $user) === val('TermsOfUseID', $terms)) {
-                return;
-            }
+        // If the user has already opted-in
+        if (val('Terms', $user) === val('TermsOfUseID', $terms) && !val('ForceRenew', $terms)) {
+            return;
         }
 
         // "Manually" flag SSO connections because the form is not being posted back.
