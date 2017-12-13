@@ -1454,6 +1454,10 @@ class KeenIOTracker implements TrackerInterface {
             $controller->addJsFile('vendors/keen.min.js', 'plugins/vanillaanalytics');
         }
 
+        if (!AnalyticsTracker::getInstance()->trackingDisabled()) {
+            $controller->addJsFile('keenio.min.js', 'plugins/vanillaanalytics');
+        }
+
         if ($inDashboard) {
             $controller->addJsFile('keeniowidget.min.js', 'plugins/vanillaanalytics');
             $controller->addJsFile('keeniofiltercallback.min.js', 'plugins/vanillaanalytics');
