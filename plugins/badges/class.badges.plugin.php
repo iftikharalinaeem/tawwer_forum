@@ -370,7 +370,7 @@ class BadgesHooks extends Gdn_Plugin {
      * Include our separate structure file because hot damn there's a lot to do.
      */
     public function structure() {
-        require_once(dirname(__FILE__).'/structure.php');
+        require(dirname(__FILE__).'/structure.php');
     }
 
     /**
