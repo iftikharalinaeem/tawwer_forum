@@ -302,7 +302,6 @@ class UserBadgeModel extends Gdn_Model {
     /**
      * Get all current badge requests.
      *
-     * @parem int $offset
      * @return Gdn_DataSet
      */
     public function getRequests() {

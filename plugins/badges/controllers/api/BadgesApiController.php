@@ -183,7 +183,7 @@ class BadgesApiController extends AbstractApiController {
                 'insertUserID:i' => 'The user that created the user badge relation.',
                 'insertUser?' => $this->getUserFragmentSchema(),
                 'dateInserted:dt' => 'When the user requested the badge.',
-            ], 'UserBadge');
+            ], 'BadgeRequest');
         }
 
         return $schema;
@@ -224,6 +224,7 @@ class BadgesApiController extends AbstractApiController {
      * @return array
      */
     public function get($id) {
+        // Individual badges can always be viewed.
         $this->permission();
 
         $this->idParamBadgeSchema()->setDescription('Get a badge.');
@@ -297,7 +298,7 @@ class BadgesApiController extends AbstractApiController {
                 'expand?' => $this->getExpandDefinition(['user', 'badge', 'insertUser'])
             ], 'in')
             ->requireOneOf(['badgeID', 'userID'])
-            ->setDescription('List all the requested badges.');
+            ->setDescription('List badge requests.');
         $out = $this->schema([':a' => $this->fullBadgeRequestSchema()], 'out');
 
         $query = $in->validate($query);
@@ -344,7 +345,6 @@ class BadgesApiController extends AbstractApiController {
                 } else {
                     $badge = $badges[$badgeID];
                 }
-//                $this->userModel->expandUsers($badge, ['InsertUserID', 'UpdateUser']);
                 $row['Badge'] = $badge;
             }
             $row = $this->normalizeUserBadgeOutput($row);
@@ -428,7 +428,6 @@ class BadgesApiController extends AbstractApiController {
                 } else {
                     $badge = $badges[$badgeID];
                 }
-//                $this->userModel->expandUsers($badge, ['InsertUserID', 'UpdateUser']);
                 $row['Badge'] = $badge;
             }
             $row = $this->normalizeUserBadgeOutput($row);
@@ -466,6 +465,7 @@ class BadgesApiController extends AbstractApiController {
      * @return array
      */
     public function index(array $query) {
+        // You need this permission to list badges.
         $this->permission('Reputation.Badges.View');
 
         $in = $this->schema([
@@ -634,22 +634,6 @@ class BadgesApiController extends AbstractApiController {
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         return $schemaRecord;
     }
-
-//    /**
-//     * Normalize a Schema record to match the database definition.
-//     *
-//     * @param array $schemaRecord Schema record.
-//     * @return array Return a database record.
-//     */
-//    public function normalizeUserBadgeInput(array $schemaRecord) {
-//        if (array_key_exists('status', $schemaRecord)) {
-//            $schemaRecord['declined'] = !$schemaRecord['status'];
-//            unset($schemaRecord['status']);
-//        }
-//
-//        $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
-//        return $dbRecord;
-//    }
 
     /**
      * Normalize a database record to match the schema definition.
