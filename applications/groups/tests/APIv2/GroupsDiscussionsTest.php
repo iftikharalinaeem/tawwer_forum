@@ -25,9 +25,6 @@ class GroupsDiscussionsTest extends DiscussionsTest {
     public function __construct($name = null, array $data = [], $dataName = '') {
         parent::__construct($name, $data, $dataName);
 
-        unset($this->record['categoryID']);
-        $this->record['groupID'] = 1;
-
         $this->patchFields[] = 'groupID';
     }
 
@@ -61,13 +58,45 @@ class GroupsDiscussionsTest extends DiscussionsTest {
     /**
      * @inheritdoc
      */
+    public function record() {
+        $record = parent::record();
+
+        unset($record['categoryID']);
+        $record['groupID'] = self::$groups[0]['groupID'];
+
+        return $record;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function modifyRow(array $row) {
         $row = parent::modifyRow($row);
 
-        // Assign the event to the other group.
+        // Assign the discussion to the other group.
         if (isset($row['groupID'])) {
             $row['groupID'] = self::$groups[1]['groupID'];
         }
         return $row;
+    }
+
+    /**
+     * Test /discussions?groupID={ID}
+     */
+    public function testIndexGroupFilter() {
+        $this->testIndex();
+
+        $indexUrl = $this->indexUrl();
+
+        $result = $this->api()->get($indexUrl.'?groupID='.self::$groups[0]['groupID']);
+        $this->assertEquals(200, $result->getStatusCode());
+
+        $groupDiscussions = $result->getBody();
+
+        $this->assertTrue(count($groupDiscussions) > 0);
+        foreach ($groupDiscussions as $discussion) {
+            $this->assertArrayHasKey('groupID', $discussion);
+            $this->assertEquals($discussion['groupID'], self::$groups[0]['groupID']);
+        }
     }
 }
