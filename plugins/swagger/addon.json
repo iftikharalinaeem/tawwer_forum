@@ -2,7 +2,7 @@
     "key": "swagger",
     "name": "API v2 Docs",
     "description": "API v2 documentation customized for your community right in your Dashboard.",
-    "version": "1.0-alpha1.1",
+    "version": "1.0",
     "license": "Proprietary",
     "type": "addon",
     "oldType": "plugin",
