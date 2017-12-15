@@ -11,27 +11,27 @@ class LinkedInPlugin extends Gdn_Plugin {
 
     /// Methods ///
 
-    protected $_AccessToken = NULL;
+    protected $_AccessToken = null;
 
-    public function accessToken($value = NULL) {
+    public function accessToken($value = null) {
         if (!$this->isConfigured()) {
-            return FALSE;
+            return false;
         }
 
-        if ($value !== NULL) {
+        if ($value !== null) {
             $this->_AccessToken = $value;
-        } elseif ($this->_AccessToken === NULL) {
+        } elseif ($this->_AccessToken === null) {
             if (Gdn::session()->isValid()) {
                 $this->_AccessToken = getValueR(self::ProviderKey.'.AccessToken', Gdn::session()->User->Attributes);
             } else {
-                $this->_AccessToken = FALSE;
+                $this->_AccessToken = false;
             }
         }
 
         return $this->_AccessToken;
     }
 
-    public function aPI($path, $post = FALSE) {
+    public function aPI($path, $post = false) {
         // Build the url.
         $url = 'https://api.linkedin.com/v1/'.ltrim($path, '/');
 
@@ -70,8 +70,8 @@ class LinkedInPlugin extends Gdn_Plugin {
 
         Gdn::controller()->setJson('Type', $contentType);
 
-        if (strpos($contentType, 'application/json') !== FALSE) {
-            $result = json_decode($response, TRUE);
+        if (strpos($contentType, 'application/json') !== false) {
+            $result = json_decode($response, true);
 
             if (isset($result['error'])) {
                 Gdn::dispatcher()->passData('LinkedInResponse', $result);
@@ -84,7 +84,7 @@ class LinkedInPlugin extends Gdn_Plugin {
         return $result;
     }
 
-    public function authorizeUri($redirectUri = FALSE) {
+    public function authorizeUri($redirectUri = false) {
         $appID = c('Plugins.LinkedIn.ApplicationID');
         $scope = c('Plugins.LinkedIn.Scope', 'r_basicprofile r_emailaddress');
 
@@ -103,7 +103,7 @@ class LinkedInPlugin extends Gdn_Plugin {
         return $signinHref;
     }
 
-    protected function getAccessToken($code, $redirectUri, $throwError = TRUE) {
+    protected function getAccessToken($code, $redirectUri, $throwError = true) {
         $get = [
             'grant_type' => 'authorization_code',
             'client_id' => c('Plugins.LinkedIn.ApplicationID'),
@@ -115,14 +115,14 @@ class LinkedInPlugin extends Gdn_Plugin {
 
         // Get the redirect URI.
         $c = curl_init();
-        curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, FALSE);
+        curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($c, CURLOPT_URL, $url);
         $contents = curl_exec($c);
 
         $info = curl_getinfo($c);
-        if (strpos(getValue('content_type', $info, ''), 'application/json') !== FALSE) {
-            $tokens = json_decode($contents, TRUE);
+        if (strpos(getValue('content_type', $info, ''), 'application/json') !== false) {
+            $tokens = json_decode($contents, true);
         } else {
             parse_str($contents, $tokens);
         }
@@ -132,7 +132,7 @@ class LinkedInPlugin extends Gdn_Plugin {
         }
 
         $accessToken = getValue('access_token', $tokens);
-//      $Expires = getValue('expires', $Tokens, NULL);
+//      $Expires = getValue('expires', $Tokens, null);
 
         return $accessToken;
     }
@@ -154,23 +154,23 @@ class LinkedInPlugin extends Gdn_Plugin {
         $appID = c('Plugins.LinkedIn.ApplicationID');
         $secret = c('Plugins.LinkedIn.Secret');
         if (!$appID || !$secret) {
-            return FALSE;
+            return false;
         }
-        return TRUE;
+        return true;
     }
 
     public static function profileConnectUrl() {
         return url('profile/linkedinconnect', true).'?userID='.Gdn::session()->UserID;
     }
 
-    protected $_RedirectUri = NULL;
+    protected $_RedirectUri = null;
 
-    public function redirectUri($newValue = NULL) {
-        if ($newValue !== NULL) {
+    public function redirectUri($newValue = null) {
+        if ($newValue !== null) {
             $this->_RedirectUri = $newValue;
-        } elseif ($this->_RedirectUri === NULL) {
-            $redirectUri = url('/entry/connect/linkedin', TRUE);
-            if (strpos($redirectUri, '=') !== FALSE) {
+        } elseif ($this->_RedirectUri === null) {
+            $redirectUri = url('/entry/connect/linkedin', true);
+            if (strpos($redirectUri, '=') !== false) {
                 $p = strrchr($redirectUri, '=');
                 $uri = substr($redirectUri, 0, -strlen($p));
                 $p = urlencode(ltrim($p, '='));
@@ -186,7 +186,7 @@ class LinkedInPlugin extends Gdn_Plugin {
             $args = ['Target' => $target];
 
 
-            $redirectUri .= strpos($redirectUri, '?') === FALSE ? '?' : '&';
+            $redirectUri .= strpos($redirectUri, '?') === false ? '?' : '&';
             $redirectUri .= http_build_query($args);
             $this->_RedirectUri = $redirectUri;
         }
@@ -210,7 +210,7 @@ class LinkedInPlugin extends Gdn_Plugin {
         // Save the facebook provider type.
         Gdn::sql()->replace('UserAuthenticationProvider',
             ['AuthenticationSchemeAlias' => 'linkedin', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'],
-            ['AuthenticationKey' => self::ProviderKey], TRUE);
+            ['AuthenticationKey' => self::ProviderKey], true);
     }
 
     /// Event Handlers ///
@@ -248,7 +248,7 @@ class LinkedInPlugin extends Gdn_Plugin {
             $code = urlencode($code);
             $accessToken = $this->getAccessToken($code, $this->redirectUri());
             $this->accessToken($accessToken);
-            $newToken = TRUE;
+            $newToken = true;
         } elseif ($accessToken) {
             $this->accessToken($accessToken);
         }
@@ -273,7 +273,7 @@ class LinkedInPlugin extends Gdn_Plugin {
         ];
         $form->setFormValue('Attributes', $attributes);
 
-        $sender->setData('Verified', TRUE);
+        $sender->setData('Verified', true);
     }
 
     public function base_getConnections_handler($sender, $args) {
@@ -324,7 +324,7 @@ class LinkedInPlugin extends Gdn_Plugin {
 
         $userID = $sender->Request->get('userID');
 
-        $sender->getUserInfo('', '', $userID, TRUE);
+        $sender->getUserInfo('', '', $userID, true);
         $sender->_SetBreadcrumbs(t('Connections'), userUrl($sender->User, '', 'connections'));
 
         // Get the access token.
