@@ -15,6 +15,7 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\ApiUtils;
 
 /**
  * Class ReactionsPlugin
@@ -386,41 +387,59 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * Update the /comments/get input schema.
      *
-     * @param CommentsApiController $sender
      * @param Schema $schema
      */
-    public function commentGetSchema_init(CommentsApiController $sender, Schema $schema) {
-        $this->updateSchemaExpand($schema, $sender);
+    public function commentGetSchema_init(Schema $schema) {
+        $this->updateSchemaExpand($schema);
     }
 
     /**
      * Update the /comments index input schema.
      *
-     * @param CommentsApiController $sender
      * @param Schema $schema
      */
-    public function commentIndexSchema_init(CommentsApiController $sender, Schema $schema) {
-        $this->updateSchemaExpand($schema, $sender);
+    public function commentIndexSchema_init(Schema $schema) {
+        $this->updateSchemaExpand($schema);
+    }
+
+    /**
+     * Add reactions summary to the comment row schema.
+     *
+     * @param Schema $schema
+     */
+    public function commentSchema_init(Schema $schema) {
+        $schema->merge(Schema::parse([
+            'reactions?' => $this->getReactionSummaryFragment()
+        ]));
     }
 
     /**
      * Update the /discussions/get input schema.
      *
-     * @param DiscussionsApiController $sender
      * @param Schema $schema
      */
-    public function discussionGetSchema_init(DiscussionsApiController $sender, Schema $schema) {
-        $this->updateSchemaExpand($schema, $sender);
+    public function discussionGetSchema_init(Schema $schema) {
+        $this->updateSchemaExpand($schema);
     }
 
     /**
      * Update the /discussions index input schema.
      *
-     * @param DiscussionsApiController $sender
      * @param Schema $schema
      */
-    public function discussionIndexSchema_init(DiscussionsApiController $sender, Schema $schema) {
-        $this->updateSchemaExpand($schema, $sender);
+    public function discussionIndexSchema_init(Schema $schema) {
+        $this->updateSchemaExpand($schema);
+    }
+
+    /**
+     * Add reactions summary field to the comment row schema.
+     *
+     * @param Schema $schema
+     */
+    public function discussionSchema_init(Schema $schema) {
+        $schema->merge(Schema::parse([
+            'reactions?' => $this->getReactionSummaryFragment()
+        ]));
     }
 
     /**
@@ -1298,9 +1317,8 @@ class ReactionsPlugin extends Gdn_Plugin {
      * Alter a schema's expand parameter to include reactions.
      *
      * @param Schema $schema
-     * @param AbstractApiController $sender
      */
-    private function updateSchemaExpand(Schema $schema, AbstractApiController $sender) {
+    private function updateSchemaExpand(Schema $schema) {
         /** @var Schema $expand */
         $expandEnum = $schema->getField('properties.expand.items.enum');
         if (is_array($expandEnum)) {
@@ -1310,7 +1328,7 @@ class ReactionsPlugin extends Gdn_Plugin {
             }
         } else {
             $schema->merge(Schema::parse([
-                'expand?' => $sender->getExpandDefinition(['reactions'])
+                'expand?' => ApiUtils::getExpandDefinition(['reactions'])
             ]));
         }
     }

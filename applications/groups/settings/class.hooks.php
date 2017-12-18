@@ -788,10 +788,9 @@ class GroupsHooks extends Gdn_Plugin {
     /**
      * Add groupID to the discussionSchema
      *
-     * @param DiscussionsApiController $controller.
      * @param Schema $schema
      */
-    public function discussionSchema_init(DiscussionsApiController $controller, Schema $schema) {
+    public function discussionSchema_init(Schema $schema) {
         $schema->merge(Schema::parse([
             'groupID:i|n?' => 'The group the discussion is in.',
         ]));
@@ -800,10 +799,9 @@ class GroupsHooks extends Gdn_Plugin {
     /**
      * Add groupID to the discussionSchema
      *
-     * @param DiscussionsApiController $controller.
      * @param Schema $schema
      */
-    public function discussionGetEditSchema_init(DiscussionsApiController $controller, Schema $schema) {
+    public function discussionGetEditSchema_init(Schema $schema) {
         $schema->merge(Schema::parse([
             'groupID:i|n?' => 'The group the discussion is in.',
         ]));
@@ -812,10 +810,9 @@ class GroupsHooks extends Gdn_Plugin {
     /**
      * Add groupID to the discussionIndexSchema.
      *
-     * @param DiscussionsApiController $controller
      * @param Schema $schema
      */
-    public function discussionIndexSchema_init(DiscussionsApiController $controller, Schema $schema) {
+    public function discussionIndexSchema_init(Schema $schema) {
         $schema->merge(Schema::parse([
             'groupID:i|n?' => 'The group the discussion is in.',
         ]));
@@ -824,10 +821,9 @@ class GroupsHooks extends Gdn_Plugin {
     /**
      * Add groupID to the discussionPostSchema.
      *
-     * @param DiscussionsApiController $controller
      * @param Schema $schema
      */
-    public function discussionPostSchema_init(DiscussionsApiController $controller, Schema $schema) {
+    public function discussionPostSchema_init(Schema $schema) {
         // Remove the required flag from categoryID and add a requireOneOf rule below.
         $schema['required'] = array_values(array_filter($schema['required'], function($value) {
             return $value !== 'categoryID';
