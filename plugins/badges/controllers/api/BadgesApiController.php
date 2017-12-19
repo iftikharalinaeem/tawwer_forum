@@ -295,7 +295,7 @@ class BadgesApiController extends AbstractApiController {
                     'minimum' => 1,
                     'maximum' => 100
                 ],
-                'expand?' => $this->getExpandDefinition(['user', 'badge', 'insertUser'])
+                'expand?' => ApiUtils::getExpandDefinition(['user', 'badge', 'insertUser'])
             ], 'in')
             ->requireOneOf(['badgeID', 'userID'])
             ->setDescription('List badge requests.');
@@ -380,7 +380,7 @@ class BadgesApiController extends AbstractApiController {
                     'minimum' => 1,
                     'maximum' => 100
                 ],
-                'expand?' => $this->getExpandDefinition(['user', 'badge', 'insertUser'])
+                'expand?' => ApiUtils::getExpandDefinition(['user', 'badge', 'insertUser'])
             ], 'in')
             ->requireOneOf(['badgeID', 'userID'])
             ->setDescription('List all the users that have the badge.');
@@ -481,7 +481,7 @@ class BadgesApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
-            'expand?' => $this->getExpandDefinition(['insertUser', 'updateUser'])
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'updateUser'])
         ], 'in')->setDescription('List badges.');
         $out = $this->schema([':a' => $this->fullBadgeSchema()], 'out');
 
