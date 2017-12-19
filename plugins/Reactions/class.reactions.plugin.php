@@ -642,7 +642,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         if ($typeFragment === null) {
             $typeFragment = Schema::parse([
                 'tagID:i',
-                'urlCode:s',
+                'urlcode:s',
                 'name:s',
                 'class:s'
             ]);
