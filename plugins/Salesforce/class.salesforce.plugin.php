@@ -52,7 +52,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             'AssociationSecret' => '...',
             'AssociationHashMethod' => '...'
          ],
-         ['AuthenticationKey' => self::ProviderKey], TRUE
+         ['AuthenticationKey' => self::ProviderKey], true
       );
       Gdn::permissionModel()->define(['Garden.Staff.Allow' => 'Garden.Moderation.Manage']);
    }
@@ -91,12 +91,12 @@ class SalesforcePlugin extends Gdn_Plugin {
     * @param bool $code
     *
     */
-   public function profileController_salesforceConnect_create($sender, $userReference = '', $username = '', $code = FALSE) {
+   public function profileController_salesforceConnect_create($sender, $userReference = '', $username = '', $code = false) {
       $sender->permission('Garden.SignIn.Allow');
-      $sender->getUserInfo($userReference, $username, '', TRUE);
+      $sender->getUserInfo($userReference, $username, '', true);
       $sender->_SetBreadcrumbs(t('Connections'), userUrl($sender->User, '', 'connections'));
       //check $GET state // if DashboardConnection // then do global connection.
-      $state = getValue('state', $_GET, FALSE);
+      $state = getValue('state', $_GET, false);
       if ($state == 'DashboardConnection') {
          try {
             $tokens = Salesforce::getTokens($code, Salesforce::profileConnecUrl());
@@ -112,10 +112,10 @@ class SalesforcePlugin extends Gdn_Plugin {
          $tokens = Salesforce::getTokens($code, Salesforce::profileConnecUrl());
       } catch (Gdn_UserException $e) {
          $attributes = [
-            'RefreshToken' => NULL,
-            'AccessToken' => NULL,
-            'InstanceUrl' => NULL,
-            'Profile' => NULL,
+            'RefreshToken' => null,
+            'AccessToken' => null,
+            'InstanceUrl' => null,
+            'Profile' => null,
          ];
          Gdn::userModel()->saveAttribute($sender->User->UserID, Salesforce::ProviderKey, $attributes);
          $message = $e->getMessage();
@@ -167,7 +167,7 @@ class SalesforcePlugin extends Gdn_Plugin {
     * Redirect to allow for DashboardConnection
     */
    public function controller_Connect() {
-      $authorizeUrl = Salesforce::authorizeUri(FALSE, 'DashboardConnection');
+      $authorizeUrl = Salesforce::authorizeUri(false, 'DashboardConnection');
       redirectTo($authorizeUrl, 302, false);
    }
 
@@ -177,14 +177,14 @@ class SalesforcePlugin extends Gdn_Plugin {
    public function controller_Disconnect() {
       $salesforce = Salesforce::instance();
       $salesforce->useDashboardConnection();
-      $token = getValue('token', $_GET, FALSE);
+      $token = getValue('token', $_GET, false);
       if ($token) {
          $salesforce->revoke($token);
          removeFromConfig([
-            'Plugins.Salesforce.DashboardConnection.Token' => FALSE,
-            'Plugins.Salesforce.DashboardConnection.RefreshToken' => FALSE,
-            'Plugins.Salesforce.DashboardConnection.Token' => FALSE,
-            'Plugins.Salesforce.DashboardConnection.InstanceUrl' => FALSE
+            'Plugins.Salesforce.DashboardConnection.Token' => false,
+            'Plugins.Salesforce.DashboardConnection.RefreshToken' => false,
+            'Plugins.Salesforce.DashboardConnection.Token' => false,
+            'Plugins.Salesforce.DashboardConnection.InstanceUrl' => false
          ]);
       }
       redirectTo('/plugin/Salesforce');
@@ -197,7 +197,7 @@ class SalesforcePlugin extends Gdn_Plugin {
    public function controller_Reconnect($sender) {
       $salesforce = Salesforce::instance();
       $salesforce->useDashboardConnection();
-      $token = getValue('token', $_GET, FALSE);
+      $token = getValue('token', $_GET, false);
       if ($token) {
          $refreshResponse = $salesforce->refresh($token);
          $accessToken = getValue('access_token', $refreshResponse);
@@ -213,7 +213,7 @@ class SalesforcePlugin extends Gdn_Plugin {
    }
 
    public function controller_Enable() {
-      saveToConfig('Plugins.Salesforce.DashboardConnection.Enabled', TRUE);
+      saveToConfig('Plugins.Salesforce.DashboardConnection.Enabled', true);
       redirectTo('/plugin/Salesforce');
    }
 
@@ -230,10 +230,10 @@ class SalesforcePlugin extends Gdn_Plugin {
     */
    public function controller_Index($sender) {
       $salesforce = Salesforce::instance();
-      if (getValue('DashboardConnection', $_GET, FALSE)) {
-         $sender->setData('DashboardConnection', TRUE);
+      if (getValue('DashboardConnection', $_GET, false)) {
+         $sender->setData('DashboardConnection', true);
          saveToConfig([
-            'Plugins.Salesforce.DashboardConnection.Enabled' => TRUE,
+            'Plugins.Salesforce.DashboardConnection.Enabled' => true,
             'Plugins.Salesforce.DashboardConnection.LoginId' => getValue('id', $_GET),
             'Plugins.Salesforce.DashboardConnection.InstanceUrl' => getValue('instance_url', $_GET),
             'Plugins.Salesforce.DashboardConnection.Token' => getValue('access_token', $_GET),
@@ -245,9 +245,9 @@ class SalesforcePlugin extends Gdn_Plugin {
       }
       $sender->setData([
          'DashboardConnection' => c('Plugins.Salesforce.DashboardConnection.Enabled'),
-         'DashboardConnectionProfile'=> FALSE,
-         'DashboardConnectionToken' => c('Plugins.Salesforce.DashboardConnection.Token', FALSE),
-         'DashboardConnectionRefreshToken' => c('Plugins.Salesforce.DashboardConnection.RefreshToken', FALSE)
+         'DashboardConnectionProfile'=> false,
+         'DashboardConnectionToken' => c('Plugins.Salesforce.DashboardConnection.Token', false),
+         'DashboardConnectionRefreshToken' => c('Plugins.Salesforce.DashboardConnection.RefreshToken', false)
       ]);
       if (c('Plugins.Salesforce.DashboardConnection.LoginId') && c('Plugins.Salesforce.DashboardConnection.Enabled')) {
 //         $Salesforce->useDashboardConnection();
@@ -265,7 +265,7 @@ class SalesforcePlugin extends Gdn_Plugin {
       // Set the model on the form.
       $sender->Form->setModel($configurationModel);
       // If seeing the form for the first time...
-      if ($sender->Form->authenticatedPostBack() === FALSE) {
+      if ($sender->Form->authenticatedPostBack() === false) {
          // Apply the config settings to the form.
          $sender->Form->setData($configurationModel->Data);
       } else {
@@ -412,7 +412,7 @@ class SalesforcePlugin extends Gdn_Plugin {
       $sender->Form->addHidden('Description', Gdn_Format::textEx($content->Body));
 
       //See if user is already registered in Sales Force
-      if (!c('Plugins.Salesforce.AllowDuplicateLeads', FALSE)) {
+      if (!c('Plugins.Salesforce.AllowDuplicateLeads', false)) {
          $existingLeadResponse = $salesforce->findLead($user->Email);
          if ($existingLeadResponse['HttpCode'] == 401) {
             $salesforce->reconnect();
@@ -429,7 +429,7 @@ class SalesforcePlugin extends Gdn_Plugin {
       $attachmentModel = AttachmentModel::instance();
 
       // If form is being submitted
-      if ($sender->Form->isPostBack() && $sender->Form->authenticatedPostBack() === TRUE) {
+      if ($sender->Form->isPostBack() && $sender->Form->authenticatedPostBack() === true) {
          // Form Validation
          $sender->Form->validateRule('FirstName', 'function:ValidateRequired', 'First Name is required');
          $sender->Form->validateRule('LastName', 'function:ValidateRequired', 'Last Name is required');
@@ -548,7 +548,7 @@ class SalesforcePlugin extends Gdn_Plugin {
       $attachmentModel = AttachmentModel::instance();
 
       //If form is being submitted
-      if ($sender->Form->isPostBack() && $sender->Form->authenticatedPostBack() === TRUE) {
+      if ($sender->Form->isPostBack() && $sender->Form->authenticatedPostBack() === true) {
          //Form Validation
          $sender->Form->validateRule('FirstName', 'function:ValidateRequired', 'First Name is required');
          $sender->Form->validateRule('LastName', 'function:ValidateRequired', 'Last Name is required');
@@ -838,7 +838,7 @@ class SalesforcePlugin extends Gdn_Plugin {
     */
    public function loginModal($sender) {
       $loginUrl = url('/profile/connections');
-      if (c('Plugins.Salesforce.DashboardConnection.Enabled', FALSE)) {
+      if (c('Plugins.Salesforce.DashboardConnection.Enabled', false)) {
          $loginUrl = url('/plugin/Salesforce');
       }
       $sender->setData('LoginURL', $loginUrl);
@@ -852,23 +852,23 @@ class SalesforcePlugin extends Gdn_Plugin {
     */
    protected function isToBeUpdated($attachment, $type = 'salesforce-case') {
       if (getValue('Status', $attachment) == $this->ClosedCaseStatusString) {
-         return FALSE;
+         return false;
       }
       $timeDiff = time() - strtotime($attachment['DateUpdated']);
       if ($timeDiff < $this->MinimumTimeForUpdate ) {
          trace("Not Checking For Update: $timeDiff seconds since last update");
-         return FALSE;
+         return false;
       }
       if (isset($attachment['LastModifiedDate'])) {
          if ($type == 'salesforce-case') {
             $timeDiff = time() - strtotime($attachment['LastModifiedDate']);
             if ($timeDiff < $this->MinimumTimeForUpdate && $attachment['Status'] != $this->ClosedCaseStatusString) {
                trace("Not Checking For Update: $timeDiff seconds since last update");
-               return FALSE;
+               return false;
             }
          }
       }
-      return TRUE;
+      return true;
    }
 
    /**
