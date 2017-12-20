@@ -83,6 +83,7 @@ class GithubPlugin extends Gdn_Plugin {
             'client_id' => $appID,
             'response_type' => 'code',
             'scope' => 'repo',
+            'state' => Gdn::session()->transientKey(),
 
         ];
         return self::OAUTH_BASE_URL.'/login/oauth/authorize?'.http_build_query($query);
@@ -230,10 +231,16 @@ class GithubPlugin extends Gdn_Plugin {
             return;
         }
 
+        $transientKey = Gdn::request()->get('state');
+        if (empty($transientKey) || Gdn::session()->validateTransientKey($transientKey) === false) {
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
+        }
+
         if (stristr(Gdn::request()->url(), 'globallogin') !== false) {
             redirectTo('/plugin/github/connect?code='.Gdn::request()->get('code'));
         }
         $sender->permission('Garden.SignIn.Allow');
+
         $sender->getUserInfo($userReference, $username, '', true);
         $sender->_SetBreadcrumbs(t('Connections'), userUrl($sender->User, '', 'connections'));
 
