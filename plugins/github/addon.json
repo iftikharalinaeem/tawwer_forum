@@ -9,7 +9,7 @@
     "icon": "github.png",
     "key": "github",
     "type": "addon",
-    "documentationUrl" : "http://docs.vanillaforums.com/help/integrations/github/",
+    "documentationUrl": "http://docs.vanillaforums.com/help/addons/social/github/",
     "authors": [
         {
             "name": "John Ashton",
