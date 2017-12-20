@@ -166,7 +166,7 @@ class SalesforcePlugin extends Gdn_Plugin {
    /**
     * Redirect to allow for DashboardConnection
     */
-   public function controller_Connect() {
+   public function controller_connect() {
       $authorizeUrl = Salesforce::authorizeUri(false, 'DashboardConnection');
       redirectTo($authorizeUrl, 302, false);
    }
@@ -174,7 +174,7 @@ class SalesforcePlugin extends Gdn_Plugin {
    /**
     * Redirect to allow for DashboardConnection
     */
-   public function controller_Disconnect() {
+   public function controller_disconnect() {
       $salesforce = Salesforce::instance();
       $salesforce->useDashboardConnection();
       $token = val('token', $_GET, false);
@@ -194,7 +194,7 @@ class SalesforcePlugin extends Gdn_Plugin {
     * Redirect to allow for DashboardConnection
     * @param Controller $sender
     */
-   public function controller_Reconnect($sender) {
+   public function controller_reconnect($sender) {
       $salesforce = Salesforce::instance();
       $salesforce->useDashboardConnection();
       $token = val('token', $_GET, false);
@@ -212,12 +212,12 @@ class SalesforcePlugin extends Gdn_Plugin {
       }
    }
 
-   public function controller_Enable() {
+   public function controller_enable() {
       saveToConfig('Plugins.Salesforce.DashboardConnection.Enabled', true);
       redirectTo('/plugin/Salesforce');
    }
 
-   public function controller_Disable() {
+   public function controller_disable() {
       removeFromConfig('Plugins.Salesforce.DashboardConnection.Enabled');
       redirectTo('/plugin/Salesforce');
    }
@@ -228,7 +228,7 @@ class SalesforcePlugin extends Gdn_Plugin {
     *
     * @param DashboardController $sender
     */
-   public function controller_Index($sender) {
+   public function controller_index($sender) {
       $salesforce = Salesforce::instance();
       if (val('DashboardConnection', $_GET, false)) {
          $sender->setData('DashboardConnection', true);
