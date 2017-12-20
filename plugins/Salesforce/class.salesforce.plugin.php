@@ -78,7 +78,7 @@ class SalesforcePlugin extends Gdn_Plugin {
          'ProviderKey' => Salesforce::ProviderKey,
          'ConnectUrl' => Salesforce::authorizeUri(Salesforce::profileConnecUrl()),
          'Profile' => [
-            'Name' => getValue('fullname', $profile),
+            'Name' => val('fullname', $profile),
             'Photo' => null
          ]
       ];
@@ -96,7 +96,7 @@ class SalesforcePlugin extends Gdn_Plugin {
       $sender->getUserInfo($userReference, $username, '', true);
       $sender->_SetBreadcrumbs(t('Connections'), userUrl($sender->User, '', 'connections'));
       //check $GET state // if DashboardConnection // then do global connection.
-      $state = getValue('state', $_GET, false);
+      $state = val('state', $_GET, false);
       if ($state == 'DashboardConnection') {
          try {
             $tokens = Salesforce::getTokens($code, Salesforce::profileConnecUrl());
@@ -123,10 +123,10 @@ class SalesforcePlugin extends Gdn_Plugin {
             ->dispatch('home/error');
          return;
       }
-      $accessToken = getValue('access_token', $tokens);
-      $instanceUrl = getValue('instance_url', $tokens);
-      $loginID = getValue('id', $tokens);
-      $refreshToken = getValue('refresh_token', $tokens);
+      $accessToken = val('access_token', $tokens);
+      $instanceUrl = val('instance_url', $tokens);
+      $loginID = val('id', $tokens);
+      $refreshToken = val('refresh_token', $tokens);
       $salesforce = new Salesforce($accessToken, $instanceUrl);
       $profile = $salesforce->getLoginProfile($loginID);
       Gdn::userModel()->saveAuthentication([
@@ -177,7 +177,7 @@ class SalesforcePlugin extends Gdn_Plugin {
    public function controller_Disconnect() {
       $salesforce = Salesforce::instance();
       $salesforce->useDashboardConnection();
-      $token = getValue('token', $_GET, false);
+      $token = val('token', $_GET, false);
       if ($token) {
          $salesforce->revoke($token);
          removeFromConfig([
@@ -197,11 +197,11 @@ class SalesforcePlugin extends Gdn_Plugin {
    public function controller_Reconnect($sender) {
       $salesforce = Salesforce::instance();
       $salesforce->useDashboardConnection();
-      $token = getValue('token', $_GET, false);
+      $token = val('token', $_GET, false);
       if ($token) {
          $refreshResponse = $salesforce->refresh($token);
-         $accessToken = getValue('access_token', $refreshResponse);
-         $instanceUrl = getValue('instance_url', $refreshResponse);
+         $accessToken = val('access_token', $refreshResponse);
+         $instanceUrl = val('instance_url', $refreshResponse);
          saveToConfig([
             'Plugins.Salesforce.DashboardConnection.InstanceUrl' => $instanceUrl,
             'Plugins.Salesforce.DashboardConnection.Token' => $accessToken
@@ -230,14 +230,14 @@ class SalesforcePlugin extends Gdn_Plugin {
     */
    public function controller_Index($sender) {
       $salesforce = Salesforce::instance();
-      if (getValue('DashboardConnection', $_GET, false)) {
+      if (val('DashboardConnection', $_GET, false)) {
          $sender->setData('DashboardConnection', true);
          saveToConfig([
             'Plugins.Salesforce.DashboardConnection.Enabled' => true,
-            'Plugins.Salesforce.DashboardConnection.LoginId' => getValue('id', $_GET),
-            'Plugins.Salesforce.DashboardConnection.InstanceUrl' => getValue('instance_url', $_GET),
-            'Plugins.Salesforce.DashboardConnection.Token' => getValue('access_token', $_GET),
-            'Plugins.Salesforce.DashboardConnection.RefreshToken' => getValue('refresh_token', $_GET),
+            'Plugins.Salesforce.DashboardConnection.LoginId' => val('id', $_GET),
+            'Plugins.Salesforce.DashboardConnection.InstanceUrl' => val('instance_url', $_GET),
+            'Plugins.Salesforce.DashboardConnection.Token' => val('access_token', $_GET),
+            'Plugins.Salesforce.DashboardConnection.RefreshToken' => val('refresh_token', $_GET),
          ]);
 
          $sender->informMessage('Changes Saved to Config');
@@ -315,7 +315,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             'Class' => 'Popup'
          ];
          //remove create Create already created
-         $attachments = getValue('Attachments', $args['Discussion'], []);
+         $attachments = val('Attachments', $args['Discussion'], []);
          foreach ($attachments as $attachment) {
             if ($attachment['Type'] == 'salesforce-case') {
                unset($args['DiscussionOptions']['SalesforceCase']);
@@ -351,7 +351,7 @@ class SalesforcePlugin extends Gdn_Plugin {
          'Class' => 'Popup'
       ];
       //remove create Create already created
-      $attachments = getValue('Attachments', $args['Comment'], []);
+      $attachments = val('Attachments', $args['Comment'], []);
       foreach ($attachments as $attachment) {
          if ($attachment['Type'] == 'salesforce-case') {
             unset($args['CommentOptions']['SalesforceCase']);
@@ -643,7 +643,7 @@ class SalesforcePlugin extends Gdn_Plugin {
 
 
    protected function writeAndUpdateAttachments($sender, $args) {
-      $type = getValue('Type', $args);
+      $type = val('Type', $args);
 
       if ($type == 'Discussion') {
          $content = 'Discussion';
@@ -851,7 +851,7 @@ class SalesforcePlugin extends Gdn_Plugin {
     * @return bool
     */
    protected function isToBeUpdated($attachment, $type = 'salesforce-case') {
-      if (getValue('Status', $attachment) == $this->ClosedCaseStatusString) {
+      if (val('Status', $attachment) == $this->ClosedCaseStatusString) {
          return false;
       }
       $timeDiff = time() - strtotime($attachment['DateUpdated']);

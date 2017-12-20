@@ -52,7 +52,7 @@ function writeSalesforceLeadAttachment($attachment) {
                      <dd><?php echo Gdn_Format::date($attachment['LastModifiedDate'], 'html') ?></dd>
                      <dt><?php echo t('Company'); ?></dt>
                      <dd><?php echo Gdn_Format::text($attachment['Company']); ?></dd>
-                     <?php if (getValue('Title', $attachment)) { ?>
+                     <?php if (val('Title', $attachment)) { ?>
                         <dt><?php echo t('Title'); ?></dt>
                         <dd><?php echo Gdn_Format::text($attachment['Title']); ?></dd>
                      <?php } ?>
