@@ -109,7 +109,7 @@ class LinkedInPlugin extends Gdn_Plugin {
             'client_id' => $appID,
             'response_type' => 'code',
             'scope' => $scope,
-            'state' => substr(sha1(mt_rand()), 0, 8),
+            'state' => Gdn::session()->transientKey(),
             'redirect_uri' => $redirectUri];
 
         $signinHref = "https://www.linkedin.com/uas/oauth2/authorization?".http_build_query($query);
@@ -372,6 +372,11 @@ class LinkedInPlugin extends Gdn_Plugin {
      */
     public function profileController_linkedInConnect_create($sender, $code = false) {
         $sender->permission('Garden.SignIn.Allow');
+
+        $transientKey = Gdn::request()->get('state');
+        if (empty($transientKey) || Gdn::session()->validateTransientKey($transientKey) === false) {
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
+        }
 
         $userID = $sender->Request->get('userID');
 
