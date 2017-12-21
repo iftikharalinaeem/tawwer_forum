@@ -223,6 +223,7 @@ class GithubPlugin extends Gdn_Plugin {
      * @param bool|string $code Authorize Code.
      */
     public function profileController_githubConnect_create($sender, $userReference = '', $username = '', $code = false) {
+        $sender->permission('Garden.SignIn.Allow');
 
         if (Gdn::request()->get('error')) {
             $message = Gdn::request()->get('error_description');
@@ -239,7 +240,6 @@ class GithubPlugin extends Gdn_Plugin {
         if (stristr(Gdn::request()->url(), 'globallogin') !== false) {
             redirectTo('/plugin/github/connect?code='.Gdn::request()->get('code'));
         }
-        $sender->permission('Garden.SignIn.Allow');
 
         $sender->getUserInfo($userReference, $username, '', true);
         $sender->_SetBreadcrumbs(t('Connections'), userUrl($sender->User, '', 'connections'));
