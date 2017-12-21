@@ -3,77 +3,80 @@
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
+
 /**
  * Communicate with the Salesforce REST API
+ *
  * @link http://www.salesforce.com/us/developer/docs/api_rest/
  */
 class Salesforce {
 
-   /**
-    * @var Salesforce
-    */
-   static $Instance;
+    /**
+     * @var Salesforce
+     */
+    static $Instance;
 
-   const ProviderKey = 'Salesforce';
-
-   /**
-    * @var int time in seconds to cache GET requests; This will help limit you calls to the API for duplicate requests
-    */
-   protected $CacheTTL = 300;
-
-   /**
-    * @var string OAuth Access Token
-    */
-   protected $AccessToken;
-
-   /**
-    * @var String Instance URL Used for API Calls
-    */
-   protected $InstanceUrl;
-
-   /**
-    * @var string REST API Version
-    */
-   protected $APIVersion = '26.0';
-
-   public $DashboardConnection = false;
-
-   /**
-    * Set up Salesforce access properties.
-    *
-    * @param bool $accessToken
-    * @param bool $instanceUrl
-    */
-   public function __construct($accessToken = false, $instanceUrl = false) {
-      if ($accessToken && $instanceUrl) {
-         // We passed in a connection
-         $this->AccessToken = $accessToken;
-         $this->InstanceUrl = $instanceUrl;
-      } elseif (Gdn::session()->isValid()) {
-         // See if user has their own connection established.
-         if ($userConnection = val('Salesforce', Gdn::session()->User->Attributes)) {
-            $this->AccessToken = val('AccessToken', $userConnection);
-            $this->InstanceUrl = val('InstanceUrl', $userConnection);
-            $this->RefreshToken = val('RefreshToken', $userConnection);
-         }
-      }
-
-      // Fallback to global dashboard connection.
-      if (c('Plugins.Salesforce.DashboardConnection.Enabled') && !$this->AccessToken) {
-         $this->useDashboardConnection();
-         $this->DashboardConnection = true;
-      }
-   }
+    const ProviderKey = 'Salesforce';
 
     /**
-    * Return the singleton instance of this class.
-    * @return Salesforce
-    */
+     * @var int time in seconds to cache GET requests; This will help limit you calls to the API for duplicate requests
+     */
+    protected $CacheTTL = 300;
+
+    /**
+     * @var string OAuth Access Token
+     */
+    protected $AccessToken;
+
+    /**
+     * @var String Instance URL Used for API Calls
+     */
+    protected $InstanceUrl;
+
+    /**
+     * @var string REST API Version
+     */
+    protected $APIVersion = '26.0';
+
+    public $DashboardConnection = false;
+
+    /**
+     * Set up Salesforce access properties.
+     *
+     * @param bool $accessToken
+     * @param bool $instanceUrl
+     */
+    public function __construct($accessToken = false, $instanceUrl = false) {
+        if ($accessToken && $instanceUrl) {
+            // We passed in a connection
+            $this->AccessToken = $accessToken;
+            $this->InstanceUrl = $instanceUrl;
+        } elseif (Gdn::session()->isValid()) {
+            // See if user has their own connection established.
+            if ($userConnection = val('Salesforce', Gdn::session()->User->Attributes)) {
+                $this->AccessToken = val('AccessToken', $userConnection);
+                $this->InstanceUrl = val('InstanceUrl', $userConnection);
+                $this->RefreshToken = val('RefreshToken', $userConnection);
+            }
+        }
+
+        // Fallback to global dashboard connection.
+        if (c('Plugins.Salesforce.DashboardConnection.Enabled') && !$this->AccessToken) {
+            $this->useDashboardConnection();
+            $this->DashboardConnection = true;
+        }
+    }
+
+    /**
+     * Return the singleton instance of this class.
+     *
+     * @return Salesforce
+     */
     public static function instance() {
         if (!isset(self::$Instance)) {
             self::$Instance = new Salesforce();
         }
-            return self::$Instance;
+        return self::$Instance;
     }
 
     /**
@@ -87,17 +90,17 @@ class Salesforce {
     }
 
     /**
-    * @param string $object Case, Contact, Lead
-    * @param string $objectID CaseId, ContactID, LeadID
-    * @param bool|array $fullHttpResponse if true will return array with
-    *    [ContentType]
-    *    [Response]
-    *    [HttpCode]
-    *    [Headers]
-    * @return array All the details returned from Salesforce
-    */
+     * @param string $object Case, Contact, Lead
+     * @param string $objectID CaseId, ContactID, LeadID
+     * @param bool|array $fullHttpResponse if true will return array with
+     *    [ContentType]
+     *    [Response]
+     *    [HttpCode]
+     *    [Headers]
+     * @return array All the details returned from Salesforce
+     */
     public function getObject($object, $objectID, $fullHttpResponse = false) {
-        $result = $this->request('sobjects/' . $object . '/' . $objectID);
+        $result = $this->request('sobjects/'.$object.'/'.$objectID);
         if ($fullHttpResponse) {
             return $result;
         } else {
@@ -106,42 +109,42 @@ class Salesforce {
     }
 
     /**
-    * @param string $contactID
-    * @return array All the details returned from Salesforce
-    */
+     * @param string $contactID
+     * @return array All the details returned from Salesforce
+     */
     public function getContact($contactID) {
         $result = $this->getObject('Contact', $contactID);
         return $result;
     }
 
     /**
-    * @param string $leadID
-    * @return array All the details returned from Salesforce
-    */
+     * @param string $leadID
+     * @return array All the details returned from Salesforce
+     */
     public function getLead($leadID) {
         return $this->getObject('Lead', $leadID, true);
     }
 
     /**
-    * @param string $accountID
-    * @return array All the details returned from Salesforce
-    */
+     * @param string $accountID
+     * @return array All the details returned from Salesforce
+     */
     public function getAccount($accountID) {
         return $this->getObject('Account', $accountID);
     }
 
     /**
-    * @param string $userID
-    * @return array All the details returned from Salesforce
-    */
+     * @param string $userID
+     * @return array All the details returned from Salesforce
+     */
     public function getUser($userID) {
         return $this->getObject('User', $userID);
     }
 
     /**
-    * @param string $email
-    * @return array|bool false if not found or All the details returned from Salesforce
-    */
+     * @param string $email
+     * @return array|bool false if not found or All the details returned from Salesforce
+     */
     public function findLead($email) {
         $result = $this->select(['id'], 'Lead', ['Email' => $email], 1);
         if ($result['totalSize'] != 1) {
@@ -151,9 +154,9 @@ class Salesforce {
     }
 
     /**
-    * @param string $email
-    * @return array|bool false if not found or All the details returned from Salesforce
-    */
+     * @param string $email
+     * @return array|bool false if not found or All the details returned from Salesforce
+     */
     public function findUser($email) {
         $result = $this->select(['id'], 'User', ['Email' => $email], 1);
         if ($result['totalSize'] != 1) {
@@ -163,9 +166,9 @@ class Salesforce {
     }
 
     /**
-    * @param string $email
-    * @return array|bool false if not found or All the details returned from Salesforce
-    */
+     * @param string $email
+     * @return array|bool false if not found or All the details returned from Salesforce
+     */
     public function findContact($email) {
         $result = $this->select(['id'], 'Contact', ['Email' => $email], 1);
         if ($result['totalSize'] != 1) {
@@ -175,34 +178,34 @@ class Salesforce {
     }
 
     /**
-    * @param string $caseID
-    * @return array All the details returned from Salesforce
-    */
+     * @param string $caseID
+     * @return array All the details returned from Salesforce
+     */
     public function getCase($caseID) {
         $result = $this->getObject('Case', $caseID, true);
         return $result;
     }
 
     /**
-    * Create a new Lead Object in Salesforce
-    *
-    * @link http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_lead.htm
-    * @see Salesforce::ValidateLead
-    * @param array $lead
-    * @return string LeadID
-    * @throws Gdn_UserException
-    */
+     * Create a new Lead Object in Salesforce
+     *
+     * @link http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_lead.htm
+     * @see Salesforce::ValidateLead
+     * @param array $lead
+     * @return string LeadID
+     * @throws Gdn_UserException
+     */
     public function createLead(array $lead) {
         if ($this->validateLead($lead) === true) {
             return $this->createObject('Lead', $lead);
         }
-        throw new Gdn_UserException('Create Lead: Required Fields Missing: ' . print_r($this->validateLead($lead)));
+        throw new Gdn_UserException('Create Lead: Required Fields Missing: '.print_r($this->validateLead($lead)));
     }
 
     /**
-    * @param array $lead
-    * @return array|bool True or array of missing required fields
-    */
+     * @param array $lead
+     * @return array|bool True or array of missing required fields
+     */
     public function validateLead(array $lead) {
         $requiredFields = [
             'LastName' => true,
@@ -225,25 +228,25 @@ class Salesforce {
     }
 
     /**
-    * Create a new Contact Object in Salesforce
-    *
-    * @link http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_contact.htm
-    * @see Salesforce::ValidateContact
-    * @param array $contact
-    * @return string ContactID
-    * @throws Gdn_UserException
-    */
+     * Create a new Contact Object in Salesforce
+     *
+     * @link http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_contact.htm
+     * @see Salesforce::ValidateContact
+     * @param array $contact
+     * @return string ContactID
+     * @throws Gdn_UserException
+     */
     public function createContact(array $contact) {
         if ($this->validateContact($contact) === true) {
             return $this->createObject('Contact', $contact);
         }
-        throw new Gdn_UserException('Create Contact: Required Fields Missing: '. print_r($this->validateContact($contact)));
+        throw new Gdn_UserException('Create Contact: Required Fields Missing: '.print_r($this->validateContact($contact)));
     }
 
     /**
-    * @param array $contact
-    * @return array|bool True or array of missing required fields
-    */
+     * @param array $contact
+     * @return array|bool True or array of missing required fields
+     */
     public function validateContact(array $contact) {
         $requiredFields = [
             'LastName' => true,
@@ -265,25 +268,25 @@ class Salesforce {
 
 
     /**
-    * Create a new Case Object in Salesforce
-    *
-    * @link http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_case.htm
-    * @see Salesforce::ValidateCase
-    * @param array $case
-    * @return string CaseID
-    * @throws Gdn_UserException
-    */
+     * Create a new Case Object in Salesforce
+     *
+     * @link http://www.salesforce.com/us/developer/docs/api/Content/sforce_api_objects_case.htm
+     * @see Salesforce::ValidateCase
+     * @param array $case
+     * @return string CaseID
+     * @throws Gdn_UserException
+     */
     public function createCase(array $case) {
         if ($this->validateCase($case) === true) {
             return $this->createObject('Case', $case);
         }
-        throw new Gdn_UserException('Create Case: Required Fields Missing: '. print_r($this->validateContact($case)));
+        throw new Gdn_UserException('Create Case: Required Fields Missing: '.print_r($this->validateContact($case)));
     }
 
     /**
-    * @param array $case
-    * @return array|bool True or array of missing required fields
-    */
+     * @param array $case
+     * @return array|bool True or array of missing required fields
+     */
     public function validateCase(array $case) {
         $requiredFields = [
             'ContactId' => true,
@@ -307,13 +310,13 @@ class Salesforce {
     }
 
     /**
-    * @param $object
-    * @param array $fields
-    * @return mixed
-    * @throws Gdn_UserException
-    */
+     * @param $object
+     * @param array $fields
+     * @return mixed
+     * @throws Gdn_UserException
+     */
     public function createObject($object, array $fields) {
-        $response = $this->request('sobjects/' . $object . '/', json_encode($fields));
+        $response = $this->request('sobjects/'.$object.'/', json_encode($fields));
         if (isset($response['Response']['success'])) {
             return $response['Response']['id'];
         }
@@ -321,20 +324,20 @@ class Salesforce {
     }
 
     /**
-    * Preform a SELECT query using SOQL
-    *
-    * @param array $fields
-    * @param $from
-    * @param array $where
-    * @param int $limit
-    * @return array Response from SFDC; Hopefully a Valid Object
-    *    [done] - bool
-    *    [totalSize] - int
-    *    [records] - array
-    *       with the fields from $fields
-    *
-    * @link http://www.salesforce.com/us/developer/docs/soql_sosl/index.htm
-    */
+     * Preform a SELECT query using SOQL
+     *
+     * @param array $fields
+     * @param $from
+     * @param array $where
+     * @param int $limit
+     * @return array Response from SFDC; Hopefully a Valid Object
+     *    [done] - bool
+     *    [totalSize] - int
+     *    [records] - array
+     *       with the fields from $fields
+     *
+     * @link http://www.salesforce.com/us/developer/docs/soql_sosl/index.htm
+     */
     public function select(array $fields, $from, array $where, $limit = 0) {
         $select = implode(', ', $fields);
         $whereClause = 'WHERE ';
@@ -356,12 +359,12 @@ class Salesforce {
     }
 
     /**
-    * Get User Profile fields.
-    *
-    * @param string $loginID - id from the Access Tokens after successful OAuth
-    * @return array $profile
-    * @throws Exception
-    */
+     * Get User Profile fields.
+     *
+     * @param string $loginID - id from the Access Tokens after successful OAuth
+     * @return array $profile
+     * @throws Exception
+     */
     public function getLoginProfile($loginID) {
         $httpResponse = $this->httpRequest($loginID);
         if ($httpResponse['HttpCode'] != 200) {
@@ -378,9 +381,9 @@ class Salesforce {
     }
 
     /**
-    * @return string the <option> string for Form
-    * @throws Gdn_UserException
-    */
+     * @return string the <option> string for Form
+     * @throws Gdn_UserException
+     */
     public function getLeadStatusOptions() {
         $options = '';
         $response = $this->request('sobjects/Lead/describe');
@@ -394,7 +397,7 @@ class Salesforce {
                     if ($pickListValue['defaultValue'] == true) {
                         $options .= 'selected';
                     }
-                
+
                     $options .= ' value="'.$pickListValue['value'].'">'.$pickListValue['label'].'</option>'."\n";
                 }
             }
@@ -403,9 +406,9 @@ class Salesforce {
     }
 
     /**
-    * @return string the <option> string for Form
-    * @throws Gdn_UserException
-    */
+     * @return string the <option> string for Form
+     * @throws Gdn_UserException
+     */
     public function getCaseStatusOptions() {
         $options = '';
         $response = $this->request('sobjects/Case/describe');
@@ -427,9 +430,9 @@ class Salesforce {
     }
 
     /**
-    * @return string the <option> string for Form
-    * @throws Gdn_UserException
-    */
+     * @return string the <option> string for Form
+     * @throws Gdn_UserException
+     */
     public function getCasePriorityOptions() {
         $options = '';
         $response = $this->request('sobjects/Case/describe');
@@ -451,24 +454,24 @@ class Salesforce {
     }
 
     /**
-    * Sends Request to the Salesforces REST API.
-    *
-    * @param $path
-    * @param bool|array $post false or array of values to be sent as json POST
-    * @param bool $cache
-    * @return array $httpResponse with the following keys
-    *    [HttpCode] - HTTP Status Code
-    *    [Response] - JSON Decoded Values if Content Type == Json
-    *    [Header] - HTTP Header
-    *    [ContentType] - HTTP Content Type
-    * @throws Gdn_UserException
-    *
-    * @see http://www.salesforce.com/us/developer/docs/api_rest/
-    */
+     * Sends Request to the Salesforces REST API.
+     *
+     * @param $path
+     * @param bool|array $post false or array of values to be sent as json POST
+     * @param bool $cache
+     * @return array $httpResponse with the following keys
+     *    [HttpCode] - HTTP Status Code
+     *    [Response] - JSON Decoded Values if Content Type == Json
+     *    [Header] - HTTP Header
+     *    [ContentType] - HTTP Content Type
+     * @throws Gdn_UserException
+     *
+     * @see http://www.salesforce.com/us/developer/docs/api_rest/
+     */
     public function request($path, $post = false, $cache = true) {
         $url = $this->InstanceUrl.'/services/data/v'.$this->APIVersion.'/'.ltrim($path, '/');
         $cacheKey = 'Salesforce.Request'.md5($url);
-    
+
         if ($cache && !$post) {
             $httpResponse = Gdn::cache()->get($cacheKey, [Gdn_Cache::FEATURE_COMPRESS => true]);
             if ($httpResponse) {
@@ -490,31 +493,31 @@ class Salesforce {
             }
         }
         if ($cache && $httpResponse['HttpCode'] == 200 && !$post) {
-        $cacheTTL = $this->CacheTTL + rand(0, 30);
+            $cacheTTL = $this->CacheTTL + rand(0, 30);
             Gdn::cache()->store($cacheKey, $httpResponse, [
-                    Gdn_Cache::FEATURE_EXPIRY  => $cacheTTL,
-                    Gdn_Cache::FEATURE_COMPRESS => true
-                ]);
+                Gdn_Cache::FEATURE_EXPIRY => $cacheTTL,
+                Gdn_Cache::FEATURE_COMPRESS => true
+            ]);
         }
         return $httpResponse;
     }
 
     /**
-    * Send an HTTP request to Salesforce with Authorize header.
-    *
-    * @param string $url -
-    * @param bool|array $post
-    * @param string|bull AccessToken
-    * @return array $HttpResponse with the following keys
-    *    [HttpCode] - HTTP Status Code
-    *    [Response] - HTTP Body
-    *    [Header] - HTTP Header
-    *    [ContentType] - HTTP Content Type
-    * @throws Exception
-    */
+     * Send an HTTP request to Salesforce with Authorize header.
+     *
+     * @param string $url -
+     * @param bool|array $post
+     * @param string|bull AccessToken
+     * @return array $HttpResponse with the following keys
+     *    [HttpCode] - HTTP Status Code
+     *    [Response] - HTTP Body
+     *    [Header] - HTTP Header
+     *    [ContentType] - HTTP Content Type
+     * @throws Exception
+     */
     public function httpRequest($url, $post = false, $requestContentType = null) {
         $proxy = new ProxyRequest();
-        $options['URL'] =  $url;
+        $options['URL'] = $url;
         $options['Method'] = 'GET';
         $options['ConnectTimeout'] = 10;
         $options['Timeout'] = 10;
@@ -522,13 +525,13 @@ class Salesforce {
         if (!empty($requestContentType)) {
             $headers['Content-Type'] = $requestContentType;
         }
-        if ($post)  {
+        if ($post) {
             $options['Method'] = 'POST';
             $queryParams = $post;
         }
         $headers['Authorization'] = 'OAuth '.$this->AccessToken;
-        trace('Salesforce Request - '.$options['Method']. ' : '.$url);
-    
+        trace('Salesforce Request - '.$options['Method'].' : '.$url);
+
         // log the query params being sent to salesforce
         Logger::event(
             'salesforce_data_sent',
@@ -536,18 +539,18 @@ class Salesforce {
             'Post data being sent to salesforce',
             (array)$post
         );
-    
+
         $response = $proxy->request(
-                $options,
-                $queryParams,
-                null,
-                $headers
-            );
+            $options,
+            $queryParams,
+            null,
+            $headers
+        );
         $failureCodes = [500 => true];
         if (isset($failureCodes[$proxy->ResponseStatus])) {
             throw new Gdn_UserException('HTTP Error communicating with Salesforce.  Code: '.$proxy->ResponseStatus);
         }
-    
+
         return [
             'HttpCode' => $proxy->ResponseStatus,
             'Header' => $proxy->RequestHeaders,
@@ -558,8 +561,8 @@ class Salesforce {
     }
 
     /**
-    * @return bool
-    */
+     * @return bool
+     */
     public function isConnected() {
         if (!$this->AccessToken || !$this->InstanceUrl) {
             return false;
@@ -568,11 +571,11 @@ class Salesforce {
     }
 
     /**
-    * Reestablishes a valid token session with Salesforce using refresh_token.
-    *
-    * @throws Gdn_UserException
-    * @see refresh()
-    */
+     * Reestablishes a valid token session with Salesforce using refresh_token.
+     *
+     * @throws Gdn_UserException
+     * @see refresh()
+     */
     public function reconnect() {
         if ($this->DashboardConnection) {
             $response = $this->refresh($this->RefreshToken);
@@ -611,12 +614,12 @@ class Salesforce {
     }
 
     /**
-    * Revoke an access token.
-    *
-    * @param $token
-    * @return bool
-    * @throws Gdn_UserException
-    */
+     * Revoke an access token.
+     *
+     * @param $token
+     * @return bool
+     * @throws Gdn_UserException
+     */
     public function revoke($token) {
         $response = $this->httpRequest(c('Plugins.Salesforce.AuthenticationUrl').'/services/oauth2/revoke?token='.$token);
         if ($response['HttpCode'] == 200) {
@@ -626,13 +629,13 @@ class Salesforce {
     }
 
     /**
-    * Sends refresh_token to Salesforce API and simply returns the response.
-    *
-    * @param $token
-    * @return bool|mixed On success, returns entire API response.
-    * @throws Gdn_UserException
-    * @see reconnect() is probably what you want.
-    */
+     * Sends refresh_token to Salesforce API and simply returns the response.
+     *
+     * @param $token
+     * @return bool|mixed On success, returns entire API response.
+     * @throws Gdn_UserException
+     * @see reconnect() is probably what you want.
+     */
     public function refresh($token) {
         $response = $this->httpRequest(
             c('Plugins.Salesforce.AuthenticationUrl').'/services/oauth2/token',
@@ -656,12 +659,12 @@ class Salesforce {
     }
 
     /**
-    * Used in the OAuth process.
-    *
-    * @param bool|string $redirectUri
-    * @param bool|string $state
-    * @return string Authorize URL
-    */
+     * Used in the OAuth process.
+     *
+     * @param bool|string $redirectUri
+     * @param bool|string $state
+     * @return string Authorize URL
+     */
     public static function authorizeUri($redirectUri = false, $state = false) {
         $appID = c('Plugins.Salesforce.ApplicationID');
         if (!$redirectUri) {
@@ -676,16 +679,16 @@ class Salesforce {
         if ($state) {
             $query['state'] = $state;
         }
-        $return = c('Plugins.Salesforce.AuthenticationUrl')."/services/oauth2/authorize?".http_build_query($query, null , "&");
+        $return = c('Plugins.Salesforce.AuthenticationUrl')."/services/oauth2/authorize?".http_build_query($query, null, "&");
         return $return;
     }
 
     /**
-    * Used in the OAuth process.
-    *
-    * @param null $newValue a different redirect url
-    * @return null|string
-    */
+     * Used in the OAuth process.
+     *
+     * @param null $newValue a different redirect url
+     * @return null|string
+     */
     public static function redirectUri($newValue = null) {
         if ($newValue !== null) {
             $redirectUri = $newValue;
@@ -702,13 +705,13 @@ class Salesforce {
     }
 
     /**
-    * Used in the Oath process.
-    *
-    * @param $code - OAuth Code
-    * @param $redirectUri - Redirect Uri
-    * @return string Response
-    * @throws Gdn_UserException
-    */
+     * Used in the Oath process.
+     *
+     * @param $code - OAuth Code
+     * @param $redirectUri - Redirect Uri
+     * @return string Response
+     * @throws Gdn_UserException
+     */
     public static function getTokens($code, $redirectUri) {
         $post = [
             'grant_type' => 'authorization_code',
@@ -722,7 +725,7 @@ class Salesforce {
         $response = $proxy->request(
             ['URL' => $url, 'Method' => 'POST'],
             $post
-            );
+        );
 
         if (strpos($proxy->ContentType, 'application/json') !== false) {
             $response = json_decode($response);
@@ -736,19 +739,19 @@ class Salesforce {
     }
 
     /**
-    * Used in the OAuth process.
-    *
-    * @return string $Url
-    */
+     * Used in the OAuth process.
+     *
+     * @return string $Url
+     */
     public static function profileConnecUrl() {
         return Gdn::request()->url('/profile/salesforceconnect', true, true, true);
     }
 
     /**
-    * Used in the OAuth process.
-    *
-    * @return bool
-    */
+     * Used in the OAuth process.
+     *
+     * @return bool
+     */
     public static function isConfigured() {
         $appID = c('Plugins.Salesforce.ApplicationID');
         $secret = c('Plugins.Salesforce.Secret');
@@ -759,19 +762,19 @@ class Salesforce {
     }
 
     /**
-    * Setter for AccessToken.
-    *
-    * @param $accessToken
-    */
+     * Setter for AccessToken.
+     *
+     * @param $accessToken
+     */
     public function setAccessToken($accessToken) {
         $this->AccessToken = $accessToken;
     }
 
     /**
-    * Setter for InstanceUrl.
-    *
-    * @param $instanceUrl
-    */
+     * Setter for InstanceUrl.
+     *
+     * @param $instanceUrl
+     */
     public function setInstanceUrl($instanceUrl) {
         $this->InstanceUrl = $instanceUrl;
     }
