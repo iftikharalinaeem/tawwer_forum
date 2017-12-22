@@ -676,7 +676,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
 
                   // No point saving banned users to invitation table.
                   if (!$banned) {
-                     $invite_success = $invitation_model->save($form_post_values, $user_model, [
+                     $invite_success = $invitation_model->save($form_post_values, [
                          'SendEmail' => $send_invite_email,
                          'Resend' => true
                      ]);
