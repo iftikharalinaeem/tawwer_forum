@@ -1,16 +1,17 @@
 jQuery(document).ready(function($) {
     var HideTopbarPlugin = function () {
-        // this plugin overrides the Topbar component to return nothing
+        // This plugin overrides the Topbar component to return nothing
         return {
             components: {
+                info: function() { return null },
                 Topbar: function() { return null }
             }
         }
-    }
+    };
 
     window.ui = SwaggerUIBundle({
-        url: gdn.url('/api/v2/swagger'),
-        dom_id: '#swagger-ui',
+        url: gdn.url("/api/v2/swagger"),
+        dom_id: "#swagger-ui",
         deepLinking: true,
         presets: [
             SwaggerUIBundle.presets.apis,
@@ -22,16 +23,10 @@ jQuery(document).ready(function($) {
         ],
         layout: "StandaloneLayout",
         validatorUrl: null,
-        // filter: true,
         requestInterceptor: function (request) {
-            request.headers['x-transient-key'] = gdn.getMeta('TransientKey');
+            request.headers["x-transient-key"] = gdn.getMeta("TransientKey");
+            return request;
         }
     });
 
 });
-//
-// (function(window, $) {
-//     $(document).on("ajaxSend", function (e, f, g) {
-//         console.log(e);
-//     });
-// })(window, jQuery);
