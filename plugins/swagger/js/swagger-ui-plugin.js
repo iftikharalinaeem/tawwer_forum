@@ -3,6 +3,7 @@ jQuery(document).ready(function($) {
         // This plugin overrides the Topbar component to return nothing
         return {
             components: {
+                contentType: function() { return null },
                 info: function() { return null },
                 Topbar: function() { return null }
             }
