@@ -209,6 +209,10 @@ class TermsManagerPlugin extends Gdn_Plugin {
             }
 
             $sender->Form->setFormValue('ConnectName', $connectName);
+        } elseif (val('UserID', $user)) {
+            // If a the user exists, and they have submitted the terms form, update the User table.
+            Gdn::userModel()->save(['UserID' => val('UserID', $user), 'Terms' => $sender->Form->getFormValue('Terms')]);
+            return;
         }
 
         // If there is no name, exiting user or connectname created, show the ConnectName form field in connect view.
@@ -235,18 +239,23 @@ class TermsManagerPlugin extends Gdn_Plugin {
             return;
         }
 
-        // If Admin wants users to opt in again when the custom terms have changed.
-        if (val('ForceRenew', $terms)) {
-            $email = $sender->Form->getFormValue('Email');
-            $user = Gdn::userModel()->getByEmail($email);
-            if (!$user) {
-                $user = Gdn::userModel()->getByUsername($email);
-            }
+        // Find out if it is an existing user.
+        $email = $sender->Form->getFormValue('Email');
+        $user = Gdn::userModel()->getByEmail($email);
+        if (!$user) {
+            $user = Gdn::userModel()->getByUsername($email);
+        }
 
-            // If the user has already opted-in
-            if (val('Terms', $user) === val('TermsOfUseID', $terms)) {
-                return;
-            }
+        // If it is an existing user and Admin who has agreed to most recent terms and Admin is not
+        // forcing to users to re-opt-in, don't validate checking the terms.
+        $isUpToDate = (val('Terms', $user) === val('TermsOfUseID', $terms));
+        $forceRenew = val('ForceRenew', $terms);
+        if ($isUpToDate) {
+            return;
+        }
+
+        if (!$isUpToDate && !$forceRenew && val('UserID', $user)) {
+            return;
         }
 
         // "Manually" flag SSO connections because the form is not being posted back.
@@ -270,23 +279,37 @@ class TermsManagerPlugin extends Gdn_Plugin {
             return;
         }
 
+        // Find out if this is an existing user connecting.
+        $email = $sender->Form->getFormValue('Email');
+        $user = Gdn::userModel()->getByEmail($email);
+        if (!$user) {
+            $user = Gdn::userModel()->getByUsername($email);
+        }
+
+        // If it is an existing user and Admin who has agreed to most recent terms and Admin is not
+        // forcing to users to re-opt-in, don't validate checking the terms.
+        $isUpToDate = (val('Terms', $user) === val('TermsOfUseID', $terms));
+        $forceRenew = val('ForceRenew', $terms);
+
+        if ($isUpToDate) {
+            return;
+        }
+
+        // is and existing user whose Terms hasn't been checked but ForceRenew is off.
+        if (!$isUpToDate && !$forceRenew && val('UserID', $user)) {
+            return;
+        }
+
         $sender->Head->addCss('/plugins/termsmanager/design/termsmanager.css');
         // If client has not specified that they would like to show both default and custom terms, hide custom terms with CSS
         if (!c('TermsManager.ShowDefault')) {
             $sender->Head->addString('<style type="text/css">.DefaultTermsLabel {display: none !important}</style>');
         }
 
-        // If Admin wants users to opt in again, if the Terms have changed.
-        if (val('ForceRenew', $terms)) {
-            $email = $sender->Form->getFormValue('Email');
-            $user = Gdn::userModel()->getByEmail($email);
-            if (!$user) {
-                $user = Gdn::userModel()->getByUsername($email);
-            }
-
-            if (val('Terms', $user) === val('TermsOfUseID', $terms)) {
-                return;
-            }
+        // If it is an existing user and Admin who has agreed to most recent terms and Admin is not
+        // forcing to users to re-opt-in, don't present a checkbox and the terms.
+        if (val('Terms', $user) === val('TermsOfUseID', $terms) && val('ForceRenew', $terms)) {
+            return;
         }
 
         $messageClass = 'InfoMessage';
