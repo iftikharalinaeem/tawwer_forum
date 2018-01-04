@@ -37,11 +37,7 @@ class SwaggerPlugin extends Gdn_Plugin {
         }
 
         $folder = 'plugins/'.$this->getAddon()->getKey();
-        $scripts = [
-            'swagger-ui-bundle.js',
-            'swagger-ui-standalone-preset.js',
-            'swagger-ui-plugin.js'
-        ];
+        $scripts = ['js/custom.js'];
         foreach ($scripts as $path) {
             $search = AssetModel::jsPath($path, $folder);
             if (!$search) {
@@ -62,7 +58,6 @@ class SwaggerPlugin extends Gdn_Plugin {
         $folder = 'plugins/'.$this->getAddon()->getKey();
 
         $sender->addCssFile('swagger-ui.css', $folder);
-        $sender->addCssFile('swagger-ui-plugin.css', $folder);
 
         $sender->title(t('Vanilla API v2'));
         $sender->render('swagger', 'settings', $folder);

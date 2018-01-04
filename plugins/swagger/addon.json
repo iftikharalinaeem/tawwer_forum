@@ -16,5 +16,7 @@
         }
     ],
     "icon": "swagger.png",
-    "buildProcessVersion": "1.0"
+    "build": {
+        "processVersion": "v1"
+    }
 }
