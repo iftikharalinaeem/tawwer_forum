@@ -556,6 +556,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             'redirect_uri' => $redirectUri,
             'client_id' => $appID,
             'scope' => 'read write',
+            'state' => Gdn::session()->transientKey(),
 
         ];
         return c('Plugins.Zendesk.Url').'/oauth/authorizations/new?'.http_build_query($query);
@@ -713,6 +714,12 @@ class ZendeskPlugin extends Gdn_Plugin {
         $code = false
     ) {
         $sender->permission('Garden.SignIn.Allow');
+
+        $transientKey = Gdn::request()->get('state');
+        if (empty($transientKey) || Gdn::session()->validateTransientKey($transientKey) === false) {
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
+        }
+
         $sender->getUserInfo($userReference, $username, '', true);
         $sender->_SetBreadcrumbs(t('Connections'), userUrl($sender->User, '', 'connections'));
 

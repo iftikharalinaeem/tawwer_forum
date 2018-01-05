@@ -658,28 +658,27 @@ class Salesforce {
         return false;
     }
 
-    /**
-     * Used in the OAuth process.
-     *
-     * @param bool|string $redirectUri
-     * @param bool|string $state
-     * @return string Authorize URL
-     */
-    public static function authorizeUri($redirectUri = false, $state = false) {
+    public static function authorizeUri($redirectUri = false, $extraStateParameters = []) {
         $appID = c('Plugins.Salesforce.ApplicationID');
         if (!$redirectUri) {
             $redirectUri = self::redirectUri();
         }
+
+        // Backward compatibility
+        if (!is_array($extraStateParameters)) {
+            $extraStateParameters = ['type' => $extraStateParameters];
+        }
+
         $query = [
             'redirect_uri' => $redirectUri,
             'client_id' => $appID,
             'response_type' => 'code',
-            'scope' => 'full refresh_token'
+            'scope' => 'full refresh_token',
+            'state' => json_encode(
+                ['transientKey' => Gdn::session()->transientKey()] + $extraStateParameters
+            ),
         ];
-        if ($state) {
-            $query['state'] = $state;
-        }
-        $return = c('Plugins.Salesforce.AuthenticationUrl')."/services/oauth2/authorize?".http_build_query($query, null, "&");
+        $return = c('Plugins.Salesforce.AuthenticationUrl')."/services/oauth2/authorize?".http_build_query($query, null , "&");
         return $return;
     }
 
