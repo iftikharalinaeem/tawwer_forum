@@ -1,20 +1,11 @@
-.swagger-ui {
-    @import 'mixins';
-    @import 'variables';
-    @import 'colors';
-    @import 'type';
-    @import 'layout';
-    @import 'buttons';
-    @import 'form';
-    @import 'modal';
-    @import 'models';
-    @import 'table';
-    @import 'topbar';
-    //@import 'information';
-    @import 'authorize';
-    @import 'errors';
-    @include text_body();
-    @import 'split-pane-mode';
-}
+@import "./node_modules/swagger-ui/dist/swagger-ui";
 
-@import 'custom';
+.swagger-ui {
+  .body-param-options { display: none; }
+
+  .opblock {
+    .opblock-section-header {
+      label { display: none; }
+    }
+  }
+}
