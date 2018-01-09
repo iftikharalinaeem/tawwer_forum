@@ -450,11 +450,12 @@ class SalesforcePlugin extends Gdn_Plugin {
             $sender->Form->validateRule('LastName', 'function:ValidateRequired', 'Last Name is required');
             $sender->Form->validateRule('Email', 'function:ValidateRequired', 'Email is required');
             $sender->Form->validateRule('Company', 'function:ValidateRequired', 'Company is required');
+            $sender->fireEvent('ValidateLead');
             // If no errors
             if ($sender->Form->errorCount() == 0) {
                 $formValues = $sender->Form->formValues();
                 // Create Lead in salesforce
-                $leadID = $salesforce->createLead([
+                $leadData = [
                     'FirstName' => $formValues['FirstName'],
                     'LastName' => $formValues['LastName'],
                     'Email' => $formValues['Email'],
@@ -464,9 +465,12 @@ class SalesforcePlugin extends Gdn_Plugin {
                     'Status' => $formValues['Status'],
                     'Vanilla__ForumUrl__c' => $formValues['ForumUrl'],
                     'Description' => $formValues['Description']
-                ]);
+                ];
+                $sender->EventArguments['LeadData'] = &$leadData;
+                $sender->fireEvent('SendingLeadData');
+                $leadID = $salesforce->createLead($leadData);
                 // Save Lead information in our Attachment Table
-                $iD = $attachmentModel->save([
+                $attachmentData = [
                     'Type' => 'salesforce-lead',
                     'ForeignID' => $attachmentModel->rowID($content),
                     'ForeignUserID' => $content->InsertUserID,
@@ -479,7 +483,10 @@ class SalesforcePlugin extends Gdn_Plugin {
                     'Title' => $formValues['Title'],
                     'Status' => $formValues['Status'],
                     'LastModifiedDate' => Gdn_Format::toDateTime(),
-                ]);
+                ];
+                $sender->EventArguments['attachmentData'] = &$attachmentData;
+                $sender->fireEvent('SavingLeadAttachment');
+                $iD = $attachmentModel->save($attachmentData);
 
                 if (!$iD) {
                     $sender->Form->setValidationResults($attachmentModel->validationResults());
@@ -488,7 +495,6 @@ class SalesforcePlugin extends Gdn_Plugin {
                 $sender->jsonTarget('', $url, 'Redirect');
                 $sender->informMessage('Salesforce Lead Created.');
             }
-
         }
         list($firstName, $lastName) = $this->getFirstNameLastName($user->Name);
         try {
@@ -568,6 +574,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             $sender->Form->validateRule('FirstName', 'function:ValidateRequired', 'First Name is required');
             $sender->Form->validateRule('LastName', 'function:ValidateRequired', 'Last Name is required');
             $sender->Form->validateRule('Email', 'function:ValidateRequired', 'Email is required');
+            $sender->fireEvent('ValidateCase');
             //if no errors
             if ($sender->Form->errorCount() == 0 && $attachmentModel->validate($sender->Form->formValues())) {
                 $formValues = $sender->Form->formValues();
@@ -576,15 +583,19 @@ class SalesforcePlugin extends Gdn_Plugin {
                 $contact = $salesforce->findContact($formValues['Email']);
                 if (!$contact['Id']) {
                     //If not a contact then add contact
-                    $contact['Id'] = $salesforce->createContact([
-                        'FirstName' => $formValues['FirstName'],
-                        'LastName' => $formValues['LastName'],
-                        'Email' => $formValues['Email'],
-                        'LeadSource' => $formValues['LeadSource'],
-                    ]);
+                   $contactData = [
+                            'FirstName' => $formValues['FirstName'],
+                            'LastName' => $formValues['LastName'],
+                            'Email' => $formValues['Email'],
+                            'LeadSource' => $formValues['LeadSource'],
+                   ];
+                   $sender->EventArguments['ContactData'] = &$contactData;
+                   $sender->fireEvent('CreateSalesforceContact');
+                   $contact['Id'] = $salesforce->createContact($contactData);
                 }
+
                 //Create Case using salesforce API
-                $caseID = $salesforce->createCase([
+                $caseData = [
                     'ContactId' => $contact['Id'],
                     'Status' => $formValues['Status'],
                     'Origin' => $formValues['Origin'],
@@ -592,9 +603,13 @@ class SalesforcePlugin extends Gdn_Plugin {
                     'Subject' => $sender->DiscussionModel->getID($content->DiscussionID)->Name,
                     'Description' => $formValues['Body'],
                     'Vanilla__ForumUrl__c' => $formValues['SourceUri']
-                ]);
-                //Save information to our Attachment Table
-                $iD = $attachmentModel->save([
+                ];
+                $sender->EventArguments['CaseData'] = &$caseData;
+                $sender->fireEvent('SendingCaseData');
+                $caseID = $salesforce->createCase($caseData);
+
+                    //Save information to our Attachment Table
+                $attachmentData = [
                     'Type' => 'salesforce-case',
                     'ForeignID' => $attachmentModel->rowID($content),
                     'ForeignUserID' => $content->InsertUserID,
@@ -604,15 +619,16 @@ class SalesforcePlugin extends Gdn_Plugin {
                     'Status' => $formValues['Status'],
                     'Priority' => $formValues['Priority'],
 
-                ]);
+                ];
+                $sender->EventArguments['AttachmentData'] = &$attachmentData;
+                $sender->fireEvent('SavingCaseAttachment');
+                $iD = $attachmentModel->save($attachmentData);
                 if (!$iD) {
                     $sender->Form->setValidationResults($attachmentModel->validationResults());
                 }
                 $sender->jsonTarget('', $url, 'Redirect');
                 $sender->informMessage('Case Added to Salesforce');
-
             }
-
         } else {
             $sender->Form->setValidationResults($attachmentModel->validationResults());
         }
@@ -633,6 +649,9 @@ class SalesforcePlugin extends Gdn_Plugin {
         } catch (Gdn_UserException $e) {
             $salesforce->reconnect();
         }
+
+      $this->EventArguments['Data'] = &$data;
+      $this->fireEvent('CaseFormData');
 
         $sender->Form->setData($data);
         $sender->setData('Data', $data);
