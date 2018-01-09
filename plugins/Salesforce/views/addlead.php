@@ -29,8 +29,7 @@ echo $this->Form->errors();
       <?php echo $this->Form->label('Company', 'Company');  ?>
       <?php echo $this->Form->textBox('Company'); ?>
    </li>
-
-
+   <?php $this->fireEvent('CreateLeadForm'); ?>
 </ul>
 
 

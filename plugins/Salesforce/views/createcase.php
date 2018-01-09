@@ -30,7 +30,7 @@ echo $this->Form->errors();
       <?php echo $this->Form->label('Body', 'Body');  ?>
       <?php echo $this->Form->textBox('Body', ['MultiLine' => true]); ?>
    </li>
-
+   <?php $this->fireEvent('CreateCaseForm'); ?>
 </ul>
 
 
