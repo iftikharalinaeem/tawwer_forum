@@ -3,7 +3,7 @@
  * Terms Manager Plugin.
  *
  * @author Patrick Kelly <patrick.k@vanillaforums.com>
- * @copyright 2009-2017 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  * @package TermsManager
  */
