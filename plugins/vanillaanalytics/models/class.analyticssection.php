@@ -2,7 +2,7 @@
 /**
  * AnalyticsSection class file.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  * @package vanillaanalytics
  */
