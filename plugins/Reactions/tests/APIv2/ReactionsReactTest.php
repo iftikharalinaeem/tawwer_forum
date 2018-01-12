@@ -7,12 +7,12 @@
 namespace VanillaTests;
 
 use ReactionModel;
-use VanillaTests\SiteTestTrait;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Test {@link ReactionsPlugin} API capabilities.
  */
-class ReactionsReactTest extends \PHPUnit_Framework_TestCase {
+class ReactionsReactTest extends TestCase {
 
     use SiteTestTrait {
         setupBeforeClass as siteSetupBeforeClass;
@@ -250,7 +250,7 @@ class ReactionsReactTest extends \PHPUnit_Framework_TestCase {
         $result = 0;
 
         foreach ($summary as $row) {
-            if ($row['urlCode'] === $type) {
+            if ($row['urlcode'] === $type) {
                 $result = $row['count'];
                 break;
             }
@@ -275,7 +275,7 @@ class ReactionsReactTest extends \PHPUnit_Framework_TestCase {
                 continue;
             } elseif (!array_key_exists('reactionType', $row) || !is_array($row['reactionType'])) {
                 continue;
-            } elseif (!array_key_exists('urlCode', $row['reactionType']) || $row['reactionType']['urlCode'] !== $type) {
+            } elseif (!array_key_exists('urlcode', $row['reactionType']) || $row['reactionType']['urlcode'] !== $type) {
                 continue;
             } else {
                 $result = true;
@@ -297,7 +297,7 @@ class ReactionsReactTest extends \PHPUnit_Framework_TestCase {
 
         foreach ($data as $row) {
             if (!array_key_exists('tagID', $row) || !is_int($row['tagID']) ||
-                !array_key_exists('urlCode', $row) || !is_string($row['urlCode']) ||
+                !array_key_exists('urlcode', $row) || !is_string($row['urlcode']) ||
                 !array_key_exists('name', $row) || !is_string($row['name']) ||
                 !array_key_exists('class', $row) || !is_string($row['class']) ||
                 !array_key_exists('count', $row) || !is_int($row['count'])) {
@@ -320,9 +320,9 @@ class ReactionsReactTest extends \PHPUnit_Framework_TestCase {
         $result = false;
 
         foreach ($data as $row) {
-            if (!array_key_exists('urlCode', $row) || !array_key_exists('count', $row)) {
+            if (!array_key_exists('urlcode', $row) || !array_key_exists('count', $row)) {
                 continue;
-            } elseif ($row['urlCode'] !== $type) {
+            } elseif ($row['urlcode'] !== $type) {
                 continue;
             }
 
