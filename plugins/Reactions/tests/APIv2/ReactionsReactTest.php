@@ -4,32 +4,21 @@
  * @license GPLv2
  */
 
-namespace VanillaTests;
+namespace VanillaTests\APIv2;
 
 use ReactionModel;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test {@link ReactionsPlugin} API capabilities.
  */
-class ReactionsReactTest extends TestCase {
-
-    use SiteTestTrait {
-        setupBeforeClass as siteSetupBeforeClass;
-    }
-
-    /** @var InternalClient */
-    private $api;
+class ReactionsReactTest extends AbstractAPIv2Test {
 
     /**
      * Setup routine, run before each test case.
      */
     public function setUp() {
-        ReactionModel::$ReactionTypes = null;
-        $this->api = static::container()->getArgs(InternalClient::class, [static::container()->get('@baseUrl').'/api/v2']);
-        $this->api->setUserID(self::$siteInfo['adminUserID']);
-        $this->api->setTransientKey(md5(now()));
         parent::setUp();
+        ReactionModel::$ReactionTypes = null;
     }
 
     /**
@@ -37,7 +26,6 @@ class ReactionsReactTest extends TestCase {
      */
     public static function setupBeforeClass() {
         self::$addons = ['reactions', 'stubcontent', 'vanilla'];
-        self::siteSetupBeforeClass();
         parent::setUpBeforeClass();
     }
 
@@ -228,15 +216,6 @@ class ReactionsReactTest extends TestCase {
             }
         }
         $this->assertTrue($indexHasReactions);
-    }
-
-    /**
-     * Get the internal client for API tests.
-     *
-     * @return InternalClient
-     */
-    public function api() {
-        return $this->api;
     }
 
     /**
