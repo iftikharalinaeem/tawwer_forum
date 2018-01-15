@@ -132,6 +132,7 @@ class AvatarStockPlugin extends Gdn_Plugin {
      */
     public function profileController_removePicture_create($sender, $userReference = '', $username = '', $tk = '') {
         $sender->permission('Garden.SignIn.Allow');
+
         $session = Gdn::session();
         if (!$session->isValid())
             $sender->Form->addError('You must be authenticated in order to use this form.');

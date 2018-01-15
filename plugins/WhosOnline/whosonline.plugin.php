@@ -171,6 +171,8 @@ class WhosOnlinePlugin extends Gdn_Plugin {
      * @param ProfileController $sender Sending controller instance.
      */
     public function profileController_whosonline_create($sender) {
+        $sender->permission('Garden.SignIn.Allow');
+
         $session = Gdn::session();
         $userID = $session->isValid() ? $session->UserID : 0;
         $sender->getUserInfo();

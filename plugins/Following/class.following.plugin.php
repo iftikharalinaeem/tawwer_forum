@@ -31,6 +31,8 @@ class FollowingPlugin extends Gdn_Plugin {
     * @return type
     */
    public function profileController_following_create($sender) {
+      $sender->permission('Garden.Profiles.View');
+
       $viewingUserID = Gdn::session()->UserID;
       $args = $sender->RequestArgs;
 
