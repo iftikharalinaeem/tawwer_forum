@@ -272,9 +272,9 @@ class GroupController extends Gdn_Controller {
             foreach ($recipients as $recipient) {
                 $userId = getValue('UserID', Gdn::userModel()->getByUsername($recipient));
                 if (in_array($userId, $memberIds)) {
-                    $this->informMessage(t(sprintf("%s is already a member.", $recipient)));
+                    $this->informMessage(t(sprintf("%s is already a member.", htmlspecialchars($recipient))));
                 } elseif (in_array($userId, $applicantIds)) {
-                  $this->informMessage(t(sprintf("%s is already an applicant.", $recipient)));
+                  $this->informMessage(t(sprintf("%s is already an applicant.", htmlspecialchars($recipient))));
                 } else {
                     $userIDs[] = $userId;
                 }
