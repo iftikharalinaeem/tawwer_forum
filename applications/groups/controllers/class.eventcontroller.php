@@ -398,7 +398,7 @@ class EventController extends Gdn_Controller {
         $eventName = val('Name', $event, t('this event'));
         $eventModel->attend(Gdn::session()->UserID, $eventID, $attending);
 
-        $this->informMessage(sprintf(t('Your status for %s is now: <b>%s</b>'), $eventName, t($attending)));
+        $this->informMessage(sprintf(t('Your status for %s is now: <b>%s</b>'), htmlspecialchars($eventName), t($attending)));
         $this->jsonTarget('#EventAttendees', $this->attendees($eventID));
         $this->render('blank', 'utility', 'dashboard');
     }
