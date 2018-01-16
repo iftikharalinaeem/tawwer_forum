@@ -105,15 +105,18 @@ class LinkedInPlugin extends Gdn_Plugin {
             $redirectUri = $this->redirectUri();
         }
 
+        // Generate a CSRF token.
+        $csrfToken = SsoUtils::createCSRFToken();
+
         $query = [
             'client_id' => $appID,
             'response_type' => 'code',
             'scope' => $scope,
-            'state' => Gdn::session()->transientKey(),
-            'redirect_uri' => $redirectUri];
+            'state' => json_encode(['csrf' => $csrfToken]),
+            'redirect_uri' => $redirectUri,
+        ];
 
-        $signinHref = "https://www.linkedin.com/uas/oauth2/authorization?".http_build_query($query);
-        return $signinHref;
+        return 'https://www.linkedin.com/uas/oauth2/authorization?'.http_build_query($query);
     }
 
     /**
@@ -169,7 +172,7 @@ class LinkedInPlugin extends Gdn_Plugin {
      * @return string
      */
     public function signInButton($type = 'button') {
-        $url = $this->authorizeUri();
+        $url = url('entry/linkedin');
 
         $result = socialSignInButton('LinkedIn', $url, $type);
         return $result;
@@ -215,7 +218,7 @@ class LinkedInPlugin extends Gdn_Plugin {
             $path = Gdn::request()->path();
 
             $target = val('Target', $_GET, $path ? $path : '/');
-            if (ltrim($target, '/') == 'entry/signin' || empty($target)) {
+            if (ltrim($target, '/') == 'entry/signin' || ltrim($target, '/') == 'entry/linkedin' || empty($target)) {
                 $target = '/';
             }
             $args = ['Target' => $target];
@@ -284,6 +287,10 @@ class LinkedInPlugin extends Gdn_Plugin {
         if (val(0, $args) != 'linkedin') {
             return;
         }
+
+        $state = json_decode(Gdn::request()->get('state', ''), true);
+        $suppliedCSRFToken = val('csrf', $state);
+        SsoUtils::verifyCSRFToken('linkedIn', $suppliedCSRFToken);
 
         if (isset($_GET['error'])) {
             throw new Gdn_UserException(val('error_description', $_GET, t('There was an error connecting to LinkedIn')));
@@ -373,12 +380,11 @@ class LinkedInPlugin extends Gdn_Plugin {
     public function profileController_linkedInConnect_create($sender, $code = false) {
         $sender->permission('Garden.SignIn.Allow');
 
-        $transientKey = Gdn::request()->get('state');
-        if (empty($transientKey) || Gdn::session()->validateTransientKey($transientKey) === false) {
-            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
-        }
+        $state = json_decode(Gdn::request()->get('state', ''), true);
+        $suppliedCSRFToken = val('csrf', $state);
+        SsoUtils::verifyCSRFToken('linkedInSocial', $suppliedCSRFToken);
 
-        $userID = $sender->Request->get('userID');
+        $userID = $sender->Request->get('UserID');
 
         $sender->getUserInfo('', '', $userID, true);
         $sender->_SetBreadcrumbs(t('Connections'), userUrl($sender->User, '', 'connections'));
@@ -429,5 +435,12 @@ class LinkedInPlugin extends Gdn_Plugin {
         $sender->setData('Title', sprintf(t('%s Settings'), 'LinkedIn'));
         $sender->ConfigurationModule = $cf;
         $sender->render('Settings', '', 'plugins/LinkedIn');
+    }
+
+    /**
+     * Create an entry/linkedIn endpoint that redirects to the authorization URI.
+     */
+    public function entryController_linkedIn_create() {
+        redirectTo($this->authorizeUri(), 302, false);
     }
 }
