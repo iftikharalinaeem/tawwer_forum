@@ -97,15 +97,9 @@ class SalesforcePlugin extends Gdn_Plugin {
     public function profileController_salesforceConnect_create($sender, $userReference = '', $username = '', $code = false) {
         $sender->permission('Garden.SignIn.Allow');
 
-        $state = Gdn::request()->get('state');
-        if (empty($state)) {
-            throw new Gdn_UserException(t('Missing "state" parameter.'), 403);
-        }
-        $state = json_decode($state, true);
-        $transientKey = val('transientKey', $state);
-        if (!$transientKey ||Gdn::session()->validateTransientKey($transientKey) === false) {
-            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
-        }
+        $state = json_decode(Gdn::request()->get('state', ''), true);
+        $suppliedCSRFToken = val('csrf', $state);
+        SsoUtils::verifyCSRFToken('salesforceConnect', $suppliedCSRFToken);
 
         $sender->getUserInfo($userReference, $username, '', true);
         $sender->_SetBreadcrumbs(t('Connections'), userUrl($sender->User, '', 'connections'));
