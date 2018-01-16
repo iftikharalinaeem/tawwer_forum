@@ -124,14 +124,20 @@ class ReactionsController extends DashboardController {
      * @param null $page
      * @throws Exception
      */
-    public function users($type, $iD, $reaction, $page = null) {
+    public function users($type, $id, $reaction, $page = null) {
         if (!c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT)) {
             throw permissionException();
         }
 
         $reactionModel = new ReactionModel();
+        $reactionType = $reactionModel::reactionTypes($reaction);
+
+        if (val('Class', $reactionType) === 'Flag' && !c('Reactions.FlagCount.DisplayToUsers', true) && !checkPermission('Garden.Moderation.Manage')) {
+            throw permissionException();
+        }
+
         list($offset, $limit) = offsetLimit($page, 10);
-        $this->setData('Users', $reactionModel->getUsers($type, $iD, $reaction, $offset, $limit));
+        $this->setData('Users', $reactionModel->getUsers($type, $id, $reaction, $offset, $limit));
         $this->render('', 'reactions', 'plugins/Reactions');
     }
 

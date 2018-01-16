@@ -93,17 +93,23 @@ function reactionButton($row, $urlCode, $options = []) {
       $iD = getValue('DiscussionID', $row);
    }
 
-   if ($isHeading) {
-      static $types = [];
-      if (!isset($types[$urlCode]))
-         $types[$urlCode] = ReactionModel::getReactionTypes(['Class' => $urlCode, 'Active' => 1]);
+   $count = 0;
+   $isFlag = $permissionClass === 'Flag' || $urlCode === 'Flag';
+   $countDisplay = !$isFlag || c('Reactions.FlagCount.DisplayToUsers', true) || checkPermission('Garden.Moderation.Manage');
+   // Don't display counts for Spam or Abuse if you are not a moderator!
+   if ($countDisplay) {
+       if ($isHeading) {
+           static $types = [];
+           if (!isset($types[$urlCode]))
+               $types[$urlCode] = ReactionModel::getReactionTypes(['Class' => $urlCode, 'Active' => 1]);
 
-      $count = reactionCount($row, $types[$urlCode]);
-   } else {
-      if ($recordType == 'activity')
-         $count = getValueR("Data.React.$urlCode", $row, 0);
-      else
-         $count = getValueR("Attributes.React.$urlCode", $row, 0);
+           $count = reactionCount($row, $types[$urlCode]);
+       } else {
+           if ($recordType == 'activity')
+               $count = getValueR("Data.React.$urlCode", $row, 0);
+           else
+               $count = getValueR("Attributes.React.$urlCode", $row, 0);
+       }
    }
    $countHtml = '';
    $linkClass = "ReactButton-$urlCode";
