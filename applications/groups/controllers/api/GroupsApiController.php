@@ -139,7 +139,6 @@ class GroupsApiController extends AbstractApiController {
                 ],
                 'reason:s' => 'The reason why the applicant wants to join the group.',
                 'body:s' => 'Universal record field. Content of "reason".',
-                'format:s' => 'Universal record field. Format of "reason".',
                 'dateInserted:dt' => 'When the applicant was created.',
             ], 'GroupApplicant');
         }
@@ -213,7 +212,6 @@ class GroupsApiController extends AbstractApiController {
                 'name:s' => 'The name of the group.',
                 'description:s' => 'The description of the group.',
                 'body:s' => 'Universal record field. Content of description.',
-                'format:s' => 'The input format of the group.',
                 'iconUrl:s|n?' => 'The URL of the icon of the group.',
                 'bannerUrl:s|n?' => 'The URL of the banner of the group.',
                 'dateInserted:dt' => 'When the group was created.',
@@ -286,7 +284,13 @@ class GroupsApiController extends AbstractApiController {
         $this->idParamGroupSchema()->setDescription('Get a group for editing.');
         $out = $this->schema(
             Schema::parse([
-                'groupID', 'name', 'description', 'format', 'iconUrl', 'bannerUrl', 'privacy'
+                'groupID',
+                'name',
+                'description',
+                'format:s' => 'The input format of the group.',
+                'iconUrl',
+                'bannerUrl',
+                'privacy'
             ])->add($this->fullGroupSchema()),
             'out'
         );
@@ -297,7 +301,7 @@ class GroupsApiController extends AbstractApiController {
             throw new ClientException('You do not have the rights to edit this group.');
         }
 
-        $result = $this->normalizeGroupOutput($group);
+        $result = $this->normalizeGroupOutput($group, ['skipFormatting' => true]);
         return $out->validate($result);
     }
 
@@ -595,7 +599,6 @@ class GroupsApiController extends AbstractApiController {
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         $schemaRecord['body'] = $schemaRecord['reason'];
-        $schemaRecord['format'] = 'Text';
 
         return $schemaRecord;
 
@@ -655,7 +658,7 @@ class GroupsApiController extends AbstractApiController {
      * @param array $dbRecord Group database record.
      * @return array Return a schema record.
      */
-    public function normalizeGroupOutput(array $dbRecord) {
+    public function normalizeGroupOutput(array $dbRecord, $options = []) {
         static $fieldToURL;
         if ($fieldToURL === null) {
             $fieldToURL = function(&$field) {
@@ -676,10 +679,12 @@ class GroupsApiController extends AbstractApiController {
 
         $dbRecord['Privacy'] = strtolower($dbRecord['Privacy']);
 
-        $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        $schemaRecord['body'] = $schemaRecord['description'];
+        if (empty($options['skipFormatting'])) {
+            $dbRecord['Description'] = Gdn_Format::to($dbRecord['Description'], $dbRecord['Format']);
+            $dbRecord['Body'] = $dbRecord['Description'];
+        }
 
-        return $schemaRecord;
+        return ApiUtils::convertOutputKeys($dbRecord);
     }
 
     /**
@@ -1050,9 +1055,14 @@ class GroupsApiController extends AbstractApiController {
 
         if ($postGroupSchema === null) {
             $postGroupSchema = $this->schema(
-                Schema::parse(
-                    ['name', 'description', 'format', 'iconUrl?', 'bannerUrl?', 'privacy']
-                )->add($this->fullGroupSchema()),
+                Schema::parse([
+                    'name',
+                    'description',
+                    'format:s' => 'The input format of the group.',
+                    'iconUrl?',
+                    'bannerUrl?',
+                    'privacy',
+                ])->add($this->fullGroupSchema()),
                 'GroupPost'
             );
         }

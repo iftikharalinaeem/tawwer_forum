@@ -133,7 +133,6 @@ class EventsApiController extends AbstractApiController {
                 'groupID:i' => 'The group the event is in.',
                 'name:s' => 'The name of the event.',
                 'body:s' => 'The description of the event.',
-                'format:s' => 'The input format of the event.',
                 'location:s|n' => [
                     'maxLength' => 255,
                     'description' => 'The location of the event.'
@@ -257,8 +256,16 @@ class EventsApiController extends AbstractApiController {
 
         $in = $this->idParamEventSchema()->setDescription('Get an event for editing.');
         $out = $this->schema(
-            Schema::parse(['eventID', 'groupID', 'name', 'body', 'format', 'location', 'dateStarts', 'dateEnds'])
-                ->add($this->fullEventSchema()),
+            Schema::parse([
+                'eventID',
+                'groupID',
+                'name',
+                'body',
+                'format:s' => 'The input format of the event.',
+                'location',
+                'dateStarts',
+                'dateEnds'
+            ])->add($this->fullEventSchema()),
             'out'
         );
 
@@ -576,9 +583,15 @@ class EventsApiController extends AbstractApiController {
 
         if ($postEventSchema === null) {
             $postEventSchema = $this->schema(
-                Schema::parse(
-                    ['groupID', 'name', 'body', 'format', 'location', 'dateStarts', 'dateEnds?']
-                )->add($this->fullEventSchema()),
+                Schema::parse([
+                    'groupID',
+                    'name',
+                    'body',
+                    'format:s' => 'The input format of the event.',
+                    'location',
+                    'dateStarts',
+                    'dateEnds?',
+                ])->add($this->fullEventSchema()),
                 'EventPost'
             );
         }
