@@ -18,6 +18,9 @@ class GroupsTest extends AbstractResourceTest {
     /** @var bool */
     protected $incrementRecordCounterOnCall = false;
 
+     /** {@inheritdoc} */
+    protected $formattedFields = ['body', 'description'];
+
     /** {@inheritdoc} */
     protected $baseUrl = '/groups';
 
