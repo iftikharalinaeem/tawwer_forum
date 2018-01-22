@@ -561,3 +561,12 @@ table.PreferenceGroup tbody td {
 .SpRefresh { background-position: -48px -324px; }
 .SpPencil { background-position: -64px -324px; }
 .SpPlus { background-position: -80px -324px; }
+
+a.TextColor.followButton:not(:hover) {
+   color: #70727c;
+}
+
+a.followButton:not(:hover) {
+   color: #ffffff;
+}
+
