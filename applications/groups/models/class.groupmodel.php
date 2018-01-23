@@ -398,6 +398,21 @@ class GroupModel extends Gdn_Model {
     }
 
     /**
+     * Get group applicants/invites count.
+     *
+     * @param int $groupID
+     * @param array $where
+     * @return int
+     */
+    public function getApplicantsCount($groupID, $where = []) {
+        return $this->SQL
+            ->from('GroupApplicant')
+            ->where('GroupID', $groupID)
+            ->where($where)
+            ->getCount();
+    }
+
+    /**
      * Get the userIDs of the applicants to a group.
      *
      * @param int $groupID

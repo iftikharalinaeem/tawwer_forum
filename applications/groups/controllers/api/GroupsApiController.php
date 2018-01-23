@@ -351,7 +351,16 @@ class GroupsApiController extends AbstractApiController {
             $this->userModel->expandUsers($invites, ['UserID', 'InsertUserID']);
         }
 
-        return $out->validate($invites);
+        $result = $out->validate($invites);
+
+        $paging = ApiUtils::numberedPagerInfo(
+            $this->groupModel->getApplicantsCount($id, ['Type' => 'Invitation']),
+            "/api/v2/groups/$id/invites",
+            $query,
+            $in
+        );
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**
@@ -405,13 +414,23 @@ class GroupsApiController extends AbstractApiController {
         }
         unset($applicant);
 
-        return $out->validate($applicants);
+        $result = $out->validate($applicants);
+
+        $paging = ApiUtils::numberedPagerInfo(
+            $this->groupModel->getApplicantsCount($id, ['Type' => 'Application']),
+            "/api/v2/groups/$id/applicants",
+            $query,
+            $in
+        );
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**
      * List the members of a group.
      *
      * @param int $id The ID of the group.
+     * @param array $query
      * @throws NotFoundException if unable to find the group.
      * @throws ClientException
      * @return array
@@ -454,7 +473,13 @@ class GroupsApiController extends AbstractApiController {
         }
 
         $members = array_map([$this, 'normalizeGroupMemberOutput'], $members);
-        return $out->validate($members);
+
+        $result = $out->validate($members);
+
+        $paging = ApiUtils::morePagerInfo($members, "/api/v2/groups/$id/members", $query, $in);
+
+        return ApiUtils::setPageMeta($result, $paging);
+
     }
 
     /**
@@ -558,6 +583,11 @@ class GroupsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
+
+        $paging = ApiUtils::numberedPagerInfo($this->groupModel->getCount(), "/api/v2/groups", $query, $in);
+
+        return ApiUtils::setPageMeta($result, $paging);
+
         return $result;
     }
 

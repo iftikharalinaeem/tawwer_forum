@@ -44,19 +44,18 @@ class GroupsInvitesTest extends AbstractGroupsSubResource {
      */
     public function testListInvites() {
         $originalGroup = $this->createGroup(__FUNCTION__, true);
+        $url = $this->createURL($originalGroup['groupID'], 'invites');
 
         foreach (self::$userIDs as $userID) {
             $this->api()->post(
-                $this->createURL($originalGroup['groupID'], 'invites'),
+                $url,
                 [
                     'userID' => $userID,
                 ]
             );
         }
 
-        $result = $this->api()->get(
-            $this->createURL($originalGroup['groupID'], 'invites')
-        );
+        $result = $this->api()->get($url);
 
         $this->assertEquals(200, $result->getStatusCode());
 
@@ -64,6 +63,8 @@ class GroupsInvitesTest extends AbstractGroupsSubResource {
 
         $this->assertInternalType('array', $invites);
         $this->assertEquals(count(self::$userIDs), count($invites));
+
+        $this->pagingTest($url);
     }
 
     /**
