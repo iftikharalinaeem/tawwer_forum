@@ -69,11 +69,12 @@ class GroupsApplicantsTest extends AbstractGroupsSubResource {
      */
     public function testListApplicants() {
         $originalGroup = $this->createGroup(__FUNCTION__, false);
+        $url = $this->createURL($originalGroup['groupID'], 'applicants');
 
         foreach (self::$userIDs as $userID) {
             $this->api()->setUserID($userID);
             $this->api()->post(
-                $this->createURL($originalGroup['groupID'], 'applicants'),
+                $url,
                 [
                     'reason' => uniqid('Because '),
                 ]
@@ -81,9 +82,7 @@ class GroupsApplicantsTest extends AbstractGroupsSubResource {
         }
 
         $this->api()->setUserID(self::$siteInfo['adminUserID']);
-        $result = $this->api()->get(
-            $this->createURL($originalGroup['groupID'], 'applicants')
-        );
+        $result = $this->api()->get($url);
 
         $this->assertEquals(200, $result->getStatusCode());
 
@@ -91,6 +90,8 @@ class GroupsApplicantsTest extends AbstractGroupsSubResource {
 
         $this->assertInternalType('array', $applicants);
         $this->assertEquals(count(self::$userIDs), count($applicants));
+
+        $this->pagingTest($url);
     }
 
     /**

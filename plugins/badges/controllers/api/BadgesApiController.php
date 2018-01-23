@@ -350,12 +350,15 @@ class BadgesApiController extends AbstractApiController {
             $row = $this->normalizeUserBadgeOutput($row);
         }
 
-        return $out->validate($rows);
+        $result = $out->validate($rows);
+
+        $paging = ApiUtils::morePagerInfo($result, "/api/v2/badges/requests", $query, $in);
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**
-     * List all the users that have the badge.
-     *
+     * List users/badges relation.
      *
      * @throws NotFoundException if unable to find the badge or user.
      * @param array $query
@@ -433,7 +436,11 @@ class BadgesApiController extends AbstractApiController {
             $row = $this->normalizeUserBadgeOutput($row);
         }
 
-        return $out->validate($rows);
+        $result = $out->validate($rows);
+
+        $paging = ApiUtils::morePagerInfo($result, "/api/v2/badges/users", $query, $in);
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**
@@ -503,7 +510,15 @@ class BadgesApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return $result;
+
+        $paging = ApiUtils::numberedPagerInfo(
+            $this->badgeModel->getCount(),
+            "/api/v2/badges",
+            $query,
+            $in
+        );
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**

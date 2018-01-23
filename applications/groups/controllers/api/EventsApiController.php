@@ -240,7 +240,10 @@ class EventsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return $result;
+
+        $paging = ApiUtils::morePagerInfo($result, "/api/v2/events/$id/participants", $query, $in);
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**
@@ -373,7 +376,10 @@ class EventsApiController extends AbstractApiController {
         }
 
         $result = $out->validate($rows);
-        return $result;
+
+        $paging = ApiUtils::morePagerInfo($result, "/api/v2/events", $query, $in);
+
+        return ApiUtils::setPageMeta($result, $paging);
     }
 
     /**
