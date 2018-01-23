@@ -38,7 +38,7 @@
                         '</span>';
 
                     echo bullet(' ');
-                    echo ' <span clsss="MItem-DateInserted">'.
+                    echo ' <span class="MItem-DateInserted">'.
                         Gdn_Format::date($Row['DateInserted'], 'html').
                         '</span> ';
 
