@@ -293,13 +293,13 @@ class ReactionsPlugin extends Gdn_Plugin {
                 'description' => 'Filter to a specific reaction type by using its URL code.'
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => 100
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->reactionModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100
@@ -492,13 +492,13 @@ class ReactionsPlugin extends Gdn_Plugin {
                 'description' => 'Filter to a specific reaction type by using its URL code.'
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
                 'maximum' => 100
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->reactionModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100

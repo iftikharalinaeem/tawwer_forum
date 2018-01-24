@@ -183,13 +183,13 @@ class SphinxPlugin extends Gdn_Plugin {
             $this->searchSchema = Schema::parse([
                 'query:s' => 'Search terms.',
                 'page:i?' => [
-                    'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                     'default' => 1,
                     'minimum' => 1,
                     'maximum' => DiscussionModel::instance()->getMaxPages()
                 ],
                 'limit:i?' => [
-                    'description' => 'The number of items per page.',
+                    'description' => 'Desired number of items per page.',
                     'default' => DiscussionModel::instance()->getDefaultLimit(),
                     'minimum' => 1,
                     'maximum' => self::MAX_SCHEMA_LIMIT
