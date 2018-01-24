@@ -91,6 +91,18 @@ class KeenIOQuery implements JsonSerializable {
     protected $interval;
 
     /**
+     * @link https://keen.io/docs/api/#limiting-the-number-of-groups-returned
+     * @var int Limit the total number of events returned in a result.
+     */
+    protected $limit;
+
+    /**
+     * @link https://keen.io/docs/api/#order-by
+     * @var array One or more properties to order the result by.
+     */
+    protected $orderBy = [];
+
+    /**
      * @link https://keen.io/docs/api/#count-unique
      * @var string Name of the property to analyze.
      */
@@ -144,6 +156,27 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Add an order_by config to the query.
+     *
+     * @param string $property Name of the target property.
+     * @param string $direction Order direction (ASC or DESC).
+     * @return array
+     */
+    public function addOrderBy($property, $direction = 'ASC') {
+        $validDirections = ['ASC', 'DESC'];
+        if (!in_array($direction, $validDirections)) {
+            throw new InvalidArgumentException("Invalid order_by direction: {$direction}");
+        }
+
+        $this->orderBy[] = [
+            'property_name' => $property,
+            'direction' => $direction
+        ];
+
+        return $this->orderBy;
+    }
+
+    /**
      * Execute this query and return the result.
      *
      * @throws Gdn_UserException if we haven't configured a type.
@@ -175,6 +208,12 @@ class KeenIOQuery implements JsonSerializable {
         }
         if ($this->interval) {
             $data['interval'] = $this->interval;
+        }
+        if ($this->limit) {
+            $data['limit'] = $this->limit;
+        }
+        if ($this->orderBy) {
+            $data['order_by'] = $this->orderBy;
         }
         if ($this->targetProperty) {
             $data['target_property'] = $this->targetProperty;
@@ -237,6 +276,24 @@ class KeenIOQuery implements JsonSerializable {
     }
 
     /**
+     * Get the current limit configured for the query.
+     *
+     * @return int|null
+     */
+    public function getLimit() {
+        return $this->limit;
+    }
+
+    /**
+     * Get the current order_by configuration.
+     *
+     * @return array
+     */
+    public function getOrderBy() {
+        return $this->orderBy;
+    }
+
+    /**
      * Fetch the current target property.
      * @return string
      */
@@ -283,6 +340,7 @@ class KeenIOQuery implements JsonSerializable {
             'filters' => $this->filters,
             'groupBy' => $this->groupBy,
             'interval' => $this->interval,
+            'order_by' => $this->orderBy,
             'target_property' => $this->targetProperty,
             'timeframe' => $this->timeframe,
             'timezone' => $this->timezone,
@@ -307,6 +365,13 @@ class KeenIOQuery implements JsonSerializable {
      */
     public function resetFilters() {
         $this->filters = [];
+    }
+
+    /**
+     * Reset the order-by config.
+     */
+    public function resetOrderBy() {
+        $this->orderBy = [];
     }
 
     /**
@@ -342,6 +407,21 @@ class KeenIOQuery implements JsonSerializable {
      */
     public function setInterval($interval) {
         $this->interval = $interval;
+        return $this;
+    }
+
+    /**
+     * Configure a limit on the total number of results returned by this query.
+     *
+     * @param int $limit
+     * @return $this
+     */
+    public function setLimit($limit) {
+        $limit = filter_var($limit, FILTER_VALIDATE_INT);
+        if ($limit === false) {
+            throw new InvalidArgumentException("Invalid limit value: {$limit}");
+        }
+        $this->limit = intval($limit);
         return $this;
     }
 
