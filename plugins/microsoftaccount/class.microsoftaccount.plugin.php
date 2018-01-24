@@ -5,14 +5,13 @@
  * @package microsoftaccount
  */
 
-require_once('class.oauth2pluginbase.php');
 
 /**
  * Class MicrosoftAccountPlugin
  *
  * A plug-in to facilitate SSO connections authenticated by Microsoft's "v2.0 app model" OAuth2 service.
  */
-class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
+class MicrosoftAccountPlugin extends Gdn_OAuth2 {
 
     /**
      * MicrosoftAccountPlugin constructor.
@@ -21,16 +20,17 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
      * @link https://azure.microsoft.com/en-us/documentation/articles/active-directory-v2-scopes/#scopes-amp-permissions
      * @link https://msdn.microsoft.com/Library/Azure/Ad/Graph/howto/azure-ad-graph-api-permission-scopes#PermissionScopeDetails
      */
-    public function __construct($accessToken = false) {
-        parent::__construct('microsoftaccount', $accessToken);
-
+    public function __construct() {
+        parent::__construct('microsoftaccount');
+        $this->settingsView = 'plugins/settings/microsoftaccount';
         $this->setScope('https://graph.microsoft.com/user.read');
-
-        $this->setAuthorizeUriParams([
+        $this->authorizeUriParams = [
             'redirect_uri'  => Gdn::request()->url("/entry/{$this->getProviderKey()}", true, true),
             'response_mode' => 'query',
-        ]);
+            'scope' => 'https://graph.microsoft.com/user.read'
+        ];
     }
+
 
     /**
      * Insert css file for custom styling of signin button/icon.
@@ -41,24 +41,13 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         $sender->addCssFile('microsoftaccount.css', 'plugins/microsoftaccount');
     }
 
-    /**
-     * Wrapper function for writing a generic entry controller.
-     *
-     * @param EntryController $sender.
-     * @param $code string Retrieved from the response of the authentication provider, used to fetch an authentication token.
-     * @param $state string Values passed by us and returned in the response of the authentication provider.
-     * @throws Exception.
-     * @throws Gdn_UserException.
-     */
-    public function entryController_microsoftaccount_create($sender, $code = false, $state = false) {
-        $this->entryController_OAuth2_create($sender, $code, $state);
-    }
 
     /**
      * Get profile data from authentication provider through API.
      *
-     * @link http://graph.microsoft.io/docs/api-reference/v1.0/api/user_get
-     * @return array User profile from provider.
+     * @return array User's profile info from Authentication Provider
+     * @throws Exception
+     * @throws Gdn_UserException
      */
     public function getProfile() {
         $provider = $this->provider();
@@ -88,19 +77,6 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         return $profile;
     }
 
-    /**
-     * Add form fields to settings specific to this plugin.
-     *
-     * @return array Form fields.
-     */
-    protected function getSettingsFormFields() {
-        $formFields = parent::getSettingsFormFields();
-
-        $formFields['AssociationKey']['LabelCode']    = 'Application ID';
-        $formFields['AssociationSecret']['LabelCode'] = 'Application Secret';
-
-        return $formFields;
-    }
 
     /**
      * Override parent provider with the url endpoints specific to this provider.
@@ -118,6 +94,7 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
 
         return $provider;
     }
+
 
     /**
      * Create signup button specific to this plugin.
@@ -148,19 +125,69 @@ class MicrosoftAccountPlugin extends OAuth2PluginBase implements Gdn_IPlugin {
         return $result;
     }
 
+
     /**
-     * Wrapper function for writing a generic settings controller.
+     * Form for capturing the Application Secret and ID.
+     * This over-rides the base class settingsEndpoint().
      *
-     * @param SettingsController $sender.
-     * @param SettingsController $args.
+     * @param $sender SettingsController
+     * @param $args SettingsController
+     * @throws Gdn_UserException
      */
     public function settingsController_microsoftaccount_create($sender, $args) {
-        $sender->setData('Title', sprintf(t('%s Settings'), 'Microsoft Account'));
+        $sender->permission('Garden.Settings.Manage');
+        $model = new Gdn_AuthenticationProviderModel();
 
-        $redirectUrls = Gdn::request()->url('/entry/'. $this->getProviderKey(), true, false).','.Gdn::request()->url('/entry/'. $this->getProviderKey(), true, true);
+        /* @var Gdn_Form $form */
+        $form = new Gdn_Form();
+        $form->setModel($model);
+        $sender->Form = $form;
+
+        if (!$form->authenticatedPostBack()) {
+            $provider = $this->provider();
+            $form->setData($provider);
+        } else {
+
+            $form->setFormValue('AuthenticationKey', $this->getProviderKey());
+
+            $sender->Form->validateRule('AssociationKey', 'ValidateRequired', 'You must provide a unique AccountID.');
+            $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
+
+            // To satisfy the AuthenticationProviderModel, create a BaseUrl.
+            $baseUrlParts = parse_url($form->getValue('AuthorizeUrl'));
+            $baseUrl = (val('scheme', $baseUrlParts) && val('host', $baseUrlParts)) ? val('scheme', $baseUrlParts).'://'.val('host', $baseUrlParts) : null;
+            if ($baseUrl) {
+                $form->setFormValue('BaseUrl', $baseUrl);
+                $form->setFormValue('SignInUrl', $baseUrl); // kludge for default provider
+            }
+            if ($form->save()) {
+                $sender->informMessage(t('Saved'));
+            }
+        }
+
+        // Set up the form.
+        $formFields = [
+            'AssociationKey' =>  ['LabelCode' => 'Application ID', 'Description' => 'Unique ID of the authentication application.'],
+            'AssociationSecret' =>  ['LabelCode' => 'Application Secret', 'Description' => 'Secret provided by the authentication provider.'],
+        ];
+
+        $formFields['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox'];
+
+        $sender->setData('_Form', $formFields);
+
+        $sender->setHighlightRoute();
+        if (!$sender->data('Title')) {
+            $sender->setData('Title', sprintf(t('%s Settings'), 'Microsoft Account'));
+        }
+
+        $view = ($this->settingsView) ? $this->settingsView : 'plugins/oauth2';
+
+        // Create and send the possible redirect URLs that will be required by the authenticating server and display them in the dashboard.
+        // Use Gdn::Request instead of convience function so that we can return http and https.
+        $redirectUrls = Gdn::request()->url('/entry/'. $this->getProviderKey(), true, true);
         $sender->setData('redirectUrls', $redirectUrls);
 
-        $this->settingsController_oAuth2_create($sender, $args);
+        $sender->render('settings', '', $view);
     }
 
     /**
