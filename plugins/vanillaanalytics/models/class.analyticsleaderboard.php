@@ -66,6 +66,13 @@ class AnalyticsLeaderboard {
             );
         }
 
+        $this->query
+            ->setLimit($this->size)
+            ->addOrderBy('result', 'DESC');
+        $this->previousQuery
+            ->setLimit($this->size)
+            ->addOrderBy('result', 'DESC');
+
         $response = $this->query->exec();
         $responsePrevious = $this->previousQuery->exec();
 
@@ -132,12 +139,6 @@ class AnalyticsLeaderboard {
                 throw new Gdn_UserException('Unable to determine result type of query.');
             }
 
-            // Sort results based on their count total, descending.
-            usort($result, [$this, 'sortResults']);
-
-            // Cut to the desired number of results
-            $result = array_slice($result, 0, $this->size);
-
             // Prepare to build out the values we need for the leaderboard.
             switch ($emulatedTypeID) {
                 case 'discussion.discussionID':
@@ -157,11 +158,10 @@ class AnalyticsLeaderboard {
             // Previous time frame results
             $ptfPositionByResult = [];
             $ptfResultIndexed = [];
-            usort($ptfResult, [$this, 'sortResults']);
 
             $position = 1;
             foreach ($ptfResult as $index => $ptfStanding) {
-                $ptfResultIndexed[$ptfStanding[$typeID]] = $ptfStanding->result;
+                $ptfResultIndexed[$ptfStanding[$typeID]] = $ptfStanding['result'];
 
                 if (!isset($ptfPositionByResult[$ptfStanding['result']])) {
                     $ptfPositionByResult[$ptfStanding['result']] = $position++;
