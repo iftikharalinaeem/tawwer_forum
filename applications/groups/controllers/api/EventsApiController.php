@@ -196,12 +196,12 @@ class EventsApiController extends AbstractApiController {
                 'description' => 'Filter participant by attending status.',
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->eventModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100,
@@ -327,12 +327,12 @@ class EventsApiController extends AbstractApiController {
                     .'Prefixing the field with "-" will sort using a descending order.',
             ],
             'page:i?' => [
-                'description' => 'Page number.',
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
                 'minimum' => 1,
             ],
             'limit:i?' => [
-                'description' => 'The number of items per page.',
+                'description' => 'Desired number of items per page.',
                 'default' => $this->eventModel->getDefaultLimit(),
                 'minimum' => 1,
                 'maximum' => 100,
