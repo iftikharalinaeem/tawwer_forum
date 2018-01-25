@@ -78,12 +78,16 @@ class GithubPlugin extends Gdn_Plugin {
         if (!$redirectUri) {
             $redirectUri = self::redirectUri();
         }
+
+        // Generate a CSRF token.
+        $csrfToken = SsoUtils::createCSRFToken();
+
         $query = [
             'redirect_uri' => $redirectUri,
             'client_id' => $appID,
             'response_type' => 'code',
             'scope' => 'repo',
-            'state' => Gdn::session()->transientKey(),
+            'state' => json_encode(['csrf' => $csrfToken]),
 
         ];
         return self::OAUTH_BASE_URL.'/login/oauth/authorize?'.http_build_query($query);
@@ -225,16 +229,15 @@ class GithubPlugin extends Gdn_Plugin {
     public function profileController_githubConnect_create($sender, $userReference = '', $username = '', $code = false) {
         $sender->permission('Garden.SignIn.Allow');
 
+        $state = json_decode(Gdn::request()->get('state', ''), true);
+        $suppliedCSRFToken = val('csrf', $state);
+        SsoUtils::verifyCSRFToken('github', $suppliedCSRFToken);
+
         if (Gdn::request()->get('error')) {
             $message = Gdn::request()->get('error_description');
             Gdn::dispatcher()->passData('Exception', htmlspecialchars($message))
                 ->dispatch('home/error');
             return;
-        }
-
-        $transientKey = Gdn::request()->get('state');
-        if (empty($transientKey) || Gdn::session()->validateTransientKey($transientKey) === false) {
-            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
         }
 
         if (stristr(Gdn::request()->url(), 'globallogin') !== false) {

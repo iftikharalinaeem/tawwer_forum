@@ -675,7 +675,7 @@ class Salesforce {
             'response_type' => 'code',
             'scope' => 'full refresh_token',
             'state' => json_encode(
-                ['transientKey' => Gdn::session()->transientKey()] + $extraStateParameters
+                ['csrf' => SsoUtils::createCSRFToken()] + $extraStateParameters
             ),
         ];
         $return = c('Plugins.Salesforce.AuthenticationUrl')."/services/oauth2/authorize?".http_build_query($query, null , "&");
