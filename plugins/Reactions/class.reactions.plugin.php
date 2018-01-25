@@ -1429,15 +1429,21 @@ if (!function_exists('writeReactions')) {
         echo '<span class="Column-Score Hidden">'.$score.'</span>';
 
         // Write the reactions.
-        echo Gdn_Theme::bulletItem('Reactions');
-        echo '<span class="ReactMenu">';
-        echo '<span class="ReactButtons">';
+        $reactionHtml = "";
         foreach ($types as $type) {
             if (isset($type['RecordTypes']) && !in_array($recordType, (array)$type['RecordTypes'])) {
                 continue;
             }
-            echo ' '.reactionButton($row, $type['UrlCode']).' ';
+            $reactionHtml .= ' '.reactionButton($row, $type['UrlCode']).' ';
         }
+
+        if ($reactionHtml !== "") {
+            echo Gdn_Theme::bulletItem('Reactions');
+        }
+
+        echo '<span class="ReactMenu">';
+        echo '<span class="ReactButtons">';
+        echo $reactionHtml;
         echo '</span>';
         echo '</span>';
 
