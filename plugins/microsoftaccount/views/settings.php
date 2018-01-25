@@ -2,7 +2,7 @@
 
     <h1><?php echo $this->data('Title'); ?></h1>
 
-    <div class="padded">
+    <div class="padded alert alert-warning">
         <p><?php printf(
                 t('Register your application at %1$s using your redirect URI: %2$s'),
                 anchor('https://apps.dev.microsoft.com', 'https://apps.dev.microsoft.com'),
