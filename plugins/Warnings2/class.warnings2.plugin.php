@@ -711,7 +711,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         $userNoteModel->calculate($notes);
 
         // Join the user records into the warnings
-        joinRecords($notes, 'Record', false, false);
+        joinRecords($notes, 'Record', false, true);
 
         // If HideWarnerIdentity is true, do not let view render that data.
         $warningModel = new WarningModel();
@@ -782,7 +782,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         // Join record in question with note.
         $notes = [];
         $notes[] = $note;
-        joinRecords($notes, 'Record');
+        joinRecords($notes, 'Record', false, true);
 
         $sender->setData('Notes', $notes);
         $sender->render('viewnote', '', 'plugins/Warnings2');
