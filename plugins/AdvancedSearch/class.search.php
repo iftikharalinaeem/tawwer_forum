@@ -51,6 +51,7 @@ class Search {
         /// Category ///
         $categoryFilter = [];
         $archived = getValue('archived', $search, 0);
+        $followedCats = getValue('followedcats', $search, 0);
         $categoryID = getValue('cat', $search);
         if (strcasecmp($categoryID, 'all') === 0) {
             $categoryID = null;
@@ -73,9 +74,21 @@ class Search {
         }
         $categories = CategoryModel::getByPermission('Discussions.View', null, $categoryFilter);
         $categories[0] = true; // allow uncategorized too.
-        $categories = array_keys($categories);
+        $categoryIDs = array_keys($categories);
 
-        Gdn::pluginManager()->fireAs('Search')->fireEvent('AllowedCategories', ['CategoriesID' => &$categories]);
+        Gdn::pluginManager()->fireAs('Search')->fireEvent('AllowedCategories', ['CategoriesID' => &$categoryIDs]);
+
+        $categories = array_intersect_key($categories, array_flip($categoryIDs));
+
+        if ($followedCats) {
+            $categories = array_filter($categories, function($category) {
+                if ($category === true) {
+                    return true;
+                }
+                return $category['Followed'];
+            });
+            $categoryIDs = array_keys($categories);
+        }
 
         if ($categoryID) {
             touchValue('subcats', $search, 0);
@@ -84,7 +97,7 @@ class Search {
                 trace($categoryID, 'cats');
             }
 
-            $categoryID = array_intersect((array)$categoryID, $categories);
+            $categoryID = array_intersect((array)$categoryID, $categoryIDs);
 
             if (empty($categoryID)) {
                 $search['cat'] = false;
@@ -93,7 +106,7 @@ class Search {
                 $doSearch = true;
             }
         } else {
-            $search['cat'] = $categories;
+            $search['cat'] = $categoryIDs;
             unset($search['subcategories']);
         }
 
