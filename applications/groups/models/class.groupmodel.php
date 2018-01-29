@@ -675,10 +675,11 @@ class GroupModel extends Gdn_Model {
                             'Route' => groupUrl($group, false, '/'),
                             'Story' => formatString(t("You've been invited to join {Name}."), ['Name' => htmlspecialchars($group['Name'])]),
                             'NotifyUserID' => $userID,
+                            'Notified' => ActivityModel::SENT_PENDING,
                             'Data' => ['Name' => $group['Name']]
                         ];
                         $activityModel = new ActivityModel();
-                        $activityModel->save($activity, 'Groups');
+                        $activityModel->save($activity);
                     }
                 }
             }
