@@ -6,6 +6,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
@@ -354,7 +355,7 @@ class BadgesApiController extends AbstractApiController {
 
         $paging = ApiUtils::morePagerInfo($result, "/api/v2/badges/requests", $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -440,7 +441,7 @@ class BadgesApiController extends AbstractApiController {
 
         $paging = ApiUtils::morePagerInfo($result, "/api/v2/badges/users", $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -518,7 +519,7 @@ class BadgesApiController extends AbstractApiController {
             $in
         );
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

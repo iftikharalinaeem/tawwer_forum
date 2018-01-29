@@ -6,6 +6,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
@@ -360,7 +361,7 @@ class GroupsApiController extends AbstractApiController {
             $in
         );
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -423,7 +424,7 @@ class GroupsApiController extends AbstractApiController {
             $in
         );
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -478,7 +479,7 @@ class GroupsApiController extends AbstractApiController {
 
         $paging = ApiUtils::morePagerInfo($members, "/api/v2/groups/$id/members", $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
 
     }
 
@@ -586,7 +587,7 @@ class GroupsApiController extends AbstractApiController {
 
         $paging = ApiUtils::numberedPagerInfo($this->groupModel->getCount(), "/api/v2/groups", $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
 
         return $result;
     }

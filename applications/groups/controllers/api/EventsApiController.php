@@ -6,6 +6,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
@@ -243,7 +244,7 @@ class EventsApiController extends AbstractApiController {
 
         $paging = ApiUtils::morePagerInfo($result, "/api/v2/events/$id/participants", $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -379,7 +380,7 @@ class EventsApiController extends AbstractApiController {
 
         $paging = ApiUtils::morePagerInfo($result, "/api/v2/events", $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
