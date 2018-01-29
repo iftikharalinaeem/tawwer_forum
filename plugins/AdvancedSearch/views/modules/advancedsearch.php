@@ -48,7 +48,8 @@
             ?>
             <div class="Checkboxes Inline">
                 <?php
-                echo $Form->checkBox('subcats', t('search subcategories'), ['nohidden' => true]).
+                $followed = c('Vanilla.EnableCategoryFollowing', 0) ? ' '.$Form->checkBox('followedcats', t('search only in followed categories'), ['nohidden' => true]) : null;
+                echo $Form->checkBox('subcats', t('search subcategories'), ['nohidden' => true]).$followed.
                     ' '.
                     $Form->checkBox('archived', t('search archived'), ['nohidden' => true])
                 ?>
