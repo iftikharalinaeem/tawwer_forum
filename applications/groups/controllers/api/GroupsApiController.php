@@ -360,7 +360,7 @@ class GroupsApiController extends AbstractApiController {
             $in
         );
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -423,7 +423,7 @@ class GroupsApiController extends AbstractApiController {
             $in
         );
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -478,7 +478,7 @@ class GroupsApiController extends AbstractApiController {
 
         $paging = ApiUtils::morePagerInfo($members, "/api/v2/groups/$id/members", $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
 
     }
 
@@ -586,7 +586,7 @@ class GroupsApiController extends AbstractApiController {
 
         $paging = ApiUtils::numberedPagerInfo($this->groupModel->getCount(), "/api/v2/groups", $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
 
         return $result;
     }

@@ -354,7 +354,7 @@ class BadgesApiController extends AbstractApiController {
 
         $paging = ApiUtils::morePagerInfo($result, "/api/v2/badges/requests", $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -440,7 +440,7 @@ class BadgesApiController extends AbstractApiController {
 
         $paging = ApiUtils::morePagerInfo($result, "/api/v2/badges/users", $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -518,7 +518,7 @@ class BadgesApiController extends AbstractApiController {
             $in
         );
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**

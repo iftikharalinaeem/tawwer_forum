@@ -243,7 +243,7 @@ class EventsApiController extends AbstractApiController {
 
         $paging = ApiUtils::morePagerInfo($result, "/api/v2/events/$id/participants", $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
@@ -379,7 +379,7 @@ class EventsApiController extends AbstractApiController {
 
         $paging = ApiUtils::morePagerInfo($result, "/api/v2/events", $query, $in);
 
-        return ApiUtils::setPageMeta($result, $paging);
+        return new Data($result, ['paging' => $paging]);
     }
 
     /**
