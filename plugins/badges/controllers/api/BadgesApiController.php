@@ -6,6 +6,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
