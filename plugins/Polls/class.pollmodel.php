@@ -158,4 +158,14 @@ class PollModel extends Gdn_Model {
         }
         return false;
     }
+
+    /**
+     * Expose Gdn_Model::addInsertFields()
+     * We need to expose this function so that we can pass pre validation in save().
+     *
+     * @param array $fields
+     */
+    public function addInsertFields(&$fields) {
+        parent::addInsertFields($fields);
+    }
 }
