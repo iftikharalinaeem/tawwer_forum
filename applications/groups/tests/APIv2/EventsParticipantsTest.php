@@ -241,7 +241,8 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
         $event = $this->createEvent(__FUNCTION__);
 
         $attendingAnswers = ['maybe', null, 'yes', 'no'];
-        foreach ($attendingAnswers as $userID => $attending) {
+        foreach ($attendingAnswers as $index => $attending) {
+            $userID = self::$userIDs[$index];
             $this->api()->setUserID($userID);
             $result = $this->api()->post(
                 $this->createURL($event['eventID'], 'participants'),
