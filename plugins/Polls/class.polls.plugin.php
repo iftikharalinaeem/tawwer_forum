@@ -322,12 +322,74 @@ class PollsPlugin extends Gdn_Plugin {
                 $sender->Form->setData(['CategoryID' => $sender->Category->CategoryID]);
             }
         } else { // Form was submitted
-            $formValues = $sender->Form->formValues();
-            $discussionID = $pollModel->save($formValues, $sender->CommentModel);
-            $sender->Form->setValidationResults($pollModel->validationResults());
-            if ($sender->Form->errorCount() == 0) {
-                $discussion = $sender->DiscussionModel->getID($discussionID);
-                redirectTo(discussionUrl($discussion));
+            $formPostValues = $sender->Form->formValues();
+            $formPostValues['Type'] = 'poll'; // Force the "poll" discussion type.
+
+            $discussionModel = new DiscussionModel();
+
+            // New poll? Set default category ID if none is defined.
+            if (!val('DiscussionID', $formPostValues, '')) {
+                if (!val('CategoryID', $formPostValues) && !c('Vanilla.Categories.Use')) {
+                    $formPostValues['CategoryID'] = val('CategoryID', CategoryModel::defaultCategory(), -1);
+                }
+            }
+
+            $pollModel->addInsertFields($formPostValues);
+
+            // Validate the discussion/poll model's form fields
+            $discussionModel->validate($formPostValues, true);
+            $pollModel->validate($formPostValues, true);
+
+            $discussionValidationResults = $discussionModel->Validation->results();
+            // Unset the body validation results (they're not required).
+            if (array_key_exists('Body', $discussionValidationResults)) {
+                unset($discussionValidationResults['Body']);
+            }
+
+            // And add the results to this validation object so they bubble up to the form.
+            $pollModel->Validation->addValidationResult($discussionValidationResults);
+
+            // Are there enough non-empty poll options?
+            $pollOptions = val('PollOption', $formPostValues);
+            $validPollOptions = [];
+            if (is_array($pollOptions)) {
+                foreach ($pollOptions as $pollOption) {
+                    $pollOption = trim(Gdn_Format::plainText($pollOption));
+                    if (!empty($pollOption)) {
+                        $validPollOptions[] = $pollOption;
+                    }
+                }
+            }
+            // Assign back the filtered data.
+            $formPostValues['PollOption'] = $validPollOptions;
+
+            $countValidOptions = count($validPollOptions);
+            if ($countValidOptions < 2) {
+                $pollModel->Validation->addValidationResult('PollOption', 'You must provide at least 2 valid poll options.');
+            }
+            if ($countValidOptions > 10) {
+                $pollModel->Validation->addValidationResult('PollOption', 'You can not specify more than 10 poll options.');
+            }
+            $discussionModel->EventArguments['PollOptions'] = $validPollOptions;
+
+            if (count($pollModel->Validation->results()) == 0) {
+                // Make the discussion body not required while creating a new poll.
+                // This saves in memory, but not to the file:
+                saveToConfig('Vanilla.DiscussionBody.Required', false, ['Save' => false]);
+
+                $discussionID = $discussionModel->save($formPostValues);
+                $discussion = $discussionModel->getID($discussionID);
+
+                $formPostValues['Name'] = val('Name', $discussion);
+                $formPostValues['DiscussionID'] = $discussionID;
+
+                $pollModel->save($formPostValues);
+
+                if ($sender->Form->errorCount() == 0) {
+                    redirectTo(discussionUrl($discussion));
+                }
+            } else {
+                $sender->Form->setValidationResults($pollModel->validationResults());
             }
         }
 
