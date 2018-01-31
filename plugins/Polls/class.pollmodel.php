@@ -199,6 +199,42 @@ class PollModel extends Gdn_Model {
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function deleteID($id, $options = null) {
+        $poll = $this->getID($id, DATASET_TYPE_ARRAY);
+        $success = parent::deleteID($id);
+
+        // Clean up
+        if ($success) {
+            $options = $this->getPollOptions($id);
+            $optionIDs = array_keys($options);
+            $this->SQL->delete('PollVote', ['PollOptionID' => $optionIDs]);
+            $this->SQL->delete('PollOption', ['PollOptionID' => $optionIDs]);
+
+            $discussionModel = new DiscussionModel();
+            $discussionModel->update(['Type' => null], ['DiscussionID' => $poll['DiscussionID']]);
+        }
+
+        return $success;
+    }
+
+    /**
+     * Get poll's options.
+     *
+     * @param $pollID
+     * @return array Options indexed by PollOptionID.
+     */
+    public function getPollOptions($pollID) {
+        $result = $this->SQL
+            ->where('PollID', $pollID)
+            ->get('PollOption')
+            ->resultArray();
+
+        return Gdn_DataSet::index($result, ['PollOptionID']);
+    }
+
+    /**
      * Expose Gdn_Model::addInsertFields()
      * We need to expose this function so that we can pass pre validation in save().
      *
