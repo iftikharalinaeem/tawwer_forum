@@ -65,7 +65,7 @@ class PollModel extends Gdn_Model {
     }
 
     /**
-     * Inserts a new poll returns the discussion id.
+     * Save a poll returns the poll id.
      *
      * @param array $formPostValues The data to save.
      * @param array $settings Not used.
@@ -73,45 +73,84 @@ class PollModel extends Gdn_Model {
      */
     public function save($formPostValues, $settings = []) {
         $formPostValues = $this->filterForm($formPostValues);
-        $this->addInsertFields($formPostValues);
-        $this->addUpdateFields($formPostValues);
 
-        // Force anonymous polls.
-        if (c('Plugins.Polls.AnonymousPolls')) {
-            $formPostValues['Anonymous'] = 1;
+        $pollID = $formPostValues['PollID'] ?? false;
+        $insert = !$pollID;
+
+        if ($insert) {
+            // Force anonymous polls.
+            if (c('Plugins.Polls.AnonymousPolls')) {
+                $formPostValues['Anonymous'] = 1;
+            }
+            $this->addInsertFields($formPostValues);
+        } else {
+            $this->addUpdateFields($formPostValues);
+        }
+
+        $discussionID = val('DiscussionID', $formPostValues, null);
+        $discussionModel = new DiscussionModel();
+        if ($discussionID) {
+            $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+            if (!$discussion) {
+                $this->Validation->addValidationResult('DiscussionID', 'Polls must belong to an existing discussion.');
+            } else {
+                // Check if the discussion is already a poll.
+                if ($discussion['Type'] === 'Poll') {
+                    // Make sure that there are no polls attached to it. (This can happen if the poll is created by the UI)
+                    if ($this->getWhere(['DiscussionID' => $discussionID])->firstRow()) {
+                        $this->Validation->addValidationResult('DiscussionID', 'Only one poll per discussion is allowed.');
+                    }
+                } else {
+                    $discussionModel->setField($discussionID, 'Type', 'Poll');
+                }
+            }
         }
 
         // Define the primary key in this model's table.
         $this->defineSchema();
 
-        $pollID = false;
         $pollOptions = val('PollOption', $formPostValues, []);
+
+        $this->validate($formPostValues, $insert);
 
         // If all validation passed, create the discussion with discmodel, and then insert all of the poll data.
         if (count($this->Validation->results()) == 0) {
-            // Save the poll record.
-            $poll = [
-                'Name' => val('Name', $formPostValues),
-                'Anonymous' => val('Anonymous', $formPostValues),
-                'DiscussionID' => val('DiscussionID', $formPostValues),
-                'CountOptions' => count($pollOptions),
-                'CountVotes' => 0
-            ];
-            $poll = $this->coerceData($poll);
-            $pollID = $this->insert($poll);
-
-            // Save the poll options.
-            $pollOptionModel = new Gdn_Model('PollOption');
-            $i = 0;
-            foreach ($pollOptions as $option) {
-                $i++;
-                $pollOption = [
-                    'PollID' => $pollID,
-                    'Body' => $option,
-                    'Format' => 'Text',
-                    'Sort' => $i
+            if ($insert) {
+                // Save the poll record.
+                $poll = [
+                    'Name' => val('Name', $formPostValues),
+                    'Anonymous' => val('Anonymous', $formPostValues),
+                    'DiscussionID' => $discussionID,
+                    'CountOptions' => count($pollOptions),
+                    'CountVotes' => 0
                 ];
-                $pollOptionModel->save($pollOption);
+                $poll = $this->coerceData($poll);
+                $pollID = $this->insert($poll);
+
+                // Save the poll options.
+                $pollOptionModel = new Gdn_Model('PollOption');
+                $i = 0;
+                foreach ($pollOptions as $option) {
+                    $i++;
+                    $pollOption = [
+                        'PollID' => $pollID,
+                        'Body' => $option,
+                        'Format' => 'Text',
+                        'Sort' => $i
+                    ];
+                    $pollOptionModel->save($pollOption);
+                }
+            } else {
+                $newPollData = $this->coerceData($formPostValues);
+
+                if (isset($discussionID)) {
+                    $currentPoll = $this->getID($pollID, DATASET_TYPE_ARRAY);
+                    if ($currentPoll['DiscussionID'] !== $discussionID) {
+                        $discussionModel->setField($currentPoll['DiscussionID'], 'Type', null);
+                    }
+                }
+
+                $this->update($newPollData, ['PollID' => $pollID]);
             }
         }
 
