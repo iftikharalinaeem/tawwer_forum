@@ -55,6 +55,9 @@ class PollsTest extends AbstractResourceTest {
         $this->patchFields = ['name', 'discussionID'];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp() {
         parent::setUp();
 
@@ -82,6 +85,9 @@ class PollsTest extends AbstractResourceTest {
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function modifyRow($row) {
         $row = parent::modifyRow($row);
 
@@ -110,6 +116,9 @@ class PollsTest extends AbstractResourceTest {
         return $row;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function generateIndexRows() {
         $rows = [];
 
