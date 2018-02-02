@@ -8,8 +8,8 @@
     <script>
         // Initialize Firebase
         var config = {
-            apiKey: "<?php c('firebase.ApiKey', 'AIzaSyABfLkOCaR15I9RHQ7dPvLXrV-xbsz7jtA') ?>",
-            authDomain: "<?php c('firebase.authDomain', 'sincere-hearth-93716.firebaseapp.com') ?>"
+            apiKey: "<?php echo c('firebase.ApiKey', 'AIzaSyABfLkOCaR15I9RHQ7dPvLXrV-xbsz7jtA') ?>",
+            authDomain: "<?php echo c('firebase.authDomain', 'sincere-hearth-93716.firebaseapp.com') ?>"
         };
         firebase.initializeApp(config);
     </script>
