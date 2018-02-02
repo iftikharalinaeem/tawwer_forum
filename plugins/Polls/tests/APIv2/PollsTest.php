@@ -39,6 +39,8 @@ class PollsTest extends AbstractResourceTest {
             'name' => 'PollsTest',
             'urlcode' => 'pollstest',
         ]);
+
+        $session->end();
     }
 
     /**

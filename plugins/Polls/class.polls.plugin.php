@@ -367,7 +367,7 @@ class PollsPlugin extends Gdn_Plugin {
             if ($countValidOptions < 2) {
                 $pollModel->Validation->addValidationResult('PollOption', 'You must provide at least 2 valid poll options.');
             }
-            if ($countValidOptions > 10) {
+            if ($countValidOptions > PollModel::MAX_POLL_OPTION) {
                 $pollModel->Validation->addValidationResult('PollOption', 'You can not specify more than 10 poll options.');
             }
             $discussionModel->EventArguments['PollOptions'] = $validPollOptions;

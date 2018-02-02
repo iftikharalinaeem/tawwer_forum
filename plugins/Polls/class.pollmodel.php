@@ -11,6 +11,8 @@
  */
 class PollModel extends Gdn_Model {
 
+    const MAX_POLL_OPTION = 10;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -62,6 +64,27 @@ class PollModel extends Gdn_Model {
             ];
         }
         return $return;
+    }
+
+
+
+    /**
+     * Returns an array of UserID => PollVote/PollOption info. Used to display a
+     * users vote on their comment in a discussion.
+     *
+     * @param array $where A filter suitable for passing to Gdn_SQLDriver::where().
+     * @param string $orderFields A comma delimited string to order the data.
+     * @param string $orderDirection One of **asc** or **desc**.
+     * @param int|bool $limit The database limit.
+     * @param int|bool $offset The database offset.
+     * @return Gdn_DataSet
+     */
+    public function getVotesWhere($where = [], $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
+        return $this->SQL
+            ->select('pv.*')
+            ->from('PollVote pv')
+            ->where($where)
+            ->get();
     }
 
     /**
@@ -158,15 +181,63 @@ class PollModel extends Gdn_Model {
     }
 
     /**
+     * Save a poll option.
+     *
+     * @param $pollID
+     * @param $data
+     * @return bool|int PollOptionID
+     */
+    public function saveOption($pollID, $data) {
+        $pollOptionModel = new Gdn_Model('PollOption');
+        $pollOptionID = $data['PollOptionID'] ?? false;
+        $insert = !$pollOptionID;
+
+        if ($insert) {
+            if (!isset($data['Body'])) {
+                $this->Validation->addValidationResult('PollOption', 'Missing PollOption Body');
+            }
+            if ($pollOptionModel->getCount(['PollID' => $pollID]) == self::MAX_POLL_OPTION) {
+                $this->Validation->addValidationResult('PollOption', 'You can not specify more than 10 poll options.');
+            }
+        }
+
+        if (isset($data['Body'])) {
+            $data['Body'] = trim(Gdn_Format::plainText($data['Body']));
+
+            if (!$data['Body']) {
+                $this->Validation->addValidationResult('PollOption', 'Poll option body cannot be empty.');
+            }
+        }
+
+        if (count($this->Validation->results()) == 0) {
+
+            unset($data['Sort'], $data['Format']);
+            if ($insert) {
+                $data['PollID'] = $pollID;
+                $data['Format'] = 'Text';
+                $data['Sort'] = $pollOptionModel->getCount(['PollID' => $pollID]) + 1;
+            }
+
+            $pollOptionID = $pollOptionModel->save($data);
+        }
+
+        return $pollOptionID;
+    }
+
+    /**
      *
      *
-     * @param $pollOptionID
+     * @param int $pollOptionID
+     * @param int $userID
      * @return bool
      * @throws Exception
      */
-    public function vote($pollOptionID) {
-        // Get objects from the database.
-        $userID = Gdn::session()->UserID;
+    public function vote($pollOptionID, $userID = null) {
+        if ($userID === null) {
+            // Get objects from the database.
+            $userID = Gdn::session()->UserID;
+        }
+
         $pollOptionModel = new Gdn_Model('PollOption');
         $pollOption = $pollOptionModel->getID($pollOptionID);
 
@@ -178,6 +249,7 @@ class PollModel extends Gdn_Model {
                 ->from('PollVote')
                 ->where(['UserID' => $userID, 'PollOptionID' => $pollOptionID])
                 ->get()->numRows() > 0);
+
             if (!$hasVoted) {
                 // Insert the vote
                 $pollVoteModel = new Gdn_Model('PollVote');
@@ -195,6 +267,7 @@ class PollModel extends Gdn_Model {
                 return $pollOptionID;
             }
         }
+
         return false;
     }
 
@@ -207,7 +280,7 @@ class PollModel extends Gdn_Model {
 
         // Clean up
         if ($success) {
-            $options = $this->getPollOptions($id);
+            $options = $this->getOptions($id);
             $optionIDs = array_keys($options);
             $this->SQL->delete('PollVote', ['PollOptionID' => $optionIDs]);
             $this->SQL->delete('PollOption', ['PollOptionID' => $optionIDs]);
@@ -220,18 +293,74 @@ class PollModel extends Gdn_Model {
     }
 
     /**
+     * Delete an option.
+     *
+     * @param $id The Option ID.
+     */
+    public function deleteOptionID($id) {
+        $option = $this->getOptionID($id);
+        if (!$option) {
+            return;
+        }
+
+        $this->SQL->delete('PollVote', ['PollOptionID' => $id]);
+        $this->SQL->delete('PollOption', ['PollOptionID' => $id]);
+
+        $this->SQL->update('PollOption', ['Sort-' => 1], ['PollOptionID' => $id])->put();
+
+        $poll = $this->getID($option['PollID'], DATASET_TYPE_ARRAY);
+        $this->update(['CountVotes' => ($poll['CountVotes'] ?? 0)-$option['CountVotes']], ['PollID' => $option['PollID']]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteVote($pollID, $userID) {
+        $options = $this->getOptions($pollID);
+        $optionIDs = array_keys($options);
+
+        if (!$optionIDs) {
+            return;
+        }
+
+        $vote = $this->getVotesWhere(['PollOptionID' => $optionIDs, 'UserID' => $userID])->firstRow(DATASET_TYPE_ARRAY);
+
+        if (!$vote) {
+            return;
+        }
+
+        $this->SQL->delete('PollVote', ['PollOptionID' => $optionIDs, 'UserID' => $userID]);
+
+        $pollOptionID = $vote['PollOptionID'];
+        $this->SQL->update('PollOption', ['CountVotes-' => 1], ['PollOptionID' => $pollOptionID])->put();
+        $this->SQL->update('Poll', ['CountVotes-' => 1], ['PollID' => $pollID])->put();
+    }
+
+    /**
      * Get poll's options.
      *
      * @param $pollID
      * @return array Options indexed by PollOptionID.
      */
-    public function getPollOptions($pollID) {
+    public function getOptions($pollID) {
         $result = $this->SQL
             ->where('PollID', $pollID)
-            ->get('PollOption')
+            ->get('PollOption', 'Sort')
             ->resultArray();
 
         return Gdn_DataSet::index($result, ['PollOptionID']);
+    }
+
+    /**
+     * Get poll's option.
+     *
+     * @param $pollOptionID
+     * @return array
+     */
+    public function getOptionID($pollOptionID) {
+        return $this->SQL
+            ->where('PollOptionID', $pollOptionID)
+            ->get('PollOption')->firstRow(DATASET_TYPE_ARRAY);
     }
 
     /**
