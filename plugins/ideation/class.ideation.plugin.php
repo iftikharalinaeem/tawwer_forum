@@ -155,7 +155,7 @@ EOT
             $sender->addJsFile('ideation.js', 'plugins/ideation'); // Show/hide allowed discussions and downvote option
 
             if (!$categoryID) {
-                $sender->Data['_ExtendedFields']['IsIdea'] = ['Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => t('Ideation') .'<div class="info"><a href="http://docs.vanillaforums.com/addons/ideation/">' . sprintf(t('Learn more about %s'), t('ideas')) . '</a></div>'];
+                $sender->Data['_ExtendedFields']['IsIdea'] = ['Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => t('Ideation') .'<div class="info"><a href="https://docs.vanillaforums.com/help/ideation/">' . sprintf(t('Learn more about %s'), t('ideas')) . '</a></div>'];
             }
 
             $downVoteOptions = [];
