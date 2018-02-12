@@ -13,6 +13,19 @@ class LinkedInPlugin extends Gdn_Plugin {
     /// Methods ///
     protected $_AccessToken = null;
 
+    /** @var SsoUtils */
+    private $ssoUtils;
+
+    /**
+     * Constructor.
+     *
+     * @param SsoUtils $ssoUtils
+     */
+    public function __construct(SsoUtils $ssoUtils) {
+        parent::__construct();
+        $this->ssoUtils = $ssoUtils;
+    }
+
     /**
      * @param null $value
      * @return bool|mixed|null
@@ -105,14 +118,14 @@ class LinkedInPlugin extends Gdn_Plugin {
             $redirectUri = $this->redirectUri();
         }
 
-        // Generate a CSRF token.
-        $csrfToken = SsoUtils::createCSRFToken();
+        // Get a state token.
+        $stateToken = $this->ssoUtils->getStateToken();
 
         $query = [
             'client_id' => $appID,
             'response_type' => 'code',
             'scope' => $scope,
-            'state' => json_encode(['csrf' => $csrfToken]),
+            'state' => json_encode(['token' => $stateToken]),
             'redirect_uri' => $redirectUri,
         ];
 
@@ -289,8 +302,8 @@ class LinkedInPlugin extends Gdn_Plugin {
         }
 
         $state = json_decode(Gdn::request()->get('state', ''), true);
-        $suppliedCSRFToken = val('csrf', $state);
-        SsoUtils::verifyCSRFToken('linkedIn', $suppliedCSRFToken);
+        $suppliedStateToken = val('token', $state);
+        $this->ssoUtils->verifyStateToken('linkedIn', $suppliedStateToken);
 
         if (isset($_GET['error'])) {
             throw new Gdn_UserException(val('error_description', $_GET, t('There was an error connecting to LinkedIn')));
@@ -381,8 +394,8 @@ class LinkedInPlugin extends Gdn_Plugin {
         $sender->permission('Garden.SignIn.Allow');
 
         $state = json_decode(Gdn::request()->get('state', ''), true);
-        $suppliedCSRFToken = val('csrf', $state);
-        SsoUtils::verifyCSRFToken('linkedInSocial', $suppliedCSRFToken);
+        $suppliedStateToken = val('token', $state);
+        $this->ssoUtils->verifyStateToken('linkedInSocial', $suppliedStateToken);
 
         $userID = $sender->Request->get('UserID');
 

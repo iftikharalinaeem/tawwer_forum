@@ -38,10 +38,15 @@ class ZendeskPlugin extends Gdn_Plugin {
     /* @var Zendesk Zendesk Zendesk Object. */
     protected $zendesk;
 
+    /** @var SsoUtils */
+    private $ssoUtils;
+
     /**
      * Set AccessToken to be used.
+     *
+     * @param SsoUtils $ssoUtils
      */
-    public function __construct() {
+    public function __construct(SsoUtils $ssoUtils) {
         parent::__construct();
 
         $this->accessToken = getValueR('Attributes.'.self::PROVIDER_KEY.'.AccessToken', Gdn::session()->User);
@@ -49,6 +54,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             $this->accessToken = c('Plugins.Zendesk.GlobalLogin.AccessToken');
         }
 
+        $this->ssoUtils = $ssoUtils;
     }
 
     /**
@@ -543,7 +549,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException If Errors.
      * @return string Authorize URL Authorize Url.
      */
-    public static function authorizeUri($redirectUri = false) {
+    public function authorizeUri($redirectUri = false) {
         if (!self::isConfigured()) {
             throw new Gdn_UserException('Zendesk is not configured yet');
         }
@@ -551,13 +557,17 @@ class ZendeskPlugin extends Gdn_Plugin {
         if (!$redirectUri) {
             $redirectUri = self::redirectUri();
         }
+
+        // Get a state token.
+        $stateToken = $this->ssoUtils->getStateToken();
+
         $query = [
             'response_type' => 'code',
             'redirect_uri' => $redirectUri,
             'client_id' => $appID,
             'scope' => 'read write',
             'state' => json_encode([
-                'csrf' => SsoUtils::createCSRFToken(),
+                'token' => $stateToken,
             ]),
 
         ];
@@ -691,7 +701,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             'Icon' => $this->getWebResource('zendesk.png', '/'),
             'Name' => self::PROVIDER_KEY,
             'ProviderKey' => self::PROVIDER_KEY,
-            'ConnectUrl' => self::authorizeUri(self::profileConnectUrl()),
+            'ConnectUrl' => $this->authorizeUri(self::profileConnectUrl()),
             'Profile' => [
                 'Name' => val('fullname', $profile),
                 'Photo' => val('photo', $profile)
@@ -718,8 +728,8 @@ class ZendeskPlugin extends Gdn_Plugin {
         $sender->permission('Garden.SignIn.Allow');
 
         $state = json_decode(Gdn::request()->get('state', ''), true);
-        $suppliedCSRFToken = val('csrf', $state);
-        SsoUtils::verifyCSRFToken('zendeskConnect', $suppliedCSRFToken);
+        $suppliedStateToken = val('token', $state);
+        $this->ssoUtils->verifyStateToken('zendeskConnect', $suppliedStateToken);
 
         $sender->getUserInfo($userReference, $username, '', true);
         $sender->_SetBreadcrumbs(t('Connections'), userUrl($sender->User, '', 'connections'));
@@ -764,7 +774,7 @@ class ZendeskPlugin extends Gdn_Plugin {
      * OAuth Method. Redirects user to request access.
      */
     public function controller_authorize() {
-        redirectTo(self::authorizeUri(self::globalConnectUrl()), 302, false);
+        redirectTo($this->authorizeUri(self::globalConnectUrl()), 302, false);
     }
 
     /**

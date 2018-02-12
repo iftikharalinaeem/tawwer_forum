@@ -40,6 +40,19 @@ class GithubPlugin extends Gdn_Plugin {
 
     const OAUTH_BASE_URL = 'https://github.com';
 
+    /** @var SsoUtils */
+    private $ssoUtils;
+
+    /**
+     * Constructor.
+     *
+     * @param SsoUtils $ssoUtils
+     */
+    public function __construct(SsoUtils $ssoUtils) {
+        parent::__construct();
+        $this->ssoUtils = $ssoUtils;
+    }
+
     //OAuth Methods
 
     /**
@@ -70,24 +83,25 @@ class GithubPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException If Errors.
      * @return string Authorize URL Authorize Url.
      */
-    public static function authorizeUri($redirectUri = false) {
+    public function authorizeUri($redirectUri = false) {
         if (!self::isConfigured()) {
             throw new Gdn_UserException('GitHub is not configured yet');
         }
+
         $appID = c('Plugins.Github.ApplicationID');
         if (!$redirectUri) {
             $redirectUri = self::redirectUri();
         }
 
-        // Generate a CSRF token.
-        $csrfToken = SsoUtils::createCSRFToken();
+        // Get a state token.
+        $stateToken = $this->ssoUtils->getStateToken();
 
         $query = [
             'redirect_uri' => $redirectUri,
             'client_id' => $appID,
             'response_type' => 'code',
             'scope' => 'repo',
-            'state' => json_encode(['csrf' => $csrfToken]),
+            'state' => json_encode(['token' => $stateToken]),
 
         ];
         return self::OAUTH_BASE_URL.'/login/oauth/authorize?'.http_build_query($query);
@@ -208,7 +222,7 @@ class GithubPlugin extends Gdn_Plugin {
             'Icon' => $this->getWebResource('icon.png', '/'),
             'Name' => ucfirst(self::PROVIDER_KEY),
             'ProviderKey' => self::PROVIDER_KEY,
-            'ConnectUrl' => self::authorizeUri(self::profileConnectUrl()),
+            'ConnectUrl' => $this->authorizeUri(self::profileConnectUrl()),
             'Profile' => [
                 'Name' => val('fullname', $profile),
                 'Photo' => val('photo', $profile),
@@ -230,8 +244,8 @@ class GithubPlugin extends Gdn_Plugin {
         $sender->permission('Garden.SignIn.Allow');
 
         $state = json_decode(Gdn::request()->get('state', ''), true);
-        $suppliedCSRFToken = val('csrf', $state);
-        SsoUtils::verifyCSRFToken('github', $suppliedCSRFToken);
+        $suppliedStateToken = val('token', $state);
+        $this->ssoUtils->verifyStateToken('github', $suppliedStateToken);
 
         if (Gdn::request()->get('error')) {
             $message = Gdn::request()->get('error_description');
@@ -287,7 +301,7 @@ class GithubPlugin extends Gdn_Plugin {
      * OAuth Method. Redirects user to request access.
      */
     public function controller_authorize() {
-        redirectTo(self::authorizeUri(self::globalConnectUrl()), 302, false);
+        redirectTo($this->authorizeUri(self::globalConnectUrl()), 302, false);
     }
 
     /**

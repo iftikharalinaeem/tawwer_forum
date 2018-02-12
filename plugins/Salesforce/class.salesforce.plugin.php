@@ -32,6 +32,18 @@ class SalesforcePlugin extends Gdn_Plugin {
      */
     const ProviderKey = 'Salesforce';
 
+    /** @var SsoUtils */
+    private $ssoUtils;
+
+    /**
+     * Constructor.
+     *
+     * @param SsoUtils $ssoUtils
+     */
+    public function __construct(SsoUtils $ssoUtils) {
+        parent::__construct();
+        $this->ssoUtils = $ssoUtils;
+    }
 
     /**
      * Setup the plugin
@@ -98,8 +110,8 @@ class SalesforcePlugin extends Gdn_Plugin {
         $sender->permission('Garden.SignIn.Allow');
 
         $state = json_decode(Gdn::request()->get('state', ''), true);
-        $suppliedCSRFToken = val('csrf', $state);
-        SsoUtils::verifyCSRFToken('salesforceConnect', $suppliedCSRFToken);
+        $suppliedStateToken = val('token', $state);
+        $this->ssoUtils->verifyStateToken('salesforceConnect', $suppliedStateToken);
 
         $sender->getUserInfo($userReference, $username, '', true);
         $sender->_SetBreadcrumbs(t('Connections'), userUrl($sender->User, '', 'connections'));
