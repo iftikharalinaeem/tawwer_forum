@@ -6,7 +6,7 @@ class AnalyticsController extends DashboardController {
      * Restrict access to that controller
      */
     public function initialize() {
-        $this->permission('Garden.Settings.Manage');
+        $this->permission('Analytics.Data.View');
 
         parent::initialize();
     }
