@@ -22,11 +22,26 @@ class SphinxPlugin extends Gdn_Plugin {
     /** The highest value for "limit" in the default, generic schema. */
     const MAX_SCHEMA_LIMIT = 100;
 
+    /** @var CategoryModel */
+    private $categoryModel;
+
+    /** @var DiscussionModel */
+    private $discussionModel;
+
     /** @var SearchModel */
     private $searchModel;
 
     /** @var Schema */
     private $searchSchema;
+
+    /** @var Gdn_Session */
+    private $session;
+
+    public function __construct(Gdn_Session $session, CategoryModel $categoryModel, DiscussionModel $discussionModel) {
+        $this->categoryModel = $categoryModel;
+        $this->discussionModel = $discussionModel;
+        $this->session = $session;
+    }
 
     /**
      * Fired when plugin is disabled
@@ -108,7 +123,7 @@ class SphinxPlugin extends Gdn_Plugin {
         );
 
         foreach ($result as &$row) {
-            $sender->normalizeOutput($row);
+            $row = $sender->normalizeOutput($row);
         }
         $result = $out->validate($result);
         return $result;
@@ -125,7 +140,10 @@ class SphinxPlugin extends Gdn_Plugin {
         $sender->permission('Garden.SignIn.Allow');
 
         $in = $sender
-            ->schema(['categoryID:i?' => 'The numeric ID of a category.'], 'in')
+            ->schema([
+                'categoryID:i?' => 'The numeric ID of a category.',
+                'followed:b?' => 'Limit results to those in followed categories.'
+            ], 'in')
             ->merge($this->searchSchema())
             ->setDescription('Search discussions.');
         $out = $sender->schema([':a' => $sender->discussionSchema()], 'out');
@@ -140,12 +158,17 @@ class SphinxPlugin extends Gdn_Plugin {
             'group' => false,
             'discussion_d' => 1
         ];
+
         if (array_key_exists('categoryID', $query)) {
             $params['cat'] = $query['categoryID'];
+        } elseif ($this->session->isValid() && !empty($query['followed'])) {
+            $followed = $this->categoryModel->getFollowed($this->session->UserID);
+            $followedIDs = array_column($followed, 'CategoryID');
+            $params['cat'] = $followedIDs;
         }
 
         $result = $this->searchModel()->modelSearch(
-            DiscussionModel::instance(),
+            $this->discussionModel,
             $query['query'],
             $params,
             $limit,
@@ -154,7 +177,7 @@ class SphinxPlugin extends Gdn_Plugin {
         );
 
         foreach ($result as &$row) {
-            $sender->normalizeOutput($row);
+            $row = $sender->normalizeOutput($row);
         }
         $result = $out->validate($result);
         return $result;
