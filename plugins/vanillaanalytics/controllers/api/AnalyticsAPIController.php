@@ -91,7 +91,7 @@ class AnalyticsApiController extends AbstractApiController {
      * @return array
      */
     public function get_leaderboard(array $query) {
-        $this->permission('Garden.Settings.Manage');
+        $this->permission('Analytics.Data.View');
 
         $boards = $this->widgetsByType('leaderboard');
 
@@ -157,7 +157,7 @@ class AnalyticsApiController extends AbstractApiController {
      * @return Data
      */
     public function post_query(array $body) {
-        $this->permission('Garden.Settings.Manage');
+        $this->permission('Analytics.Data.View');
 
         $in = $this->schema([
             'type:s' => [

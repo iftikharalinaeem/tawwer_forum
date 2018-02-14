@@ -49,7 +49,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $nav = $sender;
 
         $section = [
-            'permission' => 'Garden.Settings.Manage',
+            'permission' => 'Analytics.Data.View',
             'section' => 'Analytics',
             'title' => 'Analytics',
             'description' => 'Visualize Your Community',
@@ -65,7 +65,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $nav->addGroupToSection('Analytics', t('Analytics'), 'analytics');
 
         $nav->addLinkToSectionIf(
-            'Garden.Settings.Manage',
+            'Analytics.Data.View',
             'Analytics',
             t('My Analytics'),
             'analytics/dashboard/'.AnalyticsDashboard::DASHBOARD_PERSONAL,
@@ -76,7 +76,7 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         foreach ($sectionModel->getDefaults() as $section) {
             foreach ($section->getDashboards() as $dashboard) {
                 $nav->addLinkToSectionIf(
-                    'Garden.Settings.Manage',
+                    'Analytics.Data.View',
                     'Analytics',
                     t($dashboard->getTitle()),
                     'analytics/dashboard/'.urlencode($dashboard->dashboardID),
