@@ -660,9 +660,6 @@ class Salesforce {
 
     public static function authorizeUri($redirectUri = false, $extraStateParameters = []) {
         $ssoUtils = Gdn::getContainer()->get('SsoUtils');
-        if (!$ssoUtils) {
-            throw new Exception('Unable to get SsoUtils from the container.');
-        }
 
         $appID = c('Plugins.Salesforce.ApplicationID');
         if (!$redirectUri) {
