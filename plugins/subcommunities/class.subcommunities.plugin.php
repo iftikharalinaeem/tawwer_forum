@@ -344,7 +344,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $category = CategoryModel::categories($site['CategoryID']);
 
             // Set the default category root.
-            $routes[base64_encode('categories(.json)?$')] = ltrim(categoryUrl($category, '', '/'), '/').'$1';
+            $routes[base64_encode('categories(.json)?(?=$|\?)')] = ltrim(categoryUrl($category, '', '/'), '/').'$1';
 
             $defaultRoute = val('DefaultController', $routes);
             if (is_array($defaultRoute)) {
