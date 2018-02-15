@@ -43,7 +43,8 @@ class SwaggerPlugin extends Gdn_Plugin {
             if (!$search) {
                 continue;
             }
-            echo '<script src="' . htmlspecialchars(url($search[1])) . '" type="text/javascript"></script>'."\n";
+            list($path, $url) = $search;
+            echo '<script src="'.htmlspecialchars(asset($url, false, true)).'" type="text/javascript"></script>'."\n";
         }
     }
 
