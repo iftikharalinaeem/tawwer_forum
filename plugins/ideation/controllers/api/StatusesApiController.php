@@ -83,7 +83,7 @@ class StatusesApiController extends AbstractApiController {
     }
 
     /**
-     * Get editable fields for a record.
+     * Get editable fields for an idea status.
      *
      * @param int $id
      * @return array
@@ -91,7 +91,7 @@ class StatusesApiController extends AbstractApiController {
     public function get_edit($id) {
         $this->permission('Garden.Settings.Manage');
 
-        $in = $this->schema($this->idParamSchema(), 'in')->setDescription('Get editable fields for a record.');
+        $in = $this->schema($this->idParamSchema(), 'in')->setDescription('Get editable fields for an idea status.');
         $out = $this->schema(Schema::parse([
             'statusID',
             'name',
