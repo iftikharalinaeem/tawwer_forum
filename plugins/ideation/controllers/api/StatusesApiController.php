@@ -54,7 +54,10 @@ class StatusesApiController extends AbstractApiController {
             $schema = Schema::parse([
                 'statusID:i' => 'Unique numeric ID of a status.',
                 'name:s' => 'Label for the status.',
-                'votingEnabled:b' => 'Is voting allowed under this status?',
+                'state:s' => [
+                    'description' => 'The open/closed state of an idea.',
+                    'enum' => ['Open', 'Closed']
+                ],
                 'tagID:i' => 'Unique numeric ID of the associated tag.',
                 'isDefault:b' => 'Is this the default status?'
             ]);
@@ -95,7 +98,7 @@ class StatusesApiController extends AbstractApiController {
         $out = $this->schema(Schema::parse([
             'statusID',
             'name',
-            'votingEnabled',
+            'state',
             'isDefault',
         ])->add($this->fullSchema()), 'out');
 
@@ -150,9 +153,6 @@ class StatusesApiController extends AbstractApiController {
      * @return array
      */
     public function normalizeInput(array $fields) {
-        if (array_key_exists('votingEnabled', $fields)) {
-            $fields['State'] = $fields['votingEnabled'] ? 'Open' : 'Closed';
-        }
         if (array_key_exists('isDefault', $fields)) {
             $fields['isDefault'] = $fields['isDefault'] ? 1 : 0;
         }
@@ -168,8 +168,6 @@ class StatusesApiController extends AbstractApiController {
      * @return array
      */
     public function normalizeOutput(array $row) {
-        $row['votingEnabled'] = (array_key_exists('State', $row) && $row['State'] === 'Open');
-
         return $row;
     }
 
@@ -240,7 +238,7 @@ class StatusesApiController extends AbstractApiController {
             if (!isset($schema)) {
                 $schema = Schema::parse([
                     'name',
-                    'votingEnabled',
+                    'state',
                     'isDefault'
                 ])->add($this->fullSchema());
             }

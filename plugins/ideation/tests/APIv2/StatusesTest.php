@@ -12,7 +12,7 @@ namespace VanillaTests\APIv2;
 class StatusesTest extends AbstractResourceTest {
 
     /** {@inheritdoc} */
-    protected $editFields = ['name', 'votingEnabled', 'isDefault'];
+    protected $editFields = ['name', 'state', 'isDefault'];
 
     /** {@inheritdoc} */
     protected $testPagingOnIndex = false;
@@ -22,7 +22,7 @@ class StatusesTest extends AbstractResourceTest {
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/statuses';
-        $this->patchFields = ['name', 'votingEnabled', 'isDefault'];
+        $this->patchFields = ['name', 'state', 'isDefault'];
         $this->pk = 'statusID';
 
         parent::__construct($name, $data, $dataName);
@@ -34,7 +34,7 @@ class StatusesTest extends AbstractResourceTest {
     protected function modifyRow(array $row) {
         $row['name'] = md5($row['name']);
         $row['isDefault'] = !$row['isDefault'];
-        $row['votingEnabled'] = $row['votingEnabled'];
+        $row['state'] = $row['state'] === 'Open' ? 'Closed' : 'Open';
 
         return $row;
     }
@@ -48,7 +48,7 @@ class StatusesTest extends AbstractResourceTest {
 
         $record = [
             'name' => "Status {$total}",
-            'votingEnabled' => true,
+            'state' => 'Open',
             'isDefault' => false
         ];
         return $record;
