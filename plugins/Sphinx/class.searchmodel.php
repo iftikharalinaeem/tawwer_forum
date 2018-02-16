@@ -564,7 +564,7 @@ class SearchModel extends Gdn_Model {
                 ->resultArray();
         }
 
-        if ($expandUser) {
+        if ($expandInsertUser) {
             $userModel = new UserModel();
             $userModel->expandUsers($result, ['InsertUserID']);
         }
