@@ -1,5 +1,9 @@
 <?php if (!defined('APPLICATION')) exit;
 
+use Garden\Schema\Schema;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ServerException;
+
 /**
  * Ideation Plugin
  *
@@ -43,6 +47,18 @@ class IdeationPlugin extends Gdn_Plugin {
      * @var int The tag ID of the downvote reaction.
      */
     protected static $downTagID;
+
+    /** @var StatusModel */
+    private $statusModel;
+
+    /**
+     * IdeationPlugin constructor.
+     *
+     * @param StatusModel $statusModel
+     */
+    public function __construct(StatusModel $statusModel) {
+        $this->statusModel = $statusModel;
+    }
 
     /**
      * This will run when you "Enable" the plugin.
@@ -1037,6 +1053,52 @@ EOT
     }
 
     /**
+     * Update idea metadata on a discussion through the API.
+     *
+     * @param DiscussionsApiController $sender
+     * @param int $id
+     * @param array $body
+     */
+    public function discussionsApiController_patch_idea(DiscussionsApiController $sender, $id, array $body) {
+        $sender->permission('Vanilla.Moderation.Manage');
+
+        $in = $sender->schema(Schema::parse([
+            'statusID',
+            'statusNotes' => ['default' => '']
+        ])->add($this->statusFragment()), 'in');
+        $out = $sender->schema($this->statusFragment(), 'out');
+
+        $body = $in->validate($body);
+
+        // Verify the discussion is valid.
+        $discussion = $sender->discussionByID($id);
+        if (!$this->isIdea($discussion)) {
+            throw new ClientException("Invalid idea ({$id}).");
+        }
+
+        // Verify the status is valid.
+        $status = $this->statusModel->getStatus($body['statusID']);
+        if (!is_array($status) || !array_key_exists('StatusID', $status)) {
+            throw new ClientException("Invalid status ID ({$body['statusID']})");
+        }
+
+        $this->updateDiscussionStatus($discussion, $body['statusID'], $body['statusNotes']);
+        $currentStatus = $this->statusModel->getStatusByDiscussion($id);
+        if (empty($currentStatus)) {
+            throw new ServerException("An error was encountered while getting the status of the idea ({$id}).");
+        }
+        $currentDiscussion = $sender->discussionByID($id);
+        $currentStatusNotes = $this->getStatusNotes($currentDiscussion) ?: null;
+
+        $row = [
+            'statusID' => $currentStatus['StatusID'],
+            'statusNotes' => $currentStatusNotes
+        ];
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
      * Adds the sessioned user's Idea* reaction to the discussion data in the form [UserVote] => TagID
      * where TagID is the TagID of the reaction.
      *
@@ -1465,6 +1527,24 @@ EOT
             return $noUp + $noDown;
         }
         return 0;
+    }
+
+    /**
+     * Get a schema object representing a simple subset of idea status metadata on a discussion.
+     *
+     * @return mixed
+     */
+    private function statusFragment() {
+        static $schema;
+
+        if (!isset($schema)) {
+            $schema = Schema::parse([
+                'statusID:i' => 'Idea status ID.',
+                'statusNotes:s|n' => 'Notes on a status change. Notes will persist until overwritten.'
+            ]);
+        }
+
+        return $schema;
     }
 }
 
