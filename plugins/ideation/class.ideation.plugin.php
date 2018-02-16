@@ -108,6 +108,65 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Set idea metadata summary on a discussion's attributes.
+     *
+     * @param array $discussion
+     * @return array
+     */
+    private function getSummary(array $discussion) {
+        $result = null;
+
+        $discussionID = val('discussionID', $discussion, val('DiscussionID', $discussion));
+        $categoryID = val('categoryID', $discussion, val('CategoryID', $discussion));
+
+        if (!$discussionID || !$categoryID) {
+            return $result;
+        }
+
+        $category = CategoryModel::categories($categoryID);
+        if (!$this->isIdeaCategory($category)) {
+            return $result;
+        }
+
+        $type = $category['IdeationType'];
+        $score = val('score', $discussion, val('Score', $discussion, null)) ?: 0;
+        $status = $this->statusModel->getStatusByDiscussion($discussionID);
+        $notesKey = array_key_exists('DiscussionID', $discussion) ? 'Attributes.StatusNotes' : 'attributes.statusNotes';
+        $statusNotes = valr($notesKey, $discussion) ?: null;
+        $result = [
+            'score' => $score,
+            'status' => val('Name', $status),
+            'statusNotes' => $statusNotes,
+            'state' => val('State', $status),
+            'type' => $type
+        ];
+
+        return $result;
+    }
+
+    /**
+     * Set an idea summary on a discussion row.
+     *
+     * @param array $row Discussion row. May be partial data.
+     * @param array $data Full discussion record.
+     * @return array
+     */
+    private function setSummary(array $row, array $data) {
+        $type = val('type', $data, val('Type', $data));
+
+        if ($type === 'Idea') {
+            $schema = $this->getSummaryFragment();
+            $summary = $this->getSummary($data);
+            $summary = $schema->validate($summary);
+            if (is_array($summary)) {
+                setvalr('attributes.idea', $row, $summary);
+            }
+        }
+
+        return $row;
+    }
+
+    /**
      * Sets the upvote reaction tag ID.
      *
      * @param int $upTagID The upvote reaction tag ID.
@@ -1064,6 +1123,50 @@ EOT
     }
 
     /**
+     * Modify the data on /api/v2/discussions/:id to include ideation metadata.
+     *
+     * @param array $result Post-validated data.
+     * @param DiscussionsApiController $sender
+     * @param Schema $inSchema
+     * @param array $query The request query.
+     * @param array $row Pre-validated data.
+     * @return array
+     */
+    public function discussionsApiController_get_output(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $row) {
+        if ($row['type'] !== 'Idea') {
+            return $result;
+        }
+
+        $result = $this->setSummary($result, $row);
+
+        return $result;
+    }
+
+    /**
+     * Modify the data on /api/v2/discussions index to include ideation metadata..
+     *
+     * @param array $result Post-validated data.
+     * @param DiscussionsApiController $sender
+     * @param Schema $inSchema
+     * @param array $query The request query.
+     * @param array $rows Raw result.
+     */
+    public function discussionsApiController_index_output(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $rows) {
+        $rows = array_column($rows, null, 'discussionID');
+
+        foreach ($result as &$row) {
+            if ($row['type'] !== 'Idea') {
+                continue;
+            }
+
+            $discussion = $rows[$row['discussionID']];
+            $row = $this->setSummary($row, $discussion);
+        }
+
+        return $result;
+    }
+
+    /**
      * Update idea metadata on a discussion through the discussions API endpoint.
      *
      * @param DiscussionsApiController $sender
@@ -1186,6 +1289,42 @@ EOT
             $discussions = $sender->data('Discussions')->result();
             $this->addUserVotesToDiscussions($discussions);
         }
+    }
+
+    /**
+     * Update the /discussions/get input schema.
+     *
+     * @param Schema $schema
+     */
+    public function discussionSchema_init(Schema $schema) {
+        $this->updateSchemaAttributes($schema);
+    }
+
+    /**
+     * Get a schema object representing a summary of idea metadata on a discussion.
+     *
+     * @return Schema
+     */
+    private function getSummaryFragment() {
+        static $schema;
+
+        if (!isset($schema)) {
+            $schema = Schema::parse([
+                'score:i' => 'Total score for the idea.',
+                'status:s' => 'Name of the current idea status.',
+                'statusNotes:s|n' => 'Status update notes.',
+                'state:s' => [
+                    'description' => 'Is the idea open or closed to voting?',
+                    'enum' => ['Open', 'Closed']
+                ],
+                'type:s' => [
+                    'description' => 'Voting type for this idea: up-only or up and down.',
+                    'enum' => ['up', 'up-down']
+                ]
+            ]);
+        }
+
+        return $schema;
     }
 
     /**
@@ -1606,6 +1745,28 @@ EOT
         }
 
         return $schema;
+    }
+
+    /**
+     * Update the attributes field of a post schema.
+     *
+     * @param Schema $schema
+     */
+    private function updateSchemaAttributes(Schema $schema) {
+        $attributes = $schema->getField('properties.attributes');
+
+        // Add to an existing "attributes" field or create a new one?
+        if ($attributes instanceof Schema) {
+            $attributes->merge(Schema::parse([
+                'idea?' => $this->getSummaryFragment()
+            ]));
+        } else {
+            $schema->merge(Schema::parse([
+                'attributes?' => Schema::parse([
+                    'idea?' => $this->getSummaryFragment()
+                ])
+            ]));
+        }
     }
 }
 
