@@ -37,7 +37,7 @@ class SphinxPlugin extends Gdn_Plugin {
     /** @var Gdn_Session */
     private $session;
 
-    public function __construct(Gdn_Session $session, CategoryModel $categoryModel, DiscussionModel $discussionModel) {
+    public function __construct(CategoryModel $categoryModel, DiscussionModel $discussionModel, Gdn_Session $session) {
         $this->categoryModel = $categoryModel;
         $this->discussionModel = $discussionModel;
         $this->session = $session;
@@ -141,8 +141,8 @@ class SphinxPlugin extends Gdn_Plugin {
 
         $in = $sender
             ->schema([
-                'categoryID:i?' => 'The numeric ID of a category.',
-                'followed:b?' => 'Limit results to those in followed categories.'
+                'categoryID:i?' => 'The numeric ID of a category to limit search results to.',
+                'followed:b?' => 'Limit results to those in followed categories. Cannot be used with the categoryID parameter.'
             ], 'in')
             ->merge($this->searchSchema())
             ->setDescription('Search discussions.');
