@@ -3,6 +3,7 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\ApiUtils;
 
 /**
  * Ideation Plugin
@@ -48,16 +49,26 @@ class IdeationPlugin extends Gdn_Plugin {
      */
     protected static $downTagID;
 
+    /** @var DiscussionModel */
+    private $discussionModel;
+
     /** @var StatusModel */
     private $statusModel;
+
+    /** @var UserModel */
+    private $userModel;
 
     /**
      * IdeationPlugin constructor.
      *
+     * @param DiscussionModel $discussionModel
      * @param StatusModel $statusModel
+     * @param UserModel $userModel
      */
-    public function __construct(StatusModel $statusModel) {
+    public function __construct(DiscussionModel $discussionModel, StatusModel $statusModel, UserModel $userModel) {
+        $this->discussionModel = $discussionModel;
         $this->statusModel = $statusModel;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -1053,11 +1064,15 @@ EOT
     }
 
     /**
-     * Update idea metadata on a discussion through the API.
+     * Update idea metadata on a discussion through the discussions API endpoint.
      *
      * @param DiscussionsApiController $sender
      * @param int $id
      * @param array $body
+     * @return array
+     * @throws ClientException if the discussion is not a valid idea.
+     * @throws ClientException if the status ID is not associated with a valid idea status.
+     * @throws ServerException if, after saving, the status cannot be retrievd from an idea.
      */
     public function discussionsApiController_patch_idea(DiscussionsApiController $sender, $id, array $body) {
         $sender->permission('Vanilla.Moderation.Manage');
@@ -1065,7 +1080,7 @@ EOT
         $in = $sender->schema(Schema::parse([
             'statusID',
             'statusNotes' => ['default' => '']
-        ])->add($this->statusFragment()), 'in');
+        ])->add($this->statusFragment()), 'in')->setDescription('Update idea metadata on a discussion.');
         $out = $sender->schema($this->statusFragment(), 'out');
 
         $body = $in->validate($body);
@@ -1085,7 +1100,7 @@ EOT
         $this->updateDiscussionStatus($discussion, $body['statusID'], $body['statusNotes']);
         $currentStatus = $this->statusModel->getStatusByDiscussion($id);
         if (empty($currentStatus)) {
-            throw new ServerException("An error was encountered while getting the status of the idea ({$id}).");
+            throw new ServerException("An error was encountered while getting the status of the idea ({$id}).", 500);
         }
         $currentDiscussion = $sender->discussionByID($id);
         $currentStatusNotes = $this->getStatusNotes($currentDiscussion) ?: null;
@@ -1094,6 +1109,52 @@ EOT
             'statusID' => $currentStatus['StatusID'],
             'statusNotes' => $currentStatusNotes
         ];
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * Create an idea through the discussions API endpoint.
+     *
+     * @param DiscussionsApiController $sender
+     * @param array $body
+     * @return array
+     * @throws ClientException if the category is not configured for ideation.
+     */
+    public function discussionsApiController_post_idea(DiscussionsApiController $sender, array $body) {
+        $sender->permission('Garden.SignIn.Allow');
+
+        $in = $sender->schema($sender->discussionPostSchema(), 'in')->setDescription('Add an idea.');
+        $out = $sender->schema($sender->discussionSchema(), 'out');
+
+        $body = $in->validate($body);
+        $categoryID = $body['categoryID'];
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $categoryID);
+        $sender->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
+        $sender->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
+        $sender->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
+
+        $category = CategoryModel::categories($categoryID);
+        if (!$this->isIdeaCategory($category)) {
+            throw new ClientException("Category is not configured for ideation ({$categoryID}).");
+        }
+
+        $discussionData = ApiUtils::convertInputKeys($body);
+
+        $discussionData['Type'] = 'Idea';
+        $defaultStatus = $this->statusModel->getDefaultStatus();
+        $discussionData['Tags'] = $defaultStatus['TagID'];
+
+        $id = $this->discussionModel->save($discussionData);
+        $sender->validateModel($this->discussionModel);
+
+        if (!$id) {
+            throw new ServerException('Unable to insert idea.', 500);
+        }
+
+        $row = $sender->discussionByID($id);
+        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
+        $row = $sender->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
