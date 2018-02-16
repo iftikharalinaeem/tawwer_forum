@@ -225,6 +225,27 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Determine if the filter menu for followed categories should be displayed on a category page.
+     *
+     * @param CategoriesController $sender
+     * @param array $args
+     */
+    public function categoriesController_enableFollowingFilter_handler($sender, $args) {
+        $categoryIdentifier = $args['CategoryIdentifier'];
+
+        // If we're in a subcommunity, and the category is the subcommunity root, display the filter menu.
+        if ($categoryIdentifier !== '') {
+            $subcommunity = SubcommunityModel::getCurrent();
+            if (is_array($subcommunity)) {
+                $category = CategoryModel::categories($categoryIdentifier);
+                if (is_array($category)) {
+                    $args['EnableFollowingFilter'] = $subcommunity['CategoryID'] == $category['CategoryID'];
+                }
+            }
+        }
+    }
+
+    /**
      * Adjust the depth of the categories so that they start at 1.
      *
      * @param CategoriesController $sender
@@ -344,7 +365,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $category = CategoryModel::categories($site['CategoryID']);
 
             // Set the default category root.
-            $routes[base64_encode('categories(.json)?$')] = ltrim(categoryUrl($category, '', '/'), '/').'$1';
+            $routes[base64_encode('categories(.json)?(?=$|\?)')] = ltrim(categoryUrl($category, '', '/'), '/').'$1';
 
             $defaultRoute = val('DefaultController', $routes);
             if (is_array($defaultRoute)) {
