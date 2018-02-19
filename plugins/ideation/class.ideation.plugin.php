@@ -69,6 +69,7 @@ class IdeationPlugin extends Gdn_Plugin {
         $this->discussionModel = $discussionModel;
         $this->statusModel = $statusModel;
         $this->userModel = $userModel;
+        parent::__construct();
     }
 
     /**
@@ -135,9 +136,12 @@ class IdeationPlugin extends Gdn_Plugin {
         $statusNotes = valr($notesKey, $discussion) ?: null;
         $result = [
             'score' => $score,
-            'status' => val('Name', $status),
+            'statusID' => val('StatusID', $status),
+            'status' => [
+                'name' => val('Name', $status),
+                'state' => val('State', $status)
+            ],
             'statusNotes' => $statusNotes,
-            'state' => val('State', $status),
             'type' => $type
         ];
 
@@ -1123,6 +1127,31 @@ EOT
     }
 
     /**
+     * Get idea metadata from a discussion.
+     *
+     * @param DiscussionsApiController $sender
+     * @param int $id
+     * @return array
+     * @throws ClientException if the discussion is not an idea.
+     */
+    public function discussionsApiController_get_idea(DiscussionsApiController $sender, $id) {
+        $sender->permission();
+
+        $in = $sender->schema([], 'in')->setDescription('Get idea metadata from a discussion.');
+        $out = $sender->schema($this->getSummaryFragment(), 'out');
+
+        $row = $sender->discussionByID($id);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
+        if ($row['Type'] !== 'Idea') {
+            throw new ClientException('Discussion is not an idea.');
+        }
+        $summary = $this->getSummary($row);
+
+        $result = $out->validate($summary);
+        return $result;
+    }
+
+    /**
      * Modify the data on /api/v2/discussions/:id to include ideation metadata.
      *
      * @param array $result Post-validated data.
@@ -1180,13 +1209,11 @@ EOT
     public function discussionsApiController_patch_idea(DiscussionsApiController $sender, $id, array $body) {
         $sender->permission('Vanilla.Moderation.Manage');
 
-        $in = $sender->schema(Schema::parse([
-            'statusID',
-            'statusNotes' => ['default' => '']
-        ])->add($this->statusFragment()), 'in')->setDescription('Update idea metadata on a discussion.');
+        $in = $sender->schema($this->statusFragment(), 'in')
+            ->setDescription('Update idea metadata on a discussion.');
         $out = $sender->schema($this->statusFragment(), 'out');
 
-        $body = $in->validate($body);
+        $body = $in->validate($body, true);
 
         // Verify the discussion is valid.
         $discussion = $sender->discussionByID($id);
@@ -1195,12 +1222,19 @@ EOT
         }
 
         // Verify the status is valid.
-        $status = $this->statusModel->getStatus($body['statusID']);
-        if (!is_array($status) || !array_key_exists('StatusID', $status)) {
-            throw new ClientException("Invalid status ID ({$body['statusID']})");
+        if (array_key_exists('statusID', $body)) {
+            $statusID = $body['statusID'];
+            $status = $this->statusModel->getStatus($statusID);
+            if (!is_array($status) || !array_key_exists('StatusID', $status)) {
+                throw new ClientException("Invalid status ID ({$statusID})");
+            }
+            $this->updateDiscussionStatusTag($id, $statusID);
         }
 
-        $this->updateDiscussionStatus($discussion, $body['statusID'], $body['statusNotes']);
+        if (array_key_exists('statusNotes', $body)) {
+            $this->updateDiscussionStatusNotes($id, $body['statusNotes']);
+        }
+
         $currentStatus = $this->statusModel->getStatusByDiscussion($id);
         if (empty($currentStatus)) {
             throw new ServerException("An error was encountered while getting the status of the idea ({$id}).", 500);
@@ -1311,11 +1345,14 @@ EOT
         if (!isset($schema)) {
             $schema = Schema::parse([
                 'score:i' => 'Total score for the idea.',
-                'status:s' => 'Name of the current idea status.',
                 'statusNotes:s|n' => 'Status update notes.',
-                'state:s' => [
-                    'description' => 'Is the idea open or closed to voting?',
-                    'enum' => ['Open', 'Closed']
+                'statusID:i' => 'Unique numeric ID of a status.',
+                'status' => [
+                    'name:s' => 'Label for the status.',
+                    'state:s' => [
+                        'description' => 'The open/closed state of an idea.',
+                        'enum' => ['Open', 'Closed']
+                    ]
                 ],
                 'type:s' => [
                     'description' => 'Voting type for this idea: up-only or up and down.',
