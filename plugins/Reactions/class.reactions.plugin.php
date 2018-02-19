@@ -596,6 +596,9 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $body = $in->validate($body);
 
+        // Allow addons to validate or modify data before save.
+        $body = $sender->getEventManager()->fireFilter('discussionsApiController_reactions_input', $body, $sender, $in, $discussion);
+
         $this->reactionModel->react('Discussion', $id, $body['reactionType'], null, false, ReactionModel::FORCE_ADD);
 
         // Refresh the discussion to grab its updated attributes.

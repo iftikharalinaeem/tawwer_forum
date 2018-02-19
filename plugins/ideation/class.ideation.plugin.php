@@ -1,5 +1,8 @@
 <?php if (!defined('APPLICATION')) exit;
 
+use Garden\Web\Exception\ClientException;
+use Garden\Schema\Schema;
+
 /**
  * Ideation Plugin
  *
@@ -43,6 +46,19 @@ class IdeationPlugin extends Gdn_Plugin {
      * @var int The tag ID of the downvote reaction.
      */
     protected static $downTagID;
+
+    /** @var StatusModel */
+    private $statusModel;
+
+    /**
+     * IdeationPlugin constructor.
+     *
+     * @param StatusModel $statusModel
+     */
+    public function __construct(StatusModel $statusModel) {
+        $this->statusModel = $statusModel;
+        parent::__construct();
+    }
 
     /**
      * This will run when you "Enable" the plugin.
@@ -124,6 +140,54 @@ class IdeationPlugin extends Gdn_Plugin {
     public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = &$sender->EventArguments['SideMenu'];
         $menu->addLink('Forum', t('Idea Statuses'), '/dashboard/settings/statuses', 'Garden.Settings.Manage', ['class' => 'nav-statuses']);
+    }
+
+    /**
+     * Hook in when reacting to a discussion to validate votes on an idea.
+     *
+     * @param DiscussionsApiController $sender
+     * @param Schema $in
+     * @param array $body
+     * @param array $discussion
+     * @return array
+     */
+    public function discussionsApiController_reactions_input(array $body, DiscussionsApiController $sender, Schema $in, array $discussion) {
+        if (val('Type', $discussion) === 'Idea') {
+            $discussionID = $discussion['DiscussionID'];
+            $categoryID = $discussion['CategoryID'];
+            $category = CategoryModel::categories($categoryID);
+            if (!$this->isIdeaCategory($category)) {
+                throw new ClientException("Category is not configured for ideation.");
+            }
+            $allowDownVotes = $this->allowDownVotes($discussion, 'discussion');
+
+            // Validate the reaction now, so we can verify its legitimacy as a vote.
+            $reactionType = $body['reactionType'];
+            $reaction = ReactionModel::reactionTypes($reactionType);
+            if (!$reaction) {
+                throw new ClientException("Invalid reaction type: {$reactionType}");
+            }
+            $tagID = $reaction['TagID'];
+
+            $status = $this->statusModel->getStatusByDiscussion($discussionID);
+            if ($status['State'] === 'Closed') {
+                throw new ClientException("This idea is closed.");
+            }
+
+            $vote = $this->getReactionFromTagID($tagID);
+            if (empty($vote)) {
+                // If this isn't a valid vote reaction, let the user know what the valid reactions are for this  idea.
+                $voteReactions = [self::REACTION_UP];
+                if ($allowDownVotes) {
+                    $voteReactions[] = self::REACTION_DOWN;
+                }
+                throw new ClientException('Reactions to this idea must be one of the following: ' . implode(', ', $voteReactions));
+            } elseif ($vote === self::REACTION_DOWN && !$allowDownVotes) {
+                throw new ClientException("Down votes are not allowed on this idea.");
+            }
+        }
+
+        return $body;
     }
 
     /**
