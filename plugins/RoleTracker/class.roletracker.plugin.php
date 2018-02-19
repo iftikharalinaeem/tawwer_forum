@@ -243,6 +243,51 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add "untracking" options on discussions.
+     *
+     * @param Gdn_Controller $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function base_discussionOptions_handler($sender, $args) {
+        $discussion = $args['Discussion'];
+
+        $discussionTags = val('Tags', $discussion);
+        if ($discussionTags) {
+            $discussionTags = Gdn_DataSet::index($discussionTags, 'TagID');
+        } else {
+            $tagModel = new TagModel();
+            $discussionTags = $tagModel->getDiscussionTags(val('DiscussionID', $discussion), TagModel::IX_TAGID);
+        }
+        if (!$discussionTags) {
+            return;
+        }
+
+        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion))) {
+            return;
+        }
+
+        $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
+        if (!$trackedRoles) {
+            return;
+        }
+        $trackedRolesByTag = Gdn_DataSet::index($trackedRoles, 'TrackerTagID');
+        $discussionsTrackedTagIDs = array_intersect(array_keys($trackedRolesByTag), array_keys($discussionTags));
+        if (!$discussionsTrackedTagIDs) {
+            return;
+        };
+
+        foreach ($discussionsTrackedTagIDs as $tagID) {
+            $url = '/roletracker/untrack/'.val('DiscussionID', $discussion).'/'.$tagID;
+            $label = sprintft('Role Tracker - Remove %s Tag', htmlentities($discussionTags[$tagID]['FullName']));
+            if (isset($args['DiscussionOptions'])) {
+                $args['DiscussionOptions']['RoleTracker_'.$tagID] = ['Label' => $label, 'Url' => $url, 'Class' => 'Hijack'];
+            } elseif (isset($sender->Options)) {
+                $sender->Options .= '<li>'.anchor($label, $url, 'Hijack RoleTrackerOptions') . '</li>';
+            }
+        }
+    }
+
+    /**
      * Inject tracker roles' tag into authorInfo
      *
      * @param DiscussionController $sender Sending controller instance.
@@ -389,7 +434,7 @@ if (!function_exists('writePostTrackedTags')) {
             }
             $trackerTag = $tags[$tagID];
             $tagFullName = htmlspecialchars(t($trackerTag['FullName']));
-            $tagName = htmlspecialchars(strtolower(t($tagName['Name'])));
+            $tagName = htmlspecialchars(strtolower(t($trackerTag['Name'])));
             // Keep those spaces before and after the tag :D
             $classes[] = 'tag-'.$tagName.'-tracker';
             $names[] = $tagFullName;
