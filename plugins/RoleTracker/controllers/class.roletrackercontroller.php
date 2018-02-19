@@ -125,7 +125,7 @@ class RoleTrackerController extends Gdn_Controller {
             'TagID' => $tagID,
         ]);
 
-        $this->informMessage(sprintft('%s was successfully un tracked.', htmlentities($discussionTags[$tagID]['FullName'])));
+        $this->informMessage(sprintft('%s was successfully untracked.', htmlentities($discussionTags[$tagID]['FullName'])));
 
         $this->render('blank', 'utility', 'dashboard');
     }
