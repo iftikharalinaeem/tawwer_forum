@@ -256,9 +256,9 @@ class IdeationPlugin extends Gdn_Plugin {
                 if ($allowDownVotes) {
                     $voteReactions[] = self::REACTION_DOWN;
                 }
-                throw new ClientException('Reactions to this idea must be one of the following: ' . implode(', ', $voteReactions));
+                throw new ClientException('Reactions to this idea must be one of the following: '.implode(', ', $voteReactions));
             } elseif ($vote === self::REACTION_DOWN && !$allowDownVotes) {
-                throw new ClientException("Down votes are not allowed on this idea.");
+                throw new ClientException('Down votes are not allowed on this idea.');
             }
         }
 

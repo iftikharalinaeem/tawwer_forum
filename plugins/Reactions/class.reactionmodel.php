@@ -41,8 +41,8 @@ class ReactionModel extends Gdn_Model {
      *
      * @param EventManager $eventManager
      */
-    public function __construct(EventManager $eventManager) {
-        $this->eventManager = $eventManager;
+    public function __construct() {
+        $this->eventManager = Gdn::getContainer()->get(EventManager::class);
 
         parent::__construct('ReactionType');
         $this->filterFields = array_merge(

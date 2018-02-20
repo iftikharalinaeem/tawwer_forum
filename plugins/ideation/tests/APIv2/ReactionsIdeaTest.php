@@ -7,10 +7,9 @@
 namespace VanillaTests\APIv2;
 
 use CategoryModel;
-use DiscussionModel;
+use Garden\Http\HttpResponse;
+use IdeationPlugin;
 use ReactionModel;
-use StatusModel;
-use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * Test voting on an idea.
@@ -22,6 +21,26 @@ class ReactionsIdeaTest extends AbstractAPIv2Test {
 
     /** @var int Category ID associated with an idea category allowing down votes. */
     private static $downVoteCategoryID;
+
+    /**
+     * Verify a response is valid for a vote on an idea.
+     *
+     * @param HttpResponse $response
+     * @param $type
+     */
+    private function assertIsVoteResponse(HttpResponse $response, $type) {
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $body = $response->getBody();
+        $reactions = array_column($body, null, 'urlcode');
+        $this->assertArrayHasKey(IdeationPlugin::REACTION_UP, $reactions);
+        if ($type === 'up-down') {
+            $this->assertArrayHasKey(IdeationPlugin::REACTION_DOWN, $reactions);
+            $this->assertCount(2, $reactions); // Only up-vote and down-vote reactions.
+        } else {
+            $this->assertCount(1, $reactions); // Only up-vote reactions.
+        }
+    }
 
     /**
      * Get a discussion row.
@@ -90,31 +109,33 @@ class ReactionsIdeaTest extends AbstractAPIv2Test {
 
     /**
      * Verify ability to down-vote an idea.
+     *
+     * @param string $type Ideation category type: up or up-down
+     * @param string $vote Vote reaction: up or down
+     * @param int $score Expected score for the new idea, after the vote.
+     * @dataProvider provideVotes
      */
-    public function testDownVote() {
-        $idea = $this->postIdea('up-down');
+    public function testVote($type, $vote, $score) {
+        // Start with a clean slate.
+        $idea = $this->postIdea($type);
+        $this->assertEquals(0, $idea['attributes']['idea']['score']);
+
         $id = $idea['discussionID'];
-
-        $row = $this->getDiscussion($id);
-        $this->assertEquals(0, $row['attributes']['idea']['score']);
-
-        $this->api()->post("discussions/{$id}/reactions", ['reactionType' => 'Down']);
+        $response = $this->api()->post("discussions/{$id}/reactions", ['reactionType' => $vote]);
+        $this->assertIsVoteResponse($response, $type);
         $updated = $this->getDiscussion($id);
-        $this->assertEquals(-1, $updated['attributes']['idea']['score']);
+        $this->assertEquals($score, $updated['attributes']['idea']['score']);
     }
 
     /**
-     * Verify ability to up-vote an idea.
+     * Provide parameters for testing voting.
      */
-    public function testUpVote() {
-        $idea = $this->postIdea('up');
-        $id = $idea['discussionID'];
-
-        $row = $this->getDiscussion($id);
-        $this->assertEquals(0, $row['attributes']['idea']['score']);
-
-        $this->api()->post("discussions/{$id}/reactions", ['reactionType' => 'Up']);
-        $updated = $this->getDiscussion($id);
-        $this->assertEquals(1, $updated['attributes']['idea']['score']);
+    public function provideVotes() {
+        $result = [
+            ['up-down', 'down', -1],
+            ['up-down', 'up', 1],
+            ['up-down', 'up', 1]
+        ];
+        return $result;
     }
 }
