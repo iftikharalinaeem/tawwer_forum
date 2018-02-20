@@ -28,7 +28,7 @@ class DiscussionsIdeationTest extends AbstractAPIv2Test {
         $this->assertInternalType('array', $discussion);
 
         $this->assertArrayHasKey('type', $discussion);
-        $this->assertEquals('Idea', $discussion['type']);
+        $this->assertEquals('idea', $discussion['type']);
 
         $this->assertArrayHasKey('attributes', $discussion);
         $this->assertArrayHasKey('idea', $discussion['attributes']);
@@ -118,7 +118,7 @@ class DiscussionsIdeationTest extends AbstractAPIv2Test {
         $this->assertEquals(201, $response->getStatusCode());
 
         $body = $response->getBody();
-        $this->assertEquals('Idea', $body['type']);
+        $this->assertEquals('idea', $body['type']);
 
         $this->assertTrue(is_int($body['discussionID']));
         $this->assertTrue($body['discussionID'] > 0);

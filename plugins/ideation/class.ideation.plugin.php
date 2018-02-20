@@ -117,8 +117,8 @@ class IdeationPlugin extends Gdn_Plugin {
     private function getSummary(array $discussion) {
         $result = null;
 
-        $discussionID = val('discussionID', $discussion, val('DiscussionID', $discussion));
-        $categoryID = val('categoryID', $discussion, val('CategoryID', $discussion));
+        $discussionID = $discussion['discussionID'] ?? $discussion['DiscussionID'] ?? null;
+        $categoryID = $discussion['categoryID'] ?? $discussion['CategoryID'] ?? null;
 
         if (!$discussionID || !$categoryID) {
             return $result;
@@ -130,7 +130,7 @@ class IdeationPlugin extends Gdn_Plugin {
         }
 
         $type = $category['IdeationType'];
-        $score = val('score', $discussion, val('Score', $discussion, null)) ?: 0;
+        $score = $discussion['score'] ?? $discussion['Score'] ?? 0;
         $status = $this->statusModel->getStatusByDiscussion($discussionID);
         $notesKey = array_key_exists('DiscussionID', $discussion) ? 'Attributes.StatusNotes' : 'attributes.statusNotes';
         $statusNotes = valr($notesKey, $discussion) ?: null;
@@ -139,7 +139,7 @@ class IdeationPlugin extends Gdn_Plugin {
             'statusID' => val('StatusID', $status),
             'status' => [
                 'name' => val('Name', $status),
-                'state' => val('State', $status)
+                'state' => lcfirst(val('State', $status))
             ],
             'statusNotes' => $statusNotes,
             'type' => $type
@@ -156,9 +156,10 @@ class IdeationPlugin extends Gdn_Plugin {
      * @return array
      */
     private function setSummary(array $row, array $data) {
-        $type = val('type', $data, val('Type', $data));
+        $type = $data['type'] ?? $data['Type'] ?? '';
+        $type = strtolower($type);
 
-        if ($type === 'Idea') {
+        if ($type === 'idea') {
             $schema = $this->getSummaryFragment();
             $summary = $this->getSummary($data);
             $summary = $schema->validate($summary);
@@ -1162,7 +1163,7 @@ EOT
      * @return array
      */
     public function discussionsApiController_get_output(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $row) {
-        if ($row['type'] !== 'Idea') {
+        if ($row['type'] !== 'idea') {
             return $result;
         }
 
@@ -1184,7 +1185,7 @@ EOT
         $rows = array_column($rows, null, 'discussionID');
 
         foreach ($result as &$row) {
-            if ($row['type'] !== 'Idea') {
+            if ($row['type'] !== 'idea') {
                 continue;
             }
 
@@ -1347,11 +1348,11 @@ EOT
                 'score:i' => 'Total score for the idea.',
                 'statusNotes:s|n' => 'Status update notes.',
                 'statusID:i' => 'Unique numeric ID of a status.',
-                'status' => [
+                'status:o' => [
                     'name:s' => 'Label for the status.',
                     'state:s' => [
                         'description' => 'The open/closed state of an idea.',
-                        'enum' => ['Open', 'Closed']
+                        'enum' => ['open', 'closed']
                     ]
                 ],
                 'type:s' => [
