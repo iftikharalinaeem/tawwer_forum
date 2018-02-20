@@ -1,5 +1,10 @@
 <?php if (!defined('APPLICATION')) exit;
 
+use Garden\Schema\Schema;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ServerException;
+use Vanilla\ApiUtils;
+
 /**
  * Ideation Plugin
  *
@@ -44,6 +49,29 @@ class IdeationPlugin extends Gdn_Plugin {
      */
     protected static $downTagID;
 
+    /** @var DiscussionModel */
+    private $discussionModel;
+
+    /** @var StatusModel */
+    private $statusModel;
+
+    /** @var UserModel */
+    private $userModel;
+
+    /**
+     * IdeationPlugin constructor.
+     *
+     * @param DiscussionModel $discussionModel
+     * @param StatusModel $statusModel
+     * @param UserModel $userModel
+     */
+    public function __construct(DiscussionModel $discussionModel, StatusModel $statusModel, UserModel $userModel) {
+        $this->discussionModel = $discussionModel;
+        $this->statusModel = $statusModel;
+        $this->userModel = $userModel;
+        parent::__construct();
+    }
+
     /**
      * This will run when you "Enable" the plugin.
      */
@@ -78,6 +106,69 @@ class IdeationPlugin extends Gdn_Plugin {
             self::setUpTagID(val('TagID', $reactionUp));
         }
         return self::$upTagID;
+    }
+
+    /**
+     * Get idea metadata for a discussion.
+     *
+     * @param array $discussion
+     * @return array
+     */
+    private function getIdeaMetadata(array $discussion) {
+        $result = null;
+
+        $discussionID = $discussion['discussionID'] ?? $discussion['DiscussionID'] ?? null;
+        $categoryID = $discussion['categoryID'] ?? $discussion['CategoryID'] ?? null;
+
+        if (!$discussionID || !$categoryID) {
+            return $result;
+        }
+
+        $category = CategoryModel::categories($categoryID);
+        if (!$this->isIdeaCategory($category)) {
+            return $result;
+        }
+
+        $type = $category['IdeationType'];
+        $score = $discussion['score'] ?? $discussion['Score'] ?? 0;
+        $status = $this->statusModel->getStatusByDiscussion($discussionID);
+        $notesKey = array_key_exists('DiscussionID', $discussion) ? 'Attributes.StatusNotes' : 'attributes.statusNotes';
+        $statusNotes = valr($notesKey, $discussion) ?: null;
+        $result = [
+            'score' => $score,
+            'statusID' => val('StatusID', $status),
+            'status' => [
+                'name' => val('Name', $status),
+                'state' => lcfirst(val('State', $status))
+            ],
+            'statusNotes' => $statusNotes,
+            'type' => $type
+        ];
+
+        return $result;
+    }
+
+    /**
+     * Set a idea metadata on a discussion row.
+     *
+     * @param array $row
+     * @return array
+     */
+    private function setIdeaMetadata(array $row) {
+        $type = $row['type'] ?? $row['Type'] ?? '';
+        $type = strtolower($type);
+
+        if ($type === 'idea') {
+            $schema = $this->getIdeaMetadataFragment();
+            $metadata = $this->getIdeaMetadata($row);
+            $metadata = $schema->validate($metadata);
+            if (is_array($metadata)) {
+                $key = array_key_exists('attributes', $row) ? 'attributes.idea' : 'Attributes.Idea';
+                setvalr($key, $row, $metadata);
+            }
+        }
+
+        return $row;
     }
 
     /**
@@ -1037,6 +1128,123 @@ EOT
     }
 
     /**
+     * Modify the data on /api/v2/discussions index to include ideation metadata..
+     *
+     * @param array $discusion.
+     * @param DiscussionsApiController $sender
+     * @param array $options
+     * @param array $rows Raw result.
+     */
+    public function discussionsApiController_normalizeOutput(array $discussion, DiscussionsApiController $sender, array $options) {
+        if ($discussion['type'] === 'idea') {
+            $discussion = $this->setIdeaMetadata($discussion);
+        }
+
+        return $discussion;
+    }
+
+    /**
+     * Update idea metadata on a discussion through the discussions API endpoint.
+     *
+     * @param DiscussionsApiController $sender
+     * @param int $id
+     * @param array $body
+     * @return array
+     * @throws ClientException if the discussion is not a valid idea.
+     * @throws ClientException if the status ID is not associated with a valid idea status.
+     * @throws ServerException if, after saving, the status cannot be retrievd from an idea.
+     */
+    public function discussionsApiController_patch_idea(DiscussionsApiController $sender, $id, array $body) {
+        $sender->permission('Vanilla.Moderation.Manage');
+
+        $in = $sender->schema($this->statusFragment(), 'in')
+            ->setDescription('Update idea metadata on a discussion.');
+        $out = $sender->schema($this->statusFragment(), 'out');
+
+        $body = $in->validate($body, true);
+
+        // Verify the discussion is valid.
+        $discussion = $sender->discussionByID($id);
+        if (!$this->isIdea($discussion)) {
+            throw new ClientException("Invalid idea ({$id}).");
+        }
+
+        // Verify the status is valid.
+        if (array_key_exists('statusID', $body)) {
+            $statusID = $body['statusID'];
+            $status = $this->statusModel->getStatus($statusID);
+            if (!is_array($status) || !array_key_exists('StatusID', $status)) {
+                throw new ClientException("Invalid status ID ({$statusID})");
+            }
+            $this->updateDiscussionStatusTag($id, $statusID);
+        }
+
+        if (array_key_exists('statusNotes', $body)) {
+            $this->updateDiscussionStatusNotes($id, $body['statusNotes']);
+        }
+
+        $currentStatus = $this->statusModel->getStatusByDiscussion($id);
+        if (empty($currentStatus)) {
+            throw new ServerException("An error was encountered while getting the status of the idea ({$id}).", 500);
+        }
+        $currentDiscussion = $sender->discussionByID($id);
+        $currentStatusNotes = $this->getStatusNotes($currentDiscussion) ?: null;
+
+        $row = [
+            'statusID' => $currentStatus['StatusID'],
+            'statusNotes' => $currentStatusNotes
+        ];
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * Create an idea through the discussions API endpoint.
+     *
+     * @param DiscussionsApiController $sender
+     * @param array $body
+     * @return array
+     * @throws ClientException if the category is not configured for ideation.
+     */
+    public function discussionsApiController_post_idea(DiscussionsApiController $sender, array $body) {
+        $sender->permission('Garden.SignIn.Allow');
+
+        $in = $sender->schema($sender->discussionPostSchema(), 'in')->setDescription('Add an idea.');
+        $out = $sender->schema($sender->discussionSchema(), 'out');
+
+        $body = $in->validate($body);
+        $categoryID = $body['categoryID'];
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $categoryID);
+        $sender->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
+        $sender->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
+        $sender->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
+
+        $category = CategoryModel::categories($categoryID);
+        if (!$this->isIdeaCategory($category)) {
+            throw new ClientException("Category is not configured for ideation ({$categoryID}).");
+        }
+
+        $discussionData = ApiUtils::convertInputKeys($body);
+
+        $discussionData['Type'] = 'Idea';
+        $defaultStatus = $this->statusModel->getDefaultStatus();
+        $discussionData['Tags'] = $defaultStatus['TagID'];
+
+        $id = $this->discussionModel->save($discussionData);
+        $sender->validateModel($this->discussionModel);
+
+        if (!$id) {
+            throw new ServerException('Unable to insert idea.', 500);
+        }
+
+        $row = $sender->discussionByID($id);
+        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
+        $row = $sender->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
      * Adds the sessioned user's Idea* reaction to the discussion data in the form [UserVote] => TagID
      * where TagID is the TagID of the reaction.
      *
@@ -1063,6 +1271,45 @@ EOT
             $discussions = $sender->data('Discussions')->result();
             $this->addUserVotesToDiscussions($discussions);
         }
+    }
+
+    /**
+     * Update the /discussions/get input schema.
+     *
+     * @param Schema $schema
+     */
+    public function discussionSchema_init(Schema $schema) {
+        $this->updateSchemaAttributes($schema);
+    }
+
+    /**
+     * Get a schema object representing idea metadata on a discussion.
+     *
+     * @return Schema
+     */
+    private function getIdeaMetadataFragment() {
+        static $schema;
+
+        if (!isset($schema)) {
+            $schema = Schema::parse([
+                'score:i' => 'Total score for the idea.',
+                'statusNotes:s|n' => 'Status update notes.',
+                'statusID:i' => 'Unique numeric ID of a status.',
+                'status:o' => [
+                    'name:s' => 'Label for the status.',
+                    'state:s' => [
+                        'description' => 'The open/closed state of an idea.',
+                        'enum' => ['open', 'closed']
+                    ]
+                ],
+                'type:s' => [
+                    'description' => 'Voting type for this idea: up-only or up and down.',
+                    'enum' => ['up', 'up-down']
+                ]
+            ]);
+        }
+
+        return $schema;
     }
 
     /**
@@ -1465,6 +1712,46 @@ EOT
             return $noUp + $noDown;
         }
         return 0;
+    }
+
+    /**
+     * Get a schema object representing a simple subset of idea status metadata on a discussion.
+     *
+     * @return mixed
+     */
+    private function statusFragment() {
+        static $schema;
+
+        if (!isset($schema)) {
+            $schema = Schema::parse([
+                'statusID:i' => 'Idea status ID.',
+                'statusNotes:s|n' => 'Notes on a status change. Notes will persist until overwritten.'
+            ]);
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Update the attributes field of a post schema.
+     *
+     * @param Schema $schema
+     */
+    private function updateSchemaAttributes(Schema $schema) {
+        $attributes = $schema->getField('properties.attributes');
+
+        // Add to an existing "attributes" field or create a new one?
+        if ($attributes instanceof Schema) {
+            $attributes->merge(Schema::parse([
+                'idea?' => $this->getIdeaMetadataFragment()
+            ]));
+        } else {
+            $schema->merge(Schema::parse([
+                'attributes?' => Schema::parse([
+                    'idea?' => $this->getIdeaMetadataFragment()
+                ])
+            ]));
+        }
     }
 }
 
