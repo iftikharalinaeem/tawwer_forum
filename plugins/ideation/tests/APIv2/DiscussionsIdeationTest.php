@@ -135,13 +135,15 @@ class DiscussionsIdeationTest extends AbstractAPIv2Test {
         $indexPosts = 5;
         for ($i = 1; $i <= $indexPosts; $i++) {
             $this->testPostIdea();
-            $this->api()->post('discussions', [
-                'categoryID' => 1,
-                'name' => 'Test Discussion',
-                'body' => 'Hello world!',
-                'format' => 'markdown'
-            ]);
         }
+
+        // Add a regular discussion to ensure it's filtered out.
+        $this->api()->post('discussions', [
+            'categoryID' => 1,
+            'name' => 'Test Discussion',
+            'body' => 'Hello world!',
+            'format' => 'markdown'
+        ]);
 
         $response = $this->api()->get('discussions', ['type' => 'idea']);
         $this->assertEquals(200, $response->getStatusCode());

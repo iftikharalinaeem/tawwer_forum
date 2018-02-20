@@ -109,12 +109,12 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Set idea metadata summary on a discussion's attributes.
+     * Get idea metadata for a discussion.
      *
      * @param array $discussion
      * @return array
      */
-    private function getSummary(array $discussion) {
+    private function getIdeaMetadata(array $discussion) {
         $result = null;
 
         $discussionID = $discussion['discussionID'] ?? $discussion['DiscussionID'] ?? null;
@@ -149,22 +149,22 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Set an idea summary on a discussion row.
+     * Set a idea metadata on a discussion row.
      *
-     * @param array $row Discussion row. May be partial data.
+     * @param array $row
      * @return array
      */
-    private function setSummary(array $row) {
+    private function setIdeaMetadata(array $row) {
         $type = $row['type'] ?? $row['Type'] ?? '';
         $type = strtolower($type);
 
         if ($type === 'idea') {
-            $schema = $this->getSummaryFragment();
-            $summary = $this->getSummary($row);
-            $summary = $schema->validate($summary);
-            if (is_array($summary)) {
+            $schema = $this->getIdeaMetadataFragment();
+            $metadata = $this->getIdeaMetadata($row);
+            $metadata = $schema->validate($metadata);
+            if (is_array($metadata)) {
                 $key = array_key_exists('attributes', $row) ? 'attributes.idea' : 'Attributes.Idea';
-                setvalr($key, $row, $summary);
+                setvalr($key, $row, $metadata);
             }
         }
 
@@ -1128,31 +1128,6 @@ EOT
     }
 
     /**
-     * Get idea metadata from a discussion.
-     *
-     * @param DiscussionsApiController $sender
-     * @param int $id
-     * @return array
-     * @throws ClientException if the discussion is not an idea.
-     */
-    public function discussionsApiController_get_idea(DiscussionsApiController $sender, $id) {
-        $sender->permission();
-
-        $in = $sender->schema([], 'in')->setDescription('Get idea metadata from a discussion.');
-        $out = $sender->schema($this->getSummaryFragment(), 'out');
-
-        $row = $sender->discussionByID($id);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
-        if ($row['Type'] !== 'Idea') {
-            throw new ClientException('Discussion is not an idea.');
-        }
-        $summary = $this->getSummary($row);
-
-        $result = $out->validate($summary);
-        return $result;
-    }
-
-    /**
      * Modify the data on /api/v2/discussions index to include ideation metadata..
      *
      * @param array $discusion.
@@ -1162,7 +1137,7 @@ EOT
      */
     public function discussionsApiController_normalizeOutput(array $discussion, DiscussionsApiController $sender, array $options) {
         if ($discussion['type'] === 'idea') {
-            $discussion = $this->setSummary($discussion);
+            $discussion = $this->setIdeaMetadata($discussion);
         }
 
         return $discussion;
@@ -1308,11 +1283,11 @@ EOT
     }
 
     /**
-     * Get a schema object representing a summary of idea metadata on a discussion.
+     * Get a schema object representing idea metadata on a discussion.
      *
      * @return Schema
      */
-    private function getSummaryFragment() {
+    private function getIdeaMetadataFragment() {
         static $schema;
 
         if (!isset($schema)) {
@@ -1768,12 +1743,12 @@ EOT
         // Add to an existing "attributes" field or create a new one?
         if ($attributes instanceof Schema) {
             $attributes->merge(Schema::parse([
-                'idea?' => $this->getSummaryFragment()
+                'idea?' => $this->getIdeaMetadataFragment()
             ]));
         } else {
             $schema->merge(Schema::parse([
                 'attributes?' => Schema::parse([
-                    'idea?' => $this->getSummaryFragment()
+                    'idea?' => $this->getIdeaMetadataFragment()
                 ])
             ]));
         }
