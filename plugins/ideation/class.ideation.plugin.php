@@ -171,7 +171,7 @@ class IdeationPlugin extends Gdn_Plugin {
 
             $status = $this->statusModel->getStatusByDiscussion($discussionID);
             if ($status['State'] === 'Closed') {
-                throw new ClientException("This idea is closed.");
+                throw new ClientException('This idea is closed.');
             }
 
             $vote = $this->getReactionFromTagID($tagID);
