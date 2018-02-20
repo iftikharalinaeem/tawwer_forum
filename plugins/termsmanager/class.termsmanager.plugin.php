@@ -221,7 +221,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
             $sender->setData('NoConnectName', false);
             $sender->Form->setFormValue('ConnectName');
         }
-
+        $sender->Form->addHidden('MostRecentTerms', val('Terms', $user));
         $this->addTermsValidation($sender, true);
     }
 
