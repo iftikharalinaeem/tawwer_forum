@@ -51,7 +51,7 @@ class StatusesApiController extends AbstractApiController {
         static $schema;
 
         if (!isset($schema)) {
-            $schema = Schema::parse([
+            $schema = $this->schema([
                 'statusID:i' => 'Unique numeric ID of a status.',
                 'name:s' => 'Label for the status.',
                 'state:s' => [
@@ -60,7 +60,7 @@ class StatusesApiController extends AbstractApiController {
                 ],
                 'tagID:i' => 'Unique numeric ID of the associated tag.',
                 'isDefault:b' => 'Is this the default status?'
-            ]);
+            ], 'Status');
         }
 
         return $schema;
