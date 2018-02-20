@@ -218,51 +218,45 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook in when reacting to a discussion to validate votes on an idea.
+     * Hook in when reacting to a post to validate votes on an idea.
      *
-     * @param DiscussionsApiController $sender
-     * @param Schema $in
-     * @param array $body
-     * @param array $discussion
+     * @param array $data
+     * @param ReactionModel $sender
+     * @param array $reactionType
      * @return array
      */
-    public function discussionsApiController_reactions_input(array $body, DiscussionsApiController $sender, Schema $in, array $discussion) {
-        if (val('Type', $discussion) === 'Idea') {
-            $discussionID = $discussion['DiscussionID'];
-            $categoryID = $discussion['CategoryID'];
-            $category = CategoryModel::categories($categoryID);
-            if (!$this->isIdeaCategory($category)) {
-                throw new ClientException("Category is not configured for ideation.");
-            }
-            $allowDownVotes = $this->allowDownVotes($discussion, 'discussion');
-
-            // Validate the reaction now, so we can verify its legitimacy as a vote.
-            $reactionType = $body['reactionType'];
-            $reaction = ReactionModel::reactionTypes($reactionType);
-            if (!$reaction) {
-                throw new ClientException("Invalid reaction type: {$reactionType}");
-            }
-            $tagID = $reaction['TagID'];
-
-            $status = $this->statusModel->getStatusByDiscussion($discussionID);
-            if ($status['State'] === 'Closed') {
-                throw new ClientException('This idea is closed.');
-            }
-
-            $vote = $this->getReactionFromTagID($tagID);
-            if (empty($vote)) {
-                // If this isn't a valid vote reaction, let the user know what the valid reactions are for this  idea.
-                $voteReactions = [self::REACTION_UP];
-                if ($allowDownVotes) {
-                    $voteReactions[] = self::REACTION_DOWN;
+    public function reactionModel_react_saveData(array $data, ReactionModel $sender, array $reactionType) {
+        if (strtolower($data['RecordType']) === 'discussion') {
+            $discussion = $this->discussionModel->getID($data['RecordID'], DATASET_TYPE_ARRAY);
+            if (val('Type', $discussion) === 'Idea') {
+                $discussionID = $discussion['DiscussionID'];
+                $categoryID = $discussion['CategoryID'];
+                $category = CategoryModel::categories($categoryID);
+                if (!$this->isIdeaCategory($category)) {
+                    throw new Gdn_UserException("Category is not configured for ideation.");
                 }
-                throw new ClientException('Reactions to this idea must be one of the following: '.implode(', ', $voteReactions));
-            } elseif ($vote === self::REACTION_DOWN && !$allowDownVotes) {
-                throw new ClientException('Down votes are not allowed on this idea.');
+                $allowDownVotes = $this->allowDownVotes($discussion, 'discussion');
+
+                $status = $this->statusModel->getStatusByDiscussion($discussionID);
+                if ($status['State'] === 'Closed') {
+                    throw new Gdn_UserException('This idea is closed.');
+                }
+
+                $vote = $this->getReactionFromTagID($data['TagID']);
+                if (empty($vote)) {
+                    // If this isn't a valid vote reaction, let the user know what the valid reactions are for this  idea.
+                    $voteReactions = [self::REACTION_UP];
+                    if ($allowDownVotes) {
+                        $voteReactions[] = self::REACTION_DOWN;
+                    }
+                    throw new Gdn_UserException('Reactions to this idea must be one of the following: ' . implode(', ', $voteReactions));
+                } elseif ($vote === self::REACTION_DOWN && !$allowDownVotes) {
+                    throw new Gdn_UserException('Down votes are not allowed on this idea.');
+                }
             }
         }
 
-        return $body;
+        return $data;
     }
 
     /**

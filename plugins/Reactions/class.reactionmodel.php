@@ -970,6 +970,9 @@ class ReactionModel extends Gdn_Model {
             'UserID' => $userID,
             'Total' => $inc
         ];
+        // Allow addons to validate or modify data before save.
+        $data = $this->eventManager->fireFilter('reactionModel_react_saveData', $data, $this, $reactionType);
+
         $inserted = $this->toggleUserTag($data, $row, $model, $force);
 
         $message = [t(val('InformMessage', $reactionType, '')), 'Dismissable AutoDismiss'];
