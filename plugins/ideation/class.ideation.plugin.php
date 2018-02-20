@@ -218,6 +218,48 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Hook in when reacting to a post to validate votes on an idea.
+     *
+     * @param array $data
+     * @param ReactionModel $sender
+     * @param array $reactionType
+     * @return array
+     */
+    public function reactionModel_react_saveData(array $data, ReactionModel $sender, array $reactionType) {
+        if (strtolower($data['RecordType']) === 'discussion') {
+            $discussion = $this->discussionModel->getID($data['RecordID'], DATASET_TYPE_ARRAY);
+            if (val('Type', $discussion) === 'Idea') {
+                $discussionID = $discussion['DiscussionID'];
+                $categoryID = $discussion['CategoryID'];
+                $category = CategoryModel::categories($categoryID);
+                if (!$this->isIdeaCategory($category)) {
+                    throw new Gdn_UserException("Category is not configured for ideation.");
+                }
+                $allowDownVotes = $this->allowDownVotes($discussion, 'discussion');
+
+                $status = $this->statusModel->getStatusByDiscussion($discussionID);
+                if ($status['State'] === 'Closed') {
+                    throw new Gdn_UserException('This idea is closed.');
+                }
+
+                $vote = $this->getReactionFromTagID($data['TagID']);
+                if (empty($vote)) {
+                    // If this isn't a valid vote reaction, let the user know what the valid reactions are for this  idea.
+                    $voteReactions = [self::REACTION_UP];
+                    if ($allowDownVotes) {
+                        $voteReactions[] = self::REACTION_DOWN;
+                    }
+                    throw new Gdn_UserException('Reactions to this idea must be one of the following: ' . implode(', ', $voteReactions));
+                } elseif ($vote === self::REACTION_DOWN && !$allowDownVotes) {
+                    throw new Gdn_UserException('Down votes are not allowed on this idea.');
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Adds ideation options to the categories setting page -> enabling ideation on a category and enabling downvotes.
      * Also manipulates the allowed discussion types options when ideation is enabled on a category.
      * Ideas are the only discussion type allowed in an ideation category. Existing idea categories cannot be changed
@@ -1009,6 +1051,36 @@ EOT
                 }
             }
         }
+    }
+
+    /**
+     * Modify the types filter when getting a summary of reactions on a post.
+     *
+     * @param array $filter
+     * @param ReactionModel $sender
+     * @param array $record
+     */
+    public function reactionsModel_getRecordSummary_typesFilter(array $filter, ReactionModel $sender, array $record) {
+        $discussionID = $record['discussionID'] ?? $record['DiscussionID'] ?? null;
+        $categoryID = $record['categoryID'] ?? $record['CategoryID'] ?? null;
+
+        if ($discussionID && $categoryID && $categoryID > 0) {
+            $category = CategoryModel::categories($categoryID);
+            $discussionType = $record['type'] ?? $record['Type'] ?? '';
+            $discussionType = strtolower($discussionType);
+
+            if ($discussionType === 'idea' && $this->isIdeaCategory($category)) {
+                // Only report vote reactions on an idea.
+                $type = $category['IdeationType'] ?? null;
+                $filter = ['UrlCode' => [self::REACTION_UP]];
+                if ($type === 'up-down') {
+                    // Include down votes on categories that allow them.
+                    $filter['UrlCode'][] = self::REACTION_DOWN;
+                }
+            }
+        }
+
+        return $filter;
     }
 
     /**
