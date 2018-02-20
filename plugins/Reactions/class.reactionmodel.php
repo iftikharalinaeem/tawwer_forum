@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+use Garden\EventManager;
+
 /**
  * Class ReactionModel
  */
@@ -31,10 +33,17 @@ class ReactionModel extends Gdn_Model {
 
     protected static $columns = ['UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom', 'Hidden'];
 
+    /** @var EventManager */
+    private $eventManager;
+
     /**
      * ReactionModel constructor.
+     *
+     * @param EventManager $eventManager
      */
-    public function __construct() {
+    public function __construct(EventManager $eventManager) {
+        $this->eventManager = $eventManager;
+
         parent::__construct('ReactionType');
         $this->filterFields = array_merge(
             $this->filterFields,
@@ -323,10 +332,12 @@ class ReactionModel extends Gdn_Model {
         if ($restricted === false || Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
             $classes[] = 'Flag';
         }
-        $result = self::getReactionTypes([
+        $typesWhere = [
             'Class' => $classes,
             'Active' => 1
-        ]);
+        ];
+        $typesWhere = $this->eventManager->fireFilter('reactionsModel_getRecordSummary_typesFilter', $typesWhere, $this, $row);
+        $result = self::getReactionTypes($typesWhere);
         $result = array_values($result);
 
         foreach ($result as &$reaction) {

@@ -1060,6 +1060,36 @@ EOT
     }
 
     /**
+     * Modify the types filter when getting a summary of reactions on a post.
+     *
+     * @param array $filter
+     * @param ReactionModel $sender
+     * @param array $record
+     */
+    public function reactionsModel_getRecordSummary_typesFilter(array $filter, ReactionModel $sender, array $record) {
+        $discussionID = $record['discussionID'] ?? $record['DiscussionID'] ?? null;
+        $categoryID = $record['categoryID'] ?? $record['CategoryID'] ?? null;
+
+        if ($discussionID && $categoryID && $categoryID > 0) {
+            $category = CategoryModel::categories($categoryID);
+            $discussionType = $record['type'] ?? $record['Type'] ?? '';
+            $discussionType = strtolower($discussionType);
+
+            if ($discussionType === 'idea' && $this->isIdeaCategory($category)) {
+                // Only report vote reactions on an idea.
+                $type = $category['IdeationType'] ?? null;
+                $filter = ['UrlCode' => [self::REACTION_UP]];
+                if ($type === 'up-down') {
+                    // Include down votes on categories that allow them.
+                    $filter['UrlCode'][] = self::REACTION_DOWN;
+                }
+            }
+        }
+
+        return $filter;
+    }
+
+    /**
      * Each reaction that is changed runs through this event. Some votes change 2 reactions.
      * For example, if a user has previously downvoted something and then upvotes it, then we remove the downvote and
      * insert the upvote. This checks to see if the changed reaction is an insert and then appends the 'uservote' css
