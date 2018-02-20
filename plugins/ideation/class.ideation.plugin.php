@@ -152,19 +152,19 @@ class IdeationPlugin extends Gdn_Plugin {
      * Set an idea summary on a discussion row.
      *
      * @param array $row Discussion row. May be partial data.
-     * @param array $data Full discussion record.
      * @return array
      */
-    private function setSummary(array $row, array $data) {
-        $type = $data['type'] ?? $data['Type'] ?? '';
+    private function setSummary(array $row) {
+        $type = $row['type'] ?? $row['Type'] ?? '';
         $type = strtolower($type);
 
         if ($type === 'idea') {
             $schema = $this->getSummaryFragment();
-            $summary = $this->getSummary($data);
+            $summary = $this->getSummary($row);
             $summary = $schema->validate($summary);
             if (is_array($summary)) {
-                setvalr('attributes.idea', $row, $summary);
+                $key = array_key_exists('attributes', $row) ? 'attributes.idea' : 'Attributes.Idea';
+                setvalr($key, $row, $summary);
             }
         }
 
@@ -1153,47 +1153,19 @@ EOT
     }
 
     /**
-     * Modify the data on /api/v2/discussions/:id to include ideation metadata.
-     *
-     * @param array $result Post-validated data.
-     * @param DiscussionsApiController $sender
-     * @param Schema $inSchema
-     * @param array $query The request query.
-     * @param array $row Pre-validated data.
-     * @return array
-     */
-    public function discussionsApiController_get_output(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $row) {
-        if ($row['type'] !== 'idea') {
-            return $result;
-        }
-
-        $result = $this->setSummary($result, $row);
-
-        return $result;
-    }
-
-    /**
      * Modify the data on /api/v2/discussions index to include ideation metadata..
      *
-     * @param array $result Post-validated data.
+     * @param array $discusion.
      * @param DiscussionsApiController $sender
-     * @param Schema $inSchema
-     * @param array $query The request query.
+     * @param array $options
      * @param array $rows Raw result.
      */
-    public function discussionsApiController_index_output(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $rows) {
-        $rows = array_column($rows, null, 'discussionID');
-
-        foreach ($result as &$row) {
-            if ($row['type'] !== 'idea') {
-                continue;
-            }
-
-            $discussion = $rows[$row['discussionID']];
-            $row = $this->setSummary($row, $discussion);
+    public function discussionsApiController_normalizeOutput(array $discussion, DiscussionsApiController $sender, array $options) {
+        if ($discussion['type'] === 'idea') {
+            $discussion = $this->setSummary($discussion);
         }
 
-        return $result;
+        return $discussion;
     }
 
     /**
