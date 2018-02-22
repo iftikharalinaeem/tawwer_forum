@@ -638,6 +638,8 @@ class GroupController extends Gdn_Controller {
         $form->setModel($this->GroupModel);
         Gdn_Theme::section('Post');
 
+        $group = null;
+
         if ($iD) {
             $group = $this->GroupModel->getID($iD);
 
@@ -761,8 +763,8 @@ class GroupController extends Gdn_Controller {
                 $form->setValue('Registration', 'Public');
                 $form->setValue('Visibility', 'Public');
 
-                if (count($categories == 1)) {
-                    $form->setValue('CategoryID', array_pop(array_keys($categories)));
+                if (count($categories) == 1) {
+                    $form->setValue('CategoryID', array_keys($categories)[0]);
                 }
             }
         }

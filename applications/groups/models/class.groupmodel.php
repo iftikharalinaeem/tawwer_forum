@@ -551,7 +551,7 @@ class GroupModel extends Gdn_Model {
      */
     public static function idFromSlug($slug) {
         $id = false;
-        if (preg_match('/(\d+)-.+/', $slug, $matches)) {
+        if (preg_match('/(\d+)-.*/', $slug, $matches)) {
             $id = (int)$matches[1];
         }
 
