@@ -55,7 +55,7 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
     public function userModel_afterSetField_handler(UserModel $model, array $args) {
         if (!empty($args['Fields']['Confirmed'])) {
             $user = $model->getID($args['UserID'], DATASET_TYPE_ARRAY);
-            $this->giveRoleByEmail($model, $user);
+            $this->giveRolesByEmail($model, $user);
         }
     }
 
@@ -70,7 +70,7 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
     public function userModel_afterInsertUser_handler(UserModel $model, array $args) {
         $user = $model->getID($args['InsertUserID'], DATASET_TYPE_ARRAY);
         if (!empty($user['Confirmed'])) {
-            $this->giveRoleByEmail($model, $user);
+            $this->giveRolesByEmail($model, $user);
         }
     }
 
@@ -88,7 +88,7 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
         if (!$isInsert && !empty($args['FormPostValues']['ConfirmEmail'])) {
             $user = $model->getID($args['UserID'], DATASET_TYPE_ARRAY);
             if (!empty($user['Confirmed'])) {
-                $this->giveRoleByEmail($model, $user);
+                $this->giveRolesByEmail($model, $user);
             }
         }
     }
@@ -98,11 +98,11 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
      *
      * @param UserModel $userModel
      * @param array $user
+     * @return array
      */
-    private function giveRoleByEmail(UserModel $userModel, $user) {
+    private function giveRolesByEmail(UserModel $userModel, $user) {
         // Get new user's email domain
-        $email = $user['Email'];
-        $parts = explode('@', $email);
+        $parts = explode('@', $user['Email']);
 
         if (count($parts) !== 2) {
             return;
@@ -111,19 +111,23 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
 
         // Any roles assigned?
         $roleModel = new RoleModel();
-        $rolesToGive = [];
+        $roleIDsToGive = [];
         $roleData = $roleModel->SQL->getWhereLike('Role', ['Domains' => $domain])->result(DATASET_TYPE_ARRAY);
         foreach ($roleData as $result) {
             $domainList = explode(' ', $result['Domains']);
             if (in_array($domain, $domainList)) {
                 // Add the role to the user
-                $rolesToGive[] = $result['RoleID'];
+                $roleIDsToGive[] = $result['RoleID'];
             }
         }
 
-        if ($rolesToGive) {
-            $defaultRoles = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
-            $userModel->saveRoles($user['UserID'], array_merge($rolesToGive, $defaultRoles), false);
+        if (!$roleIDsToGive) {
+            return;
         }
+
+        // Give the new roles.
+        $currentRoles = $userModel->getRoles($user['UserID'])->resultArray();
+        $currentRoleIDs = array_column($currentRoles, 'RoleID');
+        $userModel->saveRoles($user['UserID'], array_unique(array_merge($currentRoleIDs, $roleIDsToGive)), false);
     }
 }
