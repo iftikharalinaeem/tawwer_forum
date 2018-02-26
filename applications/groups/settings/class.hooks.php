@@ -861,7 +861,7 @@ class GroupsHooks extends Gdn_Plugin {
      * @param array $query
      * @return array Where clause as array
      */
-    public function discussionsApiController_index_filters(
+    public function discussionsApiController_indexFilters(
         $where,
         DiscussionsAPIController $controller,
         Schema $inSchema,

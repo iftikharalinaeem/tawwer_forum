@@ -222,12 +222,12 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * Delete a comment reaction with /api/v2/comments/:id/reactions/:userID
      *
+     * @param CommentsApiController $sender
      * @param int $id The comment ID.
      * @param int|null $userID
-     * @param CommentsApiController $sender
      * @return array
      */
-    public function commentsApiController_delete_reactions($id, $userID = null, CommentsApiController $sender) {
+    public function commentsApiController_delete_reactions(CommentsApiController $sender, $id, $userID = null) {
         $sender->permission('Garden.SignIn.Allow');
 
         $in = $sender->schema(
@@ -261,7 +261,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $row Pre-validated data.
      * @return array
      */
-    public function commentsApiController_get_output(array $result, CommentsApiController $sender, Schema $inSchema, array $query, array $row) {
+    public function commentsApiController_getOutput(array $result, CommentsApiController $sender, Schema $inSchema, array $query, array $row) {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
         if ($sender->isExpandField('reactions', $expand)) {
@@ -278,12 +278,12 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * Respond to /api/v2/comments/:id/reactions
      *
+     * @param CommentsApiController $sender
      * @param int $id The comment ID.
      * @param array $query The request query.
-     * @param CommentsApiController $sender
      * @return array
      */
-    public function commentsApiController_get_reactions($id, array $query, CommentsApiController $sender) {
+    public function commentsApiController_get_reactions(CommentsApiController $sender, $id, array $query) {
         $sender->permission();
 
         $sender->idParamSchema();
@@ -334,8 +334,9 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param Schema $inSchema
      * @param array $query The request query.
      * @param array $rows Raw result.
+     * @return array
      */
-    public function commentsApiController_index_output(array $result, CommentsApiController $sender, Schema $inSchema, array $query, array $rows) {
+    public function commentsApiController_indexOutput(array $result, CommentsApiController $sender, Schema $inSchema, array $query, array $rows) {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
         if ($sender->isExpandField('reactions', $expand)) {
@@ -355,12 +356,12 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * React to a comment with /api/v2/comments/:id/reactions
      *
+     * @param CommentsApiController $sender
      * @param int $id The comment ID.
      * @param array $body The request query.
-     * @param CommentsApiController $sender
      * @return array
      */
-    public function commentsApiController_post_reactions($id, array $body, CommentsApiController $sender) {
+    public function commentsApiController_post_reactions(CommentsApiController $sender, $id, array $body) {
         $sender->permission('Garden.SignIn.Allow');
 
         $in = $sender->schema([
@@ -445,12 +446,12 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * Delete a discussion reaction with /api/v2/discussions/:id/reactions/:userID
      *
+     * @param DiscussionsApiController $sender
      * @param int $id The discussion ID.
      * @param int|null $userID
-     * @param DiscussionsApiController $sender
      * @return array
      */
-    public function discussionsApiController_delete_reactions($id, $userID = null, DiscussionsApiController $sender) {
+    public function discussionsApiController_delete_reactions(DiscussionsApiController $sender, $id, $userID = null) {
         $sender->permission('Garden.SignIn.Allow');
 
         $in = $sender->schema(
@@ -477,12 +478,12 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * Respond to /api/v2/discussions/:id/reactions
      *
+     * @param DiscussionsApiController $sender
      * @param int $id The discussion ID.
      * @param array $query The request query.
-     * @param DiscussionsApiController $sender
      * @return array
      */
-    public function discussionsApiController_get_reactions($id, array $query, DiscussionsApiController $sender) {
+    public function discussionsApiController_get_reactions(DiscussionsApiController $sender, $id, array $query) {
         $sender->permission();
 
         $sender->idParamSchema()->setDescription('Get a summary of reactions on a discussion.');
@@ -535,7 +536,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $row Pre-validated data.
      * @return array
      */
-    public function discussionsApiController_get_output(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $row) {
+    public function discussionsApiController_getOutput(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $row) {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
         if ($sender->isExpandField('reactions', $expand)) {
@@ -557,8 +558,9 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param Schema $inSchema
      * @param array $query The request query.
      * @param array $rows Raw result.
+     * @return array
      */
-    public function discussionsApiController_index_output(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $rows) {
+    public function discussionsApiController_indexOutput(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $rows) {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
         if ($sender->isExpandField('reactions', $expand)) {
@@ -578,12 +580,12 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * React to a discussion with /api/v2/discussions/:id/reactions
      *
+     * @param DiscussionsApiController $sender
      * @param int $id The discussion ID.
      * @param array $body The request query.
-     * @param DiscussionsApiController $sender
      * @return array
      */
-    public function discussionsApiController_post_reactions($id, array $body, DiscussionsApiController $sender) {
+    public function discussionsApiController_post_reactions(DiscussionsApiController $sender, $id, array $body) {
         $sender->permission('Garden.SignIn.Allow');
 
         $in = $sender->schema([
