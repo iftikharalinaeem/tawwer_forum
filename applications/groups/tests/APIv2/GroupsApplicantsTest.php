@@ -100,8 +100,8 @@ class GroupsApplicantsTest extends AbstractGroupsSubResource {
      * @dataProvider provideApproveApplicants
      * @depends testApply
      */
-    public function testApproveApplicants($state) {
-        $originalGroup = $this->createGroup(__FUNCTION__.'('.$state.')', false);
+    public function testApproveApplicants($status) {
+        $originalGroup = $this->createGroup(__FUNCTION__.'('.$status.')', false);
 
         $this->api()->setUserID(self::$userIDs[0]);
         $this->api()->post(
@@ -116,7 +116,7 @@ class GroupsApplicantsTest extends AbstractGroupsSubResource {
         $result = $this->api()->patch(
             $this->createURL($originalGroup['groupID'], 'applicants', self::$userIDs[0]),
             [
-                'state' => $state,
+                'status' => $status,
             ]
         );
 
@@ -126,14 +126,14 @@ class GroupsApplicantsTest extends AbstractGroupsSubResource {
 
         $this->assertInternalType('array', $applicant);
         $this->assertArrayHasKey('userID', $applicant);
-        $this->assertArrayHasKey('state', $applicant);
+        $this->assertArrayHasKey('status', $applicant);
         $this->assertEquals(self::$userIDs[0], $applicant['userID']);
-        $this->assertEquals($state, $applicant['state']);
+        $this->assertEquals($status, $applicant['status']);
 
         $result = $this->api()->get($this->createURL($originalGroup['groupID']));
         $updatedGroup = $result->getBody();
 
-        $this->assertEquals($originalGroup['countMembers'] + ($state === 'approved' ? 1 : 0), $updatedGroup['countMembers']);
+        $this->assertEquals($originalGroup['countMembers'] + ($status === 'approved' ? 1 : 0), $updatedGroup['countMembers']);
     }
 
     /**
