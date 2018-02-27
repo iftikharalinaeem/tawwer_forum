@@ -25,7 +25,7 @@ class ReflectionAction {
     /**
      * @var EventManager
      */
-    private $events;
+    private $eventManager;
 
     /**
      * @var ResourceRoute $route
@@ -68,9 +68,14 @@ class ReflectionAction {
     private $args;
 
     /**
-     * @var object A controller instance.
+     * @var object Instance to which the method belongs to.
      */
-    private $instance;
+    private $methodInstance;
+
+    /**
+     * @var object The controller on which the action will be executed.
+     */
+    private $controllerInstance;
 
     /**
      * @var array
@@ -81,15 +86,23 @@ class ReflectionAction {
      * ReflectionAction constructor.
      *
      * @param ReflectionMethod $method The PHP method that the action is meant to represent.
-     * @param object $instance An object instance that the method belongs to.
+     * @param object $methodInstance An object instance that the method belongs to.
+     * @param object $controllerInstance The controller on which the action will be executed.
      * @param ResourceRoute $route The router used to inspect and quasi-reverse route the method.
-     * @param EventManager $events An event manager for capturing events.
+     * @param EventManager $eventManager An event manager for capturing events.
      */
-    public function __construct(ReflectionMethod $method, $instance, ResourceRoute $route, EventManager $events) {
+    public function __construct(
+        ReflectionMethod $method,
+        $methodInstance,
+        $controllerInstance,
+        ResourceRoute $route,
+        EventManager $eventManager
+    ) {
         $this->method = $method;
-        $this->events = $events;
+        $this->eventManager = $eventManager;
         $this->route = $route;
-        $this->instance = $instance;
+        $this->methodInstance = $methodInstance;
+        $this->controllerInstance = $controllerInstance;
 
         $this->reflectAction();
     }
@@ -115,7 +128,7 @@ class ReflectionAction {
             $method->getName(),
             $m
         )) {
-            $controller = $m['class'] ?: get_class($this->instance);
+            $controller = $m['class'] ?: get_class($this->controllerInstance);
             $httpMethod = $m['method'];
             $subpath = isset($m['path']) ? $m['path'] : '';
         } else {
@@ -139,7 +152,15 @@ class ReflectionAction {
         $this->subpath = ltrim('/'.$this->dashCase($subpath), '/');
 
         $this->args = [];
+        $eventBound = $method->class !== $controller;
+
         foreach ($method->getParameters() as $param) {
+            // The first parameter of eventBounds endpoint has to be the controller.
+            if ($eventBound && $param->getPosition() === 0) {
+                $this->args[$param->getName()] = $this->controllerInstance;
+                continue;
+            }
+
             // Default the call args.
             $this->args[$param->getName()] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : ($param->isArray() ? [] : null);
 
@@ -151,7 +172,14 @@ class ReflectionAction {
                 $p = ['name' => $param->getName(), 'in' => 'path', 'required' => true];
 
                 $constraint = (array)$this->route->getConstraint($param->getName()) + ['position' => '*'];
-                if ($param->getPosition() === 0 && $constraint['position'] === 0) {
+
+                $position = $param->getPosition();
+                if ($eventBound) {
+                    $position -= 1;
+                }
+
+                // Check if the "first" parameter is an idParam.
+                if ($position === 0 && $constraint['position'] === $position) {
                     $this->idParam = $param->getName();
                 }
             }
@@ -215,9 +243,9 @@ class ReflectionAction {
         };
 
         try {
-            $this->events->bind('controller_schema', $fn, EventManager::PRIORITY_LOW);
+            $this->eventManager->bind('controller_schema', $fn, EventManager::PRIORITY_LOW);
 
-            $r = $this->method->invoke($this->instance, ...array_values($this->args));
+            $r = $this->method->invoke($this->methodInstance, ...array_values($this->args));
 
         } catch (ShortCircuitException $ex) {
             // We should have everything we need now.
@@ -226,7 +254,7 @@ class ReflectionAction {
             // We shouldn't get here, but let's allow it.
             $summary = "Something happened before the output schema was found. The endpoint most likely didn't define its output properly.";
         } finally {
-            $this->events->unbind('controller_schema', $fn);
+            $this->eventManager->unbind('controller_schema', $fn);
         }
 
         // Fill in information about the parameters from the input schema.
