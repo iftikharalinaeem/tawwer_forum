@@ -30,12 +30,12 @@ jQuery(document).ready(function($) {
  
 				// if the counter is 0, redirect the user
 				if(counter < 0){
-               clearInterval(timer);
-               
-               $.post(
-                  gdn.url('/entry/signout.json'),
-                  function() { window.location.replace(gdn.url('/entry/autosignedout')); }
-               );
+                    clearInterval(timer);
+                    var tk = gdn.definition('TransientKey');
+                    $.get(
+                        gdn.url('/entry/signout.json?TransientKey='+tk),
+                        function() { window.location.replace(gdn.url('/entry/autosignedout')); }
+                    );
 				} else {
 					$countdown.html( counter );
 				};
