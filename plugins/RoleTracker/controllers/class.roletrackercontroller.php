@@ -91,42 +91,65 @@ class RoleTrackerController extends Gdn_Controller {
      * Remove a tracking tag from a discussion.
      *
      * @param $discussionID
-     * @param $tagID
      * @throws Exception
-     * @throws \Vanilla\Exception\PermissionException
      */
-    public function untrack($discussionID, $tagID) {
-        // Make sure we are posting back.
-        if (!Gdn::request()->isAuthenticatedPostBack()) {
-            throw permissionException('Javascript');
-        }
+    public function untrack($discussionID) {
+        $this->form = new Gdn_Form();
 
         $discussionModel = new DiscussionModel();
         $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
-        if (!$discussion || !Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion))) {
-            throw new \Vanilla\Exception\PermissionException('Vanilla.Discussions.Edit');
+
+        if (!$discussion) {
+            throw notFoundException('Discussion');
         }
 
         $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
         if (!$trackedRoles) {
-            throw new Exception('No roles are tracked.');
+            throw notFoundException();
         }
+
+        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion))) {
+            return permissionException('Vanilla.Discussions.Edit');
+        }
+
+        $discussionTags = val('Tags', $discussion);
+        if ($discussionTags) {
+            $discussionTags = Gdn_DataSet::index($discussionTags, 'TagID');
+        } else {
+            $tagModel = new TagModel();
+            $discussionTags = $tagModel->getDiscussionTags(val('DiscussionID', $discussion), TagModel::IX_TAGID);
+        }
+        if (!$discussionTags) {
+            throw notFoundException();
+        }
+
         $trackedRolesByTag = Gdn_DataSet::index($trackedRoles, 'TrackerTagID');
-
-        $tagModel = new TagModel();
-        $discussionTags = $tagModel->getDiscussionTags($discussionID, TagModel::IX_TAGID);
-        if (!$discussionTags || !isset($discussionTags[$tagID])) {
-            throw new Exception('The discussion is not tracked.');
+        $discussionsTrackedTagIDs = array_intersect(array_keys($trackedRolesByTag), array_keys($discussionTags));
+        if (!$discussionsTrackedTagIDs) {
+            throw notFoundException();
         }
 
-        $tagDiscussionModel = new Gdn_Model('TagDiscussion');
-        $tagDiscussionModel->delete([
-            'DiscussionID' => $discussionID,
-            'TagID' => $tagID,
-        ]);
+        if ($this->form->authenticatedPostBack()) {
+            $tags = $this->form->getFormValue('trackedTag');
+            $tagDiscussionModel = new Gdn_Model('TagDiscussion');
+            foreach($tags as $tagID) {
+                if (in_array($tagID, $discussionsTrackedTagIDs)) {
+                    $tagDiscussionModel->delete([
+                        'DiscussionID' => $discussionID,
+                        'TagID' => $tagID,
+                    ]);
+                }
+            }
 
-        $this->informMessage(sprintft('%s was successfully untracked.', htmlentities($discussionTags[$tagID]['FullName'])));
+            Gdn::controller()->jsonTarget('', '', 'Refresh');
+            $this->render('blank', 'utility', 'dashboard');
+            return;
+        }
 
-        $this->render('blank', 'utility', 'dashboard');
+        $this->setData('Discussion', $discussion);
+        $this->setData('TrackedTagIDs', $discussionsTrackedTagIDs);
+        $this->setData('DiscussionTags', $discussionTags);
+
+        $this->render();
     }
 }
