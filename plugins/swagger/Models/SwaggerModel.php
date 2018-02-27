@@ -233,7 +233,7 @@ class SwaggerModel {
         // Event bounds methods
         $handlers = $this->eventManager->getAllHandlers();
         foreach ($handlers as $handlerName => $callbacks) {
-            if (stripos($handlerName, $controller->getName()) === 0) {
+            if (stripos($handlerName, $controller->getName().'_') === 0) {
                 foreach ($callbacks as $callbackInfo) {
                     try {
                         $callbackInstance = $this->container->get($callbackInfo->class);
