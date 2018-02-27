@@ -254,11 +254,10 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             return;
         }
 
+        $discussion = $args['Discussion'];
         if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion))) {
             return;
         }
-
-        $discussion = $args['Discussion'];
 
         $discussionTags = val('Tags', $discussion);
         if ($discussionTags) {
