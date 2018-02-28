@@ -2,7 +2,7 @@
     "name": "Bootstrap",
     "description": "A theme based on the popular Twitter Bootstrap framework.",
     "version": "1.0.13",
-    "hidden": false,
+    "hidden": true,
     "options": {
         "description": "This theme has an alternative colour scheme.",
         "styles": {
