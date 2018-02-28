@@ -249,7 +249,15 @@ class RoleTrackerPlugin extends Gdn_Plugin {
      * @param array $args Event arguments.
      */
     public function base_discussionOptions_handler($sender, $args) {
+        $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
+        if (!$trackedRoles) {
+            return;
+        }
+
         $discussion = $args['Discussion'];
+        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion))) {
+            return;
+        }
 
         $discussionTags = val('Tags', $discussion);
         if ($discussionTags) {
@@ -262,28 +270,18 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             return;
         }
 
-        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion))) {
-            return;
-        }
-
-        $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
-        if (!$trackedRoles) {
-            return;
-        }
         $trackedRolesByTag = Gdn_DataSet::index($trackedRoles, 'TrackerTagID');
         $discussionsTrackedTagIDs = array_intersect(array_keys($trackedRolesByTag), array_keys($discussionTags));
         if (!$discussionsTrackedTagIDs) {
             return;
-        };
+        }
 
-        foreach ($discussionsTrackedTagIDs as $tagID) {
-            $url = '/roletracker/untrack/'.val('DiscussionID', $discussion).'/'.$tagID;
-            $label = sprintft('Role Tracker - Remove %s Tag', htmlentities($discussionTags[$tagID]['FullName']));
-            if (isset($args['DiscussionOptions'])) {
-                $args['DiscussionOptions']['RoleTracker_'.$tagID] = ['Label' => $label, 'Url' => $url, 'Class' => 'Hijack'];
-            } elseif (isset($sender->Options)) {
-                $sender->Options .= '<li>'.anchor($label, $url, 'Hijack RoleTrackerOptions') . '</li>';
-            }
+        $url = '/roletracker/untrack/'.val('DiscussionID', $discussion);
+        $label = t('Role Tracker').'...';
+        if (isset($args['DiscussionOptions'])) {
+            $args['DiscussionOptions']['RoleTracker'] = ['Label' => $label, 'Url' => $url, 'Class' => 'Popup'];
+        } elseif (isset($sender->Options)) {
+            $sender->Options .= '<li>'.anchor($label, $url, 'Popup RoleTrackerOptions') . '</li>';
         }
     }
 
