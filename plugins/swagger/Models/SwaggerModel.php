@@ -49,7 +49,7 @@ class SwaggerModel {
     /**
      * @var EventManager
      */
-    private $events;
+    private $eventManager;
 
     /**
      * @var ContainerInterface The container used to create controllers.
@@ -61,14 +61,14 @@ class SwaggerModel {
      *
      * @param RequestInterface $request The page request used to construct URLs.
      * @param AddonManager $addonManager The addon manager dependency used to find classes.
-     * @param EventManager $events The event manager dependency used to intercept/change controller methods.
+     * @param EventManager $eventManager The event manager dependency used to intercept/change controller methods.
      * @param Dispatcher $dispatcher The dispatcher used to inspect routing behavior.
      * @param ContainerInterface $container The container used to construct controllers.
      */
     public function __construct(
         RequestInterface $request,
         AddonManager $addonManager,
-        EventManager $events,
+        EventManager $eventManager,
         Dispatcher $dispatcher,
         ContainerInterface $container
     ) {
@@ -76,7 +76,7 @@ class SwaggerModel {
         $this->addonManager = $addonManager;
         $this->dispatcher = $dispatcher;
         $this->route = $this->dispatcher->getRoute('api-v2');
-        $this->events = $events;
+        $this->eventManager = $eventManager;
         $this->container = $container;
     }
 
@@ -218,24 +218,60 @@ class SwaggerModel {
      * Get all of the actions for a controller.
      *
      * @param ReflectionClass $controller The controller class to reflect.
-     * @param object $instance The controller instance used to call the action and capture events.
+     * @param object $controllerInstance The controller instance used to call the action and capture events.
      * @return \Generator|ReflectionAction[] Yields the actions for the controller.
      */
-    private function getControllerActions(ReflectionClass $controller, $instance) {
-        foreach ($controller->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-            if ($method->isAbstract() || $method->isStatic() || $method->getName()[0] === '_' || $method->getName() === 'options') {
-                continue;
-            }
+    private function getControllerActions(ReflectionClass $controller, $controllerInstance) {
+        $controllerMethods = [
+            // Controller instance methods
+            [
+                'instance' => $controllerInstance,
+                'methods' => $controller->getMethods(ReflectionMethod::IS_PUBLIC),
+            ],
+        ];
 
-            try {
-                $action = new ReflectionAction($method, $instance, $this->route, $this->events);
+        // Event bounds methods
+        $handlers = $this->eventManager->getAllHandlers();
+        foreach ($handlers as $handlerName => $callbacks) {
+            if (stripos($handlerName, $controller->getName().'_') === 0) {
+                foreach ($callbacks as $callbackInfo) {
+                    try {
+                        $callbackInstance = $this->container->get($callbackInfo->class);
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+                    $callbackClass = new ReflectionClass($callbackInstance);
 
-                yield $action;
-            } catch (\InvalidArgumentException $ex) {
-                continue;
-            } catch (\Exception $ex) {
-                continue;
+                    $controllerMethods[] = [
+                        'instance' => $callbackInstance,
+                        'methods' => [$callbackClass->getMethod($callbackInfo->method)],
+                    ];
+                }
+
             }
         }
+
+        foreach ($controllerMethods as $data) {
+            $methodInstance = $data['instance'];
+            $methods = $data['methods'];
+
+            foreach ($methods as $method) {
+                if ($method->isAbstract() || $method->isStatic() || $method->getName()[0] === '_' || $method->getName() === 'options') {
+                    continue;
+                }
+
+                try {
+                    $action = new ReflectionAction($method, $methodInstance, $controllerInstance, $this->route, $this->eventManager);
+
+                    yield $action;
+                } catch (\InvalidArgumentException $ex) {
+                    continue;
+                } catch (\Exception $ex) {
+                    continue;
+                }
+            }
+        }
+
+
     }
 }
