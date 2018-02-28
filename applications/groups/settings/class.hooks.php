@@ -352,8 +352,8 @@ class GroupsHooks extends Gdn_Plugin {
     /**
      * Update items in discussion options dropdown menu.
      *
-     * @param $sender
-     * @param $args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
     public function base_discussionOptionsDropdown_handler(Gdn_Controller $sender, array $args) {
         $discussion = $args['Discussion'];
