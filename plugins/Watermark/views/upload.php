@@ -2,28 +2,27 @@
 <div class="PageInfo">
     <h2><?php echo t('Add a Watermark Image'); ?></h2>
 
-    <p>
+    <div class="alert alert-warning padded">
         <?php
         echo t('watermark image descriptions',
             'Upload a transparent PNG that will be superimposed over any images you upload with a discussion in designated categories.');
         ?>
-    </p>
+    </div>
 </div>
 <?php
 echo $this->Form->open(['enctype' => 'multipart/form-data']);
 echo $this->Form->errors();
 ?>
 
-<div class="Row">
-    <div class="Column Grid_100">
-        <ul>
-            <li>
+<div class="padded">
+    <ul>
+        <li>
 <?php
 
-$watermark = $this->data('watermark');
-if ($watermark) {
+$uploaded_watermark = $this->data('uploaded_watermark');
+if ($uploaded_watermark) {
     echo wrap(
-        img(Gdn_Upload::url($watermark), ['style' =>"max-width: 200px"]),
+        img(Gdn_Upload::url($uploaded_watermark), ['style' =>"max-width: 200px"]),
         'div'
     );
 
@@ -33,15 +32,16 @@ if ($watermark) {
         'div',
         ['class' => 'Info']
     );
+} else {
+    echo '<div class="padded">'.t('You have no watermark uploaded').'</div>';
 }
 
-echo $this->Form->input('watermark', 'file');
+echo $this->Form->input('watermark_upload', 'file');
 
 echo '<div class="Buttons">'.$this->Form->button('Save').'</div>';
 ?>
-            </li>
-        </ul>
-    </div>
+        </li>
+    </ul>
 </div>
 <?php
 echo $this->Form->close();
