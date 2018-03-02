@@ -1,4 +1,4 @@
-# AutoRoleByEmail
+# Auto-Role By Email
 
 This plugin can be used to give certain roles to users, based on the domain of their email.
 
