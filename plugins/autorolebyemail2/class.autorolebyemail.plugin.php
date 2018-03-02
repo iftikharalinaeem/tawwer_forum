@@ -23,18 +23,8 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
      * One time on enable.
      */
     public function setup() {
+        removeFromConfig('EnabledPlugins.AutoRoleByEmail');
         $this->structure();
-
-        // Backwards compatibility with 0.1
-        if (c('Plugins.AutoRoleByEmail.Domain', false)) {
-            $roleModel = new RoleModel();
-            $roleModel->update(
-                ['Domains' => c('Plugins.AutoRoleByEmail.Domain')],
-                ['Name' => c('Plugins.AutoRoleByEmail.Role')]
-            );
-            removeFromConfig('Plugins.AutoRoleByEmail.Domain');
-            removeFromConfig('Plugins.AutoRoleByEmail.Role');
-        }
     }
 
     /**
