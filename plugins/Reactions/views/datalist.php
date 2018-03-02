@@ -45,7 +45,7 @@
          <div class="Item-Body">
             <div class="Message">
                <?php
-               $linkContent = ' ('.t("More").')';
+               $linkContent = ' ('.t("View Post").')';
                $moreLink = anchor($linkContent, $Row['Url']);
                $bodyContent = Gdn_Format::excerpt($Row['Body'], $Row['Format']);
                $trimmedContent = sliceString($bodyContent, 200);
