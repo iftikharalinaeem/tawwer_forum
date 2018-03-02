@@ -588,8 +588,6 @@ class GroupsApiController extends AbstractApiController {
         $paging = ApiUtils::numberedPagerInfo($this->groupModel->getCount(), "/api/v2/groups", $query, $in);
 
         return new Data($result, ['paging' => $paging]);
-
-        return $result;
     }
 
     /**
