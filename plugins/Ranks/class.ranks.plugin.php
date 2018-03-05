@@ -4,7 +4,17 @@
  * @license Proprietary
  */
 
+use Garden\Schema\Schema;
+use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ClientException;
+use Vanilla\ApiUtils;
+
 class RanksPlugin extends Gdn_Plugin {
+
+    /** @var RankModel */
+    private $rankModel;
+
+    private $userModel;
 
     /** @var null|array  */
     public $ActivityLinks = null;
@@ -17,6 +27,18 @@ class RanksPlugin extends Gdn_Plugin {
 
     /** @var string  */
     public $LinksNotAllowedMessage = 'You have to be around for a little while longer before you can post links.';
+
+    /**
+     * RanksPlugin constructor.
+     *
+     * @param RankModel $rankModel
+     * @param UserModel $userModel
+     */
+    public function __construct(RankModel $rankModel, UserModel $userModel) {
+        $this->rankModel = $rankModel;
+        $this->userModel = $userModel;
+        parent::__construct();
+    }
 
     /**
      * Add mapper methods
@@ -224,6 +246,53 @@ class RanksPlugin extends Gdn_Plugin {
             return;
         }
         RankModel::applyAbilities();
+    }
+
+    /**
+     * Grab a schema for use in displaying a minimal subset of rank fields.
+     *
+     * @return Schema
+     */
+    public function getRankFragment() {
+        static $rankFragment;
+
+        if ($rankFragment === null) {
+            $rankFragment = Schema::parse([
+                'rankID:i' => 'Rank ID.',
+                'name:s' => 'Name of the rank.',
+                'userTitle:s' => 'Label that will display beside the user.'
+            ]);
+        }
+
+        return $rankFragment;
+    }
+
+    /**
+     * Get a subset of user rank data for use in API output.
+     *
+     * @param array $user
+     * @return array|null
+     */
+    private function getUserRank(array $user) {
+        $result = null;
+
+        $rankID = $user['rankID'] ?? null;
+        if ($rankID) {
+            $rank = $this->rankModel->getID($rankID, DATASET_TYPE_ARRAY);
+            if ($rank) {
+                // Prepare the rank data.
+                $rank = ApiUtils::convertOutputKeys($rank);
+                $rank = arrayTranslate($rank, ['label' => 'userTitle'], true);
+
+                // Verify we have everything we need.
+                $schema = $this->getRankFragment();
+                $rank = $schema->validate($rank);
+
+                $result = $rank;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -571,6 +640,148 @@ class RanksPlugin extends Gdn_Plugin {
                 }
             }
         }
+    }
+
+    /**
+     * Alter a schema's expand parameter to include reactions.
+     *
+     * @param Schema $schema
+     */
+    private function updateSchemaExpand(Schema $schema) {
+        /** @var Schema $expand */
+        $expandEnum = $schema->getField('properties.expand.items.enum');
+        if (is_array($expandEnum)) {
+            if (!in_array('rank', $expandEnum)) {
+                $expandEnum[] = 'rank';
+                $schema->setField('properties.expand.items.enum', $expandEnum);
+            }
+        } else {
+            $schema->merge(Schema::parse([
+                'expand?' => ApiUtils::getExpandDefinition(['rank'])
+            ]));
+        }
+    }
+
+    /**
+     * Modify the data on /api/v2/users/:id to include rank.
+     *
+     * @param array $result Post-validated data.
+     * @param UsersApiController $sender
+     * @param Schema $inSchema
+     * @param array $query The request query.
+     * @param array $row Pre-validated data.
+     * @return array
+     */
+    public function usersApiController_getOutput(array $result, UsersApiController $sender, Schema $inSchema, array $query, array $row) {
+        $expand = $query['expand'] ?? [];
+
+        if ($sender->isExpandField('rank', $expand)) {
+            $rank = $this->getUserRank($row);
+            if ($rank) {
+                $result['rank'] = $rank;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Modify the data on /api/v2/users index to include ranks.
+     *
+     * @param array $result Post-validated data.
+     * @param UsersApiController $sender
+     * @param Schema $inSchema
+     * @param array $query The request query.
+     * @param array $rows Raw result.
+     * @return array
+     */
+    public function usersApiController_indexOutput(array $result, UsersApiController $sender, Schema $inSchema, array $query, array $rows) {
+        $expand = $query['expand'] ?? [];
+
+        if ($sender->isExpandField('rank', $expand)) {
+            $rows = array_column($rows, null, 'userID');
+
+            foreach ($result as &$row) {
+                $userID = $row['userID'];
+                $rank = $this->getUserRank($rows[$userID]);
+                if ($rank) {
+                    $row['rank'] = $rank;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Update a user's rank.
+     *
+     * @param int $id
+     * @param UsersApiController $sender
+     * @param array $body
+     */
+    public function usersApiController_put_rank(UsersApiController $sender, $id, array $body) {
+        $sender->permission('Garden.Users.Edit');
+
+        $in = $sender->schema([
+            'rankID:i|n' => 'ID of the user rank.'
+        ], 'in')->setDescription('Update the rank of a user.');
+        $out = $sender->schema(['rankID:i|null' => 'ID of the user rank.'], 'out');
+
+        $body = $in->validate($body);
+        $user = $sender->userByID($id);
+
+        if ($body['rankID'] === null) {
+            $user['RankID'] = null;
+            $rankID = $this->rankModel->determineUserRank($user);
+        } else {
+            $rankID = $body['rankID'];
+            $manualRank = $this->rankModel->getID($rankID);
+            if (!$manualRank) {
+                throw new NotFoundException('Rank', ['rankID' => $rankID]);
+            }
+            $isManual = valr('Criteria.Manual', $manualRank);
+            if (!$isManual) {
+                throw new ClientException('Rank is not configured to be applied manually.', 400, ['rankID' => $rankID]);
+            }
+        }
+
+        $this->userModel->setField($id, 'RankID', $rankID);
+        $sender->validateModel($this->userModel);
+
+        $updatedUser = $sender->userByID($id);
+        $result = $out->validate($updatedUser);
+        return $result;
+    }
+
+    /**
+     * Add rank data to the user row schema.
+     *
+     * @param Schema $schema
+     */
+    public function userSchema_init(Schema $schema) {
+        $schema->merge(Schema::parse([
+            'rankID:i|n' => 'ID of the user rank.',
+            'rank?' => $this->getRankFragment()
+        ]));
+    }
+
+    /**
+     * Update the /users/get input schema.
+     *
+     * @param Schema $schema
+     */
+    public function userGetSchema_init(Schema $schema) {
+        $this->updateSchemaExpand($schema);
+    }
+
+    /**
+     * Update the /users index input schema.
+     *
+     * @param Schema $schema
+     */
+    public function userIndexSchema_init(Schema $schema) {
+        $this->updateSchemaExpand($schema);
     }
 }
 
