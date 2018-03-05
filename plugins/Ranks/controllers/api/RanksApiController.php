@@ -181,6 +181,24 @@ class RanksApiController extends AbstractApiController {
     }
 
     /**
+     * Get a rank for editing.
+     *
+     * @param string $urlCode
+     * @return array
+     */
+    public function get_edit($id) {
+        $this->permission('Garden.Settings.Manage');
+
+        $in = $this->idParamSchema('in')->setDescription('Get a rank for editing.');
+        $out = $this->schema($this->fullSchema(), 'out');
+
+        $row = $this->rankByID($id);
+        $row = $this->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
      * Get an ID-only rank record schema.
      *
      * @param string $type
@@ -279,12 +297,8 @@ class RanksApiController extends AbstractApiController {
      */
     public function normalizeInput(array $input) {
         // Rename fields.
-        foreach (array_flip($this->fieldMap) as $newField => $oldField) {
-            if (array_key_exists($oldField, $input)) {
-                $input[$newField] = $input[$oldField];
-                unset($input[$oldField]);
-            }
-        }
+        $fieldMap = array_flip($this->fieldMap);
+        $input = $this->renameFields($input, $fieldMap);
 
         // Filter out empty values.
         $filterFields = ['criteria', 'abilities'];
@@ -303,6 +317,8 @@ class RanksApiController extends AbstractApiController {
         }
 
         if (array_key_exists('abilities', $input) && is_array($input['abilities'])) {
+            $abilitiesMap = array_flip($this->abilitiesMap);
+            $input['abilities'] = $this->renameFields($input['abilities'], $abilitiesMap);
             foreach ($input['abilities'] as $ability => &$abilityVal) {
                 if ($abilityVal === false) {
                     $abilityVal = 'no';

@@ -474,10 +474,7 @@ class RankModel extends Gdn_Model {
      */
     public static function ranks($rankID = null) {
         if (self::$_Ranks === null) {
-            $m = new RankModel();
-            $ranks = $m->getWhere()->resultArray();
-            $ranks = Gdn_DataSet::index($ranks, ['RankID']);
-            self::$_Ranks = $ranks;
+            static::refreshCache();
         }
 
         if (!is_null($rankID) && !is_bool($rankID)) {
@@ -485,6 +482,19 @@ class RankModel extends Gdn_Model {
         } else {
             return self::$_Ranks;
         }
+    }
+
+    /**
+     * Refresh cache of ranks.
+     *
+     * @return array
+     */
+    public static function refreshCache() {
+        $m = new RankModel();
+        $ranks = $m->getWhere()->resultArray();
+        $ranks = Gdn_DataSet::index($ranks, ['RankID']);
+        self::$_Ranks = $ranks;
+        return self::$_Ranks;
     }
 
     /**
