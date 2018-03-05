@@ -183,7 +183,7 @@ class RanksApiController extends AbstractApiController {
     /**
      * Get a rank for editing.
      *
-     * @param string $urlCode
+     * @param string $id
      * @return array
      */
     public function get_edit($id) {
