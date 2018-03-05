@@ -14,6 +14,7 @@ class RanksPlugin extends Gdn_Plugin {
     /** @var RankModel */
     private $rankModel;
 
+    /** @var UserModel */
     private $userModel;
 
     /** @var null|array  */
@@ -726,7 +727,7 @@ class RanksPlugin extends Gdn_Plugin {
         $in = $sender->schema([
             'rankID:i|n' => 'ID of the user rank.'
         ], 'in')->setDescription('Update the rank of a user.');
-        $out = $sender->schema(['rankID:i|null' => 'ID of the user rank.'], 'out');
+        $out = $sender->schema(['rankID:i|n' => 'ID of the user rank.'], 'out');
 
         $body = $in->validate($body);
         $user = $sender->userByID($id);
