@@ -12,7 +12,7 @@ $giveTakeOptions = ['yes' => 'give', 'no' => 'take away', '' => 'default'];
 $takeOptions = ['no' => 'take away', '' => 'default'];
 
 // Begin form.
-echo $this->Form->open(), $this->Form->errors();
+echo $this->Form->open(['enctype' => 'multipart/form-data']), $this->Form->errors();
 ?>
 <ul>
     <li class="form-group">
@@ -32,6 +32,7 @@ echo $this->Form->open(), $this->Form->errors();
             <?php echo $this->Form->textBox('Label'); ?>
         </div>
     </li>
+    <?php $this->fireEvent('AfterRankLabel'); ?>
     <li class="form-group">
         <div class="label-wrap">
             <?php
