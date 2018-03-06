@@ -574,7 +574,7 @@ class RanksPlugin extends Gdn_Plugin {
     }
 }
 
-if (!function_exists('WriteUserRank')):
+if (!function_exists('rankTag')):
     /**
      * Output HTML for a user's rank.
      *
