@@ -29,7 +29,7 @@ $IsPrivileged = $this->data('IsPrivileged');
             echo '<span class="NoteType NoteType-'.$Row['Type'].'">'.t(ucfirst($Row['Type'])).'</span> ';
             ?>
          </div>
-         <div class="Warning-Body">
+         <div class="Warning-Body userContent">
             <?php echo $Row['Body']; ?>
          </div>
       </div>
