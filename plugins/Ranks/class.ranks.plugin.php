@@ -438,6 +438,8 @@ class RanksPlugin extends Gdn_Plugin {
                 }
             }
 
+            $sender->EventArguments['SaveData'] = &$saveData;
+            $sender->fireEvent('RankBeforeSave');
             $result = $rankModel->save($saveData);
             $sender->Form->setValidationResults($rankModel->validationResults());
             if ($result) {
