@@ -1236,7 +1236,7 @@ EOT
         // Verify the discussion is valid.
         $discussion = $sender->discussionByID($id);
         if (!$this->isIdea($discussion)) {
-            throw new ClientException("Invalid idea ({$id}).");
+            throw new ClientException('Discussion is not an idea.');
         }
 
         // Verify the status is valid.
@@ -1244,7 +1244,7 @@ EOT
             $statusID = $body['statusID'];
             $status = $this->statusModel->getStatus($statusID);
             if (!is_array($status) || !array_key_exists('StatusID', $status)) {
-                throw new ClientException("Invalid status ID ({$statusID})");
+                throw new ClientException('Invalid status ID.');
             }
             $this->updateDiscussionStatusTag($id, $statusID);
         }
@@ -1255,7 +1255,7 @@ EOT
 
         $currentStatus = $this->statusModel->getStatusByDiscussion($id);
         if (empty($currentStatus)) {
-            throw new ServerException("An error was encountered while getting the status of the idea ({$id}).", 500);
+            throw new ServerException('An error was encountered while getting the status of the idea.', 500);
         }
         $currentDiscussion = $sender->discussionByID($id);
         $currentStatusNotes = $this->getStatusNotes($currentDiscussion) ?: null;
@@ -1291,7 +1291,7 @@ EOT
 
         $category = CategoryModel::categories($categoryID);
         if (!$this->isIdeaCategory($category)) {
-            throw new ClientException("Category is not configured for ideation ({$categoryID}).");
+            throw new ClientException('Category is not configured for ideation.');
         }
 
         $discussionData = ApiUtils::convertInputKeys($body);
