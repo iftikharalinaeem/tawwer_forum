@@ -327,7 +327,7 @@ class AnalyticsTracker {
                 }
 
                 // Is this *not* a new visit and we have an existing session ID in our cookie?
-                if (!Gdn::session()->newVisit() && $sessionID = val('sessionID', $cookieIDs)) {
+                if (!Gdn::session()->isNewVisit() && $sessionID = val('sessionID', $cookieIDs)) {
                     $this->trackingIDs['sessionID'] = $sessionID;
                 } else {
                     // New session or no existing session ID? Create a new one.
