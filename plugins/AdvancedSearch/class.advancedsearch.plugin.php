@@ -368,8 +368,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         }
     }
 
-    function devancedSearch($searchModel, $search, $offset, $limit, $clean = true) {
-        $search = Search::cleanSearch($search);
+    static function devancedSearch($searchModel, $search, $offset, $limit, $clean = true) {
+        $search = Search::cleanSearch($search, $clean === 'api');
         $pdo = Gdn::database()->connection();
 
         $csearch = true;
@@ -389,7 +389,9 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         }
 
         // Only search if we have term, user, date, or title to search
-        if (!$terms && !isset($search['users']) && !isset($search['date-from']) && !isset($search['date-to']) && !isset($search['title'])) {
+        $hasDateRange = $clean !== 'api' && (isset($search['date-from']) || isset($search['date-to']));
+        $hasDateFilter = ($clean === 'api' && isset($search['date-filters']));
+        if (!$terms && !isset($search['users']) && !$hasDateRange && !$hasDateFilter && !isset($search['title'])) {
             return [];
         }
 
@@ -398,6 +400,9 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         if (isset($search['title'])) {
             $csearch = false;
             $dwhere['d.Name like'] = $pdo->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $search['title']).'%');
+
+            // In case comments search are enabled late on.
+            $cwhere['d.Name like'] = $dwhere['d.Name like'];
         }
 
         /// Author ///
@@ -406,6 +411,11 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
             $cwhere['c.InsertUserID'] = $author;
             $dwhere['d.InsertUserID'] = $author;
+        }
+
+        /// Discussion ///
+        if (isset($search['discussionid'])) {
+            $cwhere['d.DiscussionID'] = $search['discussionid'];
         }
 
         /// Category ///
@@ -423,14 +433,27 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         }
 
         /// Date ///
-        if (isset($search['date-from'])) {
-            $dwhere['d.DateInserted >='] = $pdo->quote($search['date-from']);
-            $cwhere['c.DateInserted >='] = $pdo->quote($search['date-from']);
-        }
+        if ($clean !== 'api') {
+            if (isset($search['date-from'])) {
+                $dwhere['d.DateInserted >='] = $pdo->quote($search['date-from']);
+                $cwhere['c.DateInserted >='] = $pdo->quote($search['date-from']);
+            }
 
-        if (isset($search['date-to'])) {
-            $dwhere['d.DateInserted <='] = $pdo->quote($search['date-to']);
-            $cwhere['c.DateInserted <='] = $pdo->quote($search['date-to']);
+            if (isset($search['date-to'])) {
+                $dwhere['d.DateInserted <='] = $pdo->quote($search['date-to']);
+                $cwhere['c.DateInserted <='] = $pdo->quote($search['date-to']);
+            }
+        }
+        else if (isset($search['date-filters'])) {
+            $dtZone = new DateTimeZone('UTC');
+            foreach($search['date-filters'] as $field => $value) {
+                $dt = new DateTime('@'.$value->getTimestamp());
+                $dt->setTimezone($dtZone);
+                $value = $pdo->quote($dt->format(MYSQL_DATE_FORMAT));
+
+                $dwhere['d.'.$field] = $value;
+                $cwhere['c.'.$field] = $value;
+            }
         }
 
 

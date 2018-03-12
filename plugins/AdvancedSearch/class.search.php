@@ -20,7 +20,7 @@ class Search {
      * @param array $search
      * @return array
      */
-    public static function cleanSearch($search) {
+    public static function cleanSearch($search, $api = false) {
         $search = array_change_key_case($search);
         $search = array_map(function ($v) {
             return is_string($v) ? trim($v) : $v;
@@ -162,37 +162,39 @@ class Search {
             }
         }
 
-        /// Types ///
-        $types = [];
-        $typecount = 0;
-        $selectedcount = 0;
+        if (!$api) {
+            /// Types ///
+            $types = [];
+            $typecount = 0;
+            $selectedcount = 0;
 
-        foreach (self::types() as $table => $type) {
-            $allselected = true;
+            foreach (self::types() as $table => $type) {
+                $allselected = true;
 
-            foreach ($type as $name => $label) {
-                $typecount++;
-                $key = $table.'_'.$name;
+                foreach ($type as $name => $label) {
+                    $typecount++;
+                    $key = $table.'_'.$name;
 
-                if (getValue($key, $search)) {
-                    $selectedcount++;
-                    $types[$table][] = $name;
-                } else {
-                    $allselected = false;
+                    if (getValue($key, $search)) {
+                        $selectedcount++;
+                        $types[$table][] = $name;
+                    } else {
+                        $allselected = false;
+                    }
+                    unset($search[$key]);
                 }
-                unset($search[$key]);
+                // If all of the types are selected then don't filter.
+                if ($allselected) {
+                    unset($type[$table]);
+                }
             }
-            // If all of the types are selected then don't filter.
-            if ($allselected) {
-                unset($type[$table]);
-            }
-        }
 
-        // At least one type has to be selected to filter.
-        if ($selectedcount > 0 && $selectedcount < $typecount) {
-            $search['types'] = $types;
-        } else {
-            unset($search['types']);
+            // At least one type has to be selected to filter.
+            if ($selectedcount > 0 && $selectedcount < $typecount) {
+                $search['types'] = $types;
+            } else {
+                unset($search['types']);
+            }
         }
 
 
@@ -219,6 +221,9 @@ class Search {
         if (isset($search['discussionid'])) {
             $doSearch = true;
             unset($search['title']);
+            if ($api) {
+                unset($search['types']['discussion']);
+            }
         }
 
         $search['dosearch'] = $doSearch;

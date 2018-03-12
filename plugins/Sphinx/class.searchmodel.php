@@ -142,7 +142,8 @@ class SearchModel extends Gdn_Model {
         $this->fireEvent("GetComments");
 
         $sql = Gdn::sql()
-            ->select('c.CommentID as PrimaryID, c.CommentID, d.DiscussionID, d.Name as Title, c.Body as Summary, c.Format, d.CategoryID')
+            ->select('c.CommentID as PrimaryID, c.CommentID, d.DiscussionID, c.Body as Summary, c.Format, d.CategoryID')
+            ->select('"RE: ", d.Name', 'concat', 'Title')
             ->select('c.DateInserted, c.Score, d.Type')
             ->select('c.InsertUserID as UserID');
 
@@ -156,6 +157,7 @@ class SearchModel extends Gdn_Model {
             ->get()->resultArray();
 
         foreach ($result as &$row) {
+            $row['RecordType'] = 'Comment';
             $row['Url'] = commentUrl($row, '/');
         }
 
@@ -186,6 +188,7 @@ class SearchModel extends Gdn_Model {
             ->get()->resultArray();
 
         foreach ($result as &$row) {
+            $row['RecordType'] = 'Discussion';
             $row['Name'] = $row['Title'];
             $row['Url'] = discussionUrl($row, '', '/');
             unset($row['Name']);
@@ -205,7 +208,7 @@ class SearchModel extends Gdn_Model {
         $this->fireEvent("GetGroups");
 
         $sql = Gdn::sql();
-        $sql->select('g.GroupID as PrimaryID, g.GroupID, g.Name as Title, g.Description as Summary, g.Format, 0')
+        $sql->select('g.GroupID as PrimaryID, g.GroupID, g.Name as Title, g.Description as Summary, g.Format, 0 as CategoryID')
             ->select('g.DateInserted, 1000 as Score, \'group\' as Type')
             ->select('g.InsertUserID as UserID');
 
@@ -325,7 +328,7 @@ class SearchModel extends Gdn_Model {
 
         // Filter the search into proper terms.
         if ($clean) {
-            $search = Search::cleanSearch($search);
+            $search = Search::cleanSearch($search, $clean === 'api');
         }
 
         $doSearch = $search['dosearch'];
@@ -614,20 +617,20 @@ class SearchModel extends Gdn_Model {
             $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
             $sphinxPort = c('Plugins.Sphinx.Port', 9312);
 
-            $sphinx = new SphinxClient();
-            $sphinx->setServer($sphinxHost, $sphinxPort);
+            $this->_sphinxClient = new SphinxClient();
+            $this->_sphinxClient->setServer($sphinxHost, $sphinxPort);
 
             // Set some defaults.
-            $sphinx->setMatchMode(SPH_MATCH_EXTENDED2);
-            $sphinx->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
+            $this->_sphinxClient->setMatchMode(SPH_MATCH_EXTENDED2);
+            $this->_sphinxClient->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
 //            $Sphinx->setRankingMode(SPH_RANK_SPH04);
 //            $Sphinx->setRankingMode(SPH_RANK_PROXIMITY_BM25);
 //            $Sphinx->setRankingMode(SPH_RANK_BM25);
-            $sphinx->setRankingMode(self::$rankingMode);
-            $sphinx->setMaxQueryTime(5000);
-            $sphinx->setFieldWeights(['name' => 3, 'body' => 1]);
+            $this->_sphinxClient->setRankingMode(self::$rankingMode);
+            $this->_sphinxClient->setMaxQueryTime(5000);
+            $this->_sphinxClient->setFieldWeights(['name' => 3, 'body' => 1]);
         }
-        return $sphinx;
+        return $this->_sphinxClient;
     }
 
     public function search($terms, $offset = 0, $limit = 20) {
