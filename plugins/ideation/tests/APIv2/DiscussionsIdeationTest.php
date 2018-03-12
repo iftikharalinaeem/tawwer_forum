@@ -33,7 +33,6 @@ class DiscussionsIdeationTest extends AbstractAPIv2Test {
         $this->assertArrayHasKey('attributes', $discussion);
         $this->assertArrayHasKey('idea', $discussion['attributes']);
 
-        $this->assertArrayHasKey('score', $discussion['attributes']['idea']);
         $this->assertArrayHasKey('statusID', $discussion['attributes']['idea']);
         $this->assertArrayHasKey('status', $discussion['attributes']['idea']);
         $this->assertArrayHasKey('statusNotes', $discussion['attributes']['idea']);

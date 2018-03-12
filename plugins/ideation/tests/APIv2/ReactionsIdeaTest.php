@@ -118,13 +118,13 @@ class ReactionsIdeaTest extends AbstractAPIv2Test {
     public function testVote($type, $vote, $score) {
         // Start with a clean slate.
         $idea = $this->postIdea($type);
-        $this->assertEquals(0, $idea['attributes']['idea']['score']);
+        $this->assertEquals(0, $idea['score']);
 
         $id = $idea['discussionID'];
         $response = $this->api()->post("discussions/{$id}/reactions", ['reactionType' => $vote]);
         $this->assertIsVoteResponse($response, $type);
         $updated = $this->getDiscussion($id);
-        $this->assertEquals($score, $updated['attributes']['idea']['score']);
+        $this->assertEquals($score, $updated['score']);
     }
 
     /**

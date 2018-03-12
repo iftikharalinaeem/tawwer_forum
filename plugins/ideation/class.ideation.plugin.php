@@ -130,12 +130,10 @@ class IdeationPlugin extends Gdn_Plugin {
         }
 
         $type = $category['IdeationType'];
-        $score = $discussion['score'] ?? $discussion['Score'] ?? 0;
         $status = $this->statusModel->getStatusByDiscussion($discussionID);
         $notesKey = array_key_exists('DiscussionID', $discussion) ? 'Attributes.StatusNotes' : 'attributes.statusNotes';
         $statusNotes = valr($notesKey, $discussion) ?: null;
         $result = [
-            'score' => $score,
             'statusID' => val('StatusID', $status),
             'status' => [
                 'name' => val('Name', $status),
@@ -1364,7 +1362,6 @@ EOT
 
         if (!isset($schema)) {
             $schema = Schema::parse([
-                'score:i' => 'Total score for the idea.',
                 'statusNotes:s|n' => 'Status update notes.',
                 'statusID:i' => 'Unique numeric ID of a status.',
                 'status:o' => [
