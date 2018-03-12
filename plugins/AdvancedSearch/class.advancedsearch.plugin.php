@@ -368,6 +368,14 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * @param $searchModel
+     * @param $search
+     * @param $offset
+     * @param $limit
+     * @param bool|string $clean Whether to clean $search or not. Can be set to "api" which changes the process a bit.
+     * @return array
+     */
     static function devancedSearch($searchModel, $search, $offset, $limit, $clean = true) {
         $search = Search::cleanSearch($search, $clean === 'api');
         $pdo = Gdn::database()->connection();

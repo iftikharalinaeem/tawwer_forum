@@ -18,6 +18,7 @@ class Search {
      * Massage an advanced style search query for correctness.
      *
      * @param array $search
+     * @param bool $api Whether the data comes from the UI or the API.
      * @return array
      */
     public static function cleanSearch($search, $api = false) {
