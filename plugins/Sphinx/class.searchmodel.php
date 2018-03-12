@@ -357,6 +357,24 @@ class SearchModel extends Gdn_Model {
         if (isset($search['timestamp-from'])) {
             $sphinx->setFilterRange('DateInserted', $search['timestamp-from'], $search['timestamp-to']);
             $filtered = true;
+        } else if (isset($search['date-filters'])) {
+            $dtZone = new DateTimeZone('UTC');
+
+            $fromDate = array_shift($search['date-filters']);
+            $adjustedFrom = new DateTime('@'.$fromDate->getTimestamp());
+            $adjustedFrom->setTimezone($dtZone);
+
+            // We want an exact "date" but we still need to use setFilterRange().
+            if (count($search['date-filters']) === 0) {
+                $adjustedTo = $adjustedFrom;
+            } else {
+                $toDate = array_shift($search['date-filters']);
+                $adjustedTo = new DateTime('@'.$toDate->getTimestamp());
+                $adjustedTo->setTimezone($dtZone);
+            }
+
+            $sphinx->setFilterRange('DateInserted', $adjustedFrom->getTimestamp(), $adjustedTo->getTimestamp());
+            $filtered = true;
         }
 
         if (isset($search['title'])) {
