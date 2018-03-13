@@ -51,6 +51,11 @@ class WatermarkPlugin extends Gdn_Plugin {
      * @param $args
      */
     public function vanillaSettingsController_afterCategorySettings_handler($sender, $args) {
+        if (!$sender->data('CategoryID') || !c('Watermark.WatermarkPath')) {
+            // We can only add watermarking to a category after it has been created, in edit mode, when we have a CategoryID
+            // and if there is a Watermark Image to add to image uploads.
+            return;
+        }
         $watermarkImageCategory = c("Watermark.WatermarkCategories");
         if (!$watermarkImageCategory) {
             $watermarkImageCategory = [];
