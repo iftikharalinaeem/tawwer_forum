@@ -560,7 +560,10 @@ class GroupsApiController extends AbstractApiController {
         // Filters
         $where = [];
         if (array_key_exists('memberID', $query)) {
-            $userGroups = $this->groupModel->SQL->getWhere('UserGroup', $query['memberID'])->resultArray();
+            $userGroups = $this->groupModel->SQL->getWhere(
+                'UserGroup',
+                ['UserID' => $query['memberID']]
+            )->resultArray();
             $ids  = array_column($userGroups, 'GroupID');
 
             if (empty($ids)) {
