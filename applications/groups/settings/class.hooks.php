@@ -12,6 +12,19 @@ use \Vanilla\Web\Controller;
  */
 class GroupsHooks extends Gdn_Plugin {
 
+    /** @var GroupModel */
+    private $groupModel;
+
+    /**
+     * GroupsHooks constructor.
+     *
+     * @param GroupModel $groupModel
+     */
+    public function __construct(GroupModel $groupModel) {
+        parent::__construct();
+        $this->groupModel = $groupModel;
+    }
+
     /**
      * Setup routine for when the application is enabled.
      */
@@ -887,5 +900,60 @@ class GroupsHooks extends Gdn_Plugin {
 
         $where['groupID'] = $query['groupID'];
         return $where;
+    }
+
+    /**
+     * Add group fields to search schema.
+     *
+     * @param Schema $schema
+     */
+    public function searchResultSchema_init(Schema $schema) {
+        $recordTypes = $schema->getField('properties.recordType.enum');
+        $recordTypes[] = 'group';
+        $types = $schema->getField('properties.type.enum');
+        $types[] = 'group';
+
+        $schema->merge(Schema::parse([
+            'recordType' => [
+                'enum' => $recordTypes,
+            ],
+            'groupID:i|n?' => 'The id of the group or the id of the group containing the record.',
+        ]));
+        $schema->setField('properties.type.enum', $types);
+    }
+
+    /**
+     * Hook into the pre normalization process of the searchAPIController to fill out missing information about group records.
+     *
+     * @param array $records
+     * @param SearchApiController $searchApiController
+     * @param array $options
+     * @return array
+     */
+    public function searchApiController_preNormalizeOutputs($records, SearchApiController $searchApiController, $options) {
+        $groupIDs = [];
+
+        foreach ($records as $record) {
+            if ($record['RecordType'] === 'Group') {
+                $groupIDs[] = $record['PrimaryID'];
+            }
+        }
+
+        $groups = [];
+        if ($groupIDs) {
+            $groups = $this->groupModel->getWhere(['GroupID' => $groupIDs])->resultArray();
+            $groups = Gdn_DataSet::index($groups, 'GroupID');
+        }
+
+        if ($groups) {
+            foreach ($records as &$record) {
+                if ($record['RecordType'] === 'Group') {
+                    $record['UpdateUserID'] = $groups[$record['PrimaryID']]['UpdateUserID'] ?? null;
+                    $record['DateUpdated'] = $groups[$record['PrimaryID']]['DateUpdated'] ?? null;
+                }
+            }
+        }
+
+        return $records;
     }
 }
