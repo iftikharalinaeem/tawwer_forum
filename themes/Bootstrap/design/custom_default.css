@@ -444,3 +444,7 @@ a:hover .Sprite16 {
 .Button.Primary .Sprite16 {
   background-image: url("//vanillicon.com/sprites/sprites-14-ffffff.png");
 }
+
+.PageControls .discussion-sort-filter-module {
+    height: 30px;
+}

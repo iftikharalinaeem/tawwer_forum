@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
 <ul class="DataList Compact BlogList">
-   <?php 
-   foreach ($this->data('Data', []) as $Row): 
+   <?php
+   foreach ($this->data('Data', []) as $Row):
       $this->setData('Record', $Row);
    ?>
    <li id="<?php echo "{$Row['RecordType']}_{$Row['RecordID']}" ?>" class="Item">
@@ -24,7 +24,7 @@
 <!--            <span class="AuthorInfo">
                <?php
                //echo wrapIf(GetValue('Title', $Author), 'span', array('class' => 'MItem AuthorTitle'));
-               $this->fireEvent('AuthorInfo'); 
+               $this->fireEvent('AuthorInfo');
                ?>
             </span>-->
          </div>
@@ -40,23 +40,29 @@
             </span>
          </div>
       </div>
-      
+
       <div class="Item-BodyWrap">
          <div class="Item-Body">
-            <div class="Message Expander">
+            <div class="Message">
                <?php
-               echo Gdn_Format::to($Row['Body'], $Row['Format']);
+               $linkContent = ' ('.t("View Post").')';
+               $moreLink = anchor($linkContent, $Row['Url']);
+               $bodyContent = Gdn_Format::excerpt($Row['Body'], $Row['Format']);
+               $trimmedContent = sliceString($bodyContent, 200);
+
+               echo $trimmedContent;
+               echo $moreLink;
                ?>
             </div>
          </div>
       </div>
-      
+
       <?php
       $RowObject = (object)$Row;
       Gdn::controller()->EventArguments['Object'] = $RowObject;
       Gdn::controller()->EventArguments[$Row['RecordType']] = $RowObject;
       Gdn::controller()->fireAs('DiscussionController')->fireEvent("After{$Row['RecordType']}Body");
-      
+
       writeReactions($Row);
       ?>
    </li>

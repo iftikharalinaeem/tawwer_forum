@@ -1106,3 +1106,6 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
 
 .PhotoGrid .PhotoWrap {
   display: block; }
+
+.container .discussion-sort-filter-module {
+  height: 36px; }

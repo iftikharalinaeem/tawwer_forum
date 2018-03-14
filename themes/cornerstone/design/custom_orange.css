@@ -1337,3 +1337,6 @@ a.Bookmarked:hover:before {
   border-radius: 1px;
   box-shadow: 0 0 0 3px #eeeeee;
 }
+.container .discussion-sort-filter-module {
+  height: 34px;
+}

@@ -866,9 +866,6 @@ class ReactionsPlugin extends Gdn_Plugin {
         $sender->_setBreadcrumbs(t($reactionType['Name']), $sender->canonicalUrl());
         $sender->setTabView('Reactions', 'DataList', '', 'plugins/Reactions');
         $this->addJs($sender);
-        $sender->addJsFile('jquery.expander.js');
-        $sender->addDefinition('ExpandText', t('(more)'));
-        $sender->addDefinition('CollapseText', t('(less)'));
 
         $sender->render();
     }

@@ -362,27 +362,41 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
-     * Delete discussion must redirect to Group instead of Category page.
+     * Update items in discussion options dropdown menu.
      *
-     * @param $sender
-     * @param $args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function discussionController_discussionOptions_handler($sender, $args) {
-        if ($groupID = val('GroupID', $args['Discussion'])) {
-            if (getValue('DeleteDiscussion', $args['DiscussionOptions'])) {
-                // Get the group
-                $model = new GroupModel();
-                $group = $model->getID($groupID);
-                if (!$group)
-                    return;
+    public function base_discussionOptionsDropdown_handler(Gdn_Controller $sender, array $args) {
+        $discussion = $args['Discussion'];
+        $groupID = val('GroupID', $discussion);
 
-                // Override redirect with GroupUrl instead of CategoryUrl.
-                $args['DiscussionOptions']['DeleteDiscussion'] = [
-                    'Label' => t('Delete Discussion'),
-                    'Url' => '/discussion/delete?discussionid='.$args['Discussion']->DiscussionID.'&target='.urlencode(groupUrl($group)),
-                    'Class' => 'Popup'];
-            }
+        // Needs to be a group discussion.
+        if (!$groupID) {
+            return;
         }
+
+        // Needs to be in a valid group.
+        $groupModel = new GroupModel();
+        $group = $groupModel->getID($groupID);
+        if (!$group) {
+            return;
+        }
+
+        /** @var DropdownModule $dropdown */
+        $dropdown = $args['DiscussionOptionsDropdown'];
+        $items = $dropdown->getItems();
+
+        // Update the delete URL to return users to the current group, instead of the Social Groups category.
+        if (array_key_exists('delete', $items)) {
+            $query = http_build_query([
+                'discussionid' => val('DiscussionID', $discussion),
+                'target' => groupUrl($group, 'discussions')
+            ]);
+            $items['delete']['url'] = "/discussion/delete?{$query}";
+        }
+
+        $dropdown->setItems($items);
     }
 
     /**

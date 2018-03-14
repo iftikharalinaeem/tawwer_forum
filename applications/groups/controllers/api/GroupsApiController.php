@@ -560,7 +560,10 @@ class GroupsApiController extends AbstractApiController {
         // Filters
         $where = [];
         if (array_key_exists('memberID', $query)) {
-            $userGroups = $this->groupModel->SQL->getWhere('UserGroup', $query['memberID'])->resultArray();
+            $userGroups = $this->groupModel->SQL->getWhere(
+                'UserGroup',
+                ['UserID' => $query['memberID']]
+            )->resultArray();
             $ids  = array_column($userGroups, 'GroupID');
 
             if (empty($ids)) {
@@ -588,8 +591,6 @@ class GroupsApiController extends AbstractApiController {
         $paging = ApiUtils::numberedPagerInfo($this->groupModel->getCount(), "/api/v2/groups", $query, $in);
 
         return new Data($result, ['paging' => $paging]);
-
-        return $result;
     }
 
     /**

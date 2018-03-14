@@ -83,4 +83,39 @@ class GroupsTest extends AbstractResourceTest {
         $this->incrementRecordCounterOnCall = true;
         parent::testIndex();
     }
+
+    /**
+     * Test filtering groups by member.
+     *
+     * @depends testIndex
+     */
+    public function testIndexMemberFilter() {
+        $apiUserID = $this->api()->getUserID();
+
+        // Create a group for the test.
+        $group = $this->testPost();
+        $groupID = $group['groupID'];
+
+        // Create a user for the test. Configure API requests to temporarily use this user.
+        $user = $user = $this->api()->post('users', [
+            'name' => 'IndexMemberFilter',
+            'email' => 'IndexMemberFilter@example.com',
+            'password' => md5(time()),
+        ])->getBody();
+        $userID = $user['userID'];
+        $this->api()->setUserID($userID);
+
+        // Join the test group with our test user.
+        $result = $this->api()->post("{$this->baseUrl}/{$groupID}/join");
+        $this->assertEquals(201, $result->getStatusCode());
+
+        // Switch the API user back to the original user account.
+        $this->api()->setUserID($apiUserID);
+
+        // Ths user created for this test should only be in the group created for this test.
+        $groups = $this->api()->get($this->baseUrl, ['memberID' => $userID])->getBody();
+        $this->assertCount(1, $groups);
+        $memberGroup = reset($groups);
+        $this->assertEquals($groupID, $memberGroup['groupID']);
+    }
 }
