@@ -113,8 +113,7 @@ class SearchApiController extends AbstractApiController {
                         'enum' => $fullSchema->getField('properties.recordType.enum'),
                     ],
                     'style' => 'form',
-                    'description' => 'Set the scope of the search to the specified main type(s) of records.',
-                    'x-search-scope' => true,
+                    'description' => 'Restrict the search to the specified main type(s) of records.',
                 ],
                 'types:a?' => [
                     'items' => [
@@ -122,8 +121,7 @@ class SearchApiController extends AbstractApiController {
                         'enum' => $fullSchema->getField('properties.type.enum'),
                     ],
                     'style' => 'form',
-                    'description' => 'Set the scope of the search to the specified type(s) of records.',
-                    'x-search-scope' => true,
+                    'description' => 'Restrict the search to the specified type(s) of records.',
                 ],
                 'discussionID:i?' => [
                     'description' => 'Set the scope of the search to the comments of a discussion. Incompatible with recordType and type.',
