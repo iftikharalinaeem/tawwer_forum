@@ -369,6 +369,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Search through the database and return results matching the supplied $search input.
+     *
      * @param $searchModel
      * @param $search
      * @param $offset
@@ -377,7 +379,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
      * @return array
      */
     static function devancedSearch($searchModel, $search, $offset, $limit, $clean = true) {
-        $search = Search::cleanSearch($search, $clean === 'api');
+        $isAPI = $clean === 'api';
+        $search = Search::cleanSearch($search, $isAPI);
         $pdo = Gdn::database()->connection();
 
         $csearch = true;
@@ -397,8 +400,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         }
 
         // Only search if we have term, user, date, or title to search
-        $hasDateRange = $clean !== 'api' && (isset($search['date-from']) || isset($search['date-to']));
-        $hasDateFilter = ($clean === 'api' && isset($search['date-filters']));
+        $hasDateRange = !$isAPI && (isset($search['date-from']) || isset($search['date-to']));
+        $hasDateFilter = ($isAPI && isset($search['date-filters']));
         if (!$terms && !isset($search['users']) && !$hasDateRange && !$hasDateFilter && !isset($search['title'])) {
             return [];
         }
@@ -441,7 +444,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         }
 
         /// Date ///
-        if ($clean !== 'api') {
+        if (!$isAPI) {
             if (isset($search['date-from'])) {
                 $dwhere['d.DateInserted >='] = $pdo->quote($search['date-from']);
                 $cwhere['c.DateInserted >='] = $pdo->quote($search['date-from']);
@@ -451,8 +454,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
                 $dwhere['d.DateInserted <='] = $pdo->quote($search['date-to']);
                 $cwhere['c.DateInserted <='] = $pdo->quote($search['date-to']);
             }
-        }
-        else if (isset($search['date-filters'])) {
+        } else if (isset($search['date-filters'])) {
             $dtZone = new DateTimeZone('UTC');
             foreach($search['date-filters'] as $field => $value) {
                 $dt = new DateTime('@'.$value->getTimestamp());

@@ -47,7 +47,7 @@ class SearchApiController extends AbstractApiController {
      *
      * @return Schema
      */
-    public function fullSchema() {
+    public function fullSchema(): Schema {
         if (!$this->searchResultSchema) {
             $this->searchResultSchema = $this->schema([
                 'recordID:i' => 'The identifier of the record.',
@@ -82,7 +82,7 @@ class SearchApiController extends AbstractApiController {
      * @param array $query
      * @return Data
      */
-    public function index(array $query) {
+    public function index(array $query): Data {
         $this->permission();
 
         // Custom validator
@@ -196,7 +196,6 @@ class SearchApiController extends AbstractApiController {
                     'minimum' => 1,
                     'maximum' => 100,
                 ],
-                //            'expand:b?' => 'Expand associated records.',
             ], ['SearchIndex', 'in'])
             ->addValidator('', $validator)
             ->setDescription('Search for records matching specific criteria.');
@@ -211,7 +210,7 @@ class SearchApiController extends AbstractApiController {
         // Paging
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        if (method_exists($this->searchModel, 'advancedSearch')) {
+        if (method_exists($this->searchModel, 'advancedSearch') && method_exists($this->searchModel, 'sphinxClient')) {
             $data = $this->searchModel->advancedSearch($search, $offset, $limit, 'api')['SearchResults'] ?? [];
             if (!$data) {
                 $sphinx = $this->searchModel->sphinxClient();
@@ -237,7 +236,7 @@ class SearchApiController extends AbstractApiController {
      * @param array $query
      * @return array
      */
-    public function normalizeSearch($query) {
+    public function normalizeSearch(array $query): array {
         $paramMap = [
             'discussionID' => 'discussionid',
             'categoryID' => 'cat',
@@ -314,7 +313,7 @@ class SearchApiController extends AbstractApiController {
      * @param array $searchRecord
      * @return array
      */
-    public function normalizeOutput($searchRecord) {
+    public function normalizeOutput(array $searchRecord): array {
         $schemaRecord = [
             'recordID' => $searchRecord['PrimaryID'],
             'recordType' => null,
@@ -359,7 +358,7 @@ class SearchApiController extends AbstractApiController {
      * @param array[] $records
      * @return array[]
      */
-    public function preNormalizeOutputs($records) {
+    public function preNormalizeOutputs(array $records): array {
         $discussionsIDs = [];
         $commentIDs = [];
 
@@ -396,7 +395,8 @@ class SearchApiController extends AbstractApiController {
             }
         }
 
-        $result = $this->getEventManager()->fireFilter('searchApiController_preNormalizeOutputs', $records, $this, [/*options*/]);
+        $options = [];
+        $result = $this->getEventManager()->fireFilter('searchApiController_preNormalizeOutputs', $records, $this, $options);
 
         return $result;
     }
