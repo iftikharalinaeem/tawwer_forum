@@ -21,6 +21,7 @@ class GroupsHooks extends Gdn_Plugin {
      * @param GroupModel $groupModel
      */
     public function __construct(GroupModel $groupModel) {
+        parent::construct();
         $this->groupModel = $groupModel;
     }
 
