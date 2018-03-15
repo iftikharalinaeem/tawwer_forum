@@ -636,16 +636,6 @@ class GroupsHooks extends Gdn_Plugin {
         $this->setBreadcrumbs();
     }
 
-    /**
-     * Configure Groups/Events notification preferences
-     *
-     * @param type $sender
-     */
-    public function profileController_afterPreferencesDefined_handler($sender) {
-        $sender->Preferences['Notifications']['Email.Events'] = t('Notify me when there is event activity.');
-        $sender->Preferences['Notifications']['Popup.Events'] = t('Notify me when there is event activity.');
-    }
-
      /**
       * Hide Private content.
       *
