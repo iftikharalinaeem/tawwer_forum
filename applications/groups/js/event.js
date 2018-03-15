@@ -250,7 +250,7 @@ jQuery(document).ready(function($) {
       });
 
       // On event page
-      $('.EventAttending').on('change', function(e) {
+      $(':radio.EventAttending').on('change', function(e) {
          var eventId = $('.EventInfo').data('eventid');
          var eventAttending = $(e.target);
          var result = false;
