@@ -270,7 +270,12 @@ jQuery(document).ready(function($) {
       function processStatus(eventId, result) {
          $.ajax({
             url: gdn.url('/event/attending'),
-            data: {'EventID':eventId, 'Attending':result},
+            method: 'POST',
+            data: {
+               'EventID': eventId,
+               'Attending': result,
+               'TransientKey': gdn.definition('TransientKey')
+            },
             dataType: 'json',
             success: function(json) {
                // Process targets
