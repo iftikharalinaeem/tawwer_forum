@@ -13,12 +13,30 @@
  */
 class GroupSearchModule extends Gdn_Module {
 
+    private $buttonContents;
+
     /**
-     * GroupSearchModule constructor.
+     * Group Search Module Constructor
+     * @param Gdn_Controller $sender
+     * @throws Exception
      */
-    public function __construct() {
-        parent::__construct();
-        $this->_ApplicationFolder = 'groups';
+    public function __construct($sender) {
+        parent::__construct($sender, 'groups');
+        $this->setData('buttonContents', $this->buttonContents);
+        $break = "here";
+
+        if (property_exists($this, 'buttonContents')) {
+            $this->ButtonContents = val('buttonContents', $sender);
+        }
+    }
+
+
+    /**
+     * Set Button Contents
+     * @param string $buttonContents
+     */
+    public function setButtonContents($buttonContents) {
+        $this->ButtonContents = $buttonContents;
     }
 
     /**
@@ -37,7 +55,13 @@ class GroupSearchModule extends Gdn_Module {
         $output .= $Form->textBox('Search', ['class' => 'InputBox BigInput groupsSearch-text js-search-groups', 'placeholder' => $searchPlaceholder, 'aria-label' => $searchPlaceholder]);
 
         $output .= '<button type="submit" class="Button groupsSearch-button" role="search" title="'.$title.'">';
-        $output .= '  <span class="sr-only">'.$title.'</span>';
+
+        if ($this->buttonContents) {
+            $output .= $this->buttonContents;
+        } else {
+            $output .= '<span class="sr-only">'.$title.'</span>';
+        }
+
         $output .= '</button>';
 
         $output .= $Form->close();
