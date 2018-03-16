@@ -119,7 +119,7 @@ class LeaderBoardModule extends Gdn_Module {
             Gdn::userModel()->joinUsers($data, ['UserID']);
 
             Gdn::cache()->store($cacheKey, $data, [
-                Gdn_Cache::FEATURE_EXPIRY => c('Badges.LeaderBoardModule.CacheTTL', 6000),
+                Gdn_Cache::FEATURE_EXPIRY => c('Badges.LeaderBoardModule.CacheTTL', 600),
             ]);
         }
 
