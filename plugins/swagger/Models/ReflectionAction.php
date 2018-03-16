@@ -285,9 +285,14 @@ class ReflectionAction {
                     }
                     $param = &$this->params[$name];
 
-                    if (isset($property['enum']) && is_array($property['enum'])) {
+                    $enumDescription = null;
+                    if ($property['type'] === 'array' && !empty($property['items']['enum'])) {
+                        $enumDescription = 'Items must be one of: '.implode(', ', array_map('json_encode', $property['items']['enum'])).'.';
+                    } else if (isset($property['enum']) && is_array($property['enum'])) {
                         $enumDescription = 'Must be one of: '.implode(', ', array_map('json_encode', $property['enum'])).'.';
+                    }
 
+                    if (isset($enumDescription)) {
                         $param['description'] = (empty($param['description']) ? '' : rtrim($param['description'], '.').".\n").$enumDescription;
                     }
 
