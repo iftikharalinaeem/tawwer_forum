@@ -556,16 +556,31 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   margin-right: 5px;
   vertical-align: middle; }
 
-.groupsSearch {
-  max-width: 100%;
-  width: 400px;
-  margin-left: 10px; }
-
 .groupsToolbar {
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
   -ms-flex-align: center;
-  align-items: center; }
+  align-items: center;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin-top: -12px; }
+  .groupsToolbar > .Button,
+  .groupsToolbar .groupsSearch {
+    margin-top: 12px; }
+
+.groupsToolbar-newGroup {
+  margin-right: 12px; }
+
+.groupsSearch {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -ms-flex-align: start;
+  align-items: flex-start;
+  max-width: 100%;
+  width: 400px;
+  margin-left: auto; }
+  .groupsSearch form {
+    width: 100%; }
 /*# sourceMappingURL=groups.css.map */

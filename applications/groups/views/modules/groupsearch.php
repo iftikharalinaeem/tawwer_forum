@@ -9,7 +9,6 @@ $Form = $this->Form;
 echo $Form->open(['action' => url('/search'), 'method' => 'get']);
 echo $Form->hidden('group_group', ['value' => '1']);
 
-
 echo $Form->textBox('Search', ['class' => 'InputBox BigInput groupsSearch-text js-search-groups', 'placeholder' => $searchPlaceholder, 'aria-label' => $searchPlaceholder]);
 
 echo '<button type="submit" class="Button groupsSearch-button" role="search" title="'.$title.'">';

@@ -5,11 +5,9 @@
 <div class="groupsToolbar">
 <?php
 if (checkPermission('Groups.Group.Add')) {
-    echo anchor(t('New Group'), '/group/add', 'Button Primary');
+    echo anchor(t('New Group'), '/group/add', 'Button Primary groupsToolbar-newGroup');
 }
-echo '    <div class="group-search">';
-            echo Gdn_Theme::Module('GroupSearchModule');
-echo '    </div>';
+echo Gdn_Theme::Module('GroupSearchModule');
 echo '</div>';
 
 $layout = c('Vanilla.Discussions.Layout', 'modern');
