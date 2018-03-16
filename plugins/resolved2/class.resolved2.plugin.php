@@ -232,7 +232,7 @@ class Resolved2Plugin extends Gdn_Plugin {
             'ResolvedUserID' => val('ResolvedUserID', $discussion, null),
         ];
 
-        $this->discussionModel->setField($discussion['DiscussionID'],$resolutionFields);
+        $this->discussionModel->setField($discussion['DiscussionID'], $resolutionFields);
 
         // Force a trackEvent since we are calling update instead of DiscussionModel->save()
         if (class_exists('AnalyticsTracker')) {
