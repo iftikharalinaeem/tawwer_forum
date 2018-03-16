@@ -223,7 +223,6 @@ class Resolved2Plugin extends Gdn_Plugin {
      * Save a discussion's resolved field.
      *
      * @param array $discussion
-     * @return bool
      */
     private function saveDiscussionResolvedFields($discussion) {
         $resolutionFields = [
@@ -233,10 +232,10 @@ class Resolved2Plugin extends Gdn_Plugin {
             'ResolvedUserID' => val('ResolvedUserID', $discussion, null),
         ];
 
-        $result = (bool)$this->discussionModel->update($resolutionFields, ['DiscussionID' => $discussion['DiscussionID']]);
+        $this->discussionModel->setField($discussion['DiscussionID'],$resolutionFields);
 
         // Force a trackEvent since we are calling update instead of DiscussionModel->save()
-        if ($result && class_exists('AnalyticsTracker')) {
+        if (class_exists('AnalyticsTracker')) {
             $type = 'discussion_edit';
             $collection = 'post_modify';
 
@@ -245,7 +244,6 @@ class Resolved2Plugin extends Gdn_Plugin {
             AnalyticsTracker::getInstance()->trackEvent($collection, $type, $data);
         }
 
-        return $result;
     }
 
     /**
@@ -398,13 +396,9 @@ class Resolved2Plugin extends Gdn_Plugin {
 
         // Resolve the discussion.
         $discussion = $this->setResolved($discussion, $resolved);
-        if ($this->saveDiscussionResolvedFields($discussion)) {
-            $this->controller->sendOptions((object)$discussion);
-            $this->setJSONTarget($discussion);
-        } else {
-            // This should never happen.
-            $this->controller->informMessage("An error occurred.");
-        }
+        $this->saveDiscussionResolvedFields($discussion);
+        $this->controller->sendOptions((object)$discussion);
+        $this->setJSONTarget($discussion);
 
         $this->controller->render('blank', 'utility', 'dashboard');
     }
