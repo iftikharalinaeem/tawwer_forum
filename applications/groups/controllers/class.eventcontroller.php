@@ -117,19 +117,19 @@ class EventController extends Gdn_Controller {
      * Create a new event
      *
      * @param integer $GroupID Optional, if we're creating a group event
-     * @return type|void
      * @throws Exception
      */
     public function add($GroupID = null) {
         list($Event, $Group) = $this->addEdit(null, $GroupID);
 
-        $eventCreatePermission  = false;
         if ($GroupID) {
-            $eventCreatePermission = groupPermission('Member');
+            if(!groupPermission('Member')) {
+                throw forbiddenException('@' . groupPermission('View.Reason', $GroupID));
+            }
         }
 
-        if (!eventPermission('Create') || $eventCreatePermission === false) {
-            throw forbiddenException('@'.groupPermission('View.Reason', $GroupID));
+        if (!eventPermission('Create')) {
+            throw forbiddenException('create a new event');
         }
 
         $this->title(t('New Event'));
