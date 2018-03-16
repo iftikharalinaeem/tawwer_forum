@@ -555,4 +555,17 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   width: 50%;
   margin-right: 5px;
   vertical-align: middle; }
+
+.groupsSearch {
+  max-width: 100%;
+  width: 400px;
+  margin-left: 10px; }
+
+.groupsToolbar {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -ms-flex-align: center;
+  align-items: center; }
 /*# sourceMappingURL=groups.css.map */

@@ -956,4 +956,23 @@ class GroupsHooks extends Gdn_Plugin {
 
         return $records;
     }
+
+    /**
+     * @param Smarty $sender
+     * @param type $args
+     */
+    public function gdn_smarty_init_handler($sender, $args) {
+        $smartyVersion = defined('Smarty::SMARTY_VERSION') ? Smarty::SMARTY_VERSION : $sender->_version;
+
+        // registerPlugin, introduced in Smart v3, is accessed via __call, so it cannot be detected with method_exists.
+        if (version_compare($smartyVersion, '3.0.0', '>=')) {
+            $sender->registerPlugin(
+                'function',
+                'group_search',
+                'groupSearch'
+            );
+        } else {
+            $sender->register_function('group_search', 'groupSearch');
+        }
+    }
 }

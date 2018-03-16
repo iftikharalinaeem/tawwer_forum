@@ -2,10 +2,15 @@
 
 <h1><?php echo $this->data('Title')?></h1>
 
+<div class="groupsToolbar">
 <?php
 if (checkPermission('Groups.Group.Add')) {
     echo anchor(t('New Group'), '/group/add', 'Button Primary');
 }
+echo '    <div class="group-search">';
+            echo Gdn_Theme::Module('GroupSearchModule');
+echo '    </div>';
+echo '</div>';
 
 $layout = c('Vanilla.Discussions.Layout', 'modern');
 $showMore = true;
