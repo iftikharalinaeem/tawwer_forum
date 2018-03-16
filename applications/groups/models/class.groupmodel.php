@@ -1223,11 +1223,23 @@ class GroupModel extends Gdn_Model {
         if ($this->checkPermission('View', $group)) {
             Gdn::session()->setPermission('Vanilla.Discussions.View', [$categoryID]);
             CategoryModel::setLocalField($categoryID, 'PermsDiscussionsView', true);
+        } else {
+            // Wipe the user permissions.
+            Gdn::session()->setPermission('Vanilla.Discussions.View', false);
+            // Wipe the per category permissions.
+            Gdn::session()->setPermission('Vanilla.Discussions.View', []);
         }
 
         if ($this->checkPermission('Member', $group)) {
             Gdn::session()->setPermission('Vanilla.Discussions.Add', [$categoryID]);
             Gdn::session()->setPermission('Vanilla.Comments.Add', [$categoryID]);
+        } else {
+            // Wipe the user permissions.
+            Gdn::session()->setPermission('Vanilla.Discussions.Add', false);
+            Gdn::session()->setPermission('Vanilla.Comments.Add', false);
+            // Wipe the per category permissions.
+            Gdn::session()->setPermission('Vanilla.Discussions.Add', []);
+            Gdn::session()->setPermission('Vanilla.Comments.Add', []);
         }
     }
 
