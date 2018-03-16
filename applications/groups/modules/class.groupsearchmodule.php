@@ -5,16 +5,13 @@
  */
 
 /**
- * Groups Application - Group Module
+ * Groups Application - Group Search Module
  *
- * Shows a group box with basic group info.
+ * Shows a group search box.
  *
  * @author Todd Burry <todd@vanillaforums.com>
  */
 class GroupSearchModule extends Gdn_Module {
-
-    /** @var Gdn_Form */
-    public $Form;
 
     /**
      * GroupSearchModule constructor.
@@ -22,18 +19,30 @@ class GroupSearchModule extends Gdn_Module {
     public function __construct() {
         parent::__construct();
         $this->_ApplicationFolder = 'groups';
-        $this->Visible = class_exists('Search') && Search::searchGroups();
     }
 
     /**
      * @return string
      */
     public function toString() {
-        if (!$this->Visible) {
-            return '';
-        }
+        $title = t('Search Groups');
+        $searchPlaceholder = t('GroupSearchPlaceHolder', 'Search Groups');
+        $output = '';
 
-        $this->Form = new Gdn_Form();
-        return $this->fetchView();
+        $output .= '<div class="SiteSearch groupsSearch">';
+        $Form = new Gdn_Form();
+        $output .= $Form->open(['action' => url('/search'), 'method' => 'get']);
+        $output .= $Form->hidden('group_group', ['value' => '1']);
+
+        $output .= $Form->textBox('Search', ['class' => 'InputBox BigInput groupsSearch-text js-search-groups', 'placeholder' => $searchPlaceholder, 'aria-label' => $searchPlaceholder]);
+
+        $output .= '<button type="submit" class="Button groupsSearch-button" role="search" title="'.$title.'">';
+        $output .= '  <span class="sr-only">'.$title.'</span>';
+        $output .= '</button>';
+
+        $output .= $Form->close();
+        $output .= '</div>';
+
+        return $output;
     }
 }
