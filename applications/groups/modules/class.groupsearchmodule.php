@@ -31,7 +31,7 @@ class GroupSearchModule extends Gdn_Module {
 
         $output .= '<div class="SiteSearch groupsSearch">';
         $Form = new Gdn_Form();
-        $output .= $Form->open(['action' => url('/search'), 'method' => 'get']);
+        $output .= $Form->open(['action' => url('/groups/browse/search'), 'method' => 'get']);
         $output .= $Form->hidden('group_group', ['value' => '1']);
 
         $output .= $Form->textBox('Search', ['class' => 'InputBox BigInput groupsSearch-text js-search-groups', 'placeholder' => $searchPlaceholder, 'aria-label' => $searchPlaceholder]);
