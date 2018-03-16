@@ -129,7 +129,7 @@ class EventController extends Gdn_Controller {
         }
 
         if (!eventPermission('Create') || $eventCreatePermission === false) {
-            throw forbiddenException('create a new event');
+            throw forbiddenException('@'.groupPermission('View.Reason', $GroupID));
         }
 
         $this->title(t('New Event'));
