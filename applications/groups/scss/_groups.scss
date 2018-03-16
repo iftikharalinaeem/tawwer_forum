@@ -232,6 +232,10 @@
 
 .groupsToolbar-newGroup {
     margin-right: 12px;
+
+    + .groupsSearch {
+        margin-left: auto;
+    }
 }
 
 .groupsSearch {
@@ -240,7 +244,6 @@
     align-items: flex-start;
     max-width: 100%;
     width: 400px;
-    margin-left: auto;
 
     form {
         width: 100%;

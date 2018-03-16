@@ -570,6 +570,8 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 
 .groupsToolbar-newGroup {
   margin-right: 12px; }
+  .groupsToolbar-newGroup + .groupsSearch {
+    margin-left: auto; }
 
 .groupsSearch {
   display: -ms-flexbox;
@@ -579,8 +581,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   -ms-flex-align: start;
   align-items: flex-start;
   max-width: 100%;
-  width: 400px;
-  margin-left: auto; }
+  width: 400px; }
   .groupsSearch form {
     width: 100%; }
 /*# sourceMappingURL=groups.css.map */
