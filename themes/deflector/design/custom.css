@@ -1109,7 +1109,7 @@ body.Groups .site-content {
   margin-right: 0;
   width: 100%; }
 
-.SiteSearch.groupsSearch .groupsSearch-text {
+.groupSearch .groupSearch-text {
   font-size: 14px; }
 
 .PhotoGrid .PhotoWrap {
@@ -1118,7 +1118,7 @@ body.Groups .site-content {
 .container .discussion-sort-filter-module {
   height: 36px; }
 
-.groupsSearch-button {
+.groupSearch-button {
   position: absolute;
   width: 1px;
   height: 1px;

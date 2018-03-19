@@ -14,6 +14,7 @@
 class GroupSearchModule extends Gdn_Module {
 
     private $buttonContents;
+    private $cssClass;
 
     /**
      * Group Search Module Constructor
@@ -22,12 +23,6 @@ class GroupSearchModule extends Gdn_Module {
      */
     public function __construct($sender) {
         parent::__construct($sender, 'groups');
-        $this->setData('buttonContents', $this->buttonContents);
-        $break = "here";
-
-        if (property_exists($this, 'buttonContents')) {
-            $this->ButtonContents = val('buttonContents', $sender);
-        }
     }
 
 
@@ -36,7 +31,16 @@ class GroupSearchModule extends Gdn_Module {
      * @param string $buttonContents
      */
     public function setButtonContents($buttonContents) {
-        $this->ButtonContents = $buttonContents;
+        $this->buttonContents = $buttonContents;
+    }
+
+    /**
+     * Set Custom Group Search CSS Class
+     * Note that this will remove the 'SiteSearch' class, making it easier to make a custom button
+     * @param string $cssClass
+     */
+    public function setCssClass($cssClass) {
+        $this->cssClass = $cssClass;
     }
 
     /**
@@ -47,14 +51,25 @@ class GroupSearchModule extends Gdn_Module {
         $searchPlaceholder = t('GroupSearchPlaceHolder', 'Search Groups');
         $output = '';
 
-        $output .= '<div class="SiteSearch groupsSearch">';
+        $value = ''; //Todo, load current search value if applicable
+
+        $moduleClasses = 'groupSearch ';
+
+        if ($this->cssClass) {
+            $moduleClasses .= trim($this->cssClass);
+        } else {
+            $moduleClasses .= 'SiteSearch';
+        }
+
+        $output .= '<div class="'.$moduleClasses.'">';
         $Form = new Gdn_Form();
         $output .= $Form->open(['action' => url('/groups/browse/search'), 'method' => 'get']);
         $output .= $Form->hidden('group_group', ['value' => '1']);
 
-        $output .= $Form->textBox('Search', ['class' => 'InputBox BigInput groupsSearch-text js-search-groups', 'placeholder' => $searchPlaceholder, 'aria-label' => $searchPlaceholder]);
+        $output .= '<div class="groupSearch-search">';
+        $output .= $Form->textBox('Search', ['class' => 'InputBox BigInput groupSearch-text js-search-groups', 'placeholder' => $searchPlaceholder, 'aria-label' => $searchPlaceholder]);
 
-        $output .= '<button type="submit" class="Button groupsSearch-button" role="search" title="'.$title.'">';
+        $output .= '<button type="submit" class="Button groupSearch-button" role="search" title="'.$title.'">';
 
         if ($this->buttonContents) {
             $output .= $this->buttonContents;
@@ -63,6 +78,7 @@ class GroupSearchModule extends Gdn_Module {
         }
 
         $output .= '</button>';
+        $output .= '</div>';
 
         $output .= $Form->close();
         $output .= '</div>';
