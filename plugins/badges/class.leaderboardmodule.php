@@ -23,6 +23,9 @@ class LeaderBoardModule extends Gdn_Module {
     /** @var int  */
     public $Limit = 10;
 
+    /** @var int */
+    public $CacheTTL;
+
     /**
      * Create the module instance.
      *
@@ -30,6 +33,7 @@ class LeaderBoardModule extends Gdn_Module {
      */
     public function __construct($sender = '') {
         parent::__construct($sender, 'plugins/badges');
+        $this->CacheTTL = (int)c('Badges.LeaderBoardModule.CacheDefaultTTL', 600);
     }
 
     /**
@@ -119,7 +123,7 @@ class LeaderBoardModule extends Gdn_Module {
             Gdn::userModel()->joinUsers($data, ['UserID']);
 
             Gdn::cache()->store($cacheKey, $data, [
-                Gdn_Cache::FEATURE_EXPIRY => c('Badges.LeaderBoardModule.CacheTTL', 600),
+                Gdn_Cache::FEATURE_EXPIRY => (int)$this->CacheTTL,
             ]);
         }
 
