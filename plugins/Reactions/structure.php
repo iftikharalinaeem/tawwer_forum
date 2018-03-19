@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit;
 
+use Vanilla\Addon;
+
 include_once dirname(__FILE__).'/class.reactionmodel.php';
 
 $St = Gdn::structure();
@@ -112,7 +114,7 @@ if ($mergeReactions) {
     $Rm->mergeOldUserReactions();
 }
 
-if (class_exists('BadgeModel')) {
+if (Gdn::addonManager()->isEnabled('badges', Addon::TYPE_ADDON)) {
     // Define some badges for the reactions.
     $BadgeModel = new BadgeModel();
 
