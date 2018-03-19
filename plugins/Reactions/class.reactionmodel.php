@@ -5,6 +5,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Addon;
 
 /**
  * Class ReactionModel
@@ -1077,7 +1078,7 @@ class ReactionModel extends Gdn_Model {
      * @param $reactionType
      */
     public function checkBadges($userID, $reactionType) {
-        if (!class_exists('BadgeModel')) {
+        if (!Gdn::addonManager()->isEnabled('badges', Addon::TYPE_ADDON)) {
             return;
         }
 
