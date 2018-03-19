@@ -185,12 +185,17 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook in early, before a request is dispatched to the target controller.
+     * Hook into requests for /settings/analyticstick.json.
      *
-     * @param Gdn_Dispatcher $sender
+     * @param Gdn_Statistics $sender
      * @param array $args
      */
-    public function gdn_dispatcher_beforeDispatch_handler($sender, $args) {
+    public function gdn_statistics_analyticsTick_handler(Gdn_Statistics $sender, array $args) {
+        // Avoid potentially dodging the cache during a GET request.
+        if (Gdn::request()->getMethod() === Gdn_Request::METHOD_GET) {
+            return;
+        }
+
         $setCookie = true;
         $trackingCookieRaw = Gdn::session()->getCookie('-vA');
 
