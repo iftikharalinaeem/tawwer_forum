@@ -37,7 +37,7 @@ class MicrosoftAccountPlugin extends Gdn_OAuth2 {
      *
      * @param AssetModel $sender.
      */
-    public function assetModel_styleCss_handler($sender) {
+    public function assetModel_styleCss_handler($sender, $args) {
         $sender->addCssFile('microsoftaccount.css', 'plugins/microsoftaccount');
     }
 
