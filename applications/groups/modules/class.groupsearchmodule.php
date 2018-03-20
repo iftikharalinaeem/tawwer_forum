@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2008-2016 Vanilla Forums, Inc.
+ * @copyright 2008-2018 Vanilla Forums, Inc.
  * @license Proprietary
  */
 
@@ -13,21 +13,24 @@
  */
 class GroupSearchModule extends Gdn_Module {
 
+    /** @var string */
     private $buttonContents;
+
+    /** @var string */
     private $cssClass;
 
     /**
      * Group Search Module Constructor
+     *
      * @param Gdn_Controller $sender
-     * @throws Exception
      */
     public function __construct($sender) {
         parent::__construct($sender, 'groups');
     }
 
-
     /**
      * Set Button Contents
+     *
      * @param string $buttonContents
      */
     public function setButtonContents($buttonContents) {
@@ -37,6 +40,7 @@ class GroupSearchModule extends Gdn_Module {
     /**
      * Set Custom Group Search CSS Class
      * Note that this will remove the 'SiteSearch' class, making it easier to make a custom button
+     *
      * @param string $cssClass
      */
     public function setCssClass($cssClass) {
@@ -44,7 +48,7 @@ class GroupSearchModule extends Gdn_Module {
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function toString() {
         $title = t('Search Groups');
