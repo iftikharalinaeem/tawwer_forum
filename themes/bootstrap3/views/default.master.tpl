@@ -48,15 +48,6 @@
     <section class="container">
       <div class="row">
         <main class="page-content" role="main">
-          <div style="background: orange;">
-            here
-            {module name="GroupSearchModule"}
-          </div>
-
-          {searchbox_advanced}
-
-          {searchbox}
-
           {breadcrumbs}
           {if InSection(array("CategoryList", "CategoryDiscussionList", "DiscussionList"))}
             <div class="well search-form">{searchbox}</div>
