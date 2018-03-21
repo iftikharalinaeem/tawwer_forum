@@ -7,7 +7,7 @@
 if (checkPermission('Groups.Group.Add')) {
     echo anchor(t('New Group'), '/group/add', 'Button Primary groupToolbar-newGroup');
 }
-echo groupSearch();
+writeGroupSearch();
 echo '</div>';
 
 $layout = c('Vanilla.Discussions.Layout', 'modern');
