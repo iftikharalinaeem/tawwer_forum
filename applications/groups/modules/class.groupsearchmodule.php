@@ -29,6 +29,38 @@ class GroupSearchModule extends Gdn_Module {
     }
 
     /**
+     * Get Button Contents. By default, the icon is set with a background image, so we add the title in for screen readers
+     */
+    public function getButtonContents() {
+        if (is_null($this->buttonContents)) {
+            return '<span class="sr-only">'.$this->getTitle().'</span>';
+        } else {
+            return $this->buttonContents;
+        }
+    }
+
+    /**
+     * Get Custom Group Search CSS Class. By default, we add .SiteSearch for compatibility, but if you want to style it yourself, we remove it so you don't need to "fight" against the default styles.
+     */
+    public function getCssClass() {
+        $baseClass = 'groupSearch ';
+
+        if (is_null($this->cssClass)) {
+            return $baseClass.'SiteSearch';
+        } else {
+            return $baseClass.trim($this->cssClass);
+        }
+    }
+
+    /**
+     * Get Title
+     *
+     */
+    public function getTitle() {
+        return t('Search Groups');
+    }
+
+    /**
      * Set Button Contents
      *
      * @param string $buttonContents
@@ -51,42 +83,6 @@ class GroupSearchModule extends Gdn_Module {
      * {@inheritdoc}
      */
     public function toString() {
-        $title = t('Search Groups');
-        $searchPlaceholder = t('GroupSearchPlaceHolder', 'Search Groups');
-        $output = '';
-
-        $value = ''; //Todo, load current search value if applicable
-
-        $moduleClasses = 'groupSearch ';
-
-        if ($this->cssClass) {
-            $moduleClasses .= trim($this->cssClass);
-        } else {
-            $moduleClasses .= 'SiteSearch';
-        }
-
-        $output .= '<div class="'.$moduleClasses.'">';
-        $Form = new Gdn_Form();
-        $output .= $Form->open(['action' => url('/groups/browse/search'), 'method' => 'get']);
-        $output .= $Form->hidden('group_group', ['value' => '1']);
-
-        $output .= '<div class="groupSearch-search">';
-        $output .= $Form->textBox('Search', ['class' => 'InputBox BigInput groupSearch-text js-search-groups', 'placeholder' => $searchPlaceholder, 'aria-label' => $searchPlaceholder]);
-
-        $output .= '<button type="submit" class="Button groupSearch-button" role="search" title="'.$title.'">';
-
-        if ($this->buttonContents) {
-            $output .= $this->buttonContents;
-        } else {
-            $output .= '<span class="sr-only">'.$title.'</span>';
-        }
-
-        $output .= '</button>';
-        $output .= '</div>';
-
-        $output .= $Form->close();
-        $output .= '</div>';
-
-        return $output;
+        return parent::toString();
     }
 }

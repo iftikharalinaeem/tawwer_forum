@@ -417,6 +417,9 @@ function writeMemberSimpleList($members) {
 endif;
 
 if (!function_exists('groupSearch')):
+    /**
+     * Get Group Search Module
+     */
     function groupSearch() {
         echo Gdn_Theme::module('GroupSearchModule');
     }
