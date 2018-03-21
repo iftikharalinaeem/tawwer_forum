@@ -2,10 +2,13 @@
 
 <h1><?php echo $this->data('Title')?></h1>
 
+<div class="groupToolbar">
 <?php
 if (checkPermission('Groups.Group.Add')) {
-    echo anchor(t('New Group'), '/group/add', 'Button Primary');
+    echo anchor(t('New Group'), '/group/add', 'Button Primary groupToolbar-newGroup');
 }
+writeGroupSearch();
+echo '</div>';
 
 $layout = c('Vanilla.Discussions.Layout', 'modern');
 $showMore = true;

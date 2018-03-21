@@ -218,3 +218,44 @@
   vertical-align: middle;
 }
 
+// Group Search
+
+.groupToolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: -12px;
+
+    > .Button,
+    .groupSearch {
+        margin-top: 12px;
+    }
+}
+
+.groupToolbar-newGroup {
+    margin-right: 12px;
+
+    + .groupSearch {
+        margin-left: auto;
+    }
+}
+
+.groupSearch {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    max-width: 100%;
+    width: 400px;
+
+    form {
+        width: 100%;
+    }
+}
+
+.groupSearch-search {
+    display: flex;
+}
+
+.groupSearch-text {
+    flex-grow: 1;
+}
