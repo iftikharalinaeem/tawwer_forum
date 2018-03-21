@@ -1,6 +1,6 @@
 {
-    "name": "Simple API",
-    "description": "Provides simple access_token API access to the forum.",
+    "name": "API v1",
+    "description": "Provides simple access_token API access to the forum. This addon was formally called \"Simple API\".",
     "version": "1.4.0",
     "settingsUrl": "/settings/api",
     "icon": "simple-api.png",
