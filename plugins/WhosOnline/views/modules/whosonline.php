@@ -6,7 +6,7 @@ $totalCount = $this->data('TotalCount');
 $displayStyle = c('WhosOnline.DisplayStyle', 'list');
 ?>
 <div id="WhosOnline" class="Box">
-    <h4><?php echo t('Who\'s Online'); ?>
+    <h4 aria-level="2"><?php echo t('Who\'s Online'); ?>
         <span class="Count"><?php echo Gdn_Format::bigNumber($totalCount, 'html') ?></span>
     </h4>
     <?php
