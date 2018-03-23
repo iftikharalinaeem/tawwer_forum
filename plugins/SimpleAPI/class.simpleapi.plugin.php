@@ -660,7 +660,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             } else {
                 if (!Gdn::session()->isValid()) {
                     // Add a header to aid debugging.
-                    safeHeader("X-WWW-Authenticate: error=\"invalid_token_v1\"");
+                    safeHeader('X-WWW-Authenticate: error="invalid_token_v1"');
                 }
             }
         }
