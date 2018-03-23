@@ -377,7 +377,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             $apiPath = $pathMatches[2];
 
             // Check the global access token for all API calls.
-            $this->checkAccessToken($apiVersion);
+            $this->checkAccessToken();
 
             if ($apiVersion !== 'v1') {
                 return;
