@@ -404,23 +404,23 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook on CategoryModel's CategoryWatch event.
+     * Filter visible categories.
      *
-     * Used to filter down the categories used in the normal search.
-     * Also filter down discussions controller categories.
-     *
-     * @param CategoryModel $sender Sending controller instance.
-     * @param array $args Event arguments.
+     * @param array|bool $categoryIDs An array of IDs representing categories available to the current user. True if all are available.
+     * @return array|bool
      */
-    public function categoryModel_categoryWatch_handler($sender, $args) {
-        if (!SubCommunityModel::getCurrent()) {
-            return;
+    public function categoryModel_visibleCategories_handler($categories) {
+        if (SubCommunityModel::getCurrent()) {
+            $subcommunityCategoryIDs = $this->getCategoryIDs();
+            if ($categories === true) {
+                $categories = $subcommunityCategoryIDs;
+            } elseif (is_array($categories)) {
+                $categories = array_filter($categories, function($category) use ($subcommunityCategoryIDs) {
+                    return in_array($category['CategoryID'], $subcommunityCategoryIDs);
+                });
+            }
         }
-
-        $watchedCategoryIDs = $args['CategoryIDs'];
-        $subcommunityCategoryIDs = $this->getCategoryIDs();
-
-        $args['CategoryIDs'] = array_intersect($subcommunityCategoryIDs, $watchedCategoryIDs);
+        return $categories;
     }
 
     /**
