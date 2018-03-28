@@ -353,13 +353,10 @@ class GroupController extends Gdn_Controller {
         }
 
         $userID = Gdn::session()->UserID;
-
-        if($this->GroupModel->isMember($userID, $group)) {
+        if ($this->GroupModel->isMember($userID, $group)) {
             redirectTo(groupUrl($group));
         }
-
-        $this->groupPermissionCheck('join', $group);
-
+        $this->groupPermission('Join', $group);
 
         $this->setData('Title', sprintf(t('Join %s'), htmlspecialchars($group['Name'])));
 
@@ -1194,16 +1191,16 @@ class GroupController extends Gdn_Controller {
      * @param array $group
      * @throws Exception
      */
-    public function groupPermissionCheck($permission, $group) {
+    public function groupPermission($permission, $group) {
         $session = Gdn::session();
 
         // Check group permission.
         if (!$this->GroupModel->checkPermission($permission, $group)) {
             //if group permission check fails redirect them accordingly
             if (!$session->isValid()) {
-                redirectTo('/entry/signin?Target=' . urlencode($this->Request->pathAndQuery()));
+                redirectTo('/entry/signin?Target='.urlencode($this->Request->pathAndQuery()));
             } else {
-                throw forbiddenException('@' . $this->GroupModel->checkPermission($permission . 'Reason', $group));
+                throw forbiddenException('@'.$this->GroupModel->checkPermission($permission.'.Reason', $group));
             }
         }
     }
