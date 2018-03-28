@@ -359,7 +359,6 @@ class GroupController extends Gdn_Controller {
         $this->groupPermission('Join', $group);
 
         $this->setData('Title', sprintf(t('Join %s'), htmlspecialchars($group['Name'])));
-
         $form = new Gdn_Form();
         $this->Form = $form;
 
@@ -1185,13 +1184,13 @@ class GroupController extends Gdn_Controller {
     }
 
     /**
-     * Checks user permission on group
+     * Checks user permission on group and redirects accordingly
      *
      * @param string $permission
      * @param array $group
      * @throws Exception
      */
-    public function groupPermission($permission, $group) {
+    private function groupPermission($permission, $group) {
         $session = Gdn::session();
 
         // Check group permission.
