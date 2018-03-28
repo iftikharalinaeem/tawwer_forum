@@ -352,15 +352,14 @@ class GroupController extends Gdn_Controller {
             throw notFoundException('Group');
         }
 
-        $session = Gdn::session();
-        if(!$session->isValid()){
-            redirectTo('/entry/signin?Target='.urlencode($this->Request->pathAndQuery()));
-        }
+        $this->validateUserSession();
 
+        $userID = Gdn::session()->UserID;
+        
         // Check join permission.
         if (!$this->GroupModel->checkPermission('Join', $group)) {
             // If the user is a member of the group then we redirect them to the group home page
-            if ($this->GroupModel->checkPermission('Join.Reason', $group) == 'You are already a member of this group.') {
+            if ($this->GroupModel->isMember($userID,$group)) {
                 redirectTo(groupUrl($group));
             }
             throw forbiddenException('@' . $this->GroupModel->checkPermission('Join.Reason', $group));
@@ -1191,5 +1190,14 @@ class GroupController extends Gdn_Controller {
         $this->setData('User', $user);
         $this->title(t('Remove Member'));
         $this->render();
+    }
+
+    public function validateUserSession()
+    {
+        $session = Gdn::session();
+
+        if (!$session->isValid()) {
+            redirectTo('/entry/signin?Target=' . urlencode($this->Request->pathAndQuery()));
+        }
     }
 }
