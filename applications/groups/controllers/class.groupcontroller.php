@@ -352,18 +352,7 @@ class GroupController extends Gdn_Controller {
             throw notFoundException('Group');
         }
 
-        $this->validateUserSession();
-
-        $userID = Gdn::session()->UserID;
-        
-        // Check join permission.
-        if (!$this->GroupModel->checkPermission('Join', $group)) {
-            // If the user is a member of the group then we redirect them to the group home page
-            if ($this->GroupModel->isMember($userID,$group)) {
-                redirectTo(groupUrl($group));
-            }
-            throw forbiddenException('@' . $this->GroupModel->checkPermission('Join.Reason', $group));
-        }
+        $this->groupPermission('join', $group);
 
         $this->setData('Title', sprintf(t('Join %s'), htmlspecialchars($group['Name'])));
 
@@ -386,7 +375,6 @@ class GroupController extends Gdn_Controller {
         $this->setData('Group', $group);
         $this->addBreadcrumb($group['Name'], groupUrl($group));
         $this->render();
-
     }
 
     /**
@@ -1192,12 +1180,25 @@ class GroupController extends Gdn_Controller {
         $this->render();
     }
 
-    public function validateUserSession()
+    /**
+     * @param $permission
+     * @param $group
+     */
+    public function groupPermission($permission, $group)
     {
         $session = Gdn::session();
+        $userID = $session->UserID;
 
-        if (!$session->isValid()) {
-            redirectTo('/entry/signin?Target=' . urlencode($this->Request->pathAndQuery()));
+        // Check join permission.
+        if (!$this->GroupModel->checkPermission($permission, $group)) {
+            //if group permission check fails redirect them accordingly
+            if ($this->GroupModel->isMember($userID, $group)) {
+                redirectTo(groupUrl($group));
+            } elseif (!$session->isValid()) {
+                redirectTo('/entry/signin?Target='.urlencode($this->Request->pathAndQuery()));
+            } else {
+                throw forbiddenException('@' . $this->GroupModel->checkPermission('Join.Reason', $group));
+            }
         }
     }
 }
