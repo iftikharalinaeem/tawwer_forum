@@ -210,12 +210,17 @@ class GroupController extends Gdn_Controller {
      *
      *
      * @param $group
-     * @param $iD
+     * @param $id ApplicantID
      * @param string $value
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function approve($group, $iD, $value = 'approved') {
+    public function approve($group, $id, $value = 'approved') {
+        $form = new Gdn_Form();
+        if (!$form->authenticatedPostBack()) {
+             throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
+        }
+
         $group = $this->GroupModel->getID($group);
         if (!$group)
             throw notFoundException('Group');
@@ -227,13 +232,19 @@ class GroupController extends Gdn_Controller {
 
         $value = ucfirst($value);
 
-        $this->GroupModel->joinApprove([
-            'GroupApplicantID' => $iD,
-            'Type' => $value
-        ]);
+        $applicants = $this->GroupModel->getApplicants($group['GroupID'], ['GroupApplicantID' => $id]);
+        if (!$applicants) {
+            throw notFoundException('Applicant not found');
+        }
 
-        $this->jsonTarget("#GroupApplicant_$iD", "", 'SlideUp');
-        $this->informMessage(t('Applicant '.$value));
+        $userID = reset($applicants)['UserID'];
+
+        if ($this->GroupModel->processApplicant($group['GroupID'], $userID, $value === 'Approved')) {
+            $this->jsonTarget("#GroupApplicant_$id", "", 'SlideUp');
+            $this->informMessage(t('Applicant '.$value));
+        } else {
+            $this->informMessage(t('An error occurred.'));
+        }
 
         $this->render('Blank', 'Utility', 'Dashboard');
     }
