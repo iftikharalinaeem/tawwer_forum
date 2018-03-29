@@ -10,7 +10,7 @@
      }
 </style>
 <div class="Box Leaderboard">
-     <?php echo panelHeading($this->title(), ['aria-level' => '2']); ?>
+     <?php echo panelHeading($this->title()); ?>
      <ul class="PanelInfo">
           <?php foreach ($this->Leaders as $Leader) : ?>
                 <li>
