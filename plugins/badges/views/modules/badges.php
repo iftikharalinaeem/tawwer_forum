@@ -4,7 +4,7 @@ $Title = ($this->User->UserID == Gdn::session()->UserID) ? t('MyBadgesModuleTitl
 $Title = t($Title);
 ?>
 <div id="Badges" class="Box BadgeGrid<?php if (!count($this->Badges)) echo ' NoItems'; ?>">
-    <?php echo panelHeading($Title, ['aria-level' => '2']); ?>
+    <?php echo panelHeading($Title); ?>
     <div class="PhotoGrid">
     <?php
     if (count($this->Badges) > 20) {

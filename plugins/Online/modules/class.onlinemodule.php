@@ -210,7 +210,7 @@ class OnlineModule extends Gdn_Module {
         if ($this->count > 0) {
             ?>
             <div id="WhosOnline" class="WhosOnline Box">
-            <?php echo panelHeading($title . '<span class="Count">' . Gdn_Format::bigNumber($trackCount, 'html') . '</span>', ['aria-level' => '2']); ?>
+            <?php echo panelHeading($title . '<span class="Count">' . Gdn_Format::bigNumber($trackCount, 'html') . '</span>'); ?>
             <?php
             if ($this->style == 'pictures') {
                 $listClass = 'PhotoGrid';
