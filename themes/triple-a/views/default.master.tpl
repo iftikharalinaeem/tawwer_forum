@@ -59,7 +59,7 @@
             {activity_link}
             {custom_menu}
           </ul>
-          <div class="navbar-form navbar-right">
+          <div class="navbar-form navbar-right" role="search">
             {searchbox}
           </div>
         </div>

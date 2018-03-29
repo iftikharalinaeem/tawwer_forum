@@ -11,13 +11,13 @@
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <header class="site-header" role="banner">
-      <nav class="topbar" role="navigation">
+    <header class="site-header">
+      <nav class="topbar">
         <div class="container">
           {module name="MeModule"}
         </div>
       </nav>
-      <nav class="navbar" role="navigation">
+      <nav class="navbar">
         <div class="container">
           <a class="navbar-brand" href="{link path="home"}">{logo}</a>
 
@@ -30,7 +30,7 @@
               {custom_menu}
             </ul>
 
-            <div class="navbar-form navbar-search pull-left">
+            <div class="navbar-form navbar-search pull-left" role="search">
               {searchbox}
             </div>
 
@@ -40,7 +40,7 @@
       </nav>
     </header>
 
-    <main class="container site-container" role="main">
+    <main class="container site-container">
 
       <nav class="trail">
         {breadcrumbs}
@@ -60,7 +60,7 @@
 
     </main>
 
-    <footer class="site-footer" role="contentinfo">
+    <footer class="site-footer">
       <div class="container">
         <p class="pull-left">{t c="Copyright"} &copy; {$smarty.now|date:"%Y"} <a href="{link path="home"}">{logo}</a>. {t c="All rights reserved"}.</p>
 
