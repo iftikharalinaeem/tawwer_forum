@@ -102,19 +102,35 @@ if ($St->tableExists('Category')) {
                 'AllowGroups' => 1,
                 'Sort' => 1000,
             ];
+
+            $permissions = [];
+            /** @var PermissionModel $permissionModel */
+            $permissionModel = Gdn::permissionModel();
+            /** @var RoleModel $roleModel */
+            $roleModel = Gdn::getContainer()->get(RoleModel::class);
+
+            // Upgrade existing category permissions to hide the Social Groups from everyone.
+            $roles = $roleModel->get();
+            foreach ($roles as $role) {
+                $roleID = val('RoleID', $role);
+                $categoryPermissions = $roleModel->getCategoryPermissions($roleID);
+                $categoryPermissions = array_column($categoryPermissions, null, 'CategoryID');
+                $permissionRow = $categoryPermissions[-1] ?? null;
+                if ($permissionRow) {
+                    unset($permissionRow['CategoryID']);
+                    $permissionRow['RoleID'] = $roleID;
+                    $permissionRow['Vanilla.Discussions.View'] = 0;
+                    $permissions[] = $permissionRow;
+                }
+            }
+            $Row['Permissions'] = $permissions;
+
             // Backwards compat for a new column.
             if ($St->columnExists('CanDelete')) {
                 $Row['CanDelete'] = 0;
             }
-            $categoryID = $Model->save($Row);
 
-            // Disable view permissions for the new category by default.
-            Gdn::permissionModel()->addDefault(RoleModel::TYPE_GUEST, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
-            Gdn::permissionModel()->addDefault(RoleModel::TYPE_APPLICANT, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
-            Gdn::permissionModel()->addDefault(RoleModel::TYPE_UNCONFIRMED, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
-            Gdn::permissionModel()->addDefault(RoleModel::TYPE_MEMBER, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
-            Gdn::permissionModel()->addDefault(RoleModel::TYPE_MODERATOR, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
-            Gdn::permissionModel()->addDefault(RoleModel::TYPE_ADMINISTRATOR, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            $categoryID = $Model->save($Row);
         }
     }
 }
