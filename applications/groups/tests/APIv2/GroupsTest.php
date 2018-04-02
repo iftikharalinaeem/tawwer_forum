@@ -43,6 +43,7 @@ class GroupsTest extends AbstractResourceTest {
     public static function setupBeforeClass() {
         self::$addons = ['vanilla', 'conversations', 'groups'];
         parent::setupBeforeClass();
+        \PermissionModel::resetAllRoles();
     }
 
     /**

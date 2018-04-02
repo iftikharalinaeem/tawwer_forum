@@ -41,6 +41,7 @@ class EventsTest extends AbstractResourceTest {
         self::$groups = [];
         self::$addons = ['vanilla', 'groups'];
         parent::setupBeforeClass();
+        \PermissionModel::resetAllRoles();
 
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);

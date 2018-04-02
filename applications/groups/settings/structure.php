@@ -105,22 +105,25 @@ if ($St->tableExists('Category')) {
 
             $permissions = [];
             /** @var PermissionModel $permissionModel */
-            $permissionModel = Gdn::permissionModel();
+            $permissionModel = Gdn::getContainer()->get(PermissionModel::class);
             /** @var RoleModel $roleModel */
             $roleModel = Gdn::getContainer()->get(RoleModel::class);
+            $defaultPermissions = $permissionModel->getDefaults();
 
             // Upgrade existing category permissions to hide the Social Groups from everyone.
             $roles = $roleModel->get();
             foreach ($roles as $role) {
                 $roleID = val('RoleID', $role);
-                $categoryPermissions = $roleModel->getCategoryPermissions($roleID);
-                $categoryPermissions = array_column($categoryPermissions, null, 'CategoryID');
-                $permissionRow = $categoryPermissions[-1] ?? null;
-                if ($permissionRow) {
-                    unset($permissionRow['CategoryID']);
-                    $permissionRow['RoleID'] = $roleID;
-                    $permissionRow['Vanilla.Discussions.View'] = 0;
-                    $permissions[] = $permissionRow;
+                $roleType = val('Type', $role);
+                $typeDefaults = $defaultPermissions[$roleType] ?? null;
+                if ($typeDefaults) {
+                    $categoryDefaults = $typeDefaults['Category:-1'] ?? null;
+                    if ($categoryDefaults) {
+                        $permissionRow = $categoryDefaults;
+                        $permissionRow['RoleID'] = $roleID;
+                        $permissionRow['Vanilla.Discussions.View'] = 0;
+                        $permissions[] = $permissionRow;
+                    }
                 }
             }
             $Row['Permissions'] = $permissions;
@@ -130,7 +133,7 @@ if ($St->tableExists('Category')) {
                 $Row['CanDelete'] = 0;
             }
 
-            $categoryID = $Model->save($Row);
+            $Model->save($Row);
         }
     }
 }

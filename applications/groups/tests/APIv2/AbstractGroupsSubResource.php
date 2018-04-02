@@ -21,6 +21,7 @@ abstract class AbstractGroupsSubResource extends AbstractAPIv2Test {
         self::$userIDs = [];
         self::$addons = ['vanilla', 'conversations', 'groups'];
         parent::setupBeforeClass();
+        \PermissionModel::resetAllRoles();
 
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
