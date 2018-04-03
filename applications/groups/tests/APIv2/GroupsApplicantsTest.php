@@ -98,10 +98,14 @@ class GroupsApplicantsTest extends AbstractGroupsSubResource {
      * Test PATCH :groupID/applicants/:userID.
      *
      * @dataProvider provideApproveApplicants
-     * @depends testApply
+     * @depends testListApplicants
      */
     public function testApproveApplicants($status) {
         $originalGroup = $this->createGroup(__FUNCTION__.'('.$status.')', false);
+
+        // Get current applicants count.
+        $applicantsResult = $this->api()->get($this->createURL($originalGroup['groupID'], 'applicants'));
+        $applicantsCountsBefore = count($applicantsResult->getBody());
 
         $this->api()->setUserID(self::$userIDs[0]);
         $this->api()->post(
@@ -134,6 +138,12 @@ class GroupsApplicantsTest extends AbstractGroupsSubResource {
         $updatedGroup = $result->getBody();
 
         $this->assertEquals($originalGroup['countMembers'] + ($status === 'approved' ? 1 : 0), $updatedGroup['countMembers']);
+
+        // Let's make sure that the applicants count is the same as before.
+        $applicantsResult = $this->api()->get($this->createURL($originalGroup['groupID'], 'applicants'));
+        $applicantsCountsAfter = count($applicantsResult->getBody());
+
+        $this->assertEquals($applicantsCountsBefore, $applicantsCountsAfter);
     }
 
     /**
