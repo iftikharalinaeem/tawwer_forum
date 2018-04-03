@@ -765,7 +765,7 @@ class GroupModel extends Gdn_Model {
 
             if ($inserted) {
                 $this->updateCount($groupID, 'CountMembers');
-                $this->SQL->delete('GroupApplicant', ['UserID' => $groupID, 'GroupID' => $userID]);
+                $this->SQL->delete('GroupApplicant', ['GroupID' => $groupID, 'UserID' => $userID]);
                 $success = true;
             }
         } else {
