@@ -226,13 +226,13 @@ class PollModel extends Gdn_Model {
 
     /**
      *
-     *
+     * @param int $pollID
      * @param int $pollOptionID
      * @param int $userID
      * @return bool
      * @throws Exception
      */
-    public function vote($pollOptionID, $userID = null) {
+    public function vote($pollID, $pollOptionID, $userID = null) {
         if ($userID === null) {
             // Get objects from the database.
             $userID = Gdn::session()->UserID;
@@ -245,10 +245,11 @@ class PollModel extends Gdn_Model {
         if ($userID && $pollOption) {
             // Has this user voted on this poll before?
             $hasVoted = ($this->SQL
-                ->select()
-                ->from('PollVote')
-                ->where(['UserID' => $userID, 'PollOptionID' => $pollOptionID])
-                ->get()->numRows() > 0);
+                    ->select()
+                    ->from('PollVote pv')
+                    ->join('PollOption po', 'pv.PollOptionID = po.PollOptionID')
+                    ->where(['UserID' => $userID, 'PollID' => $pollID])
+                    ->get()->numRows() > 0);
 
             if (!$hasVoted) {
                 // Insert the vote

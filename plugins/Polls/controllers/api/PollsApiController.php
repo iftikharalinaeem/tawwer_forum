@@ -716,7 +716,7 @@ class PollsApiController extends AbstractApiController {
             $userID = $this->getSession()->UserID;
         }
 
-        $this->pollModel->vote($body['pollOptionID'], $userID);
+        $this->pollModel->vote($id, $body['pollOptionID'], $userID);
         $this->validateModel($this->pollModel);
 
         $row = $this->pollModel->getVotesWhere([
