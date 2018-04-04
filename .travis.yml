@@ -18,9 +18,9 @@ matrix:
 
 # The versions of PHP to test the project under.
 php:
-  - 7.0
-  - 7.1
   - 7.2
+  - 7.1
+  - 7.0
 
 # Steps of the build script.
 script:
