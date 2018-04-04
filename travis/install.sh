@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+TRAVIS_BUILD_DIR='/www/travis/internal'
+
+cd $TRAVIS_BUILD_DIR
+
+git clone --depth=50 --branch=master https://github.com/vanilla/vanilla vanilla
+
+cd "$TRAVIS_BUILD_DIR/vanilla/applications"
+ln -s ../../applications/* ./
+cd "$TRAVIS_BUILD_DIR/vanilla/plugins"
+ln -s ../plugins/* ./
+
+cd "$TRAVIS_BUILD_DIR/vanilla"
+composer self-update
+composer install --optimize-autoloader
+composer require phpunit/phpunit ~5

@@ -1,0 +1,31 @@
+# Cache Composer package files.
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+    - node_modules
+  yarn: true
+
+# No additional system dependencies to install. Skip the install step.
+install:
+  - ./travis/install.sh
+
+# The project's primary programming language. This will affect default dependency availability.
+language: php
+
+# Configure the build.
+matrix:
+  fast_finish: true
+
+# The versions of PHP to test the project under.
+php:
+  - 7.0
+  - 7.1
+  - 7.2
+
+# Steps of the build script.
+script:
+  - cd vanilla
+  - ./vendor/bin/phpunit --exclude-group=large
+
+# Run build in a Docker container.  Reduces time between commit and start of build.
+sudo: false
