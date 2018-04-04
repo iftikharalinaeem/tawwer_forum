@@ -372,7 +372,7 @@ class PollModel extends Gdn_Model {
      * Checks if the user has voted on the poll
      *
      * @param int $userID
-     * @param string $pollID
+     * @param int $pollID
      * @return bool
      */
     public function hasUserVoted($userID, $pollID) {
