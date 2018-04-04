@@ -74,14 +74,8 @@ class PollModule extends Gdn_Module {
             $pollOptions = $this->joinPollVotes($optionData, $poll, $pollModel);
 
             // Has this user voted?
-            $countVotes = $pollModel->SQL
-                ->select()
-                ->from('PollVote')
-                ->where([
-                    'UserID' => Gdn::session()->UserID,
-                    'PollOptionID' => array_column($optionData, 'PollOptionID')
-                ])->get()->numRows();
-            $this->setData('UserHasVoted',  ($countVotes > 0));
+            $hasUserVoted = $pollModel->hasUserVoted(Gdn::session()->UserID, $pollID);
+            $this->setData('UserHasVoted',  $hasUserVoted);
         }
 
         $this->EventArguments['Poll'] = &$poll;

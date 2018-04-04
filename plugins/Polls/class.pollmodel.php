@@ -226,7 +226,6 @@ class PollModel extends Gdn_Model {
 
     /**
      *
-     *
      * @param int $pollOptionID
      * @param int $userID
      * @return bool
@@ -244,28 +243,26 @@ class PollModel extends Gdn_Model {
         // If this is a valid poll option and user session, record the vote.
         if ($userID && $pollOption) {
             // Has this user voted on this poll before?
-            $hasVoted = ($this->SQL
-                ->select()
-                ->from('PollVote')
-                ->where(['UserID' => $userID, 'PollOptionID' => $pollOptionID])
-                ->get()->numRows() > 0);
+            $hasVoted = $this->hasUserVoted($userID, $pollOption->PollID);
 
-            if (!$hasVoted) {
-                // Insert the vote
-                $pollVoteModel = new Gdn_Model('PollVote');
-                $pollVoteModel->insert(['UserID' => $userID, 'PollOptionID' => $pollOptionID]);
-
-                // Update the vote counts
-                $pollOptionModel->update(['CountVotes' => val('CountVotes', $pollOption, 0)+1], ['PollOptionID' => $pollOptionID]);
-                $poll = $this->getID(val('PollID', $pollOption));
-                $this->update(['CountVotes' => val('CountVotes', $poll, 0)+1], ['PollID' => val('PollID', $pollOption)]);
-
-                $this->EventArguments['Poll'] = (array)$poll;
-                $this->EventArguments['PollOption'] = (array)$pollOption;
-                $this->fireEvent('Vote');
-
-                return $pollOptionID;
+            if ($hasVoted) {
+                throw new Gdn_UserException(t('Users may only vote once per poll.'));
             }
+
+            // Insert the vote
+            $pollVoteModel = new Gdn_Model('PollVote');
+            $pollVoteModel->insert(['UserID' => $userID, 'PollOptionID' => $pollOptionID]);
+
+            // Update the vote counts
+            $pollOptionModel->update(['CountVotes' => val('CountVotes', $pollOption, 0)+1], ['PollOptionID' => $pollOptionID]);
+            $poll = $this->getID(val('PollID', $pollOption));
+            $this->update(['CountVotes' => val('CountVotes', $poll, 0)+1], ['PollID' => val('PollID', $pollOption)]);
+
+            $this->EventArguments['Poll'] = (array)$poll;
+            $this->EventArguments['PollOption'] = (array)$pollOption;
+            $this->fireEvent('Vote');
+
+            return $pollOptionID;
         }
 
         return false;
@@ -371,5 +368,23 @@ class PollModel extends Gdn_Model {
      */
     public function addInsertFields(&$fields) {
         parent::addInsertFields($fields);
+    }
+
+    /**
+     * Checks if the user has voted on the poll
+     *
+     * @param int $userID
+     * @param int $pollID
+     * @return bool
+     */
+    public function hasUserVoted($userID, $pollID) {
+        $hasVoted = ($this->SQL
+            ->select()
+            ->from('PollVote pv')
+            ->join('PollOption po', 'pv.PollOptionID = po.PollOptionID')
+            ->where(['pv.UserID' => $userID, 'po.PollID' => $pollID])
+            ->get()->numRows() > 0);
+
+        return $hasVoted;
     }
 }
