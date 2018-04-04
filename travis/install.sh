@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-TRAVIS_BUILD_DIR='/www/travis/internal'
-
 cd $TRAVIS_BUILD_DIR
 
 git clone --depth=50 --branch=master https://github.com/vanilla/vanilla vanilla
