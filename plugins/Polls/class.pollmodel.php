@@ -245,22 +245,24 @@ class PollModel extends Gdn_Model {
             // Has this user voted on this poll before?
             $hasVoted = $this->hasUserVoted($userID, $pollOption->PollID);
 
-            if (!$hasVoted) {
-                // Insert the vote
-                $pollVoteModel = new Gdn_Model('PollVote');
-                $pollVoteModel->insert(['UserID' => $userID, 'PollOptionID' => $pollOptionID]);
-
-                // Update the vote counts
-                $pollOptionModel->update(['CountVotes' => val('CountVotes', $pollOption, 0)+1], ['PollOptionID' => $pollOptionID]);
-                $poll = $this->getID(val('PollID', $pollOption));
-                $this->update(['CountVotes' => val('CountVotes', $poll, 0)+1], ['PollID' => val('PollID', $pollOption)]);
-
-                $this->EventArguments['Poll'] = (array)$poll;
-                $this->EventArguments['PollOption'] = (array)$pollOption;
-                $this->fireEvent('Vote');
-
-                return $pollOptionID;
+            if ($hasVoted) {
+                throw new Gdn_UserException(t('Users may only vote once per poll.'));
             }
+
+            // Insert the vote
+            $pollVoteModel = new Gdn_Model('PollVote');
+            $pollVoteModel->insert(['UserID' => $userID, 'PollOptionID' => $pollOptionID]);
+
+            // Update the vote counts
+            $pollOptionModel->update(['CountVotes' => val('CountVotes', $pollOption, 0)+1], ['PollOptionID' => $pollOptionID]);
+            $poll = $this->getID(val('PollID', $pollOption));
+            $this->update(['CountVotes' => val('CountVotes', $poll, 0)+1], ['PollID' => val('PollID', $pollOption)]);
+
+            $this->EventArguments['Poll'] = (array)$poll;
+            $this->EventArguments['PollOption'] = (array)$pollOption;
+            $this->fireEvent('Vote');
+
+            return $pollOptionID;
         }
 
         return false;
