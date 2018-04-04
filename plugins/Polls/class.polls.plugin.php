@@ -96,7 +96,7 @@ class PollsPlugin extends Gdn_Plugin {
 
         // Record the vote.
         if ($form->authenticatedPostback() && $pollOption) {
-            $votedForPollOptionID = $pollModel->vote($pollID, $pollOptionID);
+            $votedForPollOptionID = $pollModel->vote($pollOptionID);
         }
 
         if ($votedForPollOptionID == 0) {
