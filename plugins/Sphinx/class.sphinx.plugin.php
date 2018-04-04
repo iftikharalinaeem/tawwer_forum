@@ -4,12 +4,8 @@
  * @license Proprietary
  */
 
+use Garden\Container\Container;
 use Garden\Schema\Schema;
-
-// Force require our sphinx so that an incomplete autoloader doesn't miss it.
-if (!class_exists('SearchModel', false)) {
-    require_once __DIR__ . '/class.searchmodel.php';
-}
 
 /**
  * Sphinx Plugin
@@ -28,7 +24,7 @@ class SphinxPlugin extends Gdn_Plugin {
     /** @var DiscussionModel */
     private $discussionModel;
 
-    /** @var SearchModel */
+    /** @var SphinxSearchModel */
     private $searchModel;
 
     /** @var Schema */
@@ -44,13 +40,15 @@ class SphinxPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Fired when plugin is disabled
+     * Override the search model with the sphinx search model.
      *
-     * This code forces vanilla to re-index its files.
+     * @param Container $dic The container to initialize.
      */
-    public function onDisable() {
-        // Remove the current library map so re-indexing will occur
-        @unlink(PATH_CACHE . '/library_map.ini');
+    public function container_init(Container $dic) {
+        $dic->rule(\SearchModel::class)
+            ->setShared(true)
+            ->setClass(\SphinxSearchModel::class)
+        ;
     }
 
     /**
@@ -59,15 +57,13 @@ class SphinxPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function setup() {
-        if (!class_exists('SphinxClient')) {
+        if (!extension_loaded('sphinx')) {
             throw new Exception(
                 'Sphinx requires the sphinx client to be installed (See http://www.php.net/manual/en/book.sphinx.php). '
                 .'Alternatively you can set "Plugins.Sphinx.SphinxAPIDir" to the location of sphinxapi.php before enabling the plugin (See https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php).'
             );
         }
 
-        // Remove the current library map so that the core file won't be grabbed.
-        @unlink(PATH_CACHE . '/library_map.ini');
         $this->structure();
     }
 
@@ -184,13 +180,13 @@ class SphinxPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Get the plugins copy of SearchModel.
+     * Get the plugins copy of SphinxSearchModel.
      *
-     * @return SearchModel
+     * @return SphinxSearchModel
      */
     private function searchModel() {
         if (!isset($this->searchModel)) {
-            $this->searchModel = new SearchModel();
+            $this->searchModel = new SphinxSearchModel();
         }
 
         return $this->searchModel;
