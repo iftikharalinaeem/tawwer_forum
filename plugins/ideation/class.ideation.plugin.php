@@ -313,8 +313,13 @@ EOT
      */
     public function base_allowedDiscussionTypes_handler($sender, $args) {
         $category = val('Category', $args);
-        if (empty($category)) {
+        if (empty($category) || val("DisplayAs", $category) === "Categories") {
             // We're on Recent Discussions. Hitting post/idea from here is fine; it'll default to your Idea category.
+            //
+            // Alternatively we are in a nested category and currently aren't going to recursively check all child categories
+            // This is particularly necessary to make this work with the top level subcommunities without
+            // recursively checking categories. This is a STOPGAP solution until we have a better way to handle this
+            // or create workflows that do not require handling it.
             return;
         }
         if ($this->isIdeaCategory($category)) {
