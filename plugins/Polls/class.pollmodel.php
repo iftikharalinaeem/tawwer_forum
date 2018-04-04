@@ -243,12 +243,7 @@ class PollModel extends Gdn_Model {
         // If this is a valid poll option and user session, record the vote.
         if ($userID && $pollOption) {
             // Has this user voted on this poll before?
-            $hasVoted = ($this->SQL
-             ->select()
-             ->from('PollVote pv')
-             ->join('PollOption po', 'pv.PollOptionID = po.PollOptionID')
-             ->where(['pv.UserID' => $userID, 'po.PollID' => $pollOption->PollID])
-             ->get()->numRows() > 0);
+            $hasVoted = $this->hasUserVoted($userID, $pollOption->PollID);
 
             if (!$hasVoted) {
                 // Insert the vote
@@ -371,5 +366,23 @@ class PollModel extends Gdn_Model {
      */
     public function addInsertFields(&$fields) {
         parent::addInsertFields($fields);
+    }
+
+    /**
+     * Checks if the user has voted on the poll
+     *
+     * @param int $userID
+     * @param string $pollID
+     * @return bool
+     */
+    public function hasUserVoted($userID, $pollID) {
+        $hasVoted = ($this->SQL
+            ->select()
+            ->from('PollVote pv')
+            ->join('PollOption po', 'pv.PollOptionID = po.PollOptionID')
+            ->where(['pv.UserID' => $userID, 'po.PollID' => $pollID])
+            ->get()->numRows() > 0);
+
+        return $hasVoted;
     }
 }
