@@ -406,15 +406,15 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     /**
      * Filter visible categories.
      *
-     * @param array|bool $categoryIDs An array of IDs representing categories available to the current user. True if all are available.
-     * @return array|bool
+     * @param array|bool $categories An array of IDs representing categories available to the current user. True if all are available.
+     * @return array|bool array of categories or true.
      */
     public function categoryModel_visibleCategories_handler($categories) {
         if (SubCommunityModel::getCurrent()) {
-            $subcommunityCategoryIDs = $this->getCategoryIDs();
             if ($categories === true) {
-                $categories = $subcommunityCategoryIDs;
+                $categories = $this->getCategories();
             } elseif (is_array($categories)) {
+                $subcommunityCategoryIDs = $this->getCategoryIDs();
                 $categories = array_filter($categories, function($category) use ($subcommunityCategoryIDs) {
                     return in_array($category['CategoryID'], $subcommunityCategoryIDs);
                 });
