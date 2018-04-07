@@ -2,6 +2,8 @@
 
 class SubcommunityModel extends Gdn_Model {
     const CACHE_KEY = 'subcommunities';
+    const CACHE_KEY_DEFAULTSITE = 'subcommunities.defaultsite';
+    const SITE_CACHE_TTL = 600;
 
     /// Properties ///
 
@@ -37,6 +39,8 @@ class SubcommunityModel extends Gdn_Model {
 
     /**
      * Get an array of all multisites indexed by folder.
+     *
+     * @see SubcommunityModel::clearCache()
      */
     public static function all() {
         if (!isset(self::$all)) {
@@ -154,19 +158,24 @@ class SubcommunityModel extends Gdn_Model {
     /**
      * Get the default site's record.
      *
+     * @see SubcommunityModel::clearCache()
      * @return array|null
      */
     public static function getDefaultSite() {
-        $default = null;
-        $sql = clone Gdn::sql();
-        $sql->reset();
-        $row = $sql->getWhere('Subcommunity', ['IsDefault' => 1], '', '', 1)->resultArray();
-        if (is_array($row) && count($row) === 1) {
-            $default = current($row);
-            self::calculateRow($default);
+        $defaultSite = Gdn::cache()->get(self::CACHE_KEY_DEFAULTSITE);
+        if (!is_array($defaultSite)) {
+            $row = Gdn::sql()->getWhere('Subcommunity', ['IsDefault' => 1], '', '', 1)->resultArray();
+            if (is_array($row) && count($row) === 1) {
+                $defaultSite = current($row);
+                self::calculateRow($defaultSite);
+            }
+
+            Gdn::cache()->store(self::CACHE_KEY_DEFAULTSITE, $defaultSite, [
+                Gdn_Cache::FEATURE_EXPIRY => self::SITE_CACHE_TTL
+            ]);
         }
 
-        return $default;
+        return $defaultSite;
     }
 
     /**
@@ -250,6 +259,7 @@ class SubcommunityModel extends Gdn_Model {
 
     protected static function clearCache() {
         Gdn::cache()->remove(self::CACHE_KEY);
+        Gdn::cache()->remove(self::CACHE_KEY_DEFAULTSITE);
         self::$all = null;
     }
 
