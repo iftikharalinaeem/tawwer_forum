@@ -1459,4 +1459,48 @@ class GroupModel extends Gdn_Model {
         }
         return $groupCategoryIDs;
     }
+
+    /**
+     * Search groups by name.
+     *
+     * @param string $name
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     * @throws Exception
+     */
+    public function search(string $name, int $limit = 24, int $offset = 0): array {
+        $result = [];
+
+        if ($name) {
+            $result = $this->SQL
+                ->from('Group')
+                ->like('Name', $name, 'right')
+                ->limit($limit, $offset)
+                ->get()
+                ->resultArray();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get total number of groups that match the search..
+     *
+     * @param string $name
+     * @return int
+     * @throws Exception
+     */
+    public function searchTotal(string $name): int {
+        $total = 0;
+
+        if ($name) {
+            $total = $this->SQL
+                ->from('Group')
+                ->like('Name', $name, 'right')
+                ->getCount();
+        }
+
+        return $total;
+    }
 }
