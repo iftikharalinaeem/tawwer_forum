@@ -4,24 +4,24 @@
 
 $bodyBackground: #2F2F2F;
 $textColor: #c6c6c6;
-$headingsColor: #fff;
+$headingsColor: #ffffff;
 $linkColor: #84BCDE;
 $linkColorHover: #39E5FF;
-$reactColor: #999;
+$reactColor: #999999;
 
 $borderColor: #242424;
 
 /// Forms ///
 
 $btnBackground: lighten(#2F2F2F, 10%);
-$btnColor: #fff;
-$btnPrimaryBackground: #075ECC;
-$btnPrimaryColor: #fff;
+$btnColor: #ffffff;
+$btnPrimaryBackground: $red;
+$btnPrimaryColor: #ffffff;
 $formBackground: #2A2A2A;
 
 $readBackground: #383838;
 
-$navbarBackground: #000;
+$navbarBackground: #000000;
 
 $boxBackground: darken($bodyBackground, 2%);
 $listBackground: darken($bodyBackground, 2%);
@@ -31,23 +31,17 @@ $uiColor: #f0f0f0;
 
 /// Messages ///
 
-$warningText: #fff;
+$warningText: #ffffff;
 $warningBackground: $orange;
 
-$errorText: #fff;
+$errorText: #ffffff;
 $errorBackground: $red;
 
-$successText: #fff;
+$successText: #ffffff;
 $successBackground: $green;
 
-$infoText: #fff;
+$infoText: #ffffff;
 $infoBackground: $blue;
-
-.Item-Header.CommentHeader {
-   margin: -8px -8px 0px -8px;
-   padding: 8px;
-   background: darken($bodyBackground, 4%);
-}
 
 .PasswordStrength .Background {
    background-color: #333333;

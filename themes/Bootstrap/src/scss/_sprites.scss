@@ -18,7 +18,7 @@
 /* Switch to the white icons when hovering over a menuitem sprite */
 .Reactions .MenuItems a:hover .ReactSprite,
 .MenuItems a:hover .Sprite {
-   background-image: spriteUrl(#fff);
+   background-image: spriteUrl(#ffffff);
 }
 
 .FilterMenu .ReactSprite {
@@ -34,7 +34,7 @@
 
 /* Switch to bordered icons for user reaction overlays */
 .UserReactionWrap .ReactSprite {
-   background-image: spriteUrl(#000, "sprites-14-outline");
+   background-image: spriteUrl(#000000, "sprites-14-outline");
 }
 
 .Sprite,
