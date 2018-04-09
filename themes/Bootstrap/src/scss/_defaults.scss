@@ -100,7 +100,9 @@ $navbarSpriteStyle: "sprites-14";
 }
 
 @function spriteUrlLocal($color, $file: sprites-14) {
-   @return url("//vanillicon.local/sprites/#{$file}-#{$color}.png");
+   $hexString: str-replace(inspect($color), "#", "");
+
+   @return url("//vanillicon.local/sprites/#{$file}-#{$hexString}.png");
 }
 
 @mixin inset {
