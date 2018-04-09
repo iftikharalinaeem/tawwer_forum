@@ -22,5 +22,8 @@
             "email": "todd@vanillaforums.com",
             "homepage": "http://vanillaforums.org/profile/todd"
         }
-    ]
+    ],
+    "build": {
+        "process": "v1"
+    }
 }

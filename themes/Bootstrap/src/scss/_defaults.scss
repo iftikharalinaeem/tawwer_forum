@@ -17,26 +17,26 @@ $headingsFontFamily: inherit;
 
 $linkColor: #0088cc;
 $linkColorHover: #ff0084;
-$reactColor: #555;
+$reactColor: #555555;
 
 /// Tables & Lists ///
 
-$borderColor: #ddd;
+$borderColor: #dddddd;
 $boxBorder: $borderColor;
 
 /// Forms ///
 
-$btnBackground: #fff;
-$btnColor: #000;
+$btnBackground: #ffffff;
+$btnColor: #000000;
 $btnPrimaryBackground: $blue;
-$btnPrimaryColor: #fff;
+$btnPrimaryColor: #ffffff;
 
 $formBackground: accent();
 
 /// Navigation ///
 
-$navbarText: #999;
-$navbarTextHover: #fff;
+$navbarText: #999999;
+$navbarTextHover: #ffffff;
 
 $navbarBackground: #1D1D1D;
 $navbarBackgroundHighlight: #323232;
@@ -83,12 +83,24 @@ $navbarSpriteStyle: "sprites-14";
    }
 }
 
+@function str-replace($string, $search, $replace: '') {
+    $index: str-index($string, $search);
+
+    @if $index {
+      @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+    }
+
+    @return $string;
+}
+
 @function spriteUrl($color, $file: sprites-14) {
-   @return url("//vanillicon.com/sprites/#{$file}-#{hex_str(unquote($color))}.png");
+   $hexString: str-replace(inspect($color), "#", "");
+
+   @return url("//vanillicon.com/sprites/#{$file}-#{$hexString}.png");
 }
 
 @function spriteUrlLocal($color, $file: sprites-14) {
-   @return url("//vanillicon.local/sprites/#{$file}-#{hex_str(unquote($color))}.png");
+   @return url("//vanillicon.local/sprites/#{$file}-#{$color}.png");
 }
 
 @mixin inset {
