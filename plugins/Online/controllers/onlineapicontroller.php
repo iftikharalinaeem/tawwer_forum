@@ -8,7 +8,6 @@ use Vanilla\Exception\PermissionException;
 use Vanilla\Web\Controller;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
-use Garden\Web\Exception\NotFoundException;
 
 /**
  * Controller handling the /online API endpoint.
@@ -33,14 +32,14 @@ class OnlineApiController extends Controller {
     }
 
     /**
-     * Get a count of users currently online.
+     * Get a counts of users currently online.
      *
      * @return array
      * @throws ValidationException if input or output fails schema validation.
      * @throws HttpException
      * @throws PermissionException if the permission check fails.
      */
-    public function get_count(): array {
+    public function get_counts(): array {
         $this->permission('Garden.Settings.View');
 
         $in = $this->schema([], 'in')->setDescription('Get a count of users currently online.');

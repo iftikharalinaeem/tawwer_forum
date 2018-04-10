@@ -64,6 +64,9 @@ class OnlinePlugin extends Gdn_Plugin {
      */
     protected static $now;
 
+    /** @var bool */
+    private static $cachingRequired = true;
+
     /** @var UserModel */
     private $userModel;
 
@@ -195,6 +198,15 @@ class OnlinePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Is caching required?
+     *
+     * @return bool
+     */
+    public static function isCachingRequired(): bool {
+        return self::$cachingRequired;
+    }
+
+    /**
      * Hook into Informs for every minute updates
      *
      * Here we'll track and update the online status of each user while they're
@@ -237,7 +249,7 @@ class OnlinePlugin extends Gdn_Plugin {
      * Uses a shifting double cookie method to track the online state of guests.
      */
     public function trackGuest() {
-        if (!Gdn::cache()->activeEnabled()) {
+        if (self::isCachingRequired() && !Gdn::cache()->activeEnabled()) {
             return;
         }
 
@@ -328,7 +340,7 @@ class OnlinePlugin extends Gdn_Plugin {
      * @return int Number of guests
      */
     public static function guests() {
-        if (!Gdn::cache()->activeEnabled()) {
+        if (self::isCachingRequired() && !Gdn::cache()->activeEnabled()) {
             return 0;
         }
 
@@ -345,7 +357,10 @@ class OnlinePlugin extends Gdn_Plugin {
                 'Cache' => $cache,
                 'Active' => $active
             ];
-            Gdn::controller()->setData('GuestCountCache', $debug);
+            $controller = Gdn::controller();
+            if ($controller instanceof Gdn_Controller) {
+                Gdn::controller()->setData('GuestCountCache', $debug);
+            }
 
             if (isset($cache[$cookieNames[$active]])) {
                 return $cache[$cookieNames[$active]];
@@ -364,7 +379,8 @@ class OnlinePlugin extends Gdn_Plugin {
      * @return int
      */
     public function guestCount(): int {
-        return self::guests();
+        $result = self::guests();
+        return $result ?? 0;
     }
 
     /*
@@ -383,7 +399,7 @@ class OnlinePlugin extends Gdn_Plugin {
      * @return type
      */
     public function trackActiveUser($withSupplement = false) {
-        if (!Gdn::cache()->activeEnabled()) {
+        if (self::isCachingRequired() && !Gdn::cache()->activeEnabled()) {
             return;
         }
 
@@ -1180,6 +1196,17 @@ class OnlinePlugin extends Gdn_Plugin {
 
         $result = $out->validate($result);
         return $result;
+    }
+
+    /**
+     * Configure whether or not caching is required.
+     *
+     * @param $cachingRequired
+     * @return $this
+     */
+    public function setCachingRequired(bool $cachingRequired) {
+        self::$cachingRequired = $cachingRequired;
+        return $this;
     }
 
     public function structure() {
