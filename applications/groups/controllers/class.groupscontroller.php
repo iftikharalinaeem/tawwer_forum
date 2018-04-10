@@ -118,7 +118,7 @@ class GroupsController extends Gdn_Controller {
         } elseif ($Sort === 'search') {
             $query = Gdn::request()->get('query', Gdn::request()->get('Search', ''));
             $this->setData('GroupSearch', $query);
-            $Groups = $this->GroupModel->search($query, $this->PageSize, $Offset);
+            $Groups = $this->GroupModel->searchByName($query, $SortRow['OrderBy'], 'desc', $this->PageSize, $Offset);
             $TotalRecords = $this->GroupModel->searchTotal($query);
         } else {
              $Groups = $this->GroupModel->get($SortRow['OrderBy'], 'desc', $Limit, $PageNumber)->resultArray();

@@ -1469,13 +1469,22 @@ class GroupModel extends Gdn_Model {
      * @return array
      * @throws Exception
      */
-    public function search(string $name, int $limit = 24, int $offset = 0): array {
+    public function searchByName(string $name, string $orderField = null, string $orderDirection = null, int $limit = 24, int $offset = 0): array {
         $result = [];
 
         if ($name) {
+            $orderField = $orderField ?: 'Name';
+            $orderDirection = $orderDirection ?: 'asc';
+
+            $fullMatch = $this->SQL->conditionExpr('g.Name', $name, false);
+
             $result = $this->SQL
-                ->from('Group')
-                ->like('Name', $name, 'right')
+                ->select('g.*')
+                ->select($fullMatch, '', 'FullMatch')
+                ->from('Group g')
+                ->like('Name', $name)
+                ->orderBy('FullMatch', 'desc')
+                ->orderBy($orderField, $orderDirection)
                 ->limit($limit, $offset)
                 ->get()
                 ->resultArray();
