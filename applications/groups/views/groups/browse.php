@@ -3,6 +3,7 @@
 <div class="PageControls Top">
 <?php
     echo PagerModule::write();
+    writeGroupSearch();
 ?>
 </div>
 
@@ -19,8 +20,14 @@ $this->fireEvent('beforeBrowseGroupList');
 $groups = $this->data('Groups');
 $groupModel = new GroupModel();
 $groupModel->joinRecentPosts($groups);
-$list = new GroupListModule($groups, 'groups', $this->title(), t("No groups to display yet."), $cssClass, $showMore, $layout);
-echo $list;
+
+$groupSearch = $this->data('GroupSearch', false);
+if ($groupSearch && count($groups) === 0) {
+    echo '<p class="NoResults">', sprintf(t('No results for %s.', 'No results for <b>%s</b>.'), $groupSearch), '</p>';
+} else {
+    $list = new GroupListModule($groups, 'groups', $this->title(), t("No groups to display."), $cssClass, $showMore, $layout);
+    echo $list;
+}
 ?>
 
 <div class="PageControls Bottom">

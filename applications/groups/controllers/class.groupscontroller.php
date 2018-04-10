@@ -100,7 +100,8 @@ class GroupsController extends Gdn_Controller {
             'new' => ['Title' => t('New Groups'), 'OrderBy' => 'DateInserted'],
             'popular' => ['Title' => t('Popular Groups'), 'OrderBy' => 'CountMembers'],
             'updated' => ['Title' => t('Recently Updated Groups'), 'OrderBy' => 'DateLastComment'],
-            'mine' => ['Title' => t('My Groups'), 'OrderBy' => 'DateInserted']
+            'search' => ['Title' => t('Search'), 'OrderBy' => 'DateLastComment'],
+            'mine' => ['Title' => t('My Groups'), 'OrderBy' => 'DateInserted'],
         ];
 
         if (!array_key_exists($Sort, $Sorts)) {
@@ -114,6 +115,11 @@ class GroupsController extends Gdn_Controller {
 
         if (Gdn::session()->UserID && $Sort == 'mine') {
              $Groups = $this->GroupModel->getByUser(Gdn::session()->UserID, '', 'desc', $Limit, $Offset);
+        } elseif ($Sort === 'search') {
+            $query = Gdn::request()->get('query', Gdn::request()->get('Search', ''));
+            $this->setData('GroupSearch', $query);
+            $Groups = $this->GroupModel->searchByName($query, $SortRow['OrderBy'], 'desc', $this->PageSize, $Offset);
+            $TotalRecords = $this->GroupModel->searchTotal($query);
         } else {
              $Groups = $this->GroupModel->get($SortRow['OrderBy'], 'desc', $Limit, $PageNumber)->resultArray();
              $TotalRecords = $this->GroupModel->getCount();
@@ -127,7 +133,11 @@ class GroupsController extends Gdn_Controller {
         $Pager = PagerModule::current();
         // Use simple pager for 'mine'
         if (Gdn::session()->UserID && $Sort != 'mine') {
-            $Pager->configure($Offset, $Limit, $TotalRecords, "groups/browse/$Sort/{Page}");
+            $pagerUrl = "groups/browse/$Sort/{Page}";
+            if ($this->data('GroupSearch', false)) {
+                $pagerUrl .= '?query='.urlencode($this->data('GroupSearch'));
+            }
+            $Pager->configure($Offset, $Limit, $TotalRecords, $pagerUrl);
         }
 
         $this->title($SortRow['Title']);
