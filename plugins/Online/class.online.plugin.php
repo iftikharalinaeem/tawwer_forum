@@ -582,9 +582,9 @@ class OnlinePlugin extends Gdn_Plugin {
      * @staticvar array $AllOnlineUsers
      * @return array
      */
-    public function getAllOnlineUsers() {
+    public function getAllOnlineUsers($forceRefresh = false) {
         static $allOnlineUsers = null;
-        if (is_null($allOnlineUsers)) {
+        if (is_null($allOnlineUsers) || $forceRefresh) {
             $allOnlineUsers = [];
             try {
                 $allOnlineUsersResult = Gdn::sql()
@@ -676,7 +676,7 @@ class OnlinePlugin extends Gdn_Plugin {
      */
     public function onlineCount($selector = null, $selectorID = null, $selectorField = null) {
         if (is_null($selector) || $selector == 'all') {
-            $allOnlineUsers = $this->getAllOnlineUsers();
+            $allOnlineUsers = $this->getAllOnlineUsers(!self::$cachingRequired);
             return count($allOnlineUsers);
         }
 
@@ -1158,7 +1158,34 @@ class OnlinePlugin extends Gdn_Plugin {
     }
 
     /**
-     * Adjust a user’s Online privacy.
+     * Get a user’s Online privacy setting.
+     *
+     * @param int $id The user ID.
+     * @return array
+     * @throws \Garden\Schema\ValidationException if input or output fails schema validation.
+     * @throws \Garden\Web\Exception\HttpException
+     * @throws \Vanilla\Exception\PermissionException if the permission check fails.
+     */
+    public function usersApiController_get_privatemode(UsersApiController $sender, int $id) {
+        $sender->permission('Garden.Users.Edit');
+
+        $in = $sender->schema([], 'in')->setDescription('Get a user’s Online privacy setting.');
+        $out = $sender->schema([
+            'privateMode:b' => 'Whether not the user is hidden from Online status.'
+        ], 'out');
+
+        $this->userByID($id);
+
+        $result = [
+            'privateMode' => $this->userModel->getAttribute($id, self::PRIVATE_MODE_ATTRIBUTE)
+        ];
+
+        $result = $out->validate($result);
+        return $result;
+    }
+
+    /**
+     * Adjust a user’s Online privacy setting.
      *
      * @param int $id The user ID.
      * @param array $body The request body.
@@ -1202,11 +1229,11 @@ class OnlinePlugin extends Gdn_Plugin {
      * Configure whether or not caching is required.
      *
      * @param $cachingRequired
-     * @return $this
+     * @return bool
      */
-    public function setCachingRequired(bool $cachingRequired) {
+    public static function setCachingRequired(bool $cachingRequired) {
         self::$cachingRequired = $cachingRequired;
-        return $this;
+        return $cachingRequired;
     }
 
     public function structure() {
