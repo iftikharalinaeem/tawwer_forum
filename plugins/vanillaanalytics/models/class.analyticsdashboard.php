@@ -198,7 +198,7 @@ class AnalyticsDashboard implements JsonSerializable {
                         // Charts & Leaderboards
                         // 'top-member-by-total-reputation', // Hidden for now to prevent some confusion
                         'participation-rate',
-                        'top-member-by-accumulated-reputation',
+                        'top-member-by-reputation',
                         'sentiment-ratio',
                         'top-commented-discussions',
                         'visits-per-active-user',

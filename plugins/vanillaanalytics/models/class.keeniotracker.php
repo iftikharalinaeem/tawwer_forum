@@ -132,7 +132,7 @@ class KeenIOTracker implements TrackerInterface {
                 ]
             ]
         ],
-        'top-member-by-accumulated-reputation' => [
+        'top-member-by-reputation' => [
             'title' => 'Members by Accumulated Reputation',
             'rank' => AnalyticsWidget::SMALL_WIDGET_RANK,
             'type' => 'leaderboard',
@@ -645,7 +645,7 @@ class KeenIOTracker implements TrackerInterface {
             ])
             ->setGroupBy('point.user.userID');
 
-        $this->widgets['top-member-by-accumulated-reputation']['query'] = $topMembersByAccumulatedReputation;
+        $this->widgets['top-member-by-reputation']['query'] = $topMembersByAccumulatedReputation;
 
         // Top Members by Total Reputation (leaderboard)
         $topMembersByTotalReputation = new KeenIOQuery();
