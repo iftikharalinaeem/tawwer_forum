@@ -714,7 +714,7 @@ EOT
     public function base_discussionOptions_handler($sender, $args) {
         $discussion = $args['Discussion'];
 
-        if (!Gdn::session()->checkPermission('Vanilla.Moderation.Manage')
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')
             && !Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
             return;
         }
@@ -825,7 +825,7 @@ EOT
                 throw notFoundException('Idea');
             }
 
-            if (!Gdn::session()->checkPermission('Vanilla.Moderation.Manage')
+            if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')
                 && !Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
                 return;
             }
@@ -1230,7 +1230,7 @@ EOT
      * @throws ServerException if, after saving, the status cannot be retrievd from an idea.
      */
     public function discussionsApiController_patch_idea(DiscussionsApiController $sender, $id, array $body) {
-        $sender->permission('Vanilla.Moderation.Manage');
+        $sender->permission('Garden.Moderation.Manage');
 
         $in = $sender->schema($this->statusFragment(), 'in')
             ->setDescription('Update idea metadata on a discussion.');
