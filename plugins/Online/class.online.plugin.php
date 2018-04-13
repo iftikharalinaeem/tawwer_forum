@@ -1166,18 +1166,18 @@ class OnlinePlugin extends Gdn_Plugin {
      * @throws \Garden\Web\Exception\HttpException
      * @throws \Vanilla\Exception\PermissionException if the permission check fails.
      */
-    public function usersApiController_get_privatemode(UsersApiController $sender, int $id) {
+    public function usersApiController_get_onlineVisibility(UsersApiController $sender, int $id) {
         $sender->permission('Garden.Users.Edit');
 
-        $in = $sender->schema([], 'in')->setDescription('Get a user’s Online privacy setting.');
+        $in = $sender->idParamSchema('in')->setDescription('Get a user’s Online privacy setting.');
         $out = $sender->schema([
-            'privateMode:b' => 'Whether not the user is hidden from Online status.'
+            'onlineVisibility:b' => 'Whether not the user is hidden from Online status.'
         ], 'out');
 
         $this->userByID($id);
 
         $result = [
-            'privateMode' => $this->userModel->getAttribute($id, self::PRIVATE_MODE_ATTRIBUTE)
+            'onlineVisibility' => $this->userModel->getAttribute($id, self::PRIVATE_MODE_ATTRIBUTE)
         ];
 
         $result = $out->validate($result);
@@ -1187,6 +1187,7 @@ class OnlinePlugin extends Gdn_Plugin {
     /**
      * Adjust a user’s Online privacy setting.
      *
+     * @param UsersApiController $sender
      * @param int $id The user ID.
      * @param array $body The request body.
      * @return array
@@ -1194,14 +1195,15 @@ class OnlinePlugin extends Gdn_Plugin {
      * @throws \Garden\Web\Exception\HttpException
      * @throws \Vanilla\Exception\PermissionException if the permission check fails.
      */
-    public function usersApiController_patch_privatemode(UsersApiController $sender, int $id, array $body) {
+    public function usersApiController_put_onlineVisibility(UsersApiController $sender, int $id, array $body) {
         $sender->permission('Garden.Users.Edit');
 
+        $sender->idParamSchema('in');
         $in = $sender->schema([
-            'privateMode:b' => 'Whether not the user should be hidden from Online status.'
+            'onlineVisibility:b' => 'Whether not the user should be hidden from Online status.'
         ], 'in')->setDescription('Adjust a user’s Online privacy.');
         $out = $sender->schema([
-            'privateMode:b' => 'Whether not the user is hidden from Online status.'
+            'onlineVisibility:b' => 'Whether not the user is hidden from Online status.'
         ], 'out');
 
         $body = $in->validate($body);
@@ -1210,7 +1212,7 @@ class OnlinePlugin extends Gdn_Plugin {
         $this->userModel->saveAttribute(
             $id,
             self::PRIVATE_MODE_ATTRIBUTE,
-            $body['privateMode']
+            $body['onlineVisibility']
         );
         $user = $this->userByID($id);
         $attributes = $user['Attributes'] ?? null;
@@ -1218,7 +1220,7 @@ class OnlinePlugin extends Gdn_Plugin {
             throw new Garden\Web\Exception\ServerException('Unable to set Private Mode for user.');
         }
         $result = [
-            'privateMode' => $attributes[self::PRIVATE_MODE_ATTRIBUTE]
+            'onlineVisibility' => $attributes[self::PRIVATE_MODE_ATTRIBUTE]
         ];
 
         $result = $out->validate($result);

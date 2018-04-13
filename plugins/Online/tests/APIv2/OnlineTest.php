@@ -73,14 +73,14 @@ class OnlineTest extends AbstractAPIv2Test {
     /**
      * Test setting a user's "Private Mode" flag.
      */
-    public function testPatchPrivateMode() {
+    public function testPutPrivateMode() {
         $userID = 1; // System
 
         $modes = [true, false];
         foreach ($modes as $mode) {
-            $this->api()->patch("users/{$userID}/privatemode", ['privateMode' => $mode]);
-            $patchResponse = $this->api()->get("users/{$userID}/privatemode")->getBody();
-            $this->assertEquals($mode, $patchResponse['privateMode']);
+            $this->api()->put("users/{$userID}/online-visibility", ['onlineVisibility' => $mode]);
+            $putResponse = $this->api()->get("users/{$userID}/online-visibility")->getBody();
+            $this->assertEquals($mode, $putResponse['onlineVisibility']);
         }
     }
 }
