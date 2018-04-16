@@ -78,9 +78,9 @@ class OnlineTest extends AbstractAPIv2Test {
 
         $modes = [true, false];
         foreach ($modes as $mode) {
-            $this->api()->put("users/{$userID}/online-visibility", ['onlineVisibility' => $mode]);
-            $putResponse = $this->api()->get("users/{$userID}/online-visibility")->getBody();
-            $this->assertEquals($mode, $putResponse['onlineVisibility']);
+            $this->api()->put("users/{$userID}/hidden", ['hidden' => $mode]);
+            $putResponse = $this->api()->get("users/{$userID}/hidden")->getBody();
+            $this->assertEquals($mode, $putResponse['hidden']);
         }
     }
 }
