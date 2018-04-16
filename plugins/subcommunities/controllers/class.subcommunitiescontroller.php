@@ -183,7 +183,7 @@ class SubcommunitiesController extends DashboardController {
         }
 
         $this->permission('Garden.Settings.Manage');
-        $pageSize = 20;
+        $pageSize = 100;
         list($offset, $limit) = offsetLimit($page, $pageSize);
         $this->form = new Gdn_Form('', 'bootstrap');
         $this->form->Method = 'get';
@@ -206,7 +206,6 @@ class SubcommunitiesController extends DashboardController {
 
         $this->setData('_Limit', $pageSize);
         $this->addJsFile('jquery.tablednd.js');
-//        $this->addJsFile('subcommunities_admin.js', 'plugins/subcommunities');
 
         $this->title(t('Sites'));
         $this->render();
