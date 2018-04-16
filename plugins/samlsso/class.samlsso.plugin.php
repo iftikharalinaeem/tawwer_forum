@@ -523,7 +523,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
         return anchor(
             sprintf(t('Sign In with %s'), $provider['Name']),
             '/entry/saml/'.$provider['AuthenticationKey'],
-            'Button Primary SignInLink'
+            'Button Primary SignInLink',
+            ['rel' => 'nofollow']
         );
     }
 
