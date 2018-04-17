@@ -59,7 +59,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
                 self::$Types['page']['p'] = 'docs';
             }
 
-            if ($this->addonManager->checkApplication('Groups')) {
+            $group = $this->addonManager->lookupAddon('Groups');
+            if ($group && $group->getInfoValue('oldType') === 'application' && $this->addonManager->isEnabled('Groups', \Vanilla\Addon::TYPE_ADDON)) {
                 self::$Types['group']['group'] = 'groups';
             }
         }
@@ -186,7 +187,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         if (!$searchModel instanceof SphinxSearchModel) {
             throw new \Gdn_UserException("This functionality requires Sphinx Search.", 500);
         }
-        
+
         $get = $sender->Request->get();
         $get['search'] = $term;
         $results = $searchModel->autoComplete($get, $limit);
