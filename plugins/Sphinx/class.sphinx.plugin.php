@@ -57,11 +57,18 @@ class SphinxPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function setup() {
-        if (!extension_loaded('sphinx')) {
-            throw new Exception(
-                'Sphinx requires the sphinx client to be installed (See http://www.php.net/manual/en/book.sphinx.php). '
-                .'Alternatively you can set "Plugins.Sphinx.SphinxAPIDir" to the location of sphinxapi.php before enabling the plugin (See https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php).'
-            );
+        // Kludge that allows to use Sphinx on PHP7 the correct version without compiling the php extension yourself
+        // Source of the class https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php
+        // Make sure that it matches the sphinx version you are using.
+        if (!class_exists('SphinxClient') && c('Plugins.Sphinx.SphinxAPIDir')) {
+            $sphinxClientPath = rtrim(c('Plugins.Sphinx.SphinxAPIDir'), '/').'/sphinxapi.php';
+            if (!is_readable($sphinxClientPath)) {
+                throw new Exception(
+                    'Sphinx requires the sphinx client to be installed (See http://www.php.net/manual/en/book.sphinx.php). '
+                    .'Alternatively you can set "Plugins.Sphinx.SphinxAPIDir" to the location of sphinxapi.php before enabling the plugin (See https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php).'
+                );
+            }
+            require_once($sphinxClientPath);
         }
 
         $this->structure();
