@@ -131,8 +131,7 @@ class IdeationPlugin extends Gdn_Plugin {
 
         $type = $category['IdeationType'];
         $status = $this->statusModel->getStatusByDiscussion($discussionID);
-        $notesKey = array_key_exists('DiscussionID', $discussion) ? 'Attributes.StatusNotes' : 'attributes.statusNotes';
-        $statusNotes = valr($notesKey, $discussion) ?: null;
+        $statusNotes = $discussion['Attributes']['StatusNotes'] ?? $discussion['attributes']['statusNotes'] ?? null;
         $result = [
             'statusID' => val('StatusID', $status),
             'status' => [
