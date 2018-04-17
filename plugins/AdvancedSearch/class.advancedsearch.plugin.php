@@ -5,6 +5,7 @@
  * @license Proprietary
  */
 
+use Interop\Container\ContainerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 
@@ -21,6 +22,9 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
      */
     private $addonManager;
 
+    /** @var ContainerInterface */
+    private $container;
+
     /**
      * @var SearchModel
      */
@@ -32,13 +36,15 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
      * Construct the advanced search plugin.
      *
      * @param AddonManager $addonManager The addon manager dependency.
-     * @param SearchModel $searchModel The model used to perform all searches.
+     * @param ContainerInterface $container
+     *
+     * @throws Exception
      */
-    public function __construct(AddonManager $addonManager, SearchModel $searchModel) {
+    public function __construct(AddonManager $addonManager, ContainerInterface $container) {
         parent::__construct();
 
         $this->addonManager = $addonManager;
-        $this->searchModel = $searchModel;
+        $this->container = $container;
 
         self::$Types = [
             'discussion' => ['d' => 'discussions'],
@@ -66,6 +72,20 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         }
 
         $this->fireEvent('Init');
+    }
+
+    /**
+     * Get the SearchModel.
+     * We lazy load this so that other plugins can update the container rules with the container_init event.
+     *
+     * @return SearchModel
+     */
+    private function getSearchModel() {
+        if (!isset($this->searchModel)) {
+            $this->searchModel = $this->container->get(SearchModel::class);
+        }
+
+        return $this->searchModel;
     }
 
     public function quickSearch($title, $get = []) {
@@ -182,7 +202,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     }
 
     public function searchController_autoComplete_create($sender, $term, $limit = 5) {
-        $searchModel = $this->searchModel;
+        $searchModel = $this->getSearchModel();
 
         if (!$searchModel instanceof SphinxSearchModel) {
             throw new \Gdn_UserException("This functionality requires Sphinx Search.", 500);
@@ -206,7 +226,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     }
 
     public function searchController_groupAutoComplete_create($sender, $term, $limit = 5) {
-        $searchModel = $this->searchModel;
+        $searchModel = $this->getSearchModel();
 
         if (!$searchModel instanceof SphinxSearchModel) {
             throw new \Gdn_UserException("This functionality requires Sphinx Search.", 500);
@@ -242,7 +262,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $sender->setData('_Limit', $limit);
 
         // Do the search.
-        $searchModel = $this->searchModel;
+        $searchModel = $this->getSearchModel();
         $sender->setData('SearchResults', []);
         $searchTerms = Gdn_Format::text($search);
 

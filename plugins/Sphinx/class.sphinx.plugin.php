@@ -6,6 +6,7 @@
 
 use Garden\Container\Container;
 use Garden\Schema\Schema;
+use Interop\Container\ContainerInterface;
 
 /**
  * Sphinx Plugin
@@ -21,6 +22,9 @@ class SphinxPlugin extends Gdn_Plugin {
     /** @var CategoryModel */
     private $categoryModel;
 
+    /** @var ContainerInterface */
+    private $container;
+
     /** @var DiscussionModel */
     private $discussionModel;
 
@@ -33,8 +37,17 @@ class SphinxPlugin extends Gdn_Plugin {
     /** @var Gdn_Session */
     private $session;
 
-    public function __construct(CategoryModel $categoryModel, DiscussionModel $discussionModel, Gdn_Session $session) {
+    /**
+     * SphinxPlugin constructor.
+     *
+     * @param ContainerInterface $container
+     * @param CategoryModel $categoryModel
+     * @param DiscussionModel $discussionModel
+     * @param Gdn_Session $session
+     */
+    public function __construct(ContainerInterface $container, CategoryModel $categoryModel, DiscussionModel $discussionModel, Gdn_Session $session) {
         $this->categoryModel = $categoryModel;
+        $this->container = $container;
         $this->discussionModel = $discussionModel;
         $this->session = $session;
     }
@@ -57,21 +70,38 @@ class SphinxPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function setup() {
-        // Kludge that allows to use Sphinx on PHP7 the correct version without compiling the php extension yourself
-        // Source of the class https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php
-        // Make sure that it matches the sphinx version you are using.
-        if (!class_exists('SphinxClient') && c('Plugins.Sphinx.SphinxAPIDir')) {
-            $sphinxClientPath = rtrim(c('Plugins.Sphinx.SphinxAPIDir'), '/').'/sphinxapi.php';
-            if (!is_readable($sphinxClientPath)) {
-                throw new Exception(
-                    'Sphinx requires the sphinx client to be installed (See http://www.php.net/manual/en/book.sphinx.php). '
-                    .'Alternatively you can set "Plugins.Sphinx.SphinxAPIDir" to the location of sphinxapi.php before enabling the plugin (See https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php).'
-                );
-            }
-            require_once($sphinxClientPath);
+        if (!self::checkSphinxClient(c('Plugins.Sphinx.SphinxAPIDir', null))) {
+            throw new Exception(
+                'Sphinx requires the sphinx client to be installed (See http://www.php.net/manual/en/book.sphinx.php). '
+                .'Alternatively you can set "Plugins.Sphinx.SphinxAPIDir" to the location of sphinxapi.php before enabling the plugin (See https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php).'
+            );
         }
 
         $this->structure();
+    }
+
+    /**
+     * Check if a SphinxClient is available.  If not try to make it available using $apiDir.
+     *
+     * $apiPAth is a kludge that allows to use Sphinx on PHP7 the correct version without compiling the php extension yourself
+     * Source of the class https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php
+     * Make sure that it matches the sphinx version you are using.
+     *
+     * @param string $apiDir Directory that contains sphinxapi.php
+     *
+     * @return bool
+     */
+    public static function checkSphinxClient($apiDir = null) {
+        if (class_exists('SphinxClient')) {
+            return true;
+        }
+
+        $sphinxClientPath = rtrim($apiDir, '/').'/sphinxapi.php';
+        if (is_readable($sphinxClientPath)) {
+            require_once($sphinxClientPath);
+        }
+
+        return class_exists('SphinxClient');
     }
 
     /**
@@ -116,7 +146,7 @@ class SphinxPlugin extends Gdn_Plugin {
             "p{$query['page']}",
             $query['limit']
         );
-        $result = $this->searchModel()->modelSearch(
+        $result = $this->getSearchModel()->modelSearch(
             CommentModel::instance(),
             $query['query'],
             $params,
@@ -170,7 +200,7 @@ class SphinxPlugin extends Gdn_Plugin {
             $params['cat'] = $followedIDs;
         }
 
-        $result = $this->searchModel()->modelSearch(
+        $result = $this->getSearchModel()->modelSearch(
             $this->discussionModel,
             $query['query'],
             $params,
@@ -191,9 +221,9 @@ class SphinxPlugin extends Gdn_Plugin {
      *
      * @return SphinxSearchModel
      */
-    private function searchModel() {
+    private function getSearchModel() {
         if (!isset($this->searchModel)) {
-            $this->searchModel = new SphinxSearchModel();
+            $this->searchModel = $this->container->get(SearchModel::class);
         }
 
         return $this->searchModel;
