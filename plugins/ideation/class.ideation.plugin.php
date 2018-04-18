@@ -492,10 +492,17 @@ EOT
      * @throws Exception
      */
     public function postController_idea_create($sender, $args) {
+
+        //Get tag values from form and append default status
+        $tags = $sender->Form->getFormValue('Tags');
+        $defaultStatus = val('TagID', StatusModel::instance()->getDefaultStatus());
+        $tags.= ",$defaultStatus";
+
         $categoryCode = val(0, $args, '');
         $sender->setData('Type', 'Idea');
         $sender->Form->setFormValue('Type', 'Idea');
-        $sender->Form->setFormValue('Tags', val('TagID', StatusModel::instance()->getDefaultStatus()));
+        $sender->Form->setFormValue('Tags', $tags);
+        $sender->setData('Tags', $tags);
         $sender->View = 'discussion';
         $ideaTitle = t('Idea Title');
         Gdn::locale()->setTranslation('Discussion Title', $ideaTitle, false);
@@ -569,7 +576,7 @@ EOT
             'key' => 'Status',
             'name' => 'Status',
             'plural' => 'Statuses',
-            'addtag' => false
+            'addtag' => true
         ]);
     }
 
@@ -668,8 +675,10 @@ EOT
         return $ideaCounterModule;
     }
 
+
+
     /**
-     * Disables rendering of tags in a discussion and sets up the idea counter module for the discussion attachment.
+     * Sets up the idea counter module for the discussion attachment.
      *
      * @param DiscussionController $sender
      */
@@ -677,8 +686,7 @@ EOT
         $discussion = val('Discussion', $sender);
 
         $isAnIdea = $this->isIdea($discussion);
-        // Don't display tags on a idea discussion.
-        saveToConfig('Vanilla.Tagging.DisableInline', $isAnIdea, true);
+
         if (!$isAnIdea) {
             return;
         }
