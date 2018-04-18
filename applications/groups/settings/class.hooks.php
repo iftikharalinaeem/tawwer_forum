@@ -530,6 +530,8 @@ class GroupsHooks extends Gdn_Plugin {
                 $sender->setData('Breadcrumbs', []);
                 $sender->addBreadcrumb(t('Groups'), '/groups');
                 $sender->addBreadcrumb($group['Name'], groupUrl($group));
+
+                $sender->setData('Editor.BackLink', anchor(htmlspecialchars($group['Name']), groupUrl($group)));
             }
 
             Gdn_Theme::section('Group');
