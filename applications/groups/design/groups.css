@@ -556,23 +556,6 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   margin-right: 5px;
   vertical-align: middle; }
 
-.groupToolbar {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-align: center;
-  align-items: center;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  margin-top: -12px; }
-  .groupToolbar > .Button,
-  .groupToolbar .groupSearch {
-    margin-top: 12px; }
-
-.groupToolbar-newGroup {
-  margin-right: 12px; }
-  .groupToolbar-newGroup + .groupSearch {
-    margin-left: auto; }
-
 .groupSearch {
   display: -ms-flexbox;
   display: flex;
@@ -584,6 +567,8 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   width: 400px; }
   .groupSearch form {
     width: 100%; }
+  .groupSearch.SiteSearch .Button {
+    top: 5px; }
 
 .groupSearch-search {
   display: -ms-flexbox;
@@ -592,4 +577,8 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .groupSearch-text {
   -ms-flex-positive: 1;
   flex-grow: 1; }
+
+.groupToolbar {
+  margin-top: 12px;
+  margin-bottom: 12px; }
 /*# sourceMappingURL=groups.css.map */

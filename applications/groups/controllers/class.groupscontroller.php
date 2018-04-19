@@ -140,7 +140,8 @@ class GroupsController extends Gdn_Controller {
             $Pager->configure($Offset, $Limit, $TotalRecords, $pagerUrl);
         }
 
-        $this->title($SortRow['Title']);
+        $this->title(t('Group Search Results'));
+        $this->CssClass .= ' NoPanel';
         $this->addBreadcrumb($this->title(), "/groups/browse/$Sort");
 
         require_once $this->fetchViewLocation('group_functions', 'Group');

@@ -1,6 +1,3 @@
-
-// Listings
-
 .Groups {
   .PageControls {
     @include clearfix;
@@ -220,26 +217,6 @@
 
 // Group Search
 
-.groupToolbar {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-top: -12px;
-
-    > .Button,
-    .groupSearch {
-        margin-top: 12px;
-    }
-}
-
-.groupToolbar-newGroup {
-    margin-right: 12px;
-
-    + .groupSearch {
-        margin-left: auto;
-    }
-}
-
 .groupSearch {
     display: flex;
     flex-wrap: nowrap;
@@ -250,6 +227,12 @@
     form {
         width: 100%;
     }
+
+    &.SiteSearch {
+        .Button {
+            top: 5px;
+        }
+    }
 }
 
 .groupSearch-search {
@@ -258,4 +241,9 @@
 
 .groupSearch-text {
     flex-grow: 1;
+}
+
+.groupToolbar {
+    margin-top: 12px;
+    margin-bottom: 12px;
 }

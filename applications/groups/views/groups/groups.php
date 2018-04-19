@@ -1,14 +1,23 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<h1><?php echo $this->data('Title')?></h1>
+<div class="pageHeading">
+    <div class="pageHeading-main">
+        <h1 class="pageTitle pageHeading-title">
+            <?php echo $this->data('Title')?>
+        </h1>
+    </div>
+    <div class="pageHeading-actions">
+        <?php writeGroupSearch(); ?>
+    </div>
+</div>
 
-<div class="groupToolbar">
+
 <?php
 if (checkPermission('Groups.Group.Add')) {
+    echo '<div class="groupToolbar">';
     echo anchor(t('New Group'), '/group/add', 'Button Primary groupToolbar-newGroup');
+    echo '</div>';
 }
-writeGroupSearch();
-echo '</div>';
 
 $layout = c('Vanilla.Discussions.Layout', 'modern');
 $showMore = true;

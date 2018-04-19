@@ -1,9 +1,19 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
+<div class="pageHeading">
+    <div class="pageHeading-main">
+        <h1 class="pageTitle pageHeading-title">
+            <?php echo $this->data('Title')?>
+        </h1>
+    </div>
+    <div class="pageHeading-actions">
+        <?php writeGroupSearch(); ?>
+    </div>
+</div>
+
 <div class="PageControls Top">
 <?php
     echo PagerModule::write();
-    writeGroupSearch();
 ?>
 </div>
 
