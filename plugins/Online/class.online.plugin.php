@@ -1,5 +1,7 @@
 <?php
 
+use Garden\Schema\Schema;
+
 /**
  * Online Plugin
  *
@@ -1158,30 +1160,31 @@ class OnlinePlugin extends Gdn_Plugin {
     }
 
     /**
-     * Get a user’s Online privacy setting.
+     * Modify the output of a GET record request to the users endpoint.
      *
-     * @param int $id The user ID.
+     * @param array $result
+     * @param UsersApiController $sender
+     * @param Schema $in
+     * @param array $query
+     * @param array $row
      * @return array
-     * @throws \Garden\Schema\ValidationException if input or output fails schema validation.
-     * @throws \Garden\Web\Exception\HttpException
-     * @throws \Vanilla\Exception\PermissionException if the permission check fails.
      */
-    public function usersApiController_get_hidden(UsersApiController $sender, int $id) {
-        $sender->permission('Garden.Users.Edit');
-
-        $in = $sender->idParamSchema('in')->setDescription('Get a user’s Online privacy setting.');
-        $out = $sender->schema([
-            'hidden:b' => 'Whether not the user is hidden from Online status.'
-        ], 'out');
-
-        $this->userByID($id);
-
-        $result = [
-            'hidden' => $this->userModel->getAttribute($id, self::PRIVATE_MODE_ATTRIBUTE)
-        ];
-
-        $result = $out->validate($result);
+    public function usersApiController_getOutput(array $result, UsersApiController $sender, Schema $in, array $query, array $row) {
+        $attributes = $row['attributes'] ?? [];
+        $privateMode = $attributes['online/PrivateMode'] ?? false;
+        $result['hidden'] = (bool)$privateMode;
         return $result;
+    }
+
+    /**
+     * Add hidden flag to the user row schema.
+     *
+     * @param Schema $schema
+     */
+    public function userSchema_init(Schema $schema) {
+        $schema->merge(Schema::parse([
+            'hidden:b?' => 'Is this user hiding their online status?',
+        ]));
     }
 
     /**
