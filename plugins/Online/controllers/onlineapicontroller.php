@@ -36,36 +36,28 @@ class OnlineApiController extends Controller {
      *
      * @return array
      */
-    public function index(array $query): array {
+    public function index(): array {
         $this->permission('');
 
-        $in = $this->schema([
-            'filter:s' => [
-                'default' => 'all',
-                'description' => 'Filter',
-                'enum' => ['all', 'category', 'discussion']
-            ],
-            'filterID:i?' => 'Discussion or category ID to filter by. Required if filter is set to category or discussion.'
-        ], 'in')
-            ->setDescription('List all online users.')
-            ->addValidator('', function($value, \Garden\Schema\ValidationField $field) {
-                $filter = $value['filter'] ?? null;
-                $filterID = $value['filterID'] ?? null;
-                if (in_array($filter, ['category', 'discussion']) && $filterID === null) {
-                    $field->addError('missingField', [
-                        'messageCode' => 'You must specify a filterID',
-                        'required' => true
-                    ]);
-                }
-            });
-        $out = $this->schema([], 'out');
+        $in = $this->schema([], 'in')->setDescription('List all online users.');
+        $out = $this->schema([
+            ':a' => [
+                'userID:i' => 'ID of the user.',
+                'name:s' => 'Name of the user.',
+                'timestamp:dt' => '',
+                'photoUrl:s|n?' => 'URL to the user photo.'
+            ]
+        ], 'out');
 
-        $query = $in->validate($query);
-        $filterID = $query['filterID'] ?? null;
-
-        $rows = $this->onlinePlugin->onlineUsers($query['filter'], $filterID);
+        $rows = $this->onlinePlugin->onlineUsers();
         $rows = array_values($rows);
         $this->userModel->joinUsers($rows, ['UserID']);
+        array_walk($rows, function(&$value, $key) {
+            if (is_array($value) && array_key_exists('Photo', $value)) {
+                $value['PhotoUrl'] = $value['Photo'];
+                unset($value['Photo']);
+            }
+        });
 
         $result = $out->validate($rows);
         return $result;
