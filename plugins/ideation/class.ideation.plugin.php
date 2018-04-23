@@ -750,6 +750,7 @@ EOT
      *
      * @param DiscussionController $sender Sending controller instance.
      * @param string|int $discussionID Identifier of the discussion
+     * @throws exception
      */
     public function discussionController_ideationOptions_create($sender, $discussionID = '') {
         $sender->Form = new Gdn_Form();
@@ -778,6 +779,9 @@ EOT
                         'Type',
                         $type
                     );
+
+                    //removes reactions that aren't up and down votes
+                    $this->updateDiscussionReactions($discussionID);
 
                     // Setup the default idea status
                     $this->updateDiscussionStatusTag($discussionID, $statusID);
@@ -917,6 +921,63 @@ EOT
     protected function updateDiscussionStatusNotes($discussionID, $notes) {
         $discussionModel = new DiscussionModel();
         $discussionModel->saveToSerializedColumn('Attributes', $discussionID, 'StatusNotes', $notes);
+    }
+
+    /**
+     * Updates the discussions reaction count in its Attributes.  Updates discussion score. Deletes UserTags that are
+     * no longer in the discussion reaction count.
+     *
+     * @param $discussionID
+     * @throws Exception
+     */
+    protected function updateDiscussionReactions($discussionID) {
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID($discussionID);
+
+        if ($discussion->Type == 'Discussion') {
+            return;
+        }
+        //update score and reaction attributes on discussion
+        $votingReactions = [];
+        if (val('Attributes', $discussion) && $reactions = val('React', $discussion->Attributes)) {
+            $upReaction = val(self::REACTION_UP, $reactions);
+            $downReaction = val(self::REACTION_DOWN, $reactions);
+            $votingReactions[self::REACTION_UP] = ($upReaction) ? $upReaction : 0;
+            $votingReactions[self::REACTION_DOWN] = ($downReaction) ? $downReaction : 0;
+            $discussionModel->saveToSerializedColumn('Attributes', $discussionID, 'React', $votingReactions);
+            $score = $votingReactions[self::REACTION_UP] + $votingReactions[self::REACTION_DOWN];
+            $discussionModel->setField($discussionID, 'Score', $score);
+        }
+        //remove usertags associated to reactions that have been discards
+        $where = [
+            'RecordType' => ['Discussion', 'Discussion-Total'],
+            'RecordID' => $discussionID
+        ];
+
+        $votingTags[] = $this->getUpTagID();
+        $votingTags[] = $this->getDownTagID();
+
+        $results = Gdn::sql()->select()
+            ->from('UserTag')
+            ->where($where)
+            ->whereNotIn('TagID', $votingTags)
+            ->get();
+
+        $userTags = $results->resultArray();
+
+        if(!empty($userTags)) {
+            foreach ($userTags as $tags) {
+                Gdn::sql()->delete('UserTag',
+                    [
+                        'RecordType' => $tags['RecordType'],
+                        'RecordID' => $tags['RecordID'],
+                        'TagID' => $tags['TagID'],
+                        'UserID' => $tags['UserID']
+                    ]
+                );
+            }
+        }
+
     }
 
     /**
