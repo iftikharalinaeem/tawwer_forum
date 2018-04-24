@@ -15,4 +15,3 @@ ls -lah ./plugins
 
 composer self-update
 composer install --optimize-autoloader
-composer require phpunit/phpunit ~5
