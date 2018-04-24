@@ -1,27 +1,12 @@
 <?php
-
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-// Kludge that allows to use the correct version (the version must match the sphinx deamon version)
-// of https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php as SphinxClient.
-// Must do on php7 if you want to use a SphinxClient without compiling the php extension yourself.
-if (!class_exists('SphinxClient') && c('Plugins.Sphinx.SphinxAPIDir')) {
-    $sphinxClientPath = rtrim(c('Plugins.Sphinx.SphinxAPIDir'), '/').'/sphinxapi.php';
-    if (!is_readable($sphinxClientPath)) {
-        die("'$sphinxClientPath' is not readable!");
-    }
-    require_once($sphinxClientPath);
-}
-
 if (!defined('SPH_RANK_SPH04')) {
     define('SPH_RANK_SPH04', 7);
 }
-
-// Bit of a kludge, but we need these functions even if advanced search is disabled
-require_once PATH_PLUGINS . '/AdvancedSearch/class.search.php';
 
 /**
  * Sphinx Search Model
@@ -29,7 +14,7 @@ require_once PATH_PLUGINS . '/AdvancedSearch/class.search.php';
  * @author Todd Burry <todd@vanillaforums.com>
  * @package internal
  */
-class SearchModel extends Gdn_Model {
+class SphinxSearchModel extends \SearchModel {
 
     /// PROPERTIES ///
 
@@ -67,6 +52,9 @@ class SearchModel extends Gdn_Model {
      *
      */
     public function __construct() {
+        // Bit of a kludge, but we need these functions even if advanced search is disabled.
+        require_once PATH_PLUGINS . '/AdvancedSearch/class.search.php';
+
         $this->useDeltas = c('Plugins.Sphinx.UseDeltas');
 
         if (array_key_exists("Vanilla", Gdn::applicationManager()->enabledApplications())) {
@@ -526,9 +514,9 @@ class SearchModel extends Gdn_Model {
             trace($sphinx->getLastWarning(), TRACE_WARNING);
 
             if (isset($sphinx->error)) {
-                logMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Error: ' . $sphinx->error);
+                logMessage(__FILE__, __LINE__, 'SphinxPlugin::SphinxSearchModel', 'Search', 'Error: ' . $sphinx->error);
             } elseif (getValue('warning', $sphinx)) {
-                logMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Warning: ' . $sphinx->warning);
+                logMessage(__FILE__, __LINE__, 'SphinxPlugin::SphinxSearchModel', 'Search', 'Warning: ' . $sphinx->warning);
             } else {
                 trace($sphinx);
                 trace('Sphinx returned an error', TRACE_ERROR);
@@ -714,9 +702,9 @@ class SearchModel extends Gdn_Model {
           trace($Sphinx->getLastWarning(), TRACE_WARNING);
           $Warning = $Sphinx->getLastWarning();
           if (isset($Sphinx->error)) {
-          logMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Error: '.$Sphinx->error);
+          logMessage(__FILE__, __LINE__, 'SphinxPlugin::SphinxSearchModel', 'Search', 'Error: '.$Sphinx->error);
           } elseif (getValue('warning', $Sphinx)) {
-          logMessage(__FILE__, __LINE__, 'SphinxPlugin::SearchModel', 'Search', 'Warning: '.$Sphinx->warning);
+          logMessage(__FILE__, __LINE__, 'SphinxPlugin::SphinxSearchModel', 'Search', 'Warning: '.$Sphinx->warning);
           } else {
           trace($Sphinx);
           trace('Sphinx returned an error', TRACE_ERROR);

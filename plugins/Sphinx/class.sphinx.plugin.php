@@ -4,12 +4,9 @@
  * @license Proprietary
  */
 
+use Garden\Container\Container;
 use Garden\Schema\Schema;
-
-// Force require our sphinx so that an incomplete autoloader doesn't miss it.
-if (!class_exists('SearchModel', false)) {
-    require_once __DIR__ . '/class.searchmodel.php';
-}
+use Interop\Container\ContainerInterface;
 
 /**
  * Sphinx Plugin
@@ -25,10 +22,13 @@ class SphinxPlugin extends Gdn_Plugin {
     /** @var CategoryModel */
     private $categoryModel;
 
+    /** @var ContainerInterface */
+    private $container;
+
     /** @var DiscussionModel */
     private $discussionModel;
 
-    /** @var SearchModel */
+    /** @var SphinxSearchModel */
     private $searchModel;
 
     /** @var Schema */
@@ -37,20 +37,31 @@ class SphinxPlugin extends Gdn_Plugin {
     /** @var Gdn_Session */
     private $session;
 
-    public function __construct(CategoryModel $categoryModel, DiscussionModel $discussionModel, Gdn_Session $session) {
+    /**
+     * SphinxPlugin constructor.
+     *
+     * @param ContainerInterface $container
+     * @param CategoryModel $categoryModel
+     * @param DiscussionModel $discussionModel
+     * @param Gdn_Session $session
+     */
+    public function __construct(ContainerInterface $container, CategoryModel $categoryModel, DiscussionModel $discussionModel, Gdn_Session $session) {
         $this->categoryModel = $categoryModel;
+        $this->container = $container;
         $this->discussionModel = $discussionModel;
         $this->session = $session;
     }
 
     /**
-     * Fired when plugin is disabled
+     * Override the search model with the sphinx search model.
      *
-     * This code forces vanilla to re-index its files.
+     * @param Container $dic The container to initialize.
      */
-    public function onDisable() {
-        // Remove the current library map so re-indexing will occur
-        @unlink(PATH_CACHE . '/library_map.ini');
+    public function container_init(Container $dic) {
+        $dic->rule(\SearchModel::class)
+            ->setShared(true)
+            ->setClass(\SphinxSearchModel::class)
+        ;
     }
 
     /**
@@ -59,16 +70,38 @@ class SphinxPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function setup() {
-        if (!class_exists('SphinxClient')) {
+        if (!self::checkSphinxClient(c('Plugins.Sphinx.SphinxAPIDir', null))) {
             throw new Exception(
                 'Sphinx requires the sphinx client to be installed (See http://www.php.net/manual/en/book.sphinx.php). '
                 .'Alternatively you can set "Plugins.Sphinx.SphinxAPIDir" to the location of sphinxapi.php before enabling the plugin (See https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php).'
             );
         }
 
-        // Remove the current library map so that the core file won't be grabbed.
-        @unlink(PATH_CACHE . '/library_map.ini');
         $this->structure();
+    }
+
+    /**
+     * Check if a SphinxClient is available.  If not try to make it available using $apiDir.
+     *
+     * $apiPAth is a kludge that allows to use Sphinx on PHP7 the correct version without compiling the php extension yourself
+     * Source of the class https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php
+     * Make sure that it matches the sphinx version you are using.
+     *
+     * @param string $apiDir Directory that contains sphinxapi.php
+     *
+     * @return bool
+     */
+    public static function checkSphinxClient($apiDir = null) {
+        if (class_exists('SphinxClient')) {
+            return true;
+        }
+
+        $sphinxClientPath = rtrim($apiDir, '/').'/sphinxapi.php';
+        if (is_readable($sphinxClientPath)) {
+            require_once($sphinxClientPath);
+        }
+
+        return class_exists('SphinxClient');
     }
 
     /**
@@ -113,7 +146,7 @@ class SphinxPlugin extends Gdn_Plugin {
             "p{$query['page']}",
             $query['limit']
         );
-        $result = $this->searchModel()->modelSearch(
+        $result = $this->getSearchModel()->modelSearch(
             CommentModel::instance(),
             $query['query'],
             $params,
@@ -167,7 +200,7 @@ class SphinxPlugin extends Gdn_Plugin {
             $params['cat'] = $followedIDs;
         }
 
-        $result = $this->searchModel()->modelSearch(
+        $result = $this->getSearchModel()->modelSearch(
             $this->discussionModel,
             $query['query'],
             $params,
@@ -184,13 +217,13 @@ class SphinxPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Get the plugins copy of SearchModel.
+     * Get the plugins copy of SphinxSearchModel.
      *
-     * @return SearchModel
+     * @return SphinxSearchModel
      */
-    private function searchModel() {
+    private function getSearchModel() {
         if (!isset($this->searchModel)) {
-            $this->searchModel = new SearchModel();
+            $this->searchModel = $this->container->get(SearchModel::class);
         }
 
         return $this->searchModel;

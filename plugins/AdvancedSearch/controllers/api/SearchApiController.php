@@ -208,7 +208,7 @@ class SearchApiController extends AbstractApiController {
         // Paging
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        if (method_exists($this->searchModel, 'advancedSearch') && method_exists($this->searchModel, 'sphinxClient')) {
+        if ($this->searchModel instanceof SphinxSearchModel) {
             $data = $this->searchModel->advancedSearch($search, $offset, $limit, 'api')['SearchResults'] ?? [];
             if (!$data) {
                 $sphinx = $this->searchModel->sphinxClient();
