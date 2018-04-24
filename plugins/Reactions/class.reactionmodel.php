@@ -323,8 +323,10 @@ class ReactionModel extends Gdn_Model {
                 $data = $row['Data']['React'];
             }
         } elseif (array_key_exists('Attributes', $row)) {
-            $row['Attributes'] = dbdecode($row['Attributes']);
-            if (array_key_exists('React', $row['Attributes'])) {
+            if (is_string($row['Attributes'])) {
+                $row['Attributes'] = dbdecode($row['Attributes']);
+            }
+            if (isset($row['Attributes']['React'])) {
                 $data = $row['Attributes']['React'];
             }
         }
