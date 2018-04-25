@@ -930,17 +930,15 @@ EOT
     /**
      * Calculates discussion score base only vote reactions and overrides previous discussion score
      *
-     * @param $discussionID
+     * @param int $discussionID
      * @throws Exception
      */
     protected function updateDiscussionReactions($discussionID) {
         $discussionModel = new DiscussionModel();
         $discussion = $discussionModel->getID($discussionID);
-
         if ($discussion->Type == 'Discussion') {
             return;
         }
-
         if (val('Attributes', $discussion) && $reactions = val('React', $discussion->Attributes)) {
             $score = $this->getTotalVotes($discussion);
             $discussionModel->setField($discussionID, 'Score', $score);
@@ -1194,13 +1192,26 @@ EOT
      * @param $args
      */
     public function base_beforeReactionsScore_handler($sender, $args) {
+        $discussionModel = new DiscussionModel();
+
+        if(!isset($args['RecordID'])){
+            return;
+        }
+
         if (val('ReactionType', $args) && (val('Type', val('Record', $args)) == 'Idea')) {
             $reaction = val('ReactionType', $args);
             if ((val('UrlCode', $reaction) != self::REACTION_UP) && (val('UrlCode', $reaction) != self::REACTION_DOWN)) {
                 $args['Set'] = [];
-
+            } else {
+                $discussion = $discussionModel->getID($args['RecordID']);
+                //Override discussion score on a vote reaction
+                $reactionPoints =  isset($args['ReactionType']['Points'])? $args['ReactionType']['Points'] : 0;
+                $currentDiscussionVoteTotal = $this->getTotalVotes($discussion);
+                $newVoteTotal =  $currentDiscussionVoteTotal + $reactionPoints;
+                $args['Set'] = ['score' => $newVoteTotal ];
+                $discussionModel->setField($args['RecordID'],'Score', $newVoteTotal);
             }
-        }
+       }
     }
 
     /**
