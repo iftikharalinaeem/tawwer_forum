@@ -495,6 +495,8 @@ EOT
 
         //Get tag values from form and append default status
         $tags = $sender->Form->getFormValue('Tags');
+        $defaultStatus = val('TagID', StatusModel::instance()->getDefaultStatus());
+        $tags.= ",$defaultStatus";
 
         $categoryCode = val(0, $args, '');
         $sender->setData('Type', 'Idea');
@@ -682,6 +684,8 @@ EOT
      */
     public function discussionController_render_before($sender) {
         $discussion = val('Discussion', $sender);
+
+        saveToConfig('Vanilla.Tagging.DisableInline',false);
 
         $isAnIdea = $this->isIdea($discussion);
 
