@@ -495,8 +495,6 @@ EOT
 
         //Get tag values from form and append default status
         $tags = $sender->Form->getFormValue('Tags');
-        $defaultStatus = val('TagID', StatusModel::instance()->getDefaultStatus());
-        $tags.= ",$defaultStatus";
 
         $categoryCode = val(0, $args, '');
         $sender->setData('Type', 'Idea');
