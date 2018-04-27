@@ -490,6 +490,10 @@ class GroupsHooks extends Gdn_Plugin {
         $this->overridePermissions($sender);
     }
 
+    public function discussionController_bookmark_before($sender) {
+        $this->overridePermissions($sender);
+    }
+
     public function discussionController_index_before($sender) {
         $this->overridePermissions($sender);
     }
