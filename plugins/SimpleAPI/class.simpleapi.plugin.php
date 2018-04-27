@@ -590,11 +590,11 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     /**
      * Add the APIv1 menu item.
      *
-     * @param \DashboardNavModule $nav The menu to add the module to.
+     * @param DashboardNavModule $nav The menu to add the module to.
      */
-    public function dashboardNavModule_init_handler(\DashboardNavModule $nav) {
+    public function dashboardNavModule_init_handler(DashboardNavModule $nav) {
         $nav->addLinkToSectionIf(
-            \gdn::session()->checkPermission('Garden.Settings.Manage'),
+            Gdn::session()->checkPermission('Garden.Settings.Manage'),
             'settings',
             t('API'),
             '/settings/api',
