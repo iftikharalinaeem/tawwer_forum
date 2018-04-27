@@ -588,13 +588,21 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Adds "API" menu option to the Forum menu on the dashboard.
+     * Add the APIv1 menu item.
      *
-     * @param Gdn_Controller $sender
+     * @param DashboardNavModule $nav The menu to add the module to.
      */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        $menu = $sender->EventArguments['SideMenu'];
-        $menu->addLink('Site Settings', t('API v1', 'API <span class="nav-pill">v1</span>'), 'settings/api', 'Garden.Settings.Manage', ['class' => 'nav-api']);
+    public function dashboardNavModule_init_handler(DashboardNavModule $nav) {
+        $nav->addLinkToSectionIf(
+            Gdn::session()->checkPermission('Garden.Settings.Manage'),
+            'settings',
+            t('API'),
+            '/settings/api',
+            'site-settings.apiv1',
+            'nav-api',
+            ['after' => 'security'],
+            ['badge' => 'v1']
+        );
     }
 
     /**
