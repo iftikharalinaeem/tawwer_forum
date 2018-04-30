@@ -1610,7 +1610,7 @@ EOT
      * @throws Exception
      */
     public function notifyVoters($discussionID, $discussionName, $newStatus, $statusNotes = '') {
-        if (sizeof($discussionName) > 200) {
+        if (strlen($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
 
