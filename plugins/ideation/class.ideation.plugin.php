@@ -1574,7 +1574,7 @@ EOT
      * @throws Exception
      */
     public function notifyIdeaAuthor($authorID, $discussionID, $discussionName, $newStatus, $statusNotes = '') {
-        if (sizeof($discussionName) > 200) {
+        if (strlen($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
         $headline = sprintf(t('The status has changed for %s.'),
