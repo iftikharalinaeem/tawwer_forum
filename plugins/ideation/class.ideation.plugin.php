@@ -1055,13 +1055,13 @@ EOT
      */
     public function tagModule_getData_handler($sender, $args) {
 
-        $discussion = $this->discussionModel->getID($args['id']);
+        $discussion = $this->discussionModel->getID($args['ParentID']);
         if (val('Type', $discussion) != 'Idea'){
             return;
         }
 
         $tagModel = new TagModel();
-        $tags = $tagModel->getDiscussionTags($args['id'], false);
+        $tags = $tagModel->getDiscussionTags($args['ParentID'], false);
         $tagIDs = array_column($tags, 'TagID');
 
         $filteredTags =  Gdn::sql()->select('*')
@@ -1071,7 +1071,7 @@ EOT
             ->get()
             ->resultArray();
 
-        $args['_TagData'] = new Gdn_DataSet($filteredTags, DATASET_TYPE_ARRAY);
+        $args['tagData'] = $filteredTags;
     }
 
     /**
