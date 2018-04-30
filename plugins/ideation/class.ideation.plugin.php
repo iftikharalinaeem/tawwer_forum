@@ -1055,12 +1055,19 @@ EOT
      */
     public function tagModule_getData_handler($sender, $args) {
 
-        $tags = array_column($args['tags'], 'TagID');
+        $discussion = $this->discussionModel->getID($args['id']);
+        if (val('Type', $discussion) != 'Idea'){
+            return;
+        }
+
+        $tagModel = new TagModel();
+        $tags = $tagModel->getDiscussionTags($args['id'], false);
+        $tagIDs = array_column($tags, 'TagID');
 
         $filteredTags =  Gdn::sql()->select('*')
             ->from('Tag')
             ->where('Type <>', 'Status')
-            ->whereIn('TagID', $tags)
+            ->whereIn('TagID', $tagIDs)
             ->get()
             ->resultArray();
 
