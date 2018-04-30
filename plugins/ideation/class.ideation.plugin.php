@@ -494,19 +494,28 @@ EOT
     public function postController_idea_create($sender, $args) {
 
         //Get tag values from form and append default status
-        $tags = $sender->Form->getFormValue('Tags');
-        $defaultStatus = val('TagID', StatusModel::instance()->getDefaultStatus());
-        $tags.= ",$defaultStatus";
+        if ($sender->Form->isPostBack()) {
+            $defaultStatus = val('TagID', StatusModel::instance()->getDefaultStatus());
+            $userTags = $sender->Form->getFormValue('Tags');
+
+            if($defaultStatus) {
+                $tags = $defaultStatus ;
+            }
+            if($userTags) {
+                $tags .= ",$userTags";
+            }
+            $sender->setData('Type', 'Idea');
+            $sender->Form->setFormValue('Type', 'Idea');
+            $sender->Form->setFormValue('Tags', $tags);
+            $sender->setData('Tags', $tags);
+        }
 
         $categoryCode = val(0, $args, '');
-        $sender->setData('Type', 'Idea');
-        $sender->Form->setFormValue('Type', 'Idea');
-        $sender->Form->setFormValue('Tags', $tags);
-        $sender->setData('Tags', $tags);
         $sender->View = 'discussion';
         $ideaTitle = t('Idea Title');
         Gdn::locale()->setTranslation('Discussion Title', $ideaTitle, false);
         $sender->discussion($categoryCode);
+
     }
 
     /**
@@ -576,7 +585,7 @@ EOT
             'key' => 'Status',
             'name' => 'Status',
             'plural' => 'Statuses',
-            'addtag' => true
+            'addtag' => false
         ]);
     }
 
@@ -675,8 +684,6 @@ EOT
         return $ideaCounterModule;
     }
 
-
-
     /**
      * Sets up the idea counter module for the discussion attachment.
      *
@@ -685,10 +692,9 @@ EOT
     public function discussionController_render_before($sender) {
         $discussion = val('Discussion', $sender);
 
-        saveToConfig('Vanilla.Tagging.DisableInline',false);
-
         $isAnIdea = $this->isIdea($discussion);
-
+        //Enable tags to be displayed on ideas
+        saveToConfig('Vanilla.Tagging.DisableInline',false);
         if (!$isAnIdea) {
             return;
         }
@@ -1038,6 +1044,27 @@ EOT
             }
         }
         $attachmentModel->save($attachment);
+    }
+
+
+    /**
+     * Filters out the status tags so that they will not be displayed
+     *
+     * @param DiscussionController $sender
+     * @param array $args
+     */
+    public function tagModule_getData_handler($sender, $args) {
+
+        $tags = array_column($args['tags'], 'TagID');
+
+        $filteredTags =  Gdn::sql()->select('*')
+            ->from('Tag')
+            ->where('Type <>', 'Status')
+            ->whereIn('TagID', $tags)
+            ->get()
+            ->resultArray();
+
+        $args['_TagData'] = new Gdn_DataSet($filteredTags, DATASET_TYPE_ARRAY);
     }
 
     /**
