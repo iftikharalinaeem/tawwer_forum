@@ -50,6 +50,8 @@ class SphinxPlugin extends Gdn_Plugin {
         $this->container = $container;
         $this->discussionModel = $discussionModel;
         $this->session = $session;
+
+        self::checkSphinxClient(c('Plugins.Sphinx.SphinxAPIDir', null));
     }
 
     /**
