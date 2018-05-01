@@ -492,16 +492,15 @@ EOT
      * @throws Exception
      */
     public function postController_idea_create($sender, $args) {
-
-        //Get tag values from form and append default status
-        if ($sender->Form->isPostBack()) {
+        //Get tag values from form and append default status.
+        if ($sender->Form->authenticatedPostBack()) {
             $defaultStatus = val('TagID', StatusModel::instance()->getDefaultStatus());
             $userTags = $sender->Form->getFormValue('Tags');
 
-            if($defaultStatus) {
+            if ($defaultStatus) {
                 $tags = $defaultStatus ;
             }
-            if($userTags) {
+            if ($userTags) {
                 $tags .= ",$userTags";
             }
             $sender->setData('Type', 'Idea');
@@ -1048,7 +1047,7 @@ EOT
 
 
     /**
-     * Filters out the status tags so that they will not be displayed
+     * Filters out the status tags so that they will not be displayed.
      *
      * @param DiscussionController $sender
      * @param array $args
