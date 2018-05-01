@@ -928,7 +928,7 @@ EOT
     }
 
     /**
-     * Calculates discussion score base only vote reactions and overrides previous discussion score
+     * Calculates discussion score base only vote reactions and overrides previous discussion score.
      *
      * @param int $discussionID
      * @throws Exception
@@ -936,11 +936,14 @@ EOT
     protected function updateDiscussionReactions($discussionID) {
         $discussionModel = new DiscussionModel();
         $discussion = $discussionModel->getID($discussionID);
-        if ($discussion->Type == 'Discussion') {
+        if ($discussion->Type != 'Idea') {
             return;
         }
-        if (val('Attributes', $discussion) && $reactions = val('React', $discussion->Attributes)) {
-            $score = $this->getTotalVotes($discussion);
+        //if voting reactions exist, overwrite the score
+        if (valr('Attributes.React', $discussion) ) {
+            $countUp = getValueR('Attributes.React.'.self::REACTION_UP, $discussion, 0);
+            $countDown = getValueR('Attributes.React.'.self::REACTION_DOWN, $discussion, 0);
+            $score = $countUp - $countDown;
             $discussionModel->setField($discussionID, 'Score', $score);
         }
 
@@ -1194,7 +1197,7 @@ EOT
     public function base_beforeReactionsScore_handler($sender, $args) {
         $discussionModel = new DiscussionModel();
 
-        if(!isset($args['RecordID'])){
+        if (!isset($args['RecordID'])) {
             return;
         }
 
@@ -1203,13 +1206,9 @@ EOT
             if ((val('UrlCode', $reaction) != self::REACTION_UP) && (val('UrlCode', $reaction) != self::REACTION_DOWN)) {
                 $args['Set'] = [];
             } else {
-                $discussion = $discussionModel->getID($args['RecordID']);
-                //Override discussion score on a vote reaction
-                $reactionPoints =  isset($args['ReactionType']['Points'])? $args['ReactionType']['Points'] : 0;
-                $currentDiscussionVoteTotal = $this->getTotalVotes($discussion);
-                $newVoteTotal =  $currentDiscussionVoteTotal + $reactionPoints;
-                $args['Set'] = ['score' => $newVoteTotal ];
-                $discussionModel->setField($args['RecordID'],'Score', $newVoteTotal);
+                $newVoteTotal = $args['react']['Up'] - $args['react']['Down'];
+                $args['Set'] = ['score' => $newVoteTotal];
+                $discussionModel->setField($args['RecordID'], 'Score', $newVoteTotal);
             }
        }
     }
