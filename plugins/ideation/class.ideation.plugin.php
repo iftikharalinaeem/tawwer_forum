@@ -1243,30 +1243,42 @@ EOT
             throw new ClientException('Discussion is not an idea.');
         }
 
-        // Verify the status is valid.
-        if (array_key_exists('statusID', $body)) {
-            $statusID = $body['statusID'];
-            $status = $this->statusModel->getStatus($statusID);
-            if (!is_array($status) || !array_key_exists('StatusID', $status)) {
-                throw new ClientException('Invalid status ID.');
-            }
-            $this->updateDiscussionStatusTag($id, $statusID);
-        }
-
-        if (array_key_exists('statusNotes', $body)) {
-            $this->updateDiscussionStatusNotes($id, $body['statusNotes']);
-        }
-
+        // Grab the current idea state.
         $currentStatus = $this->statusModel->getStatusByDiscussion($id);
         if (empty($currentStatus)) {
             throw new ServerException('An error was encountered while getting the status of the idea.', 500);
         }
-        $currentDiscussion = $sender->discussionByID($id);
-        $currentStatusNotes = $this->getStatusNotes($currentDiscussion) ?: null;
+        $currentStatusNotes = $this->getStatusNotes($discussion) ?: null;
+
+        // Coalesce values for convenience.
+        $statusID = $body['statusID'] ?? null;
+        $statusNotes = $body['statusNotes'] ?? null;
+
+        if ($statusID) {
+            // Verify the new status.
+            $status = $this->statusModel->getStatus($statusID);
+            if (!is_array($status) || !array_key_exists('StatusID', $status)) {
+                throw new ClientException('Invalid status ID.');
+            }
+            // Updating the status can potentially trigger notices to the user.
+            $this->updateDiscussionStatus($discussion, $statusID, $statusNotes ?: $currentStatusNotes ?: '');
+        } elseif ($statusNotes) {
+            // Only update the notes. No user notifications.
+            $this->updateDiscussionStatusNotes($id, $statusNotes);
+            $this->updateAttachment($id, $currentStatus['StatusID'], $statusNotes);
+        }
+
+        // Grab the updated values.
+        $updatedStatus = $this->statusModel->getStatusByDiscussion($id);
+        if (empty($updatedStatus)) {
+            throw new ServerException('An error was encountered while getting the status of the idea.', 500);
+        }
+        $updatedDiscussion = $sender->discussionByID($id);
+        $updatedStatusNotes = $this->getStatusNotes($updatedDiscussion) ?: null;
 
         $row = [
-            'statusID' => $currentStatus['StatusID'],
-            'statusNotes' => $currentStatusNotes
+            'statusID' => $updatedStatus['StatusID'],
+            'statusNotes' => $updatedStatusNotes
         ];
         $result = $out->validate($row);
         return $result;
@@ -1562,7 +1574,7 @@ EOT
      * @throws Exception
      */
     public function notifyIdeaAuthor($authorID, $discussionID, $discussionName, $newStatus, $statusNotes = '') {
-        if (sizeof($discussionName) > 200) {
+        if (strlen($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
         $headline = sprintf(t('The status has changed for %s.'),
@@ -1598,7 +1610,7 @@ EOT
      * @throws Exception
      */
     public function notifyVoters($discussionID, $discussionName, $newStatus, $statusNotes = '') {
-        if (sizeof($discussionName) > 200) {
+        if (strlen($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
 
