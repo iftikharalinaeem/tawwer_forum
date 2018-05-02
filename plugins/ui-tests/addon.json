@@ -1,0 +1,27 @@
+{
+    "name": "UI Tests",
+    "description": "UI Tests for React components with hard coded states",
+    "version": "0.1",
+    "mobileFriendly": true,
+    "hasLocale": true,
+    "icon": "ui-tests.png",
+    "key": "ui-tests",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Stéphane LaFlèche",
+            "email": "stephane.l@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.5",
+        "rich-editor": ">=0.1"
+    },
+    "build": {
+        "process": "core",
+        "entries": {
+            "app": "./src/scripts/ui-tests"
+        }
+    }
+}
