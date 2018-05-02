@@ -1053,24 +1053,37 @@ EOT
      * @param array $args
      */
     public function tagModule_getData_handler($sender, $args) {
-
         $discussion = $this->discussionModel->getID($args['ParentID']);
         if (val('Type', $discussion) != 'Idea'){
             return;
         }
 
+        //Get the tags associated to the discussion
         $tagModel = new TagModel();
         $tags = $tagModel->getDiscussionTags($args['ParentID'], false);
-        $tagIDs = array_column($tags, 'TagID');
 
-        $filteredTags =  Gdn::sql()->select('*')
-            ->from('Tag')
-            ->where('Type <>', 'Status')
-            ->whereIn('TagID', $tagIDs)
-            ->get()
-            ->resultArray();
+        //Get the ID's for status tags
+        $cacheKey = 'statusTagIDs';
+        $statusTagIDs = Gdn::cache()->get($cacheKey);
+        if ($statusTagIDs === Gdn_Cache::CACHEOP_FAILURE) {
+            $statusTagIDs = Gdn::sql()->select('TagID')
+                ->from('Tag')
+                ->where('Type', 'Status')
+                ->get()
+                ->resultArray();
 
-        $args['tagData'] = $filteredTags;
+            $statusTagIDs = array_column($statusTagIDs, 'TagID');
+            Gdn::cache()->store($cacheKey, $statusTagIDs);
+        }
+
+        //Filter out the status tags
+        foreach ($tags as $key => $tag) {
+            if (in_array($tag['TagID'], $statusTagIDs)) {
+                unset($tags[$key]);
+            }
+        }
+
+        $args['tagData'] = $tags;
     }
 
     /**
