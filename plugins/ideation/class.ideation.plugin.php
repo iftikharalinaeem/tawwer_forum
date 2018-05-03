@@ -750,7 +750,7 @@ EOT
      *
      * @param DiscussionController $sender Sending controller instance.
      * @param string|int $discussionID Identifier of the discussion
-     * @throws exception
+     * @throws Exception if discussion isn't found.
      */
     public function discussionController_ideationOptions_create($sender, $discussionID = '') {
         $sender->Form = new Gdn_Form();
@@ -781,7 +781,7 @@ EOT
                     );
 
                     //override score on the discussion
-                    $this->updateDiscussionReactions($discussionID);
+                    $this->recalculateIdeaScore($discussion);
 
                     // Setup the default idea status
                     $this->updateDiscussionStatusTag($discussionID, $statusID);
@@ -928,23 +928,18 @@ EOT
     }
 
     /**
-     * Calculates discussion score base only vote reactions and overrides previous discussion score.
-     *
-     * @param int $discussionID
-     * @throws Exception
+     * Calculates discussion score base only vote reactions and overrides previous discussion score
+     * @param object|array $discussion
      */
-    protected function updateDiscussionReactions($discussionID) {
+    private function recalculateIdeaScore($discussion) {
         $discussionModel = new DiscussionModel();
-        $discussion = $discussionModel->getID($discussionID);
-        if ($discussion->Type != 'Idea') {
-            return;
-        }
+
         //if voting reactions exist, overwrite the score
         if (valr('Attributes.React', $discussion) ) {
-            $countUp = getValueR('Attributes.React.'.self::REACTION_UP, $discussion, 0);
-            $countDown = getValueR('Attributes.React.'.self::REACTION_DOWN, $discussion, 0);
+            $countUp = valr('Attributes.React.'.self::REACTION_UP, $discussion, 0);
+            $countDown = valr('Attributes.React.'.self::REACTION_DOWN, $discussion, 0);
             $score = $countUp - $countDown;
-            $discussionModel->setField($discussionID, 'Score', $score);
+            $discussionModel->setField($discussion->DiscussionID, 'Score', $score);
         }
 
     }
@@ -1192,22 +1187,22 @@ EOT
      * Only the up and down reactions should contribute to the score.
      *
      * @param Gdn_Controller $sender
-     * @param $args
+     * @param array $args
      */
     public function base_beforeReactionsScore_handler($sender, $args) {
-        $discussionModel = new DiscussionModel();
-
-        if (!isset($args['RecordID'])) {
-            return;
-        }
-
         if (val('ReactionType', $args) && (val('Type', val('Record', $args)) == 'Idea')) {
+            if (!isset($args['RecordID'])) {
+                return;
+            }
             $reaction = val('ReactionType', $args);
             if ((val('UrlCode', $reaction) != self::REACTION_UP) && (val('UrlCode', $reaction) != self::REACTION_DOWN)) {
                 $args['Set'] = [];
             } else {
-                $newVoteTotal = $args['react']['Up'] - $args['react']['Down'];
+                $upVote = (isset($args['reactionTotals'][self::REACTION_UP])) ? $args['reactionTotals'][self::REACTION_UP] : 0;
+                $downVote = (isset($args['reactionTotals'][self::REACTION_DOWN])) ? $args['reactionTotals'][self::REACTION_DOWN] : 0;
+                $newVoteTotal = $upVote - $downVote;
                 $args['Set'] = ['score' => $newVoteTotal];
+                $discussionModel = new DiscussionModel();
                 $discussionModel->setField($args['RecordID'], 'Score', $newVoteTotal);
             }
        }
