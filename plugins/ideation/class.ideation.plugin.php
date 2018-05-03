@@ -496,25 +496,24 @@ EOT
         if ($sender->Form->authenticatedPostBack()) {
             $defaultStatus = val('TagID', StatusModel::instance()->getDefaultStatus());
             $userTags = $sender->Form->getFormValue('Tags');
-
+            $tags = null;
             if ($defaultStatus) {
-                $tags = $defaultStatus ;
+                $tags = $defaultStatus;
             }
             if ($userTags) {
                 $tags .= ",$userTags";
             }
-            $sender->setData('Type', 'Idea');
-            $sender->Form->setFormValue('Type', 'Idea');
             $sender->Form->setFormValue('Tags', $tags);
             $sender->setData('Tags', $tags);
         }
 
+        $sender->setData('Type', 'Idea');
+        $sender->Form->setFormValue('Type', 'Idea');
         $categoryCode = val(0, $args, '');
         $sender->View = 'discussion';
         $ideaTitle = t('Idea Title');
         Gdn::locale()->setTranslation('Discussion Title', $ideaTitle, false);
         $sender->discussion($categoryCode);
-
     }
 
     /**
@@ -692,8 +691,6 @@ EOT
         $discussion = val('Discussion', $sender);
 
         $isAnIdea = $this->isIdea($discussion);
-        //Enable tags to be displayed on ideas
-        saveToConfig('Vanilla.Tagging.DisableInline',false);
         if (!$isAnIdea) {
             return;
         }
@@ -1053,8 +1050,8 @@ EOT
      * @param array $args
      */
     public function tagModule_getData_handler($sender, $args) {
-        $discussion = $this->discussionModel->getID($args['ParentID']);
-        if (val('Type', $discussion) != 'Idea'){
+        $row = $this->discussionModel->getID($args['ParentID']);
+        if (val('Type', $row) != 'Idea') {
             return;
         }
 
@@ -1066,16 +1063,11 @@ EOT
         $cacheKey = 'statusTagIDs';
         $statusTagIDs = Gdn::cache()->get($cacheKey);
         if ($statusTagIDs === Gdn_Cache::CACHEOP_FAILURE) {
-            $statusTagIDs = Gdn::sql()->select('TagID')
-                ->from('Tag')
-                ->where('Type', 'Status')
-                ->get()
-                ->resultArray();
-
-            $statusTagIDs = array_column($statusTagIDs, 'TagID');
+            $statusModel = new StatusModel();
+            $statusTags = $statusModel->getStatuses();
+            $statusTagIDs = array_column($statusTags, 'TagID');
             Gdn::cache()->store($cacheKey, $statusTagIDs);
         }
-
         //Filter out the status tags
         foreach ($tags as $key => $tag) {
             if (in_array($tag['TagID'], $statusTagIDs)) {
