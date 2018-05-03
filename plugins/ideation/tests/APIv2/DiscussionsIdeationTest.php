@@ -6,7 +6,9 @@
 
 namespace VanillaTests\APIv2;
 
+use AttachmentModel;
 use CategoryModel;
+use StatusModel;
 
 /**
  * Test managing ideas with the /api/v2/discussions endpoint.
@@ -158,6 +160,11 @@ class DiscussionsIdeationTest extends AbstractAPIv2Test {
      * Test PATCH /discussions/<id>/idea with a full overwrite.
      */
     public function testPatchIdeaFull() {
+        /** @var AttachmentModel $attachmentModel */
+        $attachmentModel = self::container()->get(AttachmentModel::class);
+        /** @var StatusModel $statusModel */
+        $statusModel = self::container()->get(StatusModel::class);
+
         $row = $this->testGetIdea();
         $discussionID = $row['discussionID'];
         $idea = $row['attributes']['idea'];
@@ -173,6 +180,14 @@ class DiscussionsIdeationTest extends AbstractAPIv2Test {
         $body = $response->getBody();
         $this->assertRowsEqual($new, $body);
 
+        $attachment = $attachmentModel->getWhere([
+            'Type' => 'status',
+            'ForeignID' => "d-{$discussionID}"
+        ])->firstRow(\DATASET_TYPE_ARRAY);
+        $newStatus = $statusModel->getID($new['statusID'], \DATASET_TYPE_ARRAY);
+        $this->assertEquals($newStatus['Name'], $attachment['StatusName']);
+        $this->assertEquals($new['statusNotes'], $attachment['StatusNotes']);
+
         return $body;
     }
 
@@ -183,6 +198,9 @@ class DiscussionsIdeationTest extends AbstractAPIv2Test {
      * @dataProvider providePatchFields
      */
     public function testPatchSparse($field) {
+        /** @var AttachmentModel $attachmentModel */
+        $attachmentModel = self::container()->get(AttachmentModel::class);
+
         $row = $this->testGetIdea();
         $discussionID = $row['discussionID'];
         $idea = $row['attributes']['idea'];
@@ -197,5 +215,20 @@ class DiscussionsIdeationTest extends AbstractAPIv2Test {
 
         $newRow = $this->api()->get("discussions/{$discussionID}");
         $this->assertSame($new[$field], $newRow['attributes']['idea'][$field]);
+
+        $attachment = $attachmentModel->getWhere([
+            'Type' => 'status',
+            'ForeignID' => "d-{$discussionID}"
+        ])->firstRow(\DATASET_TYPE_ARRAY);
+        switch ($field) {
+            case 'statusID':
+                /** @var StatusModel $statusModel */
+                $statusModel = self::container()->get(StatusModel::class);
+                $newStatus = $statusModel->getID($new['statusID'], \DATASET_TYPE_ARRAY);
+                $this->assertEquals($newStatus['Name'], $attachment['StatusName']);
+                break;
+            case 'statusNotes':
+                $this->assertEquals($new['statusNotes'], $attachment['StatusNotes']);
+        }
     }
 }
