@@ -5,7 +5,7 @@
  * @license GPLv2
  */
 
-class UITestsStylesController extends VanillaController {
+class UITestsController extends VanillaController {
 
     public function initialize() {
         $this->Application = 'ui-tests';
@@ -16,14 +16,15 @@ class UITestsStylesController extends VanillaController {
             $this->addCssFile('ui-tests.css');
         }
 
-
         // Call Gdn_Controller's initialize() as well.
         parent::initialize();
     }
 
-
-
     public function index() {
-        $this->render();
+        $this->render('index');
+    }
+
+    public function authentication() {
+        $this->render('authentication');
     }
 }
