@@ -1,3 +1,3 @@
 <a href="<?php echo url('/uitests') ?>">
-    < Back
+    < UI Tests
 </a>
