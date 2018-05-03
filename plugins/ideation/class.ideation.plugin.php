@@ -780,7 +780,7 @@ EOT
                         $type
                     );
 
-                    //override score on the discussion
+                    //Override score on the discussion.
                     $this->recalculateIdeaScore($discussion);
 
                     // Setup the default idea status
@@ -929,6 +929,7 @@ EOT
 
     /**
      * Calculates discussion score base only vote reactions and overrides previous discussion score
+     *
      * @param object|array $discussion
      */
     private function recalculateIdeaScore($discussion) {
@@ -941,7 +942,6 @@ EOT
             $score = $countUp - $countDown;
             $discussionModel->setField($discussion->DiscussionID, 'Score', $score);
         }
-
     }
 
     /**
