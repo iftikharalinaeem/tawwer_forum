@@ -21,10 +21,12 @@ class UITestsController extends VanillaController {
     }
 
     public function index() {
+        $this->CssClass .= ' NoPanel';
         $this->render('index');
     }
 
     public function authentication() {
+        $this->CssClass .= ' NoPanel';
         $this->render('authentication');
     }
 }

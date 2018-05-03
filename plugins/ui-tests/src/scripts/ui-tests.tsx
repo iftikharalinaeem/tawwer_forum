@@ -1,10 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import SSOMethods from "@dashboard/Authenticate/Components/SSOMethods";
+import PasswordForm from "@dashboard/Authenticate/Components/PasswordForm";
+import RecoverPasswordPage from "@dashboard/Authenticate/RecoverPasswordPage";
 
 // SSO Methods
-window.console.log(SSOMethods);
-
 const ssoMethodsData1 = [
     {
         authenticatorID: "facebook",
@@ -137,5 +137,13 @@ const ssoMethodsData1 = [
         },
     },
 ];
+ReactDOM.render(<SSOMethods ssoMethods={ssoMethodsData1} />, document.getElementById("uitest-ssomethods"));
 
-ReactDOM.render(<SSOMethods ssoMethods={ssoMethodsData1} />, document.getElementById("uitest-signinpage"));
+// Password Form
+ReactDOM.render(<PasswordPage ssoMethods={PasswordForm} />, document.getElementById("uitest-password"));
+
+// Recover Password
+ReactDOM.render(
+    <RecoverPasswordPage ssoMethods={ssoMethodsData1} />,
+    document.getElementById("uitest-recoverpassword"),
+);

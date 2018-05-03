@@ -5,14 +5,14 @@
     Authentication
 </h1>
 
-<h3>Sign In Page (/authenticate/signin)</h3>
+<h3>SSO Methods (/authenticate/signin)</h3>
 <div class="authenticateUserCol">
-    <div id="uitest-signinpage"></div>
+    <div id="uitest-ssomethods"></div>
 </div>
 
-<h3>Password Only Sign In (/authenticate/password)</h3>
+<h3>Simple Password Form (/authenticate/password)</h3>
 <div class="authenticateUserCol">
-    <div id="uitest-signinpage"></div>
+    <div id="uitest-password"></div>
 </div>
 
 <h3>Recover Password (/authenticate/recoverpassword)</h3>
