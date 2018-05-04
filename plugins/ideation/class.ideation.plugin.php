@@ -496,12 +496,12 @@ EOT
         if ($sender->Form->authenticatedPostBack()) {
             $defaultStatus = val('TagID', StatusModel::instance()->getDefaultStatus());
             $userTags = $sender->Form->getFormValue('Tags');
-            $tags = null;
+            $tags = "";
             if ($defaultStatus) {
-                $tags = $defaultStatus;
+                $tags = "$defaultStatus,";
             }
             if ($userTags) {
-                $tags .= ",$userTags";
+                $tags .= $userTags;
             }
             $sender->Form->setFormValue('Tags', $tags);
             $sender->setData('Tags', $tags);
@@ -1046,10 +1046,14 @@ EOT
     /**
      * Filters out the status tags so that they will not be displayed.
      *
-     * @param DiscussionController $sender
+     * @param TagModule $sender
      * @param array $args
      */
     public function tagModule_getData_handler($sender, $args) {
+        if ($args['ParentType'] != 'Discussion') {
+            return;
+        }
+
         $row = $this->discussionModel->getID($args['ParentID']);
         if (val('Type', $row) != 'Idea') {
             return;
@@ -1060,15 +1064,11 @@ EOT
         $tags = $tagModel->getDiscussionTags($args['ParentID'], false);
 
         //Get the ID's for status tags
-        $cacheKey = 'statusTagIDs';
-        $statusTagIDs = Gdn::cache()->get($cacheKey);
-        if ($statusTagIDs === Gdn_Cache::CACHEOP_FAILURE) {
-            $statusModel = new StatusModel();
-            $statusTags = $statusModel->getStatuses();
-            $statusTagIDs = array_column($statusTags, 'TagID');
-            Gdn::cache()->store($cacheKey, $statusTagIDs);
-        }
-        //Filter out the status tags
+        $statusModel = new StatusModel();
+        $statusTags = $statusModel->getStatuses();
+        $statusTagIDs = array_column($statusTags, 'TagID');
+
+        // Filter out the status tags
         foreach ($tags as $key => $tag) {
             if (in_array($tag['TagID'], $statusTagIDs)) {
                 unset($tags[$key]);
