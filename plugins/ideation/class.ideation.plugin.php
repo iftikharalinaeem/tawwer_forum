@@ -1191,15 +1191,15 @@ EOT
      */
     public function base_beforeReactionsScore_handler($sender, $args) {
         if (val('ReactionType', $args) && (val('Type', val('Record', $args)) == 'Idea')) {
-            if (!isset($args['RecordID'])) {
-                return;
-            }
             $reaction = val('ReactionType', $args);
             if ((val('UrlCode', $reaction) != self::REACTION_UP) && (val('UrlCode', $reaction) != self::REACTION_DOWN)) {
                 $args['Set'] = [];
             } else {
-                $upVote = (isset($args['reactionTotals'][self::REACTION_UP])) ? $args['reactionTotals'][self::REACTION_UP] : 0;
-                $downVote = (isset($args['reactionTotals'][self::REACTION_DOWN])) ? $args['reactionTotals'][self::REACTION_DOWN] : 0;
+                if (!isset($args['RecordID'])) {
+                    return;
+                }
+                $upVote = valr($args, $args['reactionTotals'][self::REACTION_UP], 0);
+                $downVote = valr($args, $args['reactionTotals'][self::REACTION_DOWN], 0);
                 $newVoteTotal = $upVote - $downVote;
                 $args['Set'] = ['score' => $newVoteTotal];
                 $discussionModel = new DiscussionModel();
