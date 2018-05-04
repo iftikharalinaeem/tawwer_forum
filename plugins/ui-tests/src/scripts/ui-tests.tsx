@@ -144,7 +144,7 @@ const ssoMethodsData1 = [
 ReactDOM.render(<SSOMethods ssoMethods={ssoMethodsData1} />, document.getElementById("uitest-ssomethods"));
 
 // Plausible Errors
-const passwordFormPasswordErrors = {
+const passwordFormPlausibleErrors = {
     globalError: "Global error message.",
     passwordErrors: [
         {
@@ -164,13 +164,13 @@ const passwordFormPasswordErrors = {
 
 ReactDOM.render(
     <HashRouter basename={basePath}>
-        <PasswordForm {...passwordFormPasswordErrors} />
+        <PasswordForm {...passwordFormPlausibleErrors} />
     </HashRouter>,
     document.getElementById("uitest-password-fields"),
 );
 
 // Extreme Example for styling
-const passwordFormPasswordErrors = {
+const passwordFormExtremeTest = {
     globalError:
         "Global error message - This is a long message, with some reallllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllly long words",
     passwordErrors: [
@@ -225,7 +225,7 @@ const passwordFormPasswordErrors = {
 
 ReactDOM.render(
     <HashRouter basename={basePath}>
-        <PasswordForm {...passwordFormPasswordErrors} />
+        <PasswordForm {...passwordFormExtremeTest} />
     </HashRouter>,
     document.getElementById("uitest-password-fields-unreasonable"),
 );
@@ -234,13 +234,7 @@ ReactDOM.render(
 
 const recoverPasswordErrors = {
     globalError: "Global error message",
-    errors: [
-        {
-            field: "email",
-            code: "missingField",
-            message: "Testing Multiple Errors",
-        },
-    ],
+    errors: ["Testing Multiple Errors"],
 };
 
 ReactDOM.render(
