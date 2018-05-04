@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import SSOMethods from "@dashboard/Authenticate/Components/SSOMethods";
 import PasswordForm from "@dashboard/Authenticate/Components/PasswordForm";
+import RecoverPasswordPage from "@dashboard/Authenticate/RecoverPasswordPage";
 import { getMeta } from "@core/application";
 import { HashRouter } from "react-router-dom";
 
@@ -168,7 +169,7 @@ ReactDOM.render(
     document.getElementById("uitest-password-fields"),
 );
 
-// uitest-password-fields-unreasonable
+// Extreme Example for styling
 const passwordFormPasswordErrors = {
     globalError:
         "Global error message - This is a long message, with some reallllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllly long words",
@@ -227,4 +228,24 @@ ReactDOM.render(
         <PasswordForm {...passwordFormPasswordErrors} />
     </HashRouter>,
     document.getElementById("uitest-password-fields-unreasonable"),
+);
+
+// Recover Password Tests
+
+const recoverPasswordErrors = {
+    globalError: "Global error message",
+    errors: [
+        {
+            field: "email",
+            code: "missingField",
+            message: "Testing Multiple Errors",
+        },
+    ],
+};
+
+ReactDOM.render(
+    <HashRouter basename={basePath}>
+        <RecoverPasswordPage {...recoverPasswordErrors} />
+    </HashRouter>,
+    document.getElementById("uitest-recoverpassword"),
 );
