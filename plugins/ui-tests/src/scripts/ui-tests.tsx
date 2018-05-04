@@ -2,7 +2,10 @@ import React from "react";
 import ReactDOM from "react-dom";
 import SSOMethods from "@dashboard/Authenticate/Components/SSOMethods";
 import PasswordForm from "@dashboard/Authenticate/Components/PasswordForm";
-import RecoverPasswordPage from "@dashboard/Authenticate/RecoverPasswordPage";
+import { getMeta } from "@core/application";
+import { HashRouter } from "react-router-dom";
+
+const basePath = getMeta("context.basePath", "");
 
 // SSO Methods
 const ssoMethodsData1 = [
@@ -139,11 +142,89 @@ const ssoMethodsData1 = [
 ];
 ReactDOM.render(<SSOMethods ssoMethods={ssoMethodsData1} />, document.getElementById("uitest-ssomethods"));
 
-// Password Form
-ReactDOM.render(<PasswordPage ssoMethods={PasswordForm} />, document.getElementById("uitest-password"));
+// Plausible Errors
+const passwordFormPasswordErrors = {
+    globalError: "Global error message.",
+    passwordErrors: [
+        {
+            field: "password",
+            code: "missingField",
+            message: "password is required.",
+        },
+    ],
+    usernameErrors: [
+        {
+            field: "username",
+            code: "missingField",
+            message: "username is required.",
+        },
+    ],
+};
 
-// Recover Password
 ReactDOM.render(
-    <RecoverPasswordPage ssoMethods={ssoMethodsData1} />,
-    document.getElementById("uitest-recoverpassword"),
+    <HashRouter basename={basePath}>
+        <PasswordForm {...passwordFormPasswordErrors} />
+    </HashRouter>,
+    document.getElementById("uitest-password-fields"),
+);
+
+// uitest-password-fields-unreasonable
+const passwordFormPasswordErrors = {
+    globalError:
+        "Global error message - This is a long message, with some reallllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllly long words",
+    passwordErrors: [
+        {
+            field: "password",
+            code: "missingField",
+            message: "password is required.",
+        },
+        {
+            field: "password",
+            code: "missingField",
+            message:
+                "ReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpaces",
+        },
+        {
+            field: "password",
+            code: "missingField",
+            message: "Testing Multiple Errors 1",
+        },
+        {
+            field: "password",
+            code: "missingField",
+            message:
+                "Testing Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2Testing Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2",
+        },
+    ],
+    usernameErrors: [
+        {
+            field: "username",
+            code: "missingField",
+            message: "username is required.",
+        },
+        {
+            field: "username",
+            code: "missingField",
+            message:
+                "ReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpaces",
+        },
+        {
+            field: "username",
+            code: "missingField",
+            message: "Testing Multiple Errors 1",
+        },
+        {
+            field: "username",
+            code: "missingField",
+            message:
+                "Testing Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2Testing Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2",
+        },
+    ],
+};
+
+ReactDOM.render(
+    <HashRouter basename={basePath}>
+        <PasswordForm {...passwordFormPasswordErrors} />
+    </HashRouter>,
+    document.getElementById("uitest-password-fields-unreasonable"),
 );
