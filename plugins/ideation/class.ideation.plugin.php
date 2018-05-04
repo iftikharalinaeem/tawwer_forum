@@ -935,7 +935,7 @@ EOT
     private function recalculateIdeaScore($discussion) {
         $discussionModel = new DiscussionModel();
 
-        //if voting reactions exist, overwrite the score
+        // if voting reactions exist, overwrite the score
         if (valr('Attributes.React', $discussion) ) {
             $countUp = valr('Attributes.React.'.self::REACTION_UP, $discussion, 0);
             $countDown = valr('Attributes.React.'.self::REACTION_DOWN, $discussion, 0);
@@ -1198,8 +1198,8 @@ EOT
                 if (!isset($args['RecordID'])) {
                     return;
                 }
-                $upVote = valr($args, $args['reactionTotals'][self::REACTION_UP], 0);
-                $downVote = valr($args, $args['reactionTotals'][self::REACTION_DOWN], 0);
+                $upVote = valr(self::REACTION_UP, $args['reactionTotals'], 0);
+                $downVote = valr(self::REACTION_DOWN, $args['reactionTotals'],  0);
                 $newVoteTotal = $upVote - $downVote;
                 $args['Set'] = ['score' => $newVoteTotal];
                 $discussionModel = new DiscussionModel();
