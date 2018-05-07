@@ -811,6 +811,7 @@ class ReactionModel extends Gdn_Model {
         }
 
         $eventArguments = [
+            'reactionTotals' => $react,
             'ReactionTypes' => &$reactionTypes,
             'Record' => $record,
             'Set' => &$set
