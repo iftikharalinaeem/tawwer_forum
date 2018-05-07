@@ -780,7 +780,7 @@ EOT
                         $type
                     );
 
-                    //Override score on the discussion.
+                    // Override score on the discussion.
                     $this->recalculateIdeaScore($discussion);
 
                     // Setup the default idea status
@@ -794,7 +794,7 @@ EOT
                     );
                     break;
                 default:
-                    //recalculate the discussion score when an idea is converted back to a reaction
+                    // Recalculate the discussion score when an idea is converted back to a reaction.
                     $reactionModel = new ReactionModel();
                     $reactionModel->recalculateTotals();
 
