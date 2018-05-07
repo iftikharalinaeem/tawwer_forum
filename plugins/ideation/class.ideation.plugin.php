@@ -928,14 +928,14 @@ EOT
     }
 
     /**
-     * Calculates discussion score base only vote reactions and overrides previous discussion score
+     * Calculates discussion score base only vote reactions and overrides previous discussion score.
      *
      * @param object|array $discussion
      */
     private function recalculateIdeaScore($discussion) {
         $discussionModel = new DiscussionModel();
 
-        // if voting reactions exist, overwrite the score
+        // If voting reactions exist, overwrite the score.
         if (valr('Attributes.React', $discussion) ) {
             $countUp = valr('Attributes.React.'.self::REACTION_UP, $discussion, 0);
             $countDown = valr('Attributes.React.'.self::REACTION_DOWN, $discussion, 0);
