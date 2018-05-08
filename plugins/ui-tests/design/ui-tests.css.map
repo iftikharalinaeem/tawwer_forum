@@ -1,0 +1,1 @@
+{"version":3,"sources":["ui-tests.scss"],"names":[],"mappings":"AAAA,uBAEQ,qBAAsB,AACtB,kBAAoB,CACvB,AAJL,wBASQ,iBAAkB,CACrB","file":"ui-tests.css","sourcesContent":[".UITests {\n    .site-content {\n        width: 100% !important;\n        margin: 0 !important;\n    }\n\n    h2,\n    h3\n    {\n        text-align: center;\n    }\n}\n\n"]}
