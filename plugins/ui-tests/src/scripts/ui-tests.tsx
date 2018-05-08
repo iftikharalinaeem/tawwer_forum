@@ -3,8 +3,8 @@ import ReactDOM from "react-dom";
 import SSOMethods from "@dashboard/Authenticate/Components/SSOMethods";
 import PasswordForm from "@dashboard/Authenticate/Components/PasswordForm";
 import RecoverPasswordPage from "@dashboard/Authenticate/RecoverPasswordPage";
-import { getMeta } from "@core/application";
-import { HashRouter } from "react-router-dom";
+import { getMeta, addRoutes, formatUrl } from "@core/application";
+import { Route, Link } from "react-router-dom";
 
 const basePath = getMeta("context.basePath", "");
 
@@ -141,7 +141,6 @@ const ssoMethodsData1 = [
         },
     },
 ];
-ReactDOM.render(<SSOMethods ssoMethods={ssoMethodsData1} />, document.getElementById("uitest-ssomethods"));
 
 // Plausible Errors
 const passwordFormPlausibleErrors = {
@@ -161,13 +160,6 @@ const passwordFormPlausibleErrors = {
         },
     ],
 };
-
-ReactDOM.render(
-    <HashRouter basename={basePath}>
-        <PasswordForm {...passwordFormPlausibleErrors} />
-    </HashRouter>,
-    document.getElementById("uitest-password-fields"),
-);
 
 // Extreme Example for styling
 const passwordFormExtremeTest = {
@@ -223,23 +215,63 @@ const passwordFormExtremeTest = {
     ],
 };
 
-ReactDOM.render(
-    <HashRouter basename={basePath}>
-        <PasswordForm {...passwordFormExtremeTest} />
-    </HashRouter>,
-    document.getElementById("uitest-password-fields-unreasonable"),
-);
-
 // Recover Password Tests
-
 const recoverPasswordErrors = {
     globalError: "Global error message",
     errors: ["Testing Multiple Errors"],
 };
 
-ReactDOM.render(
-    <HashRouter basename={basePath}>
-        <RecoverPasswordPage {...recoverPasswordErrors} />
-    </HashRouter>,
-    document.getElementById("uitest-recoverpassword"),
-);
+function UITestAuthenticationPage() {
+    return (
+        <div>
+            <h2>
+                <a href={formatUrl("/uitests")}>{"> Back"}</a>
+            </h2>
+            <h1>Authentication</h1>
+
+            <p>
+                <strong>Attention:</strong> This page is intended to test various potential states for React components
+                without needing to create endpoints for them. It's also a good spot check when doing CSS changes that
+                affect many components. These components may or may not fully work on <em>this</em> page. The check is
+                on the hard coded, initial state of the component. Testing the actual component should be on the real
+                page.
+            </p>
+
+            <h2>
+                SSO Methods{" "}
+                <a href={formatUrl("/authenticate/signin")} target="_blank">
+                    /authenticate/signin
+                </a>
+            </h2>
+            <div className="authenticateUserCol">
+                <SSOMethods ssoMethods={ssoMethodsData1} />
+            </div>
+
+            <h2>
+                Simple Password Form{" "}
+                <a href={formatUrl("/authenticate/password")} target="_blank">
+                    /authenticate/password
+                </a>
+            </h2>
+            <div className="authenticateUserCol">
+                <h4>Plausible Example</h4>
+                <PasswordForm {...passwordFormPlausibleErrors} />
+
+                <hr />
+
+                <h4>Extreme example (for testing CSS)</h4>
+                <PasswordForm {...passwordFormExtremeTest} />
+            </div>
+
+            <h2>
+                Recover Password{" "}
+                <a href={formatUrl("/authenticate/recoverpassword")} target="_blank">
+                    /authenticate/recoverpassword
+                </a>
+            </h2>
+            <RecoverPasswordPage {...recoverPasswordErrors} />
+        </div>
+    );
+}
+
+addRoutes([<Route exact path="/uitests/authentication" component={UITestAuthenticationPage} />]);
