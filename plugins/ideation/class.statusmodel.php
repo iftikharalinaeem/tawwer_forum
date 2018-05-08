@@ -6,6 +6,8 @@
 
 class StatusModel extends Gdn_Model {
 
+    const STATUS_TAG_ID_CACHE_KEY = 'statusTagsIDs';
+
     /**
      * @var array An array representation of all the statuses in the database.
      */
@@ -122,9 +124,13 @@ class StatusModel extends Gdn_Model {
     protected function statuses($statusID = 0) {
         if ($this->statuses === null) {
             // Fetch statuses
-            $statusModel = new StatusModel();
-            $statuses = $statusModel->getWhere()->resultArray();
-            $this->statuses = Gdn_DataSet::index($statuses, ['StatusID']);
+            $this->statuses = Gdn::cache()->get(self::STATUS_TAG_ID_CACHE_KEY);
+            if ($this->statuses === Gdn_Cache::CACHEOP_FAILURE) {
+                $statusModel = new StatusModel();
+                $statuses = $statusModel->getWhere()->resultArray();
+                $this->statuses = Gdn_DataSet::index($statuses, ['StatusID']);
+                Gdn::cache()->store(self::STATUS_TAG_ID_CACHE_KEY,  $this->statuses);
+            }
         }
 
         if ($statusID) {
