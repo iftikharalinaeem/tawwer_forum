@@ -12,7 +12,6 @@ class UITestsController extends VanillaController {
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
             $this->Head = new HeadModule($this);
-            $this->addJsFile('app/ui-tests-app.min.js');
             $this->addCssFile('ui-tests.css');
         }
 
