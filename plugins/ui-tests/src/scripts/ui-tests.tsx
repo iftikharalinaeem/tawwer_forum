@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import SSOMethods from "@dashboard/Authenticate/Components/SSOMethods";
-import PasswordForm from "@dashboard/Authenticate/Components/PasswordForm";
-import RecoverPasswordPage from "@dashboard/Authenticate/RecoverPasswordPage";
-import { getMeta } from "@core/application";
+import SSOMethods from "@dashboard/app/authenticate/components/SSOMethods";
+import PasswordForm from "@dashboard/app/authenticate/components/PasswordForm";
+import RecoverPasswordPage from "@dashboard/app/authenticate/RecoverPasswordPage";
+import { getMeta } from "@dashboard/application";
 import { HashRouter } from "react-router-dom";
 
 const basePath = getMeta("context.basePath", "");
