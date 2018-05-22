@@ -50,7 +50,7 @@
         <main class="page-content" role="main">
           {breadcrumbs}
           {if InSection(array("CategoryList", "CategoryDiscussionList", "DiscussionList"))}
-            <div class="well search-form" role="search">{searchbox}</div>
+            <div class="well search-form js-sphinxAutoComplete" role="search">{searchbox}</div>
           {/if}
           {asset name="Content"}
         </main>

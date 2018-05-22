@@ -59,7 +59,7 @@
             {activity_link}
             {custom_menu}
           </ul>
-          <div class="navbar-form navbar-right" role="search">
+          <div class="navbar-form navbar-right js-sphinxAutoComplete" role="search">
             {searchbox}
           </div>
         </div>
