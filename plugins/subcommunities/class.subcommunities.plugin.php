@@ -252,7 +252,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function categoriesController_render_before($sender) {
         $categoryID = val('CategoryID', $sender->data('Category'));
-        $subcommunity = self::getSubcommunityFromCategoryID($categoryID);
+        $subcommunity = self::getCanonicalSubcommunity($categoryID);
         $sender->canonicalUrl(self::getCanonicalUrl(Gdn::request()->path(), $subcommunity));
 
         if (!SubcommunityModel::getCurrent()) {
@@ -274,7 +274,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function discussionController_render_before($sender, $args) {
         $categoryID = val('CategoryID', $sender->data('Category'));
-        $subcommunity = self::getSubcommunityFromCategoryID($categoryID);
+        $subcommunity = self::getCanonicalSubcommunity($categoryID);
         $sender->canonicalUrl(self::getCanonicalUrl(Gdn::request()->path(), $subcommunity));
     }
 
@@ -628,12 +628,12 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Get a category's subcommunity.
+     * Attempt to get a category's subcommunity.
      *
-     * @param $categoryID
-     * @return array|null The found subcommunity or the default subcommunity is any.
+     * @param int|string $categoryID The categoryID to lookup.
+     * @return array|null The found subcommunity or null if not found.
      */
-    public static function getSubcommunityFromCategoryID($categoryID) {
+    private static function getTargetSubcommunity($categoryID) {
         $targetSubcommunity = null;
 
         // Use our own category collection to circumvent a possible recursive call stack because of CategoryModel->calculate()
@@ -666,11 +666,41 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             }
         }
 
-        // getCurrent() initializes to the default site if there is no "current" page.
-        return $targetSubcommunity ?: SubcommunityModel::getCurrent();
+        return $targetSubcommunity;
     }
 
+    /**
+     * Get the a non-canonical subcommunity for a category. This will be based off the current subcommunity.
+     *
+     * @param int|string $categoryID The categoryID to lookup.
+     * @return array The non-canonical subcommunity for a category.
+     */
+    public static function getNonCanonicalSubcommunity($categoryID) {
+        return self::getTargetSubcommunity($categoryID) ?: SubcommunityModel::getCurrent();
+    }
 
+    /**
+     * Get the a canonical subcommunity for a category.
+     *
+     * @param int|string $categoryID The categoryID to lookup.
+     * @return array The canonical subcommunity for a category.
+     */
+    public static function getCanonicalSubcommunity($categoryID) {
+        return self::getTargetSubcommunity($categoryID) ?: SubcommunityModel::getDefaultSite();
+    }
+
+    /**
+     * Get a category's subcommunity.
+     *
+     * @param int|string $categoryID The categoryID to lookup.
+     * @return array The found subcommunity or the default subcommunity (will be canonical).
+     *
+     * @deprecated since 2.6, reason: poorly named.
+     */
+    public static function getSubcommunityFromCategoryID($categoryID) {
+        deprecated(__METHOD__.'()', self::class.'::getCanonicalSubcommunity()');
+        return self::getCanonicalSubcommunity($categoryID);
+    }
 
     /**
      *
@@ -703,7 +733,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             // Skip webroot / return as is
             $url = $path;
         } else {
-            $subcommunity = self::getSubcommunityFromCategoryID($categoryID);
+            $subcommunity = self::getNonCanonicalSubcommunity($categoryID);
             $cannonicalURL = self::getCanonicalUrl($path, $subcommunity);
 
             // The url is supposed to be relative.
