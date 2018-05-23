@@ -666,7 +666,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             }
         }
 
-        return $targetSubcommunity ?: SubcommunityModel::getDefaultSite();
+        // getCurrent() initializes to the default site if there is no "current" page.
+        return $targetSubcommunity ?: SubcommunityModel::getCurrent();
     }
 
 
