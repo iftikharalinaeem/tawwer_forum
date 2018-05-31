@@ -51,7 +51,7 @@ module.exports = function (grunt) {
       },
       dist: {
         files: {
-          'design/groups.css': 'scss/custom.scss'
+          'design/groups.css': 'scss/ui-tests.scss'
        }
       }
     },

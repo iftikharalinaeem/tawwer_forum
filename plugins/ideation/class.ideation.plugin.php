@@ -491,10 +491,24 @@ EOT
      * @throws Exception
      */
     public function postController_idea_create($sender, $args) {
-        $categoryCode = val(0, $args, '');
+        //Get tag values from form and append default status.
+        if ($sender->Form->authenticatedPostBack()) {
+            $defaultStatus = val('TagID', StatusModel::instance()->getDefaultStatus());
+            $userTags = $sender->Form->getFormValue('Tags');
+            $tags = "";
+            if ($defaultStatus) {
+                $tags = "$defaultStatus,";
+            }
+            if ($userTags) {
+                $tags .= $userTags;
+            }
+            $sender->Form->setFormValue('Tags', $tags);
+            $sender->setData('Tags', $tags);
+        }
+
         $sender->setData('Type', 'Idea');
         $sender->Form->setFormValue('Type', 'Idea');
-        $sender->Form->setFormValue('Tags', val('TagID', StatusModel::instance()->getDefaultStatus()));
+        $categoryCode = val(0, $args, '');
         $sender->View = 'discussion';
         $ideaTitle = t('Idea Title');
         Gdn::locale()->setTranslation('Discussion Title', $ideaTitle, false);
@@ -668,7 +682,7 @@ EOT
     }
 
     /**
-     * Disables rendering of tags in a discussion and sets up the idea counter module for the discussion attachment.
+     * Sets up the idea counter module for the discussion attachment.
      *
      * @param DiscussionController $sender
      */
@@ -676,8 +690,6 @@ EOT
         $discussion = val('Discussion', $sender);
 
         $isAnIdea = $this->isIdea($discussion);
-        // Don't display tags on a idea discussion.
-        saveToConfig('Vanilla.Tagging.DisableInline', $isAnIdea, true);
         if (!$isAnIdea) {
             return;
         }
@@ -749,6 +761,7 @@ EOT
      *
      * @param DiscussionController $sender Sending controller instance.
      * @param string|int $discussionID Identifier of the discussion
+     * @throws Exception if discussion isn't found.
      */
     public function discussionController_ideationOptions_create($sender, $discussionID = '') {
         $sender->Form = new Gdn_Form();
@@ -778,6 +791,9 @@ EOT
                         $type
                     );
 
+                    // Override score on the discussion.
+                    $this->recalculateIdeaScore($discussion);
+
                     // Setup the default idea status
                     $this->updateDiscussionStatusTag($discussionID, $statusID);
 
@@ -789,6 +805,10 @@ EOT
                     );
                     break;
                 default:
+                    // Recalculate the discussion score when an idea is converted back to a reaction.
+                    $reactionModel = new ReactionModel();
+                    $reactionModel->recalculateTotals();
+
                     // Prune away any ideation status attachments, since this isn't an idea.
                     AttachmentModel::instance()->delete([
                         'ForeignID' => "d-{$discussionID}",
@@ -919,6 +939,23 @@ EOT
     }
 
     /**
+     * Calculates discussion score base only vote reactions and overrides previous discussion score.
+     *
+     * @param object|array $discussion
+     */
+    private function recalculateIdeaScore($discussion) {
+        $discussionModel = new DiscussionModel();
+
+        // If voting reactions exist, overwrite the score.
+        if (valr('Attributes.React', $discussion) ) {
+            $countUp = valr('Attributes.React.'.self::REACTION_UP, $discussion, 0);
+            $countDown = valr('Attributes.React.'.self::REACTION_DOWN, $discussion, 0);
+            $score = $countUp - $countDown;
+            $discussionModel->setField($discussion->DiscussionID, 'Score', $score);
+        }
+    }
+
+    /**
      * ATTACHMENTS
      * -----------
      * Attachments appear in the discussion view. They include the status, status description and status notes.
@@ -1027,6 +1064,42 @@ EOT
             }
         }
         $attachmentModel->save($attachment);
+    }
+
+
+    /**
+     * Filters out the status tags so that they will not be displayed.
+     *
+     * @param TagModule $sender
+     * @param array $args
+     */
+    public function tagModule_getData_handler($sender, $args) {
+        if ($args['ParentType'] != 'Discussion') {
+            return;
+        }
+
+        $row = $this->discussionModel->getID($args['ParentID']);
+        if (val('Type', $row) != 'Idea') {
+            return;
+        }
+
+        //Get the tags associated to the discussion
+        $tagModel = new TagModel();
+        $tags = $tagModel->getDiscussionTags($args['ParentID'], false);
+
+        //Get the ID's for status tags
+        $statusModel = new StatusModel();
+        $statusTags = $statusModel->getStatuses();
+        $statusTagIDs = array_column($statusTags, 'TagID');
+
+        // Filter out the status tags
+        foreach ($tags as $key => $tag) {
+            if (in_array($tag['TagID'], $statusTagIDs)) {
+                unset($tags[$key]);
+            }
+        }
+
+        $args['tagData'] = $tags;
     }
 
     /**
@@ -1161,16 +1234,25 @@ EOT
      * Only the up and down reactions should contribute to the score.
      *
      * @param Gdn_Controller $sender
-     * @param $args
+     * @param array $args
      */
     public function base_beforeReactionsScore_handler($sender, $args) {
         if (val('ReactionType', $args) && (val('Type', val('Record', $args)) == 'Idea')) {
             $reaction = val('ReactionType', $args);
             if ((val('UrlCode', $reaction) != self::REACTION_UP) && (val('UrlCode', $reaction) != self::REACTION_DOWN)) {
                 $args['Set'] = [];
-
+            } else {
+                if (!isset($args['RecordID'])) {
+                    return;
+                }
+                $upVote = valr(self::REACTION_UP, $args['reactionTotals'], 0);
+                $downVote = valr(self::REACTION_DOWN, $args['reactionTotals'],  0);
+                $newVoteTotal = $upVote - $downVote;
+                $args['Set'] = ['score' => $newVoteTotal];
+                $discussionModel = new DiscussionModel();
+                $discussionModel->setField($args['RecordID'], 'Score', $newVoteTotal);
             }
-        }
+       }
     }
 
     /**
