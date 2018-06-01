@@ -1105,7 +1105,7 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
     min-width: 70px; }
 
 .PhotoGrid .PhotoWrap {
-  display: block; }
+  display: inline-block; }
 
 .container .discussion-sort-filter-module {
   height: 36px; }
