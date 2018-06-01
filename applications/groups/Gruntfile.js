@@ -23,14 +23,14 @@ module.exports = function (grunt) {
       }
     , js: {
         files: ['js/src/**/*.js']
-      , tasks: ['jshint', 'concat']
+      , tasks: ['concat']
       }
     , gruntfile: {
         files: ['Gruntfile.js']
       }
     , sass: {
         files: ['scss/**/*.scss']
-      , tasks: ['scsslint', 'sass', 'autoprefixer', 'csslint']
+      , tasks: ['sass', 'autoprefixer']
       }
     , livereload: {
         options: {
@@ -56,14 +56,6 @@ module.exports = function (grunt) {
       }
     },
 
-    scsslint: {
-      options: {
-        config: 'scss/.scss-lint.yml'
-        , force: true
-      }
-    , all: ['scss/**/*.scss']
-    },
-
     autoprefixer: {
       dist: {
         src: ['design/**/*.css']
@@ -71,20 +63,6 @@ module.exports = function (grunt) {
       , options: {
         map: true
       }
-    },
-
-    jshint: {
-      options: {
-        jshintrc: 'js/.jshintrc'
-      }
-    , all: ['js/src/**/*.js']
-    },
-
-    csslint: {
-      options: {
-        csslintrc: 'design/.csslintrc'
-      }
-    , all: ['design/custom.css']
     },
 
     concat: {
@@ -116,13 +94,10 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('default', [
-    'wiredep'
-  , 'scsslint'
-  , 'sass'
-  , 'autoprefixer'
-  , 'concat'
-  , 'jshint'
-  , 'csslint'
-  , 'imagemin'
+    'wiredep',
+    'sass',
+    'concat',
+    'imagemin',
+    'autoprefixer'
   ]);
 };
