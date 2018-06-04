@@ -40,6 +40,11 @@ class IdeationPlugin extends Gdn_Plugin {
     const CATEGORY_IDEATION_COLUMN_NAME = 'IdeationType';
 
     /**
+     * Ideation cache key.
+     */
+    const IDEATION_CACHE_KEY = 'ideaCategoryIDs';
+
+    /**
      * @var int The tag ID of the upvote reaction.
      */
     protected static $upTagID;
@@ -1835,13 +1840,19 @@ EOT
      * Returns an array of Idea-type category IDs.
      */
     public function getIdeaCategoryIDs() {
-        $ideaCategoryIDs = [];
-        $categories = CategoryModel::categories();
-        foreach($categories as $category) {
-            if ($this->isIdeaCategory($category)) {
-                $ideaCategoryIDs[] = val('CategoryID', $category);
+
+        $ideaCategoryIDs = Gdn::cache()->get(self::IDEATION_CACHE_KEY);
+        if ($ideaCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
+            $ideaCategoryIDs = [];
+            $categories = CategoryModel::categories();
+            foreach ($categories as $category) {
+                if ($this->isIdeaCategory($category)) {
+                    $ideaCategoryIDs[] = val('CategoryID', $category);
+                }
             }
+            Gdn::cache()->store(self::IDEATION_CACHE_KEY, $ideaCategoryIDs, [Gdn_Cache::FEATURE_EXPIRY => 300]);
         }
+
         return $ideaCategoryIDs;
     }
 
@@ -1930,6 +1941,10 @@ EOT
                 ])
             ]));
         }
+    }
+
+    public function categoryModel_beforeSaveCategory_handler() {
+        Gdn::cache()->remove(self::IDEATION_CACHE_KEY);
     }
 }
 
