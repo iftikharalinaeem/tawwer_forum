@@ -1840,7 +1840,6 @@ EOT
      * Returns an array of Idea-type category IDs.
      */
     public function getIdeaCategoryIDs() {
-
         $ideaCategoryIDs = Gdn::cache()->get(self::IDEATION_CACHE_KEY);
         if ($ideaCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
             $ideaCategoryIDs = [];
@@ -1943,6 +1942,10 @@ EOT
         }
     }
 
+    /**
+     * Flushing the ideation cache on this hook to prevent people creating a new ideation category
+     * not being able to see/post in it right away. See getIdeaCategoryIDs().
+     */
     public function categoryModel_beforeSaveCategory_handler() {
         Gdn::cache()->remove(self::IDEATION_CACHE_KEY);
     }
