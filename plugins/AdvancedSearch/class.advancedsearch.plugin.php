@@ -574,7 +574,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         // Perform the search by unioning all of the sql together.
         $Sql = Gdn::sql()
             ->select()
-            ->from('_TBL_ s')
+            ->from('_TBL_ s', false)
             ->orderBy('s.DateInserted', 'desc')
             ->limit($limit, $offset)
             ->getSelect();
