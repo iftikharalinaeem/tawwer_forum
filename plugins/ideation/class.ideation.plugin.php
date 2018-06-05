@@ -40,6 +40,11 @@ class IdeationPlugin extends Gdn_Plugin {
     const CATEGORY_IDEATION_COLUMN_NAME = 'IdeationType';
 
     /**
+     * Ideation cache key.
+     */
+    const IDEATION_CACHE_KEY = 'ideaCategoryIDs';
+
+    /**
      * @var int The tag ID of the upvote reaction.
      */
     protected static $upTagID;
@@ -313,14 +318,25 @@ EOT
     public function base_allowedDiscussionTypes_handler($sender, $args) {
         $category = val('Category', $args);
         if (empty($category) || val("DisplayAs", $category) === "Categories") {
-            // We're on Recent Discussions. Hitting post/idea from here is fine; it'll default to your Idea category.
+            // We're on Recent Discussions;
+            // Hitting post/idea from here is fine;
+            // We might not want the "Idea" type in the drop down depending on the user/category permissions
             //
             // Alternatively we are in a nested category and currently aren't going to recursively check all child categories
             // This is particularly necessary to make this work with the top level subcommunities without
             // recursively checking categories. This is a STOPGAP solution until we have a better way to handle this
             // or create workflows that do not require handling it.
+
+            $ideaCategoryIDs = $this->getIdeaCategoryIDs();
+            foreach ($ideaCategoryIDs as $categoryID) {
+                if (CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Add')) {
+                    return;
+                }
+            }
+            unset($args['AllowedDiscussionTypes']['Idea']);
             return;
         }
+
         if ($this->isIdeaCategory($category)) {
             $args['AllowedDiscussionTypes'] = ['Idea' => $this->getIdeaDiscussionType()];
         } elseif (isset($args['AllowedDiscussionTypes']['Idea'])) {
@@ -1824,13 +1840,18 @@ EOT
      * Returns an array of Idea-type category IDs.
      */
     public function getIdeaCategoryIDs() {
-        $ideaCategoryIDs = [];
-        $categories = CategoryModel::categories();
-        foreach($categories as $category) {
-            if ($this->isIdeaCategory($category)) {
-                $ideaCategoryIDs[] = val('CategoryID', $category);
+        $ideaCategoryIDs = Gdn::cache()->get(self::IDEATION_CACHE_KEY);
+        if ($ideaCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
+            $ideaCategoryIDs = [];
+            $categories = CategoryModel::categories();
+            foreach ($categories as $category) {
+                if ($this->isIdeaCategory($category)) {
+                    $ideaCategoryIDs[] = val('CategoryID', $category);
+                }
             }
+            Gdn::cache()->store(self::IDEATION_CACHE_KEY, $ideaCategoryIDs, [Gdn_Cache::FEATURE_EXPIRY => 300]);
         }
+
         return $ideaCategoryIDs;
     }
 
@@ -1919,6 +1940,14 @@ EOT
                 ])
             ]));
         }
+    }
+
+    /**
+     * Flushing the ideation cache on this hook to prevent people creating a new ideation category
+     * not being able to see/post in it right away. See getIdeaCategoryIDs().
+     */
+    public function categoryModel_beforeSaveCategory_handler() {
+        Gdn::cache()->remove(self::IDEATION_CACHE_KEY);
     }
 }
 
