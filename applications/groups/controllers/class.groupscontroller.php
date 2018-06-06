@@ -73,7 +73,7 @@ class GroupsController extends Gdn_Controller {
 
         // Get my groups.
         if (Gdn::session()->isValid()) {
-            $MyGroups = $this->GroupModel->getByUser(Gdn::session()->UserID, $Limit);
+            $MyGroups = $this->GroupModel->getByUser(Gdn::session()->UserID, '', 'desc', $Limit);
             $this->setData('MyGroups', $MyGroups);
         }
 
