@@ -971,7 +971,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             $role_ids = $role_model->SQL
                ->select('r.RoleID')
                ->from('Role r')
-               ->whereIn('LOWER(r.Name)', $role_names)
+               ->whereIn('r.Name', $role_names)
                ->get()->resultArray();
             $role_ids = array_column($role_ids, 'RoleID');
          }
