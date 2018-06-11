@@ -511,7 +511,7 @@ class SalesforcePlugin extends Gdn_Plugin {
                 'Name' => $user->Name,
                 'Email' => $user->Email,
                 'Title' => $user->Title,
-                'LeadSource' => c('Plugins.Salesforce.SourceValue', 'Vanilla'),
+                'LeadSource' => c('Salesforce.SourceValue', 'Vanilla'),
                 'Options' => $salesforce->getLeadStatusOptions(),
             ];
         } catch (Gdn_UserException $e) {
@@ -557,8 +557,8 @@ class SalesforcePlugin extends Gdn_Plugin {
         $user = Gdn::userModel()->getID($userID);
         //Setup Form
         $sender->Form = new Gdn_Form();
-        $sender->Form->addHidden('Origin', c('Plugins.Salesforce.OriginValue', 'Vanilla'));
-        $sender->Form->addHidden('LeadSource', c('Plugins.Salesforce.SourceValue', 'Vanilla'));
+        $sender->Form->addHidden('Origin', c('Salesforce.OriginValue', 'Vanilla'));
+        $sender->Form->addHidden('LeadSource', c('Salesforce.SourceValue', 'Vanilla'));
         //Get Content
         if ($type == 'Discussion') {
             $content = $sender->DiscussionModel->getID($elementID);
@@ -646,8 +646,8 @@ class SalesforcePlugin extends Gdn_Plugin {
                 'FirstName' => $firstName,
                 'LastName' => $lastName,
                 'Email' => $user->Email,
-                'LeadSource' => c('Plugins.Salesforce.SourceValue', 'Vanilla'),
-                'Origin' => c('Plugins.Salesforce.OriginValue', 'Vanilla'),
+                'LeadSource' => c('Salesforce.SourceValue', 'Vanilla'),
+                'Origin' => c('Salesforce.OriginValue', 'Vanilla'),
                 'Options' => $salesforce->getCaseStatusOptions(),
                 'Priorities' => $salesforce->getCasePriorityOptions(),
                 'Body' => Gdn_Format::textEx($content->Body)
