@@ -659,6 +659,8 @@ class Salesforce {
     }
 
     public static function authorizeUri($redirectUri = false, $extraStateParameters = []) {
+        $ssoUtils = Gdn::getContainer()->get('SsoUtils');
+
         $appID = c('Plugins.Salesforce.ApplicationID');
         if (!$redirectUri) {
             $redirectUri = self::redirectUri();
@@ -669,13 +671,16 @@ class Salesforce {
             $extraStateParameters = ['type' => $extraStateParameters];
         }
 
+        // Get a state token.
+        $stateToken = $ssoUtils->getStateToken();
+
         $query = [
             'redirect_uri' => $redirectUri,
             'client_id' => $appID,
             'response_type' => 'code',
             'scope' => 'full refresh_token',
             'state' => json_encode(
-                ['csrf' => SsoUtils::createCSRFToken()] + $extraStateParameters
+                ['token' => $stateToken] + $extraStateParameters
             ),
         ];
         $return = c('Plugins.Salesforce.AuthenticationUrl')."/services/oauth2/authorize?".http_build_query($query, null , "&");

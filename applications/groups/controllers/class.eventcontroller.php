@@ -117,11 +117,16 @@ class EventController extends Gdn_Controller {
      * Create a new event
      *
      * @param integer $GroupID Optional, if we're creating a group event
-     * @return type
      * @throws Exception
      */
     public function add($GroupID = null) {
         list($Event, $Group) = $this->addEdit(null, $GroupID);
+
+        if ($GroupID) {
+            if(!groupPermission('Member')) {
+                throw forbiddenException('@' . groupPermission('View.Reason', $GroupID));
+            }
+        }
 
         if (!eventPermission('Create')) {
             throw forbiddenException('create a new event');
@@ -345,9 +350,16 @@ class EventController extends Gdn_Controller {
      * @param integer $eventID
      * @param string $attending [Yes, No, Maybe]
      */
-    public function attending($eventID, $attending) {
+    public function attending() {
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->permission('Garden.SignIn.Allow');
+
+        if (!$this->Form->authenticatedPostBack()) {
+            throw forbiddenException('GET');
+        }
+
+        $eventID = $this->Form->getFormValue('EventID');
+        $attending = $this->Form->getFormValue('Attending');
 
         // Lookup event
         $eventModel = new EventModel();

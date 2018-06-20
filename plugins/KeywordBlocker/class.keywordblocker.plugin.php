@@ -167,6 +167,13 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
             }
         }
 
+        // Massage fields, as necessary, in a method similar to Gdn_Model::coerceData.
+        if ($tableName == 'Event') {
+            if (array_key_exists('DateEnds', $set) && $set['DateEnds'] == '') {
+                $set['DateEnds'] = null;
+            }
+        }
+
         Gdn::sql()->options('Replace', true)->insert($tableName, $set);
     }
 
@@ -187,22 +194,22 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
         $isRecordClean = $this->isRecordClean($recordType, $recordData);
         if (!$isRecordClean) {
             $sender->EventArguments['IsValid'] = false;
-
-            // Set some information about the user in the data.
-            touchValue('InsertUserID', $recordData, Gdn::session()->UserID);
-
-            $user = Gdn::userModel()->getID(val('InsertUserID', $recordData), DATASET_TYPE_ARRAY);
-            if ($user) {
-                touchValue('Username', $recordData, $user['Name']);
-                touchValue('Email', $recordData, $user['Email']);
-                touchValue('IPAddress', $recordData, $user['LastIPAddress']);
-            }
+            $isInsert = !isset($recordData[$recordType.'ID']);
 
             // Set custom flag to handle log restoration later on
             $recordData['KeywordBlocker'] = true;
 
-            // Update :D
-            if (isset($recordData[$recordType.'ID'])) {
+            if ($isInsert) {
+                // Set some information about the user in the data.
+                touchValue('InsertUserID', $recordData, Gdn::session()->UserID);
+
+                $user = Gdn::userModel()->getID(val('InsertUserID', $recordData), DATASET_TYPE_ARRAY);
+                if ($user) {
+                    touchValue('Username', $recordData, $user['Name']);
+                    touchValue('Email', $recordData, $user['Email']);
+                    touchValue('IPAddress', $recordData, $user['LastIPAddress']);
+                }
+            } else {
                 // Clean up logs in case a user edit the post multiple times
                 $logModel = new LogModel();
                 $rows = $logModel->getWhere([
@@ -335,7 +342,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
      * @param $recordType Type of record (Comment, Discussion...)
      * @param $recordID Record ID
      *
-     * @throws Gdn_ErrorException
+     * @throws Exception
      *
      * @return array Post data
      */
@@ -354,7 +361,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
                 $model = new EventModel();
                 break;
             default:
-                throw new Gdn_ErrorException('Unsupported record type.');
+                throw new Exception('Unsupported record type.', 500);
         }
 
         return $model->getID($recordID, DATASET_TYPE_ARRAY);

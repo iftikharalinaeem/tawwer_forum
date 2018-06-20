@@ -9,6 +9,8 @@
  */
 class LeaderBoardModule extends Gdn_Module {
 
+    const CACHE_KEY = 'badge.leaderboard.%s.%s.%s.%s.%s.module';
+
     /** @var array */
     public $Leaders = [];
 
@@ -21,6 +23,9 @@ class LeaderBoardModule extends Gdn_Module {
     /** @var int  */
     public $Limit = 10;
 
+    /** @var int */
+    public $CacheTTL;
+
     /**
      * Create the module instance.
      *
@@ -28,6 +33,7 @@ class LeaderBoardModule extends Gdn_Module {
      */
     public function __construct($sender = '') {
         parent::__construct($sender, 'plugins/badges');
+        $this->CacheTTL = (int)c('Badges.LeaderBoardModule.CacheDefaultTTL', 600);
     }
 
     /**
@@ -83,36 +89,44 @@ class LeaderBoardModule extends Gdn_Module {
             }
         }
 
+        $cacheKey = sprintf(self::CACHE_KEY, $this->SlotType, $timeSlot, $categoryID, $moderatorIDs ? 1 : 0, $limit);
+        $data = Gdn::cache()->get($cacheKey);
 
+        if ($data === Gdn_Cache::CACHEOP_FAILURE) {
+            $leadersSql = Gdn::sql()
+                ->select([
+                    'SlotType',
+                    'TimeSlot',
+                    'Source',
+                    'CategoryID',
+                    'up.UserID',
+                    'Points'
+                ])
+                ->from('UserPoints up')
+                ->where([
+                    'TimeSlot' => $timeSlot,
+                    'SlotType' => $this->SlotType,
+                    'Source' => 'Total',
+                    'CategoryID' => $categoryID
+                ]);
 
-        $leadersSql = Gdn::sql()
-            ->select([
-                'SlotType',
-                'TimeSlot',
-                'Source',
-                'CategoryID',
-                'up.UserID',
-                'Points'
-            ])
-            ->from('UserPoints up')
-            ->where([
-                'TimeSlot' => $timeSlot,
-                'SlotType' => $this->SlotType,
-                'Source' => 'Total',
-                'CategoryID' => $categoryID
+            if ($moderatorIDs) {
+                $leadersSql->whereNotIn('UserID', $moderatorIDs);
+            }
+
+            $data = $leadersSql
+                ->orderBy('Points', 'desc')
+                ->limit($limit)
+                ->get()
+                ->resultArray();
+
+            Gdn::userModel()->joinUsers($data, ['UserID']);
+
+            Gdn::cache()->store($cacheKey, $data, [
+                Gdn_Cache::FEATURE_EXPIRY => (int)$this->CacheTTL,
             ]);
-
-        if ($moderatorIDs) {
-            $leadersSql->whereNotIn('UserID', $moderatorIDs);
         }
 
-        $data = $leadersSql
-            ->orderBy('Points', 'desc')
-            ->limit($limit)
-            ->get()
-            ->resultArray();
-
-        Gdn::userModel()->joinUsers($data, ['UserID']);
 
         $this->Leaders = $data;
     }

@@ -1,32 +1,32 @@
-/* line 4, sass/custom.scss */
+/* line 4, sass/ui-tests.scss */
 body {
   background: url("images/noise.png") top center repeat #333333 !important;
 }
 
-/* line 7, sass/custom.scss */
+/* line 7, sass/ui-tests.scss */
 .Head .Wrapper {
   background: url("images/bg-glow.png") center -80px no-repeat transparent !important;
 }
 
-/* line 10, sass/custom.scss */
+/* line 10, sass/ui-tests.scss */
 .Head .Center {
   position: relative;
   min-height: 80px;
 }
 
-/* line 14, sass/custom.scss */
+/* line 14, sass/ui-tests.scss */
 .Wrapper {
   text-align: center;
 }
 
-/* line 17, sass/custom.scss */
+/* line 17, sass/ui-tests.scss */
 .Center {
   text-align: left;
   width: 960px;
   margin: 0 auto;
 }
 
-/* line 22, sass/custom.scss */
+/* line 22, sass/ui-tests.scss */
 .Head {
   background: #014381;
   xbackground: -webkit-gradient(linear, center bottom, center top, from(#256098), to(#014381));
@@ -47,7 +47,7 @@ body {
   clear: both;
 }
 
-/* line 35, sass/custom.scss */
+/* line 35, sass/ui-tests.scss */
 .Divider {
   background: #66DEFF;
   border-bottom: 1px solid #7B939A;
@@ -55,7 +55,7 @@ body {
   height: 1px;
 }
 
-/* line 41, sass/custom.scss */
+/* line 41, sass/ui-tests.scss */
 body > .Body {
   background: #fff;
   padding-top: 20px;
@@ -64,7 +64,7 @@ body > .Body {
   width: 100%;
 }
 
-/* line 48, sass/custom.scss */
+/* line 48, sass/ui-tests.scss */
 body > .Foot {
   -moz-box-shadow: inset 0px 4px 2px #111;
   -webkit-box-shadow: inset 0px 4px 2px #111;
@@ -77,14 +77,14 @@ body > .Foot {
   padding: 0 0 40px;
 }
 
-/* line 59, sass/custom.scss */
+/* line 59, sass/ui-tests.scss */
 .Foot .Wrapper {
   background: url("images/bg-glow.png") center -80px no-repeat transparent;
   padding: 40px 0 0;
   min-height: 100px;
 }
 
-/* line 64, sass/custom.scss */
+/* line 64, sass/ui-tests.scss */
 .Foot .Columns strong {
   display: block;
   font-weight: bold;
@@ -92,17 +92,17 @@ body > .Foot {
   color: #fff;
 }
 
-/* line 70, sass/custom.scss */
+/* line 70, sass/ui-tests.scss */
 .Foot .Columns a {
   color: #aaa;
 }
 
-/* line 73, sass/custom.scss */
+/* line 73, sass/ui-tests.scss */
 .Foot .Columns a:hover {
   color: #bbb;
 }
 
-/* line 76, sass/custom.scss */
+/* line 76, sass/ui-tests.scss */
 .Column4 {
   float: left;
   width: 25%;
@@ -110,7 +110,7 @@ body > .Foot {
   line-height: 1.6;
 }
 
-/* line 82, sass/custom.scss */
+/* line 82, sass/ui-tests.scss */
 .Column3 {
   float: left;
   width: 33%;
@@ -119,7 +119,7 @@ body > .Foot {
   line-height: 1.6;
 }
 
-/* line 89, sass/custom.scss */
+/* line 89, sass/ui-tests.scss */
 h1.Logo {
   top: 10px;
   left: 0;
@@ -128,7 +128,7 @@ h1.Logo {
   padding: 0 !important;
 }
 
-/* line 96, sass/custom.scss */
+/* line 96, sass/ui-tests.scss */
 h1.Logo a {
   color: transparent;
   font-size: 1px;
@@ -142,7 +142,7 @@ h1.Logo a {
 }
 
 /* Contact used on narrow master view */
-/* line 108, sass/custom.scss */
+/* line 108, sass/ui-tests.scss */
 .Head .Contact {
   position: absolute;
   top: 26px;
@@ -151,7 +151,7 @@ h1.Logo a {
   color: #ffda30;
 }
 
-/* line 115, sass/custom.scss */
+/* line 115, sass/ui-tests.scss */
 .Head .Contact strong {
   font-weight: normal;
   color: #fff;
@@ -164,14 +164,14 @@ h1.Logo a {
     top: 16px;
     right: 0;
 }*/
-/* line 128, sass/custom.scss */
+/* line 128, sass/ui-tests.scss */
 .AccountMenu {
   position: absolute;
   top: 10px;
   right: 4px;
 }
 
-/* line 133, sass/custom.scss */
+/* line 133, sass/ui-tests.scss */
 .AccountMenu a {
   font-size: 12px;
   text-shadow: 0 1px 1px #000;
@@ -179,18 +179,18 @@ h1.Logo a {
   margin: 0 10px;
 }
 
-/* line 139, sass/custom.scss */
+/* line 139, sass/ui-tests.scss */
 .AccountMenu a:hover {
   text-shadow: none;
   text-decoration: underline;
 }
 
-/* line 143, sass/custom.scss */
+/* line 143, sass/ui-tests.scss */
 .AccountMenu a:last-child {
   margin: 0 0 0 10px;
 }
 
-/* line 149, sass/custom.scss */
+/* line 149, sass/ui-tests.scss */
 body.Search .AccountMenu a.Support,
 body.Vanilla .AccountMenu a.Support,
 body.Profile .AccountMenu a.Profile,
@@ -199,7 +199,7 @@ body.Account .AccountMenu a.Account {
   font-weight: bold;
 }
 
-/* line 153, sass/custom.scss */
+/* line 153, sass/ui-tests.scss */
 .VFMenu {
   position: absolute;
   top: 36px;
@@ -219,7 +219,7 @@ body.Account .AccountMenu a.Account {
   background: linear-gradient(top, #b8e9fd, #3bb6f3);
 }
 
-/* line 186, sass/custom.scss */
+/* line 186, sass/ui-tests.scss */
 .OrangeButton,
 .OrangeButton:hover,
 .BigButton,
@@ -260,7 +260,7 @@ body.Account .AccountMenu a.Account {
   -webkit-border-radius: 3px;
 }
 
-/* line 224, sass/custom.scss */
+/* line 224, sass/ui-tests.scss */
 input.OrangeButton,
 input.OrangeButton:hover,
 input.BigButton,
@@ -279,7 +279,7 @@ input.RedButton:hover {
   padding: 10px 14px;
 }
 
-/* line 228, sass/custom.scss */
+/* line 228, sass/ui-tests.scss */
 .VFMenu a {
   border-color: #3bb6f3;
   border-radius: 0;
@@ -288,14 +288,14 @@ input.RedButton:hover {
   border-width: 0 1px 0 0;
 }
 
-/* line 235, sass/custom.scss */
+/* line 235, sass/ui-tests.scss */
 .VFMenu a:first-child {
   border-radius: 3px 0 0 3px;
   -moz-border-radius: 3px 0 0 3px;
   -webkit-border-radius: 3px 0 0 3px;
 }
 
-/* line 240, sass/custom.scss */
+/* line 240, sass/ui-tests.scss */
 .VFMenu a:last-child {
   border-radius: 0 3px 3px 0;
   -moz-border-radius: 0 3px 3px 0;
@@ -303,7 +303,7 @@ input.RedButton:hover {
   border-width: 0;
 }
 
-/* line 246, sass/custom.scss */
+/* line 246, sass/ui-tests.scss */
 .VFMenu a:hover {
   box-shadow: inset 0 0 3px #fff;
   -moz-box-shadow: inset 0 0 3px #fff;
@@ -311,7 +311,7 @@ input.RedButton:hover {
   color: #003f87;
 }
 
-/* line 261, sass/custom.scss */
+/* line 261, sass/ui-tests.scss */
 .SmallBlueButton:focus,
 .BlueButton:focus,
 .VFMenu a:focus,
@@ -334,7 +334,7 @@ body.Features .VFMenu a.Features {
   color: #cef1fc;
 }
 
-/* line 279, sass/custom.scss */
+/* line 279, sass/ui-tests.scss */
 body#vfcom_info_index .VFMenu a.Home,
 body.Resources .VFMenu a.Resources,
 body.plans .VFMenu a.Plans,
@@ -342,7 +342,7 @@ body.Features .VFMenu a.Features {
   border-width: 0;
 }
 
-/* line 287, sass/custom.scss */
+/* line 287, sass/ui-tests.scss */
 .SmallBlueButton,
 .SmallBlueButton:hover,
 .SmallBlueButton:focus,
@@ -362,19 +362,19 @@ body.Features .VFMenu a.Features {
   -webkit-box-shadow: 0 0 4px #001329, inset 0 0 1px #f7fdff;
 }
 
-/* line 304, sass/custom.scss */
+/* line 304, sass/ui-tests.scss */
 .SmallBlueButton:hover,
 .BlueButton:hover {
   background: #3bb6f3;
 }
 
-/* line 308, sass/custom.scss */
+/* line 308, sass/ui-tests.scss */
 .SmallBlueButton:focus,
 .BlueButton:focus {
   background: #0f94d6;
 }
 
-/* line 313, sass/custom.scss */
+/* line 313, sass/ui-tests.scss */
 .OrangeButton,
 .OrangeButton:hover,
 .OrangeButton:focus {
@@ -391,17 +391,17 @@ body.Features .VFMenu a.Features {
   -webkit-box-shadow: 0 0 4px #001329, inset 0 0 1px #913000;
 }
 
-/* line 329, sass/custom.scss */
+/* line 329, sass/ui-tests.scss */
 .OrangeButton:hover {
   background: #c64100;
 }
 
-/* line 332, sass/custom.scss */
+/* line 332, sass/ui-tests.scss */
 .OrangeButton:focus {
   background: #a43600;
 }
 
-/* line 337, sass/custom.scss */
+/* line 337, sass/ui-tests.scss */
 .GreenButton,
 .GreenButton:hover,
 .GreenButton:focus {
@@ -418,18 +418,18 @@ body.Features .VFMenu a.Features {
   -webkit-box-shadow: 0 0 4px #001329, inset 0 0 1px #c2ffbc;
 }
 
-/* line 353, sass/custom.scss */
+/* line 353, sass/ui-tests.scss */
 .GreenButton:hover {
   background: #2c9000;
 }
 
-/* line 356, sass/custom.scss */
+/* line 356, sass/ui-tests.scss */
 .GreenButton:focus {
   background: #1f6600;
   border-color: #0a2100;
 }
 
-/* line 365, sass/custom.scss */
+/* line 365, sass/ui-tests.scss */
 .BigButton,
 .BigButton:hover,
 .BigButton:focus,
@@ -449,13 +449,13 @@ body.Features .VFMenu a.Features {
   -webkit-box-shadow: 0 0 4px #001329, inset 0 0 1px #ff8af8;
 }
 
-/* line 382, sass/custom.scss */
+/* line 382, sass/ui-tests.scss */
 .BigButton:hover,
 .PurpleButton:hover {
   background: #981d5a;
 }
 
-/* line 386, sass/custom.scss */
+/* line 386, sass/ui-tests.scss */
 .BigButton:focus,
 .PurpleButton:focus {
   background: #8b114f;
@@ -464,14 +464,14 @@ body.Features .VFMenu a.Features {
   -webkit-box-shadow: none;
 }
 
-/* line 394, sass/custom.scss */
+/* line 394, sass/ui-tests.scss */
 .BigButton,
 .BigButton:hover,
 .BigButton:focus {
   display: block;
 }
 
-/* line 399, sass/custom.scss */
+/* line 399, sass/ui-tests.scss */
 .RedButton,
 .RedButton:hover,
 .RedButton:focus {
@@ -488,18 +488,18 @@ body.Features .VFMenu a.Features {
   -webkit-box-shadow: 0 0 4px #001329, inset 0 0 1px #f8adad;
 }
 
-/* line 415, sass/custom.scss */
+/* line 415, sass/ui-tests.scss */
 .RedButton:hover {
   background: #b40613;
 }
 
-/* line 418, sass/custom.scss */
+/* line 418, sass/ui-tests.scss */
 .RedButton:focus {
   background: #7c020b;
   border-color: #5d0007;
 }
 
-/* line 424, sass/custom.scss */
+/* line 424, sass/ui-tests.scss */
 .SmallBlueButton,
 .SmallBlueButton:hover,
 .SmallBlueButton:focus {
@@ -512,14 +512,14 @@ body.Features .VFMenu a.Features {
   -webkit-box-shadow: none;
 }
 
-/* line 433, sass/custom.scss */
+/* line 433, sass/ui-tests.scss */
 .Head .SignUpButton {
   position: absolute;
   top: 31px;
   right: 440px;
 }
 
-/* line 439, sass/custom.scss */
+/* line 439, sass/ui-tests.scss */
 body.Conversations.add .FormWrapper,
 body.Vanilla.Post .FormWrapper {
   background: none;
@@ -527,18 +527,18 @@ body.Vanilla.Post .FormWrapper {
   padding: 0;
 }
 
-/* line 444, sass/custom.scss */
+/* line 444, sass/ui-tests.scss */
 a.ApplyButton {
   display: none;
 }
 
 /* Login Page */
-/* line 449, sass/custom.scss */
+/* line 449, sass/ui-tests.scss */
 body.Entry #Content {
   position: relative;
 }
 
-/* line 452, sass/custom.scss */
+/* line 452, sass/ui-tests.scss */
 .LoginHelp {
   font-size: 13px;
   padding: 10px;
@@ -550,7 +550,7 @@ body.Entry #Content {
   margin-top: -180px;
 }
 
-/* line 462, sass/custom.scss */
+/* line 462, sass/ui-tests.scss */
 .LoginHelp p {
   color: #777;
   margin: 0;
@@ -558,7 +558,7 @@ body.Entry #Content {
   font-size: 12px;
 }
 
-/* line 472, sass/custom.scss */
+/* line 472, sass/ui-tests.scss */
 body#dashboard_entry_passwordrequest #Content,
 body#dashboard_entry_passwordreset #Content,
 body#dashboard_entry_password #Content,
@@ -569,7 +569,7 @@ body#dashboard_entry_index #Content {
   margin-bottom: 40px;
 }
 
-/* line 478, sass/custom.scss */
+/* line 478, sass/ui-tests.scss */
 body.Entry div.Box,
 body.Entry div.Entry {
   position: relative;
@@ -577,12 +577,12 @@ body.Entry div.Entry {
   width: auto;
 }
 
-/* line 483, sass/custom.scss */
+/* line 483, sass/ui-tests.scss */
 body.Entry div.Box p {
   text-align: left;
 }
 
-/* line 487, sass/custom.scss */
+/* line 487, sass/ui-tests.scss */
 body.Entry div.Box,
 body.Entry div.Entry div.MainForm {
   width: auto;
@@ -596,47 +596,47 @@ body.Entry div.Entry div.MainForm {
   -webkit-box-shadow: 0 1px 2px #999;
 }
 
-/* line 498, sass/custom.scss */
+/* line 498, sass/ui-tests.scss */
 body.Entry div.Entry div.MainForm {
   border-width: 10px 340px 10px 10px;
 }
 
-/* line 501, sass/custom.scss */
+/* line 501, sass/ui-tests.scss */
 #Form_User_Password .ForgotPassword {
   display: block;
   margin-left: 0;
 }
 
-/* line 505, sass/custom.scss */
+/* line 505, sass/ui-tests.scss */
 body.Entry.register div.Box {
   border-width: 10px;
 }
 
-/* line 508, sass/custom.scss */
+/* line 508, sass/ui-tests.scss */
 body.Entry.register #Content form {
   padding: 0;
 }
 
-/* line 511, sass/custom.scss */
+/* line 511, sass/ui-tests.scss */
 body.Entry div.Entry div.MainForm {
   min-height: 150px;
 }
 
-/* line 515, sass/custom.scss */
+/* line 515, sass/ui-tests.scss */
 body#dashboard_entry_passwordrequest #Content div.Box,
 body#dashboard_entry_passwordreset #Content div.Box {
   padding: 10px;
   border-width: 10px;
 }
 
-/* line 520, sass/custom.scss */
+/* line 520, sass/ui-tests.scss */
 body.Entry#dashboard_entry_passwordrequest #Content form,
 body.Entry#dashboard_entry_passwordreset #Content form {
   padding: 0;
 }
 
 /* Forms */
-/* line 525, sass/custom.scss */
+/* line 525, sass/ui-tests.scss */
 #DiscussionForm form {
   background: #fafafa;
   border: 10px solid #f5f5f5;
@@ -650,26 +650,26 @@ body.Entry#dashboard_entry_passwordreset #Content form {
 }
 
 /* Popups */
-/* line 538, sass/custom.scss */
+/* line 538, sass/ui-tests.scss */
 div.Border {
   border: 1px solid #66deff;
   background: none;
   padding: 0;
 }
 
-/* line 543, sass/custom.scss */
+/* line 543, sass/ui-tests.scss */
 div.Popup div.Border {
   max-width: 600px;
 }
 
-/* line 546, sass/custom.scss */
+/* line 546, sass/ui-tests.scss */
 div.Popup div.Body {
   border-radius: 7px;
   -moz-border-radius: 7px;
   -webkit-border-radius: 7px;
 }
 
-/* line 551, sass/custom.scss */
+/* line 551, sass/ui-tests.scss */
 .Popup .Body {
   border: 2px solid #27b1d9 !important;
   border-radius: 6px;
@@ -677,7 +677,7 @@ div.Popup div.Body {
   -webkit-border-radius: 6px;
 }
 
-/* line 557, sass/custom.scss */
+/* line 557, sass/ui-tests.scss */
 .Popup .Body .Content {
   border-radius: 5px;
   -moz-border-radius: 5px;
@@ -694,41 +694,41 @@ div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
    color: #FFFFFF;
 }
 */
-/* line 572, sass/custom.scss */
+/* line 572, sass/ui-tests.scss */
 div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
   margin: 0 0 5px;
 }
 
-/* line 575, sass/custom.scss */
+/* line 575, sass/ui-tests.scss */
 div.Popup div.MultipleEntryMethods h1 {
   padding: 5px 9px 4px;
 }
 
-/* line 578, sass/custom.scss */
+/* line 578, sass/ui-tests.scss */
 div.Overlay {
   background: none repeat scroll 0 0 rgba(0, 0, 0, 0.7);
 }
 
-/* line 581, sass/custom.scss */
+/* line 581, sass/ui-tests.scss */
 a.Close, a.Close:hover {
   right: 11px;
   top: 9px;
   text-decoration: none;
 }
 
-/* line 586, sass/custom.scss */
+/* line 586, sass/ui-tests.scss */
 div.MultipleEntryMethods {
   width: 494px;
 }
 
-/* line 589, sass/custom.scss */
+/* line 589, sass/ui-tests.scss */
 .RoleTitle {
   color: #000000;
   font-weight: bold;
 }
 
 /* Search box on discussion list */
-/* line 595, sass/custom.scss */
+/* line 595, sass/ui-tests.scss */
 #Content .SearchForm {
   border: 1px solid #ddd;
   border-radius: 2px;
@@ -740,14 +740,14 @@ div.MultipleEntryMethods {
   -moz-box-shadow: inset 0 0 4px #fff;
 }
 
-/* line 605, sass/custom.scss */
+/* line 605, sass/ui-tests.scss */
 #Content .SearchForm .InputBox {
   font-size: 13px;
   margin-right: 6px;
   width: 582px;
 }
 
-/* line 610, sass/custom.scss */
+/* line 610, sass/ui-tests.scss */
 .NumberPoint {
   border-radius: 40px;
   -moz-border-radius: 40px;
@@ -780,28 +780,28 @@ div.MultipleEntryMethods {
 }
 
 /* Forum Fixes */
-/* line 641, sass/custom.scss */
+/* line 641, sass/ui-tests.scss */
 .ClearFix {
   clear: none;
   display: none;
 }
 
-/* line 642, sass/custom.scss */
+/* line 642, sass/ui-tests.scss */
 .Message {
   clear: none;
 }
 
-/* line 643, sass/custom.scss */
+/* line 643, sass/ui-tests.scss */
 .UserSignature {
   overflow: auto;
 }
 
-/* line 644, sass/custom.scss */
+/* line 644, sass/ui-tests.scss */
 body.filenotfound #Panel {
   display: none;
 }
 
-/* line 647, sass/custom.scss */
+/* line 647, sass/ui-tests.scss */
 body.filenotfound #Content {
   float: none;
   width: 500px;
@@ -816,14 +816,14 @@ body.filenotfound #Content {
   -webkit-box-shadow: 0 1px 2px #999;
 }
 
-/* line 662, sass/custom.scss */
+/* line 662, sass/ui-tests.scss */
 .Tag {
   background: #96DAF9;
   border: 1px solid #057EEE;
   color: #195388;
 }
 
-/* line 668, sass/custom.scss */
+/* line 668, sass/ui-tests.scss */
 .BreadcrumbWrap {
   border-top: 1px solid #B9DDE8;
   background: #F6F8FE;
@@ -832,56 +832,56 @@ body.filenotfound #Content {
   font-size: 11px;
 }
 
-/* line 676, sass/custom.scss */
+/* line 676, sass/ui-tests.scss */
 .BreadcrumbWrap a {
   color: #444;
 }
 
-/* line 680, sass/custom.scss */
+/* line 680, sass/ui-tests.scss */
 .BreadcrumbWrap a:hover {
   text-decoration: underline;
 }
 
-/* line 684, sass/custom.scss */
+/* line 684, sass/ui-tests.scss */
 .Body {
   border: none !important;
 }
 
-/* line 688, sass/custom.scss */
+/* line 688, sass/ui-tests.scss */
 .Pager {
   font-size: 14px;
 }
 
-/* line 691, sass/custom.scss */
+/* line 691, sass/ui-tests.scss */
 #Content {
   padding-bottom: 40px;
 }
 
-/* line 695, sass/custom.scss */
+/* line 695, sass/ui-tests.scss */
 .Foot .Columns {
   height: 100%;
   overflow: hidden;
   margin: 0 auto;
 }
 
-/* line 700, sass/custom.scss */
+/* line 700, sass/ui-tests.scss */
 .PoweredByRackspace {
   margin-top: 20px;
   text-align: center;
 }
 
-/* line 705, sass/custom.scss */
+/* line 705, sass/ui-tests.scss */
 .MultipleEntryMethods .Methods,
 #Form_User_SignIn .CreateAccount {
   display: none !important;
 }
 
-/* line 709, sass/custom.scss */
+/* line 709, sass/ui-tests.scss */
 body.Entry li.Buttons {
   padding-bottom: 0;
 }
 
-/* line 712, sass/custom.scss */
+/* line 712, sass/ui-tests.scss */
 body.Entry div.Entry div.MainForm {
   border-right-width: 365px;
 }

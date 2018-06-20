@@ -243,6 +243,21 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
         Logger::event('saml_profile', Logger::INFO, 'Profile Received from SAML', ['profile' => $profile]);
 
+        // Loop through profile, which is an array of arrays, and convert the values to string.
+        $convertedProfile = [];
+        foreach ($profile as $name => $value) {
+            $convertedProfile[$name] = (is_array($value)) ? implode(",", $value) : $value;
+        }
+
+        // Populate the form with values from the profile so they can be saved in UserMeta.
+        $formValues = array_replace($form->formValues(), $convertedProfile);
+
+        // Filter out any possible reserved names and UserID and Admin being passed over SAML and inserted into the User table.
+        $userModel = new UserModel();
+        $userModel->addFilterField(['UserID', 'Admin']);
+        $formValues = $userModel->filterForm($formValues);
+        $form->formValues($formValues);
+
         $this->EventArguments['Profile'] = $profile;
         $this->EventArguments['Form'] = $form;
 
@@ -513,7 +528,8 @@ class SamlSSOPlugin extends Gdn_Plugin {
         return anchor(
             sprintf(t('Sign In with %s'), $provider['Name']),
             '/entry/saml/'.$provider['AuthenticationKey'],
-            'Button Primary SignInLink'
+            'Button Primary SignInLink',
+            ['rel' => 'nofollow']
         );
     }
 

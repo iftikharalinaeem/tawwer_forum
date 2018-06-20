@@ -28,7 +28,7 @@
 
     {if InSection(array("CategoryList", "DiscussionList"))}
       <div class="masthead" data-geopattern="{$Title}">
-        <div class="container">
+        <div class="container js-sphinxAutoComplete" role="search">
 
           <h1 class="text-center">{t c="How can we help you?"}</h1>
 
@@ -44,7 +44,7 @@
       </div>
     </nav>
 
-    <main class="container" role="main">
+    <main class="container">
 
       <section class="site-content column column-content">
         {asset name="Content"}
@@ -56,7 +56,7 @@
 
     </main>
 
-    <footer class="site-footer" role="contentinfo">
+    <footer class="site-footer">
       <div class="container">
         <p class="pull-left">{t c="Copyright"} &copy; {$smarty.now|date:"%Y"}. {t c="All rights reserved"}.</p>
         <p class="pull-right">{t c="Powered by"} <a href="http://vanillaforums.com">Vanilla Forums</a></p>

@@ -12,6 +12,38 @@ use \Vanilla\Web\Controller;
  */
 class GroupsHooks extends Gdn_Plugin {
 
+    /** @var GroupModel */
+    private $groupModel;
+
+    /**
+     * GroupsHooks constructor.
+     *
+     * @param GroupModel $groupModel
+     */
+    public function __construct(GroupModel $groupModel) {
+        parent::__construct();
+        $this->groupModel = $groupModel;
+    }
+
+    /**
+     * Hook in when default category permissions are being built. Update permissions for the Social Groups category.
+     *
+     * @param PermissionModel $permissionModel
+     */
+    public function permissionModel_defaultPermissions_handler(PermissionModel $permissionModel) {
+        $socialGroups = CategoryModel::categories('social-groups');
+        if ($socialGroups) {
+            $categoryID = val('CategoryID', $socialGroups);
+            // Disable view permissions for the new category by default.
+            $permissionModel->addDefault(RoleModel::TYPE_GUEST, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            $permissionModel->addDefault(RoleModel::TYPE_APPLICANT, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            $permissionModel->addDefault(RoleModel::TYPE_UNCONFIRMED, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            $permissionModel->addDefault(RoleModel::TYPE_MEMBER, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            $permissionModel->addDefault(RoleModel::TYPE_MODERATOR, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            $permissionModel->addDefault(RoleModel::TYPE_ADMINISTRATOR, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+        }
+    }
+
     /**
      * Setup routine for when the application is enabled.
      */
@@ -350,27 +382,41 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
-     * Delete discussion must redirect to Group instead of Category page.
+     * Update items in discussion options dropdown menu.
      *
-     * @param $sender
-     * @param $args
+     * @param Gdn_Controller $sender
+     * @param array $args
      */
-    public function discussionController_discussionOptions_handler($sender, $args) {
-        if ($groupID = val('GroupID', $args['Discussion'])) {
-            if (getValue('DeleteDiscussion', $args['DiscussionOptions'])) {
-                // Get the group
-                $model = new GroupModel();
-                $group = $model->getID($groupID);
-                if (!$group)
-                    return;
+    public function base_discussionOptionsDropdown_handler(Gdn_Controller $sender, array $args) {
+        $discussion = $args['Discussion'];
+        $groupID = val('GroupID', $discussion);
 
-                // Override redirect with GroupUrl instead of CategoryUrl.
-                $args['DiscussionOptions']['DeleteDiscussion'] = [
-                    'Label' => t('Delete Discussion'),
-                    'Url' => '/discussion/delete?discussionid='.$args['Discussion']->DiscussionID.'&target='.urlencode(groupUrl($group)),
-                    'Class' => 'Popup'];
-            }
+        // Needs to be a group discussion.
+        if (!$groupID) {
+            return;
         }
+
+        // Needs to be in a valid group.
+        $groupModel = new GroupModel();
+        $group = $groupModel->getID($groupID);
+        if (!$group) {
+            return;
+        }
+
+        /** @var DropdownModule $dropdown */
+        $dropdown = $args['DiscussionOptionsDropdown'];
+        $items = $dropdown->getItems();
+
+        // Update the delete URL to return users to the current group, instead of the Social Groups category.
+        if (array_key_exists('delete', $items)) {
+            $query = http_build_query([
+                'discussionid' => val('DiscussionID', $discussion),
+                'target' => groupUrl($group, 'discussions')
+            ]);
+            $items['delete']['url'] = "/discussion/delete?{$query}";
+        }
+
+        $dropdown->setItems($items);
     }
 
     /**
@@ -444,6 +490,10 @@ class GroupsHooks extends Gdn_Plugin {
         $this->overridePermissions($sender);
     }
 
+    public function discussionController_bookmark_before($sender) {
+        $this->overridePermissions($sender);
+    }
+
     public function discussionController_index_before($sender) {
         $this->overridePermissions($sender);
     }
@@ -484,6 +534,8 @@ class GroupsHooks extends Gdn_Plugin {
                 $sender->setData('Breadcrumbs', []);
                 $sender->addBreadcrumb(t('Groups'), '/groups');
                 $sender->addBreadcrumb($group['Name'], groupUrl($group));
+
+                $sender->setData('Editor.BackLink', anchor(htmlspecialchars($group['Name']), groupUrl($group)));
             }
 
             Gdn_Theme::section('Group');
@@ -607,19 +659,6 @@ class GroupsHooks extends Gdn_Plugin {
         }
 
         $this->setBreadcrumbs();
-    }
-
-    /**
-     * Configure Groups/Events notification preferences
-     *
-     * @param type $sender
-     */
-    public function profileController_afterPreferencesDefined_handler($sender) {
-        $sender->Preferences['Notifications']['Email.Groups'] = t('Notify me when there is group activity.');
-        $sender->Preferences['Notifications']['Popup.Groups'] = t('Notify me when there is group activity.');
-
-        $sender->Preferences['Notifications']['Email.Events'] = t('Notify me when there is event activity.');
-        $sender->Preferences['Notifications']['Popup.Events'] = t('Notify me when there is event activity.');
     }
 
      /**
@@ -864,7 +903,7 @@ class GroupsHooks extends Gdn_Plugin {
      * @param array $query
      * @return array Where clause as array
      */
-    public function discussionsApiController_index_filters(
+    public function discussionsApiController_indexFilters(
         $where,
         DiscussionsAPIController $controller,
         Schema $inSchema,
@@ -876,5 +915,60 @@ class GroupsHooks extends Gdn_Plugin {
 
         $where['groupID'] = $query['groupID'];
         return $where;
+    }
+
+    /**
+     * Add group fields to search schema.
+     *
+     * @param Schema $schema
+     */
+    public function searchResultSchema_init(Schema $schema) {
+        $recordTypes = $schema->getField('properties.recordType.enum');
+        $recordTypes[] = 'group';
+        $types = $schema->getField('properties.type.enum');
+        $types[] = 'group';
+
+        $schema->merge(Schema::parse([
+            'recordType' => [
+                'enum' => $recordTypes,
+            ],
+            'groupID:i|n?' => 'The id of the group or the id of the group containing the record.',
+        ]));
+        $schema->setField('properties.type.enum', $types);
+    }
+
+    /**
+     * Hook into the pre normalization process of the searchAPIController to fill out missing information about group records.
+     *
+     * @param array $records
+     * @param SearchApiController $searchApiController
+     * @param array $options
+     * @return array
+     */
+    public function searchApiController_preNormalizeOutputs($records, SearchApiController $searchApiController, $options) {
+        $groupIDs = [];
+
+        foreach ($records as $record) {
+            if ($record['RecordType'] === 'Group') {
+                $groupIDs[] = $record['PrimaryID'];
+            }
+        }
+
+        $groups = [];
+        if ($groupIDs) {
+            $groups = $this->groupModel->getWhere(['GroupID' => $groupIDs])->resultArray();
+            $groups = Gdn_DataSet::index($groups, 'GroupID');
+        }
+
+        if ($groups) {
+            foreach ($records as &$record) {
+                if ($record['RecordType'] === 'Group') {
+                    $record['UpdateUserID'] = $groups[$record['PrimaryID']]['UpdateUserID'] ?? null;
+                    $record['DateUpdated'] = $groups[$record['PrimaryID']]['DateUpdated'] ?? null;
+                }
+            }
+        }
+
+        return $records;
     }
 }

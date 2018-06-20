@@ -4,6 +4,9 @@
  * @license Proprietary
  */
 
+use Garden\EventManager;
+use Vanilla\Addon;
+
 /**
  * Class ReactionModel
  */
@@ -31,10 +34,17 @@ class ReactionModel extends Gdn_Model {
 
     protected static $columns = ['UrlCode', 'Name', 'Description', 'Sort', 'Class', 'TagID', 'Active', 'Custom', 'Hidden'];
 
+    /** @var EventManager */
+    private $eventManager;
+
     /**
      * ReactionModel constructor.
+     *
+     * @param EventManager $eventManager
      */
     public function __construct() {
+        $this->eventManager = Gdn::getContainer()->get(EventManager::class);
+
         parent::__construct('ReactionType');
         $this->filterFields = array_merge(
             $this->filterFields,
@@ -313,8 +323,10 @@ class ReactionModel extends Gdn_Model {
                 $data = $row['Data']['React'];
             }
         } elseif (array_key_exists('Attributes', $row)) {
-            $row['Attributes'] = dbdecode($row['Attributes']);
-            if (array_key_exists('React', $row['Attributes'])) {
+            if (is_string($row['Attributes'])) {
+                $row['Attributes'] = dbdecode($row['Attributes']);
+            }
+            if (isset($row['Attributes']['React'])) {
                 $data = $row['Attributes']['React'];
             }
         }
@@ -323,10 +335,12 @@ class ReactionModel extends Gdn_Model {
         if ($restricted === false || Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
             $classes[] = 'Flag';
         }
-        $result = self::getReactionTypes([
+        $typesWhere = [
             'Class' => $classes,
             'Active' => 1
-        ]);
+        ];
+        $typesWhere = $this->eventManager->fireFilter('reactionsModel_getRecordSummary_typesFilter', $typesWhere, $this, $row);
+        $result = self::getReactionTypes($typesWhere);
         $result = array_values($result);
 
         foreach ($result as &$reaction) {
@@ -797,6 +811,7 @@ class ReactionModel extends Gdn_Model {
         }
 
         $eventArguments = [
+            'reactionTotals' => $react,
             'ReactionTypes' => &$reactionTypes,
             'Record' => $record,
             'Set' => &$set
@@ -959,6 +974,9 @@ class ReactionModel extends Gdn_Model {
             'UserID' => $userID,
             'Total' => $inc
         ];
+        // Allow addons to validate or modify data before save.
+        $data = $this->eventManager->fireFilter('reactionModel_react_saveData', $data, $this, $reactionType);
+
         $inserted = $this->toggleUserTag($data, $row, $model, $force);
 
         $message = [t(val('InformMessage', $reactionType, '')), 'Dismissable AutoDismiss'];
@@ -1063,7 +1081,7 @@ class ReactionModel extends Gdn_Model {
      * @param $reactionType
      */
     public function checkBadges($userID, $reactionType) {
-        if (!class_exists('BadgeModel')) {
+        if (!Gdn::addonManager()->isEnabled('badges', Addon::TYPE_ADDON)) {
             return;
         }
 

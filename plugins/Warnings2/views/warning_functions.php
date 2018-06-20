@@ -88,7 +88,7 @@ function writeUserNoteWarning($row) {
          ?>
       </div>
 
-      <div class="Warning-Body">
+      <div class="Warning-Body userContent">
          <?php
 
         if (val('Record', $row)) {

@@ -134,8 +134,8 @@ class GroupsApiController extends AbstractApiController {
             $schema = $this->schema([
                 'userID:i' => 'The user ID of the applicant.',
                 'user?' => $this->getUserFragmentSchema(),
-                'state:s|n' => [
-                    'enum' => ['approved', 'denied'],
+                'status:s' => [
+                    'enum' => ['approved', 'denied', 'pending'],
                     'description' => 'The status of the applicant.',
                 ],
                 'reason:s' => 'The reason why the applicant wants to join the group.',
@@ -560,7 +560,10 @@ class GroupsApiController extends AbstractApiController {
         // Filters
         $where = [];
         if (array_key_exists('memberID', $query)) {
-            $userGroups = $this->groupModel->SQL->getWhere('UserGroup', $query['memberID'])->resultArray();
+            $userGroups = $this->groupModel->SQL->getWhere(
+                'UserGroup',
+                ['UserID' => $query['memberID']]
+            )->resultArray();
             $ids  = array_column($userGroups, 'GroupID');
 
             if (empty($ids)) {
@@ -588,8 +591,6 @@ class GroupsApiController extends AbstractApiController {
         $paging = ApiUtils::numberedPagerInfo($this->groupModel->getCount(), "/api/v2/groups", $query, $in);
 
         return new Data($result, ['paging' => $paging]);
-
-        return $result;
     }
 
     /**
@@ -623,9 +624,9 @@ class GroupsApiController extends AbstractApiController {
      */
     public function normalizeGroupApplicantOutput(array $dbRecord) {
         if (in_array($dbRecord['Type'], ['Approved', 'Denied'])) {
-            $dbRecord['State'] = $this->camelCaseScheme->convert($dbRecord['Type']);
+            $dbRecord['Status'] = $this->camelCaseScheme->convert($dbRecord['Type']);
         } else {
-            $dbRecord['State'] = null;
+            $dbRecord['Status'] = 'pending';
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
@@ -791,7 +792,7 @@ class GroupsApiController extends AbstractApiController {
 
         $this->idParamGroupMemberSchema(false);
         $in = $this->schema([
-            'state:s|n' => [
+            'status:s' => [
                 'enum' => ['approved', 'denied'],
                 'description' => 'The status of the applicant.',
             ]
@@ -812,15 +813,15 @@ class GroupsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $isApproved = $body['state'] === 'approved';
+        $isApproved = $body['status'] === 'approved';
 
         if (!$this->groupModel->processApplicant($id, $userID, $isApproved)) {
             throw new ServerException('Unable to update the applicant.', 500);
         }
 
-        // If an applicant is approved the record is deleted so lets use the fetched record and update the state.
+        // If an applicant is approved the record is deleted so lets use the fetched record and update the status.
         $applicant = $this->normalizeGroupApplicantOutput($applicant);
-        $applicant['state'] = $isApproved ? 'approved' : 'denied';
+        $applicant['status'] = $isApproved ? 'approved' : 'denied';
         return $out->validate($applicant);
     }
 

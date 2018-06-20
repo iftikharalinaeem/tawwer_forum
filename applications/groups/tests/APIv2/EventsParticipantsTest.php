@@ -24,6 +24,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
         self::$userIDs = [];
         self::$addons = ['vanilla', 'groups'];
         parent::setupBeforeClass();
+        \PermissionModel::resetAllRoles();
 
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
@@ -36,7 +37,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
         $className = $classParts[count($classParts) - 1];
         for ($i = 1; $i <= 5; $i++) {
             $user = $usersAPIController->post([
-                'name' => "{$className}{$i}",
+                'name' => self::randomUsername(),
                 'email' => "{$className}{$i}$i@example.com",
                 'password' => "$%#$&ADSFBNYI*&WBV$i",
             ]);
@@ -241,7 +242,8 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
         $event = $this->createEvent(__FUNCTION__);
 
         $attendingAnswers = ['maybe', null, 'yes', 'no'];
-        foreach ($attendingAnswers as $userID => $attending) {
+        foreach ($attendingAnswers as $index => $attending) {
+            $userID = self::$userIDs[$index];
             $this->api()->setUserID($userID);
             $result = $this->api()->post(
                 $this->createURL($event['eventID'], 'participants'),

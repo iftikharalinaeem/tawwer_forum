@@ -21,6 +21,7 @@ abstract class AbstractGroupsSubResource extends AbstractAPIv2Test {
         self::$userIDs = [];
         self::$addons = ['vanilla', 'conversations', 'groups'];
         parent::setupBeforeClass();
+        \PermissionModel::resetAllRoles();
 
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
@@ -33,7 +34,7 @@ abstract class AbstractGroupsSubResource extends AbstractAPIv2Test {
         $className = $classParts[count($classParts) - 1];
         for ($i = 1; $i <= 3; $i++) {
             $user = $usersAPIController->post([
-                'name' => "{$className}{$i}",
+                'name' => self::randomUsername(),
                 'email' => "{$className}{$i}$i@example.com",
                 'password' => "$%#$&ADSFBNYI*&WBV$i",
             ]);

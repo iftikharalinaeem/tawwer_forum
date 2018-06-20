@@ -38,7 +38,7 @@ abstract class AbstractBadgesSubResource extends AbstractAPIv2Test {
         $className = $classParts[count($classParts) - 1];
         for ($i = 1; $i <= 5; $i++) {
             $user = $usersAPIController->post([
-                'name' => "{$className}{$i}",
+                'name' => self::randomUsername(),
                 'email' => "{$className}{$i}@example.com",
                 'password' => "$%#$&ADSFBNYI*&WBV$i",
             ]);

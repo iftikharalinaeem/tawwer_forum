@@ -284,7 +284,7 @@ function writeProfileCounts() {
       echo ' <span class="CountItemWrap CountItemWrap-'.$key.'"><span class="'.$itemClass.'">';
 
       if ($row['Url'])
-         echo '<a href="'.htmlspecialchars($row['Url']).'" class="TextColor">';
+         echo '<a href="'.htmlspecialchars($row['Url']).'" class="TextColor" rel="nofollow">';
 
       echo ' <span class="CountTotal">'.Gdn_Format::bigNumber($row['Total'], 'html').'</span> ';
       echo ' <span class="CountLabel">'.t($row['Name']).'</span>';

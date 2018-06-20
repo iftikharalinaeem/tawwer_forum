@@ -86,4 +86,70 @@ class RoleTrackerController extends Gdn_Controller {
 
         $this->render('blank', 'utility', 'dashboard');
     }
+
+    /**
+     * Remove a tracking tag from a discussion.
+     *
+     * @param $discussionID
+     * @throws Exception
+     */
+    public function untrack($discussionID) {
+        $this->form = new Gdn_Form();
+
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+
+        if (!$discussion) {
+            throw notFoundException('Discussion');
+        }
+
+        $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
+        if (!$trackedRoles) {
+            throw notFoundException();
+        }
+
+        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion))) {
+            return permissionException('Vanilla.Discussions.Edit');
+        }
+
+        $discussionTags = val('Tags', $discussion);
+        if ($discussionTags) {
+            $discussionTags = Gdn_DataSet::index($discussionTags, 'TagID');
+        } else {
+            $tagModel = new TagModel();
+            $discussionTags = $tagModel->getDiscussionTags(val('DiscussionID', $discussion), TagModel::IX_TAGID);
+        }
+        if (!$discussionTags) {
+            throw notFoundException();
+        }
+
+        $trackedRolesByTag = Gdn_DataSet::index($trackedRoles, 'TrackerTagID');
+        $discussionsTrackedTagIDs = array_intersect(array_keys($trackedRolesByTag), array_keys($discussionTags));
+        if (!$discussionsTrackedTagIDs) {
+            throw notFoundException();
+        }
+
+        if ($this->form->authenticatedPostBack()) {
+            $tags = $this->form->getFormValue('trackedTag');
+            $tagDiscussionModel = new Gdn_Model('TagDiscussion');
+            foreach($tags as $tagID) {
+                if (in_array($tagID, $discussionsTrackedTagIDs)) {
+                    $tagDiscussionModel->delete([
+                        'DiscussionID' => $discussionID,
+                        'TagID' => $tagID,
+                    ]);
+                }
+            }
+
+            Gdn::controller()->jsonTarget('', '', 'Refresh');
+            $this->render('blank', 'utility', 'dashboard');
+            return;
+        }
+
+        $this->setData('Discussion', $discussion);
+        $this->setData('TrackedTagIDs', $discussionsTrackedTagIDs);
+        $this->setData('DiscussionTags', $discussionTags);
+
+        $this->render();
+    }
 }

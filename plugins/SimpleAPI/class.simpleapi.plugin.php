@@ -365,25 +365,29 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      * @param Gdn_Dispatcher $Sender
      */
     public function gdn_dispatcher_appStartup_handler($Sender) {
-        $IncomingRequest = Gdn::request()->requestURI();
+        $path = Gdn::request()->path();
 
-        // Detect a versioned API call
-
-        $MatchedAPI = preg_match('`^/?api/(v1)/(.+)`i', $IncomingRequest, $URI);
-
-        if (!$MatchedAPI)
+        // Detect a versioned API call.
+        if (!preg_match('`^/?api/(v[1-2])/(.+)`i', $path, $pathMatches)) {
             return;
-
-        $this->API = true;
-        $Sender->API = true;
-        $APIVersion = $URI[1];
-        $APIRequest = $URI[2];
-
-        // Check the version slug
+        }
 
         try {
+            $apiVersion = $pathMatches[1];
+            $apiPath = $pathMatches[2];
 
-            $ClassFile = "class.api.{$APIVersion}.php";
+            // Check the global access token for all API calls.
+            $this->checkAccessToken();
+
+            if ($apiVersion !== 'v1') {
+                return;
+            }
+
+            $this->API = true;
+            $Sender->API = true;
+
+            // Check the version slug
+            $ClassFile = "class.api.{$apiVersion}.php";
             $pluginInfo = Gdn::pluginManager()->getPluginInfo('SimpleAPI');
             $PluginPath = $pluginInfo['PluginRoot'];
             $MapperFile = combinePaths([$PluginPath, 'library', $ClassFile]);
@@ -399,7 +403,7 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             $this->fireEvent('Mapper');
 
             // Lookup the mapped replacement for this request
-            $MappedURI = $this->Mapper->map($APIRequest);
+            $MappedURI = $this->Mapper->map($apiPath);
             if (!$MappedURI) throw new Exception('Unable to map request');
 
             // Apply the mapped replacement
@@ -473,31 +477,6 @@ class SimpleAPIPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     protected function prepareAPI($sender) {
-        $accessToken = getValue('access_token', $_GET, NULL);
-
-        if ($accessToken !== NULL) {
-            if ($accessToken === c('Plugins.SimpleAPI.AccessToken')) {
-                // Check for only-https here because we don't want to check for https on json calls from javascript.
-                $onlyHttps = c('Plugins.SimpleAPI.OnlyHttps');
-                if ($onlyHttps && strcasecmp(Gdn::request()->scheme(), 'https') != 0) {
-                    throw new Exception(t('You must access the API through https.'), 401);
-                }
-
-                $userID = c('Plugins.SimpleAPI.UserID');
-                $user = false;
-                if ($userID)
-                    $user = Gdn::userModel()->getID($userID);
-                if (!$user)
-                    $userID = Gdn::userModel()->getSystemUserID();
-
-                Gdn::session()->start($userID, false, false);
-                Gdn::session()->validateTransientKey(true);
-            } else {
-                if (!Gdn::session()->isValid())
-                    throw new Exception(t('Invald Access Token'), 401);
-            }
-        }
-
         if (strcasecmp(getValue('contenttype', $_GET, ''), 'json') == 0 || strpos(getValue('CONTENT_TYPE', $_SERVER, NULL), 'json') !== false) {
             $post = file_get_contents('php://input');
 
@@ -609,13 +588,21 @@ class SimpleAPIPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Adds "API" menu option to the Forum menu on the dashboard.
+     * Add the APIv1 menu item.
      *
-     * @param Gdn_Controller $sender
+     * @param DashboardNavModule $nav The menu to add the module to.
      */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        $menu = $sender->EventArguments['SideMenu'];
-        $menu->addLink('Site Settings', t('API', 'API v1'), 'settings/api', 'Garden.Settings.Manage', ['class' => 'nav-api']);
+    public function dashboardNavModule_init_handler(DashboardNavModule $nav) {
+        $nav->addLinkToSectionIf(
+            Gdn::session()->checkPermission('Garden.Settings.Manage'),
+            'settings',
+            t('API'),
+            '/settings/api',
+            'site-settings.apiv1',
+            'nav-api',
+            ['after' => 'security'],
+            ['badge' => 'v1']
+        );
     }
 
     /**
@@ -646,6 +633,45 @@ class SimpleAPIPlugin extends Gdn_Plugin {
             'Plugins.SimpleAPI.UserID' => $userID,
             'Plugins.SimpleAPI.AccessToken' => $accessToken
         ]);
+    }
+
+    /**
+     * Check the user's access token.
+     *
+     * @throws \Exception Throws an exception when trying to to validate an access token through HTTP instead of HTTPS when that's not allowed.
+     */
+    private function checkAccessToken() {
+        $accessToken = Gdn::request()->get('access_token', null);
+        if ($accessToken === null && preg_match('`^Bearer\s+(.+)$`i', Gdn::request()->getHeader('Authorization'), $m)) {
+            $accessToken = $m[1] ?:null;
+        }
+
+        if ($accessToken !== null) {
+            if (hash_equals($accessToken, c('Plugins.SimpleAPI.AccessToken'))) {
+                // Check for only-https here because we don't want to check for https on json calls from javascript.
+                $onlyHttps = c('Plugins.SimpleAPI.OnlyHttps');
+                if ($onlyHttps && strcasecmp(Gdn::request()->scheme(), 'https') !== 0) {
+                    throw new Exception(t('You must access the API through https.'), 401);
+                }
+
+                $userID = c('Plugins.SimpleAPI.UserID');
+                $user = false;
+                if ($userID) {
+                    $user = Gdn::userModel()->getID($userID);
+                }
+                if (!$user) {
+                    $userID = Gdn::userModel()->getSystemUserID();
+                }
+
+                Gdn::session()->start($userID, false, false);
+                Gdn::session()->validateTransientKey(true);
+            } else {
+                if (!Gdn::session()->isValid()) {
+                    // Add a header to aid debugging.
+                    safeHeader('X-WWW-Authenticate: error="invalid_token_v1"');
+                }
+            }
+        }
     }
 
 }

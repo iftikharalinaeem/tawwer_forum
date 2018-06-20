@@ -1,8 +1,8 @@
 {
     "name": "Bootstrap",
     "description": "A theme based on the popular Twitter Bootstrap framework.",
-    "version": "1.0.13",
-    "hidden": false,
+    "version": "1.1.0",
+    "hidden": true,
     "options": {
         "description": "This theme has an alternative colour scheme.",
         "styles": {
@@ -22,5 +22,8 @@
             "email": "todd@vanillaforums.com",
             "homepage": "http://vanillaforums.org/profile/todd"
         }
-    ]
+    ],
+    "build": {
+        "process": "v1"
+    }
 }

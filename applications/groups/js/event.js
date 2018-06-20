@@ -250,7 +250,7 @@ jQuery(document).ready(function($) {
       });
 
       // On event page
-      $('.EventAttending').on('change', function(e) {
+      $('.EventAttending:radio').on('change', function(e) {
          var eventId = $('.EventInfo').data('eventid');
          var eventAttending = $(e.target);
          var result = false;
@@ -270,7 +270,12 @@ jQuery(document).ready(function($) {
       function processStatus(eventId, result) {
          $.ajax({
             url: gdn.url('/event/attending'),
-            data: {'EventID':eventId, 'Attending':result},
+            method: 'POST',
+            data: {
+               'EventID': eventId,
+               'Attending': result,
+               'TransientKey': gdn.definition('TransientKey')
+            },
             dataType: 'json',
             success: function(json) {
                // Process targets

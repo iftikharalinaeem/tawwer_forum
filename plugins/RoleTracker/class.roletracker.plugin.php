@@ -243,6 +243,49 @@ class RoleTrackerPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add "untracking" options on discussions.
+     *
+     * @param Gdn_Controller $sender Sending controller instance.
+     * @param array $args Event arguments.
+     */
+    public function base_discussionOptions_handler($sender, $args) {
+        $trackedRoles = RoleTrackerModel::instance()->getTrackedRoles();
+        if (!$trackedRoles) {
+            return;
+        }
+
+        $discussion = $args['Discussion'];
+        if (!Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', val('PermissionCategoryID', $discussion))) {
+            return;
+        }
+
+        $discussionTags = val('Tags', $discussion);
+        if ($discussionTags) {
+            $discussionTags = Gdn_DataSet::index($discussionTags, 'TagID');
+        } else {
+            $tagModel = new TagModel();
+            $discussionTags = $tagModel->getDiscussionTags(val('DiscussionID', $discussion), TagModel::IX_TAGID);
+        }
+        if (!$discussionTags) {
+            return;
+        }
+
+        $trackedRolesByTag = Gdn_DataSet::index($trackedRoles, 'TrackerTagID');
+        $discussionsTrackedTagIDs = array_intersect(array_keys($trackedRolesByTag), array_keys($discussionTags));
+        if (!$discussionsTrackedTagIDs) {
+            return;
+        }
+
+        $url = '/roletracker/untrack/'.val('DiscussionID', $discussion);
+        $label = t('Role Tracker').'...';
+        if (isset($args['DiscussionOptions'])) {
+            $args['DiscussionOptions']['RoleTracker'] = ['Label' => $label, 'Url' => $url, 'Class' => 'Popup'];
+        } elseif (isset($sender->Options)) {
+            $sender->Options .= '<li>'.anchor($label, $url, 'Popup RoleTrackerOptions') . '</li>';
+        }
+    }
+
+    /**
      * Inject tracker roles' tag into authorInfo
      *
      * @param DiscussionController $sender Sending controller instance.
@@ -389,7 +432,7 @@ if (!function_exists('writePostTrackedTags')) {
             }
             $trackerTag = $tags[$tagID];
             $tagFullName = htmlspecialchars(t($trackerTag['FullName']));
-            $tagName = htmlspecialchars(strtolower(t($tagName['Name'])));
+            $tagName = htmlspecialchars(strtolower(t($trackerTag['Name'])));
             // Keep those spaces before and after the tag :D
             $classes[] = 'tag-'.$tagName.'-tracker';
             $names[] = $tagFullName;

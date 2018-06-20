@@ -50,14 +50,19 @@ class WatermarkPlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function settingsController_afterCategorySettings_handler($sender, $args) {
+    public function vanillaSettingsController_afterCategorySettings_handler($sender, $args) {
+        if (!$sender->data('CategoryID') || !c('Watermark.WatermarkPath')) {
+            // We can only add watermarking to a category after it has been created, in edit mode, when we have a CategoryID
+            // and if there is a Watermark Image to add to image uploads.
+            return;
+        }
         $watermarkImageCategory = c("Watermark.WatermarkCategories");
         if (!$watermarkImageCategory) {
             $watermarkImageCategory = [];
         }
         $isChecked = in_array($sender->data('CategoryID'), $watermarkImageCategory) ? 1 : 0;
         $sender->Form->setValue("Watermark", $isChecked);
-        echo "<li>" . $sender->Form->checkBox('Watermark', t("Add a watermark to images uploaded to discussions in this category.")) . "</li>";
+        echo '<li class="form-group">'.$sender->Form->toggle('Watermark', t('Add a watermark to images uploaded to discussions in this category.')).'</li>';
     }
 
     /**
@@ -102,20 +107,20 @@ class WatermarkPlugin extends Gdn_Plugin {
 
         $validation = new Gdn_Validation();
         $validation->addRule('validWatermarkType', 'function:validWaterMarkType');
-        $validation->applyRule('watermark', 'validWatermarkType', t('Watermark has to be in the PNG format'));
+        $validation->applyRule('watermark_upload', 'validWatermarkType', t('Watermark has to be in the PNG format'));
         $configurationModel = new Gdn_ConfigurationModel($validation);
 
         // Set the model on the form.
         $sender->Form->setModel($configurationModel);
         // Get the current logo.
-        $watermark = c('Watermark.WatermarkPath');
-        if ($watermark) {
-            $watermark = ltrim($watermark, '/');
+        $uploaded_watermark = c('Watermark.WatermarkPath');
+        if ($uploaded_watermark) {
+            $uploaded_watermark = ltrim($uploaded_watermark, '/');
             // Fix the logo path.
-            if (stringBeginsWith($watermark, 'uploads/')) {
-                $watermark = substr($watermark, strlen('uploads/'));
+            if (stringBeginsWith($uploaded_watermark, 'uploads/')) {
+                $uploaded_watermark = substr($uploaded_watermark, strlen('uploads/'));
             }
-            $sender->setData('watermark', $watermark);
+            $sender->setData('uploaded_watermark', $uploaded_watermark);
         }
 
         // If seeing the form for the first time...
@@ -125,55 +130,58 @@ class WatermarkPlugin extends Gdn_Plugin {
         } else {
             if (gdn::request()->post('delete_watermark')) {
                 // Remove the existing watermark in form. Redirect back to form.
-                $this->removeWatermark();
-                redirectTo('/settings/watermark');
+                $removed = false;
+                if ($this->removeWatermark()) {
+                    $removed = true;
+                    $sender->informMessage(t("Your watermark has been deleted."));
+                }
             }
 
-            if ($sender->Form->save() !== false) {
-                $upload = new Gdn_Upload();
-                try {
-                    // Validate the upload
-                    $tmpImage = $upload->validateUpload('watermark', false);
-                    if ($tmpImage) {
-                        // Generate the target image name
-                        $targetImage = $upload->generateTargetName(PATH_UPLOADS, 'png');
-                        $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
+            $upload = new Gdn_Upload();
+            try {
+                // Validate the upload
+                $tmpImage = $upload->validateUpload('watermark_upload', false);
+                if ($tmpImage) {
+                    // Generate the target image name
+                    $targetImage = $upload->generateTargetName(PATH_UPLOADS, 'png');
+                    $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
 
-                        // Delete any previously uploaded images.
-                        if ($watermark) {
-                            $upload->delete($watermark);
-                        }
-
-                        // Save the uploaded image
-                        $parts = $upload->saveAs(
-                            $tmpImage,
-                            $imageBaseName
-                        );
-                        $imageBaseName = $parts['SaveName'];
-                        $sender->setData('watermark', $imageBaseName);
+                    // Delete any previously uploaded images.
+                    if ($uploaded_watermark) {
+                        $upload->delete($uploaded_watermark);
                     }
-                } catch (Exception $ex) {
-                    $sender->Form->addError($ex);
+
+                    // Save the uploaded image
+                    $parts = $upload->saveAs(
+                        $tmpImage,
+                        $imageBaseName
+                    );
+                    $imageBaseName = $parts['SaveName'];
+                    $sender->setData('watermark_upload', $imageBaseName);
                 }
-                // If there were no errors, save the path to the logo in the config
-                if ($sender->Form->errorCount() == 0) {
-                    saveToConfig('Watermark.WatermarkPath', $imageBaseName);
-                }
+            } catch (Exception $ex) {
+                $sender->Form->addError($ex);
+            }
+            // If there were no errors, save the path to the logo in the config
+            if ($sender->Form->errorCount() == 0) {
+                saveToConfig('Watermark.WatermarkPath', $imageBaseName);
+            }
+            if (!$removed) {
                 $sender->informMessage(t("Your settings have been saved."));
             }
         }
-
         $sender->render('upload', '', 'plugins/Watermark');
     }
 
     /**
      * Delete the current watermark image. Redirect to remove the watermark embedded on page.
+     * @return bool true on success, false on failure.
      */
     public function removeWatermark() {
         $watermark = c('Watermark.WatermarkPath', '');
         removeFromConfig('Watermark.WatermarkPath');
         $upload = new Gdn_Upload();
-        $upload->delete($watermark);
+        return $upload->delete($watermark);
     }
 
     /**

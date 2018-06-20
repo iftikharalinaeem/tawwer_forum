@@ -1,5 +1,10 @@
 <?php if (!defined('APPLICATION')) exit;
 
+use Garden\Schema\Schema;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ServerException;
+use Vanilla\ApiUtils;
+
 /**
  * Ideation Plugin
  *
@@ -35,6 +40,11 @@ class IdeationPlugin extends Gdn_Plugin {
     const CATEGORY_IDEATION_COLUMN_NAME = 'IdeationType';
 
     /**
+     * Ideation cache key.
+     */
+    const IDEATION_CACHE_KEY = 'ideaCategoryIDs';
+
+    /**
      * @var int The tag ID of the upvote reaction.
      */
     protected static $upTagID;
@@ -43,6 +53,29 @@ class IdeationPlugin extends Gdn_Plugin {
      * @var int The tag ID of the downvote reaction.
      */
     protected static $downTagID;
+
+    /** @var DiscussionModel */
+    private $discussionModel;
+
+    /** @var StatusModel */
+    private $statusModel;
+
+    /** @var UserModel */
+    private $userModel;
+
+    /**
+     * IdeationPlugin constructor.
+     *
+     * @param DiscussionModel $discussionModel
+     * @param StatusModel $statusModel
+     * @param UserModel $userModel
+     */
+    public function __construct(DiscussionModel $discussionModel, StatusModel $statusModel, UserModel $userModel) {
+        $this->discussionModel = $discussionModel;
+        $this->statusModel = $statusModel;
+        $this->userModel = $userModel;
+        parent::__construct();
+    }
 
     /**
      * This will run when you "Enable" the plugin.
@@ -78,6 +111,66 @@ class IdeationPlugin extends Gdn_Plugin {
             self::setUpTagID(val('TagID', $reactionUp));
         }
         return self::$upTagID;
+    }
+
+    /**
+     * Get idea metadata for a discussion.
+     *
+     * @param array $discussion
+     * @return array
+     */
+    private function getIdeaMetadata(array $discussion) {
+        $result = null;
+
+        $discussionID = $discussion['discussionID'] ?? $discussion['DiscussionID'] ?? null;
+        $categoryID = $discussion['categoryID'] ?? $discussion['CategoryID'] ?? null;
+
+        if (!$discussionID || !$categoryID) {
+            return $result;
+        }
+
+        $category = CategoryModel::categories($categoryID);
+        if (!$this->isIdeaCategory($category)) {
+            return $result;
+        }
+
+        $type = $category['IdeationType'];
+        $status = $this->statusModel->getStatusByDiscussion($discussionID);
+        $statusNotes = $discussion['Attributes']['StatusNotes'] ?? $discussion['attributes']['statusNotes'] ?? null;
+        $result = [
+            'statusID' => val('StatusID', $status),
+            'status' => [
+                'name' => val('Name', $status),
+                'state' => lcfirst(val('State', $status))
+            ],
+            'statusNotes' => $statusNotes,
+            'type' => $type
+        ];
+
+        return $result;
+    }
+
+    /**
+     * Set a idea metadata on a discussion row.
+     *
+     * @param array $row
+     * @return array
+     */
+    private function setIdeaMetadata(array $row) {
+        $type = $row['type'] ?? $row['Type'] ?? '';
+        $type = strtolower($type);
+
+        if ($type === 'idea') {
+            $schema = $this->getIdeaMetadataFragment();
+            $metadata = $this->getIdeaMetadata($row);
+            $metadata = $schema->validate($metadata);
+            if (is_array($metadata)) {
+                $key = array_key_exists('attributes', $row) ? 'attributes.idea' : 'Attributes.Idea';
+                setvalr($key, $row, $metadata);
+            }
+        }
+
+        return $row;
     }
 
     /**
@@ -127,6 +220,48 @@ class IdeationPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Hook in when reacting to a post to validate votes on an idea.
+     *
+     * @param array $data
+     * @param ReactionModel $sender
+     * @param array $reactionType
+     * @return array
+     */
+    public function reactionModel_react_saveData(array $data, ReactionModel $sender, array $reactionType) {
+        if (strtolower($data['RecordType']) === 'discussion') {
+            $discussion = $this->discussionModel->getID($data['RecordID'], DATASET_TYPE_ARRAY);
+            if (val('Type', $discussion) === 'Idea') {
+                $discussionID = $discussion['DiscussionID'];
+                $categoryID = $discussion['CategoryID'];
+                $category = CategoryModel::categories($categoryID);
+                if (!$this->isIdeaCategory($category)) {
+                    throw new Gdn_UserException("Category is not configured for ideation.");
+                }
+                $allowDownVotes = $this->allowDownVotes($discussion, 'discussion');
+
+                $status = $this->statusModel->getStatusByDiscussion($discussionID);
+                if ($status['State'] === 'Closed') {
+                    throw new Gdn_UserException('This idea is closed.');
+                }
+
+                $vote = $this->getReactionFromTagID($data['TagID']);
+                if (empty($vote)) {
+                    // If this isn't a valid vote reaction, let the user know what the valid reactions are for this  idea.
+                    $voteReactions = [self::REACTION_UP];
+                    if ($allowDownVotes) {
+                        $voteReactions[] = self::REACTION_DOWN;
+                    }
+                    throw new Gdn_UserException('Reactions to this idea must be one of the following: ' . implode(', ', $voteReactions));
+                } elseif ($vote === self::REACTION_DOWN && !$allowDownVotes) {
+                    throw new Gdn_UserException('Down votes are not allowed on this idea.');
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Adds ideation options to the categories setting page -> enabling ideation on a category and enabling downvotes.
      * Also manipulates the allowed discussion types options when ideation is enabled on a category.
      * Ideas are the only discussion type allowed in an ideation category. Existing idea categories cannot be changed
@@ -155,7 +290,7 @@ EOT
             $sender->addJsFile('ideation.js', 'plugins/ideation'); // Show/hide allowed discussions and downvote option
 
             if (!$categoryID) {
-                $sender->Data['_ExtendedFields']['IsIdea'] = ['Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => t('Ideation') .'<div class="info"><a href="http://docs.vanillaforums.com/addons/ideation/">' . sprintf(t('Learn more about %s'), t('ideas')) . '</a></div>'];
+                $sender->Data['_ExtendedFields']['IsIdea'] = ['Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => t('Ideation') .'<div class="info"><a href="https://docs.vanillaforums.com/help/ideation/">' . sprintf(t('Learn more about %s'), t('ideas')) . '</a></div>'];
             }
 
             $downVoteOptions = [];
@@ -182,10 +317,26 @@ EOT
      */
     public function base_allowedDiscussionTypes_handler($sender, $args) {
         $category = val('Category', $args);
-        if (empty($category)) {
-            // We're on Recent Discussions. Hitting post/idea from here is fine; it'll default to your Idea category.
+        if (empty($category) || val("DisplayAs", $category) === "Categories") {
+            // We're on Recent Discussions;
+            // Hitting post/idea from here is fine;
+            // We might not want the "Idea" type in the drop down depending on the user/category permissions
+            //
+            // Alternatively we are in a nested category and currently aren't going to recursively check all child categories
+            // This is particularly necessary to make this work with the top level subcommunities without
+            // recursively checking categories. This is a STOPGAP solution until we have a better way to handle this
+            // or create workflows that do not require handling it.
+
+            $ideaCategoryIDs = $this->getIdeaCategoryIDs();
+            foreach ($ideaCategoryIDs as $categoryID) {
+                if (CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Add')) {
+                    return;
+                }
+            }
+            unset($args['AllowedDiscussionTypes']['Idea']);
             return;
         }
+
         if ($this->isIdeaCategory($category)) {
             $args['AllowedDiscussionTypes'] = ['Idea' => $this->getIdeaDiscussionType()];
         } elseif (isset($args['AllowedDiscussionTypes']['Idea'])) {
@@ -356,10 +507,24 @@ EOT
      * @throws Exception
      */
     public function postController_idea_create($sender, $args) {
-        $categoryCode = val(0, $args, '');
+        //Get tag values from form and append default status.
+        if ($sender->Form->authenticatedPostBack()) {
+            $defaultStatus = val('TagID', StatusModel::instance()->getDefaultStatus());
+            $userTags = $sender->Form->getFormValue('Tags');
+            $tags = "";
+            if ($defaultStatus) {
+                $tags = "$defaultStatus,";
+            }
+            if ($userTags) {
+                $tags .= $userTags;
+            }
+            $sender->Form->setFormValue('Tags', $tags);
+            $sender->setData('Tags', $tags);
+        }
+
         $sender->setData('Type', 'Idea');
         $sender->Form->setFormValue('Type', 'Idea');
-        $sender->Form->setFormValue('Tags', val('TagID', StatusModel::instance()->getDefaultStatus()));
+        $categoryCode = val(0, $args, '');
         $sender->View = 'discussion';
         $ideaTitle = t('Idea Title');
         Gdn::locale()->setTranslation('Discussion Title', $ideaTitle, false);
@@ -533,7 +698,7 @@ EOT
     }
 
     /**
-     * Disables rendering of tags in a discussion and sets up the idea counter module for the discussion attachment.
+     * Sets up the idea counter module for the discussion attachment.
      *
      * @param DiscussionController $sender
      */
@@ -541,8 +706,6 @@ EOT
         $discussion = val('Discussion', $sender);
 
         $isAnIdea = $this->isIdea($discussion);
-        // Don't display tags on a idea discussion.
-        saveToConfig('Vanilla.Tagging.DisableInline', $isAnIdea, true);
         if (!$isAnIdea) {
             return;
         }
@@ -578,7 +741,7 @@ EOT
     public function base_discussionOptions_handler($sender, $args) {
         $discussion = $args['Discussion'];
 
-        if (!Gdn::session()->checkPermission('Vanilla.Moderation.Manage')
+        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')
             && !Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
             return;
         }
@@ -614,6 +777,7 @@ EOT
      *
      * @param DiscussionController $sender Sending controller instance.
      * @param string|int $discussionID Identifier of the discussion
+     * @throws Exception if discussion isn't found.
      */
     public function discussionController_ideationOptions_create($sender, $discussionID = '') {
         $sender->Form = new Gdn_Form();
@@ -643,6 +807,9 @@ EOT
                         $type
                     );
 
+                    // Override score on the discussion.
+                    $this->recalculateIdeaScore($discussion);
+
                     // Setup the default idea status
                     $this->updateDiscussionStatusTag($discussionID, $statusID);
 
@@ -654,6 +821,10 @@ EOT
                     );
                     break;
                 default:
+                    // Recalculate the discussion score when an idea is converted back to a reaction.
+                    $reactionModel = new ReactionModel();
+                    $reactionModel->recalculateTotals();
+
                     // Prune away any ideation status attachments, since this isn't an idea.
                     AttachmentModel::instance()->delete([
                         'ForeignID' => "d-{$discussionID}",
@@ -689,7 +860,7 @@ EOT
                 throw notFoundException('Idea');
             }
 
-            if (!Gdn::session()->checkPermission('Vanilla.Moderation.Manage')
+            if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')
                 && !Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $discussion->PermissionCategoryID)) {
                 return;
             }
@@ -781,6 +952,23 @@ EOT
     protected function updateDiscussionStatusNotes($discussionID, $notes) {
         $discussionModel = new DiscussionModel();
         $discussionModel->saveToSerializedColumn('Attributes', $discussionID, 'StatusNotes', $notes);
+    }
+
+    /**
+     * Calculates discussion score base only vote reactions and overrides previous discussion score.
+     *
+     * @param object|array $discussion
+     */
+    private function recalculateIdeaScore($discussion) {
+        $discussionModel = new DiscussionModel();
+
+        // If voting reactions exist, overwrite the score.
+        if (valr('Attributes.React', $discussion) ) {
+            $countUp = valr('Attributes.React.'.self::REACTION_UP, $discussion, 0);
+            $countDown = valr('Attributes.React.'.self::REACTION_DOWN, $discussion, 0);
+            $score = $countUp - $countDown;
+            $discussionModel->setField($discussion->DiscussionID, 'Score', $score);
+        }
     }
 
     /**
@@ -894,6 +1082,42 @@ EOT
         $attachmentModel->save($attachment);
     }
 
+
+    /**
+     * Filters out the status tags so that they will not be displayed.
+     *
+     * @param TagModule $sender
+     * @param array $args
+     */
+    public function tagModule_getData_handler($sender, $args) {
+        if ($args['ParentType'] != 'Discussion') {
+            return;
+        }
+
+        $row = $this->discussionModel->getID($args['ParentID']);
+        if (val('Type', $row) != 'Idea') {
+            return;
+        }
+
+        //Get the tags associated to the discussion
+        $tagModel = new TagModel();
+        $tags = $tagModel->getDiscussionTags($args['ParentID'], false);
+
+        //Get the ID's for status tags
+        $statusModel = new StatusModel();
+        $statusTags = $statusModel->getStatuses();
+        $statusTagIDs = array_column($statusTags, 'TagID');
+
+        // Filter out the status tags
+        foreach ($tags as $key => $tag) {
+            if (in_array($tag['TagID'], $statusTagIDs)) {
+                unset($tags[$key]);
+            }
+        }
+
+        $args['tagData'] = $tags;
+    }
+
     /**
      * REACTIONS
      * ---------
@@ -918,6 +1142,36 @@ EOT
                 }
             }
         }
+    }
+
+    /**
+     * Modify the types filter when getting a summary of reactions on a post.
+     *
+     * @param array $filter
+     * @param ReactionModel $sender
+     * @param array $record
+     */
+    public function reactionsModel_getRecordSummary_typesFilter(array $filter, ReactionModel $sender, array $record) {
+        $discussionID = $record['discussionID'] ?? $record['DiscussionID'] ?? null;
+        $categoryID = $record['categoryID'] ?? $record['CategoryID'] ?? null;
+
+        if ($discussionID && $categoryID && $categoryID > 0) {
+            $category = CategoryModel::categories($categoryID);
+            $discussionType = $record['type'] ?? $record['Type'] ?? '';
+            $discussionType = strtolower($discussionType);
+
+            if ($discussionType === 'idea' && $this->isIdeaCategory($category)) {
+                // Only report vote reactions on an idea.
+                $type = $category['IdeationType'] ?? null;
+                $filter = ['UrlCode' => [self::REACTION_UP]];
+                if ($type === 'up-down') {
+                    // Include down votes on categories that allow them.
+                    $filter['UrlCode'][] = self::REACTION_DOWN;
+                }
+            }
+        }
+
+        return $filter;
     }
 
     /**
@@ -996,16 +1250,25 @@ EOT
      * Only the up and down reactions should contribute to the score.
      *
      * @param Gdn_Controller $sender
-     * @param $args
+     * @param array $args
      */
     public function base_beforeReactionsScore_handler($sender, $args) {
         if (val('ReactionType', $args) && (val('Type', val('Record', $args)) == 'Idea')) {
             $reaction = val('ReactionType', $args);
             if ((val('UrlCode', $reaction) != self::REACTION_UP) && (val('UrlCode', $reaction) != self::REACTION_DOWN)) {
                 $args['Set'] = [];
-
+            } else {
+                if (!isset($args['RecordID'])) {
+                    return;
+                }
+                $upVote = valr(self::REACTION_UP, $args['reactionTotals'], 0);
+                $downVote = valr(self::REACTION_DOWN, $args['reactionTotals'],  0);
+                $newVoteTotal = $upVote - $downVote;
+                $args['Set'] = ['score' => $newVoteTotal];
+                $discussionModel = new DiscussionModel();
+                $discussionModel->setField($args['RecordID'], 'Score', $newVoteTotal);
             }
-        }
+       }
     }
 
     /**
@@ -1037,6 +1300,135 @@ EOT
     }
 
     /**
+     * Modify the data on /api/v2/discussions index to include ideation metadata..
+     *
+     * @param array $discusion.
+     * @param DiscussionsApiController $sender
+     * @param array $options
+     * @param array $rows Raw result.
+     */
+    public function discussionsApiController_normalizeOutput(array $discussion, DiscussionsApiController $sender, array $options) {
+        if ($discussion['type'] === 'idea') {
+            $discussion = $this->setIdeaMetadata($discussion);
+        }
+
+        return $discussion;
+    }
+
+    /**
+     * Update idea metadata on a discussion through the discussions API endpoint.
+     *
+     * @param DiscussionsApiController $sender
+     * @param int $id
+     * @param array $body
+     * @return array
+     * @throws ClientException if the discussion is not a valid idea.
+     * @throws ClientException if the status ID is not associated with a valid idea status.
+     * @throws ServerException if, after saving, the status cannot be retrievd from an idea.
+     */
+    public function discussionsApiController_patch_idea(DiscussionsApiController $sender, $id, array $body) {
+        $sender->permission('Garden.Moderation.Manage');
+
+        $in = $sender->schema($this->statusFragment(), 'in')
+            ->setDescription('Update idea metadata on a discussion.');
+        $out = $sender->schema($this->statusFragment(), 'out');
+
+        $body = $in->validate($body, true);
+
+        // Verify the discussion is valid.
+        $discussion = $sender->discussionByID($id);
+        if (!$this->isIdea($discussion)) {
+            throw new ClientException('Discussion is not an idea.');
+        }
+
+        // Grab the current idea state.
+        $currentStatus = $this->statusModel->getStatusByDiscussion($id);
+        if (empty($currentStatus)) {
+            throw new ServerException('An error was encountered while getting the status of the idea.', 500);
+        }
+        $currentStatusNotes = $this->getStatusNotes($discussion) ?: null;
+
+        // Coalesce values for convenience.
+        $statusID = $body['statusID'] ?? null;
+        $statusNotes = $body['statusNotes'] ?? null;
+
+        if ($statusID) {
+            // Verify the new status.
+            $status = $this->statusModel->getStatus($statusID);
+            if (!is_array($status) || !array_key_exists('StatusID', $status)) {
+                throw new ClientException('Invalid status ID.');
+            }
+            // Updating the status can potentially trigger notices to the user.
+            $this->updateDiscussionStatus($discussion, $statusID, $statusNotes ?: $currentStatusNotes ?: '');
+        } elseif ($statusNotes) {
+            // Only update the notes. No user notifications.
+            $this->updateDiscussionStatusNotes($id, $statusNotes);
+            $this->updateAttachment($id, $currentStatus['StatusID'], $statusNotes);
+        }
+
+        // Grab the updated values.
+        $updatedStatus = $this->statusModel->getStatusByDiscussion($id);
+        if (empty($updatedStatus)) {
+            throw new ServerException('An error was encountered while getting the status of the idea.', 500);
+        }
+        $updatedDiscussion = $sender->discussionByID($id);
+        $updatedStatusNotes = $this->getStatusNotes($updatedDiscussion) ?: null;
+
+        $row = [
+            'statusID' => $updatedStatus['StatusID'],
+            'statusNotes' => $updatedStatusNotes
+        ];
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
+     * Create an idea through the discussions API endpoint.
+     *
+     * @param DiscussionsApiController $sender
+     * @param array $body
+     * @return array
+     * @throws ClientException if the category is not configured for ideation.
+     */
+    public function discussionsApiController_post_idea(DiscussionsApiController $sender, array $body) {
+        $sender->permission('Garden.SignIn.Allow');
+
+        $in = $sender->schema($sender->discussionPostSchema(), 'in')->setDescription('Add an idea.');
+        $out = $sender->schema($sender->discussionSchema(), 'out');
+
+        $body = $in->validate($body);
+        $categoryID = $body['categoryID'];
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $categoryID);
+        $sender->fieldPermission($body, 'closed', 'Vanilla.Discussions.Close', $categoryID);
+        $sender->fieldPermission($body, 'pinned', 'Vanilla.Discussions.Announce', $categoryID);
+        $sender->fieldPermission($body, 'sink', 'Vanilla.Discussions.Sink', $categoryID);
+
+        $category = CategoryModel::categories($categoryID);
+        if (!$this->isIdeaCategory($category)) {
+            throw new ClientException('Category is not configured for ideation.');
+        }
+
+        $discussionData = ApiUtils::convertInputKeys($body);
+
+        $discussionData['Type'] = 'Idea';
+        $defaultStatus = $this->statusModel->getDefaultStatus();
+        $discussionData['Tags'] = $defaultStatus['TagID'];
+
+        $id = $this->discussionModel->save($discussionData);
+        $sender->validateModel($this->discussionModel);
+
+        if (!$id) {
+            throw new ServerException('Unable to insert idea.', 500);
+        }
+
+        $row = $sender->discussionByID($id);
+        $this->userModel->expandUsers($row, ['InsertUserID', 'LastUserID']);
+        $row = $sender->normalizeOutput($row);
+        $result = $out->validate($row);
+        return $result;
+    }
+
+    /**
      * Adds the sessioned user's Idea* reaction to the discussion data in the form [UserVote] => TagID
      * where TagID is the TagID of the reaction.
      *
@@ -1063,6 +1455,44 @@ EOT
             $discussions = $sender->data('Discussions')->result();
             $this->addUserVotesToDiscussions($discussions);
         }
+    }
+
+    /**
+     * Update the /discussions/get input schema.
+     *
+     * @param Schema $schema
+     */
+    public function discussionSchema_init(Schema $schema) {
+        $this->updateSchemaAttributes($schema);
+    }
+
+    /**
+     * Get a schema object representing idea metadata on a discussion.
+     *
+     * @return Schema
+     */
+    private function getIdeaMetadataFragment() {
+        static $schema;
+
+        if (!isset($schema)) {
+            $schema = Schema::parse([
+                'statusNotes:s|n' => 'Status update notes.',
+                'statusID:i' => 'Unique numeric ID of a status.',
+                'status:o' => [
+                    'name:s' => 'Label for the status.',
+                    'state:s' => [
+                        'description' => 'The open/closed state of an idea.',
+                        'enum' => ['open', 'closed']
+                    ]
+                ],
+                'type:s' => [
+                    'description' => 'Voting type for this idea: up-only or up and down.',
+                    'enum' => ['up', 'up-down']
+                ]
+            ]);
+        }
+
+        return $schema;
     }
 
     /**
@@ -1242,7 +1672,7 @@ EOT
      * @throws Exception
      */
     public function notifyIdeaAuthor($authorID, $discussionID, $discussionName, $newStatus, $statusNotes = '') {
-        if (sizeof($discussionName) > 200) {
+        if (strlen($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
         $headline = sprintf(t('The status has changed for %s.'),
@@ -1278,7 +1708,7 @@ EOT
      * @throws Exception
      */
     public function notifyVoters($discussionID, $discussionName, $newStatus, $statusNotes = '') {
-        if (sizeof($discussionName) > 200) {
+        if (strlen($discussionName) > 200) {
             $discussionName = substr($discussionName, 0, 100).'…';
         }
 
@@ -1410,13 +1840,18 @@ EOT
      * Returns an array of Idea-type category IDs.
      */
     public function getIdeaCategoryIDs() {
-        $ideaCategoryIDs = [];
-        $categories = CategoryModel::categories();
-        foreach($categories as $category) {
-            if ($this->isIdeaCategory($category)) {
-                $ideaCategoryIDs[] = val('CategoryID', $category);
+        $ideaCategoryIDs = Gdn::cache()->get(self::IDEATION_CACHE_KEY);
+        if ($ideaCategoryIDs === Gdn_Cache::CACHEOP_FAILURE) {
+            $ideaCategoryIDs = [];
+            $categories = CategoryModel::categories();
+            foreach ($categories as $category) {
+                if ($this->isIdeaCategory($category)) {
+                    $ideaCategoryIDs[] = val('CategoryID', $category);
+                }
             }
+            Gdn::cache()->store(self::IDEATION_CACHE_KEY, $ideaCategoryIDs, [Gdn_Cache::FEATURE_EXPIRY => 300]);
         }
+
         return $ideaCategoryIDs;
     }
 
@@ -1465,6 +1900,54 @@ EOT
             return $noUp + $noDown;
         }
         return 0;
+    }
+
+    /**
+     * Get a schema object representing a simple subset of idea status metadata on a discussion.
+     *
+     * @return mixed
+     */
+    private function statusFragment() {
+        static $schema;
+
+        if (!isset($schema)) {
+            $schema = Schema::parse([
+                'statusID:i' => 'Idea status ID.',
+                'statusNotes:s|n' => 'Notes on a status change. Notes will persist until overwritten.'
+            ]);
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Update the attributes field of a post schema.
+     *
+     * @param Schema $schema
+     */
+    private function updateSchemaAttributes(Schema $schema) {
+        $attributes = $schema->getField('properties.attributes');
+
+        // Add to an existing "attributes" field or create a new one?
+        if ($attributes instanceof Schema) {
+            $attributes->merge(Schema::parse([
+                'idea?' => $this->getIdeaMetadataFragment()
+            ]));
+        } else {
+            $schema->merge(Schema::parse([
+                'attributes?' => Schema::parse([
+                    'idea?' => $this->getIdeaMetadataFragment()
+                ])
+            ]));
+        }
+    }
+
+    /**
+     * Flushing the ideation cache on this hook to prevent people creating a new ideation category
+     * not being able to see/post in it right away. See getIdeaCategoryIDs().
+     */
+    public function categoryModel_beforeSaveCategory_handler() {
+        Gdn::cache()->remove(self::IDEATION_CACHE_KEY);
     }
 }
 

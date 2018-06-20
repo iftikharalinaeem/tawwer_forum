@@ -34,22 +34,16 @@ class RankModel extends Gdn_Model {
         $currentRankID = val('RankID', $user);
         $result = ['CurrentRank' => $currentRankID ? self::ranks($currentRankID) : null];
 
-        $ranks = self::ranks();
+        $rankID = $this->determineUserRank($user);
 
-        // Check the ranks backwards so we know which rank to apply.
-        $ranks = array_reverse($ranks);
-        foreach ($ranks as $rank) {
-            if (self::testRank($user, $rank)) {
-                $rankID = $rank['RankID'];
-                $result['NewRank'] = $rank;
-                break;
-            }
-        }
-
-        if (!isset($rankID)) {
+        if ($rankID === null) {
             return $result;
         }
-        if (isset($rankID) && $rankID == $currentRankID) {
+
+        $rank = self::ranks($rankID);
+        $result['NewRank'] = $rank;
+
+        if ($rankID == $currentRankID) {
             return $result;
         }
 
@@ -64,6 +58,29 @@ class RankModel extends Gdn_Model {
         }
         if ($notify) {
             $this->notify($user, $rank);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Given a user row, determine the proper rank for that user.
+     *
+     * @param array $user
+     * @return int|null
+     */
+    public function determineUserRank(array $user) {
+        $result = null;
+
+        // Reverse sort ranks to ensure the highest match is first.
+        $ranks = self::ranks();
+        $ranks = array_reverse($ranks);
+
+        foreach ($ranks as $rank) {
+            if (self::testRank($user, $rank)) {
+                $result = $rank['RankID'];
+                break;
+            }
         }
 
         return $result;
@@ -457,10 +474,7 @@ class RankModel extends Gdn_Model {
      */
     public static function ranks($rankID = null) {
         if (self::$_Ranks === null) {
-            $m = new RankModel();
-            $ranks = $m->getWhere()->resultArray();
-            $ranks = Gdn_DataSet::index($ranks, ['RankID']);
-            self::$_Ranks = $ranks;
+            static::refreshCache();
         }
 
         if (!is_null($rankID) && !is_bool($rankID)) {
@@ -468,6 +482,19 @@ class RankModel extends Gdn_Model {
         } else {
             return self::$_Ranks;
         }
+    }
+
+    /**
+     * Refresh cache of ranks.
+     *
+     * @return array
+     */
+    public static function refreshCache() {
+        $m = new RankModel();
+        $ranks = $m->getWhere()->resultArray();
+        $ranks = Gdn_DataSet::index($ranks, ['RankID']);
+        self::$_Ranks = $ranks;
+        return self::$_Ranks;
     }
 
     /**

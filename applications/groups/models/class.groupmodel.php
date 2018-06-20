@@ -551,7 +551,7 @@ class GroupModel extends Gdn_Model {
      */
     public static function idFromSlug($slug) {
         $id = false;
-        if (preg_match('/(\d+)-.+/', $slug, $matches)) {
+        if (preg_match('/(\d+)-.*/', $slug, $matches)) {
             $id = (int)$matches[1];
         }
 
@@ -675,10 +675,11 @@ class GroupModel extends Gdn_Model {
                             'Route' => groupUrl($group, false, '/'),
                             'Story' => formatString(t("You've been invited to join {Name}."), ['Name' => htmlspecialchars($group['Name'])]),
                             'NotifyUserID' => $userID,
+                            'Notified' => ActivityModel::SENT_PENDING,
                             'Data' => ['Name' => $group['Name']]
                         ];
                         $activityModel = new ActivityModel();
-                        $activityModel->save($activity, 'Groups');
+                        $activityModel->save($activity);
                     }
                 }
             }
@@ -764,7 +765,7 @@ class GroupModel extends Gdn_Model {
 
             if ($inserted) {
                 $this->updateCount($groupID, 'CountMembers');
-                $this->SQL->delete('GroupApplicant', ['UserID' => $groupID, 'GroupID' => $userID]);
+                $this->SQL->delete('GroupApplicant', ['GroupID' => $groupID, 'UserID' => $userID]);
                 $success = true;
             }
         } else {
@@ -1222,11 +1223,23 @@ class GroupModel extends Gdn_Model {
         if ($this->checkPermission('View', $group)) {
             Gdn::session()->setPermission('Vanilla.Discussions.View', [$categoryID]);
             CategoryModel::setLocalField($categoryID, 'PermsDiscussionsView', true);
+        } else {
+            // Wipe the user permissions.
+            Gdn::session()->setPermission('Vanilla.Discussions.View', false);
+            // Wipe the per category permissions.
+            Gdn::session()->setPermission('Vanilla.Discussions.View', []);
         }
 
         if ($this->checkPermission('Member', $group)) {
             Gdn::session()->setPermission('Vanilla.Discussions.Add', [$categoryID]);
             Gdn::session()->setPermission('Vanilla.Comments.Add', [$categoryID]);
+        } else {
+            // Wipe the user permissions.
+            Gdn::session()->setPermission('Vanilla.Discussions.Add', false);
+            Gdn::session()->setPermission('Vanilla.Comments.Add', false);
+            // Wipe the per category permissions.
+            Gdn::session()->setPermission('Vanilla.Discussions.Add', []);
+            Gdn::session()->setPermission('Vanilla.Comments.Add', []);
         }
     }
 

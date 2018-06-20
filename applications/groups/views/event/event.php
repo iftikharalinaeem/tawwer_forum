@@ -29,7 +29,7 @@ echo $header;
         </li>
 
         <?php if ($this->data('Group')): ?>
-            <li class="EventGroup"><span class="Label"><?php echo t('Group'); ?></span><span class="FieldInfo"><?php echo anchor($this->data('Group.Name'), groupUrl($this->data('Group'))); ?></li>
+            <li class="EventGroup"><span class="Label"><?php echo t('Group'); ?></span><span class="FieldInfo"><?php echo anchor(htmlspecialchars($this->data('Group.Name')), groupUrl($this->data('Group'))); ?></li>
         <?php endif; ?>
 
         <li class="Organizer"><span class="Label"><?php echo t('Organizer'); ?></span><span class="FieldInfo"><?php echo userAnchor($this->data('Event.Organizer')); ?></span></li>
