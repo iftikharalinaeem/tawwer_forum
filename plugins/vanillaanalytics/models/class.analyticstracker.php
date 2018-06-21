@@ -12,6 +12,12 @@
  */
 class AnalyticsTracker {
 
+    /** Analytics cookie suffix. */
+    const COOKIE_SUFFIX = '-vA';
+
+    /** @var \Vanilla\Analytics\Cookie */
+    private $cookie;
+
     /**
      * @var bool Used to determine if we should avoid tracking events.
      */
@@ -35,11 +41,6 @@ class AnalyticsTracker {
     ];
 
     /**
-     * @var array An array containing the user's unique ID and session ID values.
-     */
-    protected $trackingIDs = null;
-
-    /**
      * Our constructor.
      */
     protected function __construct() {
@@ -55,6 +56,9 @@ class AnalyticsTracker {
         if (count($this->trackers) == 0) {
             Logger::event('vanilla_analytics', Logger::DEBUG, 'No tracking services available for recording analytics data.');
         }
+
+        $this->cookie = new Vanilla\Analytics\Cookie(Gdn::session());
+        $this->cookie->loadCookie(self::COOKIE_SUFFIX);
     }
 
     /**
@@ -117,19 +121,6 @@ class AnalyticsTracker {
     }
 
     /**
-     * Fetch default data to populate a tracking cookie.
-     *
-     * @param array $eventData If an event is being tracked via cookie, pass the details here.
-     * @return array
-     */
-    public function getCookieData(array $eventData = []) {
-        return [
-            'eventData'   => $eventData,
-            'trackingIDs' => $this->trackingIDs()
-        ];
-    }
-
-    /**
      * Grab an array representing available default analytics widgets.
      *
      * @return array
@@ -158,7 +149,9 @@ class AnalyticsTracker {
             'ip' => Gdn::request()->ipAddress(),
             'method' => Gdn::request()->requestMethod(),
             'site' => AnalyticsData::getSite(),
-            'url' => url('', true)
+            'url' => url('', true),
+            'pv' => $this->cookie->getPrivacy(),
+            '_country' => $this->getRequestCountry(),
         ];
 
         // Only add user-related information if a user is signed in.
@@ -222,12 +215,86 @@ class AnalyticsTracker {
     }
 
     /**
+     * Attempt to get country for the current request.
+     *
+     * @return string|null A country code in the ISO 3166-1 Alpha 2 format on success. Null on failure.
+     */
+    public function getRequestCountry() {
+        $result = $_SERVER['HTTP_CF_IPCOUNTRY'] ?? null;
+        return $result;
+    }
+
+    /**
      * Grab a list of all available analytics service tracker classes.
      *
      * @return array An array of available analytics service tracker classes.
      */
     public function getTrackerClasses() {
         return $this->trackerClasses;
+    }
+
+    /**
+     * Given a country code, determine the default privacy flag.
+     *
+     * @param string|null $country
+     * @return int
+     */
+    private function privacyByCountry($country) {
+        // Countries in the EU
+        $EU = [
+            'AT', // Austria
+            'BE', // Belgium
+            'BG', // Bulgaria
+            'HR', // Croatia
+            'CY', // Republic of Cyprus
+            'CZ', // Czech Republic
+            'DK', // Denmark
+            'EE', // Estonia
+            'FI', // Finland
+            'FR', // France
+            'DE', // Germany
+            'GR', // Greece
+            'HU', // Hungary
+            'IE', // Ireland
+            'IT', // Italy
+            'LV', // Latvia
+            'LT', // Lithuania
+            'LU', // Luxembourg
+            'MT', // Malta
+            'NL', // Netherlands
+            'PL', // Poland
+            'PT', // Portugal
+            'RO', // Romania
+            'SK', // Slovakia
+            'SI', // Slovenia
+            'ES', // Spain
+            'SE', // Sweden
+            'GB', // UK
+        ];
+
+        $result = (!$country || in_array($country, $EU)) ? 0 : \Vanilla\Analytics\Cookie::PRIVACY_MASK_OPT_IN;
+        return $result;
+    }
+
+    /**
+     * Update cookies, as necessary.
+     */
+    public function refreshCookies() {
+        if ($this->cookie->getPrivacy() === null) {
+            $country = $this->getRequestCountry();
+            $privacy = \Vanilla\Analytics\Cookie::PRIVACY_MASK_AUTO | $this->privacyByCountry($country);
+            $this->cookie->setPrivacy($privacy);
+        }
+        if ($this->cookie->getSessionID() === null || Gdn::session()->isNewVisit()) {
+            $sessionID = AnalyticsData::uuid();
+            $this->cookie->setSessionID($sessionID);
+        }
+        if ($this->cookie->getUUID() === null) {
+            $UUID = AnalyticsData::uuid();
+            $this->cookie->setUUID($UUID);
+        }
+
+        $this->cookie->saveToCookie(self::COOKIE_SUFFIX);
     }
 
     /**
@@ -293,55 +360,13 @@ class AnalyticsTracker {
     /**
      * Set and get tracking ID detail array.
      *
-     * @param string|null $uuid Universally unique ID for users.
-     * @param string|null $sessionID Unique ID for tracking user sessions.
      * @return array UUID and session ID values for the current user.
      */
     public function trackingIDs() {
-        // No tracking IDs?  Well, let's fix that...
-        if (is_null($this->trackingIDs)) {
-            // Start with an empty template.
-            $this->trackingIDs = [
-                'sessionID' => null,
-                'uuid' => null
-            ];
-
-            // Fetch our tracking cookie.
-            $cookieIDsRaw = Gdn::session()->getCookie('-vA', false);
-
-            // Does the tracking cookie contain valid JSON?
-            if ($cookieIDs = @json_decode($cookieIDsRaw)) {
-                // Do we already have a UUID for this user?
-                if ($uuid = val('uuid', $cookieIDs)) {
-                    // Is the user logged, but their UUID doesn't match what we have on file?
-                    if (Gdn::session()->isValid() && AnalyticsData::getUserUuid() != $uuid) {
-                        // Log the mismatch and update the UUID to the one we have saved for the user.
-                        Logger::event('vanilla_analytics', Logger::DEBUG, 'User UUID mismatch.');
-                        $uuid = AnalyticsData::getUserUuid();
-                    }
-
-                    $this->trackingIDs['uuid'] = $uuid;
-                } else {
-                    // No UUID? No problem.  Create a new one.
-                    $this->trackingIDs['uuid'] = AnalyticsData::getUserUuid();
-                }
-
-                // Is this *not* a new visit and we have an existing session ID in our cookie?
-                if (!Gdn::session()->isNewVisit() && $sessionID = val('sessionID', $cookieIDs)) {
-                    $this->trackingIDs['sessionID'] = $sessionID;
-                } else {
-                    // New session or no existing session ID? Create a new one.
-                    $this->trackingIDs['sessionID'] = AnalyticsData::uuid();
-                }
-            } else {
-                // We've got nothing.  Start from scratch.
-                $this->trackingIDs = [
-                    'sessionID' => AnalyticsData::uuid(),
-                    'uuid' => AnalyticsData::getUserUuid()
-                ];
-            }
-        }
-
-        return $this->trackingIDs;
+        $result = [
+            'sessionID' => $this->cookie->getSessionID(),
+            'uuid' => $this->cookie->getUUID(),
+        ];
+        return $result;
     }
 }

@@ -163,24 +163,6 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
      * @param array $args Event arguments, passed from EntryController, specifically for the event.
      */
     public function userModel_afterRegister_handler($sender, $args) {
-        $uuid = null;
-
-        // Fetch our tracking cookie.
-        $cookieIDsRaw = Gdn::session()->getCookie('-vA', false);
-
-        // Grab the UUID from our cookie data, if available.
-        if ($cookieIDs = @json_decode($cookieIDsRaw)) {
-            $uuid = val('uuid', $cookieIDs);
-        }
-
-        // If we weren't able to recover a UUID from the tracking cookie, generate a enw one.
-        if (empty($uuid)) {
-            $uuid = AnalyticsData::uuid();
-        }
-
-        // Save the new user's UUID attribute
-        Gdn::userModel()->saveAttribute($args['UserID'], 'UUID', $uuid);
-
         AnalyticsTracker::getInstance()->trackEvent('registration', 'registration_success');
     }
 
@@ -196,31 +178,12 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
             return;
         }
 
-        $setCookie = true;
-        $trackingCookieRaw = Gdn::session()->getCookie('-vA');
-
-        // Determine if we need to set a tracking cookie.
-        if ($trackingCookie = @json_decode($trackingCookieRaw)) {
-            $uuid = val('uuid', $trackingCookie);
-            $sessionID = val('sessionID', $trackingCookie);
-
-            /**
-             * Don't send the cookie to the user again if they meet the following:
-             * 1. A UUID and session ID are already set
-             * 2. The user isn't logged in or, if they are, their cookie's UUID matches the one we have on record
-             */
-            if ($uuid && $sessionID && (!Gdn::session()->isValid() || AnalyticsData::getUserUuid() == $uuid)) {
-                $setCookie = false;
-            }
+        // Nuke existing UUIDs in user rows.
+        if (Gdn::session()->isValid() && array_key_exists('UUID', Gdn::session()->User->Attributes)) {
+            Gdn::userModel()->saveAttribute(Gdn::session()->UserID, 'UUID', null);
         }
 
-        if ($setCookie) {
-            Gdn::session()->setCookie(
-                '-vA',
-                json_encode(AnalyticsTracker::getInstance()->trackingIDs()),
-                strtotime('+2 years')
-            );
-        }
+        AnalyticsTracker::getInstance()->refreshCookies();
     }
 
     /**

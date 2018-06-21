@@ -276,6 +276,18 @@ class AnalyticsData extends Gdn_Model {
     }
 
     /**
+     * Build and return anonymized user data.
+     */
+    public static function anonymizeUser($user): array {
+        return [
+            'dateFirstVisit' => null,
+            'name' => '@anonymous',
+            'roleType' => self::getRoleType($user),
+            'userID' => -1
+        ];
+    }
+
+    /**
      * Build and return guest data for the current user.
      *
      * @todo Add cookie and session values
@@ -288,6 +300,26 @@ class AnalyticsData extends Gdn_Model {
             'roleType' => 'guest',
             'userID' => 0
         ];
+    }
+
+    /**
+     * Get a user's role type.
+     *
+     * @param array|object $user A user row.
+     * @return string
+     */
+    public static function getRoleType($user): string {
+        if (Gdn::userModel()->checkPermission($user, 'Garden.Settings.Manage')) {
+            $roleType = 'admin';
+        } elseif (Gdn::userModel()->checkPermission($user, 'Garden.Community.Manage')) {
+            $roleType = 'cm';
+        } elseif (Gdn::userModel()->checkPermission($user, 'Garden.Moderation.Manage')) {
+            $roleType = 'mod';
+        } else {
+            $roleType = 'member';
+        }
+
+        return $roleType;
     }
 
     /**
@@ -319,15 +351,7 @@ class AnalyticsData extends Gdn_Model {
                 }
             }
 
-            if ($userModel->checkPermission($user, 'Garden.Settings.Manage')) {
-                $roleType = 'admin';
-            } elseif ($userModel->checkPermission($user, 'Garden.Community.Manage')) {
-                $roleType = 'cm';
-            } elseif ($userModel->checkPermission($user, 'Garden.Moderation.Manage')) {
-                $roleType = 'mod';
-            } else {
-                $roleType = 'member';
-            }
+            $roleType = self::getRoleType($user);
 
             $userInfo = [
                 'commentCount' => (int)$user->CountComments,
@@ -381,29 +405,6 @@ class AnalyticsData extends Gdn_Model {
                 'name' => '@notfound',
             ];
         }
-    }
-
-    /**
-     * Grab the saved UUID for a user or a new one for a guest.
-     *
-     * @param bool $create Should a new UUID be created and saved for a user if one doesn't exist?
-     * @return string A universally unique identifier.
-     */
-    public static function getUserUuid($create = true) {
-        if (Gdn::session()->isValid()) {
-            $user = Gdn::userModel()->getID(Gdn::session()->UserID);
-            $attributes = UserModel::attributes($user);
-            $uuid = val('UUID', $attributes, null);
-
-            if (empty($uuid) && $create) {
-                $uuid = self::uuid();
-                Gdn::userModel()->saveAttribute(Gdn::session()->UserID, 'UUID', $uuid);
-            }
-        } else {
-            $uuid = self::uuid();
-        }
-
-        return $uuid;
     }
 
     /**
