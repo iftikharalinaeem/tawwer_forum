@@ -87,6 +87,12 @@ class AnalyticsTracker {
 
         $eventData = $this->getPageViewData($controller);
 
+        // Pages served to guests can be cached on infrastructure. Some values need to be reset/removed to avoid inaccuracies.
+        if (!Gdn::session()->isValid()) {
+            $eventData['ip'] = '0.0.0.0';
+            unset($eventData['referrer']);
+        }
+
         foreach ($this->trackers as $tracker) {
             $tracker->addDefinitions($controller, $inDashboard, $eventData);
         }

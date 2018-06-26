@@ -22,7 +22,18 @@ var keenTracker = {
 keenTracker.analyticsTickHandler = function(event, sendData, jqXHR, textStatus) {
     // Only track the page view if the hit to analyticstick was a success.
     if (textStatus === 'success') {
-        keenTracker.event(gdn.definition("viewEventType", "page_view"), 'page', true);
+        if (typeof jqXHR.responseJSON !== "undefined") {
+            var eventData = gdn.definition('eventData', {});
+            if (typeof jqXHR.responseJSON.clientIP !== "undefined") {
+                eventData.ip = jqXHR.responseJSON.clientIP;
+            }
+            if (typeof jqXHR.responseJSON.dateTime !== "undefined") {
+                eventData.dateTime = jqXHR.responseJSON.dateTime;
+            }
+            eventData.referrer = document.referrer;
+            gdn.meta.eventData = eventData;
+        }
+        keenTracker.event(gdn.definition("viewEventType", "page_view"), "page", true);
     }
 };
 
