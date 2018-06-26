@@ -155,7 +155,7 @@ class AnalyticsTracker {
         // Basic information that should be universally available
         $defaults = [
             'dateTime' => AnalyticsData::getDateTime(),
-            'ip' => Gdn::request()->ipAddress(),
+            'ip' => anonymizeIP(Gdn::request()->ipAddress()),
             'method' => Gdn::request()->requestMethod(),
             'site' => AnalyticsData::getSite(),
             'url' => url('', true)
