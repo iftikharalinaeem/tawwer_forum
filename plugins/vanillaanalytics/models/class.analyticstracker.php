@@ -15,6 +15,9 @@ class AnalyticsTracker {
     /** Analytics cookie suffix. */
     const COOKIE_SUFFIX = '-vA';
 
+    /** Fallback value for when the privacy config is not explicitly set. */
+    const PRIVACY_CONFIG_DEFAULT = 'eu';
+
     /** @var \Vanilla\Analytics\Cookie */
     private $cookie;
 
@@ -139,9 +142,10 @@ class AnalyticsTracker {
      * Build an array of all the default data we'll need for most events.
      *
      * @param bool $trackerDefaults Should defaults from enabled trackers be included?
+     * @param  bool $isGuestCollection Will this data be used in a collection that contains guest data?
      * @return array
      */
-    public function getDefaultData($trackerDefaults = false) {
+    public function getDefaultData($trackerDefaults = false, bool $isGuestCollection = false) {
 
         // Basic information that should be universally available
         $defaults = [
@@ -155,8 +159,11 @@ class AnalyticsTracker {
         ];
 
         // Only add user-related information if a user is signed in.
-        $defaults['user'] = AnalyticsData::getCurrentUser();
-
+        $user = AnalyticsData::getCurrentUser($isGuestCollection);
+        if ($isGuestCollection && $user['userID'] > 0 && $this->cookie->isPrivacyOptIn() === false) {
+            $user = AnalyticsData::anonymizeUser($user);
+        }
+        $defaults['user'] = $user;
 
         // Grab the browser's user agent value, if available.
         $userAgent = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_USER_AGENT');
@@ -198,7 +205,7 @@ class AnalyticsTracker {
      * @return array
      */
     public function getPageViewData(Gdn_Controller $controller) {
-        $eventData = $this->getDefaultData(true);
+        $eventData = $this->getDefaultData(true, true);
 
         // Attempt to grab the referrer, if there is one, and record it.
         $referrer = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_REFERER');
@@ -234,12 +241,39 @@ class AnalyticsTracker {
     }
 
     /**
-     * Given a country code, determine the default privacy flag.
+     * Based off the site config, determine the default privacy status of a request.
      *
-     * @param string|null $country
      * @return int
      */
-    private function privacyByCountry($country) {
+    private function defaultRequestPrivacy() {
+        $config = c('VanillaAnalytics.Anonymize', self::PRIVACY_CONFIG_DEFAULT);
+        $result = \Vanilla\Analytics\Cookie::PRIVACY_MASK_OPT_OUT;
+
+        if (is_string($config)) {
+            $config = explodeTrim(',', $config);
+            if (in_array('eu', $config)) {
+                $country = $this->getRequestCountry();
+                if ($country && $this->countryIsEU($country) === false) {
+                    $result = \Vanilla\Analytics\Cookie::PRIVACY_MASK_OPT_IN;
+                } elseif (in_array('guest', $config) && Gdn::session()->isValid()) {
+                    $result = \Vanilla\Analytics\Cookie::PRIVACY_MASK_OPT_IN;
+                }
+            } elseif (in_array('guest', $config) && Gdn::session()->isValid()) {
+                $result = \Vanilla\Analytics\Cookie::PRIVACY_MASK_OPT_IN;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Given a country code, determine whether or not it is in the European Union.
+     *
+     * @param string $country
+     * @return bool
+     */
+    private function countryIsEU(string $country) {
+        $country = strtoupper($country);
         // Countries in the EU
         $EU = [
             'AT', // Austria
@@ -271,8 +305,7 @@ class AnalyticsTracker {
             'SE', // Sweden
             'GB', // UK
         ];
-
-        $result = (!$country || in_array($country, $EU)) ? 0 : \Vanilla\Analytics\Cookie::PRIVACY_MASK_OPT_IN;
+        $result = in_array($country, $EU);
         return $result;
     }
 
@@ -280,18 +313,40 @@ class AnalyticsTracker {
      * Update cookies, as necessary.
      */
     public function refreshCookies() {
-        if ($this->cookie->getPrivacy() === null) {
-            $country = $this->getRequestCountry();
-            $privacy = \Vanilla\Analytics\Cookie::PRIVACY_MASK_AUTO | $this->privacyByCountry($country);
-            $this->cookie->setPrivacy($privacy);
+        $privacy = $this->cookie->getPrivacy();
+        $defaultRequestPrivacy = $this->defaultRequestPrivacy();
+        $isDefaultPrivacy = ($privacy & \Vanilla\Analytics\Cookie::PRIVACY_MASK_OPT_IN) === $defaultRequestPrivacy;
+        if ($privacy === null || ($this->cookie->isPrivacyAuto() && !$isDefaultPrivacy)) {
+            // If privacy needs updating, reset it all.
+            $privacy = \Vanilla\Analytics\Cookie::PRIVACY_MASK_AUTO | $defaultRequestPrivacy;
+            $this->cookie
+                ->setPrivacy($privacy)
+                ->setSecondarySessionID(null)
+                ->setSessionID(null)
+                ->setUUID(null)
+            ;
         }
-        if ($this->cookie->getSessionID() === null || Gdn::session()->isNewVisit()) {
-            $sessionID = AnalyticsData::uuid();
-            $this->cookie->setSessionID($sessionID);
-        }
+
         if ($this->cookie->getUUID() === null) {
             $UUID = AnalyticsData::uuid();
             $this->cookie->setUUID($UUID);
+        }
+
+        // Update the two session IDs if they're empty or if a new session was detected by Vanilla.
+        if (Gdn::session()->isNewVisit()) {
+            $secondarySessionID = AnalyticsData::uuid();
+            $sessionID = AnalyticsData::uuid();
+            $this->cookie->setSessionID($sessionID);
+            $this->cookie->setSecondarySessionID($secondarySessionID);
+        } else {
+            if ($this->cookie->getSecondarySessionID() === null) {
+                $secondarySessionID = AnalyticsData::uuid();
+                $this->cookie->setSecondarySessionID($secondarySessionID);
+            }
+            if ($this->cookie->getSessionID() === null) {
+                $sessionID = AnalyticsData::uuid();
+                $this->cookie->setSessionID($sessionID);
+            }
         }
 
         $this->cookie->saveToCookie(self::COOKIE_SUFFIX);
@@ -360,11 +415,13 @@ class AnalyticsTracker {
     /**
      * Set and get tracking ID detail array.
      *
+     * @param bool $useSecondarySession Should the secondary session ID be used, instead of the primary session ID?
      * @return array UUID and session ID values for the current user.
      */
-    public function trackingIDs() {
+    public function trackingIDs(bool $useSecondarySession = false) {
+        $sessionID = $useSecondarySession ? $this->cookie->getSecondarySessionID() : $this->cookie->getSessionID();
         $result = [
-            'sessionID' => $this->cookie->getSessionID(),
+            'sessionID' => $sessionID,
             'uuid' => $this->cookie->getUUID(),
         ];
         return $result;

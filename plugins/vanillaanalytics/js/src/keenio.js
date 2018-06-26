@@ -22,7 +22,7 @@ var keenTracker = {
 keenTracker.analyticsTickHandler = function(event, sendData, jqXHR, textStatus) {
     // Only track the page view if the hit to analyticstick was a success.
     if (textStatus === 'success') {
-        keenTracker.event(gdn.definition("viewEventType", "page_view"));
+        keenTracker.event(gdn.definition("viewEventType", "page_view"), 'page', true);
     }
 };
 
@@ -32,8 +32,9 @@ keenTracker.analyticsTickHandler = function(event, sendData, jqXHR, textStatus) 
  * @memberof keenTracker
  * @param {string} eventType The type/name of the event being tracked.
  * @param {string} collection The collection to store the event under.  Defaults to "page".
+ * @param {boolean} isGuestCollection Will this data be used in a collection that contains guest data?
  */
-keenTracker.event = function(eventType, collection) {
+keenTracker.event = function(eventType, collection, isGuestCollection) {
     // Load up our API client and the event data from the page.
     var client = this.getKeenClient();
     var eventData = gdn.definition('eventData', {});
@@ -42,7 +43,7 @@ keenTracker.event = function(eventType, collection) {
     if (client && Object.keys(eventData).length > 0) {
         // Establish the event name/type and augment the user data, if necessary.
         eventData.type = eventType;
-        eventData.user = this.getUser(eventData);
+        eventData.user = this.getUser(eventData, isGuestCollection);
 
         // Send everything off to keen.
         client.recordEvent(
@@ -81,9 +82,10 @@ keenTracker.getKeenClient = function() {
  *
  * @memberof keenTracker
  * @param {object} eventData An object with properties representing specifics of the current event.
+ * @param {boolean} isGuestCollection Will this data be used in a collection that contains guest data?
  * @return {object} An object representing the current user.  May be an empty object.
  */
-keenTracker.getUser = function(eventData) {
+keenTracker.getUser = function(eventData, isGuestCollection) {
     // Defaulting to an empty object.
     var userData = {};
 
@@ -106,8 +108,14 @@ keenTracker.getUser = function(eventData) {
             }
 
             // Missing a session ID, but one is available from our cookie? Update it.
-            if (typeof userData.sessionID === 'undefined' && typeof trackingIDs.sessionID !== 'undefined') {
-                userData.sessionID = trackingIDs.sessionID;
+            if (typeof userData.sessionID === 'undefined') {
+                if (isGuestCollection) {
+                    if (typeof trackingIDs.secondarySessionID !== 'undefined') {
+                        userData.sessionID = trackingIDs.secondarySessionID;
+                    }
+                } else if (typeof trackingIDs.sessionID !== 'undefined') {
+                    userData.sessionID = trackingIDs.sessionID;
+                }
             }
         }
     }

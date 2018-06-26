@@ -19,6 +19,9 @@ class Cookie {
     /** Bit mask to determine if a privacy flag is opt-in. */
     const PRIVACY_MASK_OPT_IN = 1;
 
+    /** Bit mask to determine if a privacy flag is opt-out. */
+    const PRIVACY_MASK_OPT_OUT = 0;
+
     /** Bit mask to determine if a privacy flag was automatically set for a user. */
     const PRIVACY_MASK_AUTO = 2;
 
@@ -30,6 +33,9 @@ class Cookie {
 
     /** @var Gdn_Session */
     private $session;
+
+    /** @var string */
+    private $secondarySessionID;
 
     /** @var string */
     private $sessionID;
@@ -53,6 +59,15 @@ class Cookie {
      */
     public function getPrivacy() {
         return $this->privacy;
+    }
+
+    /**
+     * Get the secondary session ID.
+     *
+     * @return string
+     */
+    public function getSecondarySessionID() {
+        return $this->secondarySessionID;
     }
 
     /**
@@ -110,11 +125,13 @@ class Cookie {
      */
     public function loadArray(array $data) {
         $privacy = $data['pv'] ?? null;
+        $secondarySessionID = $data['secondarySessionID'] ?? null;
         $sessionID = $data['sessionID'] ?? null;
         $UUID = $data['uuid'] ?? null;
 
         $result = $this
             ->setPrivacy($privacy)
+            ->setSecondarySessionID($secondarySessionID)
             ->setSessionID($sessionID)
             ->setUUID($UUID)
         ;
@@ -159,6 +176,9 @@ class Cookie {
         if (($privacy = $this->getPrivacy()) !== null) {
             $cookie['pv'] = $privacy;
         }
+        if ($secondarySessionID = $this->getSecondarySessionID()) {
+            $cookie['secondarySessionID'] = $secondarySessionID;
+        }
         if ($sessionID = $this->getSessionID()) {
             $cookie['sessionID'] = $sessionID;
         }
@@ -183,8 +203,21 @@ class Cookie {
      * @return self
      */
     public function setPrivacy($privacy) {
-        if ($privacy === null || ($privacy = filter_var($privacy, FILTER_VALIDATE_INT)) !== false) {
+        if (($privacy = filter_var($privacy, FILTER_VALIDATE_INT)) !== false || $privacy === null) {
             $this->writeProperty('privacy', $privacy);
+        }
+        return $this;
+    }
+
+    /**
+     * Set the secondary session ID.
+     *
+     * @param string|null $sessionID
+     * @return self
+     */
+    public function setSecondarySessionID($sessionID) {
+        if (is_string($sessionID) || $sessionID === null) {
+            $this->writeProperty('secondarySessionID', $sessionID);
         }
         return $this;
     }

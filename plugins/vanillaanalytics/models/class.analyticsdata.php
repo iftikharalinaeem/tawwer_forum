@@ -165,10 +165,11 @@ class AnalyticsData extends Gdn_Model {
     /**
      * Build an array of analytics data for the current user, based on whether or not they are a logged-in user.
      *
+     * @param  bool $isGuestCollection Will this data be used in a collection that contains guest data?
      * @return array
      */
-    public static function getCurrentUser() {
-        return Gdn::session()->isValid() ? self::getUser(Gdn::session()->UserID) : self::getGuest();
+    public static function getCurrentUser(bool $isGuestCollection = false) {
+        return Gdn::session()->isValid() ? self::getUser(Gdn::session()->UserID, $isGuestCollection) : self::getGuest();
     }
 
     /**
@@ -277,12 +278,16 @@ class AnalyticsData extends Gdn_Model {
 
     /**
      * Build and return anonymized user data.
+     *
+     * @param array $user Analytics user details to be anonymized.
+     * @see \AnalyticsData::getUser
+     * @return array
      */
-    public static function anonymizeUser($user): array {
+    public static function anonymizeUser(array $user): array {
         return [
             'dateFirstVisit' => null,
             'name' => '@anonymous',
-            'roleType' => self::getRoleType($user),
+            'roleType' => $user['roleType'] ?? null,
             'userID' => -1
         ];
     }
@@ -327,13 +332,14 @@ class AnalyticsData extends Gdn_Model {
      *
      * @todo Add topBadge
      * @param integer $userID Record ID of the user to fetch.
+     * @param  bool $isGuestCollection Will this data be used in a collection that contains guest data?
      * @return array|bool An array representing the user data on success, false on failure.
      */
-    public static function getUser($userID) {
+    public static function getUser($userID, bool $isGuestCollection = false) {
         $userModel = Gdn::userModel();
         $user = $userModel->getID($userID);
         $roles = [];
-        $trackingIDs = AnalyticsTracker::getInstance()->trackingIDs();
+        $trackingIDs = AnalyticsTracker::getInstance()->trackingIDs($isGuestCollection);
 
         if ($user) {
             /**
@@ -353,6 +359,15 @@ class AnalyticsData extends Gdn_Model {
 
             $roleType = self::getRoleType($user);
 
+            if ($isGuestCollection) {
+                $uuid = $trackingIDs['uuid'];
+            } elseif (class_exists('\Infrastructure')) {
+                $siteID = \Infrastructure::site('siteid') ?: 0;
+                $uuid = "{$siteID}-{$userID}";
+            } else {
+                $uuid = "0-{$userID}";
+            }
+
             $userInfo = [
                 'commentCount' => (int)$user->CountComments,
                 'dateFirstVisit' => self::getDateTime($user->DateFirstVisit),
@@ -362,7 +377,7 @@ class AnalyticsData extends Gdn_Model {
                 'roles' => $roles,
                 'roleType' => $roleType,
                 'userID' => (int)$user->UserID,
-                'uuid' => $trackingIDs['uuid'],
+                'uuid' => $uuid,
                 'sessionID' => $trackingIDs['sessionID']
             ];
 
