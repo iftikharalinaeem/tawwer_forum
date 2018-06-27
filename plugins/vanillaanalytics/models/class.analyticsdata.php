@@ -165,10 +165,11 @@ class AnalyticsData extends Gdn_Model {
     /**
      * Build an array of analytics data for the current user, based on whether or not they are a logged-in user.
      *
+     * @param  bool $isGuestCollection Will this data be used in a collection that contains guest data?
      * @return array
      */
-    public static function getCurrentUser() {
-        return Gdn::session()->isValid() ? self::getUser(Gdn::session()->UserID) : self::getGuest();
+    public static function getCurrentUser(bool $isGuestCollection = false) {
+        return Gdn::session()->isValid() ? self::getUser(Gdn::session()->UserID, $isGuestCollection) : self::getGuest();
     }
 
     /**
@@ -276,6 +277,22 @@ class AnalyticsData extends Gdn_Model {
     }
 
     /**
+     * Build and return anonymized user data.
+     *
+     * @param array $user Analytics user details to be anonymized.
+     * @see \AnalyticsData::getUser
+     * @return array
+     */
+    public static function anonymizeUser(array $user): array {
+        return [
+            'dateFirstVisit' => null,
+            'name' => '@anonymous',
+            'roleType' => $user['roleType'] ?? null,
+            'userID' => -1
+        ];
+    }
+
+    /**
      * Build and return guest data for the current user.
      *
      * @todo Add cookie and session values
@@ -291,17 +308,38 @@ class AnalyticsData extends Gdn_Model {
     }
 
     /**
+     * Get a user's role type.
+     *
+     * @param array|object $user A user row.
+     * @return string
+     */
+    public static function getRoleType($user): string {
+        if (Gdn::userModel()->checkPermission($user, 'Garden.Settings.Manage')) {
+            $roleType = 'admin';
+        } elseif (Gdn::userModel()->checkPermission($user, 'Garden.Community.Manage')) {
+            $roleType = 'cm';
+        } elseif (Gdn::userModel()->checkPermission($user, 'Garden.Moderation.Manage')) {
+            $roleType = 'mod';
+        } else {
+            $roleType = 'member';
+        }
+
+        return $roleType;
+    }
+
+    /**
      * Retrieve information about a particular user for user in analytics.
      *
      * @todo Add topBadge
      * @param integer $userID Record ID of the user to fetch.
+     * @param  bool $isGuestCollection Will this data be used in a collection that contains guest data?
      * @return array|bool An array representing the user data on success, false on failure.
      */
-    public static function getUser($userID) {
+    public static function getUser($userID, bool $isGuestCollection = false) {
         $userModel = Gdn::userModel();
         $user = $userModel->getID($userID);
         $roles = [];
-        $trackingIDs = AnalyticsTracker::getInstance()->trackingIDs();
+        $trackingIDs = AnalyticsTracker::getInstance()->trackingIDs($isGuestCollection);
 
         if ($user) {
             /**
@@ -319,14 +357,15 @@ class AnalyticsData extends Gdn_Model {
                 }
             }
 
-            if ($userModel->checkPermission($user, 'Garden.Settings.Manage')) {
-                $roleType = 'admin';
-            } elseif ($userModel->checkPermission($user, 'Garden.Community.Manage')) {
-                $roleType = 'cm';
-            } elseif ($userModel->checkPermission($user, 'Garden.Moderation.Manage')) {
-                $roleType = 'mod';
+            $roleType = self::getRoleType($user);
+
+            if ($isGuestCollection) {
+                $uuid = $trackingIDs['uuid'];
+            } elseif (class_exists('\Infrastructure')) {
+                $siteID = \Infrastructure::site('siteid') ?: 0;
+                $uuid = "{$siteID}-{$userID}";
             } else {
-                $roleType = 'member';
+                $uuid = "0-{$userID}";
             }
 
             $userInfo = [
@@ -338,7 +377,7 @@ class AnalyticsData extends Gdn_Model {
                 'roles' => $roles,
                 'roleType' => $roleType,
                 'userID' => (int)$user->UserID,
-                'uuid' => $trackingIDs['uuid'],
+                'uuid' => $uuid,
                 'sessionID' => $trackingIDs['sessionID']
             ];
 
@@ -381,29 +420,6 @@ class AnalyticsData extends Gdn_Model {
                 'name' => '@notfound',
             ];
         }
-    }
-
-    /**
-     * Grab the saved UUID for a user or a new one for a guest.
-     *
-     * @param bool $create Should a new UUID be created and saved for a user if one doesn't exist?
-     * @return string A universally unique identifier.
-     */
-    public static function getUserUuid($create = true) {
-        if (Gdn::session()->isValid()) {
-            $user = Gdn::userModel()->getID(Gdn::session()->UserID);
-            $attributes = UserModel::attributes($user);
-            $uuid = val('UUID', $attributes, null);
-
-            if (empty($uuid) && $create) {
-                $uuid = self::uuid();
-                Gdn::userModel()->saveAttribute(Gdn::session()->UserID, 'UUID', $uuid);
-            }
-        } else {
-            $uuid = self::uuid();
-        }
-
-        return $uuid;
     }
 
     /**
