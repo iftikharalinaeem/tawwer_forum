@@ -1,6 +1,8 @@
 # Firebase
 
-Found in `plugins/firebase`, this plugin adds Javascript and CSS files from Firebase to allow users to SSO into a forum using a configured Firebase application.
+Found in `plugins/firebase`, this plugin adds Javascript and CSS files from Firebase to allow users to SSO into a forum using a configured Firebase application. Firebase is a platform  developed by Google as a middleware for authenticating against multiple providers. 
+
+See [Firebase UI](https://github.com/firebase/FirebaseUI) and [Firebase Web](https://github.com/firebase/firebaseui-web).
 
 ### Firebase SSO
 
