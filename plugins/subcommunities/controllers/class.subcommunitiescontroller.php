@@ -76,6 +76,7 @@ class SubcommunitiesController extends DashboardController {
         ];
 
         $this->EventArguments['Form'] =& $form;
+        $this->EventArguments['Site'] =& $this->site;
         $this->fireEvent('addedit');
 
         $form['IsDefault'] =['Control' => 'Checkbox', 'LabelCode' => 'Default'];
