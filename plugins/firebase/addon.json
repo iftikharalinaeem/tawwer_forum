@@ -1,0 +1,20 @@
+{
+    "name": "FireBase",
+    "description": "Use FireBase to manage your SSO user experience.",
+    "version": "1.0",
+    "mobileFriendly": true,
+    "settingsUrl": "/settings/firebase",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "firebase-logo.png",
+    "key": "firebase",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Patrick Kelly",
+            "homepage": "https://vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.6"
+    }
+}
