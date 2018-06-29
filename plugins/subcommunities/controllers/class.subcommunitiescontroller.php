@@ -33,6 +33,15 @@ class SubcommunitiesController extends DashboardController {
     }
 
     /**
+     * Get the current Gdn_Form instance.
+     *
+     * @return Gdn_Form|null
+     */
+    public function getForm() {
+        return $this->form;
+    }
+
+    /**
      * @param array $form
      */
     private function saveForm($form) {
