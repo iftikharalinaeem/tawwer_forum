@@ -1230,7 +1230,7 @@ class GroupModel extends Gdn_Model {
             Gdn::session()->setPermission('Vanilla.Discussions.View', []);
         }
 
-        if ($this->checkPermission('Member', $group)) {
+        if ($this->checkPermission('Member', $group) || $this->checkPermission('Moderate', $group)) {
             Gdn::session()->setPermission('Vanilla.Discussions.Add', [$categoryID]);
             Gdn::session()->setPermission('Vanilla.Comments.Add', [$categoryID]);
         } else {
