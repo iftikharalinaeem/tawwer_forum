@@ -1,8 +1,14 @@
 <script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
 <script src="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js"></script>
 <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
+<style type="text/css">
+    .GuestBox .P {
+        display:none
+    }
+</style>
 
 <script>
+    var targetUrl = '<?php echo Gdn::request()->get('Target') ?>';
     // Initialize Firebase
     var config = {
         apiKey: "<?php echo $sender->data('APIKey') ?>",
@@ -28,8 +34,14 @@
                     "providerData": user.providerData
                 },
                 success: function(result) {
-                    console.log('Has created a profile in stash. Redirecting to '+'/entry/connect/firebase?target='+encodeURIComponent(window.location))
-                    window.location = "/entry/connect/firebase?target="+encodeURIComponent(window.location);
+                    console.log('passed target '+targetUrl)
+                    if (targetUrl) {
+                        var target = targetUrl;
+                    } else {
+                        var target = encodeURIComponent(window.location);
+                    }
+                    console.log('call back: '+ '/entry/connect/firebase?target='+target)
+                    window.location = '/entry/connect/firebase?target='+target;
                 },
                 error: function(msg) {
                     console.log('There has been an error calling firebase!');
@@ -37,7 +49,7 @@
                 }
             });
         }
-        if(!user) {
+        if (!user) {
             // Use the Firebase
             console.log('Has No User');
             // FirebaseUI config.
@@ -50,9 +62,9 @@
                     ?>
                 ],
                 <?php
-                if (c('firebase.tosUrl')) {
+                if ($sender->data('TermsUrl')) {
                     // Terms of service url.
-                    echo 'tosUrl: '.c('firebase.tosUrl').',
+                    echo 'tosUrl: '.$sender->data('TermsUrl').',
             ';
                 }
                 ?>
@@ -65,28 +77,4 @@
         }
     });
 
-    $(function() {
-        $('.firebase-connect-link').on('click', function() {
-            var authType = $(this).attr('data-authtype');
-            switch (authType) {
-                case 'googleauthprovider':
-                    provider = new firebase.auth.GoogleAuthProvider()
-                    break;
-                case 'facebookauthprovider':
-                    provider = new firebase.auth.FacebookAuthProvider()
-                    break;
-                case 'githubauthprovider':
-                    provider = new firebase.auth.GithubAuthProvider()
-                    break;
-                case 'twitterauthprovider':
-                    provider = new firebase.auth.TwitterAuthProvider()
-                    break;
-                case 'emailauthprovider':
-                    provider = new firebase.auth.sendSignInLinkToEmail()
-                    break;
-            }
-
-            firebase.auth().signInWithRedirect(provider);
-        });
-    });
 </script>

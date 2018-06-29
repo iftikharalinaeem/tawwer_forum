@@ -16,7 +16,8 @@ See [Firebase UI](https://github.com/firebase/FirebaseUI) and [Firebase Web](htt
 	- The user is then redirected to /entry/connect/firebase where they either create a user on the Forum or connect to an existing user. 
 	- If no display name is sent they create one on this page. 
 	- If the user is **not** logged in, the SDK prints log in buttons, or presents an email/password form to the page depending on what is configured.
-- **Configs set or added:** none
+- **Configs set or added:**
+    - The log in buttons are hidden using CSS in the firebase-ui view whenever the Firebase UI constrols are present. 
 - **Events used:**
 	- `afterRenderAsset`: Inject Javascript and CSS from Firebase  and Firebase UI to create an interface for users to log in and detect if visitors are logged in.
 	- `afterSignInButton`: Inject an HTML element to recieve the UI elements from Firebase.
@@ -28,3 +29,4 @@ See [Firebase UI](https://github.com/firebase/FirebaseUI) and [Firebase Web](htt
     1. Turn on plugin.
     2. Log in through various providers.
     3. Log in through a provider who does not pass a display name to make sure you are given an interface on the connect page to create a disply name.
+    4. Go to a discussion page when you are not logged in and click on the link at the bottom of the discussion to log in. It should take you to a Firebase login page. Check that you are returned to the correct Target URL.

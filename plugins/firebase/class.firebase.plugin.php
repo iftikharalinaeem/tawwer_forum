@@ -41,6 +41,12 @@ class FireBasePlugin extends Gdn_OAuth2 {
         if (Gdn::controller()->deliveryMethod() != DELIVERY_METHOD_XHTML) {
             return;
         }
+
+        // Don't bother if the user is already logged in.
+        if (Gdn::session()->UserID) {
+            return;
+        }
+
         // Include the javascript only in the head.
         if (val('AssetName', $args) !== 'Head') {
             return;
@@ -48,10 +54,6 @@ class FireBasePlugin extends Gdn_OAuth2 {
 
         // Do not include in the entry pages since we are already connecting.
         if ($sender->ControllerName === 'entrycontroller') {
-            return;
-        }
-        // Don't bother if the user is already logged in.
-        if (Gdn::session()->UserID) {
             return;
         }
 
@@ -74,12 +76,15 @@ class FireBasePlugin extends Gdn_OAuth2 {
         }
 
         $sender->setData('APIKey', val('AssociationKey', $provider));
-        $sender->setData('AuthDomain', val('AuthorizeUrl', $provider));
+        $sender->setData('AuthDomain', val('AuthenticateUrl', $provider));
         $sender->setData('FirebaseAuthProviders', $authProvidersConfigured);
-
+        $sender->setData('TermsUrl', val('TermsUrl', $provider));
         include $sender->fetchViewLocation('firebase-ui', '', 'plugins/firebase');
    }
 
+   public function vanillaController_firebasesignin_create($sender, $args) {
+        $sender->render('firebasesignin', '', 'plugins/firebase');
+   }
     /**
      * Inject a container into page for the Firebase SDK to print out buttons, etc.
      *
@@ -87,9 +92,12 @@ class FireBasePlugin extends Gdn_OAuth2 {
      * @param $args
      */
    public function base_afterSignInButton_handler($sender, $args) {
-        echo '
-              <div id="firebaseui-auth-container"></div> 
+        $path = Gdn::request()->getPath();
+        if ($path !== '/vanilla/firebasesignin') {
+            echo '
+                <div id="firebaseui-auth-container"></div> 
             ';
+        }
    }
 
     /**
@@ -117,14 +125,14 @@ class FireBasePlugin extends Gdn_OAuth2 {
             $form->setFormValue('AuthenticationKey', $this->getProviderKey());
 
             $sender->Form->validateRule('AssociationKey', 'ValidateRequired', 'You must provide an API Key.');
-            $sender->Form->validateRule('AuthorizeUrl', 'ValidateRequired', 'You must provide a valid Firebase Auth Domain.');
+            $sender->Form->validateRule('AuthenticateUrl', 'ValidateRequired', 'You must provide a valid Firebase Auth Domain.');
 
             // To satisfy the AuthenticationProviderModel, create a BaseUrl.
-            $baseUrlParts = parse_url($form->getValue('AuthorizeUrl'));
+            $baseUrlParts = parse_url($form->getValue('AuthenticateUrl'));
             $baseUrl = (val('scheme', $baseUrlParts) && val('host', $baseUrlParts)) ? val('scheme', $baseUrlParts).'://'.val('host', $baseUrlParts) : null;
             if ($baseUrl) {
                 $form->setFormValue('BaseUrl', $baseUrl);
-                $form->setFormValue('SignInUrl', $baseUrl); // kludge for default provider
+//                $form->setFormValue('SignInUrl', $baseUrl); // kludge for default provider
             }
             if ($form->save()) {
                 $sender->informMessage(t('Saved'));
@@ -134,7 +142,7 @@ class FireBasePlugin extends Gdn_OAuth2 {
         // Set up the form.
         $formFields = [
             'AssociationKey' =>  ['LabelCode' => 'API Key', 'Description' => 'API key from the console of your Firebase Web App.'],
-            'AuthorizeUrl' =>  ['LabelCode' => 'Auth Domain', 'Description' => 'Auth Domain from the console of your Firebase Web App.'],
+            'AuthenticateUrl' =>  ['LabelCode' => 'Auth Domain', 'Description' => 'Auth Domain from the console of your Firebase Web App.'],
             'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to direct a user to register.'],
             'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to direct a user to sign out.'],
             'TermsUrl' => ['LabelCode' => 'Terms of Service URL', 'Description' => 'URL to your Terms of Service'],
@@ -221,7 +229,7 @@ class FireBasePlugin extends Gdn_OAuth2 {
             return false;
         }
 
-        if (!val('AssociationKey', $provider) || !val('AuthorizeUrl', $provider)) {
+        if (!val('AssociationKey', $provider) || !val('AuthenticateUrl', $provider)) {
             return false;
         }
         return true;
@@ -247,9 +255,9 @@ class FireBasePlugin extends Gdn_OAuth2 {
     }
 }
 
+//
 
-$firebase = new FireBasePlugin();
-if (!function_exists('signInUrl') && $firebase->isConfigured() && $firebase->isDefault()) {
+if (!function_exists('signInUrl')) {
     /**
      * Don't use Vanilla's native signin buttons if you are using the Firebase SDK.
      *
@@ -258,6 +266,12 @@ if (!function_exists('signInUrl') && $firebase->isConfigured() && $firebase->isD
      * @return string
      */
     function signInUrl($target = '', $force = false) {
-        return '';
+        $firebase = new FireBasePlugin();
+        // Check to see if there is even a sign in button.
+        if ($firebase->isConfigured() && $firebase->isDefault()) {
+            $provider = $firebase->provider();
+            return '/vanilla/firebasesignin'.($target ? '?Target='.urlencode($target) : '');
+        }
+        return '/entry/signin'.($target ? '?Target='.urlencode($target) : '');
     }
 }
