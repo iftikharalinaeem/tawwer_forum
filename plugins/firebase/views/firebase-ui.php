@@ -8,7 +8,8 @@
 </style>
 
 <script>
-    var targetUrl = '<?php echo Gdn::request()->get('Target') ?>';
+    var targetUrl = "<?php echo Gdn::request()->get('Target') ?>";
+    var debug = "<?php echo $sender->data('DebugJavascript') ?>";
     // Initialize Firebase
     var config = {
         apiKey: "<?php echo $sender->data('APIKey') ?>",
@@ -18,8 +19,11 @@
 
     firebase.auth().onAuthStateChanged(function (user) {
         if (user && !gdn.getMeta('SignedIn')) {
-            console.log('User Detected: '+user.displayName);
-            console.log('User Not Logged in:'+gdn.getMeta('SignedIn'));
+            if (debug) {
+                console.debug('User Detected: '+user.displayName);
+                console.debug('User Not Logged in:'+gdn.getMeta('SignedIn'));
+                console.debug('Passed Target '+targetUrl)
+            }
             var request = $.ajax({
                 method : "post",
                 url : "/entry/firebase",
@@ -34,24 +38,26 @@
                     "providerData": user.providerData
                 },
                 success: function(result) {
-                    console.log('passed target '+targetUrl)
                     if (targetUrl) {
                         var target = targetUrl;
                     } else {
                         var target = encodeURIComponent(window.location);
                     }
-                    console.log('call back: '+ '/entry/connect/firebase?target='+target)
-                    window.location = '/entry/connect/firebase?target='+target;
+                    var redirectUri = '/entry/connect/firebase?target='+target;
+                    window.location = redirectUri;
+                    if (debug) {
+                        console.debug('Entry Connect Redirect: '+ redirectUri)
+                    }
                 },
                 error: function(msg) {
-                    console.log('There has been an error calling firebase!');
-                    console.log(msg);
+                    if (debug) {
+                        console.debug('There has been an error calling firebase!');
+                        console.debug(msg);
+                    }
                 }
             });
         }
         if (!user) {
-            // Use the Firebase
-            console.log('Has No User');
             // FirebaseUI config.
             var uiConfig = {
                 signInSuccessUrl: window.location,
@@ -69,6 +75,10 @@
                 }
                 ?>
             };
+            if (debug) {
+                console.debug('No User Detected');
+                console.debug('UIConfig SuccessUrl: '+uiConfig.signInSuccessUrl+', SignInOptions: '+uiConfig.signInOptions);
+            }
 
             // Initialize the FirebaseUI Widget using Firebase.
             var ui = new firebaseui.auth.AuthUI(firebase.auth());

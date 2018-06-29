@@ -17,7 +17,8 @@ See [Firebase UI](https://github.com/firebase/FirebaseUI) and [Firebase Web](htt
 	- If no display name is sent they create one on this page. 
 	- If the user is **not** logged in, the SDK prints log in buttons, or presents an email/password form to the page depending on what is configured.
 - **Configs set or added:**
-    - The log in buttons are hidden using CSS in the firebase-ui view whenever the Firebase UI constrols are present. 
+    - The log in buttons are hidden using CSS in the firebase-ui view whenever the Firebase UI constrols are present.
+    - `Vanilla.SSO.Debug` is used to log data to the EventLog and to log javascript to the browser console. 
 - **Events used:**
 	- `afterRenderAsset`: Inject Javascript and CSS from Firebase  and Firebase UI to create an interface for users to log in and detect if visitors are logged in.
 	- `afterSignInButton`: Inject an HTML element to recieve the UI elements from Firebase.

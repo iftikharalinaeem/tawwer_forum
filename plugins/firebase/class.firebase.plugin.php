@@ -15,11 +15,11 @@ class FireBasePlugin extends Gdn_OAuth2 {
 
     /* var array of possible third-party providers that can be handled by Firebase. */
     public $availableAuthProviders = [
-        'GoogleAuthProvider',
-        'FacebookAuthProvider',
-        'TwitterAuthProvider',
-        'GitHubAuthProvider',
-        'EmailAuthProvider',
+            'GoogleAuthProvider',
+            'FacebookAuthProvider',
+            'TwitterAuthProvider',
+            'GithubAuthProvider',
+            'EmailAuthProvider',
         ];
 
     /**
@@ -33,8 +33,8 @@ class FireBasePlugin extends Gdn_OAuth2 {
     /**
      * Inject the Javascript and CSS files into the head to listen for and handle logged in users.
      *
-     * @param Gdn_Controller $sender
-     * @param Gdn_Controller $args
+     * @param VanillaController $sender
+     * @param VanillaController $args
      * @throws Exception
      */
     public function base_afterRenderAsset_handler($sender, $args) {
@@ -43,7 +43,7 @@ class FireBasePlugin extends Gdn_OAuth2 {
         }
 
         // Don't bother if the user is already logged in.
-        if (Gdn::session()->UserID) {
+        if (Gdn::session()->isValid()) {
             return;
         }
 
@@ -69,16 +69,16 @@ class FireBasePlugin extends Gdn_OAuth2 {
             return;
         }
 
-        $authProvidersConfigured = '';
+        $authProvidersConfigured = [];
         foreach ($configuredAuthProviders as $authProvider) {
-            $authProvidersConfigured .= 'firebase.auth.'.$authProvider.'.PROVIDER_ID,
-            ';
+            $authProvidersConfigured[] = 'firebase.auth.'.$authProvider.'.PROVIDER_ID';
         }
 
         $sender->setData('APIKey', val('AssociationKey', $provider));
         $sender->setData('AuthDomain', val('AuthenticateUrl', $provider));
-        $sender->setData('FirebaseAuthProviders', $authProvidersConfigured);
+        $sender->setData('FirebaseAuthProviders', implode(",\n", $authProvidersConfigured));
         $sender->setData('TermsUrl', val('TermsUrl', $provider));
+        $sender->setData('DebugJavascript', c('Vanilla.SSO.Debug'));
         include $sender->fetchViewLocation('firebase-ui', '', 'plugins/firebase');
    }
 
@@ -132,7 +132,6 @@ class FireBasePlugin extends Gdn_OAuth2 {
             $baseUrl = (val('scheme', $baseUrlParts) && val('host', $baseUrlParts)) ? val('scheme', $baseUrlParts).'://'.val('host', $baseUrlParts) : null;
             if ($baseUrl) {
                 $form->setFormValue('BaseUrl', $baseUrl);
-//                $form->setFormValue('SignInUrl', $baseUrl); // kludge for default provider
             }
             if ($form->save()) {
                 $sender->informMessage(t('Saved'));
@@ -149,7 +148,7 @@ class FireBasePlugin extends Gdn_OAuth2 {
             'GoogleAuthProvider' => ['LabelCode' => 'Google Auth Provider', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their Google identities.'],
             'FacebookAuthProvider' => ['LabelCode' => 'Facebook Auth Provider', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their Facebook identities.'],
             'TwitterAuthProvider' => ['LabelCode' => 'Twitter Auth Provider', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their Twitter identities.'],
-            'GitHubAuthProvider' => ['LabelCode' => 'GitHub Auth Provider', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their GitHub identities.'],
+            'GithubAuthProvider' => ['LabelCode' => 'GitHub Auth Provider', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their GitHub identities.'],
             'EmailAuthProvider' => ['LabelCode' => 'Email/Password Authentication', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their Email and Password.'],
             'IsDefault' =>  ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox']
         ];
@@ -178,7 +177,7 @@ class FireBasePlugin extends Gdn_OAuth2 {
      * @throws Gdn_UserException
      * @return true;
      */
-    public function entryEndpoint($sender) {
+    public function entryEndpoint($sender, $code, $state = '') {
         if ($error = $sender->Request->get('error')) {
             throw new Gdn_UserException($error);
         }
