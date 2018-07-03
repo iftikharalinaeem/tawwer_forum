@@ -5,13 +5,7 @@
  */
 
 /**
- * Class KeywordBlocker
+ * Class KnowledgeStylesPlugin
  */
 class KnowledgeStylesPlugin extends Gdn_Plugin {
-
-
-    function knowledgeStylesController_render_before($sender) {
-//        $smarty = val('smarty', $sender)->smarty();
-        $break = "here";
-    }
 }

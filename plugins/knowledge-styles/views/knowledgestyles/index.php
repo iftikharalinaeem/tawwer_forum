@@ -6,6 +6,7 @@ $data = array(
 );
 
 
-//$smarty = $this->smarty->assign($data);
-
-//echo $output = $smarty->fetch('components/test.tpl');
+/** @var Gdn_Smarty $smarty */
+$smarty = Gdn::getContainer()->get(\Gdn_Smarty::class);
+$smarty->smarty()->assign($data);
+$smarty->render($this->fetchViewLocation('components/test'), $this);
