@@ -6,21 +6,18 @@
  */
 
 class KnowledgeStylesController extends VanillaController {
-
     public function initialize() {
+        parent::initialize();
         $this->Application = 'knowledge-styles';
-
+        $this->CssClass .= ' NoPanel mainMasterPage';
+        Gdn::controller()->MasterView = 'default.main';
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
             $this->Head = new HeadModule($this);
             $this->addCssFile('knowledge-styles.css');
         }
-
-        // Call Gdn_Controller's initialize() as well.
-        parent::initialize();
     }
 
     public function index() {
-        $this->CssClass .= ' NoPanel';
         $this->render('index');
     }
 }
