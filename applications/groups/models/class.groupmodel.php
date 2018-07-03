@@ -154,6 +154,7 @@ class GroupModel extends Gdn_Model {
 
             // Set the default permissions.
             $perms = [
+                'Access' => true,
                 'Member' => false,
                 'Leader' => false,
                 'Apply' => false,
@@ -162,7 +163,8 @@ class GroupModel extends Gdn_Model {
                 'Edit' => false,
                 'Delete' => false,
                 'Moderate' => false,
-                'View' => true];
+                'View' => true,
+            ];
 
             // The group creator is always a member and leader.
             if ($userID == $group['InsertUserID']) {
@@ -192,6 +194,12 @@ class GroupModel extends Gdn_Model {
                     $perms['Apply'] = true;
                     $perms['View'] = false;
                     $perms['View.Reason'] = t('Join this group to view its content.');
+
+                    // Secret groups basically have the same permissions as non-public groups with some minor tweaks.
+                    if ($group['Privacy'] === 'Secret') {
+                        $perms['Access'] = false;
+                        $perms['Apply'] = false;
+                    }
                 }
             }
 
@@ -212,6 +220,7 @@ class GroupModel extends Gdn_Model {
                         $perms['Apply.Reason'] = t("You're banned from joining this group.");
                         break;
                     case 'invitation':
+                        $perms['Access'] = true;
                         $perms['Apply.Reason'] = t('You have a pending invitation to join this group.');
                         $perms['Join'] = true;
                         unset($perms['Join.Reason']);
@@ -220,14 +229,11 @@ class GroupModel extends Gdn_Model {
             }
 
             // Moderators can view and edit all groups.
-            $canManage = Gdn::session()->checkPermission([
-                'Garden.Settings.Manage',
-                'Garden.Community.Manage',
-                'Groups.Moderation.Manage'
-            ], false);
+            $canManage = $this->isModerator();
 
             if ($userID == Gdn::session()->UserID && $canManage) {
                 $managerOverrides = [
+                    'Access' => true,
                     'Delete' => true,
                     'Edit' => true,
                     'Leader' => true,
@@ -332,6 +338,20 @@ class GroupModel extends Gdn_Model {
      */
     public function deleteInvites($groupID, $userID) {
         $this->SQL->delete('GroupApplicant', ['GroupID' => $groupID, 'UserID' => $userID, 'Type' => 'Invitation']);
+    }
+
+    /**
+     * Determine if the current user is a Groups global moderator.
+     *
+     * @return bool
+     */
+    public function isModerator(): bool {
+        $result = Gdn::session()->checkPermission([
+            'Garden.Settings.Manage',
+            'Garden.Community.Manage',
+            'Groups.Moderation.Manage'
+        ], false);
+        return $result;
     }
 
     /**
