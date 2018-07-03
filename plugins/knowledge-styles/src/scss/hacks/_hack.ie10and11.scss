@@ -1,0 +1,11 @@
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+  .modal-body {
+    height: calc(60vh);
+  }
+  
+  .pageMinHeight {
+    height: 100vh;
+    min-height: 0;
+    overflow: visible;
+  }
+}

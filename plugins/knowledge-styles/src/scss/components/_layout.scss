@@ -1,0 +1,29 @@
+/* Do NOT style classes that start with "_", they are core classes meant to only be modified by variables */
+
+._page {
+  display: flex;
+  overflow: visible;
+  flex-direction: column;
+  width: 100%;
+}
+
+._pageMinHeight { // workaround for min-height: 100vh; not working in IE
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  max-width: $siteWidth_padded;
+
+  margin: {
+    left: auto;
+    right: auto;
+  }
+  padding: {
+    left: $gutter;
+    right: $gutter;
+  }
+}
