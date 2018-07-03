@@ -54,6 +54,20 @@ class GroupController extends Gdn_Controller {
     }
 
     /**
+     * Verify a user can access a group.
+     *
+     * @param array $group A group row.
+     * @param bool $throw Throw an exception on access or not-found errors?
+     * @throws Exception If $throw is true and an access or not-found error is encountered.
+     * @return void
+     */
+    private function verifyAccess($group) {
+        if (!$group || !$this->GroupModel->checkPermission('Access', $group)) {
+            throw notFoundException('Group');
+        }
+    }
+
+    /**
      * The homepage for a group.
      *
      * @param string $Group Url friendly code for the group in the form ID-url-friendly-name
@@ -67,9 +81,7 @@ class GroupController extends Gdn_Controller {
         $this->EventArguments['Group'] = &$Group;
         $this->fireEvent('GroupLoaded');
 
-        if (!$Group) {
-            throw notFoundException('Group');
-        }
+        $this->verifyAccess($Group);
 
         $GroupID = $Group['GroupID'];
 
@@ -171,9 +183,7 @@ class GroupController extends Gdn_Controller {
      */
     public function announcement($group) {
         $group = $this->GroupModel->getID($group);
-        if (!$group) {
-            throw notFoundException('Group');
-        }
+        $this->verifyAccess($group);
 
         // Check leader permission.
         if (!$this->GroupModel->checkPermission('Moderate', $group)) {
@@ -222,8 +232,7 @@ class GroupController extends Gdn_Controller {
         }
 
         $group = $this->GroupModel->getID($group);
-        if (!$group)
-            throw notFoundException('Group');
+        $this->verifyAccess($group);
 
         // Check leader permission.
         if (!$this->GroupModel->checkPermission('Leader', $group)) {
@@ -258,9 +267,7 @@ class GroupController extends Gdn_Controller {
      */
     public function invite($iD) {
         $group = $this->GroupModel->getID($iD);
-        if (!$group) {
-            throw notFoundException('Group');
-        }
+        $this->verifyAccess($group);
 
         // Check invite permission.
         if (!$this->GroupModel->checkPermission('Leader', $group)) {
@@ -313,9 +320,7 @@ class GroupController extends Gdn_Controller {
      */
     public function inviteAccept($iD) {
         $group = $this->GroupModel->getID($iD);
-        if (!$group) {
-            throw notFoundException('Group');
-        }
+        $this->verifyAccess($group);
 
         if (!$this->Request->isPostBack()) {
             throw forbiddenException('GET');
@@ -335,9 +340,7 @@ class GroupController extends Gdn_Controller {
      */
     public function inviteDecline($iD) {
         $group = $this->GroupModel->getID($iD);
-        if (!$group) {
-            throw notFoundException('Group');
-        }
+        $this->verifyAccess($group);
         if (!$this->Request->isPostBack()) {
             throw forbiddenException('GET');
         }
@@ -359,9 +362,7 @@ class GroupController extends Gdn_Controller {
      */
     public function join($iD) {
         $group = $this->GroupModel->getID($iD);
-        if (!$group) {
-            throw notFoundException('Group');
-        }
+        $this->verifyAccess($group);
 
         $userID = Gdn::session()->UserID;
         if ($this->GroupModel->isMember($userID, $group)) {
@@ -400,9 +401,7 @@ class GroupController extends Gdn_Controller {
      */
     public function leave($iD) {
         $group = $this->GroupModel->getID($iD);
-        if (!$group) {
-            throw notFoundException('Group');
-        }
+        $this->verifyAccess($group);
 
         // Check join permission.
         if (!$this->GroupModel->checkPermission('Leave', $group)) {
@@ -437,9 +436,7 @@ class GroupController extends Gdn_Controller {
      */
     public function delete($iD) {
         $group = $this->GroupModel->getID($iD);
-        if (!$group) {
-            throw notFoundException('Group');
-        }
+        $this->verifyAccess($group);
         $this->setData('Group', $group);
 
         if (!groupPermission('Leader')) {
@@ -484,9 +481,7 @@ class GroupController extends Gdn_Controller {
         }
 
         $group = $this->GroupModel->getID($groupID);
-        if (!$group) {
-            throw notFoundException('Group');
-        }
+        $this->verifyAccess($group);
 
         $userModel = new UserModel();
         $user = $userModel->getID($userID);
@@ -799,9 +794,7 @@ class GroupController extends Gdn_Controller {
         $this->addJsFile('groupicons.js');
         if ($id) {
             $group = $this->GroupModel->getID($id);
-            if (!$group) {
-                throw notFoundException('Group');
-            }
+            $this->verifyAccess($group);
 
             // Make sure the user can edit this group.
             if (!$this->GroupModel->checkPermission('Edit', $group)) {
@@ -938,9 +931,7 @@ class GroupController extends Gdn_Controller {
         Gdn_Theme::section('DiscussionList');
 
         $group = $this->GroupModel->getID($iD);
-        if (!$group) {
-            throw notFoundException('Group');
-        }
+        $this->verifyAccess($group);
 
         $this->setData('Group', $group);
         $this->GroupModel->overridePermissions($group);
@@ -1031,9 +1022,7 @@ class GroupController extends Gdn_Controller {
         Gdn_Theme::section('Members');
 
         $Group = $this->GroupModel->getID($ID);
-        if (!$Group) {
-            throw notFoundException('Group');
-        }
+        $this->verifyAccess($Group);
 
         // Check if this person is a member of the group or a moderator
         $viewGroupEvents = groupPermission('View', $Group);
@@ -1094,9 +1083,7 @@ class GroupController extends Gdn_Controller {
      */
     public function setRole($iD, $userID, $role) {
         $group = $this->GroupModel->getID($iD);
-        if (!$group) {
-            throw notFoundException('Group');
-        }
+        $this->verifyAccess($group);
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
         if (!$user) {
@@ -1143,8 +1130,7 @@ class GroupController extends Gdn_Controller {
      */
     public function removeMember($iD, $userID) {
         $group = $this->GroupModel->getID($iD);
-        if (!$group)
-            throw notFoundException('Group');
+        $this->verifyAccess($group);
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
         if (!$user) {
