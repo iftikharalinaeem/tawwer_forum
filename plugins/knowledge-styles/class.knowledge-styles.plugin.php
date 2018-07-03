@@ -8,9 +8,6 @@
  * Class KeywordBlocker
  */
 class KnowledgeStyles extends Gdn_Plugin {
-
-    public function assetModel_styleCss_handler($sender) {
-        $sender->addCssFile('knowledge-styles.css', 'plugins/knowledge-styles');
-    }
-
+    
 }
+

@@ -23,9 +23,4 @@ class KnowledgeStylesController extends VanillaController {
         $this->CssClass .= ' NoPanel';
         $this->render('index');
     }
-
-    public function authentication() {
-        $this->CssClass .= ' NoPanel';
-        $this->render('authentication');
-    }
 }
