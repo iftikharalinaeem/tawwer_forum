@@ -13,17 +13,17 @@
   min-height: 100vh;
 }
 
-.container {
+._container {
   position: relative;
   width: 100%;
-  max-width: $siteWidth_padded;
+  max-width: $global-main_paddedWidth;
 
   margin: {
     left: auto;
     right: auto;
   }
   padding: {
-    left: $gutter;
-    right: $gutter;
+    left: $global-gutter_size;
+    right: $global-gutter_size;
   }
 }
