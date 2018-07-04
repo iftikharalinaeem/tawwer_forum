@@ -8,4 +8,7 @@
  * Class KnowledgeStylesPlugin
  */
 class KnowledgeStylesPlugin extends Gdn_Plugin {
+    public function gdn_smarty_init($sender) {
+        $sender->addPluginsDir($this->getAddon()->path('/SmartyPlugins'));
+    }
 }

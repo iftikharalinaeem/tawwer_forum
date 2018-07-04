@@ -1,12 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
-echo wrap($this->data('Title'), 'h1', ['class' => 'pageTitle']);
+echo "<div class='_content'>";
+echo wrap("Knowledge base styles", 'h1', ['class' => 'pageTitle']);
+echo "</div>";
 
-$data = array(
-    'Test' => '123'
-);
+echo "<style>.knowledgeStylesHome {width: 500px; margin: auto; padding: 20px;} .styleGuideNav-link { font-size: 20px; line-height: 2; }</style>";
 
-
-/** @var Gdn_Smarty $smarty */
-$smarty = Gdn::getContainer()->get(\Gdn_Smarty::class);
-$smarty->smarty()->assign($data);
-$smarty->render($this->fetchViewLocation('components/test'), $this);
+echo "<div class='knowledgeStylesHome'>";
+include "styleGuideNav.php";
+echo "</div>";
