@@ -28,7 +28,7 @@
 
     {if InSection(array("CategoryList", "DiscussionList"))}
       <div class="masthead" data-geopattern="{$Title}">
-        <div class="container" role="search">
+        <div class="container js-sphinxAutoComplete" role="search">
 
           <h1 class="text-center">{t c="How can we help you?"}</h1>
 

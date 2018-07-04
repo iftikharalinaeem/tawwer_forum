@@ -342,7 +342,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
      * @param $recordType Type of record (Comment, Discussion...)
      * @param $recordID Record ID
      *
-     * @throws Gdn_ErrorException
+     * @throws Exception
      *
      * @return array Post data
      */
@@ -361,7 +361,7 @@ class KeywordBlockerPlugin extends Gdn_Plugin {
                 $model = new EventModel();
                 break;
             default:
-                throw new Gdn_ErrorException('Unsupported record type.');
+                throw new Exception('Unsupported record type.', 500);
         }
 
         return $model->getID($recordID, DATASET_TYPE_ARRAY);

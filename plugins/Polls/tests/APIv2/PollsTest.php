@@ -88,7 +88,7 @@ class PollsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public function modifyRow($row) {
+    public function modifyRow(array $row) {
         $row = parent::modifyRow($row);
 
         if (isset($row['discussionID'])) {

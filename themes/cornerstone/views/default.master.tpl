@@ -30,7 +30,7 @@
               {custom_menu}
             </ul>
 
-            <div class="navbar-form navbar-search pull-left" role="search">
+            <div class="navbar-form navbar-search pull-left js-sphinxAutoComplete" role="search">
               {searchbox}
             </div>
 

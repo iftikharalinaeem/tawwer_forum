@@ -542,7 +542,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                          'Banned' => $banned
                      ], [
                          'SaveRoles' => true,
-                         'FixUnique' => false // No, do not create a new user.
+                         'FixUnique' => false, // No, do not create a new user.
+                         'ValidateName' => false
                      ]);
                   } else {
                      $send_email = true;
@@ -627,7 +628,8 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
                   $form_post_options = [
                      'SaveRoles' => true,
                      'CheckCaptcha' => false,
-                     'ValidateSpam' => false
+                     'ValidateSpam' => false,
+                     'ValidateName' => false
                   ];
 
                   $user_model->Validation->unapplyRule('Email', 'Required');
@@ -969,7 +971,7 @@ class BulkUsersImporterPlugin extends Gdn_Plugin {
             $role_ids = $role_model->SQL
                ->select('r.RoleID')
                ->from('Role r')
-               ->whereIn('LOWER(r.Name)', $role_names)
+               ->whereIn('r.Name', $role_names)
                ->get()->resultArray();
             $role_ids = array_column($role_ids, 'RoleID');
          }
