@@ -13,10 +13,13 @@
   min-height: 100vh;
 }
 
+.BreadcrumbsWrapper,
 ._container {
   position: relative;
+  box-sizing: border-box;
   width: 100%;
   max-width: $global-main_paddedWidth;
+  overflow: hidden;
 
   margin: {
     left: auto;
@@ -28,8 +31,12 @@
   }
 }
 
-// Temporary:
-.Trace {
-  display: none;
-}
 
+
+
+
+
+// Temporary:
+//.Trace {
+//  display: none;
+//}

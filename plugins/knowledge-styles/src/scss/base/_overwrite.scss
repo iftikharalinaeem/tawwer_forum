@@ -5,3 +5,11 @@ body.mainMasterPage {
     }
   }
 }
+
+
+._pageContents {
+  &,
+  * {
+    box-sizing: border-box;
+  }
+}

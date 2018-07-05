@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-echo "<div class='_content'>";
+echo "<div class='_container'>";
 echo wrap("Knowledge base styles", 'h1', ['class' => 'pageTitle']);
 echo "</div>";
 

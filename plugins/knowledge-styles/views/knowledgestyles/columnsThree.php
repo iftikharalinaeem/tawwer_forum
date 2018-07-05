@@ -6,8 +6,12 @@ $data = array(
 );
 
 /** @var Gdn_Smarty $smarty */
-$smarty = Gdn::getContainer()->get(\Gdn_Smarty::class);
-$smarty->smarty()->assign($data);
-$smarty->render($this->fetchViewLocation('components/test'), $this);
+//$smarty = Gdn::getContainer()->get(\Gdn_Smarty::class);
+//$smarty->smarty()->assign($data);
+//$smarty->render($this->fetchViewLocation('layouts/columns'), $this);
+
+
+
+
 
 include "styleGuidePanel.php";
