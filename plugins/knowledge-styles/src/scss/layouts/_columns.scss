@@ -1,0 +1,32 @@
+@mixin mediaQuery-columns_oneColumn {
+  @media (max-width: #{$columns-breakpoint}) {
+    @content;
+  }
+}
+
+._columns {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+
+  @include mediaQuery-columns_oneColumn {
+    flex-wrap: wrap;
+  }
+}
+
+._column {
+  flex-grow: 1;
+  margin: {
+    left: $global-gutter_halfSize;
+    right: $global-gutter_halfSize;
+  }
+
+
+  @include mediaQuery-columns_oneColumn {
+    width: 100%;
+
+    + ._column {
+      margin-top: $global-gutter_size;
+    }
+  }
+}

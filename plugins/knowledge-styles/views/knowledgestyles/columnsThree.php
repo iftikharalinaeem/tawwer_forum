@@ -1,17 +1,11 @@
 <?php if (!defined('APPLICATION')) exit();
-echo wrap($this->data('Title'), 'h1', ['class' => 'pageTitle']);
+echo "<div class='_container'>";
+echo wrap("Layout - Three Columns", 'h1', ['class' => 'pageTitle']);
+echo "</div>";
 
-$data = array(
-    'Test' => '123'
-);
 
 /** @var Gdn_Smarty $smarty */
-//$smarty = Gdn::getContainer()->get(\Gdn_Smarty::class);
-//$smarty->smarty()->assign($data);
-//$smarty->render($this->fetchViewLocation('layouts/columns'), $this);
-
-
-
-
+$smarty = Gdn::getContainer()->get(\Gdn_Smarty::class);
+$smarty->render($this->fetchViewLocation('layouts/_example_columns_3'), $this);
 
 include "styleGuidePanel.php";

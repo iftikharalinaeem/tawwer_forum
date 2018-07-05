@@ -29,6 +29,13 @@
     left: $global-gutter_size;
     right: $global-gutter_size;
   }
+
+  &._hasPaddedContent {
+    padding: {
+      left: $global-gutter_halfSize;
+      right: $global-gutter_halfSize;
+    }
+  }
 }
 
 

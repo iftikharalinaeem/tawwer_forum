@@ -1,5 +1,4 @@
-<div class="_container _hasPaddedContent">
-    <div class="_columnsEqual">
-        {block name="main"}{/block}
-    </div>
+<div class="_container _hasPaddedContent _columns">
+    {block name="main"}{/block}
 </div>
+{block name="demo"}{/block} {* Demo CSS/JS*}

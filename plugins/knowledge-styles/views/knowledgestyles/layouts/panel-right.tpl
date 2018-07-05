@@ -8,3 +8,4 @@
         </div>
     </div>
 </div>
+{block name="demo"}{/block} {* Demo CSS/JS*}

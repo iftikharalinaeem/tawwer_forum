@@ -36,6 +36,10 @@
             background: red;
             min-height: 800px;
         }
+
+        .Trace {
+            display: none;
+        }
     </style>
     <script>
         document.querySelector("._panelAndNav-menu").addEventListener('click', function(){

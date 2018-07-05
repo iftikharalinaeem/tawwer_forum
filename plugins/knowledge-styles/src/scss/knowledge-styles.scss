@@ -11,18 +11,18 @@
 
 @import "base/overwrite"; // Overwrite styles from styles.css
 
+@import "layouts/layout";
+@import "layouts/panelAndNav";
+@import "layouts/columns";
 
 @import "components/icons";
 @import "components/buttons";
-@import "components/layout";
 @import "components/columns";
 @import "components/panels";
-@import "components/panelAndNav";
 @import "components/fullBackground";
 @import "components/messages";
 @import "components/overlays";
 @import "components/stickyBottom";
-
 
 @import "hacks/hack.ie10and11";
 

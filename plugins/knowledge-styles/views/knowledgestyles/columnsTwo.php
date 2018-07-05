@@ -1,9 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
-echo wrap($this->data('Title'), 'h1', ['class' => 'pageTitle']);
+echo "<div class='_container'>";
+echo wrap("Layout - Two Columns", 'h1', ['class' => 'pageTitle']);
+echo "</div>";
 
 /** @var Gdn_Smarty $smarty */
 $smarty = Gdn::getContainer()->get(\Gdn_Smarty::class);
-
-$smarty->render($this->fetchViewLocation('layoutExamples/'), $this);
+$smarty->render($this->fetchViewLocation('layouts/_example_columns_2'), $this);
 
 include "styleGuidePanel.php";

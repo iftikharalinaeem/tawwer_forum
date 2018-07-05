@@ -8,3 +8,10 @@
         </div>
     </div>
 </div>
+{block name="demo"}
+    <style>
+        .Trace {
+            display: none;
+        }
+    </style>
+{/block}
