@@ -1,6 +1,5 @@
 <div class="_container _panelAndNav">
     <div class="_panelAndNav-left">
-
         {* Visible in 1 column media query *}
         <button class="button button-close button-icon _panelAndNav-close" title="{t c="Close"}">
             <svg class="icon button-closeIcon" viewBox="0 0 24 24">
@@ -10,17 +9,12 @@
         </button>
 
         {* Hidden in 1 or 2 column media queries *}
-        <div class="_panelAndNav-block _panelAndNav-leftTop">
-            {block name="topLeft"}{/block}
-        </div>
-        <div class="_panelAndNav-block _panelAndNav-leftBottom">
-            {block name="bottomLeft"}{/block}
-        </div>
+        <div class="_panelAndNav-block _panelAndNav-leftTop">{block name="topLeft"}{/block}</div>
+        <div class="_panelAndNav-block _panelAndNav-leftBottom">{block name="bottomLeft"}{/block}</div>
     </div>
     <div class="_panelAndNav-content">
         <div class="_panelAndNav-middle">
             <div class="_panelAndNav-block _panelAndNav-top">
-
                 {* Visible in 1 column media query *}
                 <button class="button button-icon button-menu _panelAndNav-menu" title="{t c="Menu"}" aria-label="{t c="Menu"}">
                     <svg class="icon button-menuIcon" viewBox="0 0 24 24">
@@ -34,29 +28,17 @@
             </div>
 
             {* Displayed in 1 or 2 column media queries *}
-            <div class="_panelAndNav-block _panelAndNav-leftTop">
-                {block name="topLeft"}{/block}
-            </div>
+            <div class="_panelAndNav-block _panelAndNav-leftTop">{block name="topLeft"}{/block}</div>
 
             {* Displayed in 1 or 2 column media queries *}
-            <div class="_panelAndNav-block _panelAndNav-rightTop">
-                {block name="topRight"}{/block}
-            </div>
+            <div class="_panelAndNav-block _panelAndNav-rightTop">{block name="topRight"}{/block}</div>
 
-            <div class="_panelAndNav-block _panelAndNav-main">
-                {block name="main"}{/block}
-            </div>
+            <div class="_panelAndNav-block _panelAndNav-main">{block name="main"}{/block}</div>
         </div>
-        <div class="_panelAndNav-right">
-            {* Hidden in 1 or 2 column media queries *}
-            <div class="_panelAndNav-block _panelAndNav-rightTop">
-                {block name="topRight"}{/block}
-            </div>
-            <div class="_panelAndNav-block _panelAndNav-rightBottom">
-                {block name="bottomRight"}{/block}
-            </div>
+        <div class="_panelAndNav-right">{* Hidden in 1 or 2 column media queries *}
+            <div class="_panelAndNav-block _panelAndNav-rightTop">{block name="topRight"}{/block}</div>
+            <div class="_panelAndNav-block _panelAndNav-rightBottom">{block name="bottomRight"}{/block}</div>
         </div>
-
     </div>
 </div>
 

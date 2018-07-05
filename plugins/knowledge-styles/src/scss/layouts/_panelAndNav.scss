@@ -12,7 +12,7 @@
 
 ._panelAndNav {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 
@@ -94,6 +94,10 @@
   width: $global-panel_width;
   margin-left: $global-panelGutter_width;
 
+  &:empty {
+    display: none;
+  }
+
   @include mediaQuery-panelAndNav_twoColumn {
     width: 100%;
     margin-left: 0;
@@ -118,7 +122,7 @@
     }
   }
 
-  .button-close._panelAndNav-close {
+  .button.button-close._panelAndNav-close {
     @include absolute-topLeft;
     display: none;
 
@@ -128,3 +132,8 @@
   }
 }
 
+._panelAndNav-block {
+  &:empty {
+    display: none;
+  }
+}

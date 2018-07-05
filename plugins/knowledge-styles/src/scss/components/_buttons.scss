@@ -26,7 +26,6 @@
     }
 
     &.button-icon {
-      display: flex;
       align-items: center;
       justify-content: center;
       height: $icon-default_size;
@@ -34,9 +33,9 @@
       padding: 0;
       border: 0;
     }
-
-    &.button-menu {
-      display: none;
-    }
   }
+}
+
+.button-icon {
+  display: flex;
 }
