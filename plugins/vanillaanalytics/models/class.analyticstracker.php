@@ -90,7 +90,7 @@ class AnalyticsTracker {
         // Pages served to guests can be cached on infrastructure. Some values need to be reset/removed to avoid inaccuracies.
         if (!Gdn::session()->isValid()) {
             $eventData['ip'] = '0.0.0.0';
-            unset($eventData['referrer']);
+            unset($eventData['dateTime'], $eventData['referrer'], $eventData['user']['pv']);
         }
 
         foreach ($this->trackers as $tracker) {
@@ -160,7 +160,6 @@ class AnalyticsTracker {
             'method' => Gdn::request()->requestMethod(),
             'site' => AnalyticsData::getSite(),
             'url' => url('', true),
-            'pv' => $this->cookie->getPrivacy(),
             '_country' => $this->getRequestCountry(),
         ];
 
