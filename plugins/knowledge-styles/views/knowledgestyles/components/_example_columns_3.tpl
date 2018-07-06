@@ -1,23 +1,24 @@
 {extends file="columns.tpl"}
+{block name="extraClasses"}_columns-3{/block}
 {block name="main"}
     <div class="_column">
-        Column 1
+        {block name="column1"}
+            Column 1
+        {/block}
     </div>
     <div class="_column">
-        Column 2
+        {block name="column2"}
+            Column 2
+        {/block}
     </div>
     <div class="_column">
-        Column 3
+        {block name="column3"}
+            Column 3
+        {/block}
     </div>
 {/block}
 {block name="demo"}
     <style>
-        ._column {
-            padding: 20px;
-            background: orange;
-            height: 300px;
-        }
-
         .Trace {
             display: none;
         }

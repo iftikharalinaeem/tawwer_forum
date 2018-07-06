@@ -10,18 +10,26 @@
 
 
 @import "base/overwrite"; // Overwrite styles from styles.css
+@import "base/scaffolding";
+@import "base/utilities";
+@import "base/typography";
 
 @import "layouts/layout";
 @import "layouts/panelAndNav";
 @import "layouts/columns";
+@import "layouts/flexColumns";
 
+@import "components/widgets";
 @import "components/icons";
 @import "components/buttons";
-@import "components/columns";
 @import "components/panels";
 @import "components/fullBackground";
 @import "components/messages";
 @import "components/overlays";
 @import "components/stickyBottom";
+@import "components/uiLists";
+@import "components/featuredArticle";
+@import "components/splash";
+@import "components/searchBar";
 
 @import "hacks/hack.ie10and11";

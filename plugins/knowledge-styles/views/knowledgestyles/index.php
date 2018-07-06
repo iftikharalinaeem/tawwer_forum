@@ -8,3 +8,5 @@ echo "<style>.knowledgeStylesHome {width: 500px; margin: auto; padding: 20px;} .
 echo "<div class='knowledgeStylesHome'>";
 include "styleGuideNav.php";
 echo "</div>";
+
+echo "<style>.Trace { display: none; }</style>";

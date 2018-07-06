@@ -44,4 +44,15 @@ class KnowledgeStylesController extends VanillaController {
     public function panelAndNav() {
         $this->render("knowledgestyles/panelAndNav", '', 'plugins/knowledge-styles');
     }
+
+
+    // Pages
+    public function pageHome() {
+        $this->render("knowledgestyles/components/home", '', 'plugins/knowledge-styles');
+    }
+
+    public function pageArticle() {
+        $this->render("knowledgestyles/components/article", '', 'plugins/knowledge-styles');
+    }
+
 }

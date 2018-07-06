@@ -1,0 +1,61 @@
+$_searchBar_height: 50px;
+$_searchBar_width: 705px;
+
+._searchBar {
+  height: $_searchBar_height;
+  margin : auto;
+  flex: 1 auto;
+  width: 100%;
+  max-width: #{$_searchBar_width};
+}
+
+._searchBar-inputWrap {
+  width: 100%;
+  flex-grow: 1;
+
+  .inputText {
+    margin: 0;
+  }
+}
+
+.inputText._searchBar-input {
+  //@include _searchBar-input;
+  margin: 0;
+  width: 100%;
+}
+
+
+//.button._searchBar-button {
+//  @include generateButtonClass($button-basic);
+//}
+//
+//.searchDrawer-results {
+//  display: none;
+//  background-color: $splash-searchDrawer_bg;
+//}
+//
+//.searchDrawer-link {
+//  text-decoration: none;
+//  &:hover {
+//    text-decoration: none;
+//  }
+//}
+//
+//._splash-searchIcon {
+//  @include _searchBar-searchIcon;
+//  transform: translateY(-50%);
+//  z-index: 1;
+//  color: $searchDrawer-iconColor;
+//  cursor: text;
+//}
+//
+//._splash-iconHover,
+//._splash-iconOutline
+//{
+//  @include defaultTransition(color);
+//}
+//
+//._splash-iconHover {
+//  color: transparent;
+//  opacity: $searchDrawer-iconHoverOpacity;
+//}

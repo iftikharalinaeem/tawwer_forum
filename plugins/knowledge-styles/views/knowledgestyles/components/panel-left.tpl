@@ -29,7 +29,7 @@
 
             {* Displayed in 1 or 2 column media queries *}
             <div class="_panelAndNav-block _panelAndNav-leftTop">{block name="topLeft"}{/block}</div>
-            
+
             <div class="_panelAndNav-block _panelAndNav-main">{block name="main"}{/block}</div>
         </div>
 

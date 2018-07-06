@@ -16,7 +16,7 @@
     cursor: pointer;
     border: {
       width: $global-formElement_borderWidth;
-      radius: $global-borderRadius;
+      radius: $global-button_radius;
       style: solid;
     }
 
@@ -39,3 +39,5 @@
 .button-icon {
   display: flex;
 }
+
+

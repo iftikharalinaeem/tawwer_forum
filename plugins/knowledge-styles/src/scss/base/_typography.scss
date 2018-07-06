@@ -1,0 +1,28 @@
+@include headings {
+  @include headingFontStyle;
+}
+
+.pageTitle {
+  @include headingFontStyle();
+  font-size: $global-title_fontSize;
+
+  + .pageSubTitle {
+    display: block;
+  }
+}
+
+.pageSubTitle {
+  @include headingFontStyle();
+  font-size: $global-subTitle_fontSize;
+}
+
+.componentSubTitle {
+  @include headingFontStyle();
+  font-size: $global-large_fontSize;
+}
+
+//.note {
+//  font-size: $note-fontSize;
+//  opacity: $note-opacity;
+//  margin-left: $baseUnit;
+//}

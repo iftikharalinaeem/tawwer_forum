@@ -5,16 +5,18 @@
   max-width: 100%;
 }
 
+@mixin breakWord {
+  word-break: break-all;
+  word-break: break-word;
+}
+
 @mixin longWordEllipsis {
   text-overflow: ellipsis;
   overflow: hidden;
   max-width: 100%;
 }
 
-@mixin breakWord {
-  word-break: break-word;
-  word-break: break-all;
-}
+
 
 @mixin headings($from: 1, $to: 6){
   @for $i from $from through $to{
@@ -32,7 +34,7 @@
   font-size: $global-medium_fontSize;
   margin: {
     top: -$global-lineHeight_offset;
-    bottom: $baseUnit;
+    bottom: $utility-baseUnit;
   }
 }
 

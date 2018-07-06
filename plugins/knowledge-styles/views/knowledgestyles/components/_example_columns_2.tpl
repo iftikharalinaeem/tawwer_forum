@@ -9,12 +9,6 @@
 {/block}
 {block name="demo"}
     <style>
-        ._column {
-            padding: 20px;
-            background: orange;
-            height: 300px;
-        }
-
         .Trace {
             display: none;
         }

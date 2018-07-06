@@ -1,11 +1,11 @@
 @mixin mediaQuery-panelAndNav_twoColumn {
-  @media (max-width: #{$panelAndNav-breakpointTwoCol}) {
+  @media (max-width: #{$panelAndNav-twoColumn_breakpoint}) {
     @content;
   }
 }
 
 @mixin mediaQuery-panelAndNav_oneColumn {
-  @media (max-width: #{$panelAndNav-breakpointOneCol}) {
+  @media (max-width: #{$panelAndNav-oneColumn_breakpoint}) {
     @content;
   }
 }
