@@ -4,19 +4,18 @@ $splash-inner_bg             : transparent; // Within "content" margin
 $splash_fg                   : $global-color_fg; // Useful when setting a background image
 $splash-text_align           : center;
 $splash-text_maxWidth        : 700px;
-
+$splash-text_align           : $splash-text_align;
 
 $splash-title_fontSize       : 36px;
 $splash-title_fontWeight     : $global-heading_fontWeight;
-$splash-title_margin         : .6em;
-$splash-text_align           : $splash-text_align;
+
+$splash-paragraph_margin     : .4em;
 
 $splash-paragraph_textSize   : 24px;
 $splash-paragraph_fontWeight : 300;
-$splash-paragraph_margin     : .4em;
 $splash-paragraph_align      : $splash-text_align;
 
-$splash-_searchBar_height     : 50px;
+$splash-search_margin        : 30px;
 $splash-searchDrawer_bg      : $global-color_bg;
 
 //@mixin mediaQuery-splash {
@@ -43,14 +42,6 @@ $splash-searchDrawer_bg      : $global-color_bg;
   font-size: $splash-title_fontSize;
   font-weight: $splash-title_fontWeight;
   margin-bottom: 0;
-
-  + ._splash-p {
-    margin-top: $splash-title_margin;
-  }
-
-  + .searchDrawer {
-    margin-top: $splash-title_margin;
-  }
 }
 
 ._splash-text {
@@ -61,8 +52,8 @@ $splash-searchDrawer_bg      : $global-color_bg;
   color: $splash_fg;
   text-align: center;
 
-  + ._splash-search {
-    margin-top: $utility-baseUnit * 5;
+  + ._searchBar {
+    margin-top: $splash-search_margin;
   }
 }
 
@@ -70,6 +61,7 @@ $splash-searchDrawer_bg      : $global-color_bg;
 ._splash-p {
   font-size: $splash-paragraph_textSize;
   font-weight: $splash-paragraph_fontWeight;
+  margin-top: $splash-paragraph_margin;
 
   + ._splash-p {
     margin-top: $splash-paragraph_margin;
@@ -79,4 +71,8 @@ $splash-searchDrawer_bg      : $global-color_bg;
 ._splash-search {
   @include bgCover;
   position: relative;
+}
+
+._splash-advancedButton {
+  margin-left: auto;
 }

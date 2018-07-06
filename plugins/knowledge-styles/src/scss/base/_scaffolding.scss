@@ -99,10 +99,14 @@ a {
     text-decoration: none;
   }
 
-  color: $global-color-fg;
+  color: $link_default-color;
 
-  &:not(.isActive):hover {
-    color: $global-color-primary;
+  &:not(.isDisabled):not([disabled]):hover {
+    color: $link_default_hover-color;
+  }
+
+  &:not(.isDisabled):not([disabled]):focus {
+    color: $link_default_focus-color;
   }
 
   &.isActive {

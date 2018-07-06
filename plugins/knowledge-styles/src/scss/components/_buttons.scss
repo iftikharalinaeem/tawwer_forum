@@ -41,3 +41,14 @@
 }
 
 
+.button-fakeLink {
+  color: $link_default-color;
+
+  &:hover {
+    color: $link_default_hover-color
+  }
+
+  &:focus {
+    color: $link_default_focus-color;
+  }
+}

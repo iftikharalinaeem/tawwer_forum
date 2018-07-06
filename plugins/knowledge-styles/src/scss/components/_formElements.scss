@@ -9,14 +9,10 @@
   position: relative;
   width: 100%;
   vertical-align: middle;
-  color: $formElement_bg;
+  color: $formElement_fg;
   background-color: $formElement_bg;
   padding: $formElement_paddingVertical $formElement_horizontalPadding;
   outline: 0;
-
-  &.inputText-giant {
-    @include textInputSizing($formElement-giantInput_height, $formElement-giantInput_fontSize, $utility-baseUnit);
-  }
 }
 
 .inputText-inlineLabel {

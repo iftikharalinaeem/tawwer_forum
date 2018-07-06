@@ -1,6 +1,10 @@
 $searchBar_height: $formElement_giantInput_height;
 $searchBar_fontSize: $formElement_giantInput_fontSize;
 $searchBar_width: 705px;
+$searchBar-button_minWidth: 130px;
+$searchBar-icon_color: mix($global-color_bg, $global-color_fg, 40%);
+$searchBar-input_fontSize: $global-subTitle_fontSize;
+$searchBar-button_fontSize: $global-medium_fontSize;
 
 ._searchBar {
   height: $searchBar_height;
@@ -19,13 +23,27 @@ $searchBar_width: 705px;
 }
 
 ._searchBar-searchIcon {
-  @include absolute-middleLeft;
+  @include absolute-middleLeft($formElement_horizontalPadding);
+  color: $searchBar-icon_color;
 }
 
 .inputText._searchBar-input {
   height: $searchBar_height;
+  font-size: $searchBar-input_fontSize;
   margin: 0;
+  padding-left: #{$formElement_horizontalPadding * 2 + $icon-default_size};
   width: 100%;
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.button._searchBar-button {
+  height: $searchBar_height;
+  font-size: $searchBar-button_fontSize;
+  min-width: $searchBar-button_minWidth;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 
