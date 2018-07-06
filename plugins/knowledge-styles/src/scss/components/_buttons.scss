@@ -2,7 +2,7 @@
   .button {
     @include singleLineEllipsis;
     @include generateButtonClass($button-basic);
-    @include buttonSizing($global-formElement_height, $global-medium_fontSize, $utility-baseUnit);
+    @include buttonSizing($formElement_height, $global-medium_fontSize, $utility-baseUnit);
     @include outlineStyling;
     display: inline-block;
     position: relative;
@@ -15,7 +15,7 @@
     overflow: hidden;
     cursor: pointer;
     border: {
-      width: $global-formElement_borderWidth;
+      width: $formElement_borderWidth;
       radius: $global-button_radius;
       style: solid;
     }

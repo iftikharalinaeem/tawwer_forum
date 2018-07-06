@@ -31,7 +31,7 @@
 @mixin buttonSizing($height, $fontSize, $paddingTop) {
   min-height: $icon-default_size;
   font-size: $fontSize;
-  padding: #{$paddingTop - $global-formElement_borderWidth * 2} #{$paddingTop * 2};
+  padding: #{$paddingTop - $formElement_borderWidth * 2} #{$paddingTop * 2};
   line-height: $icon-default_size;
 }
 
@@ -41,7 +41,7 @@
   width: 100%;
   height: $height;
   padding: $paddingTop #{$paddingTop * 2};
-  line-height: inputLineHeight($height, $paddingTop, $global-formElement_borderWidthFull);
+  line-height: inputLineHeight($height, $paddingTop, $formElement-border_widthFull);
 }
 
 @mixin placeholderStyling {
@@ -95,5 +95,14 @@
 
   &::-ms-clear {
     display: none;
+  }
+}
+
+@mixin standardBorderStyles {
+  border: {
+    radius: $formElement_borderRadius;
+    width: $formElement_borderWidth;
+    color: $formElement_borderColor;
+    style: solid;
   }
 }

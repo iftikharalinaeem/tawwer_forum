@@ -1,29 +1,15 @@
 /* Do NOT style classes that start with "_", they are core classes meant to only be modified by variables */
-
 #Frame {
   display: flex;
   overflow: visible;
   flex-direction: column;
   width: 100%;
-}
-
-._pageMinHeight { // workaround for min-height: 100vh; not working in IE
-  display: flex;
-  flex-direction: column;
   min-height: 100vh;
 }
 
-.BreadcrumbsWrapper {
-  position: relative;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: $global-main_paddedWidth;
-  overflow: hidden;
-
-  margin: {
-    left: auto;
-    right: auto;
-  }
+._page-minHeight,
+#Body {
+  flex-grow: 1;
 }
 
 ._container {

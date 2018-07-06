@@ -1,25 +1,29 @@
-$_searchBar_height: 50px;
-$_searchBar_width: 705px;
+$searchBar_height: $formElement_giantInput_height;
+$searchBar_fontSize: $formElement_giantInput_fontSize;
+$searchBar_width: 705px;
 
 ._searchBar {
-  height: $_searchBar_height;
+  height: $searchBar_height;
+  max-width: #{$searchBar_width};
   margin : auto;
-  flex: 1 auto;
-  width: 100%;
-  max-width: #{$_searchBar_width};
 }
 
-._searchBar-inputWrap {
-  width: 100%;
-  flex-grow: 1;
+._searchBar-bar {
+  display: flex;
+  flex-wrap: nowrap;
+}
 
-  .inputText {
-    margin: 0;
-  }
+._searchBar-inputAndIcon {
+  position: relative;
+  flex-grow: 1;
+}
+
+._searchBar-searchIcon {
+  @include absolute-middleLeft;
 }
 
 .inputText._searchBar-input {
-  //@include _searchBar-input;
+  height: $searchBar_height;
   margin: 0;
   width: 100%;
 }

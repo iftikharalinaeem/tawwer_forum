@@ -3,7 +3,7 @@
 }
 
 .pageTitle {
-  @include headingFontStyle();
+  @include headingFontStyle;
   font-size: $global-title_fontSize;
 
   + .pageSubTitle {
@@ -12,12 +12,12 @@
 }
 
 .pageSubTitle {
-  @include headingFontStyle();
+  @include headingFontStyle;
   font-size: $global-subTitle_fontSize;
 }
 
 .componentSubTitle {
-  @include headingFontStyle();
+  @include headingFontStyle;
   font-size: $global-large_fontSize;
 }
 

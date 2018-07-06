@@ -134,7 +134,7 @@ textarea {
   min-height: $global-textArea_minHeight;
   width: 100%;
   resize: vertical;
-  border-color: $global-formElement_borderColor;
+  border-color: $formElement_borderColor;
   padding: $global-textArea_padding;
 }
 

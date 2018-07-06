@@ -26,7 +26,7 @@
   }
 }
 
-@mixin headingFontStyle() {
+@mixin headingFontStyle($marginBottom: $utility-baseUnit) {
   @include longWordEllipsis;
   display: inline-block;
   font-family: $global-heading_fontFamily;
@@ -34,7 +34,7 @@
   font-size: $global-medium_fontSize;
   margin: {
     top: -$global-lineHeight_offset;
-    bottom: $utility-baseUnit;
+    bottom: $marginBottom;
   }
 }
 

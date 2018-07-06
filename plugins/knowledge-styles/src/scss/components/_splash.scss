@@ -1,4 +1,4 @@
-$splash-verticalPadding      : $global-gutter_size;
+$splash-verticalPadding      : 36px;
 $splash-outer_bg             : $global-color_bg; // All the way to the edge
 $splash-inner_bg             : transparent; // Within "content" margin
 $splash_fg                   : $global-color_fg; // Useful when setting a background image
@@ -6,7 +6,7 @@ $splash-text_align           : center;
 $splash-text_maxWidth        : 700px;
 
 
-$splash-title_fontSize       : 45px;
+$splash-title_fontSize       : 36px;
 $splash-title_fontWeight     : $global-heading_fontWeight;
 $splash-title_margin         : .6em;
 $splash-text_align           : $splash-text_align;
@@ -38,6 +38,21 @@ $splash-searchDrawer_bg      : $global-color_bg;
   background-color: $splash-inner_bg;
 }
 
+
+._splash-title {
+  font-size: $splash-title_fontSize;
+  font-weight: $splash-title_fontWeight;
+  margin-bottom: 0;
+
+  + ._splash-p {
+    margin-top: $splash-title_margin;
+  }
+
+  + .searchDrawer {
+    margin-top: $splash-title_margin;
+  }
+}
+
 ._splash-text {
   display: block;
   width: $splash-text_maxWidth;
@@ -51,21 +66,6 @@ $splash-searchDrawer_bg      : $global-color_bg;
   }
 }
 
-._splash-title {
-  margin: {
-    bottom: 0;
-  }
-  font-size: $splash-title_fontSize;
-  font-weight: $splash-title_fontWeight;
-
-  + ._splash-p {
-    margin-top: $splash-title_margin;
-  }
-
-  + .searchDrawer {
-    margin-top: $splash-title_margin;
-  }
-}
 
 ._splash-p {
   font-size: $splash-paragraph_textSize;
