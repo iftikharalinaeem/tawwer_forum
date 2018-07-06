@@ -1,18 +1,19 @@
-{extends file="columns-3.tpl"}
+{extends file="columns-3.tpl" }
+{block name="classes"}_overview{/block}
 {block name="column1"}
     <div class="_widget">
         <div class="_widget-contents">
             <div class="_widget-head">
-                <h2 class="_widgetTitle">Getting Started</h2>
+                <h2 class="_widget-title">Getting Started</h2>
             </div>
             <div class="_widget-main">
                 <div class="_widget-body">
                     <ul class="uiList">
                         <li class="uiList-item">
-                            <a href="#">Installation</a>
+                            <a href="#" class="uiList-link">Installation</a>
                         </li>
                         <li class="uiList-item">
-                            <a href="#">Configuration</a>
+                            <a href="#" class="uiList-link">Configuration</a>
                         </li>
                     </ul>
                 </div>
@@ -27,25 +28,25 @@
     <div class="_widget">
         <div class="_widget-contents">
             <div class="_widget-head">
-                <h2 class="_widgetTitle">Appearance</h2>
+                <h2 class="_widget-title">Appearance</h2>
             </div>
             <div class="_widget-main">
                 <div class="_widget-body">
                     <ul class="uiList">
                         <li class="uiList-item">
-                            <a href="#">Custom Theme</a>
+                            <a href="#" class="uiList-link">Custom Theme</a>
                         </li>
                         <li class="uiList-item">
-                            <a href="#">Emails</a>
+                            <a href="#" class="uiList-link">Emails</a>
                         </li>
                         <li class="uiList-item">
-                            <a href="#">Accessibility</a>
+                            <a href="#" class="uiList-link">Accessibility</a>
                         </li>
                         {*<li class="uiList-item">*}
-                        {*<a href="#">Lorem Ipsum Lorem Ipsum Lorem IpsumLorem Ipsum Lorem Ipsum Lorem Ipsum</a>*}
+                        {*<a href="#" class="uiList-link">Lorem Ipsum Lorem Ipsum Lorem IpsumLorem Ipsum Lorem Ipsum Lorem Ipsum</a>*}
                         {*</li>*}
                         {*<li class="uiList-item">*}
-                        {*<a href="#">ReallylongtitlewaytoolongforthespacewehaveReallylongtitlewaytoolongforthespacewehave</a>*}
+                        {*<a href="#" class="uiList-link">ReallylongtitlewaytoolongforthespacewehaveReallylongtitlewaytoolongforthespacewehave</a>*}
                         {*</li>*}
                     </ul>
                 </div>
@@ -60,19 +61,19 @@
     <div class="_widget">
         <div class="_widget-contents">
             <div class="_widget-head">
-                <h2 class="_widgetTitle">Moderation</h2>
+                <h2 class="_widget-title">Moderation</h2>
             </div>
             <div class="_widget-main">
                 <div class="_widget-body">
                     <ul class="uiList">
                         <li class="uiList-item">
-                            <a href="#">Reporting</a>
+                            <a href="#" class="uiList-link">Reporting</a>
                         </li>
                         <li class="uiList-item">
-                            <a href="#">Spam</a>
+                            <a href="#" class="uiList-link">Spam</a>
                         </li>
                         <li class="uiList-item">
-                            <a href="#">Warnings & Notes</a>
+                            <a href="#" class="uiList-link">Warnings & Notes</a>
                         </li>
                     </ul>
                 </div>

@@ -1,3 +1,6 @@
+$uiList-font_size: $global-medium_fontSize;
+$uiList-item_spacing: $utility-baseUnit;
+
 .uiList {
   display: block;
   list-style: none;
@@ -6,4 +9,13 @@
 
 .uiList-item {
   @include breakWord;
+  font-size: $uiList-font_size;
+
+  + .uiList-item {
+    margin-top: $uiList-item_spacing;
+  }
+}
+
+.uiList-link {
+  font-size: $uiList-font_size;
 }

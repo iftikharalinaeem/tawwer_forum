@@ -29,8 +29,11 @@
 @import "components/stickyBottom";
 @import "components/uiLists";
 @import "components/featuredArticle";
-@import "components/splash";
 @import "components/searchBar";
 @import "components/formElements";
+@import "components/newArticle";
+
+@import "widget/splash";
+@import "widget/overview";
 
 @import "browserSpecific/browserSpecific";

@@ -1,7 +1,7 @@
-<div class="_container">
+<div class="_container _featuredArticles">
     <div class="_widget">
         <div class="_widget-contents"> {* Used for full background *}
-            <div class="_widget-header">
+            <div class="_widget-head">
                 {include "widget-titleBar-viewMore.tpl" title="Featured Articles"}
             </div>
             <div class="_widget-main">
@@ -17,23 +17,6 @@
                     </div>
                 </div>
             </div>
-            <div class="_widget-footer">{block name="footer"}{/block}</div>
         </div>
     </div>
 </div>
-{block name="demo"}{/block} {* Demo CSS/JS*}
-
-
-
-
-
-
-
-
-{block name="demo"}
-    <style>
-        .Trace {
-            display: none;
-        }
-    </style>
-{/block}

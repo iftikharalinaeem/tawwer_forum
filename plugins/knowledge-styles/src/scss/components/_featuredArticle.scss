@@ -1,0 +1,10 @@
+$featuredArticle_spacing: 1em;
+
+._featuredArticle {
+  display: block;
+  margin-bottom: $featuredArticle_spacing;
+}
+
+._featuredArticle-title {
+  margin-top: 0;
+}

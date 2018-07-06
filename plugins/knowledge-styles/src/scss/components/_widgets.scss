@@ -1,3 +1,6 @@
+$widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%) !default;
+
+
 ._widget {
   width: 100%;
   background-color: $global-widget_bg;
@@ -73,57 +76,47 @@
   }
 }
 
-//._widgetColumn {
-//  display: flex;
-//  width: 100%;
-//  position: relative;
-//  flex-direction: column;
-//  align-items: flex-start;
-//  justify-content: flex-start;
-//  min-height: 100%;
-//}
-//
-//._widgetColumn-pushDown {
-//  margin-top: auto;
-//  padding-top: $component-spacing_half;
-//}
+._widget-title {
+  display: block;
+  font-size: $global-widgetTitle_size;
+  margin-bottom: 0;
+}
 
-//._widget-title {
-//  font-size: $global-widgetTitle_size;
-//}
-//
-//._widget-subTitle {
-//  font-size: $global-widgetSubTitle_size;
-//}
-//
-//
-//// Test
-//
-//._columns {
-//  background-color: rgba(0, 0, 0, 0.1);
-//}
-//
-//._container {
-//  background-color: rgba(0, 0, 0, 0.1);
-//}
-//
-//._column,
-//._widget {
-//  background-color: rgba(255, 68, 0, 0.2);
-//}
-//
-//._widget-contents {
-//  background-color: rgba(0, 0, 255, 0.1);
-//}
-//
-//._widget-header {
-//  background-color: rgba(0, 128, 100, 0.1);
-//}
-//
-//._widget-body {
-//  background-color: rgba(100, 128, 0, 0.1);
-//}
-//
-//._widget-footer {
-//  background-color: rgba(50, 128, 50, 0.1);
-//}
+._widget-titleBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  ._widget-title {
+    margin-right: auto;
+  }
+}
+
+
+
+._widget-viewAll {
+  display: flex;
+  align-items: center;
+  border: 0;
+  margin-left: auto;
+}
+
+
+._widget-viewAllLabel {
+  @include outlineStyling;
+  vertical-align: middle;
+  font-size: $global-small_fontSize;
+  color: $widget-titleBar_viewMoreColor;
+  line-height: $formElement-height;
+
+  &:hover,
+  &:focus {
+    color: $global-color_primary;
+  }
+}
+
+
+._widget-viewAllIcon {
+  display: inline-block;
+  color: $widget-titleBar_viewMoreColor;
+}

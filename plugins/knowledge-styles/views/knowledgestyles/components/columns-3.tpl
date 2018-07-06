@@ -1,4 +1,4 @@
-<div class="_container _hasPaddedContent">
+<div class="_container _hasPaddedContent {block name="classes"}{/block}">
     <div class="_columns _columns-3">
         <div class="_column">
             {block name="column1"}

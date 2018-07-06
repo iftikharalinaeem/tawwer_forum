@@ -1,0 +1,17 @@
+$newArticle-button_height: 24px;
+$newArticle-button_minWidth: 75px;
+$newArticle-button_borderRadius: $newArticle-button_height;
+$newArticle-button_fontSize: $global-small_fontSize;
+
+
+
+.button.button-newArticle {
+  @include buttonSizing($newArticle-button_height, $newArticle-button_fontSize, 2px);
+  border-radius: $newArticle-button_borderRadius;
+  line-height: $newArticle-button_height;
+  font-size: $newArticle-button_fontSize;
+  min-height: $newArticle-button_height;
+  min-width: $newArticle-button_minWidth;
+}
+
+
