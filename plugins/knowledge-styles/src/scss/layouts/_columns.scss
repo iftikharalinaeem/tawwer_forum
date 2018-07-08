@@ -1,6 +1,6 @@
 // Even columns. If you have uneven columns, make new component
-@mixin mediaQuery-columns_oneColumn {
-  @media (max-width: #{$evenColumns_breakpoint}) {
+@mixin mediaQuery-columnsThreeCol_breakToOne {
+  @media (max-width: #{$evenColumns_threeColumns_breakToOne}) {
     @content;
   }
 }
@@ -15,10 +15,6 @@
     right: $widget-right_padding;
     bottom: $widget-bottom_padding;
     left: $widget-left_padding;
-  }
-
-  @include mediaQuery-columns_oneColumn {
-    flex-wrap: wrap;
   }
 }
 
@@ -58,9 +54,7 @@
     @include singleLineEllipsis;
   }
 
-  @include mediaQuery-columns_oneColumn {
-    width: 100%;
-
+  @include mediaQuery-columnsThreeCol_breakToOne {
     + ._column {
       margin-top: $global-gutter_size;
     }
@@ -80,7 +74,16 @@
 }
 
 ._columns-3 {
+  @include mediaQuery-columnsThreeCol_breakToOne {
+    flex-wrap: wrap;
+  }
+
   ._column {
     width: $utility-percentage_third;
+    @include mediaQuery-columnsThreeCol_breakToOne {
+      width: 100%;
+    }
   }
 }
+
+

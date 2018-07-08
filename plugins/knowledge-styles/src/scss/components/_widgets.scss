@@ -8,9 +8,9 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
   font-size: $global-widgetText_size;
 
   border: {
-    color: $global-widgetBorder_color;
-    width: $global-widgetBorder_width;
-    radius: $global-widgetBorder_radius;
+    color: $widget_borderColor;
+    width: $widget_borderWidth;
+    radius: $widget_borderRadius;
   }
 
   padding: {
@@ -36,6 +36,11 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
     bottom: $widget-head_bottomPadding;
     left: $widget-head_leftPadding;
   }
+  border: {
+    color: $widget-head_borderColor;
+    width: $widget-head_borderWidth;
+    radius: $widget-head_borderRadius;
+  }
   &:empty {
     display: none;
   }
@@ -47,6 +52,11 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
 
 ._widget-main {
   width: 100%;
+  border: {
+    color: $widget-main_borderColor;
+    width: $widget-main_borderWidth;
+    radius: $widget-main_borderRadius;
+  }
 }
 
 ._widget-body {
@@ -57,6 +67,11 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
     right: $widget-body_topPadding;
     bottom: $widget-body_bottomPadding;
     left: $widget-body_leftPadding;
+  }
+  border: {
+    color: $widget-body_borderColor;
+    width: $widget-body_borderWidth;
+    radius: $widget-body_borderRadius;
   }
 }
 
@@ -70,6 +85,11 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
     right: $widget-footer_topPadding;
     bottom: $widget-footer_bottomPadding;
     left: $widget-footer_leftPadding;
+  }
+  border: {
+    color: $widget-footer_borderColor;
+    width: $widget-footer_borderWidth;
+    radius: $widget-footer_borderRadius;
   }
   &:empty {
     display: none;
@@ -91,8 +111,6 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
     margin-right: auto;
   }
 }
-
-
 
 ._widget-viewAll {
   display: flex;
