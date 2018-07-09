@@ -1,32 +1,12 @@
-@mixin listItemStyle {
-  li {
-    padding-left: $userContent-listMargin;
-    margin-bottom: .5em;
-  }
-}
-
-@mixin orderedListStyle($reset: true) {
+@mixin orderedListStyle() {
   ol {
-    @include listItemStyle;
     list-style-position: inside;
-    padding-left: 0;
-    @if $reset {
-      counter-reset: listItem;
-    }
 
-    > li {
-      position: relative;
-      padding-left: 0;
-
-      &::before {
-        position: relative;
-        display: inline-block;
-        content: counter(listItem) ".\00a0";
-        counter-increment: listItem;
-        color: inherit;
-        line-height: inherit;
-        min-width: $userContent-listDecorationMinWidth;
-        margin-left: -$userContent-listMargin;
+    li {
+      list-style: decimal;
+      margin: {
+        left: $userContent-list_margin;
+        top: .5em;
       }
     }
   }
@@ -34,28 +14,11 @@
 
 @mixin unorderedListStyle {
   ul {
-    @include listItemStyle;
-    padding-left: 0;
-
     li {
+      list-style: initial;
       position: relative;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      &::before {
-        position: absolute;
-        top: 0;
-        left: 0;
-        display: inline-block;
-        content: "\2022";
-        color: inherit;
-        line-height: inherit;
-        margin-left: -#{$userContent-listDecorationMinWidth * .88 - $userContent-listMargin};
-        font-size: 1.2em;
-        font-family: Arial, sans-serif !important;
-      }
+      margin-left: $userContent-list_margin;
+      margin-top: .5em;
     }
   }
 }
