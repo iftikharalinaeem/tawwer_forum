@@ -15,7 +15,7 @@
                 </span>
             </a>
             <div class="_navMenu-itemChildren">
-                <ul class="_navMenumenu _navMenu-tier _navMenu-tier2">
+                <ul class="_navMenu-list _navMenu-tier _navMenu-tier2">
                     {include "article_navItem.tpl" text="Advanced Editor"}
                     {include "article_navItem.tpl" text="Advanced Search"}
                     <li class="_navMenu-item isActive">

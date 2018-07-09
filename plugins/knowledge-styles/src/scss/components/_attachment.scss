@@ -9,11 +9,9 @@ $attachment-formatIcon_margin    : $utility-baseUnit !default;
 $attachment-downloadIcon_color   : mix($global-color_fg, $global-color_bg, 60%) !default;
 $attachment-downloadIcon_margin  : $utility-baseUnit !default;
 
-
 ._attachments {
   display: block;
 }
-
 
 ._attachment {
   display: flex;

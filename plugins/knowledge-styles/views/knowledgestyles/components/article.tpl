@@ -1,3 +1,16 @@
+{* Temporary *}
+<div class="_container _panelAndNav">
+    <div class="_panelAndNav-left"></div>
+    <div class="_panelAndNav-content">
+        <main class="_panelAndNav-middle">
+            <div class="_panelAndNav-block _panelAndNav-top">
+                <div class="breadcrumbsWrapper">{breadcrumbs}</div>
+            </div>
+        </main>
+    </div>
+</div>
+{* --- *}
+
 <div class="_container _panelAndNav">
     <div class="_panelAndNav-left">
         <div class="_panelAndNav-leftColumn">
@@ -19,9 +32,6 @@
     <div class="_panelAndNav-content">
         <main class="_panelAndNav-middle">
             <div class="_panelAndNav-block _panelAndNav-top">
-
-                <div class="breadcrumbsWrapper">{breadcrumbs}</div>
-
                 <div class="_pageHeading">
                     <div class="_pageHeading-main">
                         <button class="button button-icon button-menu _panelAndNav-menu" title="{t c="Menu"}" aria-label="{t c="Menu"}">

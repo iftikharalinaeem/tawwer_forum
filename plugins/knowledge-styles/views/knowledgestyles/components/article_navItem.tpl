@@ -2,7 +2,7 @@
     <a href="#" class="_navMenu-link">
         <span class="_navMenu-iconWrap">
             {if $showarrow === "true"}
-                <span class="_navMenu-icon">▾</span>
+                <span class="_navMenu-icon  {$classes}">▾</span>
             {/if}
         </span>
         <span class="_navMenu-linkText">

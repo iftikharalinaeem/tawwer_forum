@@ -22,7 +22,6 @@
 @import "components/widgets";
 @import "components/icons";
 @import "components/buttons";
-@import "components/panels";
 @import "components/fullBackground";
 @import "components/messages";
 @import "components/overlays";
@@ -34,9 +33,11 @@
 @import "components/pageHeading";
 @import "components/helpful";
 @import "components/attachment";
+@import "components/navMenu";
 
 @import "widget/splash";
 @import "widget/overview";
 
-@import "browserSpecific/browserSpecific";
+@import "pages/article";
 
+@import "browserSpecific/browserSpecific";
