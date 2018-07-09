@@ -1,71 +1,61 @@
 <nav class="_navMenu">
-    <ul class="_navMenu-list _navMenu-tier _navMenu-tier1">
+    <ul class="_navMenu-items _navMenu-tier1">
         {include "article_navItem.tpl" text="Help & Training"}
         {include "article_navItem.tpl" text="Getting Started" showarrow="true"}
         {include "article_navItem.tpl" text="Appearance" showarrow="true"}
         {include "article_navItem.tpl" text="Forum Settings" showarrow="true"}
 
-        <li class="_navMenu-item isActive">
-            <a href="#" class="_navMenu-link isActive">
-                <span class="_navMenu-iconWrap">
-                    <span class="_navMenu-icon isOpen">▾</span>
-                </span>
+        <li class="_navMenu-item">
+            <a href="#" class="_navMenu-link _isActive _hasChildren">
+                {include "article_nav_triangle.tpl" classes="_isOpen"}
                 <span class="_navMenu-linkText">
                     Integrations
                 </span>
             </a>
             <div class="_navMenu-itemChildren">
-                <ul class="_navMenu-list _navMenu-tier _navMenu-tier2">
+                <ul class="_navMenu-items _navMenu-tier2">
                     {include "article_navItem.tpl" text="Advanced Editor"}
                     {include "article_navItem.tpl" text="Advanced Search"}
-                    <li class="_navMenu-item isActive">
-                        <a href="#" class="_navMenu-link isActive">
-                            <span class="_navMenu-iconWrap">
-                                <span class="_navMenu-icon isOpen">▾</span>
-                            </span>
+                    <li class="_navMenu-item _isOpen">
+                        <a href="#" class="_navMenu-link _hasChildren _isOpen">
+                            {include "article_nav_triangle.tpl" classes="_isOpen"}
                             <span class="_navMenu-linkText">
                                 Integrations
                             </span>
                         </a>
                         <div class="_navMenu-itemChildren">
-                            <ul class="_navMenumenu _navMenu-tier _navMenu-tier3">
+                            <ul class="_navMenu-items _navMenu-tier3">
 
                                 {* - *}
-                                <li class="_navMenu-item isActive">
-                                    <a href="#" class="_navMenu-link isActive">
-                                        <span class="_navMenu-iconWrap">
-                                            <span class="_navMenu-icon isOpen">▾</span>
-                                        </span>
+                                <li class="_navMenu-item _isOpen">
+                                    <a href="#" class="_navMenu-link _hasChildren _isOpen">
+                                        {include "article_nav_triangle.tpl" classes="_isOpen"}
                                         <span class="_navMenu-linkText">
                                             Badges
                                         </span>
                                     </a>
                                     <div class="_navMenu-itemChildren">
-                                        <ul class="_navMenumenu _navMenu-tier _navMenu-tier2">
+                                        <ul class="_navMenu-items _navMenu-tier2">
                                             {* - *}
-                                            <li class="_navMenu-item isActive">
-                                                <a href="#" class="_navMenu-link isActive">
-                                                    <span class="_navMenu-iconWrap">
-                                                        <span class="_navMenu-icon isOpen">▾</span>
-                                                    </span>
+                                            <li class="_navMenu-item _isOpen">
+                                                <a href="#" class="_navMenu-link _hasChildren _isOpen">
+                                                    {include "article_nav_triangle.tpl" classes="_isOpen"}
                                                     <span class="_navMenu-linkText">
                                                         Forum Merge
                                                     </span>
                                                 </a>
                                                 <div class="_navMenu-itemChildren">
-                                                    <ul class="_navMenumenu _navMenu-tier _navMenu-tier2">
+                                                    <ul class="_navMenu-items _navMenu-tier2">
                                                         {* - *}
-                                                        <li class="_navMenu-item isActive">
-                                                            <a href="#" class="_navMenu-link isActive">
-                                                            <span class="_navMenu-iconWrap">
-                                                                <span class="_navMenu-icon isOpen">▾</span>
-                                                            </span>
-                                                            <span class="_navMenu-linkText">
-                                                                Gigya Sign In
-                                                            </span>
+                                                        <li class="_navMenu-item _isOpen">
+                                                            <a href="#" class="_navMenu-link _hasChildren _isOpen">
+                                                                {include "article_nav_triangle.tpl" classes="_isOpen"}
+                                                                <span class="_navMenu-linkText">
+                                                                    Gigya Sign In
+                                                                </span>
                                                             </a>
                                                             <div class="_navMenu-itemChildren">
-                                                                <ul class="_navMenumenu _navMenu-tier _navMenu-tier2">
+                                                                <ul class="_navMenu-items _navMenu-tier2">
                                                                     {include "article_navItem.tpl" text="Groups"}
                                                                 </ul>
                                                             </div>
