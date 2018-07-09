@@ -8,3 +8,5 @@ $smarty->render($this->fetchViewLocation('pages/article'), $this);
 
 include "styleGuidePanel.php";
 echo "<style>.Trace { display: none; }</style>";
+
+

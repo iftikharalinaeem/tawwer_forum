@@ -34,4 +34,7 @@ $rootUrl = url('/knowledge-styles/');
     <li class="styleGuideNav-item">
         <a class="styleGuideNav-link" href="<?php echo $rootUrl;?>pageHome">Home</a>
     </li>
+    <li class="styleGuideNav-item">
+        <a class="styleGuideNav-link" href="<?php echo $rootUrl;?>pageArticle">Article</a>
+    </li>
 </ul>
