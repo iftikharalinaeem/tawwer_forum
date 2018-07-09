@@ -1,34 +1,34 @@
-$splash-verticalPadding              : 12px;
-$splash-outer_bg                     : $global-color_bg; // All the way to the edge
-$splash-inner_bg                     : transparent; // Within "content" margin
-$splash_fg                           : $global-color_fg; // Useful when setting a background image
-$splash-text_align                   : center;
-$splash-text_maxWidth                : 700px;
-$splash-text_align                   : $splash-text_align;
+$splash-verticalPadding              : 12px !default;
+$splash-outer_bg                     : $global-color_bg !default; // All the way to the edge
+$splash-inner_bg                     : transparent !default; // Within "content" margin
+$splash_fg                           : $global-color_fg !default; // Useful when setting a background image
+$splash-text_align                   : center !default;
+$splash-text_maxWidth                : 700px !default;
+$splash-text_align                   : $splash-text_align !default;
 
-$splash-title_fontSize               : 36px;
-$splash-title_fontWeight             : $global-heading_fontWeight;
+$splash-title_fontSize               : 36px !default;
+$splash-title_fontWeight             : $global-heading_fontWeight !default;
 
-$splash-paragraph_margin             : .4em;
+$splash-paragraph_margin             : .4em !default;
 
-$splash-paragraph_textSize           : 24px;
-$splash-paragraph_fontWeight         : 300;
-$splash-paragraph_align              : $splash-text_align;
+$splash-paragraph_textSize           : 24px !default;
+$splash-paragraph_fontWeight         : 300 !default;
+$splash-paragraph_align              : $splash-text_align !default;
 
-$splash-search_margin                : 30px;
-$splash-searchDrawer_bg              : $global-color_bg;
+$splash-search_margin                : 30px !default;
+$splash-searchDrawer_bg              : $global-color_bg !default;
 
-$splashSearchBar_height              : $formElement_giantInput_height;
-$splashSearchBar_fontSize            : $formElement_giantInput_fontSize;
-$splashSearchBar_width               : 705px;
-$splashSearchBar-button_minWidth     : 130px;
-$splashSearchBar-button_borderWidth  : $formElement_borderWidth;
-$splashSearchBar-button_borderRadius : $formElement_borderWidth;
-$splashSearchBar-button_borderColor  : $formElement_borderColor;
+$splashSearchBar_height              : $formElement_giantInput_height !default;
+$splashSearchBar_fontSize            : $formElement_giantInput_fontSize !default;
+$splashSearchBar_width               : 705px !default;
+$splashSearchBar-button_minWidth     : 130px !default;
+$splashSearchBar-button_borderWidth  : $formElement_borderWidth !default;
+$splashSearchBar-button_borderRadius : $formElement_borderWidth !default;
+$splashSearchBar-button_borderColor  : $formElement_borderColor !default;
 
-$splashSearchBar-icon_color          : mix($global-color_bg, $global-color_fg, 40%);
-$splashSearchBar-input_fontSize      : $global-subTitle_fontSize;
-$splashSearchBar-button_fontSize     : $global-medium_fontSize;
+$splashSearchBar-icon_color          : mix($global-color_bg, $global-color_fg, 40%) !default;
+$splashSearchBar-input_fontSize      : $global-subTitle_fontSize !default;
+$splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
 
 //@mixin mediaQuery-splash {
 //  @media (max-width: #{$splash-text_maxWidth + $component-spacing * 2}) {

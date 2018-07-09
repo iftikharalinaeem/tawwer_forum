@@ -1,7 +1,7 @@
-$newArticle-button_height: 24px;
-$newArticle-button_minWidth: 75px;
-$newArticle-button_borderRadius: $newArticle-button_height;
-$newArticle-button_fontSize: $global-small_fontSize;
+$newArticle-button_height: 24px !default;
+$newArticle-button_minWidth: 75px !default;
+$newArticle-button_borderRadius: $newArticle-button_height !default;
+$newArticle-button_fontSize: $global-small_fontSize !default;
 
 
 
