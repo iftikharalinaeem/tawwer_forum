@@ -34,9 +34,9 @@
                     </a>
                 </li>
                 <li class="_pagination-element">
-                    <button disabled class="button _pagination-item">
-                        <span class="_pagination-label">6</span>
-                    </button>
+                    <a itemprop="url" aria-current="page" class="button _pagination-item isCurrent" href="#6"> {*Current Page*}
+                        <span class="_pagination-label" itemprop="name">6</span>
+                    </a>
                 </li>
                 <li class="_pagination-element">
                     <a itemprop="url" class="button _pagination-item" href="#7">

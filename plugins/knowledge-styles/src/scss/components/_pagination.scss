@@ -1,10 +1,11 @@
 $pagination-buttonWidth                                     : $formElement_height;
-$pagination-padding                                         : $utility-baseUnit * 4;
+//$pagination-padding                                         : $utility-baseUnit * 4;
 $pagination_height                                          : $formElement_heightWithBorder;
 $pagination-navPadding_outer                                : 9px;
 $pagination-navPadding_inner                                : 5px;
 $pagination-bg                                              : $global-color_bg;
-$pagination-disabled_bg                                     : mix($global-color_fg, $global-color_fg, 90%) !default;
+$pagination-disabled_bg                                     : mix($global-color_fg, $global-color_bg, 10%) !default;
+$pagination-disabled_fg                                     : mix($global-color_fg, $global-color_bg, 50%) !default;
 $pagination-jumpTo_fg                                       : $global-color_fg !default;
 $pagination-jumpTo_bg                                       : $global-color_bg;
 $pagination-border_color                                    : $formElement_borderColor;
@@ -15,6 +16,8 @@ $pagination-item_borderRadius                               : 0;
 
 $pagination-navItem_borderOutsideRadius                     : $pagination_height;
 $pagination-navItem_borderInsideRadius                      : 0;
+
+
 
 ._pagination {
   position: relative;
@@ -71,7 +74,7 @@ $pagination-navItem_borderInsideRadius                      : 0;
   flex-direction: row;
   justify-content: flex-start;
   flex-wrap: wrap;
-  margin: $pagination-padding 0;
+  //margin: $pagination-padding 0;
   height: $formElement_height;
 }
 
@@ -90,6 +93,10 @@ $pagination-navItem_borderInsideRadius                      : 0;
       left: 0;
       right: 0;
     }
+  }
+
+  &:hover {
+    z-index: 1;
   }
 }
 
@@ -131,8 +138,7 @@ $pagination-navItem_borderInsideRadius                      : 0;
 
   &.isDisabled {
     background-color: $pagination-disabled_bg;
-    pointer-events: none;
-    cursor: pointer;
+    color: $pagination-disabled_fg;
   }
 }
 
@@ -202,8 +208,7 @@ $pagination-navItem_borderInsideRadius                      : 0;
 
   &.button.isCurrent {
     background-color: $pagination-disabled_bg;
-    pointer-events: none;
-    cursor: pointer;
+    color: $pagination-disabled_fg;
   }
 
   &:hover {
@@ -291,4 +296,8 @@ $pagination-navItem_borderInsideRadius                      : 0;
     width: $pagination-simple_buttonWidth * 2;
     border-radius: $formElement-halfHeight;
   }
+}
+
+._pagerWithCount-count {
+  line-height: $pagination_height;
 }

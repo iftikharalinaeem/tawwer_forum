@@ -112,6 +112,11 @@ a {
   &.isActive {
     pointer-events: none;
   }
+
+  &[aria-current] {
+    pointer-events: none;
+    cursor: default;
+  }
 }
 
 b,

@@ -67,7 +67,7 @@
         {include "_category_result.tpl" excel="false" word="false" pdf="true" title="Unreasonable" excerpt="LongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongword"}
     </div>
 
-    {include "pager.tpl"}
+    {include "pager-with-result-count.tpl"}
 </div>
 
 <style>
