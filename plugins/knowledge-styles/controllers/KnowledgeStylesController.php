@@ -21,29 +21,29 @@ class KnowledgeStylesController extends VanillaController {
         $this->render();
     }
 
-    public function columnsThree() {
-        $this->render("knowledgestyles/columnsThree", '', 'plugins/knowledge-styles');
-    }
-
-    public function columnsTwo() {
-        $this->render("knowledgestyles/columnsTwo", '', 'plugins/knowledge-styles');
-    }
-
-    public function full() {
-        $this->render("knowledgestyles/full", '', 'plugins/knowledge-styles');
-    }
-
-    public function panelLeft() {
-        $this->render("knowledgestyles/panelLeft", '', 'plugins/knowledge-styles');
-    }
-
-    public function panelRight() {
-        $this->render("knowledgestyles/panelRight", '', 'plugins/knowledge-styles');
-    }
-
-    public function panelAndNav() {
-        $this->render("knowledgestyles/panelAndNav", '', 'plugins/knowledge-styles');
-    }
+//    public function columnsThree() {
+//        $this->render("knowledgestyles/columnsThree", '', 'plugins/knowledge-styles');
+//    }
+//
+//    public function columnsTwo() {
+//        $this->render("knowledgestyles/columnsTwo", '', 'plugins/knowledge-styles');
+//    }
+//
+//    public function full() {
+//        $this->render("knowledgestyles/full-width", '', 'plugins/knowledge-styles');
+//    }
+//
+//    public function panelLeft() {
+//        $this->render("knowledgestyles/panelLeft", '', 'plugins/knowledge-styles');
+//    }
+//
+//    public function panelRight() {
+//        $this->render("knowledgestyles/panelRight", '', 'plugins/knowledge-styles');
+//    }
+//
+//    public function panelAndNav() {
+//        $this->render("knowledgestyles/panelAndNav", '', 'plugins/knowledge-styles');
+//    }
 
 
     // Pages
@@ -55,4 +55,11 @@ class KnowledgeStylesController extends VanillaController {
         $this->render("knowledgestyles/components/article", '', 'plugins/knowledge-styles');
     }
 
+    public function pageCategory() {
+        $this->render("knowledgestyles/components/category", '', 'plugins/knowledge-styles');
+    }
+
+    public function pageCategoryWithNav() {
+        $this->render("knowledgestyles/components/categoryWithNav", '', 'plugins/knowledge-styles');
+    }
 }

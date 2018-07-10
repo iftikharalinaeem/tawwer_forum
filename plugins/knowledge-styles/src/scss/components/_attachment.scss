@@ -8,8 +8,7 @@ $attachment-block_padding        : $utility-baseUnit * 2 !default;
 $attachment-block_boxShadow      : 0 0 3px 0 rgba($global-color_fg, .2) $global-border-style;
 
 $attachment-text_fontSize        : $global-small_fontSize;
-$attachment-title_color           :  mix($global-color_fg, $global-color_bg, 90%) !default;
-$attachment-meta_color           :  mix($global-color_fg, $global-color_bg, 70%) !default;
+$attachment-title_color          :  mix($global-color_fg, $global-color_bg, 90%) !default;
 
 $attachment-formatIcon_margin    : $utility-baseUnit !default;
 
@@ -58,12 +57,6 @@ $attachment-downloadIcon_margin  : $utility-baseUnit !default;
   color: $attachment-title_color;
   font-weight: $global-bold_fontWeight;
 }
-
-._attachment-metas {
-  font-size: $attachment-text_fontSize;
-  color: $attachment-meta_color;
-}
-
 
 ._attachment-download {
   color: $attachment-downloadIcon_color;

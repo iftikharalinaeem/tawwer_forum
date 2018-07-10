@@ -1,0 +1,40 @@
+._metas {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-left: -#{$widget-left_padding};
+  color: $thumbnail-border_color;
+  width: calc(100% + #{$widget-left_padding + $widget-right_padding});
+  margin-top: $utility-baseUnit;
+  overflow: hidden;
+}
+
+._meta {
+  @include breakWord;
+  display: block;
+  margin: 0 $utility-baseUnit;
+  font-size: $metaText_fontSize;
+}
+
+a._meta {
+  color: $link-default_color;
+  &:hover {
+    color: $link-default_hover-color;
+    text-shadow: none;
+  }
+  &:focus {
+    color: $link-default_focus-color;
+  }
+}
+
+._meta-text {
+  color: inherit;
+  display: inline-block;
+  line-height: inherit;
+  vertical-align: middle;
+}
+
+._meta-textPart {
+  display: inline-block;
+  vertical-align: middle;
+}
