@@ -77,4 +77,13 @@
     <style>
         .Trace { display: none; }
     </style>
+    <script>
+        document.querySelector("._panelAndNav-menu").addEventListener('click', function(){
+            document.querySelector("._panelAndNav-left").classList.toggle('isOpen');
+        });
+
+        document.querySelector("._panelAndNav-close").addEventListener('click', function(){
+            document.querySelector("._panelAndNav-left").classList.remove('isOpen');
+        });
+    </script>
 {/block}

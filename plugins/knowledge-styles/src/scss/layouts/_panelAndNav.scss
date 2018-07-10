@@ -177,6 +177,7 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
   .button.button-close._panelAndNav-close {
     @include absolute-topRight($widget-top_padding, $widget-right_padding);
     display: none;
+    z-index: 1;
 
     @include mediaQuery-panelAndNav_oneColumn {
       display: block;
