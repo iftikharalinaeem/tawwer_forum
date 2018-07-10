@@ -2,9 +2,9 @@
 $rootUrl = url('/knowledge-styles/');
 ?>
 
-<h2 style="font-size: 25px; margin-bottom: 10px;">Layout Examples</h2>
+<!--<h2 style="font-size: 25px; margin-bottom: 10px;">Layout Examples</h2>-->
 
-<ul class="styleGuideNav-list">
+<!--<ul class="styleGuideNav-list">-->
 <!--    <li class="styleGuideNav-item">-->
 <!--        <a class="styleGuideNav-link" href="--><?php //echo $rootUrl; ?><!--">Style Guide Home</a>-->
 <!--    </li>-->
@@ -38,9 +38,9 @@ $rootUrl = url('/knowledge-styles/');
         <a class="styleGuideNav-link" href="<?php echo $rootUrl;?>pageArticle">Article</a>
     </li>
     <li class="styleGuideNav-item">
-        <a class="styleGuideNav-link" href="<?php echo $rootUrl;?>pageCategory">Article</a>
+        <a class="styleGuideNav-link" href="<?php echo $rootUrl;?>pageCategory">Category</a>
     </li>
     <li class="styleGuideNav-item">
-        <a class="styleGuideNav-link" href="<?php echo $rootUrl;?>pageCategoryWithNav">Article</a>
+        <a class="styleGuideNav-link" href="<?php echo $rootUrl;?>pageCategoryWithNav">Category With Nav</a>
     </li>
 </ul>

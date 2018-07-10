@@ -71,6 +71,8 @@
         {include "_category_result.tpl" excel="true" word="false" pdf="false" title="LongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongword" excerpt="Standard with your order of the Plantronics CT12 wireless headset phone is a two in one headset that is convertible so you can use it over the head for stability or over the ear for convenience. It has a microphone that is especially designed to cancel out background noises as well as top notch clarity of sound."}
         {include "_category_result.tpl" excel="false" word="false" pdf="true" title="Unreasonable" excerpt="LongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongword"}
     </div>
+
+    {include "pager.tpl"}
 {/block}
 
 {block name="demo"}
