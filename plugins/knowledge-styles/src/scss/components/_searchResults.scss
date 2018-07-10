@@ -74,7 +74,6 @@ $searchResult_breakPoint                      : 800px;
 }
 
 ._searchResult-title {
-  @include breakWord;
   display: block;
   overflow: hidden;
   font-size: $global-title_fontSize;
@@ -114,7 +113,6 @@ $searchResult_breakPoint                      : 800px;
 }
 
 ._searchResult-title {
-  @include breakWord;
   display: block;
   color: $searchResult-title_color;
   flex-grow: 1;
@@ -141,7 +139,6 @@ $searchResult_breakPoint                      : 800px;
 
 
 ._searchResult-excerpt {
-  @include breakWord;
   margin-bottom: $utility-baseUnit;
   color: $searchResult-excerpt_color;
 }

@@ -18,7 +18,6 @@ $metas_color: mix($global-color_fg, $global-color_bg, 50%) !default;
 }
 
 ._meta {
-  @include breakWord;
   display: block;
   margin: 0 $utility-baseUnit;
   font-size: $metaText_fontSize;

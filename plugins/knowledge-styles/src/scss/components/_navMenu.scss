@@ -33,7 +33,6 @@ $navMenu_leftPadding: 6px;
 }
 
 ._navMenu-link {
-  @include breakWord;
   display: inline-block;
   position: relative;
   width: 100%;

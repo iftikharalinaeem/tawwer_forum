@@ -8,7 +8,6 @@ $relatedLink_offset      : $utility-baseUnit * 2;
 }
 
 ._relatedLink {
-  @include breakWord;
   display: inline-block;
   position: relative;
   width: 100%;

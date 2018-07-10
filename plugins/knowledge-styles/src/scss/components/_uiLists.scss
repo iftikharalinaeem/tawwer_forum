@@ -8,7 +8,6 @@ $uiList-item_spacing: $utility-baseUnit !default;
 }
 
 .uiList-item {
-  @include breakWord;
   font-size: $uiList-font_size;
 
   + .uiList-item {

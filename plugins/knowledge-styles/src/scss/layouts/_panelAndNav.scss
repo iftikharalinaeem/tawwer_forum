@@ -171,6 +171,11 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
 }
 
 ._pageContents {
+  * {
+    @include breakWord;
+  }
+
+
   .button-menu._panelAndNav-menu {
     display: none;
 
