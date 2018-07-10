@@ -1,11 +1,19 @@
+$metas_verticalMargin: $utility-baseUnit * 2;
+$metas_color: mix($global-color_fg, $global-color_bg, 50%) !default;
+
 ._metas {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  margin-left: -#{$widget-left_padding};
-  color: $thumbnail-border_color;
+  color: $metas_color;
   width: calc(100% + #{$widget-left_padding + $widget-right_padding});
-  margin-top: $utility-baseUnit;
+
+  margin: {
+    left: -#{$widget-left_padding};
+    right: $widget-left_padding;
+    bottom: $metas_verticalMargin;
+  }
+
   overflow: hidden;
 }
 
@@ -37,4 +45,12 @@ a._meta {
 ._meta-textPart {
   display: inline-block;
   vertical-align: middle;
+}
+
+._metaBreadcrumb {
+  display: inline;
+}
+
+._metaBreadcrumb-item {
+  display: inline;
 }

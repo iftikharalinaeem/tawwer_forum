@@ -67,3 +67,21 @@
         {include "_category_result.tpl" excel="false" word="false" pdf="true" title="Unreasonable" excerpt="LongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongwordLongword"}
     </div>
 </div>
+
+<style>
+    .Trace { display: none; }
+
+    /*._container {*/
+        /*background-color: rgba(0, 0, 0, .2);*/
+    /*}*/
+
+    /*._searchResults,*/
+    /*._widget {*/
+        /*background-color: rgba(255, 165, 0, .2);*/
+    /*}*/
+
+    /*._searchResult,*/
+    /*._widget-contents {*/
+        /*background-color: rgba(0, 128, 0, .2);*/
+    /*}*/
+</style>
