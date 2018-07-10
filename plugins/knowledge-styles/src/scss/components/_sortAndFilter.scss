@@ -1,0 +1,13 @@
+$sortAndFilter-margin: $utility-baseUnit * 2;
+
+
+._sortAndFilter {
+  margin: {
+    top: $sortAndFilter-margin;
+    bottom: $sortAndFilter-margin;
+  }
+}
+
+._selectBox {
+  display: flex;
+}

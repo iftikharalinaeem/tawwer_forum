@@ -38,12 +38,13 @@
 @import "components/tableOfContents";
 @import "components/relatedLinks";
 @import "components/userContent";
+@import "components/searchResult";
 @import "components/metas";
-
+@import "components/sortAndFilter";
+@import "components/formatIcon";
 
 @import "widget/splash";
 @import "widget/overview";
-
 @import "pages/article";
 
 @import "browserSpecific/browserSpecific";

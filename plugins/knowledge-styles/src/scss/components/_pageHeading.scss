@@ -6,7 +6,7 @@ $pageHeading-dropdown_width                  : 150px !default;
   width: 100%;
   align-items: center;
 
-  ._pageHeading-title {
+  ._pageTitle {
     display: block;
     margin: {
       top: 0;
@@ -44,42 +44,32 @@ $pageHeading-dropdown_width                  : 150px !default;
 
 
 ._pageHeading-back {
-  &.pageSubTitle,
-  &.pageTitle
-  {
-    @include absolute-topLeft;
-    overflow: visible;
-    width: $icon-default_size;
+  @include absolute-topLeft;
+  overflow: visible;
+  width: $icon-default_size;
+  height: #{$global-title_fontSize * $global-base_lineHeight};
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    margin: {
-      top: 0;
-      left: -#{$icon-default_size + $utility-baseUnit * 2};
-    }
-  }
-
-  &.pageTitle {
-    height: #{$global-title_fontSize * $global-base_lineHeight};
-  }
-
-  &.pageSubTitle {
-    height: #{$global-subTitle_fontSize * $global-base_lineHeight};
+  margin: {
+    top: 0;
+    left: -#{$icon-default_size + $utility-baseUnit * 2};
   }
 }
 
 ._pageHeading-backLink {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  top: 50%;
-  left: 0;
+  display: block;
   height: $icon-default_size;
   width: $icon-default_size;
-  transform:  translateY(-#{$icon-default_size / 2});
+  color: inherit;
 }
 
 ._pageHeading-backIcon {
   position: relative;
+  display: block;
+  width: $icon-default_size;
+  height: $icon-default_size;
 }
 
 ._pageHeading-titleWrap {

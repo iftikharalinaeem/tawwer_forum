@@ -1,13 +1,24 @@
-$searchResult-block_gap: 0;
-$searchResult_hover_bg: $global-color_primarySubtle;
+$searchResult-block_gap                       : 0;
+$searchResult_hover_bg                        : $global-color_primarySubtle;
 
-$searchResult-title_color: $global-color_fg;
+$searchResult-title_color                     : $global-color_fg;
 
-$searchResult-image_borderColor: $thumbnail-border_color;
-$searchResult-image_borderWidth: 1px;
+$searchResult-image_borderColor               : $thumbnail-border_color;
+$searchResult-image_borderWidth               : 1px;
+
+$searchResult-separator_color                 : $global-separator_color;
+$searchResult-separator_width                 : $global-separator_width;
+
+$searchResult-maxImageWidth                   : 153px;
 
 ._searchResults {
   display: block;
+
+  border-bottom: {
+    color: $searchResult-separator_color;
+    width: $searchResult-separator_width;
+    style: solid;
+  }
 }
 
 ._searchResult {
@@ -20,6 +31,11 @@ $searchResult-image_borderWidth: 1px;
     left: $widget-left_padding;
   }
 
+  border-bottom: {
+    color: $searchResult-separator_color;
+    width: $searchResult-separator_width;
+    style: solid;
+  }
 
   + ._searchResult {
     margin-top: $searchResult-block_gap;
@@ -73,39 +89,35 @@ $searchResult-image_borderWidth: 1px;
   display: block;
   color: $searchResult-title_color;
   margin: {
-    top: -$heading-lineHeightOffset;
+    top: -$global-lineHeight_offset;
     bottom: 0;
   }
   font: {
-    size: $fontSize-default;
-    weight: $fontWeight-bold;
-  }
-
-  &:hover {
-    color: $_searchResult-accentColor;
+    size: $global-medium_fontSize;
+    weight: $global-bold_fontWeight;
   }
 }
 
 
 ._searchResult-excerpt {
-  margin-bottom: $baseUnit;
+  margin-bottom: $utility-baseUnit;
 }
 
 ._searchResult-mediaPreview { // Flexed element
   display: block;
-  flex-basis: $_searchResult-maxImageWidth;
-  width: $_searchResult-maxImageWidth;
+  flex-basis: $searchResult-maxImageWidth;
+  width: $searchResult-maxImageWidth;
 }
 
 ._searchResult-mediaPreviewSpacer { // Force flexbox to not reduce the size of image
-  width: $_searchResult-maxImageWidth;
+  width: $searchResult-maxImageWidth;
 }
 
 ._searchResult-mediaPreviewFrame { // Image container
   position: relative;
   display: block;
   max-width: 100%;
-  padding-top: $percent-nineSixteenths; // 16/9 aspect ratio
+  padding-top: $utility-percentage_nineSixteenths; // 16/9 aspect ratio
   overflow: hidden;
 }
 
