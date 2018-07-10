@@ -925,7 +925,8 @@ class GroupsApiController extends AbstractApiController {
         ])->setDescription('Apply to a private group.');
         $out = $this->schema($this->fullGroupApplicantSchema(), 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
+        $this->verifyAccess($group);
 
         $body = $in->validate($body);
 
@@ -1009,7 +1010,8 @@ class GroupsApiController extends AbstractApiController {
         $this->idParamGroupSchema()->setDescription('Join a public group or a group that you have been invited to.');
         $out = $this->schema($this->fullGroupMemberSchema(), 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
+        $this->verifyAccess($group);
 
         if (!$this->groupModel->join($id, $this->getSession()->UserID)) {
             throw new ServerException('Unable to join the group.', 500);

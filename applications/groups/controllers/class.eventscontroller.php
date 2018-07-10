@@ -65,7 +65,7 @@ class EventsController extends Gdn_Controller {
             case 'group':
                 $groupModel = new GroupModel();
                 $group = $groupModel->getID($contextID, DATASET_TYPE_ARRAY);
-                if (!$group) {
+                if (!$group || !$groupModel->checkPermission('Access', $group)) {
                     throw notFoundException('Group');
                 }
 
