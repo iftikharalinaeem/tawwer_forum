@@ -1,4 +1,4 @@
-<div class="_container _panelAndNav">
+<div class="_container _panelAndNav {block name="classes"}{/block}">
     <div class="_panelAndNav-left">
         {* Visible in 1 column media query *}
         <button class="button button-close button-icon _panelAndNav-close" title="{t c="Close"}">

@@ -141,6 +141,7 @@ $searchResult_breakPoint                      : 800px;
 
 
 ._searchResult-excerpt {
+  @include breakWord;
   margin-bottom: $utility-baseUnit;
   color: $searchResult-excerpt_color;
 }

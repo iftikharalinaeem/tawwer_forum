@@ -1,5 +1,7 @@
 {extends file="panel-left.tpl"}
 
+{block name="classes"}_noRightColumn{/block}
+
 {block name="bottomLeft"}
     {include "article_nav.tpl"}
 {/block}
