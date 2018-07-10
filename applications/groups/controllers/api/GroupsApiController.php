@@ -1134,7 +1134,11 @@ class GroupsApiController extends AbstractApiController {
      * @throws NotFoundException If the current user does not have access to the group.
      */
     private function verifyAccess(array $group) {
-        if ($this->groupModel->checkPermission('Access', $group) === false) {
+        /**
+         * GroupModel's checkPermission method caches permissions, which make it a pain for contexts where permissions
+         * are prone to changing, like in tests or API endpoints that attempt to verify group access before a user joins.
+         */
+        if ($this->groupModel->checkPermission('Access', $group, null, false) === false) {
             throw new NotFoundException('Group');
         }
     }
