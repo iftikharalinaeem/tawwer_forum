@@ -73,7 +73,7 @@ class GroupsController extends Gdn_Controller {
 
         // Get my groups.
         if (Gdn::session()->isValid()) {
-            $MyGroups = $this->GroupModel->getByUser(Gdn::session()->UserID, '', 'desc', $Limit);
+            $MyGroups = $this->GroupModel->getByUser(Gdn::session()->UserID, 'DateLastComment', 'desc', $Limit);
             $this->setData('MyGroups', $MyGroups);
         }
 
@@ -113,7 +113,7 @@ class GroupsController extends Gdn_Controller {
         $PageNumber = pageNumber($Offset, $Limit);
 
         if (Gdn::session()->UserID && $Sort == 'mine') {
-             $Groups = $this->GroupModel->getByUser(Gdn::session()->UserID, '', 'desc', $Limit, $Offset);
+             $Groups = $this->GroupModel->getByUser(Gdn::session()->UserID, 'DateLastComment', 'desc', $Limit, $Offset);
         } else {
              $Groups = $this->GroupModel->get($SortRow['OrderBy'], 'desc', $Limit, $PageNumber)->resultArray();
              $TotalRecords = $this->GroupModel->getCount();
