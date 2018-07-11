@@ -79,15 +79,19 @@
 
 {block name="demo"}
     <style>
-        .Trace { display: none; }
+        ._container-breadcrumb,
+        .Trace {
+            display: none;
+        }
     </style>
     <script>
-        document.querySelector("._panelAndNav-menu").addEventListener('click', function(){
-            document.querySelector("._panelAndNav-left").classList.toggle('isOpen');
+        $("#forDemo ._panelAndNav-menu").on('click', function(){
+            $("#forDemo ._panelAndNav-left").toggleClass('isOpen');
         });
 
-        document.querySelector("._panelAndNav-close").addEventListener('click', function(){
-            document.querySelector("._panelAndNav-left").classList.remove('isOpen');
+        $("#forDemo ._panelAndNav-close").on('click', function(){
+            $("#forDemo ._panelAndNav-left").removeClass('isOpen');
         });
     </script>
+
 {/block}

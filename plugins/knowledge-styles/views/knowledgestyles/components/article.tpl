@@ -1,17 +1,4 @@
-{* Temporary *}
-<div class="_container _panelAndNav">
-    <div class="_panelAndNav-left"></div>
-    <div class="_panelAndNav-content">
-        <main class="_panelAndNav-middle">
-            <div class="_panelAndNav-block _panelAndNav-top">
-                <div class="breadcrumbsWrapper">{breadcrumbs}</div>
-            </div>
-        </main>
-    </div>
-</div>
-{* --- *}
-
-<div class="_container _panelAndNav">
+<div id="forDemo" class="_container _panelAndNav">
     <div class="_panelAndNav-left">
         <div class="_panelAndNav-leftColumn">
             {* Visible in 1 column media query *}
@@ -25,6 +12,9 @@
             {* Hidden in 1 or 2 column media queries *}
             {*<div class="_panelAndNav-block _panelAndNav-leftTop">{block name="topLeft"}{/block}</div>*}
             <div class="_panelAndNav-block _panelAndNav-leftBottom">
+                <div style="visibility: hidden"> {* Temporary *}
+                    <div class="breadcrumbsWrapper">{breadcrumbs}</div>
+                </div>
                 {include "article_nav.tpl"}
             </div>
         </div>
@@ -34,6 +24,7 @@
             <div class="_panelAndNav-block _panelAndNav-top">
                 <div class="_pageHeading">
                     <div class="_pageHeading-main">
+                        <div class="breadcrumbsWrapper">{breadcrumbs}</div>
                         <button class="button button-icon button-menu _panelAndNav-menu" title="{t c="Menu"}" aria-label="{t c="Menu"}">
                             <svg class="_icon button-menuIcon" viewBox="0 0 24 24">
                                 <title>{t c="Menu"}</title>
@@ -92,6 +83,9 @@
         </main>
         <div class="_panelAndNav-right">{* Hidden in 1 or 2 column media queries *}
             <div class="_panelAndNav-block _panelAndNav-rightTop">
+                <div style="visibility: hidden"> {* Temporary *}
+                    <div class="breadcrumbsWrapper">{breadcrumbs}</div>
+                </div>
                 {include "article_toc.tpl"}
             </div>
             <div class="_panelAndNav-block _panelAndNav-rightBottom">
@@ -108,11 +102,11 @@
     }
 </style>
 <script>
-    document.querySelector("._panelAndNav-menu").addEventListener('click', function(){
-        document.querySelector("._panelAndNav-left").classList.toggle('isOpen');
+    $("#forDemo ._panelAndNav-menu").on('click', function(){
+        $("#forDemo ._panelAndNav-left").toggleClass('isOpen');
     });
 
-    document.querySelector("._panelAndNav-close").addEventListener('click', function(){
-        document.querySelector("._panelAndNav-left").classList.remove('isOpen');
+    $("#forDemo ._panelAndNav-close").on('click', function(){
+        $("#forDemo ._panelAndNav-left").removeClass('isOpen');
     });
 </script>
