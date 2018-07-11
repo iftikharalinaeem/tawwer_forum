@@ -17,8 +17,6 @@ $pagination-item_borderRadius                               : 0;
 $pagination-navItem_borderOutsideRadius                     : $pagination_height;
 $pagination-navItem_borderInsideRadius                      : 0;
 
-
-
 ._pagination {
   position: relative;
   display: block;
@@ -36,13 +34,8 @@ $pagination-navItem_borderInsideRadius                      : 0;
 }
 
 .stickyPager-detachable,
-.stickyPager-placeholder
-{
+.stickyPager-placeholder {
   min-height: $pagination_height;
-
-  //@include mediaQuery-mobile {
-  //  min-height: 0;
-  //}
 }
 
 .vanillaPager {
@@ -53,17 +46,6 @@ $pagination-navItem_borderInsideRadius                      : 0;
       left: 0;
       width: 100%;
     }
-
-    //@include mediaQuery-mobile {
-    //  .stickyPager-detachable {
-    //    min-height: 0;
-    //    bottom: $mobileNav-height + $component-spacing;
-    //  }
-    //
-    //  ._pagination-list {
-    //    margin: 0 auto;
-    //  }
-    //}
   }
 }
 
@@ -152,18 +134,7 @@ $pagination-navItem_borderInsideRadius                      : 0;
 ._pagination-mobilePageSelector {
   display: none;
   flex-grow: 1;
-
-  //@include mediaQuery-mobile {
-  //  display: list-item;
-  //}
 }
-
-//@include mediaQuery-mobile {
-//  ._pagination-visibleOnMobile {
-//    display: list-item;
-//  }
-//}
-
 
 ._pagination-item,
 ._pagination-prev,

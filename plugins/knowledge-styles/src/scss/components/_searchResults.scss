@@ -23,7 +23,6 @@ $searchResult_breakPoint                      : 800px;
   }
 }
 
-
 ._searchResults {
   display: block;
 
@@ -206,34 +205,4 @@ $searchResult_breakPoint                      : 800px;
     right: auto;
   }
 }
-
-
-
-//@include mediaQuery-mobile {
-//  ._searchResult-main {
-//    padding-right: 0;
-//    width: 100%;
-//  }
-//
-//  .metas {
-//    margin-bottom: $baseUnit;
-//  }
-//
-//  .meta._searchResult-metaActivity {
-//    display: inline-block;
-//  }
-//
-//  ._searchResult {
-//    flex-wrap: wrap;
-//  }
-//
-//  ._searchResult-mediaPreview {
-//    flex-basis: 100%;
-//    width: 100%;
-//  }
-//
-//  ._searchResult-mediaPreviewSpacer {
-//    display: none;
-//  }
-//}
 
