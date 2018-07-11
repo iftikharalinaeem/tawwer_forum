@@ -8,6 +8,7 @@
 @import "mixins/mixin.disabled";
 @import "mixins/mixin.flex";
 @import "mixins/mixin.listStyles";
+@import "mixins/mixin.backLink";
 
 
 @import "base/overwrite"; // Overwrite styles from styles.css
@@ -44,10 +45,13 @@
 @import "components/formatIcons";
 @import "components/pagination";
 @import "components/pagerWithCount";
+@import "components/pageMetas";
+@import "components/breadcrumbs";
 
 @import "widget/splash";
 @import "widget/overview";
 @import "pages/article";
 
 @import "browserSpecific/browserSpecific";
+
 

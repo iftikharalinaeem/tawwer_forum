@@ -64,6 +64,13 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
     &.isOpen {
       transform: translateX(0);
     }
+
+    ._panelAndNav-leftBottom {
+      .breadcrumbsWrapper,
+      .temporaryBreadcrumbWrapper {
+        display: none;
+      }
+    }
   }
 }
 
@@ -86,18 +93,10 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
   }
 
   @include mediaQuery-panelAndNav_oneColumn {
+    @include backLinkNoBleedStyles;
     max-width: 100%;
     flex-basis: 100%;
     padding-left: 0;
-
-    ._pageHeading-main {
-      display: flex;
-    }
-
-    ._pageHeading-back {
-      position: relative;
-      margin-left: 0;
-    }
   }
 }
 
@@ -127,7 +126,11 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
 
     ._panelAndNav-rightTop {
       display: block;
-      margin-top: $global-panelGutter_width;
+      margin-bottom: $global-gutter_size;
+    }
+
+    ._pageMetas {
+      margin-bottom: $global-gutter_size;
     }
   }
 

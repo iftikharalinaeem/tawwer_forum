@@ -5,8 +5,10 @@
     {*{include file="featured.tpl"}*}
     {include file="featured-cssColumns.tpl"}
 </main>
+
 {block name="demo"}
     <style>
+        ._container-breadcrumb,
         .Trace {
             display: none;
         }

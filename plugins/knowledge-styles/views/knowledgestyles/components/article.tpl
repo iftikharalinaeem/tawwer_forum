@@ -12,7 +12,7 @@
             {* Hidden in 1 or 2 column media queries *}
             {*<div class="_panelAndNav-block _panelAndNav-leftTop">{block name="topLeft"}{/block}</div>*}
             <div class="_panelAndNav-block _panelAndNav-leftBottom">
-                <div style="visibility: hidden"> {* Temporary *}
+                <div class="temporaryBreadcrumbWrapper" style="visibility: hidden"> {* Temporary *}
                     <div class="breadcrumbsWrapper">{breadcrumbs}</div>
                 </div>
                 {include "article_nav.tpl"}
@@ -51,8 +51,7 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="_metas">
+                <div class="_pageMetas _metas">
                     <span class="_meta _meta-author">
                         By Todd Burry
                     </span>
@@ -83,7 +82,7 @@
         </main>
         <div class="_panelAndNav-right">{* Hidden in 1 or 2 column media queries *}
             <div class="_panelAndNav-block _panelAndNav-rightTop">
-                <div style="visibility: hidden"> {* Temporary *}
+                <div class="temporaryBreadcrumbWrapper" style="visibility: hidden"> {* Temporary *}
                     <div class="breadcrumbsWrapper">{breadcrumbs}</div>
                 </div>
                 {include "article_toc.tpl"}

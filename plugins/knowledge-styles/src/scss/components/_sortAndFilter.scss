@@ -1,14 +1,3 @@
-$sortAndFilter-topMargin: $utility-baseUnit * 2;
-$sortAndFilter-bottomMargin: $global-panelGutter_width;
-
-
-._sortAndFilter {
-  margin: {
-    top: $sortAndFilter-topMargin;
-    bottom: $sortAndFilter-bottomMargin;
-  }
-}
-
 ._selectBox {
   display: flex;
 }

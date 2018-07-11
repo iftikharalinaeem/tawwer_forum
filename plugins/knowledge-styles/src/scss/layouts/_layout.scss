@@ -1,4 +1,12 @@
-/* Do NOT style classes that start with "_", they are core classes meant to only be modified by variables */
+$fullWidthLayout-backLink_breakpoint: $global-main_paddedWidth + $icon-default_size + $utility-baseUnit * 8;
+
+
+@mixin mediaQuery-backLink_breakPoint {
+  @media (max-width: #{$fullWidthLayout-backLink_breakpoint}) {
+    @content;
+  }
+}
+
 #Frame {
   display: flex;
   overflow: visible;
@@ -37,7 +45,11 @@
 }
 
 
-
+._fullWidthLayout {
+  @include mediaQuery-backLink_breakPoint {
+    @include backLinkNoBleedStyles;
+  }
+}
 
 
 

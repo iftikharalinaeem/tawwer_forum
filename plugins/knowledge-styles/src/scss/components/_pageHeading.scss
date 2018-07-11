@@ -26,6 +26,12 @@ $pageHeading-dropdown_width                  : 150px !default;
   flex-grow: 1;
 }
 
+._pageHeading-titleBar {
+  display: flex;
+  position: relative;
+  align-items: center;
+}
+
 
 ._pageHeading-p {
   font-size: $global-small_fontSize;

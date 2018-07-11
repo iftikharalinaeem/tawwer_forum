@@ -1,3 +1,4 @@
+$splash-topMargin                    : 66px !default;
 $splash-verticalPadding              : 12px !default;
 $splash-outer_bg                     : $global-color_bg !default; // All the way to the edge
 $splash-inner_bg                     : transparent !default; // Within "content" margin
@@ -39,13 +40,17 @@ $splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
 ._splash { // All the way to the edges
   @include bgCover;
   position: relative;
-  padding: $splash-verticalPadding 0;
   background-color: $splash-outer_bg;
+  margin-top: $splash-topMargin
 }
 
 ._splash-main { // Site Width
   @include bgCover;
   background-color: $splash-inner_bg;
+  padding: {
+    top: $splash-verticalPadding;
+    bottom: $splash-verticalPadding;
+  }
 }
 
 

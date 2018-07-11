@@ -3,22 +3,28 @@
 {block name="classes"}_noRightColumn{/block}
 
 {block name="bottomLeft"}
+    <div class="_breadcrumbs" style="visibility:hidden;">{breadcrumbs}</div> {* Temporary *}
     {include "article_nav.tpl"}
 {/block}
 
 {block name="top"}
     <div class="_pageHeading">
         <div class="_pageHeading-main">
-            <div class="_pageHeading-back">
-                <a href="#" title="Back" class="_pageHeading-backLink">
-                    <svg class="_pageHeading-backIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path fill="currentcolor" d="M14.9,7.7l-4.4,4.4l4.4,4.4c0.1,0.1,0.1,0.2,0.1,0.3c0,0.1,0,0.2-0.1,0.3l-0.6,0.6c-0.1,0.1-0.2,0.1-0.3,0.1s-0.2,0-0.3-0.1l-5.2-5.2c-0.1-0.1-0.1-0.2-0.1-0.3s0-0.2,0.1-0.3l5.2-5.2c0.1-0.1,0.2-0.1,0.3-0.1s0.2,0,0.3,0.1l0.6,0.6C15,7.2,15,7.3,15,7.4C15,7.5,15,7.6,14.9,7.7z"></path>
-                    </svg>
-                </a>
+            <div class="_breadcrumbs">
+                {breadcrumbs}
             </div>
-            <h1 class="_pageTitle">
-                Integrations
-            </h1>
+            <div class="_pageHeading-titleBar">
+                <div class="_pageHeading-back">
+                    <a href="#" title="Back" class="_pageHeading-backLink">
+                        <svg class="_pageHeading-backIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path fill="currentcolor" d="M14.9,7.7l-4.4,4.4l4.4,4.4c0.1,0.1,0.1,0.2,0.1,0.3c0,0.1,0,0.2-0.1,0.3l-0.6,0.6c-0.1,0.1-0.2,0.1-0.3,0.1s-0.2,0-0.3-0.1l-5.2-5.2c-0.1-0.1-0.1-0.2-0.1-0.3s0-0.2,0.1-0.3l5.2-5.2c0.1-0.1,0.2-0.1,0.3-0.1s0.2,0,0.3,0.1l0.6,0.6C15,7.2,15,7.3,15,7.4C15,7.5,15,7.6,14.9,7.7z"></path>
+                        </svg>
+                    </a>
+                </div>
+                <h1 class="_pageTitle">
+                    Integrations
+                </h1>
+            </div>
         </div>
         <div class="pageHeading-actions">
             <div class="_dropDown">
@@ -32,7 +38,7 @@
         </div>
     </div>
 
-    <div class="_sortAndFilter">
+    <div class="_pageMetas">
         <div class="vanillaDropDown-content">
             <span class="ToggleFlyout selectBox _selectBox">
                 <span class="selectBox-label">View: </span>
@@ -79,7 +85,7 @@
 
 {block name="demo"}
     <style>
-        ._container-breadcrumb,
+        .breadcrumbsWrapper,
         .Trace {
             display: none;
         }
