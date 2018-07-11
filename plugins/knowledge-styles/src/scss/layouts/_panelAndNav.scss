@@ -142,6 +142,9 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
   }
 }
 
+._panelAndNav-top {
+  margin-bottom: $global-panelGutter_width;
+}
 
 // Right Column
 

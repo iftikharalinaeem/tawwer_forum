@@ -66,6 +66,7 @@
                 </span>
             </span>
         </div>
+    </div>
 {/block}
 {block name="main"}
     <div class="_searchResults">

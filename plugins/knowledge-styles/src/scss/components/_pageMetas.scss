@@ -1,9 +1,7 @@
 $pageMetas_topMargin: $utility-baseUnit * 2;
-$pageMetas_bottomMargin: $global-panelGutter_width;
 
 ._pageMetas {
   margin: {
     top: $pageMetas_topMargin;
-    bottom: $pageMetas_bottomMargin;
   }
 }
