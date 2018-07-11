@@ -1,0 +1,155 @@
+$splash-topMargin                    : 66px !default;
+$splash-verticalPadding              : 12px !default;
+$splash-outer_bg                     : $global-color_bg !default; // All the way to the edge
+$splash-inner_bg                     : transparent !default; // Within "content" margin
+$splash_fg                           : $global-color_fg !default; // Useful when setting a background image
+$splash-text_align                   : center !default;
+$splash-text_maxWidth                : 700px !default;
+$splash-text_align                   : $splash-text_align !default;
+
+$splash-title_fontSize               : 36px !default;
+$splash-title_fontWeight             : $global-heading_fontWeight !default;
+
+$splash-paragraph_margin             : .4em !default;
+
+$splash-paragraph_textSize           : 24px !default;
+$splash-paragraph_fontWeight         : 300 !default;
+$splash-paragraph_align              : $splash-text_align !default;
+
+$splash-search_margin                : 30px !default;
+$splash-searchDrawer_bg              : $global-color_bg !default;
+
+$splashSearchBar_height              : $formElement_giantInput_height !default;
+$splashSearchBar_fontSize            : $formElement_giantInput_fontSize !default;
+$splashSearchBar_width               : 705px !default;
+$splashSearchBar-button_minWidth     : 130px !default;
+$splashSearchBar-button_borderWidth  : $formElement_borderWidth !default;
+$splashSearchBar-button_borderRadius : $formElement_borderWidth !default;
+$splashSearchBar-button_borderColor  : $formElement_borderColor !default;
+
+$splashSearchBar-icon_color          : mix($global-color_bg, $global-color_fg, 40%) !default;
+$splashSearchBar-input_fontSize      : $global-subTitle_fontSize !default;
+$splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
+
+//@mixin mediaQuery-splash {
+//  @media (max-width: #{$splash-text_maxWidth + $component-spacing * 2}) {
+//    @content;
+//  }
+//}
+
+._splash { // All the way to the edges
+  @include bgCover;
+  position: relative;
+  background-color: $splash-outer_bg;
+  margin-top: $splash-topMargin
+}
+
+._splash-main { // Site Width
+  @include bgCover;
+  background-color: $splash-inner_bg;
+  padding: {
+    top: $splash-verticalPadding;
+    bottom: $splash-verticalPadding;
+  }
+}
+
+
+._splash-title {
+  font-size: $splash-title_fontSize;
+  font-weight: $splash-title_fontWeight;
+  margin-bottom: 0;
+}
+
+._splash-text {
+  display: block;
+  width: $splash-text_maxWidth;
+  max-width: 100%;
+  margin: auto auto 0;
+  color: $splash_fg;
+  text-align: center;
+
+  + ._splashSearchBar {
+    margin-top: $splash-search_margin;
+  }
+}
+
+
+._splash-p {
+  font-size: $splash-paragraph_textSize;
+  font-weight: $splash-paragraph_fontWeight;
+  margin-top: $splash-paragraph_margin;
+
+  + ._splash-p {
+    margin-top: $splash-paragraph_margin;
+  }
+}
+
+._splash-search {
+  @include bgCover;
+  position: relative;
+}
+
+
+
+._splashSearchBar {
+  max-width: #{$splashSearchBar_width};
+  margin : auto;
+}
+
+._splashSearchBar-bar {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+._splashSearchBar-inputAndIcon {
+  position: relative;
+  flex-grow: 1;
+}
+
+._splashSearchBar-searchIcon {
+  @include absolute-middleLeft($formElement_horizontalPadding);
+  color: $splashSearchBar-icon_color;
+}
+
+.inputText._splashSearchBar-input {
+  height: $splashSearchBar_height;
+  font-size: $splashSearchBar-input_fontSize;
+  margin: 0;
+  padding-left: #{$formElement_horizontalPadding * 2 + $icon-default_size};
+  width: 100%;
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.button._splashSearchBar-button {
+  height: $splashSearchBar_height;
+  font-size: $splashSearchBar-button_fontSize;
+  min-width: $splashSearchBar-button_minWidth;
+
+  border: {
+    width: $splashSearchBar-button_borderWidth;
+    color: $splashSearchBar-button_borderColor;
+    top-left-radius: 0;
+    bottom-left-radius: 0;
+    top-right-radius: $splashSearchBar-button_borderRadius;
+    bottom-right-radius: $splashSearchBar-button_borderRadius;
+  }
+}
+
+._splashSearchBar_footer {
+  display: flex;
+  margin-top: $utility-baseUnit;
+}
+
+
+._splash-advancedButton {
+  margin-left: auto;
+  min-width: $splashSearchBar-button_minWidth;
+
+
+  border: {
+    width: $splashSearchBar-button_borderWidth;
+    color: transparent;
+  }
+}

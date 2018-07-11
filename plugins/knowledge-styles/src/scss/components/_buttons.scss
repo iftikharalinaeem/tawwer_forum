@@ -1,0 +1,65 @@
+._pageContents { // Safe modification without affecting existing styles
+  .button {
+    @include singleLineEllipsis;
+    @include generateButtonClass($button-basic);
+    @include buttonSizing($formElement_height, $global-medium_fontSize, $utility-baseUnit);
+    @include outlineStyling;
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+    outline: 0;
+    vertical-align: middle;
+    touch-action: manipulation;
+    user-select: none;
+    overflow: hidden;
+    cursor: pointer;
+    border: {
+      width: $formElement_borderWidth;
+      radius: $global-button_radius;
+      style: solid;
+    }
+
+    &.button-fullWidth {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    &.button-icon {
+      align-items: center;
+      justify-content: center;
+      height: $icon-default_size;
+      width: $icon-default_size;
+      padding: 0;
+      border: 0;
+    }
+
+    &.buttonNoBorder {
+      border: 0;
+      min-width: $formElement-height;
+      padding: {
+        left: 0;
+        right: 0;
+      }
+    }
+  }
+}
+
+.button-icon {
+  display: flex;
+}
+
+
+.button-fakeLink {
+  color: $link_default-color;
+
+  &:hover {
+    color: $link_default_hover-color
+  }
+
+  &:focus {
+    color: $link_default_focus-color;
+  }
+}
+
+

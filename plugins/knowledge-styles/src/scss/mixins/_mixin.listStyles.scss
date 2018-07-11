@@ -1,0 +1,24 @@
+@mixin orderedListStyle() {
+  ol {
+    list-style-position: inside;
+
+    li {
+      list-style: decimal;
+      margin: {
+        left: $userContent-list_margin;
+        top: .5em;
+      }
+    }
+  }
+}
+
+@mixin unorderedListStyle {
+  ul {
+    li {
+      list-style: initial;
+      position: relative;
+      margin-left: $userContent-list_margin;
+      margin-top: .5em;
+    }
+  }
+}

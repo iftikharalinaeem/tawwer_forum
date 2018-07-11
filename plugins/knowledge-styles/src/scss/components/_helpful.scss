@@ -1,0 +1,40 @@
+$helpful-button_minWidth: 96px !default;
+$helpful-button_margin: $utility-baseUnit !default;
+$helpful-title_fontSize: $global-medium_fontSize !default;
+$helpful-title_fontWeight: $global-bold_fontWeight !default;
+$helpful-results_fontSize: $global-small_fontSize !default;
+$helpful-results_color: mix($global-color_fg, $global-color_bg, 50%) !default;
+$helpful_spacing: $utility-baseUnit * 2;
+$helpful_topMargin: $utility-baseUnit * 12;
+
+._helpful {
+  text-align: center;
+  margin-top: $helpful_topMargin;
+}
+
+._helpful-title {
+  display: block;
+  font-size: $helpful-title_fontSize;
+  font-weight: $helpful-title_fontWeight;
+}
+
+._helpful-vote {
+  display: flex;
+  justify-content: center;
+  margin-top: $helpful_spacing;
+}
+
+._helpful-results {
+  color: $helpful-results_color;
+  font-size: $global-small_fontSize;
+  margin-top: $helpful_spacing;
+}
+
+._helpful-signIn {
+  margin-top: $helpful_spacing;
+}
+
+._helpful-button {
+  min-width: $helpful-button_minWidth;
+  margin: 0 $helpful-button_margin;
+}

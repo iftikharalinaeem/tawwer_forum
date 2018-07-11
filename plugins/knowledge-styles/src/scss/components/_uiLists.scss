@@ -1,0 +1,20 @@
+$uiList-font_size: $global-medium_fontSize !default;
+$uiList-item_spacing: $utility-baseUnit !default;
+
+.uiList {
+  display: block;
+  list-style: none;
+  width: 100%;
+}
+
+.uiList-item {
+  font-size: $uiList-font_size;
+
+  + .uiList-item {
+    margin-top: $uiList-item_spacing;
+  }
+}
+
+.uiList-link {
+  font-size: $uiList-font_size;
+}

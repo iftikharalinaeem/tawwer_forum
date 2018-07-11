@@ -1,0 +1,88 @@
+.inputText {
+  @include outlineStyling($formElement_borderColor);
+  @include textInputSizing($formElement_height, $global-medium_fontSize, $utility-baseUnit);
+  @include standardBorderStyles;
+  @include placeholderStyling {
+    color: $formElement-placeholderColor;
+  }
+  display: block;
+  position: relative;
+  width: 100%;
+  vertical-align: middle;
+  color: $formElement_fg;
+  background-color: $formElement_bg;
+  padding: $formElement_paddingVertical $formElement_horizontalPadding;
+  outline: 0;
+}
+
+.inputText-inlineLabel {
+  font-size: $global-medium_fontSize;
+  height: $formElement_height;
+  padding: 0 #{$utility-baseUnit * 2};
+  line-height: $formElement_height;
+}
+
+.inputBlock {
+  display: block;
+  margin-bottom: $utility-baseUnit * 4;
+
+  &.hasError {
+    .inputText {
+      border-color: $global-error_fg;
+      background-color: $global-error_bg;
+      color: $global-error_fg;
+    }
+  }
+}
+
+.inputBlock-columns {
+  display: flex;
+}
+
+
+
+.inputBlock-errors {
+  display: block;
+  font-size: $global-small_fontSize;
+}
+
+.inputBlock-error {
+  display: block;
+  color: $global-error_fg;
+
+  + .inputBlock-error {
+    margin-top: $utility-baseUnit;
+  }
+}
+
+.inputBlock-labelNote {
+  display: block;
+  font-size: $global-small_fontSize;
+  font-weight: $global-normal_fontWeight;
+  opacity: .6;
+}
+
+.inputBlock-labelText {
+  display: block;
+
+  font-weight: $global-bold_fontWeight;
+  font-size: $global-medium_fontSize;
+  margin-bottom: $utility-baseUnit;
+}
+
+//.inputBlock-note {
+//  font-size: $global-small_fontSize;
+//  color: $formElement-note_fg;
+//
+//  a {
+//    color: $formElement-noteLink_fg;
+//  }
+//}
+
+.inputBlock-inputWrap {
+  & + .checkbox,
+  & + .radioButton
+  {
+    margin-top: $utility-baseUnit;
+  }
+}
