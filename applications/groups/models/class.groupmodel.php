@@ -122,9 +122,10 @@ class GroupModel extends Gdn_Model {
      *  - Moderate: The user may moderate the group.
      * @param int|array $groupID The groupID or group record.
      * @param int|null $userID
+     * @param bool $useCache Use the user-group permission cache? If false, don't read or write to it.
      * @return boolean
      */
-    public function checkPermission($permission, $groupID, $userID = null) {
+    public function checkPermission($permission, $groupID, $userID = null, $useCache = true) {
         static $permissions = [];
 
         if ($userID === null) {
@@ -138,7 +139,7 @@ class GroupModel extends Gdn_Model {
 
         $key = "$userID-$groupID";
 
-        if (!isset($permissions[$key])) {
+        if (!$useCache || !isset($permissions[$key])) {
             // Get the data for the group.
             if (!isset($group)) {
                 $group = $this->getID($groupID);
@@ -245,10 +246,12 @@ class GroupModel extends Gdn_Model {
                 $perms = array_merge($perms, $managerOverrides);
             }
 
-            $permissions[$key] = $perms;
+            if ($useCache) {
+                $permissions[$key] = $perms;
+            }
+        } else {
+            $perms = $permissions[$key];
         }
-
-        $perms = $permissions[$key];
 
         if (!$permission) {
             return $perms;

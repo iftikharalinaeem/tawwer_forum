@@ -925,7 +925,8 @@ class GroupsApiController extends AbstractApiController {
         ])->setDescription('Apply to a private group.');
         $out = $this->schema($this->fullGroupApplicantSchema(), 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
+        $this->verifyAccess($group);
 
         $body = $in->validate($body);
 
@@ -1009,7 +1010,8 @@ class GroupsApiController extends AbstractApiController {
         $this->idParamGroupSchema()->setDescription('Join a public group or a group that you have been invited to.');
         $out = $this->schema($this->fullGroupMemberSchema(), 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
+        $this->verifyAccess($group);
 
         if (!$this->groupModel->join($id, $this->getSession()->UserID)) {
             throw new ServerException('Unable to join the group.', 500);
@@ -1132,7 +1134,11 @@ class GroupsApiController extends AbstractApiController {
      * @throws NotFoundException If the current user does not have access to the group.
      */
     private function verifyAccess(array $group) {
-        if ($this->groupModel->checkPermission('Access', $group) === false) {
+        /**
+         * GroupModel's checkPermission method caches permissions, which make it a pain for contexts where permissions
+         * are prone to changing, like in tests or API endpoints that attempt to verify group access before a user joins.
+         */
+        if ($this->groupModel->checkPermission('Access', $group, null, false) === false) {
             throw new NotFoundException('Group');
         }
     }
