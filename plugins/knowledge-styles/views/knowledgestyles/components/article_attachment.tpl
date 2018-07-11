@@ -1,9 +1,9 @@
 <a href="#" class="_attachment">
     <div class="_attachment-format">
-        <svg xmlns="http://www.w3.org/2000/svg" class="_icon" viewBox="0 0 24 24">
+        <svg class="_formatIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
             <title>Word Document</title>
-            <rect x="3" y="3" width="18" height="18" rx="1" ry="1" style="fill: #2b5599"/>
-            <polygon points="9.133 16.543 7 8 8.365 8 9.707 14.07 9.73 14.07 11.389 8 12.326 8 13.979 14.07 14.002 14.07 15.35 8 16.715 8 14.582 16.543 13.498 16.543 11.869 10.385 11.846 10.385 10.211 16.543 9.133 16.543" style="fill: #fff"/>
+            <rect width="20" height="20" style="fill: #2b5599;stroke: currentColor;stroke-width: 0.5px"/>
+            <polygon points="7.3,14.3 5.1,5.7 6.5,5.7 7.8,11.8 9.5,5.7 10.5,5.7 12.1,11.8 13.5,5.7 14.9,5.7 12.7,14.3 11.6,14.3 10,8.1 8.4,14.3" style="fill: #fff"/>
         </svg>
     </div>
     <div class="_attachment-main">

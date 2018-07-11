@@ -40,6 +40,7 @@ $attachment-downloadIcon_margin  : $utility-baseUnit !default;
   + ._attachment {
     margin-top: $attachment-block_gap;
   }
+
 }
 
 ._attachment-format {
@@ -62,4 +63,9 @@ $attachment-downloadIcon_margin  : $utility-baseUnit !default;
   color: $attachment-downloadIcon_color;
   flex-basis: #{$icon-default_size + $attachment-downloadIcon_margin};
   padding-left: $attachment-downloadIcon_margin;
+}
+
+
+._attachment-metas {
+  margin-bottom: 0;
 }

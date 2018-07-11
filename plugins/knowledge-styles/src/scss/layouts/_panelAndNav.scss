@@ -89,6 +89,15 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
     max-width: 100%;
     flex-basis: 100%;
     padding-left: 0;
+
+    ._pageHeading-main {
+      display: flex;
+    }
+
+    ._pageHeading-back {
+      position: relative;
+      margin-left: 0;
+    }
   }
 }
 

@@ -21,6 +21,7 @@
 @import "layouts/flexColumns";
 
 @import "components/widgets";
+@import "components/metas";
 @import "components/icons";
 @import "components/buttons";
 @import "components/fullBackground";
@@ -39,7 +40,6 @@
 @import "components/relatedLinks";
 @import "components/userContent";
 @import "components/searchResults";
-@import "components/metas";
 @import "components/sortAndFilter";
 @import "components/formatIcons";
 @import "components/pagination";
@@ -50,3 +50,4 @@
 @import "pages/article";
 
 @import "browserSpecific/browserSpecific";
+

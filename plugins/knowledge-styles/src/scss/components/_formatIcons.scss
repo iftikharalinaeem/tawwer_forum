@@ -1,4 +1,4 @@
-$formatIcon-size                : 18.5px;
+$formatIcon-size                : 20px;
 $formatIcon-spacing             : 3px;
 $formatIcon-border_color        : $thumbnail-border_color;
 
@@ -11,16 +11,17 @@ $formatIcon-border_color        : $thumbnail-border_color;
   svg:last-child {
     margin-right: 0;
   }
-}
 
+  ._formatIcon {
+    margin: {
+      left: $formatIcon-spacing;
+      right: $formatIcon-spacing;
+    }
+  }
+}
 
 ._formatIcon {
   width: $formatIcon-size;
   height: $formatIcon-size;
   color: $formatIcon-border_color;
-  margin: {
-    left: $formatIcon-spacing;
-    right: $formatIcon-spacing;
-  }
 }
-
