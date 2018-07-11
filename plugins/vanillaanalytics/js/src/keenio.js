@@ -22,7 +22,18 @@ var keenTracker = {
 keenTracker.analyticsTickHandler = function(event, sendData, jqXHR, textStatus) {
     // Only track the page view if the hit to analyticstick was a success.
     if (textStatus === 'success') {
-        keenTracker.event(gdn.definition("viewEventType", "page_view"), 'page', true);
+        if (typeof jqXHR.responseJSON !== "undefined") {
+            var eventData = gdn.definition('eventData', {});
+            if (typeof jqXHR.responseJSON.clientIP !== "undefined") {
+                eventData.ip = jqXHR.responseJSON.clientIP;
+            }
+            if (typeof jqXHR.responseJSON.dateTime !== "undefined") {
+                eventData.dateTime = jqXHR.responseJSON.dateTime;
+            }
+            eventData.referrer = document.referrer;
+            gdn.meta.eventData = eventData;
+        }
+        keenTracker.event(gdn.definition("viewEventType", "page_view"), "page", true);
     }
 };
 
@@ -94,29 +105,28 @@ keenTracker.getUser = function(eventData, isGuestCollection) {
         userData = eventData.user;
 
         /**
-         * We'd like to include a UUID for the user, as well as a session ID for the user, if at all possible.
-         * If we have them in the userData already, great.  Nothing to d here.  If we _do not_ have them, we'll
-         * try to harvest them from the IDs available in the tracking cookie.  Simplified cookie handling is made
-         * possible with the JavaScript Cookie library (Cookies).  Make sure we have that before going forward.
+         * Grab up-to-date data from the analytics cookie.
          */
-        if ((typeof userData.uuid === 'undefined' || typeof userData.sessionID === 'undefined') &&  typeof Cookies === 'function') {
-            var trackingIDs = Cookies.getJSON(gdn.definition('vaCookieName'));
+        if (typeof Cookies === 'function') {
+            var cookie = Cookies.getJSON(gdn.definition('vaCookieName'));
 
             // Missing a UUID, but one is available from our cookie? Update it.
-            if (typeof userData.uuid === 'undefined' && typeof trackingIDs.uuid !== 'undefined') {
-                userData.uuid = trackingIDs.uuid;
+            if (typeof cookie.uuid !== 'undefined') {
+                userData.uuid = cookie.uuid;
             }
 
             // Missing a session ID, but one is available from our cookie? Update it.
-            if (typeof userData.sessionID === 'undefined') {
-                if (isGuestCollection) {
-                    if (typeof trackingIDs.secondarySessionID !== 'undefined') {
-                        userData.sessionID = trackingIDs.secondarySessionID;
-                    }
-                } else if (typeof trackingIDs.sessionID !== 'undefined') {
-                    userData.sessionID = trackingIDs.sessionID;
+            if (isGuestCollection) {
+                if (typeof cookie.secondarySessionID !== 'undefined') {
+                    userData.sessionID = cookie.secondarySessionID;
                 }
-            }
+              } else if (typeof cookie.sessionID !== 'undefined') {
+                  userData.sessionID = cookie.sessionID;
+              }
+
+          if (typeof cookie.pv !== 'undefined') {
+            userData.pv = cookie.pv;
+          }
         }
     }
 
