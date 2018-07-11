@@ -3,16 +3,12 @@
 {block name="classes"}_noRightColumn{/block}
 
 {block name="bottomLeft"}
-    <div class="_breadcrumbs" style="visibility:hidden;">{breadcrumbs}</div> {* Temporary *}
     {include "article_nav.tpl"}
 {/block}
 
 {block name="top"}
     <div class="_pageHeading">
         <div class="_pageHeading-main">
-            <div class="_breadcrumbs">
-                {breadcrumbs}
-            </div>
             <div class="_pageHeading-titleBar">
                 <div class="_pageHeading-back">
                     <a href="#" title="Back" class="_pageHeading-backLink">
@@ -86,7 +82,6 @@
 
 {block name="demo"}
     <style>
-        .breadcrumbsWrapper,
         .Trace {
             display: none;
         }

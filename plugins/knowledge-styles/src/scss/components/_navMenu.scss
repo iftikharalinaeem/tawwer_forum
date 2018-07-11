@@ -15,7 +15,8 @@ $navMenu-arrow_color: mix($global-color_bg, $global-color_fg, 30%);
 $navMenu_leftPadding: 6px;
 
 ._navMenu {
-
+  font-size: $navMenu-link_fontSize;
+  margin-top: -$global-bodylineHeight_offset;
 }
 
 ._navMenu-items {
