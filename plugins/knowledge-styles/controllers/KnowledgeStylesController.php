@@ -10,7 +10,6 @@ class KnowledgeStylesController extends VanillaController {
         parent::initialize();
         $this->Application = 'knowledge-styles';
         $this->CssClass .= ' NoPanel mainMasterPage';
-        Gdn::controller()->MasterView = 'default.main';
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
             $this->Head = new HeadModule($this);
             $this->addCssFile('knowledge-styles.css');
