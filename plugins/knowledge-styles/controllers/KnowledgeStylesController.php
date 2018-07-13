@@ -17,23 +17,28 @@ class KnowledgeStylesController extends VanillaController {
     }
 
     public function index() {
+        Gdn::controller()->MasterView = 'default.knowledge';
         $this->render();
     }
 
     // Pages
     public function pageHome() {
+        Gdn::controller()->MasterView = 'default.knowledge';
         $this->render("knowledgestyles/components/home", '', 'plugins/knowledge-styles');
     }
 
     public function pageArticle() {
+        Gdn::controller()->MasterView = 'default.knowledge';
         $this->render("knowledgestyles/components/article", '', 'plugins/knowledge-styles');
     }
 
     public function pageCategory() {
+        Gdn::controller()->MasterView = 'default.knowledge';
         $this->render("knowledgestyles/components/category", '', 'plugins/knowledge-styles');
     }
 
     public function pageCategoryWithNav() {
+        Gdn::controller()->MasterView = 'default.knowledge';
         $this->render("knowledgestyles/components/categoryWithNav", '', 'plugins/knowledge-styles');
     }
 }
