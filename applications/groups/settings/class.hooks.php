@@ -913,9 +913,9 @@ class GroupsHooks extends Gdn_Plugin {
             return $where;
         }
 
-        $model = new GroupModel();
-        $group = $model->getID($query['groupID']);
-        $model->overridePermissions($group);
+        $groupModel = new GroupModel();
+        $group = $groupModel->getID($query['groupID']);
+        $groupModel->overridePermissions($group);
 
         $where['groupID'] = $query['groupID'];
 
