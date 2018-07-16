@@ -897,6 +897,36 @@ class GroupModel extends Gdn_Model {
     }
 
     /**
+     * Get a list of the groups a user is invited to.
+     *
+     * @param $userID
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param int $limit
+     * @param bool $offset
+     * @return Gdn_DataSet
+     * @throws Exception
+     */
+    public function getInvites($userID, $orderFields = '', $orderDirection = 'desc', $limit = 9, $offset = false) {
+        $ids = $this->SQL
+            ->select('GroupID')
+            ->from('GroupApplicant')
+            ->where([
+                'UserID' => $userID,
+                'Type' => 'Invitation',
+            ])
+            ->orderBy('DateInserted')
+            ->limit(100) // protect against weird data
+            ->get()->resultArray();
+        $ids = array_column($ids, 'GroupID');
+
+        $result = $this->getWhere(['GroupID' => $ids], $orderFields, $orderDirection, $limit, $offset);
+        $result->datasetType(DATASET_TYPE_ARRAY);
+        $this->calc($result->resultArray());
+        return $result->resultArray();
+    }
+
+    /**
      *
      *
      * @param string $wheres

@@ -63,6 +63,12 @@ class GroupsController extends Gdn_Controller {
              $Limit = 9;
         }
 
+        // Get group invites.
+        if (Gdn::session()->isValid()) {
+            $invites = $this->GroupModel->getInvites(Gdn::session()->UserID, 'Name', 'asc', $Limit);
+            $this->setData('Invites', $invites);
+        }
+
         // Get popular groups.
         $Groups = $this->GroupModel->get('CountMembers', 'desc', $Limit)->resultArray();
         $this->setData('Groups', $Groups);

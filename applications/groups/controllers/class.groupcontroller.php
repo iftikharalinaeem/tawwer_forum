@@ -330,11 +330,11 @@ class GroupController extends Gdn_Controller {
     /**
      *
      *
-     * @param $iD
+     * @param $id
      * @throws Exception
      */
-    public function inviteDecline($iD) {
-        $group = $this->GroupModel->getID($iD);
+    public function inviteDecline($id, $refresh = false) {
+        $group = $this->GroupModel->getID($id);
         if (!$group) {
             throw notFoundException('Group');
         }
@@ -345,8 +345,12 @@ class GroupController extends Gdn_Controller {
         $this->setData('Result', $result);
 
         $this->jsonTarget('.GroupUserHeaderModule', '', 'SlideUp');
-        $this->setRedirectTo(groupUrl($group));
+        $this->jsonTarget(".group-invites #Group_{$group['GroupID']}", '', 'SlideUp');
+        $this->jsonTarget(".Group-Header .Group-Buttons", '', 'Remove');
         $this->informMessage(t('Invitation declined.'));
+        if ($refresh) {
+            $this->setRedirectTo(groupUrl($group));
+        }
         $this->render('Blank', 'Utility', 'Dashboard');
     }
 
