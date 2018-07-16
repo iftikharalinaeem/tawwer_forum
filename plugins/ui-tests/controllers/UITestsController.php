@@ -26,6 +26,6 @@ class UITestsController extends VanillaController {
 
     public function authentication() {
         $this->CssClass .= ' NoPanel';
-        $this->render('authentication');
+        $this->renderReact();
     }
 }

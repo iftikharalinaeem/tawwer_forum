@@ -913,7 +913,12 @@ class GroupsHooks extends Gdn_Plugin {
             return $where;
         }
 
+        $groupModel = new GroupModel();
+        $group = $groupModel->getID($query['groupID']);
+        $groupModel->overridePermissions($group);
+
         $where['groupID'] = $query['groupID'];
+
         return $where;
     }
 
