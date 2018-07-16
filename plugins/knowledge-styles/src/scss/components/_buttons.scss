@@ -11,6 +11,7 @@
     outline: 0;
     vertical-align: middle;
     touch-action: manipulation;
+    min-width: $global-button_minWidth;
     user-select: none;
     overflow: hidden;
     cursor: pointer;
@@ -47,6 +48,7 @@
 
 .button-icon {
   display: flex;
+  min-width: $formElement-height;
 }
 
 

@@ -1,3 +1,16 @@
+// Variation Testing
+
+//$splash-fullWidth_bgImage: "https://image.pbs.org/video-assets/iZOsUzY-asset-mezzanine-16x9-8YZsCRv.jpg";
+//$splash-outer_bg: #0e6baa;
+
+//$splash_fg: white;
+//
+//$splash-contentWidth_bgImage: "https://image.pbs.org/video-assets/iZOsUzY-asset-mezzanine-16x9-8YZsCRv.jpg";
+//$splash-inner_bg: #0e6baa;
+
+////////////////
+
+
 @import "@dashboard/core-variables";
 
 @import "mixins/mixin.utilities";
@@ -9,6 +22,7 @@
 @import "mixins/mixin.flex";
 @import "mixins/mixin.listStyles";
 @import "mixins/mixin.backLink";
+@import "mixins/mixin.transitions";
 
 
 @import "base/overwrite"; // Overwrite styles from styles.css
@@ -25,6 +39,7 @@
 @import "components/metas";
 @import "components/icons";
 @import "components/buttons";
+@import "components/buttonGroups";
 @import "components/fullBackground";
 @import "components/messages";
 @import "components/overlays";
@@ -49,9 +64,13 @@
 @import "components/breadcrumbs"; // Temporary
 
 @import "widget/splash";
+@import "widget/searchBar";
 @import "widget/overview";
 @import "pages/article";
 
 @import "browserSpecific/browserSpecific";
+
+
+
 
 

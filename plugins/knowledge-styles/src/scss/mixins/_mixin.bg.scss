@@ -19,7 +19,8 @@
   @include bgMiddle;
   background: {
     size: cover;
-    @if $img {
+
+    @if $img and $img != none {
       image: url($img);
     }
   }

@@ -33,6 +33,8 @@
             </div>
         </div>
     </div>
+{/block}
+{block name="main"}
 
     <div class="_pageMetas">
         <div class="vanillaDropDown-content">
@@ -63,8 +65,7 @@
             </span>
         </div>
     </div>
-{/block}
-{block name="main"}
+
     <div class="_searchResults">
         {include "_category_result.tpl" excel="true" word="true" pdf="true" image="https://vanillaforums.com/images/metaIcons/vanillaForums.png" title="Getting Help with your community" excerpt="Standard with your order of the Plantronics CT12 wireless headset phone is a two in one headset that is convertible so you can use it over the head for stability or over the ear for convenience. It has a microphone that is especially designed to cancel out background noises as well as top notch clarity of sound."}
         {include "_category_result.tpl" excel="false" word="false" pdf="false" image="https://vanillaforums.com/images/metaIcons/vanillaForums.png" title="Vanilla support needed: Poll feature not workingVanilla support needed: Poll feature not workingVanilla support needed: Poll feature not workingVanilla support needed: Poll feature not workingVanilla support needed: Poll feature not working" excerpt="Currently when I use my RSS feed, each discussion has no image attached to it. How can I assign (even manually to the same image for all discussions) an image to it, so that e.g. if I use the RSS feedCurrently when I use my RSS feed, each discussion has no image attached to it. How can I assign (even manually to the same image for all discussions) an image to it, so that e.g. if I use the RSS feedCurrently when I use my RSS feed, each discussion has no image attached to it. How can I assign (even manually to the same image for all discussions) an image to it, so that e.g. if I use the RSS feedCurrently when I use my RSS feed, each discussion has no image attached to it. How can I assign (even manually to the same image for all discussions) an image to it, so that e.g. if I use the RSS feed"}

@@ -47,17 +47,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="_pageMetas _metas">
-                    <span class="_meta _meta-author">
-                        By Todd Burry
-                    </span>
-                    <span class="_meta _meta-author">
-                        Last Updated <time class="_meta-time" datetime="2018-03-03">3 March 2018</time>
-                    </span>
-                    <span class="_meta _meta-id">
-                        ID #1029384756
-                    </span>
-                </div>
             </div>
 
             <div class="_panelAndNav-block _panelAndNav-rightTop">
@@ -71,6 +60,18 @@
             <div class="_panelAndNav-block _panelAndNav-rightTop">{block name="topRight"}{/block}</div>
 
             <div class="_panelAndNav-block _panelAndNav-main userContent">
+                <div class="_pageMetas _metas">
+                    <span class="_meta _meta-author">
+                        By Todd Burry
+                    </span>
+                    <span class="_meta _meta-author">
+                        Last Updated <time class="_meta-time" datetime="2018-03-03">3 March 2018</time>
+                    </span>
+                    <span class="_meta _meta-id">
+                        ID #1029384756
+                    </span>
+                </div>
+
                 {include "article_text.tpl"}
                 {include "article_attachments.tpl"}
                 {include "article_helpful.tpl"}

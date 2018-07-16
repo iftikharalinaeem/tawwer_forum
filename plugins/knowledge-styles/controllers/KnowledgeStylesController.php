@@ -41,4 +41,9 @@ class KnowledgeStylesController extends VanillaController {
         Gdn::controller()->MasterView = 'default.knowledge';
         $this->render("knowledgestyles/components/categoryWithNav", '', 'plugins/knowledge-styles');
     }
+
+    public function pageAdvancedSearch() {
+        Gdn::controller()->MasterView = 'default.knowledge';
+        $this->render("knowledgestyles/components/advancedSearch", '', 'plugins/knowledge-styles');
+    }
 }

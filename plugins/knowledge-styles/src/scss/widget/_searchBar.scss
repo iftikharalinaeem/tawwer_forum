@@ -1,0 +1,139 @@
+$searchBar-drawer_bg           : $global-color_bg !default;
+$searchBar_height              : $formElement_giantInput_height !default;
+$searchBar_fontSize            : $formElement_giantInput_fontSize !default;
+$searchBar_width               : 705px !default;
+$searchBar-button_minWidth     : 130px !default;
+$searchBar-button_borderWidth  : $formElement_borderWidth !default;
+$searchBar-button_borderRadius : $formElement_borderWidth !default;
+$searchBar-button_borderColor  : $formElement_borderColor !default;
+
+$searchBar-icon_color          : mix($global-color_bg, $global-color_fg, 40%) !default;
+$searchBar-input_fontSize      : $global-subTitle_fontSize !default;
+$searchBar-button_fontSize     : $global-medium_fontSize !default;
+
+._searchBar {
+  max-width: #{$searchBar_width};
+  margin : auto;
+
+  ._searchBar-submit {
+    display: none;
+  }
+
+  ._searchBar-cancel {
+    display: none;
+  }
+
+  &._showAdvancedSearch {
+    ._searchBar-button {
+      display: none;
+    }
+
+    .inputText._searchBar-input {
+      border: {
+        right-width: $formElement_borderWidth;
+        right-color: $formElement_borderColor;
+        right-style: $formElement_borderStyle;
+        top-left-radius: $searchBar-button_borderRadius;
+        bottom-left-radius: $searchBar-button_borderRadius;
+      }
+      padding-left: #{$formElement_horizontalPadding * 2 + $icon-default_size};
+    }
+
+    ._splash-advancedSearchWrap {
+      display: block;
+      max-height: 200vh;
+    }
+
+    ._searchBar-toggleAdvanced {
+      display: none;
+    }
+
+    ._searchBar-submit {
+      display: block;
+    }
+
+    ._searchBar-cancel {
+      display: block;
+    }
+  }
+}
+
+._searchBar-bar {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+._searchBar-inputAndIcon {
+  position: relative;
+  flex-grow: 1;
+}
+
+._searchBar-searchIcon {
+  @include absolute-middleLeft($formElement_horizontalPadding);
+  color: $searchBar-icon_color;
+}
+
+.inputText._searchBar-input {
+  height: $searchBar_height;
+  font-size: $searchBar-input_fontSize;
+  margin: 0;
+  padding-left: #{$formElement_horizontalPadding * 2 + $icon-default_size};
+  width: 100%;
+  border: {
+    right: 0;
+    top-right-radius: 0;
+    bottom-right-radius: 0;
+  }
+}
+
+.button {
+  &._searchBar-button {
+    height: $searchBar_height;
+    font-size: $searchBar-button_fontSize;
+    min-width: $searchBar-button_minWidth;
+
+    border: {
+      width: $searchBar-button_borderWidth;
+      color: $searchBar-button_borderColor;
+      top-left-radius: 0;
+      bottom-left-radius: 0;
+      top-right-radius: $searchBar-button_borderRadius;
+      bottom-right-radius: $searchBar-button_borderRadius;
+    }
+  }
+}
+
+
+._searchBar_footer {
+  display: flex;
+}
+
+._searchBar-toggleAdvanced {
+  min-width: $searchBar-button_minWidth;
+  padding: {
+    top: $utility-baseUnit;
+    bottom: $utility-baseUnit;
+  }
+  border: {
+    width: $searchBar-button_borderWidth;
+    color: transparent;
+  }
+
+  //&[aria-pressed=false] {
+  //  ._splash-simpleLabel {
+  //    display: none;
+  //  }
+  //}
+  //&[aria-pressed=true] {
+  //  ._splash-advancedLabel {
+  //    display: none;
+  //  }
+  //}
+}
+
+
+._splash-advancedSearchWrap {
+  @include defaultTransition(max-height);
+  overflow: hidden;
+  max-height: 0;
+}
