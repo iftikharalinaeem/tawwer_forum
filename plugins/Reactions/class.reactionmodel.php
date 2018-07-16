@@ -653,7 +653,7 @@ class ReactionModel extends Gdn_Model {
                     break;
                 case 'Comment':
                     $row['Name'] = sprintf(t('Re: %s'), $row['Name']);
-                    $url = commentUrl($row, '/');
+                    $url = commentUrl($row);
                     break;
                 default:
                     $url = '';
