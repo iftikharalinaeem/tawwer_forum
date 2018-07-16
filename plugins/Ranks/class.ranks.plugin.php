@@ -328,7 +328,8 @@ class RanksPlugin extends Gdn_Plugin {
      * @param ProfileController $sender
      */
     public function profileController_editMyAccountAfter_handler($sender) {
-        $this->addManualRanks($sender);
+        $CurrentRankID = $sender->data('Profile.RankID', null);
+        $this->addManualRanks($sender, $CurrentRankID);
     }
 
     /**
@@ -337,25 +338,27 @@ class RanksPlugin extends Gdn_Plugin {
      * @param UserController $sender
      */
     public function userController_customUserFields_handler($sender) {
-        $this->addManualRanks($sender);
+        $CurrentRankID = $sender->data('User.RankID', null);
+        $this->addManualRanks($sender, $CurrentRankID);
     }
 
     /**
      * Add the rank changer dropdown to a page.
      *
      * @param Gdn_Controller $Sender
+     * @param null|int $currentRankID
+     * @throws Exception
      */
-    protected function addManualRanks($Sender) {
+    protected function addManualRanks($Sender, $currentRankID = null) {
         if (!checkPermission('Garden.Settings.Manage')) {
             return;
         }
 
         // Grab a list of all of the manual ranks.
-        $CurrentRankID = $Sender->data('Profile.RankID');
         $AllRanks = RankModel::ranks();
         $Ranks = [];
         foreach ($AllRanks as $RankID => $Rank) {
-            if ($RankID == $CurrentRankID || valr('Criteria.Manual', $Rank)) {
+            if ($RankID == $currentRankID || valr('Criteria.Manual', $Rank)) {
                 $Ranks[$RankID] = $Rank['Name'];
             }
         }
