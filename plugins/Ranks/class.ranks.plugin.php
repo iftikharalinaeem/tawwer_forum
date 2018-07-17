@@ -786,6 +786,18 @@ class RanksPlugin extends Gdn_Plugin {
     public function userIndexSchema_init(Schema $schema) {
         $this->updateSchemaExpand($schema);
     }
+
+    /**
+     * Prevent insertion of empty string in an integer column on user create/update.
+     *
+     * @param UserModel $sender
+     * @param array $args
+     */
+    public function userModel_beforeSave_handler($sender, $args) {
+        if (empty($args['Fields']['RankID'])) {
+            $args['Fields']['RankID'] = null;
+        }
+    }
 }
 
 if (!function_exists('rankTag')):
