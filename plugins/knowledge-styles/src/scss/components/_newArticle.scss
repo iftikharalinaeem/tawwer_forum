@@ -6,7 +6,7 @@ $newArticle-button_minWidth: $global-button_minWidth !default;
 
 
 
-.button.button-newArticle {
+._button._button-newArticle {
   @include buttonSizing($newArticle-button_height, $newArticle-button_minWidth, $newArticle-button_fontSize, 2px);
   border-radius: $newArticle-button_borderRadius;
   line-height: $newArticle-button_height;

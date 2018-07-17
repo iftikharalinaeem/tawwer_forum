@@ -7,8 +7,8 @@ $buttonGroup-margin: $utility-baseUnit;
   justify-content: flex-end;
   align-items: flex-start;
 
-  .button-fakeLink,
-  .button {
+  ._button-fakeLink,
+  ._button {
     margin: {
       left: $buttonGroup-margin;
       right: $buttonGroup-margin;

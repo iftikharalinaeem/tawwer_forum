@@ -10,11 +10,13 @@ $searchBar-button_borderColor         : $formElement_borderColor !default;
 $searchBar-icon_color                 : mix($global-color_bg, $global-color_fg, 40%) !default;
 $searchBar-input_fontSize             : $global-subTitle_fontSize !default;
 $searchBar-button_fontSize            : $global-medium_fontSize !default;
-$searchBarAdvanced_topPadding         : $utility-baseUnit * 3 !default;
-$searchBarAdvanced_horizontalPadding  : $utility-baseUnit * 6 !default;
-$searchBarAdvanced_bottomPadding      : $utility-baseUnit * 6 !default;
+$searchBarAdvanced_topPadding         : $utility-baseUnit * 4 !default;
+$searchBarAdvanced_horizontalPadding  : $utility-baseUnit * 5 !default;
+$searchBarAdvanced_bottomPadding      : $utility-baseUnit * 5 !default;
 $searchBarAdvanced-panel_shadowColor  : rgba($global-color_fg, .2) !default;
 $searchBarAdvanced-panel_boxShadow    : 0 1px 3px 0 $searchBarAdvanced-panel_shadowColor !default;
+
+$searchBar-searchIn_margin            : $formElement_margin - $utility-baseUnit !default;
 
 ._searchBar {
   max-width: #{$searchBar_width};
@@ -46,6 +48,7 @@ $searchBarAdvanced-panel_boxShadow    : 0 1px 3px 0 $searchBarAdvanced-panel_sha
 
 ._searchBar-bar {
   display: flex;
+  position: relative;
   flex-wrap: nowrap;
 }
 
@@ -72,7 +75,7 @@ $searchBarAdvanced-panel_boxShadow    : 0 1px 3px 0 $searchBarAdvanced-panel_sha
   }
 }
 
-.button {
+._button {
   &._searchBar-button {
     height: $searchBar_height;
     font-size: $searchBar-button_fontSize;
@@ -152,4 +155,8 @@ $searchBarAdvanced-panel_boxShadow    : 0 1px 3px 0 $searchBarAdvanced-panel_sha
     top: $utility-baseUnit;
     bottom: $utility-baseUnit;
   }
+}
+
+._searchBarAdvanced-searchIn {
+  margin-bottom: $searchBar-searchIn_margin;
 }

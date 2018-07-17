@@ -46,7 +46,8 @@
 @import "components/stickyBottom";
 @import "components/uiLists";
 @import "components/featuredArticle";
-@import "components/formElements";
+@import "components/inputBlock";
+@import "components/inputText";
 @import "components/newArticle";
 @import "components/pageHeading";
 @import "components/helpful";
@@ -63,6 +64,7 @@
 @import "components/pageMetas";
 @import "components/breadcrumbs"; // Temporary
 @import "components/radioButtonsAsTabs";
+@import "components/autoComplete";
 
 @import "widget/splash";
 @import "widget/searchBar";

@@ -18,7 +18,7 @@
                     </ul>
                 </div>
                 <div class="_widget-footer">
-                    <button class="button button-newArticle">New</button>
+                    <button class="_button _button-newArticle">New</button>
                 </div>
             </div>
         </div>
@@ -51,7 +51,7 @@
                     </ul>
                 </div>
                 <div class="_widget-footer">
-                    <button class="button button-newArticle">New</button>
+                    <button class="_button _button-newArticle">New</button>
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
                     </ul>
                 </div>
                 <div class="_widget-footer">
-                    <button class="button button-newArticle">New</button>
+                    <button class="_button _button-newArticle">New</button>
                 </div>
             </div>
         </div>

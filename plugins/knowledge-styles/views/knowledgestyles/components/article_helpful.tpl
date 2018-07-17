@@ -1,10 +1,10 @@
 <section class="_helpful">
     <h3 class="_helpful-title">Was this article helpful?</h3>
     <div class="_helpful-vote">
-        <button class="button _helpful-button _helpful-buttonNo">
+        <button class="_button _helpful-button _helpful-buttonNo">
             No
         </button>
-        <button class="button _helpful-button _helpful-buttonYes">
+        <button class="_button _helpful-button _helpful-buttonYes">
             Yes
         </button>
     </div>

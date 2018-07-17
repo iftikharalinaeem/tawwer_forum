@@ -68,7 +68,7 @@ $pagination-navItem_borderInsideRadius                      : 0;
   width: auto;
   min-width: #{$formElement_fullBorderWidth + $icon-default_size + $pagination-navPadding_inner + $pagination-navPadding_outer};
 
-  &.button {
+  &._button {
     padding: {
       top: #{$utility-baseUnit - $formElement_borderWidth * 2};
       bottom: #{$utility-baseUnit - ($formElement_borderWidth)};
@@ -83,7 +83,7 @@ $pagination-navItem_borderInsideRadius                      : 0;
 }
 
 ._pagination-prev {
-  &.button {
+  &._button {
     border-top-left-radius: $pagination-navItem_borderOutsideRadius;
     border-top-right-radius: $pagination-navItem_borderInsideRadius;
     border-bottom-right-radius: $pagination-navItem_borderInsideRadius;
@@ -97,7 +97,7 @@ $pagination-navItem_borderInsideRadius                      : 0;
 }
 
 ._pagination-next {
-  &.button {
+  &._button {
     border-top-right-radius: $pagination-navItem_borderOutsideRadius;
     border-top-left-radius: $pagination-navItem_borderInsideRadius;
     border-bottom-right-radius: $pagination-navItem_borderOutsideRadius;
@@ -173,11 +173,11 @@ $pagination-navItem_borderInsideRadius                      : 0;
     right: $utility-baseUnit;
   }
 
-  &.button {
+  &._button {
     border-radius: $pagination-item_borderRadius;
   }
 
-  &.button.isCurrent {
+  &._button.isCurrent {
     background-color: $pagination-disabled_bg;
     color: $pagination-disabled_fg;
   }

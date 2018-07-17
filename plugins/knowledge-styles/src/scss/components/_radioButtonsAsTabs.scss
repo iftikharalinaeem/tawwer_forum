@@ -39,7 +39,8 @@ $radioButtonsAsTabs_active_bg: $global-color_active_primaryBg;
     min-height: $radioButtonsAsTabs-height;
     min-width: $radioButtonsAsTabs-minWidth;
     font-size: $radioButtonsAsTabs-fontSize;
-    padding: #{$utility-baseUnit - $radioButtonsAsTabs-borderWidth * 2} #{$utility-baseUnit * 2} $radioButtonsAsTabs-horizontalPadding;
+    line-height: 1;
+    padding: #{$utility-baseUnit - $radioButtonsAsTabs-borderWidth} #{$utility-baseUnit * 2};
     text-align: center;
     user-select: none;
     border: {

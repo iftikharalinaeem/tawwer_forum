@@ -187,7 +187,7 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
   }
 
 
-  .button-menu._panelAndNav-menu {
+  ._button-menu._panelAndNav-menu {
     display: none;
 
     @include mediaQuery-panelAndNav_oneColumn {
@@ -195,7 +195,7 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
     }
   }
 
-  .button.button-close._panelAndNav-close {
+  ._button._button-close._panelAndNav-close {
     @include absolute-topRight($widget-top_padding, $widget-right_padding);
     display: none;
     z-index: 1;

@@ -11,7 +11,7 @@ $metas_color: mix($global-color_fg, $global-color_bg, 50%) !default;
   margin: {
     left: -#{$widget-left_padding};
     right: $widget-left_padding;
-    bottom: $metas_verticalMargin;
+    //bottom: $metas_verticalMargin;
   }
 
   overflow: hidden;
