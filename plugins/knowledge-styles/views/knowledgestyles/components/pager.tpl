@@ -56,7 +56,7 @@
                         <span class="_pagination-label" itemprop="name">101</span>
                     </a>
                 </li>
-                <li class="_pagination-element _pagination-mobilePageSelector">
+                <li class="_pagination-element _pagination-visibleOnMobile _pagination-mobilePageSelector">
                     <label class="_pagination-compactNav _pagination-item">
                         <span class="_pagination-jumpTo _pagination-number">
                             <input type="number" min="1" max="101" style="width:4ex;" class="_pagination-jumpToInput" value="6"></span>
