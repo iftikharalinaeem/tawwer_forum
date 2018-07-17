@@ -328,8 +328,7 @@ class RanksPlugin extends Gdn_Plugin {
      * @param ProfileController $sender
      */
     public function profileController_editMyAccountAfter_handler($sender) {
-        $CurrentRankID = $sender->data('Profile.RankID', null);
-        $this->addManualRanks($sender, $CurrentRankID);
+        $this->addManualRanks($sender);
     }
 
     /**
@@ -338,8 +337,7 @@ class RanksPlugin extends Gdn_Plugin {
      * @param UserController $sender
      */
     public function userController_customUserFields_handler($sender) {
-        $CurrentRankID = $sender->data('User.RankID', null);
-        $this->addManualRanks($sender, $CurrentRankID);
+        $this->addManualRanks($sender);
     }
 
     /**
@@ -349,7 +347,7 @@ class RanksPlugin extends Gdn_Plugin {
      * @param null|int $currentRankID
      * @throws Exception
      */
-    protected function addManualRanks($Sender, $currentRankID = null) {
+    protected function addManualRanks($Sender) {
         if (!checkPermission('Garden.Settings.Manage')) {
             return;
         }
@@ -358,7 +356,7 @@ class RanksPlugin extends Gdn_Plugin {
         $AllRanks = RankModel::ranks();
         $Ranks = [];
         foreach ($AllRanks as $RankID => $Rank) {
-            if ($RankID == $currentRankID || valr('Criteria.Manual', $Rank)) {
+            if (valr('Criteria.Manual', $Rank)) {
                 $Ranks[$RankID] = $Rank['Name'];
             }
         }
@@ -566,18 +564,29 @@ class RanksPlugin extends Gdn_Plugin {
         if (!Gdn::controller()) {
             return;
         }
-        $userID = Gdn::controller()->data('Profile.UserID');
-        if ($userID != $args['UserID']) {
-            return;
+
+        if (Gdn::controller() instanceof ProfileController) {
+            $userID = Gdn::controller()->data('Profile.UserID');
+            if ($userID != $args['UserID']) {
+                return;
+            }
+            $oldRankID = Gdn::controller()->data('Profile.RankID');
+        } else {
+            $userID = $args['UserID'];
+            $oldRankID = valr('User.RankID', $args);
         }
 
         // Check to make sure the rank has changed.
-        $oldRankID = Gdn::controller()->data('Profile.RankID');
         $newRankID = val('RankID', $args['Fields']);
-        if ($newRankID && $newRankID != $oldRankID) {
+        if (($newRankID || $newRankID === null) && $newRankID != $oldRankID) {
             // Send the user a notification.
             $rankModel = new RankModel();
-            $rankModel->notify(Gdn::userModel()->getID($userID), $rankModel->getID($newRankID));
+            if ($newRankID === '' || $newRankID === null) {
+                $user = Gdn::userModel()->getID($args['UserID']);
+                $rankModel->applyRank($user);
+            } else {
+                $rankModel->notify(Gdn::userModel()->getID($userID), $rankModel->getID($newRankID));
+            }
         }
     }
 
