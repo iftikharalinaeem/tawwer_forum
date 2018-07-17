@@ -28,10 +28,11 @@
   }
 }
 
-@mixin buttonSizing($height, $fontSize, $paddingTop) {
+@mixin buttonSizing($height, $minWidth, $fontSize, $paddingTop) {
   min-height: $icon-default_size;
+  min-width: $minWidth;
   font-size: $fontSize;
-  padding: #{$paddingTop - $formElement_borderWidth * 2} #{$paddingTop * 2};
+  padding: #{$paddingTop - $formElement-borderWidthFull} #{$paddingTop * 2};
   line-height: $icon-default_size;
 }
 
@@ -41,7 +42,7 @@
   width: 100%;
   height: $height;
   padding: $paddingTop #{$paddingTop * 2};
-  line-height: inputLineHeight($height, $paddingTop, $formElement-border_widthFull);
+  line-height: inputLineHeight($height, $paddingTop, $formElement-borderWidthFull);
 }
 
 @mixin placeholderStyling {

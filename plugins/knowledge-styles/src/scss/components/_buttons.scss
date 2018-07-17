@@ -2,7 +2,7 @@
   .button {
     @include singleLineEllipsis;
     @include generateButtonClass($button-basic);
-    @include buttonSizing($formElement_height, $global-medium_fontSize, $utility-baseUnit);
+    @include buttonSizing($formElement_height, $global-button_minWidth, $global-medium_fontSize, $utility-baseUnit);
     @include outlineStyling;
     display: inline-block;
     position: relative;

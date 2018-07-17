@@ -19,21 +19,23 @@
             {*</button>*}
         </div>
     {if $advanced|default:'false' === "true"}
-        <div id="advancedSearchFields" aria-label="Advanced Search Fields" aria-expanded="false" class="_splash-advancedSearch">
-            <div class="_splash-advancedSearchWrap">
-                <h2 class="_advancedSearchFields-title sr-only" class="sr-only" tabindex="-1">
+        <div id="advancedSearchFields" aria-label="Advanced Search Fields" aria-expanded="false" class="_searchBarAdvanced">
+            <div class="_searchBarAdvanced-contents">
+                <h2 class="_searchBarAdvanced-title sr-only" class="sr-only" tabindex="-1">
                     Advanced Search Fields
                 </h2>
                 <fieldset class="inputBlock radioButtonsAsTabs">
                     <legend class="sr-only">Search in:</legend>
-                    <label class="radioButtonsAsTabs-tab">
-                        <input class="radioButtonsAsTabs-input" type="radio" name="AdvancedSearchType" value="Articles" checked="checked">
-                        <span class="radioButton-label">Articles</span>
-                    </label>
-                    <label class="radioButtonsAsTabs-tab">
-                        <input class="radioButtonsAsTabs-input" type="radio" name="AdvancedSearchType" value="Everywhere">
-                        <span class="radioButton-label">Everywhere</span>
-                    </label>
+                    <div class="radioButtonsAsTabs-tabs">
+                        <label class="radioButtonsAsTabs-tab">
+                            <input class="radioButtonsAsTabs-input" type="radio" name="AdvancedSearchType" value="Articles" checked="checked">
+                            <span class="radioButtonsAsTabs-label">Articles</span>
+                        </label>
+                        <label class="radioButtonsAsTabs-tab">
+                            <input class="radioButtonsAsTabs-input" type="radio" name="AdvancedSearchType" value="Everywhere">
+                            <span class="radioButtonsAsTabs-label">Everywhere</span>
+                        </label>
+                    </div>
                 </fieldset>
 
                 <label class="inputBlock">
@@ -91,19 +93,23 @@
                     </span>
                 </div>
             </div>
+            <div class="_buttonGroup _buttonGroup-right">
+                <button type="button" class="_searchBar-cancel button">
+                    <span class="_searchBarAdvanced-buttonText">Cancel</span>
+                </button>
+
+                <button type="submit" class="_searchBar-submit button">
+                    <span class="_searchBarAdvanced-buttonText">Search</span>
+                </button>
+            </div>
         </div>
-        <div class="_searchBar_footer _buttonGroup _buttonGroup-right">
-
-            <button type="button" class="_searchBar-cancel button">
-                <span class="_splash-advancedLabel">Cancel</span>
-            </button>
-
-            <button type="submit" class="_searchBar-submit button">
-                <span class="_splash-advancedLabel">Search</span>
-            </button>
-
+        <div class="_searchBarAdvanced_footer _buttonGroup _buttonGroup-right">
+            <div class="_searchBarAdvanced-query">
+                <span class="_meta">Author: Todd, Dan</span>
+                <span class="_meta">Within 1 day of today</span>
+            </div>
             <button id="toggleAdvanced" aria-controls="advancedSearchFields" type="button" class="_searchBar-toggleAdvanced button-fakeLink" aria-pressed="false">
-                <span class="_splash-advancedLabel">Advanced</span>
+                <span class="_searchBarAdvanced-buttonText">Advanced</span>
             </button>
         </div>
     {/if}

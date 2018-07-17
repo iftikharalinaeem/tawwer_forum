@@ -5,6 +5,7 @@ $buttonGroup-margin: $utility-baseUnit;
   width: calc(100% + #{$buttonGroup-margin * 2});
   margin-left: -$buttonGroup-margin;
   justify-content: flex-end;
+  align-items: flex-start;
 
   .button-fakeLink,
   .button {
