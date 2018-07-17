@@ -13,7 +13,7 @@ $searchResult-separator_width                 : $global-separator_width;
 $searchResult-maxImageWidth                   : 153px;
 
 $searchResult_verticalPadding                 : $utility-baseUnit * 3;
-$searchResult_horizontalPadding               : 0;
+$searchResult_horizontalPadding               : $utility-baseUnit;
 
 $searchResult_breakPoint                      : 800px;
 
@@ -62,7 +62,9 @@ $searchResult_breakPoint                      : 800px;
   flex-grow: 1;
   padding: {
     top: $searchResult_verticalPadding;
+    right: $searchResult_horizontalPadding;
     bottom: $searchResult_verticalPadding;
+    left: $searchResult_horizontalPadding;
   }
 }
 

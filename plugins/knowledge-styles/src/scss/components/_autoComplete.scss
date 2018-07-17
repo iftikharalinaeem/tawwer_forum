@@ -34,19 +34,10 @@ $autoComplete-separator_width    : $global-separator_width;
   user-select: none;
 
   + ._autoCompleteResult {
-    margin-top: $autoComplete-separator_width;
-
-    &::before {
-      content: "";
-      display: block;
-      width: calc(100% - #{$autoComplete-horizontalPadding * 2});
-      height: $autoComplete-separator_width;
-      background-color: $autoComplete-separator_color;
-      margin: {
-        top: -$autoComplete-separator_width;
-        left: $autoComplete-horizontalPadding;
-        right: $autoComplete-horizontalPadding;
-      }
+    border: {
+      top-color: $autoComplete-separator_color;
+      top-width: $autoComplete-separator_width;
+      style: solid;
     }
   }
 }
