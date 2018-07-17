@@ -20,6 +20,7 @@
 
             <div class="_autoComplete">
                 <ul class="_autoComplete-results" role="listbox" aria-label="AutoComplete Suggestions" aria-selected="true">
+                    {include "autoComplete-result.tpl" title="Getting Installation Help Help With your Community How to get Help if Everything Else Fails Help Help With your Last Edited June 20th 2018 Community How to get Help 20 December 2015 Article by Todd Burry" metas=["Article by Todd Burry", "20 December 2015", "Lorem Ipsum", "Last Edited June 20th 2018"] word="true" excel="true" pdf="true"}
                     {include "autoComplete-result.tpl" title="Getting Help With your Community" metas=["Article by Todd Burry", "20 December 2015", "Lorem Ipsum", "Last Edited June 20th 2018"] word="true" excel="true" pdf="true"}
                     {include "autoComplete-result.tpl" title="Theming Help" metas=["Article by Todd Burry", "20 December 2015", "Lorem Ipsum", "Last Edited June 20th 2018"] word="true" pdf="true"}
                     {include "autoComplete-result.tpl" title="How to get Help if Everything Else Fails" metas=["Article by Todd Burry", "20 December 2015", "Lorem Ipsum", "Last Edited June 20th 2018"]}

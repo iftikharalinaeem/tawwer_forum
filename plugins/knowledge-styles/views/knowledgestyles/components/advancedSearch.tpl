@@ -101,14 +101,21 @@
         $cancel.on('click', function() {
             $bar.toggleClass('_showAdvancedSearch');
             $advanced.attr("aria-pressed", !($advanced.attr("aria-pressed") === "true"));
-            $input.focus();
         });
-
 
         $wrap.on('webkitAnimationEnd animationend', function(){
             var isOpen = ($advanced.attr("aria-pressed") === "true");
             $wrap.style.display = isOpen ? "block" : "none";
         });
+
+        $input.on("focusin", function(){
+            $bar.addClass("_showAutoComplete");
+        });
+
+        $input.on("focusout", function(){
+            $bar.removeClass("_showAutoComplete");
+        });
+
     });
 
     $('#advancedSearch-toggle').on('click', function(){

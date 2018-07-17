@@ -13,8 +13,8 @@ $searchBar-button_fontSize            : $global-medium_fontSize !default;
 $searchBarAdvanced_topPadding         : $utility-baseUnit * 4 !default;
 $searchBarAdvanced_horizontalPadding  : $utility-baseUnit * 5 !default;
 $searchBarAdvanced_bottomPadding      : $utility-baseUnit * 5 !default;
-$searchBarAdvanced-panel_shadowColor  : rgba($global-color_fg, .2) !default;
-$searchBarAdvanced-panel_boxShadow    : 0 1px 3px 0 $searchBarAdvanced-panel_shadowColor !default;
+$searchBarAdvanced-panel_shadowColor  : $autoComplete-panel_shadowColor !default;
+$searchBarAdvanced-panel_boxShadow    : $autoComplete-panel_boxShadow !default;
 
 $searchBar-searchIn_margin            : $formElement_margin - $utility-baseUnit !default;
 
@@ -23,7 +23,6 @@ $searchBar-searchIn_margin            : $formElement_margin - $utility-baseUnit 
   margin : auto;
 
   &._showAdvancedSearch {
-
     ._searchBarAdvanced {
       display: block;
     }
@@ -42,6 +41,12 @@ $searchBar-searchIn_margin            : $formElement_margin - $utility-baseUnit 
         bottom-left-radius: $searchBar-button_borderRadius;
       }
       padding-left: #{$formElement_horizontalPadding * 2 + $icon-default_size};
+    }
+  }
+
+  &._showAutoComplete {
+    ._autoComplete {
+      display: block;
     }
   }
 }
