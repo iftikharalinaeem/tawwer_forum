@@ -15,6 +15,12 @@ class GroupsDiscussionsTest extends DiscussionsTest {
     /** @var array */
     protected static $groups;
 
+    /** @var array */
+    protected static $secretGroups;
+
+    /** @var array List of userID's */
+    protected static $userIDs;
+
     /**
      * GroupsDiscussionsTest constructor.
      *
@@ -52,7 +58,18 @@ class GroupsDiscussionsTest extends DiscussionsTest {
                 'privacy' => 'public',
             ]);
         }
-
+        // Create secret groups
+        foreach ([1, 2] as $i) {
+            $groupTxt = uniqid(__CLASS__." $i ");
+            self::$secretGroups[] = $groupsAPIController->post([
+                'name' => $groupTxt,
+                'description' => $groupTxt,
+                'format' => 'Markdown',
+                'privacy' => 'secret',
+            ]);
+        }
+        // Create members
+        self::createUsers(8);
         $session->end();
     }
 
@@ -99,5 +116,114 @@ class GroupsDiscussionsTest extends DiscussionsTest {
             $this->assertArrayHasKey('groupID', $discussion);
             $this->assertEquals($discussion['groupID'], self::$groups[0]['groupID']);
         }
+    }
+
+    /**
+     * Create Users for test.
+     *
+     * @param int $roleID The roleID to associate to the new user.
+     */
+    protected static function createUsers($roleID) {
+        /** @var \UsersApiController $usersAPIController */
+        $usersAPIController = static::container()->get('UsersAPIController');
+
+        $classParts = explode('\\', __CLASS__);
+        $className = $classParts[count($classParts) - 1];
+        for ($i = 1; $i <= 2; $i++) {
+            $user = $usersAPIController->post([
+                'name' => self::randomUsername(),
+                'email' => "{$className}{$i}$i@example.com",
+                'password' => "$%#$&ADSFBNYI*&WBV$i",
+                'roles' => [
+                   'roleID' => $roleID,
+                ]
+            ]);
+            self::$userIDs[] = $user['userID'];
+        }
+    }
+
+    /**
+     * Create a discussion in a group.
+     *
+     * @param int $groupID The group the discussion will be created in.
+     * @return int $discussionID The id of the newly created discussion.
+     */
+    protected function createDiscussion($groupID) {
+        $discussion = $this->api()->post("/discussions", [
+                "name" => "test",
+                "body" => "Hello Again",
+                "format" => "Markdown",
+                "categoryID" => 2,
+                "groupID" => $groupID,
+            ])->getBody();
+
+        $discussionID = $discussion['discussionID'] ?? 0 ;
+        return $discussionID;
+    }
+
+    /**
+     * Test /discussion/:id endpoint.
+     */
+    public function testGetDiscussionID() {
+        /** @var \DiscussionModel $discussionModel */
+        $discussionModel = static::container()->get('DiscussionModel');
+        $discussion = $discussionModel->getWhere(['GroupID' => self::$groups[0]['groupID']])->firstRow(DATASET_TYPE_ARRAY);
+        $discussionID = $discussion['DiscussionID'];
+        $indexUrl = $this->indexUrl();
+        $result = $this->api()->get($indexUrl.'/'.$discussionID);
+        $this->assertEquals(200, $result->getStatusCode());
+        $requestedDiscussion = $result->getBody();
+        $this->assertEquals($discussionID, $requestedDiscussion['discussionID']);
+    }
+
+    /**
+     * Test /discussion/:id endpoint with a secret group.
+     */
+    public function testSecretGroupDiscussionID() {
+        $secretGroupID = self::$secretGroups[0]['groupID'];
+        $secretDiscussionID = $this->createDiscussion($secretGroupID);
+
+        // Set session to user 1.
+        /** @var \Gdn_Session $session */
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->start(self::$userIDs[0], false, false);
+
+        //add user as member to secret group.
+        /** @var \GroupModel $groupModel */
+        $groupModel = static::container()->get('GroupModel');
+        $groupModel->addUser($secretGroupID, self::$userIDs[0], 'Member');
+
+        $secretGroup = $groupModel->getID($secretGroupID, DATASET_TYPE_ARRAY);
+        $groupModel->overridePermissions($secretGroup);
+
+        $indexUrl = $this->indexUrl();
+
+        $result = $this->api()->get($indexUrl.'/'.$secretDiscussionID);
+
+        $this->assertEquals(200, $result->getStatusCode());
+    }
+
+    /**
+     * Test /discussion/:id endpoint with a secret group and non member.
+     *
+     * @expectedException \Exception
+     * @expectedExceptionMessage You need the Vanilla.Discussions.View permission to do that.
+     */
+    public function testFailSecretGroupDiscussionID() {
+        $secretGroupID = self::$secretGroups[0]['groupID'];
+        $secretDiscussionID = $this->createDiscussion($secretGroupID);
+
+        // Set session to user 2.
+        /** @var \Gdn_Session $session */
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->start(self::$userIDs[1], false, false);
+
+        /** @var \GroupModel $groupModel */
+        $groupModel = static::container()->get('GroupModel');
+        $secretGroup = $groupModel->getID($secretGroupID, DATASET_TYPE_ARRAY);
+        $groupModel->overridePermissions($secretGroup);
+
+        $indexUrl = $this->indexUrl();
+        $this->api()->get($indexUrl.'/'.$secretDiscussionID);
     }
 }
