@@ -20,7 +20,11 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
 
 ._panelAndNav {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+
+  @include mediaQuery-panelAndNav_oneColumn {
+    flex-wrap: wrap;
+  }
 
   &._noRightColumn {
     ._panelAndNav-middle {
