@@ -1113,7 +1113,7 @@ body.Groups .site-content {
   font-size: 14px; }
 
 .PhotoGrid .PhotoWrap {
-  display: block; }
+  display: inline-block; }
 
 .container .discussion-sort-filter-module {
   height: 36px; }

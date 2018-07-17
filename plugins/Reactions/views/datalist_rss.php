@@ -1,6 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <description><?php echo htmlspecialchars($this->data('Title')); ?></description>
-<language><?php echo Gdn::config('Garden.Locale', 'en-US'); ?></language>
 <atom:link href="<?php echo htmlspecialchars(url($this->SelfUrl, TRUE)); ?>" rel="self" type="application/rss+xml" />
 
 <?php foreach ($this->data('Data', []) as $Row): ?>

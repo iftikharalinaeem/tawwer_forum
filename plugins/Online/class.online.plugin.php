@@ -1,5 +1,7 @@
 <?php
 
+use Garden\Schema\Schema;
+
 /**
  * Online Plugin
  *
@@ -64,6 +66,14 @@ class OnlinePlugin extends Gdn_Plugin {
      */
     protected static $now;
 
+    /** @var bool */
+    private static $cachingRequired = true;
+
+    /** @var UserModel */
+    private $userModel;
+
+    const PRIVATE_MODE_ATTRIBUTE = 'Online/PrivateMode';
+
     /**
      * Track when we last wrote online status back to the database.
      * @const string
@@ -117,8 +127,14 @@ class OnlinePlugin extends Gdn_Plugin {
     const DEFAULT_LOCATION = 'every';
     const DEFAULT_HIDE = 'true';
 
-    public function __construct() {
+    public function __construct(UserModel $userModel = null) {
         parent::__construct();
+
+        if ($userModel === null) {
+            $this->userModel = Gdn::getContainer()->get(UserModel::class);
+        } else {
+            $this->userModel = $userModel;
+        }
 
         $this->writeDelay = c('Plugins.Online.WriteDelay', self::DEFAULT_WRITE_DELAY);
         $this->pruneDelay = c('Plugins.Online.PruneDelay', self::DEFAULT_PRUNE_DELAY) * 60;
@@ -184,6 +200,15 @@ class OnlinePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Is caching required?
+     *
+     * @return bool
+     */
+    public static function isCachingRequired(): bool {
+        return self::$cachingRequired;
+    }
+
+    /**
      * Hook into Informs for every minute updates
      *
      * Here we'll track and update the online status of each user while they're
@@ -226,7 +251,7 @@ class OnlinePlugin extends Gdn_Plugin {
      * Uses a shifting double cookie method to track the online state of guests.
      */
     public function trackGuest() {
-        if (!Gdn::cache()->activeEnabled()) {
+        if (self::isCachingRequired() && !Gdn::cache()->activeEnabled()) {
             return;
         }
 
@@ -317,7 +342,7 @@ class OnlinePlugin extends Gdn_Plugin {
      * @return int Number of guests
      */
     public static function guests() {
-        if (!Gdn::cache()->activeEnabled()) {
+        if (self::isCachingRequired() && !Gdn::cache()->activeEnabled()) {
             return 0;
         }
 
@@ -334,7 +359,10 @@ class OnlinePlugin extends Gdn_Plugin {
                 'Cache' => $cache,
                 'Active' => $active
             ];
-            Gdn::controller()->setData('GuestCountCache', $debug);
+            $controller = Gdn::controller();
+            if ($controller instanceof Gdn_Controller) {
+                Gdn::controller()->setData('GuestCountCache', $debug);
+            }
 
             if (isset($cache[$cookieNames[$active]])) {
                 return $cache[$cookieNames[$active]];
@@ -345,6 +373,16 @@ class OnlinePlugin extends Gdn_Plugin {
         } catch (Exception $ex) {
             echo $ex->getMessage();
         }
+    }
+
+    /**
+     * Get the current total number of guests on the site
+     *
+     * @return int
+     */
+    public function guestCount(): int {
+        $result = self::guests();
+        return $result ?? 0;
     }
 
     /*
@@ -363,7 +401,7 @@ class OnlinePlugin extends Gdn_Plugin {
      * @return type
      */
     public function trackActiveUser($withSupplement = false) {
-        if (!Gdn::cache()->activeEnabled()) {
+        if (self::isCachingRequired() && !Gdn::cache()->activeEnabled()) {
             return;
         }
 
@@ -507,7 +545,7 @@ class OnlinePlugin extends Gdn_Plugin {
      * @return boolean
      */
     public function privateMode($user) {
-        $onlinePrivacy = valr('Attributes.Online/PrivateMode', $user, false);
+        $onlinePrivacy = valr('Attributes.'.self::PRIVATE_MODE_ATTRIBUTE, $user, false);
         return $onlinePrivacy;
     }
 
@@ -546,9 +584,9 @@ class OnlinePlugin extends Gdn_Plugin {
      * @staticvar array $AllOnlineUsers
      * @return array
      */
-    public function getAllOnlineUsers() {
+    public function getAllOnlineUsers($forceRefresh = false) {
         static $allOnlineUsers = null;
-        if (is_null($allOnlineUsers)) {
+        if (is_null($allOnlineUsers) || $forceRefresh) {
             $allOnlineUsers = [];
             try {
                 $allOnlineUsersResult = Gdn::sql()
@@ -640,7 +678,7 @@ class OnlinePlugin extends Gdn_Plugin {
      */
     public function onlineCount($selector = null, $selectorID = null, $selectorField = null) {
         if (is_null($selector) || $selector == 'all') {
-            $allOnlineUsers = $this->getAllOnlineUsers();
+            $allOnlineUsers = $this->getAllOnlineUsers(!self::$cachingRequired);
             return count($allOnlineUsers);
         }
 
@@ -936,14 +974,14 @@ class OnlinePlugin extends Gdn_Plugin {
         }
 
         $sender->setData('ForceEditing', ($userID == Gdn::session()->UserID) ? false : $sender->User->Name);
-        $privateMode = valr('Attributes.Online/PrivateMode', Gdn::session()->User, false);
+        $privateMode = valr('Attributes.'.self::PRIVATE_MODE_ATTRIBUTE, Gdn::session()->User, false);
         $sender->Form->setValue('PrivateMode', $privateMode);
 
         // Form submission handling.
         if ($sender->Form->authenticatedPostBack()) {
             $newPrivateMode = $sender->Form->getValue('PrivateMode', false);
             if ($newPrivateMode != $privateMode) {
-                Gdn::userModel()->saveAttribute($userID, 'Online/PrivateMode', $newPrivateMode);
+                Gdn::userModel()->saveAttribute($userID, self::PRIVATE_MODE_ATTRIBUTE, $newPrivateMode);
                 $sender->informMessage(t("Your changes have been saved."));
             }
         }
@@ -969,7 +1007,7 @@ class OnlinePlugin extends Gdn_Plugin {
         $privateMode = strtolower(Gdn::request()->get('PrivateMode', 'no'));
         $privateMode = in_array($privateMode, ['yes', 'true', 'on', true]) ? true : false;
 
-        Gdn::userModel()->saveAttribute($userID, 'Online/PrivateMode', $privateMode);
+        Gdn::userModel()->saveAttribute($userID, self::PRIVATE_MODE_ATTRIBUTE, $privateMode);
         $sender->setData('Success', sprintf("Set Online Privacy to %s.", $privateMode ? "ON" : "OFF"));
         $sender->setData('Private', $privateMode);
 
@@ -1121,6 +1159,88 @@ class OnlinePlugin extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Modify the output of a GET record request to the users endpoint.
+     *
+     * @param array $result
+     * @param UsersApiController $sender
+     * @param Schema $in
+     * @param array $query
+     * @param array $row
+     * @return array
+     */
+    public function usersApiController_getOutput(array $result, UsersApiController $sender, Schema $in, array $query, array $row) {
+        $attributes = $row['attributes'] ?? [];
+        $privateMode = $attributes['online/PrivateMode'] ?? false;
+        $result['hidden'] = (bool)$privateMode;
+        return $result;
+    }
+
+    /**
+     * Add hidden flag to the user row schema.
+     *
+     * @param Schema $schema
+     */
+    public function userSchema_init(Schema $schema) {
+        $schema->merge(Schema::parse([
+            'hidden:b?' => 'Is this user hiding their online status?',
+        ]));
+    }
+
+    /**
+     * Adjust a user’s Online privacy setting.
+     *
+     * @param UsersApiController $sender
+     * @param int $id The user ID.
+     * @param array $body The request body.
+     * @return array
+     * @throws \Garden\Schema\ValidationException if input or output fails schema validation.
+     * @throws \Garden\Web\Exception\HttpException
+     * @throws \Vanilla\Exception\PermissionException if the permission check fails.
+     */
+    public function usersApiController_put_hidden(UsersApiController $sender, int $id, array $body) {
+        $sender->permission('Garden.Users.Edit');
+
+        $sender->idParamSchema('in');
+        $in = $sender->schema([
+            'hidden:b' => 'Whether not the user should be hidden from Online status.'
+        ], 'in')->setDescription('Adjust a user’s Online privacy.');
+        $out = $sender->schema([
+            'hidden:b' => 'Whether not the user is hidden from Online status.'
+        ], 'out');
+
+        $body = $in->validate($body);
+
+        $this->userByID($id);
+        $this->userModel->saveAttribute(
+            $id,
+            self::PRIVATE_MODE_ATTRIBUTE,
+            $body['hidden']
+        );
+        $user = $this->userByID($id);
+        $attributes = $user['Attributes'] ?? null;
+        if (!is_array($attributes) || !array_key_exists(self::PRIVATE_MODE_ATTRIBUTE, $attributes)) {
+            throw new Garden\Web\Exception\ServerException('Unable to set Private Mode for user.');
+        }
+        $result = [
+            'hidden' => $attributes[self::PRIVATE_MODE_ATTRIBUTE]
+        ];
+
+        $result = $out->validate($result);
+        return $result;
+    }
+
+    /**
+     * Configure whether or not caching is required.
+     *
+     * @param $cachingRequired
+     * @return bool
+     */
+    public static function setCachingRequired(bool $cachingRequired) {
+        self::$cachingRequired = $cachingRequired;
+        return $cachingRequired;
+    }
+
     public function structure() {
         Gdn::structure()->reset();
         Gdn::structure()->table('Online')
@@ -1130,4 +1250,18 @@ class OnlinePlugin extends Gdn_Plugin {
                 ->set(false, false);
     }
 
+    /**
+     * Get a user by its numeric ID.
+     *
+     * @param int $id The user ID.
+     * @throws \Garden\Web\Exception\NotFoundException if the user could not be found.
+     * @return array
+     */
+    private function userByID($id) {
+        $row = $this->userModel->getID($id, DATASET_TYPE_ARRAY);
+        if (!$row || $row['Deleted'] > 0) {
+            throw new \Garden\Web\Exception\NotFoundException('User');
+        }
+        return $row;
+    }
 }

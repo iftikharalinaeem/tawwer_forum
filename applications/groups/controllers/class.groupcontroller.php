@@ -210,12 +210,17 @@ class GroupController extends Gdn_Controller {
      *
      *
      * @param $group
-     * @param $iD
+     * @param $id ApplicantID
      * @param string $value
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function approve($group, $iD, $value = 'approved') {
+    public function approve($group, $id, $value = 'approved') {
+        $form = new Gdn_Form();
+        if (!$form->authenticatedPostBack()) {
+             throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
+        }
+
         $group = $this->GroupModel->getID($group);
         if (!$group)
             throw notFoundException('Group');
@@ -227,13 +232,19 @@ class GroupController extends Gdn_Controller {
 
         $value = ucfirst($value);
 
-        $this->GroupModel->joinApprove([
-            'GroupApplicantID' => $iD,
-            'Type' => $value
-        ]);
+        $applicants = $this->GroupModel->getApplicants($group['GroupID'], ['GroupApplicantID' => $id]);
+        if (!$applicants) {
+            throw notFoundException('Applicant not found');
+        }
 
-        $this->jsonTarget("#GroupApplicant_$iD", "", 'SlideUp');
-        $this->informMessage(t('Applicant '.$value));
+        $userID = reset($applicants)['UserID'];
+
+        if ($this->GroupModel->processApplicant($group['GroupID'], $userID, $value === 'Approved')) {
+            $this->jsonTarget("#GroupApplicant_$id", "", 'SlideUp');
+            $this->informMessage(t('Applicant '.$value));
+        } else {
+            $this->informMessage(t('An error occurred.'));
+        }
 
         $this->render('Blank', 'Utility', 'Dashboard');
     }
@@ -352,13 +363,13 @@ class GroupController extends Gdn_Controller {
             throw notFoundException('Group');
         }
 
-        // Check join permission.
-        if (!$this->GroupModel->checkPermission('Join', $group)) {
-            throw forbiddenException('@'.$this->GroupModel->checkPermission('Join.Reason', $group));
+        $userID = Gdn::session()->UserID;
+        if ($this->GroupModel->isMember($userID, $group)) {
+            redirectTo(groupUrl($group));
         }
+        $this->groupPermission('Join', $group);
 
         $this->setData('Title', sprintf(t('Join %s'), htmlspecialchars($group['Name'])));
-
         $form = new Gdn_Form();
         $this->Form = $form;
 
@@ -1181,5 +1192,26 @@ class GroupController extends Gdn_Controller {
         $this->setData('User', $user);
         $this->title(t('Remove Member'));
         $this->render();
+    }
+
+    /**
+     * Checks user permission on group and redirects accordingly
+     *
+     * @param string $permission
+     * @param array $group
+     * @throws Exception
+     */
+    private function groupPermission($permission, $group) {
+        $session = Gdn::session();
+
+        // Check group permission.
+        if (!$this->GroupModel->checkPermission($permission, $group)) {
+            //if group permission check fails redirect them accordingly
+            if (!$session->isValid()) {
+                redirectTo('/entry/signin?Target='.urlencode($this->Request->pathAndQuery()));
+            } else {
+                throw forbiddenException('@'.$this->GroupModel->checkPermission($permission.'.Reason', $group));
+            }
+        }
     }
 }

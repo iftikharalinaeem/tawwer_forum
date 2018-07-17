@@ -444,9 +444,11 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .Group-Box .PhotoWrap {
   display: block; }
 
-.Group-Box .PhotoGrid .PhotoWrap,
 .Group-Box .Group-Member.UserTile .PhotoWrap {
   display: inline; }
+
+.Group-Box .PhotoGrid .PhotoWrap {
+  display: inline-block; }
 
 .Group-Header {
   margin-bottom: 20px; }

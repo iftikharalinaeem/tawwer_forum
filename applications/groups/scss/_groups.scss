@@ -63,12 +63,15 @@
     display: block;
   }
 
-  .PhotoGrid .PhotoWrap,
   .Group-Member.UserTile .PhotoWrap {
     display: inline;
   }
-}
 
+  .PhotoGrid .PhotoWrap {
+      display: inline-block;
+  }
+
+}
 
 // Header
 

@@ -5,6 +5,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Addon;
 
 /**
  * Class ReactionModel
@@ -322,8 +323,10 @@ class ReactionModel extends Gdn_Model {
                 $data = $row['Data']['React'];
             }
         } elseif (array_key_exists('Attributes', $row)) {
-            $row['Attributes'] = dbdecode($row['Attributes']);
-            if (array_key_exists('React', $row['Attributes'])) {
+            if (is_string($row['Attributes'])) {
+                $row['Attributes'] = dbdecode($row['Attributes']);
+            }
+            if (isset($row['Attributes']['React'])) {
                 $data = $row['Attributes']['React'];
             }
         }
@@ -650,7 +653,7 @@ class ReactionModel extends Gdn_Model {
                     break;
                 case 'Comment':
                     $row['Name'] = sprintf(t('Re: %s'), $row['Name']);
-                    $url = commentUrl($row, '/');
+                    $url = commentUrl($row);
                     break;
                 default:
                     $url = '';
@@ -808,6 +811,7 @@ class ReactionModel extends Gdn_Model {
         }
 
         $eventArguments = [
+            'reactionTotals' => $react,
             'ReactionTypes' => &$reactionTypes,
             'Record' => $record,
             'Set' => &$set
@@ -1077,7 +1081,7 @@ class ReactionModel extends Gdn_Model {
      * @param $reactionType
      */
     public function checkBadges($userID, $reactionType) {
-        if (!class_exists('BadgeModel')) {
+        if (!Gdn::addonManager()->isEnabled('badges', Addon::TYPE_ADDON)) {
             return;
         }
 

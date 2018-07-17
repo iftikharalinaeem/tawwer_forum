@@ -49,7 +49,7 @@ $list = $this->data('list');
                         <?php } ?>
                     </span>
                 <div class="ItemContent">
-                    <div class="Title">
+                    <div class="Title" role="heading" aria-level="3">
                         <a href="<?php echo val('url', $item); ?>">
                             <?php echo htmlspecialchars(val('heading', $item)); ?>
                         </a>

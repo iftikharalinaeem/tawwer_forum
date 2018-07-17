@@ -1,8 +1,13 @@
-<?php if (!defined('APPLICATION')) { exit(); }
+<?php
+
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
+
+use Interop\Container\ContainerInterface;
+use Vanilla\Addon;
+use Vanilla\AddonManager;
 
 /**
  * Class AdvancedSearchPlugin
@@ -12,36 +17,75 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
     public static $Types;
 
+    /**
+     * @var AddonManager
+     */
+    private $addonManager;
+
+    /** @var ContainerInterface */
+    private $container;
+
+    /**
+     * @var SearchModel
+     */
+    private $searchModel;
+
     /// Methods ///
 
-    public function __construct() {
+    /**
+     * Construct the advanced search plugin.
+     *
+     * @param AddonManager $addonManager The addon manager dependency.
+     * @param ContainerInterface $container
+     *
+     * @throws Exception
+     */
+    public function __construct(AddonManager $addonManager, ContainerInterface $container) {
         parent::__construct();
+
+        $this->addonManager = $addonManager;
+        $this->container = $container;
 
         self::$Types = [
             'discussion' => ['d' => 'discussions'],
             'comment' => ['c' => 'comments']
         ];
 
-        if (Gdn::addonManager()->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON)) {
-            if (Gdn::addonManager()->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
+        if ($this->addonManager->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON)) {
+            if ($this->addonManager->isEnabled('QnA', \Vanilla\Addon::TYPE_ADDON)) {
                 self::$Types['discussion']['question'] = 'questions';
                 self::$Types['comment']['answer'] = 'answers';
             }
 
-            if (Gdn::addonManager()->isEnabled('Polls', \Vanilla\Addon::TYPE_ADDON)) {
+            if ($this->addonManager->isEnabled('Polls', \Vanilla\Addon::TYPE_ADDON)) {
                 self::$Types['discussion']['poll'] = 'polls';
             }
 
-            if (Gdn::addonManager()->isEnabled('Pages', \Vanilla\Addon::TYPE_ADDON)) {
+            if ($this->addonManager->isEnabled('Pages', \Vanilla\Addon::TYPE_ADDON)) {
                 self::$Types['page']['p'] = 'docs';
             }
 
-            if (Gdn::applicationManager()->checkApplication('Groups')) {
+            $group = $this->addonManager->lookupAddon('Groups');
+            if ($group && $group->getInfoValue('oldType') === 'application' && $this->addonManager->isEnabled('Groups', \Vanilla\Addon::TYPE_ADDON)) {
                 self::$Types['group']['group'] = 'groups';
             }
         }
 
         $this->fireEvent('Init');
+    }
+
+    /**
+     * Get the SearchModel.
+     * We lazy load this so that other plugins can update the container rules with the container_init event.
+     *
+     * @return SearchModel
+     */
+    private function getSearchModel() {
+        if (!isset($this->searchModel)) {
+            $this->searchModel = $this->container->get(SearchModel::class);
+        }
+
+        return $this->searchModel;
     }
 
     public function quickSearch($title, $get = []) {
@@ -83,7 +127,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         if (!inSection('Dashboard')) {
             AdvancedSearchModule::addAssets();
 
-            if (!Gdn::addonManager()->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON)) {
+            if (!$this->addonManager->isEnabled('Sphinx', \Vanilla\Addon::TYPE_ADDON)) {
                 $sender->addDefinition('searchAutocomplete', '0');
             }
         }
@@ -158,7 +202,12 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     }
 
     public function searchController_autoComplete_create($sender, $term, $limit = 5) {
-        $searchModel = new SearchModel();
+        $searchModel = $this->getSearchModel();
+
+        if (!$searchModel instanceof SphinxSearchModel) {
+            throw new \Gdn_UserException("This functionality requires Sphinx Search.", 500);
+        }
+
         $get = $sender->Request->get();
         $get['search'] = $term;
         $results = $searchModel->autoComplete($get, $limit);
@@ -177,7 +226,12 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     }
 
     public function searchController_groupAutoComplete_create($sender, $term, $limit = 5) {
-        $searchModel = new SearchModel();
+        $searchModel = $this->getSearchModel();
+
+        if (!$searchModel instanceof SphinxSearchModel) {
+            throw new \Gdn_UserException("This functionality requires Sphinx Search.", 500);
+        }
+
         $get = $sender->Request->get();
         $get['search'] = $term;
         $results = $searchModel->groupAutoComplete($get, $limit);
@@ -190,8 +244,8 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     /**
      *
      * @param SearchController $sender
-     * @param type $search
-     * @param type $page
+     * @param string $search
+     * @param string $page
      */
     public function searchController_index_create($sender, $search = '', $page = false) {
         Gdn_Theme::section('SearchResults');
@@ -208,11 +262,11 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $sender->setData('_Limit', $limit);
 
         // Do the search.
-        $searchModel = new SearchModel();
+        $searchModel = $this->getSearchModel();
         $sender->setData('SearchResults', []);
         $searchTerms = Gdn_Format::text($search);
 
-        if (method_exists($searchModel, 'advancedSearch')) {
+        if ($searchModel instanceof SphinxSearchModel) {
             $results = $searchModel->advancedSearch($sender->Request->get(), $offset, $limit);
             $sender->setData($results);
             $searchTerms = $results['SearchTerms'];
@@ -286,9 +340,9 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             });
         }
 
-        if (debug() && method_exists('SearchModel', 'addNotes')) {
+        if (debug() && $this->addonManager->isEnabled('Sphinx', Addon::TYPE_ADDON)) {
             $calc = function ($r, $t) {
-                return SearchModel::addNotes($r, $t);
+                return SphinxSearchModel::addNotes($r, $t);
             };
         } else {
             $calc = function ($r) {
@@ -322,14 +376,14 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             $media = Search::extractMedia($Summary);
             $Row['Media'] = $media;
 
-            $Row['Summary'] = searchExcerpt(htmlspecialchars(Gdn_Format::plainText($Summary, 'Raw')), $SearchTerms, $Length);
+            $Row['Summary'] = searchExcerpt(Gdn_Format::plainText($Summary, 'Raw'), $SearchTerms, $Length);
             $Row['Summary'] = Emoji::instance()->translateToHtml($Row['Summary']);
 
             $Row['Format'] = 'Html';
             $Row['DateHtml'] = Gdn_Format::date($Row['DateInserted'], 'html');
             $Row['Notes'] = $calc($Row, $SearchTerms);
 
-            $Type = strtolower(getValue('Type', $Row));
+            $Type = strtolower(val('Type', $Row));
             if (isset($Row['CommentID'])) {
                 if ($Type == 'question') {
                     $Type = 'answer';
@@ -394,7 +448,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         /// Search query ///
 
-        $terms = getValue('search', $search);
+        $terms = val('search', $search);
         if ($terms) {
             $terms = $pdo->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $terms).'%');
         }
@@ -454,7 +508,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
                 $dwhere['d.DateInserted <='] = $pdo->quote($search['date-to']);
                 $cwhere['c.DateInserted <='] = $pdo->quote($search['date-to']);
             }
-        } else if (isset($search['date-filters'])) {
+        } elseif (isset($search['date-filters'])) {
             $dtZone = new DateTimeZone('UTC');
             foreach($search['date-filters'] as $field => $value) {
                 $dt = new DateTime('@'.$value->getTimestamp());
@@ -473,7 +527,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         if ($dsearch) {
             $sql = $vanillaSearch->discussionSql($searchModel, false);
-            $sql->select('Type');
+            $sql->select('d.Type');
 
             if ($terms) {
                 $sql->beginWhereGroup();
@@ -497,7 +551,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         if ($csearch) {
             $sql = $vanillaSearch->commentSql($searchModel, false);
-            $sql->select('Type as null');
+            $sql->select('null as Type');
 
             if ($terms) {
                 foreach ((array)$cfields as $field) {
@@ -520,7 +574,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         // Perform the search by unioning all of the sql together.
         $Sql = Gdn::sql()
             ->select()
-            ->from('_TBL_ s')
+            ->from('_TBL_ s', false)
             ->orderBy('s.DateInserted', 'desc')
             ->limit($limit, $offset)
             ->getSelect();
@@ -529,6 +583,12 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
         $Sql = str_replace(Gdn::database()->DatabasePrefix.'_TBL_', "(\n".implode("\nunion all\n", $searches)."\n)", $Sql);
         trace([$Sql], 'SearchSQL');
         $Result = Gdn::database()->query($Sql)->resultArray();
+
+        foreach ($Result as &$row) {
+            if ($row['RecordType'] === 'Comment') {
+                $row['Title'] = sprintft('Re: %s', $row['Title']);
+            }
+        }
 
         return $Result;
     }

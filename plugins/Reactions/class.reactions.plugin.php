@@ -862,6 +862,7 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $sender->setData('Data', $data);
         $sender->setData('EditMode', false, true);
+        $sender->setData('_robots', 'noindex, nofollow');
 
         $sender->_setBreadcrumbs(t($reactionType['Name']), $sender->canonicalUrl());
         $sender->setTabView('Reactions', 'DataList', '', 'plugins/Reactions');

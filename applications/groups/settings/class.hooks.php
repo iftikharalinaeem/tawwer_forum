@@ -26,6 +26,25 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
+     * Hook in when default category permissions are being built. Update permissions for the Social Groups category.
+     *
+     * @param PermissionModel $permissionModel
+     */
+    public function permissionModel_defaultPermissions_handler(PermissionModel $permissionModel) {
+        $socialGroups = CategoryModel::categories('social-groups');
+        if ($socialGroups) {
+            $categoryID = val('CategoryID', $socialGroups);
+            // Disable view permissions for the new category by default.
+            $permissionModel->addDefault(RoleModel::TYPE_GUEST, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            $permissionModel->addDefault(RoleModel::TYPE_APPLICANT, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            $permissionModel->addDefault(RoleModel::TYPE_UNCONFIRMED, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            $permissionModel->addDefault(RoleModel::TYPE_MEMBER, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            $permissionModel->addDefault(RoleModel::TYPE_MODERATOR, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+            $permissionModel->addDefault(RoleModel::TYPE_ADMINISTRATOR, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
+        }
+    }
+
+    /**
      * Setup routine for when the application is enabled.
      */
     public function setup() {
@@ -471,6 +490,10 @@ class GroupsHooks extends Gdn_Plugin {
         $this->overridePermissions($sender);
     }
 
+    public function discussionController_bookmark_before($sender) {
+        $this->overridePermissions($sender);
+    }
+
     public function discussionController_index_before($sender) {
         $this->overridePermissions($sender);
     }
@@ -511,6 +534,8 @@ class GroupsHooks extends Gdn_Plugin {
                 $sender->setData('Breadcrumbs', []);
                 $sender->addBreadcrumb(t('Groups'), '/groups');
                 $sender->addBreadcrumb($group['Name'], groupUrl($group));
+
+                $sender->setData('Editor.BackLink', anchor(htmlspecialchars($group['Name']), groupUrl($group)));
             }
 
             Gdn_Theme::section('Group');
@@ -888,7 +913,12 @@ class GroupsHooks extends Gdn_Plugin {
             return $where;
         }
 
+        $groupModel = new GroupModel();
+        $group = $groupModel->getID($query['groupID']);
+        $groupModel->overridePermissions($group);
+
         $where['groupID'] = $query['groupID'];
+
         return $where;
     }
 
