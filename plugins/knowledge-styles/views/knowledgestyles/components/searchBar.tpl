@@ -108,7 +108,7 @@
                     </div>
                 </div>
             </div>
-            <div class="_buttonGroup _buttonGroup-right">
+            <div class="_buttonGroup">
                 <button type="button" class="_searchBar-cancel _button">
                     <span class="_searchBarAdvanced-buttonText">Cancel</span>
                 </button>
@@ -118,7 +118,7 @@
                 </button>
             </div>
         </div>
-        <div class="_searchBarAdvanced_footer _buttonGroup _buttonGroup-right">
+        <div class="_searchBarAdvanced_footer">
             <div class="_searchBarAdvanced-query">
                 <span class="_meta">Author: Todd, Dan</span>
                 <span class="_meta">Within 1 day of today</span>

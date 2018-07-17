@@ -2,16 +2,18 @@ $buttonGroup-margin: $utility-baseUnit;
 
 ._buttonGroup {
   display: flex;
+  flex-wrap: wrap;
   width: calc(100% + #{$buttonGroup-margin * 2});
-  margin-left: -$buttonGroup-margin;
   justify-content: flex-end;
   align-items: flex-start;
+  margin: {
+    top: -$buttonGroup-margin;
+    bottom: -$buttonGroup-margin;
+    left: -$buttonGroup-margin;
+  }
 
   ._button-fakeLink,
   ._button {
-    margin: {
-      left: $buttonGroup-margin;
-      right: $buttonGroup-margin;
-    }
+    margin: $buttonGroup-margin;
   }
 }

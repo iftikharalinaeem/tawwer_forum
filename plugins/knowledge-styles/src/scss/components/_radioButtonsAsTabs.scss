@@ -17,7 +17,7 @@ $radioButtonsAsTabs_active_bg: $global-color_active_primaryBg;
 .radioButtonsAsTabs-tabs {
     display: flex;
     position: relative;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
 }

@@ -28,3 +28,8 @@ $pagerWithCount_breakPoint              : 800px;
     text-align: center;
   }
 }
+
+._pagerWithCount-pager {
+  position: relative;
+  z-index: 1;
+}

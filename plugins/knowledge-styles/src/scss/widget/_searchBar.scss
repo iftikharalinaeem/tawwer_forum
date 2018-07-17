@@ -1,22 +1,38 @@
-$searchBar-drawer_bg                  : $global-color_bg !default;
-$searchBar_height                     : $formElement_giantInput_height !default;
-$searchBar_fontSize                   : $formElement_giantInput_fontSize !default;
-$searchBar_width                      : 705px !default;
-$searchBar-button_minWidth            : 130px !default;
-$searchBar-button_borderWidth         : $formElement_borderWidth !default;
-$searchBar-button_borderRadius        : $formElement_borderWidth !default;
-$searchBar-button_borderColor         : $formElement_borderColor !default;
+$searchBar-drawer_bg                              : $global-color_bg !default;
+$searchBar_height                                 : $formElement_giantInput_height !default;
+$searchBar_fontSize                               : $formElement_giantInput_fontSize !default;
+$searchBar_width                                  : 705px !default;
+$searchBar-button_minWidth                        : 130px !default;
+$searchBar-button_borderWidth                     : $formElement_borderWidth !default;
+$searchBar-button_borderRadius                    : $formElement_borderWidth !default;
+$searchBar-button_borderColor                     : $formElement_borderColor !default;
 
-$searchBar-icon_color                 : mix($global-color_bg, $global-color_fg, 40%) !default;
-$searchBar-input_fontSize             : $global-subTitle_fontSize !default;
-$searchBar-button_fontSize            : $global-medium_fontSize !default;
-$searchBarAdvanced_topPadding         : $utility-baseUnit * 4 !default;
-$searchBarAdvanced_horizontalPadding  : $utility-baseUnit * 5 !default;
-$searchBarAdvanced_bottomPadding      : $utility-baseUnit * 5 !default;
-$searchBarAdvanced-panel_shadowColor  : $autoComplete-panel_shadowColor !default;
-$searchBarAdvanced-panel_boxShadow    : $autoComplete-panel_boxShadow !default;
+$searchBar-icon_color                             : mix($global-color_bg, $global-color_fg, 40%) !default;
+$searchBar-input_fontSize                         : $global-subTitle_fontSize !default;
+$searchBar-button_fontSize                        : $global-medium_fontSize !default;
 
-$searchBar-searchIn_margin            : $formElement_margin - $utility-baseUnit !default;
+$searchBarAdvanced_topPadding                     : $utility-baseUnit * 4 !default;
+$searchBarAdvanced_horizontalPadding              : $utility-baseUnit * 5 !default;
+$searchBarAdvanced_bottomPadding                  : $utility-baseUnit * 5 !default;
+
+$searchBarAdvanced_smallScreen_topPadding         : $utility-baseUnit * 2 !default;
+$searchBarAdvanced_smallScreen_horizontalPadding  : $utility-baseUnit * 3 !default;
+$searchBarAdvanced_smallScreen_bottomPadding      : $utility-baseUnit * 3 !default;
+
+$searchBarAdvanced-panel_shadowColor              : $autoComplete-panel_shadowColor !default;
+$searchBarAdvanced-panel_boxShadow                : $autoComplete-panel_boxShadow !default;
+
+$searchBar-searchIn_margin                        : $formElement_margin - $utility-baseUnit !default;
+
+$searchBarAdvanced-smallScreen_breakpoint         : 500px;
+
+
+@mixin mediaQuery-searchBarAdvanced_smallScreen {
+  @media (max-width: #{$searchBarAdvanced-smallScreen_breakpoint}) {
+    @content;
+  }
+}
+
 
 ._searchBar {
   max-width: #{$searchBar_width};
@@ -112,17 +128,7 @@ $searchBar-searchIn_margin            : $formElement_margin - $utility-baseUnit 
     width: $searchBar-button_borderWidth;
     color: transparent;
   }
-
-  //&[aria-pressed=false] {
-  //  ._splash-simpleLabel {
-  //    display: none;
-  //  }
-  //}
-  //&[aria-pressed=true] {
-  //  ._splash-advancedLabel {
-  //    display: none;
-  //  }
-  //}
+  margin-right: $buttonGroup-margin;
 }
 
 
@@ -148,6 +154,15 @@ $searchBar-searchIn_margin            : $formElement_margin - $utility-baseUnit 
     left: $searchBarAdvanced_horizontalPadding;
     bottom: $searchBarAdvanced_bottomPadding;
   }
+
+  @include mediaQuery-searchBarAdvanced_smallScreen {
+    padding: {
+      top: $searchBarAdvanced_smallScreen_horizontalPadding;
+      right: $searchBarAdvanced_smallScreen_horizontalPadding;
+      left: $searchBarAdvanced_smallScreen_horizontalPadding;
+      bottom: $searchBarAdvanced_smallScreen_bottomPadding;
+    }
+  }
 }
 
 ._searchBarAdvanced-query {
@@ -164,4 +179,15 @@ $searchBar-searchIn_margin            : $formElement_margin - $utility-baseUnit 
 
 ._searchBarAdvanced-searchIn {
   margin-bottom: $searchBar-searchIn_margin;
+}
+
+._searchBarAdvanced_footer {
+  display: flex;
+  flex-wrap: nowrap;
+  width: calc(100% + #{$buttonGroup-margin * 2});
+  justify-content: flex-end;
+  align-items: flex-start;
+  margin: {
+    left: -$buttonGroup-margin;
+  }
 }

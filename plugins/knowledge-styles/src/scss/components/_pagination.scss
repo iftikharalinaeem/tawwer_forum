@@ -62,13 +62,12 @@ $pagination-navItem_borderInsideRadius                      : 0;
 
 
 ._pagination-prev,
-._pagination-next
-{
+._pagination-next {
   min-height: $pagination-buttonWidth - $formElement_borderWidth;
   width: auto;
-  min-width: #{$formElement_fullBorderWidth + $icon-default_size + $pagination-navPadding_inner + $pagination-navPadding_outer};
 
   &._button {
+    min-width: #{$formElement_fullBorderWidth + $icon-default_size + $pagination-navPadding_inner + $pagination-navPadding_outer};
     padding: {
       top: #{$utility-baseUnit - $formElement_borderWidth * 2};
       bottom: #{$utility-baseUnit - ($formElement_borderWidth)};
@@ -162,7 +161,6 @@ $pagination-navItem_borderInsideRadius                      : 0;
 ._pagination-item {
   position: relative;
   display: block;
-  min-width: $pagination-buttonWidth;
   min-height: $pagination-buttonWidth;
   line-height: $formElement_height - $formElement_fullBorderWidth;
   height: $formElement_height;
@@ -175,6 +173,7 @@ $pagination-navItem_borderInsideRadius                      : 0;
 
   &._button {
     border-radius: $pagination-item_borderRadius;
+    min-width: $pagination-buttonWidth;
   }
 
   &._button.isCurrent {
