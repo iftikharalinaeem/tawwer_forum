@@ -790,8 +790,8 @@ class RanksPlugin extends Gdn_Plugin {
     /**
      * Prevent insertion of empty string in an integer column on user create/update.
      *
-     * @param $sender
-     * @param $args
+     * @param UserModel $sender
+     * @param array $args
      */
     public function userModel_beforeSave_handler($sender, $args) {
         if (empty($args['Fields']['RankID'])) {
