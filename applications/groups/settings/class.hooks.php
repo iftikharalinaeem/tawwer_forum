@@ -922,6 +922,17 @@ class GroupsHooks extends Gdn_Plugin {
         return $where;
     }
 
+    public function discussionsApiController_beforeGet(DiscussionsAPIController $controller, $id) {
+        if (!isset($id)) {
+            return;
+        }
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID($id, DATASET_TYPE_ARRAY);
+        $groupModel = new GroupModel();
+        $group = $groupModel->getID($discussion['GroupID']);
+        $groupModel->overridePermissions($group);
+    }
+
     /**
      * Override group permissions to allow users to see category
      *
