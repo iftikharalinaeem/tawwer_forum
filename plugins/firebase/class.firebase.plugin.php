@@ -151,7 +151,7 @@ class FireBasePlugin extends Gdn_OAuth2 {
             'AuthenticateUrl' =>  ['LabelCode' => 'Auth Domain', 'Description' => 'Auth Domain from the console of your Firebase Web App.'],
             'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to direct a user to register.'],
             'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to direct a user to sign out.'],
-            'UseFirebaseUI' => ['LabelCode' => 'User Firebase UI', 'Description' => 'Check this if you want Firebase buttons and/or email/password interfaces on the forum to connect users.', 'Control' => 'toggle'],
+            'UseFirebaseUI' => ['LabelCode' => 'Use Firebase UI', 'Description' => 'Check this if you want Firebase buttons and/or email/password interfaces on the forum to connect users.', 'Control' => 'toggle'],
             'TermsUrl' => ['LabelCode' => 'Terms of Service URL', 'Description' => 'URL to your Terms of Service'],
             'GoogleAuthProvider' => ['LabelCode' => 'Google Auth Provider', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their Google identities.'],
             'FacebookAuthProvider' => ['LabelCode' => 'Facebook Auth Provider', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their Facebook identities.'],
