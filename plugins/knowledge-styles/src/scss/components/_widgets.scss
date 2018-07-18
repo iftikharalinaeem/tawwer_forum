@@ -25,7 +25,7 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
   }
 }
 
-._widget-head {
+._widget-header {
   background-color: $widget-head_bg;
   color: $widget-head_fg;
   margin-bottom: $widget-head_gap;
@@ -48,15 +48,6 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
 
 ._widgetTitle {
   margin: 0;
-}
-
-._widget-main {
-  width: 100%;
-  border: {
-    color: $widget-main_borderColor;
-    width: $widget-main_borderWidth;
-    radius: $widget-main_borderRadius;
-  }
 }
 
 ._widget-body {

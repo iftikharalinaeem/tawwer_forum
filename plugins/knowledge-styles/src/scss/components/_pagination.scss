@@ -17,6 +17,17 @@ $pagination-item_borderRadius                               : 0;
 $pagination-navItem_borderOutsideRadius                     : $pagination_height;
 $pagination-navItem_borderInsideRadius                      : 0;
 
+$pagerWithCount-margin                                      : $utility-baseUnit * 7;
+
+$panelAndNav-smallScreen_breakpoint                         : 700px;
+
+@mixin mediaQuery-pagination_smallScreen {
+  @media (max-width: #{$panelAndNav-smallScreen_breakpoint}) {
+    @content;
+  }
+}
+
+
 ._pagination {
   position: relative;
   display: block;
@@ -62,13 +73,12 @@ $pagination-navItem_borderInsideRadius                      : 0;
 
 
 ._pagination-prev,
-._pagination-next
-{
+._pagination-next {
   min-height: $pagination-buttonWidth - $formElement_borderWidth;
   width: auto;
-  min-width: #{$formElement_fullBorderWidth + $icon-default_size + $pagination-navPadding_inner + $pagination-navPadding_outer};
 
-  &.button {
+  &._button {
+    min-width: #{$formElement_fullBorderWidth + $icon-default_size + $pagination-navPadding_inner + $pagination-navPadding_outer};
     padding: {
       top: #{$utility-baseUnit - $formElement_borderWidth * 2};
       bottom: #{$utility-baseUnit - ($formElement_borderWidth)};
@@ -83,7 +93,7 @@ $pagination-navItem_borderInsideRadius                      : 0;
 }
 
 ._pagination-prev {
-  &.button {
+  &._button {
     border-top-left-radius: $pagination-navItem_borderOutsideRadius;
     border-top-right-radius: $pagination-navItem_borderInsideRadius;
     border-bottom-right-radius: $pagination-navItem_borderInsideRadius;
@@ -97,7 +107,7 @@ $pagination-navItem_borderInsideRadius                      : 0;
 }
 
 ._pagination-next {
-  &.button {
+  &._button {
     border-top-right-radius: $pagination-navItem_borderOutsideRadius;
     border-top-left-radius: $pagination-navItem_borderInsideRadius;
     border-bottom-right-radius: $pagination-navItem_borderOutsideRadius;
@@ -128,6 +138,15 @@ $pagination-navItem_borderInsideRadius                      : 0;
   height: $formElement_height;
   margin: {
     left: -$formElement_borderWidth;
+  }
+
+  @include mediaQuery-pagination_smallScreen {
+    display: none;
+
+    &._pagination-mobilePageSelector,
+    &._pagination-visibleOnMobile {
+      display: block;
+    }
   }
 }
 
@@ -162,7 +181,6 @@ $pagination-navItem_borderInsideRadius                      : 0;
 ._pagination-item {
   position: relative;
   display: block;
-  min-width: $pagination-buttonWidth;
   min-height: $pagination-buttonWidth;
   line-height: $formElement_height - $formElement_fullBorderWidth;
   height: $formElement_height;
@@ -173,11 +191,12 @@ $pagination-navItem_borderInsideRadius                      : 0;
     right: $utility-baseUnit;
   }
 
-  &.button {
+  &._button {
     border-radius: $pagination-item_borderRadius;
+    min-width: $pagination-buttonWidth;
   }
 
-  &.button.isCurrent {
+  &._button.isCurrent {
     background-color: $pagination-disabled_bg;
     color: $pagination-disabled_fg;
   }
@@ -204,6 +223,7 @@ $pagination-navItem_borderInsideRadius                      : 0;
   min-width: 100%;
   outline: 0;
   border: solid $formElement_borderWidth $pagination-border_color;
+  font-size: $global-small_fontSize;
 }
 
 ._pagination-mobileSeparator {
@@ -269,6 +289,36 @@ $pagination-navItem_borderInsideRadius                      : 0;
   }
 }
 
+
+
+
+._pagerWithCount {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  margin-top: $pagerWithCount-margin;
+
+  @include mediaQuery-pagination_smallScreen {
+    flex-wrap: wrap;
+  }
+}
+
 ._pagerWithCount-count {
-  line-height: $pagination_height;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+
+  @include mediaQuery-pagination_smallScreen {
+    display: none;
+    position: relative;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+._pagerWithCount-pager {
+  position: relative;
+  z-index: 1;
 }

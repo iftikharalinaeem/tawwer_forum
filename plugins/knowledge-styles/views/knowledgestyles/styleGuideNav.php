@@ -15,4 +15,7 @@ $rootUrl = url('/knowledge-styles/');
     <li class="styleGuideNav-item">
         <a class="styleGuideNav-link" href="<?php echo $rootUrl;?>pageCategoryWithNav">Category With Nav</a>
     </li>
+    <li class="styleGuideNav-item">
+        <a class="styleGuideNav-link" href="<?php echo $rootUrl;?>pageAdvancedSearch">Advanced Search</a>
+    </li>
 </ul>

@@ -1,8 +1,8 @@
 ._pageContents { // Safe modification without affecting existing styles
-  .button {
+  ._button {
     @include singleLineEllipsis;
     @include generateButtonClass($button-basic);
-    @include buttonSizing($formElement_height, $global-medium_fontSize, $utility-baseUnit);
+    @include buttonSizing($formElement_height, $global-button_minWidth, $global-medium_fontSize, $utility-baseUnit);
     @include outlineStyling;
     display: inline-block;
     position: relative;
@@ -11,6 +11,7 @@
     outline: 0;
     vertical-align: middle;
     touch-action: manipulation;
+    min-width: $global-button_minWidth;
     user-select: none;
     overflow: hidden;
     cursor: pointer;
@@ -20,12 +21,12 @@
       style: solid;
     }
 
-    &.button-fullWidth {
+    &._button-fullWidth {
       width: 100%;
       max-width: 100%;
     }
 
-    &.button-icon {
+    &._button-icon {
       align-items: center;
       justify-content: center;
       height: $icon-default_size;
@@ -34,7 +35,7 @@
       border: 0;
     }
 
-    &.buttonNoBorder {
+    &._buttonNoBorder {
       border: 0;
       min-width: $formElement-height;
       padding: {
@@ -43,14 +44,19 @@
       }
     }
   }
+
+  ._button-callToAction {
+    @include generateButtonClass($buttonPrimary);
+  }
 }
 
-.button-icon {
+._button-icon {
   display: flex;
+  min-width: $formElement-height;
 }
 
 
-.button-fakeLink {
+._button-fakeLink {
   color: $link_default-color;
 
   &:hover {
@@ -61,5 +67,6 @@
     color: $link_default_focus-color;
   }
 }
+
 
 

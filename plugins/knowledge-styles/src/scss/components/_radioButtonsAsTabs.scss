@@ -1,0 +1,70 @@
+$radioButtonsAsTabs-minWidth: 93px;
+$radioButtonsAsTabs-fontSize: $global-small_fontSize;
+$radioButtonsAsTabs-height: 24px;
+$radioButtonsAsTabs-horizontalPadding: $utility-baseUnit;
+$radioButtonsAsTabs-borderRadius: $global-borderRadius;
+$radioButtonsAsTabs-borderWidth: $formElement-borderWidth;
+$radioButtonsAsTabs-borderColor: $formElement-borderColor;
+$radioButtonsAsTabs_active_borderColor: mix($global-color_bg, $global-color_primary, 50%);
+$radioButtonsAsTabs_bg: $global-color_bg;
+$radioButtonsAsTabs_fg: $global-color_fg;
+$radioButtonsAsTabs_active_bg: $global-color_active_primaryBg;
+
+.radioButtonsAsTabs {
+    display: block;
+}
+
+.radioButtonsAsTabs-tabs {
+    display: flex;
+    position: relative;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.radioButtonsAsTabs-tab {
+    position: relative;
+    display: inline-block;
+    user-select: none;
+
+    + .radioButtonsAsTabs-tab {
+        margin-left: -$radioButtonsAsTabs-borderWidth;
+    }
+}
+
+.radioButtonsAsTabs-label {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    min-height: $radioButtonsAsTabs-height;
+    min-width: $radioButtonsAsTabs-minWidth;
+    font-size: $radioButtonsAsTabs-fontSize;
+    line-height: 1;
+    padding: #{$utility-baseUnit - $radioButtonsAsTabs-borderWidth} #{$utility-baseUnit * 2};
+    text-align: center;
+    user-select: none;
+    border: {
+        width: $radioButtonsAsTabs-borderWidth;
+        color: $radioButtonsAsTabs-borderColor;
+        radius: 0;
+        style: solid;
+    }
+}
+
+.radioButtonsAsTabs-input {
+    @include sr-only;
+
+    &:hover,
+    &:focus {
+        & + .radioButtonsAsTabs-label {
+            border-color: $radioButtonsAsTabs_active_borderColor;
+            z-index: 1;
+        }
+    }
+
+    &:checked {
+        & + .radioButtonsAsTabs-label {
+            background-color: $radioButtonsAsTabs_active_bg;
+        }
+    }
+}

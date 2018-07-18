@@ -1,7 +1,7 @@
 <div class="_container _featuredArticles">
     <div class="_widget">
         <div class="_widget-contents"> {* Used for full background *}
-            <div class="_widget-head">
+            <div class="_widget-header">
                 {include "widget-titleBar-viewMore.tpl" title="Featured Articles"}
             </div>
             <div class="_widget-main">
@@ -20,3 +20,4 @@
         </div>
     </div>
 </div>
+

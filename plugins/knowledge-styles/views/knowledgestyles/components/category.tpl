@@ -18,7 +18,7 @@
                 </div>
                 <div class="pageHeading-actions">
                     <div class="_dropDown">
-                        <button class="button buttonNoBorder">
+                        <button class="_button _buttonNoBorder">
                             <svg class="_icon" viewBox="0 0 20 20">
                                 <title>▼</title>
                                 <path fill="currentColor" stroke-linecap="square" stroke-linejoin="square" fill-rule="evenodd" d="M6.79521339,4.1285572 L6.13258979,4.7726082 C6.04408814,4.85847112 6,4.95730046 6,5.0690962 C6,5.18057569 6.04408814,5.27940502 6.13258979,5.36526795 L11.3416605,10.4284924 L6.13275248,15.4915587 C6.04425083,15.5774216 6.00016269,15.6762509 6.00016269,15.7878885 C6.00016269,15.8995261 6.04425083,15.9983555 6.13275248,16.0842184 L6.79537608,16.7282694 C6.88371504,16.8142905 6.98539433,16.8571429 7.10025126,16.8571429 C7.21510819,16.8571429 7.31678748,16.8141323 7.40512644,16.7282694 L13.5818586,10.7248222 C13.6701976,10.6389593 13.7142857,10.54013 13.7142857,10.4284924 C13.7142857,10.3168547 13.6701976,10.2181835 13.5818586,10.1323206 L7.40512644,4.1285572 C7.31678748,4.04269427 7.21510819,4 7.10025126,4 C6.98539433,4 6.88371504,4.04269427 6.79521339,4.1285572 L6.79521339,4.1285572 Z" transform="rotate(90 9.857 10.429)"></path>
@@ -27,7 +27,9 @@
                     </div>
                 </div>
             </div>
+        </div>
 
+        <div class="_panelAndNav-main">
             <div class="_pageMetas">
                 <div class="vanillaDropDown-content">
                     <span class="ToggleFlyout selectBox _selectBox">
@@ -57,9 +59,8 @@
                     </span>
                 </div>
             </div>
-        </div>
 
-        <div class="_panelAndNav-main">
+
             <div class="_searchResults">
                 {include "_category_result.tpl" excel="true" word="true" pdf="true" image="https://vanillaforums.com/images/metaIcons/vanillaForums.png" title="Getting Help with your community" excerpt="Standard with your order of the Plantronics CT12 wireless headset phone is a two in one headset that is convertible so you can use it over the head for stability or over the ear for convenience. It has a microphone that is especially designed to cancel out background noises as well as top notch clarity of sound."}
                 {include "_category_result.tpl" excel="false" word="false" pdf="false" image="https://vanillaforums.com/images/metaIcons/vanillaForums.png" title="Vanilla support needed: Poll feature not workingVanilla support needed: Poll feature not workingVanilla support needed: Poll feature not workingVanilla support needed: Poll feature not workingVanilla support needed: Poll feature not working" excerpt="Currently when I use my RSS feed, each discussion has no image attached to it. How can I assign (even manually to the same image for all discussions) an image to it, so that e.g. if I use the RSS feedCurrently when I use my RSS feed, each discussion has no image attached to it. How can I assign (even manually to the same image for all discussions) an image to it, so that e.g. if I use the RSS feedCurrently when I use my RSS feed, each discussion has no image attached to it. How can I assign (even manually to the same image for all discussions) an image to it, so that e.g. if I use the RSS feedCurrently when I use my RSS feed, each discussion has no image attached to it. How can I assign (even manually to the same image for all discussions) an image to it, so that e.g. if I use the RSS feed"}
