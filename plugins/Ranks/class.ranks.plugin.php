@@ -555,6 +555,30 @@ class RanksPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Prevent insertion of empty string in an integer column on user create/update.
+     *
+     * @param UserModel $sender
+     * @param array $args
+     */
+    public function userModel_beforeSave_handler($sender, $args) {
+        if (empty($args['Fields']['RankID'])) {
+            $args['Fields']['RankID'] = null;
+        }
+
+        $oldRankID = valr('User.RankID', $args);
+        $newRankID = valr('Fields.RankID', $args);
+
+        $rankModel = new RankModel();
+        $oldRank = $rankModel->getID($oldRankID);
+
+        // The empty rank option was selected.
+        // Make sure we only overwrite a manually applied rank.
+        if ($newRankID === null && !valr('Criteria.Manual', $oldRank)) {
+            unset($args['Fields']['RankID']);
+        }
+    }
+
+    /**
      * Evaluate users for new rank when saving their state.
      *
      * @param UserModel $sender
@@ -565,6 +589,7 @@ class RanksPlugin extends Gdn_Plugin {
             return;
         }
 
+        // The if portion of this if/else statement was kept for assumed backwards compatibility.
         if (Gdn::controller() instanceof ProfileController) {
             $userID = Gdn::controller()->data('Profile.UserID');
             if ($userID != $args['UserID']) {
@@ -576,14 +601,16 @@ class RanksPlugin extends Gdn_Plugin {
             $oldRankID = valr('User.RankID', $args);
         }
 
-        // Check to make sure the rank has changed.
         $newRankID = val('RankID', $args['Fields']);
-        if (($newRankID || $newRankID === null) && $newRankID != $oldRankID) {
-            // Send the user a notification.
+
+        // Check to make sure the rank has changed.
+        if ($oldRankID != $newRankID) {
             $rankModel = new RankModel();
-            if ($newRankID === '' || $newRankID === null) {
-                $user = Gdn::userModel()->getID($args['UserID']);
+            // We have overridden a previously manually applied rank with the null value.
+            if ($newRankID === null) {
+                $user = Gdn::userModel()->getID($userID);
                 $rankModel->applyRank($user);
+            // We have applied a new manual rank.
             } else {
                 $rankModel->notify(Gdn::userModel()->getID($userID), $rankModel->getID($newRankID));
             }
@@ -797,18 +824,6 @@ class RanksPlugin extends Gdn_Plugin {
      */
     public function userIndexSchema_init(Schema $schema) {
         $this->updateSchemaExpand($schema);
-    }
-
-    /**
-     * Prevent insertion of empty string in an integer column on user create/update.
-     *
-     * @param UserModel $sender
-     * @param array $args
-     */
-    public function userModel_beforeSave_handler($sender, $args) {
-        if (empty($args['Fields']['RankID'])) {
-            $args['Fields']['RankID'] = null;
-        }
     }
 }
 
