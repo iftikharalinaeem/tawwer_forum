@@ -923,6 +923,23 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
+     * Override group permissions to allow users to see category
+     *
+     * @param DiscussionsAPIController $controller
+     * @param int $id discussion id
+     */
+    public function discussionsApiController_getFilters(DiscussionsAPIController $controller, $id) {
+        if (!isset($id)) {
+            return;
+        }
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID($id, DATASET_TYPE_ARRAY);
+        $groupModel = new GroupModel();
+        $group = $groupModel->getID($discussion['GroupID']);
+        $groupModel->overridePermissions($group);
+    }
+
+    /**
      * Add group fields to search schema.
      *
      * @param Schema $schema
