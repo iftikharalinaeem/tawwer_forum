@@ -1,4 +1,4 @@
-<li class="_autoCompleteResult">
+<li class="_autoCompleteResult" role="option" aria-selected="{$selected|default:'false'}">
     <a href="#" class="_autoCompleteResult-contents">
         <div class="_autoCompleteResult-head">
             <div class="_autoCompleteResult-title">

@@ -41,32 +41,35 @@
                 </div>
             {/if}
             <div class="_searchResult-text">
-                <div class="_metas">
+                <div class="_metas _searchResult-metas">
                     <span class="_meta">
                         Article by Todd Burry
                     </span>
                     <span class="_meta">
                         <time class="_meta-time" datetime="2016-06-01">1 August 2016</time>
                     </span>
-                    <span aria-label="Article Location" class="_meta _metaBreadcrumb">
-                        <ol class="_metaBreadcrumb">
-                            <li class="_metaBreadcrumb-item">
-                                <span class="_metaBreadcrumb-label" itemprop="name">This</span>
+                    <div class="_meta _metaBreadcrumb">
+                        <ol role="presentation" class="_metaBreadcrumb">
+                            <li class="sr-only">
+                                Page location:
+                            </li>
+                            <li role="presentation" class="_metaBreadcrumb-item">
+                                <span class="_metaBreadcrumb-label">This</span>
                             </li>
                             <li class="_metaBreadcrumb-item _metaBreadcrumb-separator" aria-hidden="true"><span class="breadcrumbs-separatorIcon">›</span></li>
-                            <li class="_metaBreadcrumb-item">
-                                <span class="_metaBreadcrumb-label" itemprop="name">Is</span>
+                            <li role="presentation" class="_metaBreadcrumb-item">
+                                <span class="_metaBreadcrumb-label">Is</span>
                             </li>
                             <li class="_metaBreadcrumb-item _metaBreadcrumb-separator" aria-hidden="true"><span class="breadcrumbs-separatorIcon">›</span></li>
-                            <li class="_metaBreadcrumb-item">
-                                <span class="_metaBreadcrumb-label" itemprop="name">The</span>
+                            <li role="presentation" class="_metaBreadcrumb-item">
+                                <span class="_metaBreadcrumb-label">The</span>
                             </li>
                             <li class="_metaBreadcrumb-item _metaBreadcrumb-separator" aria-hidden="true"><span class="breadcrumbs-separatorIcon">›</span></li>
-                            <li class="_metaBreadcrumb-item">
-                                <span class="_metaBreadcrumb-label" itemprop="name">Breadcrumb</span>
+                            <li role="presentation" class="_metaBreadcrumb-item">
+                                <span class="_metaBreadcrumb-label">Breadcrumb</span>
                             </li>
                         </ol>
-                    </span>
+                    </div>
                 </div>
                 <p class="_searchResult-excerpt">
                     {$excerpt|default:'Currently when I use my RSS feed, each discussion has no image attached to it. How can I assign (even manually to the same image for all discussions) an image to it, so that e.g. if I use the RSS feedCurrently when I use my RSS feed, each discussion has no image attached to it. How can I assign (even manually to the same image for all discussions) an image to it, so that e.g. if I use the RSS feedCurrently when I use my RSS feed, each discussion has no image attached to it. How can I assign (even manually to the same image for all discussions) an image to it, so that e.g. if I use the RSS feedCurrently when I use my RSS feed, each discussion has no image attached to it. How can I assign (even manually to the same image for all discussions) an image to it, so that e.g. if I use the RSS feed'}
