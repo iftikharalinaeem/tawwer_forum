@@ -415,3 +415,12 @@ function writeMemberSimpleList($members) {
     }
 }
 endif;
+
+if (!function_exists('writeGroupSearch')):
+    /**
+     * Get Group Search Module
+     */
+    function writeGroupSearch() {
+        echo Gdn_Theme::module('GroupSearchModule');
+    }
+endif;
