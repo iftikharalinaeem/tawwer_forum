@@ -76,29 +76,36 @@ class FireBasePlugin extends Gdn_OAuth2 {
 
         $sender->setData('APIKey', val('AssociationKey', $provider));
         $sender->setData('AuthDomain', val('AuthenticateUrl', $provider));
+        $sender->setData('UseFirebaseUI', val('UseFirebaseUI', $provider));
         $sender->setData('FirebaseAuthProviders', implode(",\n", $authProvidersConfigured));
         $sender->setData('TermsUrl', val('TermsUrl', $provider));
         $sender->setData('DebugJavascript', c('Vanilla.SSO.Debug'));
-        include $sender->fetchViewLocation('firebase-ui', '', 'plugins/firebase');
+        include $sender->fetchViewLocation('firebase-js', '', 'plugins/firebase');
    }
 
    public function vanillaController_firebasesignin_create($sender, $args) {
         $sender->render('firebasesignin', '', 'plugins/firebase');
    }
+
     /**
      * Inject a container into page for the Firebase SDK to print out buttons, etc.
      *
-     * @param $sender
-     * @param $args
+     * @param VanillaController $sender
+     * @param VanillaController $args
+     * @return string An HTML element to receive Firebase UI interface.
      */
-   public function base_afterSignInButton_handler($sender, $args) {
+    public function base_afterSignInButton_handler($sender, $args) {
+        $provider = $this->provider();
+        if (!val('UseFirebaseUI', $provider)) {
+            return '';
+        }
         $path = Gdn::request()->getPath();
         if ($path !== '/vanilla/firebasesignin') {
             echo '
                 <div id="firebaseui-auth-container"></div> 
             ';
         }
-   }
+    }
 
     /**
      * Create a form in the Dashboard to save the Firebase API Key and Auth Domain as well is toggle on and off
@@ -144,13 +151,14 @@ class FireBasePlugin extends Gdn_OAuth2 {
             'AuthenticateUrl' =>  ['LabelCode' => 'Auth Domain', 'Description' => 'Auth Domain from the console of your Firebase Web App.'],
             'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to direct a user to register.'],
             'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to direct a user to sign out.'],
+            'UseFirebaseUI' => ['LabelCode' => 'User Firebase UI', 'Description' => 'Check this if you want Firebase buttons and/or email/password interfaces on the forum to connect users.', 'Control' => 'toggle'],
             'TermsUrl' => ['LabelCode' => 'Terms of Service URL', 'Description' => 'URL to your Terms of Service'],
             'GoogleAuthProvider' => ['LabelCode' => 'Google Auth Provider', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their Google identities.'],
             'FacebookAuthProvider' => ['LabelCode' => 'Facebook Auth Provider', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their Facebook identities.'],
             'TwitterAuthProvider' => ['LabelCode' => 'Twitter Auth Provider', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their Twitter identities.'],
             'GithubAuthProvider' => ['LabelCode' => 'GitHub Auth Provider', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their GitHub identities.'],
             'EmailAuthProvider' => ['LabelCode' => 'Email/Password Authentication', 'Control' => 'toggle', 'Description' => 'Allow users to sign in with their Email and Password.'],
-            'IsDefault' =>  ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox']
+            'IsDefault' =>  ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'toggle']
         ];
 
         $sender->setData('_Form', $formFields);
