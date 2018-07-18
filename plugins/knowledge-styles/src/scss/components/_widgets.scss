@@ -50,15 +50,6 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
   margin: 0;
 }
 
-._widget-main {
-  width: 100%;
-  border: {
-    color: $widget-main_borderColor;
-    width: $widget-main_borderWidth;
-    radius: $widget-main_borderRadius;
-  }
-}
-
 ._widget-body {
   width: 100%;
   color: $widget-body_fg;
