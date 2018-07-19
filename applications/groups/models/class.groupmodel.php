@@ -15,6 +15,9 @@ class GroupModel extends Gdn_Model {
     /** @var int The number of members per page. */
     public $MemberPageSize = 30;
 
+    /** @var array The permissions associated with a group*/
+    private static $permissions = [];
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -126,7 +129,6 @@ class GroupModel extends Gdn_Model {
      * @return boolean
      */
     public function checkPermission($permission, $groupID, $userID = null, $useCache = true) {
-        static $permissions = [];
 
         if ($userID === null) {
             $userID = Gdn::session()->UserID;
@@ -139,7 +141,7 @@ class GroupModel extends Gdn_Model {
 
         $key = "$userID-$groupID";
 
-        if (!$useCache || !isset($permissions[$key])) {
+        if (!$useCache || !isset(self::$permissions[$key])) {
             // Get the data for the group.
             if (!isset($group)) {
                 $group = $this->getID($groupID);
@@ -247,10 +249,10 @@ class GroupModel extends Gdn_Model {
             }
 
             if ($useCache) {
-                $permissions[$key] = $perms;
+                self::$permissions[$key] = $perms;
             }
         } else {
-            $perms = $permissions[$key];
+            $perms = self::$permissions[$key];
         }
 
         if (!$permission) {
@@ -278,6 +280,13 @@ class GroupModel extends Gdn_Model {
         } else {
             return $perms[$permission];
         }
+    }
+
+    /**
+     * Reset the cached grouped permissions.
+     */
+    public function resetPermissions(){
+        self::$permissions =[];
     }
 
     /**

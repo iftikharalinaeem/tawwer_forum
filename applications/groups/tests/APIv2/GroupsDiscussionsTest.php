@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
+
 /**
  * Test the /api/v2/discussions with groups
  */
@@ -183,24 +184,22 @@ class GroupsDiscussionsTest extends DiscussionsTest {
         $secretGroupID = self::$secretGroups[0]['groupID'];
         $secretDiscussionID = $this->createDiscussion($secretGroupID);
 
-        // Set session to user 1.
+        //add user as member to secret group.
+        /** @var \GroupModel $groupModel */
+        $groupModel = static::container()->get('GroupModel');
+        $groupModel->resetPermissions();
+        $groupModel->addUser($secretGroupID, self::$userIDs[0], 'Member');
+
+        // Set session to user 3.
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
         $session->start(self::$userIDs[0], false, false);
 
-        //add user as member to secret group.
-        /** @var \GroupModel $groupModel */
-        $groupModel = static::container()->get('GroupModel');
-        $groupModel->addUser($secretGroupID, self::$userIDs[0], 'Member');
-
-        $secretGroup = $groupModel->getID($secretGroupID, DATASET_TYPE_ARRAY);
-        $groupModel->overridePermissions($secretGroup);
-
         $indexUrl = $this->indexUrl();
-
         $result = $this->api()->get($indexUrl.'/'.$secretDiscussionID);
-
         $this->assertEquals(200, $result->getStatusCode());
+        $requestedDiscussion = $result->getBody();
+        $this->assertEquals($secretDiscussionID, $requestedDiscussion['discussionID']);
     }
 
     /**
@@ -213,7 +212,7 @@ class GroupsDiscussionsTest extends DiscussionsTest {
         $secretGroupID = self::$secretGroups[0]['groupID'];
         $secretDiscussionID = $this->createDiscussion($secretGroupID);
 
-        // Set session to user 2.
+        // Set session to user 4.
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
         $session->start(self::$userIDs[1], false, false);
