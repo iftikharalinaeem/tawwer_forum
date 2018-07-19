@@ -19,17 +19,19 @@
             {layoutWidget class="_panelAndNav-top"}
                 <div class="_pageHeading">
                     <div class="_pageHeading-main">
-                        <button class="_button _button-icon _button-menu _panelAndNav-menu" title="{t c="Menu"}" aria-label="{t c="Menu"}">
-                            <svg class="_icon _button-menuIcon" viewBox="0 0 24 24">
-                                <title>{t c="Menu"}</title>
-                                <rect fill="currentColor" x="3.9" y="11" width="16.1" height="1.9"/>
-                                <rect fill="currentColor" x="3.9" y="5.3" width="16.1" height="1.9"/>
-                                <rect fill="currentColor" x="3.9" y="16.8" width="16.1" height="1.9"/>
-                            </svg>
-                        </button>
-                        <h1 class="_pageTitle">
-                            Integrations
-                        </h1>
+                        <div class="_pageHeading-hamburgerWrapper">
+                            <button class="_button _button-icon _button-menu _panelAndNav-menu" title="{t c="Menu"}" aria-label="{t c="Menu"}">
+                                <svg class="_icon _button-menuIcon" viewBox="0 0 24 24">
+                                    <title>{t c="Menu"}</title>
+                                    <rect fill="currentColor" x="3.9" y="11" width="16.1" height="1.9"/>
+                                    <rect fill="currentColor" x="3.9" y="5.3" width="16.1" height="1.9"/>
+                                    <rect fill="currentColor" x="3.9" y="16.8" width="16.1" height="1.9"/>
+                                </svg>
+                            </button>
+                            <h1 class="_pageTitle">
+                                Integrations
+                            </h1>
+                        </div>
                     </div>
                     <div class="pageHeading-actions">
                         <div class="_dropDown">
@@ -120,14 +122,4 @@
             display: none;
         }
     </style>
-    <script>
-        $("#forDemo ._panelAndNav-menu").on('click', function(){
-            $("#forDemo ._panelAndNav-left").toggleClass('isOpen');
-        });
-
-        $("#forDemo ._panelAndNav-close").on('click', function(){
-            $("#forDemo ._panelAndNav-left").removeClass('isOpen');
-        });
-    </script>
-
 {/block}

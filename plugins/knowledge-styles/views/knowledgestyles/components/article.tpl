@@ -19,17 +19,19 @@
             {layoutWidget class="_panelAndNav-top"}
                 <div class="_pageHeading">
                     <div class="_pageHeading-main">
-                        <button class="_button _button-icon button-menu _panelAndNav-menu" title="{t c="Menu"}" aria-label="{t c="Menu"}">
-                            <svg class="_icon _button-menuIcon" viewBox="0 0 24 24">
-                                <title>{t c="Menu"}</title>
-                                <rect fill="currentColor" x="3.9" y="11" width="16.1" height="1.9"/>
-                                <rect fill="currentColor" x="3.9" y="5.3" width="16.1" height="1.9"/>
-                                <rect fill="currentColor" x="3.9" y="16.8" width="16.1" height="1.9"/>
-                            </svg>
-                        </button>
-                        <h1 class="_pageTitle">
-                            Integrations
-                        </h1>
+                        <div class="_pageHeading-hamburgerWrapper">
+                            <button class="_button _button-icon _button-menu _panelAndNav-menu" title="{t c="Menu"}" aria-label="{t c="Menu"}">
+                                <svg class="_icon _button-menuIcon" viewBox="0 0 24 24">
+                                    <title>{t c="Menu"}</title>
+                                    <rect fill="currentColor" x="3.9" y="11" width="16.1" height="1.9"/>
+                                    <rect fill="currentColor" x="3.9" y="5.3" width="16.1" height="1.9"/>
+                                    <rect fill="currentColor" x="3.9" y="16.8" width="16.1" height="1.9"/>
+                                </svg>
+                            </button>
+                            <h1 class="_pageTitle">
+                                Integrations
+                            </h1>
+                        </div>
                     </div>
                     <div class="pageHeading-actions">
                         <div class="_dropDown">
@@ -45,6 +47,17 @@
                         </div>
                     </div>
                 </div>
+                <div class="_pageMetas _metas">
+                        <span class="_meta _meta-author">
+                            By Todd Burry
+                        </span>
+                    <span class="_meta _meta-author">
+                            Last Updated <time class="_meta-time" datetime="2018-03-03">3 March 2018</time>
+                        </span>
+                    <span class="_meta _meta-id">
+                            ID #1029384756
+                        </span>
+                </div>
             {/layoutWidget}
 
             {layoutWidget class="_panelAndNav-rightTop"}
@@ -52,18 +65,6 @@
             {/layoutWidget}
 
             {layoutWidget class="_panelAndNav-main userContent"}
-                <div class="_pageMetas _metas">
-                    <span class="_meta _meta-author">
-                        By Todd Burry
-                    </span>
-                    <span class="_meta _meta-author">
-                        Last Updated <time class="_meta-time" datetime="2018-03-03">3 March 2018</time>
-                    </span>
-                    <span class="_meta _meta-id">
-                        ID #1029384756
-                    </span>
-                </div>
-
                 {include "article_text.tpl"}
                 {include "article_attachments.tpl"}
                 {include "article_helpful.tpl"}

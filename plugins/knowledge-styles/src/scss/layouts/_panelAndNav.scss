@@ -126,10 +126,6 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
     ._panelAndNav-rightTop {
       display: block;
     }
-
-    ._pageMetas {
-      margin-bottom: $global-gutter_size;
-    }
   }
 
   @include mediaQuery-panelAndNav_oneColumn {
@@ -186,6 +182,7 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
 
   ._button-menu._panelAndNav-menu {
     display: none;
+    margin-right: $utility-baseUnit * 2;
 
     @include mediaQuery-panelAndNav_oneColumn {
       display: block;

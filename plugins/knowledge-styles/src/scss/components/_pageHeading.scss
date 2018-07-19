@@ -13,6 +13,10 @@ $pageHeading-dropdown_width                  : 150px !default;
       bottom: 0;
     }
   }
+
+  + ._pageMetas {
+    margin-top: $utility-baseUnit * 2;
+  }
 }
 
 ._pageHeading-underTitle {
@@ -82,3 +86,7 @@ $pageHeading-dropdown_width                  : 150px !default;
   position: relative;
 }
 
+._pageHeading-hamburgerWrapper {
+  display: flex;
+  align-items: center;
+}

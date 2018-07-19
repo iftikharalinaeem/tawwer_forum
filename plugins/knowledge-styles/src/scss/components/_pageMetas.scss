@@ -1,7 +1,7 @@
-$pageMetas_bottomMargin: $utility-baseUnit * 3;
+$pageMetas_bottomMargin: $utility-baseUnit * 4;
 
 ._pageMetas {
-  margin: {
-    bottom: $pageMetas_bottomMargin;
+  + ._searchResults {
+    margin-top: $pageMetas_bottomMargin;
   }
 }
