@@ -1,6 +1,5 @@
 $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%) !default;
 
-
 ._widget {
   width: 100%;
   background-color: $global-widget_bg;
@@ -14,10 +13,10 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
   }
 
   padding: {
-    top: $widget-top_padding;
-    right: $widget-right_padding;
-    bottom: $widget-bottom_padding;
-    left: $widget-left_padding;
+    top: $global-gutter_quarterSize;
+    right: $global-gutter_quarterSize;
+    bottom: $global-gutter_quarterSize;
+    left: $global-gutter_quarterSize;
   }
 
   + ._widget {

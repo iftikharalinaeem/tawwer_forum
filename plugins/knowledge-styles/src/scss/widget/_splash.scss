@@ -1,5 +1,7 @@
-$splash-topPadding                   : 69px !default;
-$splash-bottomPadding                : $splash-topPadding * .8 !default;
+$splash_topPadding                   : 69px !default;
+$splash_bottomPadding                : $splash_topPadding * .8 !default;
+$splash_rightPadding                 : $widget-body_rightPadding + $global-gutter_quarterSize;
+$splash_leftPadding                  : $widget-body_leftPadding + $global-gutter_quarterSize;
 $splash-fullWidth_bgImage            : none !default;
 $splash-contentWidth_bgImage         : none !default;
 
@@ -54,8 +56,10 @@ $splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
   @include bgCover($splash-contentWidth_bgImage);
   background-color: $splash-inner_bg;
   padding: {
-    top: $splash-topPadding;
-    bottom: $splash-bottomPadding;
+    top: $splash_topPadding;
+    right: $splash_rightPadding;
+    bottom: $splash_bottomPadding;
+    left: $splash_leftPadding;
   }
 }
 

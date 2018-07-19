@@ -34,6 +34,7 @@
 @import "layouts/panelAndNav";
 @import "layouts/columns";
 @import "layouts/flexColumns";
+@import "layouts/section";
 
 @import "components/widgets";
 @import "components/metas";
@@ -64,6 +65,7 @@
 @import "components/breadcrumbs"; // Temporary
 @import "components/radioButtonsAsTabs";
 @import "components/autoComplete";
+@import "components/layoutWidget";
 
 @import "widget/splash";
 @import "widget/searchBar";

@@ -9,19 +9,14 @@
   display: flex;
   align-items: stretch;
   justify-content: space-between;
-
-  padding: {
-    right: $widget-right_padding;
-    left: $widget-left_padding;
-  }
 }
 
 ._column {
   flex-grow: 1;
 
   padding: {
-    right: $widget-right_padding;
-    left: $widget-left_padding;
+    left: $global-gutter_quarterSize;
+    right: $global-gutter_quarterSize;
   }
 
   ._widget {
@@ -51,7 +46,7 @@
 
   @include mediaQuery-columnsThreeCol_breakToOne {
     + ._column {
-      margin-top: $global-gutter_size;
+      margin-top: $global-gutter_halfSize;
     }
   }
 }
