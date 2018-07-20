@@ -32,10 +32,6 @@ $groupModel = new GroupModel();
 if (!empty($groups = $this->data('Invites'))) {
     $groupModel->joinRecentPosts($groups);
     $cssClass = 'group-invites';
-//    $this->EventArguments['layout'] = &$layout;
-//    $this->EventArguments['showMore'] = false;
-//    $this->EventArguments['cssClass'] = &$cssClass;
-//    $this->fireEvent('beforeGroupInvites');
     $list = new GroupListModule($groups, 'invites', t('Group Invites'), '', $cssClass, false, $layout);
     echo $list;
 }
