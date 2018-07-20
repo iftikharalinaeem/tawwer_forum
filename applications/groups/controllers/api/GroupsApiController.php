@@ -1078,6 +1078,65 @@ class GroupsApiController extends AbstractApiController {
     }
 
     /**
+     * Search groups by group name.
+     *
+     * @param array $query
+     * @return array
+     */
+    public function get_search(array $query) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->schema([
+            'name:s' => 'The name of the group.',
+            'sort:s?' => [
+                'enum' => [
+                    'dateInserted', '-dateInserted',
+                    'dateLastComment', '-dateLastComment',
+                    'countMembers', '-countMembers',
+                    'countDiscussions', '-countDiscussions',
+                ],
+            ],
+            'page:i?' => [
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'Desired number of items per page.',
+                'default' => 24,
+                'minimum' => 1,
+                'maximum' => 24,
+            ],
+        ], 'in')->setDescription('Search for a group by name');
+
+        $out = $this->schema([$this->fullGroupSchema()], 'out');
+
+        // Sorting
+        $sortField = '';
+        $sortOrder = 'asc';
+        if (array_key_exists('sort', $query)) {
+            $sortField = ltrim($query['sort'], '-');
+            if (strlen($sortField) !== strlen($query['sort'])) {
+                $sortOrder = 'desc';
+            }
+        }
+
+        $query = $in->validate($query);
+        $groupName = $query['name'];
+        $page = $query['page'];
+        $limit = $query['limit'];
+
+        list($offset, $limit) = offsetLimit("p{$page}", $limit);
+
+        $row = $this->groupModel->searchByName($groupName, $sortField, $sortOrder, $limit, $offset);
+        $result = $out->validate($row);
+
+        $paging = ApiUtils::numberedPagerInfo($this->groupModel->searchTotal($groupName), "/api/v2/groups/search", $query, $in);
+
+        return new Data($result, ['paging' => $paging]);
+    }
+
+    /**
      * Get a group schema with minimal add/edit fields.
      *
      * @return Schema Returns a schema object.
