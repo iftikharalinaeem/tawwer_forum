@@ -36,11 +36,6 @@ $splashSearchBar-icon_color          : mix($global-color_bg, $global-color_fg, 4
 $splashSearchBar-input_fontSize      : $global-subTitle_fontSize !default;
 $splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
 
-//@mixin mediaQuery-splash {
-//  @media (max-width: #{$splash-text_maxWidth + $component-spacing * 2}) {
-//    @content;
-//  }
-//}
 
 ._splash { // All the way to the edges
   @include bgCover($splash-fullWidth_bgImage);
@@ -77,7 +72,6 @@ $splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
   width: $splash-text_maxWidth;
   max-width: 100%;
   margin: auto auto 0;
-  color: $splash_fg;
   text-align: center;
 
   + ._searchBar {

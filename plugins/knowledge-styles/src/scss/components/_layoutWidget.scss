@@ -13,27 +13,6 @@ $layoutWidget_rightPadding      : $global-widgetInner_padding !default;
 $layoutWidget_bottomPadding     : $global-widgetInner_padding !default;
 $layoutWidget_leftPadding       : $global-widgetInner_padding !default;
 
-
-//._layoutWidget,
-//._splash-main,
-//._widget {
-//  background-color: #c0d1ff !important;
-//}
-//
-//._layoutWidget-widget,
-//._widget-contents {
-//  background: pink !important;
-//}
-//
-//._section,
-//._columns {
-//  background: green;
-//}
-//
-//._container {
-//  background-color: yellow;
-//}
-
 ._layoutWidget {
   background-color: $layoutWidget_bg;
   border: {

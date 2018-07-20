@@ -80,10 +80,8 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
 
 
 // Content section
-
 ._panelAndNav-content {
   display: flex;
-  //flex-grow: 1;
   flex-basis: calc(100% - #{$global-panel_width});
   max-width: calc(100% - #{$global-panel_width});
 
@@ -106,13 +104,6 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
   max-width: calc(100% - #{$global-panel_width});
   background-color: $panelAndNav-middlePanel_bg;
 
-  //padding: {
-  //  top: $global-gutter_quarterSize;
-  //  right: $global-gutter_quarterSize;
-  //  bottom: $global-gutter_quarterSize;
-  //  left: $global-gutter_quarterSize;
-  //}
-
   ._panelAndNav-rightTop,
   ._panelAndNav-leftTop {
     display: none;
@@ -131,28 +122,15 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
   @include mediaQuery-panelAndNav_oneColumn {
     ._panelAndNav-leftTop {
       display: block;
-      //margin-top: $global-panelGutter_width;
     }
   }
 }
 
-._panelAndNav-top {
-  //margin-bottom: $global-panelGutter_width;
-}
-
 // Right Column
-
 ._panelAndNav-right {
   width: $global-panel_width;
   flex-basis: $global-panel_width;
   background-color: $panelAndNav-rightPanel_bg;
-
-  //padding: {
-  //  top: $global-gutter_quarterSize;
-  //  right: $global-gutter_quarterSize;
-  //  bottom: $global-gutter_quarterSize;
-  //  left: $global-gutter_quarterSize;
-  //}
 
   &:empty {
     display: none;
@@ -160,7 +138,6 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
 
   @include mediaQuery-panelAndNav_twoColumn {
     width: 100%;
-    //margin-top: $global-gutter_halfSize;
     margin-left: 0;
     flex-grow: 1;
 

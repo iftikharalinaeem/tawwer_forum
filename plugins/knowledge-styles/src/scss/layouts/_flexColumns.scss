@@ -5,7 +5,6 @@
   }
 }
 
-
 @mixin mediaQuery-flexColumnsThreeCol_breakToTwo {
   @media (max-width: #{$flexColumns-threeColumns_breakToTwo}) {
     @content;
