@@ -9,14 +9,16 @@
     </style>
 <?php endif; ?>
 <script>
+    // Inject Firebase generated buttons into the page.
     var useFirebaseUI = "<?php echo $sender->data('UseFirebaseUI') ?>";
-    var autoDetectFirebaseUser = "<?php echo $sender->data('autoDetectFirebaseUser') ?>";
+    // Initiate Firebase JS to detect if a user is logged in on a Firebase App,
+    // not necessarily using Firebase generated buttons to connect.
+    var autoDetectFirebaseUser = "<?php echo $sender->data('AutoDetectFirebaseUser') ?>";
 
-    function initFirebaseDetection () {
+    function initFirebaseDetection() {
         var targetUrl = "<?php echo Gdn::request()->get('Target') ?>";
         var debug = "<?php echo $sender->data('DebugJavascript') ?>";
 
-        console.log('debug: '+ debug);
         if (debug) {
             console.debug('useFirebaseUI', useFirebaseUI);
         }
@@ -25,10 +27,14 @@
             apiKey: "<?php echo $sender->data('APIKey') ?>",
             authDomain: "<?php echo $sender->data('AuthDomain') ?>"
         };
-            console.log('There are no apps, initializing the App');
-        firebase.initializeApp(config);
 
-        firebase.auth().onAuthStateChanged(function (user) {
+        var fireBaseApp = firebase.initializeApp(config);
+
+        fireBaseApp.auth().onAuthStateChanged(function (user) {
+            if (debug) {
+                console.debug('user', user);
+            }
+
             if (user && !gdn.getMeta('SignedIn')) {
                 if (debug) {
                     console.debug('User Detected: '+user.displayName);
@@ -100,8 +106,37 @@
     }
 
     $(function (){
-        if (useFirebaseUI || autoDetectFirebaseUser) {
+        var debug = "<?php echo $sender->data('DebugJavascript') ?>";
+
+        if (autoDetectFirebaseUser || useFirebaseUI) {
             initFirebaseDetection();
         }
+
+        $('.link-signout').on('click', function() {
+            var logoutURL = '';
+            if ($(this).attr('href')) {
+                logoutURL = $(this).attr('href');
+            } else {
+                logoutURL = $(this).children('a').attr('href');
+            }
+
+            // Initialize Firebase
+            var config = {
+                apiKey: "<?php echo $sender->data('APIKey') ?>",
+                authDomain: "<?php echo $sender->data('AuthDomain') ?>"
+            };
+            var fireBaseApp = firebase.initializeApp(config);
+            fireBaseApp.auth().signOut().then(function() {
+                if (debug) {
+                    console.debug('Signing out redirecting to '+logoutURL);
+                }
+                window.location = logoutURL;
+            }).catch(function(error) {
+                // An error happened.
+                if (debug) {
+                    console.debug('Signing out failed', error);
+                }
+            });
+        });
     })
 </script>

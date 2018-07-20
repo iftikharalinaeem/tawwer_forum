@@ -42,11 +42,6 @@ class FireBasePlugin extends Gdn_OAuth2 {
             return;
         }
 
-        // Don't bother if the user is already logged in.
-        if (Gdn::session()->isValid()) {
-            return;
-        }
-
         // Include the javascript only in the head.
         if (val('AssetName', $args) !== 'Head') {
             return;
@@ -63,20 +58,31 @@ class FireBasePlugin extends Gdn_OAuth2 {
         }
 
         $provider = $this->provider();
-        // Don't bother if there are not Firebase Auth Providers configured.
         $configuredAuthProviders = $this->configuredProviders($provider);
-        if (!$configuredAuthProviders) {
-            return;
+        $useFirebaseUI = false;
+        $autoDetectFirebasUser = false;
+
+        // If the user is not logged in, FirebaseUI is configured, set UseFirebaseUI to true.
+        if (!Gdn::session()->isValid() && val('UseFirebaseUI', $provider) && $configuredAuthProviders) {
+            $useFirebaseUI = true;
         }
 
-        $authProvidersConfigured = [];
-        foreach ($configuredAuthProviders as $authProvider) {
-            $authProvidersConfigured[] = 'firebase.auth.'.$authProvider.'.PROVIDER_ID';
+        if (!Gdn::session()->isValid() && !$configuredAuthProviders) {
+            $autoDetectFirebasUser = true;
+        }
+
+        // Create the configuration providers for FirebaseUI interface.
+        if ($configuredAuthProviders) {
+            $authProvidersConfigured = [];
+            foreach ($configuredAuthProviders as $authProvider) {
+                $authProvidersConfigured[] = 'firebase.auth.'.$authProvider.'.PROVIDER_ID';
+            }
         }
 
         $sender->setData('APIKey', val('AssociationKey', $provider));
         $sender->setData('AuthDomain', val('AuthenticateUrl', $provider));
-        $sender->setData('UseFirebaseUI', val('UseFirebaseUI', $provider));
+        $sender->setData('UseFirebaseUI', $useFirebaseUI);
+        $sender->setData('AutoDetectFirebaseUser', $autoDetectFirebasUser);
         $sender->setData('FirebaseAuthProviders', implode(",\n", $authProvidersConfigured));
         $sender->setData('TermsUrl', val('TermsUrl', $provider));
         $sender->setData('DebugJavascript', c('Vanilla.SSO.Debug'));
@@ -275,8 +281,10 @@ if (!function_exists('signInUrl')) {
     function signInUrl($target = '', $force = false) {
         $firebase = new FireBasePlugin();
         // Check to see if there is even a sign in button.
-        if ($firebase->isConfigured() && $firebase->isDefault()) {
-            $provider = $firebase->provider();
+        $provider = $firebase->provider();
+        $configuredAuthProviders = $firebase->configuredProviders($provider);
+        $isConfiguredForFirebaseUI = ($firebase->isConfigured($provider) && val('UseFirebaseUI', $provider) && $configuredAuthProviders);
+        if ($isConfiguredForFirebaseUI) {
             return '/vanilla/firebasesignin'.($target ? '?Target='.urlencode($target) : '');
         }
         return '/entry/signin'.($target ? '?Target='.urlencode($target) : '');
