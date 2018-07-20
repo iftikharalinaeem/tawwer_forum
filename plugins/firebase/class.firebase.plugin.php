@@ -33,8 +33,8 @@ class FireBasePlugin extends Gdn_OAuth2 {
     /**
      * Inject the Javascript and CSS files into the head to listen for and handle logged in users.
      *
-     * @param VanillaController $sender
-     * @param VanillaController $args
+     * @param Gdn_Controller $sender
+     * @param Gdn_Controller $args
      * @throws Exception
      */
     public function base_afterRenderAsset_handler($sender, $args) {
@@ -84,6 +84,12 @@ class FireBasePlugin extends Gdn_OAuth2 {
         include $sender->fetchViewLocation('firebase-js', '', 'plugins/firebase');
    }
 
+    /**
+     * Create a dedicated page for signing in with Firebase.
+     *
+     * @param VanillaController $sender
+     * @param VanillaController $args
+     */
    public function vanillaController_firebasesignin_create($sender, $args) {
         $sender->render('firebasesignin', '', 'plugins/firebase');
    }
@@ -91,8 +97,8 @@ class FireBasePlugin extends Gdn_OAuth2 {
     /**
      * Inject a container into page for the Firebase SDK to print out buttons, etc.
      *
-     * @param VanillaController $sender
-     * @param VanillaController $args
+     * @param Gdn_Controller $sender
+     * @param Gdn_Controller $args
      * @return string An HTML element to receive Firebase UI interface.
      */
     public function base_afterSignInButton_handler($sender, $args) {
