@@ -4,8 +4,6 @@ $newArticle-button_borderRadius: $newArticle-button_height !default;
 $newArticle-button_fontSize: $global-small_fontSize !default;
 $newArticle-button_minWidth: $global-button_minWidth !default;
 
-
-
 ._button._button-newArticle {
   @include buttonSizing($newArticle-button_height, $newArticle-button_minWidth, $newArticle-button_fontSize, 2px);
   border-radius: $newArticle-button_borderRadius;

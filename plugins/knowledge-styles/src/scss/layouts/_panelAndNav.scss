@@ -1,10 +1,13 @@
 $panelAndNav-twoColumn_breakpoint                    : $global-main_paddedWidth !default;
 $panelAndNav-oneColumn_breakpoint                    : $global-twoColumn_breakpoint !default;
-$panelAndNav-gutterMinusPadding_width                : $global-panelGutter_width - $widget-right_padding - $widget-left_padding !default;
 $panelAndNav_bg                                      : $global-color_bg;
 $panelAndNav-rightPanel_bg                           : $panelAndNav_bg;
 $panelAndNav-middlePanel_bg                          : $panelAndNav_bg;
 $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
+$panelAndNav-panel_topPadding                        : $global-widgetInner_padding !default;
+$panelAndNav-panel_rightPadding                      : $global-widgetInner_padding !default;
+$panelAndNav-panel_bottomPadding                     : $global-widgetInner_padding !default;
+$panelAndNav-panel_leftPadding                       : $global-widgetInner_padding !default;
 
 @mixin mediaQuery-panelAndNav_twoColumn {
   @media (max-width: #{$panelAndNav-twoColumn_breakpoint}) {
@@ -34,7 +37,6 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
   }
 }
 
-
 // Left Section
 ._panelAndNav-left {
   position: relative;
@@ -42,13 +44,6 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
   flex-basis: $global-panel_width;
   z-index: 2;
   background-color: $panelAndNav-rightPanel_bg;
-
-  padding: {
-    top: $widget-top_padding;
-    right: $widget-right_padding;
-    bottom: $widget-bottom_padding;
-    left: $widget-left_padding;
-  }
 
   @include mediaQuery-panelAndNav_oneColumn {
     position: absolute;
@@ -79,18 +74,16 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
 }
 
 ._panelAndNav-leftTop {
-  margin-bottom: $global-panelGutter_width;
+  margin-bottom: $global-gutter_halfSize;
   position: relative;
 }
 
-// Content section
 
+// Content section
 ._panelAndNav-content {
   display: flex;
-  //flex-grow: 1;
   flex-basis: calc(100% - #{$global-panel_width});
   max-width: calc(100% - #{$global-panel_width});
-  padding-left: $panelAndNav-gutterMinusPadding_width;
 
   @include mediaQuery-panelAndNav_twoColumn {
     flex-wrap: wrap;
@@ -111,13 +104,6 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
   max-width: calc(100% - #{$global-panel_width});
   background-color: $panelAndNav-middlePanel_bg;
 
-  padding: {
-    top: $widget-top_padding;
-    right: $widget-right_padding;
-    bottom: $widget-bottom_padding;
-    left: $widget-left_padding;
-  }
-
   ._panelAndNav-rightTop,
   ._panelAndNav-leftTop {
     display: none;
@@ -130,40 +116,21 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
 
     ._panelAndNav-rightTop {
       display: block;
-      margin-bottom: $global-gutter_size;
-    }
-
-    ._pageMetas {
-      margin-bottom: $global-gutter_size;
     }
   }
 
   @include mediaQuery-panelAndNav_oneColumn {
     ._panelAndNav-leftTop {
       display: block;
-      margin-top: $global-panelGutter_width;
     }
   }
 }
 
-._panelAndNav-top {
-  margin-bottom: $global-panelGutter_width;
-}
-
 // Right Column
-
 ._panelAndNav-right {
   width: $global-panel_width;
   flex-basis: $global-panel_width;
-  margin-left: $panelAndNav-gutterMinusPadding_width;
   background-color: $panelAndNav-rightPanel_bg;
-
-  padding: {
-    top: $widget-top_padding;
-    right: $widget-right_padding;
-    bottom: $widget-bottom_padding;
-    left: $widget-left_padding;
-  }
 
   &:empty {
     display: none;
@@ -171,7 +138,6 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
 
   @include mediaQuery-panelAndNav_twoColumn {
     width: 100%;
-    margin-top: $global-panelGutter_width;
     margin-left: 0;
     flex-grow: 1;
 
@@ -182,7 +148,7 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
 }
 
 ._panelAndNav-rightTop {
-  margin-bottom: $global-panelGutter_width;
+  margin-bottom: $global-gutter_halfSize;
 }
 
 ._pageContents {
@@ -193,6 +159,7 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
 
   ._button-menu._panelAndNav-menu {
     display: none;
+    margin-right: $utility-baseUnit * 2;
 
     @include mediaQuery-panelAndNav_oneColumn {
       display: block;
@@ -200,7 +167,7 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
   }
 
   ._button._button-close._panelAndNav-close {
-    @include absolute-topRight($widget-top_padding, $widget-right_padding);
+    @include absolute-topRight($global-widgetInner_padding, $global-widgetInner_padding);
     display: none;
     z-index: 1;
 
@@ -210,39 +177,21 @@ $panelAndNav-leftPanel_bg                            : $panelAndNav_bg;
   }
 }
 
-._panelAndNav-block {
-  padding: {
-    top: $widget-top_padding;
-    right: $widget-right_padding;
-    bottom: $widget-bottom_padding;
-    left: $widget-left_padding;
-  }
-
-  &:empty {
-    display: none;
-  }
-}
-
 @include mediaQuery-panelAndNav_oneColumn {
-  ._panelAndNav-leftColumn {
-    padding: {
-      top: $global-gutter_halfSize;
-      right: $global-gutter_halfSize;
-      bottom: $global-gutter_halfSize;
-      left: $global-gutter_halfSize;
-    }
+  ._panelAndNav-sticky {
+    position: relative;
+    top: auto;
+    left: auto;
+    bottom: auto;
   }
 }
 
-
-//// For testing:
-//._panelAndNav-middle,
-//._panelAndNav-right,
-//._panelAndNav-left {
-//  background-color: rgba(red, .2);
-//}
-//
-//._panelAndNav-block {
-//  background-color: rgba(blue, .2);
-//}
-
+._panelAndNav-sticky {
+  position: sticky;
+  width: 100%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  max-height: 100%;
+  overflow: auto;
+}

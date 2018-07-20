@@ -1,5 +1,7 @@
-$splash-topPadding                   : 69px !default;
-$splash-bottomPadding                : $splash-topPadding * .8 !default;
+$splash_topPadding                   : 69px !default;
+$splash_bottomPadding                : $splash_topPadding * .8 !default;
+$splash_rightPadding                 : $widget-body_rightPadding + $global-gutter_quarterSize;
+$splash_leftPadding                  : $widget-body_leftPadding + $global-gutter_quarterSize;
 $splash-fullWidth_bgImage            : none !default;
 $splash-contentWidth_bgImage         : none !default;
 
@@ -34,11 +36,6 @@ $splashSearchBar-icon_color          : mix($global-color_bg, $global-color_fg, 4
 $splashSearchBar-input_fontSize      : $global-subTitle_fontSize !default;
 $splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
 
-//@mixin mediaQuery-splash {
-//  @media (max-width: #{$splash-text_maxWidth + $component-spacing * 2}) {
-//    @content;
-//  }
-//}
 
 ._splash { // All the way to the edges
   @include bgCover($splash-fullWidth_bgImage);
@@ -54,8 +51,10 @@ $splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
   @include bgCover($splash-contentWidth_bgImage);
   background-color: $splash-inner_bg;
   padding: {
-    top: $splash-topPadding;
-    bottom: $splash-bottomPadding;
+    top: $splash_topPadding;
+    right: $splash_rightPadding;
+    bottom: $splash_bottomPadding;
+    left: $splash_leftPadding;
   }
 }
 
@@ -73,7 +72,6 @@ $splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
   width: $splash-text_maxWidth;
   max-width: 100%;
   margin: auto auto 0;
-  color: $splash_fg;
   text-align: center;
 
   + ._searchBar {

@@ -1,0 +1,44 @@
+// Wrap around content that goes in a non full width layout. These may or may not have spacing between them or backgrounds
+// Similar to "_widget" for full width pages, but for pages with panel layouts.
+
+$layoutWidget_bg                : transparent !default;
+$layoutWidget_borderRadius      : 0;
+$layoutWidget_borderColor       : transparent;
+$layoutWidget_borderWidth       : 0;
+$layoutWidget_borderStyle       : solid;
+$layoutWidget_gap               : $global-widget_gap;
+
+$layoutWidget_topPadding        : $global-widgetInner_padding !default;
+$layoutWidget_rightPadding      : $global-widgetInner_padding !default;
+$layoutWidget_bottomPadding     : $global-widgetInner_padding !default;
+$layoutWidget_leftPadding       : $global-widgetInner_padding !default;
+
+._layoutWidget {
+  background-color: $layoutWidget_bg;
+  border: {
+    radius: $layoutWidget_borderRadius;
+    color: $layoutWidget_borderColor;
+    width: $layoutWidget_borderWidth;
+    style: $layoutWidget_borderStyle;
+  }
+  padding: {
+    top: $layoutWidget_topPadding;
+    right: $layoutWidget_rightPadding;
+    bottom: $layoutWidget_bottomPadding;
+    left: $layoutWidget_leftPadding;
+  }
+
+  + ._layoutWidget {
+    margin-top: $layoutWidget_gap;
+  }
+}
+
+._layoutWidget-widget {
+  position: relative;
+  padding: {
+    top: $layoutWidget_topPadding;
+    right: $layoutWidget_rightPadding;
+    bottom: $layoutWidget_bottomPadding;
+    left: $layoutWidget_leftPadding;
+  }
+}

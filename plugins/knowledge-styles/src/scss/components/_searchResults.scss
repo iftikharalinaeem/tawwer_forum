@@ -46,10 +46,6 @@ $searchResult_breakPoint                      : 800px;
     style: solid;
   }
 
-  ._searchResult-metas {
-    margin-bottom: $utility-baseUnit;
-  }
-
   &:hover {
     background-color: $searchResult_hover_bg;
   }
@@ -139,7 +135,10 @@ $searchResult_breakPoint                      : 800px;
 
 
 ._searchResult-excerpt {
-  margin-bottom: $utility-baseUnit;
+  margin: {
+    top: $utility-baseUnit;
+    bottom: $utility-baseUnit;
+  }
   color: $searchResult-excerpt_color;
 }
 
@@ -189,7 +188,6 @@ $searchResult_breakPoint                      : 800px;
 ._searchResult-mediaPreviewImage {
   position: absolute;
   top: 0;
-  bottom: 0;
   left: auto;
   right: 0;
   margin: auto;
@@ -207,4 +205,6 @@ $searchResult_breakPoint                      : 800px;
     right: auto;
   }
 }
+
+
 

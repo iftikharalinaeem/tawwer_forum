@@ -9,12 +9,16 @@
         </button>
 
         {* Hidden in 1 or 2 column media queries *}
-        <div class="_panelAndNav-block _panelAndNav-leftTop">{block name="topLeft"}{/block}</div>
-        <div class="_panelAndNav-block _panelAndNav-leftBottom">{block name="bottomLeft"}{/block}</div>
+        {layoutWidget class="_panelAndNav-leftTop"}
+            {block name="topLeft"}{/block}
+        {/layoutWidget}
+        {layoutWidget class="_panelAndNav-leftBottom"}
+            {block name="bottomLeft"}{/block}
+        {/layoutWidget}
     </div>
     <div class="_panelAndNav-content">
         <div class="_panelAndNav-middle">
-            <div class="_panelAndNav-block _panelAndNav-top">
+            {layoutWidget class="_panelAndNav-top"}
                 {* Visible in 1 column media query *}
                 <button class="_button _button-icon button-menu _panelAndNav-menu" title="{t c="Menu"}" aria-label="{t c="Menu"}">
                     <svg class="_icon _button-menuIcon" viewBox="0 0 24 24">
@@ -25,14 +29,15 @@
                     </svg>
                 </button>
                 {block name="top"}{/block}
-            </div>
-
+            {/layoutWidget}
             {* Displayed in 1 or 2 column media queries *}
-            <div class="_panelAndNav-block _panelAndNav-leftTop">{block name="topLeft"}{/block}</div>
-
-            <div class="_panelAndNav-block _panelAndNav-main">{block name="main"}{/block}</div>
+            {layoutWidget class="_panelAndNav-leftTop"}
+                {block name="topLeft"}{/block}
+            {/layoutWidget}
+            {layoutWidget class="_panelAndNav-main"}
+                {block name="main"}{/block}
+            {/layoutWidget}
         </div>
-
     </div>
 </div>
 
