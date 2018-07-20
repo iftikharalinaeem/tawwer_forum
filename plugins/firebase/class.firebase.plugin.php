@@ -77,7 +77,7 @@ class FireBasePlugin extends Gdn_OAuth2 {
         $sender->setData('APIKey', val('AssociationKey', $provider));
         $sender->setData('AuthDomain', val('AuthenticateUrl', $provider));
         $sender->setData('UseFirebaseUI', $useFirebaseUI);
-        $sender->setData('AutoDetectFirebaseUser', c('FirebaseSSO.AutoDetectFirebaseUser', true));
+        $sender->setData('AutoDetectFirebaseUser', c('Firebase.AutoDetectFirebaseUser', true));
         $sender->setData('FirebaseAuthProviders', implode(",\n", $authProvidersConfigured));
         $sender->setData('TermsUrl', val('TermsUrl', $provider));
         $sender->setData('DebugJavascript', c('Vanilla.SSO.Debug'));
