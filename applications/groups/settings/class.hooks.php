@@ -934,7 +934,7 @@ class GroupsHooks extends Gdn_Plugin {
         }
         $discussionModel = new DiscussionModel();
         $discussion = $discussionModel->getID($id, DATASET_TYPE_ARRAY);
-        if(!empty($discussion['GroupID'])) {
+        if (!empty($discussion['GroupID'])) {
             $groupModel = new GroupModel();
             $group = $groupModel->getID($discussion['GroupID']);
             $groupModel->overridePermissions($group);

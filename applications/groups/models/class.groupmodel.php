@@ -15,7 +15,7 @@ class GroupModel extends Gdn_Model {
     /** @var int The number of members per page. */
     public $MemberPageSize = 30;
 
-    /** @var array The permissions associated with a group*/
+    /** @var array The permissions associated with a group. */
     private static $permissions = [];
 
     /**
@@ -285,8 +285,8 @@ class GroupModel extends Gdn_Model {
     /**
      * Reset the cached grouped permissions.
      */
-    public function resetPermissions(){
-        self::$permissions =[];
+    public function resetCachedPermissions(){
+        self::$permissions = [];
     }
 
     /**

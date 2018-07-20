@@ -60,7 +60,7 @@ class GroupsDiscussionsTest extends DiscussionsTest {
             ]);
         }
         // Create secret groups
-        foreach ([1, 2] as $i) {
+        for ($i = 1; $i <= 2; $i++) {
             $groupTxt = uniqid(__CLASS__." $i ");
             self::$secretGroups[] = $groupsAPIController->post([
                 'name' => $groupTxt,
@@ -163,21 +163,6 @@ class GroupsDiscussionsTest extends DiscussionsTest {
     }
 
     /**
-     * Test /discussion/:id endpoint.
-     */
-    public function testGetDiscussionID() {
-        /** @var \DiscussionModel $discussionModel */
-        $discussionModel = static::container()->get('DiscussionModel');
-        $discussion = $discussionModel->getWhere(['GroupID' => self::$groups[0]['groupID']])->firstRow(DATASET_TYPE_ARRAY);
-        $discussionID = $discussion['DiscussionID'];
-        $indexUrl = $this->indexUrl();
-        $result = $this->api()->get($indexUrl.'/'.$discussionID);
-        $this->assertEquals(200, $result->getStatusCode());
-        $requestedDiscussion = $result->getBody();
-        $this->assertEquals($discussionID, $requestedDiscussion['discussionID']);
-    }
-
-    /**
      * Test /discussion/:id endpoint with a secret group.
      */
     public function testSecretGroupDiscussionID() {
@@ -187,7 +172,7 @@ class GroupsDiscussionsTest extends DiscussionsTest {
         //add user as member to secret group.
         /** @var \GroupModel $groupModel */
         $groupModel = static::container()->get('GroupModel');
-        $groupModel->resetPermissions();
+        $groupModel->resetCachedPermissions();
         $groupModel->addUser($secretGroupID, self::$userIDs[0], 'Member');
 
         // Set session to user 3.
@@ -216,11 +201,6 @@ class GroupsDiscussionsTest extends DiscussionsTest {
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
         $session->start(self::$userIDs[1], false, false);
-
-        /** @var \GroupModel $groupModel */
-        $groupModel = static::container()->get('GroupModel');
-        $secretGroup = $groupModel->getID($secretGroupID, DATASET_TYPE_ARRAY);
-        $groupModel->overridePermissions($secretGroup);
 
         $indexUrl = $this->indexUrl();
         $this->api()->get($indexUrl.'/'.$secretDiscussionID);
