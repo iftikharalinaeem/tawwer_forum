@@ -22,6 +22,7 @@ See [Firebase UI](https://github.com/firebase/FirebaseUI) and [Firebase Web](htt
 - **Configs set or added:**
     - The log in buttons are hidden using CSS in the firebase-ui view whenever the Firebase UI constrols are present.
     - `Vanilla.SSO.Debug` is used to log data to the EventLog and to log javascript to the browser console. 
+    - `Firebase.AutoDetectFirebaseUser` is a flag to tell Firebase to always be listening for visitors who arrive authenticated by the configured Firebase app. Defaults to true. Can be turned off by other plugins that will initiate their own detection. This avoids conflict in the javascript.
 - **Events used:**
 	- `afterRenderAsset`: Inject Javascript and CSS from Firebase  and Firebase UI to create an interface for users to log in and detect if visitors are logged in.
 	- `afterSignInButton`: Inject an HTML element to recieve the UI elements from Firebase.
