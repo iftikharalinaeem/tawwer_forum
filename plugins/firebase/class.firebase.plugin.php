@@ -60,15 +60,10 @@ class FireBasePlugin extends Gdn_OAuth2 {
         $provider = $this->provider();
         $configuredAuthProviders = $this->configuredProviders($provider);
         $useFirebaseUI = false;
-        $autoDetectFirebasUser = false;
 
         // If the user is not logged in, FirebaseUI is configured, set UseFirebaseUI to true.
         if (!Gdn::session()->isValid() && val('UseFirebaseUI', $provider) && $configuredAuthProviders) {
             $useFirebaseUI = true;
-        }
-
-        if (!Gdn::session()->isValid() && !$configuredAuthProviders) {
-            $autoDetectFirebasUser = true;
         }
 
         // Create the configuration providers for FirebaseUI interface.
@@ -82,7 +77,7 @@ class FireBasePlugin extends Gdn_OAuth2 {
         $sender->setData('APIKey', val('AssociationKey', $provider));
         $sender->setData('AuthDomain', val('AuthenticateUrl', $provider));
         $sender->setData('UseFirebaseUI', $useFirebaseUI);
-        $sender->setData('AutoDetectFirebaseUser', $autoDetectFirebasUser);
+        $sender->setData('AutoDetectFirebaseUser', c('FirebaseSSO.AutoDetectFirebaseUser', true));
         $sender->setData('FirebaseAuthProviders', implode(",\n", $authProvidersConfigured));
         $sender->setData('TermsUrl', val('TermsUrl', $provider));
         $sender->setData('DebugJavascript', c('Vanilla.SSO.Debug'));
