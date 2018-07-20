@@ -1,3 +1,6 @@
+import { IPasswordState, IAuthenticatorState, IRequestPasswordState } from "@dashboard/@types/state";
+import { LoadStatus, IUserAuthenticator } from "@dashboard/@types/api";
+
 /**
  * Authenticate components stub data.
  *
@@ -6,7 +9,7 @@
  */
 
 // SSO Methods
-export const ssoMethodsData1 = [
+export const ssoMethodsData1: IUserAuthenticator[] = [
     {
         authenticatorID: "facebook",
         type: "facebook",
@@ -15,7 +18,7 @@ export const ssoMethodsData1 = [
         ui: {
             url: "#",
             buttonName: "Sign in with Facebook",
-            photoUrl: "https://dev.vanilla.localhost/applications/dashboard/design/images/authenticators/facebook.svg",
+            photoUrl: "/applications/dashboard/design/images/authenticators/facebook.svg",
             backgroundColor: "#4A70BD",
             foregroundColor: "#fff",
         },
@@ -28,7 +31,7 @@ export const ssoMethodsData1 = [
         ui: {
             url: "#",
             buttonName: "Sign in with Google",
-            photoUrl: "https://dev.vanilla.localhost/applications/dashboard/design/images/authenticators/google.svg",
+            photoUrl: "/applications/dashboard/design/images/authenticators/google.svg",
             backgroundColor: "#fff",
             foregroundColor: "#000",
         },
@@ -41,7 +44,7 @@ export const ssoMethodsData1 = [
         ui: {
             url: "#",
             buttonName: "Sign in with Twitter",
-            photoUrl: "https://dev.vanilla.localhost/applications/dashboard/design/images/authenticators/twitter.svg",
+            photoUrl: "/applications/dashboard/design/images/authenticators/twitter.svg",
             backgroundColor: "#1DA1F2",
             foregroundColor: "#fff",
         },
@@ -54,7 +57,7 @@ export const ssoMethodsData1 = [
         ui: {
             url: "#",
             buttonName: "Sign in with Disqus",
-            photoUrl: "https://dev.vanilla.localhost/applications/dashboard/design/images/authenticators/disqus.svg",
+            photoUrl: "/applications/dashboard/design/images/authenticators/disqus.svg",
             backgroundColor: "#35A9FF",
             foregroundColor: "#fff",
         },
@@ -67,7 +70,7 @@ export const ssoMethodsData1 = [
         ui: {
             url: "#",
             buttonName: "Sign in with Github",
-            photoUrl: "https://dev.vanilla.localhost/applications/dashboard/design/images/authenticators/github.svg",
+            photoUrl: "/applications/dashboard/design/images/authenticators/github.svg",
             backgroundColor: "#fff",
             foregroundColor: "#000",
         },
@@ -80,7 +83,7 @@ export const ssoMethodsData1 = [
         ui: {
             url: "#",
             buttonName: "Sign in with LinkedIn",
-            photoUrl: "https://dev.vanilla.localhost/applications/dashboard/design/images/authenticators/linkedin.svg",
+            photoUrl: "/applications/dashboard/design/images/authenticators/linkedin.svg",
             backgroundColor: "#0077B5",
             foregroundColor: "#fff",
         },
@@ -93,7 +96,7 @@ export const ssoMethodsData1 = [
         ui: {
             url: "#",
             buttonName: "Sign in with Microsoft",
-            photoUrl: "https://dev.vanilla.localhost/applications/dashboard/design/images/authenticators/microsoft.svg",
+            photoUrl: "/applications/dashboard/design/images/authenticators/microsoft.svg",
             backgroundColor: "#fff",
             foregroundColor: "#000",
         },
@@ -106,7 +109,7 @@ export const ssoMethodsData1 = [
         ui: {
             url: "#",
             buttonName: "Sign in with OpenID",
-            photoUrl: "https://dev.vanilla.localhost/applications/dashboard/design/images/authenticators/openid.svg",
+            photoUrl: "/applications/dashboard/design/images/authenticators/openid.svg",
             backgroundColor: "#F8941C",
             foregroundColor: "#fff",
         },
@@ -119,7 +122,7 @@ export const ssoMethodsData1 = [
         ui: {
             url: "#",
             buttonName: "Sign in with Yahoo",
-            photoUrl: "https://dev.vanilla.localhost/applications/dashboard/design/images/authenticators/yahoo.svg",
+            photoUrl: "/applications/dashboard/design/images/authenticators/yahoo.svg",
             backgroundColor: "#40008F",
             foregroundColor: "#fff",
         },
@@ -132,7 +135,7 @@ export const ssoMethodsData1 = [
         ui: {
             url: "#",
             buttonName: "Fallback Styles",
-            photoUrl: "https://dev.vanilla.localhost/applications/dashboard/design/images/authenticators/sign_in.svg",
+            photoUrl: "/applications/dashboard/design/images/authenticators/sign_in.svg",
             backgroundColor: "#0291db",
             foregroundColor: "#fff",
         },
@@ -140,80 +143,100 @@ export const ssoMethodsData1 = [
 ];
 
 // Plausible Errors
-export const passwordFormPlausibleErrors = {
-    globalError: "Global error message.",
-    passwordErrors: [
-        {
-            field: "password",
-            code: "missingField",
-            message: "password is required.",
+export const passwordFormPlausibleErrors: IPasswordState = {
+    status: LoadStatus.ERROR,
+    error: {
+        message: "Global error message.",
+        status: 404,
+        errors: {
+            password: [
+                {
+                    field: "password",
+                    code: "missingField",
+                    message: "password is required.",
+                    status: 403,
+                },
+            ],
+            username: [
+                {
+                    field: "username",
+                    code: "missingField",
+                    message: "username is required.",
+                    status: 403,
+                },
+            ],
         },
-    ],
-    usernameErrors: [
-        {
-            field: "username",
-            code: "missingField",
-            message: "username is required.",
-        },
-    ],
+    },
 };
 
 // Extreme Example for styling
-export const passwordFormExtremeTest = {
-    globalError:
-        "Global error message - This is a long message, with some reallllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllly long words",
-    passwordErrors: [
-        {
-            field: "password",
-            code: "missingField",
-            message: "password is required.",
+export const passwordFormExtremeTest: IPasswordState = {
+    status: LoadStatus.ERROR,
+    error: {
+        message:
+            "Global error message - This is a long message, with some reallllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllly long words",
+        status: 404,
+        errors: {
+            password: [
+                {
+                    field: "password",
+                    code: "missingField",
+                    message: "password is required.",
+                },
+                {
+                    field: "password",
+                    code: "missingField",
+                    message:
+                        "ReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpaces",
+                },
+                {
+                    field: "password",
+                    code: "missingField",
+                    message: "Testing Multiple Errors 1",
+                },
+                {
+                    field: "password",
+                    code: "missingField",
+                    message:
+                        "Testing Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2Testing Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2",
+                },
+            ],
+            username: [
+                {
+                    field: "username",
+                    code: "missingField",
+                    message: "username is required.",
+                },
+                {
+                    field: "username",
+                    code: "missingField",
+                    message:
+                        "ReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpaces",
+                },
+                {
+                    field: "username",
+                    code: "missingField",
+                    message: "Testing Multiple Errors 1",
+                },
+                {
+                    field: "username",
+                    code: "missingField",
+                    message:
+                        "Testing Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2Testing Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2",
+                },
+            ],
         },
-        {
-            field: "password",
-            code: "missingField",
-            message:
-                "ReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpaces",
-        },
-        {
-            field: "password",
-            code: "missingField",
-            message: "Testing Multiple Errors 1",
-        },
-        {
-            field: "password",
-            code: "missingField",
-            message:
-                "Testing Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2Testing Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2",
-        },
-    ],
-    usernameErrors: [
-        {
-            field: "username",
-            code: "missingField",
-            message: "username is required.",
-        },
-        {
-            field: "username",
-            code: "missingField",
-            message:
-                "ReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpacesReallyLongTextWithoutAnySpaces",
-        },
-        {
-            field: "username",
-            code: "missingField",
-            message: "Testing Multiple Errors 1",
-        },
-        {
-            field: "username",
-            code: "missingField",
-            message:
-                "Testing Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2Testing Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2sting Multiple Errors 2",
-        },
-    ],
+    },
 };
 
 // Recover Password Tests
-export const recoverPasswordErrors = {
-    globalError: "Global error message",
-    errors: ["Testing Multiple Errors"],
+export const recoverPasswordErrors: IRequestPasswordState = {
+    status: LoadStatus.ERROR,
+    error: {
+        message: "Global error message",
+        status: 403,
+        errors: {
+            unknown: [],
+        },
+    },
 };
