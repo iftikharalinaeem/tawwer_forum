@@ -175,8 +175,8 @@ EOT;
           }
           if ($groupPrivacy === "Secret") {
                 $secretIconLabel = t("Secret Group");
-                $item['meta']['visibility']['text'] = $secretIconLabel;
-                $item['meta']['visibility']['icon'] = <<<EOT
+                $item['meta']['privacy']['text'] = $secretIconLabel;
+                $item['meta']['privacy']['icon'] = <<<EOT
                     <span class="Title-Icon" title="$secretIconLabel">
                         <span class="sr-only">$secretIconLabel</span>
                         <svg aria-hidden="true" class="icon Title-SecretIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24.028 13.984">
