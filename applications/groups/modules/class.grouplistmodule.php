@@ -172,8 +172,7 @@ class GroupListModule extends Gdn_Module {
                             </svg>
                         </span>
 EOT;
-          }
-          if ($groupPrivacy === "Secret") {
+          } elseif ($groupPrivacy === "Secret") {
                 $secretIconLabel = t("Secret Group");
                 $item['meta']['privacy']['text'] = $secretIconLabel;
                 $item['meta']['privacy']['icon'] = <<<EOT
