@@ -120,6 +120,9 @@ class GroupsTest extends AbstractResourceTest {
         $this->assertEquals($groupID, $memberGroup['groupID']);
     }
 
+    /**
+     * Test /api/v2/group/search endpoint.
+     */
     public function testGroupSearch() {
         $groups = [];
 
