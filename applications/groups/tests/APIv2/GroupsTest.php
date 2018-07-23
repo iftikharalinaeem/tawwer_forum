@@ -119,4 +119,25 @@ class GroupsTest extends AbstractResourceTest {
         $memberGroup = reset($groups);
         $this->assertEquals($groupID, $memberGroup['groupID']);
     }
+
+    public function testGroupSearch() {
+        $groups = [];
+
+        for ($i = 0; $i <= 3; $i++) {
+            $groupName = 'testGroup'.$i;
+            $group = $this->testPost([
+                'name' => $groupName,
+                'description' => 'This is '.$groupName,
+                'format' => 'Markdown',
+                'privacy' => 'public',
+            ]);
+            $groups[] = $group;
+        }
+        
+        $query = ['name' => 'test'];
+        $result = $this->api()->get($this->baseUrl.'/search?name='.$query['name']);
+        $this->assertEquals(200, $result->getStatusCode());
+        $body = $result->getBody();
+        $this->assertEquals(4, count($body));
+    }
 }

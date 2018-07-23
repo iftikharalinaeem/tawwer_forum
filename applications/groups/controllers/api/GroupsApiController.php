@@ -1078,7 +1078,7 @@ class GroupsApiController extends AbstractApiController {
     }
 
     /**
-     * Search groups by group name.
+     * Search for a group by name.
      *
      * @param array $query
      * @return array
@@ -1109,7 +1109,7 @@ class GroupsApiController extends AbstractApiController {
             ],
         ], 'in')->setDescription('Search for a group by name');
 
-        $out = $this->schema([$this->fullGroupSchema()], 'out');
+        $out = $this->schema([':a' => $this->fullGroupSchema()], 'out');
 
         // Sorting
         $sortField = '';
@@ -1128,8 +1128,11 @@ class GroupsApiController extends AbstractApiController {
 
         list($offset, $limit) = offsetLimit("p{$page}", $limit);
 
-        $row = $this->groupModel->searchByName($groupName, $sortField, $sortOrder, $limit, $offset);
-        $result = $out->validate($row);
+        $rows = $this->groupModel->searchByName($groupName, $sortField, $sortOrder, $limit, $offset);
+        foreach ($rows as &$row) {
+            $row = $this->normalizeGroupOutput($row);
+        }
+        $result = $out->validate($rows);
 
         $paging = ApiUtils::numberedPagerInfo($this->groupModel->searchTotal($groupName), "/api/v2/groups/search", $query, $in);
 
