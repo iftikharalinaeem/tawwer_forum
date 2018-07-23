@@ -124,23 +124,11 @@ class GroupsTest extends AbstractResourceTest {
      * Test /api/v2/group/search endpoint.
      */
     public function testGroupSearch() {
-        $groups = [];
-
-        for ($i = 0; $i <= 3; $i++) {
-            $groupName = 'testGroup'.$i;
-            $group = $this->testPost([
-                'name' => $groupName,
-                'description' => 'This is '.$groupName,
-                'format' => 'Markdown',
-                'privacy' => 'public',
-            ]);
-            $groups[] = $group;
-        }
-        
         $query = ['name' => 'test'];
         $result = $this->api()->get($this->baseUrl.'/search?name='.$query['name']);
         $this->assertEquals(200, $result->getStatusCode());
         $body = $result->getBody();
-        $this->assertEquals(4, count($body));
+        //5 groups with name Test are created.
+        $this->assertEquals(5, count($body));
     }
 }
