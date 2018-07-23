@@ -285,7 +285,7 @@ class GroupModel extends Gdn_Model {
     /**
      * Reset the cached grouped permissions.
      */
-    public function resetCachedPermissions(){
+    public function resetCachedPermissions() {
         self::$permissions = [];
     }
 
