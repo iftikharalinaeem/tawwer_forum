@@ -117,7 +117,7 @@ class VFDeployPlugin extends Gdn_Plugin {
         $deploy = $this->prepareSender($sender);
         $customerRepo = val('Repo', $deploy);
 
-        if ($sender->form->isPostBack()) {
+        if ($sender->form->authenticatedPostBack()) {
 
             if ($sender->data('DeployLock') != 'free') {
                 $sender->form->addError(T("Code is currently being deployed, please be patient."));
