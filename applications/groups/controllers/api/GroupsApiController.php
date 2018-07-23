@@ -1084,7 +1084,7 @@ class GroupsApiController extends AbstractApiController {
      * @return array
      */
     public function get_search(array $query) {
-        $this->permission('Garden.SignIn.Allow');
+        $this->permission();
 
         $in = $this->schema([
             'name:s' => 'The name of the group.',
