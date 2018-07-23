@@ -53,6 +53,11 @@ class GroupMetaModule extends Gdn_Module {
         $metaItems['count']['text'] = sprintf(t('%s members'), val('CountMembers', $group));
         $metaItems['count']['url'] = groupUrl($group, 'members');
 
+        if ($group['Privacy']) {
+            $metaItems['privacy']['text'] = t('Privacy').': ';
+            $metaItems['privacy']['value'] = t($group['Privacy']);
+        }
+
         return $metaItems;
     }
 

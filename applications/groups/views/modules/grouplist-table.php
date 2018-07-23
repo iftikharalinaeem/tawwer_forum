@@ -80,7 +80,6 @@ if (val('items', $list)) {
                                             </a>
                                         <?php } ?>
                                             <?php echo valr('meta.privacy.icon', $item, ''); ?>
-                                            <?php echo valr('meta.visibility.icon', $item, ''); ?>
                                         </h3>
                                     <?php } ?>
                                     <div class="Description Excerpt <?php echo val('textCssClass', $item); ?>"><?php echo htmlspecialchars(val('text', $item)); ?></div>
