@@ -15,6 +15,9 @@ class GroupModel extends Gdn_Model {
     /** @var int The number of members per page. */
     public $MemberPageSize = 30;
 
+    /** @var array The permissions associated with a group. */
+    private static $permissions = [];
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -122,10 +125,10 @@ class GroupModel extends Gdn_Model {
      *  - Moderate: The user may moderate the group.
      * @param int|array $groupID The groupID or group record.
      * @param int|null $userID
+     * @param bool $useCache Use the user-group permission cache? If false, don't read or write to it.
      * @return boolean
      */
-    public function checkPermission($permission, $groupID, $userID = null) {
-        static $permissions = [];
+    public function checkPermission($permission, $groupID, $userID = null, $useCache = true) {
 
         if ($userID === null) {
             $userID = Gdn::session()->UserID;
@@ -138,7 +141,7 @@ class GroupModel extends Gdn_Model {
 
         $key = "$userID-$groupID";
 
-        if (!isset($permissions[$key])) {
+        if (!$useCache || !isset(self::$permissions[$key])) {
             // Get the data for the group.
             if (!isset($group)) {
                 $group = $this->getID($groupID);
@@ -154,6 +157,7 @@ class GroupModel extends Gdn_Model {
 
             // Set the default permissions.
             $perms = [
+                'Access' => true,
                 'Member' => false,
                 'Leader' => false,
                 'Apply' => false,
@@ -162,7 +166,8 @@ class GroupModel extends Gdn_Model {
                 'Edit' => false,
                 'Delete' => false,
                 'Moderate' => false,
-                'View' => true];
+                'View' => true,
+            ];
 
             // The group creator is always a member and leader.
             if ($userID == $group['InsertUserID']) {
@@ -192,6 +197,12 @@ class GroupModel extends Gdn_Model {
                     $perms['Apply'] = true;
                     $perms['View'] = false;
                     $perms['View.Reason'] = t('Join this group to view its content.');
+
+                    // Secret groups basically have the same permissions as non-public groups with some minor tweaks.
+                    if ($group['Privacy'] === 'Secret') {
+                        $perms['Access'] = false;
+                        $perms['Apply'] = false;
+                    }
                 }
             }
 
@@ -212,6 +223,7 @@ class GroupModel extends Gdn_Model {
                         $perms['Apply.Reason'] = t("You're banned from joining this group.");
                         break;
                     case 'invitation':
+                        $perms['Access'] = true;
                         $perms['Apply.Reason'] = t('You have a pending invitation to join this group.');
                         $perms['Join'] = true;
                         unset($perms['Join.Reason']);
@@ -220,14 +232,11 @@ class GroupModel extends Gdn_Model {
             }
 
             // Moderators can view and edit all groups.
-            $canManage = Gdn::session()->checkPermission([
-                'Garden.Settings.Manage',
-                'Garden.Community.Manage',
-                'Groups.Moderation.Manage'
-            ], false);
+            $canManage = $this->isModerator();
 
             if ($userID == Gdn::session()->UserID && $canManage) {
                 $managerOverrides = [
+                    'Access' => true,
                     'Delete' => true,
                     'Edit' => true,
                     'Leader' => true,
@@ -239,10 +248,12 @@ class GroupModel extends Gdn_Model {
                 $perms = array_merge($perms, $managerOverrides);
             }
 
-            $permissions[$key] = $perms;
+            if ($useCache) {
+                self::$permissions[$key] = $perms;
+            }
+        } else {
+            $perms = self::$permissions[$key];
         }
-
-        $perms = $permissions[$key];
 
         if (!$permission) {
             return $perms;
@@ -269,6 +280,13 @@ class GroupModel extends Gdn_Model {
         } else {
             return $perms[$permission];
         }
+    }
+
+    /**
+     * Reset the cached grouped permissions.
+     */
+    public function resetCachedPermissions() {
+        self::$permissions = [];
     }
 
     /**
@@ -332,6 +350,20 @@ class GroupModel extends Gdn_Model {
      */
     public function deleteInvites($groupID, $userID) {
         $this->SQL->delete('GroupApplicant', ['GroupID' => $groupID, 'UserID' => $userID, 'Type' => 'Invitation']);
+    }
+
+    /**
+     * Determine if the current user is a Groups global moderator.
+     *
+     * @return bool
+     */
+    public function isModerator(): bool {
+        $result = Gdn::session()->checkPermission([
+            'Garden.Settings.Manage',
+            'Garden.Community.Manage',
+            'Groups.Moderation.Manage'
+        ], false);
+        return $result;
     }
 
     /**

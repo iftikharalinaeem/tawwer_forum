@@ -222,7 +222,7 @@ class GroupsApiController extends AbstractApiController {
                 'updateUserID:i|n' => 'The user that updated the group.',
                 'updateUser?' => $this->getUserFragmentSchema(),
                 'privacy:s' => [
-                    'enum' => ['public', 'private'],
+                    'enum' => ['public', 'private', 'secret'],
                     'description' => 'The privacy level of the group\'s content.',
                 ],
                 'dateLastComment:dt|n' => 'When the last comment was posted in the group.',
@@ -265,6 +265,7 @@ class GroupsApiController extends AbstractApiController {
         $out = $this->schema($this->fullGroupSchema(), 'out');
 
         $row = $this->groupByID($id);
+        $this->verifyAccess($row);
         $this->userModel->expandUsers($row, ['InsertUserID', 'UpdateUserID']);
 
         $row = $this->normalizeGroupOutput($row);
@@ -557,8 +558,14 @@ class GroupsApiController extends AbstractApiController {
         // Paging
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        // Filters
+        // Default filters
         $where = [];
+
+        // If the current user is not a Groups global moderator, limit view to only public and private groups.
+        if ($this->groupModel->isModerator() === false) {
+            $where['Privacy'] = ['Public', 'Private'];
+        }
+
         if (array_key_exists('memberID', $query)) {
             $userGroups = $this->groupModel->SQL->getWhere(
                 'UserGroup',
@@ -566,10 +573,11 @@ class GroupsApiController extends AbstractApiController {
             )->resultArray();
             $ids  = array_column($userGroups, 'GroupID');
 
-            if (empty($ids)) {
-                $where = null;
-            } else {
+            if (!empty($ids)) {
                 $where['GroupID'] = $ids;
+                if ($query['memberID'] === $this->getSession()->UserID) {
+                    unset($where['Privacy']); // The user should be able to see all the groups they're a member of.
+                }
             }
         }
 
@@ -917,7 +925,8 @@ class GroupsApiController extends AbstractApiController {
         ])->setDescription('Apply to a private group.');
         $out = $this->schema($this->fullGroupApplicantSchema(), 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
+        $this->verifyAccess($group);
 
         $body = $in->validate($body);
 
@@ -1001,7 +1010,8 @@ class GroupsApiController extends AbstractApiController {
         $this->idParamGroupSchema()->setDescription('Join a public group or a group that you have been invited to.');
         $out = $this->schema($this->fullGroupMemberSchema(), 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
+        $this->verifyAccess($group);
 
         if (!$this->groupModel->join($id, $this->getSession()->UserID)) {
             throw new ServerException('Unable to join the group.', 500);
@@ -1115,5 +1125,21 @@ class GroupsApiController extends AbstractApiController {
             throw new NotFoundException('User');
         }
         return $row;
+    }
+
+    /**
+     * Verify the current user has "Access" permission for a group.
+     *
+     * @param array $group
+     * @throws NotFoundException If the current user does not have access to the group.
+     */
+    private function verifyAccess(array $group) {
+        /**
+         * GroupModel's checkPermission method caches permissions, which make it a pain for contexts where permissions
+         * are prone to changing, like in tests or API endpoints that attempt to verify group access before a user joins.
+         */
+        if ($this->groupModel->checkPermission('Access', $group, null, false) === false) {
+            throw new NotFoundException('Group');
+        }
     }
 }

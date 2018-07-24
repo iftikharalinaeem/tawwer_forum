@@ -34,7 +34,7 @@ $St
     ->column('CategoryID', 'int', false, 'key')
     ->column('Icon', 'varchar(255)', true)
     ->column('Banner', 'varchar(255)', true)
-    ->column('Privacy', ['Public', 'Private'], 'Public') // add secret later.
+    ->column('Privacy', ['Public', 'Private', 'Secret'], 'Public')
     ->column('Registration', ['Public', 'Approval', 'Invite'], true) // deprecated
     ->column('Visibility', ['Public', 'Members'], true) // deprecated
     ->column('CountMembers', 'uint', '0')
