@@ -68,7 +68,11 @@ export default function UITestAuthenticationPage() {
                     /authenticate/recoverpassword
                 </a>
             </h2>
-            <RecoverPasswordPage requestPasswordState={recoverPasswordErrors} postRequestPassword={noop} />
+            <RecoverPasswordPage
+                requestPasswordState={recoverPasswordErrors}
+                postRequestPassword={noop}
+                onNavigateAway={noop}
+            />
         </div>
     );
 }
