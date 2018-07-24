@@ -158,8 +158,6 @@ class GroupListModule extends Gdn_Module {
           $item['meta']['countDiscussionsNumber']['cssClass'] = 'Hidden MemberCountNumber Number MItem-Count';
 
           $groupPrivacy = $group["Privacy"];
-
-
           if ($groupPrivacy === "Private") {
                 $privacyIconLabel = t("Private Group");
                 $item['meta']['privacy']['text'] = $privacyIconLabel;
@@ -185,7 +183,6 @@ EOT;
                     </span>
 EOT;
           }
-
 
           $groupModel = new GroupModel();
           if ($attachDiscussionData && $groupModel->checkPermission('View', val('GroupID', $group))) {
