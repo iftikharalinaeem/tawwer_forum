@@ -344,7 +344,6 @@ class RanksPlugin extends Gdn_Plugin {
      * Add the rank changer dropdown to a page.
      *
      * @param Gdn_Controller $Sender
-     * @param null|int $currentRankID
      * @throws Exception
      */
     protected function addManualRanks($Sender) {
