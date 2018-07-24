@@ -63,18 +63,19 @@ class GroupsController extends Gdn_Controller {
              $Limit = 9;
         }
 
-        // Get group invites.
-        if (Gdn::session()->isValid()) {
-            $invites = $this->GroupModel->getInvites(Gdn::session()->UserID, 'Name', 'asc', $Limit);
-            $this->setData('Invites', $invites);
-        }
+        $isModerator = $this->GroupModel->isModerator();
 
         // Get popular groups.
-        $Groups = $this->GroupModel->get('CountMembers', 'desc', $Limit)->resultArray();
+        if ($isModerator) {
+            $groupConditions = false;
+        } else {
+            $groupConditions = ['Privacy' => ['Public', 'Private']];
+        }
+        $Groups = $this->GroupModel->getWhere($groupConditions, 'CountMembers', 'desc', $Limit)->resultArray();
         $this->setData('Groups', $Groups);
 
         // Get new groups.
-        $NewGroups = $this->GroupModel->get('DateInserted', 'desc', $Limit)->resultArray();
+        $NewGroups = $this->GroupModel->getWhere($groupConditions, 'DateInserted', 'desc', $Limit)->resultArray();
         $this->setData('NewGroups', $NewGroups);
 
         // Get my groups.
