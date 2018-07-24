@@ -7,8 +7,8 @@
 
 import React from "react";
 import SSOMethods from "@dashboard/app/authenticate/components/SSOMethods";
-import PasswordForm from "@dashboard/app/authenticate/components/PasswordForm";
-import RecoverPasswordPage from "@dashboard/app/authenticate/RecoverPasswordPage";
+import { PasswordForm } from "@dashboard/app/authenticate/components/PasswordForm";
+import { RecoverPasswordPage } from "@dashboard/app/authenticate/RecoverPasswordPage";
 import { formatUrl } from "@dashboard/application";
 import {
     ssoMethodsData1,
@@ -19,6 +19,7 @@ import {
 
 /* tslint:disable:jsx-use-translation-function */
 
+const noop = (...params) => undefined as any;
 export default function UITestAuthenticationPage() {
     return (
         <div>
@@ -53,12 +54,12 @@ export default function UITestAuthenticationPage() {
             </h2>
             <div className="authenticateUserCol">
                 <h4>Plausible Example</h4>
-                <PasswordForm {...passwordFormPlausibleErrors} />
+                <PasswordForm passwordState={passwordFormPlausibleErrors} authenticate={noop} />
 
                 <hr />
 
                 <h4>Extreme example (for testing CSS)</h4>
-                <PasswordForm {...passwordFormExtremeTest} />
+                <PasswordForm passwordState={passwordFormExtremeTest} authenticate={noop} />
             </div>
 
             <h2>
@@ -67,7 +68,7 @@ export default function UITestAuthenticationPage() {
                     /authenticate/recoverpassword
                 </a>
             </h2>
-            <RecoverPasswordPage {...recoverPasswordErrors} />
+            <RecoverPasswordPage requestPasswordState={recoverPasswordErrors} postRequestPassword={noop} />
         </div>
     );
 }
