@@ -125,18 +125,19 @@ class GroupsTest extends AbstractResourceTest {
      */
     public function testGroupSearch() {
         //8 groups are created.
-        $groups = $this->createGroups();
+        $groups = $this->createTestSearchGroups();
         $this->assertEquals(8, count($groups));
 
         $query = ['query' => 'new'];
 
         $result = $this->api()->get($this->baseUrl.'/search?query='.$query['query']);
         $this->assertEquals(200, $result->getStatusCode());
-        $body = $result->getBody();
-        $this->assertEquals(5, count($body));
+        $searchResults = $result->getBody();
+        $this->assertEquals(5, count($searchResults));
 
-        for ($count = 1; $count < count($body); $count++) {
-            $this->assertEquals($groups[$count]['name'], $body[$count]['name']);
+        foreach ($searchResults as $result) {
+            $this->assertContains($query['query'], $result['name']);
+
         }
     }
 
@@ -145,7 +146,7 @@ class GroupsTest extends AbstractResourceTest {
      *
      * @return array $groups test groups for search endpoint.
      */
-    public function createGroups() {
+    private function createTestSearchGroups() {
         $groups = [];
         for ($i = 0; $i <= 4; $i++) {
             $group = $this->api()->post($this->baseUrl, [
