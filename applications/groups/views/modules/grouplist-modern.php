@@ -68,6 +68,11 @@ $list = $this->data('list');
                 </div>
             </li>
         <?php } ?>
+        <?php if (val('sectionId', $list) === "invites") { ?>
+            <li class="EmptyMessage EmptyMessageInvites">
+                <?php echo t('There aren\'t any more groups invites.') ?>
+            </li>
+        <?php } ?>
     </ul>
     <?php if (val('emptyMessage', $list) && !val('items', $list)) { ?>
         <div class="EmptyMessage <?php echo val('emptyMessageCssClass', $list); ?>"><?php echo val('emptyMessage', $list); ?></div>

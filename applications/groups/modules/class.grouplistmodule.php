@@ -74,6 +74,7 @@ class GroupListModule extends Gdn_Module {
       */
      protected function getGroupsInfo($layout, $groups, $heading, $emptyMessage, $cssClass, $sectionId) {
 
+          $groupList['sectionId'] = $sectionId;
           $groupList['layout'] = $layout;
           $groupList['emptyMessage'] = $emptyMessage;
           $groupList['title'] = $heading;

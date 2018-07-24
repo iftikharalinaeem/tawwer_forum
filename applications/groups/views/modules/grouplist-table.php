@@ -162,8 +162,13 @@ if (val('items', $list)) {
             <?php } ?>
         </table>
     </div>
-<?php }
-if (val('emptyMessage', $list) && !val('items', $list)) { ?>
+<?php } ?>
+<?php if (val('sectionId', $list) === "invites") { ?>
+    <div class="EmptyMessage EmptyMessageInvites">
+        <?php echo t('There aren\'t any more groups invites.') ?>
+    </div>
+<?php } ?>
+<?php if (val('emptyMessage', $list) && !val('items', $list)) { ?>
     <div class="EmptyMessage <?php echo val('emptyMessageCssClass', $list); ?>"><?php echo val('emptyMessage', $list); ?></div>
 <?php } ?>
 <?php if (val('moreLink', $list)) { ?>

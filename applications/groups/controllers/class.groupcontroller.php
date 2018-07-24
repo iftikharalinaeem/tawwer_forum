@@ -349,8 +349,10 @@ class GroupController extends Gdn_Controller {
         $this->setData('Result', $result);
         $this->jsonTarget('.GroupUserHeaderModule', '', 'SlideUp');
         $this->jsonTarget(".group-invites #Group_{$group['GroupID']}", '', 'SlideUp');
+        $this->jsonTarget(".group-invites .EmptyMessageInvites", 'EmptyMessageInvites', 'RemoveClass');
         $this->jsonTarget(".Group-Header .Group-Buttons", '', 'Remove');
         $this->informMessage(t('Invitation declined.'));
+
         if ($refresh) {
             $this->setRedirectTo('/groups');
         }
