@@ -128,7 +128,7 @@ class GroupsTest extends AbstractResourceTest {
         $groups = $this->createTestSearchGroups();
         $this->assertEquals(8, count($groups));
 
-        $query = ['query' => 'new'];
+        $query = ['query' => 'New'];
 
         $result = $this->api()->get($this->baseUrl.'/search?query='.$query['query']);
         $this->assertEquals(200, $result->getStatusCode());
@@ -136,7 +136,7 @@ class GroupsTest extends AbstractResourceTest {
         $this->assertEquals(5, count($searchResults));
 
         foreach ($searchResults as $result) {
-            $this->assertContains($query['query'], $result['name'], true);
+            $this->assertContains($query['query'], $result['name'], '', true);
 
         }
     }
