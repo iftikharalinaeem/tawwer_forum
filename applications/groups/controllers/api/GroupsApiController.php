@@ -545,14 +545,7 @@ class GroupsApiController extends AbstractApiController {
         $query = $in->validate($query);
 
         // Sorting
-        $sortField = '';
-        $sortOrder = 'asc';
-        if (array_key_exists('sort', $query)) {
-            $sortField = ltrim($query['sort'], '-');
-            if (strlen($sortField) !== strlen($query['sort'])) {
-                $sortOrder = 'desc';
-            }
-        }
+        list($sortField, $sortOrder) = $this->resultSorting($query);
 
         // Paging
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
