@@ -65,6 +65,12 @@ class GroupsController extends Gdn_Controller {
 
         $isModerator = $this->GroupModel->isModerator();
 
+        // Get group invites.
+        if (Gdn::session()->isValid()) {
+            $invites = $this->GroupModel->getInvites(Gdn::session()->UserID, 'Name', 'asc', $Limit);
+            $this->setData('Invites', $invites);
+        }
+
         // Get popular groups.
         if ($isModerator) {
             $groupConditions = false;
