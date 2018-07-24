@@ -15,6 +15,9 @@ class GroupModel extends Gdn_Model {
     /** @var int The number of members per page. */
     public $MemberPageSize = 30;
 
+    /** @var int Limit of query results per page */
+    const LIMIT = 24;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -1469,7 +1472,7 @@ class GroupModel extends Gdn_Model {
      * @return array
      * @throws Exception
      */
-    public function searchByName(string $name, string $orderField = null, string $orderDirection = null, int $limit = 24, int $offset = 0): array {
+    public function searchByName(string $name, string $orderField = null, string $orderDirection = null, int $limit = self::LIMIT, int $offset = 0): array {
         $result = [];
 
         if ($name) {

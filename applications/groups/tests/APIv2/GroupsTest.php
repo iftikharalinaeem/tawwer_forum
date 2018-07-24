@@ -124,11 +124,53 @@ class GroupsTest extends AbstractResourceTest {
      * Test /api/v2/group/search endpoint.
      */
     public function testGroupSearch() {
-        $query = ['name' => 'test'];
-        $result = $this->api()->get($this->baseUrl.'/search?name='.$query['name']);
+        //8 groups are created.
+        $groups = $this->createGroups();
+        $this->assertEquals(8, count($groups));
+
+        $query = ['query' => 'new'];
+
+        $result = $this->api()->get($this->baseUrl.'/search?query='.$query['query']);
         $this->assertEquals(200, $result->getStatusCode());
         $body = $result->getBody();
-        //5 groups with name Test are created.
         $this->assertEquals(5, count($body));
+
+        for ($count = 1; $count < count($body); $count++) {
+            $this->assertEquals($groups[$count]['name'], $body[$count]['name']);
+        }
+    }
+
+    /**
+     * Create groups for /api/v2/group/search test.
+     *
+     * @return array $groups test groups for search endpoint.
+     */
+    public function createGroups() {
+        $groups = [];
+        for ($i = 0; $i <= 4; $i++) {
+            $group = $this->api()->post($this->baseUrl, [
+                'name' => 'new'.$i,
+                'description' => "search group",
+                'format' => 'Markdown',
+                'privacy' => 'public',
+                'bannerUrl' => null,
+                'iconUrl' => 'https://example.com/image.jpg',
+            ])->getBody();
+            $groups[] = $group;
+        }
+        //create groups that shouldn't match query parameter.
+        for ($i = 0; $i <= 2; $i++) {
+            $group = $this->api()->post($this->baseUrl, [
+                'name' => 'invalid'.$i,
+                'description' => "shouldn't show up",
+                'format' => 'Markdown',
+                'privacy' => 'public',
+                'bannerUrl' => null,
+                'iconUrl' => 'https://example.com/image.jpg',
+            ])->getBody();
+            $groups[] = $group;
+        }
+
+        return $groups;
     }
 }

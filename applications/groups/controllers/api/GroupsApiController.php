@@ -1078,7 +1078,7 @@ class GroupsApiController extends AbstractApiController {
     }
 
     /**
-     * Search for a group by name.
+     * Search for a group.
      *
      * @param array $query
      * @return array
@@ -1087,7 +1087,7 @@ class GroupsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'name:s' => 'The name of the group.',
+            'query:s' => 'Search parameter',
             'sort:s?' => [
                 'enum' => [
                     'dateInserted', '-dateInserted',
@@ -1095,6 +1095,8 @@ class GroupsApiController extends AbstractApiController {
                     'countMembers', '-countMembers',
                     'countDiscussions', '-countDiscussions',
                 ],
+                'description' => 'Sort the results by the specified field. The default sort order is ascending.'
+                    .'Prefixing the field with "-" will sort using a descending order.',
             ],
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
@@ -1103,26 +1105,19 @@ class GroupsApiController extends AbstractApiController {
             ],
             'limit:i?' => [
                 'description' => 'Desired number of items per page.',
-                'default' => 24,
+                'default' => GroupModel::LIMIT,
                 'minimum' => 1,
-                'maximum' => 24,
+                'maximum' => GroupModel::LIMIT,
             ],
-        ], 'in')->setDescription('Search for a group by name');
+        ], 'in')->setDescription('Search for a group');
 
         $out = $this->schema([':a' => $this->fullGroupSchema()], 'out');
+        $query = $in->validate($query);
 
         // Sorting
-        $sortField = '';
-        $sortOrder = 'asc';
-        if (array_key_exists('sort', $query)) {
-            $sortField = ltrim($query['sort'], '-');
-            if (strlen($sortField) !== strlen($query['sort'])) {
-                $sortOrder = 'desc';
-            }
-        }
+        list($sortField, $sortOrder) = $this->resultSorting($query);
 
-        $query = $in->validate($query);
-        $groupName = $query['name'];
+        $groupName = $query['query'];
         $page = $query['page'];
         $limit = $query['limit'];
 
@@ -1177,5 +1172,24 @@ class GroupsApiController extends AbstractApiController {
             throw new NotFoundException('User');
         }
         return $row;
+    }
+
+    /**
+     * Get the sorting parameters for queries.
+     *
+     * @param array $query
+     * @return array
+     */
+    protected function resultSorting(array $query) {
+        $sortField = '';
+        $sortOrder = 'asc';
+        if (array_key_exists('sort', $query)) {
+            $sortField = ltrim($query['sort'], '-');
+            if (strlen($sortField) !== strlen($query['sort'])) {
+                $sortOrder = 'desc';
+            }
+        }
+
+        return [$sortField, $sortOrder];
     }
 }
