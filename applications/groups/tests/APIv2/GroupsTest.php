@@ -136,7 +136,7 @@ class GroupsTest extends AbstractResourceTest {
         $this->assertEquals(5, count($searchResults));
 
         foreach ($searchResults as $result) {
-            $this->assertContains($query['query'], $result['name']);
+            $this->assertContains($query['query'], $result['name'], true);
 
         }
     }
