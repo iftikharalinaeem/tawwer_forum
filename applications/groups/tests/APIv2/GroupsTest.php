@@ -119,4 +119,59 @@ class GroupsTest extends AbstractResourceTest {
         $memberGroup = reset($groups);
         $this->assertEquals($groupID, $memberGroup['groupID']);
     }
+
+    /**
+     * Test /api/v2/group/search endpoint.
+     */
+    public function testGroupSearch() {
+        //8 groups are created.
+        $groups = $this->createTestSearchGroups();
+        $this->assertEquals(8, count($groups));
+
+        $query = ['query' => 'New'];
+
+        $result = $this->api()->get($this->baseUrl.'/search?query='.$query['query']);
+        $this->assertEquals(200, $result->getStatusCode());
+        $searchResults = $result->getBody();
+        $this->assertEquals(5, count($searchResults));
+
+        foreach ($searchResults as $result) {
+            $this->assertContains($query['query'], $result['name'], '', true);
+
+        }
+    }
+
+    /**
+     * Create groups for /api/v2/group/search test.
+     *
+     * @return array $groups test groups for search endpoint.
+     */
+    private function createTestSearchGroups() {
+        $groups = [];
+        for ($i = 0; $i <= 4; $i++) {
+            $group = $this->api()->post($this->baseUrl, [
+                'name' => 'new'.$i,
+                'description' => "search group",
+                'format' => 'Markdown',
+                'privacy' => 'public',
+                'bannerUrl' => null,
+                'iconUrl' => 'https://example.com/image.jpg',
+            ])->getBody();
+            $groups[] = $group;
+        }
+        //create groups that shouldn't match query parameter.
+        for ($i = 0; $i <= 2; $i++) {
+            $group = $this->api()->post($this->baseUrl, [
+                'name' => 'invalid'.$i,
+                'description' => "shouldn't show up",
+                'format' => 'Markdown',
+                'privacy' => 'public',
+                'bannerUrl' => null,
+                'iconUrl' => 'https://example.com/image.jpg',
+            ])->getBody();
+            $groups[] = $group;
+        }
+
+        return $groups;
+    }
 }
