@@ -419,7 +419,7 @@ class GroupController extends Gdn_Controller {
                 'GroupID' => $group['GroupID']
             ];
             $this->GroupModel->leave($data);
-            $this->jsonTarget('', '', 'Refresh');
+            $this->setRedirectTo('/groups');
         }
 
         $this->setData('Group', $group);
