@@ -1512,7 +1512,7 @@ class GroupModel extends Gdn_Model {
         if ($name) {
             $orderField = $orderField ?: 'Name';
             $orderDirection = $orderDirection ?: 'asc';
-            
+
             $userGroups = $this->SQL->getWhere('UserGroup', ['UserID' => $memberID])->resultArray();
             $groupIDs = array_column($userGroups, 'GroupID');
 
@@ -1540,8 +1540,10 @@ class GroupModel extends Gdn_Model {
                         ->select($fullMatch, '', 'FullMatch')
                         ->from('Group g')
                         ->like('Name', $name)
+                        ->beginWhereGroup()
                         ->whereIn('Privacy', ['Public', 'Private'])
                         ->orWhere('GroupId', $groupIDs)
+                        ->endWhereGroup()
                         ->orderBy('FullMatch', 'desc')
                         ->orderBy($orderField, $orderDirection)
                         ->limit($limit, $offset)
