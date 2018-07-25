@@ -32,7 +32,7 @@ $groupModel = new GroupModel();
 if (!empty($groups = $this->data('Invites'))) {
     $groupModel->joinRecentPosts($groups);
     $cssClass = 'group-invites';
-    $list = new GroupListModule($groups, 'invites', t('Group Invites'), '', $cssClass, false, $layout);
+    $list = new GroupListModule($groups, 'invites', t('Group Invites'), 'There aren\'t any more groups invites.', $cssClass, false, $layout);
     echo $list;
 }
 
