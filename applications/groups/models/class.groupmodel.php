@@ -1514,24 +1514,31 @@ class GroupModel extends Gdn_Model {
             $orderField = $orderField ?: 'Name';
             $orderDirection = $orderDirection ?: 'asc';
 
-            if (isset($groupFilters['memberID'])) {
-                $memberID = $groupFilters['memberID'];
-            } else {
-                $memberID = Gdn::session()->UserID;
-            }
-
-            if (isset($groupFilters['isModerator'])) {
-                $isModerater = $groupFilters['isModerator'];
-            } else {
-                $isModerater = $this->isModerator() ?: null;
-            }
+            list($memberID, $isModerater) = $this->setGroupFilters($groupFilters);
 
             $userGroups = $this->SQL->getWhere('UserGroup', ['UserID' => $memberID])->resultArray();
             $groupIDs = array_column($userGroups, 'GroupID');
 
             $fullMatch = $this->SQL->conditionExpr('g.Name', $name, false);
 
-            if ($isModerater){
+            // User is a moderator, display all groups.
+            if ($isModerater) {
+                $privacy[] = 'Secret';
+                //Get all the groups
+                $result = $this->SQL
+                    ->select('g.*')
+                    ->select($fullMatch, '', 'FullMatch')
+                    ->from('Group g')
+                    ->like('Name', $name)
+                    ->whereIn('Privacy', $privacy)
+                    ->orderBy('FullMatch', 'desc')
+                    ->orderBy($orderField, $orderDirection)
+                    ->limit($limit, $offset)
+                    ->get()
+                    ->resultArray();
+            }
+            // User is not a moderator, display all groups, except secret group member is not part of.
+            if (!$isModerater && !empty($groupIDs)) {
                 $privacy[] = 'Secret';
                 $result = $this->SQL
                     ->select('g.*')
@@ -1544,33 +1551,28 @@ class GroupModel extends Gdn_Model {
                     ->limit($limit, $offset)
                     ->get()
                     ->resultArray();
-            } elseif (!empty($groupIDs)) {
-                $privacy[] = 'Secret';
-                $result = $this->SQL
-                    ->select('g.*')
-                    ->select($fullMatch, '', 'FullMatch')
-                    ->from('Group g')
-                    ->like('Name', $name)
-                    ->whereIn('Privacy', $privacy)
-                    ->whereIn('GroupID', $groupIDs)
-                    ->orderBy('FullMatch', 'desc')
-                    ->orderBy($orderField, $orderDirection)
-                    ->limit($limit, $offset)
-                    ->get()
-                    ->resultArray();
-            } else {
-                $result = $this->SQL
-                    ->select('g.*')
-                    ->select($fullMatch, '', 'FullMatch')
-                    ->from('Group g')
-                    ->like('Name', $name)
-                    ->whereIn('Privacy', $privacy)
-                    ->orderBy('FullMatch', 'desc')
-                    ->orderBy($orderField, $orderDirection)
-                    ->limit($limit, $offset)
-                    ->get()
-                    ->resultArray();
+                // Filter out the secret groups a member is not part of
+                foreach ($result as $index => $group) {
+                    if ($group['Privacy'] === 'Secret') {
+                        if (!in_array($group['GroupID'], $groupIDs))
+                            unset($result[$index]);
+                    }
                 }
+            }
+            // User not a moderator and is not a member of any group display all non secret groups
+            if (!$isModerater && empty($groupIDs)) {
+                $result = $this->SQL
+                    ->select('g.*')
+                    ->select($fullMatch, '', 'FullMatch')
+                    ->from('Group g')
+                    ->like('Name', $name)
+                    ->whereIn('Privacy', $privacy)
+                    ->orderBy('FullMatch', 'desc')
+                    ->orderBy($orderField, $orderDirection)
+                    ->limit($limit, $offset)
+                    ->get()
+                    ->resultArray();
+            }
         }
         return $result;
     }
@@ -1593,5 +1595,26 @@ class GroupModel extends Gdn_Model {
         }
 
         return $total;
+    }
+
+    /**
+     * Sets the proper filter for a group search.
+     *
+     * @param array $groupFilters The filters to be applied to a group seach.
+     * @return array
+     */
+    protected function setGroupFilters(array $groupFilters): array {
+        if (isset($groupFilters['memberID'])) {
+            $memberID = $groupFilters['memberID'];
+        } else {
+            $memberID = Gdn::session()->UserID ?: null;
+        }
+
+        if (isset($groupFilters['isModerator'])) {
+            $isModerater = $groupFilters['isModerator'];
+        } else {
+            $isModerater = $this->isModerator() ?: null;
+        }
+        return [$memberID, $isModerater];
     }
 }

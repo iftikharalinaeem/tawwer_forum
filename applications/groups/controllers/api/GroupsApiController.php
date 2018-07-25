@@ -1128,8 +1128,8 @@ class GroupsApiController extends AbstractApiController {
 
         list($offset, $limit) = offsetLimit("p{$page}", $limit);
 
+        $groupFilters['isModerator'] = $this->groupModel->isModerator() ?: null;
         if (array_key_exists('memberID', $query)) {
-            $groupFilters['isModerator'] = $this->groupModel->isModerator() ?: null;
             $groupFilters['memberID'] = $query['memberID'];
         }
 
