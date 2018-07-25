@@ -33,9 +33,6 @@ class GroupMetaModule extends Gdn_Module {
      * @return array A meta items data array.
      */
     protected function getMetaInfo($group) {
-        $metaItems['privacy']['text'] = t('Privacy').': ';
-        $metaItems['privacy']['value'] = t($group['Privacy'] ?? '');
-
         $owner = Gdn::userModel()->getID(val('InsertUserID', $group));
         $metaItems['owner']['text'] = t('Owner').': ';
         $metaItems['owner']['value'] = userAnchor($owner);
@@ -55,6 +52,11 @@ class GroupMetaModule extends Gdn_Module {
 
         $metaItems['count']['text'] = sprintf(t('%s members'), val('CountMembers', $group));
         $metaItems['count']['url'] = groupUrl($group, 'members');
+
+        if ($group['Privacy']) {
+            $metaItems['privacy']['text'] = t('Privacy').': ';
+            $metaItems['privacy']['value'] = t($group['Privacy']);
+        }
 
         return $metaItems;
     }

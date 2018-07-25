@@ -338,18 +338,24 @@ class GroupController extends Gdn_Controller {
      * @param $iD
      * @throws Exception
      */
-    public function inviteDecline($iD) {
+    public function inviteDecline($iD, $refresh = false) {
         $group = $this->GroupModel->getID($iD);
         $this->verifyAccess($group);
+
         if (!$this->Request->isPostBack()) {
             throw forbiddenException('GET');
         }
         $result = $this->GroupModel->joinInvite($group['GroupID'], Gdn::session()->UserID, false);
         $this->setData('Result', $result);
-
         $this->jsonTarget('.GroupUserHeaderModule', '', 'SlideUp');
-        $this->setRedirectTo(groupUrl($group));
+        $this->jsonTarget(".group-invites #Group_{$group['GroupID']}", '', 'Remove');
+        $this->jsonTarget(".group-invites .group-invites-emptyMessage", 'group-invites-emptyMessage', 'RemoveClass');
+        $this->jsonTarget(".Group-Header .Group-Buttons", '', 'Remove');
         $this->informMessage(t('Invitation declined.'));
+
+        if ($refresh) {
+            $this->setRedirectTo('/groups');
+        }
         $this->render('Blank', 'Utility', 'Dashboard');
     }
 
@@ -419,7 +425,7 @@ class GroupController extends Gdn_Controller {
                 'GroupID' => $group['GroupID']
             ];
             $this->GroupModel->leave($data);
-            $this->jsonTarget('', '', 'Refresh');
+            $this->setRedirectTo('/groups');
         }
 
         $this->setData('Group', $group);

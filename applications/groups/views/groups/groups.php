@@ -27,8 +27,16 @@ $this->EventArguments['layout'] = &$layout;
 $this->EventArguments['showMore'] = &$showMore;
 $this->fireEvent('beforeGroupLists');
 
+$groupModel = new GroupModel();
+
+if (!empty($groups = $this->data('Invites'))) {
+    $groupModel->joinRecentPosts($groups);
+    $cssClass = 'group-invites';
+    $list = new GroupListModule($groups, 'invites', t('Group Invites'), 'There aren\'t any more groups invites.', $cssClass, false, $layout);
+    echo $list;
+}
+
 if ($groups = $this->data('MyGroups')) {
-    $groupModel = new GroupModel();
     $groupModel->joinRecentPosts($groups);
     $cssClass = 'my-groups';
     $this->EventArguments['layout'] = &$layout;
@@ -41,7 +49,6 @@ if ($groups = $this->data('MyGroups')) {
 
 
 if ($groups = $this->data('NewGroups')) {
-    $groupModel = new GroupModel();
     $groupModel->joinRecentPosts($groups);
     $cssClass = 'new-groups';
     $this->EventArguments['layout'] = &$layout;
@@ -53,7 +60,6 @@ if ($groups = $this->data('NewGroups')) {
 }
 
 if ($groups = $this->data('Groups')) {
-    $groupModel = new GroupModel();
     $groupModel->joinRecentPosts($groups);
     $cssClass = 'popular-groups';
     $this->EventArguments['layout'] = &$layout;

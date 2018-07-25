@@ -74,10 +74,12 @@ class GroupListModule extends Gdn_Module {
       */
      protected function getGroupsInfo($layout, $groups, $heading, $emptyMessage, $cssClass, $sectionId) {
 
+          $groupList['sectionId'] = $sectionId;
           $groupList['layout'] = $layout;
           $groupList['emptyMessage'] = $emptyMessage;
           $groupList['title'] = $heading;
           $groupList['cssClass'] = $cssClass;
+          $groupList['emptyMessageCssClass'] = $cssClass.'-emptyMessage';
 
           if ($this->showMore) {
                 $groupList['moreLink'] = sprintf(t('All %s...'), $heading);
@@ -156,6 +158,33 @@ class GroupListModule extends Gdn_Module {
           $item['meta']['countDiscussionsNumber']['text'] = val('CountDiscussions', $group);
           $item['meta']['countDiscussionsNumber']['count'] = val('CountDiscussions', $group);
           $item['meta']['countDiscussionsNumber']['cssClass'] = 'Hidden MemberCountNumber Number MItem-Count';
+
+          $groupPrivacy = $group["Privacy"];
+          if ($groupPrivacy === "Private") {
+                $privacyIconLabel = t("Private Group");
+                $item['meta']['privacy']['text'] = $privacyIconLabel;
+                $item['meta']['privacy']['icon'] = <<<EOT
+                    <span class="Title-Icon" title="$privacyIconLabel">
+                        <span class="sr-only">$privacyIconLabel</span>
+                            <svg aria-hidden="true" class="icon Title-PrivateIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14.877 18.934">
+                                <title>$privacyIconLabel</title>
+                                <path fill="currentColor" d="M14.088,6.761H12.172V4.06A4.016,4.016,0,0,0,8.2,0H6.76A4.015,4.015,0,0,0,2.705,3.96v2.8H.788A.788.788,0,0,0,0,7.55H0V18.145a.788.788,0,0,0,.787.789h13.3a.789.789,0,0,0,.789-.789V7.546A.79.79,0,0,0,14.088,6.761ZM4.06,4.051A2.678,2.678,0,0,1,6.706,1.344H8.117a2.676,2.676,0,0,1,2.7,2.648h0a.581.581,0,0,1,0,.059v2.71H4.06Zm4.057,9.335v2.842H6.76V13.386a1.827,1.827,0,0,1-1.217-1.217A1.957,1.957,0,0,1,6.657,9.636h0l.1-.037a2.011,2.011,0,0,1,1.352,3.788Z"/>
+                            </svg>
+                        </span>
+EOT;
+          } elseif ($groupPrivacy === "Secret") {
+                $secretIconLabel = t("Secret Group");
+                $item['meta']['privacy']['text'] = $secretIconLabel;
+                $item['meta']['privacy']['icon'] = <<<EOT
+                    <span class="Title-Icon" title="$secretIconLabel">
+                        <span class="sr-only">$secretIconLabel</span>
+                        <svg aria-hidden="true" class="icon Title-SecretIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24.028 13.984">
+                            <title>$secretIconLabel</title>
+                            <path fill="currentColor" d="M23.7,1.171C23.344.026,19.46-.079,16.927.037s-4.919,2.634-4.919,2.634S9.892.152,7.358.037.709.026.354,1.171A16.709,16.709,0,0,0,.068,6.094c.134,1.144,3.2,7.832,7.023,7.889s3.361-1.593,4.917-1.651c1.556.058,1.1,1.709,4.918,1.651s6.888-6.745,7.022-7.889A16.7,16.7,0,0,0,23.7,1.171ZM10.157,8.84c-.421.6-3.644.75-4.574.326A3.237,3.237,0,0,1,3.77,5.7c.1-.638-.013-1.407,3.9-.934C10.622,5.121,10.157,8.84,10.157,8.84Zm8.276.326c-.93.424-4.153.273-4.574-.326,0,0-.462-3.716,2.482-4.072,3.918-.473,3.805.3,3.9.934A3.237,3.237,0,0,1,18.433,9.166Z"/>
+                        </svg>
+                    </span>
+EOT;
+          }
 
           $groupModel = new GroupModel();
           if ($attachDiscussionData && $groupModel->checkPermission('View', val('GroupID', $group))) {
