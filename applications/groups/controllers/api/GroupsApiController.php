@@ -1091,7 +1091,6 @@ class GroupsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'query:s' => 'Search parameter',
-            'memberID:i?' => 'Filter by member userID.',
             'sort:s?' => [
                 'enum' => [
                     'dateInserted', '-dateInserted',
@@ -1124,16 +1123,10 @@ class GroupsApiController extends AbstractApiController {
         $groupName = $query['query'];
         $page = $query['page'];
         $limit = $query['limit'];
-        $groupFilters = [];
 
         list($offset, $limit) = offsetLimit("p{$page}", $limit);
 
-        $groupFilters['isModerator'] = $this->groupModel->isModerator() ?: null;
-        if (array_key_exists('memberID', $query)) {
-            $groupFilters['memberID'] = $query['memberID'];
-        }
-
-        $rows = $this->groupModel->searchByName($groupName, $sortField, $sortOrder, $limit, $offset, $groupFilters);
+        $rows = $this->groupModel->searchByName($groupName, $sortField, $sortOrder, $limit, $offset);
         foreach ($rows as &$row) {
             $row = $this->normalizeGroupOutput($row);
         }
