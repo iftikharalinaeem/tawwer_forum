@@ -1536,25 +1536,62 @@ class GroupModel extends Gdn_Model {
      */
     public function searchByName(string $name, string $orderField = null, string $orderDirection = null, int $limit = self::LIMIT, int $offset = 0): array {
         $result = [];
+        $memberID = Gdn::session()->UserID ?: null;
+        $isModerator = $this->isModerator() ?: null;
 
         if ($name) {
             $orderField = $orderField ?: 'Name';
             $orderDirection = $orderDirection ?: 'asc';
 
+            $groupIDs = $this->getUserGroupIDs($memberID);
+
             $fullMatch = $this->SQL->conditionExpr('g.Name', $name, false);
 
-            $result = $this->SQL
-                ->select('g.*')
-                ->select($fullMatch, '', 'FullMatch')
-                ->from('Group g')
-                ->like('Name', $name)
-                ->orderBy('FullMatch', 'desc')
-                ->orderBy($orderField, $orderDirection)
-                ->limit($limit, $offset)
-                ->get()
-                ->resultArray();
+            // User is a moderator, display all groups.
+            if ($isModerator) {
+                //Get all the groups
+                $result = $this->SQL
+                    ->select('g.*')
+                    ->select($fullMatch, '', 'FullMatch')
+                    ->from('Group g')
+                    ->like('Name', $name)
+                    ->orderBy('FullMatch', 'desc')
+                    ->orderBy($orderField, $orderDirection)
+                    ->limit($limit, $offset)
+                    ->get()
+                    ->resultArray();
+            } else {
+                // User is not a moderator, display all groups, except secret group member is not part of.
+                if (!empty($groupIDs)) {
+                    $result = $this->SQL
+                        ->select('g.*')
+                        ->select($fullMatch, '', 'FullMatch')
+                        ->from('Group g')
+                        ->like('Name', $name)
+                        ->beginWhereGroup()
+                        ->whereIn('Privacy', ['Public', 'Private'])
+                        ->orWhereIn('GroupId', $groupIDs)
+                        ->endWhereGroup()
+                        ->orderBy('FullMatch', 'desc')
+                        ->orderBy($orderField, $orderDirection)
+                        ->limit($limit, $offset)
+                        ->get()
+                        ->resultArray();
+                } else {
+                    $result = $this->SQL
+                        ->select('g.*')
+                        ->select($fullMatch, '', 'FullMatch')
+                        ->from('Group g')
+                        ->like('Name', $name)
+                        ->whereIn('Privacy', ['Public', 'Private'])
+                        ->orderBy('FullMatch', 'desc')
+                        ->orderBy($orderField, $orderDirection)
+                        ->limit($limit, $offset)
+                        ->get()
+                        ->resultArray();
+                }
+            }
         }
-
         return $result;
     }
 
@@ -1577,4 +1614,5 @@ class GroupModel extends Gdn_Model {
 
         return $total;
     }
+
 }
