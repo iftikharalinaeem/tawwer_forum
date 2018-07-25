@@ -204,7 +204,7 @@
   text-align: center;
   margin: 20px auto; }
 
-.EmptyMessageInvites {
+.group-invites-emptyMessage {
   display: none; }
 
 .Event.add .DatePicker, .Event.edit .DatePicker {

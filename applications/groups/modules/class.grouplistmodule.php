@@ -79,6 +79,7 @@ class GroupListModule extends Gdn_Module {
           $groupList['emptyMessage'] = $emptyMessage;
           $groupList['title'] = $heading;
           $groupList['cssClass'] = $cssClass;
+          $groupList['emptyMessageCssClass'] = $cssClass.'-emptyMessage';
 
           if ($this->showMore) {
                 $groupList['moreLink'] = sprintf(t('All %s...'), $heading);
