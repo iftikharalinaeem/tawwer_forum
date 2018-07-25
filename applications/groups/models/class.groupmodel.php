@@ -1504,27 +1504,74 @@ class GroupModel extends Gdn_Model {
      * @return array
      * @throws Exception
      */
-    public function searchByName(string $name, string $orderField = null, string $orderDirection = null, int $limit = self::LIMIT, int $offset = 0): array {
+    public function searchByName(string $name, string $orderField = null, string $orderDirection = null, int $limit = self::LIMIT, int $offset = 0, array $groupFilters = null): array {
         $result = [];
+        $privacy = ['Public', 'Private'];
+        $memberID = null;
+        $isModerater = false;
 
         if ($name) {
             $orderField = $orderField ?: 'Name';
             $orderDirection = $orderDirection ?: 'asc';
 
+            if (isset($groupFilters['memberID'])) {
+                $memberID = $groupFilters['memberID'];
+            } else {
+                $memberID = Gdn::session()->UserID;
+            }
+
+            if (isset($groupFilters['isModerator'])) {
+                $isModerater = $groupFilters['isModerator'];
+            } else {
+                $isModerater = $this->isModerator() ?: null;
+            }
+
+            $userGroups = $this->SQL->getWhere('UserGroup', ['UserID' => $memberID])->resultArray();
+            $groupIDs = array_column($userGroups, 'GroupID');
+
             $fullMatch = $this->SQL->conditionExpr('g.Name', $name, false);
 
-            $result = $this->SQL
-                ->select('g.*')
-                ->select($fullMatch, '', 'FullMatch')
-                ->from('Group g')
-                ->like('Name', $name)
-                ->orderBy('FullMatch', 'desc')
-                ->orderBy($orderField, $orderDirection)
-                ->limit($limit, $offset)
-                ->get()
-                ->resultArray();
+            if ($isModerater){
+                $privacy[] = 'Secret';
+                $result = $this->SQL
+                    ->select('g.*')
+                    ->select($fullMatch, '', 'FullMatch')
+                    ->from('Group g')
+                    ->like('Name', $name)
+                    ->whereIn('Privacy', $privacy)
+                    ->orderBy('FullMatch', 'desc')
+                    ->orderBy($orderField, $orderDirection)
+                    ->limit($limit, $offset)
+                    ->get()
+                    ->resultArray();
+            } elseif (!empty($groupIDs)) {
+                $privacy[] = 'Secret';
+                $result = $this->SQL
+                    ->select('g.*')
+                    ->select($fullMatch, '', 'FullMatch')
+                    ->from('Group g')
+                    ->like('Name', $name)
+                    ->whereIn('Privacy', $privacy)
+                    ->whereIn('GroupID', $groupIDs)
+                    ->orderBy('FullMatch', 'desc')
+                    ->orderBy($orderField, $orderDirection)
+                    ->limit($limit, $offset)
+                    ->get()
+                    ->resultArray();
+            } else {
+                $result = $this->SQL
+                    ->select('g.*')
+                    ->select($fullMatch, '', 'FullMatch')
+                    ->from('Group g')
+                    ->like('Name', $name)
+                    ->whereIn('Privacy', $privacy)
+                    ->orderBy('FullMatch', 'desc')
+                    ->orderBy($orderField, $orderDirection)
+                    ->limit($limit, $offset)
+                    ->get()
+                    ->resultArray();
+                }
         }
-
         return $result;
     }
 
