@@ -69,7 +69,7 @@ $list = $this->data('list');
             </li>
         <?php } ?>
     </ul>
-    <?php if (val('emptyMessage', $list) && (!val('items', $list) || val('sectionId', $list) === "invites")) { ?>
+    <?php if (val('emptyMessage', $list) && !val('items', $list)) { ?>
         <div class="EmptyMessage <?php echo val('emptyMessageCssClass', $list); ?>"><?php echo val('emptyMessage', $list); ?></div>
     <?php } ?>
     <?php if (val('moreLink', $list)) { ?>
