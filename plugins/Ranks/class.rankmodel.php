@@ -22,7 +22,7 @@ class RankModel extends Gdn_Model {
     /**
      * Check a user & apply their appropriate rank.
      *
-     * @param $user
+     * @param array|int $user array of user data or int user ID.
      * @return array Key 'CurrentRank' with value of set RankID.
      */
     public function applyRank($user) {
