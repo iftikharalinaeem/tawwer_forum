@@ -554,18 +554,20 @@ class RanksPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Prevent insertion of empty string in an integer column on user create/update.
+     * Handles manual ranks.
+     * Prevents insertion of empty strings in the int RankID column.
+     * Prevents overwriting "auto" ranks with NULL value from the manual ranks drop down.
      *
      * @param UserModel $sender
      * @param array $args
      */
     public function userModel_beforeSave_handler($sender, $args) {
-        if (isset($args['Fields']['RankID']) && empty($args['Fields']['RankID'])) {
-            $args['Fields']['RankID'] = null;
-        }
-
         $oldRankID = valr('User.RankID', $args);
         $newRankID = valr('Fields.RankID', $args);
+
+        if (isset($args['Fields']['RankID']) && empty($args['Fields']['RankID'])) {
+            $args['Fields']['RankID'] = $newRankID = null;
+        }
 
         $rankModel = new RankModel();
         $oldRank = $rankModel->getID($oldRankID);
