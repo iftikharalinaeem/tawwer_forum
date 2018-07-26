@@ -607,8 +607,7 @@ class RanksPlugin extends Gdn_Plugin {
             $rankModel = new RankModel();
             // We have overridden a previously manually applied rank with the null value.
             if ($newRankID === null) {
-                $user = Gdn::userModel()->getID($userID);
-                $rankModel->applyRank($user);
+                $rankModel->applyRank($userID);
             // We have applied a new manual rank.
             } else {
                 $rankModel->notify(Gdn::userModel()->getID($userID), $rankModel->getID($newRankID));
