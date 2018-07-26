@@ -560,7 +560,7 @@ class RanksPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function userModel_beforeSave_handler($sender, $args) {
-        if (empty($args['Fields']['RankID'])) {
+        if (isset($args['Fields']['RankID']) && empty($args['Fields']['RankID'])) {
             $args['Fields']['RankID'] = null;
         }
 
