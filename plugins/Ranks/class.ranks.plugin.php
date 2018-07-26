@@ -569,10 +569,14 @@ class RanksPlugin extends Gdn_Plugin {
 
         $rankModel = new RankModel();
         $oldRank = $rankModel->getID($oldRankID);
+        $newRank = $rankModel->getID($newRankID);
 
         // The empty rank option was selected.
-        // Make sure we only overwrite a manually applied rank.
-        if ($newRankID === null && !valr('Criteria.Manual', $oldRank)) {
+        // Remove the RankID from the form if
+        // RankID is NULL and current rank is an "auto" rank;
+        // Old rank and new rank are the same;
+        // New rank is not null and is not a manual rank.
+        if (($newRankID === null && !valr('Criteria.Manual', $oldRank)) || ($oldRankID == $newRankID) || ($newRankID !== null && !valr('Criteria.Manual', $newRank))) {
             unset($args['Fields']['RankID']);
         }
     }
