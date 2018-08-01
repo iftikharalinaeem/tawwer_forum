@@ -24,7 +24,7 @@ $hasBanner = val('Banner', $this->group);
         <h1 class="Group-Title"><?php echo anchor(htmlspecialchars(val('Name', $this->group)), groupUrl($this->group)); ?></h1>
         <?php
         if ($this->showDescription) { ?>
-            <div class="Group-Description">
+            <div class="Group-Description userContent">
                 <?php echo Gdn_Format::to(val('Description', $this->group), val('Format', $this->group)); ?>
             </div>
         <?php }

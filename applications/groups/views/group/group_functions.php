@@ -315,7 +315,7 @@ function writeGroupCard($group, $withButtons = true) {
             echo '<h3 class="Group-Name">'.htmlspecialchars($group['Name']).'</h3>';
         echo '</a>';
 
-        echo '<p class="Group-Description">'.
+        echo '<p class="Group-Description userContent">'.
              htmlspecialchars(sliceString(
                 Gdn_Format::plainText($group['Description'], $group['Format']),
                 c('Groups.CardDescription.ExcerptLength', 150))).'</p>';
