@@ -221,8 +221,8 @@ class FireBasePlugin extends Gdn_OAuth2 {
         $translatedKeys = [
             val('ProfileKeyEmail', $provider, 'email') => 'Email',
             val('ProfileKeyPhoto', $provider, 'photoURL') => 'Photo',
-            val('ProfileKeyName', $provider, 'displayname') => 'Name',
             val('ProfileKeyFullName', $provider, 'name') => 'FullName',
+            val('ProfileKeyName', $provider, 'displayName') => 'Name',
             val('ProfileKeyUniqueID', $provider, 'uid') => 'UniqueID'
         ];
 
