@@ -417,7 +417,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
                 $categories = $filteredCategories;
             } elseif (is_array($categories)) {
                 $filteredCategoriesID = array_column($filteredCategories, 'CategoryID');
-                $categories = array_filter($categories, function($category) use ($filteredCategories, $filteredCategoriesID) {
+                $categories = array_filter($categories, function($category) use ($filteredCategoriesID) {
                     return in_array($category['CategoryID'], $filteredCategoriesID);
                 });
             }
