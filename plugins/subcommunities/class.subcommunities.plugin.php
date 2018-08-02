@@ -3,7 +3,7 @@
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
-
+use Garden\EventManager;
 /**
  * Class SubcommunitiesPlugin
  */
@@ -411,12 +411,13 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function categoryModel_visibleCategories_handler($categories) {
         if (SubCommunityModel::getCurrent()) {
+            $subcommunityCategoryIDs = $this->getCategories();
+            $filteredIDs = Gdn::getContainer()->get(EventManager::class)->fireFilter('subcommunitiesPlugin_subcommunityVisibleCategories', $subcommunityCategoryIDs, ['categories' => $categories]);
             if ($categories === true) {
-                $categories = $this->getCategories();
+                $categories = $filteredIDs;
             } elseif (is_array($categories)) {
-                $subcommunityCategoryIDs = $this->getCategoryIDs();
-                $categories = array_filter($categories, function($category) use ($subcommunityCategoryIDs) {
-                    return in_array($category['CategoryID'], $subcommunityCategoryIDs);
+                $categories = array_filter($categories, function($category) use ($filteredIDs) {
+                    return in_array($category['CategoryID'], array_column($filteredIDs,'CategoryID'));
                 });
             }
         }
