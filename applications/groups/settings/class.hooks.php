@@ -1003,7 +1003,7 @@ class GroupsHooks extends Gdn_Plugin {
      */
     public function subcommunitiesPlugin_subcommunityVisibleCategories_handler($subcommunityCategories, $allVisibleCategories) {
         $groupCategoryIDs = CategoryModel::categories('social-groups');
-        if ($allVisibleCategories) {
+        if ($allVisibleCategories === true) {
             $subcommunityCategories[] = $groupCategoryIDs;
         } else {
             $allVisibleCategories = (array_column($allVisibleCategories, null, 'CategoryID'));
