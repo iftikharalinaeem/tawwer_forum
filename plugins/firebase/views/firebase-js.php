@@ -58,16 +58,16 @@
                         if (targetUrl) {
                             var target = targetUrl;
                         } else {
-                            var target = encodeURIComponent(window.location);
+                            var target = window.location.toString();
                         }
 
-                        if (target.toString().indexOf('%3F') != -1) {
-                            target += encodeURIComponent('&bc='+new Date().getTime());
+                        if (target.toString().indexOf('?') != -1) {
+                            target += '&bc='+new Date().getTime();
                         } else {
-                            target += encodeURIComponent('?bc='+new Date().getTime());
+                            target += '?bc='+new Date().getTime();
                         }
 
-                        var redirectUri = '/entry/connect/firebase?target='+target;
+                        var redirectUri = '/entry/connect/firebase?target='+encodeURIComponent(target);
                         window.location = redirectUri;
                         if (debug) {
                             console.debug('Entry Connect Redirect: '+ redirectUri)
