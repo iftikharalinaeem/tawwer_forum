@@ -995,4 +995,19 @@ class GroupsHooks extends Gdn_Plugin {
 
         return $records;
     }
+
+    /**
+     * @param $sender array sender An array of IDs representing Subcommunity categories available to the current user..
+     * @param $args  array|bool of IDs representing categories available to the current user. True if all are available.
+     * @return array of categories including social-groups category.
+     */
+    public function subcommunitiesPlugin_subcommunityVisibleCategories_handler($sender, $args) {
+        $category = CategoryModel::categories('social-groups');
+        if ($result = $category['CategoryID'] ?? false) {
+            if (in_array($args, CategoryModel::categories($result))) {
+                $sender[] = CategoryModel::categories($result);
+            }
+        }
+        return $sender;
+    }
 }
