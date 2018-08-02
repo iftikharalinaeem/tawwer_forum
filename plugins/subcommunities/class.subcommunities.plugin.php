@@ -411,13 +411,14 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      */
     public function categoryModel_visibleCategories_handler($categories) {
         if (SubCommunityModel::getCurrent()) {
-            $subcommunityCategoryIDs = $this->getCategories();
-            $filteredIDs = Gdn::getContainer()->get(EventManager::class)->fireFilter('subcommunitiesPlugin_subcommunityVisibleCategories', $subcommunityCategoryIDs, ['categories' => $categories]);
+            $subcommunityCategories = $this->getCategories();
+            $filteredCategories = Gdn::getContainer()->get(EventManager::class)->fireFilter('subcommunitiesPlugin_subcommunityVisibleCategories', $subcommunityCategories, $categories);
             if ($categories === true) {
-                $categories = $filteredIDs;
+                $categories = $filteredCategories;
             } elseif (is_array($categories)) {
-                $categories = array_filter($categories, function($category) use ($filteredIDs) {
-                    return in_array($category['CategoryID'], array_column($filteredIDs,'CategoryID'));
+                $filteredCategoriesID = array_column($filteredCategories, 'CategoryID');
+                $categories = array_filter($categories, function($category) use ($filteredCategories, $filteredCategoriesID) {
+                    return in_array($category['CategoryID'], $filteredCategoriesID);
                 });
             }
         }
