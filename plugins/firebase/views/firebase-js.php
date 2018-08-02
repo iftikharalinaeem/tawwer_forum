@@ -60,6 +60,13 @@
                         } else {
                             var target = encodeURIComponent(window.location);
                         }
+
+                        if (target.toString().indexOf('%3F') != -1) {
+                            target += encodeURIComponent('&bc='+new Date().getTime());
+                        } else {
+                            target += encodeURIComponent('?bc='+new Date().getTime());
+                        }
+
                         var redirectUri = '/entry/connect/firebase?target='+target;
                         window.location = redirectUri;
                         if (debug) {
