@@ -68,10 +68,11 @@
                         }
 
                         var redirectUri = '/entry/connect/firebase?target='+encodeURIComponent(target);
-                        window.location = redirectUri;
+
                         if (debug) {
                             console.debug('Entry Connect Redirect: '+ redirectUri)
                         }
+                        window.location = redirectUri;
                     },
                     error: function(msg) {
                         if (debug) {
