@@ -61,7 +61,7 @@
                             var target = window.location.toString();
                         }
 
-                        if (target.toString().indexOf('?') != -1) {
+                        if (target.indexOf('?') != -1) {
                             target += '&bc='+new Date().getTime();
                         } else {
                             target += '?bc='+new Date().getTime();
