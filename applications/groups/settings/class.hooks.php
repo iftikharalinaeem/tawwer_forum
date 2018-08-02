@@ -997,17 +997,23 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
-     * @param $sender array sender An array of IDs representing Subcommunity categories available to the current user..
-     * @param $args  array|bool of IDs representing categories available to the current user. True if all are available.
+     * @param $subcommunityCategories array  An array of IDs representing Subcommunity categories available to the current user..
+     * @param $allVisibleCategories  array|bool An array of IDs representing categories available to the current user. True if all are available.
      * @return array of categories including social-groups category.
      */
-    public function subcommunitiesPlugin_subcommunityVisibleCategories_handler($sender, $args) {
-        $category = CategoryModel::categories('social-groups');
-        if ($result = $category['CategoryID'] ?? false) {
-            if (in_array($args, CategoryModel::categories($result))) {
-                $sender[] = CategoryModel::categories($result);
+    public function subcommunitiesPlugin_subcommunityVisibleCategories_handler($subcommunityCategories, $allVisibleCategories) {
+        $groupCategoryIDs = GroupModel::getGroupCategoryIDs('social-groups');
+        if ($allVisibleCategories) {
+            $groupCategoryIDs = CategoryModel::categories('social-groups');
+            $subcommunityCategories[] = $groupCategoryIDs;
+        } else {
+            $allVisibleCategories = (array_column($allVisibleCategories, null, 'CategoryID'));
+            foreach ($groupCategoryIDs as $categoryID) {
+                if ($category = $allVisibleCategories[$categoryID] ?? false) {
+                    $subcommunityCategories[] = $category;
+                }
             }
         }
-        return $sender;
+        return $subcommunityCategories;
     }
 }
