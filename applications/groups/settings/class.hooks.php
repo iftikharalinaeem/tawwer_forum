@@ -1006,7 +1006,7 @@ class GroupsHooks extends Gdn_Plugin {
         if ($allVisibleCategories === true) {
             $subcommunityCategories[] = $groupCategoryIDs;
         } else {
-            $allVisibleCategories = (array_column($allVisibleCategories, null, 'CategoryID'));
+            $allVisibleCategories = array_column($allVisibleCategories, null, 'CategoryID');
             foreach ($groupCategoryIDs as $categoryID) {
                 if ($category = $allVisibleCategories[$categoryID] ?? false) {
                     $subcommunityCategories[] = $category;
