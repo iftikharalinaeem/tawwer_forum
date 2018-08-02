@@ -214,16 +214,18 @@ class FireBasePlugin extends Gdn_OAuth2 {
      * Translate the keys of the profile data being sent from Firebase to match the keys Vanilla uses.
      *
      * @param array $rawProfile profile as it is returned from the provider.
-     * @return array Profile array transformed by child class or as is.
+     * @return array Profile array transformed by provider.
      */
     public function translateProfileResults($rawProfile = []) {
+        $provider = $this->provider();
         $translatedKeys = [
-            'email' => 'Email',
-            'photoURL' => 'Photo',
-            'displayName' => 'Name',
-            'name' => 'FullName',
-            'uid' => 'UniqueID',
+            val('ProfileKeyEmail', $provider, 'email') => 'Email',
+            val('ProfileKeyPhoto', $provider, 'photoURL') => 'Photo',
+            val('ProfileKeyName', $provider, 'displayname') => 'Name',
+            val('ProfileKeyFullName', $provider, 'name') => 'FullName',
+            val('ProfileKeyUniqueID', $provider, 'uid') => 'UniqueID'
         ];
+
         $profile = self::translateArrayMulti($rawProfile, $translatedKeys, true);
         $profile['Provider'] = $this->providerKey;
         return $profile;
