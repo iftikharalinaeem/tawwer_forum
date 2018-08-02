@@ -58,13 +58,21 @@
                         if (targetUrl) {
                             var target = targetUrl;
                         } else {
-                            var target = encodeURIComponent(window.location);
+                            var target = window.location.toString();
                         }
-                        var redirectUri = '/entry/connect/firebase?target='+target;
-                        window.location = redirectUri;
+
+                        if (target.indexOf('?') != -1) {
+                            target += '&bc='+new Date().getTime();
+                        } else {
+                            target += '?bc='+new Date().getTime();
+                        }
+
+                        var redirectUri = '/entry/connect/firebase?target='+encodeURIComponent(target);
+
                         if (debug) {
                             console.debug('Entry Connect Redirect: '+ redirectUri)
                         }
+                        window.location = redirectUri;
                     },
                     error: function(msg) {
                         if (debug) {
