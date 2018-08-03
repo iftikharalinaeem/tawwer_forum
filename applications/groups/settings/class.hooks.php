@@ -1002,9 +1002,12 @@ class GroupsHooks extends Gdn_Plugin {
      * @return array of categories including social-groups category.
      */
     public function subcommunitiesPlugin_subcommunityVisibleCategories_handler($subcommunityCategories, $allVisibleCategories) {
-        $groupCategoryIDs = CategoryModel::categories('social-groups');
+        $groupCategoryIDs = GroupModel::getGroupCategoryIDs();
         if ($allVisibleCategories === true) {
-            $subcommunityCategories[] = $groupCategoryIDs;
+            foreach ($groupCategoryIDs as $categoryID) {
+                    $groupCategory = CategoryModel::categories($categoryID);
+                    $subcommunityCategories[] = $groupCategory;
+            }
         } else {
             $allVisibleCategories = array_column($allVisibleCategories, null, 'CategoryID');
             foreach ($groupCategoryIDs as $categoryID) {
