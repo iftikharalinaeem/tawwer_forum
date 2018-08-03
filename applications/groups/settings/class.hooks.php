@@ -1013,8 +1013,8 @@ class GroupsHooks extends Gdn_Plugin {
         } else {
             $allVisibleCategories = array_column($allVisibleCategories, null, 'CategoryID');
             foreach ($groupCategoryIDs as $categoryID) {
-                if ($category = $allVisibleCategories[$categoryID] ?? false) {
-                    $subcommunityCategories[] = $category;
+                if (isset($allVisibleCategories[$categoryID])) {
+                    $subcommunityCategories[] = $allVisibleCategories[$categoryID];
                 }
             }
         }
