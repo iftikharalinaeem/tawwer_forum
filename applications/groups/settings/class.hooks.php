@@ -997,9 +997,11 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
-     * @param $subcommunityCategories array  An array of IDs representing Subcommunity categories available to the current user..
-     * @param $allVisibleCategories  array|bool An array of IDs representing categories available to the current user. True if all are available.
-     * @return array of categories including social-groups category.
+     * Add social groups access to subcommunities if the user has the proper permissions.
+     *
+     * @param array $subcommunityCategories An array of IDs representing Subcommunity categories available to the current user.
+     * @param array|bool $allVisibleCategories An array of IDs representing categories available to the current user. True if all are available.
+     * @return array Categories available to the user in a subcommunity. Social group categories included when relevant.
      */
     public function subcommunitiesPlugin_subcommunityVisibleCategories_handler($subcommunityCategories, $allVisibleCategories) {
         $groupCategoryIDs = GroupModel::getGroupCategoryIDs();
