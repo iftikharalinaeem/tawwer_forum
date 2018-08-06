@@ -683,18 +683,19 @@ class GroupModel extends Gdn_Model {
 
                 $args = [
                     'Name' => htmlspecialchars($group['Name']),
-                    'Url' => groupUrl($group, '/')
+                    'Url' => groupUrl($group, '/'),
+                    'ActionText' => 'Join',
                 ];
                 $row = [
                     'Subject' => formatString(t('Please join my group.'), $args),
                     'Body' => formatString(t("You've been invited to join {Name}."), $args),
                     'Format' => 'Html',
                     'RecipientUserID' => $validUserIDs,
-                    'Type' => 'invite',
+                    'Type' => 'Invite',
                     'RegardingID' => $group['GroupID'],
                 ];
 
-                if (!$model->save($row)) {
+                if (!$model->save($row, [], $args)) {
                     throw new Gdn_UserException($model->Validation->resultsText());
                 }
             } else {
