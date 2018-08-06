@@ -17,8 +17,8 @@
         <a class="navbar-brand" href="{link path="home"}">{logo}</a>
         <div class="navbar-right">
           {if !$User.SignedIn}
-          <a class="button" href="{link path="entry/signin"}">{t c="Sign In"}</a>
-          <a class="button" href="{link path="entry/register"}">{t c="Register"}</a>
+              <a class="button" href="{link path="signin" target="current" format="%url"}">{t c="Sign In"}</a>
+              <a class="button" href="{link path="register" target="current" format="%url"}">{t c="Register"}</a>
           {else}
           <div class="mebox">{module name="MeModule" CssClass="Inline FlyoutRight"}</div>
           {/if}
