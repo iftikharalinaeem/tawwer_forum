@@ -11,11 +11,25 @@ body.hasRichEditor {
     }
   }
 
-  #MessageForm .MessageFormWrap .FormWrapper {
-    padding-left: 0;
-  }
-
   #Form_ConversationMessage > div {
     padding-left: 18px;
+  }
+}
+
+body.hasRichEditor {
+  .Form-Body {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .CommentFormWrap,
+  .FormWrapper:not(.FormWrapper-Condensed) {
+    .Buttons {
+      padding-right: 35px;
+    }
+  }
+
+  #Form_Comment .richEditor {
+    padding-right: 18px;
   }
 }
