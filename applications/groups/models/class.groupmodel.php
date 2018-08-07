@@ -681,11 +681,14 @@ class GroupModel extends Gdn_Model {
             if (class_exists('ConversationModel')) {
                 $model = new ConversationModel();
 
+                $groupURL = groupUrl($group);
+
                 $args = [
                     'Name' => htmlspecialchars($group['Name']),
-                    'Url' => groupUrl($group, '/'),
-                    'ActionText' => 'Join',
+                    'Url' => $groupURL,
+
                 ];
+
                 $row = [
                     'Subject' => formatString(t('Please join my group.'), $args),
                     'Body' => formatString(t("You've been invited to join {Name}."), $args),
@@ -695,7 +698,12 @@ class GroupModel extends Gdn_Model {
                     'RegardingID' => $group['GroupID'],
                 ];
 
-                if (!$model->save($row, [], $args)) {
+                $options = [
+                    'Url' => $groupURL,
+                    'ActionText' => 'Join',
+                ];
+
+                if (!$model->save($row, [], $options)) {
                     throw new Gdn_UserException($model->Validation->resultsText());
                 }
             } else {
