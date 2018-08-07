@@ -694,7 +694,7 @@ class GroupModel extends Gdn_Model {
                     'Body' => formatString(t("You've been invited to join {Name}."), $args),
                     'Format' => 'Html',
                     'RecipientUserID' => $validUserIDs,
-                    'Type' => 'Invite',
+                    'Type' => 'invite',
                     'RegardingID' => $group['GroupID'],
                 ];
 
