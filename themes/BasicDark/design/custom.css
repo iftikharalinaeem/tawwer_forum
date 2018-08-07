@@ -578,8 +578,3 @@ a.followButton:not(:hover) {
     color: #252525 !important;
 }
 
-body.hasRichEditor .MessageFormWrap .Buttons,
-body.hasRichEditor .CommentFormWrap .Buttons,
-body.hasRichEditor .FormWrapper:not(.FormWrapper-Condensed) .Buttons {
-    padding-right: 35px;
-}

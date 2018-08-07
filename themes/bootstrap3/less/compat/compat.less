@@ -10,10 +10,6 @@ body.hasRichEditor {
       padding-left: 18px;
     }
   }
-
-  #Form_ConversationMessage > div {
-    padding-left: 18px;
-  }
 }
 
 body.hasRichEditor {
@@ -32,4 +28,39 @@ body.hasRichEditor {
   #Form_Comment .richEditor {
     padding-right: 18px;
   }
+
+  &.Section-Group.Section-Discussion {
+    .richEditor {
+      padding-right: 0;
+    }
+  }
+
+  #MessageForm,
+  #Form_ConversationMessage {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .MessageFormWrap {
+    .Form-Body,
+    .FormWrapper.FormWrapper-Condensed {
+      padding-right: 0 !important;
+      padding-left: 0 !important;
+    }
+
+    .bodybox-wrap {
+      padding-left: 36px;
+      padding-right: 36px;
+    }
+
+    .Buttons {
+      padding-right: 36px !important;
+      margin-right: 0;
+      margin-left: 0;
+    }
+  }
+
+
+
+
 }

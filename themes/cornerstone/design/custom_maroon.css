@@ -1353,3 +1353,6 @@ a.Bookmarked:hover:before {
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
+body.hasRichEditor.Profile .FormWrapper.FormWrapper-Condensed {
+  padding-left: 0;
+}
