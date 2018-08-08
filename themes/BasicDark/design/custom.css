@@ -57,13 +57,13 @@ a {
 
 /* Activities */
 
-.Activities a.CommentLink, 
+.Activities a.CommentLink,
 .Activities a.CommentLink:hover {
    background: black;
    border-color: #444;
    color: white;
 }
-   
+
 li.Activity div.Title {
    color: #bbb;
 }
@@ -318,7 +318,7 @@ body.Entry #Content h1,
 #MessageForm h2,
 #DiscussionForm h2,
 #ConversationForm h2 {
-   color: #bbb;   
+   color: #bbb;
 }
 #MessageForm {
    margin-top: 1px;
@@ -566,7 +566,15 @@ a.TextColor.followButton:not(:hover) {
    color: #70727c;
 }
 
+.richEditorParagraphMenu-handle,
 a.followButton:not(:hover) {
    color: #ffffff;
+}
+
+.richEditor,
+.richEditor h2,
+.richEditor h3,
+.richEditorParagraphMenu-handle:hover {
+    color: #252525 !important;
 }
 
