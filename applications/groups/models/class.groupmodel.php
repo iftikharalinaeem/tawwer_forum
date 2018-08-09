@@ -680,8 +680,9 @@ class GroupModel extends Gdn_Model {
             // Send a message for the invite.
             if (class_exists('ConversationModel')) {
                 $model = new ConversationModel();
-
-                $groupURL = groupUrl($group);
+                
+                $groupPrivacy = $group['Privacy'] ?? null;
+                $groupURL = ($groupPrivacy == 'Secret') ? '/groups' : groupUrl($group);
 
                 $args = [
                     'Name' => htmlspecialchars($group['Name']),
