@@ -198,7 +198,7 @@ if ($St->tableExists('Discussion')) {
     $groupCategoryIDs = $groupModel->getGroupCategoryIDs();
     $result = Gdn::sql()
         ->update('Discussion')
-        ->set('Announce', 2, true, false)
+        ->set('Announce', 2, true)
         ->where(['GroupID is not null' => '', 'Announce' => 1])
         ->orBeginWhereGroup()
         ->where('Announce', 1)
