@@ -196,7 +196,7 @@ $ActivityModel->defineType('Events');
 if ($St->tableExists('Discussion')) {
     $groupModel = new GroupModel();
     $groupCategoryIDs = $groupModel->getGroupCategoryIDs();
-    $result = $groupModel->SQL
+    $result = Gdn::sql()
         ->update('Discussion')
         ->set('Announce', 2, true, false)
         ->where(['GroupID is not null' => '', 'Announce' => 1])
