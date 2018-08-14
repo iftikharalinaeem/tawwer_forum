@@ -781,7 +781,7 @@ class GroupController extends Gdn_Controller {
             }
         }
         $this->Form = $form;
-        $this->CssClass .= ' NoPanel NarrowForm';
+        $this->CssClass .= ' NoPanel';
         $this->render('AddEdit');
     }
 

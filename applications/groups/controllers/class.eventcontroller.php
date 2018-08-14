@@ -172,7 +172,7 @@ class EventController extends Gdn_Controller {
         require_once $this->fetchViewLocation('group_functions', 'Group');
 
         $this->View = 'addedit';
-        $this->CssClass .= ' NoPanel NarrowForm';
+        $this->CssClass .= ' NoPanel';
         return $this->render();
     }
 
@@ -220,7 +220,7 @@ class EventController extends Gdn_Controller {
         require_once $this->fetchViewLocation('group_functions', 'Group');
 
         $this->View = 'addedit';
-        $this->CssClass .= ' NoPanel NarrowForm';
+        $this->CssClass .= ' NoPanel';
         return $this->render();
     }
 
