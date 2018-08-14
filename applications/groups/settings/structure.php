@@ -198,11 +198,11 @@ if ($St->tableExists('Discussion')) {
     $groupCategoryIDs = $groupModel->getGroupCategoryIDs();
     $result = Gdn::sql()
         ->update('Discussion')
-        ->set('Announce', 2, true)
-        ->where(['GroupID is not null' => '', 'Announce' => 1])
-        ->orBeginWhereGroup()
+        ->set('Announce', 2)
         ->where('Announce', 1)
-        ->whereIn('CategoryID', $groupCategoryIDs)
+        ->beginWhereGroup()
+        ->where('GroupID is not null', '')
+        ->orWhereIn('CategoryID', $groupCategoryIDs)
         ->endWhereGroup()
         ->put();
 }
