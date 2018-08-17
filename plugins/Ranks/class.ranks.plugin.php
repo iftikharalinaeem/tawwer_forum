@@ -609,7 +609,7 @@ class RanksPlugin extends Gdn_Plugin {
         $newRankID = val('RankID', $args['Fields']);
 
         // Check to make sure the rank has changed.
-        if ($oldRankID != $newRankID) {
+        if ($oldRankID != $newRankID && $newRankID !== false) {
             $rankModel = new RankModel();
             // We have overridden a previously manually applied rank with the null value.
             if ($newRankID === null) {
