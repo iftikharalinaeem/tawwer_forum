@@ -354,4 +354,12 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
 
         AnalyticsTracker::getInstance()->setup();
     }
+
+    /**
+     * Hook in when a new user session is detected.
+     */
+    public function userModel_visit_handler() {
+        // Make sure all identifiers are up-to-date.
+        AnalyticsTracker::getInstance()->resetSessionIDs();
+    }
 }

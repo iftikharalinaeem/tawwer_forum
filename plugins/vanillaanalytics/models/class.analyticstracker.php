@@ -339,10 +339,7 @@ class AnalyticsTracker {
 
         // Update the two session IDs if they're empty or if a new session was detected by Vanilla.
         if (Gdn::session()->isNewVisit()) {
-            $secondarySessionID = AnalyticsData::uuid();
-            $sessionID = AnalyticsData::uuid();
-            $this->cookie->setSessionID($sessionID);
-            $this->cookie->setSecondarySessionID($secondarySessionID);
+            $this->resetSessionIDs();
         } else {
             if ($this->cookie->getSecondarySessionID() === null) {
                 $secondarySessionID = AnalyticsData::uuid();
@@ -355,6 +352,16 @@ class AnalyticsTracker {
         }
 
         $this->cookie->saveToCookie(self::COOKIE_SUFFIX);
+    }
+
+    /**
+     * Reset the user's session IDs in the cookie object.
+     */
+    public function resetSessionIDs() {
+        $secondarySessionID = AnalyticsData::uuid();
+        $sessionID = AnalyticsData::uuid();
+        $this->cookie->setSessionID($sessionID);
+        $this->cookie->setSecondarySessionID($secondarySessionID);
     }
 
     /**
