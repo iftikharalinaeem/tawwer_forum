@@ -665,11 +665,11 @@ class KeenIOTracker implements TrackerInterface {
         $totalActiveUsersQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
             ->setTitle(t('Active Users'))
             ->setEventCollection('page')
-            ->setTargetProperty('user.userID')
+            ->setTargetProperty('user.uuid')
             ->addFilter([
-                'operator' => 'gt',
-                'property_name' => 'user.userID',
-                'property_value' => 0
+                'operator' => 'ne',
+                'property_name' => 'user.roleType',
+                'property_value' => 'guest'
             ]);
 
         $this->widgets['total-active-users']['query'] = $totalActiveUsersQuery;
@@ -1095,12 +1095,12 @@ class KeenIOTracker implements TrackerInterface {
         $activeUsersQuery->setAnalysisType(KeenIOQuery::ANALYSIS_COUNT_UNIQUE)
             ->setTitle(t('Active Users'))
             ->setEventCollection('page')
-            ->setTargetProperty('user.userID')
+            ->setTargetProperty('user.uuid')
             ->setInterval('daily')
             ->addFilter([
-                'operator' => 'gt',
-                'property_name' => 'user.userID',
-                'property_value' => 0
+                'operator' => 'ne',
+                'property_name' => 'user.roleType',
+                'property_value' => 'guest'
             ]);
 
         $this->widgets['active-users']['query'] = $activeUsersQuery;
