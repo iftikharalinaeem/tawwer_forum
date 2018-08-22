@@ -666,8 +666,8 @@ class SalesforcePlugin extends Gdn_Plugin {
             $salesforce->reconnect();
         }
 
-      $this->EventArguments['Data'] = &$data;
-      $this->fireEvent('CaseFormData');
+        $sender->EventArguments['Data'] = &$data;
+        $sender->fireEvent('CaseFormData');
 
         $sender->Form->setData($data);
         $sender->setData('Data', $data);
