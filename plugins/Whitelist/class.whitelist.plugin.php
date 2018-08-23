@@ -281,14 +281,11 @@ class WhitelistPlugin extends Gdn_Plugin {
      * @return array|bool tokenized IP or false on failure.
      */
     protected function tokenizeIP($ip) {
+        $tokens = [];
         if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             $tokens = explode('.', $ip);
         } else if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 )){
             $tokens = explode(':', $ip);
-        }
-
-        if (count($tokens) < 4) {
-            $tokens = false;
         }
 
         return $tokens;
