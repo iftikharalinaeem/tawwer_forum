@@ -51,7 +51,7 @@ class WhitelistPlugin extends Gdn_Plugin {
 
             // Make sure only valid characters are part of the whitelist
             $iPList = $sender->Form->getFormValue('Whitelist.IPList');
-            $iPList = $this->cleanIPWhiteList($iPList);
+           $iPList = $this->cleanIPWhiteList($iPList);
             $sender->Form->setFormValue('Whitelist.IPList', $iPList);
 
             if ($sender->Form->save() !== false) {
@@ -182,8 +182,9 @@ class WhitelistPlugin extends Gdn_Plugin {
      * @return string Clean IPWhitelist
      */
     protected function cleanIPWhiteList($ipWhitelist) {
-        return preg_replace('/[^\d\n\-*.]/', null, $ipWhitelist);
+        return preg_replace('/[^\w\d\n\-*.:]/', null, $ipWhitelist);
     }
+
 
     /**
      * Load the tokenized list of master IPs.
@@ -274,15 +275,19 @@ class WhitelistPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Tokenize an IPv4 into 4 token.
+     * Tokenize an IPv4/IPV6
      *
      * @param string $ip IP address
      * @return array|bool tokenized IP or false on failure.
      */
     protected function tokenizeIP($ip) {
-        $tokens = explode('.', $ip);
+        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $tokens = explode('.', $ip);
+        } else if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 )){
+            $tokens = explode(':', $ip);
+        }
 
-        if (count($tokens) !== 4) {
+        if (count($tokens) < 4) {
             $tokens = false;
         }
 
