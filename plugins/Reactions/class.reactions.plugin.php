@@ -864,6 +864,12 @@ class ReactionsPlugin extends Gdn_Plugin {
         $sender->setData('EditMode', false, true);
         $sender->setData('_robots', 'noindex, nofollow');
 
+        $canonicalUrl = userUrl($sender->User, '', 'reactions');
+        if (!empty($reaction) || !in_array($page, ['', 'p1'])) {
+            $canonicalUrl .= '?'.http_build_query(['reaction' => strtolower($reaction) ?: null, 'page' => $page ?: null]);
+        }
+        $sender->canonicalUrl(url($canonicalUrl, true));
+
         $sender->_setBreadcrumbs(t($reactionType['Name']), $sender->canonicalUrl());
         $sender->setTabView('Reactions', 'DataList', '', 'plugins/Reactions');
         $this->addJs($sender);

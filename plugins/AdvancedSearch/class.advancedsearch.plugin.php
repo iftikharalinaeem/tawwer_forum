@@ -102,7 +102,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
         $result .= $form->open(['action' => url('/search')]).
 //         $Form->label('@'.$title, 'search').
-            ' '.$form->textBox('search', ['placeholder' => $title]).
+            ' '.$form->textBox('search', ['placeholder' => $title, 'class' => 'js-search']).
             ' <div class="bwrap"><button type="submit" class="Button" title="'.t('Search').'">'.t('Go').'</button></div>'.
             $form->close();
 

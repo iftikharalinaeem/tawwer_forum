@@ -1,14 +1,12 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
-<div class="FormTitleWrapper">
+<div id="EventAddEditForm" class="FormTitleWrapper">
     <h1><?php echo t($this->Data['Title']); ?></h1>
     <div class="FormWrapper StructuredForm AddEvent">
-
         <?php
             echo $this->Form->errors();
             echo $this->Form->open();
         ?>
-
         <div class="Event" data-groupid="<?php echo $this->data('Group.GroupID'); ?>">
 
             <div class="P Name">

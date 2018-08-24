@@ -292,7 +292,7 @@ class EventsApiController extends AbstractApiController {
      */
     public function groupByID($id) {
         $row = $this->groupModel->getID($id, DATASET_TYPE_ARRAY);
-        if (!$row) {
+        if (!$row || !$this->groupModel->checkPermission('Access', $row)) {
             throw new NotFoundException('Group');
         }
 
@@ -360,7 +360,12 @@ class EventsApiController extends AbstractApiController {
         // Filters
         $where = [];
         if (array_key_exists('groupID', $query)) {
-            $where['GroupID'] = $query['groupID'];
+            if (!$this->groupModel->checkPermission('Access', $query['groupID'])) {
+                // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
+                $where['GroupID'] = -1;
+            } else {
+                $where['GroupID'] = $query['groupID'];
+            }
         }
 
         // Data

@@ -80,6 +80,7 @@
             echo $this->Form->radioList('Privacy', [
                 'Public' => '@'.t('Public').'. <span class="Gloss">'.t('Public group.', 'Anyone can see the group and its content. Anyone can join.').'</span>',
                 'Private' => '@'.t('Private').'. <span class="Gloss">'.t('Private group.', 'Anyone can see the group, but only members can see its content. People must apply or be invited to join.').'</span>',
+                'Secret' => '@'.t('Secret').'. <span class="Gloss">'.t('Secret group.', 'Only members can see the group and view its content. People must be invited to join.').'</span>',
                 ],
                 ['list' => true]);
             ?>

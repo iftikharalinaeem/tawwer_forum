@@ -15,6 +15,12 @@ class GroupModel extends Gdn_Model {
     /** @var int The number of members per page. */
     public $MemberPageSize = 30;
 
+    /** @var int Limit of query results per page */
+    const LIMIT = 24;
+
+    /** @var array The permissions associated with a group. */
+    private static $permissions = [];
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -122,10 +128,10 @@ class GroupModel extends Gdn_Model {
      *  - Moderate: The user may moderate the group.
      * @param int|array $groupID The groupID or group record.
      * @param int|null $userID
+     * @param bool $useCache Use the user-group permission cache? If false, don't read or write to it.
      * @return boolean
      */
-    public function checkPermission($permission, $groupID, $userID = null) {
-        static $permissions = [];
+    public function checkPermission($permission, $groupID, $userID = null, $useCache = true) {
 
         if ($userID === null) {
             $userID = Gdn::session()->UserID;
@@ -138,7 +144,7 @@ class GroupModel extends Gdn_Model {
 
         $key = "$userID-$groupID";
 
-        if (!isset($permissions[$key])) {
+        if (!$useCache || !isset(self::$permissions[$key])) {
             // Get the data for the group.
             if (!isset($group)) {
                 $group = $this->getID($groupID);
@@ -154,6 +160,7 @@ class GroupModel extends Gdn_Model {
 
             // Set the default permissions.
             $perms = [
+                'Access' => true,
                 'Member' => false,
                 'Leader' => false,
                 'Apply' => false,
@@ -162,7 +169,8 @@ class GroupModel extends Gdn_Model {
                 'Edit' => false,
                 'Delete' => false,
                 'Moderate' => false,
-                'View' => true];
+                'View' => true,
+            ];
 
             // The group creator is always a member and leader.
             if ($userID == $group['InsertUserID']) {
@@ -192,6 +200,12 @@ class GroupModel extends Gdn_Model {
                     $perms['Apply'] = true;
                     $perms['View'] = false;
                     $perms['View.Reason'] = t('Join this group to view its content.');
+
+                    // Secret groups basically have the same permissions as non-public groups with some minor tweaks.
+                    if ($group['Privacy'] === 'Secret') {
+                        $perms['Access'] = false;
+                        $perms['Apply'] = false;
+                    }
                 }
             }
 
@@ -212,6 +226,7 @@ class GroupModel extends Gdn_Model {
                         $perms['Apply.Reason'] = t("You're banned from joining this group.");
                         break;
                     case 'invitation':
+                        $perms['Access'] = true;
                         $perms['Apply.Reason'] = t('You have a pending invitation to join this group.');
                         $perms['Join'] = true;
                         unset($perms['Join.Reason']);
@@ -220,14 +235,11 @@ class GroupModel extends Gdn_Model {
             }
 
             // Moderators can view and edit all groups.
-            $canManage = Gdn::session()->checkPermission([
-                'Garden.Settings.Manage',
-                'Garden.Community.Manage',
-                'Groups.Moderation.Manage'
-            ], false);
+            $canManage = $this->isModerator();
 
             if ($userID == Gdn::session()->UserID && $canManage) {
                 $managerOverrides = [
+                    'Access' => true,
                     'Delete' => true,
                     'Edit' => true,
                     'Leader' => true,
@@ -239,10 +251,12 @@ class GroupModel extends Gdn_Model {
                 $perms = array_merge($perms, $managerOverrides);
             }
 
-            $permissions[$key] = $perms;
+            if ($useCache) {
+                self::$permissions[$key] = $perms;
+            }
+        } else {
+            $perms = self::$permissions[$key];
         }
-
-        $perms = $permissions[$key];
 
         if (!$permission) {
             return $perms;
@@ -269,6 +283,13 @@ class GroupModel extends Gdn_Model {
         } else {
             return $perms[$permission];
         }
+    }
+
+    /**
+     * Reset the cached grouped permissions.
+     */
+    public function resetCachedPermissions() {
+        self::$permissions = [];
     }
 
     /**
@@ -332,6 +353,20 @@ class GroupModel extends Gdn_Model {
      */
     public function deleteInvites($groupID, $userID) {
         $this->SQL->delete('GroupApplicant', ['GroupID' => $groupID, 'UserID' => $userID, 'Type' => 'Invitation']);
+    }
+
+    /**
+     * Determine if the current user is a Groups global moderator.
+     *
+     * @return bool
+     */
+    public function isModerator(): bool {
+        $result = Gdn::session()->checkPermission([
+            'Garden.Settings.Manage',
+            'Garden.Community.Manage',
+            'Groups.Moderation.Manage'
+        ], false);
+        return $result;
     }
 
     /**
@@ -645,11 +680,16 @@ class GroupModel extends Gdn_Model {
             // Send a message for the invite.
             if (class_exists('ConversationModel')) {
                 $model = new ConversationModel();
+                
+                $groupPrivacy = $group['Privacy'] ?? null;
+                $groupURL = ($groupPrivacy == 'Secret') ? '/groups' : groupUrl($group);
 
                 $args = [
                     'Name' => htmlspecialchars($group['Name']),
-                    'Url' => groupUrl($group, '/')
+                    'Url' => $groupURL,
+
                 ];
+
                 $row = [
                     'Subject' => formatString(t('Please join my group.'), $args),
                     'Body' => formatString(t("You've been invited to join {Name}."), $args),
@@ -659,7 +699,12 @@ class GroupModel extends Gdn_Model {
                     'RegardingID' => $group['GroupID'],
                 ];
 
-                if (!$model->save($row)) {
+                $options = [
+                    'Url' => $groupURL,
+                    'ActionText' => 'Join',
+                ];
+
+                if (!$model->save($row, [], $options)) {
                     throw new Gdn_UserException($model->Validation->resultsText());
                 }
             } else {
@@ -894,6 +939,36 @@ class GroupModel extends Gdn_Model {
         $result = $this->getWhere(['GroupID' => $iDs], $orderFields, $orderDirection, $limit, $offset)->resultArray();
         $this->calc($result);
         return $result;
+    }
+
+    /**
+     * Get a list of the groups a user is invited to.
+     *
+     * @param $userID
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param int $limit
+     * @param bool $offset
+     * @return Gdn_DataSet
+     * @throws Exception
+     */
+    public function getInvites($userID, $orderFields = '', $orderDirection = 'desc', $limit = 9, $offset = false) {
+        $ids = $this->SQL
+            ->select('GroupID')
+            ->from('GroupApplicant')
+            ->where([
+                'UserID' => $userID,
+                'Type' => 'Invitation',
+            ])
+            ->orderBy('DateInserted')
+            ->limit(100) // protect against weird data
+            ->get()->resultArray();
+        $ids = array_column($ids, 'GroupID');
+
+        $result = $this->getWhere(['GroupID' => $ids], $orderFields, $orderDirection, $limit, $offset);
+        $result->datasetType(DATASET_TYPE_ARRAY);
+        $this->calc($result->resultArray());
+        return $result->resultArray();
     }
 
     /**
@@ -1230,7 +1305,7 @@ class GroupModel extends Gdn_Model {
             Gdn::session()->setPermission('Vanilla.Discussions.View', []);
         }
 
-        if ($this->checkPermission('Member', $group)) {
+        if ($this->checkPermission('Member', $group) || $this->checkPermission('Moderate', $group)) {
             Gdn::session()->setPermission('Vanilla.Discussions.Add', [$categoryID]);
             Gdn::session()->setPermission('Vanilla.Comments.Add', [$categoryID]);
         } else {
@@ -1459,4 +1534,95 @@ class GroupModel extends Gdn_Model {
         }
         return $groupCategoryIDs;
     }
+
+    /**
+     * Search groups by name.
+     *
+     * @param string $name
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     * @throws Exception
+     */
+    public function searchByName(string $name, string $orderField = null, string $orderDirection = null, int $limit = self::LIMIT, int $offset = 0): array {
+        $result = [];
+        $memberID = Gdn::session()->UserID ?: null;
+        $isModerator = $this->isModerator() ?: null;
+
+        if ($name) {
+            $orderField = $orderField ?: 'Name';
+            $orderDirection = $orderDirection ?: 'asc';
+
+            $groupIDs = $this->getUserGroupIDs($memberID);
+
+            $fullMatch = $this->SQL->conditionExpr('g.Name', $name, false);
+
+            // User is a moderator, display all groups.
+            if ($isModerator) {
+                //Get all the groups
+                $result = $this->SQL
+                    ->select('g.*')
+                    ->select($fullMatch, '', 'FullMatch')
+                    ->from('Group g')
+                    ->like('Name', $name)
+                    ->orderBy('FullMatch', 'desc')
+                    ->orderBy($orderField, $orderDirection)
+                    ->limit($limit, $offset)
+                    ->get()
+                    ->resultArray();
+            } else {
+                // User is not a moderator, display all groups, except secret group member is not part of.
+                if (!empty($groupIDs)) {
+                    $result = $this->SQL
+                        ->select('g.*')
+                        ->select($fullMatch, '', 'FullMatch')
+                        ->from('Group g')
+                        ->like('Name', $name)
+                        ->beginWhereGroup()
+                        ->whereIn('Privacy', ['Public', 'Private'])
+                        ->orWhereIn('GroupId', $groupIDs)
+                        ->endWhereGroup()
+                        ->orderBy('FullMatch', 'desc')
+                        ->orderBy($orderField, $orderDirection)
+                        ->limit($limit, $offset)
+                        ->get()
+                        ->resultArray();
+                } else {
+                    $result = $this->SQL
+                        ->select('g.*')
+                        ->select($fullMatch, '', 'FullMatch')
+                        ->from('Group g')
+                        ->like('Name', $name)
+                        ->whereIn('Privacy', ['Public', 'Private'])
+                        ->orderBy('FullMatch', 'desc')
+                        ->orderBy($orderField, $orderDirection)
+                        ->limit($limit, $offset)
+                        ->get()
+                        ->resultArray();
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Get total number of groups that match the search..
+     *
+     * @param string $name
+     * @return int
+     * @throws Exception
+     */
+    public function searchTotal(string $name): int {
+        $total = 0;
+
+        if ($name) {
+            $total = $this->SQL
+                ->from('Group')
+                ->like('Name', $name, 'right')
+                ->getCount();
+        }
+
+        return $total;
+    }
+
 }

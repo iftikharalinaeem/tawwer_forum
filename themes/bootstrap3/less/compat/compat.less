@@ -10,14 +10,59 @@ body.hasRichEditor {
       padding-left: 18px;
     }
   }
+}
 
-  #MessageForm .MessageFormWrap .FormWrapper {
+body.hasRichEditor {
+  .Form-Body {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .CommentFormWrap,
+  .FormWrapper:not(.FormWrapper-Condensed) {
+    .Buttons {
+      padding-right: 35px;
+    }
+  }
+
+  #Form_Comment .richEditor {
+    padding-right: 18px;
+  }
+
+  &.Section-Group.Section-Discussion {
+    .richEditor {
+      padding-right: 0;
+    }
+  }
+
+  #MessageForm,
+  #Form_ConversationMessage {
+    padding-right: 0;
     padding-left: 0;
   }
 
-  #Form_ConversationMessage > div {
-    padding-left: 18px;
+  .MessageFormWrap {
+    .Form-Body,
+    .FormWrapper.FormWrapper-Condensed {
+      padding-right: 0 !important;
+      padding-left: 0 !important;
+    }
+
+    .bodybox-wrap {
+      padding-left: 36px;
+      padding-right: 36px;
+    }
+
+    .Buttons {
+      padding-right: 36px !important;
+      margin-right: 0;
+      margin-left: 0;
+    }
   }
+
+
+
+
 }
 
 label.checkbox {

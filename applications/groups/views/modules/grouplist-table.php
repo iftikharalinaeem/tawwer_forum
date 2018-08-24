@@ -79,6 +79,7 @@ if (val('items', $list)) {
                                                 <?php if (val('url', $item)) { ?>
                                             </a>
                                         <?php } ?>
+                                            <?php echo valr('meta.privacy.icon', $item, ''); ?>
                                         </h3>
                                     <?php } ?>
                                     <div class="Description Excerpt <?php echo val('textCssClass', $item); ?>"><?php echo htmlspecialchars(val('text', $item)); ?></div>
@@ -161,8 +162,8 @@ if (val('items', $list)) {
             <?php } ?>
         </table>
     </div>
-<?php }
-if (val('emptyMessage', $list) && !val('items', $list)) { ?>
+<?php } ?>
+<?php if (val('emptyMessage', $list) && !val('items', $list)) { ?>
     <div class="EmptyMessage <?php echo val('emptyMessageCssClass', $list); ?>"><?php echo val('emptyMessage', $list); ?></div>
 <?php } ?>
 <?php if (val('moreLink', $list)) { ?>

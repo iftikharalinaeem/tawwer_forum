@@ -222,7 +222,7 @@ class GroupsApiController extends AbstractApiController {
                 'updateUserID:i|n' => 'The user that updated the group.',
                 'updateUser?' => $this->getUserFragmentSchema(),
                 'privacy:s' => [
-                    'enum' => ['public', 'private'],
+                    'enum' => ['public', 'private', 'secret'],
                     'description' => 'The privacy level of the group\'s content.',
                 ],
                 'dateLastComment:dt|n' => 'When the last comment was posted in the group.',
@@ -265,6 +265,7 @@ class GroupsApiController extends AbstractApiController {
         $out = $this->schema($this->fullGroupSchema(), 'out');
 
         $row = $this->groupByID($id);
+        $this->verifyAccess($row);
         $this->userModel->expandUsers($row, ['InsertUserID', 'UpdateUserID']);
 
         $row = $this->normalizeGroupOutput($row);
@@ -545,20 +546,19 @@ class GroupsApiController extends AbstractApiController {
         $query = $in->validate($query);
 
         // Sorting
-        $sortField = '';
-        $sortOrder = 'asc';
-        if (array_key_exists('sort', $query)) {
-            $sortField = ltrim($query['sort'], '-');
-            if (strlen($sortField) !== strlen($query['sort'])) {
-                $sortOrder = 'desc';
-            }
-        }
+        list($sortField, $sortOrder) = $this->resultSorting($query);
 
         // Paging
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
-        // Filters
+        // Default filters
         $where = [];
+
+        // If the current user is not a Groups global moderator, limit view to only public and private groups.
+        if ($this->groupModel->isModerator() === false) {
+            $where['Privacy'] = ['Public', 'Private'];
+        }
+
         if (array_key_exists('memberID', $query)) {
             $userGroups = $this->groupModel->SQL->getWhere(
                 'UserGroup',
@@ -566,10 +566,11 @@ class GroupsApiController extends AbstractApiController {
             )->resultArray();
             $ids  = array_column($userGroups, 'GroupID');
 
-            if (empty($ids)) {
-                $where = null;
-            } else {
+            if (!empty($ids)) {
                 $where['GroupID'] = $ids;
+                if ($query['memberID'] === $this->getSession()->UserID) {
+                    unset($where['Privacy']); // The user should be able to see all the groups they're a member of.
+                }
             }
         }
 
@@ -917,7 +918,8 @@ class GroupsApiController extends AbstractApiController {
         ])->setDescription('Apply to a private group.');
         $out = $this->schema($this->fullGroupApplicantSchema(), 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
+        $this->verifyAccess($group);
 
         $body = $in->validate($body);
 
@@ -1001,7 +1003,8 @@ class GroupsApiController extends AbstractApiController {
         $this->idParamGroupSchema()->setDescription('Join a public group or a group that you have been invited to.');
         $out = $this->schema($this->fullGroupMemberSchema(), 'out');
 
-        $this->groupByID($id);
+        $group = $this->groupByID($id);
+        $this->verifyAccess($group);
 
         if (!$this->groupModel->join($id, $this->getSession()->UserID)) {
             throw new ServerException('Unable to join the group.', 500);
@@ -1078,6 +1081,63 @@ class GroupsApiController extends AbstractApiController {
     }
 
     /**
+     * Search for a group.
+     *
+     * @param array $query
+     * @return array
+     */
+    public function get_search(array $query) {
+        $this->permission();
+
+        $in = $this->schema([
+            'query:s' => 'Search parameter',
+            'sort:s?' => [
+                'enum' => [
+                    'dateInserted', '-dateInserted',
+                    'dateLastComment', '-dateLastComment',
+                    'countMembers', '-countMembers',
+                    'countDiscussions', '-countDiscussions',
+                ],
+                'description' => 'Sort the results by the specified field. The default sort order is ascending.'
+                    .'Prefixing the field with "-" will sort using a descending order.',
+            ],
+            'page:i?' => [
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'Desired number of items per page.',
+                'default' => GroupModel::LIMIT,
+                'minimum' => 1,
+                'maximum' => GroupModel::LIMIT,
+            ],
+        ], 'in')->setDescription('Search for a group');
+
+        $out = $this->schema([':a' => $this->fullGroupSchema()], 'out');
+        $query = $in->validate($query);
+
+        // Sorting
+        list($sortField, $sortOrder) = $this->resultSorting($query);
+
+        $groupName = $query['query'];
+        $page = $query['page'];
+        $limit = $query['limit'];
+
+        list($offset, $limit) = offsetLimit("p{$page}", $limit);
+
+        $rows = $this->groupModel->searchByName($groupName, $sortField, $sortOrder, $limit, $offset);
+        foreach ($rows as &$row) {
+            $row = $this->normalizeGroupOutput($row);
+        }
+        $result = $out->validate($rows);
+
+        $paging = ApiUtils::numberedPagerInfo($this->groupModel->searchTotal($groupName), "/api/v2/groups/search", $query, $in);
+
+        return new Data($result, ['paging' => $paging]);
+    }
+
+    /**
      * Get a group schema with minimal add/edit fields.
      *
      * @return Schema Returns a schema object.
@@ -1115,5 +1175,41 @@ class GroupsApiController extends AbstractApiController {
             throw new NotFoundException('User');
         }
         return $row;
+    }
+
+    /**
+     * Get the sorting parameters for queries.
+     *
+     * @param array $query
+     * @return array
+     */
+    protected function resultSorting(array $query) {
+        $sortField = '';
+        $sortOrder = 'asc';
+        if (array_key_exists('sort', $query)) {
+            $sortField = ltrim($query['sort'], '-');
+            if (strlen($sortField) !== strlen($query['sort'])) {
+                $sortOrder = 'desc';
+            }
+        }
+
+        return [$sortField, $sortOrder];
+    }
+  
+    /**
+     * Verify the current user has "Access" permission for a group.
+     *
+     * @param array $group
+     * @throws NotFoundException If the current user does not have access to the group.
+     */
+    private function verifyAccess(array $group) {
+        /**
+         * GroupModel's checkPermission method caches permissions, which make it a pain for contexts where permissions
+         * are prone to changing, like in tests or API endpoints that attempt to verify group access before a user joins.
+         */
+        if ($this->groupModel->checkPermission('Access', $group, null, false) === false) {
+            throw new NotFoundException('Group');
+        }
+
     }
 }

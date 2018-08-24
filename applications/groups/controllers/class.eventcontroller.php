@@ -14,10 +14,13 @@
 class EventController extends Gdn_Controller {
 
     /** @var array  */
-    protected $Uses = ['Form'];
+    protected $Uses = ['Form', 'GroupModel'];
 
     /** @var Gdn_Form */
     protected $Form;
+
+    /** @var GroupModel */
+    protected $GroupModel;
 
     /**
      * Include JS, CSS, and modules used by all methods.
@@ -97,7 +100,7 @@ class EventController extends Gdn_Controller {
         if ($groupID) {
             $groupModel = new GroupModel();
             $group = $groupModel->getID($groupID);
-            if (!$group) throw notFoundException('Group');
+            $this->verifyGroupAccess($group);
             $this->setData('Group', $group);
         }
 
@@ -169,7 +172,7 @@ class EventController extends Gdn_Controller {
         require_once $this->fetchViewLocation('group_functions', 'Group');
 
         $this->View = 'addedit';
-        $this->CssClass .= ' NoPanel NarrowForm';
+        $this->CssClass .= ' NoPanel';
         return $this->render();
     }
 
@@ -217,7 +220,7 @@ class EventController extends Gdn_Controller {
         require_once $this->fetchViewLocation('group_functions', 'Group');
 
         $this->View = 'addedit';
-        $this->CssClass .= ' NoPanel NarrowForm';
+        $this->CssClass .= ' NoPanel';
         return $this->render();
     }
 
@@ -246,7 +249,7 @@ class EventController extends Gdn_Controller {
         if ($GroupID) {
             $GroupModel = new GroupModel();
             $Group = $GroupModel->getID($GroupID, DATASET_TYPE_ARRAY);
-            if (!$Group) throw notFoundException('Group');
+            $this->verifyGroupAccess($Group);
         }
 
         $this->EventArguments['Event'] = &$Event;
@@ -377,9 +380,7 @@ class EventController extends Gdn_Controller {
         if ($groupID) {
             $groupModel = new GroupModel();
             $group = $groupModel->getID($groupID, DATASET_TYPE_ARRAY);
-            if (!$group) {
-                throw notFoundException('Group');
-            }
+            $this->verifyGroupAccess($group);
 
             // Check if this person is a member of the group or a moderator
             $memberOfGroup = $groupModel->isMember(Gdn::session()->UserID, $groupID);
@@ -539,5 +540,17 @@ class EventController extends Gdn_Controller {
         $timeStr = strftime($timeFormat, $offTimestamp);
 
         return [$dateStr, $timeStr, $dt->format('H:i'), $dt->format('c')];
+    }
+
+    /**
+     * Verify a user can access a group.
+     *
+     * @param array $group A group row.
+     * @throws Gdn_UserException If the group cannot be accessed by the current user.
+     */
+    private function verifyGroupAccess($group) {
+        if (!$group || !$this->GroupModel->checkPermission('Access', $group)) {
+            throw notFoundException('Group');
+        }
     }
 }

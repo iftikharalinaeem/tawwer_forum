@@ -34,7 +34,7 @@ $St
     ->column('CategoryID', 'int', false, 'key')
     ->column('Icon', 'varchar(255)', true)
     ->column('Banner', 'varchar(255)', true)
-    ->column('Privacy', ['Public', 'Private'], 'Public') // add secret later.
+    ->column('Privacy', ['Public', 'Private', 'Secret'], 'Public')
     ->column('Registration', ['Public', 'Approval', 'Invite'], true) // deprecated
     ->column('Visibility', ['Public', 'Members'], true) // deprecated
     ->column('CountMembers', 'uint', '0')
@@ -188,3 +188,21 @@ $St->table('Activity')
 $ActivityModel = new ActivityModel();
 $ActivityModel->defineType('Groups');
 $ActivityModel->defineType('Events');
+
+// Added for backwards compatibility
+// Group announcements should always (in theory) be set to Announce = 2
+// Old group announcements and/or moved announcements (no GroupID) into Groups (perhaps there's more cases) are set to Announce = 1
+// Running utility update will fix this erroneous data and prevent group announcements from showing in recent discussions
+if ($St->tableExists('Discussion')) {
+    $groupModel = new GroupModel();
+    $groupCategoryIDs = $groupModel->getGroupCategoryIDs();
+    $result = Gdn::sql()
+        ->update('Discussion')
+        ->set('Announce', 2)
+        ->where('Announce', 1)
+        ->beginWhereGroup()
+        ->where('GroupID is not null', '')
+        ->orWhereIn('CategoryID', $groupCategoryIDs)
+        ->endWhereGroup()
+        ->put();
+}

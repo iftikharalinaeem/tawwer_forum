@@ -344,6 +344,7 @@ class RanksPlugin extends Gdn_Plugin {
      * Add the rank changer dropdown to a page.
      *
      * @param Gdn_Controller $Sender
+     * @throws Exception
      */
     protected function addManualRanks($Sender) {
         if (!checkPermission('Garden.Settings.Manage')) {
@@ -351,11 +352,10 @@ class RanksPlugin extends Gdn_Plugin {
         }
 
         // Grab a list of all of the manual ranks.
-        $CurrentRankID = $Sender->data('Profile.RankID');
         $AllRanks = RankModel::ranks();
         $Ranks = [];
         foreach ($AllRanks as $RankID => $Rank) {
-            if ($RankID == $CurrentRankID || valr('Criteria.Manual', $Rank)) {
+            if (valr('Criteria.Manual', $Rank)) {
                 $Ranks[$RankID] = $Rank['Name'];
             }
         }
@@ -554,6 +554,36 @@ class RanksPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Handles manual ranks.
+     * Prevents insertion of empty strings in the int RankID column.
+     * Prevents overwriting "auto" ranks with NULL value from the manual ranks drop down.
+     *
+     * @param UserModel $sender
+     * @param array $args
+     */
+    public function userModel_beforeSave_handler($sender, $args) {
+        $oldRankID = valr('User.RankID', $args);
+        $newRankID = valr('Fields.RankID', $args);
+
+        if (isset($args['Fields']['RankID']) && empty($args['Fields']['RankID'])) {
+            $args['Fields']['RankID'] = $newRankID = null;
+        }
+
+        $rankModel = new RankModel();
+        $oldRank = $rankModel->getID($oldRankID);
+        $newRank = $rankModel->getID($newRankID);
+
+        // The empty rank option was selected.
+        // Remove the RankID from the form if
+        // RankID is NULL and current rank is an "auto" rank;
+        // Old rank and new rank are the same;
+        // New rank is not null and is not a manual rank.
+        if (($newRankID === null && !valr('Criteria.Manual', $oldRank)) || ($oldRankID == $newRankID) || ($newRankID !== null && !valr('Criteria.Manual', $newRank))) {
+            unset($args['Fields']['RankID']);
+        }
+    }
+
+    /**
      * Evaluate users for new rank when saving their state.
      *
      * @param UserModel $sender
@@ -563,18 +593,31 @@ class RanksPlugin extends Gdn_Plugin {
         if (!Gdn::controller()) {
             return;
         }
-        $userID = Gdn::controller()->data('Profile.UserID');
-        if ($userID != $args['UserID']) {
-            return;
+
+        // The if portion of this if/else statement was kept for assumed backwards compatibility.
+        if (Gdn::controller() instanceof ProfileController) {
+            $userID = Gdn::controller()->data('Profile.UserID');
+            if ($userID != $args['UserID']) {
+                return;
+            }
+            $oldRankID = Gdn::controller()->data('Profile.RankID');
+        } else {
+            $userID = $args['UserID'];
+            $oldRankID = valr('User.RankID', $args);
         }
 
-        // Check to make sure the rank has changed.
-        $oldRankID = Gdn::controller()->data('Profile.RankID');
         $newRankID = val('RankID', $args['Fields']);
-        if ($newRankID && $newRankID != $oldRankID) {
-            // Send the user a notification.
+
+        // Check to make sure the rank has changed.
+        if ($oldRankID != $newRankID && $newRankID !== false) {
             $rankModel = new RankModel();
-            $rankModel->notify(Gdn::userModel()->getID($userID), $rankModel->getID($newRankID));
+            // We have overridden a previously manually applied rank with the null value.
+            if ($newRankID === null) {
+                $rankModel->applyRank($userID);
+            // We have applied a new manual rank.
+            } else {
+                $rankModel->notify(Gdn::userModel()->getID($userID), $rankModel->getID($newRankID));
+            }
         }
     }
 

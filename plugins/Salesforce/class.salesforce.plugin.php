@@ -511,12 +511,19 @@ class SalesforcePlugin extends Gdn_Plugin {
                 'Name' => $user->Name,
                 'Email' => $user->Email,
                 'Title' => $user->Title,
-                'LeadSource' => 'Vanilla',
+                'LeadSource' => c('Salesforce.SourceValue', 'Vanilla'),
                 'Options' => $salesforce->getLeadStatusOptions(),
+                'Type' => $type,
+                'CommentID' => val('CommentID', $content),
+                'InsertUserID' => val('InsertUserID', $content),
             ];
         } catch (Gdn_UserException $e) {
             $salesforce->reconnect();
         }
+
+        $this->EventArguments['Data'] = &$data;
+        $this->fireEvent('LeadFormData');
+
         $sender->Form->setData($data);
         $sender->setData('Data', $data);
         $sender->render('addlead', '', 'plugins/Salesforce');
@@ -557,8 +564,8 @@ class SalesforcePlugin extends Gdn_Plugin {
         $user = Gdn::userModel()->getID($userID);
         //Setup Form
         $sender->Form = new Gdn_Form();
-        $sender->Form->addHidden('Origin', 'Vanilla');
-        $sender->Form->addHidden('LeadSource', 'Vanilla');
+        $sender->Form->addHidden('Origin', c('Salesforce.OriginValue', 'Vanilla'));
+        $sender->Form->addHidden('LeadSource', c('Salesforce.SourceValue', 'Vanilla'));
         //Get Content
         if ($type == 'Discussion') {
             $content = $sender->DiscussionModel->getID($elementID);
@@ -646,18 +653,21 @@ class SalesforcePlugin extends Gdn_Plugin {
                 'FirstName' => $firstName,
                 'LastName' => $lastName,
                 'Email' => $user->Email,
-                'LeadSource' => 'Vanilla',
-                'Origin' => 'Vanilla',
+                'LeadSource' => c('Salesforce.SourceValue', 'Vanilla'),
+                'Origin' => c('Salesforce.OriginValue', 'Vanilla'),
                 'Options' => $salesforce->getCaseStatusOptions(),
                 'Priorities' => $salesforce->getCasePriorityOptions(),
-                'Body' => Gdn_Format::textEx($content->Body)
+                'Body' => Gdn_Format::textEx($content->Body),
+                'Type' => $type,
+                'CommentID' => val('CommentID', $content),
+                'InsertUserID' => val('InsertUserID', $content),
             ];
         } catch (Gdn_UserException $e) {
             $salesforce->reconnect();
         }
 
-      $this->EventArguments['Data'] = &$data;
-      $this->fireEvent('CaseFormData');
+        $sender->EventArguments['Data'] = &$data;
+        $sender->fireEvent('CaseFormData');
 
         $sender->Form->setData($data);
         $sender->setData('Data', $data);

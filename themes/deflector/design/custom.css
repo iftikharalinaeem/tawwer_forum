@@ -1104,8 +1104,26 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
   .Profile .DataCounts .CountItem {
     min-width: 70px; }
 
+body.Groups .site-content {
+  float: none;
+  margin-right: 0;
+  width: 100%; }
+
+.groupSearch .groupSearch-text {
+  font-size: 14px; }
+
 .PhotoGrid .PhotoWrap {
   display: inline-block; }
 
 .container .discussion-sort-filter-module {
   height: 36px; }
+
+.groupSearch-button {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0; }
