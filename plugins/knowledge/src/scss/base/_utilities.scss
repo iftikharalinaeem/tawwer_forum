@@ -1,0 +1,7 @@
+.u-linkAsContainer {
+  display: block;
+  color: inherit;
+  @include allLinkStates {
+    text-decoration: none;
+  }
+}

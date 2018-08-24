@@ -1,0 +1,55 @@
+$fullWidthLayout-backLink_breakpoint  : $global-main_paddedWidth + $icon-default_size + $utility-baseUnit * 8;
+$container-gap                        : $global-gutter_halfSize;
+
+@mixin mediaQuery-backLink_breakPoint {
+  @media (max-width: #{$fullWidthLayout-backLink_breakpoint}) {
+    @content;
+  }
+}
+
+#Frame {
+  display: flex;
+  overflow: visible;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+}
+
+._page-minHeight,
+#Body {
+  flex-grow: 1;
+}
+
+._container {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: $global-main_paddedWidth;
+
+  margin: {
+    left: auto;
+    right: auto;
+    bottom: $container-gap;
+  }
+  padding: {
+    left: $global-gutter_halfSize;
+    right: $global-gutter_halfSize;
+  }
+
+  &._fullWidthLayout,
+  &._panelAndNav,
+  &._hasPaddedContent {
+    padding: {
+      left: $global-gutter_quarterSize;
+      right: $global-gutter_quarterSize;
+    }
+  }
+}
+
+
+._fullWidthLayout {
+  @include mediaQuery-backLink_breakPoint {
+    @include backLinkNoBleedStyles;
+  }
+}
+

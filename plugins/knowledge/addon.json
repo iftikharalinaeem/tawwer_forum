@@ -1,0 +1,27 @@
+{
+    "name": "Knowledge Base",
+    "description": "Knowledge Base",
+    "version": "0.1",
+    "mobileFriendly": true,
+    "hasLocale": true,
+    "icon": "knowledge.png",
+    "key": "knowledge",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Stéphane LaFlèche",
+            "email": "stephane.l@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.5",
+        "dashboard": ">=2.5"
+    },
+    "build": {
+        "process": "core",
+        "entries": {
+            "app": "./src/scripts/knowledge"
+        }
+    }
+}

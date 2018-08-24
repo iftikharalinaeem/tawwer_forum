@@ -1,0 +1,40 @@
+// Temporary
+
+.breadcrumbsWrapper {
+  display: block;
+  height: 24px;
+}
+
+._container-breadcrumb,
+._breadcrumbs {
+  display: block;
+  margin-top: $global-gutter_size;
+  margin-bottom: $global-gutter_size;
+  a {
+    color: $metas_color;
+    font-size: $global-small_fontSize;
+  }
+}
+
+._container._container-breadcrumb {
+  margin-bottom: $utility-baseUnit;
+}
+
+body.PageArticle,
+body.pageArticle,
+body.pageCategoryWithNav,
+body.PageCategoryWithNav {
+  .breadcrumbsWrapper {
+    margin-left: 263px;
+
+    @include mediaQuery-columnsThreeCol_breakToOne {
+      margin-left: $utility-baseUnit * 2;
+    }
+  }
+
+  ._container-breadcrumb {
+    @include mediaQuery-columnsThreeCol_breakToOne {
+      margin-bottom: 0;
+    }
+  }
+}

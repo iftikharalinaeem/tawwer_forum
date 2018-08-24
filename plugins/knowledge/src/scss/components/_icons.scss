@@ -1,0 +1,13 @@
+._pageContents { // Safe modification without affecting existing styles
+  ._icon {
+    display: inline-block;
+    width: $icon-default_size;
+    height: $icon-default_size;
+    vertical-align: middle;
+
+    &.isLarge {
+      width: $icon-large_size;
+      height: $icon-large_size;
+    }
+  }
+}

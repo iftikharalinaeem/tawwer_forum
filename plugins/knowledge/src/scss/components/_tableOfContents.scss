@@ -1,0 +1,20 @@
+$tableOfContents_fontSize    : $global-medium_fontSize;
+$tableOfContents_color       : $global-color_fg;
+$tableOfContents_offset      : $utility-baseUnit * 2;
+
+._tableOfContents {
+  position: relative;
+  display: block;
+}
+
+._tableOfContents-link {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  font-size: $tableOfContents_fontSize;
+  color: $tableOfContents_color;
+
+  + ._tableOfContents-link {
+    margin-top: $tableOfContents_offset;
+  }
+}

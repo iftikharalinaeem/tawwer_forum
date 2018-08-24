@@ -1,0 +1,80 @@
+// Even columns. If you have uneven columns, make new component
+@mixin mediaQuery-columnsThreeCol_breakToOne {
+  @media (max-width: #{$evenColumns_threeColumns_breakToOne}) {
+    @content;
+  }
+}
+
+._columns {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+}
+
+._column {
+  flex-grow: 1;
+
+  padding: {
+    left: $global-gutter_quarterSize;
+    right: $global-gutter_quarterSize;
+  }
+
+  ._widget {
+    display: flex;
+    width: 100%;
+    position: relative;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    min-height: 100%;
+  }
+
+  ._widget-contents,
+  ._widget-body {
+      display: flex;
+      width: 100%;
+      flex-grow: 1;
+      position: relative;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+  }
+
+  ._widgetTitle {
+    @include singleLineEllipsis;
+  }
+
+  @include mediaQuery-columnsThreeCol_breakToOne {
+    + ._column {
+      margin-top: $global-gutter_halfSize;
+    }
+  }
+}
+
+._columns-1 {
+  ._column {
+    width: 100%;
+  }
+}
+
+._columns-2 {
+  ._column {
+    width: 50%;
+  }
+}
+
+._columns-3 {
+  @include mediaQuery-columnsThreeCol_breakToOne {
+    flex-wrap: wrap;
+  }
+
+  ._column {
+    width: $utility-percentage_third;
+    @include mediaQuery-columnsThreeCol_breakToOne {
+      width: 100%;
+    }
+  }
+}
+
+
+

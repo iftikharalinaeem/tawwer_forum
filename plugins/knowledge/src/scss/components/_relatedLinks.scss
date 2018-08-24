@@ -1,0 +1,20 @@
+$relatedLink_fontSize    : $global-small_fontSize;
+$relatedLink_color       : $global-color_primary;
+$relatedLink_offset      : $utility-baseUnit * 2;
+
+._relatedLinks {
+  position: relative;
+  display: block;
+}
+
+._relatedLink {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  font-size: $relatedLink_fontSize;
+  color: $relatedLink_color;
+
+  + ._relatedLink {
+    margin-top: $relatedLink_offset;
+  }
+}
