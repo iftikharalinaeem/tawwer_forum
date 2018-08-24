@@ -5,13 +5,13 @@
   }
 }
 
-._columns {
+.columns {
   display: flex;
   align-items: stretch;
   justify-content: space-between;
 }
 
-._column {
+.column {
   flex-grow: 1;
 
   padding: {
@@ -19,7 +19,7 @@
     right: $global-gutter_quarterSize;
   }
 
-  ._widget {
+  .widget {
     display: flex;
     width: 100%;
     position: relative;
@@ -29,8 +29,8 @@
     min-height: 100%;
   }
 
-  ._widget-contents,
-  ._widget-body {
+  .widget-contents,
+  .widget-body {
       display: flex;
       width: 100%;
       flex-grow: 1;
@@ -40,35 +40,35 @@
       justify-content: flex-start;
   }
 
-  ._widgetTitle {
+  .widgetTitle {
     @include singleLineEllipsis;
   }
 
   @include mediaQuery-columnsThreeCol_breakToOne {
-    + ._column {
+    + .column {
       margin-top: $global-gutter_halfSize;
     }
   }
 }
 
-._columns-1 {
-  ._column {
+.columns-1 {
+  .column {
     width: 100%;
   }
 }
 
-._columns-2 {
-  ._column {
+.columns-2 {
+  .column {
     width: 50%;
   }
 }
 
-._columns-3 {
+.columns-3 {
   @include mediaQuery-columnsThreeCol_breakToOne {
     flex-wrap: wrap;
   }
 
-  ._column {
+  .column {
     width: $utility-percentage_third;
     @include mediaQuery-columnsThreeCol_breakToOne {
       width: 100%;

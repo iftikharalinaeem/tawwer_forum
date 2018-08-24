@@ -1,4 +1,4 @@
-._button {
+.button {
   @include singleLineEllipsis;
   @include generateButtonClass($button-basic);
   @include buttonSizing($formElement_height, $global-button_minWidth, $global-medium_fontSize, $utility-baseUnit);
@@ -20,12 +20,12 @@
     style: solid;
   }
 
-  &._button-fullWidth {
+  &.button-fullWidth {
     width: 100%;
     max-width: 100%;
   }
 
-  &._button-icon {
+  &.button-icon {
     align-items: center;
     justify-content: center;
     height: $icon-default_size;
@@ -35,7 +35,7 @@
     border: 0;
   }
 
-  &._buttonNoBorder {
+  &.buttonNoBorder {
     border: 0;
     min-width: $formElement-height;
     padding: {
@@ -45,18 +45,18 @@
   }
 }
 
-._button-callToAction {
+.button-callToAction {
   @include generateButtonClass($buttonPrimary);
 }
 
 
-._button-icon {
+.button-icon {
   display: flex;
   min-width: $formElement-height;
 }
 
 
-._button-fakeLink {
+.button-fakeLink {
   color: $link_default-color;
 
   &:hover {

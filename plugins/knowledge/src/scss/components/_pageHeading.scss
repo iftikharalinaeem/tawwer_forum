@@ -1,12 +1,12 @@
 $pageHeading-cta_margin                      : 100px !default;
 $pageHeading-dropdown_width                  : 150px !default;
 
-._pageHeading {
+.pageHeading {
   display: flex;
   width: 100%;
   align-items: center;
 
-  ._pageTitle {
+  .pageTitle {
     display: block;
     margin: {
       top: 0;
@@ -14,35 +14,35 @@ $pageHeading-dropdown_width                  : 150px !default;
     }
   }
 
-  + ._pageMetas {
+  + .pageMetas {
     margin-top: $utility-baseUnit * 2;
   }
 }
 
-._pageHeading-underTitle {
+.pageHeading-underTitle {
   margin-top: $utility-baseUnit;
 }
 
-._pageHeading-main {
+.pageHeading-main {
   position: relative;
   display: block;
   width: 100%;
   flex-grow: 1;
 }
 
-._pageHeading-titleBar {
+.pageHeading-titleBar {
   display: flex;
   position: relative;
   align-items: center;
 }
 
 
-._pageHeading-p {
+.pageHeading-p {
   font-size: $global-small_fontSize;
   margin-bottom: $utility-baseUnit * 2;
 }
 
-._pageHeading-actions {
+.pageHeading-actions {
   display: flex;
   margin-left: $pageHeading-cta_margin;
   align-self: center;
@@ -53,7 +53,7 @@ $pageHeading-dropdown_width                  : 150px !default;
 }
 
 
-._pageHeading-back {
+.pageHeading-back {
   @include absolute-topLeft;
   overflow: visible;
   width: $icon-default_size;
@@ -68,25 +68,25 @@ $pageHeading-dropdown_width                  : 150px !default;
   }
 }
 
-._pageHeading-backLink {
+.pageHeading-backLink {
   display: block;
   height: $icon-default_size;
   width: $icon-default_size;
   color: inherit;
 }
 
-._pageHeading-backIcon {
+.pageHeading-backIcon {
   position: relative;
   display: block;
   width: $icon-default_size;
   height: $icon-default_size;
 }
 
-._pageHeading-titleWrap {
+.pageHeading-titleWrap {
   position: relative;
 }
 
-._pageHeading-hamburgerWrapper {
+.pageHeading-hamburgerWrapper {
   display: flex;
   align-items: center;
 }

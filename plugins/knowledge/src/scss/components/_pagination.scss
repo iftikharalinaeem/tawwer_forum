@@ -28,7 +28,7 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
 }
 
 
-._pagination {
+.pagination {
   position: relative;
   display: block;
   width: 100%;
@@ -61,7 +61,7 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
 }
 
 
-._pagination-list {
+.pagination-list {
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -72,12 +72,12 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
 }
 
 
-._pagination-prev,
-._pagination-next {
+.pagination-prev,
+.pagination-next {
   min-height: $pagination-buttonWidth - $formElement_borderWidth;
   width: auto;
 
-  &._button {
+  &.button {
     min-width: #{$formElement_fullBorderWidth + $icon-default_size + $pagination-navPadding_inner + $pagination-navPadding_outer};
     padding: {
       top: #{$utility-baseUnit - $formElement_borderWidth * 2};
@@ -92,8 +92,8 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
   }
 }
 
-._pagination-prev {
-  &._button {
+.pagination-prev {
+  &.button {
     border-top-left-radius: $pagination-navItem_borderOutsideRadius;
     border-top-right-radius: $pagination-navItem_borderInsideRadius;
     border-bottom-right-radius: $pagination-navItem_borderInsideRadius;
@@ -106,8 +106,8 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
   }
 }
 
-._pagination-next {
-  &._button {
+.pagination-next {
+  &.button {
     border-top-right-radius: $pagination-navItem_borderOutsideRadius;
     border-top-left-radius: $pagination-navItem_borderInsideRadius;
     border-bottom-right-radius: $pagination-navItem_borderOutsideRadius;
@@ -120,8 +120,8 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
   }
 }
 
-._pagination-prevIcon,
-._pagination-nextIcon
+.pagination-prevIcon,
+.pagination-nextIcon
 {
   display: inline-block;
   vertical-align: middle;
@@ -134,7 +134,7 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
   }
 }
 
-._pagination-element {
+.pagination-element {
   height: $formElement_height;
   margin: {
     left: -$formElement_borderWidth;
@@ -143,28 +143,28 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
   @include mediaQuery-pagination_smallScreen {
     display: none;
 
-    &._pagination-mobilePageSelector,
-    &._pagination-visibleOnMobile {
+    &.pagination-mobilePageSelector,
+    &.pagination-visibleOnMobile {
       display: block;
     }
   }
 }
 
-._pagination-mobilePageSelector {
+.pagination-mobilePageSelector {
   display: none;
   flex-grow: 1;
 }
 
-._pagination-item,
-._pagination-prev,
-._pagination-ellipsis,
-._pagination-next
+.pagination-item,
+.pagination-prev,
+.pagination-ellipsis,
+.pagination-next
 {
   background-color: $pagination-bg;
 }
 
 
-._pagination-label {
+.pagination-label {
   user-select: none;
   font-weight: $global-bold_fontWeight;
   &:focus {
@@ -172,13 +172,13 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
   }
 }
 
-._pagination-ellipsis {
+.pagination-ellipsis {
   text-align: center;
   border-left: solid $formElement_borderWidth $pagination-border_color;
   border-right: solid $formElement_borderWidth $pagination-border_color;
 }
 
-._pagination-item {
+.pagination-item {
   position: relative;
   display: block;
   min-height: $pagination-buttonWidth;
@@ -191,12 +191,12 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
     right: $utility-baseUnit;
   }
 
-  &._button {
+  &.button {
     border-radius: $pagination-item_borderRadius;
     min-width: $pagination-buttonWidth;
   }
 
-  &._button.isCurrent {
+  &.button.isCurrent {
     background-color: $pagination-disabled_bg;
     color: $pagination-disabled_fg;
   }
@@ -207,11 +207,11 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
 
 }
 
-._pagination-jumpTo {
+.pagination-jumpTo {
   text-align: right;
 }
 
-._pagination-jumpToInput {
+.pagination-jumpToInput {
   @include removeSpinner;
   width: 100%;
   line-height: #{$formElement_height - $formElement_borderWidth * 2 - $utility-baseUnit * 2};
@@ -226,16 +226,16 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
   font-size: $global-small_fontSize;
 }
 
-._pagination-mobileSeparator {
+.pagination-mobileSeparator {
   padding: 0 $utility-baseUnit;
 }
 
-._pagination-compactNav {
+.pagination-compactNav {
   display: flex;
   border: $global-border_color $formElement_borderWidth solid;
 }
 
-._pagination-number {
+.pagination-number {
   display: flex;
   flex-grow: 2;
   align-items: center;
@@ -246,7 +246,7 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
   min-width: 65px;
 }
 
-._pagination-mobileTotal {
+.pagination-mobileTotal {
   justify-content: flex-start;
 }
 
@@ -292,7 +292,7 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
 
 
 
-._pagerWithCount {
+.pagerWithCount {
   display: flex;
   position: relative;
   align-items: center;
@@ -304,7 +304,7 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
   }
 }
 
-._pagerWithCount-count {
+.pagerWithCount-count {
   position: absolute;
   top: 50%;
   left: 0;
@@ -318,7 +318,7 @@ $panelAndNav-smallScreen_breakpoint                         : 700px;
   }
 }
 
-._pagerWithCount-pager {
+.pagerWithCount-pager {
   position: relative;
   z-index: 1;
 }

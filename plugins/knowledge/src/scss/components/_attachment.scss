@@ -15,12 +15,12 @@ $attachment-formatIcon_margin    : $utility-baseUnit !default;
 $attachment-downloadIcon_color   : mix($global-color_fg, $global-color_bg, 60%) !default;
 $attachment-downloadIcon_margin  : $utility-baseUnit !default;
 
-._attachments {
+.attachments {
   display: block;
   margin-top: $attachment-block_topMargin;
 }
 
-._attachment {
+.attachment {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
@@ -37,34 +37,34 @@ $attachment-downloadIcon_margin  : $utility-baseUnit !default;
     radius: $attachment-block_borderRadius;
   }
 
-  + ._attachment {
+  + .attachment {
     margin-top: $attachment-block_gap;
   }
 }
 
-._attachment-format {
+.attachment-format {
   flex-basis: #{$icon-default_size + $attachment-formatIcon_margin};
   padding-right: $attachment-formatIcon_margin;
   flex-shrink: 1;
 }
 
-._attachment-main {
+.attachment-main {
   flex-grow: 1;
 }
 
-._attachment-title {
+.attachment-title {
   font-size: $attachment-text_fontSize;
   color: $attachment-title_color;
   font-weight: $global-bold_fontWeight;
 }
 
-._attachment-download {
+.attachment-download {
   color: $attachment-downloadIcon_color;
   flex-basis: #{$icon-default_size + $attachment-downloadIcon_margin};
   padding-left: $attachment-downloadIcon_margin;
 }
 
 
-._attachment-metas {
+.attachment-metas {
   margin-bottom: 0;
 }

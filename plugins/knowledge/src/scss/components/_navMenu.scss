@@ -14,26 +14,26 @@ $navMenu-arrow_color: mix($global-color_bg, $global-color_fg, 30%);
 
 $navMenu_leftPadding: 6px;
 
-._navMenu {
+.navMenu {
   font-size: $navMenu-link_fontSize;
   margin-top: -$global-bodylineHeight_offset;
 }
 
-._navMenu-items {
+.navMenu-items {
   list-style: none;
   display: block;
   padding: 0;
   margin: 0;
 }
 
-._navMenu-item {
+.navMenu-item {
   position: relative;
   display: block;
   color: $navMenu-item_color;
   line-height: $navMenu-item_lineHeight;
 }
 
-._navMenu-link {
+.navMenu-link {
   display: inline-block;
   position: relative;
   width: 100%;
@@ -41,16 +41,16 @@ $navMenu_leftPadding: 6px;
   font-size: $navMenu-link_fontSize;
   padding-left: $navMenu-arrow_offset;
 
-  &._isActive {
+  &.isActive {
     background-color: $navMenu-link_active_bg;
   }
 
-  &._hasChildren {
+  &.hasChildren {
     font-weight: $global-bold_fontWeight;
   }
 }
 
-._navMenu-icon {
+.navMenu-icon {
   @include absolute-topLeft(50%, $navMenu_leftPadding);
   width: $navMenu-arrow_width;
   height: $navMenu-arrow_height;
@@ -59,12 +59,12 @@ $navMenu_leftPadding: 6px;
   transform-origin: 50% 50%;
   transform: translateY(-50%) rotate(-90deg);
 
-  &._isOpen {
+  &.isOpen {
     transform: translateY(-50%) rotate(0);
   }
 }
 
-._navMenu-itemChildren {
+.navMenu-itemChildren {
   padding-left: $navMenu_leftPadding;
 }
 

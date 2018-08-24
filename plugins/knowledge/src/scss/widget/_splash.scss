@@ -37,17 +37,17 @@ $splashSearchBar-input_fontSize      : $global-subTitle_fontSize !default;
 $splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
 
 
-._splash { // All the way to the edges
+.splash { // All the way to the edges
   @include bgCover($splash-fullWidth_bgImage);
   position: relative;
   background-color: $splash-outer_bg;
 
-  ._searchBar-toggleAdvanced {
+  .searchBar-toggleAdvanced {
     color: $splash_fg;
   }
 }
 
-._splash-main { // Site Width
+.splash-main { // Site Width
   @include bgCover($splash-contentWidth_bgImage);
   background-color: $splash-inner_bg;
   padding: {
@@ -59,14 +59,14 @@ $splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
 }
 
 
-._splash-title {
+.splash-title {
   font-size: $splash-title_fontSize;
   font-weight: $splash-title_fontWeight;
   color: $splash_fg;
   margin-bottom: 0;
 }
 
-._splash-text {
+.splash-text {
   display: block;
   color: $splash_fg;
   width: $splash-text_maxWidth;
@@ -74,18 +74,18 @@ $splashSearchBar-button_fontSize     : $global-medium_fontSize !default;
   margin: auto auto 0;
   text-align: center;
 
-  + ._searchBar {
+  + .searchBar {
     margin-top: $splash-search_margin;
   }
 }
 
 
-._splash-p {
+.splash-p {
   font-size: $splash-paragraph_textSize;
   font-weight: $splash-paragraph_fontWeight;
   margin-top: $splash-paragraph_margin;
 
-  + ._splash-p {
+  + .splash-p {
     margin-top: $splash-paragraph_margin;
   }
 }

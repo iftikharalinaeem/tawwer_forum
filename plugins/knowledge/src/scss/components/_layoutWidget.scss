@@ -13,7 +13,7 @@ $layoutWidget_rightPadding      : $global-widgetInner_padding !default;
 $layoutWidget_bottomPadding     : $global-widgetInner_padding !default;
 $layoutWidget_leftPadding       : $global-widgetInner_padding !default;
 
-._layoutWidget {
+.layoutWidget {
   background-color: $layoutWidget_bg;
   border: {
     radius: $layoutWidget_borderRadius;
@@ -28,12 +28,12 @@ $layoutWidget_leftPadding       : $global-widgetInner_padding !default;
     left: $layoutWidget_leftPadding;
   }
 
-  + ._layoutWidget {
+  + .layoutWidget {
     margin-top: $layoutWidget_gap;
   }
 }
 
-._layoutWidget-widget {
+.layoutWidget-widget {
   position: relative;
   padding: {
     top: $layoutWidget_topPadding;

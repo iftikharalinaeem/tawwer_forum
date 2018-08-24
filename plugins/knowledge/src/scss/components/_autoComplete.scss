@@ -9,7 +9,7 @@ $autoComplete-horizontalPadding  : $utility-baseUnit * 2;
 $autoComplete-separator_color    : $global-separator_color;
 $autoComplete-separator_width    : $global-separator_width;
 
-._autoComplete {
+.autoComplete {
   @include absolute-topLeft(100%);
   display: none;
   background-color: $autoComplete_bg;
@@ -17,7 +17,7 @@ $autoComplete-separator_width    : $global-separator_width;
   z-index: 1;
 }
 
-._autoComplete-results {
+.autoComplete-results {
   box-shadow: $autoComplete-panel_boxShadow;
   margin-top: -$formElement-borderWidth;
   max-height: 80vh;
@@ -29,11 +29,11 @@ $autoComplete-separator_width    : $global-separator_width;
   }
 }
 
-._autoCompleteResult {
+.autoCompleteResult {
   position: relative;
   user-select: none;
 
-  + ._autoCompleteResult {
+  + .autoCompleteResult {
     border: {
       top-color: $autoComplete-separator_color;
       top-width: $autoComplete-separator_width;
@@ -42,7 +42,7 @@ $autoComplete-separator_width    : $global-separator_width;
   }
 }
 
-._autoCompleteResult-contents {
+.autoCompleteResult-contents {
   display: block;
   color: $autoComplete-title_color;
   padding: $autoComplete-verticalPadding $autoComplete-horizontalPadding;
@@ -52,20 +52,20 @@ $autoComplete-separator_width    : $global-separator_width;
   }
 }
 
-._autoCompleteResult-head {
+.autoCompleteResult-head {
   display: flex;
 }
 
-._autoCompleteResult-title {
+.autoCompleteResult-title {
   color: $autoComplete-title_color;
   font-size: $autoComplete-title_fontSize;
   flex-grow: 1;
 }
 
-._autoCompleteResult-attachments {
+.autoCompleteResult-attachments {
   display: flex;
 }
 
-._autoCompleteResult-main {
+.autoCompleteResult-main {
   margin-top: $utility-baseUnit;
 }

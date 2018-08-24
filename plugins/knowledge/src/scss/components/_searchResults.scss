@@ -23,7 +23,7 @@ $searchResult_breakPoint                      : 800px;
   }
 }
 
-._searchResults {
+.searchResults {
   display: block;
 
 
@@ -35,7 +35,7 @@ $searchResult_breakPoint                      : 800px;
 
 }
 
-._searchResult {
+.searchResult {
   display: flex;
   align-items: center;
 
@@ -51,7 +51,7 @@ $searchResult_breakPoint                      : 800px;
   }
 }
 
-._searchResult-contents {
+.searchResult-contents {
   position: relative;
   display: block;
   overflow: hidden;
@@ -64,12 +64,12 @@ $searchResult_breakPoint                      : 800px;
   }
 }
 
-._searchResult-titleWrap {
+.searchResult-titleWrap {
   display: flex;
   align-items: center;
 }
 
-._searchResult-title {
+.searchResult-title {
   display: block;
   overflow: hidden;
   font-size: $global-title_fontSize;
@@ -79,7 +79,7 @@ $searchResult_breakPoint                      : 800px;
 }
 
 
-._searchResult-head {
+.searchResult-head {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
@@ -93,11 +93,11 @@ $searchResult_breakPoint                      : 800px;
   }
 }
 
-._searchResult-titleIcon {
+.searchResult-titleIcon {
   margin-left: auto;
 }
 
-._searchResult-attachments {
+.searchResult-attachments {
   display: flex;
   flex-wrap: nowrap;
 
@@ -108,7 +108,7 @@ $searchResult_breakPoint                      : 800px;
   }
 }
 
-._searchResult-title {
+.searchResult-title {
   display: block;
   color: $searchResult-title_color;
   flex-grow: 1;
@@ -134,7 +134,7 @@ $searchResult_breakPoint                      : 800px;
 }
 
 
-._searchResult-excerpt {
+.searchResult-excerpt {
   margin: {
     top: $utility-baseUnit;
     bottom: $utility-baseUnit;
@@ -143,7 +143,7 @@ $searchResult_breakPoint                      : 800px;
 }
 
 
-._searchResult-main {
+.searchResult-main {
   display: flex;
 
   @include mediaQuery-searchResults_smallScreen {
@@ -151,17 +151,17 @@ $searchResult_breakPoint                      : 800px;
   }
 }
 
-._searchResult-text {
+.searchResult-text {
   flex-grow: 1;
 }
 
-._searchResult-mediaPreview { // Flexed element
+.searchResult-mediaPreview { // Flexed element
   display: block;
   flex-basis: $searchResult-maxImageWidth;
   width: $searchResult-maxImageWidth;
   order: 2;
 
-  ~ ._searchResult-text {
+  ~ .searchResult-text {
     width: calc(100% - #{$searchResult-maxImageWidth});
     order: 1;
     padding-right: $utility-baseUnit * 4;
@@ -177,7 +177,7 @@ $searchResult_breakPoint                      : 800px;
   }
 }
 
-._searchResult-mediaPreviewFrame { // Image container
+.searchResult-mediaPreviewFrame { // Image container
   position: relative;
   display: block;
   max-width: 100%;
@@ -185,7 +185,7 @@ $searchResult_breakPoint                      : 800px;
   overflow: hidden;
 }
 
-._searchResult-mediaPreviewImage {
+.searchResult-mediaPreviewImage {
   position: absolute;
   top: 0;
   left: auto;

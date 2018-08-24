@@ -5,8 +5,8 @@
   height: 24px;
 }
 
-._container-breadcrumb,
-._breadcrumbs {
+.container-breadcrumb,
+.breadcrumbs {
   display: block;
   margin-top: $global-gutter_size;
   margin-bottom: $global-gutter_size;
@@ -16,7 +16,7 @@
   }
 }
 
-._container._container-breadcrumb {
+.container.container-breadcrumb {
   margin-bottom: $utility-baseUnit;
 }
 
@@ -32,7 +32,7 @@ body.PageCategoryWithNav {
     }
   }
 
-  ._container-breadcrumb {
+  .container-breadcrumb {
     @include mediaQuery-columnsThreeCol_breakToOne {
       margin-bottom: 0;
     }

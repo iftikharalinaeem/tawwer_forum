@@ -1,6 +1,6 @@
 $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%) !default;
 
-._widget {
+.widget {
   width: 100%;
   background-color: $global-widget_bg;
   color: $global-widget_fg;
@@ -19,12 +19,12 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
     left: $global-gutter_quarterSize;
   }
 
-  + ._widget {
+  + .widget {
     margin-top: $global-widget_gap;
   }
 }
 
-._widget-header {
+.widget-header {
   background-color: $widget-head_bg;
   color: $widget-head_fg;
   margin-bottom: $widget-head_gap;
@@ -45,11 +45,11 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
   }
 }
 
-._widgetTitle {
+.widgetTitle {
   margin: 0;
 }
 
-._widget-body {
+.widget-body {
   width: 100%;
   color: $widget-body_fg;
   padding: {
@@ -65,7 +65,7 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
   }
 }
 
-._widget-footer {
+.widget-footer {
   width: 100%;
   background-color: $widget-footer_bg;
   color: $widget-footer_fg;
@@ -86,23 +86,23 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
   }
 }
 
-._widget-title {
+.widget-title {
   display: block;
   font-size: $global-widgetTitle_size;
   margin-bottom: 0;
 }
 
-._widget-titleBar {
+.widget-titleBar {
   display: flex;
   align-items: center;
   justify-content: flex-start;
 
-  ._widget-title {
+  .widget-title {
     margin-right: auto;
   }
 }
 
-._widget-viewAll {
+.widget-viewAll {
   display: flex;
   align-items: center;
   border: 0;
@@ -110,7 +110,7 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
 }
 
 
-._widget-viewAllLabel {
+.widget-viewAllLabel {
   @include outlineStyling;
   vertical-align: middle;
   font-size: $global-small_fontSize;
@@ -123,7 +123,7 @@ $widget-titleBar_viewMoreColor    : mix($global-color_fg, $global-color_fg, 60%)
   }
 }
 
-._widget-viewAllIcon {
+.widget-viewAllIcon {
   display: inline-block;
   color: $widget-titleBar_viewMoreColor;
 }

@@ -15,12 +15,12 @@ $container-gap                        : $global-gutter_halfSize;
   min-height: 100vh;
 }
 
-._page-minHeight,
+.page-minHeight,
 #Body {
   flex-grow: 1;
 }
 
-._container {
+.container {
   position: relative;
   box-sizing: border-box;
   width: 100%;
@@ -36,9 +36,9 @@ $container-gap                        : $global-gutter_halfSize;
     right: $global-gutter_halfSize;
   }
 
-  &._fullWidthLayout,
-  &._panelAndNav,
-  &._hasPaddedContent {
+  &.fullWidthLayout,
+  &.panelAndNav,
+  &.hasPaddedContent {
     padding: {
       left: $global-gutter_quarterSize;
       right: $global-gutter_quarterSize;
@@ -47,7 +47,7 @@ $container-gap                        : $global-gutter_halfSize;
 }
 
 
-._fullWidthLayout {
+.fullWidthLayout {
   @include mediaQuery-backLink_breakPoint {
     @include backLinkNoBleedStyles;
   }

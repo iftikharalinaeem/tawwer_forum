@@ -33,21 +33,21 @@ $searchBarAdvanced-smallScreen_breakpoint         : 500px;
   }
 }
 
-._searchBar {
+.searchBar {
   max-width: #{$searchBar_width};
   margin : auto;
 
-  &._showAdvancedSearch {
-    ._searchBarAdvanced {
+  &.showAdvancedSearch {
+    .searchBarAdvanced {
       display: block;
     }
 
-    ._searchBar-button,
-    ._searchBarAdvanced_footer {
+    .searchBar-button,
+    .searchBarAdvanced_footer {
       display: none;
     }
 
-    .inputText._searchBar-input {
+    .inputText.searchBar-input {
       border: {
         right-width: $formElement_borderWidth;
         right-color: $formElement_borderColor;
@@ -59,30 +59,30 @@ $searchBarAdvanced-smallScreen_breakpoint         : 500px;
     }
   }
 
-  &._showAutoComplete {
-    ._autoComplete {
+  &.showAutoComplete {
+    .autoComplete {
       display: block;
     }
   }
 }
 
-._searchBar-bar {
+.searchBar-bar {
   display: flex;
   position: relative;
   flex-wrap: nowrap;
 }
 
-._searchBar-inputAndIcon {
+.searchBar-inputAndIcon {
   position: relative;
   flex-grow: 1;
 }
 
-._searchBar-searchIcon {
+.searchBar-searchIcon {
   @include absolute-middleLeft($formElement_horizontalPadding);
   color: $searchBar-icon_color;
 }
 
-.inputText._searchBar-input {
+.inputText.searchBar-input {
   height: $searchBar_height;
   font-size: $searchBar-input_fontSize;
   margin: 0;
@@ -95,8 +95,8 @@ $searchBarAdvanced-smallScreen_breakpoint         : 500px;
   }
 }
 
-._button {
-  &._searchBar-button {
+.button {
+  &.searchBar-button {
     height: $searchBar_height;
     font-size: $searchBar-button_fontSize;
     min-width: $searchBar-button_minWidth;
@@ -113,11 +113,11 @@ $searchBarAdvanced-smallScreen_breakpoint         : 500px;
 }
 
 
-._searchBar_footer {
+.searchBar_footer {
   display: flex;
 }
 
-._searchBar-toggleAdvanced {
+.searchBar-toggleAdvanced {
   min-width: $searchBar-button_minWidth;
   padding: {
     top: $utility-baseUnit;
@@ -131,14 +131,14 @@ $searchBarAdvanced-smallScreen_breakpoint         : 500px;
 }
 
 
-._splash-advancedSearchWrap {
+.splash-advancedSearchWrap {
   @include defaultTransition(max-height);
   overflow: hidden;
   max-height: 0;
 }
 
 
-._searchBarAdvanced {
+.searchBarAdvanced {
   display: none;
   box-shadow: $searchBarAdvanced-panel_boxShadow;
   margin-top: -$formElement-borderWidth;
@@ -164,7 +164,7 @@ $searchBarAdvanced-smallScreen_breakpoint         : 500px;
   }
 }
 
-._searchBarAdvanced-query {
+.searchBarAdvanced-query {
   display: flex;
   flex-grow: 1;
   flex-wrap: wrap;
@@ -176,11 +176,11 @@ $searchBarAdvanced-smallScreen_breakpoint         : 500px;
   }
 }
 
-._searchBarAdvanced-searchIn {
+.searchBarAdvanced-searchIn {
   margin-bottom: $searchBar-searchIn_margin;
 }
 
-._searchBarAdvanced_footer {
+.searchBarAdvanced_footer {
   display: flex;
   flex-wrap: nowrap;
   width: calc(100% + #{$buttonGroup-margin * 2});

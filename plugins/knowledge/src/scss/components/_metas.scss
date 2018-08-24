@@ -2,7 +2,7 @@ $metas_verticalMargin: $utility-baseUnit * 2;
 $metas_color: mix($global-color_fg, $global-color_bg, 50%) !default;
 $meta_spacing: $global-gutter_quarterSize;
 
-._metas {
+.metas {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
@@ -18,14 +18,14 @@ $meta_spacing: $global-gutter_quarterSize;
   overflow: hidden;
 }
 
-._meta {
+.meta {
   display: block;
   margin: 0 $utility-baseUnit;
   font-size: $metaText_fontSize;
   color: $metas_color;
 }
 
-a._meta {
+a.meta {
   color: $link-default_color;
   &:hover {
     color: $link-default_hover-color;
@@ -36,22 +36,22 @@ a._meta {
   }
 }
 
-._meta-text {
+.meta-text {
   color: inherit;
   display: inline-block;
   line-height: inherit;
   vertical-align: middle;
 }
 
-._meta-textPart {
+.meta-textPart {
   display: inline-block;
   vertical-align: middle;
 }
 
-._metaBreadcrumb {
+.metaBreadcrumb {
   display: inline;
 }
 
-._metaBreadcrumb-item {
+.metaBreadcrumb-item {
   display: inline;
 }

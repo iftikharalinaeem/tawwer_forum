@@ -21,7 +21,7 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
   }
 }
 
-._panelAndNav {
+.panelAndNav {
   display: flex;
   flex-wrap: nowrap;
 
@@ -29,8 +29,8 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
     flex-wrap: wrap;
   }
 
-  &._noRightColumn {
-    ._panelAndNav-middle {
+  &.noRightColumn {
+    .panelAndNav-middle {
       flex-basis: 100%;
       max-width: 100%;
     }
@@ -38,7 +38,7 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
 }
 
 // Left Section
-._panelAndNav-left {
+.panelAndNav-left {
   position: relative;
   width: $global-panel_width;
   flex-basis: $global-panel_width;
@@ -56,7 +56,7 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
     height: 100%;
     overflow: auto;
 
-    ._panelAndNav-leftTop {
+    .panelAndNav-leftTop {
       display: none;
     }
 
@@ -64,7 +64,7 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
       transform: translateX(0);
     }
 
-    ._panelAndNav-leftBottom {
+    .panelAndNav-leftBottom {
       .breadcrumbsWrapper,
       .temporaryBreadcrumbWrapper {
         display: none;
@@ -73,14 +73,14 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
   }
 }
 
-._panelAndNav-leftTop {
+.panelAndNav-leftTop {
   margin-bottom: $global-gutter_halfSize;
   position: relative;
 }
 
 
 // Content section
-._panelAndNav-content {
+.panelAndNav-content {
   display: flex;
   flex-basis: calc(100% - #{$global-panel_width});
   max-width: calc(100% - #{$global-panel_width});
@@ -98,14 +98,14 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
 }
 
 // Middle Column
-._panelAndNav-middle {
+.panelAndNav-middle {
   flex-grow: 1;
   flex-basis: calc(100% - #{$global-panel_width});
   max-width: calc(100% - #{$global-panel_width});
   background-color: $panelAndNav-middlePanel_bg;
 
-  ._panelAndNav-rightTop,
-  ._panelAndNav-leftTop {
+  .panelAndNav-rightTop,
+  .panelAndNav-leftTop {
     display: none;
   }
 
@@ -114,20 +114,20 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
     max-width: 100%;
     flex-basis: 100%;
 
-    ._panelAndNav-rightTop {
+    .panelAndNav-rightTop {
       display: block;
     }
   }
 
   @include mediaQuery-panelAndNav_oneColumn {
-    ._panelAndNav-leftTop {
+    .panelAndNav-leftTop {
       display: block;
     }
   }
 }
 
 // Right Column
-._panelAndNav-right {
+.panelAndNav-right {
   width: $global-panel_width;
   flex-basis: $global-panel_width;
   background-color: $panelAndNav-rightPanel_bg;
@@ -141,23 +141,23 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
     margin-left: 0;
     flex-grow: 1;
 
-    ._panelAndNav-rightTop {
+    .panelAndNav-rightTop {
       display: none;
     }
   }
 }
 
-._panelAndNav-rightTop {
+.panelAndNav-rightTop {
   margin-bottom: $global-gutter_halfSize;
 }
 
-._pageContents {
+.pageContents {
   * {
     @include breakWord;
   }
 
 
-  ._button-menu._panelAndNav-menu {
+  .button-menu.panelAndNav-menu {
     display: none;
     margin-right: $utility-baseUnit * 2;
 
@@ -166,7 +166,7 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
     }
   }
 
-  ._button._button-close._panelAndNav-close {
+  .button.button-close.panelAndNav-close {
     @include absolute-topRight($global-widgetInner_padding, $global-widgetInner_padding);
     display: none;
     z-index: 1;
@@ -178,7 +178,7 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
 }
 
 @include mediaQuery-panelAndNav_oneColumn {
-  ._panelAndNav-sticky {
+  .panelAndNav-sticky {
     position: relative;
     top: auto;
     left: auto;
@@ -186,7 +186,7 @@ $panelAndNav-panel_leftPadding                       : $global-widgetInner_paddi
   }
 }
 
-._panelAndNav-sticky {
+.panelAndNav-sticky {
   position: sticky;
   width: 100%;
   top: 0;
