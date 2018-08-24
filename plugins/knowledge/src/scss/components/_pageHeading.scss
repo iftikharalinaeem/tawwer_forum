@@ -1,0 +1,92 @@
+$pageHeading-cta_margin                      : 100px !default;
+$pageHeading-dropdown_width                  : 150px !default;
+
+.pageHeading {
+  display: flex;
+  width: 100%;
+  align-items: center;
+
+  .pageTitle {
+    display: block;
+    margin: {
+      top: 0;
+      bottom: 0;
+    }
+  }
+
+  + .pageMetas {
+    margin-top: $utility-baseUnit * 2;
+  }
+}
+
+.pageHeading-underTitle {
+  margin-top: $utility-baseUnit;
+}
+
+.pageHeading-main {
+  position: relative;
+  display: block;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.pageHeading-titleBar {
+  display: flex;
+  position: relative;
+  align-items: center;
+}
+
+
+.pageHeading-p {
+  font-size: $global-small_fontSize;
+  margin-bottom: $utility-baseUnit * 2;
+}
+
+.pageHeading-actions {
+  display: flex;
+  margin-left: $pageHeading-cta_margin;
+  align-self: center;
+
+  .choices {
+    width: $pageHeading-dropdown_width;
+  }
+}
+
+
+.pageHeading-back {
+  @include absolute-topLeft;
+  overflow: visible;
+  width: $icon-default_size;
+  height: #{$global-title_fontSize * $global-base_lineHeight};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: {
+    top: 0;
+    left: -#{$icon-default_size + $utility-baseUnit * 2};
+  }
+}
+
+.pageHeading-backLink {
+  display: block;
+  height: $icon-default_size;
+  width: $icon-default_size;
+  color: inherit;
+}
+
+.pageHeading-backIcon {
+  position: relative;
+  display: block;
+  width: $icon-default_size;
+  height: $icon-default_size;
+}
+
+.pageHeading-titleWrap {
+  position: relative;
+}
+
+.pageHeading-hamburgerWrapper {
+  display: flex;
+  align-items: center;
+}

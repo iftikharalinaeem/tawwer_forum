@@ -1,0 +1,5 @@
+.stickyBottom {
+  &:empty {
+    display: none;
+  }
+}

@@ -1,0 +1,58 @@
+.userContent {
+  @include clearfix;
+  @include orderedListStyle;
+  @include unorderedListStyle;
+
+  position: relative;
+  width: 100%;
+  font-size: $global-large_fontSize;
+
+  h1 {
+    font-size: $global-title_fontSize;
+  }
+
+  h2 {
+    font-size: $userContent_fontSizeH2;
+  }
+
+  h3 {
+    font-size: $userContent-fontSizeH3;
+  }
+
+  h4 {
+    font-size: $userContent-fontSizeH4;
+  }
+
+  h5 {
+    font-size: $userContent-fontSizeH5;
+  }
+
+  h6 {
+    font-size: $global-large_fontSize;
+  }
+
+  @include headings {
+    display: block;
+    font-weight: $global-bold_fontWeight;
+    margin-bottom: 1em;
+  }
+
+  > *:not(.emoji):not(:last-child) {
+    margin-bottom: .6em;
+
+    + h1,
+    + h2,
+    + h3,
+    + h4,
+    + h5,
+    + h6
+    {
+      margin-top: #{$global-large_fontSize * .6};
+    }
+  }
+
+  .userSignature {
+    font-size: $global-small_fontSize;
+    margin-bottom: $utility-baseUnit * 2;
+  }
+}

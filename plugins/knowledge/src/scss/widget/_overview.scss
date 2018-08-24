@@ -1,0 +1,7 @@
+$overview-newArticle_marginTop: $utility-baseUnit * 2 !default;
+
+.overview {
+  .widget-footer {
+    margin-top: $overview-newArticle_marginTop;
+  }
+}

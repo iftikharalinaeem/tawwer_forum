@@ -1,0 +1,70 @@
+$attachment-block_topMargin      : $global-gutter_size * 2 !default;
+$attachment-block_gap            : $utility-baseUnit * 2 !default;
+$attachment-block_borderColor    : mix($global-color_fg, $global-color_bg, 20%) !default;
+$attachment-block_borderStyle    : solid !default;
+$attachment-block_borderWidth    : $formElement_borderWidth !default;
+$attachment-block_borderRadius   : $global-borderRadius !default;
+$attachment-block_padding        : $utility-baseUnit * 2 !default;
+$attachment-block_boxShadow      : 0 0 3px 0 rgba($global-color_fg, .2) $global-border-style;
+
+$attachment-text_fontSize        : $global-small_fontSize;
+$attachment-title_color          :  mix($global-color_fg, $global-color_bg, 90%) !default;
+
+$attachment-formatIcon_margin    : $utility-baseUnit !default;
+
+$attachment-downloadIcon_color   : mix($global-color_fg, $global-color_bg, 60%) !default;
+$attachment-downloadIcon_margin  : $utility-baseUnit !default;
+
+.attachments {
+  display: block;
+  margin-top: $attachment-block_topMargin;
+}
+
+.attachment {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: inherit;
+  padding: $attachment-block_padding;
+  box-shadow: $attachment-block_boxShadow;
+
+  border: {
+    color: $attachment-block_borderColor;
+    width: $attachment-block_borderWidth;
+    style: $attachment-block_borderStyle;
+    radius: $attachment-block_borderRadius;
+  }
+
+  + .attachment {
+    margin-top: $attachment-block_gap;
+  }
+}
+
+.attachment-format {
+  flex-basis: #{$icon-default_size + $attachment-formatIcon_margin};
+  padding-right: $attachment-formatIcon_margin;
+  flex-shrink: 1;
+}
+
+.attachment-main {
+  flex-grow: 1;
+}
+
+.attachment-title {
+  font-size: $attachment-text_fontSize;
+  color: $attachment-title_color;
+  font-weight: $global-bold_fontWeight;
+}
+
+.attachment-download {
+  color: $attachment-downloadIcon_color;
+  flex-basis: #{$icon-default_size + $attachment-downloadIcon_margin};
+  padding-left: $attachment-downloadIcon_margin;
+}
+
+
+.attachment-metas {
+  margin-bottom: 0;
+}

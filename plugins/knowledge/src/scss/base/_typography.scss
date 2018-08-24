@@ -1,0 +1,29 @@
+$subSubtitle_textTransform: uppercase;
+
+@include headings {
+  @include headingFontStyle;
+}
+
+.pageTitle {
+  @include headingFontStyle;
+  font-size: $global-title_fontSize;
+
+  + .pageSubTitle {
+    display: block;
+  }
+}
+
+.pageSubTitle {
+  font-size: $global-subTitle_fontSize;
+}
+
+.pageSubSubTitle {
+  font-size: $global-medium_fontSize;
+  font-weight: $global-bold_fontWeight;
+  text-transform: $subSubtitle_textTransform;
+}
+
+.componentSubTitle {
+  @include headingFontStyle;
+  font-size: $global-large_fontSize;
+}
