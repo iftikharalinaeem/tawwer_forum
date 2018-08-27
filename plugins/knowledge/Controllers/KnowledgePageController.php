@@ -26,6 +26,9 @@ class KnowledgePageController {
         $this->twig = new \Twig_Environment($loader);
     }
 
+    /**
+     * Use the asset model to get the JS assets for the knowledge section.
+     */
     private function getScripts() {
         $polyfillContent = $this->assetModel->getInlinePolyfillJSContent();
         $webpackJSFiles = $this->assetModel->getWebpackJsFiles('knowledge');
@@ -42,13 +45,22 @@ class KnowledgePageController {
         return $scripts;
     }
 
+    /**
+     * Get the stylesheets for a knowledge page. Knowledge has it's own stylesheet to load. Hardcoded for now.
+     */
     private function getStyles() {
         return [
             'src' => '/plugins/knowledge/js/webpack/knowledge.min.css',
         ];
     }
 
+    /**
+     * Render out the /knowledge page.
+     *
+     * @todo Break down this creation of the data array, and implment a better method of rendering the view than echo-ing it out.
+     */
     public function index() {
+        // We'll need to be able to set all of this dynamically in the future.
         $data = [
             'meta' => [
                 'title' => 'Knowledge Base Title',
