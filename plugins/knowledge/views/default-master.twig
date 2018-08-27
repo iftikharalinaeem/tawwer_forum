@@ -2,7 +2,7 @@
 <html lang="{{ meta.locale }}">
     <head>
         <title>{{ meta.title }}</title>
-{% for meta in meta.metaTags %}
+{% for meta in meta.tags %}
         <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
 {% endfor %}
 {% for script in meta.scripts %}
