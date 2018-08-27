@@ -17,7 +17,7 @@
             <div id="headerContainer">{{ include('partials/header.twig') }}</div>
             <div id="app">
                 <noscript>
-                    {{ page.content }}
+                    {{ page.content|raw }}
                 </noscript>
             </div>
             <div id="footerContainer">{{ include('partials/footer.twig') }}</div>

@@ -45,7 +45,7 @@ class KnowledgeController extends VanillaController {
                     'testClass',
                     'testClass2'
                 ],
-                'content' => 'Put SEO friendly content here'
+                'content' => '<p>Put SEO friendly content here</p>'
             ]
         ]));
     }
