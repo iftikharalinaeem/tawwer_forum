@@ -9,7 +9,7 @@
     {% if script.content is defined %}
         <script>{{ script.content|raw }}</script>
     {% elseif script.src is defined %}
-        <script src="{{ script.src }}"></script>
+        <script defer src="{{ script.src }}"></script>
     {% endif %}
 {% endfor %}
 {% for stylesheet in styles %}

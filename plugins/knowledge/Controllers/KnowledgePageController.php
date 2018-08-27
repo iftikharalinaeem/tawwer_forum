@@ -44,7 +44,7 @@ class KnowledgePageController {
 
     private function getStyles() {
         return [
-            'src' => '/plugins/knowledge/design/knowledge.css',
+            'src' => '/plugins/knowledge/js/webpack/knowledge.min.css',
         ];
     }
 
