@@ -15,11 +15,11 @@ class KnowledgeController extends VanillaController {
         $loader = new Twig_Loader_Filesystem(PATH_ROOT.'/plugins/knowledge/views');
         $twig = new Twig_Environment($loader);
 
-        die($twig->render('default.master.twig', [
+        die($twig->render('default-master.twig', [
             'meta' => [
                 'title' => 'Knowledge Base Title',
                 'locale' => 'en',
-                'metaTags' => [
+                'tags' => [
                     [
                         'charset' => 'utf-8'
                     ],[
