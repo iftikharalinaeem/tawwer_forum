@@ -15,13 +15,17 @@ class KnowledgePageController {
     /** @var \AssetModel */
     private $assetModel;
 
+    /** @var \Gdn_Configuration */
+    private $configuration;
+
     /**
      * KnowledgePageController constructor.
      *
      * @param \AssetModel $assetModel
      */
-    public function __construct(\AssetModel $assetModel) {
+    public function __construct(\AssetModel $assetModel, \Gdn_Configuration $configuration) {
         $this->assetModel = $assetModel;
+        $this->configuration = $configuration;
         $loader = new \Twig_Loader_Filesystem(PATH_ROOT.'/plugins/knowledge/views');
         $this->twig = new \Twig_Environment($loader);
     }
@@ -49,9 +53,13 @@ class KnowledgePageController {
      * Get the stylesheets for a knowledge page. Knowledge has it's own stylesheet to load. Hardcoded for now.
      */
     private function getStyles() {
-        return [
+        // Don't load the production stylesheets in a development build.
+        if ($this->configuration->get('HotReload.Enabled', false) === true) {
+            return [];
+        }
+        return [[
             'src' => '/plugins/knowledge/js/webpack/knowledge.min.css',
-        ];
+        ]];
     }
 
     /**
