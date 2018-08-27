@@ -2,5 +2,5 @@
   pointer-events: none;
   user-select: none;
   cursor: default;
-  opacity: .5;
+  opacity: $formElement-disabled_opacity;
 }
