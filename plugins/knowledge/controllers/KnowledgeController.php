@@ -18,8 +18,35 @@ class KnowledgeController extends VanillaController {
             'meta' => [
                 'title' => 'Knowledge Base Title',
                 'locale' => 'en',
+                'metaTags' => [
+                    [
+                        'charset' => 'utf-8'
+                    ],[
+                        'http-equiv' => 'X-UA-Compatible',
+                        'content' => 'IE=edge',
+                    ],[
+                        'name' => 'viewport',
+                        'content' => 'width=device-width, initial-scale=1',
+                    ],
+                    [
+                        'name' => 'format-detection',
+                        'content' => 'telephone=no',
+                    ],
+                ],
+                'scripts' => [
+                    "/plugins/knowledge/js/knowledge.js",
+                ],
+                'styles' => [
+                    '/plugins/knowledge/design/knowledge.css',
+                ],
             ],
-
+            'page' => [
+                'classes' => [
+                    'testClass',
+                    'testClass2'
+                ],
+                'content' => 'Put SEO friendly content here'
+            ]
         ]));
     }
 }

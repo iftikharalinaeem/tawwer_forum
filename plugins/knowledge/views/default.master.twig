@@ -1,31 +1,27 @@
 <!DOCTYPE html>
-<html lang="{{ locale }}">
+<html lang="{{ meta.locale }}">
     <head>
-        <title>Knowledge Base</title>
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="format-detection" content="telephone=no" />
-        <link href="" rel="stylesheet"/>
-        <script src=""></script>
+        <title>{{ meta.title }}</title>
+{% for meta in meta.metaTags %}
+        <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
+{% endfor %}
+{% for script in meta.scripts %}
+        <script src="{{ script }}"></script>
+{% endfor %}
+{% for stylesheet in meta.styles %}
+        <link href="{{ stylesheet }}" rel="stylesheet" type="text/css" />
+{% endfor %}
     </head>
-<body>
-
-
-<!-- Above Header -->
-<!-- Header Partial -->
-<!-- Menu -->
-<!-- below Header -->
-<!-- messages -->
-<!-- breadcrumbs -->
-<!-- main body -->
-<!-- pager -->
-<!-- footer -->
-<!-- sticky footer -->
-<!-- scripts -->
-
-
-<h1>Knowledge Base</h1>
-{{ vanilla }}
-</body>
+    <body class="{{ page.classes|join(' ') }}">
+        <div class="page">
+            <div id="headerContainer">{{ include('partials/header.twig') }}</div>
+            <div id="app">
+                <noscript>
+                    {{ page.content }}
+                </noscript>
+            </div>
+            <div id="footerContainer">{{ include('partials/footer.twig') }}</div>
+        </div>
+        <div id="modals"></div>
+    </body>
 </html>
