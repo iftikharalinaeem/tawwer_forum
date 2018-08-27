@@ -15,22 +15,6 @@ class KnowledgePageController {
     /** @var \AssetModel */
     private $assetModel;
 
-    const DEFAULT_META_TAGS = [
-        [
-            'charset' => 'utf-8',
-        ], [
-            'http-equiv' => 'X-UA-Compatible',
-            'content' => 'IE=edge',
-        ], [
-            'name' => 'viewport',
-            'content' => 'width=device-width, initial-scale=1',
-        ],
-        [
-            'name' => 'format-detection',
-            'content' => 'telephone=no',
-        ],
-    ];
-
     /**
      * KnowledgePageController constructor.
      *
@@ -40,35 +24,6 @@ class KnowledgePageController {
         $this->assetModel = $assetModel;
         $loader = new \Twig_Loader_Filesystem(PATH_ROOT.'/plugins/knowledge/views');
         $this->twig = new \Twig_Environment($loader);
-    }
-
-    public function index() {
-        die($this->twig->render('default.master.twig', $this->getTemplateData()));
-    }
-
-    private function getTemplateData() {
-        return [
-            'meta' => [
-                'metaTags' => self::DEFAULT_META_TAGS,
-            ],
-            'page' => [
-                'title' => 'Knowledge Base Title',
-                'locale' => 'en',
-                'classes' => [
-                    'testClass',
-                    'testClass2',
-                ],
-                'content' => '<p>Put SEO friendly content here</p>',
-            ],
-            'css' => $this->getStyleSheets(),
-            'scripts' => $this->getScripts(),
-        ];
-    }
-
-    private function getStyleSheets() {
-        return [
-            'src' => '/plugins/knowledge/design/knowledge.css',
-        ];
     }
 
     private function getScripts() {
@@ -85,5 +40,76 @@ class KnowledgePageController {
         }
 
         return $scripts;
+    }
+
+    private function getStyles() {
+        return [
+            'src' => '/plugins/knowledge/design/knowledge.css',
+        ];
+    }
+
+    public function index() {
+        $data = [
+            'meta' => [
+                'title' => 'Knowledge Base Title',
+                'locale' => 'en',
+                'tags' => [
+                    [
+                        'charset' => 'utf-8'
+                    ],[
+                        'http-equiv' => 'X-UA-Compatible',
+                        'content' => 'IE=edge',
+                    ],[
+                        'name' => 'viewport',
+                        'content' => 'width=device-width, initial-scale=1',
+                    ],[
+                        'name' => 'format-detection',
+                        'content' => 'telephone=no',
+                    ],[
+                        'property' => 'og:site_name',
+                        'content' => 'Vanilla',
+                    ]
+                ],
+                'links' => [ // Can be for canonical urls, alternate urls, next/previous, etc
+                    [
+                        'rel' => 'canonical',
+                        'href' => '/',
+                    ],[
+                        'locale' => 'fr',
+                        'title' => 'Français',
+                        'url' => '/fr',
+                        'rel' => 'alternate'
+                    ],[
+                        'locale' => 'de',
+                        'title' => 'German',
+                        'url' => '/de',
+                        'rel' => 'alternate',
+                    ],[
+                        'href' => '/feed.rss',
+                        'title' => 'Example RSS',
+                        'type' => 'application/rss+xml',
+                        'rel' => 'alternate',
+                    ],[
+                        'rel' => 'next',
+                        'href' => '/discussions/p3'
+                    ],[
+                        'rel' => 'prev',
+                        'href' => '/discussions/p1'
+                    ]
+                ],
+                'breadcrumb' => "{\"@context\":\"http://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Books\",\"item\":\"https://example.com/books\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Authors\",\"item\":\"https://example.com/books/authors\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Ann Leckie\",\"item\":\"https://example.com/books/authors/annleckie\"},{\"@type\":\"ListItem\",\"position\":4,\"name\":\"Ancillary Justice\",\"item\":\"https://example.com/books/authors/ancillaryjustice\"}]}",
+            ],
+            'page' => [
+                'classes' => [
+                    'testClass',
+                    'testClass2'
+                ],
+                'content' => '<p>Put SEO friendly content here</p>'
+            ],
+            'scripts' => $this->getScripts(),
+            'styles' => $this->getStyles(),
+        ];
+
+        echo $this->twig->render('default-master.twig', $data);
     }
 }
