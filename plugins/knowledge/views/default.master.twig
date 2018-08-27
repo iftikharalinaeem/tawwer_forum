@@ -6,7 +6,11 @@
         <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
 {% endfor %}
 {% for script in meta.scripts %}
-        <script src="{{ script }}"></script>
+    {% if script.content is defined %}
+        <script>{{ script.content|raw }}</script>
+    {% elseif script.src is defined %}
+        <script src="{{ script.src }}"></script>
+    {% endif %}
 {% endfor %}
 {% for stylesheet in meta.styles %}
         <link href="{{ stylesheet }}" rel="stylesheet" type="text/css" />

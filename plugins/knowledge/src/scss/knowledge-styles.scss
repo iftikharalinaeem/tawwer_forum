@@ -1,5 +1,5 @@
-@import "@dashboard/core-variables";
-@import "../../node_modules/normalize.css";
+@import "~dashboard-scss/core-variables";
+@import "~normalize.css";
 
 @import "mixins/mixin.utilities";
 @import "mixins/mixin.text";
