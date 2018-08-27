@@ -51,7 +51,7 @@ class WhitelistPlugin extends Gdn_Plugin {
 
             // Make sure only valid characters are part of the whitelist
             $iPList = $sender->Form->getFormValue('Whitelist.IPList');
-           $iPList = $this->cleanIPWhiteList($iPList);
+            $iPList = $this->cleanIPWhiteList($iPList);
             $sender->Form->setFormValue('Whitelist.IPList', $iPList);
 
             if ($sender->Form->save() !== false) {
