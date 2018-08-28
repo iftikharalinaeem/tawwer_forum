@@ -61,8 +61,7 @@ class DbLogger implements LoggerInterface {
             'domain' => true,
             'path' => true
         ];
-
-
+        
         $attributes = array_diff_key($context, $columns);
         $insert = array_diff_key($context, $attributes);
         $insert['message'] = formatString($message, $context);
