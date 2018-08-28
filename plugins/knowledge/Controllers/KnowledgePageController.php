@@ -65,7 +65,8 @@ class KnowledgePageController {
     /**
      * Render out the /knowledge page.
      *
-     * @todo Break down this creation of the data array, and implment a better method of rendering the view than echo-ing it out.
+     * @todo Break down this creation of the data array, and implement a better method of rendering the view than
+     * echo-ing it out.
      */
     public function index() {
         // We'll need to be able to set all of this dynamically in the future.
