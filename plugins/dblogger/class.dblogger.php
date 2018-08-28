@@ -62,6 +62,7 @@ class DbLogger implements LoggerInterface {
             'path' => true
         ];
 
+
         $attributes = array_diff_key($context, $columns);
         $insert = array_diff_key($context, $attributes);
         $insert['message'] = formatString($message, $context);
@@ -70,7 +71,7 @@ class DbLogger implements LoggerInterface {
             $insert['attributes'] = json_encode($attributes, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
         }
         $insert['id'] = uniqid('', false).substr(dechex(mt_rand()), 0, 3);
-
+        $insert['ip'] = ipEncode($insert['ip']);
         $r = $this->sql->insert('EventLog', $insert);
 
         // Delete a couple of old logs.
