@@ -5,17 +5,71 @@
  * @license GPLv2
  */
 
-class KnowledgeController extends VanillaController {
-    public function initialize() {
-        parent::initialize();
-        $this->Application = 'knowledge';
+namespace Vanilla\Knowledge\Controllers;
+
+class KnowledgePageController {
+
+    /** @var \Twig_Environment */
+    protected $twig;
+
+    /** @var \AssetModel */
+    private $assetModel;
+
+    /** @var \Gdn_Configuration */
+    private $configuration;
+
+    /**
+     * KnowledgePageController constructor.
+     *
+     * @param \AssetModel $assetModel
+     */
+    public function __construct(\AssetModel $assetModel, \Gdn_Configuration $configuration) {
+        $this->assetModel = $assetModel;
+        $this->configuration = $configuration;
+        $loader = new \Twig_Loader_Filesystem(PATH_ROOT.'/plugins/knowledge/views');
+        $this->twig = new \Twig_Environment($loader);
     }
 
-    public function index() {
-        $loader = new Twig_Loader_Filesystem(PATH_ROOT.'/plugins/knowledge/views');
-        $twig = new Twig_Environment($loader);
+    /**
+     * Use the asset model to get the JS assets for the knowledge section.
+     */
+    private function getScripts() {
+        $polyfillContent = $this->assetModel->getInlinePolyfillJSContent();
+        $webpackJSFiles = $this->assetModel->getWebpackJsFiles('knowledge');
+        $scripts = [[
+            'content' => $polyfillContent,
+        ]];
 
-        die($twig->render('default-master.twig', [
+        foreach ($webpackJSFiles as $webpackJSFile) {
+            $scripts[] = [
+                'src' => $webpackJSFile,
+            ];
+        }
+
+        return $scripts;
+    }
+
+    /**
+     * Get the stylesheets for a knowledge page. Knowledge has it's own stylesheet to load. Hardcoded for now.
+     */
+    private function getStyles() {
+        // Don't load the production stylesheets in a development build.
+        if ($this->configuration->get('HotReload.Enabled', false) === true) {
+            return [];
+        }
+        return [[
+            'src' => '/plugins/knowledge/js/webpack/knowledge.min.css',
+        ]];
+    }
+
+    /**
+     * Render out the /knowledge page.
+     *
+     * @todo Break down this creation of the data array, and implment a better method of rendering the view than echo-ing it out.
+     */
+    public function index() {
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = [
             'meta' => [
                 'title' => 'Knowledge Base Title',
                 'locale' => 'en',
@@ -63,12 +117,6 @@ class KnowledgeController extends VanillaController {
                         'href' => '/discussions/p1'
                     ]
                 ],
-                'scripts' => [
-                    "/plugins/knowledge/js/knowledge.js",
-                ],
-                'styles' => [
-                    '/plugins/knowledge/design/knowledge.css',
-                ],
                 'breadcrumb' => "{\"@context\":\"http://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Books\",\"item\":\"https://example.com/books\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Authors\",\"item\":\"https://example.com/books/authors\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Ann Leckie\",\"item\":\"https://example.com/books/authors/annleckie\"},{\"@type\":\"ListItem\",\"position\":4,\"name\":\"Ancillary Justice\",\"item\":\"https://example.com/books/authors/ancillaryjustice\"}]}",
             ],
             'page' => [
@@ -77,7 +125,11 @@ class KnowledgeController extends VanillaController {
                     'testClass2'
                 ],
                 'content' => '<p>Put SEO friendly content here</p>'
-            ]
-        ]));
+            ],
+            'scripts' => $this->getScripts(),
+            'styles' => $this->getStyles(),
+        ];
+
+        echo $this->twig->render('default-master.twig', $data);
     }
 }

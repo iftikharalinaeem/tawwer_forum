@@ -5,11 +5,19 @@
 {% for meta in meta.tags %}
         <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
 {% endfor %}
-{% for script in meta.scripts %}
-        <script src="{{ script }}"></script>
+{% for script in scripts %}
+    {% if script.content is defined %}
+        <script>{{ script.content|raw }}</script>
+    {% elseif script.src is defined %}
+        <script defer src="{{ script.src }}"></script>
+    {% endif %}
 {% endfor %}
-{% for stylesheet in meta.styles %}
-        <link href="{{ stylesheet }}" rel="stylesheet" type="text/css" />
+{% for stylesheet in styles %}
+    {% if stylesheet.content is defined %}
+        <style>{{ stylesheet.content|raw }}</style>
+    {% elseif stylesheet.src is defined %}
+        <link href="{{ stylesheet.src }}" rel="stylesheet" type="text/css" />
+    {% endif %}
 {% endfor %}
 {% for link in meta.links %}
         <link{% for attribute,value in link %} {{ attribute }}="{{ value }}"{% endfor %} />
