@@ -13,8 +13,10 @@ interface IProps {
     articlePageState: IArticlePageState;
 }
 
-export function HelloKnowledge() {
-    return <div>{t("Hello Knowledge")}</div>;
+export class HelloKnowledge extends React.Component<IProps> {
+    public render() {
+        return <div>{t("Hello Knowledge")}</div>;
+    }
 }
 
 function mapStateToProps(state: IStoreState) {
@@ -25,4 +27,4 @@ function mapStateToProps(state: IStoreState) {
 
 const withRedux = connect(mapStateToProps);
 
-export default connect(HelloKnowledge);
+export default withRedux(HelloKnowledge);
