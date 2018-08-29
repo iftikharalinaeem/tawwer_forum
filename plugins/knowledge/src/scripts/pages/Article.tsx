@@ -6,15 +6,40 @@ import PageHeading from "../components/PageHeading";
 import PanelLayout, {IPanelCellContent} from "../layouts/PanelLayout";
 import UserContent from "../components/UserContent";
 import { t } from "@dashboard/application";
+import {IBreadcrumbsProps} from "../components/Breadcrumbs";
 
 export interface IProps {
     device: Devices;
 }
 
 export default class Article extends React.Component<IProps> {
-
     public render() {
-        return <PanelLayout device={this.props.device}>
+        const breadcrumbDummyData:IBreadcrumbsProps = {
+            className: "breadcrumbs-test",
+            children: [
+                {
+                    name: "one",
+                    url: "#",
+                },{
+                    name: "two",
+                    url: "#",
+                },{
+                    name: "three",
+                    url: "#",
+                },{
+                    name: "four",
+                    url: "#",
+                },{
+                    name: "five",
+                    url: "#",
+                },{
+                    name: "six",
+                    url: "#",
+                },
+            ],
+        };
+
+        return <PanelLayout device={this.props.device} breadcrumbs={breadcrumbDummyData}>
             {
                 {
                     middleTopComponents: (

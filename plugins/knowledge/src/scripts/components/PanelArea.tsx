@@ -1,9 +1,9 @@
 import * as React from "react";
 import className from "classnames";
 
-interface IPanelArea {
-    className: string;
-    children: JSX.Element;
+export interface IPanelArea {
+    className?: string;
+    children?: JSX.Element;
     render?: boolean;
 }
 
