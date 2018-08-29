@@ -24,8 +24,8 @@ echo $this->Form->errors();
             ?></li>
         <li><?php
             echo $this->Form->label(t('IP Whitelist'), 'Whitelist.IPList');
-            echo wrap(t('You can use * to allow any number between 0 and 255.'), 'p');
-            echo wrap(t('You can use [number]-[number] to allow a range of number. ex. 190-200'), 'p');
+            echo wrap(t('You can use * to allow any number between 0 and 255. (IPV4)'), 'p');
+            echo wrap(t('You can use [number]-[number] to allow a range of number. ex. 190-200. (IPV4)'), 'p');
             echo wrap(t('Some examples: 192.168.1.*, 192.168.0-1.*, 192.168.0-1.0-50'), 'p');
             echo wrap(wrap(t('Put one IP definition per line.'), 'strong'), 'p');
             echo $this->Form->textBox('Whitelist.IPList', ['MultiLine' => true]);
