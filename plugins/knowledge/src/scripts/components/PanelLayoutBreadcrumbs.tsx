@@ -24,7 +24,7 @@ export default class PanelLayoutBreadcrumbs extends React.Component<IPanelLayout
                             {
                                 top: {
                                     className: "panelLayout-breadcrumbEmpty",
-                                    children: ` `,
+                                    children: <span dangerouslySetInnerHTML={{ __html: ` ` }}/>,
                                 },
                             }
                         }
