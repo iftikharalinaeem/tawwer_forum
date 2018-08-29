@@ -8,7 +8,7 @@ import { t } from "@dashboard/application";
 import {IBreadcrumbsProps} from "../components/Breadcrumbs";
 import {IDevice} from "../components/DeviceChecker";
 
-export interface IArticleProps extends IDevice {};
+export interface IArticleProps extends IDevice {}
 
 export default class Article extends React.Component<IArticleProps> {
     public render() {
