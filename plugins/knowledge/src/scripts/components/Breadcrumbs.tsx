@@ -27,19 +27,12 @@ export default class Breadcrumbs extends React.Component<IBreadcrumbsProps> {
                 if (lastElement) {
                     ariaCurrent = `page`;
                 }
-
-                const breadcrumb = <Breadcrumb lastElement={lastElement} name={crumb.name} key={index} url={crumb.url}/>;
-
-                if (lastElement) {
-                    return breadcrumb;
-                } else {
-                    return (
-                        <React.Fragment key={index}>
-                            {breadcrumb}
-                            <li className='breadcrumb-item breadcrumbs-separator'><span className='breadcrumbs-separatorIcon'>{crumbSeparator}</span></li>
-                        </React.Fragment>
-                    );
-                }
+                return (
+                    <React.Fragment key={`breadcrumb-${index}`}>
+                        <Breadcrumb lastElement={lastElement} name={crumb.name}  url={crumb.url}/>
+                        {!lastElement && <li className='breadcrumb-item breadcrumbs-separator'><span className='breadcrumbs-separatorIcon'>{crumbSeparator}</span></li>}
+                    </React.Fragment>
+                );
             });
             return (
                 <nav aria-label={t('Breadcrumb')} className={className("breadcrumbs", this.props.className)}>

@@ -8,7 +8,7 @@ export interface IBreadcrumbProps {
     lastElement: boolean;
     url: string;
     name: string;
-    key?: number;
+    key?: number | string;
 }
 
 
