@@ -1,4 +1,5 @@
 import * as React from "react";
+import debounce from "lodash/debounce";
 
 export enum Devices {
     MOBILE = "mobile",
@@ -6,16 +7,16 @@ export enum Devices {
     DESKTOP = "desktop",
 }
 
-export interface IDevice {
+export interface IDeviceProps {
     device: Devices;
 }
 
-export default class DeviceChecker extends React.Component {
-    public deviceChecker: React.RefObject<HTMLDivElement> = React.createRef();
+interface IDeviceCheckerProps {
+    doUpdate: () => void;
+}
 
-    constructor(props) {
-        super(props);
-    }
+export default class DeviceChecker extends React.Component<IDeviceCheckerProps> {
+    public deviceChecker: React.RefObject<HTMLDivElement> = React.createRef();
 
     public render() {
         return (
@@ -40,7 +41,19 @@ export default class DeviceChecker extends React.Component {
         }
     }
 
-    public componentDidMount() {
-        console.log("Device checker: ", this.device);
+    public componentDidMount () {
+        window.addEventListener("resize", e => {
+            debounce(
+                () => {
+                    window.requestAnimationFrame(data => {
+                        this.props.doUpdate();
+                    });
+                },
+                100,
+                {
+                    leading: true,
+                },
+            )();
+        });
     }
 }

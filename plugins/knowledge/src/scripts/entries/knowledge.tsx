@@ -16,23 +16,16 @@ import { onReady } from "@dashboard/application";
 import { registerReducer } from "@dashboard/state/reducerRegistry";
 
 // Knowledge Modules
-import HelloKnowledge from "@knowledge/components/HelloKnowledge";
 import rootReducer from "@knowledge/rootReducer";
 import getStore from "@dashboard/state/getStore";
 import { IGetArticleResponseBody, Format } from "@knowledge/@types/api";
 import { getArticleActions } from "@knowledge/pages/article/articlePageActions";
-import { Provider } from "react-redux";
+import KnowledgeApp from "@knowledge/KnowledgeApp";
 
 onReady(() => {
     registerReducer("knowledge", rootReducer);
     const app = document.querySelector("#app");
-    ReactDOM.render(
-        <Provider store={getStore()}>
-            <HelloKnowledge />
-        </Provider>,
-        app,
-    );
-
+    ReactDOM.render(<KnowledgeApp />, app);
     // TODO: remove this once we have the API endpoints setup.
     createDummyArticleData();
 });
@@ -74,7 +67,6 @@ function createDummyArticleData() {
 }
 
 const dummyArticleContent = `
-<div class="_userContent">
     <h3 class="_pageSubTitle">Overview</h3>
 
     <p>You will find a common format across all the hosting directories. We have information structured on three bits – Shared Unix or Shared Linux Packages, Shared Windows Packages, Reseller Packages. Each Hosting Directory <s>Strikethrough</s> has a list of plans. Each plan is accompanies by a short synopsis of the plan details. Hence, expect to find the price, the web <strong>Bold</strong>, Data This is a <a href="#">link</a> and the <em>Italic</em> platform.</p>
@@ -116,5 +108,4 @@ const dummyArticleContent = `
     </ol>
 
     <p>Unlike some of the other web hosting reviews, this website offers you reviews for free. You just do need to pay us a dime for all the information you get. It does not matter if you search Shared Unix, Shared Linux Packages or Shared Windows Packages. Our idea is to provide you quality information. We leave the decision up to you once we think we have done a good job of the deal.</p>
-</div>
 `;
