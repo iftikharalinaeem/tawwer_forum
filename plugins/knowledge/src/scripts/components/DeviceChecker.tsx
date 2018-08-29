@@ -25,10 +25,16 @@ export default class DeviceChecker extends React.Component {
 
     public get device() {
         if (this.deviceChecker.current) {
-            switch (this.deviceChecker.current.offsetWidth) {
-                default:
-                    return Devices.DESKTOP;
+            let device = Devices.DESKTOP;
+            switch (`${this.deviceChecker.current.offsetWidth}`) {
+                case "1px":
+                    device = Devices.MOBILE;
+                    break;
+                case "2px":
+                    device =  Devices.TABLET;
+                    break;
             }
+            return device;
         } else {
             throw new Error("deviceChecker does not exist");
         }
