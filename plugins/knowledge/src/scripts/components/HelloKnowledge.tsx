@@ -6,7 +6,23 @@
 
 import React from "react";
 import { t } from "@dashboard/application";
+import { IStoreState, IArticlePageState } from "@knowledge/@types/state";
+import { connect } from "react-redux";
 
-export default function HelloKnowledge() {
+interface IProps {
+    articlePageState: IArticlePageState;
+}
+
+export function HelloKnowledge() {
     return <div>{t("Hello Knowledge")}</div>;
 }
+
+function mapStateToProps(state: IStoreState) {
+    return {
+        articlePageState: state.knowledge.articlePage,
+    };
+}
+
+const withRedux = connect(mapStateToProps);
+
+export default connect(HelloKnowledge);
