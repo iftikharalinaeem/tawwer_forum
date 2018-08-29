@@ -14,7 +14,7 @@ export default class HomePage extends React.Component {
             <div>
                 <p>{t("Hello Home Page. Links are below:")}</p>
                 <p>
-                    <Link to="/kb/article/test-article-page">{t("/article/test-article-page")}</Link>
+                    <Link to="/kb/articles/test-article-page">{t("/articles/test-article-page")}</Link>
                 </p>
             </div>
         );

@@ -141,9 +141,9 @@ class KbPageController {
     }
 
     /**
-     * Render out the /kb/article/:path page.
+     * Render out the /kb/articles/:path page.
      */
-    public function index_article(string $path) {
+    public function index_articles(string $path) {
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getStaticData();
         echo $this->twig->render('default-master.twig', $data);
