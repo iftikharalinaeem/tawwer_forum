@@ -5,7 +5,6 @@
  */
 
 import React from "react";
-import { BrowserRouter, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import getStore from "@dashboard/state/getStore";
 import KnowledgeRoutes from "@knowledge/KnowledgeRoutes";

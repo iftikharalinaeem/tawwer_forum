@@ -16,7 +16,6 @@ import { onReady } from "@dashboard/application";
 import { registerReducer } from "@dashboard/state/reducerRegistry";
 
 // Knowledge Modules
-import HelloKnowledge from "@knowledge/components/HelloKnowledge";
 import rootReducer from "@knowledge/rootReducer";
 import getStore from "@dashboard/state/getStore";
 import { IGetArticleResponseBody, Format } from "@knowledge/@types/api";
@@ -27,7 +26,6 @@ onReady(() => {
     registerReducer("knowledge", rootReducer);
     const app = document.querySelector("#app");
     ReactDOM.render(<KnowledgeApp />, app);
-
     // TODO: remove this once we have the API endpoints setup.
     createDummyArticleData();
 });

@@ -7,7 +7,7 @@
 import React from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import Loadable from "react-loadable";
-import { formatUrl, t } from "@dashboard/application";
+import { t } from "@dashboard/application";
 
 function Loading({ error, pastDelay, retry }) {
     if (error) {

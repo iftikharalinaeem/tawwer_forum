@@ -141,7 +141,7 @@ class KbPageController {
     }
 
     /**
-     * Render out the /kb/article/:id page.
+     * Render out the /kb/article/:path page.
      */
     public function index_article(string $path) {
         // We'll need to be able to set all of this dynamically in the future.
