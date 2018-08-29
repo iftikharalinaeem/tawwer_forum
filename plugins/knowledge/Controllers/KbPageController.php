@@ -7,7 +7,7 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-class KnowledgePageController {
+class KbPageController {
 
     /** @var \Twig_Environment */
     protected $twig;
@@ -63,14 +63,13 @@ class KnowledgePageController {
     }
 
     /**
-     * Render out the /knowledge page.
+     * This function is for testing purposes only. This data all should be assembed dynamically.
      *
      * @todo Break down this creation of the data array, and implement a better method of rendering the view than
      * echo-ing it out.
      */
-    public function index() {
-        // We'll need to be able to set all of this dynamically in the future.
-        $data = [
+    private function getStaticData() {
+        return [
             'meta' => [
                 'title' => 'Knowledge Base Title',
                 'locale' => 'en',
@@ -130,7 +129,23 @@ class KnowledgePageController {
             'scripts' => $this->getScripts(),
             'styles' => $this->getStyles(),
         ];
+    }
 
+    /**
+     * Render out the /kb page.
+     */
+    public function index() {
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = $this->getStaticData();
+        echo $this->twig->render('default-master.twig', $data);
+    }
+
+    /**
+     * Render out the /kb/article/:id page.
+     */
+    public function index_article(string $path) {
+        // We'll need to be able to set all of this dynamically in the future.
+        $data = $this->getStaticData();
         echo $this->twig->render('default-master.twig', $data);
     }
 }

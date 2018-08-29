@@ -21,17 +21,12 @@ import rootReducer from "@knowledge/rootReducer";
 import getStore from "@dashboard/state/getStore";
 import { IGetArticleResponseBody, Format } from "@knowledge/@types/api";
 import { getArticleActions } from "@knowledge/pages/article/articlePageActions";
-import { Provider } from "react-redux";
+import KnowledgeApp from "@knowledge/KnowledgeApp";
 
 onReady(() => {
     registerReducer("knowledge", rootReducer);
     const app = document.querySelector("#app");
-    ReactDOM.render(
-        <Provider store={getStore()}>
-            <HelloKnowledge />
-        </Provider>,
-        app,
-    );
+    ReactDOM.render(<KnowledgeApp />, app);
 
     // TODO: remove this once we have the API endpoints setup.
     createDummyArticleData();

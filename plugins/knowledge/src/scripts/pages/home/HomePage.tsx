@@ -5,23 +5,16 @@
  */
 
 import React from "react";
-import { match } from "react-router";
+import { Link } from "react-router-dom";
 import { t } from "@dashboard/application";
 
-interface IProps {
-    match: match<{
-        id: string;
-    }>;
-}
-
-export default class ArticlePage extends React.Component<IProps> {
+export default class HomePage extends React.Component {
     public render() {
         return (
             <div>
-                <p>{t("Hello Article.")}</p>
+                <p>{t("Hello Home Page. Links are below:")}</p>
                 <p>
-                    {t("The current slug is ")}
-                    {this.props.match.params.id}
+                    <Link to="/kb/article/test-article-page">{t("/article/test-article-page")}</Link>
                 </p>
             </div>
         );
