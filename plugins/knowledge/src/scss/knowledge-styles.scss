@@ -13,10 +13,10 @@
 @import "mixins/mixin.transitions";
 
 @import "base/scaffolding";
-//@import "base/utilities";
+@import "base/utilities";
 //@import "base/typography";
-//
-//@import "layouts/layout";
+
+@import "layouts/layout";
 @import "layouts/panelLayout";
 //@import "layouts/columns";
 //@import "layouts/flexColumns";
