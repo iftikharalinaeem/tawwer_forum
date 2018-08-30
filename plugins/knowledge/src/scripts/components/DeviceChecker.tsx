@@ -28,10 +28,10 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
         if (this.deviceChecker.current) {
             let device = Devices.DESKTOP;
             switch (`${this.deviceChecker.current.offsetWidth}`) {
-                case "1px":
+                case "1":
                     device = Devices.MOBILE;
                     break;
-                case "2px":
+                case "2":
                     device =  Devices.TABLET;
                     break;
             }

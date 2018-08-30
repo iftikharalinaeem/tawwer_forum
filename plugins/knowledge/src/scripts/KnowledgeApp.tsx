@@ -14,12 +14,21 @@ import DeviceChecker, {Devices} from "./components/DeviceChecker";
 export default class KnowledgeApp extends React.Component {
     public deviceChecker: React.RefObject<DeviceChecker> = React.createRef();
 
+    constructor(props) {
+        super(props);
+        this.doUpdate = this.doUpdate.bind(this);
+    }
+
+    public doUpdate() {
+        this.forceUpdate();
+    }
+
     public render() {
         const store = getStore();
         return (
             <Provider store={store}>
                 <React.Fragment>
-                    <DeviceChecker ref={this.deviceChecker} doUpdate={this.forceUpdate}/>
+                    <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate}/>
                     <DeviceContext.Provider value={this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP}>
                         <KnowledgeRoutes />
                     </DeviceContext.Provider>

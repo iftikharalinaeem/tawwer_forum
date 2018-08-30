@@ -1,0 +1,22 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+.deviceChecker {
+  visibility: hidden;
+  width: 3px;
+}
+
+@include mediaQuery-panelAndNav_twoColumn {
+  .deviceChecker {
+    width: 2px;
+  }
+}
+
+@include mediaQuery-panelAndNav_oneColumn {
+  .deviceChecker {
+    width: 1px;
+  }
+}

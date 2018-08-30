@@ -30,10 +30,11 @@ body {
 //@import "base/typography";
 //
 //@import "layouts/layout";
-//@import "layouts/panelAndNav";
+@import "layouts/panelAndNav";
 //@import "layouts/columns";
 //@import "layouts/flexColumns";
 //@import "layouts/section";
+@import "layouts/deviceChecker";
 //
 //@import "components/widgets";
 //@import "components/metas";
