@@ -22,6 +22,7 @@ class KbPageController extends PageController {
         if ($configuration->get('HotReload.Enabled', false) === false) {
             $this->styles = ['/plugins/knowledge/js/webpack/knowledge.min.css'];
         }
+        $this::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
     }
 
     /**
