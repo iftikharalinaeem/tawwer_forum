@@ -40,7 +40,6 @@ class Zendesk {
      * @return int
      */
     public function createTicket($subject, $body, $requester, $additionalTicketFields = []) {
-        //$body = Gdn_Format::htmlFilter($body);
         $ticketFields = [
             'requester' => $requester,
             'subject' => $subject,
