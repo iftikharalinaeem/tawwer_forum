@@ -1,3 +1,9 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 @mixin singleLineEllipsis {
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -5,18 +11,11 @@
   max-width: 100%;
 }
 
-@mixin breakWord {
-  word-break: break-all;
-  word-break: break-word;
-}
-
 @mixin longWordEllipsis {
   text-overflow: ellipsis;
   overflow: hidden;
   max-width: 100%;
 }
-
-
 
 @mixin headings($from: 1, $to: 6){
   @for $i from $from through $to{
@@ -26,16 +25,13 @@
   }
 }
 
-@mixin headingFontStyle($marginBottom: $utility-baseUnit) {
-  @include longWordEllipsis;
-  display: inline-block;
+@mixin headingFontStyle() {
+  display: block;
   font-family: $global-heading_fontFamily;
   font-weight: $global-heading_fontWeight;
   font-size: $global-medium_fontSize;
-  margin: {
-    top: -$global-lineHeight_offset;
-    bottom: $marginBottom;
-  }
+  line-height: $global-condensed_lineHeight;
+  margin: 0;
 }
 
 @mixin bodyFontStyle() {
@@ -49,5 +45,15 @@
   &:active,
   &:visited {
     @content;
+  }
+}
+
+@mixin lineHeightAdjustment($lineHeight) {
+  &::before {
+    content: '';
+    display: block;
+    height: 0;
+    width: 0;
+    margin-top: #{(1 - $lineHeight) / 2};
   }
 }

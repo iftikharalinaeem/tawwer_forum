@@ -1,58 +1,28 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 .userContent {
   @include clearfix;
   @include orderedListStyle;
   @include unorderedListStyle;
 
+  display: block;
   position: relative;
   width: 100%;
-  font-size: $global-large_fontSize;
+  word-break: break-word;
+  line-height: $global-base_lineHeight;
 
-  h1 {
-    font-size: $global-title_fontSize;
-  }
+  > *:not(:last-child) {
 
-  h2 {
-    font-size: $userContent_fontSizeH2;
-  }
+    margin-bottom: $global-block_margin;
 
-  h3 {
-    font-size: $userContent-fontSizeH3;
-  }
-
-  h4 {
-    font-size: $userContent-fontSizeH4;
-  }
-
-  h5 {
-    font-size: $userContent-fontSizeH5;
-  }
-
-  h6 {
-    font-size: $global-large_fontSize;
-  }
-
-  @include headings {
-    display: block;
-    font-weight: $global-bold_fontWeight;
-    margin-bottom: 1em;
-  }
-
-  > *:not(.emoji):not(:last-child) {
-    margin-bottom: .6em;
-
-    + h1,
-    + h2,
-    + h3,
-    + h4,
-    + h5,
-    + h6
-    {
-      margin-top: #{$global-large_fontSize * .6};
+    & + {
+      @include headings {
+        @include lineHeightAdjustment($global-condensed_lineHeight);
+      }
     }
-  }
-
-  .userSignature {
-    font-size: $global-small_fontSize;
-    margin-bottom: $utility-baseUnit * 2;
   }
 }

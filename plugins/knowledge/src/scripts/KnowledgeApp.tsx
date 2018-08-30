@@ -8,12 +8,40 @@ import React from "react";
 import { Provider } from "react-redux";
 import getStore from "@dashboard/state/getStore";
 import KnowledgeRoutes from "@knowledge/KnowledgeRoutes";
+import DeviceContext from "@knowledge/contexts/DeviceContext";
+import DeviceChecker, { Devices } from "@knowledge/components/DeviceChecker";
 
-export default function KnowledgeApp() {
-    const store = getStore();
-    return (
-        <Provider store={store}>
-            <KnowledgeRoutes />
-        </Provider>
-    );
+export default class KnowledgeApp extends React.Component {
+    public deviceChecker: React.RefObject<DeviceChecker> = React.createRef();
+
+    constructor(props) {
+        super(props);
+        this.doUpdate = this.doUpdate.bind(this);
+    }
+
+    /**
+     * Function to force rerendering
+     */
+    public doUpdate() {
+        this.forceUpdate();
+    }
+
+    /**
+     * Device checker detects device and calls a force update if needed to update the current device.
+     */
+    public render() {
+        const store = getStore();
+        return (
+            <Provider store={store}>
+                <React.Fragment>
+                    <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
+                    <DeviceContext.Provider
+                        value={this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP}
+                    >
+                        <KnowledgeRoutes />
+                    </DeviceContext.Provider>
+                </React.Fragment>
+            </Provider>
+        );
+    }
 }

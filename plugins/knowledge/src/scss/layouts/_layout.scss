@@ -1,3 +1,9 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 $fullWidthLayout-backLink_breakpoint  : $global-main_paddedWidth + $icon-default_size + $utility-baseUnit * 8;
 $container-gap                        : $global-gutter_halfSize;
 
@@ -7,7 +13,7 @@ $container-gap                        : $global-gutter_halfSize;
   }
 }
 
-#Frame {
+.page {
   display: flex;
   overflow: visible;
   flex-direction: column;
@@ -15,8 +21,7 @@ $container-gap                        : $global-gutter_halfSize;
   min-height: 100vh;
 }
 
-.page-minHeight,
-#Body {
+.page-minHeight {
   flex-grow: 1;
 }
 
@@ -29,16 +34,16 @@ $container-gap                        : $global-gutter_halfSize;
   margin: {
     left: auto;
     right: auto;
-    bottom: $container-gap;
+    //bottom: $container-gap;
   }
   padding: {
     left: $global-gutter_halfSize;
     right: $global-gutter_halfSize;
   }
 
-  &.fullWidthLayout,
-  &.panelAndNav,
-  &.hasPaddedContent {
+  //&.fullWidthLayout,
+  //&.hasPaddedContent,
+  &.panelAndNav {
     padding: {
       left: $global-gutter_quarterSize;
       right: $global-gutter_quarterSize;

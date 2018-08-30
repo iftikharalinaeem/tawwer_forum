@@ -1,3 +1,9 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 @import "~dashboard-scss/core-variables";
 @import "~normalize.css";
 
@@ -12,28 +18,15 @@
 @import "mixins/mixin.backLink";
 @import "mixins/mixin.transitions";
 
-// TEMPORARY STYLES. REMOVE WHEN REAL STYLES ARE ADDED.
-body {
-    text-align: center;
-    color: $global-color_fg;
-    margin: 0 auto;
-    line-height: 40px;
-    padding: 60px;
-    height: $global-base_lineHeight;
-    font-size: $global-title_fontSize;
-    font-family: $global-body_fontFamily;
-    font-weight: $global-bold_fontWeight;
-}
+@import "base/scaffolding";
+@import "base/typography";
 
-//@import "base/scaffolding";
-//@import "base/utilities";
-//@import "base/typography";
-//
-//@import "layouts/layout";
-//@import "layouts/panelAndNav";
+@import "layouts/layout";
+@import "layouts/panelLayout";
 //@import "layouts/columns";
 //@import "layouts/flexColumns";
 //@import "layouts/section";
+@import "layouts/deviceChecker";
 //
 //@import "components/widgets";
 //@import "components/metas";
@@ -55,7 +48,7 @@ body {
 //@import "components/navMenu";
 //@import "components/tableOfContents";
 //@import "components/relatedLinks";
-//@import "components/userContent";
+@import "components/userContent";
 //@import "components/searchResults";
 //@import "components/sortAndFilter";
 //@import "components/formatIcons";

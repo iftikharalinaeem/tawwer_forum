@@ -7,23 +7,107 @@
 import React from "react";
 import { match } from "react-router";
 import { t } from "@dashboard/application";
+import { connect } from "react-redux";
+import { IStoreState, IArticlePageState } from "@knowledge/@types/state";
+import { IBreadcrumbsProps } from "@knowledge/components/Breadcrumbs";
+import PanelLayout from "@knowledge/layouts/PanelLayout";
+import PanelWidget from "@knowledge/components/PanelWidget";
+import PageHeading from "@knowledge/components/PageHeading";
+import UserContent from "@knowledge/components/UserContent";
+import { IDeviceProps } from "@knowledge/components/DeviceChecker";
+import { withDevice } from "@knowledge/contexts/DeviceContext";
+import Container from "@knowledge/layouts/components/Container";
 
-interface IProps {
+interface IProps extends IDeviceProps {
     match: match<{
         id: string;
     }>;
+    articlePageState: IArticlePageState;
 }
 
-export default class ArticlePage extends React.Component<IProps> {
+export class ArticlePage extends React.Component<IProps> {
     public render() {
+        const breadcrumbDummyData: IBreadcrumbsProps = {
+            children: [
+                {
+                    name: "one",
+                    url: "#",
+                },
+                {
+                    name: "two",
+                    url: "#",
+                },
+                {
+                    name: "three",
+                    url: "#",
+                },
+                {
+                    name: "four",
+                    url: "#",
+                },
+                {
+                    name: "five",
+                    url: "#",
+                },
+                {
+                    name: "six",
+                    url: "#",
+                },
+            ],
+        };
+
+        // @ts-ignore
+        const article = this.props.articlePageState.data.article;
+
         return (
-            <div>
-                <p>{t("Hello Article.")}</p>
-                <p>
-                    {t("The current slug is ")}
-                    {this.props.match.params.id}
-                </p>
-            </div>
+            <Container>
+                <PanelLayout device={this.props.device} breadcrumbs={breadcrumbDummyData}>
+                    {{
+                        leftTopComponents: (
+                            <PanelWidget>
+                                <PageHeading title={t("Actions")} />
+                            </PanelWidget>
+                        ),
+                        leftBottomComponents: (
+                            <React.Fragment>
+                                <PanelWidget>
+                                    <PageHeading title={t("Navigation")} />
+                                </PanelWidget>
+                            </React.Fragment>
+                        ),
+                        middleTopComponents: (
+                            <PanelWidget>
+                                <PageHeading title={article.name} />
+                            </PanelWidget>
+                        ),
+                        middleBottomComponents: (
+                            <PanelWidget>
+                                <UserContent content={article.bodyRendered} />
+                            </PanelWidget>
+                        ),
+                        rightTopComponents: (
+                            <PanelWidget>
+                                <PageHeading title={t("Table of Contents")} />
+                            </PanelWidget>
+                        ),
+                        rightBottomComponents: (
+                            <PanelWidget>
+                                <PageHeading title={t("Related Articles")} />
+                            </PanelWidget>
+                        ),
+                    }}
+                </PanelLayout>
+            </Container>
         );
     }
 }
+
+function mapStateToProps(state: IStoreState) {
+    return {
+        articlePageState: state.knowledge.articlePage,
+    };
+}
+
+const withRedux = connect(mapStateToProps);
+
+export default withRedux(withDevice(ArticlePage));

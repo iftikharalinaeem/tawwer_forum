@@ -1,5 +1,9 @@
-// Wrap around content that goes in a non full width layout. These may or may not have spacing between them or backgrounds
-// Similar to "_widget" for full width pages, but for pages with panel layouts.
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 
 $layoutWidget_bg                : transparent !default;
 $layoutWidget_borderRadius      : 0;
