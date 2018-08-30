@@ -9,7 +9,7 @@ import { Provider } from "react-redux";
 import getStore from "@dashboard/state/getStore";
 import KnowledgeRoutes from "@knowledge/KnowledgeRoutes";
 import DeviceContext from "./contexts/DeviceContext";
-import DeviceChecker, {Devices} from "./components/DeviceChecker";
+import DeviceChecker, { Devices } from "./components/DeviceChecker";
 
 export default class KnowledgeApp extends React.Component {
     public deviceChecker: React.RefObject<DeviceChecker> = React.createRef();
@@ -28,8 +28,10 @@ export default class KnowledgeApp extends React.Component {
         return (
             <Provider store={store}>
                 <React.Fragment>
-                    <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate}/>
-                    <DeviceContext.Provider value={this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP}>
+                    <DeviceChecker ref={this.deviceChecker} doUpdate={this.doUpdate} />
+                    <DeviceContext.Provider
+                        value={this.deviceChecker.current ? this.deviceChecker.current.device : Devices.DESKTOP}
+                    >
                         <KnowledgeRoutes />
                     </DeviceContext.Provider>
                 </React.Fragment>

@@ -1,3 +1,9 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 @import "~dashboard-scss/core-variables";
 @import "~normalize.css";
 
@@ -42,7 +48,7 @@
 //@import "components/navMenu";
 //@import "components/tableOfContents";
 //@import "components/relatedLinks";
-//@import "components/userContent";
+@import "components/userContent";
 //@import "components/searchResults";
 //@import "components/sortAndFilter";
 //@import "components/formatIcons";

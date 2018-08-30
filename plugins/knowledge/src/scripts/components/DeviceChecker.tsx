@@ -1,3 +1,9 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 import * as React from "react";
 import debounce from "lodash/debounce";
 
@@ -19,9 +25,7 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
     public deviceChecker: React.RefObject<HTMLDivElement> = React.createRef();
 
     public render() {
-        return (
-            <div ref={this.deviceChecker} className="deviceChecker" />
-        );
+        return <div ref={this.deviceChecker} className="deviceChecker" />;
     }
 
     public get device() {
@@ -32,7 +36,7 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
                     device = Devices.MOBILE;
                     break;
                 case "2":
-                    device =  Devices.TABLET;
+                    device = Devices.TABLET;
                     break;
             }
             return device;
@@ -41,7 +45,7 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
         }
     }
 
-    public componentDidMount () {
+    public componentDidMount() {
         window.addEventListener("resize", e => {
             debounce(
                 () => {

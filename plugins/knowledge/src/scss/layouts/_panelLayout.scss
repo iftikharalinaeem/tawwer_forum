@@ -1,9 +1,15 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
 $panelLayout-twoColumn_breakpoint                    : $global-main_paddedWidth !default;
 $panelLayout-oneColumn_breakpoint                    : $global-twoColumn_breakpoint !default;
 $panelLayout_bg                                      : $global-color_bg;
-$panelLayout-rightPanel_bg                           : $panelLayout_bg;
+$panelArea-rightPanel_bg                           : $panelLayout_bg;
 $panelLayout-middlePanel_bg                          : $panelLayout_bg;
-$panelLayout-leftPanel_bg                            : $panelLayout_bg;
+$panelArea-leftPanel_bg                            : $panelLayout_bg;
 $panelLayout-panel_topPadding                        : $global-widgetInner_padding !default;
 $panelLayout-panel_rightPadding                      : $global-widgetInner_padding !default;
 $panelLayout-panel_bottomPadding                     : $global-widgetInner_padding !default;
@@ -38,12 +44,12 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
 }
 
 // Left Section
-.panelLayout-left {
+.panelArea-left {
   position: relative;
   width: $global-panel_width;
   flex-basis: $global-panel_width;
   z-index: 2;
-  background-color: $panelLayout-rightPanel_bg;
+  background-color: $panelArea-rightPanel_bg;
 
   @include mediaQuery-panelLayout_oneColumn {
     position: absolute;
@@ -56,7 +62,7 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
     height: 100%;
     overflow: auto;
 
-    .panelLayout-leftTop {
+    .panelArea-leftTop {
       display: none;
     }
 
@@ -64,7 +70,7 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
       transform: translateX(0);
     }
 
-    .panelLayout-leftBottom {
+    .panelArea-leftBottom {
       .breadcrumbsWrapper,
       .temporaryBreadcrumbWrapper {
         display: none;
@@ -73,7 +79,7 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
   }
 }
 
-.panelLayout-leftTop {
+.panelArea-leftTop {
   margin-bottom: $global-gutter_halfSize;
   position: relative;
 }
@@ -104,8 +110,8 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
   max-width: calc(100% - #{$global-panel_width});
   background-color: $panelLayout-middlePanel_bg;
 
-  .panelLayout-rightTop,
-  .panelLayout-leftTop {
+  .panelArea-rightTop,
+  .panelArea-leftTop {
     display: none;
   }
 
@@ -114,23 +120,23 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
     max-width: 100%;
     flex-basis: 100%;
 
-    .panelLayout-rightTop {
+    .panelArea-rightTop {
       display: block;
     }
   }
 
   @include mediaQuery-panelLayout_oneColumn {
-    .panelLayout-leftTop {
+    .panelArea-leftTop {
       display: block;
     }
   }
 }
 
 // Right Column
-.panelLayout-right {
+.panelArea-right {
   width: $global-panel_width;
   flex-basis: $global-panel_width;
-  background-color: $panelLayout-rightPanel_bg;
+  background-color: $panelArea-rightPanel_bg;
 
   &:empty {
     display: none;
@@ -141,13 +147,13 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
     margin-left: 0;
     flex-grow: 1;
 
-    .panelLayout-rightTop {
+    .panelArea-rightTop {
       display: none;
     }
   }
 }
 
-.panelLayout-rightTop {
+.panelArea-rightTop {
   margin-bottom: $global-gutter_halfSize;
 }
 
