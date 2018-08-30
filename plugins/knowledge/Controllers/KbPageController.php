@@ -7,71 +7,21 @@
 
 namespace Vanilla\Knowledge\Controllers;
 
-class KbPageController {
+use Vanilla\Knowledge\PageController;
 
-    /** @var \Twig_Environment */
-    protected $twig;
-
-    /** @var \AssetModel */
-    private $assetModel;
-
-    /** @var \Gdn_Configuration */
-    private $configuration;
-
+class KbPageController extends PageController {
+    use \Garden\TwigTrait;
     /**
      * KnowledgePageController constructor.
      *
      * @param \AssetModel $assetModel
      */
     public function __construct(\AssetModel $assetModel, \Gdn_Configuration $configuration) {
-        $this->assetModel = $assetModel;
-        $this->configuration = $configuration;
-        $loader = new \Twig_Loader_Filesystem(PATH_ROOT.'/plugins/knowledge/views');
-        $this->twig = new \Twig_Environment($loader);
-    }
-
-    /**
-     * Use the asset model to get the external JS assets for the knowledge section.
-     */
-    private function getScripts() {
-        $webpackJSFiles = $this->assetModel->getWebpackJsFiles('knowledge');
-        foreach ($webpackJSFiles as $webpackJSFile) {
-            $scripts[] = [
-                'src' => $webpackJSFile,
-            ];
+        $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
+        $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
+        if ($configuration->get('HotReload.Enabled', false) === false) {
+            $this->styles = ['/plugins/knowledge/js/webpack/knowledge.min.css'];
         }
-        return $scripts;
-    }
-
-    /**
-     * Use the asset model to get the inline JS assets for the knowledge section.
-     */
-    private function getInlineScripts() {
-        $polyfillContent = $this->assetModel->getInlinePolyfillJSContent();
-        $scripts = [[
-            'content' => $polyfillContent,
-        ]];
-        return $scripts;
-    }
-
-    /**
-     * Get the stylesheets for a knowledge page. Knowledge has it's own stylesheet to load. Hardcoded for now.
-     */
-    private function getStyles() {
-        // Don't load the production stylesheets in a development build.
-        if ($this->configuration->get('HotReload.Enabled', false) === true) {
-            return [];
-        } else {
-            return [[
-                'src' => '/plugins/knowledge/js/webpack/knowledge.min.css',
-            ]];
-        }
-    }
-    /**
-     * Get the stylesheets for a knowledge page. Knowledge has it's own stylesheet to load. Hardcoded for now.
-     */
-    private function getInlineStyles() {
-        return [];
     }
 
     /**
