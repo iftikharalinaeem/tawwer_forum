@@ -1,0 +1,197 @@
+$panelLayout-twoColumn_breakpoint                    : $global-main_paddedWidth !default;
+$panelLayout-oneColumn_breakpoint                    : $global-twoColumn_breakpoint !default;
+$panelLayout_bg                                      : $global-color_bg;
+$panelLayout-rightPanel_bg                           : $panelLayout_bg;
+$panelLayout-middlePanel_bg                          : $panelLayout_bg;
+$panelLayout-leftPanel_bg                            : $panelLayout_bg;
+$panelLayout-panel_topPadding                        : $global-widgetInner_padding !default;
+$panelLayout-panel_rightPadding                      : $global-widgetInner_padding !default;
+$panelLayout-panel_bottomPadding                     : $global-widgetInner_padding !default;
+$panelLayout-panel_leftPadding                       : $global-widgetInner_padding !default;
+
+@mixin mediaQuery-panelLayout_twoColumn {
+  @media (max-width: #{$panelLayout-twoColumn_breakpoint}) {
+    @content;
+  }
+}
+
+@mixin mediaQuery-panelLayout_oneColumn {
+  @media (max-width: #{$panelLayout-oneColumn_breakpoint}) {
+    @content;
+  }
+}
+
+.panelLayout {
+  display: flex;
+  flex-wrap: nowrap;
+
+  @include mediaQuery-panelLayout_oneColumn {
+    flex-wrap: wrap;
+  }
+
+  &.noRightColumn {
+    .panelLayout-middle {
+      flex-basis: 100%;
+      max-width: 100%;
+    }
+  }
+}
+
+// Left Section
+.panelLayout-left {
+  position: relative;
+  width: $global-panel_width;
+  flex-basis: $global-panel_width;
+  z-index: 2;
+  background-color: $panelLayout-rightPanel_bg;
+
+  @include mediaQuery-panelLayout_oneColumn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+
+    margin: 0;
+    transform: translateX(-100vw);
+    height: 100%;
+    overflow: auto;
+
+    .panelLayout-leftTop {
+      display: none;
+    }
+
+    &.isOpen {
+      transform: translateX(0);
+    }
+
+    .panelLayout-leftBottom {
+      .breadcrumbsWrapper,
+      .temporaryBreadcrumbWrapper {
+        display: none;
+      }
+    }
+  }
+}
+
+.panelLayout-leftTop {
+  margin-bottom: $global-gutter_halfSize;
+  position: relative;
+}
+
+
+// Content section
+.panelLayout-content {
+  display: flex;
+  flex-basis: calc(100% - #{$global-panel_width});
+  max-width: calc(100% - #{$global-panel_width});
+
+  @include mediaQuery-panelLayout_twoColumn {
+    flex-wrap: wrap;
+  }
+
+  @include mediaQuery-panelLayout_oneColumn {
+    @include backLinkNoBleedStyles;
+    max-width: 100%;
+    flex-basis: 100%;
+    padding-left: 0;
+  }
+}
+
+// Middle Column
+.panelLayout-middle {
+  flex-grow: 1;
+  flex-basis: calc(100% - #{$global-panel_width});
+  max-width: calc(100% - #{$global-panel_width});
+  background-color: $panelLayout-middlePanel_bg;
+
+  .panelLayout-rightTop,
+  .panelLayout-leftTop {
+    display: none;
+  }
+
+  @include mediaQuery-panelLayout_twoColumn {
+    width: 100%;
+    max-width: 100%;
+    flex-basis: 100%;
+
+    .panelLayout-rightTop {
+      display: block;
+    }
+  }
+
+  @include mediaQuery-panelLayout_oneColumn {
+    .panelLayout-leftTop {
+      display: block;
+    }
+  }
+}
+
+// Right Column
+.panelLayout-right {
+  width: $global-panel_width;
+  flex-basis: $global-panel_width;
+  background-color: $panelLayout-rightPanel_bg;
+
+  &:empty {
+    display: none;
+  }
+
+  @include mediaQuery-panelLayout_twoColumn {
+    width: 100%;
+    margin-left: 0;
+    flex-grow: 1;
+
+    .panelLayout-rightTop {
+      display: none;
+    }
+  }
+}
+
+.panelLayout-rightTop {
+  margin-bottom: $global-gutter_halfSize;
+}
+
+.pageContents {
+  * {
+    @include breakWord;
+  }
+
+
+  .button-menu.panelLayout-menu {
+    display: none;
+    margin-right: $utility-baseUnit * 2;
+
+    @include mediaQuery-panelLayout_oneColumn {
+      display: block;
+    }
+  }
+
+  .button.button-close.panelLayout-close {
+    @include absolute-topRight($global-widgetInner_padding, $global-widgetInner_padding);
+    display: none;
+    z-index: 1;
+
+    @include mediaQuery-panelLayout_oneColumn {
+      display: block;
+    }
+  }
+}
+
+@include mediaQuery-panelLayout_oneColumn {
+  .panelLayout-sticky {
+    position: relative;
+    top: auto;
+    left: auto;
+    bottom: auto;
+  }
+}
+
+.panelLayout-sticky {
+  position: sticky;
+  width: 100%;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  max-height: 100%;
+  overflow: auto;
+}

@@ -12,25 +12,12 @@
 @import "mixins/mixin.backLink";
 @import "mixins/mixin.transitions";
 
-// TEMPORARY STYLES. REMOVE WHEN REAL STYLES ARE ADDED.
-body {
-    text-align: center;
-    color: $global-color_fg;
-    margin: 0 auto;
-    line-height: 40px;
-    padding: 60px;
-    height: $global-base_lineHeight;
-    font-size: $global-title_fontSize;
-    font-family: $global-body_fontFamily;
-    font-weight: $global-bold_fontWeight;
-}
-
-//@import "base/scaffolding";
+@import "base/scaffolding";
 //@import "base/utilities";
 //@import "base/typography";
 //
 //@import "layouts/layout";
-@import "layouts/panelAndNav";
+@import "layouts/panelLayout";
 //@import "layouts/columns";
 //@import "layouts/flexColumns";
 //@import "layouts/section";

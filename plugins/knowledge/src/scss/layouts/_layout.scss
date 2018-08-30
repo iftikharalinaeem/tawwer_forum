@@ -7,7 +7,7 @@ $container-gap                        : $global-gutter_halfSize;
   }
 }
 
-#Frame {
+.page {
   display: flex;
   overflow: visible;
   flex-direction: column;
@@ -15,8 +15,7 @@ $container-gap                        : $global-gutter_halfSize;
   min-height: 100vh;
 }
 
-.page-minHeight,
-#Body {
+.page-minHeight {
   flex-grow: 1;
 }
 
@@ -36,9 +35,9 @@ $container-gap                        : $global-gutter_halfSize;
     right: $global-gutter_halfSize;
   }
 
-  &.fullWidthLayout,
-  &.panelAndNav,
-  &.hasPaddedContent {
+  //&.fullWidthLayout,
+  //&.hasPaddedContent,
+  &.panelAndNav {
     padding: {
       left: $global-gutter_quarterSize;
       right: $global-gutter_quarterSize;

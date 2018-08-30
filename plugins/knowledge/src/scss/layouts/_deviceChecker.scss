@@ -9,13 +9,13 @@
   width: 3px;
 }
 
-@include mediaQuery-panelAndNav_twoColumn {
+@include mediaQuery-panelLayout_twoColumn {
   .deviceChecker {
     width: 2px;
   }
 }
 
-@include mediaQuery-panelAndNav_oneColumn {
+@include mediaQuery-panelLayout_oneColumn {
   .deviceChecker {
     width: 1px;
   }

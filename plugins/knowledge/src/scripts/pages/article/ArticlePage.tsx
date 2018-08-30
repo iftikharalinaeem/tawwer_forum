@@ -54,8 +54,6 @@ export class ArticlePage extends React.Component<IProps> {
         // @ts-ignore
         const article = this.props.articlePageState.data.article;
 
-        window.console.log(article);
-
         return <PanelLayout device={this.props.device} breadcrumbs={breadcrumbDummyData}>
             {
                 {

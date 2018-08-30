@@ -28,13 +28,15 @@
     </head>
     <body class="{{ page.classes|join(' ') }}">
         <div class="page">
-            <div id="headerContainer">{{ include('partials/header.twig') }}</div>
-            <div id="app">
-                <noscript>
-                    {{ page.content|raw }}
-                </noscript>
+            <div class="page-minHeight">
+                <div id="headerContainer">{{ include('partials/header.twig') }}</div>
+                <div id="app">
+                    <noscript>
+                        {{ page.content|raw }}
+                    </noscript>
+                </div>
+                <div id="footerContainer">{{ include('partials/footer.twig') }}</div>
             </div>
-            <div id="footerContainer">{{ include('partials/footer.twig') }}</div>
         </div>
         <div id="modals"></div>
     </body>
