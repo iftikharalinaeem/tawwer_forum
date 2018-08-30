@@ -31,21 +31,26 @@ class KbPageController {
     }
 
     /**
-     * Use the asset model to get the JS assets for the knowledge section.
+     * Use the asset model to get the external JS assets for the knowledge section.
      */
     private function getScripts() {
-        $polyfillContent = $this->assetModel->getInlinePolyfillJSContent();
         $webpackJSFiles = $this->assetModel->getWebpackJsFiles('knowledge');
-        $scripts = [[
-            'content' => $polyfillContent,
-        ]];
-
         foreach ($webpackJSFiles as $webpackJSFile) {
             $scripts[] = [
                 'src' => $webpackJSFile,
             ];
         }
+        return $scripts;
+    }
 
+    /**
+     * Use the asset model to get the inline JS assets for the knowledge section.
+     */
+    private function getInlineScripts() {
+        $polyfillContent = $this->assetModel->getInlinePolyfillJSContent();
+        $scripts = [[
+            'content' => $polyfillContent,
+        ]];
         return $scripts;
     }
 
@@ -56,10 +61,17 @@ class KbPageController {
         // Don't load the production stylesheets in a development build.
         if ($this->configuration->get('HotReload.Enabled', false) === true) {
             return [];
+        } else {
+            return [[
+                'src' => '/plugins/knowledge/js/webpack/knowledge.min.css',
+            ]];
         }
-        return [[
-            'src' => '/plugins/knowledge/js/webpack/knowledge.min.css',
-        ]];
+    }
+    /**
+     * Get the stylesheets for a knowledge page. Knowledge has it's own stylesheet to load. Hardcoded for now.
+     */
+    private function getInlineStyles() {
+        return [];
     }
 
     /**
@@ -127,7 +139,9 @@ class KbPageController {
                 'content' => '<p>Put SEO friendly content here</p>'
             ],
             'scripts' => $this->getScripts(),
+            'inlineScripts' => $this->getInlineScripts(),
             'styles' => $this->getStyles(),
+            'inlineStyles' => $this->getInlineStyles(),
         ];
     }
 
