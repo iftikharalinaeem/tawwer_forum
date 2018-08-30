@@ -7,7 +7,11 @@
 
 namespace Vanilla\Knowledge;
 
+use Vanilla\Knowledge\Models\PageMetaModel;
+
 class PageController extends \Garden\Controller {
+    protected $data = [];
+
     protected $scripts = [];
 
     protected $inlineScripts = [];
@@ -15,6 +19,15 @@ class PageController extends \Garden\Controller {
     protected $styles = [];
 
     protected $inlineStyles = [];
+
+    protected $meta;
+
+    /**
+     * PageController constructor.
+     */
+    public function __construct() {
+        $this->meta = new PageMetaModel();
+    }
 
     /**
      * Magic factory initializer
@@ -63,5 +76,57 @@ class PageController extends \Garden\Controller {
      */
     public function getInlineStyles() {
         return $this->inlineStyles;
+    }
+
+    /**
+     * Get the page data.
+     *
+     * @param string $key Data key to get
+     *
+     * @return array
+     */
+    public function getData(string $key) {
+        return $this->data[$key] ?? '';
+    }
+
+    public function pageMetaInit() {
+        $this->meta
+            ->setTag('charset', ['charset' => 'utf-8'])
+            ->setTag('IE=edge', ['http-equiv' => 'X-UA-Compatible', 'content' => 'IE=edge'])
+            ->setTag('viewport', ['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1'])
+            ->setTag('format-detection', ['name' => 'format-detection', 'content' => 'telephone=no']);
+    }
+
+    public function setSeoMetaData() {
+        $this->meta
+            ->setLink('canonical', ['rel' => 'canonical', 'href' => $this->getCanonicalLink()]);
+        $this->meta->setSeo('title', $this->getData('title'))
+            ->setSeo('locale', 'en')
+            ->setSeo('breadcrumb', $this->getData('breadcrumb-json'));
+    }
+
+    /**
+     * Get canonical link
+     *
+     * @return string
+     */
+    public function getCanonicalLink() {
+        return '/';
+    }
+
+    /**
+     * Get breadcrumb. Placeholder at the moment.
+     *
+     * @param string $format Breadcrumb format: array, json etc. Default is json
+     *
+     * @return string
+     */
+    public function getBreadcrumb(string $format = 'json') {
+        return '{
+                 "@context": "http://schema.org",
+                 "@type": "BreadcrumbList",
+                 "itemListElement":
+                 []
+                }';
     }
 }

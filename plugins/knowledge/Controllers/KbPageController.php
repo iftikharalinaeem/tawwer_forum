@@ -14,12 +14,13 @@ class KbPageController extends PageController {
     /**
      * KnowledgePageController constructor.
      *
-     * @param \AssetModel $assetModel
+     * @param \AssetModel $assetModel AssetModel to get js and css
      */
-    public function __construct(\AssetModel $assetModel, \Gdn_Configuration $configuration) {
+    public function __construct(\AssetModel $assetModel) {
+        parent::__construct();
         $this->inlineScripts = [$assetModel->getInlinePolyfillJSContent()];
         $this->scripts = $assetModel->getWebpackJsFiles('knowledge');
-        if ($configuration->get('HotReload.Enabled', false) === false) {
+        if (\GDN::config('HotReload.Enabled', false) === false) {
             $this->styles = ['/plugins/knowledge/js/webpack/knowledge.min.css'];
         }
         $this::$twigDefaultFolder = PATH_ROOT.'/plugins/knowledge/views';
@@ -32,74 +33,28 @@ class KbPageController extends PageController {
      * echo-ing it out.
      */
     private function getStaticData() {
-        return [
-            'meta' => [
-                'title' => 'Knowledge Base Title',
-                'locale' => 'en',
-                'tags' => [
-                    [
-                        'charset' => 'utf-8'
-                    ],[
-                        'http-equiv' => 'X-UA-Compatible',
-                        'content' => 'IE=edge',
-                    ],[
-                        'name' => 'viewport',
-                        'content' => 'width=device-width, initial-scale=1',
-                    ],[
-                        'name' => 'format-detection',
-                        'content' => 'telephone=no',
-                    ],[
-                        'property' => 'og:site_name',
-                        'content' => 'Vanilla',
-                    ]
-                ],
-                'links' => [ // Can be for canonical urls, alternate urls, next/previous, etc
-                    [
-                        'rel' => 'canonical',
-                        'href' => '/',
-                    ],[
-                        'locale' => 'fr',
-                        'title' => 'Français',
-                        'url' => '/fr',
-                        'rel' => 'alternate'
-                    ],[
-                        'locale' => 'de',
-                        'title' => 'German',
-                        'url' => '/de',
-                        'rel' => 'alternate',
-                    ],[
-                        'href' => '/feed.rss',
-                        'title' => 'Example RSS',
-                        'type' => 'application/rss+xml',
-                        'rel' => 'alternate',
-                    ],[
-                        'rel' => 'next',
-                        'href' => '/discussions/p3'
-                    ],[
-                        'rel' => 'prev',
-                        'href' => '/discussions/p1'
-                    ]
-                ],
-                'breadcrumb' => "{\"@context\":\"http://schema.org\",\"@type\":\"BreadcrumbList\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Books\",\"item\":\"https://example.com/books\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"Authors\",\"item\":\"https://example.com/books/authors\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Ann Leckie\",\"item\":\"https://example.com/books/authors/annleckie\"},{\"@type\":\"ListItem\",\"position\":4,\"name\":\"Ancillary Justice\",\"item\":\"https://example.com/books/authors/ancillaryjustice\"}]}",
-            ],
-            'page' => [
-                'classes' => [
-                    'testClass',
-                    'testClass2'
-                ],
-                'content' => '<p>Put SEO friendly content here</p>'
-            ],
+        $data = [
             'scripts' => $this->getScripts(),
             'inlineScripts' => $this->getInlineScripts(),
             'styles' => $this->getStyles(),
             'inlineStyles' => $this->getInlineStyles(),
         ];
+        $this->pageMetaInit();
+
+        $this->setSeoMetaData();
+        $this->meta->setTag('og:site_name', ['property' => 'og:site_name', 'content' => 'Vanilla']);
+
+        $data['meta'] = $this->meta->getPageMeta();
+
+        return $data;
     }
 
     /**
      * Render out the /kb page.
      */
     public function index() {
+        $this->data['breadcrumb-json'] = $this->getBreadcrumb();
+        $this->data['title'] = 'Knowledge Base Title';
         // We'll need to be able to set all of this dynamically in the future.
         $data = $this->getStaticData();
         echo $this->twig->render('default-master.twig', $data);
@@ -113,4 +68,25 @@ class KbPageController extends PageController {
         $data = $this->getStaticData();
         echo $this->twig->render('default-master.twig', $data);
     }
+
+    /**
+     * Get canonical link
+     *
+     * @return string
+     */
+    public function getCanonicalLink() {
+        return '/kb/';
+    }
+
+    /**
+     * Get breadcrumb.
+     *
+     * @param string $format Breadcrumb format: array, json etc. Default is json
+     *
+     * @return string
+     */
+    public function getBreadcrumb(string $format = 'json') {
+        return '{"@context":"http://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Books","item":"https://example.com/books"},{"@type":"ListItem","position":2,"name":"Authors","item":"https://example.com/books/authors"},{"@type":"ListItem","position":3,"name":"Ann Leckie","item":"https://example.com/books/authors/annleckie"},{"@type":"ListItem","position":4,"name":"Ancillary Justice","item":"https://example.com/books/authors/ancillaryjustice"}]}';
+    }
+
 }
