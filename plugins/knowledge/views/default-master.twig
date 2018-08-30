@@ -1,47 +1,48 @@
 <!DOCTYPE html>
 <html lang="{{ meta.locale }}">
-    <head>
-        <title>{{ meta.title }}</title>
-{% for meta in meta.tags %}
+<head>
+
+    <title>{{ meta.title }}</title>
+    {% for meta in meta.tags %}
         <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
-{% endfor %}
-{% for script in scripts %}
-            <script defer src="{{ script }}"></script>
+    {% endfor %}
 
-{% endfor %}
-        {% for script in inlineScripts %}
+    {% for script in scripts %}
+        <script defer src="{{ script }}"></script>
+    {% endfor %}
 
-            <script>{{ script|raw }}</script>
+    {% for script in inlineScripts %}
+        <script>{{ script|raw }}</script>
+    {% endfor %}
 
-        {% endfor %}
-{% for stylesheet in styles %}
+    {% for stylesheet in styles %}
+        <link href="{{ stylesheet.src }}" rel="stylesheet" type="text/css" />
+    {% endfor %}
 
-        <link href="{{ stylesheet }}" rel="stylesheet" type="text/css" />
+    {% for stylesheet in inlineStyles %}
+        <style>{{ stylesheet|raw }}</style>
+    {% endfor %}
 
-{% endfor %}
-
-        {% for stylesheet in inlineStyles %}
-
-                <style>{{ stylesheet|raw }}</style>
-
-        {% endfor %}
-{% for link in meta.links %}
+    {% for link in meta.links %}
         <link{% for attribute,value in link %} {{ attribute }}="{{ value }}"{% endfor %} />
-{% endfor %}
-        <script type="application/ld+json">
-            {{ meta.breadcrumb|raw }}
-        </script>
-    </head>
-    <body class="{{ page.classes|join(' ') }}">
-        <div class="page">
-            <div id="headerContainer">{{ include('partials/header.twig') }}</div>
-            <div id="app">
-                <noscript>
-                    {{ page.content|raw }}
-                </noscript>
-            </div>
-            <div id="footerContainer">{{ include('partials/footer.twig') }}</div>
+    {% endfor %}
+
+    <script type="application/ld+json">
+        {{ meta.breadcrumb|raw }}
+    </script>
+</head>
+<body class="{{ page.classes|join(' ') }}">
+<div class="page">
+    <div id="headerContainer">{{ include('partials/header.twig') }}</div>
+    <div class="page-minHeight">
+        <div id="app">
+            <noscript>
+                {{ page.content|raw }}
+            </noscript>
         </div>
-        <div id="modals"></div>
-    </body>
+    </div>
+    <div id="footerContainer">{{ include('partials/footer.twig') }}</div>
+</div>
+<div id="modals"></div>
+</body>
 </html>
