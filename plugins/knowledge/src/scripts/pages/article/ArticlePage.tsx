@@ -51,39 +51,44 @@ export class ArticlePage extends React.Component<IProps> {
             ],
         };
 
+        // @ts-ignore
+        const article = this.props.articlePageState.data.article;
+
+        window.console.log(article);
+
         return <PanelLayout device={this.props.device} breadcrumbs={breadcrumbDummyData}>
             {
                 {
-                    middleTopComponents: (
-                        <PanelWidget>
-                            <PageHeading title={t("Knowledge Base")}/>
-                        </PanelWidget>
-                    ),
-                    middleBottomComponents: (
-                        <PanelWidget>
-                            <UserContent content="<h2>Hello!</h1>" />
-                        </PanelWidget>
-                    ),
                     leftTopComponents: (
                         <PanelWidget>
-                            <PageHeading title={t("Left Top")}/>
+                            <PageHeading title={t("Actions")}/>
                         </PanelWidget>
                     ),
                     leftBottomComponents: (
                         <React.Fragment>
                             <PanelWidget>
-                                <PageHeading title={t("Left Bottom")}/>
+                                <PageHeading title={t("Navigation")}/>
                             </PanelWidget>
                         </React.Fragment>
                     ),
+                    middleTopComponents: (
+                        <PanelWidget>
+                            <PageHeading title={article.name}/>
+                        </PanelWidget>
+                    ),
+                    middleBottomComponents: (
+                        <PanelWidget>
+                            <UserContent content={article.bodyRendered} />
+                        </PanelWidget>
+                    ),
                     rightTopComponents: (
                         <PanelWidget>
-                            <PageHeading title={t("Right Top")}/>
+                            <PageHeading title={t("Table of Contents")}/>
                         </PanelWidget>
                     ),
                     rightBottomComponents: (
                         <PanelWidget>
-                            <PageHeading title={t("Right Bottom")}/>
+                            <PageHeading title={t("Related Articles")}/>
                         </PanelWidget>
                     ),
                 }
