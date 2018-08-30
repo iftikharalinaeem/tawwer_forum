@@ -3,42 +3,20 @@
   @include orderedListStyle;
   @include unorderedListStyle;
 
+  display: block;
   position: relative;
   width: 100%;
-  font-size: $global-large_fontSize;
+  word-break: break-word;
+  line-height: $global-base_lineHeight;
 
-  h1 {
-    font-size: $global-title_fontSize;
-  }
+  > *:not(:last-child) {
+    margin-bottom: margin-bottom: $global-block_margin;
 
-  h2 {
-    font-size: $userContent_fontSizeH2;
-  }
+    & + {
+      @include headings {
 
-  h3 {
-    font-size: $userContent-fontSizeH3;
-  }
-
-  h4 {
-    font-size: $userContent-fontSizeH4;
-  }
-
-  h5 {
-    font-size: $userContent-fontSizeH5;
-  }
-
-  h6 {
-    font-size: $global-large_fontSize;
-  }
-
-  @include headings {
-    display: block;
-    font-weight: $global-bold_fontWeight;
-    margin-bottom: 1em;
-  }
-
-  > *:not(.emoji):not(:last-child) {
-    margin-bottom: .6em;
+      }
+    }
 
     + h1,
     + h2,

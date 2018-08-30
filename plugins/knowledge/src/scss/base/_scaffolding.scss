@@ -1,18 +1,17 @@
 body,
-html
-{
+html {
   @include bodyFontStyle();
   font-size: $global-medium_fontSize;
   line-height: $global-base_lineHeight;
   color: $global-color_fg;
   background-color: $global-body_bg;
   width: 100%;
+  word-break: break-word;
 }
 
 *,
 *::before,
-*::after
-{
+*::after {
   box-sizing: border-box;
 }
 
@@ -32,17 +31,12 @@ button {
   }
 }
 
-svg {
-  display: block;
-}
-
 // Disabled Inputs
 option,
 select,
 textarea,
 button,
-input
-{
+input {
   &.isDisabled,
   &[disabled]
   {
@@ -51,24 +45,9 @@ input
 }
 
 select {
+  display: block;
   width: 100%;
   max-width: 100%;
-}
-
-p {
-  @include longWordEllipsis;
-  display: block;
-
-  margin: {
-    top: 0;
-    bottom: 1em;
-  }
-
-  &:last-of-type {
-    margin: {
-      bottom: 0;
-    }
-  }
 }
 
 table {
@@ -84,51 +63,48 @@ caption {
 }
 
 mark {
-  background-color: mix($global-color-primary, $global-color-bg, 22%);
+  background-color: $mark_bg;
   color: $global-color-fg;
 }
 
 
-a {
-  @include allLinkStates {
-    text-decoration: none;
-  }
-
-  color: $link_default-color;
-
-  &:not(.isDisabled):not([disabled]):hover {
-    color: $link_default_hover-color;
-  }
-
-  &:not(.isDisabled):not([disabled]):focus {
-    color: $link_default_focus-color;
-  }
-
-  &.isActive {
-    pointer-events: none;
-  }
-
-  &[aria-current] {
-    pointer-events: none;
-    cursor: default;
-  }
-}
+//a {
+//  @include allLinkStates {
+//    text-decoration: none;
+//  }
+//
+//  color: $link_default-color;
+//
+//  &:not(.isDisabled):not([disabled]):hover {
+//    color: $link_default_hover-color;
+//  }
+//
+//  &:not(.isDisabled):not([disabled]):focus {
+//    color: $link_default_focus-color;
+//  }
+//
+//  &.isActive {
+//    pointer-events: none;
+//  }
+//
+//  &[aria-current] {
+//    pointer-events: none;
+//    cursor: default;
+//  }
+//}
 
 b,
-strong
-{
+strong {
   font-weight: $global-bold_fontWeight;
 }
 
 s,
-strike
-{
+strike {
   text-decoration: line-through;
 }
 
 i,
-em
-{
+em {
   font-style: italic;
 }
 
@@ -143,8 +119,7 @@ textarea {
 }
 
 ul,
-ol
-{
+ol {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -155,6 +130,3 @@ li {
   margin: 0;
 }
 
-address {
-  @include breakWord;
-}

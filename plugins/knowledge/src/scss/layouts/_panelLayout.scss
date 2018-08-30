@@ -152,11 +152,6 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
 }
 
 .pageContents {
-  * {
-    @include breakWord;
-  }
-
-
   .button-menu.panelLayout-menu {
     display: none;
     margin-right: $utility-baseUnit * 2;

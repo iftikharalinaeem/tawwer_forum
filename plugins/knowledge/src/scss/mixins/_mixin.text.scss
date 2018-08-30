@@ -5,18 +5,11 @@
   max-width: 100%;
 }
 
-@mixin breakWord {
-  word-break: break-all;
-  word-break: break-word;
-}
-
 @mixin longWordEllipsis {
   text-overflow: ellipsis;
   overflow: hidden;
   max-width: 100%;
 }
-
-
 
 @mixin headings($from: 1, $to: 6){
   @for $i from $from through $to{
@@ -27,15 +20,12 @@
 }
 
 @mixin headingFontStyle($marginBottom: $utility-baseUnit) {
-  @include longWordEllipsis;
-  display: inline-block;
+  display: block;
   font-family: $global-heading_fontFamily;
   font-weight: $global-heading_fontWeight;
   font-size: $global-medium_fontSize;
-  margin: {
-    top: -$global-lineHeight_offset;
-    bottom: $marginBottom;
-  }
+  line-height: $global-condensed_lineHeight;
+  margin: 0;
 }
 
 @mixin bodyFontStyle() {

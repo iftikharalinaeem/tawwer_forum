@@ -156,5 +156,5 @@ li {
 }
 
 address {
-  @include breakWord;
+  word-break: break-word;
 }
