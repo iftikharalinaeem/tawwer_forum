@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import className from "classnames";
-import PanelArea, { IPanelArea } from "./PanelArea";
+import PanelArea, { IPanelArea } from "@knowledge/components/PanelArea";
 
 interface IPanel {
     className?: string;

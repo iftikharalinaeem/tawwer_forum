@@ -5,13 +5,13 @@
  */
 
 import * as React from "react";
-import { Devices } from "../components/DeviceChecker";
-import Panel from "../components/Panel";
+import { Devices } from "@knowledge/components/DeviceChecker";
+import Panel from "@knowledge/components/Panel";
 import className from "classnames";
-import PanelArea from "../components/PanelArea";
+import PanelArea from "@knowledge/components/PanelArea";
 import { t } from "@dashboard/application";
-import { IBreadcrumbsProps } from "../components/Breadcrumbs";
-import PanelLayoutBreadcrumbs from "../components/PanelLayoutBreadcrumbs";
+import { IBreadcrumbsProps } from "@knowledge/components/Breadcrumbs";
+import PanelLayoutBreadcrumbs from "@knowledge/components/PanelLayoutBreadcrumbs";
 
 export interface IPanelCellContent {
     middleTopComponents: JSX.Element;

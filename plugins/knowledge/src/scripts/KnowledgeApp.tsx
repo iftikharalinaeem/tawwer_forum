@@ -8,8 +8,8 @@ import React from "react";
 import { Provider } from "react-redux";
 import getStore from "@dashboard/state/getStore";
 import KnowledgeRoutes from "@knowledge/KnowledgeRoutes";
-import DeviceContext from "./contexts/DeviceContext";
-import DeviceChecker, { Devices } from "./components/DeviceChecker";
+import DeviceContext from "@knowledge/contexts/DeviceContext";
+import DeviceChecker, { Devices } from "@knowledge/components/DeviceChecker";
 
 export default class KnowledgeApp extends React.Component {
     public deviceChecker: React.RefObject<DeviceChecker> = React.createRef();

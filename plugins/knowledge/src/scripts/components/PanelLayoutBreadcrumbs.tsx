@@ -7,8 +7,8 @@
 import * as React from "react";
 import className from "classnames";
 import { t } from "@dashboard/application";
-import Panel from "./Panel";
-import Breadcrumbs, { IBreadcrumbsProps } from "./Breadcrumbs";
+import Panel from "@knowledge/components/Panel";
+import Breadcrumbs, { IBreadcrumbsProps } from "@knowledge/components/Breadcrumbs";
 
 interface IPanelLayoutBreadcrumbs {
     breadcrumbs?: IBreadcrumbsProps;

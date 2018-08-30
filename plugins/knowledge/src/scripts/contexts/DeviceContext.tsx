@@ -5,7 +5,7 @@
  */
 
 import * as React from "react";
-import { Devices, IDeviceProps } from "../components/DeviceChecker";
+import { Devices, IDeviceProps } from "@knowledge/components/DeviceChecker";
 const DeviceContext = React.createContext<Devices>(Devices.DESKTOP);
 export default DeviceContext;
 

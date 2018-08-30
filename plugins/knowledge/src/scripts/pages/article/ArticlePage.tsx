@@ -9,7 +9,7 @@ import { match } from "react-router";
 import { t } from "@dashboard/application";
 import { connect } from "react-redux";
 import { IStoreState, IArticlePageState } from "@knowledge/@types/state";
-import { IBreadcrumbsProps } from "../../components/Breadcrumbs";
+import { IBreadcrumbsProps } from "@knowledge/components/Breadcrumbs";
 import PanelLayout from "@knowledge/layouts/PanelLayout";
 import PanelWidget from "@knowledge/components/PanelWidget";
 import PageHeading from "@knowledge/components/PageHeading";
