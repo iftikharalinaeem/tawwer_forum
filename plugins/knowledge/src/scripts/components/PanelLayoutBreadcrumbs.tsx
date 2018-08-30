@@ -23,6 +23,7 @@ export default class PanelLayoutBreadcrumbs extends React.Component<IPanelLayout
 
     public render() {
         if (this.props.breadcrumbs && this.props.breadcrumbs.children.length > 1) {
+            const space = ` `;
             return (
                 <div className={className("panelLayout-top", this.props.className)}>
                     <div className="panelLayout-container">
@@ -30,7 +31,7 @@ export default class PanelLayoutBreadcrumbs extends React.Component<IPanelLayout
                             {{
                                 top: {
                                     className: "panelArea-breadcrumbs isLeft",
-                                    children: <span dangerouslySetInnerHTML={{ __html: ` ` }} />,
+                                    children: <React.Fragment>{space}</React.Fragment>,
                                 },
                             }}
                         </Panel>

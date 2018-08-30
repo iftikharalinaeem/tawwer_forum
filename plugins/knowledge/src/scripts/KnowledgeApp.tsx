@@ -19,10 +19,16 @@ export default class KnowledgeApp extends React.Component {
         this.doUpdate = this.doUpdate.bind(this);
     }
 
+    /**
+     * Function to force rerendering
+     */
     public doUpdate() {
         this.forceUpdate();
     }
 
+    /**
+     * Device checker detects device and calls a force update if needed to update the current device.
+     */
     public render() {
         const store = getStore();
         return (

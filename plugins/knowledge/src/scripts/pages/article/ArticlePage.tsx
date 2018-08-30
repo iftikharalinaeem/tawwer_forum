@@ -10,13 +10,13 @@ import { t } from "@dashboard/application";
 import { connect } from "react-redux";
 import { IStoreState, IArticlePageState } from "@knowledge/@types/state";
 import { IBreadcrumbsProps } from "../../components/Breadcrumbs";
-import PanelLayout from "../../layouts/PanelLayout";
-import PanelWidget from "../../components/PanelWidget";
-import PageHeading from "../../components/PageHeading";
-import UserContent from "../../components/UserContent";
-import { IDeviceProps } from "../../components/DeviceChecker";
-import { withDevice } from "../../contexts/DeviceContext";
-import Container from "../../layouts/components/Container";
+import PanelLayout from "@knowledge/layouts/PanelLayout";
+import PanelWidget from "@knowledge/components/PanelWidget";
+import PageHeading from "@knowledge/components/PageHeading";
+import UserContent from "@knowledge/components/UserContent";
+import { IDeviceProps } from "@knowledge/components/DeviceChecker";
+import { withDevice } from "@knowledge/contexts/DeviceContext";
+import Container from "@knowledge/layouts/components/Container";
 
 interface IProps extends IDeviceProps {
     match: match<{

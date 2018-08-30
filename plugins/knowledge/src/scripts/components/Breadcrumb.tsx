@@ -15,7 +15,7 @@ export interface IBreadcrumbProps {
     key?: number | string;
 }
 
-export default class Breadcrumbs extends React.Component<IBreadcrumbProps> {
+export default class Breadcrumb extends React.Component<IBreadcrumbProps> {
     public render() {
         let ariaCurrent;
         if (this.props.lastElement) {

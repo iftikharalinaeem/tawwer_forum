@@ -20,6 +20,11 @@ export interface IDeviceProps {
 interface IDeviceCheckerProps {
     doUpdate: () => void;
 }
+/**
+ * Component returns device, based on media queries set in CSS to avoid duplicate break points.
+ * Added DeviceContext in DeviceContext.tsx to pass data down to components
+ * Force rerender when needed by calling doUpdate.
+ */
 
 export default class DeviceChecker extends React.Component<IDeviceCheckerProps> {
     public deviceChecker: React.RefObject<HTMLDivElement> = React.createRef();
@@ -28,6 +33,9 @@ export default class DeviceChecker extends React.Component<IDeviceCheckerProps> 
         return <div ref={this.deviceChecker} className="deviceChecker" />;
     }
 
+    /**
+     * Query div in page to get device based on media query from CSS
+     */
     public get device() {
         if (this.deviceChecker.current) {
             let device = Devices.DESKTOP;
