@@ -9,8 +9,8 @@ interface IBreadcrumbProps {
 }
 
 export interface IBreadcrumbsProps {
-    className?: string;
     children: IBreadcrumbProps[];
+    className?: string;
 }
 
 

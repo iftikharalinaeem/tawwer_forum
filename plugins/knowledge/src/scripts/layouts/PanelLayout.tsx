@@ -38,51 +38,53 @@ export default class PanelLayout extends React.Component<IPanelLayoutProps> {
             <PanelLayoutBreadcrumbs renderLeftPanel={renderedLeftPanel} breadcrumbs={this.props.breadcrumbs} />
 
             <div className="panelLayout-main">
-                <Panel className="panelLayout-leftPanel" render={renderedLeftPanel}>
-                    {
-                        {
-                            top: {
-                                children: children.leftTopComponents,
-                                className: "panelAndNav-leftTop",
-                                render: !isMobile,
-                            },
-                            bottom: {
-                                children: children.leftBottomComponents,
-                                className: "panelAndNav-leftBottom",
-                            },
-                        }
-                    }
-                </Panel>
-                <div className="panelLayout-content">
-                    <main className="panelAndNav-mainPanel">
-                        <PanelArea className="panelAndNav-middleTop">
-                            {children.middleTopComponents}
-                        </PanelArea>
-                        <PanelArea className="panelAndNav-mobileMiddle" render={isMobile}>
-                            {children.leftTopComponents}
-                        </PanelArea>
-                        <PanelArea className="panelAndNav-tabletMiddle" render={this.props.device !== Devices.DESKTOP}>
-                            {children.rightTopComponents}
-                        </PanelArea>
-                        <PanelArea className="panelAndNav-middleBottom">
-                            {children.middleBottomComponents}
-                        </PanelArea>
-                    </main>
-                    <Panel className="panelLayout-rightPanel" render={renderedRightPanel}>
+                <div className="panelLayout-container">
+                    <Panel className="panelLayout-left" render={renderedLeftPanel}>
                         {
                             {
                                 top: {
-                                    children: children.rightTopComponents,
-                                    className: "panelAndNav-rightTop",
-                                    render: this.props.device !== Devices.DESKTOP,
+                                    children: children.leftTopComponents,
+                                    className: "panelArea-leftTop",
+                                    render: !isMobile,
                                 },
                                 bottom: {
-                                    children: children.rightBottomComponents,
-                                    className: "panelAndNav-rightBottom",
+                                    children: children.leftBottomComponents,
+                                    className: "panelArea-leftBottom",
                                 },
                             }
                         }
                     </Panel>
+                    <div className="panelLayout-content">
+                        <main className="panelAndNav-mainPanel">
+                            <PanelArea className="panelAndNav-middleTop">
+                                {children.middleTopComponents}
+                            </PanelArea>
+                            <PanelArea className="panelAndNav-mobileMiddle" render={isMobile}>
+                                {children.leftTopComponents}
+                            </PanelArea>
+                            <PanelArea className="panelAndNav-tabletMiddle" render={this.props.device !== Devices.DESKTOP}>
+                                {children.rightTopComponents}
+                            </PanelArea>
+                            <PanelArea className="panelAndNav-middleBottom">
+                                {children.middleBottomComponents}
+                            </PanelArea>
+                        </main>
+                        <Panel className="panelLayout-right" render={renderedRightPanel}>
+                            {
+                                {
+                                    top: {
+                                        children: children.rightTopComponents,
+                                        className: "panelArea-rightTop",
+                                        render: this.props.device !== Devices.DESKTOP,
+                                    },
+                                    bottom: {
+                                        children: children.rightBottomComponents,
+                                        className: "panelArea-rightBottom",
+                                    },
+                                }
+                            }
+                        </Panel>
+                    </div>
                 </div>
             </div>
         </div>;

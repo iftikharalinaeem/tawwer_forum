@@ -16,6 +16,7 @@ import PageHeading from "../../components/PageHeading";
 import UserContent from "../../components/UserContent";
 import {IDeviceProps} from "../../components/DeviceChecker";
 import {withDevice} from "../../contexts/DeviceContext";
+import Container from "../../layouts/components/Container";
 
 interface IProps extends IDeviceProps {
     match: match<{
@@ -27,7 +28,6 @@ interface IProps extends IDeviceProps {
 export class ArticlePage extends React.Component<IProps> {
     public render() {
         const breadcrumbDummyData:IBreadcrumbsProps = {
-            className: "breadcrumbs-test",
             children: [
                 {
                     name: "one",
@@ -54,44 +54,48 @@ export class ArticlePage extends React.Component<IProps> {
         // @ts-ignore
         const article = this.props.articlePageState.data.article;
 
-        return <PanelLayout device={this.props.device} breadcrumbs={breadcrumbDummyData}>
-            {
-                {
-                    leftTopComponents: (
-                        <PanelWidget>
-                            <PageHeading title={t("Actions")}/>
-                        </PanelWidget>
-                    ),
-                    leftBottomComponents: (
-                        <React.Fragment>
-                            <PanelWidget>
-                                <PageHeading title={t("Navigation")}/>
-                            </PanelWidget>
-                        </React.Fragment>
-                    ),
-                    middleTopComponents: (
-                        <PanelWidget>
-                            <PageHeading title={article.name}/>
-                        </PanelWidget>
-                    ),
-                    middleBottomComponents: (
-                        <PanelWidget>
-                            <UserContent content={article.bodyRendered} />
-                        </PanelWidget>
-                    ),
-                    rightTopComponents: (
-                        <PanelWidget>
-                            <PageHeading title={t("Table of Contents")}/>
-                        </PanelWidget>
-                    ),
-                    rightBottomComponents: (
-                        <PanelWidget>
-                            <PageHeading title={t("Related Articles")}/>
-                        </PanelWidget>
-                    ),
-                }
-            }
-        </PanelLayout>;
+        return (
+            <Container>
+                <PanelLayout device={this.props.device} breadcrumbs={breadcrumbDummyData}>
+                    {
+                        {
+                            leftTopComponents: (
+                                <PanelWidget>
+                                    <PageHeading title={t("Actions")}/>
+                                </PanelWidget>
+                            ),
+                            leftBottomComponents: (
+                                <React.Fragment>
+                                    <PanelWidget>
+                                        <PageHeading title={t("Navigation")}/>
+                                    </PanelWidget>
+                                </React.Fragment>
+                            ),
+                            middleTopComponents: (
+                                <PanelWidget>
+                                    <PageHeading title={article.name}/>
+                                </PanelWidget>
+                            ),
+                            middleBottomComponents: (
+                                <PanelWidget>
+                                    <UserContent content={article.bodyRendered} />
+                                </PanelWidget>
+                            ),
+                            rightTopComponents: (
+                                <PanelWidget>
+                                    <PageHeading title={t("Table of Contents")}/>
+                                </PanelWidget>
+                            ),
+                            rightBottomComponents: (
+                                <PanelWidget>
+                                    <PageHeading title={t("Related Articles")}/>
+                                </PanelWidget>
+                            ),
+                        }
+                    }
+                </PanelLayout>
+            </Container>
+        );
     }
 }
 

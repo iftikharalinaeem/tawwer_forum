@@ -24,17 +24,17 @@ export default class Panel extends React.Component<IPanel> {
 
             let bottomPanel;
             if (bottom) {
-                bottomPanel = <PanelArea className={ className('panelLayout-panel', bottom.className) } render={bottom.render}>
+                bottomPanel = <PanelArea className={ bottom.className } render={bottom.render}>
                     { bottom.children }
                 </PanelArea>;
             }
             return (
-                <React.Fragment>
-                    <PanelArea className={ className('panelLayout-panel', top.className) } render={top.render}>
+                <div className={className('panelLayout-panel', this.props.className)}>
+                    <PanelArea className={ top.className } render={top.render}>
                         { this.props.children.top.children }
                     </PanelArea>
                     {bottomPanel}
-                </React.Fragment>
+                </div>
             );
         } else {
             return null;
