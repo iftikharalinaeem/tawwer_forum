@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="{{ meta.locale }}">
+<html lang="{{ meta.seo.locale }}">
     <head>
-        <title>{{ meta.title }}</title>
+        <title>{{ meta.seo.title }}</title>
 
         {% for meta in meta.tags -%}
             <meta{% for attribute,value in meta %} {{ attribute }}="{{ value }}"{% endfor %} />
@@ -18,7 +18,8 @@
         {% endfor %}
 
         <script type="application/ld+json">
-            {{ meta.breadcrumb|raw }}
+            {{ meta.seo.breadcrumb|raw }}
+
         </script>
 
         {% for stylesheet in styles -%}
