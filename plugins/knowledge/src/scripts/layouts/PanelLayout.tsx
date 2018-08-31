@@ -12,6 +12,7 @@ import PanelArea from "@knowledge/components/PanelArea";
 import { t } from "@dashboard/application";
 import { IBreadcrumbsProps } from "@knowledge/components/Breadcrumbs";
 import PanelLayoutBreadcrumbs from "@knowledge/components/PanelLayoutBreadcrumbs";
+import classNames from "classnames";
 
 export interface IPanelCellContent {
     middleTopComponents: JSX.Element;
@@ -48,8 +49,18 @@ export default class PanelLayout extends React.Component<IPanelLayoutProps> {
         const renderMobilePanel = isMobile && !!children.leftBottomComponents;
 
         return (
-            <div className={className("panelLayout", this.props.className)}>
-                <PanelLayoutBreadcrumbs renderLeftPanel={!isMobile} breadcrumbs={this.props.breadcrumbs} />
+            <div
+                className={className(
+                    "panelLayout",
+                    { noLeftPanel: !renderedLeftPanel },
+                    { noRightPanel: !renderedRightPanel },
+                    this.props.className,
+                )}
+            >
+                <PanelLayoutBreadcrumbs
+                    renderLeftPanel={!isMobile && renderedLeftPanel}
+                    breadcrumbs={this.props.breadcrumbs}
+                />
 
                 <div className="panelLayout-main">
                     <div className="panelLayout-container">
@@ -66,8 +77,10 @@ export default class PanelLayout extends React.Component<IPanelLayoutProps> {
                                 },
                             }}
                         </Panel>
-                        <div className="panelLayout-content">
-                            <main className="panelLayout-middle">
+                        <div className={classNames("panelLayout-content", { hasAdjacentPanel: renderedLeftPanel })}>
+                            <main
+                                className={classNames("panelLayout-middle", { hasAdjacentPanel: renderedRightPanel })}
+                            >
                                 <PanelArea className="panelAndNav-middleTop">{children.middleTopComponents}</PanelArea>
                                 <PanelArea className="panelAndNav-mobileMiddle" render={isMobile}>
                                     {children.leftTopComponents}

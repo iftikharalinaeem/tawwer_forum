@@ -9,6 +9,7 @@ import className from "classnames";
 import { t } from "@dashboard/application";
 import Panel from "@knowledge/components/Panel";
 import Breadcrumbs, { IBreadcrumbsProps } from "@knowledge/components/Breadcrumbs";
+import classNames from "classnames";
 
 interface IPanelLayoutBreadcrumbs {
     breadcrumbs?: IBreadcrumbsProps;
@@ -30,7 +31,7 @@ export default class PanelLayoutBreadcrumbs extends React.Component<IPanelLayout
                 <div
                     className={className(
                         "panelLayout-top",
-                        { hasLeftPanel: this.props.renderLeftPanel },
+                        { noLeftPanel: !this.props.renderLeftPanel },
                         this.props.className,
                     )}
                 >
@@ -44,7 +45,11 @@ export default class PanelLayoutBreadcrumbs extends React.Component<IPanelLayout
                                 },
                             }}
                         </Panel>
-                        <Panel className={className("panelLayout-breadcrumbs")}>
+                        <Panel
+                            className={className("panelLayout-breadcrumbs", {
+                                hasAdjacentPanel: this.props.renderLeftPanel,
+                            })}
+                        >
                             {{
                                 top: {
                                     className: "panelArea-breadcrumbs",

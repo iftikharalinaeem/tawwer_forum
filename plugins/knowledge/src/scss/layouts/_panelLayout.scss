@@ -40,13 +40,6 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
 .panelLayout-container {
   display: flex;
   flex-wrap: nowrap;
-
-  &.noRightColumn {
-    .panelLayout-middle {
-      flex-basis: 100%;
-      max-width: 100%;
-    }
-  }
 }
 
 
@@ -79,39 +72,47 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
 }
 
 .panelLayout-breadcrumbs {
-  flex-basis: calc(100% - #{$global-panel_width});
-  max-width: calc(100% - #{$global-panel_width});
+  &.hasAdjacentPanel {
+    flex-basis: calc(100% - #{$global-panel_width});
+    max-width: calc(100% - #{$global-panel_width});
 
-  @include mediaQuery-panelLayout_oneColumn {
-    flex-basis: 100%;
-    max-width: 100%;
+    @include mediaQuery-panelLayout_oneColumn {
+      flex-basis: 100%;
+      max-width: 100%;
+    }
   }
 }
 
 // Content section
 .panelLayout-content {
   display: flex;
-  flex-basis: calc(100% - #{$global-panel_width});
-  max-width: calc(100% - #{$global-panel_width});
 
-  @include mediaQuery-panelLayout_oneColumn {
-    @include backLinkNoBleedStyles;
-    max-width: 100%;
-    flex-basis: 100%;
-    padding-left: 0;
+  &.hasAdjacentPanel {
+    flex-basis: calc(100% - #{$global-panel_width});
+    max-width: calc(100% - #{$global-panel_width});
+
+    @include mediaQuery-panelLayout_oneColumn {
+      @include backLinkNoBleedStyles;
+      max-width: 100%;
+      flex-basis: 100%;
+      padding-left: 0;
+    }
   }
 }
 
 // Middle Column
 .panelLayout-middle {
   flex-grow: 1;
-  flex-basis: calc(100% - #{$global-panel_width});
-  max-width: calc(100% - #{$global-panel_width});
 
-  @include mediaQuery-panelLayout_twoColumn {
-    width: 100%;
-    max-width: 100%;
-    flex-basis: 100%;
+  &.hasAdjacentPanel {
+    flex-basis: calc(100% - #{$global-panel_width});
+    max-width: calc(100% - #{$global-panel_width});
+
+    @include mediaQuery-panelLayout_twoColumn {
+      width: 100%;
+      max-width: 100%;
+      flex-basis: 100%;
+    }
   }
 }
 

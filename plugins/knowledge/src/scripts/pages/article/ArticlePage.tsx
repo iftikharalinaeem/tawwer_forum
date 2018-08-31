@@ -18,7 +18,6 @@ import { IDeviceProps } from "@knowledge/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import Container from "@knowledge/layouts/components/Container";
 import { Devices } from "@knowledge/components/DeviceChecker";
-import MobileMenu from "@knowledge/layouts/components/MobileMenu";
 import { dummyTestPost1, dummyTestPost2, dummyPostEverything } from "@knowledge/dummyPostHTML";
 import { LoadStatus } from "@dashboard/@types/api";
 
@@ -50,11 +49,6 @@ export class ArticlePage extends React.Component<IProps, IState> {
 
         return (
             <React.Fragment>
-                <MobileMenu render={this.props.device === Devices.MOBILE && this.state.menuOpen}>
-                    <PanelWidget>
-                        <PageHeading title={t("Navigation")} />
-                    </PanelWidget>
-                </MobileMenu>
                 <Container>
                     <PanelLayout
                         device={this.props.device}
