@@ -1,0 +1,85 @@
+<?php
+/**
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
+ */
+
+/**
+ * Primary class for the Knowledge class, mostly responsible for pluggable operations.
+ */
+class KnowledgePlugin extends Gdn_Plugin {
+
+    /** @var Gdn_Database */
+    private $database;
+
+    /**
+     * KnowledgePlugin constructor.
+     *
+     * @param Gdn_Database $database
+     */
+    public function __construct(Gdn_Database $database) {
+        parent::__construct();
+        $this->database = $database;
+    }
+
+    /**
+     * Setup routine for the addon.
+     *
+     * @return bool|void
+     */
+    public function setup() {
+        parent::setup();
+        $this->structure();
+    }
+
+    /**
+     * Ensure the database is configured.
+     */
+    public function structure() {
+        $this->database->structure()
+            ->table("article")
+            ->primaryKey("articleID")
+            ->column("knowledgeCategoryID", "int", true)
+            ->column("articleRevisionID", "int", true)
+            ->column("sort", "int", true)
+            ->column("score", "int", '0')
+            ->column("views", "int", '0')
+            ->column("insertUserID", "int")
+            ->column("dateInserted", "datetime")
+            ->column("updateUserID", "int")
+            ->column("dateUpdated", "datetime")
+            ->set();
+
+        $this->database->structure()
+            ->table("articleRevision")
+            ->primaryKey("articleRevisionID")
+            ->column("articleID", "int")
+            ->column("name", "varchar(255)")
+            ->column("format", "varchar(20)")
+            ->column("body", "text")
+            ->column("bodyRendered", "text")
+            ->column("locale", "varchar(10)", true)
+            ->column("insertUserID", "int")
+            ->column("dateInserted", "datetime")
+            ->set();
+
+        $this->database->structure()
+            ->table("knowledgeCategory")
+            ->primaryKey("knowledgeCategoryID")
+            ->column("name", "varchar(255)")
+            ->column("parentID", "int")
+            ->column("isSection", "tinyint", '0')
+            ->column("displayType", ["help", "guide", "search"], true)
+            ->column("sortChildren", ["name", "dateInserted", "dateInsertedDesc", "manual"], true)
+            ->column("sort", "int", true)
+            ->column("insertUserID", "int")
+            ->column("dateInserted", "datetime")
+            ->column("updateUserID", "int")
+            ->column("dateUpdated", "datetime")
+            ->column("lastUpdatedArticleID", "int", true)
+            ->column("articleCount", "int", '0')
+            ->column("articleCountRecursive", "int", '0')
+            ->column("childCategoryCount", "int", '0')
+            ->set();
+    }
+}
