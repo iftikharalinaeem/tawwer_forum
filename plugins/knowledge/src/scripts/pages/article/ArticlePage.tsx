@@ -17,9 +17,10 @@ import UserContent from "@knowledge/components/UserContent";
 import { IDeviceProps } from "@knowledge/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import Container from "@knowledge/layouts/components/Container";
-import Heading from "@knowledge/components/Heading";
 import { Devices } from "@knowledge/components/DeviceChecker";
 import MobileMenu from "@knowledge/layouts/components/MobileMenu";
+import { dummyTestPost1, dummyTestPost2, dummyPostEverything } from "@knowledge/dummyPostHTML";
+import { LoadStatus } from "@dashboard/@types/api";
 
 interface IProps extends IDeviceProps {
     match: match<{
@@ -41,7 +42,76 @@ export class ArticlePage extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const breadcrumbData: IBreadcrumbsProps = {
+        if (this.props.articlePageState.status !== LoadStatus.SUCCESS) {
+            return null;
+        }
+
+        const article = this.props.articlePageState.data.article;
+
+        return (
+            <React.Fragment>
+                <MobileMenu render={this.props.device === Devices.MOBILE && this.state.menuOpen} />
+                <Container>
+                    <PanelLayout
+                        device={this.props.device}
+                        breadcrumbs={this.dummyBreadcrumbData}
+                        toggleMobileMenu={toggleMobileMenu}
+                    >
+                        {{
+                            leftTopComponents: (
+                                <PanelWidget>
+                                    <PageHeading title={t("Actions")} />
+                                </PanelWidget>
+                            ),
+                            leftBottomComponents: (
+                                <React.Fragment>
+                                    <PanelWidget>
+                                        <PageHeading title={t("Navigation")} />
+                                    </PanelWidget>
+                                </React.Fragment>
+                            ),
+                            middleTopComponents: (
+                                <PanelWidget>
+                                    <PageHeading title={article.name} />
+                                </PanelWidget>
+                            ),
+                            middleBottomComponents: (
+                                <PanelWidget>
+                                    <UserContent content={this.dummyPostData} />
+                                </PanelWidget>
+                            ),
+                            rightTopComponents: (
+                                <PanelWidget>
+                                    <PageHeading title={t("Table of Contents")} />
+                                </PanelWidget>
+                            ),
+                            rightBottomComponents: (
+                                <PanelWidget>
+                                    <PageHeading title={t("Related Articles")} />
+                                </PanelWidget>
+                            ),
+                        }}
+                    </PanelLayout>
+                </Container>
+            </React.Fragment>
+        );
+    }
+
+    private get dummyPostData(): string {
+        switch (this.props.match.params.id) {
+            case "test-post-1":
+                return dummyTestPost1;
+            case "test-post-2":
+                return dummyTestPost2;
+            case "test-post-all":
+                return dummyPostEverything;
+            default:
+                return "No dummy post data exists for this URL";
+        }
+    }
+
+    private get dummyBreadcrumbData(): IBreadcrumbsProps {
+        return {
             children: [
                 {
                     name: "one",
@@ -69,70 +139,19 @@ export class ArticlePage extends React.Component<IProps, IState> {
                 },
             ],
         };
-
-        // @ts-ignore
-        const article = this.props.articlePageState.data.article;
-
-        return (
-            <>
-                <MobileMenu render={this.props.device === Devices.MOBILE && this.state.menuOpen} />
-                <Container>
-                    <PanelLayout
-                        device={this.props.device}
-                        breadcrumbs={breadcrumbData}
-                        toggleMobileMenu={toggleMobileMenu}
-                    >
-                        {{
-                            leftTopComponents: (
-                                <PanelWidget>
-                                    <Heading title={t("Actions")} depth={2} />
-                                </PanelWidget>
-                            ),
-                            leftBottomComponents: (
-                                <React.Fragment>
-                                    <PanelWidget>
-                                        <Heading title={t("Navigation")} depth={2} />
-                                    </PanelWidget>
-                                </React.Fragment>
-                            ),
-                            middleTopComponents: (
-                                <PanelWidget>
-                                    <PageHeading title={article.name} backUrl={`#`} />
-                                </PanelWidget>
-                            ),
-                            middleBottomComponents: (
-                                <PanelWidget>
-                                    <UserContent content={article.bodyRendered} />
-                                </PanelWidget>
-                            ),
-                            rightTopComponents: (
-                                <PanelWidget>
-                                    <Heading title={t("Table of Contents")} depth={2} />
-                                </PanelWidget>
-                            ),
-                            rightBottomComponents: (
-                                <PanelWidget>
-                                    <Heading title={t("Related Articles")} depth={2} />
-                                </PanelWidget>
-                            ),
-                        }}
-                    </PanelLayout>
-                </Container>
-            </>
-        );
     }
-}
-
-function toggleMobileMenu(open: boolean = !this.state.open) {
-    this.setState({
-        menuOpen: open,
-    });
 }
 
 function mapStateToProps(state: IStoreState) {
     return {
         articlePageState: state.knowledge.articlePage,
     };
+}
+
+function toggleMobileMenu(open: boolean = !this.state.open) {
+    this.setState({
+        menuOpen: open,
+    });
 }
 
 const withRedux = connect(mapStateToProps);
