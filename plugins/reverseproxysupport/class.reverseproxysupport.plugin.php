@@ -111,7 +111,7 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
                 $filteredIPs = [];
                 foreach ($ips as $ip) {
                     $ip = trim($ip);
-                    if (filter_var($ip, FILTER_VALIDATE_IP, ['flags' => FILTER_FLAG_IPV4])) {
+                    if (filter_var($ip, FILTER_VALIDATE_IP, ['flags' => FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6])) {
                         $filteredIPs[] = $ip;
                     }
                 }
