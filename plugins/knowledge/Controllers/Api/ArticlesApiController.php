@@ -76,7 +76,7 @@ class ArticlesApiController extends \AbstractApiController {
     }
 
     /**
-     * Get an article by its numeric ID.
+     * Get an article revision by its numeric ID.
      *
      * @param int $id Article ID.
      * @return array
