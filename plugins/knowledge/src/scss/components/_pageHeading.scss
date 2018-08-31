@@ -59,7 +59,7 @@ $pageHeading-dropdown_width                  : 150px !default;
 }
 
 
-.pageHeading-back {
+.pageHeading-backLink {
   @include absolute-topLeft;
   overflow: visible;
   width: $icon-default_size;
@@ -74,7 +74,7 @@ $pageHeading-dropdown_width                  : 150px !default;
   }
 }
 
-.pageHeading-backLink {
+.pageHeading-link {
   display: block;
   height: $icon-default_size;
   width: $icon-default_size;

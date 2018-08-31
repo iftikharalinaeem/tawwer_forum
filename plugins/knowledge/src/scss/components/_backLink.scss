@@ -1,0 +1,21 @@
+/*!
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2018 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+$fullWidthLayout-backLink_breakpoint  : $global-main_paddedWidth + $icon-default_size + $utility-baseUnit * 8;
+
+@mixin mediaQuery-backLink_breakPoint {
+  @media (max-width: #{$fullWidthLayout-backLink_breakpoint}) {
+    @content;
+  }
+}
+
+//
+//.fullWidthLayout {
+//  @include mediaQuery-backLink_breakPoint {
+//    @include backLinkNoBleedStyles;
+//  }
+//}
+//

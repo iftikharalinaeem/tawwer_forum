@@ -4,42 +4,46 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
+$breadcrumbs-accentColor: $global-color_primary;
+$breadcrumbs-activeLink_opacity: 1;
 
-//.breadcrumbsWrapper {
-//  display: block;
-//  height: 24px;
-//}
-//
-//.container-breadcrumb,
-//.breadcrumbs {
-//  display: block;
-//  margin-top: $global-gutter_size;
-//  margin-bottom: $global-gutter_size;
-//  a {
-//    color: $metas_color;
-//    font-size: $global-small_fontSize;
-//  }
-//}
-//
-//.container.container-breadcrumb {
-//  margin-bottom: $utility-baseUnit;
-//}
-//
-//body.PageArticle,
-//body.pageArticle,
-//body.pageCategoryWithNav,
-//body.PageCategoryWithNav {
-//  .breadcrumbsWrapper {
-//    margin-left: 263px;
-//
-//    @include mediaQuery-columnsThreeCol_breakToOne {
-//      margin-left: $utility-baseUnit * 2;
-//    }
-//  }
-//
-//  .container-breadcrumb {
-//    @include mediaQuery-columnsThreeCol_breakToOne {
-//      margin-bottom: 0;
-//    }
-//  }
-//}
+.breadcrumbs {
+  display: block;
+}
+
+.breadcrumbs-list {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+
+.breadcrumb-link {
+  @include singleLineEllipsis;
+  line-height: 1;
+  color: inherit;
+
+  &:hover {
+    color: $breadcrumbs-accentColor;
+  }
+}
+
+.breadcrumb-current {
+  line-height: 1;
+  color: inherit;
+  opacity: $breadcrumbs-activeLink_opacity;
+}
+
+.breadcrumbs-separator {
+  user-select: none;
+}
+
+.breadcrumbs-separatorIcon {
+  font-family: arial, Sans-Serif !important; // Make sure character exists, no matter what the body font is
+  margin: 0 .5em;
+  opacity: .5;
+  position: relative;
+  top: 0.04em;
+  color: inherit;
+}

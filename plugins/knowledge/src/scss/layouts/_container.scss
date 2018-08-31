@@ -1,0 +1,22 @@
+.container {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: $global-main_paddedWidth;
+
+  margin: {
+    left: auto;
+    right: auto;
+  }
+  padding: {
+    left: $global-gutter_halfSize;
+    right: $global-gutter_halfSize;
+  }
+
+  &.panelAndNav {
+    padding: {
+      left: $global-gutter_quarterSize;
+      right: $global-gutter_quarterSize;
+    }
+  }
+}

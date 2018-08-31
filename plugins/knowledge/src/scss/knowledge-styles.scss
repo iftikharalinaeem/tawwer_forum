@@ -21,7 +21,8 @@
 @import "base/scaffolding";
 @import "base/typography";
 
-@import "layouts/layout";
+@import "layouts/page";
+@import "layouts/container";
 @import "layouts/panelLayout";
 //@import "layouts/columns";
 //@import "layouts/flexColumns";
@@ -30,7 +31,7 @@
 //
 //@import "components/widgets";
 //@import "components/metas";
-//@import "components/icons";
+@import "components/icons";
 //@import "components/buttons";
 //@import "components/buttonGroups";
 //@import "components/fullBackground";
@@ -42,7 +43,7 @@
 //@import "components/inputBlock";
 //@import "components/inputText";
 //@import "components/newArticle";
-//@import "components/pageHeading";
+@import "components/pageHeading";
 //@import "components/helpful";
 //@import "components/attachment";
 //@import "components/navMenu";
@@ -54,7 +55,7 @@
 //@import "components/formatIcons";
 //@import "components/pagination";
 //@import "components/pageMetas";
-//@import "components/breadcrumbs"; // Temporary
+@import "components/breadcrumbs";
 //@import "components/radioButtonsAsTabs";
 //@import "components/autoComplete";
 //@import "components/layoutWidget";

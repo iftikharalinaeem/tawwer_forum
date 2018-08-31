@@ -27,6 +27,7 @@ interface IPanelLayoutProps {
     breadcrumbs?: IBreadcrumbsProps;
     children: IPanelCellContent;
     className?: string;
+    toggleMobileMenu?: (open) => void;
 }
 
 export default class PanelLayout extends React.Component<IPanelLayoutProps> {
@@ -63,7 +64,7 @@ export default class PanelLayout extends React.Component<IPanelLayoutProps> {
                             }}
                         </Panel>
                         <div className="panelLayout-content">
-                            <main className="panelAndNav-mainPanel">
+                            <main className="panelLayout-middle">
                                 <PanelArea className="panelAndNav-middleTop">{children.middleTopComponents}</PanelArea>
                                 <PanelArea className="panelAndNav-mobileMiddle" render={isMobile}>
                                     {children.leftTopComponents}
@@ -77,13 +78,18 @@ export default class PanelLayout extends React.Component<IPanelLayoutProps> {
                                 <PanelArea className="panelAndNav-middleBottom">
                                     {children.middleBottomComponents}
                                 </PanelArea>
+                                <PanelArea
+                                    className="panelAndNav-tabletBottom"
+                                    render={this.props.device !== Devices.DESKTOP}
+                                >
+                                    {children.rightBottomComponents}
+                                </PanelArea>
                             </main>
                             <Panel className="panelLayout-right" render={renderedRightPanel}>
                                 {{
                                     top: {
                                         children: children.rightTopComponents,
                                         className: "panelArea-rightTop",
-                                        render: this.props.device !== Devices.DESKTOP,
                                     },
                                     bottom: {
                                         children: children.rightBottomComponents,
