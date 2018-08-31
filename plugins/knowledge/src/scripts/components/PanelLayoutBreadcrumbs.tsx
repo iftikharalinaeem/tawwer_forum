@@ -14,15 +14,17 @@ interface IPanelLayoutBreadcrumbs {
     breadcrumbs?: IBreadcrumbsProps;
     renderLeftPanel?: boolean;
     className?: string;
+    render?: boolean;
 }
 
 export default class PanelLayoutBreadcrumbs extends React.Component<IPanelLayoutBreadcrumbs> {
     public static defaultProps = {
+        render: true,
         renderLeftPanel: true,
     };
 
     public render() {
-        if (this.props.breadcrumbs && this.props.breadcrumbs.children.length > 1) {
+        if (this.props.render && this.props.breadcrumbs && this.props.breadcrumbs.children.length > 1) {
             const space = ` `;
             return (
                 <div
@@ -36,15 +38,16 @@ export default class PanelLayoutBreadcrumbs extends React.Component<IPanelLayout
                         <Panel className="panelLayout-left" render={this.props.renderLeftPanel}>
                             {{
                                 top: {
-                                    className: "panelArea-breadcrumbs isLeft",
+                                    className: "panelArea-breadcrumbsSpacer",
                                     children: <React.Fragment>{space}</React.Fragment>,
+                                    render: this.props.renderLeftPanel,
                                 },
                             }}
                         </Panel>
-                        <Panel className="panelLayout-breadcrumbs">
+                        <Panel className={className("panelLayout-breadcrumbs")}>
                             {{
                                 top: {
-                                    className: "panelArea-breadcrumbs isRight",
+                                    className: "panelArea-breadcrumbs",
                                     children: <Breadcrumbs {...this.props.breadcrumbs} />,
                                 },
                             }}

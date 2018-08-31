@@ -38,15 +38,18 @@ export default class PanelLayout extends React.Component<IPanelLayoutProps> {
     public render() {
         const children = this.props.children;
         const isMobile = this.props.device === Devices.MOBILE;
-        const renderedLeftPanel: boolean =
-            !!(!isMobile && children.leftTopComponents && children.leftBottomComponents) ||
-            (isMobile && !!children.leftBottomComponents);
+        const renderedLeftPanel: boolean = !!(
+            !isMobile &&
+            (children.leftTopComponents || children.leftBottomComponents)
+        );
         const renderedRightPanel: boolean =
             !!(children.rightTopComponents || children.rightTopComponents) && this.props.device === Devices.DESKTOP;
 
+        const renderMobilePanel = isMobile && !!children.leftBottomComponents;
+
         return (
             <div className={className("panelLayout", this.props.className)}>
-                <PanelLayoutBreadcrumbs renderLeftPanel={renderedLeftPanel} breadcrumbs={this.props.breadcrumbs} />
+                <PanelLayoutBreadcrumbs renderLeftPanel={!isMobile} breadcrumbs={this.props.breadcrumbs} />
 
                 <div className="panelLayout-main">
                     <div className="panelLayout-container">

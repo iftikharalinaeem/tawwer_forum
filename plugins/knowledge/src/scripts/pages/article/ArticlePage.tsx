@@ -50,7 +50,11 @@ export class ArticlePage extends React.Component<IProps, IState> {
 
         return (
             <React.Fragment>
-                <MobileMenu render={this.props.device === Devices.MOBILE && this.state.menuOpen} />
+                <MobileMenu render={this.props.device === Devices.MOBILE && this.state.menuOpen}>
+                    <PanelWidget>
+                        <PageHeading title={t("Navigation")} />
+                    </PanelWidget>
+                </MobileMenu>
                 <Container>
                     <PanelLayout
                         device={this.props.device}

@@ -16,7 +16,11 @@ export interface IMobileMenu {
 export default class MobileMenu extends React.Component<IMobileMenu> {
     public render() {
         if (this.props.children && this.props.render) {
-            return <div className={className("mobileMenu", this.props.className)}>{this.props.children}</div>;
+            return (
+                <React.Fragment>
+                    <div className={className("mobileMenu", this.props.className)}>{this.props.children}</div>
+                </React.Fragment>
+            );
         } else {
             return null;
         }

@@ -6,10 +6,7 @@
 
 $panelLayout-twoColumn_breakpoint                    : $global-main_paddedWidth !default;
 $panelLayout-oneColumn_breakpoint                    : $global-twoColumn_breakpoint !default;
-$panelLayout_bg                                      : $global-color_bg;
-$panelArea-rightPanel_bg                             : $panelLayout_bg;
-$panelLayout-middlePanel_bg                          : $panelLayout_bg;
-$panelArea-leftPanel_bg                              : $panelLayout_bg;
+
 $panelLayout-panel_topPadding                        : $global-widgetInner_padding !default;
 $panelLayout-panel_rightPadding                      : $global-widgetInner_padding !default;
 $panelLayout-panel_bottomPadding                     : $global-widgetInner_padding !default;
@@ -31,10 +28,13 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
   display: block;
 }
 
+
 .panelLayout,
+.panelLayout-panel,
 .panelLayout-top,
 .panelLayout-main {
   display: block;
+  width: 100%;
 }
 
 .panelLayout-container {
@@ -50,14 +50,12 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
 }
 
 
-
 // Left Section
 .panelLayout-left {
   position: relative;
   width: $global-panel_width;
   flex-basis: $global-panel_width;
   z-index: 2;
-  background-color: $panelArea-rightPanel_bg;
 
   //@include mediaQuery-panelLayout_oneColumn {
   //  position: absolute;
@@ -80,8 +78,15 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
   //}
 }
 
+.panelLayout-breadcrumbs {
+  flex-basis: calc(100% - #{$global-panel_width});
+  max-width: calc(100% - #{$global-panel_width});
 
-
+  @include mediaQuery-panelLayout_oneColumn {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+}
 
 // Content section
 .panelLayout-content {
@@ -89,16 +94,12 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
   flex-basis: calc(100% - #{$global-panel_width});
   max-width: calc(100% - #{$global-panel_width});
 
-  //@include mediaQuery-panelLayout_twoColumn {
-  //  flex-wrap: wrap;
-  //}
-  //
-  //@include mediaQuery-panelLayout_oneColumn {
-  //  @include backLinkNoBleedStyles;
-  //  max-width: 100%;
-  //  flex-basis: 100%;
-  //  padding-left: 0;
-  //}
+  @include mediaQuery-panelLayout_oneColumn {
+    @include backLinkNoBleedStyles;
+    max-width: 100%;
+    flex-basis: 100%;
+    padding-left: 0;
+  }
 }
 
 // Middle Column
@@ -106,7 +107,6 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
   flex-grow: 1;
   flex-basis: calc(100% - #{$global-panel_width});
   max-width: calc(100% - #{$global-panel_width});
-  background-color: $panelLayout-middlePanel_bg;
 
   @include mediaQuery-panelLayout_twoColumn {
     width: 100%;
@@ -118,14 +118,11 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
 .panelLayout-right {
   width: $global-panel_width;
   flex-basis: $global-panel_width;
-  background-color: $panelArea-rightPanel_bg;
 }
 
 .panelArea-rightTop {
   margin-bottom: $global-gutter_halfSize;
 }
-
-
 
 .panelArea-leftTop {
   margin-bottom: $global-gutter_halfSize;
@@ -136,12 +133,6 @@ $panelLayout-panel_leftPadding                       : $global-widgetInner_paddi
   margin-bottom: $global-gutter_halfSize;
   position: relative;
 }
-
-
-
-
-
-
 
 @include mediaQuery-panelLayout_oneColumn {
   .panelLayout-sticky {
