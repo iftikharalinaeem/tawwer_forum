@@ -17,6 +17,8 @@ import UserContent from "@knowledge/components/UserContent";
 import { IDeviceProps } from "@knowledge/components/DeviceChecker";
 import { withDevice } from "@knowledge/contexts/DeviceContext";
 import Container from "@knowledge/layouts/components/Container";
+import { dummyTestPost1, dummyTestPost2, dummyPostEverything } from "@knowledge/dummyPostHTML";
+import { LoadStatus } from "@dashboard/@types/api";
 
 interface IProps extends IDeviceProps {
     match: match<{
@@ -27,7 +29,69 @@ interface IProps extends IDeviceProps {
 
 export class ArticlePage extends React.Component<IProps> {
     public render() {
-        const breadcrumbDummyData: IBreadcrumbsProps = {
+        if (this.props.articlePageState.status !== LoadStatus.SUCCESS) {
+            return null;
+        }
+
+        const article = this.props.articlePageState.data.article;
+
+        return (
+            <Container>
+                <PanelLayout device={this.props.device} breadcrumbs={this.dummyBreadcrumbData}>
+                    {{
+                        leftTopComponents: (
+                            <PanelWidget>
+                                <PageHeading title={t("Actions")} />
+                            </PanelWidget>
+                        ),
+                        leftBottomComponents: (
+                            <React.Fragment>
+                                <PanelWidget>
+                                    <PageHeading title={t("Navigation")} />
+                                </PanelWidget>
+                            </React.Fragment>
+                        ),
+                        middleTopComponents: (
+                            <PanelWidget>
+                                <PageHeading title={article.name} />
+                            </PanelWidget>
+                        ),
+                        middleBottomComponents: (
+                            <PanelWidget>
+                                <UserContent content={this.dummyPostData} />
+                            </PanelWidget>
+                        ),
+                        rightTopComponents: (
+                            <PanelWidget>
+                                <PageHeading title={t("Table of Contents")} />
+                            </PanelWidget>
+                        ),
+                        rightBottomComponents: (
+                            <PanelWidget>
+                                <PageHeading title={t("Related Articles")} />
+                            </PanelWidget>
+                        ),
+                    }}
+                </PanelLayout>
+            </Container>
+        );
+    }
+
+    private get dummyPostData(): string {
+        switch (this.props.match.params.id) {
+            case "test-post-1":
+                return dummyTestPost1;
+            case "test-post-2":
+                return dummyTestPost2;
+            case "test-post-all":
+                return dummyPostEverything;
+            default:
+                return "No dummy post data exists for this URL";
+        }
+    }
+
+    private get dummyBreadcrumbData(): IBreadcrumbsProps {
+        return {
             children: [
                 {
                     name: "one",
@@ -55,50 +119,6 @@ export class ArticlePage extends React.Component<IProps> {
                 },
             ],
         };
-
-        // @ts-ignore
-        const article = this.props.articlePageState.data.article;
-
-        return (
-            <Container>
-                <PanelLayout device={this.props.device} breadcrumbs={breadcrumbDummyData}>
-                    {{
-                        leftTopComponents: (
-                            <PanelWidget>
-                                <PageHeading title={t("Actions")} />
-                            </PanelWidget>
-                        ),
-                        leftBottomComponents: (
-                            <React.Fragment>
-                                <PanelWidget>
-                                    <PageHeading title={t("Navigation")} />
-                                </PanelWidget>
-                            </React.Fragment>
-                        ),
-                        middleTopComponents: (
-                            <PanelWidget>
-                                <PageHeading title={article.name} />
-                            </PanelWidget>
-                        ),
-                        middleBottomComponents: (
-                            <PanelWidget>
-                                <UserContent content={article.bodyRendered} />
-                            </PanelWidget>
-                        ),
-                        rightTopComponents: (
-                            <PanelWidget>
-                                <PageHeading title={t("Table of Contents")} />
-                            </PanelWidget>
-                        ),
-                        rightBottomComponents: (
-                            <PanelWidget>
-                                <PageHeading title={t("Related Articles")} />
-                            </PanelWidget>
-                        ),
-                    }}
-                </PanelLayout>
-            </Container>
-        );
     }
 }
 
